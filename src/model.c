@@ -407,7 +407,7 @@ void mtic_readParameter(const char *name, void *value, long *size){
 /**
  * \fn mtic_readInputAsBool(char *name)
  * \brief Find the Agent's input by name and return the input value as a Boolean.
- * \param Take the name of the input to read as it has been defined in the definition.
+ * \param name is the name of the input to read as it has been defined in the definition.
  * \return Return the input value as true or false.
  */
 bool mtic_readInputAsBool(const char *name){
@@ -469,7 +469,7 @@ bool mtic_readInputAsBool(const char *name){
 /**
  * \fn mtic_readInputAsInt(char *name)
  * \brief Find the Agent's input by name and return the input value as an integer.
- * \param Take the name of the input to read as it has been defined in the definition.
+ * \param name is the name of the input to read as it has been defined in the definition.
  * \return Return the input value as an integer.
  */
 int mtic_readInputAsInt(const char *name){
@@ -650,7 +650,7 @@ void mtic_readInputAsData(const char *name, void *data, long *size){ //allocs da
 /**
  * \fn mtic_readOutputAsBool(const char *name)
  * \brief Find the Agent's output by name and return the output value as a Boolean.
- * \param Take the name of the output to read as it has been defined in the definition.
+ * \param name is the name of the output to read as it has been defined in the definition.
  * \return Return the output value as true or false.
  */
 bool mtic_readOutputAsBool(const char *name){
@@ -711,7 +711,7 @@ bool mtic_readOutputAsBool(const char *name){
 /**
  * \fn mtic_readOutputAsInt(const char *name)
  * \brief Find the Agent's output by name and return the output value as an integer.
- * \param Take the name of the output to read as it has been defined in the definition.
+ * \param name is the name of the output to read as it has been defined in the definition.
  * \return Return the output value as an integer.
  */
 int mtic_readOutputAsInt(const char *name){
@@ -773,7 +773,7 @@ int mtic_readOutputAsInt(const char *name){
 /**
  * \fn mtic_readOutputAsDouble(const char *name)
  * \brief Find the Agent's output by name and return the output value as a double.
- * \param Take the name of the output to read as it has been defined in the definition.
+ * \param name is the name of the output to read as it has been defined in the definition.
  * \return Return the output value as a double.
  */
 double mtic_readOutputAsDouble(const char *name){
@@ -837,7 +837,7 @@ double mtic_readOutputAsDouble(const char *name){
  * \fn mtic_readOutputAsString(const char *name)
  * \brief Find the Agent's output by name and return the output value as a string.
  *        WARNING: Allocating memory that must be free after use.
- * \param Take the name of the output to read as it has been defined in the definition.
+ * \param name is the name of the output to read as it has been defined in the definition.
  * \return Return the output value as a string.
  */
 char* mtic_readOutputAsString(const char *name){
@@ -892,7 +892,7 @@ void mtic_readOutputAsData(const char *name, void *data, long *size){ //allocs d
 /**
  * \fn mtic_readParameterAsBool(const char *name)
  * \brief Find the Agent's parameter by name and return the output value as a Boolean.
- * \param Take the name of the parameter to read as it has been defined in the definition.
+ * \param name is the name of the parameter to read as it has been defined in the definition.
  * \return Return the parameter value as true or false.
  */
 bool mtic_readParameterAsBool(const char *name){
@@ -953,7 +953,7 @@ bool mtic_readParameterAsBool(const char *name){
 /**
  * \fn mtic_readParameterAsInt(const char *name)
  * \brief Find the Agent's parameter by name and return the parameter value as an integer.
- * \param Take the name of the parameter to read as it has been defined in the definition.
+ * \param name is the name of the parameter to read as it has been defined in the definition.
  * \return Return the parameter value as an integer.
  */
 int mtic_readParameterAsInt(const char *name){
@@ -1015,7 +1015,7 @@ int mtic_readParameterAsInt(const char *name){
 /**
  * \fn mtic_readParameterAsDouble(const char *name)
  * \brief Find the Agent's parameter by name and return the output value as a double.
- * \param Take the name of the output to read as it has been defined in the definition.
+ * \param name is the name of the output to read as it has been defined in the definition.
  * \return Return the parameter value as a double.
  */
 double mtic_readParameterAsDouble(const char *name){
@@ -1078,7 +1078,7 @@ double mtic_readParameterAsDouble(const char *name){
  * \fn mtic_readParameterAsString(const char *name)
  * \brief Find the Agent's parameter by name and return the output value as a string.
  *        WARNING: Allocating memory that must be free after use.
- * \param Take the name of the parameter to read as it has been defined in the definition.
+ * \param name is the name of the parameter to read as it has been defined in the definition.
  * \return Return the parameter value as a string.
  */
 char* mtic_readParameterAsString(const char *name){
