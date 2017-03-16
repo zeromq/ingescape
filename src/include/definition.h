@@ -9,10 +9,14 @@
 #ifndef DEFINITION_H
 #define DEFINITION_H
 
+#if defined Q_OS_WIN
 #if defined MASTIC
- #define MASTICAPI_COMMON_DLLSPEC __declspec(dllexport)
+#define MASTICAPI_COMMON_DLLSPEC __declspec(dllexport)
 #else
- #define MASTICAPI_COMMON_DLLSPEC __declspec(dllimport)
+#define MASTICAPI_COMMON_DLLSPEC __declspec(dllimport)
+#endif
+#else
+#define MASTICAPI_COMMON_DLLSPEC extern
 #endif
 
 #include <stdio.h>

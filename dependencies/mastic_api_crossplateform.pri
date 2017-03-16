@@ -59,18 +59,29 @@ win32:{
     LIBS += -L$$C:/Windows/System32 -lwsock32
     LIBS += -L$$C:/Windows/System32 -lIPHLPAPI
     LIBS += -L$$C:/Windows/System32 -lws2_32
+}
 
+macx:{
+
+    libzyre_path = $$PWD/zyre/bin/Unix
+    libyajl_path = $$PWD/yajl/lloyd-yajl-2.1.0/UNIX/lib
+
+    #Add librairies
+    LIBS += -L$$libzyre_path -lzmq -lczmq -lzyre \
+            -L$$libyajl_path -lyajl
+
+}
 #--------- COMMON ---------#
 
 ##Add headers from dependencies
 INCLUDEPATH += $$PWD/libzmq/include \
                $$PWD/czmq/include \
                $$PWD/zyre/include \
-               $$PWD/yajl/lloyd-yajl-2.1.0/MSVS/include
+               $$PWD/yajl/lloyd-yajl-2.1.0/UNIX/include
 
 DEPENDPATH += $$PWD/libzmq/include \
               $$PWD/czmq/include \
               $$PWD/zyre/include \
-              $$PWD/yajl/lloyd-yajl-2.1.0/MSVS/include
+              $$PWD/yajl/lloyd-yajl-2.1.0/UNIX/include
 
 
