@@ -59,6 +59,7 @@ win32:{
     LIBS += -L$$C:/Windows/System32 -lwsock32
     LIBS += -L$$C:/Windows/System32 -lIPHLPAPI
     LIBS += -L$$C:/Windows/System32 -lws2_32
+}
 
 #--------- COMMON ---------#
 
