@@ -63,8 +63,8 @@ win32:{
 
 macx:{
 
-    libzyre_path = $$PWD/zyre/bin/Unix
-    libyajl_path = $$PWD/yajl/lloyd-yajl-2.1.0/UNIX/lib
+    libzyre_path = $$PWD/zyre/bin/Macos
+    libyajl_path = $$PWD/yajl/lloyd-yajl-2.1.0/Macos/lib
 
     #Add librairies
     LIBS += -L$$libzyre_path -lzmq -lczmq -lzyre \
