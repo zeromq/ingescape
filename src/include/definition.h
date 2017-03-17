@@ -128,9 +128,9 @@ typedef struct definition_t {
     UT_hash_handle hh;
 } definition;
 
-MASTICAPI_COMMON_DLLSPEC extern definition * definition_loaded;
-MASTICAPI_COMMON_DLLSPEC extern definition * definition_live;
-MASTICAPI_COMMON_DLLSPEC extern definition * agents_defs_on_network;
+MASTICAPI_COMMON_DLLSPEC definition * definition_loaded;
+MASTICAPI_COMMON_DLLSPEC definition * definition_live;
+MASTICAPI_COMMON_DLLSPEC definition * agents_defs_on_network;
 
 /*
  * Function: string_to_value_type

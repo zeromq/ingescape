@@ -79,6 +79,26 @@ macx:{
 
     INSTALLS += install_libs
 }
+
+unix:{
+
+    libzyre_path = $$PWD/zyre/bin/Linux
+    libyajl_path = $$PWD/yajl/lloyd-yajl-2.1.0/Linux/lib
+
+    #Add librairies
+    LIBS += -L$$libzyre_path -lzmq -lczmq -lzyre \
+            -L$$libyajl_path -lyajl
+
+    #Intallation librairie
+    #DESTDIR = /usr/local/lib
+
+    #install_libs.files += $$libzyre_path/*.so \
+    #                        $$libyajl_path/*.so
+    #install_libs.path += $$DESTDIR
+
+    #INSTALLS += install_libs
+}
+
 #--------- COMMON ---------#
 
 ##Add headers from dependencies
