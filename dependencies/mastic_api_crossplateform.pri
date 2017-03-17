@@ -74,7 +74,7 @@ macx:{
     DESTDIR = /usr/local/lib
 
     install_libs.files += $$libzyre_path/*.dylib \
-                            $$libyajl_path/*.dylib
+                          $$libyajl_path/*.dylib
     install_libs.path += $$DESTDIR
 
     INSTALLS += install_libs
