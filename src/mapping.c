@@ -10,7 +10,7 @@
 #include "parser.h"
 
 // Global parameter declaration
-mapping * my_agent_mapping = NULL;
+mapping * mtic_my_agent_mapping = NULL;
 
 
 const char * map_state_to_string(map_state state){
@@ -98,25 +98,25 @@ void copy_to_map_global(mapping *loaded){
      *
      */
     //Initialize the table mapping if it is not
-    if(my_agent_mapping == NULL){
-        my_agent_mapping = calloc (1, sizeof (struct mapping_t));
+    if(mtic_my_agent_mapping == NULL){
+        mtic_my_agent_mapping = calloc (1, sizeof (struct mapping_t));
     }
-    if(my_agent_mapping->name) {
-        free((char*)my_agent_mapping->name);
-        my_agent_mapping->name = NULL;
+    if(mtic_my_agent_mapping->name) {
+        free((char*)mtic_my_agent_mapping->name);
+        mtic_my_agent_mapping->name = NULL;
     }
-    if(my_agent_mapping->description) {
-        free((char*)my_agent_mapping->description);
-        my_agent_mapping->description = NULL;
+    if(mtic_my_agent_mapping->description) {
+        free((char*)mtic_my_agent_mapping->description);
+        mtic_my_agent_mapping->description = NULL;
     }
-    if(my_agent_mapping->version) {
-        free((char*)my_agent_mapping->version);
-        my_agent_mapping->version = NULL;
+    if(mtic_my_agent_mapping->version) {
+        free((char*)mtic_my_agent_mapping->version);
+        mtic_my_agent_mapping->version = NULL;
     }
 
-    my_agent_mapping->name = strdup(loaded->name);
-    my_agent_mapping->description = strdup(loaded->description);
-    my_agent_mapping->version = strdup(loaded->version);
+    mtic_my_agent_mapping->name = strdup(loaded->name);
+    mtic_my_agent_mapping->description = strdup(loaded->description);
+    mtic_my_agent_mapping->version = strdup(loaded->version);
 
     /*
      * Mapping output
@@ -133,8 +133,8 @@ void copy_to_map_global(mapping *loaded){
         strcpy(out_name,temp->output_name);
         strcat(map_description, out_name);
 
-        //map
-        map(temp->input_name,map_description);
+        //mtic_map
+        mtic_map(temp->input_name,map_description);
     }
 }
 
@@ -148,10 +148,10 @@ mapping_out * add_map_to_table(char * input_name,
     *report = 0;
     
     //Check in the mapping live table if the mapping already exist and if it's ON
-    if(my_agent_mapping != NULL){
+    if(mtic_my_agent_mapping != NULL){
         mapping_out * map_out = NULL;
 
-        for(map_out = my_agent_mapping->map_out; map_out != NULL && *report == 0; map_out = map_out->hh.next) {
+        for(map_out = mtic_my_agent_mapping->map_out; map_out != NULL && *report == 0; map_out = map_out->hh.next) {
             if(     (strcmp(map_out->input_name, input_name) == 0) &&
                     (strcmp(map_out->agent_name, agent_name) == 0) &&
                     (strcmp(map_out->output_name, output_name) == 0)
@@ -184,17 +184,17 @@ mapping_out * add_map_to_table(char * input_name,
         new_map_out->state = OFF;
 
         //Initialize the table mapping if it is not
-        if(my_agent_mapping == NULL){
-            my_agent_mapping = calloc (1, sizeof (struct mapping_t));
+        if(mtic_my_agent_mapping == NULL){
+            mtic_my_agent_mapping = calloc (1, sizeof (struct mapping_t));
         }
         //Count actual mapping to define the map_int
         new_map_out->map_id = 0;
-        new_map_out->map_id = HASH_COUNT(my_agent_mapping->map_out) + 1;
+        new_map_out->map_id = HASH_COUNT(mtic_my_agent_mapping->map_out) + 1;
 
         //Add the input -> Agent name & output in the map table
-        HASH_ADD_INT(my_agent_mapping->map_out, map_id, new_map_out);
+        HASH_ADD_INT(mtic_my_agent_mapping->map_out, map_id, new_map_out);
 
-        debug("Add agent mapping : %s -> %s.%s.\n",new_map_out->input_name,new_map_out->agent_name,new_map_out->output_name);
+        mtic_debug("Add agent mapping : %s -> %s.%s.\n",new_map_out->input_name,new_map_out->agent_name,new_map_out->output_name);
     }
 
     return new_map_out;
@@ -262,7 +262,7 @@ int split_map_description(char* map_description,
     return 0;
 }
 
-int map (char* input_name,char* map_description){
+int mtic_map (char* input_name,char* map_description){
 
     int result = 0;
     agent_iop *input_to_map = NULL;     // the input to map
@@ -271,7 +271,7 @@ int map (char* input_name,char* map_description){
     int error_code = -1;
 
     //Find the input by the name in the table of the my agent's definition
-    HASH_FIND_STR(definition_loaded->inputs_table, input_name, input_to_map);
+    HASH_FIND_STR(mtic_definition_loaded->inputs_table, input_name, input_to_map);
 
     if(input_to_map == NULL){
         fprintf (stderr, "%s : input name %s not found \n",
@@ -384,15 +384,15 @@ model_state map_received(const char *agent_name, char *out_name, void *value){
     model_state state = NOK;
 
     // Check the existence of our map
-    if(my_agent_mapping != NULL)
+    if(mtic_my_agent_mapping != NULL)
     {
-        for(temp = my_agent_mapping->map_out; temp != NULL; temp = temp->hh.next) {
+        for(temp = mtic_my_agent_mapping->map_out; temp != NULL; temp = temp->hh.next) {
             if( (strcmp(agent_name, temp->agent_name) == 0)
                && (strcmp(out_name, temp->output_name) == 0) &&
                (temp->state == ON)){
 
                 // Set the new input and update the live model
-                state = set(temp->input_name, value);
+                state = mtic_set(temp->input_name, value);
             }
         }
     }
@@ -407,7 +407,7 @@ bool check_iop_type(char * input_name,
                     agent_iop* output){
 
     agent_iop * input = NULL;
-    HASH_FIND_STR(definition_live->inputs_table,input_name,input);
+    HASH_FIND_STR(mtic_definition_live->inputs_table,input_name,input);
 
     if(input == NULL)
         return false;
@@ -429,7 +429,7 @@ mapping_out * find_map(char * input_name,
                        char * agent_name,
                        char * output_name){
     mapping_out *temp = NULL;
-    for(temp = my_agent_mapping->map_out; temp != NULL; temp = temp->hh.next) {
+    for(temp = mtic_my_agent_mapping->map_out; temp != NULL; temp = temp->hh.next) {
         if((strcmp(input_name, temp->input_name) == 0) &&
            (strcmp(agent_name, temp->agent_name) == 0) &&
            (strcmp(output_name, temp->output_name) == 0)){
@@ -439,11 +439,11 @@ mapping_out * find_map(char * input_name,
     return NULL;
 }
 
-agent_iop* check_map(definition *definition){
+agent_iop* mtic_check_map(definition *definition){
     agent_iop *outputs = NULL;
 
     // If my agent_mapping has been created
-    if(my_agent_mapping != NULL)
+    if(mtic_my_agent_mapping != NULL)
     {
         //Check if the agent is concerning by a mapping
         char * agent_to_map_name = NULL;
@@ -456,7 +456,7 @@ agent_iop* check_map(definition *definition){
         mapping_out *temp;
         mapping_out *current_map;
 
-        for(temp = my_agent_mapping->map_out; temp != NULL; temp = temp->hh.next) {
+        for(temp = mtic_my_agent_mapping->map_out; temp != NULL; temp = temp->hh.next) {
             if((strcmp(agent_to_map_name, temp->agent_name) == 0) ||
                (strcmp("*", temp->agent_name) == 0)){
                 current_map = NULL;
@@ -507,7 +507,7 @@ agent_iop* check_map(definition *definition){
                         HASH_ADD_KEYPTR(hh,outputs, new_iop->name, strlen(new_iop->name), new_iop);
                     }
                 } else {
-                    printf("Error : Unable to map %s with %s\n.",definition_live->name, definition->name);
+                    printf("Error : Unable to map %s with %s\n.",mtic_definition_live->name, definition->name);
                     if(current_map->state == ON)
                         current_map->state = OFF;
                 }
@@ -522,15 +522,15 @@ agent_iop* check_map(definition *definition){
     return outputs;
 }
 
-agent_iop* unmap(definition *definition){
+agent_iop* mtic_unmap(definition *definition){
     agent_iop *return_out_table = NULL;
     agent_iop *out_found = NULL;
     mapping_out *current_map_out = NULL;
 
     //Read the table of mapping
-    if(my_agent_mapping != NULL)
+    if(mtic_my_agent_mapping != NULL)
     {
-        for(current_map_out = my_agent_mapping->map_out; current_map_out != NULL; current_map_out = current_map_out->hh.next){
+        for(current_map_out = mtic_my_agent_mapping->map_out; current_map_out != NULL; current_map_out = current_map_out->hh.next){
 
             //The agent name is found
             if(strcmp(current_map_out->agent_name, definition->name) == 0){

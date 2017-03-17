@@ -26,18 +26,18 @@ typedef struct callbacks_t {
 } callbacks;
 
 /*
- * Function: find_iop_by_name
+ * Function: mtic_find_iop_by_name
  * ----------------------------
  *
  */
-MASTICAPI_COMMON_DLLSPEC agent_iop * find_iop_by_name(const char* name, model_state *code);
-MASTICAPI_COMMON_DLLSPEC agent_iop * find_iop_by_name_on_definition(const char *name, definition* definition, model_state *code);
+MASTICAPI_COMMON_DLLSPEC agent_iop * mtic_find_iop_by_name(const char* name, model_state *code);
+MASTICAPI_COMMON_DLLSPEC agent_iop * mtic_find_iop_by_name_on_definition(const char *name, definition* definition, model_state *code);
 
 /*
  * Function: observe :
  * ----------------------------
  *  Observe the iop and associate a callback to it.
- *  When the iop value will change by calling the 'set' function, the associated callback will be called.
+ *  When the iop value will change by calling the 'mtic_set' function, the associated callback will be called.
  *
  *  name_iop        : Name of the 'input/output/parameter'
  *
@@ -46,11 +46,11 @@ MASTICAPI_COMMON_DLLSPEC agent_iop * find_iop_by_name_on_definition(const char *
  *  return : model_state (cf. enum) return error is occur
  */
 
-MASTICAPI_COMMON_DLLSPEC model_state observe(const char *iop_name,
+MASTICAPI_COMMON_DLLSPEC model_state mtic_observe(const char *iop_name,
                     void (*callback_fct)(agent_iop *input_iop) );
 
 /*
- * Function: set
+ * Function: mtic_set
  * ----------------------------
  *  Set the new value to the associated iop.
  *
@@ -60,10 +60,10 @@ MASTICAPI_COMMON_DLLSPEC model_state observe(const char *iop_name,
  *
  *  return : model_state (cf. enum) return error is occur
  */
-MASTICAPI_COMMON_DLLSPEC model_state set(const char* iop_name, void* new_value);
+MASTICAPI_COMMON_DLLSPEC model_state mtic_set(const char* iop_name, void* new_value);
 
 /*
- * Function: get
+ * Function: mtic_get
  * ----------------------------
  *  Find the 'input/output/parameter' value.
  *
@@ -73,7 +73,7 @@ MASTICAPI_COMMON_DLLSPEC model_state set(const char* iop_name, void* new_value);
  *
  *  return : pointer on the value OR null
  */
-MASTICAPI_COMMON_DLLSPEC void * get(const char* name_iop, model_state* state);
+MASTICAPI_COMMON_DLLSPEC void * mtic_get(const char* name_iop, model_state* state);
 
 /*
  * Function: mute
@@ -84,7 +84,7 @@ MASTICAPI_COMMON_DLLSPEC void * get(const char* name_iop, model_state* state);
  *
  *  return : 0 is the output has been properly muted, -1 otherwise.
  */
-MASTICAPI_COMMON_DLLSPEC int mute(const char* name_iop);
+MASTICAPI_COMMON_DLLSPEC int mtic_mute(const char* name_iop);
 
 /*
  * Function: unmute
@@ -95,25 +95,25 @@ MASTICAPI_COMMON_DLLSPEC int mute(const char* name_iop);
  *
  *  return : 0 is the output has been properly unmuted, -1 otherwise.
  */
-MASTICAPI_COMMON_DLLSPEC int unmute(const char* name_iop);
+MASTICAPI_COMMON_DLLSPEC int mtic_unmute(const char* name_iop);
 
 /*
- * Function: muteAll
+ * Function: mtic_muteAll
  * ----------------------------
  *  Mute all outputs.
  *
  *  return : 0 is the outputs have been properly muted, -1 otherwise.
  */
-MASTICAPI_COMMON_DLLSPEC int muteAll();
+MASTICAPI_COMMON_DLLSPEC int mtic_muteAll();
 
 /*
- * Function: unmuteAll
+ * Function: unmtic_muteAll
  * ----------------------------
  *  Unmute all outputs.
  *
  *  return : 0 is the outputs have been properly unmuted, -1 otherwise.
  */
-MASTICAPI_COMMON_DLLSPEC int unmuteAll();
+MASTICAPI_COMMON_DLLSPEC int unmtic_muteAll();
 
 
 

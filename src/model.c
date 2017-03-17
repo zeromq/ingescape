@@ -12,7 +12,7 @@ callbacks *agent_callbacks;
 
 // ------------ main functions use in 'MODEL' --------------- //
 
-agent_iop * find_iop_by_name_on_definition(const char *name, definition* definition, model_state *code){
+agent_iop * mtic_find_iop_by_name_on_definition(const char *name, definition* definition, model_state *code){
     agent_iop *found = NULL;
     
     if(name != NULL && definition != NULL){
@@ -51,9 +51,9 @@ agent_iop * find_iop_by_name_on_definition(const char *name, definition* definit
     }
 }
 
-agent_iop * find_iop_by_name(const char *name, model_state *code){
+agent_iop * mtic_find_iop_by_name(const char *name, model_state *code){
     
-    return find_iop_by_name_on_definition(name,definition_live,code);
+    return mtic_find_iop_by_name_on_definition(name,mtic_definition_live,code);
 }
 
 
@@ -95,12 +95,12 @@ void update_value(agent_iop *iop, void* value){
 }
 
 
-model_state observe(const char *iop_name,
+model_state mtic_observe(const char *iop_name,
              void (*callback_fct)(agent_iop *input_iop)){
 
     //1) find the iop
     model_state code;
-    agent_iop *iop = find_iop_by_name((char*)iop_name,&code);
+    agent_iop *iop = mtic_find_iop_by_name((char*)iop_name,&code);
 
     if(iop == NULL)
         return code;
@@ -118,9 +118,9 @@ model_state observe(const char *iop_name,
 }
 
 
-void * get(const char *name_iop, model_state *state){
+void * mtic_get(const char *name_iop, model_state *state){
 
-    agent_iop *iop = find_iop_by_name((char*) name_iop, state);
+    agent_iop *iop = mtic_find_iop_by_name((char*) name_iop, state);
 
     if(iop == NULL)
         return state;
@@ -153,11 +153,11 @@ void * get(const char *name_iop, model_state *state){
 }
 
 
-model_state set(const char *iop_name, void *new_value){
+model_state mtic_set(const char *iop_name, void *new_value){
 
     //1) find the iop
     model_state code;
-    agent_iop *iop = find_iop_by_name((char*) iop_name,&code);
+    agent_iop *iop = mtic_find_iop_by_name((char*) iop_name,&code);
 
     if(iop == NULL)
         return code;
@@ -166,8 +166,8 @@ model_state set(const char *iop_name, void *new_value){
     update_value(iop, new_value);
     
     // Let us know the value has changed
-    char* str_value = iop_value_to_string(iop);
-    debug("SET(%s,%s).\n",iop_name,str_value);
+    char* str_value = mtic_iop_value_to_string(iop);
+    mtic_debug("SET(%s,%s).\n",iop_name,str_value);
     free(str_value);
 
     //3) Callback associated from 'observe' function
@@ -191,12 +191,12 @@ model_state set(const char *iop_name, void *new_value){
     return OK;
 }
 
-int mute(const char* iop_name)
+int mtic_mute(const char* iop_name)
 {
     int result = -1;
     model_state code;
-    // get iop object
-    agent_iop *iop = find_iop_by_name((char*)iop_name,&code);
+    // mtic_get iop object
+    agent_iop *iop = mtic_find_iop_by_name((char*)iop_name,&code);
     
     if(iop != NULL)
     {
@@ -208,12 +208,12 @@ int mute(const char* iop_name)
     return result;
 }
 
-int unmute(const char* iop_name)
+int mtic_unmute(const char* iop_name)
 {
     int result = -1;
     model_state code;
-    // get iop object
-    agent_iop *iop = find_iop_by_name((char*)iop_name,&code);
+    // mtic_get iop object
+    agent_iop *iop = mtic_find_iop_by_name((char*)iop_name,&code);
     
     if(iop != NULL)
     {
@@ -225,16 +225,16 @@ int unmute(const char* iop_name)
     return result;
 }
 
-int muteAll()
+int mtic_muteAll()
 {
     int result = 0,result_tmp = 0;
 
     // Go through the agent outpust to mute them
     struct agent_iop_t *current_iop, *tmp_iop;
-    HASH_ITER(hh, definition_live->outputs_table, current_iop, tmp_iop) {
+    HASH_ITER(hh, mtic_definition_live->outputs_table, current_iop, tmp_iop) {
         if(current_iop != NULL)
         {
-            result_tmp = mute(current_iop->name);
+            result_tmp = mtic_mute(current_iop->name);
             // If one one the output has not been muted, we notice it
             if(result_tmp != 0)
             {
@@ -247,16 +247,16 @@ int muteAll()
 }
 
 
-int unmuteAll()
+int mtic_unmuteAll()
 {
     int result = 0,result_tmp = 0;
     
     // Go through the agent outpust to mute them
     struct agent_iop_t *current_iop, *tmp_iop;
-    HASH_ITER(hh, definition_live->outputs_table, current_iop, tmp_iop) {
+    HASH_ITER(hh, mtic_definition_live->outputs_table, current_iop, tmp_iop) {
         if(current_iop != NULL)
         {
-            result_tmp = unmute(current_iop->name);
+            result_tmp = mtic_unmute(current_iop->name);
             // If one one the output has not been unmuted, we notice it
             if(result_tmp != 0)
             {

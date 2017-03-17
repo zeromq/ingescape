@@ -21,12 +21,12 @@ int publishOutput(const char* output_name);
 
 
 /*
- * Function: temporaireStart
+ * Function: masticStart
  * ----------------------------
  *   Start the network service
  *
- *   usage : temporaireStart(agentName, networkDevice, zyrePort,channel)
- *         example : temporaireStart("TEMPORAIRE_TEST", "en15", 5670, "TEMPORAIRE")
+ *   usage : masticStart(agentName, networkDevice, zyrePort,channel)
+ *         example : masticStart("MASTIC_TEST", "en15", 5670, "MASTIC")
  *
  *   agentName          : agent name
  *   networkDevice      : device of connection
@@ -35,18 +35,18 @@ int publishOutput(const char* output_name);
  *
  *   returns : the state of the connection
  */
-MASTICAPI_COMMON_DLLSPEC int temporaireStart(const char *agentName, const char *networkDevice, int zyrePort, const char *channel);
+MASTICAPI_COMMON_DLLSPEC int masticStart(const char *agentName, const char *networkDevice, int zyrePort, const char *channel);
 
 /*
- * Function: temporaireStop
+ * Function: masticStop
  * ----------------------------
  *   Stop the network service
  *
- *   usage : temporaireStop()
+ *   usage : masticStop()
  *
  *   returns : the state of the disconnection
  */
-MASTICAPI_COMMON_DLLSPEC int temporaireStop();
+MASTICAPI_COMMON_DLLSPEC int masticStop();
 
 /*
  * Function: subscribeTo
@@ -77,15 +77,15 @@ int subscribeTo(const char *agentName, const char *filterDescription);
 int unsubscribeTo(const char *agentName, const char *outputName);
 
 /*
- * Function: sendDefinition
+ * Function: mtic_sendDefinition
  * ----------------------------
  *   Send my definition through the agent publisher
- *   The agent definition must be defined : definition_loaded
+ *   The agent definition must be defined : mtic_definition_loaded
  *
- *   usage : sendDefinition()
+ *   usage : mtic_sendDefinition()
  *
  */
-MASTICAPI_COMMON_DLLSPEC void sendDefinition();
+MASTICAPI_COMMON_DLLSPEC void mtic_sendDefinition();
 
 /*
  * Function: publishOutput
@@ -113,48 +113,48 @@ int publishOutput(const char* output_name);
 int checkAndSubscribeTo(const char* agentName);
 
 /*
- * Function: temporairePause
+ * Function: masticPause
  * ----------------------------
  *   Pause the agent (all subscribtion and publish)
  *
- *   usage : temporairePause()
+ *   usage : masticPause()
  *
  *
  */
-MASTICAPI_COMMON_DLLSPEC void temporairePause();
+MASTICAPI_COMMON_DLLSPEC void masticPause();
 
 /*
- * Function: temporaireResume
+ * Function: masticResume
  * ----------------------------
  *   Resume the agent (all subscribtion and publish)
  *
- *   usage : temporaireResume()
+ *   usage : masticResume()
  *
  *
  */
-MASTICAPI_COMMON_DLLSPEC void temporaireResume();
+MASTICAPI_COMMON_DLLSPEC void masticResume();
 
 /*
- * Function: temporaireTogglePlayPause
+ * Function: masticTogglePlayPause
  * ----------------------------
  *   Play the agent if it is pauses, resume it otherwise.
  *
- *   usage : temporaireTogglePlayPause()
+ *   usage : masticTogglePlayPause()
  *
  *   return : is_paused state
  *
  */
-MASTICAPI_COMMON_DLLSPEC bool temporaireTogglePlayPause();
+MASTICAPI_COMMON_DLLSPEC bool masticTogglePlayPause();
 
 /*
- * Function: temporaire_set_verbose
+ * Function: mtic_set_verbose
  * ----------------------------
  *   Set verbose mode
  *
- *   usage : temporaire_set_verbose(is_verbose)
+ *   usage : mtic_set_verbose(is_verbose)
  *
  */
-MASTICAPI_COMMON_DLLSPEC void temporaire_set_verbose(bool is_verbose);
+MASTICAPI_COMMON_DLLSPEC void mtic_set_verbose(bool is_verbose);
 
 /*
  * Function: debug
@@ -162,9 +162,9 @@ MASTICAPI_COMMON_DLLSPEC void temporaire_set_verbose(bool is_verbose);
  *   trace debug messages only on verbose mode
  *   Print file name and line number in debug mode
  *
- *   usage : debug(format,msg)
+ *   usage : mtic_debug(format,msg)
  *
  */
-MASTICAPI_COMMON_DLLSPEC void debug(const char *fmt, ...);
+MASTICAPI_COMMON_DLLSPEC void mtic_debug(const char *fmt, ...);
 
 #endif /* network_h */

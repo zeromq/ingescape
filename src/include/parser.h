@@ -114,17 +114,17 @@ mapping* load_map_from_path (const char* load_file);
  *   mapping_file_path : path to the agent mapping file
  *
  */
-MASTICAPI_COMMON_DLLSPEC int init_mapping (const char* mapping_file_path);
+MASTICAPI_COMMON_DLLSPEC int mtic_init_mapping (const char* mapping_file_path);
 
 /*
- * Function: init_internal_data
+ * Function: mtic_init_internal_data
  * ----------------------------
  *   read definition from file path and init inernal agent data
- *   initialize definition_load and definition_live data structures
+ *   initialize definition_load and mtic_definition_live data structures
  *
  *   definition_file_path : path to the agent definiton file
  *
  */
-MASTICAPI_COMMON_DLLSPEC int init_internal_data (const char* definition_file_path);
+MASTICAPI_COMMON_DLLSPEC int mtic_init_internal_data (const char* definition_file_path);
 
 #endif // PARSER_H

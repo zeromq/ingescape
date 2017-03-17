@@ -1,6 +1,6 @@
 //
 //  kvsimple.c
-//  Temporaire
+//  Mastic
 //
 //  Created by Vincent Deliencourt on 26/08/2016.
 //  Copyright © 2016 IKKY WP4.8. All rights reserved.
@@ -109,7 +109,7 @@ kvmsg_send (kvmsg_t *self, void *socket)
     }
 }
 
-//  These methods let the caller get and set the message key, as a
+//  These methods let the caller mtic_get and mtic_set the message key, as a
 //  fixed string and as a printf formatted string:
 
 char *
@@ -156,7 +156,7 @@ kvmsg_fmt_key (kvmsg_t *self, char *format, ...)
     kvmsg_set_key (self, value);
 }
 
-//  These two methods let the caller get and set the message sequence number:
+//  These two methods let the caller mtic_get and mtic_set the message sequence number:
 
 int64_t
 kvmsg_sequence (kvmsg_t *self)
@@ -201,7 +201,7 @@ kvmsg_set_sequence (kvmsg_t *self, int64_t sequence)
     self->present [FRAME_SEQ] = 1;
 }
 
-//  These methods let the caller get and set the message body, as a
+//  These methods let the caller mtic_get and mtic_set the message body, as a
 //  fixed string and as a printf formatted string:
 
 byte *

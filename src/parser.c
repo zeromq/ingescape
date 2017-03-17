@@ -773,14 +773,14 @@ definition * load_definition_from_path (const char* path) {
 }
 
 
-int init_mapping (const char* mapping_file_path)
+int mtic_init_mapping (const char* mapping_file_path)
 {
     int errorCode = -1;
 
     if (mapping_file_path != NULL){
         // Init definition
-        my_agent_mapping = load_map_from_path(mapping_file_path);
-        if(my_agent_mapping == NULL)
+        mtic_my_agent_mapping = load_map_from_path(mapping_file_path);
+        if(mtic_my_agent_mapping == NULL)
         {
             fprintf(stderr, "Error : Mapping file has not been loaded : %s\n", mapping_file_path );
             exit(EXIT_FAILURE);
@@ -793,18 +793,18 @@ int init_mapping (const char* mapping_file_path)
 }
 
 
-int init_internal_data (const char* definition_file_path)
+int mtic_init_internal_data (const char* definition_file_path)
 {
     int errorCode = -1;
     if (definition_file_path != NULL){
         // Init definition
-        definition_loaded = load_definition_from_path(definition_file_path);
+        mtic_definition_loaded = load_definition_from_path(definition_file_path);
 
-        if(definition_loaded != NULL)
+        if(mtic_definition_loaded != NULL)
         {
             // Live data corresponds to a copy of the initial definition
-            definition_live = calloc(1, sizeof(struct definition_t));
-            memcpy(definition_live, definition_loaded, sizeof(*definition_loaded));
+            mtic_definition_live = calloc(1, sizeof(struct definition_t));
+            memcpy(mtic_definition_live, mtic_definition_loaded, sizeof(*mtic_definition_loaded));
             errorCode = 0;
         } else {
             fprintf(stderr, "Error : Definition file has not been loaded : %s\n", definition_file_path );

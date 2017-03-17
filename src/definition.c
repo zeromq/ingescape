@@ -9,8 +9,8 @@
 #include "definition.h"
 
 // Definition structures
-definition* definition_loaded = NULL;
-definition* definition_live = NULL;
+definition* mtic_definition_loaded = NULL;
+definition* mtic_definition_live = NULL;
 definition* agents_defs_on_network = NULL;
 
 value_type string_to_value_type(const char* str) {
@@ -251,7 +251,7 @@ void free_definition (definition* def) {
     free(def);
 }
 
-char* iop_value_to_string (agent_iop* iop)
+char* mtic_iop_value_to_string (agent_iop* iop)
 {
     char str_value[BUFSIZ];
     if(iop != NULL)
@@ -291,7 +291,7 @@ char* iop_value_to_string (agent_iop* iop)
 }
 
 
-const void* iop_value_string_to_real_type (agent_iop* iop, char* value)
+const void* mtic_iop_value_string_to_real_type (agent_iop* iop, char* value)
 {
     void * out_value = NULL;
     

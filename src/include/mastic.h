@@ -1,5 +1,5 @@
 //
-//  temporaire.h
+//  mastic.h
 //
 //  Created by Stephane Vales on 10/06/2016.
 //  Modified by Mathieu Poirier

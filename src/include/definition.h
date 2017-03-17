@@ -128,8 +128,8 @@ typedef struct definition_t {
     UT_hash_handle hh;
 } definition;
 
-MASTICAPI_COMMON_DLLSPEC extern definition * definition_loaded;
-MASTICAPI_COMMON_DLLSPEC extern definition * definition_live;
+MASTICAPI_COMMON_DLLSPEC extern definition * mtic_definition_loaded;
+MASTICAPI_COMMON_DLLSPEC extern definition * mtic_definition_live;
 MASTICAPI_COMMON_DLLSPEC extern definition * agents_defs_on_network;
 
 /*
@@ -173,14 +173,14 @@ const char* value_type_to_string (value_type type);
 const char* boolean_to_string (bool boole);
 
 /*
- * Function: iop_value_to_string
+ * Function: mtic_iop_value_to_string
  * ----------------------------
  *   convert the iop value to string
  *
  *   agent_iop      : iop to convert
  *
  */
-MASTICAPI_COMMON_DLLSPEC char* iop_value_to_string (agent_iop* iop);
+MASTICAPI_COMMON_DLLSPEC char* mtic_iop_value_to_string (agent_iop* iop);
 
 /*
  * Function: iop_old_value_to_string
@@ -193,7 +193,7 @@ MASTICAPI_COMMON_DLLSPEC char* iop_value_to_string (agent_iop* iop);
 const char* iop_old_value_to_string (agent_iop* iop);
 
 /*
- * Function: iop_value_string_to_real_type
+ * Function: mtic_iop_value_string_to_real_type
  * ----------------------------
  *   convert the iop value to string
  *
@@ -202,7 +202,7 @@ const char* iop_old_value_to_string (agent_iop* iop);
  *   value          : string value
  *
  */
-MASTICAPI_COMMON_DLLSPEC const void* iop_value_string_to_real_type (agent_iop* iop, char* value);
+MASTICAPI_COMMON_DLLSPEC const void* mtic_iop_value_string_to_real_type (agent_iop* iop, char* value);
 
 
 /*>>>>>>>>>>>>>>>>>> DEFINION & CATEGORY <<<<<<<<<<<<<<<<<<<<<<<<<<< */
@@ -213,7 +213,7 @@ MASTICAPI_COMMON_DLLSPEC const void* iop_value_string_to_real_type (agent_iop* i
  *   Check if the agent is in accordance with the category
  *   GLOBAL : during the load of the agent's definition to check if ok with the parameters,inputs,outputs
  *   OUTPUT : when another agent display on the BUS his category
- *   INPUT  : when a map_category is called to check if the inputs is in accordance with the external agent's outputs
+ *   INPUT  : when a mtic_map(_category is called to check if the inputs is in accordance with the external agent's outputs
  *
  *   definition         : the definition to compare with
  *

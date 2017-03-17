@@ -166,11 +166,11 @@ int manageSubscriber (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 {
                     // convert the string value in void* corresponding to the type of iop
                     model_state code;
-                    agent_iop * found_iop = find_iop_by_name_on_definition(output,externalDefinition, &code);
+                    agent_iop * found_iop = mtic_find_iop_by_name_on_definition(output,externalDefinition, &code);
 
                     if(found_iop != NULL)
                     {
-                        const void* converted_value = iop_value_string_to_real_type(found_iop, value);
+                        const void* converted_value = mtic_iop_value_string_to_real_type(found_iop, value);
 
                         // Map reception send to modify the internal model
                         code = map_received(subscriberFound->agentName,
@@ -189,7 +189,7 @@ int manageSubscriber (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 // Print message if the agent has been paused
                 if(is_paused == true)
                 {
-                    debug("All traffic in the agent %s has been paused.\n",definition_loaded->name);
+                    mtic_debug("All traffic in the agent %s has been paused.\n",mtic_definition_loaded->name);
                 }
             }
             zmsg_destroy(&msg);
@@ -204,13 +204,13 @@ int publishOutput(const char* output_name)
     int result = -1;
 
     model_state code;
-    agent_iop * found_iop = find_iop_by_name(output_name, &code);
+    agent_iop * found_iop = mtic_find_iop_by_name(output_name, &code);
 
     if(agentElements->publisher != NULL && found_iop != NULL)
     {
         if(found_iop->is_muted == false && found_iop->name != NULL && is_paused == false)
         {
-            char* str_value = strdup(iop_value_to_string(found_iop));
+            char* str_value = strdup(mtic_iop_value_to_string(found_iop));
             if(strlen(str_value) > 0)
             {
                 // Build the map description used as filter for other agents
@@ -219,7 +219,7 @@ int publishOutput(const char* output_name)
                 strcat(mapDescription, ".");
                 strcat(mapDescription, found_iop->name);
 
-                debug("publish %s -> %s.\n",found_iop->name,str_value);
+                mtic_debug("publish %s -> %s.\n",found_iop->name,str_value);
                 // Send message
                 zstr_sendx(agentElements->publisher, mapDescription,found_iop->name,str_value,NULL);
 
@@ -230,13 +230,13 @@ int publishOutput(const char* output_name)
             // Print message if output has been muted
             if(found_iop->is_muted == true)
             {
-                debug("The output %s has been muted.\n",found_iop->name);
+                mtic_debug("The output %s has been muted.\n",found_iop->name);
             }
 
             // Print message if the agent has been paused
             if(is_paused == true)
             {
-                debug("All traffic in the agent %s has been paused.\n",definition_loaded->name);
+                mtic_debug("All traffic in the agent %s has been paused.\n",mtic_definition_loaded->name);
             }
         }
     }
@@ -262,25 +262,25 @@ int manageIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
         zmsg_t *msg = zyre_event_msg (zyre_event);
 
         if (streq (event, "ENTER")){
-            debug("->%s has entered the network with peer id %s and address %s\n", name, peer, address);
+            mtic_debug("->%s has entered the network with peer id %s and address %s\n", name, peer, address);
             assert(headers);
             char *k;
             const char *v;
             zlist_t *keys = zhash_keys(headers);
             size_t s = zlist_size(keys);
             if (s > 0){
-                debug("@%s's headers are:\n", name);
+                mtic_debug("@%s's headers are:\n", name);
             }
             while ((k = (char *)zlist_pop(keys))) {
                 v = zyre_event_header (zyre_event,k);
-                debug("\t%s -> %s\n", k, v);
+                mtic_debug("\t%s -> %s\n", k, v);
                 char endpointAddress[128];
                 strcpy(endpointAddress, address);
                 char *insert = endpointAddress + strlen(endpointAddress);
                 while (*insert != ':'){
                     insert--;
                     if (insert == endpointAddress){
-                        debug("Error: could not extract port from address %s", address);
+                        mtic_debug("Error: could not extract port from address %s", address);
                     }
                 }
                 *(insert + 1) = '\0';
@@ -292,7 +292,7 @@ int manageIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     HASH_FIND_STR(subscribers, peer, subscriber);
                     if (subscriber != NULL){
                         //Agent is already know and not cleaned: this is a case of reconnection
-                        debug("Destroy subscriber %s.\n",subscriber->agentName);
+                        mtic_debug("Destroy subscriber %s.\n",subscriber->agentName);
                         HASH_DEL(subscribers, subscriber);
                         zloop_poller_end(agentElements->loop , subscriber->pollItem);
                         zsock_destroy(&subscriber->subscriber);
@@ -318,12 +318,12 @@ int manageIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     subscriber->pollItem->revents = 0;
                     zloop_poller (zEl->loop, subscriber->pollItem, manageSubscriber, (void*)subscriber->agentPeerId);
                     zloop_poller_set_tolerant(loop, subscriber->pollItem);
-                    debug("Subscriber created for %s at %s.\n",subscriber->agentName,endpointAddress);
+                    mtic_debug("Subscriber created for %s at %s.\n",subscriber->agentName,endpointAddress);
 
 
                     // Send my definition to the new agent
-                    debug("Send our definition ...\n");
-                    sendDefinition();
+                    mtic_debug("Send our definition ...\n");
+                    mtic_sendDefinition();
                 }
 
 
@@ -331,9 +331,9 @@ int manageIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
             }
             zlist_destroy(&keys);
         } else if (streq (event, "JOIN")){
-            debug("+%s has joined %s\n", name, group);
+            mtic_debug("+%s has joined %s\n", name, group);
         } else if (streq (event, "LEAVE")){
-            debug("-%s has left %s\n", name, group);
+            mtic_debug("-%s has left %s\n", name, group);
         } else if (streq (event, "SHOUT")){
             char *message = zmsg_popstr (msg);
             if(strlen(message) > strlen(EXPORT_DEFINITION_PREFIX))
@@ -358,11 +358,11 @@ int manageIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                         // Add the new definition if not found
                         if(receivedDefinition != NULL && receivedDefinition->name != NULL)
                         {
-                            debug("Add new definition from %s\n", name);
+                            mtic_debug("Add new definition from %s\n", name);
 
                             // FIXME - needed ? Send back our definition if it's a new one for us
                             //printf ("Send our definition...\n");
-                            //sendDefinition();
+                            //mtic_sendDefinition();
 
                             // Add definition to the map
                             HASH_ADD_STR(agents_defs_on_network, name, receivedDefinition);
@@ -383,11 +383,11 @@ int manageIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
         } else if (streq (event, "WHISPER")){
             char *message;
             while ((message = zmsg_popstr(msg))) {
-                debug("#whisper[%s] : %s\n", name, message);
+                mtic_debug("#whisper[%s] : %s\n", name, message);
                 free (message);
             }
         } else if (streq (event, "EXIT")){
-            debug("<-%s exited\n", name);
+            mtic_debug("<-%s exited\n", name);
             // Try to find the subscriber to destory
             subscriber_t *subscriber = NULL;
             HASH_FIND_STR(subscribers, peer, subscriber);
@@ -400,7 +400,7 @@ int manageIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 if(receivedDefinition != NULL)
                 {
                     // Disactivate mapping of the leaving agent
-                    agent_iop* iop_unmapped = unmap(receivedDefinition);
+                    agent_iop* iop_unmapped = mtic_unmap(receivedDefinition);
                     struct agent_iop_t *iop, *tmp;
                     HASH_ITER(hh,iop_unmapped, iop, tmp)
                     {
@@ -623,7 +623,7 @@ init_actor (zsock_t *pipe, void *args)
     //zloop_timer(loop, 1000, 0, sendTestMessagesOnPublisher, zEl);
 
     // FIXME - needed ? Export my definition for once if exists
-    // sendDefinition();
+    // mtic_sendDefinition();
 
     zloop_start (loop); //start returns when one of the pollers returns -1
 
@@ -655,7 +655,7 @@ init_actor (zsock_t *pipe, void *args)
 }
 
 
-int temporaireStart(const char *agentName, const char *networkDevice, int zyrePort, const char *channel){
+int masticStart(const char *agentName, const char *networkDevice, int zyrePort, const char *channel){
 
     agentElements = (zyreloopElements_t*)calloc(1, sizeof(zyreloopElements_t));
     agentElements->agentName = strdup(agentName);
@@ -675,7 +675,7 @@ int temporaireStart(const char *agentName, const char *networkDevice, int zyrePo
 
     return 1;
 }
-int temporaireStop(){
+int masticStop(){
     zstr_sendx (agentElements->agentActor, "$TERM", NULL);
     zactor_destroy (&agentElements->agentActor);
     free((char*)agentElements->agentName);
@@ -685,13 +685,13 @@ int temporaireStop(){
     return 1;
 }
 
-void sendDefinition()
+void mtic_sendDefinition()
 {
     // Send my own definition
-    if(definition_loaded != NULL)
+    if(mtic_definition_loaded != NULL)
     {
         char * definitionStr = NULL;
-        definitionStr = export_definition(definition_loaded);
+        definitionStr = export_definition(mtic_definition_loaded);
         // Send definition to the network
         if(definitionStr)
         {
@@ -702,14 +702,14 @@ void sendDefinition()
             free ((char*) definitionStr);
             definitionStr = NULL;
         } else {
-            printf("Error : could not send definition of %s.\n",definition_loaded->name);
+            printf("Error : could not send definition of %s.\n",mtic_definition_loaded->name);
         }
     }
 }
 
 int subscribeTo(const char *agentName, const char *outputName)
 {
-    // If a filter has to be set
+    // If a filter has to be mtic_set
     if(strlen(outputName) > 0)
     {
         //we found a possible publisher to subscribe to
@@ -719,7 +719,7 @@ int subscribeTo(const char *agentName, const char *outputName)
             if(strcmp(subscriber->agentName,agentName) == 0)
             {
                 // Set subscriber to the output filter
-                debug("subcribe agent %s to %s.\n",agentName,outputName);
+                mtic_debug("subcribe agent %s to %s.\n",agentName,outputName);
                 zsock_set_subscribe(subscriber->subscriber, outputName);
 
                 // we quit
@@ -734,7 +734,7 @@ int subscribeTo(const char *agentName, const char *outputName)
 
 int unsubscribeTo(const char *agentName, const char *outputName)
 {
-    // If a filter has to be set
+    // If a filter has to be mtic_set
     if(strlen(outputName) > 0)
     {
         //we found a possible publisher to subscribe to
@@ -744,7 +744,7 @@ int unsubscribeTo(const char *agentName, const char *outputName)
             if(strcmp(subscriber->agentName,agentName) == 0)
             {
                 // Unsubscribe to the output filter
-                debug("unsubcribe agent %s to %s.\n",agentName,outputName);
+                mtic_debug("unsubcribe agent %s to %s.\n",agentName,outputName);
                 zsock_set_unsubscribe(subscriber->subscriber, outputName);
 
                 // we quit
@@ -771,7 +771,7 @@ int checkAndSubscribeTo(const char* agentName)
         // Porcess mapping
         // Check if we have a mapping with it
         // Check and add mapping if needed
-        agent_iop* outputsToSubscribe = check_map(externalDefinition);
+        agent_iop* outputsToSubscribe = mtic_check_map(externalDefinition);
 
         if(outputsToSubscribe != NULL)
         {
@@ -790,10 +790,10 @@ int checkAndSubscribeTo(const char* agentName)
                 // Subscription has been done
                 if(cr == 0)
                 {
-                    debug("Subscription found and done to output: %s from agent: %s.\n",iop->name,externalDefinition->name);
+                    mtic_debug("Subscription found and done to output: %s from agent: %s.\n",iop->name,externalDefinition->name);
                     result = 0;
                 } else {
-                    debug("Subscription has been found but not done to output: %s from agent: %s.\n",iop->name,externalDefinition->name);
+                    mtic_debug("Subscription has been found but not done to output: %s from agent: %s.\n",iop->name,externalDefinition->name);
                 }
 
                 HASH_DEL(outputsToSubscribe, iop);
@@ -809,31 +809,31 @@ int checkAndSubscribeTo(const char* agentName)
     return result;
 }
 
-void temporairePause()
+void masticPause()
 {
     if(is_paused == false)
     {
-        debug("Agent paused.\n");
+        mtic_debug("Agent paused.\n");
         is_paused = true;
     }
 }
 
-void temporaireResume()
+void masticResume()
 {
     if(is_paused == true)
     {
-        debug("Agent resumed.\n");
+        mtic_debug("Agent resumed.\n");
         is_paused = false;
     }
 }
 
-bool temporaireTogglePlayPause()
+bool masticTogglePlayPause()
 {
     if(is_paused == false)
     {
-        temporairePause();
+        masticPause();
     } else {
-        temporaireResume();
+        masticResume();
     }
 
     return is_paused;
@@ -842,7 +842,7 @@ bool temporaireTogglePlayPause()
 
 
 // Definition of a trace function depending of the verbose mode and debug compilation
-void debug(const char *fmt, ...)
+void mtic_debug(const char *fmt, ...)
 {
     if(verbose_mode == 1)
     {
@@ -864,7 +864,7 @@ void debug(const char *fmt, ...)
     }
 }
 
-void temporaire_set_verbose(bool is_verbose)
+void mtic_set_verbose(bool is_verbose)
 {
     verbose_mode = is_verbose;
 }

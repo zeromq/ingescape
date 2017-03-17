@@ -1,6 +1,6 @@
 //
 //  kvsimple.h
-//  Temporaire
+//  Mastic
 //
 //  Created by Vincent Deliencourt on 26/08/2016.
 //  Copyright © 2016 IKKY WP4.8. All rights reserved.

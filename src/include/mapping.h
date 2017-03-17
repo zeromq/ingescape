@@ -70,7 +70,7 @@ typedef struct mapping_cat_t {
 } mapping;
 
 // the table which will contain the mapping
-MASTICAPI_COMMON_DLLSPEC extern mapping * my_agent_mapping;
+MASTICAPI_COMMON_DLLSPEC extern mapping * mtic_my_agent_mapping;
 
 /*>>>>>>>>>>>>>>>>>> MAPPING <<<<<<<<<<<<<<<<<<<<<<<<<<< */
 
@@ -81,7 +81,7 @@ const char * map_state_to_string(map_state state);
  * ----------------------------
  *   Sub-function of 'load_map'.
  *   Read the table of all mappings loaded by the file json
- *   Call the 'map' function corresponding to the map
+ *   Call the 'mtic_map' function corresponding to the mtic_map
  *
  *   usage : map_all_mapping()
  *
@@ -146,7 +146,7 @@ int split_map_description(char *map_description,
  *   Check if the map is already present in the table
  *   Add the map in the table
  *
- *   usage : map('e1','A2.s1')
+ *   usage : mtic_map('e1','A2.s1')
  *
  *   input_name         : the input's name to be connected with : ex. 'e1'
  *
@@ -158,7 +158,7 @@ int split_map_description(char *map_description,
  *   2  : output name empty
  */
 
-MASTICAPI_COMMON_DLLSPEC int map(char* input_name, char* map_description);
+MASTICAPI_COMMON_DLLSPEC int mtic_map(char* input_name, char* map_description);
 
 /*
  * Function: find_map
@@ -238,7 +238,7 @@ agent_iop*  update_mapping_out_state(mapping_out* map_out, definition * external
  *
  *   value      : the new value
  *
- *   returns : the state of the 'set' function from model
+ *   returns : the state of the 'mtic_set' function from model
  */
 model_state map_received(const char * agent_name,
                          char * out_name,
