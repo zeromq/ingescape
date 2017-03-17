@@ -70,6 +70,14 @@ macx:{
     LIBS += -L$$libzyre_path -lzmq -lczmq -lzyre \
             -L$$libyajl_path -lyajl
 
+    #Intallation librairie
+    DESTDIR = /usr/local/lib
+
+    install_libs.files += $$libzyre_path/*.dylib \
+                            $$libyajl_path/*.dylib
+    install_libs.path += $$DESTDIR
+
+    INSTALLS += install_libs
 }
 #--------- COMMON ---------#
 
@@ -77,11 +85,11 @@ macx:{
 INCLUDEPATH += $$PWD/libzmq/include \
                $$PWD/czmq/include \
                $$PWD/zyre/include \
-               $$PWD/yajl/lloyd-yajl-2.1.0/UNIX/include
+               $$PWD/yajl/lloyd-yajl-2.1.0/include
 
 DEPENDPATH += $$PWD/libzmq/include \
               $$PWD/czmq/include \
               $$PWD/zyre/include \
-              $$PWD/yajl/lloyd-yajl-2.1.0/UNIX/include
+              $$PWD/yajl/lloyd-yajl-2.1.0/include
 
 
