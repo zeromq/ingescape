@@ -1,14 +1,15 @@
 //
-//  network.h
+//  mtic_network.h
 //
 //  Created by Stephane Vales on 10/06/2016.
+//  Modified by Vincent Deliencourt
 //  Copyright © 2016 IKKY WP4.8. All rights reserved.
 //
 
-#ifndef NETWORK_H
-#define NETWORK_H
+#ifndef MTIC_NETWORK_H
+#define MTIC_NETWORK_H
 
-#include "definition.h"
+#include "mtic_definition.h"
 
 #ifdef _WIN32
     #include <winsock2.h>
@@ -21,12 +22,12 @@ int publishOutput(const char* output_name);
 
 
 /*
- * Function: masticStart
+ * Function: mtic_masticStart
  * ----------------------------
  *   Start the network service
  *
- *   usage : masticStart(agentName, networkDevice, zyrePort,channel)
- *         example : masticStart("MASTIC_TEST", "en15", 5670, "MASTIC")
+ *   usage : mtic_masticStart(agentName, networkDevice, zyrePort,channel)
+ *         example : mtic_masticStart("MASTIC_TEST", "en15", 5670, "MASTIC")
  *
  *   agentName          : agent name
  *   networkDevice      : device of connection
@@ -35,18 +36,18 @@ int publishOutput(const char* output_name);
  *
  *   returns : the state of the connection
  */
-MASTICAPI_COMMON_DLLSPEC int masticStart(const char *agentName, const char *networkDevice, int zyrePort, const char *channel);
+MASTICAPI_COMMON_DLLSPEC int mtic_masticStart(const char *agentName, const char *networkDevice, int zyrePort, const char *channel);
 
 /*
- * Function: masticStop
+ * Function: mtic_masticStop
  * ----------------------------
  *   Stop the network service
  *
- *   usage : masticStop()
+ *   usage : mtic_masticStop()
  *
  *   returns : the state of the disconnection
  */
-MASTICAPI_COMMON_DLLSPEC int masticStop();
+MASTICAPI_COMMON_DLLSPEC int mtic_masticStop();
 
 /*
  * Function: subscribeTo
@@ -113,38 +114,38 @@ int publishOutput(const char* output_name);
 int checkAndSubscribeTo(const char* agentName);
 
 /*
- * Function: masticPause
+ * Function: mtic_masticPause
  * ----------------------------
  *   Pause the agent (all subscribtion and publish)
  *
- *   usage : masticPause()
+ *   usage : mtic_masticPause()
  *
  *
  */
-MASTICAPI_COMMON_DLLSPEC void masticPause();
+MASTICAPI_COMMON_DLLSPEC void mtic_masticPause();
 
 /*
- * Function: masticResume
+ * Function: mtic_masticResume
  * ----------------------------
  *   Resume the agent (all subscribtion and publish)
  *
- *   usage : masticResume()
+ *   usage : mtic_masticResume()
  *
  *
  */
-MASTICAPI_COMMON_DLLSPEC void masticResume();
+MASTICAPI_COMMON_DLLSPEC void mtic_masticResume();
 
 /*
- * Function: masticTogglePlayPause
+ * Function: mtic_masticTogglePlayPause
  * ----------------------------
  *   Play the agent if it is pauses, resume it otherwise.
  *
- *   usage : masticTogglePlayPause()
+ *   usage : mtic_masticTogglePlayPause()
  *
  *   return : is_paused state
  *
  */
-MASTICAPI_COMMON_DLLSPEC bool masticTogglePlayPause();
+MASTICAPI_COMMON_DLLSPEC bool mtic_masticTogglePlayPause();
 
 /*
  * Function: mtic_set_verbose
@@ -167,4 +168,4 @@ MASTICAPI_COMMON_DLLSPEC void mtic_set_verbose(bool is_verbose);
  */
 MASTICAPI_COMMON_DLLSPEC void mtic_debug(const char *fmt, ...);
 
-#endif /* network_h */
+#endif /* MTIC_NETWORK_H */

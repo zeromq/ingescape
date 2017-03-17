@@ -1,8 +1,17 @@
-#ifndef MODEL_H_INCLUDED
-#define MODEL_H_INCLUDED
+//
+//  mtic_model.h
+//
+//  Created by Patxi Berard
+//  Modified by Mathieu Poirier
+//  Modified by Vincent Deliencourt
+//  Copyright © 2016 IKKY WP4.8. All rights reserved.
+//
 
-#include "definition.h"
-#include "network.h"
+#ifndef MTIC_MODEL_H
+#define MTIC_MODEL_H
+
+#include "mtic_definition.h"
+#include "mtic_network.h"
 
 //Define a state to return in functions
 typedef enum
@@ -117,4 +126,4 @@ MASTICAPI_COMMON_DLLSPEC int unmtic_muteAll();
 
 
 
-#endif // MODEL_H_INCLUDED
+#endif // MTIC_MODEL_H

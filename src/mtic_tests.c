@@ -1,5 +1,5 @@
 //
-//  tests.c
+//  mtic_tests.c
 //
 //  Created by Patxi Berard
 //  Modified by Mathieu Poirier
@@ -9,7 +9,7 @@
 
 #include <stdio.h>
 #include <stdarg.h>
-#include "tests.h"
+#include "mtic_tests.h"
 
 void callback_test_input_1(agent_iop* input_iop){
     fprintf(stderr, "%s - the input name is : %s\n", __FUNCTION__, input_iop->name);

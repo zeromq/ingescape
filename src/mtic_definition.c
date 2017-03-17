@@ -1,17 +1,18 @@
 //
-//  definition.c
+//  mtic_definition.c
 //
 //  Created by Patxi Berard
 //  Modified by Mathieu Poirier
+//  Modified by Vincent Deliencourt
 //  Copyright © 2016 IKKY WP4.8. All rights reserved.
 //
 
-#include "definition.h"
+#include "mtic_definition.h"
 
 // Definition structures
 definition* mtic_definition_loaded = NULL;
 definition* mtic_definition_live = NULL;
-definition* agents_defs_on_network = NULL;
+definition* mtic_agents_defs_on_network = NULL;
 
 value_type string_to_value_type(const char* str) {
 

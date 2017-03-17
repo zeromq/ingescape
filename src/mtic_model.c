@@ -1,11 +1,12 @@
 //
-//  model.c
+//  mtic_model.c
 //
 //  Created by Patxi Berard
+//  Modified by Vincent Deliencourt
 //  Copyright © 2016 IKKY WP4.8. All rights reserved.
 //
 
-#include "model.h"
+#include "mtic_model.h"
 
 //The variable which will contain all the callbacks associated to 'iop'
 callbacks *agent_callbacks;

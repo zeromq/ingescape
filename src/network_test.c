@@ -6,15 +6,15 @@
 //
 
 
-	#include "network.h"
+        #include "mtic_network.h"
 	#include <zyre.h>
 	#include <czmq.h>
 	#include "uthash.h"
-	#include "kvsimple.h"
+        #include "mtic_kvsimple.h"
 
 
-	#include "mapping.h"
-	#include "tests.h"
+        #include "mtic_mapping.h"
+        #include "mtic_tests.h"
 
 #ifdef _WIN32
 
@@ -159,7 +159,7 @@ int manageSubscriber (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 // Find the subcriber definition
                 // Look for the new agent definition
                 definition * externalDefinition = NULL;
-                HASH_FIND_STR(agents_defs_on_network, subscriberFound->agentName, externalDefinition);
+                HASH_FIND_STR(mtic_agents_defs_on_network, subscriberFound->agentName, externalDefinition);
 
                 // We had it if we don't have it already
                 if(externalDefinition != NULL)
@@ -348,7 +348,7 @@ int manageIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
 
                     // Look for the new agent definition
                     definition * receivedDefinition = NULL;
-                    HASH_FIND_STR(agents_defs_on_network, name, receivedDefinition);
+                    HASH_FIND_STR(mtic_agents_defs_on_network, name, receivedDefinition);
 
                     // We had it if we don't have it already
                     if(receivedDefinition == NULL){
@@ -365,7 +365,7 @@ int manageIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                             //mtic_sendDefinition();
 
                             // Add definition to the map
-                            HASH_ADD_STR(agents_defs_on_network, name, receivedDefinition);
+                            HASH_ADD_STR(mtic_agents_defs_on_network, name, receivedDefinition);
 
                             // check and subscribe to the new added outputs if eixts and the concerning agent is present.
                             // Check if we have a mapping with it
@@ -395,7 +395,7 @@ int manageIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
             {
                 // Remove the agent definition from network
                 definition * receivedDefinition = NULL;
-                HASH_FIND_STR(agents_defs_on_network, name, receivedDefinition);
+                HASH_FIND_STR(mtic_agents_defs_on_network, name, receivedDefinition);
                 // We had it if we don't have it already
                 if(receivedDefinition != NULL)
                 {
@@ -408,7 +408,7 @@ int manageIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                         free(iop);
                     }
 
-                    HASH_DEL(agents_defs_on_network, receivedDefinition);
+                    HASH_DEL(mtic_agents_defs_on_network, receivedDefinition);
                     free_definition(receivedDefinition);
                     receivedDefinition = NULL;
                 }
@@ -655,7 +655,7 @@ init_actor (zsock_t *pipe, void *args)
 }
 
 
-int masticStart(const char *agentName, const char *networkDevice, int zyrePort, const char *channel){
+int mtic_masticStart(const char *agentName, const char *networkDevice, int zyrePort, const char *channel){
 
     agentElements = (zyreloopElements_t*)calloc(1, sizeof(zyreloopElements_t));
     agentElements->agentName = strdup(agentName);
@@ -675,7 +675,7 @@ int masticStart(const char *agentName, const char *networkDevice, int zyrePort, 
 
     return 1;
 }
-int masticStop(){
+int mtic_masticStop(){
     zstr_sendx (agentElements->agentActor, "$TERM", NULL);
     zactor_destroy (&agentElements->agentActor);
     free((char*)agentElements->agentName);
@@ -763,7 +763,7 @@ int checkAndSubscribeTo(const char* agentName)
     int result = -1;
     // Look for the new agent definition
     definition * externalDefinition = NULL;
-    HASH_FIND_STR(agents_defs_on_network, agentName, externalDefinition);
+    HASH_FIND_STR(mtic_agents_defs_on_network, agentName, externalDefinition);
 
     // We had it if we don't have it already
     if(externalDefinition != NULL)
@@ -809,7 +809,7 @@ int checkAndSubscribeTo(const char* agentName)
     return result;
 }
 
-void masticPause()
+void mtic_masticPause()
 {
     if(is_paused == false)
     {
@@ -818,7 +818,7 @@ void masticPause()
     }
 }
 
-void masticResume()
+void mtic_masticResume()
 {
     if(is_paused == true)
     {
@@ -827,13 +827,13 @@ void masticResume()
     }
 }
 
-bool masticTogglePlayPause()
+bool mtic_masticTogglePlayPause()
 {
     if(is_paused == false)
     {
-        masticPause();
+        mtic_masticPause();
     } else {
-        masticResume();
+        mtic_masticResume();
     }
 
     return is_paused;

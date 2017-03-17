@@ -1,13 +1,14 @@
 //
-//  definition.h
+//  mtic_definition.h
 //
 //  Created by Patxi Berard
 //  Modified by Mathieu Poirier
+//  Modified by Vincent Deliencourt
 //  Copyright © 2016 IKKY WP4.8. All rights reserved.
 //
 
-#ifndef DEFINITION_H
-#define DEFINITION_H
+#ifndef MTIC_DEFINITION_H
+#define MTIC_DEFINITION_H
 
 #if defined Q_OS_WIN
 #if defined MASTIC
@@ -274,4 +275,4 @@ void free_category (category* category);
  */
 void free_definition (definition* definition);
 
-#endif // DEFINITION_H
+#endif // MTIC_DEFINITION_H

@@ -1,21 +1,22 @@
 //
-//  mapping.h
+//  mtic_mapping.h
 //
 //  Created by Patxi Berard
 //  Modified by Mathieu Poirier
+//  Modified by Vincent Deliencourt
 //  Copyright © 2016 IKKY WP4.8. All rights reserved.
 //
 
-#ifndef MAPPING_H
-#define MAPPING_H
+#ifndef MTIC_MAPPING_H
+#define MTIC_MAPPING_H
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "definition.h"
-#include "model.h"
-#include "network.h"
+#include "mtic_definition.h"
+#include "mtic_model.h"
+#include "mtic_network.h"
 
 /*
  * Define the state of a mapping ON or OFF
@@ -272,4 +273,4 @@ void free_mapping (mapping* mapping);
 
 
 
-#endif // MAPPING_H
+#endif // MTIC_MAPPING_H

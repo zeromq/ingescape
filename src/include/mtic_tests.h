@@ -1,5 +1,5 @@
 //
-//  tests.h
+//  mtic_tests.h
 //
 //  Created by Patxi Berard
 //  Modified by Mathieu Poirier
@@ -7,13 +7,13 @@
 //  Copyright © 2016 IKKY WP4.8. All rights reserved.
 //
 
-#ifndef TESTS_H
-#define TESTS_H
+#ifndef MTIC_TESTS_H
+#define MTIC_TESTS_H
 
 
-#include "mapping.h"
-#include "parser.h"
-#include "definition.h"
+#include "mtic_mapping.h"
+#include "mtic_parser.h"
+#include "mtic_definition.h"
 
 //void test_copy_definition();
 
@@ -67,4 +67,4 @@ void print_mapping(mapping *mapp);
 void parse(char buffer[],int* num_of_args, char **arguments);
 
 
-#endif // TESTS_H
+#endif // MTIC_TESTS_H

@@ -1,15 +1,16 @@
 //
-//  parseur.h
+//  mtic_parseur.h
 //
 //  Created by Patxi Berard
+//  Modified by Vincent Deliencourt
 //  Copyright © 2016 IKKY WP4.8. All rights reserved.
 //
 
-#ifndef PARSER_H
-#define PARSER_H
+#ifndef MTIC_PARSER_H
+#define MTIC_PARSER_H
 
-#include "definition.h"
-#include "mapping.h"
+#include "mtic_definition.h"
+#include "mtic_mapping.h"
 
 /*
 * Function: load_category
@@ -127,4 +128,4 @@ MASTICAPI_COMMON_DLLSPEC int mtic_init_mapping (const char* mapping_file_path);
  */
 MASTICAPI_COMMON_DLLSPEC int mtic_init_internal_data (const char* definition_file_path);
 
-#endif // PARSER_H
+#endif // MTIC_PARSER_H

@@ -1,13 +1,14 @@
 //
-//  parseur.c
+//  mtic_parseur.c
 //
 //  Created by Patxi Berard
+//  Modified by Vincent Deliencourt
 //  Copyright © 2016 IKKY WP4.8. All rights reserved.
 //
 
 #include "yajl/yajl_tree.h"
 #include <yajl/yajl_gen.h>
-#include "parser.h"
+#include "mtic_parser.h"
 
 #define STR_CATEGORY "category"
 #define STR_DEFINITION "definition"

@@ -1,13 +1,14 @@
 //
-//  mapping.c
+//  mtic_mapping.c
 //
 //  Created by Patxi Berard
 //  Modified by Mathieu Poirier
+//  Modified by Vincent Deliencourt
 //  Copyright © 2016 IKKY WP4.8. All rights reserved.
 //
 
-#include "mapping.h"
-#include "parser.h"
+#include "mtic_mapping.h"
+#include "mtic_parser.h"
 
 // Global parameter declaration
 mapping * mtic_my_agent_mapping = NULL;
@@ -351,7 +352,7 @@ int mtic_map (char* input_name,char* map_description){
             if(strcmp("*", agent_to_map_name) == 0)
             {
                 definition *current, *tmp;
-                HASH_ITER(hh, agents_defs_on_network, current, tmp) {
+                HASH_ITER(hh, mtic_agents_defs_on_network, current, tmp) {
                     if(current != NULL)
                     {
                         // check and subscribe to the new added outputs if eixts and the concerning agent is present.
