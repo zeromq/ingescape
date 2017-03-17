@@ -128,9 +128,9 @@ typedef struct definition_t {
     UT_hash_handle hh;
 } definition;
 
-MASTICAPI_COMMON_DLLSPEC extern definition * mtic_definition_loaded;
-MASTICAPI_COMMON_DLLSPEC extern definition * mtic_definition_live;
-MASTICAPI_COMMON_DLLSPEC extern definition * agents_defs_on_network;
+MASTICAPI_COMMON_DLLSPEC definition * mtic_definition_loaded;
+MASTICAPI_COMMON_DLLSPEC definition * mtic_definition_live;
+MASTICAPI_COMMON_DLLSPEC definition * mtic_agents_defs_on_network;
 
 /*
  * Function: string_to_value_type
@@ -213,7 +213,7 @@ MASTICAPI_COMMON_DLLSPEC const void* mtic_iop_value_string_to_real_type (agent_i
  *   Check if the agent is in accordance with the category
  *   GLOBAL : during the load of the agent's definition to check if ok with the parameters,inputs,outputs
  *   OUTPUT : when another agent display on the BUS his category
- *   INPUT  : when a mtic_map(_category is called to check if the inputs is in accordance with the external agent's outputs
+ *   INPUT  : when a map_category is called to check if the inputs is in accordance with the external agent's outputs
  *
  *   definition         : the definition to compare with
  *

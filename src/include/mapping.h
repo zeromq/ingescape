@@ -70,7 +70,7 @@ typedef struct mapping_cat_t {
 } mapping;
 
 // the table which will contain the mapping
-MASTICAPI_COMMON_DLLSPEC extern mapping * mtic_my_agent_mapping;
+MASTICAPI_COMMON_DLLSPEC mapping * mtic_my_agent_mapping;
 
 /*>>>>>>>>>>>>>>>>>> MAPPING <<<<<<<<<<<<<<<<<<<<<<<<<<< */
 
