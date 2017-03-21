@@ -9,7 +9,7 @@
 #ifndef MTIC_NETWORK_H
 #define MTIC_NETWORK_H
 
-#include "mtic_definition.h"
+#include "definition.h"
 
 #ifdef _WIN32
     #include <winsock2.h>

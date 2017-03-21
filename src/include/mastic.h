@@ -10,9 +10,9 @@
 #ifndef MTIC_MASTIC_H
 #define MTIC_MASTIC_H
 
-#include "mtic_definition.h"
-#include "mtic_mapping.h"
-#include "mtic_network.h"
-#include "mtic_tests.h"
+#include "definition.h"
+#include "mapping.h"
+#include "network.h"
+#include "tests.h"
 
 #endif /* MTIC_MASTIC_H */

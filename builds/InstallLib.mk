@@ -9,9 +9,9 @@ ZYRE_DIR=../dependencies/zyre/bin/Linux
 
 install:
 	@echo "install include and lib for MASTIC"
-	mkdir -p $(INC_DEST)
+	sudo mkdir -p $(INC_DEST)
 	sudo install $(HEADERS_DIR)/*.h -D $(INC_DEST)
-	mkdir -p $(INC_DEST)/uthash
+	sudo mkdir -p $(INC_DEST)/uthash
 	sudo install $(HEADERS_DIR)/uthash/* -D $(INC_DEST)/uthash/
 	sudo install $(LIB_DIR)/libmastic.* -D $(LIB_DEST)
 	sudo install $(YAJL_DIR)/libyajl* -D $(LIB_DEST)

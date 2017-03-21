@@ -14,9 +14,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "mtic_definition.h"
-#include "mtic_model.h"
-#include "mtic_network.h"
+#include "definition.h"
+#include "model.h"
+#include "network.h"
 
 /*
  * Define the state of a mapping ON or OFF

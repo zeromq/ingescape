@@ -6,14 +6,14 @@
 //  Copyright © 2016 IKKY WP4.8. All rights reserved.
 //
 
-#include "mtic_network.h"
+#include "network.h"
 #include <zyre.h>
 #include <czmq.h>
 #include "uthash/uthash.h"
 
 
-#include "mtic_mapping.h"
-#include "mtic_tests.h"
+#include "mapping.h"
+#include "tests.h"
 
 #ifdef _WIN32
 

@@ -7,14 +7,14 @@ SOURCES += \
     $$PWD/../src/mtic_tests.c
 
 HEADERS += \
-    $$PWD/../src/include/mtic_tests.h \
-    $$PWD/../src/include/mtic_network.h \
-    $$PWD/../src/include/mtic_parser.h \
-    $$PWD/../src/include/mtic_model.h \
-    $$PWD/../src/include/mtic_mapping.h \
-    $$PWD/../src/include/mtic_definition.h \
-    $$PWD/../src/include/mtic_mastic.h \
-    $$PWD/../src/include/uthash/uthash.h
+    $$PWD/../src/include/uthash/uthash.h \
+    $$PWD/../src/include/definition.h \
+    $$PWD/../src/include/mapping.h \
+    $$PWD/../src/include/mastic.h \
+    $$PWD/../src/include/model.h \
+    $$PWD/../src/include/network.h \
+    $$PWD/../src/include/parser.h \
+    $$PWD/../src/include/tests.h
 
 INCLUDEPATH += $$PWD/../src/include
 

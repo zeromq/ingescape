@@ -11,9 +11,9 @@
 #define MTIC_TESTS_H
 
 
-#include "mtic_mapping.h"
-#include "mtic_parser.h"
-#include "mtic_definition.h"
+#include "mapping.h"
+#include "parser.h"
+#include "definition.h"
 
 //void test_copy_definition();
 

@@ -9,8 +9,8 @@
 #ifndef MTIC_PARSER_H
 #define MTIC_PARSER_H
 
-#include "mtic_definition.h"
-#include "mtic_mapping.h"
+#include "definition.h"
+#include "mapping.h"
 
 /*
 * Function: load_category

@@ -10,8 +10,8 @@
 #ifndef MTIC_MODEL_H
 #define MTIC_MODEL_H
 
-#include "mtic_definition.h"
-#include "mtic_network.h"
+#include "definition.h"
+#include "network.h"
 
 //Define a state to return in functions
 typedef enum

@@ -7,7 +7,7 @@
 //  Copyright © 2016 IKKY WP4.8. All rights reserved.
 //
 
-#include "mtic_definition.h"
+#include "definition.h"
 
 // Definition structures
 definition* mtic_definition_loaded = NULL;

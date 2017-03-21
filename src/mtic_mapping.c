@@ -7,8 +7,8 @@
 //  Copyright © 2016 IKKY WP4.8. All rights reserved.
 //
 
-#include "mtic_mapping.h"
-#include "mtic_parser.h"
+#include "mapping.h"
+#include "parser.h"
 
 // Global parameter declaration
 mapping * mtic_my_agent_mapping = NULL;

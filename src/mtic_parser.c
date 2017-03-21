@@ -8,7 +8,7 @@
 
 #include "yajl/yajl_tree.h"
 #include <yajl/yajl_gen.h>
-#include "mtic_parser.h"
+#include "parser.h"
 
 #define STR_CATEGORY "category"
 #define STR_DEFINITION "definition"
