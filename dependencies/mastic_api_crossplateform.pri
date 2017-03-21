@@ -1,24 +1,22 @@
 SOURCES += \
-    $$PWD/../src/definition.c \
-    $$PWD/../src/mapping.c \
-    $$PWD/../src/network.c \
-    $$PWD/../src/tests.c \
-    $$PWD/../src/model.c \
-    $$PWD/../src/parser.c \
-    $$PWD/../src/kvsimple.c
+    $$PWD/../src/mtic_definition.c \
+    $$PWD/../src/mtic_model.c \
+    $$PWD/../src/mtic_network.c \
+    $$PWD/../src/mtic_mapping.c \
+    $$PWD/../src/mtic_parser.c \
+    $$PWD/../src/mtic_tests.c
 
 HEADERS += \
-    $$PWD/../src/include/definition.h \
-    $$PWD/../src/include/mapping.h \
-    $$PWD/../src/include/model.h \
-    $$PWD/../src/include/network.h \
-    $$PWD/../src/include/tests.h \
-    $$PWD/../src/include/uthash/uthash.h \
-    $$PWD/../src/include/parser.h \
-    $$PWD/../src/include/kvsimple.h \
+    $$PWD/../src/include/mtic_tests.h \
+    $$PWD/../src/include/mtic_network.h \
+    $$PWD/../src/include/mtic_parser.h \
+    $$PWD/../src/include/mtic_model.h \
+    $$PWD/../src/include/mtic_mapping.h \
+    $$PWD/../src/include/mtic_definition.h \
+    $$PWD/../src/include/mtic_mastic.h \
+    $$PWD/../src/include/uthash/uthash.h
 
-INCLUDEPATH += $$PWD/../src/include \
-#               $$PWD/uthash \
+INCLUDEPATH += $$PWD/../src/include
 
 #add librairies zyre, czmq, zmq + yajl and configurate only for VS 2015 x86 (32 bits)
 win32:{
@@ -61,17 +59,63 @@ win32:{
     LIBS += -L$$C:/Windows/System32 -lws2_32
 }
 
+macx:{
+
+    libzyre_path = $$PWD/zyre/bin/Macos
+    libyajl_path = $$PWD/yajl/lloyd-yajl-2.1.0/Macos/lib
+
+    #Add librairies
+    LIBS += -L$$libzyre_path -lzmq -lczmq -lzyre \
+            -L$$libyajl_path -lyajl
+
+    #Destination repository for our librairy
+    DESTDIR = /usr/local/lib
+
+    #Copy includes
+    install_headers.files += $$PWD/../src/include/*.h \
+                             $$PWD/../src/include/uthash
+    install_headers.path += /usr/local/include/mastic
+
+    #Copy libraries
+    install_libs.files += $$libzyre_path/*.dylib \
+                          $$libyajl_path/*.dylib
+    install_libs.path += $$DESTDIR
+
+    #Add installation options
+    INSTALLS += install_libs \
+                install_headers
+}
+
+unix:{
+
+    libzyre_path = $$PWD/zyre/bin/Linux
+    libyajl_path = $$PWD/yajl/lloyd-yajl-2.1.0/Linux/lib
+
+    #Add librairies
+    LIBS += -L$$libzyre_path -lzmq -lczmq -lzyre \
+            -L$$libyajl_path -lyajl
+
+    #Intallation librairie
+    #DESTDIR = /usr/local/lib
+
+    #install_libs.files += $$libzyre_path/*.so \
+    #                        $$libyajl_path/*.so
+    #install_libs.path += $$DESTDIR
+
+    #INSTALLS += install_libs
+}
+
 #--------- COMMON ---------#
 
 ##Add headers from dependencies
 INCLUDEPATH += $$PWD/libzmq/include \
                $$PWD/czmq/include \
                $$PWD/zyre/include \
-               $$PWD/yajl/lloyd-yajl-2.1.0/MSVS/include
+               $$PWD/yajl/lloyd-yajl-2.1.0/include
 
 DEPENDPATH += $$PWD/libzmq/include \
               $$PWD/czmq/include \
               $$PWD/zyre/include \
-              $$PWD/yajl/lloyd-yajl-2.1.0/MSVS/include
+              $$PWD/yajl/lloyd-yajl-2.1.0/include
 
 

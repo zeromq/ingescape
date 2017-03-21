@@ -4,9 +4,7 @@
 #
 #-------------------------------------------------
 
-win32:{
-    TARGET = mastic
-}
+TARGET = mastic
 
 TEMPLATE = lib
 
