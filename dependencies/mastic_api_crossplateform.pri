@@ -1,10 +1,10 @@
 SOURCES += \
-    $$PWD/../src/mtic_definition.c \
-    $$PWD/../src/mtic_model.c \
-    $$PWD/../src/mtic_network.c \
-    $$PWD/../src/mtic_mapping.c \
-    $$PWD/../src/mtic_parser.c \
-    $$PWD/../src/mtic_tests.c
+    $$PWD/../src/definition.c \
+    $$PWD/../src/mapping.c \
+    $$PWD/../src/model.c \
+    $$PWD/../src/network.c \
+    $$PWD/../src/parser.c \
+    $$PWD/../src/tests.c
 
 HEADERS += \
     $$PWD/../src/include/uthash/uthash.h \

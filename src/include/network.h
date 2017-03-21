@@ -18,11 +18,11 @@
 #else
 #endif
 
-int publishOutput(const char* output_name);
+int publish_output(const char* output_name);
 
 
 /*
- * Function: mtic_masticStart
+ * Function: mtic_start
  * ----------------------------
  *   Start the network service
  *
@@ -36,10 +36,10 @@ int publishOutput(const char* output_name);
  *
  *   returns : the state of the connection
  */
-MASTICAPI_COMMON_DLLSPEC int mtic_masticStart(const char *agentName, const char *networkDevice, int zyrePort, const char *channel);
+MASTICAPI_COMMON_DLLSPEC int mtic_start(const char *agentName, const char *networkDevice, int zyrePort, const char *channel);
 
 /*
- * Function: mtic_masticStop
+ * Function: mtic_stop
  * ----------------------------
  *   Stop the network service
  *
@@ -47,10 +47,10 @@ MASTICAPI_COMMON_DLLSPEC int mtic_masticStart(const char *agentName, const char 
  *
  *   returns : the state of the disconnection
  */
-MASTICAPI_COMMON_DLLSPEC int mtic_masticStop();
+MASTICAPI_COMMON_DLLSPEC int mtic_stop();
 
 /*
- * Function: subscribeTo
+ * Function: subscribe_to
  * ----------------------------
  *   Add a subscription to an agent
  *
@@ -61,10 +61,10 @@ MASTICAPI_COMMON_DLLSPEC int mtic_masticStop();
  *
  *   returns : the state of the subscribtion
  */
-int subscribeTo(const char *agentName, const char *filterDescription);
+int subscribe_to(const char *agentName, const char *filterDescription);
 
 /*
- * Function: unsubscribeTo
+ * Function: unsubscribe_to
  * ----------------------------
  *   Remove a subscription to an agent
  *
@@ -75,10 +75,10 @@ int subscribeTo(const char *agentName, const char *filterDescription);
  *
  *   returns : the state of the subscribtion removal
  */
-int unsubscribeTo(const char *agentName, const char *outputName);
+int unsubscribe_to(const char *agentName, const char *outputName);
 
 /*
- * Function: mtic_sendDefinition
+ * Function: mtic_send_definition
  * ----------------------------
  *   Send my definition through the agent publisher
  *   The agent definition must be defined : mtic_definition_loaded
@@ -86,20 +86,20 @@ int unsubscribeTo(const char *agentName, const char *outputName);
  *   usage : mtic_sendDefinition()
  *
  */
-MASTICAPI_COMMON_DLLSPEC void mtic_sendDefinition();
+MASTICAPI_COMMON_DLLSPEC void mtic_send_definition();
 
 /*
- * Function: publishOutput
+ * Function: publish_output
  * ----------------------------
  *   Publishing output to the bus
  *
  *   usage : publishOutput(output_name)
  *
  */
-int publishOutput(const char* output_name);
+int publish_output(const char* output_name);
 
 /*
- * Function: checkAndSubscribeTo
+ * Function: check_and_subscribe_to
  * ----------------------------
  *   Check mappings made on agent name
  *   Connect to these outputs if compatibility is ok
@@ -111,10 +111,10 @@ int publishOutput(const char* output_name);
  *   returns : -1 if an error occured, 1 otherwise.
  *
  */
-int checkAndSubscribeTo(const char* agentName);
+int check_and_subscribe_to(const char* agentName);
 
 /*
- * Function: mtic_masticPause
+ * Function: mtic_pause
  * ----------------------------
  *   Pause the agent (all subscribtion and publish)
  *
@@ -122,10 +122,10 @@ int checkAndSubscribeTo(const char* agentName);
  *
  *
  */
-MASTICAPI_COMMON_DLLSPEC void mtic_masticPause();
+MASTICAPI_COMMON_DLLSPEC void mtic_pause();
 
 /*
- * Function: mtic_masticResume
+ * Function: mtic_resume
  * ----------------------------
  *   Resume the agent (all subscribtion and publish)
  *
@@ -133,10 +133,10 @@ MASTICAPI_COMMON_DLLSPEC void mtic_masticPause();
  *
  *
  */
-MASTICAPI_COMMON_DLLSPEC void mtic_masticResume();
+MASTICAPI_COMMON_DLLSPEC void mtic_resume();
 
 /*
- * Function: mtic_masticTogglePlayPause
+ * Function: mtic_toggle_play_pause
  * ----------------------------
  *   Play the agent if it is pauses, resume it otherwise.
  *
@@ -145,7 +145,7 @@ MASTICAPI_COMMON_DLLSPEC void mtic_masticResume();
  *   return : is_paused state
  *
  */
-MASTICAPI_COMMON_DLLSPEC bool mtic_masticTogglePlayPause();
+MASTICAPI_COMMON_DLLSPEC bool mtic_toggle_play_pause();
 
 /*
  * Function: mtic_set_verbose

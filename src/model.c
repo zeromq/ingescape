@@ -186,7 +186,7 @@ model_state mtic_set(const char *iop_name, void *new_value){
     if(code == TYPE_OUTPUT){
         
         // Publish the new value
-        publishOutput(iop_name);
+        publish_output(iop_name);
     }
 
     return OK;

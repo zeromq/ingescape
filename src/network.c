@@ -187,7 +187,7 @@ int manageSubscriber (zloop_t *loop, zmq_pollitem_t *item, void *arg){
     return 0;
 }
 
-int publishOutput(const char* output_name)
+int publish_output(const char* output_name)
 {
     int result = -1;
 
@@ -311,7 +311,7 @@ int manageIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
 
                     // Send my definition to the new agent
                     mtic_debug("Send our definition ...\n");
-                    mtic_sendDefinition();
+                    mtic_send_definition();
                 }
 
 
@@ -358,7 +358,7 @@ int manageIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                             // check and subscribe to the new added outputs if eixts and the concerning agent is present.
                             // Check if we have a mapping with it
                             // Check and add mapping if needed
-                            checkAndSubscribeTo(name);
+                            check_and_subscribe_to(name);
                         }
                     }
 
@@ -426,7 +426,7 @@ int sendTestMessagesOnPublisher(zloop_t *loop, int timer_id, void *arg){
     // 1 : filter "agentName.outputName
     // 2 : output name only
     // 3 : value of the output
-    publishOutput("output1");
+    publish_output("output1");
 
     return 0;
 }
@@ -639,7 +639,7 @@ init_actor (zsock_t *pipe, void *args)
 }
 
 
-int mtic_masticStart(const char *agentName, const char *networkDevice, int zyrePort, const char *channel){
+int mtic_start(const char *agentName, const char *networkDevice, int zyrePort, const char *channel){
 
     agentElements = calloc(1, sizeof(zyreloopElements_t));
     agentElements->agentName = strdup(agentName);
@@ -659,7 +659,7 @@ int mtic_masticStart(const char *agentName, const char *networkDevice, int zyreP
 
     return 1;
 }
-int mtic_masticStop(){
+int mtic_stop(){
     zstr_sendx (agentElements->agentActor, "$TERM", NULL);
     zactor_destroy (&agentElements->agentActor);
     free((char*)agentElements->agentName);
@@ -669,7 +669,7 @@ int mtic_masticStop(){
     return 1;
 }
 
-void mtic_sendDefinition()
+void mtic_send_definition()
 {
     // Send my own definition
     if(mtic_definition_loaded != NULL)
@@ -691,7 +691,7 @@ void mtic_sendDefinition()
     }
 }
 
-int subscribeTo(const char *agentName, const char *outputName)
+int subscribe_to(const char *agentName, const char *outputName)
 {
     // If a filter has to be mtic_set
     if(strlen(outputName) > 0)
@@ -716,7 +716,7 @@ int subscribeTo(const char *agentName, const char *outputName)
     return -1;
 }
 
-int unsubscribeTo(const char *agentName, const char *outputName)
+int unsubscribe_to(const char *agentName, const char *outputName)
 {
     // If a filter has to be mtic_set
     if(strlen(outputName) > 0)
@@ -742,7 +742,7 @@ int unsubscribeTo(const char *agentName, const char *outputName)
 }
 
 
-int checkAndSubscribeTo(const char* agentName)
+int check_and_subscribe_to(const char* agentName)
 {
     int result = -1;
     // Look for the new agent definition
@@ -769,7 +769,7 @@ int checkAndSubscribeTo(const char* agentName)
                 strcat(map_description, iop->name);
 
                 // Make subscribtion
-                int cr = subscribeTo(externalDefinition->name,map_description);
+                int cr = subscribe_to(externalDefinition->name,map_description);
 
                 // Subscription has been done
                 if(cr == 0)
@@ -793,7 +793,7 @@ int checkAndSubscribeTo(const char* agentName)
     return result;
 }
 
-void mtic_masticPause()
+void mtic_pause()
 {
     if(is_paused == false)
     {
@@ -802,7 +802,7 @@ void mtic_masticPause()
     }
 }
 
-void mtic_masticResume()
+void mtic_resume()
 {
     if(is_paused == true)
     {
@@ -811,13 +811,13 @@ void mtic_masticResume()
     }
 }
 
-bool mtic_masticTogglePlayPause()
+bool mtic_toggle_play_pause()
 {
     if(is_paused == false)
     {
-        mtic_masticPause();
+        mtic_pause();
     } else {
-        mtic_masticResume();
+        mtic_resume();
     }
 
     return is_paused;

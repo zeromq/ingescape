@@ -356,12 +356,12 @@ int mtic_map (char* input_name,char* map_description){
                     if(current != NULL)
                     {
                         // check and subscribe to the new added outputs if eixts and the concerning agent is present.
-                        checkAndSubscribeTo((char*)current->name);
+                        check_and_subscribe_to((char*)current->name);
                     }
                 }
             } else {
                 // check and subscribe to the new added outputs if eixts and the concerning agent is present.
-                checkAndSubscribeTo(agent_to_map_name);
+                check_and_subscribe_to(agent_to_map_name);
             }
         } else {
             result = error_code;
@@ -400,7 +400,7 @@ model_state map_received(const char *agent_name, char *out_name, void *value){
     return state;
 }
 
-bool map_category (char* map_description){
+bool mtic_map_category (char* map_description){
     return false;
 }
 

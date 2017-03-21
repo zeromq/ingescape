@@ -207,7 +207,7 @@ MASTICAPI_COMMON_DLLSPEC agent_iop* mtic_check_map (definition *definition);
  *   returns    : the table of outputs passed to OFF and to unsubscribe OR null
  */
 
-MASTICAPI_COMMON_DLLSPEC agent_iop* unmap (definition *definition);
+MASTICAPI_COMMON_DLLSPEC agent_iop* mtic_unmap (definition *definition);
 
 
 /*
@@ -258,7 +258,7 @@ model_state map_received(const char * agent_name,
  *   returns : the state of the mapping
  */
 
-MASTICAPI_COMMON_DLLSPEC bool map_category (char* map_description);
+MASTICAPI_COMMON_DLLSPEC bool mtic_map_category (char* map_description);
 
 /*
  * Function: free_mapping
