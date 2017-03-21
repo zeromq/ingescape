@@ -22,8 +22,6 @@
 #define STR_TYPE "type"
 #define STR_VALUE "value"
 
-
-
 // --------- static functions used for json parsing --------------------//
 
 /*
@@ -83,7 +81,7 @@ static void json_add_data (yajl_val node, const char** path,
     yajl_val v;
     v = yajl_tree_get(node, path, yajl_t_array);
     if (v && YAJL_IS_ARRAY(v))
-        for (int  i = 0; i < v->u.array.len; i++ ){
+        for (unsigned int  i = 0; i < v->u.array.len; i++ ){
             yajl_val obj = v->u.array.values[i];
             if( obj && YAJL_IS_OBJECT(obj))
                 json_add_data_to_hash (hasht, obj);
@@ -102,7 +100,7 @@ static char* json_fetch (const char* path) {
     char buff[BUFSIZ];
     char *js = NULL;
     int jslen = 0;
-    int rd;
+    unsigned int rd;
 
     file = fopen(path, "r");
     if (!file){
@@ -113,7 +111,7 @@ static char* json_fetch (const char* path) {
     /* read the whole config file */
     do {
 
-        rd = (int) fread(buff, 1, sizeof(buff) , file);
+        rd = (unsigned int) fread(buff, 1, sizeof(buff) , file);
         /* file read error handling */
         if (rd == 0 && !feof(stdin)) {
             fprintf(stderr, "json parser - ERROR -  fread(): error encountered on file read\n");
@@ -283,7 +281,7 @@ static definition* json_parse_definition (yajl_val node) {
     path[1] = STR_CATEGORIES;
     v = yajl_tree_get(node, path, yajl_t_array);
     if (v && YAJL_IS_ARRAY(v)){
-        for (int  i = 0; i < v->u.array.len; i++ ){
+        for (unsigned int  i = 0; i < v->u.array.len; i++ ){
             yajl_val obj = v->u.array.values[i];
             if( obj && YAJL_IS_OBJECT(obj))
                 json_add_category_to_hash (&def->categories, obj);
@@ -436,7 +434,7 @@ static mapping* json_parse_mapping (yajl_val node) {
     path[1] = "mapping_out";
     v = yajl_tree_get(node, path, yajl_t_array);
     if (v && YAJL_IS_ARRAY(v)){
-        for (int  i = 0; i < v->u.array.len; i++ ){
+        for (unsigned int  i = 0; i < v->u.array.len; i++ ){
             yajl_val obj = v->u.array.values[i];
             if( obj && YAJL_IS_OBJECT(obj))
                 json_add_map_out_to_hash (&mapp->map_out, obj);
@@ -446,7 +444,7 @@ static mapping* json_parse_mapping (yajl_val node) {
     path[1] = "mapping_cat";
     v = yajl_tree_get(node, path, yajl_t_array);
     if (v && YAJL_IS_ARRAY(v)){
-        for (int  i = 0; i < v->u.array.len; i++ ){
+        for (unsigned int  i = 0; i < v->u.array.len; i++ ){
             yajl_val obj = v->u.array.values[i];
             if( obj && YAJL_IS_OBJECT(obj))
                 json_add_map_cat_to_hash (&mapp->map_cat, obj);
