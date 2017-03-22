@@ -33,19 +33,31 @@ win32:{
         DESTDIR = $$OUT_PWD/debug
         libzyre_path = $$PWD/zyre/bin/Win32/Debug/v140/dynamic
         libyajl_path = $$PWD/yajl/lloyd-yajl-2.1.0/MSVS/VS2013/x86/DebugDLL
+        install_libs.path += "C:/mastic/lib/debug"
     }else {
         #configuration RELEASE
         DESTDIR = $$OUT_PWD/release
         libzyre_path = $$PWD/zyre/bin/Win32/Release/v140/dynamic
         libyajl_path = $$PWD/yajl/lloyd-yajl-2.1.0/MSVS/VS2013/x86/ReleaseDLL
+        install_libs.path += "C:/mastic/lib/release"
     }
 
-    # Ajouter la librairie : attention -> ajouter l'etape make install a la compilation
+    #Copy includes
+    install_headers.files += $$PWD/../src/include/*.h \
+                             $$PWD/../src/include/uthash \
+                             $$PWD/getopt
+    install_headers.path += "C:/mastic/include"
+
+
     #Add the make step 'install' to copy the dll files to the output folder
-    install_libs.files += $$libzyre_path/*.dll \
-                            $$libyajl_path/*.dll
-    install_libs.path += $$DESTDIR
-    INSTALLS += install_libs
+    install_libs.files += $$libzyre_path/* \
+                          $$libyajl_path/* \
+                          $$DESTDIR/*
+
+
+    #Add installation options
+    INSTALLS += install_libs \
+                install_headers
 
     #Add librairies
     LIBS += -L$$libzyre_path -llibzmq \
