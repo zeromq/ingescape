@@ -1,20 +1,20 @@
 SOURCES += \
-    $$PWD/../src/mtic_definition.c \
-    $$PWD/../src/mtic_model.c \
-    $$PWD/../src/mtic_network.c \
-    $$PWD/../src/mtic_mapping.c \
-    $$PWD/../src/mtic_parser.c \
-    $$PWD/../src/mtic_tests.c
+    $$PWD/../src/definition.c \
+    $$PWD/../src/mapping.c \
+    $$PWD/../src/model.c \
+    $$PWD/../src/network.c \
+    $$PWD/../src/parser.c \
+    $$PWD/../src/tests.c
 
 HEADERS += \
-    $$PWD/../src/include/mtic_tests.h \
-    $$PWD/../src/include/mtic_network.h \
-    $$PWD/../src/include/mtic_parser.h \
-    $$PWD/../src/include/mtic_model.h \
-    $$PWD/../src/include/mtic_mapping.h \
-    $$PWD/../src/include/mtic_definition.h \
-    $$PWD/../src/include/mtic_mastic.h \
-    $$PWD/../src/include/uthash/uthash.h
+    $$PWD/../src/include/uthash/uthash.h \
+    $$PWD/../src/include/definition.h \
+    $$PWD/../src/include/mapping.h \
+    $$PWD/../src/include/mastic.h \
+    $$PWD/../src/include/model.h \
+    $$PWD/../src/include/network.h \
+    $$PWD/../src/include/parser.h \
+    $$PWD/../src/include/tests.h
 
 INCLUDEPATH += $$PWD/../src/include
 
@@ -107,14 +107,8 @@ unix:{
     LIBS += -L$$libzyre_path -lzmq -lczmq -lzyre \
             -L$$libyajl_path -lyajl
 
-    #Intallation librairie
-    #DESTDIR = /usr/local/lib
-
-    #install_libs.files += $$libzyre_path/*.so \
-    #                        $$libyajl_path/*.so
-    #install_libs.path += $$DESTDIR
-
-    #INSTALLS += install_libs
+    #Intallation librairie: USE MAKE FILE in InstallLib.mk in builds directory
+    #sudo make -f InstallLib.mk
 }
 
 #--------- COMMON ---------#
