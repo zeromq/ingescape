@@ -10,7 +10,7 @@
 #ifndef MTIC_DEFINITION_H
 #define MTIC_DEFINITION_H
 
-#if defined Q_OS_WIN
+#if defined WINDOWS
 #if defined MASTIC
 #define MASTICAPI_COMMON_DLLSPEC __declspec(dllexport)
 #else
