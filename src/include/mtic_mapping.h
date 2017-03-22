@@ -193,7 +193,7 @@ mapping_out *find_map(char * input_name,
  *   returns    : the table of outputs to subscribe OR null
  */
 
-MASTICAPI_COMMON_DLLSPEC agent_iop* check_map (definition *definition);
+MASTICAPI_COMMON_DLLSPEC agent_iop* mtic_check_map (definition *definition);
 
 /*
  * Function: unmap
@@ -207,7 +207,7 @@ MASTICAPI_COMMON_DLLSPEC agent_iop* check_map (definition *definition);
  *   returns    : the table of outputs passed to OFF and to unsubscribe OR null
  */
 
-MASTICAPI_COMMON_DLLSPEC agent_iop* unmap (definition *definition);
+MASTICAPI_COMMON_DLLSPEC agent_iop* mtic_unmap (definition *definition);
 
 
 /*
