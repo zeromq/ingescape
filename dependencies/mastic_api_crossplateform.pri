@@ -107,14 +107,16 @@ unix:{
 
     message("Compilation android scope ...")
 
+    android_libs_path = $$PWD/../builds/android/libs/armeabi-v7a
+
     INCLUDEPATH += $$PWD/android-ifaddrs-master/ \
 
     SOURCES += $$PWD/android-ifaddrs-master/ifaddrs.c \
 
     HEADERS += $$PWD/android-ifaddrs-master/ifaddrs.h \
 
+    LIBS += -L$$android_libs_path/ -lzmq -lczmq -lzyre -lyajl
 
-    LIBS += -L$$PWD/../builds/android/libs/armeabi-v7a/ -lzmq -lczmq -lzyre -lyajl
     ############################
 #    QMAKE_CXXFLAGS += -std=c99
 
