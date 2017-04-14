@@ -20,13 +20,14 @@ INCLUDEPATH += $$PWD/../src/include
 
 #add librairies zyre, czmq, zmq + yajl and configurate only for VS 2015 x86 (32 bits)
 win32:{
+    message("Compilation win32 scope ...")
 
     QMAKE_CXXFLAGS += -std=c11
 
     INCLUDEPATH += $$PWD/getopt \
 
-    HEADERS += $$PWD/getopt/getopt_win32.h
-    SOURCES += $$PWD/getopt/getopt_win32.c
+#    HEADERS += $$PWD/getopt/getopt_win32.h
+#    SOURCES += $$PWD/getopt/getopt_win32.c
 
     CONFIG(debug, debug|release){
         #configuration DEBUG
@@ -72,6 +73,7 @@ win32:{
 }
 
 macx:{
+    message("Compilation macx scope ...")
 
     libzyre_path = $$PWD/zyre/bin/Macos
     libyajl_path = $$PWD/yajl/lloyd-yajl-2.1.0/Macos/lib
@@ -100,15 +102,33 @@ macx:{
 
 unix:{
 
-    libzyre_path = $$PWD/zyre/bin/Linux
-    libyajl_path = $$PWD/yajl/lloyd-yajl-2.1.0/Linux/lib
+    ############ Android ###########
+    DEFINES +=  ANDROID
 
-    #Add librairies
-    LIBS += -L$$libzyre_path -lzmq -lczmq -lzyre \
-            -L$$libyajl_path -lyajl
+    message("Compilation android scope ...")
 
-    #Intallation librairie: USE MAKE FILE in InstallLib.mk in builds directory
-    #sudo make -f InstallLib.mk
+    INCLUDEPATH += $$PWD/android-ifaddrs-master/ \
+
+    SOURCES += $$PWD/android-ifaddrs-master/ifaddrs.c \
+
+    HEADERS += $$PWD/android-ifaddrs-master/ifaddrs.h \
+
+
+    LIBS += -L$$PWD/../builds/android/libs/armeabi-v7a/ -lzmq -lczmq -lzyre -lyajl
+    ############################
+#    QMAKE_CXXFLAGS += -std=c99
+
+    ############ Linux ###########
+#    message("Compilation Linux scope ...")
+
+#    libzyre_path = $$PWD/zyre/bin/Linux
+#    libyajl_path = $$PWD/yajl/lloyd-yajl-2.1.0/Linux/lib
+
+#    #Add librairies
+#    LIBS += -L$$libzyre_path -lzmq -lczmq -lzyre \
+#            -L$$libyajl_path -lyajl
+
+    ############################
 }
 
 #--------- COMMON ---------#
@@ -117,11 +137,11 @@ unix:{
 INCLUDEPATH += $$PWD/libzmq/include \
                $$PWD/czmq/include \
                $$PWD/zyre/include \
-               $$PWD/yajl/lloyd-yajl-2.1.0/include
+               $$PWD/yajl/lloyd-yajl-2.1.0/include \
 
 DEPENDPATH += $$PWD/libzmq/include \
               $$PWD/czmq/include \
               $$PWD/zyre/include \
-              $$PWD/yajl/lloyd-yajl-2.1.0/include
+              $$PWD/yajl/lloyd-yajl-2.1.0/include \
 
 
