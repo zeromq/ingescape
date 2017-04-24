@@ -7,6 +7,31 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9762EDDA1EAE547B002062A1 /* definition.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A79851EA7B112003153EF /* definition.c */; };
+		9762EDDB1EAE547B002062A1 /* mapping.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A79981EA7B112003153EF /* mapping.c */; };
+		9762EDDC1EAE547B002062A1 /* model.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A79991EA7B112003153EF /* model.c */; };
+		9762EDDD1EAE547B002062A1 /* network.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A799A1EA7B112003153EF /* network.c */; };
+		9762EDDF1EAE547B002062A1 /* parser.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A799C1EA7B112003153EF /* parser.c */; };
+		9762EDE01EAE547B002062A1 /* tests.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A799D1EA7B112003153EF /* tests.c */; };
+		9762EDE11EAE5490002062A1 /* yajl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9762EDD61EAE5414002062A1 /* yajl.framework */; };
+		9762EDE71EAE54D6002062A1 /* libczmq.3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 9762EDE31EAE54D6002062A1 /* libczmq.3.dylib */; };
+		9762EDE81EAE54D6002062A1 /* libsodium.18.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 9762EDE41EAE54D6002062A1 /* libsodium.18.dylib */; };
+		9762EDE91EAE54D6002062A1 /* libzmq.5.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 9762EDE51EAE54D6002062A1 /* libzmq.5.dylib */; };
+		9762EDEA1EAE54D6002062A1 /* libzyre.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 9762EDE61EAE54D6002062A1 /* libzyre.1.dylib */; };
+		9762EDEB1EAE551A002062A1 /* definition.h in Headers */ = {isa = PBXBuildFile; fileRef = 979A79871EA7B112003153EF /* definition.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		9762EDEC1EAE551A002062A1 /* mapping.h in Headers */ = {isa = PBXBuildFile; fileRef = 979A79881EA7B112003153EF /* mapping.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		9762EDED1EAE551A002062A1 /* mastic.h in Headers */ = {isa = PBXBuildFile; fileRef = 979A79891EA7B112003153EF /* mastic.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		9762EDEF1EAE551A002062A1 /* network.h in Headers */ = {isa = PBXBuildFile; fileRef = 979A798B1EA7B112003153EF /* network.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		9762EDF11EAE551A002062A1 /* tests.h in Headers */ = {isa = PBXBuildFile; fileRef = 979A798D1EA7B112003153EF /* tests.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		9762EDF31EAE55D2002062A1 /* libut.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A798F1EA7B112003153EF /* libut.h */; };
+		9762EDF41EAE55D2002062A1 /* ringbuf.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79901EA7B112003153EF /* ringbuf.h */; };
+		9762EDF51EAE55D2002062A1 /* utarray.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79911EA7B112003153EF /* utarray.h */; };
+		9762EDF61EAE55D2002062A1 /* uthash.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79921EA7B112003153EF /* uthash.h */; };
+		9762EDF71EAE55D2002062A1 /* utlist.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79931EA7B112003153EF /* utlist.h */; };
+		9762EDF81EAE55D2002062A1 /* utmm.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79941EA7B112003153EF /* utmm.h */; };
+		9762EDF91EAE55D2002062A1 /* utringbuffer.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79951EA7B112003153EF /* utringbuffer.h */; };
+		9762EDFA1EAE55D2002062A1 /* utstring.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79961EA7B112003153EF /* utstring.h */; };
+		9762EDFB1EAE55D2002062A1 /* utvector.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79971EA7B112003153EF /* utvector.h */; };
 		979A799E1EA7B112003153EF /* definition.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A79851EA7B112003153EF /* definition.c */; };
 		979A799F1EA7B112003153EF /* mapping.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A79981EA7B112003153EF /* mapping.c */; };
 		979A79A01EA7B112003153EF /* model.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A79991EA7B112003153EF /* model.c */; };
@@ -125,6 +150,20 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		9762EDD51EAE5414002062A1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 979A79B31EA8A835003153EF /* yajl.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 9762EDB21EAE530B002062A1;
+			remoteInfo = "yajl-macos";
+		};
+		9762EDD81EAE5465002062A1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 979A79B31EA8A835003153EF /* yajl.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 9762EDB11EAE530B002062A1;
+			remoteInfo = "yajl-macos";
+		};
 		979A79B71EA8A835003153EF /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 979A79B31EA8A835003153EF /* yajl.xcodeproj */;
@@ -142,6 +181,24 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		9762EDF21EAE55A8002062A1 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = include/uthash;
+			dstSubfolderSpec = 16;
+			files = (
+				9762EDF31EAE55D2002062A1 /* libut.h in CopyFiles */,
+				9762EDF41EAE55D2002062A1 /* ringbuf.h in CopyFiles */,
+				9762EDF51EAE55D2002062A1 /* utarray.h in CopyFiles */,
+				9762EDF61EAE55D2002062A1 /* uthash.h in CopyFiles */,
+				9762EDF71EAE55D2002062A1 /* utlist.h in CopyFiles */,
+				9762EDF81EAE55D2002062A1 /* utmm.h in CopyFiles */,
+				9762EDF91EAE55D2002062A1 /* utringbuffer.h in CopyFiles */,
+				9762EDFA1EAE55D2002062A1 /* utstring.h in CopyFiles */,
+				9762EDFB1EAE55D2002062A1 /* utvector.h in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		979A79761EA7B0D6003153EF /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -276,6 +333,12 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		9762EDCD1EAE5414002062A1 /* mastic.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = mastic.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		9762EDD01EAE5414002062A1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9762EDE31EAE54D6002062A1 /* libczmq.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libczmq.3.dylib; path = ../../../../../../../../../usr/local/lib/libczmq.3.dylib; sourceTree = "<group>"; };
+		9762EDE41EAE54D6002062A1 /* libsodium.18.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsodium.18.dylib; path = ../../../../../../../../../usr/local/lib/libsodium.18.dylib; sourceTree = "<group>"; };
+		9762EDE51EAE54D6002062A1 /* libzmq.5.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libzmq.5.dylib; path = ../../../../../../../../../usr/local/lib/libzmq.5.dylib; sourceTree = "<group>"; };
+		9762EDE61EAE54D6002062A1 /* libzyre.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libzyre.1.dylib; path = ../../../../../../../../../usr/local/lib/libzyre.1.dylib; sourceTree = "<group>"; };
 		979A79781EA7B0D6003153EF /* libmastic.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libmastic.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		979A79851EA7B112003153EF /* definition.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = definition.c; sourceTree = "<group>"; };
 		979A79871EA7B112003153EF /* definition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = definition.h; sourceTree = "<group>"; };
@@ -1127,6 +1190,18 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		9762EDC91EAE5414002062A1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9762EDE11EAE5490002062A1 /* yajl.framework in Frameworks */,
+				9762EDE81EAE54D6002062A1 /* libsodium.18.dylib in Frameworks */,
+				9762EDE91EAE54D6002062A1 /* libzmq.5.dylib in Frameworks */,
+				9762EDE71EAE54D6002062A1 /* libczmq.3.dylib in Frameworks */,
+				9762EDEA1EAE54D6002062A1 /* libzyre.1.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		979A79751EA7B0D6003153EF /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1142,12 +1217,33 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		9762EDCE1EAE5414002062A1 /* mastic-macos */ = {
+			isa = PBXGroup;
+			children = (
+				9762EDD01EAE5414002062A1 /* Info.plist */,
+			);
+			path = "mastic-macos";
+			sourceTree = "<group>";
+		};
+		9762EDE21EAE54D5002062A1 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				9762EDE31EAE54D6002062A1 /* libczmq.3.dylib */,
+				9762EDE41EAE54D6002062A1 /* libsodium.18.dylib */,
+				9762EDE51EAE54D6002062A1 /* libzmq.5.dylib */,
+				9762EDE61EAE54D6002062A1 /* libzyre.1.dylib */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		979A796F1EA7B0D6003153EF = {
 			isa = PBXGroup;
 			children = (
 				979A79B31EA8A835003153EF /* yajl.xcodeproj */,
 				979A79BC1EA8A86F003153EF /* ios */,
 				979A79841EA7B112003153EF /* src */,
+				9762EDCE1EAE5414002062A1 /* mastic-macos */,
+				9762EDE21EAE54D5002062A1 /* Frameworks */,
 				979A79791EA7B0D6003153EF /* Products */,
 			);
 			sourceTree = "<group>";
@@ -1156,6 +1252,7 @@
 			isa = PBXGroup;
 			children = (
 				979A79781EA7B0D6003153EF /* libmastic.a */,
+				9762EDCD1EAE5414002062A1 /* mastic.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1211,6 +1308,7 @@
 			isa = PBXGroup;
 			children = (
 				979A79B81EA8A835003153EF /* libyajl.a */,
+				9762EDD61EAE5414002062A1 /* yajl.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -2480,7 +2578,41 @@
 		};
 /* End PBXGroup section */
 
+/* Begin PBXHeadersBuildPhase section */
+		9762EDCA1EAE5414002062A1 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9762EDEB1EAE551A002062A1 /* definition.h in Headers */,
+				9762EDEC1EAE551A002062A1 /* mapping.h in Headers */,
+				9762EDED1EAE551A002062A1 /* mastic.h in Headers */,
+				9762EDEF1EAE551A002062A1 /* network.h in Headers */,
+				9762EDF11EAE551A002062A1 /* tests.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
 /* Begin PBXNativeTarget section */
+		9762EDCC1EAE5414002062A1 /* mastic-macos */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9762EDD71EAE5414002062A1 /* Build configuration list for PBXNativeTarget "mastic-macos" */;
+			buildPhases = (
+				9762EDC81EAE5414002062A1 /* Sources */,
+				9762EDC91EAE5414002062A1 /* Frameworks */,
+				9762EDCA1EAE5414002062A1 /* Headers */,
+				9762EDCB1EAE5414002062A1 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				9762EDD91EAE5465002062A1 /* PBXTargetDependency */,
+			);
+			name = "mastic-macos";
+			productName = "mastic-macos";
+			productReference = 9762EDCD1EAE5414002062A1 /* mastic.framework */;
+			productType = "com.apple.product-type.framework";
+		};
 		979A79771EA7B0D6003153EF /* mastic */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 979A79811EA7B0D6003153EF /* Build configuration list for PBXNativeTarget "mastic" */;
@@ -2490,6 +2622,7 @@
 				979A79761EA7B0D6003153EF /* CopyFiles */,
 				979A7D2F1EA8A97C003153EF /* CopyFiles */,
 				979A7D5A1EA8A9B6003153EF /* CopyFiles */,
+				9762EDF21EAE55A8002062A1 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -2510,6 +2643,11 @@
 				LastUpgradeCheck = 0830;
 				ORGANIZATIONNAME = "Ingenuity i/o";
 				TargetAttributes = {
+					9762EDCC1EAE5414002062A1 = {
+						CreatedOnToolsVersion = 8.3.2;
+						DevelopmentTeam = 56DRT9MG9S;
+						ProvisioningStyle = Automatic;
+					};
 					979A79771EA7B0D6003153EF = {
 						CreatedOnToolsVersion = 8.3.2;
 						DevelopmentTeam = 56DRT9MG9S;
@@ -2536,11 +2674,19 @@
 			projectRoot = "";
 			targets = (
 				979A79771EA7B0D6003153EF /* mastic */,
+				9762EDCC1EAE5414002062A1 /* mastic-macos */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
+		9762EDD61EAE5414002062A1 /* yajl.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = yajl.framework;
+			remoteRef = 9762EDD51EAE5414002062A1 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		979A79B81EA8A835003153EF /* libyajl.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -2550,7 +2696,30 @@
 		};
 /* End PBXReferenceProxy section */
 
+/* Begin PBXResourcesBuildPhase section */
+		9762EDCB1EAE5414002062A1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
+		9762EDC81EAE5414002062A1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9762EDDA1EAE547B002062A1 /* definition.c in Sources */,
+				9762EDDB1EAE547B002062A1 /* mapping.c in Sources */,
+				9762EDDC1EAE547B002062A1 /* model.c in Sources */,
+				9762EDDD1EAE547B002062A1 /* network.c in Sources */,
+				9762EDDF1EAE547B002062A1 /* parser.c in Sources */,
+				9762EDE01EAE547B002062A1 /* tests.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		979A79741EA7B0D6003153EF /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -2567,6 +2736,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		9762EDD91EAE5465002062A1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "yajl-macos";
+			targetProxy = 9762EDD81EAE5465002062A1 /* PBXContainerItemProxy */;
+		};
 		979A79BA1EA8A83F003153EF /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = yajl;
@@ -2575,6 +2749,68 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		9762EDD21EAE5414002062A1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = 56DRT9MG9S;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_VERSION = A;
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/../src/include/",
+					/usr/local/include,
+				);
+				INFOPLIST_FILE = "mastic-macos/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = /usr/local/lib;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				PRODUCT_BUNDLE_IDENTIFIER = io.ingenuity.mastic;
+				PRODUCT_NAME = mastic;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		9762EDD31EAE5414002062A1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = 56DRT9MG9S;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_VERSION = A;
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/../src/include/",
+					/usr/local/include,
+				);
+				INFOPLIST_FILE = "mastic-macos/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = /usr/local/lib;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				PRODUCT_BUNDLE_IDENTIFIER = io.ingenuity.mastic;
+				PRODUCT_NAME = mastic;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
 		979A797F1EA7B0D6003153EF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -2700,6 +2936,14 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		9762EDD71EAE5414002062A1 /* Build configuration list for PBXNativeTarget "mastic-macos" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9762EDD21EAE5414002062A1 /* Debug */,
+				9762EDD31EAE5414002062A1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
 		979A79731EA7B0D6003153EF /* Build configuration list for PBXProject "mastic" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

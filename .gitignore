@@ -824,3 +824,11 @@ dependencies/ios/ios/perPlatform/x86_64/share/zproject/czmq/ztrie.api
 dependencies/ios/ios/perPlatform/x86_64/share/zproject/czmq/zuuid.api
 dependencies/ios/ios/perPlatform/x86_64/share/zproject/zyre/zyre.api
 dependencies/ios/ios/perPlatform/x86_64/share/zproject/zyre/zyre_event.api
+builds/mastic.xcodeproj/xcuserdata/steph.xcuserdatad/xcschemes/mastic-ios.xcscheme
+builds/mastic.xcodeproj/xcuserdata/steph.xcuserdatad/xcschemes/mastic-macos.xcscheme
+builds/mastic.xcodeproj/xcuserdata/steph.xcuserdatad/xcschemes/xcschememanagement.plist
+dependencies/ios/yajl/yajl.xcodeproj/xcuserdata/steph.xcuserdatad/xcschemes/xcschememanagement.plist
+dependencies/ios/yajl/yajl.xcodeproj/xcuserdata/steph.xcuserdatad/xcschemes/yajl-ios.xcscheme
+dependencies/ios/yajl/yajl.xcodeproj/xcuserdata/steph.xcuserdatad/xcschemes/yajl-macos.xcscheme
+zyreprobe/zyreprobe.xcodeproj/xcuserdata/steph.xcuserdatad/xcschemes/xcschememanagement.plist
+zyreprobe/zyreprobe.xcodeproj/xcuserdata/steph.xcuserdatad/xcschemes/zyreprobe.xcscheme
