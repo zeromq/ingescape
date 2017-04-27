@@ -101,13 +101,14 @@ macx:{
 }
 
 unix:{
-
-    ############ Android ###########
-    DEFINES +=  ANDROID
-
+    android_compilation {
+        ############ Android ###########
     message("Compilation android scope ...")
 
-    android_libs_path = $$PWD/../builds/android/libs/armeabi-v7a
+    # This define is used in "network.c" to use the "ifaddrs.h" for android but only to pass the compilation
+    # After we need to use the newest functions : "mtic_start_ip" & "init_actor_ip" instead of "mtic_start" & "init_actor"
+    # Because getting the Ip Address dynamically by "ifaddrs.c" doesnt work
+    DEFINES +=  ANDROID
 
     INCLUDEPATH += $$PWD/android-ifaddrs-master/ \
 
@@ -115,22 +116,20 @@ unix:{
 
     HEADERS += $$PWD/android-ifaddrs-master/ifaddrs.h \
 
+    android_libs_path = $$PWD/../builds/android/libs/armeabi-v7a
+
     LIBS += -L$$android_libs_path/ -lzmq -lczmq -lzyre -lyajl
 
-    ############################
-#    QMAKE_CXXFLAGS += -std=c99
+    } else {
+        ############ Linux ###########
+    message("Compilation Linux scope ...")
 
-    ############ Linux ###########
-#    message("Compilation Linux scope ...")
+    libzyre_path = $$PWD/zyre/bin/Linux
+    libyajl_path = $$PWD/yajl/lloyd-yajl-2.1.0/Linux/lib
 
-#    libzyre_path = $$PWD/zyre/bin/Linux
-#    libyajl_path = $$PWD/yajl/lloyd-yajl-2.1.0/Linux/lib
-
-#    #Add librairies
-#    LIBS += -L$$libzyre_path -lzmq -lczmq -lzyre \
-#            -L$$libyajl_path -lyajl
-
-    ############################
+    LIBS += -L$$libzyre_path -lzmq -lczmq -lzyre \
+            -L$$libyajl_path -lyajl
+    }
 }
 
 #--------- COMMON ---------#
