@@ -2,3 +2,4 @@ builds/builds/
 dependencies/uthash/
 builds/windows/
 build-mastic-Android_for_armeabi_v7a_GCC_4_9_Qt_5_5_1-Debug/
+build-mastic-Android_for_armeabi_v7a_GCC_4_9_Qt_5_5_1-Release/
