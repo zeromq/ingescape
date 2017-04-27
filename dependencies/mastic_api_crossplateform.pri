@@ -116,9 +116,24 @@ unix:{
 
     HEADERS += $$PWD/android-ifaddrs-master/ifaddrs.h \
 
-    android_libs_path = $$PWD/../builds/android/libs/armeabi-v7a
+    #android_libs_path = $$PWD/../builds/android/libs/armeabi-v7a
+    android_libzyre_path = $$PWD/zyre/bin/Android/armeabi-v7a
+    android_libyajl_path = $$PWD/yajl/lloyd-yajl-2.1.0/Android/armeabi-v7a
 
-    LIBS += -L$$android_libs_path/ -lzmq -lczmq -lzyre -lyajl
+    LIBS += -L$$android_libzyre_path/ -lzmq -lczmq -lzyre \
+            -L$$android_libyajl_path/ -lyajl
+
+    ############ Copy needed in C:\ ############
+    #NB: Copy includes normally already with windows
+
+    #Add the make step 'install' to copy the .a & .so files
+    install_libs.path += "C:/mastic/lib/android/armeabi-v7a"
+    install_libs.files += $$android_libzyre_path/* \
+                          $$android_libyajl_path/* \
+                          $$OUT_PWD/*.so
+
+    #Add installation options
+    INSTALLS += install_libs \
 
     } else {
         ############ Linux ###########
