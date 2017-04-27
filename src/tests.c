@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include "tests.h"
+#include "mastic_private.h"
 
 void callback_test_input_1(agent_iop* input_iop){
     fprintf(stderr, "%s - the input name is : %s\n", __FUNCTION__, input_iop->name);
@@ -161,7 +162,7 @@ void test_mapping_workflow(){
     free_definition(external_agent_def);
     free_mapping(mtic_my_agent_mapping);
     //Free iop map
-    struct agent_iop_t *iop, *tmp;
+    struct agent_iop *iop, *tmp;
     HASH_ITER(hh,output_to_unsubscribe, iop, tmp)
     {
         HASH_DEL(output_to_unsubscribe, iop);
@@ -289,7 +290,7 @@ void print_iop(agent_iop *iop)
 void print_category(category *cat)
 {
     unsigned int hashCount;
-    struct agent_iop_t *d;
+    struct agent_iop *d;
     int i;
 
     printf("\tcategory name : %s \n", cat->name);
@@ -326,7 +327,7 @@ void print_category(category *cat)
 void print_definition(definition *def)
 {
     unsigned int hashCount;
-    struct agent_iop_t *d;
+    struct agent_iop *d;
     int i;
     
     printf("Agent name : %s \n", def->name);
@@ -361,7 +362,7 @@ void print_definition(definition *def)
     }
 
     /* categories */
-    struct category_t *cat;
+    struct category *cat;
     hashCount = HASH_COUNT(def->categories);
     printf("\ncategories[%u]:\n", hashCount);
     i = 0;
@@ -630,7 +631,7 @@ void init_def()
     all_categories = init_categories();
     
     //Test all the categories
-    struct category_t *cat_to_check;
+    struct category *cat_to_check;
     for(cat_to_check = all_categories; cat_to_check != NULL; cat_to_check = cat_to_check->hh.next) {
         if(check_category(mtic_definition_live, cat_to_check, OUTPUT) == true)
         {

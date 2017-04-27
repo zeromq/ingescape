@@ -6,15 +6,15 @@
 //
 
 
-        #include "mtic_network.h"
-	#include <zyre.h>
-	#include <czmq.h>
-	#include "uthash.h"
-        #include "mtic_kvsimple.h"
+#include "mtic_network.h"
+#include <zyre.h>
+#include <czmq.h>
+#include "uthash.h"
+#include "mtic_kvsimple.h"
 
 
-        #include "mtic_mapping.h"
-        #include "mtic_tests.h"
+#include "mtic_mapping.h"
+#include "mtic_tests.h"
 
 #ifdef _WIN32
 

@@ -20,25 +20,8 @@
 #define MASTICAPI_COMMON_DLLSPEC extern
 #endif
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
-
-#include "uthash/uthash.h"
-
-/*>>>>>>>>>>>>>>>>>> COMMON STRUCTURES <<<<<<<<<<<<<<<<<<<<<<<<<<< */
-
-/*
- * Define the structure agent_port (name, port_number) :
- * 'name' : the agent name
- * 'port' : the port number used for connection
- */
-typedef struct agent_port_t {
-    const char * name;          //Need to be unique : the table hash key
-    int port;
-    UT_hash_handle hh;         /* makes this structure hashable */
-} agent_port;
 
 /*
  * The variable 'value_type' contains the data type of the value, use to parse
@@ -54,84 +37,21 @@ typedef enum {
 } value_type;
 
 /*
- * Define the structure agent_iop (input, output, parameter) :
- * 'name'       : the input/output/parameter's name
- * 'type'       : the input/output/parameter'value type (int, double, ...)
- * 'value'      : the input/output/parameter'value
- * 'is_muted'   : the input/output/parameter muted
- * NB : it's true that 3 'const char*' are defined and it's useless, only to differentiate in accordance to the type for using ex. 'e1.impulse = 'released()'
- */
-typedef struct agent_iop_t {
-    const char * name;          //Need to be unique : the table hash key
-    value_type type;
-    union {
-        int i;                  //in accordance to type INTEGER ex. '10'
-        double d;               //in accordance to type DOUBLE ex. '10.01'
-        char* s;                //in accordance to type STRING ex. 'display the image'
-        bool b;                 //in accordance to type BOOL ex. 'TRUE'
-        char* impuls;           //in accordance to type IMPULSION ex. 'released()'
-        char* strct;            //in accordance to type STRUCTURE ex. '{int:x, int:y, string:gesture_name} <=> {int:10, int:45, string:swap}
-    } old_value;
-    union {
-        int i;                  //in accordance to type INTEGER ex. '10'
-        double d;               //in accordance to type DOUBLE ex. '10.01'
-        char* s;                //in accordance to type STRING ex. 'display the image'
-        bool b;                 //in accordance to type BOOL ex. 'TRUE'
-        char* impuls;           //in accordance to type IMPULSION ex. 'released()'
-        char* strct;            //in accordance to type STRUCTURE ex. '{int:x, int:y, string:gesture_name} <=> {int:10, int:45, string:swap}
-    } value;
-    bool is_muted;              // flag indicated if the iop is muted (specially used for outputs)
-    UT_hash_handle hh;         /* makes this structure hashable */
-} agent_iop;
-
-
-/*
  * Define the state during the checking of a category
  * TODO: complete or remove useless stuff
  */
-typedef enum {GLOBAL, OUTPUT, INPUT_TYPE} category_check_type;
+typedef enum {
+    GLOBAL,
+    OUTPUT,
+    INPUT_TYPE
+} category_check_type;
 
-/*
- * Define the structure CATEGORY :
- * 'name'                   : name of the category
- * 'version'                : version of the category
- * 'parameters'             : list of parameters which describe the category
- * 'inputs'                 : list of inputs which describe the category
- * 'outputs'                : list of outputs which describe the category
- */
-typedef struct category_t {
-    const char* name;
-    const char * version;
-    agent_iop* params_table;
-    agent_iop* inputs_table;
-    agent_iop* outputs_table;
-    UT_hash_handle hh;
-} category;
+//forward declaration of internal structs
+typedef struct agent_iop agent_iop;
+typedef struct category category;
+typedef struct definition definition;
 
 
-/*
- * Define the structure DEFINITION :
- * 'name'                   : agent name
- * 'description'            : human readable description of the agent
- * 'version'                : the version of the agent
- * 'parameters'             : list of parameters contains by the agent
- * 'inputs'                 : list of inputs contains by the agent
- * 'outputs'                : list of outputs contains by the agent
- */
-typedef struct definition_t {
-    const char * name; //Need to be unique the key
-    const char * description;
-    const char * version;
-    category * categories;
-    agent_iop* params_table;
-    agent_iop* inputs_table;
-    agent_iop* outputs_table;
-    UT_hash_handle hh;
-} definition;
-
-MASTICAPI_COMMON_DLLSPEC definition * mtic_definition_loaded;
-MASTICAPI_COMMON_DLLSPEC definition * mtic_definition_live;
-MASTICAPI_COMMON_DLLSPEC definition * mtic_agents_defs_on_network;
 
 /*
  * Function: string_to_value_type

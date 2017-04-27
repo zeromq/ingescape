@@ -10,29 +10,23 @@
 #ifndef MTIC_MODEL_H
 #define MTIC_MODEL_H
 
-#include "definition.h"
 #include "network.h"
 
 //Define a state to return in functions
-typedef enum
-{OK,
-NOK,
-NAME_EMPTY,
-NAME_NOT_EXIST,
-TYPE_INPUT,
-TYPE_OUTPUT,
-TYPE_PARAM,
-NO_CALLBACK} model_state;
+typedef enum{
+    OK,
+    NOK,
+    NAME_EMPTY,
+    NAME_NOT_EXIST,
+    TYPE_INPUT,
+    TYPE_OUTPUT,
+    TYPE_PARAM,
+    NO_CALLBACK
+} model_state;
 
 //Define the pointer on the callback function
 typedef void (*calback_ptr_t)( agent_iop* );
 
-//Hashable structure which associate the name of one 'iop' and the pointer of one callback
-typedef struct callbacks_t {
-    const char * iop_name;          //Need to be unique : the table hash key
-    calback_ptr_t callback_ptr;   //pointer on the callback
-    UT_hash_handle hh;
-} callbacks;
 
 /*
  * Function: mtic_find_iop_by_name

@@ -11,69 +11,17 @@
 #define MTIC_MAPPING_H
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include "definition.h"
 #include "model.h"
-#include "network.h"
 
 /*
  * Define the state of a mapping ON or OFF
  */
 typedef enum {OFF, ON, INCOMPATIBLE, GENERIC} map_state;
+typedef struct mapping_out mapping_out;
+typedef struct mapping_cat mapping_cat;
+typedef struct mapping mapping;
 
-/*
- * Define the structure 'mapping_out' which contains mapping between an input and an (one or all) external agent's output :
- * 'map_id'                 : the key of the table
- * 'input name'             : agent's input name to connect
- * 'agent name to connect'  : external agent's name to connect with (one or all)
- * 'output name to connect' : external agent(s) output name to connect with
- */
-typedef struct mapping_out_t {
-    int map_id; //Need to be unique : the table hash key
-    char *input_name;
-    char *agent_name;
-    char *output_name;
-    map_state state;
-    UT_hash_handle hh;
-} mapping_out;
 
-/*
- * Define the structure 'mapping_cat' which contains mapping between an input and an (one or all) external agent's category :
- * 'map_id'                         : the key of the table
- * 'agent name to connect'          : external agent's name to connect with (one or all)
- * 'category unique name to connect': external agent(s) category to connect with
- */
-typedef struct mapping_cat_t {
-    int map_cat_id;//Need to be unique : the table hash key
-    char* agent_name;
-    char *category_name;
-    map_state state;
-    UT_hash_handle hh;
-} mapping_cat;
-
-/*
- * Define the structure 'mapping' which contains the json description of all mapping (output & category):
- * 'name'           : The name of the mapping need to be unique
- * 'description     :
- * 'version'        :
- * 'mapping out'    : the table of the mapping output
- * 'mapping cat'    : the table of the mapping category
- */
- typedef struct mapping_t {
-    char *name;//Need to be unique : the table hash key
-    char *description;
-    char *version;
-    mapping_out *map_out;
-    mapping_cat *map_cat;
-    UT_hash_handle hh;
-} mapping;
-
-// the table which will contain the mapping
-MASTICAPI_COMMON_DLLSPEC mapping * mtic_my_agent_mapping;
-
-/*>>>>>>>>>>>>>>>>>> MAPPING <<<<<<<<<<<<<<<<<<<<<<<<<<< */
 
 const char * map_state_to_string(map_state state);
 

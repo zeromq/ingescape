@@ -8,6 +8,20 @@
 //
 
 #include "definition.h"
+#include "mastic_private.h"
+#include "uthash/uthash.h"
+
+/*
+ * Define the structure agent_port (name, port_number) :
+ * 'name' : the agent name
+ * 'port' : the port number used for connection
+ */
+typedef struct agent_port_t {
+    const char * name;          //Need to be unique : the table hash key
+    int port;
+    UT_hash_handle hh;         /* makes this structure hashable */
+} agent_port;
+
 
 // Definition structures
 definition* mtic_definition_loaded = NULL;
@@ -168,7 +182,7 @@ bool check_category_agent_iop(agent_iop *ref_iop,
     bool state = true;
 
 
-    struct agent_iop_t *iop, *iop_found;
+    struct agent_iop *iop, *iop_found;
 
     for(iop = ref_iop; iop != NULL; iop = iop->hh.next) {
         //Init to null for the next
@@ -188,7 +202,7 @@ bool check_category_agent_iop(agent_iop *ref_iop,
 
 void free_category (category* cat){
 
-    struct agent_iop_t *current, *tmp;
+    struct agent_iop *current, *tmp;
 
     free((char*)cat->name);
     cat->name = NULL ;
@@ -217,8 +231,8 @@ void free_category (category* cat){
 
 void free_definition (definition* def) {
 
-    struct agent_iop_t *current_iop, *tmp_iop;
-    struct category_t *current_cat, *tmp_cat;
+    struct agent_iop *current_iop, *tmp_iop;
+    struct category *current_cat, *tmp_cat;
 
     free((char*)def->name);
     def->name = NULL;

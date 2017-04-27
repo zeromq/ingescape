@@ -8,7 +8,9 @@
 //
 
 #include "mapping.h"
-#include "parser.h"
+#include "mastic_private.h"
+
+
 
 // Global parameter declaration
 mapping * mtic_my_agent_mapping = NULL;
@@ -63,8 +65,8 @@ void free_map_cat (mapping_cat* map_cat){
 
 void free_mapping (mapping* mapp) {
 
-    struct mapping_out_t *current_map_out, *tmp_map_out;
-    struct mapping_cat_t *current_map_cat, *tmp_map_cat;
+    struct mapping_out *current_map_out, *tmp_map_out;
+    struct mapping_cat *current_map_cat, *tmp_map_cat;
 
     free((char*)mapp->name);
     mapp->name = NULL;
@@ -100,7 +102,7 @@ void copy_to_map_global(mapping *loaded){
      */
     //Initialize the table mapping if it is not
     if(mtic_my_agent_mapping == NULL){
-        mtic_my_agent_mapping = calloc (1, sizeof (struct mapping_t));
+        mtic_my_agent_mapping = calloc (1, sizeof (struct mapping));
     }
     if(mtic_my_agent_mapping->name) {
         free((char*)mtic_my_agent_mapping->name);
@@ -186,7 +188,7 @@ mapping_out * add_map_to_table(char * input_name,
 
         //Initialize the table mapping if it is not
         if(mtic_my_agent_mapping == NULL){
-            mtic_my_agent_mapping = calloc (1, sizeof (struct mapping_t));
+            mtic_my_agent_mapping = calloc (1, sizeof (struct mapping));
         }
         //Count actual mapping to define the map_int
         new_map_out->map_id = 0;

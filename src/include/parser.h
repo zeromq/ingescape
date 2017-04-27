@@ -9,7 +9,6 @@
 #ifndef MTIC_PARSER_H
 #define MTIC_PARSER_H
 
-#include "definition.h"
 #include "mapping.h"
 
 /*

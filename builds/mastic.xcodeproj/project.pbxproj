@@ -147,6 +147,10 @@
 		979A7D911EA8A9CB003153EF /* runtime.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79F81EA8A86F003153EF /* runtime.h */; };
 		979A7D921EA8A9CB003153EF /* utils.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79F91EA8A86F003153EF /* utils.h */; };
 		979A7D931EA8A9CB003153EF /* version.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79FA1EA8A86F003153EF /* version.h */; };
+		97C926AC1EB2472000D2B0CE /* model.h in Headers */ = {isa = PBXBuildFile; fileRef = 979A798A1EA7B112003153EF /* model.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		97C926AD1EB2472900D2B0CE /* model.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A798A1EA7B112003153EF /* model.h */; };
+		97C926AE1EB2474300D2B0CE /* parser.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A798C1EA7B112003153EF /* parser.h */; };
+		97C926AF1EB2474900D2B0CE /* parser.h in Headers */ = {isa = PBXBuildFile; fileRef = 979A798C1EA7B112003153EF /* parser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -208,7 +212,9 @@
 				979A79A51EA7B1BA003153EF /* definition.h in CopyFiles */,
 				979A79A61EA7B1BA003153EF /* mapping.h in CopyFiles */,
 				979A79A71EA7B1BA003153EF /* mastic.h in CopyFiles */,
+				97C926AD1EB2472900D2B0CE /* model.h in CopyFiles */,
 				979A79A81EA7B1BA003153EF /* network.h in CopyFiles */,
+				97C926AE1EB2474300D2B0CE /* parser.h in CopyFiles */,
 				979A79A91EA7B1BA003153EF /* tests.h in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1187,6 +1193,7 @@
 		979A7D261EA8A86F003153EF /* zuuid.api */ = {isa = PBXFileReference; lastKnownFileType = text; path = zuuid.api; sourceTree = "<group>"; };
 		979A7D281EA8A86F003153EF /* zyre.api */ = {isa = PBXFileReference; lastKnownFileType = text; path = zyre.api; sourceTree = "<group>"; };
 		979A7D291EA8A86F003153EF /* zyre_event.api */ = {isa = PBXFileReference; lastKnownFileType = text; path = zyre_event.api; sourceTree = "<group>"; };
+		97C926AB1EB23ED100D2B0CE /* mastic_private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mastic_private.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1260,14 +1267,14 @@
 		979A79841EA7B112003153EF /* src */ = {
 			isa = PBXGroup;
 			children = (
-				979A79851EA7B112003153EF /* definition.c */,
 				979A79861EA7B112003153EF /* include */,
+				979A79851EA7B112003153EF /* definition.c */,
 				979A79981EA7B112003153EF /* mapping.c */,
 				979A79991EA7B112003153EF /* model.c */,
 				979A799A1EA7B112003153EF /* network.c */,
-				979A799B1EA7B112003153EF /* network_test.c */,
 				979A799C1EA7B112003153EF /* parser.c */,
 				979A799D1EA7B112003153EF /* tests.c */,
+				979A799B1EA7B112003153EF /* network_test.c */,
 			);
 			name = src;
 			path = ../src;
@@ -1279,6 +1286,7 @@
 				979A79871EA7B112003153EF /* definition.h */,
 				979A79881EA7B112003153EF /* mapping.h */,
 				979A79891EA7B112003153EF /* mastic.h */,
+				97C926AB1EB23ED100D2B0CE /* mastic_private.h */,
 				979A798A1EA7B112003153EF /* model.h */,
 				979A798B1EA7B112003153EF /* network.h */,
 				979A798C1EA7B112003153EF /* parser.h */,
@@ -2586,7 +2594,9 @@
 				9762EDEB1EAE551A002062A1 /* definition.h in Headers */,
 				9762EDEC1EAE551A002062A1 /* mapping.h in Headers */,
 				9762EDED1EAE551A002062A1 /* mastic.h in Headers */,
+				97C926AC1EB2472000D2B0CE /* model.h in Headers */,
 				9762EDEF1EAE551A002062A1 /* network.h in Headers */,
+				97C926AF1EB2474900D2B0CE /* parser.h in Headers */,
 				9762EDF11EAE551A002062A1 /* tests.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2943,6 +2953,7 @@
 				9762EDD31EAE5414002062A1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		979A79731EA7B0D6003153EF /* Build configuration list for PBXProject "mastic" */ = {
 			isa = XCConfigurationList;

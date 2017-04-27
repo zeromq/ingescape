@@ -8,7 +8,7 @@
 
 #include "yajl/yajl_tree.h"
 #include <yajl/yajl_gen.h>
-#include "parser.h"
+#include "mastic_private.h"
 
 #define STR_CATEGORY "category"
 #define STR_DEFINITION "definition"
@@ -30,16 +30,16 @@
  *   parse a agent_iop data and add it to the corresponding hash table
  */
 
-static void json_add_data_to_hash (struct agent_iop_t** hasht,
+static void json_add_data_to_hash (struct agent_iop ** hasht,
                                    yajl_val obj){
 
-    struct agent_iop_t *data = NULL;
+    struct agent_iop *data = NULL;
 
     /* check if the key already exist */
     const char* name = YAJL_GET_STRING(obj->u.object.values[0]);
     HASH_FIND_STR(*hasht, name , data);
     if (data == NULL) {
-        data = calloc (1, sizeof (struct agent_iop_t));
+        data = calloc (1, sizeof (struct agent_iop));
         data->name = strdup (name);
 
         data->type = string_to_value_type (YAJL_GET_STRING(obj->u.object.values[1]));
@@ -77,7 +77,7 @@ static void json_add_data_to_hash (struct agent_iop_t** hasht,
  */
 
 static void json_add_data (yajl_val node, const char** path,
-                            struct agent_iop_t** hasht) {
+                            struct agent_iop ** hasht) {
     yajl_val v;
     v = yajl_tree_get(node, path, yajl_t_array);
     if (v && YAJL_IS_ARRAY(v))
@@ -173,7 +173,7 @@ static int json_tokenized (const char* json_str,
 static category* json_parse_category (yajl_val node) {
 
     yajl_val v;
-    struct category_t* cat = NULL;
+    struct category* cat = NULL;
     cat = (category*) calloc(1, sizeof(category));
     const char * path[] = { STR_CATEGORY, "",  (const char *) 0 };
 
@@ -205,10 +205,10 @@ static category* json_parse_category (yajl_val node) {
  *   parse a tab of categories and add them into the corresponding hash table
  */
 
-static void json_add_category_to_hash (struct category_t** hasht,
+static void json_add_category_to_hash (struct category** hasht,
                                        yajl_val current_cat){
 
-    struct category_t *cat = NULL;
+    struct category *cat = NULL;
     yajl_val v;
     const char * path_in_current[] = { "", (const char *) 0 };
 
@@ -219,7 +219,7 @@ static void json_add_category_to_hash (struct category_t** hasht,
         const char* name = YAJL_GET_STRING(v);
         HASH_FIND_STR(*hasht, name , cat);
         if (cat == NULL){
-            cat = calloc (1, sizeof (struct category_t));
+            cat = calloc (1, sizeof (struct category));
             cat->name = strdup (name);
 
             path_in_current[0] = STR_VERSION;
@@ -297,13 +297,13 @@ static definition* json_parse_definition (yajl_val node) {
  *   parse a tab of mapping output type and add them into the corresponding hash table
  */
 
-static void json_add_map_out_to_hash (struct mapping_out_t** hasht,
+static void json_add_map_out_to_hash (struct mapping_out** hasht,
                                        yajl_val current_map_out){
 
     const char* input_name;
     const char* agent_name;
     const char* output_name;
-    struct mapping_out_t *map_out = NULL;
+    struct mapping_out *map_out = NULL;
     yajl_val v;
     const char * path_in_current[] = { "", (const char *) 0 };
 
@@ -314,7 +314,7 @@ static void json_add_map_out_to_hash (struct mapping_out_t** hasht,
     HASH_FIND_INT(*hasht, &map_id , map_out);
 
     if (map_out == NULL){
-        map_out = calloc (1, sizeof (struct mapping_out_t));
+        map_out = calloc (1, sizeof (struct mapping_out));
         map_out->map_id = map_id;
         map_out->state = OFF;
 
@@ -353,12 +353,12 @@ static void json_add_map_out_to_hash (struct mapping_out_t** hasht,
  *   parse a tab of mapping category type and add them into the corresponding hash table
  */
 
-static void json_add_map_cat_to_hash (struct mapping_cat_t** hasht,
+static void json_add_map_cat_to_hash (struct mapping_cat** hasht,
                                        yajl_val current_map_out){
 
     const char* agent_name;
     const char* category_name;
-    struct mapping_cat_t *map_cat = NULL;
+    struct mapping_cat *map_cat = NULL;
     yajl_val v;
     const char * path_in_current[] = { "", (const char *) 0 };
 
@@ -371,7 +371,7 @@ static void json_add_map_cat_to_hash (struct mapping_cat_t** hasht,
         HASH_FIND_INT(*hasht, &map_cat_id , map_cat);
 
         if (map_cat == NULL){
-            map_cat = calloc (1, sizeof (struct mapping_cat_t));
+            map_cat = calloc (1, sizeof (struct mapping_cat));
             map_cat->map_cat_id = map_cat_id;
             map_cat->state = OFF;
 
@@ -509,7 +509,7 @@ static void json_dump_iop (yajl_gen *g, agent_iop* aiop) {
 static void json_dump_category (yajl_gen *g, category* cat) {
     
     unsigned int hashCount = 0;
-    struct agent_iop_t *d;
+    struct agent_iop *d;
     
     yajl_gen_map_open(*g);
     
@@ -561,7 +561,7 @@ static void json_dump_category (yajl_gen *g, category* cat) {
 static void json_dump_definition (yajl_gen *g, definition* def) {
     
     unsigned int hashCount = 0;
-    struct agent_iop_t *d;
+    struct agent_iop *d;
     
     yajl_gen_map_open(*g);
     
@@ -604,7 +604,7 @@ static void json_dump_definition (yajl_gen *g, definition* def) {
         yajl_gen_array_close(*g);
     }
     
-    struct category_t *cat;
+    struct category *cat;
     hashCount = HASH_COUNT(def->categories);
     if (hashCount) {
         yajl_gen_string(*g, (const unsigned char *) STR_CATEGORIES, strlen(STR_CATEGORIES));
@@ -802,7 +802,7 @@ int mtic_init_internal_data (const char* definition_file_path)
         if(mtic_definition_loaded != NULL)
         {
             // Live data corresponds to a copy of the initial definition
-            mtic_definition_live = calloc(1, sizeof(struct definition_t));
+            mtic_definition_live = calloc(1, sizeof(struct definition));
             memcpy(mtic_definition_live, mtic_definition_loaded, sizeof(*mtic_definition_loaded));
             errorCode = 0;
         } else {

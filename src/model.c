@@ -6,7 +6,18 @@
 //  Copyright © 2016 IKKY WP4.8. All rights reserved.
 //
 
-#include "model.h"
+#include "mastic_private.h"
+
+
+//Define the pointer on the callback function
+typedef void (*calback_ptr_t)( agent_iop* );
+
+//Hashable structure which associate the name of one 'iop' and the pointer of one callback
+typedef struct callbacks {
+    const char * iop_name;          //Need to be unique : the table hash key
+    calback_ptr_t callback_ptr;   //pointer on the callback
+    UT_hash_handle hh;
+} callbacks;
 
 //The variable which will contain all the callbacks associated to 'iop'
 callbacks *agent_callbacks;
@@ -231,7 +242,7 @@ int mtic_muteAll()
     int result = 0,result_tmp = 0;
 
     // Go through the agent outpust to mute them
-    struct agent_iop_t *current_iop, *tmp_iop;
+    struct agent_iop *current_iop, *tmp_iop;
     HASH_ITER(hh, mtic_definition_live->outputs_table, current_iop, tmp_iop) {
         if(current_iop != NULL)
         {
@@ -253,7 +264,7 @@ int mtic_unmuteAll()
     int result = 0,result_tmp = 0;
     
     // Go through the agent outpust to mute them
-    struct agent_iop_t *current_iop, *tmp_iop;
+    struct agent_iop *current_iop, *tmp_iop;
     HASH_ITER(hh, mtic_definition_live->outputs_table, current_iop, tmp_iop) {
         if(current_iop != NULL)
         {

@@ -10,10 +10,8 @@
 #include <zyre.h>
 #include <czmq.h>
 #include "uthash/uthash.h"
-
-
-#include "mapping.h"
-#include "tests.h"
+#include "mastic_private.h"
+#include "parser.h"
 
 #ifdef _WIN32
 
@@ -389,7 +387,7 @@ int manageIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 {
                     // Disactivate map(ping of the leaving agent
                     agent_iop* iop_unmappped = mtic_unmap(receivedDefinition);
-                    struct agent_iop_t *iop, *tmp;
+                    struct agent_iop *iop, *tmp;
                     HASH_ITER(hh,iop_unmappped, iop, tmp)
                     {
                         HASH_DEL(iop_unmappped, iop);
@@ -638,7 +636,6 @@ init_actor (zsock_t *pipe, void *args)
 
 }
 
-
 int mtic_start(const char *agentName, const char *networkDevice, int zyrePort, const char *channel){
 
     agentElements = calloc(1, sizeof(zyreloopElements_t));
@@ -659,6 +656,7 @@ int mtic_start(const char *agentName, const char *networkDevice, int zyrePort, c
 
     return 1;
 }
+
 int mtic_stop(){
     zstr_sendx (agentElements->agentActor, "$TERM", NULL);
     zactor_destroy (&agentElements->agentActor);
@@ -761,7 +759,7 @@ int check_and_subscribe_to(const char* agentName)
         {
             char map_description[100];
 
-            struct agent_iop_t *iop, *tmp;
+            struct agent_iop *iop, *tmp;
             HASH_ITER(hh,outputsToSubscribe, iop, tmp)
             {
                 strcpy(map_description, externalDefinition->name);
