@@ -25,7 +25,7 @@ typedef enum{
 } model_state;
 
 //Define the pointer on the callback function
-typedef void (*calback_ptr_t)( agent_iop* );
+typedef void (*callback_ptr_t)( agent_iop* );
 
 
 
