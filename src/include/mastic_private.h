@@ -22,7 +22,22 @@
 #include "uthash/uthash.h"
 #include "mapping.h"
 
-//////////////////  definition   //////////////////
+//////////////////  structures and enums   //////////////////
+
+//definition
+/*
+ * The variable 'value_type' contains the data type of the value, use to parse
+ * the JSON and affect the value tu right union corresponding
+ */
+typedef enum {
+    INTEGER,
+    DOUBLE_TYPE,
+    STRING,
+    BOOL_TYPE,
+    IMPULSION,
+    STRUCTURE
+} value_type;
+
 /*
  * Define the structure agent_iop (input, output, parameter) :
  * 'name'       : the input/output/parameter's name
@@ -91,12 +106,12 @@ typedef struct category {
     UT_hash_handle hh;
 } category;
 
-MASTICAPI_COMMON_DLLSPEC definition * mtic_definition_loaded;
-MASTICAPI_COMMON_DLLSPEC definition * mtic_definition_live;
-MASTICAPI_COMMON_DLLSPEC definition * mtic_agents_defs_on_network;
 
-
-//////////////////  mapping   //////////////////
+//mapping
+/*
+ * Define the state of a mapping ON or OFF
+ */
+typedef enum {OFF, ON, INCOMPATIBLE, GENERIC} map_state;
 /*
  * Define the structure 'mapping_out' which contains mapping between an input and an (one or all) external agent's output :
  * 'map_id'                 : the key of the table
@@ -144,9 +159,48 @@ typedef struct mapping {
     UT_hash_handle hh;
 } mapping;
 
+
+
+//////////////////  definition   //////////////////
+MASTICAPI_COMMON_DLLSPEC definition * mtic_definition_loaded;
+MASTICAPI_COMMON_DLLSPEC definition * mtic_definition_live;
+MASTICAPI_COMMON_DLLSPEC definition * mtic_agents_defs_on_network;
+
+
+//////////////////  mapping   //////////////////
+
 // the table which will contain the mapping
 MASTICAPI_COMMON_DLLSPEC mapping * mtic_my_agent_mapping;
 
+value_type string_to_value_type(const char* string);
+bool string_to_boolean(const char* string);
+const char* value_type_to_string (value_type type);
+const char* boolean_to_string (bool boole);
+MASTICAPI_COMMON_DLLSPEC char* mtic_iop_value_to_string (agent_iop* iop);
+MASTICAPI_COMMON_DLLSPEC const void* mtic_iop_value_string_to_real_type (agent_iop* iop, char* value);
+
+
+const char * map_state_to_string(map_state state);
+int mtic_map(char* input_name, char* map_description);
+agent_iop* mtic_check_map (definition *definition);
+agent_iop* mtic_unmap (definition *definition);
+agent_iop*  mtic_update_mapping_out_state(mapping_out* map_out, definition * external_definition);
+model_state mtic_map_received(const char * agent_name,
+                              char * out_name,
+                              void * value);
+bool mtic_map_category (char* map_description);
+void mtic_free_mapping (mapping* mapping);
+
+
+//////////////////  model   //////////////////
+agent_iop * mtic_find_iop_by_name(const char* name, model_state *code);
+agent_iop * mtic_find_iop_by_name_on_definition(const char *name, definition* definition, model_state *code);
+
+
+//////////////////  network   //////////////////
+int publish_output(const char* output_name);
+int check_and_subscribe_to(const char* agentName);
+void mtic_debug(const char *fmt, ...);
 
 
 #endif /* mastic_private_h */

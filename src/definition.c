@@ -28,6 +28,14 @@ definition* mtic_definition_loaded = NULL;
 definition* mtic_definition_live = NULL;
 definition* mtic_agents_defs_on_network = NULL;
 
+/*
+ * Function: string_to_value_type
+ * ----------------------------
+ *   convert a string to a value_type enum
+ *
+ *   string      : string to convert
+ *
+ */
 value_type string_to_value_type(const char* str) {
 
     if (!strcmp(str, "INTEGER"))
@@ -47,6 +55,14 @@ value_type string_to_value_type(const char* str) {
     return -1;
 }
 
+/*
+ * Function: string_to_boolean
+ * ----------------------------
+ *   convert a string to a boolean enum
+ *
+ *   string      : string to convert
+ *
+ */
 bool string_to_boolean(const char* str) {
 
     if (!strcmp(str, "true"))
@@ -59,6 +75,14 @@ bool string_to_boolean(const char* str) {
     return -1;
 }
 
+/*
+ * Function: value_type_to_string
+ * ----------------------------
+ *   convert a value_type to string
+ *
+ *   type      : value_type to convert
+ *
+ */
 const char* value_type_to_string (value_type type) {
     switch (type) {
         case INTEGER:
@@ -87,6 +111,14 @@ const char* value_type_to_string (value_type type) {
     return "";
 }
 
+/*
+ * Function: boolean_to_string
+ * ----------------------------
+ *   convert a boolean enum to string
+ *
+ *   bool      : boolean to convert
+ *
+ */
 const char* boolean_to_string (bool boole) {
     if (boole)
         return "true";
@@ -94,6 +126,14 @@ const char* boolean_to_string (bool boole) {
         return "false";
 }
 
+/*
+ * Function: free_agent_iop
+ * ----------------------------
+ *   free a structure agent_iop and all its pointers
+ *
+ *   agent_iop  : a pointer to the agent_iop structure to free
+ *
+ */
 void free_agent_iop (agent_iop* agent_iop){
 
     free((char*)agent_iop->name);
@@ -130,6 +170,22 @@ void free_agent_iop (agent_iop* agent_iop){
 
 // --------- public functions ----------------------
 
+/*
+ * Function: check_category
+ * ----------------------------
+ *   Check if the agent is in accordance with the category
+ *   GLOBAL : during the load of the agent's definition to check if ok with the parameters,inputs,outputs
+ *   OUTPUT : when another agent display on the BUS his category
+ *   INPUT  : when a map_category is called to check if the inputs is in accordance with the external agent's outputs
+ *
+ *   definition         : the definition to compare with
+ *
+ *   category           : the category to check
+ *
+ *   check_type         : the type of checking : GLOBAL, OUTPUT, INPUT
+ *
+ *   returns            : the state of the checking OK or NOK
+ */
 bool check_category(definition* def,
                        category *category,
                        category_check_type check_type)
@@ -176,6 +232,7 @@ bool check_category(definition* def,
     return state;
 }
 
+
 bool check_category_agent_iop(agent_iop *ref_iop,
                                 agent_iop *iop_to_check) {
 
@@ -200,6 +257,14 @@ bool check_category_agent_iop(agent_iop *ref_iop,
     return state;
 }
 
+/*
+ * Function: free_category
+ * ----------------------------
+ *   free a category structure, all its pointers and hash tables
+ *
+ *   category   : a pointer to the category structure to free
+ *
+ */
 void free_category (category* cat){
 
     struct agent_iop *current, *tmp;
@@ -229,6 +294,14 @@ void free_category (category* cat){
     free (cat);
 }
 
+/*
+ * Function: free_definition
+ * ----------------------------
+ *   free a definition structure, all its pointers and hash tables
+ *
+ *   definition : a pointer to the definition structure to free
+ *
+ */
 void free_definition (definition* def) {
 
     struct agent_iop *current_iop, *tmp_iop;
@@ -266,6 +339,14 @@ void free_definition (definition* def) {
     free(def);
 }
 
+/*
+ * Function: mtic_iop_value_to_string
+ * ----------------------------
+ *   convert the iop value to string
+ *
+ *   agent_iop      : iop to convert
+ *
+ */
 char* mtic_iop_value_to_string (agent_iop* iop)
 {
     char str_value[BUFSIZ];
@@ -305,7 +386,16 @@ char* mtic_iop_value_to_string (agent_iop* iop)
     return strdup(str_value);
 }
 
-
+/*
+ * Function: mtic_iop_value_string_to_real_type
+ * ----------------------------
+ *   convert the iop value to string
+ *
+ *   agent_iop      : boolean to convert
+ *
+ *   value          : string value
+ *
+ */
 const void* mtic_iop_value_string_to_real_type (agent_iop* iop, char* value)
 {
     void * out_value = NULL;
@@ -354,6 +444,14 @@ const void* mtic_iop_value_string_to_real_type (agent_iop* iop, char* value)
     return out_value;
 }
 
+/*
+ * Function: iop_old_value_to_string
+ * ----------------------------
+ *   convert the iop old value to string
+ *
+ *   agent_iop      : iop to convert
+ *
+ */
 const char* iop_old_value_to_string (agent_iop* iop)
 {
     char str_value[BUFSIZ];

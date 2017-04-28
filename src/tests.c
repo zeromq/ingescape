@@ -143,7 +143,7 @@ void test_mapping_workflow(){
 
     //subscribe : map received
     double value = 25.63;
-    model_state state = map_received("A2","s4",&value);
+    model_state state = mtic_map_received("A2","s4",&value);
 
     if(state == NOK)
         printf("The map_received 'A2.s4' is NOK \n");
@@ -160,7 +160,7 @@ void test_mapping_workflow(){
     free_definition(mtic_definition_loaded);
     free_definition(mtic_definition_live);
     free_definition(external_agent_def);
-    free_mapping(mtic_my_agent_mapping);
+    mtic_free_mapping(mtic_my_agent_mapping);
     //Free iop map
     struct agent_iop *iop, *tmp;
     HASH_ITER(hh,output_to_unsubscribe, iop, tmp)

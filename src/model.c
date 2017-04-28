@@ -63,6 +63,11 @@ agent_iop * mtic_find_iop_by_name_on_definition(const char *name, definition* de
     }
 }
 
+/*
+ * Function: mtic_find_iop_by_name
+ * ----------------------------
+ *
+ */
 agent_iop * mtic_find_iop_by_name(const char *name, model_state *code){
     
     return mtic_find_iop_by_name_on_definition(name,mtic_definition_live,code);
@@ -106,7 +111,18 @@ void update_value(agent_iop *iop, void* value){
     }
 }
 
-
+/*
+ * Function: observe :
+ * ----------------------------
+ *  Observe the iop and associate a callback to it.
+ *  When the iop value will change by calling the 'mtic_set' function, the associated callback will be called.
+ *
+ *  name_iop        : Name of the 'input/output/parameter'
+ *
+ *  callback_fct    : The pointer to the associated callback
+ *
+ *  return : model_state (cf. enum) return error is occur
+ */
 model_state mtic_observe(const char *iop_name,
              void (*callback_fct)(agent_iop *input_iop)){
 
@@ -129,7 +145,17 @@ model_state mtic_observe(const char *iop_name,
     return OK;
 }
 
-
+/*
+ * Function: mtic_get
+ * ----------------------------
+ *  Find the 'input/output/parameter' value.
+ *
+ *  name_iop    : Name of the 'input/output/parameter'
+ *
+ *  state       : The pointer on the state (cf. enum)
+ *
+ *  return : pointer on the value OR null
+ */
 void * mtic_get(const char *name_iop, model_state *state){
 
     agent_iop *iop = mtic_find_iop_by_name((char*) name_iop, state);
@@ -164,7 +190,17 @@ void * mtic_get(const char *name_iop, model_state *state){
     return NULL;
 }
 
-
+/*
+ * Function: mtic_set
+ * ----------------------------
+ *  Set the new value to the associated iop.
+ *
+ *  name_iop    : Name of the 'input/output/parameter'
+ *
+ *  new_value   : The new value
+ *
+ *  return : model_state (cf. enum) return error is occur
+ */
 model_state mtic_set(const char *iop_name, void *new_value){
 
     //1) find the iop
@@ -203,6 +239,16 @@ model_state mtic_set(const char *iop_name, void *new_value){
     return OK;
 }
 
+/*
+ * Function: mute
+ * ----------------------------
+ *  Mute an 'input/output/parameter'.
+ *
+ *  name_iop    : Name of the 'input/output/parameter'
+ *
+ *  return : 0 is the output has been properly muted, -1 otherwise.
+ */
+
 int mtic_mute(const char* iop_name)
 {
     int result = -1;
@@ -220,6 +266,15 @@ int mtic_mute(const char* iop_name)
     return result;
 }
 
+/*
+ * Function: unmute
+ * ----------------------------
+ *  Unmute an 'input/output/parameter'.
+ *
+ *  name_iop    : Name of the 'input/output/parameter'
+ *
+ *  return : 0 is the output has been properly unmuted, -1 otherwise.
+ */
 int mtic_unmute(const char* iop_name)
 {
     int result = -1;
@@ -237,6 +292,13 @@ int mtic_unmute(const char* iop_name)
     return result;
 }
 
+/*
+ * Function: mtic_muteAll
+ * ----------------------------
+ *  Mute all outputs.
+ *
+ *  return : 0 is the outputs have been properly muted, -1 otherwise.
+ */
 int mtic_muteAll()
 {
     int result = 0,result_tmp = 0;
@@ -258,7 +320,13 @@ int mtic_muteAll()
     return result;
 }
 
-
+/*
+ * Function: unmtic_muteAll
+ * ----------------------------
+ *  Unmute all outputs.
+ *
+ *  return : 0 is the outputs have been properly unmuted, -1 otherwise.
+ */
 int mtic_unmuteAll()
 {
     int result = 0,result_tmp = 0;

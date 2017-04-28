@@ -159,7 +159,7 @@ int manageSubscriber (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                         const void* converted_value = mtic_iop_value_string_to_real_type(found_iop, value);
 
                         // Map reception send to modify the internal model
-                        code = map_received(subscriberFound->agentName,
+                        code = mtic_map_received(subscriberFound->agentName,
                                             output,
                                             (void*)converted_value);
 
@@ -185,6 +185,14 @@ int manageSubscriber (zloop_t *loop, zmq_pollitem_t *item, void *arg){
     return 0;
 }
 
+/*
+ * Function: publish_output
+ * ----------------------------
+ *   Publishing output to the bus
+ *
+ *   usage : publishOutput(output_name)
+ *
+ */
 int publish_output(const char* output_name)
 {
     int result = -1;
@@ -636,6 +644,21 @@ init_actor (zsock_t *pipe, void *args)
 
 }
 
+/*
+ * Function: mtic_start
+ * ----------------------------
+ *   Start the network service
+ *
+ *   usage : mtic_masticStart(agentName, networkDevice, zyrePort,channel)
+ *         example : mtic_masticStart("MASTIC_TEST", "en15", 5670, "MASTIC")
+ *
+ *   agentName          : agent name
+ *   networkDevice      : device of connection
+ *   zyrePort           : zyre port used
+ *   channel            : name of the channel used to communication on zyre
+ *
+ *   returns : the state of the connection
+ */
 int mtic_start(const char *agentName, const char *networkDevice, int zyrePort, const char *channel){
 
     agentElements = calloc(1, sizeof(zyreloopElements_t));
@@ -657,6 +680,15 @@ int mtic_start(const char *agentName, const char *networkDevice, int zyrePort, c
     return 1;
 }
 
+/*
+ * Function: mtic_stop
+ * ----------------------------
+ *   Stop the network service
+ *
+ *   usage : mtic_masticStop()
+ *
+ *   returns : the state of the disconnection
+ */
 int mtic_stop(){
     zstr_sendx (agentElements->agentActor, "$TERM", NULL);
     zactor_destroy (&agentElements->agentActor);
@@ -667,6 +699,15 @@ int mtic_stop(){
     return 1;
 }
 
+/*
+ * Function: mtic_send_definition
+ * ----------------------------
+ *   Send my definition through the agent publisher
+ *   The agent definition must be defined : mtic_definition_loaded
+ *
+ *   usage : mtic_sendDefinition()
+ *
+ */
 void mtic_send_definition()
 {
     // Send my own definition
@@ -689,6 +730,18 @@ void mtic_send_definition()
     }
 }
 
+/*
+ * Function: subscribe_to
+ * ----------------------------
+ *   Add a subscription to an agent
+ *
+ *   usage : subscribeTo(const char *agentName, const char *filterDescription)
+ *
+ *   agentName          : agent name
+ *   filterDescription  : filter description (ex: "moduletest.output1")
+ *
+ *   returns : the state of the subscribtion
+ */
 int subscribe_to(const char *agentName, const char *outputName)
 {
     // If a filter has to be mtic_set
@@ -714,6 +767,18 @@ int subscribe_to(const char *agentName, const char *outputName)
     return -1;
 }
 
+/*
+ * Function: unsubscribe_to
+ * ----------------------------
+ *   Remove a subscription to an agent
+ *
+ *   usage : unsubscribeTo(const char *agentName, const char *filterDescription)
+ *
+ *   agentName          : agent name
+ *   filterDescription  : filter description (ex: "moduletest.output1")
+ *
+ *   returns : the state of the subscribtion removal
+ */
 int unsubscribe_to(const char *agentName, const char *outputName)
 {
     // If a filter has to be mtic_set
@@ -739,7 +804,19 @@ int unsubscribe_to(const char *agentName, const char *outputName)
     return -1;
 }
 
-
+/*
+ * Function: check_and_subscribe_to
+ * ----------------------------
+ *   Check mappings made on agent name
+ *   Connect to these outputs if compatibility is ok
+ *
+ *   usage : checkAndSubscribeTo(char* agentName)
+ *
+ *   agentName          : agent name
+ *
+ *   returns : -1 if an error occured, 1 otherwise.
+ *
+ */
 int check_and_subscribe_to(const char* agentName)
 {
     int result = -1;
@@ -791,6 +868,15 @@ int check_and_subscribe_to(const char* agentName)
     return result;
 }
 
+/*
+ * Function: mtic_pause
+ * ----------------------------
+ *   Pause the agent (all subscribtion and publish)
+ *
+ *   usage : mtic_masticPause()
+ *
+ *
+ */
 void mtic_pause()
 {
     if(is_paused == false)
@@ -800,6 +886,15 @@ void mtic_pause()
     }
 }
 
+/*
+ * Function: mtic_resume
+ * ----------------------------
+ *   Resume the agent (all subscribtion and publish)
+ *
+ *   usage : mtic_masticResume()
+ *
+ *
+ */
 void mtic_resume()
 {
     if(is_paused == true)
@@ -809,6 +904,16 @@ void mtic_resume()
     }
 }
 
+/*
+ * Function: mtic_toggle_play_pause
+ * ----------------------------
+ *   Play the agent if it is pauses, resume it otherwise.
+ *
+ *   usage : mtic_masticTogglePlayPause()
+ *
+ *   return : is_paused state
+ *
+ */
 bool mtic_toggle_play_pause()
 {
     if(is_paused == false)
@@ -822,7 +927,15 @@ bool mtic_toggle_play_pause()
 }
 
 
-
+/*
+ * Function: debug
+ * ----------------------------
+ *   trace debug messages only on verbose mode
+ *   Print file name and line number in debug mode
+ *
+ *   usage : mtic_debug(format,msg)
+ *
+ */
 // Definition of a trace function depending of the verbose mode and debug compilation
 void mtic_debug(const char *fmt, ...)
 {
@@ -846,6 +959,14 @@ void mtic_debug(const char *fmt, ...)
     }
 }
 
+/*
+ * Function: mtic_set_verbose
+ * ----------------------------
+ *   Set verbose mode
+ *
+ *   usage : mtic_set_verbose(is_verbose)
+ *
+ */
 void mtic_set_verbose(bool is_verbose)
 {
     verbose_mode = is_verbose;
