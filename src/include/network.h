@@ -20,6 +20,25 @@
 
 int publish_output(const char* output_name);
 
+/*
+ * Function: mtic_start_ip
+ * ----------------------------
+ *   Start the network service
+ *
+ *   usage : mtic_masticStart(agentName, ipAddress, networkDevice, zyrePort,channel)
+ *         example : mtic_masticStart("MASTIC_TEST","192.168.1.200", "en15", 5670, "MASTIC")
+ *
+ *   agentName          : agent name
+ *   ipAddress          : ip Address on device of connection
+ *   networkDevice      : device of connection
+ *   zyrePort           : zyre port used
+ *   channel            : name of the channel used to communication on zyre
+ *
+ *   returns : the state of the connection
+ */
+MASTICAPI_COMMON_DLLSPEC int mtic_start_ip(const char *agentName, const char *ipAddress, const char *networkDevice,int zyrePort, const char *channel);
+
+
 
 /*
  * Function: mtic_start
