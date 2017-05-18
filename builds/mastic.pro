@@ -15,6 +15,8 @@ win32:{
                 _CRT_NONSTDC_NO_DEPRECATE \
                 WINDOWS
 }
+#UNCOMMENT THIS LINE TO ANDROID BUILD OR COMMENT FOR ANOTHER UNIX PLATFORM
+CONFIG+=android_compilation
 
 include ('../dependencies/mastic_api_crossplateform.pri')
 

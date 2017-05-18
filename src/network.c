@@ -48,6 +48,11 @@
 
 
 #else
+
+    #ifdef ANDROID
+    #include "ifaddrs.h"
+    #else
+    #endif
 #endif
 
 
@@ -638,6 +643,126 @@ init_actor (zsock_t *pipe, void *args)
 
 }
 
+static void init_actor_ip (zsock_t *pipe, void *args)
+{
+    zyreloopElements_t *zEl = (zyreloopElements_t *)args;
+
+    if (zEl->ipAddress == NULL){
+        fprintf(stderr, "IP address could not be determined on device %s... exiting.\n", zEl->networkDevice);
+        exit(EXIT_FAILURE);
+    }
+
+    //start zyre
+    agentElements->node = zyre_new (agentElements->agentName);
+    zyre_set_port(agentElements->node, agentElements->zyrePort);
+    if (!agentElements->node)
+        return;
+    zyre_start (agentElements->node);
+    zyre_join(agentElements->node, agentElements->channel);
+    zsock_signal (pipe, 0); //notify main thread that we are ready
+
+    //start publisher
+    char endpoint[256];
+    sprintf(endpoint, "tcp://%s:*", zEl->ipAddress);
+    agentElements->publisher = zsock_new_pub(endpoint);
+    strcpy(endpoint, zsock_endpoint(agentElements->publisher));
+    char *insert = endpoint + strlen(endpoint) - 1;
+    while (*insert != ':' && insert > endpoint) {
+        insert--;
+    }
+    zyre_set_header(agentElements->node, "publisher", "%s", insert + 1);
+
+    zmq_pollitem_t zpipePollItem;
+    zmq_pollitem_t zyrePollItem;
+
+    //main zmq socket (i.e. main thread)
+    void *zpipe = zsock_resolve(pipe);
+    if (zpipe == NULL){
+        printf("Error : could not get the pipe descriptor for polling... exiting.\n");
+        exit(EXIT_FAILURE);
+    }
+    zpipePollItem.socket = zpipe;
+    zpipePollItem.fd = 0;
+    zpipePollItem.events = ZMQ_POLLIN;
+    zpipePollItem.revents = 0;
+
+    //zyre socket
+    void *zsock = zsock_resolve(zyre_socket (agentElements->node));
+    if (zsock == NULL){
+        printf("Error : could not get the zyre socket for polling... exiting.\n");
+        exit(EXIT_FAILURE);
+    }
+    zyrePollItem.socket = zsock;
+    zyrePollItem.fd = 0;
+    zyrePollItem.events = ZMQ_POLLIN;
+    zyrePollItem.revents = 0;
+
+
+    zloop_t *loop = agentElements->loop = zloop_new ();
+    assert (loop);
+    zloop_set_verbose (loop, false);
+
+    zloop_poller (loop, &zpipePollItem, manageParent, agentElements);
+    zloop_poller_set_tolerant(loop, &zpipePollItem);
+    zloop_poller (loop, &zyrePollItem, manageIncoming, agentElements);
+    zloop_poller_set_tolerant(loop, &zyrePollItem);
+
+    //FOR TESTING - SEND PERIODIC MESSAGES ON PUBLISHER
+    //zloop_timer(loop, 1000, 0, sendTestMessagesOnPublisher, zEl);
+
+    // FIXME - needed ? Export my definition for once if exists
+    // mtic_sendDefinition();
+
+    zloop_start (loop); //start returns when one of the pollers returns -1
+
+    zloop_destroy (&loop);
+    assert (loop == NULL);
+
+
+    //clean
+    zloop_destroy (&loop);
+    assert (loop == NULL);
+    zyre_stop (agentElements->node);
+    zclock_sleep (100);
+    zyre_destroy (&agentElements->node);
+    zsock_destroy(&agentElements->publisher);
+    //clean subscribers
+    subscriber_t *s, *tmp;
+    HASH_ITER(hh, subscribers, s, tmp) {
+        HASH_DEL(subscribers, s);
+        zsock_destroy(&s->subscriber);
+        free((char*)s->agentName);
+        free((char*)s->agentPeerId);
+        free(s->pollItem);
+        free(s->subscriber);
+        s->subscriber = NULL;
+        free(s);
+        s = NULL;
+    }
+
+}
+
+int mtic_start_ip(const char *agentName, const char *ipAddress, const char* networkDevice, int zyrePort, const char *channel){
+
+    agentElements = calloc(1, sizeof(zyreloopElements_t));
+    agentElements->agentName = strdup(agentName);
+    agentElements->networkDevice = strdup(networkDevice);
+    agentElements->ipAddress = strdup(ipAddress);
+    agentElements->zyrePort = zyrePort;
+    agentElements->channel = strdup(channel);
+    agentElements->agentActor = zactor_new (init_actor_ip, agentElements);
+    assert (agentElements->agentActor);
+
+    // Set sleep time for connection
+    // to leave time for the connection, to be abel to send the definition by the publisher
+    #ifdef _WIN32
+        Sleep(1);
+    #else
+        usleep(1000);
+    #endif
+
+    return 1;
+}
 
 int mtic_start(const char *agentName, const char *networkDevice, int zyrePort, const char *channel){
 
