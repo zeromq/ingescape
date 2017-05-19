@@ -11,8 +11,7 @@
 
 #include "definition.h"
 #include "mapping.h"
-#include <yajl/yajl_tree.h>
-#include <yajl/yajl_gen.h>
+
 
 /*
 * Function: load_category
