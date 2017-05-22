@@ -490,3 +490,17 @@ const char* iop_old_value_to_string (agent_iop* iop)
     
     return strdup(str_value);
 }
+
+
+int get_iop_value_as_int(agent_iop *iop){
+    model_state m;
+    int val = *(int *)(mtic_get(iop->name, &m));
+    return val;
+}
+
+double get_iop_value_as_double(agent_iop *iop){
+    model_state m;
+    double val = *(double *)(mtic_get(iop->name, &m));
+    return val;
+}
+

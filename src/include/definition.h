@@ -39,6 +39,8 @@ typedef struct agent_iop agent_iop;
 typedef struct category category;
 typedef struct definition definition;
 
+int get_iop_value_as_int(agent_iop *iop);
+double get_iop_value_as_double(agent_iop *iop);
 
 bool check_category (definition* def, category* category, category_check_type check_type);
 bool check_category_agent_iop(agent_iop* def_iop, agent_iop* iop_cat_to_check);
