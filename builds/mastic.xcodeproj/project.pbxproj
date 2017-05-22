@@ -1194,6 +1194,7 @@
 		979A7D291EA8A86F003153EF /* zyre_event.api */ = {isa = PBXFileReference; lastKnownFileType = text; path = zyre_event.api; sourceTree = "<group>"; };
 		97C926AB1EB23ED100D2B0CE /* mastic_private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mastic_private.h; sourceTree = "<group>"; };
 		97C9271C1EB38FD900D2B0CE /* yajl.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = yajl.xcodeproj; path = ../dependencies/ios/yajl/yajl.xcodeproj; sourceTree = "<group>"; };
+		97CF86F61ED3236500E2CFDF /* mastic_public.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mastic_public.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1287,6 +1288,7 @@
 				979A79881EA7B112003153EF /* mapping.h */,
 				979A79891EA7B112003153EF /* mastic.h */,
 				97C926AB1EB23ED100D2B0CE /* mastic_private.h */,
+				97CF86F61ED3236500E2CFDF /* mastic_public.h */,
 				979A798A1EA7B112003153EF /* model.h */,
 				979A798B1EA7B112003153EF /* network.h */,
 				979A798C1EA7B112003153EF /* parser.h */,
