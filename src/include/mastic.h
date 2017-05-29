@@ -157,8 +157,8 @@ int mtic_observeParameter(const char *name, mtic_observeCallback, void * myData)
 
 
 //mute or unmute an IOP
-mtic_muteOutput(const char *name);
-mtic_unmuteOutput(const char *name);
+int mtic_muteOutput(const char *name);
+int mtic_unmuteOutput(const char *name);
 bool mtic_isOutputMuted(const char *name);
 
 
@@ -202,8 +202,8 @@ int mtic_setMappingDescription(char *description);
 int mtic_setMappingVersion(char *description);
 int mtic_getMappingEntriesNumber(); //number of entries in the mapping
 int mtic_addMappingEntry(char *fromOurInput, char *toAgent, char *withOutput); //returns mapping id or 0 if creation failed
-int mtic_removeMappingEntry(int withId);
-int mtic_removeMappingEntry(char *fromOurInput, char *toAgent, char *withOutput);
+int mtic_removeMappingEntryWithId(int theId);
+int mtic_removeMappingEntryWithName(char *fromOurInput, char *toAgent, char *withOutput);
 
 
 #endif /* mastic_public_h */
