@@ -8,6 +8,8 @@
 #ifndef mastic_public_h
 #define mastic_public_h
 
+#include <stdbool.h>
+
 #if defined WINDOWS
 #if defined MASTIC
 #define PUBLIC __declspec(dllexport)
