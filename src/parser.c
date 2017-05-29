@@ -7,7 +7,9 @@
 //
 
 #include "yajl/yajl_tree.h"
-#include <yajl/yajl_gen.h>
+#include "yajl/yajl_gen.h"
+#include <stdio.h>
+#include <stdlib.h>
 #include "mastic_private.h"
 
 #define STR_CATEGORY "category"

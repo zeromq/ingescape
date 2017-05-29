@@ -7,7 +7,8 @@
 //
 
 #include "mastic_private.h"
-
+#include <stdio.h>
+#include <stdlib.h>
 
 //Define the pointer on the callback function
 typedef void (*calback_ptr_t)( agent_iop* );

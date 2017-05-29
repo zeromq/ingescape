@@ -16,15 +16,23 @@
 #define MASTICAPI_COMMON_DLLSPEC __declspec(dllimport)
 #endif
 #else
-#define MASTICAPI_COMMON_DLLSPEC extern
+#define MASTICAPI_COMMON_DLLSPEC
 #endif
 
+#include <stdbool.h>
+#include <string.h>
+
 #include "uthash/uthash.h"
-#include "mapping.h"
+
+#ifdef _WIN32
+#include <winsock2.h>
+#include <Ws2tcpip.h>
+#include <iphlpapi.h>
+#endif
 
 //////////////////  structures and enums   //////////////////
 
-//definition
+//definition //////////////////
 /*
  * The variable 'value_type' contains the data type of the value, use to parse
  * the JSON and affect the value tu right union corresponding
@@ -69,6 +77,10 @@ struct agent_iop {
     UT_hash_handle hh;         /* makes this structure hashable */
 };
 
+typedef struct agent_iop agent_iop;
+typedef struct category category;
+typedef struct definition definition;
+
 /*
  * Define the structure DEFINITION :
  * 'name'                   : agent name
@@ -106,8 +118,31 @@ typedef struct category {
     UT_hash_handle hh;
 } category;
 
+/*
+ * Define the state during the checking of a category
+ */
+typedef enum {
+    GLOBAL,
+    OUTPUT,
+    INPUT_TYPE
+} category_check_type;
 
-//mapping
+
+//model //////////////////
+//Define a state to return in functions
+typedef enum{
+    OK,
+    NOK,
+    NAME_EMPTY,
+    NAME_NOT_EXIST,
+    TYPE_INPUT,
+    TYPE_OUTPUT,
+    TYPE_PARAM,
+    NO_CALLBACK
+} model_state;
+
+
+//mapping //////////////////
 /*
  * Define the state of a mapping ON or OFF
  */
@@ -159,18 +194,32 @@ typedef struct mapping {
     UT_hash_handle hh;
 } mapping;
 
+typedef struct mapping_out mapping_out;
+typedef struct mapping_cat mapping_cat;
+typedef struct mapping mapping;
 
+
+//////////////////  functions and global variables   //////////////////
 
 //////////////////  definition   //////////////////
-MASTICAPI_COMMON_DLLSPEC definition * mtic_definition_loaded;
-MASTICAPI_COMMON_DLLSPEC definition * mtic_definition_live;
-MASTICAPI_COMMON_DLLSPEC definition * mtic_agents_defs_on_network;
+extern definition * mtic_definition_loaded;
+extern definition * mtic_definition_live;
+extern definition * mtic_agents_defs_on_network;
+
+int get_iop_value_as_int(agent_iop *iop);
+double get_iop_value_as_double(agent_iop *iop);
+
+bool check_category (definition* def, category* category, category_check_type check_type);
+bool check_category_agent_iop(agent_iop* def_iop, agent_iop* iop_cat_to_check);
+void free_agent_iop (agent_iop* agent_iop);
+void free_category (category* category);
+void free_definition (definition* definition);
 
 
 //////////////////  mapping   //////////////////
 
 // the table which will contain the mapping
-MASTICAPI_COMMON_DLLSPEC mapping * mtic_my_agent_mapping;
+extern mapping * mtic_my_agent_mapping;
 
 value_type string_to_value_type(const char* string);
 bool string_to_boolean(const char* string);
@@ -195,6 +244,16 @@ void mtic_free_mapping (mapping* mapping);
 //////////////////  model   //////////////////
 agent_iop * mtic_find_iop_by_name(const char* name, model_state *code);
 agent_iop * mtic_find_iop_by_name_on_definition(const char *name, definition* definition, model_state *code);
+//Define the pointer on the callback function
+typedef void (*callback_ptr_t)( agent_iop* );
+model_state mtic_observe(const char *iop_name,
+                         void (*callback_fct)(agent_iop *input_iop) );
+model_state mtic_set(const char* iop_name, void* new_value);
+void * mtic_get(const char* name_iop, model_state* state);
+int mtic_mute(const char* name_iop);
+int mtic_unmute(const char* name_iop);
+int mtic_muteAll();
+int mtic_unmuteAll();
 
 
 //////////////////  network   //////////////////
@@ -202,5 +261,25 @@ int publish_output(const char* output_name);
 int check_and_subscribe_to(const char* agentName);
 void mtic_debug(const char *fmt, ...);
 
+int mtic_start(const char *agentName, const char *networkDevice, int zyrePort, const char *channel);
+int mtic_stop();
+void mtic_send_definition();
+void mtic_pause();
+void mtic_resume();
+bool mtic_toggle_play_pause();
+void mtic_set_verbose(bool is_verbose);
+
+
+//////////////////  parser   //////////////////
+category* load_category (const char* json_str);
+category* load_category_from_path (const char* file_path);
+const char* export_category (category* cat);
+definition* load_definition (const char* json_str);
+definition* load_definition_from_path (const char* file_path);
+char* export_definition (definition* def);
+mapping* load_map (const char* json_str);
+mapping* load_map_from_path (const char* load_file);
+int mtic_init_mapping (const char* mapping_file_path);
+int mtic_init_internal_data (const char* definition_file_path);
 
 #endif /* mastic_private_h */

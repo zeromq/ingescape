@@ -7,9 +7,14 @@
 //  Copyright © 2016 IKKY WP4.8. All rights reserved.
 //
 
-#include "definition.h"
+#include <stdio.h>
+#include <stdlib.h>
 #include "mastic_private.h"
 #include "uthash/uthash.h"
+
+definition * mtic_definition_loaded = NULL;
+definition * mtic_definition_live = NULL;
+definition * mtic_agents_defs_on_network = NULL;
 
 /*
  * Define the structure agent_port (name, port_number) :
@@ -22,11 +27,6 @@ typedef struct agent_port_t {
     UT_hash_handle hh;         /* makes this structure hashable */
 } agent_port;
 
-
-// Definition structures
-definition* mtic_definition_loaded = NULL;
-definition* mtic_definition_live = NULL;
-definition* mtic_agents_defs_on_network = NULL;
 
 /*
  * Function: string_to_value_type

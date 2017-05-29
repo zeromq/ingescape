@@ -6,12 +6,10 @@
 //  Copyright © 2016 IKKY WP4.8. All rights reserved.
 //
 
-#include "network.h"
 #include <zyre.h>
 #include <czmq.h>
 #include "uthash/uthash.h"
 #include "mastic_private.h"
-#include "parser.h"
 
 #ifdef _WIN32
 

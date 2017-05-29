@@ -7,7 +7,8 @@
 //  Copyright © 2016 IKKY WP4.8. All rights reserved.
 //
 
-#include "mapping.h"
+#include <stdio.h>
+#include <stdlib.h>
 #include "mastic_private.h"
 
 
