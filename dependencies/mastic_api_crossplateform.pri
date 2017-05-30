@@ -101,6 +101,39 @@ macx:{
 }
 
 unix:{
+    raspberry_compilation {
+        ############ Raspberry ###########
+    message("Compilation raspberry scope ...")
+
+    libyajl_path = $$PWD/yajl/yajl-2.1.1/Raspberry
+    libzyre_path = $$PWD/zyre/bin/Raspberry
+
+    #Destination repository for our librairy
+    DESTDIR = /usr/local/lib
+
+    #Add librairies
+    LIBS += -L$$libzyre_path -lzmq -lczmq -lzyre \
+            -L$$libyajl_path/lib -lyajl
+
+    #Copy all zyre includes
+    install_headers.files += $$PWD/../src/include/*.h \
+                             $$PWD/../src/include/uthash
+    install_headers.path += $$/usr/local/include/mastic
+
+    #Copy zyre and friends libs
+    install_zyre_libs.files += $$libzyre_path/*
+    install_zyre_libs.path += $$DESTDIR
+
+    #Copy yajl libs
+    install_yajl_libs.files += $$libyajl_path/lib/*
+    install_yajl_libs.path += $$DESTDIR
+
+    #Add installation options
+    INSTALLS += install_headers
+    INSTALLS += install_zyre_libs
+    INSTALLS += install_yajl_libs
+    }
+
     android_compilation {
         ############ Android ###########
     message("Compilation android scope ...")
@@ -135,7 +168,9 @@ unix:{
     #Add installation options
     INSTALLS += install_libs \
 
-    } else {
+    }
+
+    !raspberry_compilation:!android_compilation {
         ############ Linux ###########
     message("Compilation Linux scope ...")
 
