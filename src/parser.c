@@ -6,10 +6,11 @@
 //  Copyright © 2016 IKKY WP4.8. All rights reserved.
 //
 
-#include "yajl/yajl_tree.h"
-#include "yajl/yajl_gen.h"
 #include <stdio.h>
 #include <stdlib.h>
+
+#include "yajl/yajl_tree.h"
+#include "yajl/yajl_gen.h"
 #include "mastic_private.h"
 
 #define STR_CATEGORY "category"
@@ -82,12 +83,14 @@ static void json_add_data (yajl_val node, const char** path,
                             struct agent_iop ** hasht) {
     yajl_val v;
     v = yajl_tree_get(node, path, yajl_t_array);
-    if (v && YAJL_IS_ARRAY(v))
-        for (unsigned int  i = 0; i < v->u.array.len; i++ ){
+    if (v && YAJL_IS_ARRAY(v)){
+        unsigned int  i;
+        for (i = 0; i < v->u.array.len; i++ ){
             yajl_val obj = v->u.array.values[i];
             if( obj && YAJL_IS_OBJECT(obj))
                 json_add_data_to_hash (hasht, obj);
         }
+    }
 }
 
 /*
@@ -283,7 +286,8 @@ static definition* json_parse_definition (yajl_val node) {
     path[1] = STR_CATEGORIES;
     v = yajl_tree_get(node, path, yajl_t_array);
     if (v && YAJL_IS_ARRAY(v)){
-        for (unsigned int  i = 0; i < v->u.array.len; i++ ){
+        unsigned int  i;
+        for (i = 0; i < v->u.array.len; i++ ){
             yajl_val obj = v->u.array.values[i];
             if( obj && YAJL_IS_OBJECT(obj))
                 json_add_category_to_hash (&def->categories, obj);
@@ -436,7 +440,8 @@ static mapping* json_parse_mapping (yajl_val node) {
     path[1] = "mapping_out";
     v = yajl_tree_get(node, path, yajl_t_array);
     if (v && YAJL_IS_ARRAY(v)){
-        for (unsigned int  i = 0; i < v->u.array.len; i++ ){
+        unsigned int  i;
+        for (i = 0; i < v->u.array.len; i++ ){
             yajl_val obj = v->u.array.values[i];
             if( obj && YAJL_IS_OBJECT(obj))
                 json_add_map_out_to_hash (&mapp->map_out, obj);
@@ -446,7 +451,8 @@ static mapping* json_parse_mapping (yajl_val node) {
     path[1] = "mapping_cat";
     v = yajl_tree_get(node, path, yajl_t_array);
     if (v && YAJL_IS_ARRAY(v)){
-        for (unsigned int  i = 0; i < v->u.array.len; i++ ){
+        unsigned int  i;
+        for (i = 0; i < v->u.array.len; i++ ){
             yajl_val obj = v->u.array.values[i];
             if( obj && YAJL_IS_OBJECT(obj))
                 json_add_map_cat_to_hash (&mapp->map_cat, obj);
