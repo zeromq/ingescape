@@ -6,9 +6,11 @@
 //  Copyright © 2016 IKKY WP4.8. All rights reserved.
 //
 
-#include "mastic_private.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "mastic.h"
+#include "mastic_private.h"
+
 
 //Define the pointer on the callback function
 typedef void (*calback_ptr_t)( agent_iop* );
@@ -250,7 +252,7 @@ model_state mtic_set(const char *iop_name, void *new_value){
  *  return : 0 is the output has been properly muted, -1 otherwise.
  */
 
-int mtic_mute(const char* iop_name)
+int mtic_mute_internal(const char* iop_name)
 {
     int result = -1;
     model_state code;
@@ -276,7 +278,7 @@ int mtic_mute(const char* iop_name)
  *
  *  return : 0 is the output has been properly unmuted, -1 otherwise.
  */
-int mtic_unmute(const char* iop_name)
+int mtic_unmute_internal(const char* iop_name)
 {
     int result = -1;
     model_state code;
@@ -309,7 +311,7 @@ int mtic_muteAll()
     HASH_ITER(hh, mtic_definition_live->outputs_table, current_iop, tmp_iop) {
         if(current_iop != NULL)
         {
-            result_tmp = mtic_mute(current_iop->name);
+            result_tmp = mtic_mute_internal(current_iop->name);
             // If one one the output has not been muted, we notice it
             if(result_tmp != 0)
             {
@@ -337,7 +339,7 @@ int mtic_unmuteAll()
     HASH_ITER(hh, mtic_definition_live->outputs_table, current_iop, tmp_iop) {
         if(current_iop != NULL)
         {
-            result_tmp = mtic_unmute(current_iop->name);
+            result_tmp = mtic_unmute_internal(current_iop->name);
             // If one one the output has not been unmuted, we notice it
             if(result_tmp != 0)
             {
@@ -348,3 +350,209 @@ int mtic_unmuteAll()
     
     return result;
 }
+
+////////////////////////////////////////////////////////////////////////
+// PUBLIC API
+////////////////////////////////////////////////////////////////////////
+
+//read/write IOP using void*
+//generic typeless functions (requires developer to check IOP type for type casting)
+//for IMPULSION_T value is always 0
+//size is passed by Mastic based on type (for bool, double, int and string) or metadata (for data)
+void mtic_readInput(const char *name, void *value, long *size){
+    
+}
+void mtic_readOutput(const char *name, void *value, long *size){
+    
+}
+void mtic_readParameter(const char *name, void *value, long *size){
+    
+}
+
+//read per type
+//implicit conversions are possible. Some need to raise warnings.
+//we need to make things clear on structures
+//for IMPULSION_T value is always 0
+//for DATA_T, size is passed by Mastic
+bool mtic_readInputAsBool(const char *name){
+    return 1;
+}
+int mtic_readInputAsInt(const char *name){
+    return 1;
+}
+double mtic_readInputAsDouble(const char *name){
+    return 1;
+}
+char* mtic_readInputAsString(const char *name){
+    return NULL;
+}
+void mtic_readInputAsData(const char *name, void *data, long *size){ //allocs data structure to be disposed by caller
+    
+}
+bool mtic_readOutputAsBool(const char *name){
+    return 1;
+}
+int mtic_readOutputAsInt(const char *name){
+    return 1;
+}
+double mtic_readOutputAsDouble(const char *name){
+    return 1;
+}
+char* mtic_readOutputAsString(const char *name){
+    return NULL;
+}
+void mtic_readOutputAsData(const char *name, void *data, long *size){ //allocs data structure to be disposed by caller
+    
+}
+bool mtic_readParameterAsBool(const char *name){
+    return 1;
+}
+int mtic_readParameterAsInt(const char *name){
+    return 1;
+}
+double mtic_readParameterAsDouble(const char *name){
+    return 1;
+}
+char* mtic_readParameterAsString(const char *name){
+    return NULL;
+}
+void mtic_readParameterAsData(const char *name, void *data, long *size){ //allocs data structure to be disposed by caller
+    
+}
+//write using void*
+//for IMPULSION_T value is just ignored
+//for DATA_T, these functions should be forbidden (need to know datra size)
+//size shall be given to Mastic
+//Mastic shall clone value and shall dispose of it when stopped
+int mtic_writeInput(const char *name, void *value, long size){
+    return 1;
+}
+int mtic_writeOutput(const char *name, void *value, long size){
+    return 1;
+}
+int mtic_writeParameter(const char *name, void *value, long size){
+    return 1;
+}
+
+//write using internal conversions (Mastic does the conversion job)
+//we need to make things clear on structures
+//for IMPULSION_T value is just ignored
+//Mastic shall clone value and shall dispose of it when stopped
+int mtic_writeInputAsBool(const char *name, bool value){
+    return 1;
+}
+int mtic_writeInputAsInt(const char *name, int value){
+    return 1;
+}
+int mtic_writeInputAsDouble(const char *name, double value){
+    return 1;
+}
+int mtic_writeInputAsString(const char *name, char *value){
+    return 1;
+}
+int mtic_writeInputAsData(const char *name, void *value, long size){
+    return 1;
+}
+
+int mtic_writeOutputAsBool(const char *name, bool value){
+    return 1;
+}
+int mtic_writeOutputAsInt(const char *name, int value){
+    return 1;
+}
+int mtic_writeOutputAsDouble(const char *name, double value){
+    return 1;
+}
+int mtic_writeOutputAsString(const char *name, char *value){
+    return 1;
+}
+int mtic_writeOutputAsData(const char *name, void *value, long size){
+    return 1;
+}
+
+int mtic_writeParameterAsBool(const char *name, bool value){
+    return 1;
+}
+int mtic_writeParameterAsInt(const char *name, int value){
+    return 1;
+}
+int mtic_writeParameterAsDouble(const char *name, double value){
+    return 1;
+}
+int mtic_writeParameterAsString(const char *name, char *value){
+    return 1;
+}
+int mtic_writeParameterAsData(const char *name, void *value, long size){
+    return 1;
+}
+
+
+//check IOP type, lists and existence
+iopType_t mtic_getTypeForInput(const char *name){
+    return INTEGER_T;
+}
+iopType_t mtic_getTypeForOutput(const char *name){
+    return INTEGER_T;
+}
+iopType_t mtic_getTypeForParameter(const char *name){
+    return INTEGER_T;
+}
+
+void mtic_getInputsList(char **list, long nbOfElements){
+    
+}
+void mtic_getOutputsList(char **list, long nbOfElements){
+    
+}
+void mtic_getParametersList(char **list, long nbOfElements){
+    
+}
+
+bool mtic_checkInputExistence(const char *name){
+    return 1;
+}
+bool mtic_checkOutputExistence(const char *name){
+    return 1;
+}
+bool mtic_checkParameterExistence(const char *name){
+    return 1;
+}
+
+//observe IOP
+//calback format for IOP observation
+typedef void (*mtic_observeCallback)(iop_t iop, const char *name, iopType_t valueType, void *value, void * myData);
+int mtic_observeInput(const char *name, mtic_observeCallback *cb, void *myData){
+    return 1;
+}
+int mtic_observeOutput(const char *name, mtic_observeCallback *cb, void * myData){
+    return 1;
+}
+int mtic_observeParameter(const char *name, mtic_observeCallback *cb, void * myData){
+    return 1;
+}
+
+
+//mute or unmute an IOP
+int mtic_muteOutput(const char *name){
+    return 1;
+}
+int mtic_unmuteOutput(const char *name){
+    return 1;
+}
+bool mtic_isOutputMuted(const char *name){
+    return 1;
+}
+
+//mute the agent
+int mtic_mute(){
+    return 1;
+}
+
+int mtic_unmute(){
+    return 1;
+}
+
+bool mtic_isMuted(){
+    return 1;
+}
+

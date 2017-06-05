@@ -9,6 +9,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "mastic.h"
 #include "mastic_private.h"
 
 
@@ -753,6 +754,44 @@ agent_iop*  mtic_update_mapping_out_state(mapping_out* map_out, definition * ext
     return outputFound;
 }
 
+////////////////////////////////////////////////////////////////////////
+// PUBLIC API
+////////////////////////////////////////////////////////////////////////
 
+int mtic_loadMapping (const char* json_str){
+    return 1;
+}
+int mtic_loadMappingFromPath (const char* file_path){
+    return 1;
+}
+int mtic_clearMapping(){ //clears mapping data for the agent
+    return 1;
+}
+char* mtic_getMapping(){ //returns json string
+    return NULL;
+}
+
+//edit mapping using the API
+int mtic_setMappingName(char *name){
+    return 1;
+}
+int mtic_setMappingDescription(char *description){
+    return 1;
+}
+int mtic_setMappingVersion(char *description){
+    return 1;
+}
+int mtic_getMappingEntriesNumber(){ //number of entries in the mapping
+    return 1;
+}
+int mtic_addMappingEntry(char *fromOurInput, char *toAgent, char *withOutput){ //returns mapping id or 0 if creation failed
+    return 1;
+}
+int mtic_removeMappingEntryWithId(int theId){
+    return 1;
+}
+int mtic_removeMappingEntryWithName(char *fromOurInput, char *toAgent, char *withOutput){
+    return 1;
+}
 
 

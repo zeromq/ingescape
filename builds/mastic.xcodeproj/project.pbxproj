@@ -35,7 +35,6 @@
 		979A79A11EA7B112003153EF /* network.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A799A1EA7B112003153EF /* network.c */; };
 		979A79A31EA7B112003153EF /* parser.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A799C1EA7B112003153EF /* parser.c */; };
 		979A79A41EA7B112003153EF /* tests.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A799D1EA7B112003153EF /* tests.c */; };
-		979A79A91EA7B1BA003153EF /* tests.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A798D1EA7B112003153EF /* tests.h */; };
 		979A7D2A1EA8A919003153EF /* libczmq.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 979A7A231EA8A86F003153EF /* libczmq.a */; };
 		979A7D2B1EA8A919003153EF /* libsodium.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 979A7A241EA8A86F003153EF /* libsodium.a */; };
 		979A7D2C1EA8A919003153EF /* libzmq.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 979A7A251EA8A86F003153EF /* libzmq.a */; };
@@ -199,7 +198,6 @@
 			dstPath = "include/$(PRODUCT_NAME)";
 			dstSubfolderSpec = 16;
 			files = (
-				979A79A91EA7B1BA003153EF /* tests.h in CopyFiles */,
 				971821D11EDC25B300C59F2B /* mastic.h in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

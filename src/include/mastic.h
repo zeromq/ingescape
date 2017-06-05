@@ -24,6 +24,41 @@
 // 1 : everything OK
 // 0 and below : an error occured
 
+
+//////////////////////////////////////////////////
+//initialization and configuration
+
+//start, stop & kill the agent
+int mtic_startWithDevice(const char *networkDevice, int port); //TODO: warning si agent name pas défini
+int mtic_startWithIP(const char *ipAddress, int port); //TODO: warning si agent name pas défini
+int mtic_stop();
+void mtic_die();
+
+//pause and resume the agent
+typedef void (*mtic_pauseCallback)(bool *isPaused, void *myData);
+int mtic_pause();
+bool mtic_isPaused();
+int mtic_resume();
+int mtic_observePause(mtic_pauseCallback *cb, void *myData);
+
+//control agent state
+int mtic_setAgentState(const char *state);
+void mtic_getAgentState(char *state);
+
+//mute the agent
+int mtic_mute();
+int mtic_unmute();
+bool mtic_isMuted();
+
+//set library parameters
+void mtic_setVerbose (bool verbose);
+
+
+
+
+//////////////////////////////////////////////////
+//IOP Model : Inputs, Outputs and Parameters read/write/check/observe/mute
+
 typedef enum {
     INPUT,
     OUTPUT,
@@ -38,41 +73,6 @@ typedef enum {
     IMPULSION_T,
     DATA_T
 } iopType_t;
-
-
-//////////////////////////////////////////////////
-//initialization and configuration
-
-//start, stop & kill the agent
-int mtic_startWithDevice(const char *networkDevice, int port); //TODO: warning si agent name pas défini
-int mtic_startWithIP(const char *ipAddress, int port); //TODO: warning si agent name pas défini
-int mtic_stop();
-int mtic_die();
-
-//pause and resume the agent
-typedef void mtic_pauseCallback(bool *isPaused, void *myData);
-int mtic_pause();
-bool mtic_isPaused();
-void mtic_resume();
-int mtic_observePause(mtic_pauseCallback, void *myData);
-
-//control agent state
-int mtic_setAgentState(const char *state);
-void mtic_getAgentState(char *);
-
-//mute the agent
-int mtic_mute();
-int mtic_unmute();
-bool mtic_isMuted();
-
-//set library parameters
-void mtic_setVerbose (bool verbose);
-
-
-
-
-//////////////////////////////////////////////////
-//IOP : inputs, outputs and parameters read/write/check/observe
 
 //read/write IOP using void*
 //generic typeless functions (requires developer to check IOP type for type casting)
@@ -152,11 +152,10 @@ bool mtic_checkParameterExistence(const char *name);
 
 //observe IOP
 //calback format for IOP observation
-typedef void mtic_observeCallback(iop_t iop, const char *name, iopType_t valueType, void *value, void * myData);
-int mtic_observeInput(const char *name, mtic_observeCallback, void *myData);
-int mtic_observeOutput(const char *name, mtic_observeCallback, void * myData);
-int mtic_observeParameter(const char *name, mtic_observeCallback, void * myData);
-
+typedef void (*mtic_observeCallback)(iop_t iop, const char *name, iopType_t valueType, void *value, void * myData);
+int mtic_observeInput(const char *name, mtic_observeCallback *cb, void *myData);
+int mtic_observeOutput(const char *name, mtic_observeCallback *cb, void * myData);
+int mtic_observeParameter(const char *name, mtic_observeCallback *cb, void * myData);
 
 //mute or unmute an IOP
 int mtic_muteOutput(const char *name);
@@ -167,9 +166,9 @@ bool mtic_isOutputMuted(const char *name);
 
 
 //////////////////////////////////////////////////
-//definition and categories
+//Definitions
 
-int mtic_setAgentName(char *name);
+int mtic_setAgentName(const char *name);
 int mtic_loadDefinition (const char* json_str);
 int mtic_loadDefinitionFromPath (const char* file_path);
 int mtic_clearDefinition(); //clears definition data for the agent

@@ -122,9 +122,9 @@ typedef struct category {
  * Define the state during the checking of a category
  */
 typedef enum {
-    GLOBAL,
-    OUTPUT,
-    INPUT_TYPE
+    GLOBAL_CAT,
+    OUTPUT_CAT,
+    INPUT_CAT
 } category_check_type;
 
 
@@ -250,10 +250,6 @@ model_state mtic_observe(const char *iop_name,
                          void (*callback_fct)(agent_iop *input_iop) );
 model_state mtic_set(const char* iop_name, void* new_value);
 void * mtic_get(const char* name_iop, model_state* state);
-int mtic_mute(const char* name_iop);
-int mtic_unmute(const char* name_iop);
-int mtic_muteAll();
-int mtic_unmuteAll();
 
 
 //////////////////  network   //////////////////
@@ -261,13 +257,7 @@ int publish_output(const char* output_name);
 int check_and_subscribe_to(const char* agentName);
 void mtic_debug(const char *fmt, ...);
 
-int mtic_start(const char *agentName, const char *networkDevice, int zyrePort, const char *channel);
-int mtic_stop();
 void mtic_send_definition();
-void mtic_pause();
-void mtic_resume();
-bool mtic_toggle_play_pause();
-void mtic_set_verbose(bool is_verbose);
 
 
 //////////////////  parser   //////////////////

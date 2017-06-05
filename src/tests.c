@@ -181,7 +181,7 @@ void test_check_category(){
     category *cat_incompatible = load_category_from_path("cat_incompatible.json");
 
     //Test the compatibility
-    if(check_category(mtic_definition_loaded,cat_compatible,GLOBAL) == true){
+    if(check_category(mtic_definition_loaded,cat_compatible,GLOBAL_CAT) == true){
         printf("The agent named %s is compatible with the category named %s \n",
                mtic_definition_loaded->name,
                cat_compatible->name);
@@ -192,7 +192,7 @@ void test_check_category(){
     }
 
     //Test the incompatibility
-    if(check_category(mtic_definition_loaded,cat_incompatible,GLOBAL) == true){
+    if(check_category(mtic_definition_loaded,cat_incompatible,GLOBAL_CAT) == true){
         printf("The agent named %s is compatible with the category named %s \n",
                mtic_definition_loaded->name,
                cat_incompatible->name);
@@ -633,7 +633,7 @@ void init_def()
     //Test all the categories
     struct category *cat_to_check;
     for(cat_to_check = all_categories; cat_to_check != NULL; cat_to_check = cat_to_check->hh.next) {
-        if(check_category(mtic_definition_live, cat_to_check, OUTPUT) == true)
+        if(check_category(mtic_definition_live, cat_to_check, OUTPUT_CAT) == true)
         {
             printf("the agent is compatible to the category : %s \n", cat_to_check->name);
             HASH_ADD_STR(compatible_categories, name, cat_to_check);

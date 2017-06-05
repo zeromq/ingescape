@@ -10,9 +10,9 @@
 #include <czmq.h>
 #include "uthash/uthash.h"
 #include "mastic_private.h"
+#include "mastic.h"
 
 #ifdef _WIN32
-
     #define MALLOC(x) HeapAlloc(GetProcessHeap(), 0, (x))
     #define FREE(x) HeapFree(GetProcessHeap(), 0, (x))
     #define MAX_TRIES 3
@@ -41,10 +41,7 @@
 
     PIP_ADAPTER_ADDRESSES pCurrAddresses = NULL;
     PIP_ADAPTER_UNICAST_ADDRESS pUnicast = NULL;
-
-
 #else
-
     #ifdef ANDROID
     #include "ifaddrs.h"
     #else
@@ -814,7 +811,7 @@ int mtic_start(const char *agentName, const char *networkDevice, int zyrePort, c
  *
  *   returns : the state of the disconnection
  */
-int mtic_stop(){
+int mtic_stop_network(){
     zstr_sendx (agentElements->agentActor, "$TERM", NULL);
     zactor_destroy (&agentElements->agentActor);
     free((char*)agentElements->agentName);
@@ -993,64 +990,6 @@ int check_and_subscribe_to(const char* agentName)
     return result;
 }
 
-/*
- * Function: mtic_pause
- * ----------------------------
- *   Pause the agent (all subscribtion and publish)
- *
- *   usage : mtic_masticPause()
- *
- *
- */
-void mtic_pause()
-{
-    if(is_paused == false)
-    {
-        mtic_debug("Agent paused.\n");
-        is_paused = true;
-    }
-}
-
-/*
- * Function: mtic_resume
- * ----------------------------
- *   Resume the agent (all subscribtion and publish)
- *
- *   usage : mtic_masticResume()
- *
- *
- */
-void mtic_resume()
-{
-    if(is_paused == true)
-    {
-        mtic_debug("Agent resumed.\n");
-        is_paused = false;
-    }
-}
-
-/*
- * Function: mtic_toggle_play_pause
- * ----------------------------
- *   Play the agent if it is pauses, resume it otherwise.
- *
- *   usage : mtic_masticTogglePlayPause()
- *
- *   return : is_paused state
- *
- */
-bool mtic_toggle_play_pause()
-{
-    if(is_paused == false)
-    {
-        mtic_pause();
-    } else {
-        mtic_resume();
-    }
-
-    return is_paused;
-}
-
 
 /*
  * Function: debug
@@ -1084,19 +1023,72 @@ void mtic_debug(const char *fmt, ...)
     }
 }
 
-/*
- * Function: mtic_set_verbose
- * ----------------------------
- *   Set verbose mode
- *
- *   usage : mtic_set_verbose(is_verbose)
- *
- */
-void mtic_set_verbose(bool is_verbose)
-{
-    verbose_mode = is_verbose;
+
+
+////////////////////////////////////////////////////////////////////////
+// PUBLIC API
+////////////////////////////////////////////////////////////////////////
+
+//start, stop & kill the agent
+int mtic_startWithDevice(const char *networkDevice, int port){
+    return 1;
+}//TODO: warning si agent name pas défini
+
+int mtic_startWithIP(const char *ipAddress, int port){
+    return 1;
+}//TODO: warning si agent name pas défini
+
+int mtic_stop(){
+    return 1;
 }
 
+void mtic_die(){
+    
+}
 
+//pause and resume the agent
+int mtic_pause(){
+    if(is_paused == false)
+    {
+        mtic_debug("Agent paused\n");
+        is_paused = true;
+    }
+    return 1;
+}
+
+bool mtic_isPaused(){
+    return is_paused;
+}
+
+int mtic_resume(){
+    if(is_paused == true)
+    {
+        mtic_debug("Agent resumed\n");
+        is_paused = false;
+    }
+    return 1;
+}
+
+int mtic_observePause(mtic_pauseCallback *cb, void *myData){
+    return 1;
+}
+
+//control agent state
+int mtic_setAgentState(const char *state){
+    return 1;
+}
+
+void mtic_getAgentState(char *state){
+    
+}
+
+//set library parameters
+void mtic_setVerbose (bool verbose){
+    verbose_mode = verbose;
+};
+
+int mtic_setAgentName(const char *name){
+    return 1;
+}
 
 

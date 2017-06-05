@@ -9,6 +9,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "mastic.h"
 #include "mastic_private.h"
 #include "uthash/uthash.h"
 
@@ -194,7 +195,7 @@ bool check_category(definition* def,
 
     switch(check_type)
     {
-    case INPUT_TYPE:
+    case INPUT_CAT:
         if(check_category_agent_iop(def->inputs_table,
                                     category->inputs_table) != true)
         {
@@ -202,7 +203,7 @@ bool check_category(definition* def,
         }
         break;
 
-    case OUTPUT:
+    case OUTPUT_CAT:
         if(check_category_agent_iop(def->outputs_table,
                                     category->outputs_table) != true)
         {
@@ -210,7 +211,7 @@ bool check_category(definition* def,
         }
         break;
 
-    case GLOBAL:
+    case GLOBAL_CAT:
         if(check_category_agent_iop(def->inputs_table,
                                     category->inputs_table) != true)
         {
@@ -504,3 +505,47 @@ double get_iop_value_as_double(agent_iop *iop){
     return val;
 }
 
+
+////////////////////////////////////////////////////////////////////////
+// PUBLIC API
+////////////////////////////////////////////////////////////////////////
+
+int mtic_loadDefinition (const char* json_str){
+    return 1;
+}
+int mtic_loadDefinitionFromPath (const char* file_path){
+    return 1;
+}
+int mtic_clearDefinition(){ //clears definition data for the agent
+    return 1;
+}
+char* mtic_getDefinition(){ //returns json string
+    return NULL;
+}
+int mtic_setDefinitionDescription(char *description){
+    return 1;
+}
+int mtic_setDefinitionVersion(char *description){
+    return 1;
+}
+
+//edit the definition using the API
+int mtic_createInput(const char *name, iopType_t type, void *value){ //value must be copied in function
+    return 1;
+}
+int mtic_createOutput(const char *name, iopType_t type, void *value){ //value must be copied in function
+    return 1;
+}
+int mtic_createParameter(const char *name, iopType_t type, void *value){ //value must be copied in function
+    return 1;
+}
+
+int mtic_removeInput(const char *name){
+    return 1;
+}
+int mtic_removeOutput(const char *name){
+    return 1;
+}
+int mtic_removeParameter(const char *name){
+    return 1;
+}
