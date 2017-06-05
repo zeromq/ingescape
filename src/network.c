@@ -44,26 +44,29 @@
 #else
     #ifdef ANDROID
     #include "ifaddrs.h"
-    #else
     #endif
 #endif
 
 
-// Set verbose mode
-bool verbose_mode = false;
+//global flags
+bool verboseMode = false;
+bool isPaused = false;
 
-// Set in paused
-bool is_paused = false;
+//global parameters
+//prefix for sending definition through zyre
+static const char *exportDefinitionPrefix = "DEFINITION#";
+#define CHANNEL "MASTIC_PRIVATE"
+#define NETWORK_DEVICE_LENGTH 16
+#define AGENT_NAME_LENGTH 256
+#define IP_ADDRESS_LENGTH 256
+char agentName[AGENT_NAME_LENGTH] = "";
 
-// Prefix for sending definition through zyre
-static const char EXPORT_DEFINITION_PREFIX[] = "DEFINITION#";
 
+//network structures
 typedef struct zyreloopElements{
-    const char *agentName;
-    char *networkDevice;
-    char *ipAddress;
+    char networkDevice[NETWORK_DEVICE_LENGTH];
+    char ipAddress[IP_ADDRESS_LENGTH];
     int zyrePort;
-    const char *channel;
     zactor_t *agentActor;
     zyre_t *node;
     zsock_t *publisher;
@@ -79,21 +82,134 @@ typedef struct subcriber{
 } subscriber_t;
 
 
-//we manage agent data as a global varible for now
-//might be exchanged through functions someday to insure privacy
+//we manage agent data as a global variables inside the network module for now
 zyreloopElements_t *agentElements = NULL;
-
 subscriber_t *subscribers = NULL;
+
+////////////////////////////////////////////////////////////////////////
+// Netowrk internal functions
+////////////////////////////////////////////////////////////////////////
+
+/*
+ * Function: sendDefinition
+ * ----------------------------
+ *   Send my definition through our publisher
+ *   The agent definition must be defined : mtic_definition_loaded
+ *
+ *   usage : mtic_sendDefinition()
+ *
+ */
+void sendDefinition()
+{
+    // Send my own definition
+    if(mtic_definition_loaded != NULL)
+    {
+        char * definitionStr = NULL;
+        definitionStr = export_definition(mtic_definition_loaded);
+        // Send definition to the network
+        if(definitionStr)
+        {
+            // Send definition
+            zstr_sendx(agentElements->agentActor,"definition",CHANNEL,definitionStr,NULL);
+            
+            // Free memory
+            free ((char*) definitionStr);
+            definitionStr = NULL;
+        } else {
+            mtic_debug("Error : could not send definition of %s.\n",mtic_definition_loaded->name);
+        }
+    }
+}
+
+/*
+ * Function: subscribe_to
+ * ----------------------------
+ *   Add a subscription to an agent
+ *
+ *   usage : subscribeTo(const char *agentName, const char *filterDescription)
+ *
+ *   agentName          : agent name
+ *   filterDescription  : filter description (ex: "moduletest.output1")
+ *
+ *   returns : the state of the subscribtion
+ */
+int subscribeToPublisher(const char *agentName, const char *outputName)
+{
+    // If a filter has to be mtic_set
+    if(strlen(outputName) > 0)
+    {
+        //we found a possible publisher to subscribe to
+        subscriber_t *subscriber, *tmp;
+        HASH_ITER(hh, subscribers, subscriber, tmp) {
+            
+            if(strcmp(subscriber->agentName,agentName) == 0)
+            {
+                // Set subscriber to the output filter
+                mtic_debug("subcribe agent %s to %s.\n",agentName,outputName);
+                zsock_set_subscribe(subscriber->subscriber, outputName);
+                
+                // we quit
+                return 1;
+            }
+        }
+    }
+    
+    // Subsriber not found, it is not in the network yet
+    return 0;
+}
+
+/*
+ * Function: unsubscribe_to
+ * ----------------------------
+ *   Remove a subscription to an agent
+ *
+ *   usage : unsubscribeTo(const char *agentName, const char *filterDescription)
+ *
+ *   agentName          : agent name
+ *   filterDescription  : filter description (ex: "moduletest.output1")
+ *
+ *   returns : the state of the subscribtion removal
+ */
+int unsubscribeToPublisher(const char *agentName, const char *outputName)
+{
+    // If a filter has to be mtic_set
+    if(strlen(outputName) > 0)
+    {
+        //we found a possible publisher to subscribe to
+        subscriber_t *subscriber, *tmp;
+        HASH_ITER(hh, subscribers, subscriber, tmp) {
+            
+            if(strcmp(subscriber->agentName,agentName) == 0)
+            {
+                // Unsubscribe to the output filter
+                mtic_debug("unsubcribe agent %s to %s.\n",agentName,outputName);
+                zsock_set_unsubscribe(subscriber->subscriber, outputName);
+                
+                // we quit
+                return 0;
+            }
+        }
+    }
+    
+    // Subsriber not found, it is not in the network yet
+    return -1;
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////
+// ZMQ callbacks
+////////////////////////////////////////////////////////////////////////
 
 //manage messages from the parent thread
 int manageParent (zloop_t *loop, zmq_pollitem_t *item, void *arg){
-    zyreloopElements_t *zEl = (zyreloopElements_t *)arg;
 
     if (item->revents & ZMQ_POLLIN)
     {
         zmsg_t *msg = zmsg_recv ((zsock_t *)item->socket);
         if (!msg){
-            printf("Error while reading message from main thread");
+            printf("Error while reading message from main thread... exiting.");
             exit(EXIT_FAILURE); //Interrupted
         }
         char *command = zmsg_popstr (msg);
@@ -102,8 +218,7 @@ int manageParent (zloop_t *loop, zmq_pollitem_t *item, void *arg){
         } else if (streq (command, "definition")) {
             char *group = zmsg_popstr (msg);
             char *string = zmsg_popstr (msg);
-
-            zyre_shouts (zEl->node, group, "%s%s",EXPORT_DEFINITION_PREFIX, string);
+            zyre_shouts (agentElements->node, group, "%s%s",exportDefinitionPrefix, string);
             free(group);
             free(string);
         } else {
@@ -116,11 +231,9 @@ int manageParent (zloop_t *loop, zmq_pollitem_t *item, void *arg){
     return 0;
 }
 
-//manage incoming messages from the agents we subscribed to
-int manageSubscriber (zloop_t *loop, zmq_pollitem_t *item, void *arg){
-    // Since we handle a map of subscribers chich can change in real time,
-    // If a late message comes from an old removed subscriber, we can create unstability
-    // We pass in parameter the unique subscriber peerId to get the object from the map if exists.
+//manage incoming messages from one of the publisher agents we subscribed to
+int manageSubscription (zloop_t *loop, zmq_pollitem_t *item, void *arg){
+    //get subscriber id
     char *subscriberPeerId = (char *)arg;
 
     if (item->revents & ZMQ_POLLIN && strlen(subscriberPeerId) > 0)
@@ -136,7 +249,7 @@ int manageSubscriber (zloop_t *loop, zmq_pollitem_t *item, void *arg){
             // 1 : filter "agentName.outputName
             // 2 : output name only
             // 3 : value of the output
-            if(zmsg_size(msg) == 3 && is_paused == false)
+            if(zmsg_size(msg) == 3 && isPaused == false)
             {
                 char * filter = zmsg_popstr(msg);
                 char * output = zmsg_popstr(msg);
@@ -173,9 +286,9 @@ int manageSubscriber (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 // Ignore the message
 
                 // Print message if the agent has been paused
-                if(is_paused == true)
+                if(isPaused == true)
                 {
-                    mtic_debug("All traffic in the agent %s has been paused.\n",mtic_definition_loaded->name);
+                    mtic_debug("Message received from publisher but all traffic in the agent has been paused\n");
                 }
             }
             zmsg_destroy(&msg);
@@ -185,65 +298,10 @@ int manageSubscriber (zloop_t *loop, zmq_pollitem_t *item, void *arg){
     return 0;
 }
 
-/*
- * Function: publish_output
- * ----------------------------
- *   Publishing output to the bus
- *
- *   usage : publishOutput(output_name)
- *
- */
-int publish_output(const char* output_name)
-{
-    int result = -1;
-
-    model_state code;
-    agent_iop * found_iop = mtic_find_iop_by_name(output_name, &code);
-
-    if(agentElements->publisher != NULL && found_iop != NULL)
-    {
-        if(found_iop->is_muted == false && found_iop->name != NULL && is_paused == false)
-        {
-            char* str_value = mtic_iop_value_to_string(found_iop);
-            if(strlen(str_value) > 0)
-            {
-                // Build the map description used as filter for other agents
-                char mapDescription[100];
-                strcpy(mapDescription, agentElements->agentName);
-                strcat(mapDescription, ".");
-                strcat(mapDescription, found_iop->name);
-
-                mtic_debug("publish %s -> %s.\n",found_iop->name,str_value);
-                // Send message
-                zstr_sendx(agentElements->publisher, mapDescription,found_iop->name,str_value,NULL);
-
-                result = 0;
-            }
-            free(str_value);
-        } else {
-            // Print message if output has been muted
-            if(found_iop->is_muted == true)
-            {
-                mtic_debug("The output %s has been muted.\n",found_iop->name);
-            }
-
-            // Print message if the agent has been paused
-            if(is_paused == true)
-            {
-                mtic_debug("All traffic in the agent %s has been paused.\n",mtic_definition_loaded->name);
-            }
-        }
-    }
-
-    return result;
-}
-
-
 
 //manage messages received on the bus
-int manageIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
-    zyreloopElements_t *zEl = (zyreloopElements_t *)arg;
-    zyre_t *node = zEl->node;
+int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
+    zyre_t *node = agentElements->node;
     if (item->revents & ZMQ_POLLIN)
     {
         zyre_event_t *zyre_event = zyre_event_new (node);
@@ -310,14 +368,14 @@ int manageIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     subscriber->pollItem->fd = 0;
                     subscriber->pollItem->events = ZMQ_POLLIN;
                     subscriber->pollItem->revents = 0;
-                    zloop_poller (zEl->loop, subscriber->pollItem, manageSubscriber, (void*)subscriber->agentPeerId);
+                    zloop_poller (agentElements->loop, subscriber->pollItem, manageSubscription, (void*)subscriber->agentPeerId);
                     zloop_poller_set_tolerant(loop, subscriber->pollItem);
                     mtic_debug("Subscriber created for %s at %s.\n",subscriber->agentName,endpointAddress);
 
 
                     // Send my definition to the new agent
                     mtic_debug("Send our definition ...\n");
-                    mtic_send_definition();
+                    sendDefinition();
                 }
 
 
@@ -330,15 +388,15 @@ int manageIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
             mtic_debug("-%s has left %s\n", name, group);
         } else if (streq (event, "SHOUT")){
             char *message = zmsg_popstr (msg);
-            if(strlen(message) > strlen(EXPORT_DEFINITION_PREFIX))
+            if(strlen(message) > strlen(exportDefinitionPrefix))
             {
-                if (strncmp (message, EXPORT_DEFINITION_PREFIX, strlen(EXPORT_DEFINITION_PREFIX)) == 0)
+                if (strncmp (message, exportDefinitionPrefix, strlen(exportDefinitionPrefix)) == 0)
                 {
-                    char* strDefinition = calloc(strlen(message)- strlen(EXPORT_DEFINITION_PREFIX)+1, sizeof(char));
+                    char* strDefinition = calloc(strlen(message)- strlen(exportDefinitionPrefix)+1, sizeof(char));
 
                     // Extract definition from message
-                    memcpy(strDefinition, &message[strlen(EXPORT_DEFINITION_PREFIX)], strlen(message)- strlen(EXPORT_DEFINITION_PREFIX));
-                    strDefinition[strlen(message)- strlen(EXPORT_DEFINITION_PREFIX)] = '\0';
+                    memcpy(strDefinition, &message[strlen(exportDefinitionPrefix)], strlen(message)- strlen(exportDefinitionPrefix));
+                    strDefinition[strlen(message)- strlen(exportDefinitionPrefix)] = '\0';
 
                     // Look for the new agent definition
                     definition * receivedDefinition = NULL;
@@ -364,13 +422,11 @@ int manageIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                             // check and subscribe to the new added outputs if eixts and the concerning agent is present.
                             // Check if we have a mapping with it
                             // Check and add mapping if needed
-                            check_and_subscribe_to(name);
+                            network_checkAndSubscribeTo(name);
                         }
                     }
 
                     free(strDefinition);
-
-
                 }
             }
             free(message);
@@ -393,7 +449,7 @@ int manageIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 // We had it if we don't have it already
                 if(receivedDefinition != NULL)
                 {
-                    // Disactivate map(ping of the leaving agent
+                    // Deactivate mapping of the leaving agent
                     agent_iop* iop_unmappped = mtic_unmap(receivedDefinition);
                     struct agent_iop *iop, *tmp;
                     HASH_ITER(hh,iop_unmappped, iop, tmp)
@@ -432,44 +488,292 @@ int sendTestMessagesOnPublisher(zloop_t *loop, int timer_id, void *arg){
     // 1 : filter "agentName.outputName
     // 2 : output name only
     // 3 : value of the output
-    publish_output("output1");
+    network_publishOutput ("output1");
 
     return 0;
 }
 
 
 static void
-init_actor (zsock_t *pipe, void *args)
+initActor (zsock_t *pipe, void *args)
 {
-    zyreloopElements_t *zEl = (zyreloopElements_t *)args;
+    if (strlen(agentName) == 0){
+        strncpy(agentName, "undefined", AGENT_NAME_LENGTH);
+    }
+    //start zyre
+    agentElements->node = zyre_new (agentName);
+    zyre_set_port(agentElements->node, agentElements->zyrePort);
+    if (agentElements->node == NULL){
+        printf("Error : could not create zyre node... exiting.\n");
+        exit(EXIT_FAILURE);
+    }
+    zyre_start (agentElements->node);
+    zyre_join(agentElements->node, CHANNEL);
+    zsock_signal (pipe, 0); //notify main thread that we are ready
 
-    //get our IP address
-    zEl->ipAddress = NULL;
+    //start publisher
+    char endpoint[256];
+    sprintf(endpoint, "tcp://%s:*", agentElements->ipAddress);
+    agentElements->publisher = zsock_new_pub(endpoint);
+    strncpy(endpoint, zsock_endpoint(agentElements->publisher), 256);
+    char *insert = endpoint + strlen(endpoint) - 1;
+    while (*insert != ':' && insert > endpoint) {
+        insert--;
+    }
+    zyre_set_header(agentElements->node, "publisher", "%s", insert + 1);
+
+    zmq_pollitem_t zpipePollItem;
+    zmq_pollitem_t zyrePollItem;
+
+    //main zmq socket (i.e. main thread)
+    void *zpipe = zsock_resolve(pipe);
+    if (zpipe == NULL){
+        printf("Error : could not get the pipe descriptor for polling... exiting.\n");
+        exit(EXIT_FAILURE);
+    }
+    zpipePollItem.socket = zpipe;
+    zpipePollItem.fd = 0;
+    zpipePollItem.events = ZMQ_POLLIN;
+    zpipePollItem.revents = 0;
+
+    //zyre socket
+    void *zsock = zsock_resolve(zyre_socket (agentElements->node));
+    if (zsock == NULL){
+        printf("Error : could not get the zyre socket for polling... exiting.\n");
+        exit(EXIT_FAILURE);
+    }
+    zyrePollItem.socket = zsock;
+    zyrePollItem.fd = 0;
+    zyrePollItem.events = ZMQ_POLLIN;
+    zyrePollItem.revents = 0;
 
 
-    //Manage the OS compilation to get the ip address corresponding to the interface name
-    #ifdef _WIN32
+    zloop_t *loop = agentElements->loop = zloop_new ();
+    assert (loop);
+    zloop_set_verbose (loop, false);
+
+    zloop_poller (loop, &zpipePollItem, manageParent, agentElements);
+    zloop_poller_set_tolerant(loop, &zpipePollItem);
+    zloop_poller (loop, &zyrePollItem, manageZyreIncoming, agentElements);
+    zloop_poller_set_tolerant(loop, &zyrePollItem);
+
+    //FOR TESTING - SEND PERIODIC MESSAGES ON PUBLISHER
+    //zloop_timer(loop, 1000, 0, sendTestMessagesOnPublisher, zEl);
+
+    // FIXME - needed ? Export my definition for once if exists
+    // mtic_sendDefinition();
+
+    zloop_start (loop); //start returns when one of the pollers returns -1
+
+    zloop_destroy (&loop);
+    assert (loop == NULL);
+
+    //clean
+    zloop_destroy (&loop);
+    assert (loop == NULL);
+    zyre_stop (agentElements->node);
+    zclock_sleep (100);
+    zyre_destroy (&agentElements->node);
+    zsock_destroy(&agentElements->publisher);
+    //clean subscribers
+    subscriber_t *s, *tmp;
+    HASH_ITER(hh, subscribers, s, tmp) {
+        HASH_DEL(subscribers, s);
+        zsock_destroy(&s->subscriber);
+        free((char*)s->agentName);
+        free((char*)s->agentPeerId);
+        free(s->pollItem);
+        free(s->subscriber);
+        s->subscriber = NULL;
+        free(s);
+        s = NULL;
+    }
+}
+
+////////////////////////////////////////////////////////////////////////
+// PRIVATE API
+////////////////////////////////////////////////////////////////////////
+
+/*
+ * Function: debug
+ * ----------------------------
+ *   trace debug messages only on verbose mode
+ *   Print file name and line number in debug mode
+ *
+ *   usage : mtic_debug(format,msg)
+ *
+ */
+// Definition of a trace function depending of the verbose mode and debug compilation
+void mtic_debug(const char *fmt, ...)
+{
+    if(verboseMode)
+    {
+        va_list ar;
+        va_start(ar, fmt);
+        
+        // Add prefix
+        fprintf(stderr, "[Debug] : ");
+        
+        // Add message
+        vfprintf(stderr, fmt,ar);
+        
+        // Add more information in debug mode
+#ifdef DEBUG
+        fprintf(stderr, "           ... in %s (%s, line %d).\n", __func__, __FILE__, __LINE__);
+#endif // DEBUG
+        
+        va_end(ar);
+    }
+}
+
+int network_publishOutput (const char* output_name)
+{
+    int result = 0;
+    
+    model_state code;
+    agent_iop * found_iop = mtic_find_iop_by_name(output_name, &code);
+    
+    if(agentElements->publisher != NULL && found_iop != NULL)
+    {
+        if(found_iop->is_muted == false && found_iop->name != NULL && isPaused == false)
+        {
+            char* str_value = mtic_iop_value_to_string(found_iop);
+            if(strlen(str_value) > 0)
+            {
+                // Build the map description used as filter for other agents
+                char mapDescription[100];
+                strcpy(mapDescription, agentName);
+                strcat(mapDescription, ".");
+                strcat(mapDescription, found_iop->name);
+                
+                mtic_debug("publish %s -> %s.\n",found_iop->name,str_value);
+                // Send message
+                zstr_sendx(agentElements->publisher, mapDescription,found_iop->name,str_value,NULL);
+                
+                result = 1;
+            }
+            free(str_value);
+        } else {
+            // Print message if output has been muted
+            if(found_iop->is_muted == true)
+            {
+                mtic_debug("Shoudl publish output but the output %s has been muted.\n",found_iop->name);
+            }
+            
+            // Print message if the agent has been paused
+            if(isPaused == true)
+            {
+                mtic_debug("Shoudl publish output but all traffic in the agent has been paused\n");
+            }
+        }
+    }
+    
+    return result;
+}
+
+/*
+ * Function: network_checkAndSubscribeTo
+ * ----------------------------
+ *   Check mappings made on agent name
+ *   Connect to these outputs if compatibility is ok
+ *
+ *   usage : checkAndSubscribeTo(char* agentName)
+ *
+ *   agentName          : agent name
+ *
+ *   returns : -1 if an error occured, 1 otherwise.
+ *
+ */
+int network_checkAndSubscribeTo(const char* agentName)
+{
+    int result = 0;
+    // Look for the new agent definition
+    definition * externalDefinition = NULL;
+    HASH_FIND_STR(mtic_agents_defs_on_network, agentName, externalDefinition);
+    
+    // We had it if we don't have it already
+    if(externalDefinition != NULL)
+    {
+        // Porcess mapping
+        // Check if we have a mapping with it
+        // Check and add mapping if needed
+        agent_iop* outputsToSubscribe = mtic_check_map(externalDefinition);
+        
+        if(outputsToSubscribe != NULL)
+        {
+            char map_description[100];
+            
+            struct agent_iop *iop, *tmp;
+            HASH_ITER(hh,outputsToSubscribe, iop, tmp)
+            {
+                strcpy(map_description, externalDefinition->name);
+                strcat(map_description, ".");
+                strcat(map_description, iop->name);
+                
+                // Make subscribtion
+                int cr = subscribeToPublisher(externalDefinition->name,map_description);
+                
+                // Subscription has been done
+                if(cr > 0)
+                {
+                    mtic_debug("Subscription found and done to output: %s from agent: %s.\n",iop->name,externalDefinition->name);
+                    result = 1;
+                } else {
+                    mtic_debug("Subscription has been found but not done to output: %s from agent: %s.\n",iop->name,externalDefinition->name);
+                }
+                
+                HASH_DEL(outputsToSubscribe, iop);
+                free(iop);
+            }
+        } else {
+            //printf("[Warning] : No outputs to subscribe to for agent: %s.\n",agentName);
+        }
+    } else {
+        //printf("[Warning] : No definiton found for the agent: %s. It must been arrived yet, wait for it !\n",agentName);
+    }
+    
+    return result;
+}
+
+
+////////////////////////////////////////////////////////////////////////
+// PUBLIC API
+////////////////////////////////////////////////////////////////////////
+
+//start, stop & kill the agent
+int mtic_startWithDevice(const char *networkDevice, int port){
+    
+    if (agentElements != NULL){
+        //Agent is already active : need to stop it first
+        mtic_stop();
+        agentElements = NULL;
+    }
+    
+    agentElements = calloc(1, sizeof(zyreloopElements_t));
+    strncpy(agentElements->networkDevice, networkDevice, NETWORK_DEVICE_LENGTH);
+    agentElements->ipAddress[0] = '\0';
+    
+#ifdef _WIN32
     do {
         pAddresses = (IP_ADAPTER_ADDRESSES *) MALLOC(outBufLen);
         if (pAddresses == NULL) {
-            printf
-                ("Memory allocation failed for IP_ADAPTER_ADDRESSES struct\n");
+            printf("Memory allocation failed for IP_ADAPTER_ADDRESSES struct... exiting.\n");
             exit(1);
         }
-
+        
         dwRetVal = GetAdaptersAddresses(family, flags, NULL, pAddresses, &outBufLen);
-
+        
         if (dwRetVal == ERROR_BUFFER_OVERFLOW) {
             FREE(pAddresses);
             pAddresses = NULL;
         } else {
             break;
         }
-
+        
         Iterations++;
-
+        
     } while ((dwRetVal == ERROR_BUFFER_OVERFLOW) && (Iterations < MAX_TRIES));
-
+    
     if (dwRetVal == NO_ERROR) {
         // If successful, output some information from the data we received
         pCurrAddresses = pAddresses;
@@ -477,7 +781,7 @@ init_actor (zsock_t *pipe, void *args)
             //Convert the wchar_t to char *
             frindly_name = (char *)malloc( BUFSIZ );
             count = wcstombs(frindly_name, pCurrAddresses->FriendlyName, BUFSIZ );
-
+            
             //If the friendly_name is the same of the networkDevice
             if (strcmp(zEl->networkDevice, frindly_name) == 0)
             {
@@ -493,29 +797,29 @@ init_actor (zsock_t *pipe, void *args)
                                 struct sockaddr_in *sa_in = (struct sockaddr_in *)pUnicast->Address.lpSockaddr;
                                 zEl->ipAddress = strdup(inet_ntop(AF_INET,&(sa_in->sin_addr),buff,bufflen));
                                 free(frindly_name);
-                                printf("Connection on ip address %s on device %s\n", zEl->ipAddress, zEl->networkDevice);
+                                mtic_debug("Connection on ip address %s on device %s\n", zEl->ipAddress, zEl->networkDevice);
                             }
                         }
                         pUnicast = pUnicast->Next;
                     }
                 }
             }
-
+            
             pCurrAddresses = pCurrAddresses->Next;
         }
     } else {
-        printf("Call to GetAdaptersAddresses failed with error: %d\n",
+        mtic_debug("Call to GetAdaptersAddresses failed with error: %d\n",
                dwRetVal);
         if (dwRetVal == ERROR_NO_DATA)
-            printf("\tNo addresses were found for the requested parameters\n");
+            mtic_debug("\tNo addresses were found for the requested parameters\n");
         else {
-
+            
             if (FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
-                    FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-                    NULL, dwRetVal, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                    // Default language
-                    (LPTSTR) & lpMsgBuf, 0, NULL)) {
-                printf("\tError: %s", lpMsgBuf);
+                              FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+                              NULL, dwRetVal, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                              // Default language
+                              (LPTSTR) & lpMsgBuf, 0, NULL)) {
+                mtic_debug("\tError: %s", lpMsgBuf);
                 LocalFree(lpMsgBuf);
                 if (pAddresses)
                     FREE(pAddresses);
@@ -523,12 +827,12 @@ init_actor (zsock_t *pipe, void *args)
             }
         }
     }
-
+    
     if (pAddresses) {
         FREE(pAddresses);
     }
-
-    #else
+    
+#else
     struct ifaddrs *addrs, *tmpaddr;
     getifaddrs(&addrs);
     tmpaddr = addrs;
@@ -537,558 +841,147 @@ init_actor (zsock_t *pipe, void *args)
         if (tmpaddr->ifa_addr && tmpaddr->ifa_addr->sa_family == AF_INET)
         {
             struct sockaddr_in *pAddr = (struct sockaddr_in *)tmpaddr->ifa_addr;
-            if (strcmp(zEl->networkDevice, tmpaddr->ifa_name) == 0)
+            if (strcmp(networkDevice, tmpaddr->ifa_name) == 0)
             {
-                zEl->ipAddress = strdup(inet_ntoa(pAddr->sin_addr));
-                printf("Connection on ip address %s on device %s\n", zEl->ipAddress, zEl->networkDevice);
+                strncpy(agentElements->ipAddress, inet_ntoa(pAddr->sin_addr), IP_ADDRESS_LENGTH);
+                mtic_debug("Connection with ip address %s on device %s\n", agentElements->ipAddress, networkDevice);
             }
         }
         tmpaddr = tmpaddr->ifa_next;
     }
     freeifaddrs(addrs);
-    #endif
-
-
-    if (zEl->ipAddress == NULL){
-        fprintf(stderr, "IP address could not be determined on device %s... exiting.\n", zEl->networkDevice);
+#endif
+    
+    if (strlen(agentElements->ipAddress) == 0){
+        fprintf(stderr, "IP address could not be determined on device %s... exiting.\n", networkDevice);
         exit(EXIT_FAILURE);
     }
-
-    //start zyre
-    agentElements->node = zyre_new (agentElements->agentName);
-    zyre_set_port(agentElements->node, agentElements->zyrePort);
-    if (!agentElements->node)
-        return;
-    zyre_start (agentElements->node);
-    zyre_join(agentElements->node, agentElements->channel);
-    zsock_signal (pipe, 0); //notify main thread that we are ready
-
-    //start publisher
-    char endpoint[256];
-    sprintf(endpoint, "tcp://%s:*", zEl->ipAddress);
-    agentElements->publisher = zsock_new_pub(endpoint);
-    strcpy(endpoint, zsock_endpoint(agentElements->publisher));
-    char *insert = endpoint + strlen(endpoint) - 1;
-    while (*insert != ':' && insert > endpoint) {
-        insert--;
-    }
-    zyre_set_header(agentElements->node, "publisher", "%s", insert + 1);
-
-    zmq_pollitem_t zpipePollItem;
-    zmq_pollitem_t zyrePollItem;
-
-    //main zmq socket (i.e. main thread)
-    void *zpipe = zsock_resolve(pipe);
-    if (zpipe == NULL){
-        printf("Error : could not get the pipe descriptor for polling... exiting.\n");
-        exit(EXIT_FAILURE);
-    }
-    zpipePollItem.socket = zpipe;
-    zpipePollItem.fd = 0;
-    zpipePollItem.events = ZMQ_POLLIN;
-    zpipePollItem.revents = 0;
-
-    //zyre socket
-    void *zsock = zsock_resolve(zyre_socket (agentElements->node));
-    if (zsock == NULL){
-        printf("Error : could not get the zyre socket for polling... exiting.\n");
-        exit(EXIT_FAILURE);
-    }
-    zyrePollItem.socket = zsock;
-    zyrePollItem.fd = 0;
-    zyrePollItem.events = ZMQ_POLLIN;
-    zyrePollItem.revents = 0;
-
-
-    zloop_t *loop = agentElements->loop = zloop_new ();
-    assert (loop);
-    zloop_set_verbose (loop, false);
-
-    zloop_poller (loop, &zpipePollItem, manageParent, agentElements);
-    zloop_poller_set_tolerant(loop, &zpipePollItem);
-    zloop_poller (loop, &zyrePollItem, manageIncoming, agentElements);
-    zloop_poller_set_tolerant(loop, &zyrePollItem);
-
-    //FOR TESTING - SEND PERIODIC MESSAGES ON PUBLISHER
-    //zloop_timer(loop, 1000, 0, sendTestMessagesOnPublisher, zEl);
-
-    // FIXME - needed ? Export my definition for once if exists
-    // mtic_sendDefinition();
-
-    zloop_start (loop); //start returns when one of the pollers returns -1
-
-    zloop_destroy (&loop);
-    assert (loop == NULL);
-
-
-    //clean
-    zloop_destroy (&loop);
-    assert (loop == NULL);
-    zyre_stop (agentElements->node);
-    zclock_sleep (100);
-    zyre_destroy (&agentElements->node);
-    zsock_destroy(&agentElements->publisher);
-    //clean subscribers
-    subscriber_t *s, *tmp;
-    HASH_ITER(hh, subscribers, s, tmp) {
-        HASH_DEL(subscribers, s);
-        zsock_destroy(&s->subscriber);
-        free((char*)s->agentName);
-        free((char*)s->agentPeerId);
-        free(s->pollItem);
-        free(s->subscriber);
-        s->subscriber = NULL;
-        free(s);
-        s = NULL;
-    }
-
-}
-
-static void init_actor_ip (zsock_t *pipe, void *args)
-{
-    zyreloopElements_t *zEl = (zyreloopElements_t *)args;
-
-    if (zEl->ipAddress == NULL){
-        fprintf(stderr, "IP address could not be determined on device %s... exiting.\n", zEl->networkDevice);
-        exit(EXIT_FAILURE);
-    }
-
-    //start zyre
-    agentElements->node = zyre_new (agentElements->agentName);
-    zyre_set_port(agentElements->node, agentElements->zyrePort);
-    if (!agentElements->node)
-        return;
-    zyre_start (agentElements->node);
-    zyre_join(agentElements->node, agentElements->channel);
-    zsock_signal (pipe, 0); //notify main thread that we are ready
-
-    //start publisher
-    char endpoint[256];
-    sprintf(endpoint, "tcp://%s:*", zEl->ipAddress);
-    agentElements->publisher = zsock_new_pub(endpoint);
-    strcpy(endpoint, zsock_endpoint(agentElements->publisher));
-    char *insert = endpoint + strlen(endpoint) - 1;
-    while (*insert != ':' && insert > endpoint) {
-        insert--;
-    }
-    zyre_set_header(agentElements->node, "publisher", "%s", insert + 1);
-
-    zmq_pollitem_t zpipePollItem;
-    zmq_pollitem_t zyrePollItem;
-
-    //main zmq socket (i.e. main thread)
-    void *zpipe = zsock_resolve(pipe);
-    if (zpipe == NULL){
-        printf("Error : could not get the pipe descriptor for polling... exiting.\n");
-        exit(EXIT_FAILURE);
-    }
-    zpipePollItem.socket = zpipe;
-    zpipePollItem.fd = 0;
-    zpipePollItem.events = ZMQ_POLLIN;
-    zpipePollItem.revents = 0;
-
-    //zyre socket
-    void *zsock = zsock_resolve(zyre_socket (agentElements->node));
-    if (zsock == NULL){
-        printf("Error : could not get the zyre socket for polling... exiting.\n");
-        exit(EXIT_FAILURE);
-    }
-    zyrePollItem.socket = zsock;
-    zyrePollItem.fd = 0;
-    zyrePollItem.events = ZMQ_POLLIN;
-    zyrePollItem.revents = 0;
-
-
-    zloop_t *loop = agentElements->loop = zloop_new ();
-    assert (loop);
-    zloop_set_verbose (loop, false);
-
-    zloop_poller (loop, &zpipePollItem, manageParent, agentElements);
-    zloop_poller_set_tolerant(loop, &zpipePollItem);
-    zloop_poller (loop, &zyrePollItem, manageIncoming, agentElements);
-    zloop_poller_set_tolerant(loop, &zyrePollItem);
-
-    //FOR TESTING - SEND PERIODIC MESSAGES ON PUBLISHER
-    //zloop_timer(loop, 1000, 0, sendTestMessagesOnPublisher, zEl);
-
-    // FIXME - needed ? Export my definition for once if exists
-    // mtic_sendDefinition();
-
-    zloop_start (loop); //start returns when one of the pollers returns -1
-
-    zloop_destroy (&loop);
-    assert (loop == NULL);
-
-
-    //clean
-    zloop_destroy (&loop);
-    assert (loop == NULL);
-    zyre_stop (agentElements->node);
-    zclock_sleep (100);
-    zyre_destroy (&agentElements->node);
-    zsock_destroy(&agentElements->publisher);
-    //clean subscribers
-    subscriber_t *s, *tmp;
-    HASH_ITER(hh, subscribers, s, tmp) {
-        HASH_DEL(subscribers, s);
-        zsock_destroy(&s->subscriber);
-        free((char*)s->agentName);
-        free((char*)s->agentPeerId);
-        free(s->pollItem);
-        free(s->subscriber);
-        s->subscriber = NULL;
-        free(s);
-        s = NULL;
-    }
-
-}
-
-int mtic_start_ip(const char *agentName, const char *ipAddress, const char* networkDevice, int zyrePort, const char *channel){
-
-    agentElements = calloc(1, sizeof(zyreloopElements_t));
-    agentElements->agentName = strdup(agentName);
-    agentElements->networkDevice = strdup(networkDevice);
-    agentElements->ipAddress = strdup(ipAddress);
-    agentElements->zyrePort = zyrePort;
-    agentElements->channel = strdup(channel);
-    agentElements->agentActor = zactor_new (init_actor_ip, agentElements);
+    
+    agentElements->zyrePort = port;
+    agentElements->agentActor = zactor_new (initActor, agentElements);
     assert (agentElements->agentActor);
-
-    // Set sleep time for connection
-    // to leave time for the connection, to be abel to send the definition by the publisher
-    #ifdef _WIN32
-        Sleep(1);
-    #else
-        usleep(1000);
-    #endif
-
-    return 1;
-}
-
-
-/*
- * Function: mtic_start
- * ----------------------------
- *   Start the network service
- *
- *   usage : mtic_masticStart(agentName, networkDevice, zyrePort,channel)
- *         example : mtic_masticStart("MASTIC_TEST", "en15", 5670, "MASTIC")
- *
- *   agentName          : agent name
- *   networkDevice      : device of connection
- *   zyrePort           : zyre port used
- *   channel            : name of the channel used to communication on zyre
- *
- *   returns : the state of the connection
- */
-int mtic_start(const char *agentName, const char *networkDevice, int zyrePort, const char *channel){
-
-    agentElements = calloc(1, sizeof(zyreloopElements_t));
-    agentElements->agentName = strdup(agentName);
-    agentElements->networkDevice = strdup(networkDevice);
-    agentElements->zyrePort = zyrePort;
-    agentElements->channel = strdup(channel);
-    agentElements->agentActor = zactor_new (init_actor, agentElements);
-    assert (agentElements->agentActor);
-
-    // Set sleep time for connection
-    // to leave time for the connection, to be abel to send the definition by the publisher
-    #ifdef _WIN32
-        Sleep(1);
-    #else
-        usleep(1000);
-    #endif
-
-    return 1;
-}
-
-/*
- * Function: mtic_stop
- * ----------------------------
- *   Stop the network service
- *
- *   usage : mtic_masticStop()
- *
- *   returns : the state of the disconnection
- */
-int mtic_stop_network(){
-    zstr_sendx (agentElements->agentActor, "$TERM", NULL);
-    zactor_destroy (&agentElements->agentActor);
-    free((char*)agentElements->agentName);
-    free(agentElements->networkDevice);
-    free((char*)agentElements->channel);
-    free (agentElements);
-    return 1;
-}
-
-/*
- * Function: mtic_send_definition
- * ----------------------------
- *   Send my definition through the agent publisher
- *   The agent definition must be defined : mtic_definition_loaded
- *
- *   usage : mtic_sendDefinition()
- *
- */
-void mtic_send_definition()
-{
-    // Send my own definition
-    if(mtic_definition_loaded != NULL)
-    {
-        char * definitionStr = NULL;
-        definitionStr = export_definition(mtic_definition_loaded);
-        // Send definition to the network
-        if(definitionStr)
-        {
-            // Send definition
-            zstr_sendx(agentElements->agentActor,"definition",agentElements->channel,definitionStr,NULL);
-
-            // Free memory
-            free ((char*) definitionStr);
-            definitionStr = NULL;
-        } else {
-            printf("Error : could not send definition of %s.\n",mtic_definition_loaded->name);
-        }
-    }
-}
-
-/*
- * Function: subscribe_to
- * ----------------------------
- *   Add a subscription to an agent
- *
- *   usage : subscribeTo(const char *agentName, const char *filterDescription)
- *
- *   agentName          : agent name
- *   filterDescription  : filter description (ex: "moduletest.output1")
- *
- *   returns : the state of the subscribtion
- */
-int subscribe_to(const char *agentName, const char *outputName)
-{
-    // If a filter has to be mtic_set
-    if(strlen(outputName) > 0)
-    {
-        //we found a possible publisher to subscribe to
-        subscriber_t *subscriber, *tmp;
-        HASH_ITER(hh, subscribers, subscriber, tmp) {
-
-            if(strcmp(subscriber->agentName,agentName) == 0)
-            {
-                // Set subscriber to the output filter
-                mtic_debug("subcribe agent %s to %s.\n",agentName,outputName);
-                zsock_set_subscribe(subscriber->subscriber, outputName);
-
-                // we quit
-                return 0;
-            }
-        }
-    }
-
-    // Subsriber not found, it is not in the network yet
-    return -1;
-}
-
-/*
- * Function: unsubscribe_to
- * ----------------------------
- *   Remove a subscription to an agent
- *
- *   usage : unsubscribeTo(const char *agentName, const char *filterDescription)
- *
- *   agentName          : agent name
- *   filterDescription  : filter description (ex: "moduletest.output1")
- *
- *   returns : the state of the subscribtion removal
- */
-int unsubscribe_to(const char *agentName, const char *outputName)
-{
-    // If a filter has to be mtic_set
-    if(strlen(outputName) > 0)
-    {
-        //we found a possible publisher to subscribe to
-        subscriber_t *subscriber, *tmp;
-        HASH_ITER(hh, subscribers, subscriber, tmp) {
-
-            if(strcmp(subscriber->agentName,agentName) == 0)
-            {
-                // Unsubscribe to the output filter
-                mtic_debug("unsubcribe agent %s to %s.\n",agentName,outputName);
-                zsock_set_unsubscribe(subscriber->subscriber, outputName);
-
-                // we quit
-                return 0;
-            }
-        }
-    }
-
-    // Subsriber not found, it is not in the network yet
-    return -1;
-}
-
-/*
- * Function: check_and_subscribe_to
- * ----------------------------
- *   Check mappings made on agent name
- *   Connect to these outputs if compatibility is ok
- *
- *   usage : checkAndSubscribeTo(char* agentName)
- *
- *   agentName          : agent name
- *
- *   returns : -1 if an error occured, 1 otherwise.
- *
- */
-int check_and_subscribe_to(const char* agentName)
-{
-    int result = -1;
-    // Look for the new agent definition
-    definition * externalDefinition = NULL;
-    HASH_FIND_STR(mtic_agents_defs_on_network, agentName, externalDefinition);
-
-    // We had it if we don't have it already
-    if(externalDefinition != NULL)
-    {
-        // Porcess mapping
-        // Check if we have a mapping with it
-        // Check and add mapping if needed
-        agent_iop* outputsToSubscribe = mtic_check_map(externalDefinition);
-
-        if(outputsToSubscribe != NULL)
-        {
-            char map_description[100];
-
-            struct agent_iop *iop, *tmp;
-            HASH_ITER(hh,outputsToSubscribe, iop, tmp)
-            {
-                strcpy(map_description, externalDefinition->name);
-                strcat(map_description, ".");
-                strcat(map_description, iop->name);
-
-                // Make subscribtion
-                int cr = subscribe_to(externalDefinition->name,map_description);
-
-                // Subscription has been done
-                if(cr == 0)
-                {
-                    mtic_debug("Subscription found and done to output: %s from agent: %s.\n",iop->name,externalDefinition->name);
-                    result = 0;
-                } else {
-                    mtic_debug("Subscription has been found but not done to output: %s from agent: %s.\n",iop->name,externalDefinition->name);
-                }
-
-                HASH_DEL(outputsToSubscribe, iop);
-                free(iop);
-            }
-        } else {
-            //printf("[Warning] : No outputs to subscribe to for agent: %s.\n",agentName);
-        }
-    } else {
-        //printf("[Warning] : No definiton found for the agent: %s. It must been arrived yet, wait for it !\n",agentName);
-    }
-
-    return result;
-}
-
-
-/*
- * Function: debug
- * ----------------------------
- *   trace debug messages only on verbose mode
- *   Print file name and line number in debug mode
- *
- *   usage : mtic_debug(format,msg)
- *
- */
-// Definition of a trace function depending of the verbose mode and debug compilation
-void mtic_debug(const char *fmt, ...)
-{
-    if(verbose_mode == 1)
-    {
-        va_list ar;
-        va_start(ar, fmt);
-
-        // Add prefix
-        fprintf(stderr, "[Debug] : ");
-
-        // Add message
-        vfprintf(stderr, fmt,ar);
-        
-        // Add more information in debug mode
-#ifdef DEBUG
-        fprintf(stderr, "           ... in %s (%s, line %d).\n", __func__, __FILE__, __LINE__);
-#endif // DEBUG
-        
-        va_end(ar);
-    }
-}
-
-
-
-////////////////////////////////////////////////////////////////////////
-// PUBLIC API
-////////////////////////////////////////////////////////////////////////
-
-//start, stop & kill the agent
-int mtic_startWithDevice(const char *networkDevice, int port){
+    
     return 1;
 }//TODO: warning si agent name pas défini
 
+
 int mtic_startWithIP(const char *ipAddress, int port){
+    if (agentElements != NULL){
+        //Agent is already active : need to stop it first
+        mtic_stop();
+        agentElements = NULL;
+    }
+    
+    agentElements = calloc(1, sizeof(zyreloopElements_t));
+    strncpy(agentElements->networkDevice, "unknown", NETWORK_DEVICE_LENGTH);
+    strncpy(agentElements->ipAddress, ipAddress, IP_ADDRESS_LENGTH);
+    mtic_debug("Connection with ip address %s\n", agentElements->ipAddress);
+    agentElements->zyrePort = port;
+    agentElements->agentActor = zactor_new (initActor, agentElements);
+    assert (agentElements->agentActor);
+    
+//    // Set sleep time for connection
+//    // to leave time for the connection, to be able to send the definition by the publisher
+//#ifdef _WIN32
+//    Sleep(1);
+//#else
+//    usleep(1000);
+//#endif
     return 1;
 }//TODO: warning si agent name pas défini
 
 int mtic_stop(){
+    zstr_sendx (agentElements->agentActor, "$TERM", NULL);
+    zactor_destroy (&agentElements->agentActor);
+    free (agentElements);
+    agentElements = NULL;
     return 1;
 }
 
 void mtic_die(){
-    
+    mtic_stop();
+    exit(1);
 }
+
+int mtic_setAgentName(const char *name){
+    if (strlen(name) == 0){
+        mtic_debug("mtic_setAgentName : Agent name cannot be empty\n");
+        return 0;
+    }
+    if (strcmp(agentName, name) == 0){
+        //nothing to do
+        return 1;
+    }
+    char networkDevice[NETWORK_DEVICE_LENGTH] = "";
+    char ipAddress[IP_ADDRESS_LENGTH] = "";
+    int zyrePort = 0;
+    bool needRestart = false;
+    if (agentElements != NULL){
+        //Agent is already started, zyre actor needs to be recreated
+        strncpy(networkDevice, agentElements->networkDevice, NETWORK_DEVICE_LENGTH);
+        strncpy(ipAddress, agentElements->ipAddress, IP_ADDRESS_LENGTH);
+        zyrePort = agentElements->zyrePort;
+        mtic_stop();
+        needRestart = true;
+    }
+    
+    strncpy(agentName, name, AGENT_NAME_LENGTH);
+    
+    if (needRestart){
+        if (strcmp(networkDevice, "undefined") == 0){
+            mtic_startWithIP(ipAddress, zyrePort);
+        }else{
+            mtic_startWithDevice(networkDevice, zyrePort);
+        }
+    }
+    
+    return 1;
+}
+
 
 //pause and resume the agent
 int mtic_pause(){
-    if(is_paused == false)
+    if(isPaused == false)
     {
         mtic_debug("Agent paused\n");
-        is_paused = true;
+        isPaused = true;
     }
     return 1;
 }
 
 bool mtic_isPaused(){
-    return is_paused;
+    return isPaused;
 }
 
 int mtic_resume(){
-    if(is_paused == true)
+    if(isPaused == true)
     {
         mtic_debug("Agent resumed\n");
-        is_paused = false;
+        isPaused = false;
     }
     return 1;
 }
 
 int mtic_observePause(mtic_pauseCallback *cb, void *myData){
+    //TODO
     return 1;
 }
 
 //control agent state
 int mtic_setAgentState(const char *state){
+    //TODO
     return 1;
 }
 
 void mtic_getAgentState(char *state){
-    
+    //TODO
 }
 
 //set library parameters
 void mtic_setVerbose (bool verbose){
-    verbose_mode = verbose;
+    verboseMode = verbose;
 };
 
-int mtic_setAgentName(const char *name){
-    return 1;
-}
+
 
 
