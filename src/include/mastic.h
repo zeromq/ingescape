@@ -33,6 +33,7 @@ int mtic_startWithDevice(const char *networkDevice, int port); //TODO: warning s
 int mtic_startWithIP(const char *ipAddress, int port); //TODO: warning si agent name pas défini
 int mtic_stop();
 void mtic_die();
+int mtic_setAgentName(const char *name);
 
 //pause and resume the agent
 typedef void (*mtic_pauseCallback)(bool *isPaused, void *myData);
@@ -168,7 +169,6 @@ bool mtic_isOutputMuted(const char *name);
 //////////////////////////////////////////////////
 //Definitions
 
-int mtic_setAgentName(const char *name);
 int mtic_loadDefinition (const char* json_str);
 int mtic_loadDefinitionFromPath (const char* file_path);
 int mtic_clearDefinition(); //clears definition data for the agent
