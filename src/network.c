@@ -9,6 +9,7 @@
 #include <zyre.h>
 #include <czmq.h>
 #include "uthash/uthash.h"
+#include "uthash/utlist.h"
 #include "mastic_private.h"
 #include "mastic.h"
 
@@ -60,6 +61,7 @@ static const char *exportDefinitionPrefix = "DEFINITION#";
 #define AGENT_NAME_LENGTH 256
 #define IP_ADDRESS_LENGTH 256
 char agentName[AGENT_NAME_LENGTH] = "";
+char agentState[AGENT_NAME_LENGTH] = "";
 
 
 //network structures
@@ -81,13 +83,22 @@ typedef struct subcriber{
     UT_hash_handle hh;
 } subscriber_t;
 
+typedef struct pauseCallback {      //Need to be unique : the table hash key
+    mtic_pauseCallback callback_ptr;   //pointer on the callback
+    void *myData;
+    struct pauseCallback *prev;
+    struct pauseCallback *next;
+} pauseCallback_t;
+
 
 //we manage agent data as a global variables inside the network module for now
 zyreloopElements_t *agentElements = NULL;
 subscriber_t *subscribers = NULL;
+pauseCallback_t *pauseCallbacks = NULL;
+
 
 ////////////////////////////////////////////////////////////////////////
-// Netowrk internal functions
+// Network internal functions
 ////////////////////////////////////////////////////////////////////////
 
 /*
@@ -891,10 +902,18 @@ int mtic_startWithIP(const char *ipAddress, int port){
 }//TODO: warning si agent name pas défini
 
 int mtic_stop(){
+    //interrupting and destroying mastic thread
     zstr_sendx (agentElements->agentActor, "$TERM", NULL);
     zactor_destroy (&agentElements->agentActor);
+    //cleaning agent
     free (agentElements);
     agentElements = NULL;
+    //cleaning pause callbacks
+    pauseCallback_t *elt, *tmp;
+    DL_FOREACH_SAFE(pauseCallbacks,elt,tmp) {
+        DL_DELETE(pauseCallbacks,elt);
+        free(elt);
+    }
     return 1;
 }
 
@@ -945,6 +964,10 @@ int mtic_pause(){
     {
         mtic_debug("Agent paused\n");
         isPaused = true;
+        pauseCallback_t *elt;
+        DL_FOREACH(pauseCallbacks,elt){
+            elt->callback_ptr(isPaused, elt->myData);
+        }
     }
     return 1;
 }
@@ -958,23 +981,37 @@ int mtic_resume(){
     {
         mtic_debug("Agent resumed\n");
         isPaused = false;
+        pauseCallback_t *elt;
+        DL_FOREACH(pauseCallbacks,elt){
+            elt->callback_ptr(isPaused, elt->myData);
+        }
     }
     return 1;
 }
 
-int mtic_observePause(mtic_pauseCallback *cb, void *myData){
-    //TODO
+int mtic_observePause(mtic_pauseCallback cb, void *myData){
+    if (cb != NULL){
+        pauseCallback_t *newCb = calloc(1, sizeof(pauseCallback_t));
+        newCb->callback_ptr = cb;
+        newCb->myData = myData;
+        DL_APPEND(pauseCallbacks, newCb);
+    }else{
+        mtic_debug("callback is null\n");
+        return 0;
+    }
     return 1;
 }
 
 //control agent state
 int mtic_setAgentState(const char *state){
-    //TODO
+    if (strcmp(state, agentState) != 0){
+        strncpy(agentState, state, AGENT_NAME_LENGTH);
+    }
     return 1;
 }
 
-void mtic_getAgentState(char *state){
-    //TODO
+char *mtic_getAgentState(){
+    return strdup(agentState);
 }
 
 //set library parameters
