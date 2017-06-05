@@ -253,11 +253,9 @@ void * mtic_get(const char* name_iop, model_state* state);
 
 
 //////////////////  network   //////////////////
-int publish_output(const char* output_name);
-int check_and_subscribe_to(const char* agentName);
+int network_publishOutput (const char* output_name);
+int network_checkAndSubscribeTo(const char* agentName);
 void mtic_debug(const char *fmt, ...);
-
-void mtic_send_definition();
 
 
 //////////////////  parser   //////////////////

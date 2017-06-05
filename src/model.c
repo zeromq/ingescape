@@ -236,7 +236,7 @@ model_state mtic_set(const char *iop_name, void *new_value){
     if(code == TYPE_OUTPUT){
         
         // Publish the new value
-        publish_output(iop_name);
+        network_publishOutput(iop_name);
     }
 
     return OK;

@@ -440,12 +440,12 @@ int mtic_map (char* input_name,char* map_description){
                     if(current != NULL)
                     {
                         // check and subscribe to the new added outputs if eixts and the concerning agent is present.
-                        check_and_subscribe_to((char*)current->name);
+                        network_checkAndSubscribeTo((char*)current->name);
                     }
                 }
             } else {
                 // check and subscribe to the new added outputs if eixts and the concerning agent is present.
-                check_and_subscribe_to(agent_to_map_name);
+                network_checkAndSubscribeTo(agent_to_map_name);
             }
         } else {
             result = error_code;
