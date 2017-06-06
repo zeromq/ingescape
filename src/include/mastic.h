@@ -61,9 +61,9 @@ void mtic_setVerbose (bool verbose);
 //IOP Model : Inputs, Outputs and Parameters read/write/check/observe/mute
 
 typedef enum {
-    INPUT,
-    OUTPUT,
-    PARAMETER
+    INPUT_T,
+    OUTPUT_T,
+    PARAMETER_T
 } iop_t;
 
 typedef enum {
