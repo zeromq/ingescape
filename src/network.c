@@ -145,7 +145,7 @@ void sendDefinition()
  *
  *   returns : the state of the subscribtion
  */
-int subscribeToPublisher(const char *agentName, const char *outputName)
+int subscribeToPublisherOutput(const char *agentName, const char *outputName)
 {
     // If a filter has to be mtic_set
     if(strlen(outputName) > 0)
@@ -182,7 +182,7 @@ int subscribeToPublisher(const char *agentName, const char *outputName)
  *
  *   returns : the state of the subscribtion removal
  */
-int unsubscribeToPublisher(const char *agentName, const char *outputName)
+int unsubscribeToPublisherOutput(const char *agentName, const char *outputName)
 {
     // If a filter has to be mtic_set
     if(strlen(outputName) > 0)
@@ -434,7 +434,7 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                             // check and subscribe to the new added outputs if eixts and the concerning agent is present.
                             // Check if we have a mapping with it
                             // Check and add mapping if needed
-                            network_checkAndSubscribeTo(name);
+                            network_checkAndSubscribeToPublisher(name);
                         }
                     }
 
@@ -684,7 +684,7 @@ int network_publishOutput (const char* output_name)
 }
 
 /*
- * Function: network_checkAndSubscribeTo
+ * Function: network_checkAndSubscribeToPublisher
  * ----------------------------
  *   Check mappings made on agent name
  *   Connect to these outputs if compatibility is ok
@@ -696,7 +696,7 @@ int network_publishOutput (const char* output_name)
  *   returns : -1 if an error occured, 1 otherwise.
  *
  */
-int network_checkAndSubscribeTo(const char* agentName)
+int network_checkAndSubscribeToPublisher(const char* agentName)
 {
     int result = 0;
     // Look for the new agent definition
@@ -723,7 +723,7 @@ int network_checkAndSubscribeTo(const char* agentName)
                 strcat(map_description, iop->name);
                 
                 // Make subscribtion
-                int cr = subscribeToPublisher(externalDefinition->name,map_description);
+                int cr = subscribeToPublisherOutput(externalDefinition->name, map_description);
                 
                 // Subscription has been done
                 if(cr > 0)
@@ -1012,6 +1012,9 @@ int mtic_observePause(mtic_pauseCallback cb, void *myData){
 int mtic_setAgentState(const char *state){
     if (strcmp(state, agentState) != 0){
         strncpy(agentState, state, AGENT_NAME_LENGTH);
+        if (agentElements != NULL && agentElements->node != NULL){
+            zyre_shouts(agentElements->node, CHANNEL, "STATE=%s", agentState);
+        }
     }
     return 1;
 }

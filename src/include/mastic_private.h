@@ -254,7 +254,7 @@ void * mtic_get(const char* name_iop, model_state* state);
 
 //////////////////  network   //////////////////
 int network_publishOutput (const char* output_name);
-int network_checkAndSubscribeTo(const char* agentName);
+int network_checkAndSubscribeToPublisher(const char* agentName);
 void mtic_debug(const char *fmt, ...);
 
 
