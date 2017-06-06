@@ -807,8 +807,6 @@ int mtic_startWithDevice(const char *networkDevice, int port){
                             if (pUnicast->Address.lpSockaddr->sa_family == AF_INET)
                             {
                                 struct sockaddr_in *sa_in = (struct sockaddr_in *)pUnicast->Address.lpSockaddr;
-                                //TODO : check if OK
-//                                agentElements->ipAddress[0] = strdup(inet_ntop(AF_INET,&(sa_in->sin_addr),buff,bufflen));
                                 strncpy(agentElements->ipAddress, inet_ntoa(sa_in->sin_addr), IP_ADDRESS_LENGTH);
                                 free(frindly_name);
                                 mtic_debug("Connection on ip address %s on device %s\n", agentElements->ipAddress, agentElements->networkDevice);
