@@ -62,6 +62,7 @@ static const char *exportDefinitionPrefix = "DEFINITION#";
 #define IP_ADDRESS_LENGTH 256
 char agentName[AGENT_NAME_LENGTH] = "";
 char agentState[AGENT_NAME_LENGTH] = "";
+#define NO_DEVICE "unknown"
 
 
 //network structures
@@ -884,7 +885,7 @@ int mtic_startWithIP(const char *ipAddress, int port){
     }
     
     agentElements = calloc(1, sizeof(zyreloopElements_t));
-    strncpy(agentElements->networkDevice, "unknown", NETWORK_DEVICE_LENGTH);
+    strncpy(agentElements->networkDevice, NO_DEVICE, NETWORK_DEVICE_LENGTH);
     strncpy(agentElements->ipAddress, ipAddress, IP_ADDRESS_LENGTH);
     mtic_debug("Connection with ip address %s\n", agentElements->ipAddress);
     agentElements->zyrePort = port;
@@ -902,18 +903,23 @@ int mtic_startWithIP(const char *ipAddress, int port){
 }//TODO: warning si agent name pas défini
 
 int mtic_stop(){
-    //interrupting and destroying mastic thread
-    zstr_sendx (agentElements->agentActor, "$TERM", NULL);
-    zactor_destroy (&agentElements->agentActor);
-    //cleaning agent
-    free (agentElements);
-    agentElements = NULL;
-    //cleaning pause callbacks
-    pauseCallback_t *elt, *tmp;
-    DL_FOREACH_SAFE(pauseCallbacks,elt,tmp) {
-        DL_DELETE(pauseCallbacks,elt);
-        free(elt);
+    if (agentElements != NULL){
+        //interrupting and destroying mastic thread
+        zstr_sendx (agentElements->agentActor, "$TERM", NULL);
+        zactor_destroy (&agentElements->agentActor);
+        //cleaning agent
+        free (agentElements);
+        agentElements = NULL;
+        //cleaning pause callbacks
+        pauseCallback_t *elt, *tmp;
+        DL_FOREACH_SAFE(pauseCallbacks,elt,tmp) {
+            DL_DELETE(pauseCallbacks,elt);
+            free(elt);
+        }
+    }else{
+        mtic_debug("agent already stopped\n");
     }
+    
     return 1;
 }
 
@@ -947,7 +953,7 @@ int mtic_setAgentName(const char *name){
     strncpy(agentName, name, AGENT_NAME_LENGTH);
     
     if (needRestart){
-        if (strcmp(networkDevice, "undefined") == 0){
+        if (strcmp(networkDevice, NO_DEVICE) == 0){
             mtic_startWithIP(ipAddress, zyrePort);
         }else{
             mtic_startWithDevice(networkDevice, zyrePort);
