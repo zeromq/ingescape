@@ -34,6 +34,7 @@ int mtic_startWithIP(const char *ipAddress, int port); //TODO: warning si agent 
 int mtic_stop();
 void mtic_die();
 int mtic_setAgentName(const char *name);
+char *mtic_getAgentName(); //returned string shall be freed by caller
 
 //pause and resume the agent
 typedef void (*mtic_pauseCallback)(bool isPaused, void *myData);

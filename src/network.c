@@ -963,6 +963,9 @@ int mtic_setAgentName(const char *name){
     return 1;
 }
 
+char *mtic_getAgentName(){
+    return strdup(agentName);
+}
 
 //pause and resume the agent
 int mtic_pause(){
