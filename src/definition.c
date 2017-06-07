@@ -525,9 +525,9 @@ double get_iop_value_as_double(agent_iop *iop){
 int mtic_clearDefinition(){ //clears definition data for the agent
     return 1;
 }
-char* mtic_getDefinition(){ //returns json string
-    return NULL;
-}
+//char* mtic_getDefinition(){ //returns json string
+//    return NULL;
+//}
 int mtic_setDefinitionDescription(char *description){
     return 1;
 }

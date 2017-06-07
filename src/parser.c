@@ -985,3 +985,17 @@ int mtic_loadDefinitionFromPath (const char* file_path){
 
     return 1;
 }
+
+/**
+ * \fn char* mtic_getDefinition()
+ * \brief the agent definition getter
+ *
+ * \return The definition string in json format. NULL if an error occur.
+ */
+char* mtic_getDefinition(){
+    char * def = NULL;
+
+    def = strdup(mtic_definition_live);
+
+    return def;
+}
