@@ -528,9 +528,9 @@ int mtic_clearDefinition(){ //clears definition data for the agent
 //char* mtic_getDefinition(){ //returns json string
 //    return NULL;
 //}
-int mtic_setDefinitionDescription(char *description){
-    return 1;
-}
+//int mtic_setDefinitionDescription(char *description){
+//    return 1;
+//}
 int mtic_setDefinitionVersion(char *description){
     return 1;
 }

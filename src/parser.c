@@ -999,3 +999,33 @@ char* mtic_getDefinition(){
 
     return def;
 }
+
+/**
+ * \fn int mtic_setDefinitionDescription(char *description)
+ * \brief the agent definition description setter
+ *
+ * \param description The string which contains the description of the agent. Can't be NULL.
+ * \return The error. 1 is OK, 0 description is NULL, -1 if mtic_definition_loaded is NULL
+ */
+int mtic_setDefinitionDescription(char *description){
+
+    if(description == NULL){
+        mtic_debug("Error : description string is NULL \n");
+        return 0;
+    }
+
+    if(mtic_definition_loaded == NULL)
+    {
+        mtic_debug("Error : Definition loaded is NULL \n");
+        return -1;
+    }
+
+    //Copy the description in the structure in loaded definition and copy in live
+    memcpy(mtic_definition_loaded->description,description,sizeof(description));
+
+    // Live data corresponds to a copy of the initial definition
+    mtic_definition_live = calloc(1, sizeof(struct definition));
+    memcpy(mtic_definition_live, mtic_definition_loaded, sizeof(*mtic_definition_loaded));
+
+    return 1;
+}
