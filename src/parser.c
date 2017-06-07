@@ -915,5 +915,33 @@ int mtic_init_internal_data (const char* definition_file_path)
 //à remplir ou déplacer ici
 
 
+////////////////////////////////////////////////////////////////////////
+// PUBLIC API
+////////////////////////////////////////////////////////////////////////
+//TODO : comment the function
+int mtic_loadDefinition (const char* json_str){
+    mtic_definition_loaded = NULL;
 
+    //Check if the json string is null
+    if(json_str == NULL)
+    {
+        mtic_debug("Error : json string is null \n");
+        return 0;
+    }
+
+    //Load definition and init variable : mtic_definition_loaded
+    mtic_definition_loaded = parser_loadDefinition(json_str);
+
+    if(mtic_definition_loaded == NULL)
+    {
+        mtic_debug("Error : Definition file has not been loaded from json string : %s\n", json_str );
+        return -1;
+    }
+
+    // Live data corresponds to a copy of the initial definition
+    mtic_definition_live = calloc(1, sizeof(struct definition));
+    memcpy(mtic_definition_live, mtic_definition_loaded, sizeof(*mtic_definition_loaded));
+
+    return 1;
+}
 

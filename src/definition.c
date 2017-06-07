@@ -516,9 +516,9 @@ double get_iop_value_as_double(agent_iop *iop){
 // PUBLIC API
 ////////////////////////////////////////////////////////////////////////
 
-int mtic_loadDefinition (const char* json_str){
-    return 1;
-}
+//int mtic_loadDefinition (const char* json_str){
+//    return 1;
+//}
 int mtic_loadDefinitionFromPath (const char* file_path){
     return 1;
 }
