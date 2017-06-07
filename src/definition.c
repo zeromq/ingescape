@@ -587,26 +587,37 @@ int mtic_setDefinitionDescription(char *description){
  * \brief the agent definition version setter
  *
  * \param version The string which contains the version of the agent. Can't be NULL.
- * \return The error. 1 is OK, 0 version is NULL, -1 if mtic_definition_loaded is NULL
+ * \return The error. 1 is OK, 0 Agent version is NULL, -1 Agent version is empty
  */
 int mtic_setDefinitionVersion(char *version){
+
     if(version == NULL){
-        mtic_debug("Error : version string is NULL \n");
+        mtic_debug("mtic_setDefinitionVersion : Agent version cannot be NULL \n");
         return 0;
     }
 
-    if(mtic_definition_loaded == NULL)
-    {
-        mtic_debug("Error : Definition loaded is NULL \n");
+    if (strlen(version) == 0){
+        mtic_debug("mtic_setDefinitionVersion : Agent version cannot be empty\n");
         return -1;
     }
 
+    //Check if already initialized, and do it if not
+    if(mtic_definition_loaded == NULL){
+        mtic_definition_loaded = calloc(1, sizeof(struct definition));
+    }
+
     //Copy the description in the structure in loaded definition and copy in live
-    memcpy(mtic_definition_loaded->version,version,sizeof(version));
+    //TODO : maybe we need to free before if already allocated
+    mtic_definition_loaded->version = strdup(version);
+
+    //Check if already initialized, and do it if not
+    if(mtic_definition_live == NULL){
+        mtic_definition_live = calloc(1, sizeof(struct definition));
+    }
 
     // Live data corresponds to a copy of the initial definition
-    mtic_definition_live = calloc(1, sizeof(struct definition));
-    memcpy(mtic_definition_live, mtic_definition_loaded, sizeof(*mtic_definition_loaded));
+    //TODO : maybe we need to free before if already allocated
+    mtic_definition_live->version = strdup(mtic_definition_loaded->version);
 
     return 1;
 }
