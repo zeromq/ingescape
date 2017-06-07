@@ -918,7 +918,14 @@ int mtic_init_internal_data (const char* definition_file_path)
 ////////////////////////////////////////////////////////////////////////
 // PUBLIC API
 ////////////////////////////////////////////////////////////////////////
-//TODO : comment the function
+/**
+ * \fn int mtic_loadDefinition (const char* json_str)
+ * \brief load definition in variable 'mtic_definition_loaded' & copy in 'mtic_definition_live"
+ *      from a json string
+ *
+ * \param json_str String in json format. Can't be NULL.
+ * \return The error. 1 is OK, 0 json string is NULL, -1 Definition file has not been loaded
+ */
 int mtic_loadDefinition (const char* json_str){
     mtic_definition_loaded = NULL;
 
