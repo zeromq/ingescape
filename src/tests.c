@@ -44,8 +44,8 @@ void test_map(){
     printf(" ------------ test_map ------------- \n");
 
     //Load definition
-    mtic_definition_loaded = load_definition_from_path("test_definition_my_agent.json");
-    mtic_definition_live = load_definition_from_path("test_definition_my_agent.json");
+    mtic_definition_loaded = parser_loadDefinitionFromPath("test_definition_my_agent.json");
+    mtic_definition_live = parser_loadDefinitionFromPath("test_definition_my_agent.json");
 
     //Load a map json file
     load_map_from_path("test_map.json");
@@ -65,8 +65,8 @@ void test_map(){
 void test_model_workflow(){
     printf(" ------------ test_model_workflow ------------- \n");
 
-    mtic_definition_loaded = load_definition_from_path("test_definition_my_agent.json");    //Definition of the agent
-    mtic_definition_live = load_definition_from_path("test_definition_my_agent.json");    //Definition of the agent
+    mtic_definition_loaded = parser_loadDefinitionFromPath("test_definition_my_agent.json");    //Definition of the agent
+    mtic_definition_live = parser_loadDefinitionFromPath("test_definition_my_agent.json");    //Definition of the agent
 
     /*
      * Input 1 : e1
@@ -120,8 +120,8 @@ void test_mapping_workflow(){
     printf(" ------------ test_mapping_workflow ------------- \n");
 
     //Load definition
-    mtic_definition_loaded = load_definition_from_path("test_definition_my_agent.json");
-    mtic_definition_live = load_definition_from_path("test_definition_my_agent.json");
+    mtic_definition_loaded = parser_loadDefinitionFromPath("test_definition_my_agent.json");
+    mtic_definition_live = parser_loadDefinitionFromPath("test_definition_my_agent.json");
 
     //Load a map json file
     load_map_from_path("test_map.json");
@@ -131,7 +131,7 @@ void test_mapping_workflow(){
      *
      */
 
-    definition *external_agent_def = load_definition_from_path("external_definition.json");
+    definition *external_agent_def = parser_loadDefinitionFromPath("external_definition.json");
 
     //Check the map
     agent_iop* output_to_subscribe = mtic_check_map(external_agent_def);
@@ -172,7 +172,7 @@ void test_mapping_workflow(){
 
 void test_check_category(){
     //Load the definition
-    mtic_definition_loaded = load_definition_from_path("definition.json");
+    mtic_definition_loaded = parser_loadDefinitionFromPath("definition.json");
 
     //Load the category compatible
     category *cat_compatible = load_category_from_path("cat_compatible.json");

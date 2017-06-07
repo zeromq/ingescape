@@ -263,7 +263,7 @@ category* load_category (const char* json_str);
 category* load_category_from_path (const char* file_path);
 const char* export_category (category* cat);
 definition* parser_loadDefinition (const char* json_str);
-definition* load_definition_from_path (const char* file_path);
+definition* parser_loadDefinitionFromPath (const char* file_path);
 char* export_definition (definition* def);
 mapping* load_map (const char* json_str);
 mapping* load_map_from_path (const char* load_file);

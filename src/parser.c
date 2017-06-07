@@ -831,7 +831,7 @@ definition* parser_loadDefinition (const char* json_str) {
  *
  *   returns: a pointer on a category structure or NULL if it has failed
  */
-definition * load_definition_from_path (const char* path) {
+definition * parser_loadDefinitionFromPath (const char* path) {
 
     char *json_str = NULL;
     definition *def = NULL;
@@ -889,7 +889,7 @@ int mtic_init_internal_data (const char* definition_file_path)
     int errorCode = -1;
     if (definition_file_path != NULL){
         // Init definition
-        mtic_definition_loaded = load_definition_from_path(definition_file_path);
+        mtic_definition_loaded = parser_loadDefinitionFromPath(definition_file_path);
 
         if(mtic_definition_loaded != NULL)
         {
