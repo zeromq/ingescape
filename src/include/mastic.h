@@ -174,7 +174,7 @@ PUBLIC int mtic_loadDefinitionFromPath (const char* file_path);
 int mtic_clearDefinition(); //clears definition data for the agent
 PUBLIC char* mtic_getDefinition(); //returns json string
 int mtic_setDefinitionDescription(char *description);
-int mtic_setDefinitionVersion(char *description);
+int mtic_setDefinitionVersion(char *version);
 
 //edit the definition using the API
 int mtic_createInput(const char *name, iopType_t type, void *value); //value must be copied in function
