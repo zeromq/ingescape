@@ -807,7 +807,7 @@ char* export_definition (definition* def) {
  *
  *   returns: a pointer on a category structure or NULL if it has failed
  */
-definition* load_definition (const char* json_str) {
+definition* parser_loadDefinition (const char* json_str) {
     
     definition *def = NULL;
     yajl_val node;
@@ -840,7 +840,7 @@ definition * load_definition_from_path (const char* path) {
     if (!json_str)
         return 0;
 
-    def = load_definition(json_str);
+    def = parser_loadDefinition(json_str);
 
     free (json_str);
     json_str = NULL;
