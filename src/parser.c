@@ -1029,3 +1029,32 @@ int mtic_setDefinitionDescription(char *description){
 
     return 1;
 }
+
+/**
+ * \fn mtic_setDefinitionVersion(char *description)
+ * \brief the agent definition version setter
+ *
+ * \param version The string which contains the version of the agent. Can't be NULL.
+ * \return The error. 1 is OK, 0 version is NULL, -1 if mtic_definition_loaded is NULL
+ */
+int mtic_setDefinitionVersion(char *version){
+    if(version == NULL){
+        mtic_debug("Error : version string is NULL \n");
+        return 0;
+    }
+
+    if(mtic_definition_loaded == NULL)
+    {
+        mtic_debug("Error : Definition loaded is NULL \n");
+        return -1;
+    }
+
+    //Copy the description in the structure in loaded definition and copy in live
+    memcpy(mtic_definition_loaded->version,version,sizeof(version));
+
+    // Live data corresponds to a copy of the initial definition
+    mtic_definition_live = calloc(1, sizeof(struct definition));
+    memcpy(mtic_definition_live, mtic_definition_loaded, sizeof(*mtic_definition_loaded));
+
+    return 1;
+}

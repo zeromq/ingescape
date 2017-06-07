@@ -531,9 +531,9 @@ int mtic_clearDefinition(){ //clears definition data for the agent
 //int mtic_setDefinitionDescription(char *description){
 //    return 1;
 //}
-int mtic_setDefinitionVersion(char *description){
-    return 1;
-}
+//int mtic_setDefinitionVersion(char *description){
+//    return 1;
+//}
 
 //edit the definition using the API
 int mtic_createInput(const char *name, iopType_t type, void *value){ //value must be copied in function
