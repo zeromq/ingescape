@@ -952,3 +952,36 @@ int mtic_loadDefinition (const char* json_str){
     return 1;
 }
 
+/**
+ * \fn int mtic_loadDefinitionFromPath (const char* file_path)
+ * \brief load definition in variable 'mtic_definition_loaded' & copy in 'mtic_definition_live"
+ *      from a file path
+ *
+ * \param file_path The string which contains the json file path. Can't be NULL.
+ * \return The error. 1 is OK, 0 json string is NULL, -1 Definition file has not been loaded
+ */
+int mtic_loadDefinitionFromPath (const char* file_path){
+    mtic_definition_loaded = NULL;
+
+    //Check if the json string is null
+    if(file_path == NULL)
+    {
+        mtic_debug("Error : file path is null \n");
+        return 0;
+    }
+
+    //Load definition and init variable : mtic_definition_loaded
+    mtic_definition_loaded = parser_loadDefinitionFromPath(file_path);
+
+    if(mtic_definition_loaded == NULL)
+    {
+        mtic_debug("Error : Definition file has not been loaded from file path : %s\n", file_path);
+        return -1;
+    }
+
+    // Live data corresponds to a copy of the initial definition
+    mtic_definition_live = calloc(1, sizeof(struct definition));
+    memcpy(mtic_definition_live, mtic_definition_loaded, sizeof(*mtic_definition_loaded));
+
+    return 1;
+}

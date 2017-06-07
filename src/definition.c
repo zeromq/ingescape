@@ -519,9 +519,9 @@ double get_iop_value_as_double(agent_iop *iop){
 //int mtic_loadDefinition (const char* json_str){
 //    return 1;
 //}
-int mtic_loadDefinitionFromPath (const char* file_path){
-    return 1;
-}
+//int mtic_loadDefinitionFromPath (const char* file_path){
+//    return 1;
+//}
 int mtic_clearDefinition(){ //clears definition data for the agent
     return 1;
 }
