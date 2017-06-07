@@ -525,16 +525,20 @@ double get_iop_value_as_double(agent_iop *iop){
 int mtic_clearDefinition(){ //clears definition data for the agent
     return 1;
 }
+
 /**
  * \fn char* mtic_getDefinition()
  * \brief the agent definition getter
  *
- * \return The live definition string in json format (allocated). NULL if an error occur.
+ * \return The loaded definition string in json format (allocated). NULL if mtic_definition_loaded was not initialized.
  */
 char* mtic_getDefinition(){
     char * def = NULL;
 
-    def = strdup(mtic_definition_live);
+    if(mtic_definition_loaded == NULL)
+        return NULL;
+
+    def = export_definition(mtic_definition_loaded);
 
     return def;
 }
