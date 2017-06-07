@@ -525,15 +525,79 @@ double get_iop_value_as_double(agent_iop *iop){
 int mtic_clearDefinition(){ //clears definition data for the agent
     return 1;
 }
-//char* mtic_getDefinition(){ //returns json string
-//    return NULL;
-//}
-//int mtic_setDefinitionDescription(char *description){
-//    return 1;
-//}
-//int mtic_setDefinitionVersion(char *description){
-//    return 1;
-//}
+/**
+ * \fn char* mtic_getDefinition()
+ * \brief the agent definition getter
+ *
+ * \return The live definition string in json format (allocated). NULL if an error occur.
+ */
+char* mtic_getDefinition(){
+    char * def = NULL;
+
+    def = strdup(mtic_definition_live);
+
+    return def;
+}
+
+/**
+ * \fn int mtic_setDefinitionDescription(char *description)
+ * \brief the agent definition description setter
+ *
+ * \param description The string which contains the description of the agent. Can't be NULL.
+ * \return The error. 1 is OK, 0 description is NULL, -1 if mtic_definition_loaded is NULL
+ */
+int mtic_setDefinitionDescription(char *description){
+
+    if(description == NULL){
+        mtic_debug("Error : description string is NULL \n");
+        return 0;
+    }
+
+    if(mtic_definition_loaded == NULL)
+    {
+        mtic_debug("Error : Definition loaded is NULL \n");
+        return -1;
+    }
+
+    //Copy the description in the structure in loaded definition and copy in live
+    memcpy(mtic_definition_loaded->description,description,sizeof(description));
+
+    // Live data corresponds to a copy of the initial definition
+    mtic_definition_live = calloc(1, sizeof(struct definition));
+    memcpy(mtic_definition_live, mtic_definition_loaded, sizeof(*mtic_definition_loaded));
+
+    return 1;
+}
+
+/**
+ * \fn mtic_setDefinitionVersion(char *description)
+ * \brief the agent definition version setter
+ *
+ * \param version The string which contains the version of the agent. Can't be NULL.
+ * \return The error. 1 is OK, 0 version is NULL, -1 if mtic_definition_loaded is NULL
+ */
+int mtic_setDefinitionVersion(char *version){
+    if(version == NULL){
+        mtic_debug("Error : version string is NULL \n");
+        return 0;
+    }
+
+    if(mtic_definition_loaded == NULL)
+    {
+        mtic_debug("Error : Definition loaded is NULL \n");
+        return -1;
+    }
+
+    //Copy the description in the structure in loaded definition and copy in live
+    memcpy(mtic_definition_loaded->version,version,sizeof(version));
+
+    // Live data corresponds to a copy of the initial definition
+    mtic_definition_live = calloc(1, sizeof(struct definition));
+    memcpy(mtic_definition_live, mtic_definition_loaded, sizeof(*mtic_definition_loaded));
+
+    return 1;
+}
+
 
 //edit the definition using the API
 int mtic_createInput(const char *name, iopType_t type, void *value){ //value must be copied in function
