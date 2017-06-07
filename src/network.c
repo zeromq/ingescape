@@ -417,7 +417,7 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     // We had it if we don't have it already
                     if(receivedDefinition == NULL){
                         // Load definition from string content
-                        receivedDefinition = load_definition(strDefinition);
+                        receivedDefinition = parser_loadDefinition(strDefinition);
 
                         // Add the new definition if not found
                         if(receivedDefinition != NULL && receivedDefinition->name != NULL)
