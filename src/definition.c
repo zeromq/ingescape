@@ -9,7 +9,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "mastic.h"
+//#include "mastic.h"
 #include "mastic_private.h"
 #include "uthash/uthash.h"
 
@@ -37,20 +37,20 @@ typedef struct agent_port_t {
  *   string      : string to convert
  *
  */
-value_type string_to_value_type(const char* str) {
+iopType_t string_to_value_type(const char* str) {
 
     if (!strcmp(str, "INTEGER"))
-        return INTEGER;
+        return INTEGER_T;
     if (!strcmp(str, "DOUBLE"))
-        return DOUBLE_TYPE;
+        return DOUBLE_T;
     if (!strcmp(str, "STRING"))
-        return STRING;
+        return STRING_T;
     if (!strcmp(str, "BOOL"))
-        return BOOL_TYPE;
+        return BOOL_T;
     if (!strcmp(str, "IMPULSION"))
-        return IMPULSION;
-    if (!strcmp(str, "STRUCTURE"))
-        return STRUCTURE;
+        return IMPULSION_T;
+    if (!strcmp(str, "DATA"))
+        return DATA_T;
 
     fprintf(stderr, "%s - ERROR -  unknown string \"%s\" to convert\n", __FUNCTION__, str);
     return -1;
@@ -77,35 +77,35 @@ bool string_to_boolean(const char* str) {
 }
 
 /*
- * Function: value_type_to_string
+ * Function: iopType_t_to_string
  * ----------------------------
- *   convert a value_type to string
+ *   convert a iopType_t to string
  *
- *   type      : value_type to convert
+ *   type      : iopType_t to convert
  *
  */
-const char* value_type_to_string (value_type type) {
+const char* value_type_to_string (iopType_t type) {
     switch (type) {
-        case INTEGER:
+        case INTEGER_T:
             return "INTEGER";
             break;
-        case DOUBLE_TYPE:
+        case DOUBLE_T:
             return "DOUBLE";
             break;
-        case STRING:
+        case STRING_T:
             return "STRING";
             break;
-        case BOOL_TYPE:
+        case BOOL_T:
             return "BOOL";
             break;
-        case IMPULSION:
+        case IMPULSION_T:
             return "IMPULSION";
             break;
-        case STRUCTURE:
+        case DATA_T:
             return "STRUCTURE";
             break;
         default:
-            fprintf(stderr, "%s - ERROR -  unknown value_type to convert\n", __FUNCTION__);
+            fprintf(stderr, "%s - ERROR -  unknown iopType_t to convert\n", __FUNCTION__);
             break;
     }
 
@@ -141,26 +141,26 @@ void free_agent_iop (agent_iop* agent_iop){
     agent_iop->name = NULL;
 
     switch (agent_iop->type) {
-        case STRING:
+        case STRING_T:
             free((char*)agent_iop->old_value.s);
             agent_iop->old_value.s = NULL;
 
             free((char*)agent_iop->value.s);
             agent_iop->value.s = NULL;
             break;
-        case IMPULSION:
+        case IMPULSION_T:
             free((char*)agent_iop->old_value.impuls);
             agent_iop->old_value.impuls = NULL;
 
             free((char*)agent_iop->value.impuls);
             agent_iop->value.impuls = NULL;
             break;
-        case STRUCTURE:
-            free((char*)agent_iop->old_value.strct);
-            agent_iop->old_value.strct = NULL;
+        case DATA_T:
+            free((char*)agent_iop->old_value.data);
+            agent_iop->old_value.data = NULL;
 
-            free((char*)agent_iop->value.strct);
-            agent_iop->value.strct = NULL;
+            free((char*)agent_iop->value.data);
+            agent_iop->value.data = NULL;
             break;
         default:
             break;
@@ -354,13 +354,13 @@ char* mtic_iop_value_to_string (agent_iop* iop)
     if(iop != NULL)
     {
         switch (iop->type) {
-            case INTEGER:
+            case INTEGER_T:
                 sprintf(str_value,"%i",iop->value.i);
                 break;
-            case DOUBLE_TYPE:
+            case DOUBLE_T:
                 sprintf(str_value,"%lf",iop->value.d);
                 break;
-            case BOOL_TYPE:
+            case BOOL_T:
                 if(iop->value.b == true)
                 {
                     sprintf(str_value,"%s","true");
@@ -370,14 +370,14 @@ char* mtic_iop_value_to_string (agent_iop* iop)
                     
                 }
                 break;
-            case STRING:
+            case STRING_T:
                 sprintf(str_value,"%s",iop->value.s);
                 break;
-            case IMPULSION:
+            case IMPULSION_T:
                 sprintf(str_value,"%s",iop->value.impuls);
                 break;
-            case STRUCTURE:
-                sprintf(str_value,"%s",iop->value.strct);
+            case DATA_T:
+                sprintf(str_value,"%s",iop->value.data);
                 break;
             default:
                 break;
@@ -409,18 +409,18 @@ const void* mtic_iop_value_string_to_real_type (agent_iop* iop, char* value)
     if(iop != NULL)
     {
         switch (iop->type) {
-            case INTEGER:
+            case INTEGER_T:
                 int_value=(int*)malloc(sizeof(int));
                 sscanf(value, "%i", int_value);
                 out_value = (void*) int_value;
                 break;
-            case DOUBLE_TYPE:
+            case DOUBLE_T:
                 double_value=(double*)malloc(sizeof(double));
                 sscanf(value, "%lf", double_value);
                 
                 out_value = (void*) double_value;
                 break;
-            case BOOL_TYPE:
+            case BOOL_T:
                 bool_value=(bool*)malloc(sizeof(bool));
                 if(strcmp(value,"true") == 0)
                 {
@@ -430,9 +430,9 @@ const void* mtic_iop_value_string_to_real_type (agent_iop* iop, char* value)
                 }
                 out_value = (void*) bool_value;
                 break;
-            case STRING:
-            case IMPULSION:
-            case STRUCTURE:
+            case STRING_T:
+            case IMPULSION_T:
+            case DATA_T:
                 str_value=(char*)malloc(BUFSIZ*sizeof(char));
                 sscanf(value,"%s",str_value);
                 out_value = (void*) str_value;
@@ -459,13 +459,13 @@ const char* iop_old_value_to_string (agent_iop* iop)
     if(iop != NULL)
     {
         switch (iop->type) {
-            case INTEGER:
+            case INTEGER_T:
                 sprintf(str_value,"%i",iop->old_value.i);
                 break;
-            case DOUBLE_TYPE:
+            case DOUBLE_T:
                 sprintf(str_value,"%lf",iop->old_value.d);
                 break;
-            case BOOL_TYPE:
+            case BOOL_T:
                 if(iop->old_value.b == true)
                 {
                     sprintf(str_value,"%s","true");
@@ -475,14 +475,14 @@ const char* iop_old_value_to_string (agent_iop* iop)
                     
                 }
                 break;
-            case STRING:
+            case STRING_T:
                 sprintf(str_value,"%s",iop->old_value.s);
                 break;
-            case IMPULSION:
+            case IMPULSION_T:
                 sprintf(str_value,"%s",iop->old_value.impuls);
                 break;
-            case STRUCTURE:
-                sprintf(str_value,"%s",iop->old_value.strct);
+            case DATA_T:
+                sprintf(str_value,"%s",iop->old_value.data);
                 break;
             default:
                 break;

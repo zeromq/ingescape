@@ -11,7 +11,7 @@
 #include "uthash/uthash.h"
 #include "uthash/utlist.h"
 #include "mastic_private.h"
-#include "mastic.h"
+//#include "mastic.h"
 
 #ifdef _WIN32
     #define MALLOC(x) HeapAlloc(GetProcessHeap(), 0, (x))

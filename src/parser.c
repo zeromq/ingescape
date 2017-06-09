@@ -47,23 +47,23 @@ static void json_add_data_to_hash (struct agent_iop ** hasht,
 
         data->type = string_to_value_type (YAJL_GET_STRING(obj->u.object.values[1]));
         switch (data->type) {
-            case INTEGER:
+            case INTEGER_T:
                 data->value.i =(int) YAJL_GET_INTEGER (obj->u.object.values[2]);
                 break;
-            case DOUBLE_TYPE:
+            case DOUBLE_T:
                 data->value.d = YAJL_GET_DOUBLE (obj->u.object.values[2]);
                 break;
-            case BOOL_TYPE:
+            case BOOL_T:
                 data->value.b = string_to_boolean (YAJL_GET_STRING(obj->u.object.values[2]));
                 break;
-            case STRING:
+            case STRING_T:
                 data->value.s = strdup (YAJL_GET_STRING(obj->u.object.values[2]));
                 break;
-            case IMPULSION:
+            case IMPULSION_T:
                 data->value.impuls = strdup (YAJL_GET_STRING(obj->u.object.values[2]));
                 break;
-            case STRUCTURE:
-                data->value.strct = strdup (YAJL_GET_STRING(obj->u.object.values[2]));
+            case DATA_T:
+                data->value.data = strdup (YAJL_GET_STRING(obj->u.object.values[2]));
                 break;
             default:
                 break;
@@ -482,23 +482,23 @@ static void json_dump_iop (yajl_gen *g, agent_iop* aiop) {
     yajl_gen_string(*g, (const unsigned char *) STR_VALUE, strlen(STR_VALUE));
     
     switch (aiop->type) {
-        case INTEGER:
+        case INTEGER_T:
             yajl_gen_integer(*g, aiop->value.i);
             break;
-        case DOUBLE_TYPE:
+        case DOUBLE_T:
             yajl_gen_double(*g, aiop->value.d);
             break;
-        case BOOL_TYPE:
+        case BOOL_T:
             yajl_gen_string(*g, (const unsigned char *) boolean_to_string(aiop->value.b), strlen(boolean_to_string(aiop->value.b)));
             break;
-        case STRING:
+        case STRING_T:
             yajl_gen_string(*g, (const unsigned char *) aiop->value.s, strlen(aiop->value.s));
             break;
-        case IMPULSION:
+        case IMPULSION_T:
             yajl_gen_string(*g, (const unsigned char *) aiop->value.impuls, strlen(aiop->value.impuls));
             break;
-        case STRUCTURE:
-            yajl_gen_string(*g, (const unsigned char *) aiop->value.strct, strlen(aiop->value.strct));
+        case DATA_T:
+            yajl_gen_string(*g, (const unsigned char *) aiop->value.data, strlen(aiop->value.data));
             break;
         default:
             fprintf(stderr, "%s - ERROR -  unknown value type to convert in string\n", __FUNCTION__);

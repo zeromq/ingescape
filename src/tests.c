@@ -249,34 +249,34 @@ void print_iop(agent_iop *iop)
     
     switch(iop->type)
     {
-        case INTEGER:
-            printf(", %s", "INTEGER");
+        case INTEGER_T:
+            printf(", %s", "INTEGER_T");
             printf(", %d", iop->value.i);
             break;
             
-        case DOUBLE_TYPE:
-            printf(", %s", "DOUBLE");
+        case DOUBLE_T:
+            printf(", %s", "DOUBLE_T");
             printf(", %f", iop->value.d);
             break;
             
-        case STRING:
-            printf(", %s", "STRING");
+        case STRING_T:
+            printf(", %s", "STRING_T");
             printf(", %s", iop->value.s);
             break;
             
-        case BOOL_TYPE:
-            printf(", %s", "BOOL");
+        case BOOL_T:
+            printf(", %s", "BOOL_T");
             printf(", %s", iop->value.b ? "true" : "false");
             break;
             
-        case IMPULSION:
-            printf(", %s", "IMPULSION");
+        case IMPULSION_T:
+            printf(", %s", "IMPULSION_T");
             printf(", %s", iop->value.impuls);
             break;
             
-        case STRUCTURE:
-            printf(", %s", "STRUCTURE");
-            printf(", %s", iop->value.strct);
+        case DATA_T:
+            printf(", %s", "DATA_T");
+            printf(", %s", iop->value.data);
             break;
             
         default:
@@ -436,7 +436,7 @@ category *init_categories()
     agent_iop *ihm_pointer_e1 = NULL;
     ihm_pointer_e1 = calloc(1, sizeof(agent_iop));
     ihm_pointer_e1->name = "e1";
-    ihm_pointer_e1->type = INTEGER;
+    ihm_pointer_e1->type = INTEGER_T;
     ihm_pointer_e1->value.i = 0;
     
     HASH_ADD_STR( ihm_cat->inputs_table , name,  ihm_pointer_e1);
@@ -445,7 +445,7 @@ category *init_categories()
     agent_iop *ihm_pointer_e2 = NULL;
     ihm_pointer_e2 = calloc(1, sizeof(agent_iop));
     ihm_pointer_e2->name = "e2";
-    ihm_pointer_e2->type = INTEGER;
+    ihm_pointer_e2->type = INTEGER_T;
     ihm_pointer_e2->value.i = 0;
     
     HASH_ADD_STR( ihm_cat->inputs_table , name,  ihm_pointer_e2);
@@ -457,7 +457,7 @@ category *init_categories()
     agent_iop *ihm_pointer_s1 = NULL;
     ihm_pointer_s1 = calloc(1, sizeof(agent_iop));
     ihm_pointer_s1->name = "s1";
-    ihm_pointer_s1->type = INTEGER;
+    ihm_pointer_s1->type = INTEGER_T;
     ihm_pointer_s1->value.i = 0;
     
     HASH_ADD_STR( ihm_cat->outputs_table, name,  ihm_pointer_s1);
@@ -466,7 +466,7 @@ category *init_categories()
     agent_iop *ihm_pointer_s2 = NULL;
     ihm_pointer_s2 = calloc(1, sizeof(agent_iop));
     ihm_pointer_s2->name = "s2";
-    ihm_pointer_s2->type = INTEGER;
+    ihm_pointer_s2->type = INTEGER_T;
     ihm_pointer_s2->value.i = 0;
     
     HASH_ADD_STR( ihm_cat->outputs_table, name,  ihm_pointer_s2);
@@ -478,7 +478,7 @@ category *init_categories()
     agent_iop *ihm_pointer_p1 = NULL;
     ihm_pointer_p1 = calloc(1, sizeof(agent_iop));
     ihm_pointer_p1->name = "p1";
-    ihm_pointer_p1->type = INTEGER;
+    ihm_pointer_p1->type = INTEGER_T;
     ihm_pointer_p1->value.i = 0;
     
     HASH_ADD_STR( ihm_cat->params_table, name,  ihm_pointer_p1);
@@ -487,7 +487,7 @@ category *init_categories()
     agent_iop *ihm_pointer_p2 = NULL;
     ihm_pointer_p2 = calloc(1, sizeof(agent_iop));
     ihm_pointer_p2->name = "p2";
-    ihm_pointer_p2->type = INTEGER;
+    ihm_pointer_p2->type = INTEGER_T;
     ihm_pointer_p2->value.i = 0;
     
     HASH_ADD_STR( ihm_cat->params_table, name,  ihm_pointer_p2);
@@ -508,7 +508,7 @@ category *init_categories()
     agent_iop *pointer_e1 = NULL;
     pointer_e1 = calloc(1, sizeof(agent_iop));
     pointer_e1->name = "e1";
-    pointer_e1->type = INTEGER;
+    pointer_e1->type = INTEGER_T;
     pointer_e1->value.i = 0;
     
     HASH_ADD_STR( pointer_cat->inputs_table , name,  pointer_e1);
@@ -517,7 +517,7 @@ category *init_categories()
     agent_iop *pointer_e2 = NULL;
     pointer_e2 = calloc(1, sizeof(agent_iop));
     pointer_e2->name = "e2";
-    pointer_e2->type = INTEGER;
+    pointer_e2->type = INTEGER_T;
     pointer_e2->value.i = 0;
     
     HASH_ADD_STR( pointer_cat->inputs_table , name,  pointer_e2);
@@ -529,7 +529,7 @@ category *init_categories()
     agent_iop *pointer_s1 = NULL;
     pointer_s1 = calloc(1, sizeof(agent_iop));
     pointer_s1->name = "s1";
-    pointer_s1->type = INTEGER;
+    pointer_s1->type = INTEGER_T;
     pointer_s1->value.i = 0;
     
     HASH_ADD_STR( pointer_cat->outputs_table, name,  pointer_s1);
@@ -538,7 +538,7 @@ category *init_categories()
     agent_iop *pointer_s2 = NULL;
     pointer_s2 = calloc(1, sizeof(agent_iop));
     pointer_s2->name = "s2";
-    pointer_s2->type = INTEGER;
+    pointer_s2->type = INTEGER_T;
     pointer_s2->value.i = 0;
     
     HASH_ADD_STR( pointer_cat->outputs_table, name,  pointer_s2);
@@ -550,7 +550,7 @@ category *init_categories()
     agent_iop *pointer_p1 = NULL;
     pointer_p1 = calloc(1, sizeof(agent_iop));
     pointer_p1->name = "p1";
-    pointer_p1->type = INTEGER;
+    pointer_p1->type = INTEGER_T;
     pointer_p1->value.i = 0;
     
     HASH_ADD_STR(  pointer_cat->params_table , name,  pointer_p1);
@@ -559,7 +559,7 @@ category *init_categories()
     agent_iop *pointer_p2 = NULL;
     pointer_p2 = calloc(1, sizeof(agent_iop));
     pointer_p2->name = "p2";
-    pointer_p2->type = INTEGER;
+    pointer_p2->type = INTEGER_T;
     pointer_p2->value.i = 0;
     
     HASH_ADD_STR(  pointer_cat->params_table , name,  pointer_p2);
@@ -591,7 +591,7 @@ void init_def()
     agent_iop *x = NULL;
     x = calloc(1, sizeof(agent_iop));
     x->name = "x";
-    x->type = INTEGER;
+    x->type = INTEGER_T;
     x->value.i = 0;
     
     //Add the output 'x' to the table 'outputs'
@@ -601,7 +601,7 @@ void init_def()
     agent_iop *y = NULL;
     y = calloc(1, sizeof(agent_iop));
     y->name = "y";
-    y->type = INTEGER;
+    y->type = INTEGER_T;
     y->value.i = 0;
     
     //Add the output 'y' to the table 'outputs'

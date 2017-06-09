@@ -9,7 +9,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "mastic.h"
+//#include "mastic.h"
 #include "mastic_private.h"
 
 

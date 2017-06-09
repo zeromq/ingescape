@@ -8,7 +8,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "mastic.h"
+//#include "mastic.h"
 #include "mastic_private.h"
 
 
@@ -79,35 +79,35 @@ agent_iop * mtic_find_iop_by_name(const char *name, model_state *code){
 
 void update_value(agent_iop *iop, void* value){
     switch (iop->type) {
-        case INTEGER:
+        case INTEGER_T:
             iop->old_value.i = iop->value.i;
             iop->value.i = *(int*)(value);
             break;
-        case DOUBLE_TYPE:
+        case DOUBLE_T:
             iop->old_value.d = iop->value.d;
             iop->value.d = *(double*)(value);
             break;
-        case BOOL_TYPE:
+        case BOOL_T:
             iop->old_value.b = iop->value.b;
             iop->value.b = *(bool*)(value);
             break;
-        case STRING:
+        case STRING_T:
             free(iop->old_value.s);
             iop->old_value.s = strdup(iop->value.s);
             free(iop->value.s);
             iop->value.s = strdup(value);
             break;
-        case IMPULSION:
+        case IMPULSION_T:
             free(iop->old_value.impuls);
             iop->old_value.impuls = strdup(iop->value.impuls);
             free(iop->value.impuls);
             iop->value.impuls = strdup(value);
         break;
-        case STRUCTURE:
-            free(iop->old_value.strct);
-            iop->old_value.strct = strdup(iop->value.strct);
-            free(iop->value.strct);
-            iop->value.strct = strdup(value);
+        case DATA_T:
+            free(iop->old_value.data);
+            iop->old_value.data = strdup(iop->value.data);
+            free(iop->value.data);
+            iop->value.data = strdup(value);
         break;
         default:
             break;
@@ -168,23 +168,23 @@ void * mtic_get(const char *name_iop, model_state *state){
 
     //Return the value corresponding
     switch (iop->type) {
-        case INTEGER:
+        case INTEGER_T:
             return &iop->value.i;
             break;
-        case DOUBLE_TYPE:
+        case DOUBLE_T:
             return &iop->value.d;
             break;
-        case BOOL_TYPE:
+        case BOOL_T:
             return &iop->value.b;
             break;
-        case STRING:
+        case STRING_T:
             return iop->value.s;
             break;
-        case IMPULSION:
+        case IMPULSION_T:
             return iop->value.impuls;
             break;
-        case STRUCTURE:
-            return iop->value.strct;
+        case DATA_T:
+            return iop->value.data;
             break;
         default:
             break;
