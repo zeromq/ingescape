@@ -932,7 +932,7 @@ int mtic_loadDefinition (const char* json_str){
     //Check if the json string is null
     if(json_str == NULL)
     {
-        mtic_debug("Error : json string is null \n");
+        mtic_debug("mtic_loadDefinition : json string is null \n");
         return 0;
     }
 
@@ -941,7 +941,7 @@ int mtic_loadDefinition (const char* json_str){
 
     if(mtic_definition_loaded == NULL)
     {
-        mtic_debug("Error : Definition file has not been loaded from json string : %s\n", json_str );
+        mtic_debug("mtic_loadDefinition : Definition file has not been loaded from json string : %s\n", json_str );
         return -1;
     }
 
