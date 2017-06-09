@@ -510,7 +510,105 @@ double get_iop_value_as_double(agent_iop *iop){
 ////////////////////////////////////////////////////////////////////////
 //à remplir ou déplacer ici
 
+//1 is OK, 0 iop is NULL
+int definition_setIopValue(agent_iop *iop, void * value)
+{
+    if(iop == NULL)
+        return 0;
 
+    switch (iop->type) {
+        case INTEGER_T:
+            iop->value.i = *(int*)(value);
+            break;
+        case DOUBLE_T:
+            iop->value.d = *(double*)(value);
+            break;
+        case BOOL_T:
+            iop->value.b = *(bool*)(value);
+            break;
+        case STRING_T:
+            free(iop->value.s);
+            iop->value.s = strdup(value);
+            break;
+        case IMPULSION_T:
+            free(iop->value.impuls);
+            iop->value.impuls = strdup(value);
+        break;
+        case DATA_T:
+            free(iop->value.data);
+            iop->value.data = strdup(value);
+        break;
+        default:
+            break;
+    }
+
+    return 1;
+}
+
+agent_iop* definition_createIop(const char *name, iopType_t type, void *value)
+{
+    //Create the iop
+    agent_iop *iop = NULL;
+    iop = calloc (1, sizeof (struct agent_iop));
+    iop->name = strdup(name);
+    iop->type = type;
+
+    //Set value
+    definition_setIopValue(iop,value);
+
+    return iop;
+}
+
+// iop is copied so shall be free
+// 1 OK, 0 iop already exists by name
+int definition_addIop(agent_iop *iop, iop_t iop_type, definition **def)
+{
+    agent_iop *iop_to_add = NULL;
+
+    //Check if already initialized, and do it if not
+    if((*def) == NULL){
+        (*def) = calloc(1, sizeof(struct definition));
+    }
+
+    //Check if the key already exist
+    switch (iop_type) {
+    case INPUT_T:
+        HASH_FIND_STR((*def)->inputs_table, iop->name , iop_to_add);
+        break;
+    case OUTPUT_T:
+        HASH_FIND_STR((*def)->outputs_table, iop->name , iop_to_add);
+        break;
+    case PARAMETER_T:
+        HASH_FIND_STR((*def)->params_table, iop->name , iop_to_add);
+        break;
+    default:
+        break;
+    }
+
+    if(iop_to_add != NULL)
+        return 0;
+
+    //Copy the iop
+    iop_to_add = calloc(1, sizeof(struct agent_iop));
+    memcpy(iop_to_add, iop, sizeof(*iop));
+
+    //Add the iop
+    switch (iop_type) {
+    case INPUT_T:
+        HASH_ADD_STR((*def)->inputs_table, name, iop_to_add);
+        break;
+    case OUTPUT_T:
+        HASH_ADD_STR((*def)->outputs_table, name, iop_to_add);
+        break;
+    case PARAMETER_T:
+        HASH_ADD_STR((*def)->params_table, name, iop_to_add);
+        break;
+    default:
+        break;
+    }
+
+    return 1;
+}
 
 ////////////////////////////////////////////////////////////////////////
 // PUBLIC API
@@ -637,11 +735,36 @@ int mtic_setDefinitionVersion(char *version){
     return 1;
 }
 
+/**
+ * \fn mtic_createInput(const char *name, iopType_t type, void *value)
+ * \brief Create and add an input, output or parameter for the agent
+ *
+ * \param name The name of the Iop
+ * \param type The Iop type : input, output or parameter
+ * \param value The pointer on the value (the value will be copied)
+ * \return The error. 1 is OK, 0 not able to add in definition loaded, -1 not able to add in definition live
+ */
+int mtic_createInput(const char *name, iopType_t type, void *value){ //value must be copied in function : copied in definition_setIopValue
 
-//edit the definition using the API
-int mtic_createInput(const char *name, iopType_t type, void *value){ //value must be copied in function
+    //Create the iop
+    agent_iop* iop = definition_createIop(name,type,value);
+
+    //Add iop in structure def loaded, need to be copied
+    if (definition_addIop(iop,INPUT_T, &mtic_definition_loaded) < 1){
+        return 0;
+    }
+
+    //Add iop in structure def live, need to be copied
+    if (definition_addIop(iop,INPUT_T, &mtic_definition_live) < 1){
+        return -1;
+    }
+
+    //free iop
+    free(iop);
+
     return 1;
 }
+
 int mtic_createOutput(const char *name, iopType_t type, void *value){ //value must be copied in function
     return 1;
 }
