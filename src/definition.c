@@ -522,7 +522,17 @@ double get_iop_value_as_double(agent_iop *iop){
 //int mtic_loadDefinitionFromPath (const char* file_path){
 //    return 1;
 //}
+/**
+ * \fn int mtic_clearDefinition()
+ * \brief TODO : need to be defined
+ *
+ * \param
+ * \return The error.
+ */
 int mtic_clearDefinition(){ //clears definition data for the agent
+    //TODO : implement
+    mtic_debug("mtic_clearDefinition : function need to be defined and implement it !");
+
     return 1;
 }
 
