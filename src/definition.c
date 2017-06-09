@@ -567,8 +567,9 @@ int mtic_setDefinitionDescription(char *description){
         mtic_definition_loaded = calloc(1, sizeof(struct definition));
     }
 
-    //Copy the description in the structure in loaded definition and copy in live
-    //TODO : maybe we need to free before if already allocated
+    //Copy the description in the structure in loaded definition
+    if(mtic_definition_loaded->description != NULL)//Free the field if needed
+        free(mtic_definition_loaded->description);
     mtic_definition_loaded->description = strdup(description);
 
     //Check if already initialized, and do it if not
@@ -576,7 +577,9 @@ int mtic_setDefinitionDescription(char *description){
         mtic_definition_live = calloc(1, sizeof(struct definition));
     }
 
-    //TODO : maybe we need to free before if already allocated
+    // Live data corresponds to a copy of the initial definition
+    if(mtic_definition_live->description != NULL)//Free the field if needed
+        free(mtic_definition_live->description);
      mtic_definition_live->description = strdup(mtic_definition_loaded->description);
 
     return 1;
@@ -606,8 +609,9 @@ int mtic_setDefinitionVersion(char *version){
         mtic_definition_loaded = calloc(1, sizeof(struct definition));
     }
 
-    //Copy the description in the structure in loaded definition and copy in live
-    //TODO : maybe we need to free before if already allocated
+    //Copy the description in the structure in loaded definition
+    if(mtic_definition_loaded->version != NULL)//Free the field if needed
+        free(mtic_definition_loaded->version);
     mtic_definition_loaded->version = strdup(version);
 
     //Check if already initialized, and do it if not
@@ -616,7 +620,8 @@ int mtic_setDefinitionVersion(char *version){
     }
 
     // Live data corresponds to a copy of the initial definition
-    //TODO : maybe we need to free before if already allocated
+    if(mtic_definition_live->version != NULL)//Free the field if needed
+        free(mtic_definition_live->version);
     mtic_definition_live->version = strdup(mtic_definition_loaded->version);
 
     return 1;
