@@ -29,11 +29,12 @@
 //initialization and configuration
 
 //start, stop & kill the agent
-PUBLIC int mtic_startWithDevice(const char *networkDevice, int port); //TODO: warning si agent name pas défini
-PUBLIC int mtic_startWithIP(const char *ipAddress, int port); //TODO: warning si agent name pas défini
+PUBLIC int mtic_startWithDevice(const char *networkDevice, int port);
+PUBLIC int mtic_startWithIP(const char *ipAddress, int port);
 PUBLIC int mtic_stop();
 PUBLIC void mtic_die();
 PUBLIC int mtic_setAgentName(const char *name);
+PUBLIC char *mtic_getAgentName(); //returned string shall be freed by caller
 
 //pause and resume the agent
 typedef void (*mtic_pauseCallback)(bool isPaused, void *myData);

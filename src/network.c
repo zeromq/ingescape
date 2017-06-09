@@ -19,7 +19,7 @@
     #define MAX_TRIES 3
 
     size_t  count;
-    char *frindly_name = NULL;
+    char *friendly_name = NULL;
     char buff[100];
     DWORD bufflen=100;
 
@@ -791,11 +791,11 @@ int mtic_startWithDevice(const char *networkDevice, int port){
         pCurrAddresses = pAddresses;
         while (pCurrAddresses) {
             //Convert the wchar_t to char *
-            frindly_name = (char *)malloc( BUFSIZ );
-            count = wcstombs(frindly_name, pCurrAddresses->FriendlyName, BUFSIZ );
+            friendly_name = (char *)malloc( BUFSIZ );
+            count = wcstombs(friendly_name, pCurrAddresses->FriendlyName, BUFSIZ );
             
             //If the friendly_name is the same of the networkDevice
-            if (strcmp(agentElements->networkDevice, frindly_name) == 0)
+            if (strcmp(agentElements->networkDevice, friendly_name) == 0)
             {
                 pUnicast = pCurrAddresses->FirstUnicastAddress;
                 if (pUnicast != NULL)
@@ -808,7 +808,7 @@ int mtic_startWithDevice(const char *networkDevice, int port){
                             {
                                 struct sockaddr_in *sa_in = (struct sockaddr_in *)pUnicast->Address.lpSockaddr;
                                 strncpy(agentElements->ipAddress, inet_ntoa(sa_in->sin_addr), IP_ADDRESS_LENGTH);
-                                free(frindly_name);
+                                free(friendly_name);
                                 mtic_debug("Connection on ip address %s on device %s\n", agentElements->ipAddress, agentElements->networkDevice);
                             }
                         }
@@ -963,6 +963,9 @@ int mtic_setAgentName(const char *name){
     return 1;
 }
 
+char *mtic_getAgentName(){
+    return strdup(agentName);
+}
 
 //pause and resume the agent
 int mtic_pause(){
