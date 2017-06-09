@@ -9,7 +9,7 @@
 
 #include <stdio.h>
 #include <stdarg.h>
-#include "mastic_private.h"
+#include "mastic.h"
 #include "tests.h"
 
 void callback_test_input_1(agent_iop* input_iop){
@@ -691,4 +691,14 @@ void parse(char buffer[],int* num_of_args, char **arguments)
     }
     
     arguments[*num_of_args] = NULL;
+}
+
+
+int main (int argc, char *argv[])
+{
+    printf("function main for unit function test .... \n");
+
+    mtic_setDefinitionDescription("test description");
+
+    return 0;
 }
