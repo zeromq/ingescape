@@ -407,14 +407,41 @@ bool mtic_readInputAsBool(const char *name){
     }
     else{
         //Handle the case: the input is not found.
-        mtic_debug("mtic_readInputAsBool : Angent's input %s cannot be found!", name);
+        mtic_debug("mtic_readInputAsBool : Any Agent's input has been returned", name);
         return false;
     }
 
 }
 
+/**
+ * \fn mtic_readInputAsInt(char *name)
+ * \brief Find the Agent's input by name and return the state value as an integer.
+ * \param The name of the input to read as it has been defined in the definition.
+ * \return The state value as an integer.
+ */
 int mtic_readInputAsInt(const char *name){
-    return 1;
+
+    //Get the pointer IOP Agent selected by name
+    model_state state;
+    agent_iop *iop = mtic_find_iop_by_name((char*) name, &state);
+
+    // Check if an IOP Agent has been returned.
+    if(iop != NULL){
+
+        //Check the value type.
+        if(iop->type == INTEGER_T){
+             return iop->value.i;
+        }else{
+            //Handle the case: the input is not a double.
+            mtic_debug("mtic_readInputAsInt: Angent's input %s is not an integer.", name);
+            return 0;
+        }
+    }
+    else{
+        //Handle the case: the input is not found.
+        mtic_debug("mtic_readInputAsInt : Any Agent's input has been returned.", name);
+        return 0;
+    }
 }
 
 double mtic_readInputAsDouble(const char *name){
