@@ -95,10 +95,10 @@ PUBLIC double mtic_readInputAsDouble(const char *name);
 PUBLIC char* mtic_readInputAsString(const char *name);
 void mtic_readInputAsData(const char *name, void *data, long *size); //allocs data structure to be disposed by caller
 
-bool mtic_readOutputAsBool(const char *name);
-int mtic_readOutputAsInt(const char *name);
-double mtic_readOutputAsDouble(const char *name);
-char* mtic_readOutputAsString(const char *name);
+PUBLIC bool mtic_readOutputAsBool(const char *name);
+PUBLIC int mtic_readOutputAsInt(const char *name);
+PUBLIC double mtic_readOutputAsDouble(const char *name);
+PUBLIC char* mtic_readOutputAsString(const char *name);
 void mtic_readOutputAsData(const char *name, void *data, long *size); //allocs data structure to be disposed by caller
 
 bool mtic_readParameterAsBool(const char *name);
