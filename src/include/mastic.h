@@ -184,7 +184,7 @@ PUBLIC int mtic_createParameter(const char *name, iopType_t type, void *value); 
 
 PUBLIC int mtic_removeInput(const char *name);
 PUBLIC int mtic_removeOutput(const char *name);
-int mtic_removeParameter(const char *name);
+PUBLIC int mtic_removeParameter(const char *name);
 
 //categories
 //TODO later
