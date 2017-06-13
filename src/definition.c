@@ -862,7 +862,45 @@ int mtic_removeInput(const char *name){
 
     return 1;
 }
+
+/**
+ * \fn mtic_removeOutput(const char *name)
+ * \brief Remove and free a output for the agent
+ *
+ * \param name The name of the Iop
+ * \return The error. 1 is OK, 0 Definition loaded is NULL, -1 Definition live is NULL, -2 An error occurs while finding the iop by name
+ */
 int mtic_removeOutput(const char *name){
+    //check if def loaded exist
+    if(mtic_definition_loaded == NULL){
+        mtic_debug("Definition loaded is NULL.");
+        return 0;
+    }
+
+    //check if def live iexist
+    if(mtic_definition_live == NULL){
+        mtic_debug("Definition live is NULL.");
+        return -1;
+    }
+
+    //Find Iop
+    model_state state;
+    agent_iop * iop = model_findIopByName(name,&state);
+
+    //Check if iop exist
+    if(iop == NULL){
+        mtic_debug("An error occurs while finding the iop by name : the iop is NULL.");
+        return -2;
+    }
+    //remove in definition loaded
+    HASH_DEL(mtic_definition_loaded->outputs_table, iop);
+
+    //remove in definition live
+    HASH_DEL(mtic_definition_live->outputs_table, iop);
+
+    //free Iop
+    free_agent_iop(iop);
+
     return 1;
 }
 int mtic_removeParameter(const char *name){
