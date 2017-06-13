@@ -182,7 +182,7 @@ PUBLIC int mtic_createInput(const char *name, iopType_t type, void *value); //va
 PUBLIC int mtic_createOutput(const char *name, iopType_t type, void *value); //value must be copied in function
 PUBLIC int mtic_createParameter(const char *name, iopType_t type, void *value); //value must be copied in function
 
-int mtic_removeInput(const char *name);
+PUBLIC int mtic_removeInput(const char *name);
 int mtic_removeOutput(const char *name);
 int mtic_removeParameter(const char *name);
 
