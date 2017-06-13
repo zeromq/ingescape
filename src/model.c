@@ -464,7 +464,7 @@ double mtic_readInputAsDouble(const char *name){
               return iop->value.d;
          }else{
              //Handle the case: the input is not a double.
-             mtic_debug("mtic_readInputAsInt: Angent's input %s is not an double", name);
+             mtic_debug("mtic_readInputAsInt: Angent's input %s is not a double", name);
              return 0;
          }
      }
@@ -475,8 +475,35 @@ double mtic_readInputAsDouble(const char *name){
      }
 }
 
+/**
+ * \fn mtic_readInputAsString(char *name)
+ * \brief Find the Agent's input by name and return the state value as a string.
+ *        WARNING: Allocating memory that must be free after use.
+ * \param Take name of the input to read as it has been defined in the definition.
+ * \return The state value as a string.
+ */
 char* mtic_readInputAsString(const char *name){
-    return NULL;
+    //Get the pointer IOP Agent selected by name
+    model_state state;
+    agent_iop *iop = mtic_find_iop_by_name((char*) name, &state);
+
+    // Check if an IOP Agent has been returned.
+    if(iop != NULL){
+
+        //Check the value type as a double.
+        if(iop->type == STRING_T){
+            return strdup(iop->value.s);
+        }else{
+            //Handle the case: the input is not a string.
+            mtic_debug("mtic_readInputAsInt: Angent's input %s is not a string", name);
+            return NULL;
+        }
+    }
+    else{
+        //Handle the case: the input is not found.
+        mtic_debug("mtic_readInputAsInt : Angent's input %s cannot be found", name);
+        return NULL;
+    }
 }
 
 void mtic_readInputAsData(const char *name, void *data, long *size){ //allocs data structure to be disposed by caller
