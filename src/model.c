@@ -385,8 +385,8 @@ void mtic_readParameter(const char *name, void *value, long *size){
 /**
  * \fn mtic_readInputAsBool(char *name)
  * \brief Find the Agent's input by name and return the state value as a Boolean.
- * \param The name of the input to read as it has been defined in the definition.
- * \return The state value as true or false.
+ * \param Take the name of the input to read as it has been defined in the definition.
+ * \return Return the input value as true or false.
  */
 bool mtic_readInputAsBool(const char *name){
 
@@ -400,7 +400,7 @@ bool mtic_readInputAsBool(const char *name){
         if(iop->type == BOOL_T){
             return iop->value.b;
         }else{
-             //Handle the case: the input is not a Boolean.
+            //Handle the case: the input is not a Boolean.
             mtic_debug("mtic_readInputAsBool : iop %s is not a Boolean!", name);
             return false;
         }
@@ -416,8 +416,8 @@ bool mtic_readInputAsBool(const char *name){
 /**
  * \fn mtic_readInputAsInt(char *name)
  * \brief Find the Agent's input by name and return the state value as an integer.
- * \param The name of the input to read as it has been defined in the definition.
- * \return The state value as an integer.
+ * \param Take the name of the input to read as it has been defined in the definition.
+ * \return Return the input value as an integer.
  */
 int mtic_readInputAsInt(const char *name){
 
@@ -432,7 +432,7 @@ int mtic_readInputAsInt(const char *name){
         if(iop->type == INTEGER_T){
              return iop->value.i;
         }else{
-            //Handle the case: the input is not a double.
+            //Handle the case: the input is not an interger.
             mtic_debug("mtic_readInputAsInt: Angent's input %s is not an integer.", name);
             return 0;
         }
@@ -444,8 +444,35 @@ int mtic_readInputAsInt(const char *name){
     }
 }
 
+/**
+ * \fn mtic_readInputAsDouble(char *name)
+ * \brief Find the Agent's input by name and return the state value as a double.
+ * \param Take name of the input to read as it has been defined in the definition.
+ * \return The state value as double.
+ */
 double mtic_readInputAsDouble(const char *name){
-    return 1;
+
+     //Get the pointer IOP Agent selected by name
+     model_state state;
+     agent_iop *iop = mtic_find_iop_by_name((char*) name, &state);
+
+     // Check if an IOP Agent has been returned.
+     if(iop != NULL){
+
+         //Check the value type as a double.
+         if(iop->type == DOUBLE_T){
+              return iop->value.d;
+         }else{
+             //Handle the case: the input is not a double.
+             mtic_debug("mtic_readInputAsInt: Angent's input %s is not an double", name);
+             return 0;
+         }
+     }
+     else{
+         //Handle the case: the input is not found.
+         mtic_debug("mtic_readInputAsInt : Angent's input %s cannot be found", name);
+         return 0;
+     }
 }
 
 char* mtic_readInputAsString(const char *name){

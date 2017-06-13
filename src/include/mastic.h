@@ -91,7 +91,7 @@ void mtic_readParameter(const char *name, void *value, long *size);
 //for DATA_T, size is passed by Mastic
 PUBLIC bool mtic_readInputAsBool(const char *name);
 PUBLIC int mtic_readInputAsInt(const char *name);
-double mtic_readInputAsDouble(const char *name);
+PUBLIC double mtic_readInputAsDouble(const char *name);
 char* mtic_readInputAsString(const char *name);
 void mtic_readInputAsData(const char *name, void *data, long *size); //allocs data structure to be disposed by caller
 
