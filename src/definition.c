@@ -793,7 +793,33 @@ int mtic_createOutput(const char *name, iopType_t type, void *value){ //value mu
 
     return 1;
 }
+
+/**
+ * \fn mtic_createParameter(const char *name, iopType_t type, void *value)
+ * \brief Create and add a parameter for the agent
+ *
+ * \param name The name of the Iop
+ * \param type The Iop type : input, output or parameter
+ * \param value The pointer on the value (the value will be copied)
+ * \return The error. 1 is OK, 0 not able to add in definition loaded, -1 not able to add in definition live
+ */
 int mtic_createParameter(const char *name, iopType_t type, void *value){ //value must be copied in function
+    //Create the iop
+    agent_iop* iop = definition_createIop(name,type,value);
+
+    //Add iop in structure def loaded, need to be copied
+    if (definition_addIop(iop,PARAMETER_T, &mtic_definition_loaded) < 1){
+        return 0;
+    }
+
+    //Add iop in structure def live, need to be copied
+    if (definition_addIop(iop,PARAMETER_T, &mtic_definition_live) < 1){
+        return -1;
+    }
+
+    //free iop
+    free(iop);
+
     return 1;
 }
 
