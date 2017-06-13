@@ -643,7 +643,7 @@ int network_publishOutput (const char* output_name)
     int result = 0;
     
     model_state code;
-    agent_iop * found_iop = mtic_find_iop_by_name(output_name, &code);
+    agent_iop * found_iop = model_findIopByName(output_name, &code);
     
     if(agentElements->publisher != NULL && found_iop != NULL)
     {

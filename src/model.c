@@ -71,7 +71,7 @@ agent_iop * mtic_find_iop_by_name_on_definition(const char *name, definition* de
  * ----------------------------
  *
  */
-agent_iop * mtic_find_iop_by_name(const char *name, model_state *code){
+agent_iop * model_findIopByName(const char *name, model_state *code){
     
     return mtic_find_iop_by_name_on_definition(name,mtic_definition_live,code);
 }
@@ -131,7 +131,7 @@ model_state mtic_observe(const char *iop_name,
 
     //1) find the iop
     model_state code;
-    agent_iop *iop = mtic_find_iop_by_name((char*)iop_name,&code);
+    agent_iop *iop = model_findIopByName((char*)iop_name,&code);
 
     if(iop == NULL)
         return code;
@@ -161,7 +161,7 @@ model_state mtic_observe(const char *iop_name,
  */
 void * mtic_get(const char *name_iop, model_state *state){
 
-    agent_iop *iop = mtic_find_iop_by_name((char*) name_iop, state);
+    agent_iop *iop = model_findIopByName((char*) name_iop, state);
 
     if(iop == NULL)
         return state;
@@ -208,7 +208,7 @@ model_state mtic_set(const char *iop_name, void *new_value){
 
     //1) find the iop
     model_state code;
-    agent_iop *iop = mtic_find_iop_by_name((char*) iop_name,&code);
+    agent_iop *iop = model_findIopByName((char*) iop_name,&code);
 
     if(iop == NULL)
         return code;
@@ -257,7 +257,7 @@ int mtic_mute_internal(const char* iop_name)
     int result = -1;
     model_state code;
     // mtic_get iop object
-    agent_iop *iop = mtic_find_iop_by_name((char*)iop_name,&code);
+    agent_iop *iop = model_findIopByName((char*)iop_name,&code);
     
     if(iop != NULL)
     {
@@ -283,7 +283,7 @@ int mtic_unmute_internal(const char* iop_name)
     int result = -1;
     model_state code;
     // mtic_get iop object
-    agent_iop *iop = mtic_find_iop_by_name((char*)iop_name,&code);
+    agent_iop *iop = model_findIopByName((char*)iop_name,&code);
     
     if(iop != NULL)
     {
