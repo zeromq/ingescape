@@ -381,18 +381,50 @@ void mtic_readParameter(const char *name, void *value, long *size){
 //we need to make things clear on structures
 //for IMPULSION_T value is always 0
 //for DATA_T, size is passed by Mastic
+
+/**
+ * \fn mtic_readInputAsBool(char *name)
+ * \brief Find the Agent's input by name and return the state value as a Boolean.
+ * \param The name of the input to read as it has been defined in the definition.
+ * \return The state value as true or false.
+ */
 bool mtic_readInputAsBool(const char *name){
-    return 1;
+
+    //Get the pointer IOP Agent selected by name.
+    model_state state;
+    agent_iop *iop = mtic_find_iop_by_name((char*) name, &state);
+
+    // Check if an IOP Agent has been returned.
+    if(iop != NULL){
+        //Check the value type.
+        if(iop->type == BOOL_T){
+            return iop->value.b;
+        }else{
+             //Handle the case: the input is not a Boolean.
+            mtic_debug("mtic_readInputAsBool : iop %s is not a Boolean!", name);
+            return false;
+        }
+    }
+    else{
+        //Handle the case: the input is not found.
+        mtic_debug("mtic_readInputAsBool : Angent's input %s cannot be found!", name);
+        return false;
+    }
+
 }
+
 int mtic_readInputAsInt(const char *name){
     return 1;
 }
+
 double mtic_readInputAsDouble(const char *name){
     return 1;
 }
+
 char* mtic_readInputAsString(const char *name){
     return NULL;
 }
+
 void mtic_readInputAsData(const char *name, void *data, long *size){ //allocs data structure to be disposed by caller
     
 }
