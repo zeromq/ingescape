@@ -737,7 +737,7 @@ int mtic_setDefinitionVersion(char *version){
 
 /**
  * \fn mtic_createInput(const char *name, iopType_t type, void *value)
- * \brief Create and add an input, output or parameter for the agent
+ * \brief Create and add an input for the agent
  *
  * \param name The name of the Iop
  * \param type The Iop type : input, output or parameter
