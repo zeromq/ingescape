@@ -11,7 +11,7 @@
 #include "uthash/uthash.h"
 #include "uthash/utlist.h"
 #include "mastic_private.h"
-#include "mastic.h"
+//#include "mastic.h"
 
 #ifdef _WIN32
     #define MALLOC(x) HeapAlloc(GetProcessHeap(), 0, (x))
@@ -419,7 +419,7 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     // We had it if we don't have it already
                     if(receivedDefinition == NULL){
                         // Load definition from string content
-                        receivedDefinition = load_definition(strDefinition);
+                        receivedDefinition = parser_loadDefinition(strDefinition);
 
                         // Add the new definition if not found
                         if(receivedDefinition != NULL && receivedDefinition->name != NULL)
@@ -663,7 +663,7 @@ int network_publishOutput (const char* output_name)
     int result = 0;
     
     model_state code;
-    agent_iop * found_iop = mtic_find_iop_by_name(output_name, &code);
+    agent_iop * found_iop = model_findIopByName(output_name, &code);
     
     if(agentElements->publisher != NULL && found_iop != NULL)
     {

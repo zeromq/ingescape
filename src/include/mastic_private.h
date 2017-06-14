@@ -30,6 +30,8 @@
 #include <iphlpapi.h>
 #endif
 
+#include "mastic.h"
+
 //////////////////  structures and enums   //////////////////
 
 //definition //////////////////
@@ -37,14 +39,15 @@
  * The variable 'value_type' contains the data type of the value, use to parse
  * the JSON and affect the value tu right union corresponding
  */
-typedef enum {
-    INTEGER,
-    DOUBLE_TYPE,
-    STRING,
-    BOOL_TYPE,
-    IMPULSION,
-    STRUCTURE
-} value_type;
+//TODO : replace by iopType_t in mastic.h and remove
+//typedef enum {
+//    INTEGER,
+//    DOUBLE_TYPE,
+//    STRING,
+//    BOOL,
+//    IMPULSION,
+//    STRUCTURE
+//} value_type;
 
 /*
  * Define the structure agent_iop (input, output, parameter) :
@@ -56,22 +59,22 @@ typedef enum {
  */
 struct agent_iop {
     const char * name;          //Need to be unique : the table hash key
-    value_type type;
+    iopType_t type;
     union {
-        int i;                  //in accordance to type INTEGER ex. '10'
+        int i;                  //in accordance to type INTEGER_T ex. '10'
         double d;               //in accordance to type DOUBLE ex. '10.01'
         char* s;                //in accordance to type STRING ex. 'display the image'
         bool b;                 //in accordance to type BOOL ex. 'TRUE'
         char* impuls;           //in accordance to type IMPULSION ex. 'released()'
-        char* strct;            //in accordance to type STRUCTURE ex. '{int:x, int:y, string:gesture_name} <=> {int:10, int:45, string:swap}
+        char* data;            //in accordance to type DATA ex. '{int:x, int:y, string:gesture_name} <=> {int:10, int:45, string:swap}
     } old_value;
     union {
-        int i;                  //in accordance to type INTEGER ex. '10'
+        int i;                  //in accordance to type INTEGER_T ex. '10'
         double d;               //in accordance to type DOUBLE ex. '10.01'
         char* s;                //in accordance to type STRING ex. 'display the image'
         bool b;                 //in accordance to type BOOL ex. 'TRUE'
         char* impuls;           //in accordance to type IMPULSION ex. 'released()'
-        char* strct;            //in accordance to type STRUCTURE ex. '{int:x, int:y, string:gesture_name} <=> {int:10, int:45, string:swap}
+        char* data;            //in accordance to type DATA ex. '{int:x, int:y, string:gesture_name} <=> {int:10, int:45, string:swap}
     } value;
     bool is_muted;              // flag indicated if the iop is muted (specially used for outputs)
     UT_hash_handle hh;         /* makes this structure hashable */
@@ -221,9 +224,9 @@ void free_definition (definition* definition);
 // the table which will contain the mapping
 extern mapping * mtic_my_agent_mapping;
 
-value_type string_to_value_type(const char* string);
+iopType_t string_to_value_type(const char* string);
 bool string_to_boolean(const char* string);
-const char* value_type_to_string (value_type type);
+const char* value_type_to_string (iopType_t type);
 const char* boolean_to_string (bool boole);
 MASTICAPI_COMMON_DLLSPEC char* mtic_iop_value_to_string (agent_iop* iop);
 MASTICAPI_COMMON_DLLSPEC const void* mtic_iop_value_string_to_real_type (agent_iop* iop, char* value);
@@ -242,7 +245,7 @@ void mtic_free_mapping (mapping* mapping);
 
 
 //////////////////  model   //////////////////
-agent_iop * mtic_find_iop_by_name(const char* name, model_state *code);
+agent_iop * model_findIopByName(const char* name, model_state *code);
 agent_iop * mtic_find_iop_by_name_on_definition(const char *name, definition* definition, model_state *code);
 //Define the pointer on the callback function
 typedef void (*callback_ptr_t)( agent_iop* );
@@ -262,8 +265,8 @@ void mtic_debug(const char *fmt, ...);
 category* load_category (const char* json_str);
 category* load_category_from_path (const char* file_path);
 const char* export_category (category* cat);
-definition* load_definition (const char* json_str);
-definition* load_definition_from_path (const char* file_path);
+definition* parser_loadDefinition (const char* json_str);
+definition* parser_loadDefinitionFromPath (const char* file_path);
 char* export_definition (definition* def);
 mapping* load_map (const char* json_str);
 mapping* load_map_from_path (const char* load_file);

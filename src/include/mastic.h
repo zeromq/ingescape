@@ -90,23 +90,23 @@ void mtic_readParameter(const char *name, void *value, long *size);
 //we need to make things clear on structures
 //for IMPULSION_T value is always 0
 //for DATA_T, size is passed by Mastic
-bool mtic_readInputAsBool(const char *name);
-int mtic_readInputAsInt(const char *name);
-double mtic_readInputAsDouble(const char *name);
-char* mtic_readInputAsString(const char *name);
+PUBLIC bool mtic_readInputAsBool(const char *name);
+PUBLIC int mtic_readInputAsInt(const char *name);
+PUBLIC double mtic_readInputAsDouble(const char *name);
+PUBLIC char* mtic_readInputAsString(const char *name);
 void mtic_readInputAsData(const char *name, void *data, long *size); //allocs data structure to be disposed by caller
 
-bool mtic_readOutputAsBool(const char *name);
-int mtic_readOutputAsInt(const char *name);
-double mtic_readOutputAsDouble(const char *name);
-char* mtic_readOutputAsString(const char *name);
+PUBLIC bool mtic_readOutputAsBool(const char *name);
+PUBLIC int mtic_readOutputAsInt(const char *name);
+PUBLIC double mtic_readOutputAsDouble(const char *name);
+PUBLIC char* mtic_readOutputAsString(const char *name);
 void mtic_readOutputAsData(const char *name, void *data, long *size); //allocs data structure to be disposed by caller
 
-bool mtic_readParameterAsBool(const char *name);
-int mtic_readParameterAsInt(const char *name);
-double mtic_readParameterAsDouble(const char *name);
-char* mtic_readParameterAsString(const char *name);
-void mtic_readParameterAsData(const char *name, void *data, long *size); //allocs data structure to be disposed by caller
+PUBLIC bool mtic_readParameterAsBool(const char *name);
+PUBLIC int mtic_readParameterAsInt(const char *name);
+PUBLIC double mtic_readParameterAsDouble(const char *name);
+PUBLIC char* mtic_readParameterAsString(const char *name);
+PUBLIC void mtic_readParameterAsData(const char *name, void *data, long *size); //allocs data structure to be disposed by caller
 
 //write using void*
 //for IMPULSION_T value is just ignored
@@ -171,21 +171,21 @@ bool mtic_isOutputMuted(const char *name);
 //////////////////////////////////////////////////
 //Definitions
 
-int mtic_loadDefinition (const char* json_str);
-int mtic_loadDefinitionFromPath (const char* file_path);
+PUBLIC int mtic_loadDefinition (const char* json_str);
+PUBLIC int mtic_loadDefinitionFromPath (const char* file_path);
 int mtic_clearDefinition(); //clears definition data for the agent
-char* mtic_getDefinition(); //returns json string
-int mtic_setDefinitionDescription(char *description);
-int mtic_setDefinitionVersion(char *description);
+PUBLIC char* mtic_getDefinition(); //returns json string
+PUBLIC int mtic_setDefinitionDescription(char *description);
+PUBLIC int mtic_setDefinitionVersion(char *version);
 
 //edit the definition using the API
-int mtic_createInput(const char *name, iopType_t type, void *value); //value must be copied in function
-int mtic_createOutput(const char *name, iopType_t type, void *value); //value must be copied in function
-int mtic_createParameter(const char *name, iopType_t type, void *value); //value must be copied in function
+PUBLIC int mtic_createInput(const char *name, iopType_t type, void *value); //value must be copied in function
+PUBLIC int mtic_createOutput(const char *name, iopType_t type, void *value); //value must be copied in function
+PUBLIC int mtic_createParameter(const char *name, iopType_t type, void *value); //value must be copied in function
 
-int mtic_removeInput(const char *name);
-int mtic_removeOutput(const char *name);
-int mtic_removeParameter(const char *name);
+PUBLIC int mtic_removeInput(const char *name);
+PUBLIC int mtic_removeOutput(const char *name);
+PUBLIC int mtic_removeParameter(const char *name);
 
 //categories
 //TODO later

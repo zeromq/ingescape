@@ -47,23 +47,23 @@ static void json_add_data_to_hash (struct agent_iop ** hasht,
 
         data->type = string_to_value_type (YAJL_GET_STRING(obj->u.object.values[1]));
         switch (data->type) {
-            case INTEGER:
+            case INTEGER_T:
                 data->value.i =(int) YAJL_GET_INTEGER (obj->u.object.values[2]);
                 break;
-            case DOUBLE_TYPE:
+            case DOUBLE_T:
                 data->value.d = YAJL_GET_DOUBLE (obj->u.object.values[2]);
                 break;
-            case BOOL_TYPE:
+            case BOOL_T:
                 data->value.b = string_to_boolean (YAJL_GET_STRING(obj->u.object.values[2]));
                 break;
-            case STRING:
+            case STRING_T:
                 data->value.s = strdup (YAJL_GET_STRING(obj->u.object.values[2]));
                 break;
-            case IMPULSION:
+            case IMPULSION_T:
                 data->value.impuls = strdup (YAJL_GET_STRING(obj->u.object.values[2]));
                 break;
-            case STRUCTURE:
-                data->value.strct = strdup (YAJL_GET_STRING(obj->u.object.values[2]));
+            case DATA_T:
+                data->value.data = strdup (YAJL_GET_STRING(obj->u.object.values[2]));
                 break;
             default:
                 break;
@@ -482,23 +482,23 @@ static void json_dump_iop (yajl_gen *g, agent_iop* aiop) {
     yajl_gen_string(*g, (const unsigned char *) STR_VALUE, strlen(STR_VALUE));
     
     switch (aiop->type) {
-        case INTEGER:
+        case INTEGER_T:
             yajl_gen_integer(*g, aiop->value.i);
             break;
-        case DOUBLE_TYPE:
+        case DOUBLE_T:
             yajl_gen_double(*g, aiop->value.d);
             break;
-        case BOOL_TYPE:
+        case BOOL_T:
             yajl_gen_string(*g, (const unsigned char *) boolean_to_string(aiop->value.b), strlen(boolean_to_string(aiop->value.b)));
             break;
-        case STRING:
+        case STRING_T:
             yajl_gen_string(*g, (const unsigned char *) aiop->value.s, strlen(aiop->value.s));
             break;
-        case IMPULSION:
+        case IMPULSION_T:
             yajl_gen_string(*g, (const unsigned char *) aiop->value.impuls, strlen(aiop->value.impuls));
             break;
-        case STRUCTURE:
-            yajl_gen_string(*g, (const unsigned char *) aiop->value.strct, strlen(aiop->value.strct));
+        case DATA_T:
+            yajl_gen_string(*g, (const unsigned char *) aiop->value.data, strlen(aiop->value.data));
             break;
         default:
             fprintf(stderr, "%s - ERROR -  unknown value type to convert in string\n", __FUNCTION__);
@@ -807,7 +807,7 @@ char* export_definition (definition* def) {
  *
  *   returns: a pointer on a category structure or NULL if it has failed
  */
-definition* load_definition (const char* json_str) {
+definition* parser_loadDefinition (const char* json_str) {
     
     definition *def = NULL;
     yajl_val node;
@@ -831,7 +831,7 @@ definition* load_definition (const char* json_str) {
  *
  *   returns: a pointer on a category structure or NULL if it has failed
  */
-definition * load_definition_from_path (const char* path) {
+definition * parser_loadDefinitionFromPath (const char* path) {
 
     char *json_str = NULL;
     definition *def = NULL;
@@ -840,7 +840,7 @@ definition * load_definition_from_path (const char* path) {
     if (!json_str)
         return 0;
 
-    def = load_definition(json_str);
+    def = parser_loadDefinition(json_str);
 
     free (json_str);
     json_str = NULL;
@@ -889,7 +889,7 @@ int mtic_init_internal_data (const char* definition_file_path)
     int errorCode = -1;
     if (definition_file_path != NULL){
         // Init definition
-        mtic_definition_loaded = load_definition_from_path(definition_file_path);
+        mtic_definition_loaded = parser_loadDefinitionFromPath(definition_file_path);
 
         if(mtic_definition_loaded != NULL)
         {
@@ -915,5 +915,74 @@ int mtic_init_internal_data (const char* definition_file_path)
 //à remplir ou déplacer ici
 
 
+////////////////////////////////////////////////////////////////////////
+// PUBLIC API
+////////////////////////////////////////////////////////////////////////
+/**
+ * \fn int mtic_loadDefinition (const char* json_str)
+ * \brief load definition in variable 'mtic_definition_loaded' & copy in 'mtic_definition_live"
+ *      from a json string
+ *
+ * \param json_str String in json format. Can't be NULL.
+ * \return The error. 1 is OK, 0 json string is NULL, -1 Definition file has not been loaded
+ */
+int mtic_loadDefinition (const char* json_str){
+    mtic_definition_loaded = NULL;
 
+    //Check if the json string is null
+    if(json_str == NULL)
+    {
+        mtic_debug("mtic_loadDefinition : json string is null \n");
+        return 0;
+    }
+
+    //Load definition and init variable : mtic_definition_loaded
+    mtic_definition_loaded = parser_loadDefinition(json_str);
+
+    if(mtic_definition_loaded == NULL)
+    {
+        mtic_debug("mtic_loadDefinition : Definition file has not been loaded from json string : %s\n", json_str );
+        return -1;
+    }
+
+    // Live data corresponds to a copy of the initial definition
+    mtic_definition_live = calloc(1, sizeof(struct definition));
+    memcpy(mtic_definition_live, mtic_definition_loaded, sizeof(*mtic_definition_loaded));
+
+    return 1;
+}
+
+/**
+ * \fn int mtic_loadDefinitionFromPath (const char* file_path)
+ * \brief load definition in variable 'mtic_definition_loaded' & copy in 'mtic_definition_live"
+ *      from a file path
+ *
+ * \param file_path The string which contains the json file path. Can't be NULL.
+ * \return The error. 1 is OK, 0 json string is NULL, -1 Definition file has not been loaded
+ */
+int mtic_loadDefinitionFromPath (const char* file_path){
+    mtic_definition_loaded = NULL;
+
+    //Check if the json string is null
+    if(file_path == NULL)
+    {
+        mtic_debug("Error : file path is null \n");
+        return 0;
+    }
+
+    //Load definition and init variable : mtic_definition_loaded
+    mtic_definition_loaded = parser_loadDefinitionFromPath(file_path);
+
+    if(mtic_definition_loaded == NULL)
+    {
+        mtic_debug("Error : Definition file has not been loaded from file path : %s\n", file_path);
+        return -1;
+    }
+
+    // Live data corresponds to a copy of the initial definition
+    mtic_definition_live = calloc(1, sizeof(struct definition));
+    memcpy(mtic_definition_live, mtic_definition_loaded, sizeof(*mtic_definition_loaded));
+
+    return 1;
+}
 
