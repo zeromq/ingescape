@@ -15,7 +15,7 @@
 
 
 // Global parameter declaration
-mapping * mtic_my_agent_mapping = NULL;
+//mapping * mtic_my_agent_mapping = NULL;
 
 
 const char * map_state_to_string(map_state state){
