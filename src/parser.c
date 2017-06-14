@@ -946,8 +946,7 @@ int mtic_loadDefinition (const char* json_str){
     }
 
     // Live data corresponds to a copy of the initial definition
-    mtic_definition_live = calloc(1, sizeof(struct definition));
-    memcpy(mtic_definition_live, mtic_definition_loaded, sizeof(*mtic_definition_loaded));
+    mtic_definition_live = parser_loadDefinition(json_str);
 
     return 1;
 }
@@ -980,8 +979,7 @@ int mtic_loadDefinitionFromPath (const char* file_path){
     }
 
     // Live data corresponds to a copy of the initial definition
-    mtic_definition_live = calloc(1, sizeof(struct definition));
-    memcpy(mtic_definition_live, mtic_definition_loaded, sizeof(*mtic_definition_loaded));
+    mtic_definition_live = parser_loadDefinitionFromPath(file_path);
 
     return 1;
 }
