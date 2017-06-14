@@ -50,8 +50,9 @@
 
 
 //global flags
-bool verboseMode = false;
-bool isPaused = false;
+bool verboseMode = true;
+bool isFreezed = false;
+bool agentCanBeFreezed = false;
 
 //global parameters
 //prefix for sending definition through zyre
@@ -76,7 +77,7 @@ typedef struct zyreloopElements{
     zloop_t *loop;
 } zyreloopElements_t;
 
-typedef struct subcriber{
+typedef struct subscriber{
     const char *agentName;
     const char *agentPeerId;
     zsock_t *subscriber;
@@ -84,18 +85,18 @@ typedef struct subcriber{
     UT_hash_handle hh;
 } subscriber_t;
 
-typedef struct pauseCallback {      //Need to be unique : the table hash key
-    mtic_pauseCallback callback_ptr;   //pointer on the callback
+typedef struct FreezeCallback {      //Need to be unique : the table hash key
+    mtic_freezeCallback callback_ptr;   //pointer on the callback
     void *myData;
-    struct pauseCallback *prev;
-    struct pauseCallback *next;
-} pauseCallback_t;
+    struct FreezeCallback *prev;
+    struct FreezeCallback *next;
+} FreezeCallback_t;
 
 
 //we manage agent data as a global variables inside the network module for now
 zyreloopElements_t *agentElements = NULL;
 subscriber_t *subscribers = NULL;
-pauseCallback_t *pauseCallbacks = NULL;
+FreezeCallback_t *FreezeCallbacks = NULL;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -111,7 +112,7 @@ pauseCallback_t *pauseCallbacks = NULL;
  *   usage : mtic_sendDefinition()
  *
  */
-void sendDefinition()
+void sendDefinitionToAgent(const char *peerId)
 {
     // Send my own definition
     if(mtic_definition_loaded != NULL)
@@ -122,10 +123,9 @@ void sendDefinition()
         if(definitionStr)
         {
             // Send definition
-            zstr_sendx(agentElements->agentActor,"definition",CHANNEL,definitionStr,NULL);
-            
-            // Free memory
-            free ((char*) definitionStr);
+            zyre_whispers(agentElements->node, peerId, "%s%s", exportDefinitionPrefix, definitionStr);
+            //zyre_shouts (agentElements->node, CHANNEL, "%s%s", exportDefinitionPrefix, definitionStr);
+            free (definitionStr);
             definitionStr = NULL;
         } else {
             mtic_debug("Error : could not send definition of %s.\n",mtic_definition_loaded->name);
@@ -157,7 +157,7 @@ int subscribeToPublisherOutput(const char *agentName, const char *outputName)
             if(strcmp(subscriber->agentName,agentName) == 0)
             {
                 // Set subscriber to the output filter
-                mtic_debug("subcribe agent %s to %s.\n",agentName,outputName);
+                mtic_debug("subscribe to agent %s output %s.\n",agentName,outputName);
                 zsock_set_subscribe(subscriber->subscriber, outputName);
                 
                 // we quit
@@ -194,7 +194,7 @@ int unsubscribeToPublisherOutput(const char *agentName, const char *outputName)
             if(strcmp(subscriber->agentName,agentName) == 0)
             {
                 // Unsubscribe to the output filter
-                mtic_debug("unsubcribe agent %s to %s.\n",agentName,outputName);
+                mtic_debug("unsubscribe to agent %s output %s.\n",agentName,outputName);
                 zsock_set_unsubscribe(subscriber->subscriber, outputName);
                 
                 // we quit
@@ -227,12 +227,6 @@ int manageParent (zloop_t *loop, zmq_pollitem_t *item, void *arg){
         char *command = zmsg_popstr (msg);
         if (streq (command, "$TERM")){
             return -1;
-        } else if (streq (command, "definition")) {
-            char *group = zmsg_popstr (msg);
-            char *string = zmsg_popstr (msg);
-            zyre_shouts (agentElements->node, group, "%s%s",exportDefinitionPrefix, string);
-            free(group);
-            free(string);
         } else {
             //nothing to do so far
         }
@@ -261,13 +255,13 @@ int manageSubscription (zloop_t *loop, zmq_pollitem_t *item, void *arg){
             // 1 : filter "agentName.outputName
             // 2 : output name only
             // 3 : value of the output
-            if(zmsg_size(msg) == 3 && isPaused == false)
+            if(zmsg_size(msg) == 3 && isFreezed == false)
             {
                 char * filter = zmsg_popstr(msg);
                 char * output = zmsg_popstr(msg);
                 char * value = zmsg_popstr(msg);
 
-                // Find the subcriber definition
+                // Find the subscriber definition
                 // Look for the new agent definition
                 definition * externalDefinition = NULL;
                 HASH_FIND_STR(mtic_agents_defs_on_network, subscriberFound->agentName, externalDefinition);
@@ -297,10 +291,10 @@ int manageSubscription (zloop_t *loop, zmq_pollitem_t *item, void *arg){
             } else {
                 // Ignore the message
 
-                // Print message if the agent has been paused
-                if(isPaused == true)
+                // Print message if the agent has been Freezed
+                if(isFreezed == true)
                 {
-                    mtic_debug("Message received from publisher but all traffic in the agent has been paused\n");
+                    mtic_debug("Message received from publisher but all traffic in the agent has been Freezed\n");
                 }
             }
             zmsg_destroy(&msg);
@@ -339,66 +333,74 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 v = zyre_event_header (zyre_event,k);
                 mtic_debug("\t%s -> %s\n", k, v);
                 char endpointAddress[128];
-                strcpy(endpointAddress, address);
+                strncpy(endpointAddress, address, 128);
                 char *insert = endpointAddress + strlen(endpointAddress);
+                bool extractOK = true;
                 while (*insert != ':'){
                     insert--;
                     if (insert == endpointAddress){
                         mtic_debug("Error: could not extract port from address %s", address);
+                        extractOK = false;
+                        break;
                     }
                 }
-                *(insert + 1) = '\0';
-                strcat(endpointAddress, v);
-
-                if (strcmp(k, "publisher")==0){
-                    //we found a possible publisher to subscribe to
-                    subscriber_t *subscriber;
-                    HASH_FIND_STR(subscribers, peer, subscriber);
-                    if (subscriber != NULL){
-                        //Agent is already know and not cleaned: this is a case of reconnection
-                        mtic_debug("Destroy subscriber %s.\n",subscriber->agentName);
-                        HASH_DEL(subscribers, subscriber);
-                        zloop_poller_end(agentElements->loop , subscriber->pollItem);
-                        zsock_destroy(&subscriber->subscriber);
-                        free((char*)subscriber->agentName);
-                        free((char*)subscriber->agentPeerId);
-                        free(subscriber->pollItem);
-                        free(subscriber->subscriber);
-                        subscriber->subscriber = NULL;
-                        free(subscriber);
-                        subscriber = NULL;
-
+                if (extractOK){
+                    *(insert + 1) = '\0';
+                    strcat(endpointAddress, v);
+                    
+                    if (strcmp(k, "publisher") == 0){
+                        //we found a possible publisher to subscribe to
+                        subscriber_t *subscriber;
+                        HASH_FIND_STR(subscribers, peer, subscriber);
+                        if (subscriber != NULL){
+                            //Agent is already know and not cleaned: this is a case of reconnection
+                            mtic_debug("\t\tDestroy subscriber structure for agent %s\n",subscriber->agentName);
+                            HASH_DEL(subscribers, subscriber);
+                            zloop_poller_end(agentElements->loop , subscriber->pollItem);
+                            zsock_destroy(&subscriber->subscriber);
+                            free((char*)subscriber->agentName);
+                            free((char*)subscriber->agentPeerId);
+                            free(subscriber->pollItem);
+                            free(subscriber->subscriber);
+                            subscriber->subscriber = NULL;
+                            free(subscriber);
+                            subscriber = NULL;
+                            
+                        }
+                        subscriber = calloc(1, sizeof(subscriber_t));
+                        subscriber->agentName = strdup(name);
+                        subscriber->agentPeerId = strdup (peer);
+                        subscriber->subscriber = zsock_new_sub(endpointAddress, "DEFAULT");
+                        assert(subscriber->subscriber);
+                        HASH_ADD_STR(subscribers, agentPeerId, subscriber);
+                        subscriber->pollItem = calloc(1, sizeof(zmq_pollitem_t));
+                        subscriber->pollItem->socket = zsock_resolve(subscriber->subscriber);
+                        subscriber->pollItem->fd = 0;
+                        subscriber->pollItem->events = ZMQ_POLLIN;
+                        subscriber->pollItem->revents = 0;
+                        zloop_poller (agentElements->loop, subscriber->pollItem, manageSubscription, (void*)subscriber->agentPeerId);
+                        zloop_poller_set_tolerant(loop, subscriber->pollItem);
+                        mtic_debug("\t\tSubscriber created for %s at %s.\n",subscriber->agentName,endpointAddress);
                     }
-                    subscriber = calloc(1, sizeof(subscriber_t));
-                    subscriber->agentName = strdup(name);
-                    subscriber->agentPeerId = strdup (peer);
-                    subscriber->subscriber = zsock_new_sub(endpointAddress, "DEFAULT");
-                    assert(subscriber->subscriber);
-                    HASH_ADD_STR(subscribers, agentPeerId, subscriber);
-                    subscriber->pollItem = calloc(1, sizeof(zmq_pollitem_t));
-                    subscriber->pollItem->socket = zsock_resolve(subscriber->subscriber);
-                    subscriber->pollItem->fd = 0;
-                    subscriber->pollItem->events = ZMQ_POLLIN;
-                    subscriber->pollItem->revents = 0;
-                    zloop_poller (agentElements->loop, subscriber->pollItem, manageSubscription, (void*)subscriber->agentPeerId);
-                    zloop_poller_set_tolerant(loop, subscriber->pollItem);
-                    mtic_debug("Subscriber created for %s at %s.\n",subscriber->agentName,endpointAddress);
-
-
-                    // Send my definition to the new agent
-                    mtic_debug("Send our definition ...\n");
-                    sendDefinition();
                 }
-
-
                 free(k);
             }
             zlist_destroy(&keys);
         } else if (streq (event, "JOIN")){
             mtic_debug("+%s has joined %s\n", name, group);
+            if (streq(group, CHANNEL)){
+                subscriber_t *subscriber;
+                HASH_FIND_STR(subscribers, peer, subscriber);
+                if (subscriber != NULL){
+                    //A new agent joined the MASTIC channel and has subscriber header
+                    //Send my definition to this new agent
+                    mtic_debug("Send our definition to %s (%s)\n", subscriber->agentName, subscriber->agentPeerId);
+                    sendDefinitionToAgent(subscriber->agentPeerId);
+                }
+            }
         } else if (streq (event, "LEAVE")){
             mtic_debug("-%s has left %s\n", name, group);
-        } else if (streq (event, "SHOUT")){
+        } else if (streq (event, "SHOUT") || streq (event, "WHISPER")){
             char *message = zmsg_popstr (msg);
             if(strlen(message) > strlen(exportDefinitionPrefix))
             {
@@ -442,12 +444,6 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 }
             }
             free(message);
-        } else if (streq (event, "WHISPER")){
-            char *message;
-            while ((message = zmsg_popstr(msg))) {
-                mtic_debug("#whisper[%s] : %s\n", name, message);
-                free (message);
-            }
         } else if (streq (event, "EXIT")){
             mtic_debug("<-%s exited\n", name);
             // Try to find the subscriber to destory
@@ -474,11 +470,12 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     free_definition(receivedDefinition);
                     receivedDefinition = NULL;
                 }
-
+                
+                //TODO : think about the stuff below to see if it is really necessary
                 // NB - subscriber destruction :
-                // The subscriber is destoryed at the reconnection
+                // The subscriber is destroyed at the reconnection
                 // or at the end of the execution. It's made safer for czmq
-                // sub socets to terminate that way.
+                // sub sockets to terminate that way.
 
             }
 
@@ -516,7 +513,7 @@ initActor (zsock_t *pipe, void *args)
     agentElements->node = zyre_new (agentName);
     zyre_set_port(agentElements->node, agentElements->zyrePort);
     if (agentElements->node == NULL){
-        printf("Error : could not create zyre node... exiting.\n");
+        mtic_debug("Error : could not create zyre node... exiting.\n");
         exit(EXIT_FAILURE);
     }
     zyre_start (agentElements->node);
@@ -532,15 +529,38 @@ initActor (zsock_t *pipe, void *args)
     while (*insert != ':' && insert > endpoint) {
         insert--;
     }
+    
+    //set headers for agent
     zyre_set_header(agentElements->node, "publisher", "%s", insert + 1);
-
+    zyre_set_header(agentElements->node, "canBeFreezed", "%i", agentCanBeFreezed);
+    
+    char hostname[1024];
+    hostname[1023] = '\0';
+    gethostname(hostname, 1023);
+    zyre_set_header(agentElements->node, "hostname", "%s", hostname);
+    //code for Fully Qualified Domain Name if needed someday
+//    struct addrinfo hints, *info, *p;
+//    int gai_result;
+//    memset(&hints, 0, sizeof hints);
+//    hints.ai_family = AF_UNSPEC; /*either IPV4 or IPV6*/
+//    hints.ai_socktype = SOCK_STREAM;
+//    hints.ai_flags = AI_CANONNAME;
+//    if ((gai_result = getaddrinfo(hostname, "http", &hints, &info)) != 0) {
+//        mtic_debug("getaddrinfo error: %s\n", gai_strerror(gai_result));
+//        exit(1);
+//    }
+//    for(p = info; p != NULL; p = p->ai_next) {
+//        mtic_debug("hostname: %s\n", p->ai_canonname);
+//    }
+//    freeaddrinfo(info);
+    
     zmq_pollitem_t zpipePollItem;
     zmq_pollitem_t zyrePollItem;
 
     //main zmq socket (i.e. main thread)
     void *zpipe = zsock_resolve(pipe);
     if (zpipe == NULL){
-        printf("Error : could not get the pipe descriptor for polling... exiting.\n");
+        mtic_debug("Error : could not get the pipe descriptor for polling... exiting.\n");
         exit(EXIT_FAILURE);
     }
     zpipePollItem.socket = zpipe;
@@ -551,7 +571,7 @@ initActor (zsock_t *pipe, void *args)
     //zyre socket
     void *zsock = zsock_resolve(zyre_socket (agentElements->node));
     if (zsock == NULL){
-        printf("Error : could not get the zyre socket for polling... exiting.\n");
+        mtic_debug("Error : could not get the zyre socket for polling... exiting.\n");
         exit(EXIT_FAILURE);
     }
     zyrePollItem.socket = zsock;
@@ -631,7 +651,7 @@ void mtic_debug(const char *fmt, ...)
         
         // Add more information in debug mode
 #ifdef DEBUG
-        fprintf(stderr, "           ... in %s (%s, line %d).\n", __func__, __FILE__, __LINE__);
+        //fprintf(stderr, "           ... in %s (%s, line %d).\n", __func__, __FILE__, __LINE__);
 #endif // DEBUG
         
         va_end(ar);
@@ -647,7 +667,7 @@ int network_publishOutput (const char* output_name)
     
     if(agentElements->publisher != NULL && found_iop != NULL)
     {
-        if(found_iop->is_muted == false && found_iop->name != NULL && isPaused == false)
+        if(found_iop->is_muted == false && found_iop->name != NULL && isFreezed == false)
         {
             char* str_value = mtic_iop_value_to_string(found_iop);
             if(strlen(str_value) > 0)
@@ -672,10 +692,10 @@ int network_publishOutput (const char* output_name)
                 mtic_debug("Shoudl publish output but the output %s has been muted.\n",found_iop->name);
             }
             
-            // Print message if the agent has been paused
-            if(isPaused == true)
+            // Print message if the agent has been Freezed
+            if(isFreezed == true)
             {
-                mtic_debug("Shoudl publish output but all traffic in the agent has been paused\n");
+                mtic_debug("Shoudl publish output but all traffic in the agent has been Freezed\n");
             }
         }
     }
@@ -910,10 +930,10 @@ int mtic_stop(){
         //cleaning agent
         free (agentElements);
         agentElements = NULL;
-        //cleaning pause callbacks
-        pauseCallback_t *elt, *tmp;
-        DL_FOREACH_SAFE(pauseCallbacks,elt,tmp) {
-            DL_DELETE(pauseCallbacks,elt);
+        //cleaning Freeze callbacks
+        FreezeCallback_t *elt, *tmp;
+        DL_FOREACH_SAFE(FreezeCallbacks,elt,tmp) {
+            DL_DELETE(FreezeCallbacks,elt);
             free(elt);
         }
     }else{
@@ -967,43 +987,52 @@ char *mtic_getAgentName(){
     return strdup(agentName);
 }
 
-//pause and resume the agent
-int mtic_pause(){
-    if(isPaused == false)
+//Freeze and resume the agent
+int mtic_freeze(){
+    if (!agentCanBeFreezed){
+        mtic_debug("warning: agent has been Freezed but is set to 'can't be Freezed'\n");
+    }
+    if(isFreezed == false)
     {
-        mtic_debug("Agent paused\n");
-        isPaused = true;
-        pauseCallback_t *elt;
-        DL_FOREACH(pauseCallbacks,elt){
-            elt->callback_ptr(isPaused, elt->myData);
+        mtic_debug("Agent Freezed\n");
+        if (agentElements != NULL && agentElements->node != NULL){
+            zyre_shouts(agentElements->node, CHANNEL, "Freeze=ON");
+        }
+        isFreezed = true;
+        FreezeCallback_t *elt;
+        DL_FOREACH(FreezeCallbacks,elt){
+            elt->callback_ptr(isFreezed, elt->myData);
         }
     }
     return 1;
 }
 
-bool mtic_isPaused(){
-    return isPaused;
+bool mtic_isFreezed(){
+    return isFreezed;
 }
 
-int mtic_resume(){
-    if(isPaused == true)
+int mtic_unfreeze(){
+    if(isFreezed == true)
     {
         mtic_debug("Agent resumed\n");
-        isPaused = false;
-        pauseCallback_t *elt;
-        DL_FOREACH(pauseCallbacks,elt){
-            elt->callback_ptr(isPaused, elt->myData);
+        if (agentElements != NULL && agentElements->node != NULL){
+            zyre_shouts(agentElements->node, CHANNEL, "Freeze=OFF");
+        }
+        isFreezed = false;
+        FreezeCallback_t *elt;
+        DL_FOREACH(FreezeCallbacks,elt){
+            elt->callback_ptr(isFreezed, elt->myData);
         }
     }
     return 1;
 }
 
-int mtic_observePause(mtic_pauseCallback cb, void *myData){
+int mtic_observeFreeze(mtic_freezeCallback cb, void *myData){
     if (cb != NULL){
-        pauseCallback_t *newCb = calloc(1, sizeof(pauseCallback_t));
+        FreezeCallback_t *newCb = calloc(1, sizeof(FreezeCallback_t));
         newCb->callback_ptr = cb;
         newCb->myData = myData;
-        DL_APPEND(pauseCallbacks, newCb);
+        DL_APPEND(FreezeCallbacks, newCb);
     }else{
         mtic_debug("callback is null\n");
         return 0;
@@ -1030,7 +1059,9 @@ char *mtic_getAgentState(){
 void mtic_setVerbose (bool verbose){
     verboseMode = verbose;
 };
-
+void mtic_setCanBeFreezed (bool canBeFreezed){
+    agentCanBeFreezed = canBeFreezed;
+}
 
 
 
