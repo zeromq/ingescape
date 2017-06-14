@@ -381,54 +381,383 @@ void mtic_readParameter(const char *name, void *value, long *size){
 //we need to make things clear on structures
 //for IMPULSION_T value is always 0
 //for DATA_T, size is passed by Mastic
+
+// Read Inputs ...
+/**
+ * \fn mtic_readInputAsBool(char *name)
+ * \brief Find the Agent's input by name and return the input value as a Boolean.
+ * \param Take the name of the input to read as it has been defined in the definition.
+ * \return Return the input value as true or false. If an error occurred then the function returns false.
+ */
 bool mtic_readInputAsBool(const char *name){
-    return 1;
+
+    //Get the pointer IOP Agent selected by name.
+    model_state state;
+    agent_iop *iop = mtic_find_iop_by_name((char*) name, &state);
+
+    // Check if the input has been returned.
+    if(iop != NULL){
+        //Check the value type.
+        if(iop->type == BOOL_T){
+            return iop->value.b;
+        }else{
+            //Handle the case: the input is not a Boolean.
+            mtic_debug("mtic_readInputAsBool : iop %s is not a Boolean!", name);
+            return false;
+        }
+    }
+    else{
+        //Handle the case: the input is not found.
+        mtic_debug("mtic_readInputAsBool : Any Agent's input has been returned", name);
+        return false;
+    }
+
 }
+
+/**
+ * \fn mtic_readInputAsInt(char *name)
+ * \brief Find the Agent's input by name and return the input value as an integer.
+ * \param Take the name of the input to read as it has been defined in the definition.
+ * \return Return the input value as an integer. If an error occurred then the function returns 0.
+ */
 int mtic_readInputAsInt(const char *name){
-    return 1;
+
+    //Get the pointer IOP Agent selected by name
+    model_state state;
+    agent_iop *iop = mtic_find_iop_by_name((char*) name, &state);
+
+    // Check if the input has been returned.
+    if(iop != NULL){
+
+        //Check the value type.
+        if(iop->type == INTEGER_T){
+             return iop->value.i;
+        }else{
+            //Handle the case: the input is not an interger.
+            mtic_debug("mtic_readInputAsInt: Angent's input %s is not an integer.", name);
+            return 0;
+        }
+    }
+    else{
+        //Handle the case: the input is not found.
+        mtic_debug("mtic_readInputAsInt : Any Agent's input has been returned.", name);
+        return 0;
+    }
 }
+
+/**
+ * \fn mtic_readInputAsDouble(char *name)
+ * \brief Find the Agent's input by name and return the input value as a double.
+ * \param Take name of the input to read as it has been defined in the definition.
+ * \return Return the input value as double. If an error occurred then the function returns 0.0.
+ */
 double mtic_readInputAsDouble(const char *name){
-    return 1;
+
+     //Get the pointer IOP Agent selected by name
+     model_state state;
+     agent_iop *iop = mtic_find_iop_by_name((char*) name, &state);
+
+     // Check if the input has been returned.
+     if(iop != NULL){
+
+         //Check the value type as a double.
+         if(iop->type == DOUBLE_T){
+              return iop->value.d;
+         }else{
+             //Handle the case: the input is not a double.
+             mtic_debug("mtic_readInputAsDouble: Angent's input %s is not a double", name);
+             return 0.0;
+         }
+     }
+     else{
+         //Handle the case: the input is not found.
+         mtic_debug("mtic_readInputAsDouble : Angent's input %s cannot be found", name);
+         return 0.0;
+     }
 }
+
+/**
+ * \fn mtic_readInputAsString(char *name)
+ * \brief Find the Agent's input by name and return the input value as a string.
+ *        WARNING: Allocating memory that must be free after use.
+ * \param Take name of the input to read as it has been defined in the definition.
+ * \return Return the input value as a string. If an error occurred then the function returns NULL.
+ */
 char* mtic_readInputAsString(const char *name){
-    return NULL;
+    //Get the pointer IOP Agent selected by name
+    model_state state;
+    agent_iop *iop = mtic_find_iop_by_name((char*) name, &state);
+
+    // Check if the input has been returned.
+    if(iop != NULL){
+
+        //Check the value type as a string.
+        if(iop->type == STRING_T){
+            return strdup(iop->value.s);
+        }else{
+            //Handle the case: the input is not a string.
+            mtic_debug("mtic_readInputAsString: Angent's input %s is not a string", name);
+            return NULL;
+        }
+    }
+    else{
+        //Handle the case: the input is not found.
+        mtic_debug("mtic_readInputAsString : Angent's input %s cannot be found", name);
+        return NULL;
+    }
 }
+
 void mtic_readInputAsData(const char *name, void *data, long *size){ //allocs data structure to be disposed by caller
     
 }
+
+// Read Outputs ...
+/**
+ * \fn mtic_readOutputAsBool(const char *name)
+ * \brief Find the Agent's output by name and return the output value as a Boolean.
+ * \param Take the name of the output to read as it has been defined in the definition.
+ * \return Return the output value as true or false. If an error occurred then function returns false.
+ */
 bool mtic_readOutputAsBool(const char *name){
-    return 1;
+    //Get the pointer IOP Agent selected by name.
+    model_state state;
+    agent_iop *iop = mtic_find_iop_by_name((char*) name, &state);
+
+    // Check if the output has been returned.
+    if(iop != NULL){
+        //Check the value type.
+        if(iop->type == BOOL_T){
+            return iop->value.b;
+        }else{
+            //Handle the case: the output is not a Boolean.
+            mtic_debug("mtic_readOutputAsBool : iop %s is not a Boolean!", name);
+            return false;
+        }
+    }
+    else{
+        //Handle the case: the output is not found.
+        mtic_debug("mtic_readOutputAsBool : Any Agent's output has been returned", name);
+        return false;
+    }
 }
+
+/**
+ * \fn mtic_readOutputAsInt(const char *name)
+ * \brief Find the Agent's output by name and return the output value as an integer.
+ * \param Take the name of the output to read as it has been defined in the definition.
+ * \return Return the output value as an integer. If an error occurred then function returns 0.
+ */
 int mtic_readOutputAsInt(const char *name){
-    return 1;
+    //Get the pointer IOP Agent selected by name.
+    model_state state;
+    agent_iop *iop = mtic_find_iop_by_name((char*) name, &state);
+
+    // Check if the output has been returned.
+    if(iop != NULL){
+        //Check the value type.
+        if(iop->type == INTEGER_T){
+            return iop->value.i;
+        }else{
+            //Handle the case: the output is not an integer.
+            mtic_debug("mtic_readOutputAsInt : iop %s is not an interger!", name);
+            return 0;
+        }
+    }
+    else{
+        //Handle the case: the output is not found.
+        mtic_debug("mtic_readOutputAsInt : Any Agent's output has been returned", name);
+        return 0;
+    }
 }
+
+/**
+ * \fn mtic_readOutputAsDouble(const char *name)
+ * \brief Find the Agent's output by name and return the output value as a double.
+ * \param Take the name of the output to read as it has been defined in the definition.
+ * \return Return the output value as a double. If an error occurred then function returns 0.0.
+ */
 double mtic_readOutputAsDouble(const char *name){
-    return 1;
+    //Get the pointer IOP Agent selected by name.
+    model_state state;
+    agent_iop *iop = mtic_find_iop_by_name((char*) name, &state);
+
+    // Check if the output has been returned.
+    if(iop != NULL){
+        //Check the value type.
+        if(iop->type == DOUBLE_T){
+            return iop->value.d;
+        }else{
+            //Handle the case: the output is not a double.
+            mtic_debug("mtic_readOutputAsDouble : iop %s is not a double!", name);
+            return 0.0;
+        }
+    }
+    else{
+        //Handle the case: the output is not found.
+        mtic_debug("mtic_readOutputAsDouble : Any Agent's output has been returned", name);
+        return 0.0;
+    }
 }
+
+/**
+ * \fn mtic_readOutputAsString(const char *name)
+ * \brief Find the Agent's output by name and return the output value as a string.
+ *        WARNING: Allocating memory that must be free after use.
+ * \param Take the name of the output to read as it has been defined in the definition.
+ * \return Return the output value as a string. If an error occurred then function returns NULL.
+ */
 char* mtic_readOutputAsString(const char *name){
-    return NULL;
+    //Get the pointer IOP Agent selected by name
+    model_state state;
+    agent_iop *iop = mtic_find_iop_by_name((char*) name, &state);
+
+    // Check if the output has been returned.
+    if(iop != NULL){
+
+        //Check the value type as a string.
+        if(iop->type == STRING_T){
+            return strdup(iop->value.s);
+        }else{
+            //Handle the case: the input is not a string.
+            mtic_debug("mtic_readOutputAsString: Angent's input %s is not a string", name);
+            return NULL;
+        }
+    }
+    else{
+        //Handle the case: the output is not found.
+        mtic_debug("mtic_readOutputAsString : Angent's output %s cannot be found", name);
+        return NULL;
+    }
 }
+
 void mtic_readOutputAsData(const char *name, void *data, long *size){ //allocs data structure to be disposed by caller
     
 }
+
+// Read Parameters ...
+/**
+ * \fn mtic_readParameterAsBool(const char *name)
+ * \brief Find the Agent's parameter by name and return the output value as a Boolean.
+ * \param Take the name of the parameter to read as it has been defined in the definition.
+ * \return Return the parameter value as true or false. If an error occurred then function returns false.
+ */
 bool mtic_readParameterAsBool(const char *name){
-    return 1;
+    //Get the pointer IOP Agent selected by name.
+    model_state state;
+    agent_iop *iop = mtic_find_iop_by_name((char*) name, &state);
+
+    // Check if the parameter has been returned.
+    if(iop != NULL){
+        //Check the value type.
+        if(iop->type == BOOL_T){
+            return iop->value.b;
+        }else{
+            //Handle the case: the parameter is not a Boolean.
+            mtic_debug("mtic_readParameterAsBool : iop %s is not a Boolean!", name);
+            return false;
+        }
+    }
+    else{
+        //Handle the case: the parameter is not found.
+        mtic_debug("mtic_readParameterAsBool : Any Agent's parameter has been returned", name);
+        return false;
+    }
 }
+
+/**
+ * \fn mtic_readParameterAsInt(const char *name)
+ * \brief Find the Agent's parameter by name and return the parameter value as an integer.
+ * \param Take the name of the parameter to read as it has been defined in the definition.
+ * \return Return the parameter value as an integer. If an error occurred then function returns 0.
+ */
 int mtic_readParameterAsInt(const char *name){
-    return 1;
+    //Get the pointer IOP Agent selected by name.
+    model_state state;
+    agent_iop *iop = mtic_find_iop_by_name((char*) name, &state);
+
+    // Check if the parameter has been returned.
+    if(iop != NULL){
+        //Check the value type.
+        if(iop->type == INTEGER_T){
+            return iop->value.i;
+        }else{
+            //Handle the case: the parameter is not an integer.
+            mtic_debug("mtic_readParameterAsInt : iop %s is not an interger!", name);
+            return 0;
+        }
+    }
+    else{
+        //Handle the case: the parameter is not found.
+        mtic_debug("mtic_readParameterAsInt : Any Agent's parameter has been returned", name);
+        return 0;
+    }
 }
+
+/**
+ * \fn mtic_readParameterAsDouble(const char *name)
+ * \brief Find the Agent's parameter by name and return the output value as a double.
+ * \param Take the name of the output to read as it has been defined in the definition.
+ * \return Return the parameter value as a double. If an error occurred then function returns 0.0.
+ */
 double mtic_readParameterAsDouble(const char *name){
-    return 1;
+    //Get the pointer IOP Agent selected by name.
+    model_state state;
+    agent_iop *iop = mtic_find_iop_by_name((char*) name, &state);
+
+    // Check if the parameter has been returned.
+    if(iop != NULL){
+        //Check the value type.
+        if(iop->type == DOUBLE_T){
+            return iop->value.d;
+        }else{
+            //Handle the case: the parameter is not a double.
+            mtic_debug("mtic_readParameterAsDouble : iop %s is not a double!", name);
+            return 0.0;
+        }
+    }
+    else{
+        //Handle the case: the parameter is not found.
+        mtic_debug("mtic_readParameterAsDouble : Any Agent's parameter has been returned", name);
+        return 0.0;
+    }
 }
+
+/**
+ * \fn mtic_readParameterAsString(const char *name)
+ * \brief Find the Agent's parameter by name and return the output value as a string.
+ *        WARNING: Allocating memory that must be free after use.
+ * \param Take the name of the parameter to read as it has been defined in the definition.
+ * \return Return the parameter value as a string. If an error occurred then function returns NULL.
+ */
 char* mtic_readParameterAsString(const char *name){
-    return NULL;
+    //Get the pointer IOP Agent selected by name
+    model_state state;
+    agent_iop *iop = mtic_find_iop_by_name((char*) name, &state);
+
+    // Check if the parameter has been returned.
+    if(iop != NULL){
+
+        //Check the value type as a string.
+        if(iop->type == STRING_T){
+            return strdup(iop->value.s);
+        }else{
+            //Handle the case: the input is not a string.
+            mtic_debug("mtic_readParameterAsString: Angent's parameter %s is not a string", name);
+            return NULL;
+        }
+    }
+    else{
+        //Handle the case: the input is not found.
+        mtic_debug("mtic_readParameterAsString : Angent's parameter %s cannot be found", name);
+        return NULL;
+    }
 }
 void mtic_readParameterAsData(const char *name, void *data, long *size){ //allocs data structure to be disposed by caller
     
 }
 //write using void*
 //for IMPULSION_T value is just ignored
-//for DATA_T, these functions should be forbidden (need to know datra size)
+//for DATA_T, these functions should be forbidden (need to know data size)
 //size shall be given to Mastic
 //Mastic shall clone value and shall dispose of it when stopped
 int mtic_writeInput(const char *name, void *value, long size){

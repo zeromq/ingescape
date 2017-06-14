@@ -37,11 +37,11 @@ PUBLIC int mtic_setAgentName(const char *name);
 PUBLIC char *mtic_getAgentName(); //returned string shall be freed by caller
 
 //pause and resume the agent
-typedef void (*mtic_pauseCallback)(bool isPaused, void *myData);
-int mtic_pause();
-bool mtic_isPaused();
-int mtic_resume();
-int mtic_observePause(mtic_pauseCallback cb, void *myData);
+typedef void (*mtic_freezeCallback)(bool isPaused, void *myData);
+int mtic_freeze();
+bool mtic_isFreezed();
+int mtic_unfreeze();
+int mtic_observeFreeze(mtic_freezeCallback cb, void *myData);
 
 //control agent state
 int mtic_setAgentState(const char *state);
@@ -54,6 +54,7 @@ bool mtic_isMuted();
 
 //set library parameters
 void mtic_setVerbose (bool verbose);
+void mtic_setCanBeFreezed (bool canBeFreezed);
 
 
 
@@ -89,23 +90,23 @@ void mtic_readParameter(const char *name, void *value, long *size);
 //we need to make things clear on structures
 //for IMPULSION_T value is always 0
 //for DATA_T, size is passed by Mastic
-bool mtic_readInputAsBool(const char *name);
-int mtic_readInputAsInt(const char *name);
-double mtic_readInputAsDouble(const char *name);
-char* mtic_readInputAsString(const char *name);
+PUBLIC bool mtic_readInputAsBool(const char *name);
+PUBLIC int mtic_readInputAsInt(const char *name);
+PUBLIC double mtic_readInputAsDouble(const char *name);
+PUBLIC char* mtic_readInputAsString(const char *name);
 void mtic_readInputAsData(const char *name, void *data, long *size); //allocs data structure to be disposed by caller
 
-bool mtic_readOutputAsBool(const char *name);
-int mtic_readOutputAsInt(const char *name);
-double mtic_readOutputAsDouble(const char *name);
-char* mtic_readOutputAsString(const char *name);
+PUBLIC bool mtic_readOutputAsBool(const char *name);
+PUBLIC int mtic_readOutputAsInt(const char *name);
+PUBLIC double mtic_readOutputAsDouble(const char *name);
+PUBLIC char* mtic_readOutputAsString(const char *name);
 void mtic_readOutputAsData(const char *name, void *data, long *size); //allocs data structure to be disposed by caller
 
-bool mtic_readParameterAsBool(const char *name);
-int mtic_readParameterAsInt(const char *name);
-double mtic_readParameterAsDouble(const char *name);
-char* mtic_readParameterAsString(const char *name);
-void mtic_readParameterAsData(const char *name, void *data, long *size); //allocs data structure to be disposed by caller
+PUBLIC bool mtic_readParameterAsBool(const char *name);
+PUBLIC int mtic_readParameterAsInt(const char *name);
+PUBLIC double mtic_readParameterAsDouble(const char *name);
+PUBLIC char* mtic_readParameterAsString(const char *name);
+PUBLIC void mtic_readParameterAsData(const char *name, void *data, long *size); //allocs data structure to be disposed by caller
 
 //write using void*
 //for IMPULSION_T value is just ignored
