@@ -764,11 +764,60 @@ agent_iop*  mtic_update_mapping_out_state(mapping_out* map_out, definition * ext
 ////////////////////////////////////////////////////////////////////////
 // PUBLIC API
 ////////////////////////////////////////////////////////////////////////
-
+/**
+ * \fn int mtic_loadMapping (const char* json_str)
+ * \brief load mapping in variable 'mtic_my_agent_mapping' from a json string
+ *
+ * \param json_str String in json format. Can't be NULL.
+ * \return The error. 1 is OK, 0 json string is NULL or empty, -1 Mapping has not been loaded
+ */
 int mtic_loadMapping (const char* json_str){
+    mtic_my_agent_mapping = NULL;
+
+    //Check if the json string is null or empty
+    if((json_str == NULL) || (strlen(json_str) == 1))
+    {
+        mtic_debug("json string is null or empty \n");
+        return 0;
+    }
+
+    //Load definition and init variable : mtic_definition_loaded
+    mtic_my_agent_mapping = parser_LoadMap(json_str);
+
+    if(mtic_my_agent_mapping == NULL)
+    {
+        mtic_debug("Mapping has not been loaded from json string : %s\n", json_str );
+        return -1;
+    }
+
     return 1;
 }
+/**
+ * \fn int mtic_loadMappingFromPath (const char* file_path)
+ * \brief load mapping in variable 'mtic_my_agent_mapping' from a file path
+ *
+ * \param file_path The string which contains the json file path. Can't be NULL.
+ * \return The error. 1 is OK, 0 file path is NULL or empty, -1 Definition file has not been loaded
+ */
 int mtic_loadMappingFromPath (const char* file_path){
+    mtic_my_agent_mapping = NULL;
+
+    //Check if the json string is null or empty
+    if((file_path == NULL) || (strlen(file_path) == 0))
+    {
+        mtic_debug("File path is null or empty \n");
+        return 0;
+    }
+
+    //Load definition and init variable : mtic_definition_loaded
+    mtic_my_agent_mapping = parser_LoadMapFromPath(file_path);
+
+    if(mtic_definition_loaded == NULL)
+    {
+        mtic_debug("Mapping file has not been loaded from file path : %s\n", file_path);
+        return -1;
+    }
+
     return 1;
 }
 int mtic_clearMapping(){ //clears mapping data for the agent
