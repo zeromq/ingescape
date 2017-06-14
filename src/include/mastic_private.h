@@ -245,7 +245,7 @@ void mtic_free_mapping (mapping* mapping);
 
 
 //////////////////  model   //////////////////
-agent_iop * mtic_find_iop_by_name(const char* name, model_state *code);
+agent_iop * model_findIopByName(const char* name, model_state *code);
 agent_iop * mtic_find_iop_by_name_on_definition(const char *name, definition* definition, model_state *code);
 //Define the pointer on the callback function
 typedef void (*callback_ptr_t)( agent_iop* );
