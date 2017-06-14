@@ -222,7 +222,7 @@ void free_definition (definition* definition);
 //////////////////  mapping   //////////////////
 
 // the table which will contain the mapping
-extern mapping * mtic_my_agent_mapping;
+mapping * mtic_my_agent_mapping;
 
 iopType_t string_to_value_type(const char* string);
 bool string_to_boolean(const char* string);
@@ -268,8 +268,8 @@ const char* export_category (category* cat);
 definition* parser_loadDefinition (const char* json_str);
 definition* parser_loadDefinitionFromPath (const char* file_path);
 char* export_definition (definition* def);
-mapping* load_map (const char* json_str);
-mapping* load_map_from_path (const char* load_file);
+mapping* parser_LoadMap (const char* json_str);
+mapping* parser_LoadMapFromPath (const char* load_file);
 int mtic_init_mapping (const char* mapping_file_path);
 int mtic_init_internal_data (const char* definition_file_path);
 

@@ -639,7 +639,7 @@ static void json_dump_definition (yajl_gen *g, definition* def) {
  *
  *   returns : a pointer on a mapping structure or NULL if it has failed
  */
-mapping* load_map(const char* json_str){
+mapping* parser_LoadMap(const char* json_str){
     
     mapping *mapp = NULL;
     yajl_val node;
@@ -666,7 +666,7 @@ mapping* load_map(const char* json_str){
  *
  *   returns : a pointer on a mapping structure or NULL if it has failed
  */
-mapping* load_map_from_path (const char* path){
+mapping* parser_LoadMapFromPath (const char* path){
 
     char *json_str = NULL;
     mapping *mapp = NULL;
@@ -675,7 +675,7 @@ mapping* load_map_from_path (const char* path){
     if (!json_str)
         return NULL;
 
-    mapp = load_map(json_str);
+    mapp = parser_LoadMap(json_str);
 
     free (json_str);
     json_str = NULL;
@@ -862,7 +862,7 @@ int mtic_init_mapping (const char* mapping_file_path)
 
     if (mapping_file_path != NULL){
         // Init definition
-        mtic_my_agent_mapping = load_map_from_path(mapping_file_path);
+        mtic_my_agent_mapping = parser_LoadMapFromPath(mapping_file_path);
         if(mtic_my_agent_mapping == NULL)
         {
             fprintf(stderr, "Error : Mapping file has not been loaded : %s\n", mapping_file_path );
