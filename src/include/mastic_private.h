@@ -222,7 +222,7 @@ void free_definition (definition* definition);
 //////////////////  mapping   //////////////////
 
 // the table which will contain the mapping
-mapping * mtic_my_agent_mapping;
+extern mapping * mtic_my_agent_mapping;
 
 iopType_t string_to_value_type(const char* string);
 bool string_to_boolean(const char* string);
