@@ -73,7 +73,7 @@ void free_map_cat (mapping_cat* map_cat){
  *   mapping : a pointer to the mapping structure to free
  *
  */
-void mtic_free_mapping (mapping* mapp) {
+void mapping_FreeMapping (mapping* mapp) {
 
     struct mapping_out *current_map_out, *tmp_map_out;
     struct mapping_cat *current_map_cat, *tmp_map_cat;

@@ -241,7 +241,7 @@ model_state mtic_map_received(const char * agent_name,
                               char * out_name,
                               void * value);
 bool mtic_map_category (char* map_description);
-void mtic_free_mapping (mapping* mapping);
+void mapping_FreeMapping (mapping* mapping);
 
 
 //////////////////  model   //////////////////
