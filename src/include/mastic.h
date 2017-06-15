@@ -149,9 +149,9 @@ void mtic_getInputsList(char **list, long nbOfElements);
 void mtic_getOutputsList(char **list, long nbOfElements);
 void mtic_getParametersList(char **list, long nbOfElements);
 
-bool mtic_checkInputExistence(const char *name);
-bool mtic_checkOutputExistence(const char *name);
-bool mtic_checkParameterExistence(const char *name);
+PUBLIC bool mtic_checkInputExistence(const char *name);
+PUBLIC bool mtic_checkOutputExistence(const char *name);
+PUBLIC bool mtic_checkParameterExistence(const char *name);
 
 //observe IOP
 //calback format for IOP observation
