@@ -959,9 +959,61 @@ int mtic_getMappingEntriesNumber(){ //number of entries in the mapping
     return number;
 }
 
+/**
+ * \fn int mtic_addMappingEntry(char *fromOurInput, char *toAgent, char *withOutput)
+ * \brief this function allows the user to add a new mapping entry dynamically
+ *
+ * \param fromOurInput The string which contains the name of the input to be mapped. Can't be NULL.
+ * \param toAgent The string which contains the name of the extern agent. Can't be NULL.
+ * \param withOutput The string which contains the name of the output of the extern agent to be mapped. Can't be NULL.
+ * \return The error. 1 is OK.
+ *  0 Our input name to be mapped cannot be NULL or empty.
+ * -1 Agent name to be mapped cannot be NULL or empty.
+ * -2 Extern agent output name to be mapped cannot be NULL or empty.
+ */
 int mtic_addMappingEntry(char *fromOurInput, char *toAgent, char *withOutput){ //returns mapping id or 0 if creation failed
+
+    /***    Check the string    ***/
+    //fromOurInput
+    if((fromOurInput == NULL) || (strlen(fromOurInput) == 0)){
+        mtic_debug("Our input name to be mapped cannot be NULL or empty\n");
+        return 0;
+    }
+
+    //toAgent
+    if((toAgent == NULL) || (strlen(toAgent) == 0)){
+        mtic_debug("Agent name to be mapped cannot be NULL or empty\n");
+        return -1;
+    }
+
+    //withOutput
+    if((withOutput == NULL) || (strlen(withOutput) == 0)){
+        mtic_debug("Extern agent output name to be mapped cannot be NULL or empty\n");
+        return -2;
+    }
+
+    //Check if already initialized, and do it if not
+    if(mtic_my_agent_mapping == NULL){
+        mtic_my_agent_mapping = calloc(1, sizeof(struct mapping));
+    }
+
+    /***** Add the new mapping out *****/
+
+    char map_description[MAX_PATH];
+    char out_name[MAX_PATH];
+
+    //Create map_description
+    strcpy(map_description , toAgent);
+    strcat(map_description, ".");//separator
+    strcpy(out_name, withOutput);
+    strcat(map_description, out_name);
+
+    //Check if the mapping already exist & Add map if not
+    mtic_map(fromOurInput, map_description);
+
     return 1;
 }
+
 int mtic_removeMappingEntryWithId(int theId){
     return 1;
 }
