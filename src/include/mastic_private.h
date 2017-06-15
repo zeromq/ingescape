@@ -28,6 +28,8 @@
 #include <winsock2.h>
 #include <Ws2tcpip.h>
 #include <iphlpapi.h>
+#else
+# define MAX_PATH 260
 #endif
 
 #include "mastic.h"
