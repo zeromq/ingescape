@@ -879,7 +879,7 @@ int mtic_setMappingName(char *name){
  * \brief the agent mapping description setter
  *
  * \param description The string which contains the description of the agent's mapping. Can't be NULL.
- * \return The error. 1 is OK, 0 Mapping name is NULL, -1 Mapping name is empty
+ * \return The error. 1 is OK, 0 Mapping description is NULL, -1 Mapping description is empty
  */
 int mtic_setMappingDescription(char *description){
     if(description == NULL){
@@ -904,7 +904,35 @@ int mtic_setMappingDescription(char *description){
 
     return 1;
 }
-int mtic_setMappingVersion(char *description){
+
+/**
+ * \fn int mtic_setMappingVersion(char *version)
+ * \brief the agent mapping version setter
+ *
+ * \param version The string which contains the version of the agent's mapping. Can't be NULL.
+ * \return The error. 1 is OK, 0 Mapping version is NULL, -1 Mapping version is empty
+ */
+int mtic_setMappingVersion(char *version){
+    if(version == NULL){
+        mtic_debug("Mapping version cannot be NULL \n");
+        return 0;
+    }
+
+    if (strlen(version) == 0){
+        mtic_debug("Mapping version cannot be empty\n");
+        return -1;
+    }
+
+    //Check if already initialized, and do it if not
+    if(mtic_my_agent_mapping == NULL){
+        mtic_my_agent_mapping = calloc(1, sizeof(struct mapping));
+    }
+
+    //Copy the description in the structure
+    if(mtic_my_agent_mapping->version != NULL)//Free the field if needed
+        free(mtic_my_agent_mapping->version);
+    mtic_my_agent_mapping->version = strdup(version);
+
     return 1;
 }
 int mtic_getMappingEntriesNumber(){ //number of entries in the mapping
