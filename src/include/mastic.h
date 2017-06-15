@@ -38,14 +38,14 @@ PUBLIC char *mtic_getAgentName(); //returned string shall be freed by caller
 
 //pause and resume the agent
 typedef void (*mtic_freezeCallback)(bool isPaused, void *myData);
-int mtic_freeze();
-bool mtic_isFreezed();
-int mtic_unfreeze();
-int mtic_observeFreeze(mtic_freezeCallback cb, void *myData);
+PUBLIC int mtic_freeze();
+PUBLIC bool mtic_isFreezed();
+PUBLIC int mtic_unfreeze();
+PUBLIC int mtic_observeFreeze(mtic_freezeCallback cb, void *myData);
 
 //control agent state
-int mtic_setAgentState(const char *state);
-char *mtic_getAgentState(); //returned string shall be freed by caller
+PUBLIC int mtic_setAgentState(const char *state);
+PUBLIC char *mtic_getAgentState(); //returned string shall be freed by caller
 
 //mute the agent
 int mtic_mute();
@@ -53,8 +53,8 @@ int mtic_unmute();
 bool mtic_isMuted();
 
 //set library parameters
-void mtic_setVerbose (bool verbose);
-void mtic_setCanBeFreezed (bool canBeFreezed);
+PUBLIC void mtic_setVerbose (bool verbose);
+PUBLIC void mtic_setCanBeFreezed (bool canBeFreezed);
 
 
 
