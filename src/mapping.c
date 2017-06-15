@@ -1014,7 +1014,35 @@ int mtic_addMappingEntry(char *fromOurInput, char *toAgent, char *withOutput){ /
     return 1;
 }
 
+/**
+ * \fn int mtic_removeMappingEntryWithId(int theId)
+ * \brief this function allows the user to remove a mapping in table by its id
+ *
+ * \param theId The id of the mapping. Cannot be negative.
+ * \return The error. 1 is OK.
+ * 0 The id of the mapping cannot be negative.
+ */
 int mtic_removeMappingEntryWithId(int theId){
+
+    if(theId < 0){
+        mtic_debug("The id of the mapping cannot be negative. \n");
+        return 0;
+    }
+
+    //Get the mapping output by id
+    mapping_out * mapp_out = NULL;
+
+    HASH_FIND_INT(mtic_my_agent_mapping->map_out, &theId, mapp_out);
+
+    if(mapp_out == NULL){
+        mtic_debug("The id of the mapping is not part of the table. \n");
+        return 0;
+    }
+
+    //Remove this one
+    HASH_DEL(mtic_my_agent_mapping->map_out, mapp_out);
+    free(mapp_out);
+
     return 1;
 }
 int mtic_removeMappingEntryWithName(char *fromOurInput, char *toAgent, char *withOutput){
