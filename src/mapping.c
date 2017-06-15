@@ -820,7 +820,23 @@ int mtic_loadMappingFromPath (const char* file_path){
 
     return 1;
 }
+
+/**
+ * \fn int mtic_clearMapping()
+ * \brief Clear the variable 'mtic_my_agent_mapping' and free all structures inside and itself
+ *
+ * \return The error. 1 is OK,
+ * 0 file path is NULL or empty
+ */
 int mtic_clearMapping(){ //clears mapping data for the agent
+
+    if(mtic_my_agent_mapping == NULL){
+        mtic_debug("The structure mtic_my_agent_mapping is NULL \n");
+        return 0;
+    }
+
+    mapping_FreeMapping(mtic_my_agent_mapping);
+
     return 1;
 }
 
