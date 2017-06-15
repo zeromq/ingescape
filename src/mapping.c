@@ -857,7 +857,7 @@ int mtic_setMappingName(char *name){
     }
 
     if (strlen(name) == 0){
-        mtic_debug("Agent name cannot be empty\n");
+        mtic_debug("Mapping name cannot be empty\n");
         return -1;
     }
 
@@ -866,14 +866,42 @@ int mtic_setMappingName(char *name){
         mtic_my_agent_mapping = calloc(1, sizeof(struct mapping));
     }
 
-    //Copy the description in the structure in loaded definition
+    //Copy the name in the structure
     if(mtic_my_agent_mapping->name != NULL)//Free the field if needed
         free(mtic_my_agent_mapping->name);
     mtic_my_agent_mapping->name = strdup(name);
 
     return 1;
 }
+
+/**
+ * \fn int mtic_setMappingDescription(char *description)
+ * \brief the agent mapping description setter
+ *
+ * \param description The string which contains the description of the agent's mapping. Can't be NULL.
+ * \return The error. 1 is OK, 0 Mapping name is NULL, -1 Mapping name is empty
+ */
 int mtic_setMappingDescription(char *description){
+    if(description == NULL){
+        mtic_debug("Mapping description cannot be NULL \n");
+        return 0;
+    }
+
+    if (strlen(description) == 0){
+        mtic_debug("Mapping description cannot be empty\n");
+        return -1;
+    }
+
+    //Check if already initialized, and do it if not
+    if(mtic_my_agent_mapping == NULL){
+        mtic_my_agent_mapping = calloc(1, sizeof(struct mapping));
+    }
+
+    //Copy the description in the structure
+    if(mtic_my_agent_mapping->description != NULL)//Free the field if needed
+        free(mtic_my_agent_mapping->description);
+    mtic_my_agent_mapping->description = strdup(description);
+
     return 1;
 }
 int mtic_setMappingVersion(char *description){

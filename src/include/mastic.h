@@ -201,7 +201,7 @@ PUBLIC char* mtic_getMapping(); //returns json string
 
 //edit mapping using the API
 PUBLIC int mtic_setMappingName(char *name);
-int mtic_setMappingDescription(char *description);
+PUBLIC int mtic_setMappingDescription(char *description);
 int mtic_setMappingVersion(char *description);
 int mtic_getMappingEntriesNumber(); //number of entries in the mapping
 int mtic_addMappingEntry(char *fromOurInput, char *toAgent, char *withOutput); //returns mapping id or 0 if creation failed
