@@ -935,9 +935,30 @@ int mtic_setMappingVersion(char *version){
 
     return 1;
 }
+/**
+ * \fn int mtic_getMappingEntriesNumber()
+ * \brief the agent mapping entries number getter
+ *
+ * \return The number of mapping type output entries. If -1 The structure mtic_my_agent_mapping is NULL.
+ */
 int mtic_getMappingEntriesNumber(){ //number of entries in the mapping
-    return 1;
+    int number = -1;
+
+    if(mtic_my_agent_mapping == NULL){
+        mtic_debug("The structure mtic_my_agent_mapping is NULL \n");
+        return -1;
+    }
+
+    if(mtic_my_agent_mapping->map_out == NULL){
+        mtic_debug("The structure mapping out is NULL \n");
+        return 0;
+    }
+
+    number = HASH_COUNT(mtic_my_agent_mapping->map_out);
+
+    return number;
 }
+
 int mtic_addMappingEntry(char *fromOurInput, char *toAgent, char *withOutput){ //returns mapping id or 0 if creation failed
     return 1;
 }
