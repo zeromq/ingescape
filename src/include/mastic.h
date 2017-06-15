@@ -200,7 +200,7 @@ int mtic_clearMapping(); //clears mapping data for the agent
 PUBLIC char* mtic_getMapping(); //returns json string
 
 //edit mapping using the API
-int mtic_setMappingName(char *name);
+PUBLIC int mtic_setMappingName(char *name);
 int mtic_setMappingDescription(char *description);
 int mtic_setMappingVersion(char *description);
 int mtic_getMappingEntriesNumber(); //number of entries in the mapping

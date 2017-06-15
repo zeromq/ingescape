@@ -843,8 +843,34 @@ char* mtic_getMapping(){ //returns json string
     return mappingJson;
 }
 
-//edit mapping using the API
+/**
+ * \fn int mtic_setMappingName(char *name)
+ * \brief the agent mapping name setter
+ *
+ * \param name The string which contains the name of the agent's mapping. Can't be NULL.
+ * \return The error. 1 is OK, 0 Mapping name is NULL, -1 Mapping name is empty
+ */
 int mtic_setMappingName(char *name){
+    if(name == NULL){
+        mtic_debug("Mapping name cannot be NULL \n");
+        return 0;
+    }
+
+    if (strlen(name) == 0){
+        mtic_debug("Agent name cannot be empty\n");
+        return -1;
+    }
+
+    //Check if already initialized, and do it if not
+    if(mtic_my_agent_mapping == NULL){
+        mtic_my_agent_mapping = calloc(1, sizeof(struct mapping));
+    }
+
+    //Copy the description in the structure in loaded definition
+    if(mtic_my_agent_mapping->name != NULL)//Free the field if needed
+        free(mtic_my_agent_mapping->name);
+    mtic_my_agent_mapping->name = strdup(name);
+
     return 1;
 }
 int mtic_setMappingDescription(char *description){
