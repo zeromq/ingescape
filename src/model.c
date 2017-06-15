@@ -438,34 +438,34 @@ bool mtic_readInputAsBool(const char *name){
             return iop->value.b;
         }else{
             if(iop->type == INTEGER_T){
-                //Handle the case: A implicit conversion can be done from int to bool.
-                mtic_debug("mtic_readInputAsBool : Becareful implicit conversion from int to bool for the input {%s}.", name);
+                //Handle the case: An implicit conversion can be done from int to bool.
+                mtic_debug("mtic_readInputAsBool : Implicit conversion from int to bool for the input {%s}.", name);
                 return (bool) iop->value.i;
             }
             else if(iop->type == DOUBLE_T){
-                //Handle the case: A implicit conversion can be done from double to bool.
-                mtic_debug("mtic_readInputAsBool : Becareful implicit conversion from double to bool for the input {%s}.", name);
+                //Handle the case: An implicit conversion can be done from double to bool.
+                mtic_debug("mtic_readInputAsBool : Implicit conversion from double to bool for the input {%s}.", name);
                 return (bool) iop->value.d;
             }
             else if(iop->type == STRING_T){
-                //Handle the case: A implicit conversion can be done from string to bool.
+                //Handle the case: An implicit conversion can be done from string to bool.
 
                 // Test first if the input value is {true}, then {false}. Finally if the two previous test fail the function returns {false}.
                 if (!stricmp(iop->value.s, "true")){
-                    mtic_debug("mtic_readInputAsBool : Becareful implicit conversion from string to bool for the input {%s}.", name);
+                    mtic_debug("mtic_readInputAsBool : Implicit conversion from string to bool for the input {%s}.", name);
                     return true;
                 }
                 else if (!stricmp(iop->value.s, "false")){
-                    mtic_debug("mtic_readInputAsBool : Becareful implicit conversion from string to bool for the input {%s}.", name);
+                    mtic_debug("mtic_readInputAsBool : Implicit conversion from string to bool for the input {%s}.", name);
                     return false;
                 }
                 else{
-                    mtic_debug("mtic_readInputAsBool : Becareful implicit conversion fail to attempt for the input {%s}. String value is different from {true , false}.", name);
+                    mtic_debug("mtic_readInputAsBool : Implicit conversion fails to attempt for the input {%s}. String value is different from {true , false}.", name);
                     return false;
                 }
             }
             else{
-                //Handle the case: the input connot be handled.
+                //Handle the case: the input cannot be handled.
                 mtic_debug("mtic_readInputAsBool : Agent's input {%s} cannot be returned as a Boolean! By default {false} is returned.", name);
                 return false;
             }
@@ -498,17 +498,17 @@ int mtic_readInputAsInt(const char *name){
              return iop->value.i;
         }else{
             if(iop->type == BOOL_T){
-                //Handle the case: A implicit conversion can be done from bool to int.
-                mtic_debug("mtic_readInputAsInt : Becareful implicit conversion from bool to int for the input {%s}.", name);
+                //Handle the case: An implicit conversion can be done from bool to int.
+                mtic_debug("mtic_readInputAsInt : Implicit conversion from bool to int for the input {%s}.", name);
                 return (int) iop->value.b;
             }
             else if(iop->type == DOUBLE_T){
-                //Handle the case: A implicit conversion can be done from double to int.
-                mtic_debug("mtic_readInputAsInt : Becareful implicit conversion from double to int for the input {%s}.", name);
+                //Handle the case: An implicit conversion can be done from double to int.
+                mtic_debug("mtic_readInputAsInt : Implicit conversion from double to int for the input {%s}.", name);
                 return (int) iop->value.d;
             }
             else if(iop->type == STRING_T){
-                //Handle the case: A implicit conversion can be done from string to int.
+                //Handle the case: An implicit conversion can be done from string to int.
 
                 //Try to convert en int (1 expected value)
                 int value = 0;
@@ -516,16 +516,16 @@ int mtic_readInputAsInt(const char *name){
 
                 // Check if one value is returned.
                 if(test == 1){
-                    mtic_debug("mtic_readInputAsBool : Becareful implicit conversion from string to int for the input {%s}.", name);
+                    mtic_debug("mtic_readInputAsBool : Implicit conversion from string to int for the input {%s}.", name);
                     return value;
                 }
                 else{
-                    mtic_debug("mtic_readInputAsInt : Becareful implicit conversion fail to attempt for the input {%s}. String value is different from an integer.", name);
+                    mtic_debug("mtic_readInputAsInt : Implicit conversion fails to attempt for the input {%s}. String value is different from an integer.", name);
                     return value;
                 }
             }
             else{
-                //Handle the case: the input connot be handled.
+                //Handle the case: the input cannot be handled.
                 mtic_debug("mtic_readInputAsInt : Agent's input {%s} cannot be returned as an integer! By default {0} is returned.", name);
                 return 0;
             }
@@ -558,17 +558,17 @@ double mtic_readInputAsDouble(const char *name){
               return iop->value.d;
          }else{
              if(iop->type == BOOL_T){
-                 //Handle the case: A implicit conversion can be done from bool to double.
-                 mtic_debug("mtic_readInputAsDouble : Becareful implicit conversion from bool to double for the input {%s}.", name);
+                 //Handle the case: An implicit conversion can be done from bool to double.
+                 mtic_debug("mtic_readInputAsDouble : Implicit conversion from bool to double for the input {%s}.", name);
                  return (double) iop->value.b;
              }
              else if(iop->type == INTEGER_T){
-                 //Handle the case: A implicit conversion can be done from int to double.
-                 mtic_debug("mtic_readInputAsDouble : Becareful implicit conversion from int to double for the input {%s}.", name);
+                 //Handle the case: An implicit conversion can be done from int to double.
+                 mtic_debug("mtic_readInputAsDouble : Implicit conversion from int to double for the input {%s}.", name);
                  return (double) iop->value.i;
              }
              else if(iop->type == STRING_T){
-                 //Handle the case: A implicit conversion can be done from string to int.
+                 //Handle the case: An implicit conversion can be done from string to int.
 
                  //Try to convert en int (1 expected value)
                  double value = 0.0;
@@ -576,16 +576,16 @@ double mtic_readInputAsDouble(const char *name){
 
                  // Check if one value is returned.
                  if(test == 1){
-                     mtic_debug("mtic_readInputAsDouble : Becareful implicit conversion from string to double for the input {%s}.", name);
+                     mtic_debug("mtic_readInputAsDouble : Implicit conversion from string to double for the input {%s}.", name);
                      return value;
                  }
                  else{
-                     mtic_debug("mtic_readInputAsDouble : Becareful implicit conversion fail to attempt for the input {%s}. String value is different from a double.", name);
+                     mtic_debug("mtic_readInputAsDouble : Implicit conversion fails to attempt for the input {%s}. String value is different from a double.", name);
                      return value;
                  }
              }
              else{
-                //Handle the case: the input connot be handled.
+                //Handle the case: the input cannot be handled.
                  mtic_debug("mtic_readInputAsDouble : Agent's input {%s} cannot be returned as a double! By default {0.0} is returned.", name);
                  return 0.0;
              }
@@ -618,22 +618,21 @@ char* mtic_readInputAsString(const char *name){
             return strdup(iop->value.s);
         }else{
             if(iop->type == BOOL_T){
-                //Handle the case: A implicit conversion can be done from bool to string.
-                mtic_debug("mtic_readInputAsString : Becareful implicit conversion from bool to string for the input {%s}.", name);
-
+                //Handle the case: An implicit conversion can be done from bool to string.
+                mtic_debug("mtic_readInputAsString : Implicit conversion from bool to string for the input {%s}.", name);
             }
             else if(iop->type == INTEGER_T){
-                //Handle the case: A implicit conversion can be done from int to string.
-                mtic_debug("mtic_readInputAsString : Becareful implicit conversion from int to string for the input {%s}.", name);
+                //Handle the case: An implicit conversion can be done from int to string.
+                mtic_debug("mtic_readInputAsString : Implicit conversion from int to string for the input {%s}.", name);
                 return model_IntToString(iop->value.i);
             }
             else if(iop->type == DOUBLE_T){
-                //Handle the case: A implicit conversion can be done from double to string.
-                mtic_debug("mtic_readInputAsString : Becareful implicit conversion from double to string for the input {%s}.", name);
+                //Handle the case: An implicit conversion can be done from double to string.
+                mtic_debug("mtic_readInputAsString : Implicit conversion from double to string for the input {%s}.", name);
                 model_DoubleToString(iop->value.d);
             }
             else{
-               //Handle the case: the input connot be handled.
+               //Handle the case: the input cannot be handled.
                 mtic_debug("mtic_readInputAsDouble : Agent's input {%s} cannot be return as a string! By default {NULL} is return.", name);
                 return NULL;
             }
@@ -668,9 +667,38 @@ bool mtic_readOutputAsBool(const char *name){
         if(iop->type == BOOL_T){
             return iop->value.b;
         }else{
-            //Handle the case: the output is not a Boolean.
-            mtic_debug("mtic_readOutputAsBool : Agent's output %s is not a Boolean!", name);
-            return false;
+            if(iop->type == INTEGER_T){
+                //Handle the case: An implicit conversion can be done from int to bool.
+                mtic_debug("mtic_readOutputAsBool : Implicit conversion from int to bool for the output {%s}.", name);
+                return (bool) iop->value.i;
+            }
+            else if(iop->type == DOUBLE_T){
+                //Handle the case: An implicit conversion can be done from double to bool.
+                mtic_debug("mtic_readOutputAsBool : Implicit conversion from double to bool for the output {%s}.", name);
+                return (bool) iop->value.d;
+            }
+            else if(iop->type == STRING_T){
+                //Handle the case: An implicit conversion can be done from string to bool.
+
+                // Test first if the output value is {true}, then {false}. Finally if the two previous test fail the function returns {false}.
+                if (!stricmp(iop->value.s, "true")){
+                    mtic_debug("mtic_readOutputAsBool : Implicit conversion from string to bool for the output {%s}.", name);
+                    return true;
+                }
+                else if (!stricmp(iop->value.s, "false")){
+                    mtic_debug("mtic_readOutputAsBool : Implicit conversion from string to bool for the output {%s}.", name);
+                    return false;
+                }
+                else{
+                    mtic_debug("mtic_readOutputAsBool : Implicit conversion fails to attempt for the output {%s}. String value is different from {true , false}.", name);
+                    return false;
+                }
+            }
+            else{
+                //Handle the case: the output cannot be handled.
+                mtic_debug("mtic_readOutputAsBool : Agent's output {%s} cannot be returned as a Boolean! By default {false} is returned.", name);
+                return false;
+            }
         }
     }
     else{
@@ -697,9 +725,38 @@ int mtic_readOutputAsInt(const char *name){
         if(iop->type == INTEGER_T){
             return iop->value.i;
         }else{
-            //Handle the case: the output is not an integer.
-            mtic_debug("mtic_readOutputAsInt : Agent's output %s is not an interger!", name);
-            return 0;
+            if(iop->type == BOOL_T){
+                //Handle the case: An implicit conversion can be done from bool to int.
+                mtic_debug("mtic_readOutputAsInt : Implicit conversion from bool to int for the output {%s}.", name);
+                return (int) iop->value.b;
+            }
+            else if(iop->type == DOUBLE_T){
+                //Handle the case: An implicit conversion can be done from double to int.
+                mtic_debug("mtic_readOutputAsInt : Implicit conversion from double to int for the output {%s}.", name);
+                return (int) iop->value.d;
+            }
+            else if(iop->type == STRING_T){
+                //Handle the case: An implicit conversion can be done from string to int.
+
+                //Try to convert en int (1 expected value)
+                int value = 0;
+                int test = sscanf(iop->value.s, "%d", &value);
+
+                // Check if one value is returned.
+                if(test == 1){
+                    mtic_debug("mtic_readOutputAsInt : Implicit conversion from string to int for the output {%s}.", name);
+                    return value;
+                }
+                else{
+                    mtic_debug("mtic_readOutputAsInt : Implicit conversion fails to attempt for the output {%s}. String value is different from an integer.", name);
+                    return value;
+                }
+            }
+            else{
+                //Handle the case: the output cannot be handled.
+                mtic_debug("mtic_readOutputAsInt : Agent's output {%s} cannot be returned as an integer! By default {0} is returned.", name);
+                return 0;
+            }
         }
     }
     else{
@@ -726,9 +783,38 @@ double mtic_readOutputAsDouble(const char *name){
         if(iop->type == DOUBLE_T){
             return iop->value.d;
         }else{
-            //Handle the case: the output is not a double.
-            mtic_debug("mtic_readOutputAsDouble : Agent's output %s is not an double", name);
-            return 0.0;
+            if(iop->type == BOOL_T){
+                //Handle the case: An implicit conversion can be done from bool to double.
+                mtic_debug("mtic_readOutputAsDouble : Implicit conversion from bool to double for the output {%s}.", name);
+                return (double) iop->value.b;
+            }
+            else if(iop->type == INTEGER_T){
+                //Handle the case: An implicit conversion can be done from int to double.
+                mtic_debug("mtic_readOutputAsDouble : Implicit conversion from int to double for the output {%s}.", name);
+                return (double) iop->value.i;
+            }
+            else if(iop->type == STRING_T){
+                //Handle the case: An implicit conversion can be done from string to int.
+
+                //Try to convert en int (1 expected value)
+                double value = 0.0;
+                int test = sscanf(iop->value.s, "%lf", &value);
+
+                // Check if one value is returned.
+                if(test == 1){
+                    mtic_debug("mtic_readOutputAsDouble : Implicit conversion from string to double for the output {%s}.", name);
+                    return value;
+                }
+                else{
+                    mtic_debug("mtic_readOutputAsDouble : Implicit conversion fails to attempt for the output {%s}. String value is different from a double.", name);
+                    return value;
+                }
+            }
+            else{
+               //Handle the case: the output cannot be handled.
+                mtic_debug("mtic_readOutputAsDouble : Agent's output {%s} cannot be returned as a double! By default {0.0} is returned.", name);
+                return 0.0;
+            }
         }
     }
     else{
@@ -757,9 +843,25 @@ char* mtic_readOutputAsString(const char *name){
         if(iop->type == STRING_T){
             return strdup(iop->value.s);
         }else{
-            //Handle the case: the input is not a string.
-            mtic_debug("mtic_readOutputAsString: Agent's output %s is not a string", name);
-            return NULL;
+            if(iop->type == BOOL_T){
+                //Handle the case: An implicit conversion can be done from bool to string.
+                mtic_debug("mtic_readOutputAsString : Implicit conversion from bool to string for the output {%s}.", name);
+            }
+            else if(iop->type == INTEGER_T){
+                //Handle the case: An implicit conversion can be done from int to string.
+                mtic_debug("mtic_readOutputAsString : Implicit conversion from int to string for the output {%s}.", name);
+                return model_IntToString(iop->value.i);
+            }
+            else if(iop->type == DOUBLE_T){
+                //Handle the case: An implicit conversion can be done from double to string.
+                mtic_debug("mtic_readOutputAsString : Implicit conversion from double to string for the output {%s}.", name);
+                model_DoubleToString(iop->value.d);
+            }
+            else{
+               //Handle the case: the output cannot be handled.
+                mtic_debug("mtic_readOutputAsString : Agent's output {%s} cannot be return as a string! By default {NULL} is return.", name);
+                return NULL;
+            }
         }
     }
     else{
@@ -791,9 +893,38 @@ bool mtic_readParameterAsBool(const char *name){
         if(iop->type == BOOL_T){
             return iop->value.b;
         }else{
-            //Handle the case: the parameter is not a Boolean.
-            mtic_debug("mtic_readParameterAsBool : Agent's parameter %s is not a Boolean!", name);
-            return false;
+            if(iop->type == INTEGER_T){
+                //Handle the case: An implicit conversion can be done from int to bool.
+                mtic_debug("mtic_readParameterAsBool : Implicit conversion from int to bool for the output {%s}.", name);
+                return (bool) iop->value.i;
+            }
+            else if(iop->type == DOUBLE_T){
+                //Handle the case: An implicit conversion can be done from double to bool.
+                mtic_debug("mtic_readParameterAsBool : Implicit conversion from double to bool for the parameter {%s}.", name);
+                return (bool) iop->value.d;
+            }
+            else if(iop->type == STRING_T){
+                //Handle the case: An implicit conversion can be done from string to bool.
+
+                // Test first if the output value is {true}, then {false}. Finally if the two previous test fail the function returns {false}.
+                if (!stricmp(iop->value.s, "true")){
+                    mtic_debug("mtic_readParameterAsBool : Implicit conversion from string to bool for the parameter {%s}.", name);
+                    return true;
+                }
+                else if (!stricmp(iop->value.s, "false")){
+                    mtic_debug("mtic_readParameterAsBool : Implicit conversion from string to bool for the parameter {%s}.", name);
+                    return false;
+                }
+                else{
+                    mtic_debug("mtic_readParameterAsBool : Implicit conversion fails to attempt for the parameter {%s}. String value is different from {true , false}.", name);
+                    return false;
+                }
+            }
+            else{
+                //Handle the case: the parameter cannot be handled.
+                mtic_debug("mtic_readParameterAsBool : Agent's parameter {%s} cannot be returned as a Boolean! By default {false} is returned.", name);
+                return false;
+            }
         }
     }
     else{
@@ -820,9 +951,38 @@ int mtic_readParameterAsInt(const char *name){
         if(iop->type == INTEGER_T){
             return iop->value.i;
         }else{
-            //Handle the case: the parameter is not an integer.
-            mtic_debug("mtic_readParameterAsInt : Agent's parameter %s is not an integer!", name);
-            return 0;
+            if(iop->type == BOOL_T){
+                //Handle the case: An implicit conversion can be done from bool to int.
+                mtic_debug("mtic_readParameterAsInt : Implicit conversion from bool to int for the parameter {%s}.", name);
+                return (int) iop->value.b;
+            }
+            else if(iop->type == DOUBLE_T){
+                //Handle the case: An implicit conversion can be done from double to int.
+                mtic_debug("mtic_readParameterAsInt : Implicit conversion from double to int for the parameter {%s}.", name);
+                return (int) iop->value.d;
+            }
+            else if(iop->type == STRING_T){
+                //Handle the case: An implicit conversion can be done from string to int.
+
+                //Try to convert en int (1 expected value)
+                int value = 0;
+                int test = sscanf(iop->value.s, "%d", &value);
+
+                // Check if one value is returned.
+                if(test == 1){
+                    mtic_debug("mtic_readParameterAsInt : Implicit conversion from string to int for the parameter {%s}.", name);
+                    return value;
+                }
+                else{
+                    mtic_debug("mtic_readParameterAsInt : Implicit conversion fails to attempt for the parameter {%s}. String value is different from an integer.", name);
+                    return value;
+                }
+            }
+            else{
+                //Handle the case: the parameter cannot be handled.
+                mtic_debug("mtic_readParameterAsInt : Agent's parameter {%s} cannot be returned as an integer! By default {0} is returned.", name);
+                return 0;
+            }
         }
     }
     else{
@@ -849,9 +1009,38 @@ double mtic_readParameterAsDouble(const char *name){
         if(iop->type == DOUBLE_T){
             return iop->value.d;
         }else{
-            //Handle the case: the parameter is not a double.
-            mtic_debug("mtic_readParameterAsDouble : Agent's parameter %s is not an double!", name);
-            return 0.0;
+            if(iop->type == BOOL_T){
+                //Handle the case: An implicit conversion can be done from bool to double.
+                mtic_debug("mtic_readParameterAsDouble : Implicit conversion from bool to double for the parameter {%s}.", name);
+                return (double) iop->value.b;
+            }
+            else if(iop->type == INTEGER_T){
+                //Handle the case: An implicit conversion can be done from int to double.
+                mtic_debug("mtic_readParameterAsDouble : Implicit conversion from int to double for the parameter {%s}.", name);
+                return (double) iop->value.i;
+            }
+            else if(iop->type == STRING_T){
+                //Handle the case: An implicit conversion can be done from string to int.
+
+                //Try to convert en int (1 expected value)
+                double value = 0.0;
+                int test = sscanf(iop->value.s, "%lf", &value);
+
+                // Check if one value is returned.
+                if(test == 1){
+                    mtic_debug("mtic_readParameterAsDouble : Implicit conversion from string to double for the parameter {%s}.", name);
+                    return value;
+                }
+                else{
+                    mtic_debug("mtic_readParameterAsDouble : Implicit conversion fails to attempt for the parameter {%s}. String value is different from a double.", name);
+                    return value;
+                }
+            }
+            else{
+               //Handle the case: the parameter cannot be handled.
+                mtic_debug("mtic_readParameterAsDouble : Agent's parameter {%s} cannot be returned as a double! By default {0.0} is returned.", name);
+                return 0.0;
+            }
         }
     }
     else{
@@ -880,9 +1069,26 @@ char* mtic_readParameterAsString(const char *name){
         if(iop->type == STRING_T){
             return strdup(iop->value.s);
         }else{
-            //Handle the case: the input is not a string.
-            mtic_debug("mtic_readParameterAsString: Agent's parameter %s is not a string", name);
-            return NULL;
+            if(iop->type == BOOL_T){
+                //Handle the case: An implicit conversion can be done from bool to string.
+                mtic_debug("mtic_readParameterAsString : Implicit conversion from bool to string for the parameter {%s}.", name);
+
+            }
+            else if(iop->type == INTEGER_T){
+                //Handle the case: An implicit conversion can be done from int to string.
+                mtic_debug("mtic_readParameterAsString : Implicit conversion from int to string for the parameter {%s}.", name);
+                return model_IntToString(iop->value.i);
+            }
+            else if(iop->type == DOUBLE_T){
+                //Handle the case: An implicit conversion can be done from double to string.
+                mtic_debug("mtic_readParameterAsString : Implicit conversion from double to string for the parameter {%s}.", name);
+                model_DoubleToString(iop->value.d);
+            }
+            else{
+               //Handle the case: the parameter cannot be handled.
+                mtic_debug("mtic_readParameterAsString : Agent's parameter {%s} cannot be return as a string! By default {NULL} is return.", name);
+                return NULL;
+            }
         }
     }
     else{
