@@ -254,6 +254,9 @@ model_state mtic_observe(const char *iop_name,
 model_state mtic_set(const char* iop_name, void* new_value);
 void * mtic_get(const char* name_iop, model_state* state);
 
+// Conversions
+char* model_IntToString(const int value);
+char* model_DoubleToString(const double value);
 
 //////////////////  network   //////////////////
 int network_publishOutput (const char* output_name);

@@ -324,7 +324,7 @@ int mtic_muteAll()
 }
 
 /*
- * Function: unmtic_muteAll
+ * Function: mtic_unmuteAll
  * ----------------------------
  *  Unmute all outputs.
  *
@@ -356,7 +356,43 @@ int mtic_unmuteAll()
 ////////////////////////////////////////////////////////////////////////
 //à remplir ou déplacer ici
 
+/*
+ * Function: model_model_IntToString
+ * ----------------------------
+ *  Carry out conversion from int to string.
+ *
+ *  return : the int value as a string.
+ */
+char* model_IntToString(const int value)
+{
+    // Compute the size of allocate for str.
+    int length = snprintf( NULL, 0, "%d", value );
+    // Allocate the memory.
+    char* str = malloc( length + 1 );
+    // Write the value into str.
+    snprintf( str, length + 1, "%d", value );
 
+    return str;
+}
+
+/*
+ * Function: model_DoubleToString
+ * ----------------------------
+ *  Carry out conversion from double to string.
+ *
+ *  return : the double value as a string.
+ */
+char* model_DoubleToString(const double value)
+{
+    // Compute the size of allocate for str.
+    int length = snprintf( NULL, 0, "%fl", value);
+    // Allocate the memory.
+    char* str = malloc( length + 1 );
+    // Write the value into str.
+    snprintf( str, length + 1, "%lf", value);
+
+    return str;
+}
 
 ////////////////////////////////////////////////////////////////////////
 // PUBLIC API
@@ -584,33 +620,17 @@ char* mtic_readInputAsString(const char *name){
             if(iop->type == BOOL_T){
                 //Handle the case: A implicit conversion can be done from bool to string.
                 mtic_debug("mtic_readInputAsString : Becareful implicit conversion from bool to string for the input {%s}.", name);
-                return iop->value.b ? strdup("true"): strdup("false");
+
             }
             else if(iop->type == INTEGER_T){
                 //Handle the case: A implicit conversion can be done from int to string.
                 mtic_debug("mtic_readInputAsString : Becareful implicit conversion from int to string for the input {%s}.", name);
-
-                // Compute the size of allocate for str.
-                int length = snprintf( NULL, 0, "%d", iop->value.i );
-                // Allocate the memory.
-                char* str = malloc( length + 1 );
-                // Write the value into str.
-                snprintf( str, length + 1, "%d", iop->value.i );
-
-                return str;
+                return model_IntToString(iop->value.i);
             }
             else if(iop->type == DOUBLE_T){
                 //Handle the case: A implicit conversion can be done from double to string.
                 mtic_debug("mtic_readInputAsString : Becareful implicit conversion from double to string for the input {%s}.", name);
-
-                // Compute the size of allocate for str.
-                int length = snprintf( NULL, 0, "%fl", iop->value.d );
-                // Allocate the memory.
-                char* str = malloc( length + 1 );
-                // Write the value into str.
-                snprintf( str, length + 1, "%lf", iop->value.d );
-
-                return str;
+                model_DoubleToString(iop->value.d);
             }
             else{
                //Handle the case: the input connot be handled.
