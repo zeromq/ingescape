@@ -206,7 +206,7 @@ PUBLIC int mtic_setMappingVersion(char *version);
 PUBLIC int mtic_getMappingEntriesNumber(); //number of entries in the mapping output type
 PUBLIC int mtic_addMappingEntry(char *fromOurInput, char *toAgent, char *withOutput); //returns mapping id or 0 if creation failed
 PUBLIC int mtic_removeMappingEntryWithId(int theId);
-int mtic_removeMappingEntryWithName(char *fromOurInput, char *toAgent, char *withOutput);
+PUBLIC int mtic_removeMappingEntryWithName(char *fromOurInput, char *toAgent, char *withOutput);
 
 
 #endif /* mastic_public_h */
