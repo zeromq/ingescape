@@ -824,14 +824,101 @@ int mtic_writeParameterAsData(const char *name, void *value, long size){
 
 
 //check IOP type, lists and existence
+
+/**
+ * \fn iopType_t mtic_getTypeForInput(const char *name)
+ * \brief this function returns the value type of the input (integer, bool, etc .)
+ *
+ * \param name The string which contains the name of the input. Can't be NULL or empty.
+ * \return The Input value type.
+ * 0 The input name cannot be NULL or empty.
+ * -1 The input named is not found
+ */
 iopType_t mtic_getTypeForInput(const char *name){
-    return INTEGER_T;
+
+    //Check the name
+    if((name == NULL) || (strlen(name) == 0)){
+        mtic_debug("The input name cannot be NULL or empty\n");
+        return 0;
+    }
+
+    //Find the Iop
+    agent_iop *inputFound = NULL;
+
+    //Find the input by the name in the table of the my agent's definition
+    HASH_FIND_STR(mtic_definition_live->inputs_table, name, inputFound);
+
+    if(inputFound == NULL){
+        mtic_debug("The input named : %s is not found in the table.\n", name);
+        return -1;
+    }
+
+    //Return the type of the value
+    return inputFound->type;
 }
+
+/**
+ * \fn iopType_t mtic_getTypeForOutput(const char *name)
+ * \brief this function returns the value type of the output (integer, bool, etc .)
+ *
+ * \param name The string which contains the name of the output. Can't be NULL or empty.
+ * \return The output value type.
+ * 0 The output name cannot be NULL or empty.
+ * -1 The output named is not found
+ */
 iopType_t mtic_getTypeForOutput(const char *name){
-    return INTEGER_T;
+
+    //Check the name
+    if((name == NULL) || (strlen(name) == 0)){
+        mtic_debug("The output name cannot be NULL or empty\n");
+        return 0;
+    }
+
+    //Find the Iop
+    agent_iop *outputFound = NULL;
+
+    //Find the output by the name in the table of the my agent's definition
+    HASH_FIND_STR(mtic_definition_live->outputs_table, name, outputFound);
+
+    if(outputFound == NULL){
+        mtic_debug("The output named : %s is not found in the table.\n", name);
+        return -1;
+    }
+
+    //Return the type of the value
+    return outputFound->type;
 }
+
+/**
+ * \fn iopType_t mtic_getTypeForParameter(const char *name)
+ * \brief this function returns the value type of the parameter (integer, bool, etc .)
+ *
+ * \param name The string which contains the name of the parameter. Can't be NULL or empty.
+ * \return The parameter value type.
+ * 0 The parameter name cannot be NULL or empty.
+ * -1 The parameter named is not found
+ */
 iopType_t mtic_getTypeForParameter(const char *name){
-    return INTEGER_T;
+
+    //Check the name
+    if((name == NULL) || (strlen(name) == 0)){
+        mtic_debug("The parameter name cannot be NULL or empty\n");
+        return 0;
+    }
+
+    //Find the Iop
+    agent_iop *parameterFound = NULL;
+
+    //Find the output by the name in the table of the my agent's definition
+    HASH_FIND_STR(mtic_definition_live->params_table, name, parameterFound);
+
+    if(parameterFound == NULL){
+        mtic_debug("The parameter named : %s is not found in the table.\n", name);
+        return -1;
+    }
+
+    //Return the type of the value
+    return parameterFound->type;
 }
 
 void mtic_getInputsList(char **list, long nbOfElements){
@@ -844,14 +931,90 @@ void mtic_getParametersList(char **list, long nbOfElements){
     
 }
 
+/**
+ * \fn bool mtic_checkInputExistence(const char *name)
+ * \brief this function returns the state of the input existence.
+ *
+ * \param name The string which contains the name of the input. Can't be NULL or empty.
+ * \return A boolean "true" if the input exist.
+ */
 bool mtic_checkInputExistence(const char *name){
-    return 1;
+
+    //Check the name
+    if((name == NULL) || (strlen(name) == 0)){
+        mtic_debug("The input name cannot be NULL or empty\n");
+        return false;
+    }
+
+    //Find the Iop
+    agent_iop *inputFound = NULL;
+
+    //Find the input by the name in the table of the my agent's definition
+    HASH_FIND_STR(mtic_definition_live->inputs_table, name, inputFound);
+
+    if(inputFound == NULL){
+        mtic_debug("The input named : %s is not found in the table.\n", name);
+        return false;
+    }
+
+    return true;
 }
+
+/**
+ * \fn bool mtic_checkOutputExistence(const char *name)
+ * \brief this function returns the state of the output existence.
+ *
+ * \param name The string which contains the name of the output. Can't be NULL or empty.
+ * \return A boolean "true" if the output exist.
+ */
 bool mtic_checkOutputExistence(const char *name){
-    return 1;
+
+    //Check the name
+    if((name == NULL) || (strlen(name) == 0)){
+        mtic_debug("The output name cannot be NULL or empty\n");
+        return false;
+    }
+
+    //Find the Iop
+    agent_iop *outputFound = NULL;
+
+    //Find the input by the name in the table of the my agent's definition
+    HASH_FIND_STR(mtic_definition_live->outputs_table, name, outputFound);
+
+    if(outputFound == NULL){
+        mtic_debug("The output named : %s is not found in the table.\n", name);
+        return false;
+    }
+
+    return true;
 }
+
+/**
+ * \fn bool mtic_checkParameterExistence(const char *name)
+ * \brief this function returns the state of the parameter existence.
+ *
+ * \param name The string which contains the name of the parameter. Can't be NULL or empty.
+ * \return A boolean "true" if the output exist.
+ */
 bool mtic_checkParameterExistence(const char *name){
-    return 1;
+    //Check the name
+    if((name == NULL) || (strlen(name) == 0)){
+        mtic_debug("The parameter name cannot be NULL or empty\n");
+        return false;
+    }
+
+    //Find the Iop
+    agent_iop *parameterFound = NULL;
+
+    //Find the input by the name in the table of the my agent's definition
+    HASH_FIND_STR(mtic_definition_live->params_table, name, parameterFound);
+
+    if(parameterFound == NULL){
+        mtic_debug("The parameter named : %s is not found in the table.\n", name);
+        return false;
+    }
+
+    return true;
 }
 
 //observe IOP

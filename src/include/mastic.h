@@ -63,13 +63,13 @@ PUBLIC void mtic_setCanBeFreezed (bool canBeFreezed);
 //IOP Model : Inputs, Outputs and Parameters read/write/check/observe/mute
 
 typedef enum {
-    INPUT_T,
+    INPUT_T = 1,
     OUTPUT_T,
     PARAMETER_T
 } iop_t;
 
 typedef enum {
-    INTEGER_T,
+    INTEGER_T = 1,
     DOUBLE_T,
     STRING_T,
     BOOL_T,
@@ -141,17 +141,17 @@ int mtic_writeParameterAsData(const char *name, void *value, long size);
 
 
 //check IOP type, lists and existence
-iopType_t mtic_getTypeForInput(const char *name);
-iopType_t mtic_getTypeForOutput(const char *name);
-iopType_t mtic_getTypeForParameter(const char *name);
+PUBLIC iopType_t mtic_getTypeForInput(const char *name);
+PUBLIC iopType_t mtic_getTypeForOutput(const char *name);
+PUBLIC iopType_t mtic_getTypeForParameter(const char *name);
 
 void mtic_getInputsList(char **list, long nbOfElements);
 void mtic_getOutputsList(char **list, long nbOfElements);
 void mtic_getParametersList(char **list, long nbOfElements);
 
-bool mtic_checkInputExistence(const char *name);
-bool mtic_checkOutputExistence(const char *name);
-bool mtic_checkParameterExistence(const char *name);
+PUBLIC bool mtic_checkInputExistence(const char *name);
+PUBLIC bool mtic_checkOutputExistence(const char *name);
+PUBLIC bool mtic_checkParameterExistence(const char *name);
 
 //observe IOP
 //calback format for IOP observation
