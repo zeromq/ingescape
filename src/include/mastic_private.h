@@ -268,6 +268,7 @@ const char* export_category (category* cat);
 definition* parser_loadDefinition (const char* json_str);
 definition* parser_loadDefinitionFromPath (const char* file_path);
 char* export_definition (definition* def);
+char* export_mapping(mapping * mapp);
 mapping* parser_LoadMap (const char* json_str);
 mapping* parser_LoadMapFromPath (const char* load_file);
 int mtic_init_mapping (const char* mapping_file_path);

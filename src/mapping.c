@@ -823,8 +823,24 @@ int mtic_loadMappingFromPath (const char* file_path){
 int mtic_clearMapping(){ //clears mapping data for the agent
     return 1;
 }
+
+/**
+ * \fn char* mtic_getMapping()
+ * \brief the agent mapping getter
+ *
+ * \return The loaded mapping string in json format (allocated). NULL if mtic_my_agent_mapping was not initialized.
+ */
 char* mtic_getMapping(){ //returns json string
-    return NULL;
+    char * mappingJson = NULL;
+
+    if(mtic_my_agent_mapping == NULL){
+        mtic_debug("The structure mtic_my_agent_mapping is NULL");
+        return NULL;
+    }
+
+    mappingJson = export_mapping(mtic_my_agent_mapping);
+
+    return mappingJson;
 }
 
 //edit mapping using the API

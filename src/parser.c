@@ -626,6 +626,94 @@ static void json_dump_definition (yajl_gen *g, definition* def) {
     yajl_gen_map_close(*g);
 }
 
+/*
+ * Function: json_dump_mapping_out
+ * -----------------------
+ *   convert a mapping_out structure into json string
+ */
+
+static void json_dump_mapping_out (yajl_gen *g, mapping_out* mapp_out) {
+
+    yajl_gen_map_open(*g);
+
+    yajl_gen_string(*g, (const unsigned char *) "input_name", strlen("input_name"));
+    yajl_gen_string(*g, (const unsigned char *) mapp_out->input_name, strlen (mapp_out->input_name));
+
+    yajl_gen_string(*g, (const unsigned char *) "agent_name", strlen("agent_name"));
+    yajl_gen_string(*g, (const unsigned char *) mapp_out->agent_name, strlen(mapp_out->agent_name));
+
+    yajl_gen_string(*g, (const unsigned char *) "output_name", strlen("output_name"));
+    yajl_gen_string(*g, (const unsigned char *) mapp_out->output_name, strlen(mapp_out->output_name));
+
+    yajl_gen_map_close(*g);
+}
+/*
+ * Function: json_dump_mapping_cat
+ * -----------------------
+ *   convert a mapping_cat structure into json string
+ */
+
+static void json_dump_mapping_cat (yajl_gen *g, mapping_cat* mapp_cat) {
+
+    yajl_gen_map_open(*g);
+
+    yajl_gen_string(*g, (const unsigned char *) "agent_name", strlen("agent_name"));
+    yajl_gen_string(*g, (const unsigned char *) mapp_cat->agent_name, strlen (mapp_cat->agent_name));
+
+    yajl_gen_string(*g, (const unsigned char *) "category_name", strlen("category_name"));
+    yajl_gen_string(*g, (const unsigned char *) mapp_cat->category_name, strlen(mapp_cat->category_name));
+
+    yajl_gen_map_close(*g);
+}
+
+/*
+ * Function: json_dump_mapping
+ * ------------------------------
+ *   convert a mapping structure into mapping.json string
+ */
+
+static void json_dump_mapping (yajl_gen *g, mapping* mapp) {
+
+    unsigned int hashCount = 0;
+    struct mapping_out *currentMapOut;
+    struct mapping_cat *currentMapCat;
+
+    yajl_gen_map_open(*g);
+
+    yajl_gen_string(*g, (const unsigned char *) STR_NAME, strlen(STR_NAME));
+    yajl_gen_string(*g, (const unsigned char *) mapp->name, strlen (mapp->name));
+
+    yajl_gen_string(*g, (const unsigned char *) STR_DESCRIPTION, strlen(STR_DESCRIPTION));
+    yajl_gen_string(*g, (const unsigned char *) mapp->description, strlen (mapp->description));
+
+    yajl_gen_string(*g, (const unsigned char *) STR_VERSION, strlen(STR_VERSION));
+    yajl_gen_string(*g, (const unsigned char *) mapp->version, strlen(mapp->version));
+
+    //Mapping_out
+    hashCount = HASH_COUNT(mapp->map_out);
+    if (hashCount) {
+        yajl_gen_string(*g, (const unsigned char *) "mapping_out", strlen("mapping_out"));
+        yajl_gen_array_open(*g);
+        for(currentMapOut=mapp->map_out; currentMapOut != NULL; currentMapOut=currentMapOut->hh.next) {
+            json_dump_mapping_out(g, currentMapOut);
+        }
+        yajl_gen_array_close(*g);
+    }
+
+    //Mapping_cat
+    hashCount = HASH_COUNT(mapp->map_cat);
+    if (hashCount) {
+        yajl_gen_string(*g, (const unsigned char *) "mapping_cat", strlen("mapping_cat"));
+        yajl_gen_array_open(*g);
+        for(currentMapCat=mapp->map_cat; currentMapCat != NULL; currentMapCat=currentMapOut->hh.next) {
+            json_dump_mapping_cat(g, currentMapCat);
+        }
+        yajl_gen_array_close(*g);
+    }
+
+    yajl_gen_map_close(*g);
+}
+
 
 // --------- Public API for json parsing / dumping --------------------//
 
@@ -794,6 +882,41 @@ char* export_definition (definition* def) {
     
     yajl_gen_free(g);
     
+    return result;
+}
+
+/*
+ * Function: export_mapping
+ * ----------------------------
+ *   Returns a agent's mapping structure into a standartised format json string UTF8 to send it throught the BUS or save it in a file
+ *
+ *   mapp    : the agent's mapping dump in string
+ *
+ *   returns: a mapping json format string UTF8
+ */
+char* export_mapping(mapping *mapp){
+    char* result = NULL;
+    const unsigned char * json_str = NULL;
+    size_t len;
+    yajl_gen g;
+
+    g = yajl_gen_alloc(NULL);
+    yajl_gen_config(g, yajl_gen_beautify, 1);
+    yajl_gen_config(g, yajl_gen_validate_utf8, 1);
+
+    yajl_gen_map_open(g);
+    yajl_gen_string(g, (const unsigned char *) "mapping", strlen("mapping"));
+    json_dump_mapping(&g, mapp);
+    yajl_gen_map_close(g);
+
+    // try to get our dumping result
+    if (yajl_gen_get_buf(g, &json_str, &len) == yajl_gen_status_ok)
+    {
+        result = strdup((const char*) json_str);
+    }
+
+    yajl_gen_free(g);
+
     return result;
 }
 

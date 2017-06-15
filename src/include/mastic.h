@@ -197,7 +197,7 @@ PUBLIC int mtic_removeParameter(const char *name);
 PUBLIC int mtic_loadMapping (const char* json_str);
 PUBLIC int mtic_loadMappingFromPath (const char* file_path);
 int mtic_clearMapping(); //clears mapping data for the agent
-char* mtic_getMapping(); //returns json string
+PUBLIC char* mtic_getMapping(); //returns json string
 
 //edit mapping using the API
 int mtic_setMappingName(char *name);
