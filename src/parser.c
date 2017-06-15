@@ -675,8 +675,8 @@ static void json_dump_mapping_cat (yajl_gen *g, mapping_cat* mapp_cat) {
 static void json_dump_mapping (yajl_gen *g, mapping* mapp) {
 
     unsigned int hashCount = 0;
-    struct mapping_out *currentMapOut;
-    struct mapping_cat *currentMapCat;
+    struct mapping_out *currentMapOut = NULL;
+    struct mapping_cat *currentMapCat = NULL;
 
     yajl_gen_map_open(*g);
 
