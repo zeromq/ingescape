@@ -831,8 +831,9 @@ int mtic_writeParameterAsData(const char *name, void *value, long size){
  *
  * \param name The string which contains the name of the input. Can't be NULL or empty.
  * \return The Input value type.
- * 0 The input name cannot be NULL or empty.
- * -1 The input named is not found
+ * 0 The parameter name cannot be NULL or empty.
+ * -1 The definition live is NULL.
+ * -2 The parameter named is not found
  */
 iopType_t mtic_getTypeForInput(const char *name){
 
@@ -845,12 +846,18 @@ iopType_t mtic_getTypeForInput(const char *name){
     //Find the Iop
     agent_iop *inputFound = NULL;
 
+    //check if def live iexist
+    if(mtic_definition_live == NULL){
+        mtic_debug("Definition live is NULL.");
+        return -1;
+    }
+
     //Find the input by the name in the table of the my agent's definition
     HASH_FIND_STR(mtic_definition_live->inputs_table, name, inputFound);
 
     if(inputFound == NULL){
         mtic_debug("The input named : %s is not found in the table.\n", name);
-        return -1;
+        return -2;
     }
 
     //Return the type of the value
@@ -863,8 +870,9 @@ iopType_t mtic_getTypeForInput(const char *name){
  *
  * \param name The string which contains the name of the output. Can't be NULL or empty.
  * \return The output value type.
- * 0 The output name cannot be NULL or empty.
- * -1 The output named is not found
+ * 0 The parameter name cannot be NULL or empty.
+ * -1 The definition live is NULL.
+ * -2 The parameter named is not found
  */
 iopType_t mtic_getTypeForOutput(const char *name){
 
@@ -877,12 +885,18 @@ iopType_t mtic_getTypeForOutput(const char *name){
     //Find the Iop
     agent_iop *outputFound = NULL;
 
+    //check if def live iexist
+    if(mtic_definition_live == NULL){
+        mtic_debug("Definition live is NULL.");
+        return -1;
+    }
+
     //Find the output by the name in the table of the my agent's definition
     HASH_FIND_STR(mtic_definition_live->outputs_table, name, outputFound);
 
     if(outputFound == NULL){
         mtic_debug("The output named : %s is not found in the table.\n", name);
-        return -1;
+        return -2;
     }
 
     //Return the type of the value
@@ -896,7 +910,8 @@ iopType_t mtic_getTypeForOutput(const char *name){
  * \param name The string which contains the name of the parameter. Can't be NULL or empty.
  * \return The parameter value type.
  * 0 The parameter name cannot be NULL or empty.
- * -1 The parameter named is not found
+ * -1 The definition live is NULL.
+ * -2 The parameter named is not found
  */
 iopType_t mtic_getTypeForParameter(const char *name){
 
@@ -909,12 +924,18 @@ iopType_t mtic_getTypeForParameter(const char *name){
     //Find the Iop
     agent_iop *parameterFound = NULL;
 
+    //check if def live iexist
+    if(mtic_definition_live == NULL){
+        mtic_debug("Definition live is NULL.");
+        return -1;
+    }
+
     //Find the output by the name in the table of the my agent's definition
     HASH_FIND_STR(mtic_definition_live->params_table, name, parameterFound);
 
     if(parameterFound == NULL){
         mtic_debug("The parameter named : %s is not found in the table.\n", name);
-        return -1;
+        return -2;
     }
 
     //Return the type of the value
@@ -949,6 +970,12 @@ bool mtic_checkInputExistence(const char *name){
     //Find the Iop
     agent_iop *inputFound = NULL;
 
+    //check if def live iexist
+    if(mtic_definition_live == NULL){
+        mtic_debug("Definition live is NULL.");
+        return false;
+    }
+
     //Find the input by the name in the table of the my agent's definition
     HASH_FIND_STR(mtic_definition_live->inputs_table, name, inputFound);
 
@@ -978,6 +1005,12 @@ bool mtic_checkOutputExistence(const char *name){
     //Find the Iop
     agent_iop *outputFound = NULL;
 
+    //check if def live iexist
+    if(mtic_definition_live == NULL){
+        mtic_debug("Definition live is NULL.");
+        return false;
+    }
+
     //Find the input by the name in the table of the my agent's definition
     HASH_FIND_STR(mtic_definition_live->outputs_table, name, outputFound);
 
@@ -1005,6 +1038,12 @@ bool mtic_checkParameterExistence(const char *name){
 
     //Find the Iop
     agent_iop *parameterFound = NULL;
+
+    //check if def live iexist
+    if(mtic_definition_live == NULL){
+        mtic_debug("Definition live is NULL.");
+        return false;
+    }
 
     //Find the input by the name in the table of the my agent's definition
     HASH_FIND_STR(mtic_definition_live->params_table, name, parameterFound);
