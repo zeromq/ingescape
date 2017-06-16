@@ -510,7 +510,7 @@ int mtic_readInputAsInt(const char *name){
             else if(iop->type == STRING_T){
                 //Handle the case: An implicit conversion can be done from string to int.
 
-                //Try to convert en int (1 expected value)
+                //Try to convert to int (1 expected value)
                 int value = 0;
                 int test = sscanf(iop->value.s, "%d", &value);
 
@@ -568,9 +568,9 @@ double mtic_readInputAsDouble(const char *name){
                  return (double) iop->value.i;
              }
              else if(iop->type == STRING_T){
-                 //Handle the case: An implicit conversion can be done from string to int.
+                 //Handle the case: An implicit conversion can be done from string to double.
 
-                 //Try to convert en int (1 expected value)
+                 //Try to convert to double (1 expected value)
                  double value = 0.0;
                  int test = sscanf(iop->value.s, "%lf", &value);
 
@@ -703,7 +703,7 @@ bool mtic_readOutputAsBool(const char *name){
     }
     else{
         //Handle the case: the output is not found.
-        mtic_debug("mtic_readOutputAsBool : Any Agent's output has been returned", name);
+        mtic_debug("mtic_readOutputAsBool : Any Agent's output {%s} has been returned", name);
         return false;
     }
 }
@@ -738,7 +738,7 @@ int mtic_readOutputAsInt(const char *name){
             else if(iop->type == STRING_T){
                 //Handle the case: An implicit conversion can be done from string to int.
 
-                //Try to convert en int (1 expected value)
+                //Try to convert to int (1 expected value)
                 int value = 0;
                 int test = sscanf(iop->value.s, "%d", &value);
 
@@ -761,7 +761,7 @@ int mtic_readOutputAsInt(const char *name){
     }
     else{
         //Handle the case: the output is not found.
-        mtic_debug("mtic_readOutputAsInt : Any Agent's output has been returned", name);
+        mtic_debug("mtic_readOutputAsInt : Any Agent's output {%s} has been returned", name);
         return 0;
     }
 }
@@ -796,7 +796,7 @@ double mtic_readOutputAsDouble(const char *name){
             else if(iop->type == STRING_T){
                 //Handle the case: An implicit conversion can be done from string to int.
 
-                //Try to convert en int (1 expected value)
+                //Try to convert to double (1 expected value)
                 double value = 0.0;
                 int test = sscanf(iop->value.s, "%lf", &value);
 
@@ -819,7 +819,7 @@ double mtic_readOutputAsDouble(const char *name){
     }
     else{
         //Handle the case: the output is not found.
-        mtic_debug("mtic_readOutputAsDouble : Any Agent's output has been returned", name);
+        mtic_debug("mtic_readOutputAsDouble : Any Agent's output {%s} has been returned", name);
         return 0.0;
     }
 }
@@ -859,14 +859,14 @@ char* mtic_readOutputAsString(const char *name){
             }
             else{
                //Handle the case: the output cannot be handled.
-                mtic_debug("mtic_readOutputAsString : Agent's output {%s} cannot be return as a string! By default {NULL} is return.", name);
+                mtic_debug("mtic_readOutputAsString : Agent's output {%s} cannot be returned as a string! By default {NULL} is return.", name);
                 return NULL;
             }
         }
     }
     else{
         //Handle the case: the output is not found.
-        mtic_debug("mtic_readOutputAsString : Agent's output %s cannot be found", name);
+        mtic_debug("mtic_readOutputAsString : Agent's output {%s} cannot be found", name);
         return NULL;
     }
 }
@@ -929,7 +929,7 @@ bool mtic_readParameterAsBool(const char *name){
     }
     else{
         //Handle the case: the parameter is not found.
-        mtic_debug("mtic_readParameterAsBool : Any Agent's parameter has been returned", name);
+        mtic_debug("mtic_readParameterAsBool : Any Agent's parameter {%s} has been returned", name);
         return false;
     }
 }
@@ -964,7 +964,7 @@ int mtic_readParameterAsInt(const char *name){
             else if(iop->type == STRING_T){
                 //Handle the case: An implicit conversion can be done from string to int.
 
-                //Try to convert en int (1 expected value)
+                //Try to convert to int (1 expected value)
                 int value = 0;
                 int test = sscanf(iop->value.s, "%d", &value);
 
@@ -987,7 +987,7 @@ int mtic_readParameterAsInt(const char *name){
     }
     else{
         //Handle the case: the parameter is not found.
-        mtic_debug("mtic_readParameterAsInt : Any Agent's parameter has been returned", name);
+        mtic_debug("mtic_readParameterAsInt : Any Agent's parameter {%s} has been returned", name);
         return 0;
     }
 }
@@ -1022,7 +1022,7 @@ double mtic_readParameterAsDouble(const char *name){
             else if(iop->type == STRING_T){
                 //Handle the case: An implicit conversion can be done from string to int.
 
-                //Try to convert en int (1 expected value)
+                //Try to convert to double (1 expected value)
                 double value = 0.0;
                 int test = sscanf(iop->value.s, "%lf", &value);
 
@@ -1045,7 +1045,7 @@ double mtic_readParameterAsDouble(const char *name){
     }
     else{
         //Handle the case: the parameter is not found.
-        mtic_debug("mtic_readParameterAsDouble : Any Agent's parameter has been returned", name);
+        mtic_debug("mtic_readParameterAsDouble : Any Agent's parameter {%s} has been returned", name);
         return 0.0;
     }
 }
@@ -1086,14 +1086,14 @@ char* mtic_readParameterAsString(const char *name){
             }
             else{
                //Handle the case: the parameter cannot be handled.
-                mtic_debug("mtic_readParameterAsString : Agent's parameter {%s} cannot be return as a string! By default {NULL} is return.", name);
+                mtic_debug("mtic_readParameterAsString : Agent's parameter {%s} cannot be returned as a string! By default {NULL} is return.", name);
                 return NULL;
             }
         }
     }
     else{
         //Handle the case: the input is not found.
-        mtic_debug("mtic_readParameterAsString : Agent's parameter %s cannot be found", name);
+        mtic_debug("mtic_readParameterAsString : Agent's parameter {%s} cannot be found", name);
         return NULL;
     }
 }
