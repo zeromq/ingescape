@@ -38,14 +38,14 @@ PUBLIC char *mtic_getAgentName(); //returned string shall be freed by caller
 
 //pause and resume the agent
 typedef void (*mtic_freezeCallback)(bool isPaused, void *myData);
-int mtic_freeze();
-bool mtic_isFreezed();
-int mtic_unfreeze();
-int mtic_observeFreeze(mtic_freezeCallback cb, void *myData);
+PUBLIC int mtic_freeze();
+PUBLIC bool mtic_isFreezed();
+PUBLIC int mtic_unfreeze();
+PUBLIC int mtic_observeFreeze(mtic_freezeCallback cb, void *myData);
 
 //control agent state
-int mtic_setAgentState(const char *state);
-char *mtic_getAgentState(); //returned string shall be freed by caller
+PUBLIC int mtic_setAgentState(const char *state);
+PUBLIC char *mtic_getAgentState(); //returned string shall be freed by caller
 
 //mute the agent
 int mtic_mute();
@@ -53,8 +53,8 @@ int mtic_unmute();
 bool mtic_isMuted();
 
 //set library parameters
-void mtic_setVerbose (bool verbose);
-void mtic_setCanBeFreezed (bool canBeFreezed);
+PUBLIC void mtic_setVerbose (bool verbose);
+PUBLIC void mtic_setCanBeFreezed (bool canBeFreezed);
 
 
 
@@ -63,13 +63,13 @@ void mtic_setCanBeFreezed (bool canBeFreezed);
 //IOP Model : Inputs, Outputs and Parameters read/write/check/observe/mute
 
 typedef enum {
-    INPUT_T,
+    INPUT_T = 1,
     OUTPUT_T,
     PARAMETER_T
 } iop_t;
 
 typedef enum {
-    INTEGER_T,
+    INTEGER_T = 1,
     DOUBLE_T,
     STRING_T,
     BOOL_T,
@@ -141,17 +141,17 @@ int mtic_writeParameterAsData(const char *name, void *value, long size);
 
 
 //check IOP type, lists and existence
-iopType_t mtic_getTypeForInput(const char *name);
-iopType_t mtic_getTypeForOutput(const char *name);
-iopType_t mtic_getTypeForParameter(const char *name);
+PUBLIC iopType_t mtic_getTypeForInput(const char *name);
+PUBLIC iopType_t mtic_getTypeForOutput(const char *name);
+PUBLIC iopType_t mtic_getTypeForParameter(const char *name);
 
 void mtic_getInputsList(char **list, long nbOfElements);
 void mtic_getOutputsList(char **list, long nbOfElements);
 void mtic_getParametersList(char **list, long nbOfElements);
 
-bool mtic_checkInputExistence(const char *name);
-bool mtic_checkOutputExistence(const char *name);
-bool mtic_checkParameterExistence(const char *name);
+PUBLIC bool mtic_checkInputExistence(const char *name);
+PUBLIC bool mtic_checkOutputExistence(const char *name);
+PUBLIC bool mtic_checkParameterExistence(const char *name);
 
 //observe IOP
 //calback format for IOP observation
@@ -196,17 +196,17 @@ PUBLIC int mtic_removeParameter(const char *name);
 
 PUBLIC int mtic_loadMapping (const char* json_str);
 PUBLIC int mtic_loadMappingFromPath (const char* file_path);
-int mtic_clearMapping(); //clears mapping data for the agent
-char* mtic_getMapping(); //returns json string
+PUBLIC int mtic_clearMapping(); //clears mapping data for the agent
+PUBLIC char* mtic_getMapping(); //returns json string
 
 //edit mapping using the API
-int mtic_setMappingName(char *name);
-int mtic_setMappingDescription(char *description);
-int mtic_setMappingVersion(char *description);
-int mtic_getMappingEntriesNumber(); //number of entries in the mapping
-int mtic_addMappingEntry(char *fromOurInput, char *toAgent, char *withOutput); //returns mapping id or 0 if creation failed
-int mtic_removeMappingEntryWithId(int theId);
-int mtic_removeMappingEntryWithName(char *fromOurInput, char *toAgent, char *withOutput);
+PUBLIC int mtic_setMappingName(char *name);
+PUBLIC int mtic_setMappingDescription(char *description);
+PUBLIC int mtic_setMappingVersion(char *version);
+PUBLIC int mtic_getMappingEntriesNumber(); //number of entries in the mapping output type
+PUBLIC int mtic_addMappingEntry(char *fromOurInput, char *toAgent, char *withOutput); //returns mapping id or 0 if creation failed
+PUBLIC int mtic_removeMappingEntryWithId(int theId);
+PUBLIC int mtic_removeMappingEntryWithName(char *fromOurInput, char *toAgent, char *withOutput);
 
 
 #endif /* mastic_public_h */

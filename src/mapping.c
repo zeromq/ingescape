@@ -15,7 +15,7 @@
 
 
 // Global parameter declaration
-//mapping * mtic_my_agent_mapping = NULL;
+mapping * mtic_my_agent_mapping = NULL;
 
 
 const char * map_state_to_string(map_state state){
@@ -73,7 +73,7 @@ void free_map_cat (mapping_cat* map_cat){
  *   mapping : a pointer to the mapping structure to free
  *
  */
-void mtic_free_mapping (mapping* mapp) {
+void mapping_FreeMapping (mapping* mapp) {
 
     struct mapping_out *current_map_out, *tmp_map_out;
     struct mapping_cat *current_map_cat, *tmp_map_cat;
@@ -820,33 +820,324 @@ int mtic_loadMappingFromPath (const char* file_path){
 
     return 1;
 }
+
+/**
+ * \fn int mtic_clearMapping()
+ * \brief Clear the variable 'mtic_my_agent_mapping' and free all structures inside and itself
+ *
+ * \return The error. 1 is OK,
+ * 0 file path is NULL or empty
+ */
 int mtic_clearMapping(){ //clears mapping data for the agent
+
+    if(mtic_my_agent_mapping == NULL){
+        mtic_debug("The structure mtic_my_agent_mapping is NULL \n");
+        return 0;
+    }
+
+    mapping_FreeMapping(mtic_my_agent_mapping);
+
     return 1;
-}
-char* mtic_getMapping(){ //returns json string
-    return NULL;
 }
 
-//edit mapping using the API
+/**
+ * \fn char* mtic_getMapping()
+ * \brief the agent mapping getter
+ *
+ * \return The loaded mapping string in json format (allocated). NULL if mtic_my_agent_mapping was not initialized.
+ */
+char* mtic_getMapping(){ //returns json string
+    char * mappingJson = NULL;
+
+    if(mtic_my_agent_mapping == NULL){
+        mtic_debug("The structure mtic_my_agent_mapping is NULL");
+        return NULL;
+    }
+
+    mappingJson = export_mapping(mtic_my_agent_mapping);
+
+    return mappingJson;
+}
+
+/**
+ * \fn int mtic_setMappingName(char *name)
+ * \brief the agent mapping name setter
+ *
+ * \param name The string which contains the name of the agent's mapping. Can't be NULL.
+ * \return The error. 1 is OK, 0 Mapping name is NULL, -1 Mapping name is empty
+ */
 int mtic_setMappingName(char *name){
+    if(name == NULL){
+        mtic_debug("Mapping name cannot be NULL \n");
+        return 0;
+    }
+
+    if (strlen(name) == 0){
+        mtic_debug("Mapping name cannot be empty\n");
+        return -1;
+    }
+
+    //Check if already initialized, and do it if not
+    if(mtic_my_agent_mapping == NULL){
+        mtic_my_agent_mapping = calloc(1, sizeof(struct mapping));
+    }
+
+    //Copy the name in the structure
+    if(mtic_my_agent_mapping->name != NULL)//Free the field if needed
+        free(mtic_my_agent_mapping->name);
+    mtic_my_agent_mapping->name = strdup(name);
+
     return 1;
 }
+
+/**
+ * \fn int mtic_setMappingDescription(char *description)
+ * \brief the agent mapping description setter
+ *
+ * \param description The string which contains the description of the agent's mapping. Can't be NULL.
+ * \return The error. 1 is OK, 0 Mapping description is NULL, -1 Mapping description is empty
+ */
 int mtic_setMappingDescription(char *description){
+    if(description == NULL){
+        mtic_debug("Mapping description cannot be NULL \n");
+        return 0;
+    }
+
+    if (strlen(description) == 0){
+        mtic_debug("Mapping description cannot be empty\n");
+        return -1;
+    }
+
+    //Check if already initialized, and do it if not
+    if(mtic_my_agent_mapping == NULL){
+        mtic_my_agent_mapping = calloc(1, sizeof(struct mapping));
+    }
+
+    //Copy the description in the structure
+    if(mtic_my_agent_mapping->description != NULL)//Free the field if needed
+        free(mtic_my_agent_mapping->description);
+    mtic_my_agent_mapping->description = strdup(description);
+
     return 1;
 }
-int mtic_setMappingVersion(char *description){
+
+/**
+ * \fn int mtic_setMappingVersion(char *version)
+ * \brief the agent mapping version setter
+ *
+ * \param version The string which contains the version of the agent's mapping. Can't be NULL.
+ * \return The error. 1 is OK, 0 Mapping version is NULL, -1 Mapping version is empty
+ */
+int mtic_setMappingVersion(char *version){
+    if(version == NULL){
+        mtic_debug("Mapping version cannot be NULL \n");
+        return 0;
+    }
+
+    if (strlen(version) == 0){
+        mtic_debug("Mapping version cannot be empty\n");
+        return -1;
+    }
+
+    //Check if already initialized, and do it if not
+    if(mtic_my_agent_mapping == NULL){
+        mtic_my_agent_mapping = calloc(1, sizeof(struct mapping));
+    }
+
+    //Copy the description in the structure
+    if(mtic_my_agent_mapping->version != NULL)//Free the field if needed
+        free(mtic_my_agent_mapping->version);
+    mtic_my_agent_mapping->version = strdup(version);
+
     return 1;
 }
+/**
+ * \fn int mtic_getMappingEntriesNumber()
+ * \brief the agent mapping entries number getter
+ *
+ * \return The number of mapping type output entries. If -1 The structure mtic_my_agent_mapping is NULL.
+ */
 int mtic_getMappingEntriesNumber(){ //number of entries in the mapping
-    return 1;
+    int number = -1;
+
+    if(mtic_my_agent_mapping == NULL){
+        mtic_debug("The structure mtic_my_agent_mapping is NULL \n");
+        return -1;
+    }
+
+    if(mtic_my_agent_mapping->map_out == NULL){
+        mtic_debug("The structure mapping out is NULL \n");
+        return 0;
+    }
+
+    number = HASH_COUNT(mtic_my_agent_mapping->map_out);
+
+    return number;
 }
+
+/**
+ * \fn int mtic_addMappingEntry(char *fromOurInput, char *toAgent, char *withOutput)
+ * \brief this function allows the user to add a new mapping entry dynamically
+ *
+ * \param fromOurInput The string which contains the name of the input to be mapped. Can't be NULL.
+ * \param toAgent The string which contains the name of the extern agent. Can't be NULL.
+ * \param withOutput The string which contains the name of the output of the extern agent to be mapped. Can't be NULL.
+ * \return The error. 1 is OK.
+ *  0 Our input name to be mapped cannot be NULL or empty.
+ * -1 Agent name to be mapped cannot be NULL or empty.
+ * -2 Extern agent output name to be mapped cannot be NULL or empty.
+ */
 int mtic_addMappingEntry(char *fromOurInput, char *toAgent, char *withOutput){ //returns mapping id or 0 if creation failed
+
+    /***    Check the string    ***/
+    //fromOurInput
+    if((fromOurInput == NULL) || (strlen(fromOurInput) == 0)){
+        mtic_debug("Our input name to be mapped cannot be NULL or empty\n");
+        return 0;
+    }
+
+    //toAgent
+    if((toAgent == NULL) || (strlen(toAgent) == 0)){
+        mtic_debug("Agent name to be mapped cannot be NULL or empty\n");
+        return -1;
+    }
+
+    //withOutput
+    if((withOutput == NULL) || (strlen(withOutput) == 0)){
+        mtic_debug("Extern agent output name to be mapped cannot be NULL or empty\n");
+        return -2;
+    }
+
+    //Check if already initialized, and do it if not
+    if(mtic_my_agent_mapping == NULL){
+        mtic_my_agent_mapping = calloc(1, sizeof(struct mapping));
+    }
+
+    /***** Add the new mapping out *****/
+
+    char map_description[MAX_PATH];
+    char out_name[MAX_PATH];
+
+    //Create map_description
+    strcpy(map_description , toAgent);
+    strcat(map_description, ".");//separator
+    strcpy(out_name, withOutput);
+    strcat(map_description, out_name);
+
+    //Check if the mapping already exist & Add map if not
+    mtic_map(fromOurInput, map_description);
+
     return 1;
 }
+
+/**
+ * \fn int mtic_removeMappingEntryWithId(int theId)
+ * \brief this function allows the user to remove a mapping in table by its id
+ *
+ * \param theId The id of the mapping. Cannot be negative.
+ * \return The error. 1 is OK.
+ * 0 The id of the mapping cannot be negative.
+ * -1 The structure mtic_my_agent_mapping is NULL.
+ * -2 The structure mapping out is NULL.
+ */
 int mtic_removeMappingEntryWithId(int theId){
+
+    if(theId < 0){
+        mtic_debug("The id of the mapping cannot be negative. \n");
+        return 0;
+    }
+
+    //Get the mapping output by id
+    mapping_out * mapp_out = NULL;
+
+    if(mtic_my_agent_mapping == NULL){
+        mtic_debug("The structure mtic_my_agent_mapping is NULL \n");
+        return -1;
+    }
+
+    if(mtic_my_agent_mapping->map_out == NULL){
+        mtic_debug("The structure mapping out is NULL \n");
+        return -2;
+    }
+
+    HASH_FIND_INT(mtic_my_agent_mapping->map_out, &theId, mapp_out);
+
+    if(mapp_out == NULL){
+        mtic_debug("The id of the mapping is not part of the table. \n");
+        return 0;
+    }
+
+    //Remove this one
+    HASH_DEL(mtic_my_agent_mapping->map_out, mapp_out);
+    free(mapp_out);
+
     return 1;
 }
+
+/**
+ * \fn int mtic_removeMappingEntryWithName(char *fromOurInput, char *toAgent, char *withOutput)
+ * \brief this function allows the user to remove a mapping in table by the input name, the extern agent's name, the extern agent's output
+ *
+ * \param fromOurInput The string which contains the name of the input mapped. Can't be NULL.
+ * \param toAgent The string which contains the name of the extern agent. Can't be NULL.
+ * \param withOutput The string which contains the name of the output mapped of the extern agent. Can't be NULL.
+ * \return The error. 1 is OK.
+ *  0 Our input name to be mapped cannot be NULL or empty.
+ * -1 Agent name to be mapped cannot be NULL or empty.
+ * -2 Extern agent output name to be mapped cannot be NULL or empty.
+ * -3 The structure mtic_my_agent_mapping is NULL.
+ * -4 The structure mapping out is NULL.
+ */
 int mtic_removeMappingEntryWithName(char *fromOurInput, char *toAgent, char *withOutput){
+    /***    Check the string    ***/
+    //fromOurInput
+    if((fromOurInput == NULL) || (strlen(fromOurInput) == 0)){
+        mtic_debug("Our input name to be mapped cannot be NULL or empty\n");
+        return 0;
+    }
+
+    //toAgent
+    if((toAgent == NULL) || (strlen(toAgent) == 0)){
+        mtic_debug("Agent name to be mapped cannot be NULL or empty\n");
+        return -1;
+    }
+
+    //withOutput
+    if((withOutput == NULL) || (strlen(withOutput) == 0)){
+        mtic_debug("Extern agent output name to be mapped cannot be NULL or empty\n");
+        return -2;
+    }
+
+    if(mtic_my_agent_mapping == NULL){
+        mtic_debug("The structure mtic_my_agent_mapping is NULL \n");
+        return -3;
+    }
+
+    if(mtic_my_agent_mapping->map_out == NULL){
+        mtic_debug("The structure mapping out is NULL \n");
+        return -4;
+    }
+
+    //Check in the mapping live table if the mapping already exist and if it's ON
+    if(mtic_my_agent_mapping != NULL)
+    {
+        mapping_out * map_out = NULL;
+
+        for(map_out = mtic_my_agent_mapping->map_out; map_out != NULL; map_out = map_out->hh.next)
+        {
+            if(     (strcmp(map_out->input_name, fromOurInput) == 0) &&
+                    (strcmp(map_out->agent_name, toAgent) == 0) &&
+                    (strcmp(map_out->output_name, withOutput) == 0)
+               ){
+                    //Delete this mapping
+                    HASH_DEL(mtic_my_agent_mapping->map_out, map_out);
+
+                }
+        }
+
+        free(map_out);
+    }
+
     return 1;
 }
 

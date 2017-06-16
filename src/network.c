@@ -533,10 +533,17 @@ initActor (zsock_t *pipe, void *args)
     //set headers for agent
     zyre_set_header(agentElements->node, "publisher", "%s", insert + 1);
     zyre_set_header(agentElements->node, "canBeFreezed", "%i", agentCanBeFreezed);
-    
+
+    #ifdef _WIN32
+        WSADATA wsaData;
+        WSAStartup(MAKEWORD(2,2), &wsaData);
+    #endif
     char hostname[1024];
     hostname[1023] = '\0';
     gethostname(hostname, 1023);
+    #ifdef _WIN32
+        WSACleanup();
+    #endif
     zyre_set_header(agentElements->node, "hostname", "%s", hostname);
     //code for Fully Qualified Domain Name if needed someday
 //    struct addrinfo hints, *info, *p;

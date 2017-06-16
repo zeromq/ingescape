@@ -28,6 +28,8 @@
 #include <winsock2.h>
 #include <Ws2tcpip.h>
 #include <iphlpapi.h>
+#else
+# define MAX_PATH 260
 #endif
 
 #include "mastic.h"
@@ -222,7 +224,7 @@ void free_definition (definition* definition);
 //////////////////  mapping   //////////////////
 
 // the table which will contain the mapping
-mapping * mtic_my_agent_mapping;
+extern mapping * mtic_my_agent_mapping;
 
 iopType_t string_to_value_type(const char* string);
 bool string_to_boolean(const char* string);
@@ -241,7 +243,7 @@ model_state mtic_map_received(const char * agent_name,
                               char * out_name,
                               void * value);
 bool mtic_map_category (char* map_description);
-void mtic_free_mapping (mapping* mapping);
+void mapping_FreeMapping (mapping* mapping);
 
 
 //////////////////  model   //////////////////
@@ -271,6 +273,7 @@ const char* export_category (category* cat);
 definition* parser_loadDefinition (const char* json_str);
 definition* parser_loadDefinitionFromPath (const char* file_path);
 char* export_definition (definition* def);
+char* export_mapping(mapping * mapp);
 mapping* parser_LoadMap (const char* json_str);
 mapping* parser_LoadMapFromPath (const char* load_file);
 int mtic_init_mapping (const char* mapping_file_path);
