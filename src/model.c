@@ -1418,7 +1418,7 @@ char ** mtic_getInputsList(long *nbOfElements){
 
     //Get the number of element
     (*nbOfElements) = HASH_COUNT(mtic_definition_live->inputs_table);
-    int N = (*nbOfElements);
+    long N = (*nbOfElements);
 
     if(N < 1)
         return NULL;
