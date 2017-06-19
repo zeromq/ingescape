@@ -505,6 +505,8 @@ int mtic_readInputAsInt(const char *name){
     //Get the pointer IOP Agent selected by name
     model_state state;
     agent_iop *iop = model_findIopByName((char*) name, &state);
+    int value = 0;
+    int test =0;
 
     // Check if the input has been returned.
     if(iop != NULL){
@@ -528,8 +530,7 @@ int mtic_readInputAsInt(const char *name){
             case STRING_T:
                 //Handle the case: An implicit conversion can be done from string to int.
                 //Try to convert to int (1 expected value)
-                int value = 0;
-                int test = sscanf(iop->value.s, "%d", &value);
+                test = sscanf(iop->value.s, "%d", &value);
 
                 // Check if one value is returned.
                 if(test == 1){
@@ -563,13 +564,14 @@ int mtic_readInputAsInt(const char *name){
  * \return Return the input value as double.
  */
 double mtic_readInputAsDouble(const char *name){
+    //Get the pointer IOP Agent selected by name
+    model_state state;
+    agent_iop *iop = model_findIopByName((char*) name, &state);
+    double value = 0.0;
+    int test =0;
 
-     //Get the pointer IOP Agent selected by name
-     model_state state;
-     agent_iop *iop = model_findIopByName((char*) name, &state);
-
-     // Check if the input has been returned.
-     if(iop != NULL){
+    // Check if the input has been returned.
+    if(iop != NULL){
          switch(iop->type){
              case DOUBLE_T:
                  return iop->value.d;
@@ -590,8 +592,7 @@ double mtic_readInputAsDouble(const char *name){
              case STRING_T:
                  //Handle the case: An implicit conversion can be done from string to double.
                  //Try to convert to double (1 expected value)
-                 double value = 0.0;
-                 int test = sscanf(iop->value.s, "%lf", &value);
+                 test = sscanf(iop->value.s, "%lf", &value);
 
                  // Check if one value is returned.
                  if(test == 1){
@@ -745,6 +746,8 @@ int mtic_readOutputAsInt(const char *name){
     //Get the pointer IOP Agent selected by name.
     model_state state;
     agent_iop *iop = model_findIopByName((char*) name, &state);
+    int value = 0;
+    int test =0;
 
     // Check if the output has been returned.
     if(iop != NULL){
@@ -768,8 +771,7 @@ int mtic_readOutputAsInt(const char *name){
             case STRING_T:
                 //Handle the case: An implicit conversion can be done from string to int.
                 //Try to convert to int (1 expected value)
-                int value = 0;
-                int test = sscanf(iop->value.s, "%d", &value);
+                test = sscanf(iop->value.s, "%d", &value);
 
                 // Check if one value is returned.
                 if(test == 1){
@@ -806,6 +808,8 @@ double mtic_readOutputAsDouble(const char *name){
     //Get the pointer IOP Agent selected by name.
     model_state state;
     agent_iop *iop = model_findIopByName((char*) name, &state);
+    double value = 0.0;
+    int test = 0;
 
     // Check if the output has been returned.
     if(iop != NULL){
@@ -830,8 +834,7 @@ double mtic_readOutputAsDouble(const char *name){
                 //Handle the case: An implicit conversion can be done from string to int.
 
                 //Try to convert to double (1 expected value)
-                double value = 0.0;
-                int test = sscanf(iop->value.s, "%lf", &value);
+                test = sscanf(iop->value.s, "%lf", &value);
 
                 // Check if one value is returned.
                 if(test == 1){
@@ -985,6 +988,8 @@ int mtic_readParameterAsInt(const char *name){
     //Get the pointer IOP Agent selected by name.
     model_state state;
     agent_iop *iop = model_findIopByName((char*) name, &state);
+    int value = 0;
+    int test =0;
 
     // Check if the parameter has been returned.
     if(iop != NULL){
@@ -1008,8 +1013,7 @@ int mtic_readParameterAsInt(const char *name){
             case STRING_T:
                 //Handle the case: An implicit conversion can be done from string to int.
                 //Try to convert to int (1 expected value)
-                int value = 0;
-                int test = sscanf(iop->value.s, "%d", &value);
+                test = sscanf(iop->value.s, "%d", &value);
 
                 // Check if one value is returned.
                 if(test == 1){
@@ -1046,6 +1050,8 @@ double mtic_readParameterAsDouble(const char *name){
     //Get the pointer IOP Agent selected by name.
     model_state state;
     agent_iop *iop = model_findIopByName((char*) name, &state);
+    double value = 0.0;
+    int test = 0;
 
     // Check if the parameter has been returned.
     if(iop != NULL){
@@ -1069,8 +1075,7 @@ double mtic_readParameterAsDouble(const char *name){
             case STRING_T:
                 //Handle the case: An implicit conversion can be done from string to int.
                 //Try to convert to double (1 expected value)
-                double value = 0.0;
-                int test = sscanf(iop->value.s, "%lf", &value);
+                test = sscanf(iop->value.s, "%lf", &value);
 
                 // Check if one value is returned.
                 if(test == 1){
