@@ -1339,14 +1339,169 @@ iopType_t mtic_getTypeForParameter(const char *name){
     return parameterFound->type;
 }
 
-void mtic_getInputsList(char **list, long nbOfElements){
-    
+/**
+ * \fn int mtic_getInputsNumber()
+ * \brief This function return the number of inputs.
+ *
+ * \return The number of inputs. -1 the definition live is NULL. If an error occurs a mtic_debug will be set.
+ */
+int mtic_getInputsNumber()
+{
+    //check if def live iexist
+    if(mtic_definition_live == NULL){
+        mtic_debug("Definition live is NULL.");
+        return -1;
+    }
+
+    int number = HASH_COUNT(mtic_definition_live->inputs_table);
+
+    return number;
 }
-void mtic_getOutputsList(char **list, long nbOfElements){
-    
+
+/**
+ * \fn int mtic_getOutputsNumber()
+ * \brief This function return the number of outputs.
+ *
+ * \return The number of outputs. -1 the definition live is NULL. If an error occurs a mtic_debug will be set.
+ */
+int mtic_getOutputsNumber()
+{
+    //check if def live iexist
+    if(mtic_definition_live == NULL){
+        mtic_debug("Definition live is NULL.");
+        return -1;
+    }
+
+    int number = HASH_COUNT(mtic_definition_live->outputs_table);
+
+    return number;
 }
-void mtic_getParametersList(char **list, long nbOfElements){
-    
+
+/**
+ * \fn int mtic_getParametersNumber()
+ * \brief This function return the number of parameters.
+ *
+ * \return The number of parameters. -1 the definition live is NULL. If an error occurs a mtic_debug will be set.
+ */
+int mtic_getParametersNumber()
+{
+    //check if def live iexist
+    if(mtic_definition_live == NULL){
+        mtic_debug("Definition live is NULL.");
+        return -1;
+    }
+
+    int number = HASH_COUNT(mtic_definition_live->params_table);
+
+    return number;
+}
+
+/**
+ * \fn char** mtic_getInputsList(long *nbOfElements)
+ * \brief This function return a two dimensions table to get the list of input's name and get the number of elements in this table.
+ *
+ * \param nbOfElements The pointer on the number of elements.
+ * \return list The pointer on the two dimensions table which will get the list of input's name. If an error occurs a mtic_debug will be set and the return is NULL.
+ */
+char ** mtic_getInputsList(long *nbOfElements){
+
+    //check if def live iexist
+    if(mtic_definition_live == NULL){
+        mtic_debug("Definition live is NULL.");
+        return NULL;
+    }
+
+    //Get the number of element
+    (*nbOfElements) = HASH_COUNT(mtic_definition_live->inputs_table);
+    int N = (*nbOfElements);
+
+    if(N < 1)
+        return NULL;
+
+    //Initialize the number of input name in the list
+    char ** list = (char**) malloc( N * sizeof(char*));
+
+    //Fill the table of input
+    agent_iop *current_iop;
+    int index = 0;
+    for(current_iop = mtic_definition_live->inputs_table; current_iop != NULL; current_iop = current_iop->hh.next) {
+        list[index] = strdup(current_iop->name);
+        index++;
+    }
+
+    return list;
+}
+
+/**
+ * \fn char** mtic_getOutputsList(long *nbOfElements)
+ * \brief This function return a two dimensions table to get the list of output's name and get the number of elements in this table.
+ *
+ * \param nbOfElements The pointer on the number of elements.
+ * \return list The pointer on the two dimensions table which will get the list of output's name. If an error occurs a mtic_debug will be set and the return is NULL.
+ */
+char ** mtic_getOutputsList(long *nbOfElements){
+
+    //check if def live iexist
+    if(mtic_definition_live == NULL){
+        mtic_debug("Definition live is NULL.");
+        return NULL;
+    }
+
+    //Get the number of element
+    (*nbOfElements) = HASH_COUNT(mtic_definition_live->outputs_table);
+    int N = (*nbOfElements);
+
+    if(N < 1)
+        return NULL;
+
+    //Initialize the number of input name in the list
+    char ** list = (char**) malloc( N * sizeof(char*));
+
+    //Fill the table of input
+    agent_iop *current_iop;
+    int index = 0;
+    for(current_iop = mtic_definition_live->outputs_table; current_iop != NULL; current_iop = current_iop->hh.next) {
+        list[index] = strdup(current_iop->name);
+        index++;
+    }
+
+    return list;
+}
+
+/**
+ * \fn char** mtic_getParametersList(long *nbOfElements)
+ * \brief This function return a two dimensions table to get the list of parameter's name and get the number of elements in this table.
+ *
+ * \param nbOfElements The pointer on the number of elements.
+ * \return list The pointer on the two dimensions table which will get the list of parameter's name. If an error occurs a mtic_debug will be set and the return is NULL.
+ */
+char ** mtic_getParametersList(long *nbOfElements){
+
+    //check if def live iexist
+    if(mtic_definition_live == NULL){
+        mtic_debug("Definition live is NULL.");
+        return NULL;
+    }
+
+    //Get the number of element
+    (*nbOfElements) = HASH_COUNT(mtic_definition_live->params_table);
+    int N = (*nbOfElements);
+
+    if(N < 1)
+        return NULL;
+
+    //Initialize the number of input name in the list
+    char ** list = (char**) malloc( N * sizeof(char*));
+
+    //Fill the table of input
+    agent_iop *current_iop;
+    int index = 0;
+    for(current_iop = mtic_definition_live->params_table; current_iop != NULL; current_iop = current_iop->hh.next) {
+        list[index] = strdup(current_iop->name);
+        index++;
+    }
+
+    return list;
 }
 
 /**

@@ -145,9 +145,13 @@ PUBLIC iopType_t mtic_getTypeForInput(const char *name);
 PUBLIC iopType_t mtic_getTypeForOutput(const char *name);
 PUBLIC iopType_t mtic_getTypeForParameter(const char *name);
 
-void mtic_getInputsList(char **list, long nbOfElements);
-void mtic_getOutputsList(char **list, long nbOfElements);
-void mtic_getParametersList(char **list, long nbOfElements);
+PUBLIC int mtic_getInputsNumber();
+PUBLIC int mtic_getOutputsNumber();
+PUBLIC int mtic_getParametersNumber();
+
+PUBLIC char** mtic_getInputsList(long *nbOfElements);
+PUBLIC char** mtic_getOutputsList(long *nbOfElements);
+PUBLIC char** mtic_getParametersList(long *nbOfElements);
 
 PUBLIC bool mtic_checkInputExistence(const char *name);
 PUBLIC bool mtic_checkOutputExistence(const char *name);
