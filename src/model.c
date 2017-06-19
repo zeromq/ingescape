@@ -466,11 +466,11 @@ bool mtic_readInputAsBool(const char *name){
             case STRING_T:
                 //Handle the case: An implicit conversion can be done from string to bool.
                 // Test first if the input value is {true}, then {false}. Finally if the two previous test fail the function returns {false}.
-                if (!stricmp(iop->value.s, "true")){
+                if (!strcmp(iop->value.s, "true")){
                     mtic_debug("mtic_readInputAsBool : Implicit conversion from string to bool for the input {%s}.", name);
                     return true;
                 }
-                else if (!stricmp(iop->value.s, "false")){
+                else if (!strcmp(iop->value.s, "false")){
                     mtic_debug("mtic_readInputAsBool : Implicit conversion from string to bool for the input {%s}.", name);
                     return false;
                 }
@@ -707,11 +707,11 @@ bool mtic_readOutputAsBool(const char *name){
             case STRING_T:
                 //Handle the case: An implicit conversion can be done from string to bool.
                 // Test first if the output value is {true}, then {false}. Finally if the two previous test fail the function returns {false}.
-                if (!stricmp(iop->value.s, "true")){
+                if (!strcmp(iop->value.s, "true")){
                     mtic_debug("mtic_readOutputAsBool : Implicit conversion from string to bool for the output {%s}.", name);
                     return true;
                 }
-                else if (!stricmp(iop->value.s, "false")){
+                else if (!strcmp(iop->value.s, "false")){
                     mtic_debug("mtic_readOutputAsBool : Implicit conversion from string to bool for the output {%s}.", name);
                     return false;
                 }
@@ -947,11 +947,11 @@ bool mtic_readParameterAsBool(const char *name){
             case STRING_T:
                 //Handle the case: An implicit conversion can be done from string to bool.
                 // Test first if the output value is {true}, then {false}. Finally if the two previous test fail the function returns {false}.
-                if (!stricmp(iop->value.s, "true")){
+                if (!strcmp(iop->value.s, "true")){
                     mtic_debug("mtic_readParameterAsBool : Implicit conversion from string to bool for the parameter {%s}.", name);
                     return true;
                 }
-                else if (!stricmp(iop->value.s, "false")){
+                else if (!strcmp(iop->value.s, "false")){
                     mtic_debug("mtic_readParameterAsBool : Implicit conversion from string to bool for the parameter {%s}.", name);
                     return false;
                 }
