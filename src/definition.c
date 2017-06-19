@@ -677,7 +677,7 @@ int mtic_setDefinitionDescription(char *description){
 
     //Copy the description in the structure in loaded definition
     if(mtic_definition_loaded->description != NULL)//Free the field if needed
-        free(mtic_definition_loaded->description);
+        free((char*)mtic_definition_loaded->description);
     mtic_definition_loaded->description = strdup(description);
 
     //Check if already initialized, and do it if not
@@ -687,7 +687,7 @@ int mtic_setDefinitionDescription(char *description){
 
     // Live data corresponds to a copy of the initial definition
     if(mtic_definition_live->description != NULL)//Free the field if needed
-        free(mtic_definition_live->description);
+        free((char*)mtic_definition_live->description);
      mtic_definition_live->description = strdup(mtic_definition_loaded->description);
 
     return 1;
@@ -719,7 +719,7 @@ int mtic_setDefinitionVersion(char *version){
 
     //Copy the description in the structure in loaded definition
     if(mtic_definition_loaded->version != NULL)//Free the field if needed
-        free(mtic_definition_loaded->version);
+        free((char*)mtic_definition_loaded->version);
     mtic_definition_loaded->version = strdup(version);
 
     //Check if already initialized, and do it if not
@@ -729,7 +729,7 @@ int mtic_setDefinitionVersion(char *version){
 
     // Live data corresponds to a copy of the initial definition
     if(mtic_definition_live->version != NULL)//Free the field if needed
-        free(mtic_definition_live->version);
+        free((char*)mtic_definition_live->version);
     mtic_definition_live->version = strdup(mtic_definition_loaded->version);
 
     return 1;
