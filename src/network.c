@@ -672,7 +672,7 @@ int network_publishOutput (const char* output_name)
     model_state code;
     agent_iop * found_iop = model_findIopByName(output_name, &code);
     
-    if(agentElements->publisher != NULL && found_iop != NULL)
+    if(agentElements != NULL && agentElements->publisher != NULL && found_iop != NULL)
     {
         if(found_iop->is_muted == false && found_iop->name != NULL && isFreezed == false)
         {
@@ -1069,6 +1069,11 @@ void mtic_setVerbose (bool verbose){
 void mtic_setCanBeFreezed (bool canBeFreezed){
     agentCanBeFreezed = canBeFreezed;
 }
+
+//get library parameters
+bool mtic_getVerbose (){
+    return verboseMode;
+};
 
 
 

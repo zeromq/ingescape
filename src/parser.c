@@ -1,7 +1,8 @@
 //
 //  mtic_parseur.c
 //
-//  Created by Patxi Berard
+//  Created by Mathieu Poirier
+//  Modified by Patxi Berard
 //  Modified by Vincent Deliencourt
 //  Copyright © 2016 IKKY WP4.8. All rights reserved.
 //
@@ -66,6 +67,7 @@ static void json_add_data_to_hash (struct agent_iop ** hasht,
                 data->value.data = strdup (YAJL_GET_STRING(obj->u.object.values[2]));
                 break;
             default:
+                fprintf(stderr, "%s - ERROR -  unknown data type to load from json\n", __FUNCTION__);
                 break;
         }
         data->is_muted = false;
@@ -501,10 +503,9 @@ static void json_dump_iop (yajl_gen *g, agent_iop* aiop) {
             yajl_gen_string(*g, (const unsigned char *) aiop->value.data, strlen(aiop->value.data));
             break;
         default:
-            fprintf(stderr, "%s - ERROR -  unknown value type to convert in string\n", __FUNCTION__);
+            fprintf(stderr, "%s - ERROR -  unknown data type to convert in string\n", __FUNCTION__);
             break;
     }
-    
     yajl_gen_map_close(*g);
 }
 

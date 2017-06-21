@@ -8,12 +8,7 @@ SOURCES += \
 
 HEADERS += \
     $$PWD/../src/include/uthash/uthash.h \
-#    $$PWD/../src/include/definition.h \
-#    $$PWD/../src/include/mapping.h \
     $$PWD/../src/include/mastic.h \
-#    $$PWD/../src/include/model.h \
-#    $$PWD/../src/include/network.h \
-#    $$PWD/../src/include/parser.h \
     $$PWD/../src/include/tests.h \
     $$PWD/../src/include/mastic_private.h \
 
@@ -180,6 +175,23 @@ unix:{
 
     LIBS += -L$$libzyre_path -lzmq -lczmq -lzyre \
             -L$$libyajl_path -lyajl
+
+    #Destination repository for our librairy
+    DESTDIR = /usr/local/lib
+
+    #Copy includes
+    install_headers.files += $$PWD/../src/include/*.h \
+                             $$PWD/../src/include/uthash
+    install_headers.path += /usr/local/include/mastic
+
+    #Copy libraries
+    install_libs.files += $$libzyre_path/*.dylib \
+                          $$libyajl_path/*.dylib
+    install_libs.path += $$DESTDIR
+
+    #Add installation options
+    INSTALLS += install_libs \
+                install_headers
     }
 }
 

@@ -102,7 +102,7 @@ const char* value_type_to_string (iopType_t type) {
             return "IMPULSION";
             break;
         case DATA_T:
-            return "STRUCTURE";
+            return "DATA";
             break;
         default:
             fprintf(stderr, "%s - ERROR -  unknown iopType_t to convert\n", __FUNCTION__);

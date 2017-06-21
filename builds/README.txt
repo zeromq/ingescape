@@ -26,3 +26,26 @@ Run in a terminal from the root directory (MASTIC) : sudo find -type f -exec tou
 
 if you meet the error : error while loading shared libraries: libmastic.so.1: cannot open shared object file: No such file or directory
 Run in a terminal : sudo ldconfig -v
+
+
+[LINUX]
+To deploy the mastic library on linux you have two option: A or B
+
+A. sudo mode: run the qtcreator as sudo : sudo qtcreator
+1)Open the project in Qt Creator
+2)Choose a compilation Kit based on Desktop
+3)Use the step "install" in argument of Make
+4)Build the project
+Notes : The librairy and its dependencies will be copied in "usr/local":
+		- include : contains all headers
+		- lib : all the librairies
+
+B. no sudo mode
+1)Open the project in Qt Creator
+2)Choose a compilation Kit based on Desktop
+3)Build the project
+	You will certainly have a error : can't found libmastic.so or can't not write into /usr/local/lib
+4)now you can use the script (from builds/linux directory) to install the lib with: make -f InstallLib install
+Notes : The librairy and its dependencies will be copied in "usr/local":
+		- include : contains all headers
+		- lib : all the librairies

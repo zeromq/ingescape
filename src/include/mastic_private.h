@@ -3,6 +3,7 @@
 //  mastic
 //
 //  Created by Stephane Vales on 27/04/2017.
+//  Modified by Mathieu Poirier
 //  Copyright © 2017 Ingenuity i/o. All rights reserved.
 //
 
@@ -249,10 +250,6 @@ void mapping_FreeMapping (mapping* mapping);
 //////////////////  model   //////////////////
 agent_iop * model_findIopByName(const char* name, model_state *code);
 agent_iop * mtic_find_iop_by_name_on_definition(const char *name, definition* definition, model_state *code);
-//Define the pointer on the callback function
-typedef void (*callback_ptr_t)( agent_iop* );
-model_state mtic_observe(const char *iop_name,
-                         void (*callback_fct)(agent_iop *input_iop) );
 model_state mtic_set(const char* iop_name, void* new_value);
 void * mtic_get(const char* name_iop, model_state* state);
 

@@ -15,8 +15,8 @@ INCLOCAL = /usr/local/include/
 INCDIRS   = -I${INCLOCAL}
 
 LIBDIRLOCAL = /usr/local/lib
-DYNLIBS = -lzyre -lczmq -lzmq -lsodium
-STATICLIBS = -static ${LIBDIRLOCAL}/libzyre.a ${LIBDIRLOCAL}/libczmq.a ${LIBDIRLOCAL}/libzmq.a ${LIBDIRLOCAL}/libsodium.a  
+DYNLIBS = -lzyre -lczmq -lzmq
+STATICLIBS = -static ${LIBDIRLOCAL}/libzyre.a ${LIBDIRLOCAL}/libczmq.a ${LIBDIRLOCAL}/libzmq.a ${LIBDIRLOCAL}/libsodium.a
 
 CC = gcc
 CFLAGS = -W -Wall -g $(INCDIRS)
@@ -39,8 +39,8 @@ $(EXECUTABLE) : $(OBJECTS)
 clean :
 	@rm *.o $(EXECUTABLE)
 
-test : $(EXECUTABLE) 
-	@./$(EXECUTABLE)
+test : $(EXECUTABLE)
+	@export LD_LIBRARY_PATH=$(LIBDIRLOCAL):$(LD_LIBRARY_PATH)  ; ./$(EXECUTABLE)
 
 install : $(EXECUTABLE)
 	@cp $(EXECUTABLE) /usr/local/bin/

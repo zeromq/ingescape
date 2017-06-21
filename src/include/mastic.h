@@ -2,6 +2,7 @@
 //  mastic_public.h
 //
 //  Created by Stephane Vales on 22/05/2017.
+//  Modified by Mathieu Poirier
 //  Copyright © 2016 IKKY WP4.8. All rights reserved.
 //
 
@@ -56,7 +57,8 @@ bool mtic_isMuted();
 PUBLIC void mtic_setVerbose (bool verbose);
 PUBLIC void mtic_setCanBeFreezed (bool canBeFreezed);
 
-
+// get library parameters
+PUBLIC bool mtic_getVerbose();
 
 
 //////////////////////////////////////////////////
@@ -113,30 +115,32 @@ void mtic_readParameterAsData(const char *name, void *data, long *size); //alloc
 //for DATA_T, these functions should be forbidden (need to know datra size)
 //size shall be given to Mastic
 //Mastic shall clone value and shall dispose of it when stopped
-int mtic_writeInput(const char *name, void *value, long size);
-int mtic_writeOutput(const char *name, void *value, long size);
-int mtic_writeParameter(const char *name, void *value, long size);
+PUBLIC int mtic_writeInput(const char *name, void *value, long size);
+PUBLIC int mtic_writeOutput(const char *name, void *value, long size);
+PUBLIC int mtic_writeParameter(const char *name, void *value, long size);
 
 //write using internal conversions (Mastic does the conversion job)
 //we need to make things clear on structures
 //for IMPULSION_T value is just ignored
 //Mastic shall clone value and shall dispose of it when stopped
-int mtic_writeInputAsBool(const char *name, bool value);
-int mtic_writeInputAsInt(const char *name, int value);
-int mtic_writeInputAsDouble(const char *name, double value);
-int mtic_writeInputAsString(const char *name, char *value);
+PUBLIC int mtic_writeInputAsBool(const char *name, bool value);
+PUBLIC int mtic_writeInputAsInt(const char *name, int value);
+PUBLIC int mtic_writeInputAsDouble(const char *name, double value);
+PUBLIC int mtic_writeInputAsString(const char *name, char *value);
+PUBLIC int mtic_writeInputAsImpulsion(const char *name);
 int mtic_writeInputAsData(const char *name, void *value, long size);
 
-int mtic_writeOutputAsBool(const char *name, bool value);
-int mtic_writeOutputAsInt(const char *name, int value);
-int mtic_writeOutputAsDouble(const char *name, double value);
-int mtic_writeOutputAsString(const char *name, char *value);
+PUBLIC int mtic_writeOutputAsBool(const char *name, bool value);
+PUBLIC int mtic_writeOutputAsInt(const char *name, int value);
+PUBLIC int mtic_writeOutputAsDouble(const char *name, double value);
+PUBLIC int mtic_writeOutputAsString(const char *name, char *value);
+PUBLIC int mtic_writeOutputAsImpulsion(const char *name);
 int mtic_writeOutputAsData(const char *name, void *value, long size);
 
-int mtic_writeParameterAsBool(const char *name, bool value);
-int mtic_writeParameterAsInt(const char *name, int value);
-int mtic_writeParameterAsDouble(const char *name, double value);
-int mtic_writeParameterAsString(const char *name, char *value);
+PUBLIC int mtic_writeParameterAsBool(const char *name, bool value);
+PUBLIC int mtic_writeParameterAsInt(const char *name, int value);
+PUBLIC int mtic_writeParameterAsDouble(const char *name, double value);
+PUBLIC int mtic_writeParameterAsString(const char *name, char *value);
 int mtic_writeParameterAsData(const char *name, void *value, long size);
 
 
@@ -159,10 +163,10 @@ PUBLIC bool mtic_checkParameterExistence(const char *name);
 
 //observe IOP
 //calback format for IOP observation
-typedef void (*mtic_observeCallback)(iop_t iop, const char *name, iopType_t valueType, void *value, void * myData);
-int mtic_observeInput(const char *name, mtic_observeCallback cb, void *myData);
-int mtic_observeOutput(const char *name, mtic_observeCallback cb, void * myData);
-int mtic_observeParameter(const char *name, mtic_observeCallback cb, void * myData);
+typedef void (*mtic_observeCallback)(iop_t iopType, const char *name, iopType_t valueType, void *value, void *myData);
+PUBLIC int mtic_observeInput(const char *name, mtic_observeCallback cb, void *myData);
+PUBLIC int mtic_observeOutput(const char *name, mtic_observeCallback cb, void * myData);
+PUBLIC int mtic_observeParameter(const char *name, mtic_observeCallback cb, void * myData);
 
 //mute or unmute an IOP
 int mtic_muteOutput(const char *name);
