@@ -831,11 +831,14 @@ int mtic_loadMappingFromPath (const char* file_path){
 int mtic_clearMapping(){ //clears mapping data for the agent
 
     if(mtic_my_agent_mapping == NULL){
-        mtic_debug("The structure mtic_my_agent_mapping is NULL \n");
+        mtic_debug("The structure mtic_my_agent_mapping is NULL. \n");
         return 0;
     }
 
     mapping_FreeMapping(mtic_my_agent_mapping);
+
+    //Put ptr at NULL
+    mtic_my_agent_mapping = NULL;
 
     return 1;
 }
@@ -850,7 +853,7 @@ char* mtic_getMapping(){ //returns json string
     char * mappingJson = NULL;
 
     if(mtic_my_agent_mapping == NULL){
-        mtic_debug("The structure mtic_my_agent_mapping is NULL");
+        mtic_debug("The structure mtic_my_agent_mapping is NULL. \n");
         return NULL;
     }
 
