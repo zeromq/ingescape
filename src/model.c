@@ -1183,8 +1183,53 @@ int mtic_writeInput(const char *name, void *value, long size){
 
     return ret;
 }
+
+/**
+ * \fn
+ * \brief
+ *
+ * \param
+ * \return
+ */
 int mtic_writeOutput(const char *name, void *value, long size){
-    return 1;
+
+    //Get the pointer IOP Agent selected by name
+    model_state state;
+    agent_iop *iop = model_findIopByName((char*) name, &state);
+    int ret = 0;
+
+    // Check if the iop has been returned.
+    if(iop == NULL){
+        mtic_debug("%s : Agent's output %s cannot be found\n", __FUNCTION__, name);
+        return 0;
+    }
+
+    switch (iop->type){
+    case INTEGER_T:
+        ret = mtic_writeOutputAsInt(name, *(int*) value);
+        break;
+    case DOUBLE_T:
+        ret = mtic_writeOutputAsDouble(name, *(double*) value);
+        break;
+    case BOOL_T:
+        ret = mtic_writeOutputAsBool(name, *(bool*) value);
+        break;
+    case STRING_T:
+        ret = mtic_writeOutputAsString(name, value);
+        break;
+    case IMPULSION_T:
+        ret = mtic_writeOutputAsImpulsion(name);
+        break;
+    case DATA_T:
+        ret = mtic_writeOutputAsData(name, *(int*) value, size);
+        break;
+    default:
+        mtic_debug("%s: Agent's output %s has not a known type\n.", __FUNCTION__,  name);
+        break;
+
+    }
+
+    return ret;
 }
 int mtic_writeParameter(const char *name, void *value, long size){
     return 1;
@@ -1395,19 +1440,222 @@ int mtic_writeInputAsData(const char *name, void *value, long size){
     return 1;
 }
 
+/**
+ * \fn
+ * \brief
+ *
+ * \param
+ * \return
+ */
 int mtic_writeOutputAsBool(const char *name, bool value){
+
+    //Get the pointer IOP Agent selected by name
+    model_state state;
+    agent_iop *iop = model_findIopByName((char*) name, &state);
+
+    // Check if the iop has been returned.
+    if(iop == NULL){
+        mtic_debug("%s : Agent's output '%s' cannot be found\n", __FUNCTION__, name);
+        return 0;
+    }
+
+    //Check the value type as a bool.
+    if(iop->type != BOOL_T){
+        mtic_debug("%s: Agent's output '%s' is not a bool\n", __FUNCTION__,  name);
+        return 0;
+    }
+
+    // update the value in the iop_live structure
+    update_value(iop, (void*) &value);
+
+    // call the callback associated to if it exist
+    mtic_observe_callback_T *fct_to_call;
+    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
+    if(fct_to_call != NULL)
+        fct_to_call->callback_ptr(OUTPUT_T, name, BOOL_T, (void*) &value, fct_to_call->data);
+
+    // If iop is output : publish
+    if(state == TYPE_OUTPUT)
+        network_publishOutput(name);
+
     return 1;
 }
+
+/**
+ * \fn
+ * \brief
+ *
+ * \param
+ * \return
+ */
 int mtic_writeOutputAsInt(const char *name, int value){
+
+    //Get the pointer IOP Agent selected by name
+    model_state state;
+    agent_iop *iop = model_findIopByName((char*) name, &state);
+
+    // Check if the iop has been returned.
+    if(iop == NULL){
+        mtic_debug("%s : Agent's output '%s' cannot be found\n", __FUNCTION__, name);
+        return 0;
+    }
+
+    //Check the value type as a integer.
+    if(iop->type != INTEGER_T){
+        mtic_debug("%s: Agent's output '%s' is not a integer\n", __FUNCTION__,  name);
+        return 0;
+    }
+
+    // update the value in the iop_live structure
+    update_value(iop, (void*) &value);
+
+    // call the callback associated to if it exist
+    mtic_observe_callback_T *fct_to_call;
+    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
+    if(fct_to_call != NULL)
+        fct_to_call->callback_ptr(OUTPUT_T, name, INTEGER_T, (void*) &value, fct_to_call->data);
+
+    // If iop is output : publish
+    if(state == TYPE_OUTPUT)
+        network_publishOutput(name);
+
     return 1;
+
 }
+
+/**
+ * \fn
+ * \brief
+ *
+ * \param
+ * \return
+ */
 int mtic_writeOutputAsDouble(const char *name, double value){
+
+    //Get the pointer IOP Agent selected by name
+    model_state state;
+    agent_iop *iop = model_findIopByName((char*) name, &state);
+
+    // Check if the iop has been returned.
+    if(iop == NULL){
+        mtic_debug("%s : Agent's output '%s' cannot be found\n", __FUNCTION__, name);
+        return 0;
+    }
+
+    //Check the value type as a double.
+    if(iop->type != DOUBLE_T){
+        mtic_debug("%s: Agent's output '%s' is not a double\n", __FUNCTION__,  name);
+        return 0;
+    }
+
+    // update the value in the iop_live structure
+    update_value(iop, (void*) &value);
+
+    // call the callback associated to if it exist
+    mtic_observe_callback_T *fct_to_call;
+    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
+    if(fct_to_call != NULL)
+        fct_to_call->callback_ptr(OUTPUT_T, name, DOUBLE_T, (void*) &value, fct_to_call->data);
+
+    // If iop is output : publish
+    if(state == TYPE_OUTPUT)
+        network_publishOutput(name);
+
     return 1;
 }
+
+/**
+ * \fn
+ * \brief
+ *
+ * \param
+ * \return
+ */
 int mtic_writeOutputAsString(const char *name, char *value){
+
+    //Get the pointer IOP Agent selected by name
+    model_state state;
+    agent_iop *iop = model_findIopByName((char*) name, &state);
+
+    // Check if the iop has been returned.
+    if(iop == NULL){
+        mtic_debug("%s : Agent's output '%s' cannot be found\n", __FUNCTION__, name);
+        return 0;
+    }
+
+    //Check the value type as a string.
+    if(iop->type != STRING_T){
+        mtic_debug("%s: Agent's output '%s' is not a string\n", __FUNCTION__,  name);
+        return 0;
+    }
+
+    // update the value in the iop_live structure
+    update_value(iop, (void*) value);
+
+    // call the callback associated to if it exist
+    mtic_observe_callback_T *fct_to_call;
+    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
+    if(fct_to_call != NULL)
+        fct_to_call->callback_ptr(OUTPUT_T, name, STRING_T, (void*) value, fct_to_call->data);
+
+    // If iop is output : publish
+    if(state == TYPE_OUTPUT)
+        network_publishOutput(name);
+
     return 1;
 }
+
+/**
+ * \fn
+ * \brief
+ *
+ * \param
+ * \return
+ */
+int mtic_writeOutputAsImpulsion(const char *name){
+
+    //Get the pointer IOP Agent selected by name
+    model_state state;
+    agent_iop *iop = model_findIopByName((char*) name, &state);
+
+    // Check if the iop has been returned.
+    if(iop == NULL){
+        mtic_debug("%s : Agent's output '%s' cannot be found\n", __FUNCTION__, name);
+        return 0;
+    }
+
+    //Check the value type as an impulsion.
+    if(iop->type != IMPULSION_T){
+        mtic_debug("%s: Agent's output '%s' is not a impulsion\n", __FUNCTION__,  name);
+        return 0;
+    }
+
+    //TODO: remove this code ?
+    // update the value in the iop_live structure
+    //update_value(iop, (void*) &value);
+
+    // call the callback associated to if it exist
+    mtic_observe_callback_T *fct_to_call;
+    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
+    if(fct_to_call != NULL)
+        fct_to_call->callback_ptr(OUTPUT_T, name, IMPULSION_T, 0, fct_to_call->data);
+
+    // If iop is output : publish
+    if(state == TYPE_OUTPUT)
+        network_publishOutput(name);
+
+    return 1;
+}
+
+/**
+ * \fn
+ * \brief
+ *
+ * \param
+ * \return
+ */
 int mtic_writeOutputAsData(const char *name, void *value, long size){
+    fprintf(stderr, "WARNING - %s not implemented yet !\n", __FUNCTION__);
     return 1;
 }
 
