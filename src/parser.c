@@ -58,13 +58,13 @@ static void json_add_data_to_hash (struct agent_iop ** hasht,
                 data->value.b = string_to_boolean (YAJL_GET_STRING(obj->u.object.values[2]));
                 break;
             case STRING_T:
-                data->value.s = strdup (YAJL_GET_STRING(obj->u.object.values[2]));
+                data->value.s = strdup (YAJL_IS_STRING(obj->u.object.values[2]) ? obj->u.object.values[2]->u.string : "");
                 break;
             case IMPULSION_T:
-                data->value.impuls = strdup (YAJL_GET_STRING(obj->u.object.values[2]));
+                data->value.impuls = strdup (YAJL_IS_STRING(obj->u.object.values[2]) ? obj->u.object.values[2]->u.string : "");
                 break;
             case DATA_T:
-                data->value.data = strdup (YAJL_GET_STRING(obj->u.object.values[2]));
+                data->value.data = strdup (YAJL_IS_STRING(obj->u.object.values[2]) ? obj->u.object.values[2]->u.string : "");
                 break;
             default:
                 fprintf(stderr, "%s - ERROR -  unknown data type to load from json\n", __FUNCTION__);
@@ -187,12 +187,12 @@ static category* json_parse_category (yajl_val node) {
     path[1] = STR_NAME;
     v = yajl_tree_get(node, path, yajl_t_any);
     if (v)
-        cat->name = strdup (YAJL_GET_STRING(v));
+        cat->name = strdup (YAJL_IS_STRING(v) ? (v)->u.string : "");
 
     path[1] = STR_VERSION;
     v = yajl_tree_get(node, path, yajl_t_any);
     if (v)
-        cat->version = strdup (YAJL_GET_STRING(v));
+        cat->version = strdup (YAJL_IS_STRING(v) ? (v)->u.string : "");
 
     path[1] = STR_PARAMETERS;
     json_add_data (node, path, &cat->params_table);
@@ -232,7 +232,7 @@ static void json_add_category_to_hash (struct category** hasht,
             path_in_current[0] = STR_VERSION;
             v = yajl_tree_get(current_cat, path_in_current, yajl_t_any);
             if (v)
-                cat->version = strdup (YAJL_GET_STRING(v));
+                cat->version = strdup (YAJL_IS_STRING(v) ? (v)->u.string : "");
 
             path_in_current[0] = STR_PARAMETERS;
             json_add_data (current_cat, path_in_current, &cat->params_table);
@@ -264,17 +264,17 @@ static definition* json_parse_definition (yajl_val node) {
     path[1] = STR_NAME;
     v = yajl_tree_get(node, path, yajl_t_any);
     if (v)
-        def->name = strdup (YAJL_GET_STRING(v));
+        def->name = strdup (YAJL_IS_STRING(v) ? (v)->u.string : "");
 
     path[1] = STR_DESCRIPTION;
     v = yajl_tree_get(node, path, yajl_t_any);
     if (v)
-        def->description = strdup (YAJL_GET_STRING(v));
+        def->description = strdup (YAJL_IS_STRING(v) ? (v)->u.string : "");
 
     path[1] = STR_VERSION;
     v = yajl_tree_get(node, path, yajl_t_any);
     if (v)
-        def->version = strdup (YAJL_GET_STRING(v));
+        def->version = strdup (YAJL_IS_STRING(v) ? (v)->u.string : "");
 
     path[1] = STR_INPUTS;
     json_add_data (node, path, &def->inputs_table);
