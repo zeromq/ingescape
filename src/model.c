@@ -95,6 +95,7 @@ void update_value(agent_iop *iop, void* value){
             iop->value.s = strdup(value);
             break;
         case IMPULSION_T:
+            //TODO: remove value for impulsion ?
             free(iop->old_value.impuls);
             iop->old_value.impuls = strdup(iop->value.impuls);
             free(iop->value.impuls);
@@ -176,40 +177,41 @@ void * mtic_get(const char *name_iop, model_state *state){
  */
 model_state mtic_set(const char *iop_name, void *new_value){
 
-    //1) find the iop
-    model_state code;
-    agent_iop *iop = model_findIopByName((char*) iop_name,&code);
+    fprintf (stderr, "%s removed \n !!!!!!", __FUNCTION__);
+//    //1) find the iop
+//    model_state code;
+//    agent_iop *iop = model_findIopByName((char*) iop_name,&code);
 
-    if(iop == NULL)
-        return code;
+//    if(iop == NULL)
+//        return code;
 
-    //2) update the value in the iop_live structure
-    update_value(iop, new_value);
-    
-    // Let us know the value has changed
-    char* str_value = mtic_iop_value_to_string(iop);
-    mtic_debug("SET(%s,%s).\n",iop_name,str_value);
-    free(str_value);
+//    //2) update the value in the iop_live structure
+//    update_value(iop, new_value);
 
-    //3) Callback associated from 'observe' function
-    //Check ma liste de callback et appellé celle concerné
-    callbacks *fct_to_call;
-    HASH_FIND_STR(agent_callbacks,iop_name,fct_to_call);
-    if(fct_to_call != NULL)
-    {
-        fct_to_call->callback_ptr(iop);
-    }
+//    // Let us know the value has changed
+//    char* str_value = mtic_iop_value_to_string(iop);
+//    mtic_debug("SET(%s,%s).\n",iop_name,str_value);
+//    free(str_value);
 
-    /*
-     * If the iop is an output  : publish
-     */
-    if(code == TYPE_OUTPUT){
-        
-        // Publish the new value
-        network_publishOutput(iop_name);
-    }
+//    //3) Callback associated from 'observe' function
+//    //Check ma liste de callback et appellé celle concerné
+//    callbacks *fct_to_call;
+//    HASH_FIND_STR(agent_callbacks,iop_name,fct_to_call);
+//    if(fct_to_call != NULL)
+//    {
+//        fct_to_call->callback_ptr(iop);
+//    }
 
-    return OK;
+//    /*
+//     * If the iop is an output  : publish
+//     */
+//    if(code == TYPE_OUTPUT){
+
+//        // Publish the new value
+//        network_publishOutput(iop_name);
+//    }
+
+//    return OK;
 }
 
 /*
@@ -1124,16 +1126,62 @@ char* mtic_readParameterAsString(const char *name){
 }
 
 void mtic_readParameterAsData(const char *name, void *data, long *size){ //allocs data structure to be disposed by caller
-    
 }
 
-//write using void*
+// --------------------------------  WRITE ------------------------------------//
+// TODO: remove this comments
+// write using void*
 //for IMPULSION_T value is just ignored
 //for DATA_T, these functions should be forbidden (need to know data size)
 //size shall be given to Mastic
 //Mastic shall clone value and shall dispose of it when stopped
+
+/**
+ * \fn
+ * \brief
+ *
+ * \param
+ * \return
+ */
 int mtic_writeInput(const char *name, void *value, long size){
-    return 1;
+
+    //Get the pointer IOP Agent selected by name
+    model_state state;
+    agent_iop *iop = model_findIopByName((char*) name, &state);
+    int ret = 0;
+
+    // Check if the iop has been returned.
+    if(iop == NULL){
+        mtic_debug("%s : Agent's input %s cannot be found\n", __FUNCTION__, name);
+        return 0;
+    }
+
+    switch (iop->type){
+    case INTEGER_T:
+        ret = mtic_writeInputAsInt(name, *(int*) value);
+        break;
+    case DOUBLE_T:
+        ret = mtic_writeInputAsDouble(name, *(double*) value);
+        break;
+    case BOOL_T:
+        ret = mtic_writeInputAsBool(name, *(bool*) value);
+        break;
+    case STRING_T:
+        ret = mtic_writeInputAsString(name, value);
+        break;
+    case IMPULSION_T:
+        ret = mtic_writeInputAsImpulsion(name);
+        break;
+    case DATA_T:
+        ret = mtic_writeInputAsData(name, *(int*) value, size);
+        break;
+    default:
+        mtic_debug("%s: Agent's input %s has not a known type\n.", __FUNCTION__,  name);
+        break;
+
+    }
+
+    return ret;
 }
 int mtic_writeOutput(const char *name, void *value, long size){
     return 1;
@@ -1142,23 +1190,208 @@ int mtic_writeParameter(const char *name, void *value, long size){
     return 1;
 }
 
+//TODO: remove this comment
 //write using internal conversions (Mastic does the conversion job)
 //we need to make things clear on structures
 //for IMPULSION_T value is just ignored
 //Mastic shall clone value and shall dispose of it when stopped
+
+/**
+ * \fn
+ * \brief
+ *
+ * \param
+ * \return
+ */
 int mtic_writeInputAsBool(const char *name, bool value){
+
+    //Get the pointer IOP Agent selected by name
+    model_state state;
+    agent_iop *iop = model_findIopByName((char*) name, &state);
+
+    // Check if the iop has been returned.
+    if(iop == NULL){
+        mtic_debug("%s : Agent's input '%s' cannot be found", __FUNCTION__, name);
+        return 0;
+    }
+
+    //Check the value type as a bool.
+    if(iop->type != BOOL_T){
+        mtic_debug("%s: Agent's input '%s' is not a bool", __FUNCTION__,  name);
+        return 0;
+    }
+
+    // update the value in the iop_live structure
+    update_value(iop, (void*) &value);
+
+    // call the callback associated to if it exist
+    mtic_observe_callback_T *fct_to_call;
+    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
+    if(fct_to_call != NULL)
+        fct_to_call->callback_ptr(INPUT_T, name, BOOL_T, (void*) &value, fct_to_call->data);
+
     return 1;
+
 }
+
+/**
+ * \fn
+ * \brief
+ *
+ * \param
+ * \return
+ */
 int mtic_writeInputAsInt(const char *name, int value){
+
+    //Get the pointer IOP Agent selected by name
+    model_state state;
+    agent_iop *iop = model_findIopByName((char*) name, &state);
+
+    // Check if the iop has been returned.
+    if(iop == NULL){
+        mtic_debug("%s : Agent's input '%s' cannot be found", __FUNCTION__, name);
+        return 0;
+    }
+
+    //Check the value type as an integer.
+    if(iop->type != INTEGER_T){
+        mtic_debug("%s: Agent's input '%s' is not a integer", __FUNCTION__,  name);
+        return 0;
+    }
+
+    // update the value in the iop_live structure
+    update_value(iop, (void*) &value);
+
+    // call the callback associated to if it exist
+    mtic_observe_callback_T *fct_to_call;
+    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
+    if(fct_to_call != NULL)
+        fct_to_call->callback_ptr(INPUT_T, name, INTEGER_T, (void*) &value, fct_to_call->data);
+
     return 1;
 }
+
+/**
+ * \fn
+ * \brief
+ *
+ * \param
+ * \return
+ */
 int mtic_writeInputAsDouble(const char *name, double value){
+
+    //Get the pointer IOP Agent selected by name
+    model_state state;
+    agent_iop *iop = model_findIopByName((char*) name, &state);
+
+    // Check if the iop has been returned.
+    if(iop == NULL){
+        mtic_debug("%s : Agent's input '%s' cannot be found\n", __FUNCTION__, name);
+        return 0;
+    }
+
+    //Check the value type as a double.
+    if(iop->type != DOUBLE_T){
+        mtic_debug("%s: Agent's input '%s' is not a double\n", __FUNCTION__,  name);
+        return 0;
+    }
+
+    // update the value in the iop_live structure
+    update_value(iop, (void*) &value);
+
+    // call the callback associated to if it exist
+    mtic_observe_callback_T *fct_to_call;
+    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
+    if(fct_to_call != NULL)
+        fct_to_call->callback_ptr(INPUT_T, name, DOUBLE_T, (void*) &value, fct_to_call->data);
+
     return 1;
 }
+
+/**
+ * \fn
+ * \brief
+ *
+ * \param
+ * \return
+ */
 int mtic_writeInputAsString(const char *name, char *value){
+
+    //Get the pointer IOP Agent selected by name
+    model_state state;
+    agent_iop *iop = model_findIopByName((char*) name, &state);
+
+    // Check if the iop has been returned.
+    if(iop == NULL){
+        mtic_debug("%s : Agent's input '%s' cannot be found\n", __FUNCTION__, name);
+        return 0;
+    }
+
+    //Check the value type as a string.
+    if(iop->type != STRING_T){
+        mtic_debug("%s: Agent's input '%s' is not a string\n", __FUNCTION__,  name);
+        return 0;
+    }
+
+    // update the value in the iop_live structure
+    update_value(iop, (void*) value);
+
+    // call the callback associated to if it exist
+    mtic_observe_callback_T *fct_to_call;
+    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
+    if(fct_to_call != NULL)
+        fct_to_call->callback_ptr(INPUT_T, name, STRING_T, (void*) value, fct_to_call->data);
+
     return 1;
 }
+
+/**
+ * \fn
+ * \brief
+ *
+ * \param
+ * \return
+ */
+int mtic_writeInputAsImpulsion(const char *name){
+
+    //Get the pointer IOP Agent selected by name
+    model_state state;
+    agent_iop *iop = model_findIopByName((char*) name, &state);
+
+    // Check if the iop has been returned.
+    if(iop == NULL){
+        mtic_debug("%s : Agent's input '%s' cannot be found\n", __FUNCTION__, name);
+        return 0;
+    }
+
+    //Check the value type as an impulsion.
+    if(iop->type != IMPULSION_T){
+        mtic_debug("%s: Agent's input '%s' is not an impulsion\n", __FUNCTION__,  name);
+        return 0;
+    }
+
+    //TODO: remove this code ? just call the callback
+    // update the value in the iop_live structure
+    //update_value(iop, (void*) value);
+
+    // call the callback associated to if it exist
+    mtic_observe_callback_T *fct_to_call;
+    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
+    if(fct_to_call != NULL)
+        fct_to_call->callback_ptr(INPUT_T, name, IMPULSION_T, 0, fct_to_call->data);
+
+    return 1;
+}
+
+/**
+ * \fn
+ * \brief
+ *
+ * \param
+ * \return
+ */
 int mtic_writeInputAsData(const char *name, void *value, long size){
+    fprintf(stderr, "WARNING - %s not implemented yet !\n", __FUNCTION__);
     return 1;
 }
 

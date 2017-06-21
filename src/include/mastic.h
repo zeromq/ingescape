@@ -2,6 +2,7 @@
 //  mastic_public.h
 //
 //  Created by Stephane Vales on 22/05/2017.
+//  Modified by Mathieu Poirier
 //  Copyright © 2016 IKKY WP4.8. All rights reserved.
 //
 
@@ -114,18 +115,19 @@ PUBLIC void mtic_readParameterAsData(const char *name, void *data, long *size); 
 //for DATA_T, these functions should be forbidden (need to know datra size)
 //size shall be given to Mastic
 //Mastic shall clone value and shall dispose of it when stopped
-int mtic_writeInput(const char *name, void *value, long size);
 int mtic_writeOutput(const char *name, void *value, long size);
 int mtic_writeParameter(const char *name, void *value, long size);
+PUBLIC int mtic_writeInput(const char *name, void *value, long size);
 
 //write using internal conversions (Mastic does the conversion job)
 //we need to make things clear on structures
 //for IMPULSION_T value is just ignored
 //Mastic shall clone value and shall dispose of it when stopped
-int mtic_writeInputAsBool(const char *name, bool value);
-int mtic_writeInputAsInt(const char *name, int value);
-int mtic_writeInputAsDouble(const char *name, double value);
-int mtic_writeInputAsString(const char *name, char *value);
+PUBLIC int mtic_writeInputAsBool(const char *name, bool value);
+PUBLIC int mtic_writeInputAsInt(const char *name, int value);
+PUBLIC int mtic_writeInputAsDouble(const char *name, double value);
+PUBLIC int mtic_writeInputAsString(const char *name, char *value);
+PUBLIC int mtic_writeInputAsImpulsion(const char *name);
 int mtic_writeInputAsData(const char *name, void *value, long size);
 
 int mtic_writeOutputAsBool(const char *name, bool value);
