@@ -2093,7 +2093,7 @@ char ** mtic_getOutputsList(long *nbOfElements){
 
     //Get the number of element
     (*nbOfElements) = HASH_COUNT(mtic_definition_live->outputs_table);
-    int N = (*nbOfElements);
+    long N = (*nbOfElements);
 
     if(N < 1)
         return NULL;
@@ -2129,7 +2129,7 @@ char ** mtic_getParametersList(long *nbOfElements){
 
     //Get the number of element
     (*nbOfElements) = HASH_COUNT(mtic_definition_live->params_table);
-    int N = (*nbOfElements);
+    long N = (*nbOfElements);
 
     if(N < 1)
         return NULL;
