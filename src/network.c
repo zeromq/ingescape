@@ -1070,5 +1070,10 @@ void mtic_setCanBeFreezed (bool canBeFreezed){
     agentCanBeFreezed = canBeFreezed;
 }
 
+//get library parameters
+bool mtic_getVerbose (){
+    return verboseMode;
+};
+
 
 

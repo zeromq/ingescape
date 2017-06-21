@@ -56,7 +56,8 @@ bool mtic_isMuted();
 PUBLIC void mtic_setVerbose (bool verbose);
 PUBLIC void mtic_setCanBeFreezed (bool canBeFreezed);
 
-
+// get library parameters
+PUBLIC bool mtic_getVerbose();
 
 
 //////////////////////////////////////////////////
