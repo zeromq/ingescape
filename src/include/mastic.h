@@ -115,9 +115,9 @@ PUBLIC void mtic_readParameterAsData(const char *name, void *data, long *size); 
 //for DATA_T, these functions should be forbidden (need to know datra size)
 //size shall be given to Mastic
 //Mastic shall clone value and shall dispose of it when stopped
-int mtic_writeParameter(const char *name, void *value, long size);
 PUBLIC int mtic_writeInput(const char *name, void *value, long size);
 PUBLIC int mtic_writeOutput(const char *name, void *value, long size);
+PUBLIC int mtic_writeParameter(const char *name, void *value, long size);
 
 //write using internal conversions (Mastic does the conversion job)
 //we need to make things clear on structures
@@ -137,10 +137,10 @@ PUBLIC int mtic_writeOutputAsString(const char *name, char *value);
 PUBLIC int mtic_writeOutputAsImpulsion(const char *name);
 int mtic_writeOutputAsData(const char *name, void *value, long size);
 
-int mtic_writeParameterAsBool(const char *name, bool value);
-int mtic_writeParameterAsInt(const char *name, int value);
-int mtic_writeParameterAsDouble(const char *name, double value);
-int mtic_writeParameterAsString(const char *name, char *value);
+PUBLIC int mtic_writeParameterAsBool(const char *name, bool value);
+PUBLIC int mtic_writeParameterAsInt(const char *name, int value);
+PUBLIC int mtic_writeParameterAsDouble(const char *name, double value);
+PUBLIC int mtic_writeParameterAsString(const char *name, char *value);
 int mtic_writeParameterAsData(const char *name, void *value, long size);
 
 
