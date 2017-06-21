@@ -489,9 +489,8 @@ model_state mtic_map_received(const char *agent_name, char *out_name, void *valu
             if( (strcmp(agent_name, temp->agent_name) == 0)
                && (strcmp(out_name, temp->output_name) == 0) &&
                (temp->state == ON)){
-
-                // Set the new input and update the live model
-                state = mtic_set(temp->input_name, value);
+                //TODO: do we have the size parameter for the mtic_writeInput here ?
+                state = mtic_writeInput(temp->input_name, value, 0);
             }
         }
     }
