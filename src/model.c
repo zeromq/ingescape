@@ -211,7 +211,7 @@ model_state mtic_set(const char *iop_name, void *new_value){
 //        network_publishOutput(iop_name);
 //    }
 
-//    return OK;
+    return OK;
 }
 
 /*
