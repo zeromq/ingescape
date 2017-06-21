@@ -160,10 +160,10 @@ PUBLIC bool mtic_checkParameterExistence(const char *name);
 
 //observe IOP
 //calback format for IOP observation
-typedef void (*mtic_observeCallback)(iop_t iop, const char *name, iopType_t valueType, void *value, void * myData);
-int mtic_observeInput(const char *name, mtic_observeCallback cb, void *myData);
-int mtic_observeOutput(const char *name, mtic_observeCallback cb, void * myData);
-int mtic_observeParameter(const char *name, mtic_observeCallback cb, void * myData);
+typedef void (*mtic_observeCallback)(iop_t iopType, const char *name, iopType_t valueType, void *value, void *myData);
+PUBLIC int mtic_observeInput(const char *name, mtic_observeCallback cb, void *myData);
+PUBLIC int mtic_observeOutput(const char *name, mtic_observeCallback cb, void * myData);
+PUBLIC int mtic_observeParameter(const char *name, mtic_observeCallback cb, void * myData);
 
 //mute or unmute an IOP
 int mtic_muteOutput(const char *name);

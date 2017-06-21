@@ -3,27 +3,24 @@
 //
 //  Created by Patxi Berard
 //  Modified by Vincent Deliencourt
+//  Modified by Mathieu Poirier
 //  Copyright © 2016 IKKY WP4.8. All rights reserved.
 //
 
 #include <stdio.h>
 #include <stdlib.h>
-//#include "mastic.h"
 #include "mastic_private.h"
 
-
-//Define the pointer on the callback function
-typedef void (*calback_ptr_t)( agent_iop* );
-
 //Hashable structure which associate the name of one 'iop' and the pointer of one callback
-typedef struct callbacks {
-    const char * iop_name;          //Need to be unique : the table hash key
-    calback_ptr_t callback_ptr;   //pointer on the callback
+typedef struct mtic_observe_callback_T {
+    const char * iop_name;              // Need to be unique : the table hash key
+    mtic_observeCallback callback_ptr;  // pointer on the callback
+    void* data;                         // user datas
     UT_hash_handle hh;
-} callbacks;
+} mtic_observe_callback_T;
 
 //The variable which will contain all the callbacks associated to 'iop'
-callbacks *agent_callbacks;
+mtic_observe_callback_T *agent_callbacks;
 
 // ------------ main functions use in 'MODEL' --------------- //
 
@@ -112,40 +109,13 @@ void update_value(agent_iop *iop, void* value){
         default:
             break;
     }
-}
 
-/*
- * Function: observe :
- * ----------------------------
- *  Observe the iop and associate a callback to it.
- *  When the iop value will change by calling the 'mtic_set' function, the associated callback will be called.
- *
- *  name_iop        : Name of the 'input/output/parameter'
- *
- *  callback_fct    : The pointer to the associated callback
- *
- *  return : model_state (cf. enum) return error is occur
- */
-model_state mtic_observe(const char *iop_name,
-             void (*callback_fct)(agent_iop *input_iop)){
-
-    //1) find the iop
-    model_state code;
-    agent_iop *iop = model_findIopByName((char*)iop_name,&code);
-
-    if(iop == NULL)
-        return code;
-
-    //2) Associate the input name with the callback which it will be called in SET
-    if(callback_fct != NULL){
-        callbacks *new_callback = malloc(sizeof(callbacks));
-        new_callback->iop_name = strdup(iop_name);  //assign the key
-        new_callback->callback_ptr = callback_fct;
-        HASH_ADD_STR( agent_callbacks, iop_name,  new_callback);
-    }else
-        return NO_CALLBACK;
-
-    return OK;
+    // debug - Let us know the value has changed
+    if (mtic_getVerbose() == true){
+        char* str_value = mtic_iop_value_to_string(iop);
+        mtic_debug("SET(\"%s\", %s).\n", iop->name, str_value);
+        free(str_value);
+    }
 }
 
 /*
@@ -1615,15 +1585,78 @@ bool mtic_checkParameterExistence(const char *name){
 
 //observe IOP
 //calback format for IOP observation
-typedef void (*mtic_observeCallback)(iop_t iop, const char *name, iopType_t valueType, void *value, void * myData);
+typedef void (*mtic_observeCallback)(iop_t iopType, const char *name, iopType_t valueType, void *value, void * myData);
+
+
+/** NOT in PUBLIC API
+ * fn mtic_observe(const char *name, mtic_observeCallback cb, void *myData)
+ * brief Observe the iop and associate a callback to it.
+ * When the iop value will change by calling the 'mtic_set' function, the associated callback will be called.
+ *
+ * param name the 'input/output/parameter'
+ * param cb the pointer to the associated callback
+ * return 1 if correct or 0
+ */
+static int mtic_observe(const char* type, const char* name, mtic_observeCallback cb, void* myData){
+
+    //1) find the iop
+    model_state state;
+    agent_iop *iop = model_findIopByName((char*) name, &state);
+
+    // Check if the input has been returned.
+    if(iop == NULL){
+        mtic_debug("%s : the %s Agent's '%s' cannot be found", __FUNCTION__, type,  name);
+        return 0;
+    }
+
+    //callback not defined
+    if(cb == NULL) {
+        mtic_debug("%s: the callback use for %s '%s' is null", __FUNCTION__, type,   name);
+        return 0;
+    }
+
+    mtic_observe_callback_T *new_callback = malloc(sizeof(mtic_observe_callback_T));
+    new_callback->iop_name = strdup(name);
+    new_callback->callback_ptr = cb;
+    new_callback->data = myData;
+    HASH_ADD_STR( agent_callbacks, iop_name,  new_callback);
+
+    mtic_debug("ADD_OBSERVE on the %s '%s'\n", type, name);
+
+    return 1;
+}
+
+/**
+ * \fn
+ * \brief
+ *
+ * \param
+ * \return
+ */
 int mtic_observeInput(const char *name, mtic_observeCallback cb, void *myData){
-    return 1;
+    return mtic_observe("input", name, cb, myData);
 }
+
+/**
+ * \fn
+ * \brief
+ *
+ * \param
+ * \return
+ */
 int mtic_observeOutput(const char *name, mtic_observeCallback cb, void * myData){
-    return 1;
+    return mtic_observe("output", name, cb, myData);
 }
+
+/**
+ * \fn
+ * \brief
+ *
+ * \param
+ * \return
+ */
 int mtic_observeParameter(const char *name, mtic_observeCallback cb, void * myData){
-    return 1;
+    return mtic_observe("parameter", name, cb, myData);
 }
 
 
