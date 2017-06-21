@@ -13,7 +13,7 @@ install:
 	sudo install $(HEADERS_DIR)/*.h -D $(INC_DEST)
 	sudo mkdir -p $(INC_DEST)/uthash
 	sudo install $(HEADERS_DIR)/uthash/* -D $(INC_DEST)/uthash/
-	sudo install $(LIB_DIR)/libmastic.* -D $(LIB_DEST)
+	sudo install $(LIB_DIR)/*mastic* -D $(LIB_DEST)
 	sudo install $(YAJL_DIR)/libyajl* -D $(LIB_DEST)
 	sudo install $(ZYRE_DIR)/* -D $(LIB_DEST)
 	sudo ldconfig
