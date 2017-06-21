@@ -8,12 +8,7 @@ SOURCES += \
 
 HEADERS += \
     $$PWD/../src/include/uthash/uthash.h \
-#    $$PWD/../src/include/definition.h \
-#    $$PWD/../src/include/mapping.h \
     $$PWD/../src/include/mastic.h \
-#    $$PWD/../src/include/model.h \
-#    $$PWD/../src/include/network.h \
-#    $$PWD/../src/include/parser.h \
     $$PWD/../src/include/tests.h \
     $$PWD/../src/include/mastic_private.h \
 
