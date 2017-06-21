@@ -135,38 +135,38 @@ const char* boolean_to_string (bool boole) {
  *   agent_iop  : a pointer to the agent_iop structure to free
  *
  */
-void free_agent_iop (agent_iop* agent_iop){
+void free_agent_iop (agent_iop** agent_iop){
 
-    free((char*)agent_iop->name);
-    agent_iop->name = NULL;
+    free((char*)(*agent_iop)->name);
+    (*agent_iop)->name = NULL;
 
-    switch (agent_iop->type) {
+    switch ((*agent_iop)->type) {
         case STRING_T:
-            free((char*)agent_iop->old_value.s);
-            agent_iop->old_value.s = NULL;
+            free((char*)(*agent_iop)->old_value.s);
+            (*agent_iop)->old_value.s = NULL;
 
-            free((char*)agent_iop->value.s);
-            agent_iop->value.s = NULL;
+            free((char*)(*agent_iop)->value.s);
+            (*agent_iop)->value.s = NULL;
             break;
         case IMPULSION_T:
-            free((char*)agent_iop->old_value.impuls);
-            agent_iop->old_value.impuls = NULL;
+            free((char*)(*agent_iop)->old_value.impuls);
+            (*agent_iop)->old_value.impuls = NULL;
 
-            free((char*)agent_iop->value.impuls);
-            agent_iop->value.impuls = NULL;
+            free((char*)(*agent_iop)->value.impuls);
+            (*agent_iop)->value.impuls = NULL;
             break;
         case DATA_T:
-            free((char*)agent_iop->old_value.data);
-            agent_iop->old_value.data = NULL;
+            free((char*)(*agent_iop)->old_value.data);
+            (*agent_iop)->old_value.data = NULL;
 
-            free((char*)agent_iop->value.data);
-            agent_iop->value.data = NULL;
+            free((char*)(*agent_iop)->value.data);
+            (*agent_iop)->value.data = NULL;
             break;
         default:
             break;
     }
 
-    free(agent_iop);
+    free((*agent_iop));
 }
 
 // --------- public functions ----------------------
@@ -278,17 +278,17 @@ void free_category (category* cat){
 
     HASH_ITER(hh, cat->params_table, current, tmp) {
         HASH_DEL(cat->params_table,current);
-        free_agent_iop(current);
+        free_agent_iop(&current);
         //current = NULL;
     }
     HASH_ITER(hh, cat->inputs_table, current, tmp) {
         HASH_DEL(cat->inputs_table,current);
-        free_agent_iop(current);
+        free_agent_iop(&current);
         //current = NULL;
     }
     HASH_ITER(hh, cat->outputs_table, current, tmp) {
         HASH_DEL(cat->outputs_table,current);
-        free_agent_iop(current);
+        free_agent_iop(&current);
         //current = NULL;
     }
 
@@ -317,17 +317,17 @@ void free_definition (definition* def) {
 
     HASH_ITER(hh, def->params_table, current_iop, tmp_iop) {
         HASH_DEL(def->params_table,current_iop);
-        free_agent_iop(current_iop);
+        free_agent_iop(&current_iop);
         current_iop = NULL;
     }
     HASH_ITER(hh, def->inputs_table, current_iop, tmp_iop) {
         HASH_DEL(def->inputs_table,current_iop);
-        free_agent_iop(current_iop);
+        free_agent_iop(&current_iop);
         current_iop = NULL;
     }
     HASH_ITER(hh, def->outputs_table, current_iop, tmp_iop) {
         HASH_DEL(def->outputs_table,current_iop);
-        free_agent_iop(current_iop);
+        free_agent_iop(&current_iop);
         current_iop = NULL;
     }
 
@@ -336,8 +336,6 @@ void free_definition (definition* def) {
         free_category(current_cat);
         current_cat = NULL;
     }
-
-    free(def);
 }
 
 /*
@@ -858,7 +856,7 @@ int mtic_removeInput(const char *name){
     HASH_DEL(mtic_definition_live->inputs_table, iop);
 
     //free Iop
-    free_agent_iop(iop);
+    free_agent_iop(&iop);
 
     return 1;
 }
@@ -899,7 +897,7 @@ int mtic_removeOutput(const char *name){
     HASH_DEL(mtic_definition_live->outputs_table, iop);
 
     //free Iop
-    free_agent_iop(iop);
+    free_agent_iop(&iop);
 
     return 1;
 }
@@ -940,7 +938,7 @@ int mtic_removeParameter(const char *name){
     HASH_DEL(mtic_definition_live->params_table, iop);
 
     //free Iop
-    free_agent_iop(iop);
+    free_agent_iop(&iop);
 
     return 1;
 }

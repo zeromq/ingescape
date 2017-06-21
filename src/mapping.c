@@ -40,29 +40,29 @@ const char * map_state_to_string(map_state state){
     return "";
 }
 
-void free_map_out (mapping_out* map_out){
+void free_map_out (mapping_out** map_out){
 
-    free((char*)map_out->agent_name);
-    map_out->agent_name = NULL ;
+    free((char*)(*map_out)->agent_name);
+    (*map_out)->agent_name = NULL ;
 
-    free((char*)map_out->input_name);
-    map_out->input_name = NULL ;
+    free((char*)(*map_out)->input_name);
+    (*map_out)->input_name = NULL ;
 
-    free((char*)map_out->output_name);
-    map_out->output_name = NULL ;
+    free((char*)(*map_out)->output_name);
+    (*map_out)->output_name = NULL ;
 
-    free (map_out);
+    free ((*map_out));
 }
 
-void free_map_cat (mapping_cat* map_cat){
+void free_map_cat (mapping_cat** map_cat){
 
-    free((char*)map_cat->agent_name);
-    map_cat->agent_name = NULL ;
+    free((char*)(*map_cat)->agent_name);
+    (*map_cat)->agent_name = NULL ;
 
-    free((char*)map_cat->category_name);
-    map_cat->category_name = NULL ;
+    free((char*)(*map_cat)->category_name);
+    (*map_cat)->category_name = NULL ;
 
-    free (map_cat);
+    free ((*map_cat));
 }
 
 /*
@@ -88,18 +88,14 @@ void mapping_FreeMapping (mapping* mapp) {
     //Free mapping output
     HASH_ITER(hh, mapp->map_out, current_map_out, tmp_map_out) {
         HASH_DEL(mapp->map_out,current_map_out);
-        free_map_out(current_map_out);
-        // current_map_out = NULL;
+        free_map_out(&current_map_out);
     }
 
     //Free mapping category
     HASH_ITER(hh, mapp->map_cat, current_map_cat, tmp_map_cat) {
         HASH_DEL(mapp->map_cat,current_map_cat);
-        free_map_cat(current_map_cat);
-        //current_map_cat = NULL;
+        free_map_cat(&current_map_cat);
     }
-
-    free(mapp);
 }
 
 /*
@@ -355,8 +351,13 @@ int mtic_map (char* input_name,char* map_description){
     char * output_to_map_name = NULL;   // the output name to map
     int error_code = -1;
 
+    //Check if already initialized, and do it if not
+    if(mtic_definition_live == NULL){
+        mtic_definition_live = calloc(1, sizeof(struct definition));
+    }
+
     //Find the input by the name in the table of the my agent's definition
-    HASH_FIND_STR(mtic_definition_loaded->inputs_table, input_name, input_to_map);
+    HASH_FIND_STR(mtic_definition_live->inputs_table, input_name, input_to_map);
 
     if(input_to_map == NULL){
         fprintf (stderr, "%s : input name %s not found \n",

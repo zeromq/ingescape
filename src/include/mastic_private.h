@@ -216,7 +216,7 @@ double get_iop_value_as_double(agent_iop *iop);
 
 bool check_category (definition* def, category* category, category_check_type check_type);
 bool check_category_agent_iop(agent_iop* def_iop, agent_iop* iop_cat_to_check);
-void free_agent_iop (agent_iop* agent_iop);
+void free_agent_iop (agent_iop **agent_iop);
 void free_category (category* category);
 void free_definition (definition* definition);
 
