@@ -1175,7 +1175,7 @@ int mtic_writeInput(const char *name, void *value, long size){
         ret = mtic_writeInputAsImpulsion(name);
         break;
     case DATA_T:
-        ret = mtic_writeInputAsData(name, *(int*) value, size);
+        ret = mtic_writeInputAsData(name, value, size);
         break;
     default:
         mtic_debug("%s: Agent's input %s has not a known type\n.", __FUNCTION__,  name);
@@ -1225,7 +1225,7 @@ int mtic_writeOutput(const char *name, void *value, long size){
         ret = mtic_writeOutputAsImpulsion(name);
         break;
     case DATA_T:
-        ret = mtic_writeOutputAsData(name, *(int*) value, size);
+        ret = mtic_writeOutputAsData(name, value, size);
         break;
     default:
         mtic_debug("%s: Agent's output %s has not a known type\n.", __FUNCTION__,  name);
