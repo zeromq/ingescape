@@ -61,7 +61,7 @@ static const char *exportDefinitionPrefix = "DEFINITION#";
 #define NETWORK_DEVICE_LENGTH 16
 #define AGENT_NAME_LENGTH 256
 #define IP_ADDRESS_LENGTH 256
-char agentName[AGENT_NAME_LENGTH] = "";
+char agentName[AGENT_NAME_LENGTH] = "mtic_undefined";
 char agentState[AGENT_NAME_LENGTH] = "";
 #define NO_DEVICE "unknown"
 
@@ -488,9 +488,6 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
 static void
 initActor (zsock_t *pipe, void *args)
 {
-    if (strlen(agentName) == 0){
-        strncpy(agentName, "undefined", AGENT_NAME_LENGTH);
-    }
     //start zyre
     agentElements->node = zyre_new (agentName);
     zyre_set_port(agentElements->node, agentElements->zyrePort);
