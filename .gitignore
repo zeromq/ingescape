@@ -1,3 +1,7 @@
+zyreprobe/zyreprobe/*.o
+zyreprobe/zyreprobe/zyreprobe
+builds/linux/*
+builds/doxygen/html/*
 builds/builds/
 dependencies/uthash/
 builds/windows/
