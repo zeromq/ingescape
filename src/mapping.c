@@ -348,7 +348,7 @@ int mtic_map (char* input_name,char* map_description){
     int result = 0;
     agent_iop *input_to_map = NULL;     // the input to map
     char *agent_to_map_name = NULL;     // the external agent name to map
-    char * output_to_map_name = NULL;   // the output name to map
+    char *output_to_map_name = NULL;   // the output name to map
     int error_code = -1;
 
     //Check if already initialized, and do it if not
@@ -358,20 +358,16 @@ int mtic_map (char* input_name,char* map_description){
 
     //Find the input by the name in the table of the my agent's definition
     HASH_FIND_STR(mtic_definition_live->inputs_table, input_name, input_to_map);
-
     if(input_to_map == NULL){
-        fprintf (stderr, "%s : input name %s not found \n",
-                 __FUNCTION__,
-                 input_name);
+        mtic_debug("%s : input name %s not found \n",
+                   __FUNCTION__,
+                   input_name);
         return 1;
-
     }
 
     if(map_description == NULL){
-        fprintf (stderr, "%s : Map description is NULL \n", __FUNCTION__);
-
+        mtic_debug ("%s : Map description is NULL \n", __FUNCTION__);
         return 2;
-
     }
 
     //Split the map description to : agent name & output name
@@ -399,7 +395,7 @@ int mtic_map (char* input_name,char* map_description){
     copy = NULL;
 
     if(agent_to_map_name == NULL){
-        fprintf (stderr, "%s : agent to map has no name \n", __FUNCTION__);
+        mtic_debug ("%s : agent to map has no name \n", __FUNCTION__);
 
         // Clean-up
         if (output_to_map_name != NULL)
@@ -412,7 +408,7 @@ int mtic_map (char* input_name,char* map_description){
     }
 
     if(output_to_map_name == NULL){
-        fprintf (stderr, "%s : agent's output to map has no name  \n", __FUNCTION__);
+        mtic_debug ("%s : agent's output to map has no name  \n", __FUNCTION__);
 
         // Clean-up
         if (agent_to_map_name != NULL)
@@ -424,7 +420,7 @@ int mtic_map (char* input_name,char* map_description){
         return 4;
     }
 
-    // New map_out to created
+    // New map_out to be created
     mapping_out * new_map = NULL;
 
     //Find if the map is in table mapping & Add the map in the table mapping
@@ -570,10 +566,10 @@ mapping_out * mtic_find_map(char * input_name,
  * Function: check_map
  * ----------------------------
  *   It's called in the function ENTER.
- *   Check if the agent is concerning by a mapping.
- *   Update the mapping state if some exist.
+ *   Check if the agent is involved in a mapping.
+ *   Update the mapping state if exists.
  *
- *   definition : the definition of the external entered agent
+ *   definition : the definition of the external agent
  *
  *   returns    : the table of outputs to subscribe OR null
  */
@@ -583,7 +579,7 @@ agent_iop* mtic_check_map(definition *definition){
     // If my agent_mapping has been created
     if(mtic_my_agent_mapping != NULL)
     {
-        //Check if the agent is concerning by a mapping
+        //Check if the agent definition is involved in our mapping
         char * agent_to_map_name = NULL;
         agent_to_map_name = strdup(definition->name);
 
