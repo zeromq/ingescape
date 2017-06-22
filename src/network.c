@@ -148,13 +148,13 @@ void sendDefinitionToAgent(const char *peerId)
 int subscribeToPublisherOutput(const char *agentName, const char *outputName)
 {
     // If a filter has to be mtic_set
-    if(strlen(outputName) > 0)
+    if(strlen(outputName) > 0 && strlen(agentName) > 0)
     {
         //we found a possible publisher to subscribe to
         subscriber_t *subscriber, *tmp;
         HASH_ITER(hh, subscribers, subscriber, tmp) {
-            
-            if(strcmp(subscriber->agentName,agentName) == 0)
+            //NB: iteration is robust to agents with same name
+            if(strcmp(subscriber->agentName,agentName) == 0 && subscriber->subscriber != NULL)
             {
                 // Set subscriber to the output filter
                 mtic_debug("subscribe to agent %s output %s.\n",agentName,outputName);
@@ -166,7 +166,7 @@ int subscribeToPublisherOutput(const char *agentName, const char *outputName)
         }
     }
     
-    // Subsriber not found, it is not in the network yet
+    // Subscriber not found, it is not in the network yet
     return 0;
 }
 
@@ -190,7 +190,7 @@ int unsubscribeToPublisherOutput(const char *agentName, const char *outputName)
         //we found a possible publisher to subscribe to
         subscriber_t *subscriber, *tmp;
         HASH_ITER(hh, subscribers, subscriber, tmp) {
-            
+            //NB: iteration is robust to agents with same name
             if(strcmp(subscriber->agentName,agentName) == 0)
             {
                 // Unsubscribe to the output filter
@@ -203,7 +203,7 @@ int unsubscribeToPublisherOutput(const char *agentName, const char *outputName)
         }
     }
     
-    // Subsriber not found, it is not in the network yet
+    // Subscriber not found, it is not in the network yet
     return -1;
 }
 
@@ -244,29 +244,27 @@ int manageSubscription (zloop_t *loop, zmq_pollitem_t *item, void *arg){
 
     if (item->revents & ZMQ_POLLIN && strlen(subscriberPeerId) > 0)
     {
-        subscriber_t * subscriberFound = NULL;
+        subscriber_t * foundSubscriber = NULL;
 
         // Try to find our original subscriber
-        HASH_FIND_STR(subscribers, subscriberPeerId, subscriberFound);
-        if(subscriberFound != NULL)
+        HASH_FIND_STR(subscribers, subscriberPeerId, foundSubscriber);
+        if(foundSubscriber != NULL)
         {
-            zmsg_t *msg = zmsg_recv(subscriberFound->subscriber);
-            // Message ust contain 3 elements=
-            // 1 : filter "agentName.outputName
-            // 2 : output name only
-            // 3 : value of the output
-            if(zmsg_size(msg) == 3 && isFreezed == false)
+            zmsg_t *msg = zmsg_recv(foundSubscriber->subscriber);
+            // Message ust contain 2 elements=
+            // 1 : output name
+            // 2 : value of the output
+            if(zmsg_size(msg) == 2 && isFreezed == false)
             {
-                char * filter = zmsg_popstr(msg);
                 char * output = zmsg_popstr(msg);
                 char * value = zmsg_popstr(msg);
 
                 // Find the subscriber definition
                 // Look for the new agent definition
                 definition * externalDefinition = NULL;
-                HASH_FIND_STR(mtic_agents_defs_on_network, subscriberFound->agentName, externalDefinition);
+                HASH_FIND_STR(mtic_agents_defs_on_network, foundSubscriber->agentName, externalDefinition);
 
-                // We had it if we don't have it already
+                // We add it if we don't have it already
                 if(externalDefinition != NULL)
                 {
                     // convert the string value in void* corresponding to the type of iop
@@ -278,14 +276,13 @@ int manageSubscription (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                         const void* converted_value = mtic_iop_value_string_to_real_type(found_iop, value);
 
                         // Map reception send to modify the internal model
-                        code = mtic_map_received(subscriberFound->agentName,
-                                            output,
-                                            (void*)converted_value);
+                        code = mtic_map_received(foundSubscriber->agentName,
+                                                 output,
+                                                 (void*)converted_value);
 
                     }
                 }
 
-                free(filter);
                 free(output);
                 free(value);
             } else {
@@ -370,7 +367,7 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                         subscriber = calloc(1, sizeof(subscriber_t));
                         subscriber->agentName = strdup(name);
                         subscriber->agentPeerId = strdup (peer);
-                        subscriber->subscriber = zsock_new_sub(endpointAddress, "DEFAULT");
+                        subscriber->subscriber = zsock_new_sub(endpointAddress, NULL);
                         assert(subscriber->subscriber);
                         HASH_ADD_STR(subscribers, agentPeerId, subscriber);
                         subscriber->pollItem = calloc(1, sizeof(zmq_pollitem_t));
@@ -404,42 +401,44 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
             char *message = zmsg_popstr (msg);
             if(strlen(message) > strlen(exportDefinitionPrefix))
             {
+                //check if message is a definition
                 if (strncmp (message, exportDefinitionPrefix, strlen(exportDefinitionPrefix)) == 0)
                 {
-                    char* strDefinition = calloc(strlen(message)- strlen(exportDefinitionPrefix)+1, sizeof(char));
-
                     // Extract definition from message
+                    char* strDefinition = calloc(strlen(message)- strlen(exportDefinitionPrefix)+1, sizeof(char));
                     memcpy(strDefinition, &message[strlen(exportDefinitionPrefix)], strlen(message)- strlen(exportDefinitionPrefix));
                     strDefinition[strlen(message)- strlen(exportDefinitionPrefix)] = '\0';
 
-                    // Look for the new agent definition
-                    definition * receivedDefinition = NULL;
-                    HASH_FIND_STR(mtic_agents_defs_on_network, name, receivedDefinition);
-
-                    // We had it if we don't have it already
-                    if(receivedDefinition == NULL){
-                        // Load definition from string content
-                        receivedDefinition = parser_loadDefinition(strDefinition);
-
-                        // Add the new definition if not found
-                        if(receivedDefinition != NULL && receivedDefinition->name != NULL)
-                        {
-                            mtic_debug("Add new definition from %s\n", name);
-
-                            // FIXME - needed ? Send back our definition if it's a new one for us
-                            //printf ("Send our definition...\n");
-                            //mtic_sendDefinition();
-
-                            // Add definition to the map
-                            HASH_ADD_STR(mtic_agents_defs_on_network, name, receivedDefinition);
-
-                            // check and subscribe to the new added outputs if eixts and the concerning agent is present.
-                            // Check if we have a mapping with it
-                            // Check and add mapping if needed
-                            network_checkAndSubscribeToPublisher(name);
+                    // Load definition from string content
+                    definition *newDefinition = parser_loadDefinition(strDefinition);
+                    
+                    if (newDefinition != NULL && newDefinition->name != NULL){
+                        //agent name is superior to definition name at runtime : we overwrite if needed
+                        if (strcmp (newDefinition->name, name) != 0){
+                            free((char *)newDefinition->name);
+                            newDefinition->name = strdup(name);
                         }
+                        
+                        // Look for this agent definition in our know definitions
+                        definition *tmpDefinition = NULL;
+                        HASH_FIND_STR(mtic_agents_defs_on_network, newDefinition->name, tmpDefinition);
+                        if(tmpDefinition == NULL){
+                            //no previous definition for this agent
+                            mtic_debug("Store definition for new agent %s\n", name);
+                            
+                            // Add definition to the map
+                            HASH_ADD_STR(mtic_agents_defs_on_network, name, newDefinition);
+                            
+                            // Check the involvement of this new definition in our mapping and update subscriptions
+                            network_checkAndSubscribeToPublisher(newDefinition->name);
+                        }else{
+                            mtic_debug("ERROR: definition already exists for agent %s\nCheck if another agent has the same name on the network...", name);
+                            free_definition(newDefinition);
+                        }
+                    }else{
+                        mtic_debug("ERROR: definition is NULL or has no name for agent %s\n", name);
+                        free_definition(newDefinition);
                     }
-
                     free(strDefinition);
                 }
             }
@@ -452,13 +451,13 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
             if (subscriber != NULL)
             {
                 // Remove the agent definition from network
-                definition * receivedDefinition = NULL;
-                HASH_FIND_STR(mtic_agents_defs_on_network, name, receivedDefinition);
+                definition * myDefinition = NULL;
+                HASH_FIND_STR(mtic_agents_defs_on_network, name, myDefinition);
                 // We had it if we don't have it already
-                if(receivedDefinition != NULL)
+                if(myDefinition != NULL)
                 {
                     // Deactivate mapping of the leaving agent
-                    agent_iop* iop_unmappped = mtic_unmap(receivedDefinition);
+                    agent_iop* iop_unmappped = mtic_unmap(myDefinition);
                     struct agent_iop *iop, *tmp;
                     HASH_ITER(hh,iop_unmappped, iop, tmp)
                     {
@@ -466,9 +465,9 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                         free(iop);
                     }
 
-                    HASH_DEL(mtic_agents_defs_on_network, receivedDefinition);
-                    free_definition(receivedDefinition);
-                    receivedDefinition = NULL;
+                    HASH_DEL(mtic_agents_defs_on_network, myDefinition);
+                    free_definition(myDefinition);
+                    myDefinition = NULL;
                 }
                 
                 //TODO : think about the stuff below to see if it is really necessary
@@ -485,23 +484,6 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
     }
     return 0;
 }
-
-//FOR TESTING - SEND PERIODIC MESSAGES ON PUBLISHER
-int sendTestMessagesOnPublisher(zloop_t *loop, int timer_id, void *arg){
-
-    //zyreloopElements_t *zEl = (zyreloopElements_t *)arg;
-
-    // FIXME - For test, only send an update if we are the moduletest2,
-    // will be received by moduletest
-    // Message ust contain 3 elements=
-    // 1 : filter "agentName.outputName
-    // 2 : output name only
-    // 3 : value of the output
-    network_publishOutput ("output1");
-
-    return 0;
-}
-
 
 static void
 initActor (zsock_t *pipe, void *args)
@@ -679,15 +661,9 @@ int network_publishOutput (const char* output_name)
             char* str_value = mtic_iop_value_to_string(found_iop);
             if(strlen(str_value) > 0)
             {
-                // Build the map description used as filter for other agents
-                char mapDescription[100];
-                strcpy(mapDescription, agentName);
-                strcat(mapDescription, ".");
-                strcat(mapDescription, found_iop->name);
-                
                 mtic_debug("publish %s -> %s.\n",found_iop->name,str_value);
                 // Send message
-                zstr_sendx(agentElements->publisher, mapDescription,found_iop->name,str_value,NULL);
+                zstr_sendx(agentElements->publisher, found_iop->name, str_value, NULL);
                 
                 result = 1;
             }
@@ -726,39 +702,33 @@ int network_publishOutput (const char* output_name)
 int network_checkAndSubscribeToPublisher(const char* agentName)
 {
     int result = 0;
-    // Look for the new agent definition
-    definition * externalDefinition = NULL;
-    HASH_FIND_STR(mtic_agents_defs_on_network, agentName, externalDefinition);
+    // Look for the publisher definition
+    definition * publisherDefinition = NULL;
+    HASH_FIND_STR(mtic_agents_defs_on_network, agentName, publisherDefinition);
     
-    // We had it if we don't have it already
-    if(externalDefinition != NULL)
+    // We add it if we don't have it already
+    if(publisherDefinition != NULL)
     {
-        // Porcess mapping
+        // Process mapping
         // Check if we have a mapping with it
         // Check and add mapping if needed
-        agent_iop* outputsToSubscribe = mtic_check_map(externalDefinition);
+        agent_iop* outputsToSubscribe = mtic_check_map(publisherDefinition);
         
         if(outputsToSubscribe != NULL)
         {
-            char map_description[100];
-            
             struct agent_iop *iop, *tmp;
             HASH_ITER(hh,outputsToSubscribe, iop, tmp)
             {
-                strcpy(map_description, externalDefinition->name);
-                strcat(map_description, ".");
-                strcat(map_description, iop->name);
-                
                 // Make subscribtion
-                int cr = subscribeToPublisherOutput(externalDefinition->name, map_description);
+                int cr = subscribeToPublisherOutput(publisherDefinition->name, iop->name);
                 
                 // Subscription has been done
                 if(cr > 0)
                 {
-                    mtic_debug("Subscription found and done to output: %s from agent: %s.\n",iop->name,externalDefinition->name);
+                    mtic_debug("Subscription found and done to output: %s from agent: %s.\n",iop->name,agentName);
                     result = 1;
                 } else {
-                    mtic_debug("Subscription has been found but not done to output: %s from agent: %s.\n",iop->name,externalDefinition->name);
+                    mtic_debug("Subscription has been found but not done to output: %s from agent: %s.\n",iop->name,agentName);
                 }
                 
                 HASH_DEL(outputsToSubscribe, iop);
