@@ -212,6 +212,11 @@ extern definition * mtic_definition_loaded;
 extern definition * mtic_definition_live;
 extern definition * mtic_agents_defs_on_network;
 
+iopType_t string_to_value_type(const char* string);
+bool string_to_boolean(const char* string);
+const char* value_type_to_string (iopType_t type);
+const char* boolean_to_string (bool boole);
+
 int get_iop_value_as_int(agent_iop *iop);
 double get_iop_value_as_double(agent_iop *iop);
 
@@ -227,13 +232,8 @@ void free_definition (definition* definition);
 // the table which will contain the mapping
 extern mapping * mtic_my_agent_mapping;
 
-iopType_t string_to_value_type(const char* string);
-bool string_to_boolean(const char* string);
-const char* value_type_to_string (iopType_t type);
-const char* boolean_to_string (bool boole);
 MASTICAPI_COMMON_DLLSPEC char* mtic_iop_value_to_string (agent_iop* iop);
 MASTICAPI_COMMON_DLLSPEC const void* mtic_iop_value_string_to_real_type (agent_iop* iop, char* value);
-
 
 const char * map_state_to_string(map_state state);
 int mtic_map(char* input_name, char* map_description);
@@ -252,10 +252,10 @@ agent_iop * model_findIopByName(const char* name, model_state *code);
 agent_iop * mtic_find_iop_by_name_on_definition(const char *name, definition* definition, model_state *code);
 model_state mtic_set(const char* iop_name, void* new_value);
 void * mtic_get(const char* name_iop, model_state* state);
-
 // Conversions
 char* model_IntToString(const int value);
 char* model_DoubleToString(const double value);
+
 
 //////////////////  network   //////////////////
 int network_publishOutput (const char* output_name);
