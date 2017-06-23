@@ -255,7 +255,6 @@ static void json_add_category_to_hash (struct category** hasht,
  */
 
 static definition* json_parse_definition (yajl_val node) {
-
     definition* def;
     yajl_val v;
     def = (definition*) calloc(1, sizeof(definition));
@@ -263,8 +262,18 @@ static definition* json_parse_definition (yajl_val node) {
 
     path[1] = STR_NAME;
     v = yajl_tree_get(node, path, yajl_t_any);
-    if (v)
-        def->name = strdup (YAJL_IS_STRING(v) ? (v)->u.string : "");
+
+    if (v){
+        //Check the name of agent from network layer
+        if(strcmp(mtic_getAgentName(), AGENT_NAME_DEFAULT) == 0){
+            //The name of the agent is default so we need to assign from definition
+            def->name = strdup (YAJL_IS_STRING(v) ? (v)->u.string : "");
+            mtic_setAgentName(def->name);
+        }else{
+            //The agent name was assigned by the developer so we wont change from definition
+            def->name = strdup(mtic_getAgentName());
+        }
+    }
 
     path[1] = STR_DESCRIPTION;
     v = yajl_tree_get(node, path, yajl_t_any);
