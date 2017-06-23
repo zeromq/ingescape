@@ -575,7 +575,8 @@ static void json_dump_definition (yajl_gen *g, definition* def) {
     yajl_gen_map_open(*g);
     
     yajl_gen_string(*g, (const unsigned char *) STR_NAME, strlen(STR_NAME));
-    yajl_gen_string(*g, (const unsigned char *) def->name, strlen (def->name));
+    //Get the agent name from the network layer
+    yajl_gen_string(*g, (const unsigned char *) mtic_getAgentName(), strlen (mtic_getAgentName()));
     
     yajl_gen_string(*g, (const unsigned char *) STR_DESCRIPTION, strlen(STR_DESCRIPTION));
     yajl_gen_string(*g, (const unsigned char *) def->description, strlen (def->description));
