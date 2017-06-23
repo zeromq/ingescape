@@ -258,6 +258,7 @@ char* model_DoubleToString(const double value);
 
 
 //////////////////  network   //////////////////
+#define AGENT_NAME_DEFAULT "mtic_undefined"
 int network_publishOutput (const char* output_name);
 int network_checkAndSubscribeToPublisher(const char* agentName);
 void mtic_debug(const char *fmt, ...);

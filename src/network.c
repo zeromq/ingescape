@@ -61,7 +61,7 @@ static const char *exportDefinitionPrefix = "DEFINITION#";
 #define NETWORK_DEVICE_LENGTH 16
 #define AGENT_NAME_LENGTH 256
 #define IP_ADDRESS_LENGTH 256
-char agentName[AGENT_NAME_LENGTH] = "mtic_undefined";
+char agentName[AGENT_NAME_LENGTH] = AGENT_NAME_DEFAULT;
 char agentState[AGENT_NAME_LENGTH] = "";
 #define NO_DEVICE "unknown"
 
