@@ -26,6 +26,8 @@
 #define STR_TYPE "type"
 #define STR_VALUE "value"
 
+char *previousAgentNameFromDefinition = NULL;
+
 // --------- static functions used for json parsing --------------------//
 
 /*
@@ -265,14 +267,17 @@ static definition* json_parse_definition (yajl_val node) {
 
     if (v){
         //Check the name of agent from network layer
-        if(strcmp(mtic_getAgentName(), AGENT_NAME_DEFAULT) == 0){
-            //The name of the agent is default so we need to assign from definition
+        char *name = mtic_getAgentName();
+        if(strcmp(name, AGENT_NAME_DEFAULT) == 0 || previousAgentNameFromDefinition != NULL){
+            //The name of the agent is default or was previouly changed by definition load
             def->name = strdup (YAJL_IS_STRING(v) ? (v)->u.string : "");
             mtic_setAgentName(def->name);
+            previousAgentNameFromDefinition = (char *)def->name;
         }else{
-            //The agent name was assigned by the developer so we wont change from definition
-            def->name = strdup(mtic_getAgentName());
+            //The agent name was assigned by the developer : we keep it untouched
+            def->name = strdup(name);
         }
+        free(name);
     }
 
     path[1] = STR_DESCRIPTION;
@@ -585,7 +590,9 @@ static void json_dump_definition (yajl_gen *g, definition* def) {
     
     yajl_gen_string(*g, (const unsigned char *) STR_NAME, strlen(STR_NAME));
     //Get the agent name from the network layer
-    yajl_gen_string(*g, (const unsigned char *) mtic_getAgentName(), strlen (mtic_getAgentName()));
+    char *name = mtic_getAgentName();
+    yajl_gen_string(*g, (const unsigned char *) name, strlen (name));
+    free(name);
     
     yajl_gen_string(*g, (const unsigned char *) STR_DESCRIPTION, strlen(STR_DESCRIPTION));
     yajl_gen_string(*g, (const unsigned char *) def->description, strlen (def->description));
