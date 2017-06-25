@@ -948,7 +948,7 @@ int mtic_setAgentName(const char *name){
     //We set it to NULL here to identify if the action
     //comes from the developer.
     //If it comes from definition load, we set it immediatlely
-    //after calling mtic_setAgentName in json_parse_definition in model.c
+    //after calling mtic_setAgentName in json_parse_definition in parser.c
     previousAgentNameFromDefinition = NULL;
     
     if (needRestart){
