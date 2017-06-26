@@ -19,6 +19,7 @@ typedef struct mtic_observe_callback_T {
     UT_hash_handle hh;
 } mtic_observe_callback_T;
 
+
 //The variable which will contain all the callbacks associated to 'iop'
 mtic_observe_callback_T *agent_callbacks;
 
@@ -2369,25 +2370,32 @@ int mtic_observeParameter(const char *name, mtic_observeCallback cb, void * myDa
 
 //mute or unmute an IOP
 int mtic_muteOutput(const char *name){
+    model_state state;
+    agent_iop *iop = model_findIopByName((char*) name, &state);
+    if(iop == NULL || iop->type != OUTPUT_T){
+        mtic_debug("%s : output '%s' cannot be found", __FUNCTION__, name);
+        return 0;
+    }
+    iop->is_muted = true;
     return 1;
 }
 int mtic_unmuteOutput(const char *name){
+    model_state state;
+    agent_iop *iop = model_findIopByName((char*) name, &state);
+    if(iop == NULL || iop->type != OUTPUT_T){
+        mtic_debug("%s : output '%s' cannot be found", __FUNCTION__, name);
+        return 0;
+    }
+    iop->is_muted = false;
     return 1;
 }
 bool mtic_isOutputMuted(const char *name){
-    return 1;
-}
-
-//mute the agent
-int mtic_mute(){
-    return 1;
-}
-
-int mtic_unmute(){
-    return 1;
-}
-
-bool mtic_isMuted(){
-    return 1;
+    model_state state;
+    agent_iop *iop = model_findIopByName((char*) name, &state);
+    if(iop == NULL || iop->type != OUTPUT_T){
+        mtic_debug("%s : output '%s' cannot be found", __FUNCTION__, name);
+        return 0;
+    }
+    return iop->is_muted;
 }
 

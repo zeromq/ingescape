@@ -49,9 +49,9 @@ PUBLIC int mtic_setAgentState(const char *state);
 PUBLIC char *mtic_getAgentState(); //returned string shall be freed by caller
 
 //mute the agent
-int mtic_mute();
-int mtic_unmute();
-bool mtic_isMuted();
+PUBLIC int mtic_mute();
+PUBLIC int mtic_unmute();
+PUBLIC bool mtic_isMuted();
 
 //set library parameters
 PUBLIC void mtic_setVerbose (bool verbose);
@@ -169,9 +169,9 @@ PUBLIC int mtic_observeOutput(const char *name, mtic_observeCallback cb, void * 
 PUBLIC int mtic_observeParameter(const char *name, mtic_observeCallback cb, void * myData);
 
 //mute or unmute an IOP
-int mtic_muteOutput(const char *name);
-int mtic_unmuteOutput(const char *name);
-bool mtic_isOutputMuted(const char *name);
+PUBLIC int mtic_muteOutput(const char *name);
+PUBLIC int mtic_unmuteOutput(const char *name);
+PUBLIC bool mtic_isOutputMuted(const char *name);
 
 
 

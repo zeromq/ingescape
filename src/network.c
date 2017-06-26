@@ -53,6 +53,8 @@
 bool verboseMode = true;
 bool isFrozen = false;
 bool agentCanBeFrozen = false;
+bool isWholeAgentMuted = false;
+
 
 //global parameters
 //prefix for sending definition through zyre
@@ -652,7 +654,7 @@ int network_publishOutput (const char* output_name)
     
     if(agentElements != NULL && agentElements->publisher != NULL && found_iop != NULL)
     {
-        if(found_iop->is_muted == false && found_iop->name != NULL && isFrozen == false)
+        if(!isWholeAgentMuted && !found_iop->is_muted && found_iop->name != NULL && !isFrozen)
         {
             if (found_iop->type == DATA_T){
                 //TODO
@@ -673,13 +675,17 @@ int network_publishOutput (const char* output_name)
             }
             
         } else {
-            // Print message if output has been muted
-            if(found_iop->is_muted == true)
+            if(found_iop == NULL)
             {
-                mtic_debug("Should publish output %s but it has been muted.\n",found_iop->name);
+                mtic_debug("Output %s is unknown\n", output_name);
             }
-            
-            // Print message if the agent has been Frozen
+            if (isWholeAgentMuted){
+                mtic_debug("Should publish output %s but the agent has been muted\n",found_iop->name);
+            }
+            if(found_iop->is_muted)
+            {
+                mtic_debug("Should publish output %s but it has been muted\n",found_iop->name);
+            }
             if(isFrozen == true)
             {
                 mtic_debug("Should publish output %s but the agent has been frozen\n",found_iop->name);
@@ -1053,6 +1059,27 @@ void mtic_setCanBeFrozen (bool canBeFrozen){
 bool mtic_getVerbose (){
     return verboseMode;
 };
+
+//mute the agent
+int mtic_mute(){
+    isWholeAgentMuted = true;
+    if (agentElements != NULL && agentElements->node != NULL){
+        zyre_shouts(agentElements->node, CHANNEL, "MUTED=%i", isWholeAgentMuted);
+    }
+    return 1;
+}
+
+int mtic_unmute(){
+    isWholeAgentMuted = false;
+    if (agentElements != NULL && agentElements->node != NULL){
+        zyre_shouts(agentElements->node, CHANNEL, "MUTED=%i", isWholeAgentMuted);
+    }
+    return 1;
+}
+
+bool mtic_isMuted(){
+    return isWholeAgentMuted;
+}
 
 
 
