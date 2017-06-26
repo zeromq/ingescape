@@ -26,7 +26,7 @@
 #define STR_TYPE "type"
 #define STR_VALUE "value"
 
-char *previousAgentNameFromDefinition = NULL;
+bool agentNameChangedByDefinition = false;
 
 // --------- static functions used for json parsing --------------------//
 
@@ -268,11 +268,11 @@ static definition* json_parse_definition (yajl_val node) {
     if (v){
         //Check the name of agent from network layer
         char *name = mtic_getAgentName();
-        if(strcmp(name, AGENT_NAME_DEFAULT) == 0 || previousAgentNameFromDefinition != NULL){
+        if(strcmp(name, AGENT_NAME_DEFAULT) == 0 || agentNameChangedByDefinition){
             //The name of the agent is default or was previouly changed by definition load
             def->name = strdup (YAJL_IS_STRING(v) ? (v)->u.string : "");
             mtic_setAgentName(def->name);
-            previousAgentNameFromDefinition = (char *)def->name;
+            agentNameChangedByDefinition = true;
         }else{
             //The agent name was assigned by the developer : we keep it untouched
             def->name = strdup(name);

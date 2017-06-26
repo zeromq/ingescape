@@ -945,11 +945,11 @@ int mtic_setAgentName(const char *name){
     }
     
     strncpy(agentName, name, AGENT_NAME_LENGTH);
-    //We set it to NULL here to identify if the action
+    //We set it to false here to identify if the action
     //comes from the developer.
-    //If it comes from definition load, we set it immediatlely
+    //If it comes from definition load, we set it to true
     //after calling mtic_setAgentName in json_parse_definition in parser.c
-    previousAgentNameFromDefinition = NULL;
+    agentNameChangedByDefinition = false;
     
     if (needRestart){
         if (strcmp(networkDevice, NO_DEVICE) == 0){
