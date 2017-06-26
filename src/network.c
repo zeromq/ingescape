@@ -6,12 +6,15 @@
 //  Copyright © 2016 IKKY WP4.8. All rights reserved.
 //
 
+/**
+  * \file ../../src/include/mastic.h
+  */
+
 #include <zyre.h>
 #include <czmq.h>
 #include "uthash/uthash.h"
 #include "uthash/utlist.h"
 #include "mastic_private.h"
-//#include "mastic.h"
 
 #ifdef _WIN32
     #define MALLOC(x) HeapAlloc(GetProcessHeap(), 0, (x))
@@ -753,7 +756,20 @@ int network_checkAndSubscribeToPublisher(const char* agentName)
 // PUBLIC API
 ////////////////////////////////////////////////////////////////////////
 
-//start, stop & kill the agent
+/**
+ *  \defgroup startstopfct Start / Stop / Mute functions of agent
+ *
+ */
+
+
+/**
+ * \fn int mtic_startWithDevice(const char *networkDevice, int port)
+ * \ingroup startstopfct
+ * \brief
+ * \param networkDevice
+ * \param port
+ * \return
+ */
 int mtic_startWithDevice(const char *networkDevice, int port){
     
     if (agentElements != NULL){
@@ -877,7 +893,14 @@ int mtic_startWithDevice(const char *networkDevice, int port){
     return 1;
 }//TODO: warning si agent name pas défini
 
-
+/**
+ * \fn int mtic_startWithIP(const char *ipAddress, int port)
+ * \ingroup startstopfct
+ * \brief
+ * \param ipAddress
+ * \param port
+ * \return
+ */
 int mtic_startWithIP(const char *ipAddress, int port){
     if (agentElements != NULL){
         //Agent is already active : need to stop it first
@@ -903,6 +926,12 @@ int mtic_startWithIP(const char *ipAddress, int port){
     return 1;
 }//TODO: warning si agent name pas défini
 
+/**
+ * \fn int mtic_stop()
+ * \ingroup startstopfct
+ * \brief
+ * \return
+ */
 int mtic_stop(){
     if (agentElements != NULL){
         //interrupting and destroying mastic thread
@@ -924,11 +953,24 @@ int mtic_stop(){
     return 1;
 }
 
+/**
+ * \fn void mtic_die()
+ * \ingroup startstopfct
+ * \brief
+ * \return
+ */
 void mtic_die(){
     mtic_stop();
     exit(1);
 }
 
+/**
+ * \fn int mtic_setAgentName(const char *name)
+ * \ingroup startstopfct
+ * \brief
+ * \param name
+ * \return
+ */
 int mtic_setAgentName(const char *name){
     if (strlen(name) == 0){
         mtic_debug("mtic_setAgentName : Agent name cannot be empty\n");
@@ -969,6 +1011,12 @@ int mtic_setAgentName(const char *name){
     return 1;
 }
 
+/**
+ * \fn char *mtic_getAgentName()
+ * \ingroup startstopfct
+ * \brief
+ * \return
+ */
 char *mtic_getAgentName(){
     return strdup(agentName);
 }

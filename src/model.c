@@ -7,6 +7,10 @@
 //  Copyright © 2016 IKKY WP4.8. All rights reserved.
 //
 
+/**
+  * \file ../../src/include/mastic.h
+  */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "mastic_private.h"
@@ -383,16 +387,51 @@ char* model_DoubleToString(const double value)
 // PUBLIC API
 ////////////////////////////////////////////////////////////////////////
 
+
+/**
+ *  \defgroup readfct Read functions of agent's inputs/ouputs/parameters
+ *
+ */
+
 //read/write IOP using void*
 //generic typeless functions (requires developer to check IOP type for type casting)
 //for IMPULSION_T value is always 0
 //size is passed by Mastic based on type (for bool, double, int and string) or metadata (for data)
+/**
+ * \fn void mtic_readInput(const char *name, void *value, long *size)
+ * \ingroup readfct
+ * \brief
+ * \param name is the name of the input to read as it has been defined in the definition.
+ * \param value
+ * \param size
+ * \return Return the input value as true or false.
+ */
 void mtic_readInput(const char *name, void *value, long *size){
     
 }
+
+/**
+ * \fn void mtic_readOutput(const char *name, void *value, long *size)
+ * \ingroup readfct
+ * \brief
+ * \param name is the name of the input to read as it has been defined in the definition.
+ * \param value
+ * \param size
+ * \return Return the input value as true or false.
+ */
 void mtic_readOutput(const char *name, void *value, long *size){
     
 }
+
+/**
+ * \fn void mtic_readParameter(const char *name, void *value, long *size)
+ * \ingroup readfct
+ * \brief
+ * \param name is the name of the input to read as it has been defined in the definition.
+ * \param value
+ * \param size
+ * \return Return the input value as true or false.
+ */
 void mtic_readParameter(const char *name, void *value, long *size){
     
 }
@@ -403,9 +442,9 @@ void mtic_readParameter(const char *name, void *value, long *size){
 //for IMPULSION_T value is always 0
 //for DATA_T, size is passed by Mastic
 
-// Read Inputs ...
 /**
- * \fn mtic_readInputAsBool(char *name)
+ * \fn mtic_readInputAsBool(const char *name)
+ * \ingroup readfct
  * \brief Find the Agent's input by name and return the input value as a Boolean.
  * \param name is the name of the input to read as it has been defined in the definition.
  * \return Return the input value as true or false.
@@ -467,7 +506,8 @@ bool mtic_readInputAsBool(const char *name){
 }
 
 /**
- * \fn mtic_readInputAsInt(char *name)
+ * \fn mtic_readInputAsInt(const char *name)
+ * \ingroup readfct
  * \brief Find the Agent's input by name and return the input value as an integer.
  * \param name is the name of the input to read as it has been defined in the definition.
  * \return Return the input value as an integer.
@@ -530,9 +570,10 @@ int mtic_readInputAsInt(const char *name){
 }
 
 /**
- * \fn mtic_readInputAsDouble(char *name)
+ * \fn mtic_readInputAsDouble(const char *name)
+ * \ingroup readfct
  * \brief Find the Agent's input by name and return the input value as a double.
- * \param Take name of the input to read as it has been defined in the definition.
+ * \param name is the name of the input to read as it has been defined in the definition.
  * \return Return the input value as double.
  */
 double mtic_readInputAsDouble(const char *name){
@@ -592,10 +633,11 @@ double mtic_readInputAsDouble(const char *name){
 }
 
 /**
- * \fn mtic_readInputAsString(char *name)
+ * \fn mtic_readInputAsString(const char *name)
+ * \ingroup readfct
  * \brief Find the Agent's input by name and return the input value as a string.
- *        WARNING: Allocating memory that must be free after use.
- * \param Take name of the input to read as it has been defined in the definition.
+ * \warning Allocating memory that must be free after use.
+ * \param name is the name of the input to read as it has been defined in the definition.
  * \return Return the input value as a string.
  */
 char* mtic_readInputAsString(const char *name){
@@ -642,13 +684,23 @@ char* mtic_readInputAsString(const char *name){
     }
 }
 
-void mtic_readInputAsData(const char *name, void *data, long *size){ //allocs data structure to be disposed by caller
-    
+/**
+ * \fn oid mtic_readInputAsData(const char *name, void *data, long *size)
+ * \ingroup readfct
+ * \brief
+ * \param name
+ * \param data
+ * \param size
+ * \return Return the output value as true or false.
+ */
+void mtic_readInputAsData(const char *name, void *data, long *size){
+    //allocs data structure to be disposed by caller
 }
 
 // Read Outputs ...
 /**
  * \fn mtic_readOutputAsBool(const char *name)
+ * \ingroup readfct
  * \brief Find the Agent's output by name and return the output value as a Boolean.
  * \param name is the name of the output to read as it has been defined in the definition.
  * \return Return the output value as true or false.
@@ -710,6 +762,7 @@ bool mtic_readOutputAsBool(const char *name){
 
 /**
  * \fn mtic_readOutputAsInt(const char *name)
+ * \ingroup readfct
  * \brief Find the Agent's output by name and return the output value as an integer.
  * \param name is the name of the output to read as it has been defined in the definition.
  * \return Return the output value as an integer.
@@ -772,6 +825,7 @@ int mtic_readOutputAsInt(const char *name){
 
 /**
  * \fn mtic_readOutputAsDouble(const char *name)
+ * \ingroup readfct
  * \brief Find the Agent's output by name and return the output value as a double.
  * \param name is the name of the output to read as it has been defined in the definition.
  * \return Return the output value as a double.
@@ -835,6 +889,7 @@ double mtic_readOutputAsDouble(const char *name){
 
 /**
  * \fn mtic_readOutputAsString(const char *name)
+ * \ingroup readfct
  * \brief Find the Agent's output by name and return the output value as a string.
  *        WARNING: Allocating memory that must be free after use.
  * \param name is the name of the output to read as it has been defined in the definition.
@@ -891,6 +946,7 @@ void mtic_readOutputAsData(const char *name, void *data, long *size){ //allocs d
 // Read Parameters ...
 /**
  * \fn mtic_readParameterAsBool(const char *name)
+ * \ingroup readfct
  * \brief Find the Agent's parameter by name and return the output value as a Boolean.
  * \param name is the name of the parameter to read as it has been defined in the definition.
  * \return Return the parameter value as true or false.
@@ -952,6 +1008,7 @@ bool mtic_readParameterAsBool(const char *name){
 
 /**
  * \fn mtic_readParameterAsInt(const char *name)
+ * \ingroup readfct
  * \brief Find the Agent's parameter by name and return the parameter value as an integer.
  * \param name is the name of the parameter to read as it has been defined in the definition.
  * \return Return the parameter value as an integer.
@@ -1014,6 +1071,7 @@ int mtic_readParameterAsInt(const char *name){
 
 /**
  * \fn mtic_readParameterAsDouble(const char *name)
+ * \ingroup readfct
  * \brief Find the Agent's parameter by name and return the output value as a double.
  * \param name is the name of the output to read as it has been defined in the definition.
  * \return Return the parameter value as a double.
@@ -1076,6 +1134,7 @@ double mtic_readParameterAsDouble(const char *name){
 
 /**
  * \fn mtic_readParameterAsString(const char *name)
+ * \ingroup readfct
  * \brief Find the Agent's parameter by name and return the output value as a string.
  *        WARNING: Allocating memory that must be free after use.
  * \param name is the name of the parameter to read as it has been defined in the definition.
@@ -1137,7 +1196,13 @@ void mtic_readParameterAsData(const char *name, void *data, long *size){ //alloc
 //Mastic shall clone value and shall dispose of it when stopped
 
 /**
+ *  \defgroup writefct Write functions in agent's inputs/ouputs/parameters
+ *
+ */
+
+/**
  * \fn int mtic_writeInput(const char *name, void *value, long size)
+ * \ingroup writefct
  * \brief write a value into an agent's input.
  *
  * \param name is the name of the input to write
@@ -1188,6 +1253,7 @@ int mtic_writeInput(const char *name, void *value, long size){
 
 /**
  * \fn int mtic_writeOutput(const char *name, void *value, long size)
+ * \ingroup writefct
  * \brief write a value into an agent's output.
  *
  * \param name is the name of the output to write
@@ -1238,6 +1304,7 @@ int mtic_writeOutput(const char *name, void *value, long size){
 
 /**
  * \fn int mtic_writeParameter(const char *name, void *value, long size)
+ * \ingroup writefct
  * \brief write a value into an agent's parameter.
  *
  * \param name is the name of the parameter to write
@@ -1292,6 +1359,7 @@ int mtic_writeParameter(const char *name, void *value, long size){
 
 /**
  * \fn int mtic_writeInputAsBool(const char *name, bool value)
+ * \ingroup writefct
  * \brief write a value as bool into an agent's input.
  *
  * \param name is the name of the input bool to write
@@ -1331,6 +1399,7 @@ int mtic_writeInputAsBool(const char *name, bool value){
 
 /**
  * \fn int mtic_writeInputAsInt(const char *name, int value)
+ * \ingroup writefct
  * \brief write a value as integer into an agent's input.
  *
  * \param name is the name of the input integer to write
@@ -1369,6 +1438,7 @@ int mtic_writeInputAsInt(const char *name, int value){
 
 /**
  * \fn int mtic_writeInputAsDouble(const char *name, double value)
+ * \ingroup writefct
  * \brief write a value as double into an agent's input.
  *
  * \param name is the name of the input double to write
@@ -1407,6 +1477,7 @@ int mtic_writeInputAsDouble(const char *name, double value){
 
 /**
  * \fn int mtic_writeInputAsString(const char *name, char *value)
+ * \ingroup writefct
  * \brief write a value as string (char*) into an agent's input.
  *
  * \param name is the name of the input string to write
@@ -1445,6 +1516,7 @@ int mtic_writeInputAsString(const char *name, char *value){
 
 /**
  * \fn int mtic_writeInputAsImpulsion(const char *name)
+ * \ingroup writefct
  * \brief write an impulsion into an agent's input.
  *
  * \param name is the name of the input impulsion to write
@@ -1483,6 +1555,7 @@ int mtic_writeInputAsImpulsion(const char *name){
 
 /**
  * \fn int mtic_writeInputAsData(const char *name, void *value, long size)
+ * \ingroup writefct
  * \brief write a value as data into an agent's input.
  *
  * \param name is the name of the input data to write
@@ -1497,6 +1570,7 @@ int mtic_writeInputAsData(const char *name, void *value, long size){
 
 /**
  * \fn int mtic_writeOutputAsBool(const char *name, bool value)
+ * \ingroup writefct
  * \brief write a value as bool into an agent's output.
  *
  * \param name is the name of the output bool to write.
@@ -1539,6 +1613,7 @@ int mtic_writeOutputAsBool(const char *name, bool value){
 
 /**
  * \fn int mtic_writeOutputAsInt(const char *name, int value)
+ * \ingroup writefct
  * \brief write a value as integer into an agent's output.
  *
  * \param name is the name of the output integer to write.
@@ -1582,6 +1657,7 @@ int mtic_writeOutputAsInt(const char *name, int value){
 
 /**
  * \fn int mtic_writeOutputAsDouble(const char *name, double value)
+ * \ingroup writefct
  * \brief write a value as double into an agent's output.
  *
  * \param name is the name of the output double to write.
@@ -1624,6 +1700,7 @@ int mtic_writeOutputAsDouble(const char *name, double value){
 
 /**
  * \fn int mtic_writeOutputAsString(const char *name, char *value)
+ * \ingroup writefct
  * \brief write a value as string (char*) into an agent's output.
  *
  * \param name is the name of the output string to write.
@@ -1666,6 +1743,7 @@ int mtic_writeOutputAsString(const char *name, char *value){
 
 /**
  * \fn int mtic_writeOutputAsImpulsion(const char *name)
+ * \ingroup writefct
  * \brief write an impulsion into an agent's output.
  *
  * \param name is the name of the output impulsion to write
@@ -1708,6 +1786,7 @@ int mtic_writeOutputAsImpulsion(const char *name){
 
 /**
  * \fn int mtic_writeOutputAsData(const char *name, void *value, long size)
+ * \ingroup writefct
  * \brief write a value as data into an agent's output.
  *
  * \param name is the name of the output data to write
@@ -1722,6 +1801,7 @@ int mtic_writeOutputAsData(const char *name, void *value, long size){
 
 /**
  * \fn int mtic_writeParameterAsBool(const char *name, bool value)
+ * \ingroup writefct
  * \brief write a value as bool into an agent's parameter.
  *
  * \param name is the name of the parameter bool to write.
@@ -1760,6 +1840,7 @@ int mtic_writeParameterAsBool(const char *name, bool value){
 
 /**
  * \fn int mtic_writeParameterAsInt(const char *name, int value)
+ * \ingroup writefct
  * \brief write a value as integer into an agent's parameter.
  *
  * \param name is the name of the parameter integer to write.
@@ -1798,6 +1879,7 @@ int mtic_writeParameterAsInt(const char *name, int value){
 
 /**
  * \fn int mtic_writeParameterAsDouble(const char *name, double value)
+ * \ingroup writefct
  * \brief write a value as double into an agent's parameter.
  *
  * \param name is the name of the parameter double to write.
@@ -1836,6 +1918,7 @@ int mtic_writeParameterAsDouble(const char *name, double value){
 
 /**
  * \fn int mtic_writeParameterAsString(const char *name, char *value)
+ * \ingroup writefct
  * \brief write a value as string (char*) into an agent's parameter.
  *
  * \param name is the name of the parameter string to write.
@@ -1875,6 +1958,7 @@ int mtic_writeParameterAsString(const char *name, char *value){
 
 /**
  * \fn int mtic_writeParameterAsData(const char *name, void *value, long size)
+ * \ingroup writefct
  * \brief write a value as data into an agent's parameter.
  *
  * \param name is the name of the parameter data to write
@@ -1888,10 +1972,14 @@ int mtic_writeParameterAsData(const char *name, void *value, long size){
 }
 
 
-//check IOP type, lists and existence
+/**
+ *  \defgroup getfct Get functions about agent's inputs/ouputs/parameters
+ *
+ */
 
 /**
  * \fn iopType_t mtic_getTypeForInput(const char *name)
+ * \ingroup getfct
  * \brief this function returns the value type of the input (integer, bool, etc .)
  *
  * \param name The string which contains the name of the input. Can't be NULL or empty.
@@ -1931,6 +2019,7 @@ iopType_t mtic_getTypeForInput(const char *name){
 
 /**
  * \fn iopType_t mtic_getTypeForOutput(const char *name)
+ * \ingroup getfct
  * \brief this function returns the value type of the output (integer, bool, etc .)
  *
  * \param name The string which contains the name of the output. Can't be NULL or empty.
@@ -1970,6 +2059,7 @@ iopType_t mtic_getTypeForOutput(const char *name){
 
 /**
  * \fn iopType_t mtic_getTypeForParameter(const char *name)
+ * \ingroup getfct
  * \brief this function returns the value type of the parameter (integer, bool, etc .)
  *
  * \param name The string which contains the name of the parameter. Can't be NULL or empty.
@@ -2009,6 +2099,7 @@ iopType_t mtic_getTypeForParameter(const char *name){
 
 /**
  * \fn int mtic_getInputsNumber()
+ * \ingroup getfct
  * \brief This function return the number of inputs.
  *
  * \return The number of inputs. -1 the definition live is NULL. If an error occurs a mtic_debug will be set.
@@ -2028,6 +2119,7 @@ int mtic_getInputsNumber()
 
 /**
  * \fn int mtic_getOutputsNumber()
+ * \ingroup getfct
  * \brief This function return the number of outputs.
  *
  * \return The number of outputs. -1 the definition live is NULL. If an error occurs a mtic_debug will be set.
@@ -2047,6 +2139,7 @@ int mtic_getOutputsNumber()
 
 /**
  * \fn int mtic_getParametersNumber()
+ * \ingroup getfct
  * \brief This function return the number of parameters.
  *
  * \return The number of parameters. -1 the definition live is NULL. If an error occurs a mtic_debug will be set.
@@ -2066,6 +2159,7 @@ int mtic_getParametersNumber()
 
 /**
  * \fn char** mtic_getInputsList(long *nbOfElements)
+ * \ingroup getfct
  * \brief This function return a two dimensions table to get the list of input's name and get the number of elements in this table.
  *
  * \param nbOfElements The pointer on the number of elements.
@@ -2102,6 +2196,7 @@ char ** mtic_getInputsList(long *nbOfElements){
 
 /**
  * \fn char** mtic_getOutputsList(long *nbOfElements)
+ * \ingroup getfct
  * \brief This function return a two dimensions table to get the list of output's name and get the number of elements in this table.
  *
  * \param nbOfElements The pointer on the number of elements.
@@ -2138,6 +2233,7 @@ char ** mtic_getOutputsList(long *nbOfElements){
 
 /**
  * \fn char** mtic_getParametersList(long *nbOfElements)
+ * \ingroup getfct
  * \brief This function return a two dimensions table to get the list of parameter's name and get the number of elements in this table.
  *
  * \param nbOfElements The pointer on the number of elements.
@@ -2173,7 +2269,13 @@ char ** mtic_getParametersList(long *nbOfElements){
 }
 
 /**
+ *  \defgroup checkfct Check functions on agent's inputs/outpus/parameters
+ *  check existence of inputs/ouputs/parameters
+ */
+
+/**
  * \fn bool mtic_checkInputExistence(const char *name)
+ * \ingroup checkfct
  * \brief this function returns the state of the input existence.
  *
  * \param name The string which contains the name of the input. Can't be NULL or empty.
@@ -2209,6 +2311,7 @@ bool mtic_checkInputExistence(const char *name){
 
 /**
  * \fn bool mtic_checkOutputExistence(const char *name)
+ * \ingroup checkfct
  * \brief this function returns the state of the output existence.
  *
  * \param name The string which contains the name of the output. Can't be NULL or empty.
@@ -2244,6 +2347,7 @@ bool mtic_checkOutputExistence(const char *name){
 
 /**
  * \fn bool mtic_checkParameterExistence(const char *name)
+ * \ingroup checkfct
  * \brief this function returns the state of the parameter existence.
  *
  * \param name The string which contains the name of the parameter. Can't be NULL or empty.
@@ -2322,7 +2426,13 @@ static int mtic_observe(const char* type, const char* name, mtic_observeCallback
 }
 
 /**
+ *  \defgroup observefct Observe functions on agent's inputs/ouputs/parameters
+ *
+ */
+
+/**
  * \fn int mtic_observeInput(const char *name, mtic_observeCallback cb, void *myData)
+ * \ingroup observefct
  * \brief Observe a input and associate a callback to it.
  * When the input value will change the associated callback will be called.
  *
@@ -2338,6 +2448,7 @@ int mtic_observeInput(const char *name, mtic_observeCallback cb, void *myData){
 
 /**
  * \fn int mtic_observeOutput(const char *name, mtic_observeCallback cb, void * myData)
+ * \ingroup observefct
  * \brief Observe a output and associate a callback to it.
  * When the output value will change the associated callback will be called.
  *
@@ -2353,6 +2464,7 @@ int mtic_observeOutput(const char *name, mtic_observeCallback cb, void * myData)
 
 /**
  * \fn int mtic_observeParameter(const char *name, mtic_observeCallback cb, void * myData)
+ * \ingroup observefct
  * \brief Observe a parameter and associate a callback to it.
  * When the output value will change the associated callback will be called.
  *
