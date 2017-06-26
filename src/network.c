@@ -51,8 +51,8 @@
 
 //global flags
 bool verboseMode = true;
-bool isFreezed = false;
-bool agentCanBeFreezed = false;
+bool isFrozen = false;
+bool agentCanBeFrozen = false;
 
 //global parameters
 //prefix for sending definition through zyre
@@ -251,10 +251,10 @@ int manageSubscription (zloop_t *loop, zmq_pollitem_t *item, void *arg){
         if(foundSubscriber != NULL)
         {
             zmsg_t *msg = zmsg_recv(foundSubscriber->subscriber);
-            // Message ust contain 2 elements=
+            // Message must contain 2 elements
             // 1 : output name
             // 2 : value of the output
-            if(zmsg_size(msg) == 2 && isFreezed == false)
+            if(zmsg_size(msg) == 2 && isFrozen == false)
             {
                 char * output = zmsg_popstr(msg);
                 char * value = zmsg_popstr(msg);
@@ -268,15 +268,14 @@ int manageSubscription (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 if(externalDefinition != NULL)
                 {
                     // convert the string value in void* corresponding to the type of iop
-                    model_state code;
-                    agent_iop * found_iop = mtic_find_iop_by_name_on_definition(output,externalDefinition, &code);
+                    model_state state;
+                    agent_iop * found_iop = mtic_find_iop_by_name_on_definition(output,externalDefinition, &state);
 
                     if(found_iop != NULL)
                     {
                         const void* converted_value = mtic_iop_value_string_to_real_type(found_iop, value);
-
                         // Map reception send to modify the internal model
-                        code = mtic_map_received(foundSubscriber->agentName,
+                        state = mtic_map_received(foundSubscriber->agentName,
                                                  output,
                                                  (void*)converted_value);
 
@@ -288,10 +287,10 @@ int manageSubscription (zloop_t *loop, zmq_pollitem_t *item, void *arg){
             } else {
                 // Ignore the message
 
-                // Print message if the agent has been Freezed
-                if(isFreezed == true)
+                // Print message if the agent has been Frozen
+                if(isFrozen == true)
                 {
-                    mtic_debug("Message received from publisher but all traffic in the agent has been Freezed\n");
+                    mtic_debug("Message received from publisher but all traffic in the agent has been frozen\n");
                 }
             }
             zmsg_destroy(&msg);
@@ -511,7 +510,7 @@ initActor (zsock_t *pipe, void *args)
     
     //set headers for agent
     zyre_set_header(agentElements->node, "publisher", "%s", insert + 1);
-    zyre_set_header(agentElements->node, "canBeFreezed", "%i", agentCanBeFreezed);
+    zyre_set_header(agentElements->node, "canBeFrozen", "%i", agentCanBeFrozen);
 
     #ifdef _WIN32
         WSADATA wsaData;
@@ -653,29 +652,37 @@ int network_publishOutput (const char* output_name)
     
     if(agentElements != NULL && agentElements->publisher != NULL && found_iop != NULL)
     {
-        if(found_iop->is_muted == false && found_iop->name != NULL && isFreezed == false)
+        if(found_iop->is_muted == false && found_iop->name != NULL && isFrozen == false)
         {
-            char* str_value = mtic_iop_value_to_string(found_iop);
-            if(strlen(str_value) > 0)
-            {
-                mtic_debug("publish %s -> %s.\n",found_iop->name,str_value);
-                // Send message
-                zstr_sendx(agentElements->publisher, found_iop->name, str_value, NULL);
-                
+            if (found_iop->type == DATA_T){
+                //TODO
+                mtic_debug("DATA type not implemented : %s will not be published\n",found_iop->name);
+            }else if (found_iop->type == IMPULSION_T){
+                mtic_debug("publish impulsion %s\n",found_iop->name);
+                zstr_sendx(agentElements->publisher, found_iop->name, "0", NULL);
                 result = 1;
+            }else{
+                char* str_value = mtic_iop_value_to_string(found_iop);
+                if(strlen(str_value) > 0)
+                {
+                    mtic_debug("publish %s -> %s\n",found_iop->name,str_value);
+                    zstr_sendx(agentElements->publisher, found_iop->name, str_value, NULL);
+                    result = 1;
+                }
+                free(str_value);
             }
-            free(str_value);
+            
         } else {
             // Print message if output has been muted
             if(found_iop->is_muted == true)
             {
-                mtic_debug("Shoudl publish output but the output %s has been muted.\n",found_iop->name);
+                mtic_debug("Should publish output %s but it has been muted.\n",found_iop->name);
             }
             
-            // Print message if the agent has been Freezed
-            if(isFreezed == true)
+            // Print message if the agent has been Frozen
+            if(isFrozen == true)
             {
-                mtic_debug("Shoudl publish output but all traffic in the agent has been Freezed\n");
+                mtic_debug("Should publish output %s but the agent has been frozen\n",found_iop->name);
             }
         }
     }
@@ -968,39 +975,39 @@ char *mtic_getAgentName(){
 
 //Freeze and resume the agent
 int mtic_freeze(){
-    if (!agentCanBeFreezed){
-        mtic_debug("warning: agent has been Freezed but is set to 'can't be Freezed'\n");
+    if (!agentCanBeFrozen){
+        mtic_debug("warning: agent has been Frozen but is set to 'can't be Frozen'\n");
     }
-    if(isFreezed == false)
+    if(isFrozen == false)
     {
-        mtic_debug("Agent Freezed\n");
+        mtic_debug("Agent Frozen\n");
         if (agentElements != NULL && agentElements->node != NULL){
             zyre_shouts(agentElements->node, CHANNEL, "Freeze=ON");
         }
-        isFreezed = true;
+        isFrozen = true;
         FreezeCallback_t *elt;
         DL_FOREACH(FreezeCallbacks,elt){
-            elt->callback_ptr(isFreezed, elt->myData);
+            elt->callback_ptr(isFrozen, elt->myData);
         }
     }
     return 1;
 }
 
-bool mtic_isFreezed(){
-    return isFreezed;
+bool mtic_isFrozen(){
+    return isFrozen;
 }
 
 int mtic_unfreeze(){
-    if(isFreezed == true)
+    if(isFrozen == true)
     {
         mtic_debug("Agent resumed\n");
         if (agentElements != NULL && agentElements->node != NULL){
             zyre_shouts(agentElements->node, CHANNEL, "Freeze=OFF");
         }
-        isFreezed = false;
+        isFrozen = false;
         FreezeCallback_t *elt;
         DL_FOREACH(FreezeCallbacks,elt){
-            elt->callback_ptr(isFreezed, elt->myData);
+            elt->callback_ptr(isFrozen, elt->myData);
         }
     }
     return 1;
@@ -1038,8 +1045,8 @@ char *mtic_getAgentState(){
 void mtic_setVerbose (bool verbose){
     verboseMode = verbose;
 };
-void mtic_setCanBeFreezed (bool canBeFreezed){
-    agentCanBeFreezed = canBeFreezed;
+void mtic_setCanBeFrozen (bool canBeFrozen){
+    agentCanBeFrozen = canBeFrozen;
 }
 
 //get library parameters
