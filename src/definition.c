@@ -620,10 +620,9 @@ int definition_addIop(agent_iop *iop, iop_t iop_type, definition **def)
 //}
 /**
  * \fn int mtic_clearDefinition()
- * \brief TODO : need to be defined
- *
- * \param
+ * \brief
  * \return The error.
+ * \todo need to write the doc
  */
 int mtic_clearDefinition(){ //clears definition data for the agent
     //TODO : implement
