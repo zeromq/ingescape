@@ -612,12 +612,6 @@ int definition_addIop(agent_iop *iop, iop_t iop_type, definition **def)
 // PUBLIC API
 ////////////////////////////////////////////////////////////////////////
 
-//int mtic_loadDefinition (const char* json_str){
-//    return 1;
-//}
-//int mtic_loadDefinitionFromPath (const char* file_path){
-//    return 1;
-//}
 /**
  * \fn int mtic_clearDefinition()
  * \brief
