@@ -170,56 +170,6 @@ void * mtic_get(const char *name_iop, model_state *state){
 }
 
 /*
- * Function: mtic_set
- * ----------------------------
- *  Set the new value to the associated iop.
- *
- *  name_iop    : Name of the 'input/output/parameter'
- *
- *  new_value   : The new value
- *
- *  return : model_state (cf. enum) return error is occur
- */
-model_state mtic_set(const char *iop_name, void *new_value){
-
-    fprintf (stderr, "%s removed \n !!!!!!", __FUNCTION__);
-//    //1) find the iop
-//    model_state code;
-//    agent_iop *iop = model_findIopByName((char*) iop_name,&code);
-
-//    if(iop == NULL)
-//        return code;
-
-//    //2) update the value in the iop_live structure
-//    update_value(iop, new_value);
-
-//    // Let us know the value has changed
-//    char* str_value = mtic_iop_value_to_string(iop);
-//    mtic_debug("SET(%s,%s).\n",iop_name,str_value);
-//    free(str_value);
-
-//    //3) Callback associated from 'observe' function
-//    //Check ma liste de callback et appellé celle concerné
-//    callbacks *fct_to_call;
-//    HASH_FIND_STR(agent_callbacks,iop_name,fct_to_call);
-//    if(fct_to_call != NULL)
-//    {
-//        fct_to_call->callback_ptr(iop);
-//    }
-
-//    /*
-//     * If the iop is an output  : publish
-//     */
-//    if(code == TYPE_OUTPUT){
-
-//        // Publish the new value
-//        network_publishOutput(iop_name);
-//    }
-
-    return OK;
-}
-
-/*
  * Function: mute
  * ----------------------------
  *  Mute an 'input/output/parameter'.
@@ -382,6 +332,45 @@ char* model_DoubleToString(const double value)
     snprintf( str, length + 1, "%lf", value);
 
     return str;
+}
+
+
+/* NOT in PUBLIC API
+ * fn mtic_observe(const char *name, mtic_observeCallback cb, void *myData)
+ * brief Observe the iop and associate a callback to it.
+ * When the iop value will change by calling the 'mtic_set' function, the associated callback will be called.
+ *
+ * param name the 'input/output/parameter'
+ * param cb the pointer to the associated callback
+ * return 1 if correct or 0
+ */
+static int mtic_observe(const char* type, const char* name, mtic_observeCallback cb, void* myData){
+
+    //1) find the iop
+    model_state state;
+    agent_iop *iop = model_findIopByName((char*) name, &state);
+
+    // Check if the input has been returned.
+    if(iop == NULL){
+        mtic_debug("%s : the %s Agent's '%s' cannot be found", __FUNCTION__, type,  name);
+        return 0;
+    }
+
+    //callback not defined
+    if(cb == NULL) {
+        mtic_debug("%s: the callback use for %s '%s' is null", __FUNCTION__, type,   name);
+        return 0;
+    }
+
+    mtic_observe_callback_T *new_callback = malloc(sizeof(mtic_observe_callback_T));
+    new_callback->iop_name = strdup(name);
+    new_callback->callback_ptr = cb;
+    new_callback->data = myData;
+    HASH_ADD_STR( agent_callbacks, iop_name,  new_callback);
+
+    mtic_debug("ADD_OBSERVE on the %s '%s'\n", type, name);
+
+    return 1;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2396,44 +2385,6 @@ bool mtic_checkParameterExistence(const char *name){
  * \brief typedef for the callback used in observe functions
  */
 typedef void (*mtic_observeCallback)(iop_t iopType, const char *name, iopType_t valueType, void *value, void * myData);
-
-/* NOT in PUBLIC API
- * fn mtic_observe(const char *name, mtic_observeCallback cb, void *myData)
- * brief Observe the iop and associate a callback to it.
- * When the iop value will change by calling the 'mtic_set' function, the associated callback will be called.
- *
- * param name the 'input/output/parameter'
- * param cb the pointer to the associated callback
- * return 1 if correct or 0
- */
-static int mtic_observe(const char* type, const char* name, mtic_observeCallback cb, void* myData){
-
-    //1) find the iop
-    model_state state;
-    agent_iop *iop = model_findIopByName((char*) name, &state);
-
-    // Check if the input has been returned.
-    if(iop == NULL){
-        mtic_debug("%s : the %s Agent's '%s' cannot be found", __FUNCTION__, type,  name);
-        return 0;
-    }
-
-    //callback not defined
-    if(cb == NULL) {
-        mtic_debug("%s: the callback use for %s '%s' is null", __FUNCTION__, type,   name);
-        return 0;
-    }
-
-    mtic_observe_callback_T *new_callback = malloc(sizeof(mtic_observe_callback_T));
-    new_callback->iop_name = strdup(name);
-    new_callback->callback_ptr = cb;
-    new_callback->data = myData;
-    HASH_ADD_STR( agent_callbacks, iop_name,  new_callback);
-
-    mtic_debug("ADD_OBSERVE on the %s '%s'\n", type, name);
-
-    return 1;
-}
 
 /**
  * \fn int mtic_observeInput(const char *name, mtic_observeCallback cb, void *myData)
