@@ -1080,9 +1080,8 @@ int mtic_loadDefinition (const char* json_str){
             //The name of the agent is default or was previouly changed by definition load
             mtic_setAgentName(mtic_definition_loaded->name);
             agentNameChangedByDefinition = true;
-        }else{
+        }//else
             //The agent name was assigned by the developer : we keep it untouched
-        }
         free(name);
     }
 
