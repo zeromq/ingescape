@@ -102,7 +102,7 @@ PUBLIC bool mtic_readOutputAsBool(const char *name);
 PUBLIC int mtic_readOutputAsInt(const char *name);
 PUBLIC double mtic_readOutputAsDouble(const char *name);
 PUBLIC char* mtic_readOutputAsString(const char *name);
-void mtic_readOutputAsData(const char *name, void *data, long *size); //allocs data structure to be disposed by caller
+PUBLIC int mtic_readOutputAsData(const char *name, void *data, long *size); //allocs data structure to be disposed by caller
 
 PUBLIC bool mtic_readParameterAsBool(const char *name);
 PUBLIC int mtic_readParameterAsInt(const char *name);
