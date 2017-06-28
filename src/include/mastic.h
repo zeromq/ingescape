@@ -135,13 +135,13 @@ PUBLIC int mtic_writeOutputAsInt(const char *name, int value);
 PUBLIC int mtic_writeOutputAsDouble(const char *name, double value);
 PUBLIC int mtic_writeOutputAsString(const char *name, char *value);
 PUBLIC int mtic_writeOutputAsImpulsion(const char *name);
-int mtic_writeOutputAsData(const char *name, void *value, long size);
+PUBLIC int mtic_writeOutputAsData(const char *name, void *value, long size);
 
 PUBLIC int mtic_writeParameterAsBool(const char *name, bool value);
 PUBLIC int mtic_writeParameterAsInt(const char *name, int value);
 PUBLIC int mtic_writeParameterAsDouble(const char *name, double value);
 PUBLIC int mtic_writeParameterAsString(const char *name, char *value);
-int mtic_writeParameterAsData(const char *name, void *value, long size);
+PUBLIC int mtic_writeParameterAsData(const char *name, void *value, long size);
 
 
 //check IOP type, lists and existence

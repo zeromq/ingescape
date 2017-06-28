@@ -1860,7 +1860,31 @@ int mtic_writeOutputAsImpulsion(const char *name){
  * \return 1 if ok else 0
  */
 int mtic_writeOutputAsData(const char *name, void *value, long size){
-    fprintf(stderr, "WARNING - %s not implemented yet !\n", __FUNCTION__);
+    //Get the pointer IOP Agent selected by name
+    model_state state;
+    agent_iop *iop = model_findIopByName((char*) name, &state);
+
+    // Check if the iop has been returned.
+    if(iop == NULL){
+        mtic_debug("%s : Agent's output '%s' cannot be found\n", __FUNCTION__, name);
+        return 0;
+    }
+
+    //Check the value type as an impulsion.
+    if(iop->type != DATA_T){
+        mtic_debug("%s: Agent's output '%s' is not an data\n", __FUNCTION__,  name);
+        return 0;
+    }
+
+    //Update the value in the definition
+    update_value(iop,value,size);
+
+    // call the callback associated to if it exist
+    mtic_observe_callback_T *fct_to_call;
+    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
+    if(fct_to_call != NULL)
+        fct_to_call->callback_ptr(OUTPUT_T, name, DATA_T, value, fct_to_call->data);
+
     return 1;
 }
 
@@ -2032,7 +2056,31 @@ int mtic_writeParameterAsString(const char *name, char *value){
  * \return 1 if ok else 0
  */
 int mtic_writeParameterAsData(const char *name, void *value, long size){
-    fprintf(stderr, "WARNING - %s not implemented yet !\n", __FUNCTION__);
+    //Get the pointer IOP Agent selected by name
+    model_state state;
+    agent_iop *iop = model_findIopByName((char*) name, &state);
+
+    // Check if the iop has been returned.
+    if(iop == NULL){
+        mtic_debug("%s : Agent's parameter '%s' cannot be found\n", __FUNCTION__, name);
+        return 0;
+    }
+
+    //Check the value type as an impulsion.
+    if(iop->type != DATA_T){
+        mtic_debug("%s: Agent's parameter '%s' is not an data\n", __FUNCTION__,  name);
+        return 0;
+    }
+
+    //Update the value in the definition
+    update_value(iop,value,size);
+
+    // call the callback associated to if it exist
+    mtic_observe_callback_T *fct_to_call;
+    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
+    if(fct_to_call != NULL)
+        fct_to_call->callback_ptr(PARAMETER_T, name, DATA_T, value, fct_to_call->data);
+
     return 1;
 }
 
