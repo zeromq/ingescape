@@ -697,11 +697,13 @@ char* mtic_readInputAsString(const char *name){
 /**
  * \fn int mtic_readInputAsData(const char *name, void *data, long *size)
  * \ingroup readfct
- * \brief
- * \param name
- * \param data
- * \param size
- * \return Return the output value as true or false.
+ * \brief Find the Agent's input by name and get the pointer on the data.
+ * \warning The input as to be data type
+ * \warning Allocating memory before calling this function that must be free after use.
+ * \param name The input's name
+ * \param data The pointer on the struct to get
+ * \param size The size of the data read
+ * \return Return 1 if it is OK or 0 if not.
  */
 int mtic_readInputAsData(const char *name, void *data, long *size){
     //Get the pointer IOP Agent selected by name
@@ -974,7 +976,17 @@ char* mtic_readOutputAsString(const char *name){
         return NULL;
     }
 }
-
+/**
+ * \fn int mtic_readOutputAsData(const char *name, void *data, long *size)
+ * \ingroup readfct
+ * \brief Find the Agent's output by name and get the pointer on the data.
+ * \warning The output as to be data type
+ * \warning Allocating memory before calling this function that must be free after use.
+ * \param name The output's name
+ * \param data The pointer on the struct to get
+ * \param size The size of the data read
+ * \return Return 1 if it is OK or 0 if not.
+ */
 int mtic_readOutputAsData(const char *name, void *data, long *size){ //allocs data structure to be disposed by caller
     //Get the pointer IOP Agent selected by name
     model_state state;
@@ -1244,7 +1256,17 @@ char* mtic_readParameterAsString(const char *name){
         return NULL;
     }
 }
-
+/**
+ * \fn int mtic_readParameterAsData(const char *name, void *data, long *size)
+ * \ingroup readfct
+ * \brief Find the Agent's parameter by name and get the pointer on the data.
+ * \warning The parameter as to be data type
+ * \warning Allocating memory before calling this function that must be free after use.
+ * \param name The parameter's name
+ * \param data The pointer on the struct to get
+ * \param size The size of the data read
+ * \return Return 1 if it is OK or 0 if not.
+ */
 int mtic_readParameterAsData(const char *name, void *data, long *size){ //allocs data structure to be disposed by caller
     //Get the pointer IOP Agent selected by name
     model_state state;
