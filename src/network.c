@@ -763,18 +763,19 @@ int network_checkAndSubscribeToPublisher(const char* agentName)
 ////////////////////////////////////////////////////////////////////////
 
 /**
- *  \defgroup startstopfct Start / Stop / Mute functions of agent
+ *  \defgroup startStopKillFct Agent: Start / Stop / Kill functions
  *
  */
 
-
 /**
  * \fn int mtic_startWithDevice(const char *networkDevice, int port)
- * \ingroup startstopfct
+ * \ingroup startStopKillFct
  * \brief
  * \param networkDevice
  * \param port
  * \return
+ * \todo write documentation
+ * \todo warning if agent name not defined
  */
 int mtic_startWithDevice(const char *networkDevice, int port){
     
@@ -897,15 +898,17 @@ int mtic_startWithDevice(const char *networkDevice, int port){
     assert (agentElements->agentActor);
     
     return 1;
-}//TODO: warning si agent name pas défini
+}
 
 /**
  * \fn int mtic_startWithIP(const char *ipAddress, int port)
- * \ingroup startstopfct
+ * \ingroup startStopKillFct
  * \brief
  * \param ipAddress
  * \param port
  * \return
+ * \todo write documentation
+ * \todo warning if agent name not defined
  */
 int mtic_startWithIP(const char *ipAddress, int port){
     if (agentElements != NULL){
@@ -930,13 +933,14 @@ int mtic_startWithIP(const char *ipAddress, int port){
 //    usleep(1000);
 //#endif
     return 1;
-}//TODO: warning si agent name pas défini
+}
 
 /**
  * \fn int mtic_stop()
- * \ingroup startstopfct
+ * \ingroup startStopKillFct
  * \brief
  * \return
+ * \todo write documentation
  */
 int mtic_stop(){
     if (agentElements != NULL){
@@ -961,9 +965,10 @@ int mtic_stop(){
 
 /**
  * \fn void mtic_die()
- * \ingroup startstopfct
+ * \ingroup startStopKillFct
  * \brief
  * \return
+ * \todo write documentation
  */
 void mtic_die(){
     mtic_stop();
@@ -972,10 +977,11 @@ void mtic_die(){
 
 /**
  * \fn int mtic_setAgentName(const char *name)
- * \ingroup startstopfct
+ * \ingroup startStopKillFct
  * \brief
  * \param name
  * \return
+ * \todo write documentation
  */
 int mtic_setAgentName(const char *name){
     if (strlen(name) == 0){
@@ -1019,15 +1025,28 @@ int mtic_setAgentName(const char *name){
 
 /**
  * \fn char *mtic_getAgentName()
- * \ingroup startstopfct
+ * \ingroup startStopKillFct
  * \brief
  * \return
+ * \warning Allocate memory that should be freed by the user.
+ * \todo write documentation
  */
 char *mtic_getAgentName(){
     return strdup(agentName);
 }
 
-//Freeze and resume the agent
+/**
+ *  \defgroup pauseResumeFct Agent: Pause / resume functions
+ *
+ */
+
+/**
+ * \fn int mtic_freeze()
+ * \ingroup pauseResumeFct
+ * \brief
+ * \return
+ * \todo write documentation
+ */
 int mtic_freeze(){
     if (!agentCanBeFrozen){
         mtic_debug("warning: agent has been Frozen but is set to 'can't be Frozen'\n");
@@ -1047,10 +1066,24 @@ int mtic_freeze(){
     return 1;
 }
 
+/**
+ * \fn bool mtic_isFrozen()
+ * \ingroup pauseResumeFct
+ * \brief
+ * \return
+ * \todo write documentation
+ */
 bool mtic_isFrozen(){
     return isFrozen;
 }
 
+/**
+ * \fn int mtic_unfreeze()
+ * \ingroup pauseResumeFct
+ * \brief
+ * \return
+ * \todo write documentation
+ */
 int mtic_unfreeze(){
     if(isFrozen == true)
     {
@@ -1067,6 +1100,15 @@ int mtic_unfreeze(){
     return 1;
 }
 
+/**
+ * \fn int mtic_observeFreeze(mtic_freezeCallback cb, void *myData)
+ * \ingroup pauseResumeFct
+ * \brief
+ * \return
+ * \param cb
+ * \param myData
+ * \todo write documentation
+ */
 int mtic_observeFreeze(mtic_freezeCallback cb, void *myData){
     if (cb != NULL){
         FreezeCallback_t *newCb = calloc(1, sizeof(FreezeCallback_t));
@@ -1080,7 +1122,19 @@ int mtic_observeFreeze(mtic_freezeCallback cb, void *myData){
     return 1;
 }
 
-//control agent state
+/**
+ *  \defgroup controleAgentFct Agent: Controle functions
+ *
+ */
+
+/**
+ * \fn int mtic_setAgentState(const char *state)
+ * \ingroup controleAgentFct
+ * \brief
+ * \return
+ * \param state
+ * \todo write documentation
+ */
 int mtic_setAgentState(const char *state){
     if (strcmp(state, agentState) != 0){
         strncpy(agentState, state, AGENT_NAME_LENGTH);
@@ -1091,24 +1145,65 @@ int mtic_setAgentState(const char *state){
     return 1;
 }
 
+/**
+ * \fn char *mtic_getAgentState()
+ * \ingroup controleAgentFct
+ * \brief
+ * \return
+ * \warning Allocate memory that should be freed by the user.
+ * \todo write documentation
+ */
 char *mtic_getAgentState(){
     return strdup(agentState);
 }
 
-//set library parameters
+/**
+ *  \defgroup setGetLibraryFct Agent: Get / Set general parameters
+ *
+ */
+
+/**
+ * \fn void mtic_setVerbose (bool verbose)
+ * \ingroup setGetLibraryFct
+ * \brief set or unset verbose mode on the agent to get more details informations.
+ * \param verbose is a bool to set or unset the verbose mode
+ */
 void mtic_setVerbose (bool verbose){
     verboseMode = verbose;
-};
+}
+
+/**
+ * \fn bool mtic_getVerbose ()
+ * \ingroup setGetLibraryFct
+ * \brief get current verbose mode of agent.
+ * \return true is verbose mode is set or false.
+ */
+bool mtic_getVerbose (){
+    return verboseMode;
+}
+
+/**
+ * \fn void mtic_setCanBeFrozen (bool canBeFrozen)
+ * \ingroup setGetLibraryFct
+ * \brief set or unset forzen mode on the agent.
+ * \param canBeFrozen is a bool to set or unset the verbose mode
+ */
 void mtic_setCanBeFrozen (bool canBeFrozen){
     agentCanBeFrozen = canBeFrozen;
 }
 
-//get library parameters
-bool mtic_getVerbose (){
-    return verboseMode;
-};
+/**
+ *  \defgroup muteAgentFct Agent: Mute functions
+ *
+ */
 
-//mute the agent
+/**
+ * \fn int mtic_mute()
+ * \ingroup muteAgentFct
+ * \brief function to mute the agent
+ * \return 1 if ok else 0.
+ * \todo can't return 0 ?
+ */
 int mtic_mute(){
     isWholeAgentMuted = true;
     if (agentElements != NULL && agentElements->node != NULL){
@@ -1117,6 +1212,13 @@ int mtic_mute(){
     return 1;
 }
 
+/**
+ * \fn int mtic_unmute()
+ * \ingroup muteAgentFct
+ * \brief function to unmute the agent
+ * \return 1 if ok or 0.
+ * \todo can't return 0 ?
+ */
 int mtic_unmute(){
     isWholeAgentMuted = false;
     if (agentElements != NULL && agentElements->node != NULL){
@@ -1125,6 +1227,12 @@ int mtic_unmute(){
     return 1;
 }
 
+/**
+ * \fn bool mtic_isMuted()
+ * \ingroup muteAgentFct
+ * \brief function to know if the agent are muted
+ * \return true if it is muted else false.
+ */
 bool mtic_isMuted(){
     return isWholeAgentMuted;
 }

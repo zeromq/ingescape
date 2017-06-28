@@ -253,7 +253,6 @@ void mapping_FreeMapping (mapping* mapping);
 extern bool isWholeAgentMuted;
 agent_iop * model_findIopByName(const char* name, model_state *code);
 agent_iop * mtic_find_iop_by_name_on_definition(const char *name, definition* definition, model_state *code);
-model_state mtic_set(const char* iop_name, void* new_value);
 void * mtic_get(const char* name_iop, model_state* state);
 // Conversions
 char* model_IntToString(const int value);

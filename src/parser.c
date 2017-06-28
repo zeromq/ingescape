@@ -267,18 +267,7 @@ static definition* json_parse_definition (yajl_val node) {
     v = yajl_tree_get(node, path, yajl_t_any);
 
     if (v){
-        //Check the name of agent from network layer
-        char *name = mtic_getAgentName();
-        if(strcmp(name, AGENT_NAME_DEFAULT) == 0 || agentNameChangedByDefinition){
-            //The name of the agent is default or was previouly changed by definition load
-            def->name = strdup (YAJL_IS_STRING(v) ? (v)->u.string : "");
-            mtic_setAgentName(def->name);
-            agentNameChangedByDefinition = true;
-        }else{
-            //The agent name was assigned by the developer : we keep it untouched
-            def->name = strdup(name);
-        }
-        free(name);
+        def->name = strdup (YAJL_IS_STRING(v) ? (v)->u.string : "");
     }
 
     path[1] = STR_DESCRIPTION;
@@ -1061,8 +1050,10 @@ int mtic_init_internal_data (const char* definition_file_path)
 ////////////////////////////////////////////////////////////////////////
 // PUBLIC API
 ////////////////////////////////////////////////////////////////////////
+
 /**
  * \fn int mtic_loadDefinition (const char* json_str)
+ * \ingroup loadSetGetDefFct
  * \brief load definition in variable 'mtic_definition_loaded' & copy in 'mtic_definition_live"
  *      from a json string
  *
@@ -1086,6 +1077,16 @@ int mtic_loadDefinition (const char* json_str){
     {
         mtic_debug("mtic_loadDefinition : Definition file has not been loaded from json string : %s\n", json_str );
         return -1;
+    }else{
+        //Check the name of agent from network layer
+        char *name = mtic_getAgentName();
+        if(strcmp(name, AGENT_NAME_DEFAULT) == 0 || agentNameChangedByDefinition){
+            //The name of the agent is default or was previouly changed by definition load
+            mtic_setAgentName(mtic_definition_loaded->name);
+            agentNameChangedByDefinition = true;
+        }//else
+            //The agent name was assigned by the developer : we keep it untouched
+        free(name);
     }
 
     // Live data corresponds to a copy of the initial definition
@@ -1096,6 +1097,7 @@ int mtic_loadDefinition (const char* json_str){
 
 /**
  * \fn int mtic_loadDefinitionFromPath (const char* file_path)
+ * \ingroup loadSetGetDefFct
  * \brief load definition in variable 'mtic_definition_loaded' & copy in 'mtic_definition_live"
  *      from a file path
  *
@@ -1119,6 +1121,16 @@ int mtic_loadDefinitionFromPath (const char* file_path){
     {
         mtic_debug("Error : Definition file has not been loaded from file path : %s\n", file_path);
         return -1;
+    }else{
+        //Check the name of agent from network layer
+        char *name = mtic_getAgentName();
+        if(strcmp(name, AGENT_NAME_DEFAULT) == 0 || agentNameChangedByDefinition){
+            //The name of the agent is default or was previouly changed by definition load
+            mtic_setAgentName(mtic_definition_loaded->name);
+            agentNameChangedByDefinition = true;
+        }//else
+            //The agent name was assigned by the developer : we keep it untouched
+        free(name);
     }
 
     // Live data corresponds to a copy of the initial definition

@@ -760,8 +760,15 @@ agent_iop*  mtic_update_mapping_out_state(mapping_out* map_out, definition * ext
 ////////////////////////////////////////////////////////////////////////
 // PUBLIC API
 ////////////////////////////////////////////////////////////////////////
+
+/**
+ *  \defgroup loadClearGetMapFct Agent's mapping: Load / Clear / Get functions
+ *
+ */
+
 /**
  * \fn int mtic_loadMapping (const char* json_str)
+ * \ingroup loadClearGetMapFct
  * \brief load mapping in variable 'mtic_my_agent_mapping' from a json string
  *
  * \param json_str String in json format. Can't be NULL.
@@ -788,14 +795,17 @@ int mtic_loadMapping (const char* json_str){
 
     return 1;
 }
+
 /**
  * \fn int mtic_loadMappingFromPath (const char* file_path)
+ * \ingroup loadClearGetMapFct
  * \brief load mapping in variable 'mtic_my_agent_mapping' from a file path
  *
  * \param file_path The string which contains the json file path. Can't be NULL.
  * \return The error. 1 is OK, 0 file path is NULL or empty, -1 Definition file has not been loaded
  */
 int mtic_loadMappingFromPath (const char* file_path){
+
     mtic_my_agent_mapping = NULL;
 
     //Check if the json string is null or empty
@@ -819,12 +829,13 @@ int mtic_loadMappingFromPath (const char* file_path){
 
 /**
  * \fn int mtic_clearMapping()
+ * \ingroup loadClearGetMapFct
  * \brief Clear the variable 'mtic_my_agent_mapping' and free all structures inside and itself
  *
  * \return The error. 1 is OK,
  * 0 file path is NULL or empty
  */
-int mtic_clearMapping(){ //clears mapping data for the agent
+int mtic_clearMapping(){
 
     if(mtic_my_agent_mapping == NULL){
         mtic_debug("The structure mtic_my_agent_mapping is NULL. \n");
@@ -841,11 +852,13 @@ int mtic_clearMapping(){ //clears mapping data for the agent
 
 /**
  * \fn char* mtic_getMapping()
+ * \ingroup loadClearGetMapFct
  * \brief the agent mapping getter
  *
- * \return The loaded mapping string in json format (allocated). NULL if mtic_my_agent_mapping was not initialized.
+ * \return The loaded mapping string in json format. NULL if mtic_my_agent_mapping was not initialized.
+ * \warning Allocate memory that should be freed by the user.
  */
-char* mtic_getMapping(){ //returns json string
+char* mtic_getMapping(){
     char * mappingJson = NULL;
 
     if(mtic_my_agent_mapping == NULL){
@@ -859,7 +872,13 @@ char* mtic_getMapping(){ //returns json string
 }
 
 /**
+ *  \defgroup EditMapFct Agent's mapping: Edit functions
+ *
+ */
+
+/**
  * \fn int mtic_setMappingName(char *name)
+ * \ingroup EditMapFct
  * \brief the agent mapping name setter
  *
  * \param name The string which contains the name of the agent's mapping. Can't be NULL.
@@ -891,6 +910,7 @@ int mtic_setMappingName(char *name){
 
 /**
  * \fn int mtic_setMappingDescription(char *description)
+ * \ingroup EditMapFct
  * \brief the agent mapping description setter
  *
  * \param description The string which contains the description of the agent's mapping. Can't be NULL.
@@ -922,6 +942,7 @@ int mtic_setMappingDescription(char *description){
 
 /**
  * \fn int mtic_setMappingVersion(char *version)
+ * \ingroup EditMapFct
  * \brief the agent mapping version setter
  *
  * \param version The string which contains the version of the agent's mapping. Can't be NULL.
@@ -950,8 +971,10 @@ int mtic_setMappingVersion(char *version){
 
     return 1;
 }
+
 /**
  * \fn int mtic_getMappingEntriesNumber()
+ * \ingroup EditMapFct
  * \brief the agent mapping entries number getter
  *
  * \return The number of mapping type output entries. If -1 The structure mtic_my_agent_mapping is NULL.
@@ -976,6 +999,7 @@ int mtic_getMappingEntriesNumber(){ //number of entries in the mapping
 
 /**
  * \fn int mtic_addMappingEntry(char *fromOurInput, char *toAgent, char *withOutput)
+ * \ingroup EditMapFct
  * \brief this function allows the user to add a new mapping entry dynamically
  *
  * \param fromOurInput The string which contains the name of the input to be mapped. Can't be NULL.
@@ -1031,6 +1055,7 @@ int mtic_addMappingEntry(char *fromOurInput, char *toAgent, char *withOutput){ /
 
 /**
  * \fn int mtic_removeMappingEntryWithId(int theId)
+ * \ingroup EditMapFct
  * \brief this function allows the user to remove a mapping in table by its id
  *
  * \param theId The id of the mapping. Cannot be negative.
@@ -1075,6 +1100,7 @@ int mtic_removeMappingEntryWithId(int theId){
 
 /**
  * \fn int mtic_removeMappingEntryWithName(char *fromOurInput, char *toAgent, char *withOutput)
+ * \ingroup EditMapFct
  * \brief this function allows the user to remove a mapping in table by the input name, the extern agent's name, the extern agent's output
  *
  * \param fromOurInput The string which contains the name of the input mapped. Can't be NULL.

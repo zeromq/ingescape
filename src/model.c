@@ -179,56 +179,6 @@ void * mtic_get(const char *name_iop, model_state *state){
 }
 
 /*
- * Function: mtic_set
- * ----------------------------
- *  Set the new value to the associated iop.
- *
- *  name_iop    : Name of the 'input/output/parameter'
- *
- *  new_value   : The new value
- *
- *  return : model_state (cf. enum) return error is occur
- */
-model_state mtic_set(const char *iop_name, void *new_value){
-
-    fprintf (stderr, "%s removed \n !!!!!!", __FUNCTION__);
-//    //1) find the iop
-//    model_state code;
-//    agent_iop *iop = model_findIopByName((char*) iop_name,&code);
-
-//    if(iop == NULL)
-//        return code;
-
-//    //2) update the value in the iop_live structure
-//    update_value(iop, new_value);
-
-//    // Let us know the value has changed
-//    char* str_value = mtic_iop_value_to_string(iop);
-//    mtic_debug("SET(%s,%s).\n",iop_name,str_value);
-//    free(str_value);
-
-//    //3) Callback associated from 'observe' function
-//    //Check ma liste de callback et appellé celle concerné
-//    callbacks *fct_to_call;
-//    HASH_FIND_STR(agent_callbacks,iop_name,fct_to_call);
-//    if(fct_to_call != NULL)
-//    {
-//        fct_to_call->callback_ptr(iop);
-//    }
-
-//    /*
-//     * If the iop is an output  : publish
-//     */
-//    if(code == TYPE_OUTPUT){
-
-//        // Publish the new value
-//        network_publishOutput(iop_name);
-//    }
-
-    return OK;
-}
-
-/*
  * Function: mute
  * ----------------------------
  *  Mute an 'input/output/parameter'.
@@ -393,20 +343,54 @@ char* model_DoubleToString(const double value)
     return str;
 }
 
+
+/* NOT in PUBLIC API
+ * fn mtic_observe(const char *name, mtic_observeCallback cb, void *myData)
+ * brief Observe the iop and associate a callback to it.
+ * When the iop value will change by calling the 'mtic_set' function, the associated callback will be called.
+ *
+ * param name the 'input/output/parameter'
+ * param cb the pointer to the associated callback
+ * return 1 if correct or 0
+ */
+static int mtic_observe(const char* type, const char* name, mtic_observeCallback cb, void* myData){
+
+    //1) find the iop
+    model_state state;
+    agent_iop *iop = model_findIopByName((char*) name, &state);
+
+    // Check if the input has been returned.
+    if(iop == NULL){
+        mtic_debug("%s : the %s Agent's '%s' cannot be found", __FUNCTION__, type,  name);
+        return 0;
+    }
+
+    //callback not defined
+    if(cb == NULL) {
+        mtic_debug("%s: the callback use for %s '%s' is null", __FUNCTION__, type,   name);
+        return 0;
+    }
+
+    mtic_observe_callback_T *new_callback = malloc(sizeof(mtic_observe_callback_T));
+    new_callback->iop_name = strdup(name);
+    new_callback->callback_ptr = cb;
+    new_callback->data = myData;
+    HASH_ADD_STR( agent_callbacks, iop_name,  new_callback);
+
+    mtic_debug("ADD_OBSERVE on the %s '%s'\n", type, name);
+
+    return 1;
+}
+
 ////////////////////////////////////////////////////////////////////////
 // PUBLIC API
 ////////////////////////////////////////////////////////////////////////
 
-
 /**
- *  \defgroup readfct Read functions of agent's inputs/ouputs/parameters
+ *  \defgroup readfct Agent's inputs/outputs/parameters: Read functions
  *
  */
 
-//read/write IOP using void*
-//generic typeless functions (requires developer to check IOP type for type casting)
-//for IMPULSION_T value is always 0
-//size is passed by Mastic based on type (for bool, double, int and string) or metadata (for data)
 /**
  * \fn void mtic_readInput(const char *name, void *value, long *size)
  * \ingroup readfct
@@ -415,6 +399,10 @@ char* model_DoubleToString(const double value)
  * \param value
  * \param size
  * \return Return the input value as true or false.
+ * \todo write definition
+ * \todo write function
+ * \todo generic typeless functions (requires developer to check IOP type for type casting) for IMPULSION_T value is always 0
+ * size is passed by Mastic based on type (for bool, double, int and string) or metadata (for data)
  */
 void mtic_readInput(const char *name, void *value, long *size){
     
@@ -428,6 +416,8 @@ void mtic_readInput(const char *name, void *value, long *size){
  * \param value
  * \param size
  * \return Return the input value as true or false.
+ * \todo write definition
+ * \todo write function
  */
 void mtic_readOutput(const char *name, void *value, long *size){
     
@@ -441,16 +431,12 @@ void mtic_readOutput(const char *name, void *value, long *size){
  * \param value
  * \param size
  * \return Return the input value as true or false.
+ * \todo write definition
+ * \todo write function
  */
 void mtic_readParameter(const char *name, void *value, long *size){
     
 }
-
-//read per type
-//implicit conversions are possible. Some need to raise warnings.
-//we need to make things clear on structures
-//for IMPULSION_T value is always 0
-//for DATA_T, size is passed by Mastic
 
 /**
  * \fn mtic_readInputAsBool(const char *name)
@@ -697,6 +683,7 @@ char* mtic_readInputAsString(const char *name){
 /**
  * \fn int mtic_readInputAsData(const char *name, void *data, long *size)
  * \ingroup readfct
+<<<<<<< HEAD
  * \brief Find the Agent's input by name and get the pointer on the data.
  * \warning The input as to be data type
  * \warning Allocating memory before calling this function that must be free after use.
@@ -732,10 +719,8 @@ int mtic_readInputAsData(const char *name, void *data, long *size){
     memcpy(data, value, *size);
 
     return 1;
-
 }
 
-// Read Outputs ...
 /**
  * \fn mtic_readOutputAsBool(const char *name)
  * \ingroup readfct
@@ -929,9 +914,9 @@ double mtic_readOutputAsDouble(const char *name){
  * \fn mtic_readOutputAsString(const char *name)
  * \ingroup readfct
  * \brief Find the Agent's output by name and return the output value as a string.
- *        WARNING: Allocating memory that must be free after use.
  * \param name is the name of the output to read as it has been defined in the definition.
  * \return Return the output value as a string.
+ * \warning  Allocate memory that must be freed by the user.
  */
 char* mtic_readOutputAsString(const char *name){
     //Get the pointer IOP Agent selected by name
@@ -1015,8 +1000,6 @@ int mtic_readOutputAsData(const char *name, void *data, long *size){ //allocs da
 
     return 1;
 }
-
-// Read Parameters ...
 /**
  * \fn mtic_readParameterAsBool(const char *name)
  * \ingroup readfct
@@ -1294,19 +1277,13 @@ int mtic_readParameterAsData(const char *name, void *data, long *size){ //allocs
     memcpy(data, value, *size);
 
     return 1;
-
 }
 
 // --------------------------------  WRITE ------------------------------------//
-// TODO: remove this comments
-// write using void*
-//for IMPULSION_T value is just ignored
-//for DATA_T, these functions should be forbidden (need to know data size)
-//size shall be given to Mastic
-//Mastic shall clone value and shall dispose of it when stopped
+
 
 /**
- *  \defgroup writefct Write functions in agent's inputs/ouputs/parameters
+ *  \defgroup writefct Agent's inputs/outputs/parameters: Write functions
  *
  */
 
@@ -1460,12 +1437,6 @@ int mtic_writeParameter(const char *name, void *value, long size){
 
     return ret;
 }
-
-//TODO: remove this comment
-//write using internal conversions (Mastic does the conversion job)
-//we need to make things clear on structures
-//for IMPULSION_T value is just ignored
-//Mastic shall clone value and shall dispose of it when stopped
 
 /**
  * \fn int mtic_writeInputAsBool(const char *name, bool value)
@@ -1672,6 +1643,7 @@ int mtic_writeInputAsImpulsion(const char *name){
  * \param value is a data to write in the input
  * \param size the size of the value
  * \return 1 if ok else 0
+ * \todo write the function
  */
 int mtic_writeInputAsData(const char *name, void *value, long size){
     //TODO : remove this line
@@ -1930,6 +1902,7 @@ int mtic_writeOutputAsImpulsion(const char *name){
  * \param value is a data to write in the output
  * \param size the size of the value
  * \return 1 if ok else 0
+ * \todo write the function
  */
 int mtic_writeOutputAsData(const char *name, void *value, long size){
     //Get the pointer IOP Agent selected by name
@@ -2126,6 +2099,7 @@ int mtic_writeParameterAsString(const char *name, char *value){
  * \param value is a data to write in the parameter
  * \param size the size of the value
  * \return 1 if ok else 0
+ * \todo write the function
  */
 int mtic_writeParameterAsData(const char *name, void *value, long size){
     //Get the pointer IOP Agent selected by name
@@ -2156,17 +2130,14 @@ int mtic_writeParameterAsData(const char *name, void *value, long size){
     return 1;
 }
 
-
 /**
- *  \defgroup getfct Get functions about agent's inputs/ouputs/parameters
- *
+ *  \defgroup getTypeFct Agent's inputs/outputs/parameters: Get Type / Number / List functions
  */
 
 /**
  * \fn iopType_t mtic_getTypeForInput(const char *name)
- * \ingroup getfct
+ * \ingroup getTypeFct
  * \brief this function returns the value type of the input (integer, bool, etc .)
- *
  * \param name The string which contains the name of the input. Can't be NULL or empty.
  * \return The Input value type.
  * 0 The parameter name cannot be NULL or empty.
@@ -2204,9 +2175,8 @@ iopType_t mtic_getTypeForInput(const char *name){
 
 /**
  * \fn iopType_t mtic_getTypeForOutput(const char *name)
- * \ingroup getfct
+ * \ingroup getTypeFct
  * \brief this function returns the value type of the output (integer, bool, etc .)
- *
  * \param name The string which contains the name of the output. Can't be NULL or empty.
  * \return The output value type.
  * 0 The parameter name cannot be NULL or empty.
@@ -2244,9 +2214,8 @@ iopType_t mtic_getTypeForOutput(const char *name){
 
 /**
  * \fn iopType_t mtic_getTypeForParameter(const char *name)
- * \ingroup getfct
+ * \ingroup getTypeFct
  * \brief this function returns the value type of the parameter (integer, bool, etc .)
- *
  * \param name The string which contains the name of the parameter. Can't be NULL or empty.
  * \return The parameter value type.
  * 0 The parameter name cannot be NULL or empty.
@@ -2284,9 +2253,8 @@ iopType_t mtic_getTypeForParameter(const char *name){
 
 /**
  * \fn int mtic_getInputsNumber()
- * \ingroup getfct
+ * \ingroup getTypeFct
  * \brief This function return the number of inputs.
- *
  * \return The number of inputs. -1 the definition live is NULL. If an error occurs a mtic_debug will be set.
  */
 int mtic_getInputsNumber()
@@ -2304,9 +2272,8 @@ int mtic_getInputsNumber()
 
 /**
  * \fn int mtic_getOutputsNumber()
- * \ingroup getfct
+ * \ingroup getTypeFct
  * \brief This function return the number of outputs.
- *
  * \return The number of outputs. -1 the definition live is NULL. If an error occurs a mtic_debug will be set.
  */
 int mtic_getOutputsNumber()
@@ -2324,7 +2291,7 @@ int mtic_getOutputsNumber()
 
 /**
  * \fn int mtic_getParametersNumber()
- * \ingroup getfct
+ * \ingroup getTypeFct
  * \brief This function return the number of parameters.
  *
  * \return The number of parameters. -1 the definition live is NULL. If an error occurs a mtic_debug will be set.
@@ -2344,7 +2311,7 @@ int mtic_getParametersNumber()
 
 /**
  * \fn char** mtic_getInputsList(long *nbOfElements)
- * \ingroup getfct
+ * \ingroup getTypeFct
  * \brief This function return a two dimensions table to get the list of input's name and get the number of elements in this table.
  *
  * \param nbOfElements The pointer on the number of elements.
@@ -2381,7 +2348,7 @@ char ** mtic_getInputsList(long *nbOfElements){
 
 /**
  * \fn char** mtic_getOutputsList(long *nbOfElements)
- * \ingroup getfct
+ * \ingroup getTypeFct
  * \brief This function return a two dimensions table to get the list of output's name and get the number of elements in this table.
  *
  * \param nbOfElements The pointer on the number of elements.
@@ -2418,7 +2385,7 @@ char ** mtic_getOutputsList(long *nbOfElements){
 
 /**
  * \fn char** mtic_getParametersList(long *nbOfElements)
- * \ingroup getfct
+ * \ingroup getTypeFct
  * \brief This function return a two dimensions table to get the list of parameter's name and get the number of elements in this table.
  *
  * \param nbOfElements The pointer on the number of elements.
@@ -2454,8 +2421,7 @@ char ** mtic_getParametersList(long *nbOfElements){
 }
 
 /**
- *  \defgroup checkfct Check functions on agent's inputs/outpus/parameters
- *  check existence of inputs/ouputs/parameters
+ *  \defgroup checkfct Agent's inputs/outputs/parameters: Check functions
  */
 
 /**
@@ -2566,54 +2532,16 @@ bool mtic_checkParameterExistence(const char *name){
 }
 
 /**
- * \var typedef void (*mtic_observeCallback)(iop_t iopType, const char *name, iopType_t valueType, void *value, void * myData);
+ *  \defgroup observefct Agent's inputs/outputs/parameters: Observe functions
+ *
+ */
+
+/**
+ * \var typedef void (*mtic_observeCallback)(iop_t iopType, const char *name, iopType_t valueType, void *value, void * myData)
+ * \ingroup observefct
  * \brief typedef for the callback used in observe functions
  */
 typedef void (*mtic_observeCallback)(iop_t iopType, const char *name, iopType_t valueType, void *value, void * myData);
-
-
-/* NOT in PUBLIC API
- * fn mtic_observe(const char *name, mtic_observeCallback cb, void *myData)
- * brief Observe the iop and associate a callback to it.
- * When the iop value will change by calling the 'mtic_set' function, the associated callback will be called.
- *
- * param name the 'input/output/parameter'
- * param cb the pointer to the associated callback
- * return 1 if correct or 0
- */
-static int mtic_observe(const char* type, const char* name, mtic_observeCallback cb, void* myData){
-
-    //1) find the iop
-    model_state state;
-    agent_iop *iop = model_findIopByName((char*) name, &state);
-
-    // Check if the input has been returned.
-    if(iop == NULL){
-        mtic_debug("%s : the %s Agent's '%s' cannot be found", __FUNCTION__, type,  name);
-        return 0;
-    }
-
-    //callback not defined
-    if(cb == NULL) {
-        mtic_debug("%s: the callback use for %s '%s' is null", __FUNCTION__, type,   name);
-        return 0;
-    }
-
-    mtic_observe_callback_T *new_callback = malloc(sizeof(mtic_observe_callback_T));
-    new_callback->iop_name = strdup(name);
-    new_callback->callback_ptr = cb;
-    new_callback->data = myData;
-    HASH_ADD_STR( agent_callbacks, iop_name,  new_callback);
-
-    mtic_debug("ADD_OBSERVE on the %s '%s'\n", type, name);
-
-    return 1;
-}
-
-/**
- *  \defgroup observefct Observe functions on agent's inputs/ouputs/parameters
- *
- */
 
 /**
  * \fn int mtic_observeInput(const char *name, mtic_observeCallback cb, void *myData)
@@ -2663,8 +2591,20 @@ int mtic_observeParameter(const char *name, mtic_observeCallback cb, void * myDa
     return mtic_observe("parameter", name, cb, myData);
 }
 
+/**
+ *  \defgroup muteiopFct Agent's inputs/outputs/parameters: mute functions
+ *
+ *
+ */
 
-//mute or unmute an IOP
+/**
+ * \fn int mtic_muteOutput(const char *name)
+ * \ingroup muteiopFct
+ * \brief
+ * \param name
+ * \return 1 if correct or 0
+ * \todo write definition
+ */
 int mtic_muteOutput(const char *name){
     model_state state;
     agent_iop *iop = model_findIopByName((char*) name, &state);
@@ -2675,6 +2615,15 @@ int mtic_muteOutput(const char *name){
     iop->is_muted = true;
     return 1;
 }
+
+/**
+ * \fn int mtic_unmuteOutput(const char *name)
+ * \ingroup muteiopFct
+ * \brief
+ * \param name
+ * \return 1 if correct or 0
+ * \todo write definition
+ */
 int mtic_unmuteOutput(const char *name){
     model_state state;
     agent_iop *iop = model_findIopByName((char*) name, &state);
@@ -2685,6 +2634,15 @@ int mtic_unmuteOutput(const char *name){
     iop->is_muted = false;
     return 1;
 }
+
+/**
+ * \fn bool mtic_isOutputMuted(const char *name)
+ * \ingroup muteiopFct
+ * \brief
+ * \param name
+ * \return
+ * \todo write definition
+ */
 bool mtic_isOutputMuted(const char *name){
     model_state state;
     agent_iop *iop = model_findIopByName((char*) name, &state);
@@ -2694,4 +2652,3 @@ bool mtic_isOutputMuted(const char *name){
     }
     return iop->is_muted;
 }
-
