@@ -262,7 +262,6 @@ int manageSubscription (zloop_t *loop, zmq_pollitem_t *item, void *arg){
             if(zmsg_size(msg) == 2 && isFrozen == false)
             {
                 char * output = zmsg_popstr(msg);
-                char * value = zmsg_popstr(msg);
 
                 // Find the subscriber definition
                 // Look for the new agent definition
@@ -278,17 +277,28 @@ int manageSubscription (zloop_t *loop, zmq_pollitem_t *item, void *arg){
 
                     if(found_iop != NULL)
                     {
-                        const void* converted_value = mtic_iop_value_string_to_real_type(found_iop, value);
-                        // Map reception send to modify the internal model
-                        state = mtic_map_received(foundSubscriber->agentName,
-                                                 output,
-                                                 (void*)converted_value);
+                        if (found_iop->type == DATA_T){
+                            zframe_t *frame = zmsg_pop(msg);
+                            void *data = zframe_data(frame);
+                            long size = zframe_size(frame);
+                            //TODO: write date to proper place
+                        }else if (found_iop->type == IMPULSION_T){
+                            char * value = zmsg_popstr(msg);
+                            free(value);
+                        }else{
+                            char * value = zmsg_popstr(msg);
+                            const void* converted_value = mtic_iop_value_string_to_real_type(found_iop, value);
+                            // Map reception send to update the internal model
+                            state = mtic_map_received(foundSubscriber->agentName,
+                                                      output,
+                                                      (void*)converted_value);
+                            free(value);
+                        }
+                        
 
                     }
                 }
-
                 free(output);
-                free(value);
             } else {
                 // Ignore the message
 
@@ -660,8 +670,16 @@ int network_publishOutput (const char* output_name)
         if(!isWholeAgentMuted && !found_iop->is_muted && found_iop->name != NULL && !isFrozen)
         {
             if (found_iop->type == DATA_T){
-                //TODO
-                mtic_debug("DATA type not implemented : %s will not be published\n",found_iop->name);
+                void *data = NULL;
+                long size = 0;
+                mtic_readOutputAsData(output_name, data, &size);
+                zmsg_t *msg = zmsg_new();
+                zmsg_pushstr(msg, output_name);
+                zframe_t *frame = zframe_new(data, size);
+                zmsg_append(msg, &frame);
+                if (zmsg_send(&msg, agentElements->publisher) != 0){
+                    mtic_debug("Error while publishing output %s\n",output_name);
+                }
             }else if (found_iop->type == IMPULSION_T){
                 mtic_debug("publish impulsion %s\n",found_iop->name);
                 zstr_sendx(agentElements->publisher, found_iop->name, "0", NULL);
