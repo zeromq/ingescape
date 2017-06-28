@@ -8,8 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		970670DF1EDC187900CCDFDC /* mastic_private.h in Headers */ = {isa = PBXBuildFile; fileRef = 97C926AB1EB23ED100D2B0CE /* mastic_private.h */; settings = {ATTRIBUTES = (Private, ); }; };
-		971821D01EDC258500C59F2B /* mastic.h in Headers */ = {isa = PBXBuildFile; fileRef = 97CF86F61ED3236500E2CFDF /* mastic.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		971821D11EDC25B300C59F2B /* mastic.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97CF86F61ED3236500E2CFDF /* mastic.h */; };
 		9762EDDA1EAE547B002062A1 /* definition.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A79851EA7B112003153EF /* definition.c */; };
 		9762EDDB1EAE547B002062A1 /* mapping.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A79981EA7B112003153EF /* mapping.c */; };
 		9762EDDC1EAE547B002062A1 /* model.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A79991EA7B112003153EF /* model.c */; };
@@ -28,6 +26,8 @@
 		9762EDF91EAE55D2002062A1 /* utringbuffer.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79951EA7B112003153EF /* utringbuffer.h */; };
 		9762EDFA1EAE55D2002062A1 /* utstring.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79961EA7B112003153EF /* utstring.h */; };
 		9762EDFB1EAE55D2002062A1 /* utvector.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79971EA7B112003153EF /* utvector.h */; };
+		977C247A1F03F4FA00CA1675 /* mastic.h in Headers */ = {isa = PBXBuildFile; fileRef = 977C24791F03F4FA00CA1675 /* mastic.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		977C247B1F03F50F00CA1675 /* mastic.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 977C24791F03F4FA00CA1675 /* mastic.h */; };
 		979A799E1EA7B112003153EF /* definition.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A79851EA7B112003153EF /* definition.c */; };
 		979A799F1EA7B112003153EF /* mapping.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A79981EA7B112003153EF /* mapping.c */; };
 		979A79A01EA7B112003153EF /* model.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A79991EA7B112003153EF /* model.c */; };
@@ -196,7 +196,7 @@
 			dstPath = "include/$(PRODUCT_NAME)";
 			dstSubfolderSpec = 16;
 			files = (
-				971821D11EDC25B300C59F2B /* mastic.h in CopyFiles */,
+				977C247B1F03F50F00CA1675 /* mastic.h in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -326,6 +326,7 @@
 		9762EDE41EAE54D6002062A1 /* libsodium.18.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsodium.18.dylib; path = ../../../../../../../../../usr/local/lib/libsodium.18.dylib; sourceTree = "<group>"; };
 		9762EDE51EAE54D6002062A1 /* libzmq.5.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libzmq.5.dylib; path = ../../../../../../../../../usr/local/lib/libzmq.5.dylib; sourceTree = "<group>"; };
 		9762EDE61EAE54D6002062A1 /* libzyre.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libzyre.1.dylib; path = ../../../../../../../../../usr/local/lib/libzyre.1.dylib; sourceTree = "<group>"; };
+		977C24791F03F4FA00CA1675 /* mastic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mastic.h; sourceTree = "<group>"; };
 		979A79781EA7B0D6003153EF /* libmastic.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libmastic.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		979A79851EA7B112003153EF /* definition.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = definition.c; sourceTree = "<group>"; };
 		979A798D1EA7B112003153EF /* tests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tests.h; sourceTree = "<group>"; };
@@ -1169,7 +1170,6 @@
 		979A7D291EA8A86F003153EF /* zyre_event.api */ = {isa = PBXFileReference; lastKnownFileType = text; path = zyre_event.api; sourceTree = "<group>"; };
 		97C926AB1EB23ED100D2B0CE /* mastic_private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mastic_private.h; sourceTree = "<group>"; };
 		97C9271C1EB38FD900D2B0CE /* yajl.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = yajl.xcodeproj; path = ../dependencies/ios/yajl/yajl.xcodeproj; sourceTree = "<group>"; };
-		97CF86F61ED3236500E2CFDF /* mastic.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mastic.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1260,7 +1260,7 @@
 			isa = PBXGroup;
 			children = (
 				97C926AB1EB23ED100D2B0CE /* mastic_private.h */,
-				97CF86F61ED3236500E2CFDF /* mastic.h */,
+				977C24791F03F4FA00CA1675 /* mastic.h */,
 				979A798D1EA7B112003153EF /* tests.h */,
 				979A798E1EA7B112003153EF /* uthash */,
 			);
@@ -2562,7 +2562,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				971821D01EDC258500C59F2B /* mastic.h in Headers */,
+				977C247A1F03F4FA00CA1675 /* mastic.h in Headers */,
 				970670DF1EDC187900CCDFDC /* mastic_private.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
