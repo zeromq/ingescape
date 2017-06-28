@@ -244,7 +244,8 @@ agent_iop* mtic_unmap (definition *definition);
 agent_iop*  mtic_update_mapping_out_state(mapping_out* map_out, definition * external_definition);
 model_state mtic_map_received(const char * agent_name,
                               char * out_name,
-                              void * value);
+                              void * value,
+                              long size);
 bool mtic_map_category (char* map_description);
 void mapping_FreeMapping (mapping* mapping);
 

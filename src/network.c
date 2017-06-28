@@ -281,17 +281,26 @@ int manageSubscription (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                             zframe_t *frame = zmsg_pop(msg);
                             void *data = zframe_data(frame);
                             long size = zframe_size(frame);
+                            state = mtic_map_received(foundSubscriber->agentName,
+                                                      output,
+                                                      data,
+                                                      size);
                             //TODO: write date to proper place
                         }else if (found_iop->type == IMPULSION_T){
                             char * value = zmsg_popstr(msg);
                             free(value);
+                            state = mtic_map_received(foundSubscriber->agentName,
+                                                      output,
+                                                      0,
+                                                      0);
                         }else{
                             char * value = zmsg_popstr(msg);
                             const void* converted_value = mtic_iop_value_string_to_real_type(found_iop, value);
                             // Map reception send to update the internal model
                             state = mtic_map_received(foundSubscriber->agentName,
                                                       output,
-                                                      (void*)converted_value);
+                                                      (void*)converted_value,
+                                                      0);
                             free(value);
                         }
                         
