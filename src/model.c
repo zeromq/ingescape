@@ -377,7 +377,6 @@ static int mtic_observe(const char* type, const char* name, mtic_observeCallback
 // PUBLIC API
 ////////////////////////////////////////////////////////////////////////
 
-
 /**
  *  \defgroup readfct Read functions of agent's inputs/ouputs/parameters
  *

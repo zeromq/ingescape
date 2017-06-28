@@ -21,11 +21,6 @@
 #define PUBLIC
 #endif
 
-//return codes policy for functions (using int type)
-// 1 : everything OK
-// 0 and below : an error occured
-
-
 //////////////////////////////////////////////////
 //initialization and configuration
 
@@ -61,12 +56,20 @@ PUBLIC void mtic_setCanBeFrozen (bool canBeFrozen);
 //////////////////////////////////////////////////
 //IOP Model : Inputs, Outputs and Parameters read/write/check/observe/mute
 
+/**
+ * \var iop_t
+ * \brief type of agent's inputs / outputs / parameters
+ */
 typedef enum {
     INPUT_T = 1,
     OUTPUT_T,
     PARAMETER_T
 } iop_t;
 
+/**
+ * \var iopType_t
+ * \brief type of the inputs / outputs / parameters
+ */
 typedef enum {
     INTEGER_T = 1,
     DOUBLE_T,
@@ -157,6 +160,7 @@ PUBLIC bool mtic_isOutputMuted(const char *name);
 //////////////////////////////////////////////////
 //Definitions
 
+//load / set / get definition
 PUBLIC int mtic_loadDefinition (const char* json_str);
 PUBLIC int mtic_loadDefinitionFromPath (const char* file_path);
 int mtic_clearDefinition(); //clears definition data for the agent
@@ -180,6 +184,7 @@ PUBLIC int mtic_removeParameter(const char *name);
 //////////////////////////////////////////////////
 //mapping
 
+//load / set / get definition
 PUBLIC int mtic_loadMapping (const char* json_str);
 PUBLIC int mtic_loadMappingFromPath (const char* file_path);
 PUBLIC int mtic_clearMapping(); //clears mapping data for the agent

@@ -613,13 +613,20 @@ int definition_addIop(agent_iop *iop, iop_t iop_type, definition **def)
 ////////////////////////////////////////////////////////////////////////
 
 /**
+ *  \defgroup loadSetGetDefFct Load / set / get functions on agent's definition
+ *
+ */
+
+/**
  * \fn int mtic_clearDefinition()
+ * \ingroup loadSetGetDefFct
  * \brief
  * \return The error.
- * \todo need to write the doc
+ * \todo write documentation
+ * \todo write the function
  */
-int mtic_clearDefinition(){ //clears definition data for the agent
-    //TODO : implement
+int mtic_clearDefinition(){
+
     mtic_debug("mtic_clearDefinition : function need to be defined and implement it !");
 
     return 1;
@@ -627,9 +634,11 @@ int mtic_clearDefinition(){ //clears definition data for the agent
 
 /**
  * \fn char* mtic_getDefinition()
+ * \ingroup loadSetGetDefFct
  * \brief the agent definition getter
  *
  * \return The loaded definition string in json format (allocated). NULL if mtic_definition_loaded was not initialized.
+ * \warning Allocate memory than should be freed by the user.
  */
 char* mtic_getDefinition(){
     char * def = NULL;
@@ -644,6 +653,7 @@ char* mtic_getDefinition(){
 
 /**
  * \fn int mtic_setDefinitionDescription(char *description)
+ * \ingroup loadSetGetDefFct
  * \brief the agent definition description setter
  *
  * \param description The string which contains the description of the agent. Can't be NULL.
@@ -685,7 +695,8 @@ int mtic_setDefinitionDescription(char *description){
 }
 
 /**
- * \fn mtic_setDefinitionVersion(char *description)
+ * \fn mtic_setDefinitionVersion(char *version)
+ * \ingroup loadSetGetDefFct
  * \brief the agent definition version setter
  *
  * \param version The string which contains the version of the agent. Can't be NULL.
@@ -727,15 +738,22 @@ int mtic_setDefinitionVersion(char *version){
 }
 
 /**
+ *  \defgroup EditDefFct Edit functions on agent's definition
+ *
+ */
+
+/**
  * \fn mtic_createInput(const char *name, iopType_t type, void *value)
+ * \ingroup EditDefFct
  * \brief Create and add an input for the agent
  *
  * \param name The name of the Iop
  * \param type The Iop type : input, output or parameter
  * \param value The pointer on the value (the value will be copied)
  * \return The error. 1 is OK, 0 not able to add in definition loaded, -1 not able to add in definition live
+ * \todo value must be copied in function : copied in definition_setIopValue (is it ok ?)
  */
-int mtic_createInput(const char *name, iopType_t type, void *value){ //value must be copied in function : copied in definition_setIopValue
+int mtic_createInput(const char *name, iopType_t type, void *value){
 
     //Create the iop
     agent_iop* iop = definition_createIop(name,type,value);
@@ -758,14 +776,16 @@ int mtic_createInput(const char *name, iopType_t type, void *value){ //value mus
 
 /**
  * \fn mtic_createOutput(const char *name, iopType_t type, void *value)
+ * \ingroup EditDefFct
  * \brief Create and add a output for the agent
  *
  * \param name The name of the Iop
  * \param type The Iop type : input, output or parameter
  * \param value The pointer on the value (the value will be copied)
  * \return The error. 1 is OK, 0 not able to add in definition loaded, -1 not able to add in definition live
+ * \todo value must be copied in function (is it ok ?)
  */
-int mtic_createOutput(const char *name, iopType_t type, void *value){ //value must be copied in function
+int mtic_createOutput(const char *name, iopType_t type, void *value){
     //Create the iop
     agent_iop* iop = definition_createIop(name,type,value);
 
@@ -787,14 +807,16 @@ int mtic_createOutput(const char *name, iopType_t type, void *value){ //value mu
 
 /**
  * \fn mtic_createParameter(const char *name, iopType_t type, void *value)
+ * \ingroup EditDefFct
  * \brief Create and add a parameter for the agent
  *
  * \param name The name of the Iop
  * \param type The Iop type : input, output or parameter
  * \param value The pointer on the value (the value will be copied)
  * \return The error. 1 is OK, 0 not able to add in definition loaded, -1 not able to add in definition live
+ * \todo value must be copied in function (is it ok ?)
  */
-int mtic_createParameter(const char *name, iopType_t type, void *value){ //value must be copied in function
+int mtic_createParameter(const char *name, iopType_t type, void *value){
     //Create the iop
     agent_iop* iop = definition_createIop(name,type,value);
 
@@ -813,14 +835,17 @@ int mtic_createParameter(const char *name, iopType_t type, void *value){ //value
 
     return 1;
 }
+
 /**
  * \fn mtic_removeInput(const char *name)
+ * \ingroup EditDefFct
  * \brief Remove and free an input for the agent
  *
  * \param name The name of the Iop
  * \return The error. 1 is OK, 0 Definition loaded is NULL, -1 Definition live is NULL, -2 An error occurs while finding the iop by name
  */
 int mtic_removeInput(const char *name){
+
     //check if def loaded exist
     if(mtic_definition_loaded == NULL){
         mtic_debug("Definition loaded is NULL.");
@@ -856,6 +881,7 @@ int mtic_removeInput(const char *name){
 
 /**
  * \fn mtic_removeOutput(const char *name)
+ * \ingroup EditDefFct
  * \brief Remove and free a output for the agent
  *
  * \param name The name of the Iop
@@ -897,12 +923,14 @@ int mtic_removeOutput(const char *name){
 
 /**
  * \fn mtic_removeParameter(const char *name)
+ * \ingroup EditDefFct
  * \brief Remove and free a output for the agent
  *
  * \param name The name of the Iop
  * \return The error. 1 is OK, 0 Definition loaded is NULL, -1 Definition live is NULL, -2 An error occurs while finding the iop by name
  */
 int mtic_removeParameter(const char *name){
+
     //check if def loaded exist
     if(mtic_definition_loaded == NULL){
         mtic_debug("Definition loaded is NULL.");

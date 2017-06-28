@@ -1048,8 +1048,10 @@ int mtic_init_internal_data (const char* definition_file_path)
 ////////////////////////////////////////////////////////////////////////
 // PUBLIC API
 ////////////////////////////////////////////////////////////////////////
+
 /**
  * \fn int mtic_loadDefinition (const char* json_str)
+ * \ingroup loadSetGetDefFct
  * \brief load definition in variable 'mtic_definition_loaded' & copy in 'mtic_definition_live"
  *      from a json string
  *
@@ -1093,6 +1095,7 @@ int mtic_loadDefinition (const char* json_str){
 
 /**
  * \fn int mtic_loadDefinitionFromPath (const char* file_path)
+ * \ingroup loadSetGetDefFct
  * \brief load definition in variable 'mtic_definition_loaded' & copy in 'mtic_definition_live"
  *      from a file path
  *
