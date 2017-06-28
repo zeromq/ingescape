@@ -89,19 +89,19 @@ PUBLIC bool mtic_readInputAsBool(const char *name);
 PUBLIC int mtic_readInputAsInt(const char *name);
 PUBLIC double mtic_readInputAsDouble(const char *name);
 PUBLIC char* mtic_readInputAsString(const char *name);
-void mtic_readInputAsData(const char *name, void *data, long *size); //allocs data structure to be disposed by caller
+PUBLIC int mtic_readInputAsData(const char *name, void *data, long *size); //allocs data structure to be disposed by caller
 
 PUBLIC bool mtic_readOutputAsBool(const char *name);
 PUBLIC int mtic_readOutputAsInt(const char *name);
 PUBLIC double mtic_readOutputAsDouble(const char *name);
 PUBLIC char* mtic_readOutputAsString(const char *name);
-void mtic_readOutputAsData(const char *name, void *data, long *size); //allocs data structure to be disposed by caller
+PUBLIC int mtic_readOutputAsData(const char *name, void *data, long *size); //allocs data structure to be disposed by caller
 
 PUBLIC bool mtic_readParameterAsBool(const char *name);
 PUBLIC int mtic_readParameterAsInt(const char *name);
 PUBLIC double mtic_readParameterAsDouble(const char *name);
 PUBLIC char* mtic_readParameterAsString(const char *name);
-void mtic_readParameterAsData(const char *name, void *data, long *size); //allocs data structure to be disposed by caller
+PUBLIC int mtic_readParameterAsData(const char *name, void *data, long *size); //allocs data structure to be disposed by caller
 
 //write using void*
 PUBLIC int mtic_writeInput(const char *name, void *value, long size);
@@ -114,20 +114,20 @@ PUBLIC int mtic_writeInputAsInt(const char *name, int value);
 PUBLIC int mtic_writeInputAsDouble(const char *name, double value);
 PUBLIC int mtic_writeInputAsString(const char *name, char *value);
 PUBLIC int mtic_writeInputAsImpulsion(const char *name);
-int mtic_writeInputAsData(const char *name, void *value, long size);
+PUBLIC int mtic_writeInputAsData(const char *name, void *value, long size);
 
 PUBLIC int mtic_writeOutputAsBool(const char *name, bool value);
 PUBLIC int mtic_writeOutputAsInt(const char *name, int value);
 PUBLIC int mtic_writeOutputAsDouble(const char *name, double value);
 PUBLIC int mtic_writeOutputAsString(const char *name, char *value);
 PUBLIC int mtic_writeOutputAsImpulsion(const char *name);
-int mtic_writeOutputAsData(const char *name, void *value, long size);
+PUBLIC int mtic_writeOutputAsData(const char *name, void *value, long size);
 
 PUBLIC int mtic_writeParameterAsBool(const char *name, bool value);
 PUBLIC int mtic_writeParameterAsInt(const char *name, int value);
 PUBLIC int mtic_writeParameterAsDouble(const char *name, double value);
 PUBLIC int mtic_writeParameterAsString(const char *name, char *value);
-int mtic_writeParameterAsData(const char *name, void *value, long size);
+PUBLIC int mtic_writeParameterAsData(const char *name, void *value, long size);
 
 //check IOP type, lists and existence
 PUBLIC iopType_t mtic_getTypeForInput(const char *name);
@@ -169,9 +169,9 @@ PUBLIC int mtic_setDefinitionDescription(char *description);
 PUBLIC int mtic_setDefinitionVersion(char *version);
 
 //edit the definition using the API
-PUBLIC int mtic_createInput(const char *name, iopType_t type, void *value); //value must be copied in function
-PUBLIC int mtic_createOutput(const char *name, iopType_t type, void *value); //value must be copied in function
-PUBLIC int mtic_createParameter(const char *name, iopType_t type, void *value); //value must be copied in function
+PUBLIC int mtic_createInput(const char *name, iopType_t type, void *value, long size); //value must be copied in function
+PUBLIC int mtic_createOutput(const char *name, iopType_t type, void *value, long size); //value must be copied in function
+PUBLIC int mtic_createParameter(const char *name, iopType_t type, void *value, long size); //value must be copied in function
 
 PUBLIC int mtic_removeInput(const char *name);
 PUBLIC int mtic_removeOutput(const char *name);

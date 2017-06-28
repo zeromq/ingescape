@@ -79,7 +79,7 @@ agent_iop * model_findIopByName(const char *name, model_state *code){
 }
 
 
-void update_value(agent_iop *iop, void* value){
+void update_value(agent_iop *iop, void* value, long size){
     switch (iop->type) {
         case INTEGER_T:
             iop->old_value.i = iop->value.i;
@@ -108,9 +108,18 @@ void update_value(agent_iop *iop, void* value){
         break;
         case DATA_T:
             free(iop->old_value.data);
-            iop->old_value.data = strdup(iop->value.data);
+            iop->old_value.data = NULL;
+            iop->old_value.data = calloc (1, size);
+            //Check if not first call because value.data is empty
+
+            memcpy(iop->old_value.data, iop->value.data, iop->valueSize);
+            iop->oldValueSize = iop->valueSize;
+
             free(iop->value.data);
-            iop->value.data = strdup(value);
+            iop->value.data = NULL;
+            iop->value.data = calloc (1, size);
+            memcpy(iop->value.data,value,size);
+            iop->valueSize = size;
         break;
         default:
             break;
@@ -672,19 +681,44 @@ char* mtic_readInputAsString(const char *name){
 }
 
 /**
- * \fn oid mtic_readInputAsData(const char *name, void *data, long *size)
+ * \fn int mtic_readInputAsData(const char *name, void *data, long *size)
  * \ingroup readfct
- * \brief
- * \param name
- * \param data
- * \param size
- * \return Return the output value as true or false.
- * \warning Allocate memory than need to be freed by the user.
- * \todo write the definition
- * \todo write function
+<<<<<<< HEAD
+ * \brief Find the Agent's input by name and get the pointer on the data.
+ * \warning The input as to be data type
+ * \warning Allocating memory before calling this function that must be free after use.
+ * \param name The input's name
+ * \param data The pointer on the struct to get
+ * \param size The size of the data read
+ * \return Return 1 if it is OK or 0 if not.
  */
-void mtic_readInputAsData(const char *name, void *data, long *size){
-    //allocs data structure to be disposed by caller
+int mtic_readInputAsData(const char *name, void *data, long *size){
+    //Get the pointer IOP Agent selected by name
+    model_state state;
+    agent_iop *iop = model_findIopByName((char*) name, &state);
+
+    // Check if the iop has been returned.
+    if(iop == NULL){
+        mtic_debug("%s : Agent's input '%s' cannot be found\n", __FUNCTION__, name);
+        return 0;
+    }
+
+    //Check the value type as an impulsion.
+    if(iop->type != DATA_T){
+        mtic_debug("%s: Agent's input '%s' is not an data\n", __FUNCTION__,  name);
+        return 0;
+    }
+
+    //Get the pointer on the structure data
+    void * value = mtic_get(name,&state);
+
+    //get size
+    *size = iop->valueSize;
+
+    //Copy the data
+    memcpy(data, value, *size);
+
+    return 1;
 }
 
 /**
@@ -927,20 +961,45 @@ char* mtic_readOutputAsString(const char *name){
         return NULL;
     }
 }
-
 /**
- * \fn void mtic_readOutputAsData(const char *name, void *data, long *size)
+ * \fn int mtic_readOutputAsData(const char *name, void *data, long *size)
  * \ingroup readfct
- * \brief Find the Agent's output by name and return the output value as a data.
- * \param name is the name of the output to read as it has been defined in the definition.
- * \param data is the data structure to read.
- * \param size is the size of the data structure.
- * \warning  Allocate memory that must be freed by the user.
- * \todo write function
+ * \brief Find the Agent's output by name and get the pointer on the data.
+ * \warning The output as to be data type
+ * \warning Allocating memory before calling this function that must be free after use.
+ * \param name The output's name
+ * \param data The pointer on the struct to get
+ * \param size The size of the data read
+ * \return Return 1 if it is OK or 0 if not.
  */
-void mtic_readOutputAsData(const char *name, void *data, long *size){
-}
+int mtic_readOutputAsData(const char *name, void *data, long *size){ //allocs data structure to be disposed by caller
+    //Get the pointer IOP Agent selected by name
+    model_state state;
+    agent_iop *iop = model_findIopByName((char*) name, &state);
 
+    // Check if the iop has been returned.
+    if(iop == NULL){
+        mtic_debug("%s : Agent's output '%s' cannot be found\n", __FUNCTION__, name);
+        return 0;
+    }
+
+    //Check the value type as an impulsion.
+    if(iop->type != DATA_T){
+        mtic_debug("%s: Agent's output '%s' is not an data\n", __FUNCTION__,  name);
+        return 0;
+    }
+
+    //Get the pointer on the structure data
+    void * value = mtic_get(name,&state);
+
+    //get size
+    *size = iop->valueSize;
+
+    //Copy the data
+    memcpy(data, value, *size);
+
+    return 1;
+}
 /**
  * \fn mtic_readParameterAsBool(const char *name)
  * \ingroup readfct
@@ -1180,18 +1239,44 @@ char* mtic_readParameterAsString(const char *name){
         return NULL;
     }
 }
-
 /**
- * \fn void mtic_readParameterAsData(const char *name, void *data, long *size)
+ * \fn int mtic_readParameterAsData(const char *name, void *data, long *size)
  * \ingroup readfct
- * \brief Find the Agent's parameter by name and return the parameter value as a data structure.
- * \param name is the name of the parameter to read as it has been defined in the definition.
- * \param data is the data structure to read.
- * \param size is the size of the data structure.
- * \warning  Allocate memory that must be freed by the user.
- * \todo write function
+ * \brief Find the Agent's parameter by name and get the pointer on the data.
+ * \warning The parameter as to be data type
+ * \warning Allocating memory before calling this function that must be free after use.
+ * \param name The parameter's name
+ * \param data The pointer on the struct to get
+ * \param size The size of the data read
+ * \return Return 1 if it is OK or 0 if not.
  */
-void mtic_readParameterAsData(const char *name, void *data, long *size){
+int mtic_readParameterAsData(const char *name, void *data, long *size){ //allocs data structure to be disposed by caller
+    //Get the pointer IOP Agent selected by name
+    model_state state;
+    agent_iop *iop = model_findIopByName((char*) name, &state);
+
+    // Check if the iop has been returned.
+    if(iop == NULL){
+        mtic_debug("%s : Agent's parameter '%s' cannot be found\n", __FUNCTION__, name);
+        return 0;
+    }
+
+    //Check the value type as an impulsion.
+    if(iop->type != DATA_T){
+        mtic_debug("%s: Agent's parameter '%s' is not an data\n", __FUNCTION__,  name);
+        return 0;
+    }
+
+    //Get the pointer on the structure data
+    void * value = mtic_get(name,&state);
+
+    //get size
+    *size = iop->valueSize;
+
+    //Copy the data
+    memcpy(data, value, *size);
+
+    return 1;
 }
 
 // --------------------------------  WRITE ------------------------------------//
@@ -1381,7 +1466,7 @@ int mtic_writeInputAsBool(const char *name, bool value){
     }
 
     // update the value in the iop_live structure
-    update_value(iop, (void*) &value);
+    update_value(iop, (void*) &value, 0);
 
     // call the callback associated to if it exist
     mtic_observe_callback_T *fct_to_call;
@@ -1421,7 +1506,7 @@ int mtic_writeInputAsInt(const char *name, int value){
     }
 
     // update the value in the iop_live structure
-    update_value(iop, (void*) &value);
+    update_value(iop, (void*) &value, 0);
 
     // call the callback associated to if it exist
     mtic_observe_callback_T *fct_to_call;
@@ -1460,7 +1545,7 @@ int mtic_writeInputAsDouble(const char *name, double value){
     }
 
     // update the value in the iop_live structure
-    update_value(iop, (void*) &value);
+    update_value(iop, (void*) &value, 0);
 
     // call the callback associated to if it exist
     mtic_observe_callback_T *fct_to_call;
@@ -1499,7 +1584,7 @@ int mtic_writeInputAsString(const char *name, char *value){
     }
 
     // update the value in the iop_live structure
-    update_value(iop, (void*) value);
+    update_value(iop, (void*) value, 0);
 
     // call the callback associated to if it exist
     mtic_observe_callback_T *fct_to_call;
@@ -1561,7 +1646,34 @@ int mtic_writeInputAsImpulsion(const char *name){
  * \todo write the function
  */
 int mtic_writeInputAsData(const char *name, void *value, long size){
-    fprintf(stderr, "WARNING - %s not implemented yet !\n", __FUNCTION__);
+    //TODO : remove this line
+    //    fprintf(stderr, "WARNING - %s not implemented yet !\n", __FUNCTION__);
+
+    //Get the pointer IOP Agent selected by name
+    model_state state;
+    agent_iop *iop = model_findIopByName((char*) name, &state);
+
+    // Check if the iop has been returned.
+    if(iop == NULL){
+        mtic_debug("%s : Agent's input '%s' cannot be found\n", __FUNCTION__, name);
+        return 0;
+    }
+
+    //Check the value type as an impulsion.
+    if(iop->type != DATA_T){
+        mtic_debug("%s: Agent's input '%s' is not an data\n", __FUNCTION__,  name);
+        return 0;
+    }
+
+    //Update the value in the definition
+    update_value(iop,value,size);
+
+    // call the callback associated to if it exist
+    mtic_observe_callback_T *fct_to_call;
+    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
+    if(fct_to_call != NULL)
+        fct_to_call->callback_ptr(INPUT_T, name, DATA_T, value, fct_to_call->data);
+
     return 1;
 }
 
@@ -1593,7 +1705,7 @@ int mtic_writeOutputAsBool(const char *name, bool value){
     }
 
     // update the value in the iop_live structure
-    update_value(iop, (void*) &value);
+    update_value(iop, (void*) &value, 0);
 
     // call the callback associated to if it exist
     mtic_observe_callback_T *fct_to_call;
@@ -1636,7 +1748,7 @@ int mtic_writeOutputAsInt(const char *name, int value){
     }
 
     // update the value in the iop_live structure
-    update_value(iop, (void*) &value);
+    update_value(iop, (void*) &value, 0);
 
     // call the callback associated to if it exist
     mtic_observe_callback_T *fct_to_call;
@@ -1680,7 +1792,7 @@ int mtic_writeOutputAsDouble(const char *name, double value){
     }
 
     // update the value in the iop_live structure
-    update_value(iop, (void*) &value);
+    update_value(iop, (void*) &value, 0);
 
     // call the callback associated to if it exist
     mtic_observe_callback_T *fct_to_call;
@@ -1723,7 +1835,7 @@ int mtic_writeOutputAsString(const char *name, char *value){
     }
 
     // update the value in the iop_live structure
-    update_value(iop, (void*) value);
+    update_value(iop, (void*) value, 0);
 
     // call the callback associated to if it exist
     mtic_observe_callback_T *fct_to_call;
@@ -1793,7 +1905,31 @@ int mtic_writeOutputAsImpulsion(const char *name){
  * \todo write the function
  */
 int mtic_writeOutputAsData(const char *name, void *value, long size){
-    fprintf(stderr, "WARNING - %s not implemented yet !\n", __FUNCTION__);
+    //Get the pointer IOP Agent selected by name
+    model_state state;
+    agent_iop *iop = model_findIopByName((char*) name, &state);
+
+    // Check if the iop has been returned.
+    if(iop == NULL){
+        mtic_debug("%s : Agent's output '%s' cannot be found\n", __FUNCTION__, name);
+        return 0;
+    }
+
+    //Check the value type as an impulsion.
+    if(iop->type != DATA_T){
+        mtic_debug("%s: Agent's output '%s' is not an data\n", __FUNCTION__,  name);
+        return 0;
+    }
+
+    //Update the value in the definition
+    update_value(iop,value,size);
+
+    // call the callback associated to if it exist
+    mtic_observe_callback_T *fct_to_call;
+    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
+    if(fct_to_call != NULL)
+        fct_to_call->callback_ptr(OUTPUT_T, name, DATA_T, value, fct_to_call->data);
+
     return 1;
 }
 
@@ -1825,7 +1961,7 @@ int mtic_writeParameterAsBool(const char *name, bool value){
     }
 
     // update the value in the iop_live structure
-    update_value(iop, (void*) &value);
+    update_value(iop, (void*) &value, 0);
 
     // call the callback associated to if it exist
     mtic_observe_callback_T *fct_to_call;
@@ -1864,7 +2000,7 @@ int mtic_writeParameterAsInt(const char *name, int value){
     }
 
     // update the value in the iop_live structure
-    update_value(iop, (void*) &value);
+    update_value(iop, (void*) &value, 0);
 
     // call the callback associated to if it exist
     mtic_observe_callback_T *fct_to_call;
@@ -1903,7 +2039,7 @@ int mtic_writeParameterAsDouble(const char *name, double value){
     }
 
     // update the value in the iop_live structure
-    update_value(iop, (void*) &value);
+    update_value(iop, (void*) &value, 0);
 
     // call the callback associated to if it exist
     mtic_observe_callback_T *fct_to_call;
@@ -1942,7 +2078,7 @@ int mtic_writeParameterAsString(const char *name, char *value){
     }
 
     // update the value in the iop_live structure
-    update_value(iop, value);
+    update_value(iop, value, 0);
 
     // call the callback associated to if it exist
     mtic_observe_callback_T *fct_to_call;
@@ -1966,7 +2102,31 @@ int mtic_writeParameterAsString(const char *name, char *value){
  * \todo write the function
  */
 int mtic_writeParameterAsData(const char *name, void *value, long size){
-    fprintf(stderr, "WARNING - %s not implemented yet !\n", __FUNCTION__);
+    //Get the pointer IOP Agent selected by name
+    model_state state;
+    agent_iop *iop = model_findIopByName((char*) name, &state);
+
+    // Check if the iop has been returned.
+    if(iop == NULL){
+        mtic_debug("%s : Agent's parameter '%s' cannot be found\n", __FUNCTION__, name);
+        return 0;
+    }
+
+    //Check the value type as an impulsion.
+    if(iop->type != DATA_T){
+        mtic_debug("%s: Agent's parameter '%s' is not an data\n", __FUNCTION__,  name);
+        return 0;
+    }
+
+    //Update the value in the definition
+    update_value(iop,value,size);
+
+    // call the callback associated to if it exist
+    mtic_observe_callback_T *fct_to_call;
+    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
+    if(fct_to_call != NULL)
+        fct_to_call->callback_ptr(PARAMETER_T, name, DATA_T, value, fct_to_call->data);
+
     return 1;
 }
 

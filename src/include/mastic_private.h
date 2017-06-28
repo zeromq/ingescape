@@ -69,16 +69,18 @@ struct agent_iop {
         char* s;                //in accordance to type STRING ex. 'display the image'
         bool b;                 //in accordance to type BOOL ex. 'TRUE'
         char* impuls;           //in accordance to type IMPULSION ex. 'released()'
-        char* data;            //in accordance to type DATA ex. '{int:x, int:y, string:gesture_name} <=> {int:10, int:45, string:swap}
+        void* data;             //in accordance to type DATA ex. '{int:x, int:y, string:gesture_name} <=> {int:10, int:45, string:swap}
     } old_value;
+    long oldValueSize;          //Size of pointer on data
     union {
         int i;                  //in accordance to type INTEGER_T ex. '10'
         double d;               //in accordance to type DOUBLE ex. '10.01'
         char* s;                //in accordance to type STRING ex. 'display the image'
         bool b;                 //in accordance to type BOOL ex. 'TRUE'
         char* impuls;           //in accordance to type IMPULSION ex. 'released()'
-        char* data;            //in accordance to type DATA ex. '{int:x, int:y, string:gesture_name} <=> {int:10, int:45, string:swap}
+        void* data;             //in accordance to type DATA ex. '{int:x, int:y, string:gesture_name} <=> {int:10, int:45, string:swap}
     } value;
+    long valueSize;          //Size of pointer on data
     bool is_muted;              // flag indicated if the iop is muted (specially used for outputs)
     UT_hash_handle hh;         /* makes this structure hashable */
 };
