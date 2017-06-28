@@ -156,10 +156,10 @@ void free_agent_iop (agent_iop** agent_iop){
             (*agent_iop)->value.impuls = NULL;
             break;
         case DATA_T:
-            free((char*)(*agent_iop)->old_value.data);
+            free((void*)(*agent_iop)->old_value.data);
             (*agent_iop)->old_value.data = NULL;
 
-            free((char*)(*agent_iop)->value.data);
+            free((void*)(*agent_iop)->value.data);
             (*agent_iop)->value.data = NULL;
             break;
         default:
@@ -375,7 +375,8 @@ char* mtic_iop_value_to_string (agent_iop* iop)
                 sprintf(str_value,"%s",iop->value.impuls);
                 break;
             case DATA_T:
-                sprintf(str_value,"%s",iop->value.data);
+                //TODO : DATA TYPE
+                //sprintf(str_value,"%s",iop->value.data);
                 break;
             default:
                 break;
@@ -480,7 +481,8 @@ const char* iop_old_value_to_string (agent_iop* iop)
                 sprintf(str_value,"%s",iop->old_value.impuls);
                 break;
             case DATA_T:
-                sprintf(str_value,"%s",iop->old_value.data);
+                //TODO : DATA TYPE
+                //sprintf(str_value,"%s",iop->old_value.data);
                 break;
             default:
                 break;
@@ -509,7 +511,7 @@ double get_iop_value_as_double(agent_iop *iop){
 //à remplir ou déplacer ici
 
 //1 is OK, 0 iop is NULL
-int definition_setIopValue(agent_iop *iop, void * value)
+int definition_setIopValue(agent_iop *iop, void * value, long size)
 {
     if(iop == NULL)
         return 0;
@@ -534,7 +536,10 @@ int definition_setIopValue(agent_iop *iop, void * value)
         break;
         case DATA_T:
             free(iop->value.data);
-            iop->value.data = strdup(value);
+            iop->value.data = NULL;
+            iop->valueSize = size;
+            iop->value.data = calloc(1,size);
+            memcpy(iop->value.data,value, size);
         break;
         default:
             break;
@@ -543,7 +548,7 @@ int definition_setIopValue(agent_iop *iop, void * value)
     return 1;
 }
 
-agent_iop* definition_createIop(const char *name, iopType_t type, void *value)
+agent_iop* definition_createIop(const char *name, iopType_t type, void *value, long size)
 {
     //Create the iop
     agent_iop *iop = NULL;
@@ -552,7 +557,9 @@ agent_iop* definition_createIop(const char *name, iopType_t type, void *value)
     iop->type = type;
 
     //Set value
-    definition_setIopValue(iop,value);
+//    agent_iop *ret = NULL;
+//    ret = calloc (1, sizeof (struct agent_iop));
+    definition_setIopValue(iop,value, size);
 
     return iop;
 }
@@ -741,10 +748,10 @@ int mtic_setDefinitionVersion(char *version){
  * \param value The pointer on the value (the value will be copied)
  * \return The error. 1 is OK, 0 not able to add in definition loaded, -1 not able to add in definition live
  */
-int mtic_createInput(const char *name, iopType_t type, void *value){ //value must be copied in function : copied in definition_setIopValue
+int mtic_createInput(const char *name, iopType_t type, void *value, long size){ //value must be copied in function : copied in definition_setIopValue
 
     //Create the iop
-    agent_iop* iop = definition_createIop(name,type,value);
+    agent_iop* iop = definition_createIop(name,type,value, size);
 
     //Add iop in structure def loaded, need to be copied
     if (definition_addIop(iop,INPUT_T, &mtic_definition_loaded) < 1){
@@ -771,9 +778,9 @@ int mtic_createInput(const char *name, iopType_t type, void *value){ //value mus
  * \param value The pointer on the value (the value will be copied)
  * \return The error. 1 is OK, 0 not able to add in definition loaded, -1 not able to add in definition live
  */
-int mtic_createOutput(const char *name, iopType_t type, void *value){ //value must be copied in function
+int mtic_createOutput(const char *name, iopType_t type, void *value, long size){ //value must be copied in function
     //Create the iop
-    agent_iop* iop = definition_createIop(name,type,value);
+    agent_iop* iop = definition_createIop(name,type,value, size);
 
     //Add iop in structure def loaded, need to be copied
     if (definition_addIop(iop,OUTPUT_T, &mtic_definition_loaded) < 1){
@@ -800,9 +807,9 @@ int mtic_createOutput(const char *name, iopType_t type, void *value){ //value mu
  * \param value The pointer on the value (the value will be copied)
  * \return The error. 1 is OK, 0 not able to add in definition loaded, -1 not able to add in definition live
  */
-int mtic_createParameter(const char *name, iopType_t type, void *value){ //value must be copied in function
+int mtic_createParameter(const char *name, iopType_t type, void *value, long size){ //value must be copied in function
     //Create the iop
-    agent_iop* iop = definition_createIop(name,type,value);
+    agent_iop* iop = definition_createIop(name,type,value, size);
 
     //Add iop in structure def loaded, need to be copied
     if (definition_addIop(iop,PARAMETER_T, &mtic_definition_loaded) < 1){
