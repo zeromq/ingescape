@@ -378,7 +378,7 @@ static int mtic_observe(const char* type, const char* name, mtic_observeCallback
 ////////////////////////////////////////////////////////////////////////
 
 /**
- *  \defgroup readfct Read functions of agent's inputs/ouputs/parameters
+ *  \defgroup readfct Agent's inputs/outputs/parameters: Read functions
  *
  */
 
@@ -1198,7 +1198,7 @@ void mtic_readParameterAsData(const char *name, void *data, long *size){
 
 
 /**
- *  \defgroup writefct Write functions in agent's inputs/ouputs/parameters
+ *  \defgroup writefct Agent's inputs/outputs/parameters: Write functions
  *
  */
 
@@ -1971,8 +1971,7 @@ int mtic_writeParameterAsData(const char *name, void *value, long size){
 }
 
 /**
- *  \defgroup getTypeFct Get type / number / list functions about agent's inputs/ouputs/parameters
- *
+ *  \defgroup getTypeFct Agent's inputs/outputs/parameters: Get Type / Number / List functions
  */
 
 /**
@@ -2262,8 +2261,7 @@ char ** mtic_getParametersList(long *nbOfElements){
 }
 
 /**
- *  \defgroup checkfct Check functions on agent's inputs/outpus/parameters
- *  check existence of inputs/ouputs/parameters
+ *  \defgroup checkfct Agent's inputs/outputs/parameters: Check functions
  */
 
 /**
@@ -2374,7 +2372,7 @@ bool mtic_checkParameterExistence(const char *name){
 }
 
 /**
- *  \defgroup observefct Observe functions on agent's inputs/ouputs/parameters
+ *  \defgroup observefct Agent's inputs/outputs/parameters: Observe functions
  *
  */
 
@@ -2434,7 +2432,7 @@ int mtic_observeParameter(const char *name, mtic_observeCallback cb, void * myDa
 }
 
 /**
- *  \defgroup muteiopFct mute functions on agent's inputs/ouputs/parameters
+ *  \defgroup muteiopFct Agent's inputs/outputs/parameters: mute functions
  *
  *
  */

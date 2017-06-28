@@ -763,7 +763,7 @@ int network_checkAndSubscribeToPublisher(const char* agentName)
 ////////////////////////////////////////////////////////////////////////
 
 /**
- *  \defgroup startStopKillFct Start / Stop / Kill functions for agent
+ *  \defgroup startStopKillFct Agent: Start / Stop / Kill functions
  *
  */
 
@@ -1036,7 +1036,7 @@ char *mtic_getAgentName(){
 }
 
 /**
- *  \defgroup pauseResumeFct Pause / resume functions for agents
+ *  \defgroup pauseResumeFct Agent: Pause / resume functions
  *
  */
 
@@ -1123,7 +1123,7 @@ int mtic_observeFreeze(mtic_freezeCallback cb, void *myData){
 }
 
 /**
- *  \defgroup controleAgentFct Controle functions for agents state
+ *  \defgroup controleAgentFct Agent: Controle functions
  *
  */
 
@@ -1158,7 +1158,7 @@ char *mtic_getAgentState(){
 }
 
 /**
- *  \defgroup setGetLibraryFct Set / get library parameters
+ *  \defgroup setGetLibraryFct Agent: Get / Set general parameters
  *
  */
 
@@ -1193,7 +1193,7 @@ void mtic_setCanBeFrozen (bool canBeFrozen){
 }
 
 /**
- *  \defgroup muteAgentFct Mute functions for agents
+ *  \defgroup muteAgentFct Agent: Mute functions
  *
  */
 

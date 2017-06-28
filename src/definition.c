@@ -613,7 +613,7 @@ int definition_addIop(agent_iop *iop, iop_t iop_type, definition **def)
 ////////////////////////////////////////////////////////////////////////
 
 /**
- *  \defgroup loadSetGetDefFct Load / set / get functions on agent's definition
+ *  \defgroup loadSetGetDefFct Agent's definition: Load / Clear / set / get functions
  *
  */
 
@@ -738,7 +738,7 @@ int mtic_setDefinitionVersion(char *version){
 }
 
 /**
- *  \defgroup EditDefFct Edit functions on agent's definition
+ *  \defgroup EditDefFct  Agent's definition: Edit functions
  *
  */
 

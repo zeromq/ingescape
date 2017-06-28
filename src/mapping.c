@@ -762,7 +762,7 @@ agent_iop*  mtic_update_mapping_out_state(mapping_out* map_out, definition * ext
 ////////////////////////////////////////////////////////////////////////
 
 /**
- *  \defgroup loadClearGetMapFct Load / Clear / get functions on agent's mapping
+ *  \defgroup loadClearGetMapFct Agent's mapping: Load / Clear / Get functions
  *
  */
 
@@ -872,7 +872,7 @@ char* mtic_getMapping(){
 }
 
 /**
- *  \defgroup EditMapFct Edit functions on agent's mapping
+ *  \defgroup EditMapFct Agent's mapping: Edit functions
  *
  */
 
