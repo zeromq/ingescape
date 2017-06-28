@@ -1245,7 +1245,34 @@ char* mtic_readParameterAsString(const char *name){
     }
 }
 
-void mtic_readParameterAsData(const char *name, void *data, long *size){ //allocs data structure to be disposed by caller
+int mtic_readParameterAsData(const char *name, void *data, long *size){ //allocs data structure to be disposed by caller
+    //Get the pointer IOP Agent selected by name
+    model_state state;
+    agent_iop *iop = model_findIopByName((char*) name, &state);
+
+    // Check if the iop has been returned.
+    if(iop == NULL){
+        mtic_debug("%s : Agent's parameter '%s' cannot be found\n", __FUNCTION__, name);
+        return 0;
+    }
+
+    //Check the value type as an impulsion.
+    if(iop->type != DATA_T){
+        mtic_debug("%s: Agent's parameter '%s' is not an data\n", __FUNCTION__,  name);
+        return 0;
+    }
+
+    //Get the pointer on the structure data
+    void * value = mtic_get(name,&state);
+
+    //get size
+    *size = iop->valueSize;
+
+    //Copy the data
+    memcpy(data, value, *size);
+
+    return 1;
+
 }
 
 // --------------------------------  WRITE ------------------------------------//

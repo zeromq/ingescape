@@ -108,7 +108,7 @@ PUBLIC bool mtic_readParameterAsBool(const char *name);
 PUBLIC int mtic_readParameterAsInt(const char *name);
 PUBLIC double mtic_readParameterAsDouble(const char *name);
 PUBLIC char* mtic_readParameterAsString(const char *name);
-void mtic_readParameterAsData(const char *name, void *data, long *size); //allocs data structure to be disposed by caller
+PUBLIC int mtic_readParameterAsData(const char *name, void *data, long *size); //allocs data structure to be disposed by caller
 
 //write using void*
 //for IMPULSION_T value is just ignored
