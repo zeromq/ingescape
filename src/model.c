@@ -720,8 +720,6 @@ int mtic_readInputAsData(const char *name, void *data, long *size){
         return 0;
     }
 
-    //TODO : implement code to read data
-
     //Get the pointer on the structure data
     void * value = mtic_get(name,&state);
 
