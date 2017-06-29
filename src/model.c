@@ -428,7 +428,7 @@ int mtic_readInput(const char *name, void **value, long *size){
         return 0;
         break;
     case DATA_T:
-        mtic_readInputAsData(name, *value, size);
+        mtic_readInputAsData(name, value, size);
         break;
     default:
         mtic_debug("%s: Agent's input %s has not a known type\n.", __FUNCTION__,  name);
@@ -479,7 +479,7 @@ int mtic_readOutput(const char *name, void **value, long *size){
         return 0;
         break;
     case DATA_T:
-        mtic_readOutputAsData(name, *value, size);
+        mtic_readOutputAsData(name, value, size);
         break;
     default:
         mtic_debug("%s: Agent's output %s has not a known type\n.", __FUNCTION__,  name);
@@ -530,7 +530,7 @@ int mtic_readParameter(const char *name, void **value, long *size){
         return 0;
         break;
     case DATA_T:
-        mtic_readParameterAsData(name, *value, size);
+        mtic_readParameterAsData(name, value, size);
         break;
     default:
         mtic_debug("%s: Agent's parameter %s has not a known type\n.", __FUNCTION__,  name);
