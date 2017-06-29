@@ -392,48 +392,154 @@ static int mtic_observe(const char* type, const char* name, mtic_observeCallback
 /**
  * \fn void mtic_readInput(const char *name, void *value, long *size)
  * \ingroup readfct
- * \brief
+ * \brief Find the Agent's input by name and return the input value.
  * \param name is the name of the input to read as it has been defined in the definition.
- * \param value
- * \param size
- * \return Return the input value as true or false.
- * \todo write definition
- * \todo write function
- * \todo generic typeless functions (requires developer to check IOP type for type casting) for IMPULSION_T value is always 0
- * size is passed by Mastic based on type (for bool, double, int and string) or metadata (for data)
+ * \param value is the return value of the input depending on the type of input
+ * \param size is the size of the value (only use for data input)
+ * \return Return 1 if ok else 0.
  */
-void mtic_readInput(const char *name, void *value, long *size){
-    
+int mtic_readInput(const char *name, void **value, long *size){
+
+    //Get the pointer IOP Agent selected by name
+    model_state state;
+    agent_iop *iop = model_findIopByName((char*) name, &state);
+
+    // Check if the iop has been returned.
+    if(iop == NULL){
+        mtic_debug("%s : Agent's input %s cannot be found\n", __FUNCTION__, name);
+        return 0;
+    }
+
+    switch (iop->type){
+    case INTEGER_T:
+        *(int*) value = mtic_readInputAsInt(name);
+        break;
+    case DOUBLE_T:
+        *(double*) value = mtic_readInputAsDouble(name);
+        break;
+    case BOOL_T:
+        *(bool*) value = mtic_readInputAsBool(name);
+        break;
+    case STRING_T:
+        *value = mtic_readInputAsString(name);
+        break;
+    case IMPULSION_T:
+        mtic_debug("%s: Agent's input %s is a impulsion and has nothing to read. It use the callback\n.", __FUNCTION__,  name);
+        return 0;
+        break;
+    case DATA_T:
+        mtic_readInputAsData(name, *value, size);
+        break;
+    default:
+        mtic_debug("%s: Agent's input %s has not a known type\n.", __FUNCTION__,  name);
+        return 0;
+        break;
+
+    }
+
+    return 1;
 }
 
 /**
  * \fn void mtic_readOutput(const char *name, void *value, long *size)
  * \ingroup readfct
- * \brief
- * \param name is the name of the input to read as it has been defined in the definition.
- * \param value
- * \param size
- * \return Return the input value as true or false.
- * \todo write definition
- * \todo write function
+ * \brief Find the Agent's output by name and return the output value.
+ * \param name is the name of the output to read as it has been defined in the definition.
+ * \param value is the return value of the output depending on the type of output
+ * \param size is the size of the value (only use for data output)
+ * \return Return 1 if ok else 0.
  */
-void mtic_readOutput(const char *name, void *value, long *size){
-    
+int mtic_readOutput(const char *name, void **value, long *size){
+
+    //Get the pointer IOP Agent selected by name
+    model_state state;
+    agent_iop *iop = model_findIopByName((char*) name, &state);
+
+    // Check if the iop has been returned.
+    if(iop == NULL){
+        mtic_debug("%s : Agent's output %s cannot be found\n", __FUNCTION__, name);
+        return 0;
+    }
+
+    switch (iop->type){
+    case INTEGER_T:
+        *(int*) value = mtic_readOutputAsInt(name);
+        break;
+    case DOUBLE_T:
+        *(double*) value = mtic_readOutputAsDouble(name);
+        break;
+    case BOOL_T:
+        *(bool*) value = mtic_readOutputAsBool(name);
+        break;
+    case STRING_T:
+        *value = mtic_readOutputAsString(name);
+        break;
+    case IMPULSION_T:
+        mtic_debug("%s: Agent's output %s is a impulsion and has nothing to read. It use the callback\n.", __FUNCTION__,  name);
+        return 0;
+        break;
+    case DATA_T:
+        mtic_readOutputAsData(name, *value, size);
+        break;
+    default:
+        mtic_debug("%s: Agent's output %s has not a known type\n.", __FUNCTION__,  name);
+        return 0;
+        break;
+
+    }
+
+    return 1;
 }
 
 /**
  * \fn void mtic_readParameter(const char *name, void *value, long *size)
  * \ingroup readfct
- * \brief
- * \param name is the name of the input to read as it has been defined in the definition.
- * \param value
- * \param size
- * \return Return the input value as true or false.
- * \todo write definition
- * \todo write function
+ * \brief Find the Agent's parameter by name and return the parameter value.
+ * \param name is the name of the parameter to read as it has been defined in the definition.
+ * \param value is the return value of the parameter depending on the typeof parameter
+ * \param size is the size of the value (only use for data parameter)
+ * \return Return 1 if ok else 0.
  */
-void mtic_readParameter(const char *name, void *value, long *size){
-    
+int mtic_readParameter(const char *name, void **value, long *size){
+
+    //Get the pointer IOP Agent selected by name
+    model_state state;
+    agent_iop *iop = model_findIopByName((char*) name, &state);
+
+    // Check if the iop has been returned.
+    if(iop == NULL){
+        mtic_debug("%s : Agent's parameter %s cannot be found\n", __FUNCTION__, name);
+        return 0;
+    }
+
+    switch (iop->type){
+    case INTEGER_T:
+        *(int*) value = mtic_readParameterAsInt(name);
+        break;
+    case DOUBLE_T:
+        *(double*) value = mtic_readParameterAsDouble(name);
+        break;
+    case BOOL_T:
+        *(bool*) value = mtic_readParameterAsBool(name);
+        break;
+    case STRING_T:
+        *value = mtic_readParameterAsString(name);
+        break;
+    case IMPULSION_T:
+        mtic_debug("%s: Agent's parameter %s is a impulsion and has nothing to read. It use the callback\n.", __FUNCTION__,  name);
+        return 0;
+        break;
+    case DATA_T:
+        mtic_readParameterAsData(name, *value, size);
+        break;
+    default:
+        mtic_debug("%s: Agent's parameter %s has not a known type\n.", __FUNCTION__,  name);
+        return 0;
+        break;
+
+    }
+
+    return 1;
 }
 
 /**
@@ -512,7 +618,7 @@ int mtic_readInputAsInt(const char *name){
     model_state state;
     agent_iop *iop = model_findIopByName((char*) name, &state);
     int value = 0;
-    int test =0;
+    int test = 0;
 
     // Check if the input has been returned.
     if(iop != NULL){
