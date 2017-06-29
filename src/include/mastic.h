@@ -80,9 +80,9 @@ typedef enum {
 } iopType_t;
 
 //read/write IOP using void*
-void mtic_readInput(const char *name, void *value, long *size);
-void mtic_readOutput(const char *name, void *value, long *size);
-void mtic_readParameter(const char *name, void *value, long *size);
+PUBLIC int mtic_readInput(const char *name, void **value, long *size);
+PUBLIC int mtic_readOutput(const char *name, void **value, long *size);
+PUBLIC int mtic_readParameter(const char *name, void **value, long *size);
 
 //read per type
 PUBLIC bool mtic_readInputAsBool(const char *name);
