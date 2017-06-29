@@ -89,19 +89,19 @@ PUBLIC bool mtic_readInputAsBool(const char *name);
 PUBLIC int mtic_readInputAsInt(const char *name);
 PUBLIC double mtic_readInputAsDouble(const char *name);
 PUBLIC char* mtic_readInputAsString(const char *name);
-PUBLIC int mtic_readInputAsData(const char *name, void *data, long *size); //allocs data structure to be disposed by caller
+PUBLIC int mtic_readInputAsData(const char *name, void **data, long *size); //allocs data structure to be disposed by caller
 
 PUBLIC bool mtic_readOutputAsBool(const char *name);
 PUBLIC int mtic_readOutputAsInt(const char *name);
 PUBLIC double mtic_readOutputAsDouble(const char *name);
 PUBLIC char* mtic_readOutputAsString(const char *name);
-PUBLIC int mtic_readOutputAsData(const char *name, void *data, long *size); //allocs data structure to be disposed by caller
+PUBLIC int mtic_readOutputAsData(const char *name, void **data, long *size); //allocs data structure to be disposed by caller
 
 PUBLIC bool mtic_readParameterAsBool(const char *name);
 PUBLIC int mtic_readParameterAsInt(const char *name);
 PUBLIC double mtic_readParameterAsDouble(const char *name);
 PUBLIC char* mtic_readParameterAsString(const char *name);
-PUBLIC int mtic_readParameterAsData(const char *name, void *data, long *size); //allocs data structure to be disposed by caller
+PUBLIC int mtic_readParameterAsData(const char *name, void **data, long *size); //allocs data structure to be disposed by caller
 
 //write using void*
 PUBLIC int mtic_writeInput(const char *name, void *value, long size);

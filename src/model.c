@@ -84,52 +84,50 @@ void update_value(agent_iop *iop, void* value, long size){
         case INTEGER_T:
             iop->old_value.i = iop->value.i;
             iop->value.i = *(int*)(value);
+            mtic_debug("set %s to %i\n", iop->name, iop->value.i);
             break;
         case DOUBLE_T:
             iop->old_value.d = iop->value.d;
             iop->value.d = *(double*)(value);
+            mtic_debug("set %s to %f\n", iop->name, iop->value.d);
             break;
         case BOOL_T:
             iop->old_value.b = iop->value.b;
             iop->value.b = *(bool*)(value);
+            mtic_debug("set %s to %i\n", iop->name, iop->value.b);
             break;
         case STRING_T:
             free(iop->old_value.s);
             iop->old_value.s = strdup(iop->value.s);
             free(iop->value.s);
             iop->value.s = strdup(value);
+            mtic_debug("set %s to %s\n", iop->name, iop->value.s);
             break;
         case IMPULSION_T:
-            //TODO: remove value for impulsion ?
-            free(iop->old_value.impuls);
-            iop->old_value.impuls = strdup(iop->value.impuls);
-            free(iop->value.impuls);
-            iop->value.impuls = strdup(value);
+            //nothing to do
+            mtic_debug("activate impulsion %s\n", iop->name);
         break;
         case DATA_T:
-            free(iop->old_value.data);
+        {
+            if (iop->old_value.data != NULL){
+                free(iop->old_value.data);
+            }
             iop->old_value.data = NULL;
-            iop->old_value.data = calloc (1, size);
-            //Check if not first call because value.data is empty
-
+            iop->old_value.data = calloc (1, iop->valueSize);
             memcpy(iop->old_value.data, iop->value.data, iop->valueSize);
             iop->oldValueSize = iop->valueSize;
-
-            free(iop->value.data);
+            if (iop->value.data != NULL){
+                free(iop->value.data);
+            }
             iop->value.data = NULL;
             iop->value.data = calloc (1, size);
             memcpy(iop->value.data,value,size);
             iop->valueSize = size;
+            mtic_debug("set %s data\n", iop->name);
+        }
         break;
         default:
             break;
-    }
-
-    // debug - Let us know the value has changed
-    if (mtic_getVerbose() == true){
-        char* str_value = mtic_iop_value_to_string(iop);
-        mtic_debug("SET(\"%s\", %s).\n", iop->name, str_value);
-        free(str_value);
     }
 }
 
@@ -692,7 +690,7 @@ char* mtic_readInputAsString(const char *name){
  * \param size The size of the data read
  * \return Return 1 if it is OK or 0 if not.
  */
-int mtic_readInputAsData(const char *name, void *data, long *size){
+int mtic_readInputAsData(const char *name, void **data, long *size){
     //Get the pointer IOP Agent selected by name
     model_state state;
     agent_iop *iop = model_findIopByName((char*) name, &state);
@@ -716,7 +714,8 @@ int mtic_readInputAsData(const char *name, void *data, long *size){
     *size = iop->valueSize;
 
     //Copy the data
-    memcpy(data, value, *size);
+    *data = calloc(1, iop->valueSize);
+    memcpy(*data, value, *size);
 
     return 1;
 }
@@ -972,7 +971,7 @@ char* mtic_readOutputAsString(const char *name){
  * \param size The size of the data read
  * \return Return 1 if it is OK or 0 if not.
  */
-int mtic_readOutputAsData(const char *name, void *data, long *size){ //allocs data structure to be disposed by caller
+int mtic_readOutputAsData(const char *name, void **data, long *size){ //allocs data structure to be disposed by caller
     //Get the pointer IOP Agent selected by name
     model_state state;
     agent_iop *iop = model_findIopByName((char*) name, &state);
@@ -996,7 +995,8 @@ int mtic_readOutputAsData(const char *name, void *data, long *size){ //allocs da
     *size = iop->valueSize;
 
     //Copy the data
-    memcpy(data, value, *size);
+    *data = calloc(1, iop->valueSize);
+    memcpy(*data, value, *size);
 
     return 1;
 }
@@ -1250,7 +1250,7 @@ char* mtic_readParameterAsString(const char *name){
  * \param size The size of the data read
  * \return Return 1 if it is OK or 0 if not.
  */
-int mtic_readParameterAsData(const char *name, void *data, long *size){ //allocs data structure to be disposed by caller
+int mtic_readParameterAsData(const char *name, void **data, long *size){ //allocs data structure to be disposed by caller
     //Get the pointer IOP Agent selected by name
     model_state state;
     agent_iop *iop = model_findIopByName((char*) name, &state);
@@ -1274,7 +1274,8 @@ int mtic_readParameterAsData(const char *name, void *data, long *size){ //allocs
     *size = iop->valueSize;
 
     //Copy the data
-    memcpy(data, value, *size);
+    *data = calloc(1, iop->valueSize);
+    memcpy(*data, value, *size);
 
     return 1;
 }
@@ -1930,6 +1931,10 @@ int mtic_writeOutputAsData(const char *name, void *value, long size){
     if(fct_to_call != NULL)
         fct_to_call->callback_ptr(OUTPUT_T, name, DATA_T, value, fct_to_call->data);
 
+    // If iop is output : publish
+    if(state == TYPE_OUTPUT)
+        network_publishOutput(name);
+    
     return 1;
 }
 

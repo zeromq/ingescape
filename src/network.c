@@ -285,7 +285,6 @@ int manageSubscription (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                                                       output,
                                                       data,
                                                       size);
-                            //TODO: write date to proper place
                         }else if (found_iop->type == IMPULSION_T){
                             char * value = zmsg_popstr(msg);
                             free(value);
@@ -681,11 +680,12 @@ int network_publishOutput (const char* output_name)
             if (found_iop->type == DATA_T){
                 void *data = NULL;
                 long size = 0;
-                mtic_readOutputAsData(output_name, data, &size);
+                mtic_readOutputAsData(output_name, &data, &size);
                 zmsg_t *msg = zmsg_new();
                 zmsg_pushstr(msg, output_name);
                 zframe_t *frame = zframe_new(data, size);
                 zmsg_append(msg, &frame);
+                mtic_debug("publish data %s\n",found_iop->name);
                 if (zmsg_send(&msg, agentElements->publisher) != 0){
                     mtic_debug("Error while publishing output %s\n",output_name);
                 }
