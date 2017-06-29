@@ -641,7 +641,7 @@ agent_iop* mtic_check_map(definition *definition){
                         HASH_ADD_KEYPTR(hh,outputs, new_iop->name, strlen(new_iop->name), new_iop);
                     }
                 } else {
-                    printf("Error : Unable to map %s with %s\n.",mtic_definition_live->name, definition->name);
+                    printf("Error : Unable to map %s.%s to %s.%s\n",mtic_definition_live->name, current_map->input_name, definition->name, current_map->output_name);
                     if(current_map->state == ON)
                         current_map->state = OFF;
                 }
@@ -715,7 +715,7 @@ agent_iop* mtic_unmap(definition *definition){
 /*
  * Function: update_mapping_out_state
  * ----------------------------
- *   Take a mapping_out object to update it's state according to the definition it's mapped with. .
+ *   Take a mapping_out object to update its state according to the definition it's mapped with. .
  *   Check & find the output is part of this agent.
  *   Check if the type between the input and the output is compatible.
  *   If yes, switch the state to ON.
@@ -744,7 +744,11 @@ agent_iop*  mtic_update_mapping_out_state(mapping_out* map_out, definition * ext
             }else{
                 map_out->state = INCOMPATIBLE;
             }
+        }else{
+            printf("Could not find output %s in %s definition\n", map_out->output_name, map_out->agent_name);
         }
+    }else{
+        printf("%s : one of the arguments is NULL\n", __FUNCTION__);
     }
     
     return outputFound;
