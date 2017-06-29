@@ -66,8 +66,8 @@ static void json_add_data_to_hash (struct agent_iop ** hasht,
                 data->value.impuls = strdup (YAJL_IS_STRING(obj->u.object.values[2]) ? obj->u.object.values[2]->u.string : "");
                 break;
             case DATA_T:
-                //TODO : DATA TYPE
-                //data->value.data = strdup (YAJL_IS_STRING(obj->u.object.values[2]) ? obj->u.object.values[2]->u.string : "");
+                //FIXME : we store data as string but we should check it convert it to hexa
+                //data->value.s = strdup (YAJL_IS_STRING(obj->u.object.values[2]) ? obj->u.object.values[2]->u.string : "");
                 break;
             default:
                 fprintf(stderr, "%s - ERROR -  unknown data type to load from json\n", __FUNCTION__);
@@ -501,11 +501,11 @@ static void json_dump_iop (yajl_gen *g, agent_iop* aiop) {
             yajl_gen_string(*g, (const unsigned char *) aiop->value.s, strlen(aiop->value.s));
             break;
         case IMPULSION_T:
-            yajl_gen_string(*g, (const unsigned char *) aiop->value.impuls, strlen(aiop->value.impuls));
+            yajl_gen_string(*g, (const unsigned char *) "", 0);
             break;
         case DATA_T:
         //TODO : DATA TYPE
-//            yajl_gen_string(*g, (const unsigned char *) aiop->value.data, strlen(aiop->value.data));
+            yajl_gen_string(*g, (const unsigned char *) "", 0);
             break;
         default:
             fprintf(stderr, "%s - ERROR -  unknown data type to convert in string\n", __FUNCTION__);
