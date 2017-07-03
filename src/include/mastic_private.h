@@ -64,7 +64,7 @@ struct agent_iop {
     const char * name;          //Need to be unique : the table hash key
     iopType_t value_type;
     iop_t type;          //Size of pointer on data
-    union {
+    struct {
         int i;                  //in accordance to type INTEGER_T ex. '10'
         double d;               //in accordance to type DOUBLE ex. '10.01'
         char* s;                //in accordance to type STRING ex. 'display the image'
