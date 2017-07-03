@@ -6,8 +6,8 @@
 
 TARGET = mastic
 
-#TEMPLATE = lib
-CONFIG += console
+TEMPLATE = lib
+#CONFIG += console
 
 DEFINES += MASTIC
 
