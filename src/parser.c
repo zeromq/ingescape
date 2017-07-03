@@ -36,7 +36,7 @@ bool agentNameChangedByDefinition = false;
  *   parse a agent_iop data and add it to the corresponding hash table
  */
 
-static void json_add_data_to_hash (struct agent_iop ** hasht,
+static void json_add_data_to_hash (struct agent_iop ** hasht,iop_t type,
                                    yajl_val obj){
 
     struct agent_iop *data = NULL;
@@ -74,6 +74,7 @@ static void json_add_data_to_hash (struct agent_iop ** hasht,
                 break;
         }
         data->is_muted = false;
+        data->type = type;
         HASH_ADD_STR(*hasht , name, data );  /* id: name of key field */
     }
 }
@@ -84,16 +85,17 @@ static void json_add_data_to_hash (struct agent_iop ** hasht,
  *   parse a tab of agent_iop data and add them into the corresponding hash table
  */
 
-static void json_add_data (yajl_val node, const char** path,
+static void json_add_data (yajl_val node, const char** path,iop_t type,
                             struct agent_iop ** hasht) {
     yajl_val v;
     v = yajl_tree_get(node, path, yajl_t_array);
+
     if (v && YAJL_IS_ARRAY(v)){
         unsigned int  i;
         for (i = 0; i < v->u.array.len; i++ ){
             yajl_val obj = v->u.array.values[i];
             if( obj && YAJL_IS_OBJECT(obj))
-                json_add_data_to_hash (hasht, obj);
+                json_add_data_to_hash (hasht,type, obj);
         }
     }
 }
@@ -198,13 +200,13 @@ static category* json_parse_category (yajl_val node) {
         cat->version = strdup (YAJL_IS_STRING(v) ? (v)->u.string : "");
 
     path[1] = STR_PARAMETERS;
-    json_add_data (node, path, &cat->params_table);
+    json_add_data (node, path,PARAMETER_T, &cat->params_table);
 
     path[1] = STR_INPUTS;
-    json_add_data (node, path, &cat->inputs_table);
+    json_add_data (node, path,INPUT_T, &cat->inputs_table);
 
     path[1] = STR_OUTPUTS;
-    json_add_data (node, path, &cat->outputs_table);
+    json_add_data (node, path,OUTPUT_T, &cat->outputs_table);
 
     return cat;
 }
@@ -238,13 +240,13 @@ static void json_add_category_to_hash (struct category** hasht,
                 cat->version = strdup (YAJL_IS_STRING(v) ? (v)->u.string : "");
 
             path_in_current[0] = STR_PARAMETERS;
-            json_add_data (current_cat, path_in_current, &cat->params_table);
+            json_add_data (current_cat, path_in_current,PARAMETER_T, &cat->params_table);
 
             path_in_current[0] = STR_INPUTS;
-            json_add_data (current_cat, path_in_current, &cat->inputs_table);
+            json_add_data (current_cat, path_in_current,INPUT_T, &cat->inputs_table);
 
             path_in_current[0] = STR_OUTPUTS;
-            json_add_data (current_cat, path_in_current, &cat->outputs_table);
+            json_add_data (current_cat, path_in_current,OUTPUT_T, &cat->outputs_table);
 
             HASH_ADD_STR(*hasht , name, cat );  /* id: name of key field */
         }
@@ -281,13 +283,13 @@ static definition* json_parse_definition (yajl_val node) {
         def->version = strdup (YAJL_IS_STRING(v) ? (v)->u.string : "");
 
     path[1] = STR_INPUTS;
-    json_add_data (node, path, &def->inputs_table);
+    json_add_data (node, path,INPUT_T, &def->inputs_table);
 
     path[1] = STR_OUTPUTS;
-    json_add_data (node, path, &def->outputs_table);
+    json_add_data (node, path,OUTPUT_T, &def->outputs_table);
 
     path[1] = STR_PARAMETERS;
-    json_add_data (node, path, &def->params_table);
+    json_add_data (node, path,PARAMETER_T, &def->params_table);
 
     path[1] = STR_CATEGORIES;
     v = yajl_tree_get(node, path, yajl_t_array);
