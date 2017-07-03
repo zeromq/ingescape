@@ -460,8 +460,12 @@ int definition_setIopValue(agent_iop *iop, void * value, long size)
             iop->value.b = *(bool*)(value);
             break;
         case STRING_T:
-            free(iop->value.s);
+        {
+            if (iop->value.s != NULL){
+                free(iop->value.s);
+            }
             iop->value.s = strdup(value);
+        }
             break;
         case IMPULSION_T:
             break;
