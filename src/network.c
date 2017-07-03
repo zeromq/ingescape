@@ -272,34 +272,33 @@ int manageSubscription (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 if(externalDefinition != NULL)
                 {
                     // convert the string value in void* corresponding to the type of iop
-                    model_state state;
-                    agent_iop * found_iop = mtic_find_iop_by_name_on_definition(output,externalDefinition, &state);
+                    agent_iop * found_iop = mtic_find_iop_by_name_on_definition(output,externalDefinition);
 
                     if(found_iop != NULL)
                     {
-                        if (found_iop->type == DATA_T){
+                        if (found_iop->value_type == DATA_T){
                             zframe_t *frame = zmsg_pop(msg);
                             void *data = zframe_data(frame);
                             long size = zframe_size(frame);
-                            state = mtic_map_received(foundSubscriber->agentName,
-                                                      output,
-                                                      data,
-                                                      size);
-                        }else if (found_iop->type == IMPULSION_T){
+                            mtic_map_received(foundSubscriber->agentName,
+                                              output,
+                                              data,
+                                              size);
+                        }else if (found_iop->value_type == IMPULSION_T){
                             char * value = zmsg_popstr(msg);
                             free(value);
-                            state = mtic_map_received(foundSubscriber->agentName,
-                                                      output,
-                                                      0,
-                                                      0);
+                            mtic_map_received(foundSubscriber->agentName,
+                                              output,
+                                              0,
+                                              0);
                         }else{
                             char * value = zmsg_popstr(msg);
                             const void* converted_value = mtic_iop_value_string_to_real_type(found_iop, value);
                             // Map reception send to update the internal model
-                            state = mtic_map_received(foundSubscriber->agentName,
-                                                      output,
-                                                      (void*)converted_value,
-                                                      0);
+                            mtic_map_received(foundSubscriber->agentName,
+                                              output,
+                                              (void*)converted_value,
+                                              0);
                             free(value);
                         }
                         
@@ -670,14 +669,13 @@ int network_publishOutput (const char* output_name)
 {
     int result = 0;
     
-    model_state code;
-    agent_iop * found_iop = model_findIopByName(output_name,OUTPUT_T, &code);
+    agent_iop * found_iop = model_findIopByName(output_name,OUTPUT_T);
     
     if(agentElements != NULL && agentElements->publisher != NULL && found_iop != NULL)
     {
         if(!isWholeAgentMuted && !found_iop->is_muted && found_iop->name != NULL && !isFrozen)
         {
-            if (found_iop->type == DATA_T){
+            if (found_iop->value_type == DATA_T){
                 void *data = NULL;
                 long size = 0;
                 mtic_readOutputAsData(output_name, &data, &size);
@@ -689,7 +687,7 @@ int network_publishOutput (const char* output_name)
                 if (zmsg_send(&msg, agentElements->publisher) != 0){
                     mtic_debug("Error while publishing output %s\n",output_name);
                 }
-            }else if (found_iop->type == IMPULSION_T){
+            }else if (found_iop->value_type == IMPULSION_T){
                 mtic_debug("publish impulsion %s\n",found_iop->name);
                 zstr_sendx(agentElements->publisher, found_iop->name, "0", NULL);
                 result = 1;

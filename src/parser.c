@@ -48,8 +48,8 @@ static void json_add_data_to_hash (struct agent_iop ** hasht,
         data = calloc (1, sizeof (struct agent_iop));
         data->name = strdup (name);
 
-        data->type = string_to_value_type (YAJL_GET_STRING(obj->u.object.values[1]));
-        switch (data->type) {
+        data->value_type = string_to_value_type (YAJL_GET_STRING(obj->u.object.values[1]));
+        switch (data->value_type) {
             case INTEGER_T:
                 data->value.i =(int) YAJL_GET_INTEGER (obj->u.object.values[2]);
                 break;
@@ -63,7 +63,7 @@ static void json_add_data_to_hash (struct agent_iop ** hasht,
                 data->value.s = strdup (YAJL_IS_STRING(obj->u.object.values[2]) ? obj->u.object.values[2]->u.string : "");
                 break;
             case IMPULSION_T:
-                data->value.impuls = strdup (YAJL_IS_STRING(obj->u.object.values[2]) ? obj->u.object.values[2]->u.string : "");
+                //IMPULSION has no value
                 break;
             case DATA_T:
                 //FIXME : we store data as string but we should check it convert it to hexa
@@ -483,11 +483,11 @@ static void json_dump_iop (yajl_gen *g, agent_iop* aiop) {
     yajl_gen_string(*g, (const unsigned char *) aiop->name, strlen (aiop->name));
     
     yajl_gen_string(*g, (const unsigned char *) STR_TYPE, strlen(STR_TYPE));
-    yajl_gen_string(*g, (const unsigned char *) value_type_to_string(aiop->type), strlen(value_type_to_string(aiop->type)));
+    yajl_gen_string(*g, (const unsigned char *) value_type_to_string(aiop->value_type), strlen(value_type_to_string(aiop->value_type)));
     
     yajl_gen_string(*g, (const unsigned char *) STR_VALUE, strlen(STR_VALUE));
     
-    switch (aiop->type) {
+    switch (aiop->value_type) {
         case INTEGER_T:
             yajl_gen_integer(*g, aiop->value.i);
             break;

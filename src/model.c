@@ -29,7 +29,7 @@ mtic_observe_callback_T *agent_callbacks;
 
 // ------------ main functions use in 'MODEL' --------------- //
 
-agent_iop * mtic_find_iop_by_name_on_definition(const char *name, definition* definition, model_state *code){
+agent_iop * mtic_find_iop_by_name_on_definition(const char *name, definition* definition){
     agent_iop *found = NULL;
     
     if(name != NULL && definition != NULL){
@@ -40,7 +40,6 @@ agent_iop * mtic_find_iop_by_name_on_definition(const char *name, definition* de
             HASH_FIND_STR( definition->outputs_table, name, found );
         }else
         {
-            *code = TYPE_INPUT;
             return found;
         }
         
@@ -48,22 +47,18 @@ agent_iop * mtic_find_iop_by_name_on_definition(const char *name, definition* de
             //find the parameters agent_iop
             HASH_FIND_STR( definition->params_table, name, found );
         }else{
-            *code = TYPE_OUTPUT;
             return found;
         }
         
         if(found == NULL){
             fprintf(stderr, "ERROR : The name of the iop {%s} doesn't exist. \n",name);
-            *code = NOK;
             return found;
         }else
         {
-            *code = TYPE_PARAM;
             return found;
         }
     }else{
         fprintf(stderr, "ERROR : The name of the IOP is empty. \n");
-        *code = NAME_EMPTY;
         return found;
     }
 }
@@ -78,7 +73,7 @@ agent_iop * mtic_find_iop_by_name_on_definition(const char *name, definition* de
 //    return mtic_find_iop_by_name_on_definition(name,mtic_definition_live,code);
 //}
 
-agent_iop * model_findIopByName(const char *name, iop_t type ,model_state *code){
+agent_iop * model_findIopByName(const char *name, iop_t type){
     agent_iop *found = NULL;
 
     switch (type) {
@@ -157,28 +152,27 @@ agent_iop *model_findParameterByName(const char *name)
 
 
 void update_value(agent_iop *iop, void* value, long size){
-    switch (iop->type) {
+    switch (iop->value_type) {
         case INTEGER_T:
-            iop->old_value.i = iop->value.i;
             iop->value.i = *(int*)(value);
             mtic_debug("set %s to %i\n", iop->name, iop->value.i);
             break;
         case DOUBLE_T:
-            iop->old_value.d = iop->value.d;
             iop->value.d = *(double*)(value);
             mtic_debug("set %s to %f\n", iop->name, iop->value.d);
             break;
         case BOOL_T:
-            iop->old_value.b = iop->value.b;
             iop->value.b = *(bool*)(value);
             mtic_debug("set %s to %i\n", iop->name, iop->value.b);
             break;
         case STRING_T:
-            free(iop->old_value.s);
-            iop->old_value.s = strdup(iop->value.s);
-            free(iop->value.s);
+        {
+            if (iop->value.s != NULL){
+                free(iop->value.s);
+            }
             iop->value.s = strdup(value);
             mtic_debug("set %s to %s\n", iop->name, iop->value.s);
+        }
             break;
         case IMPULSION_T:
             //nothing to do
@@ -186,13 +180,6 @@ void update_value(agent_iop *iop, void* value, long size){
         break;
         case DATA_T:
         {
-            if (iop->old_value.data != NULL){
-                free(iop->old_value.data);
-            }
-            iop->old_value.data = NULL;
-            iop->old_value.data = calloc (1, iop->valueSize);
-            memcpy(iop->old_value.data, iop->value.data, iop->valueSize);
-            iop->oldValueSize = iop->valueSize;
             if (iop->value.data != NULL){
                 free(iop->value.data);
             }
@@ -202,7 +189,7 @@ void update_value(agent_iop *iop, void* value, long size){
             iop->valueSize = size;
             mtic_debug("set %s data\n", iop->name);
         }
-        break;
+            break;
         default:
             break;
     }
@@ -219,15 +206,15 @@ void update_value(agent_iop *iop, void* value, long size){
  *
  *  return : pointer on the value OR null
  */
-void * mtic_get(const char *name_iop, iop_t type, model_state *state){
+void * mtic_get(const char *name_iop, iop_t type){
 
-    agent_iop *iop = model_findIopByName((char*) name_iop,type, state);
+    agent_iop *iop = model_findIopByName((char*) name_iop,type);
 
     if(iop == NULL)
-        return state;
+        return NULL;
 
     //Return the value corresponding
-    switch (iop->type) {
+    switch (iop->value_type) {
         case INTEGER_T:
             return &iop->value.i;
             break;
@@ -241,7 +228,7 @@ void * mtic_get(const char *name_iop, iop_t type, model_state *state){
             return iop->value.s;
             break;
         case IMPULSION_T:
-            return iop->value.impuls;
+            return NULL;
             break;
         case DATA_T:
             return iop->value.data;
@@ -266,9 +253,8 @@ void * mtic_get(const char *name_iop, iop_t type, model_state *state){
 int mtic_mute_internal(const char* iop_name, iop_t type)
 {
     int result = -1;
-    model_state code;
     // mtic_get iop object
-    agent_iop *iop = model_findIopByName((char*)iop_name,type,&code);
+    agent_iop *iop = model_findIopByName((char*)iop_name,type);
     
     if(iop != NULL)
     {
@@ -292,9 +278,8 @@ int mtic_mute_internal(const char* iop_name, iop_t type)
 int mtic_unmute_internal(const char* iop_name, iop_t type)
 {
     int result = -1;
-    model_state code;
     // mtic_get iop object
-    agent_iop *iop = model_findIopByName((char*)iop_name,type,&code);
+    agent_iop *iop = model_findIopByName((char*)iop_name,type);
     
     if(iop != NULL)
     {
@@ -431,8 +416,7 @@ char* model_DoubleToString(const double value)
 static int mtic_observe(const char* type, const char* name,iop_t typeIop, mtic_observeCallback cb, void* myData){
 
     //1) find the iop
-    model_state state;
-    agent_iop *iop = model_findIopByName((char*) name,typeIop, &state);
+    agent_iop *iop = model_findIopByName((char*) name,typeIop);
 
     // Check if the input has been returned.
     if(iop == NULL){
@@ -478,8 +462,7 @@ static int mtic_observe(const char* type, const char* name,iop_t typeIop, mtic_o
 int mtic_readInput(const char *name, void **value, long *size){
 
     //Get the pointer IOP Agent selected by name
-    model_state state;
-    agent_iop *iop = model_findIopByName((char*) name,INPUT_T, &state);
+    agent_iop *iop = model_findIopByName((char*) name,INPUT_T);
 
     // Check if the iop has been returned.
     if(iop == NULL){
@@ -487,7 +470,7 @@ int mtic_readInput(const char *name, void **value, long *size){
         return 0;
     }
 
-    switch (iop->type){
+    switch (iop->value_type){
     case INTEGER_T:
         *(int*) value = mtic_readInputAsInt(name);
         break;
@@ -529,8 +512,7 @@ int mtic_readInput(const char *name, void **value, long *size){
 int mtic_readOutput(const char *name, void **value, long *size){
 
     //Get the pointer IOP Agent selected by name
-    model_state state;
-    agent_iop *iop = model_findIopByName((char*) name,OUTPUT_T, &state);
+    agent_iop *iop = model_findIopByName((char*) name,OUTPUT_T);
 
     // Check if the iop has been returned.
     if(iop == NULL){
@@ -538,7 +520,7 @@ int mtic_readOutput(const char *name, void **value, long *size){
         return 0;
     }
 
-    switch (iop->type){
+    switch (iop->value_type){
     case INTEGER_T:
         *(int*) value = mtic_readOutputAsInt(name);
         break;
@@ -580,8 +562,7 @@ int mtic_readOutput(const char *name, void **value, long *size){
 int mtic_readParameter(const char *name, void **value, long *size){
 
     //Get the pointer IOP Agent selected by name
-    model_state state;
-    agent_iop *iop = model_findIopByName((char*) name,PARAMETER_T, &state);
+    agent_iop *iop = model_findIopByName((char*) name,PARAMETER_T);
 
     // Check if the iop has been returned.
     if(iop == NULL){
@@ -589,7 +570,7 @@ int mtic_readParameter(const char *name, void **value, long *size){
         return 0;
     }
 
-    switch (iop->type){
+    switch (iop->value_type){
     case INTEGER_T:
         *(int*) value = mtic_readParameterAsInt(name);
         break;
@@ -629,12 +610,11 @@ int mtic_readParameter(const char *name, void **value, long *size){
 bool mtic_readInputAsBool(const char *name){
 
     //Get the pointer IOP Agent selected by name.
-    model_state state;
-    agent_iop *iop = model_findIopByName((char*) name,INPUT_T, &state);
+    agent_iop *iop = model_findIopByName((char*) name,INPUT_T);
 
     // Check if the input has been returned.
     if(iop != NULL){
-        switch(iop->type){
+        switch(iop->value_type){
             case BOOL_T:
                 return iop->value.b;
                 break;
@@ -692,14 +672,13 @@ bool mtic_readInputAsBool(const char *name){
 int mtic_readInputAsInt(const char *name){
 
     //Get the pointer IOP Agent selected by name
-    model_state state;
-    agent_iop *iop = model_findIopByName((char*) name,INPUT_T, &state);
+    agent_iop *iop = model_findIopByName((char*) name,INPUT_T);
     int value = 0;
     int test = 0;
 
     // Check if the input has been returned.
     if(iop != NULL){
-        switch(iop->type){
+        switch(iop->value_type){
             case INTEGER_T:
                 return iop->value.i;
                 break;
@@ -755,14 +734,13 @@ int mtic_readInputAsInt(const char *name){
  */
 double mtic_readInputAsDouble(const char *name){
     //Get the pointer IOP Agent selected by name
-    model_state state;
-    agent_iop *iop = model_findIopByName((char*) name,INPUT_T, &state);
+    agent_iop *iop = model_findIopByName((char*) name,INPUT_T);
     double value = 0.0;
     int test =0;
 
     // Check if the input has been returned.
     if(iop != NULL){
-         switch(iop->type){
+         switch(iop->value_type){
              case DOUBLE_T:
                  return iop->value.d;
                  break;
@@ -819,12 +797,11 @@ double mtic_readInputAsDouble(const char *name){
  */
 char* mtic_readInputAsString(const char *name){
     //Get the pointer IOP Agent selected by name
-    model_state state;
-    agent_iop *iop = model_findIopByName((char*) name,INPUT_T, &state);
+    agent_iop *iop = model_findIopByName((char*) name,INPUT_T);
 
     // Check if the input has been returned.
     if(iop != NULL){
-        switch(iop->type){
+        switch(iop->value_type){
             case STRING_T:
                 return strdup(iop->value.s);
                 break;
@@ -875,8 +852,7 @@ char* mtic_readInputAsString(const char *name){
  */
 int mtic_readInputAsData(const char *name, void **data, long *size){
     //Get the pointer IOP Agent selected by name
-    model_state state;
-    agent_iop *iop = model_findIopByName((char*) name,INPUT_T, &state);
+    agent_iop *iop = model_findIopByName((char*) name,INPUT_T);
 
     // Check if the iop has been returned.
     if(iop == NULL){
@@ -885,13 +861,13 @@ int mtic_readInputAsData(const char *name, void **data, long *size){
     }
 
     //Check the value type as an impulsion.
-    if(iop->type != DATA_T){
+    if(iop->value_type != DATA_T){
         mtic_debug("%s: Agent's input '%s' is not an data\n", __FUNCTION__,  name);
         return 0;
     }
 
     //Get the pointer on the structure data
-    void * value = mtic_get(name,INPUT_T,&state);
+    void * value = mtic_get(name,INPUT_T);
 
     //get size
     *size = iop->valueSize;
@@ -912,12 +888,11 @@ int mtic_readInputAsData(const char *name, void **data, long *size){
  */
 bool mtic_readOutputAsBool(const char *name){
     //Get the pointer IOP Agent selected by name.
-    model_state state;
-    agent_iop *iop = model_findIopByName((char*) name,OUTPUT_T, &state);
+    agent_iop *iop = model_findIopByName((char*) name,OUTPUT_T);
 
     // Check if the output has been returned.
     if(iop != NULL){
-        switch(iop->type){
+        switch(iop->value_type){
             case BOOL_T:
                 return iop->value.b;
                 break;
@@ -974,14 +949,13 @@ bool mtic_readOutputAsBool(const char *name){
  */
 int mtic_readOutputAsInt(const char *name){
     //Get the pointer IOP Agent selected by name.
-    model_state state;
-    agent_iop *iop = model_findIopByName((char*) name,OUTPUT_T, &state);
+    agent_iop *iop = model_findIopByName((char*) name,OUTPUT_T);
     int value = 0;
     int test =0;
 
     // Check if the output has been returned.
     if(iop != NULL){
-        switch(iop->type){
+        switch(iop->value_type){
             case INTEGER_T:
                 return iop->value.i;
                 break;
@@ -1037,14 +1011,13 @@ int mtic_readOutputAsInt(const char *name){
  */
 double mtic_readOutputAsDouble(const char *name){
     //Get the pointer IOP Agent selected by name.
-    model_state state;
-    agent_iop *iop = model_findIopByName((char*) name,OUTPUT_T, &state);
+    agent_iop *iop = model_findIopByName((char*) name,OUTPUT_T);
     double value = 0.0;
     int test = 0;
 
     // Check if the output has been returned.
     if(iop != NULL){
-        switch(iop->type){
+        switch(iop->value_type){
             case DOUBLE_T:
                 return iop->value.d;
                 break;
@@ -1102,12 +1075,11 @@ double mtic_readOutputAsDouble(const char *name){
  */
 char* mtic_readOutputAsString(const char *name){
     //Get the pointer IOP Agent selected by name
-    model_state state;
-    agent_iop *iop = model_findIopByName((char*) name,OUTPUT_T, &state);
+    agent_iop *iop = model_findIopByName((char*) name,OUTPUT_T);
 
     // Check if the output has been returned.
     if(iop != NULL){
-        switch(iop->type){
+        switch(iop->value_type){
             case STRING_T:
                 return strdup(iop->value.s);
                 break;
@@ -1156,8 +1128,7 @@ char* mtic_readOutputAsString(const char *name){
  */
 int mtic_readOutputAsData(const char *name, void **data, long *size){
     //Get the pointer IOP Agent selected by name
-    model_state state;
-    agent_iop *iop = model_findIopByName((char*) name,OUTPUT_T, &state);
+    agent_iop *iop = model_findIopByName((char*) name,OUTPUT_T);
 
     // Check if the iop has been returned.
     if(iop == NULL){
@@ -1166,13 +1137,13 @@ int mtic_readOutputAsData(const char *name, void **data, long *size){
     }
 
     //Check the value type as an impulsion.
-    if(iop->type != DATA_T){
+    if(iop->value_type != DATA_T){
         mtic_debug("%s: Agent's output '%s' is not an data\n", __FUNCTION__,  name);
         return 0;
     }
 
     //Get the pointer on the structure data
-    void * value = mtic_get(name,OUTPUT_T,&state);
+    void * value = mtic_get(name,OUTPUT_T);
 
     //get size
     *size = iop->valueSize;
@@ -1192,12 +1163,11 @@ int mtic_readOutputAsData(const char *name, void **data, long *size){
  */
 bool mtic_readParameterAsBool(const char *name){
     //Get the pointer IOP Agent selected by name.
-    model_state state;
-    agent_iop *iop = model_findIopByName((char*) name,PARAMETER_T, &state);
+    agent_iop *iop = model_findIopByName((char*) name,PARAMETER_T);
 
     // Check if the parameter has been returned.
     if(iop != NULL){
-        switch(iop->type){
+        switch(iop->value_type){
             case BOOL_T:
                 return iop->value.b;
                 break;
@@ -1254,14 +1224,13 @@ bool mtic_readParameterAsBool(const char *name){
  */
 int mtic_readParameterAsInt(const char *name){
     //Get the pointer IOP Agent selected by name.
-    model_state state;
-    agent_iop *iop = model_findIopByName((char*) name,PARAMETER_T, &state);
+    agent_iop *iop = model_findIopByName((char*) name,PARAMETER_T);
     int value = 0;
     int test =0;
 
     // Check if the parameter has been returned.
     if(iop != NULL){
-        switch(iop->type){
+        switch(iop->value_type){
             case INTEGER_T:
                 return iop->value.i;
                 break;
@@ -1317,14 +1286,13 @@ int mtic_readParameterAsInt(const char *name){
  */
 double mtic_readParameterAsDouble(const char *name){
     //Get the pointer IOP Agent selected by name.
-    model_state state;
-    agent_iop *iop = model_findIopByName((char*) name,PARAMETER_T, &state);
+    agent_iop *iop = model_findIopByName((char*) name,PARAMETER_T);
     double value = 0.0;
     int test = 0;
 
     // Check if the parameter has been returned.
     if(iop != NULL){
-        switch(iop->type){
+        switch(iop->value_type){
             case DOUBLE_T:
                 return iop->value.d;
                 break;
@@ -1381,12 +1349,11 @@ double mtic_readParameterAsDouble(const char *name){
  */
 char* mtic_readParameterAsString(const char *name){
     //Get the pointer IOP Agent selected by name
-    model_state state;
-    agent_iop *iop = model_findIopByName((char*) name,PARAMETER_T, &state);
+    agent_iop *iop = model_findIopByName((char*) name,PARAMETER_T);
 
     // Check if the parameter has been returned.
     if(iop != NULL){
-        switch(iop->type){
+        switch(iop->value_type){
             case STRING_T:
                 return strdup(iop->value.s);
                 break;
@@ -1435,8 +1402,7 @@ char* mtic_readParameterAsString(const char *name){
  */
 int mtic_readParameterAsData(const char *name, void **data, long *size){
     //Get the pointer IOP Agent selected by name
-    model_state state;
-    agent_iop *iop = model_findIopByName((char*) name,PARAMETER_T, &state);
+    agent_iop *iop = model_findIopByName((char*) name,PARAMETER_T);
 
     // Check if the iop has been returned.
     if(iop == NULL){
@@ -1445,13 +1411,13 @@ int mtic_readParameterAsData(const char *name, void **data, long *size){
     }
 
     //Check the value type as an impulsion.
-    if(iop->type != DATA_T){
+    if(iop->value_type != DATA_T){
         mtic_debug("%s: Agent's parameter '%s' is not an data\n", __FUNCTION__,  name);
         return 0;
     }
 
     //Get the pointer on the structure data
-    void * value = mtic_get(name,PARAMETER_T,&state);
+    void * value = mtic_get(name,PARAMETER_T);
 
     //get size
     *size = iop->valueSize;
@@ -1484,8 +1450,7 @@ int mtic_readParameterAsData(const char *name, void **data, long *size){
 int mtic_writeInput(const char *name, void *value, long size){
 
     //Get the pointer IOP Agent selected by name
-    model_state state;
-    agent_iop *iop = model_findIopByName((char*) name,INPUT_T, &state);
+    agent_iop *iop = model_findIopByName((char*) name,INPUT_T);
     int ret = 0;
 
     // Check if the iop has been returned.
@@ -1494,7 +1459,7 @@ int mtic_writeInput(const char *name, void *value, long size){
         return 0;
     }
 
-    switch (iop->type){
+    switch (iop->value_type){
     case INTEGER_T:
         ret = mtic_writeInputAsInt(name, *(int*) value);
         break;
@@ -1535,8 +1500,7 @@ int mtic_writeInput(const char *name, void *value, long size){
 int mtic_writeOutput(const char *name, void *value, long size){
 
     //Get the pointer IOP Agent selected by name
-    model_state state;
-    agent_iop *iop = model_findIopByName((char*) name,OUTPUT_T, &state);
+    agent_iop *iop = model_findIopByName((char*) name,OUTPUT_T);
     int ret = 0;
 
     // Check if the iop has been returned.
@@ -1545,7 +1509,7 @@ int mtic_writeOutput(const char *name, void *value, long size){
         return 0;
     }
 
-    switch (iop->type){
+    switch (iop->value_type){
     case INTEGER_T:
         ret = mtic_writeOutputAsInt(name, *(int*) value);
         break;
@@ -1586,8 +1550,7 @@ int mtic_writeOutput(const char *name, void *value, long size){
 int mtic_writeParameter(const char *name, void *value, long size){
 
     //Get the pointer IOP Agent selected by name
-    model_state state;
-    agent_iop *iop = model_findIopByName((char*) name,PARAMETER_T, &state);
+    agent_iop *iop = model_findIopByName((char*) name,PARAMETER_T);
     int ret = 0;
 
     // Check if the iop has been returned.
@@ -1596,7 +1559,7 @@ int mtic_writeParameter(const char *name, void *value, long size){
         return 0;
     }
 
-    switch (iop->type){
+    switch (iop->value_type){
     case INTEGER_T:
         ret = mtic_writeParameterAsInt(name, *(int*) value);
         break;
@@ -1634,8 +1597,7 @@ int mtic_writeParameter(const char *name, void *value, long size){
 int mtic_writeInputAsBool(const char *name, bool value){
 
     //Get the pointer IOP Agent selected by name
-    model_state state;
-    agent_iop *iop = model_findIopByName((char*) name,INPUT_T, &state);
+    agent_iop *iop = model_findIopByName((char*) name,INPUT_T);
 
     // Check if the iop has been returned.
     if(iop == NULL){
@@ -1644,7 +1606,7 @@ int mtic_writeInputAsBool(const char *name, bool value){
     }
 
     //Check the value type as a bool.
-    if(iop->type != BOOL_T){
+    if(iop->value_type != BOOL_T){
         mtic_debug("%s: Agent's input '%s' is not a bool", __FUNCTION__,  name);
         return 0;
     }
@@ -1674,8 +1636,7 @@ int mtic_writeInputAsBool(const char *name, bool value){
 int mtic_writeInputAsInt(const char *name, int value){
 
     //Get the pointer IOP Agent selected by name
-    model_state state;
-    agent_iop *iop = model_findIopByName((char*) name,INPUT_T, &state);
+    agent_iop *iop = model_findIopByName((char*) name,INPUT_T);
 
     // Check if the iop has been returned.
     if(iop == NULL){
@@ -1684,7 +1645,7 @@ int mtic_writeInputAsInt(const char *name, int value){
     }
 
     //Check the value type as an integer.
-    if(iop->type != INTEGER_T){
+    if(iop->value_type != INTEGER_T){
         mtic_debug("%s: Agent's input '%s' is not a integer", __FUNCTION__,  name);
         return 0;
     }
@@ -1713,8 +1674,7 @@ int mtic_writeInputAsInt(const char *name, int value){
 int mtic_writeInputAsDouble(const char *name, double value){
 
     //Get the pointer IOP Agent selected by name
-    model_state state;
-    agent_iop *iop = model_findIopByName((char*) name,INPUT_T, &state);
+    agent_iop *iop = model_findIopByName((char*) name,INPUT_T);
 
     // Check if the iop has been returned.
     if(iop == NULL){
@@ -1723,7 +1683,7 @@ int mtic_writeInputAsDouble(const char *name, double value){
     }
 
     //Check the value type as a double.
-    if(iop->type != DOUBLE_T){
+    if(iop->value_type != DOUBLE_T){
         mtic_debug("%s: Agent's input '%s' is not a double\n", __FUNCTION__,  name);
         return 0;
     }
@@ -1752,8 +1712,7 @@ int mtic_writeInputAsDouble(const char *name, double value){
 int mtic_writeInputAsString(const char *name, char *value){
 
     //Get the pointer IOP Agent selected by name
-    model_state state;
-    agent_iop *iop = model_findIopByName((char*) name,INPUT_T, &state);
+    agent_iop *iop = model_findIopByName((char*) name,INPUT_T);
 
     // Check if the iop has been returned.
     if(iop == NULL){
@@ -1762,7 +1721,7 @@ int mtic_writeInputAsString(const char *name, char *value){
     }
 
     //Check the value type as a string.
-    if(iop->type != STRING_T){
+    if(iop->value_type != STRING_T){
         mtic_debug("%s: Agent's input '%s' is not a string\n", __FUNCTION__,  name);
         return 0;
     }
@@ -1790,8 +1749,7 @@ int mtic_writeInputAsString(const char *name, char *value){
 int mtic_writeInputAsImpulsion(const char *name){
 
     //Get the pointer IOP Agent selected by name
-    model_state state;
-    agent_iop *iop = model_findIopByName((char*) name,INPUT_T, &state);
+    agent_iop *iop = model_findIopByName((char*) name,INPUT_T);
 
     // Check if the iop has been returned.
     if(iop == NULL){
@@ -1800,7 +1758,7 @@ int mtic_writeInputAsImpulsion(const char *name){
     }
 
     //Check the value type as an impulsion.
-    if(iop->type != IMPULSION_T){
+    if(iop->value_type != IMPULSION_T){
         mtic_debug("%s: Agent's input '%s' is not an impulsion\n", __FUNCTION__,  name);
         return 0;
     }
@@ -1834,8 +1792,7 @@ int mtic_writeInputAsData(const char *name, void *value, long size){
     //    fprintf(stderr, "WARNING - %s not implemented yet !\n", __FUNCTION__);
 
     //Get the pointer IOP Agent selected by name
-    model_state state;
-    agent_iop *iop = model_findIopByName((char*) name,INPUT_T, &state);
+    agent_iop *iop = model_findIopByName((char*) name,INPUT_T);
 
     // Check if the iop has been returned.
     if(iop == NULL){
@@ -1844,7 +1801,7 @@ int mtic_writeInputAsData(const char *name, void *value, long size){
     }
 
     //Check the value type as an impulsion.
-    if(iop->type != DATA_T){
+    if(iop->value_type != DATA_T){
         mtic_debug("%s: Agent's input '%s' is not an data\n", __FUNCTION__,  name);
         return 0;
     }
@@ -1873,8 +1830,7 @@ int mtic_writeInputAsData(const char *name, void *value, long size){
 int mtic_writeOutputAsBool(const char *name, bool value){
 
     //Get the pointer IOP Agent selected by name
-    model_state state;
-    agent_iop *iop = model_findIopByName((char*) name,OUTPUT_T, &state);
+    agent_iop *iop = model_findIopByName((char*) name,OUTPUT_T);
 
     // Check if the iop has been returned.
     if(iop == NULL){
@@ -1883,7 +1839,7 @@ int mtic_writeOutputAsBool(const char *name, bool value){
     }
 
     //Check the value type as a bool.
-    if(iop->type != BOOL_T){
+    if(iop->value_type != BOOL_T){
         mtic_debug("%s: Agent's output '%s' is not a bool\n", __FUNCTION__,  name);
         return 0;
     }
@@ -1897,9 +1853,8 @@ int mtic_writeOutputAsBool(const char *name, bool value){
     if(fct_to_call != NULL)
         fct_to_call->callback_ptr(OUTPUT_T, name, BOOL_T, (void*) &value, fct_to_call->data);
 
-    // If iop is output : publish
-    if(state == TYPE_OUTPUT)
-        network_publishOutput(name);
+    // iop is output : publish
+    network_publishOutput(name);
 
     return 1;
 }
@@ -1916,8 +1871,7 @@ int mtic_writeOutputAsBool(const char *name, bool value){
 int mtic_writeOutputAsInt(const char *name, int value){
 
     //Get the pointer IOP Agent selected by name
-    model_state state;
-    agent_iop *iop = model_findIopByName((char*) name,OUTPUT_T, &state);
+    agent_iop *iop = model_findIopByName((char*) name, OUTPUT_T);
 
     // Check if the iop has been returned.
     if(iop == NULL){
@@ -1926,7 +1880,7 @@ int mtic_writeOutputAsInt(const char *name, int value){
     }
 
     //Check the value type as a integer.
-    if(iop->type != INTEGER_T){
+    if(iop->value_type != INTEGER_T){
         mtic_debug("%s: Agent's output '%s' is not a integer\n", __FUNCTION__,  name);
         return 0;
     }
@@ -1940,9 +1894,8 @@ int mtic_writeOutputAsInt(const char *name, int value){
     if(fct_to_call != NULL)
         fct_to_call->callback_ptr(OUTPUT_T, name, INTEGER_T, (void*) &value, fct_to_call->data);
 
-    // If iop is output : publish
-    if(state == TYPE_OUTPUT)
-        network_publishOutput(name);
+    // iop is output : publish
+    network_publishOutput(name);
 
     return 1;
 
@@ -1960,8 +1913,7 @@ int mtic_writeOutputAsInt(const char *name, int value){
 int mtic_writeOutputAsDouble(const char *name, double value){
 
     //Get the pointer IOP Agent selected by name
-    model_state state;
-    agent_iop *iop = model_findIopByName((char*) name,OUTPUT_T, &state);
+    agent_iop *iop = model_findIopByName((char*) name, OUTPUT_T);
 
     // Check if the iop has been returned.
     if(iop == NULL){
@@ -1970,7 +1922,7 @@ int mtic_writeOutputAsDouble(const char *name, double value){
     }
 
     //Check the value type as a double.
-    if(iop->type != DOUBLE_T){
+    if(iop->value_type != DOUBLE_T){
         mtic_debug("%s: Agent's output '%s' is not a double\n", __FUNCTION__,  name);
         return 0;
     }
@@ -1984,9 +1936,8 @@ int mtic_writeOutputAsDouble(const char *name, double value){
     if(fct_to_call != NULL)
         fct_to_call->callback_ptr(OUTPUT_T, name, DOUBLE_T, (void*) &value, fct_to_call->data);
 
-    // If iop is output : publish
-    if(state == TYPE_OUTPUT)
-        network_publishOutput(name);
+    // iop is output : publish
+    network_publishOutput(name);
 
     return 1;
 }
@@ -2003,8 +1954,7 @@ int mtic_writeOutputAsDouble(const char *name, double value){
 int mtic_writeOutputAsString(const char *name, char *value){
 
     //Get the pointer IOP Agent selected by name
-    model_state state;
-    agent_iop *iop = model_findIopByName((char*) name,OUTPUT_T, &state);
+    agent_iop *iop = model_findIopByName((char*) name, OUTPUT_T);
 
     // Check if the iop has been returned.
     if(iop == NULL){
@@ -2013,7 +1963,7 @@ int mtic_writeOutputAsString(const char *name, char *value){
     }
 
     //Check the value type as a string.
-    if(iop->type != STRING_T){
+    if(iop->value_type != STRING_T){
         mtic_debug("%s: Agent's output '%s' is not a string\n", __FUNCTION__,  name);
         return 0;
     }
@@ -2027,9 +1977,8 @@ int mtic_writeOutputAsString(const char *name, char *value){
     if(fct_to_call != NULL)
         fct_to_call->callback_ptr(OUTPUT_T, name, STRING_T, (void*) value, fct_to_call->data);
 
-    // If iop is output : publish
-    if(state == TYPE_OUTPUT)
-        network_publishOutput(name);
+    // iop is output : publish
+    network_publishOutput(name);
 
     return 1;
 }
@@ -2045,8 +1994,7 @@ int mtic_writeOutputAsString(const char *name, char *value){
 int mtic_writeOutputAsImpulsion(const char *name){
 
     //Get the pointer IOP Agent selected by name
-    model_state state;
-    agent_iop *iop = model_findIopByName((char*) name,OUTPUT_T, &state);
+    agent_iop *iop = model_findIopByName((char*) name, OUTPUT_T);
 
     // Check if the iop has been returned.
     if(iop == NULL){
@@ -2055,7 +2003,7 @@ int mtic_writeOutputAsImpulsion(const char *name){
     }
 
     //Check the value type as an impulsion.
-    if(iop->type != IMPULSION_T){
+    if(iop->value_type != IMPULSION_T){
         mtic_debug("%s: Agent's output '%s' is not a impulsion\n", __FUNCTION__,  name);
         return 0;
     }
@@ -2070,9 +2018,8 @@ int mtic_writeOutputAsImpulsion(const char *name){
     if(fct_to_call != NULL)
         fct_to_call->callback_ptr(OUTPUT_T, name, IMPULSION_T, 0, fct_to_call->data);
 
-    // If iop is output : publish
-    if(state == TYPE_OUTPUT)
-        network_publishOutput(name);
+    // iop is output : publish
+    network_publishOutput(name);
 
     return 1;
 }
@@ -2090,8 +2037,7 @@ int mtic_writeOutputAsImpulsion(const char *name){
  */
 int mtic_writeOutputAsData(const char *name, void *value, long size){
     //Get the pointer IOP Agent selected by name
-    model_state state;
-    agent_iop *iop = model_findIopByName((char*) name,OUTPUT_T, &state);
+    agent_iop *iop = model_findIopByName((char*) name, OUTPUT_T);
 
     // Check if the iop has been returned.
     if(iop == NULL){
@@ -2100,7 +2046,7 @@ int mtic_writeOutputAsData(const char *name, void *value, long size){
     }
 
     //Check the value type as an impulsion.
-    if(iop->type != DATA_T){
+    if(iop->value_type != DATA_T){
         mtic_debug("%s: Agent's output '%s' is not an data\n", __FUNCTION__,  name);
         return 0;
     }
@@ -2114,9 +2060,8 @@ int mtic_writeOutputAsData(const char *name, void *value, long size){
     if(fct_to_call != NULL)
         fct_to_call->callback_ptr(OUTPUT_T, name, DATA_T, value, fct_to_call->data);
 
-    // If iop is output : publish
-    if(state == TYPE_OUTPUT)
-        network_publishOutput(name);
+    // iop is output : publish
+    network_publishOutput(name);
     
     return 1;
 }
@@ -2133,8 +2078,7 @@ int mtic_writeOutputAsData(const char *name, void *value, long size){
 int mtic_writeParameterAsBool(const char *name, bool value){
 
     //Get the pointer IOP Agent selected by name
-    model_state state;
-    agent_iop *iop = model_findIopByName((char*) name,PARAMETER_T, &state);
+    agent_iop *iop = model_findIopByName((char*) name,PARAMETER_T);
 
     // Check if the iop has been returned.
     if(iop == NULL){
@@ -2143,7 +2087,7 @@ int mtic_writeParameterAsBool(const char *name, bool value){
     }
 
     //Check the value type as a bool.
-    if(iop->type != BOOL_T){
+    if(iop->value_type != BOOL_T){
         mtic_debug("%s: Agent's output '%s' is not a bool\n", __FUNCTION__,  name);
         return 0;
     }
@@ -2172,8 +2116,7 @@ int mtic_writeParameterAsBool(const char *name, bool value){
 int mtic_writeParameterAsInt(const char *name, int value){
 
     //Get the pointer IOP Agent selected by name
-    model_state state;
-    agent_iop *iop = model_findIopByName((char*) name,PARAMETER_T, &state);
+    agent_iop *iop = model_findIopByName((char*) name,PARAMETER_T);
 
     // Check if the iop has been returned.
     if(iop == NULL){
@@ -2182,7 +2125,7 @@ int mtic_writeParameterAsInt(const char *name, int value){
     }
 
     //Check the value type as a int.
-    if(iop->type != INTEGER_T){
+    if(iop->value_type != INTEGER_T){
         mtic_debug("%s: Agent's output '%s' is not a integer\n", __FUNCTION__,  name);
         return 0;
     }
@@ -2211,8 +2154,7 @@ int mtic_writeParameterAsInt(const char *name, int value){
 int mtic_writeParameterAsDouble(const char *name, double value){
 
     //Get the pointer IOP Agent selected by name
-    model_state state;
-    agent_iop *iop = model_findIopByName((char*) name,PARAMETER_T, &state);
+    agent_iop *iop = model_findIopByName((char*) name,PARAMETER_T);
 
     // Check if the iop has been returned.
     if(iop == NULL){
@@ -2221,7 +2163,7 @@ int mtic_writeParameterAsDouble(const char *name, double value){
     }
 
     //Check the value type as a double.
-    if(iop->type != DOUBLE_T){
+    if(iop->value_type != DOUBLE_T){
         mtic_debug("%s: Agent's output '%s' is not a double\n", __FUNCTION__,  name);
         return 0;
     }
@@ -2250,8 +2192,7 @@ int mtic_writeParameterAsDouble(const char *name, double value){
 int mtic_writeParameterAsString(const char *name, char *value){
 
     //Get the pointer IOP Agent selected by name
-    model_state state;
-    agent_iop *iop = model_findIopByName((char*) name,PARAMETER_T, &state);
+    agent_iop *iop = model_findIopByName((char*) name,PARAMETER_T);
 
     // Check if the iop has been returned.
     if(iop == NULL){
@@ -2260,7 +2201,7 @@ int mtic_writeParameterAsString(const char *name, char *value){
     }
 
     //Check the value type as a string.
-    if(iop->type != STRING_T){
+    if(iop->value_type != STRING_T){
         mtic_debug("%s: Agent's output '%s' is not a string\n", __FUNCTION__,  name);
         return 0;
     }
@@ -2291,8 +2232,7 @@ int mtic_writeParameterAsString(const char *name, char *value){
  */
 int mtic_writeParameterAsData(const char *name, void *value, long size){
     //Get the pointer IOP Agent selected by name
-    model_state state;
-    agent_iop *iop = model_findIopByName((char*) name,PARAMETER_T, &state);
+    agent_iop *iop = model_findIopByName((char*) name,PARAMETER_T);
 
     // Check if the iop has been returned.
     if(iop == NULL){
@@ -2301,7 +2241,7 @@ int mtic_writeParameterAsData(const char *name, void *value, long size){
     }
 
     //Check the value type as an impulsion.
-    if(iop->type != DATA_T){
+    if(iop->value_type != DATA_T){
         mtic_debug("%s: Agent's parameter '%s' is not an data\n", __FUNCTION__,  name);
         return 0;
     }
@@ -2358,7 +2298,7 @@ iopType_t mtic_getTypeForInput(const char *name){
     }
 
     //Return the type of the value
-    return inputFound->type;
+    return inputFound->value_type;
 }
 
 /**
@@ -2397,7 +2337,7 @@ iopType_t mtic_getTypeForOutput(const char *name){
     }
 
     //Return the type of the value
-    return outputFound->type;
+    return outputFound->value_type;
 }
 
 /**
@@ -2436,7 +2376,7 @@ iopType_t mtic_getTypeForParameter(const char *name){
     }
 
     //Return the type of the value
-    return parameterFound->type;
+    return parameterFound->value_type;
 }
 
 /**
@@ -2794,8 +2734,7 @@ int mtic_observeParameter(const char *name, mtic_observeCallback cb, void * myDa
  * \todo write definition
  */
 int mtic_muteOutput(const char *name){
-    model_state state;
-    agent_iop *iop = model_findIopByName((char*) name,OUTPUT_T, &state);
+    agent_iop *iop = model_findIopByName((char*) name,OUTPUT_T);
     if(iop == NULL || iop->type != OUTPUT_T){
         mtic_debug("%s : output '%s' cannot be found", __FUNCTION__, name);
         return 0;
@@ -2813,8 +2752,7 @@ int mtic_muteOutput(const char *name){
  * \todo write definition
  */
 int mtic_unmuteOutput(const char *name){
-    model_state state;
-    agent_iop *iop = model_findIopByName((char*) name,OUTPUT_T, &state);
+    agent_iop *iop = model_findIopByName((char*) name,OUTPUT_T);
     if(iop == NULL || iop->type != OUTPUT_T){
         mtic_debug("%s : output '%s' cannot be found", __FUNCTION__, name);
         return 0;
@@ -2832,8 +2770,7 @@ int mtic_unmuteOutput(const char *name){
  * \todo write definition
  */
 bool mtic_isOutputMuted(const char *name){
-    model_state state;
-    agent_iop *iop = model_findIopByName((char*) name,OUTPUT_T, &state);
+    agent_iop *iop = model_findIopByName((char*) name,OUTPUT_T);
     if(iop == NULL || iop->type != OUTPUT_T){
         mtic_debug("%s : output '%s' cannot be found", __FUNCTION__, name);
         return 0;

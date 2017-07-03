@@ -136,36 +136,19 @@ const char* boolean_to_string (bool boole) {
  *
  */
 void free_agent_iop (agent_iop** agent_iop){
-
-    free((char*)(*agent_iop)->name);
-    (*agent_iop)->name = NULL;
-
-    switch ((*agent_iop)->type) {
-        case STRING_T:
-            free((char*)(*agent_iop)->old_value.s);
-            (*agent_iop)->old_value.s = NULL;
-
-            free((char*)(*agent_iop)->value.s);
-            (*agent_iop)->value.s = NULL;
-            break;
-        case IMPULSION_T:
-            free((char*)(*agent_iop)->old_value.impuls);
-            (*agent_iop)->old_value.impuls = NULL;
-
-            free((char*)(*agent_iop)->value.impuls);
-            (*agent_iop)->value.impuls = NULL;
-            break;
-        case DATA_T:
-            free((void*)(*agent_iop)->old_value.data);
-            (*agent_iop)->old_value.data = NULL;
-
-            free((void*)(*agent_iop)->value.data);
-            (*agent_iop)->value.data = NULL;
-            break;
-        default:
-            break;
+    
+    if ((*agent_iop)->name != NULL){
+        free((char*)(*agent_iop)->name);
     }
-
+    
+    if ((*agent_iop)->value.s != NULL){
+        free((char*)(*agent_iop)->value.s);
+    }
+    
+    if ((*agent_iop)->value.data != NULL){
+        free((*agent_iop)->value.data);
+    }
+    
     free((*agent_iop));
 }
 
@@ -351,7 +334,7 @@ char* mtic_iop_value_to_string (agent_iop* iop)
     char str_value[BUFSIZ];
     if(iop != NULL)
     {
-        switch (iop->type) {
+        switch (iop->value_type) {
             case INTEGER_T:
                 sprintf(str_value,"%i",iop->value.i);
                 break;
@@ -372,7 +355,7 @@ char* mtic_iop_value_to_string (agent_iop* iop)
                 sprintf(str_value,"%s",iop->value.s);
                 break;
             case IMPULSION_T:
-                sprintf(str_value,"%s",iop->value.impuls);
+                sprintf(str_value,"");
                 break;
             case DATA_T:
                 //TODO : DATA TYPE
@@ -407,7 +390,7 @@ const void* mtic_iop_value_string_to_real_type (agent_iop* iop, char* value)
     
     if(iop != NULL)
     {
-        switch (iop->type) {
+        switch (iop->value_type) {
             case INTEGER_T:
                 int_value=(int*)malloc(sizeof(int));
                 sscanf(value, "%i", int_value);
@@ -444,64 +427,14 @@ const void* mtic_iop_value_string_to_real_type (agent_iop* iop, char* value)
     return out_value;
 }
 
-/*
- * Function: iop_old_value_to_string
- * ----------------------------
- *   convert the iop old value to string
- *
- *   agent_iop      : iop to convert
- *
- */
-const char* iop_old_value_to_string (agent_iop* iop)
-{
-    char str_value[BUFSIZ];
-    if(iop != NULL)
-    {
-        switch (iop->type) {
-            case INTEGER_T:
-                sprintf(str_value,"%i",iop->old_value.i);
-                break;
-            case DOUBLE_T:
-                sprintf(str_value,"%lf",iop->old_value.d);
-                break;
-            case BOOL_T:
-                if(iop->old_value.b == true)
-                {
-                    sprintf(str_value,"%s","true");
-                    
-                } else {
-                    sprintf(str_value,"%s","false");
-                    
-                }
-                break;
-            case STRING_T:
-                sprintf(str_value,"%s",iop->old_value.s);
-                break;
-            case IMPULSION_T:
-                sprintf(str_value,"%s",iop->old_value.impuls);
-                break;
-            case DATA_T:
-                //TODO : DATA TYPE
-                //sprintf(str_value,"%s",iop->old_value.data);
-                break;
-            default:
-                break;
-        }
-    }
-    
-    return strdup(str_value);
-}
-
 
 int get_iop_value_as_int(agent_iop *iop, iop_t type){
-    model_state m;
-    int val = *(int *)(mtic_get(iop->name,type, &m));
+    int val = *(int *)(mtic_get(iop->name,type));
     return val;
 }
 
 double get_iop_value_as_double(agent_iop *iop,iop_t type){
-    model_state m;
-    double val = *(double *)(mtic_get(iop->name,type, &m));
+    double val = *(double *)(mtic_get(iop->name,type));
     return val;
 }
 
@@ -516,7 +449,7 @@ int definition_setIopValue(agent_iop *iop, void * value, long size)
     if(iop == NULL)
         return 0;
 
-    switch (iop->type) {
+    switch (iop->value_type) {
         case INTEGER_T:
             iop->value.i = *(int*)(value);
             break;
@@ -531,16 +464,18 @@ int definition_setIopValue(agent_iop *iop, void * value, long size)
             iop->value.s = strdup(value);
             break;
         case IMPULSION_T:
-            free(iop->value.impuls);
-            iop->value.impuls = strdup(value);
-        break;
+            break;
         case DATA_T:
-            free(iop->value.data);
+        {
+            if (iop->value.data != NULL){
+                free(iop->value.data);
+            }
             iop->value.data = NULL;
             iop->valueSize = size;
             iop->value.data = calloc(1,size);
             memcpy(iop->value.data,value, size);
-        break;
+        }
+            break;
         default:
             break;
     }
@@ -554,7 +489,7 @@ agent_iop* definition_createIop(const char *name, iopType_t type, void *value, l
     agent_iop *iop = NULL;
     iop = calloc (1, sizeof (struct agent_iop));
     iop->name = strdup(name);
-    iop->type = type;
+    iop->value_type = type;
 
     //Set value
 //    agent_iop *ret = NULL;
@@ -868,8 +803,7 @@ int mtic_removeInput(const char *name){
     }
 
     //Find Iop
-    model_state state;
-    agent_iop * iop = model_findIopByName(name,INPUT_T,&state);
+    agent_iop * iop = model_findIopByName(name,INPUT_T);
 
     //Check if iop exist
     if(iop == NULL){
@@ -910,8 +844,7 @@ int mtic_removeOutput(const char *name){
     }
 
     //Find Iop
-    model_state state;
-    agent_iop * iop = model_findIopByName(name,OUTPUT_T,&state);
+    agent_iop * iop = model_findIopByName(name,OUTPUT_T);
 
     //Check if iop exist
     if(iop == NULL){
@@ -953,8 +886,7 @@ int mtic_removeParameter(const char *name){
     }
 
     //Find Iop
-    model_state state;
-    agent_iop * iop = model_findIopByName(name,PARAMETER_T,&state);
+    agent_iop * iop = model_findIopByName(name,PARAMETER_T);
 
     //Check if iop exist
     if(iop == NULL){

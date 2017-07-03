@@ -475,9 +475,9 @@ int mtic_map (char* input_name,char* map_description){
  *   returns : the state of the 'mtic_set' function from model
  */
 
-model_state mtic_map_received(const char *agent_name, char *out_name, void *value, long size){
+int mtic_map_received(const char *agent_name, char *out_name, void *value, long size){
     mapping_out *temp;
-    model_state state = NOK;
+    int state = 1;
 
     // Check the existence of our map
     if(mtic_my_agent_mapping != NULL)
