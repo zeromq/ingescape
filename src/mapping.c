@@ -9,14 +9,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-//#include "mastic.h"
 #include "mastic_private.h"
 
-
-
-// Global parameter declaration
 mapping * mtic_my_agent_mapping = NULL;
 
+////////////////////////////////////////////////////////////////////////
+// PRIVATE API
+////////////////////////////////////////////////////////////////////////
 
 const char * map_state_to_string(map_state state){
     switch (state) {
@@ -65,14 +64,6 @@ void free_map_cat (mapping_cat** map_cat){
     free ((*map_cat));
 }
 
-/*
- * Function: free_mapping
- * ----------------------------
- *   free a mapping structure, all its pointers and hash tables
- *
- *   mapping : a pointer to the mapping structure to free
- *
- */
 void mapping_FreeMapping (mapping* mapp) {
 
     struct mapping_out *current_map_out, *tmp_map_out;
@@ -98,18 +89,6 @@ void mapping_FreeMapping (mapping* mapp) {
     }
 }
 
-/*
- * Function: map_all_mapping
- * ----------------------------
- *   Sub-function of 'load_map'.
- *   Read the table of all mappings loaded by the file json
- *   Call the 'mtic_map' function corresponding to the mtic_map
- *
- *   usage : map_all_mapping()
- *
- *   loaded : the structure 'mapping' corresponding to the loaded mapping from the JSON file.
- *
- */
 void copy_to_map_global(mapping *loaded){
     if(loaded == NULL)
         return;
@@ -159,28 +138,6 @@ void copy_to_map_global(mapping *loaded){
     }
 }
 
-/*
- * Function: add_map_to_table
- * ----------------------------
- *   Check if the map is already present in the table
- *   Add the map in the table
- *
- *   usage : add_map_to_table('e1','A2', 's1')
- *
- *   input_name     : the input's name to be connected with : ex. 'e1'
- *
- *   agent_name     : the agent's name to be connected with : ex. 'A2' OR '*'
- *
- *   output_name    : the output's name to be connected with : ex. 'A2' OR '*'
- *.
- *   report         : the error code
- *                      0  : OK
- *                      1  : agent name empty
- *                      2  : output name empty
- *
- *   returns : map_out : mapping_out object newly created
- 
- */
 mapping_out * add_map_to_table(char * input_name,
                       char *agent_name,
                       char* output_name,
@@ -242,25 +199,6 @@ mapping_out * add_map_to_table(char * input_name,
 
     return new_map_out;
 }
-
-/*
- * Function: split_map_description
- * ----------------------------
- *   Split the map description in the agent name & the output name
- *
- *   usage : split_map_description('A2.s1',agent_name,output_name)
- *
- *   map_description    : the description of the mapping 'A2.s1' OR '*.s1'
- *
- *   agent_name         : the pointer on the char * which will contains the name of the agent
- *
- *   output_name         : the pointer on the char * which will contains the output name
- *
- *   returns : the error code
- *   0  : OK
- *   1  : agent name empty
- *   2  : output name empty
- */
 
 int split_map_description(char* map_description,
                           char * agent_name,
@@ -324,25 +262,6 @@ int split_map_description(char* map_description,
     return 0;
 }
 
-/*
- * Function: map
- * ----------------------------
- *   Map an input with an external agent's ouput (one OR more).
- *   Check if the input is part of the agent.
- *   Check if the map is already present in the table
- *   Add the map in the table
- *
- *   usage : mtic_map('e1','A2.s1')
- *
- *   input_name         : the input's name to be connected with : ex. 'e1'
- *
- *   map_description    : the description of the mapping 'A2.s1' OR '*.s1'
- *
- *   returns : the error code
- *   0  : OK
- *   1  : agent name empty
- *   2  : output name empty
- */
 int mtic_map (char* input_name,char* map_description){
 
     int result = 0;
@@ -460,21 +379,6 @@ int mtic_map (char* input_name,char* map_description){
     return result;
 }
 
-/*
- * Function: map_received
- * ----------------------------
- *   It's called in the function SUB when receiving value from an another agent which we have subscribed.
- *   Call SET to copy the value and updated the live model of data.
- *
- *   agent_name : the name of the external agent
- *
- *   out_name : the name of the output concerning
- *
- *   value      : the new value
- *
- *   returns : the state of the 'mtic_set' function from model
- */
-
 int mtic_map_received(const char *agent_name, char *out_name, void *value, long size){
     mapping_out *temp;
     int state = 1;
@@ -494,18 +398,6 @@ int mtic_map_received(const char *agent_name, char *out_name, void *value, long 
     return state;
 }
 
-/* TODO : implement in the next version of the API
- * Function: map_category
- * ----------------------------
- *   Map the agent's inputs to the category which an external agent is in accordance with it,
- *   So all the outputs from the external agent in accordance with the agent'inputs will be mapped
- *
- *   usage : map_category('A2.c3')
- *
- *   map_description    : the description of the mapping 'A2.c3' OR '*.c3'
- *
- *   returns : the state of the mapping
- */
 bool mtic_map_category (char* map_description){
     return false;
 }
@@ -532,22 +424,6 @@ bool check_iop_type(char * input_name,
     return true;
 }
 
-/*
- * Function: find_map
- * ----------------------------
- *   Sub-function of 'check_map'.
- *   Find the map in the table
- *
- *   usage : find_map('e1','A2','s1')
- *
- *   input_name     : the input's name
- *
- *   agent_name     : the agent's name
- *
- *   output_name    : the output's name
- *
- *   returns : the mapping output pointer
- */
 mapping_out * mtic_find_map(char * input_name,
                        char * agent_name,
                        char * output_name){
@@ -562,17 +438,6 @@ mapping_out * mtic_find_map(char * input_name,
     return NULL;
 }
 
-/*
- * Function: check_map
- * ----------------------------
- *   It's called in the function ENTER.
- *   Check if the agent is involved in a mapping.
- *   Update the mapping state if exists.
- *
- *   definition : the definition of the external agent
- *
- *   returns    : the table of outputs to subscribe OR null
- */
 agent_iop* mtic_check_map(definition *definition){
     agent_iop *outputs = NULL;
 
@@ -656,17 +521,6 @@ agent_iop* mtic_check_map(definition *definition){
     return outputs;
 }
 
-/*
- * Function: unmap
- * ----------------------------
- *   It's called in the function EXIT.
- *   Check if the agent is concerning by a mapping.
- *   Update the mapping state to OFF.
- *
- *   definition : the definition of the external agent which will exit
- *
- *   returns    : the table of outputs passed to OFF and to unsubscribe OR null
- */
 agent_iop* mtic_unmap(definition *definition){
     agent_iop *return_out_table = NULL;
     agent_iop *out_found = NULL;
@@ -712,21 +566,6 @@ agent_iop* mtic_unmap(definition *definition){
     return return_out_table;
 }
 
-/*
- * Function: update_mapping_out_state
- * ----------------------------
- *   Take a mapping_out object to update its state according to the definition it's mapped with. .
- *   Check & find the output is part of this agent.
- *   Check if the type between the input and the output is compatible.
- *   If yes, switch the state to ON.
- *
- *   map_out             : the mapping_out object
- *
- *   external_definition : the external agent definition
- *
- *   return : the agent_iop object found in the external definition corresponding to map_out
- *
- */
 agent_iop*  mtic_update_mapping_out_state(mapping_out* map_out, definition * external_definition)
 {
     agent_iop* outputFound = NULL;
@@ -753,13 +592,6 @@ agent_iop*  mtic_update_mapping_out_state(mapping_out* map_out, definition * ext
     
     return outputFound;
 }
-
-////////////////////////////////////////////////////////////////////////
-// PRIVATE API
-////////////////////////////////////////////////////////////////////////
-//à remplir ou déplacer ici
-
-
 
 ////////////////////////////////////////////////////////////////////////
 // PUBLIC API
