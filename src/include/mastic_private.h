@@ -219,8 +219,8 @@ bool string_to_boolean(const char* string);
 const char* value_type_to_string (iopType_t type);
 const char* boolean_to_string (bool boole);
 
-int get_iop_value_as_int(agent_iop *iop);
-double get_iop_value_as_double(agent_iop *iop);
+int get_iop_value_as_int(agent_iop *iop, iop_t type);
+double get_iop_value_as_double(agent_iop *iop, iop_t type);
 
 bool check_category (definition* def, category* category, category_check_type check_type);
 bool check_category_agent_iop(agent_iop* def_iop, agent_iop* iop_cat_to_check);
@@ -252,9 +252,16 @@ void mapping_FreeMapping (mapping* mapping);
 
 //////////////////  model   //////////////////
 extern bool isWholeAgentMuted;
-agent_iop * model_findIopByName(const char* name, model_state *code);
+//agent_iop * model_findIopByName(const char* name, model_state *code);
+agent_iop * model_findIopByName(const char* name, iop_t type, model_state *code);
+
+agent_iop * model_findInputByName(const char * name);
+agent_iop * model_findOutputByName(const char * name);
+agent_iop * model_findParameterByName(const char * name);
+
+
 agent_iop * mtic_find_iop_by_name_on_definition(const char *name, definition* definition, model_state *code);
-void * mtic_get(const char* name_iop, model_state* state);
+void * mtic_get(const char *name_iop, iop_t type, model_state *state);
 // Conversions
 char* model_IntToString(const int value);
 char* model_DoubleToString(const double value);

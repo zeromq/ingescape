@@ -493,15 +493,15 @@ const char* iop_old_value_to_string (agent_iop* iop)
 }
 
 
-int get_iop_value_as_int(agent_iop *iop){
+int get_iop_value_as_int(agent_iop *iop, iop_t type){
     model_state m;
-    int val = *(int *)(mtic_get(iop->name, &m));
+    int val = *(int *)(mtic_get(iop->name,type, &m));
     return val;
 }
 
-double get_iop_value_as_double(agent_iop *iop){
+double get_iop_value_as_double(agent_iop *iop,iop_t type){
     model_state m;
-    double val = *(double *)(mtic_get(iop->name, &m));
+    double val = *(double *)(mtic_get(iop->name,type, &m));
     return val;
 }
 
@@ -869,7 +869,7 @@ int mtic_removeInput(const char *name){
 
     //Find Iop
     model_state state;
-    agent_iop * iop = model_findIopByName(name,&state);
+    agent_iop * iop = model_findIopByName(name,INPUT_T,&state);
 
     //Check if iop exist
     if(iop == NULL){
@@ -911,7 +911,7 @@ int mtic_removeOutput(const char *name){
 
     //Find Iop
     model_state state;
-    agent_iop * iop = model_findIopByName(name,&state);
+    agent_iop * iop = model_findIopByName(name,OUTPUT_T,&state);
 
     //Check if iop exist
     if(iop == NULL){
@@ -954,7 +954,7 @@ int mtic_removeParameter(const char *name){
 
     //Find Iop
     model_state state;
-    agent_iop * iop = model_findIopByName(name,&state);
+    agent_iop * iop = model_findIopByName(name,PARAMETER_T,&state);
 
     //Check if iop exist
     if(iop == NULL){
