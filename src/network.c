@@ -103,7 +103,6 @@ zyreloopElements_t *agentElements = NULL;
 subscriber_t *subscribers = NULL;
 FreezeCallback_t *FreezeCallbacks = NULL;
 
-
 ////////////////////////////////////////////////////////////////////////
 // Network internal functions
 ////////////////////////////////////////////////////////////////////////
@@ -212,9 +211,6 @@ int unsubscribeToPublisherOutput(const char *agentName, const char *outputName)
     return -1;
 }
 
-
-
-
 ////////////////////////////////////////////////////////////////////////
 // ZMQ callbacks
 ////////////////////////////////////////////////////////////////////////
@@ -321,7 +317,6 @@ int manageSubscription (zloop_t *loop, zmq_pollitem_t *item, void *arg){
     }
     return 0;
 }
-
 
 //manage messages received on the bus
 int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
@@ -781,7 +776,6 @@ int network_checkAndSubscribeToPublisher(const char* agentName)
     
     return result;
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 // PUBLIC API

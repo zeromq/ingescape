@@ -11,10 +11,6 @@
   * \file ../../src/include/mastic.h
   */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include "mastic_private.h"
-
 //Hashable structure which associate the name of one 'iop' and the pointer of one callback
 typedef struct mtic_observe_callback_T {
     const char * iop_name;              // Need to be unique : the table hash key
@@ -27,7 +23,9 @@ typedef struct mtic_observe_callback_T {
 //The variable which will contain all the callbacks associated to 'iop'
 mtic_observe_callback_T *agent_callbacks;
 
-// ------------ main functions use in 'MODEL' --------------- //
+////////////////////////////////////////////////////////////////////////
+// PRIVATE API
+////////////////////////////////////////////////////////////////////////
 
 agent_iop * mtic_find_iop_by_name_on_definition(const char *name, definition* definition){
     agent_iop *found = NULL;
@@ -62,16 +60,6 @@ agent_iop * mtic_find_iop_by_name_on_definition(const char *name, definition* de
         return found;
     }
 }
-
-/*
- * Function: mtic_find_iop_by_name
- * ----------------------------
- *
- */
-//agent_iop * model_findIopByName(const char *name, model_state *code){
-    
-//    return mtic_find_iop_by_name_on_definition(name,mtic_definition_live,code);
-//}
 
 agent_iop * model_findIopByName(const char *name, iop_t type){
     agent_iop *found = NULL;
@@ -150,7 +138,6 @@ agent_iop *model_findParameterByName(const char *name)
     return found;
 }
 
-
 void update_value(agent_iop *iop, void* value, long size){
     switch (iop->value_type) {
         case INTEGER_T:
@@ -195,17 +182,6 @@ void update_value(agent_iop *iop, void* value, long size){
     }
 }
 
-/*
- * Function: mtic_get
- * ----------------------------
- *  Find the 'input/output/parameter' value.
- *
- *  name_iop    : Name of the 'input/output/parameter'
- *
- *  state       : The pointer on the state (cf. enum)
- *
- *  return : pointer on the value OR null
- */
 void * mtic_get(const char *name_iop, iop_t type){
 
     agent_iop *iop = model_findIopByName((char*) name_iop,type);
@@ -240,16 +216,6 @@ void * mtic_get(const char *name_iop, iop_t type){
     return NULL;
 }
 
-/*
- * Function: mute
- * ----------------------------
- *  Mute an 'input/output/parameter'.
- *
- *  name_iop    : Name of the 'input/output/parameter'
- *
- *  return : 0 is the output has been properly muted, -1 otherwise.
- */
-
 int mtic_mute_internal(const char* iop_name, iop_t type)
 {
     int result = -1;
@@ -266,15 +232,6 @@ int mtic_mute_internal(const char* iop_name, iop_t type)
     return result;
 }
 
-/*
- * Function: unmute
- * ----------------------------
- *  Unmute an 'input/output/parameter'.
- *
- *  name_iop    : Name of the 'input/output/parameter'
- *
- *  return : 0 is the output has been properly unmuted, -1 otherwise.
- */
 int mtic_unmute_internal(const char* iop_name, iop_t type)
 {
     int result = -1;
@@ -291,13 +248,6 @@ int mtic_unmute_internal(const char* iop_name, iop_t type)
     return result;
 }
 
-/*
- * Function: mtic_muteAll
- * ----------------------------
- *  Mute all outputs.
- *
- *  return : 0 is the outputs have been properly muted, -1 otherwise.
- */
 int mtic_muteAll()
 {
     int result = 0,result_tmp = 0;
@@ -319,13 +269,6 @@ int mtic_muteAll()
     return result;
 }
 
-/*
- * Function: mtic_unmuteAll
- * ----------------------------
- *  Unmute all outputs.
- *
- *  return : 0 is the outputs have been properly unmuted, -1 otherwise.
- */
 int mtic_unmuteAll()
 {
     int result = 0,result_tmp = 0;
@@ -347,18 +290,6 @@ int mtic_unmuteAll()
     return result;
 }
 
-////////////////////////////////////////////////////////////////////////
-// PRIVATE API
-////////////////////////////////////////////////////////////////////////
-//à remplir ou déplacer ici
-
-/*
- * Function: model_model_IntToString
- * ----------------------------
- *  Carry out conversion from int to string.
- *
- *  return : the int value as a string.
- */
 char* model_IntToString(const int value)
 {
     // Compute the size of allocate for str.
@@ -378,13 +309,6 @@ char* model_IntToString(const int value)
    return str;
 }
 
-/*
- * Function: model_DoubleToString
- * ----------------------------
- *  Carry out conversion from double to string.
- *
- *  return : the double value as a string.
- */
 char* model_DoubleToString(const double value)
 {
     // Compute the size of allocate for str.
@@ -403,16 +327,6 @@ char* model_DoubleToString(const double value)
     return str;
 }
 
-
-/* NOT in PUBLIC API
- * fn mtic_observe(const char *name, mtic_observeCallback cb, void *myData)
- * brief Observe the iop and associate a callback to it.
- * When the iop value will change by calling the 'mtic_set' function, the associated callback will be called.
- *
- * param name the 'input/output/parameter'
- * param cb the pointer to the associated callback
- * return 1 if correct or 0
- */
 static int mtic_observe(const char* type, const char* name,iop_t typeIop, mtic_observeCallback cb, void* myData){
 
     //1) find the iop

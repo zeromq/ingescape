@@ -28,7 +28,9 @@
 
 bool agentNameChangedByDefinition = false;
 
-// --------- static functions used for json parsing --------------------//
+////////////////////////////////////////////////////////////////////////
+// PRIVATE API
+////////////////////////////////////////////////////////////////////////
 
 /*
  * Function: json_add_data_to_hash
@@ -174,7 +176,6 @@ static int json_tokenized (const char* json_str,
 
     return 1;
 }
-
 
 /*
  * Function: json_parse_category
@@ -470,7 +471,6 @@ static mapping* json_parse_mapping (yajl_val node) {
     return mapp;
 }
 
-
 /*
  * Function: json_dump_iop
  * -----------------------
@@ -658,6 +658,7 @@ static void json_dump_mapping_out (yajl_gen *g, mapping_out* mapp_out) {
 
     yajl_gen_map_close(*g);
 }
+
 /*
  * Function: json_dump_mapping_cat
  * -----------------------
@@ -725,9 +726,6 @@ static void json_dump_mapping (yajl_gen *g, mapping* mapp) {
     yajl_gen_map_close(*g);
 }
 
-
-// --------- Public API for json parsing / dumping --------------------//
-
 /*
  * Function: load_map
  * ------------------
@@ -738,6 +736,7 @@ static void json_dump_mapping (yajl_gen *g, mapping* mapp) {
  *
  *   returns : a pointer on a mapping structure or NULL if it has failed
  */
+
 mapping* parser_LoadMap(const char* json_str){
     
     mapping *mapp = NULL;
@@ -765,6 +764,7 @@ mapping* parser_LoadMap(const char* json_str){
  *
  *   returns : a pointer on a mapping structure or NULL if it has failed
  */
+
 mapping* parser_LoadMapFromPath (const char* path){
 
     char *json_str = NULL;
@@ -833,6 +833,7 @@ category* load_category_from_path (const char* path) {
  *
  *   returns: a category json format string UTF8
  */
+
 const char* export_category (category* cat) {
    
     const char* result = NULL;
@@ -869,6 +870,7 @@ const char* export_category (category* cat) {
  *
  *   returns: a definition json format string UTF8
  */
+
 char* export_definition (definition* def) {
     
     char* result = NULL;
@@ -905,6 +907,7 @@ char* export_definition (definition* def) {
  *
  *   returns: a mapping json format string UTF8
  */
+
 char* export_mapping(mapping *mapp){
     char* result = NULL;
     const unsigned char * json_str = NULL;
@@ -941,6 +944,7 @@ char* export_mapping(mapping *mapp){
  *
  *   returns: a pointer on a category structure or NULL if it has failed
  */
+
 definition* parser_loadDefinition (const char* json_str) {
     
     definition *def = NULL;
@@ -965,6 +969,7 @@ definition* parser_loadDefinition (const char* json_str) {
  *
  *   returns: a pointer on a category structure or NULL if it has failed
  */
+
 definition * parser_loadDefinitionFromPath (const char* path) {
 
     char *json_str = NULL;
@@ -990,6 +995,7 @@ definition * parser_loadDefinitionFromPath (const char* path) {
  *   mapping_file_path : path to the agent mapping file
  *
  */
+
 int mtic_init_mapping (const char* mapping_file_path)
 {
     int errorCode = -1;
@@ -1018,6 +1024,7 @@ int mtic_init_mapping (const char* mapping_file_path)
  *   definition_file_path : path to the agent definiton file
  *
  */
+
 int mtic_init_internal_data (const char* definition_file_path)
 {
     int errorCode = -1;
@@ -1042,12 +1049,6 @@ int mtic_init_internal_data (const char* definition_file_path)
 
     return errorCode;
 }
-
-////////////////////////////////////////////////////////////////////////
-// PRIVATE API
-////////////////////////////////////////////////////////////////////////
-//à remplir ou déplacer ici
-
 
 ////////////////////////////////////////////////////////////////////////
 // PUBLIC API

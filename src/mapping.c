@@ -7,6 +7,10 @@
 //  Copyright © 2016 IKKY WP4.8. All rights reserved.
 //
 
+/**
+  * \file ../../src/include/mastic.h
+  */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "mastic_private.h"
