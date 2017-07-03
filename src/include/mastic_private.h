@@ -68,8 +68,7 @@ struct agent_iop {
         int i;                  //in accordance to type INTEGER_T ex. '10'
         double d;               //in accordance to type DOUBLE ex. '10.01'
         char* s;                //in accordance to type STRING ex. 'display the image'
-        bool b;                 //in accordance to type BOOL ex. 'TRUE'
-        char* impuls;           //in accordance to type IMPULSION ex. 'released()'
+        bool b;
         void* data;             //in accordance to type DATA ex. '{int:x, int:y, string:gesture_name} <=> {int:10, int:45, string:swap}
     } value;
     long valueSize;          //Size of pointer on data
@@ -224,7 +223,7 @@ int mtic_map(char* input_name, char* map_description);
 agent_iop* mtic_check_map (definition *definition);
 agent_iop* mtic_unmap (definition *definition);
 agent_iop*  mtic_update_mapping_out_state(mapping_out* map_out, definition * external_definition);
-model_state mtic_map_received(const char * agent_name,
+int mtic_map_received(const char * agent_name,
                               char * out_name,
                               void * value,
                               long size);
@@ -235,15 +234,15 @@ void mapping_FreeMapping (mapping* mapping);
 //////////////////  model   //////////////////
 extern bool isWholeAgentMuted;
 //agent_iop * model_findIopByName(const char* name, model_state *code);
-agent_iop * model_findIopByName(const char* name, iop_t type, model_state *code);
+agent_iop * model_findIopByName(const char* name, iop_t type);
 
 agent_iop * model_findInputByName(const char * name);
 agent_iop * model_findOutputByName(const char * name);
 agent_iop * model_findParameterByName(const char * name);
 
 
-agent_iop * mtic_find_iop_by_name_on_definition(const char *name, definition* definition, model_state *code);
-void * mtic_get(const char *name_iop, iop_t type, model_state *state);
+agent_iop * mtic_find_iop_by_name_on_definition(const char *name, definition* definition);
+void * mtic_get(const char *name_iop, iop_t type);
 // Conversions
 char* model_IntToString(const int value);
 char* model_DoubleToString(const double value);
