@@ -238,7 +238,7 @@ void mtic_debug(const char*fmt, ...);
 
 // Parser
 
-bool agentNameChangedByDefinition;
+extern bool agentNameChangedByDefinition;
 category* load_category (const char* json_str);
 category* load_category_from_path (const char* file_path);
 const char* export_category (category* cat);
