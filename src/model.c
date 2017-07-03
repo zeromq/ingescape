@@ -11,6 +11,10 @@
   * \file ../../src/include/mastic.h
   */
 
+#include <stdio.h>
+#include <stdlib.h>
+#include "mastic_private.h"
+
 //Hashable structure which associate the name of one 'iop' and the pointer of one callback
 typedef struct mtic_observe_callback_T {
     const char * iop_name;              // Need to be unique : the table hash key
