@@ -62,16 +62,8 @@
  */
 struct agent_iop {
     const char * name;          //Need to be unique : the table hash key
-    iopType_t type;
-    union {
-        int i;                  //in accordance to type INTEGER_T ex. '10'
-        double d;               //in accordance to type DOUBLE ex. '10.01'
-        char* s;                //in accordance to type STRING ex. 'display the image'
-        bool b;                 //in accordance to type BOOL ex. 'TRUE'
-        char* impuls;           //in accordance to type IMPULSION ex. 'released()'
-        void* data;             //in accordance to type DATA ex. '{int:x, int:y, string:gesture_name} <=> {int:10, int:45, string:swap}
-    } old_value;
-    long oldValueSize;          //Size of pointer on data
+    iopType_t value_type;
+    iop_t type;          //Size of pointer on data
     union {
         int i;                  //in accordance to type INTEGER_T ex. '10'
         double d;               //in accordance to type DOUBLE ex. '10.01'
@@ -137,17 +129,7 @@ typedef enum {
 
 
 //model //////////////////
-//Define a state to return in functions
-typedef enum{
-    OK,
-    NOK,
-    NAME_EMPTY,
-    NAME_NOT_EXIST,
-    TYPE_INPUT,
-    TYPE_OUTPUT,
-    TYPE_PARAM,
-    NO_CALLBACK
-} model_state;
+//nothing for now
 
 
 //mapping //////////////////
