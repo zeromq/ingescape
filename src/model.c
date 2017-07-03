@@ -2665,13 +2665,6 @@ bool mtic_checkParameterExistence(const char *name){
  */
 
 /**
- * \var typedef void (*mtic_observeCallback)(iop_t iopType, const char *name, iopType_t valueType, void *value, void * myData)
- * \ingroup observefct
- * \brief typedef for the callback used in observe functions
- */
-typedef void (*mtic_observeCallback)(iop_t iopType, const char *name, iopType_t valueType, void *value, void * myData);
-
-/**
  * \fn int mtic_observeInput(const char *name, mtic_observeCallback cb, void *myData)
  * \ingroup observefct
  * \brief Observe a input and associate a callback to it.

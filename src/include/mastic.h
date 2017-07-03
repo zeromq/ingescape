@@ -6,6 +6,10 @@
 //  Copyright © 2016 IKKY WP4.8. All rights reserved.
 //
 
+/**
+  * \file ../../src/include/mastic.h
+  */
+
 #ifndef mastic_public_h
 #define mastic_public_h
 
@@ -33,6 +37,11 @@ PUBLIC int mtic_setAgentName(const char *name);
 PUBLIC char *mtic_getAgentName();
 
 //pause and resume the agent
+/**
+ * \var typedef void (*mtic_freezeCallback)(bool isPaused, void *myData)
+ * \ingroup pauseResumeFct
+ * \brief typedef for the callback used in freezed functions
+ */
 typedef void (*mtic_freezeCallback)(bool isPaused, void *myData);
 PUBLIC int mtic_freeze();
 PUBLIC bool mtic_isFrozen();
@@ -57,26 +66,26 @@ PUBLIC void mtic_setCanBeFrozen (bool canBeFrozen);
 //IOP Model : Inputs, Outputs and Parameters read/write/check/observe/mute
 
 /**
- * \var iop_t
+ * \enum iop_t
  * \brief type of agent's inputs / outputs / parameters
  */
 typedef enum {
-    INPUT_T = 1,
-    OUTPUT_T,
-    PARAMETER_T
+    INPUT_T = 1, ///< input of an agent.
+    OUTPUT_T,    ///< output of an agent.
+    PARAMETER_T  ///< parameter of an agent.
 } iop_t;
 
 /**
- * \var iopType_t
- * \brief type of the inputs / outputs / parameters
+ * \enum iopType_t
+ * \brief type of the value of the inputs / outputs / parameters
  */
 typedef enum {
-    INTEGER_T = 1,
-    DOUBLE_T,
-    STRING_T,
-    BOOL_T,
-    IMPULSION_T,
-    DATA_T
+    INTEGER_T = 1,  ///< integer value type
+    DOUBLE_T,       ///< double value type
+    STRING_T,       ///< string value type
+    BOOL_T,         ///< bool value type
+    IMPULSION_T,    ///< impulsion value type
+    DATA_T          ///< data value type
 } iopType_t;
 
 //read/write IOP using void*
@@ -147,7 +156,12 @@ PUBLIC bool mtic_checkOutputExistence(const char *name);
 PUBLIC bool mtic_checkParameterExistence(const char *name);
 
 //observe IOP
-typedef void (*mtic_observeCallback)(iop_t iopType, const char *name, iopType_t valueType, void *value, void *myData);
+/**
+ * \var typedef void (*mtic_observeCallback)(iop_t iopType, const char *name, iopType_t valueType, void *value, void * myData)
+ * \ingroup observefct
+ * \brief typedef for the callback used in observe functions
+ */
+typedef void (*mtic_observeCallback)(iop_t iopType, const char* name, iopType_t valueType, void* value, void* myData);
 PUBLIC int mtic_observeInput(const char *name, mtic_observeCallback cb, void *myData);
 PUBLIC int mtic_observeOutput(const char *name, mtic_observeCallback cb, void * myData);
 PUBLIC int mtic_observeParameter(const char *name, mtic_observeCallback cb, void * myData);
