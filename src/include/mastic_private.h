@@ -35,8 +35,7 @@
 
 #include "mastic.h"
 
-//////////////////  structures and enums   //////////////////
-
+//////////////////  STRUCTURES AND ENUMS   //////////////////
 
 /*
  * Define the structure agent_iop (input, output, parameter) :
@@ -48,15 +47,15 @@
  * 'is_muted'   : flag indicated if the iop is muted (specially used for outputs)
  */
 struct agent_iop {
-    const char * name;
+    const char* name;
     iopType_t value_type;
     iop_t type;
     union {
         int i;                  //in accordance to type INTEGER_T ex. '10'
-        double d;               //in accordance to type DOUBLE ex. '10.01'
-        char* s;                //in accordance to type STRING ex. 'display the image'
-        bool b;
-        void* data;             //in accordance to type DATA ex. '{int:x, int:y, string:gesture_name} <=> {int:10, int:45, string:swap}
+        double d;               //in accordance to type DOUBLE_T ex. '10.01'
+        char* s;                //in accordance to type STRING_T ex. 'display the image'
+        bool b;                 //in accordante to type BOOL_T ex. 'true' or 'false'
+        void* data;             //in accordance to type DATA_T ex. '{int:x, int:y, string:gesture_name} <=> {int:10, int:45, string:swap}
     } value;
     long valueSize;
     bool is_muted;
@@ -77,10 +76,10 @@ typedef struct definition definition;
  * 'outputs'                : list of outputs contains by the agent
  */
 typedef struct definition {
-    const char * name; //Need to be unique the key
-    const char * description;
-    const char * version;
-    category * categories;
+    const char* name; //Need to be unique the key
+    const char* description;
+    const char* version;
+    category* categories;
     agent_iop* params_table;
     agent_iop* inputs_table;
     agent_iop* outputs_table;
@@ -97,7 +96,7 @@ typedef struct definition {
  */
 typedef struct category {
     const char* name;
-    const char * version;
+    const char* version;
     agent_iop* params_table;
     agent_iop* inputs_table;
     agent_iop* outputs_table;
@@ -113,60 +112,56 @@ typedef enum {
     INPUT_CAT
 } category_check_type;
 
-
-//model //////////////////
-//nothing for now
-
-
-//mapping //////////////////
 /*
  * Define the state of a mapping ON or OFF
  */
 typedef enum {OFF, ON, INCOMPATIBLE, GENERIC} map_state;
+
 /*
  * Define the structure 'mapping_out' which contains mapping between an input and an (one or all) external agent's output :
- * 'map_id'                 : the key of the table
+ * 'map_id'                 : the key of the table. Need to be unique : the table hash key
  * 'input name'             : agent's input name to connect
  * 'agent name to connect'  : external agent's name to connect with (one or all)
  * 'output name to connect' : external agent(s) output name to connect with
  */
+
 typedef struct mapping_out {
-    int map_id; //Need to be unique : the table hash key
-    char *input_name;
-    char *agent_name;
-    char *output_name;
+    int map_id;
+    char* input_name;
+    char* agent_name;
+    char* output_name;
     map_state state;
     UT_hash_handle hh;
 } mapping_out;
 
 /*
  * Define the structure 'mapping_cat' which contains mapping between an input and an (one or all) external agent's category :
- * 'map_id'                         : the key of the table
+ * 'map_id'                         : the key of the table. Need to be unique : the table hash key
  * 'agent name to connect'          : external agent's name to connect with (one or all)
  * 'category unique name to connect': external agent(s) category to connect with
  */
 typedef struct mapping_cat {
-    int map_cat_id;//Need to be unique : the table hash key
+    int map_cat_id;
     char* agent_name;
-    char *category_name;
+    char*category_name;
     map_state state;
     UT_hash_handle hh;
 } mapping_cat;
 
 /*
  * Define the structure 'mapping' which contains the json description of all mapping (output & category):
- * 'name'           : The name of the mapping need to be unique
+ * 'name'           : The name of the mapping. Need to be unique
  * 'description     :
  * 'version'        :
  * 'mapping out'    : the table of the mapping output
  * 'mapping cat'    : the table of the mapping category
  */
 typedef struct mapping {
-    char *name;//Need to be unique : the table hash key
-    char *description;
-    char *version;
-    mapping_out *map_out;
-    mapping_cat *map_cat;
+    char* name;
+    char* description;
+    char* version;
+    mapping_out* map_out;
+    mapping_cat* map_cat;
     UT_hash_handle hh;
 } mapping;
 
@@ -175,83 +170,82 @@ typedef struct mapping_cat mapping_cat;
 typedef struct mapping mapping;
 
 
-//////////////////  functions and global variables   //////////////////
+//////////////////  FUNCTIONS  //////////////////
 
-//////////////////  definition   //////////////////
-extern definition * mtic_definition_loaded;
-extern definition * mtic_definition_live;
-extern definition * mtic_agents_defs_on_network;
+//  definition
+
+extern definition* mtic_definition_loaded;
+extern definition* mtic_definition_live;
+extern definition* mtic_agents_defs_on_network;
 
 iopType_t string_to_value_type(const char* string);
 bool string_to_boolean(const char* string);
 const char* value_type_to_string (iopType_t type);
 const char* boolean_to_string (bool boole);
 
-int get_iop_value_as_int(agent_iop *iop, iop_t type);
-double get_iop_value_as_double(agent_iop *iop, iop_t type);
+int get_iop_value_as_int(agent_iop*iop, iop_t type);
+double get_iop_value_as_double(agent_iop*iop, iop_t type);
 
 bool check_category (definition* def, category* category, category_check_type check_type);
 bool check_category_agent_iop(agent_iop* def_iop, agent_iop* iop_cat_to_check);
-void free_agent_iop (agent_iop **agent_iop);
+void free_agent_iop (agent_iop** agent_iop);
 void free_category (category* category);
 void free_definition (definition* definition);
 
 
-//////////////////  mapping   //////////////////
+//  mapping
 
-// the table which will contain the mapping
-extern mapping * mtic_my_agent_mapping;
+extern mapping* mtic_my_agent_mapping;
 
 char* mtic_iop_value_to_string (agent_iop* iop);
 const void* mtic_iop_value_string_to_real_type (agent_iop* iop, char* value);
 
-const char * map_state_to_string(map_state state);
+const char* map_state_to_string(map_state state);
 int mtic_map(char* input_name, char* map_description);
-agent_iop* mtic_check_map (definition *definition);
-agent_iop* mtic_unmap (definition *definition);
-agent_iop*  mtic_update_mapping_out_state(mapping_out* map_out, definition * external_definition);
-int mtic_map_received(const char * agent_name,
-                              char * out_name,
-                              void * value,
-                              long size);
+agent_iop* mtic_check_map (definition* definition);
+agent_iop* mtic_unmap (definition* definition);
+agent_iop*  mtic_update_mapping_out_state(mapping_out* map_out, definition* external_definition);
+int mtic_map_received(const char* agent_name, char* out_name, void* value, long size);
 bool mtic_map_category (char* map_description);
 void mapping_FreeMapping (mapping* mapping);
 
 
-//////////////////  model   //////////////////
+// model
+
 extern bool isWholeAgentMuted;
-//agent_iop * model_findIopByName(const char* name, model_state *code);
-agent_iop * model_findIopByName(const char* name, iop_t type);
 
-agent_iop * model_findInputByName(const char * name);
-agent_iop * model_findOutputByName(const char * name);
-agent_iop * model_findParameterByName(const char * name);
+agent_iop* model_findIopByName(const char* name, iop_t type);
+agent_iop* model_findInputByName(const char* name);
+agent_iop* model_findOutputByName(const char* name);
+agent_iop* model_findParameterByName(const char* name);
+agent_iop* mtic_find_iop_by_name_on_definition(const char*name, definition* definition);
+void* mtic_get(const char*name_iop, iop_t type);
 
 
-agent_iop * mtic_find_iop_by_name_on_definition(const char *name, definition* definition);
-void * mtic_get(const char *name_iop, iop_t type);
 // Conversions
+
 char* model_IntToString(const int value);
 char* model_DoubleToString(const double value);
 
 
-//////////////////  network   //////////////////
+// Network
+
 #define AGENT_NAME_DEFAULT "mtic_undefined"
 int network_publishOutput (const char* output_name);
 int network_checkAndSubscribeToPublisher(const char* agentName);
-void mtic_debug(const char *fmt, ...);
+void mtic_debug(const char*fmt, ...);
 
 
-//////////////////  parser   //////////////////
-extern bool agentNameChangedByDefinition;
+// Parser
 
+bool agentNameChangedByDefinition;
 category* load_category (const char* json_str);
 category* load_category_from_path (const char* file_path);
 const char* export_category (category* cat);
 definition* parser_loadDefinition (const char* json_str);
 definition* parser_loadDefinitionFromPath (const char* file_path);
 char* export_definition (definition* def);
-char* export_mapping(mapping * mapp);
+char* export_mapping(mapping* mapp);
 mapping* parser_LoadMap (const char* json_str);
 mapping* parser_LoadMapFromPath (const char* load_file);
 int mtic_init_mapping (const char* mapping_file_path);
