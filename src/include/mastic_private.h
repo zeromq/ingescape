@@ -37,33 +37,20 @@
 
 //////////////////  structures and enums   //////////////////
 
-//definition //////////////////
-/*
- * The variable 'value_type' contains the data type of the value, use to parse
- * the JSON and affect the value tu right union corresponding
- */
-//TODO : replace by iopType_t in mastic.h and remove
-//typedef enum {
-//    INTEGER,
-//    DOUBLE_TYPE,
-//    STRING,
-//    BOOL,
-//    IMPULSION,
-//    STRUCTURE
-//} value_type;
 
 /*
  * Define the structure agent_iop (input, output, parameter) :
- * 'name'       : the input/output/parameter's name
- * 'type'       : the input/output/parameter'value type (int, double, ...)
+ * 'name'       : the input/output/parameter's name. Need to be unique in each type of iop (input/output/parameter)
+ * 'value_type' : the type of the value (int, double, string, impulsion ...)
+ * 'type'       : the type of the iop : input / output / parameter
  * 'value'      : the input/output/parameter'value
- * 'is_muted'   : the input/output/parameter muted
- * NB : it's true that 3 'const char*' are defined and it's useless, only to differentiate in accordance to the type for using ex. 'e1.impulse = 'released()'
+ * 'valueSize'  : the size of the value
+ * 'is_muted'   : flag indicated if the iop is muted (specially used for outputs)
  */
 struct agent_iop {
-    const char * name;          //Need to be unique : the table hash key
+    const char * name;
     iopType_t value_type;
-    iop_t type;          //Size of pointer on data
+    iop_t type;
     union {
         int i;                  //in accordance to type INTEGER_T ex. '10'
         double d;               //in accordance to type DOUBLE ex. '10.01'
@@ -71,8 +58,8 @@ struct agent_iop {
         bool b;
         void* data;             //in accordance to type DATA ex. '{int:x, int:y, string:gesture_name} <=> {int:10, int:45, string:swap}
     } value;
-    long valueSize;          //Size of pointer on data
-    bool is_muted;              // flag indicated if the iop is muted (specially used for outputs)
+    long valueSize;
+    bool is_muted;
     UT_hash_handle hh;         /* makes this structure hashable */
 };
 
@@ -215,8 +202,8 @@ void free_definition (definition* definition);
 // the table which will contain the mapping
 extern mapping * mtic_my_agent_mapping;
 
-MASTICAPI_COMMON_DLLSPEC char* mtic_iop_value_to_string (agent_iop* iop);
-MASTICAPI_COMMON_DLLSPEC const void* mtic_iop_value_string_to_real_type (agent_iop* iop, char* value);
+char* mtic_iop_value_to_string (agent_iop* iop);
+const void* mtic_iop_value_string_to_real_type (agent_iop* iop, char* value);
 
 const char * map_state_to_string(map_state state);
 int mtic_map(char* input_name, char* map_description);
