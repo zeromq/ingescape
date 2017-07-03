@@ -487,18 +487,19 @@ int definition_setIopValue(agent_iop *iop, void * value, long size)
     return 1;
 }
 
-agent_iop* definition_createIop(const char *name, iopType_t type, void *value, long size)
+agent_iop* definition_createIop(const char *name, iop_t type, iopType_t value_type, void *value, long size)
 {
     //Create the iop
     agent_iop *iop = NULL;
     iop = calloc (1, sizeof (struct agent_iop));
     iop->name = strdup(name);
-    iop->value_type = type;
+    iop->type = type;
+    iop->value_type = value_type;
 
     //Set value
 //    agent_iop *ret = NULL;
 //    ret = calloc (1, sizeof (struct agent_iop));
-    definition_setIopValue(iop,value, size);
+    definition_setIopValue(iop, value, size);
 
     return iop;
 }
@@ -700,18 +701,18 @@ int mtic_setDefinitionVersion(char *version){
  * \todo value must be copied in function : copied in definition_setIopValue (is it ok ?)
  */
 
-int mtic_createInput(const char *name, iopType_t type, void *value, long size){ //value must be copied in function : copied in definition_setIopValue
+int mtic_createInput(const char *name, iopType_t value_type, void *value, long size){ //value must be copied in function : copied in definition_setIopValue
 
     //Create the iop
-    agent_iop* iop = definition_createIop(name,type,value, size);
+    agent_iop* iop = definition_createIop(name, INPUT_T, value_type, value, size);
 
     //Add iop in structure def loaded, need to be copied
-    if (definition_addIop(iop,INPUT_T, &mtic_definition_loaded) < 1){
+    if (definition_addIop(iop, INPUT_T, &mtic_definition_loaded) < 1){
         return 0;
     }
 
     //Add iop in structure def live, need to be copied
-    if (definition_addIop(iop,INPUT_T, &mtic_definition_live) < 1){
+    if (definition_addIop(iop, INPUT_T, &mtic_definition_live) < 1){
         return -1;
     }
 
@@ -733,17 +734,17 @@ int mtic_createInput(const char *name, iopType_t type, void *value, long size){ 
  * \todo value must be copied in function (is it ok ?)
  */
 
-int mtic_createOutput(const char *name, iopType_t type, void *value, long size){ //value must be copied in function
+int mtic_createOutput(const char *name, iopType_t value_type, void *value, long size){ //value must be copied in function
     //Create the iop
-    agent_iop* iop = definition_createIop(name,type,value, size);
+    agent_iop* iop = definition_createIop(name, OUTPUT_T, value_type, value, size);
 
     //Add iop in structure def loaded, need to be copied
-    if (definition_addIop(iop,OUTPUT_T, &mtic_definition_loaded) < 1){
+    if (definition_addIop(iop, OUTPUT_T, &mtic_definition_loaded) < 1){
         return 0;
     }
 
     //Add iop in structure def live, need to be copied
-    if (definition_addIop(iop,OUTPUT_T, &mtic_definition_live) < 1){
+    if (definition_addIop(iop, OUTPUT_T, &mtic_definition_live) < 1){
         return -1;
     }
 
@@ -764,17 +765,17 @@ int mtic_createOutput(const char *name, iopType_t type, void *value, long size){
  * \return The error. 1 is OK, 0 not able to add in definition loaded, -1 not able to add in definition live
  * \todo value must be copied in function (is it ok ?)
  */
-int mtic_createParameter(const char *name, iopType_t type, void *value, long size){ //value must be copied in function
+int mtic_createParameter(const char *name, iopType_t value_type, void *value, long size){ //value must be copied in function
     //Create the iop
-    agent_iop* iop = definition_createIop(name,type,value, size);
+    agent_iop* iop = definition_createIop(name, PARAMETER_T, value_type, value, size);
 
     //Add iop in structure def loaded, need to be copied
-    if (definition_addIop(iop,PARAMETER_T, &mtic_definition_loaded) < 1){
+    if (definition_addIop(iop, PARAMETER_T, &mtic_definition_loaded) < 1){
         return 0;
     }
 
     //Add iop in structure def live, need to be copied
-    if (definition_addIop(iop,PARAMETER_T, &mtic_definition_live) < 1){
+    if (definition_addIop(iop, PARAMETER_T, &mtic_definition_live) < 1){
         return -1;
     }
 

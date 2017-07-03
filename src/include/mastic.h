@@ -169,7 +169,7 @@ PUBLIC int mtic_setDefinitionDescription(char *description);
 PUBLIC int mtic_setDefinitionVersion(char *version);
 
 //edit the definition using the API
-PUBLIC int mtic_createInput(const char *name, iopType_t type, void *value, long size); //value must be copied in function
+PUBLIC int mtic_createInput(const char *name, iopType_t value_type, void *value, long size); //value must be copied in function
 PUBLIC int mtic_createOutput(const char *name, iopType_t type, void *value, long size); //value must be copied in function
 PUBLIC int mtic_createParameter(const char *name, iopType_t type, void *value, long size); //value must be copied in function
 

@@ -2734,7 +2734,7 @@ int mtic_observeParameter(const char *name, mtic_observeCallback cb, void * myDa
  * \todo write definition
  */
 int mtic_muteOutput(const char *name){
-    agent_iop *iop = model_findIopByName((char*) name,OUTPUT_T);
+    agent_iop *iop = model_findIopByName((char*) name, OUTPUT_T);
     if(iop == NULL || iop->type != OUTPUT_T){
         mtic_debug("%s : output '%s' cannot be found", __FUNCTION__, name);
         return 0;
