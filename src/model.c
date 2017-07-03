@@ -1154,7 +1154,7 @@ char* mtic_readOutputAsString(const char *name){
  * \param size The size of the data read
  * \return Return 1 if it is OK or 0 if not.
  */
-int mtic_readOutputAsData(const char *name, void **data, long *size){ //allocs data structure to be disposed by caller
+int mtic_readOutputAsData(const char *name, void **data, long *size){
     //Get the pointer IOP Agent selected by name
     model_state state;
     agent_iop *iop = model_findIopByName((char*) name,OUTPUT_T, &state);
@@ -1433,7 +1433,7 @@ char* mtic_readParameterAsString(const char *name){
  * \param size The size of the data read
  * \return Return 1 if it is OK or 0 if not.
  */
-int mtic_readParameterAsData(const char *name, void **data, long *size){ //allocs data structure to be disposed by caller
+int mtic_readParameterAsData(const char *name, void **data, long *size){
     //Get the pointer IOP Agent selected by name
     model_state state;
     agent_iop *iop = model_findIopByName((char*) name,PARAMETER_T, &state);
