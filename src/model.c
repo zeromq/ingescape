@@ -1898,7 +1898,7 @@ int mtic_writeOutputAsBool(const char *name, bool value){
         fct_to_call->callback_ptr(OUTPUT_T, name, BOOL_T, (void*) &value, fct_to_call->data);
 
     // If iop is output : publish
-    if(state == TYPE_OUTPUT)
+    if(iop->type == OUTPUT_T)
         network_publishOutput(name);
 
     return 1;
@@ -1941,7 +1941,7 @@ int mtic_writeOutputAsInt(const char *name, int value){
         fct_to_call->callback_ptr(OUTPUT_T, name, INTEGER_T, (void*) &value, fct_to_call->data);
 
     // If iop is output : publish
-    if(state == TYPE_OUTPUT)
+    if(iop->type == OUTPUT_T)
         network_publishOutput(name);
 
     return 1;
@@ -1985,7 +1985,7 @@ int mtic_writeOutputAsDouble(const char *name, double value){
         fct_to_call->callback_ptr(OUTPUT_T, name, DOUBLE_T, (void*) &value, fct_to_call->data);
 
     // If iop is output : publish
-    if(state == TYPE_OUTPUT)
+    if(iop->type == OUTPUT_T)
         network_publishOutput(name);
 
     return 1;
@@ -2028,7 +2028,7 @@ int mtic_writeOutputAsString(const char *name, char *value){
         fct_to_call->callback_ptr(OUTPUT_T, name, STRING_T, (void*) value, fct_to_call->data);
 
     // If iop is output : publish
-    if(state == TYPE_OUTPUT)
+    if(iop->type == OUTPUT_T)
         network_publishOutput(name);
 
     return 1;
@@ -2071,7 +2071,7 @@ int mtic_writeOutputAsImpulsion(const char *name){
         fct_to_call->callback_ptr(OUTPUT_T, name, IMPULSION_T, 0, fct_to_call->data);
 
     // If iop is output : publish
-    if(state == TYPE_OUTPUT)
+    if(iop->type == OUTPUT_T)
         network_publishOutput(name);
 
     return 1;
@@ -2115,7 +2115,7 @@ int mtic_writeOutputAsData(const char *name, void *value, long size){
         fct_to_call->callback_ptr(OUTPUT_T, name, DATA_T, value, fct_to_call->data);
 
     // If iop is output : publish
-    if(state == TYPE_OUTPUT)
+    if(iop->type == OUTPUT_T)
         network_publishOutput(name);
     
     return 1;
