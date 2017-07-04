@@ -491,11 +491,11 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     myDefinition = NULL;
                 }
                 
-                //TODO : think about the stuff below to see if it is really necessary
-                // NB - subscriber destruction :
-                // The subscriber is destroyed at the reconnection
-                // or at the end of the execution. It's made safer for czmq
-                // sub sockets to terminate that way.
+                //NB: agents can take time to reconnect or be reconnected before we
+                //get a timeout for the initial discconection.
+                //Therefor, to avoid duplication of subscribers, we destroy subscribers either
+                //when our own agent is stopping (after mainloop stop in initActor)
+                //or when an agent reconnects with the same peer id (i.e. it is the same agent as before)
 
             }
 
