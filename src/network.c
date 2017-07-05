@@ -13,8 +13,15 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#include <unistd.h>
+
+#ifdef _WIN32
+#endif
+#ifdef __linux__
+    #include <unistd.h>
+#endif
+#ifdef __APPLE__
 #include <libproc.h>
+#endif
 
 #include <zyre.h>
 #include <czmq.h>
@@ -545,10 +552,15 @@ initActor (zsock_t *pipe, void *args)
 #if defined __unix__ || defined __APPLE__
     int ret;
     pid_t pid;
-    char pathbuf[PROC_PIDPATHINFO_MAXSIZE];
-    
+
     pid = getpid();
+#ifdef __APPLE__
+    char pathbuf[PROC_PIDPATHINFO_MAXSIZE];
     ret = proc_pidpath (pid, pathbuf, sizeof(pathbuf));
+#else
+    char pathbuf[4*1024];
+    ret = readlink("/proc/self/exe", pathbuf, sizeof(pathbuf));
+#endif
     if ( ret <= 0 ) {
         mtic_debug("PID %d: proc_pidpath ();\n", pid);
         mtic_debug("    %s\n", strerror(errno));
@@ -562,11 +574,25 @@ initActor (zsock_t *pipe, void *args)
 #ifdef _WIN32
     WSADATA wsaData;
     WSAStartup(MAKEWORD(2,2), &wsaData);
-    //TODO: use GetModuleFileName() to get exec path
-    //TODO get PID as well
-    //zyre_set_header(agentElements->node, "execpath", "%s", pathbuf);
-    //zyre_set_header(agentElements->node, "pid", "%i", pid);
+
+    //Use GetModuleFileName() to get exec path
+    WCHAR temp[MAX_PATH];
+    GetModuleFileName(NULL,temp,MAX_PATH);
+
+    //Conversion in char *
+    char exeFilePath[MAX_PATH];
+    wcstombs_s(NULL,exeFilePath,sizeof(exeFilePath),temp,sizeof(temp));
+
+    //Get PID as well
+    DWORD pid = GetCurrentProcessId();
+
+    mtic_debug("proc %d: %s\n", (int)pid, exeFilePath);
+
+    //Add to header
+    zyre_set_header(agentElements->node, "execpath", "%s", exeFilePath);
+    zyre_set_header(agentElements->node, "pid", "%i", (int)pid);
 #endif
+
     char hostname[1024];
     hostname[1023] = '\0';
     gethostname(hostname, 1023);
