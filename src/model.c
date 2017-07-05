@@ -1738,10 +1738,6 @@ int mtic_writeInputAsImpulsion(const char *name){
         return 0;
     }
 
-    //TODO: remove this code ? just call the callback
-    // update the value in the iop_live structure
-    //update_value(iop, (void*) value);
-
     // call the callback associated to if it exist
     mtic_observe_callback_T *fct_to_call;
     HASH_FIND_STR(agent_callbacks, name, fct_to_call);
@@ -1760,11 +1756,8 @@ int mtic_writeInputAsImpulsion(const char *name){
  * \param value is a data to write in the input
  * \param size the size of the value
  * \return 1 if ok else 0
- * \todo write the function
  */
 int mtic_writeInputAsData(const char *name, void *value, long size){
-    //TODO : remove this line
-    //    fprintf(stderr, "WARNING - %s not implemented yet !\n", __FUNCTION__);
 
     //Get the pointer IOP Agent selected by name
     agent_iop *iop = model_findIopByName((char*) name,INPUT_T);
@@ -1982,10 +1975,6 @@ int mtic_writeOutputAsImpulsion(const char *name){
         mtic_debug("%s: Agent's output '%s' is not a impulsion\n", __FUNCTION__,  name);
         return 0;
     }
-
-    //TODO: remove this useless code ?
-    // update the value in the iop_live structure
-    //update_value(iop, (void*) &value);
 
     // call the callback associated to if it exist
     mtic_observe_callback_T *fct_to_call;
