@@ -13,10 +13,14 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+
 #ifdef _WIN32
-#else
+#endif
+#ifdef __linux__
     #include <unistd.h>
-    #include <libproc.h>
+#endif
+#ifdef __APPLE__
+#include <libproc.h>
 #endif
 
 #include <zyre.h>
@@ -550,10 +554,15 @@ initActor (zsock_t *pipe, void *args)
 #if defined __unix__ || defined __APPLE__
     int ret;
     pid_t pid;
-    char pathbuf[PROC_PIDPATHINFO_MAXSIZE];
-    
+
     pid = getpid();
+#ifdef __APPLE__
+    char pathbuf[PROC_PIDPATHINFO_MAXSIZE];
     ret = proc_pidpath (pid, pathbuf, sizeof(pathbuf));
+#else
+    char pathbuf[4*1024];
+    ret = readlink("/proc/self/exe", pathbuf, sizeof(pathbuf));
+#endif
     if ( ret <= 0 ) {
         mtic_debug("PID %d: proc_pidpath ();\n", pid);
         mtic_debug("    %s\n", strerror(errno));
