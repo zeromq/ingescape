@@ -416,7 +416,7 @@ bool check_iop_type(char * input_name,
         return false;
 
     //Check if the type iop (input -> output) is correct
-    if(input->type != output->type){
+    if(input->value_type != output->value_type){
         fprintf (stderr, "%s : Incompatibility of the type between input named :'%s' & output named : '%s' \n",
                  __FUNCTION__,
                  input->name,
