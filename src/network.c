@@ -354,57 +354,67 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
             while ((k = (char *)zlist_pop(keys))) {
                 v = zyre_event_header (zyre_event,k);
                 mtic_debug("\t%s -> %s\n", k, v);
-                char endpointAddress[128];
-                strncpy(endpointAddress, address, 128);
-                char *insert = endpointAddress + strlen(endpointAddress);
-                bool extractOK = true;
-                while (*insert != ':'){
-                    insert--;
-                    if (insert == endpointAddress){
-                        mtic_debug("Error: could not extract port from address %s", address);
-                        extractOK = false;
-                        break;
-                    }
-                }
-                if (extractOK){
-                    *(insert + 1) = '\0';
-                    strcat(endpointAddress, v);
-                    
-                    if (strcmp(k, "publisher") == 0){
-                        //we found a possible publisher to subscribe to
-                        subscriber_t *subscriber;
-                        HASH_FIND_STR(subscribers, peer, subscriber);
-                        if (subscriber != NULL){
-                            //Agent is already know and not cleaned: this is a case of reconnection
-                            mtic_debug("\t\tDestroy subscriber structure for agent %s\n",subscriber->agentName);
-                            HASH_DEL(subscribers, subscriber);
-                            zloop_poller_end(agentElements->loop , subscriber->pollItem);
-                            zsock_destroy(&subscriber->subscriber);
-                            free((char*)subscriber->agentName);
-                            free((char*)subscriber->agentPeerId);
-                            free(subscriber->pollItem);
-                            free(subscriber->subscriber);
-                            subscriber->subscriber = NULL;
-                            free(subscriber);
-                            subscriber = NULL;
-                            
+
+                // FIXME need to extract pid, execPath
+                // we extract the publisher adress to subscribe to from the zyre message header
+                if(strncmp(k,"publisher", strlen("publisher")) == 0)
+                {
+                    char endpointAddress[128];
+                    strncpy(endpointAddress, address, 128);
+
+                    // IP adress extraction 
+                    char *insert = endpointAddress + strlen(endpointAddress);
+                    bool extractOK = true;
+                    while (*insert != ':'){
+                        insert--;
+                        if (insert == endpointAddress){
+                            mtic_debug("Error: could not extract port from address %s", address);
+                            extractOK = false;
+                            break;
                         }
-                        subscriber = calloc(1, sizeof(subscriber_t));
-                        subscriber->agentName = strdup(name);
-                        subscriber->agentPeerId = strdup (peer);
-                        subscriber->subscriber = zsock_new_sub(endpointAddress, NULL);
-                        assert(subscriber->subscriber);
-                        HASH_ADD_STR(subscribers, agentPeerId, subscriber);
-                        subscriber->pollItem = calloc(1, sizeof(zmq_pollitem_t));
-                        subscriber->pollItem->socket = zsock_resolve(subscriber->subscriber);
-                        subscriber->pollItem->fd = 0;
-                        subscriber->pollItem->events = ZMQ_POLLIN;
-                        subscriber->pollItem->revents = 0;
-                        zloop_poller (agentElements->loop, subscriber->pollItem, manageSubscription, (void*)subscriber->agentPeerId);
-                        zloop_poller_set_tolerant(loop, subscriber->pollItem);
-                        mtic_debug("\t\tSubscriber created for %s at %s.\n",subscriber->agentName,endpointAddress);
+                    }
+
+                    if (extractOK){
+                        *(insert + 1) = '\0';
+                        strcat(endpointAddress, v);
+
+                        if (strcmp(k, "publisher") == 0){
+                            //we found a possible publisher to subscribe to
+                            subscriber_t *subscriber;
+                            HASH_FIND_STR(subscribers, peer, subscriber);
+                            if (subscriber != NULL){
+                                //Agent is already know and not cleaned: this is a case of reconnection
+                                mtic_debug("\t\tDestroy subscriber structure for agent %s\n",subscriber->agentName);
+                                HASH_DEL(subscribers, subscriber);
+                                zloop_poller_end(agentElements->loop , subscriber->pollItem);
+                                zsock_destroy(&subscriber->subscriber);
+                                free((char*)subscriber->agentName);
+                                free((char*)subscriber->agentPeerId);
+                                free(subscriber->pollItem);
+                                free(subscriber->subscriber);
+                                subscriber->subscriber = NULL;
+                                free(subscriber);
+                                subscriber = NULL;
+
+                            }
+                            subscriber = calloc(1, sizeof(subscriber_t));
+                            subscriber->agentName = strdup(name);
+                            subscriber->agentPeerId = strdup (peer);
+                            subscriber->subscriber = zsock_new_sub(endpointAddress, NULL);
+                            assert(subscriber->subscriber);
+                            HASH_ADD_STR(subscribers, agentPeerId, subscriber);
+                            subscriber->pollItem = calloc(1, sizeof(zmq_pollitem_t));
+                            subscriber->pollItem->socket = zsock_resolve(subscriber->subscriber);
+                            subscriber->pollItem->fd = 0;
+                            subscriber->pollItem->events = ZMQ_POLLIN;
+                            subscriber->pollItem->revents = 0;
+                            zloop_poller (agentElements->loop, subscriber->pollItem, manageSubscription, (void*)subscriber->agentPeerId);
+                            zloop_poller_set_tolerant(loop, subscriber->pollItem);
+                            mtic_debug("\t\tSubscriber created for %s at %s.\n",subscriber->agentName,endpointAddress);
+                        }
                     }
                 }
+
                 free(k);
             }
             zlist_destroy(&keys);
