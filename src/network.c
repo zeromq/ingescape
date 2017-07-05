@@ -579,10 +579,13 @@ initActor (zsock_t *pipe, void *args)
     //Get PID as well
     DWORD pid = GetCurrentProcessId();
 
+    mtic_debug("proc %d: %s\n", (int)pid, exeFilePath);
+
     //Add to header
     zyre_set_header(agentElements->node, "execpath", "%s", exeFilePath);
     zyre_set_header(agentElements->node, "pid", "%i", (int)pid);
 #endif
+
     char hostname[1024];
     hostname[1023] = '\0';
     gethostname(hostname, 1023);
