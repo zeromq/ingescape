@@ -198,14 +198,13 @@ void free_definition (definition* definition);
 extern mapping* mtic_my_agent_mapping;
 
 char* mtic_iop_value_to_string (agent_iop* iop);
-const void* mtic_iop_value_string_to_real_type (agent_iop* iop, char* value);
 
 const char* map_state_to_string(map_state state);
 int mtic_map(char* input_name, char* map_description);
 agent_iop* mtic_check_map (definition* definition);
 agent_iop* mtic_unmap (definition* definition);
 agent_iop*  mtic_update_mapping_out_state(mapping_out* map_out, definition* external_definition);
-int mtic_map_received(const char* agent_name, char* out_name, void* value, long size);
+int mtic_map_received(const char* agent_name, char* out_name, char* value, long size);
 bool mtic_map_category (char* map_description);
 void mapping_FreeMapping (mapping* mapping);
 

@@ -112,10 +112,10 @@ PUBLIC double mtic_readParameterAsDouble(const char *name);
 PUBLIC char* mtic_readParameterAsString(const char *name);
 PUBLIC int mtic_readParameterAsData(const char *name, void **data, long *size);
 
-//write using void*
-PUBLIC int mtic_writeInput(const char *name, void *value, long size);
-PUBLIC int mtic_writeOutput(const char *name, void *value, long size);
-PUBLIC int mtic_writeParameter(const char *name, void *value, long size);
+//write using values in a string format
+PUBLIC int mtic_writeInput(const char *name, char *value, long size);
+PUBLIC int mtic_writeOutput(const char *name, char *value, long size);
+PUBLIC int mtic_writeParameter(const char *name, char *value, long size);
 
 //write per type
 PUBLIC int mtic_writeInputAsBool(const char *name, bool value);

@@ -383,7 +383,7 @@ int mtic_map (char* input_name,char* map_description){
     return result;
 }
 
-int mtic_map_received(const char *agent_name, char *out_name, void *value, long size){
+int mtic_map_received(const char *agent_name, char *out_name, char *value, long size){
     mapping_out *temp;
     int state = 1;
 

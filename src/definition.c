@@ -287,54 +287,6 @@ char* mtic_iop_value_to_string (agent_iop* iop)
     return strdup(str_value);
 }
 
-const void* mtic_iop_value_string_to_real_type (agent_iop* iop, char* value)
-{
-    void * out_value = NULL;
-    
-    double* double_value = NULL;
-    int* int_value = NULL;
-    bool* bool_value = NULL;
-    char* str_value = NULL;
-    
-    if(iop != NULL)
-    {
-        switch (iop->value_type) {
-            case INTEGER_T:
-                int_value=(int*)malloc(sizeof(int));
-                sscanf(value, "%i", int_value);
-                out_value = (void*) int_value;
-                break;
-            case DOUBLE_T:
-                double_value=(double*)malloc(sizeof(double));
-                sscanf(value, "%lf", double_value);
-                
-                out_value = (void*) double_value;
-                break;
-            case BOOL_T:
-                bool_value=(bool*)malloc(sizeof(bool));
-                if(strcmp(value,"true") == 0)
-                {
-                    *bool_value = true;
-                } else {
-                    *bool_value = false;
-                }
-                out_value = (void*) bool_value;
-                break;
-            case STRING_T:
-            case IMPULSION_T:
-            case DATA_T:
-                str_value=(char*)malloc(BUFSIZ*sizeof(char));
-                sscanf(value,"%s",str_value);
-                out_value = (void*) str_value;
-                break;
-            default:
-                break;
-        }
-    }
-    
-    return out_value;
-}
-
 int get_iop_value_as_int(agent_iop *iop, iop_t type){
     int val = *(int *)(mtic_get(iop->name,type));
     return val;

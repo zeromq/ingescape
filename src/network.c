@@ -295,11 +295,11 @@ int manageSubscription (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                                               0);
                         }else{
                             char * value = zmsg_popstr(msg);
-                            const void* converted_value = mtic_iop_value_string_to_real_type(found_iop, value);
+
                             // Map reception send to update the internal model
                             mtic_map_received(foundSubscriber->agentName,
                                               output,
-                                              (void*)converted_value,
+                                              value,
                                               0);
                             free(value);
                         }
@@ -374,40 +374,38 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                         *(insert + 1) = '\0';
                         strcat(endpointAddress, v);
 
-                        if (strcmp(k, "publisher") == 0){
-                            //we found a possible publisher to subscribe to
-                            subscriber_t *subscriber;
-                            HASH_FIND_STR(subscribers, peer, subscriber);
-                            if (subscriber != NULL){
-                                //Agent is already know and not cleaned: this is a case of reconnection
-                                mtic_debug("\t\tDestroy subscriber structure for agent %s\n",subscriber->agentName);
-                                HASH_DEL(subscribers, subscriber);
-                                zloop_poller_end(agentElements->loop , subscriber->pollItem);
-                                zsock_destroy(&subscriber->subscriber);
-                                free((char*)subscriber->agentName);
-                                free((char*)subscriber->agentPeerId);
-                                free(subscriber->pollItem);
-                                free(subscriber->subscriber);
-                                subscriber->subscriber = NULL;
-                                free(subscriber);
-                                subscriber = NULL;
+                        //we found a possible publisher to subscribe to
+                        subscriber_t *subscriber;
+                        HASH_FIND_STR(subscribers, peer, subscriber);
+                        if (subscriber != NULL){
+                            //Agent is already know and not cleaned: this is a case of reconnection
+                            mtic_debug("\t\tDestroy subscriber structure for agent %s\n",subscriber->agentName);
+                            HASH_DEL(subscribers, subscriber);
+                            zloop_poller_end(agentElements->loop , subscriber->pollItem);
+                            zsock_destroy(&subscriber->subscriber);
+                            free((char*)subscriber->agentName);
+                            free((char*)subscriber->agentPeerId);
+                            free(subscriber->pollItem);
+                            free(subscriber->subscriber);
+                            subscriber->subscriber = NULL;
+                            free(subscriber);
+                            subscriber = NULL;
 
-                            }
-                            subscriber = calloc(1, sizeof(subscriber_t));
-                            subscriber->agentName = strdup(name);
-                            subscriber->agentPeerId = strdup (peer);
-                            subscriber->subscriber = zsock_new_sub(endpointAddress, NULL);
-                            assert(subscriber->subscriber);
-                            HASH_ADD_STR(subscribers, agentPeerId, subscriber);
-                            subscriber->pollItem = calloc(1, sizeof(zmq_pollitem_t));
-                            subscriber->pollItem->socket = zsock_resolve(subscriber->subscriber);
-                            subscriber->pollItem->fd = 0;
-                            subscriber->pollItem->events = ZMQ_POLLIN;
-                            subscriber->pollItem->revents = 0;
-                            zloop_poller (agentElements->loop, subscriber->pollItem, manageSubscription, (void*)subscriber->agentPeerId);
-                            zloop_poller_set_tolerant(loop, subscriber->pollItem);
-                            mtic_debug("\t\tSubscriber created for %s at %s.\n",subscriber->agentName,endpointAddress);
                         }
+                        subscriber = calloc(1, sizeof(subscriber_t));
+                        subscriber->agentName = strdup(name);
+                        subscriber->agentPeerId = strdup (peer);
+                        subscriber->subscriber = zsock_new_sub(endpointAddress, NULL);
+                        assert(subscriber->subscriber);
+                        HASH_ADD_STR(subscribers, agentPeerId, subscriber);
+                        subscriber->pollItem = calloc(1, sizeof(zmq_pollitem_t));
+                        subscriber->pollItem->socket = zsock_resolve(subscriber->subscriber);
+                        subscriber->pollItem->fd = 0;
+                        subscriber->pollItem->events = ZMQ_POLLIN;
+                        subscriber->pollItem->revents = 0;
+                        zloop_poller (agentElements->loop, subscriber->pollItem, manageSubscription, (void*)subscriber->agentPeerId);
+                        zloop_poller_set_tolerant(loop, subscriber->pollItem);
+                        mtic_debug("\t\tSubscriber created for %s at %s.\n",subscriber->agentName,endpointAddress);
                     }
                 }
 
