@@ -506,8 +506,7 @@ static void json_dump_iop (yajl_gen *g, agent_iop* aiop) {
             yajl_gen_string(*g, (const unsigned char *) "", 0);
             break;
         case DATA_T:
-        //TODO : DATA TYPE
-            yajl_gen_string(*g, (const unsigned char *) "", 0);
+            yajl_gen_string(*g, (const unsigned char *) aiop->value.data, aiop->valueSize-1);
             break;
         default:
             fprintf(stderr, "%s - ERROR -  unknown data type to convert in string\n", __FUNCTION__);

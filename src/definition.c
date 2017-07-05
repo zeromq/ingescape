@@ -273,11 +273,9 @@ char* mtic_iop_value_to_string (agent_iop* iop)
                 sprintf(str_value,"%s",iop->value.s);
                 break;
             case IMPULSION_T:
-                sprintf(str_value,"");
                 break;
             case DATA_T:
-                //TODO : DATA TYPE
-                //sprintf(str_value,"%s",iop->value.data);
+                sprintf(str_value,"%s", (char*) iop->value.data);
                 break;
             default:
                 break;
