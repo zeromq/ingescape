@@ -409,17 +409,15 @@ int definition_addIop(agent_iop *iop, iop_t iop_type, definition **def)
 ////////////////////////////////////////////////////////////////////////
 
 /**
- *  \defgroup loadSetGetDefFct Agent's definition: Load / Clear / set / get functions
+ *  \defgroup loadSetGetDefFct Agent's definition: Load / Clear / Set / Get functions
  *
  */
 
 /**
  * \fn int mtic_clearDefinition()
  * \ingroup loadSetGetDefFct
- * \brief
- * \return The error.
- * \todo write documentation
- * \todo write the function
+ * \brief Clear the internal definition of the agent.
+ * \return 1 if ok else 0
  */
 int mtic_clearDefinition(){
 
@@ -547,10 +545,9 @@ int mtic_setDefinitionVersion(char *version){
  * \param type The Iop type : input, output or parameter
  * \param value The pointer on the value (the value will be copied)
  * \return The error. 1 is OK, 0 not able to add in definition loaded, -1 not able to add in definition live
- * \todo value must be copied in function : copied in definition_setIopValue (is it ok ?)
  */
 
-int mtic_createInput(const char *name, iopType_t value_type, void *value, long size){ //value must be copied in function : copied in definition_setIopValue
+int mtic_createInput(const char *name, iopType_t value_type, void *value, long size){
 
     //Create the iop
     agent_iop* iop = definition_createIop(name, INPUT_T, value_type, value, size);
@@ -580,10 +577,9 @@ int mtic_createInput(const char *name, iopType_t value_type, void *value, long s
  * \param type The Iop type : input, output or parameter
  * \param value The pointer on the value (the value will be copied)
  * \return The error. 1 is OK, 0 not able to add in definition loaded, -1 not able to add in definition live
- * \todo value must be copied in function (is it ok ?)
  */
 
-int mtic_createOutput(const char *name, iopType_t value_type, void *value, long size){ //value must be copied in function
+int mtic_createOutput(const char *name, iopType_t value_type, void *value, long size){
     //Create the iop
     agent_iop* iop = definition_createIop(name, OUTPUT_T, value_type, value, size);
 
@@ -612,9 +608,8 @@ int mtic_createOutput(const char *name, iopType_t value_type, void *value, long 
  * \param type The Iop type : input, output or parameter
  * \param value The pointer on the value (the value will be copied)
  * \return The error. 1 is OK, 0 not able to add in definition loaded, -1 not able to add in definition live
- * \todo value must be copied in function (is it ok ?)
  */
-int mtic_createParameter(const char *name, iopType_t value_type, void *value, long size){ //value must be copied in function
+int mtic_createParameter(const char *name, iopType_t value_type, void *value, long size){
     //Create the iop
     agent_iop* iop = definition_createIop(name, PARAMETER_T, value_type, value, size);
 

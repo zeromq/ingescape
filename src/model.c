@@ -1997,7 +1997,6 @@ int mtic_writeOutputAsImpulsion(const char *name){
  * \param value is a data to write in the output
  * \param size the size of the value
  * \return 1 if ok else 0
- * \todo write the function
  */
 int mtic_writeOutputAsData(const char *name, void *value, long size){
     //Get the pointer IOP Agent selected by name
@@ -2192,7 +2191,6 @@ int mtic_writeParameterAsString(const char *name, char *value){
  * \param value is a data to write in the parameter
  * \param size the size of the value
  * \return 1 if ok else 0
- * \todo write the function
  */
 int mtic_writeParameterAsData(const char *name, void *value, long size){
     //Get the pointer IOP Agent selected by name
@@ -2685,10 +2683,9 @@ int mtic_observeParameter(const char *name, mtic_observeCallback cb, void * myDa
 /**
  * \fn int mtic_muteOutput(const char *name)
  * \ingroup muteiopFct
- * \brief
- * \param name
+ * \brief mute an agent output
+ * \param name is the name of the agent output
  * \return 1 if correct or 0
- * \todo write definition
  */
 int mtic_muteOutput(const char *name){
     agent_iop *iop = model_findIopByName((char*) name, OUTPUT_T);
@@ -2703,10 +2700,9 @@ int mtic_muteOutput(const char *name){
 /**
  * \fn int mtic_unmuteOutput(const char *name)
  * \ingroup muteiopFct
- * \brief
- * \param name
+ * \brief unmute an agent output
+ * \param name is the name of the agent output
  * \return 1 if correct or 0
- * \todo write definition
  */
 int mtic_unmuteOutput(const char *name){
     agent_iop *iop = model_findIopByName((char*) name,OUTPUT_T);
@@ -2721,10 +2717,9 @@ int mtic_unmuteOutput(const char *name){
 /**
  * \fn bool mtic_isOutputMuted(const char *name)
  * \ingroup muteiopFct
- * \brief
- * \param name
- * \return
- * \todo write definition
+ * \brief Give the state of an agent output (mute/unmute)
+ * \param name is the name of the agent output
+ * \return true if muted else false
  */
 bool mtic_isOutputMuted(const char *name){
     agent_iop *iop = model_findIopByName((char*) name,OUTPUT_T);

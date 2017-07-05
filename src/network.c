@@ -849,12 +849,10 @@ int network_checkAndSubscribeToPublisher(const char* agentName)
 /**
  * \fn int mtic_startWithDevice(const char *networkDevice, int port)
  * \ingroup startStopKillFct
- * \brief
- * \param networkDevice
- * \param port
- * \return
- * \todo write documentation
- * \todo warning if agent name not defined
+ * \brief Start an agent on a specific network device and network port.
+ * \param networkDevice is the name of the network device (ex: eth0, ens2 ...)
+ * \param port is the network port number used
+ * \return 1 if ok, else 0.
  */
 int mtic_startWithDevice(const char *networkDevice, int port){
     
@@ -982,12 +980,10 @@ int mtic_startWithDevice(const char *networkDevice, int port){
 /**
  * \fn int mtic_startWithIP(const char *ipAddress, int port)
  * \ingroup startStopKillFct
- * \brief
- * \param ipAddress
- * \param port
- * \return
- * \todo write documentation
- * \todo warning if agent name not defined
+ * \brief Start an agent on a specific network IP and network port.
+ * \param ipAddress is the ip address on network
+ * \param port s the network port number used
+ * \return 1 if ok, else 0.
  */
 int mtic_startWithIP(const char *ipAddress, int port){
     if (agentElements != NULL){
@@ -1017,9 +1013,8 @@ int mtic_startWithIP(const char *ipAddress, int port){
 /**
  * \fn int mtic_stop()
  * \ingroup startStopKillFct
- * \brief
- * \return
- * \todo write documentation
+ * \brief Stop the network layer of an agent.
+ * \return 1 if ok, else 0.
  */
 int mtic_stop(){
     if (agentElements != NULL){
@@ -1045,9 +1040,7 @@ int mtic_stop(){
 /**
  * \fn void mtic_die()
  * \ingroup startStopKillFct
- * \brief
- * \return
- * \todo write documentation
+ * \brief Stop and kill an agent.
  */
 void mtic_die(){
     mtic_stop();
@@ -1057,10 +1050,9 @@ void mtic_die(){
 /**
  * \fn int mtic_setAgentName(const char *name)
  * \ingroup startStopKillFct
- * \brief
- * \param name
- * \return
- * \todo write documentation
+ * \brief Set the agent name on network if different that the one defined in its json definition.
+ * \param name is the name of the agent.
+ * \return 1 if ok, else 0
  */
 int mtic_setAgentName(const char *name){
     if (strlen(name) == 0){
@@ -1105,10 +1097,9 @@ int mtic_setAgentName(const char *name){
 /**
  * \fn char *mtic_getAgentName()
  * \ingroup startStopKillFct
- * \brief
- * \return
+ * \brief Get the agent name on the network
+ * \return the name of the agent.
  * \warning Allocate memory that should be freed by the user.
- * \todo write documentation
  */
 char *mtic_getAgentName(){
     return strdup(agentName);
@@ -1122,9 +1113,9 @@ char *mtic_getAgentName(){
 /**
  * \fn int mtic_freeze()
  * \ingroup pauseResumeFct
- * \brief
- * \return
- * \todo write documentation
+ * \brief Freeze agent. Execute the associated FreezeCallback to the agent.
+ * by default no callback is defined.
+ * \return 1 if ok, else 0
  */
 int mtic_freeze(){
     if (!agentCanBeFrozen){
@@ -1148,9 +1139,8 @@ int mtic_freeze(){
 /**
  * \fn bool mtic_isFrozen()
  * \ingroup pauseResumeFct
- * \brief
- * \return
- * \todo write documentation
+ * \brief return the frozon state of a agent.
+ * \return true if frozen else false.
  */
 bool mtic_isFrozen(){
     return isFrozen;
@@ -1159,9 +1149,9 @@ bool mtic_isFrozen(){
 /**
  * \fn int mtic_unfreeze()
  * \ingroup pauseResumeFct
- * \brief
- * \return
- * \todo write documentation
+ * \brief  Unfreeze agent. Execute the associated FreezeCallback to the agent.
+ * by default no callback is defined.
+ * \return 1 if ok, else 0
  */
 int mtic_unfreeze(){
     if(isFrozen == true)
@@ -1182,11 +1172,10 @@ int mtic_unfreeze(){
 /**
  * \fn int mtic_observeFreeze(mtic_freezeCallback cb, void *myData)
  * \ingroup pauseResumeFct
- * \brief
- * \return
- * \param cb
- * \param myData
- * \todo write documentation
+ * \brief Add a mtic_freezeCallback on an agent.
+ * \param cb is a pointer to a mtic_freezeCallback
+ * \param myData is pointer to user data is needed.
+ * \return 1 if ok, else 0.
  */
 int mtic_observeFreeze(mtic_freezeCallback cb, void *myData){
     if (cb != NULL){
@@ -1209,10 +1198,9 @@ int mtic_observeFreeze(mtic_freezeCallback cb, void *myData){
 /**
  * \fn int mtic_setAgentState(const char *state)
  * \ingroup controleAgentFct
- * \brief
- * \return
- * \param state
- * \todo write documentation
+ * \brief set the internal state of an agent (as the developper defined it)
+ * \return 1 if ok, else 0.
+ * \param state is the name of the state you want to send.
  */
 int mtic_setAgentState(const char *state){
     if (strcmp(state, agentState) != 0){
@@ -1227,10 +1215,9 @@ int mtic_setAgentState(const char *state){
 /**
  * \fn char *mtic_getAgentState()
  * \ingroup controleAgentFct
- * \brief
- * \return
+ * \brief get the internal state of an agent (as the developper defined it)
+ * \return the name of the state you want to get.
  * \warning Allocate memory that should be freed by the user.
- * \todo write documentation
  */
 char *mtic_getAgentState(){
     return strdup(agentState);
@@ -1281,7 +1268,6 @@ void mtic_setCanBeFrozen (bool canBeFrozen){
  * \ingroup muteAgentFct
  * \brief function to mute the agent
  * \return 1 if ok else 0.
- * \todo can't return 0 ?
  */
 int mtic_mute(){
     isWholeAgentMuted = true;
@@ -1296,7 +1282,6 @@ int mtic_mute(){
  * \ingroup muteAgentFct
  * \brief function to unmute the agent
  * \return 1 if ok or 0.
- * \todo can't return 0 ?
  */
 int mtic_unmute(){
     isWholeAgentMuted = false;
