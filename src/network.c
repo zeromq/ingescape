@@ -13,8 +13,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#include <unistd.h>
-#include <libproc.h>
+#ifdef _WIN32
+#else
+    #include <unistd.h>
+    #include <libproc.h>
+#endif
 
 #include <zyre.h>
 #include <czmq.h>
@@ -555,10 +558,21 @@ initActor (zsock_t *pipe, void *args)
 #ifdef _WIN32
     WSADATA wsaData;
     WSAStartup(MAKEWORD(2,2), &wsaData);
-    //TODO: use GetModuleFileName() to get exec path
-    //TODO get PID as well
-    //zyre_set_header(agentElements->node, "execpath", "%s", pathbuf);
-    //zyre_set_header(agentElements->node, "pid", "%i", pid);
+
+    //Use GetModuleFileName() to get exec path
+    WCHAR temp[MAX_PATH];
+    GetModuleFileName(NULL,temp,MAX_PATH);
+
+    //Conversion in char *
+    char exeFilePath[MAX_PATH];
+    wcstombs_s(NULL,exeFilePath,sizeof(exeFilePath),temp,sizeof(temp));
+
+    //Get PID as well
+    DWORD pid = GetCurrentProcessId();
+
+    //Add to header
+    zyre_set_header(agentElements->node, "execpath", "%s", exeFilePath);
+    zyre_set_header(agentElements->node, "pid", "%i", (int)pid);
 #endif
     char hostname[1024];
     hostname[1023] = '\0';
