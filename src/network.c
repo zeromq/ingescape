@@ -355,7 +355,6 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 v = zyre_event_header (zyre_event,k);
                 mtic_debug("\t%s -> %s\n", k, v);
 
-                // FIXME need to extract pid, execPath
                 // we extract the publisher adress to subscribe to from the zyre message header
                 if(strncmp(k,"publisher", strlen("publisher")) == 0)
                 {

@@ -175,7 +175,7 @@ bool check_category_agent_iop(agent_iop *ref_iop,
         HASH_FIND_STR(iop_to_check, iop->name, iop_found);
 
         //Check the type of the iop correspond
-        if(iop_found == NULL || (iop_found->type != iop->type)) {
+        if(iop_found == NULL || (iop_found->value_type != iop->value_type)) {
             state = false;
         }
     }
