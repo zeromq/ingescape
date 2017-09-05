@@ -24,8 +24,10 @@ typedef struct mtic_observe_callback_T {
 } mtic_observe_callback_T;
 
 
-//The variable which will contain all the callbacks associated to 'iop'
-mtic_observe_callback_T *agent_callbacks;
+//The variables which will contain all the callbacks associated to 'iop'
+mtic_observe_callback_T *input_callbacks;
+mtic_observe_callback_T *output_callbacks;
+mtic_observe_callback_T *param_callbacks;
 
 ////////////////////////////////////////////////////////////////////////
 // PRIVATE API
@@ -352,7 +354,20 @@ static int mtic_observe(const char* type, const char* name,iop_t typeIop, mtic_o
     new_callback->iop_name = strdup(name);
     new_callback->callback_ptr = cb;
     new_callback->data = myData;
-    HASH_ADD_STR( agent_callbacks, iop_name,  new_callback);
+
+    switch (typeIop) {
+    case INPUT_T:
+        HASH_ADD_STR( input_callbacks, iop_name,  new_callback);
+        break;
+    case OUTPUT_T:
+        HASH_ADD_STR( output_callbacks, iop_name,  new_callback);
+        break;
+    case PARAMETER_T:
+        HASH_ADD_STR( param_callbacks, iop_name,  new_callback);
+        break;
+    default:
+        break;
+    }
 
     mtic_debug("ADD_OBSERVE on the %s '%s'\n", type, name);
 
@@ -1561,6 +1576,39 @@ int mtic_writeParameter(const char *name, char *value, long size){
 }
 
 /**
+ * \fn void call_callback(const char *name,iop_t iopType, iopType_t valueType, void* value)
+ * \ingroup writefct
+ * \brief call the callback associated to the iop if it exist.
+ *
+ * \param name is the name of the input or output or parameter
+ * \param iopType is the type of the iop : input, output, parameter
+ * \param valueType is the type of the value of the input, output, parameter
+ * \param value is a data to pass to callback
+ * \return no return
+ */
+void call_callback(const char *name,iop_t iopType, iopType_t valueType, void* value)
+{
+    mtic_observe_callback_T *fct_to_call;
+
+    switch (iopType) {
+    case INPUT_T:
+        HASH_FIND_STR(input_callbacks, name, fct_to_call);
+        break;
+    case OUTPUT_T:
+        HASH_FIND_STR(output_callbacks, name, fct_to_call);
+        break;
+    case PARAMETER_T:
+        HASH_FIND_STR(param_callbacks, name, fct_to_call);
+        break;
+    default:
+        break;
+    }
+
+    if(fct_to_call != NULL)
+        fct_to_call->callback_ptr(iopType, name, valueType, value, fct_to_call->data);
+}
+
+/**
  * \fn int mtic_writeInputAsBool(const char *name, bool value)
  * \ingroup writefct
  * \brief write a value as bool into an agent's input.
@@ -1590,10 +1638,11 @@ int mtic_writeInputAsBool(const char *name, bool value){
     update_value(iop, (void*) &value, 0);
 
     // call the callback associated to if it exist
-    mtic_observe_callback_T *fct_to_call;
-    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
-    if(fct_to_call != NULL)
-        fct_to_call->callback_ptr(INPUT_T, name, BOOL_T, (void*) &value, fct_to_call->data);
+//    mtic_observe_callback_T *fct_to_call;
+//    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
+//    if(fct_to_call != NULL)
+//        fct_to_call->callback_ptr(INPUT_T, name, BOOL_T, (void*) &value, fct_to_call->data);
+    call_callback(name,INPUT_T,BOOL_T,(void*) &value);
 
     return 1;
 
@@ -1629,11 +1678,11 @@ int mtic_writeInputAsInt(const char *name, int value){
     update_value(iop, (void*) &value, 0);
 
     // call the callback associated to if it exist
-    mtic_observe_callback_T *fct_to_call;
-    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
-    if(fct_to_call != NULL)
-        fct_to_call->callback_ptr(INPUT_T, name, INTEGER_T, (void*) &value, fct_to_call->data);
-
+//    mtic_observe_callback_T *fct_to_call;
+//    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
+//    if(fct_to_call != NULL)
+//        fct_to_call->callback_ptr(INPUT_T, name, INTEGER_T, (void*) &value, fct_to_call->data);
+    call_callback(name, INPUT_T,INTEGER_T, (void*) &value);
     return 1;
 }
 
@@ -1667,11 +1716,11 @@ int mtic_writeInputAsDouble(const char *name, double value){
     update_value(iop, (void*) &value, 0);
 
     // call the callback associated to if it exist
-    mtic_observe_callback_T *fct_to_call;
-    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
-    if(fct_to_call != NULL)
-        fct_to_call->callback_ptr(INPUT_T, name, DOUBLE_T, (void*) &value, fct_to_call->data);
-
+//    mtic_observe_callback_T *fct_to_call;
+//    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
+//    if(fct_to_call != NULL)
+//        fct_to_call->callback_ptr(INPUT_T, name, DOUBLE_T, (void*) &value, fct_to_call->data);
+    call_callback(name,INPUT_T, DOUBLE_T, (void*) &value);
     return 1;
 }
 
@@ -1705,11 +1754,11 @@ int mtic_writeInputAsString(const char *name, char *value){
     update_value(iop, (void*) value, 0);
 
     // call the callback associated to if it exist
-    mtic_observe_callback_T *fct_to_call;
-    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
-    if(fct_to_call != NULL)
-        fct_to_call->callback_ptr(INPUT_T, name, STRING_T, (void*) value, fct_to_call->data);
-
+//    mtic_observe_callback_T *fct_to_call;
+//    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
+//    if(fct_to_call != NULL)
+//        fct_to_call->callback_ptr(INPUT_T, name, STRING_T, (void*) value, fct_to_call->data);
+    call_callback(name, INPUT_T, STRING_T, (void*) value);
     return 1;
 }
 
@@ -1739,10 +1788,11 @@ int mtic_writeInputAsImpulsion(const char *name){
     }
 
     // call the callback associated to if it exist
-    mtic_observe_callback_T *fct_to_call;
-    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
-    if(fct_to_call != NULL)
-        fct_to_call->callback_ptr(INPUT_T, name, IMPULSION_T, 0, fct_to_call->data);
+//    mtic_observe_callback_T *fct_to_call;
+//    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
+//    if(fct_to_call != NULL)
+//        fct_to_call->callback_ptr(INPUT_T, name, IMPULSION_T, 0, fct_to_call->data);
+    call_callback(name, INPUT_T, IMPULSION_T, 0);
 
     return 1;
 }
@@ -1778,10 +1828,11 @@ int mtic_writeInputAsData(const char *name, void *value, long size){
     update_value(iop,value,size);
 
     // call the callback associated to if it exist
-    mtic_observe_callback_T *fct_to_call;
-    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
-    if(fct_to_call != NULL)
-        fct_to_call->callback_ptr(INPUT_T, name, DATA_T, value, fct_to_call->data);
+//    mtic_observe_callback_T *fct_to_call;
+//    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
+//    if(fct_to_call != NULL)
+//        fct_to_call->callback_ptr(INPUT_T, name, DATA_T, value, fct_to_call->data);
+    call_callback(name, INPUT_T, DATA_T, value);
 
     return 1;
 }
@@ -1816,10 +1867,11 @@ int mtic_writeOutputAsBool(const char *name, bool value){
     update_value(iop, (void*) &value, 0);
 
     // call the callback associated to if it exist
-    mtic_observe_callback_T *fct_to_call;
-    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
-    if(fct_to_call != NULL)
-        fct_to_call->callback_ptr(OUTPUT_T, name, BOOL_T, (void*) &value, fct_to_call->data);
+//    mtic_observe_callback_T *fct_to_call;
+//    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
+//    if(fct_to_call != NULL)
+//        fct_to_call->callback_ptr(OUTPUT_T, name, BOOL_T, (void*) &value, fct_to_call->data);
+    call_callback(name, OUTPUT_T, BOOL_T, (void*) &value);
 
     // iop is output : publish
     network_publishOutput(name);
@@ -1857,10 +1909,11 @@ int mtic_writeOutputAsInt(const char *name, int value){
     update_value(iop, (void*) &value, 0);
 
     // call the callback associated to if it exist
-    mtic_observe_callback_T *fct_to_call;
-    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
-    if(fct_to_call != NULL)
-        fct_to_call->callback_ptr(OUTPUT_T, name, INTEGER_T, (void*) &value, fct_to_call->data);
+//    mtic_observe_callback_T *fct_to_call;
+//    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
+//    if(fct_to_call != NULL)
+//        fct_to_call->callback_ptr(OUTPUT_T, name, INTEGER_T, (void*) &value, fct_to_call->data);
+    call_callback(name, OUTPUT_T, INTEGER_T, (void*) &value);
 
     // iop is output : publish
     network_publishOutput(name);
@@ -1899,10 +1952,11 @@ int mtic_writeOutputAsDouble(const char *name, double value){
     update_value(iop, (void*) &value, 0);
 
     // call the callback associated to if it exist
-    mtic_observe_callback_T *fct_to_call;
-    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
-    if(fct_to_call != NULL)
-        fct_to_call->callback_ptr(OUTPUT_T, name, DOUBLE_T, (void*) &value, fct_to_call->data);
+//    mtic_observe_callback_T *fct_to_call;
+//    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
+//    if(fct_to_call != NULL)
+//        fct_to_call->callback_ptr(OUTPUT_T, name, DOUBLE_T, (void*) &value, fct_to_call->data);
+    call_callback(name, OUTPUT_T, DOUBLE_T, (void*) &value);
 
     // iop is output : publish
     network_publishOutput(name);
@@ -1940,10 +1994,11 @@ int mtic_writeOutputAsString(const char *name, char *value){
     update_value(iop, (void*) value, 0);
 
     // call the callback associated to if it exist
-    mtic_observe_callback_T *fct_to_call;
-    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
-    if(fct_to_call != NULL)
-        fct_to_call->callback_ptr(OUTPUT_T, name, STRING_T, (void*) value, fct_to_call->data);
+//    mtic_observe_callback_T *fct_to_call;
+//    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
+//    if(fct_to_call != NULL)
+//        fct_to_call->callback_ptr(OUTPUT_T, name, STRING_T, (void*) value, fct_to_call->data);
+    call_callback(name, OUTPUT_T, STRING_T, (void*) value);
 
     // iop is output : publish
     network_publishOutput(name);
@@ -1977,10 +2032,11 @@ int mtic_writeOutputAsImpulsion(const char *name){
     }
 
     // call the callback associated to if it exist
-    mtic_observe_callback_T *fct_to_call;
-    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
-    if(fct_to_call != NULL)
-        fct_to_call->callback_ptr(OUTPUT_T, name, IMPULSION_T, 0, fct_to_call->data);
+//    mtic_observe_callback_T *fct_to_call;
+//    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
+//    if(fct_to_call != NULL)
+//        fct_to_call->callback_ptr(OUTPUT_T, name, IMPULSION_T, 0, fct_to_call->data);
+    call_callback( name, OUTPUT_T, IMPULSION_T, 0);
 
     // iop is output : publish
     network_publishOutput(name);
@@ -2018,10 +2074,11 @@ int mtic_writeOutputAsData(const char *name, void *value, long size){
     update_value(iop,value,size);
 
     // call the callback associated to if it exist
-    mtic_observe_callback_T *fct_to_call;
-    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
-    if(fct_to_call != NULL)
-        fct_to_call->callback_ptr(OUTPUT_T, name, DATA_T, value, fct_to_call->data);
+//    mtic_observe_callback_T *fct_to_call;
+//    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
+//    if(fct_to_call != NULL)
+//        fct_to_call->callback_ptr(OUTPUT_T, name, DATA_T, value, fct_to_call->data);
+    call_callback(name, OUTPUT_T, DATA_T, value);
 
     // iop is output : publish
     network_publishOutput(name);
@@ -2059,10 +2116,11 @@ int mtic_writeParameterAsBool(const char *name, bool value){
     update_value(iop, (void*) &value, 0);
 
     // call the callback associated to if it exist
-    mtic_observe_callback_T *fct_to_call;
-    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
-    if(fct_to_call != NULL)
-        fct_to_call->callback_ptr(PARAMETER_T, name, BOOL_T, (void*) &value, fct_to_call->data);
+//    mtic_observe_callback_T *fct_to_call;
+//    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
+//    if(fct_to_call != NULL)
+//        fct_to_call->callback_ptr(PARAMETER_T, name, BOOL_T, (void*) &value, fct_to_call->data);
+    call_callback(name, PARAMETER_T, BOOL_T, (void*) &value);
 
     return 1;
 }
@@ -2097,10 +2155,11 @@ int mtic_writeParameterAsInt(const char *name, int value){
     update_value(iop, (void*) &value, 0);
 
     // call the callback associated to if it exist
-    mtic_observe_callback_T *fct_to_call;
-    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
-    if(fct_to_call != NULL)
-        fct_to_call->callback_ptr(PARAMETER_T, name, INTEGER_T, (void*) &value, fct_to_call->data);
+//    mtic_observe_callback_T *fct_to_call;
+//    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
+//    if(fct_to_call != NULL)
+//        fct_to_call->callback_ptr(PARAMETER_T, name, INTEGER_T, (void*) &value, fct_to_call->data);
+    call_callback(name, PARAMETER_T, INTEGER_T, (void*) &value);
 
     return 1;
 }
@@ -2135,10 +2194,11 @@ int mtic_writeParameterAsDouble(const char *name, double value){
     update_value(iop, (void*) &value, 0);
 
     // call the callback associated to if it exist
-    mtic_observe_callback_T *fct_to_call;
-    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
-    if(fct_to_call != NULL)
-        fct_to_call->callback_ptr(PARAMETER_T, name, DOUBLE_T, (void*) &value, fct_to_call->data);
+//    mtic_observe_callback_T *fct_to_call;
+//    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
+//    if(fct_to_call != NULL)
+//        fct_to_call->callback_ptr(PARAMETER_T, name, DOUBLE_T, (void*) &value, fct_to_call->data);
+    call_callback(name, PARAMETER_T, DOUBLE_T, (void*) &value);
 
     return 1;
 }
@@ -2173,10 +2233,11 @@ int mtic_writeParameterAsString(const char *name, char *value){
     update_value(iop, value, 0);
 
     // call the callback associated to if it exist
-    mtic_observe_callback_T *fct_to_call;
-    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
-    if(fct_to_call != NULL)
-        fct_to_call->callback_ptr(PARAMETER_T, name, STRING_T, value, fct_to_call->data);
+//    mtic_observe_callback_T *fct_to_call;
+//    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
+//    if(fct_to_call != NULL)
+//        fct_to_call->callback_ptr(PARAMETER_T, name, STRING_T, value, fct_to_call->data);
+    call_callback(name, PARAMETER_T, STRING_T, value);
 
     return 1;
 }
@@ -2212,10 +2273,11 @@ int mtic_writeParameterAsData(const char *name, void *value, long size){
     update_value(iop,value,size);
 
     // call the callback associated to if it exist
-    mtic_observe_callback_T *fct_to_call;
-    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
-    if(fct_to_call != NULL)
-        fct_to_call->callback_ptr(PARAMETER_T, name, DATA_T, value, fct_to_call->data);
+//    mtic_observe_callback_T *fct_to_call;
+//    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
+//    if(fct_to_call != NULL)
+//        fct_to_call->callback_ptr(PARAMETER_T, name, DATA_T, value, fct_to_call->data);
+    call_callback(name, PARAMETER_T, DATA_T, value);
 
     return 1;
 }
