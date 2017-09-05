@@ -301,38 +301,47 @@ int definition_setIopValue(agent_iop *iop, void * value, long size)
         return 0;
 
     switch (iop->value_type) {
-        case INTEGER_T:
+    case INTEGER_T:
+        if(value != NULL)
             iop->value.i = *(int*)(value);
-            break;
-        case DOUBLE_T:
+        else
+            iop->value.i = 0;
+        break;
+    case DOUBLE_T:
+        if(value != NULL)
             iop->value.d = *(double*)(value);
-            break;
-        case BOOL_T:
+        else
+            iop->value.d = 0.0;
+        break;
+    case BOOL_T:
+        if(value != NULL)
             iop->value.b = *(bool*)(value);
-            break;
-        case STRING_T:
-        {
-            if (iop->value.s != NULL){
-                free(iop->value.s);
-            }
+        else
+            iop->value.b = false;
+        break;
+    case STRING_T:
+        if (iop->value.s != NULL)
+            free(iop->value.s);
+        if(value != NULL)
             iop->value.s = strdup(value);
+        else
+            iop->value.s = strdup("");
+        break;
+    case IMPULSION_T:
+        break;
+    case DATA_T:
+    {
+        if (iop->value.data != NULL){
+            free(iop->value.data);
         }
-            break;
-        case IMPULSION_T:
-            break;
-        case DATA_T:
-        {
-            if (iop->value.data != NULL){
-                free(iop->value.data);
-            }
-            iop->value.data = NULL;
-            iop->valueSize = size;
-            iop->value.data = calloc(1,size);
-            memcpy(iop->value.data,value, size);
-        }
-            break;
-        default:
-            break;
+        iop->value.data = NULL;
+        iop->valueSize = size;
+        iop->value.data = calloc(1,size);
+        memcpy(iop->value.data,value, size);
+    }
+        break;
+    default:
+        break;
     }
 
     return 1;
