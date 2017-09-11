@@ -449,11 +449,23 @@ int definition_addIop(agent_iop *iop, iop_t iop_type, definition **def)
  * \fn int mtic_clearDefinition()
  * \ingroup loadSetGetDefFct
  * \brief Clear the internal definition of the agent.
+ *        Free all members of the structure mtic_definition_loaded & mtic_definition_live.
+ *        But the pointer of these structure is not free and stay allocated.
  * \return 1 if ok else 0
  */
 int mtic_clearDefinition(){
 
     mtic_debug("mtic_clearDefinition : function need to be defined and implement it !");
+
+    //Free the structure definition loaded
+    if(mtic_definition_loaded != NULL){
+       free_definition(mtic_definition_loaded);
+    }
+
+    //Free the structure definition loaded
+    if(mtic_definition_live != NULL){
+       free_definition(mtic_definition_live);
+    }
 
     return 1;
 }
