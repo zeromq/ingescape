@@ -178,6 +178,8 @@ extern definition* mtic_definition_loaded;
 extern definition* mtic_definition_live;
 extern definition* mtic_agents_defs_on_network;
 
+void initDefinitionToDefault();
+
 iopType_t string_to_value_type(const char* string);
 bool string_to_boolean(const char* string);
 const char* value_type_to_string (iopType_t type);

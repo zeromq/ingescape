@@ -295,6 +295,29 @@ double get_iop_value_as_double(agent_iop *iop,iop_t type){
     return val;
 }
 
+void initDefinitionToDefault()
+{
+    //Check if already allocated
+    if(mtic_definition_loaded == NULL){
+        //Dynamically allocate the memory
+        mtic_definition_loaded = calloc(1, sizeof(struct definition));
+
+        /*
+         *
+         * Initialize all members of the structure
+         *
+         */
+        if(mtic_definition_loaded->name == NULL)
+            mtic_definition_loaded->name = strdup("");
+
+        if(mtic_definition_loaded->description == NULL)
+            mtic_definition_loaded->description = strdup("");
+
+        if(mtic_definition_loaded->version == NULL)
+            mtic_definition_loaded->version = strdup("");
+    }
+}
+
 int definition_setIopValue(agent_iop *iop, void * value, long size)
 {
     if(iop == NULL)
