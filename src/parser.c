@@ -587,10 +587,16 @@ static void json_dump_definition (yajl_gen *g, definition* def) {
     free(name);
     
     yajl_gen_string(*g, (const unsigned char *) STR_DESCRIPTION, strlen(STR_DESCRIPTION));
-    yajl_gen_string(*g, (const unsigned char *) def->description, strlen (def->description));
+    if(def->description != NULL)
+        yajl_gen_string(*g, (const unsigned char *) def->description, strlen (def->description));
+    else
+        yajl_gen_string(*g, (const unsigned char *) (""), 0);
     
     yajl_gen_string(*g, (const unsigned char *) STR_VERSION, strlen(STR_VERSION));
-    yajl_gen_string(*g, (const unsigned char *) def->version, strlen(def->version));
+    if(def->version != NULL)
+        yajl_gen_string(*g, (const unsigned char *) def->version, strlen(def->version));
+    else
+        yajl_gen_string(*g, (const unsigned char *) "", 0);
     
     hashCount = HASH_COUNT(def->params_table);
     if (hashCount) {
