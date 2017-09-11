@@ -698,13 +698,22 @@ static void json_dump_mapping (yajl_gen *g, mapping* mapp) {
     yajl_gen_map_open(*g);
 
     yajl_gen_string(*g, (const unsigned char *) STR_NAME, strlen(STR_NAME));
-    yajl_gen_string(*g, (const unsigned char *) mapp->name, strlen (mapp->name));
+    if(mapp->name != NULL)
+        yajl_gen_string(*g, (const unsigned char *) mapp->name, strlen (mapp->name));
+    else
+        yajl_gen_string(*g, (const unsigned char *) (""), 0);
 
     yajl_gen_string(*g, (const unsigned char *) STR_DESCRIPTION, strlen(STR_DESCRIPTION));
-    yajl_gen_string(*g, (const unsigned char *) mapp->description, strlen (mapp->description));
+    if(mapp->description != NULL)
+        yajl_gen_string(*g, (const unsigned char *) mapp->description, strlen (mapp->description));
+    else
+        yajl_gen_string(*g, (const unsigned char *) (""), 0);
 
     yajl_gen_string(*g, (const unsigned char *) STR_VERSION, strlen(STR_VERSION));
-    yajl_gen_string(*g, (const unsigned char *) mapp->version, strlen(mapp->version));
+    if(mapp->version != NULL)
+        yajl_gen_string(*g, (const unsigned char *) mapp->version, strlen(mapp->version));
+    else
+        yajl_gen_string(*g, (const unsigned char *) (""), 0);
 
     //Mapping_out
     hashCount = HASH_COUNT(mapp->map_out);
