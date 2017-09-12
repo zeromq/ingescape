@@ -295,6 +295,20 @@ double get_iop_value_as_double(agent_iop *iop,iop_t type){
     return val;
 }
 
+void initDefinitionToDefault()
+{
+    //Check if already allocated
+    if(mtic_definition_loaded == NULL){
+        //Dynamically allocate the memory
+        mtic_definition_loaded = calloc(1, sizeof(struct definition));
+    }
+
+    if(mtic_definition_live== NULL){
+        //Dynamically allocate the memory
+        mtic_definition_live = calloc(1, sizeof(struct definition));
+    }
+}
+
 int definition_setIopValue(agent_iop *iop, void * value, long size)
 {
     if(iop == NULL)
@@ -426,11 +440,25 @@ int definition_addIop(agent_iop *iop, iop_t iop_type, definition **def)
  * \fn int mtic_clearDefinition()
  * \ingroup loadSetGetDefFct
  * \brief Clear the internal definition of the agent.
+ *        Free all members of the structure mtic_definition_loaded & mtic_definition_live.
+ *        But the pointer of these structure is not free and stay allocated.
  * \return 1 if ok else 0
  */
 int mtic_clearDefinition(){
 
-    mtic_debug("mtic_clearDefinition : function need to be defined and implement it !");
+    mtic_debug("mtic_clearDefinition ... \n");
+
+    //Free the structure definition loaded
+    if(mtic_definition_loaded != NULL){
+        mtic_debug("Clear the definition loaded ... \n");
+        free_definition(mtic_definition_loaded);
+    }
+
+    //Free the structure definition loaded
+    if(mtic_definition_live != NULL){
+        mtic_debug("Clear the definition live ... \n");
+        free_definition(mtic_definition_live);
+    }
 
     return 1;
 }
@@ -558,21 +586,25 @@ int mtic_setDefinitionVersion(char *version){
 
 int mtic_createInput(const char *name, iopType_t value_type, void *value, long size){
 
-    //Create the iop
-    agent_iop* iop = definition_createIop(name, INPUT_T, value_type, value, size);
+    //Create the iop for loaded
+    agent_iop* iopLoaded = definition_createIop(name, INPUT_T, value_type, value, size);
 
     //Add iop in structure def loaded, need to be copied
-    if (definition_addIop(iop, INPUT_T, &mtic_definition_loaded) < 1){
+    if (definition_addIop(iopLoaded, INPUT_T, &mtic_definition_loaded) < 1){
         return 0;
     }
 
+    //Create the iop for loaded
+    agent_iop* iopLive = definition_createIop(name, INPUT_T, value_type, value, size);
+
     //Add iop in structure def live, need to be copied
-    if (definition_addIop(iop, INPUT_T, &mtic_definition_live) < 1){
+    if (definition_addIop(iopLive, INPUT_T, &mtic_definition_live) < 1){
         return -1;
     }
 
     //free iop
-    free(iop);
+    free(iopLoaded);
+    free(iopLive);
 
     return 1;
 }
@@ -589,21 +621,25 @@ int mtic_createInput(const char *name, iopType_t value_type, void *value, long s
  */
 
 int mtic_createOutput(const char *name, iopType_t value_type, void *value, long size){
-    //Create the iop
-    agent_iop* iop = definition_createIop(name, OUTPUT_T, value_type, value, size);
+    //Create the iop for loaded
+    agent_iop* iopLoaded = definition_createIop(name, OUTPUT_T, value_type, value, size);
 
     //Add iop in structure def loaded, need to be copied
-    if (definition_addIop(iop, OUTPUT_T, &mtic_definition_loaded) < 1){
+    if (definition_addIop(iopLoaded, OUTPUT_T, &mtic_definition_loaded) < 1){
         return 0;
     }
 
+    //Create the iop for loaded
+    agent_iop* iopLive = definition_createIop(name, OUTPUT_T, value_type, value, size);
+
     //Add iop in structure def live, need to be copied
-    if (definition_addIop(iop, OUTPUT_T, &mtic_definition_live) < 1){
+    if (definition_addIop(iopLive, OUTPUT_T, &mtic_definition_live) < 1){
         return -1;
     }
 
     //free iop
-    free(iop);
+    free(iopLoaded);
+    free(iopLive);
 
     return 1;
 }
@@ -619,21 +655,25 @@ int mtic_createOutput(const char *name, iopType_t value_type, void *value, long 
  * \return The error. 1 is OK, 0 not able to add in definition loaded, -1 not able to add in definition live
  */
 int mtic_createParameter(const char *name, iopType_t value_type, void *value, long size){
-    //Create the iop
-    agent_iop* iop = definition_createIop(name, PARAMETER_T, value_type, value, size);
+    //Create the iop loaded
+    agent_iop* iopLoaded = definition_createIop(name, PARAMETER_T, value_type, value, size);
 
     //Add iop in structure def loaded, need to be copied
-    if (definition_addIop(iop, PARAMETER_T, &mtic_definition_loaded) < 1){
+    if (definition_addIop(iopLoaded, PARAMETER_T, &mtic_definition_loaded) < 1){
         return 0;
     }
 
+    //Create the iop
+    agent_iop* iopLive = definition_createIop(name, PARAMETER_T, value_type, value, size);
+
     //Add iop in structure def live, need to be copied
-    if (definition_addIop(iop, PARAMETER_T, &mtic_definition_live) < 1){
+    if (definition_addIop(iopLive, PARAMETER_T, &mtic_definition_live) < 1){
         return -1;
     }
 
     //free iop
-    free(iop);
+    free(iopLoaded);
+    free(iopLive);
 
     return 1;
 }

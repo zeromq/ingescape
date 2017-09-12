@@ -524,6 +524,9 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
 static void
 initActor (zsock_t *pipe, void *args)
 {
+    //Initialize the structure definition if needed
+    initDefinitionToDefault();
+
     //start zyre
     agentElements->node = zyre_new (agentName);
     zyre_set_port(agentElements->node, agentElements->zyrePort);
