@@ -455,16 +455,18 @@ int definition_addIop(agent_iop *iop, iop_t iop_type, definition **def)
  */
 int mtic_clearDefinition(){
 
-    mtic_debug("mtic_clearDefinition : function need to be defined and implement it !");
+    mtic_debug("mtic_clearDefinition ... \n");
 
     //Free the structure definition loaded
     if(mtic_definition_loaded != NULL){
-       free_definition(mtic_definition_loaded);
+        mtic_debug("Clear the definition loaded ... \n");
+        free_definition(mtic_definition_loaded);
     }
 
     //Free the structure definition loaded
     if(mtic_definition_live != NULL){
-       free_definition(mtic_definition_live);
+        mtic_debug("Clear the definition live ... \n");
+        free_definition(mtic_definition_live);
     }
 
     return 1;
