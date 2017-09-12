@@ -593,21 +593,25 @@ int mtic_setDefinitionVersion(char *version){
 
 int mtic_createInput(const char *name, iopType_t value_type, void *value, long size){
 
-    //Create the iop
-    agent_iop* iop = definition_createIop(name, INPUT_T, value_type, value, size);
+    //Create the iop for loaded
+    agent_iop* iopLoaded = definition_createIop(name, INPUT_T, value_type, value, size);
 
     //Add iop in structure def loaded, need to be copied
-    if (definition_addIop(iop, INPUT_T, &mtic_definition_loaded) < 1){
+    if (definition_addIop(iopLoaded, INPUT_T, &mtic_definition_loaded) < 1){
         return 0;
     }
 
+    //Create the iop for loaded
+    agent_iop* iopLive = definition_createIop(name, INPUT_T, value_type, value, size);
+
     //Add iop in structure def live, need to be copied
-    if (definition_addIop(iop, INPUT_T, &mtic_definition_live) < 1){
+    if (definition_addIop(iopLive, INPUT_T, &mtic_definition_live) < 1){
         return -1;
     }
 
     //free iop
-    free(iop);
+    free(iopLoaded);
+    free(iopLive);
 
     return 1;
 }
@@ -624,21 +628,25 @@ int mtic_createInput(const char *name, iopType_t value_type, void *value, long s
  */
 
 int mtic_createOutput(const char *name, iopType_t value_type, void *value, long size){
-    //Create the iop
-    agent_iop* iop = definition_createIop(name, OUTPUT_T, value_type, value, size);
+    //Create the iop for loaded
+    agent_iop* iopLoaded = definition_createIop(name, OUTPUT_T, value_type, value, size);
 
     //Add iop in structure def loaded, need to be copied
-    if (definition_addIop(iop, OUTPUT_T, &mtic_definition_loaded) < 1){
+    if (definition_addIop(iopLoaded, OUTPUT_T, &mtic_definition_loaded) < 1){
         return 0;
     }
 
+    //Create the iop for loaded
+    agent_iop* iopLive = definition_createIop(name, OUTPUT_T, value_type, value, size);
+
     //Add iop in structure def live, need to be copied
-    if (definition_addIop(iop, OUTPUT_T, &mtic_definition_live) < 1){
+    if (definition_addIop(iopLive, OUTPUT_T, &mtic_definition_live) < 1){
         return -1;
     }
 
     //free iop
-    free(iop);
+    free(iopLoaded);
+    free(iopLive);
 
     return 1;
 }
@@ -654,21 +662,25 @@ int mtic_createOutput(const char *name, iopType_t value_type, void *value, long 
  * \return The error. 1 is OK, 0 not able to add in definition loaded, -1 not able to add in definition live
  */
 int mtic_createParameter(const char *name, iopType_t value_type, void *value, long size){
-    //Create the iop
-    agent_iop* iop = definition_createIop(name, PARAMETER_T, value_type, value, size);
+    //Create the iop loaded
+    agent_iop* iopLoaded = definition_createIop(name, PARAMETER_T, value_type, value, size);
 
     //Add iop in structure def loaded, need to be copied
-    if (definition_addIop(iop, PARAMETER_T, &mtic_definition_loaded) < 1){
+    if (definition_addIop(iopLoaded, PARAMETER_T, &mtic_definition_loaded) < 1){
         return 0;
     }
 
+    //Create the iop
+    agent_iop* iopLive = definition_createIop(name, PARAMETER_T, value_type, value, size);
+
     //Add iop in structure def live, need to be copied
-    if (definition_addIop(iop, PARAMETER_T, &mtic_definition_live) < 1){
+    if (definition_addIop(iopLive, PARAMETER_T, &mtic_definition_live) < 1){
         return -1;
     }
 
     //free iop
-    free(iop);
+    free(iopLoaded);
+    free(iopLive);
 
     return 1;
 }
