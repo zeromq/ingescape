@@ -657,7 +657,7 @@ int mtic_loadMappingFromPath (const char* file_path){
     //Load definition and init variable : mtic_definition_loaded
     mtic_my_agent_mapping = parser_LoadMapFromPath(file_path);
 
-    if(mtic_definition_loaded == NULL)
+    if(mtic_my_agent_mapping == NULL)
     {
         mtic_debug("Mapping file has not been loaded from file path : %s\n", file_path);
         return -1;
