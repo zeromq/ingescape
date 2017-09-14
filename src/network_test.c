@@ -6,15 +6,15 @@
 //
 
 
-        #include "mtic_network.h"
-	#include <zyre.h>
-	#include <czmq.h>
-	#include "uthash.h"
-        #include "mtic_kvsimple.h"
+#include "mtic_network.h"
+#include <zyre.h>
+#include <czmq.h>
+#include "uthash.h"
+#include "mtic_kvsimple.h"
 
 
-        #include "mtic_mapping.h"
-        #include "mtic_tests.h"
+#include "mtic_mapping.h"
+#include "mtic_tests.h"
 
 #ifdef _WIN32
 
@@ -170,13 +170,10 @@ int manageSubscriber (zloop_t *loop, zmq_pollitem_t *item, void *arg){
 
                     if(found_iop != NULL)
                     {
-                        const void* converted_value = mtic_iop_value_string_to_real_type(found_iop, value);
-
                         // Map reception send to modify the internal model
                         code = map_received(subscriberFound->agentName,
                                             output,
-                                            (void*)converted_value);
-
+                                            value);
                     }
                 }
 

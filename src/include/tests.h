@@ -10,10 +10,7 @@
 #ifndef MTIC_TESTS_H
 #define MTIC_TESTS_H
 
-
-#include "mapping.h"
-#include "parser.h"
-#include "definition.h"
+#include "mastic_private.h"
 
 //void test_copy_definition();
 

@@ -7,22 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		970670DF1EDC187900CCDFDC /* mastic_private.h in Headers */ = {isa = PBXBuildFile; fileRef = 97C926AB1EB23ED100D2B0CE /* mastic_private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		9762EDDA1EAE547B002062A1 /* definition.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A79851EA7B112003153EF /* definition.c */; };
 		9762EDDB1EAE547B002062A1 /* mapping.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A79981EA7B112003153EF /* mapping.c */; };
 		9762EDDC1EAE547B002062A1 /* model.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A79991EA7B112003153EF /* model.c */; };
 		9762EDDD1EAE547B002062A1 /* network.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A799A1EA7B112003153EF /* network.c */; };
 		9762EDDF1EAE547B002062A1 /* parser.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A799C1EA7B112003153EF /* parser.c */; };
-		9762EDE01EAE547B002062A1 /* tests.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A799D1EA7B112003153EF /* tests.c */; };
-		9762EDE11EAE5490002062A1 /* yajl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9762EDD61EAE5414002062A1 /* yajl.framework */; };
 		9762EDE71EAE54D6002062A1 /* libczmq.3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 9762EDE31EAE54D6002062A1 /* libczmq.3.dylib */; };
 		9762EDE81EAE54D6002062A1 /* libsodium.18.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 9762EDE41EAE54D6002062A1 /* libsodium.18.dylib */; };
 		9762EDE91EAE54D6002062A1 /* libzmq.5.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 9762EDE51EAE54D6002062A1 /* libzmq.5.dylib */; };
 		9762EDEA1EAE54D6002062A1 /* libzyre.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 9762EDE61EAE54D6002062A1 /* libzyre.1.dylib */; };
-		9762EDEB1EAE551A002062A1 /* definition.h in Headers */ = {isa = PBXBuildFile; fileRef = 979A79871EA7B112003153EF /* definition.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		9762EDEC1EAE551A002062A1 /* mapping.h in Headers */ = {isa = PBXBuildFile; fileRef = 979A79881EA7B112003153EF /* mapping.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		9762EDED1EAE551A002062A1 /* mastic.h in Headers */ = {isa = PBXBuildFile; fileRef = 979A79891EA7B112003153EF /* mastic.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		9762EDEF1EAE551A002062A1 /* network.h in Headers */ = {isa = PBXBuildFile; fileRef = 979A798B1EA7B112003153EF /* network.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		9762EDF11EAE551A002062A1 /* tests.h in Headers */ = {isa = PBXBuildFile; fileRef = 979A798D1EA7B112003153EF /* tests.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		9762EDF31EAE55D2002062A1 /* libut.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A798F1EA7B112003153EF /* libut.h */; };
 		9762EDF41EAE55D2002062A1 /* ringbuf.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79901EA7B112003153EF /* ringbuf.h */; };
 		9762EDF51EAE55D2002062A1 /* utarray.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79911EA7B112003153EF /* utarray.h */; };
@@ -32,18 +26,13 @@
 		9762EDF91EAE55D2002062A1 /* utringbuffer.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79951EA7B112003153EF /* utringbuffer.h */; };
 		9762EDFA1EAE55D2002062A1 /* utstring.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79961EA7B112003153EF /* utstring.h */; };
 		9762EDFB1EAE55D2002062A1 /* utvector.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79971EA7B112003153EF /* utvector.h */; };
+		977C247A1F03F4FA00CA1675 /* mastic.h in Headers */ = {isa = PBXBuildFile; fileRef = 977C24791F03F4FA00CA1675 /* mastic.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		977C247B1F03F50F00CA1675 /* mastic.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 977C24791F03F4FA00CA1675 /* mastic.h */; };
 		979A799E1EA7B112003153EF /* definition.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A79851EA7B112003153EF /* definition.c */; };
 		979A799F1EA7B112003153EF /* mapping.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A79981EA7B112003153EF /* mapping.c */; };
 		979A79A01EA7B112003153EF /* model.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A79991EA7B112003153EF /* model.c */; };
 		979A79A11EA7B112003153EF /* network.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A799A1EA7B112003153EF /* network.c */; };
 		979A79A31EA7B112003153EF /* parser.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A799C1EA7B112003153EF /* parser.c */; };
-		979A79A41EA7B112003153EF /* tests.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A799D1EA7B112003153EF /* tests.c */; };
-		979A79A51EA7B1BA003153EF /* definition.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79871EA7B112003153EF /* definition.h */; };
-		979A79A61EA7B1BA003153EF /* mapping.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79881EA7B112003153EF /* mapping.h */; };
-		979A79A71EA7B1BA003153EF /* mastic.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79891EA7B112003153EF /* mastic.h */; };
-		979A79A81EA7B1BA003153EF /* network.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A798B1EA7B112003153EF /* network.h */; };
-		979A79A91EA7B1BA003153EF /* tests.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A798D1EA7B112003153EF /* tests.h */; };
-		979A79BB1EA8A844003153EF /* libyajl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 979A79B81EA8A835003153EF /* libyajl.a */; };
 		979A7D2A1EA8A919003153EF /* libczmq.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 979A7A231EA8A86F003153EF /* libczmq.a */; };
 		979A7D2B1EA8A919003153EF /* libsodium.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 979A7A241EA8A86F003153EF /* libsodium.a */; };
 		979A7D2C1EA8A919003153EF /* libzmq.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 979A7A251EA8A86F003153EF /* libzmq.a */; };
@@ -147,36 +136,38 @@
 		979A7D911EA8A9CB003153EF /* runtime.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79F81EA8A86F003153EF /* runtime.h */; };
 		979A7D921EA8A9CB003153EF /* utils.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79F91EA8A86F003153EF /* utils.h */; };
 		979A7D931EA8A9CB003153EF /* version.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79FA1EA8A86F003153EF /* version.h */; };
+		97C927271EB38FE800D2B0CE /* libyajl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 97C927221EB38FD900D2B0CE /* libyajl.a */; };
+		97C9272A1EB38FF300D2B0CE /* yajl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 97C927241EB38FD900D2B0CE /* yajl.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		9762EDD51EAE5414002062A1 /* PBXContainerItemProxy */ = {
+		97C927211EB38FD900D2B0CE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 979A79B31EA8A835003153EF /* yajl.xcodeproj */;
+			containerPortal = 97C9271C1EB38FD900D2B0CE /* yajl.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 9716CA461EA21C6A004F0AC0;
+			remoteInfo = "yajl-ios";
+		};
+		97C927231EB38FD900D2B0CE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 97C9271C1EB38FD900D2B0CE /* yajl.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = 9762EDB21EAE530B002062A1;
 			remoteInfo = "yajl-macos";
 		};
-		9762EDD81EAE5465002062A1 /* PBXContainerItemProxy */ = {
+		97C927251EB38FE300D2B0CE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 979A79B31EA8A835003153EF /* yajl.xcodeproj */;
+			containerPortal = 97C9271C1EB38FD900D2B0CE /* yajl.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 9716CA451EA21C6A004F0AC0;
+			remoteInfo = "yajl-ios";
+		};
+		97C927281EB38FEF00D2B0CE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 97C9271C1EB38FD900D2B0CE /* yajl.xcodeproj */;
 			proxyType = 1;
 			remoteGlobalIDString = 9762EDB11EAE530B002062A1;
 			remoteInfo = "yajl-macos";
-		};
-		979A79B71EA8A835003153EF /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 979A79B31EA8A835003153EF /* yajl.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 9716CA461EA21C6A004F0AC0;
-			remoteInfo = yajl;
-		};
-		979A79B91EA8A83F003153EF /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 979A79B31EA8A835003153EF /* yajl.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 9716CA451EA21C6A004F0AC0;
-			remoteInfo = yajl;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -205,11 +196,7 @@
 			dstPath = "include/$(PRODUCT_NAME)";
 			dstSubfolderSpec = 16;
 			files = (
-				979A79A51EA7B1BA003153EF /* definition.h in CopyFiles */,
-				979A79A61EA7B1BA003153EF /* mapping.h in CopyFiles */,
-				979A79A71EA7B1BA003153EF /* mastic.h in CopyFiles */,
-				979A79A81EA7B1BA003153EF /* network.h in CopyFiles */,
-				979A79A91EA7B1BA003153EF /* tests.h in CopyFiles */,
+				977C247B1F03F50F00CA1675 /* mastic.h in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -339,14 +326,9 @@
 		9762EDE41EAE54D6002062A1 /* libsodium.18.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsodium.18.dylib; path = ../../../../../../../../../usr/local/lib/libsodium.18.dylib; sourceTree = "<group>"; };
 		9762EDE51EAE54D6002062A1 /* libzmq.5.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libzmq.5.dylib; path = ../../../../../../../../../usr/local/lib/libzmq.5.dylib; sourceTree = "<group>"; };
 		9762EDE61EAE54D6002062A1 /* libzyre.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libzyre.1.dylib; path = ../../../../../../../../../usr/local/lib/libzyre.1.dylib; sourceTree = "<group>"; };
+		977C24791F03F4FA00CA1675 /* mastic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mastic.h; sourceTree = "<group>"; };
 		979A79781EA7B0D6003153EF /* libmastic.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libmastic.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		979A79851EA7B112003153EF /* definition.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = definition.c; sourceTree = "<group>"; };
-		979A79871EA7B112003153EF /* definition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = definition.h; sourceTree = "<group>"; };
-		979A79881EA7B112003153EF /* mapping.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mapping.h; sourceTree = "<group>"; };
-		979A79891EA7B112003153EF /* mastic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mastic.h; sourceTree = "<group>"; };
-		979A798A1EA7B112003153EF /* model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = model.h; sourceTree = "<group>"; };
-		979A798B1EA7B112003153EF /* network.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = network.h; sourceTree = "<group>"; };
-		979A798C1EA7B112003153EF /* parser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = parser.h; sourceTree = "<group>"; };
 		979A798D1EA7B112003153EF /* tests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tests.h; sourceTree = "<group>"; };
 		979A798F1EA7B112003153EF /* libut.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libut.h; sourceTree = "<group>"; };
 		979A79901EA7B112003153EF /* ringbuf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ringbuf.h; sourceTree = "<group>"; };
@@ -363,7 +345,6 @@
 		979A799B1EA7B112003153EF /* network_test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = network_test.c; sourceTree = "<group>"; };
 		979A799C1EA7B112003153EF /* parser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = parser.c; sourceTree = "<group>"; };
 		979A799D1EA7B112003153EF /* tests.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = tests.c; sourceTree = "<group>"; };
-		979A79B31EA8A835003153EF /* yajl.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = yajl.xcodeproj; path = ../dependencies/ios/yajl/yajl.xcodeproj; sourceTree = "<group>"; };
 		979A79BE1EA8A86F003153EF /* czmq.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = czmq.h; sourceTree = "<group>"; };
 		979A79BF1EA8A86F003153EF /* czmq_library.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = czmq_library.h; sourceTree = "<group>"; };
 		979A79C01EA8A86F003153EF /* czmq_prelude.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = czmq_prelude.h; sourceTree = "<group>"; };
@@ -1187,6 +1168,8 @@
 		979A7D261EA8A86F003153EF /* zuuid.api */ = {isa = PBXFileReference; lastKnownFileType = text; path = zuuid.api; sourceTree = "<group>"; };
 		979A7D281EA8A86F003153EF /* zyre.api */ = {isa = PBXFileReference; lastKnownFileType = text; path = zyre.api; sourceTree = "<group>"; };
 		979A7D291EA8A86F003153EF /* zyre_event.api */ = {isa = PBXFileReference; lastKnownFileType = text; path = zyre_event.api; sourceTree = "<group>"; };
+		97C926AB1EB23ED100D2B0CE /* mastic_private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mastic_private.h; sourceTree = "<group>"; };
+		97C9271C1EB38FD900D2B0CE /* yajl.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = yajl.xcodeproj; path = ../dependencies/ios/yajl/yajl.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1194,7 +1177,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9762EDE11EAE5490002062A1 /* yajl.framework in Frameworks */,
+				97C9272A1EB38FF300D2B0CE /* yajl.framework in Frameworks */,
 				9762EDE81EAE54D6002062A1 /* libsodium.18.dylib in Frameworks */,
 				9762EDE91EAE54D6002062A1 /* libzmq.5.dylib in Frameworks */,
 				9762EDE71EAE54D6002062A1 /* libczmq.3.dylib in Frameworks */,
@@ -1206,7 +1189,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				979A79BB1EA8A844003153EF /* libyajl.a in Frameworks */,
+				97C927271EB38FE800D2B0CE /* libyajl.a in Frameworks */,
 				979A7D2A1EA8A919003153EF /* libczmq.a in Frameworks */,
 				979A7D2B1EA8A919003153EF /* libsodium.a in Frameworks */,
 				979A7D2C1EA8A919003153EF /* libzmq.a in Frameworks */,
@@ -1239,7 +1222,7 @@
 		979A796F1EA7B0D6003153EF = {
 			isa = PBXGroup;
 			children = (
-				979A79B31EA8A835003153EF /* yajl.xcodeproj */,
+				97C9271C1EB38FD900D2B0CE /* yajl.xcodeproj */,
 				979A79BC1EA8A86F003153EF /* ios */,
 				979A79841EA7B112003153EF /* src */,
 				9762EDCE1EAE5414002062A1 /* mastic-macos */,
@@ -1260,14 +1243,14 @@
 		979A79841EA7B112003153EF /* src */ = {
 			isa = PBXGroup;
 			children = (
-				979A79851EA7B112003153EF /* definition.c */,
 				979A79861EA7B112003153EF /* include */,
+				979A79851EA7B112003153EF /* definition.c */,
 				979A79981EA7B112003153EF /* mapping.c */,
 				979A79991EA7B112003153EF /* model.c */,
 				979A799A1EA7B112003153EF /* network.c */,
-				979A799B1EA7B112003153EF /* network_test.c */,
 				979A799C1EA7B112003153EF /* parser.c */,
 				979A799D1EA7B112003153EF /* tests.c */,
+				979A799B1EA7B112003153EF /* network_test.c */,
 			);
 			name = src;
 			path = ../src;
@@ -1276,12 +1259,8 @@
 		979A79861EA7B112003153EF /* include */ = {
 			isa = PBXGroup;
 			children = (
-				979A79871EA7B112003153EF /* definition.h */,
-				979A79881EA7B112003153EF /* mapping.h */,
-				979A79891EA7B112003153EF /* mastic.h */,
-				979A798A1EA7B112003153EF /* model.h */,
-				979A798B1EA7B112003153EF /* network.h */,
-				979A798C1EA7B112003153EF /* parser.h */,
+				97C926AB1EB23ED100D2B0CE /* mastic_private.h */,
+				977C24791F03F4FA00CA1675 /* mastic.h */,
 				979A798D1EA7B112003153EF /* tests.h */,
 				979A798E1EA7B112003153EF /* uthash */,
 			);
@@ -1302,15 +1281,6 @@
 				979A79971EA7B112003153EF /* utvector.h */,
 			);
 			path = uthash;
-			sourceTree = "<group>";
-		};
-		979A79B41EA8A835003153EF /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				979A79B81EA8A835003153EF /* libyajl.a */,
-				9762EDD61EAE5414002062A1 /* yajl.framework */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 		979A79BC1EA8A86F003153EF /* ios */ = {
@@ -2576,6 +2546,15 @@
 			path = zyre;
 			sourceTree = "<group>";
 		};
+		97C9271D1EB38FD900D2B0CE /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				97C927221EB38FD900D2B0CE /* libyajl.a */,
+				97C927241EB38FD900D2B0CE /* yajl.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -2583,11 +2562,8 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9762EDEB1EAE551A002062A1 /* definition.h in Headers */,
-				9762EDEC1EAE551A002062A1 /* mapping.h in Headers */,
-				9762EDED1EAE551A002062A1 /* mastic.h in Headers */,
-				9762EDEF1EAE551A002062A1 /* network.h in Headers */,
-				9762EDF11EAE551A002062A1 /* tests.h in Headers */,
+				977C247A1F03F4FA00CA1675 /* mastic.h in Headers */,
+				970670DF1EDC187900CCDFDC /* mastic_private.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2606,7 +2582,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				9762EDD91EAE5465002062A1 /* PBXTargetDependency */,
+				97C927291EB38FEF00D2B0CE /* PBXTargetDependency */,
 			);
 			name = "mastic-macos";
 			productName = "mastic-macos";
@@ -2627,7 +2603,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				979A79BA1EA8A83F003153EF /* PBXTargetDependency */,
+				97C927261EB38FE300D2B0CE /* PBXTargetDependency */,
 			);
 			name = mastic;
 			productName = mastic;
@@ -2667,8 +2643,8 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
-					ProductGroup = 979A79B41EA8A835003153EF /* Products */;
-					ProjectRef = 979A79B31EA8A835003153EF /* yajl.xcodeproj */;
+					ProductGroup = 97C9271D1EB38FD900D2B0CE /* Products */;
+					ProjectRef = 97C9271C1EB38FD900D2B0CE /* yajl.xcodeproj */;
 				},
 			);
 			projectRoot = "";
@@ -2680,18 +2656,18 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		9762EDD61EAE5414002062A1 /* yajl.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = yajl.framework;
-			remoteRef = 9762EDD51EAE5414002062A1 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		979A79B81EA8A835003153EF /* libyajl.a */ = {
+		97C927221EB38FD900D2B0CE /* libyajl.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libyajl.a;
-			remoteRef = 979A79B71EA8A835003153EF /* PBXContainerItemProxy */;
+			remoteRef = 97C927211EB38FD900D2B0CE /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		97C927241EB38FD900D2B0CE /* yajl.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = yajl.framework;
+			remoteRef = 97C927231EB38FD900D2B0CE /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -2716,7 +2692,6 @@
 				9762EDDC1EAE547B002062A1 /* model.c in Sources */,
 				9762EDDD1EAE547B002062A1 /* network.c in Sources */,
 				9762EDDF1EAE547B002062A1 /* parser.c in Sources */,
-				9762EDE01EAE547B002062A1 /* tests.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2727,7 +2702,6 @@
 				979A79A11EA7B112003153EF /* network.c in Sources */,
 				979A79A01EA7B112003153EF /* model.c in Sources */,
 				979A799F1EA7B112003153EF /* mapping.c in Sources */,
-				979A79A41EA7B112003153EF /* tests.c in Sources */,
 				979A79A31EA7B112003153EF /* parser.c in Sources */,
 				979A799E1EA7B112003153EF /* definition.c in Sources */,
 			);
@@ -2736,15 +2710,15 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		9762EDD91EAE5465002062A1 /* PBXTargetDependency */ = {
+		97C927261EB38FE300D2B0CE /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "yajl-ios";
+			targetProxy = 97C927251EB38FE300D2B0CE /* PBXContainerItemProxy */;
+		};
+		97C927291EB38FEF00D2B0CE /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = "yajl-macos";
-			targetProxy = 9762EDD81EAE5465002062A1 /* PBXContainerItemProxy */;
-		};
-		979A79BA1EA8A83F003153EF /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = yajl;
-			targetProxy = 979A79B91EA8A83F003153EF /* PBXContainerItemProxy */;
+			targetProxy = 97C927281EB38FEF00D2B0CE /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -2943,6 +2917,7 @@
 				9762EDD31EAE5414002062A1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		979A79731EA7B0D6003153EF /* Build configuration list for PBXProject "mastic" */ = {
 			isa = XCConfigurationList;

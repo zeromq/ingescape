@@ -7,6 +7,7 @@
 TARGET = mastic
 
 TEMPLATE = lib
+#CONFIG += console
 
 DEFINES += MASTIC
 
@@ -19,7 +20,7 @@ win32:{
 #CONFIG+=android_compilation
 
 #UNCOMMENT THIS LINE TO RASPBERRY BUILD OR COMMENT FOR ANOTHER UNIX PLATFORM
-CONFIG+=raspberry_compilation
+#CONFIG+=raspberry_compilation
 
 
 include ('../dependencies/mastic_api_crossplateform.pri')

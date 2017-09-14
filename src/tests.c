@@ -9,6 +9,7 @@
 
 #include <stdio.h>
 #include <stdarg.h>
+#include "mastic.h"
 #include "tests.h"
 
 void callback_test_input_1(agent_iop* input_iop){
@@ -39,169 +40,169 @@ void callback_test_input_2(agent_iop* input_iop){
 //    free_definition(mtic_definition_live);
 //}
 
-void test_map(){
-    printf(" ------------ test_map ------------- \n");
+//void test_map(){
+//    printf(" ------------ test_map ------------- \n");
 
-    //Load definition
-    mtic_definition_loaded = load_definition_from_path("test_definition_my_agent.json");
-    mtic_definition_live = load_definition_from_path("test_definition_my_agent.json");
+//    //Load definition
+//    mtic_definition_loaded = parser_loadDefinitionFromPath("test_definition_my_agent.json");
+//    mtic_definition_live = parser_loadDefinitionFromPath("test_definition_my_agent.json");
 
-    //Load a map json file
-    load_map_from_path("test_map.json");
+//    //Load a map json file
+//    mtic_loadMappingFromPath("test_map.json");
 
-    //test map adding
-    mtic_map("e1", "*.s8");
+//    //test map adding
+//    mtic_map("e1", "*.s8");
 
-    //Print the mapping corresponding to the output
-    print_mapping(mtic_my_agent_mapping);
+//    //Print the mapping corresponding to the output
+//    print_mapping(mtic_my_agent_mapping);
 
-    //Free the memory
-    free_definition(mtic_definition_loaded);
-    free_definition(mtic_definition_live);
+//    //Free the memory
+//    free_definition(mtic_definition_loaded);
+//    free_definition(mtic_definition_live);
 
-}
+//}
 
-void test_model_workflow(){
-    printf(" ------------ test_model_workflow ------------- \n");
+//void test_model_workflow(){
+//    printf(" ------------ test_model_workflow ------------- \n");
 
-    mtic_definition_loaded = load_definition_from_path("test_definition_my_agent.json");    //Definition of the agent
-    mtic_definition_live = load_definition_from_path("test_definition_my_agent.json");    //Definition of the agent
+//    mtic_definition_loaded = parser_loadDefinitionFromPath("test_definition_my_agent.json");    //Definition of the agent
+//    mtic_definition_live = parser_loadDefinitionFromPath("test_definition_my_agent.json");    //Definition of the agent
 
-    /*
-     * Input 1 : e1
-     *
-     */
-    /***** OBSERVE & SET *****/
-    double new_value_e1 = 10.12;
-    mtic_observe("e1", &callback_test_input_1);
-    mtic_set("e1",&new_value_e1);
+//    /*
+//     * Input 1 : e1
+//     *
+//     */
+//    /***** OBSERVE & SET *****/
+//    double new_value_e1 = 10.12;
+//    mtic_observe("e1", &callback_test_input_1);
+//    mtic_set("e1",&new_value_e1);
 
-    /***** GET *****/
-    double value_e1 = 0.0;
-    model_state *state1 = NULL;
-    *state1 = OK;
-    value_e1 = *(double*)mtic_get("e1", state1);
+//    /***** GET *****/
+//    double value_e1 = 0.0;
+//    model_state *state1 = NULL;
+//    *state1 = OK;
+//    value_e1 = *(double*)mtic_get("e1", state1);
 
-    /*
-     * Input 2 : e2
-     *
-     */
-    /***** OBSERVE & SET *****/
-    char* new_value_e2 = strdup("modification");
-    mtic_observe("e2", &callback_test_input_2);
-    mtic_set("e2",new_value_e2);
+//    /*
+//     * Input 2 : e2
+//     *
+//     */
+//    /***** OBSERVE & SET *****/
+//    char* new_value_e2 = strdup("modification");
+//    mtic_observe("e2", &callback_test_input_2);
+//    mtic_set("e2",new_value_e2);
 
-    /***** GET *****/
-    char *value_e2 = NULL;
-    model_state *state2 = NULL;
-    *state2 = OK;
-    value_e2 = mtic_get("e2", state2);
+//    /***** GET *****/
+//    char *value_e2 = NULL;
+//    model_state *state2 = NULL;
+//    *state2 = OK;
+//    value_e2 = mtic_get("e2", state2);
 
-    /*
-     * Print loaded & live definition
-     *
-     */
-    printf("\t The definition loaded : \n");
-    print_definition(mtic_definition_loaded);
+//    /*
+//     * Print loaded & live definition
+//     *
+//     */
+//    printf("\t The definition loaded : \n");
+//    print_definition(mtic_definition_loaded);
 
 
-    printf("The definition live : \n");
-    print_definition(mtic_definition_live);
+//    printf("The definition live : \n");
+//    print_definition(mtic_definition_live);
 
-    //Free the memory
-    free_definition(mtic_definition_loaded);
-    free_definition(mtic_definition_live);
-    free(new_value_e2);
-    free(value_e2);
-}
+//    //Free the memory
+//    free_definition(mtic_definition_loaded);
+//    free_definition(mtic_definition_live);
+//    free(new_value_e2);
+//    free(value_e2);
+//}
 
-void test_mapping_workflow(){
-    printf(" ------------ test_mapping_workflow ------------- \n");
+//void test_mapping_workflow(){
+//    printf(" ------------ test_mapping_workflow ------------- \n");
 
-    //Load definition
-    mtic_definition_loaded = load_definition_from_path("test_definition_my_agent.json");
-    mtic_definition_live = load_definition_from_path("test_definition_my_agent.json");
+//    //Load definition
+//    mtic_definition_loaded = parser_loadDefinitionFromPath("test_definition_my_agent.json");
+//    mtic_definition_live = parser_loadDefinitionFromPath("test_definition_my_agent.json");
 
-    //Load a map json file
-    load_map_from_path("test_map.json");
+//    //Load a map json file
+//    load_map_from_path("test_map.json");
 
-    /*
-     * Simulate the ENTER
-     *
-     */
+//    /*
+//     * Simulate the ENTER
+//     *
+//     */
 
-    definition *external_agent_def = load_definition_from_path("external_definition.json");
+//    definition *external_agent_def = parser_loadDefinitionFromPath("external_definition.json");
 
-    //Check the map
-    agent_iop* output_to_subscribe = mtic_check_map(external_agent_def);
-    if(output_to_subscribe != NULL){
-    printf("The output(s) following need to be subscribed from agent : %s \n",
-           external_agent_def->name);
-    print_iop(output_to_subscribe);
-    }
+//    //Check the map
+//    agent_iop* output_to_subscribe = mtic_check_map(external_agent_def);
+//    if(output_to_subscribe != NULL){
+//    printf("The output(s) following need to be subscribed from agent : %s \n",
+//           external_agent_def->name);
+//    print_iop(output_to_subscribe);
+//    }
 
-    //subscribe : map received
-    double value = 25.63;
-    model_state state = map_received("A2","s4",&value);
+//    //subscribe : map received
+//    double value = 25.63;
+//    model_state state = mtic_map_received("A2","s4",&value);
 
-    if(state == NOK)
-        printf("The map_received 'A2.s4' is NOK \n");
+//    if(state == NOK)
+//        printf("The map_received 'A2.s4' is NOK \n");
 
-    //Print the mapping
-    print_mapping(mtic_my_agent_mapping);
+//    //Print the mapping
+//    print_mapping(mtic_my_agent_mapping);
 
-    agent_iop* output_to_unsubscribe = mtic_unmap(external_agent_def);
+//    agent_iop* output_to_unsubscribe = mtic_unmap(external_agent_def);
 
-    //Print the mapping after unmap
-    print_mapping(mtic_my_agent_mapping);
+//    //Print the mapping after unmap
+//    print_mapping(mtic_my_agent_mapping);
 
-    //Free the memory
-    free_definition(mtic_definition_loaded);
-    free_definition(mtic_definition_live);
-    free_definition(external_agent_def);
-    free_mapping(mtic_my_agent_mapping);
-    //Free iop map
-    struct agent_iop_t *iop, *tmp;
-    HASH_ITER(hh,output_to_unsubscribe, iop, tmp)
-    {
-        HASH_DEL(output_to_unsubscribe, iop);
-        free(iop);
-    }
-}
+//    //Free the memory
+//    free_definition(mtic_definition_loaded);
+//    free_definition(mtic_definition_live);
+//    free_definition(external_agent_def);
+//    mtic_free_mapping(mtic_my_agent_mapping);
+//    //Free iop map
+//    struct agent_iop *iop, *tmp;
+//    HASH_ITER(hh,output_to_unsubscribe, iop, tmp)
+//    {
+//        HASH_DEL(output_to_unsubscribe, iop);
+//        free(iop);
+//    }
+//}
 
-void test_check_category(){
-    //Load the definition
-    mtic_definition_loaded = load_definition_from_path("definition.json");
+//void test_check_category(){
+//    //Load the definition
+//    mtic_definition_loaded = parser_loadDefinitionFromPath("definition.json");
 
-    //Load the category compatible
-    category *cat_compatible = load_category_from_path("cat_compatible.json");
+//    //Load the category compatible
+//    category *cat_compatible = load_category_from_path("cat_compatible.json");
 
-    //Load the category incompatible
-    category *cat_incompatible = load_category_from_path("cat_incompatible.json");
+//    //Load the category incompatible
+//    category *cat_incompatible = load_category_from_path("cat_incompatible.json");
 
-    //Test the compatibility
-    if(check_category(mtic_definition_loaded,cat_compatible,GLOBAL) == true){
-        printf("The agent named %s is compatible with the category named %s \n",
-               mtic_definition_loaded->name,
-               cat_compatible->name);
-    }else{
-        printf("The agent named %s is NOT compatible with the category named %s \n",
-               mtic_definition_loaded->name,
-               cat_compatible->name);
-    }
+//    //Test the compatibility
+//    if(check_category(mtic_definition_loaded,cat_compatible,GLOBAL_CAT) == true){
+//        printf("The agent named %s is compatible with the category named %s \n",
+//               mtic_definition_loaded->name,
+//               cat_compatible->name);
+//    }else{
+//        printf("The agent named %s is NOT compatible with the category named %s \n",
+//               mtic_definition_loaded->name,
+//               cat_compatible->name);
+//    }
 
-    //Test the incompatibility
-    if(check_category(mtic_definition_loaded,cat_incompatible,GLOBAL) == true){
-        printf("The agent named %s is compatible with the category named %s \n",
-               mtic_definition_loaded->name,
-               cat_incompatible->name);
-    }else{
-        printf("The agent named %s is NOT compatible with the category named %s \n",
-               mtic_definition_loaded->name,
-               cat_incompatible->name);
-    }
+//    //Test the incompatibility
+//    if(check_category(mtic_definition_loaded,cat_incompatible,GLOBAL_CAT) == true){
+//        printf("The agent named %s is compatible with the category named %s \n",
+//               mtic_definition_loaded->name,
+//               cat_incompatible->name);
+//    }else{
+//        printf("The agent named %s is NOT compatible with the category named %s \n",
+//               mtic_definition_loaded->name,
+//               cat_incompatible->name);
+//    }
 
-}
+//}
 
 /*****  print function *****/
 void print_mapping(mapping *mapp){
@@ -248,34 +249,34 @@ void print_iop(agent_iop *iop)
     
     switch(iop->type)
     {
-        case INTEGER:
-            printf(", %s", "INTEGER");
+        case INTEGER_T:
+            printf(", %s", "INTEGER_T");
             printf(", %d", iop->value.i);
             break;
             
-        case DOUBLE_TYPE:
-            printf(", %s", "DOUBLE");
+        case DOUBLE_T:
+            printf(", %s", "DOUBLE_T");
             printf(", %f", iop->value.d);
             break;
             
-        case STRING:
-            printf(", %s", "STRING");
+        case STRING_T:
+            printf(", %s", "STRING_T");
             printf(", %s", iop->value.s);
             break;
             
-        case BOOL_TYPE:
-            printf(", %s", "BOOL");
+        case BOOL_T:
+            printf(", %s", "BOOL_T");
             printf(", %s", iop->value.b ? "true" : "false");
             break;
             
-        case IMPULSION:
-            printf(", %s", "IMPULSION");
+        case IMPULSION_T:
+            printf(", %s", "IMPULSION_T");
             printf(", %s", iop->value.impuls);
             break;
             
-        case STRUCTURE:
-            printf(", %s", "STRUCTURE");
-            printf(", %s", iop->value.strct);
+        case DATA_T:
+            printf(", %s", "DATA_T");
+            printf(", %s", iop->value.data);
             break;
             
         default:
@@ -289,7 +290,7 @@ void print_iop(agent_iop *iop)
 void print_category(category *cat)
 {
     unsigned int hashCount;
-    struct agent_iop_t *d;
+    struct agent_iop *d;
     int i;
 
     printf("\tcategory name : %s \n", cat->name);
@@ -326,7 +327,7 @@ void print_category(category *cat)
 void print_definition(definition *def)
 {
     unsigned int hashCount;
-    struct agent_iop_t *d;
+    struct agent_iop *d;
     int i;
     
     printf("Agent name : %s \n", def->name);
@@ -361,7 +362,7 @@ void print_definition(definition *def)
     }
 
     /* categories */
-    struct category_t *cat;
+    struct category *cat;
     hashCount = HASH_COUNT(def->categories);
     printf("\ncategories[%u]:\n", hashCount);
     i = 0;
@@ -435,7 +436,7 @@ category *init_categories()
     agent_iop *ihm_pointer_e1 = NULL;
     ihm_pointer_e1 = calloc(1, sizeof(agent_iop));
     ihm_pointer_e1->name = "e1";
-    ihm_pointer_e1->type = INTEGER;
+    ihm_pointer_e1->type = INTEGER_T;
     ihm_pointer_e1->value.i = 0;
     
     HASH_ADD_STR( ihm_cat->inputs_table , name,  ihm_pointer_e1);
@@ -444,7 +445,7 @@ category *init_categories()
     agent_iop *ihm_pointer_e2 = NULL;
     ihm_pointer_e2 = calloc(1, sizeof(agent_iop));
     ihm_pointer_e2->name = "e2";
-    ihm_pointer_e2->type = INTEGER;
+    ihm_pointer_e2->type = INTEGER_T;
     ihm_pointer_e2->value.i = 0;
     
     HASH_ADD_STR( ihm_cat->inputs_table , name,  ihm_pointer_e2);
@@ -456,7 +457,7 @@ category *init_categories()
     agent_iop *ihm_pointer_s1 = NULL;
     ihm_pointer_s1 = calloc(1, sizeof(agent_iop));
     ihm_pointer_s1->name = "s1";
-    ihm_pointer_s1->type = INTEGER;
+    ihm_pointer_s1->type = INTEGER_T;
     ihm_pointer_s1->value.i = 0;
     
     HASH_ADD_STR( ihm_cat->outputs_table, name,  ihm_pointer_s1);
@@ -465,7 +466,7 @@ category *init_categories()
     agent_iop *ihm_pointer_s2 = NULL;
     ihm_pointer_s2 = calloc(1, sizeof(agent_iop));
     ihm_pointer_s2->name = "s2";
-    ihm_pointer_s2->type = INTEGER;
+    ihm_pointer_s2->type = INTEGER_T;
     ihm_pointer_s2->value.i = 0;
     
     HASH_ADD_STR( ihm_cat->outputs_table, name,  ihm_pointer_s2);
@@ -477,7 +478,7 @@ category *init_categories()
     agent_iop *ihm_pointer_p1 = NULL;
     ihm_pointer_p1 = calloc(1, sizeof(agent_iop));
     ihm_pointer_p1->name = "p1";
-    ihm_pointer_p1->type = INTEGER;
+    ihm_pointer_p1->type = INTEGER_T;
     ihm_pointer_p1->value.i = 0;
     
     HASH_ADD_STR( ihm_cat->params_table, name,  ihm_pointer_p1);
@@ -486,7 +487,7 @@ category *init_categories()
     agent_iop *ihm_pointer_p2 = NULL;
     ihm_pointer_p2 = calloc(1, sizeof(agent_iop));
     ihm_pointer_p2->name = "p2";
-    ihm_pointer_p2->type = INTEGER;
+    ihm_pointer_p2->type = INTEGER_T;
     ihm_pointer_p2->value.i = 0;
     
     HASH_ADD_STR( ihm_cat->params_table, name,  ihm_pointer_p2);
@@ -507,7 +508,7 @@ category *init_categories()
     agent_iop *pointer_e1 = NULL;
     pointer_e1 = calloc(1, sizeof(agent_iop));
     pointer_e1->name = "e1";
-    pointer_e1->type = INTEGER;
+    pointer_e1->type = INTEGER_T;
     pointer_e1->value.i = 0;
     
     HASH_ADD_STR( pointer_cat->inputs_table , name,  pointer_e1);
@@ -516,7 +517,7 @@ category *init_categories()
     agent_iop *pointer_e2 = NULL;
     pointer_e2 = calloc(1, sizeof(agent_iop));
     pointer_e2->name = "e2";
-    pointer_e2->type = INTEGER;
+    pointer_e2->type = INTEGER_T;
     pointer_e2->value.i = 0;
     
     HASH_ADD_STR( pointer_cat->inputs_table , name,  pointer_e2);
@@ -528,7 +529,7 @@ category *init_categories()
     agent_iop *pointer_s1 = NULL;
     pointer_s1 = calloc(1, sizeof(agent_iop));
     pointer_s1->name = "s1";
-    pointer_s1->type = INTEGER;
+    pointer_s1->type = INTEGER_T;
     pointer_s1->value.i = 0;
     
     HASH_ADD_STR( pointer_cat->outputs_table, name,  pointer_s1);
@@ -537,7 +538,7 @@ category *init_categories()
     agent_iop *pointer_s2 = NULL;
     pointer_s2 = calloc(1, sizeof(agent_iop));
     pointer_s2->name = "s2";
-    pointer_s2->type = INTEGER;
+    pointer_s2->type = INTEGER_T;
     pointer_s2->value.i = 0;
     
     HASH_ADD_STR( pointer_cat->outputs_table, name,  pointer_s2);
@@ -549,7 +550,7 @@ category *init_categories()
     agent_iop *pointer_p1 = NULL;
     pointer_p1 = calloc(1, sizeof(agent_iop));
     pointer_p1->name = "p1";
-    pointer_p1->type = INTEGER;
+    pointer_p1->type = INTEGER_T;
     pointer_p1->value.i = 0;
     
     HASH_ADD_STR(  pointer_cat->params_table , name,  pointer_p1);
@@ -558,7 +559,7 @@ category *init_categories()
     agent_iop *pointer_p2 = NULL;
     pointer_p2 = calloc(1, sizeof(agent_iop));
     pointer_p2->name = "p2";
-    pointer_p2->type = INTEGER;
+    pointer_p2->type = INTEGER_T;
     pointer_p2->value.i = 0;
     
     HASH_ADD_STR(  pointer_cat->params_table , name,  pointer_p2);
@@ -590,7 +591,7 @@ void init_def()
     agent_iop *x = NULL;
     x = calloc(1, sizeof(agent_iop));
     x->name = "x";
-    x->type = INTEGER;
+    x->type = INTEGER_T;
     x->value.i = 0;
     
     //Add the output 'x' to the table 'outputs'
@@ -600,7 +601,7 @@ void init_def()
     agent_iop *y = NULL;
     y = calloc(1, sizeof(agent_iop));
     y->name = "y";
-    y->type = INTEGER;
+    y->type = INTEGER_T;
     y->value.i = 0;
     
     //Add the output 'y' to the table 'outputs'
@@ -630,9 +631,9 @@ void init_def()
     all_categories = init_categories();
     
     //Test all the categories
-    struct category_t *cat_to_check;
+    struct category *cat_to_check;
     for(cat_to_check = all_categories; cat_to_check != NULL; cat_to_check = cat_to_check->hh.next) {
-        if(check_category(mtic_definition_live, cat_to_check, OUTPUT) == true)
+        if(check_category(mtic_definition_live, cat_to_check, OUTPUT_CAT) == true)
         {
             printf("the agent is compatible to the category : %s \n", cat_to_check->name);
             HASH_ADD_STR(compatible_categories, name, cat_to_check);
@@ -690,4 +691,14 @@ void parse(char buffer[],int* num_of_args, char **arguments)
     }
     
     arguments[*num_of_args] = NULL;
+}
+
+
+int main (int argc, char *argv[])
+{
+    printf("function main for unit function test .... \n");
+
+    mtic_setDefinitionDescription("test description");
+
+    return 0;
 }

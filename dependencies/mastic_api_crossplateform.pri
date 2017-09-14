@@ -8,13 +8,9 @@ SOURCES += \
 
 HEADERS += \
     $$PWD/../src/include/uthash/uthash.h \
-    $$PWD/../src/include/definition.h \
-    $$PWD/../src/include/mapping.h \
     $$PWD/../src/include/mastic.h \
-    $$PWD/../src/include/model.h \
-    $$PWD/../src/include/network.h \
-    $$PWD/../src/include/parser.h \
-    $$PWD/../src/include/tests.h
+    $$PWD/../src/include/tests.h \
+    $$PWD/../src/include/mastic_private.h \
 
 INCLUDEPATH += $$PWD/../src/include
 
@@ -24,7 +20,7 @@ win32:{
 
     QMAKE_CXXFLAGS += -std=c11
 
-    INCLUDEPATH += $$PWD/getopt \
+#    INCLUDEPATH += $$PWD/getopt \
 
 #    HEADERS += $$PWD/getopt/getopt_win32.h
 #    SOURCES += $$PWD/getopt/getopt_win32.c
@@ -44,10 +40,11 @@ win32:{
     }
 
     #Copy includes
-    install_headers.files += $$PWD/../src/include/*.h \
-                             $$PWD/../src/include/uthash \
-                             $$PWD/getopt
+#    install_headers.files += $$PWD/../src/include/*.h \
+#                             $$PWD/../src/include/uthash \
+#                             $$PWD/getopt
     install_headers.path += "C:/mastic/include"
+    install_headers.files += $$PWD/../src/include/mastic.h \
 
 
     #Add the make step 'install' to copy the dll files to the output folder

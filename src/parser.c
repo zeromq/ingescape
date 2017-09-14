@@ -1,14 +1,18 @@
 //
 //  mtic_parseur.c
 //
-//  Created by Patxi Berard
+//  Created by Mathieu Poirier
+//  Modified by Patxi Berard
 //  Modified by Vincent Deliencourt
 //  Copyright © 2016 IKKY WP4.8. All rights reserved.
 //
 
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "yajl/yajl_tree.h"
 #include "yajl/yajl_gen.h"
-#include "parser.h"
+#include "mastic_private.h"
 
 #define STR_CATEGORY "category"
 #define STR_DEFINITION "definition"
@@ -22,7 +26,11 @@
 #define STR_TYPE "type"
 #define STR_VALUE "value"
 
-// --------- static functions used for json parsing --------------------//
+bool agentNameChangedByDefinition = false;
+
+////////////////////////////////////////////////////////////////////////
+// PRIVATE API
+////////////////////////////////////////////////////////////////////////
 
 /*
  * Function: json_add_data_to_hash
@@ -30,42 +38,45 @@
  *   parse a agent_iop data and add it to the corresponding hash table
  */
 
-static void json_add_data_to_hash (struct agent_iop_t** hasht,
+static void json_add_data_to_hash (struct agent_iop ** hasht,iop_t type,
                                    yajl_val obj){
 
-    struct agent_iop_t *data = NULL;
+    struct agent_iop *data = NULL;
 
     /* check if the key already exist */
     const char* name = YAJL_GET_STRING(obj->u.object.values[0]);
     HASH_FIND_STR(*hasht, name , data);
     if (data == NULL) {
-        data = calloc (1, sizeof (struct agent_iop_t));
+        data = calloc (1, sizeof (struct agent_iop));
         data->name = strdup (name);
 
-        data->type = string_to_value_type (YAJL_GET_STRING(obj->u.object.values[1]));
-        switch (data->type) {
-            case INTEGER:
+        data->value_type = string_to_value_type (YAJL_GET_STRING(obj->u.object.values[1]));
+        switch (data->value_type) {
+            case INTEGER_T:
                 data->value.i =(int) YAJL_GET_INTEGER (obj->u.object.values[2]);
                 break;
-            case DOUBLE_TYPE:
+            case DOUBLE_T:
                 data->value.d = YAJL_GET_DOUBLE (obj->u.object.values[2]);
                 break;
-            case BOOL_TYPE:
+            case BOOL_T:
                 data->value.b = string_to_boolean (YAJL_GET_STRING(obj->u.object.values[2]));
                 break;
-            case STRING:
-                data->value.s = strdup (YAJL_GET_STRING(obj->u.object.values[2]));
+            case STRING_T:
+                data->value.s = strdup (YAJL_IS_STRING(obj->u.object.values[2]) ? obj->u.object.values[2]->u.string : "");
                 break;
-            case IMPULSION:
-                data->value.impuls = strdup (YAJL_GET_STRING(obj->u.object.values[2]));
+            case IMPULSION_T:
+                //IMPULSION has no value
                 break;
-            case STRUCTURE:
-                data->value.strct = strdup (YAJL_GET_STRING(obj->u.object.values[2]));
+            case DATA_T:
+                //FIXME : we store data as string but we should check it convert it to hexa
+                //data->value.s = strdup (YAJL_IS_STRING(obj->u.object.values[2]) ? obj->u.object.values[2]->u.string : "");
                 break;
             default:
+                fprintf(stderr, "%s - ERROR -  unknown data type to load from json\n", __FUNCTION__);
                 break;
         }
         data->is_muted = false;
+        data->type = type;
         HASH_ADD_STR(*hasht , name, data );  /* id: name of key field */
     }
 }
@@ -76,16 +87,17 @@ static void json_add_data_to_hash (struct agent_iop_t** hasht,
  *   parse a tab of agent_iop data and add them into the corresponding hash table
  */
 
-static void json_add_data (yajl_val node, const char** path,
-                            struct agent_iop_t** hasht) {
+static void json_add_data (yajl_val node, const char** path,iop_t type,
+                            struct agent_iop ** hasht) {
     yajl_val v;
     v = yajl_tree_get(node, path, yajl_t_array);
+
     if (v && YAJL_IS_ARRAY(v)){
         unsigned int  i;
         for (i = 0; i < v->u.array.len; i++ ){
             yajl_val obj = v->u.array.values[i];
             if( obj && YAJL_IS_OBJECT(obj))
-                json_add_data_to_hash (hasht, obj);
+                json_add_data_to_hash (hasht,type, obj);
         }
     }
 }
@@ -165,7 +177,6 @@ static int json_tokenized (const char* json_str,
     return 1;
 }
 
-
 /*
  * Function: json_parse_category
  * ----------------------------
@@ -175,28 +186,28 @@ static int json_tokenized (const char* json_str,
 static category* json_parse_category (yajl_val node) {
 
     yajl_val v;
-    struct category_t* cat = NULL;
+    struct category* cat = NULL;
     cat = (category*) calloc(1, sizeof(category));
     const char * path[] = { STR_CATEGORY, "",  (const char *) 0 };
 
     path[1] = STR_NAME;
     v = yajl_tree_get(node, path, yajl_t_any);
     if (v)
-        cat->name = strdup (YAJL_GET_STRING(v));
+        cat->name = strdup (YAJL_IS_STRING(v) ? (v)->u.string : "");
 
     path[1] = STR_VERSION;
     v = yajl_tree_get(node, path, yajl_t_any);
     if (v)
-        cat->version = strdup (YAJL_GET_STRING(v));
+        cat->version = strdup (YAJL_IS_STRING(v) ? (v)->u.string : "");
 
     path[1] = STR_PARAMETERS;
-    json_add_data (node, path, &cat->params_table);
+    json_add_data (node, path,PARAMETER_T, &cat->params_table);
 
     path[1] = STR_INPUTS;
-    json_add_data (node, path, &cat->inputs_table);
+    json_add_data (node, path,INPUT_T, &cat->inputs_table);
 
     path[1] = STR_OUTPUTS;
-    json_add_data (node, path, &cat->outputs_table);
+    json_add_data (node, path,OUTPUT_T, &cat->outputs_table);
 
     return cat;
 }
@@ -207,10 +218,10 @@ static category* json_parse_category (yajl_val node) {
  *   parse a tab of categories and add them into the corresponding hash table
  */
 
-static void json_add_category_to_hash (struct category_t** hasht,
+static void json_add_category_to_hash (struct category** hasht,
                                        yajl_val current_cat){
 
-    struct category_t *cat = NULL;
+    struct category *cat = NULL;
     yajl_val v;
     const char * path_in_current[] = { "", (const char *) 0 };
 
@@ -221,22 +232,22 @@ static void json_add_category_to_hash (struct category_t** hasht,
         const char* name = YAJL_GET_STRING(v);
         HASH_FIND_STR(*hasht, name , cat);
         if (cat == NULL){
-            cat = calloc (1, sizeof (struct category_t));
+            cat = calloc (1, sizeof (struct category));
             cat->name = strdup (name);
 
             path_in_current[0] = STR_VERSION;
             v = yajl_tree_get(current_cat, path_in_current, yajl_t_any);
             if (v)
-                cat->version = strdup (YAJL_GET_STRING(v));
+                cat->version = strdup (YAJL_IS_STRING(v) ? (v)->u.string : "");
 
             path_in_current[0] = STR_PARAMETERS;
-            json_add_data (current_cat, path_in_current, &cat->params_table);
+            json_add_data (current_cat, path_in_current,PARAMETER_T, &cat->params_table);
 
             path_in_current[0] = STR_INPUTS;
-            json_add_data (current_cat, path_in_current, &cat->inputs_table);
+            json_add_data (current_cat, path_in_current,INPUT_T, &cat->inputs_table);
 
             path_in_current[0] = STR_OUTPUTS;
-            json_add_data (current_cat, path_in_current, &cat->outputs_table);
+            json_add_data (current_cat, path_in_current,OUTPUT_T, &cat->outputs_table);
 
             HASH_ADD_STR(*hasht , name, cat );  /* id: name of key field */
         }
@@ -250,7 +261,6 @@ static void json_add_category_to_hash (struct category_t** hasht,
  */
 
 static definition* json_parse_definition (yajl_val node) {
-
     definition* def;
     yajl_val v;
     def = (definition*) calloc(1, sizeof(definition));
@@ -258,27 +268,29 @@ static definition* json_parse_definition (yajl_val node) {
 
     path[1] = STR_NAME;
     v = yajl_tree_get(node, path, yajl_t_any);
-    if (v)
-        def->name = strdup (YAJL_GET_STRING(v));
+
+    if (v){
+        def->name = strdup (YAJL_IS_STRING(v) ? (v)->u.string : "");
+    }
 
     path[1] = STR_DESCRIPTION;
     v = yajl_tree_get(node, path, yajl_t_any);
     if (v)
-        def->description = strdup (YAJL_GET_STRING(v));
+        def->description = strdup (YAJL_IS_STRING(v) ? (v)->u.string : "");
 
     path[1] = STR_VERSION;
     v = yajl_tree_get(node, path, yajl_t_any);
     if (v)
-        def->version = strdup (YAJL_GET_STRING(v));
+        def->version = strdup (YAJL_IS_STRING(v) ? (v)->u.string : "");
 
     path[1] = STR_INPUTS;
-    json_add_data (node, path, &def->inputs_table);
+    json_add_data (node, path,INPUT_T, &def->inputs_table);
 
     path[1] = STR_OUTPUTS;
-    json_add_data (node, path, &def->outputs_table);
+    json_add_data (node, path,OUTPUT_T, &def->outputs_table);
 
     path[1] = STR_PARAMETERS;
-    json_add_data (node, path, &def->params_table);
+    json_add_data (node, path,PARAMETER_T, &def->params_table);
 
     path[1] = STR_CATEGORIES;
     v = yajl_tree_get(node, path, yajl_t_array);
@@ -300,13 +312,13 @@ static definition* json_parse_definition (yajl_val node) {
  *   parse a tab of mapping output type and add them into the corresponding hash table
  */
 
-static void json_add_map_out_to_hash (struct mapping_out_t** hasht,
+static void json_add_map_out_to_hash (struct mapping_out** hasht,
                                        yajl_val current_map_out){
 
     const char* input_name;
     const char* agent_name;
     const char* output_name;
-    struct mapping_out_t *map_out = NULL;
+    struct mapping_out *map_out = NULL;
     yajl_val v;
     const char * path_in_current[] = { "", (const char *) 0 };
 
@@ -317,7 +329,7 @@ static void json_add_map_out_to_hash (struct mapping_out_t** hasht,
     HASH_FIND_INT(*hasht, &map_id , map_out);
 
     if (map_out == NULL){
-        map_out = calloc (1, sizeof (struct mapping_out_t));
+        map_out = calloc (1, sizeof (struct mapping_out));
         map_out->map_id = map_id;
         map_out->state = OFF;
 
@@ -356,12 +368,12 @@ static void json_add_map_out_to_hash (struct mapping_out_t** hasht,
  *   parse a tab of mapping category type and add them into the corresponding hash table
  */
 
-static void json_add_map_cat_to_hash (struct mapping_cat_t** hasht,
+static void json_add_map_cat_to_hash (struct mapping_cat** hasht,
                                        yajl_val current_map_out){
 
     const char* agent_name;
     const char* category_name;
-    struct mapping_cat_t *map_cat = NULL;
+    struct mapping_cat *map_cat = NULL;
     yajl_val v;
     const char * path_in_current[] = { "", (const char *) 0 };
 
@@ -374,7 +386,7 @@ static void json_add_map_cat_to_hash (struct mapping_cat_t** hasht,
         HASH_FIND_INT(*hasht, &map_cat_id , map_cat);
 
         if (map_cat == NULL){
-            map_cat = calloc (1, sizeof (struct mapping_cat_t));
+            map_cat = calloc (1, sizeof (struct mapping_cat));
             map_cat->map_cat_id = map_cat_id;
             map_cat->state = OFF;
 
@@ -459,7 +471,6 @@ static mapping* json_parse_mapping (yajl_val node) {
     return mapp;
 }
 
-
 /*
  * Function: json_dump_iop
  * -----------------------
@@ -474,34 +485,33 @@ static void json_dump_iop (yajl_gen *g, agent_iop* aiop) {
     yajl_gen_string(*g, (const unsigned char *) aiop->name, strlen (aiop->name));
     
     yajl_gen_string(*g, (const unsigned char *) STR_TYPE, strlen(STR_TYPE));
-    yajl_gen_string(*g, (const unsigned char *) value_type_to_string(aiop->type), strlen(value_type_to_string(aiop->type)));
+    yajl_gen_string(*g, (const unsigned char *) value_type_to_string(aiop->value_type), strlen(value_type_to_string(aiop->value_type)));
     
     yajl_gen_string(*g, (const unsigned char *) STR_VALUE, strlen(STR_VALUE));
     
-    switch (aiop->type) {
-        case INTEGER:
+    switch (aiop->value_type) {
+        case INTEGER_T:
             yajl_gen_integer(*g, aiop->value.i);
             break;
-        case DOUBLE_TYPE:
+        case DOUBLE_T:
             yajl_gen_double(*g, aiop->value.d);
             break;
-        case BOOL_TYPE:
+        case BOOL_T:
             yajl_gen_string(*g, (const unsigned char *) boolean_to_string(aiop->value.b), strlen(boolean_to_string(aiop->value.b)));
             break;
-        case STRING:
+        case STRING_T:
             yajl_gen_string(*g, (const unsigned char *) aiop->value.s, strlen(aiop->value.s));
             break;
-        case IMPULSION:
-            yajl_gen_string(*g, (const unsigned char *) aiop->value.impuls, strlen(aiop->value.impuls));
+        case IMPULSION_T:
+            yajl_gen_string(*g, (const unsigned char *) "", 0);
             break;
-        case STRUCTURE:
-            yajl_gen_string(*g, (const unsigned char *) aiop->value.strct, strlen(aiop->value.strct));
+        case DATA_T:
+            yajl_gen_string(*g, (const unsigned char *) aiop->value.data, aiop->valueSize-1);
             break;
         default:
-            fprintf(stderr, "%s - ERROR -  unknown value type to convert in string\n", __FUNCTION__);
+            fprintf(stderr, "%s - ERROR -  unknown data type to convert in string\n", __FUNCTION__);
             break;
     }
-    
     yajl_gen_map_close(*g);
 }
 
@@ -514,7 +524,7 @@ static void json_dump_iop (yajl_gen *g, agent_iop* aiop) {
 static void json_dump_category (yajl_gen *g, category* cat) {
     
     unsigned int hashCount = 0;
-    struct agent_iop_t *d;
+    struct agent_iop *d;
     
     yajl_gen_map_open(*g);
     
@@ -566,18 +576,27 @@ static void json_dump_category (yajl_gen *g, category* cat) {
 static void json_dump_definition (yajl_gen *g, definition* def) {
     
     unsigned int hashCount = 0;
-    struct agent_iop_t *d;
+    struct agent_iop *d;
     
     yajl_gen_map_open(*g);
     
     yajl_gen_string(*g, (const unsigned char *) STR_NAME, strlen(STR_NAME));
-    yajl_gen_string(*g, (const unsigned char *) def->name, strlen (def->name));
+    //Get the agent name from the network layer
+    char *name = mtic_getAgentName();
+    yajl_gen_string(*g, (const unsigned char *) name, strlen (name));
+    free(name);
     
     yajl_gen_string(*g, (const unsigned char *) STR_DESCRIPTION, strlen(STR_DESCRIPTION));
-    yajl_gen_string(*g, (const unsigned char *) def->description, strlen (def->description));
+    if(def->description != NULL)
+        yajl_gen_string(*g, (const unsigned char *) def->description, strlen (def->description));
+    else
+        yajl_gen_string(*g, (const unsigned char *) (""), 0);
     
     yajl_gen_string(*g, (const unsigned char *) STR_VERSION, strlen(STR_VERSION));
-    yajl_gen_string(*g, (const unsigned char *) def->version, strlen(def->version));
+    if(def->version != NULL)
+        yajl_gen_string(*g, (const unsigned char *) def->version, strlen(def->version));
+    else
+        yajl_gen_string(*g, (const unsigned char *) "", 0);
     
     hashCount = HASH_COUNT(def->params_table);
     if (hashCount) {
@@ -609,7 +628,7 @@ static void json_dump_definition (yajl_gen *g, definition* def) {
         yajl_gen_array_close(*g);
     }
     
-    struct category_t *cat;
+    struct category *cat;
     hashCount = HASH_COUNT(def->categories);
     if (hashCount) {
         yajl_gen_string(*g, (const unsigned char *) STR_CATEGORIES, strlen(STR_CATEGORIES));
@@ -623,10 +642,116 @@ static void json_dump_definition (yajl_gen *g, definition* def) {
     yajl_gen_map_close(*g);
 }
 
+/*
+ * Function: json_dump_mapping_out
+ * -----------------------
+ *   convert a mapping_out structure into json string
+ */
 
-// --------- Public API for json parsing / dumping --------------------//
+static void json_dump_mapping_out (yajl_gen *g, mapping_out* mapp_out) {
 
-mapping* load_map(const char* json_str){
+    yajl_gen_map_open(*g);
+
+    yajl_gen_string(*g, (const unsigned char *) "input_name", strlen("input_name"));
+    yajl_gen_string(*g, (const unsigned char *) mapp_out->input_name, strlen (mapp_out->input_name));
+
+    yajl_gen_string(*g, (const unsigned char *) "agent_name", strlen("agent_name"));
+    yajl_gen_string(*g, (const unsigned char *) mapp_out->agent_name, strlen(mapp_out->agent_name));
+
+    yajl_gen_string(*g, (const unsigned char *) "output_name", strlen("output_name"));
+    yajl_gen_string(*g, (const unsigned char *) mapp_out->output_name, strlen(mapp_out->output_name));
+
+    yajl_gen_map_close(*g);
+}
+
+/*
+ * Function: json_dump_mapping_cat
+ * -----------------------
+ *   convert a mapping_cat structure into json string
+ */
+
+static void json_dump_mapping_cat (yajl_gen *g, mapping_cat* mapp_cat) {
+
+    yajl_gen_map_open(*g);
+
+    yajl_gen_string(*g, (const unsigned char *) "agent_name", strlen("agent_name"));
+    yajl_gen_string(*g, (const unsigned char *) mapp_cat->agent_name, strlen (mapp_cat->agent_name));
+
+    yajl_gen_string(*g, (const unsigned char *) "category_name", strlen("category_name"));
+    yajl_gen_string(*g, (const unsigned char *) mapp_cat->category_name, strlen(mapp_cat->category_name));
+
+    yajl_gen_map_close(*g);
+}
+
+/*
+ * Function: json_dump_mapping
+ * ------------------------------
+ *   convert a mapping structure into mapping.json string
+ */
+
+static void json_dump_mapping (yajl_gen *g, mapping* mapp) {
+
+    unsigned int hashCount = 0;
+    struct mapping_out *currentMapOut = NULL;
+    struct mapping_cat *currentMapCat = NULL;
+
+    yajl_gen_map_open(*g);
+
+    yajl_gen_string(*g, (const unsigned char *) STR_NAME, strlen(STR_NAME));
+    if(mapp->name != NULL)
+        yajl_gen_string(*g, (const unsigned char *) mapp->name, strlen (mapp->name));
+    else
+        yajl_gen_string(*g, (const unsigned char *) (""), 0);
+
+    yajl_gen_string(*g, (const unsigned char *) STR_DESCRIPTION, strlen(STR_DESCRIPTION));
+    if(mapp->description != NULL)
+        yajl_gen_string(*g, (const unsigned char *) mapp->description, strlen (mapp->description));
+    else
+        yajl_gen_string(*g, (const unsigned char *) (""), 0);
+
+    yajl_gen_string(*g, (const unsigned char *) STR_VERSION, strlen(STR_VERSION));
+    if(mapp->version != NULL)
+        yajl_gen_string(*g, (const unsigned char *) mapp->version, strlen(mapp->version));
+    else
+        yajl_gen_string(*g, (const unsigned char *) (""), 0);
+
+    //Mapping_out
+    hashCount = HASH_COUNT(mapp->map_out);
+    if (hashCount) {
+        yajl_gen_string(*g, (const unsigned char *) "mapping_out", strlen("mapping_out"));
+        yajl_gen_array_open(*g);
+        for(currentMapOut=mapp->map_out; currentMapOut != NULL; currentMapOut=currentMapOut->hh.next) {
+            json_dump_mapping_out(g, currentMapOut);
+        }
+        yajl_gen_array_close(*g);
+    }
+
+    //Mapping_cat
+    hashCount = HASH_COUNT(mapp->map_cat);
+    if (hashCount) {
+        yajl_gen_string(*g, (const unsigned char *) "mapping_cat", strlen("mapping_cat"));
+        yajl_gen_array_open(*g);
+        for(currentMapCat=mapp->map_cat; currentMapCat != NULL; currentMapCat=currentMapOut->hh.next) {
+            json_dump_mapping_cat(g, currentMapCat);
+        }
+        yajl_gen_array_close(*g);
+    }
+
+    yajl_gen_map_close(*g);
+}
+
+/*
+ * Function: load_map
+ * ------------------
+ *   Load a mapping in the standartised format JSON to initialize a mapping structure from a string.
+ *   The mapping structure is dynamically allocated. You will have to use free_mapping function to deallocated it correctly.
+ *
+ *   json_str      : a string (json format)
+ *
+ *   returns : a pointer on a mapping structure or NULL if it has failed
+ */
+
+mapping* parser_LoadMap(const char* json_str){
     
     mapping *mapp = NULL;
     yajl_val node;
@@ -643,7 +768,18 @@ mapping* load_map(const char* json_str){
     return mapp;
 }
 
-mapping* load_map_from_path (const char* path){
+/*
+ * Function: load_map_from_path
+ * ----------------------------
+ *   Load a mapping in the standartised format JSON to initialize a mapping structure from a local file path.
+ *   The mapping structure is dynamically allocated. You will have to use free_mapping function to deallocated it correctly.
+ *
+ *   file_path      : the file path
+ *
+ *   returns : a pointer on a mapping structure or NULL if it has failed
+ */
+
+mapping* parser_LoadMapFromPath (const char* path){
 
     char *json_str = NULL;
     mapping *mapp = NULL;
@@ -652,13 +788,24 @@ mapping* load_map_from_path (const char* path){
     if (!json_str)
         return NULL;
 
-    mapp = load_map(json_str);
+    mapp = parser_LoadMap(json_str);
 
     free (json_str);
     json_str = NULL;
 
     return mapp;
 }
+
+/*
+ * Function: load_category
+ * ----------------------------
+ *   Load a category in the standartised format JSON to initialize a category structure from string.
+ *   The category structure is dynamically allocated. You will have to use free_category function to deallocated it correctly.
+ *
+ *   json_str      : a string (json format)
+ *
+ *   returns: a pointer on a category structure or NULL if it has failed
+ */
 
 category* load_category (const char* json_str) {
     
@@ -691,6 +838,16 @@ category* load_category_from_path (const char* path) {
     return cat;
 }
 
+/*
+ * Function: export_category
+ * ----------------------------
+ *   Returns a categorie structure into a standartised format json string UTF8 to send it throught the BUS or save it in a file
+ *
+ *   cat    : the category dump in string
+ *
+ *   returns: a category json format string UTF8
+ */
+
 const char* export_category (category* cat) {
    
     const char* result = NULL;
@@ -717,6 +874,16 @@ const char* export_category (category* cat) {
     
     return result;
 }
+
+/*
+ * Function: export_definition
+ * ----------------------------
+ *   Returns a agent's definition structure into a standartised format json string UTF8 to send it throught the BUS or save it in a file
+ *
+ *   def    : the agent's definition dump in string
+ *
+ *   returns: a definition json format string UTF8
+ */
 
 char* export_definition (definition* def) {
     
@@ -745,7 +912,54 @@ char* export_definition (definition* def) {
     return result;
 }
 
-definition * load_definition (const char* json_str) {
+/*
+ * Function: export_mapping
+ * ----------------------------
+ *   Returns a agent's mapping structure into a standartised format json string UTF8 to send it throught the BUS or save it in a file
+ *
+ *   mapp    : the agent's mapping dump in string
+ *
+ *   returns: a mapping json format string UTF8
+ */
+
+char* export_mapping(mapping *mapp){
+    char* result = NULL;
+    const unsigned char * json_str = NULL;
+    size_t len;
+    yajl_gen g;
+
+    g = yajl_gen_alloc(NULL);
+    yajl_gen_config(g, yajl_gen_beautify, 1);
+    yajl_gen_config(g, yajl_gen_validate_utf8, 1);
+
+    yajl_gen_map_open(g);
+    yajl_gen_string(g, (const unsigned char *) "mapping", strlen("mapping"));
+    json_dump_mapping(&g, mapp);
+    yajl_gen_map_close(g);
+
+    // try to get our dumping result
+    if (yajl_gen_get_buf(g, &json_str, &len) == yajl_gen_status_ok)
+    {
+        result = strdup((const char*) json_str);
+    }
+
+    yajl_gen_free(g);
+
+    return result;
+}
+
+/*
+ * Function: load_definition
+ * ----------------------------
+ *   Load a agent definition in the standartised format JSON to initialize a definition structure from a string.
+ *   The definition structure is dynamically allocated. You will have to use free_definition function to deallocated it correctly.
+ *
+ *   json_str      : a string (json format)
+ *
+ *   returns: a pointer on a category structure or NULL if it has failed
+ */
+
+definition* parser_loadDefinition (const char* json_str) {
     
     definition *def = NULL;
     yajl_val node;
@@ -759,7 +973,18 @@ definition * load_definition (const char* json_str) {
     return def;
 }
 
-definition * load_definition_from_path (const char* path) {
+/*
+ * Function: load_definition_from_path
+ * -----------------------------------
+ *   Load a agent definition in the standartised format JSON to initialize a definition structure from a local file path.
+ *   The definition structure is dynamically allocated. You will have to use free_definition function to deallocated it correctly.
+ *
+ *   file_path      : the file path
+ *
+ *   returns: a pointer on a category structure or NULL if it has failed
+ */
+
+definition * parser_loadDefinitionFromPath (const char* path) {
 
     char *json_str = NULL;
     definition *def = NULL;
@@ -768,7 +993,7 @@ definition * load_definition_from_path (const char* path) {
     if (!json_str)
         return 0;
 
-    def = load_definition(json_str);
+    def = parser_loadDefinition(json_str);
 
     free (json_str);
     json_str = NULL;
@@ -776,6 +1001,14 @@ definition * load_definition_from_path (const char* path) {
     return def;
 }
 
+/*
+ * Function: init_mapping
+ * ----------------------------
+ *   read mapping from file path and init inernal mapping data
+ *
+ *   mapping_file_path : path to the agent mapping file
+ *
+ */
 
 int mtic_init_mapping (const char* mapping_file_path)
 {
@@ -783,7 +1016,7 @@ int mtic_init_mapping (const char* mapping_file_path)
 
     if (mapping_file_path != NULL){
         // Init definition
-        mtic_my_agent_mapping = load_map_from_path(mapping_file_path);
+        mtic_my_agent_mapping = parser_LoadMapFromPath(mapping_file_path);
         if(mtic_my_agent_mapping == NULL)
         {
             fprintf(stderr, "Error : Mapping file has not been loaded : %s\n", mapping_file_path );
@@ -796,18 +1029,27 @@ int mtic_init_mapping (const char* mapping_file_path)
     return errorCode;
 }
 
+/*
+ * Function: mtic_init_internal_data
+ * ----------------------------
+ *   read definition from file path and init inernal agent data
+ *   initialize definition_load and mtic_definition_live data structures
+ *
+ *   definition_file_path : path to the agent definiton file
+ *
+ */
 
 int mtic_init_internal_data (const char* definition_file_path)
 {
     int errorCode = -1;
     if (definition_file_path != NULL){
         // Init definition
-        mtic_definition_loaded = load_definition_from_path(definition_file_path);
+        mtic_definition_loaded = parser_loadDefinitionFromPath(definition_file_path);
 
         if(mtic_definition_loaded != NULL)
         {
             // Live data corresponds to a copy of the initial definition
-            mtic_definition_live = calloc(1, sizeof(struct definition_t));
+            mtic_definition_live = calloc(1, sizeof(struct definition));
             memcpy(mtic_definition_live, mtic_definition_loaded, sizeof(*mtic_definition_loaded));
             errorCode = 0;
         } else {
@@ -822,4 +1064,95 @@ int mtic_init_internal_data (const char* definition_file_path)
     return errorCode;
 }
 
+////////////////////////////////////////////////////////////////////////
+// PUBLIC API
+////////////////////////////////////////////////////////////////////////
+
+/**
+ * \fn int mtic_loadDefinition (const char* json_str)
+ * \ingroup loadSetGetDefFct
+ * \brief load definition in variable 'mtic_definition_loaded' & copy in 'mtic_definition_live"
+ *      from a json string
+ *
+ * \param json_str String in json format. Can't be NULL.
+ * \return The error. 1 is OK, 0 json string is NULL, -1 Definition file has not been loaded
+ */
+int mtic_loadDefinition (const char* json_str){
+    mtic_definition_loaded = NULL;
+
+    //Check if the json string is null
+    if(json_str == NULL)
+    {
+        mtic_debug("mtic_loadDefinition : json string is null \n");
+        return 0;
+    }
+
+    //Load definition and init variable : mtic_definition_loaded
+    mtic_definition_loaded = parser_loadDefinition(json_str);
+
+    if(mtic_definition_loaded == NULL)
+    {
+        mtic_debug("mtic_loadDefinition : Definition file has not been loaded from json string : %s\n", json_str );
+        return -1;
+    }else{
+        //Check the name of agent from network layer
+        char *name = mtic_getAgentName();
+        if(strcmp(name, AGENT_NAME_DEFAULT) == 0 || agentNameChangedByDefinition){
+            //The name of the agent is default or was previouly changed by definition load
+            mtic_setAgentName(mtic_definition_loaded->name);
+            agentNameChangedByDefinition = true;
+        }//else
+            //The agent name was assigned by the developer : we keep it untouched
+        free(name);
+    }
+
+    // Live data corresponds to a copy of the initial definition
+    mtic_definition_live = parser_loadDefinition(json_str);
+
+    return 1;
+}
+
+/**
+ * \fn int mtic_loadDefinitionFromPath (const char* file_path)
+ * \ingroup loadSetGetDefFct
+ * \brief load definition in variable 'mtic_definition_loaded' & copy in 'mtic_definition_live"
+ *      from a file path
+ *
+ * \param file_path The string which contains the json file path. Can't be NULL.
+ * \return The error. 1 is OK, 0 json string is NULL, -1 Definition file has not been loaded
+ */
+int mtic_loadDefinitionFromPath (const char* file_path){
+    mtic_definition_loaded = NULL;
+
+    //Check if the json string is null
+    if(file_path == NULL)
+    {
+        mtic_debug("Error : file path is null \n");
+        return 0;
+    }
+
+    //Load definition and init variable : mtic_definition_loaded
+    mtic_definition_loaded = parser_loadDefinitionFromPath(file_path);
+
+    if(mtic_definition_loaded == NULL)
+    {
+        mtic_debug("Error : Definition file has not been loaded from file path : %s\n", file_path);
+        return -1;
+    }else{
+        //Check the name of agent from network layer
+        char *name = mtic_getAgentName();
+        if(strcmp(name, AGENT_NAME_DEFAULT) == 0 || agentNameChangedByDefinition){
+            //The name of the agent is default or was previouly changed by definition load
+            mtic_setAgentName(mtic_definition_loaded->name);
+            agentNameChangedByDefinition = true;
+        }//else
+            //The agent name was assigned by the developer : we keep it untouched
+        free(name);
+    }
+
+    // Live data corresponds to a copy of the initial definition
+    mtic_definition_live = parser_loadDefinitionFromPath(file_path);
+
+    return 1;
+}
 
