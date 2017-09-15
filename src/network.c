@@ -17,10 +17,14 @@
 #ifdef _WIN32
 #endif
 #ifdef __linux__
-    #include <unistd.h>
+#include <unistd.h>
 #endif
-#ifdef __APPLE__
+
+#ifdef __APPLE__ 
+#include <TargetConditionals.h>
+#if TARGET_OS_OSX
 #include <libproc.h>
+#endif
 #endif
 
 #include <zyre.h>
@@ -558,8 +562,13 @@ initActor (zsock_t *pipe, void *args)
 
     pid = getpid();
 #ifdef __APPLE__
+#if TARGET_OS_IOS
+    char pathbuf[64] = "not available";
+    ret = 1;
+#elif TARGET_OS_OSX
     char pathbuf[PROC_PIDPATHINFO_MAXSIZE];
     ret = proc_pidpath (pid, pathbuf, sizeof(pathbuf));
+#endif
 #else
     char pathbuf[4*1024];
     ret = readlink("/proc/self/exe", pathbuf, sizeof(pathbuf));
