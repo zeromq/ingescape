@@ -1042,6 +1042,10 @@ int mtic_stop(){
             DL_DELETE(FreezeCallbacks,elt);
             free(elt);
         }
+
+    #ifdef _WIN32
+    zsys_shutdown();
+    #endif
     }else{
         mtic_debug("agent already stopped\n");
     }
