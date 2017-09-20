@@ -166,7 +166,7 @@ int manageSubscriber (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 {
                     // convert the string value in void* corresponding to the type of iop
                     model_state code;
-                    agent_iop * found_iop = mtic_find_iop_by_name_on_definition(output,externalDefinition, &code);
+                    agent_iop * found_iop = model_find_iop_by_name_in_definition(output,externalDefinition, &code);
 
                     if(found_iop != NULL)
                     {
@@ -207,7 +207,7 @@ int publishOutput(const char* output_name)
     {
         if(found_iop->is_muted == false && found_iop->name != NULL && is_paused == false)
         {
-            char* str_value = strdup(mtic_iop_value_to_string(found_iop));
+            char* str_value = strdup(definition_get_iop_value_as_string(found_iop));
             if(strlen(str_value) > 0)
             {
                 // Build the map description used as filter for other agents
@@ -397,7 +397,7 @@ int manageIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 if(receivedDefinition != NULL)
                 {
                     // Disactivate mapping of the leaving agent
-                    agent_iop* iop_unmapped = mtic_unmap(receivedDefinition);
+                    agent_iop* iop_unmapped = mapping_unmap(receivedDefinition);
                     struct agent_iop_t *iop, *tmp;
                     HASH_ITER(hh,iop_unmapped, iop, tmp)
                     {
@@ -406,7 +406,7 @@ int manageIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     }
 
                     HASH_DEL(mtic_agents_defs_on_network, receivedDefinition);
-                    free_definition(receivedDefinition);
+                    definition_free_definition(receivedDefinition);
                     receivedDefinition = NULL;
                 }
 
@@ -688,7 +688,7 @@ void mtic_sendDefinition()
     if(mtic_definition_loaded != NULL)
     {
         char * definitionStr = NULL;
-        definitionStr = export_definition(mtic_definition_loaded);
+        definitionStr = parser_export_definition(mtic_definition_loaded);
         // Send definition to the network
         if(definitionStr)
         {
@@ -768,7 +768,7 @@ int checkAndSubscribeTo(const char* agentName)
         // Porcess mapping
         // Check if we have a mapping with it
         // Check and add mapping if needed
-        agent_iop* outputsToSubscribe = mtic_check_map(externalDefinition);
+        agent_iop* outputsToSubscribe = mapping_check_map(externalDefinition);
 
         if(outputsToSubscribe != NULL)
         {

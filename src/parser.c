@@ -28,9 +28,73 @@
 
 bool agentNameChangedByDefinition = false;
 
-////////////////////////////////////////////////////////////////////////
-// PRIVATE API
-////////////////////////////////////////////////////////////////////////
+iopType_t string_to_value_type(const char* str) {
+    
+    if (!strcmp(str, "INTEGER"))
+        return INTEGER_T;
+    if (!strcmp(str, "DOUBLE"))
+        return DOUBLE_T;
+    if (!strcmp(str, "STRING"))
+        return STRING_T;
+    if (!strcmp(str, "BOOL"))
+        return BOOL_T;
+    if (!strcmp(str, "IMPULSION"))
+        return IMPULSION_T;
+    if (!strcmp(str, "DATA"))
+        return DATA_T;
+    
+    fprintf(stderr, "%s - ERROR -  unknown string \"%s\" to convert\n", __FUNCTION__, str);
+    return -1;
+}
+
+bool string_to_boolean(const char* str) {
+    
+    if (!strcmp(str, "true"))
+        return true;
+    
+    if (!strcmp(str, "false"))
+        return false;
+    
+    fprintf(stderr, "%s - ERROR -  unknown string \"%s\" to convert\n", __FUNCTION__, str);
+    return -1;
+}
+
+const char* value_type_to_string (iopType_t type) {
+    switch (type) {
+        case INTEGER_T:
+            return "INTEGER";
+            break;
+        case DOUBLE_T:
+            return "DOUBLE";
+            break;
+        case STRING_T:
+            return "STRING";
+            break;
+        case BOOL_T:
+            return "BOOL";
+            break;
+        case IMPULSION_T:
+            return "IMPULSION";
+            break;
+        case DATA_T:
+            return "DATA";
+            break;
+        default:
+            fprintf(stderr, "%s - ERROR -  unknown iopType_t to convert\n", __FUNCTION__);
+            break;
+    }
+    
+    return "";
+}
+
+const char* boolean_to_string (bool boole) {
+    if (boole)
+        return "true";
+    else
+        return "false";
+}
+
+
 
 /*
  * Function: json_add_data_to_hash
@@ -741,66 +805,10 @@ static void json_dump_mapping (yajl_gen *g, mapping* mapp) {
 }
 
 /*
- * Function: load_map
- * ------------------
- *   Load a mapping in the standartised format JSON to initialize a mapping structure from a string.
- *   The mapping structure is dynamically allocated. You will have to use free_mapping function to deallocated it correctly.
- *
- *   json_str      : a string (json format)
- *
- *   returns : a pointer on a mapping structure or NULL if it has failed
- */
-
-mapping* parser_LoadMap(const char* json_str){
-    
-    mapping *mapp = NULL;
-    yajl_val node;
-    
-    json_tokenized(json_str, &node);
-    mapp = json_parse_mapping (node);
-
-    //Copy the mapp structure to the global variable map
-    //copy_to_map_global(mapp);
-    
-    yajl_tree_free(node);
-    node = NULL;
-    
-    return mapp;
-}
-
-/*
- * Function: load_map_from_path
- * ----------------------------
- *   Load a mapping in the standartised format JSON to initialize a mapping structure from a local file path.
- *   The mapping structure is dynamically allocated. You will have to use free_mapping function to deallocated it correctly.
- *
- *   file_path      : the file path
- *
- *   returns : a pointer on a mapping structure or NULL if it has failed
- */
-
-mapping* parser_LoadMapFromPath (const char* path){
-
-    char *json_str = NULL;
-    mapping *mapp = NULL;
-
-    json_str = json_fetch(path);
-    if (!json_str)
-        return NULL;
-
-    mapp = parser_LoadMap(json_str);
-
-    free (json_str);
-    json_str = NULL;
-
-    return mapp;
-}
-
-/*
  * Function: load_category
  * ----------------------------
  *   Load a category in the standartised format JSON to initialize a category structure from string.
- *   The category structure is dynamically allocated. You will have to use free_category function to deallocated it correctly.
+ *   The category structure is dynamically allocated. You will have to use free_category function to deallocate it correctly.
  *
  *   json_str      : a string (json format)
  *
@@ -875,131 +883,7 @@ const char* export_category (category* cat) {
     return result;
 }
 
-/*
- * Function: export_definition
- * ----------------------------
- *   Returns a agent's definition structure into a standartised format json string UTF8 to send it throught the BUS or save it in a file
- *
- *   def    : the agent's definition dump in string
- *
- *   returns: a definition json format string UTF8
- */
 
-char* export_definition (definition* def) {
-    
-    char* result = NULL;
-    const unsigned char * json_str = NULL;
-    size_t len;
-    yajl_gen g;
-    
-    g = yajl_gen_alloc(NULL);
-    yajl_gen_config(g, yajl_gen_beautify, 1);
-    yajl_gen_config(g, yajl_gen_validate_utf8, 1);
-    
-    yajl_gen_map_open(g);
-    yajl_gen_string(g, (const unsigned char *) STR_DEFINITION, strlen(STR_DEFINITION));
-    json_dump_definition(&g, def);
-    yajl_gen_map_close(g);
-    
-    // try to get our dumping result
-    if (yajl_gen_get_buf(g, &json_str, &len) == yajl_gen_status_ok)
-    {
-        result = strdup((const char*) json_str);
-    }
-    
-    yajl_gen_free(g);
-    
-    return result;
-}
-
-/*
- * Function: export_mapping
- * ----------------------------
- *   Returns a agent's mapping structure into a standartised format json string UTF8 to send it throught the BUS or save it in a file
- *
- *   mapp    : the agent's mapping dump in string
- *
- *   returns: a mapping json format string UTF8
- */
-
-char* export_mapping(mapping *mapp){
-    char* result = NULL;
-    const unsigned char * json_str = NULL;
-    size_t len;
-    yajl_gen g;
-
-    g = yajl_gen_alloc(NULL);
-    yajl_gen_config(g, yajl_gen_beautify, 1);
-    yajl_gen_config(g, yajl_gen_validate_utf8, 1);
-
-    yajl_gen_map_open(g);
-    yajl_gen_string(g, (const unsigned char *) "mapping", strlen("mapping"));
-    json_dump_mapping(&g, mapp);
-    yajl_gen_map_close(g);
-
-    // try to get our dumping result
-    if (yajl_gen_get_buf(g, &json_str, &len) == yajl_gen_status_ok)
-    {
-        result = strdup((const char*) json_str);
-    }
-
-    yajl_gen_free(g);
-
-    return result;
-}
-
-/*
- * Function: load_definition
- * ----------------------------
- *   Load a agent definition in the standartised format JSON to initialize a definition structure from a string.
- *   The definition structure is dynamically allocated. You will have to use free_definition function to deallocated it correctly.
- *
- *   json_str      : a string (json format)
- *
- *   returns: a pointer on a category structure or NULL if it has failed
- */
-
-definition* parser_loadDefinition (const char* json_str) {
-    
-    definition *def = NULL;
-    yajl_val node;
-    
-    json_tokenized(json_str, &node);
-    def = json_parse_definition (node);
-    
-    yajl_tree_free(node);
-    node = NULL;
-    
-    return def;
-}
-
-/*
- * Function: load_definition_from_path
- * -----------------------------------
- *   Load a agent definition in the standartised format JSON to initialize a definition structure from a local file path.
- *   The definition structure is dynamically allocated. You will have to use free_definition function to deallocated it correctly.
- *
- *   file_path      : the file path
- *
- *   returns: a pointer on a category structure or NULL if it has failed
- */
-
-definition * parser_loadDefinitionFromPath (const char* path) {
-
-    char *json_str = NULL;
-    definition *def = NULL;
-
-    json_str = json_fetch(path);
-    if (!json_str)
-        return 0;
-
-    def = parser_loadDefinition(json_str);
-
-    free (json_str);
-    json_str = NULL;
-
-    return def;
-}
 
 /*
  * Function: init_mapping
@@ -1063,6 +947,192 @@ int mtic_init_internal_data (const char* definition_file_path)
 
     return errorCode;
 }
+
+////////////////////////////////////////////////////////////////////////
+// PRIVATE API
+////////////////////////////////////////////////////////////////////////
+/*
+ * Function: load_definition
+ * ----------------------------
+ *   Load a agent definition in the standartised format JSON to initialize a definition structure from a string.
+ *   The definition structure is dynamically allocated. You will have to use definition_free_definition function to deallocated it correctly.
+ *
+ *   json_str      : a string (json format)
+ *
+ *   returns: a pointer on a category structure or NULL if it has failed
+ */
+
+definition* parser_loadDefinition (const char* json_str) {
+    
+    definition *def = NULL;
+    yajl_val node;
+    
+    json_tokenized(json_str, &node);
+    def = json_parse_definition (node);
+    
+    yajl_tree_free(node);
+    node = NULL;
+    
+    return def;
+}
+
+/*
+ * Function: load_definition_from_path
+ * -----------------------------------
+ *   Load a agent definition in the standartised format JSON to initialize a definition structure from a local file path.
+ *   The definition structure is dynamically allocated. You will have to use definition_free_definition function to deallocated it correctly.
+ *
+ *   file_path      : the file path
+ *
+ *   returns: a pointer on a category structure or NULL if it has failed
+ */
+
+definition * parser_loadDefinitionFromPath (const char* path) {
+    
+    char *json_str = NULL;
+    definition *def = NULL;
+    
+    json_str = json_fetch(path);
+    if (!json_str)
+        return 0;
+    
+    def = parser_loadDefinition(json_str);
+    
+    free (json_str);
+    json_str = NULL;
+    
+    return def;
+}
+
+/*
+ * Function: parser_export_definition
+ * ----------------------------
+ *   Returns a agent's definition structure into a standartised format json string UTF8 to send it throught the BUS or save it in a file
+ *
+ *   def    : the agent's definition dump in string
+ *
+ *   returns: a definition json format string UTF8
+ */
+
+char* parser_export_definition (definition* def) {
+    
+    char* result = NULL;
+    const unsigned char * json_str = NULL;
+    size_t len;
+    yajl_gen g;
+    
+    g = yajl_gen_alloc(NULL);
+    yajl_gen_config(g, yajl_gen_beautify, 1);
+    yajl_gen_config(g, yajl_gen_validate_utf8, 1);
+    
+    yajl_gen_map_open(g);
+    yajl_gen_string(g, (const unsigned char *) STR_DEFINITION, strlen(STR_DEFINITION));
+    json_dump_definition(&g, def);
+    yajl_gen_map_close(g);
+    
+    // try to get our dumping result
+    if (yajl_gen_get_buf(g, &json_str, &len) == yajl_gen_status_ok)
+    {
+        result = strdup((const char*) json_str);
+    }
+    
+    yajl_gen_free(g);
+    
+    return result;
+}
+
+/*
+ * Function: parser_export_mapping
+ * ----------------------------
+ *   Returns a agent's mapping structure into a standartised format json string UTF8 to send it throught the BUS or save it in a file
+ *
+ *   mapp    : the agent's mapping dump in string
+ *
+ *   returns: a mapping json format string UTF8
+ */
+
+char* parser_export_mapping(mapping *mapp){
+    char* result = NULL;
+    const unsigned char * json_str = NULL;
+    size_t len;
+    yajl_gen g;
+    
+    g = yajl_gen_alloc(NULL);
+    yajl_gen_config(g, yajl_gen_beautify, 1);
+    yajl_gen_config(g, yajl_gen_validate_utf8, 1);
+    
+    yajl_gen_map_open(g);
+    yajl_gen_string(g, (const unsigned char *) "mapping", strlen("mapping"));
+    json_dump_mapping(&g, mapp);
+    yajl_gen_map_close(g);
+    
+    // try to get our dumping result
+    if (yajl_gen_get_buf(g, &json_str, &len) == yajl_gen_status_ok)
+    {
+        result = strdup((const char*) json_str);
+    }
+    
+    yajl_gen_free(g);
+    
+    return result;
+}
+
+/*
+ * Function: load_map
+ * ------------------
+ *   Load a mapping in the standartised format JSON to initialize a mapping structure from a string.
+ *   The mapping structure is dynamically allocated. You will have to use free_mapping function to deallocated it correctly.
+ *
+ *   json_str      : a string (json format)
+ *
+ *   returns : a pointer on a mapping structure or NULL if it has failed
+ */
+
+mapping* parser_LoadMap(const char* json_str){
+    
+    mapping *mapp = NULL;
+    yajl_val node;
+    
+    json_tokenized(json_str, &node);
+    mapp = json_parse_mapping (node);
+    
+    //Copy the mapp structure to the global variable map
+    //copy_to_map_global(mapp);
+    
+    yajl_tree_free(node);
+    node = NULL;
+    
+    return mapp;
+}
+
+/*
+ * Function: load_map_from_path
+ * ----------------------------
+ *   Load a mapping in the standartised format JSON to initialize a mapping structure from a local file path.
+ *   The mapping structure is dynamically allocated. You will have to use free_mapping function to deallocated it correctly.
+ *
+ *   file_path      : the file path
+ *
+ *   returns : a pointer on a mapping structure or NULL if it has failed
+ */
+
+mapping* parser_LoadMapFromPath (const char* path){
+    
+    char *json_str = NULL;
+    mapping *mapp = NULL;
+    
+    json_str = json_fetch(path);
+    if (!json_str)
+        return NULL;
+    
+    mapp = parser_LoadMap(json_str);
+    
+    free (json_str);
+    json_str = NULL;
+    
+    return mapp;
+}
+
 
 ////////////////////////////////////////////////////////////////////////
 // PUBLIC API

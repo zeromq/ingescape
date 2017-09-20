@@ -29,121 +29,6 @@ mtic_observe_callback_T *input_callbacks;
 mtic_observe_callback_T *output_callbacks;
 mtic_observe_callback_T *param_callbacks;
 
-////////////////////////////////////////////////////////////////////////
-// PRIVATE API
-////////////////////////////////////////////////////////////////////////
-
-agent_iop * mtic_find_iop_by_name_on_definition(const char *name, definition* definition){
-    agent_iop *found = NULL;
-    
-    if(name != NULL && definition != NULL){
-        //find the input agent_iop
-        HASH_FIND_STR( definition->inputs_table, name, found );
-        if(found == NULL){
-            // look in the outputs
-            HASH_FIND_STR( definition->outputs_table, name, found );
-        }else
-        {
-            return found;
-        }
-        
-        if(found == NULL){
-            //find the parameters agent_iop
-            HASH_FIND_STR( definition->params_table, name, found );
-        }else{
-            return found;
-        }
-        
-        if(found == NULL){
-            fprintf(stderr, "ERROR : The name of the iop {%s} doesn't exist. \n",name);
-            return found;
-        }else
-        {
-            return found;
-        }
-    }else{
-        fprintf(stderr, "ERROR : The name of the IOP is empty. \n");
-        return found;
-    }
-}
-
-agent_iop * model_findIopByName(const char *name, iop_t type){
-    agent_iop *found = NULL;
-
-    switch (type) {
-    case INPUT_T:
-        if(name != NULL && mtic_definition_live != NULL){
-            //find the input agent_iop
-            HASH_FIND_STR( mtic_definition_live->inputs_table, name, found );
-         }else{
-            fprintf(stderr, "ERROR : The name of the input is empty or mtic_definition_live is NULL\n");
-        }
-        break;
-    case OUTPUT_T:
-        if(name != NULL && mtic_definition_live != NULL){
-            //find the input agent_iop
-            HASH_FIND_STR( mtic_definition_live->outputs_table, name, found );
-         }else{
-            fprintf(stderr, "ERROR : The name of the output is empty or mtic_definition_live is NULL\n");
-        }
-        break;
-    case PARAMETER_T:
-        if(name != NULL && mtic_definition_live != NULL){
-            //find the input agent_iop
-            HASH_FIND_STR( mtic_definition_live->params_table, name, found );
-         }else{
-            fprintf(stderr, "ERROR : The name of the parameter is empty or mtic_definition_live is NULL\n");
-        }
-        break;
-    default:
-        break;
-    }
-
-    return found;
-}
-
-agent_iop *model_findInputByName(const char *name)
-{
-    agent_iop *found = NULL;
-
-    if(name != NULL && mtic_definition_live != NULL){
-        //find the input agent_iop
-        HASH_FIND_STR( mtic_definition_live->inputs_table, name, found );
-     }else{
-        fprintf(stderr, "ERROR : The name of the input is empty or mtic_definition_live is NULL\n");
-    }
-
-    return found;
-}
-
-agent_iop *model_findOutputByName(const char *name)
-{
-    agent_iop *found = NULL;
-
-    if(name != NULL && mtic_definition_live != NULL){
-        //find the input agent_iop
-        HASH_FIND_STR( mtic_definition_live->outputs_table, name, found );
-     }else{
-        fprintf(stderr, "ERROR : The name of the output is empty or mtic_definition_live is NULL\n");
-    }
-
-    return found;
-}
-
-agent_iop *model_findParameterByName(const char *name)
-{
-    agent_iop *found = NULL;
-
-    if(name != NULL && mtic_definition_live != NULL){
-        //find the input agent_iop
-        HASH_FIND_STR( mtic_definition_live->params_table, name, found );
-     }else{
-        fprintf(stderr, "ERROR : The name of the parameter is empty or mtic_definition_live is NULL\n");
-    }
-
-    return found;
-}
-
 void update_value(agent_iop *iop, void* value, long size){
     switch (iop->value_type) {
         case INTEGER_T:
@@ -188,39 +73,6 @@ void update_value(agent_iop *iop, void* value, long size){
     }
 }
 
-void * mtic_get(const char *name_iop, iop_t type){
-
-    agent_iop *iop = model_findIopByName((char*) name_iop,type);
-
-    if(iop == NULL)
-        return NULL;
-
-    //Return the value corresponding
-    switch (iop->value_type) {
-        case INTEGER_T:
-            return &iop->value.i;
-            break;
-        case DOUBLE_T:
-            return &iop->value.d;
-            break;
-        case BOOL_T:
-            return &iop->value.b;
-            break;
-        case STRING_T:
-            return iop->value.s;
-            break;
-        case IMPULSION_T:
-            return NULL;
-            break;
-        case DATA_T:
-            return iop->value.data;
-            break;
-        default:
-            break;
-    }
-
-    return NULL;
-}
 
 int mtic_mute_internal(const char* iop_name, iop_t type)
 {
@@ -373,6 +225,156 @@ static int mtic_observe(const char* type, const char* name,iop_t typeIop, mtic_o
 
     return 1;
 }
+
+////////////////////////////////////////////////////////////////////////
+// PRIVATE API
+////////////////////////////////////////////////////////////////////////
+agent_iop * model_find_iop_by_name_in_definition(const char *name, definition* definition){
+    agent_iop *found = NULL;
+    
+    if(name != NULL && definition != NULL){
+        //find the input agent_iop
+        HASH_FIND_STR( definition->inputs_table, name, found );
+        if(found == NULL){
+            // look in the outputs
+            HASH_FIND_STR( definition->outputs_table, name, found );
+        }else
+        {
+            return found;
+        }
+        
+        if(found == NULL){
+            //find the parameters agent_iop
+            HASH_FIND_STR( definition->params_table, name, found );
+        }else{
+            return found;
+        }
+        
+        if(found == NULL){
+            fprintf(stderr, "ERROR : The name of the iop {%s} doesn't exist. \n",name);
+            return found;
+        }else
+        {
+            return found;
+        }
+    }else{
+        fprintf(stderr, "ERROR : The name of the IOP is empty. \n");
+        return found;
+    }
+}
+
+agent_iop * model_findIopByName(const char *name, iop_t type){
+    agent_iop *found = NULL;
+    
+    switch (type) {
+        case INPUT_T:
+            if(name != NULL && mtic_definition_live != NULL){
+                //find the input agent_iop
+                HASH_FIND_STR( mtic_definition_live->inputs_table, name, found );
+            }else{
+                fprintf(stderr, "ERROR : The name of the input is empty or mtic_definition_live is NULL\n");
+            }
+            break;
+        case OUTPUT_T:
+            if(name != NULL && mtic_definition_live != NULL){
+                //find the input agent_iop
+                HASH_FIND_STR( mtic_definition_live->outputs_table, name, found );
+            }else{
+                fprintf(stderr, "ERROR : The name of the output is empty or mtic_definition_live is NULL\n");
+            }
+            break;
+        case PARAMETER_T:
+            if(name != NULL && mtic_definition_live != NULL){
+                //find the input agent_iop
+                HASH_FIND_STR( mtic_definition_live->params_table, name, found );
+            }else{
+                fprintf(stderr, "ERROR : The name of the parameter is empty or mtic_definition_live is NULL\n");
+            }
+            break;
+        default:
+            break;
+    }
+    
+    return found;
+}
+
+agent_iop *model_findInputByName(const char *name)
+{
+    agent_iop *found = NULL;
+    
+    if(name != NULL && mtic_definition_live != NULL){
+        //find the input agent_iop
+        HASH_FIND_STR( mtic_definition_live->inputs_table, name, found );
+    }else{
+        fprintf(stderr, "ERROR : The name of the input is empty or mtic_definition_live is NULL\n");
+    }
+    
+    return found;
+}
+
+agent_iop *model_findOutputByName(const char *name)
+{
+    agent_iop *found = NULL;
+    
+    if(name != NULL && mtic_definition_live != NULL){
+        //find the input agent_iop
+        HASH_FIND_STR( mtic_definition_live->outputs_table, name, found );
+    }else{
+        fprintf(stderr, "ERROR : The name of the output is empty or mtic_definition_live is NULL\n");
+    }
+    
+    return found;
+}
+
+agent_iop *model_findParameterByName(const char *name)
+{
+    agent_iop *found = NULL;
+    
+    if(name != NULL && mtic_definition_live != NULL){
+        //find the input agent_iop
+        HASH_FIND_STR( mtic_definition_live->params_table, name, found );
+    }else{
+        fprintf(stderr, "ERROR : The name of the parameter is empty or mtic_definition_live is NULL\n");
+    }
+    
+    return found;
+}
+
+void * model_get(const char *name_iop, iop_t type){
+    
+    agent_iop *iop = model_findIopByName((char*) name_iop,type);
+    
+    if(iop == NULL)
+        return NULL;
+    
+    //Return the value corresponding
+    switch (iop->value_type) {
+        case INTEGER_T:
+            return &iop->value.i;
+            break;
+        case DOUBLE_T:
+            return &iop->value.d;
+            break;
+        case BOOL_T:
+            return &iop->value.b;
+            break;
+        case STRING_T:
+            return iop->value.s;
+            break;
+        case IMPULSION_T:
+            return NULL;
+            break;
+        case DATA_T:
+            return iop->value.data;
+            break;
+        default:
+            break;
+    }
+    
+    return NULL;
+}
+
+
 
 ////////////////////////////////////////////////////////////////////////
 // PUBLIC API
@@ -800,7 +802,7 @@ int mtic_readInputAsData(const char *name, void **data, long *size){
     }
 
     //Get the pointer on the structure data
-    void * value = mtic_get(name,INPUT_T);
+    void * value = model_get(name,INPUT_T);
 
     //get size
     *size = iop->valueSize;
@@ -1076,7 +1078,7 @@ int mtic_readOutputAsData(const char *name, void **data, long *size){
     }
 
     //Get the pointer on the structure data
-    void * value = mtic_get(name,OUTPUT_T);
+    void * value = model_get(name,OUTPUT_T);
 
     //get size
     *size = iop->valueSize;
@@ -1350,7 +1352,7 @@ int mtic_readParameterAsData(const char *name, void **data, long *size){
     }
 
     //Get the pointer on the structure data
-    void * value = mtic_get(name,PARAMETER_T);
+    void * value = model_get(name,PARAMETER_T);
 
     //get size
     *size = iop->valueSize;
