@@ -247,7 +247,7 @@ void free_definition (definition* def) {
     }
 }
 
-char* mtic_iop_value_to_string (agent_iop* iop)
+char* get_iop_value_as_string (agent_iop* iop)
 {
     char str_value[BUFSIZ];
     if(iop != NULL)
@@ -286,12 +286,12 @@ char* mtic_iop_value_to_string (agent_iop* iop)
 }
 
 int get_iop_value_as_int(agent_iop *iop, iop_t type){
-    int val = *(int *)(mtic_get(iop->name,type));
+    int val = *(int *)(model_get(iop->name,type));
     return val;
 }
 
 double get_iop_value_as_double(agent_iop *iop,iop_t type){
-    double val = *(double *)(mtic_get(iop->name,type));
+    double val = *(double *)(model_get(iop->name,type));
     return val;
 }
 

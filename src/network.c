@@ -759,7 +759,7 @@ int network_publishOutput (const char* output_name)
                 zstr_sendx(agentElements->publisher, found_iop->name, "0", NULL);
                 result = 1;
             }else{
-                char* str_value = mtic_iop_value_to_string(found_iop);
+                char* str_value = get_iop_value_as_string(found_iop);
                 if(strlen(str_value) > 0)
                 {
                     mtic_debug("publish %s -> %s\n",found_iop->name,str_value);

@@ -207,7 +207,7 @@ int publishOutput(const char* output_name)
     {
         if(found_iop->is_muted == false && found_iop->name != NULL && is_paused == false)
         {
-            char* str_value = strdup(mtic_iop_value_to_string(found_iop));
+            char* str_value = strdup(get_iop_value_as_string(found_iop));
             if(strlen(str_value) > 0)
             {
                 // Build the map description used as filter for other agents

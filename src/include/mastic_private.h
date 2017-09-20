@@ -187,6 +187,8 @@ const char* boolean_to_string (bool boole);
 
 int get_iop_value_as_int(agent_iop*iop, iop_t type);
 double get_iop_value_as_double(agent_iop*iop, iop_t type);
+char* get_iop_value_as_string (agent_iop* iop);
+
 
 bool check_category (definition* def, category* category, category_check_type check_type);
 bool check_category_agent_iop(agent_iop* def_iop, agent_iop* iop_cat_to_check);
@@ -198,8 +200,6 @@ void free_definition (definition* definition);
 //  mapping
 
 extern mapping* mtic_my_agent_mapping;
-
-char* mtic_iop_value_to_string (agent_iop* iop);
 
 const char* map_state_to_string(map_state state);
 int mtic_map(char* input_name, char* map_description);
@@ -220,10 +220,7 @@ agent_iop* model_findInputByName(const char* name);
 agent_iop* model_findOutputByName(const char* name);
 agent_iop* model_findParameterByName(const char* name);
 agent_iop* mtic_find_iop_by_name_on_definition(const char*name, definition* definition);
-void* mtic_get(const char*name_iop, iop_t type);
-
-
-// Conversions
+void* model_get(const char*name_iop, iop_t type);
 
 char* model_IntToString(const int value);
 char* model_DoubleToString(const double value);

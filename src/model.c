@@ -188,7 +188,7 @@ void update_value(agent_iop *iop, void* value, long size){
     }
 }
 
-void * mtic_get(const char *name_iop, iop_t type){
+void * model_get(const char *name_iop, iop_t type){
 
     agent_iop *iop = model_findIopByName((char*) name_iop,type);
 
@@ -800,7 +800,7 @@ int mtic_readInputAsData(const char *name, void **data, long *size){
     }
 
     //Get the pointer on the structure data
-    void * value = mtic_get(name,INPUT_T);
+    void * value = model_get(name,INPUT_T);
 
     //get size
     *size = iop->valueSize;
@@ -1076,7 +1076,7 @@ int mtic_readOutputAsData(const char *name, void **data, long *size){
     }
 
     //Get the pointer on the structure data
-    void * value = mtic_get(name,OUTPUT_T);
+    void * value = model_get(name,OUTPUT_T);
 
     //get size
     *size = iop->valueSize;
@@ -1350,7 +1350,7 @@ int mtic_readParameterAsData(const char *name, void **data, long *size){
     }
 
     //Get the pointer on the structure data
-    void * value = mtic_get(name,PARAMETER_T);
+    void * value = model_get(name,PARAMETER_T);
 
     //get size
     *size = iop->valueSize;

@@ -81,7 +81,7 @@ void callback_test_input_2(agent_iop* input_iop){
 //    double value_e1 = 0.0;
 //    model_state *state1 = NULL;
 //    *state1 = OK;
-//    value_e1 = *(double*)mtic_get("e1", state1);
+//    value_e1 = *(double*)model_get("e1", state1);
 
 //    /*
 //     * Input 2 : e2
@@ -96,7 +96,7 @@ void callback_test_input_2(agent_iop* input_iop){
 //    char *value_e2 = NULL;
 //    model_state *state2 = NULL;
 //    *state2 = OK;
-//    value_e2 = mtic_get("e2", state2);
+//    value_e2 = model_get("e2", state2);
 
 //    /*
 //     * Print loaded & live definition
