@@ -36,8 +36,8 @@ void callback_test_input_2(agent_iop* input_iop){
 //    print_definition(mtic_definition_live);
 
 //    //Free the memory
-//    free_definition(mtic_definition_loaded);
-//    free_definition(mtic_definition_live);
+//    definition_free_definition(mtic_definition_loaded);
+//    definition_free_definition(mtic_definition_live);
 //}
 
 //void test_map(){
@@ -57,8 +57,8 @@ void callback_test_input_2(agent_iop* input_iop){
 //    print_mapping(mtic_my_agent_mapping);
 
 //    //Free the memory
-//    free_definition(mtic_definition_loaded);
-//    free_definition(mtic_definition_live);
+//    definition_free_definition(mtic_definition_loaded);
+//    definition_free_definition(mtic_definition_live);
 
 //}
 
@@ -110,8 +110,8 @@ void callback_test_input_2(agent_iop* input_iop){
 //    print_definition(mtic_definition_live);
 
 //    //Free the memory
-//    free_definition(mtic_definition_loaded);
-//    free_definition(mtic_definition_live);
+//    definition_free_definition(mtic_definition_loaded);
+//    definition_free_definition(mtic_definition_live);
 //    free(new_value_e2);
 //    free(value_e2);
 //}
@@ -134,7 +134,7 @@ void callback_test_input_2(agent_iop* input_iop){
 //    definition *external_agent_def = parser_loadDefinitionFromPath("external_definition.json");
 
 //    //Check the map
-//    agent_iop* output_to_subscribe = mtic_check_map(external_agent_def);
+//    agent_iop* output_to_subscribe = mapping_check_map(external_agent_def);
 //    if(output_to_subscribe != NULL){
 //    printf("The output(s) following need to be subscribed from agent : %s \n",
 //           external_agent_def->name);
@@ -143,7 +143,7 @@ void callback_test_input_2(agent_iop* input_iop){
 
 //    //subscribe : map received
 //    double value = 25.63;
-//    model_state state = mtic_map_received("A2","s4",&value);
+//    model_state state = mapping_map_received("A2","s4",&value);
 
 //    if(state == NOK)
 //        printf("The map_received 'A2.s4' is NOK \n");
@@ -151,15 +151,15 @@ void callback_test_input_2(agent_iop* input_iop){
 //    //Print the mapping
 //    print_mapping(mtic_my_agent_mapping);
 
-//    agent_iop* output_to_unsubscribe = mtic_unmap(external_agent_def);
+//    agent_iop* output_to_unsubscribe = mapping_unmap(external_agent_def);
 
 //    //Print the mapping after unmap
 //    print_mapping(mtic_my_agent_mapping);
 
 //    //Free the memory
-//    free_definition(mtic_definition_loaded);
-//    free_definition(mtic_definition_live);
-//    free_definition(external_agent_def);
+//    definition_free_definition(mtic_definition_loaded);
+//    definition_free_definition(mtic_definition_live);
+//    definition_free_definition(external_agent_def);
 //    mtic_free_mapping(mtic_my_agent_mapping);
 //    //Free iop map
 //    struct agent_iop *iop, *tmp;

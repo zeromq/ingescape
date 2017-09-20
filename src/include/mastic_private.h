@@ -178,55 +178,37 @@ extern definition* mtic_definition_loaded;
 extern definition* mtic_definition_live;
 extern definition* mtic_agents_defs_on_network;
 
-void initDefinitionToDefault();
+void definition_initDefinitionToDefault();
 
-iopType_t string_to_value_type(const char* string);
-bool string_to_boolean(const char* string);
-const char* value_type_to_string (iopType_t type);
-const char* boolean_to_string (bool boole);
+int definition_get_iop_value_as_int(agent_iop*iop, iop_t type);
+double definition_get_iop_value_as_double(agent_iop*iop, iop_t type);
+char* definition_get_iop_value_as_string (agent_iop* iop);
 
-int get_iop_value_as_int(agent_iop*iop, iop_t type);
-double get_iop_value_as_double(agent_iop*iop, iop_t type);
-char* get_iop_value_as_string (agent_iop* iop);
-
-
-bool check_category (definition* def, category* category, category_check_type check_type);
-bool check_category_agent_iop(agent_iop* def_iop, agent_iop* iop_cat_to_check);
-void free_agent_iop (agent_iop** agent_iop);
-void free_category (category* category);
-void free_definition (definition* definition);
+void definition_free_definition (definition* definition);
 
 
 //  mapping
 
 extern mapping* mtic_my_agent_mapping;
 
-const char* map_state_to_string(map_state state);
-int mtic_map(char* input_name, char* map_description);
-agent_iop* mtic_check_map (definition* definition);
-agent_iop* mtic_unmap (definition* definition);
-agent_iop*  mtic_update_mapping_out_state(mapping_out* map_out, definition* external_definition);
-int mtic_map_received(const char* agent_name, char* out_name, char* value, long size);
-bool mtic_map_category (char* map_description);
-void mapping_FreeMapping (mapping* mapping);
+agent_iop* mapping_check_map (definition* definition);
+agent_iop* mapping_unmap (definition* definition);
+int mapping_map_received(const char* agent_name, char* out_name, char* value, long size);
 
 
 // model
 
 extern bool isWholeAgentMuted;
 
+agent_iop* model_find_iop_by_name_in_definition(const char*name, definition* definition);
 agent_iop* model_findIopByName(const char* name, iop_t type);
 agent_iop* model_findInputByName(const char* name);
 agent_iop* model_findOutputByName(const char* name);
 agent_iop* model_findParameterByName(const char* name);
-agent_iop* mtic_find_iop_by_name_on_definition(const char*name, definition* definition);
 void* model_get(const char*name_iop, iop_t type);
 
-char* model_IntToString(const int value);
-char* model_DoubleToString(const double value);
 
-
-// Network
+// network
 
 #define AGENT_NAME_DEFAULT "mtic_undefined"
 int network_publishOutput (const char* output_name);
@@ -234,19 +216,15 @@ int network_checkAndSubscribeToPublisher(const char* agentName);
 void mtic_debug(const char*fmt, ...);
 
 
-// Parser
+// parser
 
 extern bool agentNameChangedByDefinition;
-category* load_category (const char* json_str);
-category* load_category_from_path (const char* file_path);
-const char* export_category (category* cat);
+
 definition* parser_loadDefinition (const char* json_str);
 definition* parser_loadDefinitionFromPath (const char* file_path);
-char* export_definition (definition* def);
-char* export_mapping(mapping* mapp);
+char* parser_export_definition (definition* def);
+char* parser_export_mapping(mapping* mapp);
 mapping* parser_LoadMap (const char* json_str);
 mapping* parser_LoadMapFromPath (const char* load_file);
-int mtic_init_mapping (const char* mapping_file_path);
-int mtic_init_internal_data (const char* definition_file_path);
 
 #endif /* mastic_private_h */

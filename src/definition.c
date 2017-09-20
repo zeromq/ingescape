@@ -27,74 +27,8 @@ typedef struct agent_port_t {
 } agent_port;
 
 ////////////////////////////////////////////////////////////////////////
-// PRIVATE API
+// INTERNAL FUNCTIONS
 ////////////////////////////////////////////////////////////////////////
-
-iopType_t string_to_value_type(const char* str) {
-
-    if (!strcmp(str, "INTEGER"))
-        return INTEGER_T;
-    if (!strcmp(str, "DOUBLE"))
-        return DOUBLE_T;
-    if (!strcmp(str, "STRING"))
-        return STRING_T;
-    if (!strcmp(str, "BOOL"))
-        return BOOL_T;
-    if (!strcmp(str, "IMPULSION"))
-        return IMPULSION_T;
-    if (!strcmp(str, "DATA"))
-        return DATA_T;
-
-    fprintf(stderr, "%s - ERROR -  unknown string \"%s\" to convert\n", __FUNCTION__, str);
-    return -1;
-}
-
-bool string_to_boolean(const char* str) {
-
-    if (!strcmp(str, "true"))
-        return true;
-
-    if (!strcmp(str, "false"))
-        return false;
-
-    fprintf(stderr, "%s - ERROR -  unknown string \"%s\" to convert\n", __FUNCTION__, str);
-    return -1;
-}
-
-const char* value_type_to_string (iopType_t type) {
-    switch (type) {
-        case INTEGER_T:
-            return "INTEGER";
-            break;
-        case DOUBLE_T:
-            return "DOUBLE";
-            break;
-        case STRING_T:
-            return "STRING";
-            break;
-        case BOOL_T:
-            return "BOOL";
-            break;
-        case IMPULSION_T:
-            return "IMPULSION";
-            break;
-        case DATA_T:
-            return "DATA";
-            break;
-        default:
-            fprintf(stderr, "%s - ERROR -  unknown iopType_t to convert\n", __FUNCTION__);
-            break;
-    }
-
-    return "";
-}
-
-const char* boolean_to_string (bool boole) {
-    if (boole)
-        return "true";
-   else
-        return "false";
-}
 
 void free_agent_iop (agent_iop** agent_iop){
     
@@ -111,6 +45,30 @@ void free_agent_iop (agent_iop** agent_iop){
     }
     
     free((*agent_iop));
+}
+
+bool check_category_agent_iop(agent_iop *ref_iop,
+                              agent_iop *iop_to_check) {
+    
+    bool state = true;
+    
+    
+    struct agent_iop *iop, *iop_found;
+    
+    for(iop = ref_iop; iop != NULL; iop = iop->hh.next) {
+        //Init to null for the next
+        iop_found = NULL;
+        
+        //Find the iop corresponding to name (key)
+        HASH_FIND_STR(iop_to_check, iop->name, iop_found);
+        
+        //Check the type of the iop correspond
+        if(iop_found == NULL || (iop_found->value_type != iop->value_type)) {
+            state = false;
+        }
+    }
+    
+    return state;
 }
 
 bool check_category(definition* def,
@@ -159,30 +117,6 @@ bool check_category(definition* def,
     return state;
 }
 
-bool check_category_agent_iop(agent_iop *ref_iop,
-                                agent_iop *iop_to_check) {
-
-    bool state = true;
-
-
-    struct agent_iop *iop, *iop_found;
-
-    for(iop = ref_iop; iop != NULL; iop = iop->hh.next) {
-        //Init to null for the next
-        iop_found = NULL;
-
-        //Find the iop corresponding to name (key)
-        HASH_FIND_STR(iop_to_check, iop->name, iop_found);
-
-        //Check the type of the iop correspond
-        if(iop_found == NULL || (iop_found->value_type != iop->value_type)) {
-            state = false;
-        }
-    }
-
-    return state;
-}
-
 void free_category (category* cat){
 
     struct agent_iop *current, *tmp;
@@ -210,103 +144,6 @@ void free_category (category* cat){
     }
 
     free (cat);
-}
-
-void free_definition (definition* def) {
-
-    struct agent_iop *current_iop, *tmp_iop;
-    struct category *current_cat, *tmp_cat;
-
-    free((char*)def->name);
-    def->name = NULL;
-    free((char*)def->version);
-    def->version = NULL;
-    free((char*)def->description);
-    def->description = NULL;
-
-    HASH_ITER(hh, def->params_table, current_iop, tmp_iop) {
-        HASH_DEL(def->params_table,current_iop);
-        free_agent_iop(&current_iop);
-        current_iop = NULL;
-    }
-    HASH_ITER(hh, def->inputs_table, current_iop, tmp_iop) {
-        HASH_DEL(def->inputs_table,current_iop);
-        free_agent_iop(&current_iop);
-        current_iop = NULL;
-    }
-    HASH_ITER(hh, def->outputs_table, current_iop, tmp_iop) {
-        HASH_DEL(def->outputs_table,current_iop);
-        free_agent_iop(&current_iop);
-        current_iop = NULL;
-    }
-
-    HASH_ITER(hh, def->categories, current_cat, tmp_cat) {
-        HASH_DEL(def->categories,current_cat);
-        free_category(current_cat);
-        current_cat = NULL;
-    }
-}
-
-char* get_iop_value_as_string (agent_iop* iop)
-{
-    char str_value[BUFSIZ];
-    if(iop != NULL)
-    {
-        switch (iop->value_type) {
-            case INTEGER_T:
-                sprintf(str_value,"%i",iop->value.i);
-                break;
-            case DOUBLE_T:
-                sprintf(str_value,"%lf",iop->value.d);
-                break;
-            case BOOL_T:
-                if(iop->value.b == true)
-                {
-                    sprintf(str_value,"%s","true");
-                    
-                } else {
-                    sprintf(str_value,"%s","false");
-                    
-                }
-                break;
-            case STRING_T:
-                sprintf(str_value,"%s",iop->value.s);
-                break;
-            case IMPULSION_T:
-                break;
-            case DATA_T:
-                sprintf(str_value,"%s", (char*) iop->value.data);
-                break;
-            default:
-                break;
-        }
-    }
-    
-    return strdup(str_value);
-}
-
-int get_iop_value_as_int(agent_iop *iop, iop_t type){
-    int val = *(int *)(model_get(iop->name,type));
-    return val;
-}
-
-double get_iop_value_as_double(agent_iop *iop,iop_t type){
-    double val = *(double *)(model_get(iop->name,type));
-    return val;
-}
-
-void initDefinitionToDefault()
-{
-    //Check if already allocated
-    if(mtic_definition_loaded == NULL){
-        //Dynamically allocate the memory
-        mtic_definition_loaded = calloc(1, sizeof(struct definition));
-    }
-
-    if(mtic_definition_live== NULL){
-        //Dynamically allocate the memory
-        mtic_definition_live = calloc(1, sizeof(struct definition));
-    }
 }
 
 int definition_setIopValue(agent_iop *iop, void * value, long size)
@@ -428,6 +265,108 @@ int definition_addIop(agent_iop *iop, iop_t iop_type, definition **def)
 }
 
 ////////////////////////////////////////////////////////////////////////
+// PRIVATE API
+////////////////////////////////////////////////////////////////////////
+void definition_initDefinitionToDefault()
+{
+    //Check if already allocated
+    if(mtic_definition_loaded == NULL){
+        //Dynamically allocate the memory
+        mtic_definition_loaded = calloc(1, sizeof(struct definition));
+    }
+    
+    if(mtic_definition_live== NULL){
+        //Dynamically allocate the memory
+        mtic_definition_live = calloc(1, sizeof(struct definition));
+    }
+}
+
+int definition_get_iop_value_as_int(agent_iop *iop, iop_t type){
+    int val = *(int *)(model_get(iop->name,type));
+    return val;
+}
+
+double definition_get_iop_value_as_double(agent_iop *iop,iop_t type){
+    double val = *(double *)(model_get(iop->name,type));
+    return val;
+}
+
+char* definition_get_iop_value_as_string (agent_iop* iop)
+{
+    char str_value[BUFSIZ];
+    if(iop != NULL)
+    {
+        switch (iop->value_type) {
+            case INTEGER_T:
+                sprintf(str_value,"%i",iop->value.i);
+                break;
+            case DOUBLE_T:
+                sprintf(str_value,"%lf",iop->value.d);
+                break;
+            case BOOL_T:
+                if(iop->value.b == true)
+                {
+                    sprintf(str_value,"%s","true");
+                    
+                } else {
+                    sprintf(str_value,"%s","false");
+                    
+                }
+                break;
+            case STRING_T:
+                sprintf(str_value,"%s",iop->value.s);
+                break;
+            case IMPULSION_T:
+                break;
+            case DATA_T:
+                sprintf(str_value,"%s", (char*) iop->value.data);
+                break;
+            default:
+                break;
+        }
+    }
+    
+    return strdup(str_value);
+}
+
+void definition_free_definition (definition* def) {
+    
+    struct agent_iop *current_iop, *tmp_iop;
+    struct category *current_cat, *tmp_cat;
+    
+    free((char*)def->name);
+    def->name = NULL;
+    free((char*)def->version);
+    def->version = NULL;
+    free((char*)def->description);
+    def->description = NULL;
+    
+    HASH_ITER(hh, def->params_table, current_iop, tmp_iop) {
+        HASH_DEL(def->params_table,current_iop);
+        free_agent_iop(&current_iop);
+        current_iop = NULL;
+    }
+    HASH_ITER(hh, def->inputs_table, current_iop, tmp_iop) {
+        HASH_DEL(def->inputs_table,current_iop);
+        free_agent_iop(&current_iop);
+        current_iop = NULL;
+    }
+    HASH_ITER(hh, def->outputs_table, current_iop, tmp_iop) {
+        HASH_DEL(def->outputs_table,current_iop);
+        free_agent_iop(&current_iop);
+        current_iop = NULL;
+    }
+    
+    HASH_ITER(hh, def->categories, current_cat, tmp_cat) {
+        HASH_DEL(def->categories,current_cat);
+        free_category(current_cat);
+        current_cat = NULL;
+    }
+}
+
+
+
+////////////////////////////////////////////////////////////////////////
 // PUBLIC API
 ////////////////////////////////////////////////////////////////////////
 
@@ -451,13 +390,13 @@ int mtic_clearDefinition(){
     //Free the structure definition loaded
     if(mtic_definition_loaded != NULL){
         mtic_debug("Clear the definition loaded ... \n");
-        free_definition(mtic_definition_loaded);
+        definition_free_definition(mtic_definition_loaded);
     }
 
     //Free the structure definition loaded
     if(mtic_definition_live != NULL){
         mtic_debug("Clear the definition live ... \n");
-        free_definition(mtic_definition_live);
+        definition_free_definition(mtic_definition_live);
     }
 
     return 1;
@@ -477,7 +416,7 @@ char* mtic_getDefinition(){
     if(mtic_definition_loaded == NULL)
         return NULL;
 
-    def = export_definition(mtic_definition_loaded);
+    def = parser_export_definition(mtic_definition_loaded);
 
     return def;
 }
