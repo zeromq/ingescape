@@ -440,50 +440,49 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
             mtic_debug("-%s has left %s\n", name, group);
         } else if (streq (event, "SHOUT") || streq (event, "WHISPER")){
             char *message = zmsg_popstr (msg);
-            if(strlen(message) > strlen(definitionPrefix))
+            
+            //check if message is a definition
+            if(strlen(message) > strlen(definitionPrefix) && strncmp (message, definitionPrefix, strlen(definitionPrefix)) == 0)
             {
-                //check if message is a definition
-                if (strncmp (message, definitionPrefix, strlen(definitionPrefix)) == 0)
-                {
-                    // Extract definition from message
-                    char* strDefinition = calloc(strlen(message)- strlen(definitionPrefix)+1, sizeof(char));
-                    memcpy(strDefinition, &message[strlen(definitionPrefix)], strlen(message)- strlen(definitionPrefix));
-                    strDefinition[strlen(message)- strlen(definitionPrefix)] = '\0';
-
-                    // Load definition from string content
-                    definition *newDefinition = parser_loadDefinition(strDefinition);
+                // Extract definition from message
+                char* strDefinition = calloc(strlen(message)- strlen(definitionPrefix)+1, sizeof(char));
+                memcpy(strDefinition, &message[strlen(definitionPrefix)], strlen(message)- strlen(definitionPrefix));
+                strDefinition[strlen(message)- strlen(definitionPrefix)] = '\0';
+                
+                // Load definition from string content
+                definition *newDefinition = parser_loadDefinition(strDefinition);
+                
+                if (newDefinition != NULL && newDefinition->name != NULL){
+                    //current agent name has higher priority than definition name at runtime : we overwrite definition if needed
+                    if (strcmp (newDefinition->name, name) != 0){
+                        free((char *)newDefinition->name);
+                        newDefinition->name = strdup(name);
+                    }
                     
-                    if (newDefinition != NULL && newDefinition->name != NULL){
-                        //current agent name has higher priority than definition name at runtime : we overwrite definition if needed
-                        if (strcmp (newDefinition->name, name) != 0){
-                            free((char *)newDefinition->name);
-                            newDefinition->name = strdup(name);
-                        }
+                    // Look for this agent definition in our know definitions
+                    definition *tmpDefinition = NULL;
+                    HASH_FIND_STR(mtic_agents_defs_on_network, newDefinition->name, tmpDefinition);
+                    if(tmpDefinition == NULL){
+                        //no previous definition for this agent
+                        mtic_debug("Store definition for new agent %s\n", name);
                         
-                        // Look for this agent definition in our know definitions
-                        definition *tmpDefinition = NULL;
-                        HASH_FIND_STR(mtic_agents_defs_on_network, newDefinition->name, tmpDefinition);
-                        if(tmpDefinition == NULL){
-                            //no previous definition for this agent
-                            mtic_debug("Store definition for new agent %s\n", name);
-                            
-                            // Add definition to the map
-                            HASH_ADD_STR(mtic_agents_defs_on_network, name, newDefinition);
-                            
-                            // Check the involvement of this new definition in our mapping and update subscriptions
-                            network_checkAndSubscribeToPublisher(newDefinition->name);
-                        }else{
-                            mtic_debug("ERROR: definition already exists for agent %s\nCheck if another agent has the same name on the network...", name);
-                            definition_free_definition(newDefinition);
-                        }
+                        // Add definition to the map
+                        HASH_ADD_STR(mtic_agents_defs_on_network, name, newDefinition);
+                        
+                        // Check the involvement of this new definition in our mapping and update subscriptions
+                        network_checkAndSubscribeToPublisher(newDefinition->name);
                     }else{
-                        mtic_debug("ERROR: definition is NULL or has no name for agent %s\n", name);
+                        mtic_debug("ERROR: definition already exists for agent %s\nCheck if another agent has the same name on the network...", name);
                         definition_free_definition(newDefinition);
                     }
-                    free(strDefinition);
+                }else{
+                    mtic_debug("ERROR: definition is NULL or has no name for agent %s\n", name);
+                    definition_free_definition(newDefinition);
                 }
-            } //check if message is mapping
-            else if (strncmp (message, mappingPrefix, strlen(mappingPrefix)) == 0)
+                free(strDefinition);
+            }
+            //check if message is mapping
+            else if (strlen(message) > strlen(mappingPrefix) && strncmp (message, mappingPrefix, strlen(mappingPrefix)) == 0)
             {
                 // Extract mapping from message
                 char* strMapping = calloc(strlen(message)- strlen(definitionPrefix)+1, sizeof(char));
@@ -495,6 +494,27 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 
                 //TODO: activate mapping dynamically
                 
+            }else{
+                //other supported messages
+                if (strncmp (message, "MAPPED", strlen("MAPPED")) == 0){
+                    mtic_debug("Mapping notification received from %s\n", name);
+                    //TODO: optimize to rewrite only outputs actually involved in the mapping
+                    long nbOutputs = 0;
+                    char **outputsList = NULL;
+                    outputsList = mtic_getOutputsList(&nbOutputs);
+                    for (int i = 0; i < nbOutputs; i++){
+                        agent_iop * found_iop = model_findIopByName(outputsList[i],OUTPUT_T);
+                        if (found_iop != NULL
+                            && found_iop->value_type != IMPULSION_T
+                            && found_iop->value_type != DATA_T){
+                            //we exclude impulsions and data from the update flow to avoid
+                            //false information (for impulsions) and data storage issues (for data)
+                            network_publishOutput(outputsList[i]);
+                            free(outputsList[i]);
+                        }
+                    }
+                    free(outputsList);
+                }
             }
             
             
@@ -712,6 +732,14 @@ initActor (zsock_t *pipe, void *args)
     }
 }
 
+//Timer callback to send MAPPED notification for agents we subscribed to
+int triggerMappingNotificationToNewcomer(zloop_t *loop, int timer_id, void *arg){
+    char *peerId = (char *) arg;
+    //zyre_shouts(agentElements->node, CHANNEL, "MAPPED");
+    zyre_whispers(agentElements->node, peerId, "MAPPED");
+    return 0;
+}
+
 ////////////////////////////////////////////////////////////////////////
 // PRIVATE API
 ////////////////////////////////////////////////////////////////////////
@@ -762,6 +790,7 @@ int network_publishOutput (const char* output_name)
                 void *data = NULL;
                 long size = 0;
                 mtic_readOutputAsData(output_name, &data, &size);
+                //TODO: decide if we should delete the data after use or keep it in memory
                 zmsg_t *msg = zmsg_new();
                 zmsg_pushstr(msg, output_name);
                 zframe_t *frame = zframe_new(data, size);
@@ -772,14 +801,18 @@ int network_publishOutput (const char* output_name)
                 }
             }else if (found_iop->value_type == IMPULSION_T){
                 mtic_debug("publish impulsion %s\n",found_iop->name);
-                zstr_sendx(agentElements->publisher, found_iop->name, "0", NULL);
+                if (zstr_sendx(agentElements->publisher, found_iop->name, "0", NULL) != 0){
+                    mtic_debug("Error while publishing output %s\n",output_name);
+                }
                 result = 1;
             }else{
                 char* str_value = definition_get_iop_value_as_string(found_iop);
                 if(strlen(str_value) > 0)
                 {
                     mtic_debug("publish %s -> %s\n",found_iop->name,str_value);
-                    zstr_sendx(agentElements->publisher, found_iop->name, str_value, NULL);
+                    if (zstr_sendx(agentElements->publisher, found_iop->name, str_value, NULL) != 0){
+                        mtic_debug("Error while publishing output %s\n",output_name);
+                    }
                     result = 1;
                 }
                 free(str_value);
@@ -820,12 +853,12 @@ int network_publishOutput (const char* output_name)
  *   returns : -1 if an error occured, 1 otherwise.
  *
  */
-int network_checkAndSubscribeToPublisher(const char* agentName)
+int network_checkAndSubscribeToPublisher(const char* agtName)
 {
     int result = 0;
     // Look for the publisher definition
     definition * publisherDefinition = NULL;
-    HASH_FIND_STR(mtic_agents_defs_on_network, agentName, publisherDefinition);
+    HASH_FIND_STR(mtic_agents_defs_on_network, agtName, publisherDefinition);
     
     // We add it if we don't have it already
     if(publisherDefinition != NULL)
@@ -846,20 +879,39 @@ int network_checkAndSubscribeToPublisher(const char* agentName)
                 // Subscription has been done
                 if(cr > 0)
                 {
-                    mtic_debug("Subscription found and done to output: %s from agent: %s.\n",iop->name,agentName);
+                    mtic_debug("Subscription found and done to output: %s from agent: %s.\n",iop->name,agtName);
                     result = 1;
                 } else {
-                    mtic_debug("Subscription has been found but not done to output: %s from agent: %s.\n",iop->name,agentName);
+                    mtic_debug("Subscription has been found but not done to output: %s from agent: %s.\n",iop->name,agtName);
                 }
                 
                 HASH_DEL(outputsToSubscribe, iop);
                 free(iop);
             }
         } else {
-            //printf("[Warning] : No outputs to subscribe to for agent: %s.\n",agentName);
+            //printf("[Warning] : No outputs to subscribe to for agent: %s.\n",agtName);
         }
     } else {
-        //printf("[Warning] : No definiton found for the agent: %s. It must been arrived yet, wait for it !\n",agentName);
+        //printf("[Warning] : No definiton found for the agent: %s. It must been arrived yet, wait for it !\n",agtName);
+    }
+    
+    if (result == 1){
+        //mapping was successful we inform target agent via zyre
+        //try to find peer ID for the publisher we are mapping to
+        subscriber_t *subsc = NULL, *iter = NULL;
+        HASH_FIND_STR(subscribers, publisherDefinition->name, subsc);
+        for(iter = subscribers; iter != NULL; iter=iter->hh.next) {
+            if (strcmp(publisherDefinition->name, iter->agentName)==0){
+                subsc = iter;
+                break;
+            }
+        }
+        if (subsc != NULL){
+            //we set a timer instead of send message to zyre immediately to
+            //let the time to all agents pub/sub sockets to synchronize
+            //their actual subscribtions
+            zloop_timer(agentElements->loop, 100, 1, triggerMappingNotificationToNewcomer, (void *)subsc->agentPeerId);
+        }
     }
     
     return result;
