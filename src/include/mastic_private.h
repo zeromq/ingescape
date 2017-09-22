@@ -178,7 +178,7 @@ extern definition* mtic_definition_loaded;
 extern definition* mtic_definition_live;
 extern definition* mtic_agents_defs_on_network;
 
-void definition_initDefinitionToDefault();
+void definition_initDefinitionToDefault(void);
 
 int definition_get_iop_value_as_int(agent_iop*iop, iop_t type);
 double definition_get_iop_value_as_double(agent_iop*iop, iop_t type);
