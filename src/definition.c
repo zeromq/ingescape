@@ -18,7 +18,6 @@
 
 definition * mtic_definition_loaded = NULL;
 definition * mtic_definition_live = NULL;
-definition * mtic_agents_defs_on_network = NULL;
 
 typedef struct agent_port_t {
     const char * name;          //Need to be unique : the table hash key
@@ -334,13 +333,18 @@ void definition_free_definition (definition* def) {
     struct agent_iop *current_iop, *tmp_iop;
     struct category *current_cat, *tmp_cat;
     
-    free((char*)def->name);
-    def->name = NULL;
-    free((char*)def->version);
-    def->version = NULL;
-    free((char*)def->description);
-    def->description = NULL;
-    
+    if (def->name != NULL){
+        free((char*)def->name);
+        def->name = NULL;
+    }
+    if (def->description != NULL){
+        free((char*)def->description);
+        def->description = NULL;
+    }
+    if (def->version != NULL){
+        free((char*)def->version);
+        def->version = NULL;
+    }
     HASH_ITER(hh, def->params_table, current_iop, tmp_iop) {
         HASH_DEL(def->params_table,current_iop);
         free_agent_iop(&current_iop);
@@ -420,6 +424,62 @@ char* mtic_getDefinition(){
 
     return def;
 }
+
+char *mtic_getDefinitionName(void){
+    if (mtic_definition_live != NULL && mtic_definition_live->name != NULL){
+        return strdup(mtic_definition_live->name);
+    }else{
+        return NULL;
+    }
+}
+char *mtic_getDefinitionDescription(void){
+    if (mtic_definition_live != NULL && mtic_definition_live->description != NULL){
+        return strdup(mtic_definition_live->description);
+    }else{
+        return NULL;
+    }
+}
+char *mtic_getDefinitionVersion(void){
+    if (mtic_definition_live != NULL && mtic_definition_live->version != NULL){
+        return strdup(mtic_definition_live->version);
+    }else{
+        return NULL;
+    }
+}
+int mtic_setDefinitionName(char *name){
+    if(name == NULL){
+        mtic_debug("mtic_setDefinitionDescription : Agent name cannot be NULL \n");
+        return 0;
+    }
+    
+    if (strlen(name) == 0){
+        mtic_debug("mtic_setDefinitionDescription : Agent name cannot be empty\n");
+        return -1;
+    }
+    
+    //Check if already initialized, and do it if not
+    if(mtic_definition_loaded == NULL){
+        mtic_definition_loaded = calloc(1, sizeof(struct definition));
+    }
+    
+    //Copy the description in the structure in loaded definition
+    if(mtic_definition_loaded->description != NULL)//Free the field if needed
+        free((char*)mtic_definition_loaded->name);
+    mtic_definition_loaded->name = strdup(name);
+    
+    //Check if already initialized, and do it if not
+    if(mtic_definition_live == NULL){
+        mtic_definition_live = calloc(1, sizeof(struct definition));
+    }
+    
+    // Live data corresponds to a copy of the initial definition
+    if(mtic_definition_live->description != NULL)//Free the field if needed
+        free((char*)mtic_definition_live->name);
+    mtic_definition_live->name = strdup(mtic_definition_loaded->name);
+    
+    return 1;
+}
+
 
 /**
  * \fn int mtic_setDefinitionDescription(char *description)

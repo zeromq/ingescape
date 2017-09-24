@@ -177,8 +177,12 @@ PUBLIC bool mtic_isOutputMuted(const char *name);
 //load / set / get definition
 PUBLIC int mtic_loadDefinition (const char* json_str);
 PUBLIC int mtic_loadDefinitionFromPath (const char* file_path);
-int mtic_clearDefinition(void); //clears definition data for the agent
+PUBLIC int mtic_clearDefinition(void); //clears definition data for the agent
 PUBLIC char* mtic_getDefinition(void); //returns json string
+PUBLIC char *mtic_getDefinitionName(void);
+PUBLIC char *mtic_getDefinitionDescription(void);
+PUBLIC char *mtic_getDefinitionVersion(void);
+PUBLIC int mtic_setDefinitionName(char *name);
 PUBLIC int mtic_setDefinitionDescription(char *description);
 PUBLIC int mtic_setDefinitionVersion(char *version);
 

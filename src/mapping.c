@@ -245,20 +245,7 @@ int mtic_map (char* input_name,char* map_description){
     {
         if((error_code == 0 || error_code == 5) && new_map->state == OFF)
         {
-            if(strcmp("*", agent_to_map_name) == 0)
-            {
-                definition *current, *tmp;
-                HASH_ITER(hh, mtic_agents_defs_on_network, current, tmp) {
-                    if(current != NULL)
-                    {
-                        // check and subscribe to the new added outputs if they exist and the corresponding agent is present.
-                        network_checkAndSubscribeToPublisher((char*)current->name);
-                    }
-                }
-            } else {
-                // check and subscribe to the new added outputs if they exist and the corresponding agent is present.
-                network_checkAndSubscribeToPublisher(agent_to_map_name);
-            }
+            network_checkAndSubscribeToPublisher(agent_to_map_name);
         } else {
             result = error_code;
         }
