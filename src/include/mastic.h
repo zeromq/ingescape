@@ -31,10 +31,10 @@
 //start, stop & kill the agent
 PUBLIC int mtic_startWithDevice(const char *networkDevice, int port);
 PUBLIC int mtic_startWithIP(const char *ipAddress, int port);
-PUBLIC int mtic_stop();
-PUBLIC void mtic_die();
+PUBLIC int mtic_stop(void);
+PUBLIC void mtic_die(void);
 PUBLIC int mtic_setAgentName(const char *name);
-PUBLIC char *mtic_getAgentName();
+PUBLIC char *mtic_getAgentName(void);
 
 //pause and resume the agent
 /**
@@ -43,23 +43,23 @@ PUBLIC char *mtic_getAgentName();
  * \brief typedef for the callback used in freezed functions
  */
 typedef void (*mtic_freezeCallback)(bool isPaused, void *myData);
-PUBLIC int mtic_freeze();
-PUBLIC bool mtic_isFrozen();
-PUBLIC int mtic_unfreeze();
+PUBLIC int mtic_freeze(void);
+PUBLIC bool mtic_isFrozen(void);
+PUBLIC int mtic_unfreeze(void);
 PUBLIC int mtic_observeFreeze(mtic_freezeCallback cb, void *myData);
 
 //control agent state
 PUBLIC int mtic_setAgentState(const char *state);
-PUBLIC char *mtic_getAgentState();
+PUBLIC char *mtic_getAgentState(void);
 
 //mute the agent
-PUBLIC int mtic_mute();
-PUBLIC int mtic_unmute();
-PUBLIC bool mtic_isMuted();
+PUBLIC int mtic_mute(void);
+PUBLIC int mtic_unmute(void);
+PUBLIC bool mtic_isMuted(void);
 
 //set/get library parameters
 PUBLIC void mtic_setVerbose (bool verbose);
-PUBLIC bool mtic_getVerbose();
+PUBLIC bool mtic_getVerbose(void);
 PUBLIC void mtic_setCanBeFrozen (bool canBeFrozen);
 
 //////////////////////////////////////////////////
@@ -143,9 +143,9 @@ PUBLIC iopType_t mtic_getTypeForInput(const char *name);
 PUBLIC iopType_t mtic_getTypeForOutput(const char *name);
 PUBLIC iopType_t mtic_getTypeForParameter(const char *name);
 
-PUBLIC int mtic_getInputsNumber();
-PUBLIC int mtic_getOutputsNumber();
-PUBLIC int mtic_getParametersNumber();
+PUBLIC int mtic_getInputsNumber(void);
+PUBLIC int mtic_getOutputsNumber(void);
+PUBLIC int mtic_getParametersNumber(void);
 
 PUBLIC char** mtic_getInputsList(long *nbOfElements);
 PUBLIC char** mtic_getOutputsList(long *nbOfElements);
@@ -177,8 +177,12 @@ PUBLIC bool mtic_isOutputMuted(const char *name);
 //load / set / get definition
 PUBLIC int mtic_loadDefinition (const char* json_str);
 PUBLIC int mtic_loadDefinitionFromPath (const char* file_path);
-int mtic_clearDefinition(); //clears definition data for the agent
-PUBLIC char* mtic_getDefinition(); //returns json string
+PUBLIC int mtic_clearDefinition(void); //clears definition data for the agent
+PUBLIC char* mtic_getDefinition(void); //returns json string
+PUBLIC char *mtic_getDefinitionName(void);
+PUBLIC char *mtic_getDefinitionDescription(void);
+PUBLIC char *mtic_getDefinitionVersion(void);
+PUBLIC int mtic_setDefinitionName(char *name);
 PUBLIC int mtic_setDefinitionDescription(char *description);
 PUBLIC int mtic_setDefinitionVersion(char *version);
 
@@ -201,14 +205,14 @@ PUBLIC int mtic_removeParameter(const char *name);
 //load / set / get definition
 PUBLIC int mtic_loadMapping (const char* json_str);
 PUBLIC int mtic_loadMappingFromPath (const char* file_path);
-PUBLIC int mtic_clearMapping(); //clears mapping data for the agent
-PUBLIC char* mtic_getMapping(); //returns json string
+PUBLIC int mtic_clearMapping(void); //clears mapping data for the agent
+PUBLIC char* mtic_getMapping(void); //returns json string
 
 //edit mapping using the API
 PUBLIC int mtic_setMappingName(char *name);
 PUBLIC int mtic_setMappingDescription(char *description);
 PUBLIC int mtic_setMappingVersion(char *version);
-PUBLIC int mtic_getMappingEntriesNumber(); //number of entries in the mapping output type
+PUBLIC int mtic_getMappingEntriesNumber(void); //number of entries in the mapping output type
 PUBLIC int mtic_addMappingEntry(char *fromOurInput, char *toAgent, char *withOutput); //returns mapping id or 0 if creation failed
 PUBLIC int mtic_removeMappingEntryWithId(int theId);
 PUBLIC int mtic_removeMappingEntryWithName(char *fromOurInput, char *toAgent, char *withOutput);

@@ -22,6 +22,7 @@
 
 #include <stdbool.h>
 #include <string.h>
+#include <czmq.h>
 
 #include "uthash/uthash.h"
 
@@ -76,7 +77,7 @@ typedef struct definition definition;
  * 'outputs'                : list of outputs contains by the agent
  */
 typedef struct definition {
-    const char* name; //Need to be unique the key
+    const char* name; //hash key
     const char* description;
     const char* version;
     category* categories;
@@ -169,6 +170,14 @@ typedef struct mapping_out mapping_out;
 typedef struct mapping_cat mapping_cat;
 typedef struct mapping mapping;
 
+typedef struct subscriber{
+    const char *agentName;
+    const char *agentPeerId;
+    zsock_t *subscriber;
+    zmq_pollitem_t *pollItem;
+    definition *definition;
+    UT_hash_handle hh;
+} subscriber_t;
 
 //////////////////  FUNCTIONS  //////////////////
 
@@ -176,9 +185,8 @@ typedef struct mapping mapping;
 
 extern definition* mtic_definition_loaded;
 extern definition* mtic_definition_live;
-extern definition* mtic_agents_defs_on_network;
 
-void definition_initDefinitionToDefault();
+void definition_initDefinitionToDefault(void);
 
 int definition_get_iop_value_as_int(agent_iop*iop, iop_t type);
 double definition_get_iop_value_as_double(agent_iop*iop, iop_t type);
@@ -209,7 +217,6 @@ void* model_get(const char*name_iop, iop_t type);
 
 
 // network
-
 #define AGENT_NAME_DEFAULT "mtic_undefined"
 int network_publishOutput (const char* output_name);
 int network_checkAndSubscribeToPublisher(const char* agentName);
@@ -217,8 +224,6 @@ void mtic_debug(const char*fmt, ...);
 
 
 // parser
-
-extern bool agentNameChangedByDefinition;
 
 definition* parser_loadDefinition (const char* json_str);
 definition* parser_loadDefinitionFromPath (const char* file_path);

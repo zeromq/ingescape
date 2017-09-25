@@ -26,8 +26,6 @@
 #define STR_TYPE "type"
 #define STR_VALUE "value"
 
-bool agentNameChangedByDefinition = false;
-
 iopType_t string_to_value_type(const char* str) {
     
     if (!strcmp(str, "INTEGER"))
@@ -646,9 +644,8 @@ static void json_dump_definition (yajl_gen *g, definition* def) {
     
     yajl_gen_string(*g, (const unsigned char *) STR_NAME, strlen(STR_NAME));
     //Get the agent name from the network layer
-    char *name = mtic_getAgentName();
+    const char *name = def->name;
     yajl_gen_string(*g, (const unsigned char *) name, strlen (name));
-    free(name);
     
     yajl_gen_string(*g, (const unsigned char *) STR_DESCRIPTION, strlen(STR_DESCRIPTION));
     if(def->description != NULL)
@@ -1167,10 +1164,9 @@ int mtic_loadDefinition (const char* json_str){
     }else{
         //Check the name of agent from network layer
         char *name = mtic_getAgentName();
-        if(strcmp(name, AGENT_NAME_DEFAULT) == 0 || agentNameChangedByDefinition){
-            //The name of the agent is default or was previouly changed by definition load
+        if(strcmp(name, AGENT_NAME_DEFAULT) == 0){
+            //The name of the agent is default : we change it to definition name
             mtic_setAgentName(mtic_definition_loaded->name);
-            agentNameChangedByDefinition = true;
         }//else
             //The agent name was assigned by the developer : we keep it untouched
         free(name);
@@ -1211,10 +1207,9 @@ int mtic_loadDefinitionFromPath (const char* file_path){
     }else{
         //Check the name of agent from network layer
         char *name = mtic_getAgentName();
-        if(strcmp(name, AGENT_NAME_DEFAULT) == 0 || agentNameChangedByDefinition){
-            //The name of the agent is default or was previouly changed by definition load
+        if(strcmp(name, AGENT_NAME_DEFAULT) == 0){
+            //The name of the agent is default : we change it to definition name
             mtic_setAgentName(mtic_definition_loaded->name);
-            agentNameChangedByDefinition = true;
         }//else
             //The agent name was assigned by the developer : we keep it untouched
         free(name);
