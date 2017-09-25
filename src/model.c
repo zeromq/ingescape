@@ -112,7 +112,7 @@ int mtic_muteAll()
 
     // Go through the agent outpust to mute them
     struct agent_iop *current_iop, *tmp_iop;
-    HASH_ITER(hh, mtic_definition_live->outputs_table, current_iop, tmp_iop) {
+    HASH_ITER(hh, mtic_internal_definition->outputs_table, current_iop, tmp_iop) {
         if(current_iop != NULL)
         {
             result_tmp = mtic_mute_internal(current_iop->name,OUTPUT_T);
@@ -133,7 +133,7 @@ int mtic_unmuteAll()
     
     // Go through the agent outpust to mute them
     struct agent_iop *current_iop, *tmp_iop;
-    HASH_ITER(hh, mtic_definition_live->outputs_table, current_iop, tmp_iop) {
+    HASH_ITER(hh, mtic_internal_definition->outputs_table, current_iop, tmp_iop) {
         if(current_iop != NULL)
         {
             result_tmp = mtic_unmute_internal(current_iop->name,OUTPUT_T);
@@ -268,27 +268,27 @@ agent_iop * model_findIopByName(const char *name, iop_t type){
     
     switch (type) {
         case INPUT_T:
-            if(name != NULL && mtic_definition_live != NULL){
+            if(name != NULL && mtic_internal_definition != NULL){
                 //find the input agent_iop
-                HASH_FIND_STR( mtic_definition_live->inputs_table, name, found );
+                HASH_FIND_STR( mtic_internal_definition->inputs_table, name, found );
             }else{
-                fprintf(stderr, "ERROR : The name of the input is empty or mtic_definition_live is NULL\n");
+                fprintf(stderr, "ERROR : The name of the input is empty or mtic_internal_definition is NULL\n");
             }
             break;
         case OUTPUT_T:
-            if(name != NULL && mtic_definition_live != NULL){
+            if(name != NULL && mtic_internal_definition != NULL){
                 //find the input agent_iop
-                HASH_FIND_STR( mtic_definition_live->outputs_table, name, found );
+                HASH_FIND_STR( mtic_internal_definition->outputs_table, name, found );
             }else{
-                fprintf(stderr, "ERROR : The name of the output is empty or mtic_definition_live is NULL\n");
+                fprintf(stderr, "ERROR : The name of the output is empty or mtic_internal_definition is NULL\n");
             }
             break;
         case PARAMETER_T:
-            if(name != NULL && mtic_definition_live != NULL){
+            if(name != NULL && mtic_internal_definition != NULL){
                 //find the input agent_iop
-                HASH_FIND_STR( mtic_definition_live->params_table, name, found );
+                HASH_FIND_STR( mtic_internal_definition->params_table, name, found );
             }else{
-                fprintf(stderr, "ERROR : The name of the parameter is empty or mtic_definition_live is NULL\n");
+                fprintf(stderr, "ERROR : The name of the parameter is empty or mtic_internal_definition is NULL\n");
             }
             break;
         default:
@@ -302,11 +302,11 @@ agent_iop *model_findInputByName(const char *name)
 {
     agent_iop *found = NULL;
     
-    if(name != NULL && mtic_definition_live != NULL){
+    if(name != NULL && mtic_internal_definition != NULL){
         //find the input agent_iop
-        HASH_FIND_STR( mtic_definition_live->inputs_table, name, found );
+        HASH_FIND_STR( mtic_internal_definition->inputs_table, name, found );
     }else{
-        fprintf(stderr, "ERROR : The name of the input is empty or mtic_definition_live is NULL\n");
+        fprintf(stderr, "ERROR : The name of the input is empty or mtic_internal_definition is NULL\n");
     }
     
     return found;
@@ -316,11 +316,11 @@ agent_iop *model_findOutputByName(const char *name)
 {
     agent_iop *found = NULL;
     
-    if(name != NULL && mtic_definition_live != NULL){
+    if(name != NULL && mtic_internal_definition != NULL){
         //find the input agent_iop
-        HASH_FIND_STR( mtic_definition_live->outputs_table, name, found );
+        HASH_FIND_STR( mtic_internal_definition->outputs_table, name, found );
     }else{
-        fprintf(stderr, "ERROR : The name of the output is empty or mtic_definition_live is NULL\n");
+        fprintf(stderr, "ERROR : The name of the output is empty or mtic_internal_definition is NULL\n");
     }
     
     return found;
@@ -330,11 +330,11 @@ agent_iop *model_findParameterByName(const char *name)
 {
     agent_iop *found = NULL;
     
-    if(name != NULL && mtic_definition_live != NULL){
+    if(name != NULL && mtic_internal_definition != NULL){
         //find the input agent_iop
-        HASH_FIND_STR( mtic_definition_live->params_table, name, found );
+        HASH_FIND_STR( mtic_internal_definition->params_table, name, found );
     }else{
-        fprintf(stderr, "ERROR : The name of the parameter is empty or mtic_definition_live is NULL\n");
+        fprintf(stderr, "ERROR : The name of the parameter is empty or mtic_internal_definition is NULL\n");
     }
     
     return found;
@@ -2310,13 +2310,13 @@ iopType_t mtic_getTypeForInput(const char *name){
     agent_iop *inputFound = NULL;
 
     //check if def live iexist
-    if(mtic_definition_live == NULL){
+    if(mtic_internal_definition == NULL){
         mtic_debug("Definition live is NULL.");
         return -1;
     }
 
     //Find the input by the name in the table of the my agent's definition
-    HASH_FIND_STR(mtic_definition_live->inputs_table, name, inputFound);
+    HASH_FIND_STR(mtic_internal_definition->inputs_table, name, inputFound);
 
     if(inputFound == NULL){
         mtic_debug("The input named : %s is not found in the table.\n", name);
@@ -2349,13 +2349,13 @@ iopType_t mtic_getTypeForOutput(const char *name){
     agent_iop *outputFound = NULL;
 
     //check if def live iexist
-    if(mtic_definition_live == NULL){
+    if(mtic_internal_definition == NULL){
         mtic_debug("Definition live is NULL.");
         return -1;
     }
 
     //Find the output by the name in the table of the my agent's definition
-    HASH_FIND_STR(mtic_definition_live->outputs_table, name, outputFound);
+    HASH_FIND_STR(mtic_internal_definition->outputs_table, name, outputFound);
 
     if(outputFound == NULL){
         mtic_debug("The output named : %s is not found in the table.\n", name);
@@ -2388,13 +2388,13 @@ iopType_t mtic_getTypeForParameter(const char *name){
     agent_iop *parameterFound = NULL;
 
     //check if def live iexist
-    if(mtic_definition_live == NULL){
+    if(mtic_internal_definition == NULL){
         mtic_debug("Definition live is NULL.");
         return -1;
     }
 
     //Find the output by the name in the table of the my agent's definition
-    HASH_FIND_STR(mtic_definition_live->params_table, name, parameterFound);
+    HASH_FIND_STR(mtic_internal_definition->params_table, name, parameterFound);
 
     if(parameterFound == NULL){
         mtic_debug("The parameter named : %s is not found in the table.\n", name);
@@ -2414,12 +2414,12 @@ iopType_t mtic_getTypeForParameter(const char *name){
 int mtic_getInputsNumber()
 {
     //check if def live iexist
-    if(mtic_definition_live == NULL){
+    if(mtic_internal_definition == NULL){
         mtic_debug("Definition live is NULL.");
         return -1;
     }
 
-    int number = HASH_COUNT(mtic_definition_live->inputs_table);
+    int number = HASH_COUNT(mtic_internal_definition->inputs_table);
 
     return number;
 }
@@ -2433,12 +2433,12 @@ int mtic_getInputsNumber()
 int mtic_getOutputsNumber()
 {
     //check if def live iexist
-    if(mtic_definition_live == NULL){
+    if(mtic_internal_definition == NULL){
         mtic_debug("Definition live is NULL.");
         return -1;
     }
 
-    int number = HASH_COUNT(mtic_definition_live->outputs_table);
+    int number = HASH_COUNT(mtic_internal_definition->outputs_table);
 
     return number;
 }
@@ -2453,12 +2453,12 @@ int mtic_getOutputsNumber()
 int mtic_getParametersNumber()
 {
     //check if def live iexist
-    if(mtic_definition_live == NULL){
+    if(mtic_internal_definition == NULL){
         mtic_debug("Definition live is NULL.");
         return -1;
     }
 
-    int number = HASH_COUNT(mtic_definition_live->params_table);
+    int number = HASH_COUNT(mtic_internal_definition->params_table);
 
     return number;
 }
@@ -2474,13 +2474,13 @@ int mtic_getParametersNumber()
 char ** mtic_getInputsList(long *nbOfElements){
 
     //check if def live iexist
-    if(mtic_definition_live == NULL){
+    if(mtic_internal_definition == NULL){
         mtic_debug("Definition live is NULL.");
         return NULL;
     }
 
     //Get the number of element
-    (*nbOfElements) = HASH_COUNT(mtic_definition_live->inputs_table);
+    (*nbOfElements) = HASH_COUNT(mtic_internal_definition->inputs_table);
     long N = (*nbOfElements);
 
     if(N < 1)
@@ -2492,7 +2492,7 @@ char ** mtic_getInputsList(long *nbOfElements){
     //Fill the table of input
     agent_iop *current_iop;
     int index = 0;
-    for(current_iop = mtic_definition_live->inputs_table; current_iop != NULL; current_iop = current_iop->hh.next) {
+    for(current_iop = mtic_internal_definition->inputs_table; current_iop != NULL; current_iop = current_iop->hh.next) {
         list[index] = strdup(current_iop->name);
         index++;
     }
@@ -2511,13 +2511,13 @@ char ** mtic_getInputsList(long *nbOfElements){
 char ** mtic_getOutputsList(long *nbOfElements){
 
     //check if def live iexist
-    if(mtic_definition_live == NULL){
+    if(mtic_internal_definition == NULL){
         mtic_debug("Definition live is NULL.");
         return NULL;
     }
 
     //Get the number of element
-    (*nbOfElements) = HASH_COUNT(mtic_definition_live->outputs_table);
+    (*nbOfElements) = HASH_COUNT(mtic_internal_definition->outputs_table);
     long N = (*nbOfElements);
 
     if(N < 1)
@@ -2529,7 +2529,7 @@ char ** mtic_getOutputsList(long *nbOfElements){
     //Fill the table of input
     agent_iop *current_iop;
     int index = 0;
-    for(current_iop = mtic_definition_live->outputs_table; current_iop != NULL; current_iop = current_iop->hh.next) {
+    for(current_iop = mtic_internal_definition->outputs_table; current_iop != NULL; current_iop = current_iop->hh.next) {
         list[index] = strdup(current_iop->name);
         index++;
     }
@@ -2548,13 +2548,13 @@ char ** mtic_getOutputsList(long *nbOfElements){
 char ** mtic_getParametersList(long *nbOfElements){
 
     //check if def live iexist
-    if(mtic_definition_live == NULL){
+    if(mtic_internal_definition == NULL){
         mtic_debug("Definition live is NULL.");
         return NULL;
     }
 
     //Get the number of element
-    (*nbOfElements) = HASH_COUNT(mtic_definition_live->params_table);
+    (*nbOfElements) = HASH_COUNT(mtic_internal_definition->params_table);
     long N = (*nbOfElements);
 
     if(N < 1)
@@ -2566,7 +2566,7 @@ char ** mtic_getParametersList(long *nbOfElements){
     //Fill the table of input
     agent_iop *current_iop;
     int index = 0;
-    for(current_iop = mtic_definition_live->params_table; current_iop != NULL; current_iop = current_iop->hh.next) {
+    for(current_iop = mtic_internal_definition->params_table; current_iop != NULL; current_iop = current_iop->hh.next) {
         list[index] = strdup(current_iop->name);
         index++;
     }
@@ -2598,13 +2598,13 @@ bool mtic_checkInputExistence(const char *name){
     agent_iop *inputFound = NULL;
 
     //check if def live iexist
-    if(mtic_definition_live == NULL){
+    if(mtic_internal_definition == NULL){
         mtic_debug("Definition live is NULL.");
         return false;
     }
 
     //Find the input by the name in the table of the my agent's definition
-    HASH_FIND_STR(mtic_definition_live->inputs_table, name, inputFound);
+    HASH_FIND_STR(mtic_internal_definition->inputs_table, name, inputFound);
 
     if(inputFound == NULL){
         mtic_debug("The input named : %s is not found in the table.\n", name);
@@ -2634,13 +2634,13 @@ bool mtic_checkOutputExistence(const char *name){
     agent_iop *outputFound = NULL;
 
     //check if def live iexist
-    if(mtic_definition_live == NULL){
+    if(mtic_internal_definition == NULL){
         mtic_debug("Definition live is NULL.");
         return false;
     }
 
     //Find the input by the name in the table of the my agent's definition
-    HASH_FIND_STR(mtic_definition_live->outputs_table, name, outputFound);
+    HASH_FIND_STR(mtic_internal_definition->outputs_table, name, outputFound);
 
     if(outputFound == NULL){
         mtic_debug("The output named : %s is not found in the table.\n", name);
@@ -2669,13 +2669,13 @@ bool mtic_checkParameterExistence(const char *name){
     agent_iop *parameterFound = NULL;
 
     //check if def live iexist
-    if(mtic_definition_live == NULL){
+    if(mtic_internal_definition == NULL){
         mtic_debug("Definition live is NULL.");
         return false;
     }
 
     //Find the input by the name in the table of the my agent's definition
-    HASH_FIND_STR(mtic_definition_live->params_table, name, parameterFound);
+    HASH_FIND_STR(mtic_internal_definition->params_table, name, parameterFound);
 
     if(parameterFound == NULL){
         mtic_debug("The parameter named : %s is not found in the table.\n", name);

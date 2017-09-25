@@ -70,29 +70,30 @@ void free_map_cat (mapping_cat** map_cat){
     free ((*map_cat));
 }
 
-void mapping_FreeMapping (mapping* mapp) {
+void mapping_freeMapping (mapping* map) {
 
     struct mapping_out *current_map_out, *tmp_map_out;
     struct mapping_cat *current_map_cat, *tmp_map_cat;
 
-    free((char*)mapp->name);
-    mapp->name = NULL;
-    free((char*)mapp->version);
-    mapp->version = NULL;
-    free((char*)mapp->description);
-    mapp->description = NULL;
+    free((char*)map->name);
+    map->name = NULL;
+    free((char*)map->version);
+    map->version = NULL;
+    free((char*)map->description);
+    map->description = NULL;
 
     //Free mapping output
-    HASH_ITER(hh, mapp->map_out, current_map_out, tmp_map_out) {
-        HASH_DEL(mapp->map_out,current_map_out);
+    HASH_ITER(hh, map->map_out, current_map_out, tmp_map_out) {
+        HASH_DEL(map->map_out,current_map_out);
         free_map_out(&current_map_out);
     }
 
     //Free mapping category
-    HASH_ITER(hh, mapp->map_cat, current_map_cat, tmp_map_cat) {
-        HASH_DEL(mapp->map_cat,current_map_cat);
+    HASH_ITER(hh, map->map_cat, current_map_cat, tmp_map_cat) {
+        HASH_DEL(map->map_cat,current_map_cat);
         free_map_cat(&current_map_cat);
     }
+    free(map);
 }
 
 mapping_out * add_map_to_table(char * input_name,
@@ -167,12 +168,12 @@ int mtic_map (char* input_name,char* map_description){
     int error_code = -1;
     
     //Check if already initialized, and do it if not
-    if(mtic_definition_live == NULL){
-        mtic_definition_live = calloc(1, sizeof(struct definition));
+    if(mtic_internal_definition == NULL){
+        mtic_internal_definition = calloc(1, sizeof(struct definition));
     }
     
     //Find the input by the name in the table of the my agent's definition
-    HASH_FIND_STR(mtic_definition_live->inputs_table, input_name, input_to_map);
+    HASH_FIND_STR(mtic_internal_definition->inputs_table, input_name, input_to_map);
     if(input_to_map == NULL){
         mtic_debug("%s : input name %s not found \n",
                    __FUNCTION__,
@@ -383,7 +384,7 @@ bool check_iop_type(char * input_name,
                     agent_iop* output){
 
     agent_iop * input = NULL;
-    HASH_FIND_STR(mtic_definition_live->inputs_table,input_name,input);
+    HASH_FIND_STR(mtic_internal_definition->inputs_table,input_name,input);
 
     if(input == NULL)
         return false;
@@ -515,7 +516,7 @@ agent_iop* mapping_check_map(definition *definition){
                         HASH_ADD_KEYPTR(hh,outputs, new_iop->name, strlen(new_iop->name), new_iop);
                     }
                 } else {
-                    printf("Error : Unable to map %s.%s to %s.%s\n",mtic_definition_live->name, current_map->input_name, definition->name, current_map->output_name);
+                    printf("Error : Unable to map %s.%s to %s.%s\n",mtic_internal_definition->name, current_map->input_name, definition->name, current_map->output_name);
                     if(current_map->state == ON)
                         current_map->state = OFF;
                 }
@@ -675,16 +676,10 @@ int mtic_loadMappingFromPath (const char* file_path){
  */
 int mtic_clearMapping(){
 
-    if(mtic_my_agent_mapping == NULL){
-        mtic_debug("The structure mtic_my_agent_mapping is NULL. \n");
-        return 0;
+    if(mtic_my_agent_mapping != NULL){
+        mapping_freeMapping(mtic_my_agent_mapping);
     }
-
-    mapping_FreeMapping(mtic_my_agent_mapping);
-
-    //Put ptr at NULL
-    mtic_my_agent_mapping = NULL;
-
+    mtic_my_agent_mapping = calloc(1, sizeof(struct mapping));
     return 1;
 }
 

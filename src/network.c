@@ -129,10 +129,10 @@ FreezeCallback_t *FreezeCallbacks = NULL;
 void sendDefinitionToAgent(const char *peerId)
 {
     // Send my own definition
-    if(mtic_definition_loaded != NULL)
+    if(mtic_internal_definition != NULL)
     {
         char * definitionStr = NULL;
-        definitionStr = parser_export_definition(mtic_definition_live);
+        definitionStr = parser_export_definition(mtic_internal_definition);
         // Send definition to the network
         if(definitionStr)
         {
@@ -142,7 +142,7 @@ void sendDefinitionToAgent(const char *peerId)
             free (definitionStr);
             definitionStr = NULL;
         } else {
-            mtic_debug("Error : could not send definition of %s.\n",mtic_definition_live->name);
+            mtic_debug("Error : could not send definition of %s.\n",mtic_internal_definition->name);
         }
     }
 }
@@ -367,6 +367,7 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                             free(subscriber->subscriber);
                             if (subscriber->definition != NULL){
                                 definition_free_definition(subscriber->definition);
+                                subscriber->definition = NULL;
                             }
                             subscriber->subscriber = NULL;
                             free(subscriber);
@@ -440,6 +441,7 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 }else{
                     mtic_debug("ERROR: definition is NULL or has no name for agent %s\n", name);
                     definition_free_definition(newDefinition);
+                    newDefinition = NULL;
                 }
                 free(strDefinition);
             }
@@ -523,9 +525,6 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
 static void
 initActor (zsock_t *pipe, void *args)
 {
-    //Initialize the structure definition if needed
-    definition_initDefinitionToDefault();
-
     //start zyre
     agentElements->node = zyre_new (agentName);
     zyre_set_port(agentElements->node, agentElements->zyrePort);

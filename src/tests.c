@@ -25,19 +25,19 @@ void callback_test_input_2(agent_iop* input_iop){
 //    printf(" ------------ test_model_workflow ------------- \n");
 
 //    mtic_definition_loaded = load_definition_from_path("test_definition_my_agent.json");    //Definition of the agent
-//    mtic_definition_live = malloc(sizeof(mtic_definition_loaded));
-//    copy_definition(mtic_definition_live, mtic_definition_loaded);
+//    mtic_internal_definition = malloc(sizeof(mtic_definition_loaded));
+//    copy_definition(mtic_internal_definition, mtic_definition_loaded);
 
 //    printf("\t The definition loaded : \n");
 //    print_definition(mtic_definition_loaded);
 
 
 //    printf("The definition live : \n");
-//    print_definition(mtic_definition_live);
+//    print_definition(mtic_internal_definition);
 
 //    //Free the memory
 //    definition_free_definition(mtic_definition_loaded);
-//    definition_free_definition(mtic_definition_live);
+//    definition_free_definition(mtic_internal_definition);
 //}
 
 //void test_map(){
@@ -45,7 +45,7 @@ void callback_test_input_2(agent_iop* input_iop){
 
 //    //Load definition
 //    mtic_definition_loaded = parser_loadDefinitionFromPath("test_definition_my_agent.json");
-//    mtic_definition_live = parser_loadDefinitionFromPath("test_definition_my_agent.json");
+//    mtic_internal_definition = parser_loadDefinitionFromPath("test_definition_my_agent.json");
 
 //    //Load a map json file
 //    mtic_loadMappingFromPath("test_map.json");
@@ -58,7 +58,7 @@ void callback_test_input_2(agent_iop* input_iop){
 
 //    //Free the memory
 //    definition_free_definition(mtic_definition_loaded);
-//    definition_free_definition(mtic_definition_live);
+//    definition_free_definition(mtic_internal_definition);
 
 //}
 
@@ -66,7 +66,7 @@ void callback_test_input_2(agent_iop* input_iop){
 //    printf(" ------------ test_model_workflow ------------- \n");
 
 //    mtic_definition_loaded = parser_loadDefinitionFromPath("test_definition_my_agent.json");    //Definition of the agent
-//    mtic_definition_live = parser_loadDefinitionFromPath("test_definition_my_agent.json");    //Definition of the agent
+//    mtic_internal_definition = parser_loadDefinitionFromPath("test_definition_my_agent.json");    //Definition of the agent
 
 //    /*
 //     * Input 1 : e1
@@ -107,11 +107,11 @@ void callback_test_input_2(agent_iop* input_iop){
 
 
 //    printf("The definition live : \n");
-//    print_definition(mtic_definition_live);
+//    print_definition(mtic_internal_definition);
 
 //    //Free the memory
 //    definition_free_definition(mtic_definition_loaded);
-//    definition_free_definition(mtic_definition_live);
+//    definition_free_definition(mtic_internal_definition);
 //    free(new_value_e2);
 //    free(value_e2);
 //}
@@ -121,7 +121,7 @@ void callback_test_input_2(agent_iop* input_iop){
 
 //    //Load definition
 //    mtic_definition_loaded = parser_loadDefinitionFromPath("test_definition_my_agent.json");
-//    mtic_definition_live = parser_loadDefinitionFromPath("test_definition_my_agent.json");
+//    mtic_internal_definition = parser_loadDefinitionFromPath("test_definition_my_agent.json");
 
 //    //Load a map json file
 //    load_map_from_path("test_map.json");
@@ -158,7 +158,7 @@ void callback_test_input_2(agent_iop* input_iop){
 
 //    //Free the memory
 //    definition_free_definition(mtic_definition_loaded);
-//    definition_free_definition(mtic_definition_live);
+//    definition_free_definition(mtic_internal_definition);
 //    definition_free_definition(external_agent_def);
 //    mtic_free_mapping(mtic_my_agent_mapping);
 //    //Free iop map
@@ -381,36 +381,36 @@ void set_definition(const char *name,
                     agent_iop *inputs,
                     agent_iop *outputs)
 {
-    mtic_definition_live = calloc(1, sizeof(definition));
+    mtic_internal_definition = calloc(1, sizeof(definition));
     
     //Set the agent's name
-    mtic_definition_live->name = name;
+    mtic_internal_definition->name = name;
     
     //Set the agent's definition
-    mtic_definition_live->description = description;
+    mtic_internal_definition->description = description;
     
     //Set the agent's version
-    mtic_definition_live->version = version;
+    mtic_internal_definition->version = version;
     
     //Initialize the agent's categories
-    mtic_definition_live->categories = NULL;
-    mtic_definition_live->categories = calloc(1, sizeof(category));
-    mtic_definition_live->categories = categories;
+    mtic_internal_definition->categories = NULL;
+    mtic_internal_definition->categories = calloc(1, sizeof(category));
+    mtic_internal_definition->categories = categories;
     
     //Set the agent's parameter
-    mtic_definition_live->params_table = NULL;
-    mtic_definition_live->params_table = calloc(1, sizeof(agent_iop));
-    mtic_definition_live->params_table = params;
+    mtic_internal_definition->params_table = NULL;
+    mtic_internal_definition->params_table = calloc(1, sizeof(agent_iop));
+    mtic_internal_definition->params_table = params;
     
     //Set the agent's inputs
-    mtic_definition_live->inputs_table = NULL;
-    mtic_definition_live->inputs_table = calloc(1, sizeof(agent_iop));
-    mtic_definition_live->inputs_table = inputs;
+    mtic_internal_definition->inputs_table = NULL;
+    mtic_internal_definition->inputs_table = calloc(1, sizeof(agent_iop));
+    mtic_internal_definition->inputs_table = inputs;
     
     //Set the agent's outputs
-    mtic_definition_live->outputs_table = NULL;
-    mtic_definition_live->outputs_table = calloc(1, sizeof(agent_iop));
-    mtic_definition_live->outputs_table = outputs;
+    mtic_internal_definition->outputs_table = NULL;
+    mtic_internal_definition->outputs_table = calloc(1, sizeof(agent_iop));
+    mtic_internal_definition->outputs_table = outputs;
 }
 
 
@@ -633,7 +633,7 @@ void init_def()
     //Test all the categories
     struct category *cat_to_check;
     for(cat_to_check = all_categories; cat_to_check != NULL; cat_to_check = cat_to_check->hh.next) {
-        if(check_category(mtic_definition_live, cat_to_check, OUTPUT_CAT) == true)
+        if(check_category(mtic_internal_definition, cat_to_check, OUTPUT_CAT) == true)
         {
             printf("the agent is compatible to the category : %s \n", cat_to_check->name);
             HASH_ADD_STR(compatible_categories, name, cat_to_check);

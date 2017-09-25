@@ -16,8 +16,7 @@
 #include "mastic_private.h"
 #include "uthash/uthash.h"
 
-definition * mtic_definition_loaded = NULL;
-definition * mtic_definition_live = NULL;
+definition * mtic_internal_definition = NULL;
 
 typedef struct agent_port_t {
     const char * name;          //Need to be unique : the table hash key
@@ -266,20 +265,6 @@ int definition_addIop(agent_iop *iop, iop_t iop_type, definition **def)
 ////////////////////////////////////////////////////////////////////////
 // PRIVATE API
 ////////////////////////////////////////////////////////////////////////
-void definition_initDefinitionToDefault()
-{
-    //Check if already allocated
-    if(mtic_definition_loaded == NULL){
-        //Dynamically allocate the memory
-        mtic_definition_loaded = calloc(1, sizeof(struct definition));
-    }
-    
-    if(mtic_definition_live== NULL){
-        //Dynamically allocate the memory
-        mtic_definition_live = calloc(1, sizeof(struct definition));
-    }
-}
-
 int definition_get_iop_value_as_int(agent_iop *iop, iop_t type){
     int val = *(int *)(model_get(iop->name,type));
     return val;
@@ -360,12 +345,12 @@ void definition_free_definition (definition* def) {
         free_agent_iop(&current_iop);
         current_iop = NULL;
     }
-    
     HASH_ITER(hh, def->categories, current_cat, tmp_cat) {
         HASH_DEL(def->categories,current_cat);
         free_category(current_cat);
         current_cat = NULL;
     }
+    free(def);
 }
 
 
@@ -383,25 +368,18 @@ void definition_free_definition (definition* def) {
  * \fn int mtic_clearDefinition()
  * \ingroup loadSetGetDefFct
  * \brief Clear the internal definition of the agent.
- *        Free all members of the structure mtic_definition_loaded & mtic_definition_live.
+ *        Free all members of the structure mtic_definition_loaded & mtic_internal_definition.
  *        But the pointer of these structure is not free and stay allocated.
  * \return 1 if ok else 0
  */
 int mtic_clearDefinition(){
 
-    mtic_debug("mtic_clearDefinition ... \n");
-
     //Free the structure definition loaded
-    if(mtic_definition_loaded != NULL){
-        mtic_debug("Clear the definition loaded ... \n");
-        definition_free_definition(mtic_definition_loaded);
+    mtic_debug("Clear our definition and initiate en empty one\n");
+    if(mtic_internal_definition != NULL){
+        definition_free_definition(mtic_internal_definition);
     }
-
-    //Free the structure definition loaded
-    if(mtic_definition_live != NULL){
-        mtic_debug("Clear the definition live ... \n");
-        definition_free_definition(mtic_definition_live);
-    }
+    mtic_internal_definition = calloc(1, sizeof(struct definition));
 
     return 1;
 }
@@ -416,32 +394,29 @@ int mtic_clearDefinition(){
  */
 char* mtic_getDefinition(){
     char * def = NULL;
-
-    if(mtic_definition_loaded == NULL)
+    if(mtic_internal_definition == NULL)
         return NULL;
-
-    def = parser_export_definition(mtic_definition_loaded);
-
+    def = parser_export_definition(mtic_internal_definition);
     return def;
 }
 
 char *mtic_getDefinitionName(void){
-    if (mtic_definition_live != NULL && mtic_definition_live->name != NULL){
-        return strdup(mtic_definition_live->name);
+    if (mtic_internal_definition != NULL && mtic_internal_definition->name != NULL){
+        return strdup(mtic_internal_definition->name);
     }else{
         return NULL;
     }
 }
 char *mtic_getDefinitionDescription(void){
-    if (mtic_definition_live != NULL && mtic_definition_live->description != NULL){
-        return strdup(mtic_definition_live->description);
+    if (mtic_internal_definition != NULL && mtic_internal_definition->description != NULL){
+        return strdup(mtic_internal_definition->description);
     }else{
         return NULL;
     }
 }
 char *mtic_getDefinitionVersion(void){
-    if (mtic_definition_live != NULL && mtic_definition_live->version != NULL){
-        return strdup(mtic_definition_live->version);
+    if (mtic_internal_definition != NULL && mtic_internal_definition->version != NULL){
+        return strdup(mtic_internal_definition->version);
     }else{
         return NULL;
     }
@@ -458,24 +433,15 @@ int mtic_setDefinitionName(char *name){
     }
     
     //Check if already initialized, and do it if not
-    if(mtic_definition_loaded == NULL){
-        mtic_definition_loaded = calloc(1, sizeof(struct definition));
+    if(mtic_internal_definition == NULL){
+        mtic_internal_definition = calloc(1, sizeof(struct definition));
     }
     
     //Copy the description in the structure in loaded definition
-    if(mtic_definition_loaded->description != NULL)//Free the field if needed
-        free((char*)mtic_definition_loaded->name);
-    mtic_definition_loaded->name = strdup(name);
-    
-    //Check if already initialized, and do it if not
-    if(mtic_definition_live == NULL){
-        mtic_definition_live = calloc(1, sizeof(struct definition));
+    if(mtic_internal_definition->description != NULL){
+        free((char*)mtic_internal_definition->name);
     }
-    
-    // Live data corresponds to a copy of the initial definition
-    if(mtic_definition_live->description != NULL)//Free the field if needed
-        free((char*)mtic_definition_live->name);
-    mtic_definition_live->name = strdup(mtic_definition_loaded->name);
+    mtic_internal_definition->name = strdup(name);
     
     return 1;
 }
@@ -500,26 +466,17 @@ int mtic_setDefinitionDescription(char *description){
         mtic_debug("mtic_setDefinitionDescription : Agent description cannot be empty\n");
         return -1;
     }
-
+    
     //Check if already initialized, and do it if not
-    if(mtic_definition_loaded == NULL){
-        mtic_definition_loaded = calloc(1, sizeof(struct definition));
-    }
-
-    //Copy the description in the structure in loaded definition
-    if(mtic_definition_loaded->description != NULL)//Free the field if needed
-        free((char*)mtic_definition_loaded->description);
-    mtic_definition_loaded->description = strdup(description);
-
-    //Check if already initialized, and do it if not
-    if(mtic_definition_live == NULL){
-        mtic_definition_live = calloc(1, sizeof(struct definition));
+    if(mtic_internal_definition == NULL){
+        mtic_internal_definition = calloc(1, sizeof(struct definition));
     }
 
     // Live data corresponds to a copy of the initial definition
-    if(mtic_definition_live->description != NULL)//Free the field if needed
-        free((char*)mtic_definition_live->description);
-     mtic_definition_live->description = strdup(mtic_definition_loaded->description);
+    if(mtic_internal_definition->description != NULL){
+        free((char*)mtic_internal_definition->description);
+    }
+     mtic_internal_definition->description = strdup(description);
 
     return 1;
 }
@@ -545,24 +502,15 @@ int mtic_setDefinitionVersion(char *version){
     }
 
     //Check if already initialized, and do it if not
-    if(mtic_definition_loaded == NULL){
-        mtic_definition_loaded = calloc(1, sizeof(struct definition));
-    }
-
-    //Copy the description in the structure in loaded definition
-    if(mtic_definition_loaded->version != NULL)//Free the field if needed
-        free((char*)mtic_definition_loaded->version);
-    mtic_definition_loaded->version = strdup(version);
-
-    //Check if already initialized, and do it if not
-    if(mtic_definition_live == NULL){
-        mtic_definition_live = calloc(1, sizeof(struct definition));
+    if(mtic_internal_definition == NULL){
+        mtic_internal_definition = calloc(1, sizeof(struct definition));
     }
 
     // Live data corresponds to a copy of the initial definition
-    if(mtic_definition_live->version != NULL)//Free the field if needed
-        free((char*)mtic_definition_live->version);
-    mtic_definition_live->version = strdup(mtic_definition_loaded->version);
+    if(mtic_internal_definition->version != NULL){
+        free((char*)mtic_internal_definition->version);
+    }
+    mtic_internal_definition->version = strdup(version);
 
     return 1;
 }
@@ -578,31 +526,25 @@ int mtic_setDefinitionVersion(char *version){
  * \brief Create and add an input for the agent
  *
  * \param name The name of the Iop
- * \param type The Iop type : input, output or parameter
+ * \param value_type The Iop type : input, output or parameter
  * \param value The pointer on the value (the value will be copied)
  * \return The error. 1 is OK, 0 not able to add in definition loaded, -1 not able to add in definition live
  */
 
 int mtic_createInput(const char *name, iopType_t value_type, void *value, long size){
-
-    //Create the iop for loaded
-    agent_iop* iopLoaded = definition_createIop(name, INPUT_T, value_type, value, size);
-
-    //Add iop in structure def loaded, need to be copied
-    if (definition_addIop(iopLoaded, INPUT_T, &mtic_definition_loaded) < 1){
-        return 0;
+    if(mtic_internal_definition == NULL){
+        mtic_internal_definition = calloc(1, sizeof(struct definition));
     }
-
-    //Create the iop for loaded
-    agent_iop* iopLive = definition_createIop(name, INPUT_T, value_type, value, size);
+    
+    //Create the iop
+    agent_iop *iopLive = definition_createIop(name, INPUT_T, value_type, value, size);
 
     //Add iop in structure def live, need to be copied
-    if (definition_addIop(iopLive, INPUT_T, &mtic_definition_live) < 1){
+    if (definition_addIop(iopLive, INPUT_T, &mtic_internal_definition) < 1){
         return -1;
     }
 
     //free iop
-    free(iopLoaded);
     free(iopLive);
 
     return 1;
@@ -614,30 +556,25 @@ int mtic_createInput(const char *name, iopType_t value_type, void *value, long s
  * \brief Create and add a output for the agent
  *
  * \param name The name of the Iop
- * \param type The Iop type : input, output or parameter
+ * \param value_type The Iop type : input, output or parameter
  * \param value The pointer on the value (the value will be copied)
  * \return The error. 1 is OK, 0 not able to add in definition loaded, -1 not able to add in definition live
  */
 
 int mtic_createOutput(const char *name, iopType_t value_type, void *value, long size){
-    //Create the iop for loaded
-    agent_iop* iopLoaded = definition_createIop(name, OUTPUT_T, value_type, value, size);
-
-    //Add iop in structure def loaded, need to be copied
-    if (definition_addIop(iopLoaded, OUTPUT_T, &mtic_definition_loaded) < 1){
-        return 0;
+    if(mtic_internal_definition == NULL){
+        mtic_internal_definition = calloc(1, sizeof(struct definition));
     }
-
-    //Create the iop for loaded
+    
+    //Create the iop
     agent_iop* iopLive = definition_createIop(name, OUTPUT_T, value_type, value, size);
 
     //Add iop in structure def live, need to be copied
-    if (definition_addIop(iopLive, OUTPUT_T, &mtic_definition_live) < 1){
+    if (definition_addIop(iopLive, OUTPUT_T, &mtic_internal_definition) < 1){
         return -1;
     }
 
     //free iop
-    free(iopLoaded);
     free(iopLive);
 
     return 1;
@@ -649,29 +586,24 @@ int mtic_createOutput(const char *name, iopType_t value_type, void *value, long 
  * \brief Create and add a parameter for the agent
  *
  * \param name The name of the Iop
- * \param type The Iop type : input, output or parameter
+ * \param value_type The Iop type : input, output or parameter
  * \param value The pointer on the value (the value will be copied)
  * \return The error. 1 is OK, 0 not able to add in definition loaded, -1 not able to add in definition live
  */
 int mtic_createParameter(const char *name, iopType_t value_type, void *value, long size){
-    //Create the iop loaded
-    agent_iop* iopLoaded = definition_createIop(name, PARAMETER_T, value_type, value, size);
-
-    //Add iop in structure def loaded, need to be copied
-    if (definition_addIop(iopLoaded, PARAMETER_T, &mtic_definition_loaded) < 1){
-        return 0;
+    if(mtic_internal_definition == NULL){
+        mtic_internal_definition = calloc(1, sizeof(struct definition));
     }
-
+    
     //Create the iop
     agent_iop* iopLive = definition_createIop(name, PARAMETER_T, value_type, value, size);
 
     //Add iop in structure def live, need to be copied
-    if (definition_addIop(iopLive, PARAMETER_T, &mtic_definition_live) < 1){
+    if (definition_addIop(iopLive, PARAMETER_T, &mtic_internal_definition) < 1){
         return -1;
     }
 
     //free iop
-    free(iopLoaded);
     free(iopLive);
 
     return 1;
@@ -687,15 +619,9 @@ int mtic_createParameter(const char *name, iopType_t value_type, void *value, lo
  */
 int mtic_removeInput(const char *name){
 
-    //check if def loaded exist
-    if(mtic_definition_loaded == NULL){
-        mtic_debug("Definition loaded is NULL.");
-        return 0;
-    }
-
     //check if def live iexist
-    if(mtic_definition_live == NULL){
-        mtic_debug("Definition live is NULL.");
+    if(mtic_internal_definition == NULL){
+        mtic_debug("Internal definition has not been defined.");
         return -1;
     }
 
@@ -704,14 +630,11 @@ int mtic_removeInput(const char *name){
 
     //Check if iop exist
     if(iop == NULL){
-        mtic_debug("An error occurs while finding the iop by name : the iop is NULL.");
+        mtic_debug("The input %s could not be found", name);
         return -2;
     }
-    //remove in definition loaded
-    HASH_DEL(mtic_definition_loaded->inputs_table, iop);
-
-    //remove in definition live
-    HASH_DEL(mtic_definition_live->inputs_table, iop);
+    //remove in definition
+    HASH_DEL(mtic_internal_definition->inputs_table, iop);
 
     //free Iop
     free_agent_iop(&iop);
@@ -728,15 +651,9 @@ int mtic_removeInput(const char *name){
  * \return The error. 1 is OK, 0 Definition loaded is NULL, -1 Definition live is NULL, -2 An error occurs while finding the iop by name
  */
 int mtic_removeOutput(const char *name){
-    //check if def loaded exist
-    if(mtic_definition_loaded == NULL){
-        mtic_debug("Definition loaded is NULL.");
-        return 0;
-    }
-
-    //check if def live iexist
-    if(mtic_definition_live == NULL){
-        mtic_debug("Definition live is NULL.");
+    //check if def exists
+    if(mtic_internal_definition == NULL){
+        mtic_debug("Internal definition has not been defined.");
         return -1;
     }
 
@@ -745,14 +662,11 @@ int mtic_removeOutput(const char *name){
 
     //Check if iop exist
     if(iop == NULL){
-        mtic_debug("An error occurs while finding the iop by name : the iop is NULL.");
+        mtic_debug("The output %s could not be found", name);
         return -2;
     }
-    //remove in definition loaded
-    HASH_DEL(mtic_definition_loaded->outputs_table, iop);
-
-    //remove in definition live
-    HASH_DEL(mtic_definition_live->outputs_table, iop);
+    //remove in definition
+    HASH_DEL(mtic_internal_definition->outputs_table, iop);
 
     //free Iop
     free_agent_iop(&iop);
@@ -770,15 +684,9 @@ int mtic_removeOutput(const char *name){
  */
 int mtic_removeParameter(const char *name){
 
-    //check if def loaded exist
-    if(mtic_definition_loaded == NULL){
-        mtic_debug("Definition loaded is NULL.");
-        return 0;
-    }
-
-    //check if def live iexist
-    if(mtic_definition_live == NULL){
-        mtic_debug("Definition live is NULL.");
+    //check if def exists
+    if(mtic_internal_definition == NULL){
+        mtic_debug("Internal definition has not been defined.");
         return -1;
     }
 
@@ -787,14 +695,11 @@ int mtic_removeParameter(const char *name){
 
     //Check if iop exist
     if(iop == NULL){
-        mtic_debug("An error occurs while finding the iop by name : the iop is NULL.");
+        mtic_debug("The parameter %s could not be found", name);
         return -2;
     }
-    //remove in definition loaded
-    HASH_DEL(mtic_definition_loaded->params_table, iop);
-
-    //remove in definition live
-    HASH_DEL(mtic_definition_live->params_table, iop);
+    //remove in definition
+    HASH_DEL(mtic_internal_definition->params_table, iop);
 
     //free Iop
     free_agent_iop(&iop);

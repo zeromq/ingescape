@@ -914,7 +914,7 @@ int mtic_init_mapping (const char* mapping_file_path)
  * Function: mtic_init_internal_data
  * ----------------------------
  *   read definition from file path and init inernal agent data
- *   initialize definition_load and mtic_definition_live data structures
+ *   initialize definition_load and mtic_internal_definition data structures
  *
  *   definition_file_path : path to the agent definiton file
  *
@@ -925,13 +925,12 @@ int mtic_init_internal_data (const char* definition_file_path)
     int errorCode = -1;
     if (definition_file_path != NULL){
         // Init definition
-        mtic_definition_loaded = parser_loadDefinitionFromPath(definition_file_path);
+        mtic_internal_definition = parser_loadDefinitionFromPath(definition_file_path);
 
-        if(mtic_definition_loaded != NULL)
+        if(mtic_internal_definition != NULL)
         {
             // Live data corresponds to a copy of the initial definition
-            mtic_definition_live = calloc(1, sizeof(struct definition));
-            memcpy(mtic_definition_live, mtic_definition_loaded, sizeof(*mtic_definition_loaded));
+            mtic_internal_definition = calloc(1, sizeof(struct definition));
             errorCode = 0;
         } else {
             fprintf(stderr, "Error : Definition file has not been loaded : %s\n", definition_file_path );
@@ -1138,14 +1137,17 @@ mapping* parser_LoadMapFromPath (const char* path){
 /**
  * \fn int mtic_loadDefinition (const char* json_str)
  * \ingroup loadSetGetDefFct
- * \brief load definition in variable 'mtic_definition_loaded' & copy in 'mtic_definition_live"
+ * \brief load definition in variable 'mtic_definition_loaded' & copy in 'mtic_internal_definition"
  *      from a json string
  *
  * \param json_str String in json format. Can't be NULL.
  * \return The error. 1 is OK, 0 json string is NULL, -1 Definition file has not been loaded
  */
 int mtic_loadDefinition (const char* json_str){
-    mtic_definition_loaded = NULL;
+    if (mtic_internal_definition != NULL){
+        definition_free_definition(mtic_internal_definition);
+        mtic_internal_definition = NULL;
+    }
 
     //Check if the json string is null
     if(json_str == NULL)
@@ -1155,9 +1157,9 @@ int mtic_loadDefinition (const char* json_str){
     }
 
     //Load definition and init variable : mtic_definition_loaded
-    mtic_definition_loaded = parser_loadDefinition(json_str);
+    mtic_internal_definition = parser_loadDefinition(json_str);
 
-    if(mtic_definition_loaded == NULL)
+    if(mtic_internal_definition == NULL)
     {
         mtic_debug("mtic_loadDefinition : Definition file has not been loaded from json string : %s\n", json_str );
         return -1;
@@ -1166,14 +1168,11 @@ int mtic_loadDefinition (const char* json_str){
         char *name = mtic_getAgentName();
         if(strcmp(name, AGENT_NAME_DEFAULT) == 0){
             //The name of the agent is default : we change it to definition name
-            mtic_setAgentName(mtic_definition_loaded->name);
+            mtic_setAgentName(mtic_internal_definition->name);
         }//else
             //The agent name was assigned by the developer : we keep it untouched
         free(name);
     }
-
-    // Live data corresponds to a copy of the initial definition
-    mtic_definition_live = parser_loadDefinition(json_str);
 
     return 1;
 }
@@ -1181,14 +1180,17 @@ int mtic_loadDefinition (const char* json_str){
 /**
  * \fn int mtic_loadDefinitionFromPath (const char* file_path)
  * \ingroup loadSetGetDefFct
- * \brief load definition in variable 'mtic_definition_loaded' & copy in 'mtic_definition_live"
+ * \brief load definition in variable 'mtic_definition_loaded' & copy in 'mtic_internal_definition"
  *      from a file path
  *
  * \param file_path The string which contains the json file path. Can't be NULL.
  * \return The error. 1 is OK, 0 json string is NULL, -1 Definition file has not been loaded
  */
 int mtic_loadDefinitionFromPath (const char* file_path){
-    mtic_definition_loaded = NULL;
+    if (mtic_internal_definition != NULL){
+        definition_free_definition(mtic_internal_definition);
+        mtic_internal_definition = NULL;
+    }
 
     //Check if the json string is null
     if(file_path == NULL)
@@ -1198,9 +1200,9 @@ int mtic_loadDefinitionFromPath (const char* file_path){
     }
 
     //Load definition and init variable : mtic_definition_loaded
-    mtic_definition_loaded = parser_loadDefinitionFromPath(file_path);
+    mtic_internal_definition = parser_loadDefinitionFromPath(file_path);
 
-    if(mtic_definition_loaded == NULL)
+    if(mtic_internal_definition == NULL)
     {
         mtic_debug("Error : Definition file has not been loaded from file path : %s\n", file_path);
         return -1;
@@ -1209,14 +1211,11 @@ int mtic_loadDefinitionFromPath (const char* file_path){
         char *name = mtic_getAgentName();
         if(strcmp(name, AGENT_NAME_DEFAULT) == 0){
             //The name of the agent is default : we change it to definition name
-            mtic_setAgentName(mtic_definition_loaded->name);
+            mtic_setAgentName(mtic_internal_definition->name);
         }//else
             //The agent name was assigned by the developer : we keep it untouched
         free(name);
     }
-
-    // Live data corresponds to a copy of the initial definition
-    mtic_definition_live = parser_loadDefinitionFromPath(file_path);
 
     return 1;
 }
