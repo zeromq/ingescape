@@ -1,0 +1,30 @@
+module I2Quick
+plugin I2Quick
+classname I2QuickPlugin
+typeinfo I2Quick.qmltypes
+I2Combobox 1.0 qml/components/I2Combobox.qml
+I2ICon 1.0 qml/components/I2ICon.qml
+I2MultiTouchButton 1.0 qml/components/I2MultiTouchButton.qml
+I2VirtualKeyboard 1.0 qml/components/I2VirtualKeyboard.qml
+I2Layer 1.0 qml/I2Layer.qml
+I2PopupBase 1.0 qml/I2PopupBase.qml
+I2TabView 1.0 qml/I2TabView.qml
+I2TabViewStyle 1.0 qml/I2TabViewStyle.qml
+I2ColorButtonStyle 1.0 qml/styles/button/I2ColorButtonStyle.qml
+I2IconButtonStyle 1.0 qml/styles/button/I2IconButtonStyle.qml
+I2IconToggleButtonStyle 1.0 qml/styles/button/I2IconToggleButtonStyle.qml
+I2ImageButtonStyle 1.0 qml/styles/button/I2ImageButtonStyle.qml
+I2ImageToggleButtonStyle 1.0 qml/styles/button/I2ImageToggleButtonStyle.qml
+I2RippleEffectButtonStyle 1.0 qml/styles/button/I2RippleEffectButtonStyle.qml
+I2SvgButtonStyle 1.0 qml/styles/button/I2SvgButtonStyle.qml
+I2SvgToggleButtonStyle 1.0 qml/styles/button/I2SvgToggleButtonStyle.qml
+I2CheckboxStyle 1.0 qml/styles/checkbox/I2CheckboxStyle.qml
+I2ImageCheckboxStyle 1.0 qml/styles/checkbox/I2ImageCheckboxStyle.qml
+I2ComboboxStyle 1.0 qml/styles/combobox/I2ComboboxStyle.qml
+I2ImageRadioButton 1.0 qml/styles/radiobutton/I2ImageRadioButton.qml
+I2RadioButtonStyle 1.0 qml/styles/radiobutton/I2RadioButtonStyle.qml
+I2TextAreaStyle 1.0 qml/styles/textarea/I2TextAreaStyle.qml
+I2TextFieldStyle 1.0 qml/styles/textfield/I2TextFieldStyle.qml
+
+
+
