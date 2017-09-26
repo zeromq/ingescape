@@ -38,6 +38,13 @@
 
 //////////////////  STRUCTURES AND ENUMS   //////////////////
 
+typedef struct mtic_observe_callback {
+    mtic_observeCallback callback_ptr;
+    void* data;
+    struct mtic_observe_callback *prev;
+    struct mtic_observe_callback *next;
+} mtic_observe_callback_t;
+
 /*
  * Define the structure agent_iop (input, output, parameter) :
  * 'name'       : the input/output/parameter's name. Need to be unique in each type of iop (input/output/parameter)
@@ -60,6 +67,7 @@ struct agent_iop {
     } value;
     long valueSize;
     bool is_muted;
+    mtic_observe_callback_t *callbacks;
     UT_hash_handle hh;         /* makes this structure hashable */
 };
 
@@ -218,6 +226,7 @@ int mapping_map_received(const char* agent_name, char* out_name, char* value, lo
 
 extern bool isWholeAgentMuted;
 
+void model_setIopValue(agent_iop *iop, void* value, long size);
 agent_iop* model_find_iop_by_name_in_definition(const char*name, definition* definition);
 agent_iop* model_findIopByName(const char* name, iop_t type);
 agent_iop* model_findInputByName(const char* name);
@@ -232,7 +241,7 @@ extern zyreloopElements_t *agentElements;
 typedef int (*network_zyreIncoming) (const zyre_event_t *zyre_event, void *arg);
 
 int network_observeZyre(network_zyreIncoming cb, void *myData);
-#define AGENT_NAME_DEFAULT "mtic_undefined"
+#define AGENT_NAME_DEFAULT "mtic_noname"
 int network_publishOutput (const char* output_name);
 int network_checkAndSubscribeToPublisher(const char* agentName);
 void mtic_debug(const char*fmt, ...);
