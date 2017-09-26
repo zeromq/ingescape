@@ -376,8 +376,8 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                         HASH_FIND_STR(subscribers, peer, subscriber);
                         
                         if (subscriber != NULL){
-                            //we have a reconnection with same peerId : normally impossible
-                            mtic_debug("Error: Peer id %s was connected before with agent name %s (normally impossible)\n", peer, subscriber->agentName);
+                            //we have a reconnection with same peerId
+                            mtic_debug("Peer id %s was connected before with agent name %s : reset and recreate subscription\n", peer, subscriber->agentName);
                             HASH_DEL(subscribers, subscriber);
                             zloop_poller_end(agentElements->loop , subscriber->pollItem);
                             zsock_destroy(&subscriber->subscriber);
@@ -512,46 +512,46 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
             HASH_FIND_STR(zyreAgents, peer, a);
             if (a != NULL){
                 if (a->reconnected > 0){
-                    //do not destroy: we are getting a timemout now whereas
+                    //do not clean: we are getting a timemout now whereas
                     //the agent is reconnected
                     a->reconnected--;
                 }else{
                     HASH_DEL(zyreAgents, a);
                     free(a);
-                }
-            }
-            // Try to find the subscriber to destory
-            subscriber_t *subscriber = NULL;
-            HASH_FIND_STR(subscribers, peer, subscriber);
-            if (subscriber != NULL)
-            {
-                mtic_debug("cleaning subscribtions to %s\n", name);
-                // Remove the agent definition from network
-                definition * myDefinition = subscriber->definition;
-                if(myDefinition != NULL)
-                {
-                    // Deactivate mapping of the leaving agent
-                    agent_iop* iop_unmappped = mapping_unmap(myDefinition);
-                    struct agent_iop *iop, *tmp;
-                    HASH_ITER(hh,iop_unmappped, iop, tmp)
+                    // Try to find the subscriber to destory
+                    subscriber_t *subscriber = NULL;
+                    HASH_FIND_STR(subscribers, peer, subscriber);
+                    if (subscriber != NULL)
                     {
-                        HASH_DEL(iop_unmappped, iop);
-                        free(iop);
+                        mtic_debug("cleaning subscribtions to %s\n", name);
+                        // Remove the agent definition from network
+                        definition * myDefinition = subscriber->definition;
+                        if(myDefinition != NULL)
+                        {
+                            // Deactivate mapping of the leaving agent
+                            agent_iop* iop_unmappped = mapping_unmap(myDefinition);
+                            struct agent_iop *iop, *tmp;
+                            HASH_ITER(hh,iop_unmappped, iop, tmp)
+                            {
+                                HASH_DEL(iop_unmappped, iop);
+                                free(iop);
+                            }
+                            definition_freeDefinition(myDefinition);
+                            subscriber->definition = myDefinition = NULL;
+                        }
+                        
+                        HASH_DEL(subscribers, subscriber);
+                        zloop_poller_end(agentElements->loop , subscriber->pollItem);
+                        zsock_destroy(&subscriber->subscriber);
+                        free((char*)subscriber->agentName);
+                        free((char*)subscriber->agentPeerId);
+                        free(subscriber->pollItem);
+                        free(subscriber->subscriber);
+                        subscriber->subscriber = NULL;
+                        free(subscriber);
+                        subscriber = NULL;
                     }
-                    definition_freeDefinition(myDefinition);
-                    subscriber->definition = myDefinition = NULL;
                 }
-                
-                HASH_DEL(subscribers, subscriber);
-                zloop_poller_end(agentElements->loop , subscriber->pollItem);
-                zsock_destroy(&subscriber->subscriber);
-                free((char*)subscriber->agentName);
-                free((char*)subscriber->agentPeerId);
-                free(subscriber->pollItem);
-                free(subscriber->subscriber);
-                subscriber->subscriber = NULL;
-                free(subscriber);
-                subscriber = NULL;
             }
         }
         zyre_event_destroy(&zyre_event);
