@@ -29,7 +29,7 @@ typedef struct agent_port_t {
 // INTERNAL FUNCTIONS
 ////////////////////////////////////////////////////////////////////////
 
-void free_agent_iop (agent_iop** agent_iop){
+void definition_freeIOP (agent_iop** agent_iop){
     
     if ((*agent_iop)->name != NULL){
         free((char*)(*agent_iop)->name);
@@ -53,106 +53,104 @@ void free_agent_iop (agent_iop** agent_iop){
     free((*agent_iop));
 }
 
-bool check_category_agent_iop(agent_iop *ref_iop,
-                              agent_iop *iop_to_check) {
-    
-    bool state = true;
-    
-    
-    struct agent_iop *iop, *iop_found;
-    
-    for(iop = ref_iop; iop != NULL; iop = iop->hh.next) {
-        //Init to null for the next
-        iop_found = NULL;
-        
-        //Find the iop corresponding to name (key)
-        HASH_FIND_STR(iop_to_check, iop->name, iop_found);
-        
-        //Check the type of the iop correspond
-        if(iop_found == NULL || (iop_found->value_type != iop->value_type)) {
-            state = false;
-        }
-    }
-    
-    return state;
-}
-
-bool check_category(definition* def,
-                       category *category,
-                       category_check_type check_type)
-{
-    bool state = true;
-
-    switch(check_type)
-    {
-    case INPUT_CAT:
-        if(check_category_agent_iop(def->inputs_table,
-                                    category->inputs_table) != true)
-        {
-            state = false;
-        }
-        break;
-
-    case OUTPUT_CAT:
-        if(check_category_agent_iop(def->outputs_table,
-                                    category->outputs_table) != true)
-        {
-            state = false;
-        }
-        break;
-
-    case GLOBAL_CAT:
-        if(check_category_agent_iop(def->inputs_table,
-                                    category->inputs_table) != true)
-        {
-            state = false;
-        }
-
-
-        if(check_category_agent_iop(def->outputs_table,
-                                    category->outputs_table) != true)
-        {
-            state = false;
-        }
-        break;
-
-    default:
-        break;
-    }
-
-    return state;
-}
-
-void free_category (category* cat){
-
-    struct agent_iop *current, *tmp;
-
-    free((char*)cat->name);
-    cat->name = NULL ;
-    free((char*)cat->version);
-    cat->version = NULL;
-
-
-    HASH_ITER(hh, cat->params_table, current, tmp) {
-        HASH_DEL(cat->params_table,current);
-        free_agent_iop(&current);
-        //current = NULL;
-    }
-    HASH_ITER(hh, cat->inputs_table, current, tmp) {
-        HASH_DEL(cat->inputs_table,current);
-        free_agent_iop(&current);
-        //current = NULL;
-    }
-    HASH_ITER(hh, cat->outputs_table, current, tmp) {
-        HASH_DEL(cat->outputs_table,current);
-        free_agent_iop(&current);
-        //current = NULL;
-    }
-
-    free (cat);
-}
-
-
+//bool check_category_agent_iop(agent_iop *ref_iop,
+//                              agent_iop *iop_to_check) {
+//
+//    bool state = true;
+//
+//
+//    struct agent_iop *iop, *iop_found;
+//
+//    for(iop = ref_iop; iop != NULL; iop = iop->hh.next) {
+//        //Init to null for the next
+//        iop_found = NULL;
+//
+//        //Find the iop corresponding to name (key)
+//        HASH_FIND_STR(iop_to_check, iop->name, iop_found);
+//
+//        //Check the type of the iop correspond
+//        if(iop_found == NULL || (iop_found->value_type != iop->value_type)) {
+//            state = false;
+//        }
+//    }
+//
+//    return state;
+//}
+//
+//bool check_category(definition* def,
+//                       category *category,
+//                       category_check_type check_type)
+//{
+//    bool state = true;
+//
+//    switch(check_type)
+//    {
+//    case INPUT_CAT:
+//        if(check_category_agent_iop(def->inputs_table,
+//                                    category->inputs_table) != true)
+//        {
+//            state = false;
+//        }
+//        break;
+//
+//    case OUTPUT_CAT:
+//        if(check_category_agent_iop(def->outputs_table,
+//                                    category->outputs_table) != true)
+//        {
+//            state = false;
+//        }
+//        break;
+//
+//    case GLOBAL_CAT:
+//        if(check_category_agent_iop(def->inputs_table,
+//                                    category->inputs_table) != true)
+//        {
+//            state = false;
+//        }
+//
+//
+//        if(check_category_agent_iop(def->outputs_table,
+//                                    category->outputs_table) != true)
+//        {
+//            state = false;
+//        }
+//        break;
+//
+//    default:
+//        break;
+//    }
+//
+//    return state;
+//}
+//
+//void free_category (category* cat){
+//
+//    struct agent_iop *current, *tmp;
+//
+//    free((char*)cat->name);
+//    cat->name = NULL ;
+//    free((char*)cat->version);
+//    cat->version = NULL;
+//
+//
+//    HASH_ITER(hh, cat->params_table, current, tmp) {
+//        HASH_DEL(cat->params_table,current);
+//        definition_freeIOP(&current);
+//        //current = NULL;
+//    }
+//    HASH_ITER(hh, cat->inputs_table, current, tmp) {
+//        HASH_DEL(cat->inputs_table,current);
+//        definition_freeIOP(&current);
+//        //current = NULL;
+//    }
+//    HASH_ITER(hh, cat->outputs_table, current, tmp) {
+//        HASH_DEL(cat->outputs_table,current);
+//        definition_freeIOP(&current);
+//        //current = NULL;
+//    }
+//
+//    free (cat);
+//}
 
 agent_iop* definition_createIop(const char *name, iop_t type, iopType_t value_type, void *value, long size)
 {
@@ -171,7 +169,7 @@ agent_iop* definition_createIop(const char *name, iop_t type, iopType_t value_ty
     return iop;
 }
 
-int definition_addIop(agent_iop *iop, iop_t iop_type, definition **def)
+int definition_addIopToDefinition(agent_iop *iop, iop_t iop_type, definition **def)
 {
     agent_iop *iop_to_add = NULL;
 
@@ -223,17 +221,7 @@ int definition_addIop(agent_iop *iop, iop_t iop_type, definition **def)
 ////////////////////////////////////////////////////////////////////////
 // PRIVATE API
 ////////////////////////////////////////////////////////////////////////
-int definition_get_iop_value_as_int(agent_iop *iop, iop_t type){
-    int val = *(int *)(model_get(iop->name,type));
-    return val;
-}
-
-double definition_get_iop_value_as_double(agent_iop *iop,iop_t type){
-    double val = *(double *)(model_get(iop->name,type));
-    return val;
-}
-
-char* definition_get_iop_value_as_string (agent_iop* iop)
+char* definition_getIOPValueAsString (agent_iop* iop)
 {
     char str_value[BUFSIZ];
     if(iop != NULL)
@@ -271,10 +259,10 @@ char* definition_get_iop_value_as_string (agent_iop* iop)
     return strdup(str_value);
 }
 
-void definition_free_definition (definition* def) {
+void definition_freeDefinition (definition* def) {
     
     struct agent_iop *current_iop, *tmp_iop;
-    struct category *current_cat, *tmp_cat;
+//    struct category *current_cat, *tmp_cat;
     
     if (def->name != NULL){
         free((char*)def->name);
@@ -290,24 +278,24 @@ void definition_free_definition (definition* def) {
     }
     HASH_ITER(hh, def->params_table, current_iop, tmp_iop) {
         HASH_DEL(def->params_table,current_iop);
-        free_agent_iop(&current_iop);
+        definition_freeIOP(&current_iop);
         current_iop = NULL;
     }
     HASH_ITER(hh, def->inputs_table, current_iop, tmp_iop) {
         HASH_DEL(def->inputs_table,current_iop);
-        free_agent_iop(&current_iop);
+        definition_freeIOP(&current_iop);
         current_iop = NULL;
     }
     HASH_ITER(hh, def->outputs_table, current_iop, tmp_iop) {
         HASH_DEL(def->outputs_table,current_iop);
-        free_agent_iop(&current_iop);
+        definition_freeIOP(&current_iop);
         current_iop = NULL;
     }
-    HASH_ITER(hh, def->categories, current_cat, tmp_cat) {
-        HASH_DEL(def->categories,current_cat);
-        free_category(current_cat);
-        current_cat = NULL;
-    }
+//    HASH_ITER(hh, def->categories, current_cat, tmp_cat) {
+//        HASH_DEL(def->categories,current_cat);
+//        free_category(current_cat);
+//        current_cat = NULL;
+//    }
     free(def);
 }
 
@@ -335,7 +323,7 @@ int mtic_clearDefinition(){
     //Free the structure definition loaded
     mtic_debug("Clear our definition and initiate en empty one\n");
     if(mtic_internal_definition != NULL){
-        definition_free_definition(mtic_internal_definition);
+        definition_freeDefinition(mtic_internal_definition);
     }
     mtic_internal_definition = calloc(1, sizeof(struct definition));
 
@@ -498,7 +486,7 @@ int mtic_createInput(const char *name, iopType_t value_type, void *value, long s
     agent_iop *iopLive = definition_createIop(name, INPUT_T, value_type, value, size);
 
     //Add iop in structure def live, need to be copied
-    if (definition_addIop(iopLive, INPUT_T, &mtic_internal_definition) < 1){
+    if (definition_addIopToDefinition(iopLive, INPUT_T, &mtic_internal_definition) < 1){
         return -1;
     }
 
@@ -528,7 +516,7 @@ int mtic_createOutput(const char *name, iopType_t value_type, void *value, long 
     agent_iop* iopLive = definition_createIop(name, OUTPUT_T, value_type, value, size);
 
     //Add iop in structure def live, need to be copied
-    if (definition_addIop(iopLive, OUTPUT_T, &mtic_internal_definition) < 1){
+    if (definition_addIopToDefinition(iopLive, OUTPUT_T, &mtic_internal_definition) < 1){
         return -1;
     }
 
@@ -557,7 +545,7 @@ int mtic_createParameter(const char *name, iopType_t value_type, void *value, lo
     agent_iop* iopLive = definition_createIop(name, PARAMETER_T, value_type, value, size);
 
     //Add iop in structure def live, need to be copied
-    if (definition_addIop(iopLive, PARAMETER_T, &mtic_internal_definition) < 1){
+    if (definition_addIopToDefinition(iopLive, PARAMETER_T, &mtic_internal_definition) < 1){
         return -1;
     }
 
@@ -595,7 +583,7 @@ int mtic_removeInput(const char *name){
     HASH_DEL(mtic_internal_definition->inputs_table, iop);
 
     //free Iop
-    free_agent_iop(&iop);
+    definition_freeIOP(&iop);
 
     return 1;
 }
@@ -627,7 +615,7 @@ int mtic_removeOutput(const char *name){
     HASH_DEL(mtic_internal_definition->outputs_table, iop);
 
     //free Iop
-    free_agent_iop(&iop);
+    definition_freeIOP(&iop);
 
     return 1;
 }
@@ -660,7 +648,7 @@ int mtic_removeParameter(const char *name){
     HASH_DEL(mtic_internal_definition->params_table, iop);
 
     //free Iop
-    free_agent_iop(&iop);
+    definition_freeIOP(&iop);
 
     return 1;
 }

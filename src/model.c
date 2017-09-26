@@ -74,81 +74,6 @@ void model_setIopValue(agent_iop *iop, void* value, long size){
     }
 }
 
-
-int mtic_mute_internal(const char* iop_name, iop_t type)
-{
-    int result = -1;
-    // mtic_get iop object
-    agent_iop *iop = model_findIopByName((char*)iop_name,type);
-    
-    if(iop != NULL)
-    {
-        // update the is_muted state
-        iop->is_muted = true;
-        result = 0;
-    }
-    
-    return result;
-}
-
-int mtic_unmute_internal(const char* iop_name, iop_t type)
-{
-    int result = -1;
-    // mtic_get iop object
-    agent_iop *iop = model_findIopByName((char*)iop_name,type);
-    
-    if(iop != NULL)
-    {
-        // update the is_muted state
-        iop->is_muted = false;
-        result = 0;
-    }
-    
-    return result;
-}
-
-int mtic_muteAll()
-{
-    int result = 0,result_tmp = 0;
-
-    // Go through the agent outpust to mute them
-    struct agent_iop *current_iop, *tmp_iop;
-    HASH_ITER(hh, mtic_internal_definition->outputs_table, current_iop, tmp_iop) {
-        if(current_iop != NULL)
-        {
-            result_tmp = mtic_mute_internal(current_iop->name,OUTPUT_T);
-            // If one one the output has not been muted, we notice it
-            if(result_tmp != 0)
-            {
-                result = result_tmp;
-            }
-        }
-    }
-    
-    return result;
-}
-
-int mtic_unmuteAll()
-{
-    int result = 0,result_tmp = 0;
-    
-    // Go through the agent outpust to mute them
-    struct agent_iop *current_iop, *tmp_iop;
-    HASH_ITER(hh, mtic_internal_definition->outputs_table, current_iop, tmp_iop) {
-        if(current_iop != NULL)
-        {
-            result_tmp = mtic_unmute_internal(current_iop->name,OUTPUT_T);
-            // If one one the output has not been unmuted, we notice it
-            if(result_tmp != 0)
-            {
-                result = result_tmp;
-            }
-        }
-    }
-    
-    return result;
-}
-
 char* model_IntToString(const int value)
 {
     // Compute the size of allocate for str.
@@ -213,7 +138,7 @@ static int model_observe(const char* name, iop_t iopType, mtic_observeCallback c
     return 1;
 }
 
-void runObserveCallbacksForIOP(agent_iop *iop, void *value, long valueSize)
+void model_runObserveCallbacksForIOP(agent_iop *iop, void *value, long valueSize)
 {
     mtic_observe_callback_t *cb;
     DL_FOREACH(iop->callbacks, cb){
@@ -1601,7 +1526,7 @@ int mtic_writeInputAsBool(const char *name, bool value){
     model_setIopValue(iop, (void*) &value, sizeof(bool));
 
     // call the callbacks associated to if it exist
-    runObserveCallbacksForIOP(iop, (void*) &value, sizeof(bool));
+    model_runObserveCallbacksForIOP(iop, (void*) &value, sizeof(bool));
 
     return 1;
 
@@ -1637,7 +1562,7 @@ int mtic_writeInputAsInt(const char *name, int value){
     model_setIopValue(iop, (void*) &value, sizeof(int));
 
     // call the callbacks associated to if it exist
-    runObserveCallbacksForIOP(iop, (void*) &value, sizeof(int));
+    model_runObserveCallbacksForIOP(iop, (void*) &value, sizeof(int));
     
     return 1;
 }
@@ -1672,7 +1597,7 @@ int mtic_writeInputAsDouble(const char *name, double value){
     model_setIopValue(iop, (void*) &value, sizeof(double));
 
     // call the callbacks associated to if it exist
-    runObserveCallbacksForIOP(iop, (void*) &value, sizeof(double));
+    model_runObserveCallbacksForIOP(iop, (void*) &value, sizeof(double));
     
     return 1;
 }
@@ -1707,7 +1632,7 @@ int mtic_writeInputAsString(const char *name, char *value){
     model_setIopValue(iop, (void*) value, (strlen(value)+1)*sizeof(char));
 
     // call the callbacks associated to if it exist
-    runObserveCallbacksForIOP(iop, (void*) &value, (strlen(value)+1)*sizeof(char));
+    model_runObserveCallbacksForIOP(iop, (void*) &value, (strlen(value)+1)*sizeof(char));
     
     return 1;
 }
@@ -1738,7 +1663,7 @@ int mtic_writeInputAsImpulsion(const char *name){
     }
 
     // call the callbacks associated to if it exist
-    runObserveCallbacksForIOP(iop, NULL, 0);
+    model_runObserveCallbacksForIOP(iop, NULL, 0);
 
     return 1;
 }
@@ -1774,7 +1699,7 @@ int mtic_writeInputAsData(const char *name, void *value, long size){
     model_setIopValue(iop,value,size);
 
     // call the callbacks associated to if it exist
-    runObserveCallbacksForIOP(iop, value, size);
+    model_runObserveCallbacksForIOP(iop, value, size);
 
     return 1;
 }
@@ -1809,7 +1734,7 @@ int mtic_writeOutputAsBool(const char *name, bool value){
     model_setIopValue(iop, (void*) &value, sizeof(bool));
 
     // call the callbacks associated to if it exist
-    runObserveCallbacksForIOP(iop, (void*) &value, sizeof(bool));
+    model_runObserveCallbacksForIOP(iop, (void*) &value, sizeof(bool));
 
     // iop is output : publish
     network_publishOutput(name);
@@ -1847,7 +1772,7 @@ int mtic_writeOutputAsInt(const char *name, int value){
     model_setIopValue(iop, (void*) &value, sizeof(int));
     
     // call the callbacks associated to if it exist
-    runObserveCallbacksForIOP(iop, (void*) &value, sizeof(int));
+    model_runObserveCallbacksForIOP(iop, (void*) &value, sizeof(int));
 
     // iop is output : publish
     network_publishOutput(name);
@@ -1886,7 +1811,7 @@ int mtic_writeOutputAsDouble(const char *name, double value){
     model_setIopValue(iop, (void*) &value, sizeof(double));
     
     // call the callbacks associated to if it exist
-    runObserveCallbacksForIOP(iop, (void*) &value, sizeof(double));
+    model_runObserveCallbacksForIOP(iop, (void*) &value, sizeof(double));
 
     // iop is output : publish
     network_publishOutput(name);
@@ -1924,7 +1849,7 @@ int mtic_writeOutputAsString(const char *name, char *value){
     model_setIopValue(iop, (void*) value, (strlen(value)+1)*sizeof(char));
     
     // call the callbacks associated to if it exist
-    runObserveCallbacksForIOP(iop, (void*) &value, (strlen(value)+1)*sizeof(char));
+    model_runObserveCallbacksForIOP(iop, (void*) &value, (strlen(value)+1)*sizeof(char));
 
     // iop is output : publish
     network_publishOutput(name);
@@ -1958,7 +1883,7 @@ int mtic_writeOutputAsImpulsion(const char *name){
     }
 
     // call the callbacks associated to if it exist
-    runObserveCallbacksForIOP(iop, NULL, 0);
+    model_runObserveCallbacksForIOP(iop, NULL, 0);
 
     // iop is output : publish
     network_publishOutput(name);
@@ -1996,7 +1921,7 @@ int mtic_writeOutputAsData(const char *name, void *value, long size){
     model_setIopValue(iop,value,size);
     
     // call the callbacks associated to if it exist
-    runObserveCallbacksForIOP(iop, value, size);
+    model_runObserveCallbacksForIOP(iop, value, size);
 
     // iop is output : publish
     network_publishOutput(name);
@@ -2034,7 +1959,7 @@ int mtic_writeParameterAsBool(const char *name, bool value){
     model_setIopValue(iop, (void*) &value, sizeof(bool));
     
     // call the callbacks associated to if it exist
-    runObserveCallbacksForIOP(iop, (void*) &value, sizeof(bool));
+    model_runObserveCallbacksForIOP(iop, (void*) &value, sizeof(bool));
 
     return 1;
 }
@@ -2069,7 +1994,7 @@ int mtic_writeParameterAsInt(const char *name, int value){
     model_setIopValue(iop, (void*) &value, sizeof(int));
     
     // call the callbacks associated to if it exist
-    runObserveCallbacksForIOP(iop, (void*) &value, sizeof(int));
+    model_runObserveCallbacksForIOP(iop, (void*) &value, sizeof(int));
 
     return 1;
 }
@@ -2104,7 +2029,7 @@ int mtic_writeParameterAsDouble(const char *name, double value){
     model_setIopValue(iop, (void*) &value, sizeof(double));
     
     // call the callbacks associated to if it exist
-    runObserveCallbacksForIOP(iop, (void*) &value, sizeof(double));
+    model_runObserveCallbacksForIOP(iop, (void*) &value, sizeof(double));
 
     return 1;
 }
@@ -2139,7 +2064,7 @@ int mtic_writeParameterAsString(const char *name, char *value){
     model_setIopValue(iop, (void*) value, (strlen(value)+1)*sizeof(char));
     
     // call the callbacks associated to if it exist
-    runObserveCallbacksForIOP(iop, (void*) &value, (strlen(value)+1)*sizeof(char));
+    model_runObserveCallbacksForIOP(iop, (void*) &value, (strlen(value)+1)*sizeof(char));
 
     return 1;
 }
@@ -2175,7 +2100,7 @@ int mtic_writeParameterAsData(const char *name, void *value, long size){
     model_setIopValue(iop,value,size);
     
     // call the callbacks associated to if it exist
-    runObserveCallbacksForIOP(iop, value, size);
+    model_runObserveCallbacksForIOP(iop, value, size);
 
     return 1;
 }

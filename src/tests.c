@@ -36,8 +36,8 @@ void callback_test_input_2(agent_iop* input_iop){
 //    print_definition(mtic_internal_definition);
 
 //    //Free the memory
-//    definition_free_definition(mtic_definition_loaded);
-//    definition_free_definition(mtic_internal_definition);
+//    definition_freeDefinition(mtic_definition_loaded);
+//    definition_freeDefinition(mtic_internal_definition);
 //}
 
 //void test_map(){
@@ -57,8 +57,8 @@ void callback_test_input_2(agent_iop* input_iop){
 //    print_mapping(mtic_my_agent_mapping);
 
 //    //Free the memory
-//    definition_free_definition(mtic_definition_loaded);
-//    definition_free_definition(mtic_internal_definition);
+//    definition_freeDefinition(mtic_definition_loaded);
+//    definition_freeDefinition(mtic_internal_definition);
 
 //}
 
@@ -110,8 +110,8 @@ void callback_test_input_2(agent_iop* input_iop){
 //    print_definition(mtic_internal_definition);
 
 //    //Free the memory
-//    definition_free_definition(mtic_definition_loaded);
-//    definition_free_definition(mtic_internal_definition);
+//    definition_freeDefinition(mtic_definition_loaded);
+//    definition_freeDefinition(mtic_internal_definition);
 //    free(new_value_e2);
 //    free(value_e2);
 //}
@@ -157,9 +157,9 @@ void callback_test_input_2(agent_iop* input_iop){
 //    print_mapping(mtic_my_agent_mapping);
 
 //    //Free the memory
-//    definition_free_definition(mtic_definition_loaded);
-//    definition_free_definition(mtic_internal_definition);
-//    definition_free_definition(external_agent_def);
+//    definition_freeDefinition(mtic_definition_loaded);
+//    definition_freeDefinition(mtic_internal_definition);
+//    definition_freeDefinition(external_agent_def);
 //    mtic_free_mapping(mtic_my_agent_mapping);
 //    //Free iop map
 //    struct agent_iop *iop, *tmp;

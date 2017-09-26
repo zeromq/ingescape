@@ -122,21 +122,22 @@ zyreCallback_t *zyreCallbacks = NULL;
  */
 void sendDefinitionToAgent(const char *peerId)
 {
-    // Send my own definition
-    if(mtic_internal_definition != NULL)
+    if(peerId != NULL &&  mtic_internal_definition != NULL)
     {
         char * definitionStr = NULL;
         definitionStr = parser_export_definition(mtic_internal_definition);
-        // Send definition to the network
-        if(definitionStr)
+        if(definitionStr != NULL && agentElements->node != NULL)
         {
-            // Send definition
             zyre_whispers(agentElements->node, peerId, "%s%s", definitionPrefix, definitionStr);
-            //zyre_shouts (agentElements->node, CHANNEL, "%s%s", exportDefinitionPrefix, definitionStr);
             free (definitionStr);
-            definitionStr = NULL;
         } else {
-            mtic_debug("Error : could not send definition of %s.\n",mtic_internal_definition->name);
+            mtic_debug("Error : could not send our definition to %s :\n",peerId);
+            if (definitionStr == NULL){
+                mtic_debug("\tdefinition is NULL\n");
+            }
+            if (agentElements->node == NULL){
+                mtic_debug("\agent is not  connected\n");
+            }
         }
     }
 }
@@ -367,7 +368,7 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                             free(subscriber->pollItem);
                             free(subscriber->subscriber);
                             if (subscriber->definition != NULL){
-                                definition_free_definition(subscriber->definition);
+                                definition_freeDefinition(subscriber->definition);
                                 subscriber->definition = NULL;
                             }
                             subscriber->subscriber = NULL;
@@ -433,7 +434,7 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     // Look if this agent already has a definition
                     if(subscriber->definition != NULL){
                         mtic_debug("definition already exists for agent %s : new definition will overwrite the previous one...\n", name);
-                        definition_free_definition(subscriber->definition);
+                        definition_freeDefinition(subscriber->definition);
                         subscriber->definition = NULL;
                     }
                     
@@ -443,7 +444,7 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     network_checkAndSubscribeToPublisher(newDefinition->name);
                 }else{
                     mtic_debug("ERROR: definition is NULL or has no name for agent %s\n", name);
-                    definition_free_definition(newDefinition);
+                    definition_freeDefinition(newDefinition);
                     newDefinition = NULL;
                 }
                 free(strDefinition);
@@ -504,7 +505,7 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                         HASH_DEL(iop_unmappped, iop);
                         free(iop);
                     }
-                    definition_free_definition(myDefinition);
+                    definition_freeDefinition(myDefinition);
                     subscriber->definition = myDefinition = NULL;
                 }
                 
@@ -761,7 +762,7 @@ int network_publishOutput (const char* output_name)
                 }
                 result = 1;
             }else{
-                char* str_value = definition_get_iop_value_as_string(found_iop);
+                char* str_value = definition_getIOPValueAsString(found_iop);
                 if(strlen(str_value) > 0)
                 {
                     mtic_debug("publish %s -> %s\n",found_iop->name,str_value);

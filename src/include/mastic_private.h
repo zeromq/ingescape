@@ -206,11 +206,8 @@ typedef struct zyreloopElements{
 
 extern definition* mtic_internal_definition;
 
-int definition_get_iop_value_as_int(agent_iop*iop, iop_t type);
-double definition_get_iop_value_as_double(agent_iop*iop, iop_t type);
-char* definition_get_iop_value_as_string (agent_iop* iop);
-
-void definition_free_definition (definition* definition);
+char* definition_getIOPValueAsString (agent_iop* iop);
+void definition_freeDefinition (definition* definition);
 
 
 //  mapping

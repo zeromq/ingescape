@@ -951,7 +951,7 @@ int mtic_init_internal_data (const char* definition_file_path)
  * Function: load_definition
  * ----------------------------
  *   Load a agent definition in the standartised format JSON to initialize a definition structure from a string.
- *   The definition structure is dynamically allocated. You will have to use definition_free_definition function to deallocated it correctly.
+ *   The definition structure is dynamically allocated. You will have to use definition_freeDefinition function to deallocated it correctly.
  *
  *   json_str      : a string (json format)
  *
@@ -976,7 +976,7 @@ definition* parser_loadDefinition (const char* json_str) {
  * Function: load_definition_from_path
  * -----------------------------------
  *   Load a agent definition in the standartised format JSON to initialize a definition structure from a local file path.
- *   The definition structure is dynamically allocated. You will have to use definition_free_definition function to deallocated it correctly.
+ *   The definition structure is dynamically allocated. You will have to use definition_freeDefinition function to deallocated it correctly.
  *
  *   file_path      : the file path
  *
@@ -1145,7 +1145,7 @@ mapping* parser_LoadMapFromPath (const char* path){
  */
 int mtic_loadDefinition (const char* json_str){
     if (mtic_internal_definition != NULL){
-        definition_free_definition(mtic_internal_definition);
+        definition_freeDefinition(mtic_internal_definition);
         mtic_internal_definition = NULL;
     }
 
@@ -1188,7 +1188,7 @@ int mtic_loadDefinition (const char* json_str){
  */
 int mtic_loadDefinitionFromPath (const char* file_path){
     if (mtic_internal_definition != NULL){
-        definition_free_definition(mtic_internal_definition);
+        definition_freeDefinition(mtic_internal_definition);
         mtic_internal_definition = NULL;
     }
 

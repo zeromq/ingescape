@@ -207,7 +207,7 @@ int publishOutput(const char* output_name)
     {
         if(found_iop->is_muted == false && found_iop->name != NULL && is_paused == false)
         {
-            char* str_value = strdup(definition_get_iop_value_as_string(found_iop));
+            char* str_value = strdup(definition_getIOPValueAsString(found_iop));
             if(strlen(str_value) > 0)
             {
                 // Build the map description used as filter for other agents
@@ -406,7 +406,7 @@ int manageIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     }
 
                     HASH_DEL(mtic_agents_defs_on_network, receivedDefinition);
-                    definition_free_definition(receivedDefinition);
+                    definition_freeDefinition(receivedDefinition);
                     receivedDefinition = NULL;
                 }
 
