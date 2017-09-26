@@ -161,7 +161,7 @@ PUBLIC bool mtic_checkParameterExistence(const char *name);
  * \ingroup observefct
  * \brief typedef for the callback used in observe functions
  */
-typedef void (*mtic_observeCallback)(iop_t iopType, const char* name, iopType_t valueType, void* value, void* myData);
+typedef void (*mtic_observeCallback)(iop_t iopType, const char* name, iopType_t valueType, void* value, long valueSize, void* myData);
 PUBLIC int mtic_observeInput(const char *name, mtic_observeCallback cb, void *myData);
 PUBLIC int mtic_observeOutput(const char *name, mtic_observeCallback cb, void * myData);
 PUBLIC int mtic_observeParameter(const char *name, mtic_observeCallback cb, void * myData);
