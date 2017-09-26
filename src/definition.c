@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include "mastic_private.h"
 #include "uthash/uthash.h"
+#include "uthash/utlist.h"
 
 definition * mtic_internal_definition = NULL;
 
@@ -40,6 +41,13 @@ void free_agent_iop (agent_iop** agent_iop){
     
     if ((*agent_iop)->value.data != NULL){
         free((*agent_iop)->value.data);
+    }
+    
+    if ((*agent_iop)->callbacks != NULL){
+        mtic_observe_callback_t *cb;
+        DL_FOREACH((*agent_iop)->callbacks, cb){
+            free(cb);
+        }
     }
     
     free((*agent_iop));
