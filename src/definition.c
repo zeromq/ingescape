@@ -144,57 +144,7 @@ void free_category (category* cat){
     free (cat);
 }
 
-int definition_setIopValue(agent_iop *iop, void * value, long size)
-{
-    if(iop == NULL)
-        return 0;
 
-    switch (iop->value_type) {
-    case INTEGER_T:
-        if(value != NULL)
-            iop->value.i = *(int*)(value);
-        else
-            iop->value.i = 0;
-        break;
-    case DOUBLE_T:
-        if(value != NULL)
-            iop->value.d = *(double*)(value);
-        else
-            iop->value.d = 0.0;
-        break;
-    case BOOL_T:
-        if(value != NULL)
-            iop->value.b = *(bool*)(value);
-        else
-            iop->value.b = false;
-        break;
-    case STRING_T:
-        if (iop->value.s != NULL)
-            free(iop->value.s);
-        if(value != NULL)
-            iop->value.s = strdup(value);
-        else
-            iop->value.s = strdup("");
-        break;
-    case IMPULSION_T:
-        break;
-    case DATA_T:
-    {
-        if (iop->value.data != NULL){
-            free(iop->value.data);
-        }
-        iop->value.data = NULL;
-        iop->valueSize = size;
-        iop->value.data = calloc(1,size);
-        memcpy(iop->value.data,value, size);
-    }
-        break;
-    default:
-        break;
-    }
-
-    return 1;
-}
 
 agent_iop* definition_createIop(const char *name, iop_t type, iopType_t value_type, void *value, long size)
 {
@@ -208,7 +158,7 @@ agent_iop* definition_createIop(const char *name, iop_t type, iopType_t value_ty
     //Set value
 //    agent_iop *ret = NULL;
 //    ret = calloc (1, sizeof (struct agent_iop));
-    definition_setIopValue(iop, value, size);
+    model_setIopValue(iop, value, size);
 
     return iop;
 }
