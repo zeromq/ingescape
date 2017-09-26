@@ -86,7 +86,6 @@ char agentName[AGENT_NAME_LENGTH] = AGENT_NAME_DEFAULT;
 char agentState[AGENT_NAME_LENGTH] = "";
 #define NO_DEVICE "unknown"
 
-
 typedef struct freezeCallback {      //Need to be unique : the table hash key
     mtic_freezeCallback callback_ptr;   //pointer on the callback
     void *myData;
@@ -100,6 +99,19 @@ typedef struct zyreCallback {      //Need to be unique : the table hash key
     struct zyreCallback *prev;
     struct zyreCallback *next;
 } zyreCallback_t;
+
+//zyre agents storage
+#define NAME_BUFFER_SIZE 256
+typedef struct zyreAgent {
+    char peerId[NAME_BUFFER_SIZE];
+    char name[NAME_BUFFER_SIZE];
+    subscriber_t *subscriber;
+    int reconnected;
+    bool hasJoinedPrivateChannel;
+    UT_hash_handle hh;
+} zyreAgent_t;
+zyreAgent_t *zyreAgents = NULL;
+bool network_needToSendDefinitionUpdate = false;
 
 //we manage agent data as a global variables inside the network module for now
 zyreloopElements_t *agentElements = NULL;
@@ -120,24 +132,15 @@ zyreCallback_t *zyreCallbacks = NULL;
  *   usage : mtic_sendDefinition()
  *
  */
-void sendDefinitionToAgent(const char *peerId)
+void sendDefinitionToAgent(const char *peerId, const char *definition)
 {
-    if(peerId != NULL &&  mtic_internal_definition != NULL)
+    if(peerId != NULL &&  definition != NULL)
     {
-        char * definitionStr = NULL;
-        definitionStr = parser_export_definition(mtic_internal_definition);
-        if(definitionStr != NULL && agentElements->node != NULL)
+        if(agentElements->node != NULL)
         {
-            zyre_whispers(agentElements->node, peerId, "%s%s", definitionPrefix, definitionStr);
-            free (definitionStr);
+            zyre_whispers(agentElements->node, peerId, "%s%s", definitionPrefix, definition);
         } else {
-            mtic_debug("Error : could not send our definition to %s :\n",peerId);
-            if (definitionStr == NULL){
-                mtic_debug("\tdefinition is NULL\n");
-            }
-            if (agentElements->node == NULL){
-                mtic_debug("\agent is not  connected\n");
-            }
+            mtic_debug("Error : could not send our definition to %s : our agent is not connected\n",peerId);
         }
     }
 }
@@ -320,6 +323,21 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
         //parse event
         if (streq (event, "ENTER")){
             mtic_debug("->%s has entered the network with peer id %s and address %s\n", name, peer, address);
+            zyreAgent_t *zagent = NULL;
+            HASH_FIND_STR(zyreAgents, peer, zagent);
+            if (zagent == NULL){
+                zagent = calloc(1, sizeof(zyreAgent_t));
+                zagent->reconnected = 0;
+                zagent->subscriber = NULL;
+                zagent->hasJoinedPrivateChannel = false;
+                strncpy(zagent->peerId, peer, NAME_BUFFER_SIZE);
+                HASH_ADD_STR(zyreAgents, peerId, zagent);
+            }else{
+                //Agent already exists, we set its reconnected flag
+                //(this is used below to avoid agent destruction on EXIT received after timeout)
+                zagent->reconnected++;
+            }
+            strncpy(zagent->name, name, NAME_BUFFER_SIZE);
             assert(headers);
             char *k;
             const char *v;
@@ -376,6 +394,7 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                             subscriber = NULL;
                         }
                         subscriber = calloc(1, sizeof(subscriber_t));
+                        zagent->subscriber = subscriber;
                         subscriber->agentName = strdup(name);
                         subscriber->agentPeerId = strdup (peer);
                         subscriber->subscriber = zsock_new_sub(endpointAddress, NULL);
@@ -399,16 +418,18 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
         } else if (streq (event, "JOIN")){
             mtic_debug("+%s has joined %s\n", name, group);
             if (streq(group, CHANNEL)){
-//                subscriber_t *subscriber;
-//                HASH_FIND_STR(subscribers, peer, subscriber);
-//                if (subscriber != NULL){
-//                    //A new agent joined the MASTIC channel and has subscriber header
-//                    //Send my definition to this new agent
-//                    mtic_debug("Send our definition to %s (%s)\n", subscriber->agentName, subscriber->agentPeerId);
-//                    sendDefinitionToAgent(subscriber->agentPeerId);
-//                }
                 //definition is sent to every newcomer on the channel (whether it is a mastic agent or not)
-                sendDefinitionToAgent(peer);
+                char * definitionStr = NULL;
+                definitionStr = parser_export_definition(mtic_internal_definition);
+                if (definitionStr != NULL){
+                    sendDefinitionToAgent(peer, definitionStr);
+                    free(definitionStr);
+                }
+                zyreAgent_t *zagent = NULL;
+                HASH_FIND_STR(zyreAgents, peer, zagent);
+                if (zagent != NULL){
+                    zagent->hasJoinedPrivateChannel = true;
+                }
             }
         } else if (streq (event, "LEAVE")){
             mtic_debug("-%s has left %s\n", name, group);
@@ -487,6 +508,18 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
             free(message);
         } else if (streq (event, "EXIT")){
             mtic_debug("<-%s exited\n", name);
+            zyreAgent_t *a = NULL;
+            HASH_FIND_STR(zyreAgents, peer, a);
+            if (a != NULL){
+                if (a->reconnected > 0){
+                    //do not destroy: we are getting a timemout now whereas
+                    //the agent is reconnected
+                    a->reconnected--;
+                }else{
+                    HASH_DEL(zyreAgents, a);
+                    free(a);
+                }
+            }
             // Try to find the subscriber to destory
             subscriber_t *subscriber = NULL;
             HASH_FIND_STR(subscribers, peer, subscriber);
@@ -522,6 +555,32 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
             }
         }
         zyre_event_destroy(&zyre_event);
+    }
+    return 0;
+}
+
+//Timer callback to send MAPPED notification for agents we subscribed to
+int triggerMappingNotificationToNewcomer(zloop_t *loop, int timer_id, void *arg){
+    char *peerId = (char *) arg;
+    zyre_whispers(agentElements->node, peerId, "MAPPED");
+    return 0;
+}
+
+//Timer callback to (re)send our definition to agents on the private channel
+int triggerDefinitionUpdate(zloop_t *loop, int timer_id, void *arg){
+    if (network_needToSendDefinitionUpdate){
+        char * definitionStr = NULL;
+        definitionStr = parser_export_definition(mtic_internal_definition);
+        if (definitionStr != NULL){
+            zyreAgent_t *a, *tmp;
+            HASH_ITER(hh, zyreAgents, a, tmp){
+                if (a->hasJoinedPrivateChannel){
+                    sendDefinitionToAgent(a->peerId, definitionStr);
+                }
+            }
+            free(definitionStr);
+        }
+        network_needToSendDefinitionUpdate = false;
     }
     return 0;
 }
@@ -651,7 +710,6 @@ initActor (zsock_t *pipe, void *args)
     zyrePollItem.events = ZMQ_POLLIN;
     zyrePollItem.revents = 0;
 
-
     zloop_t *loop = agentElements->loop = zloop_new ();
     assert (loop);
     zloop_set_verbose (loop, false);
@@ -660,6 +718,8 @@ initActor (zsock_t *pipe, void *args)
     zloop_poller_set_tolerant(loop, &zpipePollItem);
     zloop_poller (loop, &zyrePollItem, manageZyreIncoming, agentElements);
     zloop_poller_set_tolerant(loop, &zyrePollItem);
+    
+    zloop_timer(agentElements->loop, 1000, 0, triggerDefinitionUpdate, NULL);
 
     zloop_start (loop); //start returns when one of the pollers returns -1
 
@@ -686,14 +746,6 @@ initActor (zsock_t *pipe, void *args)
         free(s);
         s = NULL;
     }
-}
-
-//Timer callback to send MAPPED notification for agents we subscribed to
-int triggerMappingNotificationToNewcomer(zloop_t *loop, int timer_id, void *arg){
-    char *peerId = (char *) arg;
-    //zyre_shouts(agentElements->node, CHANNEL, "MAPPED");
-    zyre_whispers(agentElements->node, peerId, "MAPPED");
-    return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////
