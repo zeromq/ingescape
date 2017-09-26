@@ -1172,6 +1172,7 @@ int mtic_loadDefinition (const char* json_str){
         }//else
             //The agent name was assigned by the developer : we keep it untouched
         free(name);
+        network_needToSendDefinitionUpdate = true;
     }
 
     return 1;
@@ -1215,6 +1216,7 @@ int mtic_loadDefinitionFromPath (const char* file_path){
         }//else
             //The agent name was assigned by the developer : we keep it untouched
         free(name);
+        network_needToSendDefinitionUpdate = true;
     }
 
     return 1;
