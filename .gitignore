@@ -844,3 +844,7 @@ build-mastic-Desktop_Qt_5_6_0_MSVC2015_32bit-Debug/
 build-mastic-Desktop_Qt_5_7_0_MSVC2015_32bit-Debug/
 builds/mastic.pro.user
 build-mastic-Desktop_Qt_5_7_0_MSVC2015_32bit-Release/
+dependencies/ios/yajl/yajl.xcodeproj/xcuserdata/vincent.xcuserdatad/xcschemes/xcschememanagement.plist
+dependencies/ios/yajl/yajl.xcodeproj/xcuserdata/vincent.xcuserdatad/xcschemes/yajl-ios.xcscheme
+dependencies/ios/yajl/yajl.xcodeproj/xcuserdata/vincent.xcuserdatad/xcschemes/yajl-macos.xcscheme
+xcschememanagement.plist

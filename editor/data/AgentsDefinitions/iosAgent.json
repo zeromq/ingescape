@@ -1,0 +1,48 @@
+{
+    "definition": {
+        "name": "iosAgent",
+        "description": "iosAgent sends two impulsions and receives a double",
+        "version": "0.1",
+        "parameters": [
+            {
+                "name": "param1",
+                "type": "INTEGER",
+                "value": -1
+            }
+        ],
+        "inputs": [
+            {
+                "name": "input1",
+                "type": "DOUBLE",
+                "value": 3.1400000000000001243
+            },
+            {
+                "name": "heart",
+                "type": "INTEGER",
+                "value": 0
+            }
+        ],
+        "outputs": [
+            {
+                "name": "button1",
+                "type": "INTEGER",
+                "value": 383995264
+            },
+            {
+                "name": "button2",
+                "type": "IMPULSION",
+                "value": ""
+            },
+            {
+                "name": "bool",
+                "type": "BOOL",
+                "value": "false"
+            },
+            {
+                "name": "stream",
+                "type": "DATA",
+                "value": ""
+            }
+        ]
+    }
+}
