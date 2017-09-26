@@ -81,37 +81,31 @@ bool isWholeAgentMuted = false;
 static const char *definitionPrefix = "DEFINITION#";
 static const char *mappingPrefix = "MAPPING#";
 #define CHANNEL "MASTIC_PRIVATE"
-#define NETWORK_DEVICE_LENGTH 16
 #define AGENT_NAME_LENGTH 256
-#define IP_ADDRESS_LENGTH 256
 char agentName[AGENT_NAME_LENGTH] = AGENT_NAME_DEFAULT;
 char agentState[AGENT_NAME_LENGTH] = "";
 #define NO_DEVICE "unknown"
 
 
-//network structures
-typedef struct zyreloopElements{
-    char networkDevice[NETWORK_DEVICE_LENGTH];
-    char ipAddress[IP_ADDRESS_LENGTH];
-    int zyrePort;
-    zactor_t *agentActor;
-    zyre_t *node;
-    zsock_t *publisher;
-    zloop_t *loop;
-} zyreloopElements_t;
-
-typedef struct FreezeCallback {      //Need to be unique : the table hash key
+typedef struct freezeCallback {      //Need to be unique : the table hash key
     mtic_freezeCallback callback_ptr;   //pointer on the callback
     void *myData;
-    struct FreezeCallback *prev;
-    struct FreezeCallback *next;
-} FreezeCallback_t;
+    struct freezeCallback *prev;
+    struct freezeCallback *next;
+} freezeCallback_t;
 
+typedef struct zyreCallback {      //Need to be unique : the table hash key
+    network_zyreIncoming callback_ptr;   //pointer on the callback
+    void *myData;
+    struct zyreCallback *prev;
+    struct zyreCallback *next;
+} zyreCallback_t;
 
 //we manage agent data as a global variables inside the network module for now
 zyreloopElements_t *agentElements = NULL;
 subscriber_t *subscribers = NULL;
-FreezeCallback_t *FreezeCallbacks = NULL;
+freezeCallback_t *freezeCallbacks = NULL;
+zyreCallback_t *zyreCallbacks = NULL;
 
 ////////////////////////////////////////////////////////////////////////
 // Network internal functions
@@ -315,7 +309,14 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
         zhash_t *headers = zyre_event_headers (zyre_event);
         const char *group = zyre_event_group (zyre_event);
         zmsg_t *msg = zyre_event_msg (zyre_event);
+        
+        //handle callbacks
+        zyreCallback_t *elt;
+        DL_FOREACH(zyreCallbacks,elt){
+            elt->callback_ptr(zyre_event, elt->myData);
+        }
 
+        //parse event
         if (streq (event, "ENTER")){
             mtic_debug("->%s has entered the network with peer id %s and address %s\n", name, peer, address);
             assert(headers);
@@ -397,14 +398,16 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
         } else if (streq (event, "JOIN")){
             mtic_debug("+%s has joined %s\n", name, group);
             if (streq(group, CHANNEL)){
-                subscriber_t *subscriber;
-                HASH_FIND_STR(subscribers, peer, subscriber);
-                if (subscriber != NULL){
-                    //A new agent joined the MASTIC channel and has subscriber header
-                    //Send my definition to this new agent
-                    mtic_debug("Send our definition to %s (%s)\n", subscriber->agentName, subscriber->agentPeerId);
-                    sendDefinitionToAgent(subscriber->agentPeerId);
-                }
+//                subscriber_t *subscriber;
+//                HASH_FIND_STR(subscribers, peer, subscriber);
+//                if (subscriber != NULL){
+//                    //A new agent joined the MASTIC channel and has subscriber header
+//                    //Send my definition to this new agent
+//                    mtic_debug("Send our definition to %s (%s)\n", subscriber->agentName, subscriber->agentPeerId);
+//                    sendDefinitionToAgent(subscriber->agentPeerId);
+//                }
+                //definition is sent to every newcomer on the channel (whether it is a mastic agent or not)
+                sendDefinitionToAgent(peer);
             }
         } else if (streq (event, "LEAVE")){
             mtic_debug("-%s has left %s\n", name, group);
@@ -657,12 +660,6 @@ initActor (zsock_t *pipe, void *args)
     zloop_poller (loop, &zyrePollItem, manageZyreIncoming, agentElements);
     zloop_poller_set_tolerant(loop, &zyrePollItem);
 
-    //FOR TESTING - SEND PERIODIC MESSAGES ON PUBLISHER
-    //zloop_timer(loop, 1000, 0, sendTestMessagesOnPublisher, zEl);
-
-    // FIXME - needed ? Export my definition for once if exists
-    // mtic_sendDefinition();
-
     zloop_start (loop); //start returns when one of the pollers returns -1
 
     zloop_destroy (&loop);
@@ -863,6 +860,19 @@ int network_checkAndSubscribeToPublisher(const char* agtName)
     return result;
 }
 
+int network_observeZyre(network_zyreIncoming cb, void *myData){
+    if (cb != NULL){
+        zyreCallback_t *newCb = calloc(1, sizeof(zyreCallback_t));
+        newCb->callback_ptr = cb;
+        newCb->myData = myData;
+        DL_APPEND(zyreCallbacks, newCb);
+    }else{
+        mtic_debug("network_observeZyre: callback is null\n");
+        return 0;
+    }
+    return 1;
+}
+
 ////////////////////////////////////////////////////////////////////////
 // PUBLIC API
 ////////////////////////////////////////////////////////////////////////
@@ -1051,9 +1061,9 @@ int mtic_stop(){
         free (agentElements);
         agentElements = NULL;
         //cleaning Freeze callbacks
-        FreezeCallback_t *elt, *tmp;
-        DL_FOREACH_SAFE(FreezeCallbacks,elt,tmp) {
-            DL_DELETE(FreezeCallbacks,elt);
+        freezeCallback_t *elt, *tmp;
+        DL_FOREACH_SAFE(freezeCallbacks,elt,tmp) {
+            DL_DELETE(freezeCallbacks,elt);
             free(elt);
         }
 
@@ -1153,8 +1163,8 @@ int mtic_freeze(){
             zyre_shouts(agentElements->node, CHANNEL, "Freeze=ON");
         }
         isFrozen = true;
-        FreezeCallback_t *elt;
-        DL_FOREACH(FreezeCallbacks,elt){
+        freezeCallback_t *elt;
+        DL_FOREACH(freezeCallbacks,elt){
             elt->callback_ptr(isFrozen, elt->myData);
         }
     }
@@ -1186,8 +1196,8 @@ int mtic_unfreeze(){
             zyre_shouts(agentElements->node, CHANNEL, "Freeze=OFF");
         }
         isFrozen = false;
-        FreezeCallback_t *elt;
-        DL_FOREACH(FreezeCallbacks,elt){
+        freezeCallback_t *elt;
+        DL_FOREACH(freezeCallbacks,elt){
             elt->callback_ptr(isFrozen, elt->myData);
         }
     }
@@ -1204,12 +1214,12 @@ int mtic_unfreeze(){
  */
 int mtic_observeFreeze(mtic_freezeCallback cb, void *myData){
     if (cb != NULL){
-        FreezeCallback_t *newCb = calloc(1, sizeof(FreezeCallback_t));
+        freezeCallback_t *newCb = calloc(1, sizeof(freezeCallback_t));
         newCb->callback_ptr = cb;
         newCb->myData = myData;
-        DL_APPEND(FreezeCallbacks, newCb);
+        DL_APPEND(freezeCallbacks, newCb);
     }else{
-        mtic_debug("callback is null\n");
+        mtic_debug("mtic_observeFreeze: callback is null\n");
         return 0;
     }
     return 1;

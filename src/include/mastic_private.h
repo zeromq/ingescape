@@ -22,7 +22,7 @@
 
 #include <stdbool.h>
 #include <string.h>
-#include <czmq.h>
+#include <zyre.h>
 
 #include "uthash/uthash.h"
 
@@ -179,6 +179,19 @@ typedef struct subscriber{
     UT_hash_handle hh;
 } subscriber_t;
 
+//network internal structure
+#define NETWORK_DEVICE_LENGTH 16
+#define IP_ADDRESS_LENGTH 256
+typedef struct zyreloopElements{
+    char networkDevice[NETWORK_DEVICE_LENGTH];
+    char ipAddress[IP_ADDRESS_LENGTH];
+    int zyrePort;
+    zactor_t *agentActor;
+    zyre_t *node;
+    zsock_t *publisher;
+    zloop_t *loop;
+} zyreloopElements_t;
+
 //////////////////  FUNCTIONS  //////////////////
 
 //  definition
@@ -214,6 +227,11 @@ void* model_get(const char*name_iop, iop_t type);
 
 
 // network
+extern zyreloopElements_t *agentElements;
+//DO NOT DESTROY THE ZYRE_EVENT INSIDE THE CALLBACK
+typedef int (*network_zyreIncoming) (const zyre_event_t *zyre_event, void *arg);
+
+int network_observeZyre(network_zyreIncoming cb, void *myData);
 #define AGENT_NAME_DEFAULT "mtic_undefined"
 int network_publishOutput (const char* output_name);
 int network_checkAndSubscribeToPublisher(const char* agentName);
