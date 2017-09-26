@@ -1,3 +1,35 @@
+# Ignore compiled files
+*.o
+
+
+# Ignore Qt user-specific files
+*.pro.user
+*.pro.user.*
+*.qmlproject.user
+*.qmlproject.user.*
+*.qbs.user
+*.qbs.user.*
+
+
+# Ignore Qt generated files
+.qmake.cache
+.qmake.stash
+*.moc
+moc_*.cpp
+qrc_*.cpp
+ui_*.h
+
+
+# Ignore Qt default build directory
+*build-*
+
+#Ignore build Xcode Path
+build-xcode
+#Ignore Xcode User Pref
+xcuserdata
+
+.deps
+.libs
 zyreprobe/zyreprobe/*.o
 zyreprobe/zyreprobe/zyreprobe
 builds/linux/*
@@ -828,23 +860,3 @@ dependencies/ios/ios/perPlatform/x86_64/share/zproject/czmq/ztrie.api
 dependencies/ios/ios/perPlatform/x86_64/share/zproject/czmq/zuuid.api
 dependencies/ios/ios/perPlatform/x86_64/share/zproject/zyre/zyre.api
 dependencies/ios/ios/perPlatform/x86_64/share/zproject/zyre/zyre_event.api
-builds/mastic.xcodeproj/xcuserdata/steph.xcuserdatad/xcschemes/mastic-ios.xcscheme
-builds/mastic.xcodeproj/xcuserdata/steph.xcuserdatad/xcschemes/mastic-macos.xcscheme
-builds/mastic.xcodeproj/xcuserdata/steph.xcuserdatad/xcschemes/xcschememanagement.plist
-dependencies/ios/yajl/yajl.xcodeproj/xcuserdata/steph.xcuserdatad/xcschemes/xcschememanagement.plist
-dependencies/ios/yajl/yajl.xcodeproj/xcuserdata/steph.xcuserdatad/xcschemes/yajl-ios.xcscheme
-dependencies/ios/yajl/yajl.xcodeproj/xcuserdata/steph.xcuserdatad/xcschemes/yajl-macos.xcscheme
-zyreprobe/zyreprobe.xcodeproj/xcuserdata/steph.xcuserdatad/xcschemes/xcschememanagement.plist
-zyreprobe/zyreprobe.xcodeproj/xcuserdata/steph.xcuserdatad/xcschemes/zyreprobe.xcscheme
-build-mastic-Android_for_armeabi_v7a_GCC_4_9_Qt_5_5_1-Debug/
-build-mastic-Android_for_armeabi_v7a_GCC_4_9_Qt_5_5_1-Release/
-
-build-mastic-Desktop_Qt_5_6_0_MSVC2015_32bit-Release/
-build-mastic-Desktop_Qt_5_6_0_MSVC2015_32bit-Debug/
-build-mastic-Desktop_Qt_5_7_0_MSVC2015_32bit-Debug/
-builds/mastic.pro.user
-build-mastic-Desktop_Qt_5_7_0_MSVC2015_32bit-Release/
-dependencies/ios/yajl/yajl.xcodeproj/xcuserdata/vincent.xcuserdatad/xcschemes/xcschememanagement.plist
-dependencies/ios/yajl/yajl.xcodeproj/xcuserdata/vincent.xcuserdatad/xcschemes/yajl-ios.xcscheme
-dependencies/ios/yajl/yajl.xcodeproj/xcuserdata/vincent.xcuserdatad/xcschemes/yajl-macos.xcscheme
-xcschememanagement.plist
