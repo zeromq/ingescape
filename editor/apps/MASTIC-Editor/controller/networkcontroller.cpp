@@ -17,12 +17,11 @@
 
 #include <QDebug>
 
-#include "misc/masticeditorutils.h"
-
 extern "C" {
-#include <mastic/mastic.h>
+#include <mastic/mastic_private.h>
 }
 
+#include "misc/masticeditorutils.h"
 
 
 //--------------------------------------------------------------

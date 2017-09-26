@@ -44,7 +44,16 @@ HEADERS += \
     controller/masticmodelmanager.h \
     controller/networkcontroller.h \
     misc/masticeditorsettings.h \
-    misc/masticeditorutils.h
+    misc/masticeditorutils.h \
+    uthash/libut.h \
+    uthash/ringbuf.h \
+    uthash/utarray.h \
+    uthash/uthash.h \
+    uthash/utlist.h \
+    uthash/utmm.h \
+    uthash/utringbuffer.h \
+    uthash/utstring.h \
+    uthash/utvector.h
 
 
 RESOURCES += qml.qrc
@@ -93,6 +102,7 @@ INCLUDEPATH += ../../frameworks/I2Quick/include
 LIBS += -L/usr/local/lib -lmastic
 
 INCLUDEPATH += /usr/local/include
+
 
 #####################################################################
 #
