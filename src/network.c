@@ -518,6 +518,8 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                         }
                     }
                     free(outputsList);
+                }else if (strlen("DIE") == strlen(message) && strncmp (message, "DIE", strlen("DIE")) == 0){
+                    mtic_die();
                 }else if (strlen("CLEAR_MAPPING") == strlen(message) && strncmp (message, "CLEAR_MAPPING", strlen("CLEAR_MAPPING")) == 0){
                     mtic_clearMapping();
                 }else if (strlen("FREEZE") == strlen(message) && strncmp (message, "FREEZE", strlen("FREEZE")) == 0){
