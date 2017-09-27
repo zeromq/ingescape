@@ -1144,11 +1144,7 @@ mapping* parser_LoadMapFromPath (const char* path){
  * \return The error. 1 is OK, 0 json string is NULL, -1 Definition file has not been loaded
  */
 int mtic_loadDefinition (const char* json_str){
-    if (mtic_internal_definition != NULL){
-        definition_freeDefinition(mtic_internal_definition);
-        mtic_internal_definition = NULL;
-    }
-
+    
     //Check if the json string is null
     if(json_str == NULL)
     {
@@ -1156,14 +1152,19 @@ int mtic_loadDefinition (const char* json_str){
         return 0;
     }
 
-    //Load definition and init variable : mtic_definition_loaded
-    mtic_internal_definition = parser_loadDefinition(json_str);
+    //Try to load definition
+    definition *tmp = parser_loadDefinition(json_str);
 
-    if(mtic_internal_definition == NULL)
+    if(tmp == NULL)
     {
-        mtic_debug("mtic_loadDefinition : Definition file has not been loaded from json string : %s\n", json_str );
+        mtic_debug("mtic_loadDefinition : json string caused an error and was ignored\n%s\n", json_str );
         return -1;
     }else{
+        if (mtic_internal_definition != NULL){
+            definition_freeDefinition(mtic_internal_definition);
+            mtic_internal_definition = NULL;
+        }
+        mtic_internal_definition = tmp;
         //Check the name of agent from network layer
         char *name = mtic_getAgentName();
         if(strcmp(name, AGENT_NAME_DEFAULT) == 0){
@@ -1188,11 +1189,7 @@ int mtic_loadDefinition (const char* json_str){
  * \return The error. 1 is OK, 0 json string is NULL, -1 Definition file has not been loaded
  */
 int mtic_loadDefinitionFromPath (const char* file_path){
-    if (mtic_internal_definition != NULL){
-        definition_freeDefinition(mtic_internal_definition);
-        mtic_internal_definition = NULL;
-    }
-
+    
     //Check if the json string is null
     if(file_path == NULL)
     {
@@ -1200,14 +1197,20 @@ int mtic_loadDefinitionFromPath (const char* file_path){
         return 0;
     }
 
-    //Load definition and init variable : mtic_definition_loaded
-    mtic_internal_definition = parser_loadDefinitionFromPath(file_path);
+    //Try to load definition
+    definition *tmp = parser_loadDefinitionFromPath(file_path);
+    
 
-    if(mtic_internal_definition == NULL)
+    if(tmp == NULL)
     {
-        mtic_debug("Error : Definition file has not been loaded from file path : %s\n", file_path);
+        mtic_debug("mtic_loadDefinitionFromPath : %s caused an error and was ignored\n", file_path);
         return -1;
     }else{
+        if (mtic_internal_definition != NULL){
+            definition_freeDefinition(mtic_internal_definition);
+            mtic_internal_definition = NULL;
+        }
+        mtic_internal_definition = tmp;
         //Check the name of agent from network layer
         char *name = mtic_getAgentName();
         if(strcmp(name, AGENT_NAME_DEFAULT) == 0){
