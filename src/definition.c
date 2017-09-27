@@ -180,17 +180,17 @@ int definition_addIopToDefinition(agent_iop *iop, iop_t iop_type, definition **d
 
     //Check if the key already exist
     switch (iop_type) {
-    case INPUT_T:
-        HASH_FIND_STR((*def)->inputs_table, iop->name , iop_to_add);
-        break;
-    case OUTPUT_T:
-        HASH_FIND_STR((*def)->outputs_table, iop->name , iop_to_add);
-        break;
-    case PARAMETER_T:
-        HASH_FIND_STR((*def)->params_table, iop->name , iop_to_add);
-        break;
-    default:
-        break;
+        case INPUT_T:
+            HASH_FIND_STR((*def)->inputs_table, iop->name , iop_to_add);
+            break;
+        case OUTPUT_T:
+            HASH_FIND_STR((*def)->outputs_table, iop->name , iop_to_add);
+            break;
+        case PARAMETER_T:
+            HASH_FIND_STR((*def)->params_table, iop->name , iop_to_add);
+            break;
+        default:
+            break;
     }
 
     if(iop_to_add != NULL)
@@ -202,17 +202,17 @@ int definition_addIopToDefinition(agent_iop *iop, iop_t iop_type, definition **d
 
     //Add the iop
     switch (iop_type) {
-    case INPUT_T:
-        HASH_ADD_STR((*def)->inputs_table, name, iop_to_add);
-        break;
-    case OUTPUT_T:
-        HASH_ADD_STR((*def)->outputs_table, name, iop_to_add);
-        break;
-    case PARAMETER_T:
-        HASH_ADD_STR((*def)->params_table, name, iop_to_add);
-        break;
-    default:
-        break;
+        case INPUT_T:
+            HASH_ADD_STR((*def)->inputs_table, name, iop_to_add);
+            break;
+        case OUTPUT_T:
+            HASH_ADD_STR((*def)->outputs_table, name, iop_to_add);
+            break;
+        case PARAMETER_T:
+            HASH_ADD_STR((*def)->params_table, name, iop_to_add);
+            break;
+        default:
+            break;
     }
 
     return 1;
@@ -326,7 +326,7 @@ int mtic_clearDefinition(){
         definition_freeDefinition(mtic_internal_definition);
     }
     mtic_internal_definition = calloc(1, sizeof(struct definition));
-
+    network_needToSendDefinitionUpdate = true;
     return 1;
 }
 
@@ -388,6 +388,7 @@ int mtic_setDefinitionName(char *name){
         free((char*)mtic_internal_definition->name);
     }
     mtic_internal_definition->name = strdup(name);
+    network_needToSendDefinitionUpdate = true;
     
     return 1;
 }
@@ -423,6 +424,7 @@ int mtic_setDefinitionDescription(char *description){
         free((char*)mtic_internal_definition->description);
     }
      mtic_internal_definition->description = strdup(description);
+    network_needToSendDefinitionUpdate = true;
 
     return 1;
 }
@@ -457,6 +459,7 @@ int mtic_setDefinitionVersion(char *version){
         free((char*)mtic_internal_definition->version);
     }
     mtic_internal_definition->version = strdup(version);
+    network_needToSendDefinitionUpdate = true;
 
     return 1;
 }
@@ -492,6 +495,7 @@ int mtic_createInput(const char *name, iopType_t value_type, void *value, long s
 
     //free iop
     free(iopLive);
+    network_needToSendDefinitionUpdate = true;
 
     return 1;
 }
@@ -522,6 +526,7 @@ int mtic_createOutput(const char *name, iopType_t value_type, void *value, long 
 
     //free iop
     free(iopLive);
+    network_needToSendDefinitionUpdate = true;
 
     return 1;
 }
@@ -551,6 +556,7 @@ int mtic_createParameter(const char *name, iopType_t value_type, void *value, lo
 
     //free iop
     free(iopLive);
+    network_needToSendDefinitionUpdate = true;
 
     return 1;
 }
@@ -584,6 +590,7 @@ int mtic_removeInput(const char *name){
 
     //free Iop
     definition_freeIOP(&iop);
+    network_needToSendDefinitionUpdate = true;
 
     return 1;
 }
@@ -616,6 +623,7 @@ int mtic_removeOutput(const char *name){
 
     //free Iop
     definition_freeIOP(&iop);
+    network_needToSendDefinitionUpdate = true;
 
     return 1;
 }
@@ -649,6 +657,7 @@ int mtic_removeParameter(const char *name){
 
     //free Iop
     definition_freeIOP(&iop);
+    network_needToSendDefinitionUpdate = true;
 
     return 1;
 }
