@@ -42,16 +42,21 @@ void registerCustomQmlTypes()
     const char *uri = "MASTIC";
 
 
+    //---------------
     //
-    // Enum
+    // Enums
     //
+    //---------------
     qmlRegisterSingletonType<AgentIOPTypes>(uri, 1, 0, "AgentIOPTypes", &AgentIOPTypes::qmlSingleton);
     qmlRegisterSingletonType<AgentIOPValueTypes>(uri, 1, 0, "AgentIOPValueTypes", &AgentIOPValueTypes::qmlSingleton);
 
 
+
+    //----------------
     //
-    // Controller
+    // Controllers
     //
+    //----------------
     // Singleton used as primary access point to our controllers
     qmlRegisterSingletonType<MasticEditorController>(uri, 1, 0, "MasticEditorC", &MasticEditorController::qmlSingleton);
 
@@ -61,23 +66,32 @@ void registerCustomQmlTypes()
     qmlRegisterUncreatableType<MasticModelManager>(uri, 1, 0, "MasticModelManager", "Internal Class");
 
 
+    //----------------
     //
-    // Model
+    // Models
     //
+    //----------------
     qmlRegisterUncreatableType<AgentIOPM>(uri, 1, 0, "AgentIOPM", "Internal class");
     qmlRegisterUncreatableType<AgentM>(uri, 1, 0, "AgentM", "Internal class");
 
 
+
+    //---------------
     //
-    // View Model
+    // View Models
     //
+    //---------------
     qmlRegisterUncreatableType<AgentIOPVM>(uri, 1, 0, "AgentIOPVM", "Internal class");
     qmlRegisterUncreatableType<AgentVM>(uri, 1, 0, "AgentVM", "Internal class");
 
 
+
+    //------------------
     //
-    // QML singletons
+    // QML components
     //
+    //------------------
+    // - Singleton used to enable consistent app styling through predefined colors, fonts, etc.
     qmlRegisterSingletonType(QUrl("qrc:/qml/theme/MasticTheme.qml"), uri, 1, 0, "MasticTheme");
 
 }
