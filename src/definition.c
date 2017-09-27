@@ -326,6 +326,7 @@ int mtic_clearDefinition(){
         definition_freeDefinition(mtic_internal_definition);
     }
     mtic_internal_definition = calloc(1, sizeof(struct definition));
+    mtic_internal_definition->name = mtic_getAgentName();
     network_needToSendDefinitionUpdate = true;
     return 1;
 }
