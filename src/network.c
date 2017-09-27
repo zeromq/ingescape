@@ -588,6 +588,11 @@ int triggerDefinitionUpdate(zloop_t *loop, int timer_id, void *arg){
 static void
 initActor (zsock_t *pipe, void *args)
 {
+    //we are (re)starting : we rest the sendDefinitionFlag because
+    //all network connections are going to be (re)started and the
+    //"join MASTIC_PRIVATE" trigger will do its job.
+    network_needToSendDefinitionUpdate = false;
+    
     //start zyre
     agentElements->node = zyre_new (agentName);
     zyre_set_port(agentElements->node, agentElements->zyrePort);
