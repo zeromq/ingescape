@@ -20,6 +20,8 @@
 #include <QQmlApplicationEngine>
 #include <QSurfaceFormat>
 #include <QDebug>
+#include <QtGlobal>
+#include <QDate>
 
 
 #include <I2Quick.h>
@@ -27,6 +29,9 @@
 #include <controller/masticeditorcontroller.h>
 #include <misc/masticeditorsettings.h>
 #include <misc/masticeditorutils.h>
+
+
+
 
 /**
  * @brief Register our C++ types and extensions in the QML system
@@ -243,14 +248,21 @@ int main(int argc, char *argv[])
     registerCustomQmlTypes();
 
 
+
     //
     // Defines context properties
     //
     QQmlContext* qmlContext = engine.rootContext();
     if (qmlContext != NULL)
     {
-        // Version of our application
-        qmlContext->setContextProperty("APP_VERSION", app.applicationVersion());
+        // Build date
+        qmlContext->setContextProperty("BUILD_DATE", QLocale(QLocale::C).toDate(QString(__DATE__).simplified(), QLatin1String("MMM d yyyy")));
+
+        // Qt version against which the application is compiled
+        qmlContext->setContextProperty("QT_BUILD_VERSION", QString(QT_VERSION_STR));
+
+        // Runtime version of Qt. This may be a different version than the version the application was compiled against
+        qmlContext->setContextProperty("QT_RUNTIME_VERSION", QString(qVersion()));
     }
 
 
@@ -266,5 +278,8 @@ int main(int argc, char *argv[])
     // Mainloop
     //
     //------------------------------
-    return app.exec();
+
+    qInfo() << "Starting" << app.applicationName() << app.applicationVersion();
+    int exitReturnCode = app.exec();
+    qInfo() << "Quitting application with return code" << exitReturnCode;
 }
