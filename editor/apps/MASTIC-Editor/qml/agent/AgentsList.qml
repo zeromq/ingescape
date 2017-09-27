@@ -9,6 +9,7 @@
  *
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
+ *      Alexandre Lemort   <lemort@ingenuity.io>
  *
  */
 
@@ -19,6 +20,7 @@ import QtQuick.Controls.Styles 1.4
 import I2Quick 1.0
 
 import MASTIC 1.0
+
 
 Item {
     id: rootItem
@@ -48,56 +50,14 @@ Item {
     //--------------------------------
 
 
-    Row {
-        id: headerRow1
-        height: 25
-        anchors {
-            top: parent.top
-            left: parent.left
-            right: parent.right
-        }
-
-        Text {
-            id: txtSearch
-            text: qsTr("Rechercher...")
-        }
-
-        Text {
-            id: txtFilter
-            text: qsTr("Filtrer...")
-        }
-    }
-
-    Row {
-        id: headerRow2
-        height: 25
-        anchors {
-            top: headerRow1.bottom
-            left: parent.left
-            right: parent.right
-        }
-
-        Button {
-            id: btnAddAgent
-            text: qsTr("Nouvel Agent")
-            onClicked: {
-                console.log("Nouvel Agent")
-                // TODO
-            }
-        }
-
-        Text {
-            text: qsTr("Importer...")
-        }
-        Text {
-            text: qsTr("Exporter...")
-        }
-    }
-
+    //
+    // List of agents
+    //
     ListView {
         id: agentsList
+
         anchors {
-            top: headerRow2.bottom
+            top: header.bottom
             bottom: parent.bottom
             left: parent.left
             right: parent.right
@@ -111,6 +71,81 @@ Item {
     }
 
 
+    //
+    // Header
+    //
+    Rectangle {
+        id: header
+
+        anchors {
+            top: parent.top
+            left: parent.left
+            right: parent.right
+        }
+
+        height: childrenRect.height
+
+        color: "#444444"
+
+
+        Row {
+            id: headerRow1
+            height: 25
+            anchors {
+                top: parent.top
+                left: parent.left
+                right: parent.right
+            }
+
+            Text {
+                id: txtSearch
+                text: qsTr("Rechercher...")
+                color: "#ffffff"
+            }
+
+            Text {
+                id: txtFilter
+                text: qsTr("Filtrer...")
+                color: "#ffffff"
+            }
+        }
+
+        Row {
+            id: headerRow2
+
+            height: 25
+
+            anchors {
+                top: headerRow1.bottom
+                left: parent.left
+                right: parent.right
+            }
+
+            Button {
+                id: btnAddAgent
+                text: qsTr("Nouvel Agent")
+                onClicked: {
+                    console.log("Nouvel Agent")
+                    // TODO
+                }
+            }
+
+            Text {
+                text: qsTr("Importer...")
+                color: "#ffffff"
+            }
+            Text {
+                text: qsTr("Exporter...")
+                color: "#ffffff"
+            }
+        }
+    }
+
+
+
+    //
+    // Visual representaiton of an agent in our list
+    //
     Component {
         id: agentInList
 

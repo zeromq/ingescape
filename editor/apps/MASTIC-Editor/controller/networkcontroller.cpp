@@ -1,14 +1,14 @@
 /*
  *	NetworkController
  *
- *  Copyright (c) 2016-2017 Ingenuity i/o. All rights reserved.
+ *  Copyright (c) 2017 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
  *
  *
  *	Contributors:
- *      Vincent Deliencourt
+ *      Vincent Deliencourt  <deliencourt@ingenuity.io>
  *
  */
 

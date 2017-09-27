@@ -1,14 +1,15 @@
-
 /*
  *	MasticEditorUtils
  *
- *  Copyright (c) 2016-2017 Ingenuity i/o. All rights reserved.
+ *  Copyright (c) 2017 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
  *
  *
  *	Contributors:
+ *      Vincent Deliencourt <deliencourt@ingenuity.io>
+ *      Alexandre Lemort    <lemort@ingenuity.io>
  *
  */
 
@@ -19,8 +20,6 @@
 #include <QtQml>
 #include <QQmlEngine>
 #include <QJSEngine>
-
-#include "I2PropertyHelpers.h"
 
 
 
@@ -46,11 +45,13 @@ public:
       */
     ~MasticEditorUtils();
 
+
     /**
       * @brief Create a directory if it does not exist
       * @param directoryPath
       */
     static void createDirectoryIfNotExist(QString directoryPath);
+
 
     /**
      * @brief Get (and create if needed) the root path of our application
@@ -59,12 +60,14 @@ public:
      */
     static QString getRootPath();
 
+
     /**
      * @brief Get (and create if needed) the settings path of our application
      * "[DocumentsLocation]/MASTIC/settings/"
      * @return
      */
     static QString getSettingsPath();
+
 
     /**
      * @brief Get (and create if needed) the data path of our application
@@ -73,12 +76,14 @@ public:
      */
     static QString getDataPath();
 
+
     /**
      * @brief Get (and create if needed) the snapshots path of our application
      * "[DocumentsLocation]/MASTIC/snapshots/"
      * @return
      */
     static QString getSnapshotsPath();
+
 
     /**
      * @brief Get (and create if needed) the agents definitions path of our application
@@ -87,16 +92,14 @@ public:
      */
     static QString getAgentsDefinitionsPath();
 
-Q_SIGNALS:
-
-
-public Q_SLOTS:
-
 
 protected:
-
-
-
+    /**
+     * @brief Get (and create if needed) the fullpath of a given sub-directory
+     * @param subDirectory
+     * @return
+     */
+    static QString _getSubDirectoryPath(QString subDirectory);
 };
 
 QML_DECLARE_TYPE(MasticEditorUtils)

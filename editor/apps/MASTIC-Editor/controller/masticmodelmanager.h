@@ -37,6 +37,10 @@ class MasticModelManager : public QObject
 
 
 public:
+    /**
+     * @brief Default constructor
+     * @param parent
+     */
     explicit MasticModelManager(QObject *parent = nullptr);
 
 
@@ -45,9 +49,9 @@ public:
      */
     ~MasticModelManager();
 
-signals:
+Q_SIGNALS:
 
-public slots:
+public Q_SLOTS:
 
 private:
     // Helper to manage JSON definitions of agents

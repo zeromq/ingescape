@@ -90,7 +90,7 @@ public:
      static QObject* qmlSingleton(QQmlEngine* engine, QJSEngine* scriptEngine);
 
 
-public slots:
+public Q_SLOTS:
 
      /**
       * @brief Method used to force the creation of our singleton from QML

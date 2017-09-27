@@ -9,15 +9,25 @@
  *
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
+ *      Alexandre Lemort   <lemort@ingenuity.io>
  *
  */
 
 #include "masticmodelmanager.h"
 
+#include <QQmlEngine>
+#include <QDebug>
+
 #include <I2Quick.h>
 
 #include <QJsonDocument>
 
+
+
+/**
+ * @brief Default constructor
+ * @param parent
+ */
 MasticModelManager::MasticModelManager(QObject *parent) : QObject(parent)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
@@ -67,22 +77,28 @@ MasticModelManager::MasticModelManager(QObject *parent) : QObject(parent)
 
                 jsonFile.close();
             }
-            else {
+            else
+            {
                 qCritical() << "Can not open file" << fileInfo.absoluteFilePath();
             }
         }
     }
 
 
-    // Traverse the list of models of agents
-    foreach (AgentM* agentM, _allAgentsModel) {
-        if (agentM != NULL) {
+    //
+    // Build a view model for each agent
+    //
+    QList<AgentVM*> listOfAgentVMs;
+    foreach (AgentM* agentM, _allAgentsModel)
+    {
+        if (agentM != NULL)
+        {
             // Create a VM for each model of agent
             AgentVM* agentVM = new AgentVM(agentM);
-
-            _allAgentsVM.append(agentVM);
+            listOfAgentVMs.append(agentVM);
         }
     }
+    _allAgentsVM.append(listOfAgentVMs);
 }
 
 

@@ -11,5 +11,6 @@
         <file>qml/agent/AgentDefinitionEditor.qml</file>
         <file>qml/AgentsMapping.qml</file>
         <file>resources/images/agentsmapping-background-tile.jpg</file>
+        <file>qml/misc/SeamlessGrid.qml</file>
     </qresource>
 </RCC>

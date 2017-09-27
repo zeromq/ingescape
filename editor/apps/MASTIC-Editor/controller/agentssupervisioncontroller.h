@@ -9,6 +9,7 @@
  *
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
+ *      Alexandre Lemort   <lemort@ingenuity.io>
  *
  */
 
@@ -32,6 +33,11 @@ class AgentsSupervisionController : public QObject
     //I2_QOBJECT_SORTFILTERPROXY(AgentVM, agentsList)
 
 public:
+    /**
+     * @brief Default constructor
+     * @param modelManager
+     * @param parent
+     */
     explicit AgentsSupervisionController(MasticModelManager* modelManager, QObject *parent = nullptr);
 
 
@@ -40,9 +46,9 @@ public:
      */
     ~AgentsSupervisionController();
 
-signals:
+Q_SIGNALS:
 
-public slots:
+public Q_SLOTS:
 
 private:
     // Usefull to save it
