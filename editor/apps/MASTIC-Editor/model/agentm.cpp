@@ -9,11 +9,21 @@
  *
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
+ *      Alexandre Lemort   <lemort@ingenuity.io>
  *
  */
 
 #include "agentm.h"
 
+#include <QQmlEngine>
+#include <QDebug>
+
+
+
+/**
+ * @brief Default constructor
+ * @param parent
+ */
 AgentM::AgentM(QObject *parent) : QObject(parent),
     _name(""),
     _networkDevice(""),
