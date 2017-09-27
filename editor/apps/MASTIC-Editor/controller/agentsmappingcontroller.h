@@ -9,6 +9,7 @@
  *
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
+ *      Alexandre Lemort   <lemort@ingenuity.io>
  *
  */
 
@@ -20,6 +21,7 @@
 
 #include <controller/masticmodelmanager.h>
 
+
 /**
  * @brief The AgentsMappingController class defines the controller for agents mapping
  */
@@ -28,6 +30,11 @@ class AgentsMappingController : public QObject
     Q_OBJECT
 
 public:
+    /**
+     * @brief Default constructor
+     * @param modelManager
+     * @param parent
+     */
     explicit AgentsMappingController(MasticModelManager* modelManager, QObject *parent = nullptr);
 
 
@@ -36,9 +43,9 @@ public:
      */
     ~AgentsMappingController();
 
-signals:
+Q_SIGNALS:
 
-public slots:
+public Q_SLOTS:
 
 private:
     // Usefull to save it

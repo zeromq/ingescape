@@ -1,19 +1,21 @@
 /*
  *	MasticEditorUtils
  *
- *  Copyright (c) 2016-2017 Ingenuity i/o. All rights reserved.
+ *  Copyright (c) 2017 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
  *
  *
  *	Contributors:
+ *      Vincent Deliencourt <deliencourt@ingenuity.io>
+ *      Alexandre Lemort    <lemort@ingenuity.io>
  *
  */
 
 #include "masticeditorutils.h"
 
-
+#include <QQmlEngine>
 #include <QDebug>
 
 
@@ -33,7 +35,6 @@ MasticEditorUtils::MasticEditorUtils(QObject *parent) : QObject(parent)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
-
 }
 
 
@@ -43,6 +44,7 @@ MasticEditorUtils::MasticEditorUtils(QObject *parent) : QObject(parent)
 MasticEditorUtils::~MasticEditorUtils()
 {
 }
+
 
 /**
   * @brief Create a directory if it does not exist
@@ -61,13 +63,15 @@ void MasticEditorUtils::createDirectoryIfNotExist(QString directoryPath)
         //     to identify permission issues
         if (!dir.exists())
         {
-            if (!dir.mkpath(".")) {
+            if (!dir.mkpath("."))
+            {
                 qCritical() << "ERROR: could not create directory at '" << directoryPath << "' !";
                 qFatal("ERROR: could not create directory");
             }
         }
     }
 }
+
 
 /**
  * @brief Get (and create if needed) the root path of our application
@@ -76,24 +80,25 @@ void MasticEditorUtils::createDirectoryIfNotExist(QString directoryPath)
  */
 QString MasticEditorUtils::getRootPath()
 {
-    static QString RootDirectoryPath;
+    static QString rootDirectoryPath;
 
-    if (RootDirectoryPath.isEmpty())
+    if (rootDirectoryPath.isEmpty())
     {
         QStringList documentsLocation = QStandardPaths::standardLocations(QStandardPaths::DocumentsLocation);
         if (documentsLocation.count() > 0)
         {
             QString documentsDirectoryPath = documentsLocation.first();
 
-            RootDirectoryPath = QString("%1%2MASTIC").arg(documentsDirectoryPath, QDir::separator());
+            rootDirectoryPath = QString("%1%2MASTIC").arg(documentsDirectoryPath, QDir::separator());
 
             // Create a directory if it does not exist
-            MasticEditorUtils::createDirectoryIfNotExist(RootDirectoryPath);
+            MasticEditorUtils::createDirectoryIfNotExist(rootDirectoryPath);
         }
     }
 
-    return RootDirectoryPath;
+    return rootDirectoryPath;
 }
+
 
 /**
  * @brief Get (and create if needed) the settings path of our application
@@ -102,12 +107,7 @@ QString MasticEditorUtils::getRootPath()
  */
 QString MasticEditorUtils::getSettingsPath()
 {
-    QString settingsDirectoryPath = QString("%1%2Settings%2").arg(MasticEditorUtils::getRootPath(), QDir::separator());
-
-    // Create a directory if it does not exist
-    MasticEditorUtils::createDirectoryIfNotExist(settingsDirectoryPath);
-
-    return settingsDirectoryPath;
+    return MasticEditorUtils::_getSubDirectoryPath("Settings");
 }
 
 
@@ -118,13 +118,9 @@ QString MasticEditorUtils::getSettingsPath()
  */
 QString MasticEditorUtils::getDataPath()
 {
-    QString resourcesDirectoryPath = QString("%1%2Data%2").arg(MasticEditorUtils::getRootPath(), QDir::separator());
-
-    // Create a directory if it does not exist
-    MasticEditorUtils::createDirectoryIfNotExist(resourcesDirectoryPath);
-
-    return resourcesDirectoryPath;
+    return MasticEditorUtils::_getSubDirectoryPath("Data");
 }
+
 
 /**
  * @brief Get (and create if needed) the snapshots path of our application
@@ -133,13 +129,9 @@ QString MasticEditorUtils::getDataPath()
  */
 QString MasticEditorUtils::getSnapshotsPath()
 {
-    QString snapshotsDirectoryPath = QString("%1%2Snapshots%2").arg(MasticEditorUtils::getRootPath(), QDir::separator());
-
-    // Create a directory if it does not exist
-    MasticEditorUtils::createDirectoryIfNotExist(snapshotsDirectoryPath);
-
-    return snapshotsDirectoryPath;
+    return MasticEditorUtils::_getSubDirectoryPath("Snapshots");
 }
+
 
 /**
  * @brief Get (and create if needed) the agents definitions path of our application
@@ -148,12 +140,22 @@ QString MasticEditorUtils::getSnapshotsPath()
  */
 QString MasticEditorUtils::getAgentsDefinitionsPath()
 {
-    QString snapshotsDirectoryPath = QString("%1%2AgentsDefinitions%2").arg(MasticEditorUtils::getRootPath(), QDir::separator());
-
-    // Create a directory if it does not exist
-    MasticEditorUtils::createDirectoryIfNotExist(snapshotsDirectoryPath);
-
-    return snapshotsDirectoryPath;
+    return MasticEditorUtils::_getSubDirectoryPath("AgentsDefinitions");
 }
 
 
+
+/**
+ * @brief Get (and create if needed) the fullpath of a given sub-directory
+ * @param subDirectory
+ * @return
+ */
+QString MasticEditorUtils::_getSubDirectoryPath(QString subDirectory)
+{
+    QString subDirectoryPath = QString("%1%2%3%2").arg(MasticEditorUtils::getRootPath(), QDir::separator(), subDirectory);
+
+    // Create this directory if it does not exist
+    MasticEditorUtils::createDirectoryIfNotExist(subDirectoryPath);
+
+    return subDirectoryPath;
+}
