@@ -78,8 +78,9 @@ bool isWholeAgentMuted = false;
 
 //global parameters
 //prefixes for sending definitions and mappings through zyre
-static const char *definitionPrefix = "DEFINITION#";
-static const char *mappingPrefix = "MAPPING#";
+static const char *definitionPrefix = "EXTERNAL_DEFINITION#";
+static const char *loadMappingPrefix = "LOAD_THIS_MAPPING#";
+static const char *loadDefinitionPrefix = "LOAD_THIS_DEFINITION#";
 #define CHANNEL "MASTIC_PRIVATE"
 #define AGENT_NAME_LENGTH 256
 char agentName[AGENT_NAME_LENGTH] = AGENT_NAME_DEFAULT;
@@ -438,7 +439,7 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
         } else if(streq (event, "WHISPER")){
             char *message = zmsg_popstr (msg);
             
-            //check if message is a definition
+            //check if message is an EXTERNAL definition
             if(strlen(message) > strlen(definitionPrefix) && strncmp (message, definitionPrefix, strlen(definitionPrefix)) == 0)
             {
                 // Extract definition from message
@@ -470,22 +471,36 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 }
                 free(strDefinition);
             }
-            //check if message is mapping
-            else if (strlen(message) > strlen(mappingPrefix) && strncmp (message, mappingPrefix, strlen(mappingPrefix)) == 0)
+            //check if message is DEFINITION TO BE LOADED
+            else if (strlen(message) > strlen(loadDefinitionPrefix) && strncmp (message, loadDefinitionPrefix, strlen(loadDefinitionPrefix)) == 0)
+            {
+                // Extract definition from message
+                char* strDefinition = calloc(strlen(message)- strlen(definitionPrefix)+1, sizeof(char));
+                memcpy(strDefinition, &message[strlen(definitionPrefix)], strlen(message)- strlen(definitionPrefix));
+                strDefinition[strlen(message)- strlen(definitionPrefix)] = '\0';
+                
+                //load definition
+                mtic_loadDefinition(strDefinition);
+                free(strDefinition);
+                
+            }
+            //check if message is MAPPING TO BE LOADED
+            else if (strlen(message) > strlen(loadMappingPrefix) && strncmp (message, loadMappingPrefix, strlen(loadMappingPrefix)) == 0)
             {
                 // Extract mapping from message
                 char* strMapping = calloc(strlen(message)- strlen(definitionPrefix)+1, sizeof(char));
-                memcpy(strMapping, &message[strlen(mappingPrefix)], strlen(message)- strlen(mappingPrefix));
-                strMapping[strlen(message)- strlen(mappingPrefix)] = '\0';
+                memcpy(strMapping, &message[strlen(loadMappingPrefix)], strlen(message)- strlen(loadMappingPrefix));
+                strMapping[strlen(message)- strlen(loadMappingPrefix)] = '\0';
                 
                 // Load definition from string content
                 mtic_my_agent_mapping = parser_LoadMap(strMapping);
+                free(strMapping);
                 
                 //TODO: activate mapping dynamically
                 
             }else{
                 //other supported messages
-                if (strncmp (message, "MAPPED", strlen("MAPPED")) == 0){
+                if (strlen("MAPPED") == strlen(message) && strncmp (message, "MAPPED", strlen("MAPPED")) == 0){
                     mtic_debug("Mapping notification received from %s\n", name);
                     //TODO: optimize to rewrite only outputs actually involved in the mapping
                     long nbOutputs = 0;
@@ -503,6 +518,40 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                         }
                     }
                     free(outputsList);
+                }else if (strlen("CLEAR_MAPPING") == strlen(message) && strncmp (message, "CLEAR_MAPPING", strlen("CLEAR_MAPPING")) == 0){
+                    mtic_clearMapping();
+                }else if (strlen("FREEZE") == strlen(message) && strncmp (message, "FREEZE", strlen("FREEZE")) == 0){
+                    mtic_freeze();
+                }else if (strlen("UNFREEZE") == strlen(message) && strncmp (message, "UNFREEZE", strlen("UNFREEZE")) == 0){
+                    mtic_unfreeze();
+                }else if (strlen("MUTE_ALL") == strlen(message) && strncmp (message, "MUTE_ALL", strlen("MUTE_ALL")) == 0){
+                    mtic_mute();
+                }else if (strlen("UNMUTE_ALL") == strlen(message) && strncmp (message, "UNMUTE_ALL", strlen("UNMUTE_ALL")) == 0){
+                    mtic_unmute();
+                }else if ((strncmp (message, "MUTE", strlen("MUTE")) == 0) && (strlen(message) > strlen("MUTE")+1)){
+                    char *subStr = message + strlen("MUTE") + 1;
+                    mtic_muteOutput(subStr);
+                }else if ((strncmp (message, "UNMUTE", strlen("UNMUTE")) == 0) && (strlen(message) > strlen("UNMUTE")+1)){
+                    char *subStr = message + strlen("UNMUTE") + 1;
+                    mtic_unmuteOutput(subStr);
+                }else if ((strncmp (message, "MAP", strlen("MAP")) == 0) && (strlen(message) > strlen("MAP")+1)){
+                    char *subStr = message + strlen("MAP") + 1;
+                    char *input, *agent, *output;
+                    input = strtok (subStr," ");
+                    agent = strtok (NULL," ");
+                    output = strtok (NULL," ");
+                    if (input != NULL && agent != NULL && output != NULL){
+                        mtic_addMappingEntry(input, agent, output);
+                    }
+                }else if ((strncmp (message, "UNMAP", strlen("UNMAP")) == 0) && (strlen(message) > strlen("UNMAP")+1)){
+                    char *subStr = message + strlen("UNMAP") + 1;
+                    char *input, *agent, *output;
+                    input = strtok (subStr," ");
+                    agent = strtok (NULL," ");
+                    output = strtok (NULL," ");
+                    if (input != NULL && agent != NULL && output != NULL){
+                        mtic_removeMappingEntryWithName(input, agent, output);
+                    }
                 }
             }
             free(message);
@@ -1218,7 +1267,7 @@ int mtic_freeze(){
     {
         mtic_debug("Agent Frozen\n");
         if (agentElements != NULL && agentElements->node != NULL){
-            zyre_shouts(agentElements->node, CHANNEL, "Freeze=ON");
+            zyre_shouts(agentElements->node, CHANNEL, "FREEZE=ON");
         }
         isFrozen = true;
         freezeCallback_t *elt;
@@ -1251,7 +1300,7 @@ int mtic_unfreeze(){
     {
         mtic_debug("Agent resumed\n");
         if (agentElements != NULL && agentElements->node != NULL){
-            zyre_shouts(agentElements->node, CHANNEL, "Freeze=OFF");
+            zyre_shouts(agentElements->node, CHANNEL, "FREEZE=OFF");
         }
         isFrozen = false;
         freezeCallback_t *elt;
@@ -1349,6 +1398,12 @@ bool mtic_getVerbose (){
  */
 void mtic_setCanBeFrozen (bool canBeFrozen){
     agentCanBeFrozen = canBeFrozen;
+    if (agentElements != NULL && agentElements->node != NULL){
+        //update header for information to agents not arrived yet
+        zyre_set_header(agentElements->node, "canBeFrozen", "%i", agentCanBeFrozen);
+        //send real time notification for agents already there
+        zyre_shouts(agentElements->node, CHANNEL, "CANBEFROZEN=%i", canBeFrozen);
+    }
 }
 
 /**
