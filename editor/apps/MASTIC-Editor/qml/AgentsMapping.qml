@@ -21,7 +21,8 @@ import I2Quick 1.0
 
 import MASTIC 1.0
 
-
+// misc sub-directory
+import "misc" as Misc
 
 
 Item {
@@ -61,10 +62,18 @@ Item {
 
 
         //
-        // Seamless background
+        // Seamless background (bitmap version)
         //
+        // Pros:
+        //  - work with any tile pattern
+        //  - lightweight (mostly GPU)
+        //
+        // Cons:
+        //  - hard to perform a good looking zoom (scaling artifacts)
+        //
+        /*
         Image {
-            id: seamlessBackground
+            id: seamlessBackgroundBitmap
 
             width: content.width + sourceSize.width
             height: content.height + sourceSize.height
@@ -79,32 +88,101 @@ Item {
             x: ((workspace.x % sourceSize.width) + sourceSize.width) % sourceSize.width - sourceSize.width
             y: ((workspace.y % sourceSize.height) + sourceSize.height) % sourceSize.height - sourceSize.height
         }
-
+        */
 
 
         //
-        // Background interaction
+        // Seamless background (vector version)
         //
-        MouseArea {
+        // Pros:
+        //  - pan and zoom
+        //
+        // Cons:
+        //  - grid pattern only (ah-hoc look)
+        //  - heavier processing load (scale only because items are created/deleted)
+        //
+        Rectangle {
+            id: seamlessBackgroundVector
+
             anchors.fill: parent
 
-            drag.target: workspace
+            color: "#282C34"
+
+            Misc.SeamlessGrid {
+                anchors.fill: parent
+
+                offsetX: workspace.x
+                offsetY: workspace.y
+
+                cellSize: 150 * workspace.scale
+                numberOfSubCells: 5
+            }
+        }
 
 
+
+
+        //
+        // Workspace background interaction: pan & zoom
+        //
+        PinchArea {
+            anchors.fill: parent
+
+            pinch.target: workspace
+            pinch.minimumScale: 0.25
+            pinch.maximumScale: 4
+
+            MouseArea {
+                anchors.fill: parent
+
+                drag.target: workspace
+            }
+
+
+
+            //-----------------------------------------------
             //
-            // Workspace
+            // Workspace: nodes and links will be added here
             //
+            //-----------------------------------------------
             Item {
                 id: workspace
 
+                transformOrigin: Item.TopLeft
+
                 width: parent.width
                 height: parent.height
+
+
+
+                //------------------------------------------------
+                //
+                // Pseudo content to test pan & zoom, DnD, links
+                //
+                //------------------------------------------------
+
 
                 // Minimum length of control handle
                 readonly property real controlHandleMinLength: 20;
 
                 // Maximum Z-index
                 property int maxZ: 0
+
+                // Links
+                property int linkWidth: 4
+                property int linkFuzzyRadius: 4
+                property color linkColor: "#ffffff"
+                property color linkHoverColor: "firebrick"
+
+                // Slots
+                property color inletColor: "#0CB8FF"
+                property color outletColor: "#ff9933"
+
+                // Node
+                property color nodeColor: "#17191F"
+                property color nodeCollapsedColor: "darkkhaki"
+                property color nodeBorderColor: "#939CAA"
+                property color nodeSelectedBorderColor: "#ffffff"
 
 
                 //
@@ -139,8 +217,6 @@ Item {
                         secondControlPoint = Qt.point(secondPoint.x - offsetX, secondPoint.y - offsetY );
                     }
 
-                    strokeWidth: 6
-
                     firstPoint: Qt.point(item1.x + item1NodeOut.x + item1NodeOut.width/2, item1.y + item1NodeOut.y + item1NodeOut.height/2)
 
                     secondPoint: Qt.point(item3.x + item3NodeIn1.x + item3NodeIn1.width/2, item3.y + item3NodeIn1.y + item3NodeIn1.height/2)
@@ -149,10 +225,11 @@ Item {
                     onSecondPointChanged: updateControlPoints();
                     Component.onCompleted: updateControlPoints();
 
-                    stroke: (mouseAreaLink1.pressed) ? "firebrick" : "midnightblue"
+                    stroke: (mouseAreaLink1.pressed) ? workspace.linkHoverColor : workspace.linkColor
+                    strokeWidth: workspace.linkWidth
 
-                    fuzzyColor: "yellow"
-                    fuzzyRadius: (mouseAreaLink1.containsMouse) ? 5 : 0
+                    fuzzyColor: workspace.linkHoverColor
+                    fuzzyRadius: (mouseAreaLink1.containsMouse) ? workspace.linkFuzzyRadius : 0
 
                     // Clip:true to clip our mousearea
                     clip: true
@@ -199,8 +276,6 @@ Item {
                         secondControlPoint = Qt.point(secondPoint.x - offsetX, secondPoint.y - offsetY );
                     }
 
-                    strokeWidth: 6
-
                     firstPoint: Qt.point(item2.x + item2NodeOut.x + item2NodeOut.width/2, item2.y + item2NodeOut.y + item2NodeOut.height/2)
 
                     secondPoint: Qt.point(item3.x + item3NodeIn2.x + item3NodeIn2.width/2, item3.y + item3NodeIn2.y + item3NodeIn2.height/2)
@@ -209,10 +284,12 @@ Item {
                     onSecondPointChanged: updateControlPoints();
                     Component.onCompleted: updateControlPoints();
 
-                    stroke: (mouseAreaLink2.pressed) ? "firebrick" : "midnightblue"
+                    stroke: (mouseAreaLink2.pressed) ? workspace.linkHoverColor : workspace.linkColor
+                    strokeWidth: workspace.linkWidth
 
-                    fuzzyColor: "yellow"
-                    fuzzyRadius: (mouseAreaLink2.containsMouse) ? 5 : 0
+                    fuzzyColor: workspace.linkHoverColor
+                    fuzzyRadius: (mouseAreaLink2.containsMouse) ? workspace.linkFuzzyRadius : 0
+
 
                     // Clip:true to clip our mousearea
                     clip: true
@@ -259,7 +336,6 @@ Item {
                         secondControlPoint = Qt.point(secondPoint.x - offsetX, secondPoint.y - offsetY );
                     }
 
-                    strokeWidth: 6
 
                     firstPoint: Qt.point(item2.x + item2NodeOut.x + item2NodeOut.width/2, item2.y + item2NodeOut.y + item2NodeOut.height/2)
 
@@ -269,10 +345,12 @@ Item {
                     onSecondPointChanged: updateControlPoints();
                     Component.onCompleted: updateControlPoints();
 
-                    stroke: (mouseAreaLink3.pressed) ? "firebrick" : "midnightblue"
+                    stroke: (mouseAreaLink3.pressed) ? workspace.linkHoverColor : workspace.linkColor
+                    strokeWidth: workspace.linkWidth
 
-                    fuzzyColor: "yellow"
-                    fuzzyRadius: (mouseAreaLink3.containsMouse) ? 5 : 0
+                    fuzzyColor: workspace.linkHoverColor
+                    fuzzyRadius: (mouseAreaLink3.containsMouse) ? workspace.linkFuzzyRadius : 0
+
 
                     // Clip:true to clip our mousearea
                     clip: true
@@ -319,7 +397,6 @@ Item {
                         secondControlPoint = Qt.point(secondPoint.x - offsetX, secondPoint.y - offsetY );
                     }
 
-                    strokeWidth: 6
 
                     firstPoint: Qt.point(item3.x + item3NodeOut1.x + item3NodeOut1.width/2, item3.y + item3NodeOut1.y + item3NodeOut1.height/2)
 
@@ -329,10 +406,12 @@ Item {
                     onSecondPointChanged: updateControlPoints();
                     Component.onCompleted: updateControlPoints();
 
-                    stroke: (mouseAreaLink4.pressed) ? "firebrick" : "midnightblue"
+                    stroke: (mouseAreaLink4.pressed) ? workspace.linkHoverColor : workspace.linkColor
+                    strokeWidth: workspace.linkWidth
 
-                    fuzzyColor: "yellow"
-                    fuzzyRadius: (mouseAreaLink4.containsMouse) ? 5 : 0
+                    fuzzyColor: workspace.linkHoverColor
+                    fuzzyRadius: (mouseAreaLink4.containsMouse) ? workspace.linkFuzzyRadius : 0
+
 
                     // Clip:true to clip our mousearea
                     clip: true
@@ -379,7 +458,6 @@ Item {
                         secondControlPoint = Qt.point(secondPoint.x - offsetX, secondPoint.y - offsetY );
                     }
 
-                    strokeWidth: 6
 
                     firstPoint: Qt.point(item3.x + item3NodeOut2.x + item3NodeOut2.width/2, item3.y + item3NodeOut2.y + item3NodeOut2.height/2)
 
@@ -389,10 +467,12 @@ Item {
                     onSecondPointChanged: updateControlPoints();
                     Component.onCompleted: updateControlPoints();
 
-                    stroke: (mouseAreaLink5.pressed) ? "firebrick" : "midnightblue"
+                    stroke: (mouseAreaLink5.pressed) ? workspace.linkHoverColor : workspace.linkColor
+                    strokeWidth: workspace.linkWidth
 
-                    fuzzyColor: "yellow"
-                    fuzzyRadius: (mouseAreaLink5.containsMouse) ? 5 : 0
+                    fuzzyColor: workspace.linkHoverColor
+                    fuzzyRadius: (mouseAreaLink5.containsMouse) ? workspace.linkFuzzyRadius : 0
+
 
                     // Clip:true to clip our mousearea
                     clip: true
@@ -439,8 +519,6 @@ Item {
                         secondControlPoint = Qt.point(secondPoint.x - offsetX, secondPoint.y - offsetY );
                     }
 
-                    strokeWidth: 6
-
                     firstPoint: Qt.point(item4.x + item4NodeOut.x + item4NodeOut.width/2, item4.y + item4NodeOut.y + item4NodeOut.height/2)
 
                     secondPoint: Qt.point(item5.x + item5NodeIn2.x + item5NodeIn2.width/2, item5.y + item5NodeIn2.y + item5NodeIn2.height/2)
@@ -449,10 +527,12 @@ Item {
                     onSecondPointChanged: updateControlPoints();
                     Component.onCompleted: updateControlPoints();
 
-                    stroke: (mouseAreaLink6.pressed) ? "firebrick" : "midnightblue"
+                    stroke: (mouseAreaLink6.pressed) ? workspace.linkHoverColor : workspace.linkColor
+                    strokeWidth: workspace.linkWidth
 
-                    fuzzyColor: "yellow"
-                    fuzzyRadius: (mouseAreaLink6.containsMouse) ? 5 : 0
+                    fuzzyColor: workspace.linkHoverColor
+                    fuzzyRadius: (mouseAreaLink6.containsMouse) ? workspace.linkFuzzyRadius : 0
+
 
                     // Clip:true to clip our mousearea
                     clip: true
@@ -479,11 +559,13 @@ Item {
                     width: 150
                     height: 70
 
-                    radius: 25
+                    color: workspace.nodeColor
+
+                    radius: 8
 
                     border {
                         width: 2
-                        color: mouseArea1.drag.active ? "green" : "black"
+                        color: (mouseArea1.pressed) ? workspace.nodeSelectedBorderColor : workspace.nodeBorderColor
                     }
 
                     Rectangle {
@@ -499,11 +581,21 @@ Item {
                         radius: width/2
 
                         border {
-                            color: "black"
+                            color: workspace.outletColor
                             width: 2
                         }
 
-                        color: "lightsteelblue"
+                        color: workspace.nodeColor
+
+                        Rectangle {
+                            anchors.centerIn: parent
+
+                            width: parent.width - 8
+                            height: width
+                            radius: width/2
+
+                            color: workspace.outletColor
+                        }
                     }
 
 
@@ -533,11 +625,13 @@ Item {
                     width: 150
                     height: 70
 
-                    radius: 25
+                    color: workspace.nodeColor
+
+                    radius: 8
 
                     border {
                         width: 2
-                        color: mouseArea2.drag.active ? "green" : "black"
+                        color: mouseArea2.pressed ? workspace.nodeSelectedBorderColor : workspace.nodeBorderColor
                     }
 
                     Rectangle {
@@ -553,11 +647,21 @@ Item {
                         radius: width/2
 
                         border {
-                            color: "black"
+                            color: workspace.outletColor
                             width: 2
                         }
 
-                        color: "lightsteelblue"
+                        color: workspace.nodeColor
+
+                        Rectangle {
+                            anchors.centerIn: parent
+
+                            width: parent.width - 8
+                            height: width
+                            radius: width/2
+
+                            color: workspace.outletColor
+                        }
                     }
 
 
@@ -590,15 +694,16 @@ Item {
                     width: 150
                     height: (isClosed) ? 75 : 300
 
-                    radius: 25
 
-                    color: (isClosed) ? "darkkhaki" : "white"
+                    color: (isClosed) ? workspace.nodeCollapsedColor : workspace.nodeColor
 
+                    radius: 8
 
                     border {
                         width: 2
-                        color: mouseArea3.drag.active ? "green" : "black"
+                        color: mouseArea3.pressed ? workspace.nodeSelectedBorderColor : workspace.nodeBorderColor
                     }
+
 
                     Behavior on height {
                         NumberAnimation {}
@@ -618,11 +723,21 @@ Item {
                         radius: width/2
 
                         border {
-                            color: "black"
+                            color: workspace.inletColor
                             width: 2
                         }
 
-                        color: (item3.isClosed) ? "darkgreen" : "lightgreen"
+                        color: workspace.nodeColor
+
+                        Rectangle {
+                            anchors.centerIn: parent
+
+                            width: parent.width - 8
+                            height: width
+                            radius: width/2
+
+                            color: workspace.inletColor
+                        }
                     }
 
 
@@ -640,11 +755,21 @@ Item {
                         radius: width/2
 
                         border {
-                            color: "black"
+                            color: workspace.inletColor
                             width: 2
                         }
 
-                        color: (item3.isClosed) ? "darkgreen" : "lightgreen"
+                        color: workspace.nodeColor
+
+                        Rectangle {
+                            anchors.centerIn: parent
+
+                            width: parent.width - 8
+                            height: width
+                            radius: width/2
+
+                            color: workspace.inletColor
+                        }
                     }
 
 
@@ -662,11 +787,21 @@ Item {
                         radius: width/2
 
                         border {
-                            color: "black"
+                            color: workspace.outletColor
                             width: 2
                         }
 
-                        color: (item3.isClosed) ? "steelblue" : "lightsteelblue"
+                        color: workspace.nodeColor
+
+                        Rectangle {
+                            anchors.centerIn: parent
+
+                            width: parent.width - 8
+                            height: width
+                            radius: width/2
+
+                            color: workspace.outletColor
+                        }
                     }
 
 
@@ -684,11 +819,21 @@ Item {
                         radius: width/2
 
                         border {
-                            color: "black"
+                            color: workspace.outletColor
                             width: 2
                         }
 
-                        color: (item3.isClosed) ? "steelblue" : "lightsteelblue"
+                        color: workspace.nodeColor
+
+                        Rectangle {
+                            anchors.centerIn: parent
+
+                            width: parent.width - 8
+                            height: width
+                            radius: width/2
+
+                            color: workspace.outletColor
+                        }
                     }
 
 
@@ -722,11 +867,14 @@ Item {
                     width: 150
                     height: 70
 
-                    radius: 25
+
+                    color: workspace.nodeColor
+
+                    radius: 8
 
                     border {
                         width: 2
-                        color: mouseArea4.drag.active ? "green" : "black"
+                        color: mouseArea4.pressed ? workspace.nodeSelectedBorderColor : workspace.nodeBorderColor
                     }
 
 
@@ -743,11 +891,21 @@ Item {
                         radius: width/2
 
                         border {
-                            color: "black"
+                            color: workspace.inletColor
                             width: 2
                         }
 
-                        color: "lightgreen"
+                        color: workspace.nodeColor
+
+                        Rectangle {
+                            anchors.centerIn: parent
+
+                            width: parent.width - 8
+                            height: width
+                            radius: width/2
+
+                            color: workspace.inletColor
+                        }
                     }
 
                     Rectangle {
@@ -763,11 +921,21 @@ Item {
                         radius: width/2
 
                         border {
-                            color: "black"
+                            color: workspace.outletColor
                             width: 2
                         }
 
-                        color: "lightsteelblue"
+                        color: workspace.nodeColor
+
+                        Rectangle {
+                            anchors.centerIn: parent
+
+                            width: parent.width - 8
+                            height: width
+                            radius: width/2
+
+                            color: workspace.outletColor
+                        }
                     }
 
 
@@ -801,14 +969,15 @@ Item {
                     width: 150
                     height: (isClosed) ? 75 : 150
 
-                    radius: 25
+                    color: (isClosed) ? workspace.nodeCollapsedColor : workspace.nodeColor
 
-                    color: (isClosed) ? "darkkhaki" : "white"
+                    radius: 8
 
                     border {
                         width: 2
-                        color: mouseArea5.drag.active ? "green" : "black"
+                        color: mouseArea5.pressed ? workspace.nodeSelectedBorderColor : workspace.nodeBorderColor
                     }
+
 
                     Behavior on height {
                         NumberAnimation {}
@@ -828,11 +997,21 @@ Item {
                         radius: width/2
 
                         border {
-                            color: "black"
+                            color: workspace.inletColor
                             width: 2
                         }
 
-                        color: (item5.isClosed) ? "darkgreen" : "lightgreen"
+                        color: workspace.nodeColor
+
+                        Rectangle {
+                            anchors.centerIn: parent
+
+                            width: parent.width - 8
+                            height: width
+                            radius: width/2
+
+                            color: workspace.inletColor
+                        }
                     }
 
 
@@ -850,11 +1029,21 @@ Item {
                         radius: width/2
 
                         border {
-                            color: "black"
+                            color: workspace.inletColor
                             width: 2
                         }
 
-                        color: (item5.isClosed) ? "darkgreen" : "lightgreen"
+                        color: workspace.nodeColor
+
+                        Rectangle {
+                            anchors.centerIn: parent
+
+                            width: parent.width - 8
+                            height: width
+                            radius: width/2
+
+                            color: workspace.inletColor
+                        }
                     }
 
                     MouseArea {
@@ -873,6 +1062,9 @@ Item {
                         }
                     }
                 }
+
+
+
             }
         }
     }
