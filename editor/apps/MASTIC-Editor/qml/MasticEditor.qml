@@ -65,10 +65,10 @@ Item {
 
 
     //
-    // Main view
+    // Center panel
     //
     Item {
-        id: mainView
+        id: centerPanel
 
         anchors {
             left: leftPanel.right
@@ -78,8 +78,8 @@ Item {
         }
 
 
-        AgentsMapping {
-            id: agentsMapping
+        AgentsMappingView {
+            id: agentsMappingView
 
             anchors.fill: parent
 

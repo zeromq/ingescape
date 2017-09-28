@@ -9,7 +9,6 @@
  *
  *	Contributors:
  *      Alexandre Lemort   <lemort@ingenuity.io>
- *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *
  */
 
@@ -21,14 +20,13 @@ import I2Quick 1.0
 
 import MASTIC 1.0
 
-// misc sub-directory
-import "misc" as Misc
 
 
 Item {
     id: rootItem
 
     anchors.fill: parent
+
 
     //--------------------------------
     //
@@ -108,7 +106,7 @@ Item {
 
             color: "#282C34"
 
-            Misc.SeamlessGrid {
+            SeamlessGrid {
                 anchors.fill: parent
 
                 offsetX: workspace.x
