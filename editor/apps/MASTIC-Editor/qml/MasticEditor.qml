@@ -106,10 +106,11 @@ Item {
 
         Text {
             anchors.centerIn: parent
-            text: "Bottom Panel"
-            font {
-                pixelSize: 50
-            }
+
+            text: qsTr("Bottom Panel")
+
+            font: MasticTheme.headingFont
+
             color: MasticTheme.whiteColor
         }
     }

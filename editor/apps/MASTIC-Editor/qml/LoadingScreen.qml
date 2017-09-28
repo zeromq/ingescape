@@ -96,11 +96,8 @@ Item {
 
             verticalAlignment: Text.AlignHCenter
 
-            font {
-                //family: SoundSystemTheme.fontFamily
-                pixelSize: 50;
-                weight: Font.Bold
-            }
+            font: MasticTheme.headingFont
+
             color: MasticTheme.whiteColor
         }
     }
@@ -152,11 +149,8 @@ Item {
 
             text: qsTr("MASTIC Editor")
 
-            font {
-                //family: SoundSystemTheme.fontFamily
-                pixelSize: 20
-                weight: Font.Bold
-            }
+            font: MasticTheme.heading2Font
+
             color: MasticTheme.whiteColor
         }
 
@@ -168,12 +162,8 @@ Item {
 
             text: qsTr("Version %1").arg(Qt.application.version)
 
-            font {
-                //family: SoundSystemTheme.fontFamily
-                pixelSize: 20
-                weight: Font.Bold
+            font: MasticTheme.heading2Font
 
-            }
             color: MasticTheme.whiteColor
         }
     }
