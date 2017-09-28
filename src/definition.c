@@ -29,28 +29,31 @@ typedef struct agent_port_t {
 // INTERNAL FUNCTIONS
 ////////////////////////////////////////////////////////////////////////
 
-void definition_freeIOP (agent_iop** agent_iop){
-    
-    if ((*agent_iop)->name != NULL){
-        free((char*)(*agent_iop)->name);
+void definition_freeIOP (agent_iop* agent_iop){
+    if (agent_iop == NULL){
+        return;
     }
     
-    if ((*agent_iop)->value.s != NULL){
-        free((char*)(*agent_iop)->value.s);
+    if ((agent_iop)->name != NULL){
+        free((char*)(agent_iop)->name);
     }
     
-    if ((*agent_iop)->value.data != NULL){
-        free((*agent_iop)->value.data);
+    if ((agent_iop)->value.s != NULL){
+        free((char*)(agent_iop)->value.s);
     }
     
-    if ((*agent_iop)->callbacks != NULL){
+    if ((agent_iop)->value.data != NULL){
+        free((agent_iop)->value.data);
+    }
+    
+    if ((agent_iop)->callbacks != NULL){
         mtic_observe_callback_t *cb;
-        DL_FOREACH((*agent_iop)->callbacks, cb){
+        DL_FOREACH((agent_iop)->callbacks, cb){
             free(cb);
         }
     }
     
-    free((*agent_iop));
+    free(agent_iop);
 }
 
 //bool check_category_agent_iop(agent_iop *ref_iop,
@@ -278,17 +281,17 @@ void definition_freeDefinition (definition* def) {
     }
     HASH_ITER(hh, def->params_table, current_iop, tmp_iop) {
         HASH_DEL(def->params_table,current_iop);
-        definition_freeIOP(&current_iop);
+        definition_freeIOP(current_iop);
         current_iop = NULL;
     }
     HASH_ITER(hh, def->inputs_table, current_iop, tmp_iop) {
         HASH_DEL(def->inputs_table,current_iop);
-        definition_freeIOP(&current_iop);
+        definition_freeIOP(current_iop);
         current_iop = NULL;
     }
     HASH_ITER(hh, def->outputs_table, current_iop, tmp_iop) {
         HASH_DEL(def->outputs_table,current_iop);
-        definition_freeIOP(&current_iop);
+        definition_freeIOP(current_iop);
         current_iop = NULL;
     }
 //    HASH_ITER(hh, def->categories, current_cat, tmp_cat) {
@@ -321,12 +324,17 @@ void definition_freeDefinition (definition* def) {
 int mtic_clearDefinition(){
 
     //Free the structure definition loaded
-    mtic_debug("Clear our definition and initiate en empty one\n");
+    mtic_debug("Clear our definition and initiate an empty one\n");
     if(mtic_internal_definition != NULL){
         definition_freeDefinition(mtic_internal_definition);
     }
     mtic_internal_definition = calloc(1, sizeof(struct definition));
     mtic_internal_definition->name = mtic_getAgentName();
+    mtic_internal_definition->description = NULL;
+    mtic_internal_definition->version = NULL;
+    mtic_internal_definition->params_table = NULL;
+    mtic_internal_definition->inputs_table = NULL;
+    mtic_internal_definition->outputs_table = NULL;
     network_needToSendDefinitionUpdate = true;
     return 1;
 }
@@ -590,7 +598,7 @@ int mtic_removeInput(const char *name){
     HASH_DEL(mtic_internal_definition->inputs_table, iop);
 
     //free Iop
-    definition_freeIOP(&iop);
+    definition_freeIOP(iop);
     network_needToSendDefinitionUpdate = true;
 
     return 1;
@@ -623,7 +631,7 @@ int mtic_removeOutput(const char *name){
     HASH_DEL(mtic_internal_definition->outputs_table, iop);
 
     //free Iop
-    definition_freeIOP(&iop);
+    definition_freeIOP(iop);
     network_needToSendDefinitionUpdate = true;
 
     return 1;
@@ -657,7 +665,7 @@ int mtic_removeParameter(const char *name){
     HASH_DEL(mtic_internal_definition->params_table, iop);
 
     //free Iop
-    definition_freeIOP(&iop);
+    definition_freeIOP(iop);
     network_needToSendDefinitionUpdate = true;
 
     return 1;
