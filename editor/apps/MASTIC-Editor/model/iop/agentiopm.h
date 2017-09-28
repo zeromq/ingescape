@@ -9,6 +9,7 @@
  *
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
+ *      Alexandre Lemort   <lemort@ingenuity.io>
  *
  */
 
@@ -16,7 +17,10 @@
 #define AGENTIOPM_H
 
 #include <QObject>
+#include <QtQml>
+
 #include <I2PropertyHelpers.h>
+
 
 /**
   * Types:
@@ -27,10 +31,12 @@
 I2_ENUM(AgentIOPTypes, INPUT, OUTPUT, PARAMETER)
 
 
+
 /**
   * Type of the value of an Agent Input / Output / Parameter
   */
 I2_ENUM(AgentIOPValueTypes, INTEGER, DOUBLE, STRING, BOOL, IMPULSION, DATA)
+
 
 
 /**
@@ -67,6 +73,10 @@ class AgentIOPM : public QObject
 
 
 public:
+    /**
+     * @brief Default constructor
+     * @param parent
+     */
     explicit AgentIOPM(QObject *parent = nullptr);
 
 
@@ -75,9 +85,9 @@ public:
      */
     ~AgentIOPM();
 
-signals:
+Q_SIGNALS:
 
-public slots:
+public Q_SLOTS:
 };
 
 QML_DECLARE_TYPE(AgentIOPM)

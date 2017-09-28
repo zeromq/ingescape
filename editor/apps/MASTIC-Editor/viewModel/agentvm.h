@@ -9,6 +9,7 @@
  *
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
+ *      Alexandre Lemort   <lemort@ingenuity.io>
  *
  */
 
@@ -16,10 +17,14 @@
 #define AGENTVM_H
 
 #include <QObject>
+#include <QtQml>
+
 #include <I2PropertyHelpers.h>
 
 #include <model/agentm.h>
 #include <viewModel/iop/agentiopvm.h>
+
+
 
 /**
  * @brief The AgentVM class defines a view model of agent
@@ -52,6 +57,11 @@ class AgentVM : public QObject
 
 
 public:
+    /**
+     * @brief Default constructor
+     * @param model
+     * @param parent
+     */
     explicit AgentVM(AgentM* model, QObject *parent = nullptr);
 
 
@@ -60,9 +70,9 @@ public:
      */
     ~AgentVM();
 
-signals:
+Q_SIGNALS:
 
-public slots:
+public Q_SLOTS:
 };
 
 QML_DECLARE_TYPE(AgentVM)
