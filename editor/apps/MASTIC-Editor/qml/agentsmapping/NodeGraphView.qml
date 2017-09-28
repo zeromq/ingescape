@@ -104,7 +104,7 @@ Item {
 
             anchors.fill: parent
 
-            color: "#282C34"
+            color: MasticTheme.agentsMappingBackgroundColor
 
             SeamlessGrid {
                 anchors.fill: parent
@@ -113,7 +113,10 @@ Item {
                 offsetY: workspace.y
 
                 cellSize: 150 * workspace.scale
-                numberOfSubCells: 5
+                numberOfSubDivisions: 5
+
+                cellStroke: MasticTheme.agentsMappingGridLineColor
+                subCellStroke: MasticTheme.agentsMappingGridSublineColor
             }
         }
 
@@ -126,9 +129,12 @@ Item {
         PinchArea {
             anchors.fill: parent
 
-            pinch.target: workspace
-            pinch.minimumScale: 0.25
-            pinch.maximumScale: 4
+            pinch {
+                target: workspace
+
+                minimumScale: 0.25
+                maximumScale: 4
+            }
 
             MouseArea {
                 anchors.fill: parent
@@ -175,6 +181,10 @@ Item {
                 property color nodeSelectedBorderColor: "#ffffff"
 
 
+                //----------------------------------------
+                // TODO: replace with a Repeater
+                //       model: list of LinkVM
+
                 //
                 // Link between [item1, nodeOut] and [item3, nodein1]
                 //
@@ -184,6 +194,8 @@ Item {
                     firstPoint: Qt.point(item1.x + item1NodeOut.x + item1NodeOut.width/2, item1.y + item1NodeOut.y + item1NodeOut.height/2)
 
                     secondPoint: Qt.point(item3.x + item3NodeIn1.x + item3NodeIn1.width/2, item3.y + item3NodeIn1.y + item3NodeIn1.height/2)
+
+                    onClicked: console.log("Click on link1")
                 }
 
 
@@ -196,6 +208,8 @@ Item {
                     firstPoint: Qt.point(item2.x + item2NodeOut.x + item2NodeOut.width/2, item2.y + item2NodeOut.y + item2NodeOut.height/2)
 
                     secondPoint: Qt.point(item3.x + item3NodeIn2.x + item3NodeIn2.width/2, item3.y + item3NodeIn2.y + item3NodeIn2.height/2)
+
+                    onClicked: console.log("Click on link2")
                }
 
 
@@ -208,6 +222,8 @@ Item {
                     firstPoint: Qt.point(item2.x + item2NodeOut.x + item2NodeOut.width/2, item2.y + item2NodeOut.y + item2NodeOut.height/2)
 
                     secondPoint: Qt.point(item4.x + item4NodeIn.x + item4NodeIn.width/2, item4.y + item4NodeIn.y + item4NodeIn.height/2)
+
+                     onClicked: console.log("Click on link3")
                 }
 
 
@@ -220,6 +236,8 @@ Item {
                     firstPoint: Qt.point(item3.x + item3NodeOut1.x + item3NodeOut1.width/2, item3.y + item3NodeOut1.y + item3NodeOut1.height/2)
 
                     secondPoint: Qt.point(item5.x + item5NodeIn1.x + item5NodeIn1.width/2, item5.y + item5NodeIn1.y + item5NodeIn1.height/2)
+
+                     onClicked: console.log("Click on link4")
                 }
 
 
@@ -232,6 +250,8 @@ Item {
                     firstPoint: Qt.point(item3.x + item3NodeOut2.x + item3NodeOut2.width/2, item3.y + item3NodeOut2.y + item3NodeOut2.height/2)
 
                     secondPoint: Qt.point(item5.x + item5NodeIn2.x + item5NodeIn2.width/2, item5.y + item5NodeIn2.y + item5NodeIn2.height/2)
+
+                     onClicked: console.log("Click on link5")
                 }
 
 
@@ -244,8 +264,16 @@ Item {
                     firstPoint: Qt.point(item4.x + item4NodeOut.x + item4NodeOut.width/2, item4.y + item4NodeOut.y + item4NodeOut.height/2)
 
                     secondPoint: Qt.point(item5.x + item5NodeIn2.x + item5NodeIn2.width/2, item5.y + item5NodeIn2.y + item5NodeIn2.height/2)
+
+                     onClicked: console.log("Click on link6")
                }
 
+                //----------------------------------------
+
+
+                //----------------------------------------
+                // TODO: replace with a Repeater
+                //       model: list of AgentVM
 
                 //
                 // Item 1
@@ -764,7 +792,7 @@ Item {
                 }
 
 
-
+                //----------------------------------------
             }
         }
     }

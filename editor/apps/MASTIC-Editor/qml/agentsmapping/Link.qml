@@ -65,6 +65,17 @@ I2CubicBezierCurve {
 
     //--------------------------------
     //
+    // Signals
+    //
+    //--------------------------------
+
+    // Emitted when there is a click
+    signal clicked();
+
+
+
+    //--------------------------------
+    //
     // Functions
     //
     //--------------------------------
@@ -135,5 +146,9 @@ I2CubicBezierCurve {
         anchors.fill: parent
 
         hoverEnabled: true
+
+        onClicked: {
+            rootItem.clicked();
+        }
     }
 }

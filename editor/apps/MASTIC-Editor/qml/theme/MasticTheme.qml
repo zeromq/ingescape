@@ -135,6 +135,15 @@ Item {
     //-----------------------------------------
 
     //
+    // Background
+    //
+    readonly property color agentsMappingBackgroundColor: "#282C34"
+    // - grid
+    readonly property color agentsMappingGridLineColor: "#323741"
+    readonly property color agentsMappingGridSublineColor: "#29313A"
+
+
+    //
     // Links
     //
     // - Default state

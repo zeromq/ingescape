@@ -30,11 +30,11 @@ Item {
     // Offset along the Y-axis
     property int offsetY: 0
 
-    // Size of cells
+    // Size of cells (square cells)
     property int cellSize: 100
 
-    // Number of subCells (must be greater or equal to 1)
-    property int numberOfSubCells: 5
+    // Number of subdivisions (must be greater or equal to 1) per axis
+    property int numberOfSubDivisions: 5
 
     // Stroke color of cells
     property color cellStroke: "#323741"
@@ -60,10 +60,10 @@ Item {
     property int _cellSize: Math.max(1, root.cellSize)
 
     // Size of sub-cells
-    property real _subCellSize: (root.numberOfSubCells !== 0) ? root._cellSize/root.numberOfSubCells : 0
+    property real _subCellSize: (root.numberOfSubDivisions !== 0) ? root._cellSize/root.numberOfSubDivisions : 0
 
     // Number of sub-cell lines
-    property int _numberOfSubCellLines: Math.max(0, root.numberOfSubCells - 1)
+    property int _numberOfSubCellLines: Math.max(0, root.numberOfSubDivisions - 1)
 
     // Delta along the X-axis
     property int _deltaX: ((root.offsetX % root._cellSize) + root._cellSize) % root._cellSize - root._cellSize
