@@ -15,585 +15,117 @@
 #include <stdlib.h>
 #include "mastic_private.h"
 
-mapping * mtic_my_agent_mapping = NULL;
+mapping_t* mtic_internal_mapping = NULL;
 
 
 ////////////////////////////////////////////////////////////////////////
 // INTERNAL FUNCTIONS
 ////////////////////////////////////////////////////////////////////////
 
-
-const char * map_state_to_string(map_state state){
-    switch (state) {
-        case ON:
-            return "on";
-            break;
-        case OFF:
-            return "off";
-            break;
-        case INCOMPATIBLE:
-            return "incompatible";
-            break;
-        case GENERIC:
-            return "generic";
-            break;
-        default:
-            fprintf(stderr, "%s - ERROR -  unknown map state type to convert\n", __FUNCTION__);
-            break;
-    }
-
-    return "";
-}
-
-void free_map_out (mapping_out** map_out){
-
-    free((char*)(*map_out)->agent_name);
-    (*map_out)->agent_name = NULL ;
-
-    free((char*)(*map_out)->input_name);
-    (*map_out)->input_name = NULL ;
-
-    free((char*)(*map_out)->output_name);
-    (*map_out)->output_name = NULL ;
-
-    free ((*map_out));
-}
-
-void free_map_cat (mapping_cat** map_cat){
-
-    free((char*)(*map_cat)->agent_name);
-    (*map_cat)->agent_name = NULL ;
-
-    free((char*)(*map_cat)->category_name);
-    (*map_cat)->category_name = NULL ;
-
-    free ((*map_cat));
-}
-
-void mapping_freeMapping (mapping* map) {
-
-    struct mapping_out *current_map_out, *tmp_map_out;
-    struct mapping_cat *current_map_cat, *tmp_map_cat;
-
-    free((char*)map->name);
-    map->name = NULL;
-    free((char*)map->version);
-    map->version = NULL;
-    free((char*)map->description);
-    map->description = NULL;
-
-    //Free mapping output
-    HASH_ITER(hh, map->map_out, current_map_out, tmp_map_out) {
-        HASH_DEL(map->map_out,current_map_out);
-        free_map_out(&current_map_out);
-    }
-
-    //Free mapping category
-    HASH_ITER(hh, map->map_cat, current_map_cat, tmp_map_cat) {
-        HASH_DEL(map->map_cat,current_map_cat);
-        free_map_cat(&current_map_cat);
-    }
-    free(map);
-}
-
-mapping_out * add_map_to_table(char * input_name,
-                               char *agent_name,
-                               char* output_name,
-                               int* report)
+//hash function to convert input + agent + output into a unique long number
+//we use this function to give id value to map_elements in our mapping
+//see http://www.cse.yorku.ca/~oz/hash.html
+unsigned long djb2_hash (unsigned char *str)
 {
+    unsigned long hash = 5381;
+    int c;
     
-    mapping_out * new_map_out = NULL;
-    *report = 0;
+    while ((c = *str++))
+        hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
     
-    //Check in the mapping live table if the mapping already exist and if it's ON
-    if(mtic_my_agent_mapping != NULL){
-        mapping_out * map_out = NULL;
-        
-        for(map_out = mtic_my_agent_mapping->map_out; map_out != NULL && *report == 0; map_out = map_out->hh.next) {
-            if(     (strcmp(map_out->input_name, input_name) == 0) &&
-               (strcmp(map_out->agent_name, agent_name) == 0) &&
-               (strcmp(map_out->output_name, output_name) == 0)
-               ){
-                char map_description[100];
-                strcpy(map_description,"(");
-                strcat(map_description, input_name);
-                strcat(map_description, ",");
-                strcat(map_description, agent_name);
-                strcat(map_description, ".");
-                strcat(map_description,output_name);
-                strcat(map_description,")");
-                
-                fprintf (stderr, "%s : '%s' already exist in the table of mapping live. So it won't be added.\n",
-                         __FUNCTION__,
-                         map_description);
-                
-                new_map_out = map_out;
-                *report = 5;
-            }
-        }
-    }
-    
-    if(*report == 0)
-    {
-        new_map_out = calloc(1, sizeof(mapping_out));
-        new_map_out->input_name = strdup(input_name);
-        new_map_out->agent_name = strdup(agent_name);
-        new_map_out->output_name = strdup(output_name);
-        new_map_out->state = OFF;
-        
-        //Initialize the table mapping if it is not
-        if(mtic_my_agent_mapping == NULL){
-            mtic_my_agent_mapping = calloc (1, sizeof (struct mapping));
-        }
-        //Count actual mapping to define the map_int
-        new_map_out->map_id = 0;
-        new_map_out->map_id = HASH_COUNT(mtic_my_agent_mapping->map_out) + 1;
-        
-        //Add the input -> Agent name & output in the map table
-        HASH_ADD_INT(mtic_my_agent_mapping->map_out, map_id, new_map_out);
-        
-        mtic_debug("Add agent mapping : %s -> %s.%s.\n",new_map_out->input_name,new_map_out->agent_name,new_map_out->output_name);
-    }
-    
-    return new_map_out;
+    return hash;
 }
 
-
-int mtic_map (char* input_name,char* map_description){
+void mapping_freeMappingElement (mapping_element_t* mapElmt){
     
-    int result = 0;
-    agent_iop *input_to_map = NULL;     // the input to map
-    char *agent_to_map_name = NULL;     // the external agent name to map
-    char *output_to_map_name = NULL;   // the output name to map
-    int error_code = -1;
-    
-    //Check if already initialized, and do it if not
-    if(mtic_internal_definition == NULL){
-        mtic_internal_definition = calloc(1, sizeof(struct definition));
-    }
-    
-    //Find the input by the name in the table of the my agent's definition
-    HASH_FIND_STR(mtic_internal_definition->inputs_table, input_name, input_to_map);
-    if(input_to_map == NULL){
-        mtic_debug("%s : input name %s not found \n",
-                   __FUNCTION__,
-                   input_name);
-        return 1;
-    }
-    
-    if(map_description == NULL){
-        mtic_debug ("%s : Map description is NULL \n", __FUNCTION__);
-        return 2;
-    }
-    
-    //Split the map description to : agent name & output name
-    //Split the string of the map description to agent_name & output_name
-    char *token;
-    
-    //Copy the string because she has to be modifiable by the strtok
-    char *copy = strdup(map_description);
-    token = strtok(copy, ".");
-    
-    // Find agent name and output name : ex. 'A2.s1'
-    while( token != NULL )
-    {
-        if(agent_to_map_name == NULL){        //Copy the fist part 'A2'
-            agent_to_map_name = strdup(token);
-        }else if(output_to_map_name == NULL){ //Copy the second part 's1'
-            output_to_map_name = strdup(token);
-        }
-        
-        token = strtok(NULL, ".");
-    }
-    
-    //Free copy after strdup
-    free((char*) copy);
-    copy = NULL;
-    
-    if(agent_to_map_name == NULL){
-        mtic_debug ("%s : agent to map has no name \n", __FUNCTION__);
-        
-        // Clean-up
-        if (output_to_map_name != NULL)
-        {
-            free(output_to_map_name);
-            output_to_map_name = NULL;
-        }
-        
-        return 3;
-    }
-    
-    if(output_to_map_name == NULL){
-        mtic_debug ("%s : agent's output to map has no name  \n", __FUNCTION__);
-        
-        // Clean-up
-        if (agent_to_map_name != NULL)
-        {
-            free(agent_to_map_name);
-            agent_to_map_name = NULL;
-        }
-        
-        return 4;
-    }
-    
-    // New map_out to be created
-    mapping_out * new_map = NULL;
-    
-    //Find if the map is in table mapping & Add the map in the table mapping
-    new_map = add_map_to_table(input_name,agent_to_map_name,output_to_map_name,&error_code);
-    
-    if(new_map != NULL)
-    {
-        if((error_code == 0 || error_code == 5) && new_map->state == OFF)
-        {
-            network_checkAndSubscribeToPublisher(agent_to_map_name);
-        } else {
-            result = error_code;
-        }
-    } else {
-        result = error_code;
-    }
-    
-    free(agent_to_map_name);
-    agent_to_map_name = NULL;
-    free(output_to_map_name);
-    output_to_map_name = NULL;
-    
-    
-    return result;
-}
-
-
-void copy_to_map_global(mapping *loaded){
-    if(loaded == NULL)
+    if (mapElmt == NULL){
         return;
-
-    /*
-     * General Information
-     *
-     */
-    //Initialize the table mapping if it is not
-    if(mtic_my_agent_mapping == NULL){
-        mtic_my_agent_mapping = calloc (1, sizeof (struct mapping));
     }
-    if(mtic_my_agent_mapping->name) {
-        free((char*)mtic_my_agent_mapping->name);
-        mtic_my_agent_mapping->name = NULL;
+    if (mapElmt->input_name != NULL){
+        free(mapElmt->input_name);
     }
-    if(mtic_my_agent_mapping->description) {
-        free((char*)mtic_my_agent_mapping->description);
-        mtic_my_agent_mapping->description = NULL;
+    if (mapElmt->agent_name != NULL){
+        free(mapElmt->agent_name);
     }
-    if(mtic_my_agent_mapping->version) {
-        free((char*)mtic_my_agent_mapping->version);
-        mtic_my_agent_mapping->version = NULL;
+    if (mapElmt->output_name != NULL){
+        free(mapElmt->output_name);
     }
-
-    mtic_my_agent_mapping->name = strdup(loaded->name);
-    mtic_my_agent_mapping->description = strdup(loaded->description);
-    mtic_my_agent_mapping->version = strdup(loaded->version);
-
-    /*
-     * Mapping output
-     *
-     */
-    mapping_out *temp;
-    char map_description[100];
-    char out_name[100];
-    for(temp = loaded->map_out; temp != NULL; temp = temp->hh.next) {
-
-        //Create map_description
-        strcpy(map_description ,temp->agent_name);
-        strcat(map_description, ".");//separator
-        strcpy(out_name,temp->output_name);
-        strcat(map_description, out_name);
-
-        //mtic_map
-        mtic_map(temp->input_name,map_description);
-    }
+    free(mapElmt);
 }
 
-
-int split_map_description(char* map_description,
-                          char * agent_name,
-                          char * output_name){
-    //Split the string of the map description to agent_name & output_name
-    char *token;
-    char *temp_agent_name = NULL;
-    char *temp_output_name = NULL;
-
-    //Copy the string because she has to be modifiable by the strtok
-    char *copy = strdup(map_description);
-    token = strtok(copy, ".");
-
-    // Find agent name and output name : ex. 'A2.s1'
-    while( token != NULL )
-    {
-        if(agent_name == NULL){        //Copy the fist part 'A2'
-            temp_agent_name = strdup(token);
-        }else if(output_name == NULL){ //Copy the second part 's1'
-            temp_output_name = strdup(token);
-        }
-
-        token = strtok(NULL, ".");
-    }
-
-    if (temp_agent_name)
-        agent_name = temp_agent_name;
-    else {
-        fprintf (stderr, "%s : agent to map has no name \n", __FUNCTION__);
-        free((char*) copy);
-        copy = NULL;
-        if (output_name != NULL)
-        {
-            free(output_name);
-            output_name = NULL;
-        }
-        return 3;
-    }
-
-    if(temp_output_name)
-        output_name = temp_output_name;
-    else {
-        fprintf (stderr, "%s : agent's output to map has no name  \n", __FUNCTION__);
-        free((char*) copy);
-        copy = NULL;
-        if (agent_name != NULL)
-        {
-            free(agent_name);
-            agent_name = NULL;
-        }
-        return 4;
-    }
-
-    //Free copy after strdup
-    free((char*) copy);
-    copy = NULL;
-
-
-
-    //Return OK
-    return 0;
-}
-
-bool mtic_map_category (char* map_description){
-    return false;
-}
-
-bool check_iop_type(char * input_name,
-                    agent_iop* output){
-
-    agent_iop * input = NULL;
-    HASH_FIND_STR(mtic_internal_definition->inputs_table,input_name,input);
-
-    if(input == NULL)
-        return false;
-
-    //Check if the type iop (input -> output) is correct
-    if(input->value_type != output->value_type){
-        fprintf (stderr, "%s : Incompatibility of the type between input named :'%s' & output named : '%s' \n",
-                 __FUNCTION__,
-                 input->name,
-                 output->name);
-
-        return false;
-    }
-
-    return true;
-}
-
-mapping_out * mtic_find_map(char * input_name,
-                       char * agent_name,
-                       char * output_name){
-    mapping_out *temp = NULL;
-    for(temp = mtic_my_agent_mapping->map_out; temp != NULL; temp = temp->hh.next) {
-        if((strcmp(input_name, temp->input_name) == 0) &&
-           (strcmp(agent_name, temp->agent_name) == 0) &&
-           (strcmp(output_name, temp->output_name) == 0)){
-            return temp;
-        }
-    }
-    return NULL;
-}
-
-agent_iop*  mtic_update_mapping_out_state(mapping_out* map_out, definition * external_definition)
-{
-    agent_iop* outputFound = NULL;
-    
-    // If the dinition  and the map_out object are defined
-    if(external_definition != NULL && map_out != NULL)
-    {
-        HASH_FIND_STR(external_definition->outputs_table,map_out->output_name,outputFound);
-        
-        //Check if the output exist
-        if(outputFound != NULL){
-            
-            if((check_iop_type(map_out->input_name, outputFound) == true)){
-                map_out->state = ON;
-            }else{
-                map_out->state = INCOMPATIBLE;
-            }
-        }else{
-            printf("Could not find output %s in %s definition\n", map_out->output_name, map_out->agent_name);
-        }
-    }else{
-        printf("%s : one of the arguments is NULL\n", __FUNCTION__);
-    }
-    
-    return outputFound;
-}
-
-
+//void free_map_cat (mapping_cat** map_cat){
+//
+//    free((char*)(*map_cat)->agent_name);
+//    (*map_cat)->agent_name = NULL ;
+//
+//    free((char*)(*map_cat)->category_name);
+//    (*map_cat)->category_name = NULL ;
+//
+//    free ((*map_cat));
+//}
 
 ////////////////////////////////////////////////////////////////////////
 // PRIVATE API
 ////////////////////////////////////////////////////////////////////////
-agent_iop* mapping_check_map(definition *definition){
-    agent_iop *outputs = NULL;
-    
-    // If my agent_mapping has been created
-    if(mtic_my_agent_mapping != NULL)
-    {
-        //Check if the agent definition is involved in our mapping
-        char * agent_to_map_name = NULL;
-        agent_to_map_name = strdup(definition->name);
-        
-        if(agent_to_map_name == NULL)
-            return NULL;
-        
-        //Find the mapping
-        mapping_out *temp;
-        mapping_out *current_map;
-        
-        for(temp = mtic_my_agent_mapping->map_out; temp != NULL; temp = temp->hh.next) {
-            if((strcmp(agent_to_map_name, temp->agent_name) == 0) ||
-               (strcmp("*", temp->agent_name) == 0)){
-                current_map = NULL;
-                
-                //NB : maybe add the current agent has new mapping if '*'
-                //if it's not already in the table
-                //As that we have a table updated with the name of the agent
-                //And the state ON is always associated with an agent name and not a generic one
-                //See how to associated the ON with the named agent and not the generic name '*'
-                if(strcmp("*", temp->agent_name) == 0){
-                    temp->state = GENERIC;
-                    
-                    mapping_out * new_map = NULL;
-                    int report = 0;
-                    new_map = add_map_to_table(temp->input_name,
-                                               agent_to_map_name,
-                                               temp->output_name,
-                                               &report);
-                    
-                    // Get the new mapping_out if created
-                    if(new_map != NULL)
-                    {
-                        current_map = new_map;
-                    }
-                    
-                }
-                
-                //If we have not add the map
-                if(current_map == NULL){
-                    current_map = temp;
-                }
-                
-                // Update the current map state
-                agent_iop * found = NULL;
-                found = mtic_update_mapping_out_state(current_map, definition);
-                
-                if(current_map->state == ON && found != NULL)
-                {
-                    //Add the output concerning to the returning variable if not already
-                    agent_iop * already = NULL;
-                    HASH_FIND_STR( outputs, found->name, already );
-                    if(already == NULL)
-                    {
-                        // Copie the element to return it
-                        agent_iop* new_iop  = calloc(1, sizeof(*found));
-                        memcpy(new_iop, found, sizeof(*found));
-                        
-                        HASH_ADD_KEYPTR(hh,outputs, new_iop->name, strlen(new_iop->name), new_iop);
-                    }
-                } else {
-                    printf("Error : Unable to map %s.%s to %s.%s\n",mtic_internal_definition->name, current_map->input_name, definition->name, current_map->output_name);
-                    if(current_map->state == ON)
-                        current_map->state = OFF;
-                }
-            }
-        }
-        
-        free(agent_to_map_name);
-        agent_to_map_name = NULL;
+
+void mapping_freeMapping (mapping_t* map) {
+    if (map == NULL){
+        return;
     }
     
-    
-    return outputs;
+    if (map->name != NULL){
+        free(map->name);
+    }
+    if (map->description != NULL){
+        free(map->description);
+    }
+    if (map->version != NULL){
+        free(map->version);
+    }
+
+    mapping_element_t *current_map_elmt, *tmp_map_elmt;
+//    struct mapping_cat *current_map_cat, *tmp_map_cat;
+
+    //Free mapping output
+    HASH_ITER(hh, map->map_elements, current_map_elmt, tmp_map_elmt) {
+        HASH_DEL(map->map_elements,current_map_elmt);
+        mapping_freeMappingElement(current_map_elmt);
+    }
+
+//    //Free mapping category
+//    HASH_ITER(hh, map->map_cat, current_map_cat, tmp_map_cat) {
+//        HASH_DEL(map->map_cat,current_map_cat);
+//        free_map_cat(&current_map_cat);
+//    }
+    free(map);
 }
 
-agent_iop* mapping_unmap(definition *definition){
-    agent_iop *return_out_table = NULL;
-    agent_iop *out_found = NULL;
-    mapping_out *current_map_out = NULL;
+mapping_element_t * mapping_createMappingElement(const char * input_name,
+                                                 const char *agent_name,
+                                                 const char* output_name)
+{
     
-    //Read the table of mapping
-    if(mtic_my_agent_mapping != NULL)
-    {
-        for(current_map_out = mtic_my_agent_mapping->map_out; current_map_out != NULL; current_map_out = current_map_out->hh.next){
-            
-            //The agent name is found
-            if(strcmp(current_map_out->agent_name, definition->name) == 0){
-                
-                //Pass the state to OFF
-                current_map_out->state = OFF;
-                
-                //Find the output concerning by the mapping
-                HASH_FIND_STR( definition->outputs_table, current_map_out->output_name, out_found);
-                
-                //If the output exist in the definition
-                if(out_found != NULL){
-                    agent_iop * already = NULL;
-                    
-                    //Check if the output mapped name is not already part of the returning output table
-                    HASH_FIND_STR( return_out_table, current_map_out->output_name, already );
-                    if(already == NULL)
-                    {
-                        // Copie the element to return it
-                        agent_iop* new_iop  = calloc(1, sizeof(*out_found));
-                        memcpy(new_iop, out_found, sizeof(*out_found));
-                        
-                        //Add the output concerning to the returning variable if not already
-                        HASH_ADD_KEYPTR(hh,return_out_table, new_iop->name, strlen(new_iop->name), new_iop);
-                    }
-                }else{
-                    fprintf (stderr, "%s : the output named : '%s' is not part of the agent named : '%s' \n",
-                             __FUNCTION__, current_map_out->output_name, definition->name);
-                }
-            }
-        }
+    if (input_name == NULL){
+        mtic_debug("mapping_createMappingElement : input_name is NULL\n");
+        return NULL;
+    }
+    if (agent_name == NULL){
+        mtic_debug("mapping_createMappingElement : agent_name is NULL, no mapping element created\n");
+        return NULL;
+    }
+    if (output_name == NULL){
+        mtic_debug("mapping_createMappingElement : output_name is NULL, no mapping element created\n");
+        return NULL;
     }
     
-    return return_out_table;
-}
-
-int mapping_map_received(const char *agent_name, char *out_name, char *value, long size){
-    mapping_out *temp;
-    int state = 1;
+    mapping_element_t * new_map_elmt = calloc(1, sizeof(mapping_element_t));
+    new_map_elmt->input_name = strdup(input_name);
+    new_map_elmt->agent_name = strdup(agent_name);
+    new_map_elmt->output_name = strdup(output_name);
+    new_map_elmt->state = MAPPING_INACTIVE;
     
-    // Check the existence of our map
-    if(mtic_my_agent_mapping != NULL)
-    {
-        for(temp = mtic_my_agent_mapping->map_out; temp != NULL; temp = temp->hh.next) {
-            if( (strcmp(agent_name, temp->agent_name) == 0)
-               && (strcmp(out_name, temp->output_name) == 0) &&
-               (temp->state == ON)){
-                state = mtic_writeInput(temp->input_name, value, size);
-            }
-        }
-    }
-    return state;
+    return new_map_elmt;
 }
-
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -608,78 +140,83 @@ int mapping_map_received(const char *agent_name, char *out_name, char *value, lo
 /**
  * \fn int mtic_loadMapping (const char* json_str)
  * \ingroup loadClearGetMapFct
- * \brief load mapping in variable 'mtic_my_agent_mapping' from a json string
+ * \brief load mapping in variable 'mtic_internal_mapping' from a json string
  *
  * \param json_str String in json format. Can't be NULL.
  * \return The error. 1 is OK, 0 json string is NULL or empty, -1 Mapping has not been loaded
  */
 int mtic_loadMapping (const char* json_str){
-    mtic_my_agent_mapping = NULL;
 
     //Check if the json string is null or empty
-    if((json_str == NULL) || (strlen(json_str) == 1))
+    if((json_str == NULL) || (strlen(json_str) == 0))
     {
-        mtic_debug("json string is null or empty \n");
+        mtic_debug("mtic_loadMapping : json string is null or empty\n");
         return 0;
     }
 
     //Load definition and init variable : mtic_definition_loaded
-    mtic_my_agent_mapping = parser_LoadMap(json_str);
+    mapping_t *tmp = parser_LoadMap(json_str);
 
-    if(mtic_my_agent_mapping == NULL)
+    if(tmp == NULL)
     {
-        mtic_debug("Mapping has not been loaded from json string : %s\n", json_str );
+        mtic_debug("mtic_loadMapping : mapping could not be loaded from json string : %s\n", json_str );
         return -1;
+    }else{
+        mtic_internal_mapping = tmp;
     }
-
+    
     return 1;
 }
 
 /**
  * \fn int mtic_loadMappingFromPath (const char* file_path)
  * \ingroup loadClearGetMapFct
- * \brief load mapping in variable 'mtic_my_agent_mapping' from a file path
+ * \brief load mapping in variable 'mtic_internal_mapping' from a file path
  *
  * \param file_path The string which contains the json file path. Can't be NULL.
  * \return The error. 1 is OK, 0 file path is NULL or empty, -1 Definition file has not been loaded
  */
 int mtic_loadMappingFromPath (const char* file_path){
-
-    mtic_my_agent_mapping = NULL;
-
+    
     //Check if the json string is null or empty
     if((file_path == NULL) || (strlen(file_path) == 0))
     {
-        mtic_debug("File path is null or empty \n");
+        mtic_debug("mtic_loadMappingFromPath : json file path is null or empty\n");
         return 0;
     }
-
+    
     //Load definition and init variable : mtic_definition_loaded
-    mtic_my_agent_mapping = parser_LoadMapFromPath(file_path);
-
-    if(mtic_my_agent_mapping == NULL)
+    mapping_t *tmp = parser_LoadMapFromPath(file_path);
+    
+    if(tmp == NULL)
     {
-        mtic_debug("Mapping file has not been loaded from file path : %s\n", file_path);
+        mtic_debug("mtic_loadMappingFromPath : mapping could not be loaded from path %s\n", file_path );
         return -1;
+    }else{
+        mtic_internal_mapping = tmp;
     }
-
+    
     return 1;
 }
 
 /**
  * \fn int mtic_clearMapping()
  * \ingroup loadClearGetMapFct
- * \brief Clear the variable 'mtic_my_agent_mapping' and free all structures inside and itself
+ * \brief Clear the variable 'mtic_internal_mapping' and free all structures inside and itself
  *
  * \return The error. 1 is OK,
  * 0 file path is NULL or empty
  */
 int mtic_clearMapping(){
-
-    if(mtic_my_agent_mapping != NULL){
-        mapping_freeMapping(mtic_my_agent_mapping);
+    mtic_debug("Clear current mapping and initiate an empty one\n");
+    if(mtic_internal_mapping != NULL){
+        mapping_freeMapping(mtic_internal_mapping);
     }
-    mtic_my_agent_mapping = calloc(1, sizeof(struct mapping));
+    mtic_internal_mapping = calloc(1, sizeof(struct mapping));
+    mtic_internal_mapping->name = NULL;
+    mtic_internal_mapping->description = NULL;
+    mtic_internal_mapping->version = NULL;
+    mtic_internal_mapping->map_elements = NULL;
     return 1;
 }
 
@@ -688,20 +225,43 @@ int mtic_clearMapping(){
  * \ingroup loadClearGetMapFct
  * \brief the agent mapping getter
  *
- * \return The loaded mapping string in json format. NULL if mtic_my_agent_mapping was not initialized.
+ * \return The loaded mapping string in json format. NULL if mtic_internal_mapping was not initialized.
  * \warning Allocate memory that should be freed by the user.
  */
 char* mtic_getMapping(){
     char * mappingJson = NULL;
 
-    if(mtic_my_agent_mapping == NULL){
-        mtic_debug("The structure mtic_my_agent_mapping is NULL. \n");
+    if(mtic_internal_mapping == NULL){
+        mtic_debug("mtic_getMapping : no mapping defined yet\n");
         return NULL;
     }
-
-    mappingJson = parser_export_mapping(mtic_my_agent_mapping);
+    mappingJson = parser_export_mapping(mtic_internal_mapping);
 
     return mappingJson;
+}
+
+char *mtic_getMappingName(void){
+    if (mtic_internal_mapping != NULL && mtic_internal_mapping->name != NULL){
+        return strdup(mtic_internal_mapping->name);
+    }else{
+        return NULL;
+    }
+}
+
+char *mtic_getMappingDescription(void){
+    if (mtic_internal_mapping != NULL && mtic_internal_mapping->description != NULL){
+        return strdup(mtic_internal_mapping->description);
+    }else{
+        return NULL;
+    }
+}
+
+char *mtic_getMappingVersion(void){
+    if (mtic_internal_mapping != NULL && mtic_internal_mapping->version != NULL){
+        return strdup(mtic_internal_mapping->version);
+    }else{
+        return NULL;
+    }
 }
 
 /**
@@ -719,24 +279,24 @@ char* mtic_getMapping(){
  */
 int mtic_setMappingName(char *name){
     if(name == NULL){
-        mtic_debug("Mapping name cannot be NULL \n");
+        mtic_debug("mtic_setMappingName : mapping name cannot be NULL \n");
         return 0;
     }
 
     if (strlen(name) == 0){
-        mtic_debug("Mapping name cannot be empty\n");
+        mtic_debug("mtic_setMappingName : mapping name cannot be empty\n");
         return -1;
     }
 
     //Check if already initialized, and do it if not
-    if(mtic_my_agent_mapping == NULL){
-        mtic_my_agent_mapping = calloc(1, sizeof(struct mapping));
+    if(mtic_internal_mapping == NULL){
+        mtic_clearMapping();
     }
 
-    //Copy the name in the structure
-    if(mtic_my_agent_mapping->name != NULL)//Free the field if needed
-        free(mtic_my_agent_mapping->name);
-    mtic_my_agent_mapping->name = strdup(name);
+    if(mtic_internal_mapping->name != NULL){
+        free(mtic_internal_mapping->name);
+    }
+    mtic_internal_mapping->name = strdup(name);
 
     return 1;
 }
@@ -761,14 +321,15 @@ int mtic_setMappingDescription(char *description){
     }
 
     //Check if already initialized, and do it if not
-    if(mtic_my_agent_mapping == NULL){
-        mtic_my_agent_mapping = calloc(1, sizeof(struct mapping));
+    if(mtic_internal_mapping == NULL){
+        mtic_clearMapping();
     }
 
     //Copy the description in the structure
-    if(mtic_my_agent_mapping->description != NULL)//Free the field if needed
-        free(mtic_my_agent_mapping->description);
-    mtic_my_agent_mapping->description = strdup(description);
+    if(mtic_internal_mapping->description != NULL){
+        free(mtic_internal_mapping->description);
+    }
+    mtic_internal_mapping->description = strdup(description);
 
     return 1;
 }
@@ -793,14 +354,15 @@ int mtic_setMappingVersion(char *version){
     }
 
     //Check if already initialized, and do it if not
-    if(mtic_my_agent_mapping == NULL){
-        mtic_my_agent_mapping = calloc(1, sizeof(struct mapping));
+    if(mtic_internal_mapping == NULL){
+        mtic_clearMapping();
     }
 
     //Copy the description in the structure
-    if(mtic_my_agent_mapping->version != NULL)//Free the field if needed
-        free(mtic_my_agent_mapping->version);
-    mtic_my_agent_mapping->version = strdup(version);
+    if(mtic_internal_mapping->version != NULL){
+        free(mtic_internal_mapping->version);
+    }
+    mtic_internal_mapping->version = strdup(version);
 
     return 1;
 }
@@ -810,24 +372,15 @@ int mtic_setMappingVersion(char *version){
  * \ingroup EditMapFct
  * \brief the agent mapping entries number getter
  *
- * \return The number of mapping type output entries. If -1 The structure mtic_my_agent_mapping is NULL.
+ * \return The number of mapping type output entries. If -1 The structure mtic_internal_mapping is NULL.
  */
 int mtic_getMappingEntriesNumber(){ //number of entries in the mapping
-    int number = -1;
 
-    if(mtic_my_agent_mapping == NULL){
-        mtic_debug("The structure mtic_my_agent_mapping is NULL \n");
-        return -1;
-    }
-
-    if(mtic_my_agent_mapping->map_out == NULL){
-        mtic_debug("The structure mapping out is NULL \n");
+    if(mtic_internal_mapping == NULL || mtic_internal_mapping->map_elements == NULL){
+        mtic_debug("mtic_getMappingEntriesNumber : no mapping defined yet \n");
         return 0;
     }
-
-    number = HASH_COUNT(mtic_my_agent_mapping->map_out);
-
-    return number;
+    return HASH_COUNT(mtic_internal_mapping->map_elements);;
 }
 
 /**
@@ -843,47 +396,59 @@ int mtic_getMappingEntriesNumber(){ //number of entries in the mapping
  * -1 Agent name to be mapped cannot be NULL or empty.
  * -2 Extern agent output name to be mapped cannot be NULL or empty.
  */
-int mtic_addMappingEntry(char *fromOurInput, char *toAgent, char *withOutput){ //returns mapping id or 0 if creation failed
+unsigned long mtic_addMappingEntry(char *fromOurInput, char *toAgent, char *withOutput){ //returns mapping id or 0 if creation failed
 
     /***    Check the string    ***/
     //fromOurInput
     if((fromOurInput == NULL) || (strlen(fromOurInput) == 0)){
-        mtic_debug("Our input name to be mapped cannot be NULL or empty\n");
+        mtic_debug("mtic_addMappingEntry : input name to be mapped cannot be NULL or empty\n");
         return 0;
     }
 
     //toAgent
     if((toAgent == NULL) || (strlen(toAgent) == 0)){
-        mtic_debug("Agent name to be mapped cannot be NULL or empty\n");
-        return -1;
+        mtic_debug("mtic_addMappingEntry : agent name to be mapped cannot be NULL or empty\n");
+        return 0;
     }
 
     //withOutput
     if((withOutput == NULL) || (strlen(withOutput) == 0)){
-        mtic_debug("Extern agent output name to be mapped cannot be NULL or empty\n");
-        return -2;
+        mtic_debug("mtic_addMappingEntry : agent output name to be mapped cannot be NULL or empty\n");
+        return 0;
     }
 
     //Check if already initialized, and do it if not
-    if(mtic_my_agent_mapping == NULL){
-        mtic_my_agent_mapping = calloc(1, sizeof(struct mapping));
+    if(mtic_internal_mapping == NULL){
+        mtic_clearMapping();
     }
 
-    /***** Add the new mapping out *****/
-
-    char map_description[MAX_PATH];
-    char out_name[MAX_PATH];
-
-    //Create map_description
-    strcpy(map_description , toAgent);
-    strcat(map_description, ".");//separator
-    strcpy(out_name, withOutput);
-    strcat(map_description, out_name);
-
-    //Check if the mapping already exist & Add map if not
-    mtic_map(fromOurInput, map_description);
-
-    return 1;
+    //Add the new mapping element if not already there
+    unsigned long len = strlen(fromOurInput)+strlen(toAgent)+strlen(withOutput)+3+1;
+    char *mashup = calloc(1, len*sizeof(char));
+    strcpy(mashup, fromOurInput);
+    strcat(mashup, ".");//separator
+    strcat(mashup, toAgent);
+    strcat(mashup, ".");//separator
+    strcat(mashup, withOutput);
+    mashup[len -1] = '\0';
+    unsigned long h = djb2_hash((unsigned char *)mashup);
+    free (mashup);
+    
+    mapping_element_t *tmp = NULL;
+    if (mtic_internal_mapping->map_elements != NULL){
+        HASH_FIND(hh, mtic_internal_mapping->map_elements, &h, sizeof(unsigned long), tmp);
+    }
+    if (tmp == NULL){
+        //element does not exist yet : create and register it
+        //TODO: check input against definition and reject if input does not exist in definition
+        mapping_element_t *new = mapping_createMappingElement(fromOurInput, toAgent, withOutput);
+        new->id = h;
+        HASH_ADD(hh, mtic_internal_mapping->map_elements, id, sizeof(unsigned long), new);
+        return h;
+    }else{
+        mtic_debug("mtic_addMappingEntry : mapping combination (%s,%s%s) already exists\n", fromOurInput, toAgent, withOutput);
+        return h;
+    }
 }
 
 /**
@@ -894,39 +459,32 @@ int mtic_addMappingEntry(char *fromOurInput, char *toAgent, char *withOutput){ /
  * \param theId The id of the mapping. Cannot be negative.
  * \return The error. 1 is OK.
  * 0 The id of the mapping cannot be negative.
- * -1 The structure mtic_my_agent_mapping is NULL.
+ * -1 The structure mtic_internal_mapping is NULL.
  * -2 The structure mapping out is NULL.
  */
-int mtic_removeMappingEntryWithId(int theId){
+int mtic_removeMappingEntryWithId(unsigned long theId){
 
-    if(theId < 0){
-        mtic_debug("The id of the mapping cannot be negative. \n");
-        return 0;
-    }
+    mapping_element_t *el = NULL;
 
-    //Get the mapping output by id
-    mapping_out * mapp_out = NULL;
-
-    if(mtic_my_agent_mapping == NULL){
-        mtic_debug("The structure mtic_my_agent_mapping is NULL \n");
+    if(mtic_internal_mapping == NULL){
+        mtic_debug("mtic_removeMappingEntryWithId : no mapping defined yet\n");
         return -1;
     }
 
-    if(mtic_my_agent_mapping->map_out == NULL){
-        mtic_debug("The structure mapping out is NULL \n");
+    if(mtic_internal_mapping->map_elements == NULL){
+        mtic_debug("mtic_removeMappingEntryWithId : no mapping defined yet\n");
         return -2;
     }
 
-    HASH_FIND_INT(mtic_my_agent_mapping->map_out, &theId, mapp_out);
+    HASH_FIND(hh, mtic_internal_mapping->map_elements, &theId, sizeof(unsigned long), el);
 
-    if(mapp_out == NULL){
-        mtic_debug("The id of the mapping is not part of the table. \n");
+    if(el == NULL){
+        mtic_debug("mtic_removeMappingEntryWithId : this id is not part of the current mapping\n");
         return 0;
+    }else{
+        HASH_DEL(mtic_internal_mapping->map_elements, el);
+        mapping_freeMappingElement(el);
     }
-
-    //Remove this one
-    HASH_DEL(mtic_my_agent_mapping->map_out, mapp_out);
-    free(mapp_out);
 
     return 1;
 }
@@ -943,60 +501,65 @@ int mtic_removeMappingEntryWithId(int theId){
  *  0 Our input name to be mapped cannot be NULL or empty.
  * -1 Agent name to be mapped cannot be NULL or empty.
  * -2 Extern agent output name to be mapped cannot be NULL or empty.
- * -3 The structure mtic_my_agent_mapping is NULL.
+ * -3 The structure mtic_internal_mapping is NULL.
  * -4 The structure mapping out is NULL.
  */
 int mtic_removeMappingEntryWithName(char *fromOurInput, char *toAgent, char *withOutput){
     /***    Check the string    ***/
     //fromOurInput
     if((fromOurInput == NULL) || (strlen(fromOurInput) == 0)){
-        mtic_debug("Our input name to be mapped cannot be NULL or empty\n");
+        mtic_debug("mtic_removeMappingEntryWithName : input name to be mapped cannot be NULL or empty\n");
         return 0;
     }
-
+    
     //toAgent
     if((toAgent == NULL) || (strlen(toAgent) == 0)){
-        mtic_debug("Agent name to be mapped cannot be NULL or empty\n");
+        mtic_debug("mtic_removeMappingEntryWithName : agent name to be mapped cannot be NULL or empty\n");
         return -1;
     }
-
+    
     //withOutput
     if((withOutput == NULL) || (strlen(withOutput) == 0)){
-        mtic_debug("Extern agent output name to be mapped cannot be NULL or empty\n");
+        mtic_debug("mtic_removeMappingEntryWithName : agent output name to be mapped cannot be NULL or empty\n");
         return -2;
     }
 
-    if(mtic_my_agent_mapping == NULL){
-        mtic_debug("The structure mtic_my_agent_mapping is NULL \n");
+    //Check if already initialized, and do it if not
+    if(mtic_internal_mapping == NULL){
+        mtic_clearMapping();
+        mtic_debug("mtic_removeMappingEntryWithName : no mapping defined yet\n");
         return -3;
     }
 
-    if(mtic_my_agent_mapping->map_out == NULL){
-        mtic_debug("The structure mapping out is NULL \n");
+    if(mtic_internal_mapping->map_elements == NULL){
+        mtic_debug("mtic_removeMappingEntryWithName : no mapping defined yet\n");
         return -4;
     }
 
-    //Check in the mapping live table if the mapping already exist and if it's ON
-    if(mtic_my_agent_mapping != NULL)
-    {
-        mapping_out * map_out = NULL;
-
-        for(map_out = mtic_my_agent_mapping->map_out; map_out != NULL; map_out = map_out->hh.next)
-        {
-            if(     (strcmp(map_out->input_name, fromOurInput) == 0) &&
-                    (strcmp(map_out->agent_name, toAgent) == 0) &&
-                    (strcmp(map_out->output_name, withOutput) == 0)
-               ){
-                    //Delete this mapping
-                    HASH_DEL(mtic_my_agent_mapping->map_out, map_out);
-
-                }
-        }
-
-        free(map_out);
+    unsigned long len = strlen(fromOurInput)+strlen(toAgent)+strlen(withOutput)+3+1;
+    char *mashup = calloc(1, len*sizeof(char));
+    strcpy(mashup, fromOurInput);
+    strcat(mashup, ".");//separator
+    strcat(mashup, toAgent);
+    strcat(mashup, ".");//separator
+    strcat(mashup, withOutput);
+    mashup[len -1] = '\0';
+    unsigned long h = djb2_hash((unsigned char *)mashup);
+    free (mashup);
+    
+    mapping_element_t *tmp = NULL;
+    if (mtic_internal_mapping->map_elements != NULL){
+        HASH_FIND(hh, mtic_internal_mapping->map_elements, &h, sizeof(unsigned long), tmp);
     }
-
-    return 1;
+    if (tmp == NULL){
+        //element does not exist
+        mtic_debug("mtic_removeMappingEntryWithName : this combination is not part of the current mapping\n");
+        return -5;
+    }else{
+        HASH_DEL(mtic_internal_mapping->map_elements, tmp);
+        mapping_freeMappingElement(tmp);
+        return 1;
+    }
 }
 
 

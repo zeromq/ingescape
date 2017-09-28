@@ -121,18 +121,98 @@ freezeCallback_t *freezeCallbacks = NULL;
 zyreCallback_t *zyreCallbacks = NULL;
 
 ////////////////////////////////////////////////////////////////////////
-// Network internal functions
+// INTERNAL API
 ////////////////////////////////////////////////////////////////////////
+int subscribeToPublisherOutput(subscriber_t *subscriber, const char *outputName)
+{
+    if(outputName != NULL && strlen(outputName) > 0)
+    {
+        // Set subscriber to the output filter
+        mtic_debug("subscribe to agent %s output %s.\n",agentName,outputName);
+        zsock_set_subscribe(subscriber->subscriber, outputName);
+        return 1;
+    }
+    return -1;
+}
 
-/*
- * Function: sendDefinition
- * ----------------------------
- *   Send my definition through our publisher
- *   The agent definition must be defined : mtic_definition_loaded
- *
- *   usage : mtic_sendDefinition()
- *
- */
+int unsubscribeToPublisherOutput(subscriber_t *subscriber, const char *outputName)
+{
+    if(outputName != NULL && strlen(outputName) > 0)
+    {
+        // Set subscriber to the output filter
+        mtic_debug("unsubscribe to agent %s output %s.\n",agentName,outputName);
+        zsock_set_unsubscribe(subscriber->subscriber, outputName);
+        return 1;
+    }
+    
+    // Subscriber not found, it is not in the network yet
+    return -1;
+}
+
+//Timer callback to send MAPPED notification for agents we subscribed to
+int triggerMappingNotificationToNewcomer(zloop_t *loop, int timer_id, void *arg){
+    subscriber_t *subscriber = (subscriber_t *) arg;
+    if (subscriber->mappedNotificationToSend){
+        zyre_whispers(agentElements->node, subscriber->agentPeerId, "MAPPED");
+        subscriber->mappedNotificationToSend = false;
+    }
+    return 0;
+}
+
+int network_manageSubscriberMapping(subscriber_t *subscriber){
+    //get mapping elements for this subscriber
+    mapping_element_t *el, *tmp;
+    HASH_ITER(hh, mtic_internal_mapping->map_elements, el, tmp){
+        if (strcmp(subscriber->agentName, el->agent_name)==0 || strcmp(el->agent_name, "*") == 0){
+            //mapping element is compatible with subscriber name
+            //check if we find a compatible output in subscriber definition
+            agent_iop *foundOutput = NULL;
+            if (subscriber->definition != NULL){
+                HASH_FIND_STR(subscriber->definition->outputs_table, el->output_name, foundOutput);
+            }
+            //TODO : manage '*' as output by iterating to all outputs of subscriber definition
+            if (foundOutput != NULL){
+                //we have validated agent and output name : we can map
+                if (el->state == MAPPING_INACTIVE){
+                    el->state = MAPPING_ACTIVE;
+                    subscribeToPublisherOutput(subscriber, el->output_name);
+                    //mapping was successful : we set timer to notify remote agent if not already done
+                    if (!subscriber->mappedNotificationToSend){
+                        subscriber->mappedNotificationToSend = true;
+                        zloop_timer(agentElements->loop, 100, 1, triggerMappingNotificationToNewcomer, (void *)subscriber);
+                    }
+                }
+            }else{
+                //subscriber does not have this output
+                if (el->state == MAPPING_ACTIVE){
+                    //and this mapping element was previously activated:
+                    //we need to clean
+                    unsubscribeToPublisherOutput(subscriber, el->output_name);
+                    el->state = MAPPING_INACTIVE;
+                }
+            }
+        }
+    }
+    return 0;
+}
+
+int network_disableSubscriberMapping(subscriber_t *subscriber){
+    //get mapping elements for this subscriber
+    mapping_element_t *el, *tmp;
+    HASH_ITER(hh, mtic_internal_mapping->map_elements, el, tmp){
+        if (strcmp(subscriber->agentName, el->agent_name)==0 || strcmp(el->agent_name, "*") == 0){
+            //mapping element is compatible with subscriber name
+            if (el->state == MAPPING_ACTIVE){
+                //and this mapping element was previously activated:
+                //we need to clean
+                unsubscribeToPublisherOutput(subscriber, el->output_name);
+                el->state = MAPPING_INACTIVE;
+            }
+        }
+    }
+    return 0;
+}
+
 void sendDefinitionToAgent(const char *peerId, const char *definition)
 {
     if(peerId != NULL &&  definition != NULL)
@@ -146,55 +226,6 @@ void sendDefinitionToAgent(const char *peerId, const char *definition)
     }
 }
 
-/*
- * Function: subscribe_to
- * ----------------------------
- *   Add a subscription to an agent
- *
- *   usage : subscribeTo(const char *agentName, const char *filterDescription)
- *
- *   agentName          : agent name
- *   filterDescription  : filter description (ex: "moduletest.output1")
- *
- *   returns : the state of the subscribtion
- */
-int subscribeToPublisherOutput(subscriber_t *subscriber, const char *outputName)
-{
-    if(outputName != NULL && strlen(outputName) > 0)
-    {
-        // Set subscriber to the output filter
-        mtic_debug("subscribe to agent %s output %s.\n",agentName,outputName);
-        zsock_set_subscribe(subscriber->subscriber, outputName);
-        return 1;
-    }
-    return -1;
-}
-
-/*
- * Function: unsubscribe_to
- * ----------------------------
- *   Remove a subscription to an agent
- *
- *   usage : unsubscribeTo(const char *agentName, const char *filterDescription)
- *
- *   agentName          : agent name
- *   filterDescription  : filter description (ex: "moduletest.output1")
- *
- *   returns : the state of the subscribtion removal
- */
-int unsubscribeToPublisherOutput(subscriber_t *subscriber, const char *outputName)
-{
-    if(outputName != NULL && strlen(outputName) > 0)
-    {
-        // Set subscriber to the output filter
-        mtic_debug("subscribe to agent %s output %s.\n",agentName,outputName);
-        zsock_set_unsubscribe(subscriber->subscriber, outputName);
-        return 1;
-    }
-    
-    // Subscriber not found, it is not in the network yet
-    return -1;
-}
 
 ////////////////////////////////////////////////////////////////////////
 // ZMQ callbacks
@@ -243,8 +274,9 @@ int manageSubscription (zloop_t *loop, zmq_pollitem_t *item, void *arg){
             if(zmsg_size(msg) == 2 && isFrozen == false)
             {
                 char * output = zmsg_popstr(msg);
-
-                // Find the subscriber definition if received
+                
+                //NOTE: we rely on the external agent definition exclusively to get the output
+                //type. This type is then used to convert the received data.
                 definition * externalDefinition = foundSubscriber->definition;
 
                 // We add it if we don't have it already
@@ -253,35 +285,30 @@ int manageSubscription (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     // convert the string value in void* corresponding to the type of iop
                     agent_iop * found_iop = model_find_iop_by_name_in_definition(output,externalDefinition);
 
-                    if(found_iop != NULL)
+                    if(found_iop != NULL && found_iop->type == OUTPUT_T)
                     {
-                        if (found_iop->value_type == DATA_T){
-                            zframe_t *frame = zmsg_pop(msg);
-                            void *data = zframe_data(frame);
-                            long size = zframe_size(frame);
-                            mapping_map_received(foundSubscriber->agentName,
-                                              output,
-                                              data,
-                                              size);
-                        }else if (found_iop->value_type == IMPULSION_T){
-                            char * value = zmsg_popstr(msg);
-                            free(value);
-                            mapping_map_received(foundSubscriber->agentName,
-                                              output,
-                                              0,
-                                              0);
-                        }else{
-                            char * value = zmsg_popstr(msg);
-
-                            // Map reception send to update the internal model
-                            mapping_map_received(foundSubscriber->agentName,
-                                              output,
-                                              value,
-                                              0);
-                            free(value);
+                        //try to find mapping elements matching with this subscriber's output
+                        //and update mapped input(s) accordingly
+                        mapping_element_t *elmt, *tmp;
+                        HASH_ITER(hh, mtic_internal_mapping->map_elements, elmt, tmp) {
+                            if (strcmp(elmt->agent_name, foundSubscriber->agentName) == 0 && strcmp(elmt->output_name, output) == 0){
+                                //we have a matching mapping element
+                                if (found_iop->value_type == DATA_T){
+                                    zframe_t *frame = zmsg_pop(msg);
+                                    void *data = zframe_data(frame);
+                                    long size = zframe_size(frame);
+                                    mtic_writeInputAsData(elmt->input_name, data, size);
+                                }else if (found_iop->value_type == IMPULSION_T){
+                                    char * value = zmsg_popstr(msg);
+                                    free(value);
+                                    mtic_writeInputAsImpulsion(elmt->input_name);
+                                }else{
+                                    char * value = zmsg_popstr(msg);
+                                    mtic_writeInput(elmt->input_name, value, 0); //size is not used for these types
+                                    free(value);
+                                }
+                            }
                         }
-                        
-
                     }
                 }
                 free(output);
@@ -463,7 +490,7 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     mtic_debug("Store definition for agent %s\n", name);
                     subscriber->definition = newDefinition;
                     // Check the involvement of this new definition in our mapping and update subscriptions
-                    network_checkAndSubscribeToPublisher(newDefinition->name);
+                    network_manageSubscriberMapping(subscriber);
                 }else{
                     mtic_debug("ERROR: definition is NULL or has no name for agent %s\n", name);
                     definition_freeDefinition(newDefinition);
@@ -493,7 +520,7 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 strMapping[strlen(message)- strlen(loadMappingPrefix)] = '\0';
                 
                 // Load definition from string content
-                mtic_my_agent_mapping = parser_LoadMap(strMapping);
+                mtic_internal_mapping = parser_LoadMap(strMapping);
                 free(strMapping);
                 
                 //TODO: activate mapping dynamically
@@ -574,23 +601,15 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     HASH_FIND_STR(subscribers, peer, subscriber);
                     if (subscriber != NULL)
                     {
-                        mtic_debug("cleaning subscribtions to %s\n", name);
-                        // Remove the agent definition from network
+                        mtic_debug("cleaning subscribtions and mappings to %s\n", name);
+                        // disable mapping of the leaving agent
+                        network_disableSubscriberMapping(subscriber);
+                        // clean the agent definition
                         definition * myDefinition = subscriber->definition;
-                        if(myDefinition != NULL)
-                        {
-                            // Deactivate mapping of the leaving agent
-                            agent_iop* iop_unmappped = mapping_unmap(myDefinition);
-                            struct agent_iop *iop, *tmp;
-                            HASH_ITER(hh,iop_unmappped, iop, tmp)
-                            {
-                                HASH_DEL(iop_unmappped, iop);
-                                free(iop);
-                            }
+                        if(myDefinition != NULL){
                             definition_freeDefinition(myDefinition);
-                            subscriber->definition = myDefinition = NULL;
                         }
-                        
+                        //clean the rest
                         HASH_DEL(subscribers, subscriber);
                         zloop_poller_end(agentElements->loop , subscriber->pollItem);
                         zsock_destroy(&subscriber->subscriber);
@@ -607,13 +626,6 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
         }
         zyre_event_destroy(&zyre_event);
     }
-    return 0;
-}
-
-//Timer callback to send MAPPED notification for agents we subscribed to
-int triggerMappingNotificationToNewcomer(zloop_t *loop, int timer_id, void *arg){
-    char *peerId = (char *) arg;
-    zyre_whispers(agentElements->node, peerId, "MAPPED");
     return 0;
 }
 
@@ -808,16 +820,6 @@ initActor (zsock_t *pipe, void *args)
 // PRIVATE API
 ////////////////////////////////////////////////////////////////////////
 
-/*
- * Function: debug
- * ----------------------------
- *   trace debug messages only on verbose mode
- *   Print file name and line number in debug mode
- *
- *   usage : mtic_debug(format,msg)
- *
- */
-// Definition of a trace function depending of the verbose mode and debug compilation
 void mtic_debug(const char *fmt, ...)
 {
     if(verboseMode)
@@ -901,71 +903,6 @@ int network_publishOutput (const char* output_name)
         }
     }
     
-    return result;
-}
-
-/*
- * Function: network_checkAndSubscribeToPublisher
- * ----------------------------
- *   Check mappings made on agent name
- *   Connect to these outputs if compatibility is ok
- *
- *   usage : checkAndSubscribeTo(char* agentName)
- *
- *   agentName          : agent name
- *
- *   returns : -1 if an error occured, 1 otherwise.
- *
- */
-int network_checkAndSubscribeToPublisher(const char* agtName)
-{
-    int result = 0;
-    bool sendMapNotif = false;
-    // Look for the definition for this agent
-    definition * publisherDefinition = NULL;
-    subscriber_t *iter = NULL;
-    for(iter = subscribers; iter != NULL; iter=iter->hh.next) {
-        if (strcmp(agtName, iter->agentName)==0 || strcmp("*", agtName) == 0){
-            //we found an agent with the name to map or we map on *
-            publisherDefinition = iter->definition;
-            if(publisherDefinition != NULL)
-            {
-                // Process mapping
-                agent_iop* outputsToSubscribe = mapping_check_map(publisherDefinition);
-                if(outputsToSubscribe != NULL)
-                {
-                    struct agent_iop *iop, *tmp;
-                    HASH_ITER(hh,outputsToSubscribe, iop, tmp)
-                    {
-                        // Make subscribtion
-                        int cr = subscribeToPublisherOutput(iter, iop->name);
-                        if(cr > 0)
-                        {
-                            mtic_debug("Subscription found and done to output %s from agent %s.\n",iop->name,publisherDefinition->name);
-                            result = 1;
-                            sendMapNotif = true;
-                        } else {
-                            mtic_debug("Subscription has been found but not done to output %s from agent %s.\n",iop->name,publisherDefinition->name);
-                        }
-                        HASH_DEL(outputsToSubscribe, iop);
-                        free(iop);
-                    }
-                } else {
-                    mtic_debug("No outputs to subscribe to for agent: %s.\n",agtName);
-                }
-            } else {
-                mtic_debug("No definiton found for the agent: %s\n",agtName);
-            }
-            if (sendMapNotif){
-                //mapping was successful : we inform target agent via zyre
-                //we set a timer instead of send message to zyre immediately to
-                //let the time to all agents pub/sub sockets to synchronize
-                //their actual subscribtions
-                zloop_timer(agentElements->loop, 100, 1, triggerMappingNotificationToNewcomer, (void *)iter->agentPeerId);
-                sendMapNotif = false;
-            }
-        }
-    }
     return result;
 }
 

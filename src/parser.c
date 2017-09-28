@@ -280,41 +280,41 @@ static category* json_parse_category (yajl_val node) {
  *   parse a tab of categories and add them into the corresponding hash table
  */
 
-static void json_add_category_to_hash (struct category** hasht,
-                                       yajl_val current_cat){
-
-    struct category *cat = NULL;
-    yajl_val v;
-    const char * path_in_current[] = { "", (const char *) 0 };
-
-    path_in_current[0] = STR_NAME;
-    v = yajl_tree_get(current_cat, path_in_current, yajl_t_any);
-    if (v) {
-        /* check if the key already exist */
-        const char* name = YAJL_GET_STRING(v);
-        HASH_FIND_STR(*hasht, name , cat);
-        if (cat == NULL){
-            cat = calloc (1, sizeof (struct category));
-            cat->name = strdup (name);
-
-            path_in_current[0] = STR_VERSION;
-            v = yajl_tree_get(current_cat, path_in_current, yajl_t_any);
-            if (v)
-                cat->version = strdup (YAJL_IS_STRING(v) ? (v)->u.string : "");
-
-            path_in_current[0] = STR_PARAMETERS;
-            json_add_data (current_cat, path_in_current,PARAMETER_T, &cat->params_table);
-
-            path_in_current[0] = STR_INPUTS;
-            json_add_data (current_cat, path_in_current,INPUT_T, &cat->inputs_table);
-
-            path_in_current[0] = STR_OUTPUTS;
-            json_add_data (current_cat, path_in_current,OUTPUT_T, &cat->outputs_table);
-
-            HASH_ADD_STR(*hasht , name, cat );  /* id: name of key field */
-        }
-    }
-}
+//static void json_add_category_to_hash (struct category** hasht,
+//                                       yajl_val current_cat){
+//
+//    struct category *cat = NULL;
+//    yajl_val v;
+//    const char * path_in_current[] = { "", (const char *) 0 };
+//
+//    path_in_current[0] = STR_NAME;
+//    v = yajl_tree_get(current_cat, path_in_current, yajl_t_any);
+//    if (v) {
+//        /* check if the key already exist */
+//        const char* name = YAJL_GET_STRING(v);
+//        HASH_FIND_STR(*hasht, name , cat);
+//        if (cat == NULL){
+//            cat = calloc (1, sizeof (struct category));
+//            cat->name = strdup (name);
+//
+//            path_in_current[0] = STR_VERSION;
+//            v = yajl_tree_get(current_cat, path_in_current, yajl_t_any);
+//            if (v)
+//                cat->version = strdup (YAJL_IS_STRING(v) ? (v)->u.string : "");
+//
+//            path_in_current[0] = STR_PARAMETERS;
+//            json_add_data (current_cat, path_in_current,PARAMETER_T, &cat->params_table);
+//
+//            path_in_current[0] = STR_INPUTS;
+//            json_add_data (current_cat, path_in_current,INPUT_T, &cat->inputs_table);
+//
+//            path_in_current[0] = STR_OUTPUTS;
+//            json_add_data (current_cat, path_in_current,OUTPUT_T, &cat->outputs_table);
+//
+//            HASH_ADD_STR(*hasht , name, cat );  /* id: name of key field */
+//        }
+//    }
+//}
 
 /*
  * Function: json_parse_definition
@@ -359,9 +359,9 @@ static definition* json_parse_definition (yajl_val node) {
     if (v && YAJL_IS_ARRAY(v)){
         unsigned int  i;
         for (i = 0; i < v->u.array.len; i++ ){
-            yajl_val obj = v->u.array.values[i];
-            if( obj && YAJL_IS_OBJECT(obj))
-                json_add_category_to_hash (&def->categories, obj);
+//            yajl_val obj = v->u.array.values[i];
+//            if( obj && YAJL_IS_OBJECT(obj))
+//                json_add_category_to_hash (&def->categories, obj);
         }
     }
 
@@ -374,53 +374,56 @@ static definition* json_parse_definition (yajl_val node) {
  *   parse a tab of mapping output type and add them into the corresponding hash table
  */
 
-static void json_add_map_out_to_hash (struct mapping_out** hasht,
+static void json_add_map_out_to_hash (mapping_element_t** hasht,
                                        yajl_val current_map_out){
 
     const char* input_name;
     const char* agent_name;
     const char* output_name;
-    struct mapping_out *map_out = NULL;
     yajl_val v;
     const char * path_in_current[] = { "", (const char *) 0 };
 
-    //generate the map_id (hash key) in dynamic
-    int map_id = 0;
-    map_id = HASH_COUNT(*hasht) + 1;
-
-    HASH_FIND_INT(*hasht, &map_id , map_out);
-
-    if (map_out == NULL){
-        map_out = calloc (1, sizeof (struct mapping_out));
-        map_out->map_id = map_id;
-        map_out->state = OFF;
-
-        //input_name
-        path_in_current[0] = "input_name";
-        v = yajl_tree_get(current_map_out, path_in_current, yajl_t_any);
-        if (v){
-            input_name = YAJL_GET_STRING(v);
-            map_out->input_name = strdup (input_name);
-        }
-
-        //agent_name
-        path_in_current[0] = "agent_name";
-        v = yajl_tree_get(current_map_out, path_in_current, yajl_t_any);
-        if (v){
-            agent_name = YAJL_GET_STRING(v);
-            map_out->agent_name = strdup (agent_name);
-        }
-
-
-        //output_name
-        path_in_current[0] = "output_name";
-        v = yajl_tree_get(current_map_out, path_in_current, yajl_t_any);
-        if (v){
-            output_name = YAJL_GET_STRING(v);
-            map_out->output_name = strdup (output_name);
-        }
-
-        HASH_ADD_INT(*hasht , map_id, map_out );  /* id: name of key field */
+    //input_name
+    path_in_current[0] = "input_name";
+    v = yajl_tree_get(current_map_out, path_in_current, yajl_t_any);
+    if (v){
+        input_name = YAJL_GET_STRING(v);
+    }
+    
+    //agent_name
+    path_in_current[0] = "agent_name";
+    v = yajl_tree_get(current_map_out, path_in_current, yajl_t_any);
+    if (v){
+        agent_name = YAJL_GET_STRING(v);
+    }
+    
+    //output_name
+    path_in_current[0] = "output_name";
+    v = yajl_tree_get(current_map_out, path_in_current, yajl_t_any);
+    if (v){
+        output_name = YAJL_GET_STRING(v);
+    }
+    
+    unsigned long len = strlen(input_name)+strlen(agent_name)+strlen(output_name)+3+1;
+    char *mashup = calloc(1, len*sizeof(char));
+    strcpy(mashup, input_name);
+    strcat(mashup, ".");//separator
+    strcat(mashup, agent_name);
+    strcat(mashup, ".");//separator
+    strcat(mashup, output_name);
+    mashup[len -1] = '\0';
+    unsigned long h = djb2_hash((unsigned char *)mashup);
+    free (mashup);
+    
+    mapping_element_t *tmp = NULL;
+    if (*hasht != NULL){
+        HASH_FIND(hh, *hasht, &h, sizeof(unsigned long), tmp);
+    }
+    if (tmp == NULL){
+        //element does not exist yet : create and register it
+        mapping_element_t *new = mapping_createMappingElement(input_name, agent_name, output_name);
+        new->id = h;
+        HASH_ADD(hh, *hasht, id, sizeof(unsigned long), new);
     }
 }
 
@@ -430,47 +433,48 @@ static void json_add_map_out_to_hash (struct mapping_out** hasht,
  *   parse a tab of mapping category type and add them into the corresponding hash table
  */
 
-static void json_add_map_cat_to_hash (struct mapping_cat** hasht,
+static void json_add_map_cat_to_hash (mapping_element_t** hasht,
                                        yajl_val current_map_out){
 
-    const char* agent_name;
-    const char* category_name;
-    struct mapping_cat *map_cat = NULL;
-    yajl_val v;
-    const char * path_in_current[] = { "", (const char *) 0 };
-
-    path_in_current[0] = "map_cat_id";
-    v = yajl_tree_get(current_map_out, path_in_current, yajl_t_any);
-    if (v) {
-        /* check if the key already exist */
-        int map_cat_id = (int) YAJL_GET_INTEGER(v);
-
-        HASH_FIND_INT(*hasht, &map_cat_id , map_cat);
-
-        if (map_cat == NULL){
-            map_cat = calloc (1, sizeof (struct mapping_cat));
-            map_cat->map_cat_id = map_cat_id;
-            map_cat->state = OFF;
-
-            //agent_name
-            path_in_current[0] = "agent_name";
-            v = yajl_tree_get(current_map_out, path_in_current, yajl_t_any);
-            if (v){
-                agent_name = YAJL_GET_STRING(v);
-                map_cat->agent_name = strdup (agent_name);
-            }
-
-            //category_name
-            path_in_current[0] = "category_name";
-            v = yajl_tree_get(current_map_out, path_in_current, yajl_t_any);
-            if (v){
-                category_name = YAJL_GET_STRING(v);
-                map_cat->category_name = strdup (category_name);
-            }
-
-            HASH_ADD_INT(*hasht , map_cat_id, map_cat);  /* id: name of key field */
-        }
-    }
+    return;
+//    const char* agent_name;
+//    const char* category_name;
+//    struct mapping_cat *map_cat = NULL;
+//    yajl_val v;
+//    const char * path_in_current[] = { "", (const char *) 0 };
+//
+//    path_in_current[0] = "map_cat_id";
+//    v = yajl_tree_get(current_map_out, path_in_current, yajl_t_any);
+//    if (v) {
+//        /* check if the key already exist */
+//        int map_cat_id = (int) YAJL_GET_INTEGER(v);
+//
+//        HASH_FIND_INT(*hasht, &map_cat_id , map_cat);
+//
+//        if (map_cat == NULL){
+//            map_cat = calloc (1, sizeof (struct mapping_cat));
+//            map_cat->map_cat_id = map_cat_id;
+//            map_cat->state = OFF;
+//
+//            //agent_name
+//            path_in_current[0] = "agent_name";
+//            v = yajl_tree_get(current_map_out, path_in_current, yajl_t_any);
+//            if (v){
+//                agent_name = YAJL_GET_STRING(v);
+//                map_cat->agent_name = strdup (agent_name);
+//            }
+//
+//            //category_name
+//            path_in_current[0] = "category_name";
+//            v = yajl_tree_get(current_map_out, path_in_current, yajl_t_any);
+//            if (v){
+//                category_name = YAJL_GET_STRING(v);
+//                map_cat->category_name = strdup (category_name);
+//            }
+//
+//            HASH_ADD_INT(*hasht , map_cat_id, map_cat);  /* id: name of key field */
+//        }
+//    }
 }
 
 /*
@@ -479,11 +483,11 @@ static void json_add_map_cat_to_hash (struct mapping_cat** hasht,
  *   convert a map.json file into a mapping (output & category) structure
  */
 
-static mapping* json_parse_mapping (yajl_val node) {
+static mapping_t* json_parse_mapping (yajl_val node) {
 
-    mapping* mapp;
+    mapping_t* mapp;
     yajl_val v;
-    mapp = (mapping*) calloc(1, sizeof(mapping));
+    mapp = (mapping_t*) calloc(1, sizeof(mapping_t));
     const char * path[] = { "mapping", "", (const char *) 0 };
 
     path[1] = STR_NAME;
@@ -515,7 +519,7 @@ static mapping* json_parse_mapping (yajl_val node) {
         for (i = 0; i < v->u.array.len; i++ ){
             yajl_val obj = v->u.array.values[i];
             if( obj && YAJL_IS_OBJECT(obj))
-                json_add_map_out_to_hash (&mapp->map_out, obj);
+                json_add_map_out_to_hash (&mapp->map_elements, obj);
         }
     }
 
@@ -526,7 +530,7 @@ static mapping* json_parse_mapping (yajl_val node) {
         for (i = 0; i < v->u.array.len; i++ ){
             yajl_val obj = v->u.array.values[i];
             if( obj && YAJL_IS_OBJECT(obj))
-                json_add_map_cat_to_hash (&mapp->map_cat, obj);
+                json_add_map_cat_to_hash (&mapp->map_elements, obj);
         }
     }
 
@@ -689,16 +693,16 @@ static void json_dump_definition (yajl_gen *g, definition* def) {
         yajl_gen_array_close(*g);
     }
     
-    struct category *cat;
-    hashCount = HASH_COUNT(def->categories);
-    if (hashCount) {
-        yajl_gen_string(*g, (const unsigned char *) STR_CATEGORIES, strlen(STR_CATEGORIES));
-        yajl_gen_array_open(*g);
-        for(cat=def->categories; cat != NULL; cat=cat->hh.next) {
-            json_dump_category(g, cat);
-        }
-        yajl_gen_array_close(*g);
-    }
+//    struct category *cat;
+//    hashCount = HASH_COUNT(def->categories);
+//    if (hashCount) {
+//        yajl_gen_string(*g, (const unsigned char *) STR_CATEGORIES, strlen(STR_CATEGORIES));
+//        yajl_gen_array_open(*g);
+//        for(cat=def->categories; cat != NULL; cat=cat->hh.next) {
+//            json_dump_category(g, cat);
+//        }
+//        yajl_gen_array_close(*g);
+//    }
 
     yajl_gen_map_close(*g);
 }
@@ -709,7 +713,7 @@ static void json_dump_definition (yajl_gen *g, definition* def) {
  *   convert a mapping_out structure into json string
  */
 
-static void json_dump_mapping_out (yajl_gen *g, mapping_out* mapp_out) {
+static void json_dump_mapping_out (yajl_gen *g, mapping_element_t* mapp_out) {
 
     yajl_gen_map_open(*g);
 
@@ -731,18 +735,18 @@ static void json_dump_mapping_out (yajl_gen *g, mapping_out* mapp_out) {
  *   convert a mapping_cat structure into json string
  */
 
-static void json_dump_mapping_cat (yajl_gen *g, mapping_cat* mapp_cat) {
-
-    yajl_gen_map_open(*g);
-
-    yajl_gen_string(*g, (const unsigned char *) "agent_name", strlen("agent_name"));
-    yajl_gen_string(*g, (const unsigned char *) mapp_cat->agent_name, strlen (mapp_cat->agent_name));
-
-    yajl_gen_string(*g, (const unsigned char *) "category_name", strlen("category_name"));
-    yajl_gen_string(*g, (const unsigned char *) mapp_cat->category_name, strlen(mapp_cat->category_name));
-
-    yajl_gen_map_close(*g);
-}
+//static void json_dump_mapping_cat (yajl_gen *g, mapping_cat* mapp_cat) {
+//
+//    yajl_gen_map_open(*g);
+//
+//    yajl_gen_string(*g, (const unsigned char *) "agent_name", strlen("agent_name"));
+//    yajl_gen_string(*g, (const unsigned char *) mapp_cat->agent_name, strlen (mapp_cat->agent_name));
+//
+//    yajl_gen_string(*g, (const unsigned char *) "category_name", strlen("category_name"));
+//    yajl_gen_string(*g, (const unsigned char *) mapp_cat->category_name, strlen(mapp_cat->category_name));
+//
+//    yajl_gen_map_close(*g);
+//}
 
 /*
  * Function: json_dump_mapping
@@ -750,11 +754,11 @@ static void json_dump_mapping_cat (yajl_gen *g, mapping_cat* mapp_cat) {
  *   convert a mapping structure into mapping.json string
  */
 
-static void json_dump_mapping (yajl_gen *g, mapping* mapp) {
+static void json_dump_mapping (yajl_gen *g, mapping_t* mapp) {
 
     unsigned int hashCount = 0;
-    struct mapping_out *currentMapOut = NULL;
-    struct mapping_cat *currentMapCat = NULL;
+    mapping_element_t *currentMapOut = NULL;
+//    struct mapping_cat *currentMapCat = NULL;
 
     yajl_gen_map_open(*g);
 
@@ -777,26 +781,26 @@ static void json_dump_mapping (yajl_gen *g, mapping* mapp) {
         yajl_gen_string(*g, (const unsigned char *) (""), 0);
 
     //Mapping_out
-    hashCount = HASH_COUNT(mapp->map_out);
+    hashCount = HASH_COUNT(mapp->map_elements);
     if (hashCount) {
         yajl_gen_string(*g, (const unsigned char *) "mapping_out", strlen("mapping_out"));
         yajl_gen_array_open(*g);
-        for(currentMapOut=mapp->map_out; currentMapOut != NULL; currentMapOut=currentMapOut->hh.next) {
+        for(currentMapOut = mapp->map_elements; currentMapOut != NULL; currentMapOut=currentMapOut->hh.next) {
             json_dump_mapping_out(g, currentMapOut);
         }
         yajl_gen_array_close(*g);
     }
 
-    //Mapping_cat
-    hashCount = HASH_COUNT(mapp->map_cat);
-    if (hashCount) {
-        yajl_gen_string(*g, (const unsigned char *) "mapping_cat", strlen("mapping_cat"));
-        yajl_gen_array_open(*g);
-        for(currentMapCat=mapp->map_cat; currentMapCat != NULL; currentMapCat=currentMapOut->hh.next) {
-            json_dump_mapping_cat(g, currentMapCat);
-        }
-        yajl_gen_array_close(*g);
-    }
+//    //Mapping_cat
+//    hashCount = HASH_COUNT(mapp->map_cat);
+//    if (hashCount) {
+//        yajl_gen_string(*g, (const unsigned char *) "mapping_cat", strlen("mapping_cat"));
+//        yajl_gen_array_open(*g);
+//        for(currentMapCat=mapp->map_cat; currentMapCat != NULL; currentMapCat=currentMapOut->hh.next) {
+//            json_dump_mapping_cat(g, currentMapCat);
+//        }
+//        yajl_gen_array_close(*g);
+//    }
 
     yajl_gen_map_close(*g);
 }
@@ -897,8 +901,8 @@ int mtic_init_mapping (const char* mapping_file_path)
 
     if (mapping_file_path != NULL){
         // Init definition
-        mtic_my_agent_mapping = parser_LoadMapFromPath(mapping_file_path);
-        if(mtic_my_agent_mapping == NULL)
+        mtic_internal_mapping = parser_LoadMapFromPath(mapping_file_path);
+        if(mtic_internal_mapping == NULL)
         {
             fprintf(stderr, "Error : Mapping file has not been loaded : %s\n", mapping_file_path );
             exit(EXIT_FAILURE);
@@ -1047,7 +1051,7 @@ char* parser_export_definition (definition* def) {
  *   returns: a mapping json format string UTF8
  */
 
-char* parser_export_mapping(mapping *mapp){
+char* parser_export_mapping(mapping_t *mapp){
     char* result = NULL;
     const unsigned char * json_str = NULL;
     size_t len;
@@ -1084,9 +1088,9 @@ char* parser_export_mapping(mapping *mapp){
  *   returns : a pointer on a mapping structure or NULL if it has failed
  */
 
-mapping* parser_LoadMap(const char* json_str){
+mapping_t* parser_LoadMap(const char* json_str){
     
-    mapping *mapp = NULL;
+    mapping_t *mapp = NULL;
     yajl_val node;
     
     json_tokenized(json_str, &node);
@@ -1112,10 +1116,10 @@ mapping* parser_LoadMap(const char* json_str){
  *   returns : a pointer on a mapping structure or NULL if it has failed
  */
 
-mapping* parser_LoadMapFromPath (const char* path){
+mapping_t* parser_LoadMapFromPath (const char* path){
     
     char *json_str = NULL;
-    mapping *mapp = NULL;
+    mapping_t *mapp = NULL;
     
     json_str = json_fetch(path);
     if (!json_str)
