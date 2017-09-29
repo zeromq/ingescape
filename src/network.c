@@ -111,7 +111,7 @@ typedef struct zyreAgent {
     bool hasJoinedPrivateChannel;
     UT_hash_handle hh;
 } zyreAgent_t;
-zyreAgent_t *zyreAgents = NULL;
+
 
 bool network_needToSendDefinitionUpdate = false;
 bool network_needToUpdateMapping = false;
@@ -121,6 +121,7 @@ zyreloopElements_t *agentElements = NULL;
 subscriber_t *subscribers = NULL;
 freezeCallback_t *freezeCallbacks = NULL;
 zyreCallback_t *zyreCallbacks = NULL;
+zyreAgent_t *zyreAgents = NULL;
 
 ////////////////////////////////////////////////////////////////////////
 // INTERNAL API
@@ -129,9 +130,24 @@ int subscribeToPublisherOutput(subscriber_t *subscriber, const char *outputName)
 {
     if(outputName != NULL && strlen(outputName) > 0)
     {
-        // Set subscriber to the output filter
-        mtic_debug("subscribe to agent %s output %s.\n",agentName,outputName);
-        zsock_set_subscribe(subscriber->subscriber, outputName);
+        bool filterAlreadyExists = false;
+        mappingFilter_t *filter = NULL;
+        DL_FOREACH(subscriber->mappingsFilters, filter){
+            if (strcmp(filter->filter, outputName) == 0){
+                filterAlreadyExists = true;
+                break;
+            }
+        }
+        if (!filterAlreadyExists){
+            // Set subscriber to the output filter
+            mtic_debug("subscribe to agent %s output %s.\n",agentName,outputName);
+            zsock_set_subscribe(subscriber->subscriber, outputName);
+            mappingFilter_t *f = calloc(1, sizeof(mappingFilter_t));
+            strncpy(f->filter, outputName, MAX_FILTER_SIZE);
+            DL_APPEND(subscriber->mappingsFilters, f);
+        }else{
+            //printf("\n****************\nFILTER BIS %s - %s\n***************\n", subscriber->agentName, outputName);
+        }
         return 1;
     }
     return -1;
@@ -141,9 +157,17 @@ int unsubscribeToPublisherOutput(subscriber_t *subscriber, const char *outputNam
 {
     if(outputName != NULL && strlen(outputName) > 0)
     {
+        mappingFilter_t *filter = NULL;
+        DL_FOREACH(subscriber->mappingsFilters, filter){
+            if (strcmp(filter->filter, outputName) == 0){
+                mtic_debug("unsubscribe to agent %s output %s.\n",agentName,outputName);
+                zsock_set_unsubscribe(subscriber->subscriber, outputName);
+                DL_DELETE(subscriber->mappingsFilters, filter);
+                break;
+            }
+        }
         // Set subscriber to the output filter
-        mtic_debug("unsubscribe to agent %s output %s.\n",agentName,outputName);
-        zsock_set_unsubscribe(subscriber->subscriber, outputName);
+        
         return 1;
     }
     
@@ -208,6 +232,36 @@ void sendDefinitionToAgent(const char *peerId, const char *definition)
     }
 }
 
+void network_cleanAndFreeSubscriber(subscriber_t *subscriber){
+    mtic_debug("cleaning subscription to %s\n", subscriber->agentName);
+    // clean the agent definition
+    if(subscriber->definition != NULL){
+        definition_freeDefinition(subscriber->definition);
+    }
+    //clean the subscriber itself
+    mappingFilter_t *elt, *tmp;
+    DL_FOREACH_SAFE(subscriber->mappingsFilters,elt,tmp) {
+        zsock_set_unsubscribe(subscriber->subscriber, elt->filter);
+        DL_DELETE(subscriber->mappingsFilters,elt);
+        free(elt);
+    }
+    zloop_poller_end(agentElements->loop , subscriber->pollItem);
+    zsock_destroy(&subscriber->subscriber);
+    free((char*)subscriber->agentName);
+    free((char*)subscriber->agentPeerId);
+    free(subscriber->pollItem);
+    free(subscriber->subscriber);
+    subscriber->subscriber = NULL;
+    HASH_DEL(subscribers, subscriber);
+    free(subscriber);
+    subscriber = NULL;
+//    int n = HASH_COUNT(subscribers);
+//    mtic_debug("%d subscribers in the list\n", n);
+//    subscriber_t *s, *tmps;
+//    HASH_ITER(hh, subscribers, s, tmps){
+//        mtic_debug("\tsubscriber : %s - %s\n", s->agentName, s->agentPeerId);
+//    }
+}
 
 ////////////////////////////////////////////////////////////////////////
 // ZMQ callbacks
@@ -247,6 +301,12 @@ int manageSubscription (zloop_t *loop, zmq_pollitem_t *item, void *arg){
 
         // Try to find the subscriber object
         HASH_FIND_STR(subscribers, subscriberPeerId, foundSubscriber);
+//        int n = HASH_COUNT(subscribers);
+//        mtic_debug("%d subscribers in the list\n", n);
+//        subscriber_t *s, *tmp;
+//        HASH_ITER(hh, subscribers, s, tmp){
+//            mtic_debug("\tsubscriber : %s - %s\n", s->agentName, s->agentPeerId);
+//        }
         if(foundSubscriber != NULL)
         {
             zmsg_t *msg = zmsg_recv(foundSubscriber->subscriber);
@@ -431,8 +491,9 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                         subscriber->agentName = strdup(name);
                         subscriber->agentPeerId = strdup (peer);
                         subscriber->subscriber = zsock_new_sub(endpointAddress, NULL);
-                        subscriber->definition = NULL;
                         assert(subscriber->subscriber);
+                        subscriber->definition = NULL;
+                        subscriber->mappingsFilters = NULL;
                         HASH_ADD_STR(subscribers, agentPeerId, subscriber);
                         subscriber->pollItem = calloc(1, sizeof(zmq_pollitem_t));
                         subscriber->pollItem->socket = zsock_resolve(subscriber->subscriber);
@@ -617,27 +678,8 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     // Try to find the subscriber to destory
                     subscriber_t *subscriber = NULL;
                     HASH_FIND_STR(subscribers, peer, subscriber);
-                    if (subscriber != NULL)
-                    {
-                        mtic_debug("cleaning subscribtions and mappings to %s\n", name);
-                        // clean the agent definition
-                        definition * myDefinition = subscriber->definition;
-                        if(myDefinition != NULL){
-                            definition_freeDefinition(myDefinition);
-                        }
-                        //clean the subscriber itself
-                        //NOTE: we do not clean socket subscriptions because
-                        //we are going to destroy the socket as a whole
-                        HASH_DEL(subscribers, subscriber);
-                        zloop_poller_end(agentElements->loop , subscriber->pollItem);
-                        zsock_destroy(&subscriber->subscriber);
-                        free((char*)subscriber->agentName);
-                        free((char*)subscriber->agentPeerId);
-                        free(subscriber->pollItem);
-                        free(subscriber->subscriber);
-                        subscriber->subscriber = NULL;
-                        free(subscriber);
-                        subscriber = NULL;
+                    if (subscriber != NULL){
+                        network_cleanAndFreeSubscriber(subscriber);
                     }
                 }
             }
@@ -823,29 +865,23 @@ initActor (zsock_t *pipe, void *args)
 
     zloop_start (loop); //start returns when one of the pollers returns -1
 
-    zloop_destroy (&loop);
-    assert (loop == NULL);
+    mtic_debug("agent stopping...\n");
 
     //clean
-    zloop_destroy (&loop);
-    assert (loop == NULL);
+    zyreAgent_t *zagent, *tmpa;
+    HASH_ITER(hh, zyreAgents, zagent, tmpa){
+        HASH_DEL(zyreAgents, zagent);
+    }
+    subscriber_t *s, *tmps;
+    HASH_ITER(hh, subscribers, s, tmps) {
+        network_cleanAndFreeSubscriber(s);
+    }
     zyre_stop (agentElements->node);
     zclock_sleep (100);
     zyre_destroy (&agentElements->node);
     zsock_destroy(&agentElements->publisher);
-    //clean subscribers
-    subscriber_t *s, *tmp;
-    HASH_ITER(hh, subscribers, s, tmp) {
-        HASH_DEL(subscribers, s);
-        zsock_destroy(&s->subscriber);
-        free((char*)s->agentName);
-        free((char*)s->agentPeerId);
-        free(s->pollItem);
-        free(s->subscriber);
-        s->subscriber = NULL;
-        free(s);
-        s = NULL;
-    }
+    zloop_destroy (&loop);
+    assert (loop == NULL);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -973,7 +1009,6 @@ int mtic_startWithDevice(const char *networkDevice, int port){
     if (agentElements != NULL){
         //Agent is already active : need to stop it first
         mtic_stop();
-        agentElements = NULL;
     }
     
     agentElements = calloc(1, sizeof(zyreloopElements_t));
@@ -1103,7 +1138,6 @@ int mtic_startWithIP(const char *ipAddress, int port){
     if (agentElements != NULL){
         //Agent is already active : need to stop it first
         mtic_stop();
-        agentElements = NULL;
     }
     
     agentElements = calloc(1, sizeof(zyreloopElements_t));
@@ -1132,19 +1166,13 @@ int mtic_startWithIP(const char *ipAddress, int port){
  */
 int mtic_stop(){
     if (agentElements != NULL){
-        //interrupting and destroying mastic thread
+        //interrupting and destroying mastic thread and zyre layer
+        //this will also clean all subscribers
         zstr_sendx (agentElements->agentActor, "$TERM", NULL);
         zactor_destroy (&agentElements->agentActor);
         //cleaning agent
         free (agentElements);
         agentElements = NULL;
-        //cleaning Freeze callbacks
-        freezeCallback_t *elt, *tmp;
-        DL_FOREACH_SAFE(freezeCallbacks,elt,tmp) {
-            DL_DELETE(freezeCallbacks,elt);
-            free(elt);
-        }
-
     #ifdef _WIN32
     zsys_shutdown();
     #endif
