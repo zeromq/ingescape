@@ -17,6 +17,8 @@
 #define AGENTSMAPPINGCONTROLLER_H
 
 #include <QObject>
+#include <QtQml>
+
 #include <I2PropertyHelpers.h>
 
 #include <controller/masticmodelmanager.h>

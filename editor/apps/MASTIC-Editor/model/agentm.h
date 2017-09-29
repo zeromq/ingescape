@@ -9,6 +9,7 @@
  *
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
+ *      Alexandre Lemort   <lemort@ingenuity.io>
  *
  */
 
@@ -16,9 +17,13 @@
 #define AGENTM_H
 
 #include <QObject>
+#include <QtQml>
+
 #include <I2PropertyHelpers.h>
 
 #include <model/iop/agentiopm.h>
+
+
 
 /**
  * @brief The AgentM class defines a model of agent
@@ -59,7 +64,10 @@ class AgentM : public QObject
 
 
 public:
-
+    /**
+     * @brief Default constructor
+     * @param parent
+     */
     explicit AgentM(QObject *parent = nullptr);
 
 
@@ -68,9 +76,9 @@ public:
      */
     ~AgentM();
 
-signals:
+Q_SIGNALS:
 
-public slots:
+public Q_SLOTS:
 };
 
 QML_DECLARE_TYPE(AgentM)

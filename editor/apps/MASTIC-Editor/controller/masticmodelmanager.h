@@ -16,6 +16,8 @@
 #define MASTICMODELMANAGER_H
 
 #include <QObject>
+#include <QtQml>
+
 #include <I2PropertyHelpers.h>
 
 #include <model/jsonhelper.h>

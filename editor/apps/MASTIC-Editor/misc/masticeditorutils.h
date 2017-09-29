@@ -18,8 +18,7 @@
 
 #include <QObject>
 #include <QtQml>
-#include <QQmlEngine>
-#include <QJSEngine>
+
 
 
 

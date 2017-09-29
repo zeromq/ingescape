@@ -99,14 +99,22 @@ Item {
 
             Text {
                 id: txtSearch
+
                 text: qsTr("Rechercher...")
+
                 color: "#ffffff"
+
+                font: MasticTheme.normalFont
             }
 
             Text {
                 id: txtFilter
+
                 text: qsTr("Filtrer...")
+
                 color: "#ffffff"
+
+                font: MasticTheme.normalFont
             }
         }
 
@@ -132,11 +140,18 @@ Item {
 
             Text {
                 text: qsTr("Importer...")
+
                 color: "#ffffff"
+
+                 font: MasticTheme.normalFont
             }
+
             Text {
                 text: qsTr("Exporter...")
+
                 color: "#ffffff"
+
+                font: MasticTheme.normalFont
             }
         }
     }
@@ -159,16 +174,25 @@ Item {
 
                 Text {
                     text: model.modelM.name
+
+                    font: MasticTheme.normalFont
+
                     height: 25
                 }
 
                 Text {
                     text: model.modelM.description
+
+                    font: MasticTheme.normalFont
+
                     height: 25
                 }
 
                 Text {
                     text: model.modelM.version
+
+                    font: MasticTheme.normalFont
+
                     height: 25
                 }
             }

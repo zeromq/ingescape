@@ -65,10 +65,10 @@ Item {
 
 
     //
-    // Main view
+    // Center panel
     //
     Item {
-        id: mainView
+        id: centerPanel
 
         anchors {
             left: leftPanel.right
@@ -78,8 +78,8 @@ Item {
         }
 
 
-        AgentsMapping {
-            id: agentsMapping
+        AgentsMappingView {
+            id: agentsMappingView
 
             anchors.fill: parent
 
@@ -106,10 +106,11 @@ Item {
 
         Text {
             anchors.centerIn: parent
-            text: "Bottom Panel"
-            font {
-                pixelSize: 50
-            }
+
+            text: qsTr("Bottom Panel")
+
+            font: MasticTheme.headingFont
+
             color: MasticTheme.whiteColor
         }
     }

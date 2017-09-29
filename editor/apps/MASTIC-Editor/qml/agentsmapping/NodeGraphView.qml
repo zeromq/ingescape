@@ -9,7 +9,6 @@
  *
  *	Contributors:
  *      Alexandre Lemort   <lemort@ingenuity.io>
- *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *
  */
 
@@ -21,14 +20,13 @@ import I2Quick 1.0
 
 import MASTIC 1.0
 
-// misc sub-directory
-import "misc" as Misc
 
 
 Item {
     id: rootItem
 
     anchors.fill: parent
+
 
     //--------------------------------
     //
@@ -40,11 +38,11 @@ Item {
     property var controller : null;
 
 
-    //-----------------------------------------
+    //--------------------------------
     //
     // Functions
     //
-    //-----------------------------------------
+    //--------------------------------
 
 
 
@@ -106,16 +104,19 @@ Item {
 
             anchors.fill: parent
 
-            color: "#282C34"
+            color: MasticTheme.agentsMappingBackgroundColor
 
-            Misc.SeamlessGrid {
+            SeamlessGrid {
                 anchors.fill: parent
 
                 offsetX: workspace.x
                 offsetY: workspace.y
 
                 cellSize: 150 * workspace.scale
-                numberOfSubCells: 5
+                numberOfSubDivisions: 5
+
+                cellStroke: MasticTheme.agentsMappingGridLineColor
+                subCellStroke: MasticTheme.agentsMappingGridSublineColor
             }
         }
 
@@ -128,9 +129,12 @@ Item {
         PinchArea {
             anchors.fill: parent
 
-            pinch.target: workspace
-            pinch.minimumScale: 0.25
-            pinch.maximumScale: 4
+            pinch {
+                target: workspace
+
+                minimumScale: 0.25
+                maximumScale: 4
+            }
 
             MouseArea {
                 anchors.fill: parent
@@ -162,17 +166,9 @@ Item {
                 //------------------------------------------------
 
 
-                // Minimum length of control handle
-                readonly property real controlHandleMinLength: 20;
-
                 // Maximum Z-index
                 property int maxZ: 0
 
-                // Links
-                property int linkWidth: 4
-                property int linkFuzzyRadius: 4
-                property color linkColor: "#ffffff"
-                property color linkHoverColor: "firebrick"
 
                 // Slots
                 property color inletColor: "#0CB8FF"
@@ -185,367 +181,99 @@ Item {
                 property color nodeSelectedBorderColor: "#ffffff"
 
 
+                //----------------------------------------
+                // TODO: replace with a Repeater
+                //       model: list of LinkVM
+
                 //
                 // Link between [item1, nodeOut] and [item3, nodein1]
                 //
-                I2CubicBezierCurve {
+                Link {
                     id: link1
-
-                    function updateControlPoints()
-                    {
-                        var dx = secondPoint.x - firstPoint.x;
-                        var dy = secondPoint.y - firstPoint.y;
-                        var offsetX = Math.max(Math.abs(0.5 * dx), workspace.controlHandleMinLength);
-                        var offsetY = Math.max(Math.abs(0.5 * dy), workspace.controlHandleMinLength);
-
-                        if (dx > 0)
-                        {
-                            offsetY = 0;
-                        }
-                        else
-                        {
-                            offsetX = Math.max(offsetX, offsetY);
-
-                            if (dy < 0)
-                            {
-                                offsetY = -offsetY;
-                            }
-                        }
-
-
-                        firstControlPoint = Qt.point(firstPoint.x + offsetX, firstPoint.y + offsetY);
-                        secondControlPoint = Qt.point(secondPoint.x - offsetX, secondPoint.y - offsetY );
-                    }
 
                     firstPoint: Qt.point(item1.x + item1NodeOut.x + item1NodeOut.width/2, item1.y + item1NodeOut.y + item1NodeOut.height/2)
 
                     secondPoint: Qt.point(item3.x + item3NodeIn1.x + item3NodeIn1.width/2, item3.y + item3NodeIn1.y + item3NodeIn1.height/2)
 
-                    onFirstPointChanged: updateControlPoints();
-                    onSecondPointChanged: updateControlPoints();
-                    Component.onCompleted: updateControlPoints();
-
-                    stroke: (mouseAreaLink1.pressed) ? workspace.linkHoverColor : workspace.linkColor
-                    strokeWidth: workspace.linkWidth
-
-                    fuzzyColor: workspace.linkHoverColor
-                    fuzzyRadius: (mouseAreaLink1.containsMouse) ? workspace.linkFuzzyRadius : 0
-
-                    // Clip:true to clip our mousearea
-                    clip: true
-
-                    MouseArea {
-                        id: mouseAreaLink1
-
-                        anchors.fill: parent
-
-                        hoverEnabled: true
-                    }
+                    onClicked: console.log("Click on link1")
                 }
 
 
                 //
                 // Link between [item2, nodeOut] and [item3, nodein2]
                 //
-                I2CubicBezierCurve {
+                Link {
                     id: link2
-
-                    function updateControlPoints()
-                    {
-                        var dx = secondPoint.x - firstPoint.x;
-                        var dy = secondPoint.y - firstPoint.y;
-                        var offsetX = Math.max(Math.abs(0.5 * dx), workspace.controlHandleMinLength);
-                        var offsetY = Math.max(Math.abs(0.5 * dy), workspace.controlHandleMinLength);
-
-                        if (dx > 0)
-                        {
-                            offsetY = 0;
-                        }
-                        else
-                        {
-                            offsetX = Math.max(offsetX, offsetY);
-
-                            if (dy < 0)
-                            {
-                                offsetY = -offsetY;
-                            }
-                        }
-
-
-                        firstControlPoint = Qt.point(firstPoint.x + offsetX, firstPoint.y + offsetY);
-                        secondControlPoint = Qt.point(secondPoint.x - offsetX, secondPoint.y - offsetY );
-                    }
 
                     firstPoint: Qt.point(item2.x + item2NodeOut.x + item2NodeOut.width/2, item2.y + item2NodeOut.y + item2NodeOut.height/2)
 
                     secondPoint: Qt.point(item3.x + item3NodeIn2.x + item3NodeIn2.width/2, item3.y + item3NodeIn2.y + item3NodeIn2.height/2)
 
-                    onFirstPointChanged: updateControlPoints();
-                    onSecondPointChanged: updateControlPoints();
-                    Component.onCompleted: updateControlPoints();
-
-                    stroke: (mouseAreaLink2.pressed) ? workspace.linkHoverColor : workspace.linkColor
-                    strokeWidth: workspace.linkWidth
-
-                    fuzzyColor: workspace.linkHoverColor
-                    fuzzyRadius: (mouseAreaLink2.containsMouse) ? workspace.linkFuzzyRadius : 0
-
-
-                    // Clip:true to clip our mousearea
-                    clip: true
-
-                    MouseArea {
-                        id: mouseAreaLink2
-
-                        anchors.fill: parent
-
-                        hoverEnabled: true
-                    }
-                }
+                    onClicked: console.log("Click on link2")
+               }
 
 
                 //
                 // Link between [item2, nodeOut] and [item4, nodeIn]
                 //
-                I2CubicBezierCurve {
+                Link {
                     id: link3
-
-                    function updateControlPoints()
-                    {
-                        var dx = secondPoint.x - firstPoint.x;
-                        var dy = secondPoint.y - firstPoint.y;
-                        var offsetX = Math.max(Math.abs(0.5 * dx), workspace.controlHandleMinLength);
-                        var offsetY = Math.max(Math.abs(0.5 * dy), workspace.controlHandleMinLength);
-
-                        if (dx > 0)
-                        {
-                            offsetY = 0;
-                        }
-                        else
-                        {
-                            offsetX = Math.max(offsetX, offsetY);
-
-                            if (dy < 0)
-                            {
-                                offsetY = -offsetY;
-                            }
-                        }
-
-
-                        firstControlPoint = Qt.point(firstPoint.x + offsetX, firstPoint.y + offsetY);
-                        secondControlPoint = Qt.point(secondPoint.x - offsetX, secondPoint.y - offsetY );
-                    }
-
 
                     firstPoint: Qt.point(item2.x + item2NodeOut.x + item2NodeOut.width/2, item2.y + item2NodeOut.y + item2NodeOut.height/2)
 
                     secondPoint: Qt.point(item4.x + item4NodeIn.x + item4NodeIn.width/2, item4.y + item4NodeIn.y + item4NodeIn.height/2)
 
-                    onFirstPointChanged: updateControlPoints();
-                    onSecondPointChanged: updateControlPoints();
-                    Component.onCompleted: updateControlPoints();
-
-                    stroke: (mouseAreaLink3.pressed) ? workspace.linkHoverColor : workspace.linkColor
-                    strokeWidth: workspace.linkWidth
-
-                    fuzzyColor: workspace.linkHoverColor
-                    fuzzyRadius: (mouseAreaLink3.containsMouse) ? workspace.linkFuzzyRadius : 0
-
-
-                    // Clip:true to clip our mousearea
-                    clip: true
-
-                    MouseArea {
-                        id: mouseAreaLink3
-
-                        anchors.fill: parent
-
-                        hoverEnabled: true
-                    }
+                     onClicked: console.log("Click on link3")
                 }
 
 
                 //
                 // Link between [item3, nodeOut1] and [item5, nodeIn1]
                 //
-                I2CubicBezierCurve {
+                Link {
                     id: link4
-
-                    function updateControlPoints()
-                    {
-                        var dx = secondPoint.x - firstPoint.x;
-                        var dy = secondPoint.y - firstPoint.y;
-                        var offsetX = Math.max(Math.abs(0.5 * dx), workspace.controlHandleMinLength);
-                        var offsetY = Math.max(Math.abs(0.5 * dy), workspace.controlHandleMinLength);
-
-                        if (dx > 0)
-                        {
-                            offsetY = 0;
-                        }
-                        else
-                        {
-                            offsetX = Math.max(offsetX, offsetY);
-
-                            if (dy < 0)
-                            {
-                                offsetY = -offsetY;
-                            }
-                        }
-
-
-                        firstControlPoint = Qt.point(firstPoint.x + offsetX, firstPoint.y + offsetY);
-                        secondControlPoint = Qt.point(secondPoint.x - offsetX, secondPoint.y - offsetY );
-                    }
-
 
                     firstPoint: Qt.point(item3.x + item3NodeOut1.x + item3NodeOut1.width/2, item3.y + item3NodeOut1.y + item3NodeOut1.height/2)
 
                     secondPoint: Qt.point(item5.x + item5NodeIn1.x + item5NodeIn1.width/2, item5.y + item5NodeIn1.y + item5NodeIn1.height/2)
 
-                    onFirstPointChanged: updateControlPoints();
-                    onSecondPointChanged: updateControlPoints();
-                    Component.onCompleted: updateControlPoints();
-
-                    stroke: (mouseAreaLink4.pressed) ? workspace.linkHoverColor : workspace.linkColor
-                    strokeWidth: workspace.linkWidth
-
-                    fuzzyColor: workspace.linkHoverColor
-                    fuzzyRadius: (mouseAreaLink4.containsMouse) ? workspace.linkFuzzyRadius : 0
-
-
-                    // Clip:true to clip our mousearea
-                    clip: true
-
-                    MouseArea {
-                        id: mouseAreaLink4
-
-                        anchors.fill: parent
-
-                        hoverEnabled: true
-                    }
+                     onClicked: console.log("Click on link4")
                 }
 
 
                 //
                 // Link between [item3, nodeOut2] and [item5, nodeIn2]
                 //
-                I2CubicBezierCurve {
+                Link {
                     id: link5
-
-                    function updateControlPoints()
-                    {
-                        var dx = secondPoint.x - firstPoint.x;
-                        var dy = secondPoint.y - firstPoint.y;
-                        var offsetX = Math.max(Math.abs(0.5 * dx), workspace.controlHandleMinLength);
-                        var offsetY = Math.max(Math.abs(0.5 * dy), workspace.controlHandleMinLength);
-
-                        if (dx > 0)
-                        {
-                            offsetY = 0;
-                        }
-                        else
-                        {
-                            offsetX = Math.max(offsetX, offsetY);
-
-                            if (dy < 0)
-                            {
-                                offsetY = -offsetY;
-                            }
-                        }
-
-
-                        firstControlPoint = Qt.point(firstPoint.x + offsetX, firstPoint.y + offsetY);
-                        secondControlPoint = Qt.point(secondPoint.x - offsetX, secondPoint.y - offsetY );
-                    }
-
 
                     firstPoint: Qt.point(item3.x + item3NodeOut2.x + item3NodeOut2.width/2, item3.y + item3NodeOut2.y + item3NodeOut2.height/2)
 
                     secondPoint: Qt.point(item5.x + item5NodeIn2.x + item5NodeIn2.width/2, item5.y + item5NodeIn2.y + item5NodeIn2.height/2)
 
-                    onFirstPointChanged: updateControlPoints();
-                    onSecondPointChanged: updateControlPoints();
-                    Component.onCompleted: updateControlPoints();
-
-                    stroke: (mouseAreaLink5.pressed) ? workspace.linkHoverColor : workspace.linkColor
-                    strokeWidth: workspace.linkWidth
-
-                    fuzzyColor: workspace.linkHoverColor
-                    fuzzyRadius: (mouseAreaLink5.containsMouse) ? workspace.linkFuzzyRadius : 0
-
-
-                    // Clip:true to clip our mousearea
-                    clip: true
-
-                    MouseArea {
-                        id: mouseAreaLink5
-
-                        anchors.fill: parent
-
-                        hoverEnabled: true
-                    }
+                     onClicked: console.log("Click on link5")
                 }
 
 
                 //
                 // Link between [item4, nodeOut] and [item5, nodeIn2]
                 //
-                I2CubicBezierCurve {
+                Link {
                     id: link6
-
-                    function updateControlPoints()
-                    {
-                        var dx = secondPoint.x - firstPoint.x;
-                        var dy = secondPoint.y - firstPoint.y;
-                        var offsetX = Math.max(Math.abs(0.5 * dx), workspace.controlHandleMinLength);
-                        var offsetY = Math.max(Math.abs(0.5 * dy), workspace.controlHandleMinLength);
-
-                        if (dx > 0)
-                        {
-                            offsetY = 0;
-                        }
-                        else
-                        {
-                            offsetX = Math.max(offsetX, offsetY);
-
-                            if (dy < 0)
-                            {
-                                offsetY = -offsetY;
-                            }
-                        }
-
-
-                        firstControlPoint = Qt.point(firstPoint.x + offsetX, firstPoint.y + offsetY);
-                        secondControlPoint = Qt.point(secondPoint.x - offsetX, secondPoint.y - offsetY );
-                    }
 
                     firstPoint: Qt.point(item4.x + item4NodeOut.x + item4NodeOut.width/2, item4.y + item4NodeOut.y + item4NodeOut.height/2)
 
                     secondPoint: Qt.point(item5.x + item5NodeIn2.x + item5NodeIn2.width/2, item5.y + item5NodeIn2.y + item5NodeIn2.height/2)
 
-                    onFirstPointChanged: updateControlPoints();
-                    onSecondPointChanged: updateControlPoints();
-                    Component.onCompleted: updateControlPoints();
+                     onClicked: console.log("Click on link6")
+               }
 
-                    stroke: (mouseAreaLink6.pressed) ? workspace.linkHoverColor : workspace.linkColor
-                    strokeWidth: workspace.linkWidth
-
-                    fuzzyColor: workspace.linkHoverColor
-                    fuzzyRadius: (mouseAreaLink6.containsMouse) ? workspace.linkFuzzyRadius : 0
+                //----------------------------------------
 
 
-                    // Clip:true to clip our mousearea
-                    clip: true
-
-                    MouseArea {
-                        id: mouseAreaLink6
-
-                        anchors.fill: parent
-
-                        hoverEnabled: true
-                    }
-                }
-
+                //----------------------------------------
+                // TODO: replace with a Repeater
+                //       model: list of AgentVM
 
                 //
                 // Item 1
@@ -1064,7 +792,7 @@ Item {
                 }
 
 
-
+                //----------------------------------------
             }
         }
     }

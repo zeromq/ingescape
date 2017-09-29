@@ -90,38 +90,72 @@ Item {
     //
     //-----------------------------------------
 
-    // - Standard font family
-    //readonly property string fontFamily: "Source Sans Pro"
-    //readonly property string lightFontStyleName: "Light"
+    // Default font family
+    readonly property string defaultFontFamily: "Arial"
 
 
-    /*FontLoader {
-        id:sourceSansProBold
-        source: "qrc:/Resources/fonts/source-sans-pro/SourceSansPro-Bold.ttf"
-    }
+    // Normal font
+    readonly property font normalFont: Qt.font({
+                                                family: defaultFontFamily,
+                                                pixelSize: 12
+                                                });
 
-    FontLoader {
-        id:sourceSansProBoldItalic
-        source: "qrc:/Resources/fonts/source-sans-pro/SourceSansPro-BoldItalic.ttf"
-    }
 
-    FontLoader {
-        id:sourceSansProItalic
-        source: "qrc:/Resources/fonts/source-sans-pro/SourceSansPro-Italic.ttf"
-    }
+    // Heading font (level1)
+    readonly property font headingFont: Qt.font({
+                                                 family: defaultFontFamily,
+                                                 pixelSize: 50,
+                                                 weight: Font.Bold
+                                                 });
 
+
+    // Heading font (level2)
+    readonly property font heading2Font: Qt.font({
+                                                 family: defaultFontFamily,
+                                                 pixelSize: 20,
+                                                 weight: Font.Bold
+                                                 });
+
+
+
+
+    /*
     FontLoader {
         id:sourceSansProRegular
         source: "qrc:/Resources/fonts/source-sans-pro/SourceSansPro-Regular.ttf"
     }
+    */
 
-    FontLoader {
-        id:sourceSansProLight
-        source: "qrc:/Resources/fonts/source-sans-pro/SourceSansPro-Light.ttf"
-    }
 
-    FontLoader {
-        id:sourceSansProLightItalic
-        source: "qrc:/Resources/fonts/source-sans-pro/SourceSansPro-LightItalic.ttf"
-    }*/
+
+    //-----------------------------------------
+    //
+    // Agents mapping UI elements
+    //
+    //-----------------------------------------
+
+    //
+    // Background
+    //
+    readonly property color agentsMappingBackgroundColor: "#282C34"
+    // - grid
+    readonly property color agentsMappingGridLineColor: "#323741"
+    readonly property color agentsMappingGridSublineColor: "#29313A"
+
+
+    //
+    // Links
+    //
+    // - Default state
+    readonly property int agentsMappingLinkDefaultWidth: 4
+    readonly property color agentsMappingLinkDefaultColor: "#ffffff"
+    // - Hover state
+    readonly property int agentsMappingLinkHoverFuzzyRadius: 4
+    readonly property color agentsMappingLinkHoverFuzzyColor: "firebrick"
+
+    // Press state
+    readonly property color agentsMappingLinkPressColor: "firebrick"
+
+
+
 }
