@@ -140,7 +140,7 @@ int subscribeToPublisherOutput(subscriber_t *subscriber, const char *outputName)
         }
         if (!filterAlreadyExists){
             // Set subscriber to the output filter
-            mtic_debug("subscribe to agent %s output %s.\n",agentName,outputName);
+            mtic_debug("subscribe to agent %s output %s\n",agentName,outputName);
             zsock_set_subscribe(subscriber->subscriber, outputName);
             mappingFilter_t *f = calloc(1, sizeof(mappingFilter_t));
             strncpy(f->filter, outputName, MAX_FILTER_SIZE);
@@ -160,18 +160,14 @@ int unsubscribeToPublisherOutput(subscriber_t *subscriber, const char *outputNam
         mappingFilter_t *filter = NULL;
         DL_FOREACH(subscriber->mappingsFilters, filter){
             if (strcmp(filter->filter, outputName) == 0){
-                mtic_debug("unsubscribe to agent %s output %s.\n",agentName,outputName);
+                mtic_debug("unsubscribe to agent %s output %s\n",agentName,outputName);
                 zsock_set_unsubscribe(subscriber->subscriber, outputName);
                 DL_DELETE(subscriber->mappingsFilters, filter);
                 break;
             }
         }
-        // Set subscriber to the output filter
-        
         return 1;
     }
-    
-    // Subscriber not found, it is not in the network yet
     return -1;
 }
 
@@ -704,6 +700,7 @@ int triggerDefinitionUpdate(zloop_t *loop, int timer_id, void *arg){
             free(definitionStr);
         }
         network_needToSendDefinitionUpdate = false;
+        network_needToUpdateMapping = true;
     }
     return 0;
 }
