@@ -121,10 +121,6 @@ typedef enum {
     INPUT_CAT
 } category_check_type;
 
-/*
- * Define the state of a mapping element
- */
-typedef enum {MAPPING_ACTIVE, MAPPING_INACTIVE} mapping_element_state;
 
 /*
  * Define the structure 'mapping_element' which contains mapping between an input and an (one or all) external agent's output :
@@ -139,7 +135,6 @@ typedef struct mapping_element {
     char* input_name;
     char* agent_name;
     char* output_name;
-    mapping_element_state state;
     UT_hash_handle hh;
 } mapping_element_t;
 
@@ -211,6 +206,7 @@ void definition_freeDefinition (definition* definition);
 
 extern mapping_t *mtic_internal_mapping;
 
+void mapping_freeMapping (mapping_t* map);
 mapping_element_t * mapping_createMappingElement(const char * input_name,
                                                  const char *agent_name,
                                                  const char* output_name);
@@ -222,7 +218,6 @@ unsigned long djb2_hash (unsigned char *str);
 extern bool isWholeAgentMuted;
 
 void model_setIopValue(agent_iop *iop, void* value, long size);
-agent_iop* model_find_iop_by_name_in_definition(const char*name, definition* definition);
 agent_iop* model_findIopByName(const char* name, iop_t type);
 agent_iop* model_findInputByName(const char* name);
 agent_iop* model_findOutputByName(const char* name);
@@ -233,6 +228,7 @@ void* model_get(const char*name_iop, iop_t type);
 // network
 
 extern bool network_needToSendDefinitionUpdate;
+extern bool network_needToUpdateMapping;
 extern zyreloopElements_t *agentElements;
 //DO NOT DESTROY THE ZYRE_EVENT INSIDE THE CALLBACK
 typedef int (*network_zyreIncoming) (const zyre_event_t *zyre_event, void *arg);
