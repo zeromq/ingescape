@@ -149,40 +149,6 @@ void model_runObserveCallbacksForIOP(agent_iop *iop, void *value, long valueSize
 ////////////////////////////////////////////////////////////////////////
 // PRIVATE API
 ////////////////////////////////////////////////////////////////////////
-agent_iop * model_find_iop_by_name_in_definition(const char *name, definition* definition){
-    agent_iop *found = NULL;
-    
-    if(name != NULL && definition != NULL){
-        //find the input agent_iop
-        HASH_FIND_STR( definition->inputs_table, name, found );
-        if(found == NULL){
-            // look in the outputs
-            HASH_FIND_STR( definition->outputs_table, name, found );
-        }else
-        {
-            return found;
-        }
-        
-        if(found == NULL){
-            //find the parameters agent_iop
-            HASH_FIND_STR( definition->params_table, name, found );
-        }else{
-            return found;
-        }
-        
-        if(found == NULL){
-            fprintf(stderr, "ERROR : The name of the iop {%s} doesn't exist. \n",name);
-            return found;
-        }else
-        {
-            return found;
-        }
-    }else{
-        fprintf(stderr, "ERROR : The name of the IOP is empty. \n");
-        return found;
-    }
-}
-
 agent_iop * model_findIopByName(const char *name, iop_t type){
     agent_iop *found = NULL;
     
@@ -1303,13 +1269,14 @@ int mtic_readParameterAsData(const char *name, void **data, long *size){
  */
 int mtic_writeInput(const char *name, char *value, long size){
 
-    //Get the pointer IOP Agent selected by name
     agent_iop *iop = model_findIopByName((char*) name,INPUT_T);
     int ret = 0;
-
-    // Check if the iop has been returned.
     if(iop == NULL){
-        mtic_debug("%s : Agent's input %s cannot be found\n", __FUNCTION__, name);
+        mtic_debug("%s : our input %s cannot be found\n", __FUNCTION__, name);
+        return 0;
+    }
+    if (value == NULL){
+        mtic_debug("%s : value %s cannot be NULL\n", __FUNCTION__, name);
         return 0;
     }
 
@@ -1372,13 +1339,14 @@ int mtic_writeInput(const char *name, char *value, long size){
  */
 int mtic_writeOutput(const char *name, char *value, long size){
 
-    //Get the pointer IOP Agent selected by name
     agent_iop *iop = model_findIopByName((char*) name,OUTPUT_T);
     int ret = 0;
-
-    // Check if the iop has been returned.
     if(iop == NULL){
-        mtic_debug("%s : Agent's output %s cannot be found\n", __FUNCTION__, name);
+        mtic_debug("%s : our output %s cannot be found\n", __FUNCTION__, name);
+        return 0;
+    }
+    if (value == NULL){
+        mtic_debug("%s : value %s cannot be NULL\n", __FUNCTION__, name);
         return 0;
     }
 
@@ -1441,13 +1409,14 @@ int mtic_writeOutput(const char *name, char *value, long size){
  */
 int mtic_writeParameter(const char *name, char *value, long size){
 
-    //Get the pointer IOP Agent selected by name
     agent_iop *iop = model_findIopByName((char*) name,PARAMETER_T);
     int ret = 0;
-
-    // Check if the iop has been returned.
     if(iop == NULL){
-        mtic_debug("%s : Agent's parameter %s cannot be found\n", __FUNCTION__, name);
+        mtic_debug("%s : our parameter %s cannot be found\n", __FUNCTION__, name);
+        return 0;
+    }
+    if (value == NULL){
+        mtic_debug("%s : value %s cannot be NULL\n", __FUNCTION__, name);
         return 0;
     }
 
