@@ -122,7 +122,6 @@ mapping_element_t * mapping_createMappingElement(const char * input_name,
     new_map_elmt->input_name = strdup(input_name);
     new_map_elmt->agent_name = strdup(agent_name);
     new_map_elmt->output_name = strdup(output_name);
-    new_map_elmt->state = MAPPING_INACTIVE;
     
     return new_map_elmt;
 }
@@ -163,6 +162,7 @@ int mtic_loadMapping (const char* json_str){
         return -1;
     }else{
         mtic_internal_mapping = tmp;
+        network_needToUpdateMapping = true;
     }
     
     return 1;
@@ -194,6 +194,7 @@ int mtic_loadMappingFromPath (const char* file_path){
         return -1;
     }else{
         mtic_internal_mapping = tmp;
+        network_needToUpdateMapping = true;
     }
     
     return 1;
@@ -217,6 +218,7 @@ int mtic_clearMapping(){
     mtic_internal_mapping->description = NULL;
     mtic_internal_mapping->version = NULL;
     mtic_internal_mapping->map_elements = NULL;
+    network_needToUpdateMapping = true;
     return 1;
 }
 
@@ -444,6 +446,7 @@ unsigned long mtic_addMappingEntry(char *fromOurInput, char *toAgent, char *with
         mapping_element_t *new = mapping_createMappingElement(fromOurInput, toAgent, withOutput);
         new->id = h;
         HASH_ADD(hh, mtic_internal_mapping->map_elements, id, sizeof(unsigned long), new);
+        network_needToUpdateMapping = true;
         return h;
     }else{
         mtic_debug("mtic_addMappingEntry : mapping combination (%s,%s%s) already exists\n", fromOurInput, toAgent, withOutput);
