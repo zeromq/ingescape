@@ -27,6 +27,8 @@
  */
 AgentVM::AgentVM(AgentM* model, QObject *parent) : QObject(parent),
     _modelM(model),
+    _x(0),
+    _y(0),
     _isMuted(false),
     _isFrozen(false)
 {

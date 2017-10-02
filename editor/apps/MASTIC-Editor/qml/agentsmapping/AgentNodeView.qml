@@ -34,6 +34,30 @@ Item {
 
 
 
+    // Init position of our agent
+    x: (agentVM) ? agentVM.x : 0
+    y: (agentVM) ? agentVM.y : 0
+
+
+    //
+    // Bindings to save the position of our agent
+    //
+    // - Abscissa
+    Binding {
+        target: rootItem.agentVM
+        property: "x"
+        value: rootItem.x
+    }
+
+    // - Ordinate
+    Binding {
+        target: rootItem.agentVM
+        property: "y"
+        value: rootItem.y
+    }
+
+
+
     //--------------------------------
     //
     // Signals
@@ -58,7 +82,6 @@ Item {
     //--------------------------------
 
 
-
     //
     //
     // Inlets / Input slots
@@ -74,6 +97,7 @@ Item {
 
 
         Repeater {
+            // List of intput slots VM (AgentIOPVM)
             model: 0
 
             delegate: Item {
@@ -84,6 +108,7 @@ Item {
 
                 //
                 // Bindings to save the anchor point of our input slot
+                // i.e. the point used to draw a link
                 //
                 // - Abscissa
                 Binding {
@@ -125,6 +150,7 @@ Item {
 
 
         Repeater {
+            // List of output slots VM (AgentIOPVM)
             model: 0
 
             delegate: Item {
@@ -135,6 +161,7 @@ Item {
 
                 //
                 // Bindings to save the anchor point of our input slot
+                // i.e. the point used to draw a link
                 //
                 // - Abscissa
                 Binding {
