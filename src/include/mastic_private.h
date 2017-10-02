@@ -169,6 +169,12 @@ typedef struct mapping {
     UT_hash_handle hh;
 } mapping_t;
 
+#define MAX_FILTER_SIZE 1024
+typedef struct mappingFilter {
+    char filter[MAX_FILTER_SIZE];
+    struct mappingFilter *next, *prev;
+} mappingFilter_t;
+
 typedef struct subscriber{
     const char *agentName;
     const char *agentPeerId;
@@ -176,6 +182,7 @@ typedef struct subscriber{
     zmq_pollitem_t *pollItem;
     definition *definition;
     bool mappedNotificationToSend;
+    mappingFilter_t *mappingsFilters;
     UT_hash_handle hh;
 } subscriber_t;
 
