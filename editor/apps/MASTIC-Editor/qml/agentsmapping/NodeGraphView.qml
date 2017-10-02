@@ -140,6 +140,8 @@ Item {
                 anchors.fill: parent
 
                 drag.target: workspace
+
+                onWheel: console.log("wheel")
             }
 
 
@@ -794,6 +796,32 @@ Item {
 
                 //----------------------------------------
             }
+        }
+
+
+
+
+        //
+        // Legend
+        //
+        Text {
+            id: legend
+
+            anchors {
+                left: parent.left
+                right: parent.right
+                top: parent.top
+                leftMargin: 20
+                rightMargin: 20
+                topMargin: 20
+            }
+
+            text: qsTr("Demo: pan, pinch to zoom, drag-n-drop of nodes, double-click to expand/collapse a node with multiple slots")
+
+            font: MasticTheme.normalFont
+            color: MasticTheme.whiteColor
+
+            wrapMode: Text.WordWrap
         }
     }
 }

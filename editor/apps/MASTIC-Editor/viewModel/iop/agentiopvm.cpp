@@ -30,7 +30,9 @@ AgentIOPVM::AgentIOPVM(AgentIOPM* model, QObject *parent) : QObject(parent),
     _mappingValue(QVariant()),
     _displayableMappingValue(""),
     _currentValue(QVariant()),
-    _displayableCurrentValue("")
+    _displayableCurrentValue(""),
+    _x(0),
+    _y(0)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
