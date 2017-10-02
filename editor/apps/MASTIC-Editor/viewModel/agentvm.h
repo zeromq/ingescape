@@ -45,6 +45,12 @@ class AgentVM : public QObject
     // List of VM of parameters
     I2_QOBJECT_LISTMODEL(AgentIOPVM, parametersList)
 
+    // Abscissa of our view
+    I2_QML_PROPERTY(qreal, x)
+
+    // Ordinate of our view
+    I2_QML_PROPERTY(qreal, y)
+
     // State: enum with ON demandé, ON effectif, OFF demandé, OFF effectif
 
     // Status ?

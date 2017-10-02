@@ -14,5 +14,6 @@
         <file>qml/agentsmapping/Link.qml</file>
         <file>qml/AgentsMappingView.qml</file>
         <file>qml/agentsmapping/SeamlessGrid.qml</file>
+        <file>qml/agentsmapping/AgentNodeView.qml</file>
     </qresource>
 </RCC>

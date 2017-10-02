@@ -51,6 +51,14 @@ class AgentIOPVM : public QObject
     //I2_QOBJECT_LISTMODEL(QPair<QDateTime, QString>, pastValues)
 
 
+    // Abscissa of our view
+    I2_QML_PROPERTY(qreal, x)
+
+    // Ordinate of our view
+    I2_QML_PROPERTY(qreal, y)
+
+
+
 public:
     /**
      * @brief Default constructor
