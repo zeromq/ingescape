@@ -318,7 +318,6 @@ int manageSubscription (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 definition * externalDefinition = foundSubscriber->definition;
 
                 if(externalDefinition != NULL){
-                    // convert the string value in void* corresponding to the type of iop
                     agent_iop * foundOutput = NULL;
                     if (externalDefinition->outputs_table != NULL){
                         HASH_FIND_STR(externalDefinition->outputs_table, output, foundOutput);
@@ -403,12 +402,6 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
         const char *group = zyre_event_group (zyre_event);
         zmsg_t *msg = zyre_event_msg (zyre_event);
         
-        //handle callbacks
-        zyreCallback_t *elt;
-        DL_FOREACH(zyreCallbacks,elt){
-            elt->callback_ptr(zyre_event, elt->myData);
-        }
-
         //parse event
         if (streq (event, "ENTER")){
             mtic_debug("->%s has entered the network with peer id %s and address %s\n", name, peer, address);
@@ -680,6 +673,13 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 }
             }
         }
+        
+        //handle callbacks
+        zyreCallback_t *elt;
+        DL_FOREACH(zyreCallbacks,elt){
+            elt->callback_ptr(zyre_event, elt->myData);
+        }
+
         zyre_event_destroy(&zyre_event);
     }
     return 0;
