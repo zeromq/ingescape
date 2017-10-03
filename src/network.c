@@ -79,6 +79,7 @@ bool isWholeAgentMuted = false;
 //global parameters
 //prefixes for sending definitions and mappings through zyre
 static const char *definitionPrefix = "EXTERNAL_DEFINITION#";
+static const char *mappingPrefix = "EXTERNAL_MAPPING#";
 static const char *loadMappingPrefix = "LOAD_THIS_MAPPING#";
 static const char *loadDefinitionPrefix = "LOAD_THIS_DEFINITION#";
 #define CHANNEL "MASTIC_PRIVATE"
@@ -228,11 +229,28 @@ void sendDefinitionToAgent(const char *peerId, const char *definition)
     }
 }
 
+void sendMappingToAgent(const char *peerId, const char *mapping)
+{
+    if(peerId != NULL &&  mapping != NULL)
+    {
+        if(agentElements->node != NULL)
+        {
+            zyre_whispers(agentElements->node, peerId, "%s%s", mappingPrefix, mapping);
+        } else {
+            mtic_debug("Error : could not send our mapping to %s : our agent is not connected\n",peerId);
+        }
+    }
+}
+
 void network_cleanAndFreeSubscriber(subscriber_t *subscriber){
     mtic_debug("cleaning subscription to %s\n", subscriber->agentName);
     // clean the agent definition
     if(subscriber->definition != NULL){
         definition_freeDefinition(subscriber->definition);
+    }
+    //clean the agent mapping
+    if(subscriber->mapping != NULL){
+        mapping_freeMapping(subscriber->mapping);
     }
     //clean the subscriber itself
     mappingFilter_t *elt, *tmp;
@@ -508,6 +526,12 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     sendDefinitionToAgent(peer, definitionStr);
                     free(definitionStr);
                 }
+                char *mappingStr = NULL;
+                mappingStr = parser_export_mapping(mtic_internal_mapping);
+                if (mappingStr != NULL){
+                    sendMappingToAgent(peer, mappingStr);
+                    free(mappingStr);
+                }
                 zyreAgent_t *zagent = NULL;
                 HASH_FIND_STR(zyreAgents, peer, zagent);
                 if (zagent != NULL){
@@ -553,6 +577,35 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     newDefinition = NULL;
                 }
                 free(strDefinition);
+            }
+            //check if message is an EXTERNAL mapping
+            else if(strlen(message) > strlen(mappingPrefix) && strncmp (message, mappingPrefix, strlen(mappingPrefix)) == 0)
+            {
+                // Extract mapping from message
+                char* strMapping = calloc(strlen(message)- strlen(mappingPrefix)+1, sizeof(char));
+                memcpy(strMapping, &message[strlen(mappingPrefix)], strlen(message)- strlen(mappingPrefix));
+                strMapping[strlen(message)- strlen(mappingPrefix)] = '\0';
+                
+                // Load mapping from string content
+                mapping_t *newMapping = parser_LoadMap(strMapping);
+                subscriber_t *subscriber;
+                HASH_FIND_STR(subscribers, peer, subscriber);
+                
+                if (newMapping != NULL && newMapping->name != NULL && subscriber != NULL){
+                    // Look if this agent already has a mapping
+                    if(subscriber->mapping != NULL){
+                        mtic_debug("mapping already exists for agent %s : new definition will overwrite the previous one...\n", name);
+                        mapping_freeMapping(subscriber->mapping);
+                        subscriber->mapping = NULL;
+                    }
+                    
+                    mtic_debug("Store mapping for agent %s\n", name);
+                    subscriber->mapping = newMapping;
+                }else{
+                    mtic_debug("ERROR: mapping is NULL or has no name for agent %s\n", name);
+                    mapping_freeMapping(subscriber->mapping);
+                }
+                free(strMapping);
             }
             //check if message is DEFINITION TO BE LOADED
             else if (strlen(message) > strlen(loadDefinitionPrefix) && strncmp (message, loadDefinitionPrefix, strlen(loadDefinitionPrefix)) == 0)
@@ -700,14 +753,26 @@ int triggerDefinitionUpdate(zloop_t *loop, int timer_id, void *arg){
             free(definitionStr);
         }
         network_needToSendDefinitionUpdate = false;
+        //when definition changes, mapping may need to be updated as well
         network_needToUpdateMapping = true;
     }
     return 0;
 }
 
-//Timer callback to (re)send our definition to agents on the private channel
+//Timer callback to update and (re)send our mapping to agents on the private channel
 int triggerMappingUpdate(zloop_t *loop, int timer_id, void *arg){
     if (network_needToUpdateMapping){
+        char *mappingStr = NULL;
+        mappingStr = parser_export_mapping(mtic_internal_mapping);
+        if (mappingStr != NULL){
+            zyreAgent_t *a, *tmp;
+            HASH_ITER(hh, zyreAgents, a, tmp){
+                if (a->hasJoinedPrivateChannel){
+                    sendDefinitionToAgent(a->peerId, mappingStr);
+                }
+            }
+            free(mappingStr);
+        }
         subscriber_t *s, *tmp;
         HASH_ITER(hh, subscribers, s, tmp){
             network_manageSubscriberMapping(s);

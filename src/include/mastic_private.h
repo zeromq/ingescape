@@ -182,6 +182,7 @@ typedef struct subscriber{
     zmq_pollitem_t *pollItem;
     definition *definition;
     bool mappedNotificationToSend;
+    mapping_t *mapping;
     mappingFilter_t *mappingsFilters;
     UT_hash_handle hh;
 } subscriber_t;
