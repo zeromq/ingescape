@@ -170,7 +170,7 @@ Item {
                     property: "x"
 
                     // Two options: absolute value OR relative value
-                    value: rootItem.x + outputSlotItem.x
+                    value: rootItem.x + rootItem.width + outputSlotItem.x
                 }
 
                 // - Ordinate
