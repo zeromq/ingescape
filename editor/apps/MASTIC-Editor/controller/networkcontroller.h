@@ -20,11 +20,6 @@
 #include <QQmlEngine>
 #include <QJSEngine>
 
-extern "C" {
-#include <mastic/mastic_private.h>
-#include <zyre.h>
-}
-
 #include "I2PropertyHelpers.h"
 
 #include "model/agentm.h"

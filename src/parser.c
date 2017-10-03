@@ -758,51 +758,55 @@ static void json_dump_mapping (yajl_gen *g, mapping_t* mapp) {
 
     unsigned int hashCount = 0;
     mapping_element_t *currentMapOut = NULL;
-//    struct mapping_cat *currentMapCat = NULL;
 
-    yajl_gen_map_open(*g);
+    if(mapp != NULL)
+    {
+        //    struct mapping_cat *currentMapCat = NULL;
 
-    yajl_gen_string(*g, (const unsigned char *) STR_NAME, strlen(STR_NAME));
-    if(mapp->name != NULL)
-        yajl_gen_string(*g, (const unsigned char *) mapp->name, strlen (mapp->name));
-    else
-        yajl_gen_string(*g, (const unsigned char *) (""), 0);
+        yajl_gen_map_open(*g);
 
-    yajl_gen_string(*g, (const unsigned char *) STR_DESCRIPTION, strlen(STR_DESCRIPTION));
-    if(mapp->description != NULL)
-        yajl_gen_string(*g, (const unsigned char *) mapp->description, strlen (mapp->description));
-    else
-        yajl_gen_string(*g, (const unsigned char *) (""), 0);
+        yajl_gen_string(*g, (const unsigned char *) STR_NAME, strlen(STR_NAME));
+        if(mapp->name != NULL)
+            yajl_gen_string(*g, (const unsigned char *) mapp->name, strlen (mapp->name));
+        else
+            yajl_gen_string(*g, (const unsigned char *) (""), 0);
 
-    yajl_gen_string(*g, (const unsigned char *) STR_VERSION, strlen(STR_VERSION));
-    if(mapp->version != NULL)
-        yajl_gen_string(*g, (const unsigned char *) mapp->version, strlen(mapp->version));
-    else
-        yajl_gen_string(*g, (const unsigned char *) (""), 0);
+        yajl_gen_string(*g, (const unsigned char *) STR_DESCRIPTION, strlen(STR_DESCRIPTION));
+        if(mapp->description != NULL)
+            yajl_gen_string(*g, (const unsigned char *) mapp->description, strlen (mapp->description));
+        else
+            yajl_gen_string(*g, (const unsigned char *) (""), 0);
 
-    //Mapping_out
-    hashCount = HASH_COUNT(mapp->map_elements);
-    if (hashCount) {
-        yajl_gen_string(*g, (const unsigned char *) "mapping_out", strlen("mapping_out"));
-        yajl_gen_array_open(*g);
-        for(currentMapOut = mapp->map_elements; currentMapOut != NULL; currentMapOut=currentMapOut->hh.next) {
-            json_dump_mapping_out(g, currentMapOut);
+        yajl_gen_string(*g, (const unsigned char *) STR_VERSION, strlen(STR_VERSION));
+        if(mapp->version != NULL)
+            yajl_gen_string(*g, (const unsigned char *) mapp->version, strlen(mapp->version));
+        else
+            yajl_gen_string(*g, (const unsigned char *) (""), 0);
+
+        //Mapping_out
+        hashCount = HASH_COUNT(mapp->map_elements);
+        if (hashCount) {
+            yajl_gen_string(*g, (const unsigned char *) "mapping_out", strlen("mapping_out"));
+            yajl_gen_array_open(*g);
+            for(currentMapOut = mapp->map_elements; currentMapOut != NULL; currentMapOut=currentMapOut->hh.next) {
+                json_dump_mapping_out(g, currentMapOut);
+            }
+            yajl_gen_array_close(*g);
         }
-        yajl_gen_array_close(*g);
+
+    //    //Mapping_cat
+    //    hashCount = HASH_COUNT(mapp->map_cat);
+    //    if (hashCount) {
+    //        yajl_gen_string(*g, (const unsigned char *) "mapping_cat", strlen("mapping_cat"));
+    //        yajl_gen_array_open(*g);
+    //        for(currentMapCat=mapp->map_cat; currentMapCat != NULL; currentMapCat=currentMapOut->hh.next) {
+    //            json_dump_mapping_cat(g, currentMapCat);
+    //        }
+    //        yajl_gen_array_close(*g);
+    //    }
+
+        yajl_gen_map_close(*g);
     }
-
-//    //Mapping_cat
-//    hashCount = HASH_COUNT(mapp->map_cat);
-//    if (hashCount) {
-//        yajl_gen_string(*g, (const unsigned char *) "mapping_cat", strlen("mapping_cat"));
-//        yajl_gen_array_open(*g);
-//        for(currentMapCat=mapp->map_cat; currentMapCat != NULL; currentMapCat=currentMapOut->hh.next) {
-//            json_dump_mapping_cat(g, currentMapCat);
-//        }
-//        yajl_gen_array_close(*g);
-//    }
-
-    yajl_gen_map_close(*g);
 }
 
 /*
@@ -1027,7 +1031,11 @@ char* parser_export_definition (definition* def) {
     
     yajl_gen_map_open(g);
     yajl_gen_string(g, (const unsigned char *) STR_DEFINITION, strlen(STR_DEFINITION));
-    json_dump_definition(&g, def);
+
+    if(def != NULL)
+    {
+        json_dump_definition(&g, def);
+    }
     yajl_gen_map_close(g);
     
     // try to get our dumping result
