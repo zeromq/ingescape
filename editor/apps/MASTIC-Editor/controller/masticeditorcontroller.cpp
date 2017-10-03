@@ -78,7 +78,7 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     connect(_networkC,&NetworkController::agentExited,_modelManager,&MasticModelManager::onAgentExited);
 
     //TEMP sleep to display our loading screen
-    QThread::msleep(1000);
+    QThread::msleep(3000);
 }
 
 

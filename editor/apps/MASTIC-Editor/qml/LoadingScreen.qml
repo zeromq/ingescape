@@ -92,7 +92,7 @@ Item {
 
             anchors.horizontalCenter: parent.horizontalCenter
 
-            text: qsTr("Bienvenue dans l'éditeur MASTIC")
+            text: qsTr("Bienvenue dans l'éditeur")
 
             verticalAlignment: Text.AlignHCenter
 
@@ -106,7 +106,7 @@ Item {
 
     //----------------------------
     //
-    // Loading Svg Item
+    // Loading
     //
     //----------------------------
 
@@ -128,6 +128,155 @@ Item {
             duration: 2000
         }
     }*/
+
+    Item {
+        id: mastic
+
+        anchors.centerIn: parent
+
+        width: childrenRect.width
+        height: childrenRect.height
+
+        property int blockSize: 22
+        property int blockRadius: 4
+        property int blockSpacing: 2
+
+
+        BlockLoadingAnimation {
+            id: letterM
+
+            blockSize: mastic.blockSize
+            blockRadius: mastic.blockRadius
+            blockSpacing: mastic.blockSpacing
+
+            visibilitiesOfBlock: [
+                true, false, false, false, true,
+                true, true, false, true, true,
+                true, false, true, false, true,
+                true, false, true, false, true,
+                true, false, false, false, true,
+                true, false, false, false, true,
+                true, false, false, false, true
+            ]
+
+        }
+
+        BlockLoadingAnimation {
+            id: letterA
+
+            anchors {
+                left: letterM.right
+                leftMargin: mastic.blockSize + mastic.blockSpacing
+            }
+
+            blockSize: mastic.blockSize
+            blockRadius: mastic.blockRadius
+            blockSpacing: mastic.blockSpacing
+
+            visibilitiesOfBlock: [
+                false, true, true, true, false,
+                true, false, false, false, true,
+                true, false, false, false, true,
+                true, true, true, true, true,
+                true, false, false, false, true,
+                true, false, false, false, true,
+                true, false, false, false, true
+            ]
+        }
+
+        BlockLoadingAnimation {
+            id: letterS
+
+            anchors {
+                left: letterA.right
+                leftMargin: mastic.blockSize + mastic.blockSpacing
+            }
+
+            blockSize: mastic.blockSize
+            blockRadius: mastic.blockRadius
+            blockSpacing: mastic.blockSpacing
+
+            visibilitiesOfBlock: [
+                false, true, true, true, true,
+                true, false, false, false, false,
+                true, false, false, false, false,
+                false, true, true, true, false,
+                false, false, false, false, true,
+                false, false, false, false, true,
+                true, true, true, true, false
+            ]
+        }
+
+        BlockLoadingAnimation {
+            id: letterT
+
+            anchors {
+                left: letterS.right
+                leftMargin: mastic.blockSize + mastic.blockSpacing
+            }
+
+            blockSize: mastic.blockSize
+            blockRadius: mastic.blockRadius
+            blockSpacing: mastic.blockSpacing
+
+            visibilitiesOfBlock: [
+                true, true, true, true, true,
+                false, false, true, false, false,
+                false, false, true, false, false,
+                false, false, true, false, false,
+                false, false, true, false, false,
+                false, false, true, false, false,
+                false, false, true, false, false
+            ]
+        }
+
+        BlockLoadingAnimation {
+            id: letterI
+
+            anchors {
+                left: letterT.right
+                leftMargin: mastic.blockSize + mastic.blockSpacing
+            }
+
+            blockSize: mastic.blockSize
+            blockRadius: mastic.blockRadius
+            blockSpacing: mastic.blockSpacing
+
+            visibilitiesOfBlock: [
+                false, true, true, true, false,
+                false, false, true, false, false,
+                false, false, true, false, false,
+                false, false, true, false, false,
+                false, false, true, false, false,
+                false, false, true, false, false,
+                false, true, true, true, false
+            ]
+        }
+
+        BlockLoadingAnimation {
+            id: letterC
+
+            anchors {
+                left: letterI.right
+                leftMargin: mastic.blockSize + mastic.blockSpacing
+            }
+
+            blockSize: mastic.blockSize
+            blockRadius: mastic.blockRadius
+            blockSpacing: mastic.blockSpacing
+
+            visibilitiesOfBlock: [
+                false, true, true, true, false,
+                true, false, false, false, true,
+                true, false, false, false, false,
+                true, false, false, false, false,
+                true, false, false, false, false,
+                true, false, false, false, true,
+                false, true, true, true, false
+            ]
+        }
+    }
+
 
 
     //----------------------------
