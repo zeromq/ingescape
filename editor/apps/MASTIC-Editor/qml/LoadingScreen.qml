@@ -277,6 +277,13 @@ Item {
         }
     }
 
+    Patxi {
+        anchors {
+            top: mastic.bottom
+            topMargin: mastic.blockSize
+            horizontalCenter: mastic.horizontalCenter
+        }
+    }
 
 
     //----------------------------

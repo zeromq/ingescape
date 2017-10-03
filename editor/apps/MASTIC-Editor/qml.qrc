@@ -16,5 +16,6 @@
         <file>qml/agentsmapping/SeamlessGrid.qml</file>
         <file>qml/agentsmapping/AgentNodeView.qml</file>
         <file>qml/BlockLoadingAnimation.qml</file>
+        <file>qml/Patxi.qml</file>
     </qresource>
 </RCC>
