@@ -35,10 +35,6 @@ class MasticEditorController : public QObject
 {
     Q_OBJECT
 
-    // Width and height of our window
-    I2_QML_PROPERTY_READONLY(int, width)
-    I2_QML_PROPERTY_READONLY(int, height)
-
     // Network settings - host
     I2_QML_PROPERTY_READONLY(QString, host)
 

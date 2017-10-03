@@ -28,7 +28,8 @@
  * @brief Default constructor
  * @param parent
  */
-MasticModelManager::MasticModelManager(QObject *parent) : QObject(parent)
+MasticModelManager::MasticModelManager(QObject *parent) : QObject(parent),
+    _jsonHelper(NULL)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
