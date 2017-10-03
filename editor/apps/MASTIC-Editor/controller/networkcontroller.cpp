@@ -18,7 +18,7 @@
 #include <QDebug>
 
 extern "C" {
-#include <mastic/mastic_private.h>
+#include <mastic_private.h>
 }
 
 #include "misc/masticeditorutils.h"
