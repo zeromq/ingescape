@@ -23,6 +23,80 @@ extern "C" {
 
 #include "misc/masticeditorutils.h"
 
+static const QString definitionPrefix = "EXTERNAL_DEFINITION#";
+static const QString mappingPrefix = "EXTERNAL_MAPPING#";
+
+#include "misc/masticeditorutils.h"
+
+int myZyreIncommingMessageCallback (const zyre_event_t *cst_zyre_event, void *arg)
+{
+    NetworkController * myNetworkController = (NetworkController *)arg;
+
+    if(myNetworkController != NULL)
+    {
+        zyre_event_t * zyre_event = (zyre_event_t *)cst_zyre_event;
+        QString event = zyre_event_type(zyre_event);
+        QString peer = zyre_event_peer_uuid(zyre_event);
+        QString name = zyre_event_peer_name (zyre_event);
+        QString address = zyre_event_peer_addr (zyre_event);
+        //zhash_t *headers = zyre_event_headers (zyre_event);
+        QString group = zyre_event_group (zyre_event);
+        zmsg_t *msg = zyre_event_msg (zyre_event);
+
+        //parse event
+        if (event.compare("ENTER") == 0)
+        {
+            qDebug() << QString("->%1 has entered the network with peer id %2and address %3\n").arg( name, peer, address);
+        } else if (event.compare("JOIN") == 0){
+            qDebug() << QString("+%1 has joined %2").arg(name, group);
+
+        } else if (event.compare("LEAVE") == 0){
+            qDebug() << QString("-%1 has left %2").arg(name, group);
+        } else if (event.compare("SHOUT") == 0){
+            //nothing to do so far
+        } else if(event.compare("WHISPER") == 0){
+            zmsg_t* msg_dup = zmsg_dup(msg);
+            QString message = zmsg_popstr (msg_dup);
+            qDebug() << "Message unknown message received : " << message;
+
+            //check if message is a definition
+            if(message.startsWith(definitionPrefix) == true)
+            {
+                message.remove(0,definitionPrefix.length());
+
+                // FIXME - TEST ONLY - TO REMOVE
+                // Load definition from string content
+                definition *newDefinition = parser_loadDefinition(message.toStdString().c_str());
+                // Load definition from string content
+                qDebug() << "Definition received from : " << newDefinition->name << " version : " << newDefinition->version << " description : " <<newDefinition->description;
+                definition_freeDefinition(newDefinition);
+
+                myNetworkController->agentEntered(name, address, peer, message);
+            }
+            //check if message is mapping
+            else if (message.startsWith(mappingPrefix) == true)
+            {
+                message.remove(0,mappingPrefix.length());
+                qDebug() << "Mapping : " << message;
+            }else{
+                //other supported messages
+                if (message.startsWith("MAPPED") == true){
+                    qDebug() << QString("Mapping notification received from %s").arg(name);
+                } else {
+                    qDebug() << "unknown message received : " << message;
+                }
+            }
+            zmsg_destroy(&msg_dup);
+        } else if (event.compare("EXIT") == 0){
+            qDebug() << QString("<-%1 exited").arg(name);
+            myNetworkController->agentExited(peer);
+        }
+
+    }
+
+    return 0;
+}
+
 
 //--------------------------------------------------------------
 //
@@ -55,8 +129,7 @@ NetworkController::NetworkController(QString networkDevice, QString ipAddress, i
     QFileInfo checkDefinitionFile(myDefinitionPath);
     if (checkDefinitionFile.exists() && checkDefinitionFile.isFile())
     {
-        // Load the definition
-        //mtic_loadDefinitionFromPath(myDefinitionPath.toStdString().c_str());
+        mtic_setAgentName("MASTIC-Editor");
 
         // Start service with network device
         if (networkDevice.isEmpty() == false)
@@ -77,7 +150,11 @@ NetworkController::NetworkController(QString networkDevice, QString ipAddress, i
 
     if (networkInitialized == 1)
     {
-        qInfo() << "Network services started";
+        qInfo() << "Network services started ";
+
+        // begin the observe on transiting zyre messages
+        int result = network_observeZyre(&myZyreIncommingMessageCallback,this);
+        qInfo() << "Network services started result=" << QString::number(result);
     }
     else
     {

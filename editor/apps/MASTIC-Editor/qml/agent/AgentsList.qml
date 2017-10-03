@@ -172,12 +172,10 @@ Item {
 
             Column {
 
-                Text {
-                    text: model.modelM.name
+                Item {
+                    id: agentNameRow
 
-                    font: MasticTheme.normalFont
-
-                    height: 25
+                   height: 25
                     width : agentRow.width
 
                     Text {
