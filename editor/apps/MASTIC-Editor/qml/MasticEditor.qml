@@ -91,7 +91,7 @@ Item {
     //
     // Bottom panel
     //
-    Rectangle {
+    I2CustomRectangle {
         id: bottomPanel
 
         anchors {
@@ -102,12 +102,14 @@ Item {
 
         height: MasticTheme.bottomPanelHeight
 
-        color: "#AAFFAA"
+        color: MasticTheme.scenarioBackgroundColor
+        fuzzyRadius: 8
+
 
         Text {
             anchors.centerIn: parent
 
-            text: qsTr("Bottom Panel")
+            text: qsTr("Scenario")
 
             font: MasticTheme.headingFont
 
@@ -120,7 +122,7 @@ Item {
     //
     // Left panel: TODO: create tabs
     //
-    Rectangle {
+    I2CustomRectangle {
         id: leftPanel
 
         anchors {
@@ -131,7 +133,8 @@ Item {
 
         width: MasticTheme.leftPanelWidth
 
-        color: "#444444"
+        color: MasticTheme.agentsListBackgroundColor
+        fuzzyRadius: 8
 
         Agent.AgentsList {
             id: agentsList

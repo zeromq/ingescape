@@ -43,7 +43,7 @@ ApplicationWindow {
 
     title: qsTr("MASTIC Editor - v%1").arg(Qt.application.version)
 
-    color: MasticTheme.greyWindowBgColor
+    color: MasticTheme.windowBackgroundColor
 
 
 

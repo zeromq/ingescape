@@ -24,6 +24,7 @@ import MASTIC 1.0
 
 Item {
     id: rootItem
+
     anchors.fill: parent
 
     //--------------------------------
@@ -65,9 +66,39 @@ Item {
 
         model: MasticEditorC.modelManager.allAgentsVM
 
-        spacing: 10
+        delegate: componentAgentListItem
 
-        delegate: agentInList
+
+        //
+        // Transition animations
+        //
+        add: Transition {
+            NumberAnimation { property: "opacity"; from: 0.0; to: 1.0 }
+            NumberAnimation { property: "scale"; from: 0.0; to: 1.0 }
+        }
+
+        displaced: Transition {
+            NumberAnimation { properties: "x,y"; easing.type: Easing.OutBounce }
+
+            // ensure opacity and scale values return to 1.0
+            NumberAnimation { property: "opacity"; to: 1.0 }
+            NumberAnimation { property: "scale"; to: 1.0 }
+        }
+
+        move: Transition {
+            NumberAnimation { properties: "x,y"; easing.type: Easing.OutBounce }
+
+            // ensure opacity and scale values return to 1.0
+            NumberAnimation { property: "opacity"; to: 1.0 }
+            NumberAnimation { property: "scale"; to: 1.0 }
+        }
+
+        remove: Transition {
+            // ensure opacity and scale values return to 0.0
+            NumberAnimation { property: "opacity"; to: 0.0 }
+            NumberAnimation { property: "scale"; to: 0.0 }
+        }
+
     }
 
 
@@ -85,12 +116,14 @@ Item {
 
         height: childrenRect.height
 
-        color: "#444444"
+        color: MasticTheme.agentsListHeaderBackgroundColor// "#444444"
 
 
         Row {
             id: headerRow1
-            height: 25
+
+            height: 30
+
             anchors {
                 top: parent.top
                 left: parent.left
@@ -102,7 +135,7 @@ Item {
 
                 text: qsTr("Rechercher...")
 
-                color: "#ffffff"
+                color: MasticTheme.agentsListLabelColor
 
                 font: MasticTheme.normalFont
             }
@@ -112,7 +145,7 @@ Item {
 
                 text: qsTr("Filtrer...")
 
-                color: "#ffffff"
+                color:MasticTheme.agentsListLabelColor
 
                 font: MasticTheme.normalFont
             }
@@ -121,7 +154,7 @@ Item {
         Row {
             id: headerRow2
 
-            height: 25
+            height: 30
 
             anchors {
                 top: headerRow1.bottom
@@ -141,18 +174,31 @@ Item {
             Text {
                 text: qsTr("Importer...")
 
-                color: "#ffffff"
+                color: MasticTheme.agentsListLabelColor
 
-                 font: MasticTheme.normalFont
+                font: MasticTheme.normalFont
             }
 
             Text {
                 text: qsTr("Exporter...")
 
-                color: "#ffffff"
+                color: MasticTheme.agentsListLabelColor
 
                 font: MasticTheme.normalFont
             }
+        }
+
+
+        Rectangle {
+            anchors {
+                bottom: headerRow2.bottom
+                left: parent.left
+                right: parent.right
+            }
+
+            color: "#17191F"
+
+            height: 1
         }
     }
 
@@ -162,98 +208,155 @@ Item {
     // Visual representaiton of an agent in our list
     //
     Component {
-        id: agentInList
+        id: componentAgentListItem
 
-        Rectangle {
-            id : agentRow
+        Item {
+            id : agentListItem
+
             width: MasticTheme.leftPanelWidth
-            height: 120
-            color: "yellow"
+            height: 130
 
-            Column {
+
+            Rectangle {
+                anchors {
+                    fill: parent
+                    leftMargin: 4
+                    rightMargin: 4
+                    topMargin: 4
+                    bottomMargin: 4
+                }
+
+                radius: 5
+
+                color: MasticTheme.agentsListItemBackgroundColor
+
+                border {
+                    width: 1
+                    color: MasticTheme.whiteColor
+                }
+
 
                 Item {
-                    id: agentNameRow
+                     id: agentRow
 
-                   height: 25
-                    width : agentRow.width
-
-                    Text {
-                        id: agentName
-                        anchors {
-                            left : agentNameRow.left
-                        }
-
-                        text: "Name : " + model.modelM.name
-                        height: 25
+                    anchors {
+                        fill: parent
+                        leftMargin: 5
+                        topMargin: 2
                     }
 
-                    Text {
-                        id: agentStatus
-                        anchors {
-                            left : agentName.right
-                        }
+                    Column {
 
-                        text: "[" + AgentStatus.enumToString(model.status)+"]"
-                        height: 25
-                    }
+                        Item {
+                           id: agentNameRow
 
-                    Button {
-                        id: btnDefinition
-                        anchors {
-                            right : btnDeleteAgent.left
-                        }
-                        text: "Définition"
+                           height: 25
+                           width : agentRow.width
 
-                        onClicked: {
-                            console.log("Open the definition of " + model.modelM.name)
-                        }
-                    }
+                            Text {
+                                id: agentName
 
-                    Button {
-                        id: btnDeleteAgent
+                                anchors {
+                                    left : agentNameRow.left
+                                }
 
-                        anchors {
-                            right : agentNameRow.right
-                        }
-                        visible : model.status === AgentStatus.OFF
+                                text: "Name : " + model.modelM.name
 
-                        text: "X"
+                                height: 25
 
-                        onClicked: {
-                            if(controller)
-                            {
-                                console.log("Delete agent from the list : " + model.modelM.name)
-                                controller.deleteAgentFromList(model.QtObject);
+                                color: MasticTheme.agentsListLabelColor
+
+                                font: MasticTheme.normalFont
+                            }
+
+                            Text {
+                                id: agentStatus
+                                anchors {
+                                    left : agentName.right
+                                }
+
+                                text: "[" + AgentStatus.enumToString(model.status)+"]"
+
+                                height: 25
+
+                                color: MasticTheme.agentsListLabelColor
+
+                                font: MasticTheme.normalFont
+                            }
+
+                            Button {
+                                id: btnDefinition
+
+                                anchors {
+                                    right : btnDeleteAgent.left
+                                }
+                                text: "Définition"
+
+                                onClicked: {
+                                    console.log("Open the definition of " + model.modelM.name)
+                                }
+                            }
+
+                            Button {
+                                id: btnDeleteAgent
+
+                                anchors {
+                                    right : agentNameRow.right
+                                }
+                                visible : model.status === AgentStatus.OFF
+
+                                text: "X"
+
+                                onClicked: {
+                                    if(controller)
+                                    {
+                                        console.log("Delete agent from the list : " + model.modelM.name)
+                                        controller.deleteAgentFromList(model.QtObject);
+                                    }
+                                }
                             }
                         }
+
+                        Text {
+                            text: model.modelM.description
+
+                            height: 25
+
+                            color: MasticTheme.agentsListLabelColor
+
+                            font: MasticTheme.normalFont
+                        }
+
+                        Text {
+                            text: model.modelM.version
+
+                            height: 25
+
+                            color: MasticTheme.agentsListLabelColor
+
+                            font: MasticTheme.normalFont
+                        }
+
+                        Text {
+                            text: "SimilarAgents : " + model.listSimilarAgentsVM.count
+
+                            height: 25
+
+                            color: MasticTheme.agentsListLabelColor
+
+                            font: MasticTheme.normalFont
+                        }
+
+                        Text {
+                            text: "IdenticalAgents : " + model.listIdenticalAgentsVM.count
+
+                            height: 25
+
+                            color: MasticTheme.agentsListLabelColor
+
+                            font: MasticTheme.normalFont
+                        }
                     }
-                }
-
-                Text {
-                    text: model.modelM.description
-
-                    font: MasticTheme.normalFont
-
-                    height: 25
-                }
-
-                Text {
-                    text: model.modelM.version
-
-                    font: MasticTheme.normalFont
-
-                    height: 25
-                }
-
-                Text {
-                    text: "SimilarAgents : " + model.listSimilarAgentsVM.count
-                    height: 25
-                }
-
-                Text {
-                    text: "IdenticalAgents : " + model.listIdenticalAgentsVM.count
-                    height: 25
                 }
             }
         }
