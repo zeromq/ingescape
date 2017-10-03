@@ -141,7 +141,19 @@ Item {
 
                 drag.target: workspace
 
-                onWheel: console.log("wheel")
+                onWheel: {
+                    wheel.accepted = true;
+
+                    //TODO: zoom at (x, y)
+                    if (wheel.angleDelta.y >= 0)
+                    {
+                        workspace.scale *= 1/1.2;
+                    }
+                    else
+                    {
+                        workspace.scale *= 1.2;
+                    }
+                }
             }
 
 
