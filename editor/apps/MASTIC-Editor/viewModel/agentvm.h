@@ -9,6 +9,7 @@
  *
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
+ *      Alexandre Lemort   <lemort@ingenuity.io>
  *
  */
 
@@ -16,10 +17,14 @@
 #define AGENTVM_H
 
 #include <QObject>
+#include <QtQml>
+
 #include <I2PropertyHelpers.h>
 
 #include <model/agentm.h>
 #include <viewModel/iop/agentiopvm.h>
+
+
 
 /**
   * Types:
@@ -48,12 +53,18 @@ class AgentVM : public QObject
 
     // List of VM of parameters
     I2_QOBJECT_LISTMODEL(AgentIOPVM, parametersList)
-
+    
     // State string defined by the agent
     I2_QML_PROPERTY(QString, state)
-
+    
     // Status: enum with ON demandé, ON effectif, OFF demandé, OFF effectif
     I2_QML_PROPERTY(AgentStatus::Value, status)
+
+    // Abscissa of our view
+    I2_QML_PROPERTY(qreal, x)
+
+    // Ordinate of our view
+    I2_QML_PROPERTY(qreal, y)
 
     // Flag indicating if our agent is muted
     I2_QML_PROPERTY(bool, isMuted)
@@ -69,6 +80,11 @@ class AgentVM : public QObject
 
 
 public:
+    /**
+     * @brief Default constructor
+     * @param model
+     * @param parent
+     */
     explicit AgentVM(AgentM* model, QObject *parent = nullptr);
 
 
@@ -77,9 +93,9 @@ public:
      */
     ~AgentVM();
 
-signals:
+Q_SIGNALS:
 
-public slots:
+public Q_SLOTS:
 };
 
 QML_DECLARE_TYPE(AgentVM)

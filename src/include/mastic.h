@@ -161,7 +161,7 @@ PUBLIC bool mtic_checkParameterExistence(const char *name);
  * \ingroup observefct
  * \brief typedef for the callback used in observe functions
  */
-typedef void (*mtic_observeCallback)(iop_t iopType, const char* name, iopType_t valueType, void* value, void* myData);
+typedef void (*mtic_observeCallback)(iop_t iopType, const char* name, iopType_t valueType, void* value, long valueSize, void* myData);
 PUBLIC int mtic_observeInput(const char *name, mtic_observeCallback cb, void *myData);
 PUBLIC int mtic_observeOutput(const char *name, mtic_observeCallback cb, void * myData);
 PUBLIC int mtic_observeParameter(const char *name, mtic_observeCallback cb, void * myData);
@@ -202,19 +202,22 @@ PUBLIC int mtic_removeParameter(const char *name);
 //////////////////////////////////////////////////
 //mapping
 
-//load / set / get definition
+//load / set / get mapping
 PUBLIC int mtic_loadMapping (const char* json_str);
 PUBLIC int mtic_loadMappingFromPath (const char* file_path);
 PUBLIC int mtic_clearMapping(void); //clears mapping data for the agent
 PUBLIC char* mtic_getMapping(void); //returns json string
+PUBLIC char *mtic_getMappingName(void);
+PUBLIC char *mtic_getMappingDescription(void);
+PUBLIC char *mtic_getMappingVersion(void);
 
 //edit mapping using the API
 PUBLIC int mtic_setMappingName(char *name);
 PUBLIC int mtic_setMappingDescription(char *description);
 PUBLIC int mtic_setMappingVersion(char *version);
 PUBLIC int mtic_getMappingEntriesNumber(void); //number of entries in the mapping output type
-PUBLIC int mtic_addMappingEntry(char *fromOurInput, char *toAgent, char *withOutput); //returns mapping id or 0 if creation failed
-PUBLIC int mtic_removeMappingEntryWithId(int theId);
+PUBLIC unsigned long mtic_addMappingEntry(char *fromOurInput, char *toAgent, char *withOutput); //returns mapping id or zero or below if creation failed
+PUBLIC int mtic_removeMappingEntryWithId(unsigned long theId);
 PUBLIC int mtic_removeMappingEntryWithName(char *fromOurInput, char *toAgent, char *withOutput);
 
 #endif /* mastic_public_h */

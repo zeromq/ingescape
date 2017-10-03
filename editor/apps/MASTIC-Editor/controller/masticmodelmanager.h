@@ -16,6 +16,8 @@
 #define MASTICMODELMANAGER_H
 
 #include <QObject>
+#include <QtQml>
+
 #include <I2PropertyHelpers.h>
 
 #include <model/jsonhelper.h>
@@ -37,6 +39,10 @@ class MasticModelManager : public QObject
 
 
 public:
+    /**
+     * @brief Default constructor
+     * @param parent
+     */
     explicit MasticModelManager(QObject *parent = nullptr);
 
 
@@ -44,23 +50,25 @@ public:
      * @brief Destructor
      */
     ~MasticModelManager();
-
+    
     /**
      * @brief Add a new agent model into our list
      * @param agent model
      * @param agent status
      */
     void addNewAgentModelToList(AgentM* agentModelToAdd, AgentStatus::Value status);
-
+    
     /**
      * @brief Delete an agent from our list
      * @param agent view model
      */
     void deleteAgentVMFromList(AgentVM* agentModelToDelete);
 
-signals:
 
-public slots:
+Q_SIGNALS:
+
+public Q_SLOTS:
+
     /**
      * @brief Slot on agent entereing into the network
      *        Agent definition has been received and must be processed
@@ -70,12 +78,13 @@ public slots:
      * @param agent definition
      */
     void onAgentEntered(QString agentName, QString agentAdress, QString peer, QString definition);
-
+    
     /**
      * @brief Slot on agent quitting the network
      * @param agent peer
      */
     void onAgentExited(QString peer);
+
 
 private:
 

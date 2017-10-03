@@ -50,9 +50,9 @@ public:
     AgentM* createAgentWithRawDefinition(QByteArray jsonByteArray);
 
 
-signals:
+Q_SIGNALS:
 
-public slots:
+public Q_SLOTS:
 
 private:
 

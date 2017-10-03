@@ -9,6 +9,7 @@
  *
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
+ *      Alexandre Lemort   <lemort@ingenuity.io>
  *
  */
 
@@ -16,6 +17,8 @@
 #define AGENTSSUPERVISIONCONTROLLER_H
 
 #include <QObject>
+#include <QtQml>
+
 #include <I2PropertyHelpers.h>
 
 #include <controller/masticmodelmanager.h>
@@ -32,6 +35,11 @@ class AgentsSupervisionController : public QObject
     //I2_QOBJECT_SORTFILTERPROXY(AgentVM, agentsList)
 
 public:
+    /**
+     * @brief Default constructor
+     * @param modelManager
+     * @param parent
+     */
     explicit AgentsSupervisionController(MasticModelManager* modelManager, QObject *parent = nullptr);
 
 
@@ -39,16 +47,16 @@ public:
      * @brief Destructor
      */
     ~AgentsSupervisionController();
-
+    
     /**
      * @brief Delete an agent VM from the list
      * @param agent VM to delete
      */
     Q_INVOKABLE void deleteAgentFromList(AgentVM * agentToDelete);
 
-signals:
+Q_SIGNALS:
 
-public slots:
+public Q_SLOTS:
 
 private:
     // Usefull to save it

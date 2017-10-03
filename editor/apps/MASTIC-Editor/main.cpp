@@ -20,6 +20,8 @@
 #include <QQmlApplicationEngine>
 #include <QSurfaceFormat>
 #include <QDebug>
+#include <QtGlobal>
+#include <QDate>
 
 
 #include <I2Quick.h>
@@ -27,6 +29,9 @@
 #include <controller/masticeditorcontroller.h>
 #include <misc/masticeditorsettings.h>
 #include <misc/masticeditorutils.h>
+
+
+
 
 /**
  * @brief Register our C++ types and extensions in the QML system
@@ -37,17 +42,22 @@ void registerCustomQmlTypes()
     const char *uri = "MASTIC";
 
 
+    //---------------
     //
-    // Enum
+    // Enums
     //
+    //---------------
     qmlRegisterSingletonType<AgentIOPTypes>(uri, 1, 0, "AgentIOPTypes", &AgentIOPTypes::qmlSingleton);
     qmlRegisterSingletonType<AgentIOPValueTypes>(uri, 1, 0, "AgentIOPValueTypes", &AgentIOPValueTypes::qmlSingleton);
     qmlRegisterSingletonType<AgentStatus>(uri, 1, 0, "AgentStatus", &AgentStatus::qmlSingleton);
 
 
+
+    //----------------
     //
-    // Controller
+    // Controllers
     //
+    //----------------
     // Singleton used as primary access point to our controllers
     qmlRegisterSingletonType<MasticEditorController>(uri, 1, 0, "MasticEditorC", &MasticEditorController::qmlSingleton);
 
@@ -57,23 +67,32 @@ void registerCustomQmlTypes()
     qmlRegisterUncreatableType<MasticModelManager>(uri, 1, 0, "MasticModelManager", "Internal Class");
 
 
+    //----------------
     //
-    // Model
+    // Models
     //
+    //----------------
     qmlRegisterUncreatableType<AgentIOPM>(uri, 1, 0, "AgentIOPM", "Internal class");
     qmlRegisterUncreatableType<AgentM>(uri, 1, 0, "AgentM", "Internal class");
 
 
+
+    //---------------
     //
-    // View Model
+    // View Models
     //
+    //---------------
     qmlRegisterUncreatableType<AgentIOPVM>(uri, 1, 0, "AgentIOPVM", "Internal class");
     qmlRegisterUncreatableType<AgentVM>(uri, 1, 0, "AgentVM", "Internal class");
 
 
+
+    //------------------
     //
-    // QML singletons
+    // QML components
     //
+    //------------------
+    // - Singleton used to enable consistent app styling through predefined colors, fonts, etc.
     qmlRegisterSingletonType(QUrl("qrc:/qml/theme/MasticTheme.qml"), uri, 1, 0, "MasticTheme");
 
 }
@@ -244,14 +263,21 @@ int main(int argc, char *argv[])
     registerCustomQmlTypes();
 
 
+
     //
     // Defines context properties
     //
     QQmlContext* qmlContext = engine.rootContext();
     if (qmlContext != NULL)
     {
-        // Version of our application
-        qmlContext->setContextProperty("APP_VERSION", app.applicationVersion());
+        // Build date
+        qmlContext->setContextProperty("BUILD_DATE", QLocale(QLocale::C).toDate(QString(__DATE__).simplified(), QLatin1String("MMM d yyyy")));
+
+        // Qt version against which the application is compiled
+        qmlContext->setContextProperty("QT_BUILD_VERSION", QString(QT_VERSION_STR));
+
+        // Runtime version of Qt. This may be a different version than the version the application was compiled against
+        qmlContext->setContextProperty("QT_RUNTIME_VERSION", QString(qVersion()));
     }
 
 
@@ -267,5 +293,8 @@ int main(int argc, char *argv[])
     // Mainloop
     //
     //------------------------------
-    return app.exec();
+
+    qInfo() << "Starting" << app.applicationName() << app.applicationVersion();
+    int exitReturnCode = app.exec();
+    qInfo() << "Quitting application with return code" << exitReturnCode;
 }

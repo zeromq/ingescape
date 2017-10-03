@@ -9,19 +9,30 @@
  *
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
+ *      Alexandre Lemort   <lemort@ingenuity.io>
  *
  */
 
 #include "agentssupervisioncontroller.h"
 
-AgentsSupervisionController::AgentsSupervisionController(MasticModelManager* modelManager,
-                                                         QObject *parent) : QObject(parent),
+#include <QQmlEngine>
+#include <QDebug>
+
+
+/**
+ * @brief Default constructor
+ * @param modelManager
+ * @param parent
+ */
+AgentsSupervisionController::AgentsSupervisionController(MasticModelManager* modelManager, QObject *parent)
+    : QObject(parent),
     _modelManager(modelManager)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    if (_modelManager != NULL) {
+    if (_modelManager != NULL)
+    {
         // TODO: Gestion du tri et du filtre des agents
     }
 }

@@ -9,6 +9,7 @@
  *
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
+ *      Alexandre Lemort   <lemort@ingenuity.io>
  *
  */
 
@@ -26,7 +27,11 @@
  * @brief Constructor
  * @param parent
  */
-MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent)
+MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent),
+    _modelManager(NULL),
+    _agentsSupervisionC(NULL),
+    _agentsMappingC(NULL),
+    _networkC(NULL)
 {
     qInfo() << "New MASTIC Editor Controller";
 
@@ -36,15 +41,11 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
         _snapshotDirectory = QString("%1Snapshots").arg(rootDirectoryPath);
     }
 
-    // Get our settings
-    MasticEditorSettings& settings = MasticEditorSettings::Instance();
 
-    // Settings about the "Window"
-    settings.beginGroup("window");
-    _width = settings.value("width", 1920).toInt();
-    _height = settings.value("height", 1080).toInt();
-    qInfo() << "width" << _width << "height" << _height;
-    settings.endGroup();
+    //
+    // Settings
+    //
+    MasticEditorSettings& settings = MasticEditorSettings::Instance();
 
     // Settings about the "Network"
     settings.beginGroup("network");
@@ -55,6 +56,11 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     qInfo() << "host" << _host << "networkDevice" << _networkDevice << "ipAddress" << _ipAddress << "port" << QString::number(_port);
     settings.endGroup();
 
+
+
+    //
+    // Create sub-controllers
+    //
 
     // Create the manager for the data model of our MASTIC editor
     _modelManager = new MasticModelManager(this);
@@ -81,6 +87,9 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
  */
 MasticEditorController::~MasticEditorController()
 {
+    //
+    // Clean-up sub-controllers
+    //
     if (_agentsMappingC != NULL)
     {
         AgentsMappingController* temp = _agentsMappingC;

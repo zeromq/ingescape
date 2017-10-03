@@ -28,7 +28,8 @@ SOURCES += main.cpp \
     controller/masticmodelmanager.cpp \
     controller/networkcontroller.cpp \
     misc/masticeditorsettings.cpp \
-    misc/masticeditorutils.cpp
+    misc/masticeditorutils.cpp \
+    viewModel/linkvm.cpp
 
 
 HEADERS += \
@@ -53,7 +54,8 @@ HEADERS += \
     uthash/utmm.h \
     uthash/utringbuffer.h \
     uthash/utstring.h \
-    uthash/utvector.h
+    uthash/utvector.h \
+    viewModel/linkvm.h
 
 
 RESOURCES += qml.qrc

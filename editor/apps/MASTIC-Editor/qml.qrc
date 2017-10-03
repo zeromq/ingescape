@@ -9,7 +9,11 @@
         <file>resources/images/Logo-Ingenuity.png</file>
         <file>qml/agent/AgentsList.qml</file>
         <file>qml/agent/AgentDefinitionEditor.qml</file>
-        <file>qml/AgentsMapping.qml</file>
         <file>resources/images/agentsmapping-background-tile.jpg</file>
+        <file>qml/agentsmapping/NodeGraphView.qml</file>
+        <file>qml/agentsmapping/Link.qml</file>
+        <file>qml/AgentsMappingView.qml</file>
+        <file>qml/agentsmapping/SeamlessGrid.qml</file>
+        <file>qml/agentsmapping/AgentNodeView.qml</file>
     </qresource>
 </RCC>

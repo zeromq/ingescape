@@ -8,44 +8,38 @@
  *
  *
  *	Contributors:
- *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *      Alexandre Lemort   <lemort@ingenuity.io>
  *
  */
 
-#include "agentm.h"
+#include "linkvm.h"
+
 
 #include <QQmlEngine>
 #include <QDebug>
-
 
 
 /**
  * @brief Default constructor
  * @param parent
  */
-AgentM::AgentM(QObject *parent) : QObject(parent),
-    _name(""),
-    _networkDevice(""),
-    _ipAddress(""),
-    _peer(""),
-    _port(-1),
-    _version(""),
-    _description(""),
-    _canBeFrozen(false),
-    _md5Hash("")
+LinkVM::LinkVM(QObject *parent) : QObject(parent),
+    _outputSlotVM(NULL),
+    _inputSlotVM(NULL)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    //qInfo() << "New Model of Agent ...";
+
+    qInfo() << "Link created";
 }
+
 
 
 /**
  * @brief Destructor
  */
-AgentM::~AgentM()
+LinkVM::~LinkVM()
 {
-    qInfo() << "Delete Model of Agent ...";
+    qInfo() << "Link destroyed";
 }

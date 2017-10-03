@@ -9,16 +9,27 @@
  *
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
+ *      Alexandre Lemort   <lemort@ingenuity.io>
  *
  */
 
 #include "masticmodelmanager.h"
 
+#include <QQmlEngine>
+#include <QDebug>
+
 #include <I2Quick.h>
 
 #include <QJsonDocument>
 
-MasticModelManager::MasticModelManager(QObject *parent) : QObject(parent)
+
+
+/**
+ * @brief Default constructor
+ * @param parent
+ */
+MasticModelManager::MasticModelManager(QObject *parent) : QObject(parent),
+    _jsonHelper(NULL)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -65,7 +76,8 @@ MasticModelManager::MasticModelManager(QObject *parent) : QObject(parent)
 
                 jsonFile.close();
             }
-            else {
+            else
+            {
                 qCritical() << "Can not open file" << fileInfo.absoluteFilePath();
             }
         }

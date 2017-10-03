@@ -38,6 +38,13 @@
 
 //////////////////  STRUCTURES AND ENUMS   //////////////////
 
+typedef struct mtic_observe_callback {
+    mtic_observeCallback callback_ptr;
+    void* data;
+    struct mtic_observe_callback *prev;
+    struct mtic_observe_callback *next;
+} mtic_observe_callback_t;
+
 /*
  * Define the structure agent_iop (input, output, parameter) :
  * 'name'       : the input/output/parameter's name. Need to be unique in each type of iop (input/output/parameter)
@@ -60,6 +67,7 @@ struct agent_iop {
     } value;
     long valueSize;
     bool is_muted;
+    mtic_observe_callback_t *callbacks;
     UT_hash_handle hh;         /* makes this structure hashable */
 };
 
@@ -80,7 +88,7 @@ typedef struct definition {
     const char* name; //hash key
     const char* description;
     const char* version;
-    category* categories;
+//    category* categories;
     agent_iop* params_table;
     agent_iop* inputs_table;
     agent_iop* outputs_table;
@@ -113,27 +121,22 @@ typedef enum {
     INPUT_CAT
 } category_check_type;
 
-/*
- * Define the state of a mapping ON or OFF
- */
-typedef enum {OFF, ON, INCOMPATIBLE, GENERIC} map_state;
 
 /*
- * Define the structure 'mapping_out' which contains mapping between an input and an (one or all) external agent's output :
+ * Define the structure 'mapping_element' which contains mapping between an input and an (one or all) external agent's output :
  * 'map_id'                 : the key of the table. Need to be unique : the table hash key
  * 'input name'             : agent's input name to connect
  * 'agent name to connect'  : external agent's name to connect with (one or all)
  * 'output name to connect' : external agent(s) output name to connect with
  */
 
-typedef struct mapping_out {
-    int map_id;
+typedef struct mapping_element {
+    unsigned long id;
     char* input_name;
     char* agent_name;
     char* output_name;
-    map_state state;
     UT_hash_handle hh;
-} mapping_out;
+} mapping_element_t;
 
 /*
  * Define the structure 'mapping_cat' which contains mapping between an input and an (one or all) external agent's category :
@@ -141,13 +144,13 @@ typedef struct mapping_out {
  * 'agent name to connect'          : external agent's name to connect with (one or all)
  * 'category unique name to connect': external agent(s) category to connect with
  */
-typedef struct mapping_cat {
-    int map_cat_id;
-    char* agent_name;
-    char*category_name;
-    map_state state;
-    UT_hash_handle hh;
-} mapping_cat;
+//typedef struct mapping_cat {
+//    int map_cat_id;
+//    char* agent_name;
+//    char*category_name;
+//    map_state state;
+//    UT_hash_handle hh;
+//} mapping_cat_t;
 
 /*
  * Define the structure 'mapping' which contains the json description of all mapping (output & category):
@@ -161,14 +164,16 @@ typedef struct mapping {
     char* name;
     char* description;
     char* version;
-    mapping_out* map_out;
-    mapping_cat* map_cat;
+    mapping_element_t* map_elements;
+//    mapping_cat* map_cat;
     UT_hash_handle hh;
-} mapping;
+} mapping_t;
 
-typedef struct mapping_out mapping_out;
-typedef struct mapping_cat mapping_cat;
-typedef struct mapping mapping;
+#define MAX_FILTER_SIZE 1024
+typedef struct mappingFilter {
+    char filter[MAX_FILTER_SIZE];
+    struct mappingFilter *next, *prev;
+} mappingFilter_t;
 
 typedef struct subscriber{
     const char *agentName;
@@ -176,6 +181,8 @@ typedef struct subscriber{
     zsock_t *subscriber;
     zmq_pollitem_t *pollItem;
     definition *definition;
+    bool mappedNotificationToSend;
+    mappingFilter_t *mappingsFilters;
     UT_hash_handle hh;
 } subscriber_t;
 
@@ -198,27 +205,26 @@ typedef struct zyreloopElements{
 
 extern definition* mtic_internal_definition;
 
-int definition_get_iop_value_as_int(agent_iop*iop, iop_t type);
-double definition_get_iop_value_as_double(agent_iop*iop, iop_t type);
-char* definition_get_iop_value_as_string (agent_iop* iop);
-
-void definition_free_definition (definition* definition);
+char* definition_getIOPValueAsString (agent_iop* iop);
+void definition_freeDefinition (definition* definition);
 
 
 //  mapping
 
-extern mapping* mtic_my_agent_mapping;
+extern mapping_t *mtic_internal_mapping;
 
-agent_iop* mapping_check_map (definition* definition);
-agent_iop* mapping_unmap (definition* definition);
-int mapping_map_received(const char* agent_name, char* out_name, char* value, long size);
+void mapping_freeMapping (mapping_t* map);
+mapping_element_t * mapping_createMappingElement(const char * input_name,
+                                                 const char *agent_name,
+                                                 const char* output_name);
+unsigned long djb2_hash (unsigned char *str);
 
 
 // model
 
 extern bool isWholeAgentMuted;
 
-agent_iop* model_find_iop_by_name_in_definition(const char*name, definition* definition);
+void model_setIopValue(agent_iop *iop, void* value, long size);
 agent_iop* model_findIopByName(const char* name, iop_t type);
 agent_iop* model_findInputByName(const char* name);
 agent_iop* model_findOutputByName(const char* name);
@@ -227,12 +233,15 @@ void* model_get(const char*name_iop, iop_t type);
 
 
 // network
+
+extern bool network_needToSendDefinitionUpdate;
+extern bool network_needToUpdateMapping;
 extern zyreloopElements_t *agentElements;
 //DO NOT DESTROY THE ZYRE_EVENT INSIDE THE CALLBACK
 typedef int (*network_zyreIncoming) (const zyre_event_t *zyre_event, void *arg);
 
 int network_observeZyre(network_zyreIncoming cb, void *myData);
-#define AGENT_NAME_DEFAULT "mtic_undefined"
+#define AGENT_NAME_DEFAULT "mtic_noname"
 int network_publishOutput (const char* output_name);
 int network_checkAndSubscribeToPublisher(const char* agentName);
 void mtic_debug(const char*fmt, ...);
@@ -243,8 +252,8 @@ void mtic_debug(const char*fmt, ...);
 definition* parser_loadDefinition (const char* json_str);
 definition* parser_loadDefinitionFromPath (const char* file_path);
 char* parser_export_definition (definition* def);
-char* parser_export_mapping(mapping* mapp);
-mapping* parser_LoadMap (const char* json_str);
-mapping* parser_LoadMapFromPath (const char* load_file);
+char* parser_export_mapping(mapping_t* mapp);
+mapping_t* parser_LoadMap (const char* json_str);
+mapping_t* parser_LoadMapFromPath (const char* load_file);
 
 #endif /* mastic_private_h */

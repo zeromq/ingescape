@@ -9,16 +9,28 @@
  *
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
+ *      Alexandre Lemort   <lemort@ingenuity.io>
  *
  */
 
 #include "agentvm.h"
 
-AgentVM::AgentVM(AgentM* model,
-                 QObject *parent) : QObject(parent),
+#include <QQmlEngine>
+#include <QDebug>
+
+
+
+/**
+ * @brief Default constructor
+ * @param model
+ * @param parent
+ */
+AgentVM::AgentVM(AgentM* model, QObject *parent) : QObject(parent),
     _modelM(model),
     _state(""),
     _status(AgentStatus::OFF),
+    _x(0),
+    _y(0),
     _isMuted(false),
     _isFrozen(false)
 {
@@ -29,29 +41,49 @@ AgentVM::AgentVM(AgentM* model,
     {
         qInfo() << "New View Model of Agent" << _modelM->name() << "with version" << _modelM->version() << "and description" << _modelM->description();
 
+        //
         // Create the list of VM of inputs
-        foreach (AgentIOPM* inputM, _modelM->inputsList()->toList()) {
-            if (inputM != NULL) {
+        //
+        QList<AgentIOPVM*> listOfInputVMs;
+        foreach (AgentIOPM* inputM, _modelM->inputsList()->toList())
+        {
+            if (inputM != NULL)
+            {
                 AgentIOPVM* inputVM = new AgentIOPVM(inputM, this);
-                _inputsList.append(inputVM);
+                listOfInputVMs.append(inputVM);
             }
         }
+        _inputsList.append(listOfInputVMs);
 
+
+        //
         // Create the list of VM of outputs
-        foreach (AgentIOPM* outputM, _modelM->outputsList()->toList()) {
-            if (outputM != NULL) {
+        //
+        QList<AgentIOPVM*> listOfOutputVMs;
+        foreach (AgentIOPM* outputM, _modelM->outputsList()->toList())
+        {
+            if (outputM != NULL)
+            {
                 AgentIOPVM* outputVM = new AgentIOPVM(outputM, this);
-                _outputsList.append(outputVM);
+                listOfOutputVMs.append(outputVM);
             }
         }
+        _outputsList.append(listOfOutputVMs);
 
+
+        //
         // Create the list of VM of parameters
-        foreach (AgentIOPM* parameterM, _modelM->parametersList()->toList()) {
-            if (parameterM != NULL) {
+        //
+        QList<AgentIOPVM*> listOfParameterVMs;
+        foreach (AgentIOPM* parameterM, _modelM->parametersList()->toList())
+        {
+            if (parameterM != NULL)
+            {
                 AgentIOPVM* parameterVM = new AgentIOPVM(parameterM, this);
-                _parametersList.append(parameterVM);
+                listOfParameterVMs.append(parameterVM);
             }
         }
+        _parametersList.append(listOfParameterVMs);
     }
 }
 

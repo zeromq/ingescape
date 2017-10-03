@@ -14,6 +14,14 @@
 
 #include "jsonhelper.h"
 
+#include <QDebug>
+
+
+
+/**
+ * @brief Default constrcutor
+ * @param parent
+ */
 JsonHelper::JsonHelper(QObject *parent) : QObject(parent)
 {
     qInfo() << "New JSON helper";

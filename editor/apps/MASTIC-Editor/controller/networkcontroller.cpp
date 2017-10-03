@@ -1,14 +1,14 @@
 /*
  *	NetworkController
  *
- *  Copyright (c) 2016-2017 Ingenuity i/o. All rights reserved.
+ *  Copyright (c) 2017 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
  *
  *
  *	Contributors:
- *      Vincent Deliencourt
+ *      Vincent Deliencourt  <deliencourt@ingenuity.io>
  *
  */
 
@@ -108,6 +108,10 @@ int myZyreIncommingMessageCallback (const zyre_event_t *cst_zyre_event, void *ar
  */
 NetworkController::NetworkController(QString networkDevice, QString ipAddress, int port, QObject *parent) : QObject(parent)
 {
+    // Force ownership of our object, it will prevent Qml from stealing it
+    QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
+
+
     // Network is ok if the result of mtic_startWithDevice is 1, O otherwise.
     int networkInitialized = 0;
 
@@ -117,39 +121,35 @@ NetworkController::NetworkController(QString networkDevice, QString ipAddress, i
     // Read our internal definition
     QString myDefinitionPath = QString("%1/definition.json").arg(MasticEditorUtils::getDataPath());
     QFileInfo checkDefinitionFile(myDefinitionPath);
-    if(checkDefinitionFile.exists() && checkDefinitionFile.isFile())
+    if (checkDefinitionFile.exists() && checkDefinitionFile.isFile())
     {
         mtic_setAgentName("MASTIC-Editor");
 
         // Start service with network device
-        if(networkDevice.isEmpty() == false)
+        if (networkDevice.isEmpty() == false)
         {
             networkInitialized = mtic_startWithDevice(networkDevice.toStdString().c_str(),port);
         }
 
         // Start service with ip if start with network device has failed
-        if(networkInitialized != 1 && ipAddress.isEmpty() == false)
+        if ((networkInitialized != 1) && (ipAddress.isEmpty() == false))
         {
             networkInitialized = mtic_startWithIP(ipAddress.toStdString().c_str(),port);
         }
-    } else {
+    }
+    else
+    {
         qCritical() << "No definition has been found : " << myDefinitionPath;
     }
 
-    if(networkInitialized == 1)
+    if (networkInitialized == 1)
     {
-        qInfo() << "Network services started ";
-
-        // begin the observe on transiting zyre messages
-        int result = network_observeZyre(&myZyreIncommingMessageCallback,this);
-        qInfo() << "Network services started result=" << QString::number(result);
-    } else {
+        qInfo() << "Network services started";
+    }
+    else
+    {
         qCritical() << "The network has not been initialized on " << networkDevice << ipAddress << QString::number(port);
     }
-
-    // Force ownership of our object, it will prevent Qml from stealing it
-    QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
-
 }
 
 

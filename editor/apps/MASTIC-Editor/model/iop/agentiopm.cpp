@@ -9,11 +9,20 @@
  *
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
+ *      Alexandre Lemort   <lemort@ingenuity.io>
  *
  */
 
 #include "agentiopm.h"
 
+#include <QQmlEngine>
+#include <QDebug>
+
+
+/**
+ * @brief Default constructor
+ * @param parent
+ */
 AgentIOPM::AgentIOPM(QObject *parent) : QObject(parent),
     _agentIOPType(AgentIOPTypes::PARAMETER),
     _name(""),

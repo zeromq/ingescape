@@ -18,10 +18,9 @@
 
 #include <QObject>
 #include <QtQml>
-#include <QQmlEngine>
-#include <QJSEngine>
+#include <QSettings>
 
-#include "I2PropertyHelpers.h"
+#include <I2PropertyHelpers.h>
 
 
 

@@ -14,32 +14,27 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "mastic_private.h"
+#include "uthash/utlist.h"
 
-//Hashable structure which associate the name of one 'iop' and the pointer of one callback
-typedef struct mtic_observe_callback_T {
-    const char * iop_name;              // Need to be unique : the table hash key
-    mtic_observeCallback callback_ptr;  // pointer on the callback
-    void* data;                         // user datas
-    UT_hash_handle hh;
-} mtic_observe_callback_T;
-
-
-//The variables which will contain all the callbacks associated to 'iop'
-mtic_observe_callback_T *input_callbacks;
-mtic_observe_callback_T *output_callbacks;
-mtic_observe_callback_T *param_callbacks;
-
-void update_value(agent_iop *iop, void* value, long size){
+void model_setIopValue(agent_iop *iop, void* value, long size){
+    if (iop == NULL){
+        mtic_debug("model_setIopValue called with NULL iop\n");
+        return;
+    }
+    
     switch (iop->value_type) {
         case INTEGER_T:
+            iop->valueSize = sizeof(int);
             iop->value.i = *(int*)(value);
             mtic_debug("set %s to %i\n", iop->name, iop->value.i);
             break;
         case DOUBLE_T:
+            iop->valueSize = sizeof(double);
             iop->value.d = *(double*)(value);
             mtic_debug("set %s to %f\n", iop->name, iop->value.d);
             break;
         case BOOL_T:
+            iop->valueSize = sizeof(bool);
             iop->value.b = *(bool*)(value);
             mtic_debug("set %s to %i\n", iop->name, iop->value.b);
             break;
@@ -48,13 +43,19 @@ void update_value(agent_iop *iop, void* value, long size){
             if (iop->value.s != NULL){
                 free(iop->value.s);
             }
-            iop->value.s = strdup(value);
-            mtic_debug("set %s to %s\n", iop->name, iop->value.s);
+            if (value == NULL){
+                iop->value.s = "";
+            }else{
+                iop->value.s = strdup(value);
+            }
+            iop->valueSize = (strlen(iop->value.s) + 1)*sizeof(char);
+            mtic_debug("set %s to %s (length: %d)\n", iop->name, iop->value.s, iop->valueSize - 1);
         }
             break;
         case IMPULSION_T:
             //nothing to do
-            mtic_debug("activate impulsion %s\n", iop->name);
+            iop->valueSize = 0;
+            mtic_debug("set impulsion %s\n", iop->name);
         break;
         case DATA_T:
         {
@@ -65,87 +66,12 @@ void update_value(agent_iop *iop, void* value, long size){
             iop->value.data = calloc (1, size);
             memcpy(iop->value.data,value,size);
             iop->valueSize = size;
-            mtic_debug("set %s data\n", iop->name);
+            mtic_debug("set %s data (length: %d)\n", iop->name, iop->valueSize);
         }
             break;
         default:
             break;
     }
-}
-
-
-int mtic_mute_internal(const char* iop_name, iop_t type)
-{
-    int result = -1;
-    // mtic_get iop object
-    agent_iop *iop = model_findIopByName((char*)iop_name,type);
-    
-    if(iop != NULL)
-    {
-        // update the is_muted state
-        iop->is_muted = true;
-        result = 0;
-    }
-    
-    return result;
-}
-
-int mtic_unmute_internal(const char* iop_name, iop_t type)
-{
-    int result = -1;
-    // mtic_get iop object
-    agent_iop *iop = model_findIopByName((char*)iop_name,type);
-    
-    if(iop != NULL)
-    {
-        // update the is_muted state
-        iop->is_muted = false;
-        result = 0;
-    }
-    
-    return result;
-}
-
-int mtic_muteAll()
-{
-    int result = 0,result_tmp = 0;
-
-    // Go through the agent outpust to mute them
-    struct agent_iop *current_iop, *tmp_iop;
-    HASH_ITER(hh, mtic_internal_definition->outputs_table, current_iop, tmp_iop) {
-        if(current_iop != NULL)
-        {
-            result_tmp = mtic_mute_internal(current_iop->name,OUTPUT_T);
-            // If one one the output has not been muted, we notice it
-            if(result_tmp != 0)
-            {
-                result = result_tmp;
-            }
-        }
-    }
-    
-    return result;
-}
-
-int mtic_unmuteAll()
-{
-    int result = 0,result_tmp = 0;
-    
-    // Go through the agent outpust to mute them
-    struct agent_iop *current_iop, *tmp_iop;
-    HASH_ITER(hh, mtic_internal_definition->outputs_table, current_iop, tmp_iop) {
-        if(current_iop != NULL)
-        {
-            result_tmp = mtic_unmute_internal(current_iop->name,OUTPUT_T);
-            // If one one the output has not been unmuted, we notice it
-            if(result_tmp != 0)
-            {
-                result = result_tmp;
-            }
-        }
-    }
-    
-    return result;
 }
 
 char* model_IntToString(const int value)
@@ -185,84 +111,44 @@ char* model_DoubleToString(const double value)
     return str;
 }
 
-static int mtic_observe(const char* type, const char* name,iop_t typeIop, mtic_observeCallback cb, void* myData){
+static int model_observe(const char* name, iop_t iopType, mtic_observeCallback cb, void* myData){
 
-    //1) find the iop
-    agent_iop *iop = model_findIopByName((char*) name,typeIop);
+    //find the iop
+    agent_iop *iop = model_findIopByName((char*) name, iopType);
 
     // Check if the input has been returned.
     if(iop == NULL){
-        mtic_debug("%s : the %s Agent's '%s' cannot be found", __FUNCTION__, type,  name);
+        mtic_debug("%s : no iop with name %s and type %d", __FUNCTION__, name, iopType);
         return 0;
     }
 
     //callback not defined
     if(cb == NULL) {
-        mtic_debug("%s: the callback use for %s '%s' is null", __FUNCTION__, type,   name);
+        mtic_debug("%s: the observe callback for %s is null", __FUNCTION__, name);
         return 0;
     }
 
-    mtic_observe_callback_T *new_callback = malloc(sizeof(mtic_observe_callback_T));
-    new_callback->iop_name = strdup(name);
+    mtic_observe_callback_t *new_callback = malloc(sizeof(mtic_observe_callback_t));
     new_callback->callback_ptr = cb;
     new_callback->data = myData;
+    DL_APPEND(iop->callbacks, new_callback);
 
-    switch (typeIop) {
-    case INPUT_T:
-        HASH_ADD_STR( input_callbacks, iop_name,  new_callback);
-        break;
-    case OUTPUT_T:
-        HASH_ADD_STR( output_callbacks, iop_name,  new_callback);
-        break;
-    case PARAMETER_T:
-        HASH_ADD_STR( param_callbacks, iop_name,  new_callback);
-        break;
-    default:
-        break;
-    }
-
-    mtic_debug("ADD_OBSERVE on the %s '%s'\n", type, name);
+    mtic_debug("OBSERVE iop with name %s and type %d\n", name, iopType);
 
     return 1;
+}
+
+void model_runObserveCallbacksForIOP(agent_iop *iop, void *value, long valueSize)
+{
+    mtic_observe_callback_t *cb;
+    DL_FOREACH(iop->callbacks, cb){
+        cb->callback_ptr(iop->type, iop->name, iop->value_type, value, valueSize, cb->data);
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////
 // PRIVATE API
 ////////////////////////////////////////////////////////////////////////
-agent_iop * model_find_iop_by_name_in_definition(const char *name, definition* definition){
-    agent_iop *found = NULL;
-    
-    if(name != NULL && definition != NULL){
-        //find the input agent_iop
-        HASH_FIND_STR( definition->inputs_table, name, found );
-        if(found == NULL){
-            // look in the outputs
-            HASH_FIND_STR( definition->outputs_table, name, found );
-        }else
-        {
-            return found;
-        }
-        
-        if(found == NULL){
-            //find the parameters agent_iop
-            HASH_FIND_STR( definition->params_table, name, found );
-        }else{
-            return found;
-        }
-        
-        if(found == NULL){
-            fprintf(stderr, "ERROR : The name of the iop {%s} doesn't exist. \n",name);
-            return found;
-        }else
-        {
-            return found;
-        }
-    }else{
-        fprintf(stderr, "ERROR : The name of the IOP is empty. \n");
-        return found;
-    }
-}
-
 agent_iop * model_findIopByName(const char *name, iop_t type){
     agent_iop *found = NULL;
     
@@ -776,7 +662,6 @@ char* mtic_readInputAsString(const char *name){
 /**
  * \fn int mtic_readInputAsData(const char *name, void *data, long *size)
  * \ingroup readfct
-<<<<<<< HEAD
  * \brief Find the Agent's input by name and get the pointer on the data.
  * \warning The input as to be data type
  * \warning Allocating memory before calling this function that must be free after use.
@@ -1384,13 +1269,14 @@ int mtic_readParameterAsData(const char *name, void **data, long *size){
  */
 int mtic_writeInput(const char *name, char *value, long size){
 
-    //Get the pointer IOP Agent selected by name
     agent_iop *iop = model_findIopByName((char*) name,INPUT_T);
     int ret = 0;
-
-    // Check if the iop has been returned.
     if(iop == NULL){
-        mtic_debug("%s : Agent's input %s cannot be found\n", __FUNCTION__, name);
+        mtic_debug("%s : our input %s cannot be found\n", __FUNCTION__, name);
+        return 0;
+    }
+    if (value == NULL){
+        mtic_debug("%s : value %s cannot be NULL\n", __FUNCTION__, name);
         return 0;
     }
 
@@ -1453,13 +1339,14 @@ int mtic_writeInput(const char *name, char *value, long size){
  */
 int mtic_writeOutput(const char *name, char *value, long size){
 
-    //Get the pointer IOP Agent selected by name
     agent_iop *iop = model_findIopByName((char*) name,OUTPUT_T);
     int ret = 0;
-
-    // Check if the iop has been returned.
     if(iop == NULL){
-        mtic_debug("%s : Agent's output %s cannot be found\n", __FUNCTION__, name);
+        mtic_debug("%s : our output %s cannot be found\n", __FUNCTION__, name);
+        return 0;
+    }
+    if (value == NULL){
+        mtic_debug("%s : value %s cannot be NULL\n", __FUNCTION__, name);
         return 0;
     }
 
@@ -1522,13 +1409,14 @@ int mtic_writeOutput(const char *name, char *value, long size){
  */
 int mtic_writeParameter(const char *name, char *value, long size){
 
-    //Get the pointer IOP Agent selected by name
     agent_iop *iop = model_findIopByName((char*) name,PARAMETER_T);
     int ret = 0;
-
-    // Check if the iop has been returned.
     if(iop == NULL){
-        mtic_debug("%s : Agent's parameter %s cannot be found\n", __FUNCTION__, name);
+        mtic_debug("%s : our parameter %s cannot be found\n", __FUNCTION__, name);
+        return 0;
+    }
+    if (value == NULL){
+        mtic_debug("%s : value %s cannot be NULL\n", __FUNCTION__, name);
         return 0;
     }
 
@@ -1578,39 +1466,6 @@ int mtic_writeParameter(const char *name, char *value, long size){
 }
 
 /**
- * \fn void call_callback(const char *name,iop_t iopType, iopType_t valueType, void* value)
- * \ingroup writefct
- * \brief call the callback associated to the iop if it exist.
- *
- * \param name is the name of the input or output or parameter
- * \param iopType is the type of the iop : input, output, parameter
- * \param valueType is the type of the value of the input, output, parameter
- * \param value is a data to pass to callback
- * \return no return
- */
-void call_callback(const char *name,iop_t iopType, iopType_t valueType, void* value)
-{
-    mtic_observe_callback_T *fct_to_call;
-
-    switch (iopType) {
-    case INPUT_T:
-        HASH_FIND_STR(input_callbacks, name, fct_to_call);
-        break;
-    case OUTPUT_T:
-        HASH_FIND_STR(output_callbacks, name, fct_to_call);
-        break;
-    case PARAMETER_T:
-        HASH_FIND_STR(param_callbacks, name, fct_to_call);
-        break;
-    default:
-        break;
-    }
-
-    if(fct_to_call != NULL)
-        fct_to_call->callback_ptr(iopType, name, valueType, value, fct_to_call->data);
-}
-
-/**
  * \fn int mtic_writeInputAsBool(const char *name, bool value)
  * \ingroup writefct
  * \brief write a value as bool into an agent's input.
@@ -1637,14 +1492,10 @@ int mtic_writeInputAsBool(const char *name, bool value){
     }
 
     // update the value in the iop_live structure
-    update_value(iop, (void*) &value, 0);
+    model_setIopValue(iop, (void*) &value, sizeof(bool));
 
-    // call the callback associated to if it exist
-//    mtic_observe_callback_T *fct_to_call;
-//    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
-//    if(fct_to_call != NULL)
-//        fct_to_call->callback_ptr(INPUT_T, name, BOOL_T, (void*) &value, fct_to_call->data);
-    call_callback(name,INPUT_T,BOOL_T,(void*) &value);
+    // call the callbacks associated to if it exist
+    model_runObserveCallbacksForIOP(iop, (void*) &value, sizeof(bool));
 
     return 1;
 
@@ -1677,14 +1528,11 @@ int mtic_writeInputAsInt(const char *name, int value){
     }
 
     // update the value in the iop_live structure
-    update_value(iop, (void*) &value, 0);
+    model_setIopValue(iop, (void*) &value, sizeof(int));
 
-    // call the callback associated to if it exist
-//    mtic_observe_callback_T *fct_to_call;
-//    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
-//    if(fct_to_call != NULL)
-//        fct_to_call->callback_ptr(INPUT_T, name, INTEGER_T, (void*) &value, fct_to_call->data);
-    call_callback(name, INPUT_T,INTEGER_T, (void*) &value);
+    // call the callbacks associated to if it exist
+    model_runObserveCallbacksForIOP(iop, (void*) &value, sizeof(int));
+    
     return 1;
 }
 
@@ -1715,14 +1563,11 @@ int mtic_writeInputAsDouble(const char *name, double value){
     }
 
     // update the value in the iop_live structure
-    update_value(iop, (void*) &value, 0);
+    model_setIopValue(iop, (void*) &value, sizeof(double));
 
-    // call the callback associated to if it exist
-//    mtic_observe_callback_T *fct_to_call;
-//    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
-//    if(fct_to_call != NULL)
-//        fct_to_call->callback_ptr(INPUT_T, name, DOUBLE_T, (void*) &value, fct_to_call->data);
-    call_callback(name,INPUT_T, DOUBLE_T, (void*) &value);
+    // call the callbacks associated to if it exist
+    model_runObserveCallbacksForIOP(iop, (void*) &value, sizeof(double));
+    
     return 1;
 }
 
@@ -1753,14 +1598,11 @@ int mtic_writeInputAsString(const char *name, char *value){
     }
 
     // update the value in the iop_live structure
-    update_value(iop, (void*) value, 0);
+    model_setIopValue(iop, (void*) value, (strlen(value)+1)*sizeof(char));
 
-    // call the callback associated to if it exist
-//    mtic_observe_callback_T *fct_to_call;
-//    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
-//    if(fct_to_call != NULL)
-//        fct_to_call->callback_ptr(INPUT_T, name, STRING_T, (void*) value, fct_to_call->data);
-    call_callback(name, INPUT_T, STRING_T, (void*) value);
+    // call the callbacks associated to if it exist
+    model_runObserveCallbacksForIOP(iop, (void*) &value, (strlen(value)+1)*sizeof(char));
+    
     return 1;
 }
 
@@ -1789,12 +1631,8 @@ int mtic_writeInputAsImpulsion(const char *name){
         return 0;
     }
 
-    // call the callback associated to if it exist
-//    mtic_observe_callback_T *fct_to_call;
-//    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
-//    if(fct_to_call != NULL)
-//        fct_to_call->callback_ptr(INPUT_T, name, IMPULSION_T, 0, fct_to_call->data);
-    call_callback(name, INPUT_T, IMPULSION_T, 0);
+    // call the callbacks associated to if it exist
+    model_runObserveCallbacksForIOP(iop, NULL, 0);
 
     return 1;
 }
@@ -1827,14 +1665,10 @@ int mtic_writeInputAsData(const char *name, void *value, long size){
     }
 
     //Update the value in the definition
-    update_value(iop,value,size);
+    model_setIopValue(iop,value,size);
 
-    // call the callback associated to if it exist
-//    mtic_observe_callback_T *fct_to_call;
-//    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
-//    if(fct_to_call != NULL)
-//        fct_to_call->callback_ptr(INPUT_T, name, DATA_T, value, fct_to_call->data);
-    call_callback(name, INPUT_T, DATA_T, value);
+    // call the callbacks associated to if it exist
+    model_runObserveCallbacksForIOP(iop, value, size);
 
     return 1;
 }
@@ -1866,14 +1700,10 @@ int mtic_writeOutputAsBool(const char *name, bool value){
     }
 
     // update the value in the iop_live structure
-    update_value(iop, (void*) &value, 0);
+    model_setIopValue(iop, (void*) &value, sizeof(bool));
 
-    // call the callback associated to if it exist
-//    mtic_observe_callback_T *fct_to_call;
-//    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
-//    if(fct_to_call != NULL)
-//        fct_to_call->callback_ptr(OUTPUT_T, name, BOOL_T, (void*) &value, fct_to_call->data);
-    call_callback(name, OUTPUT_T, BOOL_T, (void*) &value);
+    // call the callbacks associated to if it exist
+    model_runObserveCallbacksForIOP(iop, (void*) &value, sizeof(bool));
 
     // iop is output : publish
     network_publishOutput(name);
@@ -1908,14 +1738,10 @@ int mtic_writeOutputAsInt(const char *name, int value){
     }
 
     // update the value in the iop_live structure
-    update_value(iop, (void*) &value, 0);
-
-    // call the callback associated to if it exist
-//    mtic_observe_callback_T *fct_to_call;
-//    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
-//    if(fct_to_call != NULL)
-//        fct_to_call->callback_ptr(OUTPUT_T, name, INTEGER_T, (void*) &value, fct_to_call->data);
-    call_callback(name, OUTPUT_T, INTEGER_T, (void*) &value);
+    model_setIopValue(iop, (void*) &value, sizeof(int));
+    
+    // call the callbacks associated to if it exist
+    model_runObserveCallbacksForIOP(iop, (void*) &value, sizeof(int));
 
     // iop is output : publish
     network_publishOutput(name);
@@ -1951,14 +1777,10 @@ int mtic_writeOutputAsDouble(const char *name, double value){
     }
 
     // update the value in the iop_live structure
-    update_value(iop, (void*) &value, 0);
-
-    // call the callback associated to if it exist
-//    mtic_observe_callback_T *fct_to_call;
-//    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
-//    if(fct_to_call != NULL)
-//        fct_to_call->callback_ptr(OUTPUT_T, name, DOUBLE_T, (void*) &value, fct_to_call->data);
-    call_callback(name, OUTPUT_T, DOUBLE_T, (void*) &value);
+    model_setIopValue(iop, (void*) &value, sizeof(double));
+    
+    // call the callbacks associated to if it exist
+    model_runObserveCallbacksForIOP(iop, (void*) &value, sizeof(double));
 
     // iop is output : publish
     network_publishOutput(name);
@@ -1993,14 +1815,10 @@ int mtic_writeOutputAsString(const char *name, char *value){
     }
 
     // update the value in the iop_live structure
-    update_value(iop, (void*) value, 0);
-
-    // call the callback associated to if it exist
-//    mtic_observe_callback_T *fct_to_call;
-//    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
-//    if(fct_to_call != NULL)
-//        fct_to_call->callback_ptr(OUTPUT_T, name, STRING_T, (void*) value, fct_to_call->data);
-    call_callback(name, OUTPUT_T, STRING_T, (void*) value);
+    model_setIopValue(iop, (void*) value, (strlen(value)+1)*sizeof(char));
+    
+    // call the callbacks associated to if it exist
+    model_runObserveCallbacksForIOP(iop, (void*) &value, (strlen(value)+1)*sizeof(char));
 
     // iop is output : publish
     network_publishOutput(name);
@@ -2033,12 +1851,8 @@ int mtic_writeOutputAsImpulsion(const char *name){
         return 0;
     }
 
-    // call the callback associated to if it exist
-//    mtic_observe_callback_T *fct_to_call;
-//    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
-//    if(fct_to_call != NULL)
-//        fct_to_call->callback_ptr(OUTPUT_T, name, IMPULSION_T, 0, fct_to_call->data);
-    call_callback( name, OUTPUT_T, IMPULSION_T, 0);
+    // call the callbacks associated to if it exist
+    model_runObserveCallbacksForIOP(iop, NULL, 0);
 
     // iop is output : publish
     network_publishOutput(name);
@@ -2073,14 +1887,10 @@ int mtic_writeOutputAsData(const char *name, void *value, long size){
     }
 
     //Update the value in the definition
-    update_value(iop,value,size);
-
-    // call the callback associated to if it exist
-//    mtic_observe_callback_T *fct_to_call;
-//    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
-//    if(fct_to_call != NULL)
-//        fct_to_call->callback_ptr(OUTPUT_T, name, DATA_T, value, fct_to_call->data);
-    call_callback(name, OUTPUT_T, DATA_T, value);
+    model_setIopValue(iop,value,size);
+    
+    // call the callbacks associated to if it exist
+    model_runObserveCallbacksForIOP(iop, value, size);
 
     // iop is output : publish
     network_publishOutput(name);
@@ -2115,14 +1925,10 @@ int mtic_writeParameterAsBool(const char *name, bool value){
     }
 
     // update the value in the iop_live structure
-    update_value(iop, (void*) &value, 0);
-
-    // call the callback associated to if it exist
-//    mtic_observe_callback_T *fct_to_call;
-//    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
-//    if(fct_to_call != NULL)
-//        fct_to_call->callback_ptr(PARAMETER_T, name, BOOL_T, (void*) &value, fct_to_call->data);
-    call_callback(name, PARAMETER_T, BOOL_T, (void*) &value);
+    model_setIopValue(iop, (void*) &value, sizeof(bool));
+    
+    // call the callbacks associated to if it exist
+    model_runObserveCallbacksForIOP(iop, (void*) &value, sizeof(bool));
 
     return 1;
 }
@@ -2154,14 +1960,10 @@ int mtic_writeParameterAsInt(const char *name, int value){
     }
 
     // update the value in the iop_live structure
-    update_value(iop, (void*) &value, 0);
-
-    // call the callback associated to if it exist
-//    mtic_observe_callback_T *fct_to_call;
-//    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
-//    if(fct_to_call != NULL)
-//        fct_to_call->callback_ptr(PARAMETER_T, name, INTEGER_T, (void*) &value, fct_to_call->data);
-    call_callback(name, PARAMETER_T, INTEGER_T, (void*) &value);
+    model_setIopValue(iop, (void*) &value, sizeof(int));
+    
+    // call the callbacks associated to if it exist
+    model_runObserveCallbacksForIOP(iop, (void*) &value, sizeof(int));
 
     return 1;
 }
@@ -2193,14 +1995,10 @@ int mtic_writeParameterAsDouble(const char *name, double value){
     }
 
     // update the value in the iop_live structure
-    update_value(iop, (void*) &value, 0);
-
-    // call the callback associated to if it exist
-//    mtic_observe_callback_T *fct_to_call;
-//    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
-//    if(fct_to_call != NULL)
-//        fct_to_call->callback_ptr(PARAMETER_T, name, DOUBLE_T, (void*) &value, fct_to_call->data);
-    call_callback(name, PARAMETER_T, DOUBLE_T, (void*) &value);
+    model_setIopValue(iop, (void*) &value, sizeof(double));
+    
+    // call the callbacks associated to if it exist
+    model_runObserveCallbacksForIOP(iop, (void*) &value, sizeof(double));
 
     return 1;
 }
@@ -2232,14 +2030,10 @@ int mtic_writeParameterAsString(const char *name, char *value){
     }
 
     // update the value in the iop_live structure
-    update_value(iop, value, 0);
-
-    // call the callback associated to if it exist
-//    mtic_observe_callback_T *fct_to_call;
-//    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
-//    if(fct_to_call != NULL)
-//        fct_to_call->callback_ptr(PARAMETER_T, name, STRING_T, value, fct_to_call->data);
-    call_callback(name, PARAMETER_T, STRING_T, value);
+    model_setIopValue(iop, (void*) value, (strlen(value)+1)*sizeof(char));
+    
+    // call the callbacks associated to if it exist
+    model_runObserveCallbacksForIOP(iop, (void*) &value, (strlen(value)+1)*sizeof(char));
 
     return 1;
 }
@@ -2272,14 +2066,10 @@ int mtic_writeParameterAsData(const char *name, void *value, long size){
     }
 
     //Update the value in the definition
-    update_value(iop,value,size);
-
-    // call the callback associated to if it exist
-//    mtic_observe_callback_T *fct_to_call;
-//    HASH_FIND_STR(agent_callbacks, name, fct_to_call);
-//    if(fct_to_call != NULL)
-//        fct_to_call->callback_ptr(PARAMETER_T, name, DATA_T, value, fct_to_call->data);
-    call_callback(name, PARAMETER_T, DATA_T, value);
+    model_setIopValue(iop,value,size);
+    
+    // call the callbacks associated to if it exist
+    model_runObserveCallbacksForIOP(iop, value, size);
 
     return 1;
 }
@@ -2703,7 +2493,7 @@ bool mtic_checkParameterExistence(const char *name){
  * return 1 if correct or 0
  */
 int mtic_observeInput(const char *name, mtic_observeCallback cb, void *myData){
-    return mtic_observe("input", name,INPUT_T, cb, myData);
+    return model_observe(name, INPUT_T, cb, myData);
 }
 
 /**
@@ -2719,7 +2509,7 @@ int mtic_observeInput(const char *name, mtic_observeCallback cb, void *myData){
  * return 1 if correct or 0
  */
 int mtic_observeOutput(const char *name, mtic_observeCallback cb, void * myData){
-    return mtic_observe("output", name,OUTPUT_T, cb, myData);
+    return model_observe(name, OUTPUT_T, cb, myData);
 }
 
 /**
@@ -2735,7 +2525,7 @@ int mtic_observeOutput(const char *name, mtic_observeCallback cb, void * myData)
  * return 1 if correct or 0
  */
 int mtic_observeParameter(const char *name, mtic_observeCallback cb, void * myData){
-    return mtic_observe("parameter", name,PARAMETER_T, cb, myData);
+    return model_observe(name, PARAMETER_T, cb, myData);
 }
 
 /**
