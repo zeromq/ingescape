@@ -141,6 +141,8 @@ Item {
 
                 drag.target: workspace
 
+                scrollGestureEnabled: false
+
                 onWheel: {
                     wheel.accepted = true;
 
