@@ -127,25 +127,23 @@ NetworkController::NetworkController(QString networkDevice, QString ipAddress, i
     // Read our internal definition
     QString myDefinitionPath = QString("%1/definition.json").arg(MasticEditorUtils::getDataPath());
     QFileInfo checkDefinitionFile(myDefinitionPath);
-    if (checkDefinitionFile.exists() && checkDefinitionFile.isFile())
+    if (!checkDefinitionFile.exists() || !checkDefinitionFile.isFile())
     {
-        mtic_setAgentName("MASTIC-Editor");
-
-        // Start service with network device
-        if (networkDevice.isEmpty() == false)
-        {
-            networkInitialized = mtic_startWithDevice(networkDevice.toStdString().c_str(),port);
-        }
-
-        // Start service with ip if start with network device has failed
-        if ((networkInitialized != 1) && (ipAddress.isEmpty() == false))
-        {
-            networkInitialized = mtic_startWithIP(ipAddress.toStdString().c_str(),port);
-        }
+        qWarning() << "No definition has been found : " << myDefinitionPath;
     }
-    else
+
+    mtic_setAgentName("MASTIC-Editor");
+
+    // Start service with network device
+    if (networkDevice.isEmpty() == false)
     {
-        qCritical() << "No definition has been found : " << myDefinitionPath;
+        networkInitialized = mtic_startWithDevice(networkDevice.toStdString().c_str(),port);
+    }
+
+    // Start service with ip if start with network device has failed
+    if ((networkInitialized != 1) && (ipAddress.isEmpty() == false))
+    {
+        networkInitialized = mtic_startWithIP(ipAddress.toStdString().c_str(),port);
     }
 
     if (networkInitialized == 1)
