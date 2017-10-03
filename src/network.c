@@ -458,8 +458,10 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 
                 // Load definition from string content
                 mtic_my_agent_mapping = parser_LoadMap(strMapping);
-                
+
+                free(strMapping);
                 //TODO: activate mapping dynamically
+
                 
             }else{
                 //other supported messages

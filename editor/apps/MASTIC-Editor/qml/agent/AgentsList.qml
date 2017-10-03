@@ -115,42 +115,88 @@ Item {
         id: agentInList
 
         Rectangle {
+            id : agentRow
             width: MasticTheme.leftPanelWidth
             height: 120
             color: "yellow"
 
             Column {
-                width: MasticTheme.leftPanelWidth
+
+                Item {
+                    id: agentNameRow
+                    height: 25
+                    width : agentRow.width
+
+                    Text {
+                        id: agentName
+                        anchors {
+                            left : agentNameRow.left
+                        }
+
+                        text: "Name : " + model.modelM.name
+                        height: 25
+                    }
+
+                    Text {
+                        id: agentStatus
+                        anchors {
+                            left : agentName.right
+                        }
+
+                        text: "[" + AgentStatus.enumToString(model.status)+"]"
+                        height: 25
+                    }
+
+                    Button {
+                        id: btnDefinition
+                        anchors {
+                            right : btnDeleteAgent.left
+                        }
+                        text: "Définition"
+
+                        onClicked: {
+                            console.log("Open the definition of " + model.modelM.name)
+                        }
+                    }
+
+                    Button {
+                        id: btnDeleteAgent
+
+                        anchors {
+                            right : agentNameRow.right
+                        }
+                        visible : model.status === AgentStatus.OFF
+
+                        text: "X"
+
+                        onClicked: {
+                            if(controller)
+                            {
+                                console.log("Delete agent from the list : " + model.modelM.name)
+                                controller.deleteAgentFromList(model.QtObject);
+                            }
+                        }
+                    }
+                }
 
                 Text {
-                    text: model.modelM.name
+                    text: "Description : " + model.modelM.description
                     height: 25
                 }
 
                 Text {
-                    text: model.modelM.description
+                    text: "Version : " + model.modelM.version
                     height: 25
                 }
 
                 Text {
-                    text: model.modelM.version
+                    text: "SimilarAgents : " + model.listSimilarAgentsVM.count
                     height: 25
                 }
-            }
 
-            Button {
-                id: btnDefinition
-                anchors {
-                    top: parent.top
-                    right: parent.right
-                }
-
-                text: "Définition"
-
-                onClicked: {
-                    console.log("Open the definition of " + model.modelM.name)
-
-                    //model.openEditor();
+                Text {
+                    text: "IdenticalAgents : " + model.listIdenticalAgentsVM.count
+                    height: 25
                 }
             }
         }

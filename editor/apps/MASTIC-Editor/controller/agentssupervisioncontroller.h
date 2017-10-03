@@ -40,6 +40,12 @@ public:
      */
     ~AgentsSupervisionController();
 
+    /**
+     * @brief Delete an agent VM from the list
+     * @param agent VM to delete
+     */
+    Q_INVOKABLE void deleteAgentFromList(AgentVM * agentToDelete);
+
 signals:
 
 public slots:

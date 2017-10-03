@@ -18,10 +18,12 @@ AgentM::AgentM(QObject *parent) : QObject(parent),
     _name(""),
     _networkDevice(""),
     _ipAddress(""),
+    _peer(""),
     _port(-1),
     _version(""),
     _description(""),
-    _canBeFrozen(false)
+    _canBeFrozen(false),
+    _md5Hash("")
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);

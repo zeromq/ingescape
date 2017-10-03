@@ -34,3 +34,16 @@ AgentsSupervisionController::~AgentsSupervisionController()
 {
     _modelManager = NULL;
 }
+
+/**
+ * @brief Delete an agent VM from the list
+ * @param agent VM to delete
+ */
+void AgentsSupervisionController::deleteAgentFromList(AgentVM * agentToDelete)
+{
+    if(_modelManager != NULL && agentToDelete != NULL)
+    {
+        _modelManager->deleteAgentVMFromList(agentToDelete);
+    }
+}
+

@@ -36,6 +36,9 @@ class AgentM : public QObject
     // IP address of our agent
     I2_QML_PROPERTY_READONLY(QString, ipAddress)
 
+    // Peer of our agent
+    I2_QML_PROPERTY_READONLY(QString, peer)
+
     // Port of our agent
     I2_QML_PROPERTY_READONLY(int, port)
 
@@ -56,6 +59,9 @@ class AgentM : public QObject
 
     // Flag indicating if our agent can be frozen
     I2_QML_PROPERTY_READONLY(bool, canBeFrozen)
+
+    // Md5 hash value for the definition string
+    I2_QML_PROPERTY_READONLY(QString, md5Hash)
 
 
 public:

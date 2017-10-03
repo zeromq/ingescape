@@ -99,7 +99,7 @@ QML_DESIGNER_IMPORT_PATH =
 INCLUDEPATH += ../../frameworks/I2Quick/include
 
 ## Mastic library link
-LIBS += -L/usr/local/lib -lmastic
+LIBS += -L/usr/local/lib -lmastic -lczmq -lzyre
 
 INCLUDEPATH += /usr/local/include
 

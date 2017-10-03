@@ -20,7 +20,14 @@
 #include <QQmlEngine>
 #include <QJSEngine>
 
+extern "C" {
+#include <mastic/mastic_private.h>
+#include <zyre.h>
+}
+
 #include "I2PropertyHelpers.h"
+
+#include "model/agentm.h"
 
 /**
  * @brief The NetworkController class defines the main controller of our application
@@ -47,9 +54,17 @@ public:
       */
     ~NetworkController();
 
-
-
 Q_SIGNALS:
+
+    /**
+     * @brief Signal emitted when an agent enter the network
+     */
+    void agentEntered(QString agentName, QString agentAdress, QString peer, QString definition);
+
+    /**
+     * @brief Signal emitted when an agent quit the network
+     */
+    void agentExited(QString peer);
 
 
 public Q_SLOTS:
