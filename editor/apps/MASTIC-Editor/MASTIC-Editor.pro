@@ -100,10 +100,11 @@ QML_DESIGNER_IMPORT_PATH =
 # Add the include directory of I2Quick
 INCLUDEPATH += ../../frameworks/I2Quick/include
 
-## Mastic library link
-LIBS += -L/usr/local/lib -lmastic
 
-INCLUDEPATH += /usr/local/include
+# Include MASTIC library
+!include(../../../dependencies/mastic_embedded.pri) {
+    error(Could not load mastic_embedded.pri)
+}
 
 
 #####################################################################

@@ -49,6 +49,7 @@ void registerCustomQmlTypes()
     //---------------
     qmlRegisterSingletonType<AgentIOPTypes>(uri, 1, 0, "AgentIOPTypes", &AgentIOPTypes::qmlSingleton);
     qmlRegisterSingletonType<AgentIOPValueTypes>(uri, 1, 0, "AgentIOPValueTypes", &AgentIOPValueTypes::qmlSingleton);
+    qmlRegisterSingletonType<AgentStatus>(uri, 1, 0, "AgentStatus", &AgentStatus::qmlSingleton);
 
 
 

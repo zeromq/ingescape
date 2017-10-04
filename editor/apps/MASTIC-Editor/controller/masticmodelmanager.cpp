@@ -67,13 +67,11 @@ MasticModelManager::MasticModelManager(QObject *parent) : QObject(parent),
             if (jsonFile.open(QIODevice::ReadOnly))
             {
                 QByteArray byteArrayOfJson = jsonFile.readAll();
-                QJsonDocument jsonAgentDefinition = QJsonDocument::fromJson(byteArrayOfJson);
-
-                if (jsonAgentDefinition.isObject()) {
-                    // Create a model of agent with a definition
-                    AgentM* agent = _jsonHelper->createAgentWithDefinition(jsonAgentDefinition.object());
-
-                    _allAgentsModel.append(agent);
+                // Create a model of agent with a definition
+                AgentM* agent = _jsonHelper->createAgentWithRawDefinition(byteArrayOfJson);
+                if(agent != NULL)
+                {
+                    addNewAgentModelToList(agent, AgentStatus::OFF);
                 }
 
                 jsonFile.close();
@@ -84,22 +82,6 @@ MasticModelManager::MasticModelManager(QObject *parent) : QObject(parent),
             }
         }
     }
-
-
-    //
-    // Build a view model for each agent
-    //
-    QList<AgentVM*> listOfAgentVMs;
-    foreach (AgentM* agentM, _allAgentsModel)
-    {
-        if (agentM != NULL)
-        {
-            // Create a VM for each model of agent
-            AgentVM* agentVM = new AgentVM(agentM);
-            listOfAgentVMs.append(agentVM);
-        }
-    }
-    _allAgentsVM.append(listOfAgentVMs);
 }
 
 
@@ -115,4 +97,178 @@ MasticModelManager::~MasticModelManager()
     qDeleteAll(_allAgentsModel);
 
     qInfo() << "Delete MASTIC Model Manager";
+}
+
+
+/**
+ * @brief Slot on agent entereing into the network
+ *        Agent definitino has been received and must be processed
+ * @param agent name
+ * @param agent adress
+ * @param agent definition
+ */
+void MasticModelManager::onAgentEntered(QString agentName, QString agentAdress, QString peer, QString definition)
+{
+    if(definition.isEmpty() == false)
+    {
+        QByteArray byteArrayOfJson = definition.toUtf8();
+
+        // Create a model of agent with a definition
+        AgentM* agent = _jsonHelper->createAgentWithRawDefinition(byteArrayOfJson);
+        if(agent != NULL)
+        {
+            agent->setname(agentName);
+            agent->setipAddress(agentAdress);
+            agent->setpeer(peer);
+
+            addNewAgentModelToList(agent, AgentStatus::ON);
+        }
+    }
+
+}
+
+/**
+ * @brief Slot on agent quitting the network
+ * @param agent peer
+ */
+void MasticModelManager::onAgentExited(QString peer)
+{
+
+    AgentVM* agentVM = NULL;
+    if(_mapAgentsVMPerPeerId.contains(peer) == true)
+    {
+        agentVM = _mapAgentsVMPerPeerId.value(peer);
+        if(agentVM != NULL)
+        {
+            agentVM->setstatus(AgentStatus::OFF);
+
+            // We don't delete the agent when it ran OFF
+            //_mapAgentsVMPerPeerId.remove(peer);
+            //deleteAgentVMFromList(agentVM);
+        }
+    }
+
+}
+
+
+
+/**
+ * @brief Add a new agent model into our list
+ * @param agent model
+ * @param agent status
+ */
+void MasticModelManager::addNewAgentModelToList(AgentM* agentModelToAdd, AgentStatus::Value status)
+{
+    // Create a VM for each model of agent
+    AgentVM* newAgentVM = new AgentVM(agentModelToAdd);
+    newAgentVM->setstatus(status);
+
+    QString newAgentKey = agentModelToAdd->name().replace(" ","").trimmed().toUpper() + agentModelToAdd->version().replace(" ","").trimmed().toUpper();
+
+    // Add our agent to the main agentModel list
+    _allAgentsModel.append(agentModelToAdd);
+
+    if(agentModelToAdd->peer().isEmpty() == false && _mapAgentsVMPerPeerId.contains(agentModelToAdd->peer()) == false)
+    {
+        // Add our object to the map per peer
+        _mapAgentsVMPerPeerId.insert(agentModelToAdd->peer(),newAgentVM);
+    }
+
+    // Name and version are identical, the agents are potentially the same
+    if(_mapAgentsVMPerNameAndVersion.contains(newAgentKey) == true)
+    {
+        AgentVM* mainAgent = _mapAgentsVMPerNameAndVersion.value(newAgentKey);
+
+        // Case 1 : name and version and defintion are exactly the same.
+        if(mainAgent->modelM() != NULL && mainAgent->modelM()->md5Hash().compare(agentModelToAdd->md5Hash()) == 0)
+        {
+            mainAgent->listIdenticalAgentsVM()->append(newAgentVM);
+        }
+        // Case 2 : name and version are exactly the same, but the definition is different.
+        else {
+            mainAgent->listSimilarAgentsVM()->append(newAgentVM);
+        }
+    }
+    // Case 3 : agent does not exists, we simply create a new one
+    else {
+        _allAgentsVM.append(newAgentVM);
+
+        // Create a new entry for our agent
+        _mapAgentsVMPerNameAndVersion.insert(newAgentKey,newAgentVM);
+    }
+}
+
+/**
+ * @brief Delete an agent from our list
+ * @param agent view model
+ */
+void MasticModelManager::deleteAgentVMFromList(AgentVM* agentModelToDelete)
+{
+    if(agentModelToDelete != NULL && agentModelToDelete->modelM() != NULL && agentModelToDelete->status() != AgentStatus::ON)
+    {
+        QString agentKey = agentModelToDelete->modelM()->name().replace(" ","").trimmed().toUpper() + agentModelToDelete->modelM()->version().replace(" ","").trimmed().toUpper();
+
+        // Name and version are identical, the agents are potentially the same
+        if(_mapAgentsVMPerNameAndVersion.contains(agentKey) == true)
+        {
+            AgentVM* mainAgent = _mapAgentsVMPerNameAndVersion.value(agentKey);
+
+            if(mainAgent == agentModelToDelete)
+            {
+                _mapAgentsVMPerNameAndVersion.remove(agentKey);
+
+                if(agentModelToDelete->listIdenticalAgentsVM()->count() > 0
+                        || agentModelToDelete->listSimilarAgentsVM()->count() > 0)
+                {
+                    AgentVM* newMainAgent = NULL;
+                    if(agentModelToDelete->listIdenticalAgentsVM()->count() > 0)
+                    {
+                        newMainAgent = agentModelToDelete->listIdenticalAgentsVM()->at(0);
+                        agentModelToDelete->listIdenticalAgentsVM()->remove(newMainAgent);
+                    } else if (agentModelToDelete->listSimilarAgentsVM()->count() > 0)
+                    {
+                        newMainAgent = agentModelToDelete->listSimilarAgentsVM()->at(0);
+                        agentModelToDelete->listSimilarAgentsVM()->remove(newMainAgent);
+                    }
+
+                    if(newMainAgent != NULL)
+                    {
+                        newMainAgent->listIdenticalAgentsVM()->append(agentModelToDelete->listIdenticalAgentsVM()->toList());
+                        newMainAgent->listSimilarAgentsVM()->append(agentModelToDelete->listSimilarAgentsVM()->toList());
+
+                        _mapAgentsVMPerNameAndVersion.insert(agentKey,newMainAgent);
+
+                        // Remove the agent
+                        _allAgentsVM.remove(agentModelToDelete);
+                        _allAgentsVM.append(newMainAgent);
+                        agentModelToDelete->listIdenticalAgentsVM()->clear();
+                        agentModelToDelete->listSimilarAgentsVM()->clear();
+
+                        delete agentModelToDelete;
+                        agentModelToDelete = NULL;
+                    }
+                } else {
+                    // Remove the agent
+                    _allAgentsVM.remove(agentModelToDelete);
+                    delete agentModelToDelete;
+                    agentModelToDelete = NULL;
+                }
+            }
+            // The item to delete is from a sub list
+            else {
+                if(mainAgent->listIdenticalAgentsVM()->contains(agentModelToDelete))
+                {
+                    mainAgent->listIdenticalAgentsVM()->remove(agentModelToDelete);
+                } else if(mainAgent->listSimilarAgentsVM()->contains(agentModelToDelete))
+                {
+                    mainAgent->listSimilarAgentsVM()->remove(agentModelToDelete);
+                }
+
+                // Remove the agent
+                _allAgentsVM.remove(agentModelToDelete);
+                delete agentModelToDelete;
+                agentModelToDelete = NULL;
+            }
+        }
+    }
 }

@@ -47,7 +47,7 @@ public:
      * @param jsonObject
      * @return
      */
-    AgentM* createAgentWithDefinition(QJsonObject jsonObject);
+    AgentM* createAgentWithRawDefinition(QByteArray jsonByteArray);
 
 
 Q_SIGNALS:

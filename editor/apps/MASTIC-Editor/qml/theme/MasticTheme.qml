@@ -21,6 +21,9 @@ import I2Quick 1.0
   * Singleton that provides access to standard colors, fonts, etc.
   */
 Item {
+    id: theme
+
+
     //-----------------------------------------
     //
     // Sizes of UI elements
@@ -63,24 +66,9 @@ Item {
     //
     //-----------------------------------------
 
+
     readonly property color whiteColor: "#FFFFFF"
     readonly property color blackColor: "#000000"
-
-    // Greys
-    readonly property color greyWindowBgColor: "#E4E4E4"
-    readonly property color greySeparationColor: "#4D4D4D"
-    readonly property color greyBottomPanelBgColor: "#CCCCCC"
-    readonly property color greyDarkTextColor: "#808080"
-
-
-    // Blues
-    readonly property color blueRightPanelLightColor: "#42729E"
-    readonly property color blueRightPanelDarkColor: "#2E4D6B"
-    readonly property color blueSelectedColor: "#2222FF"
-
-
-    // Other
-    readonly property color redColor: "#FF0000"
 
 
 
@@ -97,7 +85,7 @@ Item {
     // Normal font
     readonly property font normalFont: Qt.font({
                                                 family: defaultFontFamily,
-                                                pixelSize: 12
+                                                pixelSize: 14
                                                 });
 
 
@@ -130,6 +118,50 @@ Item {
 
     //-----------------------------------------
     //
+    // Window
+    //
+    //-----------------------------------------
+
+    // Background
+    readonly property color windowBackgroundColor: "#E4E4E4"
+
+
+
+    //-----------------------------------------
+    //
+    // Agents list UI elements
+    //
+    //-----------------------------------------
+
+
+    // Background
+    readonly property color agentsListBackgroundColor: "#282C34"
+
+
+    // Header
+    readonly property color agentsListHeaderBackgroundColor: "#3C424F"
+
+    // Labels
+    readonly property color agentsListLabelColor: theme.whiteColor
+
+    // List
+    readonly property color agentsListItemBackgroundColor: "#3C424F"
+
+
+    //-----------------------------------------
+    //
+    // Scenario UI elements
+    //
+    //-----------------------------------------
+
+
+    // Background
+    readonly property color scenarioBackgroundColor: "#3C424F"
+
+
+
+    //-----------------------------------------
+    //
     // Agents mapping UI elements
     //
     //-----------------------------------------
@@ -148,7 +180,7 @@ Item {
     //
     // - Default state
     readonly property int agentsMappingLinkDefaultWidth: 4
-    readonly property color agentsMappingLinkDefaultColor: "#ffffff"
+    readonly property color agentsMappingLinkDefaultColor: theme.whiteColor
     // - Hover state
     readonly property int agentsMappingLinkHoverFuzzyRadius: 4
     readonly property color agentsMappingLinkHoverFuzzyColor: "firebrick"

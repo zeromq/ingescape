@@ -27,6 +27,8 @@
  */
 AgentVM::AgentVM(AgentM* model, QObject *parent) : QObject(parent),
     _modelM(model),
+    _state(""),
+    _status(AgentStatus::OFF),
     _x(0),
     _y(0),
     _isMuted(false),
@@ -97,4 +99,8 @@ AgentVM::~AgentVM()
 
         setmodelM(NULL);
     }
+
+    // Delete our lists of agents VM
+    _listIdenticalAgentsVM.deleteAllItems();
+    _listSimilarAgentsVM.deleteAllItems();
 }
