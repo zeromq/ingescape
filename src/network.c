@@ -198,6 +198,8 @@ int network_manageSubscriberMapping(subscriber_t *subscriber){
             if (mtic_internal_definition != NULL){
                 HASH_FIND_STR(mtic_internal_definition->inputs_table, el->input_name, foundInput);
             }
+            //TODO: check type compatibility between input and output value types
+            //including implicit conversions
             if (foundOutput != NULL && foundInput != NULL){
                 //we have validated input, agent and output names : we can map
                 //NOTE: the call below may happen several times if our agent uses
@@ -419,6 +421,7 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
         zhash_t *headers = zyre_event_headers (zyre_event);
         const char *group = zyre_event_group (zyre_event);
         zmsg_t *msg = zyre_event_msg (zyre_event);
+        zmsg_t *msgDuplicate = zmsg_dup(msg);
         
         //parse event
         if (streq (event, "ENTER")){
@@ -543,7 +546,7 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
         } else if (streq (event, "SHOUT")){
             //nothing to do so far
         } else if(streq (event, "WHISPER")){
-            char *message = zmsg_popstr (msg);
+            char *message = zmsg_popstr (msgDuplicate);
             
             //check if message is an EXTERNAL definition
             if(strlen(message) > strlen(definitionPrefix) && strncmp (message, definitionPrefix, strlen(definitionPrefix)) == 0)
@@ -732,7 +735,7 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
         DL_FOREACH(zyreCallbacks,elt){
             elt->callback_ptr(zyre_event, elt->myData);
         }
-
+        zmsg_destroy(&msgDuplicate);
         zyre_event_destroy(&zyre_event);
     }
     return 0;
@@ -982,11 +985,15 @@ int network_publishOutput (const char* output_name)
     {
         if(!isWholeAgentMuted && !found_iop->is_muted && found_iop->name != NULL && !isFrozen)
         {
+            //FIXME: test return code for zmsg_send
             if (found_iop->value_type == DATA_T){
                 void *data = NULL;
                 long size = 0;
                 mtic_readOutputAsData(output_name, &data, &size);
                 //TODO: decide if we should delete the data after use or keep it in memory
+                //suggestion: we might add a clearOutputData function available to the developer
+                //for use when publishing large size data to free memory after publishing.
+                //TODO: document ZMQ high water marks and how to change them
                 zmsg_t *msg = zmsg_new();
                 zmsg_pushstr(msg, output_name);
                 zframe_t *frame = zframe_new(data, size);
