@@ -185,34 +185,36 @@ int triggerMappingNotificationToNewcomer(zloop_t *loop, int timer_id, void *arg)
 int network_manageSubscriberMapping(subscriber_t *subscriber){
     //get mapping elements for this subscriber
     mapping_element_t *el, *tmp;
-    HASH_ITER(hh, mtic_internal_mapping->map_elements, el, tmp){
-        if (strcmp(subscriber->agentName, el->agent_name)==0 || strcmp(el->agent_name, "*") == 0){
-            //mapping element is compatible with subscriber name
-            //check if we find a compatible output in subscriber definition
-            agent_iop *foundOutput = NULL;
-            if (subscriber->definition != NULL){
-                HASH_FIND_STR(subscriber->definition->outputs_table, el->output_name, foundOutput);
-            }
-            //check if we find a valid input in our own definition
-            agent_iop *foundInput = NULL;
-            if (mtic_internal_definition != NULL){
-                HASH_FIND_STR(mtic_internal_definition->inputs_table, el->input_name, foundInput);
-            }
-            //TODO: check type compatibility between input and output value types
-            //including implicit conversions
-            if (foundOutput != NULL && foundInput != NULL){
-                //we have validated input, agent and output names : we can map
-                //NOTE: the call below may happen several times if our agent uses
-                //the external agent ouput on several of its inputs. This should not have any consequence.
-                subscribeToPublisherOutput(subscriber, el->output_name);
-                //mapping was successful : we set timer to notify remote agent if not already done
-                if (!subscriber->mappedNotificationToSend){
-                    subscriber->mappedNotificationToSend = true;
-                    zloop_timer(agentElements->loop, 500, 1, triggerMappingNotificationToNewcomer, (void *)subscriber);
+    if (mtic_internal_mapping != NULL){
+        HASH_ITER(hh, mtic_internal_mapping->map_elements, el, tmp){
+            if (strcmp(subscriber->agentName, el->agent_name)==0 || strcmp(el->agent_name, "*") == 0){
+                //mapping element is compatible with subscriber name
+                //check if we find a compatible output in subscriber definition
+                agent_iop *foundOutput = NULL;
+                if (subscriber->definition != NULL){
+                    HASH_FIND_STR(subscriber->definition->outputs_table, el->output_name, foundOutput);
                 }
+                //check if we find a valid input in our own definition
+                agent_iop *foundInput = NULL;
+                if (mtic_internal_definition != NULL){
+                    HASH_FIND_STR(mtic_internal_definition->inputs_table, el->input_name, foundInput);
+                }
+                //TODO: check type compatibility between input and output value types
+                //including implicit conversions
+                if (foundOutput != NULL && foundInput != NULL){
+                    //we have validated input, agent and output names : we can map
+                    //NOTE: the call below may happen several times if our agent uses
+                    //the external agent ouput on several of its inputs. This should not have any consequence.
+                    subscribeToPublisherOutput(subscriber, el->output_name);
+                    //mapping was successful : we set timer to notify remote agent if not already done
+                    if (!subscriber->mappedNotificationToSend){
+                        subscriber->mappedNotificationToSend = true;
+                        zloop_timer(agentElements->loop, 500, 1, triggerMappingNotificationToNewcomer, (void *)subscriber);
+                    }
+                }
+                //NOTE: we do not clean subscriptions here because we cannot check
+                //an output is not used in another mapping element
             }
-            //NOTE: we do not clean subscriptions here because we cannot check
-            //an output is not used in another mapping element
         }
     }
     return 0;
