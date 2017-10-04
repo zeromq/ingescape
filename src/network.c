@@ -185,8 +185,7 @@ int triggerMappingNotificationToNewcomer(zloop_t *loop, int timer_id, void *arg)
 int network_manageSubscriberMapping(subscriber_t *subscriber){
     //get mapping elements for this subscriber
     mapping_element_t *el, *tmp;
-    if(mtic_internal_mapping != NULL)
-    {
+    if (mtic_internal_mapping != NULL){
         HASH_ITER(hh, mtic_internal_mapping->map_elements, el, tmp){
             if (strcmp(subscriber->agentName, el->agent_name)==0 || strcmp(el->agent_name, "*") == 0){
                 //mapping element is compatible with subscriber name
@@ -200,6 +199,8 @@ int network_manageSubscriberMapping(subscriber_t *subscriber){
                 if (mtic_internal_definition != NULL){
                     HASH_FIND_STR(mtic_internal_definition->inputs_table, el->input_name, foundInput);
                 }
+                //TODO: check type compatibility between input and output value types
+                //including implicit conversions
                 if (foundOutput != NULL && foundInput != NULL){
                     //we have validated input, agent and output names : we can map
                     //NOTE: the call below may happen several times if our agent uses
@@ -216,7 +217,6 @@ int network_manageSubscriberMapping(subscriber_t *subscriber){
             }
         }
     }
-
     return 0;
 }
 
@@ -423,13 +423,8 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
         zhash_t *headers = zyre_event_headers (zyre_event);
         const char *group = zyre_event_group (zyre_event);
         zmsg_t *msg = zyre_event_msg (zyre_event);
-
-        //handle callbacks
-        zyreCallback_t *elt;
-        DL_FOREACH(zyreCallbacks,elt){
-            elt->callback_ptr(zyre_event, elt->myData);
-        }
-
+        zmsg_t *msgDuplicate = zmsg_dup(msg);
+        
         //parse event
         if (streq (event, "ENTER")){
             mtic_debug("->%s has entered the network with peer id %s and address %s\n", name, peer, address);
@@ -553,7 +548,7 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
         } else if (streq (event, "SHOUT")){
             //nothing to do so far
         } else if(streq (event, "WHISPER")){
-            char *message = zmsg_popstr (msg);
+            char *message = zmsg_popstr (msgDuplicate);
             
             //check if message is an EXTERNAL definition
             if(strlen(message) > strlen(definitionPrefix) && strncmp (message, definitionPrefix, strlen(definitionPrefix)) == 0)
@@ -736,8 +731,13 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 }
             }
         }
-
-
+        
+        //handle callbacks
+        zyreCallback_t *elt;
+        DL_FOREACH(zyreCallbacks,elt){
+            elt->callback_ptr(zyre_event, elt->myData);
+        }
+        zmsg_destroy(&msgDuplicate);
         zyre_event_destroy(&zyre_event);
     }
     return 0;
@@ -987,11 +987,15 @@ int network_publishOutput (const char* output_name)
     {
         if(!isWholeAgentMuted && !found_iop->is_muted && found_iop->name != NULL && !isFrozen)
         {
+            //FIXME: test return code for zmsg_send
             if (found_iop->value_type == DATA_T){
                 void *data = NULL;
                 long size = 0;
                 mtic_readOutputAsData(output_name, &data, &size);
                 //TODO: decide if we should delete the data after use or keep it in memory
+                //suggestion: we might add a clearOutputData function available to the developer
+                //for use when publishing large size data to free memory after publishing.
+                //TODO: document ZMQ high water marks and how to change them
                 zmsg_t *msg = zmsg_new();
                 zmsg_pushstr(msg, output_name);
                 zframe_t *frame = zframe_new(data, size);
@@ -1046,7 +1050,7 @@ int network_observeZyre(network_zyreIncoming cb, void *myData){
         zyreCallback_t *newCb = calloc(1, sizeof(zyreCallback_t));
         newCb->callback_ptr = cb;
         newCb->myData = myData;
-        DL_PREPEND(zyreCallbacks, newCb);
+        DL_APPEND(zyreCallbacks, newCb);
     }else{
         mtic_debug("network_observeZyre: callback is null\n");
         return 0;
