@@ -244,7 +244,6 @@ typedef int (*network_zyreIncoming) (const zyre_event_t *zyre_event, void *arg);
 int network_observeZyre(network_zyreIncoming cb, void *myData);
 #define AGENT_NAME_DEFAULT "mtic_noname"
 int network_publishOutput (const char* output_name);
-int network_checkAndSubscribeToPublisher(const char* agentName);
 void mtic_debug(const char*fmt, ...);
 
 
