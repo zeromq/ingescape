@@ -50,9 +50,9 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     // Settings about the "Network"
     settings.beginGroup("network");
     _host = settings.value("host", "localhost").toString();
-    _networkDevice = settings.value("networkDevice", "en0").toString();
-    _ipAddress = settings.value("ipAddress", "127.0.0.1").toString();
-    _port = settings.value("port", 5556).toInt();
+    _networkDevice = settings.value("networkDevice").toString();
+    _ipAddress = settings.value("ipAddress").toString();
+    _port = settings.value("port").toInt();
     qInfo() << "host" << _host << "networkDevice" << _networkDevice << "ipAddress" << _ipAddress << "port" << QString::number(_port);
     settings.endGroup();
 
@@ -72,7 +72,7 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     _agentsMappingC = new AgentsMappingController(_modelManager, this);
 
     // Create the controller for network comunications
-    _networkC = new NetworkController(_networkDevice,_ipAddress,_port, this);
+    _networkC = new NetworkController(_networkDevice, _ipAddress, _port, this);
 
     connect(_networkC,&NetworkController::agentEntered,_modelManager,&MasticModelManager::onAgentEntered);
     connect(_networkC,&NetworkController::agentExited,_modelManager,&MasticModelManager::onAgentExited);

@@ -35,6 +35,7 @@ class MasticEditorController : public QObject
 {
     Q_OBJECT
 
+    // FIXME: Useless ?
     // Network settings - host
     I2_QML_PROPERTY_READONLY(QString, host)
 

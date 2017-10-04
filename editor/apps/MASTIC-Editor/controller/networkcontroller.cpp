@@ -143,13 +143,13 @@ NetworkController::NetworkController(QString networkDevice, QString ipAddress, i
     // Start service with network device
     if (networkDevice.isEmpty() == false)
     {
-        networkInitialized = mtic_startWithDevice(networkDevice.toStdString().c_str(),port);
+        networkInitialized = mtic_startWithDevice(networkDevice.toStdString().c_str(), port);
     }
 
     // Start service with ip if start with network device has failed
-    if ((networkInitialized != 1) && (ipAddress.isEmpty() == false))
+    if ((networkInitialized != 1) && !ipAddress.isEmpty())
     {
-        networkInitialized = mtic_startWithIP(ipAddress.toStdString().c_str(),port);
+        networkInitialized = mtic_startWithIP(ipAddress.toStdString().c_str(), port);
     }
 
     if (networkInitialized == 1)
@@ -157,7 +157,7 @@ NetworkController::NetworkController(QString networkDevice, QString ipAddress, i
         qInfo() << "Network services started ";
 
         // begin the observe on transiting zyre messages
-        int result = network_observeZyre(&myZyreIncommingMessageCallback,this);
+        int result = network_observeZyre(&myZyreIncommingMessageCallback, this);
         qInfo() << "Network services started result=" << QString::number(result);
     }
     else
