@@ -216,8 +216,11 @@ Item {
             width: MasticTheme.leftPanelWidth
             height: 130
 
+            property var rowModel : model
+
 
             Rectangle {
+
                 anchors {
                     fill: parent
                     leftMargin: 4
@@ -272,7 +275,7 @@ Item {
                             Text {
                                 id: agentStatus
                                 anchors {
-                                    left : agentName.right
+                                    right : btnDefinition.left
                                 }
 
                                 text: "[" + AgentStatus.enumToString(model.status)+"]"
@@ -327,15 +330,53 @@ Item {
                             font: MasticTheme.normalFont
                         }
 
-                        Text {
-                            text: model.modelM.version
+                        Item {
+                           id: agentVersionRow
 
-                            height: 25
+                           height: 25
+                           width : agentRow.width
 
-                            color: MasticTheme.agentsListLabelColor
+                           Text {
 
-                            font: MasticTheme.normalFont
+                               anchors {
+                                   left : agentVersionRow.left
+                               }
+
+                               text: model.modelM.version
+
+                               height: 25
+
+                               color: MasticTheme.agentsListLabelColor
+
+                               font: MasticTheme.normalFont
+                           }
+
+                           Text {
+
+                               anchors {
+                                   right : agentVersionRow.right
+                               }
+
+                               visible: model.listIdenticalAgentsVM.count > 0 || model.listSimilarAgentsVM.count
+                               text: {
+                                   if (model.listIdenticalAgentsVM.count > 0)
+                                   {
+                                       "I: " + model.listIdenticalAgentsVM.count
+                                   } else if (model.listSimilarAgentsVM.count) {
+                                       "S: " + model.listIdenticalAgentsVM.count
+                                   }
+                               }
+
+                               height: 25
+
+                               color: MasticTheme.agentsListLabelColor
+
+                               font: MasticTheme.normalFont
+                           }
+
+
                         }
+
 
                         Text {
                             text: "SimilarAgents : " + model.listSimilarAgentsVM.count
@@ -359,6 +400,13 @@ Item {
                     }
                 }
             }
+
+            ListView {
+                model : rowModel.listSimilarAgentsVM
+
+                delegate: componentAgentListItem
+            }
+
         }
     }
 }

@@ -24,6 +24,7 @@ extern "C" {
 #include "misc/masticeditorutils.h"
 
 static const QString definitionPrefix = "EXTERNAL_DEFINITION#";
+static const QString exportDefinitionPrefix = "DEFINITION#";
 static const QString mappingPrefix = "EXTERNAL_MAPPING#";
 
 #include "misc/masticeditorutils.h"
@@ -57,12 +58,17 @@ int myZyreIncommingMessageCallback (const zyre_event_t *cst_zyre_event, void *ar
         } else if(event.compare("WHISPER") == 0){
             zmsg_t* msg_dup = zmsg_dup(msg);
             QString message = zmsg_popstr (msg_dup);
-            qDebug() << "Message unknown message received : " << message;
 
             //check if message is a definition
-            if(message.startsWith(definitionPrefix) == true)
+            if(message.startsWith(definitionPrefix) == true || message.startsWith(exportDefinitionPrefix) == true)
             {
-                message.remove(0,definitionPrefix.length());
+                if(message.startsWith(definitionPrefix))
+                {
+                    message.remove(0,definitionPrefix.length());
+                } else {
+                    message.remove(0,exportDefinitionPrefix.length());
+                }
+
 
                 // FIXME - TEST ONLY - TO REMOVE
                 // Load definition from string content
