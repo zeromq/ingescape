@@ -503,7 +503,7 @@ int mtic_createInput(const char *name, iopType_t value_type, void *value, long s
     }
 
     //free iop
-    free(iopLive);
+    definition_freeIOP(iopLive);
     network_needToSendDefinitionUpdate = true;
 
     return 1;
@@ -534,7 +534,7 @@ int mtic_createOutput(const char *name, iopType_t value_type, void *value, long 
     }
 
     //free iop
-    free(iopLive);
+    definition_freeIOP(iopLive);
     network_needToSendDefinitionUpdate = true;
 
     return 1;
@@ -564,7 +564,7 @@ int mtic_createParameter(const char *name, iopType_t value_type, void *value, lo
     }
 
     //free iop
-    free(iopLive);
+    definition_freeIOP(iopLive);
     network_needToSendDefinitionUpdate = true;
 
     return 1;
