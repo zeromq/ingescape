@@ -237,6 +237,7 @@ void* model_get(const char*name_iop, iop_t type);
 
 extern bool network_needToSendDefinitionUpdate;
 extern bool network_needToUpdateMapping;
+extern subscriber_t *subscribers;
 extern zyreloopElements_t *agentElements;
 //DO NOT DESTROY THE ZYRE_EVENT INSIDE THE CALLBACK
 typedef int (*network_zyreIncoming) (const zyre_event_t *zyre_event, void *arg);
