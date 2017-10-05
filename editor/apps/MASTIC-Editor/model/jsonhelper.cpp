@@ -125,7 +125,7 @@ AgentM* JsonHelper::createAgentWithRawDefinition(QByteArray jsonByteArray)
                 }
 
                 // Generate md5 value for the definition string
-                QString md5Hash = QString(QCryptographicHash::hash(jsonByteArray,QCryptographicHash::Md5).toHex());
+                QString md5Hash = QString(QCryptographicHash::hash(jsonByteArray, QCryptographicHash::Md5).toHex());
                 agent->setmd5Hash(md5Hash);
 
                 qDebug() << jsonDefinition.toString().toUtf8();

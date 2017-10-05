@@ -205,7 +205,7 @@ Item {
 
 
     //
-    // Visual representaiton of an agent in our list
+    // Visual representation of an agent in our list
     //
     Component {
         id: componentAgentListItem

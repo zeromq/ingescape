@@ -74,8 +74,8 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     // Create the controller for network comunications
     _networkC = new NetworkController(_networkDevice, _ipAddress, _port, this);
 
-    connect(_networkC,&NetworkController::agentEntered,_modelManager,&MasticModelManager::onAgentEntered);
-    connect(_networkC,&NetworkController::agentExited,_modelManager,&MasticModelManager::onAgentExited);
+    connect(_networkC, &NetworkController::agentEntered, _modelManager, &MasticModelManager::onAgentEntered);
+    connect(_networkC, &NetworkController::agentExited, _modelManager, &MasticModelManager::onAgentExited);
 
     //TEMP sleep to display our loading screen
     QThread::msleep(4000);

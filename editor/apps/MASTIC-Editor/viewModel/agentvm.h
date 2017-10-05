@@ -27,10 +27,7 @@
 
 
 /**
-  * Types:
-  * - Agent Input
-  * - Agent Output
-  * - Agent Parameter
+  * TODO
   */
 I2_ENUM(AgentStatus, ON, OFF, ON_ASKED, OFF_ASKED)
 

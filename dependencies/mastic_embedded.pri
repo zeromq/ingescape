@@ -49,8 +49,8 @@ macx:{
     message("Compilation macx scope ...")
 
     # FIXME: chemin en dur car il manque la lib sodium dans dep/zyre/bin/Macos
-    #libzyre_path = $$PWD/zyre/bin/Macos
-    libzyre_path = /usr/local/lib
+    libzyre_path = $$PWD/zyre/bin/Macos
+    #libzyre_path = /usr/local/lib
 
     libyajl_path = $$PWD/yajl/lloyd-yajl-2.1.0/Macos/lib
 
