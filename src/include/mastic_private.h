@@ -175,7 +175,7 @@ typedef struct mappingFilter {
     struct mappingFilter *next, *prev;
 } mappingFilter_t;
 
-typedef struct subscriber{
+typedef struct subscriber_s{
     const char *agentName;
     const char *agentPeerId;
     zsock_t *subscriber;
