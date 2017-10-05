@@ -67,11 +67,15 @@ MasticModelManager::MasticModelManager(QObject *parent) : QObject(parent),
             if (jsonFile.open(QIODevice::ReadOnly))
             {
                 QByteArray byteArrayOfJson = jsonFile.readAll();
-                // Create a model of agent with a definition
-                AgentM* agent = _jsonHelper->createAgentWithRawDefinition(byteArrayOfJson);
-                if(agent != NULL)
+
+                // Create a model of agent definition with JSON
+                DefinitionM* definition = _jsonHelper->createModelOfDefinition(byteArrayOfJson);
+                if (definition != NULL)
                 {
-                    addNewAgentModelToList(agent, AgentStatus::OFF);
+                    // Create a new model of agent
+                    AgentM* agent = new AgentM(definition->name(), "", this);
+
+                    addNewAgentVMToList(definition, agent, AgentStatus::OFF);
                 }
 
                 jsonFile.close();
@@ -101,43 +105,131 @@ MasticModelManager::~MasticModelManager()
 
 
 /**
- * @brief Slot on agent entereing into the network
- *        Agent definitino has been received and must be processed
+ * @brief Add a new view model of agent into our list
+ * @param definition
+ * @param agent
+ * @param status
+ */
+void MasticModelManager::addNewAgentVMToList(DefinitionM* definition, AgentM* agent, AgentStatus::Value status)
+{
+    if ((definition != NULL) && (agent != NULL))
+    {
+        // Add our model to the list
+        _allAgentsModel.append(agent);
+
+        //QString newAgentKey = agentModelToAdd->name().replace(" ","").trimmed().toUpper() + agentModelToAdd->version().replace(" ","").trimmed().toUpper();
+
+        QString agentName = agent->name();
+
+        if (!_mapFromNameToAgentM.contains(agentName))
+        {
+            _mapFromNameToAgentM.insert(agentName, agent);
+
+            // Create a new view model of agent
+            AgentVM* newAgentVM = new AgentVM(agent, this);
+            newAgentVM->setdefinition(definition);
+            newAgentVM->setstatus(status);
+
+            _mapFromNameToAgentVM.insert(agentName, newAgentVM);
+
+            // Add our view model to the list
+            _allAgentsVM.append(newAgentVM);
+
+            if (!agent->peerId().isEmpty())
+            {
+                QString peerID = agent->peerId();
+
+                if (!_mapFromPeerIdToAgentM.contains(peerID))
+                {
+                    _mapFromPeerIdToAgentM.insert(peerID, agent);
+                }
+                if (!_mapFromPeerIdToAgentVM.contains(peerID))
+                {
+                    _mapFromPeerIdToAgentVM.insert(peerID, newAgentVM);
+                }
+            }
+        }
+        else
+        {
+            AgentM* agentWithSameNameM = _mapFromNameToAgentM.value(agentName);
+            AgentVM* agentWithSameNameVM = _mapFromNameToAgentVM.value(agentName);
+
+            if ((agentWithSameNameM != NULL) && (agentWithSameNameVM != NULL) && (agentWithSameNameVM->definition() != NULL))
+            {
+                agentWithSameNameVM->setstatus(AgentStatus::ON);
+
+                // FIXME: test all the definition
+                if (definition->name() == agentWithSameNameVM->definition()->name())
+                {
+                    //ClonedAgentVM* clonedAgent
+                }
+            }
+        }
+
+        // Name and version are identical, the agents are potentially the same
+        /*if (_mapAgentsVMPerNameAndVersion.contains(newAgentKey) == true)
+        {
+            AgentVM* mainAgent = _mapAgentsVMPerNameAndVersion.value(newAgentKey);
+
+            // Case 1 : name and version and defintion are exactly the same.
+            if(mainAgent->modelM() != NULL && mainAgent->modelM()->md5Hash().compare(agentModelToAdd->md5Hash()) == 0)
+            {
+                mainAgent->listIdenticalAgentsVM()->append(newAgentVM);
+            }
+            // Case 2 : name and version are exactly the same, but the definition is different.
+            else {
+                mainAgent->listSimilarAgentsVM()->append(newAgentVM);
+            }
+        }
+        // Case 3 : agent does not exists, we simply create a new one
+        else {
+            _allAgentsVM.append(newAgentVM);
+
+            // Create a new entry for our agent
+            _mapAgentsVMPerNameAndVersion.insert(newAgentKey,newAgentVM);
+        }*/
+    }
+}
+
+
+/**
+ * @brief Slot on agent entering into the network
+ *        Agent definition has been received and must be processed
  * @param agent name
  * @param agent adress
  * @param agent definition
  */
 void MasticModelManager::onAgentEntered(QString agentName, QString agentAdress, QString peer, QString definition)
 {
-    if(definition.isEmpty() == false)
+    if (!definition.isEmpty())
     {
         QByteArray byteArrayOfJson = definition.toUtf8();
 
-        // Create a model of agent with a definition
-        AgentM* agent = _jsonHelper->createAgentWithRawDefinition(byteArrayOfJson);
-        if(agent != NULL)
+        // Create a model of agent definition with JSON
+        DefinitionM* definition = _jsonHelper->createModelOfDefinition(byteArrayOfJson);
+        if (definition != NULL)
         {
-            agent->setname(agentName);
-            agent->setipAddress(agentAdress);
-            agent->setpeer(peer);
+            // Create a new model of agent
+            AgentM* agent = new AgentM(agentName, peer, this);
 
-            addNewAgentModelToList(agent, AgentStatus::ON);
+            // FIXME: networkDevice, IP address or HostName of our agent ?
+            agent->setipAddress(agentAdress);
+
+            addNewAgentVMToList(definition, agent, AgentStatus::ON);
         }
     }
-
 }
+
 
 /**
  * @brief Slot on agent quitting the network
- * @param agent peer
+ * @param agent peer id
  */
 void MasticModelManager::onAgentExited(QString peer)
 {
-
-    AgentVM* agentVM = NULL;
-    if(_mapAgentsVMPerPeerId.contains(peer) == true)
+    if (_mapFromPeerIdToAgentVM.contains(peer))
     {
-        agentVM = _mapAgentsVMPerPeerId.value(peer);
+        AgentVM* agentVM = _mapFromPeerIdToAgentVM.value(peer);
         if(agentVM != NULL)
         {
             agentVM->setstatus(AgentStatus::OFF);
@@ -147,64 +239,16 @@ void MasticModelManager::onAgentExited(QString peer)
             //deleteAgentVMFromList(agentVM);
         }
     }
-
 }
 
-
-
-/**
- * @brief Add a new agent model into our list
- * @param agent model
- * @param agent status
- */
-void MasticModelManager::addNewAgentModelToList(AgentM* agentModelToAdd, AgentStatus::Value status)
-{
-    // Create a VM for each model of agent
-    AgentVM* newAgentVM = new AgentVM(agentModelToAdd);
-    newAgentVM->setstatus(status);
-
-    QString newAgentKey = agentModelToAdd->name().replace(" ","").trimmed().toUpper() + agentModelToAdd->version().replace(" ","").trimmed().toUpper();
-
-    // Add our agent to the main agentModel list
-    _allAgentsModel.append(agentModelToAdd);
-
-    if(agentModelToAdd->peer().isEmpty() == false && _mapAgentsVMPerPeerId.contains(agentModelToAdd->peer()) == false)
-    {
-        // Add our object to the map per peer
-        _mapAgentsVMPerPeerId.insert(agentModelToAdd->peer(),newAgentVM);
-    }
-
-    // Name and version are identical, the agents are potentially the same
-    if(_mapAgentsVMPerNameAndVersion.contains(newAgentKey) == true)
-    {
-        AgentVM* mainAgent = _mapAgentsVMPerNameAndVersion.value(newAgentKey);
-
-        // Case 1 : name and version and defintion are exactly the same.
-        if(mainAgent->modelM() != NULL && mainAgent->modelM()->md5Hash().compare(agentModelToAdd->md5Hash()) == 0)
-        {
-            mainAgent->listIdenticalAgentsVM()->append(newAgentVM);
-        }
-        // Case 2 : name and version are exactly the same, but the definition is different.
-        else {
-            mainAgent->listSimilarAgentsVM()->append(newAgentVM);
-        }
-    }
-    // Case 3 : agent does not exists, we simply create a new one
-    else {
-        _allAgentsVM.append(newAgentVM);
-
-        // Create a new entry for our agent
-        _mapAgentsVMPerNameAndVersion.insert(newAgentKey,newAgentVM);
-    }
-}
 
 /**
  * @brief Delete an agent from our list
  * @param agent view model
  */
-void MasticModelManager::deleteAgentVMFromList(AgentVM* agentModelToDelete)
+/*void MasticModelManager::deleteAgentVMFromList(AgentVM* agentModelToDelete)
 {
-    if(agentModelToDelete != NULL && agentModelToDelete->modelM() != NULL && agentModelToDelete->status() != AgentStatus::ON)
+    if (agentModelToDelete != NULL && agentModelToDelete->modelM() != NULL && agentModelToDelete->status() != AgentStatus::ON)
     {
         QString agentKey = agentModelToDelete->modelM()->name().replace(" ","").trimmed().toUpper() + agentModelToDelete->modelM()->version().replace(" ","").trimmed().toUpper();
 
@@ -271,4 +315,4 @@ void MasticModelManager::deleteAgentVMFromList(AgentVM* agentModelToDelete)
             }
         }
     }
-}
+}*/

@@ -1,5 +1,5 @@
 /*
- *	MasticEditorUtils
+ *	MASTIC Editor
  *
  *  Copyright (c) 2017 Ingenuity i/o. All rights reserved.
  *

@@ -22,7 +22,8 @@
 
 #include <I2PropertyHelpers.h>
 
-#include <model/agentm.h>
+//#include <model/agentm.h>
+#include <model/definitionm.h>
 
 
 /**
@@ -33,6 +34,10 @@ class JsonHelper : public QObject
     Q_OBJECT
 
 public:
+    /**
+     * @brief Constructor
+     * @param parent
+     */
     explicit JsonHelper(QObject *parent = nullptr);
 
 
@@ -43,11 +48,11 @@ public:
 
 
     /**
-     * @brief Create an agent with a definition
-     * @param jsonObject
+     * @brief Create a model of agent definition with JSON
+     * @param byteArrayOfJson
      * @return
      */
-    AgentM* createAgentWithRawDefinition(QByteArray jsonByteArray);
+    DefinitionM* createModelOfDefinition(QByteArray byteArrayOfJson);
 
 
 Q_SIGNALS:
@@ -57,11 +62,11 @@ public Q_SLOTS:
 private:
 
     /**
-     * @brief Create an agent Input/Output/Parameter
+     * @brief Create a model of agent Input/Output/Parameter with JSON
      * @param jsonObject
      * @return
      */
-    AgentIOPM* _createAgentIOP(QJsonObject jsonObject);
+    AgentIOPM* _createModelOfAgentIOP(QJsonObject jsonObject);
 };
 
 #endif // JSONHELPER_H

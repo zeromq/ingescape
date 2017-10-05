@@ -35,6 +35,9 @@ class AgentIOPVM : public QObject
     // Model of our agent Input / Output / Parameter
     I2_QML_PROPERTY(AgentIOPM*, modelM)
 
+    // Flag indicating if our agent is muted
+    I2_QML_PROPERTY(bool, isMuted)
+
     // Mapping value of our Input / Output / Parameter
     I2_CPP_PROPERTY(QVariant, mappingValue)
 

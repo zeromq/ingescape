@@ -27,6 +27,7 @@
  */
 AgentIOPVM::AgentIOPVM(AgentIOPM* model, QObject *parent) : QObject(parent),
     _modelM(model),
+    _isMuted(false),
     _mappingValue(QVariant()),
     _displayableMappingValue(""),
     _currentValue(QVariant()),
@@ -39,8 +40,8 @@ AgentIOPVM::AgentIOPVM(AgentIOPM* model, QObject *parent) : QObject(parent),
 
     if (_modelM != NULL)
     {
-        qInfo() << "New VM of agent" << AgentIOPTypes::staticEnumToString(_modelM->agentIOPType()) << _modelM->name()
-                << "(" << AgentIOPValueTypes::staticEnumToString(_modelM->agentIOPValueType()) << ")" << _modelM->displayableDefaultValue();
+        /*qInfo() << "New VM of agent" << AgentIOPTypes::staticEnumToString(_modelM->agentIOPType()) << _modelM->name()
+                << "(" << AgentIOPValueTypes::staticEnumToString(_modelM->agentIOPValueType()) << ")" << _modelM->displayableDefaultValue();*/
     }
 }
 
@@ -52,8 +53,8 @@ AgentIOPVM::~AgentIOPVM()
 {
     if (_modelM != NULL)
     {
-        qInfo() << "Delete VM of Agent" << AgentIOPTypes::staticEnumToString(_modelM->agentIOPType()) << _modelM->name()
-                << "(" << AgentIOPValueTypes::staticEnumToString(_modelM->agentIOPValueType()) << ")" << _modelM->displayableDefaultValue();
+        /*qInfo() << "Delete VM of Agent" << AgentIOPTypes::staticEnumToString(_modelM->agentIOPType()) << _modelM->name()
+                << "(" << AgentIOPValueTypes::staticEnumToString(_modelM->agentIOPValueType()) << ")" << _modelM->displayableDefaultValue();*/
 
         setmodelM(NULL);
     }

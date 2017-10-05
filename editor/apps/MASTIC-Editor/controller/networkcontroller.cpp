@@ -1,5 +1,5 @@
 /*
- *	NetworkController
+ *	MASTIC Editor
  *
  *  Copyright (c) 2017 Ingenuity i/o. All rights reserved.
  *
@@ -8,7 +8,8 @@
  *
  *
  *	Contributors:
- *      Vincent Deliencourt  <deliencourt@ingenuity.io>
+ *      Vincent Deliencourt <deliencourt@ingenuity.io>
+ *      Vincent Peyruqueou  <peyruqueou@ingenuity.io>
  *
  */
 
@@ -24,51 +25,86 @@ extern "C" {
 #include "misc/masticeditorutils.h"
 
 static const QString definitionPrefix = "EXTERNAL_DEFINITION#";
-static const QString exportDefinitionPrefix = "DEFINITION#";
 static const QString mappingPrefix = "EXTERNAL_MAPPING#";
 
 #include "misc/masticeditorutils.h"
 
+/**
+ * @brief myZyreIncommingMessageCallback
+ * @param cst_zyre_event
+ * @param arg
+ * @return
+ */
 int myZyreIncommingMessageCallback (const zyre_event_t *cst_zyre_event, void *arg)
 {
     NetworkController * myNetworkController = (NetworkController *)arg;
 
-    if(myNetworkController != NULL)
+    if (myNetworkController != NULL)
     {
-        zyre_event_t * zyre_event = (zyre_event_t *)cst_zyre_event;
-        QString event = zyre_event_type(zyre_event);
-        QString peer = zyre_event_peer_uuid(zyre_event);
-        QString name = zyre_event_peer_name (zyre_event);
-        QString address = zyre_event_peer_addr (zyre_event);
-        //zhash_t *headers = zyre_event_headers (zyre_event);
-        QString group = zyre_event_group (zyre_event);
-        zmsg_t *msg = zyre_event_msg (zyre_event);
+        // Usefull to create a new one ?
+        zyre_event_t* zyre_event = (zyre_event_t *)cst_zyre_event;
 
-        //parse event
+        QString event = zyre_event_type(zyre_event);
+        QString peerId = zyre_event_peer_uuid(zyre_event);
+        QString name = zyre_event_peer_name(zyre_event);
+        QString address = zyre_event_peer_addr(zyre_event);
+        zhash_t* headers = zyre_event_headers(zyre_event);
+        QString group = zyre_event_group(zyre_event);
+        zmsg_t* msg = zyre_event_msg(zyre_event);
+
+        // ENTER
         if (event.compare("ENTER") == 0)
         {
-            qDebug() << QString("->%1 has entered the network with peer id %2and address %3\n").arg( name, peer, address);
-        } else if (event.compare("JOIN") == 0){
-            qDebug() << QString("+%1 has joined %2").arg(name, group);
+            qDebug() << QString("--> %1 has entered the network with peer id %2 and address %3").arg( name, peerId, address);
 
-        } else if (event.compare("LEAVE") == 0){
-            qDebug() << QString("-%1 has left %2").arg(name, group);
-        } else if (event.compare("SHOUT") == 0){
-            //nothing to do so far
-        } else if(event.compare("WHISPER") == 0){
-            zmsg_t* msg_dup = zmsg_dup(msg);
-            QString message = zmsg_popstr (msg_dup);
+            char *k;
+            const char *v;
+            zlist_t *keys = zhash_keys(headers);
+            size_t nbKeys = zlist_size(keys);
+            if (nbKeys > 0){
+                qDebug() << nbKeys << "headers";
 
-            //check if message is a definition
-            if(message.startsWith(definitionPrefix) == true || message.startsWith(exportDefinitionPrefix) == true)
-            {
-                if(message.startsWith(definitionPrefix))
-                {
-                    message.remove(0,definitionPrefix.length());
-                } else {
-                    message.remove(0,exportDefinitionPrefix.length());
+                while ((k = (char *)zlist_pop(keys))) {
+                    v = zyre_event_header (zyre_event, k);
+                    qDebug() << "key" << k << ":" << v;
+
+                    // we extract the publisher adress to subscribe to from the zyre message header
+                    if(strncmp(k, "publisher", strlen("publisher")) == 0)
+                    {
+                        qDebug() << "our zyre event is about MASTIC publisher !";
+
+                        // Subscribers
+                        int n = HASH_COUNT(subscribers);
+                        qDebug() << n << "subscribers in the list";
+                        subscriber_t *sub, *tmpSub;
+                        HASH_ITER(hh, subscribers, sub, tmpSub) {
+                            qDebug() << "subscriber:" << sub->agentName << "with peer id" << sub->agentPeerId;
+                        }
+                    }
                 }
+            }
+        }
+        else if (event.compare("JOIN") == 0)
+        {
+            qDebug() << QString("+%1 has joined %2").arg(name, group);
+        }
+        else if (event.compare("LEAVE") == 0)
+        {
+            qDebug() << QString("-%1 has left %2").arg(name, group);
+        }
+        else if (event.compare("SHOUT") == 0)
+        {
+            // nothing to do so far
+        }
+        else if (event.compare("WHISPER") == 0)
+        {
+            zmsg_t* msg_dup = zmsg_dup(msg);
+            QString message = zmsg_popstr(msg_dup);
 
+            // check if message is about Definition
+            if(message.startsWith(definitionPrefix))
+            {
+                message.remove(0, definitionPrefix.length());
 
                 // FIXME - TEST ONLY - TO REMOVE
                 // Load definition from string content
@@ -77,27 +113,34 @@ int myZyreIncommingMessageCallback (const zyre_event_t *cst_zyre_event, void *ar
                 qDebug() << "Definition received from : " << newDefinition->name << " version : " << newDefinition->version << " description : " <<newDefinition->description;
                 definition_freeDefinition(newDefinition);
 
-                myNetworkController->agentEntered(name, address, peer, message);
+                // Emit signal "agentEntered"
+                emit myNetworkController->agentEntered(name, address, peerId, message);
             }
-            //check if message is mapping
-            else if (message.startsWith(mappingPrefix) == true)
+            // check if message is about Mapping
+            else if (message.startsWith(mappingPrefix))
             {
-                message.remove(0,mappingPrefix.length());
+                message.remove(0, mappingPrefix.length());
                 qDebug() << "Mapping : " << message;
-            }else{
-                //other supported messages
-                if (message.startsWith("MAPPED") == true){
+            }
+            else {
+                // Others supported messages
+                if (message.startsWith("MAPPED")) {
                     qDebug() << QString("Mapping notification received from %s").arg(name);
-                } else {
+                }
+                else {
                     qDebug() << "unknown message received : " << message;
                 }
             }
             zmsg_destroy(&msg_dup);
-        } else if (event.compare("EXIT") == 0){
-            qDebug() << QString("<-%1 exited").arg(name);
-            myNetworkController->agentExited(peer);
         }
+        // EXIT
+        else if (event.compare("EXIT") == 0)
+        {
+            qDebug() << QString("<-- %1 (%2) exited").arg(name, peerId);
 
+            // Emit signal "agentExited"
+            emit myNetworkController->agentExited(peerId);
+        }
     }
 
     return 0;
@@ -141,7 +184,7 @@ NetworkController::NetworkController(QString networkDevice, QString ipAddress, i
     mtic_setAgentName("MASTIC-Editor");
 
     // Start service with network device
-    if (networkDevice.isEmpty() == false)
+    if (!networkDevice.isEmpty())
     {
         networkInitialized = mtic_startWithDevice(networkDevice.toStdString().c_str(), port);
     }

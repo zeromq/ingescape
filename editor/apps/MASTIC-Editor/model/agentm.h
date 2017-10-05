@@ -24,7 +24,6 @@
 #include <model/iop/agentiopm.h>
 
 
-
 /**
  * @brief The AgentM class defines a model of agent
  */
@@ -32,8 +31,11 @@ class AgentM : public QObject
 {
     Q_OBJECT
 
-    // Name of our agent (unique identifier)
+    // Name of our agent
     I2_QML_PROPERTY(QString, name)
+
+    // Peer ID of our agent (unique identifier)
+    I2_QML_PROPERTY_READONLY(QString, peerId)
 
     // Network device of our agent
     I2_QML_PROPERTY_READONLY(QString, networkDevice)
@@ -41,40 +43,38 @@ class AgentM : public QObject
     // IP address of our agent
     I2_QML_PROPERTY_READONLY(QString, ipAddress)
 
-    // Peer of our agent
-    I2_QML_PROPERTY_READONLY(QString, peer)
-
     // Port of our agent
     I2_QML_PROPERTY_READONLY(int, port)
 
-    // Version of our agent
-    I2_QML_PROPERTY(QString, version)
+    // HostName of our agent
+    I2_QML_PROPERTY_READONLY(QString, hostname)
 
-    // Description of our agent
-    I2_QML_PROPERTY(QString, description)
+    // Execution path of our agent
+    I2_QML_PROPERTY_READONLY(QString, executionPath)
 
-    // List of inputs of our agent
-    I2_QOBJECT_LISTMODEL(AgentIOPM, inputsList)
+    // PID of our agent ???
+    //I2_CPP_NOSIGNAL_PROPERTY(int, pid)
 
-    // List of outputs of our agent
-    I2_QOBJECT_LISTMODEL(AgentIOPM, outputsList)
-
-    // List of parameters of our agent
-    I2_QOBJECT_LISTMODEL(AgentIOPM, parametersList)
+    // Publisher of our agent ???
+    //I2_CPP_NOSIGNAL_PROPERTY(int, publisher)
 
     // Flag indicating if our agent can be frozen
     I2_QML_PROPERTY_READONLY(bool, canBeFrozen)
 
     // Md5 hash value for the definition string
-    I2_QML_PROPERTY_READONLY(QString, md5Hash)
+    //I2_QML_PROPERTY_READONLY(QString, md5Hash)
 
 
 public:
     /**
-     * @brief Default constructor
+     * @brief Constructor
+     * @param name
+     * @param peerId
      * @param parent
      */
-    explicit AgentM(QObject *parent = nullptr);
+    explicit AgentM(QString name,
+                    QString peerId = "",
+                    QObject *parent = nullptr);
 
 
     /**

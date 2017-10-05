@@ -20,6 +20,8 @@
 
 #include <I2PropertyHelpers.h>
 
+#include <model/agentmappingm.h>
+
 #include <viewModel/iop/agentiopvm.h>
 
 

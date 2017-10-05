@@ -321,7 +321,7 @@ Item {
                         }
 
                         Text {
-                            text: model.modelM.description
+                            text: model.definition.description
 
                             height: 25
 
@@ -342,7 +342,7 @@ Item {
                                    left : agentVersionRow.left
                                }
 
-                               text: model.modelM.version
+                               text: model.definition.version
 
                                height: 25
 
@@ -351,7 +351,7 @@ Item {
                                font: MasticTheme.normalFont
                            }
 
-                           Text {
+                           /*Text {
 
                                anchors {
                                    right : agentVersionRow.right
@@ -362,7 +362,8 @@ Item {
                                    if (model.listIdenticalAgentsVM.count > 0)
                                    {
                                        "I: " + model.listIdenticalAgentsVM.count
-                                   } else if (model.listSimilarAgentsVM.count) {
+                                   }
+                                   else if (model.listSimilarAgentsVM.count) {
                                        "S: " + model.listIdenticalAgentsVM.count
                                    }
                                }
@@ -372,13 +373,13 @@ Item {
                                color: MasticTheme.agentsListLabelColor
 
                                font: MasticTheme.normalFont
-                           }
+                           }*/
 
 
                         }
 
 
-                        Text {
+                        /*Text {
                             text: "SimilarAgents : " + model.listSimilarAgentsVM.count
 
                             height: 25
@@ -396,16 +397,16 @@ Item {
                             color: MasticTheme.agentsListLabelColor
 
                             font: MasticTheme.normalFont
-                        }
+                        }*/
                     }
                 }
             }
 
-            ListView {
+            /*ListView {
                 model : rowModel.listSimilarAgentsVM
 
                 delegate: componentAgentListItem
-            }
+            }*/
 
         }
     }

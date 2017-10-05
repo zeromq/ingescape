@@ -22,6 +22,8 @@
 
 #include <model/jsonhelper.h>
 #include <viewModel/agentvm.h>
+#include <viewModel/clonedagentvm.h>
+#include <viewModel/linkvm.h>
 
 
 /**
@@ -51,18 +53,21 @@ public:
      */
     ~MasticModelManager();
     
+
     /**
-     * @brief Add a new agent model into our list
-     * @param agent model
-     * @param agent status
+     * @brief Add a new view model of agent into our list
+     * @param definition
+     * @param agent
+     * @param status
      */
-    void addNewAgentModelToList(AgentM* agentModelToAdd, AgentStatus::Value status);
+    void addNewAgentVMToList(DefinitionM* definition, AgentM* agent, AgentStatus::Value status);
     
+
     /**
      * @brief Delete an agent from our list
      * @param agent view model
      */
-    void deleteAgentVMFromList(AgentVM* agentModelToDelete);
+    //void deleteAgentVMFromList(AgentVM* agentModelToDelete);
 
 
 Q_SIGNALS:
@@ -79,9 +84,10 @@ public Q_SLOTS:
      */
     void onAgentEntered(QString agentName, QString agentAdress, QString peer, QString definition);
     
+
     /**
      * @brief Slot on agent quitting the network
-     * @param agent peer
+     * @param agent peer id
      */
     void onAgentExited(QString peer);
 
@@ -95,10 +101,19 @@ private:
     QList<AgentM*> _allAgentsModel;
 
     // Map of all agents VM per name and version
-    QHash<QString, AgentVM*> _mapAgentsVMPerNameAndVersion;
+    //QHash<QString, AgentVM*> _mapAgentsVMPerNameAndVersion;
 
-    // Map of all agents VM per peer id
-    QHash<QString, AgentVM*> _mapAgentsVMPerPeerId;
+    // Map from Peer ID to model of agent
+    QHash<QString, AgentM*> _mapFromPeerIdToAgentM;
+
+    // Map from Peer ID to view model of agent
+    QHash<QString, AgentVM*> _mapFromPeerIdToAgentVM;
+
+    // Map from Name to model of agent
+    QHash<QString, AgentM*> _mapFromNameToAgentM;
+
+    // Map from Name to view model of agent
+    QHash<QString, AgentVM*> _mapFromNameToAgentVM;
 
 };
 

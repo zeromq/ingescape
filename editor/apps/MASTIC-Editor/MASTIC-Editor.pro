@@ -29,7 +29,10 @@ SOURCES += main.cpp \
     controller/networkcontroller.cpp \
     misc/masticeditorsettings.cpp \
     misc/masticeditorutils.cpp \
-    viewModel/linkvm.cpp
+    viewModel/linkvm.cpp \
+    model/definitionm.cpp \
+    model/agentmappingm.cpp \
+    viewModel/clonedagentvm.cpp
 
 
 HEADERS += \
@@ -55,7 +58,10 @@ HEADERS += \
     uthash/utringbuffer.h \
     uthash/utstring.h \
     uthash/utvector.h \
-    viewModel/linkvm.h
+    viewModel/linkvm.h \
+    model/definitionm.h \
+    model/agentmappingm.h \
+    viewModel/clonedagentvm.h
 
 
 RESOURCES += qml.qrc

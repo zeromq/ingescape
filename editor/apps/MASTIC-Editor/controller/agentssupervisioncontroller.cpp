@@ -24,8 +24,7 @@
  * @param modelManager
  * @param parent
  */
-AgentsSupervisionController::AgentsSupervisionController(MasticModelManager* modelManager, QObject *parent)
-    : QObject(parent),
+AgentsSupervisionController::AgentsSupervisionController(MasticModelManager* modelManager, QObject *parent) : QObject(parent),
     _modelManager(modelManager)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
@@ -46,15 +45,16 @@ AgentsSupervisionController::~AgentsSupervisionController()
     _modelManager = NULL;
 }
 
+
 /**
  * @brief Delete an agent VM from the list
  * @param agent VM to delete
  */
 void AgentsSupervisionController::deleteAgentFromList(AgentVM * agentToDelete)
 {
-    if(_modelManager != NULL && agentToDelete != NULL)
+    if ((_modelManager != NULL) && (agentToDelete != NULL))
     {
-        _modelManager->deleteAgentVMFromList(agentToDelete);
+        //_modelManager->deleteAgentVMFromList(agentToDelete);
     }
 }
 

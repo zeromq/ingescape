@@ -1,6 +1,5 @@
-
 /*
- *	MasticEditorSettings
+ *	MASTIC Editor
  *
  *  Copyright (c) 2016-2017 Ingenuity i/o. All rights reserved.
  *
@@ -9,7 +8,7 @@
  *
  *
  *	Contributors:
- *      Vincent Deliencourt
+ *      Vincent Deliencourt  <deliencourt@ingenuity.io>
  *
  */
 

@@ -74,7 +74,8 @@ void registerCustomQmlTypes()
     //----------------
     qmlRegisterUncreatableType<AgentIOPM>(uri, 1, 0, "AgentIOPM", "Internal class");
     qmlRegisterUncreatableType<AgentM>(uri, 1, 0, "AgentM", "Internal class");
-
+    qmlRegisterUncreatableType<AgentMappingM>(uri, 1, 0, "AgentMappingM", "Internal class");
+    qmlRegisterUncreatableType<DefinitionM>(uri, 1, 0, "DefinitionM", "Internal class");
 
 
     //---------------
@@ -84,6 +85,8 @@ void registerCustomQmlTypes()
     //---------------
     qmlRegisterUncreatableType<AgentIOPVM>(uri, 1, 0, "AgentIOPVM", "Internal class");
     qmlRegisterUncreatableType<AgentVM>(uri, 1, 0, "AgentVM", "Internal class");
+    qmlRegisterUncreatableType<ClonedAgentVM>(uri, 1, 0, "ClonedAgentVM", "Internal class");
+    qmlRegisterUncreatableType<LinkVM>(uri, 1, 0, "LinkVM", "Internal class");
 
 
 
