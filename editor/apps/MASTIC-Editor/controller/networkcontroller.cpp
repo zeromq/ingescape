@@ -30,16 +30,15 @@ static const QString mappingPrefix = "EXTERNAL_MAPPING#";
 #include "misc/masticeditorutils.h"
 
 /**
- * @brief myZyreIncommingMessageCallback
+ * @brief Callback for Incomming Zyre Messages
  * @param cst_zyre_event
  * @param arg
  * @return
  */
-int myZyreIncommingMessageCallback (const zyre_event_t *cst_zyre_event, void *arg)
+int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg)
 {
-    NetworkController * myNetworkController = (NetworkController *)arg;
-
-    if (myNetworkController != NULL)
+    NetworkController* networkController = (NetworkController*)arg;
+    if (networkController != NULL)
     {
         // Usefull to create a new one ?
         zyre_event_t* zyre_event = (zyre_event_t *)cst_zyre_event;
@@ -55,7 +54,7 @@ int myZyreIncommingMessageCallback (const zyre_event_t *cst_zyre_event, void *ar
         // ENTER
         if (event.compare("ENTER") == 0)
         {
-            qDebug() << QString("--> %1 has entered the network with peer id %2 and address %3").arg( name, peerId, address);
+            qDebug() << QString("--> %1 has entered the network with peer id %2 (and address %3)").arg(name, peerId, address);
 
             char *k;
             const char *v;
@@ -80,17 +79,20 @@ int myZyreIncommingMessageCallback (const zyre_event_t *cst_zyre_event, void *ar
                         HASH_ITER(hh, subscribers, sub, tmpSub) {
                             qDebug() << "subscriber:" << sub->agentName << "with peer id" << sub->agentPeerId;
                         }
+
+                        // Emit signal "Agent Entered"
+                        emit networkController->agentEntered(peerId, name, address);
                     }
                 }
             }
         }
         else if (event.compare("JOIN") == 0)
         {
-            qDebug() << QString("+%1 has joined %2").arg(name, group);
+            qDebug() << QString("++ %1 has joined %2").arg(name, group);
         }
         else if (event.compare("LEAVE") == 0)
         {
-            qDebug() << QString("-%1 has left %2").arg(name, group);
+            qDebug() << QString("-- %1 has left %2").arg(name, group);
         }
         else if (event.compare("SHOUT") == 0)
         {
@@ -98,39 +100,45 @@ int myZyreIncommingMessageCallback (const zyre_event_t *cst_zyre_event, void *ar
         }
         else if (event.compare("WHISPER") == 0)
         {
+            // FIXME: Usefull ?
             zmsg_t* msg_dup = zmsg_dup(msg);
             QString message = zmsg_popstr(msg_dup);
 
-            // check if message is about Definition
+            //
+            // Definition
+            //
             if(message.startsWith(definitionPrefix))
             {
                 message.remove(0, definitionPrefix.length());
 
                 // FIXME - TEST ONLY - TO REMOVE
                 // Load definition from string content
-                definition *newDefinition = parser_loadDefinition(message.toStdString().c_str());
+                definition* newDefinition = parser_loadDefinition(message.toStdString().c_str());
                 // Load definition from string content
-                qDebug() << "Definition received from : " << newDefinition->name << " version : " << newDefinition->version << " description : " <<newDefinition->description;
+                qDebug() << "Definition received from : " << newDefinition->name << " version : " << newDefinition->version << " description : " << newDefinition->description;
                 definition_freeDefinition(newDefinition);
 
-                // Emit signal "agentEntered"
-                emit myNetworkController->agentEntered(name, address, peerId, message);
+                // Emit signal "Definition Received"
+                emit networkController->definitionReceived(peerId, name, message);
             }
-            // check if message is about Mapping
+            //
+            // Mapping
+            //
             else if (message.startsWith(mappingPrefix))
             {
                 message.remove(0, mappingPrefix.length());
-                qDebug() << "Mapping : " << message;
+
+                qDebug() << name << "Mapping:" << message;
             }
-            else {
-                // Others supported messages
-                if (message.startsWith("MAPPED")) {
-                    qDebug() << QString("Mapping notification received from %s").arg(name);
-                }
-                else {
-                    qDebug() << "unknown message received : " << message;
-                }
+            else if (message.startsWith("MAPPED"))
+            {
+                qDebug() << name << "MAPPED" << message;
             }
+            else
+            {
+                qDebug() << "Unknown message received:" << message;
+            }
+
             zmsg_destroy(&msg_dup);
         }
         // EXIT
@@ -138,8 +146,8 @@ int myZyreIncommingMessageCallback (const zyre_event_t *cst_zyre_event, void *ar
         {
             qDebug() << QString("<-- %1 (%2) exited").arg(name, peerId);
 
-            // Emit signal "agentExited"
-            emit myNetworkController->agentExited(peerId);
+            // Emit signal "Agent Exited"
+            emit networkController->agentExited(peerId, name);
         }
     }
 
@@ -200,7 +208,8 @@ NetworkController::NetworkController(QString networkDevice, QString ipAddress, i
         qInfo() << "Network services started ";
 
         // begin the observe on transiting zyre messages
-        int result = network_observeZyre(&myZyreIncommingMessageCallback, this);
+        int result = network_observeZyre(&onIncommingZyreMessageCallback, this);
+
         qInfo() << "Network services started result=" << QString::number(result);
     }
     else

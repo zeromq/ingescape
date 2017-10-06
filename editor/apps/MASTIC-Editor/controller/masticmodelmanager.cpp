@@ -137,15 +137,15 @@ void MasticModelManager::addNewAgentVMToList(DefinitionM* definition, AgentM* ag
 
             if (!agent->peerId().isEmpty())
             {
-                QString peerID = agent->peerId();
+                QString peerId = agent->peerId();
 
-                if (!_mapFromPeerIdToAgentM.contains(peerID))
+                if (!_mapFromPeerIdToAgentM.contains(peerId))
                 {
-                    _mapFromPeerIdToAgentM.insert(peerID, agent);
+                    _mapFromPeerIdToAgentM.insert(peerId, agent);
                 }
-                if (!_mapFromPeerIdToAgentVM.contains(peerID))
+                if (!_mapFromPeerIdToAgentVM.contains(peerId))
                 {
-                    _mapFromPeerIdToAgentVM.insert(peerID, newAgentVM);
+                    _mapFromPeerIdToAgentVM.insert(peerId, newAgentVM);
                 }
             }
         }
@@ -193,13 +193,12 @@ void MasticModelManager::addNewAgentVMToList(DefinitionM* definition, AgentM* ag
 
 
 /**
- * @brief Slot on agent entering into the network
- *        Agent definition has been received and must be processed
- * @param agent name
- * @param agent adress
- * @param agent definition
+ * @brief Slot when an agent enter the network
+ * @param agent peerId
+ * @param agent agentName
+ * @param agent agentAdress
  */
-void MasticModelManager::onAgentEntered(QString agentName, QString agentAdress, QString peer, QString definition)
+void MasticModelManager::onAgentEntered(QString peerId, QString agentName, QString agentAdress)
 {
     if (!definition.isEmpty())
     {
@@ -210,7 +209,7 @@ void MasticModelManager::onAgentEntered(QString agentName, QString agentAdress, 
         if (definition != NULL)
         {
             // Create a new model of agent
-            AgentM* agent = new AgentM(agentName, peer, this);
+            AgentM* agent = new AgentM(agentName, peerId, this);
 
             // FIXME: networkDevice, IP address or HostName of our agent ?
             agent->setipAddress(agentAdress);
@@ -222,14 +221,43 @@ void MasticModelManager::onAgentEntered(QString agentName, QString agentAdress, 
 
 
 /**
- * @brief Slot on agent quitting the network
- * @param agent peer id
+ * @brief Slot when an agent definition has been received and must be processed
+ * @param peerId
+ * @param agentName
+ * @param definition
  */
-void MasticModelManager::onAgentExited(QString peer)
+void MasticModelManager::onDefinitionReceived(QString peerId, QString agentName, QString definition)
 {
-    if (_mapFromPeerIdToAgentVM.contains(peer))
+    /*if (!definition.isEmpty())
     {
-        AgentVM* agentVM = _mapFromPeerIdToAgentVM.value(peer);
+        QByteArray byteArrayOfJson = definition.toUtf8();
+
+        // Create a model of agent definition with JSON
+        DefinitionM* definition = _jsonHelper->createModelOfDefinition(byteArrayOfJson);
+        if (definition != NULL)
+        {
+            // Create a new model of agent
+            AgentM* agent = new AgentM(agentName, peerId, this);
+
+            // FIXME: networkDevice, IP address or HostName of our agent ?
+            agent->setipAddress(agentAdress);
+
+            addNewAgentVMToList(definition, agent, AgentStatus::ON);
+        }
+    }*/
+}
+
+
+/**
+ * @brief Slot when an agent quit the network
+ * @param peerId
+ * @param agentName
+ */
+void MasticModelManager::onAgentExited(QString peerId, QString agentName)
+{
+    if (_mapFromPeerIdToAgentVM.contains(peerId))
+    {
+        AgentVM* agentVM = _mapFromPeerIdToAgentVM.value(peerId);
         if(agentVM != NULL)
         {
             agentVM->setstatus(AgentStatus::OFF);

@@ -54,13 +54,28 @@ Q_SIGNALS:
 
     /**
      * @brief Signal emitted when an agent enter the network
+     * @param peerId
+     * @param agentName
+     * @param agentAdress
      */
-    void agentEntered(QString agentName, QString agentAdress, QString peer, QString definition);
+    void agentEntered(QString peerId, QString agentName, QString agentAdress);
+
+
+    /**
+     * @brief Signal emitted when an agent definition has been received
+     * @param peerId
+     * @param agentName
+     * @param definition
+     */
+    void definitionReceived(QString peerId, QString agentName, QString definition);
+
 
     /**
      * @brief Signal emitted when an agent quit the network
+     * @param peerId
+     * @param agentName
      */
-    void agentExited(QString peer);
+    void agentExited(QString peerId, QString agentName);
 
 
 public Q_SLOTS:

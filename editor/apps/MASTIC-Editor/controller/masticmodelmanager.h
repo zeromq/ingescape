@@ -75,21 +75,29 @@ Q_SIGNALS:
 public Q_SLOTS:
 
     /**
-     * @brief Slot on agent entereing into the network
-     *        Agent definition has been received and must be processed
-     * @param agent name
-     * @param agent adress
-     * @param agent peer
-     * @param agent definition
+     * @brief Slot when an agent enter the network
+     * @param agent peerId
+     * @param agent agentName
+     * @param agent agentAdress
      */
-    void onAgentEntered(QString agentName, QString agentAdress, QString peer, QString definition);
+    void onAgentEntered(QString peerId, QString agentName, QString agentAdress);
     
 
     /**
-     * @brief Slot on agent quitting the network
-     * @param agent peer id
+     * @brief Slot when an agent definition has been received and must be processed
+     * @param peerId
+     * @param agentName
+     * @param definition
      */
-    void onAgentExited(QString peer);
+    void onDefinitionReceived(QString peerId, QString agentName, QString definition);
+
+
+    /**
+     * @brief Slot when an agent quit the network
+     * @param peerId
+     * @param agentName
+     */
+    void onAgentExited(QString peerId, QString agentName);
 
 
 private:
