@@ -213,7 +213,7 @@ int main(int argc, char *argv[])
 
         //------------------------------
         //
-        // Agents definitions
+        // Agents definitions & mappings
         //
         //------------------------------
         QString agentsDefinitionsDirectoryPath = MasticEditorUtils::getAgentsDefinitionsPath();
@@ -222,6 +222,14 @@ int main(int argc, char *argv[])
         {
             qCritical() << "ERROR: could not create directory at '" << agentsDefinitionsDirectoryPath << "' !";
         }
+
+        QString agentsMappingsDirectoryPath = MasticEditorUtils::getAgentsMappingsPath();
+        QDir agentsMappingsDirectory(agentsMappingsDirectoryPath);
+        if (!agentsMappingsDirectory.exists())
+        {
+            qCritical() << "ERROR: could not create directory at '" << agentsMappingsDirectoryPath << "' !";
+        }
+
 
         //------------------------------
         //

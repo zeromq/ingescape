@@ -39,6 +39,8 @@ MasticModelManager::MasticModelManager(QObject *parent) : QObject(parent),
     // Create the helper to manage JSON definitions of agents
     _jsonHelper = new JsonHelper(this);
 
+    QStringList nameFilters;
+    nameFilters << "*.json";
 
     // Get the root path of our application ([DocumentsLocation]/MASTIC/)
     QString rootDirectoryPath = I2Utils::getOrCreateAppRootPathInDocumentDir("MASTIC");
@@ -52,9 +54,6 @@ MasticModelManager::MasticModelManager(QObject *parent) : QObject(parent),
     QDir agentsDefinitionsDirectory(agentsDefinitionsDirectoryPath);
     if (agentsDefinitionsDirectory.exists())
     {
-        QStringList nameFilters;
-        nameFilters << "*.json";
-
         QFileInfoList agentsDefinitionsFilesList = agentsDefinitionsDirectory.entryInfoList(nameFilters);
         qInfo() << agentsDefinitionsFilesList.count() << "files in directory" << agentsDefinitionsDirectoryPath;
 
@@ -75,7 +74,10 @@ MasticModelManager::MasticModelManager(QObject *parent) : QObject(parent),
                     // Create a new model of agent
                     AgentM* agent = new AgentM(definition->name(), "", this);
 
-                    addNewAgentVMToList(definition, agent, AgentStatus::OFF);
+                    qDebug() << "TODO: use agent" << agent->name();
+
+                    // Add a new view model of agent into our list
+                    //addNewAgentVMToList(agent, definition, AgentStatus::OFF);
                 }
 
                 jsonFile.close();
@@ -84,6 +86,28 @@ MasticModelManager::MasticModelManager(QObject *parent) : QObject(parent),
             {
                 qCritical() << "Can not open file" << fileInfo.absoluteFilePath();
             }
+        }
+    }
+
+
+    //------------------------------
+    //
+    // Agents mappings
+    //
+    //------------------------------
+    QString agentsMappingsDirectoryPath = QString("%1AgentsMappings").arg(rootDirectoryPath);
+    QDir agentsMappingsDirectory(agentsMappingsDirectoryPath);
+    if (agentsMappingsDirectory.exists())
+    {
+        QFileInfoList agentsMappingsFilesList = agentsMappingsDirectory.entryInfoList(nameFilters);
+        qInfo() << agentsMappingsFilesList.count() << "files in directory" << agentsMappingsDirectoryPath;
+
+        // Traverse the list of JSON files
+        foreach (QFileInfo fileInfo, agentsMappingsFilesList)
+        {
+            qDebug() << "File" << fileInfo.fileName() << "at" << fileInfo.absoluteFilePath();
+
+            // TODO: ESTIA
         }
     }
 }
@@ -194,68 +218,79 @@ void MasticModelManager::addNewAgentVMToList(DefinitionM* definition, AgentM* ag
 
 /**
  * @brief Slot when an agent enter the network
- * @param agent peerId
- * @param agent agentName
- * @param agent agentAdress
+ * @param peer Id
+ * @param agent name
+ * @param agent address
  */
 void MasticModelManager::onAgentEntered(QString peerId, QString agentName, QString agentAdress)
 {
-    if (!definition.isEmpty())
+    if (!peerId.isEmpty() && !agentName.isEmpty() && !agentAdress.isEmpty())
     {
-        QByteArray byteArrayOfJson = definition.toUtf8();
+        // Create a new model of agent
+        AgentM* agent = new AgentM(agentName, peerId, this);
 
-        // Create a model of agent definition with JSON
-        DefinitionM* definition = _jsonHelper->createModelOfDefinition(byteArrayOfJson);
-        if (definition != NULL)
-        {
-            // Create a new model of agent
-            AgentM* agent = new AgentM(agentName, peerId, this);
+        // FIXME: split ip and port ?
+        agent->sethostname(agentAdress);
 
-            // FIXME: networkDevice, IP address or HostName of our agent ?
-            agent->setipAddress(agentAdress);
+        qDebug() << "agentAdress" << agentAdress;
 
-            addNewAgentVMToList(definition, agent, AgentStatus::ON);
+        if (!_mapFromPeerIdToAgentM.contains(peerId)) {
+            _mapFromPeerIdToAgentM.insert(peerId, agent);
         }
+        //if (!_mapFromNameToAgentM.contains())
+
+        //addNewAgentVMToList(agent, NULL, AgentStatus::ON);
     }
 }
 
 
 /**
  * @brief Slot when an agent definition has been received and must be processed
- * @param peerId
- * @param agentName
+ * @param peer Id
+ * @param agent name
  * @param definition
  */
 void MasticModelManager::onDefinitionReceived(QString peerId, QString agentName, QString definition)
 {
-    /*if (!definition.isEmpty())
+    Q_UNUSED(agentName)
+
+    if (_mapFromPeerIdToAgentM.contains(peerId) && !definition.isEmpty())
     {
-        QByteArray byteArrayOfJson = definition.toUtf8();
-
-        // Create a model of agent definition with JSON
-        DefinitionM* definition = _jsonHelper->createModelOfDefinition(byteArrayOfJson);
-        if (definition != NULL)
+        AgentM* agent = _mapFromPeerIdToAgentM.value(peerId);
+        if(agent != NULL)
         {
-            // Create a new model of agent
-            AgentM* agent = new AgentM(agentName, peerId, this);
+            QByteArray byteArrayOfJson = definition.toUtf8();
 
-            // FIXME: networkDevice, IP address or HostName of our agent ?
-            agent->setipAddress(agentAdress);
+            // Create a model of agent definition with JSON
+            DefinitionM* definition = _jsonHelper->createModelOfDefinition(byteArrayOfJson);
+            if (definition != NULL)
+            {
+                qDebug() << "TODO: use definition for agent" << agent->name();
 
-            addNewAgentVMToList(definition, agent, AgentStatus::ON);
+                //addNewAgentVMToList(definition, agent, AgentStatus::ON);
+            }
         }
-    }*/
+    }
 }
 
 
 /**
  * @brief Slot when an agent quit the network
- * @param peerId
- * @param agentName
+ * @param peer Id
+ * @param agent name
  */
 void MasticModelManager::onAgentExited(QString peerId, QString agentName)
 {
-    if (_mapFromPeerIdToAgentVM.contains(peerId))
+    if (_mapFromPeerIdToAgentM.contains(peerId))
+    {
+        AgentM* agent = _mapFromPeerIdToAgentM.value(peerId);
+        if(agent != NULL)
+        {
+            qInfo() << "Agent" << agentName << "(" << peerId << ") EXITED";
+        }
+    }
+
+    /*if (_mapFromPeerIdToAgentVM.contains(peerId))
     {
         AgentVM* agentVM = _mapFromPeerIdToAgentVM.value(peerId);
         if(agentVM != NULL)
@@ -266,7 +301,7 @@ void MasticModelManager::onAgentExited(QString peerId, QString agentName)
             //_mapAgentsVMPerPeerId.remove(peer);
             //deleteAgentVMFromList(agentVM);
         }
-    }
+    }*/
 }
 
 

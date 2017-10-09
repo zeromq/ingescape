@@ -228,11 +228,8 @@ Item {
                     topMargin: 4
                     bottomMargin: 4
                 }
-
                 radius: 5
-
                 color: MasticTheme.agentsListItemBackgroundColor
-
                 border {
                     width: 1
                     color: MasticTheme.whiteColor
@@ -240,7 +237,7 @@ Item {
 
 
                 Item {
-                     id: agentRow
+                    id: agentRow
 
                     anchors {
                         fill: parent
@@ -251,10 +248,10 @@ Item {
                     Column {
 
                         Item {
-                           id: agentNameRow
+                            id: agentNameRow
 
-                           height: 25
-                           width : agentRow.width
+                            height: 25
+                            width : agentRow.width
 
                             Text {
                                 id: agentName
@@ -263,12 +260,10 @@ Item {
                                     left : agentNameRow.left
                                 }
 
-                                text: "Name : " + model.modelM.name
+                                text: "Name: " + model.modelM.name
 
                                 height: 25
-
                                 color: MasticTheme.agentsListLabelColor
-
                                 font: MasticTheme.normalFont
                             }
 
@@ -278,12 +273,10 @@ Item {
                                     right : btnDefinition.left
                                 }
 
-                                text: "[" + AgentStatus.enumToString(model.status)+"]"
+                                text: "[" + AgentStatus.enumToString(model.status) + "]"
 
                                 height: 25
-
                                 color: MasticTheme.agentsListLabelColor
-
                                 font: MasticTheme.normalFont
                             }
 
@@ -293,10 +286,10 @@ Item {
                                 anchors {
                                     right : btnDeleteAgent.left
                                 }
-                                text: "Définition"
+                                text: model.definition.name
 
                                 onClicked: {
-                                    console.log("Open the definition of " + model.modelM.name)
+                                    console.log("Open the definition of " + model.definition.name)
                                 }
                             }
 
@@ -304,9 +297,9 @@ Item {
                                 id: btnDeleteAgent
 
                                 anchors {
-                                    right : agentNameRow.right
+                                    right: agentNameRow.right
                                 }
-                                visible : model.status === AgentStatus.OFF
+                                visible: model.status === AgentStatus.OFF
 
                                 text: "X"
 
@@ -324,90 +317,30 @@ Item {
                             text: model.definition.description
 
                             height: 25
-
                             color: MasticTheme.agentsListLabelColor
-
                             font: MasticTheme.normalFont
                         }
 
                         Item {
-                           id: agentVersionRow
-
-                           height: 25
-                           width : agentRow.width
-
-                           Text {
-
-                               anchors {
-                                   left : agentVersionRow.left
-                               }
-
-                               text: model.definition.version
-
-                               height: 25
-
-                               color: MasticTheme.agentsListLabelColor
-
-                               font: MasticTheme.normalFont
-                           }
-
-                           /*Text {
-
-                               anchors {
-                                   right : agentVersionRow.right
-                               }
-
-                               visible: model.listIdenticalAgentsVM.count > 0 || model.listSimilarAgentsVM.count
-                               text: {
-                                   if (model.listIdenticalAgentsVM.count > 0)
-                                   {
-                                       "I: " + model.listIdenticalAgentsVM.count
-                                   }
-                                   else if (model.listSimilarAgentsVM.count) {
-                                       "S: " + model.listIdenticalAgentsVM.count
-                                   }
-                               }
-
-                               height: 25
-
-                               color: MasticTheme.agentsListLabelColor
-
-                               font: MasticTheme.normalFont
-                           }*/
-
-
-                        }
-
-
-                        /*Text {
-                            text: "SimilarAgents : " + model.listSimilarAgentsVM.count
+                            id: agentVersionRow
 
                             height: 25
+                            width : agentRow.width
 
-                            color: MasticTheme.agentsListLabelColor
+                            Text {
+                                text: model.definition.version
 
-                            font: MasticTheme.normalFont
+                                anchors {
+                                    left : agentVersionRow.left
+                                }
+                                height: 25
+                                color: MasticTheme.agentsListLabelColor
+                                font: MasticTheme.normalFont
+                            }
                         }
-
-                        Text {
-                            text: "IdenticalAgents : " + model.listIdenticalAgentsVM.count
-
-                            height: 25
-
-                            color: MasticTheme.agentsListLabelColor
-
-                            font: MasticTheme.normalFont
-                        }*/
                     }
                 }
             }
-
-            /*ListView {
-                model : rowModel.listSimilarAgentsVM
-
-                delegate: componentAgentListItem
-            }*/
-
         }
     }
 }

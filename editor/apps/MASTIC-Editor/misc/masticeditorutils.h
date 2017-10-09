@@ -92,6 +92,14 @@ public:
     static QString getAgentsDefinitionsPath();
 
 
+    /**
+     * @brief Get (and create if needed) the agents mappings path of our application
+     * "[DocumentsLocation]/MASTIC/AgentsMappings/"
+     * @return
+     */
+    static QString getAgentsMappingsPath();
+
+
 protected:
     /**
      * @brief Get (and create if needed) the fullpath of a given sub-directory

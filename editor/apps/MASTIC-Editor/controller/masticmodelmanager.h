@@ -76,17 +76,17 @@ public Q_SLOTS:
 
     /**
      * @brief Slot when an agent enter the network
-     * @param agent peerId
-     * @param agent agentName
-     * @param agent agentAdress
+     * @param peer Id
+     * @param agent name
+     * @param agent address
      */
-    void onAgentEntered(QString peerId, QString agentName, QString agentAdress);
+    void onAgentEntered(QString peerId, QString agentName, QString agentAddress);
     
 
     /**
      * @brief Slot when an agent definition has been received and must be processed
-     * @param peerId
-     * @param agentName
+     * @param peer Id
+     * @param agent name
      * @param definition
      */
     void onDefinitionReceived(QString peerId, QString agentName, QString definition);
@@ -94,8 +94,8 @@ public Q_SLOTS:
 
     /**
      * @brief Slot when an agent quit the network
-     * @param peerId
-     * @param agentName
+     * @param peer Id
+     * @param agent name
      */
     void onAgentExited(QString peerId, QString agentName);
 
