@@ -39,6 +39,9 @@ class DefinitionM : public QObject
     // Description of our agent definition
     I2_QML_PROPERTY(QString, description)
 
+    // Md5 hash value for the definition string
+    I2_QML_PROPERTY_READONLY(QString, md5Hash)
+
     // Variant of our agent definition
     I2_QML_PROPERTY(QString, variant)
 
@@ -50,9 +53,6 @@ class DefinitionM : public QObject
 
     // List of parameters of our agent definition
     I2_QOBJECT_LISTMODEL(AgentIOPM, parametersList)
-
-    // Md5 hash value for the definition string
-    //I2_QML_PROPERTY_READONLY(QString, md5Hash)
 
 
 public:

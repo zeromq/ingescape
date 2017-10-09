@@ -110,12 +110,11 @@ DefinitionM* JsonHelper::createModelOfDefinition(QByteArray byteArrayOfJson)
                 }
 
                 // Generate md5 value for the definition string
-                //QString md5Hash = QString(QCryptographicHash::hash(byteArrayOfJson, QCryptographicHash::Md5).toHex());
-                //definition->setmd5Hash(md5Hash);
+                QString md5Hash = QString(QCryptographicHash::hash(byteArrayOfJson, QCryptographicHash::Md5).toHex());
+                definition->setmd5Hash(md5Hash);
 
-                //qDebug() << jsonDefinition.toString().toUtf8();
-                //qDebug() << md5Hash;
-
+                qDebug() << "md5:" << md5Hash;
+                qDebug() << "json:" << jsonDefinition;
             }
         }
     }
