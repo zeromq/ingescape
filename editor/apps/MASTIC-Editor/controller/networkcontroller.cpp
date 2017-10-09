@@ -40,7 +40,6 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
     NetworkController* networkController = (NetworkController*)arg;
     if (networkController != NULL)
     {
-        // Usefull to create a new one ?
         zyre_event_t* zyre_event = (zyre_event_t *)cst_zyre_event;
 
         QString event = zyre_event_type(zyre_event);
@@ -54,41 +53,50 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
         // ENTER
         if (event.compare("ENTER") == 0)
         {
+            qDebug() << QString("--> %1 has entered the network with peer id %2 (and address %3)").arg(peerName, peerId, peerAddress);
+
             bool isMasticPublisher = false;
-            QString pid = "";
-            QString canBeFrozen = "";
+            bool isIntPID = false;
+            int pid = -1;
+            bool canBeFrozen = false;
             QString executionPath = "";
             QString hostname = "";
 
-            qDebug() << QString("--> %1 has entered the network with peer id %2 (and address %3)").arg(peerName, peerId, peerAddress);
-
-            char *k;
-            const char *v;
             zlist_t *keys = zhash_keys(headers);
             size_t nbKeys = zlist_size(keys);
             if (nbKeys > 0)
             {
-                qDebug() << nbKeys << "headers";
+                //qDebug() << nbKeys << "headers";
+
+                char *k;
+                const char *v;
+                QString key = "";
+                QString value = "";
 
                 while ((k = (char *)zlist_pop(keys))) {
-                    v = zyre_event_header (zyre_event, k);
-                    qDebug() << "key" << k << ":" << v;
+                    v = zyre_event_header(zyre_event, k);
+
+                    key = QString(k);
+                    value = QString(v);
+                    //qDebug() << "key" << key << ":" << value;
 
                     // We check that the key "publisher" exists
-                    if (strncmp(k, "publisher", strlen("publisher")) == 0) {
+                    if (key == "publisher") {
                         isMasticPublisher = true;
                     }
-                    else if (strncmp(k, "pid", strlen("pid")) == 0) {
-                        pid = v;
+                    else if (key == "pid") {
+                        pid = value.toInt(&isIntPID);
                     }
-                    else if (strncmp(k, "canBeFrozen", strlen("canBeFrozen")) == 0) {
-                        canBeFrozen = v;
+                    else if (key == "canBeFrozen") {
+                        if (value == "1") {
+                            canBeFrozen = true;
+                        }
                     }
-                    else if (strncmp(k, "execpath", strlen("execpath")) == 0) {
-                        executionPath = v;
+                    else if (key == "execpath") {
+                        executionPath = value;
                     }
-                    else if (strncmp(k, "hostname", strlen("hostname")) == 0) {
-                        hostname = v;
+                    else if (key == "hostname") {
+                        hostname = value;
                     }
                 }
 
@@ -104,11 +112,11 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
                 qDebug() << "subscriber:" << sub->agentName << "with peer id" << sub->agentPeerId;
             }*/
 
-            if (isMasticPublisher) {
-                qDebug() << "our zyre event is about MASTIC publisher:" << pid << canBeFrozen << hostname << executionPath;
+            if (isMasticPublisher && isIntPID) {
+                qDebug() << "our zyre event is about MASTIC publisher:" << pid << hostname << executionPath;
 
                 // Emit signal "Agent Entered"
-                Q_EMIT networkController->agentEntered(peerId, peerName, peerAddress);
+                Q_EMIT networkController->agentEntered(peerId, peerName, peerAddress, pid, hostname, executionPath, canBeFrozen);
             }
         }
         else if (event.compare("JOIN") == 0)
@@ -125,14 +133,13 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
         }
         else if (event.compare("WHISPER") == 0)
         {
-            // FIXME: Usefull ?
             zmsg_t* msg_dup = zmsg_dup(msg);
             QString message = zmsg_popstr(msg_dup);
 
             //
             // Definition
             //
-            if(message.startsWith(definitionPrefix))
+            if (message.startsWith(definitionPrefix))
             {
                 message.remove(0, definitionPrefix.length());
 

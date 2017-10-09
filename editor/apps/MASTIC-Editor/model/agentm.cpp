@@ -19,28 +19,42 @@
 #include <QDebug>
 
 /**
- * @brief Constructor
+ * @brief Constructor without peer id and address
+ * @param name
+ * @param parent
+ */
+AgentM::AgentM(QString name,
+               QObject *parent) : AgentM(name,
+                                         "",
+                                         "",
+                                         parent)
+{
+}
+
+
+/**
+ * @brief Constructor with peer id and address
  * @param name
  * @param peerId
+ * @param address
  * @param parent
  */
 AgentM::AgentM(QString name,
                QString peerId,
+               QString address,
                QObject *parent) : QObject(parent),
     _name(name),
     _peerId(peerId),
-    _networkDevice(""),
-    _ipAddress(""),
-    _port(0),
+    _address(address),
     _hostname(""),
     _executionPath(""),
+    _pid(0),
     _canBeFrozen(false)
-    //_md5Hash("")
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    qInfo() << "New Model of Agent" << _name << "(" << _peerId << ")";
+    qInfo() << "New Model of Agent" << _name << "(" << _peerId << ") at" << _address;
 }
 
 
@@ -49,5 +63,5 @@ AgentM::AgentM(QString name,
  */
 AgentM::~AgentM()
 {
-    qInfo() << "Delete Model of Agent" << _name << "(" << _peerId << ")";
+    qInfo() << "Delete Model of Agent" << _name << "(" << _peerId << ") at" << _address;
 }

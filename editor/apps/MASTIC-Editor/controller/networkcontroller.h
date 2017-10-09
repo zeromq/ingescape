@@ -54,11 +54,15 @@ Q_SIGNALS:
 
     /**
      * @brief Signal emitted when an agent enter the network
-     * @param peer id
-     * @param peer name
-     * @param peer address
+     * @param peerId
+     * @param peerName
+     * @param peerAddress
+     * @param pid
+     * @param hostname
+     * @param executionPath
+     * @param canBeFrozen
      */
-    void agentEntered(QString peerId, QString peerName, QString peerAddress);
+    void agentEntered(QString peerId, QString peerName, QString peerAddress, int pid, QString hostname, QString executionPath, bool canBeFrozen);
 
 
     /**

@@ -76,11 +76,15 @@ public Q_SLOTS:
 
     /**
      * @brief Slot when an agent enter the network
-     * @param peer Id
-     * @param agent name
-     * @param agent address
+     * @param peerId
+     * @param agentName
+     * @param agentAddress
+     * @param pid
+     * @param hostname
+     * @param executionPath
+     * @param canBeFrozen
      */
-    void onAgentEntered(QString peerId, QString agentName, QString agentAddress);
+    void onAgentEntered(QString peerId, QString agentName, QString agentAddress, int pid, QString hostname, QString executionPath, bool canBeFrozen);
     
 
     /**
@@ -111,17 +115,17 @@ private:
     // Map of all agents VM per name and version
     //QHash<QString, AgentVM*> _mapAgentsVMPerNameAndVersion;
 
-    // Map from Peer ID to model of agent
+    // Map from Peer ID to a model of agent
     QHash<QString, AgentM*> _mapFromPeerIdToAgentM;
 
-    // Map from Peer ID to view model of agent
+    // Map from Peer ID to a view model of agent
     QHash<QString, AgentVM*> _mapFromPeerIdToAgentVM;
 
-    // Map from Name to model of agent
-    QHash<QString, AgentM*> _mapFromNameToAgentM;
+    // Map from Agent Name to a list of models of agent
+    QHash<QString, QList<AgentM*>> _mapFromNameToAgentM;
 
     // Map from Name to view model of agent
-    QHash<QString, AgentVM*> _mapFromNameToAgentVM;
+    //QHash<QString, AgentVM*> _mapFromNameToAgentVM;
 
 };
 

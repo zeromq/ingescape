@@ -72,7 +72,7 @@ MasticModelManager::MasticModelManager(QObject *parent) : QObject(parent),
                 if (definition != NULL)
                 {
                     // Create a new model of agent
-                    AgentM* agent = new AgentM(definition->name(), "", this);
+                    AgentM* agent = new AgentM(definition->name(), this);
 
                     qDebug() << "TODO: use agent" << agent->name();
 
@@ -147,14 +147,14 @@ void MasticModelManager::addNewAgentVMToList(DefinitionM* definition, AgentM* ag
 
         if (!_mapFromNameToAgentM.contains(agentName))
         {
-            _mapFromNameToAgentM.insert(agentName, agent);
+            //_mapFromNameToAgentM.insert(agentName, agent);
 
             // Create a new view model of agent
             AgentVM* newAgentVM = new AgentVM(agent, this);
             newAgentVM->setdefinition(definition);
             newAgentVM->setstatus(status);
 
-            _mapFromNameToAgentVM.insert(agentName, newAgentVM);
+            //_mapFromNameToAgentVM.insert(agentName, newAgentVM);
 
             // Add our view model to the list
             _allAgentsVM.append(newAgentVM);
@@ -175,7 +175,7 @@ void MasticModelManager::addNewAgentVMToList(DefinitionM* definition, AgentM* ag
         }
         else
         {
-            AgentM* agentWithSameNameM = _mapFromNameToAgentM.value(agentName);
+            /*AgentM* agentWithSameNameM = _mapFromNameToAgentM.value(agentName);
             AgentVM* agentWithSameNameVM = _mapFromNameToAgentVM.value(agentName);
 
             if ((agentWithSameNameM != NULL) && (agentWithSameNameVM != NULL) && (agentWithSameNameVM->definition() != NULL))
@@ -187,7 +187,7 @@ void MasticModelManager::addNewAgentVMToList(DefinitionM* definition, AgentM* ag
                 {
                     //ClonedAgentVM* clonedAgent
                 }
-            }
+            }*/
         }
 
         // Name and version are identical, the agents are potentially the same
@@ -218,21 +218,25 @@ void MasticModelManager::addNewAgentVMToList(DefinitionM* definition, AgentM* ag
 
 /**
  * @brief Slot when an agent enter the network
- * @param peer Id
- * @param agent name
- * @param agent address
+ * @param peerId
+ * @param agentName
+ * @param agentAddress
+ * @param pid
+ * @param hostname
+ * @param executionPath
+ * @param canBeFrozen
  */
-void MasticModelManager::onAgentEntered(QString peerId, QString agentName, QString agentAdress)
+void MasticModelManager::onAgentEntered(QString peerId, QString agentName, QString agentAddress, int pid, QString hostname, QString executionPath, bool canBeFrozen)
 {
-    if (!peerId.isEmpty() && !agentName.isEmpty() && !agentAdress.isEmpty())
+    if (!peerId.isEmpty() && !agentName.isEmpty() && !agentAddress.isEmpty())
     {
         // Create a new model of agent
-        AgentM* agent = new AgentM(agentName, peerId, this);
+        AgentM* agent = new AgentM(agentName, peerId, agentAddress, this);
 
-        // FIXME: split ip and port ?
-        agent->sethostname(agentAdress);
-
-        qDebug() << "agentAdress" << agentAdress;
+        agent->sethostname(hostname);
+        agent->setexecutionPath(executionPath);
+        agent->setpid(pid);
+        agent->setcanBeFrozen(canBeFrozen);
 
         if (!_mapFromPeerIdToAgentM.contains(peerId)) {
             _mapFromPeerIdToAgentM.insert(peerId, agent);

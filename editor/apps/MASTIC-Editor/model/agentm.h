@@ -37,14 +37,17 @@ class AgentM : public QObject
     // Peer ID of our agent (unique identifier)
     I2_QML_PROPERTY_READONLY(QString, peerId)
 
+    // Address of our agent
+    I2_QML_PROPERTY_READONLY(QString, address)
+
     // Network device of our agent
-    I2_QML_PROPERTY_READONLY(QString, networkDevice)
+    //I2_QML_PROPERTY_READONLY(QString, networkDevice)
 
     // IP address of our agent
-    I2_QML_PROPERTY_READONLY(QString, ipAddress)
+    //I2_QML_PROPERTY_READONLY(QString, ipAddress)
 
     // Port of our agent
-    I2_QML_PROPERTY_READONLY(int, port)
+    //I2_QML_PROPERTY_READONLY(int, port)
 
     // HostName of our agent
     I2_QML_PROPERTY_READONLY(QString, hostname)
@@ -52,8 +55,8 @@ class AgentM : public QObject
     // Execution path of our agent
     I2_QML_PROPERTY_READONLY(QString, executionPath)
 
-    // PID of our agent ???
-    //I2_CPP_NOSIGNAL_PROPERTY(int, pid)
+    // Process Id of our agent
+    I2_CPP_NOSIGNAL_PROPERTY(int, pid)
 
     // Publisher of our agent ???
     //I2_CPP_NOSIGNAL_PROPERTY(int, publisher)
@@ -61,20 +64,28 @@ class AgentM : public QObject
     // Flag indicating if our agent can be frozen
     I2_QML_PROPERTY_READONLY(bool, canBeFrozen)
 
-    // Md5 hash value for the definition string
-    //I2_QML_PROPERTY_READONLY(QString, md5Hash)
-
 
 public:
     /**
-     * @brief Constructor
+     * @brief Constructor without peer id and address
      * @param name
-     * @param peerId
      * @param parent
      */
     explicit AgentM(QString name,
-                    QString peerId = "",
                     QObject *parent = nullptr);
+
+
+    /**
+     * @brief Constructor with peer id and address
+     * @param name
+     * @param peerId
+     * @param address
+     * @param parent
+     */
+    AgentM(QString name,
+           QString peerId,
+           QString address,
+           QObject *parent = nullptr);
 
 
     /**
