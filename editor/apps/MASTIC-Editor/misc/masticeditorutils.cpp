@@ -89,7 +89,7 @@ QString MasticEditorUtils::getRootPath()
         {
             QString documentsDirectoryPath = documentsLocation.first();
 
-            rootDirectoryPath = QString("%1%2MASTIC").arg(documentsDirectoryPath, QDir::separator());
+            rootDirectoryPath = QString("%1%2MASTIC%2").arg(documentsDirectoryPath, QDir::separator());
 
             // Create a directory if it does not exist
             MasticEditorUtils::createDirectoryIfNotExist(rootDirectoryPath);
@@ -144,6 +144,16 @@ QString MasticEditorUtils::getAgentsDefinitionsPath()
 }
 
 
+/**
+ * @brief Get (and create if needed) the agents mappings path of our application
+ * "[DocumentsLocation]/MASTIC/AgentsMappings/"
+ * @return
+ */
+QString MasticEditorUtils::getAgentsMappingsPath()
+{
+    return MasticEditorUtils::_getSubDirectoryPath("AgentsMappings");
+}
+
 
 /**
  * @brief Get (and create if needed) the fullpath of a given sub-directory
@@ -152,7 +162,7 @@ QString MasticEditorUtils::getAgentsDefinitionsPath()
  */
 QString MasticEditorUtils::_getSubDirectoryPath(QString subDirectory)
 {
-    QString subDirectoryPath = QString("%1%2%3%2").arg(MasticEditorUtils::getRootPath(), QDir::separator(), subDirectory);
+    QString subDirectoryPath = QString("%1%3%2").arg(MasticEditorUtils::getRootPath(), QDir::separator(), subDirectory);
 
     // Create this directory if it does not exist
     MasticEditorUtils::createDirectoryIfNotExist(subDirectoryPath);

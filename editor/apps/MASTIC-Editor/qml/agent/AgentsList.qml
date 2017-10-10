@@ -228,19 +228,15 @@ Item {
                     topMargin: 4
                     bottomMargin: 4
                 }
-
                 radius: 5
-
                 color: MasticTheme.agentsListItemBackgroundColor
-
                 border {
                     width: 1
                     color: MasticTheme.whiteColor
                 }
 
-
                 Item {
-                     id: agentRow
+                    id: agentRow
 
                     anchors {
                         fill: parent
@@ -248,166 +244,84 @@ Item {
                         topMargin: 2
                     }
 
+                    Button {
+                        id: btnDeleteAgent
+
+                        anchors {
+                            left: agentRow.right
+                            top: agentRow.top
+                        }
+                        visible: (model.modelM && (model.modelM.status === AgentStatus.OFF))
+
+                        text: "X"
+
+                        onClicked: {
+                            if(controller)
+                            {
+                                console.log("Delete agent from the list : " + model.modelM.name)
+                                controller.deleteAgentFromList(model.QtObject);
+                            }
+                        }
+                    }
+
                     Column {
+                        anchors {
+                            left : parent.left
+                        }
 
-                        Item {
-                           id: agentNameRow
+                        Text {
+                            id: agentName
+                            text: "Name: " + (model.modelM ? model.modelM.name : "")
 
-                           height: 25
-                           width : agentRow.width
+                            height: 25
+                            color: MasticTheme.agentsListLabelColor
+                            font: MasticTheme.normalFont
+                        }
 
-                            Text {
-                                id: agentName
+                        Text {
+                            id: agentStatus
+                            text: "Status: " + (model.modelM ? AgentStatus.enumToString(model.modelM.status) : "OFF")
 
-                                anchors {
-                                    left : agentNameRow.left
-                                }
+                            height: 25
+                            color: MasticTheme.agentsListLabelColor
+                            font: MasticTheme.normalFont
+                        }
+                    }
 
-                                text: "Name : " + model.modelM.name
+                    Column {
+                        anchors {
+                            right: parent.right
+                        }
 
-                                height: 25
+                        Button {
+                            id: btnDefinition
+                            text: model.definition ? model.definition.name : ""
 
-                                color: MasticTheme.agentsListLabelColor
-
-                                font: MasticTheme.normalFont
-                            }
-
-                            Text {
-                                id: agentStatus
-                                anchors {
-                                    right : btnDefinition.left
-                                }
-
-                                text: "[" + AgentStatus.enumToString(model.status)+"]"
-
-                                height: 25
-
-                                color: MasticTheme.agentsListLabelColor
-
-                                font: MasticTheme.normalFont
-                            }
-
-                            Button {
-                                id: btnDefinition
-
-                                anchors {
-                                    right : btnDeleteAgent.left
-                                }
-                                text: "Définition"
-
-                                onClicked: {
-                                    console.log("Open the definition of " + model.modelM.name)
-                                }
-                            }
-
-                            Button {
-                                id: btnDeleteAgent
-
-                                anchors {
-                                    right : agentNameRow.right
-                                }
-                                visible : model.status === AgentStatus.OFF
-
-                                text: "X"
-
-                                onClicked: {
-                                    if(controller)
-                                    {
-                                        console.log("Delete agent from the list : " + model.modelM.name)
-                                        controller.deleteAgentFromList(model.QtObject);
-                                    }
+                            onClicked: {
+                                if (model.definition) {
+                                    console.log("Open the definition of " + model.definition.name)
                                 }
                             }
                         }
 
                         Text {
-                            text: model.definition.description
+                            text: model.definition ? model.definition.description : ""
 
                             height: 25
-
                             color: MasticTheme.agentsListLabelColor
-
-                            font: MasticTheme.normalFont
-                        }
-
-                        Item {
-                           id: agentVersionRow
-
-                           height: 25
-                           width : agentRow.width
-
-                           Text {
-
-                               anchors {
-                                   left : agentVersionRow.left
-                               }
-
-                               text: model.definition.version
-
-                               height: 25
-
-                               color: MasticTheme.agentsListLabelColor
-
-                               font: MasticTheme.normalFont
-                           }
-
-                           /*Text {
-
-                               anchors {
-                                   right : agentVersionRow.right
-                               }
-
-                               visible: model.listIdenticalAgentsVM.count > 0 || model.listSimilarAgentsVM.count
-                               text: {
-                                   if (model.listIdenticalAgentsVM.count > 0)
-                                   {
-                                       "I: " + model.listIdenticalAgentsVM.count
-                                   }
-                                   else if (model.listSimilarAgentsVM.count) {
-                                       "S: " + model.listIdenticalAgentsVM.count
-                                   }
-                               }
-
-                               height: 25
-
-                               color: MasticTheme.agentsListLabelColor
-
-                               font: MasticTheme.normalFont
-                           }*/
-
-
-                        }
-
-
-                        /*Text {
-                            text: "SimilarAgents : " + model.listSimilarAgentsVM.count
-
-                            height: 25
-
-                            color: MasticTheme.agentsListLabelColor
-
                             font: MasticTheme.normalFont
                         }
 
                         Text {
-                            text: "IdenticalAgents : " + model.listIdenticalAgentsVM.count
+                            text: model.definition ? model.definition.version : ""
 
                             height: 25
-
                             color: MasticTheme.agentsListLabelColor
-
                             font: MasticTheme.normalFont
-                        }*/
+                        }
                     }
                 }
             }
-
-            /*ListView {
-                model : rowModel.listSimilarAgentsVM
-
-                delegate: componentAgentListItem
-            }*/
-
         }
     }
 }

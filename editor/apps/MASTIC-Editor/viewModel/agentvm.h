@@ -27,12 +27,6 @@
 
 
 /**
-  * TODO
-  */
-I2_ENUM(AgentStatus, ON, OFF, ON_ASKED, OFF_ASKED)
-
-
-/**
  * @brief The AgentVM class defines a view model of agent
  */
 class AgentVM : public QObject
@@ -45,6 +39,9 @@ class AgentVM : public QObject
     // Model of the agent definition
     I2_QML_PROPERTY_READONLY_CUSTOM_SETTER(DefinitionM*, definition)
 
+    // Flag indicating if our agent is fictitious (never yet appeared on the network)
+    I2_QML_PROPERTY_READONLY(bool, isFictitious)
+
     // List of VM of inputs
     I2_QOBJECT_LISTMODEL(AgentIOPVM, inputsList)
 
@@ -53,9 +50,6 @@ class AgentVM : public QObject
 
     // List of VM of parameters
     I2_QOBJECT_LISTMODEL(AgentIOPVM, parametersList)
-    
-    // Status: can be ON, OFF, ON Asked or OFF Asked
-    I2_QML_PROPERTY(AgentStatus::Value, status)
 
     // State string defined by the agent
     I2_QML_PROPERTY(QString, state)
@@ -71,12 +65,6 @@ class AgentVM : public QObject
 
     // Flag indicating if our agent is frozen
     I2_QML_PROPERTY(bool, isFrozen)
-
-    // List of identical agents VM
-    //I2_QOBJECT_LISTMODEL(AgentVM, listSimilarAgentsVM)
-
-    // List of similar agents VM
-    //I2_QOBJECT_LISTMODEL(AgentVM, listIdenticalAgentsVM)
 
 
 public:
