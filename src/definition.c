@@ -200,7 +200,7 @@ int definition_addIopToDefinition(agent_iop *iop, iop_t iop_type, definition **d
         return 0;
 
     //Copy the iop
-    iop_to_add = calloc(1, sizeof(struct agent_iop));
+    iop_to_add = calloc(1, sizeof(*iop));
     memcpy(iop_to_add, iop, sizeof(*iop));
 
     //Add the iop
