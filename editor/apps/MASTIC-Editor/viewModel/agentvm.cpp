@@ -69,10 +69,6 @@ AgentVM::~AgentVM()
 
         setmodelM(NULL);
     }
-
-    // Delete our lists of agents VM
-    //_listIdenticalAgentsVM.deleteAllItems();
-    //_listSimilarAgentsVM.deleteAllItems();
 }
 
 

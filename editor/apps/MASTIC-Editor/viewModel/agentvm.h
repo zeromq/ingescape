@@ -75,12 +75,6 @@ class AgentVM : public QObject
     // Flag indicating if our agent is frozen
     I2_QML_PROPERTY(bool, isFrozen)
 
-    // List of identical agents VM
-    //I2_QOBJECT_LISTMODEL(AgentVM, listSimilarAgentsVM)
-
-    // List of similar agents VM
-    //I2_QOBJECT_LISTMODEL(AgentVM, listIdenticalAgentsVM)
-
 
 public:
     /**

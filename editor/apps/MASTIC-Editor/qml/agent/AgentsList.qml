@@ -235,7 +235,6 @@ Item {
                     color: MasticTheme.whiteColor
                 }
 
-
                 Item {
                     id: agentRow
 
@@ -245,98 +244,80 @@ Item {
                         topMargin: 2
                     }
 
+                    Button {
+                        id: btnDeleteAgent
+
+                        anchors {
+                            left: agentRow.right
+                            top: agentRow.top
+                        }
+                        visible: model.status === AgentStatus.OFF
+
+                        text: "X"
+
+                        onClicked: {
+                            if(controller)
+                            {
+                                console.log("Delete agent from the list : " + model.modelM.name)
+                                controller.deleteAgentFromList(model.QtObject);
+                            }
+                        }
+                    }
+
                     Column {
-
-                        Item {
-                            id: agentNameRow
-
-                            height: 25
-                            width : agentRow.width
-
-                            Text {
-                                id: agentName
-
-                                anchors {
-                                    left : agentNameRow.left
-                                }
-
-                                text: "Name: " + model.modelM.name
-
-                                height: 25
-                                color: MasticTheme.agentsListLabelColor
-                                font: MasticTheme.normalFont
-                            }
-
-                            Text {
-                                id: agentStatus
-                                anchors {
-                                    right : btnDefinition.left
-                                }
-
-                                text: "[" + AgentStatus.enumToString(model.status) + "]"
-
-                                height: 25
-                                color: MasticTheme.agentsListLabelColor
-                                font: MasticTheme.normalFont
-                            }
-
-                            Button {
-                                id: btnDefinition
-
-                                anchors {
-                                    right : btnDeleteAgent.left
-                                }
-                                text: model.definition.name
-
-                                onClicked: {
-                                    console.log("Open the definition of " + model.definition.name)
-                                }
-                            }
-
-                            Button {
-                                id: btnDeleteAgent
-
-                                anchors {
-                                    right: agentNameRow.right
-                                }
-                                visible: model.status === AgentStatus.OFF
-
-                                text: "X"
-
-                                onClicked: {
-                                    if(controller)
-                                    {
-                                        console.log("Delete agent from the list : " + model.modelM.name)
-                                        controller.deleteAgentFromList(model.QtObject);
-                                    }
-                                }
-                            }
+                        anchors {
+                            left : parent.left
                         }
 
                         Text {
-                            text: model.definition.description
+                            id: agentName
+                            text: "Name: " + model.modelM.name
 
                             height: 25
                             color: MasticTheme.agentsListLabelColor
                             font: MasticTheme.normalFont
                         }
 
-                        Item {
-                            id: agentVersionRow
+                        Text {
+                            id: agentStatus
+                            text: "Status: " + AgentStatus.enumToString(model.status)
 
                             height: 25
-                            width : agentRow.width
+                            color: MasticTheme.agentsListLabelColor
+                            font: MasticTheme.normalFont
+                        }
+                    }
 
-                            Text {
-                                text: model.definition.version
+                    Column {
+                        anchors {
+                            right: parent.right
+                        }
 
-                                anchors {
-                                    left : agentVersionRow.left
+                        Button {
+                            id: btnDefinition
+                            text: (model && model.definition) ? model.definition.name : ""
+
+                            onClicked: {
+                                if (model && model.definition) {
+                                    console.log("Open the definition of " + model.definition.name)
                                 }
-                                height: 25
-                                color: MasticTheme.agentsListLabelColor
-                                font: MasticTheme.normalFont
                             }
+                        }
+
+                        Text {
+                            text: (model && model.definition) ? model.definition.description : ""
+
+                            height: 25
+                            color: MasticTheme.agentsListLabelColor
+                            font: MasticTheme.normalFont
+                        }
+
+                        Text {
+                            text: (model && model.definition) ? model.definition.version : ""
+
+                            height: 25
+                            color: MasticTheme.agentsListLabelColor
+                            font: MasticTheme.normalFont
                         }
                     }
                 }
