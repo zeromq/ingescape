@@ -172,47 +172,43 @@ agent_iop* definition_createIop(const char *name, iop_t type, iopType_t value_ty
     return iop;
 }
 
-int definition_addIopToDefinition(agent_iop *iop, iop_t iop_type, definition **def)
+int definition_addIopToDefinition(agent_iop *iop, iop_t iop_type, definition *def)
 {
-    agent_iop *iop_to_add = NULL;
+    agent_iop *previousIOP = NULL;
 
     //Check if already initialized, and do it if not
-    if((*def) == NULL){
-        (*def) = calloc(1, sizeof(struct definition));
+    if(def == NULL){
+        def = calloc(1, sizeof(struct definition));
     }
 
     //Check if the key already exist
     switch (iop_type) {
         case INPUT_T:
-            HASH_FIND_STR((*def)->inputs_table, iop->name , iop_to_add);
+            HASH_FIND_STR(def->inputs_table, iop->name , previousIOP);
             break;
         case OUTPUT_T:
-            HASH_FIND_STR((*def)->outputs_table, iop->name , iop_to_add);
+            HASH_FIND_STR(def->outputs_table, iop->name , previousIOP);
             break;
         case PARAMETER_T:
-            HASH_FIND_STR((*def)->params_table, iop->name , iop_to_add);
+            HASH_FIND_STR(def->params_table, iop->name , previousIOP);
             break;
         default:
             break;
     }
 
-    if(iop_to_add != NULL)
+    if(previousIOP != NULL)
         return 0;
-
-    //Copy the iop
-    iop_to_add = calloc(1, sizeof(struct agent_iop));
-    memcpy(iop_to_add, iop, sizeof(*iop));
 
     //Add the iop
     switch (iop_type) {
         case INPUT_T:
-            HASH_ADD_STR((*def)->inputs_table, name, iop_to_add);
+            HASH_ADD_STR(def->inputs_table, name, iop);
             break;
         case OUTPUT_T:
-            HASH_ADD_STR((*def)->outputs_table, name, iop_to_add);
+            HASH_ADD_STR(def->outputs_table, name, iop);
             break;
         case PARAMETER_T:
-            HASH_ADD_STR((*def)->params_table, name, iop_to_add);
+            HASH_ADD_STR(def->params_table, name, iop);
             break;
         default:
             break;
@@ -498,12 +494,11 @@ int mtic_createInput(const char *name, iopType_t value_type, void *value, long s
     agent_iop *iopLive = definition_createIop(name, INPUT_T, value_type, value, size);
 
     //Add iop in structure def live, need to be copied
-    if (definition_addIopToDefinition(iopLive, INPUT_T, &mtic_internal_definition) < 1){
+    if (definition_addIopToDefinition(iopLive, INPUT_T, mtic_internal_definition) < 1){
+        definition_freeIOP(iopLive);
         return -1;
     }
 
-    //free iop
-    definition_freeIOP(iopLive);
     network_needToSendDefinitionUpdate = true;
 
     return 1;
@@ -529,12 +524,11 @@ int mtic_createOutput(const char *name, iopType_t value_type, void *value, long 
     agent_iop* iopLive = definition_createIop(name, OUTPUT_T, value_type, value, size);
 
     //Add iop in structure def live, need to be copied
-    if (definition_addIopToDefinition(iopLive, OUTPUT_T, &mtic_internal_definition) < 1){
+    if (definition_addIopToDefinition(iopLive, OUTPUT_T, mtic_internal_definition) < 1){
+        definition_freeIOP(iopLive);
         return -1;
     }
 
-    //free iop
-    definition_freeIOP(iopLive);
     network_needToSendDefinitionUpdate = true;
 
     return 1;
@@ -559,12 +553,11 @@ int mtic_createParameter(const char *name, iopType_t value_type, void *value, lo
     agent_iop* iopLive = definition_createIop(name, PARAMETER_T, value_type, value, size);
 
     //Add iop in structure def live, need to be copied
-    if (definition_addIopToDefinition(iopLive, PARAMETER_T, &mtic_internal_definition) < 1){
+    if (definition_addIopToDefinition(iopLive, PARAMETER_T, mtic_internal_definition) < 1){
+        definition_freeIOP(iopLive);
         return -1;
     }
 
-    //free iop
-    definition_freeIOP(iopLive);
     network_needToSendDefinitionUpdate = true;
 
     return 1;
