@@ -55,6 +55,38 @@ public:
     
 
     /**
+     * @brief Get the model of agent from a Peer Id
+     * @param peerId
+     * @return
+     */
+    AgentM* getAgentModelFromPeerId(QString peerId);
+
+
+    /**
+     * @brief Get the list of models of agent from a name
+     * @param name
+     * @return
+     */
+    QList<AgentM*> getAgentModelsListFromName(QString name);
+
+
+    /**
+     * @brief Get the list (of models) of agent definition from a name
+     * @param name
+     * @return
+     */
+    QList<DefinitionM*> getAgentDefinitionsListFromName(QString name);
+
+
+    /**
+     * @brief Get the list of view models of agent from a name
+     * @param name
+     * @return
+     */
+    QList<AgentVM*> getAgentViewModelsListFromName(QString name);
+
+
+    /**
      * @brief Add a new view model of agent into our list
      * @param definition
      * @param agent
@@ -106,11 +138,28 @@ public Q_SLOTS:
 
 private:
 
+    /**
+     * @brief Manage the new model of agent
+     * @param agent
+     */
+    void _manageNewModelOfAgent(AgentM* agent);
+
+
+    /**
+     * @brief Manage the new (model of) definition of agent
+     * @param definition
+     * @param agent
+     */
+    void _manageNewDefinitionOfAgent(DefinitionM* definition, AgentM* agent);
+
+
+private:
+
     // Helper to manage JSON definitions of agents
     JsonHelper* _jsonHelper;
 
     // List of all models of agents
-    QList<AgentM*> _allAgentsModel;
+    //QList<AgentM*> _allAgentsModel;
 
     // Map of all agents VM per name and version
     //QHash<QString, AgentVM*> _mapAgentsVMPerNameAndVersion;
@@ -118,14 +167,14 @@ private:
     // Map from Peer ID to a model of agent
     QHash<QString, AgentM*> _mapFromPeerIdToAgentM;
 
-    // Map from Peer ID to a view model of agent
-    QHash<QString, AgentVM*> _mapFromPeerIdToAgentVM;
+    // Map from agent name to a list of models of agent
+    QHash<QString, QList<AgentM*>> _mapFromNameToAgentModelsList;
 
-    // Map from Agent Name to a list of models of agent
-    QHash<QString, QList<AgentM*>> _mapFromNameToAgentM;
+    // Map from "definition name" to a list (of models) of agent definition
+    QHash<QString, QList<DefinitionM*>> _mapFromNameToAgentDefinitionsList;
 
-    // Map from Name to view model of agent
-    //QHash<QString, AgentVM*> _mapFromNameToAgentVM;
+    // Map from agent name to a list of view models of agent
+    QHash<QString, QList<AgentVM*>> _mapFromNameToAgentViewModelsList;
 
 };
 

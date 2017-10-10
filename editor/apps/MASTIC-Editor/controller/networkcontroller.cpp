@@ -160,7 +160,7 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
             {
                 message.remove(0, mappingPrefix.length());
 
-                qDebug() << peerName << "Mapping:" << message;
+                //qDebug() << peerName << "Mapping:" << message;
             }
             else if (message.startsWith("MAPPED"))
             {

@@ -101,6 +101,8 @@ void registerCustomQmlTypes()
 }
 
 
+
+
 /**
  * @brief Entry point of our application program
  * @param argc Argument count

@@ -23,6 +23,11 @@
 
 #include <model/iop/agentiopm.h>
 
+/**
+  * Status for an agent on the network: ON or OFF (and during transition after an ask)
+  */
+I2_ENUM(AgentStatus, ON, OFF, ON_ASKED, OFF_ASKED)
+
 
 /**
  * @brief The AgentM class defines a model of agent
@@ -63,6 +68,9 @@ class AgentM : public QObject
 
     // Flag indicating if our agent can be frozen
     I2_QML_PROPERTY_READONLY(bool, canBeFrozen)
+
+    // Status: can be ON, OFF, ON Asked or OFF Asked
+    I2_QML_PROPERTY(AgentStatus::Value, status)
 
 
 public:

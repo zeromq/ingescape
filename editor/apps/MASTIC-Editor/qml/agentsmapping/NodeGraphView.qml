@@ -38,6 +38,13 @@ Item {
     property var controller : null;
 
 
+    // Minimum scale factor
+    readonly property real minimumScale: 0.25
+
+    // Maximum scale factor
+    readonly property real maximumScale: 4
+
+
     //--------------------------------
     //
     // Functions
@@ -132,8 +139,8 @@ Item {
             pinch {
                 target: workspace
 
-                minimumScale: 0.25
-                maximumScale: 4
+                minimumScale: rootItem.minimumScale
+                maximumScale: rootItem.maximumScale
             }
 
             MouseArea {
@@ -149,11 +156,11 @@ Item {
                     //TODO: zoom at (x, y)
                     if (wheel.angleDelta.y >= 0)
                     {
-                        workspace.scale *= 1/1.2;
+                        workspace.scale = Math.max(rootItem.minimumScale, workspace.scale/1.2);
                     }
                     else
                     {
-                        workspace.scale *= 1.2;
+                        workspace.scale = Math.min(rootItem.maximumScale, workspace.scale * 1.2);
                     }
                 }
             }
