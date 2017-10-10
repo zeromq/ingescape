@@ -247,6 +247,7 @@ int network_observeZyre(network_zyreIncoming cb, void *myData);
 int network_publishOutput (const char* output_name);
 void mtic_debug(const char*fmt, ...);
 
+bool network_checkCompatibilityInputOutput(agent_iop *foundInput, agent_iop *foundOutput);
 
 // parser
 

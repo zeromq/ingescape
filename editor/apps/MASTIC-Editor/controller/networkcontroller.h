@@ -54,13 +54,32 @@ Q_SIGNALS:
 
     /**
      * @brief Signal emitted when an agent enter the network
+     * @param peerId
+     * @param peerName
+     * @param peerAddress
+     * @param pid
+     * @param hostname
+     * @param executionPath
+     * @param canBeFrozen
      */
-    void agentEntered(QString agentName, QString agentAdress, QString peer, QString definition);
+    void agentEntered(QString peerId, QString peerName, QString peerAddress, int pid, QString hostname, QString executionPath, bool canBeFrozen);
+
+
+    /**
+     * @brief Signal emitted when an agent definition has been received
+     * @param peer id
+     * @param peer name
+     * @param definition
+     */
+    void definitionReceived(QString peerId, QString peerName, QString definition);
+
 
     /**
      * @brief Signal emitted when an agent quit the network
+     * @param peer id
+     * @param peer name
      */
-    void agentExited(QString peer);
+    void agentExited(QString peerId, QString peerName);
 
 
 public Q_SLOTS:

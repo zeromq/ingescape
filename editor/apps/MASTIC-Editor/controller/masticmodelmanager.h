@@ -55,6 +55,38 @@ public:
     
 
     /**
+     * @brief Get the model of agent from a Peer Id
+     * @param peerId
+     * @return
+     */
+    AgentM* getAgentModelFromPeerId(QString peerId);
+
+
+    /**
+     * @brief Get the list of models of agent from a name
+     * @param name
+     * @return
+     */
+    QList<AgentM*> getAgentModelsListFromName(QString name);
+
+
+    /**
+     * @brief Get the list (of models) of agent definition from a name
+     * @param name
+     * @return
+     */
+    QList<DefinitionM*> getAgentDefinitionsListFromName(QString name);
+
+
+    /**
+     * @brief Get the list of view models of agent from a name
+     * @param name
+     * @return
+     */
+    QList<AgentVM*> getAgentViewModelsListFromName(QString name);
+
+
+    /**
      * @brief Add a new view model of agent into our list
      * @param definition
      * @param agent
@@ -75,21 +107,50 @@ Q_SIGNALS:
 public Q_SLOTS:
 
     /**
-     * @brief Slot on agent entereing into the network
-     *        Agent definition has been received and must be processed
-     * @param agent name
-     * @param agent adress
-     * @param agent peer
-     * @param agent definition
+     * @brief Slot when an agent enter the network
+     * @param peerId
+     * @param agentName
+     * @param agentAddress
+     * @param pid
+     * @param hostname
+     * @param executionPath
+     * @param canBeFrozen
      */
-    void onAgentEntered(QString agentName, QString agentAdress, QString peer, QString definition);
+    void onAgentEntered(QString peerId, QString agentName, QString agentAddress, int pid, QString hostname, QString executionPath, bool canBeFrozen);
     
 
     /**
-     * @brief Slot on agent quitting the network
-     * @param agent peer id
+     * @brief Slot when an agent definition has been received and must be processed
+     * @param peer Id
+     * @param agent name
+     * @param definition
      */
-    void onAgentExited(QString peer);
+    void onDefinitionReceived(QString peerId, QString agentName, QString definition);
+
+
+    /**
+     * @brief Slot when an agent quit the network
+     * @param peer Id
+     * @param agent name
+     */
+    void onAgentExited(QString peerId, QString agentName);
+
+
+private:
+
+    /**
+     * @brief Manage the new model of agent
+     * @param agent
+     */
+    void _manageNewModelOfAgent(AgentM* agent);
+
+
+    /**
+     * @brief Manage the new (model of) definition of agent
+     * @param definition
+     * @param agent
+     */
+    void _manageNewDefinitionOfAgent(DefinitionM* definition, AgentM* agent);
 
 
 private:
@@ -98,22 +159,22 @@ private:
     JsonHelper* _jsonHelper;
 
     // List of all models of agents
-    QList<AgentM*> _allAgentsModel;
+    //QList<AgentM*> _allAgentsModel;
 
     // Map of all agents VM per name and version
     //QHash<QString, AgentVM*> _mapAgentsVMPerNameAndVersion;
 
-    // Map from Peer ID to model of agent
+    // Map from Peer ID to a model of agent
     QHash<QString, AgentM*> _mapFromPeerIdToAgentM;
 
-    // Map from Peer ID to view model of agent
-    QHash<QString, AgentVM*> _mapFromPeerIdToAgentVM;
+    // Map from agent name to a list of models of agent
+    QHash<QString, QList<AgentM*>> _mapFromNameToAgentModelsList;
 
-    // Map from Name to model of agent
-    QHash<QString, AgentM*> _mapFromNameToAgentM;
+    // Map from "definition name" to a list (of models) of agent definition
+    QHash<QString, QList<DefinitionM*>> _mapFromNameToAgentDefinitionsList;
 
-    // Map from Name to view model of agent
-    QHash<QString, AgentVM*> _mapFromNameToAgentVM;
+    // Map from agent name to a list of view models of agent
+    QHash<QString, QList<AgentVM*>> _mapFromNameToAgentViewModelsList;
 
 };
 

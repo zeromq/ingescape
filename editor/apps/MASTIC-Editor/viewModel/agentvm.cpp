@@ -28,7 +28,7 @@
 AgentVM::AgentVM(AgentM* model, QObject *parent) : QObject(parent),
     _modelM(model),
     _definition(NULL),
-    _status(AgentStatus::OFF),
+    _isFictitious(true),
     _state(""),
     _x(0),
     _y(0),
@@ -40,7 +40,14 @@ AgentVM::AgentVM(AgentM* model, QObject *parent) : QObject(parent),
 
     if (_modelM != NULL)
     {
-        qInfo() << "New View Model of Agent" << _modelM->name() << "(" << _modelM->peerId() << ")";
+        if (_modelM->peerId().isEmpty()) {
+            _isFictitious = true;
+            qInfo() << "New View Model of FICTITIOUS Agent" << _modelM->name();
+        }
+        else {
+            _isFictitious = false;
+            qInfo() << "New View Model of Agent" << _modelM->name() << "with peer id" << _modelM->peerId();
+        }
     }
 }
 
@@ -61,10 +68,6 @@ AgentVM::~AgentVM()
 
         setmodelM(NULL);
     }
-
-    // Delete our lists of agents VM
-    //_listIdenticalAgentsVM.deleteAllItems();
-    //_listSimilarAgentsVM.deleteAllItems();
 }
 
 
