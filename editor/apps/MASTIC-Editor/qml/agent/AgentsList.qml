@@ -251,7 +251,7 @@ Item {
                             left: agentRow.right
                             top: agentRow.top
                         }
-                        visible: model.status === AgentStatus.OFF
+                        visible: (model.modelM && (model.modelM.status === AgentStatus.OFF))
 
                         text: "X"
 
@@ -271,7 +271,7 @@ Item {
 
                         Text {
                             id: agentName
-                            text: "Name: " + model.modelM.name
+                            text: "Name: " + (model.modelM ? model.modelM.name : "")
 
                             height: 25
                             color: MasticTheme.agentsListLabelColor
@@ -280,7 +280,7 @@ Item {
 
                         Text {
                             id: agentStatus
-                            text: "Status: " + AgentStatus.enumToString(model.status)
+                            text: "Status: " + (model.modelM ? AgentStatus.enumToString(model.modelM.status) : "OFF")
 
                             height: 25
                             color: MasticTheme.agentsListLabelColor
@@ -295,17 +295,17 @@ Item {
 
                         Button {
                             id: btnDefinition
-                            text: (model && model.definition) ? model.definition.name : ""
+                            text: model.definition ? model.definition.name : ""
 
                             onClicked: {
-                                if (model && model.definition) {
+                                if (model.definition) {
                                     console.log("Open the definition of " + model.definition.name)
                                 }
                             }
                         }
 
                         Text {
-                            text: (model && model.definition) ? model.definition.description : ""
+                            text: model.definition ? model.definition.description : ""
 
                             height: 25
                             color: MasticTheme.agentsListLabelColor
@@ -313,7 +313,7 @@ Item {
                         }
 
                         Text {
-                            text: (model && model.definition) ? model.definition.version : ""
+                            text: model.definition ? model.definition.version : ""
 
                             height: 25
                             color: MasticTheme.agentsListLabelColor

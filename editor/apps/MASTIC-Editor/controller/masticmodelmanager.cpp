@@ -238,8 +238,10 @@ void MasticModelManager::onAgentEntered(QString peerId, QString agentName, QStri
         AgentM* agent = getAgentModelFromPeerId(peerId);
         if(agent != NULL)
         {
-            qWarning() << "The agent is back on the network !";
-            // FIXME: TODO ?
+            qInfo() << "The agent" << agentName << "with peer id" << peerId << "and address" << agentAddress << "is back on the network !";
+
+            // Update the status
+            agent->setstatus(AgentStatus::ON);
         }
         else
         {
@@ -250,6 +252,7 @@ void MasticModelManager::onAgentEntered(QString peerId, QString agentName, QStri
             agent->setexecutionPath(executionPath);
             agent->setpid(pid);
             agent->setcanBeFrozen(canBeFrozen);
+            agent->setstatus(AgentStatus::ON);
 
             _mapFromPeerIdToAgentM.insert(peerId, agent);
 
@@ -299,23 +302,11 @@ void MasticModelManager::onAgentExited(QString peerId, QString agentName)
     AgentM* agent = getAgentModelFromPeerId(peerId);
     if(agent != NULL)
     {
-        qInfo() << "Agent" << agentName << "(" << peerId << ") EXITED";
+        qInfo() << "The agent" << agentName << "with peer id" << peerId << "exited from the network !";
 
-        // TODO...
+        // Update the status
+        agent->setstatus(AgentStatus::OFF);
     }
-
-    /*if (_mapFromPeerIdToAgentVM.contains(peerId))
-    {
-        AgentVM* agentVM = _mapFromPeerIdToAgentVM.value(peerId);
-        if(agentVM != NULL)
-        {
-            agentVM->setstatus(AgentStatus::OFF);
-
-            // We don't delete the agent when it ran OFF
-            //_mapAgentsVMPerPeerId.remove(peer);
-            //deleteAgentVMFromList(agentVM);
-        }
-    }*/
 }
 
 
@@ -480,14 +471,6 @@ void MasticModelManager::_manageNewModelOfAgent(AgentM* agent)
 
             // Create a new view model of agent
             AgentVM* agentVM = new AgentVM(agent, this);
-
-            // Peer Id and Address are defined, agent is ON
-            if (!agent->peerId().isEmpty() && !agent->address().isEmpty()) {
-                agentVM->setstatus(AgentStatus::ON);
-            }
-            else {
-                agentVM->setstatus(AgentStatus::OFF);
-            }
 
             // Add our view model to the list
             _allAgentsVM.append(agentVM);
