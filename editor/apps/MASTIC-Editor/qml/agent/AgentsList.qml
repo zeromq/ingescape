@@ -286,6 +286,24 @@ Item {
                             color: MasticTheme.agentsListLabelColor
                             font: MasticTheme.normalFont
                         }
+
+                        Text {
+                            id: agentAddress
+                            text: model.modelM ? model.modelM.address : ""
+
+                            height: 25
+                            color: MasticTheme.agentsListLabelColor
+                            font: MasticTheme.normalFont
+                        }
+
+                        Text {
+                            id: hostname
+                            text: model.modelM ? model.modelM.hostname : ""
+
+                            height: 25
+                            color: MasticTheme.agentsListLabelColor
+                            font: MasticTheme.normalFont
+                        }
                     }
 
                     Column {
@@ -318,6 +336,23 @@ Item {
                             height: 25
                             color: MasticTheme.agentsListLabelColor
                             font: MasticTheme.normalFont
+                        }
+                    }
+
+                    Button {
+                        id: btnFreeze
+                        text: "Freeze"
+                        //visible: model.modelM ? model.modelM.canBeFrozen : false
+
+                        anchors {
+                            right: agentRow.right
+                            bottom: agentRow.bottom
+                        }
+
+                        onClicked: {
+                            if (model.modelM) {
+                                console.log("Freeze " + model.modelM.name)
+                            }
                         }
                     }
                 }

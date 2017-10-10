@@ -16,14 +16,18 @@
 
 /**
  * @brief Constructor
+ * @param name
  * @param parent
  */
-ClonedAgentVM::ClonedAgentVM(QObject *parent) : AgentVM(NULL, parent)
+ClonedAgentVM::ClonedAgentVM(QString name,
+                             QObject *parent) : AgentVM(NULL, parent),
+    _name(name)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
-}
 
+    qInfo() << "New View Model of CLONED Agent" << _name;
+}
 
 
 /**
@@ -31,5 +35,7 @@ ClonedAgentVM::ClonedAgentVM(QObject *parent) : AgentVM(NULL, parent)
  */
 ClonedAgentVM::~ClonedAgentVM()
 {
+    qInfo() << "Delete View Model of CLONED Agent" << _name;
 
+    _models.clear();
 }

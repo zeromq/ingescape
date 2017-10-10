@@ -26,6 +26,9 @@ class ClonedAgentVM : public AgentVM
 {
     Q_OBJECT
 
+    // Name of our agent
+    I2_QML_PROPERTY(QString, name)
+
     // List of models of agents
     I2_QOBJECT_LISTMODEL(AgentM, models)
 
@@ -33,9 +36,10 @@ class ClonedAgentVM : public AgentVM
 public:
     /**
      * @brief Constructor
+     * @param name
      * @param parent
      */
-    explicit ClonedAgentVM(QObject *parent = nullptr);
+    explicit ClonedAgentVM(QString name, QObject *parent = nullptr);
 
 
     /**
