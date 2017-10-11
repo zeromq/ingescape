@@ -31,8 +31,9 @@ class AgentsSupervisionController : public QObject
 {
     Q_OBJECT
 
-    //I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(AgentVM, agentsList)
-    //I2_QOBJECT_SORTFILTERPROXY(AgentVM, agentsList)
+    // Sorted list of agents
+    I2_QOBJECT_SORTFILTERPROXY(AgentVM, agentsList)
+
 
 public:
     /**
@@ -49,11 +50,12 @@ public:
     ~AgentsSupervisionController();
     
 
+
     /**
-     * @brief Delete an agent VM from the list
-     * @param agent VM to delete
+     * @brief Delete an agent from the list
+     * @param agent to delete
      */
-    Q_INVOKABLE void deleteAgentFromList(AgentVM * agentToDelete);
+    Q_INVOKABLE void deleteAgent(AgentVM* agent);
 
 
 Q_SIGNALS:

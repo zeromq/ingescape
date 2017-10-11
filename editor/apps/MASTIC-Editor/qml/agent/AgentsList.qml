@@ -64,7 +64,7 @@ Item {
             right: parent.right
         }
 
-        model: MasticEditorC.modelManager.allAgentsVM
+        model: controller.agentsList
 
         delegate: componentAgentListItem
 
@@ -116,7 +116,7 @@ Item {
 
         height: childrenRect.height
 
-        color: MasticTheme.agentsListHeaderBackgroundColor// "#444444"
+        color: MasticTheme.agentsListHeaderBackgroundColor
 
 
         Row {
@@ -214,10 +214,7 @@ Item {
             id : agentListItem
 
             width: MasticTheme.leftPanelWidth
-            height: 130
-
-            property var rowModel : model
-
+            height: model.isFictitious ? 85 : 135
 
             Rectangle {
 
@@ -260,13 +257,14 @@ Item {
                         onClicked: {
                             if (controller)
                             {
-                                console.log("Delete agent from the list : " + model.name)
-                                controller.deleteAgentFromList(model.QtObject);
+                                //console.log("QML: Delete agent from the list: " + model.name)
+                                controller.deleteAgent(model.QtObject);
                             }
                         }
                     }
 
                     Column {
+                        width: 175
                         anchors {
                             left : parent.left
                         }
@@ -277,7 +275,7 @@ Item {
 
                             height: 25
                             color: MasticTheme.agentsListLabelColor
-                            font: MasticTheme.normalFont
+                            font: MasticTheme.heading2Font
                         }
 
                         Text {
@@ -308,6 +306,7 @@ Item {
                     }
 
                     Column {
+                        width: 175
                         anchors {
                             right: parent.right
                         }
@@ -326,6 +325,9 @@ Item {
                         Text {
                             text: model.definition ? model.definition.description : ""
 
+                            width: 175
+                            elide: Text.ElideRight
+
                             height: 25
                             color: MasticTheme.agentsListLabelColor
                             font: MasticTheme.normalFont
@@ -340,18 +342,33 @@ Item {
                         }
                     }
 
-                    Button {
-                        id: btnFreeze
-                        text: "Freeze"
-                        visible: model.canBeFrozen
+                    Row {
+                        visible: !model.isFictitious
 
                         anchors {
                             right: agentRow.right
                             bottom: agentRow.bottom
                         }
 
-                        onClicked: {
-                            console.log("Freeze " + model.name)
+                        Button {
+                            id: btnMute
+                            text: "Mute"
+
+                            onClicked: {
+                                //console.log("QML: Mute " + model.name);
+                                model.QtObject.mute();
+                            }
+                        }
+
+                        Button {
+                            id: btnFreeze
+                            text: "Freeze"
+                            visible: model.canBeFrozen
+
+                            onClicked: {
+                                //console.log("QML: Freeze " + model.name);
+                                model.QtObject.freeze();
+                            }
                         }
                     }
                 }

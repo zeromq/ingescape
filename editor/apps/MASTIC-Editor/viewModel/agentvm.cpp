@@ -179,6 +179,24 @@ void AgentVM::setdefinition(DefinitionM *value)
 
 
 /**
+ * @brief Mute our agent
+ */
+void AgentVM::mute()
+{
+    qDebug() << "Mute" << _name;
+}
+
+
+/**
+ * @brief Freeze our agent
+ */
+void AgentVM::freeze()
+{
+    qDebug() << "Freeze" << _name;
+}
+
+
+/**
  * @brief Slot when the list of models changed
  */
 void AgentVM::onModelsChanged()

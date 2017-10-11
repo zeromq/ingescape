@@ -74,13 +74,13 @@ MasticModelManager::MasticModelManager(QObject *parent) : QObject(parent),
                     // FIXME: test first existing agents and definitions with the name "definition->name()"
 
                     // Create a new model of agent
-                    //AgentM* agent = new AgentM(definition->name(), this);
+                    AgentM* agent = new AgentM(definition->name(), this);
 
                     // Manage the new model of agent
-                    //_manageNewModelOfAgent(agent);
+                    _manageNewModelOfAgent(agent);
 
                     // Manage the new (model of) definition of agent
-                    //_manageNewDefinitionOfAgent(definition, agent);
+                    _manageNewDefinitionOfAgent(definition, agent);
                 }
 
                 jsonFile.close();

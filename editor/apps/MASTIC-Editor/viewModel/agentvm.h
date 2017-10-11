@@ -89,6 +89,20 @@ public:
      */
     ~AgentVM();
 
+
+    /**
+     * @brief Mute our agent
+     */
+    Q_INVOKABLE void mute();
+
+
+    /**
+     * @brief Freeze our agent
+     */
+    Q_INVOKABLE void freeze();
+
+
+
 Q_SIGNALS:
 
 public Q_SLOTS:

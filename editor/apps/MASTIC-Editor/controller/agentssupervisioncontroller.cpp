@@ -32,7 +32,11 @@ AgentsSupervisionController::AgentsSupervisionController(MasticModelManager* mod
 
     if (_modelManager != NULL)
     {
-        // TODO: Gestion du tri et du filtre des agents
+        _agentsList.setSourceModel(modelManager->allAgentsVM());
+        _agentsList.setSortProperty("name");
+
+        //_agentsList.setFilterProperty("TODO");
+        //_agentsList.setFilterFixedString("true");
     }
 }
 
@@ -43,17 +47,21 @@ AgentsSupervisionController::AgentsSupervisionController(MasticModelManager* mod
 AgentsSupervisionController::~AgentsSupervisionController()
 {
     _modelManager = NULL;
+
 }
 
 
 /**
- * @brief Delete an agent VM from the list
- * @param agent VM to delete
+ * @brief Delete an agent from the list
+ * @param agent to delete
  */
-void AgentsSupervisionController::deleteAgentFromList(AgentVM * agentToDelete)
+void AgentsSupervisionController::deleteAgent(AgentVM* agent)
 {
-    if ((_modelManager != NULL) && (agentToDelete != NULL))
+    if ((_modelManager != NULL) && (agent != NULL))
     {
+        qDebug() << "Delete agent" << agent->name();
+
+        // TODO
         //_modelManager->deleteAgentVMFromList(agentToDelete);
     }
 }
