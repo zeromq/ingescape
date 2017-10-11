@@ -219,7 +219,7 @@ mapping_element_t * mapping_createMappingElement(const char * input_name,
                                                  const char *agent_name,
                                                  const char* output_name);
 unsigned long djb2_hash (unsigned char *str);
-
+bool mapping_checkCompatibilityInputOutput(agent_iop *foundInput, agent_iop *foundOutput);
 
 // model
 
@@ -246,8 +246,6 @@ int network_observeZyre(network_zyreIncoming cb, void *myData);
 #define AGENT_NAME_DEFAULT "mtic_noname"
 int network_publishOutput (const char* output_name);
 void mtic_debug(const char*fmt, ...);
-
-bool network_checkCompatibilityInputOutput(agent_iop *foundInput, agent_iop *foundOutput);
 
 // parser
 
