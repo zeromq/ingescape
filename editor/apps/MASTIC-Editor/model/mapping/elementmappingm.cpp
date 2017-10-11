@@ -9,15 +9,18 @@
      * @param parent
      */
 ElementMappingM::ElementMappingM(QString inputAgent,
-                             QString input,
-                             QString outputAgent,
-                               QString output,
-                             QObject *parent) : QObject(parent),
+                                 QString input,
+                                 QString outputAgent,
+                                 QString output,
+                                 QObject *parent) : QObject(parent),
     _inputAgent(inputAgent),
     _input(input),
     _outputAgent(outputAgent),
     _output(output)
 {
+    // Force ownership of our object, it will prevent Qml from stealing it
+    QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
+
     qInfo() << "New Model of Element Mapping has been created between Agent input: " << inputAgent << "." << input << " and Agent output: " << outputAgent << "." << output;
 }
 
