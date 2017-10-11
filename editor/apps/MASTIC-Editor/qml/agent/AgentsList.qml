@@ -251,14 +251,16 @@ Item {
                             left: agentRow.right
                             top: agentRow.top
                         }
-                        visible: (model.modelM && (model.modelM.status === AgentStatus.OFF))
+
+                        //visible: model.isFictitious
+                        visible: (model.status === AgentStatus.OFF)
 
                         text: "X"
 
                         onClicked: {
-                            if(controller)
+                            if (controller)
                             {
-                                console.log("Delete agent from the list : " + model.modelM.name)
+                                console.log("Delete agent from the list : " + model.name)
                                 controller.deleteAgentFromList(model.QtObject);
                             }
                         }
@@ -271,7 +273,15 @@ Item {
 
                         Text {
                             id: agentName
-                            text: "Name: " + (model.modelM ? model.modelM.name : "")
+                            text: model.name
+
+                            height: 25
+                            color: MasticTheme.agentsListLabelColor
+                            font: MasticTheme.normalFont
+                        }
+
+                        Text {
+                            text: model.models.count + " clone(s)"
 
                             height: 25
                             color: MasticTheme.agentsListLabelColor
@@ -280,7 +290,7 @@ Item {
 
                         Text {
                             id: agentStatus
-                            text: "Status: " + (model.modelM ? AgentStatus.enumToString(model.modelM.status) : "OFF")
+                            text: "Status: " + AgentStatus.enumToString(model.status)
 
                             height: 25
                             color: MasticTheme.agentsListLabelColor
@@ -288,17 +298,8 @@ Item {
                         }
 
                         Text {
-                            id: agentAddress
-                            text: model.modelM ? model.modelM.address : ""
-
-                            height: 25
-                            color: MasticTheme.agentsListLabelColor
-                            font: MasticTheme.normalFont
-                        }
-
-                        Text {
-                            id: hostname
-                            text: model.modelM ? model.modelM.hostname : ""
+                            id: agentAddresses
+                            text: model.addresses
 
                             height: 25
                             color: MasticTheme.agentsListLabelColor
@@ -342,7 +343,7 @@ Item {
                     Button {
                         id: btnFreeze
                         text: "Freeze"
-                        //visible: model.modelM ? model.modelM.canBeFrozen : false
+                        visible: model.canBeFrozen
 
                         anchors {
                             right: agentRow.right
@@ -350,9 +351,7 @@ Item {
                         }
 
                         onClicked: {
-                            if (model.modelM) {
-                                console.log("Freeze " + model.modelM.name)
-                            }
+                            console.log("Freeze " + model.name)
                         }
                     }
                 }

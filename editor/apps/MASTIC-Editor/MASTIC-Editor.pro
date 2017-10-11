@@ -32,7 +32,7 @@ SOURCES += main.cpp \
     viewModel/linkvm.cpp \
     model/definitionm.cpp \
     model/agentmappingm.cpp \
-    viewModel/clonedagentvm.cpp
+    model/mapping/elementmappingm.cpp
 
 
 HEADERS += \
@@ -61,7 +61,7 @@ HEADERS += \
     viewModel/linkvm.h \
     model/definitionm.h \
     model/agentmappingm.h \
-    viewModel/clonedagentvm.h
+    model/mapping/elementmappingm.h
 
 
 RESOURCES += qml.qrc

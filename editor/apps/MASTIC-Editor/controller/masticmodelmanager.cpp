@@ -110,7 +110,24 @@ MasticModelManager::MasticModelManager(QObject *parent) : QObject(parent),
         {
             qDebug() << "File" << fileInfo.fileName() << "at" << fileInfo.absoluteFilePath();
 
-            // TODO: ESTIA
+            QFile jsonFile(fileInfo.absoluteFilePath());
+            if (jsonFile.open(QIODevice::ReadOnly))
+            {
+                QByteArray byteArrayOfJson = jsonFile.readAll();
+
+                // Create a model of agent mapping with JSON
+                AgentMappingM* agentMapping = _jsonHelper->createModelOfAgentMapping("agentUndefined", byteArrayOfJson);
+                if (agentMapping != NULL)
+                {
+                    //TODOESTIA : manage a mapping
+                }
+
+                jsonFile.close();
+            }
+            else
+            {
+                qCritical() << "Can not open file" << fileInfo.absoluteFilePath();
+            }
         }
     }
 }
@@ -128,96 +145,6 @@ MasticModelManager::~MasticModelManager()
     //qDeleteAll(_allAgentsModel);
 
     qInfo() << "Delete MASTIC Model Manager";
-}
-
-
-/**
- * @brief Add a new view model of agent into our list
- * @param definition
- * @param agent
- * @param status
- */
-void MasticModelManager::addNewAgentVMToList(DefinitionM* definition, AgentM* agent, AgentStatus::Value status)
-{
-    Q_UNUSED(status)
-
-    if ((definition != NULL) && (agent != NULL))
-    {
-        /*// Add our model to the list
-        //_allAgentsModel.append(agent);
-
-        //QString newAgentKey = agentModelToAdd->name().replace(" ","").trimmed().toUpper() + agentModelToAdd->version().replace(" ","").trimmed().toUpper();
-
-        QString agentName = agent->name();
-
-        if (!_mapFromNameToAgentM.contains(agentName))
-        {
-            //_mapFromNameToAgentM.insert(agentName, agent);
-
-            // Create a new view model of agent
-            AgentVM* newAgentVM = new AgentVM(agent, this);
-            newAgentVM->setdefinition(definition);
-            newAgentVM->setstatus(status);
-
-            //_mapFromNameToAgentVM.insert(agentName, newAgentVM);
-
-            // Add our view model to the list
-            _allAgentsVM.append(newAgentVM);
-
-            if (!agent->peerId().isEmpty())
-            {
-                QString peerId = agent->peerId();
-
-                if (!_mapFromPeerIdToAgentM.contains(peerId))
-                {
-                    _mapFromPeerIdToAgentM.insert(peerId, agent);
-                }
-                if (!_mapFromPeerIdToAgentVM.contains(peerId))
-                {
-                    _mapFromPeerIdToAgentVM.insert(peerId, newAgentVM);
-                }
-            }
-        }
-        else
-        {
-            AgentM* agentWithSameNameM = _mapFromNameToAgentM.value(agentName);
-            AgentVM* agentWithSameNameVM = _mapFromNameToAgentVM.value(agentName);
-
-            if ((agentWithSameNameM != NULL) && (agentWithSameNameVM != NULL) && (agentWithSameNameVM->definition() != NULL))
-            {
-                agentWithSameNameVM->setstatus(AgentStatus::ON);
-
-                // FIXME: test all the definition
-                if (definition->name() == agentWithSameNameVM->definition()->name())
-                {
-                    //ClonedAgentVM* clonedAgent
-                }
-            }
-        }
-
-        // Name and version are identical, the agents are potentially the same
-        if (_mapAgentsVMPerNameAndVersion.contains(newAgentKey) == true)
-        {
-            AgentVM* mainAgent = _mapAgentsVMPerNameAndVersion.value(newAgentKey);
-
-            // Case 1 : name and version and defintion are exactly the same.
-            if(mainAgent->modelM() != NULL && mainAgent->modelM()->md5Hash().compare(agentModelToAdd->md5Hash()) == 0)
-            {
-                mainAgent->listIdenticalAgentsVM()->append(newAgentVM);
-            }
-            // Case 2 : name and version are exactly the same, but the definition is different.
-            else {
-                mainAgent->listSimilarAgentsVM()->append(newAgentVM);
-            }
-        }
-        // Case 3 : agent does not exists, we simply create a new one
-        else {
-            _allAgentsVM.append(newAgentVM);
-
-            // Create a new entry for our agent
-            _mapAgentsVMPerNameAndVersion.insert(newAgentKey,newAgentVM);
-        }*/
-    }
 }
 
 
@@ -310,85 +237,9 @@ void MasticModelManager::onAgentExited(QString peerId, QString agentName)
         // Update the status
         agent->setstatus(AgentStatus::OFF);
 
-        // FIXME: Need to replace ClonedAgentVM by a simple AgentVM ?
+        // FIXME: nothing more ?
     }
 }
-
-
-/**
- * @brief Delete an agent from our list
- * @param agent view model
- */
-/*void MasticModelManager::deleteAgentVMFromList(AgentVM* agentModelToDelete)
-{
-    if (agentModelToDelete != NULL && agentModelToDelete->modelM() != NULL && agentModelToDelete->status() != AgentStatus::ON)
-    {
-        QString agentKey = agentModelToDelete->modelM()->name().replace(" ","").trimmed().toUpper() + agentModelToDelete->modelM()->version().replace(" ","").trimmed().toUpper();
-
-        // Name and version are identical, the agents are potentially the same
-        if(_mapAgentsVMPerNameAndVersion.contains(agentKey) == true)
-        {
-            AgentVM* mainAgent = _mapAgentsVMPerNameAndVersion.value(agentKey);
-
-            if(mainAgent == agentModelToDelete)
-            {
-                _mapAgentsVMPerNameAndVersion.remove(agentKey);
-
-                if(agentModelToDelete->listIdenticalAgentsVM()->count() > 0
-                        || agentModelToDelete->listSimilarAgentsVM()->count() > 0)
-                {
-                    AgentVM* newMainAgent = NULL;
-                    if(agentModelToDelete->listIdenticalAgentsVM()->count() > 0)
-                    {
-                        newMainAgent = agentModelToDelete->listIdenticalAgentsVM()->at(0);
-                        agentModelToDelete->listIdenticalAgentsVM()->remove(newMainAgent);
-                    } else if (agentModelToDelete->listSimilarAgentsVM()->count() > 0)
-                    {
-                        newMainAgent = agentModelToDelete->listSimilarAgentsVM()->at(0);
-                        agentModelToDelete->listSimilarAgentsVM()->remove(newMainAgent);
-                    }
-
-                    if(newMainAgent != NULL)
-                    {
-                        newMainAgent->listIdenticalAgentsVM()->append(agentModelToDelete->listIdenticalAgentsVM()->toList());
-                        newMainAgent->listSimilarAgentsVM()->append(agentModelToDelete->listSimilarAgentsVM()->toList());
-
-                        _mapAgentsVMPerNameAndVersion.insert(agentKey,newMainAgent);
-
-                        // Remove the agent
-                        _allAgentsVM.remove(agentModelToDelete);
-                        _allAgentsVM.append(newMainAgent);
-                        agentModelToDelete->listIdenticalAgentsVM()->clear();
-                        agentModelToDelete->listSimilarAgentsVM()->clear();
-
-                        delete agentModelToDelete;
-                        agentModelToDelete = NULL;
-                    }
-                } else {
-                    // Remove the agent
-                    _allAgentsVM.remove(agentModelToDelete);
-                    delete agentModelToDelete;
-                    agentModelToDelete = NULL;
-                }
-            }
-            // The item to delete is from a sub list
-            else {
-                if(mainAgent->listIdenticalAgentsVM()->contains(agentModelToDelete))
-                {
-                    mainAgent->listIdenticalAgentsVM()->remove(agentModelToDelete);
-                } else if(mainAgent->listSimilarAgentsVM()->contains(agentModelToDelete))
-                {
-                    mainAgent->listSimilarAgentsVM()->remove(agentModelToDelete);
-                }
-
-                // Remove the agent
-                _allAgentsVM.remove(agentModelToDelete);
-                delete agentModelToDelete;
-                agentModelToDelete = NULL;
-            }
-        }
-    }
-}*/
 
 
 /**
@@ -469,36 +320,19 @@ void MasticModelManager::_manageNewModelOfAgent(AgentM* agent)
         QList<AgentM*> agentModelsList = getAgentModelsListFromName(agentName);
         QList<AgentVM*> agentViewModelsList = getAgentViewModelsListFromName(agentName);
 
-        if ((agentModelsList.count() == 0) && (agentViewModelsList.count() == 0))
-        {
-            agentModelsList.append(agent);
-            _mapFromNameToAgentModelsList.insert(agentName, agentModelsList);
+        // We don't have yet a definition for this agent, so we create a new VM until we will get its definition
 
-            // Create a new view model of agent
-            AgentVM* agentVM = new AgentVM(agent, this);
+        agentModelsList.append(agent);
+        _mapFromNameToAgentModelsList.insert(agentName, agentModelsList);
 
-            // Add our view model to the list
-            _allAgentsVM.append(agentVM);
+        // Create a new view model of agent
+        AgentVM* agentVM = new AgentVM(agent, this);
 
-            agentViewModelsList.append(agentVM);
-            _mapFromNameToAgentViewModelsList.insert(agentName, agentViewModelsList);
-        }
-        else
-        {
-            // FIXME: TODO
-            qDebug() << "There is already a model of agent for name" << agentName;
+        // Add our view model to the list
+        _allAgentsVM.append(agentVM);
 
-            foreach (AgentM* iterator, agentModelsList) {
-                if (iterator != NULL)
-                {
-                    // Same agent name and same hostname
-                    if ((iterator->address() == agent->address()) && (iterator->hostname() == agent->hostname()))
-                    {
-                        qDebug() << "Same agent name and same hostname";
-                    }
-                }
-            }
-        }
+        agentViewModelsList.append(agentVM);
+        _mapFromNameToAgentViewModelsList.insert(agentName, agentViewModelsList);
     }
 }
 
@@ -522,137 +356,122 @@ void MasticModelManager::_manageNewDefinitionOfAgent(DefinitionM* definition, Ag
         //QList<AgentM*> agentModelsList = getAgentModelsListFromName(agentName);
         QList<AgentVM*> agentViewModelsList = getAgentViewModelsListFromName(agentName);
 
-        // New name of definition
-        if (agentDefinitionsList.count() == 0)
-        {
-            // Insert the list in the map
-            agentDefinitionsList.append(definition);
-            _mapFromNameToAgentDefinitionsList.insert(definitionName, agentDefinitionsList);
+        AgentVM* agentVM = NULL;
 
-            foreach (AgentVM* agentVM, agentViewModelsList)
+        // Get the view model of agent that corresponds to our model
+        foreach (AgentVM* iterator, agentViewModelsList)
+        {
+            // If the view model has not yet a definition and contains our model of agent
+            if ((iterator != NULL) && (iterator->definition() == NULL) && iterator->models()->contains(agent))
             {
-                // If the model is the same
-                if ((agentVM != NULL) && (agentVM->modelM() == agent))
-                {
-                    // Check that the definition is not yet defined
-                    if (agentVM->definition() == NULL)
-                    {
-                        agentVM->setdefinition(definition);
-                    }
-                    else {
-                        qCritical() << "There is already a definition (" << agentVM->definition()->name() << ") for our VM of agent" << agentName;
-                    }
-                    break;
-                }
+                agentVM = iterator;
+                break;
             }
         }
-        // Already a definition with this name
-        else
+
+        if (agentVM != NULL)
         {
-            qDebug() << "There is already an agent definition for name" << definitionName;
-
-            DefinitionM* sameDefinition = NULL;
-
-            foreach (DefinitionM* iterator, agentDefinitionsList) {
-                if ((iterator != NULL)
-                        &&
-                        // Same version
-                        (iterator->version() == definition->version())
-                        &&
-                        // Same Inputs, Outputs and Parameters
-                        (iterator->md5Hash() == definition->md5Hash()))
-                {
-                    qDebug() << "There is exactly the same agent definition for name" << definitionName << "and version" << definition->version();
-
-                    // Exactly the same definition
-                    sameDefinition = iterator;
-                    break;
-                }
-            }
-
-            // Definition is different
-            if (sameDefinition == NULL)
+            // New name of definition
+            if (agentDefinitionsList.count() == 0)
             {
-                // Update the list in the map
+                // Insert the list in the map
                 agentDefinitionsList.append(definition);
                 _mapFromNameToAgentDefinitionsList.insert(definitionName, agentDefinitionsList);
 
-                foreach (AgentVM* agentVM, agentViewModelsList)
+                agentVM->setdefinition(definition);
+            }
+            // Already a definition with this name
+            else
+            {
+                qDebug() << "There is already an agent definition for name" << definitionName;
+
+                DefinitionM* sameDefinition = NULL;
+                AgentVM* agentUsingSameDefinition = NULL;
+
+                foreach (AgentVM* iterator, agentViewModelsList)
                 {
-                    // If the model is the same
-                    if ((agentVM != NULL) && (agentVM->modelM() == agent))
+                    // If this VM contains our model of agent
+                    if ((iterator != NULL) && (iterator->definition() != NULL)
+                            &&
+                            // Same version
+                            (iterator->definition()->version() == definition->version())
+                            &&
+                            // Same Inputs, Outputs and Parameters
+                            (iterator->definition()->md5Hash() == definition->md5Hash()))
                     {
-                        // Check that the definition is not yet defined
-                        if (agentVM->definition() == NULL)
-                        {
-                            agentVM->setdefinition(definition);
-                        }
-                        else {
-                            qCritical() << "There is already a definition (" << agentVM->definition()->name() << ") for our VM of agent" << agentName;
-                        }
+                        qDebug() << "There is exactly the same agent definition for name" << definitionName << "and version" << definition->version();
+
+                        // Exactly the same definition
+                        sameDefinition = iterator->definition();
+                        agentUsingSameDefinition = iterator;
                         break;
                     }
                 }
-            }
-            // Exactly the same definition
-            else
-            {
-                foreach (AgentVM* agentVM, agentViewModelsList) {
-                    if (agentVM != NULL)
+
+                // Exactly the same definition
+                if ((sameDefinition != NULL) && (agentUsingSameDefinition != NULL))
+                {
+                    //
+                    // 1- The view model is useless, we have to remove it
+                    //
+
+                    // Update the list in the map
+                    agentViewModelsList.removeOne(agentVM);
+                    _mapFromNameToAgentViewModelsList.insert(agentName, agentViewModelsList);
+
+                    // Remove the view model from the list
+                    _allAgentsVM.remove(agentVM);
+
+                    // Free memory
+                    delete agentVM;
+                    agentVM = NULL;
+
+
+                    //
+                    // 2- Then, add our model to the view model having the same definition
+                    //
+                    bool isSameModel = false;
+                    QList<AgentM*> models = agentUsingSameDefinition->models()->toList();
+                    for (int i = 0; i < models.count(); i++)
                     {
-                        // "(simple) Agent VM" which manage one model of agent
-                        if (agentVM->modelM() != NULL)
+                        AgentM* model = models.at(i);
+
+                        // Same address and status is OFF
+                        if ((model != NULL) && (model->address() == agent->address()) && (model->status() == AgentStatus::OFF))
                         {
-                            // Same address, hostname and status is OFF
-                            if ((agentVM->modelM()->address() == agent->address()) && (agentVM->modelM()->hostname() == agent->hostname())
-                                    && (agentVM->modelM()->status() == AgentStatus::OFF))
-                            {
-                                AgentM* previousModel = agentVM->modelM();
+                            isSameModel = true;
 
-                                // We replace the model
-                                agentVM->setmodelM(agent);
+                            // Replace the model
+                            agentUsingSameDefinition->models()->replace(i, agent);
 
-                                // Previous model is useless, we free memory
-                                _mapFromPeerIdToAgentM.remove(previousModel->peerId());
-                                delete previousModel;
-                            }
-                            else
-                            {
-                                // Create a VM of "Cloned" agent
-                                ClonedAgentVM* clonedAgent = new ClonedAgentVM(agentName, this);
+                            qDebug() << "Replace model of agent" << agentName << "on" << agent->address();
 
-                                clonedAgent->setdefinition(sameDefinition);
+                            // Free previous model of agent
+                            delete model;
 
-                                clonedAgent->models()->append(agentVM->modelM());
-                                clonedAgent->models()->append(agent);
-
-                                QList<AgentVM*> newListOfAgentViewModels = QList<AgentVM*>(agentViewModelsList);
-                                newListOfAgentViewModels.removeOne(agentVM);
-                                newListOfAgentViewModels.append(clonedAgent);
-                                _mapFromNameToAgentViewModelsList.insert(agentName, newListOfAgentViewModels);
-
-                                // Free useless definition
-                                delete definition;
-                            }
-                        }
-                        // "Cloned Agent VM" which manage several models of agent
-                        else
-                        {
-                            // FIXME: check status and hostname ?
-
-                            ClonedAgentVM* clonedAgent = dynamic_cast<ClonedAgentVM*>(agentVM);
-                            if ((clonedAgent != NULL) && (clonedAgent->definition() == sameDefinition))
-                            {
-                                // FIXME: replace a model if same hostname and status OFF ?
-
-                                // Add the model of agent to the list of the VM
-                                clonedAgent->models()->append(agent);
-
-                                // Free useless definition
-                                delete definition;
-                            }
+                            // break loop on models
+                            break;
                         }
                     }
+
+                    if (!isSameModel) {
+                        // Add the model of agent to the list of the VM
+                        agentUsingSameDefinition->models()->append(agent);
+
+                        qDebug() << "Add model of agent" << agentName << "on" << agent->address();
+                    }
+
+                    // Free useless definition
+                    delete definition;
+                }
+                // Definition is different
+                else
+                {
+                    // Update the list in the map
+                    agentDefinitionsList.append(definition);
+                    _mapFromNameToAgentDefinitionsList.insert(definitionName, agentDefinitionsList);
+
+                    agentVM->setdefinition(definition);
                 }
             }
         }
