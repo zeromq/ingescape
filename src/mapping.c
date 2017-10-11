@@ -126,6 +126,121 @@ mapping_element_t * mapping_createMappingElement(const char * input_name,
     return new_map_elmt;
 }
 
+bool mapping_checkCompatibilityInputOutput(agent_iop *foundInput, agent_iop *foundOutput)
+{
+    // Remarks:
+    //TODO case output is a string not handled for numerical input. Case of Bool ("true" and "false")
+    //TODO Impulsion case. New value output = impulsion triggered in input.
+    
+    bool isCompatible = false;
+    
+    switch (foundInput->value_type) {
+        case INTEGER_T:
+            switch (foundOutput->value_type) {
+                case INTEGER_T:
+                    isCompatible = true;
+                    break;
+                    
+                case DOUBLE_T:
+                    isCompatible = true;
+                    //mtic_debug("Warning: Mapping a mapping is done between an input of type INT with an output of type DOUBLE.");
+                    break;
+                    
+                default:
+                    isCompatible = false;
+                    mtic_debug("Error: mapping_checkCompatibilityInputOutput: The input and output have incompatible type.");
+                    break;
+            }
+            break;
+            
+        case DOUBLE_T:
+            switch (foundOutput->value_type) {
+                case INTEGER_T:
+                    isCompatible = true;
+                    //mtic_debug("Warning: network_checkCompatibilityInputOutput: A mapping is done between an input of type DOUBLE with an output of type INT.");
+                    break;
+                    
+                case DOUBLE_T:
+                    isCompatible = true;
+                    break;
+                    
+                default:
+                    isCompatible = false;
+                    mtic_debug("Error: network_checkCompatibilityInputOutput: The input and output have incompatible type. ");
+                    break;
+            }
+            break;
+            
+        case STRING_T:
+            switch (foundOutput->value_type) {
+                    
+                case INTEGER_T:
+                    isCompatible = true;
+                    mtic_debug("Warning: network_checkCompatibilityInputOutput: A mapping is done between an input of type STRING with an output of type INT.");
+                    break;
+                    
+                case DOUBLE_T:
+                    isCompatible = true;
+                    mtic_debug("Warning: network_checkCompatibilityInputOutput: A mapping is done between an input of type STRING with an output of type DOUBLE.");
+                    break;
+                    
+                case BOOL_T:
+                    isCompatible = true;
+                    mtic_debug("Warning: network_checkCompatibilityInputOutput: A mapping is done between an input of type STRING with an output of type BOOL.");
+                    break;
+                    
+                case STRING_T:
+                    isCompatible = true;
+                    break;
+                    
+                default:
+                    isCompatible = false;
+                    mtic_debug("Error: network_checkCompatibilityInputOutput: The input and output have incompatible type. ");
+                    break;
+            }
+            break;
+            
+        case BOOL_T:
+            switch (foundOutput->value_type) {
+                case BOOL_T:
+                    isCompatible = true;
+                    break;
+                    
+                default:
+                    isCompatible = false;
+                    mtic_debug("Error: network_checkCompatibilityInputOutput: The input and output have incompatible type. ");
+                    break;
+            }
+            break;
+            
+        case IMPULSION_T:
+            if(foundOutput->value_type == IMPULSION_T)
+            {
+                isCompatible = true;
+            }
+            else
+            {
+                mtic_debug("Error: network_checkCompatibilityInputOutput: The input and output have incompatible type. ");
+                isCompatible = false;
+            }
+            break;
+            
+        case DATA_T:
+            //At the developer's discretion
+            if(foundOutput->value_type == DATA_T){
+                isCompatible = true;
+            }
+            else
+            {
+                mtic_debug("Error: network_checkCompatibilityInputOutput: The input and output have incompatible type. ");
+                isCompatible = false;
+            }
+            
+            break;
+    }
+    
+    return isCompatible;
+}
 
 ////////////////////////////////////////////////////////////////////////
 // PUBLIC API
