@@ -6,6 +6,9 @@
 
 #include <I2PropertyHelpers.h>
 
+/**
+ * @brief The ElementMappingM class defines a model of a mapping node as described in the JSON of the agent mapping.
+ */
 class ElementMappingM : public QObject
 {  
     Q_OBJECT
