@@ -275,6 +275,26 @@ QList<AgentM*> MasticModelManager::getAgentModelsListFromName(QString name)
 
 
 /**
+ * @brief Delete a model of Agent
+ * @param agant
+ */
+void MasticModelManager::deleteAgentModel(AgentM* agent)
+{
+    if (agent != NULL)
+    {
+        QList<AgentM*> agentModelsList = getAgentModelsListFromName(agent->name());
+        agentModelsList.removeOne(agent);
+
+        // Update the list in the map
+        _mapFromNameToAgentModelsList.insert(agent->name(), agentModelsList);
+
+        // Free memory
+        delete agent;
+    }
+}
+
+
+/**
  * @brief Get the list (of models) of agent definition from a name
  * @param name
  * @return
@@ -307,6 +327,27 @@ QList<AgentVM*> MasticModelManager::getAgentViewModelsListFromName(QString name)
 
 
 /**
+ * @brief Delete the previous view model of Agent
+ * @param agent
+ */
+void MasticModelManager::deleteAgentViewModel(AgentVM* agent)
+{
+    if (agent != NULL)
+    {
+        // Get the list of view models of agent from a name
+        QList<AgentVM*> agentViewModelsList = getAgentViewModelsListFromName(agent->name());
+        agentViewModelsList.removeOne(agent);
+
+        // Update the list in the map
+        _mapFromNameToAgentViewModelsList.insert(agent->name(), agentViewModelsList);
+
+        // Free memory
+        delete agent;
+    }
+}
+
+
+/**
  * @brief Manage the new model of agent
  * @param agent
  */
@@ -320,10 +361,10 @@ void MasticModelManager::_manageNewModelOfAgent(AgentM* agent)
         QList<AgentM*> agentModelsList = getAgentModelsListFromName(agentName);
         QList<AgentVM*> agentViewModelsList = getAgentViewModelsListFromName(agentName);
 
-        // We don't have yet a definition for this agent, so we create a new VM until we will get its definition
-
         agentModelsList.append(agent);
         _mapFromNameToAgentModelsList.insert(agentName, agentModelsList);
+
+        // We don't have yet a definition for this agent, so we create a new VM until we will get its definition
 
         // Create a new view model of agent
         AgentVM* agentVM = new AgentVM(agent, this);
@@ -352,8 +393,7 @@ void MasticModelManager::_manageNewDefinitionOfAgent(DefinitionM* definition, Ag
         // Get the list (of models) of agent definition from a name
         QList<DefinitionM*> agentDefinitionsList = getAgentDefinitionsListFromName(definitionName);
 
-        // Get the list of models and view models of agent from a name
-        //QList<AgentM*> agentModelsList = getAgentModelsListFromName(agentName);
+        // Get the list of view models of agent from a name
         QList<AgentVM*> agentViewModelsList = getAgentViewModelsListFromName(agentName);
 
         AgentVM* agentVM = NULL;
@@ -412,18 +452,12 @@ void MasticModelManager::_manageNewDefinitionOfAgent(DefinitionM* definition, Ag
                 if ((sameDefinition != NULL) && (agentUsingSameDefinition != NULL))
                 {
                     //
-                    // 1- The view model is useless, we have to remove it
+                    // 1- The previous view model of agent is useless, we have to remove it from the list
                     //
-
-                    // Update the list in the map
-                    agentViewModelsList.removeOne(agentVM);
-                    _mapFromNameToAgentViewModelsList.insert(agentName, agentViewModelsList);
-
-                    // Remove the view model from the list
                     _allAgentsVM.remove(agentVM);
 
-                    // Free memory
-                    delete agentVM;
+                    // And delete it
+                    deleteAgentViewModel(agentVM);
                     agentVM = NULL;
 
 
@@ -446,8 +480,9 @@ void MasticModelManager::_manageNewDefinitionOfAgent(DefinitionM* definition, Ag
 
                             qDebug() << "Replace model of agent" << agentName << "on" << agent->address();
 
-                            // Free previous model of agent
-                            delete model;
+                            // Delete the previous model of Agent
+                            deleteAgentModel(model);
+                            model = NULL;
 
                             // break loop on models
                             break;
@@ -461,7 +496,7 @@ void MasticModelManager::_manageNewDefinitionOfAgent(DefinitionM* definition, Ag
                         qDebug() << "Add model of agent" << agentName << "on" << agent->address();
                     }
 
-                    // Free useless definition
+                    // Free useless definition (never added into the hash)
                     delete definition;
                 }
                 // Definition is different

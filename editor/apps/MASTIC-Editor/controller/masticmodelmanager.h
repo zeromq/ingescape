@@ -70,6 +70,13 @@ public:
 
 
     /**
+     * @brief Delete a model of Agent
+     * @param agant
+     */
+    void deleteAgentModel(AgentM* agent);
+
+
+    /**
      * @brief Get the list (of models) of agent definition from a name
      * @param name
      * @return
@@ -83,6 +90,13 @@ public:
      * @return
      */
     QList<AgentVM*> getAgentViewModelsListFromName(QString name);
+
+
+    /**
+     * @brief Delete the previous view model of Agent
+     * @param agent
+     */
+    void deleteAgentViewModel(AgentVM* agent);
 
 
 Q_SIGNALS:
