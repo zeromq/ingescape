@@ -22,7 +22,6 @@
 
 #include <model/jsonhelper.h>
 #include <viewModel/agentvm.h>
-#include <viewModel/clonedagentvm.h>
 #include <viewModel/linkvm.h>
 
 
@@ -84,22 +83,6 @@ public:
      * @return
      */
     QList<AgentVM*> getAgentViewModelsListFromName(QString name);
-
-
-    /**
-     * @brief Add a new view model of agent into our list
-     * @param definition
-     * @param agent
-     * @param status
-     */
-    void addNewAgentVMToList(DefinitionM* definition, AgentM* agent, AgentStatus::Value status);
-    
-
-    /**
-     * @brief Delete an agent from our list
-     * @param agent view model
-     */
-    //void deleteAgentVMFromList(AgentVM* agentModelToDelete);
 
 
 Q_SIGNALS:

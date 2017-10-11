@@ -28,13 +28,24 @@
 
 /**
  * @brief The AgentVM class defines a view model of agent
+ * Allows to manage when several agents have exactly the same name and the same definition
+ * Only Peer ID is different (and HostName can also be different)
  */
 class AgentVM : public QObject
 {
     Q_OBJECT
 
+    // Name of our agent
+    I2_QML_PROPERTY_CUSTOM_SETTER(QString, name)
+
     // Model of our agent
-    I2_QML_PROPERTY_READONLY(AgentM*, modelM)
+    //I2_QML_PROPERTY_READONLY(AgentM*, modelM)
+
+    // List of models of agents
+    I2_QOBJECT_LISTMODEL(AgentM, models)
+
+    // Address(es) on the network of our agent(s)
+    I2_QML_PROPERTY_READONLY(QString, addresses)
 
     // Model of the agent definition
     I2_QML_PROPERTY_READONLY_CUSTOM_SETTER(DefinitionM*, definition)
@@ -51,17 +62,23 @@ class AgentVM : public QObject
     // List of VM of parameters
     I2_QOBJECT_LISTMODEL(AgentIOPVM, parametersList)
 
+    // Status: can be ON, OFF, ON Asked or OFF Asked
+    I2_QML_PROPERTY(AgentStatus::Value, status)
+
     // State string defined by the agent
     I2_QML_PROPERTY(QString, state)
 
     // Abscissa of our view
-    I2_QML_PROPERTY(qreal, x)
+    //I2_QML_PROPERTY(qreal, x)
 
     // Ordinate of our view
-    I2_QML_PROPERTY(qreal, y)
+    //I2_QML_PROPERTY(qreal, y)
 
     // Flag indicating if our agent is muted
     I2_QML_PROPERTY(bool, isMuted)
+
+    // Flag indicating if our agent can be frozen
+    I2_QML_PROPERTY_READONLY(bool, canBeFrozen)
 
     // Flag indicating if our agent is frozen
     I2_QML_PROPERTY(bool, isFrozen)
@@ -84,6 +101,19 @@ public:
 Q_SIGNALS:
 
 public Q_SLOTS:
+
+    /**
+     * @brief Slot when the list of models changed
+     */
+    void onModelsChanged();
+
+
+private:
+    /**
+     * @brief Update with the list of models
+     */
+    void _updateWithModels();
+
 };
 
 QML_DECLARE_TYPE(AgentVM)

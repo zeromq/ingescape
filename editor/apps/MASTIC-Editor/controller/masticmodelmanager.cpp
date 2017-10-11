@@ -132,96 +132,6 @@ MasticModelManager::~MasticModelManager()
 
 
 /**
- * @brief Add a new view model of agent into our list
- * @param definition
- * @param agent
- * @param status
- */
-void MasticModelManager::addNewAgentVMToList(DefinitionM* definition, AgentM* agent, AgentStatus::Value status)
-{
-    Q_UNUSED(status)
-
-    if ((definition != NULL) && (agent != NULL))
-    {
-        /*// Add our model to the list
-        //_allAgentsModel.append(agent);
-
-        //QString newAgentKey = agentModelToAdd->name().replace(" ","").trimmed().toUpper() + agentModelToAdd->version().replace(" ","").trimmed().toUpper();
-
-        QString agentName = agent->name();
-
-        if (!_mapFromNameToAgentM.contains(agentName))
-        {
-            //_mapFromNameToAgentM.insert(agentName, agent);
-
-            // Create a new view model of agent
-            AgentVM* newAgentVM = new AgentVM(agent, this);
-            newAgentVM->setdefinition(definition);
-            newAgentVM->setstatus(status);
-
-            //_mapFromNameToAgentVM.insert(agentName, newAgentVM);
-
-            // Add our view model to the list
-            _allAgentsVM.append(newAgentVM);
-
-            if (!agent->peerId().isEmpty())
-            {
-                QString peerId = agent->peerId();
-
-                if (!_mapFromPeerIdToAgentM.contains(peerId))
-                {
-                    _mapFromPeerIdToAgentM.insert(peerId, agent);
-                }
-                if (!_mapFromPeerIdToAgentVM.contains(peerId))
-                {
-                    _mapFromPeerIdToAgentVM.insert(peerId, newAgentVM);
-                }
-            }
-        }
-        else
-        {
-            AgentM* agentWithSameNameM = _mapFromNameToAgentM.value(agentName);
-            AgentVM* agentWithSameNameVM = _mapFromNameToAgentVM.value(agentName);
-
-            if ((agentWithSameNameM != NULL) && (agentWithSameNameVM != NULL) && (agentWithSameNameVM->definition() != NULL))
-            {
-                agentWithSameNameVM->setstatus(AgentStatus::ON);
-
-                // FIXME: test all the definition
-                if (definition->name() == agentWithSameNameVM->definition()->name())
-                {
-                    //ClonedAgentVM* clonedAgent
-                }
-            }
-        }
-
-        // Name and version are identical, the agents are potentially the same
-        if (_mapAgentsVMPerNameAndVersion.contains(newAgentKey) == true)
-        {
-            AgentVM* mainAgent = _mapAgentsVMPerNameAndVersion.value(newAgentKey);
-
-            // Case 1 : name and version and defintion are exactly the same.
-            if(mainAgent->modelM() != NULL && mainAgent->modelM()->md5Hash().compare(agentModelToAdd->md5Hash()) == 0)
-            {
-                mainAgent->listIdenticalAgentsVM()->append(newAgentVM);
-            }
-            // Case 2 : name and version are exactly the same, but the definition is different.
-            else {
-                mainAgent->listSimilarAgentsVM()->append(newAgentVM);
-            }
-        }
-        // Case 3 : agent does not exists, we simply create a new one
-        else {
-            _allAgentsVM.append(newAgentVM);
-
-            // Create a new entry for our agent
-            _mapAgentsVMPerNameAndVersion.insert(newAgentKey,newAgentVM);
-        }*/
-    }
-}
-
-
-/**
  * @brief Slot when an agent enter the network
  * @param peerId
  * @param agentName
@@ -310,85 +220,9 @@ void MasticModelManager::onAgentExited(QString peerId, QString agentName)
         // Update the status
         agent->setstatus(AgentStatus::OFF);
 
-        // FIXME: Need to replace ClonedAgentVM by a simple AgentVM ?
+        // FIXME: nothing more ?
     }
 }
-
-
-/**
- * @brief Delete an agent from our list
- * @param agent view model
- */
-/*void MasticModelManager::deleteAgentVMFromList(AgentVM* agentModelToDelete)
-{
-    if (agentModelToDelete != NULL && agentModelToDelete->modelM() != NULL && agentModelToDelete->status() != AgentStatus::ON)
-    {
-        QString agentKey = agentModelToDelete->modelM()->name().replace(" ","").trimmed().toUpper() + agentModelToDelete->modelM()->version().replace(" ","").trimmed().toUpper();
-
-        // Name and version are identical, the agents are potentially the same
-        if(_mapAgentsVMPerNameAndVersion.contains(agentKey) == true)
-        {
-            AgentVM* mainAgent = _mapAgentsVMPerNameAndVersion.value(agentKey);
-
-            if(mainAgent == agentModelToDelete)
-            {
-                _mapAgentsVMPerNameAndVersion.remove(agentKey);
-
-                if(agentModelToDelete->listIdenticalAgentsVM()->count() > 0
-                        || agentModelToDelete->listSimilarAgentsVM()->count() > 0)
-                {
-                    AgentVM* newMainAgent = NULL;
-                    if(agentModelToDelete->listIdenticalAgentsVM()->count() > 0)
-                    {
-                        newMainAgent = agentModelToDelete->listIdenticalAgentsVM()->at(0);
-                        agentModelToDelete->listIdenticalAgentsVM()->remove(newMainAgent);
-                    } else if (agentModelToDelete->listSimilarAgentsVM()->count() > 0)
-                    {
-                        newMainAgent = agentModelToDelete->listSimilarAgentsVM()->at(0);
-                        agentModelToDelete->listSimilarAgentsVM()->remove(newMainAgent);
-                    }
-
-                    if(newMainAgent != NULL)
-                    {
-                        newMainAgent->listIdenticalAgentsVM()->append(agentModelToDelete->listIdenticalAgentsVM()->toList());
-                        newMainAgent->listSimilarAgentsVM()->append(agentModelToDelete->listSimilarAgentsVM()->toList());
-
-                        _mapAgentsVMPerNameAndVersion.insert(agentKey,newMainAgent);
-
-                        // Remove the agent
-                        _allAgentsVM.remove(agentModelToDelete);
-                        _allAgentsVM.append(newMainAgent);
-                        agentModelToDelete->listIdenticalAgentsVM()->clear();
-                        agentModelToDelete->listSimilarAgentsVM()->clear();
-
-                        delete agentModelToDelete;
-                        agentModelToDelete = NULL;
-                    }
-                } else {
-                    // Remove the agent
-                    _allAgentsVM.remove(agentModelToDelete);
-                    delete agentModelToDelete;
-                    agentModelToDelete = NULL;
-                }
-            }
-            // The item to delete is from a sub list
-            else {
-                if(mainAgent->listIdenticalAgentsVM()->contains(agentModelToDelete))
-                {
-                    mainAgent->listIdenticalAgentsVM()->remove(agentModelToDelete);
-                } else if(mainAgent->listSimilarAgentsVM()->contains(agentModelToDelete))
-                {
-                    mainAgent->listSimilarAgentsVM()->remove(agentModelToDelete);
-                }
-
-                // Remove the agent
-                _allAgentsVM.remove(agentModelToDelete);
-                delete agentModelToDelete;
-                agentModelToDelete = NULL;
-            }
-        }
-    }
-}*/
 
 
 /**
@@ -469,7 +303,21 @@ void MasticModelManager::_manageNewModelOfAgent(AgentM* agent)
         QList<AgentM*> agentModelsList = getAgentModelsListFromName(agentName);
         QList<AgentVM*> agentViewModelsList = getAgentViewModelsListFromName(agentName);
 
-        if ((agentModelsList.count() == 0) && (agentViewModelsList.count() == 0))
+        // We don't have yet a definition for this agent, so we create a new VM until we will get its definition
+
+        agentModelsList.append(agent);
+        _mapFromNameToAgentModelsList.insert(agentName, agentModelsList);
+
+        // Create a new view model of agent
+        AgentVM* agentVM = new AgentVM(agent, this);
+
+        // Add our view model to the list
+        _allAgentsVM.append(agentVM);
+
+        agentViewModelsList.append(agentVM);
+        _mapFromNameToAgentViewModelsList.insert(agentName, agentViewModelsList);
+
+        /*if ((agentModelsList.count() == 0) && (agentViewModelsList.count() == 0))
         {
             agentModelsList.append(agent);
             _mapFromNameToAgentModelsList.insert(agentName, agentModelsList);
@@ -498,7 +346,7 @@ void MasticModelManager::_manageNewModelOfAgent(AgentM* agent)
                     }
                 }
             }
-        }
+        }*/
     }
 }
 
@@ -531,8 +379,8 @@ void MasticModelManager::_manageNewDefinitionOfAgent(DefinitionM* definition, Ag
 
             foreach (AgentVM* agentVM, agentViewModelsList)
             {
-                // If the model is the same
-                if ((agentVM != NULL) && (agentVM->modelM() == agent))
+                // If this VM contains our model of agent
+                if ((agentVM != NULL) && agentVM->models()->contains(agent))
                 {
                     // Check that the definition is not yet defined
                     if (agentVM->definition() == NULL)
@@ -579,8 +427,8 @@ void MasticModelManager::_manageNewDefinitionOfAgent(DefinitionM* definition, Ag
 
                 foreach (AgentVM* agentVM, agentViewModelsList)
                 {
-                    // If the model is the same
-                    if ((agentVM != NULL) && (agentVM->modelM() == agent))
+                    // If this VM contains our model of agent
+                    if ((agentVM != NULL) && agentVM->models()->contains(agent))
                     {
                         // Check that the definition is not yet defined
                         if (agentVM->definition() == NULL)
@@ -597,11 +445,14 @@ void MasticModelManager::_manageNewDefinitionOfAgent(DefinitionM* definition, Ag
             // Exactly the same definition
             else
             {
-                foreach (AgentVM* agentVM, agentViewModelsList) {
+                foreach (AgentVM* agentVM, agentViewModelsList)
+                {
                     if (agentVM != NULL)
                     {
+                        Q_UNUSED(agentVM)
+
                         // "(simple) Agent VM" which manage one model of agent
-                        if (agentVM->modelM() != NULL)
+                        /*if (agentVM->modelM() != NULL)
                         {
                             // Same address, hostname and status is OFF
                             if ((agentVM->modelM()->address() == agent->address()) && (agentVM->modelM()->hostname() == agent->hostname())
@@ -651,7 +502,7 @@ void MasticModelManager::_manageNewDefinitionOfAgent(DefinitionM* definition, Ag
                                 // Free useless definition
                                 delete definition;
                             }
-                        }
+                        }*/
                     }
                 }
             }

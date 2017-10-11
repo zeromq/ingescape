@@ -31,8 +31,7 @@ SOURCES += main.cpp \
     misc/masticeditorutils.cpp \
     viewModel/linkvm.cpp \
     model/definitionm.cpp \
-    model/agentmappingm.cpp \
-    viewModel/clonedagentvm.cpp
+    model/agentmappingm.cpp
 
 
 HEADERS += \
@@ -60,8 +59,7 @@ HEADERS += \
     uthash/utvector.h \
     viewModel/linkvm.h \
     model/definitionm.h \
-    model/agentmappingm.h \
-    viewModel/clonedagentvm.h
+    model/agentmappingm.h
 
 
 RESOURCES += qml.qrc
