@@ -316,37 +316,6 @@ void MasticModelManager::_manageNewModelOfAgent(AgentM* agent)
 
         agentViewModelsList.append(agentVM);
         _mapFromNameToAgentViewModelsList.insert(agentName, agentViewModelsList);
-
-        /*if ((agentModelsList.count() == 0) && (agentViewModelsList.count() == 0))
-        {
-            agentModelsList.append(agent);
-            _mapFromNameToAgentModelsList.insert(agentName, agentModelsList);
-
-            // Create a new view model of agent
-            AgentVM* agentVM = new AgentVM(agent, this);
-
-            // Add our view model to the list
-            _allAgentsVM.append(agentVM);
-
-            agentViewModelsList.append(agentVM);
-            _mapFromNameToAgentViewModelsList.insert(agentName, agentViewModelsList);
-        }
-        else
-        {
-            // FIXME: TODO
-            qDebug() << "There is already a model of agent for name" << agentName;
-
-            foreach (AgentM* iterator, agentModelsList) {
-                if (iterator != NULL)
-                {
-                    // Same agent name and same hostname
-                    if ((iterator->address() == agent->address()) && (iterator->hostname() == agent->hostname()))
-                    {
-                        qDebug() << "Same agent name and same hostname";
-                    }
-                }
-            }
-        }*/
     }
 }
 
@@ -370,146 +339,122 @@ void MasticModelManager::_manageNewDefinitionOfAgent(DefinitionM* definition, Ag
         //QList<AgentM*> agentModelsList = getAgentModelsListFromName(agentName);
         QList<AgentVM*> agentViewModelsList = getAgentViewModelsListFromName(agentName);
 
-        // New name of definition
-        if (agentDefinitionsList.count() == 0)
-        {
-            // Insert the list in the map
-            agentDefinitionsList.append(definition);
-            _mapFromNameToAgentDefinitionsList.insert(definitionName, agentDefinitionsList);
+        AgentVM* agentVM = NULL;
 
-            foreach (AgentVM* agentVM, agentViewModelsList)
+        // Get the view model of agent that corresponds to our model
+        foreach (AgentVM* iterator, agentViewModelsList)
+        {
+            // If the view model has not yet a definition and contains our model of agent
+            if ((iterator != NULL) && (iterator->definition() == NULL) && iterator->models()->contains(agent))
             {
-                // If this VM contains our model of agent
-                if ((agentVM != NULL) && agentVM->models()->contains(agent))
-                {
-                    // Check that the definition is not yet defined
-                    if (agentVM->definition() == NULL)
-                    {
-                        agentVM->setdefinition(definition);
-                    }
-                    else {
-                        qCritical() << "There is already a definition (" << agentVM->definition()->name() << ") for our VM of agent" << agentName;
-                    }
-                    break;
-                }
+                agentVM = iterator;
+                break;
             }
         }
-        // Already a definition with this name
-        else
+
+        if (agentVM != NULL)
         {
-            qDebug() << "There is already an agent definition for name" << definitionName;
-
-            DefinitionM* sameDefinition = NULL;
-
-            foreach (DefinitionM* iterator, agentDefinitionsList) {
-                if ((iterator != NULL)
-                        &&
-                        // Same version
-                        (iterator->version() == definition->version())
-                        &&
-                        // Same Inputs, Outputs and Parameters
-                        (iterator->md5Hash() == definition->md5Hash()))
-                {
-                    qDebug() << "There is exactly the same agent definition for name" << definitionName << "and version" << definition->version();
-
-                    // Exactly the same definition
-                    sameDefinition = iterator;
-                    break;
-                }
-            }
-
-            // Definition is different
-            if (sameDefinition == NULL)
+            // New name of definition
+            if (agentDefinitionsList.count() == 0)
             {
-                // Update the list in the map
+                // Insert the list in the map
                 agentDefinitionsList.append(definition);
                 _mapFromNameToAgentDefinitionsList.insert(definitionName, agentDefinitionsList);
 
-                foreach (AgentVM* agentVM, agentViewModelsList)
-                {
-                    // If this VM contains our model of agent
-                    if ((agentVM != NULL) && agentVM->models()->contains(agent))
-                    {
-                        // Check that the definition is not yet defined
-                        if (agentVM->definition() == NULL)
-                        {
-                            agentVM->setdefinition(definition);
-                        }
-                        else {
-                            qCritical() << "There is already a definition (" << agentVM->definition()->name() << ") for our VM of agent" << agentName;
-                        }
-                        break;
-                    }
-                }
+                agentVM->setdefinition(definition);
             }
-            // Exactly the same definition
+            // Already a definition with this name
             else
             {
-                AgentVM* uselessAgentVM = NULL;
+                qDebug() << "There is already an agent definition for name" << definitionName;
 
-                foreach (AgentVM* agentVM, agentViewModelsList)
+                DefinitionM* sameDefinition = NULL;
+                AgentVM* agentUsingSameDefinition = NULL;
+
+                foreach (AgentVM* iterator, agentViewModelsList)
                 {
-                    // TODO + If this VM contains our model of agent
-                    if ((agentVM != NULL) && (agentVM->definition() == NULL) && agentVM->models()->contains(agent)) {
-                        uselessAgentVM = agentVM;
+                    // If this VM contains our model of agent
+                    if ((iterator != NULL) && (iterator->definition() != NULL)
+                            &&
+                            // Same version
+                            (iterator->definition()->version() == definition->version())
+                            &&
+                            // Same Inputs, Outputs and Parameters
+                            (iterator->definition()->md5Hash() == definition->md5Hash()))
+                    {
+                        qDebug() << "There is exactly the same agent definition for name" << definitionName << "and version" << definition->version();
+
+                        // Exactly the same definition
+                        sameDefinition = iterator->definition();
+                        agentUsingSameDefinition = iterator;
                         break;
                     }
                 }
 
-                if (uselessAgentVM != NULL) {
+                // Exactly the same definition
+                if ((sameDefinition != NULL) && (agentUsingSameDefinition != NULL))
+                {
+                    //
+                    // 1- The view model is useless, we have to remove it
+                    //
+
                     // Update the list in the map
-                    agentViewModelsList.removeOne(uselessAgentVM);
+                    agentViewModelsList.removeOne(agentVM);
                     _mapFromNameToAgentViewModelsList.insert(agentName, agentViewModelsList);
 
-                    // Remove this view model from the list
-                    _allAgentsVM.remove(uselessAgentVM);
+                    // Remove the view model from the list
+                    _allAgentsVM.remove(agentVM);
 
                     // Free memory
-                    delete uselessAgentVM;
-                }
+                    delete agentVM;
+                    agentVM = NULL;
 
-                // Traverse the updated list of view models
-                foreach (AgentVM* agentVM, agentViewModelsList)
-                {
-                    if ((agentVM != NULL) && (agentVM->definition() == sameDefinition))
+
+                    //
+                    // 2- Then, add our model to the view model having the same definition
+                    //
+                    bool isSameModel = false;
+                    QList<AgentM*> models = agentUsingSameDefinition->models()->toList();
+                    for (int i = 0; i < models.count(); i++)
                     {
-                        bool isSameModel = false;
-                        QList<AgentM*> models = agentVM->models()->toList();
-                        for (int i = 0; i < models.count(); i++)
+                        AgentM* model = models.at(i);
+
+                        // Same address and status is OFF
+                        if ((model != NULL) && (model->address() == agent->address()) && (model->status() == AgentStatus::OFF))
                         {
-                            AgentM* model = models.at(i);
+                            isSameModel = true;
 
-                            // Same address and status is OFF
-                            if ((model != NULL) && (model->address() == agent->address()) && (model->status() == AgentStatus::OFF))
-                            {
-                                isSameModel = true;
+                            // Replace the model
+                            agentUsingSameDefinition->models()->replace(i, agent);
 
-                                // Replace the model
-                                agentVM->models()->replace(i, agent);
+                            qDebug() << "Replace model of agent" << agentName << "on" << agent->address();
 
-                                qDebug() << "Replace model of agent" << agentName << "on" << agent->address();
+                            // Free previous model of agent
+                            delete model;
 
-                                // Free previous model of agent
-                                delete model;
-
-                                // break loop on models
-                                break;
-                            }
+                            // break loop on models
+                            break;
                         }
-
-                        if (!isSameModel) {
-                            // Add the model of agent to the list of the VM
-                            agentVM->models()->append(agent);
-
-                            qDebug() << "Add model of agent" << agentName << "on" << agent->address();
-                        }
-
-                        // Free useless definition
-                        delete definition;
-
-                        // break loop on view models
-                        break;
                     }
+
+                    if (!isSameModel) {
+                        // Add the model of agent to the list of the VM
+                        agentUsingSameDefinition->models()->append(agent);
+
+                        qDebug() << "Add model of agent" << agentName << "on" << agent->address();
+                    }
+
+                    // Free useless definition
+                    delete definition;
+                }
+                // Definition is different
+                else
+                {
+                    // Update the list in the map
+                    agentDefinitionsList.append(definition);
+                    _mapFromNameToAgentDefinitionsList.insert(definitionName, agentDefinitionsList);
+
+                    agentVM->setdefinition(definition);
                 }
             }
         }

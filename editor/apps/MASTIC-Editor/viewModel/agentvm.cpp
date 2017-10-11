@@ -26,14 +26,11 @@
  */
 AgentVM::AgentVM(AgentM* model, QObject *parent) : QObject(parent),
     _name(""),
-    //_modelM(model),
     _addresses(""),
     _definition(NULL),
     _isFictitious(true),
     _status(AgentStatus::OFF),
     _state(""),
-    //_x(0),
-    //_y(0),
     _isMuted(false),
     _canBeFrozen(false),
     _isFrozen(false)
@@ -46,23 +43,20 @@ AgentVM::AgentVM(AgentM* model, QObject *parent) : QObject(parent),
         // Init the name
         _name = model->name();
 
-        // Add to the list
-        _models.append(model);
-
         if (model->peerId().isEmpty()) {
             _isFictitious = true;
-            qInfo() << "New View Model of FICTITIOUS Agent" << model->name();
+            qInfo() << "New View Model of FICTITIOUS Agent" << _name;
         }
         else {
             _isFictitious = false;
-            qInfo() << "New View Model of Agent" << model->name() << "with peer id" << model->peerId();
+            qInfo() << "New View Model of Agent" << _name << "with peer id" << model->peerId();
         }
-
-        // Update with the list of models
-        _updateWithModels();
 
         // Connect to signal "Count Changed" from the list of models
         connect(&_models, &AbstractI2CustomItemListModel::countChanged, this, &AgentVM::onModelsChanged);
+
+        // Add to the list
+        _models.append(model);
     }
     else
     {
@@ -76,22 +70,19 @@ AgentVM::AgentVM(AgentM* model, QObject *parent) : QObject(parent),
  */
 AgentVM::~AgentVM()
 {
+    qInfo() << "Delete View Model of Agent" << _name;
+
     if (_definition != NULL)
     {
         setdefinition(NULL);
     }
 
-    /*if (_modelM != NULL)
-    {
-        qInfo() << "Delete View Model of Agent" << _modelM->name() << "(" << _modelM->peerId() << ")";
+    // Clear the lists of models
+    _previousAgentsList.clear();
 
-        setmodelM(NULL);
-    }*/
-
-    // Clear the list of models
-    _models.clear();
     // Free the memory elsewhere
     //_models.deleteAllItems();
+    _models.clear();
 }
 
 
@@ -192,10 +183,52 @@ void AgentVM::setdefinition(DefinitionM *value)
  */
 void AgentVM::onModelsChanged()
 {
-    qDebug() << _models.count() << "models";
+    QList<AgentM*> newAgentsList = _models.toList();
+
+    // Model of agent added
+    if (_previousAgentsList.count() < newAgentsList.count())
+    {
+        qDebug() << _previousAgentsList.count() << "--> ADD --> " << newAgentsList.count();
+
+        for (AgentM* model : newAgentsList) {
+            if ((model != NULL) && !_previousAgentsList.contains(model))
+            {
+                // Connect to signal "Status Changed" from a model
+                connect(model, &AgentM::statusChanged, this, &AgentVM::onModelStatusChanged);
+            }
+        }
+    }
+    // Model of agent removed
+    else if (_previousAgentsList.count() > newAgentsList.count())
+    {
+        qDebug() << _previousAgentsList.count() << "--> REMOVE --> " << newAgentsList.count();
+
+        for (AgentM* model : _previousAgentsList) {
+            if ((model != NULL) && !newAgentsList.contains(model))
+            {
+                // DIS-connect from signal "Status Changed" from a model
+                disconnect(model, &AgentM::statusChanged, this, &AgentVM::onModelStatusChanged);
+            }
+        }
+    }
+
+    _previousAgentsList = newAgentsList;
 
     // Update with the list of models
     _updateWithModels();
+}
+
+
+/**
+ * @brief Slot when the "Status" of a model changed
+ * @param status
+ */
+void AgentVM::onModelStatusChanged(AgentStatus::Value status)
+{
+    Q_UNUSED(status)
+
+    // Update the status in function of status of models
+    _updateStatus();
 }
 
 
@@ -204,17 +237,13 @@ void AgentVM::onModelsChanged()
  */
 void AgentVM::_updateWithModels()
 {
-    AgentStatus::Value globalStatus = AgentStatus::OFF;
     QStringList addressesList;
     QString globalAddresses = "";
     bool globalCanBeFrozen = false;
 
     foreach (AgentM* model, _models.toList()) {
-        if (model != NULL) {
-            if (model->status() == AgentStatus::ON) {
-                globalStatus = AgentStatus::ON;
-            }
-
+        if (model != NULL)
+        {
             /*if (!addressesList.contains(model->address())) {
                 addressesList.append(model->address());
             }*/
@@ -238,6 +267,30 @@ void AgentVM::_updateWithModels()
     }
 
     setaddresses(globalAddresses);
-    setstatus(globalStatus);
     setcanBeFrozen(globalCanBeFrozen);
+
+    // Update the status in function of status of models
+    _updateStatus();
+}
+
+
+/**
+ * @brief Update the status in function of status of models
+ */
+void AgentVM::_updateStatus()
+{
+    AgentStatus::Value globalStatus = AgentStatus::OFF;
+
+    foreach (AgentM* model, _models.toList()) {
+        if (model != NULL)
+        {
+            // Use switch case if we need to manage transition status "..._ASKED"
+
+            if (model->status() == AgentStatus::ON) {
+                globalStatus = AgentStatus::ON;
+            }
+        }
+    }
+
+    setstatus(globalStatus);
 }

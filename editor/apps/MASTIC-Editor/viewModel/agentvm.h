@@ -38,9 +38,6 @@ class AgentVM : public QObject
     // Name of our agent
     I2_QML_PROPERTY_CUSTOM_SETTER(QString, name)
 
-    // Model of our agent
-    //I2_QML_PROPERTY_READONLY(AgentM*, modelM)
-
     // List of models of agents
     I2_QOBJECT_LISTMODEL(AgentM, models)
 
@@ -67,12 +64,6 @@ class AgentVM : public QObject
 
     // State string defined by the agent
     I2_QML_PROPERTY(QString, state)
-
-    // Abscissa of our view
-    //I2_QML_PROPERTY(qreal, x)
-
-    // Ordinate of our view
-    //I2_QML_PROPERTY(qreal, y)
 
     // Flag indicating if our agent is muted
     I2_QML_PROPERTY(bool, isMuted)
@@ -108,11 +99,29 @@ public Q_SLOTS:
     void onModelsChanged();
 
 
+    /**
+     * @brief Slot when the "Status" of a model changed
+     * @param status
+     */
+    void onModelStatusChanged(AgentStatus::Value status);
+
+
 private:
     /**
      * @brief Update with the list of models
      */
     void _updateWithModels();
+
+
+    /**
+     * @brief Update the status in function of status of models
+     */
+    void _updateStatus();
+
+
+private:
+    // Previous list of models of agents
+    QList<AgentM*> _previousAgentsList;
 
 };
 

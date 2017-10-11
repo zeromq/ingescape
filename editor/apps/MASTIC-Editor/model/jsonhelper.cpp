@@ -113,8 +113,8 @@ DefinitionM* JsonHelper::createModelOfDefinition(QByteArray byteArrayOfJson)
                 QString md5Hash = QString(QCryptographicHash::hash(byteArrayOfJson, QCryptographicHash::Md5).toHex());
                 definition->setmd5Hash(md5Hash);
 
-                qDebug() << "md5:" << md5Hash;
-                qDebug() << "json:" << jsonDefinition;
+                //qDebug() << "md5:" << md5Hash;
+                //qDebug() << "json:" << jsonDefinition;
             }
         }
     }
