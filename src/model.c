@@ -1319,7 +1319,7 @@ int mtic_writeInput(const char *name, char *value, long size){
         ret = mtic_writeInputAsData(name, value, size);
         break;
     default:
-        mtic_debug("%s: Agent's input %s has not a known type\n.", __FUNCTION__,  name);
+        mtic_debug("%s: input %s has unknown type\n.", __FUNCTION__,  name);
         break;
 
     }
@@ -1389,7 +1389,7 @@ int mtic_writeOutput(const char *name, char *value, long size){
         ret = mtic_writeOutputAsData(name, value, size);
         break;
     default:
-        mtic_debug("%s: Agent's output %s has not a known type\n.", __FUNCTION__,  name);
+        mtic_debug("%s: output %s has unknown type\n.", __FUNCTION__,  name);
         break;
 
     }
@@ -1457,7 +1457,7 @@ int mtic_writeParameter(const char *name, char *value, long size){
         break;
     case IMPULSION_T:
     default:
-        mtic_debug("%s: Agent's parameter %s has not a known type\n.", __FUNCTION__,  name);
+        mtic_debug("%s: parameter %s has unknown type\n.", __FUNCTION__,  name);
         break;
 
     }
@@ -1481,14 +1481,37 @@ int mtic_writeInputAsBool(const char *name, bool value){
 
     // Check if the iop has been returned.
     if(iop == NULL){
-        mtic_debug("%s : Agent's input '%s' cannot be found", __FUNCTION__, name);
+        mtic_debug("%s : input '%s' cannot be found", __FUNCTION__, name);
         return 0;
     }
-
-    //Check the value type as a bool.
-    if(iop->value_type != BOOL_T){
-        mtic_debug("%s: Agent's input '%s' is not a bool", __FUNCTION__,  name);
-        return 0;
+    
+    double v = 0;
+    
+    switch (iop->value_type) {
+        case BOOL_T:
+            //the easy case
+            model_setIopValue(iop, (void*) &value, sizeof(bool));
+            break;
+        case INTEGER_T:
+            //the other easy case
+            model_setIopValue(iop, (void*) &value, sizeof(bool));
+            break;
+        case DOUBLE_T:
+            v = value;
+            model_setIopValue(iop, (void*) &v, sizeof(bool));
+            break;
+        case STRING_T:
+            if (value){
+                model_setIopValue(iop, (void*) "true", 0);
+            }else{
+                model_setIopValue(iop, (void*) "false", 0);
+            }
+            break;
+        case DATA_T:
+            mtic_debug("%s: input '%s' is not compatible with bool values", __FUNCTION__,  name);
+            return 0;
+        case IMPULSION_T:
+            return mtic_writeInputAsImpulsion(name);
     }
 
     // update the value in the iop_live structure
@@ -1621,14 +1644,21 @@ int mtic_writeInputAsImpulsion(const char *name){
 
     // Check if the iop has been returned.
     if(iop == NULL){
-        mtic_debug("%s : Agent's input '%s' cannot be found\n", __FUNCTION__, name);
+        mtic_debug("%s : input '%s' cannot be found\n", __FUNCTION__, name);
         return 0;
     }
 
-    //Check the value type as an impulsion.
+    //Check the value type as an impulsion
     if(iop->value_type != IMPULSION_T){
-        mtic_debug("%s: Agent's input '%s' is not an impulsion\n", __FUNCTION__,  name);
-        return 0;
+        if (iop->value_type != DATA_T){
+            mtic_debug("%s : input '%s' is of type data and cannot handle an impulsion\n", __FUNCTION__,  name);
+            return 0;
+        }else{
+            //If not impulsion and not data, we continue by running the callbacks and just display an information.
+            //Callbacks will be executed with the current input value.
+            mtic_debug("%s : input '%s' is not an impulsion but implicit conversion is allowed for this type\n", __FUNCTION__,  name);
+        }
+        
     }
 
     // call the callbacks associated to if it exist
@@ -1654,13 +1684,13 @@ int mtic_writeInputAsData(const char *name, void *value, long size){
 
     // Check if the iop has been returned.
     if(iop == NULL){
-        mtic_debug("%s : Agent's input '%s' cannot be found\n", __FUNCTION__, name);
+        mtic_debug("%s : input %s cannot be found\n", __FUNCTION__, name);
         return 0;
     }
 
-    //Check the value type as an impulsion.
+    //Check the value type as data
     if(iop->value_type != DATA_T){
-        mtic_debug("%s: Agent's input '%s' is not an data\n", __FUNCTION__,  name);
+        mtic_debug("%s: input '%s' is not a data and will not be written\n", __FUNCTION__,  name);
         return 0;
     }
 
@@ -1841,14 +1871,21 @@ int mtic_writeOutputAsImpulsion(const char *name){
 
     // Check if the iop has been returned.
     if(iop == NULL){
-        mtic_debug("%s : Agent's output '%s' cannot be found\n", __FUNCTION__, name);
+        mtic_debug("%s : output '%s' cannot be found\n", __FUNCTION__, name);
         return 0;
     }
-
-    //Check the value type as an impulsion.
+    
+    //Check the value type as an impulsion
     if(iop->value_type != IMPULSION_T){
-        mtic_debug("%s: Agent's output '%s' is not a impulsion\n", __FUNCTION__,  name);
-        return 0;
+        if (iop->value_type != DATA_T){
+            mtic_debug("%s : output '%s' is of type data and cannot handle an impulsion\n", __FUNCTION__,  name);
+            return 0;
+        }else{
+            //If not impulsion and not data, we continue by running the callbacks and just display an information.
+            //Callbacks will be executed with the current input value.
+            mtic_debug("%s : output '%s' is not an impulsion but implicit conversion is allowed for this type\n", __FUNCTION__,  name);
+        }
+        
     }
 
     // call the callbacks associated to if it exist
@@ -1876,13 +1913,13 @@ int mtic_writeOutputAsData(const char *name, void *value, long size){
 
     // Check if the iop has been returned.
     if(iop == NULL){
-        mtic_debug("%s : Agent's output '%s' cannot be found\n", __FUNCTION__, name);
+        mtic_debug("%s : output %s cannot be found\n", __FUNCTION__, name);
         return 0;
     }
-
+    
     //Check the value type as an impulsion.
     if(iop->value_type != DATA_T){
-        mtic_debug("%s: Agent's output '%s' is not an data\n", __FUNCTION__,  name);
+        mtic_debug("%s: output '%s' is not a data and will not be written\n", __FUNCTION__,  name);
         return 0;
     }
 
@@ -2055,13 +2092,13 @@ int mtic_writeParameterAsData(const char *name, void *value, long size){
 
     // Check if the iop has been returned.
     if(iop == NULL){
-        mtic_debug("%s : Agent's parameter '%s' cannot be found\n", __FUNCTION__, name);
+        mtic_debug("%s : parameter %s cannot be found\n", __FUNCTION__, name);
         return 0;
     }
-
-    //Check the value type as an impulsion.
+    
+    //Check the value type as data
     if(iop->value_type != DATA_T){
-        mtic_debug("%s: Agent's parameter '%s' is not an data\n", __FUNCTION__,  name);
+        mtic_debug("%s: parameter '%s' is not a data and will not be written\n", __FUNCTION__,  name);
         return 0;
     }
 
