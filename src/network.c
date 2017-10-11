@@ -201,7 +201,7 @@ int network_manageSubscriberMapping(subscriber_t *subscriber){
                 }
                 //check type compatibility between input and output value types
                 //including implicit conversions
-                if (foundOutput != NULL && foundInput != NULL && network_checkCompatibilityInputOutput(foundInput, foundOutput)){
+                if (foundOutput != NULL && foundInput != NULL && mapping_checkCompatibilityInputOutput(foundInput, foundOutput)){
                     //we have validated input, agent and output names : we can map
                     //NOTE: the call below may happen several times if our agent uses
                     //the external agent ouput on several of its inputs. This should not have any consequence.
@@ -370,14 +370,18 @@ int manageSubscription (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                             }else{
                                 if (strcmp(elmt->agent_name, foundSubscriber->agentName) == 0
                                     && strcmp(elmt->output_name, output) == 0){
-                                    //we have a fully matching mapping element
-                                    //TODO: we can do types conversion between input and ouput here if we want
-                                    //for now, we use output type
+                                    //we have a fully matching mapping element : write from received output to our input
                                     if (foundOutput->value_type == DATA_T){
+                                        //If the remote output is data, we write our input as data : no type conversion
+                                        //mtic_writeInputAsData will reject writing if our input is not data
                                         mtic_writeInputAsData(elmt->input_name, data, size);
                                     }else if (foundOutput->value_type == IMPULSION_T){
+                                        //If the remote output is impulsion, we write our input as impulsion :
+                                        //this is an implicit type conversion as mtic_writeInputAsImpulsion
                                         mtic_writeInputAsImpulsion(elmt->input_name);
                                     }else{
+                                        //TODO: we can do types conversion between input and ouput here if we want
+                                        //for now, we use output type
                                         mtic_writeInput(elmt->input_name, value, 0); //size is not used for these types
                                     }
                                 }
@@ -1056,119 +1060,6 @@ int network_observeZyre(network_zyreIncoming cb, void *myData){
         return 0;
     }
     return 1;
-}
-
-bool network_checkCompatibilityInputOutput(agent_iop *foundInput, agent_iop *foundOutput)
-{
-    // Remarks:
-    //TODO case output is a string not handled for numerical input. Case of Bool ("true" and "false")
-    //TODO Impulsion case. New value output = impulsion triggered in input.
-
-    bool isCompatible = false;
-
-    switch (foundInput->value_type) {
-    case INTEGER_T:
-        switch (foundOutput->value_type) {
-        case INTEGER_T:
-            isCompatible = true;
-            break;
-
-        case DOUBLE_T:
-            isCompatible = true;
-            mtic_debug("Warning: Mapping a mapping is done between an input of type INT with an output of type DOUBLE.");
-            break;
-
-        default:
-            isCompatible = false;
-            mtic_debug("Error: network_checkCompatibilityInputOutput: The input and output have incompatible type.");
-            break;
-        }
-        break;
-
-    case DOUBLE_T:
-        switch (foundOutput->value_type) {
-        case INTEGER_T:
-            isCompatible = true;
-            mtic_debug("Warning: network_checkCompatibilityInputOutput: A mapping is done between an input of type DOUBLE with an output of type INT.");
-            break;
-
-        case DOUBLE_T:
-            isCompatible = true;
-            break;
-
-        default:
-            isCompatible = false;
-            mtic_debug("Error: network_checkCompatibilityInputOutput: The input and output have incompatible type. ");
-            break;
-        }
-        break;
-
-    case STRING_T:
-        switch (foundOutput->value_type) {
-
-        case INTEGER_T:
-            isCompatible = true;
-            mtic_debug("Warning: network_checkCompatibilityInputOutput: A mapping is done between an input of type STRING with an output of type INT.");
-            break;
-
-        case DOUBLE_T:
-            isCompatible = true;
-            mtic_debug("Warning: network_checkCompatibilityInputOutput: A mapping is done between an input of type STRING with an output of type DOUBLE.");
-            break;
-
-        case BOOL_T:
-            isCompatible = true;
-            mtic_debug("Warning: network_checkCompatibilityInputOutput: A mapping is done between an input of type STRING with an output of type BOOL.");
-            break;
-
-        case STRING_T:
-            isCompatible = true;
-            break;
-
-        default:
-            isCompatible = false;
-            mtic_debug("Error: network_checkCompatibilityInputOutput: The input and output have incompatible type. ");
-            break;
-        }
-        break;
-
-    case BOOL_T:
-        switch (foundOutput->value_type) {
-        case BOOL_T:
-            isCompatible = true;
-            break;
-
-        default:
-            isCompatible = false;
-            mtic_debug("Error: network_checkCompatibilityInputOutput: The input and output have incompatible type. ");
-            break;
-        }
-        break;
-
-    case IMPULSION_T:
-        if(foundOutput->value_type == IMPULSION_T){
-            isCompatible = true;
-        }
-        else{
-            mtic_debug("Error: network_checkCompatibilityInputOutput: The input and output have incompatible type. ");
-            isCompatible = false;
-        }
-        break;
-
-    case DATA_T:
-        //At the developer's discretion
-        if(foundOutput->value_type == DATA_T){
-            isCompatible = true;
-        }
-        else{
-            mtic_debug("Error: network_checkCompatibilityInputOutput: The input and output have incompatible type. ");
-            isCompatible = false;
-        }
-
-        break;
-    }
-
-    return isCompatible;
 }
 
 ////////////////////////////////////////////////////////////////////////
