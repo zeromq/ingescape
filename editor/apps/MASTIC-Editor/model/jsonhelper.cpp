@@ -122,6 +122,58 @@ DefinitionM* JsonHelper::createModelOfDefinition(QByteArray byteArrayOfJson)
     return definition;
 }
 
+AgentMappingM* JsonHelper::createModelOfAgentMapping(QString inputAgentName, QByteArray byteArrayOfJson)
+{
+    AgentMappingM* agentMapping = NULL;
+
+    QJsonDocument jsonAgentMapping = QJsonDocument::fromJson(byteArrayOfJson);
+
+    if (jsonAgentMapping.isObject())
+    {
+        QJsonObject jsonObject = jsonAgentMapping.object();
+
+        QJsonValue jsonMapping = jsonObject.value("mapping");
+        if (jsonMapping.isObject())
+        {
+            QJsonObject jsonSubObject = jsonMapping.toObject();
+
+            QJsonValue jsonName = jsonSubObject.value("name");
+            QJsonValue jsonDescription = jsonSubObject.value("description");
+            QJsonValue jsonVersion = jsonSubObject.value("version");
+            QJsonValue jsonMappingOut = jsonSubObject.value("mapping_out");
+
+            if (jsonName.isString() && jsonDescription.isString() && jsonVersion.isString())
+            {
+                // Create the agent definition
+                agentMapping = new AgentMappingM(jsonName.toString(), jsonVersion.toString(), jsonDescription.toString());
+
+                if (jsonMappingOut.isArray()) {
+                    foreach (QJsonValue jsonMap, jsonMappingOut.toArray()) {
+                        if (jsonMap.isObject())
+                        {
+                            ElementMappingM* elementMapping = _createModelOfElementMapping (jsonMap.toObject());
+                            if (elementMapping != NULL) {
+                                elementMapping->setinputAgent(inputAgentName);
+                                agentMapping->elementMappingsList()->append(elementMapping);
+                            }
+                        }
+                    }
+                }
+
+                // Generate md5 value for the definition string
+                QString md5Hash = QString(QCryptographicHash::hash(byteArrayOfJson, QCryptographicHash::Md5).toHex());
+                agentMapping->setmd5Hash(md5Hash);
+
+                qDebug() << "md5:" << md5Hash;
+                qDebug() << "json:" << jsonMapping;
+            }
+        }
+    }
+
+
+    return agentMapping;
+}
+
 
 /**
  * @brief Create a model of agent Input/Output/Parameter with JSON
@@ -235,4 +287,26 @@ AgentIOPM* JsonHelper::_createModelOfAgentIOP(QJsonObject jsonObject)
     }
 
     return agentIOP;
+}
+
+ElementMappingM* JsonHelper::_createModelOfElementMapping(QJsonObject jsonObject)
+{
+    ElementMappingM* elementMapping = NULL;
+
+    QJsonValue jsonInputName = jsonObject.value("input_name");
+    QJsonValue jsonAgentName = jsonObject.value("agent_name");
+    QJsonValue jsonOutputName = jsonObject.value("output_name");
+
+    //All the members need to be completed
+    if (jsonInputName.isString() && jsonAgentName.isString() && jsonOutputName.isString())
+    {
+        elementMapping = new ElementMappingM(NULL,
+                                             jsonInputName.toString(),
+                                             jsonAgentName.toString(),
+                                             jsonOutputName.toString());
+
+
+    }
+
+    return elementMapping;
 }
