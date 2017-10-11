@@ -64,7 +64,7 @@ Item {
             right: parent.right
         }
 
-        model: MasticEditorC.modelManager.allAgentsVM
+        model: controller.agentsList
 
         delegate: componentAgentListItem
 
@@ -214,7 +214,7 @@ Item {
             id : agentListItem
 
             width: MasticTheme.leftPanelWidth
-            height: model.isFictitious ? 90 : 130
+            height: model.isFictitious ? 85 : 135
 
             Rectangle {
 
@@ -257,8 +257,8 @@ Item {
                         onClicked: {
                             if (controller)
                             {
-                                console.log("Delete agent from the list : " + model.name)
-                                controller.deleteAgentFromList(model.QtObject);
+                                //console.log("QML: Delete agent from the list: " + model.name)
+                                controller.deleteAgent(model.QtObject);
                             }
                         }
                     }
@@ -275,7 +275,7 @@ Item {
 
                             height: 25
                             color: MasticTheme.agentsListLabelColor
-                            font: MasticTheme.normalFont
+                            font: MasticTheme.heading2Font
                         }
 
                         Text {
