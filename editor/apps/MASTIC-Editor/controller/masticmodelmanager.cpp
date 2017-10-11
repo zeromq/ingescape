@@ -445,64 +445,70 @@ void MasticModelManager::_manageNewDefinitionOfAgent(DefinitionM* definition, Ag
             // Exactly the same definition
             else
             {
+                AgentVM* uselessAgentVM = NULL;
+
                 foreach (AgentVM* agentVM, agentViewModelsList)
                 {
-                    if (agentVM != NULL)
+                    // TODO + If this VM contains our model of agent
+                    if ((agentVM != NULL) && (agentVM->definition() == NULL) && agentVM->models()->contains(agent)) {
+                        uselessAgentVM = agentVM;
+                        break;
+                    }
+                }
+
+                if (uselessAgentVM != NULL) {
+                    // Update the list in the map
+                    agentViewModelsList.removeOne(uselessAgentVM);
+                    _mapFromNameToAgentViewModelsList.insert(agentName, agentViewModelsList);
+
+                    // Remove this view model from the list
+                    _allAgentsVM.remove(uselessAgentVM);
+
+                    // Free memory
+                    delete uselessAgentVM;
+                }
+
+                // Traverse the updated list of view models
+                foreach (AgentVM* agentVM, agentViewModelsList)
+                {
+                    if ((agentVM != NULL) && (agentVM->definition() == sameDefinition))
                     {
-                        Q_UNUSED(agentVM)
-
-                        // "(simple) Agent VM" which manage one model of agent
-                        /*if (agentVM->modelM() != NULL)
+                        bool isSameModel = false;
+                        QList<AgentM*> models = agentVM->models()->toList();
+                        for (int i = 0; i < models.count(); i++)
                         {
-                            // Same address, hostname and status is OFF
-                            if ((agentVM->modelM()->address() == agent->address()) && (agentVM->modelM()->hostname() == agent->hostname())
-                                    && (agentVM->modelM()->status() == AgentStatus::OFF))
+                            AgentM* model = models.at(i);
+
+                            // Same address and status is OFF
+                            if ((model != NULL) && (model->address() == agent->address()) && (model->status() == AgentStatus::OFF))
                             {
-                                AgentM* previousModel = agentVM->modelM();
+                                isSameModel = true;
 
-                                // We replace the model
-                                agentVM->setmodelM(agent);
+                                // Replace the model
+                                agentVM->models()->replace(i, agent);
 
-                                // Previous model is useless, we free memory
-                                _mapFromPeerIdToAgentM.remove(previousModel->peerId());
-                                delete previousModel;
-                            }
-                            else
-                            {
-                                // Create a VM of "Cloned" agent
-                                ClonedAgentVM* clonedAgent = new ClonedAgentVM(agentName, this);
+                                qDebug() << "Replace model of agent" << agentName << "on" << agent->address();
 
-                                clonedAgent->setdefinition(sameDefinition);
+                                // Free previous model of agent
+                                delete model;
 
-                                clonedAgent->models()->append(agentVM->modelM());
-                                clonedAgent->models()->append(agent);
-
-                                QList<AgentVM*> newListOfAgentViewModels = QList<AgentVM*>(agentViewModelsList);
-                                newListOfAgentViewModels.removeOne(agentVM);
-                                newListOfAgentViewModels.append(clonedAgent);
-                                _mapFromNameToAgentViewModelsList.insert(agentName, newListOfAgentViewModels);
-
-                                // Free useless definition
-                                delete definition;
+                                // break loop on models
+                                break;
                             }
                         }
-                        // "Cloned Agent VM" which manage several models of agent
-                        else
-                        {
-                            // FIXME: check status and hostname ?
 
-                            ClonedAgentVM* clonedAgent = dynamic_cast<ClonedAgentVM*>(agentVM);
-                            if ((clonedAgent != NULL) && (clonedAgent->definition() == sameDefinition))
-                            {
-                                // FIXME: replace a model if same hostname and status OFF ?
+                        if (!isSameModel) {
+                            // Add the model of agent to the list of the VM
+                            agentVM->models()->append(agent);
 
-                                // Add the model of agent to the list of the VM
-                                clonedAgent->models()->append(agent);
+                            qDebug() << "Add model of agent" << agentName << "on" << agent->address();
+                        }
 
-                                // Free useless definition
-                                delete definition;
-                            }
-                        }*/
+                        // Free useless definition
+                        delete definition;
+
+                        // break loop on view models
+                        break;
                     }
                 }
             }
