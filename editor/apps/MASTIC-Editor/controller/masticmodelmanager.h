@@ -21,7 +21,7 @@
 #include <I2PropertyHelpers.h>
 
 #include <model/jsonhelper.h>
-#include <viewModel/agentvm.h>
+#include <model/agentm.h>
 #include <viewModel/linkvm.h>
 
 
@@ -34,9 +34,6 @@ class MasticModelManager : public QObject
 
     // List of all models of agents
     //I2_QOBJECT_LISTMODEL(AgentM, allAgents)
-
-    // List of all view model of agents
-    I2_QOBJECT_LISTMODEL(AgentVM, allAgentsVM)
 
 
 public:
@@ -85,21 +82,34 @@ public:
 
 
     /**
-     * @brief Get the list of view models of agent from a name
-     * @param name
-     * @return
+     * @brief Delete a model of agent definition
+     * @param definition
      */
-    QList<AgentVM*> getAgentViewModelsListFromName(QString name);
+    void deleteAgentDefinition(DefinitionM* definition);
 
 
     /**
-     * @brief Delete the previous view model of Agent
-     * @param agent
+     * @brief Initialize agents with JSON files
      */
-    void deleteAgentViewModel(AgentVM* agent);
+    void initAgentsWithFiles();
 
 
 Q_SIGNALS:
+
+    /**
+     * @brief Signal emitted when a new model of agent has been created
+     * @param agent
+     */
+    void agentModelCreated(AgentM* agent);
+
+
+    /**
+     * @brief Signal emitted when a new model of agent definition has been created
+     * @param definition
+     * @param agent
+     */
+    void agentDefinitionCreated(DefinitionM* definition, AgentM* agent);
+
 
 public Q_SLOTS:
 
@@ -169,9 +179,6 @@ private:
 
     // Map from "definition name" to a list (of models) of agent definition
     QHash<QString, QList<DefinitionM*>> _mapFromNameToAgentDefinitionsList;
-
-    // Map from agent name to a list of view models of agent
-    QHash<QString, QList<AgentVM*>> _mapFromNameToAgentViewModelsList;
 
 };
 

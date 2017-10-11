@@ -71,15 +71,23 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     // Create the controller for agents mapping
     _agentsMappingC = new AgentsMappingController(_modelManager, this);
 
-    // Create the controller for network comunications
+    // Create the controller for network communications
     _networkC = new NetworkController(_networkDevice, _ipAddress, _port, this);
 
+    // Connect to signals from the network controller
     connect(_networkC, &NetworkController::agentEntered, _modelManager, &MasticModelManager::onAgentEntered);
     connect(_networkC, &NetworkController::definitionReceived, _modelManager, &MasticModelManager::onDefinitionReceived);
     connect(_networkC, &NetworkController::agentExited, _modelManager, &MasticModelManager::onAgentExited);
 
-    //TEMP sleep to display our loading screen
-    QThread::msleep(4000);
+    // Connect to signals from the model manager
+    connect(_modelManager, &MasticModelManager::agentModelCreated, _agentsSupervisionC, &AgentsSupervisionController::onAgentModelCreated);
+    connect(_modelManager, &MasticModelManager::agentDefinitionCreated, _agentsSupervisionC, &AgentsSupervisionController::onAgentDefinitionCreated);
+
+    // Initialize agents with JSON files
+    _modelManager->initAgentsWithFiles();
+
+    // TEMP sleep to display our loading screen
+    QThread::msleep(2000);
 }
 
 
@@ -109,6 +117,8 @@ MasticEditorController::~MasticEditorController()
 
     if (_modelManager != NULL)
     {
+        disconnect(_modelManager);
+
         MasticModelManager* temp = _modelManager;
         setmodelManager(NULL);
         delete temp;
@@ -117,6 +127,8 @@ MasticEditorController::~MasticEditorController()
 
     if (_networkC != NULL)
     {
+        disconnect(_networkC);
+
         NetworkController* temp = _networkC;
         setnetworkC(NULL);
         delete temp;
