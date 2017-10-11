@@ -110,7 +110,24 @@ MasticModelManager::MasticModelManager(QObject *parent) : QObject(parent),
         {
             qDebug() << "File" << fileInfo.fileName() << "at" << fileInfo.absoluteFilePath();
 
-            // TODO: ESTIA
+            QFile jsonFile(fileInfo.absoluteFilePath());
+            if (jsonFile.open(QIODevice::ReadOnly))
+            {
+                QByteArray byteArrayOfJson = jsonFile.readAll();
+
+                // Create a model of agent mapping with JSON
+                AgentMappingM* agentMapping = _jsonHelper->createModelOfAgentMapping("agentUndefined", byteArrayOfJson);
+                if (agentMapping != NULL)
+                {
+                    //TODOESTIA : manage a mapping
+                }
+
+                jsonFile.close();
+            }
+            else
+            {
+                qCritical() << "Can not open file" << fileInfo.absoluteFilePath();
+            }
         }
     }
 }

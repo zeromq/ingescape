@@ -24,7 +24,7 @@
 
 //#include <model/agentm.h>
 #include <model/definitionm.h>
-
+#include <model/agentmappingm.h>
 
 /**
  * @brief The JsonHelper class defines a helper to manage JSON definitions of agents
@@ -54,6 +54,15 @@ public:
      */
     DefinitionM* createModelOfDefinition(QByteArray byteArrayOfJson);
 
+    /**
+     * @brief Create a model of agent mapping with JSON and the input agent name corresponding
+     * TODOESTIA : the input agent name will be extract from the network event "mapping"
+     * (voir avec vincent à l'appel de la fonction createModelOfAgentMapping dans networkmanager quand MAPPING event)
+     * @param inputAgentName, byteArrayOfJson
+     * @return
+     */
+    AgentMappingM* createModelOfAgentMapping(QString inputAgentName, QByteArray byteArrayOfJson);
+
 
 Q_SIGNALS:
 
@@ -67,6 +76,13 @@ private:
      * @return
      */
     AgentIOPM* _createModelOfAgentIOP(QJsonObject jsonObject);
+
+    /**
+     * @brief Create a model of element mapping Input name/Output agent name/Output name with JSON
+     * @param jsonObject
+     * @return
+     */
+    ElementMappingM* _createModelOfElementMapping(QJsonObject jsonObject);
 };
 
 #endif // JSONHELPER_H
