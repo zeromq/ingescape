@@ -1494,11 +1494,11 @@ int mtic_writeInputAsBool(const char *name, bool value){
             break;
         case INTEGER_T:
             //the other easy case
-            model_setIopValue(iop, (void*) &value, sizeof(bool));
+            model_setIopValue(iop, (void*) &value, sizeof(int));
             break;
         case DOUBLE_T:
             v = value;
-            model_setIopValue(iop, (void*) &v, sizeof(bool));
+            model_setIopValue(iop, (void*) &v, sizeof(double));
             break;
         case STRING_T:
             if (value){
