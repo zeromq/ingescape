@@ -253,13 +253,16 @@ void MasticModelManager::onAgentEntered(QString peerId, QString agentName, QStri
     if (!peerId.isEmpty() && !agentName.isEmpty() && !agentAddress.isEmpty())
     {
         AgentM* agent = getAgentModelFromPeerId(peerId);
-        if(agent != NULL)
+
+        // An agent with this peer id already exist
+        if (agent != NULL)
         {
             qInfo() << "The agent" << agentName << "with peer id" << peerId << "and address" << agentAddress << "is back on the network !";
 
             // Update the status
             agent->setstatus(AgentStatus::ON);
         }
+        // New peer id
         else
         {
             // Create a new model of agent
@@ -323,6 +326,8 @@ void MasticModelManager::onAgentExited(QString peerId, QString agentName)
 
         // Update the status
         agent->setstatus(AgentStatus::OFF);
+
+        // FIXME: Need to replace ClonedAgentVM by a simple AgentVM ?
     }
 }
 
@@ -495,9 +500,21 @@ void MasticModelManager::_manageNewModelOfAgent(AgentM* agent)
             agentViewModelsList.append(agentVM);
             _mapFromNameToAgentViewModelsList.insert(agentName, agentViewModelsList);
         }
-        else {
+        else
+        {
             // FIXME: TODO
             qDebug() << "There is already a model of agent for name" << agentName;
+
+            foreach (AgentM* iterator, agentModelsList) {
+                if (iterator != NULL)
+                {
+                    // Same agent name and same hostname
+                    if ((iterator->address() == agent->address()) && (iterator->hostname() == agent->hostname()))
+                    {
+                        qDebug() << "Same agent name and same hostname";
+                    }
+                }
+            }
         }
     }
 }
@@ -522,27 +539,139 @@ void MasticModelManager::_manageNewDefinitionOfAgent(DefinitionM* definition, Ag
         //QList<AgentM*> agentModelsList = getAgentModelsListFromName(agentName);
         QList<AgentVM*> agentViewModelsList = getAgentViewModelsListFromName(agentName);
 
-        if (agentDefinitionsList.count() == 0) {
+        // New name of definition
+        if (agentDefinitionsList.count() == 0)
+        {
+            // Insert the list in the map
             agentDefinitionsList.append(definition);
             _mapFromNameToAgentDefinitionsList.insert(definitionName, agentDefinitionsList);
 
-            if (agentViewModelsList.count() == 1) {
-                AgentVM* agentVM = agentViewModelsList.first();
-                // Check that the definition is not yet defined
-                if ((agentVM != NULL) && (agentVM->definition() == NULL))
+            foreach (AgentVM* agentVM, agentViewModelsList)
+            {
+                // If the model is the same
+                if ((agentVM != NULL) && (agentVM->modelM() == agent))
                 {
-                    agentVM->setdefinition(definition);
+                    // Check that the definition is not yet defined
+                    if (agentVM->definition() == NULL)
+                    {
+                        agentVM->setdefinition(definition);
+                    }
+                    else {
+                        qCritical() << "There is already a definition (" << agentVM->definition()->name() << ") for our VM of agent" << agentName;
+                    }
+                    break;
                 }
             }
-            else {
-                // FIXME: TODO
-                qDebug() << "There are already a model of agent for name" << agentName;
-            }
         }
+        // Already a definition with this name
         else
         {
-            // FIXME: TODO
-            qDebug() << "There is already a (model of) agent definition for name" << definitionName;
+            qDebug() << "There is already an agent definition for name" << definitionName;
+
+            DefinitionM* sameDefinition = NULL;
+
+            foreach (DefinitionM* iterator, agentDefinitionsList) {
+                if ((iterator != NULL)
+                        &&
+                        // Same version
+                        (iterator->version() == definition->version())
+                        &&
+                        // Same Inputs, Outputs and Parameters
+                        (iterator->md5Hash() == definition->md5Hash()))
+                {
+                    qDebug() << "There is exactly the same agent definition for name" << definitionName << "and version" << definition->version();
+
+                    // Exactly the same definition
+                    sameDefinition = iterator;
+                    break;
+                }
+            }
+
+            // Definition is different
+            if (sameDefinition == NULL)
+            {
+                // Update the list in the map
+                agentDefinitionsList.append(definition);
+                _mapFromNameToAgentDefinitionsList.insert(definitionName, agentDefinitionsList);
+
+                foreach (AgentVM* agentVM, agentViewModelsList)
+                {
+                    // If the model is the same
+                    if ((agentVM != NULL) && (agentVM->modelM() == agent))
+                    {
+                        // Check that the definition is not yet defined
+                        if (agentVM->definition() == NULL)
+                        {
+                            agentVM->setdefinition(definition);
+                        }
+                        else {
+                            qCritical() << "There is already a definition (" << agentVM->definition()->name() << ") for our VM of agent" << agentName;
+                        }
+                        break;
+                    }
+                }
+            }
+            // Exactly the same definition
+            else
+            {
+                foreach (AgentVM* agentVM, agentViewModelsList) {
+                    if (agentVM != NULL)
+                    {
+                        // "(simple) Agent VM" which manage one model of agent
+                        if (agentVM->modelM() != NULL)
+                        {
+                            // Same address, hostname and status is OFF
+                            if ((agentVM->modelM()->address() == agent->address()) && (agentVM->modelM()->hostname() == agent->hostname())
+                                    && (agentVM->modelM()->status() == AgentStatus::OFF))
+                            {
+                                AgentM* previousModel = agentVM->modelM();
+
+                                // We replace the model
+                                agentVM->setmodelM(agent);
+
+                                // Previous model is useless, we free memory
+                                _mapFromPeerIdToAgentM.remove(previousModel->peerId());
+                                delete previousModel;
+                            }
+                            else
+                            {
+                                // Create a VM of "Cloned" agent
+                                ClonedAgentVM* clonedAgent = new ClonedAgentVM(agentName, this);
+
+                                clonedAgent->setdefinition(sameDefinition);
+
+                                clonedAgent->models()->append(agentVM->modelM());
+                                clonedAgent->models()->append(agent);
+
+                                QList<AgentVM*> newListOfAgentViewModels = QList<AgentVM*>(agentViewModelsList);
+                                newListOfAgentViewModels.removeOne(agentVM);
+                                newListOfAgentViewModels.append(clonedAgent);
+                                _mapFromNameToAgentViewModelsList.insert(agentName, newListOfAgentViewModels);
+
+                                // Free useless definition
+                                delete definition;
+                            }
+                        }
+                        // "Cloned Agent VM" which manage several models of agent
+                        else
+                        {
+                            // FIXME: check status and hostname ?
+
+                            ClonedAgentVM* clonedAgent = dynamic_cast<ClonedAgentVM*>(agentVM);
+                            if ((clonedAgent != NULL) && (clonedAgent->definition() == sameDefinition))
+                            {
+                                // FIXME: replace a model if same hostname and status OFF ?
+
+                                // Add the model of agent to the list of the VM
+                                clonedAgent->models()->append(agent);
+
+                                // Free useless definition
+                                delete definition;
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
