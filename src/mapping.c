@@ -136,92 +136,52 @@ bool mapping_checkCompatibilityInputOutput(agent_iop *foundInput, agent_iop *fou
     
     switch (foundInput->value_type) {
         case INTEGER_T:
-            switch (foundOutput->value_type) {
-                case INTEGER_T:
-                    isCompatible = true;
-                    break;
-                    
-                case DOUBLE_T:
-                    isCompatible = true;
-                    //mtic_debug("Warning: Mapping a mapping is done between an input of type INT with an output of type DOUBLE.");
-                    break;
-                    
-                default:
-                    isCompatible = false;
-                    mtic_debug("Error: mapping_checkCompatibilityInputOutput: The input and output have incompatible type.");
-                    break;
+            if( foundOutput->value_type == DATA_T || foundOutput->value_type == STRING_T) {
+                isCompatible = false;
+                mtic_debug("%s: input '%s' and output '%s' have incompatible types", __FUNCTION__, foundInput->name, foundOutput->name);
+            }
+            else {
+                isCompatible = true;
             }
             break;
             
         case DOUBLE_T:
-            switch (foundOutput->value_type) {
-                case INTEGER_T:
-                    isCompatible = true;
-                    //mtic_debug("Warning: network_checkCompatibilityInputOutput: A mapping is done between an input of type DOUBLE with an output of type INT.");
-                    break;
-                    
-                case DOUBLE_T:
-                    isCompatible = true;
-                    break;
-                    
-                default:
-                    isCompatible = false;
-                    mtic_debug("Error: network_checkCompatibilityInputOutput: The input and output have incompatible type. ");
-                    break;
+            if(foundOutput->value_type == DATA_T  || foundOutput->value_type == STRING_T) {
+                isCompatible = false;
+                mtic_debug("%s: input '%s' and output '%s' have incompatible types", __FUNCTION__, foundInput->name, foundOutput->name);
             }
-            break;
-            
-        case STRING_T:
-            switch (foundOutput->value_type) {
-                    
-                case INTEGER_T:
-                    isCompatible = true;
-                    mtic_debug("Warning: network_checkCompatibilityInputOutput: A mapping is done between an input of type STRING with an output of type INT.");
-                    break;
-                    
-                case DOUBLE_T:
-                    isCompatible = true;
-                    mtic_debug("Warning: network_checkCompatibilityInputOutput: A mapping is done between an input of type STRING with an output of type DOUBLE.");
-                    break;
-                    
-                case BOOL_T:
-                    isCompatible = true;
-                    mtic_debug("Warning: network_checkCompatibilityInputOutput: A mapping is done between an input of type STRING with an output of type BOOL.");
-                    break;
-                    
-                case STRING_T:
-                    isCompatible = true;
-                    break;
-                    
-                default:
-                    isCompatible = false;
-                    mtic_debug("Error: network_checkCompatibilityInputOutput: The input and output have incompatible type. ");
-                    break;
+            else {
+                isCompatible = true;
             }
             break;
             
         case BOOL_T:
-            switch (foundOutput->value_type) {
-                case BOOL_T:
-                    isCompatible = true;
-                    break;
-                    
-                default:
-                    isCompatible = false;
-                    mtic_debug("Error: network_checkCompatibilityInputOutput: The input and output have incompatible type. ");
-                    break;
+            if(foundOutput->value_type == DATA_T  || foundOutput->value_type == STRING_T) {
+                isCompatible = false;
+                mtic_debug("%s: input '%s' and output '%s' have incompatible types", __FUNCTION__, foundInput->name, foundOutput->name);
+            }
+            else {
+                isCompatible = true;
+            }
+            break;
+
+        case STRING_T:
+            if(foundOutput->value_type == DATA_T) {
+                isCompatible = false;
+                mtic_debug("%s: input '%s' and output '%s' have incompatible types", __FUNCTION__, foundInput->name, foundOutput->name);
+            }
+            else {
+                isCompatible = true;
             }
             break;
             
         case IMPULSION_T:
-            if(foundOutput->value_type == IMPULSION_T)
-            {
-                isCompatible = true;
-            }
-            else
-            {
-                mtic_debug("Error: network_checkCompatibilityInputOutput: The input and output have incompatible type. ");
+            if(foundOutput->value_type == DATA_T) {
                 isCompatible = false;
+                mtic_debug("%s: input '%s' and output '%s' have incompatible types", __FUNCTION__, foundInput->name, foundOutput->name);
+            }
+            else {
+                isCompatible = true;
             }
             break;
             
@@ -232,7 +192,7 @@ bool mapping_checkCompatibilityInputOutput(agent_iop *foundInput, agent_iop *fou
             }
             else
             {
-                mtic_debug("Error: network_checkCompatibilityInputOutput: The input and output have incompatible type. ");
+                 mtic_debug("%s: input '%s' and output '%s' have incompatible types", __FUNCTION__, foundInput->name, foundOutput->name);
                 isCompatible = false;
             }
             

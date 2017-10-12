@@ -513,7 +513,12 @@ int mtic_readInputAsInt(const char *name){
             case DOUBLE_T:
                 //Handle the case: An implicit conversion can be done from double to int.
                 mtic_debug("mtic_readInputAsInt : Implicit conversion from double to int for the input {%s}.\n", name);
-                return (int) iop->value.d;
+                if(iop->value.d < 0) {
+                    return (int) (iop->value.d - 0.5);
+                }
+                else {
+                    return (int) (iop->value.d + 0.5);
+                }
                 break;
 
             case STRING_T:
@@ -789,7 +794,12 @@ int mtic_readOutputAsInt(const char *name){
             case DOUBLE_T:
                 //Handle the case: An implicit conversion can be done from double to int.
                 mtic_debug("mtic_readOutputAsInt : Implicit conversion from double to int for the output {%s}.", name);
-                return (int) iop->value.d;
+                if(iop->value.d < 0) {
+                    return (int) (iop->value.d - 0.5);
+                }
+                else {
+                    return (int) (iop->value.d + 0.5);
+                }
                 break;
 
             case STRING_T:
@@ -1064,7 +1074,12 @@ int mtic_readParameterAsInt(const char *name){
             case DOUBLE_T:
                 //Handle the case: An implicit conversion can be done from double to int.
                 mtic_debug("mtic_readParameterAsInt : Implicit conversion from double to int for the parameter {%s}.", name);
-                return (int) iop->value.d;
+                if(iop->value.d < 0) {
+                    return (int) (iop->value.d - 0.5);
+                }
+                else {
+                    return (int) (iop->value.d + 0.5);
+                }
                 break;
 
             case STRING_T:
@@ -1511,9 +1526,6 @@ int mtic_writeInputAsBool(const char *name, bool value){
             return mtic_writeInputAsImpulsion(name);
     }
 
-    // update the value in the iop_live structure
-    model_setIopValue(iop, (void*) &value, sizeof(bool));
-
     // call the callbacks associated to if it exist
     model_runObserveCallbacksForIOP(iop, (void*) &value, sizeof(bool));
 
@@ -1541,14 +1553,43 @@ int mtic_writeInputAsInt(const char *name, int value){
         return 0;
     }
 
-    //Check the value type as an integer.
-    if(iop->value_type != INTEGER_T){
-        mtic_debug("%s: Agent's input '%s' is not a integer", __FUNCTION__,  name);
-        return 0;
-    }
+    double dbl = 0;
+    int test = 0;
+    char* str = NULL;
 
-    // update the value in the iop_live structure
-    model_setIopValue(iop, (void*) &value, sizeof(int));
+    switch (iop->value_type) {
+        case BOOL_T:
+            //Different of 0 is true else is false;
+            model_setIopValue(iop, (void*) &value, sizeof(bool));
+            break;
+        case INTEGER_T:
+            //Direct
+            model_setIopValue(iop, (void*) &value, sizeof(int));
+            break;
+        case DOUBLE_T:
+            //Cast int to double
+            dbl = value;
+            model_setIopValue(iop, (void*) &dbl, sizeof(double));
+            break;
+        case STRING_T:
+            // Fail if test is negative
+            str = malloc(sizeof(int) + 1);
+            test = sprintf(str, "%d", value);
+            if(test < 0){
+                mtic_debug("%s: input '%s' Fail to convert value to string.", __FUNCTION__, name);
+                return 0;
+            }
+            else{
+                model_setIopValue(iop, (void*) str, 0);
+            }
+            free(str);
+            break;
+        case DATA_T:
+            mtic_debug("%s: input '%s' is not compatible with int values", __FUNCTION__,  name);
+            return 0;
+        case IMPULSION_T:
+            return mtic_writeInputAsImpulsion(name);
+    }
 
     // call the callbacks associated to if it exist
     model_runObserveCallbacksForIOP(iop, (void*) &value, sizeof(int));
@@ -1576,14 +1617,50 @@ int mtic_writeInputAsDouble(const char *name, double value){
         return 0;
     }
 
-    //Check the value type as a double.
-    if(iop->value_type != DOUBLE_T){
-        mtic_debug("%s: Agent's input '%s' is not a double\n", __FUNCTION__,  name);
-        return 0;
-    }
+    int integer = 0;
+    int test = 0;
+    char* str = NULL;
 
-    // update the value in the iop_live structure
-    model_setIopValue(iop, (void*) &value, sizeof(double));
+    switch (iop->value_type) {
+        case BOOL_T:
+            //Different of 0 is true else is false;
+            model_setIopValue(iop, (void*) &value, sizeof(bool));
+            break;
+        case INTEGER_T:
+            // Round to lower value
+            // Cast double to int if double is negative value add -1
+            if(value < 0) {
+                integer = (int) (value - 0.5);
+            }
+            else {
+                integer = (int) (value + 0.5);
+            }
+            model_setIopValue(iop, (void*) &integer, sizeof(int));
+            break;
+        case DOUBLE_T:
+            //Direct
+            model_setIopValue(iop, (void*) &value, sizeof(double));
+            break;
+        case STRING_T:
+            // Fail if test is negative
+            str = malloc(sizeof(double) + 1);
+            test = sprintf(str, "%f", value);
+            if(test < 0){
+                mtic_debug("%s: input '%s' Fail to convert value to string.", __FUNCTION__, name);
+                free(str);
+                return 0;
+            }
+            else{
+                model_setIopValue(iop, (void*) str, 0);
+            }
+            free(str);
+            break;
+        case DATA_T:
+            mtic_debug("%s: input '%s' is not compatible with double values", __FUNCTION__,  name);
+            return 0;
+        case IMPULSION_T:
+            return mtic_writeInputAsImpulsion(name);
+    }
 
     // call the callbacks associated to if it exist
     model_runObserveCallbacksForIOP(iop, (void*) &value, sizeof(double));
@@ -1611,14 +1688,25 @@ int mtic_writeInputAsString(const char *name, char *value){
         return 0;
     }
 
-    //Check the value type as a string.
-    if(iop->value_type != STRING_T){
-        mtic_debug("%s: Agent's input '%s' is not a string\n", __FUNCTION__,  name);
-        return 0;
+    switch (iop->value_type) {
+        case BOOL_T:
+            mtic_debug("%s: input '%s' is not compatible with string values", __FUNCTION__,  name);
+            return 0;
+        case INTEGER_T:
+            mtic_debug("%s: input '%s' is not compatible with string values", __FUNCTION__,  name);
+            return 0;
+        case DOUBLE_T:
+            mtic_debug("%s: input '%s' is not compatible with string values", __FUNCTION__,  name);
+            return 0;
+        case STRING_T:
+            model_setIopValue(iop, (void*) value, (strlen(value)+1)*sizeof(char));
+            break;
+        case DATA_T:
+            mtic_debug("%s: input '%s' is not compatible with string values", __FUNCTION__,  name);
+            return 0;
+        case IMPULSION_T:
+            return mtic_writeInputAsImpulsion(name);
     }
-
-    // update the value in the iop_live structure
-    model_setIopValue(iop, (void*) value, (strlen(value)+1)*sizeof(char));
 
     // call the callbacks associated to if it exist
     model_runObserveCallbacksForIOP(iop, (void*) &value, (strlen(value)+1)*sizeof(char));
@@ -1720,14 +1808,34 @@ int mtic_writeOutputAsBool(const char *name, bool value){
         return 0;
     }
 
-    //Check the value type as a bool.
-    if(iop->value_type != BOOL_T){
-        mtic_debug("%s: Agent's output '%s' is not a bool\n", __FUNCTION__,  name);
-        return 0;
-    }
+    double dbl = 0;
 
-    // update the value in the iop_live structure
-    model_setIopValue(iop, (void*) &value, sizeof(bool));
+    switch (iop->value_type) {
+        case BOOL_T:
+            //the easy case
+            model_setIopValue(iop, (void*) &value, sizeof(bool));
+            break;
+        case INTEGER_T:
+            //the other easy case
+            model_setIopValue(iop, (void*) &value, sizeof(int));
+            break;
+        case DOUBLE_T:
+            dbl = value;
+            model_setIopValue(iop, (void*) &dbl, sizeof(double));
+            break;
+        case STRING_T:
+            if (value){
+                model_setIopValue(iop, (void*) "true", 0);
+            }else{
+                model_setIopValue(iop, (void*) "false", 0);
+            }
+            break;
+        case DATA_T:
+            mtic_debug("%s: output '%s' is not compatible with bool values", __FUNCTION__,  name);
+            return 0;
+        case IMPULSION_T:
+            return mtic_writeOutputAsImpulsion(name);
+    }
 
     // call the callbacks associated to if it exist
     model_runObserveCallbacksForIOP(iop, (void*) &value, sizeof(bool));
@@ -1758,14 +1866,44 @@ int mtic_writeOutputAsInt(const char *name, int value){
         return 0;
     }
 
-    //Check the value type as a integer.
-    if(iop->value_type != INTEGER_T){
-        mtic_debug("%s: Agent's output '%s' is not a integer\n", __FUNCTION__,  name);
-        return 0;
-    }
+    double dbl = 0;
+    int test = 0;
+    char* str = NULL;
 
-    // update the value in the iop_live structure
-    model_setIopValue(iop, (void*) &value, sizeof(int));
+    switch (iop->value_type) {
+        case BOOL_T:
+            //Different of 0 is true else is false;
+            model_setIopValue(iop, (void*) &value, sizeof(bool));
+            break;
+        case INTEGER_T:
+            //Direct
+            model_setIopValue(iop, (void*) &value, sizeof(int));
+            break;
+        case DOUBLE_T:
+            //Cast int to double
+            dbl = value;
+            model_setIopValue(iop, (void*) &dbl, sizeof(double));
+            break;
+        case STRING_T:
+            // Fail if test is negative
+            str = malloc(sizeof(int) + 1);
+            test = sprintf(str, "%d", value);
+            if(test < 0){
+                mtic_debug("%s: output '%s' Fail to convert value to string.", __FUNCTION__, name);
+                free(str);
+                return 0;
+            }
+            else{
+                model_setIopValue(iop, (void*) str, 0);
+            }
+            free(str);
+            break;
+        case DATA_T:
+            mtic_debug("%s: output '%s' is not compatible with int values", __FUNCTION__,  name);
+            return 0;
+        case IMPULSION_T:
+            return mtic_writeOutputAsImpulsion(name);
+    }
     
     // call the callbacks associated to if it exist
     model_runObserveCallbacksForIOP(iop, (void*) &value, sizeof(int));
@@ -1797,14 +1935,50 @@ int mtic_writeOutputAsDouble(const char *name, double value){
         return 0;
     }
 
-    //Check the value type as a double.
-    if(iop->value_type != DOUBLE_T){
-        mtic_debug("%s: Agent's output '%s' is not a double\n", __FUNCTION__,  name);
-        return 0;
-    }
+    int test = 0;
+    int integer = 0;
+    char* str = NULL;
 
-    // update the value in the iop_live structure
-    model_setIopValue(iop, (void*) &value, sizeof(double));
+    switch (iop->value_type) {
+        case BOOL_T:
+            //Different of 0 is true else is false;
+            model_setIopValue(iop, (void*) &value, sizeof(bool));
+            break;
+        case INTEGER_T:
+            // Round to lower value
+            // Cast double to int if double is negative value add -1
+            if(value < 0) {
+                integer = (int) (value - 0.5);
+            }
+            else {
+                integer = (int) (value + 0.5);
+            }
+            model_setIopValue(iop, (void*) &integer, sizeof(int));
+            break;
+        case DOUBLE_T:
+            //Direct
+            model_setIopValue(iop, (void*) &value, sizeof(double));
+            break;
+        case STRING_T:
+            // Fail if test is negative
+            str = malloc(sizeof(double));
+            test = sprintf(str, "%f", value);
+            if(test < 0){
+                mtic_debug("%s: output '%s' Fail to convert value to string.", __FUNCTION__, name);
+                free(str);
+                return 0;
+            }
+            else{
+                model_setIopValue(iop, (void*) str, 0);
+            }
+            free(str);
+            break;
+        case DATA_T:
+            mtic_debug("%s: output '%s' is not compatible with double values", __FUNCTION__,  name);
+            return 0;
+        case IMPULSION_T:
+            return mtic_writeOutputAsImpulsion(name);
+    }
     
     // call the callbacks associated to if it exist
     model_runObserveCallbacksForIOP(iop, (void*) &value, sizeof(double));
@@ -1835,14 +2009,25 @@ int mtic_writeOutputAsString(const char *name, char *value){
         return 0;
     }
 
-    //Check the value type as a string.
-    if(iop->value_type != STRING_T){
-        mtic_debug("%s: Agent's output '%s' is not a string\n", __FUNCTION__,  name);
-        return 0;
+    switch (iop->value_type) {
+        case BOOL_T:
+            mtic_debug("%s: output '%s' is not compatible with string values", __FUNCTION__,  name);
+            return 0;
+        case INTEGER_T:
+            mtic_debug("%s: output '%s' is not compatible with string values", __FUNCTION__,  name);
+            return 0;
+        case DOUBLE_T:
+            mtic_debug("%s: output '%s' is not compatible with string values", __FUNCTION__,  name);
+            return 0;
+        case STRING_T:
+            model_setIopValue(iop, (void*) value, (strlen(value)+1)*sizeof(char));
+            break;
+        case DATA_T:
+            mtic_debug("%s: output '%s' is not compatible with string values", __FUNCTION__,  name);
+            return 0;
+        case IMPULSION_T:
+            return mtic_writeOutputAsImpulsion(name);
     }
-
-    // update the value in the iop_live structure
-    model_setIopValue(iop, (void*) value, (strlen(value)+1)*sizeof(char));
     
     // call the callbacks associated to if it exist
     model_runObserveCallbacksForIOP(iop, (void*) &value, (strlen(value)+1)*sizeof(char));
@@ -1952,14 +2137,32 @@ int mtic_writeParameterAsBool(const char *name, bool value){
         return 0;
     }
 
-    //Check the value type as a bool.
-    if(iop->value_type != BOOL_T){
-        mtic_debug("%s: Agent's output '%s' is not a bool\n", __FUNCTION__,  name);
-        return 0;
-    }
+    double dbl = 0;
 
-    // update the value in the iop_live structure
-    model_setIopValue(iop, (void*) &value, sizeof(bool));
+    switch (iop->value_type) {
+        case BOOL_T:
+            //the easy case
+            model_setIopValue(iop, (void*) &value, sizeof(bool));
+            break;
+        case INTEGER_T:
+            //the other easy case
+            model_setIopValue(iop, (void*) &value, sizeof(int));
+            break;
+        case DOUBLE_T:
+            dbl = value;
+            model_setIopValue(iop, (void*) &dbl, sizeof(double));
+            break;
+        case STRING_T:
+            if (value){
+                model_setIopValue(iop, (void*) "true", 0);
+            }else{
+                model_setIopValue(iop, (void*) "false", 0);
+            }
+            break;
+        case DATA_T:
+            mtic_debug("%s: parameter '%s' is not compatible with bool values", __FUNCTION__,  name);
+            return 0;
+    }
     
     // call the callbacks associated to if it exist
     model_runObserveCallbacksForIOP(iop, (void*) &value, sizeof(bool));
@@ -1987,14 +2190,44 @@ int mtic_writeParameterAsInt(const char *name, int value){
         return 0;
     }
 
-    //Check the value type as a int.
-    if(iop->value_type != INTEGER_T){
-        mtic_debug("%s: Agent's output '%s' is not a integer\n", __FUNCTION__,  name);
-        return 0;
-    }
+    double dbl = 0;
+    int test = 0;
+    char* str = NULL;
 
-    // update the value in the iop_live structure
-    model_setIopValue(iop, (void*) &value, sizeof(int));
+    switch (iop->value_type) {
+        case BOOL_T:
+            //Different of 0 is true else is false;
+            model_setIopValue(iop, (void*) &value, sizeof(bool));
+            break;
+        case INTEGER_T:
+            //Direct
+            model_setIopValue(iop, (void*) &value, sizeof(int));
+            break;
+        case DOUBLE_T:
+            //Cast int to double
+            dbl = value;
+            model_setIopValue(iop, (void*) &dbl, sizeof(double));
+            break;
+        case STRING_T:
+            // Fail if test is negative
+            str = malloc(sizeof(int) + 1);
+            test = sprintf(str, "%d", value);
+            if(test < 0){
+                mtic_debug("%s: output '%s' Fail to convert value to string.", __FUNCTION__, name);
+                free(str);
+                return 0;
+            }
+            else{
+                model_setIopValue(iop, (void*) str, 0);
+            }
+            free(str);
+            break;
+        case DATA_T:
+            mtic_debug("%s: output '%s' is not compatible with int values", __FUNCTION__,  name);
+            return 0;
+        case IMPULSION_T:
+            return mtic_writeOutputAsImpulsion(name);
+    }
     
     // call the callbacks associated to if it exist
     model_runObserveCallbacksForIOP(iop, (void*) &value, sizeof(int));
@@ -2022,14 +2255,48 @@ int mtic_writeParameterAsDouble(const char *name, double value){
         return 0;
     }
 
-    //Check the value type as a double.
-    if(iop->value_type != DOUBLE_T){
-        mtic_debug("%s: Agent's output '%s' is not a double\n", __FUNCTION__,  name);
-        return 0;
-    }
+    int integer = 0;
+    int test = 0;
+    char* str = NULL;
 
-    // update the value in the iop_live structure
-    model_setIopValue(iop, (void*) &value, sizeof(double));
+    switch (iop->value_type) {
+        case BOOL_T:
+            //Different of 0 is true else is false;
+            model_setIopValue(iop, (void*) &value, sizeof(bool));
+            break;
+        case INTEGER_T:
+            // Round to lower value
+            // Cast double to int if double is negative value add -1
+            if(value < 0) {
+                integer = (int) (value - 0.5);
+            }
+            else {
+                integer = (int) (value + 0.5);
+            }
+            model_setIopValue(iop, (void*) &integer, sizeof(int));
+            break;
+        case DOUBLE_T:
+            //Direct
+            model_setIopValue(iop, (void*) &value, sizeof(double));
+            break;
+        case STRING_T:
+            // Fail if test is negative
+            str = malloc(sizeof(double) + 1);
+            test = sprintf(str, "%f", value);
+            if(test < 0){
+                mtic_debug("%s: parameter '%s'. Fail to convert value to string.", __FUNCTION__, name);
+                free(str);
+                return 0;
+            }
+            else{
+                model_setIopValue(iop, (void*) str, 0);
+            }
+            free(str);
+            break;
+        case DATA_T:
+            mtic_debug("%s: parameter '%s' is not compatible with double values", __FUNCTION__,  name);
+            return 0;
+    }
     
     // call the callbacks associated to if it exist
     model_runObserveCallbacksForIOP(iop, (void*) &value, sizeof(double));
@@ -2059,7 +2326,7 @@ int mtic_writeParameterAsString(const char *name, char *value){
 
     //Check the value type as a string.
     if(iop->value_type != STRING_T){
-        mtic_debug("%s: Agent's output '%s' is not a string\n", __FUNCTION__,  name);
+        mtic_debug("%s: parameter '%s' is not compatible with string values", __FUNCTION__,  name);
         return 0;
     }
 
