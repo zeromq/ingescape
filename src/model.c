@@ -513,7 +513,12 @@ int mtic_readInputAsInt(const char *name){
             case DOUBLE_T:
                 //Handle the case: An implicit conversion can be done from double to int.
                 mtic_debug("mtic_readInputAsInt : Implicit conversion from double to int for the input {%s}.\n", name);
-                return (int) iop->value.d;
+                if(iop->value.d < 0) {
+                    return (int) (iop->value.d - 0.5);
+                }
+                else {
+                    return (int) (iop->value.d + 0.5);
+                }
                 break;
 
             case STRING_T:
@@ -789,7 +794,12 @@ int mtic_readOutputAsInt(const char *name){
             case DOUBLE_T:
                 //Handle the case: An implicit conversion can be done from double to int.
                 mtic_debug("mtic_readOutputAsInt : Implicit conversion from double to int for the output {%s}.", name);
-                return (int) iop->value.d;
+                if(iop->value.d < 0) {
+                    return (int) (iop->value.d - 0.5);
+                }
+                else {
+                    return (int) (iop->value.d + 0.5);
+                }
                 break;
 
             case STRING_T:
@@ -1064,7 +1074,12 @@ int mtic_readParameterAsInt(const char *name){
             case DOUBLE_T:
                 //Handle the case: An implicit conversion can be done from double to int.
                 mtic_debug("mtic_readParameterAsInt : Implicit conversion from double to int for the parameter {%s}.", name);
-                return (int) iop->value.d;
+                if(iop->value.d < 0) {
+                    return (int) (iop->value.d - 0.5);
+                }
+                else {
+                    return (int) (iop->value.d + 0.5);
+                }
                 break;
 
             case STRING_T:
@@ -1615,10 +1630,10 @@ int mtic_writeInputAsDouble(const char *name, double value){
             // Round to lower value
             // Cast double to int if double is negative value add -1
             if(value < 0) {
-                integer = (int) value - 1;
+                integer = (int) (value - 0.5);
             }
             else {
-                integer = (int) value;
+                integer = (int) (value + 0.5);
             }
             model_setIopValue(iop, (void*) &integer, sizeof(int));
             break;
@@ -1933,10 +1948,10 @@ int mtic_writeOutputAsDouble(const char *name, double value){
             // Round to lower value
             // Cast double to int if double is negative value add -1
             if(value < 0) {
-                integer = (int) value - 1;
+                integer = (int) (value - 0.5);
             }
             else {
-                integer = (int) value;
+                integer = (int) (value + 0.5);
             }
             model_setIopValue(iop, (void*) &integer, sizeof(int));
             break;
@@ -2253,10 +2268,10 @@ int mtic_writeParameterAsDouble(const char *name, double value){
             // Round to lower value
             // Cast double to int if double is negative value add -1
             if(value < 0) {
-                integer = (int) value - 1;
+                integer = (int) (value - 0.5);
             }
             else {
-                integer = (int) value;
+                integer = (int) (value + 0.5);
             }
             model_setIopValue(iop, (void*) &integer, sizeof(int));
             break;
