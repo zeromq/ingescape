@@ -138,7 +138,7 @@ bool mapping_checkCompatibilityInputOutput(agent_iop *foundInput, agent_iop *fou
         case INTEGER_T:
             if( foundOutput->value_type == DATA_T || foundOutput->value_type == STRING_T) {
                 isCompatible = false;
-                mtic_debug("Error: %s: The input '%s' and output '%s' have incompatible type.", __FUNCTION__, foundInput->name, foundOutput->name);
+                mtic_debug("%s: input '%s' and output '%s' have incompatible types", __FUNCTION__, foundInput->name, foundOutput->name);
             }
             else {
                 isCompatible = true;
@@ -148,7 +148,7 @@ bool mapping_checkCompatibilityInputOutput(agent_iop *foundInput, agent_iop *fou
         case DOUBLE_T:
             if(foundOutput->value_type == DATA_T  || foundOutput->value_type == STRING_T) {
                 isCompatible = false;
-                mtic_debug("Error: %s: The input '%s' and output '%s' have incompatible type.", __FUNCTION__, foundInput->name, foundOutput->name);
+                mtic_debug("%s: input '%s' and output '%s' have incompatible types", __FUNCTION__, foundInput->name, foundOutput->name);
             }
             else {
                 isCompatible = true;
@@ -158,7 +158,7 @@ bool mapping_checkCompatibilityInputOutput(agent_iop *foundInput, agent_iop *fou
         case BOOL_T:
             if(foundOutput->value_type == DATA_T  || foundOutput->value_type == STRING_T) {
                 isCompatible = false;
-                mtic_debug("Error: %s: The input '%s' and output '%s' have incompatible type.", __FUNCTION__, foundInput->name, foundOutput->name);
+                mtic_debug("%s: input '%s' and output '%s' have incompatible types", __FUNCTION__, foundInput->name, foundOutput->name);
             }
             else {
                 isCompatible = true;
@@ -168,7 +168,7 @@ bool mapping_checkCompatibilityInputOutput(agent_iop *foundInput, agent_iop *fou
         case STRING_T:
             if(foundOutput->value_type == DATA_T) {
                 isCompatible = false;
-                mtic_debug("Error: %s: The input '%s' and output '%s' have incompatible type.", __FUNCTION__, foundInput->name, foundOutput->name);
+                mtic_debug("%s: input '%s' and output '%s' have incompatible types", __FUNCTION__, foundInput->name, foundOutput->name);
             }
             else {
                 isCompatible = true;
@@ -178,7 +178,7 @@ bool mapping_checkCompatibilityInputOutput(agent_iop *foundInput, agent_iop *fou
         case IMPULSION_T:
             if(foundOutput->value_type == DATA_T) {
                 isCompatible = false;
-                mtic_debug("Error: %s: The input '%s' and output '%s' have incompatible type.", __FUNCTION__, foundInput->name, foundOutput->name);
+                mtic_debug("%s: input '%s' and output '%s' have incompatible types", __FUNCTION__, foundInput->name, foundOutput->name);
             }
             else {
                 isCompatible = true;
@@ -192,7 +192,7 @@ bool mapping_checkCompatibilityInputOutput(agent_iop *foundInput, agent_iop *fou
             }
             else
             {
-                 mtic_debug("Error: %s: The input '%s' and output '%s' have incompatible type.", __FUNCTION__, foundInput->name, foundOutput->name);
+                 mtic_debug("%s: input '%s' and output '%s' have incompatible types", __FUNCTION__, foundInput->name, foundOutput->name);
                 isCompatible = false;
             }
             
