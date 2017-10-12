@@ -185,54 +185,78 @@ void AgentsSupervisionController::onAgentDefinitionCreated(DefinitionM* definiti
             // Exactly the same definition
             if ((sameDefinition != NULL) && (agentUsingSameDefinition != NULL))
             {
-                //
-                // 1- The previous view model of agent is useless, we have to remove it from the list
-                //
-                _agentsList.remove(agentVM);
-
-                // And delete it
-                deleteAgentViewModel(agentVM);
-                agentVM = NULL;
-
-
-                // 2- The definition of agent is useless, we have to delete it
-                _modelManager->deleteAgentDefinition(definition);
-                definition = NULL;
-
-
-                //
-                // 3- Then, add our model to the view model having the same definition
-                //
-                bool isSameModel = false;
-                QList<AgentM*> models = agentUsingSameDefinition->models()->toList();
-                for (int i = 0; i < models.count(); i++)
+                // View model has only definition (never yet appeared on the network)
+                if (agentUsingSameDefinition->hasOnlyDefinition())
                 {
-                    AgentM* model = models.at(i);
+                    // Set the definition
+                    agentVM->setdefinition(definition);
 
-                    // Same address and status is OFF
-                    if ((model != NULL) && (model->address() == agent->address()) && (model->status() == AgentStatus::OFF))
-                    {
-                        isSameModel = true;
 
-                        // Replace the model
-                        agentUsingSameDefinition->models()->replace(i, agent);
+                    // 1- The previous view model which has only definition is useless, we have to remove it from the list
+                    _agentsList.remove(agentUsingSameDefinition);
 
-                        qDebug() << "Replace model of agent" << agentName << "on" << agent->address();
-
-                        // Delete the previous model of Agent
+                    // 2- Delete the (list of) model(s) of agent which has only definition
+                    QList<AgentM*> modelsToDelete = agentUsingSameDefinition->models()->toList();
+                    foreach (AgentM* model, modelsToDelete) {
                         _modelManager->deleteAgentModel(model);
-                        model = NULL;
-
-                        // break loop on models
-                        break;
                     }
+
+                    // 3- Delete the previous view model which has only definition
+                    deleteAgentViewModel(agentUsingSameDefinition);
+                    agentUsingSameDefinition = NULL;
+
+                    // 4- The previous definition is useless, we have to delete it
+                    _modelManager->deleteAgentDefinition(sameDefinition);
+                    sameDefinition = NULL;
+
                 }
+                // View model is about a real agent, which is (or has been) on the network
+                else
+                {
+                    // 1- The current view model for this new agent is useless, we have to remove it from the list
+                    _agentsList.remove(agentVM);
 
-                if (!isSameModel) {
-                    // Add the model of agent to the list of the VM
-                    agentUsingSameDefinition->models()->append(agent);
+                    // 2- Delete it
+                    deleteAgentViewModel(agentVM);
+                    agentVM = NULL;
 
-                    qDebug() << "Add model of agent" << agentName << "on" << agent->address();
+                    // 3- The current definition for this new agent is useless, we have to delete it
+                    _modelManager->deleteAgentDefinition(definition);
+                    definition = NULL;
+
+                    //
+                    // 4- Then, add (or replace) our model to the view model having the same definition
+                    //
+                    bool isSameModel = false;
+                    QList<AgentM*> models = agentUsingSameDefinition->models()->toList();
+                    for (int i = 0; i < models.count(); i++)
+                    {
+                        AgentM* model = models.at(i);
+
+                        // Same address and status is OFF --> we consider that it is the same model
+                        if ((model != NULL) && (model->address() == agent->address()) && (model->status() == AgentStatus::OFF))
+                        {
+                            isSameModel = true;
+
+                            // We replace the model
+                            agentUsingSameDefinition->models()->replace(i, agent);
+
+                            qDebug() << "Replace model of agent" << agentName << "on" << agent->address();
+
+                            // Delete the previous model of agent
+                            _modelManager->deleteAgentModel(model);
+                            model = NULL;
+
+                            break;
+                        }
+                    }
+
+                    if (!isSameModel) {
+                        // Add the model of agent to the list of the VM
+                        agentUsingSameDefinition->models()->append(agent);
+
+                        qDebug() << "Add model of agent" << agentName << "on" << agent->address();
+                    }
                 }
             }
             // Definition is different
