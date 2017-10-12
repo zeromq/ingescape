@@ -217,7 +217,7 @@ void MasticModelManager::onDefinitionReceived(QString peerId, QString agentName,
     if (!definitionJSON.isEmpty())
     {
         AgentM* agent = getAgentModelFromPeerId(peerId);
-        if(agent != NULL)
+        if (agent != NULL)
         {
             QByteArray byteArrayOfJson = definitionJSON.toUtf8();
 

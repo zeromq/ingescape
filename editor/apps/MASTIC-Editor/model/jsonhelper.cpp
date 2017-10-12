@@ -108,14 +108,20 @@ DefinitionM* JsonHelper::createModelOfDefinition(QByteArray byteArrayOfJson)
                         }
                     }
                 }
-
-                // Generate md5 value for the definition string
-                QString md5Hash = QString(QCryptographicHash::hash(byteArrayOfJson, QCryptographicHash::Md5).toHex());
-                definition->setmd5Hash(md5Hash);
-
-                //qDebug() << "md5:" << md5Hash;
-                //qDebug() << "json:" << jsonDefinition;
             }
+
+            // 0- Don't use directly "byteArrayOfJson" because we can have differences betwwen jsons from a file or from the network
+
+            // 1- Convert the sub objet (inside key "definition") into string
+            QJsonDocument jsonDocSubObject(jsonSubObject);
+            QByteArray byteArraySubObject = jsonDocSubObject.toJson(QJsonDocument::Compact);
+
+            // 2- Generate md5 value for this compact string
+            QString md5Hash = QString(QCryptographicHash::hash(byteArraySubObject, QCryptographicHash::Md5).toHex());
+            definition->setmd5Hash(md5Hash);
+
+            //qDebug() << "json:" << byteArraySubObject;
+            //qDebug() << "md5:" << md5Hash;
         }
     }
 
