@@ -170,9 +170,9 @@ private:
 
     /**
      * @brief Update definition variants of a list of definitions with the same name
-     * @param agentDefinitionsList
+     * @param definitionName
      */
-    void _updateDefinitionVariants(QList<DefinitionM*> agentDefinitionsList);
+    void _updateDefinitionVariants(QString definitionName);
 
 private:
 

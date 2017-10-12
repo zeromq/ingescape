@@ -362,14 +362,16 @@ void MasticModelManager::addAgentDefinition(DefinitionM* definition)
 {
     if (definition != NULL)
     {
-        QList<DefinitionM*> agentDefinitionsList = getAgentDefinitionsListFromName(definition->name());
+        QString definitionName = definition->name();
+
+        QList<DefinitionM*> agentDefinitionsList = getAgentDefinitionsListFromName(definitionName);
         agentDefinitionsList.append(definition);
 
         // Update the list in the map
-        _mapFromNameToAgentDefinitionsList.insert(definition->name(), agentDefinitionsList);
+        _mapFromNameToAgentDefinitionsList.insert(definitionName, agentDefinitionsList);
 
         // Update definition variants of a list of definitions with the same name
-        _updateDefinitionVariants(agentDefinitionsList);
+        _updateDefinitionVariants(definitionName);
     }
 }
 
@@ -398,31 +400,34 @@ void MasticModelManager::deleteAgentDefinition(DefinitionM* definition)
 {
     if (definition != NULL)
     {
-        QList<DefinitionM*> agentDefinitionsList = getAgentDefinitionsListFromName(definition->name());
+        QString definitionName = definition->name();
+
+        QList<DefinitionM*> agentDefinitionsList = getAgentDefinitionsListFromName(definitionName);
         agentDefinitionsList.removeOne(definition);
 
         // Update the list in the map
-        _mapFromNameToAgentDefinitionsList.insert(definition->name(), agentDefinitionsList);
+        _mapFromNameToAgentDefinitionsList.insert(definitionName, agentDefinitionsList);
 
         // Free memory
         delete definition;
 
         // Update definition variants of a list of definitions with the same name
-        _updateDefinitionVariants(agentDefinitionsList);
+        _updateDefinitionVariants(definitionName);
     }
 }
 
 
 /**
  * @brief Update definition variants of a list of definitions with the same name
- * @param agentDefinitionsList
+ * @param definitionName
  */
-void MasticModelManager::_updateDefinitionVariants(QList<DefinitionM*> agentDefinitionsList)
+void MasticModelManager::_updateDefinitionVariants(QString definitionName)
 {
-    // We can use versions as keys because the list contains only definition with the same name
+    QList<DefinitionM*> agentDefinitionsList = getAgentDefinitionsListFromName(definitionName);
+
+    // We can use versions as keys of the map because the list contains only definition with the same name
     QHash<QString, QList<DefinitionM*>> mapFromVersionToDefinitionsList;
     QList<QString> versionsWithVariant;
-    QString version;
 
     foreach (DefinitionM* iterator, agentDefinitionsList)
     {
@@ -431,7 +436,7 @@ void MasticModelManager::_updateDefinitionVariants(QList<DefinitionM*> agentDefi
             // First, reset all
             iterator->setisVariant(false);
 
-            version = iterator->version();
+            QString version = iterator->version();
             QList<DefinitionM*> definitionsListForVersion;
 
             // Other(s) definition(s) have the same version (and the same name)
