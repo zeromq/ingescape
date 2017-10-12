@@ -1554,7 +1554,6 @@ int mtic_writeInputAsInt(const char *name, int value){
     }
 
     double dbl = 0;
-    int test = 0;
     char* str = NULL;
 
     switch (iop->value_type) {
@@ -1572,17 +1571,17 @@ int mtic_writeInputAsInt(const char *name, int value){
             model_setIopValue(iop, (void*) &dbl, sizeof(double));
             break;
         case STRING_T:
-            // Fail if test is negative
-            str = malloc(sizeof(int) + 1);
-            test = sprintf(str, "%d", value);
-            if(test < 0){
-                mtic_debug("%s: input '%s' Fail to convert value to string.", __FUNCTION__, name);
-                return 0;
+            str = model_IntToString(value);
+            // if str is NULL Conversion fail
+            if(str != NULL){
+                model_setIopValue(iop, (void*) str, 0);
+                free(str);
             }
             else{
-                model_setIopValue(iop, (void*) str, 0);
+                mtic_debug("%s: input '%s'. Fail to convert value to string.", __FUNCTION__, name);
+                free(str);
+                return 0;
             }
-            free(str);
             break;
         case DATA_T:
             mtic_debug("%s: input '%s' is not compatible with int values", __FUNCTION__,  name);
@@ -1618,7 +1617,6 @@ int mtic_writeInputAsDouble(const char *name, double value){
     }
 
     int integer = 0;
-    int test = 0;
     char* str = NULL;
 
     switch (iop->value_type) {
@@ -1628,7 +1626,6 @@ int mtic_writeInputAsDouble(const char *name, double value){
             break;
         case INTEGER_T:
             // Round to lower value
-            // Cast double to int if double is negative value add -1
             if(value < 0) {
                 integer = (int) (value - 0.5);
             }
@@ -1642,18 +1639,17 @@ int mtic_writeInputAsDouble(const char *name, double value){
             model_setIopValue(iop, (void*) &value, sizeof(double));
             break;
         case STRING_T:
-            // Fail if test is negative
-            str = malloc(sizeof(double) + 1);
-            test = sprintf(str, "%f", value);
-            if(test < 0){
-                mtic_debug("%s: input '%s' Fail to convert value to string.", __FUNCTION__, name);
+            // if str is NULL Conversion fail
+            str = model_DoubleToString(value);
+            if(str != NULL){
+                model_setIopValue(iop, (void*) str, 0);
+                free(str);
+            }
+            else{
+                mtic_debug("%s: input '%s'. Fail to convert value to string.", __FUNCTION__, name);
                 free(str);
                 return 0;
             }
-            else{
-                model_setIopValue(iop, (void*) str, 0);
-            }
-            free(str);
             break;
         case DATA_T:
             mtic_debug("%s: input '%s' is not compatible with double values", __FUNCTION__,  name);
@@ -1867,7 +1863,6 @@ int mtic_writeOutputAsInt(const char *name, int value){
     }
 
     double dbl = 0;
-    int test = 0;
     char* str = NULL;
 
     switch (iop->value_type) {
@@ -1885,18 +1880,17 @@ int mtic_writeOutputAsInt(const char *name, int value){
             model_setIopValue(iop, (void*) &dbl, sizeof(double));
             break;
         case STRING_T:
-            // Fail if test is negative
-            str = malloc(sizeof(int) + 1);
-            test = sprintf(str, "%d", value);
-            if(test < 0){
-                mtic_debug("%s: output '%s' Fail to convert value to string.", __FUNCTION__, name);
+            str = model_IntToString(value);
+            // if str is NULL Conversion fail
+            if(str != NULL){
+                model_setIopValue(iop, (void*) str, 0);
+                free(str);
+            }
+            else{
+                mtic_debug("%s: output '%s'. Fail to convert value to string.", __FUNCTION__, name);
                 free(str);
                 return 0;
             }
-            else{
-                model_setIopValue(iop, (void*) str, 0);
-            }
-            free(str);
             break;
         case DATA_T:
             mtic_debug("%s: output '%s' is not compatible with int values", __FUNCTION__,  name);
@@ -1935,7 +1929,6 @@ int mtic_writeOutputAsDouble(const char *name, double value){
         return 0;
     }
 
-    int test = 0;
     int integer = 0;
     char* str = NULL;
 
@@ -1946,7 +1939,6 @@ int mtic_writeOutputAsDouble(const char *name, double value){
             break;
         case INTEGER_T:
             // Round to lower value
-            // Cast double to int if double is negative value add -1
             if(value < 0) {
                 integer = (int) (value - 0.5);
             }
@@ -1960,18 +1952,17 @@ int mtic_writeOutputAsDouble(const char *name, double value){
             model_setIopValue(iop, (void*) &value, sizeof(double));
             break;
         case STRING_T:
-            // Fail if test is negative
-            str = malloc(sizeof(double));
-            test = sprintf(str, "%f", value);
-            if(test < 0){
-                mtic_debug("%s: output '%s' Fail to convert value to string.", __FUNCTION__, name);
+            // if str is NULL Conversion fail
+            str = model_DoubleToString(value);
+            if(str != NULL){
+                model_setIopValue(iop, (void*) str, 0);
+                free(str);
+            }
+            else{
+                mtic_debug("%s: output '%s'. Fail to convert value to string.", __FUNCTION__, name);
                 free(str);
                 return 0;
             }
-            else{
-                model_setIopValue(iop, (void*) str, 0);
-            }
-            free(str);
             break;
         case DATA_T:
             mtic_debug("%s: output '%s' is not compatible with double values", __FUNCTION__,  name);
@@ -2191,7 +2182,6 @@ int mtic_writeParameterAsInt(const char *name, int value){
     }
 
     double dbl = 0;
-    int test = 0;
     char* str = NULL;
 
     switch (iop->value_type) {
@@ -2209,18 +2199,18 @@ int mtic_writeParameterAsInt(const char *name, int value){
             model_setIopValue(iop, (void*) &dbl, sizeof(double));
             break;
         case STRING_T:
-            // Fail if test is negative
-            str = malloc(sizeof(int) + 1);
-            test = sprintf(str, "%d", value);
-            if(test < 0){
-                mtic_debug("%s: output '%s' Fail to convert value to string.", __FUNCTION__, name);
+            str = model_IntToString(value);
+            // if str is NULL Conversion fail
+            if(str != NULL){
+                model_setIopValue(iop, (void*) str, 0);
+                free(str);
+            }
+            else{
+                mtic_debug("%s: input '%s'. Fail to convert value to string.", __FUNCTION__, name);
                 free(str);
                 return 0;
             }
-            else{
-                model_setIopValue(iop, (void*) str, 0);
-            }
-            free(str);
+            break;
             break;
         case DATA_T:
             mtic_debug("%s: output '%s' is not compatible with int values", __FUNCTION__,  name);
@@ -2256,7 +2246,6 @@ int mtic_writeParameterAsDouble(const char *name, double value){
     }
 
     int integer = 0;
-    int test = 0;
     char* str = NULL;
 
     switch (iop->value_type) {
@@ -2266,7 +2255,6 @@ int mtic_writeParameterAsDouble(const char *name, double value){
             break;
         case INTEGER_T:
             // Round to lower value
-            // Cast double to int if double is negative value add -1
             if(value < 0) {
                 integer = (int) (value - 0.5);
             }
@@ -2280,18 +2268,17 @@ int mtic_writeParameterAsDouble(const char *name, double value){
             model_setIopValue(iop, (void*) &value, sizeof(double));
             break;
         case STRING_T:
-            // Fail if test is negative
-            str = malloc(sizeof(double) + 1);
-            test = sprintf(str, "%f", value);
-            if(test < 0){
+        // if str is NULL Conversion fail
+            str = model_DoubleToString(value);
+            if(str != NULL){
+                model_setIopValue(iop, (void*) str, 0);
+                free(str);
+            }
+            else{
                 mtic_debug("%s: parameter '%s'. Fail to convert value to string.", __FUNCTION__, name);
                 free(str);
                 return 0;
             }
-            else{
-                model_setIopValue(iop, (void*) str, 0);
-            }
-            free(str);
             break;
         case DATA_T:
             mtic_debug("%s: parameter '%s' is not compatible with double values", __FUNCTION__,  name);
