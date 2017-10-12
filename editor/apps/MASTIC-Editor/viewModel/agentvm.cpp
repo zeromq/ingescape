@@ -28,7 +28,7 @@ AgentVM::AgentVM(AgentM* model, QObject *parent) : QObject(parent),
     _name(""),
     _addresses(""),
     _definition(NULL),
-    _isFictitious(true),
+    _hasOnlyDefinition(true),
     _status(AgentStatus::OFF),
     _state(""),
     _isMuted(false),
@@ -44,11 +44,11 @@ AgentVM::AgentVM(AgentM* model, QObject *parent) : QObject(parent),
         _name = model->name();
 
         if (model->peerId().isEmpty()) {
-            _isFictitious = true;
-            qInfo() << "New View Model of FICTITIOUS Agent" << _name;
+            _hasOnlyDefinition = true;
+            qInfo() << "New View Model of Agent" << _name << "with Only Definition";
         }
         else {
-            _isFictitious = false;
+            _hasOnlyDefinition = false;
             qInfo() << "New View Model of Agent" << _name << "with peer id" << model->peerId();
         }
 

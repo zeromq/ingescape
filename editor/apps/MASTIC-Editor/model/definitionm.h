@@ -42,8 +42,8 @@ class DefinitionM : public QObject
     // Md5 hash value for the definition string
     I2_QML_PROPERTY_READONLY(QString, md5Hash)
 
-    // Variant of our agent definition
-    I2_QML_PROPERTY(QString, variant)
+    // Flag indicating if our definition is a variant (same name, same version but I/O/P differents)
+    I2_QML_PROPERTY(bool, isVariant)
 
     // List of inputs of our agent definition
     I2_QOBJECT_LISTMODEL(AgentIOPM, inputsList)

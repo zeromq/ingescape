@@ -90,14 +90,20 @@ void MasticModelManager::initAgentsWithFiles()
                 DefinitionM* definition = _jsonHelper->createModelOfDefinition(byteArrayOfJson);
                 if (definition != NULL)
                 {
-                    // Create a new model of agent
+                    // Create a new model of agent with the name of the definition
                     AgentM* agent = new AgentM(definition->name(), this);
 
-                    // Manage the new model of agent
-                    _manageNewModelOfAgent(agent);
+                    // Add this new model of agent
+                    addAgentModel(agent);
 
-                    // Manage the new (model of) definition of agent
-                    _manageNewDefinitionOfAgent(definition, agent);
+                    // Emit the signal "Agent Model Created"
+                    Q_EMIT agentModelCreated(agent);
+
+                    // Add this new model of agent definition
+                    addAgentDefinition(definition);
+
+                    // Emit the signal "Agent Definition Created"
+                    Q_EMIT agentDefinitionCreated(definition, agent);
                 }
 
                 jsonFile.close();
@@ -188,8 +194,11 @@ void MasticModelManager::onAgentEntered(QString peerId, QString agentName, QStri
 
             _mapFromPeerIdToAgentM.insert(peerId, agent);
 
-            // Manage the new model of agent
-            _manageNewModelOfAgent(agent);
+            // Add this new model of agent
+            addAgentModel(agent);
+
+            // Emit the signal "Agent Model Created"
+            Q_EMIT agentModelCreated(agent);
         }
     }
 }
@@ -216,8 +225,11 @@ void MasticModelManager::onDefinitionReceived(QString peerId, QString agentName,
             DefinitionM* definition = _jsonHelper->createModelOfDefinition(byteArrayOfJson);
             if (definition != NULL)
             {
-                // Manage the new (model of) definition of agent
-                _manageNewDefinitionOfAgent(definition, agent);
+                // Add this new model of agent definition
+                addAgentDefinition(definition);
+
+                // Emit the signal "Agent Definition Created"
+                Q_EMIT agentDefinitionCreated(definition, agent);
             }
         }
     }
@@ -269,6 +281,23 @@ void MasticModelManager::onAgentExited(QString peerId, QString agentName)
         agent->setstatus(AgentStatus::OFF);
 
         // FIXME: nothing more ?
+    }
+}
+
+
+/**
+ * @brief Add a model of agent
+ * @param agent
+ */
+void MasticModelManager::addAgentModel(AgentM* agent)
+{
+    if (agent != NULL)
+    {
+        QList<AgentM*> agentModelsList = getAgentModelsListFromName(agent->name());
+        agentModelsList.append(agent);
+
+        // Update the list in the map
+        _mapFromNameToAgentModelsList.insert(agent->name(), agentModelsList);
     }
 }
 
@@ -326,6 +355,26 @@ void MasticModelManager::deleteAgentModel(AgentM* agent)
 
 
 /**
+ * @brief Add a model of agent definition
+ * @param definition
+ */
+void MasticModelManager::addAgentDefinition(DefinitionM* definition)
+{
+    if (definition != NULL)
+    {
+        QList<DefinitionM*> agentDefinitionsList = getAgentDefinitionsListFromName(definition->name());
+        agentDefinitionsList.append(definition);
+
+        // Update the list in the map
+        _mapFromNameToAgentDefinitionsList.insert(definition->name(), agentDefinitionsList);
+
+        // Update definition variants of a list of definitions with the same name
+        _updateDefinitionVariants(agentDefinitionsList);
+    }
+}
+
+
+/**
  * @brief Get the list (of models) of agent definition from a name
  * @param name
  * @return
@@ -357,46 +406,65 @@ void MasticModelManager::deleteAgentDefinition(DefinitionM* definition)
 
         // Free memory
         delete definition;
+
+        // Update definition variants of a list of definitions with the same name
+        _updateDefinitionVariants(agentDefinitionsList);
     }
 }
 
 
 /**
- * @brief Manage the new model of agent
- * @param agent
+ * @brief Update definition variants of a list of definitions with the same name
+ * @param agentDefinitionsList
  */
-void MasticModelManager::_manageNewModelOfAgent(AgentM* agent)
+void MasticModelManager::_updateDefinitionVariants(QList<DefinitionM*> agentDefinitionsList)
 {
-    if (agent != NULL)
+    // We can use versions as keys because the list contains only definition with the same name
+    QHash<QString, QList<DefinitionM*>> mapFromVersionToDefinitionsList;
+    QList<QString> versionsWithVariant;
+    QString version;
+
+    foreach (DefinitionM* iterator, agentDefinitionsList)
     {
-        // Get the list of models and view models of agent from a name
-        QList<AgentM*> agentModelsList = getAgentModelsListFromName(agent->name());
+        if ((iterator != NULL) && !iterator->version().isEmpty())
+        {
+            // First, reset all
+            iterator->setisVariant(false);
 
-        agentModelsList.append(agent);
-        _mapFromNameToAgentModelsList.insert(agent->name(), agentModelsList);
+            version = iterator->version();
+            QList<DefinitionM*> definitionsListForVersion;
 
-        // Emit the signal "Agent Model Created"
-        Q_EMIT agentModelCreated(agent);
+            // Other(s) definition(s) have the same version (and the same name)
+            if (mapFromVersionToDefinitionsList.contains(version)) {
+                definitionsListForVersion = mapFromVersionToDefinitionsList.value(version);
+
+                // The lists of I/O/P must be different to have a variant !
+                if (!versionsWithVariant.contains(version))
+                {
+                    // We compare I/O/P between current iterator and the first one
+                    DefinitionM* first = definitionsListForVersion.first();
+                    if ((first != NULL) && (first->md5Hash() != iterator->md5Hash())) {
+                        versionsWithVariant.append(version);
+                    }
+                }
+            }
+
+            definitionsListForVersion.append(iterator);
+            mapFromVersionToDefinitionsList.insert(version, definitionsListForVersion);
+        }
+    }
+
+    // The list contains only the versions that have variants
+    foreach (QString version, versionsWithVariant)
+    {
+        QList<DefinitionM*> definitionsListForVersion = mapFromVersionToDefinitionsList.value(version);
+        foreach (DefinitionM* iterator, definitionsListForVersion)
+        {
+            if (iterator != NULL) {
+                iterator->setisVariant(true);
+                //qDebug() << iterator->name() << iterator->version() << "is variant (" << iterator->md5Hash() << ")";
+            }
+        }
     }
 }
 
-
-/**
- * @brief Manage the new (model of) definition of agent
- * @param definition
- * @param agent
- */
-void MasticModelManager::_manageNewDefinitionOfAgent(DefinitionM* definition, AgentM* agent)
-{
-    if ((definition != NULL) && (agent != NULL))
-    {
-        // Get the list (of models) of agent definition from a name
-        QList<DefinitionM*> agentDefinitionsList = getAgentDefinitionsListFromName(definition->name());
-
-        agentDefinitionsList.append(definition);
-        _mapFromNameToAgentDefinitionsList.insert(definition->name(), agentDefinitionsList);
-
-        // Emit the signal "Agent Model Created"
-        Q_EMIT agentDefinitionCreated(definition, agent);
-    }
-}

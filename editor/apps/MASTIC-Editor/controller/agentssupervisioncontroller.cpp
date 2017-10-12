@@ -211,9 +211,7 @@ void AgentsSupervisionController::onAgentDefinitionCreated(DefinitionM* definiti
                     agentVM = NULL;
 
 
-                    //
                     // 2- The definition of agent is useless, we have to delete it
-                    //
                     _modelManager->deleteAgentDefinition(definition);
                     definition = NULL;
 

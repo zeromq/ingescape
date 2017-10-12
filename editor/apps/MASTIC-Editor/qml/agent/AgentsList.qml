@@ -214,7 +214,7 @@ Item {
             id : agentListItem
 
             width: MasticTheme.leftPanelWidth
-            height: model.isFictitious ? 85 : 135
+            height: model.hasOnlyDefinition ? 85 : 135
 
             Rectangle {
 
@@ -249,7 +249,6 @@ Item {
                             top: agentRow.top
                         }
 
-                        //visible: model.isFictitious
                         visible: (model.status === AgentStatus.OFF)
 
                         text: "X"
@@ -322,6 +321,34 @@ Item {
                             }
                         }
 
+                        Row {
+                            Text {
+                                text: model.definition ? model.definition.version : ""
+
+                                height: 25
+                                color: MasticTheme.agentsListLabelColor
+                                font: MasticTheme.normalFont
+                            }
+
+                            // Space
+                            Text {
+                                text: "   "
+
+                                height: 25
+                                color: MasticTheme.agentsListLabelColor
+                                font: MasticTheme.normalFont
+                            }
+
+                            Text {
+                                text: "Variante"
+                                visible: model.definition.isVariant
+
+                                height: 25
+                                color: "red"
+                                font: MasticTheme.normalFont
+                            }
+                        }
+
                         Text {
                             text: model.definition ? model.definition.description : ""
 
@@ -333,17 +360,10 @@ Item {
                             font: MasticTheme.normalFont
                         }
 
-                        Text {
-                            text: model.definition ? model.definition.version : ""
-
-                            height: 25
-                            color: MasticTheme.agentsListLabelColor
-                            font: MasticTheme.normalFont
-                        }
                     }
 
                     Row {
-                        visible: !model.isFictitious
+                        visible: !model.hasOnlyDefinition
 
                         anchors {
                             right: agentRow.right
