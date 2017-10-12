@@ -692,6 +692,30 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 }else if ((strncmp (message, "UNMUTE", strlen("UNMUTE")) == 0) && (strlen(message) > strlen("UNMUTE")+1)){
                     char *subStr = message + strlen("UNMUTE") + 1;
                     mtic_unmuteOutput(subStr);
+                }else if ((strncmp (message, "SET_INPUT", strlen("SET_INPUT")) == 0) && (strlen(message) > strlen("SET_INPUT")+1)){
+                    char *subStr = message + strlen("SET_INPUT") + 1;
+                    char *name, *value;
+                    name = strtok (subStr," ");
+                    value = strtok (NULL," ");
+                    if (name != NULL && value != NULL){
+                        mtic_writeInput(name, value, 0);
+                    }
+                }else if ((strncmp (message, "SET_OUTPUT", strlen("SET_OUTPUT")) == 0) && (strlen(message) > strlen("SET_OUTPUT")+1)){
+                    char *subStr = message + strlen("SET_OUTPUT") + 1;
+                    char *name, *value;
+                    name = strtok (subStr," ");
+                    value = strtok (NULL," ");
+                    if (name != NULL && value != NULL){
+                        mtic_writeOutput(name, value, 0);
+                    }
+                }else if ((strncmp (message, "SET_PARAMETER", strlen("SET_PARAMETER")) == 0) && (strlen(message) > strlen("SET_PARAMETER")+1)){
+                    char *subStr = message + strlen("SET_PARAMETER") + 1;
+                    char *name, *value;
+                    name = strtok (subStr," ");
+                    value = strtok (NULL," ");
+                    if (name != NULL && value != NULL){
+                        mtic_writeParameter(name, value, 0);
+                    }
                 }else if ((strncmp (message, "MAP", strlen("MAP")) == 0) && (strlen(message) > strlen("MAP")+1)){
                     char *subStr = message + strlen("MAP") + 1;
                     char *input, *agent, *output;

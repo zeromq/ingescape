@@ -204,7 +204,7 @@ void AgentVM::onModelsChanged()
     // Model of agent added
     if (_previousAgentsList.count() < newAgentsList.count())
     {
-        qDebug() << _previousAgentsList.count() << "--> ADD --> " << newAgentsList.count();
+        //qDebug() << _previousAgentsList.count() << "--> ADD --> " << newAgentsList.count();
 
         for (AgentM* model : newAgentsList) {
             if ((model != NULL) && !_previousAgentsList.contains(model))
@@ -217,7 +217,7 @@ void AgentVM::onModelsChanged()
     // Model of agent removed
     else if (_previousAgentsList.count() > newAgentsList.count())
     {
-        qDebug() << _previousAgentsList.count() << "--> REMOVE --> " << newAgentsList.count();
+        //qDebug() << _previousAgentsList.count() << "--> REMOVE --> " << newAgentsList.count();
 
         for (AgentM* model : _previousAgentsList) {
             if ((model != NULL) && !newAgentsList.contains(model))
