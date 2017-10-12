@@ -100,8 +100,20 @@ void AgentsSupervisionController::deleteAgent(AgentVM* agent)
     {
         qDebug() << "TODO: Delete agent" << agent->name();
 
-        // TODO
-        //_modelManager->delete ???
+        // Remove it from the list
+        _agentsList.remove(agent);
+
+        // Delete its definition
+        _modelManager->deleteAgentDefinition(agent->definition());
+
+        // Delete each model of agent
+        foreach (AgentM* model, agent->models()->toList()) {
+            _modelManager->deleteAgentModel(model);
+        }
+
+        // Delete the view model of agent
+        deleteAgentViewModel(agent);
+        agent = NULL;
     }
 }
 

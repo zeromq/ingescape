@@ -291,6 +291,8 @@ Item {
                         Text {
                             text: model.models.count + " clone(s)"
                             visible: (model.models.count > 1)
+                            //text: model.models ? model.models.count + " clone(s)" : ""
+                            //visible: model.models ? (model.models.count > 1) : false
 
                             height: 25
                             color: "red"
