@@ -1301,7 +1301,9 @@ int mtic_writeInput(const char *name, char *value, long size){
         {
             // string convertion to bool
             bool bool_value = false;
-            if(strncmp((char*)value,"true",strlen("true")) == 0)
+            char inputValue[128];
+            strncpy(inputValue, value, 127);
+            if(strcmp(inputValue,"true") == 0)
             {
                 bool_value = true;
             }
@@ -1650,7 +1652,7 @@ int mtic_writeInputAsImpulsion(const char *name){
 
     //Check the value type as an impulsion
     if(iop->value_type != IMPULSION_T){
-        if (iop->value_type != DATA_T){
+        if (iop->value_type == DATA_T){
             mtic_debug("%s : input '%s' is of type data and cannot handle an impulsion\n", __FUNCTION__,  name);
             return 0;
         }else{
