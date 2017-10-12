@@ -1,0 +1,43 @@
+{
+  "definition": {
+    "name": "macosAgent",
+    "version": "10.0",
+    "description": "my own description is here",
+    "inputs": [
+      {
+        "name": "input1",
+        "type": "INTEGER",
+        "value": 40
+      },
+      {
+        "name": "input2",
+        "type": "IMPULSION",
+        "value": ""
+      },
+      {
+        "name": "input3",
+        "type": "INTEGER",
+        "value": 30
+      },
+      {
+        "name": "stream",
+        "type": "DATA",
+        "value": ""
+      }
+    ],
+    "outputs": [
+      {
+        "name": "value1",
+        "type": "DOUBLE",
+        "value": 3.14
+      }
+    ],
+    "parameters": [
+      {
+        "name": "param1",
+        "type": "INTEGER",
+        "value": -1
+      }
+    ]
+  }
+}
