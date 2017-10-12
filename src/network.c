@@ -377,11 +377,10 @@ int manageSubscription (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                                         mtic_writeInputAsData(elmt->input_name, data, size);
                                     }else if (foundOutput->value_type == IMPULSION_T){
                                         //If the remote output is impulsion, we write our input as impulsion :
-                                        //this is an implicit type conversion as mtic_writeInputAsImpulsion
+                                        //this is an implicit type conversion and the received value is not used
                                         mtic_writeInputAsImpulsion(elmt->input_name);
                                     }else{
-                                        //TODO: we can do types conversion between input and ouput here if we want
-                                        //for now, we use output type
+                                        //conversion from string to actual type is achieved in mtic_writeInput
                                         mtic_writeInput(elmt->input_name, value, 0); //size is not used for these types
                                     }
                                 }
