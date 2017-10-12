@@ -300,8 +300,9 @@ Item {
                         }
 
                         Text {
-                            id: agentStatus
-                            text: "Status: " + AgentStatus.enumToString(model.status)
+                            id: agentAddresses
+                            text: model.addresses
+                            visible: !model.hasOnlyDefinition
 
                             height: 25
                             color: MasticTheme.agentsListLabelColor
@@ -309,8 +310,9 @@ Item {
                         }
 
                         Text {
-                            id: agentAddresses
-                            text: model.addresses
+                            id: agentStatus
+                            text: "Status: " + AgentStatus.enumToString(model.status)
+                            visible: !model.hasOnlyDefinition
 
                             height: 25
                             color: MasticTheme.agentsListLabelColor
@@ -392,6 +394,18 @@ Item {
                             if (model.definition) {
                                 console.log("Open the definition of " + model.definition.name)
                             }
+                        }
+                    }
+
+                    Switch {
+                        checked: (model.status === AgentStatus.ON)
+                        visible: !model.hasOnlyDefinition
+
+                        anchors {
+                            left: agentRow.left
+                            leftMargin: 2
+                            bottom: agentRow.bottom
+                            bottomMargin: 5
                         }
                     }
 
