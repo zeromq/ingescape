@@ -1285,7 +1285,6 @@ int mtic_writeInput(const char *name, char *value, long size){
         {
             // string convertion to integer
             int int_value = atoi(value);
-
             ret = mtic_writeInputAsInt(name, int_value);
             break;
         }
@@ -1293,7 +1292,6 @@ int mtic_writeInput(const char *name, char *value, long size){
         {
             // string convertion to double
             double dbl_value = atof(value);
-
             ret = mtic_writeInputAsDouble(name, dbl_value);
             break;
         }
@@ -1307,7 +1305,6 @@ int mtic_writeInput(const char *name, char *value, long size){
             {
                 bool_value = true;
             }
-
             ret = mtic_writeInputAsBool(name, bool_value);
             break;
         }
@@ -1357,7 +1354,6 @@ int mtic_writeOutput(const char *name, char *value, long size){
         {
             // string convertion to integer
             int int_value = atoi(value);
-
             ret = mtic_writeOutputAsInt(name, int_value);
             break;
         }
@@ -1365,7 +1361,6 @@ int mtic_writeOutput(const char *name, char *value, long size){
         {
             // string convertion to double
             double dbl_value = atof(value);
-
             ret = mtic_writeOutputAsDouble(name, dbl_value);
             break;
         }
@@ -1373,11 +1368,12 @@ int mtic_writeOutput(const char *name, char *value, long size){
         {
             // string convertion to bool
             bool bool_value = false;
-            if(strncmp(value,"true",strlen("true")) == 0)
+            char outputValue[128];
+            strncpy(outputValue, value, 127);
+            if(strcmp(outputValue,"true") == 0)
             {
                 bool_value = true;
             }
-
             ret = mtic_writeOutputAsBool(name, bool_value);
             break;
         }
@@ -1427,7 +1423,6 @@ int mtic_writeParameter(const char *name, char *value, long size){
         {
             // string convertion to integer
             int int_value = atoi(value);
-
             ret = mtic_writeParameterAsInt(name, int_value);
             break;
         }
@@ -1435,7 +1430,6 @@ int mtic_writeParameter(const char *name, char *value, long size){
         {
             // string convertion to double
             double dbl_value = atof(value);
-
             ret = mtic_writeParameterAsDouble(name, dbl_value);
             break;
         }
@@ -1443,11 +1437,12 @@ int mtic_writeParameter(const char *name, char *value, long size){
         {
             // string convertion to bool
             bool bool_value = false;
-            if(strncmp(value,"true",strlen("true")) == 0)
+            char parameterValue[128];
+            strncpy(parameterValue, value, 127);
+            if(strcmp(parameterValue,"true") == 0)
             {
                 bool_value = true;
             }
-
             ret = mtic_writeParameterAsBool(name, bool_value);
             break;
         }
