@@ -121,11 +121,11 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
         }
         else if (event.compare("JOIN") == 0)
         {
-            qDebug() << QString("++ %1 has joined %2").arg(peerName, group);
+            //qDebug() << QString("++ %1 has joined %2").arg(peerName, group);
         }
         else if (event.compare("LEAVE") == 0)
         {
-            qDebug() << QString("-- %1 has left %2").arg(peerName, group);
+            //qDebug() << QString("-- %1 has left %2").arg(peerName, group);
         }
         else if (event.compare("SHOUT") == 0)
         {
@@ -144,11 +144,10 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
                 message.remove(0, definitionPrefix.length());
 
                 // FIXME - TEST ONLY - TO REMOVE
-                // Load definition from string content
+                /*// Load definition from string content
                 definition* newDefinition = parser_loadDefinition(message.toStdString().c_str());
-                // Load definition from string content
                 qDebug() << "Definition received from : " << newDefinition->name << " version : " << newDefinition->version << " description : " << newDefinition->description;
-                definition_freeDefinition(newDefinition);
+                definition_freeDefinition(newDefinition);*/
 
                 // Emit signal "Definition Received"
                 Q_EMIT networkController->definitionReceived(peerId, peerName, message);
@@ -160,7 +159,14 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
             {
                 message.remove(0, mappingPrefix.length());
 
-                //qDebug() << peerName << "Mapping:" << message;
+                // FIXME - TEST ONLY - TO REMOVE
+                /*// Load mapping from string content
+                mapping* newMapping = parser_LoadMap((message.toStdString().c_str()));
+                qDebug() << "Mapping received from : " << newMapping->name << " version : " << newMapping->version << " description : " << newMapping->description;
+                mapping_freeMapping(newMapping);*/
+
+                // Emit signal "Mapping Received"
+                Q_EMIT networkController->mappingReceived(peerId, peerName, message);
             }
             else if (message.startsWith("MAPPED"))
             {

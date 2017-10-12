@@ -28,7 +28,7 @@ AgentVM::AgentVM(AgentM* model, QObject *parent) : QObject(parent),
     _name(""),
     _addresses(""),
     _definition(NULL),
-    _isFictitious(true),
+    _hasOnlyDefinition(true),
     _status(AgentStatus::OFF),
     _state(""),
     _isMuted(false),
@@ -44,11 +44,11 @@ AgentVM::AgentVM(AgentM* model, QObject *parent) : QObject(parent),
         _name = model->name();
 
         if (model->peerId().isEmpty()) {
-            _isFictitious = true;
-            qInfo() << "New View Model of FICTITIOUS Agent" << _name;
+            _hasOnlyDefinition = true;
+            qInfo() << "New View Model of Agent" << _name << "with Only Definition";
         }
         else {
-            _isFictitious = false;
+            _hasOnlyDefinition = false;
             qInfo() << "New View Model of Agent" << _name << "with peer id" << model->peerId();
         }
 
@@ -115,8 +115,6 @@ void AgentVM::setdefinition(DefinitionM *value)
     {
         // Previous value
         if (_definition != NULL) {
-            qWarning() << "Delete previous definition ?";
-
             // Delete all previous Inputs / Outputs / Parameters
             _inputsList.deleteAllItems();
             _outputsList.deleteAllItems();
@@ -206,7 +204,7 @@ void AgentVM::onModelsChanged()
     // Model of agent added
     if (_previousAgentsList.count() < newAgentsList.count())
     {
-        qDebug() << _previousAgentsList.count() << "--> ADD --> " << newAgentsList.count();
+        //qDebug() << _previousAgentsList.count() << "--> ADD --> " << newAgentsList.count();
 
         for (AgentM* model : newAgentsList) {
             if ((model != NULL) && !_previousAgentsList.contains(model))
@@ -219,7 +217,7 @@ void AgentVM::onModelsChanged()
     // Model of agent removed
     else if (_previousAgentsList.count() > newAgentsList.count())
     {
-        qDebug() << _previousAgentsList.count() << "--> REMOVE --> " << newAgentsList.count();
+        //qDebug() << _previousAgentsList.count() << "--> REMOVE --> " << newAgentsList.count();
 
         for (AgentM* model : _previousAgentsList) {
             if ((model != NULL) && !newAgentsList.contains(model))

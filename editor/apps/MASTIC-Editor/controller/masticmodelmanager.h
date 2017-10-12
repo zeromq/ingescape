@@ -51,6 +51,13 @@ public:
     
 
     /**
+     * @brief Add a model of agent
+     * @param agent
+     */
+    void addAgentModel(AgentM* agent);
+
+
+    /**
      * @brief Get the model of agent from a Peer Id
      * @param peerId
      * @return
@@ -71,6 +78,13 @@ public:
      * @param agant
      */
     void deleteAgentModel(AgentM* agent);
+
+
+    /**
+     * @brief Add a model of agent definition
+     * @param definition
+     */
+    void addAgentDefinition(DefinitionM* definition);
 
 
     /**
@@ -130,9 +144,18 @@ public Q_SLOTS:
      * @brief Slot when an agent definition has been received and must be processed
      * @param peer Id
      * @param agent name
-     * @param definition
+     * @param definition in JSON format
      */
-    void onDefinitionReceived(QString peerId, QString agentName, QString definition);
+    void onDefinitionReceived(QString peerId, QString agentName, QString definitionJSON);
+
+
+    /**
+     * @brief Slot when an agent mapping has been received and must be processed
+     * @param peer Id
+     * @param agent name
+     * @param mapping in JSON format
+     */
+    void onMappingReceived(QString peerId, QString agentName, QString mappingJSON);
 
 
     /**
@@ -146,19 +169,10 @@ public Q_SLOTS:
 private:
 
     /**
-     * @brief Manage the new model of agent
-     * @param agent
+     * @brief Update definition variants of a list of definitions with the same name
+     * @param definitionName
      */
-    void _manageNewModelOfAgent(AgentM* agent);
-
-
-    /**
-     * @brief Manage the new (model of) definition of agent
-     * @param definition
-     * @param agent
-     */
-    void _manageNewDefinitionOfAgent(DefinitionM* definition, AgentM* agent);
-
+    void _updateDefinitionVariants(QString definitionName);
 
 private:
 

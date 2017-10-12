@@ -164,12 +164,11 @@ AgentMappingM* JsonHelper::createModelOfAgentMapping(QString inputAgentName, QBy
                 QString md5Hash = QString(QCryptographicHash::hash(byteArrayOfJson, QCryptographicHash::Md5).toHex());
                 agentMapping->setmd5Hash(md5Hash);
 
-                qDebug() << "md5:" << md5Hash;
-                qDebug() << "json:" << jsonMapping;
+                //qDebug() << "md5:" << md5Hash;
+                //qDebug() << "json:" << jsonMapping;
             }
         }
     }
-
 
     return agentMapping;
 }

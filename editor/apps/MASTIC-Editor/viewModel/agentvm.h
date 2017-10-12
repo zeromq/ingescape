@@ -47,8 +47,8 @@ class AgentVM : public QObject
     // Model of the agent definition
     I2_QML_PROPERTY_READONLY_CUSTOM_SETTER(DefinitionM*, definition)
 
-    // Flag indicating if our agent is fictitious (never yet appeared on the network)
-    I2_QML_PROPERTY_READONLY(bool, isFictitious)
+    // Flag indicating if our agent has only a definition (never yet appeared on the network)
+    I2_QML_PROPERTY_READONLY(bool, hasOnlyDefinition)
 
     // List of VM of inputs
     I2_QOBJECT_LISTMODEL(AgentIOPVM, inputsList)
