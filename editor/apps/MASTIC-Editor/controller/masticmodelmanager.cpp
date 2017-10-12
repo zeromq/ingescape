@@ -199,18 +199,18 @@ void MasticModelManager::onAgentEntered(QString peerId, QString agentName, QStri
  * @brief Slot when an agent definition has been received and must be processed
  * @param peer Id
  * @param agent name
- * @param definition
+ * @param definition in JSON format
  */
-void MasticModelManager::onDefinitionReceived(QString peerId, QString agentName, QString definition)
+void MasticModelManager::onDefinitionReceived(QString peerId, QString agentName, QString definitionJSON)
 {
     Q_UNUSED(agentName)
 
-    if (!definition.isEmpty())
+    if (!definitionJSON.isEmpty())
     {
         AgentM* agent = getAgentModelFromPeerId(peerId);
         if(agent != NULL)
         {
-            QByteArray byteArrayOfJson = definition.toUtf8();
+            QByteArray byteArrayOfJson = definitionJSON.toUtf8();
 
             // Create a model of agent definition with JSON
             DefinitionM* definition = _jsonHelper->createModelOfDefinition(byteArrayOfJson);
@@ -218,6 +218,35 @@ void MasticModelManager::onDefinitionReceived(QString peerId, QString agentName,
             {
                 // Manage the new (model of) definition of agent
                 _manageNewDefinitionOfAgent(definition, agent);
+            }
+        }
+    }
+}
+
+
+/**
+ * @brief Slot when an agent mapping has been received and must be processed
+ * @param peer Id
+ * @param agent name
+ * @param mapping in JSON format
+ */
+void MasticModelManager::onMappingReceived(QString peerId, QString agentName, QString mappingJSON)
+{
+    if (!mappingJSON.isEmpty())
+    {
+        AgentM* agent = getAgentModelFromPeerId(peerId);
+        if(agent != NULL)
+        {
+            QByteArray byteArrayOfJson = mappingJSON.toUtf8();
+
+            // Create a model of agent mapping with JSON
+            AgentMappingM* agentMapping = _jsonHelper->createModelOfAgentMapping(agentName, byteArrayOfJson);
+            if (agentMapping != NULL)
+            {
+                //TODOESTIA : manage a mapping
+
+                // Manage the new (model of) agent mapping
+                //_manageNewMappingOfAgent(agentMapping, agent);
             }
         }
     }

@@ -130,9 +130,18 @@ public Q_SLOTS:
      * @brief Slot when an agent definition has been received and must be processed
      * @param peer Id
      * @param agent name
-     * @param definition
+     * @param definition in JSON format
      */
-    void onDefinitionReceived(QString peerId, QString agentName, QString definition);
+    void onDefinitionReceived(QString peerId, QString agentName, QString definitionJSON);
+
+
+    /**
+     * @brief Slot when an agent mapping has been received and must be processed
+     * @param peer Id
+     * @param agent name
+     * @param mapping in JSON format
+     */
+    void onMappingReceived(QString peerId, QString agentName, QString mappingJSON);
 
 
     /**

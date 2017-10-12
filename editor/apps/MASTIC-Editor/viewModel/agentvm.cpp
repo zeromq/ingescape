@@ -115,8 +115,6 @@ void AgentVM::setdefinition(DefinitionM *value)
     {
         // Previous value
         if (_definition != NULL) {
-            qWarning() << "Delete previous definition ?";
-
             // Delete all previous Inputs / Outputs / Parameters
             _inputsList.deleteAllItems();
             _outputsList.deleteAllItems();

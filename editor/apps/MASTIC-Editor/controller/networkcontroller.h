@@ -69,9 +69,18 @@ Q_SIGNALS:
      * @brief Signal emitted when an agent definition has been received
      * @param peer id
      * @param peer name
-     * @param definition
+     * @param definitionJSON
      */
-    void definitionReceived(QString peerId, QString peerName, QString definition);
+    void definitionReceived(QString peerId, QString peerName, QString definitionJSON);
+
+
+    /**
+     * @brief Signal emitted when an agent mapping has been received
+     * @param peerId
+     * @param peerName
+     * @param mappingJSON
+     */
+    void mappingReceived(QString peerId, QString peerName, QString mappingJSON);
 
 
     /**
