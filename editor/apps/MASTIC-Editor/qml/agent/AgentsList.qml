@@ -223,6 +223,10 @@ Item {
             width: MasticTheme.leftPanelWidth
             height: model.hasOnlyDefinition ? 85 : 135
 
+            Behavior on height {
+                NumberAnimation {}
+            }
+
             Rectangle {
 
                 anchors {
