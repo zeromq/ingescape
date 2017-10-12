@@ -68,6 +68,13 @@ Item {
 
         delegate: componentAgentListItem
 
+        /*onCurrentIndexChanged: {
+            //console.log("onCurrentIndexChanged " + agentsList.currentIndex);
+            console.log("onCurrentIndexChanged " + model.get(agentsList.currentIndex).name);
+        }
+        onCurrentItemChanged: {
+            console.log("onCurrentItemChanged " + agentsList.currentItem);
+        }*/
 
         //
         // Transition animations
@@ -226,11 +233,11 @@ Item {
                     bottomMargin: 4
                 }
                 radius: 5
-                color: MasticTheme.agentsListItemBackgroundColor
                 border {
                     width: 1
                     color: MasticTheme.whiteColor
                 }
+                color: agentListItem.ListView.isCurrentItem ? "blue" : MasticTheme.agentsListItemBackgroundColor
 
                 Item {
                     id: agentRow
@@ -249,7 +256,7 @@ Item {
                             top: agentRow.top
                         }
 
-                        visible: (model.status === AgentStatus.OFF)
+                        visible: (agentListItem.ListView.isCurrentItem && (model.status === AgentStatus.OFF))
 
                         text: "X"
 
@@ -279,9 +286,10 @@ Item {
 
                         Text {
                             text: model.models.count + " clone(s)"
+                            visible: (model.models.count > 1)
 
                             height: 25
-                            color: MasticTheme.agentsListLabelColor
+                            color: "red"
                             font: MasticTheme.normalFont
                         }
 
@@ -307,18 +315,10 @@ Item {
                     Column {
                         width: 175
                         anchors {
+                            top: parent.top
+                            topMargin: 30
+                            bottom: parent.bottom
                             right: parent.right
-                        }
-
-                        Button {
-                            id: btnDefinition
-                            text: model.definition ? model.definition.name : ""
-
-                            onClicked: {
-                                if (model.definition) {
-                                    console.log("Open the definition of " + model.definition.name)
-                                }
-                            }
                         }
 
                         Row {
@@ -341,7 +341,7 @@ Item {
 
                             Text {
                                 text: "Variante"
-                                visible: model.definition.isVariant
+                                visible: model.definition ? model.definition.isVariant : false
 
                                 height: 25
                                 color: "red"
@@ -360,6 +360,33 @@ Item {
                             font: MasticTheme.normalFont
                         }
 
+                    }
+
+                    MouseArea {
+                        id: mouseAreaForSelection
+                        anchors.fill: parent
+
+                        onPressed: {
+                            agentsList.currentIndex = index
+                        }
+                    }
+
+                    Button {
+                        id: btnDefinition
+
+                        text: model.definition ? model.definition.name : ""
+
+                        anchors {
+                            top: parent.top
+                            right: parent.right
+                        }
+                        width: 175
+
+                        onClicked: {
+                            if (model.definition) {
+                                console.log("Open the definition of " + model.definition.name)
+                            }
+                        }
                     }
 
                     Row {
