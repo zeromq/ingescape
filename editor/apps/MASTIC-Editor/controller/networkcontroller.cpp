@@ -17,17 +17,18 @@
 
 
 #include <QDebug>
+#include "QApplication"
 
 extern "C" {
 #include <mastic_private.h>
 }
 
 #include "misc/masticeditorutils.h"
+#include "model/definitionm.h"
+
 
 static const QString definitionPrefix = "EXTERNAL_DEFINITION#";
 static const QString mappingPrefix = "EXTERNAL_MAPPING#";
-
-#include "misc/masticeditorutils.h"
 
 /**
  * @brief Callback for Incomming Zyre Messages
@@ -212,6 +213,8 @@ NetworkController::NetworkController(QString networkDevice, QString ipAddress, i
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
+    // Application name
+    QString agentName = QApplication::instance()->applicationName();
 
     // Network is ok if the result of mtic_startWithDevice is 1, O otherwise.
     int networkInitialized = 0;
@@ -224,10 +227,42 @@ NetworkController::NetworkController(QString networkDevice, QString ipAddress, i
     QFileInfo checkDefinitionFile(myDefinitionPath);
     if (!checkDefinitionFile.exists() || !checkDefinitionFile.isFile())
     {
-        qWarning() << "No definition has been found : " << myDefinitionPath;
+        qWarning() << "No definition has been found : " << myDefinitionPath << ". Set definition by default";
+        // Set definition and mapping by default to editor
+        QString definitionByDefault = "{  \
+                                      \"definition\": {  \
+                                      \"name\": \""+agentName+"\",   \
+                                      \"description\": \"Definition of "+agentName+" made by "+QApplication::instance()->organizationName()+"\",  \
+                                      \"version\": \""+QApplication::instance()->applicationVersion()+"\",  \
+                                      \"parameters\": [],   \
+                                      \"inputs\": [],       \
+                                      \"outputs\": [] }}";
+        mtic_loadDefinition(definitionByDefault.toStdString().c_str());
+    } else {
+        mtic_loadDefinitionFromPath(myDefinitionPath.toStdString().c_str());
     }
 
-    mtic_setAgentName("MASTIC-Editor");
+    // Read our internal mapping
+    QString myMappingPath = QString("%1/mapping.json").arg(MasticEditorUtils::getDataPath());
+    QFileInfo checkMappingFile(myMappingPath);
+    if (!checkMappingFile.exists() || !checkMappingFile.isFile())
+    {
+        qWarning() << "No mapping has been found : " << myMappingPath << ". Set definition by default";
+        QString mappingByDefault = "{      \
+                                      \"mapping\": {    \
+                                      \"name\": \""+agentName+"\",   \
+                                      \"description\": \"Mapping of "+agentName+" made by "+QApplication::instance()->organizationName()+"\",  \
+                                      \"version\": \""+QApplication::instance()->applicationVersion()+"\",  \
+                                      \"mapping_out\": [],   \
+                                      \"mapping_cat\": [] }}";
+
+
+        mtic_loadMapping(mappingByDefault.toStdString().c_str());
+    } else {
+        mtic_loadMappingFromPath(myMappingPath.toStdString().c_str());
+    }
+
+    mtic_setAgentName(agentName.toStdString().c_str());
 
     // Start service with network device
     if (!networkDevice.isEmpty())
