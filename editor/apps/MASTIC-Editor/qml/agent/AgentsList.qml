@@ -300,8 +300,9 @@ Item {
                         }
 
                         Text {
-                            id: agentStatus
-                            text: "Status: " + AgentStatus.enumToString(model.status)
+                            id: agentAddresses
+                            text: model.addresses
+                            visible: !model.hasOnlyDefinition
 
                             height: 25
                             color: MasticTheme.agentsListLabelColor
@@ -309,8 +310,9 @@ Item {
                         }
 
                         Text {
-                            id: agentAddresses
-                            text: model.addresses
+                            id: agentStatus
+                            text: "Status: " + AgentStatus.enumToString(model.status)
+                            visible: !model.hasOnlyDefinition
 
                             height: 25
                             color: MasticTheme.agentsListLabelColor
@@ -393,6 +395,18 @@ Item {
                                 // Open the definition of our agent
                                 controller.openDefinition(model.QtObject);
                             }
+                        }
+                    }
+
+                    Switch {
+                        checked: (model.status === AgentStatus.ON)
+                        visible: !model.hasOnlyDefinition
+
+                        anchors {
+                            left: agentRow.left
+                            leftMargin: 2
+                            bottom: agentRow.bottom
+                            bottomMargin: 5
                         }
                     }
 
