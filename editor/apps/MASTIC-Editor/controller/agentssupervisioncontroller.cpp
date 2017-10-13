@@ -119,6 +119,21 @@ void AgentsSupervisionController::deleteAgent(AgentVM* agent)
 
 
 /**
+ * @brief Open the definition of an agent of the list
+ * @param agent which contain the definition
+ */
+void AgentsSupervisionController::openDefinition(AgentVM* agent)
+{
+    if ((agent != NULL) && (agent->definition() != NULL) && (_modelManager != NULL))
+    {
+        if (!_modelManager->openedDefinitions()->contains(agent->definition())) {
+            _modelManager->openedDefinitions()->append(agent->definition());
+        }
+    }
+}
+
+
+/**
  * @brief Slot when a new model of agent has been created
  * @param agent
  */

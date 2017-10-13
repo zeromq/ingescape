@@ -94,11 +94,12 @@ void AgentVM::setname(QString value)
 {
     if (_name != value)
     {
-        qDebug() << "Rename agent" << _name << "to" << value;
+        QString previousName = _name;
 
         _name = value;
 
         // TODO: update the name of models
+        qDebug() << "Rename agent from" << previousName << "to" << _name;
 
         Q_EMIT nameChanged(value);
     }
@@ -116,9 +117,9 @@ void AgentVM::setdefinition(DefinitionM *value)
         // Previous value
         if (_definition != NULL) {
             // Delete all previous Inputs / Outputs / Parameters
-            _inputsList.deleteAllItems();
-            _outputsList.deleteAllItems();
-            _parametersList.deleteAllItems();
+            //_inputsList.deleteAllItems();
+            //_outputsList.deleteAllItems();
+            //_parametersList.deleteAllItems();
         }
 
         _definition = value;
@@ -129,7 +130,7 @@ void AgentVM::setdefinition(DefinitionM *value)
             //
             // Create the list of VM of inputs
             //
-            QList<AgentIOPVM*> listOfInputVMs;
+            /*QList<AgentIOPVM*> listOfInputVMs;
             foreach (AgentIOPM* inputM, _definition->inputsList()->toList())
             {
                 if (inputM != NULL)
@@ -138,13 +139,13 @@ void AgentVM::setdefinition(DefinitionM *value)
                     listOfInputVMs.append(inputVM);
                 }
             }
-            _inputsList.append(listOfInputVMs);
+            _inputsList.append(listOfInputVMs);*/
 
 
             //
             // Create the list of VM of outputs
             //
-            QList<AgentIOPVM*> listOfOutputVMs;
+            /*QList<AgentIOPVM*> listOfOutputVMs;
             foreach (AgentIOPM* outputM, _definition->outputsList()->toList())
             {
                 if (outputM != NULL)
@@ -153,13 +154,13 @@ void AgentVM::setdefinition(DefinitionM *value)
                     listOfOutputVMs.append(outputVM);
                 }
             }
-            _outputsList.append(listOfOutputVMs);
+            _outputsList.append(listOfOutputVMs);*/
 
 
             //
             // Create the list of VM of parameters
             //
-            QList<AgentIOPVM*> listOfParameterVMs;
+            /*QList<AgentIOPVM*> listOfParameterVMs;
             foreach (AgentIOPM* parameterM, _definition->parametersList()->toList())
             {
                 if (parameterM != NULL)
@@ -168,7 +169,7 @@ void AgentVM::setdefinition(DefinitionM *value)
                     listOfParameterVMs.append(parameterVM);
                 }
             }
-            _parametersList.append(listOfParameterVMs);
+            _parametersList.append(listOfParameterVMs);*/
         }
 
         Q_EMIT definitionChanged(value);

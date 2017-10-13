@@ -267,7 +267,7 @@ Item {
                         onClicked: {
                             if (controller)
                             {
-                                //console.log("QML: Delete agent from the list: " + model.name)
+                                // Delete our agent
                                 controller.deleteAgent(model.QtObject);
                             }
                         }
@@ -389,8 +389,9 @@ Item {
                         width: 175
 
                         onClicked: {
-                            if (model.definition) {
-                                console.log("Open the definition of " + model.definition.name)
+                            if (controller) {
+                                // Open the definition of our agent
+                                controller.openDefinition(model.QtObject);
                             }
                         }
                     }

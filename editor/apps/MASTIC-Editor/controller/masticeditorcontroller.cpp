@@ -158,6 +158,19 @@ QObject* MasticEditorController::qmlSingleton(QQmlEngine* engine, QJSEngine* scr
 
 
 /**
+ * @brief Close a definition
+ * @param definition
+ */
+void MasticEditorController::closeDefinition(DefinitionM* definition)
+{
+    if ((definition != NULL) && (_modelManager != NULL))
+    {
+        _modelManager->openedDefinitions()->remove(definition);
+    }
+}
+
+
+/**
  * @brief Method used to force the creation of our singleton from QML
  */
 void MasticEditorController::forceCreation()

@@ -73,6 +73,13 @@ public:
     Q_INVOKABLE void deleteAgent(AgentVM* agent);
 
 
+    /**
+     * @brief Open the definition of an agent of the list
+     * @param agent which contain the definition
+     */
+    Q_INVOKABLE void openDefinition(AgentVM* agent);
+
+
 Q_SIGNALS:
 
 public Q_SLOTS:
