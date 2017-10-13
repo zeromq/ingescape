@@ -150,6 +150,20 @@ Item {
 
     //-----------------------------------------
     //
+    // Agent Definition editors UI elements
+    //
+    //-----------------------------------------
+
+    // Background
+    readonly property color definitionEditorsBackgroundColor: "#282C88"
+
+    // Labels
+    readonly property color definitionEditorsLabelColor: theme.whiteColor
+
+
+
+    //-----------------------------------------
+    //
     // Scenario UI elements
     //
     //-----------------------------------------

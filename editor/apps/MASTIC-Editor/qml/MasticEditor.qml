@@ -149,4 +149,15 @@ Item {
     //
     // Foreground: to add AgentDefinitionEditor(s), AgentMappingHistory ?
     //
+    Repeater {
+        model: MasticEditorC.modelManager.openedDefinitions
+
+        delegate: Agent.AgentDefinitionEditor {
+
+            // Slot on signal "Clicked on Close Button"
+            onClickedOnCloseButton: {
+                MasticEditorC.closeDefinition(model.QtObject);
+            }
+        }
+    }
 }

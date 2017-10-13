@@ -22,6 +22,7 @@
 
 #include <model/jsonhelper.h>
 #include <model/agentm.h>
+#include <model/definitionm.h>
 #include <viewModel/linkvm.h>
 
 
@@ -34,6 +35,9 @@ class MasticModelManager : public QObject
 
     // List of all models of agents
     //I2_QOBJECT_LISTMODEL(AgentM, allAgents)
+
+    // List of opened definitions
+    I2_QOBJECT_LISTMODEL(DefinitionM, openedDefinitions)
 
 
 public:
@@ -181,9 +185,6 @@ private:
 
     // List of all models of agents
     //QList<AgentM*> _allAgentsModel;
-
-    // Map of all agents VM per name and version
-    //QHash<QString, AgentVM*> _mapAgentsVMPerNameAndVersion;
 
     // Map from Peer ID to a model of agent
     QHash<QString, AgentM*> _mapFromPeerIdToAgentM;

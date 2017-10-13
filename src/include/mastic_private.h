@@ -230,7 +230,7 @@ agent_iop* model_findIopByName(const char* name, iop_t type);
 agent_iop* model_findInputByName(const char* name);
 agent_iop* model_findOutputByName(const char* name);
 agent_iop* model_findParameterByName(const char* name);
-void* model_get(const char*name_iop, iop_t type);
+void* model_getValueFor(const char*name_iop, iop_t type);
 
 
 // network

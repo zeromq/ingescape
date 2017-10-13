@@ -87,6 +87,13 @@ public:
      static QObject* qmlSingleton(QQmlEngine* engine, QJSEngine* scriptEngine);
 
 
+     /**
+      * @brief Close a definition
+      * @param definition
+      */
+     Q_INVOKABLE void closeDefinition(DefinitionM* definition);
+
+
 public Q_SLOTS:
 
      /**

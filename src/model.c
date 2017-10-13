@@ -76,17 +76,15 @@ void model_setIopValue(agent_iop *iop, void* value, long size){
 
 char* model_IntToString(const int value)
 {
-    // Compute the size of allocate for str.
+    // Compute the size to allocate for str.
    int length = snprintf( NULL, 0, "%d", value);
 
-   if(length == 0)
-   {
-       mtic_debug("value double is NULL. Its length is zero.");
+   if(length == 0){
        return NULL;
    }
 
    // Allocate the memory.
-   char* str = malloc(length+1);
+   char* str = calloc(1,length+1);
    // Write the value into str.
    snprintf( str, length + 1, "%d", value);
 
@@ -95,16 +93,14 @@ char* model_IntToString(const int value)
 
 char* model_DoubleToString(const double value)
 {
-    // Compute the size of allocate for str.
-    int length = snprintf( NULL, 0, "%fl", value);
+    // Compute the size to allocate for str.
+    int length = snprintf( NULL, 0, "%lf", value);
 
-    if(length == 0)
-    {
-        mtic_debug("value double is NULL. Its length is zero.");
+    if(length == 0){
         return NULL;
     }
     // Allocate the memory.
-    char* str = malloc(length+1);
+    char* str = calloc(1,length+1);
     // Write the value into str.
     snprintf( str, length + 1, "%lf", value);
 
@@ -158,7 +154,7 @@ agent_iop * model_findIopByName(const char *name, iop_t type){
                 //find the input agent_iop
                 HASH_FIND_STR( mtic_internal_definition->inputs_table, name, found );
             }else{
-                fprintf(stderr, "ERROR : The name of the input is empty or mtic_internal_definition is NULL\n");
+                mtic_debug("ERROR : The name of the input is empty or mtic_internal_definition is NULL\n");
             }
             break;
         case OUTPUT_T:
@@ -166,7 +162,7 @@ agent_iop * model_findIopByName(const char *name, iop_t type){
                 //find the input agent_iop
                 HASH_FIND_STR( mtic_internal_definition->outputs_table, name, found );
             }else{
-                fprintf(stderr, "ERROR : The name of the output is empty or mtic_internal_definition is NULL\n");
+                mtic_debug("ERROR : The name of the output is empty or mtic_internal_definition is NULL\n");
             }
             break;
         case PARAMETER_T:
@@ -174,7 +170,7 @@ agent_iop * model_findIopByName(const char *name, iop_t type){
                 //find the input agent_iop
                 HASH_FIND_STR( mtic_internal_definition->params_table, name, found );
             }else{
-                fprintf(stderr, "ERROR : The name of the parameter is empty or mtic_internal_definition is NULL\n");
+                mtic_debug("ERROR : The name of the parameter is empty or mtic_internal_definition is NULL\n");
             }
             break;
         default:
@@ -192,7 +188,7 @@ agent_iop *model_findInputByName(const char *name)
         //find the input agent_iop
         HASH_FIND_STR( mtic_internal_definition->inputs_table, name, found );
     }else{
-        fprintf(stderr, "ERROR : The name of the input is empty or mtic_internal_definition is NULL\n");
+        mtic_debug("ERROR : The name of the input is empty or mtic_internal_definition is NULL\n");
     }
     
     return found;
@@ -206,7 +202,7 @@ agent_iop *model_findOutputByName(const char *name)
         //find the input agent_iop
         HASH_FIND_STR( mtic_internal_definition->outputs_table, name, found );
     }else{
-        fprintf(stderr, "ERROR : The name of the output is empty or mtic_internal_definition is NULL\n");
+        mtic_debug("ERROR : The name of the output is empty or mtic_internal_definition is NULL\n");
     }
     
     return found;
@@ -220,13 +216,13 @@ agent_iop *model_findParameterByName(const char *name)
         //find the input agent_iop
         HASH_FIND_STR( mtic_internal_definition->params_table, name, found );
     }else{
-        fprintf(stderr, "ERROR : The name of the parameter is empty or mtic_internal_definition is NULL\n");
+        mtic_debug("ERROR : The name of the parameter is empty or mtic_internal_definition is NULL\n");
     }
     
     return found;
 }
 
-void * model_get(const char *name_iop, iop_t type){
+void * model_getValueFor(const char *name_iop, iop_t type){
     
     agent_iop *iop = model_findIopByName((char*) name_iop,type);
     
@@ -287,7 +283,7 @@ int mtic_readInput(const char *name, void **value, long *size){
 
     // Check if the iop has been returned.
     if(iop == NULL){
-        mtic_debug("%s : Agent's input %s cannot be found\n", __FUNCTION__, name);
+        mtic_debug("%s : input %s not found\n", __FUNCTION__, name);
         return 0;
     }
 
@@ -305,14 +301,14 @@ int mtic_readInput(const char *name, void **value, long *size){
         *value = mtic_readInputAsString(name);
         break;
     case IMPULSION_T:
-        mtic_debug("%s: Agent's input %s is a impulsion and has nothing to read. It use the callback\n.", __FUNCTION__,  name);
+        mtic_debug("%s: input %s is an impulsion and has NULL value\n.", __FUNCTION__,  name);
         return 0;
         break;
     case DATA_T:
         mtic_readInputAsData(name, value, size);
         break;
     default:
-        mtic_debug("%s: Agent's input %s has not a known type\n.", __FUNCTION__,  name);
+        mtic_debug("%s: input %s has unknown type\n.", __FUNCTION__,  name);
         return 0;
         break;
 
@@ -337,7 +333,7 @@ int mtic_readOutput(const char *name, void **value, long *size){
 
     // Check if the iop has been returned.
     if(iop == NULL){
-        mtic_debug("%s : Agent's output %s cannot be found\n", __FUNCTION__, name);
+        mtic_debug("%s : output %s not found\n", __FUNCTION__, name);
         return 0;
     }
 
@@ -355,14 +351,14 @@ int mtic_readOutput(const char *name, void **value, long *size){
         *value = mtic_readOutputAsString(name);
         break;
     case IMPULSION_T:
-        mtic_debug("%s: Agent's output %s is a impulsion and has nothing to read. It use the callback\n.", __FUNCTION__,  name);
+        mtic_debug("%s: output %s is an impulsion and has NULL value\n.", __FUNCTION__,  name);
         return 0;
         break;
     case DATA_T:
         mtic_readOutputAsData(name, value, size);
         break;
     default:
-        mtic_debug("%s: Agent's output %s has not a known type\n.", __FUNCTION__,  name);
+        mtic_debug("%s: output %s has unknown type\n.", __FUNCTION__,  name);
         return 0;
         break;
 
@@ -387,7 +383,7 @@ int mtic_readParameter(const char *name, void **value, long *size){
 
     // Check if the iop has been returned.
     if(iop == NULL){
-        mtic_debug("%s : Agent's parameter %s cannot be found\n", __FUNCTION__, name);
+        mtic_debug("%s : parameter %s not found\n", __FUNCTION__, name);
         return 0;
     }
 
@@ -405,14 +401,14 @@ int mtic_readParameter(const char *name, void **value, long *size){
         *value = mtic_readParameterAsString(name);
         break;
     case IMPULSION_T:
-        mtic_debug("%s: Agent's parameter %s is a impulsion and has nothing to read. It use the callback\n.", __FUNCTION__,  name);
+        mtic_debug("%s: parameter %s is an impulsion and has NULL value\n.", __FUNCTION__,  name);
         return 0;
         break;
     case DATA_T:
         mtic_readParameterAsData(name, value, size);
         break;
     default:
-        mtic_debug("%s: Agent's parameter %s has not a known type\n.", __FUNCTION__,  name);
+        mtic_debug("%s: parameter %s has unknown type\n.", __FUNCTION__,  name);
         return 0;
         break;
 
@@ -424,7 +420,7 @@ int mtic_readParameter(const char *name, void **value, long *size){
 /**
  * \fn mtic_readInputAsBool(const char *name)
  * \ingroup readfct
- * \brief Find the Agent's input by name and return the input value as a Boolean.
+ * \brief Find the input by name and return the input value as a Boolean.
  * \param name is the name of the input to read as it has been defined in the definition.
  * \return Return the input value as true or false.
  */
@@ -442,13 +438,13 @@ bool mtic_readInputAsBool(const char *name){
 
             case INTEGER_T:
                 //Handle the case: An implicit conversion can be done from int to bool.
-                mtic_debug("mtic_readInputAsBool : Implicit conversion from int to bool for the input {%s}.\n", name);
+                mtic_debug("mtic_readInputAsBool : Implicit conversion from int to bool for the input {%s}\n", name);
                 return (bool) iop->value.i;
                 break;
 
             case DOUBLE_T:
                 //Handle the case: An implicit conversion can be done from double to bool.
-                mtic_debug("mtic_readInputAsBool : Implicit conversion from double to bool for the input {%s}.\n", name);
+                mtic_debug("mtic_readInputAsBool : Implicit conversion from double to bool for the input {%s}\n", name);
                 return (bool) iop->value.d;
                 break;
 
@@ -456,29 +452,29 @@ bool mtic_readInputAsBool(const char *name){
                 //Handle the case: An implicit conversion can be done from string to bool.
                 // Test first if the input value is {true}, then {false}. Finally if the two previous test fail the function returns {false}.
                 if (!strcmp(iop->value.s, "true")){
-                    mtic_debug("mtic_readInputAsBool : Implicit conversion from string to bool for the input {%s}.\n", name);
+                    mtic_debug("mtic_readInputAsBool : Implicit conversion from string to bool for the input {%s}\n", name);
                     return true;
                 }
                 else if (!strcmp(iop->value.s, "false")){
-                    mtic_debug("mtic_readInputAsBool : Implicit conversion from string to bool for the input {%s}.\n", name);
+                    mtic_debug("mtic_readInputAsBool : Implicit conversion from string to bool for the input {%s}\n", name);
                     return false;
                 }
                 else{
-                    mtic_debug("mtic_readInputAsBool : Implicit conversion fails to attempt for the input {%s}. String value is different from {true , false}.\n", name);
+                    mtic_debug("mtic_readInputAsBool : Implicit conversion failed for input {%s} String value is different from {true , false}\n", name);
                     return false;
                 }
                 break;
 
             default:
                 //Handle the case: the input cannot be handled.
-                mtic_debug("mtic_readInputAsBool : Agent's input {%s} cannot be returned as a Boolean! By default {false} is returned.\n", name);
+                mtic_debug("mtic_readInputAsBool : input {%s} cannot be returned as a bool\n", name);
                 return false;
                 break;
         }
     }
     else{
         //Handle the case: the input is not found.
-        mtic_debug("mtic_readInputAsBool : Any Agent's input {%s} cannot be found. By default {false} is returned.\n", name);
+        mtic_debug("mtic_readInputAsBool : input {%s} not found\n", name);
         return false;
     }
 }
@@ -506,13 +502,13 @@ int mtic_readInputAsInt(const char *name){
 
             case BOOL_T:
                 //Handle the case: An implicit conversion can be done from bool to int.
-                mtic_debug("mtic_readInputAsInt : Implicit conversion from bool to int for the input {%s}.\n", name);
+                mtic_debug("mtic_readInputAsInt : Implicit conversion from bool to int for the input {%s}\n", name);
                 return (int) iop->value.b;
                 break;
 
             case DOUBLE_T:
                 //Handle the case: An implicit conversion can be done from double to int.
-                mtic_debug("mtic_readInputAsInt : Implicit conversion from double to int for the input {%s}.\n", name);
+                mtic_debug("mtic_readInputAsInt : Implicit conversion from double to int for the input {%s}\n", name);
                 if(iop->value.d < 0) {
                     return (int) (iop->value.d - 0.5);
                 }
@@ -528,25 +524,25 @@ int mtic_readInputAsInt(const char *name){
 
                 // Check if one value is returned.
                 if(test == 1){
-                    mtic_debug("mtic_readInputAsInt : Implicit conversion from string to int for the input {%s}.\n", name);
+                    mtic_debug("mtic_readInputAsInt : Implicit conversion from string to int for the input {%s}\n", name);
                     return value;
                 }
                 else{
-                    mtic_debug("mtic_readInputAsInt : Implicit conversion fails to attempt for the input {%s}. String value is different from an integer.\n", name);
+                    mtic_debug("mtic_readInputAsInt : Implicit conversion failed for input {%s} String value is different from an integer.\n", name);
                     return value;
                 }
                 break;
 
             default:
                 //Handle the case: the input cannot be handled.
-                mtic_debug("mtic_readInputAsInt : Agent's input {%s} cannot be returned as an integer! By default {0} is returned.\n", name);
+                mtic_debug("mtic_readInputAsInt : input {%s} cannot be returned as an integer\n", name);
                 return 0;
                 break;
         }
     }
     else{
         //Handle the case: the input is not found.
-        mtic_debug("mtic_readInputAsInt : Any Agent's {%s} input cannot be found. By default {0} is returned.\n", name);
+        mtic_debug("mtic_readInputAsInt : {%s} input not found\n", name);
         return 0;
     }
 }
@@ -573,13 +569,13 @@ double mtic_readInputAsDouble(const char *name){
 
              case BOOL_T:
                  //Handle the case: An implicit conversion can be done from bool to double.
-                 mtic_debug("mtic_readInputAsDouble : Implicit conversion from bool to double for the input {%s}.\n", name);
+                 mtic_debug("mtic_readInputAsDouble : Implicit conversion from bool to double for the input {%s}\n", name);
                  return (double) iop->value.b;
                  break;
 
              case INTEGER_T:
                  //Handle the case: An implicit conversion can be done from int to double.
-                 mtic_debug("mtic_readInputAsDouble : Implicit conversion from int to double for the input {%s}.\n", name);
+                 mtic_debug("mtic_readInputAsDouble : Implicit conversion from int to double for the input {%s}\n", name);
                  return (double) iop->value.i;
                  break;
 
@@ -590,25 +586,25 @@ double mtic_readInputAsDouble(const char *name){
 
                  // Check if one value is returned.
                  if(test == 1){
-                     mtic_debug("mtic_readInputAsDouble : Implicit conversion from string to double for the input {%s}.\n", name);
+                     mtic_debug("mtic_readInputAsDouble : Implicit conversion from string to double for the input {%s}\n", name);
                      return value;
                  }
                  else{
-                     mtic_debug("mtic_readInputAsDouble : Implicit conversion fails to attempt for the input {%s}. String value is different from a double.\n", name);
+                     mtic_debug("mtic_readInputAsDouble : Implicit conversion failed for input {%s} String value is different from a double.\n", name);
                      return value;
                  }
                  break;
 
              default:
                  //Handle the case: the input cannot be handled.
-                 mtic_debug("mtic_readInputAsDouble : Agent's input {%s} cannot be returned as a double! By default {0.0} is returned.\n", name);
+                 mtic_debug("mtic_readInputAsDouble : input {%s} cannot be returned as a double\n", name);
                  return 0.0;
                  break;
          }
      }
      else{
          //Handle the case: the input is not found.
-         mtic_debug("mtic_readInputAsDouble : Agent's input {%s} cannot be found. By default {0.0} is returned.\n", name);
+         mtic_debug("mtic_readInputAsDouble : input {%s} not found\n", name);
          return 0.0;
      }
 }
@@ -634,32 +630,32 @@ char* mtic_readInputAsString(const char *name){
 
             case BOOL_T:
                 //Handle the case: An implicit conversion can be done from bool to string.
-                mtic_debug("mtic_readInputAsString : Implicit conversion from bool to string for the input {%s}.", name);
+                mtic_debug("mtic_readInputAsString : Implicit conversion from bool to string for the input {%s}", name);
                 return iop->value.b ? strdup("true") : strdup("false");
                 break;
 
             case INTEGER_T:
                 //Handle the case: An implicit conversion can be done from int to string.
-                mtic_debug("mtic_readInputAsString : Implicit conversion from int to string for the input {%s}.", name);
+                mtic_debug("mtic_readInputAsString : Implicit conversion from int to string for the input {%s}", name);
                 return model_IntToString(iop->value.i);
                 break;
 
             case DOUBLE_T:
                 //Handle the case: An implicit conversion can be done from double to string.
-                mtic_debug("mtic_readInputAsString : Implicit conversion from double to string for the input {%s}.", name);
+                mtic_debug("mtic_readInputAsString : Implicit conversion from double to string for the input {%s}", name);
                 return model_DoubleToString(iop->value.d);
                 break;
 
             default:
                 //Handle the case: the input cannot be handled.
-                mtic_debug("mtic_readInputAsDouble : Agent's input {%s} cannot be return as a string! By default {NULL} is return.", name);
+                mtic_debug("mtic_readInputAsDouble : input {%s} cannot be returned as a string", name);
                 return NULL;
                 break;
         }
     }
     else{
         //Handle the case: the input is not found.
-        mtic_debug("mtic_readInputAsString : Agent's input {%s} cannot be found. By default {NULL} is returned.", name);
+        mtic_debug("mtic_readInputAsString : input {%s} not found", name);
         return NULL;
     }
 }
@@ -681,18 +677,18 @@ int mtic_readInputAsData(const char *name, void **data, long *size){
 
     // Check if the iop has been returned.
     if(iop == NULL){
-        mtic_debug("%s : Agent's input '%s' cannot be found\n", __FUNCTION__, name);
+        mtic_debug("%s : input '%s' not found\n", __FUNCTION__, name);
         return 0;
     }
 
     //Check the value type as an impulsion.
     if(iop->value_type != DATA_T){
-        mtic_debug("%s: Agent's input '%s' is not an data\n", __FUNCTION__,  name);
+        mtic_debug("%s: input '%s' is not a data\n", __FUNCTION__,  name);
         return 0;
     }
 
     //Get the pointer on the structure data
-    void * value = model_get(name,INPUT_T);
+    void * value = model_getValueFor(name,INPUT_T);
 
     //get size
     *size = iop->valueSize;
@@ -724,13 +720,13 @@ bool mtic_readOutputAsBool(const char *name){
 
             case INTEGER_T:
                 //Handle the case: An implicit conversion can be done from int to bool.
-                mtic_debug("mtic_readOutputAsBool : Implicit conversion from int to bool for the output {%s}.", name);
+                mtic_debug("mtic_readOutputAsBool : Implicit conversion from int to bool for the output {%s}", name);
                 return (bool) iop->value.i;
                 break;
 
             case DOUBLE_T:
                 //Handle the case: An implicit conversion can be done from double to bool.
-                mtic_debug("mtic_readOutputAsBool : Implicit conversion from double to bool for the output {%s}.", name);
+                mtic_debug("mtic_readOutputAsBool : Implicit conversion from double to bool for the output {%s}", name);
                 return (bool) iop->value.d;
                 break;
 
@@ -738,29 +734,29 @@ bool mtic_readOutputAsBool(const char *name){
                 //Handle the case: An implicit conversion can be done from string to bool.
                 // Test first if the output value is {true}, then {false}. Finally if the two previous test fail the function returns {false}.
                 if (!strcmp(iop->value.s, "true")){
-                    mtic_debug("mtic_readOutputAsBool : Implicit conversion from string to bool for the output {%s}.", name);
+                    mtic_debug("mtic_readOutputAsBool : Implicit conversion from string to bool for the output {%s}", name);
                     return true;
                 }
                 else if (!strcmp(iop->value.s, "false")){
-                    mtic_debug("mtic_readOutputAsBool : Implicit conversion from string to bool for the output {%s}.", name);
+                    mtic_debug("mtic_readOutputAsBool : Implicit conversion from string to bool for the output {%s}", name);
                     return false;
                 }
                 else{
-                    mtic_debug("mtic_readOutputAsBool : Implicit conversion fails to attempt for the output {%s}. String value is different from {true , false}.", name);
+                    mtic_debug("mtic_readOutputAsBool : Implicit conversion failed for output {%s} String value is different from {true , false}.", name);
                     return false;
                 }
                 break;
 
             default:
                 //Handle the case: the output cannot be handled.
-                mtic_debug("mtic_readOutputAsBool : Agent's output {%s} cannot be returned as a Boolean! By default {false} is returned.", name);
+                mtic_debug("mtic_readOutputAsBool : output {%s} cannot be returned as a bool", name);
                 return false;
                 break;
         }
     }
     else{
         //Handle the case: the output is not found.
-        mtic_debug("mtic_readOutputAsBool : Any Agent's output {%s} has been returned", name);
+        mtic_debug("mtic_readOutputAsBool : output : {%s} not found", name);
         return false;
     }
 }
@@ -768,7 +764,7 @@ bool mtic_readOutputAsBool(const char *name){
 /**
  * \fn mtic_readOutputAsInt(const char *name)
  * \ingroup readfct
- * \brief Find the Agent's output by name and return the output value as an integer.
+ * \brief Find the output by name and return the output value as an integer.
  * \param name is the name of the output to read as it has been defined in the definition.
  * \return Return the output value as an integer.
  */
@@ -787,13 +783,13 @@ int mtic_readOutputAsInt(const char *name){
 
             case BOOL_T:
                 //Handle the case: An implicit conversion can be done from bool to int.
-                mtic_debug("mtic_readOutputAsInt : Implicit conversion from bool to int for the output {%s}.", name);
+                mtic_debug("mtic_readOutputAsInt : Implicit conversion from bool to int for the output {%s}", name);
                 return (int) iop->value.b;
                 break;
 
             case DOUBLE_T:
                 //Handle the case: An implicit conversion can be done from double to int.
-                mtic_debug("mtic_readOutputAsInt : Implicit conversion from double to int for the output {%s}.", name);
+                mtic_debug("mtic_readOutputAsInt : Implicit conversion from double to int for the output {%s}", name);
                 if(iop->value.d < 0) {
                     return (int) (iop->value.d - 0.5);
                 }
@@ -809,25 +805,25 @@ int mtic_readOutputAsInt(const char *name){
 
                 // Check if one value is returned.
                 if(test == 1){
-                    mtic_debug("mtic_readOutputAsInt : Implicit conversion from string to int for the output {%s}.", name);
+                    mtic_debug("mtic_readOutputAsInt : Implicit conversion from string to int for the output {%s}", name);
                     return value;
                 }
                 else{
-                    mtic_debug("mtic_readOutputAsInt : Implicit conversion fails to attempt for the output {%s}. String value is different from an integer.", name);
+                    mtic_debug("mtic_readOutputAsInt : Implicit conversion failed for output {%s} String value is different from an integer.", name);
                     return value;
                 }
                 break;
 
             default:
                 //Handle the case: the output cannot be handled.
-                mtic_debug("mtic_readOutputAsInt : Agent's output {%s} cannot be returned as an integer! By default {0} is returned.", name);
+                mtic_debug("mtic_readOutputAsInt : output {%s} cannot be returned as an integer", name);
                 return 0;
                 break;
         }
     }
     else{
         //Handle the case: the output is not found.
-        mtic_debug("mtic_readOutputAsInt : Any Agent's output {%s} has been returned\n", name);
+        mtic_debug("mtic_readOutputAsInt : output : {%s} not found\n", name);
         return 0;
     }
 }
@@ -835,7 +831,7 @@ int mtic_readOutputAsInt(const char *name){
 /**
  * \fn mtic_readOutputAsDouble(const char *name)
  * \ingroup readfct
- * \brief Find the Agent's output by name and return the output value as a double.
+ * \brief Find the output by name and return the output value as a double.
  * \param name is the name of the output to read as it has been defined in the definition.
  * \return Return the output value as a double.
  */
@@ -854,13 +850,13 @@ double mtic_readOutputAsDouble(const char *name){
 
             case BOOL_T:
                 //Handle the case: An implicit conversion can be done from bool to double.
-                mtic_debug("mtic_readOutputAsDouble : Implicit conversion from bool to double for the output {%s}.", name);
+                mtic_debug("mtic_readOutputAsDouble : Implicit conversion from bool to double for the output {%s}", name);
                 return (double) iop->value.b;
                 break;
 
             case INTEGER_T:
                 //Handle the case: An implicit conversion can be done from int to double.
-                mtic_debug("mtic_readOutputAsDouble : Implicit conversion from int to double for the output {%s}.", name);
+                mtic_debug("mtic_readOutputAsDouble : Implicit conversion from int to double for the output {%s}", name);
                 return (double) iop->value.i;
                 break;
 
@@ -872,25 +868,25 @@ double mtic_readOutputAsDouble(const char *name){
 
                 // Check if one value is returned.
                 if(test == 1){
-                    mtic_debug("mtic_readOutputAsDouble : Implicit conversion from string to double for the output {%s}.", name);
+                    mtic_debug("mtic_readOutputAsDouble : Implicit conversion from string to double for the output {%s}", name);
                     return value;
                 }
                 else{
-                    mtic_debug("mtic_readOutputAsDouble : Implicit conversion fails to attempt for the output {%s}. String value is different from a double.", name);
+                    mtic_debug("mtic_readOutputAsDouble : Implicit conversion failed for output {%s} String value is different from a double.", name);
                     return value;
                 }
                 break;
 
             default:
                 //Handle the case: the output cannot be handled.
-                mtic_debug("mtic_readOutputAsDouble : Agent's output {%s} cannot be returned as a double! By default {0.0} is returned.", name);
+                mtic_debug("mtic_readOutputAsDouble : output {%s} cannot be returned as a double", name);
                 return 0.0;
                 break;
         }
     }
     else{
         //Handle the case: the output is not found.
-        mtic_debug("mtic_readOutputAsDouble : Any Agent's output {%s} has been returned\n", name);
+        mtic_debug("mtic_readOutputAsDouble : output : {%s} not found\n", name);
         return 0.0;
     }
 }
@@ -898,7 +894,7 @@ double mtic_readOutputAsDouble(const char *name){
 /**
  * \fn mtic_readOutputAsString(const char *name)
  * \ingroup readfct
- * \brief Find the Agent's output by name and return the output value as a string.
+ * \brief Find the output by name and return the output value as a string.
  * \param name is the name of the output to read as it has been defined in the definition.
  * \return Return the output value as a string.
  * \warning  Allocate memory that must be freed by the user.
@@ -916,39 +912,39 @@ char* mtic_readOutputAsString(const char *name){
 
             case BOOL_T:
                 //Handle the case: An implicit conversion can be done from bool to string.
-                mtic_debug("mtic_readOutputAsString : Implicit conversion from bool to string for the output {%s}.", name);
+                mtic_debug("mtic_readOutputAsString : Implicit conversion from bool to string for the output {%s}", name);
                 return iop->value.b ? strdup("true") : strdup("false");
                 break;
 
             case INTEGER_T:
                 //Handle the case: An implicit conversion can be done from int to string.
-                mtic_debug("mtic_readOutputAsString : Implicit conversion from int to string for the output {%s}.", name);
+                mtic_debug("mtic_readOutputAsString : Implicit conversion from int to string for the output {%s}", name);
                 return model_IntToString(iop->value.i);
                 break;
 
             case DOUBLE_T:
                 //Handle the case: An implicit conversion can be done from double to string.
-                mtic_debug("mtic_readOutputAsString : Implicit conversion from double to string for the output {%s}.", name);
+                mtic_debug("mtic_readOutputAsString : Implicit conversion from double to string for the output {%s}", name);
                 return model_DoubleToString(iop->value.d);
                 break;
 
             default:
                 //Handle the case: the output cannot be handled.
-                mtic_debug("mtic_readOutputAsString : Agent's output {%s} cannot be returned as a string! By default {NULL} is return.", name);
+                mtic_debug("mtic_readOutputAsString : output {%s} cannot be returned as a string", name);
                 return NULL;
                 break;
         }
     }
     else{
         //Handle the case: the output is not found.
-        mtic_debug("mtic_readOutputAsString : Agent's output {%s} cannot be found", name);
+        mtic_debug("mtic_readOutputAsString : output {%s} not found", name);
         return NULL;
     }
 }
 /**
  * \fn int mtic_readOutputAsData(const char *name, void *data, long *size)
  * \ingroup readfct
- * \brief Find the Agent's output by name and get the pointer on the data.
+ * \brief Find the output by name and get the pointer on the data.
  * \warning The output as to be data type
  * \warning Allocating memory before calling this function that must be free after use.
  * \param name The output's name
@@ -962,18 +958,18 @@ int mtic_readOutputAsData(const char *name, void **data, long *size){
 
     // Check if the iop has been returned.
     if(iop == NULL){
-        mtic_debug("%s : Agent's output '%s' cannot be found\n", __FUNCTION__, name);
+        mtic_debug("%s : output '%s' not found\n", __FUNCTION__, name);
         return 0;
     }
 
     //Check the value type as an impulsion.
     if(iop->value_type != DATA_T){
-        mtic_debug("%s: Agent's output '%s' is not an data\n", __FUNCTION__,  name);
+        mtic_debug("%s: output '%s' is not a data\n", __FUNCTION__,  name);
         return 0;
     }
 
     //Get the pointer on the structure data
-    void * value = model_get(name,OUTPUT_T);
+    void * value = model_getValueFor(name,OUTPUT_T);
 
     //get size
     *size = iop->valueSize;
@@ -987,7 +983,7 @@ int mtic_readOutputAsData(const char *name, void **data, long *size){
 /**
  * \fn mtic_readParameterAsBool(const char *name)
  * \ingroup readfct
- * \brief Find the Agent's parameter by name and return the output value as a Boolean.
+ * \brief Find the parameter by name and return the output value as a Boolean.
  * \param name is the name of the parameter to read as it has been defined in the definition.
  * \return Return the parameter value as true or false.
  */
@@ -1004,13 +1000,13 @@ bool mtic_readParameterAsBool(const char *name){
 
             case INTEGER_T:
                 //Handle the case: An implicit conversion can be done from int to bool.
-                mtic_debug("mtic_readParameterAsBool : Implicit conversion from int to bool for the output {%s}.", name);
+                mtic_debug("mtic_readParameterAsBool : Implicit conversion from int to bool for the output {%s}", name);
                 return (bool) iop->value.i;
                 break;
 
             case DOUBLE_T:
                 //Handle the case: An implicit conversion can be done from double to bool.
-                mtic_debug("mtic_readParameterAsBool : Implicit conversion from double to bool for the parameter {%s}.", name);
+                mtic_debug("mtic_readParameterAsBool : Implicit conversion from double to bool for the parameter {%s}", name);
                 return (bool) iop->value.d;
                 break;
 
@@ -1018,29 +1014,29 @@ bool mtic_readParameterAsBool(const char *name){
                 //Handle the case: An implicit conversion can be done from string to bool.
                 // Test first if the output value is {true}, then {false}. Finally if the two previous test fail the function returns {false}.
                 if (!strcmp(iop->value.s, "true")){
-                    mtic_debug("mtic_readParameterAsBool : Implicit conversion from string to bool for the parameter {%s}.", name);
+                    mtic_debug("mtic_readParameterAsBool : Implicit conversion from string to bool for the parameter {%s}", name);
                     return true;
                 }
                 else if (!strcmp(iop->value.s, "false")){
-                    mtic_debug("mtic_readParameterAsBool : Implicit conversion from string to bool for the parameter {%s}.", name);
+                    mtic_debug("mtic_readParameterAsBool : Implicit conversion from string to bool for the parameter {%s}", name);
                     return false;
                 }
                 else{
-                    mtic_debug("mtic_readParameterAsBool : Implicit conversion fails to attempt for the parameter {%s}. String value is different from {true , false}.", name);
+                    mtic_debug("mtic_readParameterAsBool : Implicit conversion failed for parameter {%s} String value is different from {true , false}.", name);
                     return false;
                 }
                 break;
 
             default:
                 //Handle the case: the parameter cannot be handled.
-                mtic_debug("mtic_readParameterAsBool : Agent's parameter {%s} cannot be returned as a Boolean! By default {false} is returned.", name);
+                mtic_debug("mtic_readParameterAsBool : parameter {%s} cannot be returned as a bool", name);
                 return false;
                 break;
         }
     }
     else{
         //Handle the case: the parameter is not found.
-        mtic_debug("mtic_readParameterAsBool : Any Agent's parameter {%s} has been returned", name);
+        mtic_debug("mtic_readParameterAsBool : parameter {%s} not found", name);
         return false;
     }
 }
@@ -1048,7 +1044,7 @@ bool mtic_readParameterAsBool(const char *name){
 /**
  * \fn mtic_readParameterAsInt(const char *name)
  * \ingroup readfct
- * \brief Find the Agent's parameter by name and return the parameter value as an integer.
+ * \brief Find the parameter by name and return the parameter value as an integer.
  * \param name is the name of the parameter to read as it has been defined in the definition.
  * \return Return the parameter value as an integer.
  */
@@ -1067,13 +1063,13 @@ int mtic_readParameterAsInt(const char *name){
 
             case BOOL_T:
                 //Handle the case: An implicit conversion can be done from bool to int.
-                mtic_debug("mtic_readParameterAsInt : Implicit conversion from bool to int for the parameter {%s}.", name);
+                mtic_debug("mtic_readParameterAsInt : Implicit conversion from bool to int for the parameter {%s}", name);
                 return (int) iop->value.b;
                 break;
 
             case DOUBLE_T:
                 //Handle the case: An implicit conversion can be done from double to int.
-                mtic_debug("mtic_readParameterAsInt : Implicit conversion from double to int for the parameter {%s}.", name);
+                mtic_debug("mtic_readParameterAsInt : Implicit conversion from double to int for the parameter {%s}", name);
                 if(iop->value.d < 0) {
                     return (int) (iop->value.d - 0.5);
                 }
@@ -1089,25 +1085,25 @@ int mtic_readParameterAsInt(const char *name){
 
                 // Check if one value is returned.
                 if(test == 1){
-                    mtic_debug("mtic_readParameterAsInt : Implicit conversion from string to int for the parameter {%s}.", name);
+                    mtic_debug("mtic_readParameterAsInt : Implicit conversion from string to int for the parameter {%s}", name);
                     return value;
                 }
                 else{
-                    mtic_debug("mtic_readParameterAsInt : Implicit conversion fails to attempt for the parameter {%s}. String value is different from an integer.", name);
+                    mtic_debug("mtic_readParameterAsInt : Implicit conversion failed for parameter {%s} String value is different from an integer.", name);
                     return value;
                 }
                 break;
 
             default:
                 //Handle the case: the parameter cannot be handled.
-                mtic_debug("mtic_readParameterAsInt : Agent's parameter {%s} cannot be returned as an integer! By default {0} is returned.", name);
+                mtic_debug("mtic_readParameterAsInt : parameter {%s} cannot be returned as an integer! By default {0} is returned.", name);
                 return 0;
                 break;
         }
     }
     else{
         //Handle the case: the parameter is not found.
-        mtic_debug("mtic_readParameterAsInt : Any Agent's parameter {%s} has been returned", name);
+        mtic_debug("mtic_readParameterAsInt : parameter : {%s} not found", name);
         return 0;
     }
 }
@@ -1115,7 +1111,7 @@ int mtic_readParameterAsInt(const char *name){
 /**
  * \fn mtic_readParameterAsDouble(const char *name)
  * \ingroup readfct
- * \brief Find the Agent's parameter by name and return the output value as a double.
+ * \brief Find the parameter by name and return the output value as a double.
  * \param name is the name of the output to read as it has been defined in the definition.
  * \return Return the parameter value as a double.
  */
@@ -1134,13 +1130,13 @@ double mtic_readParameterAsDouble(const char *name){
 
             case BOOL_T:
                 //Handle the case: An implicit conversion can be done from bool to double.
-                mtic_debug("mtic_readParameterAsDouble : Implicit conversion from bool to double for the parameter {%s}.", name);
+                mtic_debug("mtic_readParameterAsDouble : Implicit conversion from bool to double for the parameter {%s}", name);
                 return (double) iop->value.b;
                 break;
 
             case INTEGER_T:
                 //Handle the case: An implicit conversion can be done from int to double.
-                mtic_debug("mtic_readParameterAsDouble : Implicit conversion from int to double for the parameter {%s}.", name);
+                mtic_debug("mtic_readParameterAsDouble : Implicit conversion from int to double for the parameter {%s}", name);
                 return (double) iop->value.i;
                 break;
 
@@ -1151,25 +1147,25 @@ double mtic_readParameterAsDouble(const char *name){
 
                 // Check if one value is returned.
                 if(test == 1){
-                    mtic_debug("mtic_readParameterAsDouble : Implicit conversion from string to double for the parameter {%s}.", name);
+                    mtic_debug("mtic_readParameterAsDouble : Implicit conversion from string to double for the parameter {%s}", name);
                     return value;
                 }
                 else{
-                    mtic_debug("mtic_readParameterAsDouble : Implicit conversion fails to attempt for the parameter {%s}. String value is different from a double.", name);
+                    mtic_debug("mtic_readParameterAsDouble : Implicit conversion failed for parameter {%s} String value is different from a double.", name);
                     return value;
                 }
                 break;
 
             default:
                 //Handle the case: the parameter cannot be handled.
-                mtic_debug("mtic_readParameterAsDouble : Agent's parameter {%s} cannot be returned as a double! By default {0.0} is returned.", name);
+                mtic_debug("mtic_readParameterAsDouble : parameter {%s} cannot be returned as a double", name);
                 return 0.0;
                 break;
         }
     }
     else{
         //Handle the case: the parameter is not found.
-        mtic_debug("mtic_readParameterAsDouble : Any Agent's parameter {%s} has been returned", name);
+        mtic_debug("mtic_readParameterAsDouble : parameter {%s} not found", name);
         return 0.0;
     }
 }
@@ -1177,7 +1173,7 @@ double mtic_readParameterAsDouble(const char *name){
 /**
  * \fn mtic_readParameterAsString(const char *name)
  * \ingroup readfct
- * \brief Find the Agent's parameter by name and return the output value as a string.
+ * \brief Find the parameter by name and return the output value as a string.
  *        WARNING: Allocating memory that must be free after use.
  * \param name is the name of the parameter to read as it has been defined in the definition.
  * \return Return the parameter value as a string.
@@ -1195,39 +1191,39 @@ char* mtic_readParameterAsString(const char *name){
 
             case BOOL_T:
                 //Handle the case: An implicit conversion can be done from bool to string.
-                mtic_debug("mtic_readParameterAsString : Implicit conversion from bool to string for the parameter {%s}.", name);
+                mtic_debug("mtic_readParameterAsString : Implicit conversion from bool to string for the parameter {%s}", name);
                 return iop->value.b ? strdup("true") : strdup("false");
                 break;
 
             case INTEGER_T:
                 //Handle the case: An implicit conversion can be done from int to string.
-                mtic_debug("mtic_readParameterAsString : Implicit conversion from int to string for the parameter {%s}.", name);
+                mtic_debug("mtic_readParameterAsString : Implicit conversion from int to string for the parameter {%s}", name);
                 return model_IntToString(iop->value.i);
                 break;
 
             case DOUBLE_T:
                 //Handle the case: An implicit conversion can be done from double to string.
-                mtic_debug("mtic_readParameterAsString : Implicit conversion from double to string for the parameter {%s}.", name);
+                mtic_debug("mtic_readParameterAsString : Implicit conversion from double to string for the parameter {%s}", name);
                 return model_DoubleToString(iop->value.d);
                 break;
 
             default:
                 //Handle the case: the parameter cannot be handled.
-                mtic_debug("mtic_readParameterAsString : Agent's parameter {%s} cannot be returned as a string! By default {NULL} is return.", name);;
+                mtic_debug("mtic_readParameterAsString : parameter {%s} cannot be returned as a string", name);;
                 return NULL;
                 break;
         }
     }
     else{
         //Handle the case: the input is not found.
-        mtic_debug("mtic_readParameterAsString : Agent's parameter {%s} cannot be found", name);
+        mtic_debug("mtic_readParameterAsString : parameter {%s} not found", name);
         return NULL;
     }
 }
 /**
  * \fn int mtic_readParameterAsData(const char *name, void *data, long *size)
  * \ingroup readfct
- * \brief Find the Agent's parameter by name and get the pointer on the data.
+ * \brief Find the parameter by name and get the pointer on the data.
  * \warning The parameter as to be data type
  * \warning Allocating memory before calling this function that must be free after use.
  * \param name The parameter's name
@@ -1241,18 +1237,18 @@ int mtic_readParameterAsData(const char *name, void **data, long *size){
 
     // Check if the iop has been returned.
     if(iop == NULL){
-        mtic_debug("%s : Agent's parameter '%s' cannot be found\n", __FUNCTION__, name);
+        mtic_debug("%s : parameter '%s' not found\n", __FUNCTION__, name);
         return 0;
     }
 
     //Check the value type as an impulsion.
     if(iop->value_type != DATA_T){
-        mtic_debug("%s: Agent's parameter '%s' is not an data\n", __FUNCTION__,  name);
+        mtic_debug("%s: parameter '%s' is not a data\n", __FUNCTION__,  name);
         return 0;
     }
 
     //Get the pointer on the structure data
-    void * value = model_get(name,PARAMETER_T);
+    void * value = model_getValueFor(name,PARAMETER_T);
 
     //get size
     *size = iop->valueSize;
@@ -1268,7 +1264,7 @@ int mtic_readParameterAsData(const char *name, void **data, long *size){
 
 
 /**
- *  \defgroup writefct Agent's inputs/outputs/parameters: Write functions
+ *  \defgroup writefct inputs/outputs/parameters: Write functions
  *
  */
 
@@ -1287,11 +1283,11 @@ int mtic_writeInput(const char *name, char *value, long size){
     agent_iop *iop = model_findIopByName((char*) name,INPUT_T);
     int ret = 0;
     if(iop == NULL){
-        mtic_debug("%s : our input %s cannot be found\n", __FUNCTION__, name);
+        mtic_debug("%s : input %s not found\n", __FUNCTION__, name);
         return 0;
     }
     if (value == NULL){
-        mtic_debug("%s : value %s cannot be NULL\n", __FUNCTION__, name);
+        mtic_debug("%s : intput %s, value cannot be NULL\n", __FUNCTION__, name);
         return 0;
     }
 
@@ -1356,11 +1352,11 @@ int mtic_writeOutput(const char *name, char *value, long size){
     agent_iop *iop = model_findIopByName((char*) name,OUTPUT_T);
     int ret = 0;
     if(iop == NULL){
-        mtic_debug("%s : our output %s cannot be found\n", __FUNCTION__, name);
+        mtic_debug("%s : output %s not found\n", __FUNCTION__, name);
         return 0;
     }
     if (value == NULL){
-        mtic_debug("%s : value %s cannot be NULL\n", __FUNCTION__, name);
+        mtic_debug("%s : output %s, value cannot be NULL\n", __FUNCTION__, name);
         return 0;
     }
 
@@ -1425,11 +1421,11 @@ int mtic_writeParameter(const char *name, char *value, long size){
     agent_iop *iop = model_findIopByName((char*) name,PARAMETER_T);
     int ret = 0;
     if(iop == NULL){
-        mtic_debug("%s : our parameter %s cannot be found\n", __FUNCTION__, name);
+        mtic_debug("%s : parameter %s not found\n", __FUNCTION__, name);
         return 0;
     }
     if (value == NULL){
-        mtic_debug("%s : value %s cannot be NULL\n", __FUNCTION__, name);
+        mtic_debug("%s : parameter %s, value cannot be NULL\n", __FUNCTION__, name);
         return 0;
     }
 
@@ -1493,7 +1489,7 @@ int mtic_writeInputAsBool(const char *name, bool value){
 
     // Check if the iop has been returned.
     if(iop == NULL){
-        mtic_debug("%s : input '%s' cannot be found", __FUNCTION__, name);
+        mtic_debug("%s : input '%s' not found", __FUNCTION__, name);
         return 0;
     }
     
@@ -1549,7 +1545,7 @@ int mtic_writeInputAsInt(const char *name, int value){
 
     // Check if the iop has been returned.
     if(iop == NULL){
-        mtic_debug("%s : Agent's input '%s' cannot be found", __FUNCTION__, name);
+        mtic_debug("%s : input '%s' not found", __FUNCTION__, name);
         return 0;
     }
 
@@ -1578,7 +1574,7 @@ int mtic_writeInputAsInt(const char *name, int value){
                 free(str);
             }
             else{
-                mtic_debug("%s: input '%s'. Fail to convert value to string.", __FUNCTION__, name);
+                mtic_debug("%s: input '%s'. Failed to convert value to string.", __FUNCTION__, name);
                 free(str);
                 return 0;
             }
@@ -1612,7 +1608,7 @@ int mtic_writeInputAsDouble(const char *name, double value){
 
     // Check if the iop has been returned.
     if(iop == NULL){
-        mtic_debug("%s : Agent's input '%s' cannot be found\n", __FUNCTION__, name);
+        mtic_debug("%s : input '%s' not found\n", __FUNCTION__, name);
         return 0;
     }
 
@@ -1646,7 +1642,7 @@ int mtic_writeInputAsDouble(const char *name, double value){
                 free(str);
             }
             else{
-                mtic_debug("%s: input '%s'. Fail to convert value to string.", __FUNCTION__, name);
+                mtic_debug("%s: input '%s'. Failed to convert value to string.", __FUNCTION__, name);
                 free(str);
                 return 0;
             }
@@ -1680,7 +1676,7 @@ int mtic_writeInputAsString(const char *name, char *value){
 
     // Check if the iop has been returned.
     if(iop == NULL){
-        mtic_debug("%s : Agent's input '%s' cannot be found\n", __FUNCTION__, name);
+        mtic_debug("%s : input '%s' not found\n", __FUNCTION__, name);
         return 0;
     }
 
@@ -1725,7 +1721,7 @@ int mtic_writeInputAsImpulsion(const char *name){
 
     // Check if the iop has been returned.
     if(iop == NULL){
-        mtic_debug("%s : input '%s' cannot be found\n", __FUNCTION__, name);
+        mtic_debug("%s : input '%s' not found\n", __FUNCTION__, name);
         return 0;
     }
 
@@ -1765,7 +1761,7 @@ int mtic_writeInputAsData(const char *name, void *value, long size){
 
     // Check if the iop has been returned.
     if(iop == NULL){
-        mtic_debug("%s : input %s cannot be found\n", __FUNCTION__, name);
+        mtic_debug("%s : input %s not found\n", __FUNCTION__, name);
         return 0;
     }
 
@@ -1800,7 +1796,7 @@ int mtic_writeOutputAsBool(const char *name, bool value){
 
     // Check if the iop has been returned.
     if(iop == NULL){
-        mtic_debug("%s : Agent's output '%s' cannot be found\n", __FUNCTION__, name);
+        mtic_debug("%s : output '%s' not found\n", __FUNCTION__, name);
         return 0;
     }
 
@@ -1858,7 +1854,7 @@ int mtic_writeOutputAsInt(const char *name, int value){
 
     // Check if the iop has been returned.
     if(iop == NULL){
-        mtic_debug("%s : Agent's output '%s' cannot be found\n", __FUNCTION__, name);
+        mtic_debug("%s : output '%s' not found\n", __FUNCTION__, name);
         return 0;
     }
 
@@ -1887,7 +1883,7 @@ int mtic_writeOutputAsInt(const char *name, int value){
                 free(str);
             }
             else{
-                mtic_debug("%s: output '%s'. Fail to convert value to string.", __FUNCTION__, name);
+                mtic_debug("%s: output '%s'. Failed to convert value to string.", __FUNCTION__, name);
                 free(str);
                 return 0;
             }
@@ -1925,7 +1921,7 @@ int mtic_writeOutputAsDouble(const char *name, double value){
 
     // Check if the iop has been returned.
     if(iop == NULL){
-        mtic_debug("%s : Agent's output '%s' cannot be found\n", __FUNCTION__, name);
+        mtic_debug("%s : output '%s' not found\n", __FUNCTION__, name);
         return 0;
     }
 
@@ -1959,7 +1955,7 @@ int mtic_writeOutputAsDouble(const char *name, double value){
                 free(str);
             }
             else{
-                mtic_debug("%s: output '%s'. Fail to convert value to string.", __FUNCTION__, name);
+                mtic_debug("%s: output '%s'. Failed to convert value to string.", __FUNCTION__, name);
                 free(str);
                 return 0;
             }
@@ -1996,7 +1992,7 @@ int mtic_writeOutputAsString(const char *name, char *value){
 
     // Check if the iop has been returned.
     if(iop == NULL){
-        mtic_debug("%s : Agent's output '%s' cannot be found\n", __FUNCTION__, name);
+        mtic_debug("%s : output '%s' not found\n", __FUNCTION__, name);
         return 0;
     }
 
@@ -2044,7 +2040,7 @@ int mtic_writeOutputAsImpulsion(const char *name){
 
     // Check if the iop has been returned.
     if(iop == NULL){
-        mtic_debug("%s : output '%s' cannot be found\n", __FUNCTION__, name);
+        mtic_debug("%s : output '%s' not found\n", __FUNCTION__, name);
         return 0;
     }
     
@@ -2086,7 +2082,7 @@ int mtic_writeOutputAsData(const char *name, void *value, long size){
 
     // Check if the iop has been returned.
     if(iop == NULL){
-        mtic_debug("%s : output %s cannot be found\n", __FUNCTION__, name);
+        mtic_debug("%s : output %s not found\n", __FUNCTION__, name);
         return 0;
     }
     
@@ -2124,7 +2120,7 @@ int mtic_writeParameterAsBool(const char *name, bool value){
 
     // Check if the iop has been returned.
     if(iop == NULL){
-        mtic_debug("%s : Agent's parameter '%s' cannot be found\n", __FUNCTION__, name);
+        mtic_debug("%s : parameter '%s' not found\n", __FUNCTION__, name);
         return 0;
     }
 
@@ -2153,6 +2149,8 @@ int mtic_writeParameterAsBool(const char *name, bool value){
         case DATA_T:
             mtic_debug("%s: parameter '%s' is not compatible with bool values", __FUNCTION__,  name);
             return 0;
+        case IMPULSION_T:
+            return mtic_writeOutputAsImpulsion(name);
     }
     
     // call the callbacks associated to if it exist
@@ -2177,7 +2175,7 @@ int mtic_writeParameterAsInt(const char *name, int value){
 
     // Check if the iop has been returned.
     if(iop == NULL){
-        mtic_debug("%s : Agent's parameter '%s' cannot be found\n", __FUNCTION__, name);
+        mtic_debug("%s : parameter '%s' not found\n", __FUNCTION__, name);
         return 0;
     }
 
@@ -2206,7 +2204,7 @@ int mtic_writeParameterAsInt(const char *name, int value){
                 free(str);
             }
             else{
-                mtic_debug("%s: input '%s'. Fail to convert value to string.", __FUNCTION__, name);
+                mtic_debug("%s: input '%s'. Failed to convert value to string.", __FUNCTION__, name);
                 free(str);
                 return 0;
             }
@@ -2241,7 +2239,7 @@ int mtic_writeParameterAsDouble(const char *name, double value){
 
     // Check if the iop has been returned.
     if(iop == NULL){
-        mtic_debug("%s : Agent's parameter '%s' cannot be found\n", __FUNCTION__, name);
+        mtic_debug("%s : parameter '%s' not found\n", __FUNCTION__, name);
         return 0;
     }
 
@@ -2275,7 +2273,7 @@ int mtic_writeParameterAsDouble(const char *name, double value){
                 free(str);
             }
             else{
-                mtic_debug("%s: parameter '%s'. Fail to convert value to string.", __FUNCTION__, name);
+                mtic_debug("%s: parameter '%s'. Failed to convert value to string.", __FUNCTION__, name);
                 free(str);
                 return 0;
             }
@@ -2283,6 +2281,8 @@ int mtic_writeParameterAsDouble(const char *name, double value){
         case DATA_T:
             mtic_debug("%s: parameter '%s' is not compatible with double values", __FUNCTION__,  name);
             return 0;
+        case IMPULSION_T:
+            return mtic_writeOutputAsImpulsion(name);
     }
     
     // call the callbacks associated to if it exist
@@ -2307,7 +2307,7 @@ int mtic_writeParameterAsString(const char *name, char *value){
 
     // Check if the iop has been returned.
     if(iop == NULL){
-        mtic_debug("%s : Agent's parameter '%s' cannot be found\n", __FUNCTION__, name);
+        mtic_debug("%s : parameter '%s' not found\n", __FUNCTION__, name);
         return 0;
     }
 
@@ -2343,7 +2343,7 @@ int mtic_writeParameterAsData(const char *name, void *value, long size){
 
     // Check if the iop has been returned.
     if(iop == NULL){
-        mtic_debug("%s : parameter %s cannot be found\n", __FUNCTION__, name);
+        mtic_debug("%s : parameter %s not found\n", __FUNCTION__, name);
         return 0;
     }
     
@@ -2832,7 +2832,7 @@ int mtic_observeParameter(const char *name, mtic_observeCallback cb, void * myDa
 int mtic_muteOutput(const char *name){
     agent_iop *iop = model_findIopByName((char*) name, OUTPUT_T);
     if(iop == NULL || iop->type != OUTPUT_T){
-        mtic_debug("%s : output '%s' cannot be found", __FUNCTION__, name);
+        mtic_debug("%s : output '%s' not found", __FUNCTION__, name);
         return 0;
     }
     iop->is_muted = true;
@@ -2849,7 +2849,7 @@ int mtic_muteOutput(const char *name){
 int mtic_unmuteOutput(const char *name){
     agent_iop *iop = model_findIopByName((char*) name,OUTPUT_T);
     if(iop == NULL || iop->type != OUTPUT_T){
-        mtic_debug("%s : output '%s' cannot be found", __FUNCTION__, name);
+        mtic_debug("%s : output '%s' not found", __FUNCTION__, name);
         return 0;
     }
     iop->is_muted = false;
@@ -2866,7 +2866,7 @@ int mtic_unmuteOutput(const char *name){
 bool mtic_isOutputMuted(const char *name){
     agent_iop *iop = model_findIopByName((char*) name,OUTPUT_T);
     if(iop == NULL || iop->type != OUTPUT_T){
-        mtic_debug("%s : output '%s' cannot be found", __FUNCTION__, name);
+        mtic_debug("%s : output '%s' not found", __FUNCTION__, name);
         return 0;
     }
     return iop->is_muted;
