@@ -40,7 +40,7 @@ Item {
     //
     //--------------------------------------------------------
 
-
+    property int popupTopmostZIndex: 1
 
 
 
@@ -146,18 +146,33 @@ Item {
     }
 
 
-    //
-    // Foreground: to add AgentDefinitionEditor(s), AgentMappingHistory ?
-    //
+    // List of "Agent Definition Editor(s)"
     Repeater {
         model: MasticEditorC.modelManager.openedDefinitions
 
         delegate: Agent.AgentDefinitionEditor {
+            id: agentDefinitionEditor
 
-            // Slot on signal "Clicked on Close Button"
-            onClickedOnCloseButton: {
+            // Center popup
+            x: (parent.width - agentDefinitionEditor.width) / 2.0
+            y: (parent.height - agentDefinitionEditor.height) / 2.0
+
+            onOpened: {
+                agentDefinitionEditor.z = rootItem.popupTopmostZIndex;
+                rootItem.popupTopmostZIndex = rootItem.popupTopmostZIndex + 1;
+            }
+
+            onBringToFront: {
+                agentDefinitionEditor.z = rootItem.popupTopmostZIndex;
+                rootItem.popupTopmostZIndex = rootItem.popupTopmostZIndex + 1;
+            }
+
+            onClosed: {
                 MasticEditorC.closeDefinition(model.QtObject);
             }
         }
     }
+
+
+    // AgentMappingHistory ?
 }

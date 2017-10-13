@@ -20,12 +20,16 @@ import I2Quick 1.0
 
 import MASTIC 1.0
 
-Item {
+I2PopupBase {
     id: rootItem
 
-    anchors.centerIn: parent
     width: 400
     height: 600
+
+    automaticallyOpenWhenCompleted: true
+    isModal: false
+    dismissOnOutsideTap : false;
+    keepRelativePositionToInitialParent : false;
 
 
     //--------------------------------
@@ -44,8 +48,8 @@ Item {
     //
     //--------------------------------
 
-    // Emitted when user clicks on the close button
-    signal clickedOnCloseButton();
+    // Emitted when user pressed our popup
+    signal bringToFront();
 
 
     //--------------------------------
@@ -66,6 +70,25 @@ Item {
         }
         color: MasticTheme.definitionEditorsBackgroundColor
 
+
+        MouseArea {
+            id : dragMouseArea
+            hoverEnabled: true
+            anchors.fill: parent
+            drag.target: rootItem
+
+            /*drag.minimumX : - faisceauEditor.width/2
+            drag.maximumX : PGIMTheme.applicationWidth - faisceauEditor.width/2
+            drag.minimumY : 0
+            drag.maximumY : PGIMTheme.applicationHeight -  (dragButton.height + 30)*/
+
+            onPressed: {
+                // Emit signal "bring to front"
+                rootItem.bringToFront();
+            }
+        }
+
+
         Button {
             id: btnCloseEditor
 
@@ -77,8 +100,8 @@ Item {
             text: "X"
 
             onClicked: {
-                // Emit signal "Clicked on Close Button"
-                rootItem.clickedOnCloseButton();
+                // Close our popup
+                rootItem.close();
             }
         }
 
