@@ -111,6 +111,9 @@ void AgentsSupervisionController::deleteAgent(AgentVM* agent)
             _modelManager->deleteAgentModel(model);
         }
 
+        // Stop propagation of the signal "Command Asked"
+        disconnect(agent, &AgentVM::commandAsked, this, &AgentsSupervisionController::commandAsked);
+
         // Delete the view model of agent
         deleteAgentViewModel(agent);
         agent = NULL;
@@ -148,6 +151,9 @@ void AgentsSupervisionController::onAgentModelCreated(AgentM* agent)
 
         // Create a new view model of agent
         AgentVM* agentVM = new AgentVM(agent, this);
+
+        // Propagate the signal "Command Asked"
+        connect(agentVM, &AgentVM::commandAsked, this, &AgentsSupervisionController::commandAsked);
 
         agentViewModelsList.append(agentVM);
         _mapFromNameToAgentViewModelsList.insert(agent->name(), agentViewModelsList);
@@ -293,4 +299,3 @@ void AgentsSupervisionController::onAgentDefinitionCreated(DefinitionM* definiti
         }
     }
 }
-

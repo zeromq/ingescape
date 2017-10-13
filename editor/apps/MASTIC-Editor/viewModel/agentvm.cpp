@@ -178,20 +178,36 @@ void AgentVM::setdefinition(DefinitionM *value)
 
 
 /**
- * @brief Mute our agent
+ * @brief Mute/UN-mute all I/O/P of our agent
  */
-void AgentVM::mute()
+void AgentVM::updateMuteAll(bool muteAll)
 {
-    qDebug() << "Mute" << _name;
+    if (muteAll) {
+        Q_EMIT commandAsked(_peerIdsList, "MUTE_ALL");
+    }
+    else {
+        Q_EMIT commandAsked(_peerIdsList, "UNMUTE_ALL");
+    }
+
+    // FIXME
+    setisMuted(muteAll);
 }
 
 
 /**
- * @brief Freeze our agent
+ * @brief Freeze/UN-freeze our agent
  */
-void AgentVM::freeze()
+void AgentVM::updateFreeze(bool freeze)
 {
-    qDebug() << "Freeze" << _name;
+    if (freeze) {
+        Q_EMIT commandAsked(_peerIdsList, "FREEZE");
+    }
+    else {
+        Q_EMIT commandAsked(_peerIdsList, "UNFREEZE");
+    }
+
+    // FIXME
+    setisFrozen(freeze);
 }
 
 
@@ -254,6 +270,7 @@ void AgentVM::onModelStatusChanged(AgentStatus::Value status)
  */
 void AgentVM::_updateWithModels()
 {
+    _peerIdsList.clear();
     QStringList addressesList;
     QString globalAddresses = "";
     bool globalCanBeFrozen = false;
@@ -261,6 +278,10 @@ void AgentVM::_updateWithModels()
     foreach (AgentM* model, _models.toList()) {
         if (model != NULL)
         {
+            if (!model->peerId().isEmpty()) {
+                _peerIdsList.append(model->peerId());
+            }
+
             /*if (!addressesList.contains(model->address())) {
                 addressesList.append(model->address());
             }*/

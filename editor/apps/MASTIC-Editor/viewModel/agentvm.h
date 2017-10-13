@@ -91,19 +91,26 @@ public:
 
 
     /**
-     * @brief Mute our agent
+     * @brief Mute/UN-mute all I/O/P of our agent
      */
-    Q_INVOKABLE void mute();
+    Q_INVOKABLE void updateMuteAll(bool muteAll);
 
 
     /**
-     * @brief Freeze our agent
+     * @brief Freeze/UN-freeze our agent
      */
-    Q_INVOKABLE void freeze();
-
+    Q_INVOKABLE void updateFreeze(bool freeze);
 
 
 Q_SIGNALS:
+
+    /**
+     * @brief Signal emitted when a command must be sent on the network
+     * @param peerIdsList
+     * @param command
+     */
+    void commandAsked(QStringList peerIdsList, QString command);
+
 
 public Q_SLOTS:
 
@@ -136,6 +143,9 @@ private:
 private:
     // Previous list of models of agents
     QList<AgentM*> _previousAgentsList;
+
+    // List of peer ids of our models
+    QStringList _peerIdsList;
 
 };
 

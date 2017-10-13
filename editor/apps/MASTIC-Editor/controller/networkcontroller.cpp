@@ -203,7 +203,7 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
 
 /**
  * @brief Default constructor
- * @param network devece
+ * @param network device
  * @param ip address
  * @param port number
  * @param parent
@@ -238,7 +238,8 @@ NetworkController::NetworkController(QString networkDevice, QString ipAddress, i
                                       \"inputs\": [],       \
                                       \"outputs\": [] }}";
         mtic_loadDefinition(definitionByDefault.toStdString().c_str());
-    } else {
+    }
+    else {
         mtic_loadDefinitionFromPath(myDefinitionPath.toStdString().c_str());
     }
 
@@ -258,7 +259,8 @@ NetworkController::NetworkController(QString networkDevice, QString ipAddress, i
 
 
         mtic_loadMapping(mappingByDefault.toStdString().c_str());
-    } else {
+    }
+    else {
         mtic_loadMappingFromPath(myMappingPath.toStdString().c_str());
     }
 
@@ -301,4 +303,22 @@ NetworkController::~NetworkController()
     mtic_stop();
 }
 
+
+/**
+ * @brief Slot when a command must be sent on the network
+ * @param peerIdsList
+ * @param command
+ */
+void NetworkController::onCommandAsked(QStringList peerIdsList, QString command)
+{
+    if ((peerIdsList.count() > 0) && !command.isEmpty()) {
+        foreach (QString peerId, peerIdsList)
+        {
+            // Send the command for a peer id of agent
+            int success = zyre_whispers(agentElements->node, peerId.toStdString().c_str(), "%s", command.toStdString().c_str());
+
+            qDebug() << "Send command" << command << "for agent" << peerId << "with success ?" << success;
+        }
+    }
+}
 
