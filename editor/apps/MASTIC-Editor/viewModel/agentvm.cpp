@@ -75,7 +75,7 @@ AgentVM::~AgentVM()
     qInfo() << "Delete View Model of Agent" << _name;
 
     if (_definition != NULL)
-    {
+    {   
         setdefinition(NULL);
     }
 

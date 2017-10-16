@@ -98,13 +98,21 @@ void AgentsSupervisionController::deleteAgent(AgentVM* agent)
 {
     if ((_modelManager != NULL) && (agent != NULL))
     {
-        qDebug() << "TODO: Delete agent" << agent->name();
+        qDebug() << "Delete agent" << agent->name();
 
         // Remove it from the list
         _agentsList.remove(agent);
 
-        // Delete its definition
-        _modelManager->deleteAgentDefinition(agent->definition());
+        // Save temporarily its definition
+        DefinitionM* temp = agent->definition();
+
+        // Reset it
+        agent->setdefinition(NULL);
+
+        // Delete the definition
+        if (temp != NULL) {
+            _modelManager->deleteAgentDefinition(temp);
+        }
 
         // Delete each model of agent
         foreach (AgentM* model, agent->models()->toList()) {
