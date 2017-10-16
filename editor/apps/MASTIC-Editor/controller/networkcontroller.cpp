@@ -17,7 +17,7 @@
 
 
 #include <QDebug>
-#include "QApplication"
+#include <QApplication>
 
 extern "C" {
 #include <mastic_private.h>
@@ -306,18 +306,38 @@ NetworkController::~NetworkController()
 
 /**
  * @brief Slot when a command must be sent on the network
- * @param peerIdsList
  * @param command
+ * @param peerIdsList
  */
-void NetworkController::onCommandAsked(QStringList peerIdsList, QString command)
+void NetworkController::onCommandAsked(QString command, QStringList peerIdsList)
 {
-    if ((peerIdsList.count() > 0) && !command.isEmpty()) {
+    if (!command.isEmpty() && (peerIdsList.count() > 0)) {
         foreach (QString peerId, peerIdsList)
         {
             // Send the command for a peer id of agent
             int success = zyre_whispers(agentElements->node, peerId.toStdString().c_str(), "%s", command.toStdString().c_str());
 
             qDebug() << "Send command" << command << "for agent" << peerId << "with success ?" << success;
+        }
+    }
+}
+
+
+/**
+ * @brief Slot when a command for an output must be sent on the network
+ * @param command
+ * @param outputName
+ * @param peerIdsList
+ */
+void NetworkController::onCommandAskedForOutput(QString command, QString outputName, QStringList peerIdsList)
+{
+    if (!command.isEmpty() && !outputName.isEmpty() && (peerIdsList.count() > 0)) {
+        foreach (QString peerId, peerIdsList)
+        {
+            // Send the command for a peer id of agent
+            int success = zyre_whispers(agentElements->node, peerId.toStdString().c_str(), "%s %s", command.toStdString().c_str(), outputName.toStdString().c_str());
+
+            qDebug() << "Send command" << command << "for agent" << peerId << "and output" << outputName << "with success ?" << success;
         }
     }
 }

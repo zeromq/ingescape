@@ -85,6 +85,7 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
 
     // Connect to signals from the controller for supervision of agents
     connect(_agentsSupervisionC, &AgentsSupervisionController::commandAsked, _networkC, &NetworkController::onCommandAsked);
+    connect(_agentsSupervisionC, &AgentsSupervisionController::commandAskedForOutput, _networkC, &NetworkController::onCommandAskedForOutput);
 
     // Initialize agents with JSON files
     _modelManager->initAgentsWithFiles();
@@ -112,6 +113,8 @@ MasticEditorController::~MasticEditorController()
 
     if (_agentsSupervisionC != NULL)
     {
+        disconnect(_agentsSupervisionC);
+
         AgentsSupervisionController* temp = _agentsSupervisionC;
         setagentsSupervisionC(NULL);
         delete temp;

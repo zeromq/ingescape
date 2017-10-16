@@ -71,9 +71,38 @@ public:
      */
     ~DefinitionM();
 
+
 Q_SIGNALS:
 
+    /**
+     * @brief Signal emitted when a command must be sent on the network
+     * @param command
+     * @param outputName
+     */
+    void commandAsked(QString command, QString outputName);
+
+
 public Q_SLOTS:
+
+
+private Q_SLOTS:
+    /**
+     * @brief Slot when the list of outputs changed
+     */
+    void _onOutputsListChanged();
+
+
+    /**
+     * @brief Slot when the flag "Is Muted" of an output changed
+     * @param isMuted
+     */
+    //void _onIsMutedChanged(bool isMuted);
+
+
+private:
+    // Previous list of outputs
+    QList<AgentIOPM*> _previousOutputsList;
+
 };
 
 QML_DECLARE_TYPE(DefinitionM)

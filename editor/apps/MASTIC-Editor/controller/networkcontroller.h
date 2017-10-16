@@ -94,14 +94,21 @@ Q_SIGNALS:
 
 public Q_SLOTS:
 
-
     /**
      * @brief Slot when a command must be sent on the network
-     * @param peerIdsList
      * @param command
+     * @param peerIdsList
      */
-    void onCommandAsked(QStringList peerIdsList, const QString command);
+    void onCommandAsked(QString command, QStringList peerIdsList);
 
+
+    /**
+     * @brief Slot when a command for an output must be sent on the network
+     * @param command
+     * @param outputName
+     * @param peerIdsList
+     */
+    void onCommandAskedForOutput(QString command, QString outputName, QStringList peerIdsList);
 
 protected:
 

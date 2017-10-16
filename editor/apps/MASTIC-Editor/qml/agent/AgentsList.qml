@@ -289,10 +289,10 @@ Item {
                         }
 
                         Text {
-                            text: model.models ? model.models.count + " clone(s)" : ""
-                            visible: model.models && (model.models.count > 1)
                             //text: model.models ? model.models.count + " clone(s)" : ""
-                            //visible: model.models ? (model.models.count > 1) : false
+                            //visible: model.models && (model.models.count > 1)
+                            text: (model && model.models) ? model.models.count + " clone(s)" : ""
+                            visible: (model && model.models) ? (model.models.count > 1) : false
 
                             height: 25
                             color: "red"
@@ -419,13 +419,13 @@ Item {
                         }
 
                         Button {
-                            id: btnMute
+                            id: btnMuteAll
                             text: model.isMuted ? "UN-mute all" : "Mute all"
 
                             width: 110
 
                             onClicked: {
-                                model.QtObject.updateMuteAll(!model.isMuted);
+                                model.QtObject.updateMuteAllOutputs(!model.isMuted);
                             }
                         }
 

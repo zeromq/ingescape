@@ -23,7 +23,7 @@ import MASTIC 1.0
 I2PopupBase {
     id: rootItem
 
-    width: 400
+    width: 550
     height: 600
 
     automaticallyOpenWhenCompleted: true
@@ -167,7 +167,11 @@ I2PopupBase {
                     ListView {
                         anchors {
                             fill: parent
-                            margins: 4
+                            //margins: 4
+                            topMargin: 10
+                            leftMargin: 2
+                            rightMargin: 2
+                            bottomMargin: 2
                         }
 
                         model: definition ? definition.inputsList : 0
@@ -189,7 +193,11 @@ I2PopupBase {
                     ListView {
                         anchors {
                             fill: parent
-                            margins: 4
+                            //margins: 4
+                            topMargin: 10
+                            leftMargin: 2
+                            rightMargin: 2
+                            bottomMargin: 2
                         }
 
                         model: definition ? definition.parametersList : 0
@@ -211,7 +219,11 @@ I2PopupBase {
                     ListView {
                         anchors {
                             fill: parent
-                            margins: 4
+                            //margins: 4
+                            topMargin: 10
+                            leftMargin: 2
+                            rightMargin: 2
+                            bottomMargin: 2
                         }
 
                         model: definition ? definition.outputsList : 0
@@ -228,7 +240,7 @@ I2PopupBase {
 
         Item {
             height: 25
-            width: 300 //childrenRect.width
+            //width: childrenRect.width
 
             Text {
                 id: iopName
@@ -239,7 +251,7 @@ I2PopupBase {
                     top: parent.top
                 }
 
-                width: 100
+                width: 120
                 height: parent.height
                 color: MasticTheme.definitionEditorsLabelColor
                 font: MasticTheme.normalFont
@@ -269,10 +281,28 @@ I2PopupBase {
                     top: parent.top
                 }
 
-                width: 100
+                width: 150
                 height: parent.height
                 color: MasticTheme.definitionEditorsLabelColor
                 font: MasticTheme.normalFont
+            }
+
+            Button {
+                id: btnMuteOutput
+                visible: (model.agentIOPType === AgentIOPTypes.OUTPUT)
+
+                anchors {
+                    left: iopValue.right
+                    top: parent.top
+                }
+                width: 120
+
+                text: "Mute/UN-mute"
+
+                onClicked: {
+                    //console.log("QML: Mute/UN-mute output " + model.name);
+                    model.QtObject.updateMuteOutput(!model.isMuted);
+                }
             }
         }
     }

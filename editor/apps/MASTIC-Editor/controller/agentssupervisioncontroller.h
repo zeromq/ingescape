@@ -84,10 +84,19 @@ Q_SIGNALS:
 
     /**
      * @brief Signal emitted when a command must be sent on the network
-     * @param peerIdsList
      * @param command
+     * @param peerIdsList
      */
-    void commandAsked(QStringList peerIdsList, QString command);
+    void commandAsked(QString command, QStringList peerIdsList);
+
+
+    /**
+     * @brief Signal emitted when a command for an output must be sent on the network
+     * @param command
+     * @param outputName
+     * @param peerIdsList
+     */
+    void commandAskedForOutput(QString command, QString outputName, QStringList peerIdsList);
 
 
 public Q_SLOTS:

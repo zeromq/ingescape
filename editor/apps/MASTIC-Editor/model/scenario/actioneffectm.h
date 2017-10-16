@@ -1,0 +1,74 @@
+/*
+ *	ActionEffectM
+ *
+ *  Copyright (c) 2016-2017 Ingenuity i/o. All rights reserved.
+ *
+ *	See license terms for the rights and conditions
+ *	defined by copyright holders.
+ *
+ *
+ *	Contributors:
+ *
+ */
+
+#ifndef ACTIONEFFECTM_H
+#define ACTIONEFFECTM_H
+
+#include <QObject>
+#include <QtQml>
+#include <QQmlEngine>
+#include <QJSEngine>
+
+#include "I2PropertyHelpers.h"
+#include "model/agentm.h"
+
+/**
+  * Effect type for an action: ON, OFF, ENABLE, DISABLE
+  */
+I2_ENUM(ActionEffectType, ON, OFF, ENABLE, DISABLE)
+
+
+/**
+ * @brief The ActionEffectM class defines the main controller of our application
+ */
+class ActionEffectM: public QObject
+{
+    Q_OBJECT
+
+    // Agent model
+    I2_QML_PROPERTY(AgentM*, model)
+
+    // Effect type
+    I2_QML_PROPERTY(ActionEffectType::Value, effect)
+
+public:
+
+    /**
+     * @brief Default constructor
+     * @param parent
+     */
+    explicit ActionEffectM(QObject *parent = 0);
+
+
+    /**
+      * @brief Destructor
+      */
+    virtual ~ActionEffectM();
+
+
+
+Q_SIGNALS:
+
+
+public Q_SLOTS:
+
+
+protected:
+
+
+
+};
+
+QML_DECLARE_TYPE(ActionEffectM)
+
+#endif // ACTIONEFFECTM_H
