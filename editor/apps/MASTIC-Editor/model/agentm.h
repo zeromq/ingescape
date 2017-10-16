@@ -66,8 +66,14 @@ class AgentM : public QObject
     // Publisher of our agent ???
     //I2_CPP_NOSIGNAL_PROPERTY(int, publisher)
 
+    // Flag indicating if our agent is muted
+    I2_QML_PROPERTY(bool, isMuted)
+
     // Flag indicating if our agent can be frozen
     I2_QML_PROPERTY_READONLY(bool, canBeFrozen)
+
+    // Flag indicating if our agent is frozen
+    I2_QML_PROPERTY(bool, isFrozen)
 
     // Status: can be ON, OFF, ON Asked or OFF Asked
     I2_QML_PROPERTY(AgentStatus::Value, status)

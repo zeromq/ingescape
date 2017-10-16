@@ -47,13 +47,6 @@ class AgentIOPVM : public QObject
     // Displayable current value of our Input / Output / Parameter
     I2_QML_PROPERTY(QString, displayableCurrentValue)
 
-    // Abscissa of our view
-    //I2_QML_PROPERTY(qreal, x)
-
-    // Ordinate of our view
-    //I2_QML_PROPERTY(qreal, y)
-
-
 
 public:
     /**

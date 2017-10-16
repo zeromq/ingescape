@@ -147,7 +147,21 @@ private Q_SLOTS:
      * @brief Slot when the "Status" of a model changed
      * @param status
      */
-    void _onModelStatusChanged(AgentStatus::Value status);
+    void _onStatusOfModelChanged(AgentStatus::Value status);
+
+
+    /**
+     * @brief Slot when the flag "Is Muted" of a model changed
+     * @param isMuted
+     */
+    void _onIsMutedOfModelChanged(bool isMuted);
+
+
+    /**
+     * @brief Slot when the flag "Is Frozen" of a model changed
+     * @param isMuted
+     */
+    void _onIsFrozenOfModelChanged(bool isFrozen);
 
 
 private:
@@ -161,6 +175,18 @@ private:
      * @brief Update the status in function of status of models
      */
     void _updateStatus();
+
+
+    /**
+     * @brief Update the flag "Is Muted" in function of models
+     */
+    void _updateIsMuted();
+
+
+    /**
+     * @brief Update the flag "Is Frozen" in function of models
+     */
+    void _updateIsFrozen();
 
 
 private:

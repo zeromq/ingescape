@@ -170,6 +170,22 @@ public Q_SLOTS:
     void onAgentExited(QString peerId, QString agentName);
 
 
+    /**
+     * @brief Slot when the flag "Is Muted" of an agent updated
+     * @param peerId
+     * @param isMuted
+     */
+    void onisMutedOfAgentUpdated(QString peerId, bool isMuted);
+
+
+    /**
+     * @brief Slot when the flag "Is Frozen" of an agent updated
+     * @param peerId
+     * @param isFrozen
+     */
+    void onIsFrozenOfAgentUpdated(QString peerId, bool isFrozen);
+
+
 private:
 
     /**
