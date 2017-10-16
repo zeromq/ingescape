@@ -26,7 +26,7 @@
 #include "model/agentm.h"
 
 /**
- * @brief The NetworkController class defines the main controller of our application
+ * @brief The NetworkController class defines the controller for network communications
  */
 class NetworkController: public QObject
 {
@@ -37,7 +37,7 @@ public:
 
     /**
      * @brief Default constructor
-     * @param network devece
+     * @param network device
      * @param ip address
      * @param port number
      * @param parent
@@ -49,6 +49,7 @@ public:
       * @brief Destructor
       */
     ~NetworkController();
+
 
 Q_SIGNALS:
 
@@ -92,6 +93,14 @@ Q_SIGNALS:
 
 
 public Q_SLOTS:
+
+
+    /**
+     * @brief Slot when a command must be sent on the network
+     * @param peerIdsList
+     * @param command
+     */
+    void onCommandAsked(QStringList peerIdsList, const QString command);
 
 
 protected:

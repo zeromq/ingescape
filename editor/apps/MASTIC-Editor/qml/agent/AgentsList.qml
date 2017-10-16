@@ -420,22 +420,25 @@ Item {
 
                         Button {
                             id: btnMute
-                            text: "Mute"
+                            text: model.isMuted ? "UN-mute all" : "Mute all"
+
+                            width: 110
 
                             onClicked: {
-                                //console.log("QML: Mute " + model.name);
-                                model.QtObject.mute();
+                                model.QtObject.updateMuteAll(!model.isMuted);
                             }
                         }
 
                         Button {
                             id: btnFreeze
-                            text: "Freeze"
+                            text: model.isFrozen ? "UN-freeze" : "Freeze"
+
                             visible: model.canBeFrozen
 
+                            width: 90
+
                             onClicked: {
-                                //console.log("QML: Freeze " + model.name);
-                                model.QtObject.freeze();
+                                model.QtObject.updateFreeze(!model.isFrozen);
                             }
                         }
                     }

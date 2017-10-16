@@ -82,6 +82,14 @@ public:
 
 Q_SIGNALS:
 
+    /**
+     * @brief Signal emitted when a command must be sent on the network
+     * @param peerIdsList
+     * @param command
+     */
+    void commandAsked(QStringList peerIdsList, QString command);
+
+
 public Q_SLOTS:
 
     /**
@@ -100,7 +108,7 @@ public Q_SLOTS:
 
 
 private:
-    // Usefull to save it
+    // Manager for the data model of MASTIC
     MasticModelManager* _modelManager;
 
     // Map from agent name to a list of view models of agent

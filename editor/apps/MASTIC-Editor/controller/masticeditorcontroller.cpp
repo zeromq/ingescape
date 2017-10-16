@@ -49,11 +49,10 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
 
     // Settings about the "Network"
     settings.beginGroup("network");
-    _host = settings.value("host", "localhost").toString();
     _networkDevice = settings.value("networkDevice").toString();
     _ipAddress = settings.value("ipAddress").toString();
     _port = settings.value("port").toInt();
-    qInfo() << "host" << _host << "networkDevice" << _networkDevice << "ipAddress" << _ipAddress << "port" << QString::number(_port);
+    qInfo() << "Network Device:" << _networkDevice << "-- IP address:" << _ipAddress << "-- Port" << QString::number(_port);
     settings.endGroup();
 
 
@@ -62,17 +61,17 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     // Create sub-controllers
     //
 
-    // Create the manager for the data model of our MASTIC editor
+    // Create the manager for the data model of MASTIC
     _modelManager = new MasticModelManager(this);
+
+    // Create the controller for network communications
+    _networkC = new NetworkController(_networkDevice, _ipAddress, _port, this);
 
     // Create the controller for agents supervision
     _agentsSupervisionC = new AgentsSupervisionController(_modelManager, this);
 
     // Create the controller for agents mapping
     _agentsMappingC = new AgentsMappingController(_modelManager, this);
-
-    // Create the controller for network communications
-    _networkC = new NetworkController(_networkDevice, _ipAddress, _port, this);
 
     // Connect to signals from the network controller
     connect(_networkC, &NetworkController::agentEntered, _modelManager, &MasticModelManager::onAgentEntered);
@@ -83,6 +82,9 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     // Connect to signals from the model manager
     connect(_modelManager, &MasticModelManager::agentModelCreated, _agentsSupervisionC, &AgentsSupervisionController::onAgentModelCreated);
     connect(_modelManager, &MasticModelManager::agentDefinitionCreated, _agentsSupervisionC, &AgentsSupervisionController::onAgentDefinitionCreated);
+
+    // Connect to signals from the controller for supervision of agents
+    connect(_agentsSupervisionC, &AgentsSupervisionController::commandAsked, _networkC, &NetworkController::onCommandAsked);
 
     // Initialize agents with JSON files
     _modelManager->initAgentsWithFiles();
