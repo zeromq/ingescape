@@ -19,6 +19,7 @@
 #include <QtQml>
 #include <QQmlEngine>
 #include <QJSEngine>
+#include <QColor>
 
 #include "I2PropertyHelpers.h"
 
@@ -39,6 +40,15 @@ class ActionM: public QObject
     // Start time in milliseconds
     I2_QML_PROPERTY(int, startTime)
 
+    // Color
+    I2_QML_PROPERTY(QColor, color)
+
+    // Index in the actions panel
+    I2_QML_PROPERTY(int, actionsPanelIndex)
+
+    // Line number in timeline
+    I2_QML_PROPERTY(int, lineInTimeLine)
+
     // Validity duration in milliseconds
     I2_QML_PROPERTY(int, validityDuration)
 
@@ -53,6 +63,12 @@ class ActionM: public QObject
 
     // Flag to rearm the action
     I2_QML_PROPERTY(bool, shallRearm)
+
+    // List of effects for the action
+    I2_QOBJECT_LISTMODEL(ActionEffectM, effectsList)
+
+    // List of conditions for the action
+    I2_QOBJECT_LISTMODEL(ActionConditionM, conditionsList)
 
     // FIXME : Liste des temps de déclenchement (1 ou plus si réarmable) >> VP
 

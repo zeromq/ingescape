@@ -32,6 +32,8 @@
 ActionM::ActionM(QString name, QObject *parent) : QObject(parent),
     _name(name),
     _startTime(-1),
+    _actionsPanelIndex(-1),
+    _lineInTimeLine(-1),
     _validityDuration(0),
     _shallRevert(false),
     _revertWhenValidityIsOver(false),
@@ -49,7 +51,11 @@ ActionM::ActionM(QString name, QObject *parent) : QObject(parent),
  */
 ActionM::~ActionM()
 {
+    // Delete the list of conditions
+    _conditionsList.deleteAllItems();
 
+    // Delete the list of effects
+    _effectsList.deleteAllItems();
 }
 
 

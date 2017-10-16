@@ -78,23 +78,6 @@ class AgentVM : public QObject
     // Flag indicating if our agent is frozen
     I2_QML_PROPERTY(bool, isFrozen)
 
-    // Color
-    I2_QML_PROPERTY(QColor, color)
-
-    // Index in the actions panel
-    I2_QML_PROPERTY(int, actionsPanelIndex)
-
-    // Line number in timeline
-    I2_QML_PROPERTY(int, lineInTimeLine)
-
-    // List of effects for the action
-    I2_QOBJECT_LISTMODEL(ActionEffectM, effectsList)
-
-    // List of conditions for the action
-    I2_QOBJECT_LISTMODEL(ActionConditionM, conditionsList)
-
-
-
 public:
     /**
      * @brief Default constructor
