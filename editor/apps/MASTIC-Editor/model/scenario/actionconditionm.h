@@ -22,7 +22,7 @@
 
 #include "I2PropertyHelpers.h"
 
-#include "actionm.h"
+#include "model/agentm.h"
 
 /**
   * Comparison type for an action: SUPERIOR_TO, INFERIOR_TO, EQUAL_TO, ON, OFF
