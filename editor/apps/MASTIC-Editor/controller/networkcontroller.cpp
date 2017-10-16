@@ -17,7 +17,7 @@
 
 
 #include <QDebug>
-#include "QApplication"
+#include <QApplication>
 
 extern "C" {
 #include <mastic_private.h>

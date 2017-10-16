@@ -33,7 +33,9 @@ AgentVM::AgentVM(AgentM* model, QObject *parent) : QObject(parent),
     _state(""),
     _isMuted(false),
     _canBeFrozen(false),
-    _isFrozen(false)
+    _isFrozen(false),
+    _actionsPanelIndex(-1),
+    _lineInTimeLine(-1)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -83,6 +85,12 @@ AgentVM::~AgentVM()
     // Free the memory elsewhere
     //_models.deleteAllItems();
     _models.clear();
+
+    // Delete the list of conditions
+    _conditionsList.deleteAllItems();
+
+    // Delete the list of effects
+    _effectsList.deleteAllItems();
 }
 
 

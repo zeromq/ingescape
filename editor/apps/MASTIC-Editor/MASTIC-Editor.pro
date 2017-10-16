@@ -32,7 +32,15 @@ SOURCES += main.cpp \
     viewModel/linkvm.cpp \
     model/definitionm.cpp \
     model/agentmappingm.cpp \
-    model/mapping/elementmappingm.cpp
+    model/mapping/elementmappingm.cpp \
+    model/scenario/actionconditionm.cpp \
+    model/scenario/actioneffectm.cpp \
+    model/scenario/actionm.cpp \
+    model/scenario/iopvalueeffectm.cpp \
+    model/scenario/mappingeffectm.cpp \
+    model/scenario/scenariom.cpp \
+    model/scenario/scenariomarkerm.cpp \
+    model/scenario/iopvalueconditionm.cpp
 
 
 HEADERS += \
@@ -61,7 +69,15 @@ HEADERS += \
     viewModel/linkvm.h \
     model/definitionm.h \
     model/agentmappingm.h \
-    model/mapping/elementmappingm.h
+    model/mapping/elementmappingm.h \
+    model/scenario/actionconditionm.h \
+    model/scenario/actioneffectm.h \
+    model/scenario/actionm.h \
+    model/scenario/iopvalueeffectm.h \
+    model/scenario/mappingeffectm.h \
+    model/scenario/scenariom.h \
+    model/scenario/scenariomarkerm.h \
+    model/scenario/iopvalueconditionm.h
 
 
 RESOURCES += qml.qrc
