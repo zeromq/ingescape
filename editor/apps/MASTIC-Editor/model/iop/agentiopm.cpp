@@ -27,6 +27,7 @@ AgentIOPM::AgentIOPM(QObject *parent) : QObject(parent),
     _agentIOPType(AgentIOPTypes::PARAMETER),
     _name(""),
     _agentIOPValueType(AgentIOPValueTypes::STRING),
+    _isMuted(false),
     _defaultValue(QVariant()),
     _displayableDefaultValue("")
 {
@@ -41,4 +42,22 @@ AgentIOPM::AgentIOPM(QObject *parent) : QObject(parent),
 AgentIOPM::~AgentIOPM()
 {
 
+}
+
+
+/**
+ * @brief Mute/UN-mute our Output
+ * @param mute
+ */
+void AgentIOPM::updateMuteOutput(bool mute)
+{
+    if (mute) {
+        Q_EMIT commandAsked("MUTE", _name);
+    }
+    else {
+        Q_EMIT commandAsked("UNMUTE", _name);
+    }
+
+    // FIXME
+    setisMuted(mute);
 }

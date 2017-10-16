@@ -419,13 +419,13 @@ Item {
                         }
 
                         Button {
-                            id: btnMute
+                            id: btnMuteAll
                             text: model.isMuted ? "UN-mute all" : "Mute all"
 
                             width: 110
 
                             onClicked: {
-                                model.QtObject.updateMuteAll(!model.isMuted);
+                                model.QtObject.updateMuteAllOutputs(!model.isMuted);
                             }
                         }
 

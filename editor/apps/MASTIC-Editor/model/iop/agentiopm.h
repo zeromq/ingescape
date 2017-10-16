@@ -55,6 +55,10 @@ class AgentIOPM : public QObject
     // Value type of our Input / Output / Parameter
     I2_QML_PROPERTY(AgentIOPValueTypes::Value, agentIOPValueType)
 
+    // FIXME: create a class OutputM that inherits from AgentIOPM with this property
+    // Flag indicating if our Output is muted
+    I2_QML_PROPERTY(bool, isMuted)
+
     // ######################################################
     // Value of our Input / Output / Parameter
     // Store the value in a Byte Array or in a Variant ?
@@ -85,7 +89,23 @@ public:
      */
     ~AgentIOPM();
 
+
+    /**
+     * @brief Mute/UN-mute our Output
+     * @param mute
+     */
+    Q_INVOKABLE void updateMuteOutput(bool mute);
+
+
 Q_SIGNALS:
+
+    /**
+     * @brief Signal emitted when a command must be sent on the network
+     * @param command
+     * @param outputName
+     */
+    void commandAsked(QString command, QString outputName);
+
 
 public Q_SLOTS:
 };

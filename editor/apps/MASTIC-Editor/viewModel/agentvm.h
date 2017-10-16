@@ -91,13 +91,15 @@ public:
 
 
     /**
-     * @brief Mute/UN-mute all I/O/P of our agent
+     * @brief Mute/UN-mute all outputs of our agent
+     * @param muteAllOutputs
      */
-    Q_INVOKABLE void updateMuteAll(bool muteAll);
+    Q_INVOKABLE void updateMuteAllOutputs(bool muteAllOutputs);
 
 
     /**
      * @brief Freeze/UN-freeze our agent
+     * @param freeze
      */
     Q_INVOKABLE void updateFreeze(bool freeze);
 
@@ -106,25 +108,43 @@ Q_SIGNALS:
 
     /**
      * @brief Signal emitted when a command must be sent on the network
-     * @param peerIdsList
      * @param command
+     * @param peerIdsList
      */
-    void commandAsked(QStringList peerIdsList, QString command);
+    void commandAsked(QString command, QStringList peerIdsList);
+
+
+    /**
+     * @brief Signal emitted when a command for an output must be sent on the network
+     * @param command
+     * @param outputName
+     * @param peerIdsList
+     */
+    void commandAskedForOutput(QString command, QString outputName, QStringList peerIdsList);
 
 
 public Q_SLOTS:
 
     /**
+     * @brief Slot when a command from an output must be sent on the network
+     * @param command
+     * @param outputName
+     */
+    void onCommandAskedForOutput(QString command, QString outputName);
+
+
+private Q_SLOTS:
+    /**
      * @brief Slot when the list of models changed
      */
-    void onModelsChanged();
+    void _onModelsChanged();
 
 
     /**
      * @brief Slot when the "Status" of a model changed
      * @param status
      */
-    void onModelStatusChanged(AgentStatus::Value status);
+    void _onModelStatusChanged(AgentStatus::Value status);
 
 
 private:

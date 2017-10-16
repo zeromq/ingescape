@@ -53,7 +53,7 @@ AgentVM::AgentVM(AgentM* model, QObject *parent) : QObject(parent),
         }
 
         // Connect to signal "Count Changed" from the list of models
-        connect(&_models, &AbstractI2CustomItemListModel::countChanged, this, &AgentVM::onModelsChanged);
+        connect(&_models, &AbstractI2CustomItemListModel::countChanged, this, &AgentVM::_onModelsChanged);
 
         // Add to the list
         _models.append(model);
@@ -120,6 +120,9 @@ void AgentVM::setdefinition(DefinitionM *value)
             //_inputsList.deleteAllItems();
             //_outputsList.deleteAllItems();
             //_parametersList.deleteAllItems();
+
+            // DIS-connect from signal "Command Asked" from the previous definition
+            disconnect(_definition, &DefinitionM::commandAsked, this, &AgentVM::onCommandAskedForOutput);
         }
 
         _definition = value;
@@ -170,6 +173,9 @@ void AgentVM::setdefinition(DefinitionM *value)
                 }
             }
             _parametersList.append(listOfParameterVMs);*/
+
+            // Connect to signal "Command Asked" from the new definition
+            connect(_definition, &DefinitionM::commandAsked, this, &AgentVM::onCommandAskedForOutput);
         }
 
         Q_EMIT definitionChanged(value);
@@ -178,32 +184,34 @@ void AgentVM::setdefinition(DefinitionM *value)
 
 
 /**
- * @brief Mute/UN-mute all I/O/P of our agent
+ * @brief Mute/UN-mute all outputs of our agent
+ * @param muteAllOutputs
  */
-void AgentVM::updateMuteAll(bool muteAll)
+void AgentVM::updateMuteAllOutputs(bool muteAllOutputs)
 {
-    if (muteAll) {
-        Q_EMIT commandAsked(_peerIdsList, "MUTE_ALL");
+    if (muteAllOutputs) {
+        Q_EMIT commandAsked("MUTE_ALL", _peerIdsList);
     }
     else {
-        Q_EMIT commandAsked(_peerIdsList, "UNMUTE_ALL");
+        Q_EMIT commandAsked("UNMUTE_ALL", _peerIdsList);
     }
 
     // FIXME
-    setisMuted(muteAll);
+    setisMuted(muteAllOutputs);
 }
 
 
 /**
  * @brief Freeze/UN-freeze our agent
+ * @param freeze
  */
 void AgentVM::updateFreeze(bool freeze)
 {
     if (freeze) {
-        Q_EMIT commandAsked(_peerIdsList, "FREEZE");
+        Q_EMIT commandAsked("FREEZE", _peerIdsList);
     }
     else {
-        Q_EMIT commandAsked(_peerIdsList, "UNFREEZE");
+        Q_EMIT commandAsked("UNFREEZE", _peerIdsList);
     }
 
     // FIXME
@@ -212,9 +220,20 @@ void AgentVM::updateFreeze(bool freeze)
 
 
 /**
+ * @brief Slot when a command from an output must be sent on the network
+ * @param command
+ * @param outputName
+ */
+void AgentVM::onCommandAskedForOutput(QString command, QString outputName)
+{
+    Q_EMIT commandAskedForOutput(command, outputName, _peerIdsList);
+}
+
+
+/**
  * @brief Slot when the list of models changed
  */
-void AgentVM::onModelsChanged()
+void AgentVM::_onModelsChanged()
 {
     QList<AgentM*> newAgentsList = _models.toList();
 
@@ -227,7 +246,7 @@ void AgentVM::onModelsChanged()
             if ((model != NULL) && !_previousAgentsList.contains(model))
             {
                 // Connect to signal "Status Changed" from a model
-                connect(model, &AgentM::statusChanged, this, &AgentVM::onModelStatusChanged);
+                connect(model, &AgentM::statusChanged, this, &AgentVM::_onModelStatusChanged);
             }
         }
     }
@@ -240,7 +259,7 @@ void AgentVM::onModelsChanged()
             if ((model != NULL) && !newAgentsList.contains(model))
             {
                 // DIS-connect from signal "Status Changed" from a model
-                disconnect(model, &AgentM::statusChanged, this, &AgentVM::onModelStatusChanged);
+                disconnect(model, &AgentM::statusChanged, this, &AgentVM::_onModelStatusChanged);
             }
         }
     }
@@ -256,7 +275,7 @@ void AgentVM::onModelsChanged()
  * @brief Slot when the "Status" of a model changed
  * @param status
  */
-void AgentVM::onModelStatusChanged(AgentStatus::Value status)
+void AgentVM::_onModelStatusChanged(AgentStatus::Value status)
 {
     Q_UNUSED(status)
 
