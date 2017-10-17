@@ -42,7 +42,8 @@ SOURCES += main.cpp \
     model/scenario/iopvalueconditionm.cpp \
     viewModel/pointmapvm.cpp \
     viewModel/agentinmappingvm.cpp \
-    viewModel/mapbetweeniopvm.cpp
+    viewModel/mapbetweeniopvm.cpp \
+    model/iop/outputm.cpp
 
 HEADERS += \
     model/agentm.h \
@@ -80,7 +81,8 @@ HEADERS += \
     model/scenario/iopvalueconditionm.h \
     viewModel/pointmapvm.h \
     viewModel/agentinmappingvm.h \
-    viewModel/mapbetweeniopvm.h
+    viewModel/mapbetweeniopvm.h \
+    model/iop/outputm.h
 
 
 RESOURCES += qml.qrc

@@ -26,11 +26,11 @@
  * @param parent
  */
 AgentIOPVM::AgentIOPVM(AgentIOPM* model, QObject *parent) : QObject(parent),
-    _modelM(model),
-    _mappingValue(QVariant()),
-    _displayableMappingValue(""),
-    _currentValue(QVariant()),
-    _displayableCurrentValue("")
+    _modelM(model)
+    //_mappingValue(QVariant()),
+    //_displayableMappingValue(""),
+    //_currentValue(QVariant()),
+    //_displayableCurrentValue("")
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);

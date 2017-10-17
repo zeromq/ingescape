@@ -23,11 +23,28 @@
  * @brief Default constructor
  * @param parent
  */
-AgentIOPM::AgentIOPM(QObject *parent) : QObject(parent),
-    _agentIOPType(AgentIOPTypes::PARAMETER),
-    _name(""),
-    _agentIOPValueType(AgentIOPValueTypes::STRING),
-    _isMuted(false),
+AgentIOPM::AgentIOPM(QObject *parent) : AgentIOPM(AgentIOPTypes::PARAMETER,
+                                                  "",
+                                                  AgentIOPValueTypes::STRING,
+                                                  parent)
+{
+}
+
+
+/**
+ * @brief Constructor
+ * @param agentIOPType
+ * @param name
+ * @param agentIOPValueType
+ * @param parent
+ */
+AgentIOPM::AgentIOPM(AgentIOPTypes::Value agentIOPType,
+                     QString name,
+                     AgentIOPValueTypes::Value agentIOPValueType,
+                     QObject *parent) : QObject(parent),
+    _agentIOPType(agentIOPType),
+    _name(name),
+    _agentIOPValueType(agentIOPValueType),
     _defaultValue(QVariant()),
     _displayableDefaultValue("")
 {
@@ -42,22 +59,4 @@ AgentIOPM::AgentIOPM(QObject *parent) : QObject(parent),
 AgentIOPM::~AgentIOPM()
 {
 
-}
-
-
-/**
- * @brief Mute/UN-mute our Output
- * @param mute
- */
-void AgentIOPM::updateMuteOutput(bool mute)
-{
-    if (mute) {
-        Q_EMIT commandAsked("MUTE", _name);
-    }
-    else {
-        Q_EMIT commandAsked("UNMUTE", _name);
-    }
-
-    // FIXME
-    setisMuted(mute);
 }
