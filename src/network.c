@@ -82,7 +82,6 @@ static const char *definitionPrefix = "EXTERNAL_DEFINITION#";
 static const char *mappingPrefix = "EXTERNAL_MAPPING#";
 static const char *loadMappingPrefix = "LOAD_THIS_MAPPING#";
 static const char *loadDefinitionPrefix = "LOAD_THIS_DEFINITION#";
-#define CHANNEL "MASTIC_PRIVATE"
 #define AGENT_NAME_LENGTH 256
 char agentName[AGENT_NAME_LENGTH] = AGENT_NAME_DEFAULT;
 char agentState[AGENT_NAME_LENGTH] = "";
@@ -1373,7 +1372,7 @@ int mtic_freeze(){
     {
         mtic_debug("Agent Frozen\n");
         if (agentElements != NULL && agentElements->node != NULL){
-            zyre_shouts(agentElements->node, CHANNEL, "FREEZE=ON");
+            zyre_shouts(agentElements->node, CHANNEL, "FROZEN=1");
         }
         isFrozen = true;
         freezeCallback_t *elt;
@@ -1406,7 +1405,7 @@ int mtic_unfreeze(){
     {
         mtic_debug("Agent resumed\n");
         if (agentElements != NULL && agentElements->node != NULL){
-            zyre_shouts(agentElements->node, CHANNEL, "FREEZE=OFF");
+            zyre_shouts(agentElements->node, CHANNEL, "FROZEN=0");
         }
         isFrozen = false;
         freezeCallback_t *elt;

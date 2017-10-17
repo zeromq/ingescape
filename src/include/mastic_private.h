@@ -234,6 +234,7 @@ void* model_getValueFor(const char*name_iop, iop_t type);
 
 
 // network
+#define CHANNEL "MASTIC_PRIVATE"
 
 extern bool network_needToSendDefinitionUpdate;
 extern bool network_needToUpdateMapping;

@@ -23,7 +23,7 @@
 #include <model/jsonhelper.h>
 #include <model/agentm.h>
 #include <model/definitionm.h>
-#include <viewModel/linkvm.h>
+#include <viewModel/mapbetweeniopvm.h>
 
 
 /**
@@ -168,6 +168,22 @@ public Q_SLOTS:
      * @param agent name
      */
     void onAgentExited(QString peerId, QString agentName);
+
+
+    /**
+     * @brief Slot when the flag "Is Muted" of an agent updated
+     * @param peerId
+     * @param isMuted
+     */
+    void onisMutedOfAgentUpdated(QString peerId, bool isMuted);
+
+
+    /**
+     * @brief Slot when the flag "Is Frozen" of an agent updated
+     * @param peerId
+     * @param isFrozen
+     */
+    void onIsFrozenOfAgentUpdated(QString peerId, bool isFrozen);
 
 
 private:

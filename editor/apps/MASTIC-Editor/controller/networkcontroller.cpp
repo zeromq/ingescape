@@ -30,6 +30,12 @@ extern "C" {
 static const QString definitionPrefix = "EXTERNAL_DEFINITION#";
 static const QString mappingPrefix = "EXTERNAL_MAPPING#";
 
+static const QString mutedAllPrefix = "MUTED=";
+static const QString frozenPrefix = "FROZEN=";
+static const QString mutedOutputPrefix = "OUTPUT_MUTED ";
+static const QString unmutedOutputPrefix = "OUTPUT_UNMUTED ";
+
+
 /**
  * @brief Callback for Incomming Zyre Messages
  * @param cst_zyre_event
@@ -120,18 +126,69 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
                 Q_EMIT networkController->agentEntered(peerId, peerName, peerAddress, pid, hostname, executionPath, canBeFrozen);
             }
         }
+        // JOIN (group)
         else if (event.compare("JOIN") == 0)
         {
             //qDebug() << QString("++ %1 has joined %2").arg(peerName, group);
         }
+        // LEAVE (group)
         else if (event.compare("LEAVE") == 0)
         {
             //qDebug() << QString("-- %1 has left %2").arg(peerName, group);
         }
+        // SHOUT
         else if (event.compare("SHOUT") == 0)
         {
-            // nothing to do so far
+            zmsg_t* msg_dup = zmsg_dup(msg);
+            QString message = zmsg_popstr(msg_dup);
+
+            // MUTED / UN-MUTED
+            if (message.startsWith(mutedAllPrefix))
+            {
+                message.remove(0, mutedAllPrefix.length());
+
+                if (message == "0") {
+                    //qDebug() << peerName << "(" << peerId << ") UN-MUTED";
+
+                    // Emit signal "Is Muted of Agent Updated"
+                    Q_EMIT networkController->isMutedOfAgentUpdated(peerId, false);
+                }
+                else if (message == "1") {
+                    //qDebug() << peerName << "(" << peerId << ") MUTED";
+
+                    // Emit signal "Is Muted of Agent Updated"
+                    Q_EMIT networkController->isMutedOfAgentUpdated(peerId, true);
+                }
+                else {
+                    qWarning() << peerName << "(" << peerId << ") MUTED";
+                }
+            }
+            // FROZEN / UN-FROZEN
+            else if (message.startsWith(frozenPrefix))
+            {
+                message.remove(0, frozenPrefix.length());
+
+                if (message == "0") {
+                    //qDebug() << peerName << "(" << peerId << ") UN-FROZEN";
+
+                    // Emit signal "Is Frozen of Agent Updated"
+                    Q_EMIT networkController->isFrozenOfAgentUpdated(peerId, false);
+                }
+                else if (message == "1") {
+                    //qDebug() << peerName << "(" << peerId << ") FROZEN";
+
+                    // Emit signal "Is Frozen of Agent Updated"
+                    Q_EMIT networkController->isFrozenOfAgentUpdated(peerId, true);
+                }
+            }
+            else
+            {
+                qWarning() << "Not yet managed (SHOUT) message '" << message << "' for agent" << peerName << "(" << peerId << ")";
+            }
+
+            zmsg_destroy(&msg_dup);
         }
+        // WHISPER
         else if (event.compare("WHISPER") == 0)
         {
             zmsg_t* msg_dup = zmsg_dup(msg);
@@ -306,18 +363,38 @@ NetworkController::~NetworkController()
 
 /**
  * @brief Slot when a command must be sent on the network
- * @param peerIdsList
  * @param command
+ * @param peerIdsList
  */
-void NetworkController::onCommandAsked(QStringList peerIdsList, QString command)
+void NetworkController::onCommandAsked(QString command, QStringList peerIdsList)
 {
-    if ((peerIdsList.count() > 0) && !command.isEmpty()) {
+    if (!command.isEmpty() && (peerIdsList.count() > 0)) {
         foreach (QString peerId, peerIdsList)
         {
             // Send the command for a peer id of agent
             int success = zyre_whispers(agentElements->node, peerId.toStdString().c_str(), "%s", command.toStdString().c_str());
 
             qDebug() << "Send command" << command << "for agent" << peerId << "with success ?" << success;
+        }
+    }
+}
+
+
+/**
+ * @brief Slot when a command for an output must be sent on the network
+ * @param command
+ * @param outputName
+ * @param peerIdsList
+ */
+void NetworkController::onCommandAskedForOutput(QString command, QString outputName, QStringList peerIdsList)
+{
+    if (!command.isEmpty() && !outputName.isEmpty() && (peerIdsList.count() > 0)) {
+        foreach (QString peerId, peerIdsList)
+        {
+            // Send the command for a peer id of agent
+            int success = zyre_whispers(agentElements->node, peerId.toStdString().c_str(), "%s %s", command.toStdString().c_str(), outputName.toStdString().c_str());
+
+            qDebug() << "Send command" << command << "for agent" << peerId << "and output" << outputName << "with success ?" << success;
         }
     }
 }

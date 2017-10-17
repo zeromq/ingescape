@@ -92,16 +92,39 @@ Q_SIGNALS:
     void agentExited(QString peerId, QString peerName);
 
 
-public Q_SLOTS:
+    /**
+     * @brief Signal emitted when the flag "Is Muted" of an agent updated
+     * @param peerId
+     * @param isMuted
+     */
+    void isMutedOfAgentUpdated(QString peerId, bool isMuted);
 
 
     /**
-     * @brief Slot when a command must be sent on the network
-     * @param peerIdsList
-     * @param command
+     * @brief Signal emitted when the flag "Is Frozen" of an agent updated
+     * @param peerId
+     * @param isFrozen
      */
-    void onCommandAsked(QStringList peerIdsList, const QString command);
+    void isFrozenOfAgentUpdated(QString peerId, bool isFrozen);
 
+
+public Q_SLOTS:
+
+    /**
+     * @brief Slot when a command must be sent on the network
+     * @param command
+     * @param peerIdsList
+     */
+    void onCommandAsked(QString command, QStringList peerIdsList);
+
+
+    /**
+     * @brief Slot when a command for an output must be sent on the network
+     * @param command
+     * @param outputName
+     * @param peerIdsList
+     */
+    void onCommandAskedForOutput(QString command, QString outputName, QStringList peerIdsList);
 
 protected:
 

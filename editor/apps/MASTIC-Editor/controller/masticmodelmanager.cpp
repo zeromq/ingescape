@@ -279,8 +279,34 @@ void MasticModelManager::onAgentExited(QString peerId, QString agentName)
 
         // Update the status
         agent->setstatus(AgentStatus::OFF);
+    }
+}
 
-        // FIXME: nothing more ?
+
+/**
+ * @brief Slot when the flag "Is Muted" of an agent updated
+ * @param peerId
+ * @param isMuted
+ */
+void MasticModelManager::onisMutedOfAgentUpdated(QString peerId, bool isMuted)
+{
+    AgentM* agent = getAgentModelFromPeerId(peerId);
+    if(agent != NULL) {
+        agent->setisMuted(isMuted);
+    }
+}
+
+
+/**
+ * @brief Slot when the flag "Is Frozen" of an agent updated
+ * @param peerId
+ * @param isFrozen
+ */
+void MasticModelManager::onIsFrozenOfAgentUpdated(QString peerId, bool isFrozen)
+{
+    AgentM* agent = getAgentModelFromPeerId(peerId);
+    if(agent != NULL) {
+        agent->setisFrozen(isFrozen);
     }
 }
 

@@ -2836,6 +2836,9 @@ int mtic_muteOutput(const char *name){
         return 0;
     }
     iop->is_muted = true;
+    if (agentElements != NULL && agentElements->node != NULL){
+        zyre_shouts(agentElements->node, CHANNEL, "OUTPUT_MUTED %s", name);
+    }
     return 1;
 }
 
@@ -2853,6 +2856,9 @@ int mtic_unmuteOutput(const char *name){
         return 0;
     }
     iop->is_muted = false;
+    if (agentElements != NULL && agentElements->node != NULL){
+        zyre_shouts(agentElements->node, CHANNEL, "OUTPUT_UNMUTED %s", name);
+    }
     return 1;
 }
 

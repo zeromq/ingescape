@@ -85,7 +85,7 @@ void registerCustomQmlTypes()
     //---------------
     qmlRegisterUncreatableType<AgentIOPVM>(uri, 1, 0, "AgentIOPVM", "Internal class");
     qmlRegisterUncreatableType<AgentVM>(uri, 1, 0, "AgentVM", "Internal class");
-    qmlRegisterUncreatableType<LinkVM>(uri, 1, 0, "LinkVM", "Internal class");
+    qmlRegisterUncreatableType<MapBetweenIOPVM>(uri, 1, 0, "MapBetweenIOPVM", "Internal class");
 
 
 
