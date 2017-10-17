@@ -12,7 +12,7 @@
  *
  */
 
-#include "linkvm.h"
+#include "mapbetweeniopvm.h"
 
 
 #include <QQmlEngine>
@@ -23,15 +23,15 @@
  * @brief Default constructor
  * @param parent
  */
-LinkVM::LinkVM(QObject *parent) : QObject(parent),
-    _outputSlotVM(NULL),
-    _inputSlotVM(NULL)
+MapBetweenIOPVM::MapBetweenIOPVM(AgentIOPVM *pointFrom, AgentIOPVM *pointTo, QObject *parent) : QObject(parent),
+    _pointFrom(pointFrom),
+    _pointTo(pointTo)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
 
-    qInfo() << "Link created";
+    qInfo() << "Map created";
 }
 
 
@@ -39,7 +39,7 @@ LinkVM::LinkVM(QObject *parent) : QObject(parent),
 /**
  * @brief Destructor
  */
-LinkVM::~LinkVM()
+MapBetweenIOPVM::~MapBetweenIOPVM()
 {
-    qInfo() << "Link destroyed";
+    qInfo() << "Map destroyed";
 }

@@ -23,7 +23,7 @@
 #include <model/jsonhelper.h>
 #include <model/agentm.h>
 #include <model/definitionm.h>
-#include <viewModel/linkvm.h>
+#include <viewModel/mapbetweeniopvm.h>
 
 
 /**
