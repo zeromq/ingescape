@@ -107,6 +107,21 @@ public:
 
 
     /**
+     * @brief Add a model of agent mapping
+     * @param agentMapping
+     */
+    void addAgentMapping(AgentMappingM* agentMapping);
+
+
+    /**
+     * @brief Get the list (of models) of agent mapping from a name
+     * @param name
+     * @return
+     */
+    QList<AgentMappingM*> getAgentMappingsListFromName(QString name);
+
+
+    /**
      * @brief Initialize agents with JSON files
      */
     void initAgentsWithFiles();
@@ -127,6 +142,14 @@ Q_SIGNALS:
      * @param agent
      */
     void agentDefinitionCreated(DefinitionM* definition, AgentM* agent);
+
+
+    /**
+     * @brief Signal emitted when a new model of agent mapping has been created
+     * @param agentMapping
+     * @param agent
+     */
+    void agentMappingCreated(AgentMappingM* agentMapping, AgentM* agent);
 
 
 public Q_SLOTS:
@@ -213,7 +236,7 @@ private:
     QHash<QString, QList<DefinitionM*>> _mapFromNameToAgentDefinitionsList;
 
     // Map from "mapping name" to a list (of models) of agent mapping
-    //QHash<QString, QList<AgentMappingM*>> _mapFromNameToAgentMappingsList;
+    QHash<QString, QList<AgentMappingM*>> _mapFromNameToAgentMappingsList;
 
 };
 
