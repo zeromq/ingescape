@@ -48,4 +48,17 @@ ActionConditionM::~ActionConditionM()
     setmodel(NULL);
 }
 
+/**
+* @brief Copy from another condition model
+* @param condition to copy
+*/
+void ActionConditionM::copyFrom(ActionConditionM* condition)
+{
+    if(condition != NULL)
+    {
+        setmodel(condition->model());
+        setcomparison(condition->comparison());
+    }
+}
+
 
