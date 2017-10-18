@@ -92,6 +92,22 @@ Q_SIGNALS:
     void agentExited(QString peerId, QString peerName);
 
 
+    /**
+     * @brief Signal emitted when the flag "Is Muted" of an agent updated
+     * @param peerId
+     * @param isMuted
+     */
+    void isMutedOfAgentUpdated(QString peerId, bool isMuted);
+
+
+    /**
+     * @brief Signal emitted when the flag "Is Frozen" of an agent updated
+     * @param peerId
+     * @param isFrozen
+     */
+    void isFrozenOfAgentUpdated(QString peerId, bool isFrozen);
+
+
 public Q_SLOTS:
 
     /**

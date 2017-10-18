@@ -31,7 +31,8 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     _modelManager(NULL),
     _agentsSupervisionC(NULL),
     _agentsMappingC(NULL),
-    _networkC(NULL)
+    _networkC(NULL),
+    _scenarioC(NULL)
 {
     qInfo() << "New MASTIC Editor Controller";
 
@@ -73,15 +74,22 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     // Create the controller for agents mapping
     _agentsMappingC = new AgentsMappingController(_modelManager, this);
 
+    // Create the controller for scenario management
+    _scenarioC = new ScenarioController(this);
+
     // Connect to signals from the network controller
     connect(_networkC, &NetworkController::agentEntered, _modelManager, &MasticModelManager::onAgentEntered);
     connect(_networkC, &NetworkController::definitionReceived, _modelManager, &MasticModelManager::onDefinitionReceived);
     connect(_networkC, &NetworkController::mappingReceived, _modelManager, &MasticModelManager::onMappingReceived);
     connect(_networkC, &NetworkController::agentExited, _modelManager, &MasticModelManager::onAgentExited);
+    connect(_networkC, &NetworkController::isMutedOfAgentUpdated, _modelManager, &MasticModelManager::onisMutedOfAgentUpdated);
+    connect(_networkC, &NetworkController::isFrozenOfAgentUpdated, _modelManager, &MasticModelManager::onIsFrozenOfAgentUpdated);
+
 
     // Connect to signals from the model manager
     connect(_modelManager, &MasticModelManager::agentModelCreated, _agentsSupervisionC, &AgentsSupervisionController::onAgentModelCreated);
     connect(_modelManager, &MasticModelManager::agentDefinitionCreated, _agentsSupervisionC, &AgentsSupervisionController::onAgentDefinitionCreated);
+    //connect(_modelManager, &MasticModelManager::agentDefinitionCreated, _agentsMappingC, &AgentsMappingController::onAgentDefinitionCreated);
 
     // Connect to signals from the controller for supervision of agents
     connect(_agentsSupervisionC, &AgentsSupervisionController::commandAsked, _networkC, &NetworkController::onCommandAsked);
@@ -141,6 +149,16 @@ MasticEditorController::~MasticEditorController()
         temp = NULL;
     }
 
+    if (_scenarioC != NULL)
+    {
+        disconnect(_scenarioC);
+
+        ScenarioController* temp = _scenarioC;
+        setscenarioC(NULL);
+        delete temp;
+        temp = NULL;
+    }
+
     qInfo() << "Delete MASTIC Editor Controller";
 }
 
@@ -171,6 +189,18 @@ void MasticEditorController::closeDefinition(DefinitionM* definition)
     if ((definition != NULL) && (_modelManager != NULL))
     {
         _modelManager->openedDefinitions()->remove(definition);
+    }
+}
+
+/**
+ * @brief Close an action editor
+ * @param action editor controller
+ */
+void MasticEditorController::closeActionEditor(ActionEditorController* actionEditorC)
+{
+    if (_scenarioC != NULL)
+    {
+        _scenarioC->closeActionEditor(actionEditorC);
     }
 }
 

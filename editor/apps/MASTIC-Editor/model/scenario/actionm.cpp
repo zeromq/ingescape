@@ -32,9 +32,7 @@
 ActionM::ActionM(QString name, QObject *parent) : QObject(parent),
     _name(name),
     _startTime(-1),
-    _actionsPanelIndex(-1),
-    _lineInTimeLine(-1),
-    _validityDuration(0),
+    _validityDuration(-1),
     _shallRevert(false),
     _revertWhenValidityIsOver(false),
     _revertAtTime(-1),
@@ -56,6 +54,40 @@ ActionM::~ActionM()
 
     // Delete the list of effects
     _effectsList.deleteAllItems();
+}
+
+/**
+ * @brief Copy from another action model
+ * @param action model to copy
+ */
+void ActionM::copyFrom(ActionM* actionModel)
+{
+    if(actionModel != NULL)
+    {
+        setname(actionModel->name());
+        setstartTime(actionModel->startTime());
+        setvalidityDuration(actionModel->validityDuration());
+        setshallRevert(actionModel->shallRevert());
+        setrevertWhenValidityIsOver(actionModel->revertWhenValidityIsOver());
+        setrevertAtTime(actionModel->revertAtTime());
+        setshallRearm(actionModel->shallRearm());
+
+        _effectsList.deleteAllItems();
+        foreach (ActionEffectM* effect, actionModel->effectsList()->toList())
+        {
+            ActionEffectM* copiedEffect = new ActionEffectM();
+            copiedEffect->copyFrom(effect);
+            _conditionsList.append(effect);
+        }
+
+        _conditionsList.deleteAllItems();
+        foreach (ActionConditionM* condition, actionModel->conditionsList()->toList())
+        {
+            ActionConditionM* copiedCondition = new ActionConditionM();
+            copiedCondition->copyFrom(condition);
+            _conditionsList.append(copiedCondition);
+        }
+    }
 }
 
 

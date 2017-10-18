@@ -55,25 +55,31 @@ class AgentIOPM : public QObject
     // Value type of our Input / Output / Parameter
     I2_QML_PROPERTY(AgentIOPValueTypes::Value, agentIOPValueType)
 
-    // FIXME: create a class OutputM that inherits from AgentIOPM with this property
-    // Flag indicating if our Output is muted
-    I2_QML_PROPERTY(bool, isMuted)
-
     // ######################################################
     // Value of our Input / Output / Parameter
     // Store the value in a Byte Array or in a Variant ?
     // http://doc.qt.io/qt-5/qbytearray.html
     // http://doc.qt.io/qt-5/qvariant.html
 
-    //I2_CPP_PROPERTY(QByteArray, defaultValueByteArray)
-    //I2_CPP_PROPERTY(QVariant, defaultValueVariant)
-
     // Default value of our Input / Output / Parameter
+    //I2_CPP_PROPERTY(QByteArray, defaultValue)
     I2_CPP_PROPERTY(QVariant, defaultValue)
+    // ######################################################
 
     // Displayable defaut value of our Input / Output / Parameter
     I2_QML_PROPERTY(QString, displayableDefaultValue)
-    // ######################################################
+
+    // Mapping value of our Input / Output / Parameter
+    //I2_CPP_PROPERTY(QVariant, mappingValue)
+
+    // Displayable mapping value of our Input / Output / Parameter
+    //I2_QML_PROPERTY(QString, displayableMappingValue)
+
+    // current value of our Input / Output / Parameter
+    //I2_CPP_PROPERTY(QVariant, currentValue)
+
+    // Displayable current value of our Input / Output / Parameter
+    //I2_QML_PROPERTY(QString, displayableCurrentValue)
 
 
 public:
@@ -85,26 +91,25 @@ public:
 
 
     /**
+     * @brief Constructor
+     * @param agentIOPType
+     * @param name
+     * @param agentIOPValueType
+     * @param parent
+     */
+    AgentIOPM(AgentIOPTypes::Value agentIOPType,
+              QString name,
+              AgentIOPValueTypes::Value agentIOPValueType,
+              QObject *parent = nullptr);
+
+
+    /**
      * @brief Destructor
      */
     ~AgentIOPM();
 
 
-    /**
-     * @brief Mute/UN-mute our Output
-     * @param mute
-     */
-    Q_INVOKABLE void updateMuteOutput(bool mute);
-
-
 Q_SIGNALS:
-
-    /**
-     * @brief Signal emitted when a command must be sent on the network
-     * @param command
-     * @param outputName
-     */
-    void commandAsked(QString command, QString outputName);
 
 
 public Q_SLOTS:

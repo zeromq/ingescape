@@ -23,7 +23,7 @@
 #include <model/jsonhelper.h>
 #include <model/agentm.h>
 #include <model/definitionm.h>
-#include <viewModel/linkvm.h>
+#include <viewModel/mapbetweeniopvm.h>
 
 
 /**
@@ -107,6 +107,21 @@ public:
 
 
     /**
+     * @brief Add a model of agent mapping
+     * @param agentMapping
+     */
+    void addAgentMapping(AgentMappingM* agentMapping);
+
+
+    /**
+     * @brief Get the list (of models) of agent mapping from a name
+     * @param name
+     * @return
+     */
+    QList<AgentMappingM*> getAgentMappingsListFromName(QString name);
+
+
+    /**
      * @brief Initialize agents with JSON files
      */
     void initAgentsWithFiles();
@@ -127,6 +142,14 @@ Q_SIGNALS:
      * @param agent
      */
     void agentDefinitionCreated(DefinitionM* definition, AgentM* agent);
+
+
+    /**
+     * @brief Signal emitted when a new model of agent mapping has been created
+     * @param agentMapping
+     * @param agent
+     */
+    void agentMappingCreated(AgentMappingM* agentMapping, AgentM* agent);
 
 
 public Q_SLOTS:
@@ -170,6 +193,22 @@ public Q_SLOTS:
     void onAgentExited(QString peerId, QString agentName);
 
 
+    /**
+     * @brief Slot when the flag "Is Muted" of an agent updated
+     * @param peerId
+     * @param isMuted
+     */
+    void onisMutedOfAgentUpdated(QString peerId, bool isMuted);
+
+
+    /**
+     * @brief Slot when the flag "Is Frozen" of an agent updated
+     * @param peerId
+     * @param isFrozen
+     */
+    void onIsFrozenOfAgentUpdated(QString peerId, bool isFrozen);
+
+
 private:
 
     /**
@@ -177,6 +216,7 @@ private:
      * @param definitionName
      */
     void _updateDefinitionVariants(QString definitionName);
+
 
 private:
 
@@ -194,6 +234,9 @@ private:
 
     // Map from "definition name" to a list (of models) of agent definition
     QHash<QString, QList<DefinitionM*>> _mapFromNameToAgentDefinitionsList;
+
+    // Map from "mapping name" to a list (of models) of agent mapping
+    QHash<QString, QList<AgentMappingM*>> _mapFromNameToAgentMappingsList;
 
 };
 

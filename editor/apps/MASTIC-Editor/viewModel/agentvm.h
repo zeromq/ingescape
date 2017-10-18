@@ -22,8 +22,6 @@
 
 #include <I2PropertyHelpers.h>
 
-#include "viewModel/iop/agentiopvm.h"
-
 #include "model/agentm.h"
 #include "model/definitionm.h"
 #include "model/scenario/actionconditionm.h"
@@ -55,13 +53,13 @@ class AgentVM : public QObject
     I2_QML_PROPERTY_READONLY(bool, hasOnlyDefinition)
 
     // List of VM of inputs
-    I2_QOBJECT_LISTMODEL(AgentIOPVM, inputsList)
+    //I2_QOBJECT_LISTMODEL(AgentIOPVM, inputsList)
 
     // List of VM of outputs
-    I2_QOBJECT_LISTMODEL(AgentIOPVM, outputsList)
+    //I2_QOBJECT_LISTMODEL(AgentIOPVM, outputsList)
 
     // List of VM of parameters
-    I2_QOBJECT_LISTMODEL(AgentIOPVM, parametersList)
+    //I2_QOBJECT_LISTMODEL(AgentIOPVM, parametersList)
 
     // Status: can be ON, OFF, ON Asked or OFF Asked
     I2_QML_PROPERTY(AgentStatus::Value, status)
@@ -147,7 +145,21 @@ private Q_SLOTS:
      * @brief Slot when the "Status" of a model changed
      * @param status
      */
-    void _onModelStatusChanged(AgentStatus::Value status);
+    void _onStatusOfModelChanged(AgentStatus::Value status);
+
+
+    /**
+     * @brief Slot when the flag "Is Muted" of a model changed
+     * @param isMuted
+     */
+    void _onIsMutedOfModelChanged(bool isMuted);
+
+
+    /**
+     * @brief Slot when the flag "Is Frozen" of a model changed
+     * @param isMuted
+     */
+    void _onIsFrozenOfModelChanged(bool isFrozen);
 
 
 private:
@@ -161,6 +173,18 @@ private:
      * @brief Update the status in function of status of models
      */
     void _updateStatus();
+
+
+    /**
+     * @brief Update the flag "Is Muted" in function of models
+     */
+    void _updateIsMuted();
+
+
+    /**
+     * @brief Update the flag "Is Frozen" in function of models
+     */
+    void _updateIsFrozen();
 
 
 private:

@@ -142,7 +142,13 @@ void MasticModelManager::initAgentsWithFiles()
                 AgentMappingM* agentMapping = _jsonHelper->createModelOfAgentMapping("agentUndefined", byteArrayOfJson);
                 if (agentMapping != NULL)
                 {
-                    //TODOESTIA : manage a mapping
+                    // FIXME: which agent ?
+
+                    // Add this new model of agent mapping
+                    //addAgentMapping(agentMapping);
+
+                    // Emit the signal "Agent Mapping Created"
+                    //Q_EMIT agentMappingCreated(agentMapping, agent);
                 }
 
                 jsonFile.close();
@@ -255,10 +261,11 @@ void MasticModelManager::onMappingReceived(QString peerId, QString agentName, QS
             AgentMappingM* agentMapping = _jsonHelper->createModelOfAgentMapping(agentName, byteArrayOfJson);
             if (agentMapping != NULL)
             {
-                //TODOESTIA : manage a mapping
+                // Add this new model of agent mapping
+                addAgentMapping(agentMapping);
 
-                // Manage the new (model of) agent mapping
-                //_manageNewMappingOfAgent(agentMapping, agent);
+                // Emit the signal "Agent Mapping Created"
+                Q_EMIT agentMappingCreated(agentMapping, agent);
             }
         }
     }
@@ -279,8 +286,34 @@ void MasticModelManager::onAgentExited(QString peerId, QString agentName)
 
         // Update the status
         agent->setstatus(AgentStatus::OFF);
+    }
+}
 
-        // FIXME: nothing more ?
+
+/**
+ * @brief Slot when the flag "Is Muted" of an agent updated
+ * @param peerId
+ * @param isMuted
+ */
+void MasticModelManager::onisMutedOfAgentUpdated(QString peerId, bool isMuted)
+{
+    AgentM* agent = getAgentModelFromPeerId(peerId);
+    if(agent != NULL) {
+        agent->setisMuted(isMuted);
+    }
+}
+
+
+/**
+ * @brief Slot when the flag "Is Frozen" of an agent updated
+ * @param peerId
+ * @param isFrozen
+ */
+void MasticModelManager::onIsFrozenOfAgentUpdated(QString peerId, bool isFrozen)
+{
+    AgentM* agent = getAgentModelFromPeerId(peerId);
+    if(agent != NULL) {
+        agent->setisFrozen(isFrozen);
     }
 }
 
@@ -413,6 +446,47 @@ void MasticModelManager::deleteAgentDefinition(DefinitionM* definition)
 
         // Update definition variants of a list of definitions with the same name
         _updateDefinitionVariants(definitionName);
+    }
+}
+
+
+/**
+ * @brief Add a model of agent mapping
+ * @param agentMapping
+ */
+void MasticModelManager::addAgentMapping(AgentMappingM* agentMapping)
+{
+    if (agentMapping != NULL)
+    {
+        QString mappingName = agentMapping->name();
+
+        QList<AgentMappingM*> agentMappingsList = getAgentMappingsListFromName(mappingName);
+        agentMappingsList.append(agentMapping);
+
+        // Update the list in the map
+        _mapFromNameToAgentMappingsList.insert(mappingName, agentMappingsList);
+
+        /*foreach (ElementMappingM* elementMapping, agentMapping->elementMappingsList()) {
+            if (elementMapping != NULL) {
+
+            }
+        }*/
+    }
+}
+
+
+/**
+ * @brief Get the list (of models) of agent mapping from a name
+ * @param name
+ * @return
+ */
+QList<AgentMappingM*> MasticModelManager::getAgentMappingsListFromName(QString name)
+{
+    if (_mapFromNameToAgentMappingsList.contains(name)) {
+        return _mapFromNameToAgentMappingsList.value(name);
+    }
+    else {
+        return QList<AgentMappingM*>();
     }
 }
 

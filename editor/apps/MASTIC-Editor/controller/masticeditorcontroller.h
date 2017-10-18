@@ -26,6 +26,7 @@
 #include <controller/agentssupervisioncontroller.h>
 #include <controller/agentsmappingcontroller.h>
 #include <controller/networkcontroller.h>
+#include <controller/scenariocontroller.h>
 
 
 /**
@@ -59,6 +60,9 @@ class MasticEditorController : public QObject
     // Controller for network communication
     I2_QML_PROPERTY_READONLY(NetworkController*, networkC)
 
+    // Controller for scenario management
+    I2_QML_PROPERTY_READONLY(ScenarioController*, scenarioC)
+
 
 public:
     /**
@@ -89,6 +93,11 @@ public:
       */
      Q_INVOKABLE void closeDefinition(DefinitionM* definition);
 
+     /**
+      * @brief Close an action editor
+      * @param action editor controller
+      */
+     Q_INVOKABLE void closeActionEditor(ActionEditorController *actionEditorC);
 
 public Q_SLOTS:
 

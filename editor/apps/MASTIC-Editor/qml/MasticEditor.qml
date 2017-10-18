@@ -25,6 +25,9 @@ import MASTIC 1.0
 // agent sub-directory
 import "agent" as Agent
 
+// scenario sub-directory
+import "scenario" as Scenario
+
 
 Item {
     id: rootItem
@@ -120,29 +123,109 @@ Item {
 
 
     //
-    // Left panel: TODO: create tabs
+    // Left panel: TODO: add border in I2CustomRectangle
     //
-    I2CustomRectangle {
+    Rectangle {
         id: leftPanel
 
         anchors {
             left: parent.left
             top: parent.top
+            topMargin: 9
             bottom: parent.bottom
         }
 
         width: MasticTheme.leftPanelWidth
 
-        color: MasticTheme.agentsListBackgroundColor
-        fuzzyRadius: 8
+        color: MasticTheme.leftPanelBackgroundColor
+        radius : 5
+     //   fuzzyRadius: 8
+     //   topRightRadius : 5
 
-        Agent.AgentsList {
-            id: agentsList
-
-            anchors.fill: parent
-
-            controller: MasticEditorC.agentsSupervisionC
+        border {
+            width: 1
+            color: MasticTheme.selectedTabsBackgroundColor
         }
+
+        // tabs of left panel
+        I2TabView {
+            id : leftPanelTabs
+
+            anchors.fill :parent
+
+            style: I2TabViewStyle {
+                frameOverlap: 1
+                tab: I2CustomRectangle {
+                    color: styleData.selected ? MasticTheme.selectedTabsBackgroundColor : "transparent"
+                    implicitWidth: 107
+                    implicitHeight: 26
+                    topRightRadius : 5
+
+                    Text {
+                        id: text
+                        anchors.fill: parent
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter;
+                        text: styleData.title
+                        color: styleData.selected ? MasticTheme.agentsListLabelColor : MasticTheme.selectedTabsBackgroundColor
+                        wrapMode: Text.Wrap;
+
+                        font {
+                            family: MasticTheme.labelFontFamily;
+                            bold: true
+                            pixelSize:18;
+                            capitalization: Font.AllUppercase;
+                        }
+                    }
+                }
+                frame: Rectangle {
+                    color: MasticTheme.selectedTabsBackgroundColor
+                }
+            }
+
+            currentIndex : 0
+
+            onCurrentIndexChanged: {
+            }
+
+            Tab {
+                title: qsTr("SUPERVISION");
+                active : true
+
+                Agent.AgentsList {
+                    id: agentsList
+
+                    anchors.fill: parent
+
+                    controller: MasticEditorC.agentsSupervisionC
+                }
+            }
+
+            Tab {
+                title: qsTr("ACTIONS");
+                active : false
+
+                Scenario.ActionsList {
+                    id: actionsList
+
+                    anchors.fill: parent
+
+                    controller: MasticEditorC.scenarioC
+                }
+            }
+
+            Tab {
+                title: qsTr("RECORDS");
+                active : false
+
+                Rectangle {
+                    id: records
+                    anchors.fill: parent
+                    color : "blue"
+                }
+            }
+        }
+
     }
 
 
@@ -169,6 +252,35 @@ Item {
 
             onClosed: {
                 MasticEditorC.closeDefinition(model.QtObject);
+            }
+        }
+    }
+    
+    // List of "Actions Editor(s)"
+    Repeater {
+        model: MasticEditorC.scenarioC ? MasticEditorC.scenarioC.openedActionsEditorsControllers : 0;
+        
+        delegate: Scenario.ActionEditor {
+            id: actionEditor
+            
+            controller : MasticEditorC.scenarioC
+
+            // Center popup
+            x: (parent.width - actionEditor.width) / 2.0
+            y: (parent.height - actionEditor.height) / 2.0
+            
+            onOpened: {
+                actionEditor.z = rootItem.popupTopmostZIndex;
+                rootItem.popupTopmostZIndex = rootItem.popupTopmostZIndex + 1;
+            }
+            
+            onBringToFront: {
+                actionEditor.z = rootItem.popupTopmostZIndex;
+                rootItem.popupTopmostZIndex = rootItem.popupTopmostZIndex + 1;
+            }
+            
+            onClosed: {
+                MasticEditorC.closeActionEditor(model.QtObject);
             }
         }
     }
