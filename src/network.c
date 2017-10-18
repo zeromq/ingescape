@@ -711,13 +711,13 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     mtic_mute();
                 }else if (strlen("UNMUTE_ALL") == strlen(message) && strncmp (message, "UNMUTE_ALL", strlen("UNMUTE_ALL")) == 0){
                     mtic_unmute();
-                }else if ((strncmp (message, "MUTE", strlen("MUTE")) == 0) && (strlen(message) > strlen("MUTE")+1)){
+                }else if ((strncmp (message, "MUTE ", strlen("MUTE ")) == 0) && (strlen(message) > strlen("MUTE ")+1)){
                     char *subStr = message + strlen("MUTE") + 1;
                     mtic_muteOutput(subStr);
-                }else if ((strncmp (message, "UNMUTE", strlen("UNMUTE")) == 0) && (strlen(message) > strlen("UNMUTE")+1)){
+                }else if ((strncmp (message, "UNMUTE ", strlen("UNMUTE ")) == 0) && (strlen(message) > strlen("UNMUTE ")+1)){
                     char *subStr = message + strlen("UNMUTE") + 1;
                     mtic_unmuteOutput(subStr);
-                }else if ((strncmp (message, "SET_INPUT", strlen("SET_INPUT")) == 0) && (strlen(message) > strlen("SET_INPUT")+1)){
+                }else if ((strncmp (message, "SET_INPUT ", strlen("SET_INPUT ")) == 0) && (strlen(message) > strlen("SET_INPUT ")+1)){
                     char *subStr = message + strlen("SET_INPUT") + 1;
                     char *name, *value;
                     name = strtok (subStr," ");
@@ -725,7 +725,7 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     if (name != NULL && value != NULL){
                         mtic_writeInput(name, value, 0);
                     }
-                }else if ((strncmp (message, "SET_OUTPUT", strlen("SET_OUTPUT")) == 0) && (strlen(message) > strlen("SET_OUTPUT")+1)){
+                }else if ((strncmp (message, "SET_OUTPUT ", strlen("SET_OUTPUT ")) == 0) && (strlen(message) > strlen("SET_OUTPUT ")+1)){
                     char *subStr = message + strlen("SET_OUTPUT") + 1;
                     char *name, *value;
                     name = strtok (subStr," ");
@@ -733,7 +733,7 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     if (name != NULL && value != NULL){
                         mtic_writeOutput(name, value, 0);
                     }
-                }else if ((strncmp (message, "SET_PARAMETER", strlen("SET_PARAMETER")) == 0) && (strlen(message) > strlen("SET_PARAMETER")+1)){
+                }else if ((strncmp (message, "SET_PARAMETER ", strlen("SET_PARAMETER ")) == 0) && (strlen(message) > strlen("SET_PARAMETER ")+1)){
                     char *subStr = message + strlen("SET_PARAMETER") + 1;
                     char *name, *value;
                     name = strtok (subStr," ");
@@ -741,7 +741,7 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     if (name != NULL && value != NULL){
                         mtic_writeParameter(name, value, 0);
                     }
-                }else if ((strncmp (message, "MAP", strlen("MAP")) == 0) && (strlen(message) > strlen("MAP")+1)){
+                }else if ((strncmp (message, "MAP ", strlen("MAP ")) == 0) && (strlen(message) > strlen("MAP ")+1)){
                     char *subStr = message + strlen("MAP") + 1;
                     char *input, *agent, *output;
                     input = strtok (subStr," ");
@@ -750,7 +750,7 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     if (input != NULL && agent != NULL && output != NULL){
                         mtic_addMappingEntry(input, agent, output);
                     }
-                }else if ((strncmp (message, "UNMAP", strlen("UNMAP")) == 0) && (strlen(message) > strlen("UNMAP")+1)){
+                }else if ((strncmp (message, "UNMAP ", strlen("UNMAP ")) == 0) && (strlen(message) > strlen("UNMAP ")+1)){
                     char *subStr = message + strlen("UNMAP") + 1;
                     char *input, *agent, *output;
                     input = strtok (subStr," ");
