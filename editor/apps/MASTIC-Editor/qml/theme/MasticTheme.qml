@@ -39,7 +39,7 @@ Item {
     readonly property int appDefaultHeight: 1080
 
     // Width of our left panel
-    readonly property int leftPanelWidth: 400
+    readonly property int leftPanelWidth: 320
 
     // Height of our bottom panel
     readonly property int bottomPanelHeight: 200
@@ -68,7 +68,10 @@ Item {
 
 
     readonly property color whiteColor: "#FFFFFF"
-    readonly property color blackColor: "#000000"
+    readonly property color blackColor: "#17191E"
+
+    readonly property color darkGreyColor: "#3C424F"
+    readonly property color blueGreyColor: "#8896AA"
 
 
 
@@ -82,37 +85,54 @@ Item {
     readonly property string defaultFontFamily: "Arial"
 
 
-    // Normal font
-    readonly property font normalFont: Qt.font({
-                                                family: defaultFontFamily,
-                                                pixelSize: 14
-                                                });
+    property alias labelFontFamilyExtraBold : fontAkrobatExtraBold.name
+    property alias labelFontFamilyBlack : fontAkrobatBlack.name
+
+    property alias labelFontFamily : fontAkrobat.name
+    property alias textFontFamily : fontBloggerSans.name
+
+
+    FontLoader {
+        id: fontAkrobat
+        source: "qrc:/resources/fonts/akrobat/Akrobat.ttf"
+    }
+
+    FontLoader {
+        id: fontAkrobatBlack
+        source: "qrc:/resources/fonts/akrobat/Akrobat-Black.ttf"
+    }
+
+    FontLoader {
+        id: fontAkrobatExtraBold
+        source: "qrc:/resources/fonts/akrobat/Akrobat-ExtraBold.ttf"
+    }
+
+    FontLoader {
+        id: fontBloggerSans
+        source: "qrc:/resources/fonts/blogger-sans/Blogger_Sans.ttf"
+    }
+
 
 
     // Heading font (level1)
     readonly property font headingFont: Qt.font({
-                                                 family: defaultFontFamily,
-                                                 pixelSize: 50,
-                                                 weight: Font.Bold
+                                                 family: labelFontFamilyBlack,
+                                                 pixelSize: 20,
+                                                 weight: Font.Black
                                                  });
 
 
     // Heading font (level2)
     readonly property font heading2Font: Qt.font({
-                                                 family: defaultFontFamily,
-                                                 pixelSize: 20,
-                                                 weight: Font.Bold
+                                                 family: textFontFamily,
+                                                 pixelSize: 16
                                                  });
 
-
-
-
-    /*
-    FontLoader {
-        id:sourceSansProRegular
-        source: "qrc:/Resources/fonts/source-sans-pro/SourceSansPro-Regular.ttf"
-    }
-    */
+    // Normal font
+    readonly property font normalFont: Qt.font({
+                                                family: textFontFamily,
+                                                pixelSize: 14
+                                                });
 
 
 
@@ -135,17 +155,15 @@ Item {
 
 
     // Background
-    readonly property color agentsListBackgroundColor: "#282C34"
-
-
-    // Header
-    readonly property color agentsListHeaderBackgroundColor: "#3C424F"
+    readonly property color leftPanelBackgroundColor: theme.blackColor
+    readonly property color selectedTabsBackgroundColor: theme.darkGreyColor
 
     // Labels
     readonly property color agentsListLabelColor: theme.whiteColor
+    readonly property color agentsListTextColor: theme.blueGreyColor
 
     // List
-    readonly property color agentsListItemBackgroundColor: "#3C424F"
+    readonly property color agentsListItemBackgroundColor: theme.darkGreyColor
 
 
     //-----------------------------------------

@@ -120,29 +120,107 @@ Item {
 
 
     //
-    // Left panel: TODO: create tabs
+    // Left panel: TODO: add border in I2CustomRectangle
     //
-    I2CustomRectangle {
+    Rectangle {
         id: leftPanel
 
         anchors {
             left: parent.left
             top: parent.top
+            topMargin: 9
             bottom: parent.bottom
         }
 
         width: MasticTheme.leftPanelWidth
 
-        color: MasticTheme.agentsListBackgroundColor
-        fuzzyRadius: 8
+        color: MasticTheme.leftPanelBackgroundColor
+        radius : 5
+     //   fuzzyRadius: 8
+     //   topRightRadius : 5
 
-        Agent.AgentsList {
-            id: agentsList
-
-            anchors.fill: parent
-
-            controller: MasticEditorC.agentsSupervisionC
+        border {
+            width: 1
+            color: MasticTheme.selectedTabsBackgroundColor
         }
+
+        // tabs of left panel
+        I2TabView {
+            id : leftPanelTabs
+
+            anchors.fill :parent
+
+            style: I2TabViewStyle {
+                frameOverlap: 1
+                tab: I2CustomRectangle {
+                    color: styleData.selected ? MasticTheme.selectedTabsBackgroundColor : "transparent"
+                    implicitWidth: 107
+                    implicitHeight: 26
+                    topRightRadius : 5
+
+                    Text {
+                        id: text
+                        anchors.fill: parent
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter;
+                        text: styleData.title
+                        color: styleData.selected ? MasticTheme.agentsListLabelColor : MasticTheme.selectedTabsBackgroundColor
+                        wrapMode: Text.Wrap;
+
+                        font {
+                            family: MasticTheme.labelFontFamily;
+                            bold: true
+                            pixelSize:18;
+                            capitalization: Font.AllUppercase;
+                        }
+                    }
+                }
+                frame: Rectangle {
+                    color: MasticTheme.selectedTabsBackgroundColor
+                }
+            }
+
+            currentIndex : 0
+
+            onCurrentIndexChanged: {
+            }
+
+            Tab {
+                title: qsTr("SUPERVISION");
+                active : true
+
+                Agent.AgentsList {
+                    id: agentsList
+
+                    anchors.fill: parent
+
+                    controller: MasticEditorC.agentsSupervisionC
+                }
+            }
+
+            Tab {
+                title: qsTr("ACTIONS");
+                active : false
+
+                Rectangle {
+                    id: actions
+                    anchors.fill: parent
+                    color : "red"
+                }
+            }
+
+            Tab {
+                title: qsTr("RECORDS");
+                active : false
+
+                Rectangle {
+                    id: records
+                    anchors.fill: parent
+                    color : "blue"
+                }
+            }
+        }
+
     }
 
 
