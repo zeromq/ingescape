@@ -25,6 +25,9 @@ import MASTIC 1.0
 // agent sub-directory
 import "agent" as Agent
 
+// scenario sub-directory
+import "scenario" as Scenario
+
 
 Item {
     id: rootItem
@@ -136,12 +139,39 @@ Item {
         color: MasticTheme.agentsListBackgroundColor
         fuzzyRadius: 8
 
-        Agent.AgentsList {
-            id: agentsList
+        TabView {
+            id: tabs
 
-            anchors.fill: parent
+            anchors {
+                fill: parent
+            }
 
-            controller: MasticEditorC.agentsSupervisionC
+            Tab {
+                title: "Agents"
+
+                    Agent.AgentsList {
+                        id: agentsList
+
+                        anchors.fill: parent
+
+                        controller: MasticEditorC.agentsSupervisionC
+                    }
+
+            }
+
+            Tab {
+                title: "Actions"
+
+                Scenario.ActionsList {
+                    id: actionsList
+
+                    anchors.fill: parent
+
+                    controller: MasticEditorC.scenarioC
+                }
+
+            }
+
         }
     }
 
@@ -172,6 +202,35 @@ Item {
             }
         }
     }
+
+    // List of "Actions Editor(s)"
+    Repeater {
+        model: MasticEditorC.scenarioC ? MasticEditorC.scenarioC.openedActionsEditors : 0;
+
+        delegate: Scenario.ActionEditor {
+            id: actionEditor
+
+            // Center popup
+            x: (parent.width - actionEditor.width) / 2.0
+            y: (parent.height - actionEditor.height) / 2.0
+
+            onOpened: {
+                actionEditor.z = rootItem.popupTopmostZIndex;
+                rootItem.popupTopmostZIndex = rootItem.popupTopmostZIndex + 1;
+            }
+
+            onBringToFront: {
+                actionEditor.z = rootItem.popupTopmostZIndex;
+                rootItem.popupTopmostZIndex = rootItem.popupTopmostZIndex + 1;
+            }
+
+            onClosed: {
+                MasticEditorC.closeActionEditor(model.QtObject);
+            }
+        }
+    }
+
+
 
 
     // AgentMappingHistory ?

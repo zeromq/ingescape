@@ -40,15 +40,6 @@ class ActionM: public QObject
     // Start time in milliseconds
     I2_QML_PROPERTY(int, startTime)
 
-    // Color
-    I2_QML_PROPERTY(QColor, color)
-
-    // Index in the actions panel
-    I2_QML_PROPERTY(int, actionsPanelIndex)
-
-    // Line number in timeline
-    I2_QML_PROPERTY(int, lineInTimeLine)
-
     // Validity duration in milliseconds
     I2_QML_PROPERTY(int, validityDuration)
 

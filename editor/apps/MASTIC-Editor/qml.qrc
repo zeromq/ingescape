@@ -17,5 +17,7 @@
         <file>qml/agentsmapping/AgentNodeView.qml</file>
         <file>qml/BlockLoadingAnimation.qml</file>
         <file>qml/Patxi.qml</file>
+        <file>qml/scenario/ActionsList.qml</file>
+        <file>qml/scenario/ActionEditor.qml</file>
     </qresource>
 </RCC>
