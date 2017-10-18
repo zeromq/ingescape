@@ -22,6 +22,7 @@
 
 #include "I2PropertyHelpers.h"
 #include "viewModel/actionvm.h"
+#include "controller/actioneditorcontroller.h"
 
 
 /**
@@ -35,7 +36,7 @@ class ScenarioController: public QObject
     I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(ActionVM, actionsList)
 
     // Sorted list of ations by start time
-    I2_QOBJECT_LISTMODEL(ActionVM, openedActionsEditors)
+    I2_QOBJECT_LISTMODEL(ActionEditorController, openedActionsEditorsControllers)
 
 public:
 
@@ -63,6 +64,24 @@ public:
       */
     Q_INVOKABLE void deleteAction(ActionVM * actionVM);
 
+    /**
+      * @brief Valide action edition
+      * @param action editor controller
+      */
+    Q_INVOKABLE void valideActionEditor(ActionEditorController* actionEditorC);
+
+    /**
+      * @brief Close action edition
+      * @param action editor controller
+      */
+    Q_INVOKABLE void closeActionEditor(ActionEditorController* actionEditorC);
+
+    /**
+      * @brief Delete action edition
+      * @param action editor controller
+      */
+    Q_INVOKABLE void deleteActionEditor(ActionEditorController* actionEditorC);
+
 Q_SIGNALS:
 
 
@@ -71,7 +90,7 @@ public Q_SLOTS:
 
 protected:
 
-
+    QHash<ActionVM*, ActionEditorController*> _mapActionsEditorControllersFromActionVM;
 
 };
 

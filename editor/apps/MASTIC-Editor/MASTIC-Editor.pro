@@ -45,7 +45,8 @@ SOURCES += main.cpp \
     viewModel/mapbetweeniopvm.cpp \
     model/iop/outputm.cpp \
     controller/scenariocontroller.cpp \
-    viewModel/actionvm.cpp
+    viewModel/actionvm.cpp \
+    controller/actioneditorcontroller.cpp
 
 HEADERS += \
     model/agentm.h \
@@ -86,7 +87,8 @@ HEADERS += \
     viewModel/mapbetweeniopvm.h \
     model/iop/outputm.h  \
     controller/scenariocontroller.h \
-    viewModel/actionvm.h
+    viewModel/actionvm.h \
+    controller/actioneditorcontroller.h
 
 
 RESOURCES += qml.qrc

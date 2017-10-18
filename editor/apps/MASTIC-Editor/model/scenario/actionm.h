@@ -77,6 +77,11 @@ public:
       */
     ~ActionM();
 
+    /**
+     * @brief Copy from another action model
+     * @param action model to copy
+     */
+    void copyFrom(ActionM* actionModel);
 
 
 Q_SIGNALS:

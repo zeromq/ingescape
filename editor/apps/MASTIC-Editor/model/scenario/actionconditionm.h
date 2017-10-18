@@ -58,6 +58,11 @@ public:
       */
     virtual ~ActionConditionM();
 
+    /**
+    * @brief Copy from another condition model
+    * @param condition to copy
+    */
+    void copyFrom(ActionConditionM* condition);
 
 
 Q_SIGNALS:

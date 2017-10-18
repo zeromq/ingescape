@@ -258,11 +258,13 @@ Item {
     
     // List of "Actions Editor(s)"
     Repeater {
-        model: MasticEditorC.scenarioC ? MasticEditorC.scenarioC.openedActionsEditors : 0;
+        model: MasticEditorC.scenarioC ? MasticEditorC.scenarioC.openedActionsEditorsControllers : 0;
         
         delegate: Scenario.ActionEditor {
             id: actionEditor
             
+            controller : MasticEditorC.scenarioC
+
             // Center popup
             x: (parent.width - actionEditor.width) / 2.0
             y: (parent.height - actionEditor.height) / 2.0

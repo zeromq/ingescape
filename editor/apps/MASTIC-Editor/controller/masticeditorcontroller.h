@@ -95,9 +95,9 @@ public:
 
      /**
       * @brief Close an action editor
-      * @param action view model
+      * @param action editor controller
       */
-     Q_INVOKABLE void closeActionEditor(ActionVM* actionVM);
+     Q_INVOKABLE void closeActionEditor(ActionEditorController *actionEditorC);
 
 public Q_SLOTS:
 

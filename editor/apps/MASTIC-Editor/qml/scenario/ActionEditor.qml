@@ -39,7 +39,10 @@ I2PopupBase {
     //--------------------------------
 
     // our model is an action model
-    property var actionVM: model;
+    property var actionVM: model.editedAction;
+
+    // our controller
+    property var controller: null;
 
 
     //--------------------------------
@@ -131,9 +134,29 @@ I2PopupBase {
                     color: MasticTheme.definitionEditorsLabelColor
                 }
                 TextField {
+                    id : actionNameTextField
+
                     text: actionVM && actionVM.actionModel ? actionVM.actionModel.name : ""
                     width:100
+
+                    onTextChanged: {
+                        if (activeFocus &&  actionVM && actionVM.actionModel) {
+                            actionVM.actionModel.name = text;
+                        }
+                    }
                 }
+
+                Binding {
+                    target : actionNameTextField
+                    property :  "text"
+                    value : if (actionVM && actionVM.actionModel) {
+                              actionVM.actionModel.name
+                            } else {
+                                "";
+                            }
+                }
+
+
 
             }
 
@@ -210,5 +233,62 @@ I2PopupBase {
                 }
             }
         }
+
+
+        Button {
+            id: btnValideEditor
+
+            anchors {
+                right: parent.right
+                bottom: parent.bottom
+            }
+
+            text: "OK"
+
+            onClicked: {
+                if(controller)
+                {
+                    controller.valideActionEditor(model.QtObject);
+                }
+            }
+        }
+
+        Button {
+            id: btnCancelEditor
+
+            anchors {
+                right: btnValideEditor.left
+                bottom: parent.bottom
+                rightMargin: 10
+            }
+
+            text: "ANNULER"
+
+            onClicked: {
+                // Close our popup
+                rootItem.close();
+            }
+        }
+
+        Button {
+            id: btnDeleteEditor
+
+            anchors {
+                right: btnCancelEditor.left
+                bottom: parent.bottom
+                rightMargin: 10
+            }
+
+            text: "SUPPRIMER"
+
+            onClicked: {
+
+                if(controller)
+                {
+                    controller.deleteActionEditor(model.QtObject);
+                }
+            }
+        }
+
     }
 }

@@ -170,7 +170,6 @@ Item {
                 id: btnAddAction
                 text: qsTr("Créer action")
                 onClicked: {
-                    console.log("Creation d'action")
                     if(controller)
                     {
                         controller.openActionEditor(null);

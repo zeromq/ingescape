@@ -55,6 +55,12 @@ public:
       */
     virtual ~ActionEffectM();
 
+    /**
+    * @brief Copy from another effect model
+    * @param effct to copy
+    */
+    void copyFrom(ActionEffectM* effect);
+
 
 
 Q_SIGNALS:

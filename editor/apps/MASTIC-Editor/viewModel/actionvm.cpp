@@ -57,4 +57,31 @@ ActionVM::~ActionVM()
     }
 }
 
+/**
+ * @brief Copy from another action view model
+ * @param action VM to copy
+ */
+void ActionVM::copyFrom(ActionVM* actionVM)
+{
+    if(actionVM != NULL)
+    {
+        ActionM* originalModel =  actionVM->actionModel();
+
+        // Copy the model
+        if(originalModel != NULL)
+        {
+            ActionM* model = new ActionM(originalModel->name());
+            model->copyFrom(originalModel);
+
+            setactionModel(model);
+        }
+
+        // Copy the view model attributes
+        setcolor(actionVM->color());
+        setactionsPanelIndex(actionVM->actionsPanelIndex());
+        setlineInTimeLine(actionVM->lineInTimeLine());
+        setstartDateTime(actionVM->startDateTime());
+    }
+}
+
 

@@ -56,4 +56,38 @@ ActionM::~ActionM()
     _effectsList.deleteAllItems();
 }
 
+/**
+ * @brief Copy from another action model
+ * @param action model to copy
+ */
+void ActionM::copyFrom(ActionM* actionModel)
+{
+    if(actionModel != NULL)
+    {
+        setname(actionModel->name());
+        setstartTime(actionModel->startTime());
+        setvalidityDuration(actionModel->validityDuration());
+        setshallRevert(actionModel->shallRevert());
+        setrevertWhenValidityIsOver(actionModel->revertWhenValidityIsOver());
+        setrevertAtTime(actionModel->revertAtTime());
+        setshallRearm(actionModel->shallRearm());
+
+        _effectsList.deleteAllItems();
+        foreach (ActionEffectM* effect, actionModel->effectsList()->toList())
+        {
+            ActionEffectM* copiedEffect = new ActionEffectM();
+            copiedEffect->copyFrom(effect);
+            _conditionsList.append(effect);
+        }
+
+        _conditionsList.deleteAllItems();
+        foreach (ActionConditionM* condition, actionModel->conditionsList()->toList())
+        {
+            ActionConditionM* copiedCondition = new ActionConditionM();
+            copiedCondition->copyFrom(condition);
+            _conditionsList.append(copiedCondition);
+        }
+    }
+}
+
 

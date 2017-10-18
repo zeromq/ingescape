@@ -55,13 +55,16 @@ public:
      */
     explicit ActionVM(ActionM* actionModel, QObject *parent = 0);
 
-
     /**
       * @brief Destructor
       */
     ~ActionVM();
 
-
+    /**
+     * @brief Copy from another action view model
+     * @param action VM to copy
+     */
+    void copyFrom(ActionVM* actionVM);
 
 Q_SIGNALS:
 

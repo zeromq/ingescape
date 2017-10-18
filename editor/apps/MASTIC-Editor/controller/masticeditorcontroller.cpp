@@ -193,13 +193,13 @@ void MasticEditorController::closeDefinition(DefinitionM* definition)
 
 /**
  * @brief Close an action editor
- * @param action view model
+ * @param action editor controller
  */
-void MasticEditorController::closeActionEditor(ActionVM* actionVM)
+void MasticEditorController::closeActionEditor(ActionEditorController* actionEditorC)
 {
     if (_scenarioC != NULL)
     {
-        _scenarioC->openedActionsEditors()->remove(actionVM);
+        _scenarioC->closeActionEditor(actionEditorC);
     }
 }
 
