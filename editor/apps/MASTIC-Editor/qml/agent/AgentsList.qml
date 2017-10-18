@@ -50,7 +50,6 @@ Item {
     //
     //--------------------------------
 
-
     //
     // List of agents
     //
@@ -58,7 +57,8 @@ Item {
         id: agentsList
 
         anchors {
-            top: header.bottom
+            top: parent.top
+            topMargin: 110
             bottom: parent.bottom
             left: parent.left
             right: parent.right
@@ -119,12 +119,10 @@ Item {
             top: parent.top
             left: parent.left
             right: parent.right
+            bottom : agentsList.top
         }
 
-        height: childrenRect.height
-
-        color: MasticTheme.agentsListHeaderBackgroundColor
-
+        color : MasticTheme.selectedTabsBackgroundColor
 
         Row {
             id: headerRow1
@@ -194,19 +192,23 @@ Item {
                 font: MasticTheme.normalFont
             }
         }
+    }
 
 
-        Rectangle {
-            anchors {
-                bottom: headerRow2.bottom
-                left: parent.left
-                right: parent.right
-            }
 
-            color: "#17191F"
-
-            height: 1
+    //
+    // Separator
+    //
+    Rectangle {
+        anchors {
+            bottom: agentsList.top
+            left: parent.left
+            right: parent.right
         }
+
+        color: MasticTheme.leftPanelBackgroundColor
+
+        height: 1
     }
 
 
@@ -221,197 +223,286 @@ Item {
             id : agentListItem
 
             width: MasticTheme.leftPanelWidth
-            height: model.hasOnlyDefinition ? 85 : 135
+            height: 85
 
             Behavior on height {
                 NumberAnimation {}
             }
 
             Rectangle {
-
                 anchors {
                     fill: parent
-                    leftMargin: 4
-                    rightMargin: 4
-                    topMargin: 4
-                    bottomMargin: 4
                 }
-                radius: 5
+
                 border {
-                    width: 1
-                    color: MasticTheme.whiteColor
+                    width: 0
                 }
-                color: agentListItem.ListView.isCurrentItem ? "blue" : MasticTheme.agentsListItemBackgroundColor
+
+                color: MasticTheme.agentsListItemBackgroundColor
+
+                Rectangle {
+                    anchors {
+                        bottom: parent.bottom
+                        left: parent.left
+                        right: parent.right
+                    }
+
+                    color: MasticTheme.leftPanelBackgroundColor
+
+                    height: 1
+                }
+
 
                 Item {
                     id: agentRow
 
                     anchors {
                         fill: parent
-                        leftMargin: 5
-                        topMargin: 2
-                    }
-
-                    Button {
-                        id: btnDeleteAgent
-
-                        anchors {
-                            left: agentRow.right
-                            top: agentRow.top
-                        }
-
-                        visible: (agentListItem.ListView.isCurrentItem && (model.status === AgentStatus.OFF))
-
-                        text: "X"
-
-                        onClicked: {
-                            if (controller)
-                            {
-                                // Delete our agent
-                                controller.deleteAgent(model.QtObject);
-                            }
-                        }
-                    }
-
-                    Column {
-                        width: 175
-                        anchors {
-                            left : parent.left
-                        }
-
-                        Text {
-                            id: agentName
-                            text: model.name
-
-                            height: 25
-                            color: MasticTheme.agentsListLabelColor
-                            font: MasticTheme.heading2Font
-                        }
-
-                        Text {
-                            //text: model.models ? model.models.count + " clone(s)" : ""
-                            //visible: model.models && (model.models.count > 1)
-                            text: (model && model.models) ? model.models.count + " clone(s)" : ""
-                            visible: (model && model.models) ? (model.models.count > 1) : false
-
-                            height: 25
-                            color: "red"
-                            font: MasticTheme.normalFont
-                        }
-
-                        Text {
-                            id: agentAddresses
-                            text: model.addresses
-                            visible: !model.hasOnlyDefinition
-
-                            height: 25
-                            color: MasticTheme.agentsListLabelColor
-                            font: MasticTheme.normalFont
-                        }
-
-                        Text {
-                            id: agentStatus
-                            text: "Status: " + AgentStatus.enumToString(model.status)
-                            visible: !model.hasOnlyDefinition
-
-                            height: 25
-                            color: MasticTheme.agentsListLabelColor
-                            font: MasticTheme.normalFont
-                        }
-                    }
-
-                    Column {
-                        width: 175
-                        anchors {
-                            top: parent.top
-                            topMargin: 30
-                            bottom: parent.bottom
-                            right: parent.right
-                        }
-
-                        Row {
-                            Text {
-                                text: model.definition ? model.definition.version : ""
-
-                                height: 25
-                                color: MasticTheme.agentsListLabelColor
-                                font: MasticTheme.normalFont
-                            }
-
-                            // Space
-                            Text {
-                                text: "   "
-
-                                height: 25
-                                color: MasticTheme.agentsListLabelColor
-                                font: MasticTheme.normalFont
-                            }
-
-                            Text {
-                                text: "Variante"
-                                visible: model.definition ? model.definition.isVariant : false
-
-                                height: 25
-                                color: "red"
-                                font: MasticTheme.normalFont
-                            }
-                        }
-
-                        Text {
-                            text: model.definition ? model.definition.description : ""
-
-                            width: 175
-                            elide: Text.ElideRight
-
-                            height: 25
-                            color: MasticTheme.agentsListLabelColor
-                            font: MasticTheme.normalFont
-                        }
-
                     }
 
                     MouseArea {
                         id: mouseAreaForSelection
                         anchors.fill: parent
 
-                        onPressed: {
-                            agentsList.currentIndex = index
-                        }
-                    }
-
-                    Button {
-                        id: btnDefinition
-
-                        text: model.definition ? model.definition.name : ""
-
-                        anchors {
-                            top: parent.top
-                            right: parent.right
-                        }
-                        width: 175
-
                         onClicked: {
+                            //agentsList.currentIndex = index
+
                             if (controller) {
-                                // Open the definition of our agent
-                                controller.openDefinition(model.QtObject);
+                                controller.selectedAgent = model.QtObject;
                             }
                         }
                     }
 
-                    Switch {
-                        checked: (model.status === AgentStatus.ON)
-                        visible: !model.hasOnlyDefinition
 
-                        anchors {
-                            left: agentRow.left
-                            leftMargin: 2
-                            bottom: agentRow.bottom
-                            bottomMargin: 5
+                    Rectangle {
+                        anchors.fill: parent
+
+                        visible : controller && (controller.selectedAgent === model.QtObject);
+                        color : "transparent"
+                        radius : 5
+                        border {
+                            width : 2
+                            color : MasticTheme.selectedAgentColor
                         }
+
+
                     }
 
+                    //                    Button {
+                    //                        id: btnDeleteAgent
+
+                    //                        anchors {
+                    //                            left: agentRow.right
+                    //                            top: agentRow.top
+                    //                        }
+
+                    //                        visible: (agentListItem.ListView.isCurrentItem && (model.status === AgentStatus.OFF))
+
+                    //                        text: "X"
+
+                    //                        onClicked: {
+                    //                            if (controller)
+                    //                            {
+                    //                                // Delete our agent
+                    //                                controller.deleteAgent(model.QtObject);
+                    //                            }
+                    //                        }
+                    //                    }
+
+
+                    Column {
+                        id : columnName
+
+                        // TO DO : anchors on the right
+                        width: 175
+
+                        anchors {
+                            left : parent.left
+                            leftMargin: 28
+                            top: parent.top
+                            topMargin: 12
+                        }
+                        height : childrenRect.height
+
+                        spacing : 4
+
+                        // Name
+                        Text {
+                            id: agentName
+
+                            anchors {
+                                left : parent.left
+                                right : parent.right
+                            }
+                            elide: Text.ElideRight
+
+                            text: model.name
+                            color: ((model.status === AgentStatus.ON) && !model.hasOnlyDefinition)? MasticTheme.agentsListLabelColor : MasticTheme.agentOFFLabelColor
+                            font: MasticTheme.headingFont
+                        }
+
+                        // Definition name and version
+                        MouseArea {
+                            id : definitionNameBtn
+
+                            anchors {
+                                left : parent.left
+                            }
+
+                            height : definitionNameTxt.height
+                            width : childrenRect.width
+
+                            hoverEnabled: true
+                            onClicked: {
+                                if (controller) {
+                                    // Open the definition of our agent
+                                    controller.openDefinition(model.QtObject);
+                                }
+                            }
+
+                            TextMetrics {
+                                id : definitionName
+
+                                elideWidth: (columnName.width - versionName.width)
+                                elide: Text.ElideRight
+
+                                text: model.definition ? model.definition.name : ""
+                            }
+
+                            Text {
+                                id : definitionNameTxt
+
+                                anchors {
+                                    left : parent.left
+                                }
+
+                                text : definitionName.elidedText
+                                color: ((model.status === AgentStatus.ON) && !model.hasOnlyDefinition)? MasticTheme.agentsListLabelColor : MasticTheme.agentOFFLabelColor
+                                font: MasticTheme.heading2Font
+                            }
+
+                            Text {
+                                id : versionName
+                                anchors {
+                                    bottom: definitionNameTxt.bottom
+                                    bottomMargin : 2
+                                    left : definitionNameTxt.right
+                                    leftMargin: 5
+                                }
+
+                                text: model.definition ? "(v" + model.definition.version + ")" : ""
+
+                                color: ((model.status === AgentStatus.ON) && !model.hasOnlyDefinition)? MasticTheme.agentsListLabelColor : MasticTheme.agentOFFLabelColor
+                                font {
+                                    family: MasticTheme.textFontFamily
+                                    pixelSize : 10
+                                    italic : true
+                                }
+                            }
+
+                            // underline
+                            Rectangle {
+                                visible: definitionNameBtn.containsMouse
+
+                                anchors {
+                                    left : definitionNameTxt.left
+                                    right : versionName.right
+                                    bottom : parent.bottom
+                                }
+
+                                height : 1
+
+                                color : definitionNameTxt.color
+                            }
+
+                        }
+
+                        // Address(es) on the network of our agent(s)
+                        Text {
+                            id: agentAddresses
+                            anchors {
+                                left : parent.left
+                                right : parent.right
+                            }
+                            elide: Text.ElideRight
+
+                            text: model.addresses
+
+                            color: ((model.status === AgentStatus.ON) && !model.hasOnlyDefinition)? MasticTheme.agentsListTextColor : MasticTheme.agentOFFTextColor
+                            font: MasticTheme.normalFont
+                        }
+
+                    }
+
+
+
+                    //                        Text {
+                    //                            //text: model.models ? model.models.count + " clone(s)" : ""
+                    //                            //visible: model.models && (model.models.count > 1)
+                    //                            text: (model && model.models) ? model.models.count + " clone(s)" : ""
+                    //                            visible: (model && model.models) ? (model.models.count > 1) : false
+
+                    //                            color: "red"
+                    //                            font: MasticTheme.normalFont
+                    //                        }
+
+                    //                        Text {
+                    //                            id: agentStatus
+                    //                            text: "Status: " + AgentStatus.enumToString(model.status)
+                    //                            visible: !model.hasOnlyDefinition
+
+                    //                            height: 25
+                    //                            color: MasticTheme.agentsListLabelColor
+                    //                            font: MasticTheme.normalFont
+                    //                        }
+
+
+                    //                    Column {
+                    //                        width: 175
+                    //                        anchors {
+                    //                            top: parent.top
+                    //                            topMargin: 30
+                    //                            bottom: parent.bottom
+                    //                            right: parent.right
+                    //                        }
+
+                    //                        Text {
+                    //                            text: "Variante"
+                    //                            visible: model.definition ? model.definition.isVariant : false
+
+                    //                            height: 25
+                    //                            color: "red"
+                    //                            font: MasticTheme.normalFont
+                    //                        }
+
+                    //                        Text {
+                    //                            text: model.definition ? model.definition.description : ""
+
+                    //                            width: 175
+                    //                            elide: Text.ElideRight
+
+                    //                            height: 25
+                    //                            color: MasticTheme.agentsListLabelColor
+                    //                            font: MasticTheme.normalFont
+                    //                        }
+
+                    // }
+
+
+                    //                    Switch {
+                    //                        checked: (model.status === AgentStatus.ON)
+                    //                        visible: !model.hasOnlyDefinition
+
+                    //                        anchors {
+                    //                            left: agentRow.left
+                    //                            leftMargin: 2
+                    //                            bottom: agentRow.bottom
+                    //                            bottomMargin: 5
+                    //                        }
+                    //                    }
+
                     Row {
-                        visible: !model.hasOnlyDefinition
+                        visible: !model.hasOnlyDefinition && (model.status === AgentStatus.ON)
 
                         anchors {
                             right: agentRow.right
