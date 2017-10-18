@@ -35,6 +35,8 @@ class AgentsSupervisionController : public QObject
     // Sorted list of agents
     I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(AgentVM, agentsList)
 
+    // Selected agent in the agents list
+    I2_QML_PROPERTY(AgentVM *, selectedAgent)
 
 public:
     /**
