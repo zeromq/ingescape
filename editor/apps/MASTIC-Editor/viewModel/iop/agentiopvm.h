@@ -36,16 +36,16 @@ class AgentIOPVM : public QObject
     I2_QML_PROPERTY(AgentIOPM*, modelM)
 
     // Mapping value of our Input / Output / Parameter
-    I2_CPP_PROPERTY(QVariant, mappingValue)
+    //I2_CPP_PROPERTY(QVariant, mappingValue)
 
     // Displayable mapping value of our Input / Output / Parameter
-    I2_QML_PROPERTY(QString, displayableMappingValue)
+    //I2_QML_PROPERTY(QString, displayableMappingValue)
 
     // current value of our Input / Output / Parameter
-    I2_CPP_PROPERTY(QVariant, currentValue)
+    //I2_CPP_PROPERTY(QVariant, currentValue)
 
     // Displayable current value of our Input / Output / Parameter
-    I2_QML_PROPERTY(QString, displayableCurrentValue)
+    //I2_QML_PROPERTY(QString, displayableCurrentValue)
 
 
 public:

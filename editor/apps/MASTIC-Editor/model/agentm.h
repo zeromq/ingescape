@@ -107,6 +107,7 @@ public:
      */
     ~AgentM();
 
+
 Q_SIGNALS:
 
 public Q_SLOTS:

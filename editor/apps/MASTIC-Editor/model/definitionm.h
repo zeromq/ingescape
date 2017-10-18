@@ -21,6 +21,7 @@
 #include <I2PropertyHelpers.h>
 
 #include <model/iop/agentiopm.h>
+#include <model/iop/outputm.h>
 
 
 /**
@@ -49,7 +50,8 @@ class DefinitionM : public QObject
     I2_QOBJECT_LISTMODEL(AgentIOPM, inputsList)
 
     // List of outputs of our agent definition
-    I2_QOBJECT_LISTMODEL(AgentIOPM, outputsList)
+    //I2_QOBJECT_LISTMODEL(AgentIOPM, outputsList)
+    I2_QOBJECT_LISTMODEL(OutputM, outputsList)
 
     // List of parameters of our agent definition
     I2_QOBJECT_LISTMODEL(AgentIOPM, parametersList)
@@ -101,7 +103,7 @@ private Q_SLOTS:
 
 private:
     // Previous list of outputs
-    QList<AgentIOPM*> _previousOutputsList;
+    QList<OutputM*> _previousOutputsList;
 
 };
 

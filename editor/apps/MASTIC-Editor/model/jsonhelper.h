@@ -73,9 +73,11 @@ private:
     /**
      * @brief Create a model of agent Input/Output/Parameter with JSON
      * @param jsonObject
+     * @param agentIOPType
      * @return
      */
-    AgentIOPM* _createModelOfAgentIOP(QJsonObject jsonObject);
+    AgentIOPM* _createModelOfAgentIOP(QJsonObject jsonObject, AgentIOPTypes::Value agentIOPType);
+
 
     /**
      * @brief Create a model of element mapping Input name/Output agent name/Output name with JSON

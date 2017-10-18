@@ -567,7 +567,7 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 
                 if (newDefinition != NULL && newDefinition->name != NULL && subscriber != NULL){
                     // Look if this agent already has a definition
-                    if(subscriber->definition != NULL){
+                    if(subscriber->definition != NULL) {
                         mtic_debug("definition already exists for agent %s : new definition will overwrite the previous one...\n", name);
                         definition_freeDefinition(subscriber->definition);
                         subscriber->definition = NULL;
@@ -580,8 +580,10 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     network_manageSubscriberMapping(subscriber);
                 }else{
                     mtic_debug("ERROR: definition is NULL or has no name for agent %s\n", name);
-                    definition_freeDefinition(newDefinition);
-                    newDefinition = NULL;
+                    if(newDefinition != NULL) {
+                        definition_freeDefinition(newDefinition);
+                        newDefinition = NULL;
+                    }
                 }
                 free(strDefinition);
             }
@@ -610,7 +612,14 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     subscriber->mapping = newMapping;
                 }else{
                     mtic_debug("ERROR: mapping is NULL or has no name for agent %s\n", name);
-                    mapping_freeMapping(subscriber->mapping);
+                    if(subscriber != NULL && subscriber->mapping != NULL) {
+                        mapping_freeMapping(subscriber->mapping);
+                        subscriber->mapping = NULL;
+                    }
+                    if(newMapping != NULL) {
+                        mapping_freeMapping(newMapping);
+                        newMapping = NULL;
+                    }
                 }
                 free(strMapping);
             }
