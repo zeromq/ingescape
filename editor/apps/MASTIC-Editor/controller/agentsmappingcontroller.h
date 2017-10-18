@@ -49,6 +49,15 @@ Q_SIGNALS:
 
 public Q_SLOTS:
 
+
+    /**
+     * @brief Slot when a new model of agent definition has been created
+     * @param definition
+     * @param agent
+     */
+    void onAgentDefinitionCreated(DefinitionM* definition, AgentM* agent);
+
+
 private:
     // Usefull to save it
     MasticModelManager* _modelManager;

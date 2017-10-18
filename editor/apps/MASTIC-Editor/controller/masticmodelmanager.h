@@ -194,6 +194,7 @@ private:
      */
     void _updateDefinitionVariants(QString definitionName);
 
+
 private:
 
     // Helper to manage JSON definitions of agents
@@ -210,6 +211,9 @@ private:
 
     // Map from "definition name" to a list (of models) of agent definition
     QHash<QString, QList<DefinitionM*>> _mapFromNameToAgentDefinitionsList;
+
+    // Map from "mapping name" to a list (of models) of agent mapping
+    //QHash<QString, QList<AgentMappingM*>> _mapFromNameToAgentMappingsList;
 
 };
 
