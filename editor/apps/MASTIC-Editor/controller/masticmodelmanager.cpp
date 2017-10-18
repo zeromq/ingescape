@@ -23,7 +23,6 @@
 #include <QJsonDocument>
 
 
-
 /**
  * @brief Default constructor
  * @param parent
@@ -54,108 +53,23 @@ MasticModelManager::~MasticModelManager()
 
 
 /**
- * @brief Initialize agents with JSON files
+ * @brief Initialize agents (from JSON files) inside a directory
+ * @param agentsDirectoryPath agents directory path
  */
-void MasticModelManager::initAgentsWithFiles()
+void MasticModelManager::initAgentsInsideDirectory(QString agentsDirectoryPath)
 {
-    QStringList nameFilters;
-    nameFilters << "*.json";
-
-    // Get the root path of our application ([DocumentsLocation]/MASTIC/)
-    QString rootDirectoryPath = I2Utils::getOrCreateAppRootPathInDocumentDir("MASTIC");
-
-    //------------------------------
-    //
-    // Agents definitions
-    //
-    //------------------------------
-    QString agentsDefinitionsDirectoryPath = QString("%1AgentsDefinitions").arg(rootDirectoryPath);
-    QDir agentsDefinitionsDirectory(agentsDefinitionsDirectoryPath);
-    if (agentsDefinitionsDirectory.exists())
+    QDir agentsDefinitionsAndMappingsDirectory(agentsDirectoryPath);
+    if (agentsDefinitionsAndMappingsDirectory.exists())
     {
-        QFileInfoList agentsDefinitionsFilesList = agentsDefinitionsDirectory.entryInfoList(nameFilters);
-        qInfo() << agentsDefinitionsFilesList.count() << "files in directory" << agentsDefinitionsDirectoryPath;
+        // Get all sub directories
+        QFileInfoList agentsDirectoriesList = agentsDefinitionsAndMappingsDirectory.entryInfoList(QDir::NoDotAndDotDot | QDir::AllDirs);
 
-        // Traverse the list of JSON files
-        foreach (QFileInfo fileInfo, agentsDefinitionsFilesList)
+        // Traverse the list of sub directories
+        foreach (QFileInfo fileInfo, agentsDirectoriesList)
         {
-            qDebug() << "File" << fileInfo.fileName() << "at" << fileInfo.absoluteFilePath();
-
-            QFile jsonFile(fileInfo.absoluteFilePath());
-            if (jsonFile.open(QIODevice::ReadOnly))
-            {
-                QByteArray byteArrayOfJson = jsonFile.readAll();
-
-                // Create a model of agent definition with JSON
-                DefinitionM* definition = _jsonHelper->createModelOfDefinition(byteArrayOfJson);
-                if (definition != NULL)
-                {
-                    // Create a new model of agent with the name of the definition
-                    AgentM* agent = new AgentM(definition->name(), this);
-
-                    // Add this new model of agent
-                    addAgentModel(agent);
-
-                    // Emit the signal "Agent Model Created"
-                    Q_EMIT agentModelCreated(agent);
-
-                    // Add this new model of agent definition
-                    addAgentDefinition(definition);
-
-                    // Emit the signal "Agent Definition Created"
-                    Q_EMIT agentDefinitionCreated(definition, agent);
-                }
-
-                jsonFile.close();
-            }
-            else
-            {
-                qCritical() << "Can not open file" << fileInfo.absoluteFilePath();
-            }
-        }
-    }
-
-
-    //------------------------------
-    //
-    // Agents mappings
-    //
-    //------------------------------
-    QString agentsMappingsDirectoryPath = QString("%1AgentsMappings").arg(rootDirectoryPath);
-    QDir agentsMappingsDirectory(agentsMappingsDirectoryPath);
-    if (agentsMappingsDirectory.exists())
-    {
-        QFileInfoList agentsMappingsFilesList = agentsMappingsDirectory.entryInfoList(nameFilters);
-        qInfo() << agentsMappingsFilesList.count() << "files in directory" << agentsMappingsDirectoryPath;
-
-        // Traverse the list of JSON files
-        foreach (QFileInfo fileInfo, agentsMappingsFilesList)
-        {
-            qDebug() << "File" << fileInfo.fileName() << "at" << fileInfo.absoluteFilePath();
-
-            QFile jsonFile(fileInfo.absoluteFilePath());
-            if (jsonFile.open(QIODevice::ReadOnly))
-            {
-                QByteArray byteArrayOfJson = jsonFile.readAll();
-
-                // Create a model of agent mapping with JSON
-                AgentMappingM* agentMapping = _jsonHelper->createModelOfAgentMapping("agentUndefined", byteArrayOfJson);
-                if (agentMapping != NULL)
-                {
-                    // FIXME: which agent ?
-
-                    // Add this new model of agent mapping
-                    //addAgentMapping(agentMapping);
-
-                    // Emit the signal "Agent Mapping Created"
-                    //Q_EMIT agentMappingCreated(agentMapping, agent);
-                }
-
-                jsonFile.close();
-            }
-            else
-            {
-                qCritical() << "Can not open file" << fileInfo.absoluteFilePath();
+            if (fileInfo.isDir()) {
+                // Initialize an agent (from JSON files) inside a sub directory
+                _initAgentInsideSubDirectory(fileInfo.absoluteFilePath());
             }
         }
     }
@@ -487,6 +401,119 @@ QList<AgentMappingM*> MasticModelManager::getAgentMappingsListFromName(QString n
     }
     else {
         return QList<AgentMappingM*>();
+    }
+}
+
+
+/**
+ * @brief Initialize an agent (from JSON files) inside a sub directory
+ * @param subDirectoryPath
+ */
+void MasticModelManager::_initAgentInsideSubDirectory(QString subDirectoryPath)
+{
+    QDir subDirectory(subDirectoryPath);
+    if (subDirectory.exists())
+    {
+        QStringList nameFilters;
+        nameFilters << "*.json";
+
+        QFileInfoList agentsFilesList = subDirectory.entryInfoList(nameFilters);
+        qInfo() << agentsFilesList.count() << "files in directory" << subDirectory.absolutePath();
+
+        DefinitionM* agentDefinition = NULL;
+        AgentMappingM* agentMapping = NULL;
+
+        // Only 1 file, it must be the definition
+        if (agentsFilesList.count() == 1)
+        {
+            QFileInfo fileInfo = agentsFilesList.first();
+
+            QFile jsonFile(fileInfo.absoluteFilePath());
+            if (jsonFile.open(QIODevice::ReadOnly))
+            {
+                QByteArray byteArrayOfJson = jsonFile.readAll();
+                jsonFile.close();
+
+                // Create a model of agent definition with JSON
+                agentDefinition = _jsonHelper->createModelOfDefinition(byteArrayOfJson);
+            }
+            else {
+                qCritical() << "Can not open file" << fileInfo.absoluteFilePath();
+            }
+        }
+        // 2 files, they must be the definition and the mapping
+        else if (agentsFilesList.count() == 2)
+        {
+            QFileInfo fileInfo1 = agentsFilesList.at(0);
+            QFileInfo fileInfo2 = agentsFilesList.at(1);
+
+            QFile jsonFile1(fileInfo1.absoluteFilePath());
+            QFile jsonFile2(fileInfo2.absoluteFilePath());
+
+            if (jsonFile1.open(QIODevice::ReadOnly) && jsonFile2.open(QIODevice::ReadOnly))
+            {
+                QByteArray byteArrayOfJson1 = jsonFile1.readAll();
+                jsonFile1.close();
+
+                QByteArray byteArrayOfJson2 = jsonFile2.readAll();
+                jsonFile2.close();
+
+                // Try to create a model of agent definition with the first JSON
+                agentDefinition = _jsonHelper->createModelOfDefinition(byteArrayOfJson1);
+
+                // If succeeded
+                if (agentDefinition != NULL)
+                {
+                    // Create a model of agent mapping with the second JSON
+                    agentMapping = _jsonHelper->createModelOfAgentMapping(agentDefinition->name(), byteArrayOfJson2);
+                }
+                else
+                {
+                    // Try to create a model of agent definition with the second JSON
+                    agentDefinition = _jsonHelper->createModelOfDefinition(byteArrayOfJson2);
+
+                    // If succeeded
+                    if (agentDefinition != NULL)
+                    {
+                        // Create a model of agent mapping with the first JSON
+                        agentMapping = _jsonHelper->createModelOfAgentMapping(agentDefinition->name(), byteArrayOfJson1);
+                    }
+                }
+            }
+            else {
+                qCritical() << "Can not open 2 files" << fileInfo1.absoluteFilePath() << "and" << fileInfo2.absoluteFilePath();
+            }
+        }
+        else {
+            qCritical() << "There are more than 2 JSON files in the directory" << subDirectory.absolutePath();
+        }
+
+        if (agentDefinition != NULL)
+        {
+            // Create a new model of agent with the name of the definition
+            AgentM* agent = new AgentM(agentDefinition->name(), this);
+
+            // Add this new model of agent
+            addAgentModel(agent);
+
+            // Emit the signal "Agent Model Created"
+            Q_EMIT agentModelCreated(agent);
+
+            // Add this new model of agent definition
+            addAgentDefinition(agentDefinition);
+
+            // Emit the signal "Agent Definition Created"
+            Q_EMIT agentDefinitionCreated(agentDefinition, agent);
+
+            if (agentMapping != NULL)
+            {
+                // Add this new model of agent mapping
+                addAgentMapping(agentMapping);
+
+                // Emit the signal "Agent Mapping Created"
+                Q_EMIT agentMappingCreated(agentMapping, agent);
+            }
+        }
     }
 }
 

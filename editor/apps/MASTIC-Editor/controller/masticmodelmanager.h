@@ -122,9 +122,10 @@ public:
 
 
     /**
-     * @brief Initialize agents with JSON files
+     * @brief Initialize agents (from JSON files) inside a directory
+     * @param agentsDirectoryPath agents directory path
      */
-    void initAgentsWithFiles();
+    void initAgentsInsideDirectory(QString agentsDirectoryPath);
 
 
 Q_SIGNALS:
@@ -210,6 +211,13 @@ public Q_SLOTS:
 
 
 private:
+
+    /**
+     * @brief Initialize an agent (from JSON files) inside a sub directory
+     * @param subDirectoryPath
+     */
+    void _initAgentInsideSubDirectory(QString subDirectoryPath);
+
 
     /**
      * @brief Update definition variants of a list of definitions with the same name
