@@ -70,9 +70,15 @@ Item {
     readonly property color whiteColor: "#FFFFFF"
     readonly property color blackColor: "#17191E"
 
+    readonly property color veryDarkGreyColor: "#282D34"
     readonly property color darkGreyColor: "#3C424F"
     readonly property color blueGreyColor: "#8896AA"
+    readonly property color darkBlueGreyColor: "#535A66"
 
+
+
+
+    readonly property color orangeColor: "#F39200"
 
 
     //-----------------------------------------
@@ -156,14 +162,22 @@ Item {
 
     // Background
     readonly property color leftPanelBackgroundColor: theme.blackColor
-    readonly property color selectedTabsBackgroundColor: theme.darkGreyColor
+    readonly property color selectedTabsBackgroundColor: theme.veryDarkGreyColor
 
     // Labels
     readonly property color agentsListLabelColor: theme.whiteColor
     readonly property color agentsListTextColor: theme.blueGreyColor
 
+    readonly property color agentOFFLabelColor: theme.darkBlueGreyColor
+    readonly property color agentOFFTextColor: theme.darkGreyColor
+
+
     // List
-    readonly property color agentsListItemBackgroundColor: theme.darkGreyColor
+    readonly property color agentsListItemBackgroundColor: theme.veryDarkGreyColor
+
+    // Selected Agent
+    readonly property color selectedAgentColor: theme.orangeColor
+
 
 
     //-----------------------------------------

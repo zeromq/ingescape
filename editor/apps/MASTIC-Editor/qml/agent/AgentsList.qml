@@ -264,11 +264,29 @@ Item {
                         id: mouseAreaForSelection
                         anchors.fill: parent
 
-                        onPressed: {
-                            agentsList.currentIndex = index
+                        onClicked: {
+                            //agentsList.currentIndex = index
+
+                            if (controller) {
+                                controller.selectedAgent = model.QtObject;
+                            }
                         }
                     }
 
+
+                    Rectangle {
+                        anchors.fill: parent
+
+                        visible : controller && (controller.selectedAgent === model.QtObject);
+                        color : "transparent"
+                        radius : 5
+                        border {
+                            width : 2
+                            color : MasticTheme.selectedAgentColor
+                        }
+
+
+                    }
 
                     //                    Button {
                     //                        id: btnDeleteAgent
@@ -319,19 +337,20 @@ Item {
                             elide: Text.ElideRight
 
                             text: model.name
-                            color: MasticTheme.agentsListLabelColor
+                            color: ((model.status === AgentStatus.ON) && !model.hasOnlyDefinition)? MasticTheme.agentsListLabelColor : MasticTheme.agentOFFLabelColor
                             font: MasticTheme.headingFont
                         }
 
                         // Definition name and version
                         MouseArea {
                             id : definitionNameBtn
+
                             anchors {
                                 left : parent.left
-                                right : parent.right
                             }
 
                             height : definitionNameTxt.height
+                            width : childrenRect.width
 
                             hoverEnabled: true
                             onClicked: {
@@ -358,7 +377,7 @@ Item {
                                 }
 
                                 text : definitionName.elidedText
-                                color: MasticTheme.agentsListLabelColor
+                                color: ((model.status === AgentStatus.ON) && !model.hasOnlyDefinition)? MasticTheme.agentsListLabelColor : MasticTheme.agentOFFLabelColor
                                 font: MasticTheme.heading2Font
                             }
 
@@ -373,7 +392,7 @@ Item {
 
                                 text: model.definition ? "(v" + model.definition.version + ")" : ""
 
-                                color: MasticTheme.agentsListLabelColor
+                                color: ((model.status === AgentStatus.ON) && !model.hasOnlyDefinition)? MasticTheme.agentsListLabelColor : MasticTheme.agentOFFLabelColor
                                 font {
                                     family: MasticTheme.textFontFamily
                                     pixelSize : 10
@@ -401,10 +420,15 @@ Item {
                         // Address(es) on the network of our agent(s)
                         Text {
                             id: agentAddresses
-                            text: model.addresses
-                            visible: !model.hasOnlyDefinition
+                            anchors {
+                                left : parent.left
+                                right : parent.right
+                            }
+                            elide: Text.ElideRight
 
-                            color: MasticTheme.agentsListTextColor
+                            text: model.addresses
+
+                            color: ((model.status === AgentStatus.ON) && !model.hasOnlyDefinition)? MasticTheme.agentsListTextColor : MasticTheme.agentOFFTextColor
                             font: MasticTheme.normalFont
                         }
 
@@ -465,20 +489,20 @@ Item {
                     // }
 
 
-//                    Switch {
-//                        checked: (model.status === AgentStatus.ON)
-//                        visible: !model.hasOnlyDefinition
+                    //                    Switch {
+                    //                        checked: (model.status === AgentStatus.ON)
+                    //                        visible: !model.hasOnlyDefinition
 
-//                        anchors {
-//                            left: agentRow.left
-//                            leftMargin: 2
-//                            bottom: agentRow.bottom
-//                            bottomMargin: 5
-//                        }
-//                    }
+                    //                        anchors {
+                    //                            left: agentRow.left
+                    //                            leftMargin: 2
+                    //                            bottom: agentRow.bottom
+                    //                            bottomMargin: 5
+                    //                        }
+                    //                    }
 
                     Row {
-                        visible: !model.hasOnlyDefinition
+                        visible: !model.hasOnlyDefinition && (model.status === AgentStatus.ON)
 
                         anchors {
                             right: agentRow.right
