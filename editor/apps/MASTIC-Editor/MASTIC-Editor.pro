@@ -43,6 +43,7 @@ SOURCES += main.cpp \
     viewModel/pointmapvm.cpp \
     viewModel/agentinmappingvm.cpp \
     viewModel/mapbetweeniopvm.cpp \
+    model/iop/outputm.cpp \
     controller/scenariocontroller.cpp \
     viewModel/actionvm.cpp
 
@@ -83,6 +84,7 @@ HEADERS += \
     viewModel/pointmapvm.h \
     viewModel/agentinmappingvm.h \
     viewModel/mapbetweeniopvm.h \
+    model/iop/outputm.h  \
     controller/scenariocontroller.h \
     viewModel/actionvm.h
 

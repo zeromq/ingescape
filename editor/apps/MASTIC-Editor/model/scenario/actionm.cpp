@@ -32,7 +32,7 @@
 ActionM::ActionM(QString name, QObject *parent) : QObject(parent),
     _name(name),
     _startTime(-1),
-    _validityDuration(0),
+    _validityDuration(-1),
     _shallRevert(false),
     _revertWhenValidityIsOver(false),
     _revertAtTime(-1),

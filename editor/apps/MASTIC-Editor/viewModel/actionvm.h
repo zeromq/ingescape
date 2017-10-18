@@ -44,6 +44,9 @@ class ActionVM: public QObject
     // Line number in timeline
     I2_QML_PROPERTY(int, lineInTimeLine)
 
+    // Start date time
+    I2_QML_PROPERTY(QDateTime, startDateTime)
+
 public:
 
     /**

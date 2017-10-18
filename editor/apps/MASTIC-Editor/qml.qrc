@@ -17,6 +17,22 @@
         <file>qml/agentsmapping/AgentNodeView.qml</file>
         <file>qml/BlockLoadingAnimation.qml</file>
         <file>qml/Patxi.qml</file>
+        <file>resources/fonts/akrobat/Akrobat-Black.ttf</file>
+        <file>resources/fonts/akrobat/Akrobat-Bold.ttf</file>
+        <file>resources/fonts/akrobat/Akrobat-ExtraBold.ttf</file>
+        <file>resources/fonts/akrobat/Akrobat-ExtraLight.ttf</file>
+        <file>resources/fonts/akrobat/Akrobat-Light.ttf</file>
+        <file>resources/fonts/akrobat/Akrobat-SemiBold.ttf</file>
+        <file>resources/fonts/akrobat/Akrobat-Thin.ttf</file>
+        <file>resources/fonts/akrobat/Akrobat.ttf</file>
+        <file>resources/fonts/blogger-sans/Blogger_Sans-Bold_Italic.ttf</file>
+        <file>resources/fonts/blogger-sans/Blogger_Sans-Bold.ttf</file>
+        <file>resources/fonts/blogger-sans/Blogger_Sans-Italic.ttf</file>
+        <file>resources/fonts/blogger-sans/Blogger_Sans-Light_Italic.ttf</file>
+        <file>resources/fonts/blogger-sans/Blogger_Sans-Light.ttf</file>
+        <file>resources/fonts/blogger-sans/Blogger_Sans-Medium_Italic.ttf</file>
+        <file>resources/fonts/blogger-sans/Blogger_Sans-Medium.ttf</file>
+        <file>resources/fonts/blogger-sans/Blogger_Sans.ttf</file>
         <file>qml/scenario/ActionsList.qml</file>
         <file>qml/scenario/ActionEditor.qml</file>
     </qresource>

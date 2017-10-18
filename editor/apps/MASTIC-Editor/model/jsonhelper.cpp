@@ -72,9 +72,8 @@ DefinitionM* JsonHelper::createModelOfDefinition(QByteArray byteArrayOfJson)
                         if (jsonParameter.isObject())
                         {
                             // Create a model of agent Parameter
-                            AgentIOPM* agentParameter = _createModelOfAgentIOP(jsonParameter.toObject());
+                            AgentIOPM* agentParameter = _createModelOfAgentIOP(jsonParameter.toObject(), AgentIOPTypes::PARAMETER);
                             if (agentParameter != NULL) {
-                                agentParameter->setagentIOPType(AgentIOPTypes::PARAMETER);
                                 definition->parametersList()->append(agentParameter);
                             }
                         }
@@ -86,9 +85,8 @@ DefinitionM* JsonHelper::createModelOfDefinition(QByteArray byteArrayOfJson)
                         if (jsonInput.isObject())
                         {
                             // Create a model of agent Input
-                            AgentIOPM* agentInput = _createModelOfAgentIOP(jsonInput.toObject());
+                            AgentIOPM* agentInput = _createModelOfAgentIOP(jsonInput.toObject(), AgentIOPTypes::INPUT);
                             if (agentInput != NULL) {
-                                agentInput->setagentIOPType(AgentIOPTypes::INPUT);
                                 definition->inputsList()->append(agentInput);
                             }
                         }
@@ -100,9 +98,8 @@ DefinitionM* JsonHelper::createModelOfDefinition(QByteArray byteArrayOfJson)
                         if (jsonOutput.isObject())
                         {
                             // Create a model of agent Output
-                            AgentIOPM* agentOutput = _createModelOfAgentIOP(jsonOutput.toObject());
+                            AgentIOPM* agentOutput = _createModelOfAgentIOP(jsonOutput.toObject(), AgentIOPTypes::OUTPUT);
                             if (agentOutput != NULL) {
-                                agentOutput->setagentIOPType(AgentIOPTypes::OUTPUT);
                                 definition->outputsList()->append(agentOutput);
                             }
                         }
@@ -183,9 +180,10 @@ AgentMappingM* JsonHelper::createModelOfAgentMapping(QString inputAgentName, QBy
 /**
  * @brief Create a model of agent Input/Output/Parameter with JSON
  * @param jsonObject
+ * @param agentIOPType
  * @return
  */
-AgentIOPM* JsonHelper::_createModelOfAgentIOP(QJsonObject jsonObject)
+AgentIOPM* JsonHelper::_createModelOfAgentIOP(QJsonObject jsonObject, AgentIOPTypes::Value agentIOPType)
 {
     AgentIOPM* agentIOP = NULL;
 
@@ -195,14 +193,22 @@ AgentIOPM* JsonHelper::_createModelOfAgentIOP(QJsonObject jsonObject)
 
     if (jsonName.isString() && jsonType.isString())
     {
-        // Create the agent Input/Output/Parameter
-        agentIOP = new AgentIOPM();
-
-        agentIOP->setname(jsonName.toString());
-
         int nAgentIOPValueType = AgentIOPValueTypes::staticEnumFromKey(jsonType.toString());
-        if (nAgentIOPValueType > -1) {
-            agentIOP->setagentIOPValueType(static_cast<AgentIOPValueTypes::Value>(nAgentIOPValueType));
+        if (nAgentIOPValueType > -1)
+        {
+            if (agentIOPType == AgentIOPTypes::OUTPUT)
+            {
+                // Create the agent Output
+                agentIOP = new OutputM(jsonName.toString(),
+                                       static_cast<AgentIOPValueTypes::Value>(nAgentIOPValueType));
+            }
+            else
+            {
+                // Create the agent Input/Parameter
+                agentIOP = new AgentIOPM(agentIOPType,
+                                         jsonName.toString(),
+                                         static_cast<AgentIOPValueTypes::Value>(nAgentIOPValueType));
+            }
 
             switch (agentIOP->agentIOPValueType())
             {
@@ -287,13 +293,19 @@ AgentIOPM* JsonHelper::_createModelOfAgentIOP(QJsonObject jsonObject)
             //qDebug() << agentIOP->name() << "(" << AgentIOPValueTypes::staticEnumToString(agentIOP->agentIOPValueType()) << ")" << agentIOP->displayableDefaultValue();
         }
         else {
-            qCritical() << "IOP '" << agentIOP->name() << "': The value type '" << jsonType.toString() << "' is wrong (must be INTEGER, DOUBLE, STRING, BOOL, IMPULSION or DATA)";
+            qCritical() << "IOP '" << jsonName.toString() << "': The value type '" << jsonType.toString() << "' is wrong (must be INTEGER, DOUBLE, STRING, BOOL, IMPULSION or DATA)";
         }
     }
 
     return agentIOP;
 }
 
+
+/**
+ * @brief Create a model of element mapping Input name/Output agent name/Output name with JSON
+ * @param jsonObject
+ * @return
+ */
 ElementMappingM* JsonHelper::_createModelOfElementMapping(QJsonObject jsonObject)
 {
     ElementMappingM* elementMapping = NULL;

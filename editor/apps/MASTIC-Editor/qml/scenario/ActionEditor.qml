@@ -152,7 +152,7 @@ I2PopupBase {
                     color: MasticTheme.definitionEditorsLabelColor
                 }
                 TextField {
-                    text: actionVM && actionVM.actionModel ? actionVM.actionModel.startTime.toLocaleTimeString(Qt.locale(), "HH'h'mm") : ""
+                    text: actionVM ? actionVM.startDateTime.toLocaleTimeString(Qt.locale(), "HH':'mm':'ss") : ""
                     width:100
                 }
             }

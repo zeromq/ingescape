@@ -123,9 +123,6 @@ Item {
 
         height: childrenRect.height
 
-        color: MasticTheme.agentsListHeaderBackgroundColor
-
-
         Row {
             id: headerRow1
 
@@ -260,8 +257,8 @@ Item {
                         id: btnDeleteAction
 
                         anchors {
-                            left: agentRow.right
-                            top: agentRow.top
+                            left: actionRow.right
+                            top: actionRow.top
                         }
 
                         visible: true
@@ -294,8 +291,7 @@ Item {
 
                         Text {
                             id: actionStartTime
-                            text: model.actionModel.startTime.toLocaleTimeString(Qt.locale(), "HH'h'mm")
-                            visible: !model.hasOnlyDefinition
+                            text: model.startDateTime.toLocaleTimeString(Qt.locale(), "HH':'mm':'ss")
 
                             height: 25
                             color: MasticTheme.agentsListLabelColor
