@@ -57,6 +57,11 @@ public:
       */
     Q_INVOKABLE void openActionEditor(ActionVM* actionVM);
 
+    /**
+      * @brief Delete an action from the list
+      * @param action view model
+      */
+    Q_INVOKABLE void deleteAction(ActionVM * actionVM);
 
 Q_SIGNALS:
 

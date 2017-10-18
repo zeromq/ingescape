@@ -73,4 +73,26 @@ void ScenarioController::openActionEditor(ActionVM* actionVM)
     }
 }
 
+/**
+  * @brief Delete an action from the list
+  * @param action view model
+  */
+void ScenarioController::deleteAction(ActionVM * actionVM)
+{
+    // Delete the popup if necessary
+    if(_openedActionsEditors.contains(actionVM))
+    {
+        _openedActionsEditors.remove(actionVM);
+    }
+
+    // Delete the action item
+    if(_actionsList.contains(actionVM))
+    {
+        _actionsList.remove(actionVM);
+
+        delete actionVM;
+        actionVM = NULL;
+    }
+}
+
 
