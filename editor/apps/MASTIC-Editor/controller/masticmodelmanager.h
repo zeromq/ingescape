@@ -93,10 +93,10 @@ public:
 
     /**
      * @brief Get the list (of models) of agent definition from a name
-     * @param name
+     * @param definitionName
      * @return
      */
-    QList<DefinitionM*> getAgentDefinitionsListFromName(QString name);
+    QList<DefinitionM*> getAgentDefinitionsListFromName(QString definitionName);
 
 
     /**
@@ -118,7 +118,15 @@ public:
      * @param name
      * @return
      */
-    QList<AgentMappingM*> getAgentMappingsListFromName(QString name);
+    QList<AgentMappingM*> getAgentMappingsListFromName(QString mappingName);
+
+
+    /**
+     * @brief Get the merged list of all (models of) mapping elements which connect an input of the agent
+     * @param agentName
+     * @return
+     */
+    QList<ElementMappingM*> getMergedListOfMappingElementsFromAgentName(QString agentName);
 
 
     /**
@@ -226,6 +234,14 @@ private:
     void _updateDefinitionVariants(QString definitionName);
 
 
+    /**
+     * @brief Update the merged list of mapping elements for the agent name
+     * @param agentName
+     * @param agentMapping
+     */
+    void _updateMergedListOfMappingElementsForAgentName(QString agentName, AgentMappingM* agentMapping);
+
+
 private:
 
     // Helper to manage JSON definitions of agents
@@ -234,10 +250,10 @@ private:
     // List of all models of agents
     //QList<AgentM*> _allAgentsModel;
 
-    // Map from Peer ID to a model of agent
+    // Map from "peer id" to a model of agent
     QHash<QString, AgentM*> _mapFromPeerIdToAgentM;
 
-    // Map from agent name to a list of models of agent
+    // Map from "agent name" to a list of models of agent
     QHash<QString, QList<AgentM*>> _mapFromNameToAgentModelsList;
 
     // Map from "definition name" to a list (of models) of agent definition
@@ -245,6 +261,9 @@ private:
 
     // Map from "mapping name" to a list (of models) of agent mapping
     QHash<QString, QList<AgentMappingM*>> _mapFromNameToAgentMappingsList;
+
+    // Map from agent name to the merged list of all (models of) mapping elements which connect an input of the agent
+    QHash<QString, QList<ElementMappingM*>> _mapFromAgentNameToMergedListOfMappingElements;
 
 };
 
