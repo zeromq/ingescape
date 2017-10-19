@@ -193,27 +193,31 @@ Item {
 
             Button {
                 id: btnAddAgent
-                text: qsTr("Nouvel Agent")
+                text: qsTr("Nouveau")
                 onClicked: {
                     console.log("Nouvel Agent")
                     // TODO
                 }
             }
 
-            Text {
-                text: qsTr("Importer...")
-
-                color: MasticTheme.agentsListLabelColor
-
-                font: MasticTheme.normalFont
+            Button {
+                id: btnImportAgent
+                text: qsTr("Importer")
+                onClicked: {
+                    console.log("Importer Agent")
+                    // TODO
+                }
             }
 
-            Text {
-                text: qsTr("Exporter...")
+            Button {
+                id: btnExportAgent
+                text: qsTr("Exporter")
+                enabled: (controller.selectedAgent ? true : false)
 
-                color: MasticTheme.agentsListLabelColor
-
-                font: MasticTheme.normalFont
+                onClicked: {
+                    console.log("Exporter l'agent sélectionné")
+                    // TODO
+                }
             }
         }
     }
