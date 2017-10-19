@@ -43,6 +43,30 @@ Item {
     //
     //-----------------------------------------
 
+    // Find a root layer by its object name
+    function findLayerRootByObjectName(startingObject, layerObjectName)
+    {
+        var currentObject = startingObject;
+        var layerRoot = null;
+
+        while ((currentObject !== null) && (layerRoot == null))
+        {
+            var index = 0;
+            while ((index < currentObject.data.length) && (layerRoot == null))
+            {
+                if (currentObject.data[index].objectName === layerObjectName)
+                {
+                    layerRoot = currentObject.data[index];
+                }
+                index++;
+            }
+
+            currentObject = currentObject.parent;
+        }
+
+        return layerRoot;
+    }
+
 
     //--------------------------------
     //
@@ -220,321 +244,239 @@ Item {
         id: componentAgentListItem
 
         Item {
-            id : agentListItem
+            id : agentItem
 
             width: MasticTheme.leftPanelWidth
             height: 85
 
-            Behavior on height {
-                NumberAnimation {}
+            // Not Draggable Agent Item
+            AgentsListItem {
+                id : notDraggableItem
+                anchors.fill : parent
+                agent : model.QtObject
+                controller: rootItem.controller
             }
 
-            Rectangle {
-                anchors {
-                    fill: parent
-                }
 
-                border {
-                    width: 0
-                }
+            // Draggable Agent Item
+            Item {
+                id : draggableItem
+                height : notDraggableItem.height
+                width : notDraggableItem.width
 
-                color: MasticTheme.agentsListItemBackgroundColor
+                Drag.active: mouseArea.drag.active
+                Drag.hotSpot.x: 0
+                Drag.hotSpot.y: (agentItem.height/2)
 
-                Rectangle {
-                    anchors {
-                        bottom: parent.bottom
-                        left: parent.left
-                        right: parent.right
-                    }
+                MouseArea {
+                    id: mouseArea
 
-                    color: MasticTheme.leftPanelBackgroundColor
+                    property  var beginPositionX : null;
+                    property  var beginPositionY : null;
 
-                    height: 1
-                }
+                    anchors.fill: draggableItem
+                    hoverEnabled: true
+                    drag.smoothed: false
+                    drag.target: draggableItem
+                    cursorShape: (mouseArea.drag.active)? Qt.ClosedHandCursor : Qt.PointingHandCursor //((mouseArea.pressed) ?  : Qt.OpenHandCursor
 
+                    onPressed: {
+                        if (controller) {
+                            controller.selectedAgent = model.QtObject;
+                        }
 
-                Item {
-                    id: agentRow
+                        beginPositionX  = draggableItem.x;
+                        beginPositionY  = draggableItem.y;
 
-                    anchors {
-                        fill: parent
-                    }
+                        // Find our layer and reparent our popup in it
+                        draggableItem.parent = rootItem.findLayerRootByObjectName(draggableItem, "overlayLayer");
 
-                    MouseArea {
-                        id: mouseAreaForSelection
-                        anchors.fill: parent
-
-                        onClicked: {
-                            //agentsList.currentIndex = index
-
-                            if (controller) {
-                                controller.selectedAgent = model.QtObject;
-                            }
+                        // Compute new position if needed
+                        if ((draggableItem.parent != null))
+                        {
+                            // NB: Repositionning does not work if some anchors (e.g. anchors.fill: parent) are used
+                            var newPosition = agentItem.mapToItem(parent, beginPositionX, beginPositionY);
+                            draggableItem.x = newPosition.x;
+                            draggableItem.y = newPosition.y;
                         }
                     }
 
-
-                    Rectangle {
-                        anchors.fill: parent
-
-                        visible : controller && (controller.selectedAgent === model.QtObject);
-                        color : "transparent"
-                        radius : 5
-                        border {
-                            width : 2
-                            color : MasticTheme.selectedAgentColor
-                        }
-
-
-                    }
-
-                    //                    Button {
-                    //                        id: btnDeleteAgent
-
-                    //                        anchors {
-                    //                            left: agentRow.right
-                    //                            top: agentRow.top
-                    //                        }
-
-                    //                        visible: (agentListItem.ListView.isCurrentItem && (model.status === AgentStatus.OFF))
-
-                    //                        text: "X"
-
-                    //                        onClicked: {
-                    //                            if (controller)
-                    //                            {
-                    //                                // Delete our agent
-                    //                                controller.deleteAgent(model.QtObject);
-                    //                            }
-                    //                        }
-                    //                    }
-
-
-                    Column {
-                        id : columnName
-
-                        // TO DO : anchors on the right
-                        width: 175
-
-                        anchors {
-                            left : parent.left
-                            leftMargin: 28
-                            top: parent.top
-                            topMargin: 12
-                        }
-                        height : childrenRect.height
-
-                        spacing : 4
-
-                        // Name
-                        Text {
-                            id: agentName
-
-                            anchors {
-                                left : parent.left
-                                right : parent.right
-                            }
-                            elide: Text.ElideRight
-
-                            text: model.name
-                            color: ((model.status === AgentStatus.ON) && !model.hasOnlyDefinition)? MasticTheme.agentsListLabelColor : MasticTheme.agentOFFLabelColor
-                            font: MasticTheme.headingFont
-                        }
-
-                        // Definition name and version
-                        MouseArea {
-                            id : definitionNameBtn
-
-                            anchors {
-                                left : parent.left
-                            }
-
-                            height : definitionNameTxt.height
-                            width : childrenRect.width
-
-                            hoverEnabled: true
-                            onClicked: {
-                                if (controller) {
-                                    // Open the definition of our agent
-                                    controller.openDefinition(model.QtObject);
-                                }
-                            }
-
-                            TextMetrics {
-                                id : definitionName
-
-                                elideWidth: (columnName.width - versionName.width)
-                                elide: Text.ElideRight
-
-                                text: model.definition ? model.definition.name : ""
-                            }
-
-                            Text {
-                                id : definitionNameTxt
-
-                                anchors {
-                                    left : parent.left
-                                }
-
-                                text : definitionName.elidedText
-                                color: ((model.status === AgentStatus.ON) && !model.hasOnlyDefinition)? MasticTheme.agentsListLabelColor : MasticTheme.agentOFFLabelColor
-                                font: MasticTheme.heading2Font
-                            }
-
-                            Text {
-                                id : versionName
-                                anchors {
-                                    bottom: definitionNameTxt.bottom
-                                    bottomMargin : 2
-                                    left : definitionNameTxt.right
-                                    leftMargin: 5
-                                }
-
-                                text: model.definition ? "(v" + model.definition.version + ")" : ""
-
-                                color: ((model.status === AgentStatus.ON) && !model.hasOnlyDefinition)? MasticTheme.agentsListLabelColor : MasticTheme.agentOFFLabelColor
-                                font {
-                                    family: MasticTheme.textFontFamily
-                                    pixelSize : 10
-                                    italic : true
-                                }
-                            }
-
-                            // underline
-                            Rectangle {
-                                visible: definitionNameBtn.containsMouse
-
-                                anchors {
-                                    left : definitionNameTxt.left
-                                    right : versionName.right
-                                    bottom : parent.bottom
-                                }
-
-                                height : 1
-
-                                color : definitionNameTxt.color
-                            }
-
-                        }
-
-                        // Address(es) on the network of our agent(s)
-                        Text {
-                            id: agentAddresses
-                            anchors {
-                                left : parent.left
-                                right : parent.right
-                            }
-                            elide: Text.ElideRight
-
-                            text: model.addresses
-
-                            color: ((model.status === AgentStatus.ON) && !model.hasOnlyDefinition)? MasticTheme.agentsListTextColor : MasticTheme.agentOFFTextColor
-                            font: MasticTheme.normalFont
-                        }
-
+                    onPositionChanged: {
                     }
 
 
+                    onReleased: {
+                        if(draggableItem.Drag.target !== null)
+                        {
+                            // Drop Event
+                            var dropElement = draggableItem.Drag.target;
 
-                    //                        Text {
-                    //                            //text: model.models ? model.models.count + " clone(s)" : ""
-                    //                            //visible: model.models && (model.models.count > 1)
-                    //                            text: (model && model.models) ? model.models.count + " clone(s)" : ""
-                    //                            visible: (model && model.models) ? (model.models.count > 1) : false
-
-                    //                            color: "red"
-                    //                            font: MasticTheme.normalFont
-                    //                        }
-
-                    //                        Text {
-                    //                            id: agentStatus
-                    //                            text: "Status: " + AgentStatus.enumToString(model.status)
-                    //                            visible: !model.hasOnlyDefinition
-
-                    //                            height: 25
-                    //                            color: MasticTheme.agentsListLabelColor
-                    //                            font: MasticTheme.normalFont
-                    //                        }
-
-
-                    //                    Column {
-                    //                        width: 175
-                    //                        anchors {
-                    //                            top: parent.top
-                    //                            topMargin: 30
-                    //                            bottom: parent.bottom
-                    //                            right: parent.right
-                    //                        }
-
-                    //                        Text {
-                    //                            text: "Variante"
-                    //                            visible: model.definition ? model.definition.isVariant : false
-
-                    //                            height: 25
-                    //                            color: "red"
-                    //                            font: MasticTheme.normalFont
-                    //                        }
-
-                    //                        Text {
-                    //                            text: model.definition ? model.definition.description : ""
-
-                    //                            width: 175
-                    //                            elide: Text.ElideRight
-
-                    //                            height: 25
-                    //                            color: MasticTheme.agentsListLabelColor
-                    //                            font: MasticTheme.normalFont
-                    //                        }
-
-                    // }
-
-
-                    //                    Switch {
-                    //                        checked: (model.status === AgentStatus.ON)
-                    //                        visible: !model.hasOnlyDefinition
-
-                    //                        anchors {
-                    //                            left: agentRow.left
-                    //                            leftMargin: 2
-                    //                            bottom: agentRow.bottom
-                    //                            bottomMargin: 5
-                    //                        }
-                    //                    }
-
-                    Row {
-                        visible: !model.hasOnlyDefinition && (model.status === AgentStatus.ON)
-
-                        anchors {
-                            right: agentRow.right
-                            bottom: agentRow.bottom
+                            // Convert x, y coordinate to the target Item
+                            var newPos = mouseArea.mapToItem(dropElement, 0, 0)
                         }
 
-                        Button {
-                            id: btnMuteAll
-                            text: model.isMuted ? "UN-mute all" : "Mute all"
+                        // FIXME: we have to convert position into drop zone
+                        var position = Qt.point(draggableItem.x, draggableItem.y);
+                        console.log("Drop agent " + model.QtObject.name + " at " + position);
 
-                            width: 110
-
-                            onClicked: {
-                                model.QtObject.updateMuteAllOutputs(!model.isMuted);
-                            }
+                        if (MasticEditorC.agentsMappingC) {
+                            MasticEditorC.agentsMappingC.addAgentDefinitionToMappingAtPosition(model.QtObject.name, model.QtObject.definition, position);
                         }
 
-                        Button {
-                            id: btnFreeze
-                            text: model.isFrozen ? "UN-freeze" : "Freeze"
+                        //reset the position when the drop target is undefined
+                        // Restore our parent if needed
+                        draggableItem.parent = agentItem;
 
-                            visible: model.canBeFrozen
-
-                            width: 90
-
-                            onClicked: {
-                                model.QtObject.updateFreeze(!model.isFrozen);
-                            }
-                        }
+                        // Restore our previous position in parent if needed
+                        draggableItem.x = beginPositionX;
+                        draggableItem.y = beginPositionY;
                     }
                 }
+
+                AgentsListItem {
+                    anchors.fill: draggableItem
+                    agent : model.QtObject
+                    controller: rootItem.controller
+                }
+
             }
+
         }
+
+
+
+
     }
+
+
+    //                    //                    Button {
+    //                    //                        id: btnDeleteAgent
+
+    //                    //                        anchors {
+    //                    //                            left: agentRow.right
+    //                    //                            top: agentRow.top
+    //                    //                        }
+
+    //                    //                        visible: (agentListItem.ListView.isCurrentItem && (model.status === AgentStatus.OFF))
+
+    //                    //                        text: "X"
+
+    //                    //                        onClicked: {
+    //                    //                            if (controller)
+    //                    //                            {
+    //                    //                                // Delete our agent
+    //                    //                                controller.deleteAgent(model.QtObject);
+    //                    //                            }
+    //                    //                        }
+    //                    //                    }
+
+
+
+
+    //                    //                        Text {
+    //                    //                            //text: model.models ? model.models.count + " clone(s)" : ""
+    //                    //                            //visible: model.models && (model.models.count > 1)
+    //                    //                            text: (model && model.models) ? model.models.count + " clone(s)" : ""
+    //                    //                            visible: (model && model.models) ? (model.models.count > 1) : false
+
+    //                    //                            color: "red"
+    //                    //                            font: MasticTheme.normalFont
+    //                    //                        }
+
+    //                    //                        Text {
+    //                    //                            id: agentStatus
+    //                    //                            text: "Status: " + AgentStatus.enumToString(model.status)
+    //                    //                            visible: !model.hasOnlyDefinition
+
+    //                    //                            height: 25
+    //                    //                            color: MasticTheme.agentsListLabelColor
+    //                    //                            font: MasticTheme.normalFont
+    //                    //                        }
+
+
+    //                    //                    Column {
+    //                    //                        width: 175
+    //                    //                        anchors {
+    //                    //                            top: parent.top
+    //                    //                            topMargin: 30
+    //                    //                            bottom: parent.bottom
+    //                    //                            right: parent.right
+    //                    //                        }
+
+    //                    //                        Text {
+    //                    //                            text: "Variante"
+    //                    //                            visible: model.definition ? model.definition.isVariant : false
+
+    //                    //                            height: 25
+    //                    //                            color: "red"
+    //                    //                            font: MasticTheme.normalFont
+    //                    //                        }
+
+    //                    //                        Text {
+    //                    //                            text: model.definition ? model.definition.description : ""
+
+    //                    //                            width: 175
+    //                    //                            elide: Text.ElideRight
+
+    //                    //                            height: 25
+    //                    //                            color: MasticTheme.agentsListLabelColor
+    //                    //                            font: MasticTheme.normalFont
+    //                    //                        }
+
+    //                    // }
+
+
+    //                    //                    Switch {
+    //                    //                        checked: (model.status === AgentStatus.ON)
+    //                    //                        visible: !model.hasOnlyDefinition
+
+    //                    //                        anchors {
+    //                    //                            left: agentRow.left
+    //                    //                            leftMargin: 2
+    //                    //                            bottom: agentRow.bottom
+    //                    //                            bottomMargin: 5
+    //                    //                        }
+    //                    //                    }
+
+    //                    Row {
+    //                        visible: !model.hasOnlyDefinition && (model.status === AgentStatus.ON)
+
+    //                        anchors {
+    //                            right: agentRow.right
+    //                            bottom: agentRow.bottom
+    //                        }
+
+    //                        Button {
+    //                            id: btnMuteAll
+    //                            text: model.isMuted ? "UN-mute all" : "Mute all"
+
+    //                            width: 110
+
+    //                            onClicked: {
+    //                                model.QtObject.updateMuteAllOutputs(!model.isMuted);
+    //                            }
+    //                        }
+
+    //                        Button {
+    //                            id: btnFreeze
+    //                            text: model.isFrozen ? "UN-freeze" : "Freeze"
+
+    //                            visible: model.canBeFrozen
+
+    //                            width: 90
+
+    //                            onClicked: {
+    //                                model.QtObject.updateFreeze(!model.isFrozen);
+    //                            }
+    //                        }
+    //                    }
+    //                }
+    //            }
+    //        }
+
+
 }
+
+
+
+

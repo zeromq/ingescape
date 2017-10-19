@@ -45,7 +45,12 @@ class ActionVM: public QObject
     I2_QML_PROPERTY(int, lineInTimeLine)
 
     // Start date time
-    I2_QML_PROPERTY(QDateTime, startDateTime)
+    I2_QML_PROPERTY_CUSTOM_SETTER(QDateTime, startDateTime)
+
+    // Start date time in string format
+    I2_QML_PROPERTY_CUSTOM_SETTER(QString, startTimeString)
+
+
 
 public:
 

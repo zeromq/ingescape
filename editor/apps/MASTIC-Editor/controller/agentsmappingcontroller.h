@@ -49,13 +49,21 @@ Q_SIGNALS:
 
 public Q_SLOTS:
 
+    /**
+     * @brief Slot when a new model of agent definition must be added to current mapping
+     * @param agentName
+     * @param definition
+     */
+    void addAgentDefinitionToMapping(QString agentName, DefinitionM* definition);
+
 
     /**
-     * @brief Slot when a new model of agent definition has been created
+     * @brief Slot when a new model of agent definition must be added to current mapping at a specific position
+     * @param agentName
      * @param definition
-     * @param agent
+     * @param position
      */
-    void onAgentDefinitionCreated(DefinitionM* definition, AgentM* agent);
+    void addAgentDefinitionToMappingAtPosition(QString agentName, DefinitionM* definition, QPointF position);
 
 
 private:

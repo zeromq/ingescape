@@ -180,6 +180,9 @@ void MasticModelManager::onMappingReceived(QString peerId, QString agentName, QS
 
                 // Emit the signal "Agent Mapping Created"
                 Q_EMIT agentMappingCreated(agentMapping, agent);
+
+                // Update the merged list of mapping elements for the agent name
+                _updateMergedListOfMappingElementsForAgentName(agentName, agentMapping);
             }
         }
     }
@@ -328,10 +331,10 @@ void MasticModelManager::addAgentDefinition(DefinitionM* definition)
  * @param name
  * @return
  */
-QList<DefinitionM*> MasticModelManager::getAgentDefinitionsListFromName(QString name)
+QList<DefinitionM*> MasticModelManager::getAgentDefinitionsListFromName(QString definitionName)
 {
-    if (_mapFromNameToAgentDefinitionsList.contains(name)) {
-        return _mapFromNameToAgentDefinitionsList.value(name);
+    if (_mapFromNameToAgentDefinitionsList.contains(definitionName)) {
+        return _mapFromNameToAgentDefinitionsList.value(definitionName);
     }
     else {
         return QList<DefinitionM*>();
@@ -379,28 +382,38 @@ void MasticModelManager::addAgentMapping(AgentMappingM* agentMapping)
 
         // Update the list in the map
         _mapFromNameToAgentMappingsList.insert(mappingName, agentMappingsList);
-
-        /*foreach (ElementMappingM* elementMapping, agentMapping->elementMappingsList()) {
-            if (elementMapping != NULL) {
-
-            }
-        }*/
     }
 }
 
 
 /**
  * @brief Get the list (of models) of agent mapping from a name
- * @param name
+ * @param mappingName
  * @return
  */
-QList<AgentMappingM*> MasticModelManager::getAgentMappingsListFromName(QString name)
+QList<AgentMappingM*> MasticModelManager::getAgentMappingsListFromName(QString mappingName)
 {
-    if (_mapFromNameToAgentMappingsList.contains(name)) {
-        return _mapFromNameToAgentMappingsList.value(name);
+    if (_mapFromNameToAgentMappingsList.contains(mappingName)) {
+        return _mapFromNameToAgentMappingsList.value(mappingName);
     }
     else {
         return QList<AgentMappingM*>();
+    }
+}
+
+
+/**
+ * @brief Get the merged list of all (models of) mapping elements which connect an input of the agent
+ * @param agentName
+ * @return
+ */
+QList<ElementMappingM*> MasticModelManager::getMergedListOfMappingElementsFromAgentName(QString agentName)
+{
+    if (_mapFromAgentNameToMergedListOfMappingElements.contains(agentName)) {
+        return _mapFromAgentNameToMergedListOfMappingElements.value(agentName);
+    }
+    else {
+        return QList<ElementMappingM*>();
     }
 }
 
@@ -512,6 +525,9 @@ void MasticModelManager::_initAgentInsideSubDirectory(QString subDirectoryPath)
 
                 // Emit the signal "Agent Mapping Created"
                 Q_EMIT agentMappingCreated(agentMapping, agent);
+
+                // Update the merged list of mapping elements for the agent name
+                _updateMergedListOfMappingElementsForAgentName(agent->name(), agentMapping);
             }
         }
     }
@@ -574,3 +590,51 @@ void MasticModelManager::_updateDefinitionVariants(QString definitionName)
     }
 }
 
+
+/**
+ * @brief Update the merged list of mapping elements for the agent name
+ * @param agentName
+ * @param agentMapping
+ */
+void MasticModelManager::_updateMergedListOfMappingElementsForAgentName(QString agentName, AgentMappingM* agentMapping)
+{
+    if (!agentName.isEmpty() && agentMapping != NULL)
+    {
+        // Get the merged list of all (models of) mapping elements which connect an input of the agent
+        QList<ElementMappingM*> mergedList = getMergedListOfMappingElementsFromAgentName(agentName);
+
+        qDebug() << mergedList.count() << "elements";
+
+        foreach (ElementMappingM* elementMapping, agentMapping->elementMappingsList()->toList()) {
+            if (elementMapping != NULL)
+            {
+                qDebug() << elementMapping->outputAgent() << "." << elementMapping->output() << "-->" << elementMapping->inputAgent() << "." << elementMapping->inputAgent();
+
+                bool isAlreadyInMergedList = false;
+                foreach (ElementMappingM* iterator, mergedList)
+                {
+                    // Exactly the same ?
+                    //if ((iterator != NULL) && (iterator->md5Hash == elementMapping->md5Hash)) {
+                    if ((iterator != NULL)
+                            && (iterator->outputAgent() == elementMapping->outputAgent())
+                            && (iterator->output() == elementMapping->output())
+                            && (iterator->input() == elementMapping->input())) {
+                        isAlreadyInMergedList = true;
+                        break;
+                    }
+                }
+
+                // Not already in merged list
+                if (!isAlreadyInMergedList) {
+                    mergedList.append(elementMapping);
+
+                    // Emit the signal "Mapping Element Created"
+                    Q_EMIT mappingElementCreated(elementMapping);
+                }
+            }
+        }
+
+        // Update the list in the map
+        _mapFromAgentNameToMergedListOfMappingElements.insert(agentName, mergedList);
+    }
+}
