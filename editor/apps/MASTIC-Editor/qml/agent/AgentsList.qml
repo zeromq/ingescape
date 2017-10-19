@@ -258,15 +258,20 @@ Item {
             // Not Draggable Agent Item
             AgentsListItem {
                 id : notDraggableItem
+
                 anchors.fill : parent
+
                 agent : model.QtObject
                 controller: rootItem.controller
+
+                visible: mouseArea.drag.active
             }
 
 
             // Draggable Agent Item
             Item {
                 id : draggableItem
+
                 height : notDraggableItem.height
                 width : notDraggableItem.width
 
@@ -277,13 +282,13 @@ Item {
                 MouseArea {
                     id: mouseArea
 
-                    property  var beginPositionX : null;
-                    property  var beginPositionY : null;
-
                     anchors.fill: draggableItem
+
                     hoverEnabled: true
+
                     drag.smoothed: false
                     drag.target: draggableItem
+
                     cursorShape: (mouseArea.drag.active)? Qt.ClosedHandCursor : Qt.PointingHandCursor //((mouseArea.pressed) ?  : Qt.OpenHandCursor
 
                     onPressed: {
@@ -291,17 +296,13 @@ Item {
                             controller.selectedAgent = model.QtObject;
                         }
 
-                        beginPositionX  = draggableItem.x;
-                        beginPositionY  = draggableItem.y;
-
                         // Find our layer and reparent our popup in it
                         draggableItem.parent = rootItem.findLayerRootByObjectName(draggableItem, "overlayLayer");
 
                         // Compute new position if needed
-                        if ((draggableItem.parent != null))
+                        if (draggableItem.parent != null)
                         {
-                            // NB: Repositionning does not work if some anchors (e.g. anchors.fill: parent) are used
-                            var newPosition = agentItem.mapToItem(parent, beginPositionX, beginPositionY);
+                            var newPosition = agentItem.mapToItem(parent, 0, 0);
                             draggableItem.x = newPosition.x;
                             draggableItem.y = newPosition.y;
                         }
@@ -333,15 +334,17 @@ Item {
                         // Restore our parent if needed
                         draggableItem.parent = agentItem;
 
-                        // Restore our previous position in parent if needed
-                        draggableItem.x = beginPositionX;
-                        draggableItem.y = beginPositionY;
+                        // Restore our previous position in parent
+                        draggableItem.x = 0;
+                        draggableItem.y = 0;
                     }
                 }
 
                 AgentsListItem {
                     anchors.fill: draggableItem
+
                     agent : model.QtObject
+
                     controller: rootItem.controller
                 }
 

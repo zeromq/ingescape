@@ -142,7 +142,7 @@ Item {
         fuzzyRadius: 8
         topRightRadius : 5
 
-        borderWidth: 10
+        borderWidth: 1
         borderColor: MasticTheme.selectedTabsBackgroundColor
 
         /*
