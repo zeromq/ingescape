@@ -205,7 +205,7 @@ Item {
                 text: qsTr("Importer")
                 onClicked: {
                     console.log("Importer Agent")
-                    // TODO
+                    //controller.importAgent();
                 }
             }
 
@@ -215,8 +215,10 @@ Item {
                 enabled: (controller.selectedAgent ? true : false)
 
                 onClicked: {
-                    console.log("Exporter l'agent sélectionné")
-                    // TODO
+                    console.log("Exporter l'agent sélectionné");
+                    if (controller.selectedAgent) {
+                        //controller.exportAgent(controller.selectedAgent);
+                    }
                 }
             }
         }
