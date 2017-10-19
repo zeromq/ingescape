@@ -310,6 +310,9 @@ void AgentsSupervisionController::onAgentDefinitionCreated(DefinitionM* definiti
             {
                 // Set the definition
                 agentVM->setdefinition(definition);
+
+                // Emit the signal "Agent Definition Managed"
+                Q_EMIT agentDefinitionManaged(agentName, definition);
             }
         }
     }

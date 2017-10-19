@@ -62,6 +62,8 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
         {
             qDebug() << QString("--> %1 has entered the network with peer id %2 (and address %3)").arg(peerName, peerId, peerAddress);
 
+            // TODO: name "masticlauncher.hostname"
+
             bool isMasticPublisher = false;
             bool isIntPID = false;
             int pid = -1;
@@ -122,7 +124,7 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
             if (isMasticPublisher && isIntPID) {
                 qDebug() << "our zyre event is about MASTIC publisher:" << pid << hostname << executionPath;
 
-                // Emit signal "Agent Entered"
+                // Emit the signal "Agent Entered"
                 Q_EMIT networkController->agentEntered(peerId, peerName, peerAddress, pid, hostname, executionPath, canBeFrozen);
             }
         }
@@ -150,13 +152,13 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
                 if (message == "0") {
                     //qDebug() << peerName << "(" << peerId << ") UN-MUTED";
 
-                    // Emit signal "Is Muted of Agent Updated"
+                    // Emit the signal "Is Muted of Agent Updated"
                     Q_EMIT networkController->isMutedOfAgentUpdated(peerId, false);
                 }
                 else if (message == "1") {
                     //qDebug() << peerName << "(" << peerId << ") MUTED";
 
-                    // Emit signal "Is Muted of Agent Updated"
+                    // Emit the signal "Is Muted of Agent Updated"
                     Q_EMIT networkController->isMutedOfAgentUpdated(peerId, true);
                 }
                 else {
@@ -171,13 +173,13 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
                 if (message == "0") {
                     //qDebug() << peerName << "(" << peerId << ") UN-FROZEN";
 
-                    // Emit signal "Is Frozen of Agent Updated"
+                    // Emit the signal "Is Frozen of Agent Updated"
                     Q_EMIT networkController->isFrozenOfAgentUpdated(peerId, false);
                 }
                 else if (message == "1") {
                     //qDebug() << peerName << "(" << peerId << ") FROZEN";
 
-                    // Emit signal "Is Frozen of Agent Updated"
+                    // Emit the signal "Is Frozen of Agent Updated"
                     Q_EMIT networkController->isFrozenOfAgentUpdated(peerId, true);
                 }
             }
@@ -207,7 +209,7 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
                 qDebug() << "Definition received from : " << newDefinition->name << " version : " << newDefinition->version << " description : " << newDefinition->description;
                 definition_freeDefinition(newDefinition);*/
 
-                // Emit signal "Definition Received"
+                // Emit the signal "Definition Received"
                 Q_EMIT networkController->definitionReceived(peerId, peerName, message);
             }
             //
@@ -223,7 +225,7 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
                 qDebug() << "Mapping received from : " << newMapping->name << " version : " << newMapping->version << " description : " << newMapping->description;
                 mapping_freeMapping(newMapping);*/
 
-                // Emit signal "Mapping Received"
+                // Emit the signal "Mapping Received"
                 Q_EMIT networkController->mappingReceived(peerId, peerName, message);
             }
             else if (message.startsWith("MAPPED"))
@@ -242,7 +244,7 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
         {
             qDebug() << QString("<-- %1 (%2) exited").arg(peerName, peerId);
 
-            // Emit signal "Agent Exited"
+            // Emit the signal "Agent Exited"
             Q_EMIT networkController->agentExited(peerId, peerName);
         }
     }

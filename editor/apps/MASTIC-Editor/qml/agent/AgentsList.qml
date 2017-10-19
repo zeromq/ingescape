@@ -313,7 +313,14 @@ Item {
 
                             // Convert x, y coordinate to the target Item
                             var newPos = mouseArea.mapToItem(dropElement, 0, 0)
+                        }
 
+                        // FIXME: we have to convert position into drop zone
+                        var position = Qt.point(draggableItem.x, draggableItem.y);
+                        console.log("Drop agent " + model.QtObject.name + " at " + position);
+
+                        if (MasticEditorC.agentsMappingC) {
+                            MasticEditorC.agentsMappingC.addAgentDefinitionToMappingAtPosition(model.QtObject.name, model.QtObject.definition, position);
                         }
 
                         //reset the position when the drop target is undefined

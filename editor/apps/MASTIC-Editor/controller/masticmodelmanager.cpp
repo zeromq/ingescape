@@ -628,7 +628,7 @@ void MasticModelManager::_updateMergedListOfMappingElementsForAgentName(QString 
                 if (!isAlreadyInMergedList) {
                     mergedList.append(elementMapping);
 
-                    // Emit signal "Mapping Element Created"
+                    // Emit the signal "Mapping Element Created"
                     Q_EMIT mappingElementCreated(elementMapping);
                 }
             }
