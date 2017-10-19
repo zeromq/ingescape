@@ -125,7 +125,7 @@ Item {
     //
     // Left panel: TODO: add border in I2CustomRectangle
     //
-    Rectangle {
+    I2CustomRectangle {
         id: leftPanel
 
         anchors {
@@ -138,14 +138,20 @@ Item {
         width: MasticTheme.leftPanelWidth
 
         color: MasticTheme.leftPanelBackgroundColor
-        radius : 5
-     //   fuzzyRadius: 8
-     //   topRightRadius : 5
 
+        fuzzyRadius: 8
+        topRightRadius : 5
+
+        borderWidth: 10
+        borderColor: MasticTheme.selectedTabsBackgroundColor
+
+        /*
+        radius : 5
         border {
             width: 1
             color: MasticTheme.selectedTabsBackgroundColor
         }
+        */
 
         // tabs of left panel
         I2TabView {
