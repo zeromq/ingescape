@@ -16,7 +16,7 @@
 #include "masticeditorcontroller.h"
 
 #include "misc/masticeditorsettings.h"
-
+#include "misc/masticeditorutils.h"
 
 #include <I2Quick.h>
 
@@ -31,7 +31,8 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     _modelManager(NULL),
     _agentsSupervisionC(NULL),
     _agentsMappingC(NULL),
-    _networkC(NULL)
+    _networkC(NULL),
+    _scenarioC(NULL)
 {
     qInfo() << "New MASTIC Editor Controller";
 
@@ -73,6 +74,9 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     // Create the controller for agents mapping
     _agentsMappingC = new AgentsMappingController(_modelManager, this);
 
+    // Create the controller for scenario management
+    _scenarioC = new ScenarioController(this);
+
     // Connect to signals from the network controller
     connect(_networkC, &NetworkController::agentEntered, _modelManager, &MasticModelManager::onAgentEntered);
     connect(_networkC, &NetworkController::definitionReceived, _modelManager, &MasticModelManager::onDefinitionReceived);
@@ -85,13 +89,19 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     // Connect to signals from the model manager
     connect(_modelManager, &MasticModelManager::agentModelCreated, _agentsSupervisionC, &AgentsSupervisionController::onAgentModelCreated);
     connect(_modelManager, &MasticModelManager::agentDefinitionCreated, _agentsSupervisionC, &AgentsSupervisionController::onAgentDefinitionCreated);
+    //connect(_modelManager, &MasticModelManager::agentDefinitionCreated, _agentsMappingC, &AgentsMappingController::onAgentDefinitionCreated);
 
     // Connect to signals from the controller for supervision of agents
     connect(_agentsSupervisionC, &AgentsSupervisionController::commandAsked, _networkC, &NetworkController::onCommandAsked);
     connect(_agentsSupervisionC, &AgentsSupervisionController::commandAskedForOutput, _networkC, &NetworkController::onCommandAskedForOutput);
 
-    // Initialize agents with JSON files
-    _modelManager->initAgentsWithFiles();
+
+    // Get the agents (Definitions and Mappings) path of our application
+    QString agentsDefinitionsAndMappingsDirectoryPath = MasticEditorUtils::getAgentsDefinitionsAndMappingsPath();
+
+    // Initialize agents (from JSON files) inside a directory
+    _modelManager->initAgentsInsideDirectory(agentsDefinitionsAndMappingsDirectoryPath);
+
 
     // TEMP sleep to display our loading screen
     QThread::msleep(2000);
@@ -144,6 +154,16 @@ MasticEditorController::~MasticEditorController()
         temp = NULL;
     }
 
+    if (_scenarioC != NULL)
+    {
+        disconnect(_scenarioC);
+
+        ScenarioController* temp = _scenarioC;
+        setscenarioC(NULL);
+        delete temp;
+        temp = NULL;
+    }
+
     qInfo() << "Delete MASTIC Editor Controller";
 }
 
@@ -174,6 +194,18 @@ void MasticEditorController::closeDefinition(DefinitionM* definition)
     if ((definition != NULL) && (_modelManager != NULL))
     {
         _modelManager->openedDefinitions()->remove(definition);
+    }
+}
+
+/**
+ * @brief Close an action editor
+ * @param action editor controller
+ */
+void MasticEditorController::closeActionEditor(ActionEditorController* actionEditorC)
+{
+    if (_scenarioC != NULL)
+    {
+        _scenarioC->closeActionEditor(actionEditorC);
     }
 }
 

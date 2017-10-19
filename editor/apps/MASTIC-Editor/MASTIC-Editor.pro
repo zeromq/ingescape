@@ -43,7 +43,10 @@ SOURCES += main.cpp \
     viewModel/pointmapvm.cpp \
     viewModel/agentinmappingvm.cpp \
     viewModel/mapbetweeniopvm.cpp \
-    model/iop/outputm.cpp
+    model/iop/outputm.cpp \
+    controller/scenariocontroller.cpp \
+    viewModel/actionvm.cpp \
+    controller/actioneditorcontroller.cpp
 
 HEADERS += \
     model/agentm.h \
@@ -82,7 +85,10 @@ HEADERS += \
     viewModel/pointmapvm.h \
     viewModel/agentinmappingvm.h \
     viewModel/mapbetweeniopvm.h \
-    model/iop/outputm.h
+    model/iop/outputm.h  \
+    controller/scenariocontroller.h \
+    viewModel/actionvm.h \
+    controller/actioneditorcontroller.h
 
 
 RESOURCES += qml.qrc

@@ -48,4 +48,17 @@ ActionEffectM::~ActionEffectM()
     setmodel(NULL);
 }
 
+/**
+* @brief Copy from another effect model
+* @param effect to copy
+*/
+void ActionEffectM::copyFrom(ActionEffectM* effect)
+{
+    if(effect != NULL)
+    {
+        setmodel(effect->model());
+        seteffect(effect->effect());
+    }
+}
+
 

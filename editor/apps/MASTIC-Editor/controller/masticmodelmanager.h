@@ -93,10 +93,10 @@ public:
 
     /**
      * @brief Get the list (of models) of agent definition from a name
-     * @param name
+     * @param definitionName
      * @return
      */
-    QList<DefinitionM*> getAgentDefinitionsListFromName(QString name);
+    QList<DefinitionM*> getAgentDefinitionsListFromName(QString definitionName);
 
 
     /**
@@ -107,9 +107,33 @@ public:
 
 
     /**
-     * @brief Initialize agents with JSON files
+     * @brief Add a model of agent mapping
+     * @param agentMapping
      */
-    void initAgentsWithFiles();
+    void addAgentMapping(AgentMappingM* agentMapping);
+
+
+    /**
+     * @brief Get the list (of models) of agent mapping from a name
+     * @param name
+     * @return
+     */
+    QList<AgentMappingM*> getAgentMappingsListFromName(QString mappingName);
+
+
+    /**
+     * @brief Get the merged list of all (models of) mapping elements which connect an input of the agent
+     * @param agentName
+     * @return
+     */
+    QList<ElementMappingM*> getMergedListOfMappingElementsFromAgentName(QString agentName);
+
+
+    /**
+     * @brief Initialize agents (from JSON files) inside a directory
+     * @param agentsDirectoryPath agents directory path
+     */
+    void initAgentsInsideDirectory(QString agentsDirectoryPath);
 
 
 Q_SIGNALS:
@@ -127,6 +151,14 @@ Q_SIGNALS:
      * @param agent
      */
     void agentDefinitionCreated(DefinitionM* definition, AgentM* agent);
+
+
+    /**
+     * @brief Signal emitted when a new model of agent mapping has been created
+     * @param agentMapping
+     * @param agent
+     */
+    void agentMappingCreated(AgentMappingM* agentMapping, AgentM* agent);
 
 
 public Q_SLOTS:
@@ -189,10 +221,26 @@ public Q_SLOTS:
 private:
 
     /**
+     * @brief Initialize an agent (from JSON files) inside a sub directory
+     * @param subDirectoryPath
+     */
+    void _initAgentInsideSubDirectory(QString subDirectoryPath);
+
+
+    /**
      * @brief Update definition variants of a list of definitions with the same name
      * @param definitionName
      */
     void _updateDefinitionVariants(QString definitionName);
+
+
+    /**
+     * @brief Update the merged list of mapping elements for the agent name
+     * @param agentName
+     * @param agentMapping
+     */
+    void _updateMergedListOfMappingElementsForAgentName(QString agentName, AgentMappingM* agentMapping);
+
 
 private:
 
@@ -202,14 +250,20 @@ private:
     // List of all models of agents
     //QList<AgentM*> _allAgentsModel;
 
-    // Map from Peer ID to a model of agent
+    // Map from "peer id" to a model of agent
     QHash<QString, AgentM*> _mapFromPeerIdToAgentM;
 
-    // Map from agent name to a list of models of agent
+    // Map from "agent name" to a list of models of agent
     QHash<QString, QList<AgentM*>> _mapFromNameToAgentModelsList;
 
     // Map from "definition name" to a list (of models) of agent definition
     QHash<QString, QList<DefinitionM*>> _mapFromNameToAgentDefinitionsList;
+
+    // Map from "mapping name" to a list (of models) of agent mapping
+    QHash<QString, QList<AgentMappingM*>> _mapFromNameToAgentMappingsList;
+
+    // Map from agent name to the merged list of all (models of) mapping elements which connect an input of the agent
+    QHash<QString, QList<ElementMappingM*>> _mapFromAgentNameToMergedListOfMappingElements;
 
 };
 

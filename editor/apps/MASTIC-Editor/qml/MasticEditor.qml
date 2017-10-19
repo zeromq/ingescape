@@ -25,6 +25,9 @@ import MASTIC 1.0
 // agent sub-directory
 import "agent" as Agent
 
+// scenario sub-directory
+import "scenario" as Scenario
+
 
 Item {
     id: rootItem
@@ -202,10 +205,12 @@ Item {
                 title: qsTr("ACTIONS");
                 active : false
 
-                Rectangle {
-                    id: actions
+                Scenario.ActionsList {
+                    id: actionsList
+
                     anchors.fill: parent
-                    color : "red"
+
+                    controller: MasticEditorC.scenarioC
                 }
             }
 
@@ -247,6 +252,35 @@ Item {
 
             onClosed: {
                 MasticEditorC.closeDefinition(model.QtObject);
+            }
+        }
+    }
+    
+    // List of "Actions Editor(s)"
+    Repeater {
+        model: MasticEditorC.scenarioC ? MasticEditorC.scenarioC.openedActionsEditorsControllers : 0;
+        
+        delegate: Scenario.ActionEditor {
+            id: actionEditor
+            
+            controller : MasticEditorC.scenarioC
+
+            // Center popup
+            x: (parent.width - actionEditor.width) / 2.0
+            y: (parent.height - actionEditor.height) / 2.0
+            
+            onOpened: {
+                actionEditor.z = rootItem.popupTopmostZIndex;
+                rootItem.popupTopmostZIndex = rootItem.popupTopmostZIndex + 1;
+            }
+            
+            onBringToFront: {
+                actionEditor.z = rootItem.popupTopmostZIndex;
+                rootItem.popupTopmostZIndex = rootItem.popupTopmostZIndex + 1;
+            }
+            
+            onClosed: {
+                MasticEditorC.closeActionEditor(model.QtObject);
             }
         }
     }
