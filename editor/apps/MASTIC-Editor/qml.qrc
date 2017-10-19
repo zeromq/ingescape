@@ -33,5 +33,6 @@
         <file>resources/fonts/blogger-sans/Blogger_Sans-Medium_Italic.ttf</file>
         <file>resources/fonts/blogger-sans/Blogger_Sans-Medium.ttf</file>
         <file>resources/fonts/blogger-sans/Blogger_Sans.ttf</file>
+        <file>qml/agent/AgentsListItem.qml</file>
     </qresource>
 </RCC>
