@@ -45,3 +45,17 @@ AgentsMappingController::~AgentsMappingController()
 {
     _modelManager = NULL;
 }
+
+
+/**
+ * @brief Slot when a new model of agent definition has been created
+ * @param definition
+ * @param agent
+ */
+void AgentsMappingController::onAgentDefinitionCreated(DefinitionM* definition, AgentM* agent)
+{
+    if ((definition != NULL) && (agent != NULL) && (_modelManager != NULL))
+    {
+        qDebug() << "TODO ESTIA:" << definition->name();
+    }
+}

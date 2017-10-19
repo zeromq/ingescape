@@ -54,6 +54,7 @@ public:
      */
     DefinitionM* createModelOfDefinition(QByteArray byteArrayOfJson);
 
+
     /**
      * @brief Create a model of agent mapping with JSON and the input agent name corresponding
      * TODOESTIA : the input agent name will be extract from the network event "mapping"

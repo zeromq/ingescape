@@ -85,19 +85,11 @@ public:
 
 
     /**
-     * @brief Get (and create if needed) the agents definitions path of our application
-     * "[DocumentsLocation]/MASTIC/AgentsDefinitions/"
+     * @brief Get (and create if needed) the agents (Definitions and Mappings) path of our application
+     * "[DocumentsLocation]/MASTIC/Agents/"
      * @return
      */
-    static QString getAgentsDefinitionsPath();
-
-
-    /**
-     * @brief Get (and create if needed) the agents mappings path of our application
-     * "[DocumentsLocation]/MASTIC/AgentsMappings/"
-     * @return
-     */
-    static QString getAgentsMappingsPath();
+    static QString getAgentsDefinitionsAndMappingsPath();
 
 
 protected:

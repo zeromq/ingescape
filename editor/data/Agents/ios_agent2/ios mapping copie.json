@@ -1,0 +1,21 @@
+{
+    "mapping": {
+        "name": "iosAgent",
+        "description": "",
+        "version": "0.1",
+        "mapping_out": [{
+                        "map_id": "1",
+                        "input_name": "input1",
+                        "agent_name": "macosAgent",
+                        "output_name": "value1"
+                        },
+                        {
+                        "map_id": "2",
+                        "input_name": "heart",
+                        "agent_name": "Mio Android",
+                        "output_name": "heart_rate"
+                        }
+                        ],
+        "mapping_cat": []
+    }
+}
