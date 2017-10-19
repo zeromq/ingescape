@@ -161,6 +161,13 @@ Q_SIGNALS:
     void agentMappingCreated(AgentMappingM* agentMapping, AgentM* agent);
 
 
+    /**
+     * @brief Signal emitted when a new model of mapping element has been created
+     * @param mappingElement
+     */
+    void mappingElementCreated(ElementMappingM* mappingElement);
+
+
 public Q_SLOTS:
 
     /**
