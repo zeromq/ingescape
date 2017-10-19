@@ -48,14 +48,35 @@ AgentsMappingController::~AgentsMappingController()
 
 
 /**
- * @brief Slot when a new model of agent definition has been created
+ * @brief Slot when a new model of agent definition must be added to current mapping
+ * @param agentName
  * @param definition
- * @param agent
  */
-void AgentsMappingController::onAgentDefinitionCreated(DefinitionM* definition, AgentM* agent)
+void AgentsMappingController::addAgentDefinitionToMapping(QString agentName, DefinitionM* definition)
 {
-    if ((definition != NULL) && (agent != NULL) && (_modelManager != NULL))
+    addAgentDefinitionToMappingAtPosition(agentName, definition, QPointF());
+}
+
+
+/**
+ * @brief Slot when a new model of agent definition must be added to current mapping at a specific position
+ * @param agentName
+ * @param definition
+ * @param position
+ */
+void AgentsMappingController::addAgentDefinitionToMappingAtPosition(QString agentName, DefinitionM* definition, QPointF position)
+{
+    if (!agentName.isEmpty() && (definition != NULL))
     {
-        qDebug() << "TODO ESTIA:" << definition->name();
+        // Position is NOT defined (from network)
+        if (position.isNull())
+        {
+            qDebug() << "TODO ESTIA: add VM for agent name" << agentName << "and definition" << definition->name();
+        }
+        // Position is defined (by Drag & Drop)
+        else
+        {
+            qDebug() << "TODO ESTIA: add VM for agent name" << agentName << "and definition" << definition->name() << "at" << position.x() << position.y();
+        }
     }
 }

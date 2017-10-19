@@ -38,7 +38,12 @@ ActionVM::ActionVM(ActionM *actionModel, QObject *parent) : QObject(parent),
     if(_actionModel != NULL && _actionModel->startTime() >= 0)
     {
         _startDateTime.setTime(QTime::fromMSecsSinceStartOfDay(_actionModel->startTime()*1000));
+
+    } else {
+        _startDateTime = QDateTime::fromString("00:00:00","HH:mm:ss");
     }
+
+    _startTimeString = _startDateTime.toString("HH:mm:ss");
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
@@ -80,8 +85,55 @@ void ActionVM::copyFrom(ActionVM* actionVM)
         setcolor(actionVM->color());
         setactionsPanelIndex(actionVM->actionsPanelIndex());
         setlineInTimeLine(actionVM->lineInTimeLine());
-        setstartDateTime(actionVM->startDateTime());
+        setstartTimeString(actionVM->startTimeString());
     }
 }
+
+/**
+ * @brief Set the date time in string format
+ * @param action VM to copy
+ */
+void ActionVM::setstartTimeString(QString stringDateTime)
+{
+    if(_startTimeString.compare(stringDateTime) != 0)
+    {
+        _startTimeString = stringDateTime;
+
+        // Update the start date time
+        if(stringDateTime.isEmpty() == false)
+        {
+            QDateTime dateTime = QDateTime::fromString(stringDateTime,"HH:mm:ss");
+            setstartDateTime(dateTime);
+        } else {
+            QDateTime dateTime = QDateTime::fromString("00:00:00","HH:mm:ss");
+            setstartDateTime(dateTime);
+        }
+
+        emit startTimeStringChanged(stringDateTime);
+    }
+}
+
+
+/**
+ * @brief Set the model start time
+ * @param action VM to copy
+ */
+void ActionVM::setstartDateTime(QDateTime dateTime)
+{
+    if(_startDateTime != dateTime)
+    {
+        _startDateTime = dateTime;
+
+        // Update action model start time in seconds
+        if(_actionModel != NULL)
+        {
+            QTime time = _startDateTime.time();
+            _actionModel->setstartTime(time.second()+time.minute()*60+time.hour()*60*60);
+        }
+
+        emit startDateTimeChanged(dateTime);
+    }
+}
+
 
 

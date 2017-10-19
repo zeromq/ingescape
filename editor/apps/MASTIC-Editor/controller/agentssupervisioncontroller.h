@@ -101,6 +101,14 @@ Q_SIGNALS:
     void commandAskedForOutput(QString command, QString outputName, QStringList peerIdsList);
 
 
+    /**
+     * @brief agentDefinitionManaged
+     * @param agentName
+     * @param definition
+     */
+    void agentDefinitionManaged(QString agentName, DefinitionM* definition);
+
+
 public Q_SLOTS:
 
     /**

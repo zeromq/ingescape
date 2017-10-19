@@ -611,14 +611,25 @@ void MasticModelManager::_updateMergedListOfMappingElementsForAgentName(QString 
                 qDebug() << elementMapping->outputAgent() << "." << elementMapping->output() << "-->" << elementMapping->inputAgent() << "." << elementMapping->inputAgent();
 
                 bool isAlreadyInMergedList = false;
-                /*foreach (ElementMappingM* iterator, mergedList) {
-                    if ((iterator != NULL) && (iterator->md5Hash == elementMapping->md5Hash)) {
+                foreach (ElementMappingM* iterator, mergedList)
+                {
+                    // Exactly the same ?
+                    //if ((iterator != NULL) && (iterator->md5Hash == elementMapping->md5Hash)) {
+                    if ((iterator != NULL)
+                            && (iterator->outputAgent() == elementMapping->outputAgent())
+                            && (iterator->output() == elementMapping->output())
+                            && (iterator->input() == elementMapping->input())) {
                         isAlreadyInMergedList = true;
                         break;
                     }
-                }*/
+                }
+
+                // Not already in merged list
                 if (!isAlreadyInMergedList) {
                     mergedList.append(elementMapping);
+
+                    // Emit the signal "Mapping Element Created"
+                    Q_EMIT mappingElementCreated(elementMapping);
                 }
             }
         }

@@ -1,0 +1,95 @@
+[
+  {
+    "agentName": "macos Agent 1",
+    "definition": {
+      "name": "macosAgent",
+      "version": "10.0",
+      "description": "my own description is here",
+      "inputs": [
+        {
+          "name": "input1",
+          "type": "INTEGER",
+          "value": 40
+        },
+        {
+          "name": "input2",
+          "type": "IMPULSION",
+          "value": ""
+        },
+        {
+          "name": "input3",
+          "type": "INTEGER",
+          "value": 30
+        },
+        {
+          "name": "stream",
+          "type": "DATA",
+          "value": ""
+        }
+      ],
+      "outputs": [
+        {
+          "name": "value1",
+          "type": "DOUBLE",
+          "value": 3.14
+        }
+      ],
+      "parameters": [
+        {
+          "name": "param1",
+          "type": "INTEGER",
+          "value": -1
+        }
+      ]
+    }
+  },
+  {
+    "agentName": "macos Agent 1",
+    "definition": {
+      "name": "winAgent",
+      "description": "winAgent bla bla bla",
+      "version": "2.5",
+      "parameters": [
+          {
+              "name": "param1",
+              "type": "INTEGER",
+              "value": -1
+          }
+      ],
+      "inputs": [
+          {
+              "name": "input1",
+              "type": "DOUBLE",
+              "value": 3.1400000000000001243
+          },
+          {
+              "name": "bool",
+              "type": "BOOL",
+              "value": "true"
+          },
+          {
+              "name": "heart",
+              "type": "STRING",
+              "value": "ma valeur"
+          }
+      ],
+      "outputs": [
+          {
+              "name": "button1",
+              "type": "INTEGER",
+              "value": 383995264
+          },
+          {
+              "name": "button2",
+              "type": "IMPULSION",
+              "value": ""
+          },
+          {
+              "name": "stream",
+              "type": "DATA",
+              "value": "12A8F3AFAFAF00"
+          }
+      ]
+    }
+  }
+]
