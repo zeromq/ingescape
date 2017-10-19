@@ -299,15 +299,6 @@ Item {
                             draggableItem.x = newPosition.x;
                             draggableItem.y = newPosition.y;
                         }
-
-                        if (draggableItem.parent != null)
-                        {
-                            if (typeof draggableItem.parent.addContentItem == 'function')
-                            {
-                                draggableItem.parent.addContentItem(draggableItem);
-                            }
-                        }
-
                     }
 
                     onPositionChanged: {
@@ -315,7 +306,7 @@ Item {
 
 
                     onReleased: {
-                        if( draggableItem.Drag.target !== null)
+                        if(draggableItem.Drag.target !== null)
                         {
                             // Drop Event
                             var dropElement = draggableItem.Drag.target;
@@ -326,13 +317,6 @@ Item {
                         }
 
                         //reset the position when the drop target is undefined
-
-                        // Indicate that our popup is no more the current content of our layer
-                        if (typeof draggableItem.parent.removeContentItem == 'function')
-                        {
-                            draggableItem.parent.removeContentItem(draggableItem);
-                        }
-
                         // Restore our parent if needed
                         draggableItem.parent = agentItem;
 
