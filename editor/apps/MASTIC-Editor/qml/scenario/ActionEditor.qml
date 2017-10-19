@@ -175,8 +175,21 @@ I2PopupBase {
                     color: MasticTheme.definitionEditorsLabelColor
                 }
                 TextField {
-                    text: actionVM ? actionVM.startDateTime.toLocaleTimeString(Qt.locale(), "HH':'mm':'ss") : ""
+                    id : actionStartTextField
+                    text: actionVM ? actionVM.startTimeString: ""
                     width:100
+
+                    Binding {
+                        target : actionStartTextField
+                        property :  "text"
+                        value : actionVM.startTimeString
+                    }
+
+                    onTextChanged: {
+                        if (activeFocus &&  actionVM) {
+                            actionVM.startTimeString = text;
+                        }
+                    }
                 }
             }
 
@@ -196,11 +209,7 @@ I2PopupBase {
 
                         text : "Réciproque"
                     }
-                    CheckBox {
-                        checked: actionVM && actionVM.actionModel && actionVM.actionModel.shallRearm ? true : false
 
-                        text : "Récurrence"
-                    }
                 }
 
                 Column  {
@@ -209,8 +218,27 @@ I2PopupBase {
                     Row {
                         height: 25
                         RadioButton {
+                            id : rdButtRevertWhenValidityIsOver
                             text : "après"
-                            checked: actionVM && actionVM.actionModel && actionVM.actionModel.revertWhenValidityIsOver ? true : false
+                            checked: actionVM && actionVM.actionModel && actionVM.actionModel.revertWhenValidityIsOver ? true : false;
+
+                            Binding {
+                                target : rdButtRevertWhenValidityIsOver
+                                property :  "checked"
+                                value : actionVM.actionModel.revertWhenValidityIsOver
+                            }
+
+                            onCheckedChanged: {
+                                // Update out model
+                                if (activeFocus &&  actionVM) {
+                                    actionVM.revertWhenValidityIsOver = checked;
+                                }
+                                // Update the other check to be exclusive
+                                if(rdButtRevertAtTime.checked == checked)
+                                {
+                                    rdButtRevertAtTime.checked = !checked;
+                                }
+                            }
                         }
 
                         TextField {
@@ -221,8 +249,27 @@ I2PopupBase {
                     Row {
                         height: 25
                         RadioButton {
+                            id : rdButtRevertAtTime
                             text : "à"
-                            checked: actionVM && actionVM.actionModel && actionVM.actionModel.revertAtTime !== 0 ? true : false
+                            checked: actionVM && actionVM.actionModel && actionVM.actionModel.revertWhenValidityIsOver === false && actionVM.actionModel.revertAtTime !== -1 ? true : false;
+
+                            Binding {
+                                target : rdButtRevertAtTime
+                                property :  "checked"
+                                value : !actionVM.actionModel.revertWhenValidityIsOver
+                            }
+
+                            onCheckedChanged: {
+                                // Update out model
+                                if (activeFocus &&  actionVM) {
+                                    actionVM.revertWhenValidityIsOver = !checked;
+                                }
+                                // Update the other check to be exclusive
+                                if(rdButtRevertWhenValidityIsOver.checked == checked)
+                                {
+                                    rdButtRevertWhenValidityIsOver.checked = !checked;
+                                }
+                            }
                         }
 
                         TextField {
@@ -230,6 +277,19 @@ I2PopupBase {
                             width:100
                         }
                     }
+                }
+            }
+
+            Row {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                }
+                spacing: 2
+                CheckBox {
+                    checked: actionVM && actionVM.actionModel && actionVM.actionModel.shallRearm ? true : false
+
+                    text : "Récurrence"
                 }
             }
         }
