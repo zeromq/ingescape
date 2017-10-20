@@ -282,7 +282,7 @@ NetworkController::NetworkController(QString networkDevice, QString ipAddress, i
     mtic_setVerbose(true);
 
     // Read our internal definition
-    QString myDefinitionPath = QString("%1/definition.json").arg(MasticEditorUtils::getDataPath());
+    QString myDefinitionPath = QString("%1definition.json").arg(MasticEditorUtils::getDataPath());
     QFileInfo checkDefinitionFile(myDefinitionPath);
     if (!checkDefinitionFile.exists() || !checkDefinitionFile.isFile())
     {
@@ -303,7 +303,7 @@ NetworkController::NetworkController(QString networkDevice, QString ipAddress, i
     }
 
     // Read our internal mapping
-    QString myMappingPath = QString("%1/mapping.json").arg(MasticEditorUtils::getDataPath());
+    QString myMappingPath = QString("%1mapping.json").arg(MasticEditorUtils::getDataPath());
     QFileInfo checkMappingFile(myMappingPath);
     if (!checkMappingFile.exists() || !checkMappingFile.isFile())
     {

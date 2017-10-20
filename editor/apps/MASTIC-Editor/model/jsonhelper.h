@@ -48,7 +48,7 @@ public:
 
 
     /**
-     * @brief Create a model of agent definition with JSON
+     * @brief Create a model of agent definition from JSON file content
      * @param byteArrayOfJson
      * @return
      */
@@ -82,7 +82,15 @@ public Q_SLOTS:
 private:
 
     /**
-     * @brief Create a model of agent Input/Output/Parameter with JSON
+     * @brief Create a model of agent definition from JSON object
+     * @param jsonDefinition
+     * @return
+     */
+    DefinitionM* _createModelOfDefinitionFromJSON(QJsonObject jsonDefinition);
+
+
+    /**
+     * @brief Create a model of agent Input/Output/Parameter from JSON object
      * @param jsonObject
      * @param agentIOPType
      * @return
@@ -95,7 +103,7 @@ private:
      * @param agentIOP
      * @return
      */
-    QJsonObject _getJsonForAgentIOP(AgentIOPM* agentIOP);
+    QJsonObject _getJsonFromAgentIOP(AgentIOPM* agentIOP);
 
 
     /**

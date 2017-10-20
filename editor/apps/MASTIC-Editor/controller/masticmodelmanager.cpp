@@ -20,8 +20,6 @@
 
 #include <I2Quick.h>
 
-#include <QJsonDocument>
-
 
 /**
  * @brief Default constructor
@@ -43,8 +41,8 @@ MasticModelManager::MasticModelManager(QString agentsListDirectoryPath,
 
     QDate today = QDate::currentDate();
 
-    _agentsListFilePath = QString("%1%2agents_list_%3.json").arg(_agentsListDirectoryPath, QDir::separator(), today.toString("ddMMyy"));
-    _agentsMappingsFilePath = QString("%1%2agents_mappings_%3.json").arg(_agentsMappingsDirectoryPath, QDir::separator(), today.toString("ddMMyy"));
+    _agentsListFilePath = QString("%1agents_list_%2.json").arg(_agentsListDirectoryPath, today.toString("ddMMyy"));
+    _agentsMappingsFilePath = QString("%1agents_mappings_%2.json").arg(_agentsMappingsDirectoryPath, today.toString("ddMMyy"));
 
     // Create the helper to manage JSON definitions of agents
     _jsonHelper = new JsonHelper(this);
