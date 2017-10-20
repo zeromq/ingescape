@@ -134,16 +134,29 @@ public:
 
 
     /**
-     * @brief Initialize agents list from JSON file
+     * @brief Import the agents list from default file
      */
-    void initAgentsList();
+    void importAgentsListFromDefaultFile();
 
 
     /**
-     * @brief Export the agents list
+     * @brief Import an agents list from selected file
+     */
+    Q_INVOKABLE void importAgentsListFromSelectedFile();
+
+
+    /**
+     * @brief Export the agents list to default file
      * @param agentsListToExport list of pairs <agent name, definition>
      */
-    void exportAgentsList(QList<QPair<QString, DefinitionM*>> agentsListToExport);
+    void exportAgentsListToDefaultFile(QList<QPair<QString, DefinitionM*>> agentsListToExport);
+
+
+    /**
+     * @brief Export the agents list to selected file
+     * @param agentsListToExport list of pairs <agent name, definition>
+     */
+    void exportAgentsListToSelectedFile(QList<QPair<QString, DefinitionM*>> agentsListToExport);
 
 
 Q_SIGNALS:
@@ -238,6 +251,21 @@ public Q_SLOTS:
 private:
 
     /**
+     * @brief Import the agents list from JSON file
+     * @param agentsListFilePath
+     */
+    void _importAgentsListFromFile(QString agentsListFilePath);
+
+
+    /**
+     * @brief Export the agents list to JSON file
+     * @param agentsListToExport list of pairs <agent name, definition>
+     * @param agentsListFilePath
+     */
+    void _exportAgentsListToFile(QList<QPair<QString, DefinitionM*>> agentsListToExport, QString agentsListFilePath);
+
+
+    /**
      * @brief Initialize an agent (from JSON files) inside a sub directory
      * @param subDirectoryPath
      */
@@ -263,11 +291,11 @@ private:
 
     // Path to the directory containing JSON files to save agents list
     QString _agentsListDirectoryPath;
-    QString _agentsListFilePath;
+    QString _agentsListDefaultFilePath;
 
     // Path to the directory containing JSON files to save agents mappings
     QString _agentsMappingsDirectoryPath;
-    QString _agentsMappingsFilePath;
+    QString _agentsMappingsDefaultFilePath;
 
     // Helper to manage JSON definitions of agents
     JsonHelper* _jsonHelper;

@@ -67,17 +67,21 @@ ApplicationWindow {
             MenuItem {
                 text: qsTr("Importer une liste d'agents")
                 onTriggered: {
-                    console.log("Importer une liste d'agents");
+                    //console.log("QML: Importer une liste d'agents");
+
+                    if (MasticEditorC.modelManager) {
+                        MasticEditorC.modelManager.importAgentsListFromSelectedFile();
+                    }
                 }
             }
             MenuItem {
                 text: qsTr("Exporter la liste d'agents")
 
                 onTriggered: {
-                    console.log("Exporter la liste d'agents");
+                    //console.log("QML: Exporter la liste d'agents");
 
                     if (MasticEditorC.agentsSupervisionC) {
-                        MasticEditorC.agentsSupervisionC.exportAgentsList();
+                        MasticEditorC.agentsSupervisionC.exportAgentsListToSelectedFile();
                     }
                 }
             }
@@ -189,6 +193,14 @@ ApplicationWindow {
     Component.onCompleted: {
         // Start our loader delay animation when our initial content is ready
         loaderDelayAnimation.start();
+    }
+
+    // When user clicks on window close button
+    onClosing: {
+        console.info("QML: Close Window");
+        if (MasticEditorC.agentsSupervisionC) {
+            MasticEditorC.agentsSupervisionC.exportAgentsListToDefaultFile();
+        }
     }
 
 

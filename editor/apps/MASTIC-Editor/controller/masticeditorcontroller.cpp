@@ -118,8 +118,8 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     connect(_agentsSupervisionC, &AgentsSupervisionController::agentDefinitionManaged, _agentsMappingC, &AgentsMappingController::addAgentDefinitionToMapping);
 
 
-    // Initialize agents list from JSON file
-    _modelManager->initAgentsList();
+    // Initialize agents list from default file
+    _modelManager->importAgentsListFromDefaultFile();
 
 
     // TEMP sleep to display our loading screen

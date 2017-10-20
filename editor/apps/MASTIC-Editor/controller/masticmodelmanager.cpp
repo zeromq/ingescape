@@ -17,9 +17,9 @@
 
 #include <QQmlEngine>
 #include <QDebug>
+#include <QFileDialog>
 
 #include <I2Quick.h>
-
 
 /**
  * @brief Default constructor
@@ -41,8 +41,8 @@ MasticModelManager::MasticModelManager(QString agentsListDirectoryPath,
 
     QDate today = QDate::currentDate();
 
-    _agentsListFilePath = QString("%1agents_list_%2.json").arg(_agentsListDirectoryPath, today.toString("ddMMyy"));
-    _agentsMappingsFilePath = QString("%1agents_mappings_%2.json").arg(_agentsMappingsDirectoryPath, today.toString("ddMMyy"));
+    _agentsListDefaultFilePath = QString("%1agents_list_%2.json").arg(_agentsListDirectoryPath, today.toString("ddMMyy"));
+    _agentsMappingsDefaultFilePath = QString("%1agents_mappings_%2.json").arg(_agentsMappingsDirectoryPath, today.toString("ddMMyy"));
 
     // Create the helper to manage JSON definitions of agents
     _jsonHelper = new JsonHelper(this);
@@ -65,102 +65,61 @@ MasticModelManager::~MasticModelManager()
 
 
 /**
- * @brief Initialize agents list from JSON file
+ * @brief Import the agents list from default file
  */
-void MasticModelManager::initAgentsList()
+void MasticModelManager::importAgentsListFromDefaultFile()
 {
-    qInfo() << "Init agents list from file" << _agentsListFilePath;
+    // Import the agents list from JSON file
+    _importAgentsListFromFile(_agentsListDefaultFilePath);
+}
 
-    QFile jsonFile(_agentsListFilePath);
-    if (jsonFile.exists()) {
-        if (jsonFile.open(QIODevice::ReadOnly))
-        {
-            QByteArray byteArrayOfJson = jsonFile.readAll();
-            jsonFile.close();
 
-            // Initialize agents list from JSON file
-            QList<QPair<QString, DefinitionM*>> agentsListToImport = _jsonHelper->initAgentsList(byteArrayOfJson);
+/**
+ * @brief Import an agents list from selected file
+ */
+void MasticModelManager::importAgentsListFromSelectedFile()
+{
+    // "File Dialog" to get the file (path) to open
+    QString agentsListFilePath = QFileDialog::getOpenFileName(NULL,
+                                                              "Importer un fichier JSON avec une liste d'agents",
+                                                              _agentsListDirectoryPath,
+                                                              "JSON (*.json)");
 
-            for (int i = 0; i < agentsListToImport.count(); i++)
-            {
-                QPair<QString, DefinitionM*> pair = agentsListToImport.at(i);
-                QString agentName = pair.first;
-                DefinitionM* agentDefinition = pair.second;
-
-                if (!agentName.isEmpty() && (agentDefinition != NULL))
-                {
-                    // Create a new model of agent with the name
-                    AgentM* agent = new AgentM(agentName, this);
-
-                    // Add this new model of agent
-                    addAgentModel(agent);
-
-                    // Emit the signal "Agent Model Created"
-                    Q_EMIT agentModelCreated(agent);
-
-                    // Add this new model of agent definition
-                    addAgentDefinition(agentDefinition);
-
-                    // Emit the signal "Agent Definition Created"
-                    Q_EMIT agentDefinitionCreated(agentDefinition, agent);
-                }
-            }
-        }
-        else {
-            qCritical() << "Can not open file" << _agentsListFilePath;
-        }
-    }
-    else {
-        qWarning() << "There is no file" << _agentsListFilePath;
+    if(!agentsListFilePath.isEmpty())
+    {
+        // Import the agents list from JSON file
+        _importAgentsListFromFile(agentsListFilePath);
     }
 }
 
 
 /**
- * @brief Initialize agents (from JSON files) inside a directory
- * @param agentsDirectoryPath agents directory path
+ * @brief Export the agents list to default file
+ * @param agentsListToExport list of pairs <agent name, definition>
  */
-/*void MasticModelManager::initAgentsInsideDirectory(QString agentsDirectoryPath)
+void MasticModelManager::exportAgentsListToDefaultFile(QList<QPair<QString, DefinitionM*>> agentsListToExport)
 {
-    QDir agentsDefinitionsAndMappingsDirectory(agentsDirectoryPath);
-    if (agentsDefinitionsAndMappingsDirectory.exists())
-    {
-        // Get all sub directories
-        QFileInfoList agentsDirectoriesList = agentsDefinitionsAndMappingsDirectory.entryInfoList(QDir::NoDotAndDotDot | QDir::AllDirs);
-
-        // Traverse the list of sub directories
-        foreach (QFileInfo fileInfo, agentsDirectoriesList)
-        {
-            if (fileInfo.isDir()) {
-                // Initialize an agent (from JSON files) inside a sub directory
-                _initAgentInsideSubDirectory(fileInfo.absoluteFilePath());
-            }
-        }
-    }
-}*/
+    // Export the agents list to JSON file
+    _exportAgentsListToFile(agentsListToExport, _agentsListDefaultFilePath);
+}
 
 
 /**
- * @brief Export the agents list
+ * @brief Export the agents list to selected file
  * @param agentsListToExport list of pairs <agent name, definition>
  */
-void MasticModelManager::exportAgentsList(QList<QPair<QString, DefinitionM*>> agentsListToExport)
+void MasticModelManager::exportAgentsListToSelectedFile(QList<QPair<QString, DefinitionM*>> agentsListToExport)
 {
-    if (_jsonHelper != NULL) {
-        // Export the agents list
-        QByteArray byteArrayOfJson = _jsonHelper->exportAgentsList(agentsListToExport);
+    // "File Dialog" to get the file (path) to save
+    QString agentsListFilePath = QFileDialog::getSaveFileName(NULL,
+                                                              "Sauvegarder dans un fichier JSON la liste d'agents",
+                                                              _agentsListDirectoryPath,
+                                                              "JSON (*.json)");
 
-        qInfo() << "Export agents list to file" << _agentsListFilePath;
-
-        QFile jsonFile(_agentsListFilePath);
-        if (jsonFile.open(QIODevice::WriteOnly))
-        {
-            jsonFile.write(byteArrayOfJson);
-            jsonFile.close();
-        }
-        else {
-            qCritical() << "Can not open file" << _agentsListFilePath;
-        }
+    if(!agentsListFilePath.isEmpty())
+    {
+        // Export the agents list to JSON file
+        _exportAgentsListToFile(agentsListToExport, agentsListFilePath);
     }
 }
 
@@ -505,6 +464,89 @@ QList<ElementMappingM*> MasticModelManager::getMergedListOfMappingElementsFromAg
     }
     else {
         return QList<ElementMappingM*>();
+    }
+}
+
+
+/**
+ * @brief Import the agents list from JSON file
+ * @param agentsListFilePath
+ */
+void MasticModelManager::_importAgentsListFromFile(QString agentsListFilePath)
+{
+    if (!agentsListFilePath.isEmpty() && (_jsonHelper != NULL))
+    {
+        qInfo() << "Import the agents list from JSON file" << agentsListFilePath;
+
+        QFile jsonFile(agentsListFilePath);
+        if (jsonFile.exists()) {
+            if (jsonFile.open(QIODevice::ReadOnly))
+            {
+                QByteArray byteArrayOfJson = jsonFile.readAll();
+                jsonFile.close();
+
+                // Initialize agents list from JSON file
+                QList<QPair<QString, DefinitionM*>> agentsListToImport = _jsonHelper->initAgentsList(byteArrayOfJson);
+
+                for (int i = 0; i < agentsListToImport.count(); i++)
+                {
+                    QPair<QString, DefinitionM*> pair = agentsListToImport.at(i);
+                    QString agentName = pair.first;
+                    DefinitionM* agentDefinition = pair.second;
+
+                    if (!agentName.isEmpty() && (agentDefinition != NULL))
+                    {
+                        // Create a new model of agent with the name
+                        AgentM* agent = new AgentM(agentName, this);
+
+                        // Add this new model of agent
+                        addAgentModel(agent);
+
+                        // Emit the signal "Agent Model Created"
+                        Q_EMIT agentModelCreated(agent);
+
+                        // Add this new model of agent definition
+                        addAgentDefinition(agentDefinition);
+
+                        // Emit the signal "Agent Definition Created"
+                        Q_EMIT agentDefinitionCreated(agentDefinition, agent);
+                    }
+                }
+            }
+            else {
+                qCritical() << "Can not open file" << agentsListFilePath;
+            }
+        }
+        else {
+            qWarning() << "There is no file" << agentsListFilePath;
+        }
+    }
+}
+
+
+/**
+ * @brief Export the agents list to JSON file
+ * @param agentsListToExport list of pairs <agent name, definition>
+ * @param agentsListFilePath
+ */
+void MasticModelManager::_exportAgentsListToFile(QList<QPair<QString, DefinitionM*>> agentsListToExport, QString agentsListFilePath)
+{
+    if (!agentsListFilePath.isEmpty() && (_jsonHelper != NULL))
+    {
+        qInfo() << "Export the agents list to JSON file" << agentsListFilePath;
+
+        // Export the agents list
+        QByteArray byteArrayOfJson = _jsonHelper->exportAgentsList(agentsListToExport);
+
+        QFile jsonFile(agentsListFilePath);
+        if (jsonFile.open(QIODevice::WriteOnly))
+        {
+            jsonFile.write(byteArrayOfJson);
+            jsonFile.close();
+        }
+        else {
+            qCritical() << "Can not open file" << agentsListFilePath;
+        }
     }
 }
 

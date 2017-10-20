@@ -114,8 +114,6 @@ QByteArray JsonHelper::exportAgentsList(QList<QPair<QString, DefinitionM*>> agen
 {
     QJsonArray jsonArray;
 
-    qDebug() << "Export" << agentsListToExport.count() << "agents";
-
     for (int i = 0; i < agentsListToExport.count(); i++)
     {
         QPair<QString, DefinitionM*> pair = agentsListToExport.at(i);

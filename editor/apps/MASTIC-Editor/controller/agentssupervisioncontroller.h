@@ -76,9 +76,15 @@ public:
 
 
     /**
-     * @brief Export the agents list
+     * @brief Export the agents list to default file
      */
-    Q_INVOKABLE void exportAgentsList();
+    Q_INVOKABLE void exportAgentsListToDefaultFile();
+
+
+    /**
+     * @brief Export the agents list to selected file
+     */
+    Q_INVOKABLE void exportAgentsListToSelectedFile();
 
 
 Q_SIGNALS:
@@ -132,6 +138,13 @@ private:
      * @param agent
      */
     void _deleteAgentViewModel(AgentVM* agent);
+
+
+    /**
+     * @brief Get the agents list to export
+     * @return List of pairs <agent name, definition>
+     */
+    QList<QPair<QString, DefinitionM*>> _getAgentsListToExport();
 
 
 private:
