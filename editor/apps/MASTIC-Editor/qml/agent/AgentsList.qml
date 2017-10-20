@@ -150,70 +150,115 @@ Item {
         color : MasticTheme.selectedTabsBackgroundColor
 
         Row {
-            id: headerRow1
+            id: headerRow
 
-            height: 30
+            height: btnAddAgent.height
+            spacing : 8
 
             anchors {
                 top: parent.top
+                topMargin: 43
                 left: parent.left
-                right: parent.right
-            }
-
-            Text {
-                id: txtSearch
-
-                text: qsTr("Rechercher...")
-
-                color: MasticTheme.agentsListLabelColor
-
-                font: MasticTheme.normalFont
-            }
-
-            Text {
-                id: txtFilter
-
-                text: qsTr("Filtrer...")
-
-                color:MasticTheme.agentsListLabelColor
-
-                font: MasticTheme.normalFont
-            }
-        }
-
-        Row {
-            id: headerRow2
-
-            height: 30
-
-            anchors {
-                top: headerRow1.bottom
-                left: parent.left
-                right: parent.right
+                leftMargin: 10
             }
 
             Button {
                 id: btnAddAgent
-                text: qsTr("Nouveau")
+
+                property var boundingBox: MasticTheme.svgFileMASTIC.boundsOnElement("creernouvelagent");
+                height : boundingBox.height
+                width :  boundingBox.width
+
+                anchors {
+                    verticalCenter: parent.verticalCenter
+                }
+
+                style: I2SvgButtonStyle {
+                    fileCache: MasticTheme.svgFileMASTIC
+
+                    pressedID: releasedID //+ "-pressed"
+                    releasedID: "creernouvelagent"
+                    disabledID : releasedID
+
+                }
+
                 onClicked: {
                     console.log("Nouvel Agent")
                     // TODO
                 }
             }
 
+            Rectangle {
+                anchors {
+                    verticalCenter: parent.verticalCenter
+                }
+                height : btnAddAgent.height
+                width : 1
+                color : MasticTheme.greyColor
+            }
+
             Button {
                 id: btnImportAgent
-                text: qsTr("Importer")
+
+                property var boundingBox: MasticTheme.svgFileMASTIC.boundsOnElement("importer");
+                height : boundingBox.height
+                width :  boundingBox.width
+
+                anchors {
+                    verticalCenter: parent.verticalCenter
+                }
+
+                style: I2SvgButtonStyle {
+                    fileCache: MasticTheme.svgFileMASTIC
+
+                    pressedID: releasedID + "-pressed"
+                    releasedID: "importer"
+                    disabledID : releasedID
+
+                }
+
                 onClicked: {
                     console.log("Importer Agent")
                     //controller.importAgent();
                 }
             }
 
+        }
+
+
+        Row {
+            id: headerRow2
+
+            height: btnAddAgent.height
+            spacing : 8
+
+            anchors {
+                verticalCenter: headerRow.verticalCenter
+                right : parent.right
+                rightMargin: 10
+            }
+
+
             Button {
                 id: btnExportAgent
-                text: qsTr("Exporter")
+
+                property var boundingBox: MasticTheme.svgFileMASTIC.boundsOnElement("exporter");
+                height : boundingBox.height
+                width :  boundingBox.width
+
                 enabled: (controller.selectedAgent ? true : false)
+
+                anchors {
+                    verticalCenter: parent.verticalCenter
+                }
+
+                style: I2SvgButtonStyle {
+                    fileCache: MasticTheme.svgFileMASTIC
+
+                    pressedID: releasedID + "-pressed"
+                    releasedID: "exporter"
+                    disabledID : releasedID //+ "-disabled"
+                }
 
                 onClicked: {
                     console.log("Exporter l'agent sélectionné");
@@ -222,10 +267,47 @@ Item {
                     }
                 }
             }
+
+
+            Rectangle {
+                anchors {
+                    verticalCenter: parent.verticalCenter
+                }
+                height : btnRemoveAgent.height
+                width : 1
+                color : MasticTheme.greyColor
+            }
+
+
+            Button {
+                id: btnRemoveAgent
+
+                property var boundingBox: MasticTheme.svgFileMASTIC.boundsOnElement("selectionmultiple");
+                height : boundingBox.height
+                width :  boundingBox.width
+
+                anchors {
+                    verticalCenter: parent.verticalCenter
+                }
+
+                style: I2SvgButtonStyle {
+                    fileCache: MasticTheme.svgFileMASTIC
+
+                    pressedID: releasedID //+ "-pressed"
+                    releasedID: "selectionmultiple"
+                    disabledID : releasedID
+
+                }
+
+                onClicked: {
+                    console.log("Supprimer Agent")
+                    // TODO
+                }
+            }
+
         }
+
     }
-
-
 
     //
     // Separator

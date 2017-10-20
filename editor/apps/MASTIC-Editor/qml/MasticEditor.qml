@@ -126,113 +126,112 @@ Item {
     //
     // Left panel: TODO: add border in I2CustomRectangle
     //
-    I2CustomRectangle {
+    Rectangle {
         id: leftPanel
+
+        width: MasticTheme.leftPanelWidth
 
         anchors {
             left: parent.left
             top: parent.top
-            topMargin: 9
             bottom: parent.bottom
         }
 
-        width: MasticTheme.leftPanelWidth
+        color : MasticTheme.agentsMappingBackgroundColor;
 
-        color: MasticTheme.leftPanelBackgroundColor
+        I2CustomRectangle {
+            anchors {
+                fill: parent
+                topMargin: 9
+            }
+            color: MasticTheme.leftPanelBackgroundColor
 
-        fuzzyRadius: 8
-        topRightRadius : 5
+            fuzzyRadius: 8
+            topRightRadius : 5
 
-        borderWidth: 1
-        borderColor: MasticTheme.selectedTabsBackgroundColor
+            borderWidth: 1
+            borderColor: MasticTheme.selectedTabsBackgroundColor
 
-        /*
-        radius : 5
-        border {
-            width: 1
-            color: MasticTheme.selectedTabsBackgroundColor
-        }
-        */
+            // tabs of left panel
+            I2TabView {
+                id : leftPanelTabs
 
-        // tabs of left panel
-        I2TabView {
-            id : leftPanelTabs
+                anchors.fill :parent
 
-            anchors.fill :parent
+                style: I2TabViewStyle {
+                    frameOverlap: 1
+                    tab: I2CustomRectangle {
+                        color: styleData.selected ? MasticTheme.selectedTabsBackgroundColor : "transparent"
+                        implicitWidth: 107
+                        implicitHeight: 26
+                        topRightRadius : 5
 
-            style: I2TabViewStyle {
-                frameOverlap: 1
-                tab: I2CustomRectangle {
-                    color: styleData.selected ? MasticTheme.selectedTabsBackgroundColor : "transparent"
-                    implicitWidth: 107
-                    implicitHeight: 26
-                    topRightRadius : 5
+                        Text {
+                            id: text
+                            anchors.fill: parent
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter;
+                            text: styleData.title
+                            color: styleData.selected ? MasticTheme.agentsListLabelColor : MasticTheme.selectedTabsBackgroundColor
+                            wrapMode: Text.Wrap;
 
-                    Text {
-                        id: text
-                        anchors.fill: parent
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter;
-                        text: styleData.title
-                        color: styleData.selected ? MasticTheme.agentsListLabelColor : MasticTheme.selectedTabsBackgroundColor
-                        wrapMode: Text.Wrap;
-
-                        font {
-                            family: MasticTheme.labelFontFamilyExtraBold;
-                            bold : true;
-                            pixelSize:18;
-                            capitalization: Font.AllUppercase;
+                            font {
+                                family: MasticTheme.labelFontFamilyExtraBold;
+                                bold : true;
+                                pixelSize:18;
+                                capitalization: Font.AllUppercase;
+                            }
                         }
                     }
+                    frame: Rectangle {
+                        color: MasticTheme.selectedTabsBackgroundColor
+                    }
                 }
-                frame: Rectangle {
-                    color: MasticTheme.selectedTabsBackgroundColor
+
+                currentIndex : 0
+
+                onCurrentIndexChanged: {
+                }
+
+                Tab {
+                    title: qsTr("SUPERVISION");
+                    active : true
+
+                    Agent.AgentsList {
+                        id: agentsList
+
+                        anchors.fill: parent
+
+                        controller: MasticEditorC.agentsSupervisionC
+                    }
+                }
+
+                Tab {
+                    title: qsTr("ACTIONS");
+                    active : false
+
+                    Scenario.ActionsList {
+                        id: actionsList
+
+                        anchors.fill: parent
+
+                        controller: MasticEditorC.scenarioC
+                    }
+                }
+
+                Tab {
+                    title: qsTr("RECORDS");
+                    active : false
+
+                    Rectangle {
+                        id: records
+                        anchors.fill: parent
+                        color : "blue"
+                    }
                 }
             }
 
-            currentIndex : 0
-
-            onCurrentIndexChanged: {
-            }
-
-            Tab {
-                title: qsTr("SUPERVISION");
-                active : true
-
-                Agent.AgentsList {
-                    id: agentsList
-
-                    anchors.fill: parent
-
-                    controller: MasticEditorC.agentsSupervisionC
-                }
-            }
-
-            Tab {
-                title: qsTr("ACTIONS");
-                active : false
-
-                Scenario.ActionsList {
-                    id: actionsList
-
-                    anchors.fill: parent
-
-                    controller: MasticEditorC.scenarioC
-                }
-            }
-
-            Tab {
-                title: qsTr("RECORDS");
-                active : false
-
-                Rectangle {
-                    id: records
-                    anchors.fill: parent
-                    color : "blue"
-                }
-            }
         }
-
     }
 
 

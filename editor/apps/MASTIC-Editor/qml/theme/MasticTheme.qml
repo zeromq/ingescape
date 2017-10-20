@@ -181,8 +181,8 @@ Item {
     readonly property color agentsListTextColor: theme.blueGreyColor
 
     readonly property color agentOFFLabelColor: theme.lightGreyColor
-    readonly property color agentOFFLabel2Color: theme.greyColor
-    readonly property color agentOFFPressedLabel2Color: theme.greyColor2
+    readonly property color agentOFFLabel2Color: theme.lightGreyColor
+    readonly property color agentOFFPressedLabel2Color: theme.greyColor // TO CHANGE
     readonly property color agentOFFTextColor: theme.greyColor2
 
 
