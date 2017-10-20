@@ -48,12 +48,12 @@ AgentsSupervisionController::~AgentsSupervisionController()
 {
     _modelManager = NULL;
 
-    // Delete all VM of agents
-    _agentsList.deleteAllItems();
-
     if (_selectedAgent != NULL) {
         setselectedAgent(NULL);
     }
+
+    // Delete all VM of agents
+    _agentsList.deleteAllItems();
 }
 
 

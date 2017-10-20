@@ -52,12 +52,12 @@ Item {
     //-----------------------------------------
 
     // - Main SVG file
-    /*property var svgFileMASTIC : svgFileCacheMASTIC
+    property var svgFileMASTIC : svgFileCacheMASTIC
 
     I2SvgFileCache {
         id: svgFileCacheMASTIC
-        svgFile: "qrc:/resources/svg/MASTIC.svg"
-    }*/
+        svgFile: "qrc:/resources/SVG/mastic-pictos.svg"
+    }
 
 
     //-----------------------------------------
@@ -69,6 +69,8 @@ Item {
 
     readonly property color whiteColor: "#FFFFFF"
     readonly property color blackColor: "#17191E"
+
+    readonly property color redColor: "#E30613"
 
     readonly property color veryDarkGreyColor: "#282D34"
     readonly property color darkGreyColor: "#3C424F"

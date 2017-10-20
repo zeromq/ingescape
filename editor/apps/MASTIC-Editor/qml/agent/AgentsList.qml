@@ -278,7 +278,7 @@ Item {
                     hoverEnabled: true
                     drag.smoothed: false
                     drag.target: draggableItem
-                    cursorShape: (mouseArea.drag.active)? Qt.ClosedHandCursor : Qt.PointingHandCursor //((mouseArea.pressed) ?  : Qt.OpenHandCursor
+                    cursorShape: (mouseArea.drag.active)? Qt.ClosedHandCursor : Qt.PointingHandCursor //Qt.OpenHandCursor
 
                     onPressed: {
                         if (controller) {
@@ -289,7 +289,7 @@ Item {
                         beginPositionY  = draggableItem.y;
 
                         // Find our layer and reparent our popup in it
-                        draggableItem.parent = rootItem.findLayerRootByObjectName(draggableItem, "overlayLayer");
+                        draggableItem.parent = rootItem.findLayerRootByObjectName(draggableItem, "overlayLayer2");
 
                         // Compute new position if needed
                         if ((draggableItem.parent != null))
@@ -336,136 +336,7 @@ Item {
 
         }
 
-
-
-
     }
-
-
-    //                    //                    Button {
-    //                    //                        id: btnDeleteAgent
-
-    //                    //                        anchors {
-    //                    //                            left: agentRow.right
-    //                    //                            top: agentRow.top
-    //                    //                        }
-
-    //                    //                        visible: (agentListItem.ListView.isCurrentItem && (model.status === AgentStatus.OFF))
-
-    //                    //                        text: "X"
-
-    //                    //                        onClicked: {
-    //                    //                            if (controller)
-    //                    //                            {
-    //                    //                                // Delete our agent
-    //                    //                                controller.deleteAgent(model.QtObject);
-    //                    //                            }
-    //                    //                        }
-    //                    //                    }
-
-
-
-
-    //                    //                        Text {
-    //                    //                            //text: model.models ? model.models.count + " clone(s)" : ""
-    //                    //                            //visible: model.models && (model.models.count > 1)
-    //                    //                            text: (model && model.models) ? model.models.count + " clone(s)" : ""
-    //                    //                            visible: (model && model.models) ? (model.models.count > 1) : false
-
-    //                    //                            color: "red"
-    //                    //                            font: MasticTheme.normalFont
-    //                    //                        }
-
-    //                    //                        Text {
-    //                    //                            id: agentStatus
-    //                    //                            text: "Status: " + AgentStatus.enumToString(model.status)
-    //                    //                            visible: !model.hasOnlyDefinition
-
-    //                    //                            height: 25
-    //                    //                            color: MasticTheme.agentsListLabelColor
-    //                    //                            font: MasticTheme.normalFont
-    //                    //                        }
-
-
-    //                    //                    Column {
-    //                    //                        width: 175
-    //                    //                        anchors {
-    //                    //                            top: parent.top
-    //                    //                            topMargin: 30
-    //                    //                            bottom: parent.bottom
-    //                    //                            right: parent.right
-    //                    //                        }
-
-    //                    //                        Text {
-    //                    //                            text: "Variante"
-    //                    //                            visible: model.definition ? model.definition.isVariant : false
-
-    //                    //                            height: 25
-    //                    //                            color: "red"
-    //                    //                            font: MasticTheme.normalFont
-    //                    //                        }
-
-    //                    //                        Text {
-    //                    //                            text: model.definition ? model.definition.description : ""
-
-    //                    //                            width: 175
-    //                    //                            elide: Text.ElideRight
-
-    //                    //                            height: 25
-    //                    //                            color: MasticTheme.agentsListLabelColor
-    //                    //                            font: MasticTheme.normalFont
-    //                    //                        }
-
-    //                    // }
-
-
-    //                    //                    Switch {
-    //                    //                        checked: (model.status === AgentStatus.ON)
-    //                    //                        visible: !model.hasOnlyDefinition
-
-    //                    //                        anchors {
-    //                    //                            left: agentRow.left
-    //                    //                            leftMargin: 2
-    //                    //                            bottom: agentRow.bottom
-    //                    //                            bottomMargin: 5
-    //                    //                        }
-    //                    //                    }
-
-    //                    Row {
-    //                        visible: !model.hasOnlyDefinition && (model.status === AgentStatus.ON)
-
-    //                        anchors {
-    //                            right: agentRow.right
-    //                            bottom: agentRow.bottom
-    //                        }
-
-    //                        Button {
-    //                            id: btnMuteAll
-    //                            text: model.isMuted ? "UN-mute all" : "Mute all"
-
-    //                            width: 110
-
-    //                            onClicked: {
-    //                                model.QtObject.updateMuteAllOutputs(!model.isMuted);
-    //                            }
-    //                        }
-
-    //                        Button {
-    //                            id: btnFreeze
-    //                            text: model.isFrozen ? "UN-freeze" : "Freeze"
-
-    //                            visible: model.canBeFrozen
-
-    //                            width: 90
-
-    //                            onClicked: {
-    //                                model.QtObject.updateFreeze(!model.isFrozen);
-    //                            }
-    //                        }
-    //                    }
-    //                }
-    //            }
-    //        }
 
 
 }
