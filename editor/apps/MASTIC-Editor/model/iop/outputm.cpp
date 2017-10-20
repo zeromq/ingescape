@@ -67,5 +67,5 @@ void OutputM::changeMuteOutput()
     }
 
     // FIXME
-    setisMuted(mute);
+    setisMuted(!_isMuted);
 }
