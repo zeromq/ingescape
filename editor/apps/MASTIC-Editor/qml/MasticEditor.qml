@@ -179,6 +179,7 @@ Item {
 
                         font {
                             family: MasticTheme.labelFontFamilyExtraBold;
+                            bold : true;
                             pixelSize:18;
                             capitalization: Font.AllUppercase;
                         }

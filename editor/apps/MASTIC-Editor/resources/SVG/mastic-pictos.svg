@@ -160,7 +160,7 @@
 			C824.8,456.3,822,459.1,818.5,459.1z"/>
 	</g>
 </g>
-<g id="off-pressed">
+<g id="on-pressed_1_">
 	<g>
 		<linearGradient id="SVGID_2_" gradientUnits="userSpaceOnUse" x1="818.5409" y1="485.1837" x2="818.5409" y2="465.3837">
 			<stop  offset="0" style="stop-color:#FFFFFF"/>
@@ -194,7 +194,7 @@
 			C824.2,505.8,821.5,508.6,818,508.6z"/>
 	</g>
 </g>
-<g id="on-pressed">
+<g id="off-pressed">
 	<g>
 		<linearGradient id="SVGID_4_" gradientUnits="userSpaceOnUse" x1="818.0311" y1="534.6224" x2="818.0311" y2="514.8223">
 			<stop  offset="0" style="stop-color:#17191E"/>
@@ -229,7 +229,7 @@
 			c0.5,0,0.9,0.4,0.9,0.9S900.8,453.2,900.3,453.2z"/>
 	</g>
 </g>
-<g id="freezeinactif-pressed">
+<g id="freezeactif-pressed">
 	<g>
 		<linearGradient id="SVGID_6_" gradientUnits="userSpaceOnUse" x1="895.1262" y1="485.1827" x2="895.1262" y2="465.3826">
 			<stop  offset="0" style="stop-color:#FFFFFF"/>
@@ -265,7 +265,7 @@
 			c0.5,0,0.9,0.4,0.9,0.9S900.2,502.6,899.7,502.6z"/>
 	</g>
 </g>
-<g id="freezeactif-pressed">
+<g id="freezeinactif-pressed_1_">
 	<g>
 		<linearGradient id="SVGID_8_" gradientUnits="userSpaceOnUse" x1="894.4468" y1="534.6234" x2="894.4468" y2="514.8196">
 			<stop  offset="0" style="stop-color:#17191E"/>
@@ -301,7 +301,7 @@
 			c0.2,0.1,0.3,0.3,0.3,0.5c0,0.9,0,1.9,0,2.8l3.1-2.4c0.3-0.3,0.8-0.2,1.1,0.1C967.9,448,967.9,448.4,967.5,448.7z"/>
 	</g>
 </g>
-<g id="muteinactif-pressed">
+<g id="muteactif-pressed_1_">
 	<g>
 		<linearGradient id="SVGID_10_" gradientUnits="userSpaceOnUse" x1="959.9786" y1="485.1839" x2="959.9786" y2="465.3839">
 			<stop  offset="0" style="stop-color:#FFFFFF"/>
@@ -337,7 +337,7 @@
 			c0.2,0.1,0.3,0.3,0.3,0.5c0,0.9,0,1.9,0,2.8l3.1-2.4c0.3-0.3,0.8-0.2,1.1,0.1C968,497.4,967.9,497.9,967.6,498.2z"/>
 	</g>
 </g>
-<g id="muteactif-pressed">
+<g id="muteinactif-pressed">
 	<g>
 		<linearGradient id="SVGID_12_" gradientUnits="userSpaceOnUse" x1="960.0224" y1="534.6222" x2="960.0224" y2="514.8237">
 			<stop  offset="0" style="stop-color:#17191E"/>

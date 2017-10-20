@@ -266,6 +266,8 @@ Item {
                 controller: rootItem.controller
 
                 visible: mouseArea.drag.active
+
+                agentItemIsHovered : mouseArea.containsMouse
             }
 
 
@@ -352,14 +354,16 @@ Item {
                         draggableItem.x = 0;
                         draggableItem.y = 0;
                     }
-                }
 
-                AgentsListItem {
-                    anchors.fill: draggableItem
 
-                    agent : model.QtObject
+                    AgentsListItem {
+                        anchors.fill: parent
 
-                    controller: rootItem.controller
+                        agent : model.QtObject
+                        controller: rootItem.controller
+
+                        agentItemIsHovered : mouseArea.containsMouse
+                    }
                 }
 
             }

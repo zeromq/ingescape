@@ -35,7 +35,11 @@ Item {
     // Controller associated to our view
     property var controller : null;
 
+    // my agent
     property var agent: null;
+
+    // true if agent Item contains the mouse (rollover)
+    property bool agentItemIsHovered : false
 
     width: MasticTheme.leftPanelWidth
     height: 85
@@ -67,7 +71,7 @@ Item {
             width: 0
         }
 
-        color: MasticTheme.agentsListItemBackgroundColor
+        color: agentItemIsHovered? MasticTheme.agentsListItemRollOverBackgroundColor : MasticTheme.agentsListItemBackgroundColor
 
         Rectangle {
             anchors {
@@ -113,7 +117,7 @@ Item {
                         top: parent.top
                         topMargin: 10
                         right : parent.right
-                        rightMargin: 15
+                        rightMargin: 10 + (offButton.width - removeButton.width)/2
                     }
 
                     style: I2SvgButtonStyle {
@@ -128,7 +132,7 @@ Item {
                         if (controller)
                         {
                             // Delete our agent
-                            controller.deleteAgent();
+                            controller.deleteAgent(model.QtObject);
                         }
                     }
                 }
@@ -138,14 +142,12 @@ Item {
             Column {
                 id : columnName
 
-                // TODO : anchors on the right
-                width: 175
-
                 anchors {
                     left : parent.left
                     leftMargin: 28
                     top: parent.top
                     topMargin: 12
+                    right : freezeButton.left
                 }
                 height : childrenRect.height
 
@@ -162,7 +164,9 @@ Item {
                     elide: Text.ElideRight
 
                     text: root.agent? root.agent.name : ""
-                    color: (root.agent && (root.agent.isON === true) && !root.agent.hasOnlyDefinition)? MasticTheme.agentsListLabelColor : MasticTheme.agentOFFLabelColor
+                    color: (root.agent  && (root.agent.isON === true) && !root.agent.hasOnlyDefinition)? MasticTheme.agentsListLabelColor : MasticTheme.agentOFFLabelColor
+
+
                     font: MasticTheme.headingFont
 
 
@@ -190,7 +194,7 @@ Item {
                             color : MasticTheme.whiteColor
                             font {
                                 family: MasticTheme.labelFontFamilyBlack
-                                weight: Font.Black
+                                bold : true
                                 pixelSize : 10
                             }
                         }
@@ -235,7 +239,11 @@ Item {
                         }
 
                         text : definitionName.elidedText
-                        color: (model.definition.isVariant )? MasticTheme.redColor : ((root.agent && (root.agent.isON === true) && !root.agent.hasOnlyDefinition)? MasticTheme.agentsListLabelColor : MasticTheme.agentOFFLabelColor)
+                        color: (model.definition.isVariant)?
+                                   (definitionNameBtn.pressed? MasticTheme.darkRedColor : MasticTheme.redColor)
+                                 : ((root.agent && root.agent.isON === true)?
+                                       (definitionNameBtn.pressed? MasticTheme.agentsListPressedLabel2Color : MasticTheme.agentsListLabel2Color)
+                                       : (definitionNameBtn.pressed? MasticTheme.agentOFFPressedLabel2Color : MasticTheme.agentOFFLabel2Color))
 
                         font: MasticTheme.heading2Font
                     }
@@ -250,7 +258,7 @@ Item {
                         }
 
                         text: root.agent && root.agent.definition ? "(v" + root.agent.definition.version + ")" : ""
-                        color: (root.agent && model.definition.isVariant )? MasticTheme.redColor : ((root.agent &&  (root.agent.isON === true) && !root.agent.hasOnlyDefinition)? MasticTheme.agentsListLabelColor : MasticTheme.agentOFFLabelColor)
+                        color: definitionNameTxt.color
 
                         font {
                             family: MasticTheme.textFontFamily
@@ -286,7 +294,7 @@ Item {
 
                     text: root.agent ? root.agent.addresses: ""
 
-                    color: (root.agent && (root.agent.isON === true) && !root.agent.hasOnlyDefinition)? MasticTheme.agentsListTextColor : MasticTheme.agentOFFTextColor
+                    color: (root.agent && root.agent.isON === true)? MasticTheme.agentsListTextColor : MasticTheme.agentOFFTextColor
                     font: MasticTheme.normalFont
                 }
 
@@ -308,8 +316,8 @@ Item {
                 style: I2SvgButtonStyle {
                     fileCache: MasticTheme.svgFileMASTIC
 
-                    pressedID: !model.isOFF? "on-pressed" : "off-pressed"
-                    releasedID: model.isOFF? "on" : "off"
+                    pressedID: releasedID + "-pressed"
+                    releasedID: model.isON? "on" : "off"
                     disabledID : releasedID
                 }
 
@@ -325,6 +333,7 @@ Item {
                 height : boundingBox.height
                 width :  boundingBox.width
 
+                visible : (model.isON === true)
                 anchors {
                     bottom: parent.bottom
                     bottomMargin: 10
@@ -335,7 +344,7 @@ Item {
                 style: I2SvgButtonStyle {
                     fileCache: MasticTheme.svgFileMASTIC
 
-                    pressedID: !model.isMuted? "muteactif-pressed" : "muteinactif-pressed"
+                    pressedID: releasedID + "-pressed"
                     releasedID: model.isMuted? "muteactif" : "muteinactif"
                     disabledID : releasedID
 
@@ -353,7 +362,7 @@ Item {
                 height : boundingBox.height
                 width :  boundingBox.width
 
-                visible: model.canBeFrozen
+                visible: model.canBeFrozen && (model.isON === true)
                 enabled : visible
 
                 anchors {
@@ -365,7 +374,7 @@ Item {
                 style: I2SvgButtonStyle {
                     fileCache: MasticTheme.svgFileMASTIC
 
-                    pressedID: model.isFrozen? "freezeinactif-pressed" : "freezeactif-pressed"
+                    pressedID: releasedID + "-pressed"
                     releasedID: model.isFrozen? "freezeactif" : "freezeinactif"
                     disabledID : releasedID
 
