@@ -8,8 +8,9 @@
  *
  *
  *	Contributors:
- *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *      Alexandre Lemort   <lemort@ingenuity.io>
+ *      Justine Limoges    <limoges@ingenuity.io>
+ *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *
  */
 
@@ -275,9 +276,12 @@ Item {
                 height : notDraggableItem.height
                 width : notDraggableItem.width
 
+                // Reference to our agent that can be used by a DropArea item
+                property var agent: model.QtObject
+
                 Drag.active: mouseArea.drag.active
                 Drag.hotSpot.x: 0
-                Drag.hotSpot.y: (agentItem.height/2)
+                Drag.hotSpot.y: agentItem.height
 
                 MouseArea {
                     id: mouseArea
@@ -313,28 +317,39 @@ Item {
 
 
                     onReleased: {
-                        if(draggableItem.Drag.target !== null)
+                        // Check if we have a drop area below our item
+                        if (draggableItem.Drag.target !== null)
                         {
-                            // Drop Event
-                            var dropElement = draggableItem.Drag.target;
+                            var dropAreaElement = draggableItem.Drag.target;
 
-                            // Convert x, y coordinate to the target Item
-                            var newPos = mouseArea.mapToItem(dropElement, 0, 0)
+                            if (typeof dropAreaElement.getDropCoordinates == 'function')
+                            {
+                                var dropPosition = dropAreaElement.getDropCoordinates();
+                                console.log("Drop agent " + model.QtObject.name + " at "+ dropPosition);
+
+                                if (MasticEditorC.agentsMappingC)
+                                {
+                                    MasticEditorC.agentsMappingC.addAgentDefinitionToMappingAtPosition(model.QtObject.name, model.QtObject.definition, dropPosition);
+                                }
+                            }
+                            else
+                            {
+                                console.log("AgentsList: invalid DropArea to drop an agent");
+                            }
+                        }
+                        else
+                        {
+                            console.log("AgentsList: agent dropped outside the mapping area");
                         }
 
-                        // FIXME: we have to convert position into drop zone
-                        var position = Qt.point(draggableItem.x, draggableItem.y);
-                        console.log("Drop agent " + model.QtObject.name + " at " + position);
 
-                        if (MasticEditorC.agentsMappingC) {
-                            MasticEditorC.agentsMappingC.addAgentDefinitionToMappingAtPosition(model.QtObject.name, model.QtObject.definition, position);
-                        }
-
-                        //reset the position when the drop target is undefined
-                        // Restore our parent if needed
+                        //
+                        // Reset the position of our draggable item
+                        //
+                        // - restore our parent if needed
                         draggableItem.parent = agentItem;
 
-                        // Restore our previous position in parent
+                        // - restore our previous position in parent
                         draggableItem.x = 0;
                         draggableItem.y = 0;
                     }
