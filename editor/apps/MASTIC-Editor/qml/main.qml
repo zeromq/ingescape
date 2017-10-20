@@ -8,8 +8,9 @@
  *
  *
  *	Contributors:
- *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *      Alexandre Lemort   <lemort@ingenuity.io>
+ *      Justine Limoges    <limoges@ingenuity.io>
+ *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *
  */
 
@@ -280,6 +281,7 @@ ApplicationWindow {
         // Overlay layer used to display popups above the content of our window
         I2Layer {
             id: overlayLayer
+
             objectName: "overlayLayer"
 
             anchors.fill: parent

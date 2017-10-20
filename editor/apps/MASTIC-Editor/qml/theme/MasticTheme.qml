@@ -8,6 +8,8 @@
  *
  *
  *	Contributors:
+ *      Alexandre Lemort   <lemort@ingenuity.io>
+ *      Justine Limoges    <limoges@ingenuity.io>
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *
  */
