@@ -8,8 +8,9 @@
  *
  *
  *	Contributors:
- *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *      Alexandre Lemort   <lemort@ingenuity.io>
+ *      Justine Limoges    <limoges@ingenuity.io>
+ *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *
  */
 
@@ -125,7 +126,7 @@ Item {
     //
     // Left panel: TODO: add border in I2CustomRectangle
     //
-    Rectangle {
+    I2CustomRectangle {
         id: leftPanel
 
         anchors {
@@ -138,14 +139,20 @@ Item {
         width: MasticTheme.leftPanelWidth
 
         color: MasticTheme.leftPanelBackgroundColor
-        radius : 5
-     //   fuzzyRadius: 8
-     //   topRightRadius : 5
 
+        fuzzyRadius: 8
+        topRightRadius : 5
+
+        borderWidth: 1
+        borderColor: MasticTheme.selectedTabsBackgroundColor
+
+        /*
+        radius : 5
         border {
             width: 1
             color: MasticTheme.selectedTabsBackgroundColor
         }
+        */
 
         // tabs of left panel
         I2TabView {
@@ -242,6 +249,9 @@ Item {
             onOpened: {
                 agentDefinitionEditor.z = rootItem.popupTopmostZIndex;
                 rootItem.popupTopmostZIndex = rootItem.popupTopmostZIndex + 1;
+
+                x = x + (index * 40);
+                y = y + (index * 40);
             }
 
             onBringToFront: {

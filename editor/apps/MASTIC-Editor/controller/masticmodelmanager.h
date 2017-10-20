@@ -92,7 +92,7 @@ public:
 
 
     /**
-     * @brief Get the list (of models) of agent definition from a name
+     * @brief Get the list (of models) of agent definition from a definition name
      * @param definitionName
      * @return
      */
@@ -114,7 +114,7 @@ public:
 
 
     /**
-     * @brief Get the list (of models) of agent mapping from a name
+     * @brief Get the list (of models) of agent mapping from a mapping name
      * @param name
      * @return
      */
@@ -161,6 +161,13 @@ Q_SIGNALS:
     void agentMappingCreated(AgentMappingM* agentMapping, AgentM* agent);
 
 
+    /**
+     * @brief Signal emitted when a new model of mapping element has been created
+     * @param mappingElement
+     */
+    void mappingElementCreated(ElementMappingM* mappingElement);
+
+
 public Q_SLOTS:
 
     /**
@@ -203,7 +210,7 @@ public Q_SLOTS:
 
 
     /**
-     * @brief Slot when the flag "Is Muted" of an agent updated
+     * @brief Slot when the flag "is Muted" of an agent updated
      * @param peerId
      * @param isMuted
      */
@@ -211,7 +218,7 @@ public Q_SLOTS:
 
 
     /**
-     * @brief Slot when the flag "Is Frozen" of an agent updated
+     * @brief Slot when the flag "is Frozen" of an agent updated
      * @param peerId
      * @param isFrozen
      */

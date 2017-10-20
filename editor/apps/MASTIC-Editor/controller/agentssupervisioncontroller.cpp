@@ -48,9 +48,8 @@ AgentsSupervisionController::~AgentsSupervisionController()
 {
     _modelManager = NULL;
 
-    if (_selectedAgent != NULL) {
-        setselectedAgent(NULL);
-    }
+    // Clean-up current selection
+    setselectedAgent(NULL);
 
     // Delete all VM of agents
     _agentsList.deleteAllItems();
@@ -143,10 +142,43 @@ void AgentsSupervisionController::openDefinition(AgentVM* agent)
 {
     if ((agent != NULL) && (agent->definition() != NULL) && (_modelManager != NULL))
     {
-        if (!_modelManager->openedDefinitions()->contains(agent->definition())) {
-            _modelManager->openedDefinitions()->append(agent->definition());
+        DefinitionM* definition = agent->definition();
+
+        QList<DefinitionM*> definitionsToOpen;
+
+        // Variant --> we have to open each variants of this definition
+        if (definition->isVariant())
+        {
+            // Get the list (of models) of agent definition from a definition name
+            QList<DefinitionM*> agentDefinitionsList = _modelManager->getAgentDefinitionsListFromName(definition->name());
+
+            foreach (DefinitionM* iterator, agentDefinitionsList) {
+                // Same name, same version and variant, we have to open it
+                if ((iterator != NULL) && iterator->isVariant() && (iterator->version() == definition->version())) {
+                    definitionsToOpen.append(iterator);
+                }
+            }
+        }
+        else {
+            // Simply add our definition
+            definitionsToOpen.append(definition);
+        }
+
+        foreach (DefinitionM* iterator, definitionsToOpen) {
+            if (!_modelManager->openedDefinitions()->contains(iterator)) {
+                _modelManager->openedDefinitions()->append(iterator);
+            }
         }
     }
+}
+
+
+/**
+ * @brief Export the agents list
+ */
+void AgentsSupervisionController::exportAgentsList()
+{
+
 }
 
 
@@ -279,8 +311,8 @@ void AgentsSupervisionController::onAgentDefinitionCreated(DefinitionM* definiti
                     {
                         AgentM* model = models.at(i);
 
-                        // Same address and status is OFF --> we consider that it is the same model
-                        if ((model != NULL) && (model->address() == agent->address()) && (model->status() == AgentStatus::OFF))
+                        // Same address and state is OFF --> we consider that it is the same model
+                        if ((model != NULL) && (model->address() == agent->address()) && !model->isON())
                         {
                             isSameModel = true;
 
@@ -310,6 +342,9 @@ void AgentsSupervisionController::onAgentDefinitionCreated(DefinitionM* definiti
             {
                 // Set the definition
                 agentVM->setdefinition(definition);
+
+                // Emit the signal "Agent Definition Managed"
+                Q_EMIT agentDefinitionManaged(agentName, definition);
             }
         }
     }

@@ -49,10 +49,10 @@ AgentM::AgentM(QString name,
     _hostname(""),
     _executionPath(""),
     _pid(0),
+    _isON(false),
     _isMuted(false),
     _canBeFrozen(false),
-    _isFrozen(false),
-    _status(AgentStatus::OFF)
+    _isFrozen(false)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);

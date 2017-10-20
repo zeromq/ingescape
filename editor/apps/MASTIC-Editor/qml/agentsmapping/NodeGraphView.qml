@@ -66,6 +66,7 @@ Item {
         anchors.fill: parent
 
 
+
         //
         // Seamless background (bitmap version)
         //
@@ -179,6 +180,8 @@ Item {
 
                 width: parent.width
                 height: parent.height
+
+
 
 
 
@@ -816,6 +819,121 @@ Item {
 
 
                 //----------------------------------------
+            }
+
+        }
+
+
+
+        //----------------------------------------------------------------
+        //
+        // Drop-area to handle drag-n-drop of agents from our agents list
+        //
+        //----------------------------------------------------------------
+
+        DropArea {
+            id: workspaceDropArea
+
+            anchors.fill: parent
+
+
+            // Get coordinates of drop
+            function getDropCoordinates()
+            {
+                return workspace.mapFromItem(workspaceDropArea, workspaceDropArea.drag.x, workspaceDropArea.drag.y);
+            }
+
+            onEntered: {
+                if (drag.source !== null)
+                {
+                    var dragItem = drag.source;
+                    console.log("source "+dragItem)
+                    if (typeof dragItem.agent !== 'undefined')
+                    {
+                        dropGhost.agent = dragItem.agent;
+                    }
+                    else
+                    {
+                        console.log("no agent "+dragItem.agent)
+                        dropGhost.agent = null;
+                    }
+                }
+                else
+                {
+                    console.log("no source "+ drag.source)
+                }
+            }
+
+
+            onPositionChanged: {
+                dropGhost.x = drag.x;
+                dropGhost.y = drag.y;
+            }
+
+
+            onExited: {
+                dropGhost.agent = null;
+            }
+
+
+
+            //
+            // Ghost displayed when a dragged item enters the bounds of our drop area
+            //
+            Item {
+                id: dropGhost
+
+                property var agent: null;
+
+                opacity: (workspaceDropArea.containsDrag ? 1 : 0)
+                visible: (opacity != 0)
+
+                Behavior on opacity {
+                    NumberAnimation {}
+                }
+
+
+                Rectangle {
+                    transformOrigin: Item.TopLeft
+
+                    scale: workspace.scale
+
+                    width: 150
+                    height: 150
+
+                    opacity: 0.7
+
+                    color: workspace.nodeColor
+
+                    radius: 8
+
+                    border {
+                        width: 2
+                        color: workspace.nodeBorderColor
+                    }
+
+                    visible: workspaceDropArea.containsDrag
+
+                    Text {
+                        id: agentName
+
+                        anchors {
+                            fill: parent
+                            margins: 5
+                        }
+
+                        verticalAlignment: Text.AlignVCenter
+                        horizontalAlignment: Text.AlignHCenter
+
+                        elide: Text.ElideRight
+
+                        text: dropGhost.agent ? dropGhost.agent.name : ""
+
+                        color: (dropGhost.agent && (dropGhost.agent.isON === true) && !dropGhost.agent.hasOnlyDefinition) ? MasticTheme.agentsListLabelColor : MasticTheme.agentOFFLabelColor
+
+                        font: MasticTheme.headingFont
+                    }
+                }
             }
         }
 

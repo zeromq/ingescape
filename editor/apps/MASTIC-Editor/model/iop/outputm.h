@@ -59,10 +59,9 @@ public:
 
 
     /**
-     * @brief Mute/UN-mute our output
-     * @param mute
+     * @brief Mute / UN-mute our output
      */
-    Q_INVOKABLE void updateMute(bool mute);
+    Q_INVOKABLE void changeMuteOutput();
 
 
 Q_SIGNALS:

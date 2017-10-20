@@ -8,8 +8,9 @@
  *
  *
  *	Contributors:
- *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *      Alexandre Lemort   <lemort@ingenuity.io>
+ *      Justine Limoges    <limoges@ingenuity.io>
+ *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *
  */
 
@@ -58,15 +59,26 @@ ApplicationWindow {
             title: qsTr("Supervision")
 
             MenuItem {
-                text: qsTr("TODO 1")
+                text: qsTr("Créer un nouvel Agent")
                 onTriggered: {
-                    console.log("Supervision TODO 1");
+                    console.log("Créer un nouvel Agent");
                 }
             }
             MenuItem {
-                text: qsTr("TODO 2")
+                text: qsTr("Importer une liste d'agents")
                 onTriggered: {
-                    console.log("Supervision TODO 2");
+                    console.log("Importer une liste d'agents");
+                }
+            }
+            MenuItem {
+                text: qsTr("Exporter la liste d'agents")
+
+                onTriggered: {
+                    console.log("Exporter la liste d'agents");
+
+                    if (MasticEditorC.agentsSupervisionC != NULL) {
+                        MasticEditorC.agentsSupervisionC.exportAgentsList();
+                    }
                 }
             }
         }
@@ -273,6 +285,7 @@ ApplicationWindow {
         // Overlay layer used to display popups above the content of our window
         I2Layer {
             id: overlayLayer
+
             objectName: "overlayLayer"
 
             anchors.fill: parent

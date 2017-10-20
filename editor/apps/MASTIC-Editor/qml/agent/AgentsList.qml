@@ -8,8 +8,9 @@
  *
  *
  *	Contributors:
- *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *      Alexandre Lemort   <lemort@ingenuity.io>
+ *      Justine Limoges    <limoges@ingenuity.io>
+ *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *
  */
 
@@ -193,27 +194,33 @@ Item {
 
             Button {
                 id: btnAddAgent
-                text: qsTr("Nouvel Agent")
+                text: qsTr("Nouveau")
                 onClicked: {
                     console.log("Nouvel Agent")
                     // TODO
                 }
             }
 
-            Text {
-                text: qsTr("Importer...")
-
-                color: MasticTheme.agentsListLabelColor
-
-                font: MasticTheme.normalFont
+            Button {
+                id: btnImportAgent
+                text: qsTr("Importer")
+                onClicked: {
+                    console.log("Importer Agent")
+                    //controller.importAgent();
+                }
             }
 
-            Text {
-                text: qsTr("Exporter...")
+            Button {
+                id: btnExportAgent
+                text: qsTr("Exporter")
+                enabled: (controller.selectedAgent ? true : false)
 
-                color: MasticTheme.agentsListLabelColor
-
-                font: MasticTheme.normalFont
+                onClicked: {
+                    console.log("Exporter l'agent sélectionné");
+                    if (controller.selectedAgent) {
+                        //controller.exportAgent(controller.selectedAgent);
+                    }
+                }
             }
         }
     }
@@ -252,30 +259,37 @@ Item {
             // Not Draggable Agent Item
             AgentsListItem {
                 id : notDraggableItem
+
                 anchors.fill : parent
+
                 agent : model.QtObject
                 controller: rootItem.controller
+
+                visible: mouseArea.drag.active
             }
 
 
             // Draggable Agent Item
             Item {
                 id : draggableItem
+
                 height : notDraggableItem.height
                 width : notDraggableItem.width
 
+                // Reference to our agent that can be used by a DropArea item
+                property var agent: model.QtObject
+
                 Drag.active: mouseArea.drag.active
                 Drag.hotSpot.x: 0
-                Drag.hotSpot.y: (agentItem.height/2)
+                Drag.hotSpot.y: agentItem.height
 
                 MouseArea {
                     id: mouseArea
 
-                    property  var beginPositionX : null;
-                    property  var beginPositionY : null;
-
                     anchors.fill: draggableItem
+
                     hoverEnabled: true
+
                     drag.smoothed: false
                     drag.target: draggableItem
                     cursorShape: (mouseArea.drag.active)? Qt.ClosedHandCursor : Qt.PointingHandCursor //Qt.OpenHandCursor
@@ -285,17 +299,13 @@ Item {
                             controller.selectedAgent = model.QtObject;
                         }
 
-                        beginPositionX  = draggableItem.x;
-                        beginPositionY  = draggableItem.y;
-
                         // Find our layer and reparent our popup in it
                         draggableItem.parent = rootItem.findLayerRootByObjectName(draggableItem, "overlayLayer2");
 
                         // Compute new position if needed
-                        if ((draggableItem.parent != null))
+                        if (draggableItem.parent != null)
                         {
-                            // NB: Repositionning does not work if some anchors (e.g. anchors.fill: parent) are used
-                            var newPosition = agentItem.mapToItem(parent, beginPositionX, beginPositionY);
+                            var newPosition = agentItem.mapToItem(parent, 0, 0);
                             draggableItem.x = newPosition.x;
                             draggableItem.y = newPosition.y;
                         }
@@ -306,29 +316,49 @@ Item {
 
 
                     onReleased: {
-                        if(draggableItem.Drag.target !== null)
+                        // Check if we have a drop area below our item
+                        if (draggableItem.Drag.target !== null)
                         {
-                            // Drop Event
-                            var dropElement = draggableItem.Drag.target;
+                            var dropAreaElement = draggableItem.Drag.target;
 
-                            // Convert x, y coordinate to the target Item
-                            var newPos = mouseArea.mapToItem(dropElement, 0, 0)
+                            if (typeof dropAreaElement.getDropCoordinates == 'function')
+                            {
+                                var dropPosition = dropAreaElement.getDropCoordinates();
+                                console.log("Drop agent " + model.QtObject.name + " at "+ dropPosition);
 
+                                if (MasticEditorC.agentsMappingC)
+                                {
+                                    MasticEditorC.agentsMappingC.addAgentDefinitionToMappingAtPosition(model.QtObject.name, model.QtObject.definition, dropPosition);
+                                }
+                            }
+                            else
+                            {
+                                console.log("AgentsList: invalid DropArea to drop an agent");
+                            }
+                        }
+                        else
+                        {
+                            console.log("AgentsList: agent dropped outside the mapping area");
                         }
 
-                        //reset the position when the drop target is undefined
-                        // Restore our parent if needed
+
+                        //
+                        // Reset the position of our draggable item
+                        //
+                        // - restore our parent if needed
                         draggableItem.parent = agentItem;
 
-                        // Restore our previous position in parent if needed
-                        draggableItem.x = beginPositionX;
-                        draggableItem.y = beginPositionY;
+                        // - restore our previous position in parent
+                        draggableItem.x = 0;
+                        draggableItem.y = 0;
                     }
                 }
 
                 AgentsListItem {
                     anchors.fill: draggableItem
+
                     agent : model.QtObject
+
                     controller: rootItem.controller
                 }
 

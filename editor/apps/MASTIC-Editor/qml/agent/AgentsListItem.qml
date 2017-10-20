@@ -8,8 +8,9 @@
  *
  *
  *	Contributors:
- *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *      Alexandre Lemort   <lemort@ingenuity.io>
+ *      Justine Limoges    <limoges@ingenuity.io>
+ *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *
  */
 
@@ -157,7 +158,7 @@ Item {
                     elide: Text.ElideRight
 
                     text: root.agent? root.agent.name : ""
-                    color: (root.agent && (root.agent.status === AgentStatus.ON) && !root.agent.hasOnlyDefinition)? MasticTheme.agentsListLabelColor : MasticTheme.agentOFFLabelColor
+                    color: (root.agent && (root.agent.isON === true) && !root.agent.hasOnlyDefinition)? MasticTheme.agentsListLabelColor : MasticTheme.agentOFFLabelColor
                     font: MasticTheme.headingFont
 
 
@@ -230,7 +231,8 @@ Item {
                         }
 
                         text : definitionName.elidedText
-                        color: (model.definition.isVariant )? MasticTheme.redColor : ((root.agent && (root.agent.status === AgentStatus.ON) && !root.agent.hasOnlyDefinition)? MasticTheme.agentsListLabelColor : MasticTheme.agentOFFLabelColor)
+                        color: (model.definition.isVariant )? MasticTheme.redColor : ((root.agent && (root.agent.isON === true) && !root.agent.hasOnlyDefinition)? MasticTheme.agentsListLabelColor : MasticTheme.agentOFFLabelColor)
+
                         font: MasticTheme.heading2Font
                     }
 
@@ -244,8 +246,8 @@ Item {
                         }
 
                         text: root.agent && root.agent.definition ? "(v" + root.agent.definition.version + ")" : ""
+                        color: (root.agent && model.definition.isVariant )? MasticTheme.redColor : ((root.agent &&  (root.agent.isON === true) && !root.agent.hasOnlyDefinition)? MasticTheme.agentsListLabelColor : MasticTheme.agentOFFLabelColor)
 
-                        color: (root.agent && model.definition.isVariant )? MasticTheme.redColor : ((root.agent && (root.agent.status === AgentStatus.ON) && !root.agent.hasOnlyDefinition)? MasticTheme.agentsListLabelColor : MasticTheme.agentOFFLabelColor)
                         font {
                             family: MasticTheme.textFontFamily
                             pixelSize : 10
@@ -280,7 +282,7 @@ Item {
 
                     text: root.agent ? root.agent.addresses: ""
 
-                    color: (root.agent && (root.agent.status === AgentStatus.ON) && !root.agent.hasOnlyDefinition)? MasticTheme.agentsListTextColor : MasticTheme.agentOFFTextColor
+                    color: (root.agent && (root.agent.isON === true) && !root.agent.hasOnlyDefinition)? MasticTheme.agentsListTextColor : MasticTheme.agentOFFTextColor
                     font: MasticTheme.normalFont
                 }
 

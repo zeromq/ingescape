@@ -360,15 +360,20 @@ int manageSubscription (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                         //and update mapped input(s) value accordingly
                         mapping_element_t *elmt, *tmp;
                         HASH_ITER(hh, mtic_internal_mapping->map_elements, elmt, tmp) {
-                            agent_iop *foundInput = NULL;
-                            if (mtic_internal_definition->inputs_table != NULL){
-                                HASH_FIND_STR(mtic_internal_definition->inputs_table, elmt->input_name, foundInput);
-                            }
-                            if (foundInput == NULL){
-                                mtic_debug("manageSubscription : input %s missing in our definition for use in a mapping element\n", elmt->input_name);
-                            }else{
-                                if (strcmp(elmt->agent_name, foundSubscriber->agentName) == 0
-                                    && strcmp(elmt->output_name, output) == 0){
+                            if (strcmp(elmt->agent_name, foundSubscriber->agentName) == 0
+                                && strcmp(elmt->output_name, output) == 0){
+                                //we have a match on emitting agent name and its ouput name :
+                                //still need to check the targeted input existence in our definition
+                                agent_iop *foundInput = NULL;
+                                if (mtic_internal_definition->inputs_table != NULL){
+                                    HASH_FIND_STR(mtic_internal_definition->inputs_table, elmt->input_name, foundInput);
+                                }
+                                if (foundInput == NULL){
+                                    mtic_debug("manageSubscription : input %s missing in our definition for use in a mapping with %s.%s\n",
+                                               elmt->input_name,
+                                               elmt->agent_name,
+                                               elmt->output_name);
+                                }else{
                                     //we have a fully matching mapping element : write from received output to our input
                                     if (foundOutput->value_type == DATA_T){
                                         //If the remote output is data, we write our input as data : no type conversion

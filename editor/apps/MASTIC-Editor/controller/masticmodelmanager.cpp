@@ -97,8 +97,8 @@ void MasticModelManager::onAgentEntered(QString peerId, QString agentName, QStri
         {
             qInfo() << "The agent" << agentName << "with peer id" << peerId << "and address" << agentAddress << "is back on the network !";
 
-            // Update the status
-            agent->setstatus(AgentStatus::ON);
+            // Update the state (flag "is ON")
+            agent->setisON(true);
         }
         // New peer id
         else
@@ -110,7 +110,9 @@ void MasticModelManager::onAgentEntered(QString peerId, QString agentName, QStri
             agent->setexecutionPath(executionPath);
             agent->setpid(pid);
             agent->setcanBeFrozen(canBeFrozen);
-            agent->setstatus(AgentStatus::ON);
+
+            // Update the state (flag "is ON")
+            agent->setisON(true);
 
             _mapFromPeerIdToAgentM.insert(peerId, agent);
 
@@ -201,14 +203,14 @@ void MasticModelManager::onAgentExited(QString peerId, QString agentName)
     {
         qInfo() << "The agent" << agentName << "with peer id" << peerId << "exited from the network !";
 
-        // Update the status
-        agent->setstatus(AgentStatus::OFF);
+        // Update the state (flag "is ON")
+        agent->setisON(false);
     }
 }
 
 
 /**
- * @brief Slot when the flag "Is Muted" of an agent updated
+ * @brief Slot when the flag "is Muted" of an agent updated
  * @param peerId
  * @param isMuted
  */
@@ -222,7 +224,7 @@ void MasticModelManager::onisMutedOfAgentUpdated(QString peerId, bool isMuted)
 
 
 /**
- * @brief Slot when the flag "Is Frozen" of an agent updated
+ * @brief Slot when the flag "is Frozen" of an agent updated
  * @param peerId
  * @param isFrozen
  */
@@ -327,7 +329,7 @@ void MasticModelManager::addAgentDefinition(DefinitionM* definition)
 
 
 /**
- * @brief Get the list (of models) of agent definition from a name
+ * @brief Get the list (of models) of agent definition from a definition name
  * @param name
  * @return
  */
@@ -387,7 +389,7 @@ void MasticModelManager::addAgentMapping(AgentMappingM* agentMapping)
 
 
 /**
- * @brief Get the list (of models) of agent mapping from a name
+ * @brief Get the list (of models) of agent mapping from a mapping name
  * @param mappingName
  * @return
  */
@@ -611,14 +613,25 @@ void MasticModelManager::_updateMergedListOfMappingElementsForAgentName(QString 
                 qDebug() << elementMapping->outputAgent() << "." << elementMapping->output() << "-->" << elementMapping->inputAgent() << "." << elementMapping->inputAgent();
 
                 bool isAlreadyInMergedList = false;
-                /*foreach (ElementMappingM* iterator, mergedList) {
-                    if ((iterator != NULL) && (iterator->md5Hash == elementMapping->md5Hash)) {
+                foreach (ElementMappingM* iterator, mergedList)
+                {
+                    // Exactly the same ?
+                    //if ((iterator != NULL) && (iterator->md5Hash == elementMapping->md5Hash)) {
+                    if ((iterator != NULL)
+                            && (iterator->outputAgent() == elementMapping->outputAgent())
+                            && (iterator->output() == elementMapping->output())
+                            && (iterator->input() == elementMapping->input())) {
                         isAlreadyInMergedList = true;
                         break;
                     }
-                }*/
+                }
+
+                // Not already in merged list
                 if (!isAlreadyInMergedList) {
                     mergedList.append(elementMapping);
+
+                    // Emit the signal "Mapping Element Created"
+                    Q_EMIT mappingElementCreated(elementMapping);
                 }
             }
         }

@@ -43,6 +43,20 @@ struct I2TriangulationResult {
 };
 
 
+/**
+ * @brief The I2OffsetContourResult struct is used to store the result of a call to _computeContourAndVerticesForOffsetContour
+ */
+struct I2OffsetContourResult {
+    // Exterior contour
+    QList<QPointF> exteriorContour;
+
+    // Interior contour
+    QList<QPointF> interiorContour;
+
+    // Vertices
+    QList<QPair<QPointF, bool>> vertices;
+};
+
 
 
 
@@ -100,7 +114,7 @@ public:
 
 
     /**
-     * @brief Compute vertices of the exterior offset contours for a given polyline
+     * @brief Compute vertices of the exterior offset contour for a given polyline
      *
      * @param polyline
      * @param offset (offset must be positive)
@@ -112,7 +126,7 @@ public:
 
 
     /**
-     * @brief Compute vertices of the interior offset contours for a given polyline
+     * @brief Compute vertices of the interior offset contour for a given polyline
      *
      * @param polyline
      * @param offset (offset must be positive)
@@ -123,21 +137,34 @@ public:
     static QList<QPair<QPointF, bool>> computeVerticesForInteriorOffsetContour(QList<QPointF> polyline, qreal offset, bool transparentVertices);
 
 
+    /**
+     * @brief Compute contour and vertices of the interior offset contour for a given polyline
+     *
+     * @param polyline
+     * @param offset (offset must be positive)
+     * @param transparentVertices
+     *
+     * @return Contour and list of vertices (coordinates, true if vertex must be transparent)
+     */
+    static I2OffsetContourResult computeContourAndVerticesForInteriorOffsetContour(QList<QPointF> polyline, qreal offset, bool transparentVertices);
+
+
 
 protected:
 
     /**
-     * @brief Compute vertices of the interior offset contours for a given polyline
+     * @brief Compute contour and vertices of an offset contour for a given polyline
      *
      * @param polyline
      * @param offset (offset must be positive)
+     * @param computeContours
      * @param computeExteriorOffsetContour
      * @param computeInteriorOffsetContour
      * @param transparentVertices
      *
-     * @return List of vertices (coordinates, true if vertex must be transparent)
+     * @return Contour and list of vertices (coordinates, true if vertex must be transparent)
      */
-    static QList<QPair<QPointF, bool>> _computeVerticesForOffsetContour(QList<QPointF> polyline, qreal offset, bool computeExteriorOffsetContour, bool computeInteriorOffsetContour, bool transparentVertices);
+    static I2OffsetContourResult _computeContourAndVerticesForOffsetContour(QList<QPointF> polyline, qreal offset, bool computeContours, bool computeExteriorOffsetContour, bool computeInteriorOffsetContour, bool transparentVertices);
 
 
     /**
