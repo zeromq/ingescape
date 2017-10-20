@@ -327,7 +327,7 @@ void MasticModelManager::addAgentDefinition(DefinitionM* definition)
 
 
 /**
- * @brief Get the list (of models) of agent definition from a name
+ * @brief Get the list (of models) of agent definition from a definition name
  * @param name
  * @return
  */
@@ -387,7 +387,7 @@ void MasticModelManager::addAgentMapping(AgentMappingM* agentMapping)
 
 
 /**
- * @brief Get the list (of models) of agent mapping from a name
+ * @brief Get the list (of models) of agent mapping from a mapping name
  * @param mappingName
  * @return
  */

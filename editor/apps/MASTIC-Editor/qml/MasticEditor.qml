@@ -250,6 +250,9 @@ Item {
             onOpened: {
                 agentDefinitionEditor.z = rootItem.popupTopmostZIndex;
                 rootItem.popupTopmostZIndex = rootItem.popupTopmostZIndex + 1;
+
+                x = x + (index * 40);
+                y = y + (index * 40);
             }
 
             onBringToFront: {

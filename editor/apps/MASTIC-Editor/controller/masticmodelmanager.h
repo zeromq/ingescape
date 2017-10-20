@@ -92,7 +92,7 @@ public:
 
 
     /**
-     * @brief Get the list (of models) of agent definition from a name
+     * @brief Get the list (of models) of agent definition from a definition name
      * @param definitionName
      * @return
      */
@@ -114,7 +114,7 @@ public:
 
 
     /**
-     * @brief Get the list (of models) of agent mapping from a name
+     * @brief Get the list (of models) of agent mapping from a mapping name
      * @param name
      * @return
      */
