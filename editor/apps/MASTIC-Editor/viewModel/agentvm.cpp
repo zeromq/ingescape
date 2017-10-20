@@ -29,8 +29,7 @@ AgentVM::AgentVM(AgentM* model, QObject *parent) : QObject(parent),
     _addresses(""),
     _definition(NULL),
     _hasOnlyDefinition(true),
-    _status(AgentStatus::OFF),
-    _state(""),
+    _isON(false),
     _isMuted(false),
     _canBeFrozen(false),
     _isFrozen(false)
@@ -133,31 +132,43 @@ void AgentVM::setdefinition(DefinitionM *value)
 
 
 /**
- * @brief Mute/UN-mute all outputs of our agent
- * @param muteAllOutputs
+ * @brief Change the state of our agent
  */
-void AgentVM::updateMuteAllOutputs(bool muteAllOutputs)
+void AgentVM::changeState()
 {
-    if (muteAllOutputs) {
-        Q_EMIT commandAsked("MUTE_ALL", _peerIdsList);
+    if (_isON) {
+        Q_EMIT commandAsked("OFF", _peerIdsList);
     }
     else {
-        Q_EMIT commandAsked("UNMUTE_ALL", _peerIdsList);
+        Q_EMIT commandAsked("ON", _peerIdsList);
     }
 }
 
 
 /**
- * @brief Freeze/UN-freeze our agent
- * @param freeze
+ * @brief Mute / UN-mute all outputs of our agent
  */
-void AgentVM::updateFreeze(bool freeze)
+void AgentVM::changeMuteAllOutputs()
 {
-    if (freeze) {
-        Q_EMIT commandAsked("FREEZE", _peerIdsList);
+    if (_isMuted) {
+        Q_EMIT commandAsked("UNMUTE_ALL", _peerIdsList);
     }
     else {
+        Q_EMIT commandAsked("MUTE_ALL", _peerIdsList);
+    }
+}
+
+
+/**
+ * @brief Freeze / UN-freeze our agent
+ */
+void AgentVM::changeFreeze()
+{
+    if (_isFrozen) {
         Q_EMIT commandAsked("UNFREEZE", _peerIdsList);
+    }
+    else {
+        Q_EMIT commandAsked("FREEZE", _peerIdsList);
     }
 }
 
@@ -189,7 +200,7 @@ void AgentVM::_onModelsChanged()
             if ((model != NULL) && !_previousAgentsList.contains(model))
             {   
                 // Connect to signals from a model
-                connect(model, &AgentM::statusChanged, this, &AgentVM::_onStatusOfModelChanged);
+                connect(model, &AgentM::isONChanged, this, &AgentVM::_onIsONofModelChanged);
                 connect(model, &AgentM::isMutedChanged, this, &AgentVM::_onIsMutedOfModelChanged);
                 connect(model, &AgentM::isFrozenChanged, this, &AgentVM::_onIsFrozenOfModelChanged);
             }
@@ -217,40 +228,40 @@ void AgentVM::_onModelsChanged()
 
 
 /**
- * @brief Slot when the "Status" of a model changed
- * @param status
+ * @brief Slot when the flag "is ON" of a model changed
+ * @param isON
  */
-void AgentVM::_onStatusOfModelChanged(AgentStatus::Value status)
+void AgentVM::_onIsONofModelChanged(bool isON)
 {
-    Q_UNUSED(status)
+    Q_UNUSED(isON)
 
-    // Update the status in function of status of models
-    _updateStatus();
+    // Update the flag "is ON" in function of flags of models
+    _updateIsON();
 }
 
 
 /**
- * @brief Slot when the flag "Is Muted" of a model changed
+ * @brief Slot when the flag "is Muted" of a model changed
  * @param isMuted
  */
 void AgentVM::_onIsMutedOfModelChanged(bool isMuted)
 {
     Q_UNUSED(isMuted)
 
-    // Update the flag "Is Muted" in function of models
+    // Update the flag "is Muted" in function of models
     _updateIsMuted();
 }
 
 
 /**
- * @brief Slot when the flag "Is Frozen" of a model changed
+ * @brief Slot when the flag "is Frozen" of a model changed
  * @param isMuted
  */
 void AgentVM::_onIsFrozenOfModelChanged(bool isFrozen)
 {
     Q_UNUSED(isFrozen)
 
-    // Update the flag "Is Frozen" in function of models
+    // Update the flag "is Frozen" in function of models
     _updateIsFrozen();
 }
 
@@ -297,37 +308,33 @@ void AgentVM::_updateWithModels()
     setaddresses(globalAddresses);
     setcanBeFrozen(globalCanBeFrozen);
 
-    // Update the status and flags in function of models
-    _updateStatus();
+    // Update flags in function of models
+    _updateIsON();
     _updateIsMuted();
     _updateIsFrozen();
 }
 
 
 /**
- * @brief Update the status in function of status of models
+ * @brief Update the flag "is ON" in function of flags of models
  */
-void AgentVM::_updateStatus()
+void AgentVM::_updateIsON()
 {
-    AgentStatus::Value globalStatus = AgentStatus::OFF;
+    bool globalIsON = true;
 
     foreach (AgentM* model, _models.toList()) {
-        if (model != NULL)
-        {
-            // Use switch case if we need to manage transition status "..._ASKED"
-
-            if (model->status() == AgentStatus::ON) {
-                globalStatus = AgentStatus::ON;
-            }
+        if ((model != NULL) && !model->isON()) {
+            globalIsON = false;
+            break;
         }
     }
 
-    setstatus(globalStatus);
+    setisON(globalIsON);
 }
 
 
 /**
- * @brief Update the flag "Is Muted" in function of models
+ * @brief Update the flag "is Muted" in function of flags of models
  */
 void AgentVM::_updateIsMuted()
 {
@@ -345,7 +352,7 @@ void AgentVM::_updateIsMuted()
 
 
 /**
- * @brief Update the flag "Is Frozen" in function of models
+ * @brief Update the flag "is Frozen" in function of flags of models
  */
 void AgentVM::_updateIsFrozen()
 {

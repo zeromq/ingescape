@@ -99,7 +99,7 @@ void DefinitionM::_onOutputsListChanged()
 
 
 /**
- * @brief Slot when the flag "Is Muted" of an output changed
+ * @brief Slot when the flag "is Muted" of an output changed
  * @param isMuted
  */
 /*void DefinitionM::_onIsMutedChanged(bool isMuted)

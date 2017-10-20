@@ -929,7 +929,7 @@ Item {
 
                         text: dropGhost.agent ? dropGhost.agent.name : ""
 
-                        color: (dropGhost.agent && (dropGhost.agent.status === AgentStatus.ON) && !dropGhost.agent.hasOnlyDefinition) ? MasticTheme.agentsListLabelColor : MasticTheme.agentOFFLabelColor
+                        color: (dropGhost.agent && (dropGhost.agent.isON === true) && !dropGhost.agent.hasOnlyDefinition) ? MasticTheme.agentsListLabelColor : MasticTheme.agentOFFLabelColor
 
                         font: MasticTheme.headingFont
                     }

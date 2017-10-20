@@ -174,6 +174,15 @@ void AgentsSupervisionController::openDefinition(AgentVM* agent)
 
 
 /**
+ * @brief Export the agents list
+ */
+void AgentsSupervisionController::exportAgentsList()
+{
+
+}
+
+
+/**
  * @brief Slot when a new model of agent has been created
  * @param agent
  */
@@ -302,8 +311,8 @@ void AgentsSupervisionController::onAgentDefinitionCreated(DefinitionM* definiti
                     {
                         AgentM* model = models.at(i);
 
-                        // Same address and status is OFF --> we consider that it is the same model
-                        if ((model != NULL) && (model->address() == agent->address()) && (model->status() == AgentStatus::OFF))
+                        // Same address and state is OFF --> we consider that it is the same model
+                        if ((model != NULL) && (model->address() == agent->address()) && !model->isON())
                         {
                             isSameModel = true;
 

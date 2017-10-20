@@ -55,16 +55,15 @@ OutputM::~OutputM()
 
 
 /**
- * @brief Mute/UN-mute our output
- * @param mute
+ * @brief Mute / UN-mute our output
  */
-void OutputM::updateMute(bool mute)
+void OutputM::changeMuteOutput()
 {
-    if (mute) {
-        Q_EMIT commandAsked("MUTE", _name);
+    if (_isMuted) {
+        Q_EMIT commandAsked("UNMUTE", _name);
     }
     else {
-        Q_EMIT commandAsked("UNMUTE", _name);
+        Q_EMIT commandAsked("MUTE", _name);
     }
 
     // FIXME

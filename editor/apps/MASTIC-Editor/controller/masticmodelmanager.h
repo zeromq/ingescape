@@ -210,7 +210,7 @@ public Q_SLOTS:
 
 
     /**
-     * @brief Slot when the flag "Is Muted" of an agent updated
+     * @brief Slot when the flag "is Muted" of an agent updated
      * @param peerId
      * @param isMuted
      */
@@ -218,7 +218,7 @@ public Q_SLOTS:
 
 
     /**
-     * @brief Slot when the flag "Is Frozen" of an agent updated
+     * @brief Slot when the flag "is Frozen" of an agent updated
      * @param peerId
      * @param isFrozen
      */

@@ -95,7 +95,7 @@ private Q_SLOTS:
 
 
     /**
-     * @brief Slot when the flag "Is Muted" of an output changed
+     * @brief Slot when the flag "is Muted" of an output changed
      * @param isMuted
      */
     //void _onIsMutedChanged(bool isMuted);

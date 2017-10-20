@@ -152,13 +152,13 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
                 if (message == "0") {
                     //qDebug() << peerName << "(" << peerId << ") UN-MUTED";
 
-                    // Emit the signal "Is Muted of Agent Updated"
+                    // Emit the signal "is Muted of Agent Updated"
                     Q_EMIT networkController->isMutedOfAgentUpdated(peerId, false);
                 }
                 else if (message == "1") {
                     //qDebug() << peerName << "(" << peerId << ") MUTED";
 
-                    // Emit the signal "Is Muted of Agent Updated"
+                    // Emit the signal "is Muted of Agent Updated"
                     Q_EMIT networkController->isMutedOfAgentUpdated(peerId, true);
                 }
                 else {
@@ -173,13 +173,13 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
                 if (message == "0") {
                     //qDebug() << peerName << "(" << peerId << ") UN-FROZEN";
 
-                    // Emit the signal "Is Frozen of Agent Updated"
+                    // Emit the signal "is Frozen of Agent Updated"
                     Q_EMIT networkController->isFrozenOfAgentUpdated(peerId, false);
                 }
                 else if (message == "1") {
                     //qDebug() << peerName << "(" << peerId << ") FROZEN";
 
-                    // Emit the signal "Is Frozen of Agent Updated"
+                    // Emit the signal "is Frozen of Agent Updated"
                     Q_EMIT networkController->isFrozenOfAgentUpdated(peerId, true);
                 }
             }

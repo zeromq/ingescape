@@ -82,6 +82,12 @@ public:
     Q_INVOKABLE void openDefinition(AgentVM* agent);
 
 
+    /**
+     * @brief Export the agents list
+     */
+    Q_INVOKABLE void exportAgentsList();
+
+
 Q_SIGNALS:
 
     /**

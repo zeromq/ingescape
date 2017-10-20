@@ -93,7 +93,7 @@ Q_SIGNALS:
 
 
     /**
-     * @brief Signal emitted when the flag "Is Muted" of an agent updated
+     * @brief Signal emitted when the flag "is Muted" of an agent updated
      * @param peerId
      * @param isMuted
      */
@@ -101,7 +101,7 @@ Q_SIGNALS:
 
 
     /**
-     * @brief Signal emitted when the flag "Is Frozen" of an agent updated
+     * @brief Signal emitted when the flag "is Frozen" of an agent updated
      * @param peerId
      * @param isFrozen
      */
