@@ -63,7 +63,7 @@ class AgentIOPM : public QObject
 
     // Default value of our Input / Output / Parameter
     //I2_CPP_PROPERTY(QByteArray, defaultValue)
-    I2_CPP_PROPERTY(QVariant, defaultValue)
+    I2_CPP_PROPERTY_CUSTOM_SETTER(QVariant, defaultValue)
     // ######################################################
 
     // Displayable defaut value of our Input / Output / Parameter

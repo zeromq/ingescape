@@ -55,6 +55,16 @@ public:
     DefinitionM* createModelOfDefinition(QByteArray byteArrayOfJson);
 
 
+    void getAgentsList(QByteArray byteArrayOfJson);
+
+
+    /**
+     * @brief Export the agents list
+     * @param agentsListToExport list of pairs <agent name, definition>
+     */
+    QByteArray exportAgentsList(QList<QPair<QString, DefinitionM*>> agentsListToExport);
+
+
     /**
      * @brief Create a model of agent mapping with JSON and the input agent name corresponding
      * TODOESTIA : the input agent name will be extract from the network event "mapping"
@@ -78,6 +88,14 @@ private:
      * @return
      */
     AgentIOPM* _createModelOfAgentIOP(QJsonObject jsonObject, AgentIOPTypes::Value agentIOPType);
+
+
+    /**
+     * @brief Get JSON object from an agent Input/Output/Parameter
+     * @param agentIOP
+     * @return
+     */
+    QJsonObject _getJsonForAgentIOP(AgentIOPM* agentIOP);
 
 
     /**

@@ -208,32 +208,6 @@ int main(int argc, char *argv[])
 
             qDebug() << "Settings" << settings.fileName();
         }
-
-
-        //------------------------------
-        //
-        // Agents definitions & mappings
-        //
-        //------------------------------
-        QString agentsDefinitionsAndMappingsDirectoryPath = MasticEditorUtils::getAgentsDefinitionsAndMappingsPath();
-        QDir agentsDefinitionsAndMappingsDirectory(agentsDefinitionsAndMappingsDirectoryPath);
-        if (!agentsDefinitionsAndMappingsDirectory.exists())
-        {
-            qCritical() << "ERROR: could not create directory at '" << agentsDefinitionsAndMappingsDirectoryPath << "' !";
-        }
-
-
-        //------------------------------
-        //
-        // Snapshots directory
-        //
-        //------------------------------
-        QString snapshotsDirectoryPath = MasticEditorUtils::getSnapshotsPath();
-        QDir snapshotsDirectory(snapshotsDirectoryPath);
-        if (!snapshotsDirectory.exists())
-        {
-            qCritical() << "ERROR: could not create directory at '" << snapshotsDirectoryPath << "' !";
-        }
     }
     else
     {

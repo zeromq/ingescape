@@ -43,9 +43,13 @@ class MasticModelManager : public QObject
 public:
     /**
      * @brief Default constructor
+     * @param agentsListDirectoryPath
+     * @param agentsMappingsDirectoryPath
      * @param parent
      */
-    explicit MasticModelManager(QObject *parent = nullptr);
+    explicit MasticModelManager(QString agentsListDirectoryPath,
+                                QString agentsMappingsDirectoryPath,
+                                QObject *parent = nullptr);
 
 
     /**
@@ -130,10 +134,16 @@ public:
 
 
     /**
-     * @brief Initialize agents (from JSON files) inside a directory
-     * @param agentsDirectoryPath agents directory path
+     * @brief Initialize agents list from JSON file
      */
-    void initAgentsInsideDirectory(QString agentsDirectoryPath);
+    void initAgentsList();
+
+
+    /**
+     * @brief Export the agents list
+     * @param agentsListToExport list of pairs <agent name, definition>
+     */
+    void exportAgentsList(QList<QPair<QString, DefinitionM*>> agentsListToExport);
 
 
 Q_SIGNALS:
@@ -250,6 +260,14 @@ private:
 
 
 private:
+
+    // Path to the directory containing JSON files to save agents list
+    QString _agentsListDirectoryPath;
+    QString _agentsListFilePath;
+
+    // Path to the directory containing JSON files to save agents mappings
+    QString _agentsMappingsDirectoryPath;
+    QString _agentsMappingsFilePath;
 
     // Helper to manage JSON definitions of agents
     JsonHelper* _jsonHelper;

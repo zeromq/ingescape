@@ -125,6 +125,103 @@ DefinitionM* JsonHelper::createModelOfDefinition(QByteArray byteArrayOfJson)
 }
 
 
+
+void JsonHelper::getAgentsList(QByteArray byteArrayOfJson)
+{
+    QJsonDocument jsonAgentsList = QJsonDocument::fromJson(byteArrayOfJson);
+    if (jsonAgentsList.isArray())
+    {
+        foreach (QJsonValue jsonValue, jsonAgentsList.array()) {
+            if (jsonValue.isObject())
+            {
+                QJsonObject jsonAgent = jsonValue.toObject();
+
+                QJsonValue jsonName = jsonAgent.value("name");
+                QJsonValue jsonDefinition = jsonAgent.value("definition");
+
+                if (jsonName.isString() && jsonDefinition.isObject()) {
+                    qDebug() << "agent" << jsonName.toString() << "definition" << jsonDefinition;
+                }
+            }
+        }
+    }
+
+    // TODO
+}
+
+/**
+ * @brief Export the agents list
+ * @param agentsListToExport list of pairs <agent name, definition>
+ */
+QByteArray JsonHelper::exportAgentsList(QList<QPair<QString, DefinitionM*>> agentsListToExport)
+{
+    QJsonArray jsonArray;
+
+    qDebug() << "Export" << agentsListToExport.count() << "agents";
+
+    for (int i = 0; i < agentsListToExport.count(); i++)
+    {
+        QPair<QString, DefinitionM*> pair = agentsListToExport.at(i);
+        QString agentName = pair.first;
+        DefinitionM* definition = pair.second;
+
+        QJsonObject jsonAgent;
+
+        jsonAgent.insert("agentName", agentName);
+
+        if (definition != NULL) {
+            QJsonObject jsonDefinition;
+
+            jsonDefinition.insert("name", definition->name());
+            jsonDefinition.insert("version", definition->version());
+            jsonDefinition.insert("description", definition->description());
+
+            QJsonArray jsonInputs;
+            foreach (AgentIOPM* agentIOP, definition->inputsList()->toList()) {
+                if (agentIOP != NULL) {
+                    // Get JSON object from the agent Input/Output/Parameter
+                    QJsonObject jsonAgentIOP = _getJsonForAgentIOP(agentIOP);
+
+                    jsonInputs.append(jsonAgentIOP);
+                }
+            }
+
+            QJsonArray jsonOutputs;
+            foreach (AgentIOPM* agentIOP, definition->outputsList()->toList()) {
+                if (agentIOP != NULL) {
+                    // Get JSON object from the agent Input/Output/Parameter
+                    QJsonObject jsonAgentIOP = _getJsonForAgentIOP(agentIOP);
+
+                    jsonOutputs.append(jsonAgentIOP);
+                }
+            }
+
+            QJsonArray jsonParameters;
+            foreach (AgentIOPM* agentIOP, definition->parametersList()->toList()) {
+                if (agentIOP != NULL) {
+                    // Get JSON object from the agent Input/Output/Parameter
+                    QJsonObject jsonAgentIOP = _getJsonForAgentIOP(agentIOP);
+
+                    jsonParameters.append(jsonAgentIOP);
+                }
+            }
+
+            jsonDefinition.insert("inputs", jsonInputs);
+            jsonDefinition.insert("outputs", jsonOutputs);
+            jsonDefinition.insert("parameters", jsonParameters);
+
+            jsonAgent.insert("definition", jsonDefinition);
+        }
+
+        jsonArray.append(jsonAgent);
+    }
+
+    QJsonDocument jsonDocument = QJsonDocument(jsonArray);
+
+    return jsonDocument.toJson();
+}
+
+
 /**
  * @brief Create a model of agent mapping with JSON and the input agent name corresponding
  * TODOESTIA : the input agent name will be extract from the network event "mapping"
@@ -224,7 +321,7 @@ AgentIOPM* JsonHelper::_createModelOfAgentIOP(QJsonObject jsonObject, AgentIOPTy
                     int value = (int)jsonValue.toDouble();
 
                     agentIOP->setdefaultValue(QVariant(value));
-                    agentIOP->setdisplayableDefaultValue(QString::number(value));
+                    //agentIOP->setdisplayableDefaultValue(QString::number(value));
                 }
                 else {
                     qCritical() << "IOP '" << agentIOP->name() << "': The value '" << jsonValue << "' is not an int";
@@ -236,7 +333,7 @@ AgentIOPM* JsonHelper::_createModelOfAgentIOP(QJsonObject jsonObject, AgentIOPTy
                     double value = jsonValue.toDouble();
 
                     agentIOP->setdefaultValue(QVariant(value));
-                    agentIOP->setdisplayableDefaultValue(QString::number(value));
+                    //agentIOP->setdisplayableDefaultValue(QString::number(value));
                 }
                 else {
                     qCritical() << "IOP '" << agentIOP->name() << "': The value '" << jsonValue << "' is not a double";
@@ -248,7 +345,7 @@ AgentIOPM* JsonHelper::_createModelOfAgentIOP(QJsonObject jsonObject, AgentIOPTy
                     QString value = jsonValue.toString();
 
                     agentIOP->setdefaultValue(QVariant(value));
-                    agentIOP->setdisplayableDefaultValue(value);
+                    //agentIOP->setdisplayableDefaultValue(value);
                 }
                 else {
                     qCritical() << "IOP '" << agentIOP->name() << "': The value '" << jsonValue << "' is not a string";
@@ -264,7 +361,7 @@ AgentIOPM* JsonHelper::_createModelOfAgentIOP(QJsonObject jsonObject, AgentIOPTy
                         bool value = (strValue == "false") ? false : true;
 
                         agentIOP->setdefaultValue(QVariant(value));
-                        agentIOP->setdisplayableDefaultValue(strValue);
+                        //agentIOP->setdisplayableDefaultValue(strValue);
                     }
                     else {
                         qCritical() << "IOP '" << agentIOP->name() << "': The value '" << strValue << "' is not a bool";
@@ -286,7 +383,7 @@ AgentIOPM* JsonHelper::_createModelOfAgentIOP(QJsonObject jsonObject, AgentIOPTy
                     //QByteArray value = strValue.toUtf8();
 
                     agentIOP->setdefaultValue(QVariant(value));
-                    agentIOP->setdisplayableDefaultValue(strValue);
+                    //agentIOP->setdisplayableDefaultValue(strValue);
                 }
                 else {
                     qCritical() << "IOP '" << agentIOP->name() << "': The value '" << jsonValue << "' is not a data of bytes";
@@ -305,6 +402,77 @@ AgentIOPM* JsonHelper::_createModelOfAgentIOP(QJsonObject jsonObject, AgentIOPTy
     }
 
     return agentIOP;
+}
+
+
+/**
+ * @brief Get JSON object from an agent Input/Output/Parameter
+ * @param agentIOP
+ * @return
+ */
+QJsonObject JsonHelper::_getJsonForAgentIOP(AgentIOPM* agentIOP)
+{
+    QJsonObject jsonAgentIOP;
+
+    if (agentIOP != NULL)
+    {
+        jsonAgentIOP.insert("name", agentIOP->name());
+        jsonAgentIOP.insert("type", AgentIOPValueTypes::staticEnumToString(agentIOP->agentIOPValueType()));
+
+        switch (agentIOP->agentIOPValueType())
+        {
+        case AgentIOPValueTypes::INTEGER:
+        {
+            bool success = false;
+            int number = agentIOP->defaultValue().toInt(&success);
+            if (success) {
+                jsonAgentIOP.insert("value", number);
+            }
+            else {
+                jsonAgentIOP.insert("value", 0);
+                qWarning() << "Default value" << agentIOP->displayableDefaultValue() << "of I/O/P" << agentIOP->name() << "is NOT an int !";
+            }
+        }
+            break;
+
+        case AgentIOPValueTypes::DOUBLE:
+        {
+            bool success = false;
+            double number = agentIOP->defaultValue().toDouble(&success);
+            if (success) {
+                jsonAgentIOP.insert("value", number);
+            }
+            else {
+                jsonAgentIOP.insert("value", 0.0);
+                qWarning() << "Default value" << agentIOP->displayableDefaultValue() << "of I/O/P" << agentIOP->name() << "is NOT a double !";
+            }
+        }
+            break;
+
+        case AgentIOPValueTypes::STRING:
+            jsonAgentIOP.insert("value", agentIOP->defaultValue().toString());
+            break;
+
+        case AgentIOPValueTypes::BOOL:
+            jsonAgentIOP.insert("value", agentIOP->defaultValue().toString());
+            break;
+
+        case AgentIOPValueTypes::IMPULSION:
+            jsonAgentIOP.insert("value", "");
+            break;
+
+        case AgentIOPValueTypes::DATA:
+            //jsonAgentIOP.insert("value", agentIOP->defaultValue().toString());
+            jsonAgentIOP.insert("value", agentIOP->displayableDefaultValue());
+            break;
+
+        default:
+            jsonAgentIOP.insert("value", "");
+            break;
+        }
+    }
+
+    return jsonAgentIOP;
 }
 
 

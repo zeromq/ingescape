@@ -76,7 +76,7 @@ ApplicationWindow {
                 onTriggered: {
                     console.log("Exporter la liste d'agents");
 
-                    if (MasticEditorC.agentsSupervisionC != NULL) {
+                    if (MasticEditorC.agentsSupervisionC) {
                         MasticEditorC.agentsSupervisionC.exportAgentsList();
                     }
                 }

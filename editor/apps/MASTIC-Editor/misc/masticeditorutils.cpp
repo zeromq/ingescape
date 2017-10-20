@@ -134,13 +134,24 @@ QString MasticEditorUtils::getSnapshotsPath()
 
 
 /**
- * @brief Get (and create if needed) the agents (Definitions and Mappings) path of our application
- * "[DocumentsLocation]/MASTIC/Agents/"
+ * @brief Get (and create if needed) the path with files about agents list
+ * "[DocumentsLocation]/MASTIC/AgentsList/"
  * @return
  */
-QString MasticEditorUtils::getAgentsDefinitionsAndMappingsPath()
+QString MasticEditorUtils::getAgentsListPath()
 {
-    return MasticEditorUtils::_getSubDirectoryPath("Agents");
+    return MasticEditorUtils::_getSubDirectoryPath("AgentsList");
+}
+
+
+/**
+ * @brief Get (and create if needed) the path with files about agents mappings
+ * "[DocumentsLocation]/MASTIC/AgentsMappings/"
+ * @return
+ */
+QString MasticEditorUtils::getAgentsMappingsPath()
+{
+    return MasticEditorUtils::_getSubDirectoryPath("AgentsMappings");
 }
 
 

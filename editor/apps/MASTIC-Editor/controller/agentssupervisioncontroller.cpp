@@ -152,7 +152,24 @@ void AgentsSupervisionController::openDefinition(AgentVM* agent)
  */
 void AgentsSupervisionController::exportAgentsList()
 {
+    if (_modelManager != NULL)
+    {
+        // List of pairs <agent name, definition>
+        QList<QPair<QString, DefinitionM*>> agentsListToExport;
 
+        foreach (AgentVM* agent, _agentsList.toList())
+        {
+            if ((agent != NULL) && !agent->name().isEmpty() && (agent->definition() != NULL))
+            {
+                QPair<QString, DefinitionM*> pair;
+                pair.first = agent->name();
+                pair.second = agent->definition();
+
+                agentsListToExport.append(pair);
+            }
+        }
+        _modelManager->exportAgentsList(agentsListToExport);
+    }
 }
 
 
