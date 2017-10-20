@@ -62,13 +62,6 @@ public:
 
 
     /**
-     * @brief Delete the previous view model of Agent
-     * @param agent
-     */
-    void deleteAgentViewModel(AgentVM* agent);
-
-
-    /**
      * @brief Delete an agent from the list
      * @param agent to delete
      */
@@ -130,6 +123,15 @@ public Q_SLOTS:
      * @param agent
      */
     void onAgentDefinitionCreated(DefinitionM* definition, AgentM* agent);
+
+
+private:
+
+    /**
+     * @brief Delete the view model of Agent
+     * @param agent
+     */
+    void _deleteAgentViewModel(AgentVM* agent);
 
 
 private:
