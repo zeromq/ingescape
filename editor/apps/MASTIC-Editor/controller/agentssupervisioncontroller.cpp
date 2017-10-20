@@ -73,28 +73,6 @@ QList<AgentVM*> AgentsSupervisionController::getAgentViewModelsListFromName(QStr
 
 
 /**
- * @brief Delete the previous view model of Agent
- * @param agent
- */
-void AgentsSupervisionController::deleteAgentViewModel(AgentVM* agent)
-{
-    if (agent != NULL)
-    {
-        // Get the list of view models of agent from a name
-        QList<AgentVM*> agentViewModelsList = getAgentViewModelsListFromName(agent->name());
-        agentViewModelsList.removeOne(agent);
-
-        // Update the list in the map
-        _mapFromNameToAgentViewModelsList.insert(agent->name(), agentViewModelsList);
-
-        // Free memory
-        delete agent;
-    }
-}
-
-
-
-/**
  * @brief Delete an agent from the list
  * @param agent to delete
  */
@@ -123,12 +101,8 @@ void AgentsSupervisionController::deleteAgent(AgentVM* agent)
             _modelManager->deleteAgentModel(model);
         }
 
-        // Stop propagation of signals "Command Asked (for output)"
-        disconnect(agent, &AgentVM::commandAsked, this, &AgentsSupervisionController::commandAsked);
-        disconnect(agent, &AgentVM::commandAskedForOutput, this, &AgentsSupervisionController::commandAskedForOutput);
-
         // Delete the view model of agent
-        deleteAgentViewModel(agent);
+        _deleteAgentViewModel(agent);
         agent = NULL;
     }
 }
@@ -269,7 +243,7 @@ void AgentsSupervisionController::onAgentDefinitionCreated(DefinitionM* definiti
                 _agentsList.remove(agentVM);
 
                 // 2- Delete it
-                deleteAgentViewModel(agentVM);
+                _deleteAgentViewModel(agentVM);
                 agentVM = NULL;
 
                 // 3- The current definition for this new agent is useless, we have to delete it
@@ -347,5 +321,30 @@ void AgentsSupervisionController::onAgentDefinitionCreated(DefinitionM* definiti
                 Q_EMIT agentDefinitionManaged(agentName, definition);
             }
         }
+    }
+}
+
+
+/**
+ * @brief Delete the view model of Agent
+ * @param agent
+ */
+void AgentsSupervisionController::_deleteAgentViewModel(AgentVM* agent)
+{
+    if (agent != NULL)
+    {
+        // Get the list of view models of agent from a name
+        QList<AgentVM*> agentViewModelsList = getAgentViewModelsListFromName(agent->name());
+        agentViewModelsList.removeOne(agent);
+
+        // Update the list in the map
+        _mapFromNameToAgentViewModelsList.insert(agent->name(), agentViewModelsList);
+
+        // Stop propagation of signals "Command Asked (for output)"
+        disconnect(agent, &AgentVM::commandAsked, this, &AgentsSupervisionController::commandAsked);
+        disconnect(agent, &AgentVM::commandAskedForOutput, this, &AgentsSupervisionController::commandAskedForOutput);
+
+        // Free memory
+        delete agent;
     }
 }
