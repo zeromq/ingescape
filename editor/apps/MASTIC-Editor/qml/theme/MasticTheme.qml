@@ -72,12 +72,18 @@ Item {
     readonly property color whiteColor: "#FFFFFF"
     readonly property color blackColor: "#17191E"
 
-    readonly property color redColor: "#E30613"
+    readonly property color redColor: "#E30513"
+    readonly property color darkRedColor:"#7A110E"
 
     readonly property color veryDarkGreyColor: "#282D34"
     readonly property color darkGreyColor: "#3C424F"
+    readonly property color darkGreyColor2: "#2B3137"
+    readonly property color greyColor : "#525A66"
+    readonly property color greyColor2 : "#3B424F"
+    readonly property color lightGreyColor : "#9D9C9C"
+
     readonly property color blueGreyColor: "#8896AA"
-    readonly property color darkBlueGreyColor: "#535A66"
+    readonly property color darkBlueGreyColor: "#525A66"
 
 
 
@@ -170,14 +176,19 @@ Item {
 
     // Labels
     readonly property color agentsListLabelColor: theme.whiteColor
+    readonly property color agentsListLabel2Color: theme.whiteColor
+    readonly property color agentsListPressedLabel2Color: theme.lightGreyColor
     readonly property color agentsListTextColor: theme.blueGreyColor
 
-    readonly property color agentOFFLabelColor: theme.darkBlueGreyColor
-    readonly property color agentOFFTextColor: theme.darkGreyColor
+    readonly property color agentOFFLabelColor: theme.lightGreyColor
+    readonly property color agentOFFLabel2Color: theme.lightGreyColor
+    readonly property color agentOFFPressedLabel2Color: theme.greyColor // TO CHANGE
+    readonly property color agentOFFTextColor: theme.greyColor2
 
 
     // List
     readonly property color agentsListItemBackgroundColor: theme.veryDarkGreyColor
+    readonly property color agentsListItemRollOverBackgroundColor: theme.darkGreyColor2
 
     // Selected Agent
     readonly property color selectedAgentColor: theme.orangeColor
