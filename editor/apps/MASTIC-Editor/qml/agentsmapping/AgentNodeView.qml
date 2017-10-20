@@ -97,7 +97,7 @@ Item {
 
 
         Repeater {
-            // List of intput slots VM (AgentIOPVM)
+            // List of intput slots VM
             model: 0
 
             delegate: Item {
@@ -150,7 +150,7 @@ Item {
 
 
         Repeater {
-            // List of output slots VM (AgentIOPVM)
+            // List of output slots VM
             model: 0
 
             delegate: Item {

@@ -72,8 +72,7 @@ AgentVM::~AgentVM()
 {
     qInfo() << "Delete View Model of Agent" << _name;
 
-    if (_definition != NULL)
-    {   
+    if (_definition != NULL) {
         setdefinition(NULL);
     }
 
@@ -116,11 +115,6 @@ void AgentVM::setdefinition(DefinitionM *value)
     {
         // Previous value
         if (_definition != NULL) {
-            // Delete all previous Inputs / Outputs / Parameters
-            //_inputsList.deleteAllItems();
-            //_outputsList.deleteAllItems();
-            //_parametersList.deleteAllItems();
-
             // DIS-connect from signal "Command Asked" from the previous definition
             disconnect(_definition, &DefinitionM::commandAsked, this, &AgentVM::onCommandAskedForOutput);
         }
@@ -128,52 +122,7 @@ void AgentVM::setdefinition(DefinitionM *value)
         _definition = value;
 
         // New value
-        if (_definition != NULL)
-        {
-            //
-            // Create the list of VM of inputs
-            //
-            /*QList<AgentIOPVM*> listOfInputVMs;
-            foreach (AgentIOPM* inputM, _definition->inputsList()->toList())
-            {
-                if (inputM != NULL)
-                {
-                    AgentIOPVM* inputVM = new AgentIOPVM(inputM, this);
-                    listOfInputVMs.append(inputVM);
-                }
-            }
-            _inputsList.append(listOfInputVMs);*/
-
-
-            //
-            // Create the list of VM of outputs
-            //
-            /*QList<AgentIOPVM*> listOfOutputVMs;
-            foreach (AgentIOPM* outputM, _definition->outputsList()->toList())
-            {
-                if (outputM != NULL)
-                {
-                    AgentIOPVM* outputVM = new AgentIOPVM(outputM, this);
-                    listOfOutputVMs.append(outputVM);
-                }
-            }
-            _outputsList.append(listOfOutputVMs);*/
-
-
-            //
-            // Create the list of VM of parameters
-            //
-            /*QList<AgentIOPVM*> listOfParameterVMs;
-            foreach (AgentIOPM* parameterM, _definition->parametersList()->toList())
-            {
-                if (parameterM != NULL)
-                {
-                    AgentIOPVM* parameterVM = new AgentIOPVM(parameterM, this);
-                    listOfParameterVMs.append(parameterVM);
-                }
-            }
-            _parametersList.append(listOfParameterVMs);*/
-
+        if (_definition != NULL) {
             // Connect to signal "Command Asked" from the new definition
             connect(_definition, &DefinitionM::commandAsked, this, &AgentVM::onCommandAskedForOutput);
         }
