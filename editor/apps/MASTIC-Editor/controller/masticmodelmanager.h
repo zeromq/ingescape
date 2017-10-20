@@ -146,6 +146,12 @@ public:
 
 
     /**
+     * @brief Import an agent from selected files (definition and mapping)
+     */
+    Q_INVOKABLE void importAgentFromSelectedFiles();
+
+
+    /**
      * @brief Export the agents list to default file
      * @param agentsListToExport list of pairs <agent name, definition>
      */
@@ -258,18 +264,18 @@ private:
 
 
     /**
+     * @brief Import an agent from JSON files (definition and mapping)
+     * @param subDirectoryPath
+     */
+    void _importAgentFromFiles(QStringList agentFilesPaths);
+
+
+    /**
      * @brief Export the agents list to JSON file
      * @param agentsListToExport list of pairs <agent name, definition>
      * @param agentsListFilePath
      */
     void _exportAgentsListToFile(QList<QPair<QString, DefinitionM*>> agentsListToExport, QString agentsListFilePath);
-
-
-    /**
-     * @brief Initialize an agent (from JSON files) inside a sub directory
-     * @param subDirectoryPath
-     */
-    void _initAgentInsideSubDirectory(QString subDirectoryPath);
 
 
     /**

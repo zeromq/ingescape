@@ -44,7 +44,7 @@
     }
   },
   {
-    "agentName": "macos Agent 1",
+    "agentName": "win Agent 1",
     "definition": {
       "name": "winAgent",
       "description": "winAgent bla bla bla",
