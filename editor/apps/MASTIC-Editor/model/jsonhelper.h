@@ -48,14 +48,19 @@ public:
 
 
     /**
-     * @brief Create a model of agent definition from JSON file content
+     * @brief Initialize agents list from JSON file
+     * @param byteArrayOfJson
+     * @return
+     */
+    QList<QPair<QString, DefinitionM*>> initAgentsList(QByteArray byteArrayOfJson);
+
+
+    /**
+     * @brief Create a model of agent definition from JSON file
      * @param byteArrayOfJson
      * @return
      */
     DefinitionM* createModelOfDefinition(QByteArray byteArrayOfJson);
-
-
-    void getAgentsList(QByteArray byteArrayOfJson);
 
 
     /**

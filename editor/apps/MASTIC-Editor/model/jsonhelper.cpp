@@ -36,7 +36,52 @@ JsonHelper::~JsonHelper()
 
 
 /**
- * @brief Create a model of agent definition from JSON file content
+ * @brief Initialize agents list from JSON file
+ * @param byteArrayOfJson
+ * @return
+ */
+QList<QPair<QString, DefinitionM*>> JsonHelper::initAgentsList(QByteArray byteArrayOfJson)
+{
+    QList<QPair<QString, DefinitionM*>> agentsListToImport;
+
+    QJsonDocument jsonAgentsList = QJsonDocument::fromJson(byteArrayOfJson);
+    if (jsonAgentsList.isArray())
+    {
+        foreach (QJsonValue jsonValue, jsonAgentsList.array()) {
+            if (jsonValue.isObject()) {
+                QJsonObject jsonAgent = jsonValue.toObject();
+
+                // Get value for keys "agentName" and "definition"
+                QJsonValue jsonName = jsonAgent.value("agentName");
+                QJsonValue jsonDefinition = jsonAgent.value("definition");
+
+                if (jsonName.isString() && jsonDefinition.isObject())
+                {
+                    // Create a model of agent definition from JSON object
+                    DefinitionM* definition = _createModelOfDefinitionFromJSON(jsonDefinition.toObject());
+                    if (definition != NULL)
+                    {
+                        qDebug() << "Initialize agent" << jsonName.toString() << "with definition" << definition->name();
+
+                        // Create a pair with agent name and definition
+                        QPair<QString, DefinitionM*> pair;
+                        pair.first = jsonName.toString();
+                        pair.second = definition;
+
+                        // Add the pair to the list
+                        agentsListToImport.append(pair);
+                    }
+                }
+            }
+        }
+    }
+
+    return agentsListToImport;
+}
+
+
+/**
+ * @brief Create a model of agent definition from JSON file
  * @param byteArrayOfJson
  * @return
  */
@@ -61,36 +106,6 @@ DefinitionM* JsonHelper::createModelOfDefinition(QByteArray byteArrayOfJson)
 }
 
 
-
-void JsonHelper::getAgentsList(QByteArray byteArrayOfJson)
-{
-    QJsonDocument jsonAgentsList = QJsonDocument::fromJson(byteArrayOfJson);
-    if (jsonAgentsList.isArray())
-    {
-        foreach (QJsonValue jsonValue, jsonAgentsList.array()) {
-            if (jsonValue.isObject())
-            {
-                QJsonObject jsonAgent = jsonValue.toObject();
-
-                QJsonValue jsonName = jsonAgent.value("agentName");
-                QJsonValue jsonDefinition = jsonAgent.value("definition");
-
-                if (jsonName.isString() && jsonDefinition.isObject()) {
-                    // Create a model of agent definition from JSON object
-                    DefinitionM* definition = _createModelOfDefinitionFromJSON(jsonDefinition.toObject());
-
-                    if (definition != NULL) {
-                        qDebug() << "agent" << jsonName.toString() << "definition" << definition->name();
-                    }
-                }
-            }
-        }
-    }
-
-    // TODO
-}
-
-
 /**
  * @brief Export the agents list
  * @param agentsListToExport list of pairs <agent name, definition>
@@ -107,13 +122,12 @@ QByteArray JsonHelper::exportAgentsList(QList<QPair<QString, DefinitionM*>> agen
         QString agentName = pair.first;
         DefinitionM* definition = pair.second;
 
-        QJsonObject jsonAgent;
+        if (!agentName.isEmpty() && (definition != NULL))
+        {
+            QJsonObject jsonAgent;
+            jsonAgent.insert("agentName", agentName);
 
-        jsonAgent.insert("agentName", agentName);
-
-        if (definition != NULL) {
             QJsonObject jsonDefinition;
-
             jsonDefinition.insert("name", definition->name());
             jsonDefinition.insert("version", definition->version());
             jsonDefinition.insert("description", definition->description());
@@ -153,9 +167,9 @@ QByteArray JsonHelper::exportAgentsList(QList<QPair<QString, DefinitionM*>> agen
             jsonDefinition.insert("parameters", jsonParameters);
 
             jsonAgent.insert("definition", jsonDefinition);
-        }
 
-        jsonArray.append(jsonAgent);
+            jsonArray.append(jsonAgent);
+        }
     }
 
     QJsonDocument jsonDocument = QJsonDocument(jsonArray);
@@ -291,8 +305,8 @@ DefinitionM* JsonHelper::_createModelOfDefinitionFromJSON(QJsonObject jsonDefini
         QString md5Hash = QString(QCryptographicHash::hash(byteArray, QCryptographicHash::Md5).toHex());
         definition->setmd5Hash(md5Hash);
 
-        qDebug() << "json:" << jsonDefinition;
-        qDebug() << "md5:" << md5Hash;
+        //qDebug() << "json:" << jsonDefinition;
+        //qDebug() << "md5:" << md5Hash;
     }
 
     return definition;

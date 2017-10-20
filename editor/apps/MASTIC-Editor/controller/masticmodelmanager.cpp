@@ -78,8 +78,33 @@ void MasticModelManager::initAgentsList()
             QByteArray byteArrayOfJson = jsonFile.readAll();
             jsonFile.close();
 
-            // TODO
-            _jsonHelper->getAgentsList(byteArrayOfJson);
+            // Initialize agents list from JSON file
+            QList<QPair<QString, DefinitionM*>> agentsListToImport = _jsonHelper->initAgentsList(byteArrayOfJson);
+
+            for (int i = 0; i < agentsListToImport.count(); i++)
+            {
+                QPair<QString, DefinitionM*> pair = agentsListToImport.at(i);
+                QString agentName = pair.first;
+                DefinitionM* agentDefinition = pair.second;
+
+                if (!agentName.isEmpty() && (agentDefinition != NULL))
+                {
+                    // Create a new model of agent with the name
+                    AgentM* agent = new AgentM(agentName, this);
+
+                    // Add this new model of agent
+                    addAgentModel(agent);
+
+                    // Emit the signal "Agent Model Created"
+                    Q_EMIT agentModelCreated(agent);
+
+                    // Add this new model of agent definition
+                    addAgentDefinition(agentDefinition);
+
+                    // Emit the signal "Agent Definition Created"
+                    Q_EMIT agentDefinitionCreated(agentDefinition, agent);
+                }
+            }
         }
         else {
             qCritical() << "Can not open file" << _agentsListFilePath;
