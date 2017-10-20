@@ -107,10 +107,13 @@ Item {
                     height : boundingBox.height
                     width :  boundingBox.width
 
-                    visible : (model.status === AgentStatus.OFF)
+                    visible : (model.isON === false)
 
                     anchors {
-                        verticalCenter: parent.verticalCenter
+                        top: parent.top
+                        topMargin: 10
+                        right : parent.right
+                        rightMargin: 15
                     }
 
                     style: I2SvgButtonStyle {
@@ -118,13 +121,14 @@ Item {
 
                         pressedID: releasedID + "-pressed"
                         releasedID: "supprimer"
+                        disabledID : releasedID
                     }
 
                     onClicked: {
                         if (controller)
                         {
                             // Delete our agent
-                            controller.deleteAgent(model.QtObject);
+                            controller.deleteAgent();
                         }
                     }
                 }
@@ -304,12 +308,13 @@ Item {
                 style: I2SvgButtonStyle {
                     fileCache: MasticTheme.svgFileMASTIC
 
-                    pressedID: releasedID + "-pressed"
+                    pressedID: !model.isOFF? "on-pressed" : "off-pressed"
                     releasedID: model.isOFF? "on" : "off"
+                    disabledID : releasedID
                 }
 
                 onClicked: {
-                    model.QtObject.updateMuteAllOutputs(!model.isMuted);
+                    model.QtObject.changeState();
                 }
             }
 
@@ -330,12 +335,14 @@ Item {
                 style: I2SvgButtonStyle {
                     fileCache: MasticTheme.svgFileMASTIC
 
-                    pressedID: releasedID + "-pressed"
+                    pressedID: !model.isMuted? "muteactif-pressed" : "muteinactif-pressed"
                     releasedID: model.isMuted? "muteactif" : "muteinactif"
+                    disabledID : releasedID
+
                 }
 
                 onClicked: {
-                    model.QtObject.updateMuteAllOutputs(muteButton.checked);
+                    model.QtObject.changeMuteAllOutputs();
                 }
             }
 
@@ -358,12 +365,14 @@ Item {
                 style: I2SvgButtonStyle {
                     fileCache: MasticTheme.svgFileMASTIC
 
-                    pressedID: releasedID + "-pressed"
+                    pressedID: model.isFrozen? "freezeinactif-pressed" : "freezeactif-pressed"
                     releasedID: model.isFrozen? "freezeactif" : "freezeinactif"
+                    disabledID : releasedID
+
                 }
 
                 onClicked: {
-                    model.QtObject.updateFreeze(!model.isFrozen);
+                    model.QtObject.changeFreeze();
                 }
             }
 
