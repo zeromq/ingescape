@@ -161,9 +161,6 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
                     // Emit the signal "is Muted from Agent Updated"
                     Q_EMIT networkController->isMutedFromAgentUpdated(peerId, true);
                 }
-                else {
-                    qWarning() << peerName << "(" << peerId << ") MUTED";
-                }
             }
             // FROZEN / UN-FROZEN
             else if (message.startsWith(frozenPrefix))
@@ -247,6 +244,42 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
             else if (message.startsWith("MAPPED"))
             {
                 qDebug() << peerName << "MAPPED" << message;
+            }
+            // MUTED / UN-MUTED
+            if (message.startsWith(mutedAllPrefix))
+            {
+                message.remove(0, mutedAllPrefix.length());
+
+                if (message == "0") {
+                    //qDebug() << peerName << "(" << peerId << ") UN-MUTED";
+
+                    // Emit the signal "is Muted from Agent Updated"
+                    Q_EMIT networkController->isMutedFromAgentUpdated(peerId, false);
+                }
+                else if (message == "1") {
+                    //qDebug() << peerName << "(" << peerId << ") MUTED";
+
+                    // Emit the signal "is Muted from Agent Updated"
+                    Q_EMIT networkController->isMutedFromAgentUpdated(peerId, true);
+                }
+            }
+            // FROZEN / UN-FROZEN
+            else if (message.startsWith(frozenPrefix))
+            {
+                message.remove(0, frozenPrefix.length());
+
+                if (message == "0") {
+                    //qDebug() << peerName << "(" << peerId << ") UN-FROZEN";
+
+                    // Emit the signal "is Frozen from Agent Updated"
+                    Q_EMIT networkController->isFrozenFromAgentUpdated(peerId, false);
+                }
+                else if (message == "1") {
+                    //qDebug() << peerName << "(" << peerId << ") FROZEN";
+
+                    // Emit the signal "is Frozen from Agent Updated"
+                    Q_EMIT networkController->isFrozenFromAgentUpdated(peerId, true);
+                }
             }
             else
             {
