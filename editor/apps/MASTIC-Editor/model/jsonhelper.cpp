@@ -178,8 +178,6 @@ QByteArray JsonHelper::exportAgentsList(QList<QPair<QString, DefinitionM*>> agen
 
 /**
  * @brief Create a model of agent mapping with JSON and the input agent name corresponding
- * TODOESTIA : the input agent name will be extract from the network event "mapping"
- * (voir avec vincent à l'appel de la fonction createModelOfAgentMapping dans networkmanager quand MAPPING event)
  * @param inputAgentName, byteArrayOfJson
  * @return
  */
@@ -212,9 +210,8 @@ AgentMappingM* JsonHelper::createModelOfAgentMapping(QString inputAgentName, QBy
                     foreach (QJsonValue jsonMap, jsonMappingOut.toArray()) {
                         if (jsonMap.isObject())
                         {
-                            ElementMappingM* elementMapping = _createModelOfElementMapping (jsonMap.toObject());
+                            ElementMappingM* elementMapping = _createModelOfElementMapping(inputAgentName, jsonMap.toObject());
                             if (elementMapping != NULL) {
-                                elementMapping->setinputAgent(inputAgentName);
                                 agentMapping->elementMappingsList()->append(elementMapping);
                             }
                         }
@@ -508,10 +505,11 @@ QJsonObject JsonHelper::_getJsonFromAgentIOP(AgentIOPM* agentIOP)
 
 /**
  * @brief Create a model of element mapping Input name/Output agent name/Output name with JSON
+ * @param inputAgentName
  * @param jsonObject
  * @return
  */
-ElementMappingM* JsonHelper::_createModelOfElementMapping(QJsonObject jsonObject)
+ElementMappingM* JsonHelper::_createModelOfElementMapping(QString inputAgentName, QJsonObject jsonObject)
 {
     ElementMappingM* elementMapping = NULL;
 
@@ -522,12 +520,10 @@ ElementMappingM* JsonHelper::_createModelOfElementMapping(QJsonObject jsonObject
     //All the members need to be completed
     if (jsonInputName.isString() && jsonAgentName.isString() && jsonOutputName.isString())
     {
-        elementMapping = new ElementMappingM(NULL,
+        elementMapping = new ElementMappingM(inputAgentName,
                                              jsonInputName.toString(),
                                              jsonAgentName.toString(),
                                              jsonOutputName.toString());
-
-
     }
 
     return elementMapping;

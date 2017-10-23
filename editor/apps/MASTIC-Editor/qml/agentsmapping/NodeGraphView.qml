@@ -209,7 +209,7 @@ Item {
 
                 //----------------------------------------
                 // TODO: replace with a Repeater
-                //       model: list of LinkVM
+                //       model: list of MapBetweenIOPVM
 
                 //
                 // Link between [item1, nodeOut] and [item3, nodein1]

@@ -113,10 +113,11 @@ private:
 
     /**
      * @brief Create a model of element mapping Input name/Output agent name/Output name with JSON
+     * @param inputAgentName
      * @param jsonObject
      * @return
      */
-    ElementMappingM* _createModelOfElementMapping(QJsonObject jsonObject);
+    ElementMappingM* _createModelOfElementMapping(QString inputAgentName, QJsonObject jsonObject);
 };
 
 #endif // JSONHELPER_H
