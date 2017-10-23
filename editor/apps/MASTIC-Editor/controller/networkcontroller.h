@@ -51,6 +51,21 @@ public:
     ~NetworkController();
 
 
+    /**
+     * @brief Called when a MASTIC Launcher enter the network
+     * @param hostname
+     * @param peerId
+     */
+    void masticLauncherEntered(QString hostname, QString peerId);
+
+
+    /**
+     * @brief Called when a MASTIC Launcher exit the network
+     * @param hostname
+     */
+    void masticLauncherExited(QString hostname);
+
+
 Q_SIGNALS:
 
     /**
@@ -120,6 +135,15 @@ Q_SIGNALS:
 public Q_SLOTS:
 
     /**
+     * @brief Slot when a command must be sent on the network to a launcher
+     * @param command
+     * @param hostname
+     * @param executionPath
+     */
+    void onCommandAskedToLauncher(QString command, QString hostname, QString executionPath);
+
+
+    /**
      * @brief Slot when a command must be sent on the network
      * @param command
      * @param peerIdsList
@@ -135,9 +159,10 @@ public Q_SLOTS:
      */
     void onCommandAskedForOutput(QString command, QString outputName, QStringList peerIdsList);
 
-protected:
+private:
 
-
+    // Map from "Hostname" to the "Peer Id" of the corresponding MASTIC launcher
+    QHash<QString, QString> _mapFromHostnameToMasticLauncherPeerId;
 
 };
 

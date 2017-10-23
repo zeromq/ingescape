@@ -27,6 +27,8 @@ extern "C" {
 #include "model/definitionm.h"
 
 
+static const QString launcherSuffix = ".masticlauncher";
+
 static const QString definitionPrefix = "EXTERNAL_DEFINITION#";
 static const QString mappingPrefix = "EXTERNAL_MAPPING#";
 
@@ -62,7 +64,11 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
         {
             qDebug() << QString("--> %1 has entered the network with peer id %2 (and address %3)").arg(peerName, peerId, peerAddress);
 
-            // TODO: name "masticlauncher.hostname"
+            // Mastic Launcher
+            if (peerName.endsWith(launcherSuffix)) {
+                QString hostname = peerName.left(peerName.length() - launcherSuffix.length());
+                networkController->masticLauncherEntered(hostname, peerId);
+            }
 
             bool isMasticPublisher = false;
             bool isIntPID = false;
@@ -293,6 +299,12 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
         {
             qDebug() << QString("<-- %1 (%2) exited").arg(peerName, peerId);
 
+            // Mastic Launcher
+            if (peerName.endsWith(launcherSuffix)) {
+                QString hostname = peerName.left(peerName.length() - launcherSuffix.length());
+                networkController->masticLauncherExited(hostname);
+            }
+
             // Emit the signal "Agent Exited"
             Q_EMIT networkController->agentExited(peerId, peerName);
         }
@@ -409,6 +421,59 @@ NetworkController::~NetworkController()
 {
     // Stop network services
     mtic_stop();
+}
+
+
+/**
+ * @brief Called when a MASTIC Launcher enter the network
+ * @param hostname
+ * @param peerId
+ */
+void NetworkController::masticLauncherEntered(QString hostname, QString peerId)
+{
+    qInfo() << "MASTIC Launcher on" << hostname << "entered";
+
+    _mapFromHostnameToMasticLauncherPeerId.insert(hostname, peerId);
+}
+
+
+/**
+ * @brief Called when a MASTIC Launcher exit the network
+ * @param hostname
+ */
+void NetworkController::masticLauncherExited(QString hostname)
+{
+    qInfo() << "MASTIC Launcher on" << hostname << "exited";
+
+    _mapFromHostnameToMasticLauncherPeerId.remove(hostname);
+}
+
+
+/**
+ * @brief Slot when a command must be sent on the network to a launcher
+ * @param command
+ * @param hostname
+ * @param executionPath
+ */
+void NetworkController::onCommandAskedToLauncher(QString command, QString hostname, QString executionPath)
+{
+    //Q_UNUSED(command)
+
+    if (!hostname.isEmpty() && !executionPath.isEmpty())
+    {
+        if (_mapFromHostnameToMasticLauncherPeerId.contains(hostname)) {
+            QString peerId = _mapFromHostnameToMasticLauncherPeerId.value(hostname);
+
+            if (!peerId.isEmpty()) {
+                qInfo() << "Send command" << command << "to launcher on" << hostname << "with execution path" << executionPath;
+
+                // FIXME TODO
+            }
+        }
+        else {
+            qInfo() << "There is no launcher on" << hostname;
+        }
+    }
 }
 
 

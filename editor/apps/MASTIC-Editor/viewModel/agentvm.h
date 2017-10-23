@@ -104,6 +104,14 @@ public:
 Q_SIGNALS:
 
     /**
+     * @brief Signal emitted when a command must be sent on the network to a launcher
+     * @param command
+     * @param hostname
+     * @param executionPath
+     */
+    void commandAskedToLauncher(QString command, QString hostname, QString executionPath);
+
+    /**
      * @brief Signal emitted when a command must be sent on the network
      * @param command
      * @param peerIdsList
