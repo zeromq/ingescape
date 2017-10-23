@@ -283,17 +283,26 @@ void AgentsSupervisionController::onAgentDefinitionCreated(DefinitionM* definiti
                         AgentM* model = agentUsingSameDefinition->models()->at(0);
                         if (model != NULL)
                         {
-                            // We replace the fake model of agent
-                            agentUsingSameDefinition->models()->replace(0, agent);
+                            // If the new model has a peer id (not only definition)
+                            if (model->peerId().isEmpty() && !agent->peerId().isEmpty())
+                            {
+                                // We replace the fake model of agent
+                                agentUsingSameDefinition->models()->replace(0, agent);
 
-                            qDebug() << "Replace model (which had only definition) by agent" << agentName << "on" << agent->address();
+                                qDebug() << "Replace model (which had only definition) by agent" << agentName << "on" << agent->address();
 
-                            // Delete the previous (fake) model of agent
-                            _modelManager->deleteAgentModel(model);
-                            model = NULL;
+                                // Delete the previous (fake) model of agent
+                                _modelManager->deleteAgentModel(model);
+                                model = NULL;
 
-                            // Update the flag "Has Only Definition"
-                            agentUsingSameDefinition->sethasOnlyDefinition(false);
+                                // Update the flag "Has Only Definition"
+                                agentUsingSameDefinition->sethasOnlyDefinition(false);
+                            }
+                            else {
+                                // Delete this new (fake) model of agent
+                                _modelManager->deleteAgentModel(agent);
+                                agent = NULL;
+                            }
                         }
                     }
                 }
