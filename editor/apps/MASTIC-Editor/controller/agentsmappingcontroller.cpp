@@ -79,7 +79,7 @@ void AgentsMappingController::addAgentDefinitionToMappingAtPosition(QString agen
             qDebug() << "TODO ESTIA: add VM for agent name" << agentName << "and definition" << definition->name() << "at" << position.x() << position.y();
         }
 
-        AgentInMappingVM * newAgentInMapping;
+        AgentInMappingVM * newAgentInMapping = NULL;
 
         //Extract the name of tha agent
         QString agentName = definition->name();

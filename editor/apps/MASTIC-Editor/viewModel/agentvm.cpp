@@ -114,8 +114,8 @@ void AgentVM::setdefinition(DefinitionM *value)
     {
         // Previous value
         if (_definition != NULL) {
-            // DIS-connect from signal "Command Asked" from the previous definition
-            disconnect(_definition, &DefinitionM::commandAsked, this, &AgentVM::onCommandAskedForOutput);
+            // DIS-connect from signals from the previous definition
+            disconnect(_definition, 0, this, 0);
         }
 
         _definition = value;
