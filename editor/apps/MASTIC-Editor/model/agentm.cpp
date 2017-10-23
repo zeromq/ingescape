@@ -68,3 +68,14 @@ AgentM::~AgentM()
 {
     qInfo() << "Delete Model of Agent" << _name << "(" << _peerId << ") at" << _address;
 }
+
+
+/**
+ * @brief Set the flag "is Muted" of an Output of our agent
+ * @param isMuted
+ * @param outputName
+ */
+/*void AgentM::setisMutedOfOutput(bool isMuted, QString outputName)
+{
+
+}*/

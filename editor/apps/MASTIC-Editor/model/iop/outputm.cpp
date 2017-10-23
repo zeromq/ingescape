@@ -65,7 +65,4 @@ void OutputM::changeMuteOutput()
     else {
         Q_EMIT commandAsked("MUTE", _name);
     }
-
-    // FIXME
-    setisMuted(!_isMuted);
 }

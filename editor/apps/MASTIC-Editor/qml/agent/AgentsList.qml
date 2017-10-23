@@ -221,7 +221,7 @@ Item {
 
                 onClicked: {
                     console.log("Importer Agent")
-                    //controller.importAgent();
+                    MasticEditorC.modelManager.importAgentFromSelectedFiles();
                 }
             }
 

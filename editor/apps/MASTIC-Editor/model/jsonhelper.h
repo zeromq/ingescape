@@ -48,11 +48,26 @@ public:
 
 
     /**
-     * @brief Create a model of agent definition with JSON
+     * @brief Initialize agents list from JSON file
+     * @param byteArrayOfJson
+     * @return
+     */
+    QList<QPair<QString, DefinitionM*>> initAgentsList(QByteArray byteArrayOfJson);
+
+
+    /**
+     * @brief Create a model of agent definition from JSON file
      * @param byteArrayOfJson
      * @return
      */
     DefinitionM* createModelOfDefinition(QByteArray byteArrayOfJson);
+
+
+    /**
+     * @brief Export the agents list
+     * @param agentsListToExport list of pairs <agent name, definition>
+     */
+    QByteArray exportAgentsList(QList<QPair<QString, DefinitionM*>> agentsListToExport);
 
 
     /**
@@ -72,12 +87,28 @@ public Q_SLOTS:
 private:
 
     /**
-     * @brief Create a model of agent Input/Output/Parameter with JSON
+     * @brief Create a model of agent definition from JSON object
+     * @param jsonDefinition
+     * @return
+     */
+    DefinitionM* _createModelOfDefinitionFromJSON(QJsonObject jsonDefinition);
+
+
+    /**
+     * @brief Create a model of agent Input/Output/Parameter from JSON object
      * @param jsonObject
      * @param agentIOPType
      * @return
      */
     AgentIOPM* _createModelOfAgentIOP(QJsonObject jsonObject, AgentIOPTypes::Value agentIOPType);
+
+
+    /**
+     * @brief Get JSON object from an agent Input/Output/Parameter
+     * @param agentIOP
+     * @return
+     */
+    QJsonObject _getJsonFromAgentIOP(AgentIOPM* agentIOP);
 
 
     /**

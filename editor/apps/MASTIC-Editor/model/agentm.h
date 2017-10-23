@@ -106,6 +106,14 @@ public:
     ~AgentM();
 
 
+    /**
+     * @brief Set the flag "is Muted" of an Output of our agent
+     * @param isMuted
+     * @param outputName
+     */
+    //void setisMutedOfOutput(bool isMuted, QString outputName);
+
+
 Q_SIGNALS:
 
 public Q_SLOTS:

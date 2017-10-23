@@ -148,11 +148,34 @@ void AgentsSupervisionController::openDefinition(AgentVM* agent)
 
 
 /**
- * @brief Export the agents list
+ * @brief Export the agents list to default file
  */
-void AgentsSupervisionController::exportAgentsList()
+void AgentsSupervisionController::exportAgentsListToDefaultFile()
 {
+    if (_modelManager != NULL)
+    {
+        // Get the agents list to export
+        QList<QPair<QString, DefinitionM*>> agentsListToExport = _getAgentsListToExport();
 
+        // Export the agents list to default file
+        _modelManager->exportAgentsListToDefaultFile(agentsListToExport);
+    }
+}
+
+
+/**
+ * @brief Export the agents list to selected file
+ */
+void AgentsSupervisionController::exportAgentsListToSelectedFile()
+{
+    if (_modelManager != NULL)
+    {
+        // Get the agents list to export
+        QList<QPair<QString, DefinitionM*>> agentsListToExport = _getAgentsListToExport();
+
+        // Export the agents list to selected file
+        _modelManager->exportAgentsListToSelectedFile(agentsListToExport);
+    }
 }
 
 
@@ -326,6 +349,34 @@ void AgentsSupervisionController::onAgentDefinitionCreated(DefinitionM* definiti
 
 
 /**
+ * @brief Slot when the flag "is Muted" from an output of agent updated
+ * @param agent
+ * @param isMuted
+ * @param outputName
+ */
+void AgentsSupervisionController::onIsMutedFromOutputOfAgentUpdated(AgentM* agent, bool isMuted, QString outputName)
+{
+    if (agent != NULL) {
+        // Get the list of view models of agent from a name
+        QList<AgentVM*> agentViewModelsList = getAgentViewModelsListFromName(agent->name());
+
+        // Get the view model of agent that corresponds to our model
+        foreach (AgentVM* agentVM, agentViewModelsList)
+        {
+            // If the view model has not yet a definition and contains our model of agent
+            if ((agentVM != NULL) && agentVM->models()->contains(agent))
+            {
+                if (agentVM->definition() != NULL) {
+                    agentVM->definition()->setisMutedOfOutput(isMuted, outputName);
+                }
+                break;
+            }
+        }
+    }
+}
+
+
+/**
  * @brief Delete the view model of Agent
  * @param agent
  */
@@ -347,4 +398,28 @@ void AgentsSupervisionController::_deleteAgentViewModel(AgentVM* agent)
         // Free memory
         delete agent;
     }
+}
+
+
+/**
+ * @brief Get the agents list to export
+ * @return List of pairs <agent name, definition>
+ */
+QList<QPair<QString, DefinitionM*>> AgentsSupervisionController::_getAgentsListToExport()
+{
+    // List of pairs <agent name, definition>
+    QList<QPair<QString, DefinitionM*>> agentsListToExport;
+
+    foreach (AgentVM* agent, _agentsList.toList())
+    {
+        if ((agent != NULL) && !agent->name().isEmpty() && (agent->definition() != NULL))
+        {
+            QPair<QString, DefinitionM*> pair;
+            pair.first = agent->name();
+            pair.second = agent->definition();
+
+            agentsListToExport.append(pair);
+        }
+    }
+    return agentsListToExport;
 }

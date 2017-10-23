@@ -60,3 +60,21 @@ AgentIOPM::~AgentIOPM()
 {
 
 }
+
+
+/**
+ * @brief Setter for property "Default Value"
+ * @param value
+ */
+void AgentIOPM::setdefaultValue(QVariant value)
+{
+    if (_defaultValue != value)
+    {
+        _defaultValue = value;
+
+        // To String
+        setdisplayableDefaultValue(_defaultValue.toString());
+
+        Q_EMIT defaultValueChanged(value);
+    }
+}

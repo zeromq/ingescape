@@ -18,27 +18,25 @@
 #include <QQmlEngine>
 #include <QDebug>
 
-
-/**
- * @brief Default constructor
- * @param parent
- */
-MapBetweenIOPVM::MapBetweenIOPVM(AgentIOPVM *pointFrom, AgentIOPVM *pointTo, QObject *parent) : QObject(parent),
+MapBetweenIOPVM::MapBetweenIOPVM(PointMapVM *pointFrom, PointMapVM *pointTo, QObject *parent) : QObject(parent),
     _pointFrom(pointFrom),
     _pointTo(pointTo)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-
-    qInfo() << "Map created";
+    qInfo() << "Map Between "<<_pointFrom->iopModel()->name()<<"->"<<_pointTo->iopModel()->name()<<"created";
 }
 
+MapBetweenIOPVM::MapBetweenIOPVM(PointMapVM *pointFrom, QObject *parent) : QObject(parent),
+    _pointFrom(pointFrom)
+{
+    // Force ownership of our object, it will prevent Qml from stealing it
+    QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
+    qInfo() << "Map Between "<<_pointFrom->iopModel()->name()<<"created";
+}
 
-/**
- * @brief Destructor
- */
 MapBetweenIOPVM::~MapBetweenIOPVM()
 {
     qInfo() << "Map destroyed";

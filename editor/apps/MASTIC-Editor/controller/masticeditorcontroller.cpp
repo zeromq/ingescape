@@ -36,10 +36,16 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
 {
     qInfo() << "New MASTIC Editor Controller";
 
-    QString rootDirectoryPath = I2Utils::getOrCreateAppRootPathInDocumentDir("MASTIC");
-    if (!rootDirectoryPath.isEmpty())
-    {
-        _snapshotDirectory = QString("%1Snapshots").arg(rootDirectoryPath);
+    //
+    // Snapshots directory
+    //
+    QString snapshotsDirectoryPath = MasticEditorUtils::getSnapshotsPath();
+    QDir snapshotsDirectory(snapshotsDirectoryPath);
+    if (snapshotsDirectory.exists()) {
+        _snapshotDirectory = snapshotsDirectoryPath;
+    }
+    else {
+        qCritical() << "ERROR: could not create directory at '" << snapshotsDirectoryPath << "' !";
     }
 
 
@@ -57,13 +63,28 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     settings.endGroup();
 
 
+    //
+    // Agents lists & mappings
+    //
+    QString agentsListPath = MasticEditorUtils::getAgentsListPath();
+    QDir agentsListDir(agentsListPath);
+    if (!agentsListDir.exists()) {
+        qCritical() << "ERROR: could not create directory at '" << agentsListPath << "' !";
+    }
+
+    QString agentsMappingsPath = MasticEditorUtils::getAgentsMappingsPath();
+    QDir agentsMappingsDir(agentsMappingsPath);
+    if (!agentsMappingsDir.exists()) {
+        qCritical() << "ERROR: could not create directory at '" << agentsMappingsPath << "' !";
+    }
+
 
     //
     // Create sub-controllers
     //
 
     // Create the manager for the data model of MASTIC
-    _modelManager = new MasticModelManager(this);
+    _modelManager = new MasticModelManager(agentsListPath, agentsMappingsPath, this);
 
     // Create the controller for network communications
     _networkC = new NetworkController(_networkDevice, _ipAddress, _port, this);
@@ -82,13 +103,15 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     connect(_networkC, &NetworkController::definitionReceived, _modelManager, &MasticModelManager::onDefinitionReceived);
     connect(_networkC, &NetworkController::mappingReceived, _modelManager, &MasticModelManager::onMappingReceived);
     connect(_networkC, &NetworkController::agentExited, _modelManager, &MasticModelManager::onAgentExited);
-    connect(_networkC, &NetworkController::isMutedOfAgentUpdated, _modelManager, &MasticModelManager::onisMutedOfAgentUpdated);
-    connect(_networkC, &NetworkController::isFrozenOfAgentUpdated, _modelManager, &MasticModelManager::onIsFrozenOfAgentUpdated);
+    connect(_networkC, &NetworkController::isMutedFromAgentUpdated, _modelManager, &MasticModelManager::onisMutedFromAgentUpdated);
+    connect(_networkC, &NetworkController::isFrozenFromAgentUpdated, _modelManager, &MasticModelManager::onIsFrozenFromAgentUpdated);
+    connect(_networkC, &NetworkController::isMutedFromOutputOfAgentUpdated, _modelManager, &MasticModelManager::onIsMutedFromOutputOfAgentUpdated);
 
 
     // Connect to signals from the model manager
     connect(_modelManager, &MasticModelManager::agentModelCreated, _agentsSupervisionC, &AgentsSupervisionController::onAgentModelCreated);
     connect(_modelManager, &MasticModelManager::agentDefinitionCreated, _agentsSupervisionC, &AgentsSupervisionController::onAgentDefinitionCreated);
+    connect(_modelManager, &MasticModelManager::isMutedFromOutputOfAgentUpdated, _agentsSupervisionC, &AgentsSupervisionController::onIsMutedFromOutputOfAgentUpdated);
 
 
     // Connect to signals from the controller for supervision of agents
@@ -97,11 +120,8 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     connect(_agentsSupervisionC, &AgentsSupervisionController::agentDefinitionManaged, _agentsMappingC, &AgentsMappingController::addAgentDefinitionToMapping);
 
 
-    // Get the agents (Definitions and Mappings) path of our application
-    QString agentsDefinitionsAndMappingsDirectoryPath = MasticEditorUtils::getAgentsDefinitionsAndMappingsPath();
-
-    // Initialize agents (from JSON files) inside a directory
-    _modelManager->initAgentsInsideDirectory(agentsDefinitionsAndMappingsDirectoryPath);
+    // Initialize agents list from default file
+    _modelManager->importAgentsListFromDefaultFile();
 
 
     // TEMP sleep to display our loading screen

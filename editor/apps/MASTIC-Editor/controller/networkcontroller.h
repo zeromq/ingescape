@@ -93,19 +93,28 @@ Q_SIGNALS:
 
 
     /**
-     * @brief Signal emitted when the flag "is Muted" of an agent updated
+     * @brief Signal emitted when the flag "is Muted" from an agent updated
      * @param peerId
      * @param isMuted
      */
-    void isMutedOfAgentUpdated(QString peerId, bool isMuted);
+    void isMutedFromAgentUpdated(QString peerId, bool isMuted);
 
 
     /**
-     * @brief Signal emitted when the flag "is Frozen" of an agent updated
+     * @brief Signal emitted when the flag "is Frozen" from an agent updated
      * @param peerId
      * @param isFrozen
      */
-    void isFrozenOfAgentUpdated(QString peerId, bool isFrozen);
+    void isFrozenFromAgentUpdated(QString peerId, bool isFrozen);
+
+
+    /**
+     * @brief Signal emitted when the flag "is Muted" from an output of agent updated
+     * @param peerId
+     * @param isMuted
+     * @param outputName
+     */
+    void isMutedFromOutputOfAgentUpdated(QString peerId, bool isMuted, QString outputName);
 
 
 public Q_SLOTS:

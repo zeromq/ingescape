@@ -301,7 +301,7 @@ I2PopupBase {
 
                 onClicked: {
                     //console.log("QML: Mute/UN-mute output " + model.name);
-                    model.QtObject.updateMute(!model.isMuted);
+                    model.QtObject.changeMuteOutput();
                 }
             }
         }

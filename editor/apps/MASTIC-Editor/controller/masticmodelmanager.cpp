@@ -17,23 +17,32 @@
 
 #include <QQmlEngine>
 #include <QDebug>
+#include <QFileDialog>
 
 #include <I2Quick.h>
 
-#include <QJsonDocument>
-
-
 /**
  * @brief Default constructor
+ * @param agentsListDirectoryPath
+ * @param agentsMappingsDirectoryPath
  * @param parent
  */
-MasticModelManager::MasticModelManager(QObject *parent) : QObject(parent),
+MasticModelManager::MasticModelManager(QString agentsListDirectoryPath,
+                                       QString agentsMappingsDirectoryPath,
+                                       QObject *parent) : QObject(parent),
+    _agentsListDirectoryPath(agentsListDirectoryPath),
+    _agentsMappingsDirectoryPath(agentsMappingsDirectoryPath),
     _jsonHelper(NULL)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
     qInfo() << "New MASTIC Model Manager";
+
+    QDate today = QDate::currentDate();
+
+    _agentsListDefaultFilePath = QString("%1agents_list_%2.json").arg(_agentsListDirectoryPath, today.toString("ddMMyy"));
+    _agentsMappingsDefaultFilePath = QString("%1agents_mappings_%2.json").arg(_agentsMappingsDirectoryPath, today.toString("ddMMyy"));
 
     // Create the helper to manage JSON definitions of agents
     _jsonHelper = new JsonHelper(this);
@@ -45,33 +54,86 @@ MasticModelManager::MasticModelManager(QObject *parent) : QObject(parent),
  */
 MasticModelManager::~MasticModelManager()
 {
+    qInfo() << "Delete MASTIC Model Manager";
+
     // Delete all models of agents
     //qDeleteAll(_allAgentsModel);
 
-    qInfo() << "Delete MASTIC Model Manager";
+    // Clear all opened definitions
+    _openedDefinitions.clear();
 }
 
 
 /**
- * @brief Initialize agents (from JSON files) inside a directory
- * @param agentsDirectoryPath agents directory path
+ * @brief Import the agents list from default file
  */
-void MasticModelManager::initAgentsInsideDirectory(QString agentsDirectoryPath)
+void MasticModelManager::importAgentsListFromDefaultFile()
 {
-    QDir agentsDefinitionsAndMappingsDirectory(agentsDirectoryPath);
-    if (agentsDefinitionsAndMappingsDirectory.exists())
-    {
-        // Get all sub directories
-        QFileInfoList agentsDirectoriesList = agentsDefinitionsAndMappingsDirectory.entryInfoList(QDir::NoDotAndDotDot | QDir::AllDirs);
+    // Import the agents list from JSON file
+    _importAgentsListFromFile(_agentsListDefaultFilePath);
+}
 
-        // Traverse the list of sub directories
-        foreach (QFileInfo fileInfo, agentsDirectoriesList)
-        {
-            if (fileInfo.isDir()) {
-                // Initialize an agent (from JSON files) inside a sub directory
-                _initAgentInsideSubDirectory(fileInfo.absoluteFilePath());
-            }
-        }
+
+/**
+ * @brief Import an agents list from selected file
+ */
+void MasticModelManager::importAgentsListFromSelectedFile()
+{
+    // "File Dialog" to get the file (path) to open
+    QString agentsListFilePath = QFileDialog::getOpenFileName(NULL,
+                                                              "Importer un fichier JSON avec une liste d'agents",
+                                                              _agentsListDirectoryPath,
+                                                              "JSON (*.json)");
+
+    if(!agentsListFilePath.isEmpty()) {
+        // Import the agents list from JSON file
+        _importAgentsListFromFile(agentsListFilePath);
+    }
+}
+
+
+/**
+ * @brief Import an agent from selected files (definition and mapping)
+ */
+void MasticModelManager::importAgentFromSelectedFiles()
+{
+    // "File Dialog" to get the files (paths) to open
+    QStringList agentFilesPaths = QFileDialog::getOpenFileNames(NULL,
+                                                                "Importer le fichier de définition (et de mapping) d'un agent",
+                                                                _agentsListDirectoryPath,
+                                                                "JSON (*.json)");
+
+    // Import the agent from JSON files (definition and mapping)
+    _importAgentFromFiles(agentFilesPaths);
+}
+
+
+/**
+ * @brief Export the agents list to default file
+ * @param agentsListToExport list of pairs <agent name, definition>
+ */
+void MasticModelManager::exportAgentsListToDefaultFile(QList<QPair<QString, DefinitionM*>> agentsListToExport)
+{
+    // Export the agents list to JSON file
+    _exportAgentsListToFile(agentsListToExport, _agentsListDefaultFilePath);
+}
+
+
+/**
+ * @brief Export the agents list to selected file
+ * @param agentsListToExport list of pairs <agent name, definition>
+ */
+void MasticModelManager::exportAgentsListToSelectedFile(QList<QPair<QString, DefinitionM*>> agentsListToExport)
+{
+    // "File Dialog" to get the file (path) to save
+    QString agentsListFilePath = QFileDialog::getSaveFileName(NULL,
+                                                              "Sauvegarder dans un fichier JSON la liste d'agents",
+                                                              _agentsListDirectoryPath,
+                                                              "JSON (*.json)");
+
+    if(!agentsListFilePath.isEmpty()) {
+        // Export the agents list to JSON file
+        _exportAgentsListToFile(agentsListToExport, agentsListFilePath);
     }
 }
 
@@ -210,11 +272,11 @@ void MasticModelManager::onAgentExited(QString peerId, QString agentName)
 
 
 /**
- * @brief Slot when the flag "is Muted" of an agent updated
+ * @brief Slot when the flag "is Muted" from an agent updated
  * @param peerId
  * @param isMuted
  */
-void MasticModelManager::onisMutedOfAgentUpdated(QString peerId, bool isMuted)
+void MasticModelManager::onisMutedFromAgentUpdated(QString peerId, bool isMuted)
 {
     AgentM* agent = getAgentModelFromPeerId(peerId);
     if(agent != NULL) {
@@ -224,15 +286,33 @@ void MasticModelManager::onisMutedOfAgentUpdated(QString peerId, bool isMuted)
 
 
 /**
- * @brief Slot when the flag "is Frozen" of an agent updated
+ * @brief Slot when the flag "is Frozen" from an agent updated
  * @param peerId
  * @param isFrozen
  */
-void MasticModelManager::onIsFrozenOfAgentUpdated(QString peerId, bool isFrozen)
+void MasticModelManager::onIsFrozenFromAgentUpdated(QString peerId, bool isFrozen)
 {
     AgentM* agent = getAgentModelFromPeerId(peerId);
     if(agent != NULL) {
         agent->setisFrozen(isFrozen);
+    }
+}
+
+
+/**
+ * @brief Slot when the flag "is Muted" from an output of agent updated
+ * @param peerId
+ * @param isMuted
+ * @param outputName
+ */
+void MasticModelManager::onIsMutedFromOutputOfAgentUpdated(QString peerId, bool isMuted, QString outputName)
+{
+    AgentM* agent = getAgentModelFromPeerId(peerId);
+    if(agent != NULL) {
+        //agent->setisMutedOfOutput(isMuted, outputName);
+
+        // Propagate the signal with the model of agent
+        Q_EMIT isMutedFromOutputOfAgentUpdated(agent, isMuted, outputName);
     }
 }
 
@@ -421,29 +501,78 @@ QList<ElementMappingM*> MasticModelManager::getMergedListOfMappingElementsFromAg
 
 
 /**
- * @brief Initialize an agent (from JSON files) inside a sub directory
+ * @brief Import the agents list from JSON file
+ * @param agentsListFilePath
+ */
+void MasticModelManager::_importAgentsListFromFile(QString agentsListFilePath)
+{
+    if (!agentsListFilePath.isEmpty() && (_jsonHelper != NULL))
+    {
+        qInfo() << "Import the agents list from JSON file" << agentsListFilePath;
+
+        QFile jsonFile(agentsListFilePath);
+        if (jsonFile.exists()) {
+            if (jsonFile.open(QIODevice::ReadOnly))
+            {
+                QByteArray byteArrayOfJson = jsonFile.readAll();
+                jsonFile.close();
+
+                // Initialize agents list from JSON file
+                QList<QPair<QString, DefinitionM*>> agentsListToImport = _jsonHelper->initAgentsList(byteArrayOfJson);
+
+                for (int i = 0; i < agentsListToImport.count(); i++)
+                {
+                    QPair<QString, DefinitionM*> pair = agentsListToImport.at(i);
+                    QString agentName = pair.first;
+                    DefinitionM* agentDefinition = pair.second;
+
+                    if (!agentName.isEmpty() && (agentDefinition != NULL))
+                    {
+                        // Create a new model of agent with the name
+                        AgentM* agent = new AgentM(agentName, this);
+
+                        // Add this new model of agent
+                        addAgentModel(agent);
+
+                        // Emit the signal "Agent Model Created"
+                        Q_EMIT agentModelCreated(agent);
+
+                        // Add this new model of agent definition
+                        addAgentDefinition(agentDefinition);
+
+                        // Emit the signal "Agent Definition Created"
+                        Q_EMIT agentDefinitionCreated(agentDefinition, agent);
+                    }
+                }
+            }
+            else {
+                qCritical() << "Can not open file" << agentsListFilePath;
+            }
+        }
+        else {
+            qWarning() << "There is no file" << agentsListFilePath;
+        }
+    }
+}
+
+
+/**
+ * @brief Import an agent from JSON files (definition and mapping)
  * @param subDirectoryPath
  */
-void MasticModelManager::_initAgentInsideSubDirectory(QString subDirectoryPath)
+void MasticModelManager::_importAgentFromFiles(QStringList agentFilesPaths)
 {
-    QDir subDirectory(subDirectoryPath);
-    if (subDirectory.exists())
+    if ((agentFilesPaths.count() == 1) || (agentFilesPaths.count() == 2))
     {
-        QStringList nameFilters;
-        nameFilters << "*.json";
-
-        QFileInfoList agentsFilesList = subDirectory.entryInfoList(nameFilters);
-        qInfo() << agentsFilesList.count() << "files in directory" << subDirectory.absolutePath();
-
         DefinitionM* agentDefinition = NULL;
         AgentMappingM* agentMapping = NULL;
 
         // Only 1 file, it must be the definition
-        if (agentsFilesList.count() == 1)
+        if (agentFilesPaths.count() == 1)
         {
-            QFileInfo fileInfo = agentsFilesList.first();
+            QString agentFilePath = agentFilesPaths.first();
 
-            QFile jsonFile(fileInfo.absoluteFilePath());
+            QFile jsonFile(agentFilePath);
             if (jsonFile.open(QIODevice::ReadOnly))
             {
                 QByteArray byteArrayOfJson = jsonFile.readAll();
@@ -453,17 +582,17 @@ void MasticModelManager::_initAgentInsideSubDirectory(QString subDirectoryPath)
                 agentDefinition = _jsonHelper->createModelOfDefinition(byteArrayOfJson);
             }
             else {
-                qCritical() << "Can not open file" << fileInfo.absoluteFilePath();
+                qCritical() << "Can not open file" << agentFilePath;
             }
         }
         // 2 files, they must be the definition and the mapping
-        else if (agentsFilesList.count() == 2)
+        else if (agentFilesPaths.count() == 2)
         {
-            QFileInfo fileInfo1 = agentsFilesList.at(0);
-            QFileInfo fileInfo2 = agentsFilesList.at(1);
+            QString agentFilePath1 = agentFilesPaths.at(0);
+            QString agentFilePath2 = agentFilesPaths.at(1);
 
-            QFile jsonFile1(fileInfo1.absoluteFilePath());
-            QFile jsonFile2(fileInfo2.absoluteFilePath());
+            QFile jsonFile1(agentFilePath1);
+            QFile jsonFile2(agentFilePath2);
 
             if (jsonFile1.open(QIODevice::ReadOnly) && jsonFile2.open(QIODevice::ReadOnly))
             {
@@ -496,11 +625,8 @@ void MasticModelManager::_initAgentInsideSubDirectory(QString subDirectoryPath)
                 }
             }
             else {
-                qCritical() << "Can not open 2 files" << fileInfo1.absoluteFilePath() << "and" << fileInfo2.absoluteFilePath();
+                qCritical() << "Can not open 2 files" << agentFilePath1 << "and" << agentFilePath2;
             }
-        }
-        else {
-            qCritical() << "There are more than 2 JSON files in the directory" << subDirectory.absolutePath();
         }
 
         if (agentDefinition != NULL)
@@ -531,6 +657,33 @@ void MasticModelManager::_initAgentInsideSubDirectory(QString subDirectoryPath)
                 // Update the merged list of mapping elements for the agent name
                 _updateMergedListOfMappingElementsForAgentName(agent->name(), agentMapping);
             }
+        }
+    }
+}
+
+
+/**
+ * @brief Export the agents list to JSON file
+ * @param agentsListToExport list of pairs <agent name, definition>
+ * @param agentsListFilePath
+ */
+void MasticModelManager::_exportAgentsListToFile(QList<QPair<QString, DefinitionM*>> agentsListToExport, QString agentsListFilePath)
+{
+    if (!agentsListFilePath.isEmpty() && (_jsonHelper != NULL))
+    {
+        qInfo() << "Export the agents list to JSON file" << agentsListFilePath;
+
+        // Export the agents list
+        QByteArray byteArrayOfJson = _jsonHelper->exportAgentsList(agentsListToExport);
+
+        QFile jsonFile(agentsListFilePath);
+        if (jsonFile.open(QIODevice::WriteOnly))
+        {
+            jsonFile.write(byteArrayOfJson);
+            jsonFile.close();
+        }
+        else {
+            qCritical() << "Can not open file" << agentsListFilePath;
         }
     }
 }
