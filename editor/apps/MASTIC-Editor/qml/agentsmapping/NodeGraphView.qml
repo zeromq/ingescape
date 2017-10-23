@@ -301,6 +301,29 @@ Item {
                 // TODO: replace with a Repeater
                 //       model: list of AgentVM
 
+                Repeater {
+                    model : controller? controller.agentInMappingVMList : 0;
+
+
+                    AgentNodeView {
+                        id: agent
+                        agentVM : model.QtObject
+
+                        MouseArea {
+                            id: mouseArea
+
+                            anchors.fill: parent
+
+                            drag.target: parent
+
+                            onPressed: {
+                                parent.z = workspace.maxZ++;
+                            }
+                        }
+                    }
+                }
+
+
                 //
                 // Item 1
                 //
