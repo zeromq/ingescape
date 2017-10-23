@@ -94,10 +94,12 @@ private:
     /**
          * @brief This function check if the point map already exist in the list (input/output list)
          * @param list The list where to add the points map (input/output list)
-         * @param newPointMapVM The point map to add and so to check before
+         * @param agentName The name of the agent mapping VM
+         * @param iopName The name of the input/output to add
          */
     bool checkIfAlreadyInList(QList<PointMapVM *> list,
-                              PointMapVM* newPointMapVM);
+                              QString agentName,
+                              QString iopName);
 };
 
 QML_DECLARE_TYPE(AgentInMappingVM)

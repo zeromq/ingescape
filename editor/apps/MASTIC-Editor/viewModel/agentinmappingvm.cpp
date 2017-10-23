@@ -89,12 +89,21 @@ void AgentInMappingVM::addPointMapInInternalList(DefinitionM *newDefinition,
         {
             if (inputM != NULL)
             {
-                PointMapVM* inputPtMapVM = new PointMapVM(_agentName, inputM, this);
+
 
                 //Check if it's not alreafy exist in the list & add it
-                if(!checkIfAlreadyInList(list->toList(), inputPtMapVM))
+                if(!checkIfAlreadyInList(list->toList(),
+                                         _agentName,
+                                         inputM->name()))
                 {
+                    PointMapVM* inputPtMapVM = new PointMapVM(_agentName, inputM, this);
+
                     listOfPointMapTemp.append(inputPtMapVM);
+
+                    qInfo()<<"Add the new point in the list.";
+                }else
+                {
+                    qInfo() << "This point map : " << _agentName << "." << inputM->name()<<" is already present in the list.";
                 }
             }
         }
@@ -103,7 +112,8 @@ void AgentInMappingVM::addPointMapInInternalList(DefinitionM *newDefinition,
 }
 
 bool AgentInMappingVM::checkIfAlreadyInList(QList<PointMapVM *> list,
-                                            PointMapVM *newPointMapVM)
+                                            QString agentName,
+                                            QString iopName)
 {
     foreach (PointMapVM* iterator, list)
     {
@@ -111,13 +121,12 @@ bool AgentInMappingVM::checkIfAlreadyInList(QList<PointMapVM *> list,
         if ( (iterator != NULL)
              &&
              // Same agent name
-             (iterator->nameAgent() == newPointMapVM->nameAgent())
+             (iterator->nameAgent() == agentName)
              &&
              // Same Input name
-             (iterator->iopModel()->name() == newPointMapVM->iopModel()->name())
+             (iterator->iopModel()->name() == iopName)
              )
         {
-            qDebug() << "There is exactly the same point map for agent name : " << newPointMapVM->nameAgent() << "and input name : " << newPointMapVM->iopModel()->name();
 
             // Exactly the same point ('agent name' & 'iop name')
             return true;
