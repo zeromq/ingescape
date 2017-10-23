@@ -132,23 +132,23 @@ Item {
 
     // Heading font (level1)
     readonly property font headingFont: Qt.font({
-                                                 family: labelFontFamilyBlack,
-                                                 pixelSize: 20,
-                                                 weight: Font.Black
-                                                 });
+                                                    family: labelFontFamilyBlack,
+                                                    pixelSize: 20,
+                                                    weight: Font.Black
+                                                });
 
 
     // Heading font (level2)
     readonly property font heading2Font: Qt.font({
-                                                 family: textFontFamily,
-                                                 pixelSize: 16
+                                                     family: textFontFamily,
+                                                     pixelSize: 16
                                                  });
 
     // Normal font
     readonly property font normalFont: Qt.font({
-                                                family: textFontFamily,
-                                                pixelSize: 14
-                                                });
+                                                   family: textFontFamily,
+                                                   pixelSize: 14
+                                               });
 
 
 
@@ -232,9 +232,8 @@ Item {
     //
     readonly property color agentsMappingBackgroundColor: theme.blackColor
     // - grid
-    readonly property color agentsMappingGridLineColor:  theme.darkGreyColor
-    readonly property color agentsMappingGridSublineColor: theme.veryDarkGreyColor
-//"#29313A"
+    readonly property color agentsMappingGridLineColor:  "#3E414B"
+    readonly property color agentsMappingGridSublineColor: "#232830"
 
     //
     // Links
@@ -250,5 +249,10 @@ Item {
     readonly property color agentsMappingLinkPressColor: "firebrick"
 
 
+    //
+    // Agents
+    //
+    readonly property color agentsNameMappingColor : theme.whiteColor
+    readonly property color agentsInputsOutputsMappingColor : theme.whiteColor
 
 }
