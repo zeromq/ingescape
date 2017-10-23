@@ -130,7 +130,15 @@ public:
      * @param agentName
      * @return
      */
-    QList<ElementMappingM*> getMergedListOfMappingElementsFromAgentName(QString agentName);
+    QList<ElementMappingM*> getMergedListOfInputMappingElementsFromAgentName(QString agentName);
+
+
+    /**
+     * @brief Get the merged list of all (models of) mapping elements which connect an output of the agent
+     * @param agentName
+     * @return
+     */
+    QList<ElementMappingM*> getMergedListOfOutputMappingElementsFromAgentName(QString agentName);
 
 
     /**
@@ -304,11 +312,11 @@ private:
 
 
     /**
-     * @brief Update the merged list of mapping elements for the agent name
+     * @brief Update merged lists of mapping elements for the agent name
      * @param agentName
      * @param agentMapping
      */
-    void _updateMergedListOfMappingElementsForAgentName(QString agentName, AgentMappingM* agentMapping);
+    void _updateMergedListsOfMappingElementsForAgentName(QString agentName, AgentMappingM* agentMapping);
 
 
 private:
@@ -340,7 +348,10 @@ private:
     QHash<QString, QList<AgentMappingM*>> _mapFromNameToAgentMappingsList;
 
     // Map from agent name to the merged list of all (models of) mapping elements which connect an input of the agent
-    QHash<QString, QList<ElementMappingM*>> _mapFromAgentNameToMergedListOfMappingElements;
+    QHash<QString, QList<ElementMappingM*>> _mapFromAgentNameToMergedListOfInputMappingElements;
+
+    // Map from agent name to the merged list of all (models of) mapping elements which connect an output of the agent
+    QHash<QString, QList<ElementMappingM*>> _mapFromAgentNameToMergedListOfOutputMappingElements;
 
 };
 

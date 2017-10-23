@@ -161,9 +161,6 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
                     // Emit the signal "is Muted from Agent Updated"
                     Q_EMIT networkController->isMutedFromAgentUpdated(peerId, true);
                 }
-                else {
-                    qWarning() << peerName << "(" << peerId << ") MUTED";
-                }
             }
             // FROZEN / UN-FROZEN
             else if (message.startsWith(frozenPrefix))
