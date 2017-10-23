@@ -1,0 +1,292 @@
+[
+    {
+        "agentName": "ikky_aero_hmi_agent",
+        "definition": {
+            "description": "Definition of the agent used as demonstrator for an airplane HMI!",
+            "inputs": [
+                {
+                    "name": "enable_display",
+                    "type": "BOOL",
+                    "value": "false"
+                },
+                {
+                    "name": "altitude_value",
+                    "type": "DOUBLE",
+                    "value": 0
+                },
+                {
+                    "name": "speed_value",
+                    "type": "DOUBLE",
+                    "value": 0
+                },
+                {
+                    "name": "pitch_value",
+                    "type": "DOUBLE",
+                    "value": 0
+                },
+                {
+                    "name": "roll_value",
+                    "type": "DOUBLE",
+                    "value": 0
+                },
+                {
+                    "name": "yaw_value",
+                    "type": "DOUBLE",
+                    "value": 0
+                },
+                {
+                    "name": "longitude_value",
+                    "type": "DOUBLE",
+                    "value": 0
+                },
+                {
+                    "name": "latitude_value",
+                    "type": "DOUBLE",
+                    "value": 0
+                }
+            ],
+            "name": "ikky_aero_hmi_agent",
+            "outputs": [
+            ],
+            "parameters": [
+                {
+                    "name": "pitch_min_limit",
+                    "type": "DOUBLE",
+                    "value": -90
+                },
+                {
+                    "name": "pitch_max_limit",
+                    "type": "DOUBLE",
+                    "value": 90
+                },
+                {
+                    "name": "roll_min_limit",
+                    "type": "DOUBLE",
+                    "value": -90
+                },
+                {
+                    "name": "roll_max_limit",
+                    "type": "DOUBLE",
+                    "value": 90
+                },
+                {
+                    "name": "yaw_min_limit",
+                    "type": "DOUBLE",
+                    "value": 0
+                },
+                {
+                    "name": "yaw_max_limit",
+                    "type": "DOUBLE",
+                    "value": 360
+                },
+                {
+                    "name": "speed_min_limit",
+                    "type": "DOUBLE",
+                    "value": 0
+                },
+                {
+                    "name": "speed_max_limit",
+                    "type": "DOUBLE",
+                    "value": 870
+                },
+                {
+                    "name": "altitude_min_limit",
+                    "type": "DOUBLE",
+                    "value": -400
+                },
+                {
+                    "name": "altitude_max_limit",
+                    "type": "DOUBLE",
+                    "value": 12500
+                }
+            ],
+            "version": "0.2"
+        }
+    },
+    {
+        "agentName": "iosAgent",
+        "definition": {
+            "description": "iosAgent copie sends two impulsions and receives a double",
+            "inputs": [
+                {
+                    "name": "input1",
+                    "type": "DOUBLE",
+                    "value": 3.14
+                },
+                {
+                    "name": "heart",
+                    "type": "INTEGER",
+                    "value": 0
+                }
+            ],
+            "name": "iosAgent",
+            "outputs": [
+                {
+                    "name": "button2",
+                    "type": "IMPULSION",
+                    "value": ""
+                },
+                {
+                    "name": "bool",
+                    "type": "BOOL",
+                    "value": "false"
+                },
+                {
+                    "name": "stream",
+                    "type": "DATA",
+                    "value": ""
+                }
+            ],
+            "parameters": [
+                {
+                    "name": "param1",
+                    "type": "INTEGER",
+                    "value": -1
+                }
+            ],
+            "version": "0.1"
+        }
+    },
+    {
+        "agentName": "iosAgent",
+        "definition": {
+            "description": "iosAgent sends two impulsions and receives a double",
+            "inputs": [
+                {
+                    "name": "input1",
+                    "type": "DOUBLE",
+                    "value": 3.14
+                },
+                {
+                    "name": "heart",
+                    "type": "INTEGER",
+                    "value": 0
+                }
+            ],
+            "name": "iosAgent",
+            "outputs": [
+                {
+                    "name": "button1",
+                    "type": "INTEGER",
+                    "value": 383995264
+                },
+                {
+                    "name": "button2",
+                    "type": "IMPULSION",
+                    "value": ""
+                },
+                {
+                    "name": "bool",
+                    "type": "BOOL",
+                    "value": "false"
+                },
+                {
+                    "name": "stream",
+                    "type": "DATA",
+                    "value": ""
+                }
+            ],
+            "parameters": [
+                {
+                    "name": "param1",
+                    "type": "INTEGER",
+                    "value": -1
+                }
+            ],
+            "version": "0.1"
+        }
+    },
+    {
+        "agentName": "macosAgent",
+        "definition": {
+            "description": "my own description is here",
+            "inputs": [
+                {
+                    "name": "input1",
+                    "type": "INTEGER",
+                    "value": 40
+                },
+                {
+                    "name": "input2",
+                    "type": "IMPULSION",
+                    "value": ""
+                },
+                {
+                    "name": "input3",
+                    "type": "INTEGER",
+                    "value": 30
+                },
+                {
+                    "name": "stream",
+                    "type": "DATA",
+                    "value": ""
+                }
+            ],
+            "name": "macosAgent",
+            "outputs": [
+                {
+                    "name": "value1",
+                    "type": "DOUBLE",
+                    "value": 3.14
+                }
+            ],
+            "parameters": [
+                {
+                    "name": "param1",
+                    "type": "INTEGER",
+                    "value": -1
+                }
+            ],
+            "version": "10.0"
+        }
+    },
+    {
+        "agentName": "winAgent",
+        "definition": {
+            "description": "winAgent bla bla bla",
+            "inputs": [
+                {
+                    "name": "input1",
+                    "type": "DOUBLE",
+                    "value": 3.14
+                },
+                {
+                    "name": "bool",
+                    "type": "BOOL",
+                    "value": "true"
+                },
+                {
+                    "name": "heart",
+                    "type": "STRING",
+                    "value": "ma valeur"
+                }
+            ],
+            "name": "winAgent",
+            "outputs": [
+                {
+                    "name": "button1",
+                    "type": "INTEGER",
+                    "value": 383995264
+                },
+                {
+                    "name": "button2",
+                    "type": "IMPULSION",
+                    "value": ""
+                },
+                {
+                    "name": "stream",
+                    "type": "DATA",
+                    "value": "12A8F3AFAFAF00"
+                }
+            ],
+            "parameters": [
+                {
+                    "name": "param1",
+                    "type": "INTEGER",
+                    "value": -1
+                }
+            ],
+            "version": "2.5"
+        }
+    }
+]
