@@ -76,8 +76,8 @@ Item {
     readonly property color darkRedColor:"#7A110E"
 
     readonly property color veryDarkGreyColor: "#282D34"
-    readonly property color darkGreyColor: "#3C424F"
     readonly property color darkGreyColor2: "#2B3137"
+    readonly property color darkGreyColor: "#3C424F"
     readonly property color greyColor : "#525A66"
     readonly property color greyColor2 : "#3B424F"
     readonly property color lightGreyColor : "#9D9C9C"
@@ -182,7 +182,7 @@ Item {
 
     readonly property color agentOFFLabelColor: theme.lightGreyColor
     readonly property color agentOFFLabel2Color: theme.lightGreyColor
-    readonly property color agentOFFPressedLabel2Color: theme.greyColor // TO CHANGE
+    readonly property color agentOFFPressedLabel2Color: theme.greyColor
     readonly property color agentOFFTextColor: theme.greyColor2
 
 
@@ -230,11 +230,11 @@ Item {
     //
     // Background
     //
-    readonly property color agentsMappingBackgroundColor: "#282C34"
+    readonly property color agentsMappingBackgroundColor: theme.blackColor
     // - grid
-    readonly property color agentsMappingGridLineColor: "#323741"
-    readonly property color agentsMappingGridSublineColor: "#29313A"
-
+    readonly property color agentsMappingGridLineColor:  theme.darkGreyColor
+    readonly property color agentsMappingGridSublineColor: theme.veryDarkGreyColor
+//"#29313A"
 
     //
     // Links

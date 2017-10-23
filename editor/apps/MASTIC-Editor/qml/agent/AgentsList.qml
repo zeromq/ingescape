@@ -169,6 +169,8 @@ Item {
                 height : boundingBox.height
                 width :  boundingBox.width
 
+                enabled:false
+
                 anchors {
                     verticalCenter: parent.verticalCenter
                 }
@@ -176,9 +178,9 @@ Item {
                 style: I2SvgButtonStyle {
                     fileCache: MasticTheme.svgFileMASTIC
 
-                    pressedID: releasedID //+ "-pressed"
+                    pressedID: releasedID + "-pressed"
                     releasedID: "creernouvelagent"
-                    disabledID : releasedID
+                    disabledID : releasedID + "-disabled"
 
                 }
 
@@ -213,7 +215,7 @@ Item {
 
                     pressedID: releasedID + "-pressed"
                     releasedID: "importer"
-                    disabledID : releasedID
+                    disabledID : releasedID + "-disabled"
 
                 }
 
@@ -246,7 +248,7 @@ Item {
                 height : boundingBox.height
                 width :  boundingBox.width
 
-                enabled: (controller.selectedAgent ? true : false)
+                enabled: visible & (controller.selectedAgent ? true : false)
 
                 anchors {
                     verticalCenter: parent.verticalCenter
@@ -257,7 +259,7 @@ Item {
 
                     pressedID: releasedID + "-pressed"
                     releasedID: "exporter"
-                    disabledID : releasedID //+ "-disabled"
+                    disabledID : releasedID + "-disabled"
                 }
 
                 onClicked: {
@@ -282,9 +284,11 @@ Item {
             Button {
                 id: btnRemoveAgent
 
-                property var boundingBox: MasticTheme.svgFileMASTIC.boundsOnElement("selectionmultiple");
+                property var boundingBox: MasticTheme.svgFileMASTIC.boundsOnElement("supprimerplusieurs");
                 height : boundingBox.height
                 width :  boundingBox.width
+
+                enabled: false
 
                 anchors {
                     verticalCenter: parent.verticalCenter
@@ -293,9 +297,9 @@ Item {
                 style: I2SvgButtonStyle {
                     fileCache: MasticTheme.svgFileMASTIC
 
-                    pressedID: releasedID //+ "-pressed"
-                    releasedID: "selectionmultiple"
-                    disabledID : releasedID
+                    pressedID: releasedID + "-pressed"
+                    releasedID: "supprimerplusieurs"
+                    disabledID : releasedID + "-disabled"
 
                 }
 
