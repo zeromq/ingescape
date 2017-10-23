@@ -197,6 +197,15 @@ Q_SIGNALS:
     void mappingElementCreated(ElementMappingM* mappingElement);
 
 
+    /**
+     * @brief Signal emitted when the flag "is Muted" from an output of agent updated
+     * @param agent
+     * @param isMuted
+     * @param outputName
+     */
+    void isMutedFromOutputOfAgentUpdated(AgentM* agent, bool isMuted, QString outputName);
+
+
 public Q_SLOTS:
 
     /**
@@ -239,19 +248,28 @@ public Q_SLOTS:
 
 
     /**
-     * @brief Slot when the flag "is Muted" of an agent updated
+     * @brief Slot when the flag "is Muted" from an agent updated
      * @param peerId
      * @param isMuted
      */
-    void onisMutedOfAgentUpdated(QString peerId, bool isMuted);
+    void onisMutedFromAgentUpdated(QString peerId, bool isMuted);
 
 
     /**
-     * @brief Slot when the flag "is Frozen" of an agent updated
+     * @brief Slot when the flag "is Frozen" from an agent updated
      * @param peerId
      * @param isFrozen
      */
-    void onIsFrozenOfAgentUpdated(QString peerId, bool isFrozen);
+    void onIsFrozenFromAgentUpdated(QString peerId, bool isFrozen);
+
+
+    /**
+     * @brief Slot when the flag "is Muted" from an output of agent updated
+     * @param peerId
+     * @param isMuted
+     * @param outputName
+     */
+    void onIsMutedFromOutputOfAgentUpdated(QString peerId, bool isMuted, QString outputName);
 
 
 private:

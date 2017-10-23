@@ -131,6 +131,15 @@ public Q_SLOTS:
     void onAgentDefinitionCreated(DefinitionM* definition, AgentM* agent);
 
 
+    /**
+     * @brief Slot when the flag "is Muted" from an output of agent updated
+     * @param agent
+     * @param isMuted
+     * @param outputName
+     */
+    void onIsMutedFromOutputOfAgentUpdated(AgentM* agent, bool isMuted, QString outputName);
+
+
 private:
 
     /**

@@ -103,13 +103,15 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     connect(_networkC, &NetworkController::definitionReceived, _modelManager, &MasticModelManager::onDefinitionReceived);
     connect(_networkC, &NetworkController::mappingReceived, _modelManager, &MasticModelManager::onMappingReceived);
     connect(_networkC, &NetworkController::agentExited, _modelManager, &MasticModelManager::onAgentExited);
-    connect(_networkC, &NetworkController::isMutedOfAgentUpdated, _modelManager, &MasticModelManager::onisMutedOfAgentUpdated);
-    connect(_networkC, &NetworkController::isFrozenOfAgentUpdated, _modelManager, &MasticModelManager::onIsFrozenOfAgentUpdated);
+    connect(_networkC, &NetworkController::isMutedFromAgentUpdated, _modelManager, &MasticModelManager::onisMutedFromAgentUpdated);
+    connect(_networkC, &NetworkController::isFrozenFromAgentUpdated, _modelManager, &MasticModelManager::onIsFrozenFromAgentUpdated);
+    connect(_networkC, &NetworkController::isMutedFromOutputOfAgentUpdated, _modelManager, &MasticModelManager::onIsMutedFromOutputOfAgentUpdated);
 
 
     // Connect to signals from the model manager
     connect(_modelManager, &MasticModelManager::agentModelCreated, _agentsSupervisionC, &AgentsSupervisionController::onAgentModelCreated);
     connect(_modelManager, &MasticModelManager::agentDefinitionCreated, _agentsSupervisionC, &AgentsSupervisionController::onAgentDefinitionCreated);
+    connect(_modelManager, &MasticModelManager::isMutedFromOutputOfAgentUpdated, _agentsSupervisionC, &AgentsSupervisionController::onIsMutedFromOutputOfAgentUpdated);
 
 
     // Connect to signals from the controller for supervision of agents

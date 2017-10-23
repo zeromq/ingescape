@@ -272,11 +272,11 @@ void MasticModelManager::onAgentExited(QString peerId, QString agentName)
 
 
 /**
- * @brief Slot when the flag "is Muted" of an agent updated
+ * @brief Slot when the flag "is Muted" from an agent updated
  * @param peerId
  * @param isMuted
  */
-void MasticModelManager::onisMutedOfAgentUpdated(QString peerId, bool isMuted)
+void MasticModelManager::onisMutedFromAgentUpdated(QString peerId, bool isMuted)
 {
     AgentM* agent = getAgentModelFromPeerId(peerId);
     if(agent != NULL) {
@@ -286,15 +286,33 @@ void MasticModelManager::onisMutedOfAgentUpdated(QString peerId, bool isMuted)
 
 
 /**
- * @brief Slot when the flag "is Frozen" of an agent updated
+ * @brief Slot when the flag "is Frozen" from an agent updated
  * @param peerId
  * @param isFrozen
  */
-void MasticModelManager::onIsFrozenOfAgentUpdated(QString peerId, bool isFrozen)
+void MasticModelManager::onIsFrozenFromAgentUpdated(QString peerId, bool isFrozen)
 {
     AgentM* agent = getAgentModelFromPeerId(peerId);
     if(agent != NULL) {
         agent->setisFrozen(isFrozen);
+    }
+}
+
+
+/**
+ * @brief Slot when the flag "is Muted" from an output of agent updated
+ * @param peerId
+ * @param isMuted
+ * @param outputName
+ */
+void MasticModelManager::onIsMutedFromOutputOfAgentUpdated(QString peerId, bool isMuted, QString outputName)
+{
+    AgentM* agent = getAgentModelFromPeerId(peerId);
+    if(agent != NULL) {
+        //agent->setisMutedOfOutput(isMuted, outputName);
+
+        // Propagate the signal with the model of agent
+        Q_EMIT isMutedFromOutputOfAgentUpdated(agent, isMuted, outputName);
     }
 }
 
