@@ -11,20 +11,15 @@ class PointMapVM : public QObject
 {
     Q_OBJECT
 
-       // Name of agent using this input/output
-       I2_QML_PROPERTY_READONLY(QString, nameAgent)
+       // Name of agent using this input/output represent by a point map
+       I2_QML_PROPERTY(QString, nameAgent)
 
        // Model of our agent Input / Output / Parameter
-       //TODOESTIA : Question à vincent : on garde une instace de class IOPM ou on utilise que les infos dont on a besoin (à priori que IOP name)
-       //peut être le type
-       I2_QML_PROPERTY(AgentIOPM*, modelM)
+       I2_QML_PROPERTY_DELETE_PROOF(AgentIOPM*, iopModel)
 
        // Geometry for the connector in the view
-       // Abscisse of the center of the connector (Absolute coordinate)
-       I2_QML_PROPERTY(qreal, x_center)
-
-       // Ordinate of the center of the connector (Absolute coordinate)
-       I2_QML_PROPERTY(qreal, y_center)
+       // Position the center of the connector (Absolute coordinate)
+       I2_QML_PROPERTY(QPointF, position)
 
        // Radius of the connector
        I2_QML_PROPERTY(qreal, radius)
@@ -32,10 +27,11 @@ class PointMapVM : public QObject
 public:
     /**
      * @brief Default constructor
-     * @param model
+     * @param nameAgent The name of the agent using this input/output represent by a point map
+     * @param model the Iop model which will be represent by the point map view
      * @param parent
      */
-    explicit PointMapVM(AgentIOPM* model, QObject *parent = nullptr);
+    explicit PointMapVM(QString nameAgent, AgentIOPM* iopModel, QObject *parent = nullptr);
 
    /**
     * @brief Destructor

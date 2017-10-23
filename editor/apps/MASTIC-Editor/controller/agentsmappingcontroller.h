@@ -22,6 +22,7 @@
 #include <I2PropertyHelpers.h>
 
 #include <controller/masticmodelmanager.h>
+#include <viewModel/agentinmappingvm.h>
 
 
 /**
@@ -31,13 +32,20 @@ class AgentsMappingController : public QObject
 {
     Q_OBJECT
 
+    // List of all agent in mapping VM
+    //TODOESTIA : vérifier si le sort est utile ou non (je pense que oui dans la partie qml)
+    I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(AgentInMappingVM, agentInMappingVMList)
+
+    //List of all agent
+    I2_QOBJECT_LISTMODEL(MapBetweenIOPVM, allMapInMapping)
 public:
     /**
      * @brief Default constructor
      * @param modelManager
      * @param parent
      */
-    explicit AgentsMappingController(MasticModelManager* modelManager, QObject *parent = nullptr);
+    explicit AgentsMappingController(MasticModelManager* modelManager,
+                                     QObject *parent = nullptr);
 
 
     /**
@@ -69,6 +77,8 @@ public Q_SLOTS:
 private:
     // Usefull to save it
     MasticModelManager* _modelManager;
+
+    QHash<QString, AgentInMappingVM *> _mapFromNameToAgentInMappingViewModelsList;
 };
 
 QML_DECLARE_TYPE(AgentsMappingController)

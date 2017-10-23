@@ -26,14 +26,14 @@
  */
 AgentsMappingController::AgentsMappingController(MasticModelManager* modelManager, QObject *parent)
     : QObject(parent),
-    _modelManager(modelManager)
+      _modelManager(modelManager)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
     if (_modelManager != NULL)
     {
-        // use agents ?
+        _agentInMappingVMList.setSortProperty("agentName");
     }
 }
 
@@ -78,5 +78,42 @@ void AgentsMappingController::addAgentDefinitionToMappingAtPosition(QString agen
         {
             qDebug() << "TODO ESTIA: add VM for agent name" << agentName << "and definition" << definition->name() << "at" << position.x() << position.y();
         }
+
+        AgentInMappingVM * newAgentInMapping;
+
+        //Extract the name of tha agent
+        QString agentName = definition->name();
+
+
+        //Check if it's already in the list
+        bool exists = _mapFromNameToAgentInMappingViewModelsList.contains(agentName);
+
+
+        //if yes only add the definition to the corresponding item
+        //if not instanciate and add it
+        if(exists)
+        {
+            newAgentInMapping  = _mapFromNameToAgentInMappingViewModelsList.value(agentName);
+
+            newAgentInMapping->addDefinitionInInternalList(definition);
+
+            qInfo()<<"The agent mapping already existing, new definition added to : "<<agentName;
+        }
+        else
+        {
+            //Create new Agent In Mapping
+            newAgentInMapping = new AgentInMappingVM(definition,
+                                                     position,
+                                                     this);
+
+            //Add in the map list
+            _mapFromNameToAgentInMappingViewModelsList.insert(agentName,newAgentInMapping);
+
+            //Add this new Agent In Mapping VM in the list for the qml
+            _agentInMappingVMList.append(newAgentInMapping);
+
+            qInfo()<<"A new agent mapping has been added : "<<agentName<<" from new definition";
+        }
     }
+
 }
