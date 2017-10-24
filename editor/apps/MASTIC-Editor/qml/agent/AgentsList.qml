@@ -369,7 +369,7 @@ Item {
 
                 Drag.active: mouseArea.drag.active
                 Drag.hotSpot.x: 0
-                Drag.hotSpot.y: agentItem.height
+                Drag.hotSpot.y: 0
 
                 MouseArea {
                     id: mouseArea

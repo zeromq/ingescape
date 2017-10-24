@@ -417,7 +417,11 @@ AgentIOPM* JsonHelper::_createModelOfAgentIOP(QJsonObject jsonObject, AgentIOPTy
                 }
                 break;
 
+            /*case AgentIOPValueTypes::UNKNOWN:
+                break;*/
+
             default:
+                qCritical() << "IOP '" << agentIOP->name() << "' has a bad type" << jsonType.toString();
                 break;
             }
 
@@ -492,6 +496,10 @@ QJsonObject JsonHelper::_getJsonFromAgentIOP(AgentIOPM* agentIOP)
             //jsonAgentIOP.insert("value", agentIOP->defaultValue().toString());
             jsonAgentIOP.insert("value", agentIOP->displayableDefaultValue());
             break;
+
+        /*case AgentIOPValueTypes::UNKNOWN:
+            jsonAgentIOP.insert("value", "");
+            break;*/
 
         default:
             jsonAgentIOP.insert("value", "");

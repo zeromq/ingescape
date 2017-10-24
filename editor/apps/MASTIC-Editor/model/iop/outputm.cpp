@@ -20,7 +20,7 @@
  * @param parent
  */
 OutputM::OutputM(QObject *parent) : OutputM("",
-                                            AgentIOPValueTypes::STRING,
+                                            AgentIOPValueTypes::UNKNOWN,
                                             parent)
 {
 }
