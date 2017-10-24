@@ -38,6 +38,9 @@ class AgentsMappingController : public QObject
 
     //List of all agent
     I2_QOBJECT_LISTMODEL(MapBetweenIOPVM, allMapInMapping)
+
+    //Flag to process the mapping when it's needed
+    I2_QML_PROPERTY(bool, mappingIsApplied)
 public:
     /**
      * @brief Default constructor
@@ -73,6 +76,21 @@ public Q_SLOTS:
      */
     void addAgentDefinitionToMappingAtPosition(QString agentName, DefinitionM* definition, QPointF position);
 
+private Q_SLOTS:
+    /**
+     * @brief Slot when a new view model of a agent mapping is created on the main view mapping.
+     *      Check if a map need to be created from the element mapping list in the model manager.
+     *      The two agents corresponding need to be visible in the list.
+     * @param agentName
+     */
+    void createMapBetweenIopInMappingFromAgentName(QString agentName);
+
+    /**
+     * @brief Slot which allow to find the second point element to map in the view with the name of the second agent and the iop corresponding
+     * @param agentName The second agent in mapping name
+     * @param iopName The input/output to map with
+     */
+    PointMapVM* findTheSecondPointOfElementMap(QString agentName, QString iopName);
 
 private:
     // Usefull to save it
