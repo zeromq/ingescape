@@ -149,19 +149,39 @@ Item {
 
                 drag.target: workspace
 
-                scrollGestureEnabled: false
+                //scrollGestureEnabled: false
 
                 onWheel: {
                     wheel.accepted = true;
 
-                    //TODO: zoom at (x, y)
-                    if (wheel.angleDelta.y >= 0)
+                    // Check if we have a real wheel event
+                    if ((wheel.pixelDelta.x !== 0) || (wheel.pixelDelta.y !== 0))
                     {
-                        workspace.scale = Math.max(rootItem.minimumScale, workspace.scale/1.2);
+                        //
+                        // Trackpad event
+                        //
+
+                        workspace.x += wheel.pixelDelta.x;
+                        workspace.y += wheel.pixelDelta.y;
+
+                        console.log("delta "+wheel.pixelDelta)
                     }
                     else
                     {
-                        workspace.scale = Math.min(rootItem.maximumScale, workspace.scale * 1.2);
+                        //
+                        // Physical mouse wheel event
+                        //
+
+                        //TODO: zoom at (x, y)
+                        if (wheel.angleDelta.y > 0)
+                        {
+                            workspace.scale = Math.max(rootItem.minimumScale, workspace.scale/1.2);
+                        }
+                        else if (wheel.angleDelta.y < 0)
+                        {
+                            workspace.scale = Math.min(rootItem.maximumScale, workspace.scale * 1.2);
+                        }
+                        // Else: wheel.angleDelta.y  == 0  => end of gesture
                     }
                 }
             }
