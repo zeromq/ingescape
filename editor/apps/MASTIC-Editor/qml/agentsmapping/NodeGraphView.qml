@@ -44,12 +44,36 @@ Item {
     // Maximum scale factor
     readonly property real maximumScale: 4
 
+    // Duration of scroll animation in milliseconds
+    readonly property int scrollAnimationDuration: 250
+
 
     //--------------------------------
     //
     // Functions
     //
     //--------------------------------
+
+
+    // Center our view on a given position
+    function centerViewOn(x, y)
+    {
+        var targetX = rootItem.width/2 - x * workspace.scale;
+        var targetY = rootItem.height/2 - y * workspace.scale;
+
+        _scrollTo(targetX, targetY);
+    }
+
+
+    // Scroll to a given position (top-left corner)
+    function _scrollTo(x, y)
+    {
+        workspaceXAnimation.to = x;
+        workspaceYAnimation.to = y;
+
+        workspaceXAnimation.restart();
+        workspaceYAnimation.restart();
+    }
 
 
 
@@ -149,7 +173,7 @@ Item {
 
                 drag.target: workspace
 
-                //scrollGestureEnabled: false
+                scrollGestureEnabled: true
 
                 onWheel: {
                     wheel.accepted = true;
@@ -200,6 +224,30 @@ Item {
                 height: parent.height
 
 
+
+                //------------------------------------------------
+                //
+                // Animations used to scroll our view
+                //
+                //------------------------------------------------
+
+                PropertyAnimation {
+                    id: workspaceXAnimation
+
+                    target: workspace
+                    property: "x"
+
+                    duration: rootItem.scrollAnimationDuration
+                }
+
+                PropertyAnimation {
+                    id: workspaceYAnimation
+
+                    target: workspace
+                    property: "y"
+
+                    duration: rootItem.scrollAnimationDuration
+                }
 
 
 
