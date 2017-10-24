@@ -44,12 +44,36 @@ Item {
     // Maximum scale factor
     readonly property real maximumScale: 4
 
+    // Duration of scroll animation in milliseconds
+    readonly property int scrollAnimationDuration: 250
+
 
     //--------------------------------
     //
     // Functions
     //
     //--------------------------------
+
+
+    // Center our view on a given position
+    function centerViewOn(x, y)
+    {
+        var targetX = rootItem.width/2 - x * workspace.scale;
+        var targetY = rootItem.height/2 - y * workspace.scale;
+
+        _scrollTo(targetX, targetY);
+    }
+
+
+    // Scroll to a given position (top-left corner)
+    function _scrollTo(x, y)
+    {
+        workspaceXAnimation.to = x;
+        workspaceYAnimation.to = y;
+
+        workspaceXAnimation.restart();
+        workspaceYAnimation.restart();
+    }
 
 
 
@@ -149,19 +173,37 @@ Item {
 
                 drag.target: workspace
 
-                scrollGestureEnabled: false
+                scrollGestureEnabled: true
 
                 onWheel: {
                     wheel.accepted = true;
 
-                    //TODO: zoom at (x, y)
-                    if (wheel.angleDelta.y >= 0)
+                    // Check if we have a real wheel event
+                    if ((wheel.pixelDelta.x !== 0) || (wheel.pixelDelta.y !== 0))
                     {
-                        workspace.scale = Math.max(rootItem.minimumScale, workspace.scale/1.2);
+                        //
+                        // Trackpad event
+                        //
+
+                        workspace.x += wheel.pixelDelta.x;
+                        workspace.y += wheel.pixelDelta.y;
                     }
                     else
                     {
-                        workspace.scale = Math.min(rootItem.maximumScale, workspace.scale * 1.2);
+                        //
+                        // Physical mouse wheel event
+                        //
+
+                        //TODO: zoom at (x, y)
+                        if (wheel.angleDelta.y > 0)
+                        {
+                            workspace.scale = Math.max(rootItem.minimumScale, workspace.scale/1.2);
+                        }
+                        else if (wheel.angleDelta.y < 0)
+                        {
+                            workspace.scale = Math.min(rootItem.maximumScale, workspace.scale * 1.2);
+                        }
+                        // Else: wheel.angleDelta.y  == 0  => end of gesture
                     }
                 }
             }
@@ -182,6 +224,30 @@ Item {
                 height: parent.height
 
 
+
+                //------------------------------------------------
+                //
+                // Animations used to scroll our view
+                //
+                //------------------------------------------------
+
+                PropertyAnimation {
+                    id: workspaceXAnimation
+
+                    target: workspace
+                    property: "x"
+
+                    duration: rootItem.scrollAnimationDuration
+                }
+
+                PropertyAnimation {
+                    id: workspaceYAnimation
+
+                    target: workspace
+                    property: "y"
+
+                    duration: rootItem.scrollAnimationDuration
+                }
 
 
 

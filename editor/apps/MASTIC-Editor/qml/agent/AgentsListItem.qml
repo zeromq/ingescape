@@ -45,9 +45,6 @@ Item {
     height: 85
 
 
-    Behavior on height {
-        NumberAnimation {}
-    }
 
     //-----------------------------------------
     //
