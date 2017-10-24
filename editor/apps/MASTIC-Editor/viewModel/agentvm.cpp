@@ -148,7 +148,7 @@ void AgentVM::changeState()
         foreach (AgentM* model, _models.toList())
         {
             if ((model != NULL) && !model->hostname().isEmpty()) {
-                Q_EMIT commandAskedToLauncher("EXECUTE", model->hostname(), model->executionPath());
+                Q_EMIT commandAskedToLauncher("RUN", model->hostname(), model->executionPath());
             }
         }
     }
