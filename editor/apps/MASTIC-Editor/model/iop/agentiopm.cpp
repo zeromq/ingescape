@@ -25,7 +25,7 @@
  */
 AgentIOPM::AgentIOPM(QObject *parent) : AgentIOPM(AgentIOPTypes::PARAMETER,
                                                   "",
-                                                  AgentIOPValueTypes::STRING,
+                                                  AgentIOPValueTypes::UNKNOWN,
                                                   parent)
 {
 }

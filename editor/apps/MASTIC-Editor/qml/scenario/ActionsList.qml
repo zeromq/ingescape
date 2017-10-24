@@ -221,7 +221,7 @@ Item {
             id : actionListItem
 
             width: MasticTheme.leftPanelWidth
-            height: model.hasOnlyDefinition ? 85 : 135
+            height: 135
 
             Behavior on height {
                 NumberAnimation {}
