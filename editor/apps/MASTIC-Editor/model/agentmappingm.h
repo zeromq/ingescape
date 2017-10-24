@@ -42,8 +42,6 @@ class AgentMappingM : public QObject
     // List of element mapping of our agent mapping
     I2_QOBJECT_LISTMODEL(ElementMappingM, elementMappingsList)
 
-    // Md5 hash value for the agent mapping string
-    I2_QML_PROPERTY_READONLY(QString, md5Hash)
 
 public:
         /**

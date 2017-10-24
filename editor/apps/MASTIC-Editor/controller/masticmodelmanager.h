@@ -117,7 +117,7 @@ public:
      * @brief Add a model of agent mapping
      * @param agentMapping
      */
-    void addAgentMapping(AgentMappingM* agentMapping);
+    //void addAgentMapping(AgentMappingM* agentMapping);
 
 
     /**
@@ -125,7 +125,7 @@ public:
      * @param name
      * @return
      */
-    QList<AgentMappingM*> getAgentMappingsListFromName(QString mappingName);
+    //QList<AgentMappingM*> getAgentMappingsListFromName(QString mappingName);
 
 
     /**
@@ -198,7 +198,7 @@ Q_SIGNALS:
      * @param agentMapping
      * @param agent
      */
-    void agentMappingCreated(AgentMappingM* agentMapping, AgentM* agent);
+    //void agentMappingCreated(AgentMappingM* agentMapping, AgentM* agent);
 
 
     /**
@@ -319,7 +319,15 @@ private:
      * @param agentName
      * @param agentMapping
      */
-    void _updateMergedListsOfMappingElementsForAgentName(QString agentName, AgentMappingM* agentMapping);
+    //void _updateMergedListsOfMappingElementsForAgentName(QString agentName, AgentMappingM* agentMapping);
+    void _updateMergedListsOfMappingElementsForAgentName(QString agentName, QList<ElementMappingM*> mappingElementsList);
+
+
+    /**
+     * @brief Clean merged lists of mapping elements for the agent name
+     * @param agentName
+     */
+    void _cleanMergedListsOfMappingElementsForAgentName(QString agentName);
 
 
 private:
