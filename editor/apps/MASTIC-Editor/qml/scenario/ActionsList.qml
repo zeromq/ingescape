@@ -223,9 +223,6 @@ Item {
             width: MasticTheme.leftPanelWidth
             height: 135
 
-            Behavior on height {
-                NumberAnimation {}
-            }
 
             Rectangle {
 

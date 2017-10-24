@@ -163,8 +163,6 @@ Item {
 
                         workspace.x += wheel.pixelDelta.x;
                         workspace.y += wheel.pixelDelta.y;
-
-                        console.log("delta "+wheel.pixelDelta)
                     }
                     else
                     {
