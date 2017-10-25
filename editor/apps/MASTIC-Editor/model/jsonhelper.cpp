@@ -217,13 +217,6 @@ AgentMappingM* JsonHelper::createModelOfAgentMapping(QString inputAgentName, QBy
                         }
                     }
                 }
-
-                // Generate md5 value for the definition string
-                QString md5Hash = QString(QCryptographicHash::hash(byteArrayOfJson, QCryptographicHash::Md5).toHex());
-                agentMapping->setmd5Hash(md5Hash);
-
-                //qDebug() << "md5:" << md5Hash;
-                //qDebug() << "json:" << jsonMapping;
             }
         }
     }
@@ -399,9 +392,9 @@ AgentIOPM* JsonHelper::_createModelOfAgentIOP(QJsonObject jsonObject, AgentIOPTy
                 }
                 break;
 
-            /*case AgentIOPValueTypes::IMPULSION:
+            case AgentIOPValueTypes::IMPULSION:
                 // Nothing to do
-                break;*/
+                break;
 
             case AgentIOPValueTypes::DATA:
                 if (jsonValue.isString()) {
