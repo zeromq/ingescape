@@ -1,3 +1,17 @@
+/*
+ *	MASTIC Editor
+ *
+ *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *
+ *	See license terms for the rights and conditions
+ *	defined by copyright holders.
+ *
+ *
+ *	Contributors:
+ *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
+ *
+ */
+
 #ifndef POINTMAPVM_H
 #define POINTMAPVM_H
 
@@ -7,6 +21,9 @@
 
 #include "model/iop/agentiopm.h"
 
+/**
+ * @brief The PointMapVM class TODO ESTIA
+ */
 class PointMapVM : public QObject
 {
     Q_OBJECT
@@ -38,4 +55,5 @@ public:
 };
 
 QML_DECLARE_TYPE(PointMapVM)
+
 #endif // POINTMAPVM_H

@@ -12,8 +12,6 @@ AgentInMappingVM::AgentInMappingVM(DefinitionM *definitionModel,
                                    QObject *parent) : QObject(parent),
     _agentName(""),
     _position(position),
-    _width(150),
-    _height(70),
     _isON(false),
     _isReduced(false),
     _reducedMapValueTypeInInput(AgentIOPValueTypes::MIXED),
@@ -30,8 +28,8 @@ AgentInMappingVM::AgentInMappingVM(DefinitionM *definitionModel,
 
         //Process the definition model to add the point Map
         addDefinitionInInternalList(definitionModel);
-    }else
-    {
+    }
+    else {
         qCritical() << "The model of agent mapping is NULL !";
     }
 }
@@ -48,8 +46,6 @@ AgentInMappingVM::AgentInMappingVM(QList<DefinitionM *> definitionModelList,
                                    QObject *parent) : QObject(parent),
     _agentName(""),
     _position(position),
-    _width(150),
-    _height(70),
     _isON(false),
     _isReduced(false),
     _reducedMapValueTypeInInput(AgentIOPValueTypes::MIXED),
@@ -59,7 +55,7 @@ AgentInMappingVM::AgentInMappingVM(QList<DefinitionM *> definitionModelList,
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
     //Set the agent name
-    if(definitionModelList.first() != NULL){
+    if(definitionModelList.first() != NULL) {
 
         //Get the name of the AgentInMappingVM
         _agentName = definitionModelList.first()->name();
@@ -68,8 +64,8 @@ AgentInMappingVM::AgentInMappingVM(QList<DefinitionM *> definitionModelList,
         foreach (DefinitionM * currentDefinition, definitionModelList) {
             addDefinitionInInternalList(currentDefinition);
         }
-    }else
-    {
+    }
+    else {
         qCritical() << "The model of agent mapping is NULL !";
     }
 }
@@ -97,8 +93,8 @@ void AgentInMappingVM::addDefinitionInInternalList(DefinitionM *newDefinition)
          addPointMapInInternalOutputList(newDefinition);
 
         Q_EMIT newDefinitionInAgentMapping(this->agentName());
-    }else
-    {
+    }
+    else {
         qInfo()<<"The definition of the agent named '" << _agentName << "' could not be add to the agent mapping VM named '" << newDefinition->name() << "'";
     }
 }
@@ -134,9 +130,8 @@ void AgentInMappingVM::addPointMapInInternalInputList(DefinitionM *newDefinition
                     _mapOfInputsFromInputName.insert(iopM->name(), inputPoint);
 
                     qInfo()<<"Add new point map " << _agentName << "." << iopM->name() << " in the inputs list.";
-
-                }else
-                {
+                }
+                else {
                     qInfo() << "Point map : " << _agentName << "." << iopM->name() << " is already present in the list.";
                 }
             }
@@ -174,9 +169,8 @@ void AgentInMappingVM::addPointMapInInternalOutputList(DefinitionM *newDefinitio
                     _mapOfOutputsFromOutputName.insert(iopM->name(), outputPoint);
 
                     qInfo()<<"Add new point map " << _agentName << "." << iopM->name() << " in the inputs list.";
-
-                }else
-                {
+                }
+                else {
                     qInfo() << "Point map : " << _agentName << "." << iopM->name() << " is already present in the list.";
                 }
             }
@@ -206,7 +200,6 @@ bool AgentInMappingVM::checkIfAlreadyInIntputList(QString agentName, QString iop
              (iterator->modelM()->name() == iopName)
              )
         {
-
             // Exactly the same point ('agent name' & 'iop name')
             return true;
         }
@@ -235,7 +228,6 @@ bool AgentInMappingVM::checkIfAlreadyInOutputList(QString agentName, QString iop
              (iterator->modelM()->name() == iopName)
              )
         {
-
             // Exactly the same point ('agent name' & 'iop name')
             return true;
         }
@@ -250,6 +242,8 @@ bool AgentInMappingVM::checkIfAlreadyInOutputList(QString agentName, QString iop
      */
 InputVM * AgentInMappingVM::getPointMapFromInputName(QString inputName)
 {
+    // Doc QT: If the hash contains no item with the given key, the function returns defaultValue.
+    // Suggestion pour être sur: if (contains) ... else { return NULL; }
     return _mapOfInputsFromInputName.value(inputName);
 }
 
@@ -259,6 +253,8 @@ InputVM * AgentInMappingVM::getPointMapFromInputName(QString inputName)
      */
 OutputVM * AgentInMappingVM::getPointMapFromOutputName(QString outputName)
 {
+    // Doc QT: If the hash contains no item with the given key, the function returns defaultValue.
+    // Suggestion pour être sur: if (contains) ... else { return NULL; }
     return _mapOfOutputsFromOutputName.value(outputName);
 }
 

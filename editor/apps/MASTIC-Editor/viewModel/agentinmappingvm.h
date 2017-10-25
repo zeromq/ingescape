@@ -29,17 +29,8 @@ class AgentInMappingVM : public QObject
     // List of VM of outputs
     I2_QOBJECT_LISTMODEL(OutputVM, outputsList)
 
-    // Geometry for the connector in the view
-    //TODO ESTIA
-    // The center of the box (POINT HG)
+    // The position corresponds to the corner Top-Left of the box
     I2_QML_PROPERTY(QPointF, position)
-
-    // Width of the box
-    I2_QML_PROPERTY(int, width)
-
-    // Height of the box
-    I2_QML_PROPERTY(int, height)
-
 
     // Flag indicating if our agent is ON (vs OFF)
     I2_QML_PROPERTY_READONLY(bool, isON)

@@ -21,9 +21,6 @@
 
 #include <I2PropertyHelpers.h>
 #include <viewModel/agentinmappingvm.h>
-//#include <viewModel/pointmapvm.h>
-//#include <viewModel/iop/inputvm.h>
-//#include <viewModel/iop/outputvm.h>
 
 
 /**
