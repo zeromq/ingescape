@@ -18,7 +18,6 @@
 InputVM::InputVM(QString agentName,
                  AgentIOPM* modelM,
                  QObject *parent) : PointMapVM(agentName,
-                                               NULL,
                                                parent),
     _modelM(NULL)
 {

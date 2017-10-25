@@ -37,14 +37,14 @@ class MapBetweenIOPVM : public QObject
     I2_QML_PROPERTY_DELETE_PROOF(AgentInMappingVM*, agentFrom)
 
     // View model of the output slot associated to our link
-    I2_QML_PROPERTY_DELETE_PROOF(PointMapVM*, pointFrom)
+    I2_QML_PROPERTY_DELETE_PROOF(OutputVM*, pointFrom)
     //I2_QML_PROPERTY_DELETE_PROOF(InputVM*, pointFrom)
 
     // View model of the input agent of our link (link ends to this agent)
     I2_QML_PROPERTY_DELETE_PROOF(AgentInMappingVM*, agentTo)
 
     // View model of the input slot associated to our link
-    I2_QML_PROPERTY_DELETE_PROOF(PointMapVM*, pointTo)
+    I2_QML_PROPERTY_DELETE_PROOF(InputVM*, pointTo)
     //I2_QML_PROPERTY_DELETE_PROOF(OutputVM*, pointTo)
 
     // Flag indicating if a new value is published on the output
@@ -57,8 +57,8 @@ public:
      * @param pointTo The point map which the map will stop
      * @param parent
      */
-    explicit MapBetweenIOPVM(PointMapVM *pointFrom,
-                             PointMapVM *pointTo,
+    explicit MapBetweenIOPVM(OutputVM *pointFrom,
+                             InputVM *pointTo,
                              QObject *parent = nullptr);
 
    /**
@@ -85,9 +85,9 @@ public:
      * @param parent
      */
     explicit MapBetweenIOPVM(AgentInMappingVM* agentFrom,
-                             PointMapVM *pointFrom,
+                             OutputVM *pointFrom,
                              AgentInMappingVM* agentTo,
-                             PointMapVM *pointTo,
+                             InputVM *pointTo,
                              QObject *parent = nullptr);
 
 
