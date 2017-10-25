@@ -394,6 +394,11 @@ void AgentsSupervisionController::_deleteAgentViewModel(AgentVM* agent)
 {
     if (agent != NULL)
     {
+        // Unselect our agent if needed
+        if (_selectedAgent == agent) {
+            setselectedAgent(NULL);
+        }
+
         // Get the list of view models of agent from a name
         QList<AgentVM*> agentViewModelsList = getAgentViewModelsListFromName(agent->name());
         agentViewModelsList.removeOne(agent);
