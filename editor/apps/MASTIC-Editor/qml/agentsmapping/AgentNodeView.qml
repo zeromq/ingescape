@@ -34,16 +34,18 @@ Item {
 
     property bool isClosed : false
 
-    width : 208
-    height : (rootItem.agentVM & !rootItem.isClosed)?
+    width : 228
+    height : (rootItem.agentVM && !rootItem.isClosed)?
                  (52 + 20*Math.max(rootItem.agentVM.inputsList.count , rootItem.agentVM.outputsList.count))
-                : 40
+               : 40
 
 
     // Init position of our agent
     x: (agentVM && agentVM.position) ? agentVM.position.x : 0
     y: (agentVM && agentVM.position) ? agentVM.position.y : 0
 
+
+    clip : true
 
     //
     // Bindings to save the position of our agent
@@ -53,20 +55,14 @@ Item {
         property: "position"
         value: Qt.point(rootItem.x,rootItem.y)
     }
-    //    // - Abscisse
-    //    Binding {
-    //        target: rootItem.agentVM
-    //        property: "x"
-    //        value: rootItem.x
-    //    }
 
-    //    // - Ordinate
-    //    Binding {
-    //        target: rootItem.agentVM
-    //        property: "y"
-    //        value: rootItem.y
-    //    }
 
+    Behavior on height {
+        NumberAnimation {
+            onStopped: {
+            }
+        }
+    }
 
     //--------------------------------
     //
@@ -92,7 +88,11 @@ Item {
     //--------------------------------
 
     Rectangle {
-        anchors.fill: parent
+        anchors {
+            fill: parent
+            leftMargin: 10
+            rightMargin: 10
+        }
 
         color : MasticTheme.darkGreyColor
         radius : 6
@@ -138,7 +138,6 @@ Item {
 
 
 
-
         //
         //
         // Inlets / Input slots
@@ -149,15 +148,15 @@ Item {
             anchors {
                 left: parent.left
                 right : parent.right
+
                 top: separator.bottom
                 topMargin: 5
                 bottom: parent.bottom
             }
 
-
             Repeater {
                 // List of intput slots VM
-                model: rootItem.agentVM? rootItem.agentVM.inputsList : 0
+                model: (rootItem.agentVM && !rootItem.isClosed)? rootItem.agentVM.inputsList : 0
 
                 delegate: Item {
                     id: inputSlotItem
@@ -175,8 +174,8 @@ Item {
                         anchors {
                             left : parent.left
                             leftMargin: 20
-                            right : parent.right
-                            rightMargin: 20
+                            right : parent.horizontalCenter
+                            rightMargin: 5
                             verticalCenter: parent.verticalCenter
                         }
                         elide: Text.ElideRight
@@ -186,28 +185,42 @@ Item {
                         font: MasticTheme.heading2Font
                     }
 
+
+                    Rectangle {
+                        id : linkPoint
+
+                        anchors {
+                            horizontalCenter: parent.left
+                            verticalCenter: parent.verticalCenter
+                        }
+
+                        height : 13
+                        width : height
+                        radius : height/2
+
+                        color : MasticTheme.whiteColor
+                    }
+
+
                     //
                     // Bindings to save the anchor point of our input slot
                     // i.e. the point used to draw a link
                     //
-                    // - Abscisse
-//                    Binding {
-//                        target: myModel
+                    Binding {
+                        target: myModel
 
-//                        property: "x"
+                        property: "position"
 
-//                        // Two options: absolute value OR relative value
-//                        value: rootItem.x + inputSlotItem.x
-//                    }
+                        value: Qt.point(rootItem.x + inputSlotItem.mapToItem(rootItem, linkPoint.x, linkPoint.y).x + linkPoint.width/2,
+                                        rootItem.y + inputSlotItem.mapToItem(rootItem, linkPoint.x, linkPoint.y).y + linkPoint.height/2)
+                    }
 
-//                    // - Ordinate
-//                    Binding {
-//                        target: myModel
 
-//                        property: "y"
-
-//                        // Two options: absolute value OR relative value
-//                        value: rootItem.y + inputSlotItem.y
+//                    Connections {
+//                        target : myModel
+//                        onPositionChanged : {
+//                            console.log( " position changed input" + myModel.position.x + "   " + myModel.position.y)
+//                        }
 //                    }
                 }
             }
@@ -223,45 +236,83 @@ Item {
             id: columnOutputSlots
 
             anchors {
-                right: parent.right
-                top: parent.top
+                left: parent.left
+                right : parent.right
+                top: separator.bottom
+                topMargin: 5
                 bottom: parent.bottom
             }
 
-
             Repeater {
                 // List of output slots VM
-                model: 0
+                model: (rootItem.agentVM && !rootItem.isClosed)? rootItem.agentVM.outputsList : 0
 
                 delegate: Item {
                     id: outputSlotItem
 
-                    property var myModel: null
+                    property var myModel: model.QtObject
+
+                    height : 20
+                    anchors {
+                        left : parent.left
+                        right : parent.right
+                    }
+
+                    Text {
+                        id : agentOutput
+                        anchors {
+                            left : parent.horizontalCenter
+                            leftMargin: 5
+                            right : parent.right
+                            rightMargin: 20
+                            verticalCenter: parent.verticalCenter
+                        }
+
+                        horizontalAlignment : Text.AlignRight
+
+                        elide: Text.ElideRight
+                        text : myModel.iopModel ? myModel.iopModel.name : ""
+
+                        color : MasticTheme.agentsInputsOutputsMappingColor
+                        font: MasticTheme.heading2Font
+                    }
+
+
+                    Rectangle {
+                        id : linkPointOut
+
+                        anchors {
+                            horizontalCenter: parent.right
+                            verticalCenter: parent.verticalCenter
+                        }
+
+                        height : 13
+                        width : height
+                        radius : height/2
+
+                        color : MasticTheme.whiteColor
+                    }
 
 
                     //
                     // Bindings to save the anchor point of our input slot
                     // i.e. the point used to draw a link
                     //
-                    // - Abscissa
                     Binding {
                         target: myModel
 
-                        property: "x"
+                        property: "position"
 
-                        // Two options: absolute value OR relative value
-                        value: rootItem.x + rootItem.width + outputSlotItem.x
+                        value: Qt.point(rootItem.x + outputSlotItem.mapToItem(rootItem, linkPointOut.x, linkPointOut.y).x + linkPointOut.width/2,
+                                        rootItem.y + outputSlotItem.mapToItem(rootItem, linkPointOut.x, linkPointOut.y).y + linkPointOut.height/2)
                     }
 
-                    // - Ordinate
-                    Binding {
-                        target: myModel
-
-                        property: "y"
-
-                        // Two options: absolute value OR relative value
-                        value: rootItem.y + outputSlotItem.y
-                    }
+//                    Connections {
+//                        target : myModel
+//                        onPositionChanged : {
+//                            console.log( " position changed output " + myModel.position.x + "   " + myModel.position.y)
+//                        }
+//                    }
                 }
             }
         }

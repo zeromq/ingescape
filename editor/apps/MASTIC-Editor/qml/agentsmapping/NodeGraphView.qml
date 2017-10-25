@@ -211,6 +211,16 @@ Item {
                 // TODO: replace with a Repeater
                 //       model: list of MapBetweenIOPVM
 
+                Repeater {
+                    model : controller? controller.allMapInMapping : 0;
+
+                    Link {
+                        id : link
+                        firstPoint: model.pointFrom? model.pointFrom.position : Qt.point(0,0)
+                        secondPoint: model.pointFrom? model.pointTo.position : Qt.point(0,0)
+                    }
+                }
+
                 //
                 // Link between [item1, nodeOut] and [item3, nodein1]
                 //
@@ -318,6 +328,14 @@ Item {
 
                             onPressed: {
                                 parent.z = workspace.maxZ++;
+                            }
+
+                            onPositionChanged: {
+                                console.log("agentVM position " + model.position.x + "  " + model.position.y)
+                            }
+
+                            onDoubleClicked: {
+                                agent.isClosed = !agent.isClosed;
                             }
                         }
                     }
