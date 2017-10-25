@@ -20,6 +20,7 @@ class AgentInMappingVM : public QObject
     // List of models of definition agents
     I2_QOBJECT_LISTMODEL(DefinitionM, definitionModelList)
 
+    //TODO ESTIA input output VM
     // List of VM of inputs
     I2_QOBJECT_LISTMODEL(PointMapVM, inputsList)
 
@@ -27,7 +28,8 @@ class AgentInMappingVM : public QObject
     I2_QOBJECT_LISTMODEL(PointMapVM, outputsList)
 
     // Geometry for the connector in the view
-    // The center of the box (Absolute coordinate)
+    //TODO ESTIA
+    // The center of the box (POINT HG)
     I2_QML_PROPERTY(QPointF, position)
 
     // Width of the box
@@ -35,6 +37,19 @@ class AgentInMappingVM : public QObject
 
     // Height of the box
     I2_QML_PROPERTY(int, height)
+
+
+    // Flag indicating if our agent is ON (vs OFF)
+    I2_QML_PROPERTY_READONLY(bool, isON)
+
+    // Flag indicating if our agent is reduced
+    I2_QML_PROPERTY_READONLY(bool, isReduced)
+
+    // Define the value type of the reduced map (= brin) in input of the agent
+    I2_QML_PROPERTY_READONLY(AgentIOPValueTypes::Value, _reducedMapValueTypeInIntput)
+
+    // Define the value type of the reduced map (= brin) in output of the agent
+    I2_QML_PROPERTY_READONLY(AgentIOPValueTypes::Value, _reducedMapValueTypeInOutput)
 
 
 public:
@@ -80,7 +95,16 @@ public Q_SLOTS:
          */
     void addDefinitionInInternalList(DefinitionM * newDefinition);
 
+    /**
+         * @brief Return the corresponding PointMap from the input IOP name
+         * @param inputName
+         */
     PointMapVM * getPointMapFromInputName(QString inputName);
+
+    /**
+         * @brief Return the corresponding PointMap from the output IOP name
+         * @param outputName
+         */
     PointMapVM * getPointMapFromOutputName(QString outputName);
 
 private:
@@ -95,12 +119,16 @@ private:
     //
 
     /**
-         * @brief Add new points Map to list from a definition model
+         * @brief Add new points Map to the inputs list from a definition model
          * @param newDefinition The definition model
-         * @param list The list where to add the points map (input/output list)
          */
-    void addPointMapInInternalList(DefinitionM *newDefinition,
-                                   I2CustomItemListModel<PointMapVM> *list);
+        void addPointMapInInternalInputList(DefinitionM *newDefinition);
+
+     /**
+        * @brief Add new points Map to the outputs list from a definition model
+        * @param newDefinition The definition model
+        */
+       void addPointMapInInternalOutputList(DefinitionM *newDefinition);
 
     /**
          * @brief This function check if the point map already exist in the list (input/output list)

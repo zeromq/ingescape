@@ -71,12 +71,12 @@ void AgentsMappingController::addAgentDefinitionToMappingAtPosition(QString agen
         // Position is NOT defined (from network)
         if (position.isNull())
         {
-            qDebug() << "TODO ESTIA: add VM for agent name" << agentName << "and definition" << definition->name();
+            qInfo() << "TODO ESTIA: add VM for agent name" << agentName << "and definition" << definition->name();
         }
         // Position is defined (by Drag & Drop)
         else
         {
-            qDebug() << "TODO ESTIA: add VM for agent name" << agentName << "and definition" << definition->name() << "at" << position.x() << position.y();
+            qInfo() << "TODO ESTIA: add VM for agent name" << agentName << "and definition" << definition->name() << "at ( " << position.x() << " ; " << position.y() << " ).";
         }
 
         AgentInMappingVM * newAgentInMapping = NULL;
@@ -97,7 +97,7 @@ void AgentsMappingController::addAgentDefinitionToMappingAtPosition(QString agen
 
             newAgentInMapping->addDefinitionInInternalList(definition);
 
-            qInfo()<<"The agent mapping already existing, new definition added to : "<<agentName;
+            qInfo() << "The agent mapping already existing, new definition added to : " << agentName;
         }
         else
         {
@@ -121,7 +121,7 @@ void AgentsMappingController::addAgentDefinitionToMappingAtPosition(QString agen
             //Add this new Agent In Mapping VM in the list for the qml
             _agentInMappingVMList.append(newAgentInMapping);
 
-            qInfo()<<"A new agent mapping has been added : "<<agentName<<" from new definition";
+            qInfo() << "A new agent mapping has been added : " << agentName << " from new definition";
         }
     }
 
@@ -138,8 +138,11 @@ void AgentsMappingController::createMapBetweenIopInMappingFromAgentName(QString 
     AgentInMappingVM * currentAgentInMapping = NULL;
     currentAgentInMapping = _mapFromNameToAgentInMappingViewModelsList.value(agentName);
 
+
     if(_modelManager != NULL && currentAgentInMapping != NULL)
     {
+        qInfo() << "Agent input " << agentName << " found. /n";
+
         //Find the element mapping
         QList<ElementMappingM *> elementsMappingFound;
 
@@ -154,18 +157,23 @@ void AgentsMappingController::createMapBetweenIopInMappingFromAgentName(QString 
 
         if(!elementsMappingFound.isEmpty())
         {
+             qInfo() << "Element Mapping List in input of the current Agent" << agentName << "is not empty. /n";
+
             foreach (ElementMappingM* currentElementMapping, elementsMappingFound)
             {
                 //Check if the iop exist
                 if(currentElementMapping != NULL)
                 {
+
                     QString inputName = currentElementMapping->input();
+                    qInfo() << "Node in input is: " << inputName << ". /n";
                     if(inputName != "")
                     {
                         inputPointMap = currentAgentInMapping->getPointMapFromInputName(inputName);
 
                         if(inputPointMap != NULL)
                         {
+                            qInfo() << "PointMap " << inputName << " found. /n";
                             outputPointMap = findTheSecondPointOfElementMap(currentElementMapping->outputAgent(),
                                                            currentElementMapping->output());
                         }
@@ -181,6 +189,8 @@ void AgentsMappingController::createMapBetweenIopInMappingFromAgentName(QString 
 
         if(!elementsMappingFound.isEmpty())
         {
+            qInfo() << "Element Mapping List in output of the current Agent is not empty. /n";
+
             foreach (ElementMappingM* currentElementMapping, elementsMappingFound)
             {
                 //Check if the iop exist
@@ -189,11 +199,12 @@ void AgentsMappingController::createMapBetweenIopInMappingFromAgentName(QString 
                     QString outputName = currentElementMapping->output();
                     if(outputName != "")
                     {
-
                         outputPointMap = currentAgentInMapping->getPointMapFromOutputName(outputName);
+                        qInfo() << "Node in input is: " << outputName << ". /n";
 
                         if(outputPointMap != NULL)
                         {
+                            qInfo() << "PointMap " << outputName << " found. /n";
                             inputPointMap = findTheSecondPointOfElementMap(currentElementMapping->inputAgent(),
                                                            currentElementMapping->input());
                         }
@@ -207,6 +218,8 @@ void AgentsMappingController::createMapBetweenIopInMappingFromAgentName(QString 
         {
             MapBetweenIOPVM* map = new MapBetweenIOPVM(outputPointMap, inputPointMap);
             _allMapInMapping.append(map);
+
+            qInfo() << "Create the MapBetweenIOPVM : " << inputPointMap->nameAgent() << "." << inputPointMap->iopModel()->name() << " -> " << outputPointMap->nameAgent() << "." << outputPointMap->iopModel()->name();
 
         }
     }
@@ -233,10 +246,13 @@ PointMapVM * AgentsMappingController::findTheSecondPointOfElementMap(QString age
     //
     if(secondAgentInMapping != NULL)
     {
+         qInfo() << "Agent in output" << agentName << " found. /n";
+
         //First check in input list
         secondPointMapVM = secondAgentInMapping->getPointMapFromInputName(iopName);
         if(secondPointMapVM != NULL)
         {
+            qInfo() << "PointMap " << iopName << " found. /n";
             return secondPointMapVM;
         }
 
@@ -244,9 +260,11 @@ PointMapVM * AgentsMappingController::findTheSecondPointOfElementMap(QString age
         secondPointMapVM = secondAgentInMapping->getPointMapFromOutputName(iopName);
         if(secondPointMapVM != NULL)
         {
+            qInfo() << "PointMap " << iopName << " found. /n";
             return secondPointMapVM;
         }
     }
 
+    qInfo() << "PointMap " << iopName << " NOT found. /n";
     return secondPointMapVM;
 }
