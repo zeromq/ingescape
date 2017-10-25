@@ -180,7 +180,7 @@ Item {
                             verticalCenter: parent.verticalCenter
                         }
                         elide: Text.ElideRight
-                        text : myModel.iopModel ? myModel.iopModel.name : ""
+                        text : myModel.modelM ? myModel.modelM.name : ""
 
                         color : MasticTheme.agentsInputsOutputsMappingColor
                         font: MasticTheme.heading2Font
@@ -272,7 +272,7 @@ Item {
                         horizontalAlignment : Text.AlignRight
 
                         elide: Text.ElideRight
-                        text : myModel.iopModel ? myModel.iopModel.name : ""
+                        text : myModel.modelM ? myModel.modelM.name : ""
 
                         color : MasticTheme.agentsInputsOutputsMappingColor
                         font: MasticTheme.heading2Font

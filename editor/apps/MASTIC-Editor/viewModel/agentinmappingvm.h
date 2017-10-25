@@ -137,14 +137,14 @@ private:
             * @param agentName The name of the agent mapping VM
             * @param iopName The name of the input to add
             */
-       bool AgentInMappingVM::checkIfAlreadyInIntputList(QString agentName, QString iopName);
+       bool checkIfAlreadyInIntputList(QString agentName, QString iopName);
 
        /**
             * @brief This function check if the point map already exist in the output list
             * @param agentName The name of the agent mapping VM
             * @param iopName The name of the output to add
             */
-       bool AgentInMappingVM::checkIfAlreadyInOutputList(QString agentName, QString iopName);
+       bool checkIfAlreadyInOutputList(QString agentName, QString iopName);
 };
 
 QML_DECLARE_TYPE(AgentInMappingVM)

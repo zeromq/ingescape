@@ -140,11 +140,10 @@ void AgentsMappingController::addAgentDefinitionToMappingAtPosition(QString agen
  */
 void AgentsMappingController::createMapBetweenIopInMappingFromAgentName(QString agentName)
 {
-    AgentInMappingVM * currentAgentInMapping = NULL;
-    currentAgentInMapping = _mapFromNameToAgentInMappingViewModelsList.value(agentName);
+    if (_mapFromNameToAgentInMappingViewModelsList.contains(agentName)) {
+        AgentInMappingVM* currentAgentInMapping = _mapFromNameToAgentInMappingViewModelsList.value(agentName);
 
-
-    if(_modelManager != NULL)// && currentAgentInMapping != NULL)
+    if ((_modelManager != NULL) && (currentAgentInMapping != NULL))
     {
         qInfo() << "Agent input " << agentName << " found. /n";
 
@@ -229,6 +228,7 @@ void AgentsMappingController::createMapBetweenIopInMappingFromAgentName(QString 
             qInfo() << "Create the MapBetweenIOPVM : " << inputPointVM->nameAgent() << "." << inputPointVM->modelM()->name() << " -> " << outputPointVM->nameAgent() << "." << outputPointVM->modelM()->name();
 
         }
+    }
     }
 }
 

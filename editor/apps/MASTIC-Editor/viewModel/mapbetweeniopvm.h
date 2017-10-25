@@ -38,14 +38,12 @@ class MapBetweenIOPVM : public QObject
 
     // View model of the output slot associated to our link
     I2_QML_PROPERTY_DELETE_PROOF(OutputVM*, pointFrom)
-    //I2_QML_PROPERTY_DELETE_PROOF(InputVM*, pointFrom)
 
     // View model of the input agent of our link (link ends to this agent)
     I2_QML_PROPERTY_DELETE_PROOF(AgentInMappingVM*, agentTo)
 
     // View model of the input slot associated to our link
     I2_QML_PROPERTY_DELETE_PROOF(InputVM*, pointTo)
-    //I2_QML_PROPERTY_DELETE_PROOF(OutputVM*, pointTo)
 
     // Flag indicating if a new value is published on the output
     I2_QML_PROPERTY_READONLY(bool, isNewValueOnOutput)
