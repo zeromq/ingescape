@@ -71,5 +71,23 @@ Item {
 
             controller: rootItem.controller
         }
+
+        Button {
+            id: btnActivateMapping
+
+            anchors {
+                bottom: parent.bottom
+                left: parent.left
+                margins: 10
+            }
+            text: checked ? "DES-active le mapping" : "ACTIVE le mapping"
+
+            checkable: true
+            checked: MasticEditorC.modelManager.isActivatedMapping
+
+            onCheckedChanged: {
+                MasticEditorC.modelManager.isActivatedMapping = checked;
+            }
+        }
     }
 }

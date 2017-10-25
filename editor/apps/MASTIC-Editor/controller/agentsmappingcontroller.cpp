@@ -285,6 +285,8 @@ void AgentsMappingController::onIsActivatedMappingChanged(bool isActivatedMappin
         qInfo() << "Mapping ACTIVATED !";
 
         if (_isEmptyMapping) {
+            qDebug() << "...et il est vide, on tente d'ajouter des choses...";
+
             if (_modelManager != NULL) {
                 // Get the map from agent name to list of active agents
                 QHash<QString, QList<AgentM*>> mapFromAgentNameToActiveAgentsList = _modelManager->getMapFromAgentNameToActiveAgentsList();
@@ -307,7 +309,7 @@ void AgentsMappingController::onIsActivatedMappingChanged(bool isActivatedMappin
             }
         }
         else {
-
+            qDebug() << "...et il n'est PAS vide, on ne fait rien de plus";
         }
     }
     else {
