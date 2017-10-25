@@ -710,7 +710,11 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     mtic_Interrupted = true;
                     free(message);
                     //send interruptin signal to parent process
+                    #ifdef _WIN32
+                    //TODO for windows
+                    #else
                     kill(getppid(), SIGINT);
+                    #endif
                     //stop our zyre loop by returning -1
                     return -1;
                 }else if (strlen("CLEAR_MAPPING") == strlen(message) && strncmp (message, "CLEAR_MAPPING", strlen("CLEAR_MAPPING")) == 0){
