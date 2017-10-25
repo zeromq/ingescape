@@ -34,7 +34,7 @@ I2_ENUM(AgentIOPTypes, INPUT, OUTPUT, PARAMETER)
 /**
   * Type of the value of an Agent Input / Output / Parameter
   */
-I2_ENUM(AgentIOPValueTypes, INTEGER, DOUBLE, STRING, BOOL, IMPULSION, DATA, UNKNOWN)
+I2_ENUM(AgentIOPValueTypes, INTEGER, DOUBLE, STRING, BOOL, IMPULSION, DATA, MIXED, UNKNOWN)
 
 
 /**
