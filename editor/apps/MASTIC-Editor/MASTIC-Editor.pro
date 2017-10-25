@@ -46,7 +46,9 @@ SOURCES += main.cpp \
     model/iop/outputm.cpp \
     controller/scenariocontroller.cpp \
     viewModel/actionvm.cpp \
-    controller/actioneditorcontroller.cpp
+    controller/actioneditorcontroller.cpp \
+    viewModel/iop/inputvm.cpp \
+    viewModel/iop/outputvm.cpp
 
 HEADERS += \
     model/agentm.h \
@@ -88,7 +90,9 @@ HEADERS += \
     model/iop/outputm.h  \
     controller/scenariocontroller.h \
     viewModel/actionvm.h \
-    controller/actioneditorcontroller.h
+    controller/actioneditorcontroller.h \
+    viewModel/iop/inputvm.h \
+    viewModel/iop/outputvm.h
 
 
 RESOURCES += qml.qrc
