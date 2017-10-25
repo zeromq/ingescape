@@ -72,8 +72,6 @@ public:
 
     /**
      * @brief Create a model of agent mapping with JSON and the input agent name corresponding
-     * TODOESTIA : the input agent name will be extract from the network event "mapping"
-     * (voir avec vincent à l'appel de la fonction createModelOfAgentMapping dans networkmanager quand MAPPING event)
      * @param inputAgentName, byteArrayOfJson
      * @return
      */

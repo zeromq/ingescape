@@ -70,6 +70,8 @@ void AgentInMappingVM::addDefinitionInInternalList(DefinitionM *newDefinition)
         // Create the list of output (PointMapVM)
         //
         addPointMapInInternalList(newDefinition, &_outputsList);
+
+        Q_EMIT newDefinitionInAgentMapping(this->agentName());
     }else
     {
         qInfo()<<"The definition of the agent named '"<<_agentName<<"' could not be add to the agent mapping VM named '"<<newDefinition->name()<<"'";
@@ -79,31 +81,55 @@ void AgentInMappingVM::addDefinitionInInternalList(DefinitionM *newDefinition)
 void AgentInMappingVM::addPointMapInInternalList(DefinitionM *newDefinition,
                                                  I2CustomItemListModel<PointMapVM> *list)
 {
+    //TODOESTIA : voir si on peut passer direct la list plutot que I2CustomItemListModel<PointMapVM>
+
     if(newDefinition != NULL)
     {
         //
         // Create the list of Point Map
         //
         QList<PointMapVM*> listOfPointMapTemp;
-        foreach (AgentIOPM* inputM, newDefinition->inputsList()->toList())
+        I2CustomItemListModel<AgentIOPM> *definitionIopList ;
+        if(list->objectName() == _inputsList.objectName())
         {
-            if (inputM != NULL)
+            definitionIopList  = newDefinition->inputsList();
+        }else
+        {
+            //TODOESTIA : voir avec Vincent pourquoi OutputM
+//            definitionIopList  = newDefinition->outputsList();
+            definitionIopList  = newDefinition->inputsList();
+        }
+
+        foreach (AgentIOPM* iopM, definitionIopList->toList())
+        {
+            if (iopM != NULL)
             {
 
 
                 //Check if it's not alreafy exist in the list & add it
                 if(!checkIfAlreadyInList(list->toList(),
                                          _agentName,
-                                         inputM->name()))
+                                         iopM->name()))
                 {
-                    PointMapVM* inputPtMapVM = new PointMapVM(_agentName, inputM, this);
+                    PointMapVM* pointMapVM = new PointMapVM(_agentName, iopM, this);
 
-                    listOfPointMapTemp.append(inputPtMapVM);
+                    listOfPointMapTemp.append(pointMapVM);
 
-                    qInfo()<<"Add the new point in the list.";
+                    //add to the map
+                    if(list->objectName() == _inputsList.objectName())
+                    {
+                        _mapOfInputsFromInputName.insert(iopM->name(),
+                                                         pointMapVM);
+                    }else
+                    {
+                        _mapOfOutputsFromOutputName.insert(iopM->name(),
+                                                         pointMapVM);
+                    }
+
+                    qInfo()<<"Add the new point in the list : "<<list->objectName();
                 }else
                 {
-                    qInfo() << "This point map : " << _agentName << "." << inputM->name()<<" is already present in the list.";
+                    qInfo() << "This point map : " << _agentName << "." << iopM->name()<<" is already present in the list.";
                 }
             }
         }
@@ -136,6 +162,17 @@ bool AgentInMappingVM::checkIfAlreadyInList(QList<PointMapVM *> list,
     return false;
 }
 
+
+PointMapVM * AgentInMappingVM::getPointMapFromInputName(QString inputName)
+{
+    return _mapOfInputsFromInputName.value(inputName);
+}
+
+PointMapVM * AgentInMappingVM::getPointMapFromOutputName(QString outputName)
+{
+    return _mapOfOutputsFromOutputName.value(outputName);
+}
+
 AgentInMappingVM::~AgentInMappingVM()
 {
     qInfo() << "Delete View Model of AgentInMapping" << _agentName;
@@ -144,8 +181,8 @@ AgentInMappingVM::~AgentInMappingVM()
     _definitionModelList.clear();
 
     //Delete element in the previous list Input & Output
-    _previousInputsList.clear();
-    _previousOutputsList.clear();
+    _mapOfInputsFromInputName.clear();
+    _mapOfOutputsFromOutputName.clear();
 
     //Delete element in the list Input & Output
     _inputsList.deleteAllItems();

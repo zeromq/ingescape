@@ -465,9 +465,10 @@ void NetworkController::onCommandAskedToLauncher(QString command, QString hostna
             QString peerId = _mapFromHostnameToMasticLauncherPeerId.value(hostname);
 
             if (!peerId.isEmpty()) {
-                qInfo() << "Send command" << command << "to launcher on" << hostname << "with execution path" << executionPath;
+                // Send the command with execution path to the peer id of the launcher
+                int success = zyre_whispers(agentElements->node, peerId.toStdString().c_str(), "%s %s", command.toStdString().c_str(), executionPath.toStdString().c_str());
 
-                // FIXME TODO
+                qInfo() << "Send command" << command << "to launcher on" << hostname << "with execution path" << executionPath << "with success ?" << success;
             }
         }
         else {
@@ -487,7 +488,7 @@ void NetworkController::onCommandAsked(QString command, QStringList peerIdsList)
     if (!command.isEmpty() && (peerIdsList.count() > 0)) {
         foreach (QString peerId, peerIdsList)
         {
-            // Send the command for a peer id of agent
+            // Send the command to a peer id of agent
             int success = zyre_whispers(agentElements->node, peerId.toStdString().c_str(), "%s", command.toStdString().c_str());
 
             qDebug() << "Send command" << command << "for agent" << peerId << "with success ?" << success;
@@ -507,7 +508,7 @@ void NetworkController::onCommandAskedForOutput(QString command, QString outputN
     if (!command.isEmpty() && !outputName.isEmpty() && (peerIdsList.count() > 0)) {
         foreach (QString peerId, peerIdsList)
         {
-            // Send the command for a peer id of agent
+            // Send the command with the output name to a peer id of agent
             int success = zyre_whispers(agentElements->node, peerId.toStdString().c_str(), "%s %s", command.toStdString().c_str(), outputName.toStdString().c_str());
 
             qDebug() << "Send command" << command << "for agent" << peerId << "and output" << outputName << "with success ?" << success;

@@ -65,6 +65,14 @@ public:
      */
     ~AgentInMappingVM();
 
+Q_SIGNALS:
+
+    /**
+     * @brief Signal emitted when a definition is added to the agent mapping
+     * @param agentName
+     */
+    void newDefinitionInAgentMapping(QString agentName);
+
 public Q_SLOTS:
     /**
          * @brief Add definition dynamically to the internal list
@@ -72,12 +80,15 @@ public Q_SLOTS:
          */
     void addDefinitionInInternalList(DefinitionM * newDefinition);
 
+    PointMapVM * getPointMapFromInputName(QString inputName);
+    PointMapVM * getPointMapFromOutputName(QString outputName);
+
 private:
     // Previous list of input
-    QList<PointMapVM*> _previousInputsList;
+    QHash<QString,PointMapVM*> _mapOfInputsFromInputName;
 
     // Previous list of output
-    QList<PointMapVM*> _previousOutputsList;
+    QHash<QString,PointMapVM*> _mapOfOutputsFromOutputName;
 
     //
     // Internal functions to factorize code

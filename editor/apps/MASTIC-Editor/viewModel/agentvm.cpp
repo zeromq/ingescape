@@ -137,18 +137,15 @@ void AgentVM::setdefinition(DefinitionM *value)
 void AgentVM::changeState()
 {
     if (_isON) {
-        //Q_EMIT commandAsked("OFF", _peerIdsList);
-
         // FIXME TODO
         Q_EMIT commandAsked("DIE", _peerIdsList);
     }
     else {
-        //Q_EMIT commandAsked("ON", _peerIdsList);
-
         foreach (AgentM* model, _models.toList())
         {
+            // Check if the model has a hostname
             if ((model != NULL) && !model->hostname().isEmpty()) {
-                Q_EMIT commandAskedToLauncher("EXECUTE", model->hostname(), model->executionPath());
+                Q_EMIT commandAskedToLauncher("RUN", model->hostname(), model->executionPath());
             }
         }
     }
