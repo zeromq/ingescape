@@ -74,6 +74,7 @@ bool verboseMode = true;
 bool isFrozen = false;
 bool agentCanBeFrozen = false;
 bool isWholeAgentMuted = false;
+bool mtic_Interrupted = false;
 
 
 //global parameters
@@ -705,7 +706,13 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     }
                     free(outputsList);
                 }else if (strlen("DIE") == strlen(message) && strncmp (message, "DIE", strlen("DIE")) == 0){
-                    mtic_die();
+                    //set flag for parent process
+                    mtic_Interrupted = true;
+                    free(message);
+                    //send interruptin signal to parent process
+                    kill(getppid(), SIGINT);
+                    //stop our zyre loop by returning -1
+                    return -1;
                 }else if (strlen("CLEAR_MAPPING") == strlen(message) && strncmp (message, "CLEAR_MAPPING", strlen("CLEAR_MAPPING")) == 0){
                     mtic_clearMapping();
                 }else if (strlen("FREEZE") == strlen(message) && strncmp (message, "FREEZE", strlen("FREEZE")) == 0){
@@ -1138,6 +1145,7 @@ int mtic_startWithDevice(const char *networkDevice, int port){
         //Agent is already active : need to stop it first
         mtic_stop();
     }
+    mtic_Interrupted = false;
     
     agentElements = calloc(1, sizeof(zyreloopElements_t));
     strncpy(agentElements->networkDevice, networkDevice, NETWORK_DEVICE_LENGTH);
@@ -1267,6 +1275,7 @@ int mtic_startWithIP(const char *ipAddress, int port){
         //Agent is already active : need to stop it first
         mtic_stop();
     }
+    mtic_Interrupted = false;
     
     agentElements = calloc(1, sizeof(zyreloopElements_t));
     strncpy(agentElements->networkDevice, NO_DEVICE, NETWORK_DEVICE_LENGTH);
@@ -1307,6 +1316,7 @@ int mtic_stop(){
     }else{
         mtic_debug("agent already stopped\n");
     }
+    mtic_Interrupted = true;
     
     return 1;
 }
