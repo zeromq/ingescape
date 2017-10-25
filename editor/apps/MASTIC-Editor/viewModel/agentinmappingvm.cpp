@@ -13,7 +13,11 @@ AgentInMappingVM::AgentInMappingVM(DefinitionM *definitionModel,
     _agentName(""),
     _position(position),
     _width(150),
-    _height(70)
+    _height(70),
+    _isON(false),
+    _isReduced(false),
+    _reducedMapValueTypeInInput(AgentIOPValueTypes::MIXED),
+    _reducedMapValueTypeInOutput(AgentIOPValueTypes::MIXED)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -45,7 +49,11 @@ AgentInMappingVM::AgentInMappingVM(QList<DefinitionM *> definitionModelList,
     _agentName(""),
     _position(position),
     _width(150),
-    _height(70)
+    _height(70),
+    _isON(false),
+    _isReduced(false),
+    _reducedMapValueTypeInInput(AgentIOPValueTypes::MIXED),
+    _reducedMapValueTypeInOutput(AgentIOPValueTypes::MIXED)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);

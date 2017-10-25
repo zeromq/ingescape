@@ -43,13 +43,13 @@ class AgentInMappingVM : public QObject
     I2_QML_PROPERTY_READONLY(bool, isON)
 
     // Flag indicating if our agent is reduced
-    I2_QML_PROPERTY_READONLY(bool, isReduced)
+    I2_QML_PROPERTY(bool, isReduced)
 
     // Define the value type of the reduced map (= brin) in input of the agent
-    I2_QML_PROPERTY_READONLY(AgentIOPValueTypes::Value, _reducedMapValueTypeInIntput)
+    I2_QML_PROPERTY_READONLY(AgentIOPValueTypes::Value, reducedMapValueTypeInInput)
 
     // Define the value type of the reduced map (= brin) in output of the agent
-    I2_QML_PROPERTY_READONLY(AgentIOPValueTypes::Value, _reducedMapValueTypeInOutput)
+    I2_QML_PROPERTY_READONLY(AgentIOPValueTypes::Value, reducedMapValueTypeInOutput)
 
 
 public:
