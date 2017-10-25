@@ -29,6 +29,7 @@
 //initialization and configuration
 
 //start, stop & kill the agent
+PUBLIC extern bool mtic_Interrupted;
 PUBLIC int mtic_startWithDevice(const char *networkDevice, int port);
 PUBLIC int mtic_startWithIP(const char *ipAddress, int port);
 PUBLIC int mtic_stop(void);
