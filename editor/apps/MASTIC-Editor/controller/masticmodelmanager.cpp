@@ -57,9 +57,6 @@ MasticModelManager::~MasticModelManager()
 {
     qInfo() << "Delete MASTIC Model Manager";
 
-    // Delete all models of agents
-    //qDeleteAll(_allAgentsModel);
-
     // Clear all opened definitions
     _openedDefinitions.clear();
 }
@@ -384,6 +381,32 @@ QList<AgentM*> MasticModelManager::getAgentModelsListFromName(QString name)
     else {
         return QList<AgentM*>();
     }
+}
+
+
+/**
+ * @brief Get the map from agent name to list of active agents
+ * @return
+ */
+QHash<QString, QList<AgentM*>> MasticModelManager::getMapFromAgentNameToActiveAgentsList()
+{
+    QHash<QString, QList<AgentM*>> mapFromAgentNameToActiveAgentsList;
+
+    foreach (QString agentName, _mapFromNameToAgentModelsList.keys())
+    {
+        QList<AgentM*> allAgentsList = getAgentModelsListFromName(agentName);
+        QList<AgentM*> activeAgentsList;
+        foreach (AgentM* agent, allAgentsList) {
+            if ((agent != NULL) && agent->isON()) {
+                activeAgentsList.append(agent);
+            }
+        }
+        if (activeAgentsList.count() > 0) {
+            mapFromAgentNameToActiveAgentsList.insert(agentName, activeAgentsList);
+        }
+    }
+
+    return mapFromAgentNameToActiveAgentsList;
 }
 
 

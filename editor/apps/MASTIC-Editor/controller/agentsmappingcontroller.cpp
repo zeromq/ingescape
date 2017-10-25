@@ -26,14 +26,16 @@
  */
 AgentsMappingController::AgentsMappingController(MasticModelManager* modelManager, QObject *parent)
     : QObject(parent),
+      _isEmptyMapping(true),
       _modelManager(modelManager)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
     if (_modelManager != NULL)
-    {
-        _agentInMappingVMList.setSortProperty("agentName");
+    {   
+        // Connect to signal "Count Changed" from the list of agents in mapping
+        connect(&_agentInMappingVMList, &AbstractI2CustomItemListModel::countChanged, this, &AgentsMappingController::_onAgentsInMappingChanged);
     }
 }
 
@@ -43,6 +45,9 @@ AgentsMappingController::AgentsMappingController(MasticModelManager* modelManage
  */
 AgentsMappingController::~AgentsMappingController()
 {
+    // DIS-connect from signal "Count Changed" from the list of agents in mapping
+    disconnect(&_agentInMappingVMList, 0, this, 0);
+
     _modelManager = NULL;
 }
 
@@ -267,4 +272,60 @@ PointMapVM * AgentsMappingController::findTheSecondPointOfElementMap(QString age
 
     qInfo() << "PointMap " << iopName << " NOT found. /n";
     return secondPointMapVM;
+}
+
+
+/**
+ * @brief Slot when the flag "is Activated Mapping" changed
+ * @param isActivatedMapping
+ */
+void AgentsMappingController::onIsActivatedMappingChanged(bool isActivatedMapping)
+{
+    if (isActivatedMapping) {
+        qInfo() << "Mapping ACTIVATED !";
+
+        if (_isEmptyMapping) {
+            if (_modelManager != NULL) {
+                // Get the map from agent name to list of active agents
+                QHash<QString, QList<AgentM*>> mapFromAgentNameToActiveAgentsList = _modelManager->getMapFromAgentNameToActiveAgentsList();
+
+                foreach (QString agentName, mapFromAgentNameToActiveAgentsList.keys()) {
+                    QList<AgentM*> activeAgentsList = mapFromAgentNameToActiveAgentsList.value(agentName);
+                    qDebug() << "Create an AgentMappingVM for name" << agentName << "and with definitions of" << activeAgentsList.count() << "agents";
+
+                    // FIXME VINCENT: En attendant de regrouper au sein de la classe AgentM: la définition et le mapping
+                    if (activeAgentsList.count() == 1) {
+                        QList<DefinitionM*> definitionsList = _modelManager->getAgentDefinitionsListFromName(agentName);
+
+                        foreach (DefinitionM* definition, definitionsList) {
+                            if (definition != NULL) {
+                                addAgentDefinitionToMappingAtPosition(agentName, definition, QPointF());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        else {
+
+        }
+    }
+    else {
+        qInfo() << "Mapping DE-activated !";
+    }
+}
+
+
+/**
+ * @brief Slot when the list of "Agents in Mapping" changed
+ */
+void AgentsMappingController::_onAgentsInMappingChanged()
+{
+    // Update the flag "is Empty Mapping"
+    if (_agentInMappingVMList.count() == 0) {
+        setisEmptyMapping(true);
+    }
+    else {
+        setisEmptyMapping(false);
+    }
 }
