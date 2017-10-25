@@ -23,13 +23,44 @@
 #include <QtGlobal>
 #include <QDate>
 
-
 #include <I2Quick.h>
 
 #include <controller/masticeditorcontroller.h>
 #include <misc/masticeditorsettings.h>
 #include <misc/masticeditorutils.h>
 
+/*#include <signal.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/socket.h>*/
+
+//http://doc.qt.io/qt-5/unix-signals.html
+
+/**
+ * @brief Install our Unix signal handlers with sigaction
+ * @return
+ */
+/*static int setup_unix_signal_handlers()
+{
+    struct sigaction hup, term;
+
+    hup.sa_handler = MasticEditorController::hupSignalHandler;
+    sigemptyset(&hup.sa_mask);
+    hup.sa_flags = 0;
+    hup.sa_flags |= SA_RESTART;
+
+    if (sigaction(SIGHUP, &hup, 0))
+       return 1;
+
+    term.sa_handler = MasticEditorController::termSignalHandler;
+    sigemptyset(&term.sa_mask);
+    term.sa_flags |= SA_RESTART;
+
+    if (sigaction(SIGTERM, &term, 0))
+       return 2;
+
+    return 0;
+}*/
 
 
 
@@ -100,8 +131,6 @@ void registerCustomQmlTypes()
     qmlRegisterSingletonType(QUrl("qrc:/qml/theme/MasticTheme.qml"), uri, 1, 0, "MasticTheme");
 
 }
-
-
 
 
 /**
@@ -217,6 +246,10 @@ int main(int argc, char *argv[])
     {
         qFatal("ERROR: There is no special directory 'Documents' !");
     }
+
+
+    // Install our Unix signal handlers with sigaction
+    //setup_unix_signal_handlers();
 
 
     //------------------------------

@@ -65,6 +65,7 @@ class MasticEditorController : public QObject
 
 
 public:
+
     /**
      * @brief Constructor
      * @param parent
@@ -76,6 +77,11 @@ public:
      * @brief Destructor
      */
     ~MasticEditorController();
+
+
+    // Unix signal handlers.
+    //static void hupSignalHandler(int unused);
+    //static void termSignalHandler(int unused);
 
 
     /**
@@ -99,12 +105,26 @@ public:
       */
      Q_INVOKABLE void closeActionEditor(ActionEditorController *actionEditorC);
 
+
 public Q_SLOTS:
 
      /**
       * @brief Method used to force the creation of our singleton from QML
       */
      void forceCreation();
+
+
+     // Qt signal handlers.
+     //void handleSigHup();
+     //void handleSigTerm();
+
+
+private:
+     /*static int sighupFd[2];
+     static int sigtermFd[2];
+
+     QSocketNotifier *snHup;
+     QSocketNotifier *snTerm;*/
 
 };
 
