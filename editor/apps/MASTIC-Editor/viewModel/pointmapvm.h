@@ -11,6 +11,7 @@ class PointMapVM : public QObject
 {
     Q_OBJECT
 
+       // TODO ESTIA SUPP NAME_AGENT
        // Name of agent using this input/output represent by a point map
        I2_QML_PROPERTY(QString, nameAgent)
 
