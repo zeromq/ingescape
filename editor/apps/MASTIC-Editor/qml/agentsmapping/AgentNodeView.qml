@@ -30,19 +30,20 @@ Item {
     //--------------------------------
 
     // Model associated to our QML item
-    property var agentVM: null
+    property var agentMappingVM: null
+    property var agentName: agentMappingVM ? agentMappingVM.agentName : ""
 
     property bool isClosed : false
 
     width : 228
-    height : (rootItem.agentVM && !rootItem.isClosed)?
-                 (52 + 20*Math.max(rootItem.agentVM.inputsList.count , rootItem.agentVM.outputsList.count))
+    height : (rootItem.agentMappingVM && !rootItem.isClosed)?
+                 (52 + 20*Math.max(rootItem.agentMappingVM.inputsList.count , rootItem.agentMappingVM.outputsList.count))
                : 40
 
 
     // Init position of our agent
-    x: (agentVM && agentVM.position) ? agentVM.position.x : 0
-    y: (agentVM && agentVM.position) ? agentVM.position.y : 0
+    x: (agentMappingVM && agentMappingVM.position) ? agentMappingVM.position.x : 0
+    y: (agentMappingVM && agentMappingVM.position) ? agentMappingVM.position.y : 0
 
 
     clip : true
@@ -51,7 +52,7 @@ Item {
     // Bindings to save the position of our agent
     //
     Binding {
-        target: rootItem.agentVM
+        target: rootItem.agentMappingVM
         property: "position"
         value: Qt.point(rootItem.x,rootItem.y)
     }
@@ -111,7 +112,7 @@ Item {
 
 
             elide: Text.ElideRight
-            text : agentVM ? agentVM.agentName : ""
+            text : rootItem.agentName
 
             color : MasticTheme.agentsNameMappingColor
             font: MasticTheme.headingFont
@@ -156,7 +157,7 @@ Item {
 
             Repeater {
                 // List of intput slots VM
-                model: (rootItem.agentVM && !rootItem.isClosed)? rootItem.agentVM.inputsList : 0
+                model: (rootItem.agentMappingVM && !rootItem.isClosed)? rootItem.agentMappingVM.inputsList : 0
 
                 delegate: Item {
                     id: inputSlotItem
@@ -245,7 +246,7 @@ Item {
 
             Repeater {
                 // List of output slots VM
-                model: (rootItem.agentVM && !rootItem.isClosed)? rootItem.agentVM.outputsList : 0
+                model: (rootItem.agentMappingVM && !rootItem.isClosed)? rootItem.agentMappingVM.outputsList : 0
 
                 delegate: Item {
                     id: outputSlotItem

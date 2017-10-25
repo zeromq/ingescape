@@ -161,7 +161,7 @@ Item {
                     elide: Text.ElideRight
 
                     text: root.agent? root.agent.name : ""
-                    color: (root.agent  && (root.agent.isON === true) && !root.agent.hasOnlyDefinition)? MasticTheme.agentsListLabelColor : MasticTheme.agentOFFLabelColor
+                    color: (root.agent  && (root.agent.isON === true))? MasticTheme.agentsListLabelColor : MasticTheme.agentOFFLabelColor
 
 
                     font: MasticTheme.headingFont
@@ -236,7 +236,7 @@ Item {
                         }
 
                         text : definitionName.elidedText
-                        color: (model.definition.isVariant)?
+                        color: (model.definition && model.definition.isVariant)?
                                    (definitionNameBtn.pressed? MasticTheme.darkRedColor : MasticTheme.redColor)
                                  : ((root.agent && root.agent.isON === true)?
                                        (definitionNameBtn.pressed? MasticTheme.agentsListPressedLabel2Color : MasticTheme.agentsListLabel2Color)
@@ -303,6 +303,9 @@ Item {
                 property var boundingBox: MasticTheme.svgFileMASTIC.boundsOnElement("on");
                 height : boundingBox.height
                 width :  boundingBox.width
+
+                visible : (root.agent && !root.agent.hasOnlyDefinition)
+                enabled: visible
 
                 anchors {
                     bottom: muteButton.top

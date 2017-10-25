@@ -23,6 +23,10 @@ import I2Quick 1.0
 import MASTIC 1.0
 
 
+// agent sub-directory
+import "../agentsmapping" as AgentMapping
+
+
 Item {
     id: rootItem
 
@@ -342,6 +346,7 @@ Item {
             width: MasticTheme.leftPanelWidth
             height: 85
 
+
             // Not Draggable Agent Item
             AgentsListItem {
                 id : notDraggableItem
@@ -351,11 +356,10 @@ Item {
                 agent : model.QtObject
                 controller: rootItem.controller
 
-                visible: mouseArea.drag.active
+               visible: mouseArea.drag.active
 
                 agentItemIsHovered : mouseArea.containsMouse
             }
-
 
             // Draggable Agent Item
             Item {
@@ -443,12 +447,22 @@ Item {
 
 
                     AgentsListItem {
-                        anchors.fill: parent
+                        height : notDraggableItem.height
+                        width : notDraggableItem.width
+
 
                         agent : model.QtObject
                         controller: rootItem.controller
 
                         agentItemIsHovered : mouseArea.containsMouse
+                        visible: !mouseArea.drag.active
+                    }
+
+                    AgentMapping.AgentNodeView {
+                         opacity : 0.5
+                         isClosed : true
+                         agentName : model.name
+                         visible: mouseArea.drag.active
                     }
                 }
 

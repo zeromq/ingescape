@@ -375,7 +375,7 @@ Item {
 
                 //----------------------------------------
                 // TODO: replace with a Repeater
-                //       model: list of AgentVM
+                //       model: list of AgentMappingVM
 
                 Repeater {
                     model : controller? controller.agentInMappingVMList : 0;
@@ -383,7 +383,7 @@ Item {
 
                     AgentNodeView {
                         id: agent
-                        agentVM : model.QtObject
+                        agentMappingVM : model.QtObject
 
                         MouseArea {
                             id: mouseArea
@@ -397,7 +397,7 @@ Item {
                             }
 
                             onPositionChanged: {
-                                console.log("agentVM position " + model.position.x + "  " + model.position.y)
+                                console.log("agentMapping position " + model.position.x + "  " + model.position.y)
                             }
 
                             onDoubleClicked: {
@@ -999,47 +999,12 @@ Item {
                     NumberAnimation {}
                 }
 
-
-                Rectangle {
+                AgentNodeView {
                     transformOrigin: Item.TopLeft
 
                     scale: workspace.scale
-
-                    width: 150
-                    height: 150
-
-                    opacity: 0.7
-
-                    color: workspace.nodeColor
-
-                    radius: 8
-
-                    border {
-                        width: 2
-                        color: workspace.nodeBorderColor
-                    }
-
-                    visible: workspaceDropArea.containsDrag
-
-                    Text {
-                        id: agentName
-
-                        anchors {
-                            fill: parent
-                            margins: 5
-                        }
-
-                        verticalAlignment: Text.AlignVCenter
-                        horizontalAlignment: Text.AlignHCenter
-
-                        elide: Text.ElideRight
-
-                        text: dropGhost.agent ? dropGhost.agent.name : ""
-
-                        color: (dropGhost.agent && (dropGhost.agent.isON === true) && !dropGhost.agent.hasOnlyDefinition) ? MasticTheme.agentsListLabelColor : MasticTheme.agentOFFLabelColor
-
-                        font: MasticTheme.headingFont
-                    }
+                    isClosed : true
+                    agentName : dropGhost.agent ? dropGhost.agent.name : ""
                 }
             }
         }
