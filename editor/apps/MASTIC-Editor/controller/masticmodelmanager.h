@@ -39,13 +39,20 @@ class MasticModelManager : public QObject
     // List of opened definitions
     I2_QOBJECT_LISTMODEL(DefinitionM, openedDefinitions)
 
+    // Flag indicating if our global mapping is activated
+    I2_QML_PROPERTY(bool, isActivatedMapping)
+
 
 public:
     /**
      * @brief Default constructor
+     * @param agentsListDirectoryPath
+     * @param agentsMappingsDirectoryPath
      * @param parent
      */
-    explicit MasticModelManager(QObject *parent = nullptr);
+    explicit MasticModelManager(QString agentsListDirectoryPath,
+                                QString agentsMappingsDirectoryPath,
+                                QObject *parent = nullptr);
 
 
     /**
@@ -78,6 +85,13 @@ public:
 
 
     /**
+     * @brief Get the map from agent name to list of active agents
+     * @return
+     */
+    QHash<QString, QList<AgentM*>> getMapFromAgentNameToActiveAgentsList();
+
+
+    /**
      * @brief Delete a model of Agent
      * @param agant
      */
@@ -92,7 +106,7 @@ public:
 
 
     /**
-     * @brief Get the list (of models) of agent definition from a name
+     * @brief Get the list (of models) of agent definition from a definition name
      * @param definitionName
      * @return
      */
@@ -110,15 +124,15 @@ public:
      * @brief Add a model of agent mapping
      * @param agentMapping
      */
-    void addAgentMapping(AgentMappingM* agentMapping);
+    //void addAgentMapping(AgentMappingM* agentMapping);
 
 
     /**
-     * @brief Get the list (of models) of agent mapping from a name
+     * @brief Get the list (of models) of agent mapping from a mapping name
      * @param name
      * @return
      */
-    QList<AgentMappingM*> getAgentMappingsListFromName(QString mappingName);
+    //QList<AgentMappingM*> getAgentMappingsListFromName(QString mappingName);
 
 
     /**
@@ -126,14 +140,47 @@ public:
      * @param agentName
      * @return
      */
-    QList<ElementMappingM*> getMergedListOfMappingElementsFromAgentName(QString agentName);
+    QList<ElementMappingM*> getMergedListOfInputMappingElementsFromAgentName(QString agentName);
 
 
     /**
-     * @brief Initialize agents (from JSON files) inside a directory
-     * @param agentsDirectoryPath agents directory path
+     * @brief Get the merged list of all (models of) mapping elements which connect an output of the agent
+     * @param agentName
+     * @return
      */
-    void initAgentsInsideDirectory(QString agentsDirectoryPath);
+    QList<ElementMappingM*> getMergedListOfOutputMappingElementsFromAgentName(QString agentName);
+
+
+    /**
+     * @brief Import the agents list from default file
+     */
+    void importAgentsListFromDefaultFile();
+
+
+    /**
+     * @brief Import an agents list from selected file
+     */
+    Q_INVOKABLE void importAgentsListFromSelectedFile();
+
+
+    /**
+     * @brief Import an agent from selected files (definition and mapping)
+     */
+    Q_INVOKABLE void importAgentFromSelectedFiles();
+
+
+    /**
+     * @brief Export the agents list to default file
+     * @param agentsListToExport list of pairs <agent name, definition>
+     */
+    void exportAgentsListToDefaultFile(QList<QPair<QString, DefinitionM*>> agentsListToExport);
+
+
+    /**
+     * @brief Export the agents list to selected file
+     * @param agentsListToExport list of pairs <agent name, definition>
+     */
+    void exportAgentsListToSelectedFile(QList<QPair<QString, DefinitionM*>> agentsListToExport);
 
 
 Q_SIGNALS:
@@ -158,7 +205,7 @@ Q_SIGNALS:
      * @param agentMapping
      * @param agent
      */
-    void agentMappingCreated(AgentMappingM* agentMapping, AgentM* agent);
+    //void agentMappingCreated(AgentMappingM* agentMapping, AgentM* agent);
 
 
     /**
@@ -166,6 +213,15 @@ Q_SIGNALS:
      * @param mappingElement
      */
     void mappingElementCreated(ElementMappingM* mappingElement);
+
+
+    /**
+     * @brief Signal emitted when the flag "is Muted" from an output of agent updated
+     * @param agent
+     * @param isMuted
+     * @param outputName
+     */
+    void isMutedFromOutputOfAgentUpdated(AgentM* agent, bool isMuted, QString outputName);
 
 
 public Q_SLOTS:
@@ -210,28 +266,52 @@ public Q_SLOTS:
 
 
     /**
-     * @brief Slot when the flag "Is Muted" of an agent updated
+     * @brief Slot when the flag "is Muted" from an agent updated
      * @param peerId
      * @param isMuted
      */
-    void onisMutedOfAgentUpdated(QString peerId, bool isMuted);
+    void onisMutedFromAgentUpdated(QString peerId, bool isMuted);
 
 
     /**
-     * @brief Slot when the flag "Is Frozen" of an agent updated
+     * @brief Slot when the flag "is Frozen" from an agent updated
      * @param peerId
      * @param isFrozen
      */
-    void onIsFrozenOfAgentUpdated(QString peerId, bool isFrozen);
+    void onIsFrozenFromAgentUpdated(QString peerId, bool isFrozen);
+
+
+    /**
+     * @brief Slot when the flag "is Muted" from an output of agent updated
+     * @param peerId
+     * @param isMuted
+     * @param outputName
+     */
+    void onIsMutedFromOutputOfAgentUpdated(QString peerId, bool isMuted, QString outputName);
 
 
 private:
 
     /**
-     * @brief Initialize an agent (from JSON files) inside a sub directory
+     * @brief Import the agents list from JSON file
+     * @param agentsListFilePath
+     */
+    void _importAgentsListFromFile(QString agentsListFilePath);
+
+
+    /**
+     * @brief Import an agent from JSON files (definition and mapping)
      * @param subDirectoryPath
      */
-    void _initAgentInsideSubDirectory(QString subDirectoryPath);
+    void _importAgentFromFiles(QStringList agentFilesPaths);
+
+
+    /**
+     * @brief Export the agents list to JSON file
+     * @param agentsListToExport list of pairs <agent name, definition>
+     * @param agentsListFilePath
+     */
+    void _exportAgentsListToFile(QList<QPair<QString, DefinitionM*>> agentsListToExport, QString agentsListFilePath);
 
 
     /**
@@ -242,20 +322,33 @@ private:
 
 
     /**
-     * @brief Update the merged list of mapping elements for the agent name
+     * @brief Update merged lists of mapping elements for the agent name
      * @param agentName
      * @param agentMapping
      */
-    void _updateMergedListOfMappingElementsForAgentName(QString agentName, AgentMappingM* agentMapping);
+    //void _updateMergedListsOfMappingElementsForAgentName(QString agentName, AgentMappingM* agentMapping);
+    void _updateMergedListsOfMappingElementsForAgentName(QString agentName, QList<ElementMappingM*> mappingElementsList);
+
+
+    /**
+     * @brief Clean merged lists of mapping elements for the agent name
+     * @param agentName
+     */
+    void _cleanMergedListsOfMappingElementsForAgentName(QString agentName);
 
 
 private:
 
+    // Path to the directory containing JSON files to save agents list
+    QString _agentsListDirectoryPath;
+    QString _agentsListDefaultFilePath;
+
+    // Path to the directory containing JSON files to save agents mappings
+    QString _agentsMappingsDirectoryPath;
+    QString _agentsMappingsDefaultFilePath;
+
     // Helper to manage JSON definitions of agents
     JsonHelper* _jsonHelper;
-
-    // List of all models of agents
-    //QList<AgentM*> _allAgentsModel;
 
     // Map from "peer id" to a model of agent
     QHash<QString, AgentM*> _mapFromPeerIdToAgentM;
@@ -267,10 +360,13 @@ private:
     QHash<QString, QList<DefinitionM*>> _mapFromNameToAgentDefinitionsList;
 
     // Map from "mapping name" to a list (of models) of agent mapping
-    QHash<QString, QList<AgentMappingM*>> _mapFromNameToAgentMappingsList;
+    //QHash<QString, QList<AgentMappingM*>> _mapFromNameToAgentMappingsList;
 
     // Map from agent name to the merged list of all (models of) mapping elements which connect an input of the agent
-    QHash<QString, QList<ElementMappingM*>> _mapFromAgentNameToMergedListOfMappingElements;
+    QHash<QString, QList<ElementMappingM*>> _mapFromAgentNameToMergedListOfInputMappingElements;
+
+    // Map from agent name to the merged list of all (models of) mapping elements which connect an output of the agent
+    QHash<QString, QList<ElementMappingM*>> _mapFromAgentNameToMergedListOfOutputMappingElements;
 
 };
 

@@ -49,10 +49,10 @@ AgentM::AgentM(QString name,
     _hostname(""),
     _executionPath(""),
     _pid(0),
+    _isON(false),
     _isMuted(false),
     _canBeFrozen(false),
-    _isFrozen(false),
-    _status(AgentStatus::OFF)
+    _isFrozen(false)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -68,3 +68,14 @@ AgentM::~AgentM()
 {
     qInfo() << "Delete Model of Agent" << _name << "(" << _peerId << ") at" << _address;
 }
+
+
+/**
+ * @brief Set the flag "is Muted" of an Output of our agent
+ * @param isMuted
+ * @param outputName
+ */
+/*void AgentM::setisMutedOfOutput(bool isMuted, QString outputName)
+{
+
+}*/

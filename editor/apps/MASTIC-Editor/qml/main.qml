@@ -8,8 +8,9 @@
  *
  *
  *	Contributors:
- *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *      Alexandre Lemort   <lemort@ingenuity.io>
+ *      Justine Limoges    <limoges@ingenuity.io>
+ *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *
  */
 
@@ -58,15 +59,30 @@ ApplicationWindow {
             title: qsTr("Supervision")
 
             MenuItem {
-                text: qsTr("TODO 1")
+                text: qsTr("Créer un nouvel Agent")
                 onTriggered: {
-                    console.log("Supervision TODO 1");
+                    console.log("Créer un nouvel Agent");
                 }
             }
             MenuItem {
-                text: qsTr("TODO 2")
+                text: qsTr("Importer une liste d'agents")
                 onTriggered: {
-                    console.log("Supervision TODO 2");
+                    //console.log("QML: Importer une liste d'agents");
+
+                    if (MasticEditorC.modelManager) {
+                        MasticEditorC.modelManager.importAgentsListFromSelectedFile();
+                    }
+                }
+            }
+            MenuItem {
+                text: qsTr("Exporter la liste d'agents")
+
+                onTriggered: {
+                    //console.log("QML: Exporter la liste d'agents");
+
+                    if (MasticEditorC.agentsSupervisionC) {
+                        MasticEditorC.agentsSupervisionC.exportAgentsListToSelectedFile();
+                    }
                 }
             }
         }
@@ -179,6 +195,14 @@ ApplicationWindow {
         loaderDelayAnimation.start();
     }
 
+    // When user clicks on window close button
+    onClosing: {
+        console.info("QML: Close Window");
+        if (MasticEditorC.agentsSupervisionC) {
+            MasticEditorC.agentsSupervisionC.exportAgentsListToDefaultFile();
+        }
+    }
+
 
     // Content of our window
     Item {
@@ -273,7 +297,16 @@ ApplicationWindow {
         // Overlay layer used to display popups above the content of our window
         I2Layer {
             id: overlayLayer
+
             objectName: "overlayLayer"
+
+            anchors.fill: parent
+        }
+
+        // Overlay layer used to display draggable agent item above the content of our window and the popups
+        I2Layer {
+            id: overlayLayer2
+            objectName: "overlayLayer2"
 
             anchors.fill: parent
         }

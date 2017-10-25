@@ -289,21 +289,35 @@ I2PopupBase {
 
             Button {
                 id: btnMuteOutput
+
+                property var boundingBox: MasticTheme.svgFileMASTIC.boundsOnElement("muteactif");
+                height : boundingBox.height
+                width :  boundingBox.width
+
                 visible: (model.agentIOPType === AgentIOPTypes.OUTPUT)
+                enabled : visible
 
                 anchors {
                     left: iopValue.right
                     top: parent.top
                 }
-                width: 120
 
-                text: "Mute/UN-mute"
+                style: I2SvgButtonStyle {
+                    fileCache: MasticTheme.svgFileMASTIC
+
+                    pressedID: releasedID + "-pressed"
+                    releasedID: model.isMuted? "muteactif" : "muteinactif"
+                    disabledID : releasedID
+
+                }
 
                 onClicked: {
                     //console.log("QML: Mute/UN-mute output " + model.name);
-                    model.QtObject.updateMute(!model.isMuted);
+                    model.QtObject.changeMuteOutput();
                 }
             }
+
+
         }
     }
 }

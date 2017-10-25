@@ -8,8 +8,9 @@
  *
  *
  *	Contributors:
- *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *      Alexandre Lemort   <lemort@ingenuity.io>
+ *      Justine Limoges    <limoges@ingenuity.io>
+ *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *
  */
 
@@ -128,104 +129,109 @@ Item {
     Rectangle {
         id: leftPanel
 
+        width: MasticTheme.leftPanelWidth
+
         anchors {
             left: parent.left
             top: parent.top
-            topMargin: 9
             bottom: parent.bottom
         }
 
-        width: MasticTheme.leftPanelWidth
+        color : MasticTheme.agentsMappingBackgroundColor;
 
-        color: MasticTheme.leftPanelBackgroundColor
-        radius : 5
-     //   fuzzyRadius: 8
-     //   topRightRadius : 5
+        I2CustomRectangle {
+            anchors {
+                fill: parent
+                topMargin: 9
+            }
+            color: MasticTheme.leftPanelBackgroundColor
 
-        border {
-            width: 1
-            color: MasticTheme.selectedTabsBackgroundColor
-        }
+            fuzzyRadius: 8
+            topRightRadius : 5
 
-        // tabs of left panel
-        I2TabView {
-            id : leftPanelTabs
+            borderWidth: 1
+            borderColor: MasticTheme.selectedTabsBackgroundColor
 
-            anchors.fill :parent
+            // tabs of left panel
+            I2TabView {
+                id : leftPanelTabs
 
-            style: I2TabViewStyle {
-                frameOverlap: 1
-                tab: I2CustomRectangle {
-                    color: styleData.selected ? MasticTheme.selectedTabsBackgroundColor : "transparent"
-                    implicitWidth: 107
-                    implicitHeight: 26
-                    topRightRadius : 5
+                anchors.fill :parent
 
-                    Text {
-                        id: text
-                        anchors.fill: parent
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter;
-                        text: styleData.title
-                        color: styleData.selected ? MasticTheme.agentsListLabelColor : MasticTheme.selectedTabsBackgroundColor
-                        wrapMode: Text.Wrap;
+                style: I2TabViewStyle {
+                    frameOverlap: 1
+                    tab: I2CustomRectangle {
+                        color: styleData.selected ? MasticTheme.selectedTabsBackgroundColor : "transparent"
+                        implicitWidth: 107
+                        implicitHeight: 26
+                        topRightRadius : 5
 
-                        font {
-                            family: MasticTheme.labelFontFamily;
-                            bold: true
-                            pixelSize:18;
-                            capitalization: Font.AllUppercase;
+                        Text {
+                            id: text
+                            anchors.fill: parent
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter;
+                            text: styleData.title
+                            color: styleData.selected ? MasticTheme.agentsListLabelColor : MasticTheme.selectedTabsBackgroundColor
+                            wrapMode: Text.Wrap;
+
+                            font {
+                                family: MasticTheme.labelFontFamilyExtraBold;
+                                bold : true;
+                                pixelSize:18;
+                                capitalization: Font.AllUppercase;
+                            }
                         }
                     }
+                    frame: Rectangle {
+                        color: MasticTheme.selectedTabsBackgroundColor
+                    }
                 }
-                frame: Rectangle {
-                    color: MasticTheme.selectedTabsBackgroundColor
+
+                currentIndex : 0
+
+                onCurrentIndexChanged: {
+                }
+
+                Tab {
+                    title: qsTr("SUPERVISION");
+                    active : true
+
+                    Agent.AgentsList {
+                        id: agentsList
+
+                        anchors.fill: parent
+
+                        controller: MasticEditorC.agentsSupervisionC
+                    }
+                }
+
+                Tab {
+                    title: qsTr("ACTIONS");
+                    active : false
+
+                    Scenario.ActionsList {
+                        id: actionsList
+
+                        anchors.fill: parent
+
+                        controller: MasticEditorC.scenarioC
+                    }
+                }
+
+                Tab {
+                    title: qsTr("RECORDS");
+                    active : false
+
+                    Rectangle {
+                        id: records
+                        anchors.fill: parent
+                        color : "blue"
+                    }
                 }
             }
 
-            currentIndex : 0
-
-            onCurrentIndexChanged: {
-            }
-
-            Tab {
-                title: qsTr("SUPERVISION");
-                active : true
-
-                Agent.AgentsList {
-                    id: agentsList
-
-                    anchors.fill: parent
-
-                    controller: MasticEditorC.agentsSupervisionC
-                }
-            }
-
-            Tab {
-                title: qsTr("ACTIONS");
-                active : false
-
-                Scenario.ActionsList {
-                    id: actionsList
-
-                    anchors.fill: parent
-
-                    controller: MasticEditorC.scenarioC
-                }
-            }
-
-            Tab {
-                title: qsTr("RECORDS");
-                active : false
-
-                Rectangle {
-                    id: records
-                    anchors.fill: parent
-                    color : "blue"
-                }
-            }
         }
-
     }
 
 
@@ -243,6 +249,9 @@ Item {
             onOpened: {
                 agentDefinitionEditor.z = rootItem.popupTopmostZIndex;
                 rootItem.popupTopmostZIndex = rootItem.popupTopmostZIndex + 1;
+
+                x = x + (index * 40);
+                y = y + (index * 40);
             }
 
             onBringToFront: {

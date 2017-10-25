@@ -51,6 +51,21 @@ public:
     ~NetworkController();
 
 
+    /**
+     * @brief Called when a MASTIC Launcher enter the network
+     * @param hostname
+     * @param peerId
+     */
+    void masticLauncherEntered(QString hostname, QString peerId);
+
+
+    /**
+     * @brief Called when a MASTIC Launcher exit the network
+     * @param hostname
+     */
+    void masticLauncherExited(QString hostname);
+
+
 Q_SIGNALS:
 
     /**
@@ -93,22 +108,40 @@ Q_SIGNALS:
 
 
     /**
-     * @brief Signal emitted when the flag "Is Muted" of an agent updated
+     * @brief Signal emitted when the flag "is Muted" from an agent updated
      * @param peerId
      * @param isMuted
      */
-    void isMutedOfAgentUpdated(QString peerId, bool isMuted);
+    void isMutedFromAgentUpdated(QString peerId, bool isMuted);
 
 
     /**
-     * @brief Signal emitted when the flag "Is Frozen" of an agent updated
+     * @brief Signal emitted when the flag "is Frozen" from an agent updated
      * @param peerId
      * @param isFrozen
      */
-    void isFrozenOfAgentUpdated(QString peerId, bool isFrozen);
+    void isFrozenFromAgentUpdated(QString peerId, bool isFrozen);
+
+
+    /**
+     * @brief Signal emitted when the flag "is Muted" from an output of agent updated
+     * @param peerId
+     * @param isMuted
+     * @param outputName
+     */
+    void isMutedFromOutputOfAgentUpdated(QString peerId, bool isMuted, QString outputName);
 
 
 public Q_SLOTS:
+
+    /**
+     * @brief Slot when a command must be sent on the network to a launcher
+     * @param command
+     * @param hostname
+     * @param executionPath
+     */
+    void onCommandAskedToLauncher(QString command, QString hostname, QString executionPath);
+
 
     /**
      * @brief Slot when a command must be sent on the network
@@ -126,9 +159,10 @@ public Q_SLOTS:
      */
     void onCommandAskedForOutput(QString command, QString outputName, QStringList peerIdsList);
 
-protected:
+private:
 
-
+    // Map from "Hostname" to the "Peer Id" of the corresponding MASTIC launcher
+    QHash<QString, QString> _mapFromHostnameToMasticLauncherPeerId;
 
 };
 

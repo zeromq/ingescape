@@ -49,8 +49,6 @@ void registerCustomQmlTypes()
     //---------------
     qmlRegisterSingletonType<AgentIOPTypes>(uri, 1, 0, "AgentIOPTypes", &AgentIOPTypes::qmlSingleton);
     qmlRegisterSingletonType<AgentIOPValueTypes>(uri, 1, 0, "AgentIOPValueTypes", &AgentIOPValueTypes::qmlSingleton);
-    qmlRegisterSingletonType<AgentStatus>(uri, 1, 0, "AgentStatus", &AgentStatus::qmlSingleton);
-
 
 
     //----------------
@@ -76,6 +74,7 @@ void registerCustomQmlTypes()
     qmlRegisterUncreatableType<AgentM>(uri, 1, 0, "AgentM", "Internal class");
     qmlRegisterUncreatableType<AgentMappingM>(uri, 1, 0, "AgentMappingM", "Internal class");
     qmlRegisterUncreatableType<DefinitionM>(uri, 1, 0, "DefinitionM", "Internal class");
+    qmlRegisterUncreatableType<ElementMappingM>(uri, 1, 0, "ElementMappingM", "Internal class");
     qmlRegisterUncreatableType<OutputM>(uri, 1, 0, "OutputM", "Internal class");
 
 
@@ -84,9 +83,12 @@ void registerCustomQmlTypes()
     // View Models
     //
     //---------------
+    qmlRegisterUncreatableType<AgentInMappingVM>(uri, 1, 0, "AgentInMappingVM", "Internal class");
     qmlRegisterUncreatableType<AgentVM>(uri, 1, 0, "AgentVM", "Internal class");
     qmlRegisterUncreatableType<MapBetweenIOPVM>(uri, 1, 0, "MapBetweenIOPVM", "Internal class");
-
+    qmlRegisterUncreatableType<PointMapVM>(uri, 1, 0, "PointMapVM", "Internal class");
+    //qmlRegisterUncreatableType<InputVM>(uri, 1, 0, "InputVM", "Internal class");
+    //qmlRegisterUncreatableType<OutputVM>(uri, 1, 0, "OutputVM", "Internal class");
 
 
     //------------------
@@ -209,32 +211,6 @@ int main(int argc, char *argv[])
             MasticEditorSettings& settings = MasticEditorSettings::Instance(settingsFilePath);
 
             qDebug() << "Settings" << settings.fileName();
-        }
-
-
-        //------------------------------
-        //
-        // Agents definitions & mappings
-        //
-        //------------------------------
-        QString agentsDefinitionsAndMappingsDirectoryPath = MasticEditorUtils::getAgentsDefinitionsAndMappingsPath();
-        QDir agentsDefinitionsAndMappingsDirectory(agentsDefinitionsAndMappingsDirectoryPath);
-        if (!agentsDefinitionsAndMappingsDirectory.exists())
-        {
-            qCritical() << "ERROR: could not create directory at '" << agentsDefinitionsAndMappingsDirectoryPath << "' !";
-        }
-
-
-        //------------------------------
-        //
-        // Snapshots directory
-        //
-        //------------------------------
-        QString snapshotsDirectoryPath = MasticEditorUtils::getSnapshotsPath();
-        QDir snapshotsDirectory(snapshotsDirectoryPath);
-        if (!snapshotsDirectory.exists())
-        {
-            qCritical() << "ERROR: could not create directory at '" << snapshotsDirectoryPath << "' !";
         }
     }
     else

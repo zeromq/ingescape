@@ -23,11 +23,6 @@
 
 #include <model/iop/agentiopm.h>
 
-/**
-  * Status for an agent on the network: ON or OFF (and during transition after an ask)
-  */
-I2_ENUM(AgentStatus, ON, OFF, ON_ASKED, OFF_ASKED)
-
 
 /**
  * @brief The AgentM class defines a model of agent
@@ -66,17 +61,20 @@ class AgentM : public QObject
     // Publisher of our agent ???
     //I2_CPP_NOSIGNAL_PROPERTY(int, publisher)
 
+    // Flag indicating if our agent is ON (vs OFF)
+    I2_QML_PROPERTY_READONLY(bool, isON)
+
     // Flag indicating if our agent is muted
-    I2_QML_PROPERTY(bool, isMuted)
+    I2_QML_PROPERTY_READONLY(bool, isMuted)
 
     // Flag indicating if our agent can be frozen
     I2_QML_PROPERTY_READONLY(bool, canBeFrozen)
 
     // Flag indicating if our agent is frozen
-    I2_QML_PROPERTY(bool, isFrozen)
+    I2_QML_PROPERTY_READONLY(bool, isFrozen)
 
-    // Status: can be ON, OFF, ON Asked or OFF Asked
-    I2_QML_PROPERTY(AgentStatus::Value, status)
+    // Status defined by the agent
+    //I2_QML_PROPERTY_READONLY(QString, status)
 
 
 public:
@@ -106,6 +104,14 @@ public:
      * @brief Destructor
      */
     ~AgentM();
+
+
+    /**
+     * @brief Set the flag "is Muted" of an Output of our agent
+     * @param isMuted
+     * @param outputName
+     */
+    //void setisMutedOfOutput(bool isMuted, QString outputName);
 
 
 Q_SIGNALS:

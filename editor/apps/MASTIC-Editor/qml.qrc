@@ -36,5 +36,6 @@
         <file>qml/agent/AgentsListItem.qml</file>
         <file>qml/scenario/ActionsList.qml</file>
         <file>qml/scenario/ActionEditor.qml</file>
+        <file>resources/SVG/mastic-pictos.svg</file>
     </qresource>
 </RCC>

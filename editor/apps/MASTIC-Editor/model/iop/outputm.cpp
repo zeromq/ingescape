@@ -20,7 +20,7 @@
  * @param parent
  */
 OutputM::OutputM(QObject *parent) : OutputM("",
-                                            AgentIOPValueTypes::STRING,
+                                            AgentIOPValueTypes::UNKNOWN,
                                             parent)
 {
 }
@@ -55,18 +55,14 @@ OutputM::~OutputM()
 
 
 /**
- * @brief Mute/UN-mute our output
- * @param mute
+ * @brief Mute / UN-mute our output
  */
-void OutputM::updateMute(bool mute)
+void OutputM::changeMuteOutput()
 {
-    if (mute) {
-        Q_EMIT commandAsked("MUTE", _name);
-    }
-    else {
+    if (_isMuted) {
         Q_EMIT commandAsked("UNMUTE", _name);
     }
-
-    // FIXME
-    setisMuted(mute);
+    else {
+        Q_EMIT commandAsked("MUTE", _name);
+    }
 }

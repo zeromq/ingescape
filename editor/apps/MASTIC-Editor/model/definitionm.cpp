@@ -59,6 +59,22 @@ DefinitionM::~DefinitionM()
 
 
 /**
+ * @brief Set the flag "is Muted" of an Output of our agent definition
+ * @param isMuted
+ * @param outputName
+ */
+void DefinitionM::setisMutedOfOutput(bool isMuted, QString outputName)
+{
+    foreach (OutputM* output, _outputsList.toList()) {
+        if ((output != NULL) && (output->name() == outputName)) {
+            output->setisMuted(isMuted);
+            break;
+        }
+    }
+}
+
+
+/**
  * @brief Slot when the list of outputs changed
  */
 void DefinitionM::_onOutputsListChanged()
@@ -99,7 +115,7 @@ void DefinitionM::_onOutputsListChanged()
 
 
 /**
- * @brief Slot when the flag "Is Muted" of an output changed
+ * @brief Slot when the flag "is Muted" of an output changed
  * @param isMuted
  */
 /*void DefinitionM::_onIsMutedChanged(bool isMuted)

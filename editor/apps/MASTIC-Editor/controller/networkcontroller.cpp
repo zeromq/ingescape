@@ -27,6 +27,8 @@ extern "C" {
 #include "model/definitionm.h"
 
 
+static const QString launcherSuffix = ".masticlauncher";
+
 static const QString definitionPrefix = "EXTERNAL_DEFINITION#";
 static const QString mappingPrefix = "EXTERNAL_MAPPING#";
 
@@ -62,7 +64,11 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
         {
             qDebug() << QString("--> %1 has entered the network with peer id %2 (and address %3)").arg(peerName, peerId, peerAddress);
 
-            // TODO: name "masticlauncher.hostname"
+            // Mastic Launcher
+            if (peerName.endsWith(launcherSuffix)) {
+                QString hostname = peerName.left(peerName.length() - launcherSuffix.length());
+                networkController->masticLauncherEntered(hostname, peerId);
+            }
 
             bool isMasticPublisher = false;
             bool isIntPID = false;
@@ -152,17 +158,14 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
                 if (message == "0") {
                     //qDebug() << peerName << "(" << peerId << ") UN-MUTED";
 
-                    // Emit the signal "Is Muted of Agent Updated"
-                    Q_EMIT networkController->isMutedOfAgentUpdated(peerId, false);
+                    // Emit the signal "is Muted from Agent Updated"
+                    Q_EMIT networkController->isMutedFromAgentUpdated(peerId, false);
                 }
                 else if (message == "1") {
                     //qDebug() << peerName << "(" << peerId << ") MUTED";
 
-                    // Emit the signal "Is Muted of Agent Updated"
-                    Q_EMIT networkController->isMutedOfAgentUpdated(peerId, true);
-                }
-                else {
-                    qWarning() << peerName << "(" << peerId << ") MUTED";
+                    // Emit the signal "is Muted from Agent Updated"
+                    Q_EMIT networkController->isMutedFromAgentUpdated(peerId, true);
                 }
             }
             // FROZEN / UN-FROZEN
@@ -173,15 +176,31 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
                 if (message == "0") {
                     //qDebug() << peerName << "(" << peerId << ") UN-FROZEN";
 
-                    // Emit the signal "Is Frozen of Agent Updated"
-                    Q_EMIT networkController->isFrozenOfAgentUpdated(peerId, false);
+                    // Emit the signal "is Frozen from Agent Updated"
+                    Q_EMIT networkController->isFrozenFromAgentUpdated(peerId, false);
                 }
                 else if (message == "1") {
                     //qDebug() << peerName << "(" << peerId << ") FROZEN";
 
-                    // Emit the signal "Is Frozen of Agent Updated"
-                    Q_EMIT networkController->isFrozenOfAgentUpdated(peerId, true);
+                    // Emit the signal "is Frozen from Agent Updated"
+                    Q_EMIT networkController->isFrozenFromAgentUpdated(peerId, true);
                 }
+            }
+            // OUTPUT MUTED
+            else if (message.startsWith(mutedOutputPrefix))
+            {
+                QString outputName = message.remove(0, mutedOutputPrefix.length());
+
+                // Emit the signal "is Muted from OUTPUT of Agent Updated"
+                Q_EMIT networkController->isMutedFromOutputOfAgentUpdated(peerId, true, outputName);
+            }
+            // OUTPUT UN-MUTED
+            else if (message.startsWith(unmutedOutputPrefix))
+            {
+                QString outputName = message.remove(0, unmutedOutputPrefix.length());
+
+                // Emit the signal "is Muted from OUTPUT of Agent Updated"
+                Q_EMIT networkController->isMutedFromOutputOfAgentUpdated(peerId, false, outputName);
             }
             else
             {
@@ -230,7 +249,44 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
             }
             else if (message.startsWith("MAPPED"))
             {
+                // FIXME TODO
                 qDebug() << peerName << "MAPPED" << message;
+            }
+            // MUTED / UN-MUTED
+            if (message.startsWith(mutedAllPrefix))
+            {
+                message.remove(0, mutedAllPrefix.length());
+
+                if (message == "0") {
+                    //qDebug() << peerName << "(" << peerId << ") UN-MUTED";
+
+                    // Emit the signal "is Muted from Agent Updated"
+                    Q_EMIT networkController->isMutedFromAgentUpdated(peerId, false);
+                }
+                else if (message == "1") {
+                    //qDebug() << peerName << "(" << peerId << ") MUTED";
+
+                    // Emit the signal "is Muted from Agent Updated"
+                    Q_EMIT networkController->isMutedFromAgentUpdated(peerId, true);
+                }
+            }
+            // FROZEN / UN-FROZEN
+            else if (message.startsWith(frozenPrefix))
+            {
+                message.remove(0, frozenPrefix.length());
+
+                if (message == "0") {
+                    //qDebug() << peerName << "(" << peerId << ") UN-FROZEN";
+
+                    // Emit the signal "is Frozen from Agent Updated"
+                    Q_EMIT networkController->isFrozenFromAgentUpdated(peerId, false);
+                }
+                else if (message == "1") {
+                    //qDebug() << peerName << "(" << peerId << ") FROZEN";
+
+                    // Emit the signal "is Frozen from Agent Updated"
+                    Q_EMIT networkController->isFrozenFromAgentUpdated(peerId, true);
+                }
             }
             else
             {
@@ -243,6 +299,12 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
         else if (event.compare("EXIT") == 0)
         {
             qDebug() << QString("<-- %1 (%2) exited").arg(peerName, peerId);
+
+            // Mastic Launcher
+            if (peerName.endsWith(launcherSuffix)) {
+                QString hostname = peerName.left(peerName.length() - launcherSuffix.length());
+                networkController->masticLauncherExited(hostname);
+            }
 
             // Emit the signal "Agent Exited"
             Q_EMIT networkController->agentExited(peerId, peerName);
@@ -282,7 +344,7 @@ NetworkController::NetworkController(QString networkDevice, QString ipAddress, i
     mtic_setVerbose(true);
 
     // Read our internal definition
-    QString myDefinitionPath = QString("%1/definition.json").arg(MasticEditorUtils::getDataPath());
+    QString myDefinitionPath = QString("%1definition.json").arg(MasticEditorUtils::getDataPath());
     QFileInfo checkDefinitionFile(myDefinitionPath);
     if (!checkDefinitionFile.exists() || !checkDefinitionFile.isFile())
     {
@@ -303,7 +365,7 @@ NetworkController::NetworkController(QString networkDevice, QString ipAddress, i
     }
 
     // Read our internal mapping
-    QString myMappingPath = QString("%1/mapping.json").arg(MasticEditorUtils::getDataPath());
+    QString myMappingPath = QString("%1mapping.json").arg(MasticEditorUtils::getDataPath());
     QFileInfo checkMappingFile(myMappingPath);
     if (!checkMappingFile.exists() || !checkMappingFile.isFile())
     {
@@ -364,6 +426,60 @@ NetworkController::~NetworkController()
 
 
 /**
+ * @brief Called when a MASTIC Launcher enter the network
+ * @param hostname
+ * @param peerId
+ */
+void NetworkController::masticLauncherEntered(QString hostname, QString peerId)
+{
+    qInfo() << "MASTIC Launcher on" << hostname << "entered";
+
+    _mapFromHostnameToMasticLauncherPeerId.insert(hostname, peerId);
+}
+
+
+/**
+ * @brief Called when a MASTIC Launcher exit the network
+ * @param hostname
+ */
+void NetworkController::masticLauncherExited(QString hostname)
+{
+    qInfo() << "MASTIC Launcher on" << hostname << "exited";
+
+    _mapFromHostnameToMasticLauncherPeerId.remove(hostname);
+}
+
+
+/**
+ * @brief Slot when a command must be sent on the network to a launcher
+ * @param command
+ * @param hostname
+ * @param executionPath
+ */
+void NetworkController::onCommandAskedToLauncher(QString command, QString hostname, QString executionPath)
+{
+    //Q_UNUSED(command)
+
+    if (!hostname.isEmpty() && !executionPath.isEmpty())
+    {
+        if (_mapFromHostnameToMasticLauncherPeerId.contains(hostname)) {
+            QString peerId = _mapFromHostnameToMasticLauncherPeerId.value(hostname);
+
+            if (!peerId.isEmpty()) {
+                // Send the command with execution path to the peer id of the launcher
+                int success = zyre_whispers(agentElements->node, peerId.toStdString().c_str(), "%s %s", command.toStdString().c_str(), executionPath.toStdString().c_str());
+
+                qInfo() << "Send command" << command << "to launcher on" << hostname << "with execution path" << executionPath << "with success ?" << success;
+            }
+        }
+        else {
+            qInfo() << "There is no launcher on" << hostname;
+        }
+    }
+}
+
+
+/**
  * @brief Slot when a command must be sent on the network
  * @param command
  * @param peerIdsList
@@ -373,7 +489,7 @@ void NetworkController::onCommandAsked(QString command, QStringList peerIdsList)
     if (!command.isEmpty() && (peerIdsList.count() > 0)) {
         foreach (QString peerId, peerIdsList)
         {
-            // Send the command for a peer id of agent
+            // Send the command to a peer id of agent
             int success = zyre_whispers(agentElements->node, peerId.toStdString().c_str(), "%s", command.toStdString().c_str());
 
             qDebug() << "Send command" << command << "for agent" << peerId << "with success ?" << success;
@@ -393,7 +509,7 @@ void NetworkController::onCommandAskedForOutput(QString command, QString outputN
     if (!command.isEmpty() && !outputName.isEmpty() && (peerIdsList.count() > 0)) {
         foreach (QString peerId, peerIdsList)
         {
-            // Send the command for a peer id of agent
+            // Send the command with the output name to a peer id of agent
             int success = zyre_whispers(agentElements->node, peerId.toStdString().c_str(), "%s %s", command.toStdString().c_str(), outputName.toStdString().c_str());
 
             qDebug() << "Send command" << command << "for agent" << peerId << "and output" << outputName << "with success ?" << success;

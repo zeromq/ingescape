@@ -17,23 +17,33 @@
 
 #include <QQmlEngine>
 #include <QDebug>
+#include <QFileDialog>
 
 #include <I2Quick.h>
 
-#include <QJsonDocument>
-
-
 /**
  * @brief Default constructor
+ * @param agentsListDirectoryPath
+ * @param agentsMappingsDirectoryPath
  * @param parent
  */
-MasticModelManager::MasticModelManager(QObject *parent) : QObject(parent),
+MasticModelManager::MasticModelManager(QString agentsListDirectoryPath,
+                                       QString agentsMappingsDirectoryPath,
+                                       QObject *parent) : QObject(parent),
+    _isActivatedMapping(false),
+    _agentsListDirectoryPath(agentsListDirectoryPath),
+    _agentsMappingsDirectoryPath(agentsMappingsDirectoryPath),
     _jsonHelper(NULL)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
     qInfo() << "New MASTIC Model Manager";
+
+    QDate today = QDate::currentDate();
+
+    _agentsListDefaultFilePath = QString("%1agents_list_%2.json").arg(_agentsListDirectoryPath, today.toString("ddMMyy"));
+    _agentsMappingsDefaultFilePath = QString("%1agents_mappings_%2.json").arg(_agentsMappingsDirectoryPath, today.toString("ddMMyy"));
 
     // Create the helper to manage JSON definitions of agents
     _jsonHelper = new JsonHelper(this);
@@ -45,33 +55,83 @@ MasticModelManager::MasticModelManager(QObject *parent) : QObject(parent),
  */
 MasticModelManager::~MasticModelManager()
 {
-    // Delete all models of agents
-    //qDeleteAll(_allAgentsModel);
-
     qInfo() << "Delete MASTIC Model Manager";
+
+    // Clear all opened definitions
+    _openedDefinitions.clear();
 }
 
 
 /**
- * @brief Initialize agents (from JSON files) inside a directory
- * @param agentsDirectoryPath agents directory path
+ * @brief Import the agents list from default file
  */
-void MasticModelManager::initAgentsInsideDirectory(QString agentsDirectoryPath)
+void MasticModelManager::importAgentsListFromDefaultFile()
 {
-    QDir agentsDefinitionsAndMappingsDirectory(agentsDirectoryPath);
-    if (agentsDefinitionsAndMappingsDirectory.exists())
-    {
-        // Get all sub directories
-        QFileInfoList agentsDirectoriesList = agentsDefinitionsAndMappingsDirectory.entryInfoList(QDir::NoDotAndDotDot | QDir::AllDirs);
+    // Import the agents list from JSON file
+    _importAgentsListFromFile(_agentsListDefaultFilePath);
+}
 
-        // Traverse the list of sub directories
-        foreach (QFileInfo fileInfo, agentsDirectoriesList)
-        {
-            if (fileInfo.isDir()) {
-                // Initialize an agent (from JSON files) inside a sub directory
-                _initAgentInsideSubDirectory(fileInfo.absoluteFilePath());
-            }
-        }
+
+/**
+ * @brief Import an agents list from selected file
+ */
+void MasticModelManager::importAgentsListFromSelectedFile()
+{
+    // "File Dialog" to get the file (path) to open
+    QString agentsListFilePath = QFileDialog::getOpenFileName(NULL,
+                                                              "Importer un fichier JSON avec une liste d'agents",
+                                                              _agentsListDirectoryPath,
+                                                              "JSON (*.json)");
+
+    if(!agentsListFilePath.isEmpty()) {
+        // Import the agents list from JSON file
+        _importAgentsListFromFile(agentsListFilePath);
+    }
+}
+
+
+/**
+ * @brief Import an agent from selected files (definition and mapping)
+ */
+void MasticModelManager::importAgentFromSelectedFiles()
+{
+    // "File Dialog" to get the files (paths) to open
+    QStringList agentFilesPaths = QFileDialog::getOpenFileNames(NULL,
+                                                                "Importer le fichier de définition (et de mapping) d'un agent",
+                                                                _agentsListDirectoryPath,
+                                                                "JSON (*.json)");
+
+    // Import the agent from JSON files (definition and mapping)
+    _importAgentFromFiles(agentFilesPaths);
+}
+
+
+/**
+ * @brief Export the agents list to default file
+ * @param agentsListToExport list of pairs <agent name, definition>
+ */
+void MasticModelManager::exportAgentsListToDefaultFile(QList<QPair<QString, DefinitionM*>> agentsListToExport)
+{
+    // Export the agents list to JSON file
+    _exportAgentsListToFile(agentsListToExport, _agentsListDefaultFilePath);
+}
+
+
+/**
+ * @brief Export the agents list to selected file
+ * @param agentsListToExport list of pairs <agent name, definition>
+ */
+void MasticModelManager::exportAgentsListToSelectedFile(QList<QPair<QString, DefinitionM*>> agentsListToExport)
+{
+    // "File Dialog" to get the file (path) to save
+    QString agentsListFilePath = QFileDialog::getSaveFileName(NULL,
+                                                              "Sauvegarder dans un fichier JSON la liste d'agents",
+                                                              _agentsListDirectoryPath,
+                                                              "JSON (*.json)");
+
+    if(!agentsListFilePath.isEmpty()) {
+        // Export the agents list to JSON file
+        _exportAgentsListToFile(agentsListToExport, agentsListFilePath);
     }
 }
 
@@ -97,8 +157,8 @@ void MasticModelManager::onAgentEntered(QString peerId, QString agentName, QStri
         {
             qInfo() << "The agent" << agentName << "with peer id" << peerId << "and address" << agentAddress << "is back on the network !";
 
-            // Update the status
-            agent->setstatus(AgentStatus::ON);
+            // Update the state (flag "is ON")
+            agent->setisON(true);
         }
         // New peer id
         else
@@ -110,7 +170,9 @@ void MasticModelManager::onAgentEntered(QString peerId, QString agentName, QStri
             agent->setexecutionPath(executionPath);
             agent->setpid(pid);
             agent->setcanBeFrozen(canBeFrozen);
-            agent->setstatus(AgentStatus::ON);
+
+            // Update the state (flag "is ON")
+            agent->setisON(true);
 
             _mapFromPeerIdToAgentM.insert(peerId, agent);
 
@@ -176,13 +238,17 @@ void MasticModelManager::onMappingReceived(QString peerId, QString agentName, QS
             if (agentMapping != NULL)
             {
                 // Add this new model of agent mapping
-                addAgentMapping(agentMapping);
+                //addAgentMapping(agentMapping);
 
                 // Emit the signal "Agent Mapping Created"
-                Q_EMIT agentMappingCreated(agentMapping, agent);
+                //Q_EMIT agentMappingCreated(agentMapping, agent);
 
                 // Update the merged list of mapping elements for the agent name
-                _updateMergedListOfMappingElementsForAgentName(agentName, agentMapping);
+                //_updateMergedListsOfMappingElementsForAgentName(agentName, agentMapping);
+                _updateMergedListsOfMappingElementsForAgentName(agentName, agentMapping->elementMappingsList()->toList());
+
+                // Free memory
+                delete agentMapping;
             }
         }
     }
@@ -201,18 +267,34 @@ void MasticModelManager::onAgentExited(QString peerId, QString agentName)
     {
         qInfo() << "The agent" << agentName << "with peer id" << peerId << "exited from the network !";
 
-        // Update the status
-        agent->setstatus(AgentStatus::OFF);
+        // Update the state (flag "is ON")
+        agent->setisON(false);
+
+        // Check if all agents with this name are OFF
+        bool allAgentsAreOFF = true;
+        QList<AgentM*> agentModelsList = getAgentModelsListFromName(agentName);
+        foreach (AgentM* model, agentModelsList) {
+            if (model->isON()) {
+                allAgentsAreOFF = false;
+                break;
+            }
+        }
+
+        if (allAgentsAreOFF)
+        {
+            // Clean merged lists of mapping elements for the agent name
+            _cleanMergedListsOfMappingElementsForAgentName(agentName);
+        }
     }
 }
 
 
 /**
- * @brief Slot when the flag "Is Muted" of an agent updated
+ * @brief Slot when the flag "is Muted" from an agent updated
  * @param peerId
  * @param isMuted
  */
-void MasticModelManager::onisMutedOfAgentUpdated(QString peerId, bool isMuted)
+void MasticModelManager::onisMutedFromAgentUpdated(QString peerId, bool isMuted)
 {
     AgentM* agent = getAgentModelFromPeerId(peerId);
     if(agent != NULL) {
@@ -222,15 +304,33 @@ void MasticModelManager::onisMutedOfAgentUpdated(QString peerId, bool isMuted)
 
 
 /**
- * @brief Slot when the flag "Is Frozen" of an agent updated
+ * @brief Slot when the flag "is Frozen" from an agent updated
  * @param peerId
  * @param isFrozen
  */
-void MasticModelManager::onIsFrozenOfAgentUpdated(QString peerId, bool isFrozen)
+void MasticModelManager::onIsFrozenFromAgentUpdated(QString peerId, bool isFrozen)
 {
     AgentM* agent = getAgentModelFromPeerId(peerId);
     if(agent != NULL) {
         agent->setisFrozen(isFrozen);
+    }
+}
+
+
+/**
+ * @brief Slot when the flag "is Muted" from an output of agent updated
+ * @param peerId
+ * @param isMuted
+ * @param outputName
+ */
+void MasticModelManager::onIsMutedFromOutputOfAgentUpdated(QString peerId, bool isMuted, QString outputName)
+{
+    AgentM* agent = getAgentModelFromPeerId(peerId);
+    if(agent != NULL) {
+        //agent->setisMutedOfOutput(isMuted, outputName);
+
+        // Propagate the signal with the model of agent
+        Q_EMIT isMutedFromOutputOfAgentUpdated(agent, isMuted, outputName);
     }
 }
 
@@ -285,6 +385,32 @@ QList<AgentM*> MasticModelManager::getAgentModelsListFromName(QString name)
 
 
 /**
+ * @brief Get the map from agent name to list of active agents
+ * @return
+ */
+QHash<QString, QList<AgentM*>> MasticModelManager::getMapFromAgentNameToActiveAgentsList()
+{
+    QHash<QString, QList<AgentM*>> mapFromAgentNameToActiveAgentsList;
+
+    foreach (QString agentName, _mapFromNameToAgentModelsList.keys())
+    {
+        QList<AgentM*> allAgentsList = getAgentModelsListFromName(agentName);
+        QList<AgentM*> activeAgentsList;
+        foreach (AgentM* agent, allAgentsList) {
+            if ((agent != NULL) && agent->isON()) {
+                activeAgentsList.append(agent);
+            }
+        }
+        if (activeAgentsList.count() > 0) {
+            mapFromAgentNameToActiveAgentsList.insert(agentName, activeAgentsList);
+        }
+    }
+
+    return mapFromAgentNameToActiveAgentsList;
+}
+
+
+/**
  * @brief Delete a model of Agent
  * @param agant
  */
@@ -327,7 +453,7 @@ void MasticModelManager::addAgentDefinition(DefinitionM* definition)
 
 
 /**
- * @brief Get the list (of models) of agent definition from a name
+ * @brief Get the list (of models) of agent definition from a definition name
  * @param name
  * @return
  */
@@ -371,7 +497,7 @@ void MasticModelManager::deleteAgentDefinition(DefinitionM* definition)
  * @brief Add a model of agent mapping
  * @param agentMapping
  */
-void MasticModelManager::addAgentMapping(AgentMappingM* agentMapping)
+/*void MasticModelManager::addAgentMapping(AgentMappingM* agentMapping)
 {
     if (agentMapping != NULL)
     {
@@ -383,15 +509,15 @@ void MasticModelManager::addAgentMapping(AgentMappingM* agentMapping)
         // Update the list in the map
         _mapFromNameToAgentMappingsList.insert(mappingName, agentMappingsList);
     }
-}
+}*/
 
 
 /**
- * @brief Get the list (of models) of agent mapping from a name
+ * @brief Get the list (of models) of agent mapping from a mapping name
  * @param mappingName
  * @return
  */
-QList<AgentMappingM*> MasticModelManager::getAgentMappingsListFromName(QString mappingName)
+/*QList<AgentMappingM*> MasticModelManager::getAgentMappingsListFromName(QString mappingName)
 {
     if (_mapFromNameToAgentMappingsList.contains(mappingName)) {
         return _mapFromNameToAgentMappingsList.value(mappingName);
@@ -399,7 +525,7 @@ QList<AgentMappingM*> MasticModelManager::getAgentMappingsListFromName(QString m
     else {
         return QList<AgentMappingM*>();
     }
-}
+}*/
 
 
 /**
@@ -407,10 +533,10 @@ QList<AgentMappingM*> MasticModelManager::getAgentMappingsListFromName(QString m
  * @param agentName
  * @return
  */
-QList<ElementMappingM*> MasticModelManager::getMergedListOfMappingElementsFromAgentName(QString agentName)
+QList<ElementMappingM*> MasticModelManager::getMergedListOfInputMappingElementsFromAgentName(QString agentName)
 {
-    if (_mapFromAgentNameToMergedListOfMappingElements.contains(agentName)) {
-        return _mapFromAgentNameToMergedListOfMappingElements.value(agentName);
+    if (_mapFromAgentNameToMergedListOfInputMappingElements.contains(agentName)) {
+        return _mapFromAgentNameToMergedListOfInputMappingElements.value(agentName);
     }
     else {
         return QList<ElementMappingM*>();
@@ -419,29 +545,94 @@ QList<ElementMappingM*> MasticModelManager::getMergedListOfMappingElementsFromAg
 
 
 /**
- * @brief Initialize an agent (from JSON files) inside a sub directory
+ * @brief Get the merged list of all (models of) mapping elements which connect an output of the agent
+ * @param agentName
+ * @return
+ */
+QList<ElementMappingM*> MasticModelManager::getMergedListOfOutputMappingElementsFromAgentName(QString agentName)
+{
+    if (_mapFromAgentNameToMergedListOfOutputMappingElements.contains(agentName)) {
+        return _mapFromAgentNameToMergedListOfOutputMappingElements.value(agentName);
+    }
+    else {
+        return QList<ElementMappingM*>();
+    }
+}
+
+
+/**
+ * @brief Import the agents list from JSON file
+ * @param agentsListFilePath
+ */
+void MasticModelManager::_importAgentsListFromFile(QString agentsListFilePath)
+{
+    if (!agentsListFilePath.isEmpty() && (_jsonHelper != NULL))
+    {
+        qInfo() << "Import the agents list from JSON file" << agentsListFilePath;
+
+        QFile jsonFile(agentsListFilePath);
+        if (jsonFile.exists()) {
+            if (jsonFile.open(QIODevice::ReadOnly))
+            {
+                QByteArray byteArrayOfJson = jsonFile.readAll();
+                jsonFile.close();
+
+                // Initialize agents list from JSON file
+                QList<QPair<QString, DefinitionM*>> agentsListToImport = _jsonHelper->initAgentsList(byteArrayOfJson);
+
+                for (int i = 0; i < agentsListToImport.count(); i++)
+                {
+                    QPair<QString, DefinitionM*> pair = agentsListToImport.at(i);
+                    QString agentName = pair.first;
+                    DefinitionM* agentDefinition = pair.second;
+
+                    if (!agentName.isEmpty() && (agentDefinition != NULL))
+                    {
+                        // Create a new model of agent with the name
+                        AgentM* agent = new AgentM(agentName, this);
+
+                        // Add this new model of agent
+                        addAgentModel(agent);
+
+                        // Emit the signal "Agent Model Created"
+                        Q_EMIT agentModelCreated(agent);
+
+                        // Add this new model of agent definition
+                        addAgentDefinition(agentDefinition);
+
+                        // Emit the signal "Agent Definition Created"
+                        Q_EMIT agentDefinitionCreated(agentDefinition, agent);
+                    }
+                }
+            }
+            else {
+                qCritical() << "Can not open file" << agentsListFilePath;
+            }
+        }
+        else {
+            qWarning() << "There is no file" << agentsListFilePath;
+        }
+    }
+}
+
+
+/**
+ * @brief Import an agent from JSON files (definition and mapping)
  * @param subDirectoryPath
  */
-void MasticModelManager::_initAgentInsideSubDirectory(QString subDirectoryPath)
+void MasticModelManager::_importAgentFromFiles(QStringList agentFilesPaths)
 {
-    QDir subDirectory(subDirectoryPath);
-    if (subDirectory.exists())
+    if ((agentFilesPaths.count() == 1) || (agentFilesPaths.count() == 2))
     {
-        QStringList nameFilters;
-        nameFilters << "*.json";
-
-        QFileInfoList agentsFilesList = subDirectory.entryInfoList(nameFilters);
-        qInfo() << agentsFilesList.count() << "files in directory" << subDirectory.absolutePath();
-
         DefinitionM* agentDefinition = NULL;
-        AgentMappingM* agentMapping = NULL;
+        //AgentMappingM* agentMapping = NULL;
 
         // Only 1 file, it must be the definition
-        if (agentsFilesList.count() == 1)
+        if (agentFilesPaths.count() == 1)
         {
-            QFileInfo fileInfo = agentsFilesList.first();
+            QString agentFilePath = agentFilesPaths.first();
 
-            QFile jsonFile(fileInfo.absoluteFilePath());
+            QFile jsonFile(agentFilePath);
             if (jsonFile.open(QIODevice::ReadOnly))
             {
                 QByteArray byteArrayOfJson = jsonFile.readAll();
@@ -451,17 +642,17 @@ void MasticModelManager::_initAgentInsideSubDirectory(QString subDirectoryPath)
                 agentDefinition = _jsonHelper->createModelOfDefinition(byteArrayOfJson);
             }
             else {
-                qCritical() << "Can not open file" << fileInfo.absoluteFilePath();
+                qCritical() << "Can not open file" << agentFilePath;
             }
         }
         // 2 files, they must be the definition and the mapping
-        else if (agentsFilesList.count() == 2)
+        else if (agentFilesPaths.count() == 2)
         {
-            QFileInfo fileInfo1 = agentsFilesList.at(0);
-            QFileInfo fileInfo2 = agentsFilesList.at(1);
+            QString agentFilePath1 = agentFilesPaths.at(0);
+            QString agentFilePath2 = agentFilesPaths.at(1);
 
-            QFile jsonFile1(fileInfo1.absoluteFilePath());
-            QFile jsonFile2(fileInfo2.absoluteFilePath());
+            QFile jsonFile1(agentFilePath1);
+            QFile jsonFile2(agentFilePath2);
 
             if (jsonFile1.open(QIODevice::ReadOnly) && jsonFile2.open(QIODevice::ReadOnly))
             {
@@ -478,7 +669,7 @@ void MasticModelManager::_initAgentInsideSubDirectory(QString subDirectoryPath)
                 if (agentDefinition != NULL)
                 {
                     // Create a model of agent mapping with the second JSON
-                    agentMapping = _jsonHelper->createModelOfAgentMapping(agentDefinition->name(), byteArrayOfJson2);
+                    //agentMapping = _jsonHelper->createModelOfAgentMapping(agentDefinition->name(), byteArrayOfJson2);
                 }
                 else
                 {
@@ -486,19 +677,16 @@ void MasticModelManager::_initAgentInsideSubDirectory(QString subDirectoryPath)
                     agentDefinition = _jsonHelper->createModelOfDefinition(byteArrayOfJson2);
 
                     // If succeeded
-                    if (agentDefinition != NULL)
+                    /*if (agentDefinition != NULL)
                     {
                         // Create a model of agent mapping with the first JSON
                         agentMapping = _jsonHelper->createModelOfAgentMapping(agentDefinition->name(), byteArrayOfJson1);
-                    }
+                    }*/
                 }
             }
             else {
-                qCritical() << "Can not open 2 files" << fileInfo1.absoluteFilePath() << "and" << fileInfo2.absoluteFilePath();
+                qCritical() << "Can not open 2 files" << agentFilePath1 << "and" << agentFilePath2;
             }
-        }
-        else {
-            qCritical() << "There are more than 2 JSON files in the directory" << subDirectory.absolutePath();
         }
 
         if (agentDefinition != NULL)
@@ -518,7 +706,7 @@ void MasticModelManager::_initAgentInsideSubDirectory(QString subDirectoryPath)
             // Emit the signal "Agent Definition Created"
             Q_EMIT agentDefinitionCreated(agentDefinition, agent);
 
-            if (agentMapping != NULL)
+            /*if (agentMapping != NULL)
             {
                 // Add this new model of agent mapping
                 addAgentMapping(agentMapping);
@@ -527,8 +715,35 @@ void MasticModelManager::_initAgentInsideSubDirectory(QString subDirectoryPath)
                 Q_EMIT agentMappingCreated(agentMapping, agent);
 
                 // Update the merged list of mapping elements for the agent name
-                _updateMergedListOfMappingElementsForAgentName(agent->name(), agentMapping);
-            }
+                _updateMergedListsOfMappingElementsForAgentName(agent->name(), agentMapping);
+            }*/
+        }
+    }
+}
+
+
+/**
+ * @brief Export the agents list to JSON file
+ * @param agentsListToExport list of pairs <agent name, definition>
+ * @param agentsListFilePath
+ */
+void MasticModelManager::_exportAgentsListToFile(QList<QPair<QString, DefinitionM*>> agentsListToExport, QString agentsListFilePath)
+{
+    if (!agentsListFilePath.isEmpty() && (_jsonHelper != NULL))
+    {
+        qInfo() << "Export the agents list to JSON file" << agentsListFilePath;
+
+        // Export the agents list
+        QByteArray byteArrayOfJson = _jsonHelper->exportAgentsList(agentsListToExport);
+
+        QFile jsonFile(agentsListFilePath);
+        if (jsonFile.open(QIODevice::WriteOnly))
+        {
+            jsonFile.write(byteArrayOfJson);
+            jsonFile.close();
+        }
+        else {
+            qCritical() << "Can not open file" << agentsListFilePath;
         }
     }
 }
@@ -592,49 +807,121 @@ void MasticModelManager::_updateDefinitionVariants(QString definitionName)
 
 
 /**
- * @brief Update the merged list of mapping elements for the agent name
+ * @brief Update merged lists of mapping elements for the agent name
  * @param agentName
  * @param agentMapping
  */
-void MasticModelManager::_updateMergedListOfMappingElementsForAgentName(QString agentName, AgentMappingM* agentMapping)
+//void MasticModelManager::_updateMergedListsOfMappingElementsForAgentName(QString agentName, AgentMappingM* agentMapping)
+void MasticModelManager::_updateMergedListsOfMappingElementsForAgentName(QString agentName, QList<ElementMappingM*> mappingElementsList)
 {
-    if (!agentName.isEmpty() && agentMapping != NULL)
+    if (!agentName.isEmpty() && mappingElementsList.count() > 0)
     {
         // Get the merged list of all (models of) mapping elements which connect an input of the agent
-        QList<ElementMappingM*> mergedList = getMergedListOfMappingElementsFromAgentName(agentName);
+        QList<ElementMappingM*> mergedListOfInputMappingElements = getMergedListOfInputMappingElementsFromAgentName(agentName);
 
-        qDebug() << mergedList.count() << "elements";
+        qDebug() << mergedListOfInputMappingElements.count() << "INPUT mapping elements";
 
-        foreach (ElementMappingM* elementMapping, agentMapping->elementMappingsList()->toList()) {
-            if (elementMapping != NULL)
+        qDebug() << "AVANT: From Agent Name To Merged List of INPUT Mapping Elements:" << _mapFromAgentNameToMergedListOfInputMappingElements;
+        qDebug() << "AVANT: From Agent Name To Merged List of OUTPUT Mapping Elements:" << _mapFromAgentNameToMergedListOfOutputMappingElements;
+
+        foreach (ElementMappingM* elementMapping, mappingElementsList)
+        {
+            if ((elementMapping != NULL) && (elementMapping->inputAgent() == agentName) && !elementMapping->outputAgent().isEmpty())
             {
-                qDebug() << elementMapping->outputAgent() << "." << elementMapping->output() << "-->" << elementMapping->inputAgent() << "." << elementMapping->inputAgent();
+                qDebug() << elementMapping->outputAgent() << "." << elementMapping->output() << "-->" << elementMapping->inputAgent() << "." << elementMapping->input();
 
-                bool isAlreadyInMergedList = false;
-                foreach (ElementMappingM* iterator, mergedList)
+                bool isAlreadyInMergedListOfInputMappingElements = false;
+                foreach (ElementMappingM* iterator, mergedListOfInputMappingElements)
                 {
-                    // Exactly the same ?
-                    //if ((iterator != NULL) && (iterator->md5Hash == elementMapping->md5Hash)) {
+                    // Exactly the same
                     if ((iterator != NULL)
                             && (iterator->outputAgent() == elementMapping->outputAgent())
                             && (iterator->output() == elementMapping->output())
                             && (iterator->input() == elementMapping->input())) {
-                        isAlreadyInMergedList = true;
+                        isAlreadyInMergedListOfInputMappingElements = true;
                         break;
                     }
                 }
-
-                // Not already in merged list
-                if (!isAlreadyInMergedList) {
-                    mergedList.append(elementMapping);
+                // Not already in merged list of mapping elements which connect an INPUT of the agent, we add it
+                if (!isAlreadyInMergedListOfInputMappingElements) {
+                    mergedListOfInputMappingElements.append(elementMapping);
 
                     // Emit the signal "Mapping Element Created"
                     Q_EMIT mappingElementCreated(elementMapping);
                 }
+
+
+                //
+                // Update merged list for output agent name
+                //
+                // Get the merged list of all (models of) mapping elements which connect the output agent
+                QList<ElementMappingM*> mergedListOfOutputMappingElements = getMergedListOfOutputMappingElementsFromAgentName(elementMapping->outputAgent());
+
+                bool isAlreadyInMergedListOfOutputMappingElements = false;
+                foreach (ElementMappingM* iterator, mergedListOfOutputMappingElements)
+                {
+                    // Exactly the same
+                    if ((iterator != NULL)
+                            && (iterator->inputAgent() == elementMapping->inputAgent())
+                            && (iterator->output() == elementMapping->output())
+                            && (iterator->input() == elementMapping->input())) {
+                        isAlreadyInMergedListOfOutputMappingElements = true;
+                        break;
+                    }
+                }
+                // Not already in merged list of mapping elements which connect an OUTPUT of the output agent, we add it
+                if (!isAlreadyInMergedListOfOutputMappingElements) {
+                    mergedListOfOutputMappingElements.append(elementMapping);
+
+                    // Update the merged list in the map
+                    _mapFromAgentNameToMergedListOfOutputMappingElements.insert(elementMapping->outputAgent(), mergedListOfOutputMappingElements);
+                }
             }
         }
 
-        // Update the list in the map
-        _mapFromAgentNameToMergedListOfMappingElements.insert(agentName, mergedList);
+        // Update the merged list in the map
+        _mapFromAgentNameToMergedListOfInputMappingElements.insert(agentName, mergedListOfInputMappingElements);
+
+        qDebug() << "APRES: From Agent Name To Merged List of INPUT Mapping Elements:" << _mapFromAgentNameToMergedListOfInputMappingElements;
+        qDebug() << "APRES: From Agent Name To Merged List of OUTPUT Mapping Elements:" << _mapFromAgentNameToMergedListOfOutputMappingElements;
+    }
+}
+
+
+/**
+ * @brief Clean merged lists of mapping elements for the agent name
+ * @param agentName
+ */
+void MasticModelManager::_cleanMergedListsOfMappingElementsForAgentName(QString agentName)
+{
+    if (!agentName.isEmpty())
+    {
+        qDebug() << "AVANT: From Agent Name To Merged List of INPUT Mapping Elements:" << _mapFromAgentNameToMergedListOfInputMappingElements;
+        qDebug() << "AVANT: From Agent Name To Merged List of OUTPUT Mapping Elements:" << _mapFromAgentNameToMergedListOfOutputMappingElements;
+
+        // Get the merged list of all (models of) mapping elements which connect an input of the agent
+        QList<ElementMappingM*> mergedListOfInputMappingElements = getMergedListOfInputMappingElementsFromAgentName(agentName);
+
+        foreach (ElementMappingM* mappingElement, mergedListOfInputMappingElements) {
+            if ((mappingElement != NULL) && (mappingElement->inputAgent() == agentName) && !mappingElement->outputAgent().isEmpty())
+            {
+                // Get the merged list of all (models of) mapping elements which connect the output agent
+                QList<ElementMappingM*> mergedListOfOutputMappingElements = getMergedListOfOutputMappingElementsFromAgentName(mappingElement->outputAgent());
+
+                mergedListOfOutputMappingElements.removeOne(mappingElement);
+
+                // Update the merged list in the map
+                _mapFromAgentNameToMergedListOfOutputMappingElements.insert(mappingElement->outputAgent(), mergedListOfOutputMappingElements);
+            }
+        }
+
+        _mapFromAgentNameToMergedListOfInputMappingElements.remove(agentName);
+
+        qDebug() << "APRES: From Agent Name To Merged List of INPUT Mapping Elements:" << _mapFromAgentNameToMergedListOfInputMappingElements;
+        qDebug() << "APRES: From Agent Name To Merged List of OUTPUT Mapping Elements:" << _mapFromAgentNameToMergedListOfOutputMappingElements;
+
+        // Free memory
+        qDeleteAll(mergedListOfInputMappingElements);
+        mergedListOfInputMappingElements.clear();
     }
 }

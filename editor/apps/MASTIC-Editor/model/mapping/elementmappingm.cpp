@@ -21,7 +21,7 @@ ElementMappingM::ElementMappingM(QString inputAgent,
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    qInfo() << "New Model of Element Mapping has been created between Agent input: " << inputAgent << "." << input << " and Agent output: " << outputAgent << "." << output;
+    qInfo() << "New Model of Element Mapping between Agent input: " << _inputAgent << "." << _input << " and Agent output: " << _outputAgent << "." << _output;
 }
 
 
@@ -30,5 +30,5 @@ ElementMappingM::ElementMappingM(QString inputAgent,
  */
 ElementMappingM::~ElementMappingM()
 {
-    qInfo() << "Delete Model of element mapping ...";
+    qInfo() << "Delete Model of Element Mapping between Agent input: " << _inputAgent << "." << _input << " and Agent output: " << _outputAgent << "." << _output;
 }

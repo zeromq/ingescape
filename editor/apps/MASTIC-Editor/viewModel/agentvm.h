@@ -52,29 +52,21 @@ class AgentVM : public QObject
     // Flag indicating if our agent has only a definition (never yet appeared on the network)
     I2_QML_PROPERTY_READONLY(bool, hasOnlyDefinition)
 
-    // List of VM of inputs
-    //I2_QOBJECT_LISTMODEL(AgentIOPVM, inputsList)
-
-    // List of VM of outputs
-    //I2_QOBJECT_LISTMODEL(AgentIOPVM, outputsList)
-
-    // List of VM of parameters
-    //I2_QOBJECT_LISTMODEL(AgentIOPVM, parametersList)
-
-    // Status: can be ON, OFF, ON Asked or OFF Asked
-    I2_QML_PROPERTY(AgentStatus::Value, status)
-
-    // State string defined by the agent
-    I2_QML_PROPERTY(QString, state)
+    // Flag indicating if our agent is ON (vs OFF)
+    I2_QML_PROPERTY_READONLY(bool, isON)
 
     // Flag indicating if our agent is muted
-    I2_QML_PROPERTY(bool, isMuted)
+    I2_QML_PROPERTY_READONLY(bool, isMuted)
 
     // Flag indicating if our agent can be frozen
     I2_QML_PROPERTY_READONLY(bool, canBeFrozen)
 
     // Flag indicating if our agent is frozen
-    I2_QML_PROPERTY(bool, isFrozen)
+    I2_QML_PROPERTY_READONLY(bool, isFrozen)
+
+    // Status defined by the agent
+    //I2_QML_PROPERTY_READONLY(QString, status)
+
 
 public:
     /**
@@ -92,20 +84,32 @@ public:
 
 
     /**
-     * @brief Mute/UN-mute all outputs of our agent
-     * @param muteAllOutputs
+     * @brief Change the state of our agent
      */
-    Q_INVOKABLE void updateMuteAllOutputs(bool muteAllOutputs);
+    Q_INVOKABLE void changeState();
 
 
     /**
-     * @brief Freeze/UN-freeze our agent
-     * @param freeze
+     * @brief Mute / UN-mute all outputs of our agent
      */
-    Q_INVOKABLE void updateFreeze(bool freeze);
+    Q_INVOKABLE void changeMuteAllOutputs();
+
+
+    /**
+     * @brief Freeze / UN-freeze our agent
+     */
+    Q_INVOKABLE void changeFreeze();
 
 
 Q_SIGNALS:
+
+    /**
+     * @brief Signal emitted when a command must be sent on the network to a launcher
+     * @param command
+     * @param hostname
+     * @param executionPath
+     */
+    void commandAskedToLauncher(QString command, QString hostname, QString executionPath);
 
     /**
      * @brief Signal emitted when a command must be sent on the network
@@ -142,21 +146,21 @@ private Q_SLOTS:
 
 
     /**
-     * @brief Slot when the "Status" of a model changed
-     * @param status
+     * @brief Slot when the flag "is ON" of a model changed
+     * @param isON
      */
-    void _onStatusOfModelChanged(AgentStatus::Value status);
+    void _onIsONofModelChanged(bool isON);
 
 
     /**
-     * @brief Slot when the flag "Is Muted" of a model changed
+     * @brief Slot when the flag "is Muted" of a model changed
      * @param isMuted
      */
     void _onIsMutedOfModelChanged(bool isMuted);
 
 
     /**
-     * @brief Slot when the flag "Is Frozen" of a model changed
+     * @brief Slot when the flag "is Frozen" of a model changed
      * @param isMuted
      */
     void _onIsFrozenOfModelChanged(bool isFrozen);
@@ -170,19 +174,19 @@ private:
 
 
     /**
-     * @brief Update the status in function of status of models
+     * @brief Update the flag "is ON" in function of flags of models
      */
-    void _updateStatus();
+    void _updateIsON();
 
 
     /**
-     * @brief Update the flag "Is Muted" in function of models
+     * @brief Update the flag "is Muted" in function of flags of models
      */
     void _updateIsMuted();
 
 
     /**
-     * @brief Update the flag "Is Frozen" in function of models
+     * @brief Update the flag "is Frozen" in function of flags of models
      */
     void _updateIsFrozen();
 

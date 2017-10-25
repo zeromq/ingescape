@@ -36,7 +36,7 @@ class AgentsSupervisionController : public QObject
     I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(AgentVM, agentsList)
 
     // Selected agent in the agents list
-    I2_QML_PROPERTY(AgentVM *, selectedAgent)
+    I2_QML_PROPERTY_DELETE_PROOF(AgentVM*, selectedAgent)
 
 public:
     /**
@@ -62,13 +62,6 @@ public:
 
 
     /**
-     * @brief Delete the previous view model of Agent
-     * @param agent
-     */
-    void deleteAgentViewModel(AgentVM* agent);
-
-
-    /**
      * @brief Delete an agent from the list
      * @param agent to delete
      */
@@ -82,7 +75,28 @@ public:
     Q_INVOKABLE void openDefinition(AgentVM* agent);
 
 
+    /**
+     * @brief Export the agents list to default file
+     */
+    Q_INVOKABLE void exportAgentsListToDefaultFile();
+
+
+    /**
+     * @brief Export the agents list to selected file
+     */
+    Q_INVOKABLE void exportAgentsListToSelectedFile();
+
+
 Q_SIGNALS:
+
+    /**
+     * @brief Signal emitted when a command must be sent on the network to a launcher
+     * @param command
+     * @param hostname
+     * @param executionPath
+     */
+    void commandAskedToLauncher(QString command, QString hostname, QString executionPath);
+
 
     /**
      * @brief Signal emitted when a command must be sent on the network
@@ -124,6 +138,31 @@ public Q_SLOTS:
      * @param agent
      */
     void onAgentDefinitionCreated(DefinitionM* definition, AgentM* agent);
+
+
+    /**
+     * @brief Slot when the flag "is Muted" from an output of agent updated
+     * @param agent
+     * @param isMuted
+     * @param outputName
+     */
+    void onIsMutedFromOutputOfAgentUpdated(AgentM* agent, bool isMuted, QString outputName);
+
+
+private:
+
+    /**
+     * @brief Delete the view model of Agent
+     * @param agent
+     */
+    void _deleteAgentViewModel(AgentVM* agent);
+
+
+    /**
+     * @brief Get the agents list to export
+     * @return List of pairs <agent name, definition>
+     */
+    QList<QPair<QString, DefinitionM*>> _getAgentsListToExport();
 
 
 private:

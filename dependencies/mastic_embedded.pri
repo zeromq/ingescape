@@ -45,7 +45,7 @@ win32:{
     LIBS += -L$$C:/Windows/System32 -lws2_32
 }
 
-macx:{
+mac:{
     message("Compilation macx scope ...")
 
     # FIXME: chemin en dur car il manque la lib sodium dans dep/zyre/bin/Macos
@@ -59,7 +59,7 @@ macx:{
             -L$$libyajl_path -lyajl
 }
 
-unix:{
+unix:!mac {
     raspberry_compilation {
         ############ Raspberry ###########
     message("Compilation raspberry scope ...")

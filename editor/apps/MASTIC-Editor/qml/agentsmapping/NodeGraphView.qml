@@ -44,6 +44,9 @@ Item {
     // Maximum scale factor
     readonly property real maximumScale: 4
 
+    // Duration of automatic pan and/or zoom animations in milliseconds
+    readonly property int automaticPanZoomAnimationDuration: 300
+
 
     //--------------------------------
     //
@@ -52,6 +55,98 @@ Item {
     //--------------------------------
 
 
+    // Center our view on a given node
+    function centerViewOnNode(node)
+    {
+        if (node)
+        {
+            centerViewOn(node.x + node.width/2, node.y + node.height/2);
+        }
+    }
+
+
+    // Center our view on a given position
+    function centerViewOn(x, y)
+    {
+        var targetX = rootItem.width/2 - x * workspace.scale;
+        var targetY = rootItem.height/2 - y * workspace.scale;
+
+        _scrollWorkspaceTo(targetX, targetY);
+    }
+
+
+    // Show all
+    function showAll()
+    {
+        //TODO get the bounding box of all nodes from our controller
+        var x0 = Math.min(item1.x, Math.min(item2.x, Math.min(item3.x, Math.min(item4.x, item5.x))));
+        var y0 = Math.min(item1.y, Math.min(item2.y, Math.min(item3.y, Math.min(item4.y, item5.y))));
+
+        var x1 = Math.max(item1.x + item1.width, Math.max(item2.x + item2.width, Math.max(item3.x + item3.width, Math.max(item4.x + item4.width, item5.x + item5.width))));
+        var y1 = Math.max(item1.y + item1.height, Math.max(item2.y + item2.height, Math.max(item3.y + item3.height, Math.max(item4.y + item4.height, item5.y + item5.height))));
+
+        var margin = 5;
+        var area = Qt.rect(x0 - margin, y0 - margin, x1 - x0 + 2 * margin, y1 - y0 + 2 * margin);
+        //--------------------
+
+        _showArea(area);
+    }
+
+
+
+
+    // Scroll our workspace to a given position (top-left corner)
+    function _scrollWorkspaceTo(x, y)
+    {
+        workspaceXAnimation.to = x;
+        workspaceYAnimation.to = y;
+
+        workspaceXAnimation.restart();
+        workspaceYAnimation.restart();
+    }
+
+
+    // Show a given area
+    function _showArea(area)
+    {
+        var areaWidth = area.width;
+        var areaHeight = area.height;
+
+        if ((areaWidth > 0) && (areaHeight > 0))
+        {
+            var scaleX = rootItem.width/areaWidth;
+            var scaleY = rootItem.height/areaHeight;
+
+            var targetScale = Math.min(scaleX, scaleY);
+            var targetX = rootItem.width/2 - (area.x + areaWidth/2) * targetScale;
+            var targetY = rootItem.height/2 - (area.y + areaHeight/2) * targetScale;
+
+            workspaceXAnimation.to = targetX;
+            workspaceYAnimation.to = targetY;
+            workspaceScaleAnimation.to = targetScale;
+
+            workspaceXAnimation.restart();
+            workspaceYAnimation.restart();
+            workspaceScaleAnimation.restart();
+        }
+        else
+        {
+            console.log("_showArea: invalid area "+area);
+        }
+    }
+
+
+
+    // TEMP: to test showAll
+    focus: true
+    Keys.onPressed: {
+         if (event.key === Qt.Key_Space)
+         {
+            showAll();
+
+             event.accepted = true;
+         }
+    }
 
 
     //--------------------------------
@@ -64,6 +159,7 @@ Item {
         id: content
 
         anchors.fill: parent
+
 
 
         //
@@ -148,19 +244,39 @@ Item {
 
                 drag.target: workspace
 
-                scrollGestureEnabled: false
+                scrollGestureEnabled: true
+
+                onPressed: rootItem.forceActiveFocus();
 
                 onWheel: {
                     wheel.accepted = true;
 
-                    //TODO: zoom at (x, y)
-                    if (wheel.angleDelta.y >= 0)
+                    // Check if we have a real wheel event
+                    if ((wheel.pixelDelta.x !== 0) || (wheel.pixelDelta.y !== 0))
                     {
-                        workspace.scale = Math.max(rootItem.minimumScale, workspace.scale/1.2);
+                        //
+                        // Trackpad event
+                        //
+
+                        workspace.x += wheel.pixelDelta.x;
+                        workspace.y += wheel.pixelDelta.y;
                     }
                     else
                     {
-                        workspace.scale = Math.min(rootItem.maximumScale, workspace.scale * 1.2);
+                        //
+                        // Physical mouse wheel event
+                        //
+
+                        //TODO: zoom at (x, y)
+                        if (wheel.angleDelta.y > 0)
+                        {
+                            workspace.scale = Math.max(rootItem.minimumScale, workspace.scale/1.2);
+                        }
+                        else if (wheel.angleDelta.y < 0)
+                        {
+                            workspace.scale = Math.min(rootItem.maximumScale, workspace.scale * 1.2);
+                        }
+                        // Else: wheel.angleDelta.y  == 0  => end of gesture
                     }
                 }
             }
@@ -179,6 +295,41 @@ Item {
 
                 width: parent.width
                 height: parent.height
+
+
+
+                //------------------------------------------------
+                //
+                // Animations used to scroll and/or scale our view
+                //
+                //------------------------------------------------
+
+                PropertyAnimation {
+                    id: workspaceXAnimation
+
+                    target: workspace
+                    property: "x"
+
+                    duration: rootItem.automaticPanZoomAnimationDuration
+                }
+
+                PropertyAnimation {
+                    id: workspaceYAnimation
+
+                    target: workspace
+                    property: "y"
+
+                    duration: rootItem.automaticPanZoomAnimationDuration
+                }
+
+                PropertyAnimation {
+                    id: workspaceScaleAnimation
+
+                    target: workspace
+                    property: "scale"
+
+                    duration: rootItem.automaticPanZoomAnimationDuration
+                }
 
 
 
@@ -206,7 +357,17 @@ Item {
 
                 //----------------------------------------
                 // TODO: replace with a Repeater
-                //       model: list of LinkVM
+                //       model: list of MapBetweenIOPVM
+
+                Repeater {
+                    model : controller? controller.allMapInMapping : 0;
+
+                    Link {
+                        id : link
+                        firstPoint: model.pointFrom? model.pointFrom.position : Qt.point(0,0)
+                        secondPoint: model.pointFrom? model.pointTo.position : Qt.point(0,0)
+                    }
+                }
 
                 //
                 // Link between [item1, nodeOut] and [item3, nodein1]
@@ -296,7 +457,38 @@ Item {
 
                 //----------------------------------------
                 // TODO: replace with a Repeater
-                //       model: list of AgentVM
+                //       model: list of AgentMappingVM
+
+                Repeater {
+                    model : controller? controller.agentInMappingVMList : 0;
+
+
+                    AgentNodeView {
+                        id: agent
+                        agentMappingVM : model.QtObject
+
+                        MouseArea {
+                            id: mouseArea
+
+                            anchors.fill: parent
+
+                            drag.target: parent
+
+                            onPressed: {
+                                parent.z = workspace.maxZ++;
+                            }
+
+                            onPositionChanged: {
+                                console.log("agentMapping position " + model.position.x + "  " + model.position.y)
+                            }
+
+                            onDoubleClicked: {
+                                agent.isClosed = !agent.isClosed;
+                            }
+                        }
+                    }
+                }
+
 
                 //
                 // Item 1
@@ -359,6 +551,10 @@ Item {
 
                         onPressed: {
                             parent.z = workspace.maxZ++;
+                        }
+
+                        onDoubleClicked: {
+                            rootItem.centerViewOnNode(item1);
                         }
                     }
                 }
@@ -425,6 +621,10 @@ Item {
 
                         onPressed: {
                             parent.z = workspace.maxZ++;
+                        }
+
+                        onDoubleClicked: {
+                            rootItem.centerViewOnNode(item2);
                         }
                     }
                 }
@@ -700,6 +900,10 @@ Item {
                         onPressed: {
                             parent.z = workspace.maxZ++;
                         }
+
+                        onDoubleClicked: {
+                            rootItem.centerViewOnNode(item4);
+                        }
                     }
                 }
 
@@ -817,6 +1021,86 @@ Item {
 
                 //----------------------------------------
             }
+
+        }
+
+
+
+        //----------------------------------------------------------------
+        //
+        // Drop-area to handle drag-n-drop of agents from our agents list
+        //
+        //----------------------------------------------------------------
+
+        DropArea {
+            id: workspaceDropArea
+
+            anchors.fill: parent
+
+
+            // Get coordinates of drop
+            function getDropCoordinates()
+            {
+                return workspace.mapFromItem(workspaceDropArea, workspaceDropArea.drag.x, workspaceDropArea.drag.y);
+            }
+
+            onEntered: {
+                if (drag.source !== null)
+                {
+                    var dragItem = drag.source;
+                    console.log("source "+dragItem)
+                    if (typeof dragItem.agent !== 'undefined')
+                    {
+                        dropGhost.agent = dragItem.agent;
+                    }
+                    else
+                    {
+                        console.log("no agent "+dragItem.agent)
+                        dropGhost.agent = null;
+                    }
+                }
+                else
+                {
+                    console.log("no source "+ drag.source)
+                }
+            }
+
+
+            onPositionChanged: {
+                dropGhost.x = drag.x;
+                dropGhost.y = drag.y;
+            }
+
+
+            onExited: {
+                dropGhost.agent = null;
+            }
+
+
+
+            //
+            // Ghost displayed when a dragged item enters the bounds of our drop area
+            //
+            Item {
+                id: dropGhost
+
+                property var agent: null;
+
+                opacity: (workspaceDropArea.containsDrag ? 1 : 0)
+                visible: (opacity != 0)
+
+                Behavior on opacity {
+                    NumberAnimation {}
+                }
+
+                AgentNodeView {
+                    transformOrigin: Item.TopLeft
+
+                    scale: workspace.scale
+                    isClosed : true
+                    agentName : dropGhost.agent ? dropGhost.agent.name : ""
+                }
+            }
         }
 
 
@@ -837,7 +1121,7 @@ Item {
                 topMargin: 20
             }
 
-            text: qsTr("Demo: pan, pinch to zoom, drag-n-drop of nodes, double-click to expand/collapse a node with multiple slots")
+            text: qsTr("Demo: pan, pinch to zoom, drag-n-drop of nodes, double-click to expand/collapse a node with multiple slots, space to show all")
 
             font: MasticTheme.normalFont
             color: MasticTheme.whiteColor

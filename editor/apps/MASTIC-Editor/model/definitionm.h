@@ -74,6 +74,14 @@ public:
     ~DefinitionM();
 
 
+    /**
+     * @brief Set the flag "is Muted" of an Output of our agent definition
+     * @param isMuted
+     * @param outputName
+     */
+    void setisMutedOfOutput(bool isMuted, QString outputName);
+
+
 Q_SIGNALS:
 
     /**
@@ -95,7 +103,7 @@ private Q_SLOTS:
 
 
     /**
-     * @brief Slot when the flag "Is Muted" of an output changed
+     * @brief Slot when the flag "is Muted" of an output changed
      * @param isMuted
      */
     //void _onIsMutedChanged(bool isMuted);
