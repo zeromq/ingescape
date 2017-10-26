@@ -39,7 +39,7 @@ MapBetweenIOPVM::MapBetweenIOPVM(OutputVM *pointFrom, InputVM *pointTo, QObject 
     setpointFrom(pointFrom);
     setpointTo(pointTo);
 
-    if ((_pointFrom != NULL) && (_pointTo != NULL))
+    if ((_pointFrom != NULL) && (_pointTo != NULL) && (_pointFrom->modelM() != NULL) && (_pointTo->modelM() != NULL))
     {
         qInfo() << "Map Between "<< _pointFrom->nameAgent() << "." << _pointFrom->modelM()->name() << "->" << _pointTo->nameAgent() << "." <<_pointTo->modelM()->name()  <<"created";
     }
