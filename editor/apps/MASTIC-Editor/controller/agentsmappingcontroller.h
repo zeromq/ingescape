@@ -97,8 +97,9 @@ private Q_SLOTS:
      * @brief Slot which allow to find the second point element to map in the view with the name of the second agent and the iop corresponding
      * @param agentName The second agent in mapping name
      * @param iopName The input/output to map with
+     * @param secondAgentInMapping Pointer of the second AgentInMapping.
      */
-    PointMapVM* findTheSecondPointOfElementMap(QString agentName, QString iopName);
+    PointMapVM* findTheSecondPointOfElementMap(QString agentName, QString iopName, AgentInMappingVM **secondAgentInMapping);
 
 
     /**

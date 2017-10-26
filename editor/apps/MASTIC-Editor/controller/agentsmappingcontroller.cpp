@@ -123,6 +123,7 @@ void AgentsMappingController::addAgentDefinitionToMappingAtPosition(QString agen
             //Call for the fist shot the another call will be proceed by the connect mechanism
             createMapBetweenIopInMappingFromAgentName(newAgentInMapping->agentName());
 
+            //TODOESTIA createMapBetweenIopInMappingFromAgent(AgentInMappingVM* )
             // Connect to signal "new Definition added to agent in mapping" from the new definition
             connect(newAgentInMapping, &AgentInMappingVM::newDefinitionInAgentMapping,
                     this, &AgentsMappingController::createMapBetweenIopInMappingFromAgentName);
@@ -175,17 +176,22 @@ void AgentsMappingController::createMapBetweenIopInMappingFromAgentName(QString 
                             if(inputPointVM != NULL)
                             {
                                 qInfo() << "InputVM " << inputName << " found. ";
+
+                                // Create outputAgent to capture the agentInMapping while searching for the second pointMap
+                                AgentInMappingVM* outputAgent = NULL;
                                 PointMapVM* pointTemp = findTheSecondPointOfElementMap(currentElementMapping->outputAgent(),
-                                                                                       currentElementMapping->output());
+                                                                                       currentElementMapping->output(),
+                                                                                       &outputAgent);
                                 outputPointVM = dynamic_cast<OutputVM*>(pointTemp);
 
-
                                 //Add the Map between agent
-                                if((inputPointVM != NULL) && (outputPointVM != NULL))
+                                if((inputPointVM != NULL) && (outputPointVM != NULL) && ((outputAgent) != NULL))
                                 {
-                                    MapBetweenIOPVM* map = new MapBetweenIOPVM(outputPointVM, inputPointVM);
+                                    //Create the MapBetweenIOPVM
+                                    MapBetweenIOPVM* map = new MapBetweenIOPVM((outputAgent), outputPointVM, currentAgentInMapping,inputPointVM);
                                     if(map != NULL)
                                     {
+                                        //Add the new MapBetweenIOP to the temp list.
                                         newMapBetweenIOP.append(map);
                                     }
                                     qInfo() << "Create the MapBetweenIOPVM : " << inputPointVM->nameAgent() << "." << inputPointVM->modelM()->name() << " -> " << outputPointVM->nameAgent() << "." << outputPointVM->modelM()->name();
@@ -217,16 +223,22 @@ void AgentsMappingController::createMapBetweenIopInMappingFromAgentName(QString 
                             if(outputPointVM != NULL)
                             {
                                 qInfo() << "OutputVM " << outputName << " found. ";
+
+                                // Create inputAgent to capture the agentInMapping while searching for the second pointMap
+                                AgentInMappingVM* inputAgent = NULL;
                                 PointMapVM* pointTemp = findTheSecondPointOfElementMap(currentElementMapping->inputAgent(),
-                                                                                       currentElementMapping->input());
+                                                                                       currentElementMapping->input(),
+                                                                                       &inputAgent);
                                 inputPointVM = dynamic_cast<InputVM*>(pointTemp);
 
                                 //Add the Map between agent
-                                if((inputPointVM != NULL) && (outputPointVM != NULL))
+                                if((inputPointVM != NULL) && (outputPointVM != NULL) && (inputAgent != NULL))
                                 {
-                                    MapBetweenIOPVM* map = new MapBetweenIOPVM(outputPointVM, inputPointVM);
+                                    //Create new MapBetweenIOP.
+                                    MapBetweenIOPVM* map = new MapBetweenIOPVM(currentAgentInMapping, outputPointVM, inputAgent, inputPointVM);
                                     if(map != NULL)
                                     {
+                                        //Add the new MapBetweenIOP to the temp list.
                                         newMapBetweenIOP.append(map);
                                     }
                                     qInfo() << "Create the MapBetweenIOPVM : " << inputPointVM->nameAgent() << "." << inputPointVM->modelM()->name() << " -> " << outputPointVM->nameAgent() << "." << outputPointVM->modelM()->name();
@@ -240,6 +252,7 @@ void AgentsMappingController::createMapBetweenIopInMappingFromAgentName(QString 
 
             if(!newMapBetweenIOP.isEmpty())
             {
+                //Append all new mapBetweenIOP.
                 _allMapInMapping.append(newMapBetweenIOP);
             }
         }
@@ -250,26 +263,24 @@ void AgentsMappingController::createMapBetweenIopInMappingFromAgentName(QString 
  * @brief Slot which allow to find the second point element to map in the view with the name of the second agent and the iop corresponding
  * @param agentName The second agent in mapping name
  * @param iopName The input/output to map with
+ * @param secondAgentInMapping Pointer of the second AgentInMapping.
  */
-PointMapVM* AgentsMappingController::findTheSecondPointOfElementMap(QString agentName, QString iopName)
+PointMapVM* AgentsMappingController::findTheSecondPointOfElementMap(QString agentName, QString iopName, AgentInMappingVM** secondAgentInMapping)
 {
     PointMapVM* secondPointMapVM = NULL;
 
-    //TODOESTIA : implement the function
-
     //Check If the second Agent is in the mapping
-    AgentInMappingVM* secondAgentInMapping = NULL;
-    secondAgentInMapping = _mapFromNameToAgentInMappingViewModelsList.value(agentName);
+    (*secondAgentInMapping) = _mapFromNameToAgentInMappingViewModelsList.value(agentName);
 
     //
     // Check if the iop is part of the definition of the second agent
     //
-    if(secondAgentInMapping != NULL)
+    if((*secondAgentInMapping) != NULL)
     {
          qInfo() << "Agent in output" << agentName << " found. ";
 
         //First check in input list
-        secondPointMapVM = secondAgentInMapping->getPointMapFromInputName(iopName);
+        secondPointMapVM = (*secondAgentInMapping)->getPointMapFromInputName(iopName);
         if(secondPointMapVM != NULL)
         {
             qInfo() << "PointMap " << iopName << " found. ";
@@ -277,7 +288,7 @@ PointMapVM* AgentsMappingController::findTheSecondPointOfElementMap(QString agen
         }
 
         //Second check in output list
-        secondPointMapVM = secondAgentInMapping->getPointMapFromOutputName(iopName);
+        secondPointMapVM = (*secondAgentInMapping)->getPointMapFromOutputName(iopName);
         if(secondPointMapVM != NULL)
         {
             qInfo() << "PointMap " << iopName << " found. ";
