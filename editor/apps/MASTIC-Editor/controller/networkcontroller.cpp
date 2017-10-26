@@ -253,7 +253,7 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
                 qDebug() << peerName << "MAPPED" << message;
             }
             // MUTED / UN-MUTED
-            if (message.startsWith(mutedAllPrefix))
+            else if (message.startsWith(mutedAllPrefix))
             {
                 message.remove(0, mutedAllPrefix.length());
 
