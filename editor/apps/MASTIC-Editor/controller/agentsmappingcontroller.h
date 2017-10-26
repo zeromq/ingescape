@@ -65,7 +65,7 @@ public Q_SLOTS:
      * @param agentName
      * @param definition
      */
-    void addAgentDefinitionToMapping(QString agentName, DefinitionM* definition);
+    void addAgentDefinitionToMapping(QString agentName, bool isON, DefinitionM* definition);
 
 
     /**
@@ -74,7 +74,7 @@ public Q_SLOTS:
      * @param definition
      * @param position
      */
-    void addAgentDefinitionToMappingAtPosition(QString agentName, DefinitionM* definition, QPointF position);
+    void addAgentDefinitionToMappingAtPosition(QString agentName, bool isON, DefinitionM* definition, QPointF position);
 
 
     /**

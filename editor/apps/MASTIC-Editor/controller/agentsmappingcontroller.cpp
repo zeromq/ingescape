@@ -57,9 +57,9 @@ AgentsMappingController::~AgentsMappingController()
  * @param agentName
  * @param definition
  */
-void AgentsMappingController::addAgentDefinitionToMapping(QString agentName, DefinitionM* definition)
+void AgentsMappingController::addAgentDefinitionToMapping(QString agentName, bool isON, DefinitionM* definition)
 {
-    addAgentDefinitionToMappingAtPosition(agentName, definition, QPointF());
+    addAgentDefinitionToMappingAtPosition(agentName, isON, definition, QPointF());
 }
 
 
@@ -69,7 +69,7 @@ void AgentsMappingController::addAgentDefinitionToMapping(QString agentName, Def
  * @param definition
  * @param position
  */
-void AgentsMappingController::addAgentDefinitionToMappingAtPosition(QString agentName, DefinitionM* definition, QPointF position)
+void AgentsMappingController::addAgentDefinitionToMappingAtPosition(QString agentName, bool isON, DefinitionM* definition, QPointF position)
 {
     if (!agentName.isEmpty() && (definition != NULL))
     {
@@ -112,6 +112,7 @@ void AgentsMappingController::addAgentDefinitionToMappingAtPosition(QString agen
             newAgentInMapping = new AgentInMappingVM(definition,
                                                      position,
                                                      this);
+            newAgentInMapping->setisON(isON);
 
             //Add in the map list
             _mapFromNameToAgentInMappingViewModelsList.insert(agentName,newAgentInMapping);
@@ -315,7 +316,7 @@ void AgentsMappingController::onIsActivatedMappingChanged(bool isActivatedMappin
 
                         foreach (DefinitionM* definition, definitionsList) {
                             if (definition != NULL) {
-                                addAgentDefinitionToMappingAtPosition(agentName, definition, QPointF());
+                                addAgentDefinitionToMappingAtPosition(agentName, true, definition, QPointF());
                             }
                         }
                     }

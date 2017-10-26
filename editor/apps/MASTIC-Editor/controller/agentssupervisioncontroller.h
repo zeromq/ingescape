@@ -120,7 +120,7 @@ Q_SIGNALS:
      * @param agentName
      * @param definition
      */
-    void agentDefinitionManaged(QString agentName, DefinitionM* definition);
+    void agentDefinitionManaged(QString agentName, bool isON, DefinitionM* definition);
 
 
 public Q_SLOTS:

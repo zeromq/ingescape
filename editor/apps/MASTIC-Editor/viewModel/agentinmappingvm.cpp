@@ -258,6 +258,7 @@ OutputVM * AgentInMappingVM::getPointMapFromOutputName(QString outputName)
     return _mapOfOutputsFromOutputName.value(outputName);
 }
 
+
 /**
  * @brief Destructor
  */
