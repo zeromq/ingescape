@@ -102,10 +102,10 @@ MapBetweenIOPVM::MapBetweenIOPVM(AgentInMappingVM* agentFrom,
     setagentTo(agentTo);
     setpointTo(pointTo);
 
-    if ((_agentFrom != NULL) && (_pointFrom != NULL) && (_agentTo != NULL) && (_pointTo != NULL))
+    if ((_agentFrom != NULL) && (_pointFrom != NULL) && (_pointFrom->modelM() != NULL)
+            && (_agentTo != NULL) && (_pointTo != NULL) && (_pointTo->modelM() != NULL))
     {
-        //qInfo() << "New Map Between" << _agentFrom->agentName() << "." << _pointFrom->iopModel()->name() << "-->" << _agentTo->agentName() << "." << _pointTo->iopModel()->name();
-        qInfo() << "New Map Between" << _agentFrom->agentName() << "." << "TODO _pointFrom OutputVM" << "-->" << _agentTo->agentName() << "." << "TODO _pointTo InputVM";
+        qInfo() << "New Map Between" << _agentFrom->agentName() << "." << _pointFrom->modelM()->name() << "-->" << _agentTo->agentName() << "." << _pointTo->modelM()->name();
     }
 }
 
