@@ -310,9 +310,9 @@ Item {
                         width : height
                         radius : height/2
 
-                        color : if (agentMappingVM && myModel && myModel.iopModel) {
+                        color : if (agentMappingVM && myModel && myModel.modelM) {
 
-                                    switch (myModel.iopModel.agentIOPValueType)
+                                    switch (myModel.modelM.agentIOPValueType)
                                     {
                                     case AgentIOPValueTypes.INTEGER:
                                         agentMappingVM.isON? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
@@ -443,9 +443,9 @@ Item {
                         width : height
                         radius : height/2
 
-                        color : if (agentMappingVM && myModel && myModel.iopModel) {
+                        color : if (agentMappingVM && myModel && myModel.modelM) {
 
-                                    switch (myModel.iopModel.agentIOPValueType)
+                                    switch (myModel.modelM.agentIOPValueType)
                                     {
                                     case AgentIOPValueTypes.INTEGER:
                                          agentMappingVM.isON? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
