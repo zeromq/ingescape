@@ -364,8 +364,7 @@ Item {
 
                     Link {
                         id : link
-                        firstPoint: model.pointFrom? model.pointFrom.position : Qt.point(0,0)
-                        secondPoint: model.pointFrom? model.pointTo.position : Qt.point(0,0)
+                        mapBetweenIOPVM: model.QtObject
                     }
                 }
 
@@ -466,6 +465,8 @@ Item {
                     AgentNodeView {
                         id: agent
                         agentMappingVM : model.QtObject
+                        agentIsPressed : mouseArea.pressed
+
 
                         MouseArea {
                             id: mouseArea
@@ -483,7 +484,7 @@ Item {
                             }
 
                             onDoubleClicked: {
-                                agent.isClosed = !agent.isClosed;
+                                model.isReduced = !model.isReduced;
                             }
                         }
                     }
@@ -1097,7 +1098,7 @@ Item {
                     transformOrigin: Item.TopLeft
 
                     scale: workspace.scale
-                    isClosed : true
+                    isReduced : true
                     agentName : dropGhost.agent ? dropGhost.agent.name : ""
                 }
             }
