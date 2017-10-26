@@ -80,12 +80,14 @@ Item {
     readonly property color darkGreyColor: "#3C424F"
     readonly property color greyColor : "#525A66"
     readonly property color greyColor2 : "#3B424F"
+    readonly property color blueGreyColor: "#8896AA"
+
+    readonly property color greyColor4 : "#575756"
+    readonly property color greyColor3 : "#706f6f"
     readonly property color lightGreyColor : "#9D9C9C"
 
-    readonly property color blueGreyColor: "#8896AA"
+
     readonly property color darkBlueGreyColor: "#525A66"
-
-
 
 
     readonly property color orangeColor: "#F39200"
@@ -239,7 +241,10 @@ Item {
     // Links
     //
     // - Default state
-    readonly property int agentsMappingLinkDefaultWidth: 4
+    readonly property int agentsMappingLinkDefaultWidth: 2
+    readonly property int agentsMappingBrinDefaultWidth: 6
+
+
     readonly property color agentsMappingLinkDefaultColor: theme.whiteColor
     // - Hover state
     readonly property int agentsMappingLinkHoverFuzzyRadius: 4
@@ -249,10 +254,27 @@ Item {
     readonly property color agentsMappingLinkPressColor: "firebrick"
 
 
+    // links colors
+    readonly property color orangeColor2 : "#e37724"
+    readonly property color darkOrangeColor2 : "#53382c"
+
+    readonly property color redColor2 : "#cf4f56"
+    readonly property color darkRedColor2 : "#4d3033"
+
+    readonly property color purpleColor : "#8e71b0"
+    readonly property color darkPurpleColor : "#3b3649"
+
+    readonly property color greenColor : "#14b2ad"
+    readonly property color darkGreenColor : "#214848"
+
+
     //
     // Agents
     //
-    readonly property color agentsNameMappingColor : theme.whiteColor
-    readonly property color agentsInputsOutputsMappingColor : theme.whiteColor
+    readonly property color agentsONNameMappingColor : theme.whiteColor
+    readonly property color agentsOFFNameMappingColor : theme.greyColor3
+
+    readonly property color agentsONInputsOutputsMappingColor : theme.whiteColor
+    readonly property color agentsOFFInputsOutputsMappingColor : theme.greyColor3
 
 }

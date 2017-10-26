@@ -151,7 +151,8 @@ I2PopupBase {
                     property :  "text"
                     value : if (actionVM && actionVM.actionModel) {
                               actionVM.actionModel.name
-                            } else {
+                            }
+                            else {
                                 "";
                             }
                 }

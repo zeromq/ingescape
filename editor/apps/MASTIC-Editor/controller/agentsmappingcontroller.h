@@ -89,7 +89,7 @@ private Q_SLOTS:
      * @brief Slot when a new view model of a agent mapping is created on the main view mapping.
      *      Check if a map need to be created from the element mapping list in the model manager.
      *      The two agents corresponding need to be visible in the list.
-     * @param agentName
+     * @param agentInMapping
      */
     void createMapBetweenIopInMappingFromAgentName(QString agentName);
 

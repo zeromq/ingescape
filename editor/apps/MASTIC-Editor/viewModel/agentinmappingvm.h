@@ -6,7 +6,9 @@
 
 #include <I2PropertyHelpers.h>
 
-#include <viewModel/pointmapvm.h>
+#include <viewModel/iop/inputvm.h>
+#include <viewModel/iop/outputvm.h>
+
 #include <model/agentmappingm.h>
 #include <model/definitionm.h>
 
@@ -22,22 +24,13 @@ class AgentInMappingVM : public QObject
 
     //TODO ESTIA input output VM
     // List of VM of inputs
-    I2_QOBJECT_LISTMODEL(PointMapVM, inputsList)
+    I2_QOBJECT_LISTMODEL(InputVM, inputsList)
 
     // List of VM of outputs
-    I2_QOBJECT_LISTMODEL(PointMapVM, outputsList)
+    I2_QOBJECT_LISTMODEL(OutputVM, outputsList)
 
-    // Geometry for the connector in the view
-    //TODO ESTIA
-    // The center of the box (POINT HG)
+    // The position corresponds to the corner Top-Left of the box
     I2_QML_PROPERTY(QPointF, position)
-
-    // Width of the box
-    I2_QML_PROPERTY(int, width)
-
-    // Height of the box
-    I2_QML_PROPERTY(int, height)
-
 
     // Flag indicating if our agent is ON (vs OFF)
     I2_QML_PROPERTY_READONLY(bool, isON)
@@ -99,20 +92,20 @@ public Q_SLOTS:
          * @brief Return the corresponding PointMap from the input IOP name
          * @param inputName
          */
-    PointMapVM * getPointMapFromInputName(QString inputName);
+    InputVM * getPointMapFromInputName(QString inputName);
 
     /**
          * @brief Return the corresponding PointMap from the output IOP name
          * @param outputName
          */
-    PointMapVM * getPointMapFromOutputName(QString outputName);
+    OutputVM * getPointMapFromOutputName(QString outputName);
 
 private:
     // Previous list of input
-    QHash<QString,PointMapVM*> _mapOfInputsFromInputName;
+    QHash<QString,InputVM*> _mapOfInputsFromInputName;
 
     // Previous list of output
-    QHash<QString,PointMapVM*> _mapOfOutputsFromOutputName;
+    QHash<QString,OutputVM*> _mapOfOutputsFromOutputName;
 
     //
     // Internal functions to factorize code
@@ -130,15 +123,19 @@ private:
         */
        void addPointMapInInternalOutputList(DefinitionM *newDefinition);
 
-    /**
-         * @brief This function check if the point map already exist in the list (input/output list)
-         * @param list The list where to add the points map (input/output list)
-         * @param agentName The name of the agent mapping VM
-         * @param iopName The name of the input/output to add
-         */
-    bool checkIfAlreadyInList(QList<PointMapVM *> list,
-                              QString agentName,
-                              QString iopName);
+       /**
+            * @brief This function check if the point map already exist in the input list
+            * @param agentName The name of the agent mapping VM
+            * @param iopName The name of the input to add
+            */
+       bool checkIfAlreadyInIntputList(QString agentName, QString iopName);
+
+       /**
+            * @brief This function check if the point map already exist in the output list
+            * @param agentName The name of the agent mapping VM
+            * @param iopName The name of the output to add
+            */
+       bool checkIfAlreadyInOutputList(QString agentName, QString iopName);
 };
 
 QML_DECLARE_TYPE(AgentInMappingVM)

@@ -30,6 +30,15 @@ I2CubicBezierCurve {
     //
     //--------------------------------
 
+    property var mapBetweenIOPVM : null
+    property var inputModel : mapBetweenIOPVM ?  mapBetweenIOPVM.pointFrom : null
+    property var outputModel : mapBetweenIOPVM ?  mapBetweenIOPVM.pointTo : null
+
+
+    firstPoint: inputModel? inputModel.position : Qt.point(0,0)
+    secondPoint: outputModel? outputModel.position : Qt.point(0,0)
+
+
     // Minimum offset of control point
     property int minimumControlPointOffset: 20
 
@@ -53,8 +62,81 @@ I2CubicBezierCurve {
 
 
     // Stroke
-    stroke: (mouseArea.pressed) ? pressColor : defaultColor
-    strokeWidth: MasticTheme.agentsMappingLinkDefaultWidth
+    stroke: if (mapBetweenIOPVM && mapBetweenIOPVM.agentTo && mapBetweenIOPVM.agentTo.isReduced) { // if the agentTo is reduced : global type of its inputs
+                switch (mapBetweenIOPVM.agentTo.reducedMapValueTypeInInput)
+                {
+                case AgentIOPValueTypes.INTEGER:
+                    mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
+                    break;
+                case AgentIOPValueTypes.DOUBLE:
+                    mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
+                    break;
+                case AgentIOPValueTypes.STRING:
+                    mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.redColor2 : MasticTheme.darkRedColor2
+                    break;
+                case AgentIOPValueTypes.BOOL:
+                    mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
+                    break;
+                case AgentIOPValueTypes.IMPULSION:
+                    mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.purpleColor : MasticTheme.darkPurpleColor
+                    break;
+                case AgentIOPValueTypes.DATA:
+                    mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.greenColor : MasticTheme.darkGreenColor
+                    break;
+                case AgentIOPValueTypes.MIXED:
+                    mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.whiteColor : MasticTheme.greyColor4
+                    break;
+                case AgentIOPValueTypes.UNKNOWN:
+                    "#000000"
+                    break;
+                default:
+                    MasticTheme.whiteColor;
+                    break;
+                }
+            } else { // if the agentTo is reduced : global type of its inputs
+                if (outputModel && outputModel.iopModel) {
+                    switch (outputModel.iopModel.agentIOPType)
+                    {
+                    case AgentIOPValueTypes.INTEGER:
+                        mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
+                        break;
+                    case AgentIOPValueTypes.DOUBLE:
+                        mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
+                        break;
+                    case AgentIOPValueTypes.STRING:
+                        mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.redColor2 : MasticTheme.darkRedColor2
+                        break;
+                    case AgentIOPValueTypes.BOOL:
+                        mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
+                        break;
+                    case AgentIOPValueTypes.IMPULSION:
+                        mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.purpleColor : MasticTheme.darkPurpleColor
+                        break;
+                    case AgentIOPValueTypes.DATA:
+                        mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.greenColor : MasticTheme.darkGreenColor
+                        break;
+                    case AgentIOPValueTypes.MIXED:
+                        mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.whiteColor : MasticTheme.greyColor4
+                        break;
+                    case AgentIOPValueTypes.UNKNOWN:
+                        "#000000"
+                        break;
+                    default:
+                        MasticTheme.whiteColor;
+                        break;
+                    }
+                } else {
+                    MasticTheme.whiteColor;
+                }
+            }
+
+
+    strokeWidth: if (mapBetweenIOPVM && mapBetweenIOPVM.agentTo && mapBetweenIOPVM.agentTo.isReduced
+                         && mapBetweenIOPVM.agentFrom && mapBetweenIOPVM.agentFrom.isReduced) {
+                     MasticTheme.agentsMappingBrinDefaultWidth
+                 } else {
+                     MasticTheme.agentsMappingLinkDefaultWidth
+                 }
 
 
     // Fuzzy contour

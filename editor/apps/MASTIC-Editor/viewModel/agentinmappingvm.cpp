@@ -12,8 +12,6 @@ AgentInMappingVM::AgentInMappingVM(DefinitionM *definitionModel,
                                    QObject *parent) : QObject(parent),
     _agentName(""),
     _position(position),
-    _width(150),
-    _height(70),
     _isON(false),
     _isReduced(false),
     _reducedMapValueTypeInInput(AgentIOPValueTypes::MIXED),
@@ -30,8 +28,8 @@ AgentInMappingVM::AgentInMappingVM(DefinitionM *definitionModel,
 
         //Process the definition model to add the point Map
         addDefinitionInInternalList(definitionModel);
-    }else
-    {
+    }
+    else {
         qCritical() << "The model of agent mapping is NULL !";
     }
 }
@@ -48,8 +46,6 @@ AgentInMappingVM::AgentInMappingVM(QList<DefinitionM *> definitionModelList,
                                    QObject *parent) : QObject(parent),
     _agentName(""),
     _position(position),
-    _width(150),
-    _height(70),
     _isON(false),
     _isReduced(false),
     _reducedMapValueTypeInInput(AgentIOPValueTypes::MIXED),
@@ -59,7 +55,7 @@ AgentInMappingVM::AgentInMappingVM(QList<DefinitionM *> definitionModelList,
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
     //Set the agent name
-    if(definitionModelList.first() != NULL){
+    if(definitionModelList.first() != NULL) {
 
         //Get the name of the AgentInMappingVM
         _agentName = definitionModelList.first()->name();
@@ -68,8 +64,8 @@ AgentInMappingVM::AgentInMappingVM(QList<DefinitionM *> definitionModelList,
         foreach (DefinitionM * currentDefinition, definitionModelList) {
             addDefinitionInInternalList(currentDefinition);
         }
-    }else
-    {
+    }
+    else {
         qCritical() << "The model of agent mapping is NULL !";
     }
 }
@@ -94,12 +90,12 @@ void AgentInMappingVM::addDefinitionInInternalList(DefinitionM *newDefinition)
         //
         // Create the list of output (PointMapVM)
         //
-        // addPointMapInInternalOutputList(newDefinition);
+         addPointMapInInternalOutputList(newDefinition);
 
         Q_EMIT newDefinitionInAgentMapping(this->agentName());
-    }else
-    {
-        qInfo()<<"The definition of the agent named '"<<_agentName<<"' could not be add to the agent mapping VM named '"<<newDefinition->name()<<"'";
+    }
+    else {
+        qInfo()<<"The definition of the agent named '" << _agentName << "' could not be add to the agent mapping VM named '" << newDefinition->name() << "'";
     }
 }
 
@@ -115,28 +111,27 @@ void AgentInMappingVM::addPointMapInInternalInputList(DefinitionM *newDefinition
     if(newDefinition != NULL)
     {
         // Create the list of Point Map to add in the agent in mapping
-        QList<PointMapVM*> listOfPointMapTemp;
+        QList<InputVM*> listOfPointMapTemp;
 
         foreach (AgentIOPM* iopM, newDefinition->inputsList()->toList())
         {
             if (iopM != NULL)
             {
                 //Check if it's not alreafy exist in the list & add it
-                if(!checkIfAlreadyInList(_inputsList.toList(), _agentName, iopM->name()))
+                if(!checkIfAlreadyInIntputList(_agentName, iopM->name()))
                 {
                     // New pointMapVM (from agent and input model
-                    PointMapVM* pointMapVM = new PointMapVM(_agentName, iopM, this);
+                    InputVM* inputPoint = new InputVM(_agentName, iopM, this);
 
                     // Add to the list of newly created pointMap
-                    listOfPointMapTemp.append(pointMapVM);
+                    listOfPointMapTemp.append(inputPoint);
 
                     // Update the hash table
-                    _mapOfInputsFromInputName.insert(iopM->name(), pointMapVM);
+                    _mapOfInputsFromInputName.insert(iopM->name(), inputPoint);
 
                     qInfo()<<"Add new point map " << _agentName << "." << iopM->name() << " in the inputs list.";
-
-                }else
-                {
+                }
+                else {
                     qInfo() << "Point map : " << _agentName << "." << iopM->name() << " is already present in the list.";
                 }
             }
@@ -154,67 +149,85 @@ void AgentInMappingVM::addPointMapInInternalOutputList(DefinitionM *newDefinitio
 {
     if(newDefinition != NULL)
     {
+        // Create the list of Point Map to add in the agent in mapping
+        QList<OutputVM*> listOfPointMapTemp;
 
-        // TODO ESTIA : AWAITING FOR TWO NEW DAUGHTERS CLASSES FROM POINTMAPVM
+        foreach (OutputM* iopM, newDefinition->outputsList()->toList())
+        {
+            if (iopM != NULL)
+            {
+                //Check if it's not alreafy exist in the list & add it
+                if(!checkIfAlreadyInOutputList(_agentName, iopM->name()))
+                {
+                    // New pointMapVM (from agent and input model
+                    OutputVM* outputPoint = new OutputVM(_agentName, iopM, this);
 
-//        // Create the list of Point Map to add in the agent in mapping
-//        QList<PointMapVM*> listOfPointMapTemp;
+                    // Add to the list of newly created pointMap
+                    listOfPointMapTemp.append(outputPoint);
 
-//        // Get the input list from the model
-//        I2CustomItemListModel<AgentIOPM> *definitionIopList = newDefinition->outputsList();
+                    // Update the hash table
+                    _mapOfOutputsFromOutputName.insert(iopM->name(), outputPoint);
 
-//        foreach (AgentIOPM* iopM, definitionIopList->toList())
-//        {
-//            if (iopM != NULL)
-//            {
-//                //Check if it's not alreafy exist in the list & add it
-//                if(!checkIfAlreadyInList(list->toList(), _agentName, iopM->name()))
-//                {
-//                    // New pointMapVM (from agent and input model
-//                    PointMapVM* pointMapVM = new PointMapVM(_agentName, iopM, this);
-
-//                    // Add to the list of newly created pointMap
-//                    listOfPointMapTemp.append(pointMapVM);
-
-//                    // Update the hash table
-//                    _mapOfInputsFromInputName.insert(iopM->name(), pointMapVM);
-
-//                    qInfo()<<"Add new point map " << _agentName << "." << iopM->name() << " in the inputs list.";
-
-//                }else
-//                {
-//                    qInfo() << "Point map : " << _agentName << "." << iopM->name() << " is already present in the list.";
-//                }
-//            }
-//        }
-//        _outputsList->append(listOfPointMapTemp);
+                    qInfo()<<"Add new point map " << _agentName << "." << iopM->name() << " in the inputs list.";
+                }
+                else {
+                    qInfo() << "Point map : " << _agentName << "." << iopM->name() << " is already present in the list.";
+                }
+            }
+        }
+        _outputsList.append(listOfPointMapTemp);
     }
 }
 
-
 /**
-     * @brief This function check if the point map already exist in the list (input/output list)
-     * @param list The list where to add the points map (input/output list)
+     * @brief This function check if the point map already exist in the input list
      * @param agentName The name of the agent mapping VM
-     * @param iopName The name of the input/output to add
+     * @param iopName The name of the input to add
      */
-bool AgentInMappingVM::checkIfAlreadyInList(QList<PointMapVM *> list,
-                                            QString agentName,
-                                            QString iopName)
+bool AgentInMappingVM::checkIfAlreadyInIntputList(QString agentName, QString iopName)
 {
-    foreach (PointMapVM* iterator, list)
+    foreach (InputVM* iterator, _inputsList.toList())
     {
         // If this VM contains our model of agent
         if ( (iterator != NULL)
              &&
+
+             //TODO ESTIA PATXI : on est déjà dans l'agent (UTILE?).
              // Same agent name
              (iterator->nameAgent() == agentName)
              &&
              // Same Input name
-             (iterator->iopModel()->name() == iopName)
+             (iterator->modelM()->name() == iopName)
              )
         {
+            // Exactly the same point ('agent name' & 'iop name')
+            return true;
+        }
+    }
 
+    return false;
+}
+
+/**
+     * @brief This function check if the point map already exist in the outputList
+     * @param agentName The name of the agent mapping VM
+     * @param iopName The name of the input to add
+     */
+bool AgentInMappingVM::checkIfAlreadyInOutputList(QString agentName, QString iopName)
+{
+    foreach (OutputVM* iterator, _outputsList.toList())
+    {
+        // If this VM contains our model of agent
+        if ( (iterator != NULL)
+             &&
+              //TODO ESTIA PATXI : on est déjà dans l'agent (UTILE?).
+             // Same agent name
+             (iterator->nameAgent() == agentName)
+             &&
+             // Same Input name
+             (iterator->modelM()->name() == iopName)
+             )
+        {
             // Exactly the same point ('agent name' & 'iop name')
             return true;
         }
@@ -227,8 +240,10 @@ bool AgentInMappingVM::checkIfAlreadyInList(QList<PointMapVM *> list,
      * @brief Return the corresponding PointMap from the input IOP name
      * @param inputName
      */
-PointMapVM * AgentInMappingVM::getPointMapFromInputName(QString inputName)
+InputVM * AgentInMappingVM::getPointMapFromInputName(QString inputName)
 {
+    // Doc QT: If the hash contains no item with the given key, the function returns defaultValue.
+    // Suggestion pour être sur: if (contains) ... else { return NULL; }
     return _mapOfInputsFromInputName.value(inputName);
 }
 
@@ -236,8 +251,10 @@ PointMapVM * AgentInMappingVM::getPointMapFromInputName(QString inputName)
      * @brief Return the corresponding PointMap from the output IOP name
      * @param outputName
      */
-PointMapVM * AgentInMappingVM::getPointMapFromOutputName(QString outputName)
+OutputVM * AgentInMappingVM::getPointMapFromOutputName(QString outputName)
 {
+    // Doc QT: If the hash contains no item with the given key, the function returns defaultValue.
+    // Suggestion pour être sur: if (contains) ... else { return NULL; }
     return _mapOfOutputsFromOutputName.value(outputName);
 }
 

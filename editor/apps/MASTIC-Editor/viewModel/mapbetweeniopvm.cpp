@@ -26,8 +26,10 @@
  * @param pointTo
  * @param parent
  */
-MapBetweenIOPVM::MapBetweenIOPVM(PointMapVM *pointFrom, PointMapVM *pointTo, QObject *parent) : QObject(parent),
+MapBetweenIOPVM::MapBetweenIOPVM(OutputVM *pointFrom, InputVM *pointTo, QObject *parent) : QObject(parent),
+    _agentFrom(NULL),
     _pointFrom(NULL),
+    _agentTo(NULL),
     _pointTo(NULL),
     _isNewValueOnOutput(false)
 {
@@ -39,7 +41,7 @@ MapBetweenIOPVM::MapBetweenIOPVM(PointMapVM *pointFrom, PointMapVM *pointTo, QOb
 
     if ((_pointFrom != NULL) && (_pointTo != NULL))
     {
-        qInfo() << "Map Between "<<_pointFrom->iopModel()->name()<<"->"<<_pointTo->iopModel()->name()<<"created";
+        qInfo() << "Map Between "<< _pointFrom->nameAgent() << "." << _pointFrom->modelM()->name() << "->" << _pointTo->nameAgent() << "." <<_pointTo->modelM()->name()  <<"created";
     }
     else
     {
@@ -63,7 +65,7 @@ MapBetweenIOPVM::MapBetweenIOPVM(PointMapVM *pointFrom, PointMapVM *pointTo, QOb
 
     if (_pointFrom != NULL)
     {
-        qInfo() << "Map Between "<<_pointFrom->iopModel()->name()<<"created";
+        qInfo() << "Map Between " << _pointFrom->nameAgent() << "." << _pointFrom->modelM()->name() << "created";
     }
     else
     {
@@ -81,9 +83,9 @@ MapBetweenIOPVM::MapBetweenIOPVM(PointMapVM *pointFrom, PointMapVM *pointTo, QOb
  * @param parent
  */
 MapBetweenIOPVM::MapBetweenIOPVM(AgentInMappingVM* agentFrom,
-                                 PointMapVM *pointFrom,
+                                 OutputVM *pointFrom,
                                  AgentInMappingVM* agentTo,
-                                 PointMapVM *pointTo,
+                                 InputVM *pointTo,
                                  QObject *parent) : QObject(parent),
     _agentFrom(NULL),
     _pointFrom(NULL),
@@ -100,10 +102,10 @@ MapBetweenIOPVM::MapBetweenIOPVM(AgentInMappingVM* agentFrom,
     setagentTo(agentTo);
     setpointTo(pointTo);
 
-    if ((_agentFrom != NULL) && (_pointFrom != NULL) && (_agentTo != NULL) && (_pointTo != NULL))
+    if ((_agentFrom != NULL) && (_pointFrom != NULL) && (_pointFrom->modelM() != NULL)
+            && (_agentTo != NULL) && (_pointTo != NULL) && (_pointTo->modelM() != NULL))
     {
-        //qInfo() << "New Map Between" << _agentFrom->agentName() << "." << _pointFrom->iopModel()->name() << "-->" << _agentTo->agentName() << "." << _pointTo->iopModel()->name();
-        qInfo() << "New Map Between" << _agentFrom->agentName() << "." << "TODO _pointFrom OutputVM" << "-->" << _agentTo->agentName() << "." << "TODO _pointTo InputVM";
+        qInfo() << "New Map Between" << _agentFrom->agentName() << "." << _pointFrom->modelM()->name() << "-->" << _agentTo->agentName() << "." << _pointTo->modelM()->name();
     }
 }
 

@@ -18,7 +18,6 @@
 OutputVM::OutputVM(QString agentName,
                    OutputM* modelM,
                    QObject *parent) : PointMapVM(agentName,
-                                                 NULL,
                                                  parent),
     _modelM(modelM)
 {

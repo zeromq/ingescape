@@ -33,10 +33,12 @@ Item {
     property var agentMappingVM: null
     property var agentName: agentMappingVM ? agentMappingVM.agentName : ""
 
-    property bool isClosed : false
+    property bool agentIsPressed : false;
+
+    property bool isReduced : agentMappingVM && agentMappingVM.isReduced
 
     width : 228
-    height : (rootItem.agentMappingVM && !rootItem.isClosed)?
+    height : (rootItem.agentMappingVM && !rootItem.isReduced)?
                  (52 + 20*Math.max(rootItem.agentMappingVM.inputsList.count , rootItem.agentMappingVM.outputsList.count))
                : 40
 
@@ -95,7 +97,9 @@ Item {
             rightMargin: 10
         }
 
-        color : MasticTheme.darkGreyColor
+        color : rootItem.agentIsPressed?
+                    MasticTheme.darkGreyColor2
+                  : (rootItem.agentMappingVM && rootItem.agentMappingVM.isON)? MasticTheme.darkGreyColor : MasticTheme.veryDarkGreyColor
         radius : 6
 
         // Agent Name
@@ -114,10 +118,10 @@ Item {
             elide: Text.ElideRight
             text : rootItem.agentName
 
-            color : MasticTheme.agentsNameMappingColor
+            color : (rootItem.agentMappingVM && rootItem.agentMappingVM.isON)? MasticTheme.agentsONNameMappingColor : MasticTheme.agentsOFFNameMappingColor
             font: MasticTheme.headingFont
-
         }
+
 
         //Separator
         Rectangle {
@@ -134,9 +138,114 @@ Item {
             height : 2
             color : agentName.color
 
-            visible : !rootItem.isClosed
+            visible : !rootItem.isReduced
         }
 
+
+
+        //
+        //
+        // Global Points
+        //
+        Rectangle {
+            id : inputGlobalPoint
+
+            anchors {
+                horizontalCenter : parent.left
+                verticalCenter: parent.verticalCenter
+            }
+
+            height : 13
+            width : height
+            radius : height/2
+
+            color : if (agentMappingVM) {
+                        switch (agentMappingVM.reducedMapValueTypeInInput)
+                        {
+                        case AgentIOPValueTypes.INTEGER:
+                            agentMappingVM.isON? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
+                            break;
+                        case AgentIOPValueTypes.DOUBLE:
+                            agentMappingVM.isON? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
+                            break;
+                        case AgentIOPValueTypes.STRING:
+                            agentMappingVM.isON? MasticTheme.redColor2 : MasticTheme.darkRedColor2
+                            break;
+                        case AgentIOPValueTypes.BOOL:
+                            agentMappingVM.isON? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
+                            break;
+                        case AgentIOPValueTypes.IMPULSION:
+                            agentMappingVM.isON? MasticTheme.purpleColor : MasticTheme.darkPurpleColor
+                            break;
+                        case AgentIOPValueTypes.DATA:
+                            agentMappingVM.isON? MasticTheme.greenColor : MasticTheme.darkGreenColor
+                            break;
+                        case AgentIOPValueTypes.MIXED:
+                            agentMappingVM.isON? MasticTheme.whiteColor : MasticTheme.greyColor4
+                            break;
+                        case AgentIOPValueTypes.UNKNOWN:
+                            "#000000"
+                            break;
+                        default:
+                            MasticTheme.whiteColor;
+                            break;
+                        }
+                    } else {
+                        MasticTheme.whiteColor
+                    }
+
+            visible : rootItem.isReduced && rootItem.agentMappingVM && rootItem.agentMappingVM.inputsList.count > 0
+        }
+
+        Rectangle {
+            id : outputGlobalPoint
+
+            anchors {
+                horizontalCenter : parent.right
+                verticalCenter: parent.verticalCenter
+            }
+
+            height : 13
+            width : height
+            radius : height/2
+
+            color : if (agentMappingVM) {
+                        switch (agentMappingVM.reducedMapValueTypeInOutput)
+                        {
+                        case AgentIOPValueTypes.INTEGER:
+                            agentMappingVM.isON? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
+                            break;
+                        case AgentIOPValueTypes.DOUBLE:
+                            agentMappingVM.isON? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
+                            break;
+                        case AgentIOPValueTypes.STRING:
+                            agentMappingVM.isON? MasticTheme.redColor2 : MasticTheme.darkRedColor2
+                            break;
+                        case AgentIOPValueTypes.BOOL:
+                            agentMappingVM.isON? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
+                            break;
+                        case AgentIOPValueTypes.IMPULSION:
+                            agentMappingVM.isON? MasticTheme.purpleColor : MasticTheme.darkPurpleColor
+                            break;
+                        case AgentIOPValueTypes.DATA:
+                            agentMappingVM.isON? MasticTheme.greenColor : MasticTheme.darkGreenColor
+                            break;
+                        case AgentIOPValueTypes.MIXED:
+                            agentMappingVM.isON? MasticTheme.whiteColor : MasticTheme.greyColor4
+                            break;
+                        case AgentIOPValueTypes.UNKNOWN:
+                            "#000000"
+                            break;
+                        default:
+                            MasticTheme.whiteColor;
+                            break;
+                        }
+                    } else {
+                        MasticTheme.whiteColor
+                    }
+
+            visible : rootItem.isReduced && rootItem.agentMappingVM && rootItem.agentMappingVM.outputsList.count > 0
+        }
 
 
         //
@@ -155,9 +264,11 @@ Item {
                 bottom: parent.bottom
             }
 
+            visible : !rootItem.isReduced
+
             Repeater {
                 // List of intput slots VM
-                model: (rootItem.agentMappingVM && !rootItem.isClosed)? rootItem.agentMappingVM.inputsList : 0
+                model: rootItem.agentMappingVM ? rootItem.agentMappingVM.inputsList : 0
 
                 delegate: Item {
                     id: inputSlotItem
@@ -180,9 +291,9 @@ Item {
                             verticalCenter: parent.verticalCenter
                         }
                         elide: Text.ElideRight
-                        text : myModel.iopModel ? myModel.iopModel.name : ""
+                        text : myModel.modelM ? myModel.modelM.name : ""
 
-                        color : MasticTheme.agentsInputsOutputsMappingColor
+                        color : (rootItem.agentMappingVM && rootItem.agentMappingVM.isON)? MasticTheme.agentsONInputsOutputsMappingColor : MasticTheme.agentsOFFInputsOutputsMappingColor
                         font: MasticTheme.heading2Font
                     }
 
@@ -199,7 +310,42 @@ Item {
                         width : height
                         radius : height/2
 
-                        color : MasticTheme.whiteColor
+                        color : if (agentMappingVM && myModel && myModel.modelM) {
+
+                                    switch (myModel.modelM.agentIOPValueType)
+                                    {
+                                    case AgentIOPValueTypes.INTEGER:
+                                        agentMappingVM.isON? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
+                                        break;
+                                    case AgentIOPValueTypes.DOUBLE:
+                                        agentMappingVM.isON? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
+                                        break;
+                                    case AgentIOPValueTypes.STRING:
+                                        agentMappingVM.isON? MasticTheme.redColor2 : MasticTheme.darkRedColor2
+                                        break;
+                                    case AgentIOPValueTypes.BOOL:
+                                        agentMappingVM.isON? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
+                                        break;
+                                    case AgentIOPValueTypes.IMPULSION:
+                                        agentMappingVM.isON? MasticTheme.purpleColor : MasticTheme.darkPurpleColor
+                                        break;
+                                    case AgentIOPValueTypes.DATA:
+                                        agentMappingVM.isON? MasticTheme.greenColor : MasticTheme.darkGreenColor
+                                        break;
+                                    case AgentIOPValueTypes.MIXED:
+                                        agentMappingVM.isON? MasticTheme.whiteColor : MasticTheme.greyColor4
+                                        break;
+                                    case AgentIOPValueTypes.UNKNOWN:
+                                        "#000000"
+                                        break;
+                                    default:
+                                        "#000000"
+                                        break;
+                                    }
+
+                                } else {
+                                    MasticTheme.whiteColor
+                                }
                     }
 
 
@@ -212,17 +358,21 @@ Item {
 
                         property: "position"
 
-                        value: Qt.point(rootItem.x + inputSlotItem.mapToItem(rootItem, linkPoint.x, linkPoint.y).x + linkPoint.width/2,
-                                        rootItem.y + inputSlotItem.mapToItem(rootItem, linkPoint.x, linkPoint.y).y + linkPoint.height/2)
+                        // the position inside the agent is not the same if the agent is reduced or not
+                        value:  (rootItem.agentMappingVM && !rootItem.agentMappingVM.isReduced) ?
+                                    (Qt.point(rootItem.x + inputSlotItem.mapToItem(rootItem, linkPoint.x, linkPoint.y).x + linkPoint.width/2,
+                                              rootItem.y + inputSlotItem.mapToItem(rootItem, linkPoint.x, linkPoint.y).y + linkPoint.height/2))
+                                  : (Qt.point(rootItem.x + inputGlobalPoint.x + inputGlobalPoint.width/2,
+                                              rootItem.y + inputGlobalPoint.y + inputGlobalPoint.height/2));
                     }
 
 
-//                    Connections {
-//                        target : myModel
-//                        onPositionChanged : {
-//                            console.log( " position changed input" + myModel.position.x + "   " + myModel.position.y)
-//                        }
-//                    }
+                    //                    Connections {
+                    //                        target : myModel
+                    //                        onPositionChanged : {
+                    //                            console.log( " position changed input" + myModel.position.x + "   " + myModel.position.y)
+                    //                        }
+                    //                    }
                 }
             }
         }
@@ -244,9 +394,11 @@ Item {
                 bottom: parent.bottom
             }
 
+            visible : !rootItem.isReduced
+
             Repeater {
                 // List of output slots VM
-                model: (rootItem.agentMappingVM && !rootItem.isClosed)? rootItem.agentMappingVM.outputsList : 0
+                model: (rootItem.agentMappingVM)? rootItem.agentMappingVM.outputsList : 0
 
                 delegate: Item {
                     id: outputSlotItem
@@ -272,9 +424,9 @@ Item {
                         horizontalAlignment : Text.AlignRight
 
                         elide: Text.ElideRight
-                        text : myModel.iopModel ? myModel.iopModel.name : ""
+                        text : myModel.modelM ? myModel.modelM.name : ""
 
-                        color : MasticTheme.agentsInputsOutputsMappingColor
+                        color : (rootItem.agentMappingVM && rootItem.agentMappingVM.isON)? MasticTheme.agentsONInputsOutputsMappingColor : MasticTheme.agentsOFFInputsOutputsMappingColor
                         font: MasticTheme.heading2Font
                     }
 
@@ -291,7 +443,52 @@ Item {
                         width : height
                         radius : height/2
 
-                        color : MasticTheme.whiteColor
+                        color : if (agentMappingVM && myModel && myModel.modelM) {
+
+                                    switch (myModel.modelM.agentIOPValueType)
+                                    {
+                                    case AgentIOPValueTypes.INTEGER:
+                                        (agentMappingVM.isON && !myModel.modelM.isMuted) ? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
+                                        break;
+                                    case AgentIOPValueTypes.DOUBLE:
+                                        (agentMappingVM.isON && !myModel.modelM.isMuted)? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
+                                        break;
+                                    case AgentIOPValueTypes.STRING:
+                                        (agentMappingVM.isON && !myModel.modelM.isMuted)? MasticTheme.redColor2 : MasticTheme.darkRedColor2
+                                        break;
+                                    case AgentIOPValueTypes.BOOL:
+                                        (agentMappingVM.isON && !myModel.modelM.isMuted)? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
+                                        break;
+                                    case AgentIOPValueTypes.IMPULSION:
+                                        (agentMappingVM.isON && !myModel.modelM.isMuted)? MasticTheme.purpleColor : MasticTheme.darkPurpleColor
+                                        break;
+                                    case AgentIOPValueTypes.DATA:
+                                        (agentMappingVM.isON && !myModel.modelM.isMuted)? MasticTheme.greenColor : MasticTheme.darkGreenColor
+                                        break;
+                                    case AgentIOPValueTypes.MIXED:
+                                        (agentMappingVM.isON && !myModel.modelM.isMuted)? MasticTheme.whiteColor : MasticTheme.greyColor4
+                                        break;
+                                    case AgentIOPValueTypes.UNKNOWN:
+                                        "#000000"
+                                        break;
+                                    default:
+                                        "#000000"
+                                        break;
+                                    }
+
+                                } else {
+                                    MasticTheme.whiteColor
+                                }
+
+
+
+                        I2SvgItem {
+                            anchors.centerIn: parent
+                            svgFileCache: MasticTheme.svgFileMASTIC
+                            svgElementId: "outputIsMuted"
+
+                            visible : myModel.modelM && myModel.modelM.isMuted
+                        }
                     }
 
 
@@ -304,21 +501,25 @@ Item {
 
                         property: "position"
 
-                        value: Qt.point(rootItem.x + outputSlotItem.mapToItem(rootItem, linkPointOut.x, linkPointOut.y).x + linkPointOut.width/2,
-                                        rootItem.y + outputSlotItem.mapToItem(rootItem, linkPointOut.x, linkPointOut.y).y + linkPointOut.height/2)
+                        // the position inside the agent is not the same if the agent is reduced or not
+                        value: (rootItem.agentMappingVM && !rootItem.agentMappingVM.isReduced) ?
+                                   (Qt.point(rootItem.x + outputSlotItem.mapToItem(rootItem, linkPointOut.x, linkPointOut.y).x + linkPointOut.width/2,
+                                             rootItem.y + outputSlotItem.mapToItem(rootItem, linkPointOut.x, linkPointOut.y).y + linkPointOut.height/2))
+                                 : (Qt.point(rootItem.x + outputGlobalPoint.x + outputGlobalPoint.width/2,
+                                             rootItem.y + outputGlobalPoint.y + outputGlobalPoint.height/2));
                     }
 
-//                    Connections {
-//                        target : myModel
-//                        onPositionChanged : {
-//                            console.log( " position changed output " + myModel.position.x + "   " + myModel.position.y)
-//                        }
-//                    }
+                    //                    Connections {
+                    //                        target : myModel
+                    //                        onPositionChanged : {
+                    //                            console.log( " position changed output " + myModel.position.x + "   " + myModel.position.y)
+                    //                        }
+                    //                    }
                 }
             }
         }
 
-
-
     }
+
+
 }

@@ -231,7 +231,6 @@ Item {
 
         }
 
-
         Row {
             id: headerRow2
 
@@ -314,8 +313,8 @@ Item {
             }
 
         }
-
     }
+
 
     //
     // Separator
@@ -356,7 +355,7 @@ Item {
                 agent : model.QtObject
                 controller: rootItem.controller
 
-               visible: mouseArea.drag.active
+                visible: mouseArea.drag.active
 
                 agentItemIsHovered : mouseArea.containsMouse
             }
@@ -405,7 +404,6 @@ Item {
 
                     onPositionChanged: {
                     }
-
 
                     onReleased: {
                         // Check if we have a drop area below our item
@@ -460,7 +458,7 @@ Item {
 
                     AgentMapping.AgentNodeView {
                          opacity : 0.5
-                         isClosed : true
+                         isReduced : true
                          agentName : model.name
                          visible: mouseArea.drag.active
                     }

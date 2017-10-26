@@ -364,93 +364,23 @@ Item {
 
                     Link {
                         id : link
-                        firstPoint: model.pointFrom? model.pointFrom.position : Qt.point(0,0)
-                        secondPoint: model.pointFrom? model.pointTo.position : Qt.point(0,0)
+                        mapBetweenIOPVM: model.QtObject
                     }
                 }
 
-                //
-                // Link between [item1, nodeOut] and [item3, nodein1]
-                //
-                Link {
-                    id: link1
-
-                    firstPoint: Qt.point(item1.x + item1NodeOut.x + item1NodeOut.width/2, item1.y + item1NodeOut.y + item1NodeOut.height/2)
-
-                    secondPoint: Qt.point(item3.x + item3NodeIn1.x + item3NodeIn1.width/2, item3.y + item3NodeIn1.y + item3NodeIn1.height/2)
-
-                    onClicked: console.log("Click on link1")
-                }
-
 
                 //
-                // Link between [item2, nodeOut] and [item3, nodein2]
-                //
-                Link {
-                    id: link2
+//                // Link between [item4, nodeOut] and [item5, nodeIn2]
+//                //
+//                Link {
+//                    id: link6
 
-                    firstPoint: Qt.point(item2.x + item2NodeOut.x + item2NodeOut.width/2, item2.y + item2NodeOut.y + item2NodeOut.height/2)
+//                    firstPoint: Qt.point(item4.x + item4NodeOut.x + item4NodeOut.width/2, item4.y + item4NodeOut.y + item4NodeOut.height/2)
 
-                    secondPoint: Qt.point(item3.x + item3NodeIn2.x + item3NodeIn2.width/2, item3.y + item3NodeIn2.y + item3NodeIn2.height/2)
+//                    secondPoint: Qt.point(item5.x + item5NodeIn2.x + item5NodeIn2.width/2, item5.y + item5NodeIn2.y + item5NodeIn2.height/2)
 
-                    onClicked: console.log("Click on link2")
-               }
-
-
-                //
-                // Link between [item2, nodeOut] and [item4, nodeIn]
-                //
-                Link {
-                    id: link3
-
-                    firstPoint: Qt.point(item2.x + item2NodeOut.x + item2NodeOut.width/2, item2.y + item2NodeOut.y + item2NodeOut.height/2)
-
-                    secondPoint: Qt.point(item4.x + item4NodeIn.x + item4NodeIn.width/2, item4.y + item4NodeIn.y + item4NodeIn.height/2)
-
-                     onClicked: console.log("Click on link3")
-                }
-
-
-                //
-                // Link between [item3, nodeOut1] and [item5, nodeIn1]
-                //
-                Link {
-                    id: link4
-
-                    firstPoint: Qt.point(item3.x + item3NodeOut1.x + item3NodeOut1.width/2, item3.y + item3NodeOut1.y + item3NodeOut1.height/2)
-
-                    secondPoint: Qt.point(item5.x + item5NodeIn1.x + item5NodeIn1.width/2, item5.y + item5NodeIn1.y + item5NodeIn1.height/2)
-
-                     onClicked: console.log("Click on link4")
-                }
-
-
-                //
-                // Link between [item3, nodeOut2] and [item5, nodeIn2]
-                //
-                Link {
-                    id: link5
-
-                    firstPoint: Qt.point(item3.x + item3NodeOut2.x + item3NodeOut2.width/2, item3.y + item3NodeOut2.y + item3NodeOut2.height/2)
-
-                    secondPoint: Qt.point(item5.x + item5NodeIn2.x + item5NodeIn2.width/2, item5.y + item5NodeIn2.y + item5NodeIn2.height/2)
-
-                     onClicked: console.log("Click on link5")
-                }
-
-
-                //
-                // Link between [item4, nodeOut] and [item5, nodeIn2]
-                //
-                Link {
-                    id: link6
-
-                    firstPoint: Qt.point(item4.x + item4NodeOut.x + item4NodeOut.width/2, item4.y + item4NodeOut.y + item4NodeOut.height/2)
-
-                    secondPoint: Qt.point(item5.x + item5NodeIn2.x + item5NodeIn2.width/2, item5.y + item5NodeIn2.y + item5NodeIn2.height/2)
-
-                     onClicked: console.log("Click on link6")
-               }
+//                     onClicked: console.log("Click on link6")
+//               }
 
                 //----------------------------------------
 
@@ -466,6 +396,8 @@ Item {
                     AgentNodeView {
                         id: agent
                         agentMappingVM : model.QtObject
+                        agentIsPressed : mouseArea.pressed
+
 
                         MouseArea {
                             id: mouseArea
@@ -479,544 +411,227 @@ Item {
                             }
 
                             onPositionChanged: {
-                                console.log("agentMapping position " + model.position.x + "  " + model.position.y)
+                           //     console.log("agentMapping position " + model.position.x + "  " + model.position.y)
                             }
 
                             onDoubleClicked: {
-                                agent.isClosed = !agent.isClosed;
+                                model.isReduced = !model.isReduced;
                             }
                         }
                     }
                 }
 
+//                //
+//                // Item 4
+//                //
+//                Rectangle {
+//                    id: item4
 
-                //
-                // Item 1
-                //
-                Rectangle {
-                    id: item1
+//                    x: 400
+//                    y: 550
 
-                    x: 50
-                    y: 50
+//                    width: 150
+//                    height: 70
 
-                    width: 150
-                    height: 70
 
-                    color: workspace.nodeColor
+//                    color: workspace.nodeColor
 
-                    radius: 8
+//                    radius: 8
 
-                    border {
-                        width: 2
-                        color: (mouseArea1.pressed) ? workspace.nodeSelectedBorderColor : workspace.nodeBorderColor
-                    }
+//                    border {
+//                        width: 2
+//                        color: mouseArea4.pressed ? workspace.nodeSelectedBorderColor : workspace.nodeBorderColor
+//                    }
 
-                    Rectangle {
-                        id: item1NodeOut
 
-                        anchors {
-                            horizontalCenter: parent.right
-                            verticalCenter: parent.verticalCenter
-                        }
+//                    Rectangle {
+//                        id: item4NodeIn
 
-                        width: 20
-                        height: width
-                        radius: width/2
+//                        anchors {
+//                            verticalCenter: parent.verticalCenter
+//                            horizontalCenter: parent.left
+//                        }
 
-                        border {
-                            color: workspace.outletColor
-                            width: 2
-                        }
+//                        width: 20
+//                        height: width
+//                        radius: width/2
 
-                        color: workspace.nodeColor
+//                        border {
+//                            color: workspace.inletColor
+//                            width: 2
+//                        }
 
-                        Rectangle {
-                            anchors.centerIn: parent
+//                        color: workspace.nodeColor
 
-                            width: parent.width - 8
-                            height: width
-                            radius: width/2
+//                        Rectangle {
+//                            anchors.centerIn: parent
 
-                            color: workspace.outletColor
-                        }
-                    }
+//                            width: parent.width - 8
+//                            height: width
+//                            radius: width/2
 
+//                            color: workspace.inletColor
+//                        }
+//                    }
 
-                    MouseArea {
-                        id: mouseArea1
+//                    Rectangle {
+//                        id: item4NodeOut
 
-                        anchors.fill: parent
+//                        anchors {
+//                            horizontalCenter: parent.right
+//                            verticalCenter: parent.verticalCenter
+//                        }
 
-                        drag.target: parent
+//                        width: 20
+//                        height: width
+//                        radius: width/2
 
-                        onPressed: {
-                            parent.z = workspace.maxZ++;
-                        }
+//                        border {
+//                            color: workspace.outletColor
+//                            width: 2
+//                        }
 
-                        onDoubleClicked: {
-                            rootItem.centerViewOnNode(item1);
-                        }
-                    }
-                }
+//                        color: workspace.nodeColor
 
+//                        Rectangle {
+//                            anchors.centerIn: parent
 
-                //
-                // Item 2
-                //
-                Rectangle {
-                    id: item2
+//                            width: parent.width - 8
+//                            height: width
+//                            radius: width/2
 
-                    x: 50
-                    y: 300
+//                            color: workspace.outletColor
+//                        }
+//                    }
 
-                    width: 150
-                    height: 70
 
-                    color: workspace.nodeColor
+//                    MouseArea {
+//                        id: mouseArea4
 
-                    radius: 8
+//                        anchors.fill: parent
 
-                    border {
-                        width: 2
-                        color: mouseArea2.pressed ? workspace.nodeSelectedBorderColor : workspace.nodeBorderColor
-                    }
+//                        drag.target: parent
 
-                    Rectangle {
-                        id: item2NodeOut
+//                        onPressed: {
+//                            parent.z = workspace.maxZ++;
+//                        }
 
-                        anchors {
-                            horizontalCenter: parent.right
-                            verticalCenter: parent.verticalCenter
-                        }
+//                        onDoubleClicked: {
+//                            rootItem.centerViewOnNode(item4);
+//                        }
+//                    }
+//                }
 
-                        width: 20
-                        height: width
-                        radius: width/2
 
-                        border {
-                            color: workspace.outletColor
-                            width: 2
-                        }
+//                //
+//                // Item 5
+//                //
+//                Rectangle {
+//                    id: item5
 
-                        color: workspace.nodeColor
+//                    // Flag indicating if our item is closed or not
+//                    property bool isClosed: false
 
-                        Rectangle {
-                            anchors.centerIn: parent
 
-                            width: parent.width - 8
-                            height: width
-                            radius: width/2
+//                    x: 700
+//                    y: 250
 
-                            color: workspace.outletColor
-                        }
-                    }
+//                    width: 150
+//                    height: (isClosed) ? 75 : 150
 
+//                    color: (isClosed) ? workspace.nodeCollapsedColor : workspace.nodeColor
 
-                    MouseArea {
-                        id: mouseArea2
+//                    radius: 8
 
-                        anchors.fill: parent
+//                    border {
+//                        width: 2
+//                        color: mouseArea5.pressed ? workspace.nodeSelectedBorderColor : workspace.nodeBorderColor
+//                    }
 
-                        drag.target: parent
 
-                        onPressed: {
-                            parent.z = workspace.maxZ++;
-                        }
+//                    Behavior on height {
+//                        NumberAnimation {}
+//                    }
 
-                        onDoubleClicked: {
-                            rootItem.centerViewOnNode(item2);
-                        }
-                    }
-                }
+//                    Rectangle {
+//                        id: item5NodeIn1
 
+//                        anchors {
+//                            horizontalCenter: parent.left
+//                        }
 
-                //
-                // Item 3
-                //
-                Rectangle {
-                    id: item3
+//                        y: (item5.isClosed) ? (parent.height/2 - height/2) : (parent.height/3 - height/2)
 
-                    // Flag indicating if our item is closed or not
-                    property bool isClosed: false
+//                        width: 20
+//                        height: width
+//                        radius: width/2
 
-                    x: 400
-                    y: 150
+//                        border {
+//                            color: workspace.inletColor
+//                            width: 2
+//                        }
 
-                    width: 150
-                    height: (isClosed) ? 75 : 300
+//                        color: workspace.nodeColor
 
+//                        Rectangle {
+//                            anchors.centerIn: parent
 
-                    color: (isClosed) ? workspace.nodeCollapsedColor : workspace.nodeColor
+//                            width: parent.width - 8
+//                            height: width
+//                            radius: width/2
 
-                    radius: 8
+//                            color: workspace.inletColor
+//                        }
+//                    }
 
-                    border {
-                        width: 2
-                        color: mouseArea3.pressed ? workspace.nodeSelectedBorderColor : workspace.nodeBorderColor
-                    }
 
+//                    Rectangle {
+//                        id: item5NodeIn2
 
-                    Behavior on height {
-                        NumberAnimation {}
-                    }
+//                        anchors {
+//                            horizontalCenter: parent.left
+//                        }
 
-                    Rectangle {
-                        id: item3NodeIn1
+//                        y: (item5.isClosed) ? (parent.height/2 - height/2) : (parent.height * 2/3 - height/2)
 
-                        anchors {
-                            horizontalCenter: parent.left
-                        }
+//                        width: 20
+//                        height: width
+//                        radius: width/2
 
-                        y: (item3.isClosed) ? (parent.height/2 - height/2) : (parent.height/3 - height/2)
+//                        border {
+//                            color: workspace.inletColor
+//                            width: 2
+//                        }
 
-                        width: 20
-                        height: width
-                        radius: width/2
+//                        color: workspace.nodeColor
 
-                        border {
-                            color: workspace.inletColor
-                            width: 2
-                        }
+//                        Rectangle {
+//                            anchors.centerIn: parent
 
-                        color: workspace.nodeColor
+//                            width: parent.width - 8
+//                            height: width
+//                            radius: width/2
 
-                        Rectangle {
-                            anchors.centerIn: parent
+//                            color: workspace.inletColor
+//                        }
+//                    }
 
-                            width: parent.width - 8
-                            height: width
-                            radius: width/2
+//                    MouseArea {
+//                        id: mouseArea5
 
-                            color: workspace.inletColor
-                        }
-                    }
+//                        anchors.fill: parent
 
+//                        drag.target: parent
 
-                    Rectangle {
-                        id: item3NodeIn2
+//                        onPressed: {
+//                            parent.z = workspace.maxZ++;
+//                        }
 
-                        anchors {
-                            horizontalCenter: parent.left
-                        }
-
-                        y: (item3.isClosed) ? (parent.height/2 - height/2) : (parent.height * 2/3 - height/2)
-
-                        width: 20
-                        height: width
-                        radius: width/2
-
-                        border {
-                            color: workspace.inletColor
-                            width: 2
-                        }
-
-                        color: workspace.nodeColor
-
-                        Rectangle {
-                            anchors.centerIn: parent
-
-                            width: parent.width - 8
-                            height: width
-                            radius: width/2
-
-                            color: workspace.inletColor
-                        }
-                    }
-
-
-                    Rectangle {
-                        id: item3NodeOut1
-
-                        anchors {
-                            horizontalCenter: parent.right
-                        }
-
-                        y: (item3.isClosed) ? (parent.height/2 - height/2) : (parent.height/3 - height/2)
-
-                        width: 20
-                        height: width
-                        radius: width/2
-
-                        border {
-                            color: workspace.outletColor
-                            width: 2
-                        }
-
-                        color: workspace.nodeColor
-
-                        Rectangle {
-                            anchors.centerIn: parent
-
-                            width: parent.width - 8
-                            height: width
-                            radius: width/2
-
-                            color: workspace.outletColor
-                        }
-                    }
-
-
-                    Rectangle {
-                        id: item3NodeOut2
-
-                        anchors {
-                            horizontalCenter: parent.right
-                        }
-
-                        y: (item3.isClosed) ? (parent.height/2 - height/2) : (parent.height * 2/3 - height/2)
-
-                        width: 20
-                        height: width
-                        radius: width/2
-
-                        border {
-                            color: workspace.outletColor
-                            width: 2
-                        }
-
-                        color: workspace.nodeColor
-
-                        Rectangle {
-                            anchors.centerIn: parent
-
-                            width: parent.width - 8
-                            height: width
-                            radius: width/2
-
-                            color: workspace.outletColor
-                        }
-                    }
-
-
-                    MouseArea {
-                        id: mouseArea3
-
-                        anchors.fill: parent
-
-                        drag.target: parent
-
-                        onPressed: {
-                            parent.z = workspace.maxZ++;
-                        }
-
-                        onDoubleClicked: {
-                            item3.isClosed = !item3.isClosed;
-                        }
-                    }
-                }
-
-
-                //
-                // Item 4
-                //
-                Rectangle {
-                    id: item4
-
-                    x: 400
-                    y: 550
-
-                    width: 150
-                    height: 70
-
-
-                    color: workspace.nodeColor
-
-                    radius: 8
-
-                    border {
-                        width: 2
-                        color: mouseArea4.pressed ? workspace.nodeSelectedBorderColor : workspace.nodeBorderColor
-                    }
-
-
-                    Rectangle {
-                        id: item4NodeIn
-
-                        anchors {
-                            verticalCenter: parent.verticalCenter
-                            horizontalCenter: parent.left
-                        }
-
-                        width: 20
-                        height: width
-                        radius: width/2
-
-                        border {
-                            color: workspace.inletColor
-                            width: 2
-                        }
-
-                        color: workspace.nodeColor
-
-                        Rectangle {
-                            anchors.centerIn: parent
-
-                            width: parent.width - 8
-                            height: width
-                            radius: width/2
-
-                            color: workspace.inletColor
-                        }
-                    }
-
-                    Rectangle {
-                        id: item4NodeOut
-
-                        anchors {
-                            horizontalCenter: parent.right
-                            verticalCenter: parent.verticalCenter
-                        }
-
-                        width: 20
-                        height: width
-                        radius: width/2
-
-                        border {
-                            color: workspace.outletColor
-                            width: 2
-                        }
-
-                        color: workspace.nodeColor
-
-                        Rectangle {
-                            anchors.centerIn: parent
-
-                            width: parent.width - 8
-                            height: width
-                            radius: width/2
-
-                            color: workspace.outletColor
-                        }
-                    }
-
-
-                    MouseArea {
-                        id: mouseArea4
-
-                        anchors.fill: parent
-
-                        drag.target: parent
-
-                        onPressed: {
-                            parent.z = workspace.maxZ++;
-                        }
-
-                        onDoubleClicked: {
-                            rootItem.centerViewOnNode(item4);
-                        }
-                    }
-                }
-
-
-                //
-                // Item 5
-                //
-                Rectangle {
-                    id: item5
-
-                    // Flag indicating if our item is closed or not
-                    property bool isClosed: false
-
-
-                    x: 700
-                    y: 250
-
-                    width: 150
-                    height: (isClosed) ? 75 : 150
-
-                    color: (isClosed) ? workspace.nodeCollapsedColor : workspace.nodeColor
-
-                    radius: 8
-
-                    border {
-                        width: 2
-                        color: mouseArea5.pressed ? workspace.nodeSelectedBorderColor : workspace.nodeBorderColor
-                    }
-
-
-                    Behavior on height {
-                        NumberAnimation {}
-                    }
-
-                    Rectangle {
-                        id: item5NodeIn1
-
-                        anchors {
-                            horizontalCenter: parent.left
-                        }
-
-                        y: (item5.isClosed) ? (parent.height/2 - height/2) : (parent.height/3 - height/2)
-
-                        width: 20
-                        height: width
-                        radius: width/2
-
-                        border {
-                            color: workspace.inletColor
-                            width: 2
-                        }
-
-                        color: workspace.nodeColor
-
-                        Rectangle {
-                            anchors.centerIn: parent
-
-                            width: parent.width - 8
-                            height: width
-                            radius: width/2
-
-                            color: workspace.inletColor
-                        }
-                    }
-
-
-                    Rectangle {
-                        id: item5NodeIn2
-
-                        anchors {
-                            horizontalCenter: parent.left
-                        }
-
-                        y: (item5.isClosed) ? (parent.height/2 - height/2) : (parent.height * 2/3 - height/2)
-
-                        width: 20
-                        height: width
-                        radius: width/2
-
-                        border {
-                            color: workspace.inletColor
-                            width: 2
-                        }
-
-                        color: workspace.nodeColor
-
-                        Rectangle {
-                            anchors.centerIn: parent
-
-                            width: parent.width - 8
-                            height: width
-                            radius: width/2
-
-                            color: workspace.inletColor
-                        }
-                    }
-
-                    MouseArea {
-                        id: mouseArea5
-
-                        anchors.fill: parent
-
-                        drag.target: parent
-
-                        onPressed: {
-                            parent.z = workspace.maxZ++;
-                        }
-
-                        onDoubleClicked: {
-                            item5.isClosed = !item5.isClosed;
-                        }
-                    }
-                }
+//                        onDoubleClicked: {
+//                            item5.isClosed = !item5.isClosed;
+//                        }
+//                    }
+//                }
 
 
                 //----------------------------------------
@@ -1097,7 +712,7 @@ Item {
                     transformOrigin: Item.TopLeft
 
                     scale: workspace.scale
-                    isClosed : true
+                    isReduced : true
                     agentName : dropGhost.agent ? dropGhost.agent.name : ""
                 }
             }

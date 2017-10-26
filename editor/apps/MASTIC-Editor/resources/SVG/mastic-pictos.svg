@@ -458,4 +458,10 @@
 			c0.2,0.1,0.3,0.3,0.3,0.5c0,0.9,0,1.9,0,2.8l3.1-2.4c0.3-0.3,0.8-0.2,1.1,0.1C968,520.4,967.9,520.9,967.6,521.1z"/>
 	</g>
 </g>
+<g id="outputIsMuted">
+	<g>
+		<line fill="none" stroke="#FFFFFF" stroke-width="2" stroke-miterlimit="10" x1="548.8" y1="506.7" x2="542.7" y2="512.7"/>
+		<line fill="none" stroke="#FFFFFF" stroke-width="2" stroke-miterlimit="10" x1="548.8" y1="512.7" x2="542.7" y2="506.7"/>
+	</g>
+</g>
 </svg>

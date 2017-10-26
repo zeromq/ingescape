@@ -23,14 +23,11 @@
 #include <QtGlobal>
 #include <QDate>
 
-
 #include <I2Quick.h>
 
 #include <controller/masticeditorcontroller.h>
 #include <misc/masticeditorsettings.h>
 #include <misc/masticeditorutils.h>
-
-
 
 
 /**
@@ -85,10 +82,10 @@ void registerCustomQmlTypes()
     //---------------
     qmlRegisterUncreatableType<AgentInMappingVM>(uri, 1, 0, "AgentInMappingVM", "Internal class");
     qmlRegisterUncreatableType<AgentVM>(uri, 1, 0, "AgentVM", "Internal class");
+    qmlRegisterUncreatableType<InputVM>(uri, 1, 0, "InputVM", "Internal class");
     qmlRegisterUncreatableType<MapBetweenIOPVM>(uri, 1, 0, "MapBetweenIOPVM", "Internal class");
+    qmlRegisterUncreatableType<OutputVM>(uri, 1, 0, "OutputVM", "Internal class");
     qmlRegisterUncreatableType<PointMapVM>(uri, 1, 0, "PointMapVM", "Internal class");
-    //qmlRegisterUncreatableType<InputVM>(uri, 1, 0, "InputVM", "Internal class");
-    //qmlRegisterUncreatableType<OutputVM>(uri, 1, 0, "OutputVM", "Internal class");
 
 
     //------------------
@@ -100,8 +97,6 @@ void registerCustomQmlTypes()
     qmlRegisterSingletonType(QUrl("qrc:/qml/theme/MasticTheme.qml"), uri, 1, 0, "MasticTheme");
 
 }
-
-
 
 
 /**
@@ -219,6 +214,7 @@ int main(int argc, char *argv[])
     }
 
 
+
     //------------------------------
     //
     // Configure our QML engine
@@ -275,7 +271,7 @@ int main(int argc, char *argv[])
     //
     //------------------------------
 
-    qInfo() << "Starting" << app.applicationName() << app.applicationVersion();
+    qInfo() << "Starting" << app.applicationName() << app.applicationVersion() << "with processID" << QApplication::applicationPid();
     int exitReturnCode = app.exec();
     qInfo() << "Quitting application with return code" << exitReturnCode;
 }
