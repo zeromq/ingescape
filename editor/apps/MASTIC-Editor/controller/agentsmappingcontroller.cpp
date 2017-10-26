@@ -123,6 +123,7 @@ void AgentsMappingController::addAgentDefinitionToMappingAtPosition(QString agen
             //Call for the fist shot the another call will be proceed by the connect mechanism
             createMapBetweenIopInMappingFromAgentName(newAgentInMapping->agentName());
 
+            //TODOESTIA createMapBetweenIopInMappingFromAgent(AgentInMappingVM* )
             // Connect to signal "new Definition added to agent in mapping" from the new definition
             connect(newAgentInMapping, &AgentInMappingVM::newDefinitionInAgentMapping,
                     this, &AgentsMappingController::createMapBetweenIopInMappingFromAgentName);
@@ -268,14 +269,8 @@ PointMapVM* AgentsMappingController::findTheSecondPointOfElementMap(QString agen
 {
     PointMapVM* secondPointMapVM = NULL;
 
-    //TODOESTIA : implement the function
-
     //Check If the second Agent is in the mapping
-//    AgentInMappingVM* secondAgentInMapping = NULL;
-    AgentInMappingVM * temp = NULL;
-    temp = _mapFromNameToAgentInMappingViewModelsList.value(agentName);
-
-    (*secondAgentInMapping) = temp;
+    (*secondAgentInMapping) = _mapFromNameToAgentInMappingViewModelsList.value(agentName);
 
     //
     // Check if the iop is part of the definition of the second agent
