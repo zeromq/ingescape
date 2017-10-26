@@ -291,7 +291,7 @@ Item {
                             verticalCenter: parent.verticalCenter
                         }
                         elide: Text.ElideRight
-                        text : myModel.iopModel ? myModel.iopModel.name : ""
+                        text : myModel.modelM ? myModel.modelM.name : ""
 
                         color : (rootItem.agentMappingVM && rootItem.agentMappingVM.isON)? MasticTheme.agentsONInputsOutputsMappingColor : MasticTheme.agentsOFFInputsOutputsMappingColor
                         font: MasticTheme.heading2Font
@@ -424,7 +424,7 @@ Item {
                         horizontalAlignment : Text.AlignRight
 
                         elide: Text.ElideRight
-                        text : myModel.iopModel ? myModel.iopModel.name : ""
+                        text : myModel.modelM ? myModel.modelM.name : ""
 
                         color : (rootItem.agentMappingVM && rootItem.agentMappingVM.isON)? MasticTheme.agentsONInputsOutputsMappingColor : MasticTheme.agentsOFFInputsOutputsMappingColor
                         font: MasticTheme.heading2Font

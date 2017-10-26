@@ -26,14 +26,16 @@
  */
 AgentsMappingController::AgentsMappingController(MasticModelManager* modelManager, QObject *parent)
     : QObject(parent),
+      _isEmptyMapping(true),
       _modelManager(modelManager)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
     if (_modelManager != NULL)
-    {
-        _agentInMappingVMList.setSortProperty("agentName");
+    {   
+        // Connect to signal "Count Changed" from the list of agents in mapping
+        connect(&_agentInMappingVMList, &AbstractI2CustomItemListModel::countChanged, this, &AgentsMappingController::_onAgentsInMappingChanged);
     }
 }
 
@@ -43,6 +45,9 @@ AgentsMappingController::AgentsMappingController(MasticModelManager* modelManage
  */
 AgentsMappingController::~AgentsMappingController()
 {
+    // DIS-connect from signal "Count Changed" from the list of agents in mapping
+    disconnect(&_agentInMappingVMList, 0, this, 0);
+
     _modelManager = NULL;
 }
 
@@ -135,11 +140,10 @@ void AgentsMappingController::addAgentDefinitionToMappingAtPosition(QString agen
  */
 void AgentsMappingController::createMapBetweenIopInMappingFromAgentName(QString agentName)
 {
-    AgentInMappingVM * currentAgentInMapping = NULL;
-    currentAgentInMapping = _mapFromNameToAgentInMappingViewModelsList.value(agentName);
+    if (_mapFromNameToAgentInMappingViewModelsList.contains(agentName)) {
+        AgentInMappingVM* currentAgentInMapping = _mapFromNameToAgentInMappingViewModelsList.value(agentName);
 
-
-    if(_modelManager != NULL && currentAgentInMapping != NULL)
+    if ((_modelManager != NULL) && (currentAgentInMapping != NULL))
     {
         qInfo() << "Agent input " << agentName << " found. /n";
 
@@ -147,8 +151,8 @@ void AgentsMappingController::createMapBetweenIopInMappingFromAgentName(QString 
         QList<ElementMappingM *> elementsMappingFound;
 
         //Initialize
-        PointMapVM* inputPointMap = NULL;
-        PointMapVM* outputPointMap = NULL;
+        InputVM* inputPointVM = NULL;
+        OutputVM* outputPointVM = NULL;
 
         //
         // Input management
@@ -169,13 +173,14 @@ void AgentsMappingController::createMapBetweenIopInMappingFromAgentName(QString 
                     qInfo() << "Node in input is: " << inputName << ". /n";
                     if(inputName != "")
                     {
-                        inputPointMap = currentAgentInMapping->getPointMapFromInputName(inputName);
+                        inputPointVM = currentAgentInMapping->getPointMapFromInputName(inputName);
 
-                        if(inputPointMap != NULL)
+                        if(inputPointVM != NULL)
                         {
                             qInfo() << "PointMap " << inputName << " found. /n";
-                            outputPointMap = findTheSecondPointOfElementMap(currentElementMapping->outputAgent(),
-                                                           currentElementMapping->output());
+                            PointMapVM* pointTemp = findTheSecondPointOfElementMap(currentElementMapping->outputAgent(),
+                                                                                   currentElementMapping->output());
+                            outputPointVM = dynamic_cast<OutputVM*>(pointTemp);
                         }
                     }
                 }
@@ -199,14 +204,15 @@ void AgentsMappingController::createMapBetweenIopInMappingFromAgentName(QString 
                     QString outputName = currentElementMapping->output();
                     if(outputName != "")
                     {
-                        outputPointMap = currentAgentInMapping->getPointMapFromOutputName(outputName);
+                        outputPointVM = currentAgentInMapping->getPointMapFromOutputName(outputName);
                         qInfo() << "Node in input is: " << outputName << ". /n";
 
-                        if(outputPointMap != NULL)
+                        if(outputPointVM != NULL)
                         {
                             qInfo() << "PointMap " << outputName << " found. /n";
-                            inputPointMap = findTheSecondPointOfElementMap(currentElementMapping->inputAgent(),
-                                                           currentElementMapping->input());
+                            PointMapVM* pointTemp = findTheSecondPointOfElementMap(currentElementMapping->inputAgent(),
+                                                                                   currentElementMapping->input());
+                            inputPointVM = dynamic_cast<InputVM*>(pointTemp);
                         }
                     }
                 }
@@ -214,14 +220,15 @@ void AgentsMappingController::createMapBetweenIopInMappingFromAgentName(QString 
         }
 
         //Add the Map between agent
-        if((inputPointMap != NULL) && (outputPointMap != NULL))
+        if((inputPointVM != NULL) && (outputPointVM != NULL))
         {
-            MapBetweenIOPVM* map = new MapBetweenIOPVM(outputPointMap, inputPointMap);
+            MapBetweenIOPVM* map = new MapBetweenIOPVM(outputPointVM, inputPointVM);
             _allMapInMapping.append(map);
 
-            qInfo() << "Create the MapBetweenIOPVM : " << inputPointMap->nameAgent() << "." << inputPointMap->iopModel()->name() << " -> " << outputPointMap->nameAgent() << "." << outputPointMap->iopModel()->name();
+            qInfo() << "Create the MapBetweenIOPVM : " << inputPointVM->nameAgent() << "." << inputPointVM->modelM()->name() << " -> " << outputPointVM->nameAgent() << "." << outputPointVM->modelM()->name();
 
         }
+    }
     }
 }
 
@@ -230,8 +237,7 @@ void AgentsMappingController::createMapBetweenIopInMappingFromAgentName(QString 
  * @param agentName The second agent in mapping name
  * @param iopName The input/output to map with
  */
-PointMapVM * AgentsMappingController::findTheSecondPointOfElementMap(QString agentName,
-                                                                     QString iopName)
+PointMapVM* AgentsMappingController::findTheSecondPointOfElementMap(QString agentName, QString iopName)
 {
     PointMapVM* secondPointMapVM = NULL;
 
@@ -267,4 +273,62 @@ PointMapVM * AgentsMappingController::findTheSecondPointOfElementMap(QString age
 
     qInfo() << "PointMap " << iopName << " NOT found. /n";
     return secondPointMapVM;
+}
+
+
+/**
+ * @brief Slot when the flag "is Activated Mapping" changed
+ * @param isActivatedMapping
+ */
+void AgentsMappingController::onIsActivatedMappingChanged(bool isActivatedMapping)
+{
+    if (isActivatedMapping) {
+        qInfo() << "Mapping ACTIVATED !";
+
+        if (_isEmptyMapping) {
+            qDebug() << "...et il est vide, on tente d'ajouter des choses...";
+
+            if (_modelManager != NULL) {
+                // Get the map from agent name to list of active agents
+                QHash<QString, QList<AgentM*>> mapFromAgentNameToActiveAgentsList = _modelManager->getMapFromAgentNameToActiveAgentsList();
+
+                foreach (QString agentName, mapFromAgentNameToActiveAgentsList.keys()) {
+                    QList<AgentM*> activeAgentsList = mapFromAgentNameToActiveAgentsList.value(agentName);
+                    qDebug() << "Create an AgentMappingVM for name" << agentName << "and with definitions of" << activeAgentsList.count() << "agents";
+
+                    // FIXME VINCENT: En attendant de regrouper au sein de la classe AgentM: la définition et le mapping
+                    if (activeAgentsList.count() == 1) {
+                        QList<DefinitionM*> definitionsList = _modelManager->getAgentDefinitionsListFromName(agentName);
+
+                        foreach (DefinitionM* definition, definitionsList) {
+                            if (definition != NULL) {
+                                addAgentDefinitionToMappingAtPosition(agentName, definition, QPointF());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        else {
+            qDebug() << "...et il n'est PAS vide, on ne fait rien de plus";
+        }
+    }
+    else {
+        qInfo() << "Mapping DE-activated !";
+    }
+}
+
+
+/**
+ * @brief Slot when the list of "Agents in Mapping" changed
+ */
+void AgentsMappingController::_onAgentsInMappingChanged()
+{
+    // Update the flag "is Empty Mapping"
+    if (_agentInMappingVMList.count() == 0) {
+        setisEmptyMapping(true);
+    }
+    else {
+        setisEmptyMapping(false);
+    }
 }

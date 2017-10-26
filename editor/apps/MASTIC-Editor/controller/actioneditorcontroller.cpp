@@ -69,7 +69,8 @@ void ActionEditorController::validateModification()
     {
         setoriginalAction(_editedAction);
         seteditedAction(NULL);
-    } else {
+    }
+    else {
         _originalAction->copyFrom(_editedAction);
     }
 }

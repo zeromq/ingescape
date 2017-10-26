@@ -13,7 +13,8 @@
  *
  */
 
-#include "masticeditorcontroller.h"
+
+#include "controller/masticeditorcontroller.h"
 
 #include "misc/masticeditorsettings.h"
 #include "misc/masticeditorutils.h"
@@ -21,6 +22,7 @@
 #include <I2Quick.h>
 
 #include <QThread>
+#include <QApplication>
 
 
 /**
@@ -32,7 +34,8 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     _agentsSupervisionC(NULL),
     _agentsMappingC(NULL),
     _networkC(NULL),
-    _scenarioC(NULL)
+    _scenarioC(NULL),
+    _terminationSignalWatcher(NULL)
 {
     qInfo() << "New MASTIC Editor Controller";
 
@@ -41,10 +44,12 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     //
     QString snapshotsDirectoryPath = MasticEditorUtils::getSnapshotsPath();
     QDir snapshotsDirectory(snapshotsDirectoryPath);
-    if (snapshotsDirectory.exists()) {
+    if (snapshotsDirectory.exists())
+    {
         _snapshotDirectory = snapshotsDirectoryPath;
     }
-    else {
+    else
+    {
         qCritical() << "ERROR: could not create directory at '" << snapshotsDirectoryPath << "' !";
     }
 
@@ -112,6 +117,7 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     connect(_modelManager, &MasticModelManager::agentModelCreated, _agentsSupervisionC, &AgentsSupervisionController::onAgentModelCreated);
     connect(_modelManager, &MasticModelManager::agentDefinitionCreated, _agentsSupervisionC, &AgentsSupervisionController::onAgentDefinitionCreated);
     connect(_modelManager, &MasticModelManager::isMutedFromOutputOfAgentUpdated, _agentsSupervisionC, &AgentsSupervisionController::onIsMutedFromOutputOfAgentUpdated);
+    connect(_modelManager, &MasticModelManager::isActivatedMappingChanged, _agentsMappingC, &AgentsMappingController::onIsActivatedMappingChanged);
 
 
     // Connect to signals from the controller for supervision of agents
@@ -125,6 +131,24 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     _modelManager->importAgentsListFromDefaultFile();
 
 
+
+    //
+    // Subscribe to system signals to interceipt interruption and termination signals
+    //
+    _terminationSignalWatcher = new TerminationSignalWatcher(this);
+    connect(_terminationSignalWatcher, &TerminationSignalWatcher::terminationSignal,
+                     [=] () {
+                        qDebug() << "\n\n\nTu connais le tarif Vincent ;-)\n\n\n";
+
+                        if (QApplication::instance() != NULL)
+                        {
+                            QApplication::instance()->quit();
+                        }
+                     });
+
+
+
+
     // TEMP sleep to display our loading screen
     QThread::msleep(2000);
 }
@@ -135,6 +159,17 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
  */
 MasticEditorController::~MasticEditorController()
 {
+    //
+    // Clean-up our TerminationSignalWatcher first
+    //
+    if (_terminationSignalWatcher != NULL)
+    {
+        disconnect(_terminationSignalWatcher, 0);
+        delete _terminationSignalWatcher;
+        _terminationSignalWatcher = NULL;
+    }
+
+
     //
     // Clean-up sub-controllers
     //

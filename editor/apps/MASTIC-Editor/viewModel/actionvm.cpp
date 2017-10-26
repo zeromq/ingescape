@@ -39,7 +39,8 @@ ActionVM::ActionVM(ActionM *actionModel, QObject *parent) : QObject(parent),
     {
         _startDateTime.setTime(QTime::fromMSecsSinceStartOfDay(_actionModel->startTime()*1000));
 
-    } else {
+    }
+    else {
         _startDateTime = QDateTime::fromString("00:00:00","HH:mm:ss");
     }
 
@@ -104,7 +105,8 @@ void ActionVM::setstartTimeString(QString stringDateTime)
         {
             QDateTime dateTime = QDateTime::fromString(stringDateTime,"HH:mm:ss");
             setstartDateTime(dateTime);
-        } else {
+        }
+        else {
             QDateTime dateTime = QDateTime::fromString("00:00:00","HH:mm:ss");
             setstartDateTime(dateTime);
         }

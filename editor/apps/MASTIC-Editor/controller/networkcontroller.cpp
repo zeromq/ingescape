@@ -249,6 +249,7 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
             }
             else if (message.startsWith("MAPPED"))
             {
+                // FIXME TODO
                 qDebug() << peerName << "MAPPED" << message;
             }
             // MUTED / UN-MUTED

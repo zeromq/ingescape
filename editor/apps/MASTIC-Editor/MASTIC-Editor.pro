@@ -48,7 +48,8 @@ SOURCES += main.cpp \
     viewModel/actionvm.cpp \
     controller/actioneditorcontroller.cpp \
     viewModel/iop/inputvm.cpp \
-    viewModel/iop/outputvm.cpp
+    viewModel/iop/outputvm.cpp \
+    misc/terminationsignalwatcher.cpp
 
 HEADERS += \
     model/agentm.h \
@@ -92,7 +93,8 @@ HEADERS += \
     viewModel/actionvm.h \
     controller/actioneditorcontroller.h \
     viewModel/iop/inputvm.h \
-    viewModel/iop/outputvm.h
+    viewModel/iop/outputvm.h \
+    misc/terminationsignalwatcher.h
 
 
 RESOURCES += qml.qrc

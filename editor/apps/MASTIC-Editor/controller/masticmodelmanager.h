@@ -85,6 +85,13 @@ public:
 
 
     /**
+     * @brief Get the map from agent name to list of active agents
+     * @return
+     */
+    QHash<QString, QList<AgentM*>> getMapFromAgentNameToActiveAgentsList();
+
+
+    /**
      * @brief Delete a model of Agent
      * @param agant
      */
@@ -343,9 +350,6 @@ private:
     // Helper to manage JSON definitions of agents
     JsonHelper* _jsonHelper;
 
-    // List of all models of agents
-    //QList<AgentM*> _allAgentsModel;
-
     // Map from "peer id" to a model of agent
     QHash<QString, AgentM*> _mapFromPeerIdToAgentM;
 
@@ -356,7 +360,7 @@ private:
     QHash<QString, QList<DefinitionM*>> _mapFromNameToAgentDefinitionsList;
 
     // Map from "mapping name" to a list (of models) of agent mapping
-    QHash<QString, QList<AgentMappingM*>> _mapFromNameToAgentMappingsList;
+    //QHash<QString, QList<AgentMappingM*>> _mapFromNameToAgentMappingsList;
 
     // Map from agent name to the merged list of all (models of) mapping elements which connect an input of the agent
     QHash<QString, QList<ElementMappingM*>> _mapFromAgentNameToMergedListOfInputMappingElements;
