@@ -28,6 +28,9 @@
 #include <controller/networkcontroller.h>
 #include <controller/scenariocontroller.h>
 
+#include <misc/terminationsignalwatcher.h>
+
+
 
 /**
  * @brief The MasticEditorController class defines the main controller of the MASTIC editor
@@ -113,19 +116,9 @@ public Q_SLOTS:
       */
      void forceCreation();
 
-
-     // Qt signal handlers.
-     //void handleSigHup();
-     //void handleSigTerm();
-
-
 private:
-     /*static int sighupFd[2];
-     static int sigtermFd[2];
-
-     QSocketNotifier *snHup;
-     QSocketNotifier *snTerm;*/
-
+     // To subscribe to termination signals
+     TerminationSignalWatcher *_terminationSignalWatcher;
 };
 
 QML_DECLARE_TYPE(MasticEditorController)

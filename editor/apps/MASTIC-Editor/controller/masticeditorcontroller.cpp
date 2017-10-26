@@ -13,12 +13,8 @@
  *
  */
 
-#include "masticeditorcontroller.h"
 
-/*#include <signal.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/socket.h>*/
+#include "controller/masticeditorcontroller.h"
 
 #include "misc/masticeditorsettings.h"
 #include "misc/masticeditorutils.h"
@@ -26,6 +22,7 @@
 #include <I2Quick.h>
 
 #include <QThread>
+#include <QApplication>
 
 
 /**
@@ -37,34 +34,22 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     _agentsSupervisionC(NULL),
     _agentsMappingC(NULL),
     _networkC(NULL),
-    _scenarioC(NULL)
+    _scenarioC(NULL),
+    _terminationSignalWatcher(NULL)
 {
     qInfo() << "New MASTIC Editor Controller";
-
-
-    /*// http://doc.qt.io/qt-5/unix-signals.html
-    if (::socketpair(AF_UNIX, SOCK_STREAM, 0, sighupFd))
-        qFatal("Couldn't create HUP socketpair");
-
-    if (::socketpair(AF_UNIX, SOCK_STREAM, 0, sigtermFd))
-        qFatal("Couldn't create TERM socketpair");
-
-    snHup = new QSocketNotifier(sighupFd[1], QSocketNotifier::Read, this);
-    connect(snHup, SIGNAL(activated(int)), this, SLOT(handleSigHup()));
-
-    snTerm = new QSocketNotifier(sigtermFd[1], QSocketNotifier::Read, this);
-    connect(snTerm, SIGNAL(activated(int)), this, SLOT(handleSigTerm()));*/
-
 
     //
     // Snapshots directory
     //
     QString snapshotsDirectoryPath = MasticEditorUtils::getSnapshotsPath();
     QDir snapshotsDirectory(snapshotsDirectoryPath);
-    if (snapshotsDirectory.exists()) {
+    if (snapshotsDirectory.exists())
+    {
         _snapshotDirectory = snapshotsDirectoryPath;
     }
-    else {
+    else
+    {
         qCritical() << "ERROR: could not create directory at '" << snapshotsDirectoryPath << "' !";
     }
 
@@ -146,6 +131,24 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     _modelManager->importAgentsListFromDefaultFile();
 
 
+
+    //
+    // Subscribe to system signals to interceipt interruption and termination signals
+    //
+    _terminationSignalWatcher = new TerminationSignalWatcher(this);
+    connect(_terminationSignalWatcher, &TerminationSignalWatcher::terminationSignal,
+                     [=] () {
+                        qDebug() << "\n\n\nTu connais le tarif Vincent ;-)\n\n\n";
+
+                        if (QApplication::instance() != NULL)
+                        {
+                            QApplication::instance()->quit();
+                        }
+                     });
+
+
+
+
     // TEMP sleep to display our loading screen
     QThread::msleep(2000);
 }
@@ -156,6 +159,17 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
  */
 MasticEditorController::~MasticEditorController()
 {
+    //
+    // Clean-up our TerminationSignalWatcher first
+    //
+    if (_terminationSignalWatcher != NULL)
+    {
+        disconnect(_terminationSignalWatcher, 0);
+        delete _terminationSignalWatcher;
+        _terminationSignalWatcher = NULL;
+    }
+
+
     //
     // Clean-up sub-controllers
     //
@@ -260,44 +274,3 @@ void MasticEditorController::forceCreation()
 {
     qDebug() << "Force the creation of our singleton from QML";
 }
-
-
-/*void MasticEditorController::hupSignalHandler(int unused)
-{
-    Q_UNUSED(unused)
-
-    char a = 1;
-    ::write(sighupFd[0], &a, sizeof(a));
-}
-
-void MasticEditorController::termSignalHandler(int unused)
-{
-    Q_UNUSED(unused)
-
-    char a = 1;
-    ::write(sigtermFd[0], &a, sizeof(a));
-}
-
-void MasticEditorController::handleSigTerm()
-{
-    snTerm->setEnabled(false);
-    char tmp;
-    ::read(sigtermFd[1], &tmp, sizeof(tmp));
-
-    // do Qt stuff
-    qInfo() << "handleSigTerm" << tmp;
-
-    snTerm->setEnabled(true);
-}
-
-void MasticEditorController::handleSigHup()
-{
-    snHup->setEnabled(false);
-    char tmp;
-    ::read(sighupFd[1], &tmp, sizeof(tmp));
-
-    // do Qt stuff
-    qInfo() << "handleSigHup" << tmp;
-
-    snHup->setEnabled(true);
-}*/
