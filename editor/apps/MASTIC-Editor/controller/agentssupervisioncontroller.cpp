@@ -245,11 +245,8 @@ void AgentsSupervisionController::onAgentDefinitionCreated(DefinitionM* definiti
                 // If this VM contains our model of agent
                 if ((iterator != NULL) && (iterator->definition() != NULL)
                         &&
-                        // Same version
-                        (iterator->definition()->version() == definition->version())
-                        &&
-                        // Same Inputs, Outputs and Parameters
-                        (iterator->definition()->md5Hash() == definition->md5Hash()))
+                        // The 2 definitions are strictly identicals
+                        DefinitionM::areIdenticals(iterator->definition(), definition))
                 {
                     qDebug() << "There is exactly the same agent definition for name" << definition->name() << "and version" << definition->version();
 

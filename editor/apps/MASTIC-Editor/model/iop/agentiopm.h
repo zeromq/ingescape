@@ -53,6 +53,9 @@ class AgentIOPM : public QObject
     // Value type of our Input / Output / Parameter
     I2_QML_PROPERTY(AgentIOPValueTypes::Value, agentIOPValueType)
 
+    // Identifier with name and value type
+    I2_CPP_PROPERTY(QString, id)
+
     // ######################################################
     // Value of our Input / Output / Parameter
     // Store the value in a Byte Array or in a Variant ?

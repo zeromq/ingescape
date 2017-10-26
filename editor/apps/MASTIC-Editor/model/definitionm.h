@@ -50,11 +50,19 @@ class DefinitionM : public QObject
     I2_QOBJECT_LISTMODEL(AgentIOPM, inputsList)
 
     // List of outputs of our agent definition
-    //I2_QOBJECT_LISTMODEL(AgentIOPM, outputsList)
     I2_QOBJECT_LISTMODEL(OutputM, outputsList)
 
     // List of parameters of our agent definition
     I2_QOBJECT_LISTMODEL(AgentIOPM, parametersList)
+
+    // List of ids of inputs
+    I2_CPP_NOSIGNAL_PROPERTY(QStringList, inputsIdsList)
+
+    // List of ids of outputs
+    I2_CPP_NOSIGNAL_PROPERTY(QStringList, outputsIdsList)
+
+    // List of ids of parameters
+    I2_CPP_NOSIGNAL_PROPERTY(QStringList, parametersIdsList)
 
 
 public:
@@ -82,6 +90,15 @@ public:
     void setisMutedOfOutput(bool isMuted, QString outputName);
 
 
+    /**
+     * @brief Return true if the 2 definitions are strictly identicals
+     * @param definition1
+     * @param definition2
+     * @return
+     */
+    static bool areIdenticals(DefinitionM* definition1, DefinitionM* definition2);
+
+
 Q_SIGNALS:
 
     /**
@@ -96,10 +113,22 @@ public Q_SLOTS:
 
 
 private Q_SLOTS:
+
+    /**
+     * @brief Slot when the list of inputs changed
+     */
+    void _onInputsListChanged();
+
     /**
      * @brief Slot when the list of outputs changed
      */
     void _onOutputsListChanged();
+
+
+    /**
+     * @brief Slot when the list of parameters changed
+     */
+    void _onParametersListChanged();
 
 
     /**
@@ -109,9 +138,24 @@ private Q_SLOTS:
     //void _onIsMutedChanged(bool isMuted);
 
 
+    /**
+     * @brief Return true if the 2 list of ids are strictly identicals
+     * @param idsList1
+     * @param idsList2
+     * @return
+     */
+    static bool _areIdenticalsIdsList(QStringList idsList1, QStringList idsList2);
+
+
 private:
+    // Previous list of inputs
+    QList<AgentIOPM*> _previousInputsList;
+
     // Previous list of outputs
     QList<OutputM*> _previousOutputsList;
+
+    // Previous list of outputs
+    QList<AgentIOPM*> _previousParametersList;
 
 };
 
