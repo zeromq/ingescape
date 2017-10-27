@@ -780,7 +780,7 @@ void MasticModelManager::_updateDefinitionVariants(QString definitionName)
                 {
                     // We compare I/O/P between current iterator and the first one
                     DefinitionM* first = definitionsListForVersion.first();
-                    if ((first != NULL) && (first->md5Hash() != iterator->md5Hash())) {
+                    if ((first != NULL) && !DefinitionM::areIdenticals(first, iterator)) {
                         versionsWithVariant.append(version);
                     }
                 }
@@ -799,7 +799,7 @@ void MasticModelManager::_updateDefinitionVariants(QString definitionName)
         {
             if (iterator != NULL) {
                 iterator->setisVariant(true);
-                //qDebug() << iterator->name() << iterator->version() << "is variant (" << iterator->md5Hash() << ")";
+                //qDebug() << iterator->name() << iterator->version() << "is variant";
             }
         }
     }
