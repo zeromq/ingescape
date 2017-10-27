@@ -90,7 +90,7 @@ I2CubicBezierCurve {
                     "#000000"
                     break;
                 default:
-                    MasticTheme.whiteColor;
+                    defaultColor;
                     break;
                 }
             }
@@ -127,7 +127,7 @@ I2CubicBezierCurve {
                         break;
                     }
                 } else {
-                    MasticTheme.whiteColor;
+                     defaultColor;
                 }
             }
 
@@ -141,8 +141,8 @@ I2CubicBezierCurve {
 
 
     // Fuzzy contour
-    fuzzyColor: hoverFuzzyColor
-    fuzzyRadius: (mouseArea.containsMouse) ? hoverFuzzyRadius : 0
+    fuzzyColor: "transparent"
+    fuzzyRadius: 0
 
 
 

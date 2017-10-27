@@ -27,6 +27,7 @@
 AgentsMappingController::AgentsMappingController(MasticModelManager* modelManager, QObject *parent)
     : QObject(parent),
       _isEmptyMapping(true),
+      _selectedAgent(NULL),
       _modelManager(modelManager)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
@@ -45,6 +46,9 @@ AgentsMappingController::AgentsMappingController(MasticModelManager* modelManage
  */
 AgentsMappingController::~AgentsMappingController()
 {
+    // Clean-up current selection
+    setselectedAgent(NULL);
+
     // DIS-connect from signal "Count Changed" from the list of agents in mapping
     disconnect(&_agentInMappingVMList, 0, this, 0);
 

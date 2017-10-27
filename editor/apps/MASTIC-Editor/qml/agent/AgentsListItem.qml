@@ -192,7 +192,7 @@ Item {
                             font {
                                 family: MasticTheme.labelFontFamilyBlack
                                 bold : true
-                                pixelSize : 10
+                                pixelSize : 12
                             }
                         }
 
@@ -329,10 +329,6 @@ Item {
             Button {
                 id: muteButton
 
-                property var boundingBox: MasticTheme.svgFileMASTIC.boundsOnElement("muteactif");
-                height : boundingBox.height
-                width :  boundingBox.width
-
                 visible : (model.isON === true)
                 anchors {
                     bottom: parent.bottom
@@ -348,6 +344,13 @@ Item {
                     releasedID: model.isMuted? "muteactif" : "muteinactif"
                     disabledID : releasedID
 
+                    label : Item { }
+                    padding {
+                        left : 0
+                        right : 0
+                        top : 0
+                        bottom : 0
+                    }
                 }
 
                 onClicked: {

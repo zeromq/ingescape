@@ -160,8 +160,6 @@ Item {
 
         anchors.fill: parent
 
-
-
         //
         // Seamless background (bitmap version)
         //
@@ -220,6 +218,70 @@ Item {
 
                 cellStroke: MasticTheme.agentsMappingGridLineColor
                 subCellStroke: MasticTheme.agentsMappingGridSublineColor
+            }
+        }
+
+
+
+
+
+        //----------------------------------------------------------------
+        //
+        // Drop-area to handle drag-n-drop of agents from our agents list
+        //
+        //----------------------------------------------------------------
+        DropArea {
+            id: workspaceDropArea
+
+            anchors.fill: parent
+
+
+            // Get coordinates of drop
+            function getDropCoordinates()
+            {
+                return workspace.mapFromItem(workspaceDropArea, workspaceDropArea.drag.x, workspaceDropArea.drag.y);
+            }
+
+            onEntered: {
+                if (drag.source !== null)
+                {
+                    var dragItem = drag.source;
+
+                    console.log("source "+dragItem)
+                    if (typeof dragItem.agent !== 'undefined')
+                    {
+                        dragItem.opacity = 0;
+                        dropGhost.agent = dragItem.agent;
+                    }
+                    else
+                    {
+                        console.log("no agent "+dragItem.agent)
+                        dropGhost.agent = null;
+                    }
+                }
+                else
+                {
+                    console.log("no source "+ drag.source)
+                }
+            }
+
+
+            onPositionChanged: {
+                if (dropGhost.agent)
+                {
+                    dropGhost.x = drag.x;
+                    dropGhost.y = drag.y;
+                }
+            }
+
+
+            onExited: {
+                var dragItem = drag.source;
+                if (typeof dragItem.agent !== 'undefined')
+                {
+                    drag.source.opacity = 1;
+                }
+                dropGhost.agent = null;
             }
         }
 
@@ -386,7 +448,6 @@ Item {
 
 
                 //----------------------------------------
-                // TODO: replace with a Repeater
                 //       model: list of AgentMappingVM
 
                 Repeater {
@@ -396,28 +457,8 @@ Item {
                     AgentNodeView {
                         id: agent
                         agentMappingVM : model.QtObject
-                        agentIsPressed : mouseArea.pressed
 
-
-                        MouseArea {
-                            id: mouseArea
-
-                            anchors.fill: parent
-
-                            drag.target: parent
-
-                            onPressed: {
-                                parent.z = workspace.maxZ++;
-                            }
-
-                            onPositionChanged: {
-                           //     console.log("agentMapping position " + model.position.x + "  " + model.position.y)
-                            }
-
-                            onDoubleClicked: {
-                                model.isReduced = !model.isReduced;
-                            }
-                        }
+                        controller : rootItem.controller
                     }
                 }
 
@@ -641,84 +682,31 @@ Item {
 
 
 
-        //----------------------------------------------------------------
         //
-        // Drop-area to handle drag-n-drop of agents from our agents list
+        // Ghost displayed when a dragged item enters the bounds of our drop area
         //
-        //----------------------------------------------------------------
+        Item {
+            id: dropGhost
 
-        DropArea {
-            id: workspaceDropArea
+            property var agent: null;
 
-            anchors.fill: parent
+            opacity: (agent ? (workspaceDropArea.containsDrag ? 1 : 0) : 0);
+            visible: (opacity != 0)
 
 
-            // Get coordinates of drop
-            function getDropCoordinates()
-            {
-                return workspace.mapFromItem(workspaceDropArea, workspaceDropArea.drag.x, workspaceDropArea.drag.y);
+
+            Behavior on opacity {
+                NumberAnimation {}
             }
 
-            onEntered: {
-                if (drag.source !== null)
-                {
-                    var dragItem = drag.source;
-                    console.log("source "+dragItem)
-                    if (typeof dragItem.agent !== 'undefined')
-                    {
-                        dropGhost.agent = dragItem.agent;
-                    }
-                    else
-                    {
-                        console.log("no agent "+dragItem.agent)
-                        dropGhost.agent = null;
-                    }
-                }
-                else
-                {
-                    console.log("no source "+ drag.source)
-                }
-            }
+            AgentNodeView {
+                transformOrigin: Item.TopLeft
 
-
-            onPositionChanged: {
-                dropGhost.x = drag.x;
-                dropGhost.y = drag.y;
-            }
-
-
-            onExited: {
-                dropGhost.agent = null;
-            }
-
-
-
-            //
-            // Ghost displayed when a dragged item enters the bounds of our drop area
-            //
-            Item {
-                id: dropGhost
-
-                property var agent: null;
-
-                opacity: (workspaceDropArea.containsDrag ? 1 : 0)
-                visible: (opacity != 0)
-
-                Behavior on opacity {
-                    NumberAnimation {}
-                }
-
-                AgentNodeView {
-                    transformOrigin: Item.TopLeft
-
-                    scale: workspace.scale
-                    isReduced : true
-                    agentName : dropGhost.agent ? dropGhost.agent.name : ""
-                }
+                scale: workspace.scale
+                isReduced : true
+                agentName : dropGhost.agent ? dropGhost.agent.name : ""
             }
         }
-
-
 
 
         //

@@ -41,6 +41,9 @@ class AgentsMappingController : public QObject
     // Flag indicating if our mapping is empty
     I2_QML_PROPERTY_READONLY(bool, isEmptyMapping)
 
+    // Selected agent in the mapping
+    I2_QML_PROPERTY_DELETE_PROOF(AgentInMappingVM*, selectedAgent)
+
 public:
     /**
      * @brief Default constructor

@@ -13,6 +13,8 @@
  */
 
 import QtQuick 2.8
+import QtQuick.Controls 1.4
+import QtQuick.Controls.Styles 1.4
 
 import I2Quick 1.0
 
@@ -28,19 +30,19 @@ Item {
     // Properties
     //
     //--------------------------------
+    // Controller associated to our view
+    property var controller : null;
 
     // Model associated to our QML item
     property var agentMappingVM: null
     property var agentName: agentMappingVM ? agentMappingVM.agentName : ""
 
-    property bool agentIsPressed : false;
-
     property bool isReduced : agentMappingVM && agentMappingVM.isReduced
 
     width : 228
     height : (rootItem.agentMappingVM && !rootItem.isReduced)?
-                 (52 + 20*Math.max(rootItem.agentMappingVM.inputsList.count , rootItem.agentMappingVM.outputsList.count))
-               : 40
+                 (54 + 20*Math.max(rootItem.agentMappingVM.inputsList.count , rootItem.agentMappingVM.outputsList.count))
+               : 42
 
 
     // Init position of our agent
@@ -90,17 +92,92 @@ Item {
     //
     //--------------------------------
 
+    MouseArea {
+        id: mouseArea
+
+        anchors.fill: parent
+        drag.target: parent
+
+        onPressed: {
+            if (controller && agentMappingVM) {
+                controller.selectedAgent = agentMappingVM
+            }
+
+            parent.z = rootItem.parent.maxZ++;
+        }
+
+        onPositionChanged: {
+            //     console.log("agentMapping position " + model.position.x + "  " + model.position.y)
+        }
+
+        onDoubleClicked: {
+            if (agentMappingVM) {
+                agentMappingVM.isReduced = !agentMappingVM.isReduced;
+            }
+        }
+    }
+
     Rectangle {
         anchors {
             fill: parent
-            leftMargin: 10
+            leftMargin: 8
             rightMargin: 10
+            topMargin: 1
+            bottomMargin: 1
         }
 
-        color : rootItem.agentIsPressed?
+        color : mouseArea.pressed?
                     MasticTheme.darkGreyColor2
                   : (rootItem.agentMappingVM && rootItem.agentMappingVM.isON)? MasticTheme.darkGreyColor : MasticTheme.veryDarkGreyColor
         radius : 6
+
+        Rectangle {
+            anchors.fill: parent
+            anchors.margins: -1
+
+            visible : (controller && rootItem.agentMappingVM && (controller.selectedAgent === rootItem.agentMappingVM))
+            color : "transparent"
+            radius : 6
+
+            border {
+                width : 2
+                color : MasticTheme.selectedAgentColor
+            }
+
+            Button {
+                id: removeButton
+
+                property var boundingBox: MasticTheme.svgFileMASTIC.boundsOnElement("supprimer");
+                height : boundingBox.height
+                width :  boundingBox.width
+
+                visible : (rootItem.agentMappingVM && !rootItem.agentMappingVM.isON)
+
+                anchors {
+                    top: parent.top
+                    topMargin: 10
+                    right : parent.right
+                    rightMargin: 10
+                }
+
+                style: I2SvgButtonStyle {
+                    fileCache: MasticTheme.svgFileMASTIC
+
+                    pressedID: releasedID + "-pressed"
+                    releasedID: "supprimer"
+                    disabledID : releasedID
+                }
+
+                onClicked: {
+                    //                if (controller)
+                    //                {
+                    //                    // Delete our agent
+                    //                    controller.deleteAgent(model.QtObject);
+                    //                }
+                }
+            }
+
+        }
 
         // Agent Name
         Text {
@@ -120,6 +197,72 @@ Item {
 
             color : (rootItem.agentMappingVM && rootItem.agentMappingVM.isON)? MasticTheme.agentsONNameMappingColor : MasticTheme.agentsOFFNameMappingColor
             font: MasticTheme.headingFont
+        }
+
+
+        // Warnings
+        Rectangle {
+            id : agentWithSameName
+            height : 17
+            width : height
+            radius : height/2
+
+            visible: false // (model && model.models) ? (model.models.count > 1) : false
+
+            anchors {
+                verticalCenter: agentName.verticalCenter
+                verticalCenterOffset:  2
+                right : parent.right
+                rightMargin: 48
+            }
+
+            color : MasticTheme.redColor
+
+            Text {
+                anchors.centerIn : parent
+                anchors.verticalCenterOffset: -1
+
+                text: "3" //(model && model.models) ? model.models.count : ""
+
+                color : MasticTheme.whiteColor
+                font {
+                    family: MasticTheme.labelFontFamilyBlack
+                    bold : true
+                    pixelSize : 13
+                }
+            }
+        }
+
+        Rectangle {
+            height : 17
+            width : height
+            radius : height/2
+
+            visible: false // (model && model.models) ? (model.models.count > 1) : false
+
+            anchors {
+                verticalCenter: agentName.verticalCenter
+                verticalCenterOffset:  2
+                left : agentWithSameName.right
+                leftMargin: 5
+            }
+
+            color : MasticTheme.redColor
+
+            Text {
+                anchors {
+                    centerIn : parent
+                    verticalCenterOffset:  -1
+                }
+                text: "!" //(model && model.models) ? model.models.count : ""
+
+                color : MasticTheme.whiteColor
+                font {
+                    family: MasticTheme.labelFontFamilyBlack
+                    bold : true
+                    pixelSize : 14
+                }
+            }
         }
 
 
@@ -297,6 +440,61 @@ Item {
                         font: MasticTheme.heading2Font
                     }
 
+                    Rectangle {
+                        id : draggablePointFROM
+
+                        height : linkPoint.height
+                        width : height
+                        radius : height/2
+
+                        property bool dragActive : mouseAreaPointFROM.drag.active;
+
+                        Drag.active: mouseAreaPointFROM.drag.active;
+                        Drag.hotSpot.x: width/2
+                        Drag.hotSpot.y: height/2
+
+                        border {
+                            width : 1
+                            color : draggablePointFROM.dragActive? linkPoint.color : "transparent"
+                        }
+
+
+                        color : draggablePointFROM.dragActive? MasticTheme.agentsMappingBackgroundColor : "transparent"
+                        parent : draggablePointFROM.dragActive? rootItem.parent  : linkPoint
+
+                        MouseArea {
+                            id: mouseAreaPointFROM
+                            anchors.fill: parent
+                            drag.target: parent
+
+                            hoverEnabled: true
+
+                            drag.smoothed: false
+                            cursorShape: (draggablePointFROM.dragActive)? Qt.ClosedHandCursor : Qt.PointingHandCursor //Qt.OpenHandCursor
+
+                            onPressed: {
+                                draggablePointFROM.z = rootItem.parent.maxZ++;
+                                linkDraggablePoint.z = rootItem.parent.maxZ++;
+                            }
+
+                            onReleased: {
+                                // replace the draggablePointTO
+                                draggablePointFROM.x = 0
+                                draggablePointFROM.y = 0
+                            }
+                        }
+
+                        Link {
+                            id : linkDraggablePoint
+                            parent : rootItem.parent
+                            visible: draggablePointFROM.dragActive
+                            secondPoint: Qt.point(myModel.position.x + draggablePointFROM.width/2 , myModel.position.y)
+                            firstPoint: Qt.point(draggablePointFROM.x + draggablePointFROM.width, draggablePointFROM.y + draggablePointFROM.height/2)
+
+                            defaultColor:linkPoint.color
+                        }
+                    }
+
 
                     Rectangle {
                         id : linkPoint
@@ -309,6 +507,11 @@ Item {
                         height : 13
                         width : height
                         radius : height/2
+
+                        border {
+                            width : 0
+                            color : MasticTheme.lightGreyColor // "#DADADA"
+                        }
 
                         color : if (agentMappingVM && myModel && myModel.modelM) {
 
@@ -349,6 +552,53 @@ Item {
                     }
 
 
+                    DropArea {
+                        id: inputDropArea
+
+                        anchors.fill: linkPoint
+
+                        onEntered: {
+                            console.log("drag enter ")
+
+                            if (drag.source !== null)
+                            {
+                                var dragItem = drag.source;
+
+                                console.log("source "+dragItem)
+                                if (typeof dragItem.dragActive !== 'undefined')
+                                {
+                                    dragItem.color = dragItem.border.color;
+                                    linkPoint.border.width = 2
+                                }
+                                else
+                                {
+                                    console.log("no dragActive "+dragItem.agent)
+                                }
+                            }
+                            else
+                            {
+                                console.log("no source "+ drag.source)
+                            }
+                        }
+
+
+                        onPositionChanged: {
+                        }
+
+
+                        onExited: {
+                            var dragItem = drag.source;
+                            if (typeof dragItem.dragActive !== 'undefined')
+                            {
+                                dragItem.color = "transparent";
+                                linkPoint.border.width = 0
+                            }
+                        }
+
+                    }
+
+
+
                     //
                     // Bindings to save the anchor point of our input slot
                     // i.e. the point used to draw a link
@@ -360,19 +610,12 @@ Item {
 
                         // the position inside the agent is not the same if the agent is reduced or not
                         value:  (rootItem.agentMappingVM && !rootItem.agentMappingVM.isReduced) ?
-                                    (Qt.point(rootItem.x + inputSlotItem.mapToItem(rootItem, linkPoint.x, linkPoint.y).x + linkPoint.width/2,
-                                              rootItem.y + inputSlotItem.mapToItem(rootItem, linkPoint.x, linkPoint.y).y + linkPoint.height/2))
+                                    (Qt.point(rootItem.x + columnInputSlots.x + inputSlotItem.x + linkPoint.x + linkPoint.width/2,
+                                              rootItem.y + columnInputSlots.y + inputSlotItem.y + linkPoint.y + linkPoint.height/2))
                                   : (Qt.point(rootItem.x + inputGlobalPoint.x + inputGlobalPoint.width/2,
                                               rootItem.y + inputGlobalPoint.y + inputGlobalPoint.height/2));
                     }
 
-
-                    //                    Connections {
-                    //                        target : myModel
-                    //                        onPositionChanged : {
-                    //                            console.log( " position changed input" + myModel.position.x + "   " + myModel.position.y)
-                    //                        }
-                    //                    }
                 }
             }
         }
@@ -429,6 +672,65 @@ Item {
                         color : (rootItem.agentMappingVM && rootItem.agentMappingVM.isON)? MasticTheme.agentsONInputsOutputsMappingColor : MasticTheme.agentsOFFInputsOutputsMappingColor
                         font: MasticTheme.heading2Font
                     }
+
+
+
+                    Rectangle {
+                        id : draggablePointTO
+
+                        height : linkPointOut.height
+                        width : height
+                        radius : height/2
+
+                        border {
+                            width : 1
+                            color : draggablePointTO.dragActive? linkPointOut.color : "transparent"
+                        }
+
+                        property bool dragActive : mouseAreaPointTO.drag.active;
+
+                        Drag.active: draggablePointTO.dragActive;
+                        Drag.hotSpot.x: 0
+                        Drag.hotSpot.y: 0
+
+                        color : draggablePointTO.dragActive? MasticTheme.agentsMappingBackgroundColor : "transparent"
+                        parent : draggablePointTO.dragActive? rootItem.parent  : linkPointOut
+
+                        MouseArea {
+                            id: mouseAreaPointTO
+                            anchors.fill: parent
+                            drag.target: parent
+
+                            hoverEnabled: true
+
+                            drag.smoothed: false
+                            cursorShape: (draggablePointTO.dragActive)? Qt.ClosedHandCursor : Qt.PointingHandCursor //Qt.OpenHandCursor
+
+                            onPressed: {
+                                draggablePointTO.z = rootItem.parent.maxZ++;
+                                linkDraggablePointTO.z = rootItem.parent.maxZ++;
+                            }
+
+                            onReleased: {
+                                // replace the draggablePointTO
+                                draggablePointTO.x = 0
+                                draggablePointTO.y = 0
+                            }
+                        }
+
+
+
+                        Link {
+                            id : linkDraggablePointTO
+                            parent : rootItem.parent
+                            visible: draggablePointTO.dragActive
+                            firstPoint: Qt.point(myModel.position.x + draggablePointTO.width/2 , myModel.position.y)
+                            secondPoint: Qt.point(draggablePointTO.x,draggablePointTO.y + draggablePointTO.height/2)
+
+                            defaultColor:linkPointOut.color
+                        }
+                    }
+
 
 
                     Rectangle {
@@ -503,23 +805,17 @@ Item {
 
                         // the position inside the agent is not the same if the agent is reduced or not
                         value: (rootItem.agentMappingVM && !rootItem.agentMappingVM.isReduced) ?
-                                   (Qt.point(rootItem.x + outputSlotItem.mapToItem(rootItem, linkPointOut.x, linkPointOut.y).x + linkPointOut.width/2,
-                                             rootItem.y + outputSlotItem.mapToItem(rootItem, linkPointOut.x, linkPointOut.y).y + linkPointOut.height/2))
+                                   (Qt.point(rootItem.x + columnOutputSlots.x + outputSlotItem.x + linkPointOut.x + linkPointOut.width/2,
+                                             rootItem.y + columnOutputSlots.y + outputSlotItem.y + linkPointOut.y + linkPointOut.height/2))
                                  : (Qt.point(rootItem.x + outputGlobalPoint.x + outputGlobalPoint.width/2,
                                              rootItem.y + outputGlobalPoint.y + outputGlobalPoint.height/2));
                     }
-
-                    //                    Connections {
-                    //                        target : myModel
-                    //                        onPositionChanged : {
-                    //                            console.log( " position changed output " + myModel.position.x + "   " + myModel.position.y)
-                    //                        }
-                    //                    }
                 }
             }
         }
 
     }
+
 
 
 }

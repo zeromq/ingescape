@@ -67,8 +67,6 @@ Item {
     // Colors
     //
     //-----------------------------------------
-
-
     readonly property color whiteColor: "#FFFFFF"
     readonly property color blackColor: "#17191E"
 
@@ -204,10 +202,12 @@ Item {
     //-----------------------------------------
 
     // Background
-    readonly property color definitionEditorsBackgroundColor: "#282C88"
+    readonly property color definitionEditorsBackgroundColor: veryDarkGreyColor
+    readonly property color definitionEditorsBackgroundBorderColor: greyColor
 
     // Labels
     readonly property color definitionEditorsLabelColor: theme.whiteColor
+    readonly property color definitionEditorsAgentDescriptionColor: theme.lightGreyColor
 
 
 
