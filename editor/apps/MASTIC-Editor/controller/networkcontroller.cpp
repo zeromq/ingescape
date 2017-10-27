@@ -348,7 +348,7 @@ NetworkController::NetworkController(QString networkDevice, QString ipAddress, i
     QFileInfo checkDefinitionFile(myDefinitionPath);
     if (!checkDefinitionFile.exists() || !checkDefinitionFile.isFile())
     {
-        qWarning() << "No definition has been found : " << myDefinitionPath << ". Set definition by default";
+        qWarning() << "No definition has been found : " << myDefinitionPath << ". Set default definition";
         // Set definition and mapping by default to editor
         QString definitionByDefault = "{  \
                                       \"definition\": {  \
@@ -369,7 +369,7 @@ NetworkController::NetworkController(QString networkDevice, QString ipAddress, i
     QFileInfo checkMappingFile(myMappingPath);
     if (!checkMappingFile.exists() || !checkMappingFile.isFile())
     {
-        qWarning() << "No mapping has been found : " << myMappingPath << ". Set definition by default";
+        qWarning() << "No mapping has been found : " << myMappingPath << ". Set default mapping";
         QString mappingByDefault = "{      \
                                       \"mapping\": {    \
                                       \"name\": \""+agentName+"\",   \

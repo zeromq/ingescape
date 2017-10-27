@@ -86,15 +86,15 @@ void AgentsSupervisionController::deleteAgent(AgentVM* agent)
         _agentsList.remove(agent);
 
         // Save temporarily its definition
-        DefinitionM* temp = agent->definition();
+        //DefinitionM* temp = agent->definition();
 
         // Reset it
-        agent->setdefinition(NULL);
+        //agent->setdefinition(NULL);
 
         // Delete the definition
-        if (temp != NULL) {
+        /*if (temp != NULL) {
             _modelManager->deleteAgentDefinition(temp);
-        }
+        }*/
 
         // Delete each model of agent
         foreach (AgentM* model, agent->models()->toList()) {
@@ -114,7 +114,11 @@ void AgentsSupervisionController::deleteAgent(AgentVM* agent)
  */
 void AgentsSupervisionController::openDefinition(AgentVM* agent)
 {
-    if ((agent != NULL) && (agent->definition() != NULL) && (_modelManager != NULL))
+    Q_UNUSED(agent)
+
+    // FIXME TODO
+
+    /*if ((agent != NULL) && (agent->definition() != NULL) && (_modelManager != NULL))
     {
         DefinitionM* definition = agent->definition();
 
@@ -143,7 +147,7 @@ void AgentsSupervisionController::openDefinition(AgentVM* agent)
                 _modelManager->openedDefinitions()->append(iterator);
             }
         }
-    }
+    }*/
 }
 
 
@@ -216,7 +220,12 @@ void AgentsSupervisionController::onAgentModelCreated(AgentM* agent)
  */
 void AgentsSupervisionController::onAgentDefinitionCreated(DefinitionM* definition, AgentM* agent)
 {
-    if ((definition != NULL) && (agent != NULL) && (_modelManager != NULL))
+    Q_UNUSED(definition)
+    Q_UNUSED(agent)
+
+    // FIXME TODO
+
+    /*if ((definition != NULL) && (agent != NULL) && (_modelManager != NULL))
     {
         QString agentName = agent->name();
 
@@ -351,7 +360,7 @@ void AgentsSupervisionController::onAgentDefinitionCreated(DefinitionM* definiti
                 //Q_EMIT agentDefinitionManaged(agentName, agentVM->isON(), definition);
             }
         }
-    }
+    }*/
 }
 
 
@@ -363,7 +372,13 @@ void AgentsSupervisionController::onAgentDefinitionCreated(DefinitionM* definiti
  */
 void AgentsSupervisionController::onIsMutedFromOutputOfAgentUpdated(AgentM* agent, bool isMuted, QString outputName)
 {
-    if (agent != NULL) {
+    Q_UNUSED(agent)
+    Q_UNUSED(isMuted)
+    Q_UNUSED(outputName)
+
+    // FIXME TODO
+
+    /*if (agent != NULL) {
         // Get the list of view models of agent from a name
         QList<AgentVM*> agentViewModelsList = getAgentViewModelsListFromName(agent->name());
 
@@ -379,7 +394,7 @@ void AgentsSupervisionController::onIsMutedFromOutputOfAgentUpdated(AgentM* agen
                 break;
             }
         }
-    }
+    }*/
 }
 
 
@@ -421,7 +436,9 @@ QList<QPair<QString, DefinitionM*>> AgentsSupervisionController::_getAgentsListT
     // List of pairs <agent name, definition>
     QList<QPair<QString, DefinitionM*>> agentsListToExport;
 
-    foreach (AgentVM* agent, _agentsList.toList())
+    // FIXME TODO
+
+    /*foreach (AgentVM* agent, _agentsList.toList())
     {
         if ((agent != NULL) && !agent->name().isEmpty() && (agent->definition() != NULL))
         {
@@ -431,6 +448,6 @@ QList<QPair<QString, DefinitionM*>> AgentsSupervisionController::_getAgentsListT
 
             agentsListToExport.append(pair);
         }
-    }
+    }*/
     return agentsListToExport;
 }
