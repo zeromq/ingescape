@@ -126,7 +126,7 @@ void DefinitionM::_onOutputsListChanged()
                 _outputsIdsList.append(output->id());
 
                 // Connect to signals from the output
-                connect(output, &OutputM::commandAsked, this, &DefinitionM::commandAsked);
+                connect(output, &OutputM::commandAsked, this, &DefinitionM::commandAskedForOutput);
                 //connect(output, &OutputM::isMutedChanged, this, &DefinitionM::_onIsMutedChanged);
             }
         }
@@ -141,7 +141,7 @@ void DefinitionM::_onOutputsListChanged()
                 _outputsIdsList.removeOne(output->id());
 
                 // DIS-connect from signals from the output
-                disconnect(output, &OutputM::commandAsked, this, &DefinitionM::commandAsked);
+                disconnect(output, &OutputM::commandAsked, this, &DefinitionM::commandAskedForOutput);
                 //disconnect(output, &OutputM::isMutedChanged, this, &DefinitionM::_onIsMutedChanged);
             }
         }

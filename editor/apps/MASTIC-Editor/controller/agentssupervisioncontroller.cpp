@@ -109,11 +109,7 @@ void AgentsSupervisionController::deleteAgent(AgentVM* agent)
  */
 void AgentsSupervisionController::openDefinition(AgentVM* agent)
 {
-    Q_UNUSED(agent)
-
-    // FIXME TODO
-
-    /*if ((agent != NULL) && (agent->definition() != NULL) && (_modelManager != NULL))
+    if ((agent != NULL) && (agent->definition() != NULL) && (_modelManager != NULL))
     {
         DefinitionM* definition = agent->definition();
 
@@ -137,12 +133,13 @@ void AgentsSupervisionController::openDefinition(AgentVM* agent)
             definitionsToOpen.append(definition);
         }
 
+        // Traverse the list of definitions to open
         foreach (DefinitionM* iterator, definitionsToOpen) {
             if (!_modelManager->openedDefinitions()->contains(iterator)) {
                 _modelManager->openedDefinitions()->append(iterator);
             }
         }
-    }*/
+    }
 }
 
 

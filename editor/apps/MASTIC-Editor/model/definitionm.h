@@ -123,11 +123,11 @@ public:
 Q_SIGNALS:
 
     /**
-     * @brief Signal emitted when a command must be sent on the network
+     * @brief Signal emitted when a command from an output must be sent on the network
      * @param command
      * @param outputName
      */
-    void commandAsked(QString command, QString outputName);
+    void commandAskedForOutput(QString command, QString outputName);
 
 
 public Q_SLOTS:
@@ -139,6 +139,7 @@ private Q_SLOTS:
      * @brief Slot when the list of inputs changed
      */
     void _onInputsListChanged();
+
 
     /**
      * @brief Slot when the list of outputs changed

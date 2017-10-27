@@ -117,15 +117,15 @@ void AgentVM::setdefinition(DefinitionM* value)
         // Previous value
         if (previousValue != NULL) {
             // DIS-connect from signals from the previous definition
-            //disconnect(previousValue, &DefinitionM::commandAsked, this, &AgentVM::onCommandAskedForOutput);
+            disconnect(previousValue, &DefinitionM::commandAskedForOutput, this, &AgentVM::onCommandAskedForOutput);
         }
 
         _definition = value;
 
         // New value
         if (_definition != NULL) {
-            // Connect to signal "Command Asked" from the new definition
-            //connect(_definition, &DefinitionM::commandAsked, this, &AgentVM::onCommandAskedForOutput);
+            // Connect to signal from the new definition
+            connect(_definition, &DefinitionM::commandAskedForOutput, this, &AgentVM::onCommandAskedForOutput);
         }
 
         // Emit simple signal for QML
@@ -194,8 +194,6 @@ void AgentVM::changeFreeze()
  */
 void AgentVM::onCommandAskedForOutput(QString command, QString outputName)
 {
-    // FIXME TODO
-
     Q_EMIT commandAskedForOutput(command, outputName, _peerIdsList);
 }
 
