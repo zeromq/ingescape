@@ -31,7 +31,9 @@ AgentVM::AgentVM(AgentM* model, QObject *parent) : QObject(parent),
     _isON(false),
     _isMuted(false),
     _canBeFrozen(false),
-    _isFrozen(false)
+    _isFrozen(false),
+    _definitionName(""),
+    _definitionVersion("")
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -205,6 +207,8 @@ void AgentVM::_onModelsChanged()
                 connect(model, &AgentM::isONChanged, this, &AgentVM::_onIsONofModelChanged);
                 connect(model, &AgentM::isMutedChanged, this, &AgentVM::_onIsMutedOfModelChanged);
                 connect(model, &AgentM::isFrozenChanged, this, &AgentVM::_onIsFrozenOfModelChanged);
+                connect(model, &AgentM::definitionChanged, this, &AgentVM::_onDefinitionOfModelChanged);
+                //connect(model, &AgentM::mappingChanged, this, &AgentVM::_onMappingOfModelChanged);
             }
         }
     }
@@ -224,8 +228,8 @@ void AgentVM::_onModelsChanged()
 
     _previousAgentsList = newAgentsList;
 
-    // Update with the list of models
-    _updateWithModels();
+    // Update with all models
+    _updateWithAllModels();
 }
 
 
@@ -237,7 +241,7 @@ void AgentVM::_onIsONofModelChanged(bool isON)
 {
     Q_UNUSED(isON)
 
-    // Update the flag "is ON" in function of flags of models
+    // Update the flag "is ON" in function of flags of all models
     _updateIsON();
 }
 
@@ -250,7 +254,7 @@ void AgentVM::_onIsMutedOfModelChanged(bool isMuted)
 {
     Q_UNUSED(isMuted)
 
-    // Update the flag "is Muted" in function of models
+    // Update the flag "is Muted" in function of all models
     _updateIsMuted();
 }
 
@@ -263,15 +267,26 @@ void AgentVM::_onIsFrozenOfModelChanged(bool isFrozen)
 {
     Q_UNUSED(isFrozen)
 
-    // Update the flag "is Frozen" in function of models
+    // Update the flag "is Frozen" in function of all models
     _updateIsFrozen();
 }
 
 
 /**
- * @brief Update with the list of models
+ * @brief Slot when the definition of a model changed
+ * @param definition
  */
-void AgentVM::_updateWithModels()
+void AgentVM::_onDefinitionOfModelChanged(DefinitionM* definition)
+{
+    // Update the definition name and version
+    _updateDefinitionNameAndVersion(definition);
+}
+
+
+/**
+ * @brief Update with all models of agents
+ */
+void AgentVM::_updateWithAllModels()
 {
     _peerIdsList.clear();
     QStringList hostnamesList;
@@ -291,6 +306,9 @@ void AgentVM::_updateWithModels()
             if (!model->canBeFrozen()) {
                 globalCanBeFrozen = false;
             }
+
+            // Update the definition name and version
+            _updateDefinitionNameAndVersion(model->definition());
         }
     }
 
@@ -365,4 +383,20 @@ void AgentVM::_updateIsFrozen()
     }
 
     setisFrozen(globalIsFrozen);
+}
+
+
+/**
+ * @brief Update the definition name and version
+ */
+void AgentVM::_updateDefinitionNameAndVersion(DefinitionM* definition)
+{
+    if (definition != NULL) {
+        if (_definitionName.isEmpty()) {
+            setdefinitionName(definition->name());
+        }
+        if (_definitionVersion.isEmpty()) {
+            setdefinitionVersion(definition->version());
+        }
+    }
 }

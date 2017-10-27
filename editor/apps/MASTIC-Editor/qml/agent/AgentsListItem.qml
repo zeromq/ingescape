@@ -225,7 +225,7 @@ Item {
                         elideWidth: (columnName.width - versionName.width)
                         elide: Text.ElideRight
 
-                        text: root.agent && root.agent.definition ? root.agent.definition.name : ""
+                        text: root.agent ? root.agent.definitionName : ""
                     }
 
                     Text {
@@ -254,7 +254,7 @@ Item {
                             leftMargin: 5
                         }
 
-                        text: root.agent && root.agent.definition ? "(v" + root.agent.definition.version + ")" : ""
+                        text: root.agent ? "(v" + root.agent.definitionVersion + ")" : ""
                         color: definitionNameTxt.color
 
                         font {

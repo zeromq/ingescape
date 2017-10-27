@@ -445,7 +445,7 @@ void MasticModelManager::deleteAgentModel(AgentM* agent)
  * @brief Add a model of agent definition
  * @param definition
  */
-void MasticModelManager::addAgentDefinition(DefinitionM* definition)
+/*void MasticModelManager::addAgentDefinition(DefinitionM* definition)
 {
     if (definition != NULL)
     {
@@ -460,7 +460,7 @@ void MasticModelManager::addAgentDefinition(DefinitionM* definition)
         // Update definition variants of a list of definitions with the same name
         _updateDefinitionVariants(definitionName);
     }
-}
+}*/
 
 
 /**
@@ -483,7 +483,7 @@ QList<DefinitionM*> MasticModelManager::getAgentDefinitionsListFromName(QString 
  * @brief Delete a model of agent definition
  * @param definition
  */
-void MasticModelManager::deleteAgentDefinition(DefinitionM* definition)
+/*void MasticModelManager::deleteAgentDefinition(DefinitionM* definition)
 {
     if (definition != NULL)
     {
@@ -501,7 +501,7 @@ void MasticModelManager::deleteAgentDefinition(DefinitionM* definition)
         // Update definition variants of a list of definitions with the same name
         _updateDefinitionVariants(definitionName);
     }
-}
+}*/
 
 
 /**

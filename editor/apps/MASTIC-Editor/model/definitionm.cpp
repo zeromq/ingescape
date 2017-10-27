@@ -105,7 +105,7 @@ void DefinitionM::_onInputsListChanged()
 
     _previousInputsList = newInputsList;
 
-    qDebug() << "Definition" << _name << "has inputs:" << _inputsIdsList;
+    //qDebug() << "Definition" << _name << "has inputs:" << _inputsIdsList;
 }
 
 
@@ -185,7 +185,7 @@ void DefinitionM::_onParametersListChanged()
 
     _previousParametersList = newParametersList;
 
-    qDebug() << "Definition" << _name << "has parameters:" << _parametersIdsList;
+    //qDebug() << "Definition" << _name << "has parameters:" << _parametersIdsList;
 }
 
 

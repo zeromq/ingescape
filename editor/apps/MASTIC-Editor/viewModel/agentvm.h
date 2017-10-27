@@ -64,6 +64,12 @@ class AgentVM : public QObject
     // Status defined by the agent
     //I2_QML_PROPERTY_READONLY(QString, status)
 
+    // Name of the definition of our agent
+    I2_QML_PROPERTY_READONLY(QString, definitionName)
+
+    // Version of the definition of our agent
+    I2_QML_PROPERTY_READONLY(QString, definitionVersion)
+
 
 public:
     /**
@@ -163,11 +169,18 @@ private Q_SLOTS:
     void _onIsFrozenOfModelChanged(bool isFrozen);
 
 
+    /**
+     * @brief Slot when the definition of a model changed
+     * @param definition
+     */
+    void _onDefinitionOfModelChanged(DefinitionM* definition);
+
+
 private:
     /**
-     * @brief Update with the list of models
+     * @brief Update with all models of agents
      */
-    void _updateWithModels();
+    void _updateWithAllModels();
 
 
     /**
@@ -186,6 +199,12 @@ private:
      * @brief Update the flag "is Frozen" in function of flags of models
      */
     void _updateIsFrozen();
+
+
+    /**
+     * @brief Update the definition name and version
+     */
+    void _updateDefinitionNameAndVersion(DefinitionM* definition);
 
 
 private:

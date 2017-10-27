@@ -102,7 +102,7 @@ public:
      * @brief Add a model of agent definition
      * @param definition
      */
-    void addAgentDefinition(DefinitionM* definition);
+    //void addAgentDefinition(DefinitionM* definition);
 
 
     /**
@@ -117,7 +117,7 @@ public:
      * @brief Delete a model of agent definition
      * @param definition
      */
-    void deleteAgentDefinition(DefinitionM* definition);
+    //void deleteAgentDefinition(DefinitionM* definition);
 
 
     /**
