@@ -119,7 +119,7 @@ void AgentsSupervisionController::openDefinition(AgentVM* agent)
         if (definition->isVariant())
         {
             // Get the list (of models) of agent definition from a definition name
-            QList<DefinitionM*> agentDefinitionsList = _modelManager->getAgentDefinitionsListFromName(definition->name());
+            QList<DefinitionM*> agentDefinitionsList = _modelManager->getAgentDefinitionsListFromDefinitionName(definition->name());
 
             foreach (DefinitionM* iterator, agentDefinitionsList) {
                 // Same name, same version and variant, we have to open it

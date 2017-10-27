@@ -110,7 +110,7 @@ public:
      * @param definitionName
      * @return
      */
-    QList<DefinitionM*> getAgentDefinitionsListFromName(QString definitionName);
+    QList<DefinitionM*> getAgentDefinitionsListFromDefinitionName(QString definitionName);
 
 
     /**
@@ -124,7 +124,7 @@ public:
      * @brief Add a model of agent mapping
      * @param agentMapping
      */
-    //void addAgentMapping(AgentMappingM* agentMapping);
+    void addAgentMapping(AgentMappingM* agentMapping);
 
 
     /**
@@ -132,7 +132,14 @@ public:
      * @param name
      * @return
      */
-    //QList<AgentMappingM*> getAgentMappingsListFromName(QString mappingName);
+    QList<AgentMappingM*> getAgentMappingsListFromMappingName(QString mappingName);
+
+
+    /**
+     * @brief Delete a model of agent mapping
+     * @param agentMapping
+     */
+    void deleteAgentMapping(AgentMappingM* agentMapping);
 
 
     /**
@@ -328,6 +335,24 @@ private:
     void _cleanMergedListsOfMappingElementsForAgentName(QString agentName);
 
 
+    /**
+     * @brief Print all models of agents (for Debug)
+     */
+    void _printAgents();
+
+
+    /**
+     * @brief Print all models of agent definitions (for Debug)
+     */
+    void _printDefinitions();
+
+
+    /**
+     * @brief Print all models of agent mappings (for Debug)
+     */
+    void _printMappings();
+
+
 private:
 
     // Path to the directory containing JSON files to save agents list
@@ -351,7 +376,7 @@ private:
     QHash<QString, QList<DefinitionM*>> _mapFromNameToAgentDefinitionsList;
 
     // Map from "mapping name" to a list (of models) of agent mapping
-    //QHash<QString, QList<AgentMappingM*>> _mapFromNameToAgentMappingsList;
+    QHash<QString, QList<AgentMappingM*>> _mapFromNameToAgentMappingsList;
 
     // Map from agent name to the merged list of all (models of) mapping elements which connect an input of the agent
     QHash<QString, QList<ElementMappingM*>> _mapFromAgentNameToMergedListOfInputMappingElements;

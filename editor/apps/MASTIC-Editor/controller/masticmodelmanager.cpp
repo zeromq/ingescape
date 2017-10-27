@@ -236,17 +236,10 @@ void MasticModelManager::onMappingReceived(QString peerId, QString agentName, QS
                 agent->setmapping(agentMapping);
 
                 // Add this new model of agent mapping
-                //addAgentMapping(agentMapping);
-
-                // Emit the signal "Agent Mapping Created"
-                //Q_EMIT agentMappingCreated(agentMapping, agent);
+                addAgentMapping(agentMapping);
 
                 // Update the merged list of mapping elements for the agent name
                 //_updateMergedListsOfMappingElementsForAgentName(agentName, agentMapping);
-                //_updateMergedListsOfMappingElementsForAgentName(agentName, agentMapping->elementMappingsList()->toList());
-
-                // Free memory
-                //delete agentMapping;
             }
         }
     }
@@ -350,6 +343,8 @@ void MasticModelManager::addAgentModel(AgentM* agent)
 
         // Emit the signal "Agent Model Created"
         Q_EMIT agentModelCreated(agent);
+
+        _printAgents();
     }
 }
 
@@ -429,9 +424,9 @@ void MasticModelManager::deleteAgentModel(AgentM* agent)
 
         // Delete its model of mapping if needed
         if (agent->mapping() != NULL) {
-            //AgentMappingM* temp = agent->mapping();
+            AgentMappingM* temp = agent->mapping();
             agent->setmapping(NULL);
-            //deleteAgentMapping(temp);
+            deleteAgentMapping(temp);
         }
 
         QList<AgentM*> agentModelsList = getAgentModelsListFromName(agent->name());
@@ -446,6 +441,8 @@ void MasticModelManager::deleteAgentModel(AgentM* agent)
 
         // Free memory
         delete agent;
+
+        _printAgents();
     }
 }
 
@@ -460,11 +457,13 @@ void MasticModelManager::addAgentDefinition(DefinitionM* definition)
     {
         QString definitionName = definition->name();
 
-        QList<DefinitionM*> agentDefinitionsList = getAgentDefinitionsListFromName(definitionName);
+        QList<DefinitionM*> agentDefinitionsList = getAgentDefinitionsListFromDefinitionName(definitionName);
         agentDefinitionsList.append(definition);
 
         // Update the list in the map
         _mapFromNameToAgentDefinitionsList.insert(definitionName, agentDefinitionsList);
+
+        _printDefinitions();
 
         // Update definition variants of a list of definitions with the same name
         _updateDefinitionVariants(definitionName);
@@ -477,7 +476,7 @@ void MasticModelManager::addAgentDefinition(DefinitionM* definition)
  * @param name
  * @return
  */
-QList<DefinitionM*> MasticModelManager::getAgentDefinitionsListFromName(QString definitionName)
+QList<DefinitionM*> MasticModelManager::getAgentDefinitionsListFromDefinitionName(QString definitionName)
 {
     if (_mapFromNameToAgentDefinitionsList.contains(definitionName)) {
         return _mapFromNameToAgentDefinitionsList.value(definitionName);
@@ -498,7 +497,7 @@ void MasticModelManager::deleteAgentDefinition(DefinitionM* definition)
     {
         QString definitionName = definition->name();
 
-        QList<DefinitionM*> agentDefinitionsList = getAgentDefinitionsListFromName(definitionName);
+        QList<DefinitionM*> agentDefinitionsList = getAgentDefinitionsListFromDefinitionName(definitionName);
         agentDefinitionsList.removeOne(definition);
 
         // Update the list in the map
@@ -506,6 +505,8 @@ void MasticModelManager::deleteAgentDefinition(DefinitionM* definition)
 
         // Free memory
         delete definition;
+
+        _printDefinitions();
 
         // Update definition variants of a list of definitions with the same name
         _updateDefinitionVariants(definitionName);
@@ -517,19 +518,21 @@ void MasticModelManager::deleteAgentDefinition(DefinitionM* definition)
  * @brief Add a model of agent mapping
  * @param agentMapping
  */
-/*void MasticModelManager::addAgentMapping(AgentMappingM* agentMapping)
+void MasticModelManager::addAgentMapping(AgentMappingM* agentMapping)
 {
     if (agentMapping != NULL)
     {
         QString mappingName = agentMapping->name();
 
-        QList<AgentMappingM*> agentMappingsList = getAgentMappingsListFromName(mappingName);
+        QList<AgentMappingM*> agentMappingsList = getAgentMappingsListFromMappingName(mappingName);
         agentMappingsList.append(agentMapping);
 
         // Update the list in the map
         _mapFromNameToAgentMappingsList.insert(mappingName, agentMappingsList);
+
+        _printMappings();
     }
-}*/
+}
 
 
 /**
@@ -537,7 +540,7 @@ void MasticModelManager::deleteAgentDefinition(DefinitionM* definition)
  * @param mappingName
  * @return
  */
-/*QList<AgentMappingM*> MasticModelManager::getAgentMappingsListFromName(QString mappingName)
+QList<AgentMappingM*> MasticModelManager::getAgentMappingsListFromMappingName(QString mappingName)
 {
     if (_mapFromNameToAgentMappingsList.contains(mappingName)) {
         return _mapFromNameToAgentMappingsList.value(mappingName);
@@ -545,7 +548,7 @@ void MasticModelManager::deleteAgentDefinition(DefinitionM* definition)
     else {
         return QList<AgentMappingM*>();
     }
-}*/
+}
 
 
 /**
@@ -560,6 +563,30 @@ QList<ElementMappingM*> MasticModelManager::getMergedListOfInputMappingElementsF
     }
     else {
         return QList<ElementMappingM*>();
+    }
+}
+
+
+/**
+ * @brief Delete a model of agent mapping
+ * @param agentMapping
+ */
+void MasticModelManager::deleteAgentMapping(AgentMappingM* agentMapping)
+{
+    if (agentMapping != NULL)
+    {
+        QString mappingName = agentMapping->name();
+
+        QList<AgentMappingM*> agentMappingsList = getAgentMappingsListFromMappingName(mappingName);
+        agentMappingsList.removeOne(agentMapping);
+
+        // Update the list in the map
+        _mapFromNameToAgentMappingsList.insert(mappingName, agentMappingsList);
+
+        // Free memory
+        delete agentMapping;
+
+        _printMappings();
     }
 }
 
@@ -725,17 +752,13 @@ void MasticModelManager::_importAgentFromFiles(QStringList agentFilesPaths)
             // Add this new model of agent definition
             addAgentDefinition(agentDefinition);
 
-            /*if (agentMapping != NULL)
-            {
+            if (agentMapping != NULL) {
                 // Add this new model of agent mapping
                 addAgentMapping(agentMapping);
 
-                // Emit the signal "Agent Mapping Created"
-                Q_EMIT agentMappingCreated(agentMapping, agent);
-
                 // Update the merged list of mapping elements for the agent name
-                _updateMergedListsOfMappingElementsForAgentName(agent->name(), agentMapping);
-            }*/
+                //_updateMergedListsOfMappingElementsForAgentName(agent->name(), agentMapping);
+            }
         }
     }
 }
@@ -774,7 +797,7 @@ void MasticModelManager::_exportAgentsListToFile(QList<QPair<QString, Definition
  */
 void MasticModelManager::_updateDefinitionVariants(QString definitionName)
 {
-    QList<DefinitionM*> agentDefinitionsList = getAgentDefinitionsListFromName(definitionName);
+    QList<DefinitionM*> agentDefinitionsList = getAgentDefinitionsListFromDefinitionName(definitionName);
 
     // We can use versions as keys of the map because the list contains only definition with the same name
     QHash<QString, QList<DefinitionM*>> mapFromVersionToDefinitionsList;
@@ -942,5 +965,44 @@ void MasticModelManager::_cleanMergedListsOfMappingElementsForAgentName(QString 
         // Free memory
         qDeleteAll(mergedListOfInputMappingElements);
         mergedListOfInputMappingElements.clear();
+    }
+}
+
+
+/**
+ * @brief Print all models of agents (for Debug)
+ */
+void MasticModelManager::_printAgents()
+{
+    qDebug() << "Print Agents:";
+    foreach (QString agentName, _mapFromNameToAgentModelsList.keys()) {
+        QList<AgentM*> agentModelsList = getAgentModelsListFromName(agentName);
+        qDebug() << agentName << ":" << agentModelsList.count() << "agents";
+    }
+}
+
+
+/**
+ * @brief Print all models of agent definitions (for Debug)
+ */
+void MasticModelManager::_printDefinitions()
+{
+    qDebug() << "Print Definitions:";
+    foreach (QString definitionName, _mapFromNameToAgentDefinitionsList.keys()) {
+        QList<DefinitionM*> agentDefinitionsList = getAgentDefinitionsListFromDefinitionName(definitionName);
+        qDebug() << definitionName << ":" << agentDefinitionsList.count() << "definitions";
+    }
+}
+
+
+/**
+ * @brief Print all models of agent mappings (for Debug)
+ */
+void MasticModelManager::_printMappings()
+{
+    qDebug() << "Print Mappings:";
+    foreach (QString mappingName, _mapFromNameToAgentMappingsList.keys()) {
+        QList<AgentMappingM*> agentMappingsList = getAgentMappingsListFromMappingName(mappingName);
+        qDebug() << mappingName << ":" << agentMappingsList.count() << "mappings";
     }
 }
