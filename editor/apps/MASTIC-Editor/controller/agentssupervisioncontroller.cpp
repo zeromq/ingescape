@@ -365,40 +365,6 @@ void AgentsSupervisionController::onAgentDefinitionCreated(DefinitionM* definiti
 
 
 /**
- * @brief Slot when the flag "is Muted" from an output of agent updated
- * @param agent
- * @param isMuted
- * @param outputName
- */
-void AgentsSupervisionController::onIsMutedFromOutputOfAgentUpdated(AgentM* agent, bool isMuted, QString outputName)
-{
-    Q_UNUSED(agent)
-    Q_UNUSED(isMuted)
-    Q_UNUSED(outputName)
-
-    // FIXME TODO
-
-    /*if (agent != NULL) {
-        // Get the list of view models of agent from a name
-        QList<AgentVM*> agentViewModelsList = getAgentViewModelsListFromName(agent->name());
-
-        // Get the view model of agent that corresponds to our model
-        foreach (AgentVM* agentVM, agentViewModelsList)
-        {
-            // If the view model has not yet a definition and contains our model of agent
-            if ((agentVM != NULL) && agentVM->models()->contains(agent))
-            {
-                if (agentVM->definition() != NULL) {
-                    agentVM->definition()->setisMutedOfOutput(isMuted, outputName);
-                }
-                break;
-            }
-        }
-    }*/
-}
-
-
-/**
  * @brief Delete the view model of Agent
  * @param agent
  */

@@ -205,11 +205,14 @@ void MasticModelManager::onDefinitionReceived(QString peerId, QString agentName,
             DefinitionM* definition = _jsonHelper->createModelOfDefinition(byteArrayOfJson);
             if (definition != NULL)
             {
+                // Set this definition to the agent
+                agent->setdefinition(definition);
+
                 // Add this new model of agent definition
-                addAgentDefinition(definition);
+                //addAgentDefinition(definition);
 
                 // Emit the signal "Agent Definition Created"
-                Q_EMIT agentDefinitionCreated(definition, agent);
+                //Q_EMIT agentDefinitionCreated(definition, agent);
             }
         }
     }
@@ -235,6 +238,9 @@ void MasticModelManager::onMappingReceived(QString peerId, QString agentName, QS
             AgentMappingM* agentMapping = _jsonHelper->createModelOfAgentMapping(agentName, byteArrayOfJson);
             if (agentMapping != NULL)
             {
+                // Set this mapping to the agent
+                agent->setmapping(agentMapping);
+
                 // Add this new model of agent mapping
                 //addAgentMapping(agentMapping);
 
@@ -243,10 +249,10 @@ void MasticModelManager::onMappingReceived(QString peerId, QString agentName, QS
 
                 // Update the merged list of mapping elements for the agent name
                 //_updateMergedListsOfMappingElementsForAgentName(agentName, agentMapping);
-                _updateMergedListsOfMappingElementsForAgentName(agentName, agentMapping->elementMappingsList()->toList());
+                //_updateMergedListsOfMappingElementsForAgentName(agentName, agentMapping->elementMappingsList()->toList());
 
                 // Free memory
-                delete agentMapping;
+                //delete agentMapping;
             }
         }
     }
@@ -268,8 +274,10 @@ void MasticModelManager::onAgentExited(QString peerId, QString agentName)
         // Update the state (flag "is ON")
         agent->setisON(false);
 
+        // FIXME TODO
+
         // Check if all agents with this name are OFF
-        bool allAgentsAreOFF = true;
+        /*bool allAgentsAreOFF = true;
         QList<AgentM*> agentModelsList = getAgentModelsListFromName(agentName);
         foreach (AgentM* model, agentModelsList) {
             if (model->isON()) {
@@ -282,7 +290,7 @@ void MasticModelManager::onAgentExited(QString peerId, QString agentName)
         {
             // Clean merged lists of mapping elements for the agent name
             _cleanMergedListsOfMappingElementsForAgentName(agentName);
-        }
+        }*/
     }
 }
 
@@ -325,10 +333,7 @@ void MasticModelManager::onIsMutedFromOutputOfAgentUpdated(QString peerId, bool 
 {
     AgentM* agent = getAgentModelFromPeerId(peerId);
     if(agent != NULL) {
-        //agent->setisMutedOfOutput(isMuted, outputName);
-
-        // Propagate the signal with the model of agent
-        Q_EMIT isMutedFromOutputOfAgentUpdated(agent, isMuted, outputName);
+        agent->setisMutedOfOutput(isMuted, outputName);
     }
 }
 
@@ -425,6 +430,10 @@ void MasticModelManager::deleteAgentModel(AgentM* agent)
 
         // Update the list in the map
         _mapFromNameToAgentModelsList.insert(agent->name(), agentModelsList);
+
+        if (!agent->peerId().isEmpty()) {
+            _mapFromPeerIdToAgentM.remove(agent->peerId());
+        }
 
         // Free memory
         delete agent;

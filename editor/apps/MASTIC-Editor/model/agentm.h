@@ -122,7 +122,7 @@ public:
      * @param isMuted
      * @param outputName
      */
-    //void setisMutedOfOutput(bool isMuted, QString outputName);
+    void setisMutedOfOutput(bool isMuted, QString outputName);
 
 
 Q_SIGNALS:

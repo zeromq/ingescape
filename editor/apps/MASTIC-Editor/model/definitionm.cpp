@@ -66,11 +66,9 @@ DefinitionM::~DefinitionM()
  */
 void DefinitionM::setisMutedOfOutput(bool isMuted, QString outputName)
 {
-    foreach (OutputM* output, _outputsList.toList()) {
-        if ((output != NULL) && (output->name() == outputName)) {
-            output->setisMuted(isMuted);
-            break;
-        }
+    OutputM* output = getOutputWithName(outputName);
+    if (output != NULL) {
+        output->setisMuted(isMuted);
     }
 }
 
@@ -233,6 +231,54 @@ bool DefinitionM::areIdenticals(DefinitionM* definition1, DefinitionM* definitio
     }
 
     return areIdenticals;
+}
+
+
+/**
+ * @brief Get an Input with its name
+ * @param name
+ * @return
+ */
+AgentIOPM* DefinitionM::getInputWithName(QString name)
+{
+    foreach (AgentIOPM* input, _inputsList.toList()) {
+        if ((input != NULL) && (input->name() == name)) {
+            return input;
+        }
+    }
+    return NULL;
+}
+
+
+/**
+ * @brief Get an Output with its name
+ * @param name
+ * @return
+ */
+OutputM* DefinitionM::getOutputWithName(QString name)
+{
+    foreach (OutputM* output, _outputsList.toList()) {
+        if ((output != NULL) && (output->name() == name)) {
+            return output;
+        }
+    }
+    return NULL;
+}
+
+
+/**
+ * @brief Get a Parameter with its name
+ * @param name
+ * @return
+ */
+AgentIOPM* DefinitionM::getParameterWithName(QString name)
+{
+    foreach (AgentIOPM* parameter, _parametersList.toList()) {
+        if ((parameter != NULL) && (parameter->name() == name)) {
+            return parameter;
+        }
+    }
+    return NULL;
 }
 
 

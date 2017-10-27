@@ -96,6 +96,30 @@ public:
     static bool areIdenticals(DefinitionM* definition1, DefinitionM* definition2);
 
 
+    /**
+     * @brief Get an Input with its name
+     * @param name
+     * @return
+     */
+    AgentIOPM* getInputWithName(QString name);
+
+
+    /**
+     * @brief Get an Output with its name
+     * @param name
+     * @return
+     */
+    OutputM* getOutputWithName(QString name);
+
+
+    /**
+     * @brief Get a Parameter with its name
+     * @param name
+     * @return
+     */
+    AgentIOPM* getParameterWithName(QString name);
+
+
 Q_SIGNALS:
 
     /**

@@ -215,15 +215,6 @@ Q_SIGNALS:
     void mappingElementCreated(ElementMappingM* mappingElement);
 
 
-    /**
-     * @brief Signal emitted when the flag "is Muted" from an output of agent updated
-     * @param agent
-     * @param isMuted
-     * @param outputName
-     */
-    void isMutedFromOutputOfAgentUpdated(AgentM* agent, bool isMuted, QString outputName);
-
-
 public Q_SLOTS:
 
     /**
