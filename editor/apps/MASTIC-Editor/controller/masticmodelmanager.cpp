@@ -268,10 +268,8 @@ void MasticModelManager::onAgentExited(QString peerId, QString agentName)
         // Update the state (flag "is ON")
         agent->setisON(false);
 
-        // FIXME TODO
-
         // Check if all agents with this name are OFF
-        /*bool allAgentsAreOFF = true;
+        bool allAgentsAreOFF = true;
         QList<AgentM*> agentModelsList = getAgentModelsListFromName(agentName);
         foreach (AgentM* model, agentModelsList) {
             if (model->isON()) {
@@ -284,7 +282,7 @@ void MasticModelManager::onAgentExited(QString peerId, QString agentName)
         {
             // Clean merged lists of mapping elements for the agent name
             _cleanMergedListsOfMappingElementsForAgentName(agentName);
-        }*/
+        }
     }
 }
 

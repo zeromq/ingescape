@@ -390,9 +390,7 @@ QList<QPair<QString, DefinitionM*>> AgentsSupervisionController::_getAgentsListT
     // List of pairs <agent name, definition>
     QList<QPair<QString, DefinitionM*>> agentsListToExport;
 
-    // FIXME TODO
-
-    /*foreach (AgentVM* agent, _agentsList.toList())
+    foreach (AgentVM* agent, _agentsList.toList())
     {
         if ((agent != NULL) && !agent->name().isEmpty() && (agent->definition() != NULL))
         {
@@ -402,6 +400,6 @@ QList<QPair<QString, DefinitionM*>> AgentsSupervisionController::_getAgentsListT
 
             agentsListToExport.append(pair);
         }
-    }*/
+    }
     return agentsListToExport;
 }

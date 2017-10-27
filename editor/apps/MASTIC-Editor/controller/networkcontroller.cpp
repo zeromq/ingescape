@@ -247,11 +247,6 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
                 // Emit the signal "Mapping Received"
                 Q_EMIT networkController->mappingReceived(peerId, peerName, message);
             }
-            else if (message.startsWith("MAPPED"))
-            {
-                // FIXME TODO
-                qDebug() << peerName << "MAPPED" << message;
-            }
             // MUTED / UN-MUTED
             else if (message.startsWith(mutedAllPrefix))
             {
@@ -288,6 +283,12 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
                     Q_EMIT networkController->isFrozenFromAgentUpdated(peerId, true);
                 }
             }
+            // MAPPED
+            /*else if (message.startsWith("MAPPED"))
+            {
+                // FIXME Nothing TODO ?
+                //qDebug() << peerName << "MAPPED" << message;
+            }*/
             else
             {
                 qDebug() << "Unknown message received:" << message;
