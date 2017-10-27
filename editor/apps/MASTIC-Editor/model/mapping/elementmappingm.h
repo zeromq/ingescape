@@ -1,3 +1,17 @@
+/*
+ *	MASTIC Editor
+ *
+ *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *
+ *	See license terms for the rights and conditions
+ *	defined by copyright holders.
+ *
+ *
+ *	Contributors:
+ *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
+ *
+ */
+
 #ifndef ELEMENTMAPPINGM_H
 #define ELEMENTMAPPINGM_H
 

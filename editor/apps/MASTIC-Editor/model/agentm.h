@@ -38,9 +38,9 @@ class AgentM : public QObject
     // Peer ID of our agent (unique identifier)
     I2_CPP_NOSIGNAL_PROPERTY(QString, peerId)
 
-    // Flag indicating if our agent has never yet appeared on the network
+    // Flag indicating if our agent never yet appeared on the network
     // It has only a definition (and evetually a mapping)
-    I2_QML_PROPERTY_READONLY(bool, hasNeverAppearedOnNetwork)
+    I2_QML_PROPERTY_READONLY(bool, neverAppearedOnNetwork)
 
     // Address of our agent
     I2_QML_PROPERTY_READONLY(QString, address)

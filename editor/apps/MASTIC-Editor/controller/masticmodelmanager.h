@@ -197,7 +197,7 @@ Q_SIGNALS:
      * @param definition
      * @param agent
      */
-    void agentDefinitionCreated(DefinitionM* definition, AgentM* agent);
+    //void agentDefinitionCreated(DefinitionM* definition, AgentM* agent);
 
 
     /**

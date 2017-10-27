@@ -225,7 +225,7 @@ Item {
                         elideWidth: (columnName.width - versionName.width)
                         elide: Text.ElideRight
 
-                        text: root.agent ? root.agent.definitionName : ""
+                        text: root.agent && root.agent.definition ? root.agent.definition.name : ""
                     }
 
                     Text {
@@ -254,7 +254,7 @@ Item {
                             leftMargin: 5
                         }
 
-                        text: root.agent ? "(v" + root.agent.definitionVersion + ")" : ""
+                        text: root.agent && root.agent.definition ? "(v" + root.agent.definition.version + ")" : ""
                         color: definitionNameTxt.color
 
                         font {
@@ -304,7 +304,7 @@ Item {
                 height : boundingBox.height
                 width :  boundingBox.width
 
-                visible : (root.agent && !root.agent.hasNeverAppearedOnNetwork)
+                visible : (root.agent && !root.agent.neverAppearedOnNetwork)
                 enabled: visible
 
                 anchors {

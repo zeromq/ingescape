@@ -149,7 +149,7 @@ void DefinitionM::_onOutputsListChanged()
 
     _previousOutputsList = newOutputsList;
 
-    qDebug() << "Definition" << _name << "has outputs:" << _outputsIdsList;
+    //qDebug() << "Definition" << _name << "has outputs:" << _outputsIdsList;
 }
 
 

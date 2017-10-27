@@ -210,9 +210,6 @@ void MasticModelManager::onDefinitionReceived(QString peerId, QString agentName,
 
                 // Add this new model of agent definition
                 //addAgentDefinition(definition);
-
-                // Emit the signal "Agent Definition Created"
-                //Q_EMIT agentDefinitionCreated(definition, agent);
             }
         }
     }
@@ -613,9 +610,6 @@ void MasticModelManager::_importAgentsListFromFile(QString agentsListFilePath)
 
                         // Add this new model of agent definition
                         //addAgentDefinition(agentDefinition);
-
-                        // Emit the signal "Agent Definition Created"
-                        //Q_EMIT agentDefinitionCreated(agentDefinition, agent);
                     }
                 }
             }
@@ -724,9 +718,6 @@ void MasticModelManager::_importAgentFromFiles(QStringList agentFilesPaths)
 
             // Add this new model of agent definition
             //addAgentDefinition(agentDefinition);
-
-            // Emit the signal "Agent Definition Created"
-            //Q_EMIT agentDefinitionCreated(agentDefinition, agent);
 
             /*if (agentMapping != NULL)
             {

@@ -46,8 +46,8 @@ class AgentVM : public QObject
     // Hostname(s) on the network of our agent(s)
     I2_QML_PROPERTY_READONLY(QString, hostnames)
 
-    // Flag indicating if our agent has never yet appeared on the network
-    I2_QML_PROPERTY_READONLY(bool, hasNeverAppearedOnNetwork)
+    // Flag indicating if our agent never yet appeared on the network
+    I2_QML_PROPERTY_READONLY(bool, neverAppearedOnNetwork)
 
     // Flag indicating if our agent is ON (vs OFF)
     I2_QML_PROPERTY_READONLY(bool, isON)
@@ -64,11 +64,8 @@ class AgentVM : public QObject
     // Status defined by the agent
     //I2_QML_PROPERTY_READONLY(QString, status)
 
-    // Name of the definition of our agent
-    I2_QML_PROPERTY_READONLY(QString, definitionName)
-
-    // Version of the definition of our agent
-    I2_QML_PROPERTY_READONLY(QString, definitionVersion)
+    // Definition of our agent
+    I2_QML_PROPERTY_READONLY_CUSTOM_SETTER(DefinitionM*, definition)
 
 
 public:
@@ -107,12 +104,21 @@ public:
 Q_SIGNALS:
 
     /**
+     * @brief Signal emitted when the definition changed
+     * @param previousValue
+     * @param newValue
+     */
+    void definitionChangedWithPreviousValue(DefinitionM* previousValue, DefinitionM* newValue);
+
+
+    /**
      * @brief Signal emitted when a command must be sent on the network to a launcher
      * @param command
      * @param hostname
      * @param executionPath
      */
     void commandAskedToLauncher(QString command, QString hostname, QString executionPath);
+
 
     /**
      * @brief Signal emitted when a command must be sent on the network
@@ -202,9 +208,9 @@ private:
 
 
     /**
-     * @brief Update the definition name and version
+     * @brief Update with the definition of first model
      */
-    void _updateDefinitionNameAndVersion(DefinitionM* definition);
+    void _updateWithDefinitionOfFirstModel();
 
 
 private:

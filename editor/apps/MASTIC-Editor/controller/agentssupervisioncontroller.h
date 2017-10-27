@@ -115,14 +115,6 @@ Q_SIGNALS:
     void commandAskedForOutput(QString command, QString outputName, QStringList peerIdsList);
 
 
-    /**
-     * @brief agentDefinitionManaged
-     * @param agentName
-     * @param definition
-     */
-    void agentDefinitionManaged(QString agentName, bool isON, DefinitionM* definition);
-
-
 public Q_SLOTS:
 
     /**
@@ -133,14 +125,22 @@ public Q_SLOTS:
 
 
     /**
-     * @brief Slot when a new model of agent definition has been created
-     * @param definition
-     * @param agent
+     * @brief Slot when the definition of a view model of agent changed
+     * @param previousValue
+     * @param newValue
      */
-    void onAgentDefinitionCreated(DefinitionM* definition, AgentM* agent);
+    void onAgentDefinitionChangedWithPreviousValue(DefinitionM* previousValue, DefinitionM* newValue);
 
 
 private:
+
+    /**
+     * @brief Update our list of agents with the new definition for this agent
+     * @param agent
+     * @param definition
+     */
+    void _updateWithNewDefinitionForAgent(AgentVM* agent, DefinitionM* definition);
+
 
     /**
      * @brief Delete the view model of Agent
