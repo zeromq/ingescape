@@ -192,7 +192,7 @@ Item {
                             font {
                                 family: MasticTheme.labelFontFamilyBlack
                                 bold : true
-                                pixelSize : 10
+                                pixelSize : 12
                             }
                         }
 

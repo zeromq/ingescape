@@ -23,8 +23,8 @@ import MASTIC 1.0
 I2PopupBase {
     id: rootItem
 
-    width: 550
-    height: 600
+    width: 666
+    height: 420
 
     automaticallyOpenWhenCompleted: true
     isModal: false
@@ -65,8 +65,8 @@ I2PopupBase {
         }
         radius: 5
         border {
-            width: 1
-            color: MasticTheme.whiteColor
+            width: 2
+            color: MasticTheme.definitionEditorsBackgroundBorderColor
         }
         color: MasticTheme.definitionEditorsBackgroundColor
 
@@ -88,16 +88,26 @@ I2PopupBase {
             }
         }
 
-
         Button {
             id: btnCloseEditor
 
+            property var boundingBox: MasticTheme.svgFileMASTIC.boundsOnElement("supprimer");
+            height : boundingBox.height
+            width :  boundingBox.width
+
             anchors {
-                right: parent.right
-                top: parent.top
+                verticalCenter: definitionNameItem.verticalCenter
+                right : parent.right
+                rightMargin: 20
             }
 
-            text: "X"
+            style: I2SvgButtonStyle {
+                fileCache: MasticTheme.svgFileMASTIC
+
+                pressedID: releasedID + "-pressed"
+                releasedID: "supprimer"
+                disabledID : releasedID
+            }
 
             onClicked: {
                 // Close our popup
@@ -105,53 +115,104 @@ I2PopupBase {
             }
         }
 
-        Column {
-            id: headers
+
+        // Definition name and version
+        Item {
+            id : definitionNameItem
 
             anchors {
-                top: parent.top
-                left: parent.left
-                right: parent.right
-                margins: 4
+                top : parent.top
+                topMargin: 15
+                left : parent.left
+                leftMargin: 18
+                right : parent.right
+                rightMargin: 18
             }
-            height: 120
 
-            Text {
+            height : definitionNameTxt.height
+
+            TextMetrics {
+                id : definitionName
+
+                elideWidth: (definitionNameItem.width - versionName.width)
+                elide: Text.ElideRight
+
                 text: definition ? definition.name : ""
-
-                height: 25
-                color: MasticTheme.definitionEditorsLabelColor
-                font: MasticTheme.heading2Font
             }
 
             Text {
-                text: definition ? definition.version : ""
+                id : definitionNameTxt
 
-                height: 25
+                anchors {
+                    left : parent.left
+                }
+
+                text : definitionName.elidedText
                 color: MasticTheme.definitionEditorsLabelColor
-                font: MasticTheme.normalFont
+                font {
+                    family: MasticTheme.textFontFamily
+                    pixelSize: 23
+                    weight: Font.Medium
+                }
+
             }
 
             Text {
-                text: definition ? definition.description : ""
+                id : versionName
+                anchors {
+                    bottom: definitionNameTxt.bottom
+                    bottomMargin : 2
+                    left : definitionNameTxt.right
+                    leftMargin: 5
+                }
 
-                width: parent.width
-                wrapMode: Text.Wrap
+                text: definition ? "(v" + definition.version + ")" : ""
+                color: definitionNameTxt.color
 
-                color: MasticTheme.definitionEditorsLabelColor
-                font: MasticTheme.normalFont
+                font {
+                    family: MasticTheme.textFontFamily
+                    pixelSize : 16
+                    italic : true
+                }
             }
         }
+
+
+        Text {
+            anchors {
+                top : definitionNameItem.bottom
+                topMargin: 18
+                left : definitionNameItem.left
+                right : parent.right
+                rightMargin: 22
+            }
+
+            text: definition ? definition.description + "ddoekd dkodko dkodkoe zko djaiodj endodo,dz, dzop ad,zo d,zpaz z,sioa,d zps ;z;aos;osoz ddoekd dkodko dkodkoe zko djaiodj endodo,dz, dzop ad,zo d,zpaz z,sioa,d zps ;z;aos;osoz ddoekd dkodko dkodkoe zko djaiodj endodo,dz, dzop ad,zo d,zpaz z,sioa,d zps ;z;aos;osoz" : ""
+
+            width: parent.width
+            wrapMode: Text.Wrap
+            elide : Text.ElideRight
+            maximumLineCount : 3
+
+            color: MasticTheme.definitionEditorsAgentDescriptionColor
+            font {
+                family: MasticTheme.textFontFamily
+                pixelSize : 16
+            }
+        }
+
+
 
         TabView {
             id: tabs
 
             anchors {
-                top: headers.bottom
+                top: parent.top
+                topMargin: 130
                 left: parent.left
                 right: parent.right
                 bottom: parent.bottom
-                margins: 4
+                margins: 20
             }
 
             Tab {

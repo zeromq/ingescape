@@ -120,8 +120,8 @@ Item {
     Rectangle {
         anchors {
             fill: parent
-            leftMargin: 10
-            rightMargin: 12
+            leftMargin: 8
+            rightMargin: 10
             topMargin: 1
             bottomMargin: 1
         }
@@ -200,27 +200,61 @@ Item {
         }
 
 
-
-        // warnings
+        // Warnings
         Rectangle {
-            height : 18
+            id : agentWithSameName
+            height : 17
             width : height
             radius : height/2
 
-            //visible: (model && model.models) ? (model.models.count > 1) : false
+            visible: false // (model && model.models) ? (model.models.count > 1) : false
 
             anchors {
                 verticalCenter: agentName.verticalCenter
-                verticalCenterOffset: 1
-                right : parent.left
-                rightMargin: 41
+                verticalCenterOffset:  2
+                right : parent.right
+                rightMargin: 48
             }
 
             color : MasticTheme.redColor
 
             Text {
                 anchors.centerIn : parent
-                text: "1" //(model && model.models) ? model.models.count : ""
+                anchors.verticalCenterOffset: -1
+
+                text: "3" //(model && model.models) ? model.models.count : ""
+
+                color : MasticTheme.whiteColor
+                font {
+                    family: MasticTheme.labelFontFamilyBlack
+                    bold : true
+                    pixelSize : 13
+                }
+            }
+        }
+
+        Rectangle {
+            height : 17
+            width : height
+            radius : height/2
+
+            visible: false // (model && model.models) ? (model.models.count > 1) : false
+
+            anchors {
+                verticalCenter: agentName.verticalCenter
+                verticalCenterOffset:  2
+                left : agentWithSameName.right
+                leftMargin: 5
+            }
+
+            color : MasticTheme.redColor
+
+            Text {
+                anchors {
+                    centerIn : parent
+                    verticalCenterOffset:  -1
+                }
+                text: "!" //(model && model.models) ? model.models.count : ""
 
                 color : MasticTheme.whiteColor
                 font {
