@@ -88,18 +88,8 @@ void AgentsSupervisionController::deleteAgent(AgentVM* agent)
         // Remove it from the list
         _agentsList.remove(agent);
 
-        // Save temporarily its definition
-        //DefinitionM* temp = agent->definition();
-
-        // Reset it
-        //agent->setdefinition(NULL);
-
-        // Delete the definition
-        /*if (temp != NULL) {
-            _modelManager->deleteAgentDefinition(temp);
-        }*/
-
-        // FIXME TODO: remonter actions faites dans _deleteAgentViewModel (et supprimer _deleteAgentViewModel)
+        // Reset its definition
+        agent->setdefinition(NULL);
 
         // Delete each model of agent
         foreach (AgentM* model, agent->models()->toList()) {
@@ -282,6 +272,9 @@ void AgentsSupervisionController::_updateWithNewDefinitionForAgent(AgentVM* agen
                     // The current view model for this model of agent is useless, we have to remove it from the list
                     _agentsList.remove(agent);
 
+                    // Reset its definition
+                    agent->setdefinition(NULL);
+
                     // Delete it
                     _deleteAgentViewModel(agent);
                     agent = NULL;
@@ -305,7 +298,6 @@ void AgentsSupervisionController::_updateWithNewDefinitionForAgent(AgentVM* agen
 
                                     // Delete the previous (fake) model of agent
                                     _modelManager->deleteAgentModel(modelUsingSameDefinition);
-                                    modelUsingSameDefinition = NULL;
 
                                     // Update the flag "Never Appeared on the Network"
                                     agentUsingSameDefinition->setneverAppearedOnNetwork(false);
@@ -313,7 +305,6 @@ void AgentsSupervisionController::_updateWithNewDefinitionForAgent(AgentVM* agen
                                 else {
                                     // Delete this new (fake) model of agent
                                     _modelManager->deleteAgentModel(model);
-                                    model = NULL;
                                 }
                             }
                         }
@@ -342,7 +333,6 @@ void AgentsSupervisionController::_updateWithNewDefinitionForAgent(AgentVM* agen
 
                                 // Delete the previous model of agent
                                 _modelManager->deleteAgentModel(iterator);
-                                iterator = NULL;
 
                                 break;
                             }

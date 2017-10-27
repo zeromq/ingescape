@@ -102,7 +102,7 @@ public:
      * @brief Add a model of agent definition
      * @param definition
      */
-    //void addAgentDefinition(DefinitionM* definition);
+    void addAgentDefinition(DefinitionM* definition);
 
 
     /**
@@ -117,7 +117,7 @@ public:
      * @brief Delete a model of agent definition
      * @param definition
      */
-    //void deleteAgentDefinition(DefinitionM* definition);
+    void deleteAgentDefinition(DefinitionM* definition);
 
 
     /**
@@ -306,7 +306,7 @@ private:
 
 
     /**
-     * @brief Update definition variants of a list of definitions with the same name
+     * @brief Update definition variants of the list of definitions with the same name
      * @param definitionName
      */
     void _updateDefinitionVariants(QString definitionName);

@@ -176,9 +176,6 @@ void MasticModelManager::onAgentEntered(QString peerId, QString agentName, QStri
 
             // Add this new model of agent
             addAgentModel(agent);
-
-            // Emit the signal "Agent Model Created"
-            Q_EMIT agentModelCreated(agent);
         }
     }
 }
@@ -209,7 +206,7 @@ void MasticModelManager::onDefinitionReceived(QString peerId, QString agentName,
                 agent->setdefinition(definition);
 
                 // Add this new model of agent definition
-                //addAgentDefinition(definition);
+                addAgentDefinition(definition);
             }
         }
     }
@@ -352,6 +349,9 @@ void MasticModelManager::addAgentModel(AgentM* agent)
         if (!agent->peerId().isEmpty()) {
             _mapFromPeerIdToAgentM.insert(agent->peerId(), agent);
         }
+
+        // Emit the signal "Agent Model Created"
+        Q_EMIT agentModelCreated(agent);
     }
 }
 
@@ -422,6 +422,20 @@ void MasticModelManager::deleteAgentModel(AgentM* agent)
 {
     if (agent != NULL)
     {
+        // Delete its model of definition if needed
+        if (agent->definition() != NULL) {
+            DefinitionM* temp = agent->definition();
+            agent->setdefinition(NULL);
+            deleteAgentDefinition(temp);
+        }
+
+        // Delete its model of mapping if needed
+        if (agent->mapping() != NULL) {
+            //AgentMappingM* temp = agent->mapping();
+            agent->setmapping(NULL);
+            //deleteAgentMapping(temp);
+        }
+
         QList<AgentM*> agentModelsList = getAgentModelsListFromName(agent->name());
         agentModelsList.removeOne(agent);
 
@@ -442,7 +456,7 @@ void MasticModelManager::deleteAgentModel(AgentM* agent)
  * @brief Add a model of agent definition
  * @param definition
  */
-/*void MasticModelManager::addAgentDefinition(DefinitionM* definition)
+void MasticModelManager::addAgentDefinition(DefinitionM* definition)
 {
     if (definition != NULL)
     {
@@ -457,7 +471,7 @@ void MasticModelManager::deleteAgentModel(AgentM* agent)
         // Update definition variants of a list of definitions with the same name
         _updateDefinitionVariants(definitionName);
     }
-}*/
+}
 
 
 /**
@@ -480,7 +494,7 @@ QList<DefinitionM*> MasticModelManager::getAgentDefinitionsListFromName(QString 
  * @brief Delete a model of agent definition
  * @param definition
  */
-/*void MasticModelManager::deleteAgentDefinition(DefinitionM* definition)
+void MasticModelManager::deleteAgentDefinition(DefinitionM* definition)
 {
     if (definition != NULL)
     {
@@ -498,7 +512,7 @@ QList<DefinitionM*> MasticModelManager::getAgentDefinitionsListFromName(QString 
         // Update definition variants of a list of definitions with the same name
         _updateDefinitionVariants(definitionName);
     }
-}*/
+}
 
 
 /**
@@ -605,11 +619,8 @@ void MasticModelManager::_importAgentsListFromFile(QString agentsListFilePath)
                         // Add this new model of agent
                         addAgentModel(agent);
 
-                        // Emit the signal "Agent Model Created"
-                        Q_EMIT agentModelCreated(agent);
-
                         // Add this new model of agent definition
-                        //addAgentDefinition(agentDefinition);
+                        addAgentDefinition(agentDefinition);
                     }
                 }
             }
@@ -713,11 +724,8 @@ void MasticModelManager::_importAgentFromFiles(QStringList agentFilesPaths)
             // Add this new model of agent
             addAgentModel(agent);
 
-            // Emit the signal "Agent Model Created"
-            Q_EMIT agentModelCreated(agent);
-
             // Add this new model of agent definition
-            //addAgentDefinition(agentDefinition);
+            addAgentDefinition(agentDefinition);
 
             /*if (agentMapping != NULL)
             {
@@ -763,7 +771,7 @@ void MasticModelManager::_exportAgentsListToFile(QList<QPair<QString, Definition
 
 
 /**
- * @brief Update definition variants of a list of definitions with the same name
+ * @brief Update definition variants of the list of definitions with the same name
  * @param definitionName
  */
 void MasticModelManager::_updateDefinitionVariants(QString definitionName)
