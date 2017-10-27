@@ -28,7 +28,6 @@ DefinitionM::DefinitionM(QString name,
     _name(name),
     _version(version),
     _description(description),
-    _md5Hash(""),
     _isVariant(false)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
