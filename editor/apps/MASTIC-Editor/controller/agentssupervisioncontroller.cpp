@@ -271,8 +271,8 @@ void AgentsSupervisionController::onAgentDefinitionCreated(DefinitionM* definiti
                 _modelManager->deleteAgentDefinition(definition);
                 definition = NULL;
 
-                // 4.1- View model has only definition (never yet appeared on the network)
-                if (agentUsingSameDefinition->hasOnlyDefinition())
+                // 4.1- View model has never yet appeared on the network
+                if (agentUsingSameDefinition->hasNeverAppearedOnNetwork())
                 {
                     // It must have only one (fake) model of agent
                     if (agentUsingSameDefinition->models()->count() == 1)
@@ -280,8 +280,8 @@ void AgentsSupervisionController::onAgentDefinitionCreated(DefinitionM* definiti
                         AgentM* model = agentUsingSameDefinition->models()->at(0);
                         if (model != NULL)
                         {
-                            // If the new model has a peer id (not only definition)
-                            if (model->peerId().isEmpty() && !agent->peerId().isEmpty())
+                            // If the new model has already appeared on the network
+                            if (model->hasNeverAppearedOnNetwork() && !agent->hasNeverAppearedOnNetwork())
                             {
                                 // We replace the fake model of agent
                                 agentUsingSameDefinition->models()->replace(0, agent);
@@ -292,8 +292,8 @@ void AgentsSupervisionController::onAgentDefinitionCreated(DefinitionM* definiti
                                 _modelManager->deleteAgentModel(model);
                                 model = NULL;
 
-                                // Update the flag "Has Only Definition"
-                                agentUsingSameDefinition->sethasOnlyDefinition(false);
+                                // Update the flag "has Never Appeared on the Network"
+                                agentUsingSameDefinition->sethasNeverAppearedOnNetwork(false);
                             }
                             else {
                                 // Delete this new (fake) model of agent

@@ -43,14 +43,11 @@ class AgentVM : public QObject
     // List of models of agents
     I2_QOBJECT_LISTMODEL(AgentM, models)
 
-    // Address(es) on the network of our agent(s)
-    I2_QML_PROPERTY_READONLY(QString, addresses)
+    // Hostname(s) on the network of our agent(s)
+    I2_QML_PROPERTY_READONLY(QString, hostnames)
 
-    // Model of the agent definition
-    I2_QML_PROPERTY_READONLY_CUSTOM_SETTER(DefinitionM*, definition)
-
-    // Flag indicating if our agent has only a definition (never yet appeared on the network)
-    I2_QML_PROPERTY_READONLY(bool, hasOnlyDefinition)
+    // Flag indicating if our agent has never yet appeared on the network
+    I2_QML_PROPERTY_READONLY(bool, hasNeverAppearedOnNetwork)
 
     // Flag indicating if our agent is ON (vs OFF)
     I2_QML_PROPERTY_READONLY(bool, isON)

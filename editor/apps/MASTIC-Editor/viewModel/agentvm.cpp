@@ -26,9 +26,8 @@
  */
 AgentVM::AgentVM(AgentM* model, QObject *parent) : QObject(parent),
     _name(""),
-    _addresses(""),
-    _definition(NULL),
-    _hasOnlyDefinition(true),
+    _hostnames(""),
+    _hasNeverAppearedOnNetwork(true),
     _isON(false),
     _isMuted(false),
     _canBeFrozen(false),
@@ -41,13 +40,12 @@ AgentVM::AgentVM(AgentM* model, QObject *parent) : QObject(parent),
     {
         // Init the name
         _name = model->name();
+        _hasNeverAppearedOnNetwork = model->hasNeverAppearedOnNetwork();
 
-        if (model->peerId().isEmpty()) {
-            _hasOnlyDefinition = true;
-            qInfo() << "New View Model of Agent" << _name << "with Only Definition";
+        if (_hasNeverAppearedOnNetwork) {
+            qInfo() << "New View Model of Agent" << _name << "which has never yet appeared on the network";
         }
         else {
-            _hasOnlyDefinition = false;
             qInfo() << "New View Model of Agent" << _name << "with peer id" << model->peerId();
         }
 
@@ -70,10 +68,6 @@ AgentVM::AgentVM(AgentM* model, QObject *parent) : QObject(parent),
 AgentVM::~AgentVM()
 {
     qInfo() << "Delete View Model of Agent" << _name;
-
-    if (_definition != NULL) {
-        setdefinition(NULL);
-    }
 
     // Clear the lists of models
     _previousAgentsList.clear();
@@ -108,7 +102,7 @@ void AgentVM::setname(QString value)
  * @brief Setter for property "Definition"
  * @param value
  */
-void AgentVM::setdefinition(DefinitionM *value)
+/*void AgentVM::setdefinition(DefinitionM *value)
 {
     if (_definition != value)
     {
@@ -128,7 +122,7 @@ void AgentVM::setdefinition(DefinitionM *value)
 
         Q_EMIT definitionChanged(value);
     }
-}
+}*/
 
 
 /**
@@ -136,10 +130,11 @@ void AgentVM::setdefinition(DefinitionM *value)
  */
 void AgentVM::changeState()
 {
+    // is ON --> Kill all agents
     if (_isON) {
-        // FIXME TODO
         Q_EMIT commandAsked("DIE", _peerIdsList);
     }
+    // is OFF --> Execute all agents
     else {
         foreach (AgentM* model, _models.toList())
         {
@@ -279,8 +274,7 @@ void AgentVM::_onIsFrozenOfModelChanged(bool isFrozen)
 void AgentVM::_updateWithModels()
 {
     _peerIdsList.clear();
-    QStringList addressesList;
-    QString globalAddresses = "";
+    QStringList hostnamesList;
     bool globalCanBeFrozen = true;
 
     foreach (AgentM* model, _models.toList()) {
@@ -290,11 +284,8 @@ void AgentVM::_updateWithModels()
                 _peerIdsList.append(model->peerId());
             }
 
-            /*if (!addressesList.contains(model->address())) {
-                addressesList.append(model->address());
-            }*/
-            if (!addressesList.contains(model->hostname())) {
-                addressesList.append(model->hostname());
+            if (!hostnamesList.contains(model->hostname())) {
+                hostnamesList.append(model->hostname());
             }
 
             if (!model->canBeFrozen()) {
@@ -303,16 +294,17 @@ void AgentVM::_updateWithModels()
         }
     }
 
-    for (int i = 0; i < addressesList.count(); i++) {
+    QString globalHostnames = "";
+    for (int i = 0; i < hostnamesList.count(); i++) {
         if (i == 0) {
-            globalAddresses = addressesList.at(i);
+            globalHostnames = hostnamesList.at(i);
         }
         else {
-            globalAddresses = QString("%1, %2").arg(globalAddresses, addressesList.at(i));
+            globalHostnames = QString("%1, %2").arg(globalHostnames, hostnamesList.at(i));
         }
     }
 
-    setaddresses(globalAddresses);
+    sethostnames(globalHostnames);
     setcanBeFrozen(globalCanBeFrozen);
 
     // Update flags in function of models

@@ -282,14 +282,14 @@ Item {
 
                 // Address(es) on the network of our agent(s)
                 Text {
-                    id: agentAddresses
+                    id: agentHostnames
                     anchors {
                         left : parent.left
                         right : parent.right
                     }
                     elide: Text.ElideRight
 
-                    text: root.agent ? root.agent.addresses: ""
+                    text: root.agent ? root.agent.hostnames: ""
 
                     color: (root.agent && root.agent.isON === true)? MasticTheme.agentsListTextColor : MasticTheme.agentOFFTextColor
                     font: MasticTheme.normalFont
@@ -304,7 +304,7 @@ Item {
                 height : boundingBox.height
                 width :  boundingBox.width
 
-                visible : (root.agent && !root.agent.hasOnlyDefinition)
+                visible : (root.agent && !root.agent.hasNeverAppearedOnNetwork)
                 enabled: visible
 
                 anchors {

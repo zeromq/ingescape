@@ -174,8 +174,6 @@ void MasticModelManager::onAgentEntered(QString peerId, QString agentName, QStri
             // Update the state (flag "is ON")
             agent->setisON(true);
 
-            _mapFromPeerIdToAgentM.insert(peerId, agent);
-
             // Add this new model of agent
             addAgentModel(agent);
 
@@ -348,6 +346,10 @@ void MasticModelManager::addAgentModel(AgentM* agent)
 
         // Update the list in the map
         _mapFromNameToAgentModelsList.insert(agent->name(), agentModelsList);
+
+        if (!agent->peerId().isEmpty()) {
+            _mapFromPeerIdToAgentM.insert(agent->peerId(), agent);
+        }
     }
 }
 
@@ -591,6 +593,9 @@ void MasticModelManager::_importAgentsListFromFile(QString agentsListFilePath)
                         // Create a new model of agent with the name
                         AgentM* agent = new AgentM(agentName, this);
 
+                        // Set its definition
+                        agent->setdefinition(agentDefinition);
+
                         // Add this new model of agent
                         addAgentModel(agent);
 
@@ -598,10 +603,10 @@ void MasticModelManager::_importAgentsListFromFile(QString agentsListFilePath)
                         Q_EMIT agentModelCreated(agent);
 
                         // Add this new model of agent definition
-                        addAgentDefinition(agentDefinition);
+                        //addAgentDefinition(agentDefinition);
 
                         // Emit the signal "Agent Definition Created"
-                        Q_EMIT agentDefinitionCreated(agentDefinition, agent);
+                        //Q_EMIT agentDefinitionCreated(agentDefinition, agent);
                     }
                 }
             }
@@ -625,7 +630,7 @@ void MasticModelManager::_importAgentFromFiles(QStringList agentFilesPaths)
     if ((agentFilesPaths.count() == 1) || (agentFilesPaths.count() == 2))
     {
         DefinitionM* agentDefinition = NULL;
-        //AgentMappingM* agentMapping = NULL;
+        AgentMappingM* agentMapping = NULL;
 
         // Only 1 file, it must be the definition
         if (agentFilesPaths.count() == 1)
@@ -669,7 +674,7 @@ void MasticModelManager::_importAgentFromFiles(QStringList agentFilesPaths)
                 if (agentDefinition != NULL)
                 {
                     // Create a model of agent mapping with the second JSON
-                    //agentMapping = _jsonHelper->createModelOfAgentMapping(agentDefinition->name(), byteArrayOfJson2);
+                    agentMapping = _jsonHelper->createModelOfAgentMapping(agentDefinition->name(), byteArrayOfJson2);
                 }
                 else
                 {
@@ -677,11 +682,11 @@ void MasticModelManager::_importAgentFromFiles(QStringList agentFilesPaths)
                     agentDefinition = _jsonHelper->createModelOfDefinition(byteArrayOfJson2);
 
                     // If succeeded
-                    /*if (agentDefinition != NULL)
+                    if (agentDefinition != NULL)
                     {
                         // Create a model of agent mapping with the first JSON
                         agentMapping = _jsonHelper->createModelOfAgentMapping(agentDefinition->name(), byteArrayOfJson1);
-                    }*/
+                    }
                 }
             }
             else {
@@ -694,6 +699,14 @@ void MasticModelManager::_importAgentFromFiles(QStringList agentFilesPaths)
             // Create a new model of agent with the name of the definition
             AgentM* agent = new AgentM(agentDefinition->name(), this);
 
+            // Set its definition
+            agent->setdefinition(agentDefinition);
+
+            if (agentMapping != NULL) {
+                // Set its mapping
+                agent->setmapping(agentMapping);
+            }
+
             // Add this new model of agent
             addAgentModel(agent);
 
@@ -701,10 +714,10 @@ void MasticModelManager::_importAgentFromFiles(QStringList agentFilesPaths)
             Q_EMIT agentModelCreated(agent);
 
             // Add this new model of agent definition
-            addAgentDefinition(agentDefinition);
+            //addAgentDefinition(agentDefinition);
 
             // Emit the signal "Agent Definition Created"
-            Q_EMIT agentDefinitionCreated(agentDefinition, agent);
+            //Q_EMIT agentDefinitionCreated(agentDefinition, agent);
 
             /*if (agentMapping != NULL)
             {
