@@ -357,11 +357,11 @@ void AgentVM::_updateWithAllModels()
  */
 void AgentVM::_updateIsON()
 {
-    bool globalIsON = true;
+    bool globalIsON = false;
 
     foreach (AgentM* model, _models.toList()) {
-        if ((model != NULL) && !model->isON()) {
-            globalIsON = false;
+        if ((model != NULL) && model->isON()) {
+            globalIsON = true;
             break;
         }
     }
@@ -374,11 +374,11 @@ void AgentVM::_updateIsON()
  */
 void AgentVM::_updateIsMuted()
 {
-    bool globalIsMuted = true;
+    bool globalIsMuted = false;
 
     foreach (AgentM* model, _models.toList()) {
-        if ((model != NULL) && !model->isMuted()) {
-            globalIsMuted = false;
+        if ((model != NULL) && model->isMuted()) {
+            globalIsMuted = true;
             break;
         }
     }
@@ -391,11 +391,11 @@ void AgentVM::_updateIsMuted()
  */
 void AgentVM::_updateIsFrozen()
 {
-    bool globalIsFrozen = true;
+    bool globalIsFrozen = false;
 
     foreach (AgentM* model, _models.toList()) {
-        if ((model != NULL) && !model->isFrozen()) {
-            globalIsFrozen = false;
+        if ((model != NULL) && model->isFrozen()) {
+            globalIsFrozen = true;
             break;
         }
     }
