@@ -21,6 +21,7 @@ import QtQuick.Controls.Styles 1.4
 import I2Quick 1.0
 
 import MASTIC 1.0
+import "../theme" as Theme
 
 
 Item {
@@ -104,10 +105,6 @@ Item {
                 Button {
                     id: removeButton
 
-                    property var boundingBox: MasticTheme.svgFileMASTIC.boundsOnElement("supprimer");
-                    height : boundingBox.height
-                    width :  boundingBox.width
-
                     visible : (model.isON === false)
 
                     anchors {
@@ -117,7 +114,7 @@ Item {
                         rightMargin: 10 + (offButton.width - removeButton.width)/2
                     }
 
-                    style: I2SvgButtonStyle {
+                    style: Theme.LabellessSvgButtonStyle {
                         fileCache: MasticTheme.svgFileMASTIC
 
                         pressedID: releasedID + "-pressed"
@@ -300,10 +297,6 @@ Item {
             Button {
                 id: offButton
 
-                property var boundingBox: MasticTheme.svgFileMASTIC.boundsOnElement("on");
-                height : boundingBox.height
-                width :  boundingBox.width
-
                 visible : (root.agent && !root.agent.hasOnlyDefinition)
                 enabled: visible
 
@@ -313,7 +306,7 @@ Item {
                     horizontalCenter: muteButton.horizontalCenter
                 }
 
-                style: I2SvgButtonStyle {
+                style: Theme.LabellessSvgButtonStyle {
                     fileCache: MasticTheme.svgFileMASTIC
 
                     pressedID: releasedID + "-pressed"
@@ -337,20 +330,12 @@ Item {
                     rightMargin: 10
                 }
 
-                style: I2SvgButtonStyle {
+                style: Theme.LabellessSvgButtonStyle {
                     fileCache: MasticTheme.svgFileMASTIC
 
                     pressedID: releasedID + "-pressed"
                     releasedID: model.isMuted? "muteactif" : "muteinactif"
                     disabledID : releasedID
-
-                    label : Item { }
-                    padding {
-                        left : 0
-                        right : 0
-                        top : 0
-                        bottom : 0
-                    }
                 }
 
                 onClicked: {
@@ -361,10 +346,6 @@ Item {
             Button {
                 id: freezeButton
 
-                property var boundingBox: MasticTheme.svgFileMASTIC.boundsOnElement("freezeactif");
-                height : boundingBox.height
-                width :  boundingBox.width
-
                 visible: model.canBeFrozen && (model.isON === true)
                 enabled : visible
 
@@ -374,13 +355,12 @@ Item {
                     rightMargin: 5
                 }
 
-                style: I2SvgButtonStyle {
+                style: Theme.LabellessSvgButtonStyle {
                     fileCache: MasticTheme.svgFileMASTIC
 
                     pressedID: releasedID + "-pressed"
                     releasedID: model.isFrozen? "freezeactif" : "freezeinactif"
                     disabledID : releasedID
-
                 }
 
                 onClicked: {

@@ -37,5 +37,6 @@
         <file>qml/scenario/ActionsList.qml</file>
         <file>qml/scenario/ActionEditor.qml</file>
         <file>resources/SVG/mastic-pictos.svg</file>
+        <file>qml/theme/LabellessSvgButtonStyle.qml</file>
     </qresource>
 </RCC>
