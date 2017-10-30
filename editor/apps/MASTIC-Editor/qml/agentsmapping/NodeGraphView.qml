@@ -235,6 +235,8 @@ Item {
 
             anchors.fill: parent
 
+            // Only accept drag events from AgentsListItem
+            keys: ["AgentsListItem"]
 
             // Get coordinates of drop
             function getDropCoordinates()
@@ -247,7 +249,7 @@ Item {
                 {
                     var dragItem = drag.source;
 
-                    console.log("source "+dragItem)
+                    // Check if our source has an "agent" property
                     if (typeof dragItem.agent !== 'undefined')
                     {
                         dragItem.opacity = 0;
@@ -255,13 +257,8 @@ Item {
                     }
                     else
                     {
-                        console.log("no agent "+dragItem.agent)
                         dropGhost.agent = null;
                     }
-                }
-                else
-                {
-                    console.log("no source "+ drag.source)
                 }
             }
 

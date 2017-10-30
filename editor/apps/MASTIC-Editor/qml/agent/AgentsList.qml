@@ -373,6 +373,7 @@ Item {
                 Drag.active: mouseArea.drag.active
                 Drag.hotSpot.x: 0
                 Drag.hotSpot.y: 0
+                Drag.keys: ["AgentsListItem"]
 
                 MouseArea {
                     id: mouseArea
