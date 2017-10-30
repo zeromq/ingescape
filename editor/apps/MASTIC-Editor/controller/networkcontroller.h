@@ -37,18 +37,24 @@ public:
 
     /**
      * @brief Default constructor
-     * @param network device
-     * @param ip address
-     * @param port number
      * @param parent
      */
-    explicit NetworkController(QString networkDevice, QString ipAddress, int port, QObject *parent = 0);
+    explicit NetworkController(QObject *parent = 0);
 
 
     /**
       * @brief Destructor
       */
     ~NetworkController();
+
+
+    /**
+     * @brief Start our MASTIC agent with a network device (or an IP address) and a port
+     * @param networkDevice
+     * @param ipAddress
+     * @param port
+     */
+    void start(QString networkDevice, QString ipAddress, int port);
 
 
     /**
@@ -159,7 +165,14 @@ public Q_SLOTS:
      */
     void onCommandAskedForOutput(QString command, QString outputName, QStringList peerIdsList);
 
+
 private:
+
+    // Name of our Mastic agent
+    QString _agentName;
+
+    // Our Mastic agent is successfully started if the result of mtic_startWithDevice / mtic_startWithIP is 1 (O otherwise)
+    int _isMasticAgentStarted;
 
     // Map from "Hostname" to the "Peer Id" of the corresponding MASTIC launcher
     QHash<QString, QString> _mapFromHostnameToMasticLauncherPeerId;
