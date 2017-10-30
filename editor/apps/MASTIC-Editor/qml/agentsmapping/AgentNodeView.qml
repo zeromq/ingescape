@@ -9,6 +9,7 @@
  *
  *	Contributors:
  *      Alexandre Lemort   <lemort@ingenuity.io>
+ *      Justine Limoges    <limoges@ingenuity.io>
  *
  */
 
@@ -497,10 +498,13 @@ Item {
 
                         Link {
                             id : linkDraggablePoint
+
                             parent : rootItem.parent
+
                             visible: draggablePointFROM.dragActive
+
                             secondPoint: Qt.point(myModel.position.x + draggablePointFROM.width/2 , myModel.position.y)
-                            firstPoint: Qt.point(draggablePointFROM.x + draggablePointFROM.width, draggablePointFROM.y + draggablePointFROM.height/2)
+                            firstPoint: Qt.point(draggablePointFROM.x + draggablePointFROM.width/2, draggablePointFROM.y + draggablePointFROM.height/2)
 
                             defaultColor:linkPoint.color
                         }
@@ -748,10 +752,12 @@ Item {
 
                         Link {
                             id : linkDraggablePointTO
+
                             parent : rootItem.parent
                             visible: draggablePointTO.dragActive
+
                             firstPoint: Qt.point(myModel.position.x + draggablePointTO.width/2 , myModel.position.y)
-                            secondPoint: Qt.point(draggablePointTO.x,draggablePointTO.y + draggablePointTO.height/2)
+                            secondPoint: Qt.point(draggablePointTO.x + draggablePointTO.width/2, draggablePointTO.y + draggablePointTO.height/2)
 
                             defaultColor:linkPointOut.color
                         }

@@ -87,16 +87,29 @@ Item {
     function showAll()
     {
         //TODO get the bounding box of all nodes from our controller
-        var x0 = Math.min(item1.x, Math.min(item2.x, Math.min(item3.x, Math.min(item4.x, item5.x))));
-        var y0 = Math.min(item1.y, Math.min(item2.y, Math.min(item3.y, Math.min(item4.y, item5.y))));
+        var x0 = Number.POSITIVE_INFINITY;
+        var y0 = Number.POSITIVE_INFINITY;
+        var x1 = Number.NEGATIVE_INFINITY;
+        var y1 = Number.NEGATIVE_INFINITY;
+        for (var index = 0; index < workspace.children.length; index++)
+        {
+            var child = workspace.children[index];
+console.log("child "+child+ " type "+(typeof child))
+            if (typeof child.x !== 'undefined')
+            {
+                console.log("child "+child+" "+child.x + " "+child.width)
+                x0 = Math.min(x0, child.x);
+                y0 = Math.min(y0, child.y);
 
-        var x1 = Math.max(item1.x + item1.width, Math.max(item2.x + item2.width, Math.max(item3.x + item3.width, Math.max(item4.x + item4.width, item5.x + item5.width))));
-        var y1 = Math.max(item1.y + item1.height, Math.max(item2.y + item2.height, Math.max(item3.y + item3.height, Math.max(item4.y + item4.height, item5.y + item5.height))));
+                x1 = Math.max(x1, child.x + child.width);
+                y1 = Math.max(y1, child.y + child.height);
+            }
+        }
 
         var margin = 5;
         var area = Qt.rect(x0 - margin, y0 - margin, x1 - x0 + 2 * margin, y1 - y0 + 2 * margin);
         //--------------------
-
+console.log("Area is "+area);
         _showArea(area);
     }
 
@@ -296,7 +309,9 @@ Item {
 
                 scrollGestureEnabled: true
 
-                onPressed: rootItem.forceActiveFocus();
+                onPressed: {
+                    rootItem.forceActiveFocus();
+                }
 
                 onWheel: {
                     wheel.accepted = true;
@@ -408,6 +423,7 @@ Item {
 
                     Link {
                         id : link
+
                         mapBetweenIOPVM: model.QtObject
                     }
                 }
@@ -423,6 +439,7 @@ Item {
 
                     AgentNodeView {
                         id: agent
+
                         agentMappingVM : model.QtObject
 
                         controller : rootItem.controller
