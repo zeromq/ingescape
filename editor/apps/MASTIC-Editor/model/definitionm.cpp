@@ -66,11 +66,9 @@ DefinitionM::~DefinitionM()
  */
 void DefinitionM::setisMutedOfOutput(bool isMuted, QString outputName)
 {
-    foreach (OutputM* output, _outputsList.toList()) {
-        if ((output != NULL) && (output->name() == outputName)) {
-            output->setisMuted(isMuted);
-            break;
-        }
+    OutputM* output = getOutputWithName(outputName);
+    if (output != NULL) {
+        output->setisMuted(isMuted);
     }
 }
 
@@ -107,7 +105,7 @@ void DefinitionM::_onInputsListChanged()
 
     _previousInputsList = newInputsList;
 
-    qDebug() << "Definition" << _name << "has inputs:" << _inputsIdsList;
+    //qDebug() << "Definition" << _name << "has inputs:" << _inputsIdsList;
 }
 
 
@@ -128,7 +126,7 @@ void DefinitionM::_onOutputsListChanged()
                 _outputsIdsList.append(output->id());
 
                 // Connect to signals from the output
-                connect(output, &OutputM::commandAsked, this, &DefinitionM::commandAsked);
+                connect(output, &OutputM::commandAsked, this, &DefinitionM::commandAskedForOutput);
                 //connect(output, &OutputM::isMutedChanged, this, &DefinitionM::_onIsMutedChanged);
             }
         }
@@ -143,7 +141,7 @@ void DefinitionM::_onOutputsListChanged()
                 _outputsIdsList.removeOne(output->id());
 
                 // DIS-connect from signals from the output
-                disconnect(output, &OutputM::commandAsked, this, &DefinitionM::commandAsked);
+                disconnect(output, &OutputM::commandAsked, this, &DefinitionM::commandAskedForOutput);
                 //disconnect(output, &OutputM::isMutedChanged, this, &DefinitionM::_onIsMutedChanged);
             }
         }
@@ -151,7 +149,7 @@ void DefinitionM::_onOutputsListChanged()
 
     _previousOutputsList = newOutputsList;
 
-    qDebug() << "Definition" << _name << "has outputs:" << _outputsIdsList;
+    //qDebug() << "Definition" << _name << "has outputs:" << _outputsIdsList;
 }
 
 
@@ -187,7 +185,7 @@ void DefinitionM::_onParametersListChanged()
 
     _previousParametersList = newParametersList;
 
-    qDebug() << "Definition" << _name << "has parameters:" << _parametersIdsList;
+    //qDebug() << "Definition" << _name << "has parameters:" << _parametersIdsList;
 }
 
 
@@ -233,6 +231,54 @@ bool DefinitionM::areIdenticals(DefinitionM* definition1, DefinitionM* definitio
     }
 
     return areIdenticals;
+}
+
+
+/**
+ * @brief Get an Input with its name
+ * @param name
+ * @return
+ */
+AgentIOPM* DefinitionM::getInputWithName(QString name)
+{
+    foreach (AgentIOPM* input, _inputsList.toList()) {
+        if ((input != NULL) && (input->name() == name)) {
+            return input;
+        }
+    }
+    return NULL;
+}
+
+
+/**
+ * @brief Get an Output with its name
+ * @param name
+ * @return
+ */
+OutputM* DefinitionM::getOutputWithName(QString name)
+{
+    foreach (OutputM* output, _outputsList.toList()) {
+        if ((output != NULL) && (output->name() == name)) {
+            return output;
+        }
+    }
+    return NULL;
+}
+
+
+/**
+ * @brief Get a Parameter with its name
+ * @param name
+ * @return
+ */
+AgentIOPM* DefinitionM::getParameterWithName(QString name)
+{
+    foreach (AgentIOPM* parameter, _parametersList.toList()) {
+        if ((parameter != NULL) && (parameter->name() == name)) {
+            return parameter;
+        }
+    }
+    return NULL;
 }
 
 

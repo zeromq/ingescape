@@ -96,14 +96,38 @@ public:
     static bool areIdenticals(DefinitionM* definition1, DefinitionM* definition2);
 
 
+    /**
+     * @brief Get an Input with its name
+     * @param name
+     * @return
+     */
+    AgentIOPM* getInputWithName(QString name);
+
+
+    /**
+     * @brief Get an Output with its name
+     * @param name
+     * @return
+     */
+    OutputM* getOutputWithName(QString name);
+
+
+    /**
+     * @brief Get a Parameter with its name
+     * @param name
+     * @return
+     */
+    AgentIOPM* getParameterWithName(QString name);
+
+
 Q_SIGNALS:
 
     /**
-     * @brief Signal emitted when a command must be sent on the network
+     * @brief Signal emitted when a command from an output must be sent on the network
      * @param command
      * @param outputName
      */
-    void commandAsked(QString command, QString outputName);
+    void commandAskedForOutput(QString command, QString outputName);
 
 
 public Q_SLOTS:
@@ -115,6 +139,7 @@ private Q_SLOTS:
      * @brief Slot when the list of inputs changed
      */
     void _onInputsListChanged();
+
 
     /**
      * @brief Slot when the list of outputs changed

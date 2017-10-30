@@ -26,13 +26,13 @@
  */
 AgentVM::AgentVM(AgentM* model, QObject *parent) : QObject(parent),
     _name(""),
-    _addresses(""),
-    _definition(NULL),
-    _hasOnlyDefinition(true),
+    _hostnames(""),
+    _neverAppearedOnNetwork(true),
     _isON(false),
     _isMuted(false),
     _canBeFrozen(false),
-    _isFrozen(false)
+    _isFrozen(false),
+    _definition(NULL)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -41,13 +41,12 @@ AgentVM::AgentVM(AgentM* model, QObject *parent) : QObject(parent),
     {
         // Init the name
         _name = model->name();
+        _neverAppearedOnNetwork = model->neverAppearedOnNetwork();
 
-        if (model->peerId().isEmpty()) {
-            _hasOnlyDefinition = true;
-            qInfo() << "New View Model of Agent" << _name << "with Only Definition";
+        if (_neverAppearedOnNetwork) {
+            qInfo() << "New View Model of Agent" << _name << "which never yet appeared on the network";
         }
         else {
-            _hasOnlyDefinition = false;
             qInfo() << "New View Model of Agent" << _name << "with peer id" << model->peerId();
         }
 
@@ -71,9 +70,10 @@ AgentVM::~AgentVM()
 {
     qInfo() << "Delete View Model of Agent" << _name;
 
-    if (_definition != NULL) {
-        setdefinition(NULL);
-    }
+    // Reset the definition
+    setdefinition(NULL);
+
+    disconnect(&_models, &AbstractI2CustomItemListModel::countChanged, this, &AgentVM::_onModelsChanged);
 
     // Clear the lists of models
     _previousAgentsList.clear();
@@ -108,25 +108,31 @@ void AgentVM::setname(QString value)
  * @brief Setter for property "Definition"
  * @param value
  */
-void AgentVM::setdefinition(DefinitionM *value)
+void AgentVM::setdefinition(DefinitionM* value)
 {
     if (_definition != value)
     {
+        DefinitionM* previousValue = _definition;
+
         // Previous value
-        if (_definition != NULL) {
+        if (previousValue != NULL) {
             // DIS-connect from signals from the previous definition
-            disconnect(_definition, 0, this, 0);
+            disconnect(previousValue, &DefinitionM::commandAskedForOutput, this, &AgentVM::onCommandAskedForOutput);
         }
 
         _definition = value;
 
         // New value
         if (_definition != NULL) {
-            // Connect to signal "Command Asked" from the new definition
-            connect(_definition, &DefinitionM::commandAsked, this, &AgentVM::onCommandAskedForOutput);
+            // Connect to signal from the new definition
+            connect(_definition, &DefinitionM::commandAskedForOutput, this, &AgentVM::onCommandAskedForOutput);
         }
 
+        // Emit simple signal for QML
         Q_EMIT definitionChanged(value);
+
+        // Emit signal with previous value
+        Q_EMIT definitionChangedWithPreviousValue(previousValue, _definition);
     }
 }
 
@@ -136,10 +142,11 @@ void AgentVM::setdefinition(DefinitionM *value)
  */
 void AgentVM::changeState()
 {
+    // is ON --> Kill all agents
     if (_isON) {
-        // FIXME TODO
         Q_EMIT commandAsked("DIE", _peerIdsList);
     }
+    // is OFF --> Execute all agents
     else {
         foreach (AgentM* model, _models.toList())
         {
@@ -205,11 +212,15 @@ void AgentVM::_onModelsChanged()
 
         for (AgentM* model : newAgentsList) {
             if ((model != NULL) && !_previousAgentsList.contains(model))
-            {   
+            {
+                //qDebug() << "New model" << model->name() << "ADDED (" << model->peerId() << ")";
+
                 // Connect to signals from a model
                 connect(model, &AgentM::isONChanged, this, &AgentVM::_onIsONofModelChanged);
                 connect(model, &AgentM::isMutedChanged, this, &AgentVM::_onIsMutedOfModelChanged);
                 connect(model, &AgentM::isFrozenChanged, this, &AgentVM::_onIsFrozenOfModelChanged);
+                connect(model, &AgentM::definitionChanged, this, &AgentVM::_onDefinitionOfModelChanged);
+                //connect(model, &AgentM::mappingChanged, this, &AgentVM::_onMappingOfModelChanged);
             }
         }
     }
@@ -221,16 +232,22 @@ void AgentVM::_onModelsChanged()
         for (AgentM* model : _previousAgentsList) {
             if ((model != NULL) && !newAgentsList.contains(model))
             {
+                //qDebug() << "Old model" << model->name() << "REMOVED (" << model->peerId() << ")";
+
                 // DIS-connect from signals from a model
-                disconnect(model, 0, this, 0);
+                disconnect(model, &AgentM::isONChanged, this, &AgentVM::_onIsONofModelChanged);
+                disconnect(model, &AgentM::isMutedChanged, this, &AgentVM::_onIsMutedOfModelChanged);
+                disconnect(model, &AgentM::isFrozenChanged, this, &AgentVM::_onIsFrozenOfModelChanged);
+                disconnect(model, &AgentM::definitionChanged, this, &AgentVM::_onDefinitionOfModelChanged);
+                //disconnect(model, &AgentM::mappingChanged, this, &AgentVM::_onMappingOfModelChanged);
             }
         }
     }
 
     _previousAgentsList = newAgentsList;
 
-    // Update with the list of models
-    _updateWithModels();
+    // Update with all models
+    _updateWithAllModels();
 }
 
 
@@ -242,7 +259,7 @@ void AgentVM::_onIsONofModelChanged(bool isON)
 {
     Q_UNUSED(isON)
 
-    // Update the flag "is ON" in function of flags of models
+    // Update the flag "is ON" in function of flags of all models
     _updateIsON();
 }
 
@@ -255,7 +272,7 @@ void AgentVM::_onIsMutedOfModelChanged(bool isMuted)
 {
     Q_UNUSED(isMuted)
 
-    // Update the flag "is Muted" in function of models
+    // Update the flag "is Muted" in function of all models
     _updateIsMuted();
 }
 
@@ -268,19 +285,31 @@ void AgentVM::_onIsFrozenOfModelChanged(bool isFrozen)
 {
     Q_UNUSED(isFrozen)
 
-    // Update the flag "is Frozen" in function of models
+    // Update the flag "is Frozen" in function of all models
     _updateIsFrozen();
 }
 
 
 /**
- * @brief Update with the list of models
+ * @brief Slot when the definition of a model changed
+ * @param definition
  */
-void AgentVM::_updateWithModels()
+void AgentVM::_onDefinitionOfModelChanged(DefinitionM* definition)
+{
+    Q_UNUSED(definition)
+
+    // Update with the definition of first model
+    _updateWithDefinitionOfFirstModel();
+}
+
+
+/**
+ * @brief Update with all models of agents
+ */
+void AgentVM::_updateWithAllModels()
 {
     _peerIdsList.clear();
-    QStringList addressesList;
-    QString globalAddresses = "";
+    QStringList hostnamesList;
     bool globalCanBeFrozen = true;
 
     foreach (AgentM* model, _models.toList()) {
@@ -290,11 +319,8 @@ void AgentVM::_updateWithModels()
                 _peerIdsList.append(model->peerId());
             }
 
-            /*if (!addressesList.contains(model->address())) {
-                addressesList.append(model->address());
-            }*/
-            if (!addressesList.contains(model->hostname())) {
-                addressesList.append(model->hostname());
+            if (!hostnamesList.contains(model->hostname())) {
+                hostnamesList.append(model->hostname());
             }
 
             if (!model->canBeFrozen()) {
@@ -303,22 +329,26 @@ void AgentVM::_updateWithModels()
         }
     }
 
-    for (int i = 0; i < addressesList.count(); i++) {
+    QString globalHostnames = "";
+    for (int i = 0; i < hostnamesList.count(); i++) {
         if (i == 0) {
-            globalAddresses = addressesList.at(i);
+            globalHostnames = hostnamesList.at(i);
         }
         else {
-            globalAddresses = QString("%1, %2").arg(globalAddresses, addressesList.at(i));
+            globalHostnames = QString("%1, %2").arg(globalHostnames, hostnamesList.at(i));
         }
     }
 
-    setaddresses(globalAddresses);
+    sethostnames(globalHostnames);
     setcanBeFrozen(globalCanBeFrozen);
 
     // Update flags in function of models
     _updateIsON();
     _updateIsMuted();
     _updateIsFrozen();
+
+    // Update with the definition of first model
+    _updateWithDefinitionOfFirstModel();
 }
 
 
@@ -335,7 +365,6 @@ void AgentVM::_updateIsON()
             break;
         }
     }
-
     setisON(globalIsON);
 }
 
@@ -353,7 +382,6 @@ void AgentVM::_updateIsMuted()
             break;
         }
     }
-
     setisMuted(globalIsMuted);
 }
 
@@ -371,6 +399,21 @@ void AgentVM::_updateIsFrozen()
             break;
         }
     }
-
     setisFrozen(globalIsFrozen);
+}
+
+
+/**
+ * @brief Update with the definition of first model
+ */
+void AgentVM::_updateWithDefinitionOfFirstModel()
+{
+    DefinitionM* definition = NULL;
+    if (_models.count() > 0) {
+         AgentM* model = _models.at(0);
+         if (model != NULL) {
+             definition = model->definition();
+         }
+    }
+    setdefinition(definition);
 }

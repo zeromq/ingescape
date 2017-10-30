@@ -247,11 +247,6 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
                 // Emit the signal "Mapping Received"
                 Q_EMIT networkController->mappingReceived(peerId, peerName, message);
             }
-            else if (message.startsWith("MAPPED"))
-            {
-                // FIXME TODO
-                qDebug() << peerName << "MAPPED" << message;
-            }
             // MUTED / UN-MUTED
             else if (message.startsWith(mutedAllPrefix))
             {
@@ -288,6 +283,12 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
                     Q_EMIT networkController->isFrozenFromAgentUpdated(peerId, true);
                 }
             }
+            // MAPPED
+            /*else if (message.startsWith("MAPPED"))
+            {
+                // FIXME Nothing TODO ?
+                //qDebug() << peerName << "MAPPED" << message;
+            }*/
             else
             {
                 qDebug() << "Unknown message received:" << message;
@@ -348,7 +349,7 @@ NetworkController::NetworkController(QString networkDevice, QString ipAddress, i
     QFileInfo checkDefinitionFile(myDefinitionPath);
     if (!checkDefinitionFile.exists() || !checkDefinitionFile.isFile())
     {
-        qWarning() << "No definition has been found : " << myDefinitionPath << ". Set definition by default";
+        qWarning() << "No definition has been found : " << myDefinitionPath << ". Set default definition";
         // Set definition and mapping by default to editor
         QString definitionByDefault = "{  \
                                       \"definition\": {  \
@@ -369,7 +370,7 @@ NetworkController::NetworkController(QString networkDevice, QString ipAddress, i
     QFileInfo checkMappingFile(myMappingPath);
     if (!checkMappingFile.exists() || !checkMappingFile.isFile())
     {
-        qWarning() << "No mapping has been found : " << myMappingPath << ". Set definition by default";
+        qWarning() << "No mapping has been found : " << myMappingPath << ". Set default mapping";
         QString mappingByDefault = "{      \
                                       \"mapping\": {    \
                                       \"name\": \""+agentName+"\",   \

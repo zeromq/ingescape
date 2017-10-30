@@ -110,7 +110,7 @@ public:
      * @param definitionName
      * @return
      */
-    QList<DefinitionM*> getAgentDefinitionsListFromName(QString definitionName);
+    QList<DefinitionM*> getAgentDefinitionsListFromDefinitionName(QString definitionName);
 
 
     /**
@@ -124,7 +124,7 @@ public:
      * @brief Add a model of agent mapping
      * @param agentMapping
      */
-    //void addAgentMapping(AgentMappingM* agentMapping);
+    void addAgentMapping(AgentMappingM* agentMapping);
 
 
     /**
@@ -132,7 +132,14 @@ public:
      * @param name
      * @return
      */
-    //QList<AgentMappingM*> getAgentMappingsListFromName(QString mappingName);
+    QList<AgentMappingM*> getAgentMappingsListFromMappingName(QString mappingName);
+
+
+    /**
+     * @brief Delete a model of agent mapping
+     * @param agentMapping
+     */
+    void deleteAgentMapping(AgentMappingM* agentMapping);
 
 
     /**
@@ -197,7 +204,7 @@ Q_SIGNALS:
      * @param definition
      * @param agent
      */
-    void agentDefinitionCreated(DefinitionM* definition, AgentM* agent);
+    //void agentDefinitionCreated(DefinitionM* definition, AgentM* agent);
 
 
     /**
@@ -213,15 +220,6 @@ Q_SIGNALS:
      * @param mappingElement
      */
     void mappingElementCreated(ElementMappingM* mappingElement);
-
-
-    /**
-     * @brief Signal emitted when the flag "is Muted" from an output of agent updated
-     * @param agent
-     * @param isMuted
-     * @param outputName
-     */
-    void isMutedFromOutputOfAgentUpdated(AgentM* agent, bool isMuted, QString outputName);
 
 
 public Q_SLOTS:
@@ -315,7 +313,7 @@ private:
 
 
     /**
-     * @brief Update definition variants of a list of definitions with the same name
+     * @brief Update definition variants of the list of definitions with the same name
      * @param definitionName
      */
     void _updateDefinitionVariants(QString definitionName);
@@ -335,6 +333,24 @@ private:
      * @param agentName
      */
     void _cleanMergedListsOfMappingElementsForAgentName(QString agentName);
+
+
+    /**
+     * @brief Print all models of agents (for Debug)
+     */
+    void _printAgents();
+
+
+    /**
+     * @brief Print all models of agent definitions (for Debug)
+     */
+    void _printDefinitions();
+
+
+    /**
+     * @brief Print all models of agent mappings (for Debug)
+     */
+    void _printMappings();
 
 
 private:
@@ -360,7 +376,7 @@ private:
     QHash<QString, QList<DefinitionM*>> _mapFromNameToAgentDefinitionsList;
 
     // Map from "mapping name" to a list (of models) of agent mapping
-    //QHash<QString, QList<AgentMappingM*>> _mapFromNameToAgentMappingsList;
+    QHash<QString, QList<AgentMappingM*>> _mapFromNameToAgentMappingsList;
 
     // Map from agent name to the merged list of all (models of) mapping elements which connect an input of the agent
     QHash<QString, QList<ElementMappingM*>> _mapFromAgentNameToMergedListOfInputMappingElements;

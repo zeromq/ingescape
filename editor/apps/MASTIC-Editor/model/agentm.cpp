@@ -52,10 +52,15 @@ AgentM::AgentM(QString name,
     _isON(false),
     _isMuted(false),
     _canBeFrozen(false),
-    _isFrozen(false)
+    _isFrozen(false),
+    _definition(NULL),
+    _mapping(NULL)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
+
+    // Init flag indicating if our agent never yet appeared on the network
+    _neverAppearedOnNetwork = _peerId.isEmpty();
 
     qInfo() << "New Model of Agent" << _name << "(" << _peerId << ") at" << _address;
 }
@@ -67,6 +72,26 @@ AgentM::AgentM(QString name,
 AgentM::~AgentM()
 {
     qInfo() << "Delete Model of Agent" << _name << "(" << _peerId << ") at" << _address;
+
+    // Delete our agent definition
+    if (_definition != NULL) {
+        //disconnect(_definition);
+
+        //DefinitionM* temp = _definition;
+        setdefinition(NULL);
+        //delete temp;
+        //temp = NULL;
+    }
+
+    // Delete our agent mapping
+    if (_mapping != NULL) {
+        //disconnect(_mapping);
+
+        //AgentMappingM* temp = _mapping;
+        setmapping(NULL);
+        //delete temp;
+        //temp = NULL;
+    }
 }
 
 
@@ -75,7 +100,9 @@ AgentM::~AgentM()
  * @param isMuted
  * @param outputName
  */
-/*void AgentM::setisMutedOfOutput(bool isMuted, QString outputName)
+void AgentM::setisMutedOfOutput(bool isMuted, QString outputName)
 {
-
-}*/
+    if (_definition != NULL) {
+        _definition->setisMutedOfOutput(isMuted, outputName);
+    }
+}

@@ -115,8 +115,6 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
 
     // Connect to signals from the model manager
     connect(_modelManager, &MasticModelManager::agentModelCreated, _agentsSupervisionC, &AgentsSupervisionController::onAgentModelCreated);
-    connect(_modelManager, &MasticModelManager::agentDefinitionCreated, _agentsSupervisionC, &AgentsSupervisionController::onAgentDefinitionCreated);
-    connect(_modelManager, &MasticModelManager::isMutedFromOutputOfAgentUpdated, _agentsSupervisionC, &AgentsSupervisionController::onIsMutedFromOutputOfAgentUpdated);
     connect(_modelManager, &MasticModelManager::isActivatedMappingChanged, _agentsMappingC, &AgentsMappingController::onIsActivatedMappingChanged);
 
 
@@ -124,7 +122,6 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     connect(_agentsSupervisionC, &AgentsSupervisionController::commandAskedToLauncher, _networkC, &NetworkController::onCommandAskedToLauncher);
     connect(_agentsSupervisionC, &AgentsSupervisionController::commandAsked, _networkC, &NetworkController::onCommandAsked);
     connect(_agentsSupervisionC, &AgentsSupervisionController::commandAskedForOutput, _networkC, &NetworkController::onCommandAskedForOutput);
-    connect(_agentsSupervisionC, &AgentsSupervisionController::agentDefinitionManaged, _agentsMappingC, &AgentsMappingController::addAgentDefinitionToMapping);
 
 
     // Initialize agents list from default file

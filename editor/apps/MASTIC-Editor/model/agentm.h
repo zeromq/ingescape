@@ -21,7 +21,8 @@
 
 #include <I2PropertyHelpers.h>
 
-#include <model/iop/agentiopm.h>
+#include <model/definitionm.h>
+#include <model/agentmappingm.h>
 
 
 /**
@@ -35,7 +36,11 @@ class AgentM : public QObject
     I2_QML_PROPERTY(QString, name)
 
     // Peer ID of our agent (unique identifier)
-    I2_QML_PROPERTY_READONLY(QString, peerId)
+    I2_CPP_NOSIGNAL_PROPERTY(QString, peerId)
+
+    // Flag indicating if our agent never yet appeared on the network
+    // It has only a definition (and evetually a mapping)
+    I2_QML_PROPERTY_READONLY(bool, neverAppearedOnNetwork)
 
     // Address of our agent
     I2_QML_PROPERTY_READONLY(QString, address)
@@ -53,7 +58,7 @@ class AgentM : public QObject
     I2_QML_PROPERTY_READONLY(QString, hostname)
 
     // Execution path of our agent
-    I2_QML_PROPERTY_READONLY(QString, executionPath)
+    I2_CPP_NOSIGNAL_PROPERTY(QString, executionPath)
 
     // Process Id of our agent
     I2_CPP_NOSIGNAL_PROPERTY(int, pid)
@@ -75,6 +80,12 @@ class AgentM : public QObject
 
     // Status defined by the agent
     //I2_QML_PROPERTY_READONLY(QString, status)
+
+    // Definition of our agent
+    I2_QML_PROPERTY_READONLY(DefinitionM*, definition)
+
+    // Mapping of our agent
+    I2_QML_PROPERTY_READONLY(AgentMappingM*, mapping)
 
 
 public:
@@ -111,7 +122,7 @@ public:
      * @param isMuted
      * @param outputName
      */
-    //void setisMutedOfOutput(bool isMuted, QString outputName);
+    void setisMutedOfOutput(bool isMuted, QString outputName);
 
 
 Q_SIGNALS:

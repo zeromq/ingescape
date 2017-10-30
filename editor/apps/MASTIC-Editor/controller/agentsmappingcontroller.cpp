@@ -327,7 +327,7 @@ void AgentsMappingController::onIsActivatedMappingChanged(bool isActivatedMappin
 
                     // FIXME VINCENT: En attendant de regrouper au sein de la classe AgentM: la définition et le mapping
                     if (activeAgentsList.count() == 1) {
-                        QList<DefinitionM*> definitionsList = _modelManager->getAgentDefinitionsListFromName(agentName);
+                        QList<DefinitionM*> definitionsList = _modelManager->getAgentDefinitionsListFromDefinitionName(agentName);
 
                         foreach (DefinitionM* definition, definitionsList) {
                             if (definition != NULL) {
