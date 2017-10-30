@@ -64,20 +64,12 @@ Q_SIGNALS:
 public Q_SLOTS:
 
     /**
-     * @brief Slot when a new model of agent definition must be added to current mapping
+     * @brief Slot when an agent from the list is dropped on the current mapping at a position
      * @param agentName
-     * @param definition
-     */
-    void addAgentDefinitionToMapping(QString agentName, bool isON, DefinitionM* definition);
-
-
-    /**
-     * @brief Slot when a new model of agent definition must be added to current mapping at a specific position
-     * @param agentName
-     * @param definition
+     * @param list
      * @param position
      */
-    void addAgentDefinitionToMappingAtPosition(QString agentName, bool isON, DefinitionM* definition, QPointF position);
+    void addAgentToMappingAtPosition(QString agentName, AbstractI2CustomItemListModel* list, QPointF position);
 
 
     /**
@@ -109,6 +101,16 @@ private Q_SLOTS:
      * @brief Slot when the list of "Agents in Mapping" changed
      */
     void _onAgentsInMappingChanged();
+
+
+private:
+    /**
+     * @brief Add new model(s) of agent to the current mapping at a specific position
+     * @param agentName
+     * @param agentsList
+     * @param position
+     */
+    void _addAgentModelsToMappingAtPosition(QString agentName, QList<AgentM*> agentsList, QPointF position);
 
 
 private:

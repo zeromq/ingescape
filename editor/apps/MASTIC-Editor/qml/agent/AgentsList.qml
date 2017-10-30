@@ -419,7 +419,7 @@ Item {
 
                                 if (MasticEditorC.agentsMappingC)
                                 {
-                                    MasticEditorC.agentsMappingC.addAgentDefinitionToMappingAtPosition(model.QtObject.name, model.QtObject.isON, model.QtObject.definition, dropPosition);
+                                    MasticEditorC.agentsMappingC.addAgentToMappingAtPosition(model.QtObject.name, model.QtObject.models, dropPosition);
                                 }
                             }
                             else

@@ -57,87 +57,20 @@ AgentsMappingController::~AgentsMappingController()
 
 
 /**
- * @brief Slot when a new model of agent definition must be added to current mapping
+ * @brief Slot when an agent from the list is dropped on the current mapping at a position
  * @param agentName
- * @param definition
- */
-void AgentsMappingController::addAgentDefinitionToMapping(QString agentName, bool isON, DefinitionM* definition)
-{
-    addAgentDefinitionToMappingAtPosition(agentName, isON, definition, QPointF());
-}
-
-
-/**
- * @brief Slot when a new model of agent definition must be added to current mapping at a specific position
- * @param agentName
- * @param definition
+ * @param list
  * @param position
  */
-void AgentsMappingController::addAgentDefinitionToMappingAtPosition(QString agentName, bool isON, DefinitionM* definition, QPointF position)
+void AgentsMappingController::addAgentToMappingAtPosition(QString agentName, AbstractI2CustomItemListModel* list, QPointF position)
 {
-    if (!agentName.isEmpty() && (definition != NULL))
-    {
-        // Position is NOT defined (from network)
-        if (position.isNull())
-        {
-            qInfo() << "TODO ESTIA: add VM for agent name" << agentName << "and definition" << definition->name();
-        }
-        // Position is defined (by Drag & Drop)
-        else
-        {
-            qInfo() << "TODO ESTIA: add VM for agent name" << agentName << "and definition" << definition->name() << "at ( " << position.x() << " ; " << position.y() << " ).";
-        }
-
-        AgentInMappingVM * newAgentInMapping = NULL;
-
-        //Extract the name of tha agent
-        QString agentName = definition->name();
-
-
-        //Check if it's already in the list
-        bool exists = _mapFromNameToAgentInMappingViewModelsList.contains(agentName);
-
-
-        //if yes only add the definition to the corresponding item
-        //if not instanciate and add it
-        if(exists)
-        {
-            newAgentInMapping  = _mapFromNameToAgentInMappingViewModelsList.value(agentName);
-
-            newAgentInMapping->addDefinitionInInternalList(definition);
-
-            qInfo() << "The agent mapping already existing, new definition added to : " << agentName;
-        }
-        else
-        {
-
-
-            //Create new Agent In Mapping
-            newAgentInMapping = new AgentInMappingVM(definition,
-                                                     position,
-                                                     this);
-            newAgentInMapping->setisON(isON);
-
-            //Add in the map list
-            _mapFromNameToAgentInMappingViewModelsList.insert(agentName,newAgentInMapping);
-
-            //Add this new Agent In Mapping VM in the list for the qml
-            _agentInMappingVMList.append(newAgentInMapping);
-
-            //Call for the fist shot the another call will be proceed by the connect mechanism
-            createMapBetweenIopInMappingFromAgentName(newAgentInMapping->agentName());
-
-            //TODOESTIA createMapBetweenIopInMappingFromAgent(AgentInMappingVM* )
-            // Connect to signal "new Definition added to agent in mapping" from the new definition
-            connect(newAgentInMapping, &AgentInMappingVM::newDefinitionInAgentMapping,
-                    this, &AgentsMappingController::createMapBetweenIopInMappingFromAgentName);
-
-
-            qInfo() << "A new agent mapping has been added : " << agentName << " from new definition";
-        }
+    I2CustomItemListModel<AgentM>* agentsList = dynamic_cast<I2CustomItemListModel<AgentM>*>(list);
+    if (agentsList != NULL) {
+        // Add new model(s) of agent to the current mapping at a specific position
+        _addAgentModelsToMappingAtPosition(agentName, agentsList->toList(), position);
     }
-
 }
+
 
 /**
  * @brief Slot when a new view model of a agent mapping is created on the main view mapping.
@@ -323,18 +256,9 @@ void AgentsMappingController::onIsActivatedMappingChanged(bool isActivatedMappin
 
                 foreach (QString agentName, mapFromAgentNameToActiveAgentsList.keys()) {
                     QList<AgentM*> activeAgentsList = mapFromAgentNameToActiveAgentsList.value(agentName);
-                    qDebug() << "Create an AgentMappingVM for name" << agentName << "and with definitions of" << activeAgentsList.count() << "agents";
 
-                    // FIXME VINCENT: En attendant de regrouper au sein de la classe AgentM: la définition et le mapping
-                    if (activeAgentsList.count() == 1) {
-                        QList<DefinitionM*> definitionsList = _modelManager->getAgentDefinitionsListFromDefinitionName(agentName);
-
-                        foreach (DefinitionM* definition, definitionsList) {
-                            if (definition != NULL) {
-                                addAgentDefinitionToMappingAtPosition(agentName, true, definition, QPointF());
-                            }
-                        }
-                    }
+                    // Add new model(s) of agent to the current mapping
+                    _addAgentModelsToMappingAtPosition(agentName, activeAgentsList, QPointF());
                 }
             }
         }
@@ -360,4 +284,80 @@ void AgentsMappingController::_onAgentsInMappingChanged()
     else {
         setisEmptyMapping(false);
     }
+}
+
+
+/**
+ * @brief Add new model(s) of agent to the current mapping at a specific position
+ * @param agentName
+ * @param agentsList
+ * @param position
+ */
+void AgentsMappingController::_addAgentModelsToMappingAtPosition(QString agentName, QList<AgentM*> agentsList, QPointF position)
+{
+    if (!agentName.isEmpty() && (agentsList.count() > 0))
+    {
+        // Position is NOT defined (from network)
+        if (position.isNull())
+        {
+            qDebug() << "Create an Agent Mapping VM for name" << agentName << "and with definitions of" << agentsList.count() << "agents";
+        }
+        // Position is defined (by Drag & Drop)
+        else
+        {
+            qDebug() << "Create an Agent Mapping VM for name" << agentName << "and with definitions of" << agentsList.count() << "agents at ( " << position.x() << " ; " << position.y() << " ).";
+        }
+
+        AgentInMappingVM * newAgentInMapping = NULL;
+
+        // FIXME: juste pour pouvoir compiler... TODOESTIA
+        DefinitionM* definition = NULL;
+        AgentM* agent = agentsList.first();
+        if (agent != NULL) {
+            definition = agent->definition();
+        }
+
+        //Check if it's already in the list
+        bool exists = _mapFromNameToAgentInMappingViewModelsList.contains(agentName);
+
+
+        //if yes only add the definition to the corresponding item
+        //if not instanciate and add it
+        if(exists)
+        {
+            newAgentInMapping  = _mapFromNameToAgentInMappingViewModelsList.value(agentName);
+
+            newAgentInMapping->addDefinitionInInternalList(definition);
+
+            qInfo() << "The agent mapping already existing, new definition added to : " << agentName;
+        }
+        else
+        {
+
+
+            //Create new Agent In Mapping
+            newAgentInMapping = new AgentInMappingVM(definition,
+                                                     position,
+                                                     this);
+            newAgentInMapping->setisON(agent->isON());
+
+            //Add in the map list
+            _mapFromNameToAgentInMappingViewModelsList.insert(agentName,newAgentInMapping);
+
+            //Add this new Agent In Mapping VM in the list for the qml
+            _agentInMappingVMList.append(newAgentInMapping);
+
+            //Call for the fist shot the another call will be proceed by the connect mechanism
+            createMapBetweenIopInMappingFromAgentName(newAgentInMapping->agentName());
+
+            //TODOESTIA createMapBetweenIopInMappingFromAgent(AgentInMappingVM* )
+            // Connect to signal "new Definition added to agent in mapping" from the new definition
+            connect(newAgentInMapping, &AgentInMappingVM::newDefinitionInAgentMapping,
+                    this, &AgentsMappingController::createMapBetweenIopInMappingFromAgentName);
+
+
+            qInfo() << "A new agent mapping has been added : " << agentName << " from new definition";
+        }
+    }
+
 }
