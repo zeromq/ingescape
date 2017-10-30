@@ -452,6 +452,7 @@ Item {
                         Drag.active: mouseAreaPointFROM.drag.active;
                         Drag.hotSpot.x: width/2
                         Drag.hotSpot.y: height/2
+                        Drag.keys: ["InputSlotItem"]
 
                         border {
                             width : 1
@@ -555,16 +556,24 @@ Item {
                     DropArea {
                         id: inputDropArea
 
-                        anchors.fill: linkPoint
+                        anchors {
+                            fill: linkPoint
+                            margins: -3
+                        }
+
+                        // Only accept drag events from output slot items
+                        keys: ["OutputSlotItem"]
 
                         onEntered: {
-                            console.log("drag enter ")
+                            console.log("inputDropArea: drag enter ");
 
                             if (drag.source !== null)
                             {
                                 var dragItem = drag.source;
 
-                                console.log("source "+dragItem)
+                                // NB: the "keys" property can be used to know the type of source
+                                console.log("inputDropArea: keys "+drag.keys)
+                                console.log("inputDropArea: source "+dragItem)
                                 if (typeof dragItem.dragActive !== 'undefined')
                                 {
                                     dragItem.color = dragItem.border.color;
@@ -572,21 +581,23 @@ Item {
                                 }
                                 else
                                 {
-                                    console.log("no dragActive "+dragItem.agent)
+                                    console.log("inputDropArea: no dragActive "+dragItem.agent)
                                 }
                             }
                             else
                             {
-                                console.log("no source "+ drag.source)
+                                console.log("inputDropArea: no source "+ drag.source)
                             }
                         }
 
 
                         onPositionChanged: {
+                            console.log("inputDropArea: onPositionChanged");
                         }
 
 
                         onExited: {
+                            console.log("inputDropArea: onExited");
                             var dragItem = drag.source;
                             if (typeof dragItem.dragActive !== 'undefined')
                             {
@@ -692,6 +703,7 @@ Item {
                         Drag.active: draggablePointTO.dragActive;
                         Drag.hotSpot.x: 0
                         Drag.hotSpot.y: 0
+                        Drag.keys: ["OutputSlotItem"]
 
                         color : draggablePointTO.dragActive? MasticTheme.agentsMappingBackgroundColor : "transparent"
                         parent : draggablePointTO.dragActive? rootItem.parent  : linkPointOut
@@ -792,6 +804,66 @@ Item {
                             visible : myModel.modelM && myModel.modelM.isMuted
                         }
                     }
+
+
+
+                    DropArea {
+                        id: outputDropArea
+
+                        anchors {
+                            fill: linkPointOut
+                            margins: -3
+                        }
+
+                        // Only accept drag events from input slot items
+                        keys: ["InputSlotItem"]
+
+                        onEntered: {
+                            console.log("outputDropArea: drag enter ");
+
+                            if (drag.source !== null)
+                            {
+                                var dragItem = drag.source;
+
+                                // NB: the "keys" property can be used to know the type of source
+                                console.log("outputDropArea: keys "+drag.keys)
+                                console.log("outputDropArea: source "+dragItem)
+                                if (typeof dragItem.dragActive !== 'undefined')
+                                {
+                                    dragItem.color = dragItem.border.color;
+                                    linkPointOut.border.width = 2
+                                }
+                                else
+                                {
+                                    console.log("outputDropArea: no dragActive "+dragItem.agent)
+                                }
+                            }
+                            else
+                            {
+                                console.log("outputDropArea: no source "+ drag.source)
+                            }
+                        }
+
+
+                        onPositionChanged: {
+                            console.log("outputDropArea: onPositionChanged");
+                        }
+
+
+                        onExited: {
+                            console.log("outputDropArea: onExited");
+                            var dragItem = drag.source;
+                            if (typeof dragItem.dragActive !== 'undefined')
+                            {
+                                dragItem.color = "transparent";
+                                linkPointOut.border.width = 0
+                            }
+                        }
+
+                    }
+
+
+
 
 
                     //
