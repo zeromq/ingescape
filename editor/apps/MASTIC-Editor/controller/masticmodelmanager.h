@@ -99,10 +99,11 @@ public:
 
 
     /**
-     * @brief Add a model of agent definition
-     * @param definition
+     * @brief Add a model of agent definition for an agent name
+     * @param agentDefinition
+     * @param agentName
      */
-    void addAgentDefinition(DefinitionM* definition);
+    void addAgentDefinitionForAgentName(DefinitionM* agentDefinition, QString agentName);
 
 
     /**
@@ -121,10 +122,11 @@ public:
 
 
     /**
-     * @brief Add a model of agent mapping
+     * @brief Add a model of agent mapping for an agent name
      * @param agentMapping
+     * @param agentName
      */
-    void addAgentMapping(AgentMappingM* agentMapping);
+    void addAgentMappingForAgentName(AgentMappingM* agentMapping, QString agentName);
 
 
     /**
@@ -200,26 +202,10 @@ Q_SIGNALS:
 
 
     /**
-     * @brief Signal emitted when a new model of agent definition has been created
-     * @param definition
+     * @brief Signal emitted when a model of agent will be deleted
      * @param agent
      */
-    //void agentDefinitionCreated(DefinitionM* definition, AgentM* agent);
-
-
-    /**
-     * @brief Signal emitted when a new model of agent mapping has been created
-     * @param agentMapping
-     * @param agent
-     */
-    //void agentMappingCreated(AgentMappingM* agentMapping, AgentM* agent);
-
-
-    /**
-     * @brief Signal emitted when a new model of mapping element has been created
-     * @param mappingElement
-     */
-    void mappingElementCreated(ElementMappingM* mappingElement);
+    void agentModelWillBeDeleted(AgentM* agent);
 
 
 public Q_SLOTS:
@@ -324,8 +310,7 @@ private:
      * @param agentName
      * @param agentMapping
      */
-    //void _updateMergedListsOfMappingElementsForAgentName(QString agentName, AgentMappingM* agentMapping);
-    void _updateMergedListsOfMappingElementsForAgentName(QString agentName, QList<ElementMappingM*> mappingElementsList);
+    void _updateMergedListsOfMappingElementsForAgentName(QString agentName, AgentMappingM* agentMapping);
 
 
     /**
