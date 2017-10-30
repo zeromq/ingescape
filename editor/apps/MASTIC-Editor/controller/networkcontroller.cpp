@@ -325,37 +325,40 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
 
 /**
  * @brief Default constructor
- * @param network device
- * @param ip address
- * @param port number
  * @param parent
  */
-NetworkController::NetworkController(QString networkDevice, QString ipAddress, int port, QObject *parent) : QObject(parent)
+NetworkController::NetworkController(QObject *parent) : QObject(parent),
+    _isMasticAgentStarted(0)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    // Application name
-    QString agentName = QApplication::instance()->applicationName();
-
-    // Network is ok if the result of mtic_startWithDevice is 1, O otherwise.
-    int networkInitialized = 0;
+    // Init the name of our Mastic agent with the application name
+    _agentName = QApplication::instance()->applicationName();
+    QString organizationName = QApplication::instance()->organizationName();
+    QString version = QApplication::instance()->applicationVersion();
 
     // Set trace mode
     mtic_setVerbose(true);
 
+    // Set the name of our agent
+    mtic_setAgentName(_agentName.toStdString().c_str());
+
+    //
     // Read our internal definition
+    //
     QString myDefinitionPath = QString("%1definition.json").arg(MasticEditorUtils::getDataPath());
     QFileInfo checkDefinitionFile(myDefinitionPath);
     if (!checkDefinitionFile.exists() || !checkDefinitionFile.isFile())
     {
         qWarning() << "No definition has been found : " << myDefinitionPath << ". Set default definition";
+
         // Set definition and mapping by default to editor
         QString definitionByDefault = "{  \
                                       \"definition\": {  \
-                                      \"name\": \""+agentName+"\",   \
-                                      \"description\": \"Definition of "+agentName+" made by "+QApplication::instance()->organizationName()+"\",  \
-                                      \"version\": \""+QApplication::instance()->applicationVersion()+"\",  \
+                                      \"name\": \""+ _agentName + "\",   \
+                                      \"description\": \"Definition of " + _agentName + " made by "+ organizationName +"\",  \
+                                      \"version\": \"" + version + "\",  \
                                       \"parameters\": [],   \
                                       \"inputs\": [],       \
                                       \"outputs\": [] }}";
@@ -365,7 +368,10 @@ NetworkController::NetworkController(QString networkDevice, QString ipAddress, i
         mtic_loadDefinitionFromPath(myDefinitionPath.toStdString().c_str());
     }
 
+
+    //
     // Read our internal mapping
+    //
     QString myMappingPath = QString("%1mapping.json").arg(MasticEditorUtils::getDataPath());
     QFileInfo checkMappingFile(myMappingPath);
     if (!checkMappingFile.exists() || !checkMappingFile.isFile())
@@ -373,9 +379,9 @@ NetworkController::NetworkController(QString networkDevice, QString ipAddress, i
         qWarning() << "No mapping has been found : " << myMappingPath << ". Set default mapping";
         QString mappingByDefault = "{      \
                                       \"mapping\": {    \
-                                      \"name\": \""+agentName+"\",   \
-                                      \"description\": \"Mapping of "+agentName+" made by "+QApplication::instance()->organizationName()+"\",  \
-                                      \"version\": \""+QApplication::instance()->applicationVersion()+"\",  \
+                                      \"name\": \"" + _agentName + "\",   \
+                                      \"description\": \"Mapping of " + _agentName + " made by "+ organizationName + "\",  \
+                                      \"version\": \"" + version + "\",  \
                                       \"mapping_out\": [],   \
                                       \"mapping_cat\": [] }}";
 
@@ -385,34 +391,6 @@ NetworkController::NetworkController(QString networkDevice, QString ipAddress, i
     else {
         mtic_loadMappingFromPath(myMappingPath.toStdString().c_str());
     }
-
-    mtic_setAgentName(agentName.toStdString().c_str());
-
-    // Start service with network device
-    if (!networkDevice.isEmpty())
-    {
-        networkInitialized = mtic_startWithDevice(networkDevice.toStdString().c_str(), port);
-    }
-
-    // Start service with ip if start with network device has failed
-    if ((networkInitialized != 1) && !ipAddress.isEmpty())
-    {
-        networkInitialized = mtic_startWithIP(ipAddress.toStdString().c_str(), port);
-    }
-
-    if (networkInitialized == 1)
-    {
-        qInfo() << "Network services started ";
-
-        // begin the observe on transiting zyre messages
-        int result = network_observeZyre(&onIncommingZyreMessageCallback, this);
-
-        qInfo() << "Network services started result=" << QString::number(result);
-    }
-    else
-    {
-        qCritical() << "The network has not been initialized on " << networkDevice << ipAddress << QString::number(port);
-    }
 }
 
 
@@ -421,8 +399,48 @@ NetworkController::NetworkController(QString networkDevice, QString ipAddress, i
  */
 NetworkController::~NetworkController()
 {
-    // Stop network services
-    mtic_stop();
+    if (_isMasticAgentStarted == 1) {
+        // Stop network services
+        mtic_stop();
+    }
+}
+
+
+/**
+ * @brief Start our MASTIC agent with a network device (or an IP address) and a port
+ * @param networkDevice
+ * @param ipAddress
+ * @param port
+ */
+void NetworkController::start(QString networkDevice, QString ipAddress, int port)
+{
+    if (_isMasticAgentStarted == 0)
+    {
+        // Start service with network device
+        if (!networkDevice.isEmpty()) {
+            _isMasticAgentStarted = mtic_startWithDevice(networkDevice.toStdString().c_str(), port);
+        }
+
+        // Start service with ip address (if start with network device has failed)
+        if ((_isMasticAgentStarted != 1) && !ipAddress.isEmpty()) {
+            _isMasticAgentStarted = mtic_startWithIP(ipAddress.toStdString().c_str(), port);
+        }
+
+        if (_isMasticAgentStarted == 1)
+        {
+            qInfo() << "Mastic Agent" << _agentName << "started";
+
+            // Begin the observe on transiting zyre messages
+            int result = network_observeZyre(&onIncommingZyreMessageCallback, this);
+
+            if (result == 0) {
+                qCritical() << "The callback on zyre messages has NOT been registered !";
+            }
+        }
+        else {
+            qCritical() << "The network has NOT been initialized on" << networkDevice << "or" << ipAddress << "and port" << QString::number(port);
+        }
+    }
 }
 
 
