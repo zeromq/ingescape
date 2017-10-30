@@ -98,7 +98,13 @@ Item {
         id: mouseArea
 
         anchors.fill: parent
+
+
         drag.target: parent
+        // Disable smoothed so that the Item pixel from where we started
+        // the drag remains under the mouse cursor
+        drag.smoothed: false
+
 
         onPressed: {
             if (controller && agentMappingVM) {
@@ -118,6 +124,8 @@ Item {
             }
         }
     }
+
+
 
     Rectangle {
         anchors {
@@ -463,12 +471,16 @@ Item {
 
                         MouseArea {
                             id: mouseAreaPointFROM
+
                             anchors.fill: parent
+
                             drag.target: parent
+                            // Disable smoothed so that the Item pixel from where we started
+                            // the drag remains under the mouse cursor
+                            drag.smoothed: false
 
                             hoverEnabled: true
 
-                            drag.smoothed: false
                             cursorShape: (draggablePointFROM.dragActive)? Qt.ClosedHandCursor : Qt.PointingHandCursor //Qt.OpenHandCursor
 
                             onPressed: {
@@ -708,12 +720,16 @@ Item {
 
                         MouseArea {
                             id: mouseAreaPointTO
+
                             anchors.fill: parent
+
                             drag.target: parent
+                            // Disable smoothed so that the Item pixel from where we started
+                            // the drag remains under the mouse cursor
+                            drag.smoothed: false
 
                             hoverEnabled: true
 
-                            drag.smoothed: false
                             cursorShape: (draggablePointTO.dragActive)? Qt.ClosedHandCursor : Qt.PointingHandCursor //Qt.OpenHandCursor
 
                             onPressed: {
