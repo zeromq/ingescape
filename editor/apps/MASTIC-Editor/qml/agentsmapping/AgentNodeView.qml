@@ -20,6 +20,8 @@ import I2Quick 1.0
 
 import MASTIC 1.0
 
+import "../theme" as Theme;
+
 
 Item {
     id: rootItem
@@ -147,10 +149,6 @@ Item {
             Button {
                 id: removeButton
 
-                property var boundingBox: MasticTheme.svgFileMASTIC.boundsOnElement("supprimer");
-                height : boundingBox.height
-                width :  boundingBox.width
-
                 visible : (rootItem.agentMappingVM && !rootItem.agentMappingVM.isON)
 
                 anchors {
@@ -160,7 +158,7 @@ Item {
                     rightMargin: 10
                 }
 
-                style: I2SvgButtonStyle {
+                style: Theme.LabellessSvgButtonStyle {
                     fileCache: MasticTheme.svgFileMASTIC
 
                     pressedID: releasedID + "-pressed"
