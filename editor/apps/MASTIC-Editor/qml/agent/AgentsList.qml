@@ -26,6 +26,9 @@ import MASTIC 1.0
 // agent sub-directory
 import "../agentsmapping" as AgentMapping
 
+// theme sub-directory
+import "../theme" as Theme;
+
 
 Item {
     id: rootItem
@@ -169,17 +172,13 @@ Item {
             Button {
                 id: btnAddAgent
 
-                property var boundingBox: MasticTheme.svgFileMASTIC.boundsOnElement("creernouvelagent");
-                height : boundingBox.height
-                width :  boundingBox.width
-
                 enabled:false
 
                 anchors {
                     verticalCenter: parent.verticalCenter
                 }
 
-                style: I2SvgButtonStyle {
+                style: Theme.LabellessSvgButtonStyle {
                     fileCache: MasticTheme.svgFileMASTIC
 
                     pressedID: releasedID + "-pressed"
@@ -206,15 +205,11 @@ Item {
             Button {
                 id: btnImportAgent
 
-                property var boundingBox: MasticTheme.svgFileMASTIC.boundsOnElement("importer");
-                height : boundingBox.height
-                width :  boundingBox.width
-
                 anchors {
                     verticalCenter: parent.verticalCenter
                 }
 
-                style: I2SvgButtonStyle {
+                style: Theme.LabellessSvgButtonStyle {
                     fileCache: MasticTheme.svgFileMASTIC
 
                     pressedID: releasedID + "-pressed"
@@ -247,17 +242,13 @@ Item {
             Button {
                 id: btnExportAgent
 
-                property var boundingBox: MasticTheme.svgFileMASTIC.boundsOnElement("exporter");
-                height : boundingBox.height
-                width :  boundingBox.width
-
                 enabled: visible & (controller.selectedAgent ? true : false)
 
                 anchors {
                     verticalCenter: parent.verticalCenter
                 }
 
-                style: I2SvgButtonStyle {
+                style: Theme.LabellessSvgButtonStyle {
                     fileCache: MasticTheme.svgFileMASTIC
 
                     pressedID: releasedID + "-pressed"
@@ -287,17 +278,13 @@ Item {
             Button {
                 id: btnRemoveAgent
 
-                property var boundingBox: MasticTheme.svgFileMASTIC.boundsOnElement("supprimerplusieurs");
-                height : boundingBox.height
-                width :  boundingBox.width
-
                 enabled: false
 
                 anchors {
                     verticalCenter: parent.verticalCenter
                 }
 
-                style: I2SvgButtonStyle {
+                style: Theme.LabellessSvgButtonStyle {
                     fileCache: MasticTheme.svgFileMASTIC
 
                     pressedID: releasedID + "-pressed"
@@ -419,7 +406,7 @@ Item {
 
                                 if (MasticEditorC.agentsMappingC)
                                 {
-                                    MasticEditorC.agentsMappingC.addAgentDefinitionToMappingAtPosition(model.QtObject.name, model.QtObject.isON, model.QtObject.definition, dropPosition);
+                                    MasticEditorC.agentsMappingC.addAgentToMappingAtPosition(model.QtObject.name, model.QtObject.models, dropPosition);
                                 }
                             }
                             else

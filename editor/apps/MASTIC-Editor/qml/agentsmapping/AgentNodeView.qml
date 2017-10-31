@@ -9,6 +9,7 @@
  *
  *	Contributors:
  *      Alexandre Lemort   <lemort@ingenuity.io>
+ *      Justine Limoges    <limoges@ingenuity.io>
  *
  */
 
@@ -19,6 +20,8 @@ import QtQuick.Controls.Styles 1.4
 import I2Quick 1.0
 
 import MASTIC 1.0
+
+import "../theme" as Theme;
 
 
 Item {
@@ -96,7 +99,13 @@ Item {
         id: mouseArea
 
         anchors.fill: parent
+
+
         drag.target: parent
+        // Disable smoothed so that the Item pixel from where we started
+        // the drag remains under the mouse cursor
+        drag.smoothed: false
+
 
         onPressed: {
             if (controller && agentMappingVM) {
@@ -116,6 +125,8 @@ Item {
             }
         }
     }
+
+
 
     Rectangle {
         anchors {
@@ -147,10 +158,6 @@ Item {
             Button {
                 id: removeButton
 
-                property var boundingBox: MasticTheme.svgFileMASTIC.boundsOnElement("supprimer");
-                height : boundingBox.height
-                width :  boundingBox.width
-
                 visible : (rootItem.agentMappingVM && !rootItem.agentMappingVM.isON)
 
                 anchors {
@@ -160,7 +167,7 @@ Item {
                     rightMargin: 10
                 }
 
-                style: I2SvgButtonStyle {
+                style: Theme.LabellessSvgButtonStyle {
                     fileCache: MasticTheme.svgFileMASTIC
 
                     pressedID: releasedID + "-pressed"
@@ -448,6 +455,7 @@ Item {
                         radius : height/2
 
                         property bool dragActive : mouseAreaPointFROM.drag.active;
+                        property var inputSlotModel: model.QtObject
 
                         Drag.active: mouseAreaPointFROM.drag.active;
                         Drag.hotSpot.x: width/2
@@ -465,12 +473,16 @@ Item {
 
                         MouseArea {
                             id: mouseAreaPointFROM
+
                             anchors.fill: parent
+
                             drag.target: parent
+                            // Disable smoothed so that the Item pixel from where we started
+                            // the drag remains under the mouse cursor
+                            drag.smoothed: false
 
                             hoverEnabled: true
 
-                            drag.smoothed: false
                             cursorShape: (draggablePointFROM.dragActive)? Qt.ClosedHandCursor : Qt.PointingHandCursor //Qt.OpenHandCursor
 
                             onPressed: {
@@ -479,6 +491,9 @@ Item {
                             }
 
                             onReleased: {
+                                // Drop our item
+                                draggablePointFROM.Drag.drop();
+
                                 // replace the draggablePointTO
                                 draggablePointFROM.x = 0
                                 draggablePointFROM.y = 0
@@ -487,10 +502,13 @@ Item {
 
                         Link {
                             id : linkDraggablePoint
+
                             parent : rootItem.parent
+
                             visible: draggablePointFROM.dragActive
+
                             secondPoint: Qt.point(myModel.position.x + draggablePointFROM.width/2 , myModel.position.y)
-                            firstPoint: Qt.point(draggablePointFROM.x + draggablePointFROM.width, draggablePointFROM.y + draggablePointFROM.height/2)
+                            firstPoint: Qt.point(draggablePointFROM.x + draggablePointFROM.width/2, draggablePointFROM.y + draggablePointFROM.height/2)
 
                             defaultColor:linkPoint.color
                         }
@@ -571,9 +589,6 @@ Item {
                             {
                                 var dragItem = drag.source;
 
-                                // NB: the "keys" property can be used to know the type of source
-                                console.log("inputDropArea: keys "+drag.keys)
-                                console.log("inputDropArea: source "+dragItem)
                                 if (typeof dragItem.dragActive !== 'undefined')
                                 {
                                     dragItem.color = dragItem.border.color;
@@ -592,7 +607,6 @@ Item {
 
 
                         onPositionChanged: {
-                            console.log("inputDropArea: onPositionChanged");
                         }
 
 
@@ -603,6 +617,21 @@ Item {
                             {
                                 dragItem.color = "transparent";
                                 linkPoint.border.width = 0
+                            }
+                        }
+
+
+                        onDropped: {
+                            var dragItem = drag.source;
+                            if (dragItem)
+                            {
+                                if (typeof dragItem.outputSlotModel !== 'undefined')
+                                {
+                                    dragItem.color = "transparent";
+                                    linkPoint.border.width = 0
+
+                                    console.log("inputDropArea: create a link from " + dragItem.outputSlotModel + " to " + inputSlotItem.myModel);
+                                }
                             }
                         }
 
@@ -699,6 +728,7 @@ Item {
                         }
 
                         property bool dragActive : mouseAreaPointTO.drag.active;
+                        property var outputSlotModel: model.QtObject
 
                         Drag.active: draggablePointTO.dragActive;
                         Drag.hotSpot.x: 0
@@ -710,12 +740,16 @@ Item {
 
                         MouseArea {
                             id: mouseAreaPointTO
+
                             anchors.fill: parent
+
                             drag.target: parent
+                            // Disable smoothed so that the Item pixel from where we started
+                            // the drag remains under the mouse cursor
+                            drag.smoothed: false
 
                             hoverEnabled: true
 
-                            drag.smoothed: false
                             cursorShape: (draggablePointTO.dragActive)? Qt.ClosedHandCursor : Qt.PointingHandCursor //Qt.OpenHandCursor
 
                             onPressed: {
@@ -724,6 +758,9 @@ Item {
                             }
 
                             onReleased: {
+                                // Drop our item
+                                draggablePointTO.Drag.drop();
+
                                 // replace the draggablePointTO
                                 draggablePointTO.x = 0
                                 draggablePointTO.y = 0
@@ -734,10 +771,12 @@ Item {
 
                         Link {
                             id : linkDraggablePointTO
+
                             parent : rootItem.parent
                             visible: draggablePointTO.dragActive
+
                             firstPoint: Qt.point(myModel.position.x + draggablePointTO.width/2 , myModel.position.y)
-                            secondPoint: Qt.point(draggablePointTO.x,draggablePointTO.y + draggablePointTO.height/2)
+                            secondPoint: Qt.point(draggablePointTO.x + draggablePointTO.width/2, draggablePointTO.y + draggablePointTO.height/2)
 
                             defaultColor:linkPointOut.color
                         }
@@ -825,9 +864,6 @@ Item {
                             {
                                 var dragItem = drag.source;
 
-                                // NB: the "keys" property can be used to know the type of source
-                                console.log("outputDropArea: keys "+drag.keys)
-                                console.log("outputDropArea: source "+dragItem)
                                 if (typeof dragItem.dragActive !== 'undefined')
                                 {
                                     dragItem.color = dragItem.border.color;
@@ -846,7 +882,6 @@ Item {
 
 
                         onPositionChanged: {
-                            console.log("outputDropArea: onPositionChanged");
                         }
 
 
@@ -857,6 +892,20 @@ Item {
                             {
                                 dragItem.color = "transparent";
                                 linkPointOut.border.width = 0
+                            }
+                        }
+
+                        onDropped: {
+                            var dragItem = drag.source;
+                            if (dragItem)
+                            {
+                                if (typeof dragItem.inputSlotModel !== 'undefined')
+                                {
+                                    dragItem.color = "transparent";
+                                    linkPointOut.border.width = 0
+
+                                    console.log("outputDropArea: create a link from " + outputSlotItem.myModel + " to " + dragItem.inputSlotModel);
+                                }
                             }
                         }
 

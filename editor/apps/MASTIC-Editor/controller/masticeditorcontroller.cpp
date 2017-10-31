@@ -92,7 +92,7 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     _modelManager = new MasticModelManager(agentsListPath, agentsMappingsPath, this);
 
     // Create the controller for network communications
-    _networkC = new NetworkController(_networkDevice, _ipAddress, _port, this);
+    _networkC = new NetworkController(this);
 
     // Create the controller for agents supervision
     _agentsSupervisionC = new AgentsSupervisionController(_modelManager, this);
@@ -114,8 +114,9 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
 
 
     // Connect to signals from the model manager
-    connect(_modelManager, &MasticModelManager::agentModelCreated, _agentsSupervisionC, &AgentsSupervisionController::onAgentModelCreated);
     connect(_modelManager, &MasticModelManager::isActivatedMappingChanged, _agentsMappingC, &AgentsMappingController::onIsActivatedMappingChanged);
+    connect(_modelManager, &MasticModelManager::agentModelCreated, _agentsSupervisionC, &AgentsSupervisionController::onAgentModelCreated);
+    //connect(_modelManager, &MasticModelManager::agentModelWillBeDeleted, _agentsSupervisionC, &AgentsSupervisionController::onAgentModelWillBeDeleted);
 
 
     // Connect to signals from the controller for supervision of agents
@@ -127,6 +128,8 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     // Initialize agents list from default file
     _modelManager->importAgentsListFromDefaultFile();
 
+    // Start our MASTIC agent with a network device (or an IP address) and a port
+    _networkC->start(_networkDevice, _ipAddress, _port);
 
 
     //

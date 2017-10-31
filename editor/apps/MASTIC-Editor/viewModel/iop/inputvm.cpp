@@ -15,9 +15,9 @@
 
 #include "inputvm.h"
 
-InputVM::InputVM(QString agentName,
+InputVM::InputVM(QString inputName,
                  AgentIOPM* modelM,
-                 QObject *parent) : PointMapVM(agentName,
+                 QObject *parent) : PointMapVM(inputName,
                                                parent),
     _modelM(NULL)
 {
@@ -27,7 +27,7 @@ InputVM::InputVM(QString agentName,
     setmodelM(modelM);
 
     if (_modelM != NULL) {
-        qInfo() << "New Input VM" << _nameAgent << "." << _modelM->name();
+        qInfo() << "New Input VM" << "." << _modelM->name();
     }
 }
 
@@ -38,7 +38,7 @@ InputVM::InputVM(QString agentName,
 InputVM::~InputVM()
 {
     if (_modelM != NULL) {
-        qInfo() << "Delete Input VM" << _nameAgent << "." << _modelM->name();
+        qInfo() << "Delete Input VM" << "." << _modelM->name();
     }
 
     setmodelM(NULL);

@@ -30,14 +30,21 @@ class OutputVM : public PointMapVM
 {
     Q_OBJECT
 
+    // Point map name (AgentIOP name) but needed for ghost input/output
+    I2_QML_PROPERTY(bool, isGhost)
+
     // Model of our agent Output
     I2_QML_PROPERTY_READONLY_DELETE_PROOF(OutputM*, modelM)
 
 
 public:
-    explicit OutputVM(QString agentName,
+    explicit OutputVM(QString outputName,
                       OutputM* modelM,
                       QObject *parent = nullptr);
+
+    explicit OutputVM(QString outputName,
+                      QObject *parent = nullptr);
+
 
     /**
      * @brief Destructor

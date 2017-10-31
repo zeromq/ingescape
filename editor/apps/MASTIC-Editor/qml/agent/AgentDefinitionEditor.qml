@@ -20,6 +20,9 @@ import I2Quick 1.0
 
 import MASTIC 1.0
 
+import "../theme" as Theme;
+
+
 I2PopupBase {
     id: rootItem
 
@@ -118,17 +121,13 @@ I2PopupBase {
         Button {
             id: btnCloseEditor
 
-            property var boundingBox: MasticTheme.svgFileMASTIC.boundsOnElement("supprimer");
-            height : boundingBox.height
-            width :  boundingBox.width
-
             anchors {
                 verticalCenter: definitionNameItem.verticalCenter
                 right : parent.right
                 rightMargin: 20
             }
 
-            style: I2SvgButtonStyle {
+            style: Theme.LabellessSvgButtonStyle {
                 fileCache: MasticTheme.svgFileMASTIC
 
                 pressedID: releasedID + "-pressed"
@@ -670,7 +669,7 @@ I2PopupBase {
                     verticalCenter: parent.verticalCenter
                 }
 
-                style: I2SvgButtonStyle {
+                style: Theme.LabellessSvgButtonStyle {
                     fileCache: MasticTheme.svgFileMASTIC
 
                     pressedID: releasedID + "-pressed"

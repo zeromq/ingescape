@@ -39,13 +39,21 @@ Item {
 
 
     // Minimum scale factor
-    readonly property real minimumScale: 0.25
+    readonly property real minimumScale: 0.25;
 
     // Maximum scale factor
-    readonly property real maximumScale: 4
+    readonly property real maximumScale: 4;
 
     // Duration of automatic pan and/or zoom animations in milliseconds
-    readonly property int automaticPanZoomAnimationDuration: 300
+    readonly property int automaticPanZoomAnimationDuration: 300;
+
+
+    // Size of a cell of our background
+    readonly property int backgroundCellSize: 150;
+
+    // Number of subdivisions for background cells
+    readonly property int backgroundCellNumberOfSubDivisions: 5
+
 
 
     //--------------------------------
@@ -79,19 +87,45 @@ Item {
     function showAll()
     {
         //TODO get the bounding box of all nodes from our controller
-        var x0 = Math.min(item1.x, Math.min(item2.x, Math.min(item3.x, Math.min(item4.x, item5.x))));
-        var y0 = Math.min(item1.y, Math.min(item2.y, Math.min(item3.y, Math.min(item4.y, item5.y))));
+        var x0 = Number.POSITIVE_INFINITY;
+        var y0 = Number.POSITIVE_INFINITY;
+        var x1 = Number.NEGATIVE_INFINITY;
+        var y1 = Number.NEGATIVE_INFINITY;
+        var validBoundingBox = false;
 
-        var x1 = Math.max(item1.x + item1.width, Math.max(item2.x + item2.width, Math.max(item3.x + item3.width, Math.max(item4.x + item4.width, item5.x + item5.width))));
-        var y1 = Math.max(item1.y + item1.height, Math.max(item2.y + item2.height, Math.max(item3.y + item3.height, Math.max(item4.y + item4.height, item5.y + item5.height))));
+        for (var index = 0; index < workspace.visibleChildren.length; index++)
+        {
+            var child = workspace.visibleChildren[index];
 
-        var margin = 5;
-        var area = Qt.rect(x0 - margin, y0 - margin, x1 - x0 + 2 * margin, y1 - y0 + 2 * margin);
-        //--------------------
+            // Check if our child must be filtered
+            if (
+                // We don't need repeaters because they don't have a valid geometry (they create items and add them to their parent)
+                !_qmlItemIsA(child, "Repeater")
+                &&
+                //TEMP FIXME: remove links because AgentNodeView creates links attached to (0,0)
+                !_qmlItemIsA(child, "Link")
+                )
+            {
+                x0 = Math.min(x0, child.x);
+                y0 = Math.min(y0, child.y);
 
-        _showArea(area);
+                x1 = Math.max(x1, child.x + child.width);
+                y1 = Math.max(y1, child.y + child.height);
+
+                validBoundingBox = true;
+            }
+            // Else: child has been filtered
+        }
+
+        if (validBoundingBox)
+        {
+            var margin = 5;
+            var area = Qt.rect(x0 - margin, y0 - margin, x1 - x0 + 2 * margin, y1 - y0 + 2 * margin);
+            console.log("NodeGraphView: bounding box (+ margins) = " + area + " VS workspace.childrenRect =" + workspace.childrenRect);
+
+            _showArea(area);
+        }
     }
-
 
 
 
@@ -136,6 +170,33 @@ Item {
     }
 
 
+    // Check if a given item is an instance of a given class
+    function _qmlItemIsA(item, className)
+    {
+        var result = false;
+
+        if (item)
+        {
+            var itemToString = item.toString();
+
+            result = (
+                      // class + ( + address + ) => class instance without modification
+                      (itemToString.indexOf(className + "(") === 0)
+                      ||
+                      // QQuick + class + ( + address + ) => basic QML class instance
+                      // E.g. QQuickRepeater(0x7fa8c8667070)
+                      (itemToString.indexOf("QQuick" + className + "(") === 0)
+                      ||
+                      // class + _QMLTYPE_ + number + ( + address + ) => class instance with user-defined properties
+                      // E.g. AgentNodeView_QMLTYPE_90(0x7f97cb1416e0)
+                      (itemToString.indexOf(className + "_QML") === 0)
+                      );
+        }
+
+        return result;
+    }
+
+
 
     // TEMP: to test showAll
     focus: true
@@ -160,45 +221,9 @@ Item {
 
         anchors.fill: parent
 
-        //
-        // Seamless background (bitmap version)
-        //
-        // Pros:
-        //  - work with any tile pattern
-        //  - lightweight (mostly GPU)
-        //
-        // Cons:
-        //  - hard to perform a good looking zoom (scaling artifacts)
-        //
-        /*
-        Image {
-            id: seamlessBackgroundBitmap
-
-            width: content.width + sourceSize.width
-            height: content.height + sourceSize.height
-
-            horizontalAlignment: Image.AlignLeft
-            verticalAlignment: Image.AlignTop
-            fillMode: Image.Tile
-
-            // Source must be a tileable pattern
-            source: "qrc:/resources/images/agentsmapping-background-tile.jpg"
-
-            x: ((workspace.x % sourceSize.width) + sourceSize.width) % sourceSize.width - sourceSize.width
-            y: ((workspace.y % sourceSize.height) + sourceSize.height) % sourceSize.height - sourceSize.height
-        }
-        */
-
 
         //
-        // Seamless background (vector version)
-        //
-        // Pros:
-        //  - pan and zoom
-        //
-        // Cons:
-        //  - grid pattern only (ah-hoc look)
-        //  - heavier processing load (scale only because items are created/deleted)
+        // Seamless background
         //
         Rectangle {
             id: seamlessBackgroundVector
@@ -213,8 +238,8 @@ Item {
                 offsetX: workspace.x
                 offsetY: workspace.y
 
-                cellSize: 150 * workspace.scale
-                numberOfSubDivisions: 5
+                cellSize: rootItem.backgroundCellSize * workspace.scale
+                numberOfSubDivisions: rootItem.backgroundCellNumberOfSubDivisions
 
                 cellStroke: MasticTheme.agentsMappingGridLineColor
                 subCellStroke: MasticTheme.agentsMappingGridSublineColor
@@ -238,11 +263,17 @@ Item {
             // Only accept drag events from AgentsListItem
             keys: ["AgentsListItem"]
 
+
+            // To save the opacity of our source
+            property real _previousOpacityOfSource: 1;
+
+
             // Get coordinates of drop
             function getDropCoordinates()
             {
                 return workspace.mapFromItem(workspaceDropArea, workspaceDropArea.drag.x, workspaceDropArea.drag.y);
             }
+
 
             onEntered: {
                 if (drag.source !== null)
@@ -250,9 +281,14 @@ Item {
                     var dragItem = drag.source;
 
                     // Check if our source has an "agent" property
+                    // NB: it should be useless because we only accept drag events with key AgentsListItem
                     if (typeof dragItem.agent !== 'undefined')
                     {
+                        // Hide our source to avoid visual artifacts
+                        _previousOpacityOfSource = dragItem.opacity;
                         dragItem.opacity = 0;
+
+                        // Configure our ghost
                         dropGhost.agent = dragItem.agent;
                     }
                     else
@@ -276,18 +312,22 @@ Item {
                 var dragItem = drag.source;
                 if (typeof dragItem.agent !== 'undefined')
                 {
-                    drag.source.opacity = 1;
+                    // Restore opacity of our source
+                    drag.source.opacity = _previousOpacityOfSource;
                 }
+
+                // Clean-up ghost
                 dropGhost.agent = null;
             }
         }
 
 
 
-
+        //-----------------------------------------------
         //
-        // Workspace background interaction: pan & zoom
+        // Workspace interaction: pan & zoom
         //
+        //-----------------------------------------------
         PinchArea {
             anchors.fill: parent
 
@@ -298,6 +338,10 @@ Item {
                 maximumScale: rootItem.maximumScale
             }
 
+
+            //
+            // MouseArea used to drag-n-drop our workspace AND handle mouse wheel events and scroll gesture events (trackpad)
+            //
             MouseArea {
                 anchors.fill: parent
 
@@ -305,7 +349,9 @@ Item {
 
                 scrollGestureEnabled: true
 
-                onPressed: rootItem.forceActiveFocus();
+                onPressed: {
+                    rootItem.forceActiveFocus();
+                }
 
                 onWheel: {
                     wheel.accepted = true;
@@ -344,7 +390,7 @@ Item {
 
             //-----------------------------------------------
             //
-            // Workspace: nodes and links will be added here
+            // Workspace: nodes and links
             //
             //-----------------------------------------------
             Item {
@@ -354,6 +400,16 @@ Item {
 
                 width: parent.width
                 height: parent.height
+
+
+                //------------------------------------------------
+                //
+                // Properties
+                //
+                //------------------------------------------------
+
+                // Maximum Z-index
+                property int maxZ: 0
 
 
 
@@ -394,303 +450,59 @@ Item {
 
                 //------------------------------------------------
                 //
-                // Pseudo content to test pan & zoom, DnD, links
+                // Content of our workspace
                 //
                 //------------------------------------------------
 
 
-                // Maximum Z-index
-                property int maxZ: 0
-
-
-                // Slots
-                property color inletColor: "#0CB8FF"
-                property color outletColor: "#ff9933"
-
-                // Node
-                property color nodeColor: "#17191F"
-                property color nodeCollapsedColor: "darkkhaki"
-                property color nodeBorderColor: "#939CAA"
-                property color nodeSelectedBorderColor: "#ffffff"
-
-
-                //----------------------------------------
-                // TODO: replace with a Repeater
-                //       model: list of MapBetweenIOPVM
-
+                //
+                // Links between nodes
+                //
                 Repeater {
                     model : controller? controller.allMapInMapping : 0;
 
                     Link {
                         id : link
+
                         mapBetweenIOPVM: model.QtObject
                     }
                 }
 
 
+
                 //
-//                // Link between [item4, nodeOut] and [item5, nodeIn2]
-//                //
-//                Link {
-//                    id: link6
-
-//                    firstPoint: Qt.point(item4.x + item4NodeOut.x + item4NodeOut.width/2, item4.y + item4NodeOut.y + item4NodeOut.height/2)
-
-//                    secondPoint: Qt.point(item5.x + item5NodeIn2.x + item5NodeIn2.width/2, item5.y + item5NodeIn2.y + item5NodeIn2.height/2)
-
-//                     onClicked: console.log("Click on link6")
-//               }
-
-                //----------------------------------------
-
-
-                //----------------------------------------
-                //       model: list of AgentMappingVM
-
+                // Nodes
+                //
                 Repeater {
                     model : controller? controller.agentInMappingVMList : 0;
 
 
                     AgentNodeView {
                         id: agent
+
                         agentMappingVM : model.QtObject
 
                         controller : rootItem.controller
                     }
                 }
 
-//                //
-//                // Item 4
-//                //
-//                Rectangle {
-//                    id: item4
-
-//                    x: 400
-//                    y: 550
-
-//                    width: 150
-//                    height: 70
-
-
-//                    color: workspace.nodeColor
-
-//                    radius: 8
-
-//                    border {
-//                        width: 2
-//                        color: mouseArea4.pressed ? workspace.nodeSelectedBorderColor : workspace.nodeBorderColor
-//                    }
-
-
-//                    Rectangle {
-//                        id: item4NodeIn
-
-//                        anchors {
-//                            verticalCenter: parent.verticalCenter
-//                            horizontalCenter: parent.left
-//                        }
-
-//                        width: 20
-//                        height: width
-//                        radius: width/2
-
-//                        border {
-//                            color: workspace.inletColor
-//                            width: 2
-//                        }
-
-//                        color: workspace.nodeColor
-
-//                        Rectangle {
-//                            anchors.centerIn: parent
-
-//                            width: parent.width - 8
-//                            height: width
-//                            radius: width/2
-
-//                            color: workspace.inletColor
-//                        }
-//                    }
-
-//                    Rectangle {
-//                        id: item4NodeOut
-
-//                        anchors {
-//                            horizontalCenter: parent.right
-//                            verticalCenter: parent.verticalCenter
-//                        }
-
-//                        width: 20
-//                        height: width
-//                        radius: width/2
-
-//                        border {
-//                            color: workspace.outletColor
-//                            width: 2
-//                        }
-
-//                        color: workspace.nodeColor
-
-//                        Rectangle {
-//                            anchors.centerIn: parent
-
-//                            width: parent.width - 8
-//                            height: width
-//                            radius: width/2
-
-//                            color: workspace.outletColor
-//                        }
-//                    }
-
-
-//                    MouseArea {
-//                        id: mouseArea4
-
-//                        anchors.fill: parent
-
-//                        drag.target: parent
-
-//                        onPressed: {
-//                            parent.z = workspace.maxZ++;
-//                        }
-
-//                        onDoubleClicked: {
-//                            rootItem.centerViewOnNode(item4);
-//                        }
-//                    }
-//                }
-
-
-//                //
-//                // Item 5
-//                //
-//                Rectangle {
-//                    id: item5
-
-//                    // Flag indicating if our item is closed or not
-//                    property bool isClosed: false
-
-
-//                    x: 700
-//                    y: 250
-
-//                    width: 150
-//                    height: (isClosed) ? 75 : 150
-
-//                    color: (isClosed) ? workspace.nodeCollapsedColor : workspace.nodeColor
-
-//                    radius: 8
-
-//                    border {
-//                        width: 2
-//                        color: mouseArea5.pressed ? workspace.nodeSelectedBorderColor : workspace.nodeBorderColor
-//                    }
-
-
-//                    Behavior on height {
-//                        NumberAnimation {}
-//                    }
-
-//                    Rectangle {
-//                        id: item5NodeIn1
-
-//                        anchors {
-//                            horizontalCenter: parent.left
-//                        }
-
-//                        y: (item5.isClosed) ? (parent.height/2 - height/2) : (parent.height/3 - height/2)
-
-//                        width: 20
-//                        height: width
-//                        radius: width/2
-
-//                        border {
-//                            color: workspace.inletColor
-//                            width: 2
-//                        }
-
-//                        color: workspace.nodeColor
-
-//                        Rectangle {
-//                            anchors.centerIn: parent
-
-//                            width: parent.width - 8
-//                            height: width
-//                            radius: width/2
-
-//                            color: workspace.inletColor
-//                        }
-//                    }
-
-
-//                    Rectangle {
-//                        id: item5NodeIn2
-
-//                        anchors {
-//                            horizontalCenter: parent.left
-//                        }
-
-//                        y: (item5.isClosed) ? (parent.height/2 - height/2) : (parent.height * 2/3 - height/2)
-
-//                        width: 20
-//                        height: width
-//                        radius: width/2
-
-//                        border {
-//                            color: workspace.inletColor
-//                            width: 2
-//                        }
-
-//                        color: workspace.nodeColor
-
-//                        Rectangle {
-//                            anchors.centerIn: parent
-
-//                            width: parent.width - 8
-//                            height: width
-//                            radius: width/2
-
-//                            color: workspace.inletColor
-//                        }
-//                    }
-
-//                    MouseArea {
-//                        id: mouseArea5
-
-//                        anchors.fill: parent
-
-//                        drag.target: parent
-
-//                        onPressed: {
-//                            parent.z = workspace.maxZ++;
-//                        }
-
-//                        onDoubleClicked: {
-//                            item5.isClosed = !item5.isClosed;
-//                        }
-//                    }
-//                }
-
-
-                //----------------------------------------
             }
-
         }
 
 
 
+        //----------------------------------------------------------------------------------
         //
-        // Ghost displayed when a dragged item enters the bounds of our drop area
+        // Ghost displayed when we drag-n-drop on agent from our list of agents (left panel)
         //
+        //----------------------------------------------------------------------------------
         Item {
             id: dropGhost
 
-            property var agent: null;
+            property var agent: null
 
-            opacity: (agent ? (workspaceDropArea.containsDrag ? 1 : 0) : 0);
+            opacity: (agent && workspaceDropArea.containsDrag ? 1 : 0)
             visible: (opacity != 0)
-
-
 
             Behavior on opacity {
                 NumberAnimation {}
@@ -700,33 +512,12 @@ Item {
                 transformOrigin: Item.TopLeft
 
                 scale: workspace.scale
-                isReduced : true
-                agentName : dropGhost.agent ? dropGhost.agent.name : ""
+
+                isReduced: true
+
+                agentName: dropGhost.agent ? dropGhost.agent.name : ""
             }
         }
 
-
-        //
-        // Legend
-        //
-        Text {
-            id: legend
-
-            anchors {
-                left: parent.left
-                right: parent.right
-                top: parent.top
-                leftMargin: 20
-                rightMargin: 20
-                topMargin: 20
-            }
-
-            text: qsTr("Demo: pan, pinch to zoom, drag-n-drop of nodes, double-click to expand/collapse a node with multiple slots, space to show all")
-
-            font: MasticTheme.normalFont
-            color: MasticTheme.whiteColor
-
-            wrapMode: Text.WordWrap
-        }
     }
 }
