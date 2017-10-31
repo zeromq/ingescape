@@ -28,6 +28,7 @@
 #include <controller/masticeditorcontroller.h>
 #include <misc/masticeditorsettings.h>
 #include <misc/masticeditorutils.h>
+#include <misc/collapsiblecolumn.h>
 
 
 /**
@@ -60,6 +61,16 @@ void registerCustomQmlTypes()
     qmlRegisterUncreatableType<AgentsMappingController>(uri, 1, 0, "AgentsMappingController", "Internal Class");
     qmlRegisterUncreatableType<AgentsSupervisionController>(uri, 1, 0, "AgentsSupervisionController", "Internal Class");
     qmlRegisterUncreatableType<MasticModelManager>(uri, 1, 0, "MasticModelManager", "Internal Class");
+
+
+    //----------------
+    //
+    // Misc.
+    //
+    //----------------
+
+    qmlRegisterType<CollapsibleColumn>(uri, 1, 0, "CollapsibleColumn");
+
 
 
     //----------------
