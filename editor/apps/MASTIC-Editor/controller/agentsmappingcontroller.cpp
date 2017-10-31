@@ -73,6 +73,27 @@ void AgentsMappingController::addAgentToMappingAtPosition(QString agentName, Abs
 
 
 /**
+ * @brief Slot when a link from an output is dropped over an input on the current mapping (or when a link to an input is dropped over an output)
+ * @param outputAgent
+ * @param output
+ * @param inputAgent
+ * @param input
+ */
+void AgentsMappingController::addMapBetweenAgents(AgentInMappingVM* outputAgent, OutputVM* output, AgentInMappingVM* inputAgent, InputVM* input)
+{
+    if ((outputAgent != NULL) && (output != NULL)
+            && (inputAgent != NULL) && (input != NULL))
+    {
+        // Create a new map between agents
+        MapBetweenIOPVM* mapBetweenIOP = new MapBetweenIOPVM(outputAgent, output, inputAgent, input, this);
+
+        // Add to the list
+        _allMapInMapping.append(mapBetweenIOP);
+    }
+}
+
+
+/**
  * @brief Slot when a new view model of a agent mapping is created on the main view mapping.
  *      Check if a map need to be created from the element mapping list in the model manager.
  *      The two agents corresponding need to be visible in the list.
