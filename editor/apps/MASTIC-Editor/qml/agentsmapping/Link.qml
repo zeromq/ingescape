@@ -84,7 +84,7 @@ I2CubicBezierCurve {
                     mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.greenColor : MasticTheme.darkGreenColor
                     break;
                 case AgentIOPValueTypes.MIXED:
-                    mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.whiteColor : MasticTheme.greyColor4
+                    mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.whiteColor : MasticTheme.darkGreyColor
                     break;
                 case AgentIOPValueTypes.UNKNOWN:
                     "#000000"
@@ -117,7 +117,7 @@ I2CubicBezierCurve {
                         mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.greenColor : MasticTheme.darkGreenColor
                         break;
                     case AgentIOPValueTypes.MIXED:
-                        mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.whiteColor : MasticTheme.greyColor4
+                        mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.whiteColor : MasticTheme.darkGreyColor
                         break;
                     case AgentIOPValueTypes.UNKNOWN:
                         "#000000"

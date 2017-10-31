@@ -266,7 +266,7 @@ I2PopupBase {
                             color : styleData.selected ? MasticTheme.veryDarkGreyColor : MasticTheme.whiteColor
                             font {
                                 family: MasticTheme.textFontFamily
-                                bold: true
+                                weight : Font.Medium
                                 pixelSize : 16
                             }
                         }
@@ -556,11 +556,6 @@ I2PopupBase {
 
                                         Button {
                                             id: btnMuteOutput
-
-                                            property var boundingBox: MasticTheme.svgFileMASTIC.boundsOnElement("muteactif");
-                                            height : boundingBox.height
-                                            width :  boundingBox.width
-
                                             visible: (model.agentIOPType === AgentIOPTypes.OUTPUT)
                                             enabled : visible
 
@@ -569,7 +564,7 @@ I2PopupBase {
                                                 right : parent.right
                                             }
 
-                                            style: I2SvgButtonStyle {
+                                            style: Theme.LabellessSvgButtonStyle {
                                                 fileCache: MasticTheme.svgFileMASTIC
 
                                                 pressedID: releasedID + "-pressed"
@@ -619,41 +614,43 @@ I2PopupBase {
             spacing : 15
 
 
-            Button {
-                id: cancelButton
+//            Button {
+//                id: cancelButton
 
-                property var boundingBox: MasticTheme.svgFileMASTIC.boundsOnElement("button");
-                height : boundingBox.height
-                width :  boundingBox.width
+//                property var boundingBox: MasticTheme.svgFileMASTIC.boundsOnElement("button");
+//                height : boundingBox.height
+//                width :  boundingBox.width
 
-                enabled : visible
-                text : "Cancel"
+//                enabled : visible
+//                text : "Cancel"
 
-                anchors {
-                    verticalCenter: parent.verticalCenter
-                }
+//                anchors {
+//                    verticalCenter: parent.verticalCenter
+//                }
 
-                style: I2SvgButtonStyle {
-                    fileCache: MasticTheme.svgFileMASTIC
+//                style: I2SvgButtonStyle {
+//                    fileCache: MasticTheme.svgFileMASTIC
 
-                    pressedID: releasedID + "-pressed"
-                    releasedID: "button"
-                    disabledID : releasedID
+//                    pressedID: releasedID + "-pressed"
+//                    releasedID: "button"
+//                    disabledID : releasedID
 
-                    font {
-                        family: MasticTheme.textFontFamily
-                        bold : true
-                        pixelSize : 16
-                    }
-                    labelColorPressed: MasticTheme.blackColor
-                    labelColorReleased: MasticTheme.whiteColor
-                    labelColorDisabled: MasticTheme.whiteColor
+//                    font {
+//                        family: MasticTheme.textFontFamily
+//                        weight : Font.Medium
+//                        pixelSize : 16
+//                    }
+//                    labelColorPressed: MasticTheme.blackColor
+//                    labelColorReleased: MasticTheme.whiteColor
+//                    labelColorDisabled: MasticTheme.whiteColor
 
-                }
+//                }
 
-                onClicked: {
-                }
-            }
+//                onClicked: {
+//                    // Close our popup
+//                    rootItem.close();
+//                }
+//            }
 
             Button {
                 id: okButton
@@ -669,7 +666,7 @@ I2PopupBase {
                     verticalCenter: parent.verticalCenter
                 }
 
-                style: Theme.LabellessSvgButtonStyle {
+                style: I2SvgButtonStyle {
                     fileCache: MasticTheme.svgFileMASTIC
 
                     pressedID: releasedID + "-pressed"
@@ -678,7 +675,7 @@ I2PopupBase {
 
                     font {
                         family: MasticTheme.textFontFamily
-                        bold : true
+                        weight : Font.Medium
                         pixelSize : 16
                     }
                     labelColorPressed: MasticTheme.blackColor
@@ -688,6 +685,8 @@ I2PopupBase {
                 }
 
                 onClicked: {
+                    // Close our popup
+                    rootItem.close();
                 }
             }
 

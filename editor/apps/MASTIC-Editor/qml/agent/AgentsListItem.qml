@@ -187,8 +187,8 @@ Item {
 
                             color : MasticTheme.whiteColor
                             font {
-                                family: MasticTheme.labelFontFamilyBlack
-                                bold : true
+                                family: MasticTheme.labelFontFamily
+                                weight : Font.Black
                                 pixelSize : 12
                             }
                         }

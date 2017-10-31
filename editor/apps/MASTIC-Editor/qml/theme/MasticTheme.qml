@@ -75,17 +75,14 @@ Item {
 
     readonly property color veryDarkGreyColor: "#282D34"
     readonly property color darkGreyColor2: "#2B3137"
-    readonly property color darkGreyColor: "#3C424F"
-    readonly property color greyColor : "#525A66"
-    readonly property color greyColor2 : "#3B424F"
-    readonly property color blueGreyColor: "#8896AA"
 
-    readonly property color greyColor4 : "#575756"
-    readonly property color greyColor3 : "#706f6f"
+    readonly property color darkBlueGreyColor: "#3C424F"
+    readonly property color blueGreyColor : "#525A66"
+    readonly property color lightBlueGreyColor: "#8896AA"
+
+    readonly property color darkGreyColor : "#575756"
+    readonly property color greyColor : "#706f6f"
     readonly property color lightGreyColor : "#9D9C9C"
-
-
-    readonly property color darkBlueGreyColor: "#525A66"
 
 
     readonly property color orangeColor: "#F39200"
@@ -101,12 +98,8 @@ Item {
     readonly property string defaultFontFamily: "Arial"
 
 
-    property alias labelFontFamilyExtraBold : fontAkrobatExtraBold.name
-    property alias labelFontFamilyBlack : fontAkrobatBlack.name
-
     property alias labelFontFamily : fontAkrobat.name
     property alias textFontFamily : fontBloggerSans.name
-
 
     FontLoader {
         id: fontAkrobat
@@ -114,12 +107,10 @@ Item {
     }
 
     FontLoader {
-        id: fontAkrobatBlack
         source: "qrc:/resources/fonts/akrobat/Akrobat-Black.ttf"
     }
 
     FontLoader {
-        id: fontAkrobatExtraBold
         source: "qrc:/resources/fonts/akrobat/Akrobat-ExtraBold.ttf"
     }
 
@@ -128,11 +119,14 @@ Item {
         source: "qrc:/resources/fonts/blogger-sans/Blogger_Sans.ttf"
     }
 
+    FontLoader {
+        source: "qrc:/resources/fonts/blogger-sans/Blogger_Sans-Medium.ttf"
+    }
 
 
     // Heading font (level1)
     readonly property font headingFont: Qt.font({
-                                                    family: labelFontFamilyBlack,
+                                                    family: labelFontFamily,
                                                     pixelSize: 20,
                                                     weight: Font.Black
                                                 });
@@ -178,12 +172,12 @@ Item {
     readonly property color agentsListLabelColor: theme.whiteColor
     readonly property color agentsListLabel2Color: theme.whiteColor
     readonly property color agentsListPressedLabel2Color: theme.lightGreyColor
-    readonly property color agentsListTextColor: theme.blueGreyColor
+    readonly property color agentsListTextColor: theme.lightBlueGreyColor
 
     readonly property color agentOFFLabelColor: theme.lightGreyColor
     readonly property color agentOFFLabel2Color: theme.lightGreyColor
     readonly property color agentOFFPressedLabel2Color: theme.greyColor
-    readonly property color agentOFFTextColor: theme.greyColor2
+    readonly property color agentOFFTextColor: theme.darkBlueGreyColor
 
 
     // List
@@ -272,9 +266,9 @@ Item {
     // Agents
     //
     readonly property color agentsONNameMappingColor : theme.whiteColor
-    readonly property color agentsOFFNameMappingColor : theme.greyColor3
+    readonly property color agentsOFFNameMappingColor : theme.greyColor
 
     readonly property color agentsONInputsOutputsMappingColor : theme.whiteColor
-    readonly property color agentsOFFInputsOutputsMappingColor : theme.greyColor3
+    readonly property color agentsOFFInputsOutputsMappingColor : theme.greyColor
 
 }
