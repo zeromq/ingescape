@@ -93,9 +93,9 @@ Item {
         var y1 = Number.NEGATIVE_INFINITY;
         var validBoundingBox = false;
 
-        for (var index = 0; index < workspace.children.length; index++)
+        for (var index = 0; index < workspace.visibleChildren.length; index++)
         {
-            var child = workspace.children[index];
+            var child = workspace.visibleChildren[index];
 
             // Check if our child must be filtered
             if (
@@ -121,8 +121,7 @@ Item {
         {
             var margin = 5;
             var area = Qt.rect(x0 - margin, y0 - margin, x1 - x0 + 2 * margin, y1 - y0 + 2 * margin);
-            console.log("NodeGraphView: bounding box (+ margins) = " + area);
-            console.log("NodeGraphView. workspace.childrenRect =" + workspace.childrenRect);
+            console.log("NodeGraphView: bounding box (+ margins) = " + area + " VS workspace.childrenRect =" + workspace.childrenRect);
 
             _showArea(area);
         }
