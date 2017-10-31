@@ -402,22 +402,15 @@ Item {
                             if (typeof dropAreaElement.getDropCoordinates == 'function')
                             {
                                 var dropPosition = dropAreaElement.getDropCoordinates();
-                                console.log("Drop agent " + model.QtObject.name + " at "+ dropPosition);
 
                                 if (MasticEditorC.agentsMappingC)
                                 {
                                     MasticEditorC.agentsMappingC.addAgentToMappingAtPosition(model.QtObject.name, model.QtObject.models, dropPosition);
                                 }
                             }
-                            else
-                            {
-                                console.log("AgentsList: invalid DropArea to drop an agent");
-                            }
+                            // Else: invalid DropArea to drop an item of our list
                         }
-                        else
-                        {
-                            console.log("AgentsList: agent dropped outside the mapping area");
-                        }
+                        // Else: agent dropped outside the mapping area");
 
 
                         //
