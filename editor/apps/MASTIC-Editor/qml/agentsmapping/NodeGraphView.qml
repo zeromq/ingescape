@@ -91,28 +91,46 @@ Item {
         var y0 = Number.POSITIVE_INFINITY;
         var x1 = Number.NEGATIVE_INFINITY;
         var y1 = Number.NEGATIVE_INFINITY;
+        var validBoundingBox = false;
+
         for (var index = 0; index < workspace.children.length; index++)
         {
             var child = workspace.children[index];
-console.log("child "+child+ " type "+(typeof child))
-            if (typeof child.x !== 'undefined')
-            {
-                console.log("child "+child+" "+child.x + " "+child.width)
-                x0 = Math.min(x0, child.x);
-                y0 = Math.min(y0, child.y);
 
-                x1 = Math.max(x1, child.x + child.width);
-                y1 = Math.max(y1, child.y + child.height);
+            // Check if our child must be filtered
+            if (
+                // We don't need repeaters because they don't have a valid geometry (they create items and add them to their parent)
+                !_qmlItemIsA(child, "Repeater")
+                &&
+                //TEMP FIXME: remove links because AgentNodeView creates links attached to (0,0)
+                !_qmlItemIsA(child, "Link")
+                )
+            {
+                // Check if our child has a geometry
+                if ((typeof child.x !== 'undefined') && (typeof child.y !== 'undefined') && (typeof child.width !== 'undefined') && (typeof child.height !== 'undefined'))
+                {
+                    x0 = Math.min(x0, child.x);
+                    y0 = Math.min(y0, child.y);
+
+                    x1 = Math.max(x1, child.x + child.width);
+                    y1 = Math.max(y1, child.y + child.height);
+
+                    validBoundingBox = true;
+                }
+                // Else: child does not have a geometry
             }
+            // Else: child has been filtered
         }
 
-        var margin = 5;
-        var area = Qt.rect(x0 - margin, y0 - margin, x1 - x0 + 2 * margin, y1 - y0 + 2 * margin);
-        //--------------------
-console.log("Area is "+area);
-        _showArea(area);
-    }
+        if (validBoundingBox)
+        {
+            var margin = 5;
+            var area = Qt.rect(x0 - margin, y0 - margin, x1 - x0 + 2 * margin, y1 - y0 + 2 * margin);
+            console.log("NodeGraphView: bounding box (+ margins) = " + area);
 
+            _showArea(area);
+        }
+    }
 
 
 
@@ -154,6 +172,33 @@ console.log("Area is "+area);
         {
             console.log("_showArea: invalid area "+area);
         }
+    }
+
+
+    // Check if a given item is an instance of a given class
+    function _qmlItemIsA(item, className)
+    {
+        var result = false;
+
+        if (item)
+        {
+            var itemToString = item.toString();
+
+            result = (
+                      // class + ( + address + ) => class instance without modification
+                      (itemToString.indexOf(className + "(") === 0)
+                      ||
+                      // QQuick + class + ( + address + ) => basic QML class instance
+                      // E.g. QQuickRepeater(0x7fa8c8667070)
+                      (itemToString.indexOf("QQuick" + className + "(") === 0)
+                      ||
+                      // class + _QMLTYPE_ + number + ( + address + ) => class instance with user-defined properties
+                      // E.g. AgentNodeView_QMLTYPE_90(0x7f97cb1416e0)
+                      (itemToString.indexOf(className + "_QML") === 0)
+                      );
+        }
+
+        return result;
     }
 
 
