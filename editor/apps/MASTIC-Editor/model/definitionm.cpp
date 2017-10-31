@@ -50,7 +50,9 @@ DefinitionM::~DefinitionM()
     qInfo() << "Delete Model of Agent Definition" << _name;
 
     // DIS-connect from signal "Count Changed" from the list of outputs
+    disconnect(&_inputsList, &AbstractI2CustomItemListModel::countChanged, this, &DefinitionM::_onInputsListChanged);
     disconnect(&_outputsList, &AbstractI2CustomItemListModel::countChanged, this, &DefinitionM::_onOutputsListChanged);
+    disconnect(&_parametersList, &AbstractI2CustomItemListModel::countChanged, this, &DefinitionM::_onParametersListChanged);
 
     // Delete all models of Inputs, Outputs and Parameters
     _inputsList.deleteAllItems();

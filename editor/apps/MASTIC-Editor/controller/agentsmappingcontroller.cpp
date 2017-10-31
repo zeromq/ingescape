@@ -73,6 +73,27 @@ void AgentsMappingController::addAgentToMappingAtPosition(QString agentName, Abs
 
 
 /**
+ * @brief Slot when a link from an output is dropped over an input on the current mapping (or when a link to an input is dropped over an output)
+ * @param outputAgent
+ * @param output
+ * @param inputAgent
+ * @param input
+ */
+void AgentsMappingController::addMapBetweenAgents(AgentInMappingVM* outputAgent, OutputVM* output, AgentInMappingVM* inputAgent, InputVM* input)
+{
+    if ((outputAgent != NULL) && (output != NULL)
+            && (inputAgent != NULL) && (input != NULL))
+    {
+        // Create a new map between agents
+        MapBetweenIOPVM* mapBetweenIOP = new MapBetweenIOPVM(outputAgent, output, inputAgent, input, this);
+
+        // Add to the list
+        _allMapInMapping.append(mapBetweenIOP);
+    }
+}
+
+
+/**
  * @brief Slot when a new view model of a agent mapping is created on the main view mapping.
  *      Check if a map need to be created from the element mapping list in the model manager.
  *      The two agents corresponding need to be visible in the list.
@@ -101,20 +122,25 @@ void AgentsMappingController::createMapBetweenIopInMappingFromAgentInMapping(Age
 
                 if(missingOutput != NULL)
                 {
-                    //Stuff the ghost elements in the partial map with the real things.
+                    //Set the ghost elements in the partial map with the real stuff.
 
-                    //Destroy ghost agent
-                    AgentInMappingVM* agentToDestroy = partialMap->agentFrom();
-                    agentToDestroy->~AgentInMappingVM();
-                    //Set real agent
-                    partialMap->setagentFrom(currentAgentInMapping);
+                    if(partialMap->agentFrom()->isGhost())
+                    {
+                        //Destroy ghost agent
+                        AgentInMappingVM* agentToDestroy = partialMap->agentFrom();
+                        agentToDestroy->~AgentInMappingVM();
+                        //Set real agent
+                        partialMap->setagentFrom(currentAgentInMapping);
+                    }
 
-                    //Destroy ghost output.
-                    OutputVM* outputToDestroy = partialMap->pointFrom();
-                    outputToDestroy->~OutputVM();
-                    //Set real output
-                    partialMap->setpointFrom(missingOutput);
-
+                    if(partialMap->pointFrom()->isGhost())
+                    {
+                        //Destroy ghost output.
+                        OutputVM* outputToDestroy = partialMap->pointFrom();
+                        outputToDestroy->~OutputVM();
+                        //Set real output
+                        partialMap->setpointFrom(missingOutput);
+                    }
                     //Add newly finalised MapBetweenIOP.
                     newMapBetweenIOP.append(partialMap);
 
@@ -147,26 +173,24 @@ void AgentsMappingController::createMapBetweenIopInMappingFromAgentInMapping(Age
                 if(currentElementMapping != NULL)
                 {
                     // Get the input conserned by the current elementMapping.
-
-                    InputVM* inputPointVM = NULL;
-                    inputPointVM = currentAgentInMapping->getPointMapFromInputName(currentElementMapping->input());
+                    InputVM* inputPointVM = currentAgentInMapping->getPointMapFromInputName(currentElementMapping->input());
 
                     if(inputPointVM != NULL)
                     {
                         // Search for the output agent based on the current elementMapping
                         AgentInMappingVM* outputAgent = _mapFromNameToAgentInMappingViewModelsList.value(currentElementMapping->outputAgent());
 
-                        OutputVM* outputPointVM = NULL;
-
-                        // if NOT NULL proceed to create the MapBetweenIOP else create a ghost agent.
                         if(outputAgent != NULL)
                         {
                             // Get the output conserned by the mapping.
-                            outputPointVM = outputAgent->getPointMapFromOutputName(currentElementMapping->output());
+                            OutputVM* outputPointVM = outputAgent->getPointMapFromOutputName(currentElementMapping->output());
 
-                            //We can proceed with the creation of the new MapBetweenIOP
                             if(outputPointVM != NULL)
                             {
+                                    //
+                                    // Everything went smoothly.
+                                    //
+
                                 //Create the MapBetweenIOPVM
                                 MapBetweenIOPVM* map = new MapBetweenIOPVM(outputAgent, outputPointVM, currentAgentInMapping, inputPointVM);
 
@@ -177,22 +201,13 @@ void AgentsMappingController::createMapBetweenIopInMappingFromAgentInMapping(Age
                             }
                             else
                             {
-                                // TODO ESTIA: ON fait quoi si l'output n'est pas trouvée.
-                                // Handle a missing Output
-                                qCritical() << outputAgent->agentName() << "." << currentElementMapping->output() << " is missing!";
-                            }
+                                    //
+                                    // Handle a missing Output
+                                    //
 
-                        }
-                        else
-                        {
-                            //Create a new ghost agent (AgentInMappingVM) as substitute of the missing agent name.
-                            outputAgent = new AgentInMappingVM(currentElementMapping->outputAgent());
+                                //Create a new ghost output (OutputVM) as substitute of the missing output.
+                                OutputVM* outputPointVM = new OutputVM(currentElementMapping->output());
 
-                            //Create a new ghost output (OutputVM) as substitute of the missing agent name.
-                            outputPointVM = new OutputVM(currentElementMapping->output());
-
-                            if(outputPointVM != NULL && outputAgent != NULL)
-                            {
                                 MapBetweenIOPVM* partialMap = new MapBetweenIOPVM(outputAgent, outputPointVM, currentAgentInMapping, inputPointVM);
 
                                 //Add the new MapBetweenIOP to the temp list.
@@ -201,8 +216,32 @@ void AgentsMappingController::createMapBetweenIopInMappingFromAgentInMapping(Age
                                 //Map partial mapBetweenIOP with output agent name to active search
                                 _mapFromAgentNameToPartialMapBetweenIOPViewModelsList.insertMulti(outputAgent->agentName(), partialMap);
 
-                                qInfo() << "Create the partial MapBetweenIOPVM : " << currentAgentInMapping->agentName() << "." << inputPointVM->modelM()->name() << " -> " << outputAgent->agentName() << "." << outputPointVM->iopName();
+                                qInfo() << "Create the partial MapBetweenIOPVM with onlmy the output as a ghost: " << currentAgentInMapping->agentName() << "." << inputPointVM->modelM()->name() << " -> " << outputAgent->agentName() << "." << outputPointVM->iopName();
                             }
+
+                        }
+                        else
+                        {
+                                //
+                                // Handle a missing Output Agent
+                                //
+
+                            //Create a new ghost agent (AgentInMappingVM) as substitute of the missing agent.
+                            outputAgent = new AgentInMappingVM(currentElementMapping->outputAgent());
+
+                            //Create a new ghost output (OutputVM) as substitute of the missing output.
+                            OutputVM* outputPointVM = new OutputVM(currentElementMapping->output());
+
+                            MapBetweenIOPVM* partialMap = new MapBetweenIOPVM(outputAgent, outputPointVM, currentAgentInMapping, inputPointVM);
+
+                            //Add the new MapBetweenIOP to the temp list.
+                            _allPartialMapInMapping.append(partialMap);
+
+                            //Map partial mapBetweenIOP with output agent name to active search
+                            _mapFromAgentNameToPartialMapBetweenIOPViewModelsList.insertMulti(outputAgent->agentName(), partialMap);
+
+                            qInfo() << "Create the partial MapBetweenIOPVM : " << currentAgentInMapping->agentName() << "." << inputPointVM->modelM()->name() << " -> " << outputAgent->agentName() << "." << outputPointVM->iopName();
+
                         }
                     }
                 }

@@ -139,7 +139,7 @@ Item {
 
         color : mouseArea.pressed?
                     MasticTheme.darkGreyColor2
-                  : (rootItem.agentMappingVM && rootItem.agentMappingVM.isON)? MasticTheme.darkGreyColor : MasticTheme.veryDarkGreyColor
+                  : (rootItem.agentMappingVM && rootItem.agentMappingVM.isON)? MasticTheme.darkBlueGreyColor : MasticTheme.veryDarkGreyColor
         radius : 6
 
         Rectangle {
@@ -233,8 +233,8 @@ Item {
 
                 color : MasticTheme.whiteColor
                 font {
-                    family: MasticTheme.labelFontFamilyBlack
-                    bold : true
+                    family: MasticTheme.labelFontFamily
+                    weight : Font.Black
                     pixelSize : 13
                 }
             }
@@ -265,8 +265,8 @@ Item {
 
                 color : MasticTheme.whiteColor
                 font {
-                    family: MasticTheme.labelFontFamilyBlack
-                    bold : true
+                    family: MasticTheme.labelFontFamily
+                    weight : Font.Black
                     pixelSize : 14
                 }
             }
@@ -331,7 +331,7 @@ Item {
                             agentMappingVM.isON? MasticTheme.greenColor : MasticTheme.darkGreenColor
                             break;
                         case AgentIOPValueTypes.MIXED:
-                            agentMappingVM.isON? MasticTheme.whiteColor : MasticTheme.greyColor4
+                            agentMappingVM.isON? MasticTheme.whiteColor : MasticTheme.darkGreyColor
                             break;
                         case AgentIOPValueTypes.UNKNOWN:
                             "#000000"
@@ -381,7 +381,7 @@ Item {
                             agentMappingVM.isON? MasticTheme.greenColor : MasticTheme.darkGreenColor
                             break;
                         case AgentIOPValueTypes.MIXED:
-                            agentMappingVM.isON? MasticTheme.whiteColor : MasticTheme.greyColor4
+                            agentMappingVM.isON? MasticTheme.whiteColor : MasticTheme.darkGreyColor
                             break;
                         case AgentIOPValueTypes.UNKNOWN:
                             "#000000"
@@ -555,7 +555,7 @@ Item {
                                         agentMappingVM.isON? MasticTheme.greenColor : MasticTheme.darkGreenColor
                                         break;
                                     case AgentIOPValueTypes.MIXED:
-                                        agentMappingVM.isON? MasticTheme.whiteColor : MasticTheme.greyColor4
+                                        agentMappingVM.isON? MasticTheme.whiteColor : MasticTheme.darkGreyColor
                                         break;
                                     case AgentIOPValueTypes.UNKNOWN:
                                         "#000000"
@@ -819,7 +819,7 @@ Item {
                                         (agentMappingVM.isON && !myModel.modelM.isMuted)? MasticTheme.greenColor : MasticTheme.darkGreenColor
                                         break;
                                     case AgentIOPValueTypes.MIXED:
-                                        (agentMappingVM.isON && !myModel.modelM.isMuted)? MasticTheme.whiteColor : MasticTheme.greyColor4
+                                        (agentMappingVM.isON && !myModel.modelM.isMuted)? MasticTheme.whiteColor : MasticTheme.darkGreyColor
                                         break;
                                     case AgentIOPValueTypes.UNKNOWN:
                                         "#000000"
