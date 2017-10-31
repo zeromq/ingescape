@@ -42,6 +42,33 @@ I2PopupBase {
     property var definition: model;
 
 
+
+    // Columns with a fixed size
+    // - Type
+    property int widthColumnType: 122
+    // - Definition Value
+    property int widthColumnDefValue: 102
+    // - Mapping Value
+    property int widthColumnMappingValue: 120
+    // - Scenario Value
+    property int widthColumnScenarioValue: 142
+    // - Mute
+    property int widthColumnMute: 40
+
+    // Resizable columns
+    // - Name
+    property int widthColumnName: (tabs.width - widthColumnType - widthColumnDefValue - widthColumnMappingValue - widthColumnScenarioValue - widthColumnMute)
+
+    // List of widths
+    property var widthsOfColumns: [
+        widthColumnName,
+        widthColumnType,
+        widthColumnDefValue,
+        widthColumnMappingValue,
+        widthColumnScenarioValue,
+        widthColumnMute
+    ]
+
     //--------------------------------
     //
     // Signals
@@ -105,7 +132,7 @@ I2PopupBase {
                 fileCache: MasticTheme.svgFileMASTIC
 
                 pressedID: releasedID + "-pressed"
-                releasedID: "supprimer"
+                releasedID: "closeEditor"
                 disabledID : releasedID
             }
 
@@ -179,6 +206,7 @@ I2PopupBase {
 
 
         Text {
+            id : descriptionTxt
             anchors {
                 top : definitionNameItem.bottom
                 topMargin: 18
@@ -187,7 +215,7 @@ I2PopupBase {
                 rightMargin: 22
             }
 
-            text: definition ? definition.description + "ddoekd dkodko dkodkoe zko djaiodj endodo,dz, dzop ad,zo d,zpaz z,sioa,d zps ;z;aos;osoz ddoekd dkodko dkodkoe zko djaiodj endodo,dz, dzop ad,zo d,zpaz z,sioa,d zps ;z;aos;osoz ddoekd dkodko dkodkoe zko djaiodj endodo,dz, dzop ad,zo d,zpaz z,sioa,d zps ;z;aos;osoz" : ""
+            text: definition ? definition.description : ""
 
             width: parent.width
             wrapMode: Text.Wrap
@@ -203,181 +231,466 @@ I2PopupBase {
 
 
 
-        TabView {
-            id: tabs
+        I2TabView {
+            id : tabs
 
             anchors {
                 top: parent.top
                 topMargin: 130
                 left: parent.left
+                leftMargin: 20
                 right: parent.right
+                rightMargin: 20
                 bottom: parent.bottom
-                margins: 20
+                bottomMargin: 55
             }
 
-            Tab {
-                title: "Inputs"
+            style: I2TabViewStyle {
+                frameOverlap: 1
+                tabsAlignment : Qt.AlignHCenter
+                tab: Item {
+                    implicitHeight: 30
+                    implicitWidth: 104
 
-                Rectangle {
-                    color: MasticTheme.definitionEditorsBackgroundColor
-                    border {
-                        width: 1
-                        color: MasticTheme.whiteColor
-                    }
+                    I2SvgItem {
+                        id : svgMenu
+                        anchors.centerIn: parent
 
-                    ListView {
-                        anchors {
-                            fill: parent
-                            //margins: 4
-                            topMargin: 10
-                            leftMargin: 2
-                            rightMargin: 2
-                            bottomMargin: 2
+                        svgFileCache : MasticTheme.svgFileMASTIC;
+                        svgElementId:  styleData.selected ? "tab-" + index + "-Selected" : "tab-" + index;
+
+                        Text {
+                            anchors.centerIn: parent
+
+                            text : styleData.title
+
+                            color : styleData.selected ? MasticTheme.veryDarkGreyColor : MasticTheme.whiteColor
+                            font {
+                                family: MasticTheme.textFontFamily
+                                bold: true
+                                pixelSize : 16
+                            }
                         }
-
-                        model: definition ? definition.inputsList : 0
-
-                        delegate: componentIOP
                     }
                 }
-            }
-            Tab {
-                title: "Parameters"
 
-                Rectangle {
-                    color: MasticTheme.definitionEditorsBackgroundColor
-                    border {
-                        width: 1
-                        color: MasticTheme.whiteColor
-                    }
-
-                    ListView {
-                        anchors {
-                            fill: parent
-                            //margins: 4
-                            topMargin: 10
-                            leftMargin: 2
-                            rightMargin: 2
-                            bottomMargin: 2
-                        }
-
-                        model: definition ? definition.parametersList : 0
-
-                        delegate: componentIOP
-                    }
+                frame: Rectangle {
+                    color : "transparent"
                 }
             }
-            Tab {
-                title: "Outputs"
 
-                Rectangle {
-                    color: MasticTheme.definitionEditorsBackgroundColor
-                    border {
-                        width: 1
-                        color: MasticTheme.whiteColor
-                    }
+            onCurrentIndexChanged: {
+            }
 
-                    ListView {
-                        anchors {
-                            fill: parent
-                            //margins: 4
-                            topMargin: 10
-                            leftMargin: 2
-                            rightMargin: 2
-                            bottomMargin: 2
+
+            //---------------------------------------
+            //
+            // Content of our tabs
+            //
+            //---------------------------------------
+            Repeater {
+                model : ["Inputs", "Outputs", "Parameters"]
+
+                Tab {
+                    id : tab
+                    title: modelData;
+                    active : true
+
+                    Item {
+                        anchors.fill: parent
+
+                        /// ****** Headers of columns ***** ////
+                        Row {
+                            id: tableauHeaderRow
+
+                            anchors {
+                                left: parent.left
+                                right: parent.right
+                                top: parent.top
+                                topMargin: 15
+                            }
+                            height : 33
+
+                            Repeater {
+                                model: [
+                                    qsTr("Name"),
+                                    qsTr("Type"),
+                                    qsTr("Def value"),
+                                    qsTr("Mapping value"),
+                                    qsTr("Scenario value"),
+                                    qsTr("Mute")
+                                ]
+
+                                Item {
+                                    height : 33
+                                    width : rootItem.widthsOfColumns[index]
+
+                                    Text {
+                                        anchors {
+                                            left: parent.left
+                                            leftMargin: 2
+                                            verticalCenter: parent.verticalCenter
+                                        }
+
+                                        text : (modelData !== "Mute" || tab.title === "Outputs") ? modelData : ""
+
+                                        color : MasticTheme.definitionEditorsAgentDescriptionColor
+                                        font {
+                                            family: MasticTheme.textFontFamily
+                                            pixelSize : 16
+                                        }
+                                    }
+                                }
+                            }
                         }
 
-                        model: definition ? definition.outputsList : 0
 
-                        delegate: componentIOP
+                        // separator
+                        Rectangle {
+                            anchors {
+                                left : parent.left
+                                right : parent.right
+                                top : tableauHeaderRow.bottom
+                            }
+                            height : 1
+
+                            color : MasticTheme.blackColor
+                        }
+
+                        /// ****** List ***** ////
+                        ListView {
+                            anchors {
+                                top: tableauHeaderRow.bottom
+                                left : parent.left
+                                right : parent.right
+                                bottom : parent.bottom
+                            }
+
+                            model: if (definition) {
+                                       switch (tabs.currentIndex)
+                                       {
+                                       case 0:
+                                           definition.inputsList
+                                           break;
+                                       case 1:
+                                           definition.outputsList
+                                           break;
+                                       case 2:
+                                           definition.parametersList
+                                           break;
+                                       }
+                                   }
+                                   else {
+                                       0
+                                   }
+
+                            delegate:   Item {
+                                anchors {
+                                    left : parent.left
+                                    right : parent.right
+                                }
+                                height : 30
+
+                                Row {
+                                    id: listLine
+
+                                    anchors {
+                                        fill : parent
+                                    }
+
+                                    // Name
+                                    Text {
+                                        text: model.name
+
+                                        anchors {
+                                            verticalCenter: parent.verticalCenter
+                                        }
+                                        verticalAlignment: Text.AlignVCenter
+                                        width : rootItem.widthsOfColumns[0]
+                                        elide: Text.ElideRight
+                                        height: parent.height
+                                        color: MasticTheme.whiteColor
+                                        font {
+                                            family: MasticTheme.textFontFamily
+                                            pixelSize : 16
+                                        }
+                                    }
+
+
+                                    // Type
+                                    Item {
+                                        anchors {
+                                            verticalCenter: parent.verticalCenter
+                                        }
+                                        height: parent.height
+                                        width : rootItem.widthsOfColumns[1]
+
+                                        Rectangle {
+                                            id : circle
+                                            anchors {
+                                                left : parent.left
+                                                verticalCenter: parent.verticalCenter
+                                            }
+
+                                            width : 16
+                                            height : width
+                                            radius : width/2
+
+                                            color : switch (model.agentIOPValueType)
+                                                    {
+                                                    case AgentIOPValueTypes.INTEGER:
+                                                        MasticTheme.orangeColor2
+                                                        break;
+                                                    case AgentIOPValueTypes.DOUBLE:
+                                                        MasticTheme.orangeColor2
+                                                        break;
+                                                    case AgentIOPValueTypes.STRING:
+                                                        MasticTheme.redColor2
+                                                        break;
+                                                    case AgentIOPValueTypes.BOOL:
+                                                        MasticTheme.orangeColor2
+                                                        break;
+                                                    case AgentIOPValueTypes.IMPULSION:
+                                                        MasticTheme.purpleColor
+                                                        break;
+                                                    case AgentIOPValueTypes.DATA:
+                                                        MasticTheme.greenColor
+                                                        break;
+                                                    case AgentIOPValueTypes.MIXED:
+                                                        MasticTheme.whiteColor
+                                                        break;
+                                                    case AgentIOPValueTypes.UNKNOWN:
+                                                        "#000000"
+                                                        break;
+                                                    default:
+                                                        MasticTheme.whiteColor;
+                                                        break;
+                                                    }
+                                        }
+
+                                        Text {
+                                            text: AgentIOPValueTypes.enumToString(model.agentIOPValueType)
+
+                                            anchors {
+                                                verticalCenter: circle.verticalCenter
+                                                verticalCenterOffset: 1
+                                                left : circle.right
+                                                leftMargin: 5
+                                                right : parent.right
+                                            }
+                                            verticalAlignment: Text.AlignVCenter
+                                            elide: Text.ElideRight
+                                            height: parent.height
+                                            color: MasticTheme.whiteColor
+                                            font {
+                                                family: MasticTheme.textFontFamily
+                                                pixelSize : 16
+                                            }
+                                        }
+                                    }
+
+
+                                    // Def Value
+                                    Text {
+                                        text: model.displayableDefaultValue
+
+                                        anchors {
+                                            verticalCenter: parent.verticalCenter
+                                        }
+                                        verticalAlignment: Text.AlignVCenter
+                                        width : rootItem.widthsOfColumns[2]
+                                        height: parent.height
+                                        elide: Text.ElideRight
+                                        color: MasticTheme.whiteColor
+                                        font {
+                                            family: MasticTheme.textFontFamily
+                                            pixelSize : 16
+                                        }
+                                    }
+
+
+                                    // Mapping Value
+                                    Text {
+                                        text: "    -"
+
+                                        anchors {
+                                            verticalCenter: parent.verticalCenter
+                                        }
+                                        verticalAlignment: Text.AlignVCenter
+                                        width : rootItem.widthsOfColumns[3]
+                                        height: parent.height
+                                        color: MasticTheme.whiteColor
+                                        elide: Text.ElideRight
+
+                                        font {
+                                            family: MasticTheme.textFontFamily
+                                            pixelSize : 16
+                                        }
+                                    }
+
+                                    // Scenario Value
+                                    Text {
+                                        text: "    -"
+
+                                        anchors {
+                                            verticalCenter: parent.verticalCenter
+                                        }
+                                        verticalAlignment: Text.AlignVCenter
+                                        width : rootItem.widthsOfColumns[4]
+                                        height: parent.height
+                                        elide: Text.ElideRight
+                                        color: MasticTheme.whiteColor
+                                        font {
+                                            family: MasticTheme.textFontFamily
+                                            pixelSize : 16
+                                        }
+                                    }
+
+
+                                    // Mute
+                                    Item {
+                                        anchors {
+                                            verticalCenter: parent.verticalCenter
+                                        }
+                                        width : rootItem.widthsOfColumns[5]
+                                        height: parent.height
+
+                                        Button {
+                                            id: btnMuteOutput
+
+                                            property var boundingBox: MasticTheme.svgFileMASTIC.boundsOnElement("muteactif");
+                                            height : boundingBox.height
+                                            width :  boundingBox.width
+
+                                            visible: (model.agentIOPType === AgentIOPTypes.OUTPUT)
+                                            enabled : visible
+
+                                            anchors {
+                                                verticalCenter: parent.verticalCenter
+                                                right : parent.right
+                                            }
+
+                                            style: I2SvgButtonStyle {
+                                                fileCache: MasticTheme.svgFileMASTIC
+
+                                                pressedID: releasedID + "-pressed"
+                                                releasedID: model.isMuted? "muteactif" : "muteinactif"
+                                                disabledID : releasedID
+
+                                            }
+
+                                            onClicked: {
+                                                model.QtObject.changeMuteOutput();
+                                            }
+                                        }
+                                    }
+                                }
+
+
+                                //separator
+                                Rectangle {
+                                    anchors {
+                                        left : parent.left
+                                        right : parent.right
+                                        bottom : parent.bottom
+                                    }
+                                    height : 1
+
+                                    color : MasticTheme.blackColor
+                                }
+
+                            }
+                        }
                     }
                 }
+
             }
+
         }
-    }
 
-    Component {
-        id: componentIOP
 
-        Item {
-            height: 25
-            //width: childrenRect.width
-
-            Text {
-                id: iopName
-                text: model.name
-
-                anchors {
-                    left: parent.left
-                    top: parent.top
-                }
-
-                width: 120
-                height: parent.height
-                color: MasticTheme.definitionEditorsLabelColor
-                font: MasticTheme.normalFont
+        Row {
+            anchors {
+                right : tabs.right
+                top : tabs.bottom
+                topMargin: 12
+                bottom : parent.bottom
+                bottomMargin: 16
             }
+            spacing : 15
 
-            Text {
-                id: iopType
-                text: AgentIOPValueTypes.enumToString(model.agentIOPValueType)
-
-                anchors {
-                    left: iopName.right
-                    top: parent.top
-                }
-
-                width: 100
-                height: parent.height
-                color: MasticTheme.definitionEditorsLabelColor
-                font: MasticTheme.normalFont
-            }
-
-            Text {
-                id: iopValue
-                text: model.displayableDefaultValue
-
-                anchors {
-                    left: iopType.right
-                    top: parent.top
-                }
-
-                width: 150
-                height: parent.height
-                color: MasticTheme.definitionEditorsLabelColor
-                font: MasticTheme.normalFont
-            }
 
             Button {
-                id: btnMuteOutput
+                id: cancelButton
 
-                property var boundingBox: MasticTheme.svgFileMASTIC.boundsOnElement("muteactif");
+                property var boundingBox: MasticTheme.svgFileMASTIC.boundsOnElement("button");
                 height : boundingBox.height
                 width :  boundingBox.width
 
-                visible: (model.agentIOPType === AgentIOPTypes.OUTPUT)
                 enabled : visible
+                text : "Cancel"
 
                 anchors {
-                    left: iopValue.right
-                    top: parent.top
+                    verticalCenter: parent.verticalCenter
                 }
 
                 style: I2SvgButtonStyle {
                     fileCache: MasticTheme.svgFileMASTIC
 
                     pressedID: releasedID + "-pressed"
-                    releasedID: model.isMuted? "muteactif" : "muteinactif"
+                    releasedID: "button"
                     disabledID : releasedID
+
+                    font {
+                        family: MasticTheme.textFontFamily
+                        bold : true
+                        pixelSize : 16
+                    }
+                    labelColorPressed: MasticTheme.blackColor
+                    labelColorReleased: MasticTheme.whiteColor
+                    labelColorDisabled: MasticTheme.whiteColor
 
                 }
 
                 onClicked: {
-                    //console.log("QML: Mute/UN-mute output " + model.name);
-                    model.QtObject.changeMuteOutput();
                 }
             }
 
+            Button {
+                id: okButton
+
+                property var boundingBox: MasticTheme.svgFileMASTIC.boundsOnElement("button");
+                height : boundingBox.height
+                width :  boundingBox.width
+
+                enabled : visible
+                text : "OK"
+
+                anchors {
+                    verticalCenter: parent.verticalCenter
+                }
+
+                style: I2SvgButtonStyle {
+                    fileCache: MasticTheme.svgFileMASTIC
+
+                    pressedID: releasedID + "-pressed"
+                    releasedID: "button"
+                    disabledID : releasedID
+
+                    font {
+                        family: MasticTheme.textFontFamily
+                        bold : true
+                        pixelSize : 16
+                    }
+                    labelColorPressed: MasticTheme.blackColor
+                    labelColorReleased: MasticTheme.whiteColor
+                    labelColorDisabled: MasticTheme.whiteColor
+
+                }
+
+                onClicked: {
+                }
+            }
 
         }
     }

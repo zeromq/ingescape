@@ -458,10 +458,103 @@
 			c0.2,0.1,0.3,0.3,0.3,0.5c0,0.9,0,1.9,0,2.8l3.1-2.4c0.3-0.3,0.8-0.2,1.1,0.1C968,520.4,967.9,520.9,967.6,521.1z"/>
 	</g>
 </g>
-<g id="outputIsMuted">
+<g id="outputIsMute">
 	<g>
 		<line fill="none" stroke="#FFFFFF" stroke-width="2" stroke-miterlimit="10" x1="548.8" y1="506.7" x2="542.7" y2="512.7"/>
 		<line fill="none" stroke="#FFFFFF" stroke-width="2" stroke-miterlimit="10" x1="548.8" y1="512.7" x2="542.7" y2="506.7"/>
+	</g>
+</g>
+<g id="editeurDefinition">
+	<linearGradient id="tab-0_1_" gradientUnits="userSpaceOnUse" x1="469.1121" y1="616.2708" x2="469.1121" y2="586.8051">
+		<stop  offset="0" style="stop-color:#17191E"/>
+		<stop  offset="1" style="stop-color:#3C424F"/>
+	</linearGradient>
+	<path id="tab-0" fill="url(#tab-0_1_)" stroke="#878787" stroke-width="0.2932" stroke-miterlimit="10" d="M520.4,616.3h-94.2
+		c-4.7,0-8.5-3.8-8.5-8.5v-12.5c0-4.7,3.8-8.5,8.5-8.5h94.2V616.3z"/>
+	
+		<linearGradient id="tab-0-Selected_1_" gradientUnits="userSpaceOnUse" x1="584.1666" y1="679.1584" x2="584.1666" y2="708.6241" gradientTransform="matrix(-1 0 0 -1 1168.333 1295.4292)">
+		<stop  offset="0" style="stop-color:#FFFFFF"/>
+		<stop  offset="0.3119" style="stop-color:#FDFDFE"/>
+		<stop  offset="0.4787" style="stop-color:#F6F6F9"/>
+		<stop  offset="0.6113" style="stop-color:#E9EAEF"/>
+		<stop  offset="0.7259" style="stop-color:#D8DAE2"/>
+		<stop  offset="0.8288" style="stop-color:#C1C6D1"/>
+		<stop  offset="0.9219" style="stop-color:#A5AEBD"/>
+		<stop  offset="1" style="stop-color:#8896AA"/>
+	</linearGradient>
+	<path id="tab-0-Selected" fill="url(#tab-0-Selected_1_)" stroke="#17191E" stroke-width="0.2932" stroke-miterlimit="10" d="
+		M541.3,586.8l94.2,0v29.5h-93.1c-5.3,0-9.5-4.3-9.5-9.5v-11.4C532.8,590.6,536.6,586.8,541.3,586.8z"/>
+	<linearGradient id="tab-1_1_" gradientUnits="userSpaceOnUse" x1="469.1121" y1="653.6561" x2="469.1121" y2="624.1904">
+		<stop  offset="0" style="stop-color:#17191E"/>
+		<stop  offset="1" style="stop-color:#3C424F"/>
+	</linearGradient>
+	
+		<rect id="tab-1" x="417.8" y="624.2" fill="url(#tab-1_1_)" stroke="#878787" stroke-width="0.2932" stroke-miterlimit="10" width="102.7" height="29.5"/>
+	
+		<linearGradient id="tab-1-Selected_1_" gradientUnits="userSpaceOnUse" x1="584.1664" y1="624.1905" x2="584.1664" y2="653.6561" gradientTransform="matrix(-1 0 0 -1 1168.3328 1277.8466)">
+		<stop  offset="0" style="stop-color:#FFFFFF"/>
+		<stop  offset="0.3119" style="stop-color:#FDFDFE"/>
+		<stop  offset="0.4787" style="stop-color:#F6F6F9"/>
+		<stop  offset="0.6113" style="stop-color:#E9EAEF"/>
+		<stop  offset="0.7259" style="stop-color:#D8DAE2"/>
+		<stop  offset="0.8288" style="stop-color:#C1C6D1"/>
+		<stop  offset="0.9219" style="stop-color:#A5AEBD"/>
+		<stop  offset="1" style="stop-color:#8896AA"/>
+	</linearGradient>
+	
+		<rect id="tab-1-Selected" x="532.8" y="624.2" fill="url(#tab-1-Selected_1_)" stroke="#17191E" stroke-width="0.2932" stroke-miterlimit="10" width="102.7" height="29.5"/>
+	<linearGradient id="button_1_" gradientUnits="userSpaceOnUse" x1="467.3487" y1="747.6381" x2="467.3487" y2="718.1724">
+		<stop  offset="0" style="stop-color:#17191E"/>
+		<stop  offset="1" style="stop-color:#3C424F"/>
+	</linearGradient>
+	<path id="button" fill="url(#button_1_)" stroke="#878787" stroke-width="0.2588" stroke-miterlimit="10" d="M503.3,747.6h-71.8
+		c-2.3,0-4.1-1.8-4.1-4.1v-21.3c0-2.3,1.8-4.1,4.1-4.1h71.8c2.3,0,4.1,1.8,4.1,4.1v21.3C507.3,745.8,505.5,747.6,503.3,747.6z"/>
+	<linearGradient id="button-pressed_1_" gradientUnits="userSpaceOnUse" x1="584.1664" y1="747.6381" x2="584.1664" y2="718.1724">
+		<stop  offset="0" style="stop-color:#FFFFFF"/>
+		<stop  offset="0.3119" style="stop-color:#FDFDFE"/>
+		<stop  offset="0.4787" style="stop-color:#F6F6F9"/>
+		<stop  offset="0.6113" style="stop-color:#E9EAEF"/>
+		<stop  offset="0.7259" style="stop-color:#D8DAE2"/>
+		<stop  offset="0.8288" style="stop-color:#C1C6D1"/>
+		<stop  offset="0.9219" style="stop-color:#A5AEBD"/>
+		<stop  offset="1" style="stop-color:#8896AA"/>
+	</linearGradient>
+	<path id="button-pressed" fill="url(#button-pressed_1_)" stroke="#17191E" stroke-width="0.2588" stroke-miterlimit="10" d="
+		M620.1,747.6h-71.8c-2.3,0-4.1-1.8-4.1-4.1v-21.3c0-2.3,1.8-4.1,4.1-4.1h71.8c2.3,0,4.1,1.8,4.1,4.1v21.3
+		C624.2,745.8,622.3,747.6,620.1,747.6z"/>
+	<linearGradient id="tab-2-Selected_1_" gradientUnits="userSpaceOnUse" x1="584.1664" y1="696.4041" x2="584.1664" y2="666.9384">
+		<stop  offset="0" style="stop-color:#FFFFFF"/>
+		<stop  offset="0.3119" style="stop-color:#FDFDFE"/>
+		<stop  offset="0.4787" style="stop-color:#F6F6F9"/>
+		<stop  offset="0.6113" style="stop-color:#E9EAEF"/>
+		<stop  offset="0.7259" style="stop-color:#D8DAE2"/>
+		<stop  offset="0.8288" style="stop-color:#C1C6D1"/>
+		<stop  offset="0.9219" style="stop-color:#A5AEBD"/>
+		<stop  offset="1" style="stop-color:#8896AA"/>
+	</linearGradient>
+	<path id="tab-2-Selected" fill="url(#tab-2-Selected_1_)" stroke="#17191E" stroke-width="0.2932" stroke-miterlimit="10" d="
+		M627,696.4h-94.2v-29.5H626c5.3,0,9.5,4.3,9.5,9.5v11.4C635.5,692.6,631.7,696.4,627,696.4z"/>
+	<linearGradient id="tab-2_1_" gradientUnits="userSpaceOnUse" x1="469.1121" y1="696.4041" x2="469.1121" y2="666.9384">
+		<stop  offset="0" style="stop-color:#17191E"/>
+		<stop  offset="1" style="stop-color:#3C424F"/>
+	</linearGradient>
+	<path id="tab-2" fill="url(#tab-2_1_)" stroke="#878787" stroke-width="0.2932" stroke-miterlimit="10" d="M511.9,696.4h-94.2
+		v-29.5h93.1c5.3,0,9.5,4.3,9.5,9.5v11.4C520.4,692.6,516.6,696.4,511.9,696.4z"/>
+	<g id="closeEditor">
+		<g>
+			
+				<line fill="#FFFFFF" stroke="#FFFFFF" stroke-width="1.3322" stroke-miterlimit="10" x1="711.5" y1="610.8" x2="698.3" y2="624.2"/>
+			
+				<line fill="#FFFFFF" stroke="#FFFFFF" stroke-width="1.3322" stroke-miterlimit="10" x1="711.4" y1="624.3" x2="698.2" y2="610.8"/>
+		</g>
+	</g>
+	<g id="closeEditor-pressed">
+		<g>
+			
+				<line fill="#9D9C9C" stroke="#9D9C9C" stroke-width="1.3322" stroke-miterlimit="10" x1="711.5" y1="632.2" x2="698.2" y2="645.6"/>
+			
+				<line fill="#9D9C9C" stroke="#9D9C9C" stroke-width="1.3322" stroke-miterlimit="10" x1="711.4" y1="645.7" x2="698.2" y2="632.3"/>
+		</g>
 	</g>
 </g>
 </svg>
