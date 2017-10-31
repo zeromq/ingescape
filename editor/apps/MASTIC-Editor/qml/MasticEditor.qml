@@ -176,8 +176,8 @@ Item {
                             wrapMode: Text.Wrap;
 
                             font {
-                                family: MasticTheme.labelFontFamilyExtraBold;
-                                bold : true;
+                                family: MasticTheme.labelFontFamily;
+                                weight: Font.ExtraBold;
                                 pixelSize:18;
                                 capitalization: Font.AllUppercase;
                             }

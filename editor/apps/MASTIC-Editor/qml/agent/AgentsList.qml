@@ -199,7 +199,7 @@ Item {
                 }
                 height : btnAddAgent.height
                 width : 1
-                color : MasticTheme.greyColor
+                color : MasticTheme.blueGreyColor
             }
 
             Button {
@@ -271,7 +271,7 @@ Item {
                 }
                 height : btnRemoveAgent.height
                 width : 1
-                color : MasticTheme.greyColor
+                color : MasticTheme.blueGreyColor
             }
 
 
