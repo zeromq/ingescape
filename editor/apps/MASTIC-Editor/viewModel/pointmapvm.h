@@ -28,12 +28,13 @@ class PointMapVM : public QObject
 {
     Q_OBJECT
 
-       // Name of this input/output represent by a point map
-       I2_QML_PROPERTY(QString, iopName)
+    // Name of this input/output represent by a point map
+    I2_QML_PROPERTY(QString, iopName)
 
-       // Geometry for the connector in the view
-       // Position the center of the connector (Absolute coordinate)
-       I2_QML_PROPERTY(QPointF, position)
+    // Geometry for the connector in the view
+    // Position the center of the connector (Absolute coordinate)
+    I2_QML_PROPERTY(QPointF, position)
+
 
 public:
     /**
@@ -43,10 +44,33 @@ public:
      */
     explicit PointMapVM(QString iopName, QObject *parent = nullptr);
 
-   /**
-    * @brief Destructor
-    */
+
+    /**
+     * @brief Destructor
+     */
     ~PointMapVM();
+
+
+Q_SIGNALS:
+
+public Q_SLOTS:
+
+    /**
+     * @brief Return true if our point can link with the point (types are compatible)
+     * @param pointMap
+     * @return
+     */
+    virtual bool canLinkWith(PointMapVM* pointMap) = 0;
+
+
+protected:
+    /**
+     * @brief Return true if the type of the output is compatible with the type of the input
+     * @param outputValueType
+     * @param inputValueType
+     * @return
+     */
+    bool _canLinkOutputToInput(AgentIOPValueTypes::Value outputValueType, AgentIOPValueTypes::Value inputValueType);
 
 };
 
