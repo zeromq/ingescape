@@ -77,6 +77,16 @@ public Q_SLOTS:
 
 
     /**
+     * @brief Slot when a link from an output is dropped over an input on the current mapping (or when a link to an input is dropped over an output)
+     * @param outputAgent
+     * @param output
+     * @param inputAgent
+     * @param input
+     */
+    void addMapBetweenAgents(AgentInMappingVM* outputAgent, OutputVM* output, AgentInMappingVM* inputAgent, InputVM* input);
+
+
+    /**
      * @brief Slot when the flag "is Activated Mapping" changed
      * @param isActivatedMapping
      */
