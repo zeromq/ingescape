@@ -30,11 +30,11 @@ class OutputVM : public PointMapVM
 {
     Q_OBJECT
 
-    // Point map name (AgentIOP name) but needed for ghost input/output
-    I2_QML_PROPERTY(bool, isGhost)
-
     // Model of our agent Output
     I2_QML_PROPERTY_READONLY_DELETE_PROOF(OutputM*, modelM)
+
+    // Point map name (AgentIOP name) but needed for ghost input/output
+    I2_QML_PROPERTY(bool, isGhost)
 
 
 public:
