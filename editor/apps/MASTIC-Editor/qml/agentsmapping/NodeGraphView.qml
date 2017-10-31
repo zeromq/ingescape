@@ -106,18 +106,13 @@ Item {
                 !_qmlItemIsA(child, "Link")
                 )
             {
-                // Check if our child has a geometry
-                if ((typeof child.x !== 'undefined') && (typeof child.y !== 'undefined') && (typeof child.width !== 'undefined') && (typeof child.height !== 'undefined'))
-                {
-                    x0 = Math.min(x0, child.x);
-                    y0 = Math.min(y0, child.y);
+                x0 = Math.min(x0, child.x);
+                y0 = Math.min(y0, child.y);
 
-                    x1 = Math.max(x1, child.x + child.width);
-                    y1 = Math.max(y1, child.y + child.height);
+                x1 = Math.max(x1, child.x + child.width);
+                y1 = Math.max(y1, child.y + child.height);
 
-                    validBoundingBox = true;
-                }
-                // Else: child does not have a geometry
+                validBoundingBox = true;
             }
             // Else: child has been filtered
         }
@@ -127,6 +122,7 @@ Item {
             var margin = 5;
             var area = Qt.rect(x0 - margin, y0 - margin, x1 - x0 + 2 * margin, y1 - y0 + 2 * margin);
             console.log("NodeGraphView: bounding box (+ margins) = " + area);
+            console.log("NodeGraphView. workspace.childrenRect =" + workspace.childrenRect);
 
             _showArea(area);
         }
