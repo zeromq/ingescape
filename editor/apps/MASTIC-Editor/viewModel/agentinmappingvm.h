@@ -44,6 +44,9 @@ class AgentInMappingVM : public QObject
     // Define the value type of the reduced map (= brin) in output of the agent
     I2_QML_PROPERTY_READONLY(AgentIOPValueTypes::Value, reducedMapValueTypeInOutput)
 
+    // Flag indicating if our agent is a ghost agent
+    I2_QML_PROPERTY_READONLY(bool, isGhost)
+
 
 public:
     /**
@@ -69,6 +72,14 @@ public:
                               QObject* parent = nullptr);
 
     /**
+         * @brief Ghost Constructor: Definition model is empty. The agent is an empty shell only defined by a name.
+         * @param agentName
+         * @param parent
+         */
+    explicit AgentInMappingVM(QString agentName,
+                              QObject* parent = nullptr);
+
+    /**
      * @brief Destructor
      */
     ~AgentInMappingVM();
@@ -77,9 +88,9 @@ Q_SIGNALS:
 
     /**
      * @brief Signal emitted when a definition is added to the agent mapping
-     * @param agentName
+     * @param agentInMapping
      */
-    void newDefinitionInAgentMapping(QString agentName);
+    void newDefinitionInAgentMapping(AgentInMappingVM* agentInMapping);
 
 public Q_SLOTS:
     /**
@@ -125,17 +136,10 @@ private:
 
        /**
             * @brief This function check if the point map already exist in the input list
-            * @param agentName The name of the agent mapping VM
-            * @param iopName The name of the input to add
+            * @param iopName The name of the iop
+            * @param typeofIOP The type of iop
             */
-       bool checkIfAlreadyInIntputList(QString agentName, QString iopName);
-
-       /**
-            * @brief This function check if the point map already exist in the output list
-            * @param agentName The name of the agent mapping VM
-            * @param iopName The name of the output to add
-            */
-       bool checkIfAlreadyInOutputList(QString agentName, QString iopName);
+       bool checkIfAlreadyInInputOutputList(QString iopName, AgentIOPTypes::Value typeofIOP);
 };
 
 QML_DECLARE_TYPE(AgentInMappingVM)

@@ -34,7 +34,7 @@ class InputVM : public PointMapVM
     I2_QML_PROPERTY_READONLY_DELETE_PROOF(AgentIOPM*, modelM)
 
 public:
-    explicit InputVM(QString agentName,
+    explicit InputVM(QString inputName,
                      AgentIOPM* modelM,
                      QObject *parent = nullptr);
 

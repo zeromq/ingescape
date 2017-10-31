@@ -15,7 +15,8 @@ AgentInMappingVM::AgentInMappingVM(DefinitionM *definitionModel,
     _isON(false),
     _isReduced(false),
     _reducedMapValueTypeInInput(AgentIOPValueTypes::MIXED),
-    _reducedMapValueTypeInOutput(AgentIOPValueTypes::MIXED)
+    _reducedMapValueTypeInOutput(AgentIOPValueTypes::MIXED),
+    _isGhost(false)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -49,7 +50,8 @@ AgentInMappingVM::AgentInMappingVM(QList<DefinitionM *> definitionModelList,
     _isON(false),
     _isReduced(false),
     _reducedMapValueTypeInInput(AgentIOPValueTypes::MIXED),
-    _reducedMapValueTypeInOutput(AgentIOPValueTypes::MIXED)
+    _reducedMapValueTypeInOutput(AgentIOPValueTypes::MIXED),
+    _isGhost(false)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -68,6 +70,26 @@ AgentInMappingVM::AgentInMappingVM(QList<DefinitionM *> definitionModelList,
     else {
         qCritical() << "The model of agent mapping is NULL !";
     }
+}
+
+
+/**
+     * @brief Ghost Constructor: Definition model is empty. The agent is an empty shell only defined by a name.
+     * @param agentName
+     * @param parent
+     */
+AgentInMappingVM::AgentInMappingVM(QString agentName, QObject *parent) : QObject(parent),
+    _agentName(agentName),
+    _position(QPointF()),
+    _isON(false),
+    _isReduced(false),
+    _reducedMapValueTypeInInput(AgentIOPValueTypes::MIXED),
+    _reducedMapValueTypeInOutput(AgentIOPValueTypes::MIXED),
+    _isGhost(true)
+{
+    // Force ownership of our object, it will prevent Qml from stealing it
+    QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
+
 }
 
 /**
@@ -92,7 +114,7 @@ void AgentInMappingVM::addDefinitionInInternalList(DefinitionM *newDefinition)
         //
          addPointMapInInternalOutputList(newDefinition);
 
-        Q_EMIT newDefinitionInAgentMapping(this->agentName());
+        Q_EMIT newDefinitionInAgentMapping(this);
     }
     else {
         qInfo()<<"The definition of the agent named '" << _agentName << "' could not be add to the agent mapping VM named '" << newDefinition->name() << "'";
@@ -118,10 +140,10 @@ void AgentInMappingVM::addPointMapInInternalInputList(DefinitionM *newDefinition
             if (iopM != NULL)
             {
                 //Check if it's not alreafy exist in the list & add it
-                if(!checkIfAlreadyInIntputList(_agentName, iopM->name()))
+                if(!checkIfAlreadyInInputOutputList(iopM->name(), iopM->agentIOPType()))
                 {
                     // New pointMapVM (from agent and input model
-                    InputVM* inputPoint = new InputVM(_agentName, iopM, this);
+                    InputVM* inputPoint = new InputVM(iopM->name(), iopM, this);
 
                     // Add to the list of newly created pointMap
                     listOfPointMapTemp.append(inputPoint);
@@ -157,10 +179,10 @@ void AgentInMappingVM::addPointMapInInternalOutputList(DefinitionM *newDefinitio
             if (iopM != NULL)
             {
                 //Check if it's not alreafy exist in the list & add it
-                if(!checkIfAlreadyInOutputList(_agentName, iopM->name()))
+                if(!checkIfAlreadyInInputOutputList(iopM->name(), iopM->agentIOPType()))
                 {
                     // New pointMapVM (from agent and input model
-                    OutputVM* outputPoint = new OutputVM(_agentName, iopM, this);
+                    OutputVM* outputPoint = new OutputVM(iopM->name(), iopM, this);
 
                     // Add to the list of newly created pointMap
                     listOfPointMapTemp.append(outputPoint);
@@ -179,62 +201,53 @@ void AgentInMappingVM::addPointMapInInternalOutputList(DefinitionM *newDefinitio
     }
 }
 
+
+// TODO ESTIA Sera sans doute supprimer. Attendre de voir le multidefinition
 /**
      * @brief This function check if the point map already exist in the input list
-     * @param agentName The name of the agent mapping VM
-     * @param iopName The name of the input to add
+     * @param iopName The name of the iop
+     * @param typeofIOP The type of iop
      */
-bool AgentInMappingVM::checkIfAlreadyInIntputList(QString agentName, QString iopName)
+bool AgentInMappingVM::checkIfAlreadyInInputOutputList(QString iopName, AgentIOPTypes::Value typeofIOP)
 {
-    foreach (InputVM* iterator, _inputsList.toList())
+    if(typeofIOP == AgentIOPTypes::INPUT)
     {
-        // If this VM contains our model of agent
-        if ( (iterator != NULL)
-             &&
-
-             //TODO ESTIA PATXI : on est déjà dans l'agent (UTILE?).
-             // Same agent name
-             (iterator->nameAgent() == agentName)
-             &&
-             // Same Input name
-             (iterator->modelM()->name() == iopName)
-             )
+        foreach (InputVM* iterator, _inputsList.toList())
         {
-            // Exactly the same point ('agent name' & 'iop name')
-            return true;
+            // If this VM contains our model of agent
+            if ( (iterator != NULL)
+                 &&
+
+                 // Same Input name
+                 (iterator->modelM()->name() == iopName)
+                 )
+            {
+                // Exactly the same point ('agent name' & 'iop name')
+                return true;
+            }
+        }
+    }
+    else if(typeofIOP == AgentIOPTypes::OUTPUT)
+    {
+        foreach (OutputVM* iterator, _outputsList.toList())
+        {
+            // If this VM contains our model of agent
+            if ( (iterator != NULL)
+                 &&
+
+                 // Same Input name
+                 (iterator->modelM()->name() == iopName)
+                 )
+            {
+                // Exactly the same point ('agent name' & 'iop name')
+                return true;
+            }
         }
     }
 
     return false;
 }
 
-/**
-     * @brief This function check if the point map already exist in the outputList
-     * @param agentName The name of the agent mapping VM
-     * @param iopName The name of the input to add
-     */
-bool AgentInMappingVM::checkIfAlreadyInOutputList(QString agentName, QString iopName)
-{
-    foreach (OutputVM* iterator, _outputsList.toList())
-    {
-        // If this VM contains our model of agent
-        if ( (iterator != NULL)
-             &&
-              //TODO ESTIA PATXI : on est déjà dans l'agent (UTILE?).
-             // Same agent name
-             (iterator->nameAgent() == agentName)
-             &&
-             // Same Input name
-             (iterator->modelM()->name() == iopName)
-             )
-        {
-            // Exactly the same point ('agent name' & 'iop name')
-            return true;
-        }
-    }
-
-    return false;
-}
 
 /**
      * @brief Return the corresponding PointMap from the input IOP name

@@ -38,6 +38,10 @@ class AgentsMappingController : public QObject
     // List of all maps between agents
     I2_QOBJECT_LISTMODEL(MapBetweenIOPVM, allMapInMapping)
 
+    // List of all partial maps between agents (input and input agent are fully defined, output and output agent are ghost element)
+    // This list is not empty in the case of the presence of Ghost Agents in the mapping
+    I2_QOBJECT_LISTMODEL(MapBetweenIOPVM, allPartialMapInMapping)
+
     // Flag indicating if our mapping is empty
     I2_QML_PROPERTY_READONLY(bool, isEmptyMapping)
 
@@ -84,17 +88,9 @@ private Q_SLOTS:
      * @brief Slot when a new view model of a agent mapping is created on the main view mapping.
      *      Check if a map need to be created from the element mapping list in the model manager.
      *      The two agents corresponding need to be visible in the list.
-     * @param agentInMapping
+     * @param currentAgentInMapping
      */
-    void createMapBetweenIopInMappingFromAgentName(QString agentName);
-
-    /**
-     * @brief Slot which allow to find the second point element to map in the view with the name of the second agent and the iop corresponding
-     * @param agentName The second agent in mapping name
-     * @param iopName The input/output to map with
-     * @param secondAgentInMapping Pointer of the second AgentInMapping.
-     */
-    PointMapVM* findTheSecondPointOfElementMap(QString agentName, QString iopName, AgentInMappingVM **secondAgentInMapping);
+    void createMapBetweenIopInMappingFromAgentInMapping(AgentInMappingVM* currentAgentInMapping);
 
 
     /**
@@ -118,6 +114,8 @@ private:
     MasticModelManager* _modelManager;
 
     QHash<QString, AgentInMappingVM *> _mapFromNameToAgentInMappingViewModelsList;
+
+    QHash<QString, MapBetweenIOPVM*> _mapFromAgentNameToPartialMapBetweenIOPViewModelsList;
 };
 
 QML_DECLARE_TYPE(AgentsMappingController)

@@ -28,11 +28,8 @@ class PointMapVM : public QObject
 {
     Q_OBJECT
 
-       // Name of agent using this input/output represent by a point map
-       I2_QML_PROPERTY(QString, nameAgent)
-
-       // Model of our agent Input / Output / Parameter
-       // I2_QML_PROPERTY_DELETE_PROOF(AgentIOPM*, iopModel)
+       // Name of this input/output represent by a point map
+       I2_QML_PROPERTY(QString, iopName)
 
        // Geometry for the connector in the view
        // Position the center of the connector (Absolute coordinate)
@@ -41,11 +38,10 @@ class PointMapVM : public QObject
 public:
     /**
      * @brief Default constructor
-     * @param nameAgent The name of the agent using this input/output represent by a point map
-     * @param model the Iop model which will be represent by the point map view
+     * @param iopName
      * @param parent
      */
-    explicit PointMapVM(QString nameAgent, QObject *parent = nullptr);
+    explicit PointMapVM(QString iopName, QObject *parent = nullptr);
 
    /**
     * @brief Destructor

@@ -15,11 +15,12 @@
 
 #include "outputvm.h"
 
-OutputVM::OutputVM(QString agentName,
+OutputVM::OutputVM(QString outputName,
                    OutputM* modelM,
-                   QObject *parent) : PointMapVM(agentName,
+                   QObject *parent) : PointMapVM(outputName,
                                                  parent),
-    _modelM(modelM)
+    _modelM(modelM),
+    _isGhost(false)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -27,8 +28,17 @@ OutputVM::OutputVM(QString agentName,
     setmodelM(modelM);
 
     if (_modelM != NULL) {
-        qInfo() << "New Output VM" << _nameAgent << "." << _modelM->name();
+        qInfo() << "New Output VM" << _modelM->name();
     }
+}
+
+OutputVM::OutputVM(QString outputName, QObject *parent) : PointMapVM(outputName,
+                                                                  parent),
+    _modelM(NULL),
+    _isGhost(true)
+{
+    // Force ownership of our object, it will prevent Qml from stealing it
+    QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 }
 
 
@@ -38,7 +48,7 @@ OutputVM::OutputVM(QString agentName,
 OutputVM::~OutputVM()
 {
     if (_modelM != NULL) {
-        qInfo() << "Delete Output VM" << _nameAgent << "." << _modelM->name();
+        qInfo() << "Delete Output VM" << _modelM->name();
     }
 
     setmodelM(NULL);
