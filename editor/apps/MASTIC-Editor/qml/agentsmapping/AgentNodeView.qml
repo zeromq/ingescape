@@ -455,6 +455,7 @@ Item {
                         radius : height/2
 
                         property bool dragActive : mouseAreaPointFROM.drag.active;
+                        property var inputSlotModel: model.QtObject
 
                         Drag.active: mouseAreaPointFROM.drag.active;
                         Drag.hotSpot.x: width/2
@@ -490,6 +491,9 @@ Item {
                             }
 
                             onReleased: {
+                                // Drop our item
+                                draggablePointFROM.Drag.drop();
+
                                 // replace the draggablePointTO
                                 draggablePointFROM.x = 0
                                 draggablePointFROM.y = 0
@@ -585,9 +589,6 @@ Item {
                             {
                                 var dragItem = drag.source;
 
-                                // NB: the "keys" property can be used to know the type of source
-                                console.log("inputDropArea: keys "+drag.keys)
-                                console.log("inputDropArea: source "+dragItem)
                                 if (typeof dragItem.dragActive !== 'undefined')
                                 {
                                     dragItem.color = dragItem.border.color;
@@ -606,7 +607,6 @@ Item {
 
 
                         onPositionChanged: {
-                            console.log("inputDropArea: onPositionChanged");
                         }
 
 
@@ -617,6 +617,21 @@ Item {
                             {
                                 dragItem.color = "transparent";
                                 linkPoint.border.width = 0
+                            }
+                        }
+
+
+                        onDropped: {
+                            var dragItem = drag.source;
+                            if (dragItem)
+                            {
+                                if (typeof dragItem.outputSlotModel !== 'undefined')
+                                {
+                                    dragItem.color = "transparent";
+                                    linkPoint.border.width = 0
+
+                                    console.log("inputDropArea: create a link from " + dragItem.outputSlotModel + " to " + inputSlotItem.myModel);
+                                }
                             }
                         }
 
@@ -713,6 +728,7 @@ Item {
                         }
 
                         property bool dragActive : mouseAreaPointTO.drag.active;
+                        property var outputSlotModel: model.QtObject
 
                         Drag.active: draggablePointTO.dragActive;
                         Drag.hotSpot.x: 0
@@ -742,6 +758,9 @@ Item {
                             }
 
                             onReleased: {
+                                // Drop our item
+                                draggablePointTO.Drag.drop();
+
                                 // replace the draggablePointTO
                                 draggablePointTO.x = 0
                                 draggablePointTO.y = 0
@@ -845,9 +864,6 @@ Item {
                             {
                                 var dragItem = drag.source;
 
-                                // NB: the "keys" property can be used to know the type of source
-                                console.log("outputDropArea: keys "+drag.keys)
-                                console.log("outputDropArea: source "+dragItem)
                                 if (typeof dragItem.dragActive !== 'undefined')
                                 {
                                     dragItem.color = dragItem.border.color;
@@ -866,7 +882,6 @@ Item {
 
 
                         onPositionChanged: {
-                            console.log("outputDropArea: onPositionChanged");
                         }
 
 
@@ -877,6 +892,20 @@ Item {
                             {
                                 dragItem.color = "transparent";
                                 linkPointOut.border.width = 0
+                            }
+                        }
+
+                        onDropped: {
+                            var dragItem = drag.source;
+                            if (dragItem)
+                            {
+                                if (typeof dragItem.inputSlotModel !== 'undefined')
+                                {
+                                    dragItem.color = "transparent";
+                                    linkPointOut.border.width = 0
+
+                                    console.log("outputDropArea: create a link from " + outputSlotItem.myModel + " to " + dragItem.inputSlotModel);
+                                }
                             }
                         }
 
