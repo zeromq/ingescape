@@ -1701,7 +1701,7 @@ int mtic_writeInputAsString(const char *name, char *value){
     }
 
     // call the callbacks associated to if it exist
-    model_runObserveCallbacksForIOP(iop, (void*) &value, (strlen(value)+1)*sizeof(char));
+    model_runObserveCallbacksForIOP(iop, (void*)value, (strlen(value)+1)*sizeof(char));
     
     return 1;
 }
