@@ -126,6 +126,9 @@ void CollapsibleColumn::updatePolish()
  */
 void CollapsibleColumn::itemChange(ItemChange change, const ItemChangeData& value)
 {
+    // Don't forget to call the method of our parent class
+    QQuickItem::itemChange(change, value);
+
     // Check if a child has been added
     if (change == QQuickItem::ItemChildAddedChange)
     {
