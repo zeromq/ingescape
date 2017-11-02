@@ -516,11 +516,11 @@ Item {
                             id : linkDraggablePoint
 
                             parent : rootItem.parent
-
+                            strokeDashArray : "5, 5"
                             visible: draggablePointFROM.dragActive
 
-                            secondPoint: Qt.point(myModel.position.x + draggablePointFROM.width/2 , myModel.position.y)
-                            firstPoint: Qt.point(draggablePointFROM.x + draggablePointFROM.width/2, draggablePointFROM.y + draggablePointFROM.height/2)
+                            secondPoint: Qt.point(myModel.position.x, myModel.position.y)
+                            firstPoint: Qt.point(draggablePointFROM.x + draggablePointFROM.width, draggablePointFROM.y + draggablePointFROM.height/2)
 
                             defaultColor:linkPoint.color
                         }
@@ -784,10 +784,11 @@ Item {
                             id : linkDraggablePointTO
 
                             parent : rootItem.parent
+                            strokeDashArray : "5, 5"
                             visible: draggablePointTO.dragActive
 
-                            firstPoint: Qt.point(myModel.position.x + draggablePointTO.width/2 , myModel.position.y)
-                            secondPoint: Qt.point(draggablePointTO.x + draggablePointTO.width/2, draggablePointTO.y + draggablePointTO.height/2)
+                            firstPoint: Qt.point(myModel.position.x + linkPointOut.width, myModel.position.y)
+                            secondPoint: Qt.point(draggablePointTO.x, draggablePointTO.y + draggablePointTO.height/2)
 
                             defaultColor:linkPointOut.color
                         }
