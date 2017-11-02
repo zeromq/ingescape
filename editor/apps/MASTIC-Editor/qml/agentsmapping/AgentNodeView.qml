@@ -455,6 +455,7 @@ Item {
                         radius : height/2
 
                         property bool dragActive : mouseAreaPointFROM.drag.active;
+                        property var agentInMappingVMOfInput : rootItem.agentMappingVM;
                         property var inputSlotModel: model.QtObject
 
                         Drag.active: mouseAreaPointFROM.drag.active;
@@ -899,12 +900,14 @@ Item {
                             var dragItem = drag.source;
                             if (dragItem)
                             {
-                                if (typeof dragItem.inputSlotModel !== 'undefined')
+                                if (typeof dragItem.inputSlotModel !== 'undefined' && controller && rootItem.agentMappingVM && outputSlotItem.myModel)
                                 {
                                     dragItem.color = "transparent";
                                     linkPointOut.border.width = 0
 
                                     console.log("outputDropArea: create a link from " + outputSlotItem.myModel + " to " + dragItem.inputSlotModel);
+
+                                    controller.addMapBetweenAgents(rootItem.agentMappingVM, outputSlotItem.myModel, dragItem.agentInMappingVMOfInput, dragItem.inputSlotModel);
                                 }
                             }
                         }
