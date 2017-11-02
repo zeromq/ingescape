@@ -108,7 +108,14 @@ private Q_SLOTS:
      */
     void _onAgentsInMappingChanged();
 
+    /**
+     * @brief Check if the map between already exist.
+     */
 
+    bool _checkIfMapBetweenIOPVMAlreadyExist(AgentInMappingVM* agentFrom,
+                                             OutputVM *pointFrom,
+                                             AgentInMappingVM* agentTo,
+                                             InputVM *pointTo);
 private:
     /**
      * @brief Add new model(s) of agent to the current mapping at a specific position
