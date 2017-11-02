@@ -46,19 +46,19 @@ AgentsMappingController::AgentsMappingController(MasticModelManager* modelManage
  */
 AgentsMappingController::~AgentsMappingController()
 {
-    //Clea all list
-    _allMapInMapping.deleteAllItems();
-    _allPartialMapInMapping.deleteAllItems();
-    _agentInMappingVMList.deleteAllItems();
-
     // Clean-up current selection
     setselectedAgent(NULL);
+
+    // DIS-connect from signal "Count Changed" from the list of agents in mapping
+    disconnect(&_agentInMappingVMList, 0, this, 0);
 
     // Clear the previous list
     _previousListOfAgentsInMapping.clear();
 
-    // DIS-connect from signal "Count Changed" from the list of agents in mapping
-    disconnect(&_agentInMappingVMList, 0, this, 0);
+    //Clea all list
+    _allMapInMapping.deleteAllItems();
+    _allPartialMapInMapping.deleteAllItems();
+    _agentInMappingVMList.deleteAllItems();
 
     _modelManager = NULL;
 }
