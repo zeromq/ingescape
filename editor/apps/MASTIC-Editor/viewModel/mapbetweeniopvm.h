@@ -46,30 +46,6 @@ class MapBetweenIOPVM : public QObject
     I2_QML_PROPERTY_READONLY(bool, isNewValueOnOutput)
 
 public:
-    /**
-     * @brief Default constructor
-     * @param pointFrom The point map which the map will start
-     * @param pointTo The point map which the map will stop
-     * @param parent
-     */
-    explicit MapBetweenIOPVM(OutputVM *pointFrom,
-                             InputVM *pointTo,
-                             QObject *parent = nullptr);
-
-   /**
-      *TODOESTIA : Implémenter un constructeur avec juste un 'pointFrom' pour gérer le cas de la construction dans la vue
-      * (Clic sur le point de départ et tirer le fil jusqu'au point d'arrivée)
-      *
-      */
-
-    /**
-     * @brief Constructor which only the point map 'from'. Usecase when the user create a map dynamically by mouse clicking on the start point map.
-     * @param pointFrom The point map which the map will start
-     * @param parent
-     */
-    /*explicit MapBetweenIOPVM(PointMapVM *pointFrom,
-                             QObject *parent = nullptr);*/
-
 
     /**
      * @brief Default constructor
@@ -90,11 +66,6 @@ public:
      * @brief Destructor
      */
     ~MapBetweenIOPVM();
-
-Q_SIGNALS:
-
-public Q_SLOTS:
-
 };
 
 QML_DECLARE_TYPE(MapBetweenIOPVM)

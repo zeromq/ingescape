@@ -21,60 +21,6 @@
 
 
 /**
- * @brief Constructor
- * @param pointFrom
- * @param pointTo
- * @param parent
- */
-MapBetweenIOPVM::MapBetweenIOPVM(OutputVM *pointFrom, InputVM *pointTo, QObject *parent) : QObject(parent),
-    _agentFrom(NULL),
-    _pointFrom(NULL),
-    _agentTo(NULL),
-    _pointTo(NULL),
-    _isNewValueOnOutput(false)
-{
-    // Force ownership of our object, it will prevent Qml from stealing it
-    QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
-
-    setpointFrom(pointFrom);
-    setpointTo(pointTo);
-
-    if ((_pointFrom != NULL) && (_pointTo != NULL) && (_pointFrom->modelM() != NULL) && (_pointTo->modelM() != NULL))
-    {
-        qInfo() << "Map Between " << _pointFrom->modelM()->name() << "->" << _pointTo->modelM()->name()  <<"created";
-    }
-    else
-    {
-        qWarning() << "Invalid map";
-    }
-}
-
-
-/**
- * @brief Constructor
- * @param pointFrom
- * @param parent
- */
-/*MapBetweenIOPVM::MapBetweenIOPVM(PointMapVM *pointFrom, QObject *parent) : QObject(parent),
-    _pointFrom(NULL)
-{
-    // Force ownership of our object, it will prevent Qml from stealing it
-    QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
-
-    setpointFrom(pointFrom);
-
-    if (_pointFrom != NULL)
-    {
-        qInfo() << "Map Between " << _pointFrom->nameAgent() << "." << _pointFrom->modelM()->name() << "created";
-    }
-    else
-    {
-        qWarning() << "Invalid map";
-    }
-}*/
-
-
-/**
  * @brief Default constructor
  * @param agentFrom The link starts from this agent
  * @param pointFrom The link starts from this output of the agentFrom
@@ -105,7 +51,7 @@ MapBetweenIOPVM::MapBetweenIOPVM(AgentInMappingVM* agentFrom,
     if ((_agentFrom != NULL) && (_pointFrom != NULL) && (_pointFrom->modelM() != NULL)
             && (_agentTo != NULL) && (_pointTo != NULL) && (_pointTo->modelM() != NULL))
     {
-        qInfo() << "New Map Between" << _agentFrom->agentName() << "." << _pointFrom->modelM()->name() << "-->" << _agentTo->agentName() << "." << _pointTo->modelM()->name();
+        qInfo() << "New Map Between" << _agentFrom->agentName() << "." << _pointFrom->iopName() << "-->" << _agentTo->agentName() << "." << _pointTo->iopName();
     }
 }
 
@@ -117,8 +63,21 @@ MapBetweenIOPVM::~MapBetweenIOPVM()
 {
     qInfo() << "Map destroyed";
 
-    setagentFrom(NULL);
-    setpointFrom(NULL);
+    if(agentFrom()->isGhost()) {
+        delete(_agentFrom);     // Handle ghost agent
+    }
+    else {
+        setagentFrom(NULL);
+    }
+
+    if(pointFrom()->isGhost()) {
+        delete(_pointFrom);     // Handle ghost output
+    }
+    else {
+        setpointFrom(NULL);
+    }
+
     setagentTo(NULL);
     setpointTo(NULL);
 }
+
