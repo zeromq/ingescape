@@ -84,11 +84,19 @@ void AgentsMappingController::addMapBetweenAgents(AgentInMappingVM* outputAgent,
     if ((outputAgent != NULL) && (output != NULL)
             && (inputAgent != NULL) && (input != NULL))
     {
-        // Create a new map between agents
-        MapBetweenIOPVM* mapBetweenIOP = new MapBetweenIOPVM(outputAgent, output, inputAgent, input, this);
+        if (output->canLinkWith(input)) {
+            // Create a new map between agents
+            MapBetweenIOPVM* mapBetweenIOP = new MapBetweenIOPVM(outputAgent, output, inputAgent, input, this);
 
-        // Add to the list
-        _allMapInMapping.append(mapBetweenIOP);
+            // Add to the list
+            _allMapInMapping.append(mapBetweenIOP);
+        }
+        else {
+            if ((output->modelM() != NULL) && (input->modelM() != NULL)) {
+                qDebug() << "Can not link output" << output->modelM()->name() << "with type" << AgentIOPValueTypes::staticEnumToString(output->modelM()->agentIOPValueType()) << "(of agent" << outputAgent->agentName() << ")"
+                         << "and input" << input->modelM()->name() << "with type" << AgentIOPValueTypes::staticEnumToString(input->modelM()->agentIOPValueType()) << "(of agent" << inputAgent->agentName() << ")";
+            }
+        }
     }
 }
 
