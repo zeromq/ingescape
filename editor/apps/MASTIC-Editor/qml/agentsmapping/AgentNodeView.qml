@@ -55,22 +55,33 @@ Item {
 
     clip : true
 
+
+
+    //--------------------------------
     //
-    // Bindings to save the position of our agent
+    // Behaviors
+    //
+    //--------------------------------
+
+    //
+    // Bindings to save the position of our agent when we move it (drag-n-drop)
     //
     Binding {
         target: rootItem.agentMappingVM
         property: "position"
-        value: Qt.point(rootItem.x,rootItem.y)
+        value: Qt.point(rootItem.x, rootItem.y)
     }
 
 
+
+    //
+    // Animation used when our item is collapsed or expanded (its height changes)
+    //
     Behavior on height {
         NumberAnimation {
-            onStopped: {
-            }
         }
     }
+
 
     //--------------------------------
     //
@@ -402,7 +413,7 @@ Item {
         //
         // Inlets / Input slots
         //
-        Column {
+        CollapsibleColumn {
             id: columnInputSlots
 
             anchors {
@@ -667,7 +678,7 @@ Item {
         //
         // Outlets / Output slots
         //
-        Column {
+        CollapsibleColumn {
             id: columnOutputSlots
 
             anchors {

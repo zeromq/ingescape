@@ -49,7 +49,8 @@ SOURCES += main.cpp \
     controller/actioneditorcontroller.cpp \
     viewModel/iop/inputvm.cpp \
     viewModel/iop/outputvm.cpp \
-    misc/terminationsignalwatcher.cpp
+    misc/terminationsignalwatcher.cpp \
+    misc/collapsiblecolumn.cpp
 
 HEADERS += \
     model/agentm.h \
@@ -94,7 +95,8 @@ HEADERS += \
     controller/actioneditorcontroller.h \
     viewModel/iop/inputvm.h \
     viewModel/iop/outputvm.h \
-    misc/terminationsignalwatcher.h
+    misc/terminationsignalwatcher.h \
+    misc/collapsiblecolumn.h
 
 
 RESOURCES += qml.qrc

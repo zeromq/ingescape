@@ -23,6 +23,7 @@
 #include <viewModel/pointmapvm.h>
 #include <model/iop/outputm.h>
 
+
 /**
  * @brief The OutputVM class defines a view model of output
  */
@@ -39,11 +40,8 @@ class OutputVM : public PointMapVM
 
 public:
     explicit OutputVM(QString outputName,
-                      OutputM* modelM,
-                      QObject *parent = nullptr);
-
-    explicit OutputVM(QString outputName,
-                      QObject *parent = nullptr);
+                      OutputM* modelM = NULL,
+                      QObject* parent = nullptr);
 
 
     /**
@@ -55,6 +53,14 @@ public:
 Q_SIGNALS:
 
 public Q_SLOTS:
+
+    /**
+     * @brief Return true if our output can link with the input (types are compatible)
+     * @param pointMap
+     * @return
+     */
+    bool canLinkWith(PointMapVM* pointMap) Q_DECL_OVERRIDE;
+
 };
 
 QML_DECLARE_TYPE(OutputVM)

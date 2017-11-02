@@ -16,7 +16,8 @@ AgentInMappingVM::AgentInMappingVM(DefinitionM *definitionModel,
     _isReduced(false),
     _reducedMapValueTypeInInput(AgentIOPValueTypes::MIXED),
     _reducedMapValueTypeInOutput(AgentIOPValueTypes::MIXED),
-    _isGhost(false)
+    _isGhost(false),
+    _areIdenticalsAllDefinitions(true)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -51,7 +52,8 @@ AgentInMappingVM::AgentInMappingVM(QList<DefinitionM *> definitionModelList,
     _isReduced(false),
     _reducedMapValueTypeInInput(AgentIOPValueTypes::MIXED),
     _reducedMapValueTypeInOutput(AgentIOPValueTypes::MIXED),
-    _isGhost(false)
+    _isGhost(false),
+    _areIdenticalsAllDefinitions(true)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -85,7 +87,8 @@ AgentInMappingVM::AgentInMappingVM(QString agentName, QObject *parent) : QObject
     _isReduced(false),
     _reducedMapValueTypeInInput(AgentIOPValueTypes::MIXED),
     _reducedMapValueTypeInOutput(AgentIOPValueTypes::MIXED),
-    _isGhost(true)
+    _isGhost(true),
+    _areIdenticalsAllDefinitions(true)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);

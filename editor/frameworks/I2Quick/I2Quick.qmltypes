@@ -261,6 +261,9 @@ Module {
         Property { name: "secondPointX"; type: "double" }
         Property { name: "secondPointY"; type: "double" }
         Property { name: "strokeWidth"; type: "double" }
+        Property { name: "strokeLineCap"; type: "I2LineCap::Value" }
+        Property { name: "strokeDashArray"; type: "string" }
+        Property { name: "strokeDashOffset"; type: "double" }
         Property { name: "fuzzyColor"; type: "QColor" }
         Property { name: "fuzzyRadius"; type: "double" }
         Signal {
@@ -285,6 +288,18 @@ Module {
         }
         Signal {
             name: "strokeWidthChanged"
+            Parameter { name: "value"; type: "double" }
+        }
+        Signal {
+            name: "strokeLineCapChanged"
+            Parameter { name: "value"; type: "I2LineCap::Value" }
+        }
+        Signal {
+            name: "strokeDashArrayChanged"
+            Parameter { name: "value"; type: "string" }
+        }
+        Signal {
+            name: "strokeDashOffsetChanged"
             Parameter { name: "value"; type: "double" }
         }
         Signal {
@@ -2991,7 +3006,7 @@ Module {
         Property { name: "placeholderMarginLeft"; type: "int" }
         Property { name: "isError"; type: "bool" }
         Property { name: "hasFeedbackWhenActiveFocus"; type: "bool" }
-        Property { name: "control"; type: "TextField_QMLTYPE_76"; isReadonly: true; isPointer: true }
+        Property { name: "control"; type: "TextField_QMLTYPE_77"; isReadonly: true; isPointer: true }
         Property { name: "font"; type: "QFont" }
         Property { name: "textColor"; type: "QColor" }
         Property { name: "selectionColor"; type: "QColor" }

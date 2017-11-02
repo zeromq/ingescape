@@ -32,7 +32,7 @@ class ActionVM: public QObject
     Q_OBJECT
 
     // Action model
-    I2_QML_PROPERTY_READONLY(ActionM*, actionModel)
+    I2_QML_PROPERTY_READONLY_DELETE_PROOF(ActionM*, actionModel)
 
     // Color
     I2_QML_PROPERTY(QColor, color)

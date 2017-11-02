@@ -22,7 +22,6 @@ class AgentInMappingVM : public QObject
     // List of models of definition agents
     I2_QOBJECT_LISTMODEL(DefinitionM, definitionModelList)
 
-    //TODO ESTIA input output VM
     // List of VM of inputs
     I2_QOBJECT_LISTMODEL(InputVM, inputsList)
 
@@ -46,6 +45,9 @@ class AgentInMappingVM : public QObject
 
     // Flag indicating if our agent is a ghost agent
     I2_QML_PROPERTY_READONLY(bool, isGhost)
+
+    // Flag indicating if all definitions are strictly identicals
+    I2_QML_PROPERTY_READONLY(bool, areIdenticalsAllDefinitions)
 
 
 public:
