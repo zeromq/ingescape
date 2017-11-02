@@ -21,7 +21,8 @@ OutputVM::OutputVM(QString outputName,
                    QObject *parent) : PointMapVM(outputName,
                                                  parent),
     _modelM(NULL),
-    _isGhost(false)
+    _isGhost(false),
+    _isPublishedNewValue(false)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
