@@ -61,10 +61,6 @@ public:
      */
     ~ElementMappingM();
 
-Q_SIGNALS:
-
-public Q_SLOTS:
-
 };
 
 QML_DECLARE_TYPE(ElementMappingM)

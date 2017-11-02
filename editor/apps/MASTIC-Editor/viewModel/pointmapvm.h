@@ -22,7 +22,7 @@
 #include "model/iop/agentiopm.h"
 
 /**
- * @brief The PointMapVM class TODO ESTIA
+ * @brief The PointMapVM class is the base class derivated to create InputVM and OutputVM.
  */
 class PointMapVM : public QObject
 {

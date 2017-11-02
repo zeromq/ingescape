@@ -10,7 +10,7 @@
 #include <viewModel/iop/outputvm.h>
 
 #include <model/agentmappingm.h>
-#include <model/definitionm.h>
+#include <model/agentm.h>
 
 class AgentInMappingVM : public QObject
 {
@@ -19,8 +19,8 @@ class AgentInMappingVM : public QObject
     // Name of our agent
     I2_QML_PROPERTY_READONLY(QString, agentName)
 
-    // List of models of definition agents
-    I2_QOBJECT_LISTMODEL(DefinitionM, definitionModelList)
+    // List of models of agentM
+    I2_QOBJECT_LISTMODEL(AgentM, agentModelList)
 
     // List of VM of inputs
     I2_QOBJECT_LISTMODEL(InputVM, inputsList)
@@ -53,23 +53,12 @@ class AgentInMappingVM : public QObject
 public:
     /**
          * @brief Default constructor
-         * @param definitionModel The first definition model needed to instanciate an agent mapping VM.
+         * @param agentModelList The first agentM is needed to instanciate an agent mapping VM.
          * Typically passing during the drag-drop from the list of agent on the left side.
          * @param position Position of the box
          * @param parent
          */
-    explicit AgentInMappingVM(DefinitionM * definitionModel,
-                              QPointF position,
-                              QObject* parent = nullptr);
-
-    /**
-         * @brief Second constructor to instanciate from a list of definition
-         * @param definitionModelList The definition model list needed to instanciate an agent mapping VM.
-         * Typically passing during the drag-drop from the list of agent on the left side.
-         * @param position Position of the box
-         * @param parent
-         */
-    explicit AgentInMappingVM(QList<DefinitionM *> definitionModelList,
+    explicit AgentInMappingVM(QList<AgentM*> agentModelList,
                               QPointF position,
                               QObject* parent = nullptr);
 
@@ -96,10 +85,10 @@ Q_SIGNALS:
 
 public Q_SLOTS:
     /**
-         * @brief Add definition dynamically to the internal list
-         * @param newDefinition The definition to add
+         * @brief Add agent dynamically to the internal list
+         * @param newAgent The definition to add
          */
-    void addDefinitionInInternalList(DefinitionM * newDefinition);
+    void addAgentToInternalList(AgentM* newAgentM);
 
     /**
          * @brief Return the corresponding PointMap from the input IOP name
@@ -137,11 +126,16 @@ private:
        void addPointMapInInternalOutputList(DefinitionM *newDefinition);
 
        /**
-            * @brief This function check if the point map already exist in the input list
-            * @param iopName The name of the iop
-            * @param typeofIOP The type of iop
+            * @brief This function check if the OutputVM already exist in the input list
+            * @param currentOuput The newly created OutputVM
             */
-       bool checkIfAlreadyInInputOutputList(QString iopName, AgentIOPTypes::Value typeofIOP);
+       bool checkIfAlreadyInOutputList(OutputVM* currentOuput);
+
+       /**
+            * @brief This function check if the InputVM already exist in the input list
+            * @param currentInput The newly created Input VM
+            */
+       bool checkIfAlreadyInInputList(InputVM* currentInput);
 };
 
 QML_DECLARE_TYPE(AgentInMappingVM)
