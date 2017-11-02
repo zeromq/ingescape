@@ -225,7 +225,7 @@ Item {
             width : height
             radius : height/2
 
-            visible: false // (model && model.models) ? (model.models.count > 1) : false
+            visible: false
 
             anchors {
                 verticalCenter: agentName.verticalCenter
@@ -256,7 +256,7 @@ Item {
             width : height
             radius : height/2
 
-            visible: false // (model && model.models) ? (model.models.count > 1) : false
+            visible: rootItem.agentMappingVM && !rootItem.agentMappingVM.areIdenticalsAllDefinitions
 
             anchors {
                 verticalCenter: agentName.verticalCenter
@@ -272,7 +272,7 @@ Item {
                     centerIn : parent
                     verticalCenterOffset:  -1
                 }
-                text: "!" //(model && model.models) ? model.models.count : ""
+                text: "!"
 
                 color : MasticTheme.whiteColor
                 font {
@@ -595,13 +595,11 @@ Item {
                         keys: ["OutputSlotItem"]
 
                         onEntered: {
-                            console.log("inputDropArea: drag enter ");
-
                             if (drag.source !== null)
                             {
                                 var dragItem = drag.source;
 
-                                if (typeof dragItem.dragActive !== 'undefined')
+                                if (typeof dragItem.dragActive !== 'undefined' && dragItem.outputSlotModel.canLinkWith(inputSlotItem.myModel))
                                 {
                                     dragItem.color = dragItem.border.color;
                                     linkPoint.border.width = 2
@@ -623,7 +621,6 @@ Item {
 
 
                         onExited: {
-                            console.log("inputDropArea: onExited");
                             var dragItem = drag.source;
                             if (typeof dragItem.dragActive !== 'undefined')
                             {
@@ -637,12 +634,13 @@ Item {
                             var dragItem = drag.source;
                             if (dragItem)
                             {
-                                if (typeof dragItem.outputSlotModel !== 'undefined')
+                                if (typeof dragItem.outputSlotModel !== 'undefined' && dragItem.agentInMappingVMOfOutput && rootItem.agentMappingVM)
                                 {
                                     dragItem.color = "transparent";
                                     linkPoint.border.width = 0
 
                                     console.log("inputDropArea: create a link from " + dragItem.outputSlotModel + " to " + inputSlotItem.myModel);
+                                    controller.addMapBetweenAgents(dragItem.agentInMappingVMOfOutput, dragItem.outputSlotModel, rootItem.agentMappingVM, inputSlotItem.myModel);
                                 }
                             }
                         }
@@ -740,6 +738,7 @@ Item {
                         }
 
                         property bool dragActive : mouseAreaPointTO.drag.active;
+                        property var agentInMappingVMOfOutput : rootItem.agentMappingVM
                         property var outputSlotModel: model.QtObject
 
                         Drag.active: draggablePointTO.dragActive;
@@ -870,16 +869,15 @@ Item {
                         keys: ["InputSlotItem"]
 
                         onEntered: {
-                            console.log("outputDropArea: drag enter ");
-
                             if (drag.source !== null)
                             {
                                 var dragItem = drag.source;
 
-                                if (typeof dragItem.dragActive !== 'undefined')
+                                if (typeof dragItem.dragActive !== 'undefined'  && outputSlotItem.myModel.canLinkWith(dragItem.inputSlotModel))
                                 {
                                     dragItem.color = dragItem.border.color;
                                     linkPointOut.border.width = 2
+
                                 }
                                 else
                                 {
@@ -898,7 +896,6 @@ Item {
 
 
                         onExited: {
-                            console.log("outputDropArea: onExited");
                             var dragItem = drag.source;
                             if (typeof dragItem.dragActive !== 'undefined')
                             {
@@ -917,7 +914,6 @@ Item {
                                     linkPointOut.border.width = 0
 
                                     console.log("outputDropArea: create a link from " + outputSlotItem.myModel + " to " + dragItem.inputSlotModel);
-
                                     controller.addMapBetweenAgents(rootItem.agentMappingVM, outputSlotItem.myModel, dragItem.agentInMappingVMOfInput, dragItem.inputSlotModel);
                                 }
                             }
