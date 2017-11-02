@@ -125,6 +125,11 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     connect(_agentsSupervisionC, &AgentsSupervisionController::commandAskedForOutput, _networkC, &NetworkController::onCommandAskedForOutput);
 
 
+    // Connect to signals from the controller for mapping of agents
+    connect(_agentsMappingC, &AgentsMappingController::addInputsToEditorForOutputs, _networkC, &NetworkController::onAddInputsToEditorForOutputs);
+    connect(_agentsMappingC, &AgentsMappingController::removeInputsToEditorForOutputs, _networkC, &NetworkController::onRemoveInputsToEditorForOutputs);
+
+
     // Initialize agents list from default file
     _modelManager->importAgentsListFromDefaultFile();
 
