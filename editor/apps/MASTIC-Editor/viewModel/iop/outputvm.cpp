@@ -14,6 +14,7 @@
  */
 
 #include "outputvm.h"
+#include <viewModel/iop/inputvm.h>
 
 OutputVM::OutputVM(QString outputName,
                    OutputM* modelM,
@@ -37,14 +38,6 @@ OutputVM::OutputVM(QString outputName,
 }
 
 
-OutputVM::OutputVM(QString outputName,
-                   QObject *parent) : OutputVM(outputName,
-                                               NULL,
-                                               parent)
-{
-}
-
-
 /**
  * @brief Destructor
  */
@@ -55,4 +48,24 @@ OutputVM::~OutputVM()
     }
 
     setmodelM(NULL);
+}
+
+
+/**
+ * @brief Return true if our output can link with the input (types are compatible)
+ * @param pointMap
+ * @return
+ */
+bool OutputVM::canLinkWith(PointMapVM* pointMap)
+{
+    InputVM* input = qobject_cast<InputVM*>(pointMap);
+    if ((input != NULL) && (input->modelM() != NULL)
+            && (_modelM != NULL))
+    {
+        // Call parent class function
+        return _canLinkOutputToInput(_modelM->agentIOPValueType(), input->modelM()->agentIOPValueType());
+    }
+    else {
+        return false;
+    }
 }
