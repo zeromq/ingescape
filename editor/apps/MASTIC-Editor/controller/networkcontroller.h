@@ -166,10 +166,26 @@ public Q_SLOTS:
     void onCommandAskedForOutput(QString command, QString outputName, QStringList peerIdsList);
 
 
+    /**
+     * @brief Slot when inputs must be added to our Editor for a list of outputs
+     * @param agentName
+     * @param outputsList
+     */
+    void onAddInputsToEditorForOutputs(QString agentName, QList<OutputM*> outputsList);
+
+
+    /**
+     * @brief Slot when inputs must be removed to our Editor for a list of outputs
+     * @param agentName
+     * @param outputsList
+     */
+    void onRemoveInputsToEditorForOutputs(QString agentName, QList<OutputM*> outputsList);
+
+
 private:
 
-    // Name of our Mastic agent
-    QString _agentName;
+    // Name of our agent "MASTIC Editor"
+    QString _editorAgentName;
 
     // Our Mastic agent is successfully started if the result of mtic_startWithDevice / mtic_startWithIP is 1 (O otherwise)
     int _isMasticAgentStarted;

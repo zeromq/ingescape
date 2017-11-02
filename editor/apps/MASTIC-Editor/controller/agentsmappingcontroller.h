@@ -63,7 +63,24 @@ public:
      */
     ~AgentsMappingController();
 
+
 Q_SIGNALS:
+
+    /**
+     * @brief Emitted when inputs must be added to our Editor for a list of outputs
+     * @param agentName
+     * @param outputsList
+     */
+    void addInputsToEditorForOutputs(QString agentName, QList<OutputM*> outputsList);
+
+
+    /**
+     * @brief Emitted when inputs must be removed to our Editor for a list of outputs
+     * @param agentName
+     * @param outputsList
+     */
+    void removeInputsToEditorForOutputs(QString agentName, QList<OutputM*> outputsList);
+
 
 public Q_SLOTS:
 
@@ -133,6 +150,9 @@ private:
     QHash<QString, AgentInMappingVM *> _mapFromNameToAgentInMappingViewModelsList;
 
     QHash<QString, MapBetweenIOPVM*> _mapFromAgentNameToPartialMapBetweenIOPViewModelsList;
+
+    // Previous list of agents in mapping
+    QList<AgentInMappingVM*> _previousListOfAgentsInMapping;
 };
 
 QML_DECLARE_TYPE(AgentsMappingController)
