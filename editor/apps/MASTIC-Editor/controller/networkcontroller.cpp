@@ -332,42 +332,48 @@ void onObserveInputCallback(iop_t iopType, const char* name, iopType_t valueType
     {
         if (iopType == INPUT_T) {
             QString inputName = name;
-
-            switch (valueType) {
-            case INTEGER_T:
-
-                break;
-
-            case DOUBLE_T:
-
-                break;
-
-            case STRING_T:
-
-                break;
-
-            case BOOL_T:
-
-                break;
-
-            case IMPULSION_T:
-
-                break;
-
-            case DATA_T:
-
-                break;
-
-            default:
-                break;
-            }
-
             AgentIOPValueTypes::Value agentIOPValueType = static_cast<AgentIOPValueTypes::Value>(valueType);
 
-            Q_UNUSED(value)
-            Q_UNUSED(valueSize)
-
-            qDebug() << "New value received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
+            switch (valueType)
+            {
+            case INTEGER_T: {
+                int* newValue = (int*)value;
+                qDebug() << "New value" << *newValue << "received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
+                break;
+            }
+            case DOUBLE_T: {
+                double* newValue = (double*)value;
+                qDebug() << "New value" << *newValue << "received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
+                break;
+            }
+            case STRING_T: {
+                QString newValue = QString((char*)value);
+                qDebug() << "New value" << newValue << "received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
+                break;
+            }
+            case BOOL_T: {
+                bool* newValue = (bool*)value;
+                if (*newValue) {
+                    qDebug() << "New value TRUE received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
+                }
+                else {
+                    qDebug() << "New value FALSE received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
+                }
+                break;
+            }
+            case IMPULSION_T: {
+                qDebug() << "New IMPULSION received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
+                break;
+            }
+            case DATA_T: {
+                // FIXME TODO
+                qDebug() << "New DATA with size" << valueSize << "received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
+                break;
+            }
+            default: {
+                break;
+            }
+            }
         }
     }
 }
@@ -602,19 +608,80 @@ void NetworkController::onAddInputsToEditorForOutputs(QString agentName, QList<O
 {
     foreach (OutputM* output, outputsList) {
         if (output != NULL) {
-            QString inputName = QString("%1.%2.%3").arg(_editorAgentName, agentName, output->name());
+            QString inputName = QString("%1.%2").arg(agentName, output->id());
 
-            unsigned long id = mtic_addMappingEntry(inputName.toStdString().c_str(), agentName.toStdString().c_str(), output->name().toStdString().c_str());
+            int resultCreateInput = 0;
 
-            qDebug() << "Add input" << inputName << "on output" << output->name() << "of agent" << agentName << "id" << id;
+            switch (output->agentIOPValueType())
+            {
+            case AgentIOPValueTypes::INTEGER: {
+                bool success = false;
+                int defaultValue = output->defaultValue().toInt(&success);
+                if (success) {
+                    resultCreateInput = mtic_createInput(inputName.toStdString().c_str(), INTEGER_T, &defaultValue, sizeof(int));
+                }
+                break;
+            }
+            case AgentIOPValueTypes::DOUBLE: {
+                bool success = false;
+                double defaultValue = output->defaultValue().toDouble(&success);
+                if (success) {
+                    resultCreateInput = mtic_createInput(inputName.toStdString().c_str(), DOUBLE_T, &defaultValue, sizeof(double));
+                }
+                break;
+            }
+            case AgentIOPValueTypes::STRING: {
+                const char* defaultValue = output->defaultValue().toString().toStdString().c_str();
+                //resultCreateInput = mtic_createInput(inputName.toStdString().c_str(), STRING_T, (void*)defaultValue, strlen(defaultValue) * sizeof(char));
+                resultCreateInput = mtic_createInput(inputName.toStdString().c_str(), STRING_T, (void*)defaultValue, (strlen(defaultValue) + 1) * sizeof(char));
+                break;
+            }
+            case AgentIOPValueTypes::BOOL: {
+                bool defaultValue = output->defaultValue().toBool();
+                resultCreateInput = mtic_createInput(inputName.toStdString().c_str(), BOOL_T, &defaultValue, sizeof(bool));
+                break;
+            }
+            case AgentIOPValueTypes::IMPULSION: {
+                resultCreateInput = mtic_createInput(inputName.toStdString().c_str(), IMPULSION_T, NULL, 0);
+                break;
+            }
+            case AgentIOPValueTypes::DATA: {
+                // FIXME TODO
+                //resultCreateInput = mtic_createInput(inputName.toStdString().c_str(), DATA_T, &defaultValue, sizeof(...));
+                break;
+            }
+            default: {
+                qCritical() << "Wrong type for the value of output" << output->name() << "of agent" << agentName;
+                break;
+            }
+            }
 
-            // Begin the observe of this input
-            int result = mtic_observeInput(inputName.toStdString().c_str(), &onObserveInputCallback, this);
-            if (result == 1) {
-                qDebug() << "Observe input" << inputName << "on output" << output->name() << "of agent" << agentName;
+            if (resultCreateInput == 1) {
+                qDebug() << "Create input" << inputName << "on agent" << _editorAgentName;
+
+                // Begin the observe of this input
+                int resultObserveInput = mtic_observeInput(inputName.toStdString().c_str(), &onObserveInputCallback, this);
+
+                if (resultObserveInput == 1) {
+                    qDebug() << "Observe input" << inputName << "on agent" << _editorAgentName;
+                }
+                else {
+                    qCritical() << "Can NOT observe input" << inputName << "on agent" << _editorAgentName << "Error code:" << resultObserveInput;
+                }
+
+                // Add mapping between our input and this output
+                unsigned long id = mtic_addMappingEntry(inputName.toStdString().c_str(), agentName.toStdString().c_str(), output->name().toStdString().c_str());
+
+                if (id > 0) {
+                    qDebug() << "Add mapping between output" << output->name() << "of agent" << agentName << "and input" << inputName << "of agent" << _editorAgentName << "(id" << id << ")";
+                }
+                else {
+                    qCritical() << "Can NOT add mapping between output" << output->name() << "of agent" << agentName << "and input" << inputName << "of agent" << _editorAgentName << "Error code:" << id;
+                }
+
             }
             else {
-                qCritical() << "Can NOT observe input" << inputName << "on output" << output->name() << "of agent" << agentName << ". Error code:" << result;
+                qCritical() << "Can NOT create input" << inputName << "on agent" << _editorAgentName << "Error code:" << resultCreateInput;
             }
         }
     }
