@@ -94,8 +94,6 @@ void CollapsibleColumn::componentComplete()
  */
 void CollapsibleColumn::updatePolish()
 {
-    qDebug() << Q_FUNC_INFO;
-
     const QList<QQuickItem *> childrenList = childItems();
     if (childrenList.count() > 0)
     {
