@@ -541,7 +541,7 @@ Item {
 
                         border {
                             width : 0
-                            color : MasticTheme.lightGreyColor // "#DADADA"
+                            color : MasticTheme.lightGreyColor
                         }
 
                         color : if (agentMappingVM && myModel && myModel.modelM) {
@@ -806,6 +806,11 @@ Item {
                         height : 13
                         width : height
                         radius : height/2
+
+                        border {
+                            width : 0
+                            color : MasticTheme.lightGreyColor
+                        }
 
                         color : if (agentMappingVM && myModel && myModel.modelM) {
 
