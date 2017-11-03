@@ -148,8 +148,13 @@ unix:{
     android_libzyre_path = $$PWD/zyre/bin/Android/armeabi-v7a
     android_libyajl_path = $$PWD/yajl/lloyd-yajl-2.1.0/Android/armeabi-v7a
 
-    LIBS += -L$$android_libzyre_path/ -lzmq -lczmq -lzyre \
-            -L$$android_libyajl_path/ -lyajl
+    #TODO : gérer les espaces dans les chemins donc copie à la main dans le C et link temporaire
+    #temp to manage the space in the path
+#    android_libzyre_path = "C:\mastic\lib\android\armeabi-v7a"
+#    android_libyajl_path = "C:\mastic\lib\android\armeabi-v7a"
+
+    LIBS += $$quote(-L$$android_libzyre_path/) -lzmq -lczmq -lzyre \
+            $$quote(-L$$android_libyajl_path/) -lyajl
 
     ############ Copy needed in C:\ ############
     #NB: Copy includes normally already with windows
