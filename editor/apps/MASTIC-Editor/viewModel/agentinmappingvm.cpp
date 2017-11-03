@@ -16,7 +16,7 @@
 
 /**
  * @brief Default constructor
- * @param agentModelList. The first agent is needed to instanciate an agent mapping VM.
+ * @param models. The first agent is needed to instanciate an agent mapping VM.
  * Typically passing during the drag-drop from the list of agents on the left side.
  * @param position Position of the top left corner
  * @param parent

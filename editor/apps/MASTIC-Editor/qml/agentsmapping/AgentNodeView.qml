@@ -232,7 +232,7 @@ Item {
             width : height
             radius : height/2
 
-            visible: (agentMappingVM && agentMappingVM.agentModelList.count > 1)
+            visible: (agentMappingVM && agentMappingVM.models.count > 1)
 
             anchors {
                 verticalCenter: agentName.verticalCenter
@@ -247,7 +247,7 @@ Item {
                 anchors.centerIn : parent
                 anchors.verticalCenterOffset: -1
 
-                text: agentMappingVM? agentMappingVM.agentModelList.count : "0"
+                text: agentMappingVM? agentMappingVM.models.count : "0"
 
                 color : MasticTheme.whiteColor
                 font {
