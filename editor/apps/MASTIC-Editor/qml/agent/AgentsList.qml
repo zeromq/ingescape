@@ -394,24 +394,7 @@ Item {
                     }
 
                     onReleased: {
-                        // Check if we have a drop area below our item
-                        if (draggableItem.Drag.target !== null)
-                        {
-                            var dropAreaElement = draggableItem.Drag.target;
-
-                            if (typeof dropAreaElement.getDropCoordinates == 'function')
-                            {
-                                var dropPosition = dropAreaElement.getDropCoordinates();
-
-                                if (MasticEditorC.agentsMappingC)
-                                {
-                                    MasticEditorC.agentsMappingC.dropAgentToMappingAtPosition(model.QtObject.name, model.QtObject.models, dropPosition);
-                                }
-                            }
-                            // Else: invalid DropArea to drop an item of our list
-                        }
-                        // Else: agent dropped outside the mapping area");
-
+                        draggableItem.Drag.drop();
 
                         //
                         // Reset the position of our draggable item

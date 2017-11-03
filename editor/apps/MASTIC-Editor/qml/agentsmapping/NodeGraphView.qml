@@ -99,12 +99,12 @@ Item {
 
             // Check if our child must be filtered
             if (
-                // We don't need repeaters because they don't have a valid geometry (they create items and add them to their parent)
-                !_qmlItemIsA(child, "Repeater")
-                &&
-                //TEMP FIXME: remove links because AgentNodeView creates links attached to (0,0)
-                !_qmlItemIsA(child, "Link")
-                )
+                    // We don't need repeaters because they don't have a valid geometry (they create items and add them to their parent)
+                    !_qmlItemIsA(child, "Repeater")
+                    &&
+                    //TEMP FIXME: remove links because AgentNodeView creates links attached to (0,0)
+                    !_qmlItemIsA(child, "Link")
+                    )
             {
                 x0 = Math.min(x0, child.x);
                 y0 = Math.min(y0, child.y);
@@ -180,17 +180,17 @@ Item {
             var itemToString = item.toString();
 
             result = (
-                      // class + ( + address + ) => class instance without modification
-                      (itemToString.indexOf(className + "(") === 0)
-                      ||
-                      // QQuick + class + ( + address + ) => basic QML class instance
-                      // E.g. QQuickRepeater(0x7fa8c8667070)
-                      (itemToString.indexOf("QQuick" + className + "(") === 0)
-                      ||
-                      // class + _QMLTYPE_ + number + ( + address + ) => class instance with user-defined properties
-                      // E.g. AgentNodeView_QMLTYPE_90(0x7f97cb1416e0)
-                      (itemToString.indexOf(className + "_QML") === 0)
-                      );
+                        // class + ( + address + ) => class instance without modification
+                        (itemToString.indexOf(className + "(") === 0)
+                        ||
+                        // QQuick + class + ( + address + ) => basic QML class instance
+                        // E.g. QQuickRepeater(0x7fa8c8667070)
+                        (itemToString.indexOf("QQuick" + className + "(") === 0)
+                        ||
+                        // class + _QMLTYPE_ + number + ( + address + ) => class instance with user-defined properties
+                        // E.g. AgentNodeView_QMLTYPE_90(0x7f97cb1416e0)
+                        (itemToString.indexOf(className + "_QML") === 0)
+                        );
         }
 
         return result;
@@ -201,12 +201,12 @@ Item {
     // TEMP: to test showAll
     focus: true
     Keys.onPressed: {
-         if (event.key === Qt.Key_Space)
-         {
+        if (event.key === Qt.Key_Space)
+        {
             showAll();
 
-             event.accepted = true;
-         }
+            event.accepted = true;
+        }
     }
 
 
@@ -316,8 +316,28 @@ Item {
                     drag.source.opacity = _previousOpacityOfSource;
                 }
 
+
                 // Clean-up ghost
                 dropGhost.agent = null;
+            }
+
+
+            onDropped: {
+                var dragItem = drag.source;
+                if (typeof dragItem.agent !== 'undefined')
+                {
+                    var dropPosition = getDropCoordinates();
+
+                    if (MasticEditorC.agentsMappingC)
+                    {
+                        MasticEditorC.agentsMappingC.dropAgentToMappingAtPosition(dragItem.agent.name, dragItem.agent.models, dropPosition);
+                    }
+
+                    // Restore opacity of our source
+                    drag.source.opacity = _previousOpacityOfSource;
+                }
+
+                 dropGhost.agent = null;
             }
         }
 
@@ -515,7 +535,9 @@ Item {
                 isReduced: true
 
                 agentName: dropGhost.agent ? dropGhost.agent.name : ""
-                dropEnabled : false
+                dropEnabled : (dropGhost.agent === null)
+                              ||
+                              ((dropGhost.agent && MasticEditorC.agentsMappingC) && !MasticEditorC.agentsMappingC.getAgentInMappingForName(dropGhost.agent.name))
             }
         }
 
