@@ -308,7 +308,23 @@ void AgentInMappingVM::_agentModelRemoved(AgentM* model)
 {
     if ((model != NULL) && (model->definition() != NULL))
     {
+        // Traverse the list of models of inputs in the definition
+        foreach (AgentIOPM* input, model->definition()->inputsList()->toList()) {
+            InputVM* inputVM = _inputModelRemoved(input);
+            if (inputVM != NULL) {
+                // FIXME TODO: manage if (inputVM->models.count() == 0)
+                //_inputsList.remove(inputVM);
+            }
+        }
 
+        // Traverse the list of models of outputs in the definition
+        foreach (OutputM* output, model->definition()->outputsList()->toList()) {
+            OutputVM* outputVM = _outputModelRemoved(output);
+            if (outputVM != NULL) {
+                // FIXME TODO: manage if (outputVM->models.count() == 0)
+                //_outputsList.remove(outputVM);
+            }
+        }
     }
 }
 
@@ -368,6 +384,41 @@ InputVM* AgentInMappingVM::_inputModelAdded(AgentIOPM* input)
 
 
 /**
+ * @brief A model of input has been removed
+ * @param input
+ * @return
+ */
+InputVM* AgentInMappingVM::_inputModelRemoved(AgentIOPM* input)
+{
+    InputVM* inputVM = NULL;
+
+    if (input != NULL)
+    {
+        // Input id is defined
+        if (!input->id().isEmpty())
+        {
+            inputVM = getInputFromId(input->id());
+            if (inputVM != NULL)
+            {
+                // FIXME TODO
+                //inputVM->models.remove(input);
+            }
+            /*else
+            {
+                inputVM = getInputFromName(input->name());
+                if (inputVM != NULL)
+                {
+                    // FIXME TODO ?
+                }
+            }*/
+        }
+    }
+
+    return inputVM;
+}
+
+
+/**
  * @brief A model of output has been added
  * @param output
  * @return
@@ -418,6 +469,42 @@ OutputVM* AgentInMappingVM::_outputModelAdded(OutputM* output)
     }
 
     return newOutputVM;
+}
+
+
+
+/**
+ * @brief A model of output has been removed
+ * @param output
+ * @return
+ */
+OutputVM* AgentInMappingVM::_outputModelRemoved(OutputM* output)
+{
+    OutputVM* outputVM = NULL;
+
+    if (output != NULL)
+    {
+        // Input id is defined
+        if (!output->id().isEmpty())
+        {
+            outputVM = getOutputFromId(output->id());
+            if (outputVM != NULL)
+            {
+                // FIXME TODO
+                //outputVM->models.remove(output);
+            }
+            /*else
+            {
+                outputVM = getOutputFromName(output->name());
+                if (outputVM != NULL)
+                {
+                    // FIXME TODO ?
+                }
+            }*/
+        }
+    }
+
+    return outputVM;
 }
 
 

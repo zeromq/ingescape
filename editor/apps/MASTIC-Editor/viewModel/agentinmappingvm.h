@@ -175,11 +175,27 @@ private:
 
 
     /**
+     * @brief A model of input has been removed
+     * @param input
+     * @return
+     */
+    InputVM* _inputModelRemoved(AgentIOPM* input);
+
+
+    /**
      * @brief A model of output has been added
      * @param output
      * @return
      */
     OutputVM* _outputModelAdded(OutputM* output);
+
+
+    /**
+     * @brief A model of output has been removed
+     * @param output
+     * @return
+     */
+    OutputVM* _outputModelRemoved(OutputM* output);
 
 
     /**
@@ -227,11 +243,11 @@ private:
     // Previous list of models of agents
     QList<AgentM*> _previousAgentsList;
 
-    // TODO
+    // FIXME: input name as key is not unique (value type can be different)
     QHash<QString, InputVM*> _mapOfInputsFromInputName;
     QHash<QString, InputVM*> _mapOfInputsFromInputId;
 
-    // TODO
+    // FIXME: output name as key is not unique (value type can be different)
     QHash<QString, OutputVM*> _mapOfOutputsFromOutputName;
     QHash<QString, OutputVM*> _mapOfOutputsFromOutputId;
 
