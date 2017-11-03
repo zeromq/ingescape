@@ -25,17 +25,17 @@ void model_setIopValue(agent_iop *iop, void* value, long size){
     switch (iop->value_type) {
         case INTEGER_T:
             iop->valueSize = sizeof(int);
-            iop->value.i = *(int*)(value);
+            iop->value.i = (value == NULL)?0:*(int*)(value);
             mtic_debug("set %s to %i\n", iop->name, iop->value.i);
             break;
         case DOUBLE_T:
             iop->valueSize = sizeof(double);
-            iop->value.d = *(double*)(value);
+            iop->value.d = (value == NULL)?0:*(double*)(value);
             mtic_debug("set %s to %f\n", iop->name, iop->value.d);
             break;
         case BOOL_T:
             iop->valueSize = sizeof(bool);
-            iop->value.b = *(bool*)(value);
+            iop->value.b = (value == NULL)?0:*(bool*)(value);
             mtic_debug("set %s to %i\n", iop->name, iop->value.b);
             break;
         case STRING_T:
