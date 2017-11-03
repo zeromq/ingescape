@@ -199,7 +199,7 @@ Item {
                 }
                 height : btnAddAgent.height
                 width : 1
-                color : MasticTheme.greyColor
+                color : MasticTheme.blueGreyColor
             }
 
             Button {
@@ -271,7 +271,7 @@ Item {
                 }
                 height : btnRemoveAgent.height
                 width : 1
-                color : MasticTheme.greyColor
+                color : MasticTheme.blueGreyColor
             }
 
 
@@ -402,22 +402,15 @@ Item {
                             if (typeof dropAreaElement.getDropCoordinates == 'function')
                             {
                                 var dropPosition = dropAreaElement.getDropCoordinates();
-                                console.log("Drop agent " + model.QtObject.name + " at "+ dropPosition);
 
                                 if (MasticEditorC.agentsMappingC)
                                 {
                                     MasticEditorC.agentsMappingC.addAgentToMappingAtPosition(model.QtObject.name, model.QtObject.models, dropPosition);
                                 }
                             }
-                            else
-                            {
-                                console.log("AgentsList: invalid DropArea to drop an agent");
-                            }
+                            // Else: invalid DropArea to drop an item of our list
                         }
-                        else
-                        {
-                            console.log("AgentsList: agent dropped outside the mapping area");
-                        }
+                        // Else: agent dropped outside the mapping area");
 
 
                         //
@@ -445,10 +438,10 @@ Item {
                     }
 
                     AgentMapping.AgentNodeView {
-                         opacity : 0.5
                          isReduced : true
                          agentName : model.name
                          visible: mouseArea.drag.active
+                         dropEnabled : false
                     }
                 }
 

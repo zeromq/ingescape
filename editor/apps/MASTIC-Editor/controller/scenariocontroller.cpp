@@ -63,8 +63,8 @@ void ScenarioController::openActionEditor(ActionVM* actionVM)
         // Create an empty action if we create a new one
         if(actionVM == NULL)
         {
-            ActionM* actionM = new ActionM("New action",this);
-            actionVM = new ActionVM(actionM,this);
+            ActionM* actionM = new ActionM("New action");
+            actionVM = new ActionVM(actionM);
         }
 
         // Create action editor controller
@@ -77,6 +77,7 @@ void ScenarioController::openActionEditor(ActionVM* actionVM)
         _openedActionsEditorsControllers.append(actionEditorC);
     }
 }
+
 
 /**
   * @brief Delete an action from the list

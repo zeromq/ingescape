@@ -227,8 +227,8 @@ PUBLIC int mtic_setMappingName(char *name);
 PUBLIC int mtic_setMappingDescription(char *description);
 PUBLIC int mtic_setMappingVersion(char *version);
 PUBLIC int mtic_getMappingEntriesNumber(void); //number of entries in the mapping output type
-PUBLIC unsigned long mtic_addMappingEntry(char *fromOurInput, char *toAgent, char *withOutput); //returns mapping id or zero or below if creation failed
+PUBLIC unsigned long mtic_addMappingEntry(const char *fromOurInput, const char *toAgent, const char *withOutput); //returns mapping id or zero or below if creation failed
 PUBLIC int mtic_removeMappingEntryWithId(unsigned long theId);
-PUBLIC int mtic_removeMappingEntryWithName(char *fromOurInput, char *toAgent, char *withOutput);
+PUBLIC int mtic_removeMappingEntryWithName(const char *fromOurInput, const char *toAgent, const char *withOutput);
 
 #endif /* mastic_public_h */

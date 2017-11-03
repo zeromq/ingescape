@@ -114,13 +114,13 @@ static int model_observe(const char* name, iop_t iopType, mtic_observeCallback c
 
     // Check if the input has been returned.
     if(iop == NULL){
-        mtic_debug("%s : no iop with name %s and type %d", __FUNCTION__, name, iopType);
+        mtic_debug("%s : no iop with name %s and type %d\n", __FUNCTION__, name, iopType);
         return 0;
     }
 
     //callback not defined
     if(cb == NULL) {
-        mtic_debug("%s: the observe callback for %s is null", __FUNCTION__, name);
+        mtic_debug("%s: the observe callback for %s is null\n", __FUNCTION__, name);
         return 0;
     }
 
@@ -1701,7 +1701,7 @@ int mtic_writeInputAsString(const char *name, char *value){
     }
 
     // call the callbacks associated to if it exist
-    model_runObserveCallbacksForIOP(iop, (void*) &value, (strlen(value)+1)*sizeof(char));
+    model_runObserveCallbacksForIOP(iop, (void*)value, (strlen(value)+1)*sizeof(char));
     
     return 1;
 }

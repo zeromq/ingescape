@@ -31,12 +31,12 @@ I2CubicBezierCurve {
     //--------------------------------
 
     property var mapBetweenIOPVM : null
-    property var inputModel : mapBetweenIOPVM ?  mapBetweenIOPVM.pointFrom : null
-    property var outputModel : mapBetweenIOPVM ?  mapBetweenIOPVM.pointTo : null
+    property var inputModel : mapBetweenIOPVM ?  mapBetweenIOPVM.pointTo : null
+    property var outputModel : mapBetweenIOPVM ?  mapBetweenIOPVM.pointFrom : null
 
 
-    firstPoint: inputModel? inputModel.position : Qt.point(0,0)
-    secondPoint: outputModel? outputModel.position : Qt.point(0,0)
+    secondPoint: inputModel? inputModel.position : Qt.point(0,0)
+    firstPoint: outputModel? outputModel.position : Qt.point(0,0)
 
 
     // Minimum offset of control point
@@ -84,7 +84,7 @@ I2CubicBezierCurve {
                     mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.greenColor : MasticTheme.darkGreenColor
                     break;
                 case AgentIOPValueTypes.MIXED:
-                    mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.whiteColor : MasticTheme.greyColor4
+                    mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.whiteColor : MasticTheme.darkGreyColor
                     break;
                 case AgentIOPValueTypes.UNKNOWN:
                     "#000000"
@@ -94,9 +94,9 @@ I2CubicBezierCurve {
                     break;
                 }
             }
-            else { // if the agentTo is reduced : global type of its inputs
+            else { // if the agentTo is not reduced : type of its outputs
                 if (outputModel && outputModel.modelM) {
-                    switch (outputModel.modelM.agentIOPType)
+                    switch (outputModel.modelM.agentIOPValueType)
                     {
                     case AgentIOPValueTypes.INTEGER:
                         mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
@@ -117,7 +117,7 @@ I2CubicBezierCurve {
                         mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.greenColor : MasticTheme.darkGreenColor
                         break;
                     case AgentIOPValueTypes.MIXED:
-                        mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.whiteColor : MasticTheme.greyColor4
+                        mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.whiteColor : MasticTheme.darkGreyColor
                         break;
                     case AgentIOPValueTypes.UNKNOWN:
                         "#000000"
@@ -207,8 +207,12 @@ I2CubicBezierCurve {
     // Update control points when our second point has changed
     onSecondPointChanged: updateControlPoints();
 
-    // Compute control points when our item is created
-    Component.onCompleted: updateControlPoints();
+
+    Component.onCompleted: {
+        // Compute control points when our item is created
+        updateControlPoints();
+  }
+
 
 
     Behavior on fuzzyRadius {

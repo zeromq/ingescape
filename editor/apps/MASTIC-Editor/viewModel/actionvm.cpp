@@ -1,7 +1,7 @@
 /*
  *	ActionVM
  *
- *  Copyright (c) 2016-2017 Ingenuity i/o. All rights reserved.
+ *  Copyright (c) 2017 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -35,6 +35,9 @@ ActionVM::ActionVM(ActionM *actionModel, QObject *parent) : QObject(parent),
     _lineInTimeLine(-1),
     _startDateTime(QDateTime::currentDateTime())
 {
+    // Force ownership of our object, it will prevent Qml from stealing it
+    QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
+
     if(_actionModel != NULL && _actionModel->startTime() >= 0)
     {
         _startDateTime.setTime(QTime::fromMSecsSinceStartOfDay(_actionModel->startTime()*1000));
@@ -45,9 +48,6 @@ ActionVM::ActionVM(ActionM *actionModel, QObject *parent) : QObject(parent),
     }
 
     _startTimeString = _startDateTime.toString("HH:mm:ss");
-    // Force ownership of our object, it will prevent Qml from stealing it
-    QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
-
 }
 
 
@@ -56,12 +56,14 @@ ActionVM::ActionVM(ActionM *actionModel, QObject *parent) : QObject(parent),
  */
 ActionVM::~ActionVM()
 {
-    if(_actionModel != NULL)
+    if (_actionModel != NULL)
     {
-        delete _actionModel;
-        _actionModel = NULL;
+        ActionM* temp = _actionModel;
+        setactionModel(NULL);
+        delete temp;
     }
 }
+
 
 /**
  * @brief Copy from another action view model

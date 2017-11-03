@@ -9,6 +9,7 @@
  *
  *	Contributors:
  *      Alexandre Lemort   <lemort@ingenuity.io>
+ *      Justine Limoges    <limoges@ingenuity.io>
  *
  */
 
@@ -41,6 +42,11 @@ Item {
 
     property bool isReduced : agentMappingVM && agentMappingVM.isReduced
 
+    //false if the agent is dropping and the drop is not available, true otherwise
+    property bool dropEnabled : true
+
+
+
     width : 228
     height : (rootItem.agentMappingVM && !rootItem.isReduced)?
                  (54 + 20*Math.max(rootItem.agentMappingVM.inputsList.count , rootItem.agentMappingVM.outputsList.count))
@@ -54,22 +60,33 @@ Item {
 
     clip : true
 
+
+
+    //--------------------------------
     //
-    // Bindings to save the position of our agent
+    // Behaviors
+    //
+    //--------------------------------
+
+    //
+    // Bindings to save the position of our agent when we move it (drag-n-drop)
     //
     Binding {
         target: rootItem.agentMappingVM
         property: "position"
-        value: Qt.point(rootItem.x,rootItem.y)
+        value: Qt.point(rootItem.x, rootItem.y)
     }
 
 
+
+    //
+    // Animation used when our item is collapsed or expanded (its height changes)
+    //
     Behavior on height {
         NumberAnimation {
-            onStopped: {
-            }
         }
     }
+
 
     //--------------------------------
     //
@@ -115,7 +132,6 @@ Item {
         }
 
         onPositionChanged: {
-            //     console.log("agentMapping position " + model.position.x + "  " + model.position.y)
         }
 
         onDoubleClicked: {
@@ -136,9 +152,11 @@ Item {
             bottomMargin: 1
         }
 
-        color : mouseArea.pressed?
-                    MasticTheme.darkGreyColor2
-                  : (rootItem.agentMappingVM && rootItem.agentMappingVM.isON)? MasticTheme.darkGreyColor : MasticTheme.veryDarkGreyColor
+        color :  (dropEnabled === true) ?
+                     (mouseArea.pressed?
+                          MasticTheme.darkGreyColor2
+                        : (rootItem.agentMappingVM && rootItem.agentMappingVM.isON)? MasticTheme.darkBlueGreyColor : MasticTheme.veryDarkGreyColor)
+                   : MasticTheme.darkGreyColor2;
         radius : 6
 
         Rectangle {
@@ -201,10 +219,11 @@ Item {
             elide: Text.ElideRight
             text : rootItem.agentName
 
-            color : (rootItem.agentMappingVM && rootItem.agentMappingVM.isON)? MasticTheme.agentsONNameMappingColor : MasticTheme.agentsOFFNameMappingColor
+            color : (dropEnabled === true) ?
+                        (rootItem.agentMappingVM && rootItem.agentMappingVM.isON)? MasticTheme.agentsONNameMappingColor : MasticTheme.agentsOFFNameMappingColor
+            : MasticTheme.lightGreyColor;
             font: MasticTheme.headingFont
         }
-
 
         // Warnings
         Rectangle {
@@ -213,7 +232,7 @@ Item {
             width : height
             radius : height/2
 
-            visible: false // (model && model.models) ? (model.models.count > 1) : false
+            visible: false
 
             anchors {
                 verticalCenter: agentName.verticalCenter
@@ -232,8 +251,8 @@ Item {
 
                 color : MasticTheme.whiteColor
                 font {
-                    family: MasticTheme.labelFontFamilyBlack
-                    bold : true
+                    family: MasticTheme.labelFontFamily
+                    weight : Font.Black
                     pixelSize : 13
                 }
             }
@@ -244,7 +263,7 @@ Item {
             width : height
             radius : height/2
 
-            visible: false // (model && model.models) ? (model.models.count > 1) : false
+            visible: rootItem.agentMappingVM && !rootItem.agentMappingVM.areIdenticalsAllDefinitions
 
             anchors {
                 verticalCenter: agentName.verticalCenter
@@ -260,17 +279,16 @@ Item {
                     centerIn : parent
                     verticalCenterOffset:  -1
                 }
-                text: "!" //(model && model.models) ? model.models.count : ""
+                text: "!"
 
                 color : MasticTheme.whiteColor
                 font {
-                    family: MasticTheme.labelFontFamilyBlack
-                    bold : true
+                    family: MasticTheme.labelFontFamily
+                    weight : Font.Black
                     pixelSize : 14
                 }
             }
         }
-
 
         //Separator
         Rectangle {
@@ -290,6 +308,19 @@ Item {
             visible : !rootItem.isReduced
         }
 
+
+        // Drop Impossible
+        I2SvgItem {
+            anchors {
+              right: parent.right
+              top : parent.top
+              margins: 2
+            }
+            svgFileCache: MasticTheme.svgFileMASTIC
+            svgElementId: "dropImpossible"
+
+            visible : (rootItem.dropEnabled === false)
+        }
 
 
         //
@@ -330,7 +361,7 @@ Item {
                             agentMappingVM.isON? MasticTheme.greenColor : MasticTheme.darkGreenColor
                             break;
                         case AgentIOPValueTypes.MIXED:
-                            agentMappingVM.isON? MasticTheme.whiteColor : MasticTheme.greyColor4
+                            agentMappingVM.isON? MasticTheme.whiteColor : MasticTheme.darkGreyColor
                             break;
                         case AgentIOPValueTypes.UNKNOWN:
                             "#000000"
@@ -380,7 +411,7 @@ Item {
                             agentMappingVM.isON? MasticTheme.greenColor : MasticTheme.darkGreenColor
                             break;
                         case AgentIOPValueTypes.MIXED:
-                            agentMappingVM.isON? MasticTheme.whiteColor : MasticTheme.greyColor4
+                            agentMappingVM.isON? MasticTheme.whiteColor : MasticTheme.darkGreyColor
                             break;
                         case AgentIOPValueTypes.UNKNOWN:
                             "#000000"
@@ -401,7 +432,7 @@ Item {
         //
         // Inlets / Input slots
         //
-        Column {
+        CollapsibleColumn {
             id: columnInputSlots
 
             anchors {
@@ -454,6 +485,8 @@ Item {
                         radius : height/2
 
                         property bool dragActive : mouseAreaPointFROM.drag.active;
+                        property var agentInMappingVMOfInput : rootItem.agentMappingVM;
+                        property var inputSlotModel: model.QtObject
 
                         Drag.active: mouseAreaPointFROM.drag.active;
                         Drag.hotSpot.x: width/2
@@ -489,6 +522,9 @@ Item {
                             }
 
                             onReleased: {
+                                // Drop our item
+                                draggablePointFROM.Drag.drop();
+
                                 // replace the draggablePointTO
                                 draggablePointFROM.x = 0
                                 draggablePointFROM.y = 0
@@ -497,9 +533,12 @@ Item {
 
                         Link {
                             id : linkDraggablePoint
+
                             parent : rootItem.parent
+                            strokeDashArray : "5, 5"
                             visible: draggablePointFROM.dragActive
-                            secondPoint: Qt.point(myModel.position.x + draggablePointFROM.width/2 , myModel.position.y)
+
+                            secondPoint: Qt.point(myModel.position.x, myModel.position.y)
                             firstPoint: Qt.point(draggablePointFROM.x + draggablePointFROM.width, draggablePointFROM.y + draggablePointFROM.height/2)
 
                             defaultColor:linkPoint.color
@@ -521,7 +560,7 @@ Item {
 
                         border {
                             width : 0
-                            color : MasticTheme.lightGreyColor // "#DADADA"
+                            color : MasticTheme.lightGreyColor
                         }
 
                         color : if (agentMappingVM && myModel && myModel.modelM) {
@@ -547,7 +586,7 @@ Item {
                                         agentMappingVM.isON? MasticTheme.greenColor : MasticTheme.darkGreenColor
                                         break;
                                     case AgentIOPValueTypes.MIXED:
-                                        agentMappingVM.isON? MasticTheme.whiteColor : MasticTheme.greyColor4
+                                        agentMappingVM.isON? MasticTheme.whiteColor : MasticTheme.darkGreyColor
                                         break;
                                     case AgentIOPValueTypes.UNKNOWN:
                                         "#000000"
@@ -575,16 +614,11 @@ Item {
                         keys: ["OutputSlotItem"]
 
                         onEntered: {
-                            console.log("inputDropArea: drag enter ");
-
                             if (drag.source !== null)
                             {
                                 var dragItem = drag.source;
 
-                                // NB: the "keys" property can be used to know the type of source
-                                console.log("inputDropArea: keys "+drag.keys)
-                                console.log("inputDropArea: source "+dragItem)
-                                if (typeof dragItem.dragActive !== 'undefined')
+                                if (typeof dragItem.dragActive !== 'undefined' && dragItem.outputSlotModel.canLinkWith(inputSlotItem.myModel))
                                 {
                                     dragItem.color = dragItem.border.color;
                                     linkPoint.border.width = 2
@@ -602,17 +636,31 @@ Item {
 
 
                         onPositionChanged: {
-                            console.log("inputDropArea: onPositionChanged");
                         }
 
 
                         onExited: {
-                            console.log("inputDropArea: onExited");
                             var dragItem = drag.source;
                             if (typeof dragItem.dragActive !== 'undefined')
                             {
                                 dragItem.color = "transparent";
                                 linkPoint.border.width = 0
+                            }
+                        }
+
+
+                        onDropped: {
+                            var dragItem = drag.source;
+                            if (dragItem)
+                            {
+                                if (typeof dragItem.outputSlotModel !== 'undefined' && dragItem.agentInMappingVMOfOutput && rootItem.agentMappingVM)
+                                {
+                                    dragItem.color = "transparent";
+                                    linkPoint.border.width = 0
+
+                                    console.log("inputDropArea: create a link from " + dragItem.outputSlotModel + " to " + inputSlotItem.myModel);
+                                    controller.addMapBetweenAgents(dragItem.agentInMappingVMOfOutput, dragItem.outputSlotModel, rootItem.agentMappingVM, inputSlotItem.myModel);
+                                }
                             }
                         }
 
@@ -647,7 +695,7 @@ Item {
         //
         // Outlets / Output slots
         //
-        Column {
+        CollapsibleColumn {
             id: columnOutputSlots
 
             anchors {
@@ -709,6 +757,8 @@ Item {
                         }
 
                         property bool dragActive : mouseAreaPointTO.drag.active;
+                        property var agentInMappingVMOfOutput : rootItem.agentMappingVM
+                        property var outputSlotModel: model.QtObject
 
                         Drag.active: draggablePointTO.dragActive;
                         Drag.hotSpot.x: 0
@@ -738,6 +788,9 @@ Item {
                             }
 
                             onReleased: {
+                                // Drop our item
+                                draggablePointTO.Drag.drop();
+
                                 // replace the draggablePointTO
                                 draggablePointTO.x = 0
                                 draggablePointTO.y = 0
@@ -748,10 +801,13 @@ Item {
 
                         Link {
                             id : linkDraggablePointTO
+
                             parent : rootItem.parent
+                            strokeDashArray : "5, 5"
                             visible: draggablePointTO.dragActive
-                            firstPoint: Qt.point(myModel.position.x + draggablePointTO.width/2 , myModel.position.y)
-                            secondPoint: Qt.point(draggablePointTO.x,draggablePointTO.y + draggablePointTO.height/2)
+
+                            firstPoint: Qt.point(myModel.position.x + linkPointOut.width, myModel.position.y)
+                            secondPoint: Qt.point(draggablePointTO.x, draggablePointTO.y + draggablePointTO.height/2)
 
                             defaultColor:linkPointOut.color
                         }
@@ -770,6 +826,11 @@ Item {
                         height : 13
                         width : height
                         radius : height/2
+
+                        border {
+                            width : 0
+                            color : MasticTheme.lightGreyColor
+                        }
 
                         color : if (agentMappingVM && myModel && myModel.modelM) {
 
@@ -794,7 +855,7 @@ Item {
                                         (agentMappingVM.isON && !myModel.modelM.isMuted)? MasticTheme.greenColor : MasticTheme.darkGreenColor
                                         break;
                                     case AgentIOPValueTypes.MIXED:
-                                        (agentMappingVM.isON && !myModel.modelM.isMuted)? MasticTheme.whiteColor : MasticTheme.greyColor4
+                                        (agentMappingVM.isON && !myModel.modelM.isMuted)? MasticTheme.whiteColor : MasticTheme.darkGreyColor
                                         break;
                                     case AgentIOPValueTypes.UNKNOWN:
                                         "#000000"
@@ -833,19 +894,15 @@ Item {
                         keys: ["InputSlotItem"]
 
                         onEntered: {
-                            console.log("outputDropArea: drag enter ");
-
                             if (drag.source !== null)
                             {
                                 var dragItem = drag.source;
 
-                                // NB: the "keys" property can be used to know the type of source
-                                console.log("outputDropArea: keys "+drag.keys)
-                                console.log("outputDropArea: source "+dragItem)
-                                if (typeof dragItem.dragActive !== 'undefined')
+                                if (typeof dragItem.dragActive !== 'undefined'  && outputSlotItem.myModel.canLinkWith(dragItem.inputSlotModel))
                                 {
                                     dragItem.color = dragItem.border.color;
                                     linkPointOut.border.width = 2
+
                                 }
                                 else
                                 {
@@ -860,17 +917,30 @@ Item {
 
 
                         onPositionChanged: {
-                            console.log("outputDropArea: onPositionChanged");
                         }
 
 
                         onExited: {
-                            console.log("outputDropArea: onExited");
                             var dragItem = drag.source;
                             if (typeof dragItem.dragActive !== 'undefined')
                             {
                                 dragItem.color = "transparent";
                                 linkPointOut.border.width = 0
+                            }
+                        }
+
+                        onDropped: {
+                            var dragItem = drag.source;
+                            if (dragItem)
+                            {
+                                if (typeof dragItem.inputSlotModel !== 'undefined' && controller && rootItem.agentMappingVM && outputSlotItem.myModel)
+                                {
+                                    dragItem.color = "transparent";
+                                    linkPointOut.border.width = 0
+
+                                    console.log("outputDropArea: create a link from " + outputSlotItem.myModel + " to " + dragItem.inputSlotModel);
+                                    controller.addMapBetweenAgents(rootItem.agentMappingVM, outputSlotItem.myModel, dragItem.agentInMappingVMOfInput, dragItem.inputSlotModel);
+                                }
                             }
                         }
 

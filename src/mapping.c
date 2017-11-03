@@ -473,7 +473,7 @@ int mtic_getMappingEntriesNumber(){ //number of entries in the mapping
  * -1 Agent name to be mapped cannot be NULL or empty.
  * -2 Extern agent output name to be mapped cannot be NULL or empty.
  */
-unsigned long mtic_addMappingEntry(char *fromOurInput, char *toAgent, char *withOutput){ //returns mapping id or 0 if creation failed
+unsigned long mtic_addMappingEntry(const char *fromOurInput, const char *toAgent, const char *withOutput){ //returns mapping id or 0 if creation failed
 
     /***    Check the string    ***/
     //fromOurInput
@@ -582,7 +582,7 @@ int mtic_removeMappingEntryWithId(unsigned long theId){
  * -3 The structure mtic_internal_mapping is NULL.
  * -4 The structure mapping out is NULL.
  */
-int mtic_removeMappingEntryWithName(char *fromOurInput, char *toAgent, char *withOutput){
+int mtic_removeMappingEntryWithName(const char *fromOurInput, const char *toAgent, const char *withOutput){
     /***    Check the string    ***/
     //fromOurInput
     if((fromOurInput == NULL) || (strlen(fromOurInput) == 0)){

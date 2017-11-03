@@ -49,13 +49,15 @@ AgentsSupervisionController::AgentsSupervisionController(MasticModelManager* mod
  */
 AgentsSupervisionController::~AgentsSupervisionController()
 {
-    _modelManager = NULL;
-
     // Clean-up current selection
     setselectedAgent(NULL);
 
+    _mapFromNameToAgentViewModelsList.clear();
+
     // Delete all VM of agents
     _agentsList.deleteAllItems();
+
+    _modelManager = NULL;
 }
 
 

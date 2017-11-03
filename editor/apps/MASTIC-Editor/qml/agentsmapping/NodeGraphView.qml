@@ -87,19 +87,45 @@ Item {
     function showAll()
     {
         //TODO get the bounding box of all nodes from our controller
-        var x0 = Math.min(item1.x, Math.min(item2.x, Math.min(item3.x, Math.min(item4.x, item5.x))));
-        var y0 = Math.min(item1.y, Math.min(item2.y, Math.min(item3.y, Math.min(item4.y, item5.y))));
+        var x0 = Number.POSITIVE_INFINITY;
+        var y0 = Number.POSITIVE_INFINITY;
+        var x1 = Number.NEGATIVE_INFINITY;
+        var y1 = Number.NEGATIVE_INFINITY;
+        var validBoundingBox = false;
 
-        var x1 = Math.max(item1.x + item1.width, Math.max(item2.x + item2.width, Math.max(item3.x + item3.width, Math.max(item4.x + item4.width, item5.x + item5.width))));
-        var y1 = Math.max(item1.y + item1.height, Math.max(item2.y + item2.height, Math.max(item3.y + item3.height, Math.max(item4.y + item4.height, item5.y + item5.height))));
+        for (var index = 0; index < workspace.visibleChildren.length; index++)
+        {
+            var child = workspace.visibleChildren[index];
 
-        var margin = 5;
-        var area = Qt.rect(x0 - margin, y0 - margin, x1 - x0 + 2 * margin, y1 - y0 + 2 * margin);
-        //--------------------
+            // Check if our child must be filtered
+            if (
+                // We don't need repeaters because they don't have a valid geometry (they create items and add them to their parent)
+                !_qmlItemIsA(child, "Repeater")
+                &&
+                //TEMP FIXME: remove links because AgentNodeView creates links attached to (0,0)
+                !_qmlItemIsA(child, "Link")
+                )
+            {
+                x0 = Math.min(x0, child.x);
+                y0 = Math.min(y0, child.y);
 
-        _showArea(area);
+                x1 = Math.max(x1, child.x + child.width);
+                y1 = Math.max(y1, child.y + child.height);
+
+                validBoundingBox = true;
+            }
+            // Else: child has been filtered
+        }
+
+        if (validBoundingBox)
+        {
+            var margin = 5;
+            var area = Qt.rect(x0 - margin, y0 - margin, x1 - x0 + 2 * margin, y1 - y0 + 2 * margin);
+            console.log("NodeGraphView: bounding box (+ margins) = " + area + " VS workspace.childrenRect =" + workspace.childrenRect);
+
+            _showArea(area);
+        }
     }
-
 
 
 
@@ -141,6 +167,33 @@ Item {
         {
             console.log("_showArea: invalid area "+area);
         }
+    }
+
+
+    // Check if a given item is an instance of a given class
+    function _qmlItemIsA(item, className)
+    {
+        var result = false;
+
+        if (item)
+        {
+            var itemToString = item.toString();
+
+            result = (
+                      // class + ( + address + ) => class instance without modification
+                      (itemToString.indexOf(className + "(") === 0)
+                      ||
+                      // QQuick + class + ( + address + ) => basic QML class instance
+                      // E.g. QQuickRepeater(0x7fa8c8667070)
+                      (itemToString.indexOf("QQuick" + className + "(") === 0)
+                      ||
+                      // class + _QMLTYPE_ + number + ( + address + ) => class instance with user-defined properties
+                      // E.g. AgentNodeView_QMLTYPE_90(0x7f97cb1416e0)
+                      (itemToString.indexOf(className + "_QML") === 0)
+                      );
+        }
+
+        return result;
     }
 
 
@@ -296,7 +349,9 @@ Item {
 
                 scrollGestureEnabled: true
 
-                onPressed: rootItem.forceActiveFocus();
+                onPressed: {
+                    rootItem.forceActiveFocus();
+                }
 
                 onWheel: {
                     wheel.accepted = true;
@@ -408,6 +463,7 @@ Item {
 
                     Link {
                         id : link
+
                         mapBetweenIOPVM: model.QtObject
                     }
                 }
@@ -423,8 +479,8 @@ Item {
 
                     AgentNodeView {
                         id: agent
-                        agentMappingVM : model.QtObject
 
+                        agentMappingVM : model.QtObject
                         controller : rootItem.controller
                     }
                 }
@@ -459,6 +515,7 @@ Item {
                 isReduced: true
 
                 agentName: dropGhost.agent ? dropGhost.agent.name : ""
+                dropEnabled : false
             }
         }
 

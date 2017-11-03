@@ -38,6 +38,10 @@ class AgentsMappingController : public QObject
     // List of all maps between agents
     I2_QOBJECT_LISTMODEL(MapBetweenIOPVM, allMapInMapping)
 
+    // List of all partial maps between agents (input and input agent are fully defined, output and output agent are ghost element)
+    // This list is not empty in the case of the presence of Ghost Agents in the mapping
+    I2_QOBJECT_LISTMODEL(MapBetweenIOPVM, allPartialMapInMapping)
+
     // Flag indicating if our mapping is empty
     I2_QML_PROPERTY_READONLY(bool, isEmptyMapping)
 
@@ -59,7 +63,24 @@ public:
      */
     ~AgentsMappingController();
 
+
 Q_SIGNALS:
+
+    /**
+     * @brief Emitted when inputs must be added to our Editor for a list of outputs
+     * @param agentName
+     * @param outputsList
+     */
+    void addInputsToEditorForOutputs(QString agentName, QList<OutputM*> outputsList);
+
+
+    /**
+     * @brief Emitted when inputs must be removed to our Editor for a list of outputs
+     * @param agentName
+     * @param outputsList
+     */
+    void removeInputsToEditorForOutputs(QString agentName, QList<OutputM*> outputsList);
+
 
 public Q_SLOTS:
 
@@ -73,10 +94,28 @@ public Q_SLOTS:
 
 
     /**
+     * @brief Slot when a link from an output is dropped over an input on the current mapping (or when a link to an input is dropped over an output)
+     * @param outputAgent
+     * @param output
+     * @param inputAgent
+     * @param input
+     */
+    void addMapBetweenAgents(AgentInMappingVM* outputAgent, OutputVM* output, AgentInMappingVM* inputAgent, InputVM* input);
+
+
+    /**
      * @brief Slot when the flag "is Activated Mapping" changed
      * @param isActivatedMapping
      */
     void onIsActivatedMappingChanged(bool isActivatedMapping);
+
+
+    /**
+     * @brief Get the agent in mapping for an agent name
+     * @param name
+     * @return
+     */
+    AgentInMappingVM* getAgentInMappingForName(QString name);
 
 
 private Q_SLOTS:
@@ -84,17 +123,9 @@ private Q_SLOTS:
      * @brief Slot when a new view model of a agent mapping is created on the main view mapping.
      *      Check if a map need to be created from the element mapping list in the model manager.
      *      The two agents corresponding need to be visible in the list.
-     * @param agentInMapping
+     * @param currentAgentInMapping
      */
-    void createMapBetweenIopInMappingFromAgentName(QString agentName);
-
-    /**
-     * @brief Slot which allow to find the second point element to map in the view with the name of the second agent and the iop corresponding
-     * @param agentName The second agent in mapping name
-     * @param iopName The input/output to map with
-     * @param secondAgentInMapping Pointer of the second AgentInMapping.
-     */
-    PointMapVM* findTheSecondPointOfElementMap(QString agentName, QString iopName, AgentInMappingVM **secondAgentInMapping);
+    void createMapBetweenIopInMappingFromAgentInMapping(AgentInMappingVM* currentAgentInMapping);
 
 
     /**
@@ -102,7 +133,14 @@ private Q_SLOTS:
      */
     void _onAgentsInMappingChanged();
 
+    /**
+     * @brief Check if the map between already exist.
+     */
 
+    bool _checkIfMapBetweenIOPVMAlreadyExist(AgentInMappingVM* agentFrom,
+                                             OutputVM *pointFrom,
+                                             AgentInMappingVM* agentTo,
+                                             InputVM *pointTo);
 private:
     /**
      * @brief Add new model(s) of agent to the current mapping at a specific position
@@ -118,6 +156,11 @@ private:
     MasticModelManager* _modelManager;
 
     QHash<QString, AgentInMappingVM *> _mapFromNameToAgentInMappingViewModelsList;
+
+    QHash<QString, MapBetweenIOPVM*> _mapFromAgentNameToPartialMapBetweenIOPViewModelsList;
+
+    // Previous list of agents in mapping
+    QList<AgentInMappingVM*> _previousListOfAgentsInMapping;
 };
 
 QML_DECLARE_TYPE(AgentsMappingController)

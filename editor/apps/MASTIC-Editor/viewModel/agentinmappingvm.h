@@ -10,7 +10,7 @@
 #include <viewModel/iop/outputvm.h>
 
 #include <model/agentmappingm.h>
-#include <model/definitionm.h>
+#include <model/agentm.h>
 
 class AgentInMappingVM : public QObject
 {
@@ -19,10 +19,9 @@ class AgentInMappingVM : public QObject
     // Name of our agent
     I2_QML_PROPERTY_READONLY(QString, agentName)
 
-    // List of models of definition agents
-    I2_QOBJECT_LISTMODEL(DefinitionM, definitionModelList)
+    // List of models of agentM
+    I2_QOBJECT_LISTMODEL(AgentM, agentModelList)
 
-    //TODO ESTIA input output VM
     // List of VM of inputs
     I2_QOBJECT_LISTMODEL(InputVM, inputsList)
 
@@ -44,28 +43,31 @@ class AgentInMappingVM : public QObject
     // Define the value type of the reduced map (= brin) in output of the agent
     I2_QML_PROPERTY_READONLY(AgentIOPValueTypes::Value, reducedMapValueTypeInOutput)
 
+    // Flag indicating if our agent is a ghost agent
+    I2_QML_PROPERTY_READONLY(bool, isGhost)
+
+    // Flag indicating if all definitions are strictly identicals
+    I2_QML_PROPERTY_READONLY(bool, areIdenticalsAllDefinitions)
+
 
 public:
     /**
          * @brief Default constructor
-         * @param definitionModel The first definition model needed to instanciate an agent mapping VM.
+         * @param agentModelList The first agentM is needed to instanciate an agent mapping VM.
          * Typically passing during the drag-drop from the list of agent on the left side.
          * @param position Position of the box
          * @param parent
          */
-    explicit AgentInMappingVM(DefinitionM * definitionModel,
+    explicit AgentInMappingVM(QList<AgentM*> agentModelList,
                               QPointF position,
                               QObject* parent = nullptr);
 
     /**
-         * @brief Second constructor to instanciate from a list of definition
-         * @param definitionModelList The definition model list needed to instanciate an agent mapping VM.
-         * Typically passing during the drag-drop from the list of agent on the left side.
-         * @param position Position of the box
+         * @brief Ghost Constructor: Definition model is empty. The agent is an empty shell only defined by a name.
+         * @param agentName
          * @param parent
          */
-    explicit AgentInMappingVM(QList<DefinitionM *> definitionModelList,
-                              QPointF position,
+    explicit AgentInMappingVM(QString agentName,
                               QObject* parent = nullptr);
 
     /**
@@ -77,16 +79,16 @@ Q_SIGNALS:
 
     /**
      * @brief Signal emitted when a definition is added to the agent mapping
-     * @param agentName
+     * @param agentInMapping
      */
-    void newDefinitionInAgentMapping(QString agentName);
+    void newDefinitionInAgentMapping(AgentInMappingVM* agentInMapping);
 
 public Q_SLOTS:
     /**
-         * @brief Add definition dynamically to the internal list
-         * @param newDefinition The definition to add
+         * @brief Add agent dynamically to the internal list
+         * @param newAgent The definition to add
          */
-    void addDefinitionInInternalList(DefinitionM * newDefinition);
+    void addAgentToInternalList(AgentM* newAgentM);
 
     /**
          * @brief Return the corresponding PointMap from the input IOP name
@@ -124,18 +126,16 @@ private:
        void addPointMapInInternalOutputList(DefinitionM *newDefinition);
 
        /**
-            * @brief This function check if the point map already exist in the input list
-            * @param agentName The name of the agent mapping VM
-            * @param iopName The name of the input to add
+            * @brief This function check if the OutputVM already exist in the input list
+            * @param currentOuput The newly created OutputVM
             */
-       bool checkIfAlreadyInIntputList(QString agentName, QString iopName);
+       bool checkIfAlreadyInOutputList(OutputVM* currentOuput);
 
        /**
-            * @brief This function check if the point map already exist in the output list
-            * @param agentName The name of the agent mapping VM
-            * @param iopName The name of the output to add
+            * @brief This function check if the InputVM already exist in the input list
+            * @param currentInput The newly created Input VM
             */
-       bool checkIfAlreadyInOutputList(QString agentName, QString iopName);
+       bool checkIfAlreadyInInputList(InputVM* currentInput);
 };
 
 QML_DECLARE_TYPE(AgentInMappingVM)

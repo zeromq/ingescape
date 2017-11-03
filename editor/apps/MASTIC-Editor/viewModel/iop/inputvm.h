@@ -23,6 +23,7 @@
 #include <viewModel/pointmapvm.h>
 #include <model/iop/agentiopm.h>
 
+
 /**
  * @brief The InputVM class defines a view model of input
  */
@@ -33,8 +34,9 @@ class InputVM : public PointMapVM
     // Model of our agent Input
     I2_QML_PROPERTY_READONLY_DELETE_PROOF(AgentIOPM*, modelM)
 
+
 public:
-    explicit InputVM(QString agentName,
+    explicit InputVM(QString inputName,
                      AgentIOPM* modelM,
                      QObject *parent = nullptr);
 
@@ -47,6 +49,14 @@ public:
 Q_SIGNALS:
 
 public Q_SLOTS:
+
+    /**
+     * @brief Return true if our input can link with the output (types are compatible)
+     * @param pointMap
+     * @return
+     */
+    bool canLinkWith(PointMapVM* pointMap) Q_DECL_OVERRIDE;
+
 };
 
 QML_DECLARE_TYPE(InputVM)

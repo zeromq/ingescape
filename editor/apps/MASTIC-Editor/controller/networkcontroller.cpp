@@ -316,6 +316,69 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
 }
 
 
+/**
+ * @brief Callback for Observing Input
+ * @param iopType
+ * @param name
+ * @param valueType
+ * @param value
+ * @param valueSize
+ * @param myData
+ */
+void onObserveInputCallback(iop_t iopType, const char* name, iopType_t valueType, void* value, long valueSize, void* myData)
+{
+    NetworkController* networkController = (NetworkController*)myData;
+    if (networkController != NULL)
+    {
+        if (iopType == INPUT_T) {
+            QString inputName = name;
+            AgentIOPValueTypes::Value agentIOPValueType = static_cast<AgentIOPValueTypes::Value>(valueType);
+
+            switch (valueType)
+            {
+            case INTEGER_T: {
+                int* newValue = (int*)value;
+                qDebug() << "New value" << *newValue << "received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
+                break;
+            }
+            case DOUBLE_T: {
+                double* newValue = (double*)value;
+                qDebug() << "New value" << *newValue << "received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
+                break;
+            }
+            case STRING_T: {
+                QString newValue = QString((char*)value);
+                qDebug() << "New value" << newValue << "received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
+                break;
+            }
+            case BOOL_T: {
+                bool* newValue = (bool*)value;
+                if (*newValue) {
+                    qDebug() << "New value TRUE received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
+                }
+                else {
+                    qDebug() << "New value FALSE received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
+                }
+                break;
+            }
+            case IMPULSION_T: {
+                qDebug() << "New IMPULSION received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
+                break;
+            }
+            case DATA_T: {
+                // FIXME TODO
+                qDebug() << "New DATA with size" << valueSize << "received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
+                break;
+            }
+            default: {
+                break;
+            }
+            }
+        }
+    }
+}
+
+
 //--------------------------------------------------------------
 //
 // NetworkController
@@ -334,7 +397,7 @@ NetworkController::NetworkController(QObject *parent) : QObject(parent),
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
     // Init the name of our Mastic agent with the application name
-    _agentName = QApplication::instance()->applicationName();
+    _editorAgentName = QApplication::instance()->applicationName();
     QString organizationName = QApplication::instance()->organizationName();
     QString version = QApplication::instance()->applicationVersion();
 
@@ -342,7 +405,7 @@ NetworkController::NetworkController(QObject *parent) : QObject(parent),
     mtic_setVerbose(true);
 
     // Set the name of our agent
-    mtic_setAgentName(_agentName.toStdString().c_str());
+    mtic_setAgentName(_editorAgentName.toStdString().c_str());
 
     //
     // Read our internal definition
@@ -356,8 +419,8 @@ NetworkController::NetworkController(QObject *parent) : QObject(parent),
         // Set definition and mapping by default to editor
         QString definitionByDefault = "{  \
                                       \"definition\": {  \
-                                      \"name\": \""+ _agentName + "\",   \
-                                      \"description\": \"Definition of " + _agentName + " made by "+ organizationName +"\",  \
+                                      \"name\": \""+ _editorAgentName + "\",   \
+                                      \"description\": \"Definition of " + _editorAgentName + " made by "+ organizationName +"\",  \
                                       \"version\": \"" + version + "\",  \
                                       \"parameters\": [],   \
                                       \"inputs\": [],       \
@@ -379,8 +442,8 @@ NetworkController::NetworkController(QObject *parent) : QObject(parent),
         qWarning() << "No mapping has been found : " << myMappingPath << ". Set default mapping";
         QString mappingByDefault = "{      \
                                       \"mapping\": {    \
-                                      \"name\": \"" + _agentName + "\",   \
-                                      \"description\": \"Mapping of " + _agentName + " made by "+ organizationName + "\",  \
+                                      \"name\": \"" + _editorAgentName + "\",   \
+                                      \"description\": \"Mapping of " + _editorAgentName + " made by "+ organizationName + "\",  \
                                       \"version\": \"" + version + "\",  \
                                       \"mapping_out\": [],   \
                                       \"mapping_cat\": [] }}";
@@ -428,7 +491,7 @@ void NetworkController::start(QString networkDevice, QString ipAddress, int port
 
         if (_isMasticAgentStarted == 1)
         {
-            qInfo() << "Mastic Agent" << _agentName << "started";
+            qInfo() << "Mastic Agent" << _editorAgentName << "started";
 
             // Begin the observe on transiting zyre messages
             int result = network_observeZyre(&onIncommingZyreMessageCallback, this);
@@ -532,6 +595,117 @@ void NetworkController::onCommandAskedForOutput(QString command, QString outputN
             int success = zyre_whispers(agentElements->node, peerId.toStdString().c_str(), "%s %s", command.toStdString().c_str(), outputName.toStdString().c_str());
 
             qDebug() << "Send command" << command << "for agent" << peerId << "and output" << outputName << "with success ?" << success;
+        }
+    }
+}
+
+
+/**
+ * @brief Slot when inputs must be added to our Editor for a list of outputs
+ * @param outputsList
+ */
+void NetworkController::onAddInputsToEditorForOutputs(QString agentName, QList<OutputM*> outputsList)
+{
+    foreach (OutputM* output, outputsList) {
+        if (output != NULL) {
+            QString inputName = QString("%1.%2").arg(agentName, output->id());
+
+            int resultCreateInput = 0;
+
+            switch (output->agentIOPValueType())
+            {
+            case AgentIOPValueTypes::INTEGER: {
+                bool success = false;
+                int defaultValue = output->defaultValue().toInt(&success);
+                if (success) {
+                    resultCreateInput = mtic_createInput(inputName.toStdString().c_str(), INTEGER_T, &defaultValue, sizeof(int));
+                }
+                break;
+            }
+            case AgentIOPValueTypes::DOUBLE: {
+                bool success = false;
+                double defaultValue = output->defaultValue().toDouble(&success);
+                if (success) {
+                    resultCreateInput = mtic_createInput(inputName.toStdString().c_str(), DOUBLE_T, &defaultValue, sizeof(double));
+                }
+                break;
+            }
+            case AgentIOPValueTypes::STRING: {
+                const char* defaultValue = output->defaultValue().toString().toStdString().c_str();
+                //resultCreateInput = mtic_createInput(inputName.toStdString().c_str(), STRING_T, (void*)defaultValue, strlen(defaultValue) * sizeof(char));
+                resultCreateInput = mtic_createInput(inputName.toStdString().c_str(), STRING_T, (void*)defaultValue, (strlen(defaultValue) + 1) * sizeof(char));
+                break;
+            }
+            case AgentIOPValueTypes::BOOL: {
+                bool defaultValue = output->defaultValue().toBool();
+                resultCreateInput = mtic_createInput(inputName.toStdString().c_str(), BOOL_T, &defaultValue, sizeof(bool));
+                break;
+            }
+            case AgentIOPValueTypes::IMPULSION: {
+                resultCreateInput = mtic_createInput(inputName.toStdString().c_str(), IMPULSION_T, NULL, 0);
+                break;
+            }
+            case AgentIOPValueTypes::DATA: {
+                // FIXME TODO
+                //resultCreateInput = mtic_createInput(inputName.toStdString().c_str(), DATA_T, &defaultValue, sizeof(...));
+                break;
+            }
+            default: {
+                qCritical() << "Wrong type for the value of output" << output->name() << "of agent" << agentName;
+                break;
+            }
+            }
+
+            if (resultCreateInput == 1) {
+                qDebug() << "Create input" << inputName << "on agent" << _editorAgentName;
+
+                // Begin the observe of this input
+                int resultObserveInput = mtic_observeInput(inputName.toStdString().c_str(), &onObserveInputCallback, this);
+
+                if (resultObserveInput == 1) {
+                    qDebug() << "Observe input" << inputName << "on agent" << _editorAgentName;
+                }
+                else {
+                    qCritical() << "Can NOT observe input" << inputName << "on agent" << _editorAgentName << "Error code:" << resultObserveInput;
+                }
+
+                // Add mapping between our input and this output
+                unsigned long id = mtic_addMappingEntry(inputName.toStdString().c_str(), agentName.toStdString().c_str(), output->name().toStdString().c_str());
+
+                if (id > 0) {
+                    qDebug() << "Add mapping between output" << output->name() << "of agent" << agentName << "and input" << inputName << "of agent" << _editorAgentName << "(id" << id << ")";
+                }
+                else {
+                    qCritical() << "Can NOT add mapping between output" << output->name() << "of agent" << agentName << "and input" << inputName << "of agent" << _editorAgentName << "Error code:" << id;
+                }
+
+            }
+            else {
+                qCritical() << "Can NOT create input" << inputName << "on agent" << _editorAgentName << "Error code:" << resultCreateInput;
+            }
+        }
+    }
+}
+
+
+/**
+ * @brief Slot when inputs must be removed to our Editor for a list of outputs
+ * @param outputsList
+ */
+void NetworkController::onRemoveInputsToEditorForOutputs(QString agentName, QList<OutputM*> outputsList)
+{
+    foreach (OutputM* output, outputsList) {
+        if (output != NULL) {
+            QString inputName = QString("%1.%2.%3").arg(_editorAgentName, agentName, output->name());
+
+            int result = mtic_removeMappingEntryWithName(inputName.toStdString().c_str(), agentName.toStdString().c_str(), output->name().toStdString().c_str());
+
+            if (result == 1) {
+                qDebug() << "Remove input" << inputName << "on output" << output->name() << "of agent" << agentName;
+            }
+            else {
+                qCritical() << "Can NOT remove input" << inputName << "on output" << output->name() << "of agent" << agentName << ". Error code:" << result;
+            }
         }
     }
 }

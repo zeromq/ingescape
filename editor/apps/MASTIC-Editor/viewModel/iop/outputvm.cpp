@@ -14,20 +14,27 @@
  */
 
 #include "outputvm.h"
+#include <viewModel/iop/inputvm.h>
 
-OutputVM::OutputVM(QString agentName,
+OutputVM::OutputVM(QString outputName,
                    OutputM* modelM,
-                   QObject *parent) : PointMapVM(agentName,
+                   QObject *parent) : PointMapVM(outputName,
                                                  parent),
-    _modelM(modelM)
+    _modelM(NULL),
+    _isGhost(false),
+    _isPublishedNewValue(false)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
+    // Allow to benefit of "DELETE PROOF"
     setmodelM(modelM);
 
     if (_modelM != NULL) {
-        qInfo() << "New Output VM" << _nameAgent << "." << _modelM->name();
+        qInfo() << "New Output VM" << _modelM->name();
+    }
+    else {
+        _isGhost = true;
     }
 }
 
@@ -38,8 +45,28 @@ OutputVM::OutputVM(QString agentName,
 OutputVM::~OutputVM()
 {
     if (_modelM != NULL) {
-        qInfo() << "Delete Output VM" << _nameAgent << "." << _modelM->name();
+        qInfo() << "Delete Output VM" << _modelM->name();
     }
 
     setmodelM(NULL);
+}
+
+
+/**
+ * @brief Return true if our output can link with the input (types are compatible)
+ * @param pointMap
+ * @return
+ */
+bool OutputVM::canLinkWith(PointMapVM* pointMap)
+{
+    InputVM* input = qobject_cast<InputVM*>(pointMap);
+    if ((input != NULL) && (input->modelM() != NULL)
+            && (_modelM != NULL))
+    {
+        // Call parent class function
+        return _canLinkOutputToInput(_modelM->agentIOPValueType(), input->modelM()->agentIOPValueType());
+    }
+    else {
+        return false;
+    }
 }
