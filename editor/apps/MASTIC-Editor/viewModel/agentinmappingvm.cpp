@@ -649,11 +649,33 @@ OutputVM* AgentInMappingVM::_outputModelRemoved(OutputM* output)
  */
 void AgentInMappingVM::_updateWithAllModels()
 {
-    /*foreach (AgentM* model, _models.toList()) {
-        if (model != NULL)
+    bool areIdenticalsAllDefinitions = true;
+
+    if (_models.count() > 1)
+    {
+        QList<AgentM*> modelsList = _models.toList();
+
+        AgentM* firstModel = modelsList.at(0);
+        DefinitionM* firstDefinition = NULL;
+
+        if ((firstModel != NULL) && (firstModel->definition() != NULL))
         {
+            firstDefinition = firstModel->definition();
+
+            for (int i = 1; i < modelsList.count(); i++) {
+                AgentM* model = modelsList.at(i);
+
+                if ((model != NULL) && (model->definition() != NULL))
+                {
+                    if (!DefinitionM::areIdenticals(firstDefinition, model->definition())) {
+                        areIdenticalsAllDefinitions = false;
+                        break;
+                    }
+                }
+            }
         }
-    }*/
+    }
+    setareIdenticalsAllDefinitions(areIdenticalsAllDefinitions);
 
     // Update flags in function of models
     _updateIsON();
