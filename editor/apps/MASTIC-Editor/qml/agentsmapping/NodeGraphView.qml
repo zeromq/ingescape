@@ -481,7 +481,6 @@ Item {
                         id: agent
 
                         agentMappingVM : model.QtObject
-
                         controller : rootItem.controller
                     }
                 }
@@ -516,6 +515,7 @@ Item {
                 isReduced: true
 
                 agentName: dropGhost.agent ? dropGhost.agent.name : ""
+                dropEnabled : false
             }
         }
 

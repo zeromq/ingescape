@@ -438,10 +438,10 @@ Item {
                     }
 
                     AgentMapping.AgentNodeView {
-                         opacity : 0.5
                          isReduced : true
                          agentName : model.name
                          visible: mouseArea.drag.active
+                         dropEnabled : false
                     }
                 }
 
