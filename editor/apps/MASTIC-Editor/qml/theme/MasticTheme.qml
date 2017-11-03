@@ -239,7 +239,7 @@ Item {
     // Links
     //
     // - Default state
-    readonly property int agentsMappingLinkDefaultWidth: 2
+    readonly property int agentsMappingLinkDefaultWidth: 3
     readonly property int agentsMappingBrinDefaultWidth: 6
 
 
