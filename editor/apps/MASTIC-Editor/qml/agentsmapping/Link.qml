@@ -95,8 +95,8 @@ I2CubicBezierCurve {
                 }
             }
             else { // if the agentTo is not reduced : type of its outputs
-                if (outputModel && outputModel.modelM) {
-                    switch (outputModel.modelM.agentIOPValueType)
+                if (outputModel && outputModel.firstModel) {
+                    switch (outputModel.firstModel.agentIOPValueType)
                     {
                     case AgentIOPValueTypes.INTEGER:
                         mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
