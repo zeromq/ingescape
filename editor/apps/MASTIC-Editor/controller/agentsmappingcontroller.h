@@ -125,7 +125,7 @@ private Q_SLOTS:
      *      The two agents corresponding need to be visible in the list.
      * @param currentAgentInMapping
      */
-    void createMapBetweenIopInMappingFromAgentInMapping(AgentInMappingVM* currentAgentInMapping);
+    void _onCreateMapBetweenIopInMappingFromAgentInMapping(AgentInMappingVM* currentAgentInMapping);
 
 
     /**
@@ -155,6 +155,7 @@ private:
     // Usefull to save it
     MasticModelManager* _modelManager;
 
+    // Map from agent name to a list of view models of agent in mapping
     QHash<QString, AgentInMappingVM *> _mapFromNameToAgentInMappingViewModelsList;
 
     QHash<QString, MapBetweenIOPVM*> _mapFromAgentNameToPartialMapBetweenIOPViewModelsList;

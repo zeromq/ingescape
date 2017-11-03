@@ -110,12 +110,62 @@ void AgentsMappingController::addMapBetweenAgents(AgentInMappingVM* outputAgent,
 
 
 /**
+ * @brief Slot when the flag "is Activated Mapping" changed
+ * @param isActivatedMapping
+ */
+void AgentsMappingController::onIsActivatedMappingChanged(bool isActivatedMapping)
+{
+    if (isActivatedMapping) {
+        qInfo() << "Mapping ACTIVATED !";
+
+        if (_isEmptyMapping) {
+            qDebug() << "...et il est vide, on tente d'ajouter des choses...";
+
+            if (_modelManager != NULL) {
+                // Get the map from agent name to list of active agents
+                QHash<QString, QList<AgentM*>> mapFromAgentNameToActiveAgentsList = _modelManager->getMapFromAgentNameToActiveAgentsList();
+
+                foreach (QString agentName, mapFromAgentNameToActiveAgentsList.keys()) {
+                    QList<AgentM*> activeAgentsList = mapFromAgentNameToActiveAgentsList.value(agentName);
+
+                    // Add new model(s) of agent to the current mapping
+                    _addAgentModelsToMappingAtPosition(agentName, activeAgentsList, QPointF());
+                }
+            }
+        }
+        else {
+            qDebug() << "...et il n'est PAS vide, on ne fait rien de plus";
+        }
+    }
+    else {
+        qInfo() << "Mapping DE-activated !";
+    }
+}
+
+
+/**
+ * @brief Get the agent in mapping for an agent name
+ * @param name
+ * @return
+ */
+AgentInMappingVM* AgentsMappingController::getAgentInMappingForName(QString name)
+{
+    if (_mapFromNameToAgentInMappingViewModelsList.contains(name)) {
+        return _mapFromNameToAgentInMappingViewModelsList.value(name);
+    }
+    else {
+        return NULL;
+    }
+}
+
+
+/**
  * @brief Slot when a new view model of a agent mapping is created on the main view mapping.
  *      Check if a map need to be created from the element mapping list in the model manager.
  *      The two agents corresponding need to be visible in the list.
  * @param currentAgentInMapping
  */
-void AgentsMappingController::createMapBetweenIopInMappingFromAgentInMapping(AgentInMappingVM* currentAgentInMapping)
+void AgentsMappingController::_onCreateMapBetweenIopInMappingFromAgentInMapping(AgentInMappingVM* currentAgentInMapping)
 {
     if ((_modelManager != NULL) && (currentAgentInMapping != NULL))
     {
@@ -133,7 +183,7 @@ void AgentsMappingController::createMapBetweenIopInMappingFromAgentInMapping(Age
             foreach (MapBetweenIOPVM* partialMap, foundPartialMapBetweenIOP)
             {
                 // Get the real Output from the name of the ghost Output used to create the mapBetweenIOP.
-                OutputVM* missingOutput = currentAgentInMapping->getPointMapFromOutputName(partialMap->pointFrom()->iopName());
+                OutputVM* missingOutput = currentAgentInMapping->getOutputFromName(partialMap->pointFrom()->iopName());
 
                 if (missingOutput != NULL)
                 {
@@ -193,19 +243,19 @@ void AgentsMappingController::createMapBetweenIopInMappingFromAgentInMapping(Age
                 if( (currentElementMapping != NULL))
                 {
                     // Get the input conserned by the current elementMapping.
-                    InputVM* inputPointVM = currentAgentInMapping->getPointMapFromInputName(currentElementMapping->input());
+                    InputVM* inputPointVM = currentAgentInMapping->getInputFromName(currentElementMapping->input());
 
                     if(inputPointVM != NULL)
                     {
                         // Search for the output agent based on the current elementMapping
-                        AgentInMappingVM* outputAgent = _mapFromNameToAgentInMappingViewModelsList.value(currentElementMapping->outputAgent());
+                        AgentInMappingVM* outputAgent = getAgentInMappingForName(currentElementMapping->outputAgent());
 
                         OutputVM* outputPointVM = NULL;
 
                         if(outputAgent != NULL)
                         {
                             // Get the output conserned by the mapping.
-                            outputPointVM = outputAgent->getPointMapFromOutputName(currentElementMapping->output());
+                            outputPointVM = outputAgent->getOutputFromName(currentElementMapping->output());
 
                             if(outputPointVM == NULL)
                             {
@@ -274,56 +324,6 @@ void AgentsMappingController::createMapBetweenIopInMappingFromAgentInMapping(Age
         {
             _allMapInMapping.append(newMapBetweenIOP);
         }
-    }
-}
-
-
-/**
- * @brief Slot when the flag "is Activated Mapping" changed
- * @param isActivatedMapping
- */
-void AgentsMappingController::onIsActivatedMappingChanged(bool isActivatedMapping)
-{
-    if (isActivatedMapping) {
-        qInfo() << "Mapping ACTIVATED !";
-
-        if (_isEmptyMapping) {
-            qDebug() << "...et il est vide, on tente d'ajouter des choses...";
-
-            if (_modelManager != NULL) {
-                // Get the map from agent name to list of active agents
-                QHash<QString, QList<AgentM*>> mapFromAgentNameToActiveAgentsList = _modelManager->getMapFromAgentNameToActiveAgentsList();
-
-                foreach (QString agentName, mapFromAgentNameToActiveAgentsList.keys()) {
-                    QList<AgentM*> activeAgentsList = mapFromAgentNameToActiveAgentsList.value(agentName);
-
-                    // Add new model(s) of agent to the current mapping
-                    _addAgentModelsToMappingAtPosition(agentName, activeAgentsList, QPointF());
-                }
-            }
-        }
-        else {
-            qDebug() << "...et il n'est PAS vide, on ne fait rien de plus";
-        }
-    }
-    else {
-        qInfo() << "Mapping DE-activated !";
-    }
-}
-
-
-/**
- * @brief Get the agent in mapping for an agent name
- * @param name
- * @return
- */
-AgentInMappingVM* AgentsMappingController::getAgentInMappingForName(QString name)
-{
-    if (_mapFromNameToAgentInMappingViewModelsList.contains(name)) {
-        return _mapFromNameToAgentInMappingViewModelsList.value(name);
-    }
-    else {
-        return NULL;
     }
 }
 
@@ -405,45 +405,40 @@ void AgentsMappingController::_addAgentModelsToMappingAtPosition(QString agentNa
 {
     if (!agentName.isEmpty() && (agentsList.count() > 0))
     {
-        AgentInMappingVM * newAgentInMapping = NULL;
+        AgentInMappingVM* agentInMapping = getAgentInMappingForName(agentName);
 
-        //Check if it's already in the list
-        bool exists = _mapFromNameToAgentInMappingViewModelsList.contains(agentName);
-
-        //if yes only add the agent in the internal list of the agentInMappingVM
-        //if not instanciate and add it
-        if(exists)
+        // The agent is defined, only add models of agent in the internal list of the agentInMappingVM
+        if (agentInMapping != NULL)
         {
-            newAgentInMapping  = _mapFromNameToAgentInMappingViewModelsList.value(agentName);
-
             // TODO ESTIA FIXME
             foreach (AgentM* agentModel, agentsList) {
-                newAgentInMapping->addAgentToInternalList(agentModel);
+                agentInMapping->addAgentToInternalList(agentModel);
             }
 
-            qInfo() << "The agent mapping already existing, new agnet model added to : " << agentName;
+            qInfo() << "The agent in mapping already exist, new agent models added to" << agentName;
         }
+        // Instanciate a new view model of agent in mapping (and add models)
         else
         {
-            //Create new Agent In Mapping
-            newAgentInMapping = new AgentInMappingVM(agentsList,
-                                                     position,
-                                                     this);
+            // Create a new Agent In Mapping
+            agentInMapping = new AgentInMappingVM(agentsList,
+                                                  position,
+                                                  this);
 
-            //Add in the map list
-            _mapFromNameToAgentInMappingViewModelsList.insert(agentName, newAgentInMapping);
+            // Add in the map list
+            _mapFromNameToAgentInMappingViewModelsList.insert(agentName, agentInMapping);
 
-            //Add this new Agent In Mapping VM in the list for the qml
-            _agentInMappingVMList.append(newAgentInMapping);
+            // Add this new Agent In Mapping VM in the list for the qml
+            _agentInMappingVMList.append(agentInMapping);
 
-            //Call for the first shot -> new call will be proceed by the connect mechanism
-            createMapBetweenIopInMappingFromAgentInMapping(newAgentInMapping);
+            // Call for the first shot -> new call will be proceed by the connect mechanism
+            _onCreateMapBetweenIopInMappingFromAgentInMapping(agentInMapping);
 
             // Connect to signal "new Definition added to agent in mapping" from the new definition
-            connect(newAgentInMapping, &AgentInMappingVM::newDefinitionInAgentMapping,
-                    this, &AgentsMappingController::createMapBetweenIopInMappingFromAgentInMapping);
+            connect(agentInMapping, &AgentInMappingVM::newDefinitionInAgentMapping,
+                    this, &AgentsMappingController::_onCreateMapBetweenIopInMappingFromAgentInMapping);
 
-            qInfo() << "A new agent mapping has been added : " << agentName << " from new definition";
+            qInfo() << "A new agent mapping has been added:" << agentName;
         }
     }
 }

@@ -29,7 +29,7 @@
 
 
 /**
- * @brief The AgentVM class defines a view model of agent
+ * @brief The AgentVM class defines a view model of agent in the list
  * Allows to manage when several agents have exactly the same name and the same definition
  * Only Peer ID is different (and HostName can also be different)
  */
