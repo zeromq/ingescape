@@ -91,14 +91,21 @@ Item {
                 fill: parent
             }
 
-            Rectangle {
-                anchors.fill: parent
 
+            // Selected Agent
+            Item {
+                anchors.fill: parent
                 visible : controller && root.agent && (controller.selectedAgent === root.agent);
-                color : "transparent"
-                radius : 5
-                border {
-                    width : 2
+
+                Rectangle {
+                    anchors {
+                        left : parent.left
+                        top : parent.top
+                        bottom: parent.bottom
+                    }
+
+                    width : 6
+
                     color : MasticTheme.selectedAgentColor
                 }
 
