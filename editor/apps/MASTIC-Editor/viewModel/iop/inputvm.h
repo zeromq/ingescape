@@ -37,8 +37,10 @@ class InputVM : public PointMapVM
 
 public:
     explicit InputVM(QString inputName,
+                     QString inputId,
                      AgentIOPM* modelM,
                      QObject *parent = nullptr);
+
 
     /**
      * @brief Destructor

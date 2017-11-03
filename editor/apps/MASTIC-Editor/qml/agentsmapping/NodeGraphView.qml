@@ -330,7 +330,7 @@ Item {
 
                     if (MasticEditorC.agentsMappingC)
                     {
-                        MasticEditorC.agentsMappingC.addAgentToMappingAtPosition(dragItem.agent.name, dragItem.agent.models, dropPosition);
+                        MasticEditorC.agentsMappingC.dropAgentToMappingAtPosition(dragItem.agent.name, dragItem.agent.models, dropPosition);
                     }
 
                     // Restore opacity of our source

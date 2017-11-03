@@ -51,7 +51,7 @@ MapBetweenIOPVM::MapBetweenIOPVM(AgentInMappingVM* agentFrom,
     if ((_agentFrom != NULL) && (_pointFrom != NULL) && (_pointFrom->modelM() != NULL)
             && (_agentTo != NULL) && (_pointTo != NULL) && (_pointTo->modelM() != NULL))
     {
-        qInfo() << "New Map Between" << _agentFrom->agentName() << "." << _pointFrom->iopName() << "-->" << _agentTo->agentName() << "." << _pointTo->iopName();
+        qInfo() << "New Map Between" << _agentFrom->agentName() << "." << _pointFrom->name() << "-->" << _agentTo->agentName() << "." << _pointTo->name();
     }
 }
 

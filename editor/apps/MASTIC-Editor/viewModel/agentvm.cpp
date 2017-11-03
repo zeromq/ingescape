@@ -75,7 +75,7 @@ AgentVM::~AgentVM()
 
     disconnect(&_models, &AbstractI2CustomItemListModel::countChanged, this, &AgentVM::_onModelsChanged);
 
-    // Clear the lists of models
+    // Clear the previous list of models
     _previousAgentsList.clear();
 
     // Free the memory elsewhere

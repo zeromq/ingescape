@@ -70,12 +70,62 @@ AgentsMappingController::~AgentsMappingController()
  * @param list
  * @param position
  */
-void AgentsMappingController::addAgentToMappingAtPosition(QString agentName, AbstractI2CustomItemListModel* list, QPointF position)
+void AgentsMappingController::dropAgentToMappingAtPosition(QString agentName, AbstractI2CustomItemListModel* list, QPointF position)
 {
-    I2CustomItemListModel<AgentM>* agentsList = dynamic_cast<I2CustomItemListModel<AgentM>*>(list);
-    if (agentsList != NULL) {
-        // Add new model(s) of agent to the current mapping at a specific position
-        _addAgentModelsToMappingAtPosition(agentName, agentsList->toList(), position);
+    // Check that there is NOT yet an agent in the current mapping for this name
+    AgentInMappingVM* agentInMapping = getAgentInMappingForName(agentName);
+    if (agentInMapping == NULL)
+    {
+        I2CustomItemListModel<AgentM>* agentsList = dynamic_cast<I2CustomItemListModel<AgentM>*>(list);
+        if (agentsList != NULL)
+        {
+            // Add new model(s) of agent to the current mapping at a specific position
+            _addAgentModelsToMappingAtPosition(agentName, agentsList->toList(), position);
+
+            // Selects this new agent
+            agentInMapping = getAgentInMappingForName(agentName);
+            if (agentInMapping != NULL) {
+                setselectedAgent(agentInMapping);
+            }
+        }
+    }
+}
+
+
+/**
+ * @brief Slot when a previous agent model is replaced by a new one strictly identical
+ * @param previousModel
+ * @param newModel
+ */
+void AgentsMappingController::onIdenticalAgentModelReplaced(AgentM* previousModel, AgentM* newModel)
+{
+    if ((previousModel != NULL) && (newModel != NULL))
+    {
+        AgentInMappingVM* agentInMapping = getAgentInMappingForName(newModel->name());
+        if (agentInMapping != NULL)
+        {
+            int index = agentInMapping->models()->indexOf(previousModel);
+            if (index > -1) {
+                agentInMapping->models()->replace(index, newModel);
+            }
+        }
+    }
+}
+
+
+/**
+ * @brief Slot when an identical agent model is added
+ * @param newModel
+ */
+void AgentsMappingController::onIdenticalAgentModelAdded(AgentM* newModel)
+{
+    if (newModel != NULL)
+    {
+        AgentInMappingVM* agentInMapping = getAgentInMappingForName(newModel->name());
+        if (agentInMapping != NULL)
+        {
+            agentInMapping->models()->append(newModel);
+        }
     }
 }
 
@@ -104,175 +154,6 @@ void AgentsMappingController::addMapBetweenAgents(AgentInMappingVM* outputAgent,
                 qDebug() << "Can not link output" << output->modelM()->name() << "with type" << AgentIOPValueTypes::staticEnumToString(output->modelM()->agentIOPValueType()) << "(of agent" << outputAgent->agentName() << ")"
                          << "and input" << input->modelM()->name() << "with type" << AgentIOPValueTypes::staticEnumToString(input->modelM()->agentIOPValueType()) << "(of agent" << inputAgent->agentName() << ")";
             }
-        }
-    }
-}
-
-
-/**
- * @brief Slot when a new view model of a agent mapping is created on the main view mapping.
- *      Check if a map need to be created from the element mapping list in the model manager.
- *      The two agents corresponding need to be visible in the list.
- * @param currentAgentInMapping
- */
-void AgentsMappingController::createMapBetweenIopInMappingFromAgentInMapping(AgentInMappingVM* currentAgentInMapping)
-{
-    if ((_modelManager != NULL) && (currentAgentInMapping != NULL))
-    {
-        // All newly generated mapBetweenIOP
-        QList<MapBetweenIOPVM *> newMapBetweenIOP;
-
-        //
-        // Handle all mappings that could not be finalised.
-        //
-        if (_mapFromAgentNameToPartialMapBetweenIOPViewModelsList.contains(currentAgentInMapping->agentName()))
-        {
-            // Sublist of partial maps where the ghost agent is matching with the new agent in mapping VM. (Outputs that were needed to realise other agents' mappings)
-            QList<MapBetweenIOPVM*> foundPartialMapBetweenIOP  = _mapFromAgentNameToPartialMapBetweenIOPViewModelsList.values(currentAgentInMapping->agentName());
-
-            foreach (MapBetweenIOPVM* partialMap, foundPartialMapBetweenIOP)
-            {
-                // Get the real Output from the name of the ghost Output used to create the mapBetweenIOP.
-                OutputVM* missingOutput = currentAgentInMapping->getPointMapFromOutputName(partialMap->pointFrom()->iopName());
-
-                if (missingOutput != NULL)
-                {
-                    //Set the ghost elements in the partial map with the real stuff.
-                    if (partialMap->agentFrom()->isGhost())
-                    {
-                        // Get our ghost agent
-                        AgentInMappingVM* agentToDestroy = partialMap->agentFrom();
-
-                        //Set real agent
-                        partialMap->setagentFrom(currentAgentInMapping);
-
-                        // Destroy ghost agent
-                        delete agentToDestroy;
-                        agentToDestroy = NULL;
-                    }
-                    if (partialMap->pointFrom()->isGhost())
-                    {
-                        // Get our ghost output.
-                        OutputVM* outputToDestroy = partialMap->pointFrom();
-
-                        //Set real output
-                        partialMap->setpointFrom(missingOutput);
-
-                        // Destroy output
-                        delete outputToDestroy;
-                        outputToDestroy = NULL;
-                    }
-                    //Add newly finalised MapBetweenIOP.
-                    newMapBetweenIOP.append(partialMap);
-
-                    _allPartialMapInMapping.remove(partialMap);
-                    qInfo() <<"Delete Partial Map; " << currentAgentInMapping->agentName() << "." << missingOutput->iopName();
-                }
-
-            }
-
-        }
-
-        //
-        // Handle all mappings of the current agents.
-        // Note: No need to check for empty string from elementMapping.
-        //
-
-        // Sublist of elementMapping that conserns the agent mappings in input
-        QList<ElementMappingM *> elementsMappingFound = _modelManager->getMergedListOfInputMappingElementsFromAgentName(currentAgentInMapping->agentName());
-
-        // if empty -> skiped
-        if (!elementsMappingFound.isEmpty())
-        {
-            //Initialize
-
-            // iterate on the list of element mapping
-            foreach (ElementMappingM* currentElementMapping, elementsMappingFound)
-            {
-                //Check if the mapping doesnot already exist.
-                if( (currentElementMapping != NULL))
-                {
-                    // Get the input conserned by the current elementMapping.
-                    InputVM* inputPointVM = currentAgentInMapping->getPointMapFromInputName(currentElementMapping->input());
-
-                    if(inputPointVM != NULL)
-                    {
-                        // Search for the output agent based on the current elementMapping
-                        AgentInMappingVM* outputAgent = _mapFromNameToAgentInMappingViewModelsList.value(currentElementMapping->outputAgent());
-
-                        OutputVM* outputPointVM = NULL;
-
-                        if(outputAgent != NULL)
-                        {
-                            // Get the output conserned by the mapping.
-                            outputPointVM = outputAgent->getPointMapFromOutputName(currentElementMapping->output());
-
-                            if(outputPointVM == NULL)
-                            {
-                               // Handle Output is missing
-
-                               //Create a new ghost output (OutputVM) as substitute of the missing output.
-                               outputPointVM = new OutputVM(currentElementMapping->output());
-                            }
-                        }
-                        else
-                        {
-                            // Handle output agent is missing
-
-                            //Create a new ghost agent (AgentInMappingVM) as substitute of the missing agent.
-                            outputAgent = new AgentInMappingVM(currentElementMapping->outputAgent());
-
-                            //Create a new ghost output (OutputVM) as substitute of the missing output.
-                            outputPointVM = new OutputVM(currentElementMapping->output());
-                        }
-
-                        // Create the new MapBetweenIOP ...
-                        if( (!outputAgent->isGhost()) && (!outputPointVM->isGhost()) )
-                        {
-                            // Handle everything went smoothly i.e. no ghost output nor ghost agent.
-                            if(!_checkIfMapBetweenIOPVMAlreadyExist(outputAgent, outputPointVM, currentAgentInMapping, inputPointVM))
-                            {
-                                MapBetweenIOPVM* map = new MapBetweenIOPVM(outputAgent, outputPointVM, currentAgentInMapping, inputPointVM);
-
-                                //Add the new MapBetweenIOP to the temp list.
-                                newMapBetweenIOP.append(map);
-
-                                qInfo() << "Create the MapBetweenIOPVM : " << currentAgentInMapping->agentName() << "." << inputPointVM->modelM()->name() << " -> " << outputAgent->agentName() << "." << outputPointVM->modelM()->name();
-                            }
-                            else
-                            {
-                                qInfo() << "MapBetweenIOPVM already exist : " << currentAgentInMapping->agentName() << "." << inputPointVM->modelM()->name() << " -> " << outputAgent->agentName() << "." << outputPointVM->iopName();
-                            }
-                        }
-                        else
-                        {
-                            // Handle the new partial MapBetweenIOPVM
-                            if(!_checkIfMapBetweenIOPVMAlreadyExist(outputAgent, outputPointVM, currentAgentInMapping, inputPointVM))
-                            {
-                                MapBetweenIOPVM* partialMap = new MapBetweenIOPVM(outputAgent, outputPointVM, currentAgentInMapping, inputPointVM);
-
-                                //Add the new MapBetweenIOP to the temp list.
-                                _allPartialMapInMapping.append(partialMap);
-
-                                //Map partial mapBetweenIOP with output agent name to active search
-                                _mapFromAgentNameToPartialMapBetweenIOPViewModelsList.insertMulti(outputAgent->agentName(), partialMap);
-
-                                qInfo() << "Create the partial MapBetweenIOPVM : " << currentAgentInMapping->agentName() << "." << inputPointVM->modelM()->name() << " -> " << outputAgent->agentName() << "." << outputPointVM->iopName();
-                            }
-                            else
-                            {
-                                qInfo() << "Partial MapBetweenIOPVM already exist : " << currentAgentInMapping->agentName() << "." << inputPointVM->modelM()->name() << " -> " << outputAgent->agentName() << "." << outputPointVM->iopName();
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-         //Append all new mapBetweenIOP.
-        if (!newMapBetweenIOP.isEmpty())
-        {
-            _allMapInMapping.append(newMapBetweenIOP);
         }
     }
 }
@@ -329,6 +210,175 @@ AgentInMappingVM* AgentsMappingController::getAgentInMappingForName(QString name
 
 
 /**
+ * @brief Slot when a new view model of a agent mapping is created on the main view mapping.
+ *      Check if a map need to be created from the element mapping list in the model manager.
+ *      The two agents corresponding need to be visible in the list.
+ * @param currentAgentInMapping
+ */
+void AgentsMappingController::_onCreateMapBetweenIopInMappingFromAgentInMapping(AgentInMappingVM* currentAgentInMapping)
+{
+    if ((_modelManager != NULL) && (currentAgentInMapping != NULL))
+    {
+        // All newly generated mapBetweenIOP
+        QList<MapBetweenIOPVM *> newMapBetweenIOP;
+
+        //
+        // Handle all mappings that could not be finalised.
+        //
+        if (_mapFromAgentNameToPartialMapBetweenIOPViewModelsList.contains(currentAgentInMapping->agentName()))
+        {
+            // Sublist of partial maps where the ghost agent is matching with the new agent in mapping VM. (Outputs that were needed to realise other agents' mappings)
+            QList<MapBetweenIOPVM*> foundPartialMapBetweenIOP  = _mapFromAgentNameToPartialMapBetweenIOPViewModelsList.values(currentAgentInMapping->agentName());
+
+            foreach (MapBetweenIOPVM* partialMap, foundPartialMapBetweenIOP)
+            {
+                // Get the real Output from the name of the ghost Output used to create the mapBetweenIOP.
+                OutputVM* missingOutput = currentAgentInMapping->getOutputFromName(partialMap->pointFrom()->name());
+
+                if (missingOutput != NULL)
+                {
+                    //Set the ghost elements in the partial map with the real stuff.
+                    if (partialMap->agentFrom()->isGhost())
+                    {
+                        // Get our ghost agent
+                        AgentInMappingVM* agentToDestroy = partialMap->agentFrom();
+
+                        //Set real agent
+                        partialMap->setagentFrom(currentAgentInMapping);
+
+                        // Destroy ghost agent
+                        delete agentToDestroy;
+                        agentToDestroy = NULL;
+                    }
+                    if (partialMap->pointFrom()->isGhost())
+                    {
+                        // Get our ghost output.
+                        OutputVM* outputToDestroy = partialMap->pointFrom();
+
+                        //Set real output
+                        partialMap->setpointFrom(missingOutput);
+
+                        // Destroy output
+                        delete outputToDestroy;
+                        outputToDestroy = NULL;
+                    }
+                    //Add newly finalised MapBetweenIOP.
+                    newMapBetweenIOP.append(partialMap);
+
+                    _allPartialMapInMapping.remove(partialMap);
+                    qInfo() <<"Delete Partial Map; " << currentAgentInMapping->agentName() << "." << missingOutput->name();
+                }
+
+            }
+
+        }
+
+        //
+        // Handle all mappings of the current agents.
+        // Note: No need to check for empty string from elementMapping.
+        //
+
+        // Sublist of elementMapping that conserns the agent mappings in input
+        QList<ElementMappingM *> elementsMappingFound = _modelManager->getMergedListOfInputMappingElementsFromAgentName(currentAgentInMapping->agentName());
+
+        // if empty -> skiped
+        if (!elementsMappingFound.isEmpty())
+        {
+            //Initialize
+
+            // iterate on the list of element mapping
+            foreach (ElementMappingM* currentElementMapping, elementsMappingFound)
+            {
+                //Check if the mapping doesnot already exist.
+                if( (currentElementMapping != NULL))
+                {
+                    // Get the input conserned by the current elementMapping.
+                    InputVM* inputPointVM = currentAgentInMapping->getInputFromName(currentElementMapping->input());
+
+                    if(inputPointVM != NULL)
+                    {
+                        // Search for the output agent based on the current elementMapping
+                        AgentInMappingVM* outputAgent = getAgentInMappingForName(currentElementMapping->outputAgent());
+
+                        OutputVM* outputPointVM = NULL;
+
+                        if(outputAgent != NULL)
+                        {
+                            // Get the output conserned by the mapping.
+                            outputPointVM = outputAgent->getOutputFromName(currentElementMapping->output());
+
+                            if(outputPointVM == NULL)
+                            {
+                               // Handle Output is missing
+
+                               //Create a new ghost output (OutputVM) as substitute of the missing output.
+                               outputPointVM = new OutputVM(currentElementMapping->output());
+                            }
+                        }
+                        else
+                        {
+                            // Handle output agent is missing
+
+                            //Create a new ghost agent (AgentInMappingVM) as substitute of the missing agent.
+                            outputAgent = new AgentInMappingVM(currentElementMapping->outputAgent());
+
+                            //Create a new ghost output (OutputVM) as substitute of the missing output.
+                            outputPointVM = new OutputVM(currentElementMapping->output());
+                        }
+
+                        // Create the new MapBetweenIOP ...
+                        if( (!outputAgent->isGhost()) && (!outputPointVM->isGhost()) )
+                        {
+                            // Handle everything went smoothly i.e. no ghost output nor ghost agent.
+                            if(!_checkIfMapBetweenIOPVMAlreadyExist(outputAgent, outputPointVM, currentAgentInMapping, inputPointVM))
+                            {
+                                MapBetweenIOPVM* map = new MapBetweenIOPVM(outputAgent, outputPointVM, currentAgentInMapping, inputPointVM);
+
+                                //Add the new MapBetweenIOP to the temp list.
+                                newMapBetweenIOP.append(map);
+
+                                qInfo() << "Create the MapBetweenIOPVM : " << currentAgentInMapping->agentName() << "." << inputPointVM->modelM()->name() << " -> " << outputAgent->agentName() << "." << outputPointVM->modelM()->name();
+                            }
+                            else
+                            {
+                                qInfo() << "MapBetweenIOPVM already exist : " << currentAgentInMapping->agentName() << "." << inputPointVM->modelM()->name() << " -> " << outputAgent->agentName() << "." << outputPointVM->name();
+                            }
+                        }
+                        else
+                        {
+                            // Handle the new partial MapBetweenIOPVM
+                            if(!_checkIfMapBetweenIOPVMAlreadyExist(outputAgent, outputPointVM, currentAgentInMapping, inputPointVM))
+                            {
+                                MapBetweenIOPVM* partialMap = new MapBetweenIOPVM(outputAgent, outputPointVM, currentAgentInMapping, inputPointVM);
+
+                                //Add the new MapBetweenIOP to the temp list.
+                                _allPartialMapInMapping.append(partialMap);
+
+                                //Map partial mapBetweenIOP with output agent name to active search
+                                _mapFromAgentNameToPartialMapBetweenIOPViewModelsList.insertMulti(outputAgent->agentName(), partialMap);
+
+                                qInfo() << "Create the partial MapBetweenIOPVM : " << currentAgentInMapping->agentName() << "." << inputPointVM->modelM()->name() << " -> " << outputAgent->agentName() << "." << outputPointVM->name();
+                            }
+                            else
+                            {
+                                qInfo() << "Partial MapBetweenIOPVM already exist : " << currentAgentInMapping->agentName() << "." << inputPointVM->modelM()->name() << " -> " << outputAgent->agentName() << "." << outputPointVM->name();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+         //Append all new mapBetweenIOP.
+        if (!newMapBetweenIOP.isEmpty())
+        {
+            _allMapInMapping.append(newMapBetweenIOP);
+        }
+    }
+}
+
+
+/**
  * @brief Slot when the list of "Agents in Mapping" changed
  */
 void AgentsMappingController::_onAgentsInMappingChanged()
@@ -354,6 +404,8 @@ void AgentsMappingController::_onAgentsInMappingChanged()
             {
                 qDebug() << "Agent in mapping" << agentInMapping->agentName() << "ADDED with" << agentInMapping->outputsList()->count() << "outputs";
 
+                // FIXME TODO: add a connect to changes on list of inputs and list of outputs
+
                 QList<OutputM*> outputsList;
                 foreach (OutputVM* output, agentInMapping->outputsList()->toList()) {
                     if ((output != NULL) && (output->modelM() != NULL)) {
@@ -376,6 +428,8 @@ void AgentsMappingController::_onAgentsInMappingChanged()
             if ((agentInMapping != NULL) && !newListOfAgentsInMapping.contains(agentInMapping))
             {
                 qDebug() << "Agent in mapping" << agentInMapping->agentName() << "REMOVED with" << agentInMapping->outputsList()->count() << "outputs";
+
+                // FIXME TODO: add a DIS-connect to changes on list of inputs and list of outputs
 
                 QList<OutputM*> outputsList;
                 foreach (OutputVM* output, agentInMapping->outputsList()->toList()) {
@@ -405,49 +459,54 @@ void AgentsMappingController::_addAgentModelsToMappingAtPosition(QString agentNa
 {
     if (!agentName.isEmpty() && (agentsList.count() > 0))
     {
-        AgentInMappingVM * newAgentInMapping = NULL;
+        AgentInMappingVM* agentInMapping = getAgentInMappingForName(agentName);
 
-        //Check if it's already in the list
-        bool exists = _mapFromNameToAgentInMappingViewModelsList.contains(agentName);
-
-        //if yes only add the agent in the internal list of the agentInMappingVM
-        //if not instanciate and add it
-        if(exists)
-        {
-            newAgentInMapping  = _mapFromNameToAgentInMappingViewModelsList.value(agentName);
-
-            // TODO ESTIA FIXME
-            foreach (AgentM* agentModel, agentsList) {
-                newAgentInMapping->addAgentToInternalList(agentModel);
+        // The agent is defined, only add models of agent in the internal list of the agentInMappingVM
+        if (agentInMapping != NULL)
+        {   
+            foreach (AgentM* model, agentsList) {
+                if (model != NULL) {
+                    agentInMapping->models()->append(model);
+                }
             }
 
-            qInfo() << "The agent mapping already existing, new agnet model added to : " << agentName;
+            qInfo() << "The agent in mapping already exist, new agent models added to" << agentName;
         }
+        // Instanciate a new view model of agent in mapping (and add models)
         else
         {
-            //Create new Agent In Mapping
-            newAgentInMapping = new AgentInMappingVM(agentsList,
-                                                     position,
-                                                     this);
+            // Create a new Agent In Mapping
+            agentInMapping = new AgentInMappingVM(agentsList,
+                                                  position,
+                                                  this);
 
-            //Add in the map list
-            _mapFromNameToAgentInMappingViewModelsList.insert(agentName, newAgentInMapping);
+            // Add in the map list
+            _mapFromNameToAgentInMappingViewModelsList.insert(agentName, agentInMapping);
 
-            //Add this new Agent In Mapping VM in the list for the qml
-            _agentInMappingVMList.append(newAgentInMapping);
+            // Add this new Agent In Mapping VM in the list for the qml
+            _agentInMappingVMList.append(agentInMapping);
 
-            //Call for the first shot -> new call will be proceed by the connect mechanism
-            createMapBetweenIopInMappingFromAgentInMapping(newAgentInMapping);
+            // Call for the first shot -> new call will be proceed by the connect mechanism
+            _onCreateMapBetweenIopInMappingFromAgentInMapping(agentInMapping);
 
             // Connect to signal "new Definition added to agent in mapping" from the new definition
-            connect(newAgentInMapping, &AgentInMappingVM::newDefinitionInAgentMapping,
-                    this, &AgentsMappingController::createMapBetweenIopInMappingFromAgentInMapping);
+            connect(agentInMapping, &AgentInMappingVM::newDefinitionInAgentMapping,
+                    this, &AgentsMappingController::_onCreateMapBetweenIopInMappingFromAgentInMapping);
 
-            qInfo() << "A new agent mapping has been added : " << agentName << " from new definition";
+            qInfo() << "A new agent mapping has been added:" << agentName;
         }
     }
 }
 
+
+/**
+ * @brief Check if the map between an agent output and an agent input already exist.
+ * @param agentFrom
+ * @param pointFrom
+ * @param agentTo
+ * @param pointTo
+ * @return
+ */
 bool AgentsMappingController::_checkIfMapBetweenIOPVMAlreadyExist(AgentInMappingVM* agentFrom, OutputVM *pointFrom, AgentInMappingVM* agentTo, InputVM *pointTo)
 {
     if(pointFrom->isGhost() || agentFrom->isGhost())     // Partial Map
@@ -459,7 +518,7 @@ bool AgentsMappingController::_checkIfMapBetweenIOPVMAlreadyExist(AgentInMapping
                 if(partialMap != NULL)
                 {
                    // pointsTo have same name && pointsFrom have same name
-                   if( (partialMap->pointTo()->iopName() == pointTo->iopName()) && (partialMap->pointFrom()->iopName() == pointFrom->iopName()) )
+                   if( (partialMap->pointTo()->name() == pointTo->name()) && (partialMap->pointFrom()->name() == pointFrom->name()) )
                    {
                        // agentsTo have same name && agentsFrom have same name
                        if( (partialMap->agentTo()->agentName() == agentTo->agentName()) && (partialMap->agentFrom()->agentName() == agentFrom->agentName()) )

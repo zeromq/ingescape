@@ -115,6 +115,21 @@ Q_SIGNALS:
     void commandAskedForOutput(QString command, QString outputName, QStringList peerIdsList);
 
 
+    /**
+     * @brief Signal emitted when a previous agent model is replaced by a new one strictly identical
+     * @param previousModel
+     * @param newModel
+     */
+    void identicalAgentModelReplaced(AgentM* previousModel, AgentM* newModel);
+
+
+    /**
+     * @brief Signal emitted when an identical agent model is added
+     * @param newModel
+     */
+    void identicalAgentModelAdded(AgentM* newModel);
+
+
 public Q_SLOTS:
 
     /**

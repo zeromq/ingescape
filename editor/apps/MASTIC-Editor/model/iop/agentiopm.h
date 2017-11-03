@@ -54,7 +54,7 @@ class AgentIOPM : public QObject
     I2_QML_PROPERTY(AgentIOPValueTypes::Value, agentIOPValueType)
 
     // Identifier with name and value type
-    I2_CPP_PROPERTY(QString, id)
+    I2_CPP_NOSIGNAL_PROPERTY(QString, id)
 
     // ######################################################
     // Value of our Input / Output / Parameter

@@ -28,8 +28,11 @@ class PointMapVM : public QObject
 {
     Q_OBJECT
 
-    // Name of this input/output represent by a point map
-    I2_QML_PROPERTY(QString, iopName)
+    // Name of our input / output
+    I2_QML_PROPERTY_READONLY(QString, name)
+
+    // Identifier with name and value type (can be empty when ghost)
+    I2_CPP_NOSIGNAL_PROPERTY(QString, id)
 
     // Geometry for the connector in the view
     // Position the center of the connector (Absolute coordinate)
@@ -39,10 +42,13 @@ class PointMapVM : public QObject
 public:
     /**
      * @brief Default constructor
-     * @param iopName
+     * @param name
+     * @param id
      * @param parent
      */
-    explicit PointMapVM(QString iopName, QObject *parent = nullptr);
+    explicit PointMapVM(QString name,
+                        QString id,
+                        QObject *parent = nullptr);
 
 
     /**
