@@ -693,7 +693,8 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     long nbOutputs = 0;
                     char **outputsList = NULL;
                     outputsList = mtic_getOutputsList(&nbOutputs);
-                    for (int i = 0; i < nbOutputs; i++){
+                    int i = 0;
+                    for (i = 0; i < nbOutputs; i++){
                         agent_iop * found_iop = model_findIopByName(outputsList[i],OUTPUT_T);
                         if (found_iop != NULL
                             && found_iop->value_type != IMPULSION_T
