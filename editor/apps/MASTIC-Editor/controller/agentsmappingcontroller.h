@@ -110,6 +110,14 @@ public Q_SLOTS:
     void onIsActivatedMappingChanged(bool isActivatedMapping);
 
 
+    /**
+     * @brief Get the agent in mapping for an agent name
+     * @param name
+     * @return
+     */
+    AgentInMappingVM* getAgentInMappingForName(QString name);
+
+
 private Q_SLOTS:
     /**
      * @brief Slot when a new view model of a agent mapping is created on the main view mapping.

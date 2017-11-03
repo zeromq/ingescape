@@ -313,6 +313,22 @@ void AgentsMappingController::onIsActivatedMappingChanged(bool isActivatedMappin
 
 
 /**
+ * @brief Get the agent in mapping for an agent name
+ * @param name
+ * @return
+ */
+AgentInMappingVM* AgentsMappingController::getAgentInMappingForName(QString name)
+{
+    if (_mapFromNameToAgentInMappingViewModelsList.contains(name)) {
+        return _mapFromNameToAgentInMappingViewModelsList.value(name);
+    }
+    else {
+        return NULL;
+    }
+}
+
+
+/**
  * @brief Slot when the list of "Agents in Mapping" changed
  */
 void AgentsMappingController::_onAgentsInMappingChanged()
