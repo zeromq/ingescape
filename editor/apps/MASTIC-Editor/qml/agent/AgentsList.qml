@@ -405,7 +405,7 @@ Item {
 
                                 if (MasticEditorC.agentsMappingC)
                                 {
-                                    MasticEditorC.agentsMappingC.addAgentToMappingAtPosition(model.QtObject.name, model.QtObject.models, dropPosition);
+                                    MasticEditorC.agentsMappingC.dropAgentToMappingAtPosition(model.QtObject.name, model.QtObject.models, dropPosition);
                                 }
                             }
                             // Else: invalid DropArea to drop an item of our list

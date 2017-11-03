@@ -17,8 +17,10 @@
 #include <viewModel/iop/inputvm.h>
 
 OutputVM::OutputVM(QString outputName,
+                   QString outputId,
                    OutputM* modelM,
                    QObject *parent) : PointMapVM(outputName,
+                                                 outputId,
                                                  parent),
     _modelM(NULL),
     _isGhost(false),
@@ -31,10 +33,11 @@ OutputVM::OutputVM(QString outputName,
     setmodelM(modelM);
 
     if (_modelM != NULL) {
-        qInfo() << "New Output VM" << _modelM->name();
+        qInfo() << "New Output VM" << _name << "(" << _id << ")";
     }
     else {
         _isGhost = true;
+        qInfo() << "New GHOST of Output VM" << _name;
     }
 }
 
@@ -45,7 +48,10 @@ OutputVM::OutputVM(QString outputName,
 OutputVM::~OutputVM()
 {
     if (_modelM != NULL) {
-        qInfo() << "Delete Output VM" << _modelM->name();
+        qInfo() << "Delete Output VM" << _name << "(" << _id << ")";
+    }
+    else {
+        qInfo() << "Delete GHOST of Output VM" << _name;
     }
 
     setmodelM(NULL);

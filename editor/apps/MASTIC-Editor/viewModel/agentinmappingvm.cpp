@@ -47,14 +47,8 @@ AgentInMappingVM::AgentInMappingVM(QList<AgentM*> models,
             // Connect to signal "Count Changed" from the list of models
             connect(&_models, &AbstractI2CustomItemListModel::countChanged, this, &AgentInMappingVM::_onModelsChanged);
 
-            foreach (AgentM* model, models) {
-                if (model != NULL) {
-                    addAgentToInternalList(model);
-
-                    // Add to the list
-                    //_models.append(model);
-                }
-            }
+            // Initialize our list
+            _models.append(models);
         }
         else {
             qCritical() << "No agent model for the agent in mapping !";
@@ -107,58 +101,6 @@ AgentInMappingVM::~AgentInMappingVM()
 
 
 /**
- * @brief Add agent dynamically to the internal list
- * @param newAgent The definition to add
- */
-void AgentInMappingVM::addAgentToInternalList(AgentM* newAgentM)
-{
-    //Check if agent model and agent in mapping share the same name
-    if(newAgentM->name() == _agentName)
-    {
-        // First model of agent to be ever submitted.
-        if (_models.count() == 0)
-        {
-            qInfo() << "Add initial agent model.";
-
-            // Create the list of input (PointMapVM)
-            _addPointMapInInternalInputList(newAgentM->definition());
-
-            // Create the list of output (PointMapVM)
-            _addPointMapInInternalOutputList(newAgentM->definition());
-
-            // Pull the creation of newMapBetweenIOPVM...
-            Q_EMIT newDefinitionInAgentMapping(this);
-        }
-        else // Another model of agent is provided. Must show "patte blanche".
-        {
-            //Check if agentM has same definition as the first agent of internal agentList().
-            if(!DefinitionM::areIdenticals(_models.toList().first()->definition(), newAgentM->definition()))
-            {
-                // Should handle the difference by creating the missing INPUT / OUTPUT. More work is done at their creation.
-                qInfo() << "Add initial agent model but defintion is different.";
-
-                // Create the list of input (PointMapVM)
-                _addPointMapInInternalInputList(newAgentM->definition());
-
-                // Create the list of output (PointMapVM)
-                _addPointMapInInternalOutputList(newAgentM->definition());
-
-                // Pull the creation of newMapBetweenIOPVM...
-                Q_EMIT newDefinitionInAgentMapping(this);
-            }
-        }
-
-        //Add new agent model
-        _models.append(newAgentM);
-
-    }
-    else {
-        qInfo()<<"The agent model named '" << _agentName << "' could not be add to the agent mapping VM named '" << newAgentM->name() << "'";
-    }
-}
-
-
-/**
  * @brief Return the corresponding view model of input from the input name
  * @param inputName
  */
@@ -166,6 +108,21 @@ InputVM* AgentInMappingVM::getInputFromName(QString inputName)
 {
     if (_mapOfInputsFromInputName.contains(inputName)) {
         return _mapOfInputsFromInputName.value(inputName);
+    }
+    else {
+        return NULL;
+    }
+}
+
+
+/**
+ * @brief Return the corresponding view model of input from the input id
+ * @param inputId
+ */
+InputVM* AgentInMappingVM::getInputFromId(QString inputId)
+{
+    if (_mapOfInputsFromInputId.contains(inputId)) {
+        return _mapOfInputsFromInputId.value(inputId);
     }
     else {
         return NULL;
@@ -189,6 +146,21 @@ OutputVM* AgentInMappingVM::getOutputFromName(QString outputName)
 
 
 /**
+ * @brief Return the corresponding view model of output from the output id
+ * @param outputId
+ */
+OutputVM* AgentInMappingVM::getOutputFromId(QString outputId)
+{
+    if (_mapOfOutputsFromOutputId.contains(outputId)) {
+        return _mapOfOutputsFromOutputId.value(outputId);
+    }
+    else {
+        return NULL;
+    }
+}
+
+
+/**
  * @brief Slot when the list of models changed
  */
 void AgentInMappingVM::_onModelsChanged()
@@ -198,34 +170,40 @@ void AgentInMappingVM::_onModelsChanged()
     // Model of agent added
     if (_previousAgentsList.count() < newAgentsList.count())
     {
-        //qDebug() << _previousAgentsList.count() << "--> ADD --> " << newAgentsList.count();
+        qDebug() << _previousAgentsList.count() << "--> ADD --> " << newAgentsList.count();
 
         for (AgentM* model : newAgentsList) {
             if ((model != NULL) && !_previousAgentsList.contains(model))
             {
-                //qDebug() << "New model" << model->name() << "ADDED (" << model->peerId() << ")";
+                qDebug() << "New model" << model->name() << "ADDED (" << model->peerId() << ")";
 
                 // Connect to signals from a model
                 connect(model, &AgentM::isONChanged, this, &AgentInMappingVM::_onIsONofModelChanged);
                 //connect(model, &AgentM::definitionChanged, this, &AgentInMappingVM::_onDefinitionOfModelChanged);
                 //connect(model, &AgentM::mappingChanged, this, &AgentInMappingVM::_onMappingOfModelChanged);
+
+                // A model of agent has been added to our list
+                _agentModelAdded(model);
             }
         }
     }
     // Model of agent removed
     else if (_previousAgentsList.count() > newAgentsList.count())
     {
-        //qDebug() << _previousAgentsList.count() << "--> REMOVE --> " << newAgentsList.count();
+        qDebug() << _previousAgentsList.count() << "--> REMOVE --> " << newAgentsList.count();
 
         for (AgentM* model : _previousAgentsList) {
             if ((model != NULL) && !newAgentsList.contains(model))
             {
-                //qDebug() << "Old model" << model->name() << "REMOVED (" << model->peerId() << ")";
+                qDebug() << "Old model" << model->name() << "REMOVED (" << model->peerId() << ")";
 
                 // DIS-connect from signals from a model
                 disconnect(model, &AgentM::isONChanged, this, &AgentInMappingVM::_onIsONofModelChanged);
                 //disconnect(model, &AgentM::definitionChanged, this, &AgentInMappingVM::_onDefinitionOfModelChanged);
                 //disconnect(model, &AgentM::mappingChanged, this, &AgentInMappingVM::_onMappingOfModelChanged);
+
+                // A model of agent has been removed from our list
+                _agentModelRemoved(model);
             }
         }
     }
@@ -251,10 +229,203 @@ void AgentInMappingVM::_onIsONofModelChanged(bool isON)
 
 
 /**
+ * @brief A model of agent has been added to our list
+ * @param model
+ */
+void AgentInMappingVM::_agentModelAdded(AgentM* model)
+{
+    if ((model != NULL) && (model->definition() != NULL))
+    {
+        QList<InputVM*> inputsListToAdd;
+        QList<OutputVM*> outputsListToAdd;
+
+        // Traverse the list of models of inputs in the definition
+        foreach (AgentIOPM* input, model->definition()->inputsList()->toList()) {
+            InputVM* newInputVM = _inputModelAdded(input);
+            if (newInputVM != NULL) {
+                inputsListToAdd.append(newInputVM);
+            }
+        }
+
+        // Traverse the list of models of outputs in the definition
+        foreach (OutputM* output, model->definition()->outputsList()->toList()) {
+            OutputVM* newOutputVM = _outputModelAdded(output);
+            if (newOutputVM != NULL) {
+                outputsListToAdd.append(newOutputVM);
+            }
+        }
+
+        _inputsList.append(inputsListToAdd);
+        _outputsList.append(outputsListToAdd);
+
+        // First model of agent to be ever submitted.
+        /*if (_models.count() == 0)
+        {
+            qInfo() << "Add initial agent model";
+
+            // Create the list of input (PointMapVM)
+            _addPointMapInInternalInputList(model->definition());
+
+            // Create the list of output (PointMapVM)
+            _addPointMapInInternalOutputList(model->definition());
+
+            // Pull the creation of new MapBetweenIOPVM...
+            Q_EMIT newDefinitionInAgentMapping(this);
+        }
+        // Another model of agent is provided. Must show "patte blanche".
+        else
+        {
+            AgentM* firstModel = _models.toList().first();
+            if (firstModel != NULL)
+            {
+                // Check if this agent has exactly the same definition as the first agent of internal list
+                if (!DefinitionM::areIdenticals(firstModel->definition(), model->definition()))
+                {
+                    // Should handle the difference by creating the missing INPUT / OUTPUT. More work is done at their creation.
+
+                    qInfo() << "Add agent model but defintion is different.";
+
+                    // Create the list of input (PointMapVM)
+                    _addPointMapInInternalInputList(model->definition());
+
+                    // Create the list of output (PointMapVM)
+                    _addPointMapInInternalOutputList(model->definition());
+
+                    // Pull the creation of new MapBetweenIOPVM...
+                    Q_EMIT newDefinitionInAgentMapping(this);
+                }
+            }
+        }*/
+    }
+}
+
+
+/**
+ * @brief A model of agent has been removed from our list
+ * @param model
+ */
+void AgentInMappingVM::_agentModelRemoved(AgentM* model)
+{
+    if ((model != NULL) && (model->definition() != NULL))
+    {
+
+    }
+}
+
+
+/**
+ * @brief A model of input has been added
+ * @param input
+ * @return
+ */
+InputVM* AgentInMappingVM::_inputModelAdded(AgentIOPM* input)
+{
+    InputVM* newInputVM = NULL;
+
+    if (input != NULL)
+    {
+        // Input id is defined
+        if (!input->id().isEmpty())
+        {
+            InputVM* inputVM = getInputFromId(input->id());
+            if (inputVM == NULL)
+            {
+                inputVM = getInputFromName(input->name());
+                if (inputVM == NULL)
+                {
+                    // Create a new view model of input
+                    newInputVM = new InputVM(input->name(),
+                                             input->id(),
+                                             input,
+                                             this);
+
+                    // Don't add to the list here (this input will be added globally via temporary list)
+
+                    // Update the hash table with input id
+                    _mapOfInputsFromInputId.insert(newInputVM->id(), newInputVM);
+
+                    // Update the hash table with input name
+                    _mapOfInputsFromInputName.insert(newInputVM->name(), newInputVM);
+                }
+                // View model of input exists for this name (but not yet id)
+                else {
+                    // FIXME TODO: gestion des ghost...
+                }
+            }
+            else {
+                // FIXME TODO
+                //inputVM->models.append(input)
+            }
+        }
+        // Input id is NOT defined
+        else {
+            // FIXME TODO: gestion des ghost...
+        }
+    }
+
+    return newInputVM;
+}
+
+
+/**
+ * @brief A model of output has been added
+ * @param output
+ * @return
+ */
+OutputVM* AgentInMappingVM::_outputModelAdded(OutputM* output)
+{
+    OutputVM* newOutputVM = NULL;
+
+    if (output != NULL)
+    {
+        // Input id is defined
+        if (!output->id().isEmpty())
+        {
+            OutputVM* outputVM = getOutputFromId(output->id());
+            if (outputVM == NULL)
+            {
+                outputVM = getOutputFromName(output->name());
+                if (outputVM == NULL)
+                {
+                    // Create a new view model of output
+                    newOutputVM = new OutputVM(output->name(),
+                                               output->id(),
+                                               output,
+                                               this);
+
+                    // Don't add to the list here (this output will be added globally via temporary list)
+
+                    // Update the hash table with output id
+                    _mapOfOutputsFromOutputId.insert(newOutputVM->id(), newOutputVM);
+
+                    // Update the hash table with output name
+                    _mapOfOutputsFromOutputName.insert(newOutputVM->name(), newOutputVM);
+                }
+                // View model of output exists for this name (but not yet id)
+                else {
+                    // FIXME TODO: gestion des ghost...
+                }
+            }
+            else {
+                // FIXME TODO
+                //outputVM->models.append(output)
+            }
+        }
+        // Output id is NOT defined
+        else {
+            // FIXME TODO: gestion des ghost...
+        }
+    }
+
+    return newOutputVM;
+}
+
+
+/**
      * @brief Add new points Map to the inputs list from a definition model
      * @param newDefinition The definition model
      */
-void AgentInMappingVM::_addPointMapInInternalInputList(DefinitionM *newDefinition)
+/*void AgentInMappingVM::_addPointMapInInternalInputList(DefinitionM *newDefinition)
 {
     if(newDefinition != NULL)
     {
@@ -286,14 +457,14 @@ void AgentInMappingVM::_addPointMapInInternalInputList(DefinitionM *newDefinitio
         }
         _inputsList.append(listOfPointMapTemp);
     }
-}
+}*/
 
 
 /**
      * @brief Add new points Map to the outputs list from a definition model
      * @param newDefinition The definition model
      */
-void AgentInMappingVM::_addPointMapInInternalOutputList(DefinitionM *newDefinition)
+/*void AgentInMappingVM::_addPointMapInInternalOutputList(DefinitionM *newDefinition)
 {
     if(newDefinition != NULL)
     {
@@ -325,14 +496,14 @@ void AgentInMappingVM::_addPointMapInInternalOutputList(DefinitionM *newDefiniti
         }
         _outputsList.append(listOfPointMapTemp);
     }
-}
+}*/
 
 
 /**
      * @brief This function check if the InputVM already exist in the input list
      * @param currentInput The newly created Input VM
      */
-bool AgentInMappingVM::_checkIfAlreadyInInputList(InputVM* currentInput)
+/*bool AgentInMappingVM::_checkIfAlreadyInInputList(InputVM* currentInput)
 {
     foreach (InputVM* iterator, _inputsList.toList())
     {
@@ -349,14 +520,14 @@ bool AgentInMappingVM::_checkIfAlreadyInInputList(InputVM* currentInput)
         }
     }
     return false;
-}
+}*/
 
 
 /**
      * @brief This function check if the OutputVM already exist in the input list
      * @param currentOuput The newly created OutputVM
      */
-bool AgentInMappingVM::_checkIfAlreadyInOutputList(OutputVM* currentOuput)
+/*bool AgentInMappingVM::_checkIfAlreadyInOutputList(OutputVM* currentOuput)
 {
     foreach (OutputVM* iterator, _outputsList.toList())
     {
@@ -373,7 +544,7 @@ bool AgentInMappingVM::_checkIfAlreadyInOutputList(OutputVM* currentOuput)
         }
     }
     return false;
-}
+}*/
 
 
 /**

@@ -17,18 +17,21 @@
 #include <viewModel/iop/outputvm.h>
 
 InputVM::InputVM(QString inputName,
+                 QString inputId,
                  AgentIOPM* modelM,
                  QObject *parent) : PointMapVM(inputName,
+                                               inputId,
                                                parent),
     _modelM(NULL)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
+    // Allow to benefit of "DELETE PROOF"
     setmodelM(modelM);
 
     if (_modelM != NULL) {
-        qInfo() << "New Input VM" << "." << _modelM->name();
+        qInfo() << "New Input VM" << _name << "(" << _id << ")";
     }
 }
 
@@ -39,7 +42,7 @@ InputVM::InputVM(QString inputName,
 InputVM::~InputVM()
 {
     if (_modelM != NULL) {
-        qInfo() << "Delete Input VM" << "." << _modelM->name();
+        qInfo() << "Delete Input VM" << _name;
     }
 
     setmodelM(NULL);

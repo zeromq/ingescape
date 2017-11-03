@@ -43,6 +43,7 @@ class OutputVM : public PointMapVM
 
 public:
     explicit OutputVM(QString outputName,
+                      QString outputId = "",
                       OutputM* modelM = NULL,
                       QObject* parent = nullptr);
 

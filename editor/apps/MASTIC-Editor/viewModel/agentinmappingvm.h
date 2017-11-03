@@ -107,12 +107,6 @@ Q_SIGNALS:
 
 
 public Q_SLOTS:
-    /**
-     * @brief Add agent dynamically to the internal list
-     * @param newAgent The definition to add
-     */
-    void addAgentToInternalList(AgentM* newAgentM);
-
 
     /**
      * @brief Return the corresponding view model of input from the input name
@@ -122,10 +116,24 @@ public Q_SLOTS:
 
 
     /**
+     * @brief Return the corresponding view model of input from the input id
+     * @param inputId
+     */
+    InputVM* getInputFromId(QString inputId);
+
+
+    /**
      * @brief Return the corresponding view model of output from the output name
      * @param outputName
      */
     OutputVM* getOutputFromName(QString outputName);
+
+
+    /**
+     * @brief Return the corresponding view model of output from the output id
+     * @param outputId
+     */
+    OutputVM* getOutputFromId(QString outputId);
 
 
 private Q_SLOTS:
@@ -141,34 +149,65 @@ private Q_SLOTS:
      */
     void _onIsONofModelChanged(bool isON);
 
+
 private:
+
+    /**
+     * @brief A model of agent has been added to our list
+     * @param model
+     */
+    void _agentModelAdded(AgentM* model);
+
+
+    /**
+     * @brief A model of agent has been removed from our list
+     * @param model
+     */
+    void _agentModelRemoved(AgentM* model);
+
+
+    /**
+     * @brief A model of input has been added
+     * @param input
+     * @return
+     */
+    InputVM* _inputModelAdded(AgentIOPM* input);
+
+
+    /**
+     * @brief A model of output has been added
+     * @param output
+     * @return
+     */
+    OutputVM* _outputModelAdded(OutputM* output);
+
 
     /**
      * @brief Add new points Map to the inputs list from a definition model
      * @param newDefinition The definition model
      */
-    void _addPointMapInInternalInputList(DefinitionM *newDefinition);
+    //void _addPointMapInInternalInputList(DefinitionM *newDefinition);
 
 
     /**
      * @brief Add new points Map to the outputs list from a definition model
      * @param newDefinition The definition model
      */
-    void _addPointMapInInternalOutputList(DefinitionM *newDefinition);
+    //void _addPointMapInInternalOutputList(DefinitionM *newDefinition);
 
 
     /**
      * @brief This function check if the OutputVM already exist in the input list
      * @param currentOuput The newly created OutputVM
      */
-    bool _checkIfAlreadyInOutputList(OutputVM* currentOuput);
+    //bool _checkIfAlreadyInOutputList(OutputVM* currentOuput);
 
 
     /**
      * @brief This function check if the InputVM already exist in the input list
      * @param currentInput The newly created Input VM
      */
-    bool _checkIfAlreadyInInputList(InputVM* currentInput);
+    //bool _checkIfAlreadyInInputList(InputVM* currentInput);
 
 
     /**
@@ -190,9 +229,11 @@ private:
 
     // TODO
     QHash<QString, InputVM*> _mapOfInputsFromInputName;
+    QHash<QString, InputVM*> _mapOfInputsFromInputId;
 
     // TODO
     QHash<QString, OutputVM*> _mapOfOutputsFromOutputName;
+    QHash<QString, OutputVM*> _mapOfOutputsFromOutputId;
 
 };
 

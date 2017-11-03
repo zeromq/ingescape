@@ -290,6 +290,9 @@ void AgentsSupervisionController::_updateWithNewDefinitionForAgent(AgentVM* agen
                                 // If the new model already appeared on the network
                                 if (!model->neverAppearedOnNetwork())
                                 {
+                                    // Emit signal "Identical Agent Model Replaced"
+                                    Q_EMIT identicalAgentModelReplaced(modelUsingSameDefinition, model);
+
                                     // We replace the fake model of agent
                                     agentUsingSameDefinition->models()->replace(0, model);
 
@@ -325,6 +328,9 @@ void AgentsSupervisionController::_updateWithNewDefinitionForAgent(AgentVM* agen
                             {
                                 isSameModel = true;
 
+                                // Emit signal "Identical Agent Model Replaced"
+                                Q_EMIT identicalAgentModelReplaced(iterator, model);
+
                                 // 2.1- We replace the model
                                 agentUsingSameDefinition->models()->replace(i, model);
 
@@ -342,6 +348,9 @@ void AgentsSupervisionController::_updateWithNewDefinitionForAgent(AgentVM* agen
                             agentUsingSameDefinition->models()->append(model);
 
                             qDebug() << "Add model of agent" << model->name() << "on" << model->address();
+
+                            // Emit signal "Identical Agent Model Added"
+                            Q_EMIT identicalAgentModelAdded(model);
                         }
                     }
                 }

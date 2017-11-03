@@ -48,6 +48,7 @@ class AgentsMappingController : public QObject
     // Selected agent in the mapping
     I2_QML_PROPERTY_DELETE_PROOF(AgentInMappingVM*, selectedAgent)
 
+
 public:
     /**
      * @brief Default constructor
@@ -90,7 +91,22 @@ public Q_SLOTS:
      * @param list
      * @param position
      */
-    void addAgentToMappingAtPosition(QString agentName, AbstractI2CustomItemListModel* list, QPointF position);
+    void dropAgentToMappingAtPosition(QString agentName, AbstractI2CustomItemListModel* list, QPointF position);
+
+
+    /**
+     * @brief Slot when a previous agent model is replaced by a new one strictly identical
+     * @param previousModel
+     * @param newModel
+     */
+    void onIdenticalAgentModelReplaced(AgentM* previousModel, AgentM* newModel);
+
+
+    /**
+     * @brief Slot when an identical agent model is added
+     * @param newModel
+     */
+    void onIdenticalAgentModelAdded(AgentM* newModel);
 
 
     /**
@@ -133,14 +149,7 @@ private Q_SLOTS:
      */
     void _onAgentsInMappingChanged();
 
-    /**
-     * @brief Check if the map between already exist.
-     */
 
-    bool _checkIfMapBetweenIOPVMAlreadyExist(AgentInMappingVM* agentFrom,
-                                             OutputVM *pointFrom,
-                                             AgentInMappingVM* agentTo,
-                                             InputVM *pointTo);
 private:
     /**
      * @brief Add new model(s) of agent to the current mapping at a specific position
@@ -149,6 +158,20 @@ private:
      * @param position
      */
     void _addAgentModelsToMappingAtPosition(QString agentName, QList<AgentM*> agentsList, QPointF position);
+
+
+    /**
+     * @brief Check if the map between an agent output and an agent input already exist.
+     * @param agentFrom
+     * @param pointFrom
+     * @param agentTo
+     * @param pointTo
+     * @return
+     */
+    bool _checkIfMapBetweenIOPVMAlreadyExist(AgentInMappingVM* agentFrom,
+                                             OutputVM *pointFrom,
+                                             AgentInMappingVM* agentTo,
+                                             InputVM *pointTo);
 
 
 private:
