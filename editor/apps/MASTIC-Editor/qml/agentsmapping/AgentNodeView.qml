@@ -47,7 +47,7 @@ Item {
 
 
 
-    width : 228
+    width : 258
     height : (rootItem.agentMappingVM && !rootItem.isReduced)?
                  (54 + 20*Math.max(rootItem.agentMappingVM.inputsList.count , rootItem.agentMappingVM.outputsList.count))
                : 42
@@ -144,6 +144,7 @@ Item {
 
 
     Rectangle {
+        id : rectBck
         anchors {
             fill: parent
             leftMargin: 8
@@ -247,7 +248,7 @@ Item {
                 anchors.centerIn : parent
                 anchors.verticalCenterOffset: -1
 
-                text: agentMappingVM? agentMappingVM.agentModelList.count : "0"
+                text: agentMappingVM? agentMappingVM.agentModelList.count : ""
 
                 color : MasticTheme.whiteColor
                 font {
@@ -679,9 +680,9 @@ Item {
 
                         // the position inside the agent is not the same if the agent is reduced or not
                         value:  (rootItem.agentMappingVM && !rootItem.agentMappingVM.isReduced) ?
-                                    (Qt.point(rootItem.x + columnInputSlots.x + inputSlotItem.x + linkPoint.x + linkPoint.width/2,
+                                    (Qt.point(rootItem.x + columnInputSlots.x + rectBck.x + inputSlotItem.x + linkPoint.x + linkPoint.width/2,
                                               rootItem.y + columnInputSlots.y + inputSlotItem.y + linkPoint.y + linkPoint.height/2))
-                                  : (Qt.point(rootItem.x + inputGlobalPoint.x + inputGlobalPoint.width/2,
+                                  : (Qt.point(rootItem.x + inputGlobalPoint.x + rectBck.x + inputGlobalPoint.width/2,
                                               rootItem.y + inputGlobalPoint.y + inputGlobalPoint.height/2));
                     }
 
@@ -961,9 +962,9 @@ Item {
 
                         // the position inside the agent is not the same if the agent is reduced or not
                         value: (rootItem.agentMappingVM && !rootItem.agentMappingVM.isReduced) ?
-                                   (Qt.point(rootItem.x + columnOutputSlots.x + outputSlotItem.x + linkPointOut.x + linkPointOut.width/2,
+                                   (Qt.point(rootItem.x + columnOutputSlots.x + rectBck.x + outputSlotItem.x + linkPointOut.x + linkPointOut.width/2,
                                              rootItem.y + columnOutputSlots.y + outputSlotItem.y + linkPointOut.y + linkPointOut.height/2))
-                                 : (Qt.point(rootItem.x + outputGlobalPoint.x + outputGlobalPoint.width/2,
+                                 : (Qt.point(rootItem.x + outputGlobalPoint.x + rectBck.x +outputGlobalPoint.width/2,
                                              rootItem.y + outputGlobalPoint.y + outputGlobalPoint.height/2));
                     }
                 }

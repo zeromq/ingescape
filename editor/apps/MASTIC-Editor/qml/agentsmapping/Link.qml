@@ -140,9 +140,10 @@ I2CubicBezierCurve {
                  }
 
 
+
     // Fuzzy contour
-    fuzzyColor: "transparent"
-    fuzzyRadius: 0
+    fuzzyColor: mouseArea.pressed ? MasticTheme.lightGreyColor : "transparent"
+    fuzzyRadius: 2
 
 
 
@@ -230,9 +231,12 @@ I2CubicBezierCurve {
     MouseArea {
         id: mouseArea
 
-        anchors.fill: parent
+        anchors {
+           fill: parent
+        }
 
-        hoverEnabled: true
+        enabled: rootItem.visible
+        hoverEnabled: enabled
 
         onClicked: {
             rootItem.clicked();
