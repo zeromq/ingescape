@@ -75,6 +75,7 @@ Item {
 
     readonly property color veryDarkGreyColor: "#282D34"
     readonly property color darkGreyColor2: "#2B3137"
+    readonly property color color : "#34393b"
 
     readonly property color darkBlueGreyColor: "#3C424F"
     readonly property color blueGreyColor : "#525A66"
@@ -83,7 +84,6 @@ Item {
     readonly property color darkGreyColor : "#575756"
     readonly property color greyColor : "#706f6f"
     readonly property color lightGreyColor : "#9D9C9C"
-
 
     readonly property color orangeColor: "#F39200"
 
@@ -121,6 +121,10 @@ Item {
 
     FontLoader {
         source: "qrc:/resources/fonts/blogger-sans/Blogger_Sans-Medium.ttf"
+    }
+
+    FontLoader {
+        source: "qrc:/resources/fonts/blogger-sans/Blogger_Sans-Light.ttf"
     }
 
 

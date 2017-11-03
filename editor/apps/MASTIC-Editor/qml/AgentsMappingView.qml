@@ -23,7 +23,7 @@ import MASTIC 1.0
 
 // agentsmapping sub-directory
 import "agentsmapping" as AgentsMapping
-
+import "theme" as Theme
 
 Item {
     id: rootItem
@@ -72,22 +72,62 @@ Item {
             controller: rootItem.controller
         }
 
+
+
+
+        //
+        // Mapping Activation
+        //
         Button {
-            id: btnActivateMapping
+            id: activeMappingBtn
 
             anchors {
                 bottom: parent.bottom
                 left: parent.left
-                margins: 10
+                leftMargin: 23
+                bottomMargin: 20
             }
-            text: checked ? "DES-active le mapping" : "ACTIVE le mapping"
 
             checkable: true
-            checked: MasticEditorC.modelManager.isActivatedMapping
 
-            onCheckedChanged: {
+            style: Theme.LabellessSvgButtonStyle {
+                fileCache: MasticTheme.svgFileMASTIC
+
+                pressedID: releasedID + "-pressed"
+                releasedID: MasticEditorC.modelManager.isActivatedMapping? "mappingActivation-activated" : "mappingActivation"
+                disabledID : releasedID
+            }
+
+            onClicked: {
                 MasticEditorC.modelManager.isActivatedMapping = checked;
             }
+
+            Binding {
+                target : activeMappingBtn
+                property : "checked"
+                value : MasticEditorC.modelManager.isActivatedMapping
+            }
         }
+
+        Text {
+            anchors {
+                verticalCenter: activeMappingBtn.verticalCenter
+                left : activeMappingBtn.right
+                leftMargin: 15
+            }
+
+            visible : rootItem.controller && rootItem.controller.isEmptyMapping && !MasticEditorC.modelManager.isActivatedMapping
+            text : "Click on the button to synchronize with the environement and get the currently active mapping.\nOr create/load a mapping and click on the button to apply it to the environment."
+
+            color : MasticTheme.darkBlueGreyColor
+            font {
+                family : MasticTheme.textFontFamily
+                weight : Font.Light
+                pixelSize: 17
+            }
+        }
+
+
+
     }
 }

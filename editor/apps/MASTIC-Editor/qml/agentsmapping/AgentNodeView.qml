@@ -42,6 +42,11 @@ Item {
 
     property bool isReduced : agentMappingVM && agentMappingVM.isReduced
 
+    //false if the agent is dropping and the drop is not available, true otherwise
+    property bool dropEnabled : true
+
+
+
     width : 228
     height : (rootItem.agentMappingVM && !rootItem.isReduced)?
                  (54 + 20*Math.max(rootItem.agentMappingVM.inputsList.count , rootItem.agentMappingVM.outputsList.count))
@@ -127,7 +132,6 @@ Item {
         }
 
         onPositionChanged: {
-            //     console.log("agentMapping position " + model.position.x + "  " + model.position.y)
         }
 
         onDoubleClicked: {
@@ -148,9 +152,11 @@ Item {
             bottomMargin: 1
         }
 
-        color : mouseArea.pressed?
-                    MasticTheme.darkGreyColor2
-                  : (rootItem.agentMappingVM && rootItem.agentMappingVM.isON)? MasticTheme.darkBlueGreyColor : MasticTheme.veryDarkGreyColor
+        color :  (dropEnabled === true) ?
+                     (mouseArea.pressed?
+                          MasticTheme.darkGreyColor2
+                        : (rootItem.agentMappingVM && rootItem.agentMappingVM.isON)? MasticTheme.darkBlueGreyColor : MasticTheme.veryDarkGreyColor)
+                   : MasticTheme.darkGreyColor2;
         radius : 6
 
         Rectangle {
@@ -213,10 +219,11 @@ Item {
             elide: Text.ElideRight
             text : rootItem.agentName
 
-            color : (rootItem.agentMappingVM && rootItem.agentMappingVM.isON)? MasticTheme.agentsONNameMappingColor : MasticTheme.agentsOFFNameMappingColor
+            color : (dropEnabled === true) ?
+                        (rootItem.agentMappingVM && rootItem.agentMappingVM.isON)? MasticTheme.agentsONNameMappingColor : MasticTheme.agentsOFFNameMappingColor
+            : MasticTheme.lightGreyColor;
             font: MasticTheme.headingFont
         }
-
 
         // Warnings
         Rectangle {
@@ -283,7 +290,6 @@ Item {
             }
         }
 
-
         //Separator
         Rectangle {
             id : separator
@@ -302,6 +308,19 @@ Item {
             visible : !rootItem.isReduced
         }
 
+
+        // Drop Impossible
+        I2SvgItem {
+            anchors {
+              right: parent.right
+              top : parent.top
+              margins: 2
+            }
+            svgFileCache: MasticTheme.svgFileMASTIC
+            svgElementId: "dropImpossible"
+
+            visible : (rootItem.dropEnabled === false)
+        }
 
 
         //
