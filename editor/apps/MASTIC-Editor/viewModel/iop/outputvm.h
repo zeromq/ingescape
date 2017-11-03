@@ -31,8 +31,11 @@ class OutputVM : public PointMapVM
 {
     Q_OBJECT
 
-    // Model of our agent Output
-    I2_QML_PROPERTY_READONLY_DELETE_PROOF(OutputM*, modelM)
+    // First model of our agent Output
+    I2_QML_PROPERTY_READONLY_DELETE_PROOF(OutputM*, firstModel)
+
+    // Models of our agent output
+    I2_QOBJECT_LISTMODEL(OutputM, models)
 
     // Point map name (AgentIOP name) but needed for ghost input/output
     I2_QML_PROPERTY_READONLY(bool, isGhost)
@@ -64,6 +67,18 @@ public Q_SLOTS:
      * @return
      */
     bool canLinkWith(PointMapVM* pointMap) Q_DECL_OVERRIDE;
+
+
+private Q_SLOTS:
+    /**
+     * @brief Slot when the list of models changed
+     */
+    void _onModelsChanged();
+
+
+private:
+    // Previous list of models
+    //QList<OutputM*> _previousModelsList;
 
 };
 
