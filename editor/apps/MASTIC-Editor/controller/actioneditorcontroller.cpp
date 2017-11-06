@@ -35,7 +35,7 @@ ActionEditorController::ActionEditorController(ActionVM * originalAction, QObjec
 {
     if(_originalAction != NULL)
     {
-        _editedAction = new ActionVM(NULL);
+        _editedAction = new ActionVM(NULL, this);
         _editedAction->copyFrom(_originalAction);
     }
     // Force ownership of our object, it will prevent Qml from stealing it

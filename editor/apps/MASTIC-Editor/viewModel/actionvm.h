@@ -50,6 +50,12 @@ class ActionVM: public QObject
     // Start date time in string format
     I2_QML_PROPERTY_CUSTOM_SETTER(QString, startTimeString)
 
+    // Revert after date time flag
+    I2_QML_PROPERTY_CUSTOM_SETTER(bool, revertAfterTime)
+
+    // Revert at date time flag
+    I2_QML_PROPERTY_CUSTOM_SETTER(bool, revertAtTime)
+
 
 
 public:

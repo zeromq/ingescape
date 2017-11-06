@@ -220,23 +220,18 @@ I2PopupBase {
                         RadioButton {
                             id : rdButtRevertWhenValidityIsOver
                             text : "après"
-                            checked: actionVM && actionVM.actionModel && actionVM.actionModel.revertWhenValidityIsOver ? true : false;
+                            checked: actionVM && actionVM.revertAfterTime === true ? true : false;
 
                             Binding {
                                 target : rdButtRevertWhenValidityIsOver
                                 property :  "checked"
-                                value : actionVM.actionModel.revertWhenValidityIsOver
+                                value : actionVM.revertAfterTime
                             }
 
                             onCheckedChanged: {
                                 // Update out model
-                                if (activeFocus &&  actionVM) {
-                                    actionVM.revertWhenValidityIsOver = checked;
-                                }
-                                // Update the other check to be exclusive
-                                if(rdButtRevertAtTime.checked == checked)
-                                {
-                                    rdButtRevertAtTime.checked = !checked;
+                                if (actionVM) {
+                                    actionVM.revertAfterTime = checked;
                                 }
                             }
                         }
@@ -251,23 +246,18 @@ I2PopupBase {
                         RadioButton {
                             id : rdButtRevertAtTime
                             text : "à"
-                            checked: actionVM && actionVM.actionModel && actionVM.actionModel.revertWhenValidityIsOver === false && actionVM.actionModel.revertAtTime !== -1 ? true : false;
+                            checked: actionVM && actionVM.revertAtTime === true ? true : false;
 
                             Binding {
                                 target : rdButtRevertAtTime
                                 property :  "checked"
-                                value : !actionVM.actionModel.revertWhenValidityIsOver
+                                value : actionVM.revertAtTime
                             }
 
                             onCheckedChanged: {
                                 // Update out model
-                                if (activeFocus &&  actionVM) {
-                                    actionVM.revertWhenValidityIsOver = !checked;
-                                }
-                                // Update the other check to be exclusive
-                                if(rdButtRevertWhenValidityIsOver.checked == checked)
-                                {
-                                    rdButtRevertWhenValidityIsOver.checked = !checked;
+                                if (actionVM) {
+                                    actionVM.revertAtTime = checked;
                                 }
                             }
                         }
