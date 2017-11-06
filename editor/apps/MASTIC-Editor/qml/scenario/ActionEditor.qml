@@ -101,6 +101,7 @@ I2PopupBase {
             }
 
             text: "X"
+            activeFocusOnPress: true
 
             onClicked: {
                 // Close our popup
@@ -151,7 +152,8 @@ I2PopupBase {
                     property :  "text"
                     value : if (actionVM && actionVM.actionModel) {
                               actionVM.actionModel.name
-                            } else {
+                            }
+                            else {
                                 "";
                             }
                 }

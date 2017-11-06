@@ -23,6 +23,13 @@ import I2Quick 1.0
 import MASTIC 1.0
 
 
+// agent sub-directory
+import "../agentsmapping" as AgentMapping
+
+// theme sub-directory
+import "../theme" as Theme;
+
+
 Item {
     id: rootItem
 
@@ -83,7 +90,7 @@ Item {
 
         anchors {
             top: parent.top
-            topMargin: 110
+            topMargin: 108
             bottom: parent.bottom
             left: parent.left
             right: parent.right
@@ -165,17 +172,14 @@ Item {
             Button {
                 id: btnAddAgent
 
-                property var boundingBox: MasticTheme.svgFileMASTIC.boundsOnElement("creernouvelagent");
-                height : boundingBox.height
-                width :  boundingBox.width
-
                 enabled:false
+                activeFocusOnPress: true
 
                 anchors {
                     verticalCenter: parent.verticalCenter
                 }
 
-                style: I2SvgButtonStyle {
+                style: Theme.LabellessSvgButtonStyle {
                     fileCache: MasticTheme.svgFileMASTIC
 
                     pressedID: releasedID + "-pressed"
@@ -196,21 +200,18 @@ Item {
                 }
                 height : btnAddAgent.height
                 width : 1
-                color : MasticTheme.greyColor
+                color : MasticTheme.blueGreyColor
             }
 
             Button {
                 id: btnImportAgent
 
-                property var boundingBox: MasticTheme.svgFileMASTIC.boundsOnElement("importer");
-                height : boundingBox.height
-                width :  boundingBox.width
-
                 anchors {
                     verticalCenter: parent.verticalCenter
                 }
+                activeFocusOnPress: true
 
-                style: I2SvgButtonStyle {
+                style: Theme.LabellessSvgButtonStyle {
                     fileCache: MasticTheme.svgFileMASTIC
 
                     pressedID: releasedID + "-pressed"
@@ -226,7 +227,6 @@ Item {
             }
 
         }
-
 
         Row {
             id: headerRow2
@@ -244,17 +244,14 @@ Item {
             Button {
                 id: btnExportAgent
 
-                property var boundingBox: MasticTheme.svgFileMASTIC.boundsOnElement("exporter");
-                height : boundingBox.height
-                width :  boundingBox.width
-
                 enabled: visible & (controller.selectedAgent ? true : false)
+                activeFocusOnPress: true
 
                 anchors {
                     verticalCenter: parent.verticalCenter
                 }
 
-                style: I2SvgButtonStyle {
+                style: Theme.LabellessSvgButtonStyle {
                     fileCache: MasticTheme.svgFileMASTIC
 
                     pressedID: releasedID + "-pressed"
@@ -277,24 +274,21 @@ Item {
                 }
                 height : btnRemoveAgent.height
                 width : 1
-                color : MasticTheme.greyColor
+                color : MasticTheme.blueGreyColor
             }
 
 
             Button {
                 id: btnRemoveAgent
 
-                property var boundingBox: MasticTheme.svgFileMASTIC.boundsOnElement("supprimerplusieurs");
-                height : boundingBox.height
-                width :  boundingBox.width
-
                 enabled: false
+                activeFocusOnPress: true
 
                 anchors {
                     verticalCenter: parent.verticalCenter
                 }
 
-                style: I2SvgButtonStyle {
+                style: Theme.LabellessSvgButtonStyle {
                     fileCache: MasticTheme.svgFileMASTIC
 
                     pressedID: releasedID + "-pressed"
@@ -310,8 +304,8 @@ Item {
             }
 
         }
-
     }
+
 
     //
     // Separator
@@ -342,6 +336,7 @@ Item {
             width: MasticTheme.leftPanelWidth
             height: 85
 
+
             // Not Draggable Agent Item
             AgentsListItem {
                 id : notDraggableItem
@@ -356,7 +351,6 @@ Item {
                 agentItemIsHovered : mouseArea.containsMouse
             }
 
-
             // Draggable Agent Item
             Item {
                 id : draggableItem
@@ -369,7 +363,8 @@ Item {
 
                 Drag.active: mouseArea.drag.active
                 Drag.hotSpot.x: 0
-                Drag.hotSpot.y: agentItem.height
+                Drag.hotSpot.y: 0
+                Drag.keys: ["AgentsListItem"]
 
                 MouseArea {
                     id: mouseArea
@@ -402,33 +397,8 @@ Item {
                     onPositionChanged: {
                     }
 
-
                     onReleased: {
-                        // Check if we have a drop area below our item
-                        if (draggableItem.Drag.target !== null)
-                        {
-                            var dropAreaElement = draggableItem.Drag.target;
-
-                            if (typeof dropAreaElement.getDropCoordinates == 'function')
-                            {
-                                var dropPosition = dropAreaElement.getDropCoordinates();
-                                console.log("Drop agent " + model.QtObject.name + " at "+ dropPosition);
-
-                                if (MasticEditorC.agentsMappingC)
-                                {
-                                    MasticEditorC.agentsMappingC.addAgentDefinitionToMappingAtPosition(model.QtObject.name, model.QtObject.definition, dropPosition);
-                                }
-                            }
-                            else
-                            {
-                                console.log("AgentsList: invalid DropArea to drop an agent");
-                            }
-                        }
-                        else
-                        {
-                            console.log("AgentsList: agent dropped outside the mapping area");
-                        }
-
+                        draggableItem.Drag.drop();
 
                         //
                         // Reset the position of our draggable item
@@ -443,12 +413,22 @@ Item {
 
 
                     AgentsListItem {
-                        anchors.fill: parent
+                        height : notDraggableItem.height
+                        width : notDraggableItem.width
+
 
                         agent : model.QtObject
                         controller: rootItem.controller
 
                         agentItemIsHovered : mouseArea.containsMouse
+                        visible: !mouseArea.drag.active
+                    }
+
+                    AgentMapping.AgentNodeView {
+                         isReduced : true
+                         agentName : model.name
+                         visible: mouseArea.drag.active
+                         dropEnabled : false
                     }
                 }
 

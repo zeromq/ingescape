@@ -37,18 +37,39 @@ public:
 
     /**
      * @brief Default constructor
-     * @param network device
-     * @param ip address
-     * @param port number
      * @param parent
      */
-    explicit NetworkController(QString networkDevice, QString ipAddress, int port, QObject *parent = 0);
+    explicit NetworkController(QObject *parent = 0);
 
 
     /**
       * @brief Destructor
       */
     ~NetworkController();
+
+
+    /**
+     * @brief Start our MASTIC agent with a network device (or an IP address) and a port
+     * @param networkDevice
+     * @param ipAddress
+     * @param port
+     */
+    void start(QString networkDevice, QString ipAddress, int port);
+
+
+    /**
+     * @brief Called when a MASTIC Launcher enter the network
+     * @param hostname
+     * @param peerId
+     */
+    void masticLauncherEntered(QString hostname, QString peerId);
+
+
+    /**
+     * @brief Called when a MASTIC Launcher exit the network
+     * @param hostname
+     */
+    void masticLauncherExited(QString hostname);
 
 
 Q_SIGNALS:
@@ -120,6 +141,15 @@ Q_SIGNALS:
 public Q_SLOTS:
 
     /**
+     * @brief Slot when a command must be sent on the network to a launcher
+     * @param command
+     * @param hostname
+     * @param executionPath
+     */
+    void onCommandAskedToLauncher(QString command, QString hostname, QString executionPath);
+
+
+    /**
      * @brief Slot when a command must be sent on the network
      * @param command
      * @param peerIdsList
@@ -135,9 +165,33 @@ public Q_SLOTS:
      */
     void onCommandAskedForOutput(QString command, QString outputName, QStringList peerIdsList);
 
-protected:
+
+    /**
+     * @brief Slot when inputs must be added to our Editor for a list of outputs
+     * @param agentName
+     * @param outputsList
+     */
+    void onAddInputsToEditorForOutputs(QString agentName, QList<OutputM*> outputsList);
 
 
+    /**
+     * @brief Slot when inputs must be removed to our Editor for a list of outputs
+     * @param agentName
+     * @param outputsList
+     */
+    void onRemoveInputsToEditorForOutputs(QString agentName, QList<OutputM*> outputsList);
+
+
+private:
+
+    // Name of our agent "MASTIC Editor"
+    QString _editorAgentName;
+
+    // Our Mastic agent is successfully started if the result of mtic_startWithDevice / mtic_startWithIP is 1 (O otherwise)
+    int _isMasticAgentStarted;
+
+    // Map from "Hostname" to the "Peer Id" of the corresponding MASTIC launcher
+    QHash<QString, QString> _mapFromHostnameToMasticLauncherPeerId;
 
 };
 

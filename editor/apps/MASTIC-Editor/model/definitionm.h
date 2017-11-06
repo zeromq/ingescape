@@ -40,9 +40,6 @@ class DefinitionM : public QObject
     // Description of our agent definition
     I2_QML_PROPERTY(QString, description)
 
-    // Md5 hash value for the definition string
-    I2_QML_PROPERTY_READONLY(QString, md5Hash)
-
     // Flag indicating if our definition is a variant (same name, same version but I/O/P differents)
     I2_QML_PROPERTY(bool, isVariant)
 
@@ -50,11 +47,19 @@ class DefinitionM : public QObject
     I2_QOBJECT_LISTMODEL(AgentIOPM, inputsList)
 
     // List of outputs of our agent definition
-    //I2_QOBJECT_LISTMODEL(AgentIOPM, outputsList)
     I2_QOBJECT_LISTMODEL(OutputM, outputsList)
 
     // List of parameters of our agent definition
     I2_QOBJECT_LISTMODEL(AgentIOPM, parametersList)
+
+    // List of ids of inputs
+    I2_CPP_NOSIGNAL_PROPERTY(QStringList, inputsIdsList)
+
+    // List of ids of outputs
+    I2_CPP_NOSIGNAL_PROPERTY(QStringList, outputsIdsList)
+
+    // List of ids of parameters
+    I2_CPP_NOSIGNAL_PROPERTY(QStringList, parametersIdsList)
 
 
 public:
@@ -82,24 +87,70 @@ public:
     void setisMutedOfOutput(bool isMuted, QString outputName);
 
 
+    /**
+     * @brief Return true if the 2 definitions are strictly identicals
+     * @param definition1
+     * @param definition2
+     * @return
+     */
+    static bool areIdenticals(DefinitionM* definition1, DefinitionM* definition2);
+
+
+    /**
+     * @brief Get an Input with its name
+     * @param name
+     * @return
+     */
+    AgentIOPM* getInputWithName(QString name);
+
+
+    /**
+     * @brief Get an Output with its name
+     * @param name
+     * @return
+     */
+    OutputM* getOutputWithName(QString name);
+
+
+    /**
+     * @brief Get a Parameter with its name
+     * @param name
+     * @return
+     */
+    AgentIOPM* getParameterWithName(QString name);
+
+
 Q_SIGNALS:
 
     /**
-     * @brief Signal emitted when a command must be sent on the network
+     * @brief Signal emitted when a command from an output must be sent on the network
      * @param command
      * @param outputName
      */
-    void commandAsked(QString command, QString outputName);
+    void commandAskedForOutput(QString command, QString outputName);
 
 
 public Q_SLOTS:
 
 
 private Q_SLOTS:
+
+    /**
+     * @brief Slot when the list of inputs changed
+     */
+    void _onInputsListChanged();
+
+
     /**
      * @brief Slot when the list of outputs changed
      */
     void _onOutputsListChanged();
+
+
+    /**
+     * @brief Slot when the list of parameters changed
+     */
+    void _onParametersListChanged();
 
 
     /**
@@ -109,9 +160,24 @@ private Q_SLOTS:
     //void _onIsMutedChanged(bool isMuted);
 
 
+    /**
+     * @brief Return true if the 2 list of ids are strictly identicals
+     * @param idsList1
+     * @param idsList2
+     * @return
+     */
+    static bool _areIdenticalsIdsList(QStringList idsList1, QStringList idsList2);
+
+
 private:
+    // Previous list of inputs
+    QList<AgentIOPM*> _previousInputsList;
+
     // Previous list of outputs
     QList<OutputM*> _previousOutputsList;
+
+    // Previous list of outputs
+    QList<AgentIOPM*> _previousParametersList;
 
 };
 

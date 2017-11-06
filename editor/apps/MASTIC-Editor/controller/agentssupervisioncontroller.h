@@ -36,7 +36,7 @@ class AgentsSupervisionController : public QObject
     I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(AgentVM, agentsList)
 
     // Selected agent in the agents list
-    I2_QML_PROPERTY_DELETE_PROOF(AgentVM *, selectedAgent)
+    I2_QML_PROPERTY_DELETE_PROOF(AgentVM*, selectedAgent)
 
 public:
     /**
@@ -90,6 +90,15 @@ public:
 Q_SIGNALS:
 
     /**
+     * @brief Signal emitted when a command must be sent on the network to a launcher
+     * @param command
+     * @param hostname
+     * @param executionPath
+     */
+    void commandAskedToLauncher(QString command, QString hostname, QString executionPath);
+
+
+    /**
      * @brief Signal emitted when a command must be sent on the network
      * @param command
      * @param peerIdsList
@@ -107,11 +116,18 @@ Q_SIGNALS:
 
 
     /**
-     * @brief agentDefinitionManaged
-     * @param agentName
-     * @param definition
+     * @brief Signal emitted when a previous agent model is replaced by a new one strictly identical
+     * @param previousModel
+     * @param newModel
      */
-    void agentDefinitionManaged(QString agentName, DefinitionM* definition);
+    void identicalAgentModelReplaced(AgentM* previousModel, AgentM* newModel);
+
+
+    /**
+     * @brief Signal emitted when an identical agent model is added
+     * @param newModel
+     */
+    void identicalAgentModelAdded(AgentM* newModel);
 
 
 public Q_SLOTS:
@@ -124,23 +140,22 @@ public Q_SLOTS:
 
 
     /**
-     * @brief Slot when a new model of agent definition has been created
-     * @param definition
-     * @param agent
+     * @brief Slot when the definition of a view model of agent changed
+     * @param previousValue
+     * @param newValue
      */
-    void onAgentDefinitionCreated(DefinitionM* definition, AgentM* agent);
-
-
-    /**
-     * @brief Slot when the flag "is Muted" from an output of agent updated
-     * @param agent
-     * @param isMuted
-     * @param outputName
-     */
-    void onIsMutedFromOutputOfAgentUpdated(AgentM* agent, bool isMuted, QString outputName);
+    void onAgentDefinitionChangedWithPreviousValue(DefinitionM* previousValue, DefinitionM* newValue);
 
 
 private:
+
+    /**
+     * @brief Update our list of agents with the new definition for this agent
+     * @param agent
+     * @param definition
+     */
+    void _updateWithNewDefinitionForAgent(AgentVM* agent, DefinitionM* definition);
+
 
     /**
      * @brief Delete the view model of Agent

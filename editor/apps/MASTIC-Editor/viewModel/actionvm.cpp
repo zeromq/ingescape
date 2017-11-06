@@ -1,7 +1,7 @@
 /*
  *	ActionVM
  *
- *  Copyright (c) 2016-2017 Ingenuity i/o. All rights reserved.
+ *  Copyright (c) 2017 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -37,13 +37,16 @@ ActionVM::ActionVM(ActionM *actionModel, QObject *parent) : QObject(parent),
     _revertAfterTime(false),
     _revertAtTime(false)
 {
+    // Force ownership of our object, it will prevent Qml from stealing it
+    QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
+
     if(_actionModel != NULL)
     {
         if(_actionModel->startTime() >= 0)
         {
             _startDateTime.setTime(QTime::fromMSecsSinceStartOfDay(_actionModel->startTime()*1000));
         } else {
-             _startDateTime = QDateTime::fromString("00:00:00","HH:mm:ss");
+            _startDateTime = QDateTime::fromString("00:00:00","HH:mm:ss");
         }
         if(_actionModel->revertWhenValidityIsOver() == true)
         {
@@ -56,11 +59,6 @@ ActionVM::ActionVM(ActionM *actionModel, QObject *parent) : QObject(parent),
         _startDateTime = QDateTime::fromString("00:00:00","HH:mm:ss");
         _actionModel = NULL;
     }
-
-    _startTimeString = _startDateTime.toString("HH:mm:ss");
-    // Force ownership of our object, it will prevent Qml from stealing it
-    QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
-
 }
 
 
@@ -69,12 +67,14 @@ ActionVM::ActionVM(ActionM *actionModel, QObject *parent) : QObject(parent),
  */
 ActionVM::~ActionVM()
 {
-    if(_actionModel != NULL)
+    if (_actionModel != NULL)
     {
-        delete _actionModel;
-        _actionModel = NULL;
+        ActionM* temp = _actionModel;
+        setactionModel(NULL);
+        delete temp;
     }
 }
+
 
 /**
  * @brief Copy from another action view model
@@ -122,7 +122,9 @@ void ActionVM::setstartTimeString(QString stringDateTime)
         {
             QDateTime dateTime = QDateTime::fromString(stringDateTime,"HH:mm:ss");
             setstartDateTime(dateTime);
-        } else {
+        }
+        else
+        {
             QDateTime dateTime = QDateTime::fromString("00:00:00","HH:mm:ss");
             setstartDateTime(dateTime);
         }

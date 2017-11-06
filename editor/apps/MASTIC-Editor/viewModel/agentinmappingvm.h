@@ -1,3 +1,17 @@
+/*
+ *	MASTIC Editor
+ *
+ *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *
+ *	See license terms for the rights and conditions
+ *	defined by copyright holders.
+ *
+ *
+ *	Contributors:
+ *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
+ *
+ */
+
 #ifndef AGENTINMAPPINGVM_H
 #define AGENTINMAPPINGVM_H
 
@@ -6,10 +20,16 @@
 
 #include <I2PropertyHelpers.h>
 
-#include <viewModel/pointmapvm.h>
-#include <model/agentmappingm.h>
-#include <model/definitionm.h>
+#include <viewModel/iop/inputvm.h>
+#include <viewModel/iop/outputvm.h>
 
+#include <model/agentmappingm.h>
+#include <model/agentm.h>
+
+/**
+ * @brief The AgentInMappingVM class a view model of agent in the mapping
+ * Allows to manage when several agents have the same name
+ */
 class AgentInMappingVM : public QObject
 {
     Q_OBJECT
@@ -17,89 +37,234 @@ class AgentInMappingVM : public QObject
     // Name of our agent
     I2_QML_PROPERTY_READONLY(QString, agentName)
 
-    // List of models of definition agents
-    I2_QOBJECT_LISTMODEL(DefinitionM, definitionModelList)
+    // List of models of agents
+    I2_QOBJECT_LISTMODEL(AgentM, models)
 
     // List of VM of inputs
-    I2_QOBJECT_LISTMODEL(PointMapVM, inputsList)
+    I2_QOBJECT_LISTMODEL(InputVM, inputsList)
 
     // List of VM of outputs
-    I2_QOBJECT_LISTMODEL(PointMapVM, outputsList)
+    I2_QOBJECT_LISTMODEL(OutputVM, outputsList)
 
-    // Geometry for the connector in the view
-    // The center of the box (Absolute coordinate)
+    // The position corresponds to the corner Top-Left of the box
     I2_QML_PROPERTY(QPointF, position)
 
-    // Width of the box
-    I2_QML_PROPERTY(int, width)
+    // Flag indicating if our agent is ON (vs OFF)
+    I2_QML_PROPERTY_READONLY(bool, isON)
 
-    // Height of the box
-    I2_QML_PROPERTY(int, height)
+    // Flag indicating if our agent is reduced
+    I2_QML_PROPERTY(bool, isReduced)
+
+    // Define the value type of the reduced map (= brin) in input of the agent
+    I2_QML_PROPERTY_READONLY(AgentIOPValueTypes::Value, reducedMapValueTypeInInput)
+
+    // Define the value type of the reduced map (= brin) in output of the agent
+    I2_QML_PROPERTY_READONLY(AgentIOPValueTypes::Value, reducedMapValueTypeInOutput)
+
+    // Flag indicating if our agent is a ghost agent
+    I2_QML_PROPERTY_READONLY(bool, isGhost)
+
+    // Flag indicating if all definitions are strictly identicals
+    I2_QML_PROPERTY_READONLY(bool, areIdenticalsAllDefinitions)
 
 
 public:
     /**
-         * @brief Default constructor
-         * @param definitionModel The first definition model needed to instanciate an agent mapping VM.
-         * Typically passing during the drag-drop from the list of agent on the left side.
-         * @param position Position of the box
-         * @param parent
-         */
-    explicit AgentInMappingVM(DefinitionM * definitionModel,
+     * @brief Default constructor
+     * @param models The first agent is needed to instanciate an agent mapping VM.
+     * Typically passing during the drag-drop from the list of agents on the left side.
+     * @param position Position of the top left corner
+     * @param parent
+     */
+    explicit AgentInMappingVM(QList<AgentM*> models,
                               QPointF position,
                               QObject* parent = nullptr);
 
+
     /**
-         * @brief Second constructor to instanciate from a list of definition
-         * @param definitionModelList The definition model list needed to instanciate an agent mapping VM.
-         * Typically passing during the drag-drop from the list of agent on the left side.
-         * @param position Position of the box
-         * @param parent
-         */
-    explicit AgentInMappingVM(QList<DefinitionM *> definitionModelList,
-                              QPointF position,
+     * @brief Ghost Constructor: model (and definition) is not defined.
+     * The agent is an empty shell only defined by a name.
+     * @param agentName
+     * @param parent
+     */
+    explicit AgentInMappingVM(QString agentName,
                               QObject* parent = nullptr);
+
 
     /**
      * @brief Destructor
      */
     ~AgentInMappingVM();
 
-public Q_SLOTS:
+
+Q_SIGNALS:
+
     /**
-         * @brief Add definition dynamically to the internal list
-         * @param newDefinition The definition to add
-         */
-    void addDefinitionInInternalList(DefinitionM * newDefinition);
+     * @brief Signal emitted when some view models of inputs have been added to our agent in mapping
+     * @param inputsListAdded
+     */
+    void inputsListAdded(QList<InputVM*> inputsListAdded);
+
+
+    /**
+     * @brief Signal emitted when some view models of outputs have been added to our agent in mapping
+     * @param outputsListAdded
+     */
+    void outputsListAdded(QList<OutputVM*> outputsListAdded);
+
+
+    /**
+     * @brief Signal emitted when some view models of outputs will be removed from our agent in mapping
+     * @param outputsListWillBeRemoved
+     */
+    void outputsListRemoved(QList<OutputVM*> outputsListWillBeRemoved);
+
+
+public Q_SLOTS:
+
+    /**
+     * @brief Return the corresponding view model of input from the input name
+     * @param inputName
+     */
+    InputVM* getInputFromName(QString inputName);
+
+
+    /**
+     * @brief Return the corresponding view model of input from the input id
+     * @param inputId
+     */
+    InputVM* getInputFromId(QString inputId);
+
+
+    /**
+     * @brief Return the corresponding view model of output from the output name
+     * @param outputName
+     */
+    OutputVM* getOutputFromName(QString outputName);
+
+
+    /**
+     * @brief Return the corresponding view model of output from the output id
+     * @param outputId
+     */
+    OutputVM* getOutputFromId(QString outputId);
+
+
+private Q_SLOTS:
+    /**
+     * @brief Slot when the list of models changed
+     */
+    void _onModelsChanged();
+
+
+    /**
+     * @brief Slot when the flag "is ON" of a model changed
+     * @param isON
+     */
+    void _onIsONofModelChanged(bool isON);
+
 
 private:
-    // Previous list of input
-    QList<PointMapVM*> _previousInputsList;
-
-    // Previous list of output
-    QList<PointMapVM*> _previousOutputsList;
-
-    //
-    // Internal functions to factorize code
-    //
 
     /**
-         * @brief Add new points Map to list from a definition model
-         * @param newDefinition The definition model
-         * @param list The list where to add the points map (input/output list)
-         */
-    void addPointMapInInternalList(DefinitionM *newDefinition,
-                                   I2CustomItemListModel<PointMapVM> *list);
+     * @brief A model of agent has been added to our list
+     * @param model
+     */
+    void _agentModelAdded(AgentM* model);
+
 
     /**
-         * @brief This function check if the point map already exist in the list (input/output list)
-         * @param list The list where to add the points map (input/output list)
-         * @param agentName The name of the agent mapping VM
-         * @param iopName The name of the input/output to add
-         */
-    bool checkIfAlreadyInList(QList<PointMapVM *> list,
-                              QString agentName,
-                              QString iopName);
+     * @brief A model of agent has been removed from our list
+     * @param model
+     */
+    void _agentModelRemoved(AgentM* model);
+
+
+    /**
+     * @brief A model of input has been added
+     * @param input
+     * @return
+     */
+    InputVM* _inputModelAdded(AgentIOPM* input);
+
+
+    /**
+     * @brief A model of input has been removed
+     * @param input
+     * @return
+     */
+    InputVM* _inputModelRemoved(AgentIOPM* input);
+
+
+    /**
+     * @brief A model of output has been added
+     * @param output
+     * @return
+     */
+    OutputVM* _outputModelAdded(OutputM* output);
+
+
+    /**
+     * @brief A model of output has been removed
+     * @param output
+     * @return
+     */
+    OutputVM* _outputModelRemoved(OutputM* output);
+
+
+    /**
+     * @brief Add new points Map to the inputs list from a definition model
+     * @param newDefinition The definition model
+     */
+    //void _addPointMapInInternalInputList(DefinitionM *newDefinition);
+
+
+    /**
+     * @brief Add new points Map to the outputs list from a definition model
+     * @param newDefinition The definition model
+     */
+    //void _addPointMapInInternalOutputList(DefinitionM *newDefinition);
+
+
+    /**
+     * @brief This function check if the OutputVM already exist in the input list
+     * @param currentOuput The newly created OutputVM
+     */
+    //bool _checkIfAlreadyInOutputList(OutputVM* currentOuput);
+
+
+    /**
+     * @brief This function check if the InputVM already exist in the input list
+     * @param currentInput The newly created Input VM
+     */
+    //bool _checkIfAlreadyInInputList(InputVM* currentInput);
+
+
+    /**
+     * @brief Update with all models of agents
+     */
+    void _updateWithAllModels();
+
+
+    /**
+     * @brief Update the flag "is ON" in function of flags of models
+     */
+    void _updateIsON();
+
+
+private:
+
+    // Previous list of models of agents
+    QList<AgentM*> _previousAgentsList;
+
+    // FIXME: input name as key is not unique (value type can be different)
+    QHash<QString, InputVM*> _mapOfInputsFromInputName;
+    QHash<QString, InputVM*> _mapOfInputsFromInputId;
+
+    // FIXME: output name as key is not unique (value type can be different)
+    QHash<QString, OutputVM*> _mapOfOutputsFromOutputName;
+    QHash<QString, OutputVM*> _mapOfOutputsFromOutputId;
+
 };
 
 QML_DECLARE_TYPE(AgentInMappingVM)

@@ -21,6 +21,7 @@ import QtQuick.Controls.Styles 1.4
 import I2Quick 1.0
 
 import MASTIC 1.0
+import "../theme" as Theme
 
 
 Item {
@@ -45,9 +46,6 @@ Item {
     height: 85
 
 
-    Behavior on height {
-        NumberAnimation {}
-    }
 
     //-----------------------------------------
     //
@@ -93,25 +91,28 @@ Item {
                 fill: parent
             }
 
-            Rectangle {
-                anchors.fill: parent
 
+            // Selected Agent
+            Item {
+                anchors.fill: parent
                 visible : controller && root.agent && (controller.selectedAgent === root.agent);
-                color : "transparent"
-                radius : 5
-                border {
-                    width : 2
+
+                Rectangle {
+                    anchors {
+                        left : parent.left
+                        top : parent.top
+                        bottom: parent.bottom
+                    }
+
+                    width : 6
                     color : MasticTheme.selectedAgentColor
                 }
 
                 Button {
                     id: removeButton
 
-                    property var boundingBox: MasticTheme.svgFileMASTIC.boundsOnElement("supprimer");
-                    height : boundingBox.height
-                    width :  boundingBox.width
-
                     visible : (model.isON === false)
+                    activeFocusOnPress: true
 
                     anchors {
                         top: parent.top
@@ -120,7 +121,7 @@ Item {
                         rightMargin: 10 + (offButton.width - removeButton.width)/2
                     }
 
-                    style: I2SvgButtonStyle {
+                    style: Theme.LabellessSvgButtonStyle {
                         fileCache: MasticTheme.svgFileMASTIC
 
                         pressedID: releasedID + "-pressed"
@@ -164,7 +165,7 @@ Item {
                     elide: Text.ElideRight
 
                     text: root.agent? root.agent.name : ""
-                    color: (root.agent  && (root.agent.isON === true) && !root.agent.hasOnlyDefinition)? MasticTheme.agentsListLabelColor : MasticTheme.agentOFFLabelColor
+                    color: (root.agent  && (root.agent.isON === true))? MasticTheme.agentsListLabelColor : MasticTheme.agentOFFLabelColor
 
 
                     font: MasticTheme.headingFont
@@ -193,9 +194,9 @@ Item {
 
                             color : MasticTheme.whiteColor
                             font {
-                                family: MasticTheme.labelFontFamilyBlack
-                                bold : true
-                                pixelSize : 10
+                                family: MasticTheme.labelFontFamily
+                                weight : Font.Black
+                                pixelSize : 12
                             }
                         }
 
@@ -239,7 +240,7 @@ Item {
                         }
 
                         text : definitionName.elidedText
-                        color: (model.definition.isVariant)?
+                        color: (model.definition && model.definition.isVariant)?
                                    (definitionNameBtn.pressed? MasticTheme.darkRedColor : MasticTheme.redColor)
                                  : ((root.agent && root.agent.isON === true)?
                                        (definitionNameBtn.pressed? MasticTheme.agentsListPressedLabel2Color : MasticTheme.agentsListLabel2Color)
@@ -285,14 +286,14 @@ Item {
 
                 // Address(es) on the network of our agent(s)
                 Text {
-                    id: agentAddresses
+                    id: agentHostnames
                     anchors {
                         left : parent.left
                         right : parent.right
                     }
                     elide: Text.ElideRight
 
-                    text: root.agent ? root.agent.addresses: ""
+                    text: root.agent ? root.agent.hostnames: ""
 
                     color: (root.agent && root.agent.isON === true)? MasticTheme.agentsListTextColor : MasticTheme.agentOFFTextColor
                     font: MasticTheme.normalFont
@@ -303,9 +304,9 @@ Item {
             Button {
                 id: offButton
 
-                property var boundingBox: MasticTheme.svgFileMASTIC.boundsOnElement("on");
-                height : boundingBox.height
-                width :  boundingBox.width
+                visible : (root.agent && !root.agent.neverAppearedOnNetwork)
+                activeFocusOnPress: true
+                enabled: visible
 
                 anchors {
                     bottom: muteButton.top
@@ -313,7 +314,7 @@ Item {
                     horizontalCenter: muteButton.horizontalCenter
                 }
 
-                style: I2SvgButtonStyle {
+                style: Theme.LabellessSvgButtonStyle {
                     fileCache: MasticTheme.svgFileMASTIC
 
                     pressedID: releasedID + "-pressed"
@@ -329,11 +330,9 @@ Item {
             Button {
                 id: muteButton
 
-                property var boundingBox: MasticTheme.svgFileMASTIC.boundsOnElement("muteactif");
-                height : boundingBox.height
-                width :  boundingBox.width
-
                 visible : (model.isON === true)
+                activeFocusOnPress: true
+
                 anchors {
                     bottom: parent.bottom
                     bottomMargin: 10
@@ -341,13 +340,12 @@ Item {
                     rightMargin: 10
                 }
 
-                style: I2SvgButtonStyle {
+                style: Theme.LabellessSvgButtonStyle {
                     fileCache: MasticTheme.svgFileMASTIC
 
                     pressedID: releasedID + "-pressed"
                     releasedID: model.isMuted? "muteactif" : "muteinactif"
                     disabledID : releasedID
-
                 }
 
                 onClicked: {
@@ -358,12 +356,9 @@ Item {
             Button {
                 id: freezeButton
 
-                property var boundingBox: MasticTheme.svgFileMASTIC.boundsOnElement("freezeactif");
-                height : boundingBox.height
-                width :  boundingBox.width
-
                 visible: model.canBeFrozen && (model.isON === true)
                 enabled : visible
+                activeFocusOnPress: true
 
                 anchors {
                     verticalCenter: muteButton.verticalCenter
@@ -371,13 +366,12 @@ Item {
                     rightMargin: 5
                 }
 
-                style: I2SvgButtonStyle {
+                style: Theme.LabellessSvgButtonStyle {
                     fileCache: MasticTheme.svgFileMASTIC
 
                     pressedID: releasedID + "-pressed"
                     releasedID: model.isFrozen? "freezeactif" : "freezeinactif"
                     disabledID : releasedID
-
                 }
 
                 onClicked: {

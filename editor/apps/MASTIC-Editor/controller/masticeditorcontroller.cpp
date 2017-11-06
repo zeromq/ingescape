@@ -13,7 +13,8 @@
  *
  */
 
-#include "masticeditorcontroller.h"
+
+#include "controller/masticeditorcontroller.h"
 
 #include "misc/masticeditorsettings.h"
 #include "misc/masticeditorutils.h"
@@ -21,6 +22,7 @@
 #include <I2Quick.h>
 
 #include <QThread>
+#include <QApplication>
 
 
 /**
@@ -32,7 +34,8 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     _agentsSupervisionC(NULL),
     _agentsMappingC(NULL),
     _networkC(NULL),
-    _scenarioC(NULL)
+    _scenarioC(NULL),
+    _terminationSignalWatcher(NULL)
 {
     qInfo() << "New MASTIC Editor Controller";
 
@@ -41,10 +44,12 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     //
     QString snapshotsDirectoryPath = MasticEditorUtils::getSnapshotsPath();
     QDir snapshotsDirectory(snapshotsDirectoryPath);
-    if (snapshotsDirectory.exists()) {
+    if (snapshotsDirectory.exists())
+    {
         _snapshotDirectory = snapshotsDirectoryPath;
     }
-    else {
+    else
+    {
         qCritical() << "ERROR: could not create directory at '" << snapshotsDirectoryPath << "' !";
     }
 
@@ -87,7 +92,7 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     _modelManager = new MasticModelManager(agentsListPath, agentsMappingsPath, this);
 
     // Create the controller for network communications
-    _networkC = new NetworkController(_networkDevice, _ipAddress, _port, this);
+    _networkC = new NetworkController(this);
 
     // Create the controller for agents supervision
     _agentsSupervisionC = new AgentsSupervisionController(_modelManager, this);
@@ -109,19 +114,46 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
 
 
     // Connect to signals from the model manager
+    connect(_modelManager, &MasticModelManager::isActivatedMappingChanged, _agentsMappingC, &AgentsMappingController::onIsActivatedMappingChanged);
     connect(_modelManager, &MasticModelManager::agentModelCreated, _agentsSupervisionC, &AgentsSupervisionController::onAgentModelCreated);
-    connect(_modelManager, &MasticModelManager::agentDefinitionCreated, _agentsSupervisionC, &AgentsSupervisionController::onAgentDefinitionCreated);
-    connect(_modelManager, &MasticModelManager::isMutedFromOutputOfAgentUpdated, _agentsSupervisionC, &AgentsSupervisionController::onIsMutedFromOutputOfAgentUpdated);
+    //connect(_modelManager, &MasticModelManager::agentModelWillBeDeleted, _agentsSupervisionC, &AgentsSupervisionController::onAgentModelWillBeDeleted);
 
 
     // Connect to signals from the controller for supervision of agents
+    connect(_agentsSupervisionC, &AgentsSupervisionController::commandAskedToLauncher, _networkC, &NetworkController::onCommandAskedToLauncher);
     connect(_agentsSupervisionC, &AgentsSupervisionController::commandAsked, _networkC, &NetworkController::onCommandAsked);
     connect(_agentsSupervisionC, &AgentsSupervisionController::commandAskedForOutput, _networkC, &NetworkController::onCommandAskedForOutput);
-    connect(_agentsSupervisionC, &AgentsSupervisionController::agentDefinitionManaged, _agentsMappingC, &AgentsMappingController::addAgentDefinitionToMapping);
+    connect(_agentsSupervisionC, &AgentsSupervisionController::identicalAgentModelReplaced, _agentsMappingC, &AgentsMappingController::onIdenticalAgentModelReplaced);
+    connect(_agentsSupervisionC, &AgentsSupervisionController::identicalAgentModelAdded, _agentsMappingC, &AgentsMappingController::onIdenticalAgentModelAdded);
+
+
+    // Connect to signals from the controller for mapping of agents
+    connect(_agentsMappingC, &AgentsMappingController::addInputsToEditorForOutputs, _networkC, &NetworkController::onAddInputsToEditorForOutputs);
+    connect(_agentsMappingC, &AgentsMappingController::removeInputsToEditorForOutputs, _networkC, &NetworkController::onRemoveInputsToEditorForOutputs);
 
 
     // Initialize agents list from default file
     _modelManager->importAgentsListFromDefaultFile();
+
+    // Start our MASTIC agent with a network device (or an IP address) and a port
+    _networkC->start(_networkDevice, _ipAddress, _port);
+
+
+    //
+    // Subscribe to system signals to interceipt interruption and termination signals
+    //
+    _terminationSignalWatcher = new TerminationSignalWatcher(this);
+    connect(_terminationSignalWatcher, &TerminationSignalWatcher::terminationSignal,
+                     [=] () {
+                        qDebug() << "\n\n\nTu connais le tarif Vincent ;-)\n\n\n";
+
+                        if (QApplication::instance() != NULL)
+                        {
+                            QApplication::instance()->quit();
+                        }
+                     });
+
+
 
 
     // TEMP sleep to display our loading screen
@@ -134,6 +166,17 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
  */
 MasticEditorController::~MasticEditorController()
 {
+    //
+    // Clean-up our TerminationSignalWatcher first
+    //
+    if (_terminationSignalWatcher != NULL)
+    {
+        disconnect(_terminationSignalWatcher, 0);
+        delete _terminationSignalWatcher;
+        _terminationSignalWatcher = NULL;
+    }
+
+
     //
     // Clean-up sub-controllers
     //

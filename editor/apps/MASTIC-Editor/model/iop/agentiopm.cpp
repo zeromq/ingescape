@@ -25,7 +25,7 @@
  */
 AgentIOPM::AgentIOPM(QObject *parent) : AgentIOPM(AgentIOPTypes::PARAMETER,
                                                   "",
-                                                  AgentIOPValueTypes::STRING,
+                                                  AgentIOPValueTypes::UNKNOWN,
                                                   parent)
 {
 }
@@ -50,6 +50,9 @@ AgentIOPM::AgentIOPM(AgentIOPTypes::Value agentIOPType,
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
+
+    // Create the identifier with name and value type
+    _id = QString("%1::%2").arg(_name, AgentIOPValueTypes::staticEnumToString(_agentIOPValueType));
 }
 
 

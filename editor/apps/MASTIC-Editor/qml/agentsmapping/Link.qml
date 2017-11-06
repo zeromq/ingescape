@@ -30,6 +30,16 @@ I2CubicBezierCurve {
     //
     //--------------------------------
 
+    property var mapBetweenIOPVM : null
+    property var controller : null
+    property var inputModel : mapBetweenIOPVM ?  mapBetweenIOPVM.pointTo : null
+    property var outputModel : mapBetweenIOPVM ?  mapBetweenIOPVM.pointFrom : null
+
+
+    secondPoint: inputModel? inputModel.position : Qt.point(0,0)
+    firstPoint: outputModel? outputModel.position : Qt.point(0,0)
+
+
     // Minimum offset of control point
     property int minimumControlPointOffset: 20
 
@@ -53,13 +63,88 @@ I2CubicBezierCurve {
 
 
     // Stroke
-    stroke: (mouseArea.pressed) ? pressColor : defaultColor
-    strokeWidth: MasticTheme.agentsMappingLinkDefaultWidth
+    stroke: if (mapBetweenIOPVM && mapBetweenIOPVM.agentTo && mapBetweenIOPVM.agentTo.isReduced) { // if the agentTo is reduced : global type of its inputs
+                switch (mapBetweenIOPVM.agentTo.reducedMapValueTypeInInput)
+                {
+                case AgentIOPValueTypes.INTEGER:
+                    mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
+                    break;
+                case AgentIOPValueTypes.DOUBLE:
+                    mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
+                    break;
+                case AgentIOPValueTypes.STRING:
+                    mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.redColor2 : MasticTheme.darkRedColor2
+                    break;
+                case AgentIOPValueTypes.BOOL:
+                    mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
+                    break;
+                case AgentIOPValueTypes.IMPULSION:
+                    mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.purpleColor : MasticTheme.darkPurpleColor
+                    break;
+                case AgentIOPValueTypes.DATA:
+                    mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.greenColor : MasticTheme.darkGreenColor
+                    break;
+                case AgentIOPValueTypes.MIXED:
+                    mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.whiteColor : MasticTheme.darkGreyColor
+                    break;
+                case AgentIOPValueTypes.UNKNOWN:
+                    "#000000"
+                    break;
+                default:
+                    defaultColor;
+                    break;
+                }
+            }
+            else { // if the agentTo is not reduced : type of its outputs
+                if (outputModel && outputModel.firstModel) {
+                    switch (outputModel.firstModel.agentIOPValueType)
+                    {
+                    case AgentIOPValueTypes.INTEGER:
+                        mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
+                        break;
+                    case AgentIOPValueTypes.DOUBLE:
+                        mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
+                        break;
+                    case AgentIOPValueTypes.STRING:
+                        mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.redColor2 : MasticTheme.darkRedColor2
+                        break;
+                    case AgentIOPValueTypes.BOOL:
+                        mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
+                        break;
+                    case AgentIOPValueTypes.IMPULSION:
+                        mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.purpleColor : MasticTheme.darkPurpleColor
+                        break;
+                    case AgentIOPValueTypes.DATA:
+                        mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.greenColor : MasticTheme.darkGreenColor
+                        break;
+                    case AgentIOPValueTypes.MIXED:
+                        mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.whiteColor : MasticTheme.darkGreyColor
+                        break;
+                    case AgentIOPValueTypes.UNKNOWN:
+                        "#000000"
+                        break;
+                    default:
+                        MasticTheme.whiteColor;
+                        break;
+                    }
+                } else {
+                    defaultColor;
+                }
+            }
+
+
+    strokeWidth: if (mapBetweenIOPVM && mapBetweenIOPVM.agentTo && mapBetweenIOPVM.agentTo.isReduced
+                         && mapBetweenIOPVM.agentFrom && mapBetweenIOPVM.agentFrom.isReduced) {
+                     MasticTheme.agentsMappingBrinDefaultWidth
+                 } else {
+                     MasticTheme.agentsMappingLinkDefaultWidth
+                 }
+
 
 
     // Fuzzy contour
-    fuzzyColor: hoverFuzzyColor
-    fuzzyRadius: (mouseArea.containsMouse) ? hoverFuzzyRadius : 0
+    fuzzyColor: (mapBetweenIOPVM && controller.selectedMapBetweenIOP === mapBetweenIOPVM) ? MasticTheme.lightGreyColor : "transparent"
+    fuzzyRadius: 2
 
 
 
@@ -72,7 +157,15 @@ I2CubicBezierCurve {
     // Emitted when there is a click
     signal clicked();
 
-
+    onClicked: {
+        if (controller) {
+            if (controller.selectedMapBetweenIOP !== model.QtObject) {
+                controller.selectedMapBetweenIOP = model.QtObject;
+            } else {
+                controller.selectedMapBetweenIOP = null;
+            }
+        }
+    }
 
     //--------------------------------
     //
@@ -124,14 +217,37 @@ I2CubicBezierCurve {
     // Update control points when our second point has changed
     onSecondPointChanged: updateControlPoints();
 
-    // Compute control points when our item is created
-    Component.onCompleted: updateControlPoints();
+
+    Component.onCompleted: {
+        // Compute control points when our item is created
+        updateControlPoints();
+    }
+
 
 
     Behavior on fuzzyRadius {
         NumberAnimation {}
     }
 
+
+    focus: true
+    Keys.onPressed: {
+        if (event.key === Qt.Key_Backspace || event.key === Qt.Key_Delete) {
+            if (controller && controller.selectedMapBetweenIOP) {
+                console.log( " delete " + controller.selectedMapBetweenIOP);
+            }
+
+            event.accepted = true;
+        }
+    }
+
+    onFocusChanged: {
+        if (!focus) {
+            if (controller && controller.selectedMapBetweenIOP) {
+                controller.selectedMapBetweenIOP = null;
+            }
+        }
+    }
 
     //--------------------------------
     //
@@ -143,12 +259,16 @@ I2CubicBezierCurve {
     MouseArea {
         id: mouseArea
 
-        anchors.fill: parent
+        anchors {
+            fill: parent
+        }
 
-        hoverEnabled: true
+        enabled: rootItem.visible
+        hoverEnabled: enabled
 
         onClicked: {
             rootItem.clicked();
+            rootItem.forceActiveFocus();
         }
     }
 }

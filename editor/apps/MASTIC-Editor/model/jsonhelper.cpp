@@ -178,8 +178,6 @@ QByteArray JsonHelper::exportAgentsList(QList<QPair<QString, DefinitionM*>> agen
 
 /**
  * @brief Create a model of agent mapping with JSON and the input agent name corresponding
- * TODOESTIA : the input agent name will be extract from the network event "mapping"
- * (voir avec vincent à l'appel de la fonction createModelOfAgentMapping dans networkmanager quand MAPPING event)
  * @param inputAgentName, byteArrayOfJson
  * @return
  */
@@ -212,21 +210,13 @@ AgentMappingM* JsonHelper::createModelOfAgentMapping(QString inputAgentName, QBy
                     foreach (QJsonValue jsonMap, jsonMappingOut.toArray()) {
                         if (jsonMap.isObject())
                         {
-                            ElementMappingM* elementMapping = _createModelOfElementMapping (jsonMap.toObject());
+                            ElementMappingM* elementMapping = _createModelOfElementMapping(inputAgentName, jsonMap.toObject());
                             if (elementMapping != NULL) {
-                                elementMapping->setinputAgent(inputAgentName);
                                 agentMapping->elementMappingsList()->append(elementMapping);
                             }
                         }
                     }
                 }
-
-                // Generate md5 value for the definition string
-                QString md5Hash = QString(QCryptographicHash::hash(byteArrayOfJson, QCryptographicHash::Md5).toHex());
-                agentMapping->setmd5Hash(md5Hash);
-
-                //qDebug() << "md5:" << md5Hash;
-                //qDebug() << "json:" << jsonMapping;
             }
         }
     }
@@ -294,17 +284,6 @@ DefinitionM* JsonHelper::_createModelOfDefinitionFromJSON(QJsonObject jsonDefini
                 }
             }
         }
-
-        // 1- Convert into compact string
-        QJsonDocument jsonDocument(jsonDefinition);
-        QByteArray byteArray = jsonDocument.toJson(QJsonDocument::Compact);
-
-        // 2- Generate md5 value for this compact string
-        QString md5Hash = QString(QCryptographicHash::hash(byteArray, QCryptographicHash::Md5).toHex());
-        definition->setmd5Hash(md5Hash);
-
-        //qDebug() << "json:" << jsonDefinition;
-        //qDebug() << "md5:" << md5Hash;
     }
 
     return definition;
@@ -402,9 +381,9 @@ AgentIOPM* JsonHelper::_createModelOfAgentIOP(QJsonObject jsonObject, AgentIOPTy
                 }
                 break;
 
-            /*case AgentIOPValueTypes::IMPULSION:
+            case AgentIOPValueTypes::IMPULSION:
                 // Nothing to do
-                break;*/
+                break;
 
             case AgentIOPValueTypes::DATA:
                 if (jsonValue.isString()) {
@@ -420,7 +399,11 @@ AgentIOPM* JsonHelper::_createModelOfAgentIOP(QJsonObject jsonObject, AgentIOPTy
                 }
                 break;
 
+            /*case AgentIOPValueTypes::UNKNOWN:
+                break;*/
+
             default:
+                qCritical() << "IOP '" << agentIOP->name() << "' has a bad type" << jsonType.toString();
                 break;
             }
 
@@ -496,6 +479,10 @@ QJsonObject JsonHelper::_getJsonFromAgentIOP(AgentIOPM* agentIOP)
             jsonAgentIOP.insert("value", agentIOP->displayableDefaultValue());
             break;
 
+        /*case AgentIOPValueTypes::UNKNOWN:
+            jsonAgentIOP.insert("value", "");
+            break;*/
+
         default:
             jsonAgentIOP.insert("value", "");
             break;
@@ -508,10 +495,11 @@ QJsonObject JsonHelper::_getJsonFromAgentIOP(AgentIOPM* agentIOP)
 
 /**
  * @brief Create a model of element mapping Input name/Output agent name/Output name with JSON
+ * @param inputAgentName
  * @param jsonObject
  * @return
  */
-ElementMappingM* JsonHelper::_createModelOfElementMapping(QJsonObject jsonObject)
+ElementMappingM* JsonHelper::_createModelOfElementMapping(QString inputAgentName, QJsonObject jsonObject)
 {
     ElementMappingM* elementMapping = NULL;
 
@@ -522,12 +510,10 @@ ElementMappingM* JsonHelper::_createModelOfElementMapping(QJsonObject jsonObject
     //All the members need to be completed
     if (jsonInputName.isString() && jsonAgentName.isString() && jsonOutputName.isString())
     {
-        elementMapping = new ElementMappingM(NULL,
+        elementMapping = new ElementMappingM(inputAgentName,
                                              jsonInputName.toString(),
                                              jsonAgentName.toString(),
                                              jsonOutputName.toString());
-
-
     }
 
     return elementMapping;

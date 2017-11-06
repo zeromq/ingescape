@@ -29,7 +29,7 @@
 
 
 /**
- * @brief The AgentVM class defines a view model of agent
+ * @brief The AgentVM class defines a view model of agent in the list
  * Allows to manage when several agents have exactly the same name and the same definition
  * Only Peer ID is different (and HostName can also be different)
  */
@@ -43,14 +43,11 @@ class AgentVM : public QObject
     // List of models of agents
     I2_QOBJECT_LISTMODEL(AgentM, models)
 
-    // Address(es) on the network of our agent(s)
-    I2_QML_PROPERTY_READONLY(QString, addresses)
+    // Hostname(s) on the network of our agent(s)
+    I2_QML_PROPERTY_READONLY(QString, hostnames)
 
-    // Model of the agent definition
-    I2_QML_PROPERTY_READONLY_CUSTOM_SETTER(DefinitionM*, definition)
-
-    // Flag indicating if our agent has only a definition (never yet appeared on the network)
-    I2_QML_PROPERTY_READONLY(bool, hasOnlyDefinition)
+    // Flag indicating if our agent never yet appeared on the network
+    I2_QML_PROPERTY_READONLY(bool, neverAppearedOnNetwork)
 
     // Flag indicating if our agent is ON (vs OFF)
     I2_QML_PROPERTY_READONLY(bool, isON)
@@ -66,6 +63,9 @@ class AgentVM : public QObject
 
     // Status defined by the agent
     //I2_QML_PROPERTY_READONLY(QString, status)
+
+    // Definition of our agent
+    I2_QML_PROPERTY_READONLY_CUSTOM_SETTER(DefinitionM*, definition)
 
 
 public:
@@ -102,6 +102,23 @@ public:
 
 
 Q_SIGNALS:
+
+    /**
+     * @brief Signal emitted when the definition changed
+     * @param previousValue
+     * @param newValue
+     */
+    void definitionChangedWithPreviousValue(DefinitionM* previousValue, DefinitionM* newValue);
+
+
+    /**
+     * @brief Signal emitted when a command must be sent on the network to a launcher
+     * @param command
+     * @param hostname
+     * @param executionPath
+     */
+    void commandAskedToLauncher(QString command, QString hostname, QString executionPath);
+
 
     /**
      * @brief Signal emitted when a command must be sent on the network
@@ -158,11 +175,18 @@ private Q_SLOTS:
     void _onIsFrozenOfModelChanged(bool isFrozen);
 
 
+    /**
+     * @brief Slot when the definition of a model changed
+     * @param definition
+     */
+    void _onDefinitionOfModelChanged(DefinitionM* definition);
+
+
 private:
     /**
-     * @brief Update with the list of models
+     * @brief Update with all models of agents
      */
-    void _updateWithModels();
+    void _updateWithAllModels();
 
 
     /**
@@ -181,6 +205,12 @@ private:
      * @brief Update the flag "is Frozen" in function of flags of models
      */
     void _updateIsFrozen();
+
+
+    /**
+     * @brief Update with the definition of first model
+     */
+    void _updateWithDefinitionOfFirstModel();
 
 
 private:

@@ -46,7 +46,11 @@ SOURCES += main.cpp \
     model/iop/outputm.cpp \
     controller/scenariocontroller.cpp \
     viewModel/actionvm.cpp \
-    controller/actioneditorcontroller.cpp
+    controller/actioneditorcontroller.cpp \
+    viewModel/iop/inputvm.cpp \
+    viewModel/iop/outputvm.cpp \
+    misc/terminationsignalwatcher.cpp \
+    misc/collapsiblecolumn.cpp
 
 HEADERS += \
     model/agentm.h \
@@ -88,7 +92,11 @@ HEADERS += \
     model/iop/outputm.h  \
     controller/scenariocontroller.h \
     viewModel/actionvm.h \
-    controller/actioneditorcontroller.h
+    controller/actioneditorcontroller.h \
+    viewModel/iop/inputvm.h \
+    viewModel/iop/outputvm.h \
+    misc/terminationsignalwatcher.h \
+    misc/collapsiblecolumn.h
 
 
 RESOURCES += qml.qrc
@@ -123,7 +131,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
-QML_IMPORT_PATH = ../../frameworks
+QML_IMPORT_PATH = ../../frameworks .
 
 
 # Additional import path used to resolve QML modules just for Qt Quick Designer

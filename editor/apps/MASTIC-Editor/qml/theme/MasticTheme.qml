@@ -67,8 +67,6 @@ Item {
     // Colors
     //
     //-----------------------------------------
-
-
     readonly property color whiteColor: "#FFFFFF"
     readonly property color blackColor: "#17191E"
 
@@ -77,16 +75,15 @@ Item {
 
     readonly property color veryDarkGreyColor: "#282D34"
     readonly property color darkGreyColor2: "#2B3137"
-    readonly property color darkGreyColor: "#3C424F"
-    readonly property color greyColor : "#525A66"
-    readonly property color greyColor2 : "#3B424F"
+    readonly property color color : "#34393b"
+
+    readonly property color darkBlueGreyColor: "#3C424F"
+    readonly property color blueGreyColor : "#525A66"
+    readonly property color lightBlueGreyColor: "#8896AA"
+
+    readonly property color darkGreyColor : "#575756"
+    readonly property color greyColor : "#706f6f"
     readonly property color lightGreyColor : "#9D9C9C"
-
-    readonly property color blueGreyColor: "#8896AA"
-    readonly property color darkBlueGreyColor: "#525A66"
-
-
-
 
     readonly property color orangeColor: "#F39200"
 
@@ -101,12 +98,8 @@ Item {
     readonly property string defaultFontFamily: "Arial"
 
 
-    property alias labelFontFamilyExtraBold : fontAkrobatExtraBold.name
-    property alias labelFontFamilyBlack : fontAkrobatBlack.name
-
     property alias labelFontFamily : fontAkrobat.name
     property alias textFontFamily : fontBloggerSans.name
-
 
     FontLoader {
         id: fontAkrobat
@@ -114,12 +107,10 @@ Item {
     }
 
     FontLoader {
-        id: fontAkrobatBlack
         source: "qrc:/resources/fonts/akrobat/Akrobat-Black.ttf"
     }
 
     FontLoader {
-        id: fontAkrobatExtraBold
         source: "qrc:/resources/fonts/akrobat/Akrobat-ExtraBold.ttf"
     }
 
@@ -128,27 +119,34 @@ Item {
         source: "qrc:/resources/fonts/blogger-sans/Blogger_Sans.ttf"
     }
 
+    FontLoader {
+        source: "qrc:/resources/fonts/blogger-sans/Blogger_Sans-Medium.ttf"
+    }
+
+    FontLoader {
+        source: "qrc:/resources/fonts/blogger-sans/Blogger_Sans-Light.ttf"
+    }
 
 
     // Heading font (level1)
     readonly property font headingFont: Qt.font({
-                                                 family: labelFontFamilyBlack,
-                                                 pixelSize: 20,
-                                                 weight: Font.Black
-                                                 });
+                                                    family: labelFontFamily,
+                                                    pixelSize: 20,
+                                                    weight: Font.Black
+                                                });
 
 
     // Heading font (level2)
     readonly property font heading2Font: Qt.font({
-                                                 family: textFontFamily,
-                                                 pixelSize: 16
+                                                     family: textFontFamily,
+                                                     pixelSize: 16
                                                  });
 
     // Normal font
     readonly property font normalFont: Qt.font({
-                                                family: textFontFamily,
-                                                pixelSize: 14
-                                                });
+                                                   family: textFontFamily,
+                                                   pixelSize: 14
+                                               });
 
 
 
@@ -178,12 +176,12 @@ Item {
     readonly property color agentsListLabelColor: theme.whiteColor
     readonly property color agentsListLabel2Color: theme.whiteColor
     readonly property color agentsListPressedLabel2Color: theme.lightGreyColor
-    readonly property color agentsListTextColor: theme.blueGreyColor
+    readonly property color agentsListTextColor: theme.lightBlueGreyColor
 
     readonly property color agentOFFLabelColor: theme.lightGreyColor
     readonly property color agentOFFLabel2Color: theme.lightGreyColor
     readonly property color agentOFFPressedLabel2Color: theme.greyColor
-    readonly property color agentOFFTextColor: theme.greyColor2
+    readonly property color agentOFFTextColor: theme.darkBlueGreyColor
 
 
     // List
@@ -202,10 +200,12 @@ Item {
     //-----------------------------------------
 
     // Background
-    readonly property color definitionEditorsBackgroundColor: "#282C88"
+    readonly property color definitionEditorsBackgroundColor: veryDarkGreyColor
+    readonly property color definitionEditorsBackgroundBorderColor: greyColor
 
     // Labels
     readonly property color definitionEditorsLabelColor: theme.whiteColor
+    readonly property color definitionEditorsAgentDescriptionColor: theme.lightGreyColor
 
 
 
@@ -232,15 +232,17 @@ Item {
     //
     readonly property color agentsMappingBackgroundColor: theme.blackColor
     // - grid
-    readonly property color agentsMappingGridLineColor:  theme.darkGreyColor
-    readonly property color agentsMappingGridSublineColor: theme.veryDarkGreyColor
-//"#29313A"
+    readonly property color agentsMappingGridLineColor:  "#3E414B"
+    readonly property color agentsMappingGridSublineColor: "#232830"
 
     //
     // Links
     //
     // - Default state
-    readonly property int agentsMappingLinkDefaultWidth: 4
+    readonly property int agentsMappingLinkDefaultWidth: 3
+    readonly property int agentsMappingBrinDefaultWidth: 6
+
+
     readonly property color agentsMappingLinkDefaultColor: theme.whiteColor
     // - Hover state
     readonly property int agentsMappingLinkHoverFuzzyRadius: 4
@@ -250,5 +252,27 @@ Item {
     readonly property color agentsMappingLinkPressColor: "firebrick"
 
 
+    // links colors
+    readonly property color orangeColor2 : "#e37724"
+    readonly property color darkOrangeColor2 : "#53382c"
+
+    readonly property color redColor2 : "#cf4f56"
+    readonly property color darkRedColor2 : "#4d3033"
+
+    readonly property color purpleColor : "#8e71b0"
+    readonly property color darkPurpleColor : "#3b3649"
+
+    readonly property color greenColor : "#14b2ad"
+    readonly property color darkGreenColor : "#214848"
+
+
+    //
+    // Agents
+    //
+    readonly property color agentsONNameMappingColor : theme.whiteColor
+    readonly property color agentsOFFNameMappingColor : theme.greyColor
+
+    readonly property color agentsONInputsOutputsMappingColor : theme.whiteColor
+    readonly property color agentsOFFInputsOutputsMappingColor : theme.greyColor
 
 }

@@ -31,12 +31,10 @@
 I2_ENUM(AgentIOPTypes, INPUT, OUTPUT, PARAMETER)
 
 
-
 /**
   * Type of the value of an Agent Input / Output / Parameter
   */
-I2_ENUM(AgentIOPValueTypes, INTEGER, DOUBLE, STRING, BOOL, IMPULSION, DATA)
-
+I2_ENUM(AgentIOPValueTypes, INTEGER = 1, DOUBLE, STRING, BOOL, IMPULSION, DATA, MIXED, UNKNOWN)
 
 
 /**
@@ -54,6 +52,9 @@ class AgentIOPM : public QObject
 
     // Value type of our Input / Output / Parameter
     I2_QML_PROPERTY(AgentIOPValueTypes::Value, agentIOPValueType)
+
+    // Identifier with name and value type
+    I2_CPP_NOSIGNAL_PROPERTY(QString, id)
 
     // ######################################################
     // Value of our Input / Output / Parameter

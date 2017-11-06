@@ -28,6 +28,17 @@
 //////////////////////////////////////////////////
 //initialization and configuration
 
+//This flag can be used to check if the Mastic internal thread
+//has been interrupted or not. The flag is updated when using the
+//mtic_start* (set to true) and mtic_stop (set to false) functions,
+//and also when a DIE command is received by the agent (set to false).
+//There three non-exclusive ways to check & control the execution of the mastic
+//instance and its hosting application:
+//1- using mtic_start* and mtic_stop from the hosting app
+//2- catching SIGINT in the hosting app that is triggered by a DIE command in the agent
+//3- monitoring the status of mtic_Interrupted in the hosting app
+PUBLIC extern bool mtic_Interrupted;
+
 //start, stop & kill the agent
 PUBLIC int mtic_startWithDevice(const char *networkDevice, int port);
 PUBLIC int mtic_startWithIP(const char *ipAddress, int port);
@@ -216,8 +227,8 @@ PUBLIC int mtic_setMappingName(char *name);
 PUBLIC int mtic_setMappingDescription(char *description);
 PUBLIC int mtic_setMappingVersion(char *version);
 PUBLIC int mtic_getMappingEntriesNumber(void); //number of entries in the mapping output type
-PUBLIC unsigned long mtic_addMappingEntry(char *fromOurInput, char *toAgent, char *withOutput); //returns mapping id or zero or below if creation failed
+PUBLIC unsigned long mtic_addMappingEntry(const char *fromOurInput, const char *toAgent, const char *withOutput); //returns mapping id or zero or below if creation failed
 PUBLIC int mtic_removeMappingEntryWithId(unsigned long theId);
-PUBLIC int mtic_removeMappingEntryWithName(char *fromOurInput, char *toAgent, char *withOutput);
+PUBLIC int mtic_removeMappingEntryWithName(const char *fromOurInput, const char *toAgent, const char *withOutput);
 
 #endif /* mastic_public_h */

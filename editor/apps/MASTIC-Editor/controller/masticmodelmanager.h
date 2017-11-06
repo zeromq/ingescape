@@ -39,6 +39,9 @@ class MasticModelManager : public QObject
     // List of opened definitions
     I2_QOBJECT_LISTMODEL(DefinitionM, openedDefinitions)
 
+    // Flag indicating if our global mapping is activated
+    I2_QML_PROPERTY(bool, isActivatedMapping)
+
 
 public:
     /**
@@ -82,6 +85,13 @@ public:
 
 
     /**
+     * @brief Get the map from agent name to list of active agents
+     * @return
+     */
+    QHash<QString, QList<AgentM*>> getMapFromAgentNameToActiveAgentsList();
+
+
+    /**
      * @brief Delete a model of Agent
      * @param agant
      */
@@ -89,10 +99,11 @@ public:
 
 
     /**
-     * @brief Add a model of agent definition
-     * @param definition
+     * @brief Add a model of agent definition for an agent name
+     * @param agentDefinition
+     * @param agentName
      */
-    void addAgentDefinition(DefinitionM* definition);
+    void addAgentDefinitionForAgentName(DefinitionM* agentDefinition, QString agentName);
 
 
     /**
@@ -100,7 +111,7 @@ public:
      * @param definitionName
      * @return
      */
-    QList<DefinitionM*> getAgentDefinitionsListFromName(QString definitionName);
+    QList<DefinitionM*> getAgentDefinitionsListFromDefinitionName(QString definitionName);
 
 
     /**
@@ -111,10 +122,11 @@ public:
 
 
     /**
-     * @brief Add a model of agent mapping
+     * @brief Add a model of agent mapping for an agent name
      * @param agentMapping
+     * @param agentName
      */
-    void addAgentMapping(AgentMappingM* agentMapping);
+    void addAgentMappingForAgentName(AgentMappingM* agentMapping, QString agentName);
 
 
     /**
@@ -122,7 +134,14 @@ public:
      * @param name
      * @return
      */
-    QList<AgentMappingM*> getAgentMappingsListFromName(QString mappingName);
+    QList<AgentMappingM*> getAgentMappingsListFromMappingName(QString mappingName);
+
+
+    /**
+     * @brief Delete a model of agent mapping
+     * @param agentMapping
+     */
+    void deleteAgentMapping(AgentMappingM* agentMapping);
 
 
     /**
@@ -130,7 +149,15 @@ public:
      * @param agentName
      * @return
      */
-    QList<ElementMappingM*> getMergedListOfMappingElementsFromAgentName(QString agentName);
+    QList<ElementMappingM*> getMergedListOfInputMappingElementsFromAgentName(QString agentName);
+
+
+    /**
+     * @brief Get the merged list of all (models of) mapping elements which connect an output of the agent
+     * @param agentName
+     * @return
+     */
+    QList<ElementMappingM*> getMergedListOfOutputMappingElementsFromAgentName(QString agentName);
 
 
     /**
@@ -175,35 +202,10 @@ Q_SIGNALS:
 
 
     /**
-     * @brief Signal emitted when a new model of agent definition has been created
-     * @param definition
+     * @brief Signal emitted when a model of agent will be deleted
      * @param agent
      */
-    void agentDefinitionCreated(DefinitionM* definition, AgentM* agent);
-
-
-    /**
-     * @brief Signal emitted when a new model of agent mapping has been created
-     * @param agentMapping
-     * @param agent
-     */
-    void agentMappingCreated(AgentMappingM* agentMapping, AgentM* agent);
-
-
-    /**
-     * @brief Signal emitted when a new model of mapping element has been created
-     * @param mappingElement
-     */
-    void mappingElementCreated(ElementMappingM* mappingElement);
-
-
-    /**
-     * @brief Signal emitted when the flag "is Muted" from an output of agent updated
-     * @param agent
-     * @param isMuted
-     * @param outputName
-     */
-    void isMutedFromOutputOfAgentUpdated(AgentM* agent, bool isMuted, QString outputName);
+    void agentModelWillBeDeleted(AgentM* agent);
 
 
 public Q_SLOTS:
@@ -297,18 +299,43 @@ private:
 
 
     /**
-     * @brief Update definition variants of a list of definitions with the same name
+     * @brief Update definition variants of the list of definitions with the same name
      * @param definitionName
      */
     void _updateDefinitionVariants(QString definitionName);
 
 
     /**
-     * @brief Update the merged list of mapping elements for the agent name
+     * @brief Update merged lists of mapping elements for the agent name
      * @param agentName
      * @param agentMapping
      */
-    void _updateMergedListOfMappingElementsForAgentName(QString agentName, AgentMappingM* agentMapping);
+    void _updateMergedListsOfMappingElementsForAgentName(QString agentName, AgentMappingM* agentMapping);
+
+
+    /**
+     * @brief Clean merged lists of mapping elements for the agent name
+     * @param agentName
+     */
+    void _cleanMergedListsOfMappingElementsForAgentName(QString agentName);
+
+
+    /**
+     * @brief Print all models of agents (for Debug)
+     */
+    void _printAgents();
+
+
+    /**
+     * @brief Print all models of agent definitions (for Debug)
+     */
+    void _printDefinitions();
+
+
+    /**
+     * @brief Print all models of agent mappings (for Debug)
+     */
+    void _printMappings();
 
 
 private:
@@ -324,9 +351,6 @@ private:
     // Helper to manage JSON definitions of agents
     JsonHelper* _jsonHelper;
 
-    // List of all models of agents
-    //QList<AgentM*> _allAgentsModel;
-
     // Map from "peer id" to a model of agent
     QHash<QString, AgentM*> _mapFromPeerIdToAgentM;
 
@@ -340,7 +364,10 @@ private:
     QHash<QString, QList<AgentMappingM*>> _mapFromNameToAgentMappingsList;
 
     // Map from agent name to the merged list of all (models of) mapping elements which connect an input of the agent
-    QHash<QString, QList<ElementMappingM*>> _mapFromAgentNameToMergedListOfMappingElements;
+    QHash<QString, QList<ElementMappingM*>> _mapFromAgentNameToMergedListOfInputMappingElements;
+
+    // Map from agent name to the merged list of all (models of) mapping elements which connect an output of the agent
+    QHash<QString, QList<ElementMappingM*>> _mapFromAgentNameToMergedListOfOutputMappingElements;
 
 };
 
