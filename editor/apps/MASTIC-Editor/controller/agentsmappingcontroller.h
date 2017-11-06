@@ -150,6 +150,27 @@ private Q_SLOTS:
     void _onAgentsInMappingChanged();
 
 
+    /**
+     * @brief Slot when some view models of inputs have been added to an agent in mapping
+     * @param inputsListAdded
+     */
+    void _onInputsListAdded(QList<InputVM*> inputsListAdded);
+
+
+    /**
+     * @brief Slot when some view models of outputs have been added to an agent in mapping
+     * @param outputsListAdded
+     */
+    void _onOutputsListAdded(QList<OutputVM*> outputsListAdded);
+
+
+    /**
+     * @brief Slot when some view models of outputs will be removed from an agent in mapping
+     * @param outputsListWillBeRemoved
+     */
+    void _onOutputsListRemoved(QList<OutputVM*> outputsListWillBeRemoved);
+
+
 private:
     /**
      * @brief Add new model(s) of agent to the current mapping at a specific position

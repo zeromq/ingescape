@@ -260,44 +260,11 @@ void AgentInMappingVM::_agentModelAdded(AgentM* model)
         _inputsList.append(inputsListToAdd);
         _outputsList.append(outputsListToAdd);
 
-        // First model of agent to be ever submitted.
-        /*if (_models.count() == 0)
-        {
-            qInfo() << "Add initial agent model";
+        // Emit signal "Inputs List Added"
+        Q_EMIT inputsListAdded(inputsListToAdd);
 
-            // Create the list of input (PointMapVM)
-            _addPointMapInInternalInputList(model->definition());
-
-            // Create the list of output (PointMapVM)
-            _addPointMapInInternalOutputList(model->definition());
-
-            // Pull the creation of new MapBetweenIOPVM...
-            Q_EMIT newDefinitionInAgentMapping(this);
-        }
-        // Another model of agent is provided. Must show "patte blanche".
-        else
-        {
-            AgentM* firstModel = _models.toList().first();
-            if (firstModel != NULL)
-            {
-                // Check if this agent has exactly the same definition as the first agent of internal list
-                if (!DefinitionM::areIdenticals(firstModel->definition(), model->definition()))
-                {
-                    // Should handle the difference by creating the missing INPUT / OUTPUT. More work is done at their creation.
-
-                    qInfo() << "Add agent model but defintion is different.";
-
-                    // Create the list of input (PointMapVM)
-                    _addPointMapInInternalInputList(model->definition());
-
-                    // Create the list of output (PointMapVM)
-                    _addPointMapInInternalOutputList(model->definition());
-
-                    // Pull the creation of new MapBetweenIOPVM...
-                    Q_EMIT newDefinitionInAgentMapping(this);
-                }
-            }
-        }*/
+        // Emit signal "Outputs List Added"
+        Q_EMIT outputsListAdded(outputsListToAdd);
     }
 }
 

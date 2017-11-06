@@ -100,10 +100,24 @@ public:
 Q_SIGNALS:
 
     /**
-     * @brief Signal emitted when a definition is added to the agent mapping
-     * @param agentInMapping
+     * @brief Signal emitted when some view models of inputs have been added to our agent in mapping
+     * @param inputsListAdded
      */
-    void newDefinitionInAgentMapping(AgentInMappingVM* agentInMapping);
+    void inputsListAdded(QList<InputVM*> inputsListAdded);
+
+
+    /**
+     * @brief Signal emitted when some view models of outputs have been added to our agent in mapping
+     * @param outputsListAdded
+     */
+    void outputsListAdded(QList<OutputVM*> outputsListAdded);
+
+
+    /**
+     * @brief Signal emitted when some view models of outputs will be removed from our agent in mapping
+     * @param outputsListWillBeRemoved
+     */
+    void outputsListRemoved(QList<OutputVM*> outputsListWillBeRemoved);
 
 
 public Q_SLOTS:

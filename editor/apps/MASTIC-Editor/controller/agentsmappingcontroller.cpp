@@ -402,22 +402,16 @@ void AgentsMappingController::_onAgentsInMappingChanged()
         for (AgentInMappingVM* agentInMapping : newListOfAgentsInMapping) {
             if ((agentInMapping != NULL) && !_previousListOfAgentsInMapping.contains(agentInMapping))
             {
-                qDebug() << "Agent in mapping" << agentInMapping->agentName() << "ADDED with" << agentInMapping->outputsList()->count() << "outputs";
+                qDebug() << "Agent in mapping" << agentInMapping->agentName() << "ADDED";
 
-                // FIXME TODO: add a connect to changes on list of outputs
-                // On ne peut pas le faire directement car on aura besoin de connaitre le nom de l'agent
-                //connect(&agentInMapping->outputsList(), &AbstractI2CustomItemListModel::countChanged, this, &AgentsMappingController::on)
+                // Connect to signals from the new agent in mapping
+                connect(agentInMapping, &AgentInMappingVM::inputsListAdded, this, &AgentsMappingController::_onInputsListAdded);
+                connect(agentInMapping, &AgentInMappingVM::outputsListAdded, this, &AgentsMappingController::_onOutputsListAdded);
+                connect(agentInMapping, &AgentInMappingVM::outputsListRemoved, this, &AgentsMappingController::_onOutputsListRemoved);
 
-                QList<OutputM*> outputsList;
-                foreach (OutputVM* output, agentInMapping->outputsList()->toList()) {
-                    if ((output != NULL) && (output->firstModel() != NULL)) {
-                        outputsList.append(output->firstModel());
-                    }
-                }
-                if (outputsList.count() > 0) {
-                    // Emit signal "Add Inputs to Editor for Outputs"
-                    Q_EMIT addInputsToEditorForOutputs(agentInMapping->agentName(), outputsList);
-                }
+                // Emit signals "Inputs/Outputs List Added" for initial list of inputs and initial list of outputs
+                agentInMapping->inputsListAdded(agentInMapping->inputsList()->toList());
+                agentInMapping->outputsListAdded(agentInMapping->outputsList()->toList());
             }
         }
     }
@@ -429,26 +423,85 @@ void AgentsMappingController::_onAgentsInMappingChanged()
         for (AgentInMappingVM* agentInMapping : _previousListOfAgentsInMapping) {
             if ((agentInMapping != NULL) && !newListOfAgentsInMapping.contains(agentInMapping))
             {
-                qDebug() << "Agent in mapping" << agentInMapping->agentName() << "REMOVED with" << agentInMapping->outputsList()->count() << "outputs";
+                qDebug() << "Agent in mapping" << agentInMapping->agentName() << "REMOVED";
 
-                // FIXME TODO: add a DIS-connect to changes on list of outputs
-                // On ne peut pas le faire directement car on aura besoin de connaitre le nom de l'agent
+                // Emit signal "Outputs List Removed" with current list of outputs
+                agentInMapping->outputsListRemoved(agentInMapping->outputsList()->toList());
 
-                QList<OutputM*> outputsList;
-                foreach (OutputVM* output, agentInMapping->outputsList()->toList()) {
-                    if ((output != NULL) && (output->firstModel() != NULL)) {
-                        outputsList.append(output->firstModel());
-                    }
-                }
-                if (outputsList.count() > 0) {
-                    // Emit signal "Add Inputs to Editor for Outputs"
-                    Q_EMIT removeInputsToEditorForOutputs(agentInMapping->agentName(), outputsList);
-                }
+                // DIS-connect to signals from the previous agent in mapping
+                disconnect(agentInMapping, &AgentInMappingVM::inputsListAdded, this, &AgentsMappingController::_onInputsListAdded);
+                disconnect(agentInMapping, &AgentInMappingVM::outputsListAdded, this, &AgentsMappingController::_onOutputsListAdded);
+                disconnect(agentInMapping, &AgentInMappingVM::outputsListRemoved, this, &AgentsMappingController::_onOutputsListRemoved);
             }
         }
     }
 
     _previousListOfAgentsInMapping = newListOfAgentsInMapping;
+}
+
+
+/**
+ * @brief Slot when some view models of inputs have been added to an agent in mapping
+ * @param inputsListAdded
+ */
+void AgentsMappingController::_onInputsListAdded(QList<InputVM*> inputsListAdded)
+{
+    AgentInMappingVM* agentInMapping = qobject_cast<AgentInMappingVM*>(sender());
+    if ((agentInMapping != NULL) && (inputsListAdded.count() > 0)) {
+        qDebug() << "_on Inputs List Added from agent" << agentInMapping->agentName() << inputsListAdded.count();
+
+        // FIXME TODO ESTIA: appel à _onCreateMapBetweenIopInMappingFromAgentInMapping en l'adaptant en fonction des paramètres (agentInMapping->agentName() et inputsListAdded ?)
+    }
+}
+
+
+/**
+ * @brief Slot when some view models of outputs have been added to an agent in mapping
+ * @param outputsListAdded
+ */
+void AgentsMappingController::_onOutputsListAdded(QList<OutputVM*> outputsListAdded)
+{
+    AgentInMappingVM* agentInMapping = qobject_cast<AgentInMappingVM*>(sender());
+    if ((agentInMapping != NULL) && (outputsListAdded.count() > 0)) {
+        qDebug() << "_on Outputs List Added from agent" << agentInMapping->agentName() << outputsListAdded.count();
+
+        // FIXME TODO ESTIA: appel à _onCreateMapBetweenIopInMappingFromAgentInMapping en l'adaptant en fonction des paramètres (agentInMapping->agentName() et outputsListAdded ?)
+
+        QList<OutputM*> models;
+        foreach (OutputVM* output, outputsListAdded) {
+            if ((output != NULL) && (output->firstModel() != NULL)) {
+                models.append(output->firstModel());
+            }
+        }
+        if (models.count() > 0) {
+            // Emit signal "Add Inputs to Editor for Outputs"
+            Q_EMIT addInputsToEditorForOutputs(agentInMapping->agentName(), models);
+        }
+    }
+}
+
+
+/**
+ * @brief Slot when some view models of outputs will be removed from an agent in mapping
+ * @param outputsListWillBeRemoved
+ */
+void AgentsMappingController::_onOutputsListRemoved(QList<OutputVM*> outputsListWillBeRemoved)
+{
+    AgentInMappingVM* agentInMapping = qobject_cast<AgentInMappingVM*>(sender());
+    if ((agentInMapping != NULL) && (outputsListWillBeRemoved.count() > 0)) {
+        qDebug() << "_on Outputs List Removed from agent" << agentInMapping->agentName() << outputsListWillBeRemoved.count();
+
+        QList<OutputM*> models;
+        foreach (OutputVM* output, outputsListWillBeRemoved) {
+            if ((output != NULL) && (output->firstModel() != NULL)) {
+                models.append(output->firstModel());
+            }
+        }
+        if (models.count() > 0) {
+            // Emit signal "Remove Inputs to Editor for Outputs"
+            Q_EMIT removeInputsToEditorForOutputs(agentInMapping->agentName(), models);
+        }
+    }
 }
 
 
@@ -488,13 +541,6 @@ void AgentsMappingController::_addAgentModelsToMappingAtPosition(QString agentNa
 
             // Add this new Agent In Mapping VM in the list for the qml
             _agentInMappingVMList.append(agentInMapping);
-
-            // Call for the first shot -> new call will be proceed by the connect mechanism
-            _onCreateMapBetweenIopInMappingFromAgentInMapping(agentInMapping);
-
-            // Connect to signal "new Definition added to agent in mapping" from the new definition
-            connect(agentInMapping, &AgentInMappingVM::newDefinitionInAgentMapping,
-                    this, &AgentsMappingController::_onCreateMapBetweenIopInMappingFromAgentInMapping);
 
             qInfo() << "A new agent mapping has been added:" << agentName;
         }
