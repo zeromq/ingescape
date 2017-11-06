@@ -483,12 +483,10 @@ Item {
 
                     Link {
                         id : link
-
+                        controller : rootItem.controller
                         mapBetweenIOPVM: model.QtObject
                     }
                 }
-
-
 
                 //
                 // Nodes

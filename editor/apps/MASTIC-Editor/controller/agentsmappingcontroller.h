@@ -48,6 +48,8 @@ class AgentsMappingController : public QObject
     // Selected agent in the mapping
     I2_QML_PROPERTY_DELETE_PROOF(AgentInMappingVM*, selectedAgent)
 
+    // Selected map between agents in the mapping
+    I2_QML_PROPERTY_DELETE_PROOF(MapBetweenIOPVM*, selectedMapBetweenIOP)
 
 public:
     /**
