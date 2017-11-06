@@ -230,6 +230,25 @@ I2CubicBezierCurve {
     }
 
 
+    focus: true
+    Keys.onPressed: {
+        if (event.key === Qt.Key_Backspace || event.key === Qt.Key_Delete) {
+            if (controller && controller.selectedMapBetweenIOP) {
+                console.log( " delete " + controller.selectedMapBetweenIOP);
+            }
+
+            event.accepted = true;
+        }
+    }
+
+    onFocusChanged: {
+        if (!focus) {
+            if (controller && controller.selectedMapBetweenIOP) {
+                controller.selectedMapBetweenIOP = null;
+            }
+        }
+    }
+
     //--------------------------------
     //
     // Content
@@ -251,16 +270,5 @@ I2CubicBezierCurve {
             rootItem.clicked();
             rootItem.forceActiveFocus();
         }
-    }
-
-
-    onActiveFocusChanged: {
-        if (activeFocus) {
-            console.log("active focus " + activeFocus);
-        }
-    }
-
-    Keys.onSpacePressed: {
-        console.log("delete Link");
     }
 }

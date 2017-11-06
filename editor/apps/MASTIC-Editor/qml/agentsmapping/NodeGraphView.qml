@@ -337,7 +337,7 @@ Item {
                     drag.source.opacity = _previousOpacityOfSource;
                 }
 
-                 dropGhost.agent = null;
+                dropGhost.agent = null;
             }
         }
 
