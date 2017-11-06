@@ -337,7 +337,7 @@ Item {
                     drag.source.opacity = _previousOpacityOfSource;
                 }
 
-                 dropGhost.agent = null;
+                dropGhost.agent = null;
             }
         }
 
@@ -483,12 +483,10 @@ Item {
 
                     Link {
                         id : link
-
+                        controller : rootItem.controller
                         mapBetweenIOPVM: model.QtObject
                     }
                 }
-
-
 
                 //
                 // Nodes

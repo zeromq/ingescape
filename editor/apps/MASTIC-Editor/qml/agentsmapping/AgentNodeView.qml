@@ -177,6 +177,7 @@ Item {
                 id: removeButton
 
                 visible : (rootItem.agentMappingVM && !rootItem.agentMappingVM.isON)
+                activeFocusOnPress: true
 
                 anchors {
                     top: parent.top

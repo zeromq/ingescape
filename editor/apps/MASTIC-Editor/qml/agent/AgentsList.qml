@@ -173,6 +173,7 @@ Item {
                 id: btnAddAgent
 
                 enabled:false
+                activeFocusOnPress: true
 
                 anchors {
                     verticalCenter: parent.verticalCenter
@@ -208,6 +209,7 @@ Item {
                 anchors {
                     verticalCenter: parent.verticalCenter
                 }
+                activeFocusOnPress: true
 
                 style: Theme.LabellessSvgButtonStyle {
                     fileCache: MasticTheme.svgFileMASTIC
@@ -243,6 +245,7 @@ Item {
                 id: btnExportAgent
 
                 enabled: visible & (controller.selectedAgent ? true : false)
+                activeFocusOnPress: true
 
                 anchors {
                     verticalCenter: parent.verticalCenter
@@ -279,6 +282,7 @@ Item {
                 id: btnRemoveAgent
 
                 enabled: false
+                activeFocusOnPress: true
 
                 anchors {
                     verticalCenter: parent.verticalCenter

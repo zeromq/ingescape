@@ -31,6 +31,7 @@ I2CubicBezierCurve {
     //--------------------------------
 
     property var mapBetweenIOPVM : null
+    property var controller : null
     property var inputModel : mapBetweenIOPVM ?  mapBetweenIOPVM.pointTo : null
     property var outputModel : mapBetweenIOPVM ?  mapBetweenIOPVM.pointFrom : null
 
@@ -127,7 +128,7 @@ I2CubicBezierCurve {
                         break;
                     }
                 } else {
-                     defaultColor;
+                    defaultColor;
                 }
             }
 
@@ -142,7 +143,7 @@ I2CubicBezierCurve {
 
 
     // Fuzzy contour
-    fuzzyColor: mouseArea.pressed ? MasticTheme.lightGreyColor : "transparent"
+    fuzzyColor: (mapBetweenIOPVM && controller.selectedMapBetweenIOP === mapBetweenIOPVM) ? MasticTheme.lightGreyColor : "transparent"
     fuzzyRadius: 2
 
 
@@ -156,7 +157,15 @@ I2CubicBezierCurve {
     // Emitted when there is a click
     signal clicked();
 
-
+    onClicked: {
+        if (controller) {
+            if (controller.selectedMapBetweenIOP !== model.QtObject) {
+                controller.selectedMapBetweenIOP = model.QtObject;
+            } else {
+                controller.selectedMapBetweenIOP = null;
+            }
+        }
+    }
 
     //--------------------------------
     //
@@ -212,7 +221,7 @@ I2CubicBezierCurve {
     Component.onCompleted: {
         // Compute control points when our item is created
         updateControlPoints();
-  }
+    }
 
 
 
@@ -220,6 +229,25 @@ I2CubicBezierCurve {
         NumberAnimation {}
     }
 
+
+    focus: true
+    Keys.onPressed: {
+        if (event.key === Qt.Key_Backspace || event.key === Qt.Key_Delete) {
+            if (controller && controller.selectedMapBetweenIOP) {
+                console.log( " delete " + controller.selectedMapBetweenIOP);
+            }
+
+            event.accepted = true;
+        }
+    }
+
+    onFocusChanged: {
+        if (!focus) {
+            if (controller && controller.selectedMapBetweenIOP) {
+                controller.selectedMapBetweenIOP = null;
+            }
+        }
+    }
 
     //--------------------------------
     //
@@ -232,7 +260,7 @@ I2CubicBezierCurve {
         id: mouseArea
 
         anchors {
-           fill: parent
+            fill: parent
         }
 
         enabled: rootItem.visible
@@ -240,6 +268,7 @@ I2CubicBezierCurve {
 
         onClicked: {
             rootItem.clicked();
+            rootItem.forceActiveFocus();
         }
     }
 }

@@ -88,6 +88,7 @@ Item {
                 bottomMargin: 20
             }
 
+            activeFocusOnPress: true
             checkable: true
 
             style: Theme.LabellessSvgButtonStyle {

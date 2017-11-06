@@ -101,6 +101,7 @@ I2PopupBase {
             }
 
             text: "X"
+            activeFocusOnPress: true
 
             onClicked: {
                 // Close our popup
