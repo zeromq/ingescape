@@ -240,7 +240,8 @@ void AgentInMappingVM::_agentModelAdded(AgentM* model)
         QList<OutputVM*> outputsListToAdd;
 
         // Traverse the list of models of inputs in the definition
-        foreach (AgentIOPM* input, model->definition()->inputsList()->toList()) {
+        foreach (AgentIOPM* input, model->definition()->inputsList()->toList())
+        {
             InputVM* newInputVM = _inputModelAdded(input);
             if (newInputVM != NULL) {
                 inputsListToAdd.append(newInputVM);
@@ -248,7 +249,8 @@ void AgentInMappingVM::_agentModelAdded(AgentM* model)
         }
 
         // Traverse the list of models of outputs in the definition
-        foreach (OutputM* output, model->definition()->outputsList()->toList()) {
+        foreach (OutputM* output, model->definition()->outputsList()->toList())
+        {
             OutputVM* newOutputVM = _outputModelAdded(output);
             if (newOutputVM != NULL) {
                 outputsListToAdd.append(newOutputVM);
@@ -308,7 +310,29 @@ void AgentInMappingVM::_agentModelRemoved(AgentM* model)
 {
     if ((model != NULL) && (model->definition() != NULL))
     {
+        // Traverse the list of models of inputs in the definition
+        foreach (AgentIOPM* input, model->definition()->inputsList()->toList())
+        {
+            InputVM* inputVM = _inputModelRemoved(input);
+            Q_UNUSED(inputVM)
 
+            // Usefull ?
+            /*if ((inputVM != NULL) && (inputVM->models()->count() == 0)) {
+                _inputsList.remove(inputVM);
+            }*/
+        }
+
+        // Traverse the list of models of outputs in the definition
+        foreach (OutputM* output, model->definition()->outputsList()->toList())
+        {
+            OutputVM* outputVM = _outputModelRemoved(output);
+            Q_UNUSED(outputVM)
+
+            // Usefull ?
+            /*if ((outputVM != NULL) && (outputVM->models()->count() == 0)) {
+                _outputsList.remove(outputVM);
+            }*/
+        }
     }
 }
 
@@ -353,8 +377,8 @@ InputVM* AgentInMappingVM::_inputModelAdded(AgentIOPM* input)
                 }
             }
             else {
-                // FIXME TODO
-                //inputVM->models.append(input)
+                // Add this new model to the list
+                inputVM->models()->append(input);
             }
         }
         // Input id is NOT defined
@@ -364,6 +388,42 @@ InputVM* AgentInMappingVM::_inputModelAdded(AgentIOPM* input)
     }
 
     return newInputVM;
+}
+
+
+/**
+ * @brief A model of input has been removed
+ * @param input
+ * @return
+ */
+InputVM* AgentInMappingVM::_inputModelRemoved(AgentIOPM* input)
+{
+    InputVM* inputVM = NULL;
+
+    if (input != NULL)
+    {
+        // Input id is defined
+        if (!input->id().isEmpty())
+        {
+            inputVM = getInputFromId(input->id());
+            if (inputVM != NULL)
+            {
+                // Remove this model from the list
+                inputVM->models()->remove(input);
+            }
+            /*else
+            {
+                inputVM = getInputFromName(input->name());
+                if (inputVM != NULL)
+                {
+                    // Remove this model from the list
+                    inputVM->models().remove(input);
+                }
+            }*/
+        }
+    }
+
+    return inputVM;
 }
 
 
@@ -407,8 +467,8 @@ OutputVM* AgentInMappingVM::_outputModelAdded(OutputM* output)
                 }
             }
             else {
-                // FIXME TODO
-                //outputVM->models.append(output)
+                // Add this new model to the list
+                outputVM->models()->append(output);
             }
         }
         // Output id is NOT defined
@@ -418,6 +478,43 @@ OutputVM* AgentInMappingVM::_outputModelAdded(OutputM* output)
     }
 
     return newOutputVM;
+}
+
+
+
+/**
+ * @brief A model of output has been removed
+ * @param output
+ * @return
+ */
+OutputVM* AgentInMappingVM::_outputModelRemoved(OutputM* output)
+{
+    OutputVM* outputVM = NULL;
+
+    if (output != NULL)
+    {
+        // Input id is defined
+        if (!output->id().isEmpty())
+        {
+            outputVM = getOutputFromId(output->id());
+            if (outputVM != NULL)
+            {
+                // Remove this model from the list
+                outputVM->models()->remove(output);
+            }
+            /*else
+            {
+                outputVM = getOutputFromName(output->name());
+                if (outputVM != NULL)
+                {
+                    // Remove this model from the list
+                    outputVM->models().remove(output);
+                }
+            }*/
+        }
+    }
+
+    return outputVM;
 }
 
 
@@ -552,11 +649,33 @@ OutputVM* AgentInMappingVM::_outputModelAdded(OutputM* output)
  */
 void AgentInMappingVM::_updateWithAllModels()
 {
-    /*foreach (AgentM* model, _models.toList()) {
-        if (model != NULL)
+    bool areIdenticalsAllDefinitions = true;
+
+    if (_models.count() > 1)
+    {
+        QList<AgentM*> modelsList = _models.toList();
+
+        AgentM* firstModel = modelsList.at(0);
+        DefinitionM* firstDefinition = NULL;
+
+        if ((firstModel != NULL) && (firstModel->definition() != NULL))
         {
+            firstDefinition = firstModel->definition();
+
+            for (int i = 1; i < modelsList.count(); i++) {
+                AgentM* model = modelsList.at(i);
+
+                if ((model != NULL) && (model->definition() != NULL))
+                {
+                    if (!DefinitionM::areIdenticals(firstDefinition, model->definition())) {
+                        areIdenticalsAllDefinitions = false;
+                        break;
+                    }
+                }
+            }
         }
-    }*/
+    }
+    setareIdenticalsAllDefinitions(areIdenticalsAllDefinitions);
 
     // Update flags in function of models
     _updateIsON();

@@ -22,17 +22,17 @@ InputVM::InputVM(QString inputName,
                  QObject *parent) : PointMapVM(inputName,
                                                inputId,
                                                parent),
-    _modelM(NULL)
+    _firstModel(NULL)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    // Allow to benefit of "DELETE PROOF"
-    setmodelM(modelM);
+    qInfo() << "New Input VM" << _name << "(" << _id << ")";
 
-    if (_modelM != NULL) {
-        qInfo() << "New Input VM" << _name << "(" << _id << ")";
-    }
+    // Connect to signal "Count Changed" from the list of models
+    connect(&_models, &AbstractI2CustomItemListModel::countChanged, this, &InputVM::_onModelsChanged);
+
+    _models.append(modelM);
 }
 
 
@@ -41,11 +41,14 @@ InputVM::InputVM(QString inputName,
  */
 InputVM::~InputVM()
 {
-    if (_modelM != NULL) {
-        qInfo() << "Delete Input VM" << _name;
-    }
+    qInfo() << "Delete Input VM" << _name << "(" << _id << ")";
 
-    setmodelM(NULL);
+    setfirstModel(NULL);
+
+    // DIS-connect to signal "Count Changed" from the list of models
+    disconnect(&_models, &AbstractI2CustomItemListModel::countChanged, this, &InputVM::_onModelsChanged);
+
+    _models.clear();
 }
 
 
@@ -57,13 +60,56 @@ InputVM::~InputVM()
 bool InputVM::canLinkWith(PointMapVM* pointMap)
 {
     OutputVM* output = qobject_cast<OutputVM*>(pointMap);
-    if ((output != NULL) && (output->modelM() != NULL)
-            && (_modelM != NULL))
+    if ((output != NULL) && (output->firstModel() != NULL)
+            && (_firstModel != NULL))
     {
         // Call parent class function
-        return _canLinkOutputToInput(output->modelM()->agentIOPValueType(), _modelM->agentIOPValueType());
+        return _canLinkOutputToInput(output->firstModel()->agentIOPValueType(), _firstModel->agentIOPValueType());
     }
     else {
         return false;
     }
+}
+
+
+/**
+ * @brief Slot when the list of models changed
+ */
+void InputVM::_onModelsChanged()
+{
+    if (_models.count() > 0) {
+        setfirstModel(_models.at(0));
+    }
+    else {
+        setfirstModel(NULL);
+    }
+
+    /*QList<AgentIOPM*> newModelsList = _models.toList();
+
+    // Model of input added
+    if (_previousModelsList.count() < newModelsList.count())
+    {
+        qDebug() << _previousModelsList.count() << "--> ADD --> " << newModelsList.count();
+
+        for (AgentIOPM* model : newModelsList) {
+            if ((model != NULL) && !_previousModelsList.contains(model))
+            {
+                qDebug() << "New model" << model->name() << "ADDED";
+            }
+        }
+    }
+    // Model of input removed
+    else if (_previousModelsList.count() > newModelsList.count())
+    {
+        qDebug() << _previousModelsList.count() << "--> REMOVE --> " << newModelsList.count();
+
+        for (AgentIOPM* model : _previousModelsList) {
+            if ((model != NULL) && !newModelsList.contains(model))
+            {
+                qDebug() << "Old model" << model->name() << "REMOVED";
+            }
+        }
+    }
+
+    _previousModelsList = newModelsList;*/
 }
