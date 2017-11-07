@@ -34,28 +34,17 @@ class ActionVM: public QObject
     // Action model
     I2_QML_PROPERTY_READONLY_DELETE_PROOF(ActionM*, actionModel)
 
-    // Color
-    I2_QML_PROPERTY(QColor, color)
-
-    // Index in the actions panel
-    I2_QML_PROPERTY(int, actionsPanelIndex)
-
-    // Line number in timeline
-    I2_QML_PROPERTY(int, lineInTimeLine)
-
-    // Start date time
-    I2_QML_PROPERTY_CUSTOM_SETTER(QDateTime, startDateTime)
+    // Start time in seconds
+    I2_CPP_PROPERTY(int, startTimeInSec)
 
     // Start date time in string format
     I2_QML_PROPERTY_CUSTOM_SETTER(QString, startTimeString)
 
-    // Revert after date time flag
-    I2_QML_PROPERTY_CUSTOM_SETTER(bool, revertAfterTime)
+    // Color
+    I2_QML_PROPERTY(QColor, color)
 
-    // Revert at date time flag
-    I2_QML_PROPERTY_CUSTOM_SETTER(bool, revertAtTime)
-
-
+    // Line number in timeline
+    I2_QML_PROPERTY(int, lineInTimeLine)
 
 public:
 
@@ -63,7 +52,7 @@ public:
      * @brief Default constructor
      * @param parent
      */
-    explicit ActionVM(ActionM* actionModel, QObject *parent = 0);
+    explicit ActionVM(ActionM* actionModel, int startTime, QObject *parent = 0);
 
     /**
       * @brief Destructor

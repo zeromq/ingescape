@@ -31,16 +31,18 @@
  */
 ActionM::ActionM(QString name, QObject *parent) : QObject(parent),
     _name(name),
-    _startTime(-1),
+    _validityDurationType(ValidationDurationType::CUSTOM),
     _validityDuration(-1),
     _shallRevert(false),
-    _revertWhenValidityIsOver(false),
-    _revertAtTime(-1),
-    _shallRearm(false)
+    _shallRevertWhenValidityIsOver(false),
+    _shallRevertAfterTime(false),
+    _revertAfterTimeInSec(-1),
+    _revertAfterTime("00:00:00"),
+    _shallRearm(false),
+    _actionsPanelIndex(-1)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
-
 }
 
 
@@ -65,12 +67,15 @@ void ActionM::copyFrom(ActionM* actionModel)
     if(actionModel != NULL)
     {
         setname(actionModel->name());
-        setstartTime(actionModel->startTime());
+        setvalidityDurationType(actionModel->validityDurationType());
         setvalidityDuration(actionModel->validityDuration());
         setshallRevert(actionModel->shallRevert());
-        setrevertWhenValidityIsOver(actionModel->revertWhenValidityIsOver());
-        setrevertAtTime(actionModel->revertAtTime());
+        setshallRevertWhenValidityIsOver(actionModel->shallRevertWhenValidityIsOver());
+        setshallRevertAfterTime(actionModel->shallRevertAfterTime());
+        setrevertAfterTimeInSec(actionModel->revertAfterTimeInSec());
+        setrevertAfterTime(actionModel->revertAfterTime());
         setshallRearm(actionModel->shallRearm());
+        setactionsPanelIndex(actionModel->actionsPanelIndex());
 
         _effectsList.deleteAllItems();
         foreach (ActionEffectM* effect, actionModel->effectsList()->toList())
@@ -89,5 +94,32 @@ void ActionM::copyFrom(ActionM* actionModel)
         }
     }
 }
+
+/**
+ * @brief Set the revertAfterTime flag
+ * @param revertAfterTime value
+ */
+void ActionM::setrevertAfterTime(QString revertAfterTime)
+{
+    if(_revertAfterTime != revertAfterTime)
+    {
+        _revertAfterTime = revertAfterTime;
+
+        // Update the start date time
+        if(revertAfterTime.isEmpty() == false)
+        {
+            QStringList splittedTime = revertAfterTime.split(':');
+            if(splittedTime.count() == 3)
+            {
+                setrevertAfterTimeInSec(QString(splittedTime.at(0)).toInt()*3600 + QString(splittedTime.at(1)).toInt()*60 + + QString(splittedTime.at(2)).toInt());
+            }
+        } else {
+            setrevertAfterTimeInSec(-1);
+        }
+
+        emit revertAfterTimeChanged(revertAfterTime);
+    }
+}
+
 
 

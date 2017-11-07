@@ -55,23 +55,22 @@ ScenarioController::~ScenarioController()
   * @brief Open the action editor
   * @param action view model
   */
-void ScenarioController::openActionEditor(ActionVM* actionVM)
+void ScenarioController::openActionEditor(ActionM* actionM)
 {
     // We check that or editor is not already opened
-    if(_mapActionsEditorControllersFromActionVM.contains(actionVM) == false)
+    if(_mapActionsEditorControllersFromActionVM.contains(actionM) == false)
     {
         // Create an empty action if we create a new one
-        if(actionVM == NULL)
+        if(actionM == NULL)
         {
-            ActionM* actionM = new ActionM("New action");
-            actionVM = new ActionVM(actionM);
+            actionM = new ActionM("New action");
         }
 
         // Create action editor controller
-        ActionEditorController* actionEditorC = new ActionEditorController(actionVM);
+        ActionEditorController* actionEditorC = new ActionEditorController(actionM);
 
         // Add action into our opened actions
-        _mapActionsEditorControllersFromActionVM.insert(actionVM,actionEditorC);
+        _mapActionsEditorControllersFromActionVM.insert(actionM,actionEditorC);
 
         // Add to list
         _openedActionsEditorsControllers.append(actionEditorC);
@@ -83,24 +82,24 @@ void ScenarioController::openActionEditor(ActionVM* actionVM)
   * @brief Delete an action from the list
   * @param action view model
   */
-void ScenarioController::deleteAction(ActionVM * actionVM)
+void ScenarioController::deleteAction(ActionM * actionM)
 {
     // Delete the popup if necessary
-    if(_mapActionsEditorControllersFromActionVM.contains(actionVM))
+    if(_mapActionsEditorControllersFromActionVM.contains(actionM))
     {
-        ActionEditorController* actionEditorC = _mapActionsEditorControllersFromActionVM.value(actionVM);
+        ActionEditorController* actionEditorC = _mapActionsEditorControllersFromActionVM.value(actionM);
 
-        _mapActionsEditorControllersFromActionVM.remove(actionVM);
+        _mapActionsEditorControllersFromActionVM.remove(actionM);
         _openedActionsEditorsControllers.remove(actionEditorC);
     }
 
     // Delete the action item
-    if(_actionsList.contains(actionVM))
+    if(_actionsList.contains(actionM))
     {
-        _actionsList.remove(actionVM);
+        _actionsList.remove(actionM);
 
-        delete actionVM;
-        actionVM = NULL;
+        delete actionM;
+        actionM = NULL;
     }
 }
 
@@ -113,7 +112,7 @@ void ScenarioController::valideActionEditor(ActionEditorController* actionEditor
     // Valide modification
     actionEditorC->validateModification();
 
-    ActionVM* originalActionVM = actionEditorC->originalAction();
+    ActionM* originalActionVM = actionEditorC->originalAction();
 
     // We check that or editor is not already opened
     if(_actionsList.contains(originalActionVM) == false)
@@ -134,13 +133,13 @@ void ScenarioController::valideActionEditor(ActionEditorController* actionEditor
   */
 void ScenarioController::closeActionEditor(ActionEditorController* actionEditorC)
 {
-    ActionVM* actionVM = actionEditorC->originalAction();
+    ActionM* actionM = actionEditorC->originalAction();
     // Delete the popup if necessary
-    if(actionVM != NULL && _mapActionsEditorControllersFromActionVM.contains(actionVM))
+    if(actionM != NULL && _mapActionsEditorControllersFromActionVM.contains(actionM))
     {
-        ActionEditorController* actionEditorC = _mapActionsEditorControllersFromActionVM.value(actionVM);
+        ActionEditorController* actionEditorC = _mapActionsEditorControllersFromActionVM.value(actionM);
 
-        _mapActionsEditorControllersFromActionVM.remove(actionVM);
+        _mapActionsEditorControllersFromActionVM.remove(actionM);
         _openedActionsEditorsControllers.remove(actionEditorC);
     }
 }
@@ -151,12 +150,12 @@ void ScenarioController::closeActionEditor(ActionEditorController* actionEditorC
   */
 void ScenarioController::deleteActionEditor(ActionEditorController* actionEditorC)
 {
-    ActionVM* actionVM = actionEditorC->originalAction();
+    ActionM* actionM = actionEditorC->originalAction();
 
     // Delete the original action
-    if(actionVM != NULL)
+    if(actionM != NULL)
     {
-        deleteAction(actionVM);
+        deleteAction(actionM);
     }
 }
 

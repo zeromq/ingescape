@@ -32,8 +32,8 @@ class ScenarioController: public QObject
 {
     Q_OBJECT
 
-    // Sorted list of ations by start time
-    I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(ActionVM, actionsList)
+    // Filtered Sorted list of actions
+    I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(ActionM, actionsList)
 
     // Sorted list of ations by start time
     I2_QOBJECT_LISTMODEL(ActionEditorController, openedActionsEditorsControllers)
@@ -54,15 +54,15 @@ public:
 
     /**
       * @brief Open the action editor
-      * @param action view model
+      * @param action model
       */
-    Q_INVOKABLE void openActionEditor(ActionVM* actionVM);
+    Q_INVOKABLE void openActionEditor(ActionM* actionM);
 
     /**
       * @brief Delete an action from the list
-      * @param action view model
+      * @param action model
       */
-    Q_INVOKABLE void deleteAction(ActionVM * actionVM);
+    Q_INVOKABLE void deleteAction(ActionM * actionM);
 
     /**
       * @brief Valide action edition
@@ -90,7 +90,7 @@ public Q_SLOTS:
 
 protected:
 
-    QHash<ActionVM*, ActionEditorController*> _mapActionsEditorControllersFromActionVM;
+    QHash<ActionM*, ActionEditorController*> _mapActionsEditorControllersFromActionVM;
 
 };
 

@@ -26,6 +26,14 @@
 #include "model/scenario/actioneffectm.h"
 #include "model/scenario/actionconditionm.h"
 
+/**
+  * Types:
+  * - Custom
+  * - Immediate
+  * - Infinite
+  */
+I2_ENUM(ValidationDurationType, CUSTOM, IMMEDIATE, INFINITE)
+
 
 /**
  * @brief The ActionM class defines the main controller of our application
@@ -37,20 +45,26 @@ class ActionM: public QObject
     // Action name
     I2_QML_PROPERTY(QString, name)
 
-    // Start time in milliseconds
-    I2_QML_PROPERTY(int, startTime)
+    // Validity duration type
+    I2_QML_PROPERTY(ValidationDurationType::Value, validityDurationType)
 
     // Validity duration in milliseconds
     I2_QML_PROPERTY(int, validityDuration)
 
-    // Flag to revert the action
+    // Shall revert the action
     I2_QML_PROPERTY(bool, shallRevert)
 
-    // Flag to revert action when validity is over
-    I2_QML_PROPERTY(bool, revertWhenValidityIsOver)
+    // Shall revert action when validity is over
+    I2_QML_PROPERTY(bool, shallRevertWhenValidityIsOver)
 
-    // Time in milliseconds when to revert
-    I2_QML_PROPERTY(int, revertAtTime)
+    // Shall revert after date time flag
+    I2_QML_PROPERTY(bool, shallRevertAfterTime)
+
+    // Revert after date time flag
+    I2_QML_PROPERTY(int, revertAfterTimeInSec)
+
+    // Revert after date time flag
+    I2_QML_PROPERTY_CUSTOM_SETTER(QString, revertAfterTime)
 
     // Flag to rearm the action
     I2_QML_PROPERTY(bool, shallRearm)
@@ -60,6 +74,9 @@ class ActionM: public QObject
 
     // List of conditions for the action
     I2_QOBJECT_LISTMODEL(ActionConditionM, conditionsList)
+
+    // Index in the actions panel
+    I2_QML_PROPERTY(int, actionsPanelIndex)
 
     // FIXME : Liste des temps de déclenchement (1 ou plus si réarmable) >> VP
 

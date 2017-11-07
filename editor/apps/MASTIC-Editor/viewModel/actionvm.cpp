@@ -29,35 +29,21 @@
  * @brief Default constructor
  * @param parent
  */
-ActionVM::ActionVM(ActionM *actionModel, QObject *parent) : QObject(parent),
+ActionVM::ActionVM(ActionM *actionModel, int startTime, QObject *parent) : QObject(parent),
     _actionModel(actionModel),
-    _actionsPanelIndex(-1),
-    _lineInTimeLine(-1),
-    _startDateTime(QDateTime::currentDateTime()),
-    _revertAfterTime(false),
-    _revertAtTime(false)
+    _startTimeInSec(startTime),
+    _startTimeString("00:00:00"),
+    _lineInTimeLine(-1)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
     if(_actionModel != NULL)
     {
-        if(_actionModel->startTime() >= 0)
+        if(startTime >= 0)
         {
-            _startDateTime.setTime(QTime::fromMSecsSinceStartOfDay(_actionModel->startTime()*1000));
-        } else {
-            _startDateTime = QDateTime::fromString("00:00:00","HH:mm:ss");
+            _startTimeString = QString::number((int)startTime/3600) + ":" + QString::number((int)startTime/60) + ":" + QString::number((int)startTime%60);
         }
-        if(_actionModel->revertWhenValidityIsOver() == true)
-        {
-            setrevertAfterTime(true);
-        } else if(_actionModel->revertAtTime() > -1)
-        {
-            setrevertAtTime(true);
-        }
-    } else {
-        _startDateTime = QDateTime::fromString("00:00:00","HH:mm:ss");
-        _actionModel = NULL;
     }
 }
 
@@ -99,11 +85,9 @@ void ActionVM::copyFrom(ActionVM* actionVM)
 
         // Copy the view model attributes
         setcolor(actionVM->color());
-        setactionsPanelIndex(actionVM->actionsPanelIndex());
+        setstartTimeInSec(actionVM->startTimeInSec());
         setlineInTimeLine(actionVM->lineInTimeLine());
         setstartTimeString(actionVM->startTimeString());
-        setrevertAfterTime(actionVM->revertAfterTime());
-        setrevertAtTime(actionVM->revertAtTime());
     }
 }
 
@@ -120,90 +104,21 @@ void ActionVM::setstartTimeString(QString stringDateTime)
         // Update the start date time
         if(stringDateTime.isEmpty() == false)
         {
-            QDateTime dateTime = QDateTime::fromString(stringDateTime,"HH:mm:ss");
-            setstartDateTime(dateTime);
+            QStringList splittedTime = stringDateTime.split(':');
+            if(splittedTime.count() == 3)
+            {
+                setstartTimeInSec(QString(splittedTime.at(0)).toInt()*3600 + QString(splittedTime.at(1)).toInt()*60 + + QString(splittedTime.at(2)).toInt());
+            }
         }
         else
         {
-            QDateTime dateTime = QDateTime::fromString("00:00:00","HH:mm:ss");
-            setstartDateTime(dateTime);
+            setstartTimeInSec(-1);
         }
 
         emit startTimeStringChanged(stringDateTime);
     }
 }
 
-
-/**
- * @brief Set the model start time
- * @param action VM to copy
- */
-void ActionVM::setstartDateTime(QDateTime dateTime)
-{
-    if(_startDateTime != dateTime)
-    {
-        _startDateTime = dateTime;
-
-        // Update action model start time in seconds
-        if(_actionModel != NULL)
-        {
-            QTime time = _startDateTime.time();
-            _actionModel->setstartTime(time.second()+time.minute()*60+time.hour()*60*60);
-        }
-
-        emit startDateTimeChanged(dateTime);
-    }
-}
-
-/**
- * @brief Set the revertAfterTime flag
- * @param revertAfterTime value
- */
-void ActionVM::setrevertAfterTime(bool revertAfterTime)
-{
-    if(_revertAfterTime != revertAfterTime)
-    {
-        _revertAfterTime = revertAfterTime;
-
-        // Update action model
-        if(_actionModel != NULL)
-        {
-            _actionModel->setrevertWhenValidityIsOver(_revertAfterTime);
-        }
-
-        if(_revertAtTime == true && _revertAfterTime == true)
-        {
-            setrevertAtTime(false);
-        }
-
-        emit revertAfterTimeChanged(revertAfterTime);
-    }
-}
-
-/**
- * @brief Set the revertAtTime flag
- * @param revertAtTime value
- */
-void ActionVM::setrevertAtTime(bool revertAtTime)
-{
-    if(_revertAtTime != revertAtTime)
-    {
-        _revertAtTime = revertAtTime;
-
-        // Update action model
-        if(_actionModel != NULL)
-        {
-            _actionModel->setrevertWhenValidityIsOver(!_revertAtTime);
-        }
-
-        if(_revertAtTime == true && _revertAfterTime == true)
-        {
-            setrevertAfterTime(false);
-        }
-
-        emit revertAtTimeChanged(revertAtTime);
-    }
-}
 
 
 
