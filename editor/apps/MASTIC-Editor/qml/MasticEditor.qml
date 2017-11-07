@@ -124,7 +124,7 @@ Item {
 
 
     //
-    // Left panel: TODO: add border in I2CustomRectangle
+    // Left panel
     //
     Rectangle {
         id: leftPanel
