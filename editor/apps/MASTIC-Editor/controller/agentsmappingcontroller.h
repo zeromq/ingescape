@@ -138,13 +138,24 @@ public Q_SLOTS:
 
 private Q_SLOTS:
     /**
-     * @brief Slot when a new view model of a agent mapping is created on the main view mapping.
+     * @brief Slot when inside an agentInMappingVM, new inputsVM are created.
      *      Check if a map need to be created from the element mapping list in the model manager.
-     *      The two agents corresponding need to be visible in the list.
+     *      A missing agent is substituted by a ghost agent with same name. > create a partial map.
+     *      A missing output is substituted by a ghost output with same name. > create partial map.
      * @param currentAgentInMapping
+     * @param inputsListAdded
      */
-    void _onCreateMapBetweenIopInMappingFromAgentInMapping(AgentInMappingVM* currentAgentInMapping);
+    void _generateAllMapBetweenIopUsingNewlyAddedInputsVM(AgentInMappingVM* currentAgentInMapping, QList<InputVM*> inputsListAdded);
 
+    /**
+     * @brief Slot when inside an agentInMappingVM, new outputsVM are created.
+     *      Check if a map need can be completed from internal partial maps list in the mapping controller.
+     *      A missing agent is substituted by a ghost agent with same name. > create a partial map.
+     *      A missing output is substituted by a ghost output with same name. > create partial map.
+     * @param currentAgentInMapping
+     * @param outputsListAdded
+     */
+    void _completeAllPartialMapBetweenIopUsingNewlyOutputsVM(AgentInMappingVM* currentAgentInMapping, QList<OutputVM*> outputsListAdded);
 
     /**
      * @brief Slot when the list of "Agents in Mapping" changed

@@ -34,7 +34,7 @@ OutputVM::OutputVM(QString outputName,
     }
     else {
         _isGhost = true;
-        qInfo() << "New GHOST of Output VM" << _name;
+        qInfo() << "New ghost of Output VM" << _name;
     }
 
     // Connect to signal "Count Changed" from the list of models
@@ -55,7 +55,7 @@ OutputVM::~OutputVM()
         setfirstModel(NULL);
     }
     else {
-        qInfo() << "Delete GHOST of Output VM" << _name;
+        qInfo() << "Delete ghost of Output VM" << _name;
     }
 
     // DIS-connect to signal "Count Changed" from the list of models

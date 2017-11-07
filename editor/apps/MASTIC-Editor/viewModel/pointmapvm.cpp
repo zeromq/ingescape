@@ -30,13 +30,13 @@ PointMapVM::PointMapVM(QString name,
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    qInfo() << "New Point Map VM" << _name << "(" << _id << ")";
+   // qInfo() << "New Point Map VM" << _name << "(" << _id << ")";
 }
 
 
 PointMapVM::~PointMapVM()
 {
-    qInfo() << "Delete Point Map VM" << _name << "(" << _id << ")";
+   // qInfo() << "Delete Point Map VM" << _name << "(" << _id << ")";
 }
 
 
