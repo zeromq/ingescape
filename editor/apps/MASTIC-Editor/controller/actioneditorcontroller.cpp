@@ -29,13 +29,13 @@
  * @brief Default constructor
  * @param parent
  */
-ActionEditorController::ActionEditorController(ActionVM * originalAction, QObject *parent) : QObject(parent),
+ActionEditorController::ActionEditorController(ActionM *originalAction, QObject *parent) : QObject(parent),
     _originalAction(originalAction),
     _editedAction(NULL)
 {
     if(_originalAction != NULL)
     {
-        _editedAction = new ActionVM(NULL, this);
+        _editedAction = new ActionM("", this);
         _editedAction->copyFrom(_originalAction);
     }
     // Force ownership of our object, it will prevent Qml from stealing it
@@ -53,7 +53,7 @@ ActionEditorController::~ActionEditorController()
 
     if(_editedAction != NULL)
     {
-        ActionVM* tmp = _editedAction;
+        ActionM* tmp = _editedAction;
         seteditedAction(NULL);
         delete tmp;
         tmp = NULL;

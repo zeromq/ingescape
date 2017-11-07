@@ -33,10 +33,10 @@ class ActionEditorController: public QObject
     Q_OBJECT
 
     // Original action view model
-    I2_QML_PROPERTY(ActionVM*, originalAction)
+    I2_QML_PROPERTY(ActionM*, originalAction)
 
     // Temporary action view model
-    I2_QML_PROPERTY(ActionVM*, editedAction)
+    I2_QML_PROPERTY(ActionM*, editedAction)
 
 public:
 
@@ -45,7 +45,7 @@ public:
      * @param original action
      * @param parent
      */
-    explicit ActionEditorController(ActionVM * originalAction, QObject *parent = 0);
+    explicit ActionEditorController(ActionM * originalAction, QObject *parent = 0);
 
 
     /**
