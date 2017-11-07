@@ -29,7 +29,8 @@
  * @brief Default constructor
  * @param parent
  */
-ScenarioController::ScenarioController(QObject *parent) : QObject(parent)
+ScenarioController::ScenarioController(QObject *parent) : QObject(parent),
+    _selectedAction(NULL)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -42,6 +43,9 @@ ScenarioController::ScenarioController(QObject *parent) : QObject(parent)
  */
 ScenarioController::~ScenarioController()
 {
+    // Clean-up current selection
+    setselectedAction(NULL);
+
     // Clear the list of editor opened
     _mapActionsEditorControllersFromActionVM.clear();
     _openedActionsEditorsControllers.deleteAllItems();
@@ -84,6 +88,11 @@ void ScenarioController::openActionEditor(ActionM* actionM)
   */
 void ScenarioController::deleteAction(ActionM * actionM)
 {
+    // Unselect our action if needed
+    if (_selectedAction == actionM) {
+        setselectedAction(NULL);
+    }
+
     // Delete the popup if necessary
     if(_mapActionsEditorControllersFromActionVM.contains(actionM))
     {

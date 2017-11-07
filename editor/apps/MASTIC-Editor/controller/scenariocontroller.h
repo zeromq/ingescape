@@ -38,6 +38,10 @@ class ScenarioController: public QObject
     // Sorted list of ations by start time
     I2_QOBJECT_LISTMODEL(ActionEditorController, openedActionsEditorsControllers)
 
+    // Selected action
+    I2_QML_PROPERTY_DELETE_PROOF(ActionM*, selectedAction)
+
+
 public:
 
     /**
