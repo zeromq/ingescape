@@ -196,6 +196,31 @@ void AgentsMappingController::onIsActivatedMappingChanged(bool isActivatedMappin
 
 
 /**
+ * @brief Slot when a model of agent will be deleted
+ * @param agent
+ */
+void AgentsMappingController::onAgentModelWillBeDeleted(AgentM* agent)
+{
+    if (agent != NULL)
+    {
+        // Get the agent in mapping for the agent name
+        AgentInMappingVM* agentInMapping = getAgentInMappingForName(agent->name());
+        if (agentInMapping != NULL)
+        {
+            // Remove the model
+            agentInMapping->models()->remove(agent);
+
+            // If it was the last one...
+            if (agentInMapping->models()->count() == 0) {
+                // ...delete this agent in mapping
+                _deleteAgentInMapping(agentInMapping);
+            }
+        }
+    }
+}
+
+
+/**
  * @brief Get the agent in mapping for an agent name
  * @param name
  * @return
@@ -517,15 +542,20 @@ void AgentsMappingController::_onOutputsListRemoved(QList<OutputVM*> outputsList
     if ((agentInMapping != NULL) && (outputsListWillBeRemoved.count() > 0)) {
         qDebug() << "_on Outputs List Removed from agent" << agentInMapping->agentName() << outputsListWillBeRemoved.count();
 
-        QList<OutputM*> models;
+        // List of pairs <output id, output name>
+        QList<QPair<QString, QString>> pairsList;
         foreach (OutputVM* output, outputsListWillBeRemoved) {
-            if ((output != NULL) && (output->firstModel() != NULL)) {
-                models.append(output->firstModel());
+            if (output != NULL) {
+                QPair<QString, QString> pair;
+                pair.first = output->id();
+                pair.second = output->name();
+
+                pairsList.append(pair);
             }
         }
-        if (models.count() > 0) {
+        if (pairsList.count() > 0) {
             // Emit signal "Remove Inputs to Editor for Outputs"
-            Q_EMIT removeInputsToEditorForOutputs(agentInMapping->agentName(), models);
+            Q_EMIT removeInputsToEditorForOutputs(agentInMapping->agentName(), pairsList);
         }
     }
 }
@@ -570,6 +600,28 @@ void AgentsMappingController::_addAgentModelsToMappingAtPosition(QString agentNa
 
             qInfo() << "A new agent mapping has been added:" << agentName;
         }
+    }
+}
+
+
+/**
+ * @brief Delete an Agent in Mapping
+ * @param agentInMapping
+ */
+void AgentsMappingController::_deleteAgentInMapping(AgentInMappingVM* agentInMapping)
+{
+    if (agentInMapping != NULL)
+    {
+        qInfo() << "An agent mapping has been removed:" << agentInMapping->agentName();
+
+        // Remove from the map list
+        _mapFromNameToAgentInMappingViewModelsList.remove(agentInMapping->agentName());
+
+        // Remove this Agent In Mapping VM from the list for the qml
+        _agentInMappingVMList.remove(agentInMapping);
+
+        // Free memory
+        delete agentInMapping;
     }
 }
 

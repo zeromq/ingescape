@@ -116,7 +116,7 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     // Connect to signals from the model manager
     connect(_modelManager, &MasticModelManager::isActivatedMappingChanged, _agentsMappingC, &AgentsMappingController::onIsActivatedMappingChanged);
     connect(_modelManager, &MasticModelManager::agentModelCreated, _agentsSupervisionC, &AgentsSupervisionController::onAgentModelCreated);
-    //connect(_modelManager, &MasticModelManager::agentModelWillBeDeleted, _agentsSupervisionC, &AgentsSupervisionController::onAgentModelWillBeDeleted);
+    connect(_modelManager, &MasticModelManager::agentModelWillBeDeleted, _agentsMappingC, &AgentsMappingController::onAgentModelWillBeDeleted);
 
 
     // Connect to signals from the controller for supervision of agents

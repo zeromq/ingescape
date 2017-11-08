@@ -150,14 +150,6 @@ public Q_SLOTS:
 private:
 
     /**
-     * @brief Update our list of agents with the new definition for this agent
-     * @param agent
-     * @param definition
-     */
-    void _updateWithNewDefinitionForAgent(AgentVM* agent, DefinitionM* definition);
-
-
-    /**
      * @brief Delete the view model of Agent
      * @param agent
      */

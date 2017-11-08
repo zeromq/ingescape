@@ -208,31 +208,21 @@ void AgentsSupervisionController::onAgentModelCreated(AgentM* model)
 
 /**
  * @brief Slot when the definition of a view model of agent changed
- * @param previousValue
- * @param newValue
+ * @param previousDefinition
+ * @param newDefinition
  */
-void AgentsSupervisionController::onAgentDefinitionChangedWithPreviousValue(DefinitionM* previousValue, DefinitionM* newValue)
+void AgentsSupervisionController::onAgentDefinitionChangedWithPreviousValue(DefinitionM* previousDefinition, DefinitionM* newDefinition)
 {
     AgentVM* agent = qobject_cast<AgentVM*>(sender());
-    if ((agent != NULL)
+    if ((agent != NULL) && (_modelManager != NULL)
+
             // Only if the previous definition was NULL and if the new definition is defined
-            && (previousValue == NULL) && (newValue != NULL))
+            && (previousDefinition == NULL) && (newDefinition != NULL))
     {
+        //
         // Update our list of agents with the new definition for this agent
-        _updateWithNewDefinitionForAgent(agent, newValue);
-    }
-}
+        //
 
-
-/**
- * @brief Update our list of agents with the new definition for this agent
- * @param agent
- * @param definition
- */
-void AgentsSupervisionController::_updateWithNewDefinitionForAgent(AgentVM* agent, DefinitionM* definition)
-{
-    if ((agent != NULL) && (definition != NULL) && (_modelManager != NULL))
-    {
         // Get the list of view models of agent from a name
         QList<AgentVM*> agentViewModelsList = getAgentViewModelsListFromName(agent->name());
 
@@ -245,9 +235,9 @@ void AgentsSupervisionController::_updateWithNewDefinitionForAgent(AgentVM* agen
             if ((iterator != NULL) && (iterator != agent) && (iterator->definition() != NULL)
                     &&
                     // The 2 definitions are strictly identicals
-                    DefinitionM::areIdenticals(iterator->definition(), definition))
+                    DefinitionM::areIdenticals(iterator->definition(), newDefinition))
             {
-                qDebug() << "There is exactly the same agent definition for name" << definition->name() << "and version" << definition->version();
+                qDebug() << "There is exactly the same agent definition for name" << newDefinition->name() << "and version" << newDefinition->version();
 
                 agentUsingSameDefinition = iterator;
                 sameDefinition = iterator->definition();
