@@ -63,31 +63,27 @@ I2CubicBezierCurve {
 
 
     // Stroke
-    stroke: if (mapBetweenIOPVM && mapBetweenIOPVM.agentTo && mapBetweenIOPVM.agentTo.isReduced) { // if the agentTo is reduced : global type of its inputs
-                switch (mapBetweenIOPVM.agentTo.reducedMapValueTypeInInput)
+    stroke:
+        // if the agentTo and agantFrom are reduced : global type of its inputs
+        if (mapBetweenIOPVM && mapBetweenIOPVM.agentTo && mapBetweenIOPVM.agentTo.isReduced && mapBetweenIOPVM.agentFrom.isReduced) {
+                switch (mapBetweenIOPVM.agentTo.reducedMapValueTypeGroupInInput)
                 {
-                case AgentIOPValueTypes.INTEGER:
+                case AgentIOPValueTypeGroups.NUMBER:
                     mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
                     break;
-                case AgentIOPValueTypes.DOUBLE:
-                    mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
-                    break;
-                case AgentIOPValueTypes.STRING:
+               case AgentIOPValueTypeGroups.STRING:
                     mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.redColor2 : MasticTheme.darkRedColor2
                     break;
-                case AgentIOPValueTypes.BOOL:
-                    mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
-                    break;
-                case AgentIOPValueTypes.IMPULSION:
+                case AgentIOPValueTypeGroups.IMPULSION:
                     mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.purpleColor : MasticTheme.darkPurpleColor
                     break;
-                case AgentIOPValueTypes.DATA:
+                case AgentIOPValueTypeGroups.DATA:
                     mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.greenColor : MasticTheme.darkGreenColor
                     break;
-                case AgentIOPValueTypes.MIXED:
+                case AgentIOPValueTypeGroups.MIXED:
                     mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.whiteColor : MasticTheme.darkGreyColor
                     break;
-                case AgentIOPValueTypes.UNKNOWN:
+                case AgentIOPValueTypeGroups.UNKNOWN:
                     "#000000"
                     break;
                 default:
@@ -97,30 +93,24 @@ I2CubicBezierCurve {
             }
             else { // if the agentTo is not reduced : type of its outputs
                 if (outputModel && outputModel.firstModel) {
-                    switch (outputModel.firstModel.agentIOPValueType)
+                    switch (outputModel.firstModel.agentIOPValueTypeGroup)
                     {
-                    case AgentIOPValueTypes.INTEGER:
+                    case AgentIOPValueTypeGroups.NUMBER:
                         mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
                         break;
-                    case AgentIOPValueTypes.DOUBLE:
-                        mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
-                        break;
-                    case AgentIOPValueTypes.STRING:
+                    case AgentIOPValueTypeGroups.STRING:
                         mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.redColor2 : MasticTheme.darkRedColor2
                         break;
-                    case AgentIOPValueTypes.BOOL:
-                        mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
-                        break;
-                    case AgentIOPValueTypes.IMPULSION:
+                     case AgentIOPValueTypeGroups.IMPULSION:
                         mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.purpleColor : MasticTheme.darkPurpleColor
                         break;
-                    case AgentIOPValueTypes.DATA:
+                    case AgentIOPValueTypeGroups.DATA:
                         mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.greenColor : MasticTheme.darkGreenColor
                         break;
-                    case AgentIOPValueTypes.MIXED:
+                    case AgentIOPValueTypeGroups.MIXED:
                         mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.whiteColor : MasticTheme.darkGreyColor
                         break;
-                    case AgentIOPValueTypes.UNKNOWN:
+                    case AgentIOPValueTypeGroups.UNKNOWN:
                         "#000000"
                         break;
                     default:
@@ -146,6 +136,7 @@ I2CubicBezierCurve {
     fuzzyColor: (mapBetweenIOPVM && controller.selectedMapBetweenIOP === mapBetweenIOPVM) ? MasticTheme.lightGreyColor : "transparent"
     fuzzyRadius: 2
 
+    opacity: mouseArea.pressed ? 0.8 : 1;
 
 
     //--------------------------------
