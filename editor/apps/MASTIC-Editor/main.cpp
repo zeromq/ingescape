@@ -48,7 +48,8 @@ void registerCustomQmlTypes()
     qmlRegisterSingletonType<AgentIOPTypes>(uri, 1, 0, "AgentIOPTypes", &AgentIOPTypes::qmlSingleton);
     qmlRegisterSingletonType<AgentIOPValueTypes>(uri, 1, 0, "AgentIOPValueTypes", &AgentIOPValueTypes::qmlSingleton);
     qmlRegisterSingletonType<AgentIOPValueTypeGroups>(uri, 1, 0, "AgentIOPValueTypeGroups", &AgentIOPValueTypeGroups::qmlSingleton);
-
+    qmlRegisterSingletonType<AgentIOPValueTypes>(uri, 1, 0, "ComparisonType", &ComparisonType::qmlSingleton);
+    qmlRegisterSingletonType<AgentIOPValueTypes>(uri, 1, 0, "ActionEffectType", &ActionEffectType::qmlSingleton);
 
     //----------------
     //

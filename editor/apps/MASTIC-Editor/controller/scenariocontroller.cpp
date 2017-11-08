@@ -35,6 +35,20 @@ ScenarioController::ScenarioController(QObject *parent) : QObject(parent),
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
+    // Fill state comparisons types list
+    _comparisonsStatesTypesList.appendEnumValue(ComparisonType::ON);
+    _comparisonsStatesTypesList.appendEnumValue(ComparisonType::OFF);
+
+    // Fill value comparisons types list
+    _comparisonsValuesTypesList.fillWithAllEnumValues();
+    _comparisonsValuesTypesList.removeEnumValue(ComparisonType::ON);
+    _comparisonsValuesTypesList.removeEnumValue(ComparisonType::OFF);
+
+    // Fill value effects types list
+    _effectsTypesList.fillWithAllEnumValues();
+
+    // Fill validity duration types list
+    _validationDurationsTypesList.fillWithAllEnumValues();
 }
 
 
@@ -52,6 +66,9 @@ ScenarioController::~ScenarioController()
 
     // Delete actions Vm List
     _actionsList.deleteAllItems();
+
+    // Clear map
+    _mapActionsFromActionName.clear();
 }
 
 
@@ -67,11 +84,16 @@ void ScenarioController::openActionEditor(ActionM* actionM)
         // Create an empty action if we create a new one
         if(actionM == NULL)
         {
-            actionM = new ActionM("New action");
+            actionM = new ActionM(_buildNewActionName());
+        }
+        // Set selected action
+        else
+        {
+            setselectedAction(actionM);
         }
 
         // Create action editor controller
-        ActionEditorController* actionEditorC = new ActionEditorController(actionM);
+        ActionEditorController* actionEditorC = new ActionEditorController(actionM,agentsInMappingList());
 
         // Add action into our opened actions
         _mapActionsEditorControllersFromActionVM.insert(actionM,actionEditorC);
@@ -107,6 +129,8 @@ void ScenarioController::deleteAction(ActionM * actionM)
     {
         _actionsList.remove(actionM);
 
+        _mapActionsFromActionName.remove(actionM->name());
+
         delete actionM;
         actionM = NULL;
     }
@@ -126,7 +150,11 @@ void ScenarioController::valideActionEditor(ActionEditorController* actionEditor
     // We check that or editor is not already opened
     if(_actionsList.contains(originalActionVM) == false)
     {
+        // Insert in to the list
         _actionsList.append(originalActionVM);
+
+        // Insert into the map
+        _mapActionsFromActionName.insert(originalActionVM->name(),originalActionVM);
     }
 
     if(_mapActionsEditorControllersFromActionVM.contains(originalActionVM))
@@ -134,6 +162,9 @@ void ScenarioController::valideActionEditor(ActionEditorController* actionEditor
         _mapActionsEditorControllersFromActionVM.remove(originalActionVM);
     }
     _openedActionsEditorsControllers.remove(actionEditorC);
+
+    // Set selected action
+    setselectedAction(originalActionVM);
 }
 
 /**
@@ -168,6 +199,38 @@ void ScenarioController::deleteActionEditor(ActionEditorController* actionEditor
     }
 }
 
+/**
+  * @brief slot on agents in mapping list count change
+  */
+void ScenarioController::onAgentsInMappingListCountChange()
+{
+    I2CustomItemListModel<AgentInMappingVM> * agentInMappingList = dynamic_cast<I2CustomItemListModel<AgentInMappingVM> *>(sender());
+    if (agentInMappingList != NULL)
+    {
+        // Reset the agents in mapping list
+        _agentsInMappingList.clear();
 
+        // Add the new list of agents
+        _agentsInMappingList.append(agentInMappingList->toList());
+    }
+}
+
+/**
+ * @brief Get a new action name
+ */
+QString ScenarioController::_buildNewActionName()
+{
+    // Remove the effect
+    int index = 1;
+    QString tmpName = "Action_"+QString("%1").arg(index, 3,10, QChar('0'));
+
+    while(_mapActionsFromActionName.contains(tmpName))
+    {
+        index++;
+        tmpName = "Action_"+QString("%1").arg(index, 3, 10, QChar('0'));
+    }
+
+    return tmpName;
+}
 
 
