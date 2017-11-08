@@ -44,12 +44,16 @@ AgentIOPM::AgentIOPM(AgentIOPTypes::Value agentIOPType,
                      QObject *parent) : QObject(parent),
     _agentIOPType(agentIOPType),
     _name(name),
-    _agentIOPValueType(agentIOPValueType),
+    _agentIOPValueType(AgentIOPValueTypes::UNKNOWN),
+    _agentIOPValueTypeGroup(AgentIOPValueTypeGroups::UNKNOWN),
     _defaultValue(QVariant()),
     _displayableDefaultValue("")
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
+
+    // Call the setter to update the corresponding group
+    setagentIOPValueType(agentIOPValueType);
 
     // Create the identifier with name and value type
     _id = QString("%1::%2").arg(_name, AgentIOPValueTypes::staticEnumToString(_agentIOPValueType));
@@ -62,6 +66,50 @@ AgentIOPM::AgentIOPM(AgentIOPTypes::Value agentIOPType,
 AgentIOPM::~AgentIOPM()
 {
 
+}
+
+
+void AgentIOPM::setagentIOPValueType(AgentIOPValueTypes::Value value)
+{
+    if (_agentIOPValueType != value)
+    {
+        _agentIOPValueType = value;
+
+        // Update the corresponding group
+        switch (_agentIOPValueType)
+        {
+        case AgentIOPValueTypes::INTEGER:
+        case AgentIOPValueTypes::DOUBLE:
+        case AgentIOPValueTypes::BOOL:
+            setagentIOPValueTypeGroup(AgentIOPValueTypeGroups::NUMBER);
+            break;
+
+        case AgentIOPValueTypes::STRING:
+            setagentIOPValueTypeGroup(AgentIOPValueTypeGroups::STRING);
+            break;
+
+        case AgentIOPValueTypes::IMPULSION:
+            setagentIOPValueTypeGroup(AgentIOPValueTypeGroups::IMPULSION);
+            break;
+
+        case AgentIOPValueTypes::DATA:
+            setagentIOPValueTypeGroup(AgentIOPValueTypeGroups::DATA);
+            break;
+
+        case AgentIOPValueTypes::MIXED:
+            setagentIOPValueTypeGroup(AgentIOPValueTypeGroups::MIXED);
+            break;
+
+        case AgentIOPValueTypes::UNKNOWN:
+            setagentIOPValueTypeGroup(AgentIOPValueTypeGroups::UNKNOWN);
+            break;
+
+        default:
+            break;
+        }
+
+        Q_EMIT agentIOPValueTypeChanged(value);
+    }
 }
 
 

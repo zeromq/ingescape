@@ -28,8 +28,8 @@ AgentInMappingVM::AgentInMappingVM(QList<AgentM*> models,
     _position(position),
     _isON(false),
     _isReduced(false),
-    _reducedMapValueTypeInInput(AgentIOPValueTypes::MIXED),
-    _reducedMapValueTypeInOutput(AgentIOPValueTypes::MIXED),
+    _reducedMapValueTypeGroupInInput(AgentIOPValueTypeGroups::MIXED),
+    _reducedMapValueTypeGroupInOutput(AgentIOPValueTypeGroups::MIXED),
     _isGhost(false),
     _areIdenticalsAllDefinitions(true)
 {
@@ -46,6 +46,8 @@ AgentInMappingVM::AgentInMappingVM(QList<AgentM*> models,
 
             // Connect to signal "Count Changed" from the list of models
             connect(&_models, &AbstractI2CustomItemListModel::countChanged, this, &AgentInMappingVM::_onModelsChanged);
+            //connect(&_inputsList, &AbstractI2CustomItemListModel::countChanged, this, &AgentInMappingVM::_onInputsListChanged);
+            //connect(&_outputsList, &AbstractI2CustomItemListModel::countChanged, this, &AgentInMappingVM::_onOutputsListChanged);
 
             // Initialize our list
             _models.append(models);
@@ -82,6 +84,10 @@ AgentInMappingVM::~AgentInMappingVM()
 {
     qInfo() << "Delete View Model of Agent in Mapping" << _agentName;
 
+    disconnect(&_models, &AbstractI2CustomItemListModel::countChanged, this, &AgentInMappingVM::_onModelsChanged);
+    //disconnect(&_inputsList, &AbstractI2CustomItemListModel::countChanged, this, &AgentInMappingVM::_onInputsListChanged);
+    //disconnect(&_outputsList, &AbstractI2CustomItemListModel::countChanged, this, &AgentInMappingVM::_onOutputsListChanged);
+
     // Clear maps of Inputs & Outputs
     _mapOfInputsFromInputName.clear();
     _mapOfOutputsFromOutputName.clear();
@@ -89,8 +95,6 @@ AgentInMappingVM::~AgentInMappingVM()
     // Delete elements in the lists of Inputs & Outputs
     _inputsList.deleteAllItems();
     _outputsList.deleteAllItems();
-
-    disconnect(&_models, &AbstractI2CustomItemListModel::countChanged, this, &AgentInMappingVM::_onModelsChanged);
 
     // Clear the previous list of models
     _previousAgentsList.clear();
@@ -216,6 +220,30 @@ void AgentInMappingVM::_onModelsChanged()
 
 
 /**
+ * @brief Slot when the list of (view models of) inputs changed
+ */
+/*void AgentInMappingVM::_onInputsListChanged()
+{
+    foreach (InputVM* input, _inputsList.toList()) {
+        if ((input != NULL) && (input->firstModel() != NULL)) {
+        }
+    }
+}*/
+
+
+/**
+ * @brief Slot when the list of (view models of) outputs changed
+ */
+/*void AgentInMappingVM::_onOutputsListChanged()
+{
+    foreach (OutputVM* output, _outputsList.toList()) {
+        if ((output != NULL) && (output->firstModel() != NULL)) {
+        }
+    }
+}*/
+
+
+/**
  * @brief Slot when the flag "is ON" of a model changed
  * @param isON
  */
@@ -242,7 +270,9 @@ void AgentInMappingVM::_agentModelAdded(AgentM* model)
         // Traverse the list of models of inputs in the definition
         foreach (AgentIOPM* input, model->definition()->inputsList()->toList())
         {
+            // This method returns a view model only if it is a new one
             InputVM* newInputVM = _inputModelAdded(input);
+
             if (newInputVM != NULL) {
                 inputsListToAdd.append(newInputVM);
             }
@@ -251,7 +281,9 @@ void AgentInMappingVM::_agentModelAdded(AgentM* model)
         // Traverse the list of models of outputs in the definition
         foreach (OutputM* output, model->definition()->outputsList()->toList())
         {
+            // This method returns a view model only if it is a new one
             OutputVM* newOutputVM = _outputModelAdded(output);
+
             if (newOutputVM != NULL) {
                 outputsListToAdd.append(newOutputVM);
             }
@@ -307,7 +339,7 @@ void AgentInMappingVM::_agentModelRemoved(AgentM* model)
 /**
  * @brief A model of input has been added
  * @param input
- * @return
+ * @return a view model of input only if it is a new one
  */
 InputVM* AgentInMappingVM::_inputModelAdded(AgentIOPM* input)
 {
@@ -397,7 +429,7 @@ InputVM* AgentInMappingVM::_inputModelRemoved(AgentIOPM* input)
 /**
  * @brief A model of output has been added
  * @param output
- * @return
+ * @return a view model of output only if it is a new one
  */
 OutputVM* AgentInMappingVM::_outputModelAdded(OutputM* output)
 {
@@ -486,132 +518,6 @@ OutputVM* AgentInMappingVM::_outputModelRemoved(OutputM* output)
 
 
 /**
-     * @brief Add new points Map to the inputs list from a definition model
-     * @param newDefinition The definition model
-     */
-/*void AgentInMappingVM::_addPointMapInInternalInputList(DefinitionM *newDefinition)
-{
-    if(newDefinition != NULL)
-    {
-        // Create the list of Point Map to add in the agent in mapping
-        QList<InputVM*> listOfPointMapTemp;
-
-        foreach (AgentIOPM* iopM, newDefinition->inputsList()->toList())
-        {
-            if (iopM != NULL)
-            {
-                // New pointMapVM (from agent and input model
-                InputVM* inputPoint = new InputVM(iopM->name(), iopM, this);
-
-                //Check if it's not alreafy exist in the list & add it
-                if(!_checkIfAlreadyInInputList(inputPoint))
-                {
-                    // Add to the list of newly created pointMap
-                    listOfPointMapTemp.append(inputPoint);
-
-                    // Update the hash table
-                    _mapOfInputsFromInputName.insert(iopM->name(), inputPoint);
-
-                    qInfo()<<"Add new point map " << _agentName << "." << iopM->name() << " in the inputs list.";
-                }
-                else {
-                    qInfo() << "Point map : " << _agentName << "." << iopM->name() << " is already present in the list.";
-                }
-            }
-        }
-        _inputsList.append(listOfPointMapTemp);
-    }
-}*/
-
-
-/**
-     * @brief Add new points Map to the outputs list from a definition model
-     * @param newDefinition The definition model
-     */
-/*void AgentInMappingVM::_addPointMapInInternalOutputList(DefinitionM *newDefinition)
-{
-    if(newDefinition != NULL)
-    {
-        // Create the list of Point Map to add in the agent in mapping
-        QList<OutputVM*> listOfPointMapTemp;
-
-        foreach (OutputM* iopM, newDefinition->outputsList()->toList())
-        {
-            if (iopM != NULL)
-            {
-                // New pointMapVM (from agent and input model
-                OutputVM* outputPoint = new OutputVM(iopM->name(), iopM, this);
-
-                //Check if it's not alreafy exist in the list & add it
-                if(!_checkIfAlreadyInOutputList(outputPoint))
-                {
-                    // Add to the list of newly created pointMap
-                    listOfPointMapTemp.append(outputPoint);
-
-                    // Update the hash table
-                    _mapOfOutputsFromOutputName.insert(iopM->name(), outputPoint);
-
-                    qInfo()<<"Add new point map " << _agentName << "." << iopM->name() << " in the inputs list.";
-                }
-                else {
-                    qInfo() << "Point map : " << _agentName << "." << iopM->name() << " is already present in the list.";
-                }
-            }
-        }
-        _outputsList.append(listOfPointMapTemp);
-    }
-}*/
-
-
-/**
-     * @brief This function check if the InputVM already exist in the input list
-     * @param currentInput The newly created Input VM
-     */
-/*bool AgentInMappingVM::_checkIfAlreadyInInputList(InputVM* currentInput)
-{
-    foreach (InputVM* iterator, _inputsList.toList())
-    {
-        if( (currentInput != NULL) && (iterator != NULL))
-        {
-            if(currentInput->modelM() != NULL && iterator->modelM() != NULL )
-            {
-                if( currentInput->modelM()->id() == iterator->modelM()->id() )
-                {
-                    // Exactly the same point
-                    return true;
-                }
-            }
-        }
-    }
-    return false;
-}*/
-
-
-/**
-     * @brief This function check if the OutputVM already exist in the input list
-     * @param currentOuput The newly created OutputVM
-     */
-/*bool AgentInMappingVM::_checkIfAlreadyInOutputList(OutputVM* currentOuput)
-{
-    foreach (OutputVM* iterator, _outputsList.toList())
-    {
-        if( (currentOuput != NULL) && (iterator != NULL))
-        {
-            if(currentOuput->modelM() != NULL && iterator->modelM() != NULL )
-            {
-                if( currentOuput->modelM()->id() == iterator->modelM()->id() )
-                {
-                    // Exactly the same point
-                    return true;
-                }
-            }
-        }
-    }
-    return false;
-}*/
-
-
-/**
  * @brief Update with all models of agents
  */
 void AgentInMappingVM::_updateWithAllModels()
@@ -646,6 +552,10 @@ void AgentInMappingVM::_updateWithAllModels()
 
     // Update flags in function of models
     _updateIsON();
+
+    // Update the group (of value type) of the reduced map (= brin) in input and in output of our agent
+    _updateReducedMapValueTypeGroupInInput();
+    _updateReducedMapValueTypeGroupInOutput();
 }
 
 
@@ -663,4 +573,56 @@ void AgentInMappingVM::_updateIsON()
         }
     }
     setisON(globalIsON);
+}
+
+
+/**
+ * @brief Update the group (of value type) of the reduced map (= brin) in input of our agent
+ */
+void AgentInMappingVM::_updateReducedMapValueTypeGroupInInput()
+{
+    AgentIOPValueTypeGroups::Value globalReducedMapValueTypeGroupInInput = AgentIOPValueTypeGroups::UNKNOWN;
+
+    for (int i = 0; i < _inputsList.count(); i++)
+    {
+        InputVM* input = _inputsList.at(i);
+        if ((input != NULL) && (input->firstModel() != NULL)) {
+            if (i == 0) {
+                globalReducedMapValueTypeGroupInInput = input->firstModel()->agentIOPValueTypeGroup();
+            }
+            else {
+                if (globalReducedMapValueTypeGroupInInput != input->firstModel()->agentIOPValueTypeGroup()) {
+                    globalReducedMapValueTypeGroupInInput = AgentIOPValueTypeGroups::MIXED;
+                    break;
+                }
+            }
+        }
+    }
+    setreducedMapValueTypeGroupInInput(globalReducedMapValueTypeGroupInInput);
+}
+
+
+/**
+ * @brief Update the group (of value type) of the reduced map (= brin) in output of our agent
+ */
+void AgentInMappingVM::_updateReducedMapValueTypeGroupInOutput()
+{
+    AgentIOPValueTypeGroups::Value globalReducedMapValueTypeGroupInOutput = AgentIOPValueTypeGroups::UNKNOWN;
+
+    for (int i = 0; i < _outputsList.count(); i++)
+    {
+        OutputVM* output = _outputsList.at(i);
+        if ((output != NULL) && (output->firstModel() != NULL)) {
+            if (i == 0) {
+                globalReducedMapValueTypeGroupInOutput = output->firstModel()->agentIOPValueTypeGroup();
+            }
+            else {
+                if (globalReducedMapValueTypeGroupInOutput != output->firstModel()->agentIOPValueTypeGroup()) {
+                    globalReducedMapValueTypeGroupInOutput = AgentIOPValueTypeGroups::MIXED;
+                    break;
+                }
+            }
+        }
+    }
+    setreducedMapValueTypeGroupInOutput(globalReducedMapValueTypeGroupInOutput);
 }
