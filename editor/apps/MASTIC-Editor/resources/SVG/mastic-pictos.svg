@@ -782,4 +782,11 @@
 			<line fill="none" stroke="#F39200" stroke-width="2.5333" stroke-miterlimit="10" x1="1021.8" y1="562.5" x2="1009.7" y2="574.6"/>
 	</g>
 </g>
+<g id="iconCombo">
+	<polygon fill="#535A66" points="1082.7,570.4 1086.3,576.7 1090,570.4 	"/>
+</g>
+<g id="check">
+	<polyline fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" points="
+		1084.1,590 1087.2,594.8 1091.7,587 	"/>
+</g>
 </svg>

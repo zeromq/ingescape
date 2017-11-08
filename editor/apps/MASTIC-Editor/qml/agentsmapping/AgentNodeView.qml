@@ -175,10 +175,7 @@ Item {
 
             Button {
                 id: removeButton
-
-                visible : (rootItem.agentMappingVM && !rootItem.agentMappingVM.isON)
                 activeFocusOnPress: true
-
                 anchors {
                     top: parent.top
                     topMargin: 10
@@ -342,30 +339,24 @@ Item {
             radius : height/2
 
             color : if (agentMappingVM) {
-                        switch (agentMappingVM.reducedMapValueTypeInInput)
+                        switch (agentMappingVM.reducedMapValueTypeGroupInInput)
                         {
-                        case AgentIOPValueTypes.INTEGER:
+                        case AgentIOPValueTypeGroups.NUMBER:
                             agentMappingVM.isON? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
                             break;
-                        case AgentIOPValueTypes.DOUBLE:
-                            agentMappingVM.isON? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
-                            break;
-                        case AgentIOPValueTypes.STRING:
+                        case AgentIOPValueTypeGroups.STRING:
                             agentMappingVM.isON? MasticTheme.redColor2 : MasticTheme.darkRedColor2
                             break;
-                        case AgentIOPValueTypes.BOOL:
-                            agentMappingVM.isON? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
-                            break;
-                        case AgentIOPValueTypes.IMPULSION:
+                        case AgentIOPValueTypeGroups.IMPULSION:
                             agentMappingVM.isON? MasticTheme.purpleColor : MasticTheme.darkPurpleColor
                             break;
-                        case AgentIOPValueTypes.DATA:
+                        case AgentIOPValueTypeGroups.DATA:
                             agentMappingVM.isON? MasticTheme.greenColor : MasticTheme.darkGreenColor
                             break;
-                        case AgentIOPValueTypes.MIXED:
+                        case AgentIOPValueTypeGroups.MIXED:
                             agentMappingVM.isON? MasticTheme.whiteColor : MasticTheme.darkGreyColor
                             break;
-                        case AgentIOPValueTypes.UNKNOWN:
+                        case AgentIOPValueTypeGroups.UNKNOWN:
                             "#000000"
                             break;
                         default:
@@ -392,30 +383,24 @@ Item {
             radius : height/2
 
             color : if (agentMappingVM) {
-                        switch (agentMappingVM.reducedMapValueTypeInOutput)
+                        switch (agentMappingVM.reducedMapValueTypeGroupInOutput)
                         {
-                        case AgentIOPValueTypes.INTEGER:
+                        case AgentIOPValueTypeGroups.NUMBER:
                             agentMappingVM.isON? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
                             break;
-                        case AgentIOPValueTypes.DOUBLE:
-                            agentMappingVM.isON? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
-                            break;
-                        case AgentIOPValueTypes.STRING:
+                       case AgentIOPValueTypeGroups.STRING:
                             agentMappingVM.isON? MasticTheme.redColor2 : MasticTheme.darkRedColor2
                             break;
-                        case AgentIOPValueTypes.BOOL:
-                            agentMappingVM.isON? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
-                            break;
-                        case AgentIOPValueTypes.IMPULSION:
+                        case AgentIOPValueTypeGroups.IMPULSION:
                             agentMappingVM.isON? MasticTheme.purpleColor : MasticTheme.darkPurpleColor
                             break;
-                        case AgentIOPValueTypes.DATA:
+                        case AgentIOPValueTypeGroups.DATA:
                             agentMappingVM.isON? MasticTheme.greenColor : MasticTheme.darkGreenColor
                             break;
-                        case AgentIOPValueTypes.MIXED:
+                        case AgentIOPValueTypeGroups.MIXED:
                             agentMappingVM.isON? MasticTheme.whiteColor : MasticTheme.darkGreyColor
                             break;
-                        case AgentIOPValueTypes.UNKNOWN:
+                        case AgentIOPValueTypeGroups.UNKNOWN:
                             "#000000"
                             break;
                         default:
@@ -567,30 +552,24 @@ Item {
 
                         color : if (agentMappingVM && myModel && myModel.firstModel) {
 
-                                    switch (myModel.firstModel.agentIOPValueType)
+                                    switch (myModel.firstModel.agentIOPValueTypeGroup)
                                     {
-                                    case AgentIOPValueTypes.INTEGER:
+                                    case AgentIOPValueTypeGroups.NUMBER:
                                         agentMappingVM.isON? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
                                         break;
-                                    case AgentIOPValueTypes.DOUBLE:
-                                        agentMappingVM.isON? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
-                                        break;
-                                    case AgentIOPValueTypes.STRING:
+                                    case AgentIOPValueTypeGroups.STRING:
                                         agentMappingVM.isON? MasticTheme.redColor2 : MasticTheme.darkRedColor2
                                         break;
-                                    case AgentIOPValueTypes.BOOL:
-                                        agentMappingVM.isON? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
-                                        break;
-                                    case AgentIOPValueTypes.IMPULSION:
+                                    case AgentIOPValueTypeGroups.IMPULSION:
                                         agentMappingVM.isON? MasticTheme.purpleColor : MasticTheme.darkPurpleColor
                                         break;
-                                    case AgentIOPValueTypes.DATA:
+                                    case AgentIOPValueTypeGroups.DATA:
                                         agentMappingVM.isON? MasticTheme.greenColor : MasticTheme.darkGreenColor
                                         break;
-                                    case AgentIOPValueTypes.MIXED:
+                                    case AgentIOPValueTypeGroups.MIXED:
                                         agentMappingVM.isON? MasticTheme.whiteColor : MasticTheme.darkGreyColor
                                         break;
-                                    case AgentIOPValueTypes.UNKNOWN:
+                                    case AgentIOPValueTypeGroups.UNKNOWN:
                                         "#000000"
                                         break;
                                     default:
@@ -836,30 +815,24 @@ Item {
 
                         color : if (agentMappingVM && myModel && myModel.firstModel) {
 
-                                    switch (myModel.firstModel.agentIOPValueType)
+                                    switch (myModel.firstModel.agentIOPValueTypeGroup)
                                     {
-                                    case AgentIOPValueTypes.INTEGER:
+                                    case AgentIOPValueTypeGroups.NUMBER:
                                         (agentMappingVM.isON && !myModel.firstModel.isMuted) ? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
                                         break;
-                                    case AgentIOPValueTypes.DOUBLE:
-                                        (agentMappingVM.isON && !myModel.firstModel.isMuted)? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
-                                        break;
-                                    case AgentIOPValueTypes.STRING:
+                                    case AgentIOPValueTypeGroups.STRING:
                                         (agentMappingVM.isON && !myModel.firstModel.isMuted)? MasticTheme.redColor2 : MasticTheme.darkRedColor2
                                         break;
-                                    case AgentIOPValueTypes.BOOL:
-                                        (agentMappingVM.isON && !myModel.firstModel.isMuted)? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
-                                        break;
-                                    case AgentIOPValueTypes.IMPULSION:
+                                    case AgentIOPValueTypeGroups.IMPULSION:
                                         (agentMappingVM.isON && !myModel.firstModel.isMuted)? MasticTheme.purpleColor : MasticTheme.darkPurpleColor
                                         break;
-                                    case AgentIOPValueTypes.DATA:
+                                    case AgentIOPValueTypeGroups.DATA:
                                         (agentMappingVM.isON && !myModel.firstModel.isMuted)? MasticTheme.greenColor : MasticTheme.darkGreenColor
                                         break;
-                                    case AgentIOPValueTypes.MIXED:
+                                    case AgentIOPValueTypeGroups.MIXED:
                                         (agentMappingVM.isON && !myModel.firstModel.isMuted)? MasticTheme.whiteColor : MasticTheme.darkGreyColor
                                         break;
-                                    case AgentIOPValueTypes.UNKNOWN:
+                                    case AgentIOPValueTypeGroups.UNKNOWN:
                                         "#000000"
                                         break;
                                     default:

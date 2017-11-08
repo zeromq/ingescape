@@ -75,17 +75,21 @@ Item {
 
     readonly property color veryDarkGreyColor: "#282D34"
     readonly property color darkGreyColor2: "#2B3137"
+
     readonly property color color : "#34393b"
 
     readonly property color darkBlueGreyColor: "#3C424F"
     readonly property color blueGreyColor : "#525A66"
+
     readonly property color lightBlueGreyColor: "#8896AA"
 
+    readonly property color darkGreyColor3 : "#42474A"
     readonly property color darkGreyColor : "#575756"
     readonly property color greyColor : "#706f6f"
     readonly property color lightGreyColor : "#9D9C9C"
 
     readonly property color orangeColor: "#F39200"
+
 
 
     //-----------------------------------------
@@ -163,6 +167,10 @@ Item {
     readonly property color leftPanelBackgroundColor: theme.blackColor
     readonly property color selectedTabsBackgroundColor: theme.veryDarkGreyColor
 
+    // Editors Background
+    readonly property color editorsBackgroundColor: veryDarkGreyColor
+    readonly property color editorsBackgroundBorderColor: greyColor
+
 
     //-----------------------------------------
     //
@@ -195,10 +203,6 @@ Item {
     // Agent Definition editors UI elements
     //
     //-----------------------------------------
-
-    // Background
-    readonly property color definitionEditorsBackgroundColor: veryDarkGreyColor
-    readonly property color definitionEditorsBackgroundBorderColor: greyColor
 
     // Labels
     readonly property color definitionEditorsLabelColor: theme.whiteColor
