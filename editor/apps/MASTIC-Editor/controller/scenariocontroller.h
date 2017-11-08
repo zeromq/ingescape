@@ -22,7 +22,9 @@
 
 #include "I2PropertyHelpers.h"
 #include "viewModel/actionvm.h"
+#include "viewModel/agentinmappingvm.h"
 #include "controller/actioneditorcontroller.h"
+#include "masticmodelmanager.h"
 
 
 /**
@@ -40,6 +42,20 @@ class ScenarioController: public QObject
 
     // Selected action
     I2_QML_PROPERTY_DELETE_PROOF(ActionM*, selectedAction)
+
+    // Used for action edition
+    // --- List of comparisons values types
+    I2_ENUM_LISTMODEL(ComparisonType, comparisonsValuesTypesList)
+    // --- List of comparisons state types
+    I2_ENUM_LISTMODEL(ComparisonType, comparisonsStatesTypesList)
+    // --- List of validity duration type
+    I2_ENUM_LISTMODEL(ValidationDurationType, validationDurationsTypesList)
+    // --- List of effects type
+    I2_ENUM_LISTMODEL(ActionEffectType, effectsTypesList)
+
+    // --- agents list in mapping
+    I2_QOBJECT_LISTMODEL(AgentInMappingVM, agentsInMappingList)
+
 
 
 public:
@@ -91,11 +107,22 @@ Q_SIGNALS:
 
 public Q_SLOTS:
 
+    /**
+      * @brief slot on agents in mapping list count change
+      */
+    void onAgentsInMappingListCountChange();
+
+private :
+    /**
+     * @brief Get e new action name
+     */
+    QString _buildNewActionName();
 
 protected:
 
     QHash<ActionM*, ActionEditorController*> _mapActionsEditorControllersFromActionVM;
 
+    QHash<QString, ActionM*> _mapActionsFromActionName;
 };
 
 QML_DECLARE_TYPE(ScenarioController)

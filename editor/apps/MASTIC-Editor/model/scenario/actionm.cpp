@@ -31,7 +31,7 @@
  */
 ActionM::ActionM(QString name, QObject *parent) : QObject(parent),
     _name(name),
-    _validityDurationType(ValidationDurationType::CUSTOM),
+    _validityDurationType(ValidationDurationType::IMMEDIATE),
     _validityDuration(-1),
     _shallRevert(false),
     _shallRevertWhenValidityIsOver(false),

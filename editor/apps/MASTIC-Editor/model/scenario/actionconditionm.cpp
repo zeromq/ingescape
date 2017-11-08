@@ -30,7 +30,7 @@
  * @param parent
  */
 ActionConditionM::ActionConditionM(QObject *parent) : QObject(parent),
-    _model(NULL),
+    _agentModel(NULL),
     _comparison(ComparisonType::EQUAL_TO)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
@@ -45,7 +45,7 @@ ActionConditionM::ActionConditionM(QObject *parent) : QObject(parent),
 ActionConditionM::~ActionConditionM()
 {
     // Reset agent model to null
-    setmodel(NULL);
+    setagentModel(NULL);
 }
 
 /**
@@ -56,7 +56,7 @@ void ActionConditionM::copyFrom(ActionConditionM* condition)
 {
     if(condition != NULL)
     {
-        setmodel(condition->model());
+        setagentModel(condition->agentModel());
         setcomparison(condition->comparison());
     }
 }

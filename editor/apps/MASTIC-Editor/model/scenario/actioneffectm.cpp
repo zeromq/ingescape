@@ -30,7 +30,7 @@
  * @param parent
  */
 ActionEffectM::ActionEffectM(QObject *parent) : QObject(parent),
-    _model(NULL),
+    _agentModel(NULL),
     _effect(ActionEffectType::ON)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
@@ -45,7 +45,7 @@ ActionEffectM::ActionEffectM(QObject *parent) : QObject(parent),
 ActionEffectM::~ActionEffectM()
 {
     // Reset agent model to null
-    setmodel(NULL);
+    setagentModel(NULL);
 }
 
 /**
@@ -56,7 +56,7 @@ void ActionEffectM::copyFrom(ActionEffectM* effect)
 {
     if(effect != NULL)
     {
-        setmodel(effect->model());
+        setagentModel(effect->agentModel());
         seteffect(effect->effect());
     }
 }

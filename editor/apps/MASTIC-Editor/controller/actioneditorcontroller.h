@@ -21,8 +21,8 @@
 #include <QJSEngine>
 
 #include "I2PropertyHelpers.h"
-#include "viewModel/actionvm.h"
-
+#include "model/scenario/actionm.h"
+#include "viewModel/agentinmappingvm.h"
 
 
 /**
@@ -38,6 +38,9 @@ class ActionEditorController: public QObject
     // Temporary action view model
     I2_QML_PROPERTY(ActionM*, editedAction)
 
+    // Agents in mapping list
+    I2_QML_PROPERTY(I2CustomItemListModel<AgentInMappingVM> *, listAgentsInMapping)
+
 public:
 
     /**
@@ -45,7 +48,7 @@ public:
      * @param original action
      * @param parent
      */
-    explicit ActionEditorController(ActionM * originalAction, QObject *parent = 0);
+    explicit ActionEditorController(ActionM * originalAction, I2CustomItemListModel<AgentInMappingVM> * listAgentsInMapping, QObject *parent = 0);
 
 
     /**
@@ -57,6 +60,26 @@ public:
      * @brief Valide the edition/creation
      */
     void validateModification();
+
+    /**
+     * @brief Create a new condition
+     */
+    Q_INVOKABLE void createNewCondition();
+
+    /**
+     * @brief Remove the condition
+     */
+    Q_INVOKABLE void removeCondition(ActionConditionM* condition);
+
+    /**
+     * @brief Create a new effect
+     */
+    Q_INVOKABLE void createNewEffect();
+
+    /**
+     * @brief Remove the effect
+     */
+    Q_INVOKABLE void removeEffect(ActionEffectM* effect);
 
 
 Q_SIGNALS:

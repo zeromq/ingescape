@@ -36,7 +36,7 @@ class ActionEffectM: public QObject
     Q_OBJECT
 
     // Agent model
-    I2_QML_PROPERTY(AgentM*, model)
+    I2_QML_PROPERTY(AgentM*, agentModel)
 
     // Effect type
     I2_QML_PROPERTY(ActionEffectType::Value, effect)
