@@ -202,11 +202,6 @@ void AgentsSupervisionController::onAgentModelCreated(AgentM* model)
 
         // Add our view model to the list
         _agentsList.append(agent);
-
-        if (agent->definition() != NULL) {
-            // Update our list of agents with the new definition for this agent
-            _updateWithNewDefinitionForAgent(agent, agent->definition());
-        }
     }
 }
 
