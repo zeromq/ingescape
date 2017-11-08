@@ -55,11 +55,11 @@ class AgentInMappingVM : public QObject
     // Flag indicating if our agent is reduced
     I2_QML_PROPERTY(bool, isReduced)
 
-    // Define the value type of the reduced map (= brin) in input of the agent
-    I2_QML_PROPERTY_READONLY(AgentIOPValueTypes::Value, reducedMapValueTypeInInput)
+    // Group of value type of the reduced map (= brin) in input of the agent
+    I2_QML_PROPERTY_READONLY(AgentIOPValueTypeGroups::Value, reducedMapValueTypeGroupInInput)
 
-    // Define the value type of the reduced map (= brin) in output of the agent
-    I2_QML_PROPERTY_READONLY(AgentIOPValueTypes::Value, reducedMapValueTypeInOutput)
+    // Group of value type of the reduced map (= brin) in output of the agent
+    I2_QML_PROPERTY_READONLY(AgentIOPValueTypeGroups::Value, reducedMapValueTypeGroupInOutput)
 
     // Flag indicating if our agent is a ghost agent
     I2_QML_PROPERTY_READONLY(bool, isGhost)
@@ -158,6 +158,18 @@ private Q_SLOTS:
 
 
     /**
+     * @brief Slot when the list of (view models of) inputs changed
+     */
+    //void _onInputsListChanged();
+
+
+    /**
+     * @brief Slot when the list of (view models of) outputs changed
+     */
+    //void _onOutputsListChanged();
+
+
+    /**
      * @brief Slot when the flag "is ON" of a model changed
      * @param isON
      */
@@ -183,7 +195,7 @@ private:
     /**
      * @brief A model of input has been added
      * @param input
-     * @return
+     * @return a view model of input only if it is a new one
      */
     InputVM* _inputModelAdded(AgentIOPM* input);
 
@@ -199,7 +211,7 @@ private:
     /**
      * @brief A model of output has been added
      * @param output
-     * @return
+     * @return a view model of output only if it is a new one
      */
     OutputVM* _outputModelAdded(OutputM* output);
 
@@ -213,34 +225,6 @@ private:
 
 
     /**
-     * @brief Add new points Map to the inputs list from a definition model
-     * @param newDefinition The definition model
-     */
-    //void _addPointMapInInternalInputList(DefinitionM *newDefinition);
-
-
-    /**
-     * @brief Add new points Map to the outputs list from a definition model
-     * @param newDefinition The definition model
-     */
-    //void _addPointMapInInternalOutputList(DefinitionM *newDefinition);
-
-
-    /**
-     * @brief This function check if the OutputVM already exist in the input list
-     * @param currentOuput The newly created OutputVM
-     */
-    //bool _checkIfAlreadyInOutputList(OutputVM* currentOuput);
-
-
-    /**
-     * @brief This function check if the InputVM already exist in the input list
-     * @param currentInput The newly created Input VM
-     */
-    //bool _checkIfAlreadyInInputList(InputVM* currentInput);
-
-
-    /**
      * @brief Update with all models of agents
      */
     void _updateWithAllModels();
@@ -250,6 +234,18 @@ private:
      * @brief Update the flag "is ON" in function of flags of models
      */
     void _updateIsON();
+
+
+    /**
+     * @brief Update the group (of value type) of the reduced map (= brin) in input of our agent
+     */
+    void _updateReducedMapValueTypeGroupInInput();
+
+
+    /**
+     * @brief Update the group (of value type) of the reduced map (= brin) in output of our agent
+     */
+    void _updateReducedMapValueTypeGroupInOutput();
 
 
 private:

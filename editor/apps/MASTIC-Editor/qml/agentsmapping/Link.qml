@@ -234,7 +234,7 @@ I2CubicBezierCurve {
     Keys.onPressed: {
         if (event.key === Qt.Key_Backspace || event.key === Qt.Key_Delete) {
             if (controller && controller.selectedMapBetweenIOP) {
-                console.log( " delete " + controller.selectedMapBetweenIOP);
+                console.log( "delete " + controller.selectedMapBetweenIOP);
             }
 
             event.accepted = true;

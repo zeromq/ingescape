@@ -159,6 +159,9 @@ Item {
     // Background
     readonly property color windowBackgroundColor: "#E4E4E4"
 
+    // Left panel lists Background
+    readonly property color leftPanelBackgroundColor: theme.blackColor
+    readonly property color selectedTabsBackgroundColor: theme.veryDarkGreyColor
 
 
     //-----------------------------------------
@@ -166,12 +169,6 @@ Item {
     // Agents list UI elements
     //
     //-----------------------------------------
-
-
-    // Background
-    readonly property color leftPanelBackgroundColor: theme.blackColor
-    readonly property color selectedTabsBackgroundColor: theme.veryDarkGreyColor
-
     // Labels
     readonly property color agentsListLabelColor: theme.whiteColor
     readonly property color agentsListLabel2Color: theme.whiteColor
@@ -220,6 +217,12 @@ Item {
     readonly property color scenarioBackgroundColor: "#3C424F"
 
 
+    // List Actions
+    readonly property color actionsListItemBackgroundColor: theme.veryDarkGreyColor
+    readonly property color actionsListItemRollOverBackgroundColor: theme.darkGreyColor2
+
+    readonly property color actionsListLabelColor: theme.whiteColor
+    readonly property color actionsListPressedLabelColor: theme.greyColor
 
     //-----------------------------------------
     //
