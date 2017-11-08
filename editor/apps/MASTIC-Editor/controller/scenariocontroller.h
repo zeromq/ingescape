@@ -114,7 +114,7 @@ public Q_SLOTS:
 
 private :
     /**
-     * @brief Get e new action name
+     * @brief Get a new action name
      */
     QString _buildNewActionName();
 

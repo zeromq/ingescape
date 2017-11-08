@@ -16,6 +16,34 @@
 
 #include <QDebug>
 
+/**
+ * @brief Validation duration type for an action
+ * @param value
+ * @return
+ */
+QString ValidationDurationType::enumToString(int value)
+{
+    QString string = "Validation duration";
+
+    switch (value) {
+    case ValidationDurationType::CUSTOM:
+        string = "custom";
+        break;
+
+    case ValidationDurationType::IMMEDIATE:
+        string = "immediate";
+        break;
+
+    case ValidationDurationType::INFINITE:
+        string = "infinite";
+        break;
+
+    default:
+        break;
+    }
+
+    return string;
+}
 
 
 //--------------------------------------------------------------

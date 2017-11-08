@@ -86,6 +86,11 @@ void ScenarioController::openActionEditor(ActionM* actionM)
         {
             actionM = new ActionM(_buildNewActionName());
         }
+        // Set selected action
+        else
+        {
+            setselectedAction(actionM);
+        }
 
         // Create action editor controller
         ActionEditorController* actionEditorC = new ActionEditorController(actionM,agentsInMappingList());
@@ -211,7 +216,7 @@ void ScenarioController::onAgentsInMappingListCountChange()
 }
 
 /**
- * @brief Get e new action name
+ * @brief Get a new action name
  */
 QString ScenarioController::_buildNewActionName()
 {

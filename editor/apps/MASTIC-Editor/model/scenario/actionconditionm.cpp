@@ -17,6 +17,42 @@
 #include <QDebug>
 
 
+/**
+ * @brief Comparison type for an action
+ * @param value
+ * @return
+ */
+QString ComparisonType::enumToString(int value)
+{
+    QString string = "Comparison type";
+
+    switch (value) {
+    case ComparisonType::SUPERIOR_TO:
+        string = ">";
+        break;
+
+    case ComparisonType::INFERIOR_TO:
+        string = "<";
+        break;
+
+    case ComparisonType::EQUAL_TO:
+        string = "=";
+        break;
+
+    case ComparisonType::ON:
+        string = "On";
+        break;
+
+    case ComparisonType::OFF:
+        string = "Off";
+        break;
+
+    default:
+        break;
+    }
+
+    return string;
+}
 
 //--------------------------------------------------------------
 //

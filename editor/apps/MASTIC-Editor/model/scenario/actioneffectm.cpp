@@ -16,7 +16,38 @@
 
 #include <QDebug>
 
+/**
+ * @brief Effect type for an action
+ * @param value
+ * @return
+ */
+QString ActionEffectType::enumToString(int value)
+{
+    QString string = "Effect type";
 
+    switch (value) {
+    case ActionEffectType::ENABLE:
+        string = "Enable";
+        break;
+
+    case ActionEffectType::DISABLE:
+        string = "Disable";
+        break;
+
+    case ActionEffectType::ON:
+        string = "On";
+        break;
+
+    case ActionEffectType::OFF:
+        string = "Off";
+        break;
+
+    default:
+        break;
+    }
+
+    return string;
+}
 
 //--------------------------------------------------------------
 //

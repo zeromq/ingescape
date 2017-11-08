@@ -27,12 +27,13 @@
 #include "model/scenario/actionconditionm.h"
 
 /**
+  * @brief Validation duration type for an action
   * Types:
   * - Custom
   * - Immediate
   * - Infinite
   */
-I2_ENUM(ValidationDurationType, CUSTOM, IMMEDIATE, INFINITE)
+I2_ENUM_CUSTOM(ValidationDurationType, CUSTOM, IMMEDIATE, INFINITE)
 
 
 /**

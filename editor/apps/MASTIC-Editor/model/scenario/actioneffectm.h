@@ -25,7 +25,7 @@
 /**
   * Effect type for an action: ON, OFF, ENABLE, DISABLE
   */
-I2_ENUM(ActionEffectType, ON, OFF, ENABLE, DISABLE)
+I2_ENUM_CUSTOM(ActionEffectType, ON, OFF, ENABLE, DISABLE)
 
 
 /**

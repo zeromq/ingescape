@@ -25,9 +25,9 @@
 #include "model/agentm.h"
 
 /**
-  * Comparison type for an action: SUPERIOR_TO, INFERIOR_TO, EQUAL_TO, ON, OFF
+  * Comparison type for an action: SUPERIOR_TO, INFERIOR_TO, DIFFER_TO, ON, OFF
   */
-I2_ENUM(ComparisonType, SUPERIOR_TO, INFERIOR_TO, EQUAL_TO, ON, OFF)
+I2_ENUM_CUSTOM(ComparisonType, SUPERIOR_TO, INFERIOR_TO, EQUAL_TO, ON, OFF)
 
 
 /**
