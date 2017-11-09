@@ -278,10 +278,15 @@ void AgentsMappingController::_generateAllMapBetweenIopUsingNewlyAddedInputsVM(A
 
                                 if(outputAgent != NULL)
                                 {
+                                    // FIXME TODO: il peut y avoir plusieurs output VM pour un nom (lequel prendre dans la liste ?)
                                     // Get the output conserned by the mapping.
-                                    outputPointVM = outputAgent->getOutputFromName(currentElementMapping->output());
+                                    //outputPointVM = outputAgent->getOutputFromName(currentElementMapping->output());
+                                    QList<OutputVM*> outputsWithSameName = outputAgent->getOutputsListFromName(currentElementMapping->output());
+                                    if (outputsWithSameName.count() > 0) {
+                                        outputPointVM = outputsWithSameName.first();
+                                    }
 
-                                    if(outputPointVM == NULL)
+                                    if (outputPointVM == NULL)
                                     {
                                        // Handle Output is missing
 
@@ -613,6 +618,11 @@ void AgentsMappingController::_deleteAgentInMapping(AgentInMappingVM* agentInMap
     if (agentInMapping != NULL)
     {
         qInfo() << "An agent mapping has been removed:" << agentInMapping->agentName();
+
+        // Unselect our agent if needed
+        if (_selectedAgent == agentInMapping) {
+            setselectedAgent(NULL);
+        }
 
         // Remove from the map list
         _mapFromNameToAgentInMappingViewModelsList.remove(agentInMapping->agentName());

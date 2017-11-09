@@ -79,14 +79,8 @@ class AgentIOPM : public QObject
     // Displayable defaut value of our Input / Output / Parameter
     I2_QML_PROPERTY(QString, displayableDefaultValue)
 
-    // Mapping value of our Input / Output / Parameter
-    //I2_CPP_PROPERTY(QVariant, mappingValue)
-
-    // Displayable mapping value of our Input / Output / Parameter
-    //I2_QML_PROPERTY(QString, displayableMappingValue)
-
     // current value of our Input / Output / Parameter
-    //I2_CPP_PROPERTY(QVariant, currentValue)
+    //I2_CPP_PROPERTY_CUSTOM_SETTER(QVariant, currentValue)
 
     // Displayable current value of our Input / Output / Parameter
     //I2_QML_PROPERTY(QString, displayableCurrentValue)

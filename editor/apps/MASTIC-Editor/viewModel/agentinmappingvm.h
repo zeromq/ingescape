@@ -123,10 +123,10 @@ Q_SIGNALS:
 public Q_SLOTS:
 
     /**
-     * @brief Return the corresponding view model of input from the input name
+     * @brief Return the corresponding list of view models of input from the input name
      * @param inputName
      */
-    InputVM* getInputFromName(QString inputName);
+    QList<InputVM*> getInputsListFromName(QString inputName);
 
 
     /**
@@ -137,10 +137,10 @@ public Q_SLOTS:
 
 
     /**
-     * @brief Return the corresponding view model of output from the output name
+     * @brief Return the corresponding list of view models of output from the output name
      * @param outputName
      */
-    OutputVM* getOutputFromName(QString outputName);
+    QList<OutputVM*> getOutputsListFromName(QString outputName);
 
 
     /**
@@ -253,13 +253,19 @@ private:
     // Previous list of models of agents
     QList<AgentM*> _previousAgentsList;
 
-    // FIXME: input name as key is not unique (value type can be different)
-    QHash<QString, InputVM*> _mapOfInputsFromInputName;
-    QHash<QString, InputVM*> _mapOfInputsFromInputId;
+    // Input name as key is not unique (value type can be different)
+    // Map from an input name to a list of view models of inputs
+    QHash<QString, QList<InputVM*>> _mapFromNameToInputsList;
 
-    // FIXME: output name as key is not unique (value type can be different)
-    QHash<QString, OutputVM*> _mapOfOutputsFromOutputName;
-    QHash<QString, OutputVM*> _mapOfOutputsFromOutputId;
+    // Map from a (unique) input id to a view model of input
+    QHash<QString, InputVM*> _mapFromUniqueIdToInput;
+
+    // Output name as key is not unique (value type can be different)
+    // Map from an output name to a list of view models of outputs
+    QHash<QString, QList<OutputVM*>> _mapFromNameToOutputsList;
+
+    // Map from a (unique) output id to a view model of output
+    QHash<QString, OutputVM*> _mapFromUniqueIdToOutput;
 
 };
 

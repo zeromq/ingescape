@@ -334,25 +334,31 @@ void onObserveInputCallback(iop_t iopType, const char* name, iopType_t valueType
     if (networkController != NULL)
     {
         if (iopType == INPUT_T) {
+            //QString inputName = name;
             AgentIOPValueTypes::Value agentIOPValueType = static_cast<AgentIOPValueTypes::Value>(valueType);
+
             switch (valueType)
             {
             case INTEGER_T: {
+                //int* newValue = (int*)value;
                 int newValue = mtic_readInputAsInt(name);
                 qDebug() << "New value" << newValue << "received on" << name << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
                 break;
             }
             case DOUBLE_T: {
+                //double* newValue = (double*)value;
                 double newValue = mtic_readInputAsDouble(name);
                 qDebug() << "New value" << newValue << "received on" << name << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
                 break;
             }
             case STRING_T: {
+                //QString newValue = QString((char*)value);
                 QString newValue = mtic_readInputAsString(name);
                 qDebug() << "New value" << newValue << "received on" << name << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
                 break;
             }
             case BOOL_T: {
+                //bool* newValue = (bool*)value;
                 bool newValue = mtic_readInputAsBool(name);
                 if (newValue) {
                     qDebug() << "New value TRUE received on" << name << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
@@ -367,12 +373,15 @@ void onObserveInputCallback(iop_t iopType, const char* name, iopType_t valueType
                 break;
             }
             case DATA_T: {
-
                 // On stocke dans un dossier le media (eg video, son, image) et on log le path et le start time!!.
                 void* data = NULL;
-                if(mtic_readInputAsData(name, &data, &valueSize))
-                qDebug() << "New DATA with size" << valueSize << "received on" << name << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
-
+                int result = mtic_readInputAsData(name, &data, &valueSize);
+                if (result == 1) {
+                    qDebug() << "New DATA with size" << valueSize << "received on" << name << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
+                }
+                else {
+                    // FIXME TODO
+                }
                 break;
             }
             default: {
