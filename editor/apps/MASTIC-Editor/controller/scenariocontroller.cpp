@@ -45,8 +45,8 @@ ScenarioController::ScenarioController(QObject *parent) : QObject(parent),
     _comparisonsValuesTypesList.removeEnumValue(ActionComparisonValueType::OFF);
 
     // Fill value effects types list
-    _effectsStatesTypesList.appendEnumValue(ActionEffectValueType::ON);
-    _effectsStatesTypesList.appendEnumValue(ActionEffectValueType::OFF);
+    _effectsAgentsTypesList.appendEnumValue(ActionEffectValueType::ON);
+    _effectsAgentsTypesList.appendEnumValue(ActionEffectValueType::OFF);
 
     // Fill link effects types list
     _effectsLinksTypesList.appendEnumValue(ActionEffectValueType::ENABLE);
@@ -58,6 +58,17 @@ ScenarioController::ScenarioController(QObject *parent) : QObject(parent),
 
     // Fill validity duration types list
     _validationDurationsTypesList.fillWithAllEnumValues();
+
+    // Initialize the 9 items of the palette with NULL action
+    _actionsInPaletteList.append(new ActionInPaletteVM(NULL));
+    _actionsInPaletteList.append(new ActionInPaletteVM(NULL));
+    _actionsInPaletteList.append(new ActionInPaletteVM(NULL));
+    _actionsInPaletteList.append(new ActionInPaletteVM(NULL));
+    _actionsInPaletteList.append(new ActionInPaletteVM(NULL));
+    _actionsInPaletteList.append(new ActionInPaletteVM(NULL));
+    _actionsInPaletteList.append(new ActionInPaletteVM(NULL));
+    _actionsInPaletteList.append(new ActionInPaletteVM(NULL));
+    _actionsInPaletteList.append(new ActionInPaletteVM(NULL));
 }
 
 
@@ -68,6 +79,9 @@ ScenarioController::~ScenarioController()
 {
     // Clean-up current selection
     setselectedAction(NULL);
+
+    // Delete actions VM from the palette
+    _actionsInPaletteList.deleteAllItems();
 
     // Clear the list of editor opened
     _mapActionsEditorControllersFromActionVM.clear();
@@ -210,6 +224,20 @@ QString ScenarioController::_buildNewActionName()
     }
 
     return tmpName;
+}
+
+/**
+ * @brief Set an action into the palette at index
+ * @param index where to insert the action
+ * @param action to insert
+ */
+void ScenarioController::setActionInPalette(int index, ActionM* actionM)
+{
+    // Set action in palette
+    if(index < _actionsInPaletteList.count())
+    {
+        _actionsInPaletteList.at(index)->setactionModel(actionM);
+    }
 }
 
 

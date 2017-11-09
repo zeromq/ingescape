@@ -99,7 +99,7 @@ void ActionConditionVM::setconditionType(ActionConditionType::Value value)
  */
 void ActionConditionVM::_configureToType(ActionConditionType::Value value)
 {
-    AgentM* agent = NULL;
+    AgentInMappingVM* agent = NULL;
 
     // Delete the old condition if exists
     if(_condition != NULL)

@@ -84,11 +84,7 @@ void ActionEditorController::createNewCondition()
 
     if(_listAgentsInMapping != NULL && _listAgentsInMapping->count() > 0)
     {
-        AgentInMappingVM * agentInMapping = _listAgentsInMapping->at(0);
-        if(agentInMapping->models()->count() > 0)
-        {
-            conditionVM->condition()->setagentModel(agentInMapping->models()->at(0));
-        }
+        conditionVM->condition()->setagentModel(_listAgentsInMapping->at(0));
     }
 
     _editedAction->conditionsList()->append(conditionVM);
@@ -115,11 +111,7 @@ void ActionEditorController::createNewEffect()
 
     if(_listAgentsInMapping != NULL && _listAgentsInMapping->count() > 0)
     {
-        AgentInMappingVM * agentInMapping = _listAgentsInMapping->at(0);
-        if(agentInMapping->models()->count() > 0)
-        {
-            effectVM->effect()->setagentModel(agentInMapping->models()->at(0));
-        }
+        effectVM->effect()->setagentModel(_listAgentsInMapping->at(0));
     }
 
     _editedAction->effectsList()->append(effectVM);

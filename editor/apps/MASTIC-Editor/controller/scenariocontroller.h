@@ -23,6 +23,7 @@
 #include "I2PropertyHelpers.h"
 #include "viewModel/actionvm.h"
 #include "viewModel/agentinmappingvm.h"
+#include "viewModel/actioninpalettevm.h"
 #include "controller/actioneditorcontroller.h"
 #include "masticmodelmanager.h"
 
@@ -51,7 +52,7 @@ class ScenarioController: public QObject
     // --- List of validity duration type
     I2_ENUM_LISTMODEL(ValidationDurationType, validationDurationsTypesList)
     // --- List of effects states type
-    I2_ENUM_LISTMODEL(ActionEffectValueType, effectsStatesTypesList)
+    I2_ENUM_LISTMODEL(ActionEffectValueType, effectsAgentsTypesList)
     // --- List of effects links type
     I2_ENUM_LISTMODEL(ActionEffectValueType, effectsLinksTypesList)
 
@@ -60,11 +61,12 @@ class ScenarioController: public QObject
     // --- List of effects type
     I2_ENUM_LISTMODEL(ActionEffectType, effectsTypesList)
 
-
     // --- agents list in mapping
     I2_QOBJECT_LISTMODEL(AgentInMappingVM, agentsInMappingList)
 
 
+    // List of actions in palette
+    I2_QOBJECT_LISTMODEL(ActionInPaletteVM, actionsInPaletteList)
 
 public:
 
@@ -103,6 +105,13 @@ public:
       * @param action editor controller
       */
     Q_INVOKABLE void closeActionEditor(ActionEditorController* actionEditorC);
+
+    /**
+     * @brief Set an action into the palette at index
+     * @param index where to insert the action
+     * @param action to insert
+     */
+    Q_INVOKABLE void setActionInPalette(int index, ActionM* actionM);
 
 Q_SIGNALS:
 

@@ -1,5 +1,5 @@
 /*
- *	IOPValueEffectM
+ *	ActionInPaletteVM
  *
  *  Copyright (c) 2016-2017 Ingenuity i/o. All rights reserved.
  *
@@ -11,7 +11,7 @@
  *
  */
 
-#include "iopvalueeffectm.h"
+#include "actioninpalettevm.h"
 
 
 #include <QDebug>
@@ -20,18 +20,18 @@
 
 //--------------------------------------------------------------
 //
-// IOPValueEffectM
+// ActionInPaletteVM
 //
 //--------------------------------------------------------------
 
 
 /**
  * @brief Default constructor
+ * @param action model
  * @param parent
  */
-IOPValueEffectM::IOPValueEffectM(QObject *parent) : ActionEffectM(parent),
-    _agentIOP(NULL),
-    _value("")
+ActionInPaletteVM::ActionInPaletteVM(ActionM* actionM, QObject *parent) : QObject(parent),
+    _actionModel(actionM)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -42,13 +42,25 @@ IOPValueEffectM::IOPValueEffectM(QObject *parent) : ActionEffectM(parent),
 /**
  * @brief Destructor
  */
-IOPValueEffectM::~IOPValueEffectM()
+ActionInPaletteVM::~ActionInPaletteVM()
 {
-    // Clear our list
-    _agentIopList.clear();
+    setactionModel(NULL);
+}
 
-    // reset agent IOP pointer
-    setagentIOP(NULL);
+/**
+ * @brief Custom setter on action model
+ */
+void ActionInPaletteVM::setactionModel(ActionM* actionM)
+{
+    if(_actionModel != actionM)
+    {
+        _actionModel = actionM;
+
+        // Reset status
+        setstatus(ActionInPaletteState::DISABLE);
+
+        emit actionModelChanged(actionM);
+    }
 }
 
 

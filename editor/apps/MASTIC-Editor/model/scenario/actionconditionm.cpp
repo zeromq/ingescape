@@ -15,7 +15,7 @@
 
 
 #include <QDebug>
-
+#include "iopvalueconditionm.h"
 
 /**
  * @brief Comparison type for an action
@@ -96,6 +96,55 @@ void ActionConditionM::copyFrom(ActionConditionM* condition)
     {
         setagentModel(condition->agentModel());
         setcomparison(condition->comparison());
+    }
+}
+
+/**
+* @brief Custom setter on the agent model
+* @param agent
+*/
+void ActionConditionM::setagentModel(AgentInMappingVM* agentM)
+{
+    if(_agentModel != agentM)
+    {
+        _agentModel = agentM;
+
+        IOPValueConditionM* iopCondition = dynamic_cast<IOPValueConditionM*>(this);
+        if(iopCondition != NULL)
+        {
+            // Clear the list
+            iopCondition->agentIopList()->clear();
+
+            if(_agentModel != NULL)
+            {
+                // Fill with inputs
+                foreach (InputVM* input, _agentModel->inputsList()->toList())
+                {
+                    if(input->firstModel() != NULL)
+                    {
+                        iopCondition->agentIopList()->append(input->firstModel());
+                    }
+                }
+
+                // Fill with outputs
+                foreach (OutputVM* output, _agentModel->outputsList()->toList())
+                {
+                    if(output->firstModel() != NULL)
+                    {
+                        iopCondition->agentIopList()->append(output->firstModel());
+                    }
+                }
+
+                // Select the first item
+                if(iopCondition->agentIopList()->count() > 0)
+                {
+                    iopCondition->setagentIOP(iopCondition->agentIopList()->at(0));
+                }
+            }
+
+        }
+
+        emit agentModelChanged(agentM);
     }
 }
 

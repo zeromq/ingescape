@@ -41,6 +41,9 @@ class IOPValueEffectM: public ActionEffectM
     // value converted into string
     I2_QML_PROPERTY(QString, value)
 
+    // Concatened list of iop agents items
+    I2_QOBJECT_LISTMODEL(AgentIOPM , agentIopList)
+
 public:
 
     /**

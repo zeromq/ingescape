@@ -52,6 +52,9 @@ class ActionM: public QObject
     // Validity duration in milliseconds
     I2_QML_PROPERTY(int, validityDuration)
 
+    // Validity duration in milliseconds in string format
+    I2_QML_PROPERTY_CUSTOM_SETTER(QString, validityDurationString)
+
     // Shall revert the action
     I2_QML_PROPERTY(bool, shallRevert)
 
@@ -61,11 +64,11 @@ class ActionM: public QObject
     // Shall revert after date time flag
     I2_QML_PROPERTY(bool, shallRevertAfterTime)
 
-    // Revert after date time flag
-    I2_QML_PROPERTY(int, revertAfterTimeInSec)
+    // Revert after time in milliseconds
+    I2_QML_PROPERTY(int, revertAfterTime)
 
-    // Revert after date time flag
-    I2_QML_PROPERTY_CUSTOM_SETTER(QString, revertAfterTime)
+    // Revert after time in string format
+    I2_QML_PROPERTY_CUSTOM_SETTER(QString, revertAfterTimeString)
 
     // Flag to rearm the action
     I2_QML_PROPERTY(bool, shallRearm)

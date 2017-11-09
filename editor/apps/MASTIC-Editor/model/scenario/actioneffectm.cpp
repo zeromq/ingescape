@@ -15,6 +15,7 @@
 
 
 #include <QDebug>
+#include "iopvalueeffectm.h"
 
 /**
  * @brief Effect type for an action
@@ -92,4 +93,52 @@ void ActionEffectM::copyFrom(ActionEffectM* effect)
     }
 }
 
+/**
+* @brief Custom setter on the agent model
+* @param agent
+*/
+void ActionEffectM::setagentModel(AgentInMappingVM* agentM)
+{
+    if(_agentModel != agentM)
+    {
+        _agentModel = agentM;
+
+        IOPValueEffectM* iopEffect = dynamic_cast<IOPValueEffectM*>(this);
+        if(iopEffect != NULL)
+        {
+            if(_agentModel != NULL)
+            {
+                // Clear the list
+                iopEffect->agentIopList()->clear();
+
+                // Fill with inputs
+                foreach (InputVM* input, _agentModel->inputsList()->toList())
+                {
+                    if(input->firstModel() != NULL)
+                    {
+                        iopEffect->agentIopList()->append(input->firstModel());
+                    }
+                }
+
+                // Fill with outputs
+                foreach (OutputVM* output, _agentModel->outputsList()->toList())
+                {
+                    if(output->firstModel() != NULL)
+                    {
+                        iopEffect->agentIopList()->append(output->firstModel());
+                    }
+                }
+
+                // Select the first item
+                if(iopEffect->agentIopList()->count() > 0)
+                {
+                    iopEffect->setagentIOP(iopEffect->agentIopList()->at(0));
+                }
+            }
+
+        }
+
+        emit agentModelChanged(agentM);
+    }
+}
 
