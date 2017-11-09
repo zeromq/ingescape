@@ -25,9 +25,9 @@
 #include "model/scenario/iopvalueconditionm.h"
 
 /**
-  * Action condition type : STATUS, VALUE
+  * Action condition type : AGENT, VALUE
   */
-I2_ENUM_CUSTOM(ActionConditionType, STATUS, VALUE)
+I2_ENUM_CUSTOM(ActionConditionType, AGENT, VALUE)
 
 
 /**

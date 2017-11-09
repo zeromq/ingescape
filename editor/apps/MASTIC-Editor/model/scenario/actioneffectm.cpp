@@ -35,11 +35,11 @@ QString ActionEffectValueType::enumToString(int value)
         break;
 
     case ActionEffectValueType::ON:
-        string = "On";
+        string = "ON";
         break;
 
     case ActionEffectValueType::OFF:
-        string = "Off";
+        string = "OFF";
         break;
 
     default:
