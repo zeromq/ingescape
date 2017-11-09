@@ -52,7 +52,8 @@ SOURCES += main.cpp \
     misc/terminationsignalwatcher.cpp \
     misc/collapsiblecolumn.cpp \
     viewModel/actionconditionvm.cpp \
-    viewModel/actioneffectvm.cpp
+    viewModel/actioneffectvm.cpp \
+    viewModel/actioninpalettevm.cpp
 
 HEADERS += \
     model/agentm.h \
@@ -100,7 +101,8 @@ HEADERS += \
     misc/terminationsignalwatcher.h \
     misc/collapsiblecolumn.h \
     viewModel/actionconditionvm.h \
-    viewModel/actioneffectvm.h
+    viewModel/actioneffectvm.h \
+    viewModel/actioninpalettevm.h
 
 
 RESOURCES += qml.qrc
