@@ -30,11 +30,14 @@
  * @param parent
  */
 IOPValueConditionM::IOPValueConditionM(QObject *parent) : ActionConditionM(parent),
-    _agentIOP(NULL)
+    _agentIOP(NULL),
+    _value("")
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
+    // Initialize value comparison type
+    setcomparison(ActionComparisonValueType::EQUAL_TO);
 }
 
 

@@ -35,6 +35,9 @@ class IOPValueConditionM: public ActionConditionM
     // Agent IOP
     I2_QML_PROPERTY(AgentIOPM* , agentIOP)
 
+    // value in string format
+    I2_QML_PROPERTY(QString , value)
+
 
 public:
 

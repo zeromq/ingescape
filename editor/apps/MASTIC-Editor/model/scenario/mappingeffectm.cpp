@@ -35,6 +35,8 @@ MappingEffectM::MappingEffectM(QObject *parent) : ActionEffectM(parent),
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
+    // Initialize effect
+    seteffect(ActionEffectValueType::ENABLE);
 }
 
 

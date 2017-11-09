@@ -50,7 +50,9 @@ SOURCES += main.cpp \
     viewModel/iop/inputvm.cpp \
     viewModel/iop/outputvm.cpp \
     misc/terminationsignalwatcher.cpp \
-    misc/collapsiblecolumn.cpp
+    misc/collapsiblecolumn.cpp \
+    viewModel/actionconditionvm.cpp \
+    viewModel/actioneffectvm.cpp
 
 HEADERS += \
     model/agentm.h \
@@ -96,7 +98,9 @@ HEADERS += \
     viewModel/iop/inputvm.h \
     viewModel/iop/outputvm.h \
     misc/terminationsignalwatcher.h \
-    misc/collapsiblecolumn.h
+    misc/collapsiblecolumn.h \
+    viewModel/actionconditionvm.h \
+    viewModel/actioneffectvm.h
 
 
 RESOURCES += qml.qrc

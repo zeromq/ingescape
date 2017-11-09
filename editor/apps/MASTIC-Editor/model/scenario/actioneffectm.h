@@ -25,7 +25,7 @@
 /**
   * Effect type for an action: ON, OFF, ENABLE, DISABLE
   */
-I2_ENUM_CUSTOM(ActionEffectType, ON, OFF, ENABLE, DISABLE)
+I2_ENUM_CUSTOM(ActionEffectValueType, ON, OFF, ENABLE, DISABLE)
 
 
 /**
@@ -39,7 +39,7 @@ class ActionEffectM: public QObject
     I2_QML_PROPERTY(AgentM*, agentModel)
 
     // Effect type
-    I2_QML_PROPERTY(ActionEffectType::Value, effect)
+    I2_QML_PROPERTY(ActionEffectValueType::Value, effect)
 
 public:
 

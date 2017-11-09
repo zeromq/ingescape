@@ -23,6 +23,8 @@
 #include "I2PropertyHelpers.h"
 #include "model/scenario/actionm.h"
 #include "viewModel/agentinmappingvm.h"
+#include "viewModel/actionconditionvm.h"
+#include "viewModel/actioneffectvm.h"
 
 
 /**
@@ -69,7 +71,7 @@ public:
     /**
      * @brief Remove the condition
      */
-    Q_INVOKABLE void removeCondition(ActionConditionM* condition);
+    Q_INVOKABLE void removeCondition(ActionConditionVM* conditionVM);
 
     /**
      * @brief Create a new effect
@@ -79,7 +81,7 @@ public:
     /**
      * @brief Remove the effect
      */
-    Q_INVOKABLE void removeEffect(ActionEffectM* effect);
+    Q_INVOKABLE void removeEffect(ActionEffectVM* effectVM);
 
 
 Q_SIGNALS:

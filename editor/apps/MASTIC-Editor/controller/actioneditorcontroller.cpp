@@ -80,60 +80,60 @@ void ActionEditorController::validateModification()
  */
 void ActionEditorController::createNewCondition()
 {
-    ActionConditionM * condition = new ActionConditionM(this);
+    ActionConditionVM * conditionVM = new ActionConditionVM(this);
 
     if(_listAgentsInMapping != NULL && _listAgentsInMapping->count() > 0)
     {
         AgentInMappingVM * agentInMapping = _listAgentsInMapping->at(0);
         if(agentInMapping->models()->count() > 0)
         {
-            condition->setagentModel(agentInMapping->models()->at(0));
+            conditionVM->condition()->setagentModel(agentInMapping->models()->at(0));
         }
     }
 
-    _editedAction->conditionsList()->append(condition);
+    _editedAction->conditionsList()->append(conditionVM);
 }
 
 /**
- * @brief Remove the condition
+ * @brief Remove the conditionVM
  */
-void ActionEditorController::removeCondition(ActionConditionM* condition)
+void ActionEditorController::removeCondition(ActionConditionVM* conditionVM)
 {
     // Remove the condition
-    if(_editedAction->conditionsList()->contains(condition))
+    if(_editedAction->conditionsList()->contains(conditionVM))
     {
-        _editedAction->conditionsList()->remove(condition);
+        _editedAction->conditionsList()->remove(conditionVM);
     }
 }
 
 /**
- * @brief Create a new effect
+ * @brief Create a new effectVM
  */
 void ActionEditorController::createNewEffect()
 {
-    ActionEffectM * effect = new ActionEffectM(this);
+    ActionEffectVM * effectVM = new ActionEffectVM(this);
 
     if(_listAgentsInMapping != NULL && _listAgentsInMapping->count() > 0)
     {
         AgentInMappingVM * agentInMapping = _listAgentsInMapping->at(0);
         if(agentInMapping->models()->count() > 0)
         {
-            effect->setagentModel(agentInMapping->models()->at(0));
+            effectVM->effect()->setagentModel(agentInMapping->models()->at(0));
         }
     }
 
-    _editedAction->effectsList()->append(effect);
+    _editedAction->effectsList()->append(effectVM);
 }
 
 /**
- * @brief Remove the effect
+ * @brief Remove the effectVM
  */
-void ActionEditorController::removeEffect(ActionEffectM* effect)
+void ActionEditorController::removeEffect(ActionEffectVM* effectVM)
 {
     // Remove the effect
-    if(_editedAction->effectsList()->contains(effect))
+    if(_editedAction->effectsList()->contains(effectVM))
     {
-        _editedAction->effectsList()->remove(effect);
+        _editedAction->effectsList()->remove(effectVM);
     }
 }
 

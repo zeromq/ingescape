@@ -22,28 +22,28 @@
  * @param value
  * @return
  */
-QString ComparisonType::enumToString(int value)
+QString ActionComparisonValueType::enumToString(int value)
 {
     QString string = "Comparison type";
 
     switch (value) {
-    case ComparisonType::SUPERIOR_TO:
+    case ActionComparisonValueType::SUPERIOR_TO:
         string = ">";
         break;
 
-    case ComparisonType::INFERIOR_TO:
+    case ActionComparisonValueType::INFERIOR_TO:
         string = "<";
         break;
 
-    case ComparisonType::EQUAL_TO:
+    case ActionComparisonValueType::EQUAL_TO:
         string = "=";
         break;
 
-    case ComparisonType::ON:
+    case ActionComparisonValueType::ON:
         string = "On";
         break;
 
-    case ComparisonType::OFF:
+    case ActionComparisonValueType::OFF:
         string = "Off";
         break;
 
@@ -67,11 +67,13 @@ QString ComparisonType::enumToString(int value)
  */
 ActionConditionM::ActionConditionM(QObject *parent) : QObject(parent),
     _agentModel(NULL),
-    _comparison(ComparisonType::EQUAL_TO)
+    _comparison(ActionComparisonValueType::ON)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
+    // Set the condition comparision type
+    setcomparison(ActionComparisonValueType::ON);
 }
 
 

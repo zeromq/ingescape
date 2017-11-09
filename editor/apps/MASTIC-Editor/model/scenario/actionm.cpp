@@ -27,15 +27,15 @@ QString ValidationDurationType::enumToString(int value)
 
     switch (value) {
     case ValidationDurationType::CUSTOM:
-        string = "custom";
+        string = "Custom";
         break;
 
     case ValidationDurationType::IMMEDIATE:
-        string = "immediate";
+        string = "Immediate";
         break;
 
-    case ValidationDurationType::INFINITE:
-        string = "infinite";
+    case ValidationDurationType::FOREVER:
+        string = "Forever";
         break;
 
     default:
@@ -106,19 +106,21 @@ void ActionM::copyFrom(ActionM* actionModel)
         setactionsPanelIndex(actionModel->actionsPanelIndex());
 
         _effectsList.deleteAllItems();
-        foreach (ActionEffectM* effect, actionModel->effectsList()->toList())
+        foreach (ActionEffectVM* effectVM, actionModel->effectsList()->toList())
         {
-            ActionEffectM* copiedEffect = new ActionEffectM();
-            copiedEffect->copyFrom(effect);
-            _conditionsList.append(effect);
+            ActionEffectVM* copiedEffectVM = new ActionEffectVM();
+            copiedEffectVM->effect()->copyFrom(effectVM->effect());
+            copiedEffectVM->seteffectType(effectVM->effectType());
+            _effectsList.append(copiedEffectVM);
         }
 
         _conditionsList.deleteAllItems();
-        foreach (ActionConditionM* condition, actionModel->conditionsList()->toList())
+        foreach (ActionConditionVM* conditionVM, actionModel->conditionsList()->toList())
         {
-            ActionConditionM* copiedCondition = new ActionConditionM();
-            copiedCondition->copyFrom(condition);
-            _conditionsList.append(copiedCondition);
+            ActionConditionVM* copiedConditionVM = new ActionConditionVM();
+            copiedConditionVM->condition()->copyFrom(conditionVM->condition());
+            copiedConditionVM->setconditionType(conditionVM->conditionType());
+            _conditionsList.append(copiedConditionVM);
         }
     }
 }

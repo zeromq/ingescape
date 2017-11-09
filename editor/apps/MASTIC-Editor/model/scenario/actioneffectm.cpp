@@ -21,24 +21,24 @@
  * @param value
  * @return
  */
-QString ActionEffectType::enumToString(int value)
+QString ActionEffectValueType::enumToString(int value)
 {
     QString string = "Effect type";
 
     switch (value) {
-    case ActionEffectType::ENABLE:
+    case ActionEffectValueType::ENABLE:
         string = "Enable";
         break;
 
-    case ActionEffectType::DISABLE:
+    case ActionEffectValueType::DISABLE:
         string = "Disable";
         break;
 
-    case ActionEffectType::ON:
+    case ActionEffectValueType::ON:
         string = "On";
         break;
 
-    case ActionEffectType::OFF:
+    case ActionEffectValueType::OFF:
         string = "Off";
         break;
 
@@ -62,7 +62,7 @@ QString ActionEffectType::enumToString(int value)
  */
 ActionEffectM::ActionEffectM(QObject *parent) : QObject(parent),
     _agentModel(NULL),
-    _effect(ActionEffectType::ON)
+    _effect(ActionEffectValueType::ON)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);

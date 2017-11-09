@@ -36,15 +36,24 @@ ScenarioController::ScenarioController(QObject *parent) : QObject(parent),
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
     // Fill state comparisons types list
-    _comparisonsStatesTypesList.appendEnumValue(ComparisonType::ON);
-    _comparisonsStatesTypesList.appendEnumValue(ComparisonType::OFF);
+    _comparisonsStatesTypesList.appendEnumValue(ActionComparisonValueType::ON);
+    _comparisonsStatesTypesList.appendEnumValue(ActionComparisonValueType::OFF);
 
     // Fill value comparisons types list
     _comparisonsValuesTypesList.fillWithAllEnumValues();
-    _comparisonsValuesTypesList.removeEnumValue(ComparisonType::ON);
-    _comparisonsValuesTypesList.removeEnumValue(ComparisonType::OFF);
+    _comparisonsValuesTypesList.removeEnumValue(ActionComparisonValueType::ON);
+    _comparisonsValuesTypesList.removeEnumValue(ActionComparisonValueType::OFF);
 
     // Fill value effects types list
+    _effectsStatesTypesList.appendEnumValue(ActionEffectValueType::ON);
+    _effectsStatesTypesList.appendEnumValue(ActionEffectValueType::OFF);
+
+    // Fill link effects types list
+    _effectsLinksTypesList.appendEnumValue(ActionEffectValueType::ENABLE);
+    _effectsLinksTypesList.appendEnumValue(ActionEffectValueType::DISABLE);
+
+    // Fill general types
+    _conditionsTypesList.fillWithAllEnumValues();
     _effectsTypesList.fillWithAllEnumValues();
 
     // Fill validity duration types list
@@ -115,15 +124,6 @@ void ScenarioController::deleteAction(ActionM * actionM)
         setselectedAction(NULL);
     }
 
-    // Delete the popup if necessary
-    if(_mapActionsEditorControllersFromActionVM.contains(actionM))
-    {
-        ActionEditorController* actionEditorC = _mapActionsEditorControllersFromActionVM.value(actionM);
-
-        _mapActionsEditorControllersFromActionVM.remove(actionM);
-        _openedActionsEditorsControllers.remove(actionEditorC);
-    }
-
     // Delete the action item
     if(_actionsList.contains(actionM))
     {
@@ -157,12 +157,6 @@ void ScenarioController::valideActionEditor(ActionEditorController* actionEditor
         _mapActionsFromActionName.insert(originalActionVM->name(),originalActionVM);
     }
 
-    if(_mapActionsEditorControllersFromActionVM.contains(originalActionVM))
-    {
-        _mapActionsEditorControllersFromActionVM.remove(originalActionVM);
-    }
-    _openedActionsEditorsControllers.remove(actionEditorC);
-
     // Set selected action
     setselectedAction(originalActionVM);
 }
@@ -181,21 +175,6 @@ void ScenarioController::closeActionEditor(ActionEditorController* actionEditorC
 
         _mapActionsEditorControllersFromActionVM.remove(actionM);
         _openedActionsEditorsControllers.remove(actionEditorC);
-    }
-}
-
-/**
-  * @brief Delete action edition
-  * @param action editor controller
-  */
-void ScenarioController::deleteActionEditor(ActionEditorController* actionEditorC)
-{
-    ActionM* actionM = actionEditorC->originalAction();
-
-    // Delete the original action
-    if(actionM != NULL)
-    {
-        deleteAction(actionM);
     }
 }
 

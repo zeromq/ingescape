@@ -45,13 +45,21 @@ class ScenarioController: public QObject
 
     // Used for action edition
     // --- List of comparisons values types
-    I2_ENUM_LISTMODEL(ComparisonType, comparisonsValuesTypesList)
+    I2_ENUM_LISTMODEL(ActionComparisonValueType, comparisonsValuesTypesList)
     // --- List of comparisons state types
-    I2_ENUM_LISTMODEL(ComparisonType, comparisonsStatesTypesList)
+    I2_ENUM_LISTMODEL(ActionComparisonValueType, comparisonsStatesTypesList)
     // --- List of validity duration type
     I2_ENUM_LISTMODEL(ValidationDurationType, validationDurationsTypesList)
+    // --- List of effects states type
+    I2_ENUM_LISTMODEL(ActionEffectValueType, effectsStatesTypesList)
+    // --- List of effects links type
+    I2_ENUM_LISTMODEL(ActionEffectValueType, effectsLinksTypesList)
+
+    // --- List of conditions type
+    I2_ENUM_LISTMODEL(ActionConditionType, conditionsTypesList)
     // --- List of effects type
     I2_ENUM_LISTMODEL(ActionEffectType, effectsTypesList)
+
 
     // --- agents list in mapping
     I2_QOBJECT_LISTMODEL(AgentInMappingVM, agentsInMappingList)
@@ -95,12 +103,6 @@ public:
       * @param action editor controller
       */
     Q_INVOKABLE void closeActionEditor(ActionEditorController* actionEditorC);
-
-    /**
-      * @brief Delete action edition
-      * @param action editor controller
-      */
-    Q_INVOKABLE void deleteActionEditor(ActionEditorController* actionEditorC);
 
 Q_SIGNALS:
 

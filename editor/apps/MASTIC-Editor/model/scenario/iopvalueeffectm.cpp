@@ -31,7 +31,7 @@
  */
 IOPValueEffectM::IOPValueEffectM(QObject *parent) : ActionEffectM(parent),
     _agentIOP(NULL),
-    _targetValue("")
+    _value("")
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);

@@ -23,17 +23,17 @@
 
 #include "I2PropertyHelpers.h"
 
-#include "model/scenario/actioneffectm.h"
-#include "model/scenario/actionconditionm.h"
+#include "viewModel/actionconditionvm.h"
+#include "viewModel/actioneffectvm.h"
 
 /**
   * @brief Validation duration type for an action
   * Types:
   * - Custom
   * - Immediate
-  * - Infinite
+  * - Forever
   */
-I2_ENUM_CUSTOM(ValidationDurationType, CUSTOM, IMMEDIATE, INFINITE)
+I2_ENUM_CUSTOM(ValidationDurationType, CUSTOM, IMMEDIATE, FOREVER)
 
 
 /**
@@ -71,10 +71,10 @@ class ActionM: public QObject
     I2_QML_PROPERTY(bool, shallRearm)
 
     // List of effects for the action
-    I2_QOBJECT_LISTMODEL(ActionEffectM, effectsList)
+    I2_QOBJECT_LISTMODEL(ActionEffectVM, effectsList)
 
     // List of conditions for the action
-    I2_QOBJECT_LISTMODEL(ActionConditionM, conditionsList)
+    I2_QOBJECT_LISTMODEL(ActionConditionVM, conditionsList)
 
     // Index in the actions panel
     I2_QML_PROPERTY(int, actionsPanelIndex)

@@ -27,7 +27,7 @@
 /**
   * Comparison type for an action: SUPERIOR_TO, INFERIOR_TO, DIFFER_TO, ON, OFF
   */
-I2_ENUM_CUSTOM(ComparisonType, SUPERIOR_TO, INFERIOR_TO, EQUAL_TO, ON, OFF)
+I2_ENUM_CUSTOM(ActionComparisonValueType, SUPERIOR_TO, INFERIOR_TO, EQUAL_TO, ON, OFF)
 
 
 /**
@@ -41,7 +41,7 @@ class ActionConditionM: public QObject
     I2_QML_PROPERTY(AgentM*, agentModel)
 
     // Effect type
-    I2_QML_PROPERTY(ComparisonType::Value, comparison)
+    I2_QML_PROPERTY(ActionComparisonValueType::Value, comparison)
 
 
 public:

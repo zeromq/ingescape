@@ -38,8 +38,8 @@ class IOPValueEffectM: public ActionEffectM
     // Agent IOP
     I2_QML_PROPERTY(AgentIOPM* , agentIOP)
 
-    // Target value converted into string
-    I2_QML_PROPERTY(QString, targetValue)
+    // value converted into string
+    I2_QML_PROPERTY(QString, value)
 
 public:
 
