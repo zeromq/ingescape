@@ -40,11 +40,11 @@ QString ActionComparisonValueType::enumToString(int value)
         break;
 
     case ActionComparisonValueType::ON:
-        string = "On";
+        string = "ON";
         break;
 
     case ActionComparisonValueType::OFF:
-        string = "Off";
+        string = "OFF";
         break;
 
     default:

@@ -30,8 +30,8 @@ QString ActionConditionType::enumToString(int value)
         string = "Value";
         break;
 
-    case ActionConditionType::STATUS:
-        string = "Status";
+    case ActionConditionType::AGENT:
+        string = "Agent";
         break;
 
     default:
@@ -54,7 +54,7 @@ QString ActionConditionType::enumToString(int value)
  */
 ActionConditionVM::ActionConditionVM(QObject *parent) : QObject(parent),
     _condition(NULL),
-    _conditionType(ActionConditionType::STATUS)
+    _conditionType(ActionConditionType::AGENT)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -116,7 +116,7 @@ void ActionConditionVM::_configureToType(ActionConditionType::Value value)
     // Create the new type condition
     switch (value)
     {
-        case ActionConditionType::STATUS :
+        case ActionConditionType::AGENT :
         {
             setcondition(new ActionConditionM());
             _condition->setagentModel(agent);

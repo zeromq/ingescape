@@ -36,8 +36,8 @@ ScenarioController::ScenarioController(QObject *parent) : QObject(parent),
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
     // Fill state comparisons types list
-    _comparisonsStatesTypesList.appendEnumValue(ActionComparisonValueType::ON);
-    _comparisonsStatesTypesList.appendEnumValue(ActionComparisonValueType::OFF);
+    _comparisonsAgentsTypesList.appendEnumValue(ActionComparisonValueType::ON);
+    _comparisonsAgentsTypesList.appendEnumValue(ActionComparisonValueType::OFF);
 
     // Fill value comparisons types list
     _comparisonsValuesTypesList.fillWithAllEnumValues();

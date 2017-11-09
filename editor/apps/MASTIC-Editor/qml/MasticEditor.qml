@@ -273,6 +273,7 @@ Item {
             id: actionEditor
             
             controller : MasticEditorC.scenarioC
+            panelController: model.QtObject
 
             // Center popup
             x: (parent.width - actionEditor.width) / 2.0
