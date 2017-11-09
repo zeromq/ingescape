@@ -103,7 +103,7 @@ void ActionEffectVM::seteffectType(ActionEffectType::Value value)
  */
 void ActionEffectVM::_configureToType(ActionEffectType::Value value)
 {
-    AgentM* agent = NULL;
+    AgentInMappingVM* agent = NULL;
 
     // Delete the old effect if exists
     if(_effect != NULL)

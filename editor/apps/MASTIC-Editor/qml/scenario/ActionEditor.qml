@@ -40,7 +40,7 @@ I2PopupBase {
     //--------------------------------
 
     // our model is an action model
-    property var actionVM: model.editedAction;
+    property var actionM: model.editedAction;
 
     // our scenario controller
     property var controller: null;
@@ -166,7 +166,7 @@ I2PopupBase {
                     height: 25
                     width: 185
                     verticalAlignment: TextInput.AlignVCenter
-                    text: actionVM && actionVM.actionModel ? actionVM.actionModel.name : ""
+                    text: actionM ? actionM.name : ""
 
                     style: I2TextFieldStyle {
                         backgroundColor: MasticTheme.darkBlueGreyColor
@@ -188,16 +188,16 @@ I2PopupBase {
                     }
 
                     onTextChanged: {
-                        if (activeFocus &&  actionVM && actionVM.actionModel) {
-                            actionVM.actionModel.name = text;
+                        if (activeFocus &&  actionM ) {
+                            actionM.name = text;
                         }
                     }
 
                     Binding {
                         target : textFieldName
                         property :  "text"
-                        value : if (actionVM && actionVM.actionModel) {
-                                    actionVM.actionModel.name
+                        value : if (actionM ) {
+                                    actionM.name
                                 }
                                 else {
                                     "";
@@ -309,9 +309,9 @@ I2PopupBase {
                             Binding {
                                 target : validityDurationCombo
                                 property : "selectedItem"
-                                value : if (actionVM && controller)
+                                value : if (actionM && controller)
                                         {
-                                            controller.validationDurationsTypesList.getItemWithValue(actionVM.validityDurationType);
+                                            controller.validationDurationsTypesList.getItemWithValue(actionM.validityDurationType);
                                         } else {
                                             null;
                                         }
@@ -320,9 +320,9 @@ I2PopupBase {
 
                             onSelectedItemChanged:
                             {
-                                if (actionVM)
+                                if (actionM)
                                 {
-                                    actionVM.validityDurationType = validityDurationCombo.selectedItem.value;
+                                    actionM.validityDurationType = validityDurationCombo.selectedItem.value;
                                 }
                             }
 
@@ -340,7 +340,7 @@ I2PopupBase {
                             horizontalAlignment: TextInput.AlignLeft
                             verticalAlignment: TextInput.AlignVCenter
 
-                            text : actionVM && actionVM.actionModel ? actionVM.actionModel.validityDuration : "0.0"
+                            text : actionM ? actionM.validityDurationString : "0.000"
                             inputMethodHints: Qt.ImhFormattedNumbersOnly
                             validator: RegExpValidator { regExp: /(\d{1,4})([.]\d{3})?$/ }
 
@@ -364,16 +364,16 @@ I2PopupBase {
                             }
 
                             onTextChanged: {
-                                if (activeFocus &&  actionVM && actionVM.actionModel) {
-                                    actionVM.actionModel.validityDuration = text;
+                                if (activeFocus &&  actionM ) {
+                                    actionM.validityDurationString = text;
                                 }
                             }
 
                             Binding {
-                                target : textFieldName
+                                target : textFieldValidity
                                 property :  "text"
-                                value : if (actionVM && actionVM.actionModel) {
-                                            actionVM.actionModel.validityDuration
+                                value : if (actionM) {
+                                            actionM.validityDurationString
                                         }
                                         else {
                                             "";
@@ -413,7 +413,7 @@ I2PopupBase {
                     spacing : 6
 
                     Repeater {
-                        model : actionVM ? actionVM.conditionsList : 0
+                        model : actionM ? actionM.conditionsList : 0
 
                         Rectangle {
                             height : 62
@@ -579,10 +579,10 @@ I2PopupBase {
                                     height : 25
                                     width : 148
 
-                                    model : (myCondition && myCondition.condition && myCondition.condition.agentModel) ? myCondition.condition.agentModel.inputsList : 0
+                                    model : (myCondition && myCondition.condition && myCondition.condition.agentIopList) ? myCondition.condition.agentIopList : 0
                                     function modelToString(model)
                                     {
-                                        return model.agentName;
+                                        return model.name;
                                     }
 
 
@@ -619,7 +619,17 @@ I2PopupBase {
                                     height : 25
                                     width : (myCondition && myCondition.conditionType === ActionConditionType.VALUE) ? 45 : 78
 
-                                    model : controller ? controller.comparisonsAgentsTypesList : 0
+                                    model :
+                                    {
+                                        if(controller)
+                                        {
+                                            (myCondition && myCondition.conditionType === ActionConditionType.VALUE) ? controller.comparisonsValuesTypesList : controller.comparisonsAgentsTypesList
+                                        } else {
+                                            0
+                                        }
+
+                                    }
+
                                     function modelToString(model)
                                     {
                                         return model.name;
@@ -664,7 +674,7 @@ I2PopupBase {
                                     horizontalAlignment: TextInput.AlignLeft
                                     verticalAlignment: TextInput.AlignVCenter
 
-                                    text : actionVM && actionVM.actionModel ? actionVM.actionModel.validityDuration : "0.0"
+                                    text : actionM  ? actionM.validityDuration : "0.0"
                                     //   inputMethodHints: Qt.ImhFormattedNumbersOnly
                                     //   validator: RegExpValidator { regExp: /(\d{1,4})([.]\d{3})?$/ }
 
@@ -973,7 +983,7 @@ I2PopupBase {
             //                    height: 50
             //                    spacing: 2
             //                    CheckBox {
-            //                        checked: actionVM && actionVM.actionModel && actionVM.actionModel.shallRevert ? true : false
+            //                        checked: actionM && actionM.actionModel && actionM.actionModel.shallRevert ? true : false
 
             //                        text : "Réciproque"
             //                    }
@@ -988,24 +998,24 @@ I2PopupBase {
             //                        RadioButton {
             //                            id : rdButtRevertWhenValidityIsOver
             //                            text : "après"
-            //                            checked: actionVM && actionVM.revertAfterTime === true ? true : false;
+            //                            checked: actionM && actionM.revertAfterTime === true ? true : false;
 
             //                            Binding {
             //                                target : rdButtRevertWhenValidityIsOver
             //                                property :  "checked"
-            //                                value : actionVM.revertAfterTime
+            //                                value : actionM.revertAfterTime
             //                            }
 
             //                            onCheckedChanged: {
             //                                // Update out model
-            //                                if (actionVM) {
-            //                                    actionVM.revertAfterTime = checked;
+            //                                if (actionM) {
+            //                                    actionM.revertAfterTime = checked;
             //                                }
             //                            }
             //                        }
 
             //                        TextField {
-            //                            text : actionVM && actionVM.actionModel ? actionVM.actionModel.validityDuration : "0"
+            //                            text : actionM && actionM.actionModel ? actionM.actionModel.validityDuration : "0"
             //                            width:100
             //                        }
             //                    }
@@ -1014,24 +1024,24 @@ I2PopupBase {
             //                        RadioButton {
             //                            id : rdButtRevertAtTime
             //                            text : "à"
-            //                            checked: actionVM && actionVM.revertAtTime === true ? true : false;
+            //                            checked: actionM && actionM.revertAtTime === true ? true : false;
 
             //                            Binding {
             //                                target : rdButtRevertAtTime
             //                                property :  "checked"
-            //                                value : actionVM.revertAtTime
+            //                                value : actionM.revertAtTime
             //                            }
 
             //                            onCheckedChanged: {
             //                                // Update out model
-            //                                if (actionVM) {
-            //                                    actionVM.revertAtTime = checked;
+            //                                if (actionM) {
+            //                                    actionM.revertAtTime = checked;
             //                                }
             //                            }
             //                        }
 
             //                        TextField {
-            //                            text : actionVM && actionVM.actionModel ? actionVM.actionModel.revertAtTime : "0"
+            //                            text : actionM && actionM.actionModel ? actionM.actionModel.revertAtTime : "0"
             //                            width:100
             //                        }
             //                    }
@@ -1045,7 +1055,7 @@ I2PopupBase {
             //                }
             //                spacing: 2
             //                CheckBox {
-            //                    checked: actionVM && actionVM.actionModel && actionVM.actionModel.shallRearm ? true : false
+            //                    checked: actionM && actionM.actionModel && actionM.actionModel.shallRearm ? true : false
 
             //                    text : "Récurrence"
             //                }

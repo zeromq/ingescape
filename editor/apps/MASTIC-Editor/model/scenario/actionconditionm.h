@@ -21,8 +21,7 @@
 #include <QJSEngine>
 
 #include "I2PropertyHelpers.h"
-
-#include "model/agentm.h"
+#include "viewModel/agentinmappingvm.h"
 
 /**
   * Comparison type for an action: SUPERIOR_TO, INFERIOR_TO, DIFFER_TO, ON, OFF
@@ -38,7 +37,7 @@ class ActionConditionM: public QObject
     Q_OBJECT
 
     // Agent model
-    I2_QML_PROPERTY(AgentM*, agentModel)
+    I2_QML_PROPERTY_CUSTOM_SETTER(AgentInMappingVM*, agentModel)
 
     // Effect type
     I2_QML_PROPERTY(ActionComparisonValueType::Value, comparison)

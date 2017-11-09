@@ -38,6 +38,9 @@ class IOPValueConditionM: public ActionConditionM
     // value in string format
     I2_QML_PROPERTY(QString , value)
 
+    // Concatened list of iop agents items
+    I2_QOBJECT_LISTMODEL(AgentIOPM , agentIopList)
+
 
 public:
 

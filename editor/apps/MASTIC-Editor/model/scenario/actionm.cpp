@@ -61,11 +61,12 @@ ActionM::ActionM(QString name, QObject *parent) : QObject(parent),
     _name(name),
     _validityDurationType(ValidationDurationType::IMMEDIATE),
     _validityDuration(-1),
+    _validityDurationString("0.000"),
     _shallRevert(false),
     _shallRevertWhenValidityIsOver(false),
     _shallRevertAfterTime(false),
-    _revertAfterTimeInSec(-1),
-    _revertAfterTime("00:00:00"),
+    _revertAfterTime(-1),
+    _revertAfterTimeString("00:00:00"),
     _shallRearm(false),
     _actionsPanelIndex(-1)
 {
@@ -97,11 +98,12 @@ void ActionM::copyFrom(ActionM* actionModel)
         setname(actionModel->name());
         setvalidityDurationType(actionModel->validityDurationType());
         setvalidityDuration(actionModel->validityDuration());
+        setvalidityDurationString(actionModel->validityDurationString());
         setshallRevert(actionModel->shallRevert());
         setshallRevertWhenValidityIsOver(actionModel->shallRevertWhenValidityIsOver());
         setshallRevertAfterTime(actionModel->shallRevertAfterTime());
-        setrevertAfterTimeInSec(actionModel->revertAfterTimeInSec());
         setrevertAfterTime(actionModel->revertAfterTime());
+        setrevertAfterTimeString(actionModel->revertAfterTimeString());
         setshallRearm(actionModel->shallRearm());
         setactionsPanelIndex(actionModel->actionsPanelIndex());
 
@@ -126,28 +128,54 @@ void ActionM::copyFrom(ActionM* actionModel)
 }
 
 /**
- * @brief Set the revertAfterTime flag
+ * @brief Set the revertAfterTime string
  * @param revertAfterTime value
  */
-void ActionM::setrevertAfterTime(QString revertAfterTime)
+void ActionM::setrevertAfterTimeString(QString revertAfterTime)
 {
-    if(_revertAfterTime != revertAfterTime)
+    if(_revertAfterTimeString != revertAfterTime)
     {
-        _revertAfterTime = revertAfterTime;
+        _revertAfterTimeString = revertAfterTime;
 
         // Update the start date time
         if(revertAfterTime.isEmpty() == false)
         {
-            QStringList splittedTime = revertAfterTime.split(':');
-            if(splittedTime.count() == 3)
+            QStringList splittedTime = revertAfterTime.split('.');
+            if(splittedTime.count() == 2)
             {
-                setrevertAfterTimeInSec(QString(splittedTime.at(0)).toInt()*3600 + QString(splittedTime.at(1)).toInt()*60 + + QString(splittedTime.at(2)).toInt());
+                setrevertAfterTime(QString(splittedTime.at(0)).toInt()*1000 + QString(splittedTime.at(1)).toInt());
             }
         } else {
-            setrevertAfterTimeInSec(-1);
+            setrevertAfterTime(-1);
         }
 
-        emit revertAfterTimeChanged(revertAfterTime);
+        emit revertAfterTimeStringChanged(revertAfterTime);
+    }
+}
+
+/**
+ * @brief Set the validityDuration string
+ * @param validityDuration value
+ */
+void ActionM::setvalidityDurationString(QString validityDuration)
+{
+    if(_validityDurationString != validityDuration)
+    {
+        _validityDurationString = validityDuration;
+
+        // Update the start date time
+        if(_validityDurationString.isEmpty() == false)
+        {
+            QStringList splittedTime = _validityDurationString.split('.');
+            if(splittedTime.count() == 2)
+            {
+                setvalidityDuration(QString(splittedTime.at(0)).toInt()*1000 + QString(splittedTime.at(1)).toInt());
+            }
+        } else {
+            setvalidityDuration(-1);
+        }
+
+        emit validityDurationStringChanged(validityDuration);
     }
 }
 
