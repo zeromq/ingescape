@@ -30,12 +30,12 @@ QString ActionEffectType::enumToString(int value)
         string = "Value";
         break;
 
-    case ActionEffectType::STATUS:
-        string = "Status";
+    case ActionEffectType::AGENT:
+        string = "Agent";
         break;
 
-    case ActionEffectType::LINK:
-        string = "Link";
+    case ActionEffectType::MAPPING:
+        string = "Mapping";
         break;
 
     default:
@@ -58,7 +58,7 @@ QString ActionEffectType::enumToString(int value)
  */
 ActionEffectVM::ActionEffectVM(QObject *parent) : QObject(parent),
     _effect(NULL),
-    _effectType(ActionEffectType::STATUS)
+    _effectType(ActionEffectType::AGENT)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -120,7 +120,7 @@ void ActionEffectVM::_configureToType(ActionEffectType::Value value)
     // Create the new type effect
     switch (value)
     {
-        case ActionEffectType::STATUS :
+        case ActionEffectType::AGENT :
         {
             seteffect(new ActionEffectM());
             _effect->setagentModel(agent);
@@ -134,7 +134,7 @@ void ActionEffectVM::_configureToType(ActionEffectType::Value value)
             break;
         }
 
-        case ActionEffectType::LINK :
+        case ActionEffectType::MAPPING :
         {
             seteffect(new MappingEffectM());
             _effect->setagentModel(agent);

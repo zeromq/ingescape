@@ -26,9 +26,9 @@
 #include "model/scenario/mappingeffectm.h"
 
 /**
-  * Action effect type : STATUS, VALUE, LINK
+  * Action effect type : AGENT, VALUE, MAPPING
   */
-I2_ENUM_CUSTOM(ActionEffectType, STATUS, VALUE, LINK)
+I2_ENUM_CUSTOM(ActionEffectType, AGENT, VALUE, MAPPING)
 
 
 /**

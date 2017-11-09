@@ -45,8 +45,8 @@ ScenarioController::ScenarioController(QObject *parent) : QObject(parent),
     _comparisonsValuesTypesList.removeEnumValue(ActionComparisonValueType::OFF);
 
     // Fill value effects types list
-    _effectsStatesTypesList.appendEnumValue(ActionEffectValueType::ON);
-    _effectsStatesTypesList.appendEnumValue(ActionEffectValueType::OFF);
+    _effectsAgentsTypesList.appendEnumValue(ActionEffectValueType::ON);
+    _effectsAgentsTypesList.appendEnumValue(ActionEffectValueType::OFF);
 
     // Fill link effects types list
     _effectsLinksTypesList.appendEnumValue(ActionEffectValueType::ENABLE);

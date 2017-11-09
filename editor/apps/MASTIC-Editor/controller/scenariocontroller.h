@@ -52,7 +52,7 @@ class ScenarioController: public QObject
     // --- List of validity duration type
     I2_ENUM_LISTMODEL(ValidationDurationType, validationDurationsTypesList)
     // --- List of effects states type
-    I2_ENUM_LISTMODEL(ActionEffectValueType, effectsStatesTypesList)
+    I2_ENUM_LISTMODEL(ActionEffectValueType, effectsAgentsTypesList)
     // --- List of effects links type
     I2_ENUM_LISTMODEL(ActionEffectValueType, effectsLinksTypesList)
 
