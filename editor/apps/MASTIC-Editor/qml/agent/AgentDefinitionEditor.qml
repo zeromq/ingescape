@@ -96,9 +96,9 @@ I2PopupBase {
         radius: 5
         border {
             width: 2
-            color: MasticTheme.definitionEditorsBackgroundBorderColor
+            color: MasticTheme.editorsBackgroundBorderColor
         }
-        color: MasticTheme.definitionEditorsBackgroundColor
+        color: MasticTheme.editorsBackgroundColor
 
 
         MouseArea {
@@ -436,30 +436,24 @@ I2PopupBase {
                                             height : width
                                             radius : width/2
 
-                                            color : switch (model.agentIOPValueType)
+                                            color : switch (model.agentIOPValueTypeGroup)
                                                     {
-                                                    case AgentIOPValueTypes.INTEGER:
+                                                    case AgentIOPValueTypeGroups.NUMBER:
                                                         MasticTheme.orangeColor2
                                                         break;
-                                                    case AgentIOPValueTypes.DOUBLE:
-                                                        MasticTheme.orangeColor2
-                                                        break;
-                                                    case AgentIOPValueTypes.STRING:
+                                                    case AgentIOPValueTypeGroups.STRING:
                                                         MasticTheme.redColor2
                                                         break;
-                                                    case AgentIOPValueTypes.BOOL:
-                                                        MasticTheme.orangeColor2
-                                                        break;
-                                                    case AgentIOPValueTypes.IMPULSION:
+                                                    case AgentIOPValueTypeGroups.IMPULSION:
                                                         MasticTheme.purpleColor
                                                         break;
-                                                    case AgentIOPValueTypes.DATA:
+                                                    case AgentIOPValueTypeGroups.DATA:
                                                         MasticTheme.greenColor
                                                         break;
-                                                    case AgentIOPValueTypes.MIXED:
+                                                    case AgentIOPValueTypeGroups.MIXED:
                                                         MasticTheme.whiteColor
                                                         break;
-                                                    case AgentIOPValueTypes.UNKNOWN:
+                                                    case AgentIOPValueTypeGroups.UNKNOWN:
                                                         "#000000"
                                                         break;
                                                     default:

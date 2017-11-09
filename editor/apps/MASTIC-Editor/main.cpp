@@ -52,6 +52,7 @@ void registerCustomQmlTypes()
     qmlRegisterSingletonType<AgentIOPValueTypes>(uri, 1, 0, "ActionEffectValueType", &ActionEffectValueType::qmlSingleton);
     qmlRegisterSingletonType<AgentIOPValueTypes>(uri, 1, 0, "ActionConditionType", &ActionConditionType::qmlSingleton);
     qmlRegisterSingletonType<AgentIOPValueTypes>(uri, 1, 0, "ActionEffectType", &ActionEffectType::qmlSingleton);
+    qmlRegisterSingletonType<ValidationDurationType>(uri, 1, 0, "ValidationDurationType", &ValidationDurationType::qmlSingleton);
 
     //----------------
     //

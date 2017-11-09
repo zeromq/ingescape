@@ -80,9 +80,9 @@ Q_SIGNALS:
     /**
      * @brief Emitted when inputs must be removed to our Editor for a list of outputs
      * @param agentName
-     * @param outputsList
+     * @param pairsList
      */
-    void removeInputsToEditorForOutputs(QString agentName, QList<OutputM*> outputsList);
+    void removeInputsToEditorForOutputs(QString agentName, QList<QPair<QString, QString>> pairsList);
 
 
 public Q_SLOTS:
@@ -126,6 +126,13 @@ public Q_SLOTS:
      * @param isActivatedMapping
      */
     void onIsActivatedMappingChanged(bool isActivatedMapping);
+
+
+    /**
+     * @brief Slot when a model of agent will be deleted
+     * @param agent
+     */
+    void onAgentModelWillBeDeleted(AgentM* agent);
 
 
     /**
@@ -192,6 +199,13 @@ private:
      * @param position
      */
     void _addAgentModelsToMappingAtPosition(QString agentName, QList<AgentM*> agentsList, QPointF position);
+
+
+    /**
+     * @brief Delete an Agent in Mapping
+     * @param agentInMapping
+     */
+    void _deleteAgentInMapping(AgentInMappingVM* agentInMapping);
 
 
     /**

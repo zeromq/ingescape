@@ -39,5 +39,6 @@
         <file>resources/SVG/mastic-pictos.svg</file>
         <file>qml/theme/LabellessSvgButtonStyle.qml</file>
         <file>qml/scenario/ActionsListItem.qml</file>
+        <file>qml/scenario/MasticComboBox.qml</file>
     </qresource>
 </RCC>

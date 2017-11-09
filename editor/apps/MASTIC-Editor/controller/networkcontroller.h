@@ -177,9 +177,9 @@ public Q_SLOTS:
     /**
      * @brief Slot when inputs must be removed to our Editor for a list of outputs
      * @param agentName
-     * @param outputsList
+     * @param pairsList
      */
-    void onRemoveInputsToEditorForOutputs(QString agentName, QList<OutputM*> outputsList);
+    void onRemoveInputsToEditorForOutputs(QString agentName, QList<QPair<QString, QString>> pairsList);
 
 
 private:

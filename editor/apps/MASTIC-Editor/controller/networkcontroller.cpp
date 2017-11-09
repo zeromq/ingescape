@@ -602,12 +602,14 @@ void NetworkController::onCommandAskedForOutput(QString command, QString outputN
 
 /**
  * @brief Slot when inputs must be added to our Editor for a list of outputs
+ * @param agentName
  * @param outputsList
  */
 void NetworkController::onAddInputsToEditorForOutputs(QString agentName, QList<OutputM*> outputsList)
 {
     foreach (OutputM* output, outputsList) {
-        if (output != NULL) {
+        if (output != NULL)
+        {
             QString inputName = QString("%1.%2").arg(agentName, output->id());
 
             int resultCreateInput = 0;
@@ -690,21 +692,39 @@ void NetworkController::onAddInputsToEditorForOutputs(QString agentName, QList<O
 
 /**
  * @brief Slot when inputs must be removed to our Editor for a list of outputs
- * @param outputsList
+ * @param agentName
+ * @param pairsList
  */
-void NetworkController::onRemoveInputsToEditorForOutputs(QString agentName, QList<OutputM*> outputsList)
+void NetworkController::onRemoveInputsToEditorForOutputs(QString agentName, QList<QPair<QString, QString>> pairsList)
 {
-    foreach (OutputM* output, outputsList) {
-        if (output != NULL) {
-            QString inputName = QString("%1.%2.%3").arg(_editorAgentName, agentName, output->name());
+    for (int i = 0; i < pairsList.count(); i++)
+    {
+        QPair<QString, QString> pair = pairsList.at(i);
+        QString outputId = pair.first;
+        QString outputName = pair.second;
 
-            int result = mtic_removeMappingEntryWithName(inputName.toStdString().c_str(), agentName.toStdString().c_str(), output->name().toStdString().c_str());
+        if (!outputId.isEmpty() && !outputName.isEmpty())
+        {
+            QString inputName = QString("%1.%2").arg(agentName, outputId);
 
-            if (result == 1) {
-                qDebug() << "Remove input" << inputName << "on output" << output->name() << "of agent" << agentName;
+            // Remove mapping between our input and this output
+            int resultRemoveMappingEntry = mtic_removeMappingEntryWithName(inputName.toStdString().c_str(), agentName.toStdString().c_str(), outputName.toStdString().c_str());
+
+            if (resultRemoveMappingEntry == 1) {
+                qDebug() << "Remove mapping between output" << outputName << "of agent" << agentName << "and input" << inputName << "of agent" << _editorAgentName;
+
+                // Remove our input
+                int resultRemoveInput = mtic_removeInput(inputName.toStdString().c_str());
+
+                if (resultRemoveInput == 1) {
+                    qDebug() << "Remove input" << inputName << "on agent" << _editorAgentName;
+                }
+                else {
+                    qCritical() << "Can NOT remove input" << inputName << "on agent" << _editorAgentName << "Error code:" << resultRemoveInput;
+                }
             }
             else {
-                qCritical() << "Can NOT remove input" << inputName << "on output" << output->name() << "of agent" << agentName << ". Error code:" << result;
+                qCritical() << "Can NOT remove mapping between output" << outputName << "of agent" << agentName << "and input" << inputName << "of agent" << _editorAgentName << "Error code:" << resultRemoveMappingEntry;
             }
         }
     }

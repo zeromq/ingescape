@@ -200,11 +200,11 @@ void MasticModelManager::onDefinitionReceived(QString peerId, QString agentName,
             DefinitionM* agentDefinition = _jsonHelper->createModelOfDefinition(byteArrayOfJson);
             if (agentDefinition != NULL)
             {
-                // Set this definition to the agent
-                agent->setdefinition(agentDefinition);
-
                 // Add this new model of agent definition for the agent name
                 addAgentDefinitionForAgentName(agentDefinition, agentName);
+
+                // Set this definition to the agent
+                agent->setdefinition(agentDefinition);
             }
         }
     }
@@ -643,14 +643,14 @@ void MasticModelManager::_importAgentsListFromFile(QString agentsListFilePath)
                         // Create a new model of agent with the name
                         AgentM* agent = new AgentM(agentName, this);
 
-                        // Set its definition
-                        agent->setdefinition(agentDefinition);
-
                         // Add this new model of agent
                         addAgentModel(agent);
 
                         // Add this new model of agent definition for the agent name
                         addAgentDefinitionForAgentName(agentDefinition, agentName);
+
+                        // Set its definition
+                        agent->setdefinition(agentDefinition);
                     }
                 }
             }
@@ -745,23 +745,21 @@ void MasticModelManager::_importAgentFromFiles(QStringList agentFilesPaths)
             // Create a new model of agent with the name of the definition
             AgentM* agent = new AgentM(agentName, this);
 
-            // Set its definition
-            agent->setdefinition(agentDefinition);
-
-            if (agentMapping != NULL) {
-                // Set its mapping
-                agent->setmapping(agentMapping);
-            }
-
             // Add this new model of agent
             addAgentModel(agent);
 
             // Add this new model of agent definition for the agent name
             addAgentDefinitionForAgentName(agentDefinition, agentName);
 
+            // Set its definition
+            agent->setdefinition(agentDefinition);
+
             if (agentMapping != NULL) {
                 // Add this new model of agent mapping for the agent name
                 addAgentMappingForAgentName(agentMapping, agentName);
+
+                // Set its mapping
+                agent->setmapping(agentMapping);
             }
         }
     }
@@ -802,6 +800,8 @@ void MasticModelManager::_exportAgentsListToFile(QList<QPair<QString, Definition
 void MasticModelManager::_updateDefinitionVariants(QString definitionName)
 {
     QList<DefinitionM*> agentDefinitionsList = getAgentDefinitionsListFromDefinitionName(definitionName);
+
+    //qDebug() << "Update Definition Variants for definition name" << definitionName << "(" << agentDefinitionsList.count() << "definitions)";
 
     // We can use versions as keys of the map because the list contains only definition with the same name
     QHash<QString, QList<DefinitionM*>> mapFromVersionToDefinitionsList;

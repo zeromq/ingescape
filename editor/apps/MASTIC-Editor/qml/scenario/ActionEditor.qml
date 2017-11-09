@@ -19,6 +19,7 @@ import QtQuick.Controls.Styles 1.4
 import I2Quick 1.0
 
 import MASTIC 1.0
+import "../theme" as Theme;
 
 I2PopupBase {
     id: rootItem
@@ -55,6 +56,12 @@ I2PopupBase {
     signal bringToFront();
 
 
+    onClosed: {
+        if (contoller) {
+            controller.closeActionEditor(model.QtObject);
+        }
+    }
+
     //--------------------------------
     //
     // Content
@@ -69,10 +76,9 @@ I2PopupBase {
         radius: 5
         border {
             width: 1
-            color: MasticTheme.whiteColor
+            color: MasticTheme.editorsBackgroundBorderColor
         }
-        color: MasticTheme.definitionEditorsBackgroundColor
-
+        color: MasticTheme.editorsBackgroundColor
 
         MouseArea {
             id : dragMouseArea
@@ -92,255 +98,460 @@ I2PopupBase {
         }
 
 
-        Button {
-            id: btnCloseEditor
-
+        Item {
             anchors {
-                right: parent.right
-                top: parent.top
+                fill : parent
+                margins : 20
             }
 
-            text: "X"
-            activeFocusOnPress: true
+            Text {
+                id : titleTxt
 
-            onClicked: {
-                // Close our popup
-                rootItem.close();
-            }
-        }
-
-        Column {
-            id: headers
-
-            anchors {
-                top: parent.top
-                left: parent.left
-                right: parent.right
-                bottom: parent.bottom
-                margins: 4
-            }
-            //height: 120
-
-            // Name
-            Row {
                 anchors {
-                    left: parent.left
-                    right: parent.right
+                    left : parent.left
+                    top : parent.top
+                    right : parent.right
                 }
-                height: 25
 
-                Text {
-                    text: "Nom "
-
-                    color: MasticTheme.definitionEditorsLabelColor
+                text : "Action Editor"
+                elide: Text.ElideRight
+                color: MasticTheme.definitionEditorsLabelColor
+                font {
+                    family: MasticTheme.textFontFamily
+                    pixelSize: 23
+                    weight: Font.Medium
                 }
-                TextField {
-                    id : actionNameTextField
+            }
 
-                    text: actionVM && actionVM.actionModel ? actionVM.actionModel.name : ""
-                    width:100
+            Button {
+                id: btnCloseEditor
 
-                    onTextChanged: {
-                        if (activeFocus &&  actionVM && actionVM.actionModel) {
-                            actionVM.actionModel.name = text;
+                anchors {
+                    top: parent.top
+                    right : parent.right
+                }
+
+                activeFocusOnPress: true
+                style: Theme.LabellessSvgButtonStyle {
+                    fileCache: MasticTheme.svgFileMASTIC
+
+                    pressedID: releasedID + "-pressed"
+                    releasedID: "closeEditor"
+                    disabledID : releasedID
+                }
+
+                onClicked: {
+                    // Close our popup
+                    rootItem.close();
+                }
+            }
+
+            Column {
+                anchors {
+                    left : parent.left
+                    right : parent.right
+                    top : titleTxt.bottom
+                    topMargin : 18
+                }
+
+                spacing: 5
+
+                /// Name
+                Item {
+                    anchors {
+                        left : parent.left
+                        right : parent.right
+                    }
+
+                    height: textFieldName.height
+
+                    Text {
+                        anchors {
+                            left : parent.left
+                            verticalCenter : parent.verticalCenter
+                        }
+
+                        text : "Name:"
+
+                        color: MasticTheme.lightGreyColor
+                        font {
+                            family: MasticTheme.textFontFamily
+                            pixelSize: 16
                         }
                     }
-                }
 
-                Binding {
-                    target : actionNameTextField
-                    property :  "text"
-                    value : if (actionVM && actionVM.actionModel) {
-                              actionVM.actionModel.name
-                            }
-                            else {
-                                "";
-                            }
-                }
+                    TextField {
+                        id: textFieldName
 
-
-
-            }
-
-
-
-            // Start
-            Row {
-                anchors {
-                    left: parent.left
-                    right: parent.right
-                }
-                height: 25
-                Text {
-                    text: "Début"
-
-                    color: MasticTheme.definitionEditorsLabelColor
-                }
-                TextField {
-                    id : actionStartTextField
-                    text: actionVM ? actionVM.startTimeString: ""
-                    width:100
-
-                    Binding {
-                        target : actionStartTextField
-                        property :  "text"
-                        value : actionVM.startTimeString
-                    }
-
-                    onTextChanged: {
-                        if (activeFocus &&  actionVM) {
-                            actionVM.startTimeString = text;
+                        anchors {
+                            right: parent.right
+                            verticalCenter : parent.verticalCenter
                         }
-                    }
-                }
-            }
 
-
-
-            Row {
-                anchors {
-                    left: parent.left
-                    right: parent.right
-                }
-                spacing: 2
-                Column {
-                    height: 50
-                    spacing: 2
-                    CheckBox {
-                        checked: actionVM && actionVM.actionModel && actionVM.actionModel.shallRevert ? true : false
-
-                        text : "Réciproque"
-                    }
-
-                }
-
-                Column  {
-                    height: 50
-                    spacing: 2
-                    Row {
                         height: 25
-                        RadioButton {
-                            id : rdButtRevertWhenValidityIsOver
-                            text : "après"
-                            checked: actionVM && actionVM.revertAfterTime === true ? true : false;
+                        width: 185
+                        verticalAlignment: TextInput.AlignVCenter
+                        text: actionVM && actionVM.actionModel ? actionVM.actionModel.name : ""
 
-                            Binding {
-                                target : rdButtRevertWhenValidityIsOver
-                                property :  "checked"
-                                value : actionVM.revertAfterTime
+                        style: I2TextFieldStyle {
+                            backgroundColor: MasticTheme.darkBlueGreyColor
+                            borderColor: MasticTheme.lightGreyColor;
+                            borderErrorColor: MasticTheme.redColor
+                            radiusTextBox: 1
+                            borderWidth: 0;
+                            borderWidthActive: 1
+                            textColor: MasticTheme.lightGreyColor;
+
+                            padding.left: 3
+                            padding.right: 3
+
+                            font {
+                                pixelSize:15
+                                family: MasticTheme.textFontFamily
                             }
 
-                            onCheckedChanged: {
-                                // Update out model
-                                if (actionVM) {
-                                    actionVM.revertAfterTime = checked;
-                                }
+                        }
+
+                        onTextChanged: {
+                            if (activeFocus &&  actionVM && actionVM.actionModel) {
+                                actionVM.actionModel.name = text;
                             }
                         }
 
-                        TextField {
-                            text : actionVM && actionVM.actionModel ? actionVM.actionModel.validityDuration : "0"
-                            width:100
+                        Binding {
+                            target : textFieldName
+                            property :  "text"
+                            value : if (actionVM && actionVM.actionModel) {
+                                        actionVM.actionModel.name
+                                    }
+                                    else {
+                                        "";
+                                    }
                         }
                     }
-                    Row {
+
+
+                }
+
+                /// Validity duration
+                Item {
+                    anchors {
+                        left : parent.left
+                        right : parent.right
+                    }
+
+                    height: validityDurationCombo.height
+
+
+                    Text {
+                        anchors {
+                            left : parent.left
+                            verticalCenter : parent.verticalCenter
+                        }
+
+                        text : "Validity duration:"
+
+                        color: MasticTheme.lightGreyColor
+                        font {
+                            family: MasticTheme.textFontFamily
+                            pixelSize: 16
+                        }
+                    }
+
+                    MasticComboBox {
+                        id : validityDurationCombo
+
+                        anchors {
+                            verticalCenter : parent.verticalCenter
+                            right : textFieldValidity.left
+                            rightMargin: 6
+                        }
+
+                        height : 25
+                        width : 117
+
+                        model : controller ? controller.validationDurationsTypesList : 0
+                        function modelToString(model)
+                        {
+                            return model.name;
+                        }
+
+
+                        Binding {
+                            target : validityDurationCombo
+                            property : "selectedItem"
+                            value : if (actionVM && controller)
+                                    {
+                                        controller.validationDurationsTypesList.getItemWithValue(actionVM.validityDurationType);
+                                    } else {
+                                        null;
+                                    }
+                        }
+
+
+                        onSelectedItemChanged:
+                        {
+                            if (actionVM && controller)
+                            {
+                                controller.validationDurationsTypesList = validityDurationCombo.selectedItem.value;
+                            }
+                        }
+
+                    }
+
+                    TextField {
+                        id: textFieldValidity
+
+                        anchors {
+                            right: parent.right
+                            verticalCenter : parent.verticalCenter
+                        }
+
                         height: 25
-                        RadioButton {
-                            id : rdButtRevertAtTime
-                            text : "à"
-                            checked: actionVM && actionVM.revertAtTime === true ? true : false;
+                        width: 80
+                        horizontalAlignment: TextInput.AlignHCenter
+                        verticalAlignment: TextInput.AlignVCenter
 
-                            Binding {
-                                target : rdButtRevertAtTime
-                                property :  "checked"
-                                value : actionVM.revertAtTime
+                        text : actionVM && actionVM.actionModel ? actionVM.actionModel.validityDuration : "0.0"
+                        inputMethodHints: Qt.ImhFormattedNumbersOnly
+                        validator: RegExpValidator { regExp: /^[0-9]{0,9}$/ }
+
+                        style: I2TextFieldStyle {
+                            backgroundColor: MasticTheme.darkBlueGreyColor
+                            borderColor: MasticTheme.lightGreyColor;
+                            borderErrorColor: ENEDISTheme.redColor
+                            radiusTextBox: 1
+                            borderWidth: 0;
+                            borderWidthActive: 1
+                            textColor: MasticTheme.lightGreyColor;
+
+                            padding.left: 3
+                            padding.right: 3
+
+                            font {
+                                pixelSize:15
+                                family: MasticTheme.textFontFamily
                             }
 
-                            onCheckedChanged: {
-                                // Update out model
-                                if (actionVM) {
-                                    actionVM.revertAtTime = checked;
-                                }
+                        }
+
+                        onTextChanged: {
+                            if (activeFocus &&  actionVM && actionVM.actionModel) {
+                                actionVM.actionModel.validityDuration = text;
                             }
                         }
 
-                        TextField {
-                            text : actionVM && actionVM.actionModel ? actionVM.actionModel.revertAtTime : "0"
-                            width:100
+                        Binding {
+                            target : textFieldName
+                            property :  "text"
+                            value : if (actionVM && actionVM.actionModel) {
+                                        actionVM.actionModel.validityDuration
+                                    }
+                                    else {
+                                        "";
+                                    }
                         }
                     }
                 }
             }
 
-            Row {
+
+            //            Row {
+            //                anchors {
+            //                    left: parent.left
+            //                    right: parent.right
+            //                }
+            //                spacing: 2
+            //                Column {
+            //                    height: 50
+            //                    spacing: 2
+            //                    CheckBox {
+            //                        checked: actionVM && actionVM.actionModel && actionVM.actionModel.shallRevert ? true : false
+
+            //                        text : "Réciproque"
+            //                    }
+
+            //                }
+
+            //                Column  {
+            //                    height: 50
+            //                    spacing: 2
+            //                    Row {
+            //                        height: 25
+            //                        RadioButton {
+            //                            id : rdButtRevertWhenValidityIsOver
+            //                            text : "après"
+            //                            checked: actionVM && actionVM.revertAfterTime === true ? true : false;
+
+            //                            Binding {
+            //                                target : rdButtRevertWhenValidityIsOver
+            //                                property :  "checked"
+            //                                value : actionVM.revertAfterTime
+            //                            }
+
+            //                            onCheckedChanged: {
+            //                                // Update out model
+            //                                if (actionVM) {
+            //                                    actionVM.revertAfterTime = checked;
+            //                                }
+            //                            }
+            //                        }
+
+            //                        TextField {
+            //                            text : actionVM && actionVM.actionModel ? actionVM.actionModel.validityDuration : "0"
+            //                            width:100
+            //                        }
+            //                    }
+            //                    Row {
+            //                        height: 25
+            //                        RadioButton {
+            //                            id : rdButtRevertAtTime
+            //                            text : "à"
+            //                            checked: actionVM && actionVM.revertAtTime === true ? true : false;
+
+            //                            Binding {
+            //                                target : rdButtRevertAtTime
+            //                                property :  "checked"
+            //                                value : actionVM.revertAtTime
+            //                            }
+
+            //                            onCheckedChanged: {
+            //                                // Update out model
+            //                                if (actionVM) {
+            //                                    actionVM.revertAtTime = checked;
+            //                                }
+            //                            }
+            //                        }
+
+            //                        TextField {
+            //                            text : actionVM && actionVM.actionModel ? actionVM.actionModel.revertAtTime : "0"
+            //                            width:100
+            //                        }
+            //                    }
+            //                }
+            //            }
+
+            //            Row {
+            //                anchors {
+            //                    left: parent.left
+            //                    right: parent.right
+            //                }
+            //                spacing: 2
+            //                CheckBox {
+            //                    checked: actionVM && actionVM.actionModel && actionVM.actionModel.shallRearm ? true : false
+
+            //                    text : "Récurrence"
+            //                }
+            //            }
+
+
+            //        Button {
+            //            id: btnDeleteEditor
+
+            //            anchors {
+            //                right: btnCancelEditor.left
+            //                bottom: parent.bottom
+            //                rightMargin: 10
+            //            }
+
+            //            text: "SUPPRIMER"
+
+            //            onClicked: {
+
+            //                if(controller)
+            //                {
+            //                    controller.deleteActionEditor(model.QtObject);
+            //                }
+            //            }
+            //        }
+
+
+            Button {
+                id: cancelButton
+                activeFocusOnPress: true
+                property var boundingBox: MasticTheme.svgFileMASTIC.boundsOnElement("button");
+                height : boundingBox.height
+                width :  boundingBox.width
+
+                enabled : visible
+                text : "Cancel"
+
                 anchors {
-                    left: parent.left
-                    right: parent.right
+                    verticalCenter: okButton.verticalCenter
+                    right : okButton.left
+                    rightMargin: 20
                 }
-                spacing: 2
-                CheckBox {
-                    checked: actionVM && actionVM.actionModel && actionVM.actionModel.shallRearm ? true : false
 
-                    text : "Récurrence"
+                style: I2SvgButtonStyle {
+                    fileCache: MasticTheme.svgFileMASTIC
+
+                    pressedID: releasedID + "-pressed"
+                    releasedID: "button"
+                    disabledID : releasedID
+
+                    font {
+                        family: MasticTheme.textFontFamily
+                        weight : Font.Medium
+                        pixelSize : 16
+                    }
+                    labelColorPressed: MasticTheme.blackColor
+                    labelColorReleased: MasticTheme.whiteColor
+                    labelColorDisabled: MasticTheme.whiteColor
+
+                }
+
+                onClicked: {
+                    // Close our popup
+                    rootItem.close();
                 }
             }
-        }
 
+            Button {
+                id: okButton
 
-        Button {
-            id: btnValideEditor
+                property var boundingBox: MasticTheme.svgFileMASTIC.boundsOnElement("button");
+                height : boundingBox.height
+                width :  boundingBox.width
 
-            anchors {
-                right: parent.right
-                bottom: parent.bottom
-            }
+                enabled : visible
+                activeFocusOnPress: true
+                text : "OK"
 
-            text: "OK"
-
-            onClicked: {
-                if(controller)
-                {
-                    controller.valideActionEditor(model.QtObject);
+                anchors {
+                    bottom: parent.bottom
+                    right : parent.right
                 }
-            }
-        }
 
-        Button {
-            id: btnCancelEditor
+                style: I2SvgButtonStyle {
+                    fileCache: MasticTheme.svgFileMASTIC
 
-            anchors {
-                right: btnValideEditor.left
-                bottom: parent.bottom
-                rightMargin: 10
-            }
+                    pressedID: releasedID + "-pressed"
+                    releasedID: "button"
+                    disabledID : releasedID
 
-            text: "ANNULER"
+                    font {
+                        family: MasticTheme.textFontFamily
+                        weight : Font.Medium
+                        pixelSize : 16
+                    }
+                    labelColorPressed: MasticTheme.blackColor
+                    labelColorReleased: MasticTheme.whiteColor
+                    labelColorDisabled: MasticTheme.whiteColor
 
-            onClicked: {
-                // Close our popup
-                rootItem.close();
-            }
-        }
+                }
 
-        Button {
-            id: btnDeleteEditor
-
-            anchors {
-                right: btnCancelEditor.left
-                bottom: parent.bottom
-                rightMargin: 10
-            }
-
-            text: "SUPPRIMER"
-
-            onClicked: {
-
-                if(controller)
-                {
-                    controller.deleteActionEditor(model.QtObject);
+                onClicked: {
+                    if(controller)
+                    {
+                        controller.valideActionEditor(model.QtObject);
+                    }
+                    // Close our popup
+                    rootItem.close();
                 }
             }
         }
 
     }
+
 }
+
