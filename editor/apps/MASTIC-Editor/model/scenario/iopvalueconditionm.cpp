@@ -46,6 +46,9 @@ IOPValueConditionM::IOPValueConditionM(QObject *parent) : ActionConditionM(paren
  */
 IOPValueConditionM::~IOPValueConditionM()
 {
+    // Clear our list
+    _agentIopList.clear();
+
     // reset agent IOP pointer
     setagentIOP(NULL);
 }

@@ -44,6 +44,9 @@ IOPValueEffectM::IOPValueEffectM(QObject *parent) : ActionEffectM(parent),
  */
 IOPValueEffectM::~IOPValueEffectM()
 {
+    // Clear our list
+    _agentIopList.clear();
+
     // reset agent IOP pointer
     setagentIOP(NULL);
 }

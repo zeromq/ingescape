@@ -20,7 +20,7 @@
 #include <QJSEngine>
 
 #include "I2PropertyHelpers.h"
-#include "model/agentm.h"
+#include "viewModel/agentinmappingvm.h"
 
 /**
   * Effect type for an action: ON, OFF, ENABLE, DISABLE
@@ -36,7 +36,7 @@ class ActionEffectM: public QObject
     Q_OBJECT
 
     // Agent model
-    I2_QML_PROPERTY(AgentM*, agentModel)
+    I2_QML_PROPERTY_CUSTOM_SETTER(AgentInMappingVM*, agentModel)
 
     // Effect type
     I2_QML_PROPERTY(ActionEffectValueType::Value, effect)

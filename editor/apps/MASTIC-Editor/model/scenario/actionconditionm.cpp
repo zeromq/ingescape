@@ -103,7 +103,7 @@ void ActionConditionM::copyFrom(ActionConditionM* condition)
 * @brief Custom setter on the agent model
 * @param agent
 */
-void ActionConditionM::setagentModel(AgentM* agentM)
+void ActionConditionM::setagentModel(AgentInMappingVM* agentM)
 {
     if(_agentModel != agentM)
     {
@@ -112,13 +112,34 @@ void ActionConditionM::setagentModel(AgentM* agentM)
         IOPValueConditionM* iopCondition = dynamic_cast<IOPValueConditionM*>(this);
         if(iopCondition != NULL)
         {
-            if(_agentModel == NULL)
+            // Clear the list
+            iopCondition->agentIopList()->clear();
+
+            if(_agentModel != NULL)
             {
-                iopCondition->agentIopList()->clear();
-            } else if(_agentModel->definition() != NULL ){
-                iopCondition->agentIopList()->append(_agentModel->definition()->inputsList());
-                iopCondition->agentIopList()->append(_agentModel->definition()->outputsList());
-                iopCondition->agentIopList()->append(_agentModel->definition()->parametersList());
+                // Fill with inputs
+                foreach (InputVM* input, _agentModel->inputsList()->toList())
+                {
+                    if(input->firstModel() != NULL)
+                    {
+                        iopCondition->agentIopList()->append(input->firstModel());
+                    }
+                }
+
+                // Fill with outputs
+                foreach (OutputVM* output, _agentModel->outputsList()->toList())
+                {
+                    if(output->firstModel() != NULL)
+                    {
+                        iopCondition->agentIopList()->append(output->firstModel());
+                    }
+                }
+
+                // Select the first item
+                if(iopCondition->agentIopList()->count() > 0)
+                {
+                    iopCondition->setagentIOP(iopCondition->agentIopList()->at(0));
+                }
             }
 
         }
