@@ -813,61 +813,145 @@ I2PopupBase {
                     color : MasticTheme.whiteColor
                 }
 
-
-                CheckBox {
-                    id : revertActionCB
+                // Revert Action
+                Item {
                     anchors {
                         left: parent.left;
                         right: parent.right;
                         top : separatorAdvMode.bottom
                         topMargin: 8
                     }
+                    height : childrenRect.height
 
-                    checked : actionVM && actionVM.shallRevert;
-                    activeFocusOnPress: true;
+                    CheckBox {
+                        id : revertActionCB
+                        anchors {
+                            left: parent.left;
+                            right: parent.right;
+                            top : parent.top
+                        }
 
-                    style: CheckBoxStyle {
-                        label: Text {
-                            color: control.checked? MasticTheme.lightGreyColor : MasticTheme.greyColor
+                        checked : actionVM && actionVM.shallRevert;
+                        activeFocusOnPress: true;
 
-                            text: "Revert action"
-                            elide: Text.ElideRight
+                        style: CheckBoxStyle {
+                            label: Text {
+                                color: control.checked? MasticTheme.lightGreyColor : MasticTheme.greyColor
 
-                            font {
-                                family: MasticTheme.labelFontFamily
-                                pixelSize: 15
+                                text: "Revert action"
+                                elide: Text.ElideRight
+                                padding.left : 5
+
+                                font {
+                                    family: MasticTheme.labelFontFamily
+                                    pixelSize: 16
+                                }
+                            }
+
+                            indicator: Rectangle {
+                                implicitWidth: 14
+                                implicitHeight: 14
+                                border.width: 0;
+                                color : MasticTheme.darkBlueGreyColor
+
+                                I2SvgItem {
+                                    visible : control.checked
+                                    anchors.centerIn: parent
+
+                                    svgFileCache : MasticTheme.svgFileMASTIC;
+                                    svgElementId:  "check";
+
+                                }
+                            }
+
+                        }
+
+                        onCheckedChanged : {
+                            if (actionVM) {
+                                actionVM.shallRevert = checked
                             }
                         }
 
-                        indicator: Rectangle {
-                            implicitWidth: 14
-                            implicitHeight: 14
-                            border.width: 0;
-                            color : MasticTheme.darkBlueGreyColor
 
-                            I2SvgItem {
-                                visible : control.checked
-                                anchors.centerIn: parent
+                        Binding {
+                            target : revertActionCB
+                            property : "checked"
+                            value : (actionVM && actionVM.shallRevert)
+                        }
+                    }
 
-                                svgFileCache : MasticTheme.svgFileMASTIC;
-                                svgElementId:  "check";
+                    Column {
+                        id : revertActionTime
 
+                        anchors {
+                            left : revertActionCB.right
+                            leftMargin: 14
+                            verticalCenter: revertActionCB.verticalCenter
+                        }
+                        spacing: 6
+
+                        ExclusiveGroup {
+                            id : revertActionOpt
+                        }
+
+                        CheckBox {
+                            id : revertActionTimeCB
+                            anchors {
+                                verticalCenter: parent.verticalCenter;
+                            }
+
+                            checked : actionVM && actionVM.shallRevertWhenValidityIsOver;
+                            exclusiveGroup: revertActionOpt
+                            activeFocusOnPress: true;
+
+                            style: CheckBoxStyle {
+                                label: Text {
+                                    color: control.checked? MasticTheme.lightGreyColor : MasticTheme.greyColor
+
+                                    text: model.name
+                                    elide: Text.ElideRight
+
+                                    font {
+                                        family: MasticTheme.labelFontFamily
+                                        pixelSize: 16
+                                    }
+                                }
+
+                                indicator: Rectangle {
+                                    implicitWidth: 14
+                                    implicitHeight: 14
+                                    radius : height / 2
+                                    border.width: 0;
+                                    color : MasticTheme.darkBlueGreyColor
+
+                                    Rectangle {
+                                        anchors.centerIn: parent
+                                        visible : control.checked
+                                        width: 8
+                                        height: 8
+                                        radius : height / 2
+
+                                        border.width: 0;
+                                        color : MasticTheme.lightGreyColor
+                                    }
+                                }
+
+                            }
+
+                            onCheckedChanged : {
+                                if (actionVM) {
+                                    actionVM.shallRevertWhenValidityIsOver = checked
+                                }
+                            }
+
+
+                            Binding {
+                                target : revertActionTimeCB
+                                property : "checked"
+                                value : (actionVM && actionVM.shallRevertWhenValidityIsOver)
                             }
                         }
 
-                    }
-
-                    onCheckedChanged : {
-                        if (actionVM) {
-                            actionVM.shallRevert = checked
-                        }
-                    }
-
-
-                    Binding {
-                        target : revertActionCB
-                        property : "checked"
-                        value : (actionVM && actionVM.shallRevert)
                     }
                 }
 
