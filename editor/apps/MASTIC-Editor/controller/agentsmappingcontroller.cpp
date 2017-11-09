@@ -276,22 +276,21 @@ void AgentsMappingController::_generateAllMapBetweenIopUsingNewlyAddedInputsVM(A
 
                                 OutputVM* outputPointVM = NULL;
 
-                                if(outputAgent != NULL)
+                                if (outputAgent != NULL)
                                 {
-                                    // FIXME TODO: il peut y avoir plusieurs output VM pour un nom (lequel prendre dans la liste ?)
-                                    // Get the output conserned by the mapping.
-                                    //outputPointVM = outputAgent->getOutputFromName(currentElementMapping->output());
+                                    // Get the list of view models of output from the output name
                                     QList<OutputVM*> outputsWithSameName = outputAgent->getOutputsListFromName(currentElementMapping->output());
-                                    if (outputsWithSameName.count() > 0) {
+                                    if (outputsWithSameName.count() == 0)
+                                    {
+                                        // Create a new ghost output (OutputVM) as substitute of the missing output.
+                                        outputPointVM = new OutputVM(currentElementMapping->output());
+                                    }
+                                    else if (outputsWithSameName.count() == 1) {
                                         outputPointVM = outputsWithSameName.first();
                                     }
-
-                                    if (outputPointVM == NULL)
-                                    {
-                                       // Handle Output is missing
-
-                                       //Create a new ghost output (OutputVM) as substitute of the missing output.
-                                       outputPointVM = new OutputVM(currentElementMapping->output());
+                                    else {
+                                        qWarning() << "There are" << outputsWithSameName.count() << "outputs with the same name" << currentElementMapping->output() << "."
+                                                   << "We cannot choose and create the link" << currentElementMapping->outputAgent() << "." << currentElementMapping->output() << "-->" << currentElementMapping->inputAgent() << "." << currentElementMapping->input();
                                     }
                                 }
                                 else
@@ -305,49 +304,50 @@ void AgentsMappingController::_generateAllMapBetweenIopUsingNewlyAddedInputsVM(A
                                     outputPointVM = new OutputVM(currentElementMapping->output());
                                 }
 
-                                // Create the new MapBetweenIOP ...
-                                if( (!outputAgent->isGhost()) && (!outputPointVM->isGhost()) )
+                                if ((outputAgent != NULL) && (outputPointVM != NULL))
                                 {
-                                    // Handle everything went smoothly i.e. no ghost output nor ghost agent.
-                                    if(!_checkIfMapBetweenIOPVMAlreadyExist(outputAgent, outputPointVM, currentAgentInMapping, inputPointVM))
+                                    // Create the new MapBetweenIOP ...
+                                    if( (!outputAgent->isGhost()) && (!outputPointVM->isGhost()) )
                                     {
-                                        MapBetweenIOPVM* map = new MapBetweenIOPVM(outputAgent, outputPointVM, currentAgentInMapping, inputPointVM);
+                                        // Handle everything went smoothly i.e. no ghost output nor ghost agent.
+                                        if(!_checkIfMapBetweenIOPVMAlreadyExist(outputAgent, outputPointVM, currentAgentInMapping, inputPointVM))
+                                        {
+                                            MapBetweenIOPVM* map = new MapBetweenIOPVM(outputAgent, outputPointVM, currentAgentInMapping, inputPointVM);
 
-                                        //Add the new MapBetweenIOP to the temp list.
-                                        newMapBetweenIOP.append(map);
+                                            //Add the new MapBetweenIOP to the temp list.
+                                            newMapBetweenIOP.append(map);
 
-                                        qInfo() << "Create the MapBetweenIOPVM : " << currentAgentInMapping->agentName() << "." << inputPointVM->name() << " -> " << outputAgent->agentName() << "." << outputPointVM->name();
+                                            qInfo() << "Create the MapBetweenIOPVM : " << currentAgentInMapping->agentName() << "." << inputPointVM->name() << " -> " << outputAgent->agentName() << "." << outputPointVM->name();
+                                        }
+                                        else {
+                                            qDebug() << "MapBetweenIOPVM already exist : " << currentAgentInMapping->agentName() << "." << inputPointVM->name() << " -> " << outputAgent->agentName() << "." << outputPointVM->name();
+                                        }
                                     }
                                     else
                                     {
-                                        qInfo() << "MapBetweenIOPVM already exist : " << currentAgentInMapping->agentName() << "." << inputPointVM->name() << " -> " << outputAgent->agentName() << "." << outputPointVM->name();
-                                    }
-                                }
-                                else
-                                {
-                                    // Handle the new partial MapBetweenIOPVM
-                                    if(!_checkIfMapBetweenIOPVMAlreadyExist(outputAgent, outputPointVM, currentAgentInMapping, inputPointVM))
-                                    {
-                                        MapBetweenIOPVM* partialMap = new MapBetweenIOPVM(outputAgent, outputPointVM, currentAgentInMapping, inputPointVM);
+                                        // Handle the new partial MapBetweenIOPVM
+                                        if(!_checkIfMapBetweenIOPVMAlreadyExist(outputAgent, outputPointVM, currentAgentInMapping, inputPointVM))
+                                        {
+                                            MapBetweenIOPVM* partialMap = new MapBetweenIOPVM(outputAgent, outputPointVM, currentAgentInMapping, inputPointVM);
 
-                                        //Add the new MapBetweenIOP to the temp list.
-                                        _allPartialMapInMapping.append(partialMap);
+                                            //Add the new MapBetweenIOP to the temp list.
+                                            _allPartialMapInMapping.append(partialMap);
 
-                                        //Map partial mapBetweenIOP with output agent name to active search
-                                        _mapFromAgentNameToPartialMapBetweenIOPViewModelsList.insertMulti(outputAgent->agentName(), partialMap);
+                                            //Map partial mapBetweenIOP with output agent name to active search
+                                            _mapFromAgentNameToPartialMapBetweenIOPViewModelsList.insertMulti(outputAgent->agentName(), partialMap);
 
-                                        qInfo() << "Create the partial MapBetweenIOPVM : " << currentAgentInMapping->agentName() << "." << inputPointVM->name() << " -> " << outputAgent->agentName() << "." << outputPointVM->name();
-                                    }
-                                    else
-                                    {
-                                        qInfo() << "Partial MapBetweenIOPVM already exist : " << currentAgentInMapping->agentName() << "." << inputPointVM->name() << " -> " << outputAgent->agentName() << "." << outputPointVM->name();
+                                            qInfo() << "Create the partial MapBetweenIOPVM : " << currentAgentInMapping->agentName() << "." << inputPointVM->name() << " -> " << outputAgent->agentName() << "." << outputPointVM->name();
+                                        }
+                                        else {
+                                            qDebug() << "Partial MapBetweenIOPVM already exist : " << currentAgentInMapping->agentName() << "." << inputPointVM->name() << " -> " << outputAgent->agentName() << "." << outputPointVM->name();
+                                        }
                                     }
                                 }
                             }
                         }
                         else
                         {
-                            qInfo() << "Input " << currentElementMapping->input() << "is missing while creating MapBetweenIOPVM";
+                            qWarning() << "Input " << currentElementMapping->input() << "is missing while creating MapBetweenIOPVM";
                         }
                     }
                 }

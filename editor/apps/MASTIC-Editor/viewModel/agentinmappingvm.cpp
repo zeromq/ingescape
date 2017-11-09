@@ -107,7 +107,7 @@ AgentInMappingVM::~AgentInMappingVM()
 
 
 /**
- * @brief Return the corresponding list of view models of input from the input name
+ * @brief Return the list of view models of input from the input name
  * @param inputName
  */
 QList<InputVM*> AgentInMappingVM::getInputsListFromName(QString inputName)
@@ -122,7 +122,7 @@ QList<InputVM*> AgentInMappingVM::getInputsListFromName(QString inputName)
 
 
 /**
- * @brief Return the corresponding view model of input from the input id
+ * @brief Return the view model of input from the input id
  * @param inputId
  */
 InputVM* AgentInMappingVM::getInputFromId(QString inputId)
@@ -137,7 +137,7 @@ InputVM* AgentInMappingVM::getInputFromId(QString inputId)
 
 
 /**
- * @brief Return the corresponding list of view models of output from the output name
+ * @brief Return the list of view models of output from the output name
  * @param outputName
  */
 QList<OutputVM*> AgentInMappingVM::getOutputsListFromName(QString outputName)
@@ -152,7 +152,7 @@ QList<OutputVM*> AgentInMappingVM::getOutputsListFromName(QString outputName)
 
 
 /**
- * @brief Return the corresponding view model of output from the output id
+ * @brief Return the view model of output from the output id
  * @param outputId
  */
 OutputVM* AgentInMappingVM::getOutputFromId(QString outputId)

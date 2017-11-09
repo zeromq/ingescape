@@ -123,28 +123,28 @@ Q_SIGNALS:
 public Q_SLOTS:
 
     /**
-     * @brief Return the corresponding list of view models of input from the input name
+     * @brief Return the list of view models of input from the input name
      * @param inputName
      */
     QList<InputVM*> getInputsListFromName(QString inputName);
 
 
     /**
-     * @brief Return the corresponding view model of input from the input id
+     * @brief Return the view model of input from the input id
      * @param inputId
      */
     InputVM* getInputFromId(QString inputId);
 
 
     /**
-     * @brief Return the corresponding list of view models of output from the output name
+     * @brief Return the list of view models of output from the output name
      * @param outputName
      */
     QList<OutputVM*> getOutputsListFromName(QString outputName);
 
 
     /**
-     * @brief Return the corresponding view model of output from the output id
+     * @brief Return the view model of output from the output id
      * @param outputId
      */
     OutputVM* getOutputFromId(QString outputId);
