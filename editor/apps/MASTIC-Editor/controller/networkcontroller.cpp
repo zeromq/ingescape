@@ -327,47 +327,52 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
  */
 void onObserveInputCallback(iop_t iopType, const char* name, iopType_t valueType, void* value, long valueSize, void* myData)
 {
+    Q_UNUSED(value);
+
+    // Historique: on log la value et le dateTime.
     NetworkController* networkController = (NetworkController*)myData;
     if (networkController != NULL)
     {
         if (iopType == INPUT_T) {
-            QString inputName = name;
             AgentIOPValueTypes::Value agentIOPValueType = static_cast<AgentIOPValueTypes::Value>(valueType);
-
             switch (valueType)
             {
             case INTEGER_T: {
-                int* newValue = (int*)value;
-                qDebug() << "New value" << *newValue << "received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
+                int newValue = mtic_readInputAsInt(name);
+                qDebug() << "New value" << newValue << "received on" << name << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
                 break;
             }
             case DOUBLE_T: {
-                double* newValue = (double*)value;
-                qDebug() << "New value" << *newValue << "received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
+                double newValue = mtic_readInputAsDouble(name);
+                qDebug() << "New value" << newValue << "received on" << name << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
                 break;
             }
             case STRING_T: {
-                QString newValue = QString((char*)value);
-                qDebug() << "New value" << newValue << "received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
+                QString newValue = mtic_readInputAsString(name);
+                qDebug() << "New value" << newValue << "received on" << name << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
                 break;
             }
             case BOOL_T: {
-                bool* newValue = (bool*)value;
-                if (*newValue) {
-                    qDebug() << "New value TRUE received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
+                bool newValue = mtic_readInputAsBool(name);
+                if (newValue) {
+                    qDebug() << "New value TRUE received on" << name << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
                 }
                 else {
-                    qDebug() << "New value FALSE received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
+                    qDebug() << "New value FALSE received on" << name << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
                 }
                 break;
             }
             case IMPULSION_T: {
-                qDebug() << "New IMPULSION received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
+                qDebug() << "New IMPULSION received on" << name << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
                 break;
             }
             case DATA_T: {
-                // FIXME TODO
-                qDebug() << "New DATA with size" << valueSize << "received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
+
+                // On stocke dans un dossier le media (eg video, son, image) et on log le path et le start time!!.
+                void* data = NULL;
+                if(mtic_readInputAsData(name, &data, &valueSize))
+                qDebug() << "New DATA with size" << valueSize << "received on" << name << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
+
                 break;
             }
             default: {
