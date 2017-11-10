@@ -21,7 +21,6 @@ SOURCES += main.cpp \
     viewModel/agentvm.cpp \
     model/iop/agentiopm.cpp \
     model/jsonhelper.cpp \
-    viewModel/iop/agentiopvm.cpp \
     controller/agentssupervisioncontroller.cpp \
     controller/agentsmappingcontroller.cpp \
     controller/masticeditorcontroller.cpp \
@@ -53,7 +52,9 @@ SOURCES += main.cpp \
     misc/collapsiblecolumn.cpp \
     viewModel/actionconditionvm.cpp \
     viewModel/actioneffectvm.cpp \
-    viewModel/actioninpalettevm.cpp
+    viewModel/actioninpalettevm.cpp \
+    model/publishedvaluem.cpp \
+    model/enums.cpp
 
 HEADERS += \
     model/agentm.h \
@@ -61,7 +62,6 @@ HEADERS += \
     stable.h \
     model/iop/agentiopm.h \
     model/jsonhelper.h \
-    viewModel/iop/agentiopvm.h \
     controller/agentssupervisioncontroller.h \
     controller/agentsmappingcontroller.h \
     controller/masticeditorcontroller.h \
@@ -102,7 +102,9 @@ HEADERS += \
     misc/collapsiblecolumn.h \
     viewModel/actionconditionvm.h \
     viewModel/actioneffectvm.h \
-    viewModel/actioninpalettevm.h
+    viewModel/actioninpalettevm.h \
+    model/publishedvaluem.h \
+    model/enums.h
 
 
 RESOURCES += qml.qrc

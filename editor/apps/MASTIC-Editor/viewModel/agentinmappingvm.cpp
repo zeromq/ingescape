@@ -89,8 +89,10 @@ AgentInMappingVM::~AgentInMappingVM()
     //disconnect(&_outputsList, &AbstractI2CustomItemListModel::countChanged, this, &AgentInMappingVM::_onOutputsListChanged);
 
     // Clear maps of Inputs & Outputs
-    _mapOfInputsFromInputName.clear();
-    _mapOfOutputsFromOutputName.clear();
+    _mapFromNameToInputsList.clear();
+    _mapFromUniqueIdToInput.clear();
+    _mapFromNameToOutputsList.clear();
+    _mapFromUniqueIdToOutput.clear();
 
     // Delete elements in the lists of Inputs & Outputs
     _inputsList.deleteAllItems();
@@ -105,28 +107,28 @@ AgentInMappingVM::~AgentInMappingVM()
 
 
 /**
- * @brief Return the corresponding view model of input from the input name
+ * @brief Return the list of view models of input from the input name
  * @param inputName
  */
-InputVM* AgentInMappingVM::getInputFromName(QString inputName)
+QList<InputVM*> AgentInMappingVM::getInputsListFromName(QString inputName)
 {
-    if (_mapOfInputsFromInputName.contains(inputName)) {
-        return _mapOfInputsFromInputName.value(inputName);
+    if (_mapFromNameToInputsList.contains(inputName)) {
+        return _mapFromNameToInputsList.value(inputName);
     }
     else {
-        return NULL;
+        return QList<InputVM*>();
     }
 }
 
 
 /**
- * @brief Return the corresponding view model of input from the input id
+ * @brief Return the view model of input from the input id
  * @param inputId
  */
 InputVM* AgentInMappingVM::getInputFromId(QString inputId)
 {
-    if (_mapOfInputsFromInputId.contains(inputId)) {
-        return _mapOfInputsFromInputId.value(inputId);
+    if (_mapFromUniqueIdToInput.contains(inputId)) {
+        return _mapFromUniqueIdToInput.value(inputId);
     }
     else {
         return NULL;
@@ -135,28 +137,28 @@ InputVM* AgentInMappingVM::getInputFromId(QString inputId)
 
 
 /**
- * @brief Return the corresponding view model of output from the output name
+ * @brief Return the list of view models of output from the output name
  * @param outputName
  */
-OutputVM* AgentInMappingVM::getOutputFromName(QString outputName)
+QList<OutputVM*> AgentInMappingVM::getOutputsListFromName(QString outputName)
 {
-    if (_mapOfOutputsFromOutputName.contains(outputName)) {
-        return _mapOfOutputsFromOutputName.value(outputName);
+    if (_mapFromNameToOutputsList.contains(outputName)) {
+        return _mapFromNameToOutputsList.value(outputName);
     }
     else {
-        return NULL;
+        return QList<OutputVM*>();
     }
 }
 
 
 /**
- * @brief Return the corresponding view model of output from the output id
+ * @brief Return the view model of output from the output id
  * @param outputId
  */
 OutputVM* AgentInMappingVM::getOutputFromId(QString outputId)
 {
-    if (_mapOfOutputsFromOutputId.contains(outputId)) {
-        return _mapOfOutputsFromOutputId.value(outputId);
+    if (_mapFromUniqueIdToOutput.contains(outputId)) {
+        return _mapFromUniqueIdToOutput.value(outputId);
     }
     else {
         return NULL;
@@ -347,42 +349,79 @@ InputVM* AgentInMappingVM::_inputModelAdded(AgentIOPM* input)
 
     if (input != NULL)
     {
-        // Input id is defined
-        if (!input->id().isEmpty())
+        // First, we get a ghost of this input: an input without id (only the same name)
+        QList<InputVM*> inputsWithSameName = getInputsListFromName(input->name());
+        InputVM* inputWithoutId = NULL;
+
+        foreach (InputVM* iterator, inputsWithSameName)
         {
-            InputVM* inputVM = getInputFromId(input->id());
-            if (inputVM == NULL)
-            {
-                inputVM = getInputFromName(input->name());
-                if (inputVM == NULL)
-                {
-                    // Create a new view model of input
-                    newInputVM = new InputVM(input->name(),
-                                             input->id(),
-                                             input,
-                                             this);
-
-                    // Don't add to the list here (this input will be added globally via temporary list)
-
-                    // Update the hash table with input id
-                    _mapOfInputsFromInputId.insert(newInputVM->id(), newInputVM);
-
-                    // Update the hash table with input name
-                    _mapOfInputsFromInputName.insert(newInputVM->name(), newInputVM);
-                }
-                // View model of input exists for this name (but not yet id)
-                else {
-                    // FIXME TODO: gestion des ghost...
-                }
+            // Already a view model with an EMPTY id (NOT defined)
+            if ((iterator != NULL) && iterator->id().isEmpty()) {
+                inputWithoutId = iterator;
+                break;
             }
-            else {
+        }
+
+        // Input id is NOT defined
+        if (input->id().isEmpty())
+        {
+            // There is already a view model without id
+            if (inputWithoutId != NULL)
+            {
+                // Add this new model to the list
+                inputWithoutId->models()->append(input);
+            }
+            // There is not yet a view model without id
+            else
+            {
+                // Create a new view model of input (without id)
+                newInputVM = new InputVM(input->name(),
+                                         "",
+                                         input,
+                                         this);
+
+                // Don't add to the list here (this input will be added globally via temporary list)
+
+                // Update the hash table with the input name
+                inputsWithSameName.append(newInputVM);
+                _mapFromNameToInputsList.insert(input->name(), inputsWithSameName);
+            }
+        }
+        // Input id is defined
+        else
+        {
+            // There is a view model without id
+            if (inputWithoutId != NULL)
+            {
+                // FIXME TODO: gestion du ghost...passage en view model avec id
+            }
+
+            InputVM* inputVM = getInputFromId(input->id());
+
+            // There is already a view model for this id
+            if (inputVM != NULL)
+            {
                 // Add this new model to the list
                 inputVM->models()->append(input);
             }
-        }
-        // Input id is NOT defined
-        else {
-            // FIXME TODO: gestion des ghost...
+            // There is not yet a view model for this id
+            else
+            {
+                // Create a new view model of input
+                newInputVM = new InputVM(input->name(),
+                                         input->id(),
+                                         input,
+                                         this);
+
+                // Don't add to the list here (this input will be added globally via temporary list)
+
+                // Update the hash table with the input id
+                _mapFromUniqueIdToInput.insert(input->id(), newInputVM);
+
+                // Update the hash table with the input name
+                inputsWithSameName.append(newInputVM);
+                _mapFromNameToInputsList.insert(input->name(), inputsWithSameName);
+            }
         }
     }
 
@@ -437,42 +476,79 @@ OutputVM* AgentInMappingVM::_outputModelAdded(OutputM* output)
 
     if (output != NULL)
     {
-        // Input id is defined
-        if (!output->id().isEmpty())
+        // First, we get a ghost of this output: an output without id (only the same name)
+        QList<OutputVM*> outputsWithSameName = getOutputsListFromName(output->name());
+        OutputVM* outputWithoutId = NULL;
+
+        foreach (OutputVM* iterator, outputsWithSameName)
         {
-            OutputVM* outputVM = getOutputFromId(output->id());
-            if (outputVM == NULL)
-            {
-                outputVM = getOutputFromName(output->name());
-                if (outputVM == NULL)
-                {
-                    // Create a new view model of output
-                    newOutputVM = new OutputVM(output->name(),
-                                               output->id(),
-                                               output,
-                                               this);
-
-                    // Don't add to the list here (this output will be added globally via temporary list)
-
-                    // Update the hash table with output id
-                    _mapOfOutputsFromOutputId.insert(newOutputVM->id(), newOutputVM);
-
-                    // Update the hash table with output name
-                    _mapOfOutputsFromOutputName.insert(newOutputVM->name(), newOutputVM);
-                }
-                // View model of output exists for this name (but not yet id)
-                else {
-                    // FIXME TODO: gestion des ghost...
-                }
+            // Already a view model with an EMPTY id (NOT defined)
+            if ((iterator != NULL) && iterator->id().isEmpty()) {
+                outputWithoutId = iterator;
+                break;
             }
-            else {
+        }
+
+        // Output id is NOT defined
+        if (output->id().isEmpty())
+        {
+            // There is already a view model without id
+            if (outputWithoutId != NULL)
+            {
+                // Add this new model to the list
+                outputWithoutId->models()->append(output);
+            }
+            // There is not yet a view model without id
+            else
+            {
+                // Create a new view model of output (without id)
+                newOutputVM = new OutputVM(output->name(),
+                                           "",
+                                           output,
+                                           this);
+
+                // Don't add to the list here (this output will be added globally via temporary list)
+
+                // Update the hash table with the output name
+                outputsWithSameName.append(newOutputVM);
+                _mapFromNameToOutputsList.insert(output->name(), outputsWithSameName);
+            }
+        }
+        // Output id is defined
+        else
+        {
+            // There is a view model without id
+            if (outputWithoutId != NULL)
+            {
+                // FIXME TODO: gestion du ghost...passage en view model avec id
+            }
+
+            OutputVM* outputVM = getOutputFromId(output->id());
+
+            // There is already a view model for this id
+            if (outputVM != NULL)
+            {
                 // Add this new model to the list
                 outputVM->models()->append(output);
             }
-        }
-        // Output id is NOT defined
-        else {
-            // FIXME TODO: gestion des ghost...
+            // There is not yet a view model for this id
+            else
+            {
+                // Create a new view model of output
+                newOutputVM = new OutputVM(output->name(),
+                                           output->id(),
+                                           output,
+                                           this);
+
+                // Don't add to the list here (this output will be added globally via temporary list)
+
+                // Update the hash table with the output id
+                _mapFromUniqueIdToOutput.insert(output->id(), newOutputVM);
+
+                // Update the hash table with the output name
+                outputsWithSameName.append(newOutputVM);
+                _mapFromNameToOutputsList.insert(output->name(), outputsWithSameName);
+            }
         }
     }
 
@@ -492,7 +568,7 @@ OutputVM* AgentInMappingVM::_outputModelRemoved(OutputM* output)
 
     if (output != NULL)
     {
-        // Input id is defined
+        // Output id is defined
         if (!output->id().isEmpty())
         {
             outputVM = getOutputFromId(output->id());

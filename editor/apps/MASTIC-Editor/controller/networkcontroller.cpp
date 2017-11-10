@@ -37,6 +37,8 @@ static const QString frozenPrefix = "FROZEN=";
 static const QString mutedOutputPrefix = "OUTPUT_MUTED ";
 static const QString unmutedOutputPrefix = "OUTPUT_UNMUTED ";
 
+static const QString NAME_SEPARATOR = "##";
+
 
 /**
  * @brief Callback for Incomming Zyre Messages
@@ -317,7 +319,7 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
 
 
 /**
- * @brief Callback for Observing Input
+ * @brief Callback for Observing inputs of our agent "MASTIC-Editor"
  * @param iopType
  * @param name
  * @param valueType
@@ -333,51 +335,69 @@ void onObserveInputCallback(iop_t iopType, const char* name, iopType_t valueType
     NetworkController* networkController = (NetworkController*)myData;
     if (networkController != NULL)
     {
-        if (iopType == INPUT_T) {
-            AgentIOPValueTypes::Value agentIOPValueType = static_cast<AgentIOPValueTypes::Value>(valueType);
-            switch (valueType)
+        if (iopType == INPUT_T)
+        {
+            QString inputName = name;
+            QStringList names = inputName.split(NAME_SEPARATOR);
+            if (names.count() == 2)
             {
-            case INTEGER_T: {
-                int newValue = mtic_readInputAsInt(name);
-                qDebug() << "New value" << newValue << "received on" << name << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
-                break;
-            }
-            case DOUBLE_T: {
-                double newValue = mtic_readInputAsDouble(name);
-                qDebug() << "New value" << newValue << "received on" << name << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
-                break;
-            }
-            case STRING_T: {
-                QString newValue = mtic_readInputAsString(name);
-                qDebug() << "New value" << newValue << "received on" << name << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
-                break;
-            }
-            case BOOL_T: {
-                bool newValue = mtic_readInputAsBool(name);
-                if (newValue) {
-                    qDebug() << "New value TRUE received on" << name << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
-                }
-                else {
-                    qDebug() << "New value FALSE received on" << name << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
-                }
-                break;
-            }
-            case IMPULSION_T: {
-                qDebug() << "New IMPULSION received on" << name << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
-                break;
-            }
-            case DATA_T: {
+                QString outputAgentName = names.at(0);
+                QString outputName = names.at(1);
+                qDebug() << "outputAgentName" << outputAgentName << "outputName" << outputName;
 
-                // On stocke dans un dossier le media (eg video, son, image) et on log le path et le start time!!.
-                void* data = NULL;
-                if(mtic_readInputAsData(name, &data, &valueSize))
-                qDebug() << "New DATA with size" << valueSize << "received on" << name << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
+                AgentIOPValueTypes::Value agentIOPValueType = static_cast<AgentIOPValueTypes::Value>(valueType);
 
-                break;
-            }
-            default: {
-                break;
-            }
+                switch (valueType)
+                {
+                case INTEGER_T: {
+                    //int* newValue = (int*)value;
+                    int newValue = mtic_readInputAsInt(name);
+                    qDebug() << "New value" << newValue << "received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
+                    break;
+                }
+                case DOUBLE_T: {
+                    //double* newValue = (double*)value;
+                    double newValue = mtic_readInputAsDouble(name);
+                    qDebug() << "New value" << newValue << "received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
+                    break;
+                }
+                case STRING_T: {
+                    //QString newValue = QString((char*)value);
+                    QString newValue = mtic_readInputAsString(name);
+                    qDebug() << "New value" << newValue << "received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
+                    break;
+                }
+                case BOOL_T: {
+                    //bool* newValue = (bool*)value;
+                    bool newValue = mtic_readInputAsBool(name);
+                    if (newValue) {
+                        qDebug() << "New value TRUE received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
+                    }
+                    else {
+                        qDebug() << "New value FALSE received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
+                    }
+                    break;
+                }
+                case IMPULSION_T: {
+                    qDebug() << "New IMPULSION received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
+                    break;
+                }
+                case DATA_T: {
+                    // On stocke dans un dossier le media (eg video, son, image) et on log le path et le start time!!.
+                    void* data = NULL;
+                    int result = mtic_readInputAsData(name, &data, &valueSize);
+                    if (result == 1) {
+                        qDebug() << "New DATA with size" << valueSize << "received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
+                    }
+                    else {
+                        // FIXME TODO
+                    }
+                    break;
+                }
+                default: {
+                    break;
+                }
+                }
             }
         }
     }
@@ -612,10 +632,11 @@ void NetworkController::onCommandAskedForOutput(QString command, QString outputN
  */
 void NetworkController::onAddInputsToEditorForOutputs(QString agentName, QList<OutputM*> outputsList)
 {
-    foreach (OutputM* output, outputsList) {
+    foreach (OutputM* output, outputsList)
+    {
         if (output != NULL)
         {
-            QString inputName = QString("%1.%2").arg(agentName, output->id());
+            QString inputName = QString("%1%2%3").arg(agentName, NAME_SEPARATOR, output->id());
 
             int resultCreateInput = 0;
 
@@ -710,7 +731,7 @@ void NetworkController::onRemoveInputsToEditorForOutputs(QString agentName, QLis
 
         if (!outputId.isEmpty() && !outputName.isEmpty())
         {
-            QString inputName = QString("%1.%2").arg(agentName, outputId);
+            QString inputName = QString("%1%2%3").arg(agentName, NAME_SEPARATOR, outputId);
 
             // Remove mapping between our input and this output
             int resultRemoveMappingEntry = mtic_removeMappingEntryWithName(inputName.toStdString().c_str(), agentName.toStdString().c_str(), outputName.toStdString().c_str());
