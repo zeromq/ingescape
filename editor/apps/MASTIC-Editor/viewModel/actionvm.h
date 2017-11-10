@@ -35,7 +35,7 @@ class ActionVM: public QObject
     I2_QML_PROPERTY_READONLY_DELETE_PROOF(ActionM*, actionModel)
 
     // Start time in seconds
-    I2_CPP_PROPERTY(int, startTimeInSec)
+    I2_CPP_PROPERTY(int, startTime)
 
     // Start date time in string format
     I2_QML_PROPERTY_CUSTOM_SETTER(QString, startTimeString)

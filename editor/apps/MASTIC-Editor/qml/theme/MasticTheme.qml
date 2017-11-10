@@ -76,8 +76,6 @@ Item {
     readonly property color veryDarkGreyColor: "#282D34"
     readonly property color darkGreyColor2: "#2B3137"
 
-    readonly property color color : "#34393b"
-
     readonly property color darkBlueGreyColor: "#3C424F"
     readonly property color blueGreyColor : "#525A66"
 
