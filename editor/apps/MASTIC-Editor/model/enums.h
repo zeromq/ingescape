@@ -42,6 +42,10 @@ I2_ENUM(AgentIOPValueTypes, INTEGER = 1, DOUBLE, STRING, BOOL, IMPULSION, DATA, 
 I2_ENUM(AgentIOPValueTypeGroups, NUMBER, STRING, IMPULSION, DATA, MIXED, UNKNOWN)
 
 
+static const QString SEPARATOR_AGENT_NAME_AND_IOP = QString("##");
+static const QString SEPARATOR_IOP_NAME_AND_IOP_VALUE_TYPE = QString("::");
+
+
 /**
  * @brief The Enums class is a helper for general enumerations
  */
@@ -55,6 +59,36 @@ public:
      * @param parent
      */
     explicit Enums(QObject *parent = nullptr);
+
+
+    /**
+     * @brief Get a displayable value: convert a variant into a string (in function of the value type)
+     * @param valueType
+     * @param value
+     * @return
+     */
+    static QString getDisplayableValue(AgentIOPValueTypes::Value valueType, QVariant value);
+
+    static QString getDisplayableValueFromInteger(int value);
+
+    static QString getDisplayableValueFromDouble(double value);
+
+    static QString getDisplayableValueFromString(QString value);
+
+    static QString getDisplayableValueFromBool(bool value);
+
+    static QString getDisplayableValueFromData(QByteArray value);
+
+
+    /*static int getIntegerFromValue(QVariant value);
+
+    static double getDoubleFromValue(QVariant value);
+
+    static QString getStringFromValue(QVariant value);
+
+    static bool getBoolFromValue(QVariant value);
+
+    static QByteArray getDataFromValue(QVariant value);*/
 
 };
 

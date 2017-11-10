@@ -115,6 +115,13 @@ Q_SIGNALS:
 
 
     /**
+     * @brief Signal emitted when a new value is published
+     * @param publishedValue
+     */
+    void valuePublished(PublishedValueM* publishedValue);
+
+
+    /**
      * @brief Signal emitted when the flag "is Muted" from an agent updated
      * @param peerId
      * @param isMuted

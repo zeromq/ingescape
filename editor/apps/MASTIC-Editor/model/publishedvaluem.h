@@ -35,14 +35,17 @@ class PublishedValueM : public QObject
     // Name of the agent
     I2_QML_PROPERTY_READONLY(QString, agentName)
 
-    // Name of the Input / Output / Parameter
-    I2_QML_PROPERTY_READONLY(QString, iopName)
+    // Type of the agent sub part: Input, Output or Parameter
+    I2_QML_PROPERTY_READONLY(AgentIOPTypes::Value, iopType)
+
+    // Identifier with name and value type
+    I2_CPP_NOSIGNAL_PROPERTY(QString, iopId)
 
     // Value type of the Input / Output / Parameter
     I2_QML_PROPERTY_READONLY(AgentIOPValueTypes::Value, iopValueType)
 
-    // Identifier with name and value type
-    I2_CPP_NOSIGNAL_PROPERTY(QString, id)
+    // Name of the Input / Output / Parameter
+    I2_QML_PROPERTY_READONLY(QString, iopName)
 
     // Value of the Input / Output / Parameter
     I2_CPP_PROPERTY(QVariant, value)
@@ -53,19 +56,21 @@ class PublishedValueM : public QObject
 
 public:
     /**
-     * @brief Constructor
+     * @brief
      * @param time
      * @param agentName
-     * @param iopName
+     * @param iopId
      * @param iopValueType
      * @param value
+     * @param iopType
      * @param parent
      */
     explicit PublishedValueM(QDateTime time,
                              QString agentName,
-                             QString iopName,
+                             QString iopId,
                              AgentIOPValueTypes::Value iopValueType,
                              QVariant value,
+                             AgentIOPTypes::Value iopType = AgentIOPTypes::OUTPUT,
                              QObject *parent = nullptr);
 
 
