@@ -54,7 +54,8 @@ SOURCES += main.cpp \
     viewModel/actioneffectvm.cpp \
     viewModel/actioninpalettevm.cpp \
     model/publishedvaluem.cpp \
-    model/enums.cpp
+    model/enums.cpp \
+    controller/valueshistorycontroller.cpp
 
 HEADERS += \
     model/agentm.h \
@@ -104,7 +105,8 @@ HEADERS += \
     viewModel/actioneffectvm.h \
     viewModel/actioninpalettevm.h \
     model/publishedvaluem.h \
-    model/enums.h
+    model/enums.h \
+    controller/valueshistorycontroller.h
 
 
 RESOURCES += qml.qrc

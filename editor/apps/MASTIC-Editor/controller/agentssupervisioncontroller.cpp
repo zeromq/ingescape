@@ -24,7 +24,8 @@
  * @param modelManager
  * @param parent
  */
-AgentsSupervisionController::AgentsSupervisionController(MasticModelManager* modelManager, QObject *parent) : QObject(parent),
+AgentsSupervisionController::AgentsSupervisionController(MasticModelManager* modelManager,
+                                                         QObject *parent) : QObject(parent),
     _selectedAgent(NULL),
     _modelManager(modelManager)
 {
@@ -40,6 +41,8 @@ AgentsSupervisionController::AgentsSupervisionController(MasticModelManager* mod
 
         //_agentsList.setFilterProperty("TODO");
         //_agentsList.setFilterFixedString("true");
+        //_agentsList.setFilterProperty("currentState");
+        //_agentsList.setFilterFixedString(QString::number(SegmentZoneStates::ENCOMBRE));
     }
 }
 

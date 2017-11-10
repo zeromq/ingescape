@@ -435,6 +435,7 @@ void AgentsMappingController::_completeAllPartialMapBetweenIopUsingNewlyOutputsV
     }
 }
 
+
 /**
  * @brief Slot when the list of "Agents in Mapping" changed
  */
@@ -468,6 +469,9 @@ void AgentsMappingController::_onAgentsInMappingChanged()
                 // Emit signals "Inputs/Outputs List Added" for initial list of inputs and initial list of outputs
                 agentInMapping->inputsListAdded(agentInMapping->inputsList()->toList());
                 agentInMapping->outputsListAdded(agentInMapping->outputsList()->toList());
+
+                // Emit the signal "Agent in Mapping Added"
+                Q_EMIT agentInMappingAdded(agentInMapping->agentName());
             }
         }
     }
@@ -488,6 +492,9 @@ void AgentsMappingController::_onAgentsInMappingChanged()
                 disconnect(agentInMapping, &AgentInMappingVM::inputsListAdded, this, &AgentsMappingController::_onInputsListAdded);
                 disconnect(agentInMapping, &AgentInMappingVM::outputsListAdded, this, &AgentsMappingController::_onOutputsListAdded);
                 disconnect(agentInMapping, &AgentInMappingVM::outputsListRemoved, this, &AgentsMappingController::_onOutputsListRemoved);
+
+                // Emit the signal "Agent in Mapping Removed"
+                Q_EMIT agentInMappingRemoved(agentInMapping->agentName());
             }
         }
     }

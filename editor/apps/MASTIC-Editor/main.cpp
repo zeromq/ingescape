@@ -68,6 +68,7 @@ void registerCustomQmlTypes()
     qmlRegisterUncreatableType<AgentsSupervisionController>(uri, 1, 0, "AgentsSupervisionController", "Internal Class");
     qmlRegisterUncreatableType<MasticModelManager>(uri, 1, 0, "MasticModelManager", "Internal Class");
     qmlRegisterUncreatableType<ScenarioController>(uri, 1, 0, "ScenarioController", "Internal Class");
+    qmlRegisterUncreatableType<ValuesHistoryController>(uri, 1, 0, "ValuesHistoryController", "Internal Class");
 
 
     //----------------
@@ -99,6 +100,7 @@ void registerCustomQmlTypes()
     qmlRegisterUncreatableType<IOPValueConditionM>(uri, 1, 0, "IOPValueConditionM", "Internal class");
     qmlRegisterUncreatableType<IOPValueEffectM>(uri, 1, 0, "IOPValueEffectM", "Internal class");
     qmlRegisterUncreatableType<MappingEffectM>(uri, 1, 0, "MappingEffectM", "Internal class");
+
 
     //---------------
     //

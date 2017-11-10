@@ -59,6 +59,9 @@ MasticModelManager::~MasticModelManager()
 
     // Clear all opened definitions
     _openedDefinitions.clear();
+
+    // Free memory
+    _publishedValues.deleteAllItems();
 }
 
 
@@ -283,8 +286,12 @@ void MasticModelManager::onValuePublished(PublishedValueM* publishedValue)
 {
     if (publishedValue != NULL)
     {
+        // Add to the list
+        _publishedValues.append(publishedValue);
+
         QList<AgentM*> agentsList = getAgentModelsListFromName(publishedValue->agentName());
-        foreach (AgentM* agent, agentsList) {
+        foreach (AgentM* agent, agentsList)
+        {
             if ((agent != NULL) && (agent->definition() != NULL))
             {
                 switch (publishedValue->iopType())
