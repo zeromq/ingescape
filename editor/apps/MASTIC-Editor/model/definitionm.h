@@ -98,26 +98,26 @@ public:
 
     /**
      * @brief Get an Input with its name
-     * @param name
+     * @param inputName
      * @return
      */
-    AgentIOPM* getInputWithName(QString name);
+    AgentIOPM* getInputWithName(QString inputName);
 
 
     /**
      * @brief Get an Output with its name
-     * @param name
+     * @param outputName
      * @return
      */
-    OutputM* getOutputWithName(QString name);
+    OutputM* getOutputWithName(QString outputName);
 
 
     /**
      * @brief Get a Parameter with its name
-     * @param name
+     * @param parameterName
      * @return
      */
-    AgentIOPM* getParameterWithName(QString name);
+    AgentIOPM* getParameterWithName(QString parameterName);
 
 
 Q_SIGNALS:
@@ -178,6 +178,15 @@ private:
 
     // Previous list of outputs
     QList<AgentIOPM*> _previousParametersList;
+
+    // Map from an input name to a model of input
+    QHash<QString, AgentIOPM*> _mapFromInputNameToInput;
+
+    // Map from an output name to a model of output
+    QHash<QString, OutputM*> _mapFromOutputNameToOutput;
+
+    // Map from a parameter name to a model of parameter
+    QHash<QString, AgentIOPM*> _mapFromParameterNameToParameter;
 
 };
 
