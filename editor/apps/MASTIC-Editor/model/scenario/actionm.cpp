@@ -120,9 +120,17 @@ void ActionM::copyFrom(ActionM* actionModel)
                 copiedIopEffect->copyFrom(iopEffect);
                 copiedEffectVM->seteffect(copiedIopEffect);
             } else {
-                ActionEffectM * copiedIopEffect = new ActionEffectM();
-                copiedIopEffect->copyFrom(effectVM->effect());
-                copiedEffectVM->seteffect(copiedIopEffect);
+                MappingEffectM* mappingEffect = dynamic_cast<MappingEffectM*>(effectVM->effect());
+                if(mappingEffect != NULL)
+                {
+                    MappingEffectM * copiedMappingEffect = new MappingEffectM();
+                    copiedMappingEffect->copyFrom(mappingEffect);
+                    copiedEffectVM->seteffect(copiedMappingEffect);
+                } else {
+                    ActionEffectM * copiedIopEffect = new ActionEffectM();
+                    copiedIopEffect->copyFrom(effectVM->effect());
+                    copiedEffectVM->seteffect(copiedIopEffect);
+                }
             }
             _effectsList.append(copiedEffectVM);
         }

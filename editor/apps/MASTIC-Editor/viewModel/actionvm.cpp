@@ -31,8 +31,8 @@
  */
 ActionVM::ActionVM(ActionM *actionModel, int startTime, QObject *parent) : QObject(parent),
     _actionModel(actionModel),
-    _startTimeInSec(startTime),
-    _startTimeString("00:00:00"),
+    _startTime(startTime),
+    _startTimeString("0.0"),
     _lineInTimeLine(-1)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
@@ -85,7 +85,7 @@ void ActionVM::copyFrom(ActionVM* actionVM)
 
         // Copy the view model attributes
         setcolor(actionVM->color());
-        setstartTimeInSec(actionVM->startTimeInSec());
+        setstartTime(actionVM->startTime());
         setlineInTimeLine(actionVM->lineInTimeLine());
         setstartTimeString(actionVM->startTimeString());
     }
@@ -104,15 +104,15 @@ void ActionVM::setstartTimeString(QString stringDateTime)
         // Update the start date time
         if(stringDateTime.isEmpty() == false)
         {
-            QStringList splittedTime = stringDateTime.split(':');
-            if(splittedTime.count() == 3)
+            QStringList splittedTime = stringDateTime.split('.');
+            if(splittedTime.count() == 2)
             {
-                setstartTimeInSec(QString(splittedTime.at(0)).toInt()*3600 + QString(splittedTime.at(1)).toInt()*60 + + QString(splittedTime.at(2)).toInt());
+                setstartTime(QString(splittedTime.at(0)).toInt()*1000 + QString(splittedTime.at(1)).toInt());
             }
         }
         else
         {
-            setstartTimeInSec(-1);
+            setstartTime(-1);
         }
 
         emit startTimeStringChanged(stringDateTime);

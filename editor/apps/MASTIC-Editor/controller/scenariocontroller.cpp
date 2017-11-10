@@ -15,6 +15,7 @@
 
 
 #include <QDebug>
+#include <QFileDialog>
 
 
 
@@ -27,10 +28,12 @@
 
 /**
  * @brief Default constructor
+ * @param scenarios files path
  * @param parent
  */
-ScenarioController::ScenarioController(QObject *parent) : QObject(parent),
-    _selectedAction(NULL)
+ScenarioController::ScenarioController(QString scenariosPath, QObject *parent) : QObject(parent),
+    _selectedAction(NULL),
+    _scenariosDirectoryPath(scenariosPath)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -69,6 +72,13 @@ ScenarioController::ScenarioController(QObject *parent) : QObject(parent),
     _actionsInPaletteList.append(new ActionInPaletteVM(NULL));
     _actionsInPaletteList.append(new ActionInPaletteVM(NULL));
     _actionsInPaletteList.append(new ActionInPaletteVM(NULL));
+
+    QDate today = QDate::currentDate();
+    _scenariosDefaultFilePath = QString("%1scenarios_%2.json").arg(_scenariosDirectoryPath, today.toString("ddMMyy"));
+
+    // Create the helper to manage JSON definitions of agents
+    _jsonHelper = new JsonHelper(this);
+
 }
 
 
@@ -240,4 +250,53 @@ void ScenarioController::setActionInPalette(int index, ActionM* actionM)
     }
 }
 
+/**
+ * @brief Import a scenario a file (actions, palette, timeline actions )
+ */
+void ScenarioController::importScenarioFromFile()
+{
+    // "File Dialog" to get the files (paths) to open
+    QString scenarioFilePath = QFileDialog::getOpenFileName(NULL,
+                                                                "Importer un fichier scénario",
+                                                                _scenariosDirectoryPath,
+                                                                "JSON (*.json)");
+
+    // Import the scenario from JSON file
+    _importScenarioFromFile(scenarioFilePath);
+}
+
+/**
+ * @brief Import the scenario from JSON file
+ * @param scenarioFilePath
+ */
+void ScenarioController::_importScenarioFromFile(QString scenarioFilePath)
+{
+    if (!scenarioFilePath.isEmpty() && (_jsonHelper != NULL))
+    {
+        qInfo() << "Import the scenario from JSON file" << scenarioFilePath;
+
+        QFile jsonFile(scenarioFilePath);
+        if (jsonFile.exists())
+        {
+            if (jsonFile.open(QIODevice::ReadOnly))
+            {
+                QByteArray byteArrayOfJson = jsonFile.readAll();
+                jsonFile.close();
+
+                // Initialize agents list from JSON file
+                QList<ActionM*> agentsListToImport = _jsonHelper->initActionsList(byteArrayOfJson, _agentsInMappingList.toList());
+
+                // Append the list of actions
+                _actionsList.append(agentsListToImport);
+            }
+            else {
+                qCritical() << "Can not open file" << scenarioFilePath;
+            }
+        }
+        else {
+            qWarning() << "There is no file" << scenarioFilePath;
+        }
+    }
+
+}
 

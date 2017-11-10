@@ -99,6 +99,13 @@ public:
      */
     static QString getAgentsMappingsPath();
 
+    /**
+     * @brief Get (and create if needed) the path with files about scenarios
+     * "[DocumentsLocation]/MASTIC/Scenarios/"
+     * @return
+     */
+    static QString getScenariosPath();
+
 
 protected:
     /**

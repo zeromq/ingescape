@@ -72,9 +72,10 @@ public:
 
     /**
      * @brief Default constructor
+     * @param scenarios files path
      * @param parent
      */
-    explicit ScenarioController(QObject *parent = 0);
+    explicit ScenarioController(QString scenariosPath, QObject *parent = 0);
 
 
     /**
@@ -113,6 +114,11 @@ public:
      */
     Q_INVOKABLE void setActionInPalette(int index, ActionM* actionM);
 
+    /**
+     * @brief Import a scenario a file (actions, palette, timeline actions )
+     */
+    Q_INVOKABLE void importScenarioFromFile();
+
 Q_SIGNALS:
 
 
@@ -129,10 +135,26 @@ private :
      */
     QString _buildNewActionName();
 
+    /**
+     * @brief Import the scenario from JSON file
+     * @param scenarioFilePath
+     */
+    void _importScenarioFromFile(QString scenarioFilePath);
+
+
 protected:
 
+    // Path to the directory containing JSON files to save scenarios
+    QString _scenariosDirectoryPath;
+    QString _scenariosDefaultFilePath;
+
+    // Helper to manage JSON definitions of agents
+    JsonHelper* _jsonHelper;
+
+    // Map of actions editors controllers from the actions view model
     QHash<ActionM*, ActionEditorController*> _mapActionsEditorControllersFromActionVM;
 
+    // Map of actions model from the action name
     QHash<QString, ActionM*> _mapActionsFromActionName;
 };
 
