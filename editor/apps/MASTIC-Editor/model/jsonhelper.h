@@ -23,8 +23,11 @@
 #include <I2PropertyHelpers.h>
 
 //#include <model/agentm.h>
-#include <model/definitionm.h>
-#include <model/agentmappingm.h>
+#include "model/definitionm.h"
+#include "model/agentmappingm.h"
+#include "viewModel/actionvm.h"
+#include "viewModel/actioneffectvm.h"
+#include "viewModel/actionconditionvm.h"
 
 /**
  * @brief The JsonHelper class defines a helper to manage JSON definitions of agents
@@ -77,6 +80,13 @@ public:
      */
     AgentMappingM* createModelOfAgentMapping(QString inputAgentName, QByteArray byteArrayOfJson);
 
+    /**
+     * @brief Initialize actions list from JSON file
+     * @param byteArrayOfJson
+     * @param agents list
+     * @return
+     */
+    QList<ActionM*> initActionsList(QByteArray byteArrayOfJson, QList<AgentInMappingVM*> listAgentsInMapping);
 
 Q_SIGNALS:
 
@@ -116,6 +126,13 @@ private:
      * @return
      */
     ElementMappingM* _createModelOfElementMapping(QString inputAgentName, QJsonObject jsonObject);
+
+    /**
+     * @brief Create a model of agent mapping with JSON and the input agent name corresponding
+     * @param inputAgentName, byteArrayOfJson
+     * @return
+     */
+    ActionEffectVM* _parseEffectVMFromJson(QJsonObject jsonEffect, QList<AgentInMappingVM *> listAgentsInMapping);
 };
 
 #endif // JSONHELPER_H

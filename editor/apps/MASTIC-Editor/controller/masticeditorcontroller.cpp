@@ -83,6 +83,15 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
         qCritical() << "ERROR: could not create directory at '" << agentsMappingsPath << "' !";
     }
 
+    //
+    // Scenarios
+    //
+    QString scenariosPath = MasticEditorUtils::getScenariosPath();
+    QDir scenariosDir(scenariosPath);
+    if (!scenariosDir.exists()) {
+        qCritical() << "ERROR: could not create directory at '" << scenariosPath << "' !";
+    }
+
 
     //
     // Create sub-controllers
@@ -101,7 +110,7 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     _agentsMappingC = new AgentsMappingController(_modelManager, this);
 
     // Create the controller for scenario management
-    _scenarioC = new ScenarioController(this);
+    _scenarioC = new ScenarioController(scenariosPath, this);
 
     // Connect to signals from the network controller
     connect(_networkC, &NetworkController::agentEntered, _modelManager, &MasticModelManager::onAgentEntered);

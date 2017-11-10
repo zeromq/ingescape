@@ -154,6 +154,16 @@ QString MasticEditorUtils::getAgentsMappingsPath()
     return MasticEditorUtils::_getSubDirectoryPath("AgentsMappings");
 }
 
+/**
+ * @brief Get (and create if needed) the path with files about scenarios
+ * "[DocumentsLocation]/MASTIC/Scenarios/"
+ * @return
+ */
+QString MasticEditorUtils::getScenariosPath()
+{
+    return MasticEditorUtils::_getSubDirectoryPath("Scenarios");
+}
+
 
 /**
  * @brief Get (and create if needed) the fullpath of a given sub-directory
