@@ -16,6 +16,13 @@
 #include "outputvm.h"
 #include <viewModel/iop/inputvm.h>
 
+/**
+ * @brief Constructor
+ * @param outputName
+ * @param outputId
+ * @param modelM
+ * @param parent
+ */
 OutputVM::OutputVM(QString outputName,
                    QString outputId,
                    OutputM* modelM,

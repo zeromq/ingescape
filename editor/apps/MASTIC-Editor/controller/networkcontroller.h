@@ -23,7 +23,8 @@
 
 #include "I2PropertyHelpers.h"
 
-#include "model/agentm.h"
+#include <model/iop/outputm.h>
+#include <model/publishedvaluem.h>
 
 /**
  * @brief The NetworkController class defines the controller for network communications

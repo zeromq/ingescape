@@ -45,6 +45,13 @@ class OutputVM : public PointMapVM
 
 
 public:
+    /**
+     * @brief Constructor
+     * @param outputName
+     * @param outputId
+     * @param modelM
+     * @param parent
+     */
     explicit OutputVM(QString outputName,
                       QString outputId = "",
                       OutputM* modelM = NULL,

@@ -319,7 +319,7 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
 
 
 /**
- * @brief Callback for Observing Input
+ * @brief Callback for Observing inputs of our agent "MASTIC-Editor"
  * @param iopType
  * @param name
  * @param valueType
@@ -632,7 +632,8 @@ void NetworkController::onCommandAskedForOutput(QString command, QString outputN
  */
 void NetworkController::onAddInputsToEditorForOutputs(QString agentName, QList<OutputM*> outputsList)
 {
-    foreach (OutputM* output, outputsList) {
+    foreach (OutputM* output, outputsList)
+    {
         if (output != NULL)
         {
             QString inputName = QString("%1%2%3").arg(agentName, NAME_SEPARATOR, output->id());

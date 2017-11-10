@@ -20,18 +20,6 @@
 
 
 /**
- * @brief Default constructor
- * @param parent
- */
-AgentIOPM::AgentIOPM(QObject *parent) : AgentIOPM(AgentIOPTypes::PARAMETER,
-                                                  "",
-                                                  AgentIOPValueTypes::UNKNOWN,
-                                                  parent)
-{
-}
-
-
-/**
  * @brief Constructor
  * @param agentIOPType
  * @param name
@@ -47,7 +35,9 @@ AgentIOPM::AgentIOPM(AgentIOPTypes::Value agentIOPType,
     _agentIOPValueType(AgentIOPValueTypes::UNKNOWN),
     _agentIOPValueTypeGroup(AgentIOPValueTypeGroups::UNKNOWN),
     _defaultValue(QVariant()),
-    _displayableDefaultValue("")
+    _displayableDefaultValue(""),
+    _currentValue(QVariant()),
+    _displayableCurrentValue("")
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -55,7 +45,7 @@ AgentIOPM::AgentIOPM(AgentIOPTypes::Value agentIOPType,
     // Call the setter to update the corresponding group
     setagentIOPValueType(agentIOPValueType);
 
-    // Create the identifier with name and value type
+    // Create the unique identifier with name and value type
     _id = QString("%1::%2").arg(_name, AgentIOPValueTypes::staticEnumToString(_agentIOPValueType));
 }
 
@@ -127,5 +117,23 @@ void AgentIOPM::setdefaultValue(QVariant value)
         setdisplayableDefaultValue(_defaultValue.toString());
 
         Q_EMIT defaultValueChanged(value);
+    }
+}
+
+
+/**
+ * @brief Setter for property "Current Value"
+ * @param value
+ */
+void AgentIOPM::setcurrentValue(QVariant value)
+{
+    if (_currentValue != value)
+    {
+        _currentValue = value;
+
+        // To String
+        setdisplayableCurrentValue(_currentValue.toString());
+
+        Q_EMIT currentValueChanged(value);
     }
 }
