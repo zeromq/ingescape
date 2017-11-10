@@ -1796,7 +1796,7 @@ I2PopupBase {
 
                                 // Agent TO Intpus
                                 MasticComboBox {
-                                    id : oEffectsMappingTOCombo
+                                    id : iEffectsMappingTOCombo
 
                                     enabled : visible
                                     anchors {
@@ -1815,7 +1815,7 @@ I2PopupBase {
 
 
                                     Binding {
-                                        target : oEffectsMappingTOCombo
+                                        target : iEffectsMappingTOCombo
                                         property : "selectedItem"
                                         value : if (myEffect && myEffect.effect)
                                                 {
@@ -1830,7 +1830,7 @@ I2PopupBase {
                                     {
                                         if (myEffect && myEffect.effect)
                                         {
-                                            myEffect.effect.toAgentIOP = oEffectsMappingTOCombo.selectedItem;
+                                            myEffect.effect.toAgentIOP = iEffectsMappingTOCombo.selectedItem;
                                         }
                                     }
 
