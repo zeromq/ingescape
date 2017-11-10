@@ -26,7 +26,7 @@
 /**
   * Comparison type for an action: SUPERIOR_TO, INFERIOR_TO, DIFFER_TO, ON, OFF
   */
-I2_ENUM_CUSTOM(ActionComparisonValueType, SUPERIOR_TO, INFERIOR_TO, EQUAL_TO, ON, OFF)
+I2_ENUM_CUSTOM(ActionComparisonValueType, EQUAL_TO, SUPERIOR_TO, INFERIOR_TO, ON, OFF)
 
 
 /**
@@ -37,7 +37,7 @@ class ActionConditionM: public QObject
     Q_OBJECT
 
     // Agent model
-    I2_QML_PROPERTY_CUSTOM_SETTER(AgentInMappingVM*, agentModel)
+    I2_QML_PROPERTY(AgentInMappingVM*, agentModel)
 
     // Effect type
     I2_QML_PROPERTY(ActionComparisonValueType::Value, comparison)
@@ -62,7 +62,6 @@ public:
     * @param condition to copy
     */
     void copyFrom(ActionConditionM* condition);
-
 
 Q_SIGNALS:
 

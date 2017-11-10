@@ -82,6 +82,9 @@ void ActionEditorController::createNewCondition()
 {
     ActionConditionVM * conditionVM = new ActionConditionVM(this);
 
+    // Set a condition model
+    conditionVM->setcondition(new ActionConditionM());
+
     if(_listAgentsInMapping != NULL && _listAgentsInMapping->count() > 0)
     {
         conditionVM->condition()->setagentModel(_listAgentsInMapping->at(0));
@@ -108,6 +111,9 @@ void ActionEditorController::removeCondition(ActionConditionVM* conditionVM)
 void ActionEditorController::createNewEffect()
 {
     ActionEffectVM * effectVM = new ActionEffectVM(this);
+
+    // Set an effect model
+    effectVM->seteffect(new ActionEffectM());
 
     if(_listAgentsInMapping != NULL && _listAgentsInMapping->count() > 0)
     {

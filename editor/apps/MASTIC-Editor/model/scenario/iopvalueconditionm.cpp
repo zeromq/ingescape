@@ -53,4 +53,66 @@ IOPValueConditionM::~IOPValueConditionM()
     setagentIOP(NULL);
 }
 
+/**
+* @brief Copy from another condition model
+* @param condition to copy
+*/
+void IOPValueConditionM::copyFrom(ActionConditionM* condition)
+{
+    ActionConditionM::copyFrom(condition);
+
+    IOPValueConditionM* iopCondition = dynamic_cast<IOPValueConditionM*>(condition);
+    if(iopCondition != NULL)
+    {
+        setagentIOP(iopCondition->agentIOP());
+        _agentIopList.clear();
+        _agentIopList.append(iopCondition->agentIopList()->toList());
+        setvalue(iopCondition->value());
+    }
+}
+
+/**
+* @brief Copy from another condition model
+* @param condition to copy
+*/
+bool IOPValueConditionM::setagentModel(AgentInMappingVM* agentModel)
+{
+    bool hasChanged = ActionConditionM::setagentModel(agentModel);
+
+    if(hasChanged)
+    {
+        // Clear the list
+        _agentIopList.clear();
+
+        if(_agentModel != NULL)
+        {
+            // Fill with inputs
+            foreach (InputVM* input, _agentModel->inputsList()->toList())
+            {
+                if(input->firstModel() != NULL)
+                {
+                    _agentIopList.append(input->firstModel());
+                }
+            }
+
+            // Fill with outputs
+            foreach (OutputVM* output, _agentModel->outputsList()->toList())
+            {
+                if(output->firstModel() != NULL)
+                {
+                    _agentIopList.append(output->firstModel());
+                }
+            }
+
+            // Select the first item
+            if(_agentIopList.count() > 0)
+            {
+                setagentIOP(_agentIopList.at(0));
+            }
+        }
+    }
+
+    return hasChanged;
+}
+
 

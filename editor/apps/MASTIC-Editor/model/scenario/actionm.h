@@ -33,7 +33,7 @@
   * - Immediate
   * - Forever
   */
-I2_ENUM_CUSTOM(ValidationDurationType, CUSTOM, IMMEDIATE, FOREVER)
+I2_ENUM_CUSTOM(ValidationDurationType, IMMEDIATE, FOREVER, CUSTOM)
 
 
 /**
@@ -56,7 +56,7 @@ class ActionM: public QObject
     I2_QML_PROPERTY_CUSTOM_SETTER(QString, validityDurationString)
 
     // Shall revert the action
-    I2_QML_PROPERTY(bool, shallRevert)
+    I2_QML_PROPERTY_CUSTOM_SETTER(bool, shallRevert)
 
     // Shall revert action when validity is over
     I2_QML_PROPERTY(bool, shallRevertWhenValidityIsOver)
