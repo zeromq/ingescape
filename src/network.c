@@ -86,7 +86,6 @@ static const char *loadDefinitionPrefix = "LOAD_THIS_DEFINITION#";
 #define AGENT_NAME_LENGTH 256
 char agentName[AGENT_NAME_LENGTH] = AGENT_NAME_DEFAULT;
 char agentState[AGENT_NAME_LENGTH] = "";
-#define NO_DEVICE "unknown"
 
 typedef struct freezeCallback {      //Need to be unique : the table hash key
     mtic_freezeCallback callback_ptr;   //pointer on the callback
@@ -867,6 +866,7 @@ initActor (zsock_t *pipe, void *args)
     
     //start zyre
     agentElements->node = zyre_new (agentName);
+    zyre_set_interface(agentElements->node, agentElements->networkDevice);
     zyre_set_port(agentElements->node, agentElements->zyrePort);
     if (agentElements->node == NULL){
         mtic_debug("Error : could not create zyre node... exiting.\n");
@@ -1200,7 +1200,7 @@ int mtic_startWithDevice(const char *networkDevice, int port){
                                 struct sockaddr_in *sa_in = (struct sockaddr_in *)pUnicast->Address.lpSockaddr;
                                 strncpy(agentElements->ipAddress, inet_ntoa(sa_in->sin_addr), IP_ADDRESS_LENGTH);
                                 free(friendly_name);
-                                mtic_debug("Connection on ip address %s on device %s\n", agentElements->ipAddress, agentElements->networkDevice);
+                                mtic_debug("Connection with ip address %s on device %s\n", agentElements->ipAddress, agentElements->networkDevice);
                             }
                         }
                         pUnicast = pUnicast->Next;
@@ -1248,6 +1248,7 @@ int mtic_startWithDevice(const char *networkDevice, int port){
             {
                 strncpy(agentElements->ipAddress, inet_ntoa(pAddr->sin_addr), IP_ADDRESS_LENGTH);
                 mtic_debug("Connection with ip address %s on device %s\n", agentElements->ipAddress, networkDevice);
+                break;
             }
         }
         tmpaddr = tmpaddr->ifa_next;
@@ -1281,11 +1282,113 @@ int mtic_startWithIP(const char *ipAddress, int port){
         mtic_stop();
     }
     mtic_Interrupted = false;
-    
     agentElements = calloc(1, sizeof(zyreloopElements_t));
-    strncpy(agentElements->networkDevice, NO_DEVICE, NETWORK_DEVICE_LENGTH);
+    
+    //get device name for IP
+#ifdef _WIN32
+    do {
+        pAddresses = (IP_ADAPTER_ADDRESSES *) MALLOC(outBufLen);
+        if (pAddresses == NULL) {
+            printf("Memory allocation failed for IP_ADAPTER_ADDRESSES struct... exiting.\n");
+            exit(1);
+        }
+        
+        dwRetVal = GetAdaptersAddresses(family, flags, NULL, pAddresses, &outBufLen);
+        
+        if (dwRetVal == ERROR_BUFFER_OVERFLOW) {
+            FREE(pAddresses);
+            pAddresses = NULL;
+        } else {
+            break;
+        }
+        
+        Iterations++;
+        
+    } while ((dwRetVal == ERROR_BUFFER_OVERFLOW) && (Iterations < MAX_TRIES));
+    
+    if (dwRetVal == NO_ERROR) {
+        // If successful, output some information from the data we received
+        pCurrAddresses = pAddresses;
+        while (pCurrAddresses) {
+            //Convert the wchar_t to char *
+            friendly_name = (char *)malloc( BUFSIZ );
+            count = wcstombs(friendly_name, pCurrAddresses->FriendlyName, BUFSIZ );
+            
+            //If the friendly_name is the same of the networkDevice
+            pUnicast = pCurrAddresses->FirstUnicastAddress;
+            if (pUnicast != NULL)
+            {
+                for (i = 0; pUnicast != NULL; i++)
+                {
+                    if(pUnicast)
+                    {
+                        if (pUnicast->Address.lpSockaddr->sa_family == AF_INET)
+                        {
+                            struct sockaddr_in *sa_in = (struct sockaddr_in *)pUnicast->Address.lpSockaddr;
+                            if (strcmp(ipAddress, inet_ntoa(sa_in->sin_addr)) == 0){
+                                strncpy(agentElements->networkDevice, friendly_name, 15);
+                                printf("Connection with ip address %s on device %s\n", ipAddress, agentElements->networkDevice);
+                                break;
+                            }
+                        }
+                    }
+                    pUnicast = pUnicast->Next;
+                }
+            }
+            pCurrAddresses = pCurrAddresses->Next;
+        }
+    } else {
+        printf("Call to GetAdaptersAddresses failed with error: %d\n",
+               dwRetVal);
+        if (dwRetVal == ERROR_NO_DATA)
+            printf("\tNo addresses were found for the requested parameters\n");
+        else {
+            
+            if (FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
+                              FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+                              NULL, dwRetVal, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                              // Default language
+                              (LPTSTR) & lpMsgBuf, 0, NULL)) {
+                printf("\tError: %s", lpMsgBuf);
+                LocalFree(lpMsgBuf);
+                if (pAddresses)
+                    FREE(pAddresses);
+                exit(1);
+            }
+        }
+    }
+    
+    if (pAddresses) {
+        FREE(pAddresses);
+    }
+    
+#else
+    struct ifaddrs *addrs, *tmpaddr;
+    getifaddrs(&addrs);
+    tmpaddr = addrs;
+    while (tmpaddr)
+    {
+        if (tmpaddr->ifa_addr && tmpaddr->ifa_addr->sa_family == AF_INET)
+        {
+            struct sockaddr_in *pAddr = (struct sockaddr_in *)tmpaddr->ifa_addr;
+            if (strcmp(ipAddress, inet_ntoa(pAddr->sin_addr)) == 0)
+            {
+                strncpy(agentElements->networkDevice, tmpaddr->ifa_name, 15);
+                printf("Connection with ip address %s on device %s\n", ipAddress, agentElements->networkDevice);
+                break;
+            }
+        }
+        tmpaddr = tmpaddr->ifa_next;
+    }
+    freeifaddrs(addrs);
+#endif
+    
+    if (strlen(agentElements->networkDevice) == 0){
+        fprintf(stderr, "Device name could not be determined for IP address %s... exiting.\n", ipAddress);
+        exit(EXIT_FAILURE);
+    }
+    
     strncpy(agentElements->ipAddress, ipAddress, IP_ADDRESS_LENGTH);
-    mtic_debug("Connection with ip address %s\n", agentElements->ipAddress);
     agentElements->zyrePort = port;
     agentElements->agentActor = zactor_new (initActor, agentElements);
     assert (agentElements->agentActor);
@@ -1368,11 +1471,7 @@ int mtic_setAgentName(const char *name){
     strncpy(agentName, name, AGENT_NAME_LENGTH);
     
     if (needRestart){
-        if (strcmp(networkDevice, NO_DEVICE) == 0){
-            mtic_startWithIP(ipAddress, zyrePort);
-        }else{
-            mtic_startWithDevice(networkDevice, zyrePort);
-        }
+        mtic_startWithIP(ipAddress, zyrePort);
     }
     
     return 1;
