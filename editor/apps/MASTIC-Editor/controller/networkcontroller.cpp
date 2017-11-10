@@ -317,7 +317,7 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
 
 
 /**
- * @brief Callback for Observing Input
+ * @brief Callback for Observing inputs of our agent "MASTIC-Editor"
  * @param iopType
  * @param name
  * @param valueType
@@ -327,52 +327,116 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
  */
 void onObserveInputCallback(iop_t iopType, const char* name, iopType_t valueType, void* value, long valueSize, void* myData)
 {
+    Q_UNUSED(value);
+
+    // Historique: on log la value et le dateTime.
     NetworkController* networkController = (NetworkController*)myData;
     if (networkController != NULL)
     {
-        if (iopType == INPUT_T) {
+        if (iopType == INPUT_T)
+        {
             QString inputName = name;
-            AgentIOPValueTypes::Value agentIOPValueType = static_cast<AgentIOPValueTypes::Value>(valueType);
 
-            switch (valueType)
+            QStringList agentNameAndIOP = inputName.split(SEPARATOR_AGENT_NAME_AND_IOP);
+            if (agentNameAndIOP.count() == 2)
             {
-            case INTEGER_T: {
-                int* newValue = (int*)value;
-                qDebug() << "New value" << *newValue << "received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
-                break;
-            }
-            case DOUBLE_T: {
-                double* newValue = (double*)value;
-                qDebug() << "New value" << *newValue << "received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
-                break;
-            }
-            case STRING_T: {
-                QString newValue = QString((char*)value);
-                qDebug() << "New value" << newValue << "received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
-                break;
-            }
-            case BOOL_T: {
-                bool* newValue = (bool*)value;
-                if (*newValue) {
-                    qDebug() << "New value TRUE received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
+                QString outputAgentName = agentNameAndIOP.at(0);
+                QString outputId = agentNameAndIOP.at(1);
+
+                AgentIOPValueTypes::Value agentIOPValueType = static_cast<AgentIOPValueTypes::Value>(valueType);
+                QVariant currentValue = QVariant();
+                bool isValid = false;
+
+                switch (valueType)
+                {
+                case INTEGER_T: {
+                    //int* newValue = (int*)value;
+                    int newValue = mtic_readInputAsInt(name);
+
+                    currentValue = QVariant(newValue);
+                    isValid = true;
+
+                    //qDebug() << "New value" << newValue << "received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
+                    break;
+                }
+                case DOUBLE_T: {
+                    //double* newValue = (double*)value;
+                    double newValue = mtic_readInputAsDouble(name);
+
+                    currentValue = QVariant(newValue);
+                    isValid = true;
+
+                    //qDebug() << "New value" << newValue << "received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
+                    break;
+                }
+                case STRING_T: {
+                    //QString newValue = QString((char*)value);
+                    QString newValue = mtic_readInputAsString(name);
+
+                    currentValue = QVariant(newValue);
+                    isValid = true;
+
+                    //qDebug() << "New value" << newValue << "received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
+                    break;
+                }
+                case BOOL_T: {
+                    //bool* newValue = (bool*)value;
+                    bool newValue = mtic_readInputAsBool(name);
+
+                    currentValue = QVariant(newValue);
+                    isValid = true;
+
+                    /*if (newValue) {
+                        qDebug() << "New value TRUE received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
+                    }
+                    else {
+                        qDebug() << "New value FALSE received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
+                    }*/
+                    break;
+                }
+                case IMPULSION_T: {
+                    isValid = true;
+
+                    //qDebug() << "New IMPULSION received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
+                    break;
+                }
+                case DATA_T: {
+                    // On peut utiliser directement value plutôt que de re-générer un tableau de bytes ??
+                    // On stocke dans un dossier le media (eg video, son, image) et on log le path et le start time ??
+                    void* data = NULL;
+                    int result = mtic_readInputAsData(name, &data, &valueSize);
+                    if (result == 1) {
+                        // data must be a char* to have automatic conversion
+                        //QByteArray newValue = QByteArray(data, valueSize);
+                        //currentValue = QVariant(newValue);
+                        //isValid = true;
+
+                        qDebug() << "New DATA with size" << valueSize << "received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
+                    }
+                    else {
+                        // FIXME TODO
+                    }
+                    break;
+                }
+                default: {
+                    break;
+                }
+                }
+
+                if (isValid) {
+                    PublishedValueM* publishedValue = new PublishedValueM(QDateTime::currentDateTime(),
+                                                                          outputAgentName,
+                                                                          outputId,
+                                                                          agentIOPValueType,
+                                                                          currentValue);
+
+                    // Emit the signal "Value Published"
+                    Q_EMIT networkController->valuePublished(publishedValue);
                 }
                 else {
-                    qDebug() << "New value FALSE received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
+                    // FIXME TODO log error
+                    //qCritical()
                 }
-                break;
-            }
-            case IMPULSION_T: {
-                qDebug() << "New IMPULSION received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
-                break;
-            }
-            case DATA_T: {
-                // FIXME TODO
-                qDebug() << "New DATA with size" << valueSize << "received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
-                break;
-            }
-            default: {
-                break;
-            }
             }
         }
     }
@@ -602,13 +666,16 @@ void NetworkController::onCommandAskedForOutput(QString command, QString outputN
 
 /**
  * @brief Slot when inputs must be added to our Editor for a list of outputs
+ * @param agentName
  * @param outputsList
  */
 void NetworkController::onAddInputsToEditorForOutputs(QString agentName, QList<OutputM*> outputsList)
 {
-    foreach (OutputM* output, outputsList) {
-        if (output != NULL) {
-            QString inputName = QString("%1.%2").arg(agentName, output->id());
+    foreach (OutputM* output, outputsList)
+    {
+        if (output != NULL)
+        {
+            QString inputName = QString("%1%2%3").arg(agentName, SEPARATOR_AGENT_NAME_AND_IOP, output->id());
 
             int resultCreateInput = 0;
 
@@ -690,21 +757,39 @@ void NetworkController::onAddInputsToEditorForOutputs(QString agentName, QList<O
 
 /**
  * @brief Slot when inputs must be removed to our Editor for a list of outputs
- * @param outputsList
+ * @param agentName
+ * @param pairsList
  */
-void NetworkController::onRemoveInputsToEditorForOutputs(QString agentName, QList<OutputM*> outputsList)
+void NetworkController::onRemoveInputsToEditorForOutputs(QString agentName, QList<QPair<QString, QString>> pairsList)
 {
-    foreach (OutputM* output, outputsList) {
-        if (output != NULL) {
-            QString inputName = QString("%1.%2.%3").arg(_editorAgentName, agentName, output->name());
+    for (int i = 0; i < pairsList.count(); i++)
+    {
+        QPair<QString, QString> pair = pairsList.at(i);
+        QString outputId = pair.first;
+        QString outputName = pair.second;
 
-            int result = mtic_removeMappingEntryWithName(inputName.toStdString().c_str(), agentName.toStdString().c_str(), output->name().toStdString().c_str());
+        if (!outputId.isEmpty() && !outputName.isEmpty())
+        {
+            QString inputName = QString("%1%2%3").arg(agentName, SEPARATOR_AGENT_NAME_AND_IOP, outputId);
 
-            if (result == 1) {
-                qDebug() << "Remove input" << inputName << "on output" << output->name() << "of agent" << agentName;
+            // Remove mapping between our input and this output
+            int resultRemoveMappingEntry = mtic_removeMappingEntryWithName(inputName.toStdString().c_str(), agentName.toStdString().c_str(), outputName.toStdString().c_str());
+
+            if (resultRemoveMappingEntry == 1) {
+                qDebug() << "Remove mapping between output" << outputName << "of agent" << agentName << "and input" << inputName << "of agent" << _editorAgentName;
+
+                // Remove our input
+                int resultRemoveInput = mtic_removeInput(inputName.toStdString().c_str());
+
+                if (resultRemoveInput == 1) {
+                    qDebug() << "Remove input" << inputName << "on agent" << _editorAgentName;
+                }
+                else {
+                    qCritical() << "Can NOT remove input" << inputName << "on agent" << _editorAgentName << "Error code:" << resultRemoveInput;
+                }
             }
             else {
-                qCritical() << "Can NOT remove input" << inputName << "on output" << output->name() << "of agent" << agentName << ". Error code:" << result;
+                qCritical() << "Can NOT remove mapping between output" << outputName << "of agent" << agentName << "and input" << inputName << "of agent" << _editorAgentName << "Error code:" << resultRemoveMappingEntry;
             }
         }
     }

@@ -124,7 +124,7 @@ Item {
 
 
     //
-    // Left panel: TODO: add border in I2CustomRectangle
+    // Left panel
     //
     Rectangle {
         id: leftPanel
@@ -273,6 +273,7 @@ Item {
             id: actionEditor
             
             controller : MasticEditorC.scenarioC
+            panelController: model.QtObject
 
             // Center popup
             x: (parent.width - actionEditor.width) / 2.0
@@ -293,7 +294,6 @@ Item {
             }
         }
     }
-
 
     // AgentMappingHistory ?
 }

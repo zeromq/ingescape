@@ -782,4 +782,62 @@
 			<line fill="none" stroke="#F39200" stroke-width="2.5333" stroke-miterlimit="10" x1="1021.8" y1="562.5" x2="1009.7" y2="574.6"/>
 	</g>
 </g>
+<g id="iconCombo">
+	<polygon fill="#535A66" points="1082.7,570.4 1086.3,576.7 1090,570.4 	"/>
+</g>
+<g id="check">
+	<polyline fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" points="
+		1084.1,590 1087.2,594.8 1091.7,587 	"/>
+</g>
+<g id="createButton">
+	<g>
+		<line fill="none" stroke="#FFFFFF" stroke-width="0.7642" stroke-miterlimit="10" x1="1107.5" y1="621" x2="1107.5" y2="631.2"/>
+		
+			<line fill="none" stroke="#FFFFFF" stroke-width="0.7642" stroke-miterlimit="10" x1="1112.6" y1="626.2" x2="1102.5" y2="626.2"/>
+		<circle fill="none" stroke="#FFFFFF" stroke-width="0.7642" stroke-miterlimit="10" cx="1107.5" cy="626.2" r="7.6"/>
+	</g>
+</g>
+<g id="createButton-pressed">
+	<g>
+		
+			<line fill="none" stroke="#878787" stroke-width="0.7642" stroke-miterlimit="10" x1="1106.5" y1="620.5" x2="1106.5" y2="630.6"/>
+		
+			<line fill="none" stroke="#878787" stroke-width="0.7642" stroke-miterlimit="10" x1="1111.6" y1="625.6" x2="1101.5" y2="625.6"/>
+		<circle fill="none" stroke="#878787" stroke-width="0.7642" stroke-miterlimit="10" cx="1106.5" cy="625.6" r="7.6"/>
+	</g>
+</g>
+<g id="Calque_34">
+	<g id="enabledToggle">
+		<path fill="#3C424F" d="M1057.7,672.4h49.9c5.1,0,9.2,4.1,9.2,9.2v4.4c0,5.1-4.1,9.2-9.2,9.2h-49.9c-5.1,0-9.2-4.1-9.2-9.2v-4.4
+			C1048.5,676.5,1052.7,672.4,1057.7,672.4z"/>
+		<circle fill="#706F6F" cx="1060.5" cy="683.7" r="9.8"/>
+		<g>
+			<text transform="matrix(1 0 0 1 1072.4248 687.8166)" fill="#706F6F" font-family="'BloggerSans'" font-size="13px">Disable</text>
+		</g>
+	</g>
+	<g id="enabledToggle-checked_1_">
+		<path fill="#3C424F" d="M1104.9,728.2H1055c-5.1,0-9.2-4.1-9.2-9.2v-4.4c0-5.1,4.1-9.2,9.2-9.2h49.9c5.1,0,9.2,4.1,9.2,9.2v4.4
+			C1114.1,724.1,1110,728.2,1104.9,728.2z"/>
+		<circle fill="#B2B2B2" cx="1102.2" cy="716.9" r="9.8"/>
+		<g>
+			<text transform="matrix(1 0 0 1 1051.604 720.6014)" fill="#B2B2B2" font-family="'BloggerSans'" font-size="13px">Enable</text>
+		</g>
+	</g>
+	<g id="enabledToggle-checked-pressed">
+		<path fill="#2C3138" d="M1102.4,762.7h-49.9c-5.1,0-9.2-4.1-9.2-9.2v-4.4c0-5.1,4.1-9.2,9.2-9.2h49.9c5.1,0,9.2,4.1,9.2,9.2v4.4
+			C1111.6,758.6,1107.5,762.7,1102.4,762.7z"/>
+		<circle fill="#B2B2B2" cx="1099.7" cy="751.3" r="9.8"/>
+		<g>
+			<text transform="matrix(1 0 0 1 1049.1157 755.0821)" fill="#B2B2B2" font-family="'BloggerSans'" font-size="13px">Enable</text>
+		</g>
+	</g>
+	<g id="enabledToggle-pressed">
+		<path fill="#2C3138" d="M1050.4,769.5h49.9c5.1,0,9.2,4.1,9.2,9.2v4.4c0,5.1-4.1,9.2-9.2,9.2h-49.9c-5.1,0-9.2-4.1-9.2-9.2v-4.4
+			C1041.2,773.6,1045.3,769.5,1050.4,769.5z"/>
+		<circle fill="#706F6F" cx="1053.2" cy="780.9" r="9.8"/>
+		<g>
+			<text transform="matrix(1 0 0 1 1065.0889 784.9723)" fill="#706F6F" font-family="'BloggerSans'" font-size="13px">Disable</text>
+		</g>
+	</g>
+</g>
 </svg>

@@ -75,10 +75,10 @@ Item {
 
     readonly property color veryDarkGreyColor: "#282D34"
     readonly property color darkGreyColor2: "#2B3137"
-    readonly property color color : "#34393b"
 
     readonly property color darkBlueGreyColor: "#3C424F"
     readonly property color blueGreyColor : "#525A66"
+
     readonly property color lightBlueGreyColor: "#8896AA"
 
     readonly property color darkGreyColor : "#575756"
@@ -159,6 +159,13 @@ Item {
     // Background
     readonly property color windowBackgroundColor: "#E4E4E4"
 
+    // Left panel lists Background
+    readonly property color leftPanelBackgroundColor: theme.blackColor
+    readonly property color selectedTabsBackgroundColor: theme.veryDarkGreyColor
+
+    // Editors Background
+    readonly property color editorsBackgroundColor: veryDarkGreyColor
+    readonly property color editorsBackgroundBorderColor: greyColor
 
 
     //-----------------------------------------
@@ -166,12 +173,6 @@ Item {
     // Agents list UI elements
     //
     //-----------------------------------------
-
-
-    // Background
-    readonly property color leftPanelBackgroundColor: theme.blackColor
-    readonly property color selectedTabsBackgroundColor: theme.veryDarkGreyColor
-
     // Labels
     readonly property color agentsListLabelColor: theme.whiteColor
     readonly property color agentsListLabel2Color: theme.whiteColor
@@ -199,10 +200,6 @@ Item {
     //
     //-----------------------------------------
 
-    // Background
-    readonly property color definitionEditorsBackgroundColor: veryDarkGreyColor
-    readonly property color definitionEditorsBackgroundBorderColor: greyColor
-
     // Labels
     readonly property color definitionEditorsLabelColor: theme.whiteColor
     readonly property color definitionEditorsAgentDescriptionColor: theme.lightGreyColor
@@ -220,6 +217,12 @@ Item {
     readonly property color scenarioBackgroundColor: "#3C424F"
 
 
+    // List Actions
+    readonly property color actionsListItemBackgroundColor: theme.veryDarkGreyColor
+    readonly property color actionsListItemRollOverBackgroundColor: theme.darkGreyColor2
+
+    readonly property color actionsListLabelColor: theme.whiteColor
+    readonly property color actionsListPressedLabelColor: theme.greyColor
 
     //-----------------------------------------
     //
@@ -239,7 +242,7 @@ Item {
     // Links
     //
     // - Default state
-    readonly property int agentsMappingLinkDefaultWidth: 2
+    readonly property int agentsMappingLinkDefaultWidth: 3
     readonly property int agentsMappingBrinDefaultWidth: 6
 
 

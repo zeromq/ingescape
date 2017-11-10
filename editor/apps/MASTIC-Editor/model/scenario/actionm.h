@@ -23,8 +23,17 @@
 
 #include "I2PropertyHelpers.h"
 
-#include "model/scenario/actioneffectm.h"
-#include "model/scenario/actionconditionm.h"
+#include "viewModel/actionconditionvm.h"
+#include "viewModel/actioneffectvm.h"
+
+/**
+  * @brief Validation duration type for an action
+  * Types:
+  * - Custom
+  * - Immediate
+  * - Forever
+  */
+I2_ENUM_CUSTOM(ValidationDurationType, IMMEDIATE, FOREVER, CUSTOM)
 
 
 /**
@@ -37,29 +46,41 @@ class ActionM: public QObject
     // Action name
     I2_QML_PROPERTY(QString, name)
 
-    // Start time in milliseconds
-    I2_QML_PROPERTY(int, startTime)
+    // Validity duration type
+    I2_QML_PROPERTY(ValidationDurationType::Value, validityDurationType)
 
     // Validity duration in milliseconds
     I2_QML_PROPERTY(int, validityDuration)
 
-    // Flag to revert the action
-    I2_QML_PROPERTY(bool, shallRevert)
+    // Validity duration in milliseconds in string format
+    I2_QML_PROPERTY_CUSTOM_SETTER(QString, validityDurationString)
 
-    // Flag to revert action when validity is over
-    I2_QML_PROPERTY(bool, revertWhenValidityIsOver)
+    // Shall revert the action
+    I2_QML_PROPERTY_CUSTOM_SETTER(bool, shallRevert)
 
-    // Time in milliseconds when to revert
-    I2_QML_PROPERTY(int, revertAtTime)
+    // Shall revert action when validity is over
+    I2_QML_PROPERTY(bool, shallRevertWhenValidityIsOver)
+
+    // Shall revert after date time flag
+    I2_QML_PROPERTY(bool, shallRevertAfterTime)
+
+    // Revert after time in milliseconds
+    I2_QML_PROPERTY(int, revertAfterTime)
+
+    // Revert after time in string format
+    I2_QML_PROPERTY_CUSTOM_SETTER(QString, revertAfterTimeString)
 
     // Flag to rearm the action
     I2_QML_PROPERTY(bool, shallRearm)
 
     // List of effects for the action
-    I2_QOBJECT_LISTMODEL(ActionEffectM, effectsList)
+    I2_QOBJECT_LISTMODEL(ActionEffectVM, effectsList)
 
     // List of conditions for the action
-    I2_QOBJECT_LISTMODEL(ActionConditionM, conditionsList)
+    I2_QOBJECT_LISTMODEL(ActionConditionVM, conditionsList)
+
+    // Index in the actions panel
+    I2_QML_PROPERTY(int, actionsPanelIndex)
 
     // FIXME : Liste des temps de déclenchement (1 ou plus si réarmable) >> VP
 

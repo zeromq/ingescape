@@ -15,6 +15,7 @@
 
 
 #include <QDebug>
+#include <QFileDialog>
 
 
 
@@ -27,12 +28,56 @@
 
 /**
  * @brief Default constructor
+ * @param scenarios files path
  * @param parent
  */
-ScenarioController::ScenarioController(QObject *parent) : QObject(parent)
+ScenarioController::ScenarioController(QString scenariosPath, QObject *parent) : QObject(parent),
+    _selectedAction(NULL),
+    _scenariosDirectoryPath(scenariosPath)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
+
+    // Fill state comparisons types list
+    _comparisonsAgentsTypesList.appendEnumValue(ActionComparisonValueType::ON);
+    _comparisonsAgentsTypesList.appendEnumValue(ActionComparisonValueType::OFF);
+
+    // Fill value comparisons types list
+    _comparisonsValuesTypesList.fillWithAllEnumValues();
+    _comparisonsValuesTypesList.removeEnumValue(ActionComparisonValueType::ON);
+    _comparisonsValuesTypesList.removeEnumValue(ActionComparisonValueType::OFF);
+
+    // Fill value effects types list
+    _effectsAgentsTypesList.appendEnumValue(ActionEffectValueType::ON);
+    _effectsAgentsTypesList.appendEnumValue(ActionEffectValueType::OFF);
+
+    // Fill link effects types list
+    _effectsLinksTypesList.appendEnumValue(ActionEffectValueType::ENABLE);
+    _effectsLinksTypesList.appendEnumValue(ActionEffectValueType::DISABLE);
+
+    // Fill general types
+    _conditionsTypesList.fillWithAllEnumValues();
+    _effectsTypesList.fillWithAllEnumValues();
+
+    // Fill validity duration types list
+    _validationDurationsTypesList.fillWithAllEnumValues();
+
+    // Initialize the 9 items of the palette with NULL action
+    _actionsInPaletteList.append(new ActionInPaletteVM(NULL));
+    _actionsInPaletteList.append(new ActionInPaletteVM(NULL));
+    _actionsInPaletteList.append(new ActionInPaletteVM(NULL));
+    _actionsInPaletteList.append(new ActionInPaletteVM(NULL));
+    _actionsInPaletteList.append(new ActionInPaletteVM(NULL));
+    _actionsInPaletteList.append(new ActionInPaletteVM(NULL));
+    _actionsInPaletteList.append(new ActionInPaletteVM(NULL));
+    _actionsInPaletteList.append(new ActionInPaletteVM(NULL));
+    _actionsInPaletteList.append(new ActionInPaletteVM(NULL));
+
+    QDate today = QDate::currentDate();
+    _scenariosDefaultFilePath = QString("%1scenarios_%2.json").arg(_scenariosDirectoryPath, today.toString("ddMMyy"));
+
+    // Create the helper to manage JSON definitions of agents
+    _jsonHelper = new JsonHelper(this);
 
 }
 
@@ -42,12 +87,21 @@ ScenarioController::ScenarioController(QObject *parent) : QObject(parent)
  */
 ScenarioController::~ScenarioController()
 {
+    // Clean-up current selection
+    setselectedAction(NULL);
+
+    // Delete actions VM from the palette
+    _actionsInPaletteList.deleteAllItems();
+
     // Clear the list of editor opened
     _mapActionsEditorControllersFromActionVM.clear();
     _openedActionsEditorsControllers.deleteAllItems();
 
     // Delete actions Vm List
     _actionsList.deleteAllItems();
+
+    // Clear map
+    _mapActionsFromActionName.clear();
 }
 
 
@@ -55,23 +109,27 @@ ScenarioController::~ScenarioController()
   * @brief Open the action editor
   * @param action view model
   */
-void ScenarioController::openActionEditor(ActionVM* actionVM)
+void ScenarioController::openActionEditor(ActionM* actionM)
 {
     // We check that or editor is not already opened
-    if(_mapActionsEditorControllersFromActionVM.contains(actionVM) == false)
+    if(_mapActionsEditorControllersFromActionVM.contains(actionM) == false)
     {
         // Create an empty action if we create a new one
-        if(actionVM == NULL)
+        if(actionM == NULL)
         {
-            ActionM* actionM = new ActionM("New action");
-            actionVM = new ActionVM(actionM);
+            actionM = new ActionM(_buildNewActionName());
+        }
+        // Set selected action
+        else
+        {
+            setselectedAction(actionM);
         }
 
         // Create action editor controller
-        ActionEditorController* actionEditorC = new ActionEditorController(actionVM);
+        ActionEditorController* actionEditorC = new ActionEditorController(actionM,agentsInMappingList());
 
         // Add action into our opened actions
-        _mapActionsEditorControllersFromActionVM.insert(actionVM,actionEditorC);
+        _mapActionsEditorControllersFromActionVM.insert(actionM,actionEditorC);
 
         // Add to list
         _openedActionsEditorsControllers.append(actionEditorC);
@@ -83,24 +141,22 @@ void ScenarioController::openActionEditor(ActionVM* actionVM)
   * @brief Delete an action from the list
   * @param action view model
   */
-void ScenarioController::deleteAction(ActionVM * actionVM)
+void ScenarioController::deleteAction(ActionM * actionM)
 {
-    // Delete the popup if necessary
-    if(_mapActionsEditorControllersFromActionVM.contains(actionVM))
-    {
-        ActionEditorController* actionEditorC = _mapActionsEditorControllersFromActionVM.value(actionVM);
-
-        _mapActionsEditorControllersFromActionVM.remove(actionVM);
-        _openedActionsEditorsControllers.remove(actionEditorC);
+    // Unselect our action if needed
+    if (_selectedAction == actionM) {
+        setselectedAction(NULL);
     }
 
     // Delete the action item
-    if(_actionsList.contains(actionVM))
+    if(_actionsList.contains(actionM))
     {
-        _actionsList.remove(actionVM);
+        _actionsList.remove(actionM);
 
-        delete actionVM;
-        actionVM = NULL;
+        _mapActionsFromActionName.remove(actionM->name());
+
+        delete actionM;
+        actionM = NULL;
     }
 }
 
@@ -113,19 +169,20 @@ void ScenarioController::valideActionEditor(ActionEditorController* actionEditor
     // Valide modification
     actionEditorC->validateModification();
 
-    ActionVM* originalActionVM = actionEditorC->originalAction();
+    ActionM* originalActionVM = actionEditorC->originalAction();
 
     // We check that or editor is not already opened
     if(_actionsList.contains(originalActionVM) == false)
     {
+        // Insert in to the list
         _actionsList.append(originalActionVM);
+
+        // Insert into the map
+        _mapActionsFromActionName.insert(originalActionVM->name(),originalActionVM);
     }
 
-    if(_mapActionsEditorControllersFromActionVM.contains(originalActionVM))
-    {
-        _mapActionsEditorControllersFromActionVM.remove(originalActionVM);
-    }
-    _openedActionsEditorsControllers.remove(actionEditorC);
+    // Set selected action
+    setselectedAction(originalActionVM);
 }
 
 /**
@@ -134,32 +191,112 @@ void ScenarioController::valideActionEditor(ActionEditorController* actionEditor
   */
 void ScenarioController::closeActionEditor(ActionEditorController* actionEditorC)
 {
-    ActionVM* actionVM = actionEditorC->originalAction();
+    ActionM* actionM = actionEditorC->originalAction();
     // Delete the popup if necessary
-    if(actionVM != NULL && _mapActionsEditorControllersFromActionVM.contains(actionVM))
+    if(actionM != NULL && _mapActionsEditorControllersFromActionVM.contains(actionM))
     {
-        ActionEditorController* actionEditorC = _mapActionsEditorControllersFromActionVM.value(actionVM);
+        ActionEditorController* actionEditorC = _mapActionsEditorControllersFromActionVM.value(actionM);
 
-        _mapActionsEditorControllersFromActionVM.remove(actionVM);
+        _mapActionsEditorControllersFromActionVM.remove(actionM);
         _openedActionsEditorsControllers.remove(actionEditorC);
     }
 }
 
 /**
-  * @brief Delete action edition
-  * @param action editor controller
+  * @brief slot on agents in mapping list count change
   */
-void ScenarioController::deleteActionEditor(ActionEditorController* actionEditorC)
+void ScenarioController::onAgentsInMappingListCountChange()
 {
-    ActionVM* actionVM = actionEditorC->originalAction();
-
-    // Delete the original action
-    if(actionVM != NULL)
+    I2CustomItemListModel<AgentInMappingVM> * agentInMappingList = dynamic_cast<I2CustomItemListModel<AgentInMappingVM> *>(sender());
+    if (agentInMappingList != NULL)
     {
-        deleteAction(actionVM);
+        // Reset the agents in mapping list
+        _agentsInMappingList.clear();
+
+        // Add the new list of agents
+        _agentsInMappingList.append(agentInMappingList->toList());
     }
 }
 
+/**
+ * @brief Get a new action name
+ */
+QString ScenarioController::_buildNewActionName()
+{
+    // Remove the effect
+    int index = 1;
+    QString tmpName = "Action_"+QString("%1").arg(index, 3,10, QChar('0'));
 
+    while(_mapActionsFromActionName.contains(tmpName))
+    {
+        index++;
+        tmpName = "Action_"+QString("%1").arg(index, 3, 10, QChar('0'));
+    }
 
+    return tmpName;
+}
+
+/**
+ * @brief Set an action into the palette at index
+ * @param index where to insert the action
+ * @param action to insert
+ */
+void ScenarioController::setActionInPalette(int index, ActionM* actionM)
+{
+    // Set action in palette
+    if(index < _actionsInPaletteList.count())
+    {
+        _actionsInPaletteList.at(index)->setactionModel(actionM);
+    }
+}
+
+/**
+ * @brief Import a scenario a file (actions, palette, timeline actions )
+ */
+void ScenarioController::importScenarioFromFile()
+{
+    // "File Dialog" to get the files (paths) to open
+    QString scenarioFilePath = QFileDialog::getOpenFileName(NULL,
+                                                                "Importer un fichier scénario",
+                                                                _scenariosDirectoryPath,
+                                                                "JSON (*.json)");
+
+    // Import the scenario from JSON file
+    _importScenarioFromFile(scenarioFilePath);
+}
+
+/**
+ * @brief Import the scenario from JSON file
+ * @param scenarioFilePath
+ */
+void ScenarioController::_importScenarioFromFile(QString scenarioFilePath)
+{
+    if (!scenarioFilePath.isEmpty() && (_jsonHelper != NULL))
+    {
+        qInfo() << "Import the scenario from JSON file" << scenarioFilePath;
+
+        QFile jsonFile(scenarioFilePath);
+        if (jsonFile.exists())
+        {
+            if (jsonFile.open(QIODevice::ReadOnly))
+            {
+                QByteArray byteArrayOfJson = jsonFile.readAll();
+                jsonFile.close();
+
+                // Initialize agents list from JSON file
+                QList<ActionM*> agentsListToImport = _jsonHelper->initActionsList(byteArrayOfJson, _agentsInMappingList.toList());
+
+                // Append the list of actions
+                _actionsList.append(agentsListToImport);
+            }
+            else {
+                qCritical() << "Can not open file" << scenarioFilePath;
+            }
+        }
+        else {
+            qWarning() << "There is no file" << scenarioFilePath;
+        }
+    }
+
+}
 

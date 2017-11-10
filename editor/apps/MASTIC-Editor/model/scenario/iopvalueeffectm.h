@@ -38,8 +38,11 @@ class IOPValueEffectM: public ActionEffectM
     // Agent IOP
     I2_QML_PROPERTY(AgentIOPM* , agentIOP)
 
-    // Target value converted into string
-    I2_QML_PROPERTY(QString, targetValue)
+    // value converted into string
+    I2_QML_PROPERTY(QString, value)
+
+    // Concatened list of iop agents items
+    I2_QOBJECT_LISTMODEL(AgentIOPM , agentIopList)
 
 public:
 
@@ -54,6 +57,18 @@ public:
       * @brief Destructor
       */
     ~IOPValueEffectM();
+
+    /**
+      * @brief Redefinition of action effect copy
+      */
+    void copyFrom(ActionEffectM* effect);
+
+    /**
+    * @brief Custom setter on set agent model
+    *        to fill inputs and outputs
+    * @param agentModel
+    */
+    bool setagentModel(AgentInMappingVM* agentModel);
 
 
 

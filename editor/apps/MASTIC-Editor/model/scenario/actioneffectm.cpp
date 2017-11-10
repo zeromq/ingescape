@@ -15,8 +15,40 @@
 
 
 #include <QDebug>
+#include "iopvalueeffectm.h"
 
+/**
+ * @brief Effect type for an action
+ * @param value
+ * @return
+ */
+QString ActionEffectValueType::enumToString(int value)
+{
+    QString string = "Effect type";
 
+    switch (value) {
+    case ActionEffectValueType::ENABLE:
+        string = "Enable";
+        break;
+
+    case ActionEffectValueType::DISABLE:
+        string = "Disable";
+        break;
+
+    case ActionEffectValueType::ON:
+        string = "ON";
+        break;
+
+    case ActionEffectValueType::OFF:
+        string = "OFF";
+        break;
+
+    default:
+        break;
+    }
+
+    return string;
+}
 
 //--------------------------------------------------------------
 //
@@ -30,8 +62,8 @@
  * @param parent
  */
 ActionEffectM::ActionEffectM(QObject *parent) : QObject(parent),
-    _model(NULL),
-    _effect(ActionEffectType::ON)
+    _agentModel(NULL),
+    _effect(ActionEffectValueType::ON)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -45,7 +77,7 @@ ActionEffectM::ActionEffectM(QObject *parent) : QObject(parent),
 ActionEffectM::~ActionEffectM()
 {
     // Reset agent model to null
-    setmodel(NULL);
+    setagentModel(NULL);
 }
 
 /**
@@ -56,9 +88,8 @@ void ActionEffectM::copyFrom(ActionEffectM* effect)
 {
     if(effect != NULL)
     {
-        setmodel(effect->model());
+        setagentModel(effect->agentModel());
         seteffect(effect->effect());
     }
 }
-
 

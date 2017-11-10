@@ -21,7 +21,6 @@ SOURCES += main.cpp \
     viewModel/agentvm.cpp \
     model/iop/agentiopm.cpp \
     model/jsonhelper.cpp \
-    viewModel/iop/agentiopvm.cpp \
     controller/agentssupervisioncontroller.cpp \
     controller/agentsmappingcontroller.cpp \
     controller/masticeditorcontroller.cpp \
@@ -50,7 +49,13 @@ SOURCES += main.cpp \
     viewModel/iop/inputvm.cpp \
     viewModel/iop/outputvm.cpp \
     misc/terminationsignalwatcher.cpp \
-    misc/collapsiblecolumn.cpp
+    misc/collapsiblecolumn.cpp \
+    viewModel/actionconditionvm.cpp \
+    viewModel/actioneffectvm.cpp \
+    viewModel/actioninpalettevm.cpp \
+    model/publishedvaluem.cpp \
+    model/enums.cpp \
+    controller/valueshistorycontroller.cpp
 
 HEADERS += \
     model/agentm.h \
@@ -58,7 +63,6 @@ HEADERS += \
     stable.h \
     model/iop/agentiopm.h \
     model/jsonhelper.h \
-    viewModel/iop/agentiopvm.h \
     controller/agentssupervisioncontroller.h \
     controller/agentsmappingcontroller.h \
     controller/masticeditorcontroller.h \
@@ -96,7 +100,13 @@ HEADERS += \
     viewModel/iop/inputvm.h \
     viewModel/iop/outputvm.h \
     misc/terminationsignalwatcher.h \
-    misc/collapsiblecolumn.h
+    misc/collapsiblecolumn.h \
+    viewModel/actionconditionvm.h \
+    viewModel/actioneffectvm.h \
+    viewModel/actioninpalettevm.h \
+    model/publishedvaluem.h \
+    model/enums.h \
+    controller/valueshistorycontroller.h
 
 
 RESOURCES += qml.qrc

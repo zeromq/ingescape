@@ -34,12 +34,6 @@ class OutputM : public AgentIOPM
 
 
 public:
-    /**
-     * @brief Default constructor
-     * @param parent
-     */
-    explicit OutputM(QObject *parent = nullptr);
-
 
     /**
      * @brief Constructor
@@ -47,9 +41,9 @@ public:
      * @param agentIOPValueType
      * @param parent
      */
-    OutputM(QString name,
-            AgentIOPValueTypes::Value agentIOPValueType,
-            QObject *parent = nullptr);
+    explicit OutputM(QString name,
+                     AgentIOPValueTypes::Value agentIOPValueType,
+                     QObject *parent = nullptr);
 
 
     /**

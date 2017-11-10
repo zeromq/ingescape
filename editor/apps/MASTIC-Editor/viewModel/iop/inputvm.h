@@ -31,14 +31,19 @@ class InputVM : public PointMapVM
 {
     Q_OBJECT
 
-    // Model of our agent Input
-    I2_QML_PROPERTY_READONLY_DELETE_PROOF(AgentIOPM*, modelM)
+    // First model of our agent Input
+    I2_QML_PROPERTY_READONLY_DELETE_PROOF(AgentIOPM*, firstModel)
+
+    // Models of our agent input
+    I2_QOBJECT_LISTMODEL(AgentIOPM, models)
 
 
 public:
     explicit InputVM(QString inputName,
+                     QString inputId,
                      AgentIOPM* modelM,
                      QObject *parent = nullptr);
+
 
     /**
      * @brief Destructor
@@ -56,6 +61,18 @@ public Q_SLOTS:
      * @return
      */
     bool canLinkWith(PointMapVM* pointMap) Q_DECL_OVERRIDE;
+
+
+private Q_SLOTS:
+    /**
+     * @brief Slot when the list of models changed
+     */
+    void _onModelsChanged();
+
+
+private:
+    // Previous list of models
+    //QList<AgentIOPM*> _previousModelsList;
 
 };
 

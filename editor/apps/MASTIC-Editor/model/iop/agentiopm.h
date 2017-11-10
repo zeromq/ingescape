@@ -20,21 +20,7 @@
 #include <QtQml>
 
 #include <I2PropertyHelpers.h>
-
-
-/**
-  * Types:
-  * - Agent Input
-  * - Agent Output
-  * - Agent Parameter
-  */
-I2_ENUM(AgentIOPTypes, INPUT, OUTPUT, PARAMETER)
-
-
-/**
-  * Type of the value of an Agent Input / Output / Parameter
-  */
-I2_ENUM(AgentIOPValueTypes, INTEGER = 1, DOUBLE, STRING, BOOL, IMPULSION, DATA, MIXED, UNKNOWN)
+#include <model/enums.h>
 
 
 /**
@@ -48,13 +34,16 @@ class AgentIOPM : public QObject
     I2_QML_PROPERTY_READONLY(AgentIOPTypes::Value, agentIOPType)
 
     // Name of our Input / Output / Parameter
-    I2_QML_PROPERTY(QString, name)
+    I2_QML_PROPERTY_READONLY(QString, name)
 
     // Value type of our Input / Output / Parameter
-    I2_QML_PROPERTY(AgentIOPValueTypes::Value, agentIOPValueType)
+    I2_QML_PROPERTY_READONLY_CUSTOM_SETTER(AgentIOPValueTypes::Value, agentIOPValueType)
+
+    // Group of the value type of our Input / Output / Parameter
+    I2_QML_PROPERTY_READONLY(AgentIOPValueTypeGroups::Value, agentIOPValueTypeGroup)
 
     // Identifier with name and value type
-    I2_CPP_PROPERTY(QString, id)
+    I2_CPP_NOSIGNAL_PROPERTY(QString, id)
 
     // ######################################################
     // Value of our Input / Output / Parameter
@@ -63,33 +52,21 @@ class AgentIOPM : public QObject
     // http://doc.qt.io/qt-5/qvariant.html
 
     // Default value of our Input / Output / Parameter
-    //I2_CPP_PROPERTY(QByteArray, defaultValue)
+    //I2_CPP_PROPERTY_CUSTOM_SETTER(QByteArray, defaultValue)
     I2_CPP_PROPERTY_CUSTOM_SETTER(QVariant, defaultValue)
     // ######################################################
 
-    // Displayable defaut value of our Input / Output / Parameter
+    // Displayable default value of our Input / Output / Parameter
     I2_QML_PROPERTY(QString, displayableDefaultValue)
 
-    // Mapping value of our Input / Output / Parameter
-    //I2_CPP_PROPERTY(QVariant, mappingValue)
-
-    // Displayable mapping value of our Input / Output / Parameter
-    //I2_QML_PROPERTY(QString, displayableMappingValue)
-
-    // current value of our Input / Output / Parameter
-    //I2_CPP_PROPERTY(QVariant, currentValue)
+    // Current value of our Input / Output / Parameter
+    I2_CPP_PROPERTY_CUSTOM_SETTER(QVariant, currentValue)
 
     // Displayable current value of our Input / Output / Parameter
-    //I2_QML_PROPERTY(QString, displayableCurrentValue)
+    I2_QML_PROPERTY_READONLY(QString, displayableCurrentValue)
 
 
 public:
-    /**
-     * @brief Default constructor
-     * @param parent
-     */
-    explicit AgentIOPM(QObject *parent = nullptr);
-
 
     /**
      * @brief Constructor
@@ -98,10 +75,10 @@ public:
      * @param agentIOPValueType
      * @param parent
      */
-    AgentIOPM(AgentIOPTypes::Value agentIOPType,
-              QString name,
-              AgentIOPValueTypes::Value agentIOPValueType,
-              QObject *parent = nullptr);
+    explicit AgentIOPM(AgentIOPTypes::Value agentIOPType,
+                       QString name,
+                       AgentIOPValueTypes::Value agentIOPValueType,
+                       QObject *parent = nullptr);
 
 
     /**

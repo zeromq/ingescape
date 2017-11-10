@@ -330,14 +330,14 @@ Item {
 
                     if (MasticEditorC.agentsMappingC)
                     {
-                        MasticEditorC.agentsMappingC.addAgentToMappingAtPosition(dragItem.agent.name, dragItem.agent.models, dropPosition);
+                        MasticEditorC.agentsMappingC.dropAgentToMappingAtPosition(dragItem.agent.name, dragItem.agent.models, dropPosition);
                     }
 
                     // Restore opacity of our source
                     drag.source.opacity = _previousOpacityOfSource;
                 }
 
-                 dropGhost.agent = null;
+                dropGhost.agent = null;
             }
         }
 
@@ -483,12 +483,10 @@ Item {
 
                     Link {
                         id : link
-
+                        controller : rootItem.controller
                         mapBetweenIOPVM: model.QtObject
                     }
                 }
-
-
 
                 //
                 // Nodes

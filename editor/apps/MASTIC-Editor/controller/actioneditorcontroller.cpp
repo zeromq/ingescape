@@ -29,18 +29,18 @@
  * @brief Default constructor
  * @param parent
  */
-ActionEditorController::ActionEditorController(ActionVM * originalAction, QObject *parent) : QObject(parent),
+ActionEditorController::ActionEditorController(ActionM *originalAction, I2CustomItemListModel<AgentInMappingVM> * listAgentsInMapping, QObject *parent) : QObject(parent),
     _originalAction(originalAction),
-    _editedAction(NULL)
+    _editedAction(NULL),
+    _listAgentsInMapping(listAgentsInMapping)
 {
     if(_originalAction != NULL)
     {
-        _editedAction = new ActionVM(NULL);
+        _editedAction = new ActionM(_originalAction->name(), this);
         _editedAction->copyFrom(_originalAction);
     }
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
-
 }
 
 
@@ -53,7 +53,7 @@ ActionEditorController::~ActionEditorController()
 
     if(_editedAction != NULL)
     {
-        ActionVM* tmp = _editedAction;
+        ActionM* tmp = _editedAction;
         seteditedAction(NULL);
         delete tmp;
         tmp = NULL;
@@ -72,6 +72,66 @@ void ActionEditorController::validateModification()
     }
     else {
         _originalAction->copyFrom(_editedAction);
+    }
+}
+
+/**
+ * @brief Create a new condition
+ */
+void ActionEditorController::createNewCondition()
+{
+    ActionConditionVM * conditionVM = new ActionConditionVM(this);
+
+    // Set a condition model
+    conditionVM->setcondition(new ActionConditionM());
+
+    if(_listAgentsInMapping != NULL && _listAgentsInMapping->count() > 0)
+    {
+        conditionVM->condition()->setagentModel(_listAgentsInMapping->at(0));
+    }
+
+    _editedAction->conditionsList()->append(conditionVM);
+}
+
+/**
+ * @brief Remove the conditionVM
+ */
+void ActionEditorController::removeCondition(ActionConditionVM* conditionVM)
+{
+    // Remove the condition
+    if(_editedAction->conditionsList()->contains(conditionVM))
+    {
+        _editedAction->conditionsList()->remove(conditionVM);
+    }
+}
+
+/**
+ * @brief Create a new effectVM
+ */
+void ActionEditorController::createNewEffect()
+{
+    ActionEffectVM * effectVM = new ActionEffectVM(this);
+
+    // Set an effect model
+    effectVM->seteffect(new ActionEffectM());
+
+    if(_listAgentsInMapping != NULL && _listAgentsInMapping->count() > 0)
+    {
+        effectVM->effect()->setagentModel(_listAgentsInMapping->at(0));
+    }
+
+    _editedAction->effectsList()->append(effectVM);
+}
+
+/**
+ * @brief Remove the effectVM
+ */
+void ActionEditorController::removeEffect(ActionEffectVM* effectVM)
+{
+    // Remove the effect
+    if(_editedAction->effectsList()->contains(effectVM))
+    {
+        _editedAction->effectsList()->remove(effectVM);
     }
 }
 

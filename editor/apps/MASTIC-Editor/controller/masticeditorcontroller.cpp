@@ -35,6 +35,7 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     _agentsMappingC(NULL),
     _networkC(NULL),
     _scenarioC(NULL),
+    _valuesHistoryC(NULL),
     _terminationSignalWatcher(NULL)
 {
     qInfo() << "New MASTIC Editor Controller";
@@ -83,6 +84,15 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
         qCritical() << "ERROR: could not create directory at '" << agentsMappingsPath << "' !";
     }
 
+    //
+    // Scenarios
+    //
+    QString scenariosPath = MasticEditorUtils::getScenariosPath();
+    QDir scenariosDir(scenariosPath);
+    if (!scenariosDir.exists()) {
+        qCritical() << "ERROR: could not create directory at '" << scenariosPath << "' !";
+    }
+
 
     //
     // Create sub-controllers
@@ -101,13 +111,17 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     _agentsMappingC = new AgentsMappingController(_modelManager, this);
 
     // Create the controller for scenario management
-    _scenarioC = new ScenarioController(this);
+    _scenarioC = new ScenarioController(scenariosPath, this);
+
+    // Create the controller for the history of values
+    _valuesHistoryC = new ValuesHistoryController(_modelManager, this);
 
     // Connect to signals from the network controller
     connect(_networkC, &NetworkController::agentEntered, _modelManager, &MasticModelManager::onAgentEntered);
     connect(_networkC, &NetworkController::definitionReceived, _modelManager, &MasticModelManager::onDefinitionReceived);
     connect(_networkC, &NetworkController::mappingReceived, _modelManager, &MasticModelManager::onMappingReceived);
     connect(_networkC, &NetworkController::agentExited, _modelManager, &MasticModelManager::onAgentExited);
+    connect(_networkC, &NetworkController::valuePublished, _modelManager, &MasticModelManager::onValuePublished);
     connect(_networkC, &NetworkController::isMutedFromAgentUpdated, _modelManager, &MasticModelManager::onisMutedFromAgentUpdated);
     connect(_networkC, &NetworkController::isFrozenFromAgentUpdated, _modelManager, &MasticModelManager::onIsFrozenFromAgentUpdated);
     connect(_networkC, &NetworkController::isMutedFromOutputOfAgentUpdated, _modelManager, &MasticModelManager::onIsMutedFromOutputOfAgentUpdated);
@@ -116,19 +130,25 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     // Connect to signals from the model manager
     connect(_modelManager, &MasticModelManager::isActivatedMappingChanged, _agentsMappingC, &AgentsMappingController::onIsActivatedMappingChanged);
     connect(_modelManager, &MasticModelManager::agentModelCreated, _agentsSupervisionC, &AgentsSupervisionController::onAgentModelCreated);
-    //connect(_modelManager, &MasticModelManager::agentModelWillBeDeleted, _agentsSupervisionC, &AgentsSupervisionController::onAgentModelWillBeDeleted);
+    connect(_modelManager, &MasticModelManager::agentModelWillBeDeleted, _agentsMappingC, &AgentsMappingController::onAgentModelWillBeDeleted);
 
 
     // Connect to signals from the controller for supervision of agents
     connect(_agentsSupervisionC, &AgentsSupervisionController::commandAskedToLauncher, _networkC, &NetworkController::onCommandAskedToLauncher);
     connect(_agentsSupervisionC, &AgentsSupervisionController::commandAsked, _networkC, &NetworkController::onCommandAsked);
     connect(_agentsSupervisionC, &AgentsSupervisionController::commandAskedForOutput, _networkC, &NetworkController::onCommandAskedForOutput);
+    connect(_agentsSupervisionC, &AgentsSupervisionController::identicalAgentModelReplaced, _agentsMappingC, &AgentsMappingController::onIdenticalAgentModelReplaced);
+    connect(_agentsSupervisionC, &AgentsSupervisionController::identicalAgentModelAdded, _agentsMappingC, &AgentsMappingController::onIdenticalAgentModelAdded);
 
 
     // Connect to signals from the controller for mapping of agents
+    connect(_agentsMappingC, &AgentsMappingController::agentInMappingAdded, _valuesHistoryC, &ValuesHistoryController::onAgentInMappingAdded);
+    connect(_agentsMappingC, &AgentsMappingController::agentInMappingRemoved, _valuesHistoryC, &ValuesHistoryController::onAgentInMappingRemoved);
     connect(_agentsMappingC, &AgentsMappingController::addInputsToEditorForOutputs, _networkC, &NetworkController::onAddInputsToEditorForOutputs);
     connect(_agentsMappingC, &AgentsMappingController::removeInputsToEditorForOutputs, _networkC, &NetworkController::onRemoveInputsToEditorForOutputs);
 
+    // Connect to signals from the agents mapping list to the action editor
+    connect(_agentsMappingC->agentInMappingVMList(), &AbstractI2CustomItemListModel::countChanged, _scenarioC, &ScenarioController::onAgentsInMappingListCountChange);
 
     // Initialize agents list from default file
     _modelManager->importAgentsListFromDefaultFile();
@@ -143,7 +163,7 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     _terminationSignalWatcher = new TerminationSignalWatcher(this);
     connect(_terminationSignalWatcher, &TerminationSignalWatcher::terminationSignal,
                      [=] () {
-                        qDebug() << "\n\n\nTu connais le tarif Vincent ;-)\n\n\n";
+                        qDebug() << "\n\n\n CATCH Termination Signal \n\n\n";
 
                         if (QApplication::instance() != NULL)
                         {
@@ -178,8 +198,20 @@ MasticEditorController::~MasticEditorController()
     //
     // Clean-up sub-controllers
     //
+    if (_valuesHistoryC != NULL)
+    {
+        disconnect(_valuesHistoryC);
+
+        ValuesHistoryController* temp = _valuesHistoryC;
+        setvaluesHistoryC(NULL);
+        delete temp;
+        temp = NULL;
+    }
+
     if (_agentsMappingC != NULL)
     {
+        disconnect(_agentsMappingC);
+
         AgentsMappingController* temp = _agentsMappingC;
         setagentsMappingC(NULL);
         delete temp;

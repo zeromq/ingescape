@@ -96,9 +96,9 @@ I2PopupBase {
         radius: 5
         border {
             width: 2
-            color: MasticTheme.definitionEditorsBackgroundBorderColor
+            color: MasticTheme.editorsBackgroundBorderColor
         }
-        color: MasticTheme.definitionEditorsBackgroundColor
+        color: MasticTheme.editorsBackgroundColor
 
 
         MouseArea {
@@ -127,6 +127,7 @@ I2PopupBase {
                 rightMargin: 20
             }
 
+            activeFocusOnPress: true
             style: Theme.LabellessSvgButtonStyle {
                 fileCache: MasticTheme.svgFileMASTIC
 
@@ -435,30 +436,24 @@ I2PopupBase {
                                             height : width
                                             radius : width/2
 
-                                            color : switch (model.agentIOPValueType)
+                                            color : switch (model.agentIOPValueTypeGroup)
                                                     {
-                                                    case AgentIOPValueTypes.INTEGER:
+                                                    case AgentIOPValueTypeGroups.NUMBER:
                                                         MasticTheme.orangeColor2
                                                         break;
-                                                    case AgentIOPValueTypes.DOUBLE:
-                                                        MasticTheme.orangeColor2
-                                                        break;
-                                                    case AgentIOPValueTypes.STRING:
+                                                    case AgentIOPValueTypeGroups.STRING:
                                                         MasticTheme.redColor2
                                                         break;
-                                                    case AgentIOPValueTypes.BOOL:
-                                                        MasticTheme.orangeColor2
-                                                        break;
-                                                    case AgentIOPValueTypes.IMPULSION:
+                                                    case AgentIOPValueTypeGroups.IMPULSION:
                                                         MasticTheme.purpleColor
                                                         break;
-                                                    case AgentIOPValueTypes.DATA:
+                                                    case AgentIOPValueTypeGroups.DATA:
                                                         MasticTheme.greenColor
                                                         break;
-                                                    case AgentIOPValueTypes.MIXED:
+                                                    case AgentIOPValueTypeGroups.MIXED:
                                                         MasticTheme.whiteColor
                                                         break;
-                                                    case AgentIOPValueTypes.UNKNOWN:
+                                                    case AgentIOPValueTypeGroups.UNKNOWN:
                                                         "#000000"
                                                         break;
                                                     default:
@@ -508,9 +503,9 @@ I2PopupBase {
                                     }
 
 
-                                    // Mapping Value
+                                    // Current Value
                                     Text {
-                                        text: "    -"
+                                        text: model.displayableCurrentValue
 
                                         anchors {
                                             verticalCenter: parent.verticalCenter
@@ -558,6 +553,7 @@ I2PopupBase {
                                             id: btnMuteOutput
                                             visible: (model.agentIOPType === AgentIOPTypes.OUTPUT)
                                             enabled : visible
+                                            activeFocusOnPress: true
 
                                             anchors {
                                                 verticalCenter: parent.verticalCenter
@@ -616,7 +612,7 @@ I2PopupBase {
 
 //            Button {
 //                id: cancelButton
-
+//            activeFocusOnPress: true
 //                property var boundingBox: MasticTheme.svgFileMASTIC.boundsOnElement("button");
 //                height : boundingBox.height
 //                width :  boundingBox.width
@@ -660,6 +656,7 @@ I2PopupBase {
                 width :  boundingBox.width
 
                 enabled : visible
+                activeFocusOnPress: true
                 text : "OK"
 
                 anchors {

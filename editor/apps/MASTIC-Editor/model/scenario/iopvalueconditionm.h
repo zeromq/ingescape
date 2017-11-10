@@ -35,6 +35,12 @@ class IOPValueConditionM: public ActionConditionM
     // Agent IOP
     I2_QML_PROPERTY(AgentIOPM* , agentIOP)
 
+    // value in string format
+    I2_QML_PROPERTY(QString , value)
+
+    // Concatened list of iop agents items
+    I2_QOBJECT_LISTMODEL(AgentIOPM , agentIopList)
+
 
 public:
 
@@ -50,7 +56,17 @@ public:
       */
     ~IOPValueConditionM();
 
+    /**
+      * @brief Redefinition of action condition copy
+      */
+    void copyFrom(ActionConditionM* condition);
 
+    /**
+    * @brief Custom setter on set agent model
+    *        to fill inputs and outputs
+    * @param agentModel
+    */
+    bool setagentModel(AgentInMappingVM* agentModel);
 
 Q_SIGNALS:
 

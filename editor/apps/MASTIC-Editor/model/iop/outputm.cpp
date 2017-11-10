@@ -16,17 +16,6 @@
 #include "outputm.h"
 
 /**
- * @brief Default constructor
- * @param parent
- */
-OutputM::OutputM(QObject *parent) : OutputM("",
-                                            AgentIOPValueTypes::UNKNOWN,
-                                            parent)
-{
-}
-
-
-/**
  * @brief Constructor
  * @param name
  * @param agentIOPValueType

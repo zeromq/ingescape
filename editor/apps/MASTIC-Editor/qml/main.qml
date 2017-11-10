@@ -130,15 +130,21 @@ ApplicationWindow {
             title: qsTr("Scénario")
 
             MenuItem {
-                text: qsTr("TODO 1")
+                text: qsTr("Importer un scénario")
                 onTriggered: {
-                    console.log("Scénario TODO 1");
+                    if (MasticEditorC.scenarioC) {
+                        MasticEditorC.scenarioC.importScenarioFromFile();
+                    }
+                    console.log("TODO : Importer un scénario");
                 }
             }
             MenuItem {
-                text: qsTr("TODO 2")
+                text: qsTr("Exporter le scénario")
                 onTriggered: {
-                    console.log("Scénario TODO 2");
+                    if (MasticEditorC.scenarioC) {
+                        MasticEditorC.scenarioC.exportScenarioToDefaultFile();
+                    }
+                    console.log("TODO : Exporter le scénario");
                 }
             }
         }
@@ -311,4 +317,5 @@ ApplicationWindow {
             anchors.fill: parent
         }
     }
+
 }

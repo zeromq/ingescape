@@ -88,6 +88,7 @@ Item {
                 bottomMargin: 20
             }
 
+            activeFocusOnPress: true
             checkable: true
 
             style: Theme.LabellessSvgButtonStyle {
@@ -117,7 +118,7 @@ Item {
             }
 
             visible : rootItem.controller && rootItem.controller.isEmptyMapping && !MasticEditorC.modelManager.isActivatedMapping
-            text : "Click on the button to synchronize with the environement and get the currently active mapping.\nOr create/load a mapping and click on the button to apply it to the environment."
+            text : "No active mapping at the moment.\nClick on the button to synchronize with the environement and get the currently active mapping.\nOr create/load a mapping and click on the button to apply it to the environment."
 
             color : MasticTheme.darkBlueGreyColor
             font {

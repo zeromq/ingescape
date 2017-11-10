@@ -23,6 +23,7 @@
 
 #include <controller/masticmodelmanager.h>
 #include <viewModel/agentinmappingvm.h>
+#include <viewModel/mapbetweeniopvm.h>
 
 
 /**
@@ -48,6 +49,9 @@ class AgentsMappingController : public QObject
     // Selected agent in the mapping
     I2_QML_PROPERTY_DELETE_PROOF(AgentInMappingVM*, selectedAgent)
 
+    // Selected map between agents in the mapping
+    I2_QML_PROPERTY_DELETE_PROOF(MapBetweenIOPVM*, selectedMapBetweenIOP)
+
 public:
     /**
      * @brief Default constructor
@@ -67,6 +71,20 @@ public:
 Q_SIGNALS:
 
     /**
+     * @brief Emitted when a new "Agent in Mapping" is added
+     * @param agentName
+     */
+    void agentInMappingAdded(QString agentName);
+
+
+    /**
+     * @brief Emitted when an "Agent in Mapping" is removed
+     * @param agentName
+     */
+    void agentInMappingRemoved(QString agentName);
+
+
+    /**
      * @brief Emitted when inputs must be added to our Editor for a list of outputs
      * @param agentName
      * @param outputsList
@@ -77,9 +95,9 @@ Q_SIGNALS:
     /**
      * @brief Emitted when inputs must be removed to our Editor for a list of outputs
      * @param agentName
-     * @param outputsList
+     * @param pairsList
      */
-    void removeInputsToEditorForOutputs(QString agentName, QList<OutputM*> outputsList);
+    void removeInputsToEditorForOutputs(QString agentName, QList<QPair<QString, QString>> pairsList);
 
 
 public Q_SLOTS:
@@ -90,7 +108,22 @@ public Q_SLOTS:
      * @param list
      * @param position
      */
-    void addAgentToMappingAtPosition(QString agentName, AbstractI2CustomItemListModel* list, QPointF position);
+    void dropAgentToMappingAtPosition(QString agentName, AbstractI2CustomItemListModel* list, QPointF position);
+
+
+    /**
+     * @brief Slot when a previous agent model is replaced by a new one strictly identical
+     * @param previousModel
+     * @param newModel
+     */
+    void onIdenticalAgentModelReplaced(AgentM* previousModel, AgentM* newModel);
+
+
+    /**
+     * @brief Slot when an identical agent model is added
+     * @param newModel
+     */
+    void onIdenticalAgentModelAdded(AgentM* newModel);
 
 
     /**
@@ -111,6 +144,13 @@ public Q_SLOTS:
 
 
     /**
+     * @brief Slot when a model of agent will be deleted
+     * @param agent
+     */
+    void onAgentModelWillBeDeleted(AgentM* agent);
+
+
+    /**
      * @brief Get the agent in mapping for an agent name
      * @param name
      * @return
@@ -120,27 +160,52 @@ public Q_SLOTS:
 
 private Q_SLOTS:
     /**
-     * @brief Slot when a new view model of a agent mapping is created on the main view mapping.
+     * @brief Slot when inside an agentInMappingVM, new inputsVM are created.
      *      Check if a map need to be created from the element mapping list in the model manager.
-     *      The two agents corresponding need to be visible in the list.
+     *      A missing agent is substituted by a ghost agent with same name. > create a partial map.
+     *      A missing output is substituted by a ghost output with same name. > create partial map.
      * @param currentAgentInMapping
+     * @param inputsListAdded
      */
-    void createMapBetweenIopInMappingFromAgentInMapping(AgentInMappingVM* currentAgentInMapping);
+    void _generateAllMapBetweenIopUsingNewlyAddedInputsVM(AgentInMappingVM* currentAgentInMapping, QList<InputVM*> inputsListAdded);
 
+    /**
+     * @brief Slot when inside an agentInMappingVM, new outputsVM are created.
+     *      Check if a map need can be completed from internal partial maps list in the mapping controller.
+     *      A missing agent is substituted by a ghost agent with same name. > create a partial map.
+     *      A missing output is substituted by a ghost output with same name. > create partial map.
+     * @param currentAgentInMapping
+     * @param outputsListAdded
+     */
+    void _completeAllPartialMapBetweenIopUsingNewlyOutputsVM(AgentInMappingVM* currentAgentInMapping, QList<OutputVM*> outputsListAdded);
 
     /**
      * @brief Slot when the list of "Agents in Mapping" changed
      */
     void _onAgentsInMappingChanged();
 
-    /**
-     * @brief Check if the map between already exist.
-     */
 
-    bool _checkIfMapBetweenIOPVMAlreadyExist(AgentInMappingVM* agentFrom,
-                                             OutputVM *pointFrom,
-                                             AgentInMappingVM* agentTo,
-                                             InputVM *pointTo);
+    /**
+     * @brief Slot when some view models of inputs have been added to an agent in mapping
+     * @param inputsListAdded
+     */
+    void _onInputsListAdded(QList<InputVM*> inputsListAdded);
+
+
+    /**
+     * @brief Slot when some view models of outputs have been added to an agent in mapping
+     * @param outputsListAdded
+     */
+    void _onOutputsListAdded(QList<OutputVM*> outputsListAdded);
+
+
+    /**
+     * @brief Slot when some view models of outputs will be removed from an agent in mapping
+     * @param outputsListWillBeRemoved
+     */
+    void _onOutputsListRemoved(QList<OutputVM*> outputsListWillBeRemoved);
+
+
 private:
     /**
      * @brief Add new model(s) of agent to the current mapping at a specific position
@@ -151,10 +216,32 @@ private:
     void _addAgentModelsToMappingAtPosition(QString agentName, QList<AgentM*> agentsList, QPointF position);
 
 
+    /**
+     * @brief Delete an Agent in Mapping
+     * @param agentInMapping
+     */
+    void _deleteAgentInMapping(AgentInMappingVM* agentInMapping);
+
+
+    /**
+     * @brief Check if the map between an agent output and an agent input already exist.
+     * @param agentFrom
+     * @param pointFrom
+     * @param agentTo
+     * @param pointTo
+     * @return
+     */
+    bool _checkIfMapBetweenIOPVMAlreadyExist(AgentInMappingVM* agentFrom,
+                                             OutputVM *pointFrom,
+                                             AgentInMappingVM* agentTo,
+                                             InputVM *pointTo);
+
+
 private:
     // Usefull to save it
     MasticModelManager* _modelManager;
 
+    // Map from agent name to a list of view models of agent in mapping
     QHash<QString, AgentInMappingVM *> _mapFromNameToAgentInMappingViewModelsList;
 
     QHash<QString, MapBetweenIOPVM*> _mapFromAgentNameToPartialMapBetweenIOPViewModelsList;

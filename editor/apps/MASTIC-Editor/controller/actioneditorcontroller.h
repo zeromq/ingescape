@@ -21,8 +21,10 @@
 #include <QJSEngine>
 
 #include "I2PropertyHelpers.h"
-#include "viewModel/actionvm.h"
-
+#include "model/scenario/actionm.h"
+#include "viewModel/agentinmappingvm.h"
+#include "viewModel/actionconditionvm.h"
+#include "viewModel/actioneffectvm.h"
 
 
 /**
@@ -33,10 +35,13 @@ class ActionEditorController: public QObject
     Q_OBJECT
 
     // Original action view model
-    I2_QML_PROPERTY(ActionVM*, originalAction)
+    I2_QML_PROPERTY(ActionM*, originalAction)
 
     // Temporary action view model
-    I2_QML_PROPERTY(ActionVM*, editedAction)
+    I2_QML_PROPERTY(ActionM*, editedAction)
+
+    // Agents in mapping list
+    I2_QML_PROPERTY(I2CustomItemListModel<AgentInMappingVM> *, listAgentsInMapping)
 
 public:
 
@@ -45,7 +50,7 @@ public:
      * @param original action
      * @param parent
      */
-    explicit ActionEditorController(ActionVM * originalAction, QObject *parent = 0);
+    explicit ActionEditorController(ActionM * originalAction, I2CustomItemListModel<AgentInMappingVM> * listAgentsInMapping, QObject *parent = 0);
 
 
     /**
@@ -57,6 +62,26 @@ public:
      * @brief Valide the edition/creation
      */
     void validateModification();
+
+    /**
+     * @brief Create a new condition
+     */
+    Q_INVOKABLE void createNewCondition();
+
+    /**
+     * @brief Remove the condition
+     */
+    Q_INVOKABLE void removeCondition(ActionConditionVM* conditionVM);
+
+    /**
+     * @brief Create a new effect
+     */
+    Q_INVOKABLE void createNewEffect();
+
+    /**
+     * @brief Remove the effect
+     */
+    Q_INVOKABLE void removeEffect(ActionEffectVM* effectVM);
 
 
 Q_SIGNALS:

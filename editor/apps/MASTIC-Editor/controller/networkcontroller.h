@@ -23,7 +23,8 @@
 
 #include "I2PropertyHelpers.h"
 
-#include "model/agentm.h"
+#include <model/iop/outputm.h>
+#include <model/publishedvaluem.h>
 
 /**
  * @brief The NetworkController class defines the controller for network communications
@@ -114,6 +115,13 @@ Q_SIGNALS:
 
 
     /**
+     * @brief Signal emitted when a new value is published
+     * @param publishedValue
+     */
+    void valuePublished(PublishedValueM* publishedValue);
+
+
+    /**
      * @brief Signal emitted when the flag "is Muted" from an agent updated
      * @param peerId
      * @param isMuted
@@ -177,9 +185,9 @@ public Q_SLOTS:
     /**
      * @brief Slot when inputs must be removed to our Editor for a list of outputs
      * @param agentName
-     * @param outputsList
+     * @param pairsList
      */
-    void onRemoveInputsToEditorForOutputs(QString agentName, QList<OutputM*> outputsList);
+    void onRemoveInputsToEditorForOutputs(QString agentName, QList<QPair<QString, QString>> pairsList);
 
 
 private:

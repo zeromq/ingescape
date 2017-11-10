@@ -330,7 +330,6 @@ AgentIOPM* JsonHelper::_createModelOfAgentIOP(QJsonObject jsonObject, AgentIOPTy
                     int value = (int)jsonValue.toDouble();
 
                     agentIOP->setdefaultValue(QVariant(value));
-                    //agentIOP->setdisplayableDefaultValue(QString::number(value));
                 }
                 else {
                     qCritical() << "IOP '" << agentIOP->name() << "': The value '" << jsonValue << "' is not an int";
@@ -342,7 +341,6 @@ AgentIOPM* JsonHelper::_createModelOfAgentIOP(QJsonObject jsonObject, AgentIOPTy
                     double value = jsonValue.toDouble();
 
                     agentIOP->setdefaultValue(QVariant(value));
-                    //agentIOP->setdisplayableDefaultValue(QString::number(value));
                 }
                 else {
                     qCritical() << "IOP '" << agentIOP->name() << "': The value '" << jsonValue << "' is not a double";
@@ -354,7 +352,6 @@ AgentIOPM* JsonHelper::_createModelOfAgentIOP(QJsonObject jsonObject, AgentIOPTy
                     QString value = jsonValue.toString();
 
                     agentIOP->setdefaultValue(QVariant(value));
-                    //agentIOP->setdisplayableDefaultValue(value);
                 }
                 else {
                     qCritical() << "IOP '" << agentIOP->name() << "': The value '" << jsonValue << "' is not a string";
@@ -370,7 +367,6 @@ AgentIOPM* JsonHelper::_createModelOfAgentIOP(QJsonObject jsonObject, AgentIOPTy
                         bool value = (strValue == "false") ? false : true;
 
                         agentIOP->setdefaultValue(QVariant(value));
-                        //agentIOP->setdisplayableDefaultValue(strValue);
                     }
                     else {
                         qCritical() << "IOP '" << agentIOP->name() << "': The value '" << strValue << "' is not a bool";
@@ -388,19 +384,16 @@ AgentIOPM* JsonHelper::_createModelOfAgentIOP(QJsonObject jsonObject, AgentIOPTy
             case AgentIOPValueTypes::DATA:
                 if (jsonValue.isString()) {
                     QString strValue = jsonValue.toString();
+
                     QByteArray value = strValue.toLocal8Bit();
                     //QByteArray value = strValue.toUtf8();
 
                     agentIOP->setdefaultValue(QVariant(value));
-                    //agentIOP->setdisplayableDefaultValue(strValue);
                 }
                 else {
                     qCritical() << "IOP '" << agentIOP->name() << "': The value '" << jsonValue << "' is not a data of bytes";
                 }
                 break;
-
-            /*case AgentIOPValueTypes::UNKNOWN:
-                break;*/
 
             default:
                 qCritical() << "IOP '" << agentIOP->name() << "' has a bad type" << jsonType.toString();
@@ -463,11 +456,13 @@ QJsonObject JsonHelper::_getJsonFromAgentIOP(AgentIOPM* agentIOP)
             break;
 
         case AgentIOPValueTypes::STRING:
-            jsonAgentIOP.insert("value", agentIOP->defaultValue().toString());
+            //jsonAgentIOP.insert("value", agentIOP->defaultValue().toString());
+            jsonAgentIOP.insert("value", agentIOP->displayableDefaultValue());
             break;
 
         case AgentIOPValueTypes::BOOL:
-            jsonAgentIOP.insert("value", agentIOP->defaultValue().toString());
+            //jsonAgentIOP.insert("value", agentIOP->defaultValue().toString());
+            jsonAgentIOP.insert("value", agentIOP->displayableDefaultValue());
             break;
 
         case AgentIOPValueTypes::IMPULSION:
@@ -478,10 +473,6 @@ QJsonObject JsonHelper::_getJsonFromAgentIOP(AgentIOPM* agentIOP)
             //jsonAgentIOP.insert("value", agentIOP->defaultValue().toString());
             jsonAgentIOP.insert("value", agentIOP->displayableDefaultValue());
             break;
-
-        /*case AgentIOPValueTypes::UNKNOWN:
-            jsonAgentIOP.insert("value", "");
-            break;*/
 
         default:
             jsonAgentIOP.insert("value", "");
@@ -517,4 +508,201 @@ ElementMappingM* JsonHelper::_createModelOfElementMapping(QString inputAgentName
     }
 
     return elementMapping;
+}
+
+/**
+ * @brief Initialize actions list from JSON file
+ * @param byteArrayOfJson
+ * @return
+ */
+QList<ActionM*> JsonHelper::initActionsList(QByteArray byteArrayOfJson, QList<AgentInMappingVM*> listAgentsInMapping)
+{
+    Q_UNUSED(byteArrayOfJson)
+    Q_UNUSED(listAgentsInMapping)
+    QList<ActionM*> actionsListToImport;
+
+//    QJsonDocument jsonFileRoot = QJsonDocument::fromJson(byteArrayOfJson);
+//    if (jsonFileRoot.isObject())
+//    {
+//        QJsonObject jsonActionsRoot = jsonFileRoot.toObject();
+//        QJsonValue jsonActionsList = jsonActionsRoot.value("actions");
+
+//        if(jsonActionsList.isArray())
+//        {
+//            foreach (QJsonValue jsonAction, jsonActionsList.array())
+//            {
+//                if (jsonAction.isObject())
+//                {
+//                    ActionM* actionM = NULL;
+
+//                    QJsonValue jsonName = jsonAction.value("name");
+//                    if(jsonName.isString())
+//                    {
+//                        // Create the model
+//                        actionM = new ActionM(jsonName.toString());
+
+//                        QJsonValue jsonValue = jsonAction.value("validity_duration_type");
+//                        if(jsonValue.isString())
+//                        {
+//                            int validationDurationType = ValidationDurationType::enumFromKey(jsonValue.toString());
+//                            actionM->setvalidityDuration((ValidationDurationType::Value)validationDurationType);
+//                        }
+
+//                        jsonValue = jsonAction.value("validity_duration_value");
+//                        if(jsonValue.isString())
+//                        {
+//                            actionM->setvalidityDurationString(jsonValue.toString());
+//                        }
+
+//                        jsonValue = jsonAction.value("shall_revert");
+//                        if(jsonValue.isBool())
+//                        {
+//                            actionM->setshallRevert(jsonValue.toBool());
+//                        }
+
+//                        jsonValue = jsonAction.value("shall_revert_at_validity_end");
+//                        if(jsonValue.isBool())
+//                        {
+//                            actionM->setshallRevertWhenValidityIsOver(jsonValue.toBool());
+//                        }
+
+//                        jsonValue = jsonAction.value("shall_revert_after_time");
+//                        if(jsonValue.isBool())
+//                        {
+//                            actionM->setshallRevertAfterTime(jsonValue.toBool());
+//                        }
+
+//                        jsonValue = jsonAction.value("shall_rearm");
+//                        if(jsonValue.isBool())
+//                        {
+//                            actionM->setshallRearm(jsonValue.toBool());
+//                        }
+
+//                        jsonValue = jsonAction.value("revert_after_time");
+//                        if(jsonValue.isDouble())
+//                        {
+//                            actionM->setshallRearm(jsonValue.toDouble());
+//                        }
+
+//                        QJsonValue jsonEffectsList = jsonAction.value("effects");
+//                        if(jsonEffectsList.isArray())
+//                        {
+//                            foreach (QJsonValue jsonEffect, jsonEffectsList.array())
+//                            {
+//                                if (jsonEffect.isObject())
+//                                {
+//                                    ActionEffectVM* effectVM = _parseEffectVMFromJson(jsonEffect, listAgentsInMapping);
+
+//                                    if(effectVM != NULL)
+//                                    {
+//                                        actionM->effectsList()->append(effectVM);
+//                                    }
+//                                }
+//                            }
+//                        }
+
+//                    }
+
+//                    if(actionVM != NULL)
+//                    {
+//                        actionsListToImport.append(actionVM);
+//                    }
+//                }
+//            }
+//        }
+//    }
+
+    return actionsListToImport;
+}
+
+/**
+ * @brief Create a model of agent Input/Output/Parameter from JSON object
+ * @param jsonObject
+ * @param agentIOPType
+ * @return
+ */
+ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList<AgentInMappingVM*> listAgentsInMapping)
+{
+    Q_UNUSED(jsonEffect)
+    Q_UNUSED(listAgentsInMapping)
+    ActionEffectVM* actionEffectVM = NULL;
+
+//    QJsonValue jsonValue = jsonEffect.value("type");
+//    if(jsonValue.isString())
+//    {
+//        int effectType = ActionEffectType::enumFromKey(jsonType.toString());
+//        if(effectType >= 0)
+//        {
+//            switch (actionEffectVM->effectType())
+//            {
+//                case ActionEffectType::VALUE:
+//                {
+//                    QJsonValue jsonAgentName = jsonEffect.value("agent_name");
+//                    QJsonValue jsonIOPName = jsonEffect.value("iop_name");
+//                    if(jsonAgentName.isString() && jsonIOPName.isString())
+//                    {
+
+//                        // Check agent name and iop name exists
+//                        QString agentAgentName = jsonAgentName.toString();
+//                        QString agentIOPName = jsonAgentName.toString();
+//                        bool found = false;
+//                        foreach (AgentInMappingVM* agent, listAgentsInMapping)
+//                        {
+//                            if(agent->agentName() == agentAgentName)
+//                            {
+//                                foreach (InputVM* inputVM, agent->inputsList)
+//                                {
+//                                    if(inputVM->name() == agentIOPName)
+//                                    {
+//                                        found = true;
+//                                        break;
+//                                    }
+//                                }
+
+//                                if(found == true)
+//                                {
+//                                    break;
+//                                }
+//                            }
+
+//                        }
+
+//                        if(found == true)
+//                        {
+//                            actionEffectVM = new ActionEffectVM();
+//                            actionEffectVM->seteffectType(ActionEffectType::VALUE);
+
+//                            ActionEffectM* actionEffectM = new ActionEffectM();
+//                            actionEffectM->
+//                            jsonValue = jsonEffect.value("operator");
+//                            jsonValue = jsonEffect.value("value");
+//                        }
+//                    }
+
+//                    break;
+//                }
+//                case ActionEffectType::AGENT:
+//                {
+//                    jsonValue = jsonEffect.value("agent_name");
+//                    jsonValue = jsonEffect.value("value");
+//                    break;
+//                }
+//                case ActionEffectType::MAPPING:
+//                {
+//                    jsonValue = jsonEffect.value("agent_name");
+//                    jsonValue = jsonEffect.value("iop_name");
+//                    jsonValue = jsonEffect.value("operator");
+//                    jsonValue = jsonEffect.value("value");
+
+//                    break;
+//                }
+//                default:
+//                    break;
+//            }
+
+//            actionEffectVM = new ActionEffectVM();
+//            actionEffectVM->seteffectType((ActionEffectType::Value)effectType);
+//        }
+//    }
+    return actionEffectVM;
 }

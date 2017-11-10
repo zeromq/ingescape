@@ -19,12 +19,13 @@ import QtQuick.Controls.Styles 1.4
 import I2Quick 1.0
 
 import MASTIC 1.0
+import "../theme" as Theme;
 
 I2PopupBase {
     id: rootItem
 
-    width: 550
-    height: 600
+    width: 466
+    height: 882
 
     automaticallyOpenWhenCompleted: true
     isModal: false
@@ -39,10 +40,12 @@ I2PopupBase {
     //--------------------------------
 
     // our model is an action model
-    property var actionVM: model.editedAction;
+    property var actionM: model.editedAction;
 
-    // our controller
+    // our scenario controller
     property var controller: null;
+    // our panel controller
+    property var panelController: null;
 
 
     //--------------------------------
@@ -53,7 +56,6 @@ I2PopupBase {
 
     // Emitted when user pressed our popup
     signal bringToFront();
-
 
     //--------------------------------
     //
@@ -69,10 +71,9 @@ I2PopupBase {
         radius: 5
         border {
             width: 1
-            color: MasticTheme.whiteColor
+            color: MasticTheme.editorsBackgroundBorderColor
         }
-        color: MasticTheme.definitionEditorsBackgroundColor
-
+        color: MasticTheme.editorsBackgroundColor
 
         MouseArea {
             id : dragMouseArea
@@ -92,264 +93,1960 @@ I2PopupBase {
         }
 
 
-        Button {
-            id: btnCloseEditor
-
+        Item {
             anchors {
-                right: parent.right
-                top: parent.top
+                fill : parent
+                margins : 20
             }
 
-            text: "X"
+            Text {
+                id : titleTxt
 
-            onClicked: {
-                // Close our popup
-                rootItem.close();
-            }
-        }
-
-        Column {
-            id: headers
-
-            anchors {
-                top: parent.top
-                left: parent.left
-                right: parent.right
-                bottom: parent.bottom
-                margins: 4
-            }
-            //height: 120
-
-            // Name
-            Row {
                 anchors {
-                    left: parent.left
-                    right: parent.right
+                    left : parent.left
+                    top : parent.top
+                    right : parent.right
                 }
-                height: 25
 
-                Text {
-                    text: "Nom "
-
-                    color: MasticTheme.definitionEditorsLabelColor
+                text : "Action Editor"
+                elide: Text.ElideRight
+                color: MasticTheme.definitionEditorsLabelColor
+                font {
+                    family: MasticTheme.textFontFamily
+                    pixelSize: 23
+                    weight: Font.Medium
                 }
+            }
+
+            Button {
+                id: btnCloseEditor
+
+                anchors {
+                    top: parent.top
+                    right : parent.right
+                }
+
+                activeFocusOnPress: true
+                style: Theme.LabellessSvgButtonStyle {
+                    fileCache: MasticTheme.svgFileMASTIC
+
+                    pressedID: releasedID + "-pressed"
+                    releasedID: "closeEditor"
+                    disabledID : releasedID
+                }
+
+                onClicked: {
+                    // Close our popup
+                    rootItem.close();
+                }
+            }
+
+            //
+            // Name
+            //
+            Item {
+                id : nameItem
+                anchors {
+                    left : parent.left
+                    right : parent.right
+                    top : titleTxt.bottom
+                    topMargin : 25
+                }
+
+                height: textFieldName.height
+
                 TextField {
-                    id : actionNameTextField
+                    id: textFieldName
 
-                    text: actionVM && actionVM.actionModel ? actionVM.actionModel.name : ""
-                    width:100
+                    anchors {
+                        left : parent.left
+                        verticalCenter : parent.verticalCenter
+                    }
+
+                    height: 25
+                    width: 185
+                    verticalAlignment: TextInput.AlignVCenter
+                    text: actionM ? actionM.name : ""
+
+                    style: I2TextFieldStyle {
+                        backgroundColor: MasticTheme.darkBlueGreyColor
+                        borderColor: MasticTheme.lightGreyColor;
+                        borderErrorColor: MasticTheme.redColor
+                        radiusTextBox: 1
+                        borderWidth: 0;
+                        borderWidthActive: 1
+                        textColor: MasticTheme.lightGreyColor;
+
+                        padding.left: 3
+                        padding.right: 3
+
+                        font {
+                            pixelSize:15
+                            family: MasticTheme.textFontFamily
+                        }
+
+                    }
 
                     onTextChanged: {
-                        if (activeFocus &&  actionVM && actionVM.actionModel) {
-                            actionVM.actionModel.name = text;
+                        if (activeFocus &&  actionM ) {
+                            actionM.name = text;
                         }
                     }
-                }
-
-                Binding {
-                    target : actionNameTextField
-                    property :  "text"
-                    value : if (actionVM && actionVM.actionModel) {
-                              actionVM.actionModel.name
-                            }
-                            else {
-                                "";
-                            }
-                }
-
-
-
-            }
-
-
-
-            // Start
-            Row {
-                anchors {
-                    left: parent.left
-                    right: parent.right
-                }
-                height: 25
-                Text {
-                    text: "Début"
-
-                    color: MasticTheme.definitionEditorsLabelColor
-                }
-                TextField {
-                    id : actionStartTextField
-                    text: actionVM ? actionVM.startTimeString: ""
-                    width:100
 
                     Binding {
-                        target : actionStartTextField
+                        target : textFieldName
                         property :  "text"
-                        value : actionVM.startTimeString
-                    }
-
-                    onTextChanged: {
-                        if (activeFocus &&  actionVM) {
-                            actionVM.startTimeString = text;
-                        }
+                        value : if (actionM ) {
+                                    actionM.name
+                                }
+                                else {
+                                    "";
+                                }
                     }
                 }
             }
 
 
 
-            Row {
+
+            //
+            // Conditions
+            //
+            Item {
+                id : conditionsItem
                 anchors {
-                    left: parent.left
-                    right: parent.right
+                    left : parent.left
+                    right : parent.right
+                    top : nameItem.bottom
+                    topMargin: 14
                 }
-                spacing: 2
+
+                //Title
+                Text {
+                    id : titleCdt
+                    anchors {
+                        left : parent.left
+                        right : parent.right
+                    }
+
+                    text : "Conditions"
+
+                    color: MasticTheme.whiteColor
+                    font {
+                        family: MasticTheme.textFontFamily
+                        pixelSize: 19
+                    }
+                }
+
+                // separator
+                Rectangle {
+                    id : separatorCdt
+                    anchors {
+                        left : parent.left
+                        right : parent.right
+                        top : titleCdt.bottom
+                        topMargin: 5
+                    }
+                    height : 1
+                    color : MasticTheme.whiteColor
+                }
+
+
+                /// Validity duration
+                Item {
+                    id : validityDuration
+                    anchors {
+                        left : parent.left
+                        right : parent.right
+                        top : separatorCdt.bottom
+                        topMargin: 8
+                    }
+
+                    height: validityDurationCombo.height
+
+
+                    Text {
+                        id : textValidity
+                        anchors {
+                            left : parent.left
+                            verticalCenter : parent.verticalCenter
+                        }
+
+                        text : "Conditions check duration:"
+
+                        color: MasticTheme.lightGreyColor
+                        font {
+                            family: MasticTheme.textFontFamily
+                            pixelSize: 16
+                        }
+                    }
+
+                    Row {
+                        anchors {
+                            verticalCenter : parent.verticalCenter
+                            left : textValidity.right
+                            leftMargin: 10
+                        }
+                        spacing : 6
+
+                        MasticComboBox {
+                            id : validityDurationCombo
+
+                            anchors {
+                                verticalCenter : parent.verticalCenter
+                            }
+
+                            height : 25
+                            width : 115
+
+                            model : controller ? controller.validationDurationsTypesList : 0
+                            function modelToString(model)
+                            {
+                                return model.name;
+                            }
+
+
+                            Binding {
+                                target : validityDurationCombo
+                                property : "selectedItem"
+                                value : if (actionM && controller)
+                                        {
+                                            controller.validationDurationsTypesList.getItemWithValue(actionM.validityDurationType);
+                                        } else {
+                                            null;
+                                        }
+                            }
+
+
+                            onSelectedItemChanged:
+                            {
+                                if (actionM)
+                                {
+                                    actionM.validityDurationType = validityDurationCombo.selectedItem.value;
+                                }
+                            }
+
+                        }
+
+                        TextField {
+                            id: textFieldValidity
+
+                            anchors {
+                                verticalCenter : parent.verticalCenter
+                            }
+
+                            visible :  actionM && actionM.validityDurationType === ValidationDurationType.CUSTOM
+                            enabled: visible
+                            height: 25
+                            width: 57
+                            horizontalAlignment: TextInput.AlignLeft
+                            verticalAlignment: TextInput.AlignVCenter
+
+                            text : actionM ? actionM.validityDurationString : "0.0"
+                            inputMethodHints: Qt.ImhFormattedNumbersOnly
+                            validator: RegExpValidator { regExp: /(\d{1,4})([.]\d{3})?$/ }
+
+                            style: I2TextFieldStyle {
+                                backgroundColor: MasticTheme.darkBlueGreyColor
+                                borderColor: MasticTheme.lightGreyColor;
+                                borderErrorColor: MasticTheme.redColor
+                                radiusTextBox: 1
+                                borderWidth: 0;
+                                borderWidthActive: 1
+                                textColor: MasticTheme.lightGreyColor;
+
+                                padding.left: 3
+                                padding.right: 3
+
+                                font {
+                                    pixelSize:15
+                                    family: MasticTheme.textFontFamily
+                                }
+
+                            }
+
+                            onTextChanged: {
+                                if (activeFocus &&  actionM ) {
+                                    actionM.validityDurationString = text;
+                                }
+                            }
+
+                            Binding {
+                                target : textFieldValidity
+                                property :  "text"
+                                value : if (actionM) {
+                                            actionM.validityDurationString
+                                        }
+                                        else {
+                                            "";
+                                        }
+                            }
+                        }
+
+                        Text {
+                            anchors {
+                                verticalCenter : parent.verticalCenter
+                            }
+
+                            visible : textFieldValidity.visible
+                            text : "seconds"
+
+                            color: MasticTheme.lightGreyColor
+                            font {
+                                family: MasticTheme.textFontFamily
+                                pixelSize: 15
+                            }
+                        }
+
+                    }
+                }
+
+
+                //
+                // Conditions List
+                //
                 Column {
-                    height: 50
-                    spacing: 2
-                    CheckBox {
-                        checked: actionVM && actionVM.actionModel && actionVM.actionModel.shallRevert ? true : false
-
-                        text : "Réciproque"
+                    id : conditionsListColumn
+                    anchors {
+                        top : validityDuration.bottom
+                        topMargin: 18
+                        right : parent.right
+                        left : parent.left
                     }
+                    spacing : 6
 
+                    Repeater {
+                        model : actionM ? actionM.conditionsList : 0
+
+                        Rectangle {
+                            height : 62
+                            anchors {
+                                right : parent.right
+                                left : parent.left
+                            }
+
+                            color : "transparent"
+                            radius: 5
+                            border {
+                                width : 1
+                                color : MasticTheme.blackColor
+                            }
+
+                            // my condition
+                            property var myCondition: model.QtObject
+
+                            // Condition Type
+                            Row {
+                                id : rowConditionsTypes
+                                anchors {
+                                    right : parent.right
+                                    left : parent.left
+                                    leftMargin: 10
+                                    top : parent.top
+                                    topMargin: 6
+                                }
+                                height : 14
+                                spacing : 15
+
+                                ExclusiveGroup {
+                                    id : cdtTypesExclusifGroup
+                                }
+
+                                Repeater {
+                                    model : controller? controller.conditionsTypesList : 0
+
+                                    CheckBox {
+                                        id : conditionsTypeCB
+                                        anchors {
+                                            verticalCenter: parent.verticalCenter;
+                                        }
+
+                                        checked : myCondition && myCondition.conditionType === model.value;
+                                        exclusiveGroup: cdtTypesExclusifGroup
+                                        activeFocusOnPress: true;
+
+                                        style: CheckBoxStyle {
+                                            label: Text {
+                                                anchors {
+                                                    verticalCenter: parent.verticalCenter
+                                                    verticalCenterOffset: 2
+                                                }
+                                                color: control.checked? MasticTheme.lightGreyColor : MasticTheme.greyColor
+
+                                                text: model.name
+                                                elide: Text.ElideRight
+
+                                                font {
+                                                    family: MasticTheme.textFontFamily
+                                                    pixelSize: 15
+                                                }
+                                            }
+
+                                            indicator: Rectangle {
+                                                implicitWidth: 14
+                                                implicitHeight: 14
+                                                radius : height / 2
+                                                border.width: 0;
+                                                color : MasticTheme.darkBlueGreyColor
+
+                                                Rectangle {
+                                                    anchors.centerIn: parent
+                                                    visible : control.checked
+                                                    width: 8
+                                                    height: 8
+                                                    radius : height / 2
+
+                                                    border.width: 0;
+                                                    color : MasticTheme.lightGreyColor
+                                                }
+                                            }
+
+                                        }
+
+                                        onCheckedChanged : {
+                                            if (myCondition && checked) {
+                                                myCondition.conditionType = model.value
+                                            }
+                                        }
+
+
+                                        Binding {
+                                            target : conditionsTypeCB
+                                            property : "checked"
+                                            value : (myCondition && myCondition.conditionType === model.value)
+                                        }
+                                    }
+                                }
+
+                            }
+
+                            //
+                            // Conditions Details
+                            //
+                            Row {
+                                anchors {
+                                    right : parent.right
+                                    rightMargin: 10
+                                    left : rowConditionsTypes.left
+                                    bottom : parent.bottom
+                                    bottomMargin: 6
+                                }
+                                height : agentCombo.height
+                                spacing : 6
+
+                                // Agent
+                                MasticComboBox {
+                                    id : agentCombo
+
+                                    anchors {
+                                        verticalCenter : parent.verticalCenter
+                                    }
+
+                                    height : 25
+                                    width : 148
+
+                                    model : controller ? controller.agentsInMappingList : 0
+                                    function modelToString(model)
+                                    {
+                                        return model.agentName;
+                                    }
+
+
+                                    Binding {
+                                        target : agentCombo
+                                        property : "selectedItem"
+                                        value : if (myCondition && myCondition.condition)
+                                                {
+                                                    myCondition.condition.agentModel;
+                                                } else {
+                                                    null;
+                                                }
+                                    }
+
+
+                                    onSelectedItemChanged:
+                                    {
+                                        if (myCondition && myCondition.condition && agentCombo.selectedItem)
+                                        {
+                                            myCondition.condition.agentModel = agentCombo.selectedItem;
+                                        }
+                                    }
+
+                                }
+
+                                // Agent Inputs/Outputs
+                                MasticComboBox {
+                                    id : ioCombo
+
+                                    visible : myCondition && myCondition.conditionType === ActionConditionType.VALUE
+                                    enabled : visible
+                                    anchors {
+                                        verticalCenter : parent.verticalCenter
+                                    }
+
+                                    height : 25
+                                    width : 148
+
+                                    model : (myCondition && myCondition.condition && myCondition.condition.agentIopList) ? myCondition.condition.agentIopList : 0
+                                    function modelToString(model)
+                                    {
+                                        return model.name;
+                                    }
+
+
+                                    Binding {
+                                        target : ioCombo
+                                        property : "selectedItem"
+                                        value : if (myCondition && myCondition.condition)
+                                                {
+                                                    myCondition.condition.agentIOP;
+                                                } else {
+                                                    null;
+                                                }
+                                    }
+
+
+                                    onSelectedItemChanged:
+                                    {
+                                        if (myCondition && myCondition.condition)
+                                        {
+                                            myCondition.condition.agentIOP = ioCombo.selectedItem;
+                                        }
+                                    }
+
+                                }
+
+                                // Comparison Type
+                                MasticComboBox {
+                                    id : comparisonCombo
+                                    enabled : visible
+                                    anchors {
+                                        verticalCenter : parent.verticalCenter
+                                    }
+
+                                    height : 25
+                                    width : (myCondition && myCondition.conditionType === ActionConditionType.VALUE) ? 45 : 78
+
+                                    model :
+                                    {
+                                        if(controller)
+                                        {
+                                            (myCondition && myCondition.conditionType === ActionConditionType.VALUE) ? controller.comparisonsValuesTypesList : controller.comparisonsAgentsTypesList
+                                        } else {
+                                            0
+                                        }
+
+                                    }
+
+                                    function modelToString(model)
+                                    {
+                                        return model.name;
+                                    }
+
+
+                                    Binding {
+                                        target : comparisonCombo
+                                        property : "selectedItem"
+                                        value : if (myCondition && myCondition.condition && controller)
+                                                {
+                                                    (myCondition && myCondition.conditionType === ActionConditionType.VALUE) ?
+                                                                controller.comparisonsValuesTypesList.getItemWithValue(myCondition.condition.comparison)
+                                                              :  controller.comparisonsAgentsTypesList.getItemWithValue(myCondition.condition.comparison);
+                                                } else {
+                                                    null;
+                                                }
+                                    }
+
+
+                                    onSelectedItemChanged:
+                                    {
+                                        if (myCondition && myCondition.condition && comparisonCombo.selectedItem)
+                                        {
+                                            myCondition.condition.comparison = comparisonCombo.selectedItem.value;
+                                        }
+                                    }
+
+                                }
+
+                                // Comparison Value
+                                TextField {
+                                    id: textFieldComparisonValue
+
+                                    anchors {
+                                        verticalCenter : parent.verticalCenter
+                                    }
+
+                                    visible : myCondition && myCondition.conditionType === ActionConditionType.VALUE
+
+                                    enabled : visible
+                                    height: 25
+                                    width: 49
+
+                                    horizontalAlignment: TextInput.AlignLeft
+                                    verticalAlignment: TextInput.AlignVCenter
+
+                                    text : actionM  ? actionM.validityDuration : "0.0"
+                                    //   inputMethodHints: Qt.ImhFormattedNumbersOnly
+                                    //   validator: RegExpValidator { regExp: /(\d{1,4})([.]\d{3})?$/ }
+
+                                    style: I2TextFieldStyle {
+                                        backgroundColor: MasticTheme.darkBlueGreyColor
+                                        borderColor: MasticTheme.lightGreyColor;
+                                        borderErrorColor: MasticTheme.redColor
+                                        radiusTextBox: 1
+                                        borderWidth: 0;
+                                        borderWidthActive: 1
+                                        textColor: MasticTheme.lightGreyColor;
+
+                                        padding.left: 3
+                                        padding.right: 3
+
+                                        font {
+                                            pixelSize:15
+                                            family: MasticTheme.textFontFamily
+                                        }
+
+                                    }
+
+                                    onTextChanged: {
+                                        if (activeFocus && (myCondition && myCondition.condition)) {
+                                            myCondition.condition.value = text;
+                                        }
+                                    }
+
+                                    Binding {
+                                        target : textFieldComparisonValue
+                                        property :  "text"
+                                        value : if  (myCondition && myCondition.condition) {
+                                                    myCondition.condition.value
+                                                }
+                                                else {
+                                                    "";
+                                                }
+                                    }
+                                }
+
+                            }
+
+
+                            // Delete Condition
+                            Button {
+                                id: btnDeleteCondition
+
+                                height : 10
+                                width : 10
+                                anchors {
+                                    top: parent.top
+                                    right : parent.right
+                                    margins: 5
+                                }
+
+                                activeFocusOnPress: true
+                                style: Theme.LabellessSvgButtonStyle {
+                                    fileCache: MasticTheme.svgFileMASTIC
+
+                                    pressedID: releasedID + "-pressed"
+                                    releasedID: "closeEditor"
+                                    disabledID : releasedID
+                                }
+
+                                onClicked: {
+                                    if (panelController && myCondition)
+                                    {
+                                        panelController.removeCondition(myCondition);
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
 
-                Column  {
-                    height: 50
-                    spacing: 2
-                    Row {
-                        height: 25
-                        RadioButton {
-                            id : rdButtRevertWhenValidityIsOver
-                            text : "après"
-                            checked: actionVM && actionVM.actionModel && actionVM.actionModel.revertWhenValidityIsOver ? true : false;
 
-                            Binding {
-                                target : rdButtRevertWhenValidityIsOver
-                                property :  "checked"
-                                value : actionVM.actionModel.revertWhenValidityIsOver
-                            }
+                // add conditions
+                Button {
+                    id: addCondition
 
-                            onCheckedChanged: {
-                                // Update out model
-                                if (activeFocus &&  actionVM) {
-                                    actionVM.revertWhenValidityIsOver = checked;
-                                }
-                                // Update the other check to be exclusive
-                                if(rdButtRevertAtTime.checked == checked)
-                                {
-                                    rdButtRevertAtTime.checked = !checked;
-                                }
-                            }
-                        }
+                    activeFocusOnPress: true
 
-                        TextField {
-                            text : actionVM && actionVM.actionModel ? actionVM.actionModel.validityDuration : "0"
-                            width:100
-                        }
+                    anchors {
+                        top: conditionsListColumn. bottom
+                        topMargin: 6
+                        left: parent.left
                     }
-                    Row {
-                        height: 25
-                        RadioButton {
-                            id : rdButtRevertAtTime
-                            text : "à"
-                            checked: actionVM && actionVM.actionModel && actionVM.actionModel.revertWhenValidityIsOver === false && actionVM.actionModel.revertAtTime !== -1 ? true : false;
 
-                            Binding {
-                                target : rdButtRevertAtTime
-                                property :  "checked"
-                                value : !actionVM.actionModel.revertWhenValidityIsOver
-                            }
+                    style: Theme.LabellessSvgButtonStyle {
+                        fileCache: MasticTheme.svgFileMASTIC
 
-                            onCheckedChanged: {
-                                // Update out model
-                                if (activeFocus &&  actionVM) {
-                                    actionVM.revertWhenValidityIsOver = !checked;
-                                }
-                                // Update the other check to be exclusive
-                                if(rdButtRevertWhenValidityIsOver.checked == checked)
-                                {
-                                    rdButtRevertWhenValidityIsOver.checked = !checked;
-                                }
-                            }
-                        }
+                        pressedID: releasedID + "-pressed"
+                        releasedID: "createButton"
+                        disabledID : releasedID
+                    }
 
-                        TextField {
-                            text : actionVM && actionVM.actionModel ? actionVM.actionModel.revertAtTime : "0"
-                            width:100
+                    onClicked: {
+                        if (panelController)
+                        {
+                            panelController.createNewCondition();
                         }
                     }
                 }
+
             }
 
-            Row {
+
+            //
+            // Advanced mode
+            //
+            Item {
+                id : advModesItem
                 anchors {
-                    left: parent.left
-                    right: parent.right
+                    left : parent.left
+                    right : parent.right
+                    top : conditionsItem.top
+                    topMargin: 320
                 }
-                spacing: 2
-                CheckBox {
-                    checked: actionVM && actionVM.actionModel && actionVM.actionModel.shallRearm ? true : false
+                height : childrenRect.height
 
-                    text : "Récurrence"
+                //Title
+                Text {
+                    id : titleAdvMode
+                    anchors {
+                        left : parent.left
+                        right : parent.right
+                    }
+
+                    text : "Advanced modes"
+
+                    color: MasticTheme.whiteColor
+                    font {
+                        family: MasticTheme.textFontFamily
+                        pixelSize: 19
+                    }
+                }
+
+                // separator
+                Rectangle {
+                    id : separatorAdvMode
+                    anchors {
+                        left : parent.left
+                        right : parent.right
+                        top : titleAdvMode.bottom
+                        topMargin: 5
+                    }
+                    height : 1
+                    color : MasticTheme.whiteColor
+                }
+
+                // Revert Action
+                Item {
+                    id : revertActionitem
+                    anchors {
+                        left: parent.left;
+                        right: parent.right;
+                        top : separatorAdvMode.bottom
+                        topMargin: 8
+                    }
+                    height : childrenRect.height
+
+                    CheckBox {
+                        id : revertActionCB
+                        anchors {
+                            left: parent.left;
+                            top : parent.top
+                        }
+
+                        checked : actionM && actionM.shallRevert;
+                        activeFocusOnPress: true;
+
+                        style: CheckBoxStyle {
+                            label:  Text {
+                                anchors {
+                                    verticalCenter: parent.verticalCenter
+                                    verticalCenterOffset: 2
+                                }
+
+                                color: control.checked? MasticTheme.lightGreyColor : MasticTheme.greyColor
+
+                                text: "Revert action"
+                                elide: Text.ElideRight
+
+                                font {
+                                    family: MasticTheme.textFontFamily
+                                    pixelSize: 16
+                                }
+
+                            }
+
+                            indicator: Rectangle {
+                                implicitWidth: 14
+                                implicitHeight: 14
+                                border.width: 0;
+                                color : MasticTheme.darkBlueGreyColor
+
+                                I2SvgItem {
+                                    visible : control.checked
+                                    anchors.centerIn: parent
+
+                                    svgFileCache : MasticTheme.svgFileMASTIC;
+                                    svgElementId:  "check";
+
+                                }
+                            }
+
+                        }
+
+                        onCheckedChanged : {
+                            if (actionM) {
+                                actionM.shallRevert = checked
+                            }
+                        }
+
+
+                        Binding {
+                            target : revertActionCB
+                            property : "checked"
+                            value : (actionM && actionM.shallRevert)
+                        }
+                    }
+
+                    Column {
+                        id : revertActionTime
+
+                        anchors {
+                            left : revertActionCB.right
+                            leftMargin: 14
+                            right : parent.right
+                            top: revertActionCB.top
+                        }
+                        spacing: 6
+
+                        enabled: revertActionCB.checked
+
+                        ExclusiveGroup {
+                            id : revertActionOpt
+                        }
+
+                        CheckBox {
+                            id : revertActionTimeCB
+                            anchors {
+                                left: parent.left;
+                            }
+                            checked : actionM && actionM.shallRevertWhenValidityIsOver;
+                            exclusiveGroup: revertActionOpt
+                            activeFocusOnPress: true;
+
+                            style: CheckBoxStyle {
+                                label: Text {
+                                    anchors {
+                                        verticalCenter: parent.verticalCenter
+                                        verticalCenterOffset: 2
+                                    }
+                                    color: control.enabled ? (control.checked? MasticTheme.lightGreyColor : MasticTheme.greyColor) : "#3C3C3B"
+
+                                    text: "At end of conditions check duration"
+                                    elide: Text.ElideRight
+
+                                    font {
+                                        family: MasticTheme.textFontFamily
+                                        pixelSize: 16
+                                    }
+                                }
+
+                                indicator: Rectangle {
+                                    implicitWidth: 14
+                                    implicitHeight: 14
+                                    radius : height / 2
+                                    border.width: 0;
+                                    color : control.enabled ?  MasticTheme.darkBlueGreyColor : "#3C3C3B"
+
+                                    Rectangle {
+                                        anchors.centerIn: parent
+                                        visible : control.checked
+                                        width: 8
+                                        height: 8
+                                        radius : height / 2
+
+                                        border.width: 0;
+                                        color : MasticTheme.lightGreyColor
+                                    }
+                                }
+
+                            }
+
+                            onCheckedChanged : {
+                                if (actionM) {
+                                    actionM.shallRevertWhenValidityIsOver = checked
+                                }
+                            }
+
+
+                            Binding {
+                                target : revertActionTimeCB
+                                property : "checked"
+                                value : (actionM && actionM.shallRevertWhenValidityIsOver)
+                            }
+                        }
+
+                        Row {
+                            anchors {
+                                left: parent.left;
+                                right :parent.right
+                            }
+                            height : 25
+
+                            CheckBox {
+                                id : revertActionAfterCB
+                                anchors {
+                                    verticalCenter: parent.verticalCenter
+                                }
+
+                                checked : actionM && actionM.shallRevertAfterTime;
+                                exclusiveGroup: revertActionOpt
+                                activeFocusOnPress: true;
+
+                                style: CheckBoxStyle {
+                                    label: Text {
+                                        anchors {
+                                            verticalCenter: parent.verticalCenter
+                                            verticalCenterOffset: 2
+                                        }
+                                        color: control.enabled ? (control.checked? MasticTheme.lightGreyColor : MasticTheme.greyColor) : "#3C3C3B"
+
+                                        text: "After " // space allowing to keep selection possible for the whole row
+
+                                        elide: Text.ElideRight
+
+                                        font {
+                                            family: MasticTheme.textFontFamily
+                                            pixelSize: 16
+                                        }
+                                    }
+
+                                    indicator: Rectangle {
+                                        implicitWidth: 14
+                                        implicitHeight: 14
+                                        radius : height / 2
+                                        border.width: 0;
+                                        color : control.enabled ?  MasticTheme.darkBlueGreyColor : "#3C3C3B"
+
+                                        Rectangle {
+                                            anchors.centerIn: parent
+                                            visible : control.checked
+                                            width: 8
+                                            height: 8
+                                            radius : height / 2
+
+                                            border.width: 0;
+                                            color : MasticTheme.lightGreyColor
+                                        }
+                                    }
+
+                                }
+
+                                onCheckedChanged : {
+                                    if (actionM) {
+                                        actionM.shallRevertAfterTime = checked
+                                    }
+                                }
+
+                                Binding {
+                                    target : revertActionAfterCB
+                                    property : "checked"
+                                    value : (actionM && actionM.shallRevertAfterTime)
+                                }
+                            }
+
+
+                            TextField {
+                                id: textFieldDuration
+
+                                anchors {
+                                    verticalCenter: parent.verticalCenter
+                                    verticalCenterOffset: 2
+                                }
+
+                                height: 25
+                                width: 57
+                                enabled: revertActionAfterCB.enabled
+                                horizontalAlignment: TextInput.AlignLeft
+                                verticalAlignment: TextInput.AlignVCenter
+
+                                text : actionM ? actionM.revertAfterTimeString : "0.0"
+                                inputMethodHints: Qt.ImhFormattedNumbersOnly
+                                validator: RegExpValidator { regExp: /(\d{1,4})([.]\d{3})?$/ }
+
+                                style: I2TextFieldStyle {
+                                    backgroundColor: MasticTheme.darkBlueGreyColor
+                                    backgroundDisabledColor: "#3C3C3B"
+                                    borderColor: MasticTheme.lightGreyColor;
+                                    borderErrorColor: MasticTheme.redColor
+                                    radiusTextBox: 1
+                                    borderWidth: 0;
+                                    borderWidthActive: 1
+                                    textColor: MasticTheme.lightGreyColor;
+                                    textDisabledColor: MasticTheme.darkGreyColor;
+
+                                    padding.left: 3
+                                    padding.right: 3
+
+                                    font {
+                                        pixelSize:14
+                                        family: MasticTheme.textFontFamily
+                                    }
+
+                                }
+
+                                onTextChanged: {
+                                    if (activeFocus &&  actionM ) {
+                                        actionM.revertAfterTimeString = text;
+                                    }
+                                }
+
+                                Binding {
+                                    target : textFieldDuration
+                                    property :  "text"
+                                    value : if (actionM) {
+                                                actionM.revertAfterTimeString
+                                            }
+                                            else {
+                                                "";
+                                            }
+                                }
+
+                                onFocusChanged: {
+                                    if (focus) {
+                                       revertActionAfterCB.checked = true;
+                                    }
+                                }
+                            }
+
+
+                            Text {
+                                anchors {
+                                    verticalCenter: parent.verticalCenter
+                                    verticalCenterOffset: 2
+                                }
+                                color: revertActionAfterCB.enabled ? (revertActionAfterCB.checked? MasticTheme.lightGreyColor : MasticTheme.greyColor) : "#3C3C3B"
+
+                                text: " seconds"
+                                elide: Text.ElideRight
+
+                                font {
+                                    family: MasticTheme.textFontFamily
+                                    pixelSize: 16
+                                }
+
+                                MouseArea {
+                                    anchors.fill: parent
+
+                                    onPressed: {
+                                        revertActionAfterCB.checked = true;
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+                }
+
+                // Rearm Action
+                Item {
+                    id : rearmActionitem
+                    anchors {
+                        left: parent.left;
+                        right: parent.right;
+                        top : revertActionitem.bottom
+                        topMargin: 17
+                    }
+                    height : childrenRect.height
+
+
+                    CheckBox {
+                        id : rearmActionCB
+                        anchors {
+                            left: parent.left;
+                            top : parent.top
+                        }
+
+                        checked : actionM && actionM.v;
+                        activeFocusOnPress: true;
+
+                        style: CheckBoxStyle {
+                            label: Text {
+                                anchors {
+                                    verticalCenter: parent.verticalCenter
+                                    verticalCenterOffset: 2
+                                }
+                                color: control.checked? MasticTheme.lightGreyColor : MasticTheme.greyColor
+
+                                text: "Rearm action after each execution"
+                                elide: Text.ElideRight
+
+                                font {
+                                    family: MasticTheme.textFontFamily
+                                    pixelSize: 16
+                                }
+                            }
+
+                            indicator: Rectangle {
+                                implicitWidth: 14
+                                implicitHeight: 14
+                                border.width: 0;
+                                color : MasticTheme.darkBlueGreyColor
+
+                                I2SvgItem {
+                                    visible : control.checked
+                                    anchors.centerIn: parent
+
+                                    svgFileCache : MasticTheme.svgFileMASTIC;
+                                    svgElementId:  "check";
+
+                                }
+                            }
+
+                        }
+
+                        onCheckedChanged : {
+                            if (actionM) {
+                                actionM.shallRearm = checked
+                            }
+                        }
+
+
+                        Binding {
+                            target : rearmActionCB
+                            property : "checked"
+                            value : (actionM && actionM.shallRearm)
+                        }
+                    }
+
                 }
             }
-        }
 
 
-        Button {
-            id: btnValideEditor
+            //
+            // Effects
+            //
+            Item {
+                anchors {
+                    left : parent.left
+                    right : parent.right
+                    top : advModesItem.bottom
+                    topMargin: 20
+                }
 
-            anchors {
-                right: parent.right
-                bottom: parent.bottom
+                //Title
+                Text {
+                    id : titleEffects
+                    anchors {
+                        left : parent.left
+                        right : parent.right
+                    }
+
+                    text : "Effects"
+
+                    color: MasticTheme.whiteColor
+                    font {
+                        family: MasticTheme.textFontFamily
+                        pixelSize: 19
+                    }
+                }
+
+                // separator
+                Rectangle {
+                    id : separatorEffect
+                    anchors {
+                        left : parent.left
+                        right : parent.right
+                        top : titleEffects.bottom
+                        topMargin: 5
+                    }
+                    height : 1
+                    color : MasticTheme.whiteColor
+                }
+
+
+                /// Effects List
+                Column {
+                    id : effectsList
+
+                    anchors {
+                        top : separatorEffect.bottom
+                        topMargin: 15
+                        right : parent.right
+                        left : parent.left
+                    }
+                    spacing : 6
+
+                    Repeater {
+                        model : actionM ? actionM.effectsList : 0
+
+                        Rectangle {
+                            height :  (myEffect && myEffect.effectType === ActionEffectType.MAPPING) ? 90 : 62
+                            anchors {
+                                right : parent.right
+                                left : parent.left
+                            }
+
+                            color : "transparent"
+                            radius: 5
+                            border {
+                                width : 1
+                                color : MasticTheme.blackColor
+                            }
+
+                            // my effect
+                            property var myEffect: model.QtObject
+
+                            // Effect Type
+                            Row {
+                                id : rowEffectsTypes
+                                anchors {
+                                    right : parent.right
+                                    left : parent.left
+                                    leftMargin: 10
+                                    top : parent.top
+                                    topMargin: 6
+                                }
+                                height : 14
+                                spacing : 15
+
+                                ExclusiveGroup {
+                                    id : effectTypesExclusifGroup
+                                }
+
+                                Repeater {
+                                    model : controller? controller.effectsTypesList : 0
+
+                                    CheckBox {
+                                        id : effectTypeCB
+                                        anchors {
+                                            verticalCenter: parent.verticalCenter;
+                                        }
+
+                                        checked : myEffect && myEffect.effectType === model.value;
+                                        exclusiveGroup: effectTypesExclusifGroup
+                                        activeFocusOnPress: true;
+
+                                        style: CheckBoxStyle {
+                                            label: Text {
+                                                anchors {
+                                                    verticalCenter: parent.verticalCenter
+                                                    verticalCenterOffset: 2
+                                                }
+                                                color: control.checked? MasticTheme.lightGreyColor : MasticTheme.greyColor
+
+                                                text: model.name
+                                                elide: Text.ElideRight
+
+                                                font {
+                                                    family: MasticTheme.textFontFamily
+                                                    pixelSize: 15
+                                                }
+                                            }
+
+                                            indicator: Rectangle {
+                                                implicitWidth: 14
+                                                implicitHeight: 14
+                                                radius : height / 2
+                                                border.width: 0;
+                                                color : MasticTheme.darkBlueGreyColor
+
+                                                Rectangle {
+                                                    anchors.centerIn: parent
+                                                    visible : control.checked
+                                                    width: 8
+                                                    height: 8
+                                                    radius : height / 2
+
+                                                    border.width: 0;
+                                                    color : MasticTheme.lightGreyColor
+                                                }
+                                            }
+
+                                        }
+
+                                        onCheckedChanged : {
+                                            if (myEffect && checked) {
+                                                myEffect.effectType = model.value
+                                            }
+                                        }
+
+
+                                        Binding {
+                                            target : effectTypeCB
+                                            property : "checked"
+                                            value : (myEffect && myEffect.effectType === model.value)
+                                        }
+                                    }
+                                }
+                            }
+
+
+
+                            //
+                            // Effect Details for Agent and Value
+                            //
+                            Row {
+                                anchors {
+                                    right : parent.right
+                                    rightMargin: 10
+                                    left : rowEffectsTypes.left
+                                    bottom : parent.bottom
+                                    bottomMargin: 6
+                                }
+                                height : agentEffectCombo.height
+                                spacing : 6
+
+                                visible : myEffect && myEffect.effectType !== ActionEffectType.MAPPING
+
+                                // Agent
+                                MasticComboBox {
+                                    id : agentEffectCombo
+
+                                    anchors {
+                                        verticalCenter : parent.verticalCenter
+                                    }
+
+                                    height : 25
+                                    width : 148
+
+                                    model : controller ? controller.agentsInMappingList : 0
+                                    function modelToString(model)
+                                    {
+                                        return model.agentName;
+                                    }
+
+
+                                    Binding {
+                                        target : agentEffectCombo
+                                        property : "selectedItem"
+                                        value : if (myEffect && myEffect.effect)
+                                                {
+                                                    myEffect.effect.agentModel;
+                                                } else {
+                                                    null;
+                                                }
+                                    }
+
+
+                                    onSelectedItemChanged:
+                                    {
+                                        if (myEffect && myEffect.effect)
+                                        {
+                                            myEffect.effect.agentModel = agentEffectCombo.selectedItem;
+                                        }
+                                    }
+
+                                }
+
+                                // Agent Inputs/Outputs
+                                MasticComboBox {
+                                    id : ioEffectsCombo
+
+                                    visible : myEffect && myEffect.effectType === ActionEffectType.VALUE
+                                    enabled : visible
+                                    anchors {
+                                        verticalCenter : parent.verticalCenter
+                                    }
+
+                                    height : 25
+                                    width : 148
+
+                                    model : (myEffect && myEffect.effect && myEffect.effect.agentIopList) ? myEffect.effect.agentIopList : 0
+                                    function modelToString(model)
+                                    {
+                                        return model.name;
+                                    }
+
+
+                                    Binding {
+                                        target : ioEffectsCombo
+                                        property : "selectedItem"
+                                        value : if (myEffect && myEffect.effect)
+                                                {
+                                                    myEffect.effect.agentIOP;
+                                                } else {
+                                                    null;
+                                                }
+                                    }
+
+
+                                    onSelectedItemChanged:
+                                    {
+                                        if (myEffect && myEffect.effect)
+                                        {
+                                            myEffect.effect.agentIOP = ioEffectsCombo.selectedItem;
+                                        }
+                                    }
+
+                                }
+
+                                // Comparison Type
+                                MasticComboBox {
+                                    id : effectTypeCombo
+
+                                    anchors {
+                                        verticalCenter : parent.verticalCenter
+                                    }
+
+                                    height : 25
+                                    width : 78
+
+                                    visible : (myEffect && myEffect.effectType === ActionEffectType.AGENT)
+                                    enabled : visible
+
+                                    model :
+                                    {
+                                        if(controller)
+                                        {
+                                            controller.effectsAgentsTypesList
+                                        } else {
+                                            0
+                                        }
+
+                                    }
+
+                                    function modelToString(model)
+                                    {
+                                        return model.name;
+                                    }
+
+
+                                    Binding {
+                                        target : effectTypeCombo
+                                        property : "selectedItem"
+                                        value : if (myEffect && myEffect.effect && controller)
+                                                {
+                                                    controller.effectsAgentsTypesList.getItemWithValue(myEffect.effect.effect);
+                                                } else {
+                                                    null;
+                                                }
+                                    }
+
+
+                                    onSelectedItemChanged:
+                                    {
+                                        if (myEffect && myEffect.effect)
+                                        {
+                                            myEffect.effect.effect = effectTypeCombo.selectedItem.value;
+                                        }
+                                    }
+
+                                }
+
+                                // Target Value
+                                TextField {
+                                    id: textFieldTargetValue
+
+                                    anchors {
+                                        verticalCenter : parent.verticalCenter
+                                    }
+
+                                    visible : myEffect && myEffect.effectType === ActionEffectType.VALUE
+                                    enabled : visible
+
+                                    height: 25
+                                    width: 49
+
+                                    horizontalAlignment: TextInput.AlignLeft
+                                    verticalAlignment: TextInput.AlignVCenter
+
+                                    text : actionM  ? actionM.validityDuration : "0.0"
+                                    //   inputMethodHints: Qt.ImhFormattedNumbersOnly
+                                    //   validator: RegExpValidator { regExp: /(\d{1,4})([.]\d{3})?$/ }
+
+                                    style: I2TextFieldStyle {
+                                        backgroundColor: MasticTheme.darkBlueGreyColor
+                                        borderColor: MasticTheme.lightGreyColor;
+                                        borderErrorColor: MasticTheme.redColor
+                                        radiusTextBox: 1
+                                        borderWidth: 0;
+                                        borderWidthActive: 1
+                                        textColor: MasticTheme.lightGreyColor;
+
+                                        padding.left: 3
+                                        padding.right: 3
+
+                                        font {
+                                            pixelSize:15
+                                            family: MasticTheme.textFontFamily
+                                        }
+
+                                    }
+
+                                    onTextChanged: {
+                                        if (activeFocus && (myEffect && myEffect.effect)) {
+                                            myEffect.effect.value = text;
+                                        }
+                                    }
+
+                                    Binding {
+                                        target : textFieldTargetValue
+                                        property :  "text"
+                                        value : if  (myEffect && myEffect.effect) {
+                                                    myEffect.effect.value
+                                                }
+                                                else {
+                                                    "";
+                                                }
+                                    }
+                                }
+
+                            }
+
+
+
+                            //
+                            // Effect Details for Mapping
+                            //
+                            Item {
+                                anchors {
+                                    right : parent.right
+                                    rightMargin: 10
+                                    left : rowEffectsTypes.left
+                                    bottom : parent.bottom
+                                    bottomMargin: 6
+                                }
+                                visible : myEffect && myEffect.effectType === ActionEffectType.MAPPING
+
+                                // Agent FROM
+                                MasticComboBox {
+                                    id : agentFROMEffectMappingCombo
+
+                                    anchors {
+                                        left : parent.left
+                                        bottom : oEffectsMappingFROMCombo.top
+                                        bottomMargin: 6
+                                    }
+
+                                    height : 25
+                                    width : 148
+
+                                    model : controller ? controller.agentsInMappingList : 0
+                                    function modelToString(model)
+                                    {
+                                        return model.agentName;
+                                    }
+
+
+                                    Binding {
+                                        target : agentFROMEffectMappingCombo
+                                        property : "selectedItem"
+                                        value : if (myEffect && myEffect.effect)
+                                                {
+                                                    myEffect.effect.agentModel;
+                                                } else {
+                                                    null;
+                                                }
+                                    }
+
+
+                                    onSelectedItemChanged:
+                                    {
+                                        if (myEffect && myEffect.effect)
+                                        {
+                                            myEffect.effect.agentModel = agentFROMEffectMappingCombo.selectedItem;
+                                        }
+                                    }
+
+                                }
+
+                                // Agent FROM Outputs
+                                MasticComboBox {
+                                    id : oEffectsMappingFROMCombo
+
+                                    enabled : visible
+                                    anchors {
+                                        left : parent.left
+                                        bottom : parent.bottom
+                                    }
+
+                                    height : 25
+                                    width : 148
+
+                                    model : (myEffect && myEffect.effect && myEffect.effect.agentModel) ? myEffect.effect.agentModel.outputsList : 0
+                                    function modelToString(model)
+                                    {
+                                        return model.name;
+                                    }
+
+
+                                    Binding {
+                                        target : oEffectsMappingFROMCombo
+                                        property : "selectedItem"
+                                        value : if (myEffect && myEffect.effect)
+                                                {
+                                                    myEffect.effect.fromAgentIOP;
+                                                } else {
+                                                    null;
+                                                }
+                                    }
+
+
+                                    onSelectedItemChanged:
+                                    {
+                                        if (myEffect && myEffect.effect)
+                                        {
+                                            myEffect.effect.fromAgentIOP = oEffectsMappingFROMCombo.selectedItem;
+                                        }
+                                    }
+
+                                }
+
+
+                                Item {
+                                    id : disableMappingItem
+                                    anchors {
+                                        left : agentFROMEffectMappingCombo.right
+                                        right : agentTOEffectMappingCombo.left
+                                        top : agentFROMEffectMappingCombo.top
+                                        bottom : parent.bottom
+                                    }
+                                    clip : true
+
+                                    Rectangle {
+                                        anchors {
+                                            verticalCenter: parent.verticalCenter
+                                            right : rectRight.right
+                                            left : rectLeft.left
+                                        }
+                                        color : MasticTheme.blackColor
+                                        height : 1
+
+                                    }
+
+                                    Rectangle {
+                                        id : rectLeft
+                                        anchors {
+                                            horizontalCenter: parent.left
+                                            top : parent.top
+                                            bottom : parent.bottom
+                                            topMargin: agentFROMEffectMappingCombo.height/2
+                                            bottomMargin: agentFROMEffectMappingCombo.height/2
+                                        }
+                                        width : 12
+                                        color : MasticTheme.veryDarkGreyColor
+                                        border {
+                                            width: 1
+                                            color : MasticTheme.blackColor
+                                        }
+                                    }
+
+                                    Rectangle {
+                                        id : rectRight
+                                        anchors {
+                                            horizontalCenter: parent.right
+                                            top : parent.top
+                                            bottom : parent.bottom
+                                            topMargin: agentFROMEffectMappingCombo.height/2
+                                            bottomMargin: agentFROMEffectMappingCombo.height/2
+                                        }
+                                        width : 12
+                                        color : MasticTheme.veryDarkGreyColor
+                                        border {
+                                            width: 1
+                                            color : MasticTheme.blackColor
+                                        }
+                                    }
+
+
+                                }
+
+                                // Agent TO
+                                MasticComboBox {
+                                    id : agentTOEffectMappingCombo
+
+                                    anchors {
+                                        right : parent.right
+                                        bottom : oEffectsMappingTOCombo.top
+                                        bottomMargin: 6
+                                    }
+
+                                    height : 25
+                                    width : 148
+
+                                    model : controller ? controller.agentsInMappingList : 0
+                                    function modelToString(model)
+                                    {
+                                        return model.agentName;
+                                    }
+
+
+                                    Binding {
+                                        target : agentTOEffectMappingCombo
+                                        property : "selectedItem"
+                                        value : if (myEffect && myEffect.effect)
+                                                {
+                                                    myEffect.effect.toAgentModel;
+                                                } else {
+                                                    null;
+                                                }
+                                    }
+
+
+                                    onSelectedItemChanged:
+                                    {
+                                        if (myEffect && myEffect.effect)
+                                        {
+                                            myEffect.effect.toAgentModel = agentTOEffectMappingCombo.selectedItem;
+                                        }
+                                    }
+
+                                }
+
+                                // Agent TO Intpus
+                                MasticComboBox {
+                                    id : iEffectsMappingTOCombo
+
+                                    enabled : visible
+                                    anchors {
+                                        right : parent.right
+                                        bottom : parent.bottom
+                                    }
+
+                                    height : 25
+                                    width : 148
+
+                                    model : (myEffect && myEffect.effect && myEffect.effect.toAgentModel) ? myEffect.effect.toAgentModel.inputsList : 0
+                                    function modelToString(model)
+                                    {
+                                        return model.name;
+                                    }
+
+
+                                    Binding {
+                                        target : iEffectsMappingTOCombo
+                                        property : "selectedItem"
+                                        value : if (myEffect && myEffect.effect)
+                                                {
+                                                    myEffect.effect.toAgentIOP;
+                                                } else {
+                                                    null;
+                                                }
+                                    }
+
+
+                                    onSelectedItemChanged:
+                                    {
+                                        if (myEffect && myEffect.effect)
+                                        {
+                                            myEffect.effect.toAgentIOP = iEffectsMappingTOCombo.selectedItem;
+                                        }
+                                    }
+
+                                }
+
+
+                            }
+
+
+                            // Delete Effect
+                            Button {
+                                id: btnDeletEffect
+
+                                height : 10
+                                width : 10
+                                anchors {
+                                    top: parent.top
+                                    right : parent.right
+                                    margins: 5
+                                }
+
+                                activeFocusOnPress: true
+                                style: Theme.LabellessSvgButtonStyle {
+                                    fileCache: MasticTheme.svgFileMASTIC
+
+                                    pressedID: releasedID + "-pressed"
+                                    releasedID: "closeEditor"
+                                    disabledID : releasedID
+                                }
+
+                                onClicked: {
+                                    if (panelController && myEffect)
+                                    {
+                                        panelController.removeEffect(myEffect);
+                                    }
+                                }
+                            }
+
+
+                        }
+
+                    }
+                }
+
+
+                // add effect
+                Button {
+                    id: addEffects
+
+                    activeFocusOnPress: true
+
+                    anchors {
+                        top: effectsList.bottom
+                        topMargin: 6
+                        left: parent.left
+                    }
+
+                    style: Theme.LabellessSvgButtonStyle {
+                        fileCache: MasticTheme.svgFileMASTIC
+
+                        pressedID: releasedID + "-pressed"
+                        releasedID: "createButton"
+                        disabledID : releasedID
+                    }
+
+                    onClicked: {
+                        if (panelController)
+                        {
+                            panelController.createNewEffect();
+                        }
+                    }
+                }
+
             }
 
-            text: "OK"
 
-            onClicked: {
-                if(controller)
-                {
-                    controller.valideActionEditor(model.QtObject);
+            // Delete Action
+            MouseArea {
+                id : actionDeleteBtn
+
+                anchors {
+                    left : parent.left
+                    leftMargin: 15
+                    verticalCenter: cancelButton.verticalCenter
+                    verticalCenterOffset: 2
+                }
+
+                height : actionDelete.height
+                width : actionDelete.width
+
+                hoverEnabled: true
+                onClicked: {
+                    if (controller && actionM) {
+                        controller.deleteAction(actionM);
+                    }
+                }
+
+                Text {
+                    id: actionDelete
+
+                    anchors {
+                        left : parent.left
+                    }
+                    text : "Delete Action"
+                    color: actionDeleteBtn.pressed ? MasticTheme.greyColor : MasticTheme.lightGreyColor
+                    elide: Text.ElideRight
+
+                    font {
+                        family: MasticTheme.textFontFamily
+                        pixelSize: 16
+                    }
+                }
+
+                // underline
+                Rectangle {
+                    visible: actionDeleteBtn.containsMouse
+
+                    anchors {
+                        left : actionDeleteBtn.left
+                        right : actionDelete.right
+                        bottom : parent.bottom
+                    }
+
+                    height : 1
+
+                    color : actionDelete.color
                 }
             }
-        }
 
-        Button {
-            id: btnCancelEditor
 
-            anchors {
-                right: btnValideEditor.left
-                bottom: parent.bottom
-                rightMargin: 10
+            Button {
+                id: cancelButton
+                activeFocusOnPress: true
+                property var boundingBox: MasticTheme.svgFileMASTIC.boundsOnElement("button");
+                height : boundingBox.height
+                width :  boundingBox.width
+
+                enabled : visible
+                text : "Cancel"
+
+                anchors {
+                    verticalCenter: okButton.verticalCenter
+                    right : okButton.left
+                    rightMargin: 20
+                }
+
+                style: I2SvgButtonStyle {
+                    fileCache: MasticTheme.svgFileMASTIC
+
+                    pressedID: releasedID + "-pressed"
+                    releasedID: "button"
+                    disabledID : releasedID
+
+                    font {
+                        family: MasticTheme.textFontFamily
+                        weight : Font.Medium
+                        pixelSize : 16
+                    }
+                    labelColorPressed: MasticTheme.blackColor
+                    labelColorReleased: MasticTheme.whiteColor
+                    labelColorDisabled: MasticTheme.whiteColor
+
+                }
+
+                onClicked: {
+                    // Close our popup
+                    rootItem.close();
+                }
             }
 
-            text: "ANNULER"
+            Button {
+                id: okButton
 
-            onClicked: {
-                // Close our popup
-                rootItem.close();
-            }
-        }
+                property var boundingBox: MasticTheme.svgFileMASTIC.boundsOnElement("button");
+                height : boundingBox.height
+                width :  boundingBox.width
 
-        Button {
-            id: btnDeleteEditor
+                enabled : visible
+                activeFocusOnPress: true
+                text : "OK"
 
-            anchors {
-                right: btnCancelEditor.left
-                bottom: parent.bottom
-                rightMargin: 10
-            }
+                anchors {
+                    bottom: parent.bottom
+                    right : parent.right
+                }
 
-            text: "SUPPRIMER"
+                style: I2SvgButtonStyle {
+                    fileCache: MasticTheme.svgFileMASTIC
 
-            onClicked: {
+                    pressedID: releasedID + "-pressed"
+                    releasedID: "button"
+                    disabledID : releasedID
 
-                if(controller)
-                {
-                    controller.deleteActionEditor(model.QtObject);
+                    font {
+                        family: MasticTheme.textFontFamily
+                        weight : Font.Medium
+                        pixelSize : 16
+                    }
+                    labelColorPressed: MasticTheme.blackColor
+                    labelColorReleased: MasticTheme.whiteColor
+                    labelColorDisabled: MasticTheme.whiteColor
+
+                }
+
+                onClicked: {
+                    if(controller)
+                    {
+                        controller.valideActionEditor(model.QtObject);
+                    }
+                    // Close our popup
+                    rootItem.close();
                 }
             }
         }
 
     }
+
 }
+

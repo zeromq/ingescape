@@ -91,14 +91,20 @@ Item {
                 fill: parent
             }
 
-            Rectangle {
-                anchors.fill: parent
 
+            // Selected Agent
+            Item {
+                anchors.fill: parent
                 visible : controller && root.agent && (controller.selectedAgent === root.agent);
-                color : "transparent"
-                radius : 5
-                border {
-                    width : 2
+
+                Rectangle {
+                    anchors {
+                        left : parent.left
+                        top : parent.top
+                        bottom: parent.bottom
+                    }
+
+                    width : 6
                     color : MasticTheme.selectedAgentColor
                 }
 
@@ -106,6 +112,7 @@ Item {
                     id: removeButton
 
                     visible : (model.isON === false)
+                    activeFocusOnPress: true
 
                     anchors {
                         top: parent.top
@@ -298,7 +305,7 @@ Item {
                 id: offButton
 
                 visible : (root.agent && !root.agent.neverAppearedOnNetwork)
-
+                activeFocusOnPress: true
                 enabled: visible
 
                 anchors {
@@ -324,6 +331,8 @@ Item {
                 id: muteButton
 
                 visible : (model.isON === true)
+                activeFocusOnPress: true
+
                 anchors {
                     bottom: parent.bottom
                     bottomMargin: 10
@@ -349,6 +358,7 @@ Item {
 
                 visible: model.canBeFrozen && (model.isON === true)
                 enabled : visible
+                activeFocusOnPress: true
 
                 anchors {
                     verticalCenter: muteButton.verticalCenter
