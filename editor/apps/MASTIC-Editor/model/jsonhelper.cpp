@@ -330,7 +330,6 @@ AgentIOPM* JsonHelper::_createModelOfAgentIOP(QJsonObject jsonObject, AgentIOPTy
                     int value = (int)jsonValue.toDouble();
 
                     agentIOP->setdefaultValue(QVariant(value));
-                    //agentIOP->setdisplayableDefaultValue(QString::number(value));
                 }
                 else {
                     qCritical() << "IOP '" << agentIOP->name() << "': The value '" << jsonValue << "' is not an int";
@@ -342,7 +341,6 @@ AgentIOPM* JsonHelper::_createModelOfAgentIOP(QJsonObject jsonObject, AgentIOPTy
                     double value = jsonValue.toDouble();
 
                     agentIOP->setdefaultValue(QVariant(value));
-                    //agentIOP->setdisplayableDefaultValue(QString::number(value));
                 }
                 else {
                     qCritical() << "IOP '" << agentIOP->name() << "': The value '" << jsonValue << "' is not a double";
@@ -354,7 +352,6 @@ AgentIOPM* JsonHelper::_createModelOfAgentIOP(QJsonObject jsonObject, AgentIOPTy
                     QString value = jsonValue.toString();
 
                     agentIOP->setdefaultValue(QVariant(value));
-                    //agentIOP->setdisplayableDefaultValue(value);
                 }
                 else {
                     qCritical() << "IOP '" << agentIOP->name() << "': The value '" << jsonValue << "' is not a string";
@@ -370,7 +367,6 @@ AgentIOPM* JsonHelper::_createModelOfAgentIOP(QJsonObject jsonObject, AgentIOPTy
                         bool value = (strValue == "false") ? false : true;
 
                         agentIOP->setdefaultValue(QVariant(value));
-                        //agentIOP->setdisplayableDefaultValue(strValue);
                     }
                     else {
                         qCritical() << "IOP '" << agentIOP->name() << "': The value '" << strValue << "' is not a bool";
@@ -388,19 +384,16 @@ AgentIOPM* JsonHelper::_createModelOfAgentIOP(QJsonObject jsonObject, AgentIOPTy
             case AgentIOPValueTypes::DATA:
                 if (jsonValue.isString()) {
                     QString strValue = jsonValue.toString();
+
                     QByteArray value = strValue.toLocal8Bit();
                     //QByteArray value = strValue.toUtf8();
 
                     agentIOP->setdefaultValue(QVariant(value));
-                    //agentIOP->setdisplayableDefaultValue(strValue);
                 }
                 else {
                     qCritical() << "IOP '" << agentIOP->name() << "': The value '" << jsonValue << "' is not a data of bytes";
                 }
                 break;
-
-            /*case AgentIOPValueTypes::UNKNOWN:
-                break;*/
 
             default:
                 qCritical() << "IOP '" << agentIOP->name() << "' has a bad type" << jsonType.toString();
@@ -463,11 +456,13 @@ QJsonObject JsonHelper::_getJsonFromAgentIOP(AgentIOPM* agentIOP)
             break;
 
         case AgentIOPValueTypes::STRING:
-            jsonAgentIOP.insert("value", agentIOP->defaultValue().toString());
+            //jsonAgentIOP.insert("value", agentIOP->defaultValue().toString());
+            jsonAgentIOP.insert("value", agentIOP->displayableDefaultValue());
             break;
 
         case AgentIOPValueTypes::BOOL:
-            jsonAgentIOP.insert("value", agentIOP->defaultValue().toString());
+            //jsonAgentIOP.insert("value", agentIOP->defaultValue().toString());
+            jsonAgentIOP.insert("value", agentIOP->displayableDefaultValue());
             break;
 
         case AgentIOPValueTypes::IMPULSION:
@@ -478,10 +473,6 @@ QJsonObject JsonHelper::_getJsonFromAgentIOP(AgentIOPM* agentIOP)
             //jsonAgentIOP.insert("value", agentIOP->defaultValue().toString());
             jsonAgentIOP.insert("value", agentIOP->displayableDefaultValue());
             break;
-
-        /*case AgentIOPValueTypes::UNKNOWN:
-            jsonAgentIOP.insert("value", "");
-            break;*/
 
         default:
             jsonAgentIOP.insert("value", "");

@@ -61,12 +61,12 @@ ActionM::ActionM(QString name, QObject *parent) : QObject(parent),
     _name(name),
     _validityDurationType(ValidationDurationType::IMMEDIATE),
     _validityDuration(-1),
-    _validityDurationString("0.000"),
+    _validityDurationString("0.0"),
     _shallRevert(false),
     _shallRevertWhenValidityIsOver(false),
     _shallRevertAfterTime(false),
     _revertAfterTime(-1),
-    _revertAfterTimeString("00:00:00"),
+    _revertAfterTimeString("0.0"),
     _shallRearm(false),
     _actionsPanelIndex(-1)
 {
@@ -111,17 +111,40 @@ void ActionM::copyFrom(ActionM* actionModel)
         foreach (ActionEffectVM* effectVM, actionModel->effectsList()->toList())
         {
             ActionEffectVM* copiedEffectVM = new ActionEffectVM();
-            copiedEffectVM->effect()->copyFrom(effectVM->effect());
             copiedEffectVM->seteffectType(effectVM->effectType());
+
+            IOPValueEffectM* iopEffect = dynamic_cast<IOPValueEffectM*>(effectVM->effect());
+            if(iopEffect != NULL)
+            {
+                IOPValueEffectM * copiedIopEffect = new IOPValueEffectM();
+                copiedIopEffect->copyFrom(iopEffect);
+                copiedEffectVM->seteffect(copiedIopEffect);
+            } else {
+                ActionEffectM * copiedIopEffect = new ActionEffectM();
+                copiedIopEffect->copyFrom(effectVM->effect());
+                copiedEffectVM->seteffect(copiedIopEffect);
+            }
             _effectsList.append(copiedEffectVM);
         }
+
 
         _conditionsList.deleteAllItems();
         foreach (ActionConditionVM* conditionVM, actionModel->conditionsList()->toList())
         {
             ActionConditionVM* copiedConditionVM = new ActionConditionVM();
-            copiedConditionVM->condition()->copyFrom(conditionVM->condition());
             copiedConditionVM->setconditionType(conditionVM->conditionType());
+
+            IOPValueConditionM* iopCondition = dynamic_cast<IOPValueConditionM*>(conditionVM->condition());
+            if(iopCondition != NULL)
+            {
+                IOPValueConditionM * copiedIopCondition = new IOPValueConditionM();
+                copiedIopCondition->copyFrom(iopCondition);
+                copiedConditionVM->setcondition(copiedIopCondition);
+            } else {
+                ActionConditionM * copiedIopCondition = new ActionConditionM();
+                copiedIopCondition->copyFrom(conditionVM->condition());
+                copiedConditionVM->setcondition(copiedIopCondition);
+            }
             _conditionsList.append(copiedConditionVM);
         }
     }
@@ -176,6 +199,28 @@ void ActionM::setvalidityDurationString(QString validityDuration)
         }
 
         emit validityDurationStringChanged(validityDuration);
+    }
+}
+
+/**
+ * @brief Custom setter on the shall revert flag
+ * @param shall revert flag
+ */
+void ActionM::setshallRevert(bool shallRevert)
+{
+    if(_shallRevert != shallRevert)
+    {
+        _shallRevert = shallRevert;
+
+        // Resert selection if the shall revert is unchecked
+        if(_shallRevert == false)
+        {
+            setshallRevertAfterTime(false);
+            setshallRevertWhenValidityIsOver(false);
+            setrevertAfterTimeString("0.0");
+        }
+
+        emit shallRevertChanged(shallRevert);
     }
 }
 

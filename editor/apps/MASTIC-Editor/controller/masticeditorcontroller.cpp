@@ -108,6 +108,7 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     connect(_networkC, &NetworkController::definitionReceived, _modelManager, &MasticModelManager::onDefinitionReceived);
     connect(_networkC, &NetworkController::mappingReceived, _modelManager, &MasticModelManager::onMappingReceived);
     connect(_networkC, &NetworkController::agentExited, _modelManager, &MasticModelManager::onAgentExited);
+    connect(_networkC, &NetworkController::valuePublished, _modelManager, &MasticModelManager::onValuePublished);
     connect(_networkC, &NetworkController::isMutedFromAgentUpdated, _modelManager, &MasticModelManager::onisMutedFromAgentUpdated);
     connect(_networkC, &NetworkController::isFrozenFromAgentUpdated, _modelManager, &MasticModelManager::onIsFrozenFromAgentUpdated);
     connect(_networkC, &NetworkController::isMutedFromOutputOfAgentUpdated, _modelManager, &MasticModelManager::onIsMutedFromOutputOfAgentUpdated);

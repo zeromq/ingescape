@@ -46,7 +46,7 @@ AgentIOPM::AgentIOPM(AgentIOPTypes::Value agentIOPType,
     setagentIOPValueType(agentIOPValueType);
 
     // Create the unique identifier with name and value type
-    _id = QString("%1::%2").arg(_name, AgentIOPValueTypes::staticEnumToString(_agentIOPValueType));
+    _id = QString("%1%2%3").arg(_name, SEPARATOR_IOP_NAME_AND_IOP_VALUE_TYPE, AgentIOPValueTypes::staticEnumToString(_agentIOPValueType));
 }
 
 
@@ -113,8 +113,11 @@ void AgentIOPM::setdefaultValue(QVariant value)
     {
         _defaultValue = value;
 
-        // To String
-        setdisplayableDefaultValue(_defaultValue.toString());
+        // Get a displayable value: convert a variant into a string (in function of the value type)
+        setdisplayableDefaultValue(Enums::getDisplayableValue(_agentIOPValueType, _defaultValue));
+
+        // Set the current value
+        setcurrentValue(_defaultValue);
 
         Q_EMIT defaultValueChanged(value);
     }
@@ -131,8 +134,8 @@ void AgentIOPM::setcurrentValue(QVariant value)
     {
         _currentValue = value;
 
-        // To String
-        setdisplayableCurrentValue(_currentValue.toString());
+        // Get a displayable value: convert a variant into a string (in function of the value type)
+        setdisplayableCurrentValue(Enums::getDisplayableValue(_agentIOPValueType, _currentValue));
 
         Q_EMIT currentValueChanged(value);
     }

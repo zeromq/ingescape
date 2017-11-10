@@ -23,6 +23,7 @@
 
 #include <controller/masticmodelmanager.h>
 #include <viewModel/agentinmappingvm.h>
+#include <viewModel/mapbetweeniopvm.h>
 
 
 /**

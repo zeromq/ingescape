@@ -54,6 +54,11 @@ DefinitionM::~DefinitionM()
     disconnect(&_outputsList, &AbstractI2CustomItemListModel::countChanged, this, &DefinitionM::_onOutputsListChanged);
     disconnect(&_parametersList, &AbstractI2CustomItemListModel::countChanged, this, &DefinitionM::_onParametersListChanged);
 
+    // Clear maps
+    _mapFromInputNameToInput.clear();
+    _mapFromOutputNameToOutput.clear();
+    _mapFromParameterNameToParameter.clear();
+
     // Delete all models of Inputs, Outputs and Parameters
     _inputsList.deleteAllItems();
     _outputsList.deleteAllItems();
@@ -88,8 +93,8 @@ void DefinitionM::_onInputsListChanged()
         for (AgentIOPM* input : newInputsList) {
             if ((input != NULL) && !_previousInputsList.contains(input))
             {
-                // Add its id
                 _inputsIdsList.append(input->id());
+                _mapFromInputNameToInput.insert(input->name(), input);
             }
         }
     }
@@ -99,8 +104,8 @@ void DefinitionM::_onInputsListChanged()
         for (AgentIOPM* input : _previousInputsList) {
             if ((input != NULL) && !newInputsList.contains(input))
             {
-                // Remove its id
                 _inputsIdsList.removeOne(input->id());
+                _mapFromInputNameToInput.remove(input->name());
             }
         }
     }
@@ -124,8 +129,8 @@ void DefinitionM::_onOutputsListChanged()
         for (OutputM* output : newOutputsList) {
             if ((output != NULL) && !_previousOutputsList.contains(output))
             {
-                // Add its id
                 _outputsIdsList.append(output->id());
+                _mapFromOutputNameToOutput.insert(output->name(), output);
 
                 // Connect to signals from the output
                 connect(output, &OutputM::commandAsked, this, &DefinitionM::commandAskedForOutput);
@@ -139,8 +144,8 @@ void DefinitionM::_onOutputsListChanged()
         for (OutputM* output : _previousOutputsList) {
             if ((output != NULL) && !newOutputsList.contains(output))
             {
-                // Remove its id
                 _outputsIdsList.removeOne(output->id());
+                _mapFromOutputNameToOutput.remove(output->name());
 
                 // DIS-connect from signals from the output
                 disconnect(output, &OutputM::commandAsked, this, &DefinitionM::commandAskedForOutput);
@@ -168,8 +173,8 @@ void DefinitionM::_onParametersListChanged()
         for (AgentIOPM* parameter : newParametersList) {
             if ((parameter != NULL) && !_previousParametersList.contains(parameter))
             {
-                // Add its id
                 _parametersIdsList.append(parameter->id());
+                _mapFromParameterNameToParameter.insert(parameter->name(), parameter);
             }
         }
     }
@@ -179,8 +184,8 @@ void DefinitionM::_onParametersListChanged()
         for (AgentIOPM* parameter : _previousParametersList) {
             if ((parameter != NULL) && !newParametersList.contains(parameter))
             {
-                // Remove its id
                 _parametersIdsList.removeOne(parameter->id());
+                _mapFromParameterNameToParameter.remove(parameter->name());
             }
         }
     }
@@ -238,49 +243,49 @@ bool DefinitionM::areIdenticals(DefinitionM* definition1, DefinitionM* definitio
 
 /**
  * @brief Get an Input with its name
- * @param name
+ * @param inputName
  * @return
  */
-AgentIOPM* DefinitionM::getInputWithName(QString name)
+AgentIOPM* DefinitionM::getInputWithName(QString inputName)
 {
-    foreach (AgentIOPM* input, _inputsList.toList()) {
-        if ((input != NULL) && (input->name() == name)) {
-            return input;
-        }
+    if (_mapFromInputNameToInput.contains(inputName)) {
+        return _mapFromInputNameToInput.value(inputName);
     }
-    return NULL;
+    else {
+        return NULL;
+    }
 }
 
 
 /**
  * @brief Get an Output with its name
- * @param name
+ * @param outputName
  * @return
  */
-OutputM* DefinitionM::getOutputWithName(QString name)
+OutputM* DefinitionM::getOutputWithName(QString outputName)
 {
-    foreach (OutputM* output, _outputsList.toList()) {
-        if ((output != NULL) && (output->name() == name)) {
-            return output;
-        }
+    if (_mapFromOutputNameToOutput.contains(outputName)) {
+        return _mapFromOutputNameToOutput.value(outputName);
     }
-    return NULL;
+    else {
+        return NULL;
+    }
 }
 
 
 /**
  * @brief Get a Parameter with its name
- * @param name
+ * @param parameterName
  * @return
  */
-AgentIOPM* DefinitionM::getParameterWithName(QString name)
+AgentIOPM* DefinitionM::getParameterWithName(QString parameterName)
 {
-    foreach (AgentIOPM* parameter, _parametersList.toList()) {
-        if ((parameter != NULL) && (parameter->name() == name)) {
-            return parameter;
-        }
+    if (_mapFromParameterNameToParameter.contains(parameterName)) {
+        return _mapFromParameterNameToParameter.value(parameterName);
     }
-    return NULL;
+    else {
+        return NULL;
+    }
 }
 
 

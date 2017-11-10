@@ -22,8 +22,7 @@
 
 #include <model/jsonhelper.h>
 #include <model/agentm.h>
-#include <model/definitionm.h>
-#include <viewModel/mapbetweeniopvm.h>
+#include <model/publishedvaluem.h>
 
 
 /**
@@ -211,7 +210,7 @@ Q_SIGNALS:
 public Q_SLOTS:
 
     /**
-     * @brief Slot when an agent enter the network
+     * @brief Slot called when an agent enter the network
      * @param peerId
      * @param agentName
      * @param agentAddress
@@ -224,7 +223,7 @@ public Q_SLOTS:
     
 
     /**
-     * @brief Slot when an agent definition has been received and must be processed
+     * @brief Slot called when an agent definition has been received and must be processed
      * @param peer Id
      * @param agent name
      * @param definition in JSON format
@@ -233,7 +232,7 @@ public Q_SLOTS:
 
 
     /**
-     * @brief Slot when an agent mapping has been received and must be processed
+     * @brief Slot called when an agent mapping has been received and must be processed
      * @param peer Id
      * @param agent name
      * @param mapping in JSON format
@@ -242,7 +241,7 @@ public Q_SLOTS:
 
 
     /**
-     * @brief Slot when an agent quit the network
+     * @brief Slot called when an agent quit the network
      * @param peer Id
      * @param agent name
      */
@@ -250,7 +249,14 @@ public Q_SLOTS:
 
 
     /**
-     * @brief Slot when the flag "is Muted" from an agent updated
+     * @brief Slot called when a new value is published
+     * @param publishedValue
+     */
+    void onValuePublished(PublishedValueM* publishedValue);
+
+
+    /**
+     * @brief Slot called when the flag "is Muted" from an agent updated
      * @param peerId
      * @param isMuted
      */
@@ -258,7 +264,7 @@ public Q_SLOTS:
 
 
     /**
-     * @brief Slot when the flag "is Frozen" from an agent updated
+     * @brief Slot called when the flag "is Frozen" from an agent updated
      * @param peerId
      * @param isFrozen
      */
@@ -266,7 +272,7 @@ public Q_SLOTS:
 
 
     /**
-     * @brief Slot when the flag "is Muted" from an output of agent updated
+     * @brief Slot called when the flag "is Muted" from an output of agent updated
      * @param peerId
      * @param isMuted
      * @param outputName

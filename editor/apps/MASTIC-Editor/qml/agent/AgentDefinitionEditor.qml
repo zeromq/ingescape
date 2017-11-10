@@ -503,9 +503,9 @@ I2PopupBase {
                                     }
 
 
-                                    // Mapping Value
+                                    // Current Value
                                     Text {
-                                        text: "    -"
+                                        text: model.displayableCurrentValue
 
                                         anchors {
                                             verticalCenter: parent.verticalCenter
