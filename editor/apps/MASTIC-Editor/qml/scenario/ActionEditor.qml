@@ -987,7 +987,6 @@ I2PopupBase {
                         }
 
                         Row {
-                            spacing : 4
                             anchors {
                                 left: parent.left;
                                 right :parent.right
@@ -1012,7 +1011,8 @@ I2PopupBase {
                                         }
                                         color: control.enabled ? (control.checked? MasticTheme.lightGreyColor : MasticTheme.greyColor) : "#3C3C3B"
 
-                                        text: "After"
+                                        text: "After " // space allowing to keep selection possible for the whole row
+
                                         elide: Text.ElideRight
 
                                         font {
@@ -1066,7 +1066,7 @@ I2PopupBase {
 
                                 height: 25
                                 width: 57
-                                enabled: control.enabled
+                                enabled: revertActionAfterCB.enabled
                                 horizontalAlignment: TextInput.AlignLeft
                                 verticalAlignment: TextInput.AlignVCenter
 
@@ -1083,7 +1083,7 @@ I2PopupBase {
                                     borderWidth: 0;
                                     borderWidthActive: 1
                                     textColor: MasticTheme.lightGreyColor;
-                                    textDisabledColor: MasticTheme.greyColor;
+                                    textDisabledColor: MasticTheme.darkGreyColor;
 
                                     padding.left: 3
                                     padding.right: 3
@@ -1127,7 +1127,7 @@ I2PopupBase {
                                 }
                                 color: revertActionAfterCB.enabled ? (revertActionAfterCB.checked? MasticTheme.lightGreyColor : MasticTheme.greyColor) : "#3C3C3B"
 
-                                text: "seconds"
+                                text: " seconds"
                                 elide: Text.ElideRight
 
                                 font {
@@ -1676,7 +1676,7 @@ I2PopupBase {
                                         property : "selectedItem"
                                         value : if (myEffect && myEffect.effect)
                                                 {
-                                                    myEffect.effect.agentIOP;
+                                                    myEffect.effect.fromAgentIOP;
                                                 } else {
                                                     null;
                                                 }
@@ -1687,7 +1687,7 @@ I2PopupBase {
                                     {
                                         if (myEffect && myEffect.effect)
                                         {
-                                            myEffect.effect.agentIOP = oEffectsMappingFROMCombo.selectedItem;
+                                            myEffect.effect.fromAgentIOP = oEffectsMappingFROMCombo.selectedItem;
                                         }
                                     }
 
@@ -1777,7 +1777,7 @@ I2PopupBase {
                                         property : "selectedItem"
                                         value : if (myEffect && myEffect.effect)
                                                 {
-                                                    myEffect.effect.agentModel;
+                                                    myEffect.effect.toAgentModel;
                                                 } else {
                                                     null;
                                                 }
@@ -1788,7 +1788,7 @@ I2PopupBase {
                                     {
                                         if (myEffect && myEffect.effect)
                                         {
-                                            myEffect.effect.agentModel = agentTOEffectMappingCombo.selectedItem;
+                                            myEffect.effect.toAgentModel = agentTOEffectMappingCombo.selectedItem;
                                         }
                                     }
 
@@ -1807,7 +1807,7 @@ I2PopupBase {
                                     height : 25
                                     width : 148
 
-                                    model : (myEffect && myEffect.effect && myEffect.effect.agentModel) ? myEffect.effect.agentModel.inputsList : 0
+                                    model : (myEffect && myEffect.effect && myEffect.effect.toAgentModel) ? myEffect.effect.toAgentModel.inputsList : 0
                                     function modelToString(model)
                                     {
                                         return model.name;
@@ -1819,7 +1819,7 @@ I2PopupBase {
                                         property : "selectedItem"
                                         value : if (myEffect && myEffect.effect)
                                                 {
-                                                    myEffect.effect.agentIOP;
+                                                    myEffect.effect.toAgentIOP;
                                                 } else {
                                                     null;
                                                 }
@@ -1830,7 +1830,7 @@ I2PopupBase {
                                     {
                                         if (myEffect && myEffect.effect)
                                         {
-                                            myEffect.effect.agentIOP = oEffectsMappingTOCombo.selectedItem;
+                                            myEffect.effect.toAgentIOP = oEffectsMappingTOCombo.selectedItem;
                                         }
                                     }
 
