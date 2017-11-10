@@ -33,8 +33,14 @@ class MappingEffectM: public ActionEffectM
 {
     Q_OBJECT
 
-    // Mapping element
-    I2_QML_PROPERTY(ElementMappingM* , elementMapping)
+    // TO Agent IOP
+    I2_QML_PROPERTY(AgentIOPM *, fromAgentIOP)
+
+    // TO Agent model
+    I2_QML_PROPERTY(AgentInMappingVM *, toAgentModel)
+
+    // TO Agent IOP
+    I2_QML_PROPERTY(AgentIOPM *, toAgentIOP)
 
 public:
 
@@ -50,7 +56,10 @@ public:
       */
     ~MappingEffectM();
 
-
+    /**
+      * @brief Redefinition of action effect copy
+      */
+    void copyFrom(ActionEffectM* effect);
 
 Q_SIGNALS:
 
