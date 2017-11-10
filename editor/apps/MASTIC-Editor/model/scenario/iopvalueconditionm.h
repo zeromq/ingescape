@@ -56,7 +56,17 @@ public:
       */
     ~IOPValueConditionM();
 
+    /**
+      * @brief Redefinition of action condition copy
+      */
+    void copyFrom(ActionConditionM* condition);
 
+    /**
+    * @brief Custom setter on set agent model
+    *        to fill inputs and outputs
+    * @param agentModel
+    */
+    bool setagentModel(AgentInMappingVM* agentModel);
 
 Q_SIGNALS:
 

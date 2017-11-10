@@ -338,7 +338,7 @@ I2PopupBase {
                             visible :  actionM && actionM.validityDurationType === ValidationDurationType.CUSTOM
                             enabled: visible
                             height: 25
-                            width: 47
+                            width: 57
                             horizontalAlignment: TextInput.AlignLeft
                             verticalAlignment: TextInput.AlignVCenter
 
@@ -595,7 +595,7 @@ I2PopupBase {
 
 
                                     Binding {
-                                        target : agentCombo
+                                        target : ioCombo
                                         property : "selectedItem"
                                         value : if (myCondition && myCondition.condition)
                                                 {
@@ -649,7 +649,9 @@ I2PopupBase {
                                         property : "selectedItem"
                                         value : if (myCondition && myCondition.condition && controller)
                                                 {
-                                                    controller.comparisonsAgentsTypesList.getItemWithValue(myCondition.condition.comparison);
+                                                     (myCondition && myCondition.conditionType === ActionConditionType.VALUE) ?
+                                                         controller.comparisonsValuesTypesList.getItemWithValue(myCondition.condition.comparison)
+                                                       :  controller.comparisonsAgentsTypesList.getItemWithValue(myCondition.condition.comparison);
                                                 } else {
                                                     null;
                                                 }
@@ -1024,7 +1026,7 @@ I2PopupBase {
                                         }
 
                                         height: 25
-                                        width: 47
+                                        width: 57
                                         enabled: control.checked
                                         horizontalAlignment: TextInput.AlignLeft
                                         verticalAlignment: TextInput.AlignVCenter
@@ -1260,7 +1262,7 @@ I2PopupBase {
                         model : actionM ? actionM.effectsList : 0
 
                         Rectangle {
-                            height : 62
+                            height :  (myEffect && myEffect.effectType === ActionEffectType.MAPPING) ? 90 : 62
                             anchors {
                                 right : parent.right
                                 left : parent.left
@@ -1363,7 +1365,7 @@ I2PopupBase {
 
 
                             //
-                            // Effect Details
+                            // Effect Details for Agent and Value
                             //
                             Row {
                                 anchors {
@@ -1375,6 +1377,8 @@ I2PopupBase {
                                 }
                                 height : agentEffectCombo.height
                                 spacing : 6
+
+                                visible : myEffect && myEffect.effectType !== ActionEffectType.MAPPING
 
                                 // Agent
                                 MasticComboBox {
@@ -1558,7 +1562,7 @@ I2PopupBase {
                                     }
 
                                     Binding {
-                                        target : textFieldComparisonValue
+                                        target : textFieldTargetValue
                                         property :  "text"
                                         value : if  (myEffect && myEffect.effect) {
                                                     myEffect.effect.value
@@ -1568,6 +1572,248 @@ I2PopupBase {
                                                 }
                                     }
                                 }
+
+                            }
+
+
+
+                            //
+                            // Effect Details for Mapping
+                            //
+                            Item {
+                                anchors {
+                                    right : parent.right
+                                    rightMargin: 10
+                                    left : rowEffectsTypes.left
+                                    bottom : parent.bottom
+                                    bottomMargin: 6
+                                }
+                                visible : myEffect && myEffect.effectType === ActionEffectType.MAPPING
+
+                                // Agent FROM
+                                MasticComboBox {
+                                    id : agentFROMEffectMappingCombo
+
+                                    anchors {
+                                        left : parent.left
+                                        bottom : oEffectsMappingFROMCombo.top
+                                        bottomMargin: 6
+                                    }
+
+                                    height : 25
+                                    width : 148
+
+                                    model : controller ? controller.agentsInMappingList : 0
+                                    function modelToString(model)
+                                    {
+                                        return model.agentName;
+                                    }
+
+
+                                    Binding {
+                                        target : agentFROMEffectMappingCombo
+                                        property : "selectedItem"
+                                        value : if (myEffect && myEffect.effect)
+                                                {
+                                                    myEffect.effect.agentModel;
+                                                } else {
+                                                    null;
+                                                }
+                                    }
+
+
+                                    onSelectedItemChanged:
+                                    {
+                                        if (myEffect && myEffect.effect)
+                                        {
+                                            myEffect.effect.agentModel = agentFROMEffectMappingCombo.selectedItem;
+                                        }
+                                    }
+
+                                }
+
+                                // Agent FROM Outputs
+                                MasticComboBox {
+                                    id : oEffectsMappingFROMCombo
+
+                                    enabled : visible
+                                    anchors {
+                                        left : parent.left
+                                        bottom : parent.bottom
+                                    }
+
+                                    height : 25
+                                    width : 148
+
+                                    model : (myEffect && myEffect.effect && myEffect.effect.agentModel) ? myEffect.effect.agentModel.outputsList : 0
+                                    function modelToString(model)
+                                    {
+                                        return model.name;
+                                    }
+
+
+                                    Binding {
+                                        target : oEffectsMappingFROMCombo
+                                        property : "selectedItem"
+                                        value : if (myEffect && myEffect.effect)
+                                                {
+                                                    myEffect.effect.agentIOP;
+                                                } else {
+                                                    null;
+                                                }
+                                    }
+
+
+                                    onSelectedItemChanged:
+                                    {
+                                        if (myEffect && myEffect.effect)
+                                        {
+                                            myEffect.effect.agentIOP = oEffectsMappingFROMCombo.selectedItem;
+                                        }
+                                    }
+
+                                }
+
+
+                                Item {
+                                    id : disableMappingItem
+                                    anchors {
+                                       left : agentFROMEffectMappingCombo.right
+                                       right : agentTOEffectMappingCombo.left
+                                       top : agentFROMEffectMappingCombo.top
+                                       bottom : parent.bottom
+                                    }
+                                    clip : true
+
+                                    Rectangle {
+                                        anchors {
+                                            verticalCenter: parent.verticalCenter
+                                            right : rectRight.right
+                                            left : rectLeft.left
+                                        }
+                                        color : MasticTheme.blackColor
+                                        height : 1
+                                    }
+
+                                    Rectangle {
+                                        id : rectLeft
+                                        anchors {
+                                            horizontalCenter: parent.left
+                                            top : parent.top
+                                            bottom : parent.bottom
+                                            topMargin: agentFROMEffectMappingCombo.height/2
+                                            bottomMargin: agentFROMEffectMappingCombo.height/2
+                                        }
+                                        color : MasticTheme.darkBlueGreyColor
+                                        border {
+                                            width: 1
+                                            color : MasticTheme.blackColor
+                                        }
+                                    }
+
+                                    Rectangle {
+                                        id : rectRight
+                                        anchors {
+                                            horizontalCenter: parent.right
+                                            top : parent.top
+                                            bottom : parent.bottom
+                                            topMargin: agentFROMEffectMappingCombo.height/2
+                                            bottomMargin: agentFROMEffectMappingCombo.height/2
+                                        }
+                                        color : MasticTheme.darkBlueGreyColor
+                                        border {
+                                            width: 1
+                                            color : MasticTheme.blackColor
+                                        }
+                                    }
+
+
+                                }
+
+                                // Agent TO
+                                MasticComboBox {
+                                    id : agentTOEffectMappingCombo
+
+                                    anchors {
+                                        right : parent.right
+                                        bottom : oEffectsMappingTOCombo.top
+                                        bottomMargin: 6
+                                    }
+
+                                    height : 25
+                                    width : 148
+
+                                    model : controller ? controller.agentsInMappingList : 0
+                                    function modelToString(model)
+                                    {
+                                        return model.agentName;
+                                    }
+
+
+                                    Binding {
+                                        target : agentTOEffectMappingCombo
+                                        property : "selectedItem"
+                                        value : if (myEffect && myEffect.effect)
+                                                {
+                                                    myEffect.effect.agentModel;
+                                                } else {
+                                                    null;
+                                                }
+                                    }
+
+
+                                    onSelectedItemChanged:
+                                    {
+                                        if (myEffect && myEffect.effect)
+                                        {
+                                            myEffect.effect.agentModel = agentTOEffectMappingCombo.selectedItem;
+                                        }
+                                    }
+
+                                }
+
+                                // Agent TO Intpus
+                                MasticComboBox {
+                                    id : oEffectsMappingTOCombo
+
+                                    enabled : visible
+                                    anchors {
+                                        right : parent.right
+                                        bottom : parent.bottom
+                                    }
+
+                                    height : 25
+                                    width : 148
+
+                                    model : (myEffect && myEffect.effect && myEffect.effect.agentModel) ? myEffect.effect.agentModel.inputsList : 0
+                                    function modelToString(model)
+                                    {
+                                        return model.name;
+                                    }
+
+
+                                    Binding {
+                                        target : oEffectsMappingTOCombo
+                                        property : "selectedItem"
+                                        value : if (myEffect && myEffect.effect)
+                                                {
+                                                    myEffect.effect.agentIOP;
+                                                } else {
+                                                    null;
+                                                }
+                                    }
+
+
+                                    onSelectedItemChanged:
+                                    {
+                                        if (myEffect && myEffect.effect)
+                                        {
+                                            myEffect.effect.agentIOP = oEffectsMappingTOCombo.selectedItem;
+                                        }
+                                    }
+
+                                }
+
 
                             }
 
@@ -1638,25 +1884,59 @@ I2PopupBase {
 
             }
 
-            //        Button {
-            //            id: btnDeleteEditor
 
-            //            anchors {
-            //                right: btnCancelEditor.left
-            //                bottom: parent.bottom
-            //                rightMargin: 10
-            //            }
+            // Delete Action
+            MouseArea {
+                id : actionDeleteBtn
 
-            //            text: "SUPPRIMER"
+                anchors {
+                    left : parent.left
+                    leftMargin: 15
+                    verticalCenter: cancelButton.verticalCenter
+                    verticalCenterOffset: 2
+                }
 
-            //            onClicked: {
+                height : actionDelete.height
+                width : actionDelete.width
 
-            //                if(controller)
-            //                {
-            //                    controller.deleteActionEditor(model.QtObject);
-            //                }
-            //            }
-            //        }
+                hoverEnabled: true
+                onClicked: {
+                    if (controller && actionM) {
+                        controller.deleteAction(actionM);
+                    }
+                }
+
+                Text {
+                    id: actionDelete
+
+                    anchors {
+                        left : parent.left
+                    }
+                    text : "Delete Action"
+                    color: actionDeleteBtn.pressed ? MasticTheme.greyColor : MasticTheme.lightGreyColor
+                    elide: Text.ElideRight
+
+                    font {
+                        family: MasticTheme.textFontFamily
+                        pixelSize: 16
+                    }
+                }
+
+                // underline
+                Rectangle {
+                    visible: actionDeleteBtn.containsMouse
+
+                    anchors {
+                        left : actionDeleteBtn.left
+                        right : actionDelete.right
+                        bottom : parent.bottom
+                    }
+
+                    height : 1
+
+                    color : actionDelete.color
+                }
+            }
 
 
             Button {

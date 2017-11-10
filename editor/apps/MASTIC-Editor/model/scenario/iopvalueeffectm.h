@@ -58,6 +58,18 @@ public:
       */
     ~IOPValueEffectM();
 
+    /**
+      * @brief Redefinition of action effect copy
+      */
+    void copyFrom(ActionEffectM* effect);
+
+    /**
+    * @brief Custom setter on set agent model
+    *        to fill inputs and outputs
+    * @param agentModel
+    */
+    bool setagentModel(AgentInMappingVM* agentModel);
+
 
 
 Q_SIGNALS:

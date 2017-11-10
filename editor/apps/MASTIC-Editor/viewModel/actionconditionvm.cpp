@@ -58,9 +58,6 @@ ActionConditionVM::ActionConditionVM(QObject *parent) : QObject(parent),
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
-
-    // Create an initial action condition
-    setcondition(new ActionConditionM(this));
 }
 
 

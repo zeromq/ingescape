@@ -93,7 +93,12 @@ void registerCustomQmlTypes()
     qmlRegisterUncreatableType<Enums>(uri, 1, 0, "Enums", "Internal class");
     qmlRegisterUncreatableType<OutputM>(uri, 1, 0, "OutputM", "Internal class");
     qmlRegisterUncreatableType<PublishedValueM>(uri, 1, 0, "PublishedValueM", "Internal class");
-
+    qmlRegisterUncreatableType<ActionConditionM>(uri, 1, 0, "ActionConditionM", "Internal class");
+    qmlRegisterUncreatableType<ActionEffectM>(uri, 1, 0, "ActionEffectM", "Internal class");
+    qmlRegisterUncreatableType<ActionM>(uri, 1, 0, "ActionM", "Internal class");
+    qmlRegisterUncreatableType<IOPValueConditionM>(uri, 1, 0, "IOPValueConditionM", "Internal class");
+    qmlRegisterUncreatableType<IOPValueEffectM>(uri, 1, 0, "IOPValueEffectM", "Internal class");
+    qmlRegisterUncreatableType<MappingEffectM>(uri, 1, 0, "MappingEffectM", "Internal class");
 
     //---------------
     //
@@ -106,6 +111,10 @@ void registerCustomQmlTypes()
     qmlRegisterUncreatableType<MapBetweenIOPVM>(uri, 1, 0, "MapBetweenIOPVM", "Internal class");
     qmlRegisterUncreatableType<OutputVM>(uri, 1, 0, "OutputVM", "Internal class");
     qmlRegisterUncreatableType<PointMapVM>(uri, 1, 0, "PointMapVM", "Internal class");
+    qmlRegisterUncreatableType<ActionVM>(uri, 1, 0, "ActionVM", "Internal class");
+    qmlRegisterUncreatableType<ActionInPaletteVM>(uri, 1, 0, "ActionInPaletteVM", "Internal class");
+    qmlRegisterUncreatableType<ActionEffectVM>(uri, 1, 0, "ActionEffectVM", "Internal class");
+    qmlRegisterUncreatableType<ActionConditionVM>(uri, 1, 0, "ActionConditionVM", "Internal class");
 
 
     //------------------
