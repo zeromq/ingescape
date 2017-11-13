@@ -90,6 +90,9 @@ ScenarioController::~ScenarioController()
     // Clean-up current selection
     setselectedAction(NULL);
 
+    // Delete actions VM from the timeline
+    _actionsInTimeLine.deleteAllItems();
+
     // Delete actions VM from the palette
     _actionsInPaletteList.deleteAllItems();
 
@@ -284,10 +287,25 @@ void ScenarioController::_importScenarioFromFile(QString scenarioFilePath)
                 jsonFile.close();
 
                 // Initialize agents list from JSON file
-                QList<ActionM*> agentsListToImport = _jsonHelper->initActionsList(byteArrayOfJson, _agentsInMappingList.toList());
+                QPair< QPair< QList<ActionM*>, QList<ActionInPaletteVM*> > , QList<ActionVM*> > scenarioToImport = _jsonHelper->initActionsList(byteArrayOfJson, _agentsInMappingList.toList());
 
                 // Append the list of actions
-                _actionsList.append(agentsListToImport);
+                if(scenarioToImport.first.first.count() > 0)
+                {
+                    _actionsList.append(scenarioToImport.first.first);
+                }
+
+                // Append the list of actions in palette
+                if(scenarioToImport.first.second.count() > 0)
+                {
+                    _actionsInPaletteList.append(scenarioToImport.first.second);
+                }
+
+                // Append the list of actions in timeline
+                if(scenarioToImport.second.count() > 0)
+                {
+                    _actionsInTimeLine.append(scenarioToImport.second);
+                }
             }
             else {
                 qCritical() << "Can not open file" << scenarioFilePath;

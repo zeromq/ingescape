@@ -37,13 +37,17 @@ class MappingEffectM: public ActionEffectM
     I2_QML_PROPERTY(AgentIOPM *, fromAgentIOP)
 
     // TO Agent model
-    I2_QML_PROPERTY(AgentInMappingVM *, toAgentModel)
+    I2_QML_PROPERTY_CUSTOM_SETTER(AgentInMappingVM *, toAgentModel)
 
     // TO Agent IOP
     I2_QML_PROPERTY(AgentIOPM *, toAgentIOP)
 
-    // Enable state to set
-    I2_QML_PROPERTY(bool, isEnabled)
+    // Concatened list of FROM iop agents items
+    I2_QOBJECT_LISTMODEL(AgentIOPM , fromAgentIopList)
+
+    // Concatened list of TO iop agents items
+    I2_QOBJECT_LISTMODEL(AgentIOPM , toAgentIopList)
+
 
 public:
 
@@ -63,6 +67,13 @@ public:
       * @brief Redefinition of action effect copy
       */
     void copyFrom(ActionEffectM* effect);
+
+    /**
+    * @brief Custom setter on set agent model
+    *        to fill inputs and outputs
+    * @param agentModel
+    */
+    bool setagentModel(AgentInMappingVM* agentModel);
 
 Q_SIGNALS:
 

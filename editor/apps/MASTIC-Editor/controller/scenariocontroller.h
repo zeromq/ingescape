@@ -68,6 +68,9 @@ class ScenarioController: public QObject
     // List of actions in palette
     I2_QOBJECT_LISTMODEL(ActionInPaletteVM, actionsInPaletteList)
 
+    // List of actions in timeline
+    I2_QOBJECT_LISTMODEL(ActionVM, actionsInTimeLine)
+
 public:
 
     /**
