@@ -47,6 +47,12 @@ public:
     ~ValuesHistorySortFilter();
 
 
+    /**
+     * @brief Update the filter
+     */
+    void updateFilter();
+
+
 Q_SIGNALS:
 
 
