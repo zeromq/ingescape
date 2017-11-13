@@ -21,6 +21,8 @@
 #include <I2PropertyHelpers.h>
 
 #include <controller/masticmodelmanager.h>
+#include <sortFilter/valueshistorysortfilter.h>
+
 
 /**
  * @brief The ValuesHistoryController class defines the controller for history of values
@@ -30,13 +32,19 @@ class ValuesHistoryController : public QObject
     Q_OBJECT
 
     // List of filtered (and sorted) values
-    I2_QOBJECT_SORTFILTERPROXY(PublishedValueM, filteredValues)
+    Q_PROPERTY(ValuesHistorySortFilter* filteredValues READ filteredValues CONSTANT)
 
-    // List with all agent Input/Output/Parameter Types
+    // List with all agent Input/Output/Parameter types
     I2_ENUM_LISTMODEL(AgentIOPTypes, allAgentIOPTypes)
+
+    // List with types of selected agent Input/Output/Parameter
+    I2_ENUM_LISTMODEL(AgentIOPTypes, selectedAgentIOPTypes)
 
     // List with all agent names
     I2_QML_PROPERTY_READONLY(QStringList, allAgentNamesList)
+
+    // List with names of selected agents
+    I2_QML_PROPERTY_READONLY(QStringList, selectedAgentNamesList)
 
 
 public:
@@ -52,6 +60,16 @@ public:
      * @brief Destructor
      */
     ~ValuesHistoryController();
+
+
+    /**
+     * @brief Get our filtered list of values
+     * @return
+     */
+    ValuesHistorySortFilter* filteredValues()
+    {
+        return &_filteredValues;
+    }
 
 
     /**
@@ -101,6 +119,13 @@ public Q_SLOTS:
     void onAgentInMappingRemoved(QString agentName);
 
 
+    /**
+     * @brief Slot called when we have to filter values to show only those of the agent (with the name)
+     * @param agentName
+     */
+    void filterValuesToShowOnlyAgent(QString agentName);
+
+
 private:
     /**
      * @brief Update the filters on the list of values
@@ -112,13 +137,8 @@ private:
     // Manager for the data model of MASTIC
     MasticModelManager* _modelManager;
 
-    // List with types of selected agent Input/Output/Parameter
-    QList<AgentIOPTypes::Value> _selectedAgentIOPTypes;
-    //QStringList _selectedAgentIOPTypes;
-
-    // List with names of selected agents
-    QStringList _selectedAgentNamesList;
-
+    // List of filtered (and sorted) values
+    ValuesHistorySortFilter _filteredValues;
 };
 
 QML_DECLARE_TYPE(ValuesHistoryController)
