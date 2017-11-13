@@ -27,6 +27,7 @@
 #include <controller/agentsmappingcontroller.h>
 #include <controller/networkcontroller.h>
 #include <controller/scenariocontroller.h>
+#include <controller/valueshistorycontroller.h>
 
 #include <misc/terminationsignalwatcher.h>
 
@@ -65,6 +66,9 @@ class MasticEditorController : public QObject
 
     // Controller for scenario management
     I2_QML_PROPERTY_READONLY(ScenarioController*, scenarioC)
+
+    // Controller for the history of values
+    I2_QML_PROPERTY_READONLY(ValuesHistoryController*, valuesHistoryC)
 
 
 public:

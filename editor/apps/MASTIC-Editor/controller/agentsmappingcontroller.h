@@ -71,6 +71,20 @@ public:
 Q_SIGNALS:
 
     /**
+     * @brief Emitted when a new "Agent in Mapping" is added
+     * @param agentName
+     */
+    void agentInMappingAdded(QString agentName);
+
+
+    /**
+     * @brief Emitted when an "Agent in Mapping" is removed
+     * @param agentName
+     */
+    void agentInMappingRemoved(QString agentName);
+
+
+    /**
      * @brief Emitted when inputs must be added to our Editor for a list of outputs
      * @param agentName
      * @param outputsList

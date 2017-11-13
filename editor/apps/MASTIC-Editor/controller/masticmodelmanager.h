@@ -32,14 +32,14 @@ class MasticModelManager : public QObject
 {
     Q_OBJECT
 
-    // List of all models of agents
-    //I2_QOBJECT_LISTMODEL(AgentM, allAgents)
-
     // List of opened definitions
     I2_QOBJECT_LISTMODEL(DefinitionM, openedDefinitions)
 
     // Flag indicating if our global mapping is activated
     I2_QML_PROPERTY(bool, isActivatedMapping)
+
+    // List of all published values
+    I2_QOBJECT_LISTMODEL(PublishedValueM, publishedValues)
 
 
 public:

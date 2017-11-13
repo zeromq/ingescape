@@ -649,9 +649,9 @@ I2PopupBase {
                                         property : "selectedItem"
                                         value : if (myCondition && myCondition.condition && controller)
                                                 {
-                                                     (myCondition && myCondition.conditionType === ActionConditionType.VALUE) ?
-                                                         controller.comparisonsValuesTypesList.getItemWithValue(myCondition.condition.comparison)
-                                                       :  controller.comparisonsAgentsTypesList.getItemWithValue(myCondition.condition.comparison);
+                                                    (myCondition && myCondition.conditionType === ActionConditionType.VALUE) ?
+                                                                controller.comparisonsValuesTypesList.getItemWithValue(myCondition.condition.comparison)
+                                                              :  controller.comparisonsAgentsTypesList.getItemWithValue(myCondition.condition.comparison);
                                                 } else {
                                                     null;
                                                 }
@@ -914,6 +914,7 @@ I2PopupBase {
                         anchors {
                             left : revertActionCB.right
                             leftMargin: 14
+                            right : parent.right
                             top: revertActionCB.top
                         }
                         spacing: 6
@@ -939,7 +940,7 @@ I2PopupBase {
                                         verticalCenter: parent.verticalCenter
                                         verticalCenterOffset: 2
                                     }
-                                    color: control.checked? MasticTheme.lightGreyColor : MasticTheme.greyColor
+                                    color: control.enabled ? (control.checked? MasticTheme.lightGreyColor : MasticTheme.greyColor) : "#3C3C3B"
 
                                     text: "At end of conditions check duration"
                                     elide: Text.ElideRight
@@ -955,7 +956,7 @@ I2PopupBase {
                                     implicitHeight: 14
                                     radius : height / 2
                                     border.width: 0;
-                                    color : MasticTheme.darkBlueGreyColor
+                                    color : control.enabled ?  MasticTheme.darkBlueGreyColor : "#3C3C3B"
 
                                     Rectangle {
                                         anchors.centerIn: parent
@@ -985,144 +986,162 @@ I2PopupBase {
                             }
                         }
 
-                        CheckBox {
-                            id : revertActionAfterCB
+                        Row {
                             anchors {
                                 left: parent.left;
+                                right :parent.right
                             }
+                            height : 25
 
-
-                            checked : actionM && actionM.shallRevertAfterTime;
-                            exclusiveGroup: revertActionOpt
-                            activeFocusOnPress: true;
-
-                            style: CheckBoxStyle {
-                                label: Row {
-                                    spacing : 4
-
-                                    Text {
-                                        anchors {
-                                            verticalCenter: parent.verticalCenter
-                                            verticalCenterOffset: 2
-                                        }
-                                        color: control.checked? MasticTheme.lightGreyColor : MasticTheme.greyColor
-
-                                        text: "After"
-                                        elide: Text.ElideRight
-
-                                        font {
-                                            family: MasticTheme.textFontFamily
-                                            pixelSize: 16
-                                        }
-                                    }
-
-
-                                    TextField {
-                                        id: textFieldDuration
-
-                                        anchors {
-                                            verticalCenter: parent.verticalCenter
-                                            verticalCenterOffset: 2
-                                        }
-
-                                        height: 25
-                                        width: 57
-                                        enabled: control.checked
-                                        horizontalAlignment: TextInput.AlignLeft
-                                        verticalAlignment: TextInput.AlignVCenter
-
-                                        text : actionM ? actionM.revertAfterTimeString : "0.0"
-                                        inputMethodHints: Qt.ImhFormattedNumbersOnly
-                                        validator: RegExpValidator { regExp: /(\d{1,4})([.]\d{3})?$/ }
-
-                                        style: I2TextFieldStyle {
-                                            backgroundColor: MasticTheme.darkBlueGreyColor
-                                            borderColor: MasticTheme.lightGreyColor;
-                                            borderErrorColor: MasticTheme.redColor
-                                            radiusTextBox: 1
-                                            borderWidth: 0;
-                                            borderWidthActive: 1
-                                            textColor: MasticTheme.lightGreyColor;
-
-                                            padding.left: 3
-                                            padding.right: 3
-
-                                            font {
-                                                pixelSize:15
-                                                family: MasticTheme.textFontFamily
-                                            }
-
-                                        }
-
-                                        onTextChanged: {
-                                            if (activeFocus &&  actionM ) {
-                                                actionM.revertAfterTimeString = text;
-                                            }
-                                        }
-
-                                        Binding {
-                                            target : textFieldDuration
-                                            property :  "text"
-                                            value : if (actionM) {
-                                                        actionM.revertAfterTimeString
-                                                    }
-                                                    else {
-                                                        "";
-                                                    }
-                                        }
-                                    }
-
-
-                                    Text {
-                                        anchors {
-                                            verticalCenter: parent.verticalCenter
-                                            verticalCenterOffset: 2
-                                        }
-                                        color: control.checked? MasticTheme.lightGreyColor : MasticTheme.greyColor
-
-                                        text: "seconds"
-                                        elide: Text.ElideRight
-
-                                        font {
-                                            family: MasticTheme.textFontFamily
-                                            pixelSize: 16
-                                        }
-                                    }
+                            CheckBox {
+                                id : revertActionAfterCB
+                                anchors {
+                                    verticalCenter: parent.verticalCenter
                                 }
 
+                                checked : actionM && actionM.shallRevertAfterTime;
+                                exclusiveGroup: revertActionOpt
+                                activeFocusOnPress: true;
 
-                                indicator: Rectangle {
-                                    implicitWidth: 14
-                                    implicitHeight: 14
-                                    radius : height / 2
-                                    border.width: 0;
-                                    color : MasticTheme.darkBlueGreyColor
+                                style: CheckBoxStyle {
+                                    label: Text {
+                                        anchors {
+                                            verticalCenter: parent.verticalCenter
+                                            verticalCenterOffset: 2
+                                        }
+                                        color: control.enabled ? (control.checked? MasticTheme.lightGreyColor : MasticTheme.greyColor) : "#3C3C3B"
 
-                                    Rectangle {
-                                        anchors.centerIn: parent
-                                        visible : control.checked
-                                        width: 8
-                                        height: 8
+                                        text: "After " // space allowing to keep selection possible for the whole row
+
+                                        elide: Text.ElideRight
+
+                                        font {
+                                            family: MasticTheme.textFontFamily
+                                            pixelSize: 16
+                                        }
+                                    }
+
+                                    indicator: Rectangle {
+                                        implicitWidth: 14
+                                        implicitHeight: 14
                                         radius : height / 2
-
                                         border.width: 0;
-                                        color : MasticTheme.lightGreyColor
+                                        color : control.enabled ?  MasticTheme.darkBlueGreyColor : "#3C3C3B"
+
+                                        Rectangle {
+                                            anchors.centerIn: parent
+                                            visible : control.checked
+                                            width: 8
+                                            height: 8
+                                            radius : height / 2
+
+                                            border.width: 0;
+                                            color : MasticTheme.lightGreyColor
+                                        }
+                                    }
+
+                                }
+
+                                onCheckedChanged : {
+                                    if (actionM) {
+                                        actionM.shallRevertAfterTime = checked
                                     }
                                 }
 
-                            }
-
-                            onCheckedChanged : {
-                                if (actionM) {
-                                    actionM.shallRevertAfterTime = checked
+                                Binding {
+                                    target : revertActionAfterCB
+                                    property : "checked"
+                                    value : (actionM && actionM.shallRevertAfterTime)
                                 }
                             }
 
 
-                            Binding {
-                                target : revertActionAfterCB
-                                property : "checked"
-                                value : (actionM && actionM.shallRevertAfterTime)
+                            TextField {
+                                id: textFieldDuration
+
+                                anchors {
+                                    verticalCenter: parent.verticalCenter
+                                    verticalCenterOffset: 2
+                                }
+
+                                height: 25
+                                width: 57
+                                enabled: revertActionAfterCB.enabled
+                                horizontalAlignment: TextInput.AlignLeft
+                                verticalAlignment: TextInput.AlignVCenter
+
+                                text : actionM ? actionM.revertAfterTimeString : "0.0"
+                                inputMethodHints: Qt.ImhFormattedNumbersOnly
+                                validator: RegExpValidator { regExp: /(\d{1,4})([.]\d{3})?$/ }
+
+                                style: I2TextFieldStyle {
+                                    backgroundColor: MasticTheme.darkBlueGreyColor
+                                    backgroundDisabledColor: "#3C3C3B"
+                                    borderColor: MasticTheme.lightGreyColor;
+                                    borderErrorColor: MasticTheme.redColor
+                                    radiusTextBox: 1
+                                    borderWidth: 0;
+                                    borderWidthActive: 1
+                                    textColor: MasticTheme.lightGreyColor;
+                                    textDisabledColor: MasticTheme.darkGreyColor;
+
+                                    padding.left: 3
+                                    padding.right: 3
+
+                                    font {
+                                        pixelSize:14
+                                        family: MasticTheme.textFontFamily
+                                    }
+
+                                }
+
+                                onTextChanged: {
+                                    if (activeFocus &&  actionM ) {
+                                        actionM.revertAfterTimeString = text;
+                                    }
+                                }
+
+                                Binding {
+                                    target : textFieldDuration
+                                    property :  "text"
+                                    value : if (actionM) {
+                                                actionM.revertAfterTimeString
+                                            }
+                                            else {
+                                                "";
+                                            }
+                                }
+
+                                onFocusChanged: {
+                                    if (focus) {
+                                       revertActionAfterCB.checked = true;
+                                    }
+                                }
+                            }
+
+
+                            Text {
+                                anchors {
+                                    verticalCenter: parent.verticalCenter
+                                    verticalCenterOffset: 2
+                                }
+                                color: revertActionAfterCB.enabled ? (revertActionAfterCB.checked? MasticTheme.lightGreyColor : MasticTheme.greyColor) : "#3C3C3B"
+
+                                text: " seconds"
+                                elide: Text.ElideRight
+
+                                font {
+                                    family: MasticTheme.textFontFamily
+                                    pixelSize: 16
+                                }
+
+                                MouseArea {
+                                    anchors.fill: parent
+
+                                    onPressed: {
+                                        revertActionAfterCB.checked = true;
+                                    }
+                                }
                             }
                         }
 
@@ -1657,7 +1676,7 @@ I2PopupBase {
                                         property : "selectedItem"
                                         value : if (myEffect && myEffect.effect)
                                                 {
-                                                    myEffect.effect.agentIOP;
+                                                    myEffect.effect.fromAgentIOP;
                                                 } else {
                                                     null;
                                                 }
@@ -1668,7 +1687,7 @@ I2PopupBase {
                                     {
                                         if (myEffect && myEffect.effect)
                                         {
-                                            myEffect.effect.agentIOP = oEffectsMappingFROMCombo.selectedItem;
+                                            myEffect.effect.fromAgentIOP = oEffectsMappingFROMCombo.selectedItem;
                                         }
                                     }
 
@@ -1678,10 +1697,10 @@ I2PopupBase {
                                 Item {
                                     id : disableMappingItem
                                     anchors {
-                                       left : agentFROMEffectMappingCombo.right
-                                       right : agentTOEffectMappingCombo.left
-                                       top : agentFROMEffectMappingCombo.top
-                                       bottom : parent.bottom
+                                        left : agentFROMEffectMappingCombo.right
+                                        right : agentTOEffectMappingCombo.left
+                                        top : agentFROMEffectMappingCombo.top
+                                        bottom : parent.bottom
                                     }
                                     clip : true
 
@@ -1693,6 +1712,7 @@ I2PopupBase {
                                         }
                                         color : MasticTheme.blackColor
                                         height : 1
+
                                     }
 
                                     Rectangle {
@@ -1704,7 +1724,8 @@ I2PopupBase {
                                             topMargin: agentFROMEffectMappingCombo.height/2
                                             bottomMargin: agentFROMEffectMappingCombo.height/2
                                         }
-                                        color : MasticTheme.darkBlueGreyColor
+                                        width : 12
+                                        color : MasticTheme.veryDarkGreyColor
                                         border {
                                             width: 1
                                             color : MasticTheme.blackColor
@@ -1720,7 +1741,8 @@ I2PopupBase {
                                             topMargin: agentFROMEffectMappingCombo.height/2
                                             bottomMargin: agentFROMEffectMappingCombo.height/2
                                         }
-                                        color : MasticTheme.darkBlueGreyColor
+                                        width : 12
+                                        color : MasticTheme.veryDarkGreyColor
                                         border {
                                             width: 1
                                             color : MasticTheme.blackColor
@@ -1755,7 +1777,7 @@ I2PopupBase {
                                         property : "selectedItem"
                                         value : if (myEffect && myEffect.effect)
                                                 {
-                                                    myEffect.effect.agentModel;
+                                                    myEffect.effect.toAgentModel;
                                                 } else {
                                                     null;
                                                 }
@@ -1766,7 +1788,7 @@ I2PopupBase {
                                     {
                                         if (myEffect && myEffect.effect)
                                         {
-                                            myEffect.effect.agentModel = agentTOEffectMappingCombo.selectedItem;
+                                            myEffect.effect.toAgentModel = agentTOEffectMappingCombo.selectedItem;
                                         }
                                     }
 
@@ -1774,7 +1796,7 @@ I2PopupBase {
 
                                 // Agent TO Intpus
                                 MasticComboBox {
-                                    id : oEffectsMappingTOCombo
+                                    id : iEffectsMappingTOCombo
 
                                     enabled : visible
                                     anchors {
@@ -1785,7 +1807,7 @@ I2PopupBase {
                                     height : 25
                                     width : 148
 
-                                    model : (myEffect && myEffect.effect && myEffect.effect.agentModel) ? myEffect.effect.agentModel.inputsList : 0
+                                    model : (myEffect && myEffect.effect && myEffect.effect.toAgentModel) ? myEffect.effect.toAgentModel.inputsList : 0
                                     function modelToString(model)
                                     {
                                         return model.name;
@@ -1793,11 +1815,11 @@ I2PopupBase {
 
 
                                     Binding {
-                                        target : oEffectsMappingTOCombo
+                                        target : iEffectsMappingTOCombo
                                         property : "selectedItem"
                                         value : if (myEffect && myEffect.effect)
                                                 {
-                                                    myEffect.effect.agentIOP;
+                                                    myEffect.effect.toAgentIOP;
                                                 } else {
                                                     null;
                                                 }
@@ -1808,7 +1830,7 @@ I2PopupBase {
                                     {
                                         if (myEffect && myEffect.effect)
                                         {
-                                            myEffect.effect.agentIOP = oEffectsMappingTOCombo.selectedItem;
+                                            myEffect.effect.toAgentIOP = iEffectsMappingTOCombo.selectedItem;
                                         }
                                     }
 
