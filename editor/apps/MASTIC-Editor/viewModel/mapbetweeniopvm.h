@@ -42,8 +42,6 @@ class MapBetweenIOPVM : public QObject
     // View model of the input slot associated to our link
     I2_QML_PROPERTY_DELETE_PROOF(InputVM*, pointTo)
 
-    // Flag indicating if a new value is published on the output
-    I2_QML_PROPERTY_READONLY(bool, isNewValueOnOutput)
 
 public:
 

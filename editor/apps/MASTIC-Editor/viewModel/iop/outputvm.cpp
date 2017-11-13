@@ -174,8 +174,6 @@ void OutputVM::_onCurrentValueOfModelChanged(QVariant value)
     if (!_isPublishedNewValue) {
         setisPublishedNewValue(true);
 
-        qDebug() << "SET flag for output" << _name;
-
         // Start the timer to reset the flag "is Published New Value"
         _timer.start();
     }
@@ -193,7 +191,5 @@ void OutputVM::_onTimeout()
     if (_isPublishedNewValue) {
         // Reset the flag
         setisPublishedNewValue(false);
-
-        qDebug() << "RE-set flag for output" << _name;
     }
 }
