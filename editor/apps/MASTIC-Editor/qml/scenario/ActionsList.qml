@@ -172,7 +172,8 @@ Item {
                     verticalCenter: parent.verticalCenter
                 }
 
-                style: Theme.LabellessSvgButtonStyle {
+                enabled: controller && controller.agentsInMappingList.count > 0
+                style : Theme.LabellessSvgButtonStyle {
                     fileCache: MasticTheme.svgFileMASTIC
 
                     pressedID: releasedID + "-pressed"
