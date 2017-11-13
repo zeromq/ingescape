@@ -521,96 +521,98 @@ QList<ActionM*> JsonHelper::initActionsList(QByteArray byteArrayOfJson, QList<Ag
     Q_UNUSED(listAgentsInMapping)
     QList<ActionM*> actionsListToImport;
 
-//    QJsonDocument jsonFileRoot = QJsonDocument::fromJson(byteArrayOfJson);
-//    if (jsonFileRoot.isObject())
-//    {
-//        QJsonObject jsonActionsRoot = jsonFileRoot.toObject();
-//        QJsonValue jsonActionsList = jsonActionsRoot.value("actions");
+    QJsonDocument jsonFileRoot = QJsonDocument::fromJson(byteArrayOfJson);
+    if (jsonFileRoot.isObject())
+    {
+        QJsonObject jsonActionsRoot = jsonFileRoot.object();
+        QJsonValue jsonActionsList = jsonActionsRoot.value("actions");
 
-//        if(jsonActionsList.isArray())
-//        {
-//            foreach (QJsonValue jsonAction, jsonActionsList.array())
-//            {
-//                if (jsonAction.isObject())
-//                {
-//                    ActionM* actionM = NULL;
+        if(jsonActionsList.isArray())
+        {
+            foreach (QJsonValue jsonTmp, jsonActionsList.toArray())
+            {
+                if (jsonTmp.isObject())
+                {
+                    ActionM* actionM = NULL;
 
-//                    QJsonValue jsonName = jsonAction.value("name");
-//                    if(jsonName.isString())
-//                    {
-//                        // Create the model
-//                        actionM = new ActionM(jsonName.toString());
+                    QJsonObject jsonAction = jsonTmp.toObject();
+                    QJsonValue jsonName = jsonAction.value("name");
+                    if(jsonName.isString())
+                    {
+                        // Create the model
+                        actionM = new ActionM(jsonName.toString());
 
-//                        QJsonValue jsonValue = jsonAction.value("validity_duration_type");
-//                        if(jsonValue.isString())
-//                        {
-//                            int validationDurationType = ValidationDurationType::enumFromKey(jsonValue.toString());
-//                            actionM->setvalidityDuration((ValidationDurationType::Value)validationDurationType);
-//                        }
+                        QJsonValue jsonValue = jsonAction.value("validity_duration_type");
+                        if(jsonValue.isString())
+                        {
+                            int validationDurationType = ValidationDurationType::staticEnumFromKey(jsonValue.toString());
+                            actionM->setvalidityDuration((ValidationDurationType::Value)validationDurationType);
+                        }
 
-//                        jsonValue = jsonAction.value("validity_duration_value");
-//                        if(jsonValue.isString())
-//                        {
-//                            actionM->setvalidityDurationString(jsonValue.toString());
-//                        }
+                        jsonValue = jsonAction.value("validity_duration_value");
+                        if(jsonValue.isString())
+                        {
+                            actionM->setvalidityDurationString(jsonValue.toString());
+                        }
 
-//                        jsonValue = jsonAction.value("shall_revert");
-//                        if(jsonValue.isBool())
-//                        {
-//                            actionM->setshallRevert(jsonValue.toBool());
-//                        }
+                        jsonValue = jsonAction.value("shall_revert");
+                        if(jsonValue.isBool())
+                        {
+                            actionM->setshallRevert(jsonValue.toBool());
+                        }
 
-//                        jsonValue = jsonAction.value("shall_revert_at_validity_end");
-//                        if(jsonValue.isBool())
-//                        {
-//                            actionM->setshallRevertWhenValidityIsOver(jsonValue.toBool());
-//                        }
+                        jsonValue = jsonAction.value("shall_revert_at_validity_end");
+                        if(jsonValue.isBool())
+                        {
+                            actionM->setshallRevertWhenValidityIsOver(jsonValue.toBool());
+                        }
 
-//                        jsonValue = jsonAction.value("shall_revert_after_time");
-//                        if(jsonValue.isBool())
-//                        {
-//                            actionM->setshallRevertAfterTime(jsonValue.toBool());
-//                        }
+                        jsonValue = jsonAction.value("shall_revert_after_time");
+                        if(jsonValue.isBool())
+                        {
+                            actionM->setshallRevertAfterTime(jsonValue.toBool());
+                        }
 
-//                        jsonValue = jsonAction.value("shall_rearm");
-//                        if(jsonValue.isBool())
-//                        {
-//                            actionM->setshallRearm(jsonValue.toBool());
-//                        }
+                        jsonValue = jsonAction.value("shall_rearm");
+                        if(jsonValue.isBool())
+                        {
+                            actionM->setshallRearm(jsonValue.toBool());
+                        }
 
-//                        jsonValue = jsonAction.value("revert_after_time");
-//                        if(jsonValue.isDouble())
-//                        {
-//                            actionM->setshallRearm(jsonValue.toDouble());
-//                        }
+                        jsonValue = jsonAction.value("revert_after_time");
+                        if(jsonValue.isDouble())
+                        {
+                            actionM->setshallRearm(jsonValue.toDouble());
+                        }
 
-//                        QJsonValue jsonEffectsList = jsonAction.value("effects");
-//                        if(jsonEffectsList.isArray())
-//                        {
-//                            foreach (QJsonValue jsonEffect, jsonEffectsList.array())
-//                            {
-//                                if (jsonEffect.isObject())
-//                                {
-//                                    ActionEffectVM* effectVM = _parseEffectVMFromJson(jsonEffect, listAgentsInMapping);
+                        QJsonValue jsonEffectsList = jsonAction.value("effects");
+                        if(jsonEffectsList.isArray())
+                        {
+                            foreach (QJsonValue jsonEffect, jsonEffectsList.toArray())
+                            {
+                                if (jsonEffect.isObject())
+                                {
+                                    QJsonObject jsonEffectObj = jsonEffect.toObject();
+                                    ActionEffectVM* effectVM = _parseEffectVMFromJson(jsonEffectObj, listAgentsInMapping);
 
-//                                    if(effectVM != NULL)
-//                                    {
-//                                        actionM->effectsList()->append(effectVM);
-//                                    }
-//                                }
-//                            }
-//                        }
+                                    if(effectVM != NULL)
+                                    {
+                                        actionM->effectsList()->append(effectVM);
+                                    }
+                                }
+                            }
+                        }
 
-//                    }
+                    }
 
-//                    if(actionVM != NULL)
-//                    {
-//                        actionsListToImport.append(actionVM);
-//                    }
-//                }
-//            }
-//        }
-//    }
+                    if(actionM != NULL)
+                    {
+                        actionsListToImport.append(actionM);
+                    }
+                }
+            }
+        }
+    }
 
     return actionsListToImport;
 }
@@ -630,7 +632,7 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
 //    QJsonValue jsonValue = jsonEffect.value("type");
 //    if(jsonValue.isString())
 //    {
-//        int effectType = ActionEffectType::enumFromKey(jsonType.toString());
+//        int effectType = ActionEffectType::staticEnumFromKey(jsonValue.toString());
 //        if(effectType >= 0)
 //        {
 //            switch (actionEffectVM->effectType())
@@ -650,7 +652,7 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
 //                        {
 //                            if(agent->agentName() == agentAgentName)
 //                            {
-//                                foreach (InputVM* inputVM, agent->inputsList)
+//                                foreach (InputVM* inputVM, agent->inputsList()->toList())
 //                                {
 //                                    if(inputVM->name() == agentIOPName)
 //                                    {
@@ -662,9 +664,17 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
 //                                if(found == true)
 //                                {
 //                                    break;
+//                                } else {
+//                                    foreach (OutputVM* outputVM, agent->outputsList()->toList())
+//                                    {
+//                                        if(outputVM->name() == agentIOPName)
+//                                        {
+//                                            found = true;
+//                                            break;
+//                                        }
+//                                    }
 //                                }
 //                            }
-
 //                        }
 
 //                        if(found == true)

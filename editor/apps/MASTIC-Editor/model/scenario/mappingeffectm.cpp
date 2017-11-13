@@ -32,7 +32,8 @@
 MappingEffectM::MappingEffectM(QObject *parent) : ActionEffectM(parent),
     _fromAgentIOP(NULL),
     _toAgentModel(NULL),
-    _toAgentIOP(NULL)
+    _toAgentIOP(NULL),
+    _isEnabled(false)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -71,6 +72,7 @@ void MappingEffectM::copyFrom(ActionEffectM *effect)
         setfromAgentIOP(mappingEffect->fromAgentIOP());
         settoAgentIOP(mappingEffect->toAgentIOP());
         settoAgentModel(mappingEffect->toAgentModel());
+        setisEnabled(mappingEffect->isEnabled());
     }
 }
 

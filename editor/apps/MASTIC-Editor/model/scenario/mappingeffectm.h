@@ -42,6 +42,9 @@ class MappingEffectM: public ActionEffectM
     // TO Agent IOP
     I2_QML_PROPERTY(AgentIOPM *, toAgentIOP)
 
+    // Enable state to set
+    I2_QML_PROPERTY(bool, isEnabled)
+
 public:
 
     /**
