@@ -67,8 +67,7 @@ ActionM::ActionM(QString name, QObject *parent) : QObject(parent),
     _shallRevertAfterTime(false),
     _revertAfterTime(-1),
     _revertAfterTimeString("0.0"),
-    _shallRearm(false),
-    _actionsPanelIndex(-1)
+    _shallRearm(false)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -105,7 +104,6 @@ void ActionM::copyFrom(ActionM* actionModel)
         setrevertAfterTime(actionModel->revertAfterTime());
         setrevertAfterTimeString(actionModel->revertAfterTimeString());
         setshallRearm(actionModel->shallRearm());
-        setactionsPanelIndex(actionModel->actionsPanelIndex());
 
         _effectsList.deleteAllItems();
         foreach (ActionEffectVM* effectVM, actionModel->effectsList()->toList())

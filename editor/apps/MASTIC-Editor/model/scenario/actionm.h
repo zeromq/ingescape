@@ -79,9 +79,6 @@ class ActionM: public QObject
     // List of conditions for the action
     I2_QOBJECT_LISTMODEL(ActionConditionVM, conditionsList)
 
-    // Index in the actions panel
-    I2_QML_PROPERTY(int, actionsPanelIndex)
-
     // FIXME : Liste des temps de déclenchement (1 ou plus si réarmable) >> VP
 
 public:
