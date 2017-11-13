@@ -72,8 +72,9 @@ void IOPValueConditionM::copyFrom(ActionConditionM* condition)
 }
 
 /**
-* @brief Copy from another condition model
-* @param condition to copy
+* @brief Custom setter on set agent model
+*        to fill inputs and outputs
+* @param agentModel
 */
 bool IOPValueConditionM::setagentModel(AgentInMappingVM* agentModel)
 {

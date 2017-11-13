@@ -70,8 +70,9 @@ void IOPValueEffectM::copyFrom(ActionEffectM *effect)
 }
 
 /**
-* @brief Copy from another effect model
-* @param effect to copy
+* @brief Custom setter on set agent model
+*        to fill inputs and outputs
+* @param agentModel
 */
 bool IOPValueEffectM::setagentModel(AgentInMappingVM* agentModel)
 {
