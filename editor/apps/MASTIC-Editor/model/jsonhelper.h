@@ -89,6 +89,14 @@ public:
      */
     QPair< QPair< QList<ActionM*>, QList<ActionInPaletteVM*> > , QList<ActionVM*> > initActionsList(QByteArray byteArrayOfJson, QList<AgentInMappingVM*> listAgentsInMapping);
 
+    /**
+     * @brief Create an action condition VM from JSON object
+     * @param jsonObject
+     * @param list of agents in mapping
+     * @return
+     */
+    QByteArray exportScenario(QList<ActionM*> actionsList, QList<ActionInPaletteVM*> actionsInPaletteList, QList<ActionVM*> actionsInTimeLine);
+
 Q_SIGNALS:
 
 public Q_SLOTS:

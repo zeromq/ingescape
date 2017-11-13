@@ -63,15 +63,15 @@ ScenarioController::ScenarioController(QString scenariosPath, QObject *parent) :
     _validationDurationsTypesList.fillWithAllEnumValues();
 
     // Initialize the 9 items of the palette with NULL action
-    _actionsInPaletteList.append(new ActionInPaletteVM(NULL));
-    _actionsInPaletteList.append(new ActionInPaletteVM(NULL));
-    _actionsInPaletteList.append(new ActionInPaletteVM(NULL));
-    _actionsInPaletteList.append(new ActionInPaletteVM(NULL));
-    _actionsInPaletteList.append(new ActionInPaletteVM(NULL));
-    _actionsInPaletteList.append(new ActionInPaletteVM(NULL));
-    _actionsInPaletteList.append(new ActionInPaletteVM(NULL));
-    _actionsInPaletteList.append(new ActionInPaletteVM(NULL));
-    _actionsInPaletteList.append(new ActionInPaletteVM(NULL));
+    _actionsInPaletteList.append(new ActionInPaletteVM(NULL,0));
+    _actionsInPaletteList.append(new ActionInPaletteVM(NULL,1));
+    _actionsInPaletteList.append(new ActionInPaletteVM(NULL,2));
+    _actionsInPaletteList.append(new ActionInPaletteVM(NULL,3));
+    _actionsInPaletteList.append(new ActionInPaletteVM(NULL,4));
+    _actionsInPaletteList.append(new ActionInPaletteVM(NULL,5));
+    _actionsInPaletteList.append(new ActionInPaletteVM(NULL,6));
+    _actionsInPaletteList.append(new ActionInPaletteVM(NULL,7));
+    _actionsInPaletteList.append(new ActionInPaletteVM(NULL,8));
 
     QDate today = QDate::currentDate();
     _scenariosDefaultFilePath = QString("%1scenarios_%2.json").arg(_scenariosDirectoryPath, today.toString("ddMMyy"));
@@ -311,10 +311,19 @@ void ScenarioController::_importScenarioFromFile(QString scenarioFilePath)
                     _actionsList.append(scenarioToImport.first.first);
                 }
 
-                // Append the list of actions in palette
+                // Set the list of actions in palette
                 if(scenarioToImport.first.second.count() > 0)
                 {
-                    _actionsInPaletteList.append(scenarioToImport.first.second);
+                    foreach (ActionInPaletteVM* actionInPalette, scenarioToImport.first.second)
+                    {
+                        if(actionInPalette->actionModel() != NULL)
+                        {
+                            setActionInPalette(actionInPalette->indexInPanel(),actionInPalette->actionModel());
+                        }
+
+                        delete actionInPalette;
+                        actionInPalette = NULL;
+                    }
                 }
 
                 // Append the list of actions in timeline
@@ -329,6 +338,49 @@ void ScenarioController::_importScenarioFromFile(QString scenarioFilePath)
         }
         else {
             qWarning() << "There is no file" << scenarioFilePath;
+        }
+    }
+
+}
+
+/**
+ * @brief Export a scenario to the default file (actions, palette, timeline actions)
+ */
+void ScenarioController::exportScenarioToSelectedFile()
+{
+    // "File Dialog" to get the file (path) to save
+    QString scenarioFilePath = QFileDialog::getSaveFileName(NULL,
+                                                              "Sauvegarder dans un fichier JSON e scenario",
+                                                              _scenariosDirectoryPath,
+                                                              "JSON (*.json)");
+
+    if(!scenarioFilePath.isEmpty()) {
+        // Export the scenario to JSON file
+        _exportScenarioToFile(scenarioFilePath);
+    }
+}
+
+/**
+ * @brief Export the scenario to JSON file
+ * @param scenarioFilePath
+ */
+void ScenarioController::_exportScenarioToFile(QString scenarioFilePath)
+{
+    if (!scenarioFilePath.isEmpty() && (_jsonHelper != NULL))
+    {
+        qInfo() << "Export the scenario to JSON file" << scenarioFilePath;
+
+        // Export the scenario
+        QByteArray byteArrayOfJson = _jsonHelper->exportScenario(_actionsList.toList(),_actionsInPaletteList.toList(),_actionsInTimeLine.toList());
+
+        QFile jsonFile(scenarioFilePath);
+        if (jsonFile.open(QIODevice::WriteOnly))
+        {
+            jsonFile.write(byteArrayOfJson);
+            jsonFile.close();
+        }
+        else {
+            qCritical() << "Can not open file" << scenarioFilePath;
         }
     }
 
