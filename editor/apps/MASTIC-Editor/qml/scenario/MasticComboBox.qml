@@ -15,6 +15,8 @@ I2Combobox {
     style : I2ComboboxStyle {
         backgroundColorIdle : MasticTheme.darkBlueGreyColor
         borderWidthIdle : 0
+        borderColorPressed: MasticTheme.darkBlueGreyColor
+        borderWidthPressed: 1
         currentTextColorIdle : MasticTheme.lightGreyColor
         backgroundColorPressed : MasticTheme.darkGreyColor2
         radius: 1
