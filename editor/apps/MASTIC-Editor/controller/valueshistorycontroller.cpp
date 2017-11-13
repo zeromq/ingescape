@@ -161,11 +161,11 @@ void ValuesHistoryController::filterValuesToShowOnlyAgent(QString agentName)
  */
 void ValuesHistoryController::_updateFilters()
 {
-    qDebug() << "Display Values for type:";
+    /*qDebug() << "Display Values for type:";
     foreach (int iterator, _selectedAgentIOPTypes.toEnumValuesList()) {
         AgentIOPTypes::Value agentIOPType = static_cast<AgentIOPTypes::Value>(iterator);
         qDebug() << AgentIOPTypes::staticEnumToString(agentIOPType);
-    }
+    }*/
 
     qDebug() << "and for agents" << _selectedAgentNamesList;
 

@@ -52,6 +52,7 @@ class AgentsMappingController : public QObject
     // Selected map between agents in the mapping
     I2_QML_PROPERTY_DELETE_PROOF(MapBetweenIOPVM*, selectedMapBetweenIOP)
 
+
 public:
     /**
      * @brief Default constructor
@@ -66,6 +67,20 @@ public:
      * @brief Destructor
      */
     ~AgentsMappingController();
+
+
+    /**
+     * @brief Remove the agent from the mapping
+     * @param agent
+     */
+    Q_INVOKABLE void removeAgentFromMapping(AgentInMappingVM* agent);
+
+
+    /**
+     * @brief Remove a link between two agents from the mapping
+     * @param link
+     */
+    Q_INVOKABLE void deleteLinkBetweenTwoAgents(MapBetweenIOPVM* link);
 
 
 Q_SIGNALS:

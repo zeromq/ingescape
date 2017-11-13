@@ -192,11 +192,10 @@ Item {
                 }
 
                 onClicked: {
-                    //                if (controller)
-                    //                {
-                    //                    // Delete our agent
-                    //                    controller.deleteAgent(model.QtObject);
-                    //                }
+                    if (controller) {
+                        // Delete our agent
+                        controller.removeAgentFromMapping(model.QtObject);
+                    }
                 }
             }
 
