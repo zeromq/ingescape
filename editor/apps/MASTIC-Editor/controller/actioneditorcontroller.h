@@ -47,10 +47,11 @@ public:
 
     /**
      * @brief Default constructor
+     * @param action name
      * @param original action
      * @param parent
      */
-    explicit ActionEditorController(ActionM * originalAction, I2CustomItemListModel<AgentInMappingVM> * listAgentsInMapping, QObject *parent = 0);
+    explicit ActionEditorController(QString actionName, ActionM * originalAction, I2CustomItemListModel<AgentInMappingVM> * listAgentsInMapping, QObject *parent = 0);
 
 
     /**

@@ -72,13 +72,14 @@ void MappingEffectM::copyFrom(ActionEffectM *effect)
     MappingEffectM* mappingEffect = dynamic_cast<MappingEffectM*>(effect);
     if(mappingEffect != NULL)
     {
-        setfromAgentIOP(mappingEffect->fromAgentIOP());
-        settoAgentIOP(mappingEffect->toAgentIOP());
-        settoAgentModel(mappingEffect->toAgentModel());
         _toAgentIopList.clear();
         _toAgentIopList.append(mappingEffect->toAgentIopList()->toList());
         _fromAgentIopList.clear();
         _fromAgentIopList.append(mappingEffect->fromAgentIopList()->toList());
+
+        setfromAgentIOP(mappingEffect->fromAgentIOP());
+        settoAgentModel(mappingEffect->toAgentModel());
+        settoAgentIOP(mappingEffect->toAgentIOP());
     }
 }
 

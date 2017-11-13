@@ -118,24 +118,31 @@ void ScenarioController::openActionEditor(ActionM* actionM)
     if(_mapActionsEditorControllersFromActionVM.contains(actionM) == false)
     {
         // Create an empty action if we create a new one
-        if(actionM == NULL)
+        if(actionM != NULL)
         {
-            actionM = new ActionM(_buildNewActionName());
+            setselectedAction(actionM);
+
+            // Create action editor controller
+            ActionEditorController* actionEditorC = new ActionEditorController(_buildNewActionName(), actionM,agentsInMappingList());
+
+            // Add action into our opened actions
+            _mapActionsEditorControllersFromActionVM.insert(actionM,actionEditorC);
+
+            // Add to list
+            _openedActionsEditorsControllers.append(actionEditorC);
         }
         // Set selected action
         else
         {
-            setselectedAction(actionM);
+            // Create action editor controller
+            ActionEditorController* actionEditorC = new ActionEditorController(_buildNewActionName(), actionM ,agentsInMappingList());
+
+            // Add action into our opened actions
+            _mapActionsEditorControllersFromActionVM.insert(actionEditorC->editedAction(),actionEditorC);
+
+            // Add to list
+            _openedActionsEditorsControllers.append(actionEditorC);
         }
-
-        // Create action editor controller
-        ActionEditorController* actionEditorC = new ActionEditorController(actionM,agentsInMappingList());
-
-        // Add action into our opened actions
-        _mapActionsEditorControllersFromActionVM.insert(actionM,actionEditorC);
-
-        // Add to list
-        _openedActionsEditorsControllers.append(actionEditorC);
     }
 }
 
@@ -146,6 +153,15 @@ void ScenarioController::openActionEditor(ActionM* actionM)
   */
 void ScenarioController::deleteAction(ActionM * actionM)
 {
+    // Delete the popup if necessary
+    if(actionM != NULL && _mapActionsEditorControllersFromActionVM.contains(actionM))
+    {
+        ActionEditorController* actionEditorC = _mapActionsEditorControllersFromActionVM.value(actionM);
+
+        _mapActionsEditorControllersFromActionVM.remove(actionM);
+        _openedActionsEditorsControllers.remove(actionEditorC);
+    }
+
     // Unselect our action if needed
     if (_selectedAction == actionM) {
         setselectedAction(NULL);
@@ -194,7 +210,7 @@ void ScenarioController::valideActionEditor(ActionEditorController* actionEditor
   */
 void ScenarioController::closeActionEditor(ActionEditorController* actionEditorC)
 {
-    ActionM* actionM = actionEditorC->originalAction();
+    ActionM* actionM = actionEditorC->originalAction() != NULL ? actionEditorC->originalAction() : actionEditorC->editedAction();
     // Delete the popup if necessary
     if(actionM != NULL && _mapActionsEditorControllersFromActionVM.contains(actionM))
     {
