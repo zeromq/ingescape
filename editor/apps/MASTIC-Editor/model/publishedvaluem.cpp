@@ -41,6 +41,9 @@ PublishedValueM::PublishedValueM(QDateTime time,
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
+    // Set the corresponding group
+    _iopValueTypeGroup = Enums::getGroupForAgentIOPValueType(_iopValueType);
+
     QStringList iopNameAndValueType = _iopId.split(SEPARATOR_IOP_NAME_AND_IOP_VALUE_TYPE);
     if (iopNameAndValueType.count() == 2)
     {
