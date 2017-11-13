@@ -73,6 +73,14 @@ void registerCustomQmlTypes()
 
     //----------------
     //
+    // Sort and Filter
+    //
+    //----------------
+    qmlRegisterUncreatableType<ValuesHistorySortFilter>(uri, 1, 0, "ValuesHistorySortFilter", "Internal class");
+
+
+    //----------------
+    //
     // Misc.
     //
     //----------------
