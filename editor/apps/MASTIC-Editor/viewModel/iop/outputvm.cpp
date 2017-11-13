@@ -46,7 +46,7 @@ OutputVM::OutputVM(QString outputName,
 
     // Init the timer to reset the flag "is Published New Value"
     // Allows to play an animation when the value changed
-    _timer.setInterval(1000);
+    _timer.setInterval(500);
     connect(&_timer, &QTimer::timeout, this, &OutputVM::_onTimeout);
 
 
