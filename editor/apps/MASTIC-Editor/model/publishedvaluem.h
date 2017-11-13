@@ -44,6 +44,9 @@ class PublishedValueM : public QObject
     // Value type of the Input / Output / Parameter
     I2_QML_PROPERTY_READONLY(AgentIOPValueTypes::Value, iopValueType)
 
+    // Group of the value type of the Input / Output / Parameter
+    I2_QML_PROPERTY_READONLY(AgentIOPValueTypeGroups::Value, iopValueTypeGroup)
+
     // Name of the Input / Output / Parameter
     I2_QML_PROPERTY_READONLY(QString, iopName)
 

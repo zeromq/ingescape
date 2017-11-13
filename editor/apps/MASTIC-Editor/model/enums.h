@@ -62,6 +62,14 @@ public:
 
 
     /**
+     * @brief Get the group for an Agent Input/Output/Parameter Value Type
+     * @param valueType
+     * @return
+     */
+    static AgentIOPValueTypeGroups::Value getGroupForAgentIOPValueType(AgentIOPValueTypes::Value valueType);
+
+
+    /**
      * @brief Get a displayable value: convert a variant into a string (in function of the value type)
      * @param valueType
      * @param value

@@ -40,5 +40,6 @@
         <file>qml/theme/LabellessSvgButtonStyle.qml</file>
         <file>qml/scenario/ActionsListItem.qml</file>
         <file>qml/scenario/MasticComboBox.qml</file>
+        <file>qml/agent/HistoryPanel.qml</file>
     </qresource>
 </RCC>

@@ -262,6 +262,10 @@ Item {
             onClosed: {
                 MasticEditorC.closeDefinition(model.QtObject);
             }
+
+            onOpenHistory : {
+                historyPanel.open();
+            }
         }
     }
     
@@ -295,5 +299,22 @@ Item {
         }
     }
 
-    // AgentMappingHistory ?
+    // AgentMappingHistory
+    Agent.HistoryPanel {
+        id: historyPanel
+
+        // Center popup
+        x: (parent.width - historyPanel.width) / 2.0
+        y: (parent.height - historyPanel.height) / 2.0
+
+        onOpened: {
+            historyPanel.z = rootItem.popupTopmostZIndex;
+            rootItem.popupTopmostZIndex = rootItem.popupTopmostZIndex + 1;
+        }
+
+        onBringToFront: {
+            historyPanel.z = rootItem.popupTopmostZIndex;
+            rootItem.popupTopmostZIndex = rootItem.popupTopmostZIndex + 1;
+        }
+    }
 }
