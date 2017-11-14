@@ -625,7 +625,7 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 if (newMapping != NULL && newMapping->name != NULL && subscriber != NULL){
                     // Look if this agent already has a mapping
                     if(subscriber->mapping != NULL){
-                        mtic_debug("mapping already exists for agent %s : new definition will overwrite the previous one...\n", name);
+                        mtic_debug("mapping already exists for agent %s : new mapping will overwrite the previous one...\n", name);
                         mapping_freeMapping(subscriber->mapping);
                         subscriber->mapping = NULL;
                     }
@@ -841,7 +841,7 @@ int triggerMappingUpdate(zloop_t *loop, int timer_id, void *arg){
             zyreAgent_t *a, *tmp;
             HASH_ITER(hh, zyreAgents, a, tmp){
                 if (a->hasJoinedPrivateChannel){
-                    sendDefinitionToAgent(a->peerId, mappingStr);
+                    sendMappingToAgent(a->peerId, mappingStr);
                 }
             }
             free(mappingStr);
@@ -858,10 +858,11 @@ int triggerMappingUpdate(zloop_t *loop, int timer_id, void *arg){
 static void
 initActor (zsock_t *pipe, void *args)
 {
-    //we are (re)starting : we enable the timer flags because
-    //all network connections are going to be (re)started
-    network_needToSendDefinitionUpdate = true;
-    network_needToUpdateMapping = true;
+    //Ae are (re)starting : we disable the timer flags because
+    //all network connections are going to be (re)started.
+    //Each agent will be mapped if needed when receiving its definition.
+    network_needToSendDefinitionUpdate = false;
+    network_needToUpdateMapping = false;
 
     //start zyre
     agentElements->node = zyre_new (agentName);
