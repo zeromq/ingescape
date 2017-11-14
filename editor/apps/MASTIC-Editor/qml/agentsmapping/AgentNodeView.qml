@@ -38,7 +38,7 @@ Item {
 
     // Model associated to our QML item
     property var agentMappingVM: null
-    property var agentName: agentMappingVM ? agentMappingVM.agentName : ""
+    property var agentName: agentMappingVM ? agentMappingVM.name : ""
 
     property bool isReduced : agentMappingVM && agentMappingVM.isReduced
 

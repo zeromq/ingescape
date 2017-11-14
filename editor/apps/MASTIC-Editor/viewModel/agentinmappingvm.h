@@ -35,7 +35,7 @@ class AgentInMappingVM : public QObject
     Q_OBJECT
 
     // Name of our agent
-    I2_QML_PROPERTY_READONLY(QString, agentName)
+    I2_QML_PROPERTY_READONLY(QString, name)
 
     // List of models of agents
     I2_QOBJECT_LISTMODEL(AgentM, models)
@@ -84,10 +84,10 @@ public:
     /**
      * @brief Ghost Constructor: model (and definition) is not defined.
      * The agent is an empty shell only defined by a name.
-     * @param agentName
+     * @param name
      * @param parent
      */
-    explicit AgentInMappingVM(QString agentName,
+    explicit AgentInMappingVM(QString name,
                               QObject* parent = nullptr);
 
 
