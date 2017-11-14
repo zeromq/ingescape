@@ -120,6 +120,12 @@ public:
     AgentIOPM* getParameterWithName(QString parameterName);
 
 
+    /**
+     * @brief Open the values history of our agent definition
+     */
+    Q_INVOKABLE void openValuesHistory();
+
+
 Q_SIGNALS:
 
     /**
@@ -128,6 +134,12 @@ Q_SIGNALS:
      * @param outputName
      */
     void commandAskedForOutput(QString command, QString outputName);
+
+
+    /**
+     * @brief Signal emitted when we have to open the values history of our agent definition
+     */
+    void openValuesHistoryOfAgent();
 
 
 public Q_SLOTS:

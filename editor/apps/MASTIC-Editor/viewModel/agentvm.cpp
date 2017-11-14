@@ -117,7 +117,8 @@ void AgentVM::setdefinition(DefinitionM* value)
         // Previous value
         if (previousValue != NULL) {
             // DIS-connect from signals from the previous definition
-            disconnect(previousValue, &DefinitionM::commandAskedForOutput, this, &AgentVM::onCommandAskedForOutput);
+            disconnect(previousValue, &DefinitionM::commandAskedForOutput, this, &AgentVM::_onCommandAskedForOutput);
+            disconnect(previousValue, &DefinitionM::openValuesHistoryOfAgent, this, &AgentVM::_onOpenValuesHistoryOfAgent);
         }
 
         _definition = value;
@@ -125,7 +126,8 @@ void AgentVM::setdefinition(DefinitionM* value)
         // New value
         if (_definition != NULL) {
             // Connect to signal from the new definition
-            connect(_definition, &DefinitionM::commandAskedForOutput, this, &AgentVM::onCommandAskedForOutput);
+            connect(_definition, &DefinitionM::commandAskedForOutput, this, &AgentVM::_onCommandAskedForOutput);
+            connect(_definition, &DefinitionM::openValuesHistoryOfAgent, this, &AgentVM::_onOpenValuesHistoryOfAgent);
         }
 
         // Emit simple signal for QML
@@ -184,17 +186,6 @@ void AgentVM::changeFreeze()
     else {
         Q_EMIT commandAsked("FREEZE", _peerIdsList);
     }
-}
-
-
-/**
- * @brief Slot when a command from an output must be sent on the network
- * @param command
- * @param outputName
- */
-void AgentVM::onCommandAskedForOutput(QString command, QString outputName)
-{
-    Q_EMIT commandAskedForOutput(command, outputName, _peerIdsList);
 }
 
 
@@ -300,6 +291,26 @@ void AgentVM::_onDefinitionOfModelChanged(DefinitionM* definition)
 
     // Update with the definition of first model
     _updateWithDefinitionOfFirstModel();
+}
+
+
+/**
+ * @brief Slot when a command from an output must be sent on the network
+ * @param command
+ * @param outputName
+ */
+void AgentVM::_onCommandAskedForOutput(QString command, QString outputName)
+{
+    Q_EMIT commandAskedForOutput(command, outputName, _peerIdsList);
+}
+
+
+/**
+ * @brief Slot when we have to open the values history of our agent
+ */
+void AgentVM::_onOpenValuesHistoryOfAgent()
+{
+    Q_EMIT openValuesHistoryOfAgent(_name);
 }
 
 

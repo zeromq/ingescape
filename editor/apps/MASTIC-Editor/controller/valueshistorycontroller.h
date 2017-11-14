@@ -100,6 +100,14 @@ public:
     Q_INVOKABLE void hideValuesOfAgent(QString agentName);
 
 
+    /**
+     * @brief Return true if the values of the agent are shown
+     * @param agentName
+     * @return
+     */
+    Q_INVOKABLE bool areShownValuesOfAgent(QString agentName);
+
+
 Q_SIGNALS:
 
 

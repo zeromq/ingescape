@@ -137,17 +137,15 @@ Q_SIGNALS:
     void commandAskedForOutput(QString command, QString outputName, QStringList peerIdsList);
 
 
-public Q_SLOTS:
-
     /**
-     * @brief Slot when a command from an output must be sent on the network
-     * @param command
-     * @param outputName
+     * @brief Signal emitted when we have to open the values history of our agent
+     * @param agentName
      */
-    void onCommandAskedForOutput(QString command, QString outputName);
+    void openValuesHistoryOfAgent(QString agentName);
 
 
 private Q_SLOTS:
+
     /**
      * @brief Slot when the list of models changed
      */
@@ -180,6 +178,20 @@ private Q_SLOTS:
      * @param definition
      */
     void _onDefinitionOfModelChanged(DefinitionM* definition);
+
+
+    /**
+     * @brief Slot when a command from an output must be sent on the network
+     * @param command
+     * @param outputName
+     */
+    void _onCommandAskedForOutput(QString command, QString outputName);
+
+
+    /**
+     * @brief Slot when we have to open the values history of our agent
+     */
+    void _onOpenValuesHistoryOfAgent();
 
 
 private:
