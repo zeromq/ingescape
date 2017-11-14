@@ -187,6 +187,7 @@ I2PopupBase {
 
             height : 25
             width : 197
+            enabled: rootItem.controller && rootItem.controller.allAgentNamesList.length > 0
 
             onVisibleChanged: {
                 if (!visible) {
@@ -226,7 +227,7 @@ I2PopupBase {
                     id:_comboPlaceholder
 
                     visible: (_comboText.text === "");
-                    text : "- Select an agent -"
+                    text : _combobox.enabled? "- Select an agent -" : "- No agent -"
                     anchors {
                         verticalCenter: parent.verticalCenter;
                         left: parent.left;
@@ -267,7 +268,7 @@ I2PopupBase {
                     color : MasticTheme.lightGreyColor
                     verticalAlignment: Text.AlignVCenter;
                     elide : Text.ElideRight;
-                    text : (rootItem.controller && rootItem.controller.selectedAgentNamesList.length > 0)?
+                    text : (_combobox.enabled && rootItem.controller && rootItem.controller.selectedAgentNamesList.length > 0)?
                                (rootItem.controller.selectedAgentNamesList.length < rootItem.controller.allAgentNamesList.length)?
                                    (rootItem.controller.selectedAgentNamesList.length === 1 ? "- " + rootItem.controller.selectedAgentNamesList.length + " agent selected -" : "- " + rootItem.controller.selectedAgentNamesList.length + " agents selected -")
                                  : "- All agents selected -"
@@ -345,6 +346,33 @@ I2PopupBase {
 
                     width: _comboButton.width;
                     height: ((_combolist.count < 8) ? (_combolist.count+1)*(_comboButton.height+1) : 9*(_comboButton.height+1) );
+
+                    style: ScrollViewStyle {
+                        transientScrollBars: true
+                        handle: Item {
+                            implicitWidth: 8
+                            implicitHeight: 26
+
+                            Rectangle {
+                                color: MasticTheme.lightGreyColor
+
+                                anchors {
+                                    fill: parent
+                                    topMargin: 1
+                                    leftMargin: 1
+                                    rightMargin:0
+                                    bottomMargin: 2
+                                }
+
+                                opacity : 0.8
+                                radius: 10
+                            }
+                        }
+                        scrollBarBackground: Item {
+                            implicitWidth: 8
+                            implicitHeight: 26
+                        }
+                    }
 
                     Item {
                         width: _scrollView.width;
@@ -650,7 +678,8 @@ I2PopupBase {
             }
 
             /// ****** List ***** ////
-            ListView {
+            ScrollView {
+                id : scrollView
                 anchors {
                     top: tableauHeaderRow.bottom
                     left : parent.left
@@ -658,121 +687,65 @@ I2PopupBase {
                     bottom : parent.bottom
                 }
 
-                model: if (controller) {
-                           controller.filteredValues
-                       }
-                       else {
-                           0
-                       }
+                style: ScrollViewStyle {
+                    transientScrollBars: true
+                    handle: Item {
+                        implicitWidth: 8
+                        implicitHeight: 26
 
-                delegate:   Item {
-                    anchors {
-                        left : parent.left
-                        right : parent.right
-                    }
-                    height : 30
-
-                    Row {
-                        id: listLine
-
-                        anchors {
-                            fill : parent
-                            leftMargin: 2
-                        }
-
-                        // IOP Name
-                        Text {
-                            text: model.iopName
-
-                            anchors {
-                                verticalCenter: parent.verticalCenter
-                            }
-                            verticalAlignment: Text.AlignVCenter
-                            width : rootItem.widthsOfColumns[0]
-                            elide: Text.ElideRight
-                            height: parent.height
-                            color: MasticTheme.whiteColor
-                            font {
-                                family: MasticTheme.textFontFamily
-                                pixelSize : 16
-                            }
-                        }
-
-                        // Agent Name
-                        Text {
-                            text: model.agentName
-
-                            anchors {
-                                verticalCenter: parent.verticalCenter
-                            }
-                            verticalAlignment: Text.AlignVCenter
-                            width : rootItem.widthsOfColumns[1]
-                            elide: Text.ElideRight
-                            height: parent.height
+                        Rectangle {
                             color: MasticTheme.lightGreyColor
-                            font {
-                                family: MasticTheme.textFontFamily
-                                pixelSize : 15
-                            }
-                        }
 
-
-                        // Type
-                        Item {
                             anchors {
-                                verticalCenter: parent.verticalCenter
+                                fill: parent
+                                topMargin: 1
+                                leftMargin: 1
+                                rightMargin:0
+                                bottomMargin: 2
                             }
-                            height: parent.height
-                            width : rootItem.widthsOfColumns[2]
 
-                            Rectangle {
-                                id : circle
+                            opacity : 0.8
+                            radius: 10
+                        }
+                    }
+                    scrollBarBackground: Item {
+                        implicitWidth: 8
+                        implicitHeight: 26
+                    }
+                }
+
+                ListView {
+                    model: if (controller) {
+                               controller.filteredValues
+                           }
+                           else {
+                               0
+                           }
+
+                    delegate:   Item {
+                        anchors {
+                            left : parent.left
+                            right : parent.right
+                        }
+                        height : 30
+
+                        Row {
+                            id: listLine
+
+                            anchors {
+                                fill : parent
+                                leftMargin: 2
+                            }
+
+                            // IOP Name
+                            Text {
+                                text: model.iopName
+
                                 anchors {
-                                    left : parent.left
                                     verticalCenter: parent.verticalCenter
                                 }
-
-                                width : 16
-                                height : width
-                                radius : width/2
-
-                                color : switch (model.iopValueTypeGroup)
-                                        {
-                                        case AgentIOPValueTypeGroups.NUMBER:
-                                            MasticTheme.orangeColor2
-                                            break;
-                                        case AgentIOPValueTypeGroups.STRING:
-                                            MasticTheme.redColor2
-                                            break;
-                                        case AgentIOPValueTypeGroups.IMPULSION:
-                                            MasticTheme.purpleColor
-                                            break;
-                                        case AgentIOPValueTypeGroups.DATA:
-                                            MasticTheme.greenColor
-                                            break;
-                                        case AgentIOPValueTypeGroups.MIXED:
-                                            MasticTheme.whiteColor
-                                            break;
-                                        case AgentIOPValueTypeGroups.UNKNOWN:
-                                            "#000000"
-                                            break;
-                                        default:
-                                            MasticTheme.whiteColor;
-                                            break;
-                                        }
-                            }
-
-                            Text {
-                                text: AgentIOPValueTypes.enumToString(model.iopValueType)
-
-                                anchors {
-                                    verticalCenter: circle.verticalCenter
-                                    verticalCenterOffset: 1
-                                    left : circle.right
-                                    leftMargin: 5
-                                    right : parent.right
-                                }
                                 verticalAlignment: Text.AlignVCenter
+                                width : rootItem.widthsOfColumns[0]
                                 elide: Text.ElideRight
                                 height: parent.height
                                 color: MasticTheme.whiteColor
@@ -781,61 +754,146 @@ I2PopupBase {
                                     pixelSize : 16
                                 }
                             }
+
+                            // Agent Name
+                            Text {
+                                text: model.agentName
+
+                                anchors {
+                                    verticalCenter: parent.verticalCenter
+                                }
+                                verticalAlignment: Text.AlignVCenter
+                                width : rootItem.widthsOfColumns[1]
+                                elide: Text.ElideRight
+                                height: parent.height
+                                color: MasticTheme.lightGreyColor
+                                font {
+                                    family: MasticTheme.textFontFamily
+                                    pixelSize : 15
+                                }
+                            }
+
+
+                            // Type
+                            Item {
+                                anchors {
+                                    verticalCenter: parent.verticalCenter
+                                }
+                                height: parent.height
+                                width : rootItem.widthsOfColumns[2]
+
+                                Rectangle {
+                                    id : circle
+                                    anchors {
+                                        left : parent.left
+                                        verticalCenter: parent.verticalCenter
+                                    }
+
+                                    width : 16
+                                    height : width
+                                    radius : width/2
+
+                                    color : switch (model.iopValueTypeGroup)
+                                            {
+                                            case AgentIOPValueTypeGroups.NUMBER:
+                                                MasticTheme.orangeColor2
+                                                break;
+                                            case AgentIOPValueTypeGroups.STRING:
+                                                MasticTheme.redColor2
+                                                break;
+                                            case AgentIOPValueTypeGroups.IMPULSION:
+                                                MasticTheme.purpleColor
+                                                break;
+                                            case AgentIOPValueTypeGroups.DATA:
+                                                MasticTheme.greenColor
+                                                break;
+                                            case AgentIOPValueTypeGroups.MIXED:
+                                                MasticTheme.whiteColor
+                                                break;
+                                            case AgentIOPValueTypeGroups.UNKNOWN:
+                                                "#000000"
+                                                break;
+                                            default:
+                                                MasticTheme.whiteColor;
+                                                break;
+                                            }
+                                }
+
+                                Text {
+                                    text: AgentIOPValueTypes.enumToString(model.iopValueType)
+
+                                    anchors {
+                                        verticalCenter: circle.verticalCenter
+                                        verticalCenterOffset: 1
+                                        left : circle.right
+                                        leftMargin: 5
+                                        right : parent.right
+                                    }
+                                    verticalAlignment: Text.AlignVCenter
+                                    elide: Text.ElideRight
+                                    height: parent.height
+                                    color: MasticTheme.whiteColor
+                                    font {
+                                        family: MasticTheme.textFontFamily
+                                        pixelSize : 16
+                                    }
+                                }
+                            }
+
+
+                            // Value
+                            Text {
+                                text: model.displayableValue
+
+                                anchors {
+                                    verticalCenter: parent.verticalCenter
+                                }
+                                verticalAlignment: Text.AlignVCenter
+                                width : rootItem.widthsOfColumns[3]
+                                height: parent.height
+                                elide: Text.ElideRight
+                                color: MasticTheme.whiteColor
+                                font {
+                                    family: MasticTheme.textFontFamily
+                                    pixelSize : 16
+                                }
+                            }
+
+
+                            // Date
+                            Text {
+                                text: model.time.toLocaleString(Qt.locale(),"hh:mm:ss.zzz")
+
+                                anchors {
+                                    verticalCenter: parent.verticalCenter
+                                }
+                                verticalAlignment: Text.AlignVCenter
+                                width : rootItem.widthsOfColumns[4]
+                                height: parent.height
+                                color: MasticTheme.whiteColor
+                                elide: Text.ElideRight
+
+                                font {
+                                    family: MasticTheme.textFontFamily
+                                    pixelSize : 16
+                                }
+                            }
+
                         }
 
-
-                        // Value
-                        Text {
-                            text: model.displayableValue
-
+                        //separator
+                        Rectangle {
                             anchors {
-                                verticalCenter: parent.verticalCenter
+                                left : parent.left
+                                right : parent.right
+                                bottom : parent.bottom
                             }
-                            verticalAlignment: Text.AlignVCenter
-                            width : rootItem.widthsOfColumns[3]
-                            height: parent.height
-                            elide: Text.ElideRight
-                            color: MasticTheme.whiteColor
-                            font {
-                                family: MasticTheme.textFontFamily
-                                pixelSize : 16
-                            }
-                        }
+                            height : 1
 
-
-                        // Date
-                        Text {
-                            text: model.time.toLocaleString(Qt.locale(),"hh:mm:ss.zzz")
-
-                            anchors {
-                                verticalCenter: parent.verticalCenter
-                            }
-                            verticalAlignment: Text.AlignVCenter
-                            width : rootItem.widthsOfColumns[4]
-                            height: parent.height
-                            color: MasticTheme.whiteColor
-                            elide: Text.ElideRight
-
-                            font {
-                                family: MasticTheme.textFontFamily
-                                pixelSize : 16
-                            }
+                            color : MasticTheme.blackColor
                         }
 
                     }
-
-                    //separator
-                    Rectangle {
-                        anchors {
-                            left : parent.left
-                            right : parent.right
-                            bottom : parent.bottom
-                        }
-                        height : 1
-
-                        color : MasticTheme.blackColor
-                    }
-
                 }
             }
         }
