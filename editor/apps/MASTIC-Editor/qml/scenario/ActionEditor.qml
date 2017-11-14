@@ -24,7 +24,7 @@ import "../theme" as Theme;
 I2PopupBase {
     id: rootItem
 
-    width: 466
+    width: 475
     height: 882
 
     automaticallyOpenWhenCompleted: true
@@ -694,7 +694,7 @@ I2PopupBase {
                                         }
 
                                         height : 25
-                                        width : (myCondition && myCondition.conditionType === ActionConditionType.VALUE) ? 45 : 78
+                                        width : (myCondition && myCondition.conditionType === ActionConditionType.VALUE) ? 44 : 78
 
                                         model :
                                         {
