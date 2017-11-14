@@ -183,7 +183,7 @@ void ValuesHistoryController::onAgentInMappingAdded(QString agentName)
  * @brief Slot called when an "Agent in Mapping" is removed
  * @param agentName
  */
-void ValuesHistoryController::onAgentInMappingRemoved(QString agentName)
+/*void ValuesHistoryController::onAgentInMappingRemoved(QString agentName)
 {
     QStringList temp1 = _allAgentNamesList;
     temp1.removeOne(agentName);
@@ -204,7 +204,7 @@ void ValuesHistoryController::onAgentInMappingRemoved(QString agentName)
         // Update the filters on the list of values
         _updateFilters();
     }
-}
+}*/
 
 
 /**

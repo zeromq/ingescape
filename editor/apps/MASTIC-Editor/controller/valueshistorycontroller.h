@@ -136,7 +136,7 @@ public Q_SLOTS:
      * @brief Slot called when an "Agent in Mapping" is removed
      * @param agentName
      */
-    void onAgentInMappingRemoved(QString agentName);
+    //void onAgentInMappingRemoved(QString agentName);
 
 
     /**

@@ -144,7 +144,7 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
 
     // Connect to signals from the controller for mapping of agents
     connect(_agentsMappingC, &AgentsMappingController::agentInMappingAdded, _valuesHistoryC, &ValuesHistoryController::onAgentInMappingAdded);
-    connect(_agentsMappingC, &AgentsMappingController::agentInMappingRemoved, _valuesHistoryC, &ValuesHistoryController::onAgentInMappingRemoved);
+    //connect(_agentsMappingC, &AgentsMappingController::agentInMappingRemoved, _valuesHistoryC, &ValuesHistoryController::onAgentInMappingRemoved);
     connect(_agentsMappingC, &AgentsMappingController::addInputsToEditorForOutputs, _networkC, &NetworkController::onAddInputsToEditorForOutputs);
     connect(_agentsMappingC, &AgentsMappingController::removeInputsToEditorForOutputs, _networkC, &NetworkController::onRemoveInputsToEditorForOutputs);
 
