@@ -77,6 +77,7 @@ bool InputVM::canLinkWith(PointMapVM* pointMap)
  */
 void InputVM::_onModelsChanged()
 {
+    // Update the first model
     if (_models.count() > 0) {
         setfirstModel(_models.at(0));
     }
