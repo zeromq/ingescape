@@ -66,7 +66,7 @@ I2CubicBezierCurve {
     stroke: if (mapBetweenIOPVM && mapBetweenIOPVM.agentTo && mapBetweenIOPVM.agentTo.isReduced && mapBetweenIOPVM.agentFrom && mapBetweenIOPVM.agentFrom.isReduced
                     && outputModel)
             {
-                switch (mapBetweenIOPVM.agentFrom.reducedMapValueTypeGroupInInput)
+                switch (mapBetweenIOPVM.agentFrom.reducedMapValueTypeGroupInOutput)
                 {
                 case AgentIOPValueTypeGroups.NUMBER:
                     outputModel.isPublishedNewValue ? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2

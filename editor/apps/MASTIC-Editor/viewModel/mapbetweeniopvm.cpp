@@ -62,18 +62,24 @@ MapBetweenIOPVM::~MapBetweenIOPVM()
 {
     qInfo() << "Map destroyed";
 
-    if(agentFrom()->isGhost()) {
-        delete(_agentFrom);     // Handle ghost agent
-    }
-    else {
+    if (_agentFrom != NULL) {
+        AgentInMappingVM* temp = _agentFrom;
         setagentFrom(NULL);
+
+        // Handle ghost agent
+        if (temp->isGhost()) {
+            delete temp;
+        }
     }
 
-    if(pointFrom()->isGhost()) {
-        delete(_pointFrom);     // Handle ghost output
-    }
-    else {
+    if (_pointFrom != NULL) {
+        OutputVM* temp = _pointFrom;
         setpointFrom(NULL);
+
+        // Handle ghost output
+        if (temp->isGhost()) {
+            delete temp;
+        }
     }
 
     setagentTo(NULL);

@@ -311,6 +311,8 @@ void AgentVM::_onCommandAskedForOutput(QString command, QString outputName)
 void AgentVM::_onOpenValuesHistoryOfAgent()
 {
     Q_EMIT openValuesHistoryOfAgent(_name);
+
+    qDebug() << "Open Values History of Agent" << _name;
 }
 
 
