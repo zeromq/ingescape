@@ -562,6 +562,7 @@ int mtic_removeMappingEntryWithId(unsigned long theId){
     }else{
         HASH_DEL(mtic_internal_mapping->map_elements, el);
         mapping_freeMappingElement(el);
+        network_needToUpdateMapping = true;
     }
 
     return 1;
