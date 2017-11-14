@@ -86,7 +86,10 @@ void ValuesHistoryController::hideValuesOfAgentIOPType(AgentIOPTypes::Value agen
  */
 void ValuesHistoryController::showValuesOfAgent(QString agentName)
 {
-    _selectedAgentNamesList.append(agentName);
+    QStringList temp = _selectedAgentNamesList;
+    temp.append(agentName);
+    // Use the setter to emit a signal for QML binding
+    setselectedAgentNamesList(temp);
 
     // Update the filters on the list of values
     _updateFilters();
@@ -99,10 +102,24 @@ void ValuesHistoryController::showValuesOfAgent(QString agentName)
  */
 void ValuesHistoryController::hideValuesOfAgent(QString agentName)
 {
-    _selectedAgentNamesList.removeOne(agentName);
+    QStringList temp = _selectedAgentNamesList;
+    temp.removeOne(agentName);
+    // Use the setter to emit a signal for QML binding
+    setselectedAgentNamesList(temp);
 
     // Update the filters on the list of values
     _updateFilters();
+}
+
+
+/**
+ * @brief Return true if the values of the agent are shown
+ * @param agentName
+ * @return
+ */
+bool ValuesHistoryController::areShownValuesOfAgent(QString agentName)
+{
+    return _selectedAgentNamesList.contains(agentName);
 }
 
 
@@ -112,10 +129,16 @@ void ValuesHistoryController::hideValuesOfAgent(QString agentName)
  */
 void ValuesHistoryController::onAgentInMappingAdded(QString agentName)
 {
-    _allAgentNamesList.append(agentName);
+    QStringList temp1 = _allAgentNamesList;
+    temp1.append(agentName);
+    // Use the setter to emit a signal for QML binding
+    setallAgentNamesList(temp1);
 
     // By default: the agent name is selected
-    _selectedAgentNamesList.append(agentName);
+    QStringList temp2 = _selectedAgentNamesList;
+    temp2.append(agentName);
+    // Use the setter to emit a signal for QML binding
+    setselectedAgentNamesList(temp2);
 
     // Update the filters on the list of values
     _updateFilters();
@@ -128,10 +151,17 @@ void ValuesHistoryController::onAgentInMappingAdded(QString agentName)
  */
 void ValuesHistoryController::onAgentInMappingRemoved(QString agentName)
 {
-    _allAgentNamesList.removeOne(agentName);
+    QStringList temp1 = _allAgentNamesList;
+    temp1.removeOne(agentName);
+    // Use the setter to emit a signal for QML binding
+    setallAgentNamesList(temp1);
 
-    if (_selectedAgentNamesList.contains(agentName)) {
-        _selectedAgentNamesList.removeOne(agentName);
+    if (_selectedAgentNamesList.contains(agentName))
+    {
+        QStringList temp2 = _selectedAgentNamesList;
+        temp2.removeOne(agentName);
+        // Use the setter to emit a signal for QML binding
+        setselectedAgentNamesList(temp2);
 
         // Update the filters on the list of values
         _updateFilters();
@@ -145,11 +175,12 @@ void ValuesHistoryController::onAgentInMappingRemoved(QString agentName)
  */
 void ValuesHistoryController::filterValuesToShowOnlyAgent(QString agentName)
 {
-    // Clear all names
-    _selectedAgentNamesList.clear();
+    // Empty list and append only the agent name
+    QStringList temp;
+    temp.append(agentName);
 
-    // Add only this one
-    _selectedAgentNamesList.append(agentName);
+    // Use the setter to emit a signal for QML binding
+    setselectedAgentNamesList(temp);
 
     // Update the filters on the list of values
     _updateFilters();
@@ -167,7 +198,7 @@ void ValuesHistoryController::_updateFilters()
         qDebug() << AgentIOPTypes::staticEnumToString(agentIOPType);
     }*/
 
-    qDebug() << "and for agents" << _selectedAgentNamesList;
+    qDebug() << "All agents" << _allAgentNamesList << "-- selected agents" << _selectedAgentNamesList;
 
     // Update the list of agent names of the filter
     _filteredValues.setselectedAgentNamesList(_selectedAgentNamesList);
