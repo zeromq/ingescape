@@ -101,6 +101,18 @@ public:
 
 
     /**
+     * @brief Show the values of all agents
+     */
+    Q_INVOKABLE void showValuesOfAllAgents();
+
+
+    /**
+     * @brief Hide the values of all agents
+     */
+    Q_INVOKABLE void hideValuesOfAllAgents();
+
+
+    /**
      * @brief Return true if the values of the agent are shown
      * @param agentName
      * @return

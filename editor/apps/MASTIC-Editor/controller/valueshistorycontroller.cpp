@@ -117,6 +117,32 @@ void ValuesHistoryController::hideValuesOfAgent(QString agentName)
 
 
 /**
+ * @brief Show the values of all agents
+ */
+void ValuesHistoryController::showValuesOfAllAgents()
+{
+    // Use the setter to emit a signal for QML binding
+    setselectedAgentNamesList(_allAgentNamesList);
+
+    // Update the filters on the list of values
+    _updateFilters();
+}
+
+
+/**
+ * @brief Hide the values of all agents
+ */
+void ValuesHistoryController::hideValuesOfAllAgents()
+{
+    // Use the setter to emit a signal for QML binding
+    setselectedAgentNamesList(QStringList());
+
+    // Update the filters on the list of values
+    _updateFilters();
+}
+
+
+/**
  * @brief Return true if the values of the agent are shown
  * @param agentName
  * @return
