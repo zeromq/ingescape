@@ -10,8 +10,6 @@ I2Combobox {
     height : 22
     width : 115
 
-
-
     style : I2ComboboxStyle {
         backgroundColorIdle : MasticTheme.darkBlueGreyColor
         borderWidthIdle : 0
@@ -38,6 +36,34 @@ I2Combobox {
         iconMarginRight : 6
 
         layerObjectName : "overlayLayerComboBox"
+
+        ScrollViewStyle {
+                transientScrollBars: true
+                handle: Item {
+                    implicitWidth: 8
+                    implicitHeight: 26
+
+                    Rectangle {
+                        color: MasticTheme.lightGreyColor
+
+                        anchors {
+                            fill: parent
+                            topMargin: 1
+                            leftMargin: 1
+                            rightMargin:0
+                            bottomMargin: 2
+                        }
+
+                        opacity : 0.8
+                        radius: 10
+                    }
+                }
+                scrollBarBackground: Item {
+                    implicitWidth: 8
+                    implicitHeight: 26
+                }
+            }
+
     }
 
 }

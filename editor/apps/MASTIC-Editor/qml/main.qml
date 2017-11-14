@@ -85,6 +85,16 @@ ApplicationWindow {
                     }
                 }
             }
+
+            MenuItem {
+                text: qsTr("Historique")
+                onTriggered: {
+                    console.log("Historique");
+                    if (applicationLoader.item) {
+                        applicationLoader.item.openHistory();
+                    }
+                }
+            }
         }
 
         Menu {
@@ -113,17 +123,7 @@ ApplicationWindow {
                 onTriggered: {
                     console.log("Exécuter le mapping");
                 }
-            }
-
-            MenuSeparator {
-            }
-
-            MenuItem {
-                text: qsTr("Historique")
-                onTriggered: {
-                    console.log("Historique");
-                }
-            }
+            }   
         }
 
         Menu {

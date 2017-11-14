@@ -56,6 +56,10 @@ Item {
     //
     //--------------------------------------------------------
 
+    // function allowing to open the history panel
+    function openHistory() {
+        historyPanel.open();
+    }
 
 
 
