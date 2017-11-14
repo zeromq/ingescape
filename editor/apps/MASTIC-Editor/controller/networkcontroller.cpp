@@ -283,12 +283,6 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
                     Q_EMIT networkController->isFrozenFromAgentUpdated(peerId, true);
                 }
             }
-            // MAPPED
-            /*else if (message.startsWith("MAPPED"))
-            {
-                // FIXME Nothing TODO ?
-                //qDebug() << peerName << "MAPPED" << message;
-            }*/
             else
             {
                 qDebug() << "Unknown message received:" << message;
@@ -386,12 +380,7 @@ void onObserveInputCallback(iop_t iopType, const char* name, iopType_t valueType
                     currentValue = QVariant(newValue);
                     isValid = true;
 
-                    /*if (newValue) {
-                        qDebug() << "New value TRUE received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
-                    }
-                    else {
-                        qDebug() << "New value FALSE received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
-                    }*/
+                    //qDebug() << "New value" << newValue << "received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
                     break;
                 }
                 case IMPULSION_T: {
@@ -414,7 +403,7 @@ void onObserveInputCallback(iop_t iopType, const char* name, iopType_t valueType
                         qDebug() << "New DATA with size" << valueSize << "received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
                     }
                     else {
-                        // FIXME TODO
+                        qCritical() << "Can NOT read input" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType) << "(DATA of size:" << valueSize << ")";
                     }
                     break;
                 }
@@ -434,8 +423,7 @@ void onObserveInputCallback(iop_t iopType, const char* name, iopType_t valueType
                     Q_EMIT networkController->valuePublished(publishedValue);
                 }
                 else {
-                    // FIXME TODO log error
-                    //qCritical()
+                    qCritical() << "Can NOT read input" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
                 }
             }
         }
@@ -719,7 +707,7 @@ void NetworkController::onAddInputsToEditorForOutputs(QString agentName, QList<O
                     break;
                 }
                 case AgentIOPValueTypes::DATA: {
-                    // FIXME TODO
+                    // FIXME TODO mtic_createInput DATA_T
                     //resultCreateInput = mtic_createInput(inputName.toStdString().c_str(), DATA_T, &defaultValue, sizeof(...));
                     break;
                 }
