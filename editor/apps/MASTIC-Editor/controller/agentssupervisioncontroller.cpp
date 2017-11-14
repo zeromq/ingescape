@@ -199,6 +199,7 @@ void AgentsSupervisionController::onAgentModelCreated(AgentM* model)
         connect(agent, &AgentVM::commandAskedToLauncher, this, &AgentsSupervisionController::commandAskedToLauncher);
         connect(agent, &AgentVM::commandAsked, this, &AgentsSupervisionController::commandAsked);
         connect(agent, &AgentVM::commandAskedForOutput, this, &AgentsSupervisionController::commandAskedForOutput);
+        connect(agent, &AgentVM::openValuesHistoryOfAgent, this, &AgentsSupervisionController::openValuesHistoryOfAgent);
 
         agentViewModelsList.append(agent);
         _mapFromNameToAgentViewModelsList.insert(model->name(), agentViewModelsList);
@@ -373,6 +374,7 @@ void AgentsSupervisionController::_deleteAgentViewModel(AgentVM* agent)
         disconnect(agent, &AgentVM::commandAskedToLauncher, this, &AgentsSupervisionController::commandAskedToLauncher);
         disconnect(agent, &AgentVM::commandAsked, this, &AgentsSupervisionController::commandAsked);
         disconnect(agent, &AgentVM::commandAskedForOutput, this, &AgentsSupervisionController::commandAskedForOutput);
+        disconnect(agent, &AgentVM::openValuesHistoryOfAgent, this, &AgentsSupervisionController::openValuesHistoryOfAgent);
 
         // Free memory
         delete agent;
