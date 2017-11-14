@@ -118,7 +118,7 @@ Item {
                         top: parent.top
                         topMargin: 10
                         right : parent.right
-                        rightMargin: 10 + (offButton.width - removeButton.width)/2
+                        rightMargin: 12
                     }
 
                     style: Theme.LabellessSvgButtonStyle {
@@ -337,7 +337,7 @@ Item {
                     bottom: parent.bottom
                     bottomMargin: 10
                     right : parent.right
-                    rightMargin: 10
+                    rightMargin: 12
                 }
 
                 style: Theme.LabellessSvgButtonStyle {

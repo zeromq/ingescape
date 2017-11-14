@@ -111,7 +111,7 @@ bool OutputVM::canLinkWith(PointMapVM* pointMap)
  */
 void OutputVM::_onModelsChanged()
 {
-    // Update the first model"
+    // Update the first model
     if (_models.count() > 0) {
         setfirstModel(_models.at(0));
     }
@@ -125,7 +125,7 @@ void OutputVM::_onModelsChanged()
     // Model of output added
     if (_previousModelsList.count() < newModelsList.count())
     {
-        qDebug() << _previousModelsList.count() << "--> ADD --> " << newModelsList.count();
+        //qDebug() << _previousModelsList.count() << "--> ADD --> " << newModelsList.count();
 
         for (OutputM* model : newModelsList) {
             if ((model != NULL) && !_previousModelsList.contains(model))
@@ -140,7 +140,7 @@ void OutputVM::_onModelsChanged()
     // Model of output removed
     else if (_previousModelsList.count() > newModelsList.count())
     {
-        qDebug() << _previousModelsList.count() << "--> REMOVE --> " << newModelsList.count();
+        //qDebug() << _previousModelsList.count() << "--> REMOVE --> " << newModelsList.count();
 
         for (OutputM* model : _previousModelsList) {
             if ((model != NULL) && !newModelsList.contains(model))

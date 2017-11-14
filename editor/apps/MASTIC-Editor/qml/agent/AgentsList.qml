@@ -85,9 +85,8 @@ Item {
     //
     // List of agents
     //
-    ListView {
-        id: agentsList
-
+    ScrollView {
+        id : agentsListScrollView
         anchors {
             top: parent.top
             topMargin: 108
@@ -96,11 +95,41 @@ Item {
             right: parent.right
         }
 
-        model: controller.agentsList
+        style: ScrollViewStyle {
+            transientScrollBars: true
+            handle: Item {
+                implicitWidth: 8
+                implicitHeight: 26
 
-        delegate: componentAgentListItem
+                Rectangle {
+                    color: MasticTheme.lightGreyColor
 
-        /*onCurrentIndexChanged: {
+                    anchors {
+                        fill: parent
+                        topMargin: 1
+                        leftMargin: 1
+                        rightMargin:0
+                        bottomMargin: 2
+                    }
+
+                    opacity : 0.8
+                    radius: 10
+                }
+            }
+            scrollBarBackground: Item {
+                implicitWidth: 8
+                implicitHeight: 26
+            }
+        }
+
+        ListView {
+            id: agentsList
+
+            model: controller.agentsList
+
+            delegate: componentAgentListItem
+
+            /*onCurrentIndexChanged: {
             //console.log("onCurrentIndexChanged " + agentsList.currentIndex);
             console.log("onCurrentIndexChanged " + model.get(agentsList.currentIndex).name);
         }
@@ -108,38 +137,38 @@ Item {
             console.log("onCurrentItemChanged " + agentsList.currentItem);
         }*/
 
-        //
-        // Transition animations
-        //
-        add: Transition {
-            NumberAnimation { property: "opacity"; from: 0.0; to: 1.0 }
-            NumberAnimation { property: "scale"; from: 0.0; to: 1.0 }
+            //
+            // Transition animations
+            //
+            add: Transition {
+                NumberAnimation { property: "opacity"; from: 0.0; to: 1.0 }
+                NumberAnimation { property: "scale"; from: 0.0; to: 1.0 }
+            }
+
+            displaced: Transition {
+                NumberAnimation { properties: "x,y"; easing.type: Easing.OutBounce }
+
+                // ensure opacity and scale values return to 1.0
+                NumberAnimation { property: "opacity"; to: 1.0 }
+                NumberAnimation { property: "scale"; to: 1.0 }
+            }
+
+            move: Transition {
+                NumberAnimation { properties: "x,y"; easing.type: Easing.OutBounce }
+
+                // ensure opacity and scale values return to 1.0
+                NumberAnimation { property: "opacity"; to: 1.0 }
+                NumberAnimation { property: "scale"; to: 1.0 }
+            }
+
+            remove: Transition {
+                // ensure opacity and scale values return to 0.0
+                NumberAnimation { property: "opacity"; to: 0.0 }
+                NumberAnimation { property: "scale"; to: 0.0 }
+            }
+
         }
-
-        displaced: Transition {
-            NumberAnimation { properties: "x,y"; easing.type: Easing.OutBounce }
-
-            // ensure opacity and scale values return to 1.0
-            NumberAnimation { property: "opacity"; to: 1.0 }
-            NumberAnimation { property: "scale"; to: 1.0 }
-        }
-
-        move: Transition {
-            NumberAnimation { properties: "x,y"; easing.type: Easing.OutBounce }
-
-            // ensure opacity and scale values return to 1.0
-            NumberAnimation { property: "opacity"; to: 1.0 }
-            NumberAnimation { property: "scale"; to: 1.0 }
-        }
-
-        remove: Transition {
-            // ensure opacity and scale values return to 0.0
-            NumberAnimation { property: "opacity"; to: 0.0 }
-            NumberAnimation { property: "scale"; to: 0.0 }
-        }
-
     }
-
 
     //
     // Header
@@ -151,7 +180,7 @@ Item {
             top: parent.top
             left: parent.left
             right: parent.right
-            bottom : agentsList.top
+            bottom : agentsListScrollView.top
         }
 
         color : MasticTheme.selectedTabsBackgroundColor
@@ -312,7 +341,7 @@ Item {
     //
     Rectangle {
         anchors {
-            bottom: agentsList.top
+            bottom: agentsListScrollView.top
             left: parent.left
             right: parent.right
         }
@@ -425,10 +454,10 @@ Item {
                     }
 
                     AgentMapping.AgentNodeView {
-                         isReduced : true
-                         agentName : model.name
-                         visible: mouseArea.drag.active
-                         dropEnabled : false
+                        isReduced : true
+                        agentName : model.name
+                        visible: mouseArea.drag.active
+                        dropEnabled : false
                     }
                 }
 

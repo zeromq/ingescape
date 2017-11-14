@@ -195,7 +195,7 @@ void AgentsSupervisionController::onAgentModelCreated(AgentM* model)
         AgentVM* agent = new AgentVM(model, this);
 
         // Connect to signals from this new view model of agent
-        connect(agent, &AgentVM::definitionChangedWithPreviousValue, this, &AgentsSupervisionController::onAgentDefinitionChangedWithPreviousValue);
+        connect(agent, &AgentVM::definitionChangedWithPreviousValue, this, &AgentsSupervisionController::_onAgentDefinitionChangedWithPreviousValue);
         connect(agent, &AgentVM::commandAskedToLauncher, this, &AgentsSupervisionController::commandAskedToLauncher);
         connect(agent, &AgentVM::commandAsked, this, &AgentsSupervisionController::commandAsked);
         connect(agent, &AgentVM::commandAskedForOutput, this, &AgentsSupervisionController::commandAskedForOutput);
@@ -215,7 +215,7 @@ void AgentsSupervisionController::onAgentModelCreated(AgentM* model)
  * @param previousDefinition
  * @param newDefinition
  */
-void AgentsSupervisionController::onAgentDefinitionChangedWithPreviousValue(DefinitionM* previousDefinition, DefinitionM* newDefinition)
+void AgentsSupervisionController::_onAgentDefinitionChangedWithPreviousValue(DefinitionM* previousDefinition, DefinitionM* newDefinition)
 {
     AgentVM* agent = qobject_cast<AgentVM*>(sender());
     if ((agent != NULL) && (_modelManager != NULL)
@@ -370,7 +370,7 @@ void AgentsSupervisionController::_deleteAgentViewModel(AgentVM* agent)
         _mapFromNameToAgentViewModelsList.insert(agent->name(), agentViewModelsList);
 
         // DIS-connect from signals from this old view model of agent
-        disconnect(agent, &AgentVM::definitionChangedWithPreviousValue, this, &AgentsSupervisionController::onAgentDefinitionChangedWithPreviousValue);
+        disconnect(agent, &AgentVM::definitionChangedWithPreviousValue, this, &AgentsSupervisionController::_onAgentDefinitionChangedWithPreviousValue);
         disconnect(agent, &AgentVM::commandAskedToLauncher, this, &AgentsSupervisionController::commandAskedToLauncher);
         disconnect(agent, &AgentVM::commandAsked, this, &AgentsSupervisionController::commandAsked);
         disconnect(agent, &AgentVM::commandAskedForOutput, this, &AgentsSupervisionController::commandAskedForOutput);

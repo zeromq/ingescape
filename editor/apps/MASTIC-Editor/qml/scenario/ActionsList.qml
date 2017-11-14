@@ -79,8 +79,8 @@ Item {
     //
     // List of actions
     //
-    ListView {
-        id: actionsList
+    ScrollView {
+        id : actionsListScrollView
 
         anchors {
             top: parent.top
@@ -90,11 +90,41 @@ Item {
             right: parent.right
         }
 
-        model: controller.actionsList
+        style: ScrollViewStyle {
+            transientScrollBars: true
+            handle: Item {
+                implicitWidth: 8
+                implicitHeight: 26
 
-        delegate: componentActionsListItem
+                Rectangle {
+                    color: MasticTheme.lightGreyColor
 
-        /*onCurrentIndexChanged: {
+                    anchors {
+                        fill: parent
+                        topMargin: 1
+                        leftMargin: 1
+                        rightMargin:0
+                        bottomMargin: 2
+                    }
+
+                    opacity : 0.8
+                    radius: 10
+                }
+            }
+            scrollBarBackground: Item {
+                implicitWidth: 8
+                implicitHeight: 26
+            }
+        }
+
+        ListView {
+            id: actionsList
+
+            model: controller.actionsList
+
+            delegate: componentActionsListItem
+
+            /*onCurrentIndexChanged: {
             //console.log("onCurrentIndexChanged " + agentsList.currentIndex);
             console.log("onCurrentIndexChanged " + model.get(agentsList.currentIndex).name);
         }
@@ -102,38 +132,38 @@ Item {
             console.log("onCurrentItemChanged " + agentsList.currentItem);
         }*/
 
-        //
-        // Transition animations
-        //
-        add: Transition {
-            NumberAnimation { property: "opacity"; from: 0.0; to: 1.0 }
-            NumberAnimation { property: "scale"; from: 0.0; to: 1.0 }
+            //
+            // Transition animations
+            //
+            add: Transition {
+                NumberAnimation { property: "opacity"; from: 0.0; to: 1.0 }
+                NumberAnimation { property: "scale"; from: 0.0; to: 1.0 }
+            }
+
+            displaced: Transition {
+                NumberAnimation { properties: "x,y"; easing.type: Easing.OutBounce }
+
+                // ensure opacity and scale values return to 1.0
+                NumberAnimation { property: "opacity"; to: 1.0 }
+                NumberAnimation { property: "scale"; to: 1.0 }
+            }
+
+            move: Transition {
+                NumberAnimation { properties: "x,y"; easing.type: Easing.OutBounce }
+
+                // ensure opacity and scale values return to 1.0
+                NumberAnimation { property: "opacity"; to: 1.0 }
+                NumberAnimation { property: "scale"; to: 1.0 }
+            }
+
+            remove: Transition {
+                // ensure opacity and scale values return to 0.0
+                NumberAnimation { property: "opacity"; to: 0.0 }
+                NumberAnimation { property: "scale"; to: 0.0 }
+            }
+
         }
-
-        displaced: Transition {
-            NumberAnimation { properties: "x,y"; easing.type: Easing.OutBounce }
-
-            // ensure opacity and scale values return to 1.0
-            NumberAnimation { property: "opacity"; to: 1.0 }
-            NumberAnimation { property: "scale"; to: 1.0 }
-        }
-
-        move: Transition {
-            NumberAnimation { properties: "x,y"; easing.type: Easing.OutBounce }
-
-            // ensure opacity and scale values return to 1.0
-            NumberAnimation { property: "opacity"; to: 1.0 }
-            NumberAnimation { property: "scale"; to: 1.0 }
-        }
-
-        remove: Transition {
-            // ensure opacity and scale values return to 0.0
-            NumberAnimation { property: "opacity"; to: 0.0 }
-            NumberAnimation { property: "scale"; to: 0.0 }
-        }
-
     }
-
 
     //
     // Header
@@ -145,7 +175,7 @@ Item {
             top: parent.top
             left: parent.left
             right: parent.right
-            bottom : actionsList.top
+            bottom : actionsListScrollView.top
         }
 
         color : MasticTheme.selectedTabsBackgroundColor
@@ -307,7 +337,7 @@ Item {
     //
     Rectangle {
         anchors {
-            bottom: actionsList.top
+            bottom: actionsListScrollView.top
             left: parent.left
             right: parent.right
         }
@@ -340,7 +370,7 @@ Item {
                 action : model.QtObject
                 controller: rootItem.controller
 
-               // visible: mouseArea.drag.active
+                // visible: mouseArea.drag.active
                 actionItemIsHovered : mouseArea.containsMouse
             }
 
@@ -417,117 +447,117 @@ Item {
                         visible: !mouseArea.drag.active
                     }
 
-//                    AgentMapping.AgentNodeView {
-//                         isReduced : true
-//                         agentName : model.name
-//                         visible: mouseArea.drag.active
-//                         dropEnabled : false
-//                    }
+                    //                    AgentMapping.AgentNodeView {
+                    //                         isReduced : true
+                    //                         agentName : model.name
+                    //                         visible: mouseArea.drag.active
+                    //                         dropEnabled : false
+                    //                    }
                 }
 
             }
 
 
-//            Rectangle {
+            //            Rectangle {
 
-//                anchors {
-//                    fill: parent
-//                    leftMargin: 4
-//                    rightMargin: 4
-//                    topMargin: 4
-//                    bottomMargin: 4
-//                }
-//                radius: 5
-//                border {
-//                    width: 1
-//                    color: MasticTheme.whiteColor
-//                }
-//                color: actionListItem.ListView.isCurrentItem ? "blue" : MasticTheme.agentsListItemBackgroundColor
+            //                anchors {
+            //                    fill: parent
+            //                    leftMargin: 4
+            //                    rightMargin: 4
+            //                    topMargin: 4
+            //                    bottomMargin: 4
+            //                }
+            //                radius: 5
+            //                border {
+            //                    width: 1
+            //                    color: MasticTheme.whiteColor
+            //                }
+            //                color: actionListItem.ListView.isCurrentItem ? "blue" : MasticTheme.agentsListItemBackgroundColor
 
-//                Item {
-//                    id: actionRow
+            //                Item {
+            //                    id: actionRow
 
-//                    anchors {
-//                        fill: parent
-//                        leftMargin: 5
-//                        topMargin: 2
-//                    }
+            //                    anchors {
+            //                        fill: parent
+            //                        leftMargin: 5
+            //                        topMargin: 2
+            //                    }
 
-//                    Button {
-//                        id: btnDeleteAction
+            //                    Button {
+            //                        id: btnDeleteAction
 
-//                        anchors {
-//                            left: actionRow.right
-//                            top: actionRow.top
-//                        }
+            //                        anchors {
+            //                            left: actionRow.right
+            //                            top: actionRow.top
+            //                        }
 
-//                        visible: true
+            //                        visible: true
 
-//                        text: "X"
+            //                        text: "X"
 
-//                        onClicked: {
-//                            if (controller)
-//                            {
-//                                // Delete our action
-//                                controller.deleteAction(model.QtObject);
-//                            }
-//                        }
-//                    }
+            //                        onClicked: {
+            //                            if (controller)
+            //                            {
+            //                                // Delete our action
+            //                                controller.deleteAction(model.QtObject);
+            //                            }
+            //                        }
+            //                    }
 
-//                    Column {
-//                        width: 175
-//                        anchors {
-//                            left : parent.left
-//                        }
+            //                    Column {
+            //                        width: 175
+            //                        anchors {
+            //                            left : parent.left
+            //                        }
 
-//                        Text {
-//                            id: actionName
-//                            text: model.actionModel.name
+            //                        Text {
+            //                            id: actionName
+            //                            text: model.actionModel.name
 
-//                            height: 25
-//                            color: MasticTheme.agentsListLabelColor
-//                            font: MasticTheme.heading2Font
-//                        }
+            //                            height: 25
+            //                            color: MasticTheme.agentsListLabelColor
+            //                            font: MasticTheme.heading2Font
+            //                        }
 
-//                        Text {
-//                            id: actionStartTime
-//                            text: model.startDateTime.toLocaleTimeString(Qt.locale(), "HH':'mm':'ss")
+            //                        Text {
+            //                            id: actionStartTime
+            //                            text: model.startDateTime.toLocaleTimeString(Qt.locale(), "HH':'mm':'ss")
 
-//                            height: 25
-//                            color: MasticTheme.agentsListLabelColor
-//                            font: MasticTheme.normalFont
-//                        }
-//                    }
+            //                            height: 25
+            //                            color: MasticTheme.agentsListLabelColor
+            //                            font: MasticTheme.normalFont
+            //                        }
+            //                    }
 
-//                    MouseArea {
-//                        id: mouseAreaForSelection
-//                        anchors.fill: parent
+            //                    MouseArea {
+            //                        id: mouseAreaForSelection
+            //                        anchors.fill: parent
 
-//                        onPressed: {
-//                            actionsList.currentIndex = index
-//                        }
-//                    }
+            //                        onPressed: {
+            //                            actionsList.currentIndex = index
+            //                        }
+            //                    }
 
-//                    Button {
-//                        id: btnEdition
+            //                    Button {
+            //                        id: btnEdition
 
-//                        text: "Edit"
+            //                        text: "Edit"
 
-//                        anchors {
-//                            top: parent.top
-//                            right: parent.right
-//                        }
-//                        width: 175
+            //                        anchors {
+            //                            top: parent.top
+            //                            right: parent.right
+            //                        }
+            //                        width: 175
 
-//                        onClicked: {
-//                            if (controller) {
-//                                // Open the action editor of our agent
-//                                controller.openActionEditor(model.QtObject);
-//                            }
-//                        }
-//                    }
-//                }
-//            }
+            //                        onClicked: {
+            //                            if (controller) {
+            //                                // Open the action editor of our agent
+            //                                controller.openActionEditor(model.QtObject);
+            //                            }
+            //                        }
+            //                    }
+            //                }
+            //            }
         }
     }
 }
