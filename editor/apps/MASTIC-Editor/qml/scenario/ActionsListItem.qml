@@ -122,7 +122,7 @@ Item {
                 }
 
                 height : actionName.height
-                width : childrenRect.width - (removeButton.width + 12)
+                width : actionName.width
 
                 hoverEnabled: true
                 onClicked: {
@@ -160,7 +160,7 @@ Item {
                     visible: actionNameBtn.containsMouse
 
                     anchors {
-                        left : actionNameBtn.left
+                        left : actionName.left
                         right : actionName.right
                         bottom : parent.bottom
                     }
