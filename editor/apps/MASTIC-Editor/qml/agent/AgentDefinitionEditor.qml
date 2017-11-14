@@ -396,8 +396,8 @@ I2PopupBase {
 
                             ListView {
                                 id : listView
-                                model: 25
-                                width : if (definition) {
+                                width : scrollView.width
+                                model: if (definition) {
                                            switch (tabs.currentIndex)
                                            {
                                            case 0:
