@@ -1156,106 +1156,120 @@ int mtic_startWithDevice(const char *networkDevice, int port){
     strncpy(agentElements->networkDevice, networkDevice, NETWORK_DEVICE_LENGTH);
     agentElements->ipAddress[0] = '\0';
     
-#ifdef _WIN32
-    do {
-        pAddresses = (IP_ADAPTER_ADDRESSES *) MALLOC(outBufLen);
-        if (pAddresses == NULL) {
-            printf("Memory allocation failed for IP_ADAPTER_ADDRESSES struct... exiting.\n");
-            exit(1);
+    ziflist_t *iflist = ziflist_new ();
+    assert (iflist);
+    const char *name = ziflist_first (iflist);
+    while (name) {
+        printf (" - name=%s address=%s netmask=%s broadcast=%s\n",
+                name, ziflist_address (iflist), ziflist_netmask (iflist), ziflist_broadcast (iflist));
+        if (strcmp(name, networkDevice) == 0){
+            strncpy(agentElements->ipAddress, ziflist_address (iflist), IP_ADDRESS_LENGTH-1);
+            mtic_debug("Connection with ip address %s on device %s\n", agentElements->ipAddress, networkDevice);
         }
-        
-        dwRetVal = GetAdaptersAddresses(family, flags, NULL, pAddresses, &outBufLen);
-        
-        if (dwRetVal == ERROR_BUFFER_OVERFLOW) {
-            FREE(pAddresses);
-            pAddresses = NULL;
-        } else {
-            break;
-        }
-        
-        Iterations++;
-        
-    } while ((dwRetVal == ERROR_BUFFER_OVERFLOW) && (Iterations < MAX_TRIES));
-    
-    if (dwRetVal == NO_ERROR) {
-        // If successful, output some information from the data we received
-        pCurrAddresses = pAddresses;
-        while (pCurrAddresses) {
-            //Convert the wchar_t to char *
-            friendly_name = (char *)malloc( BUFSIZ );
-            count = wcstombs(friendly_name, pCurrAddresses->FriendlyName, BUFSIZ );
-            
-            //If the friendly_name is the same of the networkDevice
-            if (strcmp(agentElements->networkDevice, friendly_name) == 0)
-            {
-                pUnicast = pCurrAddresses->FirstUnicastAddress;
-                if (pUnicast != NULL)
-                {
-                    for (i = 0; pUnicast != NULL; i++)
-                    {
-                        if(pUnicast)
-                        {
-                            if (pUnicast->Address.lpSockaddr->sa_family == AF_INET)
-                            {
-                                struct sockaddr_in *sa_in = (struct sockaddr_in *)pUnicast->Address.lpSockaddr;
-                                strncpy(agentElements->ipAddress, inet_ntoa(sa_in->sin_addr), IP_ADDRESS_LENGTH);
-                                free(friendly_name);
-                                mtic_debug("Connection with ip address %s on device %s\n", agentElements->ipAddress, agentElements->networkDevice);
-                                break;
-                            }
-                        }
-                        pUnicast = pUnicast->Next;
-                    }
-                }
-            }
-            
-            pCurrAddresses = pCurrAddresses->Next;
-        }
-    } else {
-        mtic_debug("Call to GetAdaptersAddresses failed with error: %d\n",
-               dwRetVal);
-        if (dwRetVal == ERROR_NO_DATA)
-            mtic_debug("\tNo addresses were found for the requested parameters\n");
-        else {
-            
-            if (FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
-                              FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-                              NULL, dwRetVal, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                              // Default language
-                              (LPTSTR) & lpMsgBuf, 0, NULL)) {
-                mtic_debug("\tError: %s", lpMsgBuf);
-                LocalFree(lpMsgBuf);
-                if (pAddresses)
-                    FREE(pAddresses);
-                exit(1);
-            }
-        }
+        name = ziflist_next (iflist);
     }
+    ziflist_destroy (&iflist);
     
-    if (pAddresses) {
-        FREE(pAddresses);
-    }
-    
-#else
-    struct ifaddrs *addrs, *tmpaddr;
-    getifaddrs(&addrs);
-    tmpaddr = addrs;
-    while (tmpaddr)
-    {
-        if (tmpaddr->ifa_addr && tmpaddr->ifa_addr->sa_family == AF_INET)
-        {
-            struct sockaddr_in *pAddr = (struct sockaddr_in *)tmpaddr->ifa_addr;
-            if (strcmp(networkDevice, tmpaddr->ifa_name) == 0)
-            {
-                strncpy(agentElements->ipAddress, inet_ntoa(pAddr->sin_addr), IP_ADDRESS_LENGTH);
-                mtic_debug("Connection with ip address %s on device %s\n", agentElements->ipAddress, networkDevice);
-                break;
-            }
-        }
-        tmpaddr = tmpaddr->ifa_next;
-    }
-    freeifaddrs(addrs);
-#endif
+//#ifdef _WIN32
+//    do {
+//        pAddresses = (IP_ADAPTER_ADDRESSES *) MALLOC(outBufLen);
+//        if (pAddresses == NULL) {
+//            printf("Memory allocation failed for IP_ADAPTER_ADDRESSES struct... exiting.\n");
+//            exit(1);
+//        }
+//
+//        dwRetVal = GetAdaptersAddresses(family, flags, NULL, pAddresses, &outBufLen);
+//
+//        if (dwRetVal == ERROR_BUFFER_OVERFLOW) {
+//            FREE(pAddresses);
+//            pAddresses = NULL;
+//        } else {
+//            break;
+//        }
+//
+//        Iterations++;
+//
+//    } while ((dwRetVal == ERROR_BUFFER_OVERFLOW) && (Iterations < MAX_TRIES));
+//
+//    if (dwRetVal == NO_ERROR) {
+//        // If successful, output some information from the data we received
+//        pCurrAddresses = pAddresses;
+//        while (pCurrAddresses) {
+//            //Convert the wchar_t to char *
+//            friendly_name = (char *)malloc( BUFSIZ );
+//            count = wcstombs(friendly_name, pCurrAddresses->FriendlyName, BUFSIZ );
+//
+//            //If the friendly_name is the same of the networkDevice
+//            if (strcmp(agentElements->networkDevice, friendly_name) == 0)
+//            {
+//                pUnicast = pCurrAddresses->FirstUnicastAddress;
+//                if (pUnicast != NULL)
+//                {
+//                    for (i = 0; pUnicast != NULL; i++)
+//                    {
+//                        if(pUnicast)
+//                        {
+//                            if (pUnicast->Address.lpSockaddr->sa_family == AF_INET)
+//                            {
+//                                struct sockaddr_in *sa_in = (struct sockaddr_in *)pUnicast->Address.lpSockaddr;
+//                                strncpy(agentElements->ipAddress, inet_ntoa(sa_in->sin_addr), IP_ADDRESS_LENGTH);
+//                                free(friendly_name);
+//                                mtic_debug("Connection with ip address %s on device %s\n", agentElements->ipAddress, agentElements->networkDevice);
+//                                break;
+//                            }
+//                        }
+//                        pUnicast = pUnicast->Next;
+//                    }
+//                }
+//            }
+//
+//            pCurrAddresses = pCurrAddresses->Next;
+//        }
+//    } else {
+//        mtic_debug("Call to GetAdaptersAddresses failed with error: %d\n",
+//               dwRetVal);
+//        if (dwRetVal == ERROR_NO_DATA)
+//            mtic_debug("\tNo addresses were found for the requested parameters\n");
+//        else {
+//
+//            if (FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
+//                              FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+//                              NULL, dwRetVal, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+//                              // Default language
+//                              (LPTSTR) & lpMsgBuf, 0, NULL)) {
+//                mtic_debug("\tError: %s", lpMsgBuf);
+//                LocalFree(lpMsgBuf);
+//                if (pAddresses)
+//                    FREE(pAddresses);
+//                exit(1);
+//            }
+//        }
+//    }
+//
+//    if (pAddresses) {
+//        FREE(pAddresses);
+//    }
+//
+//#else
+//    struct ifaddrs *addrs, *tmpaddr;
+//    getifaddrs(&addrs);
+//    tmpaddr = addrs;
+//    while (tmpaddr)
+//    {
+//        if (tmpaddr->ifa_addr && tmpaddr->ifa_addr->sa_family == AF_INET)
+//        {
+//            struct sockaddr_in *pAddr = (struct sockaddr_in *)tmpaddr->ifa_addr;
+//            if (strcmp(networkDevice, tmpaddr->ifa_name) == 0)
+//            {
+//                strncpy(agentElements->ipAddress, inet_ntoa(pAddr->sin_addr), IP_ADDRESS_LENGTH);
+//                mtic_debug("Connection with ip address %s on device %s\n", agentElements->ipAddress, networkDevice);
+//                break;
+//            }
+//        }
+//        tmpaddr = tmpaddr->ifa_next;
+//    }
+//    freeifaddrs(addrs);
+//#endif
     
     if (strlen(agentElements->ipAddress) == 0){
         fprintf(stderr, "IP address could not be determined on device %s... exiting.\n", networkDevice);
@@ -1285,104 +1299,118 @@ int mtic_startWithIP(const char *ipAddress, int port){
     mtic_Interrupted = false;
     agentElements = calloc(1, sizeof(zyreloopElements_t));
     
-    //get device name for IP
-#ifdef _WIN32
-    do {
-        pAddresses = (IP_ADAPTER_ADDRESSES *) MALLOC(outBufLen);
-        if (pAddresses == NULL) {
-            printf("Memory allocation failed for IP_ADAPTER_ADDRESSES struct... exiting.\n");
-            exit(1);
+    ziflist_t *iflist = ziflist_new ();
+    assert (iflist);
+    const char *name = ziflist_first (iflist);
+    while (name) {
+        printf (" - name=%s address=%s netmask=%s broadcast=%s\n",
+                name, ziflist_address (iflist), ziflist_netmask (iflist), ziflist_broadcast (iflist));
+        if (strcmp(ziflist_address (iflist), ipAddress) == 0){
+            strncpy(agentElements->networkDevice, name, 15);
+            printf("Connection with ip address %s on device %s\n", ipAddress, agentElements->networkDevice);
         }
-        
-        dwRetVal = GetAdaptersAddresses(family, flags, NULL, pAddresses, &outBufLen);
-        
-        if (dwRetVal == ERROR_BUFFER_OVERFLOW) {
-            FREE(pAddresses);
-            pAddresses = NULL;
-        } else {
-            break;
-        }
-        
-        Iterations++;
-        
-    } while ((dwRetVal == ERROR_BUFFER_OVERFLOW) && (Iterations < MAX_TRIES));
-    
-    if (dwRetVal == NO_ERROR) {
-        // If successful, output some information from the data we received
-        pCurrAddresses = pAddresses;
-        while (pCurrAddresses) {
-            //Convert the wchar_t to char *
-            friendly_name = (char *)malloc( BUFSIZ );
-            count = wcstombs(friendly_name, pCurrAddresses->FriendlyName, BUFSIZ );
-            
-            //If the friendly_name is the same of the networkDevice
-            pUnicast = pCurrAddresses->FirstUnicastAddress;
-            if (pUnicast != NULL)
-            {
-                for (i = 0; pUnicast != NULL; i++)
-                {
-                    if(pUnicast)
-                    {
-                        if (pUnicast->Address.lpSockaddr->sa_family == AF_INET)
-                        {
-                            struct sockaddr_in *sa_in = (struct sockaddr_in *)pUnicast->Address.lpSockaddr;
-                            if (strcmp(ipAddress, inet_ntoa(sa_in->sin_addr)) == 0){
-                                strncpy(agentElements->networkDevice, friendly_name, 15);
-                                printf("Connection with ip address %s on device %s\n", ipAddress, agentElements->networkDevice);
-                                break;
-                            }
-                        }
-                    }
-                    pUnicast = pUnicast->Next;
-                }
-            }
-            pCurrAddresses = pCurrAddresses->Next;
-        }
-    } else {
-        printf("Call to GetAdaptersAddresses failed with error: %d\n",
-               dwRetVal);
-        if (dwRetVal == ERROR_NO_DATA)
-            printf("\tNo addresses were found for the requested parameters\n");
-        else {
-            
-            if (FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
-                              FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-                              NULL, dwRetVal, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                              // Default language
-                              (LPTSTR) & lpMsgBuf, 0, NULL)) {
-                printf("\tError: %s", lpMsgBuf);
-                LocalFree(lpMsgBuf);
-                if (pAddresses)
-                    FREE(pAddresses);
-                exit(1);
-            }
-        }
+        name = ziflist_next (iflist);
     }
+    ziflist_destroy (&iflist);
     
-    if (pAddresses) {
-        FREE(pAddresses);
-    }
-    
-#else
-    struct ifaddrs *addrs, *tmpaddr;
-    getifaddrs(&addrs);
-    tmpaddr = addrs;
-    while (tmpaddr)
-    {
-        if (tmpaddr->ifa_addr && tmpaddr->ifa_addr->sa_family == AF_INET)
-        {
-            struct sockaddr_in *pAddr = (struct sockaddr_in *)tmpaddr->ifa_addr;
-            if (strcmp(ipAddress, inet_ntoa(pAddr->sin_addr)) == 0)
-            {
-                strncpy(agentElements->networkDevice, tmpaddr->ifa_name, 15);
-                printf("Connection with ip address %s on device %s\n", ipAddress, agentElements->networkDevice);
-                break;
-            }
-        }
-        tmpaddr = tmpaddr->ifa_next;
-    }
-    freeifaddrs(addrs);
-#endif
+//    //get device name for IP
+//#ifdef _WIN32
+//    do {
+//        pAddresses = (IP_ADAPTER_ADDRESSES *) MALLOC(outBufLen);
+//        if (pAddresses == NULL) {
+//            printf("Memory allocation failed for IP_ADAPTER_ADDRESSES struct... exiting.\n");
+//            exit(1);
+//        }
+//
+//        dwRetVal = GetAdaptersAddresses(family, flags, NULL, pAddresses, &outBufLen);
+//
+//        if (dwRetVal == ERROR_BUFFER_OVERFLOW) {
+//            FREE(pAddresses);
+//            pAddresses = NULL;
+//        } else {
+//            break;
+//        }
+//
+//        Iterations++;
+//
+//    } while ((dwRetVal == ERROR_BUFFER_OVERFLOW) && (Iterations < MAX_TRIES));
+//
+//    if (dwRetVal == NO_ERROR) {
+//        // If successful, output some information from the data we received
+//        pCurrAddresses = pAddresses;
+//        while (pCurrAddresses) {
+//            //Convert the wchar_t to char *
+//            friendly_name = (char *)malloc( BUFSIZ );
+//            count = wcstombs(friendly_name, pCurrAddresses->FriendlyName, BUFSIZ );
+//
+//            //If the friendly_name is the same of the networkDevice
+//            pUnicast = pCurrAddresses->FirstUnicastAddress;
+//            if (pUnicast != NULL)
+//            {
+//                for (i = 0; pUnicast != NULL; i++)
+//                {
+//                    if(pUnicast)
+//                    {
+//                        if (pUnicast->Address.lpSockaddr->sa_family == AF_INET)
+//                        {
+//                            struct sockaddr_in *sa_in = (struct sockaddr_in *)pUnicast->Address.lpSockaddr;
+//                            if (strcmp(ipAddress, inet_ntoa(sa_in->sin_addr)) == 0){
+//                                strncpy(agentElements->networkDevice, friendly_name, 15);
+//                                printf("Connection with ip address %s on device %s\n", ipAddress, agentElements->networkDevice);
+//                                break;
+//                            }
+//                        }
+//                    }
+//                    pUnicast = pUnicast->Next;
+//                }
+//            }
+//            pCurrAddresses = pCurrAddresses->Next;
+//        }
+//    } else {
+//        printf("Call to GetAdaptersAddresses failed with error: %d\n",
+//               dwRetVal);
+//        if (dwRetVal == ERROR_NO_DATA)
+//            printf("\tNo addresses were found for the requested parameters\n");
+//        else {
+//
+//            if (FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
+//                              FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+//                              NULL, dwRetVal, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+//                              // Default language
+//                              (LPTSTR) & lpMsgBuf, 0, NULL)) {
+//                printf("\tError: %s", lpMsgBuf);
+//                LocalFree(lpMsgBuf);
+//                if (pAddresses)
+//                    FREE(pAddresses);
+//                exit(1);
+//            }
+//        }
+//    }
+//
+//    if (pAddresses) {
+//        FREE(pAddresses);
+//    }
+//
+//#else
+//    struct ifaddrs *addrs, *tmpaddr;
+//    getifaddrs(&addrs);
+//    tmpaddr = addrs;
+//    while (tmpaddr)
+//    {
+//        if (tmpaddr->ifa_addr && tmpaddr->ifa_addr->sa_family == AF_INET)
+//        {
+//            struct sockaddr_in *pAddr = (struct sockaddr_in *)tmpaddr->ifa_addr;
+//            if (strcmp(ipAddress, inet_ntoa(pAddr->sin_addr)) == 0)
+//            {
+//                strncpy(agentElements->networkDevice, tmpaddr->ifa_name, 15);
+//                printf("Connection with ip address %s on device %s\n", ipAddress, agentElements->networkDevice);
+//                break;
+//            }
+//        }
+//        tmpaddr = tmpaddr->ifa_next;
+//    }
+//    freeifaddrs(addrs);
+//#endif
     
     if (strlen(agentElements->networkDevice) == 0){
         fprintf(stderr, "Device name could not be determined for IP address %s... exiting.\n", ipAddress);
