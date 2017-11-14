@@ -1201,6 +1201,7 @@ int mtic_startWithDevice(const char *networkDevice, int port){
                                 strncpy(agentElements->ipAddress, inet_ntoa(sa_in->sin_addr), IP_ADDRESS_LENGTH);
                                 free(friendly_name);
                                 mtic_debug("Connection with ip address %s on device %s\n", agentElements->ipAddress, agentElements->networkDevice);
+                                break;
                             }
                         }
                         pUnicast = pUnicast->Next;
