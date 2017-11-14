@@ -858,6 +858,11 @@ int triggerMappingUpdate(zloop_t *loop, int timer_id, void *arg){
 static void
 initActor (zsock_t *pipe, void *args)
 {
+    //we are (re)starting : we enable the timer flags because
+    //all network connections are going to be (re)started
+    network_needToSendDefinitionUpdate = true;
+    network_needToUpdateMapping = true;
+
     //start zyre
     agentElements->node = zyre_new (agentName);
     zyre_set_interface(agentElements->node, agentElements->networkDevice);
