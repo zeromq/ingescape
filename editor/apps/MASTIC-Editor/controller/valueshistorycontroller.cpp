@@ -182,6 +182,8 @@ void ValuesHistoryController::filterValuesToShowOnlyAgent(QString agentName)
     // Use the setter to emit a signal for QML binding
     setselectedAgentNamesList(temp);
 
+    qDebug() << "filterValuesToShowOnlyAgent" << agentName;
+
     // Update the filters on the list of values
     _updateFilters();
 }
