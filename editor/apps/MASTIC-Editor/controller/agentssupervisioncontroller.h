@@ -116,6 +116,13 @@ Q_SIGNALS:
 
 
     /**
+     * @brief Signal emitted when we have to open the values history of an agent
+     * @param agentName
+     */
+    void openValuesHistoryOfAgent(QString agentName);
+
+
+    /**
      * @brief Signal emitted when a previous agent model is replaced by a new one strictly identical
      * @param previousModel
      * @param newModel
