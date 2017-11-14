@@ -63,15 +63,15 @@ ScenarioController::ScenarioController(QString scenariosPath, QObject *parent) :
     _validationDurationsTypesList.fillWithAllEnumValues();
 
     // Initialize the 9 items of the palette with NULL action
-    _actionsInPaletteList.append(new ActionInPaletteVM(NULL));
-    _actionsInPaletteList.append(new ActionInPaletteVM(NULL));
-    _actionsInPaletteList.append(new ActionInPaletteVM(NULL));
-    _actionsInPaletteList.append(new ActionInPaletteVM(NULL));
-    _actionsInPaletteList.append(new ActionInPaletteVM(NULL));
-    _actionsInPaletteList.append(new ActionInPaletteVM(NULL));
-    _actionsInPaletteList.append(new ActionInPaletteVM(NULL));
-    _actionsInPaletteList.append(new ActionInPaletteVM(NULL));
-    _actionsInPaletteList.append(new ActionInPaletteVM(NULL));
+    _actionsInPaletteList.append(new ActionInPaletteVM(NULL,0));
+    _actionsInPaletteList.append(new ActionInPaletteVM(NULL,1));
+    _actionsInPaletteList.append(new ActionInPaletteVM(NULL,2));
+    _actionsInPaletteList.append(new ActionInPaletteVM(NULL,3));
+    _actionsInPaletteList.append(new ActionInPaletteVM(NULL,4));
+    _actionsInPaletteList.append(new ActionInPaletteVM(NULL,5));
+    _actionsInPaletteList.append(new ActionInPaletteVM(NULL,6));
+    _actionsInPaletteList.append(new ActionInPaletteVM(NULL,7));
+    _actionsInPaletteList.append(new ActionInPaletteVM(NULL,8));
 
     QDate today = QDate::currentDate();
     _scenariosDefaultFilePath = QString("%1scenarios_%2.json").arg(_scenariosDirectoryPath, today.toString("ddMMyy"));
@@ -89,6 +89,9 @@ ScenarioController::~ScenarioController()
 {
     // Clean-up current selection
     setselectedAction(NULL);
+
+    // Delete actions VM from the timeline
+    _actionsInTimeLine.deleteAllItems();
 
     // Delete actions VM from the palette
     _actionsInPaletteList.deleteAllItems();
@@ -115,24 +118,31 @@ void ScenarioController::openActionEditor(ActionM* actionM)
     if(_mapActionsEditorControllersFromActionVM.contains(actionM) == false)
     {
         // Create an empty action if we create a new one
-        if(actionM == NULL)
+        if(actionM != NULL)
         {
-            actionM = new ActionM(_buildNewActionName());
+            setselectedAction(actionM);
+
+            // Create action editor controller
+            ActionEditorController* actionEditorC = new ActionEditorController(_buildNewActionName(), actionM,agentsInMappingList());
+
+            // Add action into our opened actions
+            _mapActionsEditorControllersFromActionVM.insert(actionM,actionEditorC);
+
+            // Add to list
+            _openedActionsEditorsControllers.append(actionEditorC);
         }
         // Set selected action
         else
         {
-            setselectedAction(actionM);
+            // Create action editor controller
+            ActionEditorController* actionEditorC = new ActionEditorController(_buildNewActionName(), actionM ,agentsInMappingList());
+
+            // Add action into our opened actions
+            _mapActionsEditorControllersFromActionVM.insert(actionEditorC->editedAction(),actionEditorC);
+
+            // Add to list
+            _openedActionsEditorsControllers.append(actionEditorC);
         }
-
-        // Create action editor controller
-        ActionEditorController* actionEditorC = new ActionEditorController(actionM,agentsInMappingList());
-
-        // Add action into our opened actions
-        _mapActionsEditorControllersFromActionVM.insert(actionM,actionEditorC);
-
-        // Add to list
-        _openedActionsEditorsControllers.append(actionEditorC);
     }
 }
 
@@ -143,6 +153,15 @@ void ScenarioController::openActionEditor(ActionM* actionM)
   */
 void ScenarioController::deleteAction(ActionM * actionM)
 {
+    // Delete the popup if necessary
+    if(actionM != NULL && _mapActionsEditorControllersFromActionVM.contains(actionM))
+    {
+        ActionEditorController* actionEditorC = _mapActionsEditorControllersFromActionVM.value(actionM);
+
+        _mapActionsEditorControllersFromActionVM.remove(actionM);
+        _openedActionsEditorsControllers.remove(actionEditorC);
+    }
+
     // Unselect our action if needed
     if (_selectedAction == actionM) {
         setselectedAction(NULL);
@@ -191,7 +210,7 @@ void ScenarioController::valideActionEditor(ActionEditorController* actionEditor
   */
 void ScenarioController::closeActionEditor(ActionEditorController* actionEditorC)
 {
-    ActionM* actionM = actionEditorC->originalAction();
+    ActionM* actionM = actionEditorC->originalAction() != NULL ? actionEditorC->originalAction() : actionEditorC->editedAction();
     // Delete the popup if necessary
     if(actionM != NULL && _mapActionsEditorControllersFromActionVM.contains(actionM))
     {
@@ -284,10 +303,34 @@ void ScenarioController::_importScenarioFromFile(QString scenarioFilePath)
                 jsonFile.close();
 
                 // Initialize agents list from JSON file
-                QList<ActionM*> agentsListToImport = _jsonHelper->initActionsList(byteArrayOfJson, _agentsInMappingList.toList());
+                QPair< QPair< QList<ActionM*>, QList<ActionInPaletteVM*> > , QList<ActionVM*> > scenarioToImport = _jsonHelper->initActionsList(byteArrayOfJson, _agentsInMappingList.toList());
 
                 // Append the list of actions
-                _actionsList.append(agentsListToImport);
+                if(scenarioToImport.first.first.count() > 0)
+                {
+                    _actionsList.append(scenarioToImport.first.first);
+                }
+
+                // Set the list of actions in palette
+                if(scenarioToImport.first.second.count() > 0)
+                {
+                    foreach (ActionInPaletteVM* actionInPalette, scenarioToImport.first.second)
+                    {
+                        if(actionInPalette->actionModel() != NULL)
+                        {
+                            setActionInPalette(actionInPalette->indexInPanel(),actionInPalette->actionModel());
+                        }
+
+                        delete actionInPalette;
+                        actionInPalette = NULL;
+                    }
+                }
+
+                // Append the list of actions in timeline
+                if(scenarioToImport.second.count() > 0)
+                {
+                    _actionsInTimeLine.append(scenarioToImport.second);
+                }
             }
             else {
                 qCritical() << "Can not open file" << scenarioFilePath;
@@ -295,6 +338,49 @@ void ScenarioController::_importScenarioFromFile(QString scenarioFilePath)
         }
         else {
             qWarning() << "There is no file" << scenarioFilePath;
+        }
+    }
+
+}
+
+/**
+ * @brief Export a scenario to the default file (actions, palette, timeline actions)
+ */
+void ScenarioController::exportScenarioToSelectedFile()
+{
+    // "File Dialog" to get the file (path) to save
+    QString scenarioFilePath = QFileDialog::getSaveFileName(NULL,
+                                                              "Sauvegarder dans un fichier JSON e scenario",
+                                                              _scenariosDirectoryPath,
+                                                              "JSON (*.json)");
+
+    if(!scenarioFilePath.isEmpty()) {
+        // Export the scenario to JSON file
+        _exportScenarioToFile(scenarioFilePath);
+    }
+}
+
+/**
+ * @brief Export the scenario to JSON file
+ * @param scenarioFilePath
+ */
+void ScenarioController::_exportScenarioToFile(QString scenarioFilePath)
+{
+    if (!scenarioFilePath.isEmpty() && (_jsonHelper != NULL))
+    {
+        qInfo() << "Export the scenario to JSON file" << scenarioFilePath;
+
+        // Export the scenario
+        QByteArray byteArrayOfJson = _jsonHelper->exportScenario(_actionsList.toList(),_actionsInPaletteList.toList(),_actionsInTimeLine.toList());
+
+        QFile jsonFile(scenarioFilePath);
+        if (jsonFile.open(QIODevice::WriteOnly))
+        {
+            jsonFile.write(byteArrayOfJson);
+            jsonFile.close();
+        }
+        else {
+            qCritical() << "Can not open file" << scenarioFilePath;
         }
     }
 

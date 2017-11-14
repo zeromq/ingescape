@@ -44,6 +44,12 @@ OutputVM::OutputVM(QString outputName,
         qInfo() << "New ghost of Output VM" << _name;
     }
 
+    // Init the timer to reset the flag "is Published New Value"
+    // Allows to play an animation when the value changed
+    _timer.setInterval(500);
+    connect(&_timer, &QTimer::timeout, this, &OutputVM::_onTimeout);
+
+
     // Connect to signal "Count Changed" from the list of models
     connect(&_models, &AbstractI2CustomItemListModel::countChanged, this, &OutputVM::_onModelsChanged);
 
@@ -56,6 +62,13 @@ OutputVM::OutputVM(QString outputName,
  */
 OutputVM::~OutputVM()
 {
+    //
+    // Stop and clean the timer
+    //
+    _timer.stop();
+    disconnect(&_timer, 0, this, 0);
+
+    // Reset the first model
     if (_firstModel != NULL) {
         qInfo() << "Delete Output VM" << _name << "(" << _id << ")";
 
@@ -68,6 +81,7 @@ OutputVM::~OutputVM()
     // DIS-connect to signal "Count Changed" from the list of models
     disconnect(&_models, &AbstractI2CustomItemListModel::countChanged, this, &OutputVM::_onModelsChanged);
 
+    _previousModelsList.clear();
     _models.clear();
 }
 
@@ -97,6 +111,7 @@ bool OutputVM::canLinkWith(PointMapVM* pointMap)
  */
 void OutputVM::_onModelsChanged()
 {
+    // Update the first model"
     if (_models.count() > 0) {
         setfirstModel(_models.at(0));
     }
@@ -104,7 +119,8 @@ void OutputVM::_onModelsChanged()
         setfirstModel(NULL);
     }
 
-    /**QList<OutputM*> newModelsList = _models.toList();
+    //
+    QList<OutputM*> newModelsList = _models.toList();
 
     // Model of output added
     if (_previousModelsList.count() < newModelsList.count())
@@ -115,6 +131,9 @@ void OutputVM::_onModelsChanged()
             if ((model != NULL) && !_previousModelsList.contains(model))
             {
                 qDebug() << "New model" << model->name() << "ADDED";
+
+                // Connect to signals from this new model
+                connect(model, &OutputM::currentValueChanged, this, &OutputVM::_onCurrentValueOfModelChanged);
             }
         }
     }
@@ -127,9 +146,50 @@ void OutputVM::_onModelsChanged()
             if ((model != NULL) && !newModelsList.contains(model))
             {
                 qDebug() << "Old model" << model->name() << "REMOVED";
+
+                // DIS-connect to signals from this previous model
+                disconnect(model, &OutputM::currentValueChanged, this, &OutputVM::_onCurrentValueOfModelChanged);
             }
         }
     }
 
-    _previousModelsList = newModelsList;*/
+    _previousModelsList = newModelsList;
+}
+
+
+/**
+ * @brief Slot when the current value (of a model) changed
+ * @param value
+ */
+void OutputVM::_onCurrentValueOfModelChanged(QVariant value)
+{
+    Q_UNUSED(value)
+
+    /*OutputM* model = qobject_cast<OutputM*>(sender());
+    if (model != NULL) {
+        qDebug() << "On Current Value of Model Changed" << model->name() << value.toString();
+    }*/
+
+    // Check that the flag is not already to true
+    if (!_isPublishedNewValue) {
+        setisPublishedNewValue(true);
+
+        // Start the timer to reset the flag "is Published New Value"
+        _timer.start();
+    }
+}
+
+
+/**
+ * @brief Slot when the timer time out
+ */
+void OutputVM::_onTimeout()
+{
+    // Stop the timer
+    _timer.stop();
+
+    if (_isPublishedNewValue) {
+        // Reset the flag
+        setisPublishedNewValue(false);
+    }
 }

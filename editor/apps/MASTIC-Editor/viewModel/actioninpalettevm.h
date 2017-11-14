@@ -40,7 +40,11 @@ class ActionInPaletteVM: public QObject
     I2_QML_PROPERTY_CUSTOM_SETTER(ActionM*, actionModel)
 
     // State
+    I2_QML_PROPERTY(int, indexInPanel)
+
+    // State
     I2_QML_PROPERTY(ActionInPaletteState::Value, status)
+
 
 
 public:
@@ -50,7 +54,7 @@ public:
      * @param action model
      * @param parent
      */
-    explicit ActionInPaletteVM(ActionM *actionM, QObject *parent = 0);
+    explicit ActionInPaletteVM(ActionM *actionM, int indexInPanel, QObject *parent = 0);
 
 
     /**

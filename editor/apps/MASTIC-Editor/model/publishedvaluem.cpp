@@ -41,6 +41,9 @@ PublishedValueM::PublishedValueM(QDateTime time,
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
+    // Set the corresponding group
+    _iopValueTypeGroup = Enums::getGroupForAgentIOPValueType(_iopValueType);
+
     QStringList iopNameAndValueType = _iopId.split(SEPARATOR_IOP_NAME_AND_IOP_VALUE_TYPE);
     if (iopNameAndValueType.count() == 2)
     {
@@ -58,7 +61,7 @@ PublishedValueM::PublishedValueM(QDateTime time,
     // Get a displayable value: convert a variant into a string (in function of the value type)
     _displayableValue = Enums::getDisplayableValue(_iopValueType, _value);
 
-    qDebug() << "New Published Value at" << _time.toString("dd/MM/yy hh:mm:ss.zzz") << "on" << AgentIOPTypes::staticEnumToString(_iopType) << "of" << _agentName << "." << _iopName << "with type" << AgentIOPValueTypes::staticEnumToString(_iopValueType) << ":" << _displayableValue;
+    //qDebug() << "New Published Value at" << _time.toString("dd/MM/yy hh:mm:ss.zzz") << "on" << AgentIOPTypes::staticEnumToString(_iopType) << "of" << _agentName << "." << _iopName << "with type" << AgentIOPValueTypes::staticEnumToString(_iopValueType) << ":" << _displayableValue;
 }
 
 

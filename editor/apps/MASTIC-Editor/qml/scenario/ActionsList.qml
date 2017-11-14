@@ -172,7 +172,8 @@ Item {
                     verticalCenter: parent.verticalCenter
                 }
 
-                style: Theme.LabellessSvgButtonStyle {
+                enabled: controller && controller.agentsInMappingList.count > 0
+                style : Theme.LabellessSvgButtonStyle {
                     fileCache: MasticTheme.svgFileMASTIC
 
                     pressedID: releasedID + "-pressed"
@@ -375,7 +376,7 @@ Item {
                         }
 
                         // Find our layer and reparent our popup in it
-                        draggableItem.parent = rootItem.findLayerRootByObjectName(draggableItem, "overlayLayer2");
+                        draggableItem.parent = rootItem.findLayerRootByObjectName(draggableItem, "overlayLayerDraggableItem");
 
                         // Compute new position if needed
                         if (draggableItem.parent != null)

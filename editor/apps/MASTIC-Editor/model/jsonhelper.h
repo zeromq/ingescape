@@ -28,6 +28,7 @@
 #include "viewModel/actionvm.h"
 #include "viewModel/actioneffectvm.h"
 #include "viewModel/actionconditionvm.h"
+#include "viewModel/actioninpalettevm.h"
 
 /**
  * @brief The JsonHelper class defines a helper to manage JSON definitions of agents
@@ -86,7 +87,15 @@ public:
      * @param agents list
      * @return
      */
-    QList<ActionM*> initActionsList(QByteArray byteArrayOfJson, QList<AgentInMappingVM*> listAgentsInMapping);
+    QPair< QPair< QList<ActionM*>, QList<ActionInPaletteVM*> > , QList<ActionVM*> > initActionsList(QByteArray byteArrayOfJson, QList<AgentInMappingVM*> listAgentsInMapping);
+
+    /**
+     * @brief Create an action condition VM from JSON object
+     * @param jsonObject
+     * @param list of agents in mapping
+     * @return
+     */
+    QByteArray exportScenario(QList<ActionM*> actionsList, QList<ActionInPaletteVM*> actionsInPaletteList, QList<ActionVM*> actionsInTimeLine);
 
 Q_SIGNALS:
 
@@ -133,6 +142,14 @@ private:
      * @return
      */
     ActionEffectVM* _parseEffectVMFromJson(QJsonObject jsonEffect, QList<AgentInMappingVM *> listAgentsInMapping);
+
+    /**
+     * @brief Create an action condition VM from JSON object
+     * @param jsonObject
+     * @param list of agents in mapping
+     * @return
+     */
+    ActionConditionVM* _parseConditionsVMFromJson(QJsonObject jsonCondition, QList<AgentInMappingVM*> listAgentsInMapping);
 };
 
 #endif // JSONHELPER_H

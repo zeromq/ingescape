@@ -68,6 +68,9 @@ class ScenarioController: public QObject
     // List of actions in palette
     I2_QOBJECT_LISTMODEL(ActionInPaletteVM, actionsInPaletteList)
 
+    // List of actions in timeline
+    I2_QOBJECT_LISTMODEL(ActionVM, actionsInTimeLine)
+
 public:
 
     /**
@@ -119,6 +122,11 @@ public:
      */
     Q_INVOKABLE void importScenarioFromFile();
 
+    /**
+     * @brief Export a scenario to a selected file (actions, palette, timeline actions)
+     */
+    Q_INVOKABLE void exportScenarioToSelectedFile();
+
 Q_SIGNALS:
 
 
@@ -140,6 +148,12 @@ private :
      * @param scenarioFilePath
      */
     void _importScenarioFromFile(QString scenarioFilePath);
+
+    /**
+     * @brief Export the scenario to JSON file
+     * @param scenarioFilePath
+     */
+    void _exportScenarioToFile(QString scenarioFilePath);
 
 
 protected:

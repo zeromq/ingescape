@@ -9,7 +9,7 @@
  *
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
- *
+ *      Justine Limoges <limoges@ingenuity.io>
  */
 
 import QtQuick 2.8
@@ -42,33 +42,30 @@ I2PopupBase {
     //--------------------------------
 
     // our model is a definition
-    property var definition: model;
+    property var definition: model.QtObject;
 
 
 
     // Columns with a fixed size
     // - Type
-    property int widthColumnType: 122
+    property int widthColumnType: 135
     // - Definition Value
-    property int widthColumnDefValue: 102
+    property int widthColumnDefaultValue: 140
     // - Mapping Value
-    property int widthColumnMappingValue: 120
-    // - Scenario Value
-    property int widthColumnScenarioValue: 142
+    property int widthColumnCurrentValue: 140
     // - Mute
     property int widthColumnMute: 40
 
     // Resizable columns
     // - Name
-    property int widthColumnName: (tabs.width - widthColumnType - widthColumnDefValue - widthColumnMappingValue - widthColumnScenarioValue - widthColumnMute)
+    property int widthColumnName: (tabs.width - widthColumnType - widthColumnDefaultValue - widthColumnCurrentValue - widthColumnMute)
 
     // List of widths
     property var widthsOfColumns: [
         widthColumnName,
         widthColumnType,
-        widthColumnDefValue,
-        widthColumnMappingValue,
-        widthColumnScenarioValue,
+        widthColumnDefaultValue,
+        widthColumnCurrentValue,
         widthColumnMute
     ]
 
@@ -81,6 +78,9 @@ I2PopupBase {
     // Emitted when user pressed our popup
     signal bringToFront();
 
+
+    // Emitted when user clicks on "istory" button
+    signal openHistory();
 
     //--------------------------------
     //
@@ -242,8 +242,9 @@ I2PopupBase {
                 right: parent.right
                 rightMargin: 20
                 bottom: parent.bottom
-                bottomMargin: 55
+                bottomMargin: 50
             }
+            clip : true
 
             style: I2TabViewStyle {
                 frameOverlap: 1
@@ -315,9 +316,8 @@ I2PopupBase {
                                 model: [
                                     qsTr("Name"),
                                     qsTr("Type"),
-                                    qsTr("Def value"),
-                                    qsTr("Mapping value"),
-                                    qsTr("Scenario value"),
+                                    qsTr("Default value"),
+                                    qsTr("Current value"),
                                     qsTr("Mute")
                                 ]
 
@@ -484,7 +484,7 @@ I2PopupBase {
                                     }
 
 
-                                    // Def Value
+                                    // Default Value
                                     Text {
                                         text: model.displayableDefaultValue
 
@@ -522,31 +522,12 @@ I2PopupBase {
                                         }
                                     }
 
-                                    // Scenario Value
-                                    Text {
-                                        text: "    -"
-
-                                        anchors {
-                                            verticalCenter: parent.verticalCenter
-                                        }
-                                        verticalAlignment: Text.AlignVCenter
-                                        width : rootItem.widthsOfColumns[4]
-                                        height: parent.height
-                                        elide: Text.ElideRight
-                                        color: MasticTheme.whiteColor
-                                        font {
-                                            family: MasticTheme.textFontFamily
-                                            pixelSize : 16
-                                        }
-                                    }
-
-
                                     // Mute
                                     Item {
                                         anchors {
                                             verticalCenter: parent.verticalCenter
                                         }
-                                        width : rootItem.widthsOfColumns[5]
+                                        width : rootItem.widthsOfColumns[4]
                                         height: parent.height
 
                                         Button {
@@ -596,6 +577,59 @@ I2PopupBase {
 
             }
 
+        }
+
+        // History
+        MouseArea {
+            id : historyBtn
+            enabled: visible
+            anchors {
+                left : tabs.left
+                top : tabs.bottom
+                topMargin: 16
+            }
+
+            height : history.height
+            width : history.width
+
+            hoverEnabled: true
+            onClicked: {
+                if (definition) {
+                    definition.openValuesHistoryOfAgent();
+                }
+                rootItem.openHistory();
+            }
+
+            Text {
+                id: history
+
+                anchors {
+                    left : parent.left
+                }
+                text : "> History"
+                color: historyBtn.pressed ? MasticTheme.lightGreyColor : MasticTheme.whiteColor
+                elide: Text.ElideRight
+
+                font {
+                    family: MasticTheme.textFontFamily
+                    pixelSize: 16
+                }
+            }
+
+            // underline
+            Rectangle {
+                visible: historyBtn.containsMouse
+
+                anchors {
+                    left : historyBtn.left
+                    right : history.right
+                    bottom : parent.bottom
+                }
+
+                height : 1
+
+                color : history.color
+            }
         }
 
 
@@ -688,5 +722,8 @@ I2PopupBase {
             }
 
         }
-    }
+
+  }
+
+
 }

@@ -455,7 +455,7 @@ QHash<QString, QList<AgentM*>> MasticModelManager::getMapFromAgentNameToActiveAg
 
 /**
  * @brief Delete a model of Agent
- * @param agant
+ * @param agent
  */
 void MasticModelManager::deleteAgentModel(AgentM* agent)
 {

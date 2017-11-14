@@ -26,6 +26,51 @@ Enums::Enums(QObject *parent) : QObject(parent)
 
 
 /**
+ * @brief Get the group for an Agent Input/Output/Parameter Value Type
+ * @param valueType
+ * @return
+ */
+AgentIOPValueTypeGroups::Value Enums::getGroupForAgentIOPValueType(AgentIOPValueTypes::Value valueType)
+{
+    AgentIOPValueTypeGroups::Value agentIOPValueTypeGroup = AgentIOPValueTypeGroups::UNKNOWN;
+
+    switch (valueType)
+    {
+    case AgentIOPValueTypes::INTEGER:
+    case AgentIOPValueTypes::DOUBLE:
+    case AgentIOPValueTypes::BOOL:
+        agentIOPValueTypeGroup = AgentIOPValueTypeGroups::NUMBER;
+        break;
+
+    case AgentIOPValueTypes::STRING:
+        agentIOPValueTypeGroup = AgentIOPValueTypeGroups::STRING;
+        break;
+
+    case AgentIOPValueTypes::IMPULSION:
+        agentIOPValueTypeGroup = AgentIOPValueTypeGroups::IMPULSION;
+        break;
+
+    case AgentIOPValueTypes::DATA:
+        agentIOPValueTypeGroup = AgentIOPValueTypeGroups::DATA;
+        break;
+
+    case AgentIOPValueTypes::MIXED:
+        agentIOPValueTypeGroup = AgentIOPValueTypeGroups::MIXED;
+        break;
+
+    case AgentIOPValueTypes::UNKNOWN:
+        agentIOPValueTypeGroup = AgentIOPValueTypeGroups::UNKNOWN;
+        break;
+
+    default:
+        break;
+    }
+
+    return agentIOPValueTypeGroup;
+}
+
+
+/**
  * @brief Get a displayable value: convert a variant into a string (in function of the value type)
  * @param valueType
  * @param value

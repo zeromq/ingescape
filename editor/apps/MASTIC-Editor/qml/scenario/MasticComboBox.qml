@@ -15,6 +15,8 @@ I2Combobox {
     style : I2ComboboxStyle {
         backgroundColorIdle : MasticTheme.darkBlueGreyColor
         borderWidthIdle : 0
+        borderColorPressed: MasticTheme.darkBlueGreyColor
+        borderWidthPressed: 1
         currentTextColorIdle : MasticTheme.lightGreyColor
         backgroundColorPressed : MasticTheme.darkGreyColor2
         radius: 1
@@ -35,7 +37,7 @@ I2Combobox {
         dropdownIcon : "image://I2svg/resources/SVG/mastic-pictos.svg#iconCombo"
         iconMarginRight : 6
 
-        layerObjectName : "overlayLayer2"
+        layerObjectName : "overlayLayerComboBox"
     }
 
 }

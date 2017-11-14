@@ -67,6 +67,46 @@ AgentsMappingController::~AgentsMappingController()
 
 
 /**
+ * @brief Remove the agent from the mapping
+ * @param agent
+ */
+void AgentsMappingController::removeAgentFromMapping(AgentInMappingVM* agent)
+{
+    // FIXME TODO ? une seule méthode est nécessaire entre:
+    // - celle-ci: removeAgentFromMapping
+    // - _deleteAgentInMapping
+
+    if (agent != NULL) {
+        qInfo() << "Delete Agen in Mapping" << agent->agentName();
+
+        // Delete an Agent in Mapping
+        _deleteAgentInMapping(agent);
+    }
+}
+
+
+/**
+ * @brief Remove a link between two agents from the mapping
+ * @param link
+ */
+void AgentsMappingController::deleteLinkBetweenTwoAgents(MapBetweenIOPVM* link)
+{
+    if ((link != NULL) && (link->agentFrom() != NULL) && (link->agentTo() != NULL)) {
+        qInfo() << "Delete Link Between agents" << link->agentFrom()->agentName() << "and" << link->agentTo()->agentName();
+
+        if (_selectedMapBetweenIOP == link) {
+            setselectedMapBetweenIOP(NULL);
+        }
+
+        // Remove from the list
+        _allMapInMapping.remove(link);
+
+        // FIXME TODO: delete and free memory
+    }
+}
+
+
+/**
  * @brief Slot when an agent from the list is dropped on the current mapping at a position
  * @param agentName
  * @param list

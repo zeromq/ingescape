@@ -53,12 +53,8 @@ ActionVM::ActionVM(ActionM *actionModel, int startTime, QObject *parent) : QObje
  */
 ActionVM::~ActionVM()
 {
-    if (_actionModel != NULL)
-    {
-        ActionM* temp = _actionModel;
-        setactionModel(NULL);
-        delete temp;
-    }
+    // Reset the action model
+    setactionModel(NULL);
 }
 
 

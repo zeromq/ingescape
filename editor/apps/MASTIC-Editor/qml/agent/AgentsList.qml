@@ -383,7 +383,7 @@ Item {
                         }
 
                         // Find our layer and reparent our popup in it
-                        draggableItem.parent = rootItem.findLayerRootByObjectName(draggableItem, "overlayLayer2");
+                        draggableItem.parent = rootItem.findLayerRootByObjectName(draggableItem, "overlayLayerDraggableItem");
 
                         // Compute new position if needed
                         if (draggableItem.parent != null)
