@@ -858,12 +858,6 @@ int triggerMappingUpdate(zloop_t *loop, int timer_id, void *arg){
 static void
 initActor (zsock_t *pipe, void *args)
 {
-    //we are (re)starting : we reset the timer flags because
-    //all network connections are going to be (re)started and
-    //manageZyreIncoming will do its job.
-    network_needToSendDefinitionUpdate = false;
-    network_needToUpdateMapping = false;
-    
     //start zyre
     agentElements->node = zyre_new (agentName);
     zyre_set_interface(agentElements->node, agentElements->networkDevice);
@@ -1201,6 +1195,7 @@ int mtic_startWithDevice(const char *networkDevice, int port){
                                 strncpy(agentElements->ipAddress, inet_ntoa(sa_in->sin_addr), IP_ADDRESS_LENGTH);
                                 free(friendly_name);
                                 mtic_debug("Connection with ip address %s on device %s\n", agentElements->ipAddress, agentElements->networkDevice);
+                                break;
                             }
                         }
                         pUnicast = pUnicast->Next;
