@@ -154,49 +154,27 @@ bool ValuesHistoryController::areShownValuesOfAgent(QString agentName)
 
 
 /**
- * @brief Slot called when a new "Agent in Mapping" is added
+ * @brief Slot called when we start to observe the outputs of an agent
  * @param agentName
+ * @param outputsList
  */
-void ValuesHistoryController::onAgentInMappingAdded(QString agentName)
+void ValuesHistoryController::onAgentOutputsObserved(QString agentName, QList<OutputM*> outputsList)
 {
-    QStringList temp1 = _allAgentNamesList;
-    temp1.append(agentName);
-    temp1.sort(Qt::CaseInsensitive);
+    Q_UNUSED(outputsList)
 
-    // Use the setter to emit a signal for QML binding
-    setallAgentNamesList(temp1);
-
-    // By default: the agent name is selected
-    QStringList temp2 = _selectedAgentNamesList;
-    temp2.append(agentName);
-    temp2.sort(Qt::CaseInsensitive);
-
-    // Use the setter to emit a signal for QML binding
-    setselectedAgentNamesList(temp2);
-
-    // Update the filters on the list of values
-    _updateFilters();
-}
-
-
-/**
- * @brief Slot called when an "Agent in Mapping" is removed
- * @param agentName
- */
-/*void ValuesHistoryController::onAgentInMappingRemoved(QString agentName)
-{
-    QStringList temp1 = _allAgentNamesList;
-    temp1.removeOne(agentName);
-    // No need to sort (list is already sorted)
-
-    // Use the setter to emit a signal for QML binding
-    setallAgentNamesList(temp1);
-
-    if (_selectedAgentNamesList.contains(agentName))
+    if (!_allAgentNamesList.contains(agentName))
     {
+        QStringList temp1 = _allAgentNamesList;
+        temp1.append(agentName);
+        temp1.sort(Qt::CaseInsensitive);
+
+        // Use the setter to emit a signal for QML binding
+        setallAgentNamesList(temp1);
+
+        // By default: the agent name is selected
         QStringList temp2 = _selectedAgentNamesList;
-        temp2.removeOne(agentName);
-        // No need to sort (list is already sorted)
+        temp2.append(agentName);
+        temp2.sort(Qt::CaseInsensitive);
 
         // Use the setter to emit a signal for QML binding
         setselectedAgentNamesList(temp2);
@@ -204,7 +182,7 @@ void ValuesHistoryController::onAgentInMappingAdded(QString agentName)
         // Update the filters on the list of values
         _updateFilters();
     }
-}*/
+}
 
 
 /**

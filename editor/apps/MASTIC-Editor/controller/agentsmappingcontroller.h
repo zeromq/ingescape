@@ -99,22 +99,6 @@ Q_SIGNALS:
     void agentInMappingRemoved(QString agentName);
 
 
-    /**
-     * @brief Emitted when inputs must be added to our Editor for a list of outputs
-     * @param agentName
-     * @param outputsList
-     */
-    void addInputsToEditorForOutputs(QString agentName, QList<OutputM*> outputsList);
-
-
-    /**
-     * @brief Emitted when inputs must be removed to our Editor for a list of outputs
-     * @param agentName
-     * @param pairsList
-     */
-    void removeInputsToEditorForOutputs(QString agentName, QList<QPair<QString, QString>> pairsList);
-
-
 public Q_SLOTS:
 
     /**
@@ -218,7 +202,7 @@ private Q_SLOTS:
      * @brief Slot when some view models of outputs will be removed from an agent in mapping
      * @param outputsListWillBeRemoved
      */
-    void _onOutputsListRemoved(QList<OutputVM*> outputsListWillBeRemoved);
+    //void _onOutputsListRemoved(QList<OutputVM*> outputsListWillBeRemoved);
 
 
 private:
