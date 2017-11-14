@@ -195,7 +195,7 @@ void MasticModelManager::onDefinitionReceived(QString peerId, QString agentName,
     if (!definitionJSON.isEmpty())
     {
         AgentM* agent = getAgentModelFromPeerId(peerId);
-        if (agent != NULL) // && (agent->definition() == NULL))
+        if (agent != NULL)
         {
             QByteArray byteArrayOfJson = definitionJSON.toUtf8();
 
@@ -203,11 +203,21 @@ void MasticModelManager::onDefinitionReceived(QString peerId, QString agentName,
             DefinitionM* agentDefinition = _jsonHelper->createModelOfDefinition(byteArrayOfJson);
             if (agentDefinition != NULL)
             {
-                // Add this new model of agent definition for the agent name
-                addAgentDefinitionForAgentName(agentDefinition, agentName);
+                 if (agent->definition() == NULL)
+                 {
+                     // Add this new model of agent definition for the agent name
+                     addAgentDefinitionForAgentName(agentDefinition, agentName);
 
-                // Set this definition to the agent
-                agent->setdefinition(agentDefinition);
+                     // Set this definition to the agent
+                     agent->setdefinition(agentDefinition);
+
+                     // Emit the signal "Add Inputs to Editor for Outputs"
+                     Q_EMIT addInputsToEditorForOutputs(agentName, agentDefinition->outputsList()->toList());
+                 }
+                 else {
+                     // FIXME TODO
+                     qWarning() << "Update the definition of agent" << agentName << "(if this definition changed)";
+                 }
             }
         }
     }
@@ -258,6 +268,11 @@ void MasticModelManager::onAgentExited(QString peerId, QString agentName)
 
         // Update the state (flag "is ON")
         agent->setisON(false);
+
+        if (agent->definition() != NULL) {
+            // Emit the signal "Remove Inputs to Editor for Outputs"
+            Q_EMIT removeInputsToEditorForOutputs(agentName, agent->definition()->outputsList()->toList());
+        }
 
         // Check if all agents with this name are OFF
         bool allAgentsAreOFF = true;
