@@ -88,6 +88,8 @@ void ValuesHistoryController::showValuesOfAgent(QString agentName)
 {
     QStringList temp = _selectedAgentNamesList;
     temp.append(agentName);
+    temp.sort(Qt::CaseInsensitive);
+
     // Use the setter to emit a signal for QML binding
     setselectedAgentNamesList(temp);
 
@@ -104,6 +106,8 @@ void ValuesHistoryController::hideValuesOfAgent(QString agentName)
 {
     QStringList temp = _selectedAgentNamesList;
     temp.removeOne(agentName);
+    // No need to sort (list is already sorted)
+
     // Use the setter to emit a signal for QML binding
     setselectedAgentNamesList(temp);
 
@@ -131,12 +135,16 @@ void ValuesHistoryController::onAgentInMappingAdded(QString agentName)
 {
     QStringList temp1 = _allAgentNamesList;
     temp1.append(agentName);
+    temp1.sort(Qt::CaseInsensitive);
+
     // Use the setter to emit a signal for QML binding
     setallAgentNamesList(temp1);
 
     // By default: the agent name is selected
     QStringList temp2 = _selectedAgentNamesList;
     temp2.append(agentName);
+    temp2.sort(Qt::CaseInsensitive);
+
     // Use the setter to emit a signal for QML binding
     setselectedAgentNamesList(temp2);
 
@@ -153,6 +161,8 @@ void ValuesHistoryController::onAgentInMappingRemoved(QString agentName)
 {
     QStringList temp1 = _allAgentNamesList;
     temp1.removeOne(agentName);
+    // No need to sort (list is already sorted)
+
     // Use the setter to emit a signal for QML binding
     setallAgentNamesList(temp1);
 
@@ -160,6 +170,8 @@ void ValuesHistoryController::onAgentInMappingRemoved(QString agentName)
     {
         QStringList temp2 = _selectedAgentNamesList;
         temp2.removeOne(agentName);
+        // No need to sort (list is already sorted)
+
         // Use the setter to emit a signal for QML binding
         setselectedAgentNamesList(temp2);
 
@@ -178,6 +190,7 @@ void ValuesHistoryController::filterValuesToShowOnlyAgent(QString agentName)
     // Empty list and append only the agent name
     QStringList temp;
     temp.append(agentName);
+    temp.sort(Qt::CaseInsensitive);
 
     // Use the setter to emit a signal for QML binding
     setselectedAgentNamesList(temp);
