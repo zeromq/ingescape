@@ -311,11 +311,20 @@ ApplicationWindow {
 
         // Overlay layer used to display draggable agent item above the content of our window and the popups
         I2Layer {
-            id: overlayLayer2
-            objectName: "overlayLayer2"
+            id: overlayLayerDraggableItem
+            objectName: "overlayLayerDraggableItem"
 
             anchors.fill: parent
         }
+
+        I2Layer {
+            id: overlayLayerComboBox
+            objectName: "overlayLayerComboBox"
+
+            anchors.fill: parent
+        }
+
+
     }
 
 }

@@ -42,7 +42,7 @@ I2PopupBase {
     //--------------------------------
 
     // our model is a definition
-    property var definition: model;
+    property var definition: model.QtObject;
 
 
 
@@ -594,6 +594,9 @@ I2PopupBase {
 
             hoverEnabled: true
             onClicked: {
+                if (definition) {
+                    definition.openValuesHistoryOfAgent();
+                }
                 rootItem.openHistory();
             }
 

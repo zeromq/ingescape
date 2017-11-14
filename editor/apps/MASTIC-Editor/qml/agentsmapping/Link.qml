@@ -66,8 +66,7 @@ I2CubicBezierCurve {
     stroke: if (mapBetweenIOPVM && mapBetweenIOPVM.agentTo && mapBetweenIOPVM.agentTo.isReduced && mapBetweenIOPVM.agentFrom && mapBetweenIOPVM.agentFrom.isReduced
                     && outputModel)
             {
-                // FIXME: mapBetweenIOPVM.agentFrom plutot que agentTo ?
-                switch (mapBetweenIOPVM.agentTo.reducedMapValueTypeGroupInInput)
+                switch (mapBetweenIOPVM.agentFrom.reducedMapValueTypeGroupInInput)
                 {
                 case AgentIOPValueTypeGroups.NUMBER:
                     outputModel.isPublishedNewValue ? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2

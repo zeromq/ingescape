@@ -37,7 +37,7 @@ I2Combobox {
         dropdownIcon : "image://I2svg/resources/SVG/mastic-pictos.svg#iconCombo"
         iconMarginRight : 6
 
-        layerObjectName : "overlayLayer2"
+        layerObjectName : "overlayLayerComboBox"
     }
 
 }

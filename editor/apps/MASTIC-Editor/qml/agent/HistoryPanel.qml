@@ -171,6 +171,291 @@ I2PopupBase {
         }
 
 
+        //Agents Filter
+        Item {
+            id : _combobox
+
+            anchors {
+                right : parent.right
+                rightMargin: 20
+                top : titleItem.bottom
+                topMargin: 20
+            }
+
+            height : 25
+            width : 197
+
+            onVisibleChanged: {
+                if (!visible) {
+                    close();
+                }
+            }
+
+            /***
+            * open function : open the combobox
+            ***/
+            function open() {
+                _comboButton.checked = true;
+                popup.open();
+            }
+
+            /***
+            * close function : close the combobox
+            ***/
+            function close() {
+                _comboButton.checked = false;
+                _combobox.forceActiveFocus();
+                popup.close();
+            }
+
+            Rectangle {
+                id: _comboButton
+                property bool checked : false;
+                width:  parent.width;
+                height: parent.height;
+                radius: 1;
+
+                border.width: _mouseAreaCombo.containsPress ? 1 : 0;
+                border.color: MasticTheme.darkBlueGreyColor
+                color : _mouseAreaCombo.containsPress? MasticTheme.darkGreyColor2 : MasticTheme.darkBlueGreyColor
+
+                Text {
+                    id:_comboPlaceholder
+
+                    visible: (_comboText.text === "");
+                    text : "- Select an agent -"
+                    anchors {
+                        verticalCenter: parent.verticalCenter;
+                        left: parent.left;
+                        leftMargin: 10
+                        right: _imageCombo.left;
+                        rightMargin: 10
+                    }
+
+
+                    font {
+                        pixelSize: 15
+                        family: MasticTheme.textFontFamily;
+                        italic : true;
+                    }
+
+                    color : MasticTheme.greyColor
+                    verticalAlignment: Text.AlignVCenter;
+                    elide : Text.ElideRight;
+                }
+
+
+                Text {
+                    id:_comboText
+
+                    anchors {
+                        verticalCenter: parent.verticalCenter;
+                        left: parent.left;
+                        leftMargin: 10
+                        right: _imageCombo.left;
+                        rightMargin: 10
+                    }
+
+                    font {
+                        pixelSize: 15
+                        family: MasticTheme.textFontFamily;
+                    }
+
+                    color : MasticTheme.lightGreyColor
+                    verticalAlignment: Text.AlignVCenter;
+                    elide : Text.ElideRight;
+                    text : (rootItem.controller && rootItem.controller.selectedAgentNamesList.length > 0)?
+                               (rootItem.controller.selectedAgentNamesList.length < rootItem.controller.allAgentNamesList.length)?
+                                   "- " + rootItem.controller.selectedAgentNamesList.length + " agent(s) -" : "Tous les agents"
+                    : "";
+                }
+
+
+                Image {
+                    id:_imageCombo;
+                    anchors.verticalCenter: parent.verticalCenter;
+                    anchors.right: parent.right;
+                    anchors.rightMargin: 10
+                    rotation : (_comboButton.checked ? 180 : 0);
+                    source : "image://I2svg/resources/SVG/mastic-pictos.svg#iconCombo";
+
+                    Behavior on rotation {
+                        NumberAnimation {}
+                    }
+                }
+
+
+                MouseArea {
+                    id:_mouseAreaCombo;
+                    anchors.fill: parent;
+                    activeFocusOnTab: true;
+                    onClicked: {
+                        _mouseAreaCombo.forceActiveFocus();
+                        (_comboButton.checked) ? _combobox.close() : _combobox.open();
+                    }
+                }
+
+                onVisibleChanged: {
+                    if(!visible)
+                        _combobox.close();
+                }
+            }
+
+            I2PopupBase {
+                id : popup
+                anchors.top:_comboButton.bottom;
+
+                width: _comboButton.width;
+                height: ((_combolist.count < 8) ? _combolist.count*(_comboButton.height+1) : 8*(_comboButton.height+1) );
+
+
+                isModal: true;
+                layerColor: "transparent"
+                layerObjectName: "overlayLayerComboBox";
+                dismissOnOutsideTap : true;
+
+                keepRelativePositionToInitialParent : true;
+
+                onClosed: {
+                    _combobox.close();
+                }
+
+                onOpened: {
+
+                }
+
+                Rectangle {
+                    id : popUpBackground
+                    anchors.fill : parent
+                    color:  MasticTheme.darkBlueGreyColor
+                }
+
+                ScrollView{
+                    id : _scrollView
+                    visible: _comboButton.checked;
+
+                    anchors {
+                        top:  parent.top;
+                        bottom:  parent.bottom;
+                    }
+
+                    width: _comboButton.width;
+                    height: ((_combolist.count < 8) ? _combolist.count*(_comboButton.height+1) : 8*(_comboButton.height+1) );
+
+                    ListView {
+                        id:_combolist
+
+                        boundsBehavior: Flickable.StopAtBounds
+
+                        width: parent.width;
+                        height: ( (_combolist.count<8) ? _combolist.count*(_comboButton.height+1) : 8*(_comboButton.height+1) );
+
+                        visible: parent.visible;
+
+                        model: rootItem.controller ? rootItem.controller.allAgentNamesList : 0;
+
+                        delegate: Item {
+                            anchors {
+                                left: parent.left
+                                right: parent.right
+                            }
+
+                            width:  _comboButton.width
+                            height: _comboButton.height
+
+                            CheckBox {
+                                id : filterAgentCB
+                                anchors {
+                                    verticalCenter: parent.verticalCenter
+                                    left: parent.left
+                                    leftMargin :10
+                                    right : parent.right
+                                    rightMargin : 10
+                                }
+
+                                checked : false;
+                                activeFocusOnPress: true;
+
+                                style: CheckBoxStyle {
+                                    label:  Text {
+                                        anchors {
+                                            verticalCenter: parent.verticalCenter
+                                            verticalCenterOffset: 1
+                                        }
+
+                                        color: MasticTheme.lightGreyColor
+
+                                        text: " " + modelData
+                                        elide: Text.ElideRight
+
+                                        font {
+                                            family: MasticTheme.textFontFamily
+                                            pixelSize: 16
+                                        }
+
+                                    }
+
+                                    indicator: Rectangle {
+                                        implicitWidth: 14
+                                        implicitHeight: 14
+                                        border.width: 0;
+                                        color : MasticTheme.veryDarkGreyColor
+
+                                        I2SvgItem {
+                                            visible : control.checkedState === Qt.Checked
+                                            anchors.centerIn: parent
+
+                                            svgFileCache : MasticTheme.svgFileMASTIC;
+                                            svgElementId:  "check";
+
+                                        }
+
+                                        Text {
+                                            visible : control.checkedState === Qt.PartiallyChecked
+                                            anchors {
+                                                centerIn: parent
+                                            }
+
+                                            color: MasticTheme.whiteColor
+
+                                            text: "-"
+                                            elide: Text.ElideRight
+
+                                            font {
+                                                family: MasticTheme.textFontFamily
+                                                pixelSize: 16
+                                            }
+                                        }
+                                    }
+
+                                }
+
+                                onClicked : {
+                                    if (rootItem.controller) {
+                                        if (filterAgentCB.checked) {
+                                            rootItem.controller.showValuesOfAgent(modelData)
+                                        } else {
+                                            rootItem.controller.hideValuesOfAgent(modelData)
+                                        }
+                                    }
+                                }
+
+                                Connections {
+                                    target : popup
+                                    onOpened : {
+                                         if (controller) {
+                                             filterAgentCB.checked = controller.areShownValuesOfAgent(modelData);
+                                         }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // History List
         Item {
             id : tableHistory
 
@@ -432,49 +717,51 @@ I2PopupBase {
                 }
             }
         }
-    }
 
 
-    Button {
-        id: okButton
 
-        property var boundingBox: MasticTheme.svgFileMASTIC.boundsOnElement("button");
-        height : boundingBox.height
-        width :  boundingBox.width
 
-        enabled : visible
-        activeFocusOnPress: true
-        text : "OK"
+        Button {
+            id: okButton
 
-        anchors {
-            right : parent.right
-            rightMargin: 16
-            bottom : parent.bottom
-            bottomMargin: 16
-        }
+            property var boundingBox: MasticTheme.svgFileMASTIC.boundsOnElement("button");
+            height : boundingBox.height
+            width :  boundingBox.width
 
-        style: I2SvgButtonStyle {
-            fileCache: MasticTheme.svgFileMASTIC
+            enabled : visible
+            activeFocusOnPress: true
+            text : "OK"
 
-            pressedID: releasedID + "-pressed"
-            releasedID: "button"
-            disabledID : releasedID
-
-            font {
-                family: MasticTheme.textFontFamily
-                weight : Font.Medium
-                pixelSize : 16
+            anchors {
+                right : parent.right
+                rightMargin: 16
+                bottom : parent.bottom
+                bottomMargin: 16
             }
-            labelColorPressed: MasticTheme.blackColor
-            labelColorReleased: MasticTheme.whiteColor
-            labelColorDisabled: MasticTheme.whiteColor
+
+            style: I2SvgButtonStyle {
+                fileCache: MasticTheme.svgFileMASTIC
+
+                pressedID: releasedID + "-pressed"
+                releasedID: "button"
+                disabledID : releasedID
+
+                font {
+                    family: MasticTheme.textFontFamily
+                    weight : Font.Medium
+                    pixelSize : 16
+                }
+                labelColorPressed: MasticTheme.blackColor
+                labelColorReleased: MasticTheme.whiteColor
+                labelColorDisabled: MasticTheme.whiteColor
+            }
+
+            onClicked: {
+                // Close our popup
+                rootItem.close();
+            }
         }
 
-        onClicked: {
-            // Close our popup
-            rootItem.close();
-        }
     }
-
 }
 
