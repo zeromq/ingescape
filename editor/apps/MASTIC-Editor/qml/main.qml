@@ -142,7 +142,7 @@ ApplicationWindow {
                 text: qsTr("Exporter le scénario")
                 onTriggered: {
                     if (MasticEditorC.scenarioC) {
-                        MasticEditorC.scenarioC.exportScenarioToDefaultFile();
+                        MasticEditorC.scenarioC.exportScenarioToSelectedFile();
                     }
                     console.log("TODO : Exporter le scénario");
                 }

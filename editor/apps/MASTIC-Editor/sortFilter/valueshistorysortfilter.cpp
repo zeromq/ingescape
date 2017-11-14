@@ -36,6 +36,16 @@ ValuesHistorySortFilter::~ValuesHistorySortFilter()
 
 
 /**
+ * @brief Update the filter
+ */
+void ValuesHistorySortFilter::updateFilter()
+{
+    // Invalidates the current filtering
+    invalidateFilter();
+}
+
+
+/**
  * @brief filterAccepts is used to check if an item should be included in our result list or not
  *
  * @param item
@@ -49,7 +59,7 @@ bool ValuesHistorySortFilter::filterAccepts(QObject* item, int index) const
 
     bool result = false;
 
-    // Try to cast our item as an OccupationVoieM
+    // Try to cast our item as a model of "Published Value"
     PublishedValueM* publishedValue = qobject_cast<PublishedValueM*>(item);
     if (publishedValue != NULL)
     {

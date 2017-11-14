@@ -32,12 +32,6 @@ ValuesHistoryController::ValuesHistoryController(MasticModelManager* modelManage
         // Link our list to the list of the model manager
         //
         _filteredValues.setSourceModel(_modelManager->publishedValues());
-        //_filteredValues.setDynamicSortFilter(true);
-
-        // Init its property "Selected Agent Names List"
-        _filteredValues.setselectedAgentNamesList(_selectedAgentNamesList);
-
-        //_filteredValues.setSortProperty("time");
 
         // Fill the list with all enum values
         _allAgentIOPTypes.fillWithAllEnumValues();
@@ -94,9 +88,6 @@ void ValuesHistoryController::showValuesOfAgent(QString agentName)
 {
     _selectedAgentNamesList.append(agentName);
 
-    // Update the filter
-    _filteredValues.selectedAgentNamesList().append(agentName);
-
     // Update the filters on the list of values
     _updateFilters();
 }
@@ -109,9 +100,6 @@ void ValuesHistoryController::showValuesOfAgent(QString agentName)
 void ValuesHistoryController::hideValuesOfAgent(QString agentName)
 {
     _selectedAgentNamesList.removeOne(agentName);
-
-    // Update the filter
-    _filteredValues.selectedAgentNamesList().removeOne(agentName);
 
     // Update the filters on the list of values
     _updateFilters();
@@ -129,9 +117,6 @@ void ValuesHistoryController::onAgentInMappingAdded(QString agentName)
     // By default: the agent name is selected
     _selectedAgentNamesList.append(agentName);
 
-    // Update the filter
-    _filteredValues.selectedAgentNamesList().removeOne(agentName);
-
     // Update the filters on the list of values
     _updateFilters();
 }
@@ -148,9 +133,6 @@ void ValuesHistoryController::onAgentInMappingRemoved(QString agentName)
     if (_selectedAgentNamesList.contains(agentName)) {
         _selectedAgentNamesList.removeOne(agentName);
 
-        // Update the filter
-        _filteredValues.selectedAgentNamesList().removeOne(agentName);
-
         // Update the filters on the list of values
         _updateFilters();
     }
@@ -166,14 +148,8 @@ void ValuesHistoryController::filterValuesToShowOnlyAgent(QString agentName)
     // Clear all names
     _selectedAgentNamesList.clear();
 
-    // Update the filter
-    _filteredValues.selectedAgentNamesList().clear();
-
     // Add only this one
     _selectedAgentNamesList.append(agentName);
-
-    // Update the filter
-    _filteredValues.selectedAgentNamesList().append(agentName);
 
     // Update the filters on the list of values
     _updateFilters();
@@ -185,11 +161,17 @@ void ValuesHistoryController::filterValuesToShowOnlyAgent(QString agentName)
  */
 void ValuesHistoryController::_updateFilters()
 {
-    qDebug() << "Display Values for type:";
+    /*qDebug() << "Display Values for type:";
     foreach (int iterator, _selectedAgentIOPTypes.toEnumValuesList()) {
         AgentIOPTypes::Value agentIOPType = static_cast<AgentIOPTypes::Value>(iterator);
         qDebug() << AgentIOPTypes::staticEnumToString(agentIOPType);
-    }
+    }*/
 
     qDebug() << "and for agents" << _selectedAgentNamesList;
+
+    // Update the list of agent names of the filter
+    _filteredValues.setselectedAgentNamesList(_selectedAgentNamesList);
+
+    // Update the filter
+    _filteredValues.updateFilter();
 }

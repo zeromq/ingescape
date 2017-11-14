@@ -226,7 +226,7 @@ Item {
                     Rectangle {
                         id: records
                         anchors.fill: parent
-                        color : "blue"
+                        color : "transparent"
                     }
                 }
             }

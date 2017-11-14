@@ -58,7 +58,8 @@ QString ActionEffectType::enumToString(int value)
  */
 ActionEffectVM::ActionEffectVM(QObject *parent) : QObject(parent),
     _effect(NULL),
-    _effectType(ActionEffectType::AGENT)
+    _effectType(ActionEffectType::AGENT),
+    _secondAgentInMapping(NULL)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -70,6 +71,9 @@ ActionEffectVM::ActionEffectVM(QObject *parent) : QObject(parent),
  */
 ActionEffectVM::~ActionEffectVM()
 {
+    // reset pointer
+    setsecondAgentInMapping(NULL);
+
     if(_effect != NULL)
     {
         ActionEffectM* tmp = _effect;
@@ -133,8 +137,17 @@ void ActionEffectVM::_configureToType(ActionEffectType::Value value)
 
         case ActionEffectType::MAPPING :
         {
-            seteffect(new MappingEffectM());
-            _effect->setagentModel(agent);
+            MappingEffectM * mappingEffect = new MappingEffectM();
+            seteffect(mappingEffect);
+            mappingEffect->setagentModel(agent);
+
+            if(_secondAgentInMapping != NULL)
+            {
+                mappingEffect->settoAgentModel(_secondAgentInMapping);
+            } else {
+                mappingEffect->settoAgentModel(agent);
+            }
+
             break;
         }
         default:

@@ -83,9 +83,26 @@ private Q_SLOTS:
     void _onModelsChanged();
 
 
+    /**
+     * @brief Slot when the current value (of a model) changed
+     * @param value
+     */
+    void _onCurrentValueOfModelChanged(QVariant value);
+
+
+    /**
+     * @brief Slot when the timer time out
+     */
+    void _onTimeout();
+
+
 private:
     // Previous list of models
-    //QList<OutputM*> _previousModelsList;
+    QList<OutputM*> _previousModelsList;
+
+    // Timer to reset the flag "is Published New Value"
+    // Allows to play an animation when the value changed
+    QTimer _timer;
 
 };
 

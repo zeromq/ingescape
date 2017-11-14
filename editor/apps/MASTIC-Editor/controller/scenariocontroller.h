@@ -122,6 +122,11 @@ public:
      */
     Q_INVOKABLE void importScenarioFromFile();
 
+    /**
+     * @brief Export a scenario to a selected file (actions, palette, timeline actions)
+     */
+    Q_INVOKABLE void exportScenarioToSelectedFile();
+
 Q_SIGNALS:
 
 
@@ -143,6 +148,12 @@ private :
      * @param scenarioFilePath
      */
     void _importScenarioFromFile(QString scenarioFilePath);
+
+    /**
+     * @brief Export the scenario to JSON file
+     * @param scenarioFilePath
+     */
+    void _exportScenarioToFile(QString scenarioFilePath);
 
 
 protected:

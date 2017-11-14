@@ -62,26 +62,27 @@ I2CubicBezierCurve {
     clip: true
 
 
-    // Stroke
-    stroke:
-        // if the agentTo and agantFrom are reduced : global type of its inputs
-        if (mapBetweenIOPVM && mapBetweenIOPVM.agentTo && mapBetweenIOPVM.agentTo.isReduced && mapBetweenIOPVM.agentFrom.isReduced) {
+    // if the agentTo and agentFrom are reduced : global type of its inputs
+    stroke: if (mapBetweenIOPVM && mapBetweenIOPVM.agentTo && mapBetweenIOPVM.agentTo.isReduced && mapBetweenIOPVM.agentFrom && mapBetweenIOPVM.agentFrom.isReduced
+                    && outputModel)
+            {
+                // FIXME: mapBetweenIOPVM.agentFrom plutot que agentTo ?
                 switch (mapBetweenIOPVM.agentTo.reducedMapValueTypeGroupInInput)
                 {
                 case AgentIOPValueTypeGroups.NUMBER:
-                    mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
+                    outputModel.isPublishedNewValue ? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
                     break;
-               case AgentIOPValueTypeGroups.STRING:
-                    mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.redColor2 : MasticTheme.darkRedColor2
+                case AgentIOPValueTypeGroups.STRING:
+                    outputModel.isPublishedNewValue ? MasticTheme.redColor2 : MasticTheme.darkRedColor2
                     break;
                 case AgentIOPValueTypeGroups.IMPULSION:
-                    mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.purpleColor : MasticTheme.darkPurpleColor
+                    outputModel.isPublishedNewValue ? MasticTheme.purpleColor : MasticTheme.darkPurpleColor
                     break;
                 case AgentIOPValueTypeGroups.DATA:
-                    mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.greenColor : MasticTheme.darkGreenColor
+                    outputModel.isPublishedNewValue ? MasticTheme.greenColor : MasticTheme.darkGreenColor
                     break;
                 case AgentIOPValueTypeGroups.MIXED:
-                    mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.whiteColor : MasticTheme.darkGreyColor
+                    outputModel.isPublishedNewValue ? MasticTheme.whiteColor : MasticTheme.darkGreyColor
                     break;
                 case AgentIOPValueTypeGroups.UNKNOWN:
                     "#000000"
@@ -91,24 +92,26 @@ I2CubicBezierCurve {
                     break;
                 }
             }
-            else { // if the agentTo is not reduced : type of its outputs
-                if (outputModel && outputModel.firstModel) {
+            else {
+                // if the agentTo is not reduced : type of its output
+                if (outputModel && outputModel.firstModel)
+                {
                     switch (outputModel.firstModel.agentIOPValueTypeGroup)
                     {
                     case AgentIOPValueTypeGroups.NUMBER:
-                        mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
+                        outputModel.isPublishedNewValue ? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
                         break;
                     case AgentIOPValueTypeGroups.STRING:
-                        mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.redColor2 : MasticTheme.darkRedColor2
+                        outputModel.isPublishedNewValue ? MasticTheme.redColor2 : MasticTheme.darkRedColor2
                         break;
-                     case AgentIOPValueTypeGroups.IMPULSION:
-                        mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.purpleColor : MasticTheme.darkPurpleColor
+                    case AgentIOPValueTypeGroups.IMPULSION:
+                        outputModel.isPublishedNewValue ? MasticTheme.purpleColor : MasticTheme.darkPurpleColor
                         break;
                     case AgentIOPValueTypeGroups.DATA:
-                        mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.greenColor : MasticTheme.darkGreenColor
+                        outputModel.isPublishedNewValue ? MasticTheme.greenColor : MasticTheme.darkGreenColor
                         break;
                     case AgentIOPValueTypeGroups.MIXED:
-                        mapBetweenIOPVM && mapBetweenIOPVM.isNewValueOnOutput? MasticTheme.whiteColor : MasticTheme.darkGreyColor
+                        outputModel.isPublishedNewValue ? MasticTheme.whiteColor : MasticTheme.darkGreyColor
                         break;
                     case AgentIOPValueTypeGroups.UNKNOWN:
                         "#000000"
@@ -117,7 +120,8 @@ I2CubicBezierCurve {
                         MasticTheme.whiteColor;
                         break;
                     }
-                } else {
+                }
+                else {
                     defaultColor;
                 }
             }
@@ -126,7 +130,8 @@ I2CubicBezierCurve {
     strokeWidth: if (mapBetweenIOPVM && mapBetweenIOPVM.agentTo && mapBetweenIOPVM.agentTo.isReduced
                          && mapBetweenIOPVM.agentFrom && mapBetweenIOPVM.agentFrom.isReduced) {
                      MasticTheme.agentsMappingBrinDefaultWidth
-                 } else {
+                 }
+                 else {
                      MasticTheme.agentsMappingLinkDefaultWidth
                  }
 
@@ -137,6 +142,17 @@ I2CubicBezierCurve {
     fuzzyRadius: 2
 
     opacity: mouseArea.pressed ? 0.8 : 1;
+
+
+    //--------------------------------
+    //
+    // Behaviors
+    //
+    //--------------------------------
+    Behavior on stroke {
+        ColorAnimation {
+        }
+    }
 
 
     //--------------------------------
@@ -223,9 +239,10 @@ I2CubicBezierCurve {
 
     focus: true
     Keys.onPressed: {
-        if (event.key === Qt.Key_Backspace || event.key === Qt.Key_Delete) {
+        if (event.key === Qt.Key_Backspace || event.key === Qt.Key_Delete)
+        {
             if (controller && controller.selectedMapBetweenIOP) {
-                console.log( "delete " + controller.selectedMapBetweenIOP);
+                controller.deleteLinkBetweenTwoAgents(controller.selectedMapBetweenIOP);
             }
 
             event.accepted = true;

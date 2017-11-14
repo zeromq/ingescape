@@ -44,6 +44,9 @@ class ActionEffectVM: public QObject
     // Action effect type
     I2_QML_PROPERTY_CUSTOM_SETTER(ActionEffectType::Value, effectType)
 
+    // [Optional] second agent in mapping to initalize the combobox
+    I2_QML_PROPERTY(AgentInMappingVM*, secondAgentInMapping)
+
 public:
 
     /**

@@ -1633,7 +1633,7 @@ I2PopupBase {
 
                                         onSelectedItemChanged:
                                         {
-                                            if (myEffect && myEffect.effect)
+                                            if (myEffect && myEffect.effect && effectTypeCombo.selectedItem)
                                             {
                                                 myEffect.effect.effect = effectTypeCombo.selectedItem.value;
                                             }
@@ -1772,7 +1772,7 @@ I2PopupBase {
                                         height : 25
                                         width : 148
 
-                                        model : (myEffect && myEffect.effect && myEffect.effect.agentModel) ? myEffect.effect.agentModel.outputsList : 0
+                                        model : (myEffect && myEffect.effect && myEffect.effect) ? myEffect.effect.fromAgentIopList : 0
                                         function modelToString(model)
                                         {
                                             return model.name;
@@ -1879,19 +1879,15 @@ I2PopupBase {
                                             onCheckedChanged: {
                                                 if (myEffect && myEffect.effect)
                                                 {
-                                                    myEffect.effect.isEnabled = checked;
+                                                    myEffect.effect.effect = checked ? ActionEffectValueType.ENABLE : ActionEffectValueType.DISABLE;
                                                 }
                                             }
 
                                             Binding {
                                                 target : enabledbutton
                                                 property : "checked"
-                                                value : if (myEffect && myEffect.effect)
-                                                        {
-                                                            myEffect.effect.isEnabled;
-                                                        } else {
-                                                            false;
-                                                        }
+                                                value : myEffect && myEffect.effect && myEffect.effect.effect === ActionEffectValueType.ENABLE ? true : false;
+
                                             }
 
                                         }
@@ -1952,7 +1948,7 @@ I2PopupBase {
                                         height : 25
                                         width : 148
 
-                                        model : (myEffect && myEffect.effect && myEffect.effect.toAgentModel) ? myEffect.effect.toAgentModel.inputsList : 0
+                                        model : (myEffect && myEffect.effect && myEffect.effect) ? myEffect.effect.toAgentIopList : 0
                                         function modelToString(model)
                                         {
                                             return model.name;
@@ -2031,7 +2027,7 @@ I2PopupBase {
             MouseArea {
                 id : actionDeleteBtn
                 enabled: visible
-                visible: (panelController && panelController.originalAction !== null)
+                visible: (model && model.originalAction !== null)
                 anchors {
                     left : parent.left
                     leftMargin: 15
@@ -2044,11 +2040,12 @@ I2PopupBase {
 
                 hoverEnabled: true
                 onClicked: {
-                    if (controller && actionM) {
-                        controller.deleteAction(actionM);
+                    if (controller && model && model.originalAction) {
+                        controller.deleteAction(model.originalAction);
+                    } else {
+                        // Close our popup
+                        rootItem.close();
                     }
-                    // Close our popup
-                    rootItem.close();
                 }
 
                 Text {

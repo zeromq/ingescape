@@ -36,8 +36,7 @@ MapBetweenIOPVM::MapBetweenIOPVM(AgentInMappingVM* agentFrom,
     _agentFrom(NULL),
     _pointFrom(NULL),
     _agentTo(NULL),
-    _pointTo(NULL),
-    _isNewValueOnOutput(false)
+    _pointTo(NULL)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);

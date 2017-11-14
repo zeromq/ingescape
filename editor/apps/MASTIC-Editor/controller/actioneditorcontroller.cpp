@@ -29,16 +29,18 @@
  * @brief Default constructor
  * @param parent
  */
-ActionEditorController::ActionEditorController(ActionM *originalAction, I2CustomItemListModel<AgentInMappingVM> * listAgentsInMapping, QObject *parent) : QObject(parent),
+ActionEditorController::ActionEditorController(QString actionName, ActionM *originalAction, I2CustomItemListModel<AgentInMappingVM> * listAgentsInMapping, QObject *parent) : QObject(parent),
     _originalAction(originalAction),
     _editedAction(NULL),
     _listAgentsInMapping(listAgentsInMapping)
 {
+    _editedAction = new ActionM(actionName, this);
+
     if(_originalAction != NULL)
     {
-        _editedAction = new ActionM(_originalAction->name(), this);
         _editedAction->copyFrom(_originalAction);
     }
+
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 }
@@ -118,6 +120,11 @@ void ActionEditorController::createNewEffect()
     if(_listAgentsInMapping != NULL && _listAgentsInMapping->count() > 0)
     {
         effectVM->effect()->setagentModel(_listAgentsInMapping->at(0));
+
+        if(_listAgentsInMapping->count() > 1)
+        {
+            effectVM->setsecondAgentInMapping(_listAgentsInMapping->at(1));
+        }
     }
 
     _editedAction->effectsList()->append(effectVM);
