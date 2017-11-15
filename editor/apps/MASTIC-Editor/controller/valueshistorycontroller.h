@@ -126,17 +126,11 @@ Q_SIGNALS:
 public Q_SLOTS:
 
     /**
-     * @brief Slot called when a new "Agent in Mapping" is added
+     * @brief Slot called when we start to observe the outputs of an agent
      * @param agentName
+     * @param outputsList
      */
-    void onAgentInMappingAdded(QString agentName);
-
-
-    /**
-     * @brief Slot called when an "Agent in Mapping" is removed
-     * @param agentName
-     */
-    //void onAgentInMappingRemoved(QString agentName);
+    void onAgentOutputsObserved(QString agentName, QList<OutputM*> outputsList);
 
 
     /**

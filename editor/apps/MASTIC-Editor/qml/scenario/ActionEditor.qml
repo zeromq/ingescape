@@ -617,7 +617,7 @@ I2PopupBase {
                                         model : controller ? controller.agentsInMappingList : 0
                                         function modelToString(model)
                                         {
-                                            return model.agentName;
+                                            return model.name;
                                         }
 
 
@@ -1516,7 +1516,7 @@ I2PopupBase {
                                         model : controller ? controller.agentsInMappingList : 0
                                         function modelToString(model)
                                         {
-                                            return model.agentName;
+                                            return model.name;
                                         }
 
 
@@ -1731,7 +1731,7 @@ I2PopupBase {
                                         model : controller ? controller.agentsInMappingList : 0
                                         function modelToString(model)
                                         {
-                                            return model.agentName;
+                                            return model.name;
                                         }
 
 
@@ -1906,7 +1906,7 @@ I2PopupBase {
                                         model : controller ? controller.agentsInMappingList : 0
                                         function modelToString(model)
                                         {
-                                            return model.agentName;
+                                            return model.name;
                                         }
 
 

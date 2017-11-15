@@ -119,14 +119,6 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
             }
             zlist_destroy(&keys);
 
-            // Subscribers
-            /*int n = HASH_COUNT(subscribers);
-            qDebug() << n << "subscribers in the list";
-            subscriber_t *sub, *tmpSub;
-            HASH_ITER(hh, subscribers, sub, tmpSub) {
-                qDebug() << "subscriber:" << sub->agentName << "with peer id" << sub->agentPeerId;
-            }*/
-
             if (isMasticPublisher && isIntPID) {
                 qDebug() << "our zyre event is about MASTIC publisher:" << pid << hostname << executionPath;
 
@@ -153,38 +145,14 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
             // MUTED / UN-MUTED
             if (message.startsWith(mutedAllPrefix))
             {
-                message.remove(0, mutedAllPrefix.length());
-
-                if (message == "0") {
-                    //qDebug() << peerName << "(" << peerId << ") UN-MUTED";
-
-                    // Emit the signal "is Muted from Agent Updated"
-                    Q_EMIT networkController->isMutedFromAgentUpdated(peerId, false);
-                }
-                else if (message == "1") {
-                    //qDebug() << peerName << "(" << peerId << ") MUTED";
-
-                    // Emit the signal "is Muted from Agent Updated"
-                    Q_EMIT networkController->isMutedFromAgentUpdated(peerId, true);
-                }
+                // Manage the message "MUTED / UN-MUTED"
+                networkController->manageMessageMutedUnmuted(peerId, message.remove(0, mutedAllPrefix.length()));
             }
             // FROZEN / UN-FROZEN
             else if (message.startsWith(frozenPrefix))
             {
-                message.remove(0, frozenPrefix.length());
-
-                if (message == "0") {
-                    //qDebug() << peerName << "(" << peerId << ") UN-FROZEN";
-
-                    // Emit the signal "is Frozen from Agent Updated"
-                    Q_EMIT networkController->isFrozenFromAgentUpdated(peerId, false);
-                }
-                else if (message == "1") {
-                    //qDebug() << peerName << "(" << peerId << ") FROZEN";
-
-                    // Emit the signal "is Frozen from Agent Updated"
-                    Q_EMIT networkController->isFrozenFromAgentUpdated(peerId, true);
-                }
+                // Manage the message "FROZEN / UN-FROZEN"
+                networkController->manageMessageFrozenUnfrozen(peerId, message.remove(0, frozenPrefix.length()));
             }
             // OUTPUT MUTED
             else if (message.startsWith(mutedOutputPrefix))
@@ -215,34 +183,18 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
             zmsg_t* msg_dup = zmsg_dup(msg);
             QString message = zmsg_popstr(msg_dup);
 
-            //
             // Definition
-            //
             if (message.startsWith(definitionPrefix))
             {
                 message.remove(0, definitionPrefix.length());
 
-                // FIXME - TEST ONLY - TO REMOVE
-                /*// Load definition from string content
-                definition* newDefinition = parser_loadDefinition(message.toStdString().c_str());
-                qDebug() << "Definition received from : " << newDefinition->name << " version : " << newDefinition->version << " description : " << newDefinition->description;
-                definition_freeDefinition(newDefinition);*/
-
                 // Emit the signal "Definition Received"
                 Q_EMIT networkController->definitionReceived(peerId, peerName, message);
             }
-            //
             // Mapping
-            //
             else if (message.startsWith(mappingPrefix))
             {
                 message.remove(0, mappingPrefix.length());
-
-                // FIXME - TEST ONLY - TO REMOVE
-                /*// Load mapping from string content
-                mapping* newMapping = parser_LoadMap((message.toStdString().c_str()));
-                qDebug() << "Mapping received from : " << newMapping->name << " version : " << newMapping->version << " description : " << newMapping->description;
-                mapping_freeMapping(newMapping);*/
 
                 // Emit the signal "Mapping Received"
                 Q_EMIT networkController->mappingReceived(peerId, peerName, message);
@@ -250,48 +202,34 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
             // MUTED / UN-MUTED
             else if (message.startsWith(mutedAllPrefix))
             {
-                message.remove(0, mutedAllPrefix.length());
-
-                if (message == "0") {
-                    //qDebug() << peerName << "(" << peerId << ") UN-MUTED";
-
-                    // Emit the signal "is Muted from Agent Updated"
-                    Q_EMIT networkController->isMutedFromAgentUpdated(peerId, false);
-                }
-                else if (message == "1") {
-                    //qDebug() << peerName << "(" << peerId << ") MUTED";
-
-                    // Emit the signal "is Muted from Agent Updated"
-                    Q_EMIT networkController->isMutedFromAgentUpdated(peerId, true);
-                }
+                // Manage the message "MUTED / UN-MUTED"
+                networkController->manageMessageMutedUnmuted(peerId, message.remove(0, mutedAllPrefix.length()));
             }
             // FROZEN / UN-FROZEN
             else if (message.startsWith(frozenPrefix))
             {
-                message.remove(0, frozenPrefix.length());
-
-                if (message == "0") {
-                    //qDebug() << peerName << "(" << peerId << ") UN-FROZEN";
-
-                    // Emit the signal "is Frozen from Agent Updated"
-                    Q_EMIT networkController->isFrozenFromAgentUpdated(peerId, false);
-                }
-                else if (message == "1") {
-                    //qDebug() << peerName << "(" << peerId << ") FROZEN";
-
-                    // Emit the signal "is Frozen from Agent Updated"
-                    Q_EMIT networkController->isFrozenFromAgentUpdated(peerId, true);
-                }
+                // Manage the message "FROZEN / UN-FROZEN"
+                networkController->manageMessageFrozenUnfrozen(peerId, message.remove(0, frozenPrefix.length()));
             }
-            // MAPPED
-            /*else if (message.startsWith("MAPPED"))
+            // OUTPUT MUTED
+            else if (message.startsWith(mutedOutputPrefix))
             {
-                // FIXME Nothing TODO ?
-                //qDebug() << peerName << "MAPPED" << message;
-            }*/
+                QString outputName = message.remove(0, mutedOutputPrefix.length());
+
+                // Emit the signal "is Muted from OUTPUT of Agent Updated"
+                Q_EMIT networkController->isMutedFromOutputOfAgentUpdated(peerId, true, outputName);
+            }
+            // OUTPUT UN-MUTED
+            else if (message.startsWith(unmutedOutputPrefix))
+            {
+                QString outputName = message.remove(0, unmutedOutputPrefix.length());
+
+                // Emit the signal "is Muted from OUTPUT of Agent Updated"
+                Q_EMIT networkController->isMutedFromOutputOfAgentUpdated(peerId, false, outputName);
+            }
             else
             {
-                qDebug() << "Unknown message received:" << message;
+                qWarning() << "Not yet managed (WHISPER) message '" << message << "' for agent" << peerName << "(" << peerId << ")";
             }
 
             zmsg_destroy(&msg_dup);
@@ -386,12 +324,7 @@ void onObserveInputCallback(iop_t iopType, const char* name, iopType_t valueType
                     currentValue = QVariant(newValue);
                     isValid = true;
 
-                    /*if (newValue) {
-                        qDebug() << "New value TRUE received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
-                    }
-                    else {
-                        qDebug() << "New value FALSE received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
-                    }*/
+                    //qDebug() << "New value" << newValue << "received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
                     break;
                 }
                 case IMPULSION_T: {
@@ -414,7 +347,7 @@ void onObserveInputCallback(iop_t iopType, const char* name, iopType_t valueType
                         qDebug() << "New DATA with size" << valueSize << "received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
                     }
                     else {
-                        // FIXME TODO
+                        qCritical() << "Can NOT read input" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType) << "(DATA of size:" << valueSize << ")";
                     }
                     break;
                 }
@@ -434,8 +367,7 @@ void onObserveInputCallback(iop_t iopType, const char* name, iopType_t valueType
                     Q_EMIT networkController->valuePublished(publishedValue);
                 }
                 else {
-                    // FIXME TODO log error
-                    //qCritical()
+                    qCritical() << "Can NOT read input" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
                 }
             }
         }
@@ -597,6 +529,50 @@ void NetworkController::masticLauncherExited(QString hostname)
 
 
 /**
+ * @brief Manage the message "MUTED / UN-MUTED"
+ * @param peerId
+ * @param message
+ */
+void NetworkController::manageMessageMutedUnmuted(QString peerId, QString message)
+{
+    if (message == "0") {
+        //qDebug() << peerName << "(" << peerId << ") UN-MUTED";
+
+        // Emit the signal "is Muted from Agent Updated"
+        Q_EMIT isMutedFromAgentUpdated(peerId, false);
+    }
+    else if (message == "1") {
+        //qDebug() << peerName << "(" << peerId << ") MUTED";
+
+        // Emit the signal "is Muted from Agent Updated"
+        Q_EMIT isMutedFromAgentUpdated(peerId, true);
+    }
+}
+
+
+/**
+ * @brief Manage the message "FROZEN / UN-FROZEN"
+ * @param peerId
+ * @param message
+ */
+void NetworkController::manageMessageFrozenUnfrozen(QString peerId, QString message)
+{
+    if (message == "0") {
+        //qDebug() << peerName << "(" << peerId << ") UN-FROZEN";
+
+        // Emit the signal "is Frozen from Agent Updated"
+        Q_EMIT isFrozenFromAgentUpdated(peerId, false);
+    }
+    else if (message == "1") {
+        //qDebug() << peerName << "(" << peerId << ") FROZEN";
+
+        // Emit the signal "is Frozen from Agent Updated"
+        Q_EMIT isFrozenFromAgentUpdated(peerId, true);
+    }
+}
+
+
+/**
  * @brief Slot when a command must be sent on the network to a launcher
  * @param command
  * @param hostname
@@ -673,83 +649,95 @@ void NetworkController::onAddInputsToEditorForOutputs(QString agentName, QList<O
 {
     foreach (OutputM* output, outputsList)
     {
-        if (output != NULL)
+        if ((output != NULL) && !output->id().isEmpty())
         {
             QString inputName = QString("%1%2%3").arg(agentName, SEPARATOR_AGENT_NAME_AND_IOP, output->id());
 
-            int resultCreateInput = 0;
+            // Get the number of agents in state ON with an "Input (on our editor) Name"
+            int numberOfAgentsON = _getNumberOfAgentsONwithInputName(inputName);
 
-            switch (output->agentIOPValueType())
+            // If there is not yet an agent in state ON for this input name, we create a new input on our agent
+            if (numberOfAgentsON == 0)
             {
-            case AgentIOPValueTypes::INTEGER: {
-                bool success = false;
-                int defaultValue = output->defaultValue().toInt(&success);
-                if (success) {
-                    resultCreateInput = mtic_createInput(inputName.toStdString().c_str(), INTEGER_T, &defaultValue, sizeof(int));
+                int resultCreateInput = 0;
+
+                switch (output->agentIOPValueType())
+                {
+                case AgentIOPValueTypes::INTEGER: {
+                    bool success = false;
+                    int defaultValue = output->defaultValue().toInt(&success);
+                    if (success) {
+                        resultCreateInput = mtic_createInput(inputName.toStdString().c_str(), INTEGER_T, &defaultValue, sizeof(int));
+                    }
+                    break;
                 }
-                break;
-            }
-            case AgentIOPValueTypes::DOUBLE: {
-                bool success = false;
-                double defaultValue = output->defaultValue().toDouble(&success);
-                if (success) {
-                    resultCreateInput = mtic_createInput(inputName.toStdString().c_str(), DOUBLE_T, &defaultValue, sizeof(double));
+                case AgentIOPValueTypes::DOUBLE: {
+                    bool success = false;
+                    double defaultValue = output->defaultValue().toDouble(&success);
+                    if (success) {
+                        resultCreateInput = mtic_createInput(inputName.toStdString().c_str(), DOUBLE_T, &defaultValue, sizeof(double));
+                    }
+                    break;
                 }
-                break;
-            }
-            case AgentIOPValueTypes::STRING: {
-                const char* defaultValue = output->defaultValue().toString().toStdString().c_str();
-                //resultCreateInput = mtic_createInput(inputName.toStdString().c_str(), STRING_T, (void*)defaultValue, strlen(defaultValue) * sizeof(char));
-                resultCreateInput = mtic_createInput(inputName.toStdString().c_str(), STRING_T, (void*)defaultValue, (strlen(defaultValue) + 1) * sizeof(char));
-                break;
-            }
-            case AgentIOPValueTypes::BOOL: {
-                bool defaultValue = output->defaultValue().toBool();
-                resultCreateInput = mtic_createInput(inputName.toStdString().c_str(), BOOL_T, &defaultValue, sizeof(bool));
-                break;
-            }
-            case AgentIOPValueTypes::IMPULSION: {
-                resultCreateInput = mtic_createInput(inputName.toStdString().c_str(), IMPULSION_T, NULL, 0);
-                break;
-            }
-            case AgentIOPValueTypes::DATA: {
-                // FIXME TODO
-                //resultCreateInput = mtic_createInput(inputName.toStdString().c_str(), DATA_T, &defaultValue, sizeof(...));
-                break;
-            }
-            default: {
-                qCritical() << "Wrong type for the value of output" << output->name() << "of agent" << agentName;
-                break;
-            }
-            }
+                case AgentIOPValueTypes::STRING: {
+                    const char* defaultValue = output->defaultValue().toString().toStdString().c_str();
+                    //resultCreateInput = mtic_createInput(inputName.toStdString().c_str(), STRING_T, (void*)defaultValue, strlen(defaultValue) * sizeof(char));
+                    resultCreateInput = mtic_createInput(inputName.toStdString().c_str(), STRING_T, (void*)defaultValue, (strlen(defaultValue) + 1) * sizeof(char));
+                    break;
+                }
+                case AgentIOPValueTypes::BOOL: {
+                    bool defaultValue = output->defaultValue().toBool();
+                    resultCreateInput = mtic_createInput(inputName.toStdString().c_str(), BOOL_T, &defaultValue, sizeof(bool));
+                    break;
+                }
+                case AgentIOPValueTypes::IMPULSION: {
+                    resultCreateInput = mtic_createInput(inputName.toStdString().c_str(), IMPULSION_T, NULL, 0);
+                    break;
+                }
+                case AgentIOPValueTypes::DATA: {
+                    // FIXME TODO mtic_createInput DATA_T
+                    //resultCreateInput = mtic_createInput(inputName.toStdString().c_str(), DATA_T, &defaultValue, sizeof(...));
+                    break;
+                }
+                default: {
+                    qCritical() << "Wrong type for the value of output" << output->name() << "of agent" << agentName;
+                    break;
+                }
+                }
 
-            if (resultCreateInput == 1) {
-                qDebug() << "Create input" << inputName << "on agent" << _editorAgentName;
+                if (resultCreateInput == 1) {
+                    qDebug() << "Create input" << inputName << "on agent" << _editorAgentName;
 
-                // Begin the observe of this input
-                int resultObserveInput = mtic_observeInput(inputName.toStdString().c_str(), &onObserveInputCallback, this);
+                    // Begin the observe of this input
+                    int resultObserveInput = mtic_observeInput(inputName.toStdString().c_str(), &onObserveInputCallback, this);
 
-                if (resultObserveInput == 1) {
-                    qDebug() << "Observe input" << inputName << "on agent" << _editorAgentName;
+                    if (resultObserveInput == 1) {
+                        qDebug() << "Observe input" << inputName << "on agent" << _editorAgentName;
+                    }
+                    else {
+                        qCritical() << "Can NOT observe input" << inputName << "on agent" << _editorAgentName << "Error code:" << resultObserveInput;
+                    }
+
+                    // Add mapping between our input and this output
+                    unsigned long id = mtic_addMappingEntry(inputName.toStdString().c_str(), agentName.toStdString().c_str(), output->name().toStdString().c_str());
+
+                    if (id > 0) {
+                        qDebug() << "Add mapping between output" << output->name() << "of agent" << agentName << "and input" << inputName << "of agent" << _editorAgentName << "(id" << id << ")";
+                    }
+                    else {
+                        qCritical() << "Can NOT add mapping between output" << output->name() << "of agent" << agentName << "and input" << inputName << "of agent" << _editorAgentName << "Error code:" << id;
+                    }
+
                 }
                 else {
-                    qCritical() << "Can NOT observe input" << inputName << "on agent" << _editorAgentName << "Error code:" << resultObserveInput;
+                    qCritical() << "Can NOT create input" << inputName << "on agent" << _editorAgentName << "Error code:" << resultCreateInput;
                 }
-
-                // Add mapping between our input and this output
-                unsigned long id = mtic_addMappingEntry(inputName.toStdString().c_str(), agentName.toStdString().c_str(), output->name().toStdString().c_str());
-
-                if (id > 0) {
-                    qDebug() << "Add mapping between output" << output->name() << "of agent" << agentName << "and input" << inputName << "of agent" << _editorAgentName << "(id" << id << ")";
-                }
-                else {
-                    qCritical() << "Can NOT add mapping between output" << output->name() << "of agent" << agentName << "and input" << inputName << "of agent" << _editorAgentName << "Error code:" << id;
-                }
-
             }
-            else {
-                qCritical() << "Can NOT create input" << inputName << "on agent" << _editorAgentName << "Error code:" << resultCreateInput;
-            }
+
+            qDebug() << "on Add Inputs: There are already" << numberOfAgentsON << "agents ON for input name" << inputName;
+
+            numberOfAgentsON++;
+            _mapFromInputNameToNumberOfAgentsON.insert(inputName, numberOfAgentsON);
         }
     }
 }
@@ -758,40 +746,64 @@ void NetworkController::onAddInputsToEditorForOutputs(QString agentName, QList<O
 /**
  * @brief Slot when inputs must be removed to our Editor for a list of outputs
  * @param agentName
- * @param pairsList
+ * @param outputsList
  */
-void NetworkController::onRemoveInputsToEditorForOutputs(QString agentName, QList<QPair<QString, QString>> pairsList)
+void NetworkController::onRemoveInputsToEditorForOutputs(QString agentName, QList<OutputM*> outputsList)
 {
-    for (int i = 0; i < pairsList.count(); i++)
+    foreach (OutputM* output, outputsList)
     {
-        QPair<QString, QString> pair = pairsList.at(i);
-        QString outputId = pair.first;
-        QString outputName = pair.second;
-
-        if (!outputId.isEmpty() && !outputName.isEmpty())
+        if ((output != NULL) && !output->id().isEmpty())
         {
-            QString inputName = QString("%1%2%3").arg(agentName, SEPARATOR_AGENT_NAME_AND_IOP, outputId);
+            QString inputName = QString("%1%2%3").arg(agentName, SEPARATOR_AGENT_NAME_AND_IOP, output->id());
 
-            // Remove mapping between our input and this output
-            int resultRemoveMappingEntry = mtic_removeMappingEntryWithName(inputName.toStdString().c_str(), agentName.toStdString().c_str(), outputName.toStdString().c_str());
+            // Get the number of agents in state ON with an "Input (on our editor) Name"
+            int numberOfAgentsON = _getNumberOfAgentsONwithInputName(inputName);
 
-            if (resultRemoveMappingEntry == 1) {
-                qDebug() << "Remove mapping between output" << outputName << "of agent" << agentName << "and input" << inputName << "of agent" << _editorAgentName;
+            numberOfAgentsON--;
+            _mapFromInputNameToNumberOfAgentsON.insert(inputName, numberOfAgentsON);
 
-                // Remove our input
-                int resultRemoveInput = mtic_removeInput(inputName.toStdString().c_str());
+            qDebug() << "on Remove Inputs: There are" << numberOfAgentsON << "agents ON for input name" << inputName;
 
-                if (resultRemoveInput == 1) {
-                    qDebug() << "Remove input" << inputName << "on agent" << _editorAgentName;
+            // If there is no more agent in state ON for this input name, we remove an old input on our agent
+            if (numberOfAgentsON == 0)
+            {
+                // Remove mapping between our input and this output
+                int resultRemoveMappingEntry = mtic_removeMappingEntryWithName(inputName.toStdString().c_str(), agentName.toStdString().c_str(), output->name().toStdString().c_str());
+
+                if (resultRemoveMappingEntry == 1) {
+                    qDebug() << "Remove mapping between output" << output->name() << "of agent" << agentName << "and input" << inputName << "of agent" << _editorAgentName;
+
+                    // Remove our input
+                    int resultRemoveInput = mtic_removeInput(inputName.toStdString().c_str());
+
+                    if (resultRemoveInput == 1) {
+                        qDebug() << "Remove input" << inputName << "on agent" << _editorAgentName;
+                    }
+                    else {
+                        qCritical() << "Can NOT remove input" << inputName << "on agent" << _editorAgentName << "Error code:" << resultRemoveInput;
+                    }
                 }
                 else {
-                    qCritical() << "Can NOT remove input" << inputName << "on agent" << _editorAgentName << "Error code:" << resultRemoveInput;
+                    qCritical() << "Can NOT remove mapping between output" << output->name() << "of agent" << agentName << "and input" << inputName << "of agent" << _editorAgentName << "Error code:" << resultRemoveMappingEntry;
                 }
             }
-            else {
-                qCritical() << "Can NOT remove mapping between output" << outputName << "of agent" << agentName << "and input" << inputName << "of agent" << _editorAgentName << "Error code:" << resultRemoveMappingEntry;
-            }
         }
+    }
+}
+
+
+/**
+ * @brief Get the number of agents in state ON with an "Input (on our editor) Name"
+ * @param inputName name of an input on our editor
+ * @return
+ */
+int NetworkController::_getNumberOfAgentsONwithInputName(QString inputName)
+{
+    if (_mapFromInputNameToNumberOfAgentsON.contains(inputName)) {
+        return _mapFromInputNameToNumberOfAgentsON.value(inputName);
+    }
+    else {
+        return 0;
     }
 }
 

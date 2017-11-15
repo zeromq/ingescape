@@ -73,6 +73,22 @@ public:
     void masticLauncherExited(QString hostname);
 
 
+    /**
+     * @brief Manage the message "MUTED / UN-MUTED"
+     * @param peerId
+     * @param message
+     */
+    void manageMessageMutedUnmuted(QString peerId, QString message);
+
+
+    /**
+     * @brief Manage the message "FROZEN / UN-FROZEN"
+     * @param peerId
+     * @param message
+     */
+    void manageMessageFrozenUnfrozen(QString peerId, QString message);
+
+
 Q_SIGNALS:
 
     /**
@@ -185,9 +201,19 @@ public Q_SLOTS:
     /**
      * @brief Slot when inputs must be removed to our Editor for a list of outputs
      * @param agentName
-     * @param pairsList
+     * @param outputsList
      */
-    void onRemoveInputsToEditorForOutputs(QString agentName, QList<QPair<QString, QString>> pairsList);
+    void onRemoveInputsToEditorForOutputs(QString agentName, QList<OutputM*> outputsList);
+
+
+private:
+
+    /**
+     * @brief Get the number of agents in state ON with an "Input (on our editor) Name"
+     * @param inputName name of an input on our editor
+     * @return
+     */
+    int _getNumberOfAgentsONwithInputName(QString inputName);
 
 
 private:
@@ -200,6 +226,10 @@ private:
 
     // Map from "Hostname" to the "Peer Id" of the corresponding MASTIC launcher
     QHash<QString, QString> _mapFromHostnameToMasticLauncherPeerId;
+
+    // Map from "Input (on our editor) Name" to the number of agents in state ON
+    // Variants of an agent can have some outputs with same name and some outputs with different name
+    QHash<QString, int> _mapFromInputNameToNumberOfAgentsON;
 
 };
 

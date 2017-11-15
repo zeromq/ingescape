@@ -131,6 +131,9 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     connect(_modelManager, &MasticModelManager::isActivatedMappingChanged, _agentsMappingC, &AgentsMappingController::onIsActivatedMappingChanged);
     connect(_modelManager, &MasticModelManager::agentModelCreated, _agentsSupervisionC, &AgentsSupervisionController::onAgentModelCreated);
     connect(_modelManager, &MasticModelManager::agentModelWillBeDeleted, _agentsMappingC, &AgentsMappingController::onAgentModelWillBeDeleted);
+    connect(_modelManager, &MasticModelManager::addInputsToEditorForOutputs, _valuesHistoryC, &ValuesHistoryController::onAgentOutputsObserved);
+    connect(_modelManager, &MasticModelManager::addInputsToEditorForOutputs, _networkC, &NetworkController::onAddInputsToEditorForOutputs);
+    connect(_modelManager, &MasticModelManager::removeInputsToEditorForOutputs, _networkC, &NetworkController::onRemoveInputsToEditorForOutputs);
 
 
     // Connect to signals from the controller for supervision of agents
@@ -143,10 +146,8 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
 
 
     // Connect to signals from the controller for mapping of agents
-    connect(_agentsMappingC, &AgentsMappingController::agentInMappingAdded, _valuesHistoryC, &ValuesHistoryController::onAgentInMappingAdded);
-    //connect(_agentsMappingC, &AgentsMappingController::agentInMappingRemoved, _valuesHistoryC, &ValuesHistoryController::onAgentInMappingRemoved);
-    connect(_agentsMappingC, &AgentsMappingController::addInputsToEditorForOutputs, _networkC, &NetworkController::onAddInputsToEditorForOutputs);
-    connect(_agentsMappingC, &AgentsMappingController::removeInputsToEditorForOutputs, _networkC, &NetworkController::onRemoveInputsToEditorForOutputs);
+    //connect(_agentsMappingC, &AgentsMappingController::agentInMappingAdded, _scenarioC, &ScenarioController::onAgentInMappingAdded);
+    //connect(_agentsMappingC, &AgentsMappingController::agentInMappingRemoved, _scenarioC, &ScenarioController::onAgentInMappingRemoved);
 
     // Connect to signals from the agents mapping list to the action editor
     connect(_agentsMappingC->agentInMappingVMList(), &AbstractI2CustomItemListModel::countChanged, _scenarioC, &ScenarioController::onAgentsInMappingListCountChange);

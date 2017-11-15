@@ -207,6 +207,22 @@ Q_SIGNALS:
     void agentModelWillBeDeleted(AgentM* agent);
 
 
+    /**
+     * @brief Emitted when inputs must be added to our Editor for a list of outputs
+     * @param agentName
+     * @param outputsList
+     */
+    void addInputsToEditorForOutputs(QString agentName, QList<OutputM*> outputsList);
+
+
+    /**
+     * @brief Emitted when inputs must be removed to our Editor for a list of outputs
+     * @param agentName
+     * @param outputsList
+     */
+    void removeInputsToEditorForOutputs(QString agentName, QList<OutputM*> outputsList);
+
+
 public Q_SLOTS:
 
     /**
