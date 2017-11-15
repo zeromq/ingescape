@@ -97,23 +97,42 @@ void CollapsibleColumn::updatePolish()
     const QList<QQuickItem *> childrenList = childItems();
     if (childrenList.count() > 0)
     {
-        qreal currentY = 0;
-        for (QList<QQuickItem *>::const_iterator iterator = childrenList.constBegin(); iterator != childrenList.constEnd(); ++iterator)
+        // Check if value is zero
+        if (qFuzzyIsNull(_value))
         {
-            QQuickItem* child = (*iterator);
-            if (child != NULL)
+            // Special case: all items have the same ordinate i.e. 0
+            for (QList<QQuickItem *>::const_iterator iterator = childrenList.constBegin(); iterator != childrenList.constEnd(); ++iterator)
             {
-                // Filter invisible items and repeaters
-                if (child->isVisible() && !child->inherits("QQuickRepeater"))
+                QQuickItem* child = (*iterator);
+                if (child != NULL)
                 {
-                    // Set ordinate of our child
-                    child->setY(currentY * _value);
-
-                    // Update current ordinate
-                    currentY += child->height() + _spacing;
+                    child->setY(0);
                 }
             }
-            // Else: should not happen
+        }
+        else
+        {
+            //
+            // Common case: we need to compute an ordinate for each item
+            //
+            qreal currentY = 0;
+            for (QList<QQuickItem *>::const_iterator iterator = childrenList.constBegin(); iterator != childrenList.constEnd(); ++iterator)
+            {
+                QQuickItem* child = (*iterator);
+                if (child != NULL)
+                {
+                    // Filter invisible items and repeaters
+                    if (child->isVisible() && !child->inherits("QQuickRepeater"))
+                    {
+                        // Set ordinate of our child
+                        child->setY(currentY * _value);
+
+                        // Update current ordinate
+                        currentY += child->height() + _spacing;
+                    }
+                }
+                // Else: should not happen
+            }
         }
     }
 }
