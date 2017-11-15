@@ -47,8 +47,7 @@ MapBetweenIOPVM::MapBetweenIOPVM(AgentInMappingVM* agentFrom,
     setagentTo(agentTo);
     setpointTo(pointTo);
 
-    if ((_agentFrom != NULL) && (_pointFrom != NULL)
-            && (_agentTo != NULL) && (_pointTo != NULL))
+    if ((_agentFrom != NULL) && (_pointFrom != NULL) && (_agentTo != NULL) && (_pointTo != NULL))
     {
         qInfo() << "Create new MapBetweenIOPVM " << _agentFrom->name() << "." << _pointFrom->name() << "-->" << _agentTo->name() << "." << _pointTo->name();
     }
@@ -60,24 +59,31 @@ MapBetweenIOPVM::MapBetweenIOPVM(AgentInMappingVM* agentFrom,
  */
 MapBetweenIOPVM::~MapBetweenIOPVM()
 {
-    qInfo() << "Delete MapBetweenIOPVM " << _agentFrom->name() << "." << _pointFrom->name() << "-->" << _agentTo->name() << "." << _pointTo->name();
+    if ((_agentFrom != NULL) && (_pointFrom != NULL) && (_agentTo != NULL) && (_pointTo != NULL))
+    {
+        qInfo() << "Delete MapBetweenIOPVM " << _agentFrom->name() << "." << _pointFrom->name() << "-->" << _agentTo->name() << "." << _pointTo->name();
+    }
 
-    if (_agentFrom != NULL) {
+    if (_agentFrom != NULL)
+    {
         AgentInMappingVM* temp = _agentFrom;
         setagentFrom(NULL);
 
         // Handle ghost agent
-        if (temp->isGhost()) {
+        if (temp->isGhost())
+        {
             delete temp;
         }
     }
 
-    if (_pointFrom != NULL) {
+    if (_pointFrom != NULL)
+    {
         OutputVM* temp = _pointFrom;
         setpointFrom(NULL);
 
         // Handle ghost output
-        if (temp->isGhost()) {
+        if (temp->isGhost())
+        {
             delete temp;
         }
     }
