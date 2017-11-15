@@ -101,7 +101,8 @@ void AgentsMappingController::deleteLinkBetweenTwoAgents(MapBetweenIOPVM* link)
         // Remove from the list
         _allMapInMapping.remove(link);
 
-        // FIXME TODO: delete and free memory
+        // Free memory
+        delete link;
     }
 }
 
