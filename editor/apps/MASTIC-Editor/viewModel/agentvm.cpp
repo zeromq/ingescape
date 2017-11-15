@@ -117,7 +117,7 @@ void AgentVM::setdefinition(DefinitionM* value)
         // Previous value
         if (previousValue != NULL) {
             // DIS-connect from signals from the previous definition
-            disconnect(previousValue, &DefinitionM::commandAskedForOutput, this, &AgentVM::_onCommandAskedForOutput);
+            disconnect(previousValue, &DefinitionM::commandAskedForOutput, this, &AgentVM::_onCommandAskedToAgentAboutOutput);
             disconnect(previousValue, &DefinitionM::openValuesHistoryOfAgent, this, &AgentVM::_onOpenValuesHistoryOfAgent);
         }
 
@@ -126,7 +126,7 @@ void AgentVM::setdefinition(DefinitionM* value)
         // New value
         if (_definition != NULL) {
             // Connect to signal from the new definition
-            connect(_definition, &DefinitionM::commandAskedForOutput, this, &AgentVM::_onCommandAskedForOutput);
+            connect(_definition, &DefinitionM::commandAskedForOutput, this, &AgentVM::_onCommandAskedToAgentAboutOutput);
             connect(_definition, &DefinitionM::openValuesHistoryOfAgent, this, &AgentVM::_onOpenValuesHistoryOfAgent);
         }
 
@@ -146,7 +146,7 @@ void AgentVM::changeState()
 {
     // is ON --> Kill all agents
     if (_isON) {
-        Q_EMIT commandAsked("DIE", _peerIdsList);
+        Q_EMIT commandAskedToAgent(_peerIdsList, "DIE");
     }
     // is OFF --> Execute all agents
     else {
@@ -167,10 +167,10 @@ void AgentVM::changeState()
 void AgentVM::changeMuteAllOutputs()
 {
     if (_isMuted) {
-        Q_EMIT commandAsked("UNMUTE_ALL", _peerIdsList);
+        Q_EMIT commandAskedToAgent(_peerIdsList, "UNMUTE_ALL");
     }
     else {
-        Q_EMIT commandAsked("MUTE_ALL", _peerIdsList);
+        Q_EMIT commandAskedToAgent(_peerIdsList, "MUTE_ALL");
     }
 }
 
@@ -181,10 +181,10 @@ void AgentVM::changeMuteAllOutputs()
 void AgentVM::changeFreeze()
 {
     if (_isFrozen) {
-        Q_EMIT commandAsked("UNFREEZE", _peerIdsList);
+        Q_EMIT commandAskedToAgent(_peerIdsList, "UNFREEZE");
     }
     else {
-        Q_EMIT commandAsked("FREEZE", _peerIdsList);
+        Q_EMIT commandAskedToAgent(_peerIdsList, "FREEZE");
     }
 }
 
@@ -295,13 +295,13 @@ void AgentVM::_onDefinitionOfModelChanged(DefinitionM* definition)
 
 
 /**
- * @brief Slot when a command from an output must be sent on the network
+ * @brief Slot when a command must be sent on the network to an agent about one of its output
  * @param command
  * @param outputName
  */
-void AgentVM::_onCommandAskedForOutput(QString command, QString outputName)
+void AgentVM::_onCommandAskedToAgentAboutOutput(QString command, QString outputName)
 {
-    Q_EMIT commandAskedForOutput(command, outputName, _peerIdsList);
+    Q_EMIT commandAskedToAgentAboutOutput(_peerIdsList, command, outputName);
 }
 
 

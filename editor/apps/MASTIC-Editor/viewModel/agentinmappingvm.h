@@ -97,6 +97,13 @@ public:
     ~AgentInMappingVM();
 
 
+    /**
+     * @brief Get the list of peer ids of our models
+     * @return
+     */
+    QStringList getPeerIdsList();
+
+
 Q_SIGNALS:
 
     /**
@@ -252,6 +259,9 @@ private:
 
     // Previous list of models of agents
     QList<AgentM*> _previousAgentsList;
+
+    // List of peer ids of our models
+    QStringList _peerIdsList;
 
     // Input name as key is not unique (value type can be different)
     // Map from an input name to a list of view models of inputs
