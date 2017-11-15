@@ -84,8 +84,10 @@ static const char *mappingPrefix = "EXTERNAL_MAPPING#";
 static const char *loadMappingPrefix = "LOAD_THIS_MAPPING#";
 static const char *loadDefinitionPrefix = "LOAD_THIS_DEFINITION#";
 #define AGENT_NAME_LENGTH 256
+#define COMMAND_LINE_LENGTH 2048
 char agentName[AGENT_NAME_LENGTH] = AGENT_NAME_DEFAULT;
 char agentState[AGENT_NAME_LENGTH] = "";
+char commandLine[COMMAND_LINE_LENGTH] = "";
 
 typedef struct freezeCallback {      //Need to be unique : the table hash key
     mtic_freezeCallback callback_ptr;   //pointer on the callback
@@ -111,7 +113,6 @@ typedef struct zyreAgent {
     bool hasJoinedPrivateChannel;
     UT_hash_handle hh;
 } zyreAgent_t;
-
 
 bool network_needToSendDefinitionUpdate = false;
 bool network_needToUpdateMapping = false;
@@ -893,51 +894,56 @@ initActor (zsock_t *pipe, void *args)
 #if defined __unix__ || defined __APPLE__
     int ret;
     pid_t pid;
-
     pid = getpid();
+    zyre_set_header(agentElements->node, "pid", "%i", pid);
+    
+    if (strlen(commandLine) == 0){
+        //command line was not set manually : we try to get exec path instead
 #ifdef __APPLE__
 #if TARGET_OS_IOS
-    char pathbuf[64] = "no_path";
-    ret = 1;
+        char pathbuf[64] = "no_path";
+        ret = 1;
 #elif TARGET_OS_OSX
-    char pathbuf[PROC_PIDPATHINFO_MAXSIZE];
-    ret = proc_pidpath (pid, pathbuf, sizeof(pathbuf));
+        char pathbuf[PROC_PIDPATHINFO_MAXSIZE];
+        ret = proc_pidpath (pid, pathbuf, sizeof(pathbuf));
 #endif
 #else
-    char pathbuf[4*1024];
-    ret = readlink("/proc/self/exe", pathbuf, sizeof(pathbuf));
+        char pathbuf[4*1024];
+        ret = readlink("/proc/self/exe", pathbuf, sizeof(pathbuf));
 #endif
-    if ( ret <= 0 ) {
-        mtic_debug("PID %d: proc_pidpath ();\n", pid);
-        mtic_debug("    %s\n", strerror(errno));
-    } else {
-        mtic_debug("proc %d: %s\n", pid, pathbuf);
+        if ( ret <= 0 ) {
+            mtic_debug("PID %d: proc_pidpath ();\n", pid);
+            mtic_debug("    %s\n", strerror(errno));
+        } else {
+            mtic_debug("proc %d: %s\n", pid, pathbuf);
+        }
+        zyre_set_header(agentElements->node, "commandline", "%s", pathbuf);
+    }else{
+        zyre_set_header(agentElements->node, "commandline", "%s", commandLine);
     }
-    zyre_set_header(agentElements->node, "execpath", "%s", pathbuf);
-    zyre_set_header(agentElements->node, "pid", "%i", pid);
 #endif
     
 #ifdef _WIN32
     WSADATA wsaData;
     WSAStartup(MAKEWORD(2,2), &wsaData);
+    if (strlen(commandLine) == 0){
+        //command line was not set manually : we try to get exec path instead
 
-    //Use GetModuleFileName() to get exec path
-    WCHAR temp[MAX_PATH];
-    GetModuleFileName(NULL,temp,MAX_PATH);
-
-    //Conversion in char *
-    char exeFilePath[MAX_PATH];
-    wcstombs_s(NULL,exeFilePath,sizeof(exeFilePath),temp,sizeof(temp));
-
-    //Get PID as well
+        //Use GetModuleFileName() to get exec path
+        WCHAR temp[MAX_PATH];
+        GetModuleFileName(NULL,temp,MAX_PATH);
+        
+        //Conversion in char *
+        char exeFilePath[MAX_PATH];
+        wcstombs_s(NULL,exeFilePath,sizeof(exeFilePath),temp,sizeof(temp));
+        zyre_set_header(agentElements->node, "commandline", "%s", exeFilePath);
+    }else{
+        zyre_set_header(agentElements->node, "commandline", "%s", commandLine);
+    }
     DWORD pid = GetCurrentProcessId();
-
-    mtic_debug("pid %d, path: %s\n", (int)pid, exeFilePath);
-
-    //Add to header
-    zyre_set_header(agentElements->node, "execpath", "%s", exeFilePath);
     zyre_set_header(agentElements->node, "pid", "%i", (int)pid);
 #endif
+
 
     char hostname[1024];
     hostname[1023] = '\0';
@@ -1160,8 +1166,8 @@ int mtic_startWithDevice(const char *networkDevice, int port){
     assert (iflist);
     const char *name = ziflist_first (iflist);
     while (name) {
-        printf (" - name=%s address=%s netmask=%s broadcast=%s\n",
-                name, ziflist_address (iflist), ziflist_netmask (iflist), ziflist_broadcast (iflist));
+//        printf (" - name=%s address=%s netmask=%s broadcast=%s\n",
+//                name, ziflist_address (iflist), ziflist_netmask (iflist), ziflist_broadcast (iflist));
         if (strcmp(name, networkDevice) == 0){
             strncpy(agentElements->ipAddress, ziflist_address (iflist), IP_ADDRESS_LENGTH-1);
             mtic_debug("Connection with ip address %s on device %s\n", agentElements->ipAddress, networkDevice);
@@ -1169,107 +1175,6 @@ int mtic_startWithDevice(const char *networkDevice, int port){
         name = ziflist_next (iflist);
     }
     ziflist_destroy (&iflist);
-    
-//#ifdef _WIN32
-//    do {
-//        pAddresses = (IP_ADAPTER_ADDRESSES *) MALLOC(outBufLen);
-//        if (pAddresses == NULL) {
-//            printf("Memory allocation failed for IP_ADAPTER_ADDRESSES struct... exiting.\n");
-//            exit(1);
-//        }
-//
-//        dwRetVal = GetAdaptersAddresses(family, flags, NULL, pAddresses, &outBufLen);
-//
-//        if (dwRetVal == ERROR_BUFFER_OVERFLOW) {
-//            FREE(pAddresses);
-//            pAddresses = NULL;
-//        } else {
-//            break;
-//        }
-//
-//        Iterations++;
-//
-//    } while ((dwRetVal == ERROR_BUFFER_OVERFLOW) && (Iterations < MAX_TRIES));
-//
-//    if (dwRetVal == NO_ERROR) {
-//        // If successful, output some information from the data we received
-//        pCurrAddresses = pAddresses;
-//        while (pCurrAddresses) {
-//            //Convert the wchar_t to char *
-//            friendly_name = (char *)malloc( BUFSIZ );
-//            count = wcstombs(friendly_name, pCurrAddresses->FriendlyName, BUFSIZ );
-//
-//            //If the friendly_name is the same of the networkDevice
-//            if (strcmp(agentElements->networkDevice, friendly_name) == 0)
-//            {
-//                pUnicast = pCurrAddresses->FirstUnicastAddress;
-//                if (pUnicast != NULL)
-//                {
-//                    for (i = 0; pUnicast != NULL; i++)
-//                    {
-//                        if(pUnicast)
-//                        {
-//                            if (pUnicast->Address.lpSockaddr->sa_family == AF_INET)
-//                            {
-//                                struct sockaddr_in *sa_in = (struct sockaddr_in *)pUnicast->Address.lpSockaddr;
-//                                strncpy(agentElements->ipAddress, inet_ntoa(sa_in->sin_addr), IP_ADDRESS_LENGTH);
-//                                free(friendly_name);
-//                                mtic_debug("Connection with ip address %s on device %s\n", agentElements->ipAddress, agentElements->networkDevice);
-//                                break;
-//                            }
-//                        }
-//                        pUnicast = pUnicast->Next;
-//                    }
-//                }
-//            }
-//
-//            pCurrAddresses = pCurrAddresses->Next;
-//        }
-//    } else {
-//        mtic_debug("Call to GetAdaptersAddresses failed with error: %d\n",
-//               dwRetVal);
-//        if (dwRetVal == ERROR_NO_DATA)
-//            mtic_debug("\tNo addresses were found for the requested parameters\n");
-//        else {
-//
-//            if (FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
-//                              FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-//                              NULL, dwRetVal, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-//                              // Default language
-//                              (LPTSTR) & lpMsgBuf, 0, NULL)) {
-//                mtic_debug("\tError: %s", lpMsgBuf);
-//                LocalFree(lpMsgBuf);
-//                if (pAddresses)
-//                    FREE(pAddresses);
-//                exit(1);
-//            }
-//        }
-//    }
-//
-//    if (pAddresses) {
-//        FREE(pAddresses);
-//    }
-//
-//#else
-//    struct ifaddrs *addrs, *tmpaddr;
-//    getifaddrs(&addrs);
-//    tmpaddr = addrs;
-//    while (tmpaddr)
-//    {
-//        if (tmpaddr->ifa_addr && tmpaddr->ifa_addr->sa_family == AF_INET)
-//        {
-//            struct sockaddr_in *pAddr = (struct sockaddr_in *)tmpaddr->ifa_addr;
-//            if (strcmp(networkDevice, tmpaddr->ifa_name) == 0)
-//            {
-//                strncpy(agentElements->ipAddress, inet_ntoa(pAddr->sin_addr), IP_ADDRESS_LENGTH);
-//                mtic_debug("Connection with ip address %s on device %s\n", agentElements->ipAddress, networkDevice);
-//                break;
-//            }
-//        }
-//        tmpaddr = tmpaddr->ifa_next;
-//    }
-//    freeifaddrs(addrs);
-//#endif
     
     if (strlen(agentElements->ipAddress) == 0){
         fprintf(stderr, "IP address could not be determined on device %s... exiting.\n", networkDevice);
@@ -1298,13 +1203,14 @@ int mtic_startWithIP(const char *ipAddress, int port){
     }
     mtic_Interrupted = false;
     agentElements = calloc(1, sizeof(zyreloopElements_t));
+    strncpy(agentElements->ipAddress, ipAddress, IP_ADDRESS_LENGTH);
     
     ziflist_t *iflist = ziflist_new ();
     assert (iflist);
     const char *name = ziflist_first (iflist);
     while (name) {
-        printf (" - name=%s address=%s netmask=%s broadcast=%s\n",
-                name, ziflist_address (iflist), ziflist_netmask (iflist), ziflist_broadcast (iflist));
+//        printf (" - name=%s address=%s netmask=%s broadcast=%s\n",
+//                name, ziflist_address (iflist), ziflist_netmask (iflist), ziflist_broadcast (iflist));
         if (strcmp(ziflist_address (iflist), ipAddress) == 0){
             strncpy(agentElements->networkDevice, name, 15);
             printf("Connection with ip address %s on device %s\n", ipAddress, agentElements->networkDevice);
@@ -1313,111 +1219,11 @@ int mtic_startWithIP(const char *ipAddress, int port){
     }
     ziflist_destroy (&iflist);
     
-//    //get device name for IP
-//#ifdef _WIN32
-//    do {
-//        pAddresses = (IP_ADAPTER_ADDRESSES *) MALLOC(outBufLen);
-//        if (pAddresses == NULL) {
-//            printf("Memory allocation failed for IP_ADAPTER_ADDRESSES struct... exiting.\n");
-//            exit(1);
-//        }
-//
-//        dwRetVal = GetAdaptersAddresses(family, flags, NULL, pAddresses, &outBufLen);
-//
-//        if (dwRetVal == ERROR_BUFFER_OVERFLOW) {
-//            FREE(pAddresses);
-//            pAddresses = NULL;
-//        } else {
-//            break;
-//        }
-//
-//        Iterations++;
-//
-//    } while ((dwRetVal == ERROR_BUFFER_OVERFLOW) && (Iterations < MAX_TRIES));
-//
-//    if (dwRetVal == NO_ERROR) {
-//        // If successful, output some information from the data we received
-//        pCurrAddresses = pAddresses;
-//        while (pCurrAddresses) {
-//            //Convert the wchar_t to char *
-//            friendly_name = (char *)malloc( BUFSIZ );
-//            count = wcstombs(friendly_name, pCurrAddresses->FriendlyName, BUFSIZ );
-//
-//            //If the friendly_name is the same of the networkDevice
-//            pUnicast = pCurrAddresses->FirstUnicastAddress;
-//            if (pUnicast != NULL)
-//            {
-//                for (i = 0; pUnicast != NULL; i++)
-//                {
-//                    if(pUnicast)
-//                    {
-//                        if (pUnicast->Address.lpSockaddr->sa_family == AF_INET)
-//                        {
-//                            struct sockaddr_in *sa_in = (struct sockaddr_in *)pUnicast->Address.lpSockaddr;
-//                            if (strcmp(ipAddress, inet_ntoa(sa_in->sin_addr)) == 0){
-//                                strncpy(agentElements->networkDevice, friendly_name, 15);
-//                                printf("Connection with ip address %s on device %s\n", ipAddress, agentElements->networkDevice);
-//                                break;
-//                            }
-//                        }
-//                    }
-//                    pUnicast = pUnicast->Next;
-//                }
-//            }
-//            pCurrAddresses = pCurrAddresses->Next;
-//        }
-//    } else {
-//        printf("Call to GetAdaptersAddresses failed with error: %d\n",
-//               dwRetVal);
-//        if (dwRetVal == ERROR_NO_DATA)
-//            printf("\tNo addresses were found for the requested parameters\n");
-//        else {
-//
-//            if (FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
-//                              FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-//                              NULL, dwRetVal, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-//                              // Default language
-//                              (LPTSTR) & lpMsgBuf, 0, NULL)) {
-//                printf("\tError: %s", lpMsgBuf);
-//                LocalFree(lpMsgBuf);
-//                if (pAddresses)
-//                    FREE(pAddresses);
-//                exit(1);
-//            }
-//        }
-//    }
-//
-//    if (pAddresses) {
-//        FREE(pAddresses);
-//    }
-//
-//#else
-//    struct ifaddrs *addrs, *tmpaddr;
-//    getifaddrs(&addrs);
-//    tmpaddr = addrs;
-//    while (tmpaddr)
-//    {
-//        if (tmpaddr->ifa_addr && tmpaddr->ifa_addr->sa_family == AF_INET)
-//        {
-//            struct sockaddr_in *pAddr = (struct sockaddr_in *)tmpaddr->ifa_addr;
-//            if (strcmp(ipAddress, inet_ntoa(pAddr->sin_addr)) == 0)
-//            {
-//                strncpy(agentElements->networkDevice, tmpaddr->ifa_name, 15);
-//                printf("Connection with ip address %s on device %s\n", ipAddress, agentElements->networkDevice);
-//                break;
-//            }
-//        }
-//        tmpaddr = tmpaddr->ifa_next;
-//    }
-//    freeifaddrs(addrs);
-//#endif
-    
     if (strlen(agentElements->networkDevice) == 0){
         fprintf(stderr, "Device name could not be determined for IP address %s... exiting.\n", ipAddress);
         exit(EXIT_FAILURE);
     }
     
-    strncpy(agentElements->ipAddress, ipAddress, IP_ADDRESS_LENGTH);
     agentElements->zyrePort = port;
     agentElements->agentActor = zactor_new (initActor, agentElements);
     assert (agentElements->agentActor);
@@ -1447,9 +1253,9 @@ int mtic_stop(){
         //cleaning agent
         free (agentElements);
         agentElements = NULL;
-    #ifdef _WIN32
-    zsys_shutdown();
-    #endif
+        #ifdef _WIN32
+        zsys_shutdown();
+        #endif
     }else{
         mtic_debug("agent already stopped\n");
     }
@@ -1719,5 +1525,8 @@ bool mtic_isMuted(){
     return isWholeAgentMuted;
 }
 
+void mtic_setCommandLine(const char *line){
+    strncpy(commandLine, line, COMMAND_LINE_LENGTH);
+}
 
 
