@@ -347,34 +347,10 @@ I2PopupBase {
                     width: _comboButton.width;
                     height: ((_combolist.count < 8) ? (_combolist.count+1)*(_comboButton.height+1) : 9*(_comboButton.height+1) );
 
-                    style: ScrollViewStyle {
-                        transientScrollBars: true
-                        handle: Item {
-                            implicitWidth: 8
-                            implicitHeight: 26
-
-                            Rectangle {
-                                color: MasticTheme.lightGreyColor
-
-                                anchors {
-                                    fill: parent
-                                    topMargin: 1
-                                    leftMargin: 1
-                                    rightMargin:0
-                                    bottomMargin: 2
-                                }
-
-                                opacity : 0.8
-                                radius: 10
-                            }
-                        }
-                        scrollBarBackground: Item {
-                            implicitWidth: 8
-                            implicitHeight: 26
-                        }
+                    style: MasticScrollViewStyle {
                     }
 
-                    Item {
+                    contentItem: Item {
                         width: _scrollView.width;
                         height: ( (_combolist.count<8) ? (_combolist.count+1)*(_comboButton.height+1) : 9*(_comboButton.height+1) );
 
@@ -687,34 +663,10 @@ I2PopupBase {
                     bottom : parent.bottom
                 }
 
-                style: ScrollViewStyle {
-                    transientScrollBars: true
-                    handle: Item {
-                        implicitWidth: 8
-                        implicitHeight: 26
-
-                        Rectangle {
-                            color: MasticTheme.lightGreyColor
-
-                            anchors {
-                                fill: parent
-                                topMargin: 1
-                                leftMargin: 1
-                                rightMargin:0
-                                bottomMargin: 2
-                            }
-
-                            opacity : 0.8
-                            radius: 10
-                        }
-                    }
-                    scrollBarBackground: Item {
-                        implicitWidth: 8
-                        implicitHeight: 26
-                    }
+                style: MasticScrollViewStyle {
                 }
 
-                ListView {
+                contentItem: ListView {
                     model: if (controller) {
                                controller.filteredValues
                            }

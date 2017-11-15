@@ -135,6 +135,9 @@ void registerCustomQmlTypes()
     // - Singleton used to enable consistent app styling through predefined colors, fonts, etc.
     qmlRegisterSingletonType(QUrl("qrc:/qml/theme/MasticTheme.qml"), uri, 1, 0, "MasticTheme");
 
+    // - Srollview style
+    qmlRegisterType(QUrl("qrc:/qml/theme/MasticScrollViewStyle.qml"), uri, 1, 0, "MasticScrollViewStyle");
+
 }
 
 
