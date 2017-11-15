@@ -88,8 +88,6 @@ Item {
         }
     }
 
-
-
     /***
     * open function : open the combobox
     ***/
