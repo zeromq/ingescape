@@ -46,6 +46,9 @@ PUBLIC int mtic_stop(void);
 PUBLIC void mtic_die(void);
 PUBLIC int mtic_setAgentName(const char *name);
 PUBLIC char *mtic_getAgentName(void);
+//Command line for the agent can be passed here for inclusion in the
+//agent's headers. If not used, header is initialized with exec path.
+PUBLIC void mtic_setCommandLine(const char *line);
 
 //pause and resume the agent
 /**
