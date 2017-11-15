@@ -763,7 +763,7 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
 
                         foreach (AgentInMappingVM* agent, listAgentsInMapping)
                         {
-                            if(agent->agentName() == agentAgentName)
+                            if(agent->name() == agentAgentName)
                             {
                                 agentM = agent;
                                 // Go through the inputs
@@ -850,7 +850,7 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
 
                         foreach (AgentInMappingVM* agent, listAgentsInMapping)
                         {
-                            if(agent->agentName() == agentAgentName)
+                            if (agent->name() == agentAgentName)
                             {
                                 agentM = agent;
                                 break;
@@ -908,7 +908,7 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
 
                         foreach (AgentInMappingVM* agent, listAgentsInMapping)
                         {
-                            if(agent->agentName() == fromAgentAgentName)
+                            if (agent->name() == fromAgentAgentName)
                             {
                                 fromAgentM = agent;
                                 found = false;
@@ -943,7 +943,7 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
                                 }
                             }
 
-                            if(agent->agentName() == toAgentAgentName)
+                            if (agent->name() == toAgentAgentName)
                             {
                                 toAgentM = agent;
                                 found = false;
@@ -1057,7 +1057,7 @@ ActionConditionVM* JsonHelper::_parseConditionsVMFromJson(QJsonObject jsonCondit
 
                         foreach (AgentInMappingVM* agent, listAgentsInMapping)
                         {
-                            if(agent->agentName() == agentAgentName)
+                            if (agent->name() == agentAgentName)
                             {
                                 agentM = agent;
                                 // Go through the inputs
@@ -1144,7 +1144,7 @@ ActionConditionVM* JsonHelper::_parseConditionsVMFromJson(QJsonObject jsonCondit
 
                         foreach (AgentInMappingVM* agent, listAgentsInMapping)
                         {
-                            if(agent->agentName() == agentAgentName)
+                            if (agent->name() == agentAgentName)
                             {
                                 agentM = agent;
                                 break;
@@ -1222,7 +1222,7 @@ QByteArray JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<ActionI
             {
                 QJsonObject jsonCondition;
                 jsonCondition.insert("type",ActionConditionType::staticEnumToString(conditionVM->conditionType()));
-                jsonCondition.insert("agent_name", actionCondition->agentModel()->agentName());
+                jsonCondition.insert("agent_name", actionCondition->agentModel()->name());
 
                 switch (conditionVM->conditionType())
                 {
@@ -1285,7 +1285,7 @@ QByteArray JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<ActionI
                         IOPValueEffectM* iopEffect = dynamic_cast<IOPValueEffectM*>(actionEffect);
                         if(iopEffect != NULL && iopEffect->agentIOP() != NULL)
                         {
-                            jsonEffect.insert("agent_name", actionEffect->agentModel()->agentName());
+                            jsonEffect.insert("agent_name", actionEffect->agentModel()->name());
                             jsonEffect.insert("iop_name", iopEffect->agentIOP()->name());
                             jsonEffect.insert("operator", ActionEffectValueType::staticEnumToString(iopEffect->effect()));
                             jsonEffect.insert("value", iopEffect->value());
@@ -1299,7 +1299,7 @@ QByteArray JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<ActionI
                     {
                         if(actionEffect->agentModel() != NULL)
                         {
-                            jsonEffect.insert("agent_name", actionEffect->agentModel()->agentName());
+                            jsonEffect.insert("agent_name", actionEffect->agentModel()->name());
                             jsonEffect.insert("value", ActionEffectValueType::staticEnumToString(actionEffect->effect()));
 
                             jsonFilled = true;
@@ -1313,9 +1313,9 @@ QByteArray JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<ActionI
                                 mappingEffect->toAgentModel() != NULL && mappingEffect->toAgentIOP() != NULL &&
                                 mappingEffect->fromAgentIOP() != NULL)
                         {
-                            jsonEffect.insert("from_agent_name", mappingEffect->agentModel()->agentName());
+                            jsonEffect.insert("from_agent_name", mappingEffect->agentModel()->name());
                             jsonEffect.insert("from_iop_name", mappingEffect->fromAgentIOP()->name());
-                            jsonEffect.insert("to_agent_name", mappingEffect->toAgentModel()->agentName());
+                            jsonEffect.insert("to_agent_name", mappingEffect->toAgentModel()->name());
                             jsonEffect.insert("to_iop_name", mappingEffect->toAgentIOP()->name());
                             jsonEffect.insert("value", ActionEffectValueType::staticEnumToString(actionEffect->effect()));
 

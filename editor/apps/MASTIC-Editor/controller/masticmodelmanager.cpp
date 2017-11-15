@@ -216,7 +216,7 @@ void MasticModelManager::onDefinitionReceived(QString peerId, QString agentName,
                  }
                  else {
                      // FIXME TODO
-                     qWarning() << "Update the definition of agent" << agentName << "(if this definition changed)";
+                     qWarning() << "Update the definition of agent" << agentName << "(if this definition has changed)";
                  }
             }
         }
@@ -235,7 +235,7 @@ void MasticModelManager::onMappingReceived(QString peerId, QString agentName, QS
     if (!mappingJSON.isEmpty())
     {
         AgentM* agent = getAgentModelFromPeerId(peerId);
-        if (agent != NULL) // && (agent->mapping() == NULL))
+        if (agent != NULL)
         {
             QByteArray byteArrayOfJson = mappingJSON.toUtf8();
 
@@ -243,11 +243,18 @@ void MasticModelManager::onMappingReceived(QString peerId, QString agentName, QS
             AgentMappingM* agentMapping = _jsonHelper->createModelOfAgentMapping(agentName, byteArrayOfJson);
             if (agentMapping != NULL)
             {
-                // Add this new model of agent mapping
-                addAgentMappingForAgentName(agentMapping, agentName);
+                if (agent->mapping() == NULL)
+                {
+                    // Add this new model of agent mapping
+                    addAgentMappingForAgentName(agentMapping, agentName);
 
-                // Set this mapping to the agent
-                agent->setmapping(agentMapping);
+                    // Set this mapping to the agent
+                    agent->setmapping(agentMapping);
+                }
+                else {
+                    // FIXME TODO
+                    qWarning() << "Update the mapping of agent" << agentName << "(if this mapping has changed)";
+                }
             }
         }
     }

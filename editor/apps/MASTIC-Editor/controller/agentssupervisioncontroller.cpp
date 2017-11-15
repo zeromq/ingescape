@@ -197,8 +197,8 @@ void AgentsSupervisionController::onAgentModelCreated(AgentM* model)
         // Connect to signals from this new view model of agent
         connect(agent, &AgentVM::definitionChangedWithPreviousValue, this, &AgentsSupervisionController::_onAgentDefinitionChangedWithPreviousValue);
         connect(agent, &AgentVM::commandAskedToLauncher, this, &AgentsSupervisionController::commandAskedToLauncher);
-        connect(agent, &AgentVM::commandAsked, this, &AgentsSupervisionController::commandAsked);
-        connect(agent, &AgentVM::commandAskedForOutput, this, &AgentsSupervisionController::commandAskedForOutput);
+        connect(agent, &AgentVM::commandAskedToAgent, this, &AgentsSupervisionController::commandAskedToAgent);
+        connect(agent, &AgentVM::commandAskedToAgentAboutOutput, this, &AgentsSupervisionController::commandAskedToAgentAboutOutput);
         connect(agent, &AgentVM::openValuesHistoryOfAgent, this, &AgentsSupervisionController::openValuesHistoryOfAgent);
 
         agentViewModelsList.append(agent);
@@ -372,8 +372,8 @@ void AgentsSupervisionController::_deleteAgentViewModel(AgentVM* agent)
         // DIS-connect from signals from this old view model of agent
         disconnect(agent, &AgentVM::definitionChangedWithPreviousValue, this, &AgentsSupervisionController::_onAgentDefinitionChangedWithPreviousValue);
         disconnect(agent, &AgentVM::commandAskedToLauncher, this, &AgentsSupervisionController::commandAskedToLauncher);
-        disconnect(agent, &AgentVM::commandAsked, this, &AgentsSupervisionController::commandAsked);
-        disconnect(agent, &AgentVM::commandAskedForOutput, this, &AgentsSupervisionController::commandAskedForOutput);
+        disconnect(agent, &AgentVM::commandAskedToAgent, this, &AgentsSupervisionController::commandAskedToAgent);
+        disconnect(agent, &AgentVM::commandAskedToAgentAboutOutput, this, &AgentsSupervisionController::commandAskedToAgentAboutOutput);
         disconnect(agent, &AgentVM::openValuesHistoryOfAgent, this, &AgentsSupervisionController::openValuesHistoryOfAgent);
 
         // Free memory

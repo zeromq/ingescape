@@ -38,7 +38,7 @@ Item {
 
     // Model associated to our QML item
     property var agentMappingVM: null
-    property var agentName: agentMappingVM ? agentMappingVM.agentName : ""
+    property var agentName: agentMappingVM ? agentMappingVM.name : ""
 
     property bool isReduced : agentMappingVM && agentMappingVM.isReduced
 
@@ -48,6 +48,7 @@ Item {
 
 
     width : 258
+
     height : (rootItem.agentMappingVM && !rootItem.isReduced)?
                  (54 + 20*Math.max(rootItem.agentMappingVM.inputsList.count , rootItem.agentMappingVM.outputsList.count))
                : 42
@@ -58,7 +59,16 @@ Item {
     y: (agentMappingVM && agentMappingVM.position) ? agentMappingVM.position.y : 0
 
 
-    clip : true
+   // clip : true
+
+
+
+    // To check if our item is selected or not
+    property bool _isSelected: (controller && rootItem.agentMappingVM && (controller.selectedAgent === rootItem.agentMappingVM))
+
+
+    // Duration of expand/collapse animation in milliseconds (250 ms => default duration of QML animations)
+    property int _expandCollapseAnimationDuration: 250
 
 
 
@@ -84,6 +94,7 @@ Item {
     //
     Behavior on height {
         NumberAnimation {
+            duration: rootItem._expandCollapseAnimationDuration
         }
     }
 
@@ -128,11 +139,10 @@ Item {
                 controller.selectedAgent = agentMappingVM
             }
 
+            // bring our agent to front
             parent.z = rootItem.parent.maxZ++;
         }
 
-        onPositionChanged: {
-        }
 
         onDoubleClicked: {
             if (agentMappingVM) {
@@ -144,70 +154,80 @@ Item {
 
 
     Rectangle {
-        id : rectBck
+        id: background
+
         anchors {
             fill: parent
-            leftMargin: 8
-            rightMargin: 10
-            topMargin: 1
-            bottomMargin: 1
         }
 
-        color :  (dropEnabled === true) ?
-                     (mouseArea.pressed?
-                          MasticTheme.darkGreyColor2
-                        : (rootItem.agentMappingVM && rootItem.agentMappingVM.isON)? MasticTheme.darkBlueGreyColor : MasticTheme.veryDarkGreyColor)
+        radius: 6
+
+        color:  (dropEnabled === true) ?
+                     (mouseArea.pressed ?
+                         MasticTheme.darkGreyColor2
+                        : (rootItem.agentMappingVM && rootItem.agentMappingVM.isON) ? MasticTheme.darkBlueGreyColor : MasticTheme.veryDarkGreyColor)
                    : MasticTheme.darkGreyColor2;
-        radius : 6
 
-        Rectangle {
-            anchors.fill: parent
-            anchors.margins: -1
 
-            visible : (controller && rootItem.agentMappingVM && (controller.selectedAgent === rootItem.agentMappingVM))
-            color : "transparent"
-            radius : 6
-
-            border {
-                width : 2
-                color : MasticTheme.selectedAgentColor
-            }
-
-            Button {
-                id: removeButton
-                activeFocusOnPress: true
-                anchors {
-                    top: parent.top
-                    topMargin: 10
-                    right : parent.right
-                    rightMargin: 10
-                }
-
-                style: Theme.LabellessSvgButtonStyle {
-                    fileCache: MasticTheme.svgFileMASTIC
-
-                    pressedID: releasedID + "-pressed"
-                    releasedID: "supprimer"
-                    disabledID : releasedID
-                }
-
-                onClicked: {
-                    if (controller) {
-                        // Delete our agent
-                        controller.removeAgentFromMapping(model.QtObject);
-                    }
-                }
-            }
-
+        border {
+            color: MasticTheme.selectedAgentColor
+            width: rootItem._isSelected ? 2 : 0
         }
+
+
+        // Animate our border
+        Behavior on border.width {
+            NumberAnimation {}
+        }
+
+
+        // Remove button
+        Button {
+            id: removeButton
+
+            visible: (opacity !== 0)
+            enabled: visible
+
+            opacity: rootItem._isSelected ? 1 : 0
+
+            Behavior on opacity {
+                NumberAnimation {}
+            }
+
+            activeFocusOnPress: true
+
+            anchors {
+                top: parent.top
+                topMargin: 10
+                right : parent.right
+                rightMargin: 10
+            }
+
+            style: Theme.LabellessSvgButtonStyle {
+                fileCache: MasticTheme.svgFileMASTIC
+
+                pressedID: releasedID + "-pressed"
+                releasedID: "supprimer"
+                disabledID : releasedID
+            }
+
+            onClicked: {
+                if (controller) {
+                    // Delete our agent
+                    controller.removeAgentFromMapping(model.QtObject);
+                }
+            }
+        }
+
 
         // Agent Name
         Text {
-            id : agentName
+            id: agentName
+
             anchors {
-                left : parent.left
+                left: parent.left
                 leftMargin: 20
-                right : parent.right
+                right: parent.right
                 rightMargin: 20
                 verticalCenter: parent.top
                 verticalCenterOffset: 20
@@ -215,51 +235,57 @@ Item {
 
 
             elide: Text.ElideRight
-            text : rootItem.agentName
+            text: rootItem.agentName
 
-            color : (dropEnabled === true) ?
-                        (rootItem.agentMappingVM && rootItem.agentMappingVM.isON)? MasticTheme.agentsONNameMappingColor : MasticTheme.agentsOFFNameMappingColor
-            : MasticTheme.lightGreyColor;
+            color: (dropEnabled === true) ?
+                        (rootItem.agentMappingVM && rootItem.agentMappingVM.isON) ? MasticTheme.agentsONNameMappingColor : MasticTheme.agentsOFFNameMappingColor
+                    : MasticTheme.lightGreyColor;
+
             font: MasticTheme.headingFont
         }
 
+
         // Warnings
         Rectangle {
-            id : agentWithSameName
-            height : 17
-            width : height
-            radius : height/2
+            id: agentWithSameName
+
+            height: 17
+            width: height
+            radius: height/2
 
             visible: (agentMappingVM && agentMappingVM.models.count > 1)
 
             anchors {
                 verticalCenter: agentName.verticalCenter
                 verticalCenterOffset:  2
-                right : parent.right
+                right: parent.right
                 rightMargin: 48
             }
 
-            color : MasticTheme.redColor
+            color: MasticTheme.redColor
 
             Text {
-                anchors.centerIn : parent
-                anchors.verticalCenterOffset: -1
+                anchors {
+                    centerIn : parent
+                    verticalCenterOffset: -1
+                }
 
                 text: agentMappingVM? agentMappingVM.models.count : ""
 
-                color : MasticTheme.whiteColor
+                color: MasticTheme.whiteColor
+
                 font {
                     family: MasticTheme.labelFontFamily
-                    weight : Font.Black
-                    pixelSize : 13
+                    weight: Font.Black
+                    pixelSize: 13
                 }
             }
         }
 
         Rectangle {
-            height : 17
-            width : height
-            radius : height/2
+            height: 17
+            width: height
+            radius: height/2
 
             visible: rootItem.agentMappingVM && !rootItem.agentMappingVM.areIdenticalsAllDefinitions
 
@@ -274,36 +300,39 @@ Item {
 
             Text {
                 anchors {
-                    centerIn : parent
+                    centerIn: parent
                     verticalCenterOffset:  -1
                 }
                 text: "!"
 
                 color : MasticTheme.whiteColor
+
                 font {
                     family: MasticTheme.labelFontFamily
-                    weight : Font.Black
-                    pixelSize : 14
+                    weight: Font.Black
+                    pixelSize: 14
                 }
             }
         }
 
+
         //Separator
         Rectangle {
-            id : separator
+            id: separator
+
             anchors {
-                left : parent.left
+                left: parent.left
                 leftMargin: 18
-                right : parent.right
+                right: parent.right
                 rightMargin: 18
-                verticalCenter : parent.top
+                verticalCenter: parent.top
                 verticalCenterOffset: 40
             }
 
-            height : 2
-            color : agentName.color
+            height: 2
+            color: agentName.color
 
-            visible : !rootItem.isReduced
+            visible: !rootItem.isReduced
         }
 
 
@@ -311,9 +340,10 @@ Item {
         I2SvgItem {
             anchors {
               right: parent.right
-              top : parent.top
+              top: parent.top
               margins: 2
             }
+
             svgFileCache: MasticTheme.svgFileMASTIC
             svgElementId: "dropImpossible"
 
@@ -423,14 +453,24 @@ Item {
 
             anchors {
                 left: parent.left
-                right : parent.right
+                right: parent.right
 
                 top: separator.bottom
                 topMargin: 5
                 bottom: parent.bottom
             }
 
-            visible : !rootItem.isReduced
+            visible: (value !== 0)
+            opacity: value
+
+            value: (rootItem.isReduced) ? 0 : 1
+
+            Behavior on value {
+                NumberAnimation {
+                    duration: rootItem._expandCollapseAnimationDuration
+                }
+            }
+
 
             Repeater {
                 // List of intput slots VM
@@ -441,37 +481,39 @@ Item {
 
                     property var myModel: model.QtObject
 
-                    height : 20
+                    height: 20
                     anchors {
-                        left : parent.left
-                        right : parent.right
+                        left: parent.left
+                        right: parent.right
                     }
 
                     Text {
-                        id : agentInput
+                        id: agentInput
+
                         anchors {
-                            left : parent.left
+                            left: parent.left
                             leftMargin: 20
-                            right : parent.horizontalCenter
+                            right: parent.horizontalCenter
                             rightMargin: 5
                             verticalCenter: parent.verticalCenter
                         }
-                        elide: Text.ElideRight
-                        text : myModel ? myModel.name : ""
 
-                        color : (rootItem.agentMappingVM && rootItem.agentMappingVM.isON)? MasticTheme.agentsONInputsOutputsMappingColor : MasticTheme.agentsOFFInputsOutputsMappingColor
+                        elide: Text.ElideRight
+                        text: myModel ? myModel.name : ""
+
+                        color: (rootItem.agentMappingVM && rootItem.agentMappingVM.isON)? MasticTheme.agentsONInputsOutputsMappingColor : MasticTheme.agentsOFFInputsOutputsMappingColor
                         font: MasticTheme.heading2Font
                     }
 
                     Rectangle {
-                        id : draggablePointFROM
+                        id: draggablePointFROM
 
-                        height : linkPoint.height
-                        width : height
-                        radius : height/2
+                        height: linkPoint.height
+                        width: height
+                        radius: height/2
 
-                        property bool dragActive : mouseAreaPointFROM.drag.active;
-                        property var agentInMappingVMOfInput : rootItem.agentMappingVM;
+                        property bool dragActive: mouseAreaPointFROM.drag.active;
+                        property var agentInMappingVMOfInput: rootItem.agentMappingVM;
                         property var inputSlotModel: model.QtObject
 
                         Drag.active: mouseAreaPointFROM.drag.active;
@@ -480,13 +522,13 @@ Item {
                         Drag.keys: ["InputSlotItem"]
 
                         border {
-                            width : 1
-                            color : draggablePointFROM.dragActive? linkPoint.color : "transparent"
+                            width: 1
+                            color: draggablePointFROM.dragActive? linkPoint.color : "transparent"
                         }
 
+                        color: draggablePointFROM.dragActive? MasticTheme.agentsMappingBackgroundColor : "transparent"
 
-                        color : draggablePointFROM.dragActive? MasticTheme.agentsMappingBackgroundColor : "transparent"
-                        parent : draggablePointFROM.dragActive? rootItem.parent  : linkPoint
+                        parent: draggablePointFROM.dragActive? rootItem.parent  : linkPoint
 
                         MouseArea {
                             id: mouseAreaPointFROM
@@ -518,14 +560,15 @@ Item {
                         }
 
                         Link {
-                            id : linkDraggablePoint
+                            id: linkDraggablePoint
 
-                            parent : rootItem.parent
-                            strokeDashArray : "5, 5"
+                            parent: rootItem.parent
+
+                            strokeDashArray: "5, 5"
                             visible: draggablePointFROM.dragActive
 
                             secondPoint: Qt.point(myModel.position.x, myModel.position.y)
-                            firstPoint: Qt.point(draggablePointFROM.x + draggablePointFROM.width, draggablePointFROM.y + draggablePointFROM.height/2)
+                            firstPoint: Qt.point(draggablePointFROM.x + draggablePointFROM.width/2, draggablePointFROM.y + draggablePointFROM.height/2)
 
                             defaultColor:linkPoint.color
                         }
@@ -540,9 +583,9 @@ Item {
                             verticalCenter: parent.verticalCenter
                         }
 
-                        height : 13
-                        width : height
-                        radius : height/2
+                        height: 13
+                        width: height
+                        radius: height/2
 
                         border {
                             width : 0
@@ -657,14 +700,9 @@ Item {
 
                         property: "position"
 
-                        // the position inside the agent is not the same if the agent is reduced or not
-                        value:  (rootItem.agentMappingVM && !rootItem.agentMappingVM.isReduced) ?
-                                    (Qt.point(rootItem.x + columnInputSlots.x + rectBck.x + inputSlotItem.x + linkPoint.x + linkPoint.width/2,
-                                              rootItem.y + columnInputSlots.y + inputSlotItem.y + linkPoint.y + linkPoint.height/2))
-                                  : (Qt.point(rootItem.x + inputGlobalPoint.x + rectBck.x + inputGlobalPoint.width/2,
-                                              rootItem.y + inputGlobalPoint.y + inputGlobalPoint.height/2));
+                        value: Qt.point(rootItem.x + columnInputSlots.x + background.x + inputSlotItem.x + linkPoint.x + linkPoint.width/2,
+                                        rootItem.y + columnInputSlots.y + inputSlotItem.y + linkPoint.y + linkPoint.height/2)
                     }
-
                 }
             }
         }
@@ -686,7 +724,18 @@ Item {
                 bottom: parent.bottom
             }
 
-            visible : !rootItem.isReduced
+
+            visible: (value !== 0)
+            opacity: value
+
+            value: (rootItem.isReduced) ? 0 : 1
+
+            Behavior on value {
+                NumberAnimation {
+                    duration: rootItem._expandCollapseAnimationDuration
+                }
+            }
+
 
             Repeater {
                 // List of output slots VM
@@ -697,18 +746,19 @@ Item {
 
                     property var myModel: model.QtObject
 
-                    height : 20
+                    height: 20
                     anchors {
-                        left : parent.left
-                        right : parent.right
+                        left: parent.left
+                        right: parent.right
                     }
 
                     Text {
                         id : agentOutput
+
                         anchors {
-                            left : parent.horizontalCenter
+                            left: parent.horizontalCenter
                             leftMargin: 5
-                            right : parent.right
+                            right: parent.right
                             rightMargin: 20
                             verticalCenter: parent.verticalCenter
                         }
@@ -716,9 +766,9 @@ Item {
                         horizontalAlignment : Text.AlignRight
 
                         elide: Text.ElideRight
-                        text : myModel ? myModel.name : ""
+                        text: myModel ? myModel.name : ""
 
-                        color : (rootItem.agentMappingVM && rootItem.agentMappingVM.isON)? MasticTheme.agentsONInputsOutputsMappingColor : MasticTheme.agentsOFFInputsOutputsMappingColor
+                        color: (rootItem.agentMappingVM && rootItem.agentMappingVM.isON)? MasticTheme.agentsONInputsOutputsMappingColor : MasticTheme.agentsOFFInputsOutputsMappingColor
                         font: MasticTheme.heading2Font
                     }
 
@@ -727,13 +777,13 @@ Item {
                     Rectangle {
                         id : draggablePointTO
 
-                        height : linkPointOut.height
-                        width : height
-                        radius : height/2
+                        height: linkPointOut.height
+                        width: height
+                        radius: height/2
 
                         border {
                             width : 1
-                            color : draggablePointTO.dragActive? linkPointOut.color : "transparent"
+                            color : draggablePointTO.dragActive ? linkPointOut.color : "transparent"
                         }
 
                         property bool dragActive : mouseAreaPointTO.drag.active;
@@ -745,8 +795,8 @@ Item {
                         Drag.hotSpot.y: 0
                         Drag.keys: ["OutputSlotItem"]
 
-                        color : draggablePointTO.dragActive? MasticTheme.agentsMappingBackgroundColor : "transparent"
-                        parent : draggablePointTO.dragActive? rootItem.parent  : linkPointOut
+                        color: draggablePointTO.dragActive ? MasticTheme.agentsMappingBackgroundColor : "transparent"
+                        parent: draggablePointTO.dragActive ? rootItem.parent  : linkPointOut
 
                         MouseArea {
                             id: mouseAreaPointTO
@@ -760,7 +810,7 @@ Item {
 
                             hoverEnabled: true
 
-                            cursorShape: (draggablePointTO.dragActive)? Qt.ClosedHandCursor : Qt.PointingHandCursor //Qt.OpenHandCursor
+                            cursorShape: (draggablePointTO.dragActive) ? Qt.ClosedHandCursor : Qt.PointingHandCursor //Qt.OpenHandCursor
 
                             onPressed: {
                                 draggablePointTO.z = rootItem.parent.maxZ++;
@@ -780,14 +830,14 @@ Item {
 
 
                         Link {
-                            id : linkDraggablePointTO
+                            id: linkDraggablePointTO
 
-                            parent : rootItem.parent
-                            strokeDashArray : "5, 5"
+                            parent: rootItem.parent
+                            strokeDashArray: "5, 5"
                             visible: draggablePointTO.dragActive
 
-                            firstPoint: Qt.point(myModel.position.x + linkPointOut.width, myModel.position.y)
-                            secondPoint: Qt.point(draggablePointTO.x, draggablePointTO.y + draggablePointTO.height/2)
+                            firstPoint: Qt.point(myModel.position.x, myModel.position.y)
+                            secondPoint: Qt.point(draggablePointTO.x + draggablePointTO.width/2, draggablePointTO.y + draggablePointTO.height/2)
 
                             defaultColor:linkPointOut.color
                         }
@@ -796,23 +846,23 @@ Item {
 
 
                     Rectangle {
-                        id : linkPointOut
+                        id: linkPointOut
 
                         anchors {
                             horizontalCenter: parent.right
                             verticalCenter: parent.verticalCenter
                         }
 
-                        height : 13
-                        width : height
-                        radius : height/2
+                        height: 13
+                        width: height
+                        radius: height/2
 
                         border {
                             width : 0
                             color : MasticTheme.lightGreyColor
                         }
 
-                        color : if (agentMappingVM && myModel && myModel.firstModel) {
+                        color: if (agentMappingVM && myModel && myModel.firstModel) {
 
                                     switch (myModel.firstModel.agentIOPValueTypeGroup)
                                     {
@@ -847,6 +897,7 @@ Item {
 
                         I2SvgItem {
                             anchors.centerIn: parent
+
                             svgFileCache: MasticTheme.svgFileMASTIC
                             svgElementId: "outputIsMuted"
 
@@ -890,10 +941,6 @@ Item {
                         }
 
 
-                        onPositionChanged: {
-                        }
-
-
                         onExited: {
                             var dragItem = drag.source;
                             if (typeof dragItem.dragActive !== 'undefined')
@@ -917,7 +964,6 @@ Item {
                                 }
                             }
                         }
-
                     }
 
 
@@ -934,11 +980,15 @@ Item {
                         property: "position"
 
                         // the position inside the agent is not the same if the agent is reduced or not
+                        /*
                         value: (rootItem.agentMappingVM && !rootItem.agentMappingVM.isReduced) ?
-                                   (Qt.point(rootItem.x + columnOutputSlots.x + rectBck.x + outputSlotItem.x + linkPointOut.x + linkPointOut.width/2,
+                                   (Qt.point(rootItem.x + columnOutputSlots.x + background.x + outputSlotItem.x + linkPointOut.x + linkPointOut.width/2,
                                              rootItem.y + columnOutputSlots.y + outputSlotItem.y + linkPointOut.y + linkPointOut.height/2))
-                                 : (Qt.point(rootItem.x + outputGlobalPoint.x + rectBck.x +outputGlobalPoint.width/2,
+                                 : (Qt.point(rootItem.x + outputGlobalPoint.x + background.x +outputGlobalPoint.width/2,
                                              rootItem.y + outputGlobalPoint.y + outputGlobalPoint.height/2));
+                                             */
+                        value: Qt.point(rootItem.x + columnOutputSlots.x + background.x + outputSlotItem.x + linkPointOut.x + linkPointOut.width/2,
+                                        rootItem.y + columnOutputSlots.y + outputSlotItem.y + linkPointOut.y + linkPointOut.height/2)
                     }
                 }
             }

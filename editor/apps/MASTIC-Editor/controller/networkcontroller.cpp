@@ -119,14 +119,6 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
             }
             zlist_destroy(&keys);
 
-            // Subscribers
-            /*int n = HASH_COUNT(subscribers);
-            qDebug() << n << "subscribers in the list";
-            subscriber_t *sub, *tmpSub;
-            HASH_ITER(hh, subscribers, sub, tmpSub) {
-                qDebug() << "subscriber:" << sub->agentName << "with peer id" << sub->agentPeerId;
-            }*/
-
             if (isMasticPublisher && isIntPID) {
                 qDebug() << "our zyre event is about MASTIC publisher:" << pid << hostname << executionPath;
 
@@ -153,38 +145,14 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
             // MUTED / UN-MUTED
             if (message.startsWith(mutedAllPrefix))
             {
-                message.remove(0, mutedAllPrefix.length());
-
-                if (message == "0") {
-                    //qDebug() << peerName << "(" << peerId << ") UN-MUTED";
-
-                    // Emit the signal "is Muted from Agent Updated"
-                    Q_EMIT networkController->isMutedFromAgentUpdated(peerId, false);
-                }
-                else if (message == "1") {
-                    //qDebug() << peerName << "(" << peerId << ") MUTED";
-
-                    // Emit the signal "is Muted from Agent Updated"
-                    Q_EMIT networkController->isMutedFromAgentUpdated(peerId, true);
-                }
+                // Manage the message "MUTED / UN-MUTED"
+                networkController->manageMessageMutedUnmuted(peerId, message.remove(0, mutedAllPrefix.length()));
             }
             // FROZEN / UN-FROZEN
             else if (message.startsWith(frozenPrefix))
             {
-                message.remove(0, frozenPrefix.length());
-
-                if (message == "0") {
-                    //qDebug() << peerName << "(" << peerId << ") UN-FROZEN";
-
-                    // Emit the signal "is Frozen from Agent Updated"
-                    Q_EMIT networkController->isFrozenFromAgentUpdated(peerId, false);
-                }
-                else if (message == "1") {
-                    //qDebug() << peerName << "(" << peerId << ") FROZEN";
-
-                    // Emit the signal "is Frozen from Agent Updated"
-                    Q_EMIT networkController->isFrozenFromAgentUpdated(peerId, true);
-                }
+                // Manage the message "FROZEN / UN-FROZEN"
+                networkController->manageMessageFrozenUnfrozen(peerId, message.remove(0, frozenPrefix.length()));
             }
             // OUTPUT MUTED
             else if (message.startsWith(mutedOutputPrefix))
@@ -215,34 +183,18 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
             zmsg_t* msg_dup = zmsg_dup(msg);
             QString message = zmsg_popstr(msg_dup);
 
-            //
             // Definition
-            //
             if (message.startsWith(definitionPrefix))
             {
                 message.remove(0, definitionPrefix.length());
 
-                // FIXME - TEST ONLY - TO REMOVE
-                /*// Load definition from string content
-                definition* newDefinition = parser_loadDefinition(message.toStdString().c_str());
-                qDebug() << "Definition received from : " << newDefinition->name << " version : " << newDefinition->version << " description : " << newDefinition->description;
-                definition_freeDefinition(newDefinition);*/
-
                 // Emit the signal "Definition Received"
                 Q_EMIT networkController->definitionReceived(peerId, peerName, message);
             }
-            //
             // Mapping
-            //
             else if (message.startsWith(mappingPrefix))
             {
                 message.remove(0, mappingPrefix.length());
-
-                // FIXME - TEST ONLY - TO REMOVE
-                /*// Load mapping from string content
-                mapping* newMapping = parser_LoadMap((message.toStdString().c_str()));
-                qDebug() << "Mapping received from : " << newMapping->name << " version : " << newMapping->version << " description : " << newMapping->description;
-                mapping_freeMapping(newMapping);*/
 
                 // Emit the signal "Mapping Received"
                 Q_EMIT networkController->mappingReceived(peerId, peerName, message);
@@ -250,48 +202,34 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
             // MUTED / UN-MUTED
             else if (message.startsWith(mutedAllPrefix))
             {
-                message.remove(0, mutedAllPrefix.length());
-
-                if (message == "0") {
-                    //qDebug() << peerName << "(" << peerId << ") UN-MUTED";
-
-                    // Emit the signal "is Muted from Agent Updated"
-                    Q_EMIT networkController->isMutedFromAgentUpdated(peerId, false);
-                }
-                else if (message == "1") {
-                    //qDebug() << peerName << "(" << peerId << ") MUTED";
-
-                    // Emit the signal "is Muted from Agent Updated"
-                    Q_EMIT networkController->isMutedFromAgentUpdated(peerId, true);
-                }
+                // Manage the message "MUTED / UN-MUTED"
+                networkController->manageMessageMutedUnmuted(peerId, message.remove(0, mutedAllPrefix.length()));
             }
             // FROZEN / UN-FROZEN
             else if (message.startsWith(frozenPrefix))
             {
-                message.remove(0, frozenPrefix.length());
-
-                if (message == "0") {
-                    //qDebug() << peerName << "(" << peerId << ") UN-FROZEN";
-
-                    // Emit the signal "is Frozen from Agent Updated"
-                    Q_EMIT networkController->isFrozenFromAgentUpdated(peerId, false);
-                }
-                else if (message == "1") {
-                    //qDebug() << peerName << "(" << peerId << ") FROZEN";
-
-                    // Emit the signal "is Frozen from Agent Updated"
-                    Q_EMIT networkController->isFrozenFromAgentUpdated(peerId, true);
-                }
+                // Manage the message "FROZEN / UN-FROZEN"
+                networkController->manageMessageFrozenUnfrozen(peerId, message.remove(0, frozenPrefix.length()));
             }
-            // MAPPED
-            /*else if (message.startsWith("MAPPED"))
+            // OUTPUT MUTED
+            else if (message.startsWith(mutedOutputPrefix))
             {
-                // FIXME Nothing TODO ?
-                //qDebug() << peerName << "MAPPED" << message;
-            }*/
+                QString outputName = message.remove(0, mutedOutputPrefix.length());
+
+                // Emit the signal "is Muted from OUTPUT of Agent Updated"
+                Q_EMIT networkController->isMutedFromOutputOfAgentUpdated(peerId, true, outputName);
+            }
+            // OUTPUT UN-MUTED
+            else if (message.startsWith(unmutedOutputPrefix))
+            {
+                QString outputName = message.remove(0, unmutedOutputPrefix.length());
+
+                // Emit the signal "is Muted from OUTPUT of Agent Updated"
+                Q_EMIT networkController->isMutedFromOutputOfAgentUpdated(peerId, false, outputName);
+            }
             else
             {
-                qDebug() << "Unknown message received:" << message;
+                qWarning() << "Not yet managed (WHISPER) message '" << message << "' for agent" << peerName << "(" << peerId << ")";
             }
 
             zmsg_destroy(&msg_dup);
@@ -386,12 +324,7 @@ void onObserveInputCallback(iop_t iopType, const char* name, iopType_t valueType
                     currentValue = QVariant(newValue);
                     isValid = true;
 
-                    /*if (newValue) {
-                        qDebug() << "New value TRUE received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
-                    }
-                    else {
-                        qDebug() << "New value FALSE received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
-                    }*/
+                    //qDebug() << "New value" << newValue << "received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
                     break;
                 }
                 case IMPULSION_T: {
@@ -414,7 +347,7 @@ void onObserveInputCallback(iop_t iopType, const char* name, iopType_t valueType
                         qDebug() << "New DATA with size" << valueSize << "received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
                     }
                     else {
-                        // FIXME TODO
+                        qCritical() << "Can NOT read input" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType) << "(DATA of size:" << valueSize << ")";
                     }
                     break;
                 }
@@ -434,8 +367,7 @@ void onObserveInputCallback(iop_t iopType, const char* name, iopType_t valueType
                     Q_EMIT networkController->valuePublished(publishedValue);
                 }
                 else {
-                    // FIXME TODO log error
-                    //qCritical()
+                    qCritical() << "Can NOT read input" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
                 }
             }
         }
@@ -597,6 +529,50 @@ void NetworkController::masticLauncherExited(QString hostname)
 
 
 /**
+ * @brief Manage the message "MUTED / UN-MUTED"
+ * @param peerId
+ * @param message
+ */
+void NetworkController::manageMessageMutedUnmuted(QString peerId, QString message)
+{
+    if (message == "0") {
+        //qDebug() << peerName << "(" << peerId << ") UN-MUTED";
+
+        // Emit the signal "is Muted from Agent Updated"
+        Q_EMIT isMutedFromAgentUpdated(peerId, false);
+    }
+    else if (message == "1") {
+        //qDebug() << peerName << "(" << peerId << ") MUTED";
+
+        // Emit the signal "is Muted from Agent Updated"
+        Q_EMIT isMutedFromAgentUpdated(peerId, true);
+    }
+}
+
+
+/**
+ * @brief Manage the message "FROZEN / UN-FROZEN"
+ * @param peerId
+ * @param message
+ */
+void NetworkController::manageMessageFrozenUnfrozen(QString peerId, QString message)
+{
+    if (message == "0") {
+        //qDebug() << peerName << "(" << peerId << ") UN-FROZEN";
+
+        // Emit the signal "is Frozen from Agent Updated"
+        Q_EMIT isFrozenFromAgentUpdated(peerId, false);
+    }
+    else if (message == "1") {
+        //qDebug() << peerName << "(" << peerId << ") FROZEN";
+
+        // Emit the signal "is Frozen from Agent Updated"
+        Q_EMIT isFrozenFromAgentUpdated(peerId, true);
+    }
+}
+
+
+/**
  * @brief Slot when a command must be sent on the network to a launcher
  * @param command
  * @param hostname
@@ -626,11 +602,11 @@ void NetworkController::onCommandAskedToLauncher(QString command, QString hostna
 
 
 /**
- * @brief Slot when a command must be sent on the network
- * @param command
+ * @brief Slot when a command must be sent on the network to an agent
  * @param peerIdsList
+ * @param command
  */
-void NetworkController::onCommandAsked(QString command, QStringList peerIdsList)
+void NetworkController::onCommandAskedToAgent(QStringList peerIdsList, QString command)
 {
     if (!command.isEmpty() && (peerIdsList.count() > 0)) {
         foreach (QString peerId, peerIdsList)
@@ -638,28 +614,48 @@ void NetworkController::onCommandAsked(QString command, QStringList peerIdsList)
             // Send the command to a peer id of agent
             int success = zyre_whispers(agentElements->node, peerId.toStdString().c_str(), "%s", command.toStdString().c_str());
 
-            qDebug() << "Send command" << command << "for agent" << peerId << "with success ?" << success;
+            qInfo() << "Send command" << command << "for agent" << peerId << "with success ?" << success;
         }
     }
 }
 
 
 /**
- * @brief Slot when a command for an output must be sent on the network
+ * @brief Slot when a command must be sent on the network to an agent about one of its output
+ * @param peerIdsList
  * @param command
  * @param outputName
- * @param peerIdsList
  */
-void NetworkController::onCommandAskedForOutput(QString command, QString outputName, QStringList peerIdsList)
+void NetworkController::onCommandAskedToAgentAboutOutput(QStringList peerIdsList, QString command, QString outputName)
 {
     if (!command.isEmpty() && !outputName.isEmpty() && (peerIdsList.count() > 0)) {
         foreach (QString peerId, peerIdsList)
         {
-            // Send the command with the output name to a peer id of agent
+            // Send the command to a peer id of agent
             int success = zyre_whispers(agentElements->node, peerId.toStdString().c_str(), "%s %s", command.toStdString().c_str(), outputName.toStdString().c_str());
 
-            qDebug() << "Send command" << command << "for agent" << peerId << "and output" << outputName << "with success ?" << success;
+            qInfo() << "Send command" << command << "for agent" << peerId << "and output" << outputName << "with success ?" << success;
         }
+    }
+}
+
+
+/**
+ * @brief Slot when a command must be sent on the network to an agent about mapping one of its input
+ * @param peerIdsList
+ * @param command
+ * @param inputName
+ * @param outputAgentName
+ * @param outputName
+ */
+void NetworkController::onCommandAskedToAgentAboutMappingInput(QStringList peerIdsList, QString command, QString inputName, QString outputAgentName, QString outputName)
+{
+    foreach (QString peerId, peerIdsList)
+    {
+        // Send the command to a peer id of agent
+        int success = zyre_whispers(agentElements->node, peerId.toStdString().c_str(), "%s %s %s %s", command.toStdString().c_str(), inputName.toStdString().c_str(), outputAgentName.toStdString().c_str(), outputName.toStdString().c_str());
+
+        qInfo() << "Send command" << command << "for agent" << peerId << "and input" << inputName << "about mapping on agent" << outputAgentName << "and output" << outputName << "with success ?" << success;
     }
 }
 
@@ -719,7 +715,7 @@ void NetworkController::onAddInputsToEditorForOutputs(QString agentName, QList<O
                     break;
                 }
                 case AgentIOPValueTypes::DATA: {
-                    // FIXME TODO
+                    // FIXME TODO mtic_createInput DATA_T
                     //resultCreateInput = mtic_createInput(inputName.toStdString().c_str(), DATA_T, &defaultValue, sizeof(...));
                     break;
                 }

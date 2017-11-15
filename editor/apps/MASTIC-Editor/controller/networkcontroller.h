@@ -73,6 +73,22 @@ public:
     void masticLauncherExited(QString hostname);
 
 
+    /**
+     * @brief Manage the message "MUTED / UN-MUTED"
+     * @param peerId
+     * @param message
+     */
+    void manageMessageMutedUnmuted(QString peerId, QString message);
+
+
+    /**
+     * @brief Manage the message "FROZEN / UN-FROZEN"
+     * @param peerId
+     * @param message
+     */
+    void manageMessageFrozenUnfrozen(QString peerId, QString message);
+
+
 Q_SIGNALS:
 
     /**
@@ -158,20 +174,31 @@ public Q_SLOTS:
 
 
     /**
-     * @brief Slot when a command must be sent on the network
-     * @param command
+     * @brief Slot when a command must be sent on the network to an agent
      * @param peerIdsList
+     * @param command
      */
-    void onCommandAsked(QString command, QStringList peerIdsList);
+    void onCommandAskedToAgent(QStringList peerIdsList, QString command);
 
 
     /**
-     * @brief Slot when a command for an output must be sent on the network
+     * @brief Slot when a command must be sent on the network to an agent about one of its output
+     * @param peerIdsList
      * @param command
      * @param outputName
-     * @param peerIdsList
      */
-    void onCommandAskedForOutput(QString command, QString outputName, QStringList peerIdsList);
+    void onCommandAskedToAgentAboutOutput(QStringList peerIdsList, QString command, QString outputName);
+
+
+    /**
+     * @brief Slot when a command must be sent on the network to an agent about mapping one of its input
+     * @param peerIdsList
+     * @param command
+     * @param inputName
+     * @param outputAgentName
+     * @param outputName
+     */
+    void onCommandAskedToAgentAboutMappingInput(QStringList peerIdsList, QString command, QString inputName, QString outputAgentName, QString outputName);
 
 
     /**

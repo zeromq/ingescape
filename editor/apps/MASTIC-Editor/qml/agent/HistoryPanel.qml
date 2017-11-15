@@ -103,10 +103,10 @@ I2PopupBase {
             anchors.fill: parent
             drag.target: rootItem
 
-            /*drag.minimumX : - faisceauEditor.width/2
-            drag.maximumX : PGIMTheme.applicationWidth - faisceauEditor.width/2
+            drag.minimumX : 0
+            drag.maximumX : rootItem.parent.width - rootItem.width
             drag.minimumY : 0
-            drag.maximumY : PGIMTheme.applicationHeight -  (dragButton.height + 30)*/
+            drag.maximumY :  rootItem.parent.height - rootItem.height
 
             onPressed: {
                 // Emit signal "bring to front"
@@ -337,6 +337,7 @@ I2PopupBase {
 
                 ScrollView {
                     id : _scrollView
+
                     visible: _comboButton.checked;
 
                     anchors {
@@ -347,34 +348,13 @@ I2PopupBase {
                     width: _comboButton.width;
                     height: ((_combolist.count < 8) ? (_combolist.count+1)*(_comboButton.height+1) : 9*(_comboButton.height+1) );
 
-                    style: ScrollViewStyle {
-                        transientScrollBars: true
-                        handle: Item {
-                            implicitWidth: 8
-                            implicitHeight: 26
+                    // Prevent drag overshoot on Windows
+                    flickableItem.boundsBehavior: Flickable.OvershootBounds
 
-                            Rectangle {
-                                color: MasticTheme.lightGreyColor
-
-                                anchors {
-                                    fill: parent
-                                    topMargin: 1
-                                    leftMargin: 1
-                                    rightMargin:0
-                                    bottomMargin: 2
-                                }
-
-                                opacity : 0.8
-                                radius: 10
-                            }
-                        }
-                        scrollBarBackground: Item {
-                            implicitWidth: 8
-                            implicitHeight: 26
-                        }
+                    style: MasticScrollViewStyle {
                     }
 
-                    Item {
+                    contentItem: Item {
                         width: _scrollView.width;
                         height: ( (_combolist.count<8) ? (_combolist.count+1)*(_comboButton.height+1) : 9*(_comboButton.height+1) );
 
@@ -605,6 +585,7 @@ I2PopupBase {
             }
         }
 
+
         // History List
         Item {
             id : tableHistory
@@ -680,6 +661,7 @@ I2PopupBase {
             /// ****** List ***** ////
             ScrollView {
                 id : scrollView
+
                 anchors {
                     top: tableauHeaderRow.bottom
                     left : parent.left
@@ -687,33 +669,13 @@ I2PopupBase {
                     bottom : parent.bottom
                 }
 
-                style: ScrollViewStyle {
-                    transientScrollBars: true
-                    handle: Item {
-                        implicitWidth: 8
-                        implicitHeight: 26
-
-                        Rectangle {
-                            color: MasticTheme.lightGreyColor
-
-                            anchors {
-                                fill: parent
-                                topMargin: 1
-                                leftMargin: 1
-                                rightMargin:0
-                                bottomMargin: 2
-                            }
-
-                            opacity : 0.8
-                            radius: 10
-                        }
-                    }
-                    scrollBarBackground: Item {
-                        implicitWidth: 8
-                        implicitHeight: 26
-                    }
+                style: MasticScrollViewStyle {
                 }
 
+                // Prevent drag overshoot on Windows
+                flickableItem.boundsBehavior: Flickable.OvershootBounds
+
+                // Content of our scrollview
                 ListView {
                     model: if (controller) {
                                controller.filteredValues
@@ -722,7 +684,7 @@ I2PopupBase {
                                0
                            }
 
-                    delegate:   Item {
+                    delegate: Item {
                         anchors {
                             left : parent.left
                             right : parent.right
@@ -899,8 +861,6 @@ I2PopupBase {
         }
 
 
-
-
         Button {
             id: okButton
 
@@ -941,7 +901,6 @@ I2PopupBase {
                 rootItem.close();
             }
         }
-
     }
 }
 

@@ -24,7 +24,7 @@
 AgentInMappingVM::AgentInMappingVM(QList<AgentM*> models,
                                    QPointF position,
                                    QObject *parent) : QObject(parent),
-    _agentName(""),
+    _name(""),
     _position(position),
     _isON(false),
     _isReduced(false),
@@ -42,7 +42,7 @@ AgentInMappingVM::AgentInMappingVM(QList<AgentM*> models,
         if (firstModel != NULL)
         {
             // Set the name of our agent in mapping
-            _agentName = firstModel->name();
+            _name = firstModel->name();
 
             // Connect to signal "Count Changed" from the list of models
             connect(&_models, &AbstractI2CustomItemListModel::countChanged, this, &AgentInMappingVM::_onModelsChanged);
@@ -62,18 +62,18 @@ AgentInMappingVM::AgentInMappingVM(QList<AgentM*> models,
 /**
  * @brief Ghost Constructor: model (and definition) is not defined.
  * The agent is an empty shell only defined by a name.
- * @param agentName
+ * @param name
  * @param parent
  */
-AgentInMappingVM::AgentInMappingVM(QString agentName,
+AgentInMappingVM::AgentInMappingVM(QString name,
                                    QObject *parent) : AgentInMappingVM(QList<AgentM*>(),
                                                                        QPointF(),
                                                                        parent)
 {
-    setagentName(agentName);
+    setname(name);
     setisGhost(true);
 
-    qInfo() << "New Ghost of Agent in Mapping" << _agentName;
+    qInfo() << "New Ghost of Agent in Mapping" << _name;
 }
 
 
@@ -82,7 +82,7 @@ AgentInMappingVM::AgentInMappingVM(QString agentName,
  */
 AgentInMappingVM::~AgentInMappingVM()
 {
-    qInfo() << "Delete View Model of Agent in Mapping" << _agentName;
+    qInfo() << "Delete View Model of Agent in Mapping" << _name;
 
     disconnect(&_models, &AbstractI2CustomItemListModel::countChanged, this, &AgentInMappingVM::_onModelsChanged);
     //disconnect(&_inputsList, &AbstractI2CustomItemListModel::countChanged, this, &AgentInMappingVM::_onInputsListChanged);
@@ -103,6 +103,16 @@ AgentInMappingVM::~AgentInMappingVM()
 
     // Clear the list of definition
     _models.clear();
+}
+
+
+/**
+ * @brief Get the list of peer ids of our models
+ * @return
+ */
+QStringList AgentInMappingVM::getPeerIdsList()
+{
+    return _peerIdsList;
 }
 
 
@@ -598,28 +608,29 @@ OutputVM* AgentInMappingVM::_outputModelRemoved(OutputM* output)
  */
 void AgentInMappingVM::_updateWithAllModels()
 {
+    _peerIdsList.clear();
     bool areIdenticalsAllDefinitions = true;
 
-    if (_models.count() > 1)
+    if (_models.count() > 0)
     {
         QList<AgentM*> modelsList = _models.toList();
-
-        AgentM* firstModel = modelsList.at(0);
         DefinitionM* firstDefinition = NULL;
 
-        if ((firstModel != NULL) && (firstModel->definition() != NULL))
+        for (int i = 0; i < modelsList.count(); i++)
         {
-            firstDefinition = firstModel->definition();
+            AgentM* model = modelsList.at(i);
+            if (model != NULL)
+            {
+                if (!model->peerId().isEmpty()) {
+                    _peerIdsList.append(model->peerId());
+                }
 
-            for (int i = 1; i < modelsList.count(); i++) {
-                AgentM* model = modelsList.at(i);
-
-                if ((model != NULL) && (model->definition() != NULL))
-                {
-                    if (!DefinitionM::areIdenticals(firstDefinition, model->definition())) {
-                        areIdenticalsAllDefinitions = false;
-                        break;
-                    }
+                if (i == 0) {
+                    firstDefinition = model->definition();
+                }
+                else if ((firstDefinition != NULL) && (model->definition() != NULL)
+                         && !DefinitionM::areIdenticals(firstDefinition, model->definition())) {
+                    areIdenticalsAllDefinitions = false;
                 }
             }
         }
