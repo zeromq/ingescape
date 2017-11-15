@@ -99,6 +99,17 @@ Q_SIGNALS:
     void agentInMappingRemoved(QString agentName);
 
 
+    /**
+     * @brief Emitted when a command must be sent on the network to an agent about mapping one of its input
+     * @param peerIdsList
+     * @param command
+     * @param inputName
+     * @param outputAgentName
+     * @param outputName
+     */
+    void commandAskedToAgentAboutMappingInput(QStringList peerIdsList, QString command, QString inputName, QString outputAgentName, QString outputName);
+
+
 public Q_SLOTS:
 
     /**

@@ -129,7 +129,7 @@ public:
 Q_SIGNALS:
 
     /**
-     * @brief Signal emitted when a command from an output must be sent on the network
+     * @brief Signal emitted when a command must be sent on the network to an agent about one of its output
      * @param command
      * @param outputName
      */

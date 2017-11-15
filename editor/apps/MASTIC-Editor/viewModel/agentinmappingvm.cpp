@@ -107,6 +107,16 @@ AgentInMappingVM::~AgentInMappingVM()
 
 
 /**
+ * @brief Get the list of peer ids of our models
+ * @return
+ */
+QStringList AgentInMappingVM::getPeerIdsList()
+{
+    return _peerIdsList;
+}
+
+
+/**
  * @brief Return the list of view models of input from the input name
  * @param inputName
  */
@@ -598,28 +608,29 @@ OutputVM* AgentInMappingVM::_outputModelRemoved(OutputM* output)
  */
 void AgentInMappingVM::_updateWithAllModels()
 {
+    _peerIdsList.clear();
     bool areIdenticalsAllDefinitions = true;
 
-    if (_models.count() > 1)
+    if (_models.count() > 0)
     {
         QList<AgentM*> modelsList = _models.toList();
-
-        AgentM* firstModel = modelsList.at(0);
         DefinitionM* firstDefinition = NULL;
 
-        if ((firstModel != NULL) && (firstModel->definition() != NULL))
+        for (int i = 0; i < modelsList.count(); i++)
         {
-            firstDefinition = firstModel->definition();
+            AgentM* model = modelsList.at(i);
+            if (model != NULL)
+            {
+                if (!model->peerId().isEmpty()) {
+                    _peerIdsList.append(model->peerId());
+                }
 
-            for (int i = 1; i < modelsList.count(); i++) {
-                AgentM* model = modelsList.at(i);
-
-                if ((model != NULL) && (model->definition() != NULL))
-                {
-                    if (!DefinitionM::areIdenticals(firstDefinition, model->definition())) {
-                        areIdenticalsAllDefinitions = false;
-                        break;
-                    }
+                if (i == 0) {
+                    firstDefinition = model->definition();
+                }
+                else if ((firstDefinition != NULL) && (model->definition() != NULL)
+                         && !DefinitionM::areIdenticals(firstDefinition, model->definition())) {
+                    areIdenticalsAllDefinitions = false;
                 }
             }
         }

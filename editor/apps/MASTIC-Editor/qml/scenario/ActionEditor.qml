@@ -25,7 +25,7 @@ I2PopupBase {
     id: rootItem
 
     width: 475
-    height: 882
+    height: MasticTheme.appMinHeight
 
     automaticallyOpenWhenCompleted: true
     isModal: false
@@ -81,10 +81,10 @@ I2PopupBase {
             anchors.fill: parent
             drag.target: rootItem
 
-            /*drag.minimumX : - faisceauEditor.width/2
-            drag.maximumX : PGIMTheme.applicationWidth - faisceauEditor.width/2
+            drag.minimumX : 0
+            drag.maximumX : rootItem.parent.width - rootItem.width
             drag.minimumY : 0
-            drag.maximumY : PGIMTheme.applicationHeight -  (dragButton.height + 30)*/
+            drag.maximumY :  rootItem.parent.height - rootItem.height
 
             onPressed: {
                 // Emit signal "bring to front"
@@ -252,7 +252,6 @@ I2PopupBase {
                     color : MasticTheme.whiteColor
                 }
 
-
                 /// Validity duration
                 Item {
                     id : validityDuration
@@ -403,37 +402,6 @@ I2PopupBase {
                     }
                 }
 
-
-
-                // add conditions
-                Button {
-                    id: addCondition
-
-                    activeFocusOnPress: true
-
-                    anchors {
-                        top : validityDuration.bottom
-                        topMargin: 18
-                        left: parent.left
-                    }
-
-                    style: Theme.LabellessSvgButtonStyle {
-                        fileCache: MasticTheme.svgFileMASTIC
-
-                        pressedID: releasedID + "-pressed"
-                        releasedID: "createButton"
-                        disabledID : releasedID
-                    }
-
-                    onClicked: {
-                        if (panelController)
-                        {
-                            panelController.createNewCondition();
-                        }
-                    }
-                }
-
-
                 //
                 // Conditions List
                 //
@@ -441,7 +409,7 @@ I2PopupBase {
                     id : scrollViewCondition
 
                     anchors {
-                        top : addCondition.bottom
+                        top : validityDuration.bottom
                         topMargin: 8
                         right : parent.right
                         left : parent.left
@@ -805,6 +773,33 @@ I2PopupBase {
                                 }
                             }
                         }
+
+                        // add conditions
+                        Button {
+                            id: addCondition
+
+                            activeFocusOnPress: true
+
+                            anchors {
+                                left: parent.left
+                            }
+
+                            style: Theme.LabellessSvgButtonStyle {
+                                fileCache: MasticTheme.svgFileMASTIC
+
+                                pressedID: releasedID + "-pressed"
+                                releasedID: "createButton"
+                                disabledID : releasedID
+                            }
+
+                            onClicked: {
+                                if (panelController)
+                                {
+                                    panelController.createNewCondition();
+                                }
+                            }
+                        }
+
                     }
                 }
 
@@ -820,7 +815,7 @@ I2PopupBase {
                     left : parent.left
                     right : parent.right
                     top : conditionsItem.top
-                    topMargin: 320
+                    topMargin: 240
                 }
                 height : childrenRect.height
 
@@ -1285,44 +1280,12 @@ I2PopupBase {
                     color : MasticTheme.whiteColor
                 }
 
-
-
-                // add effect
-                Button {
-                    id: addEffects
-
-                    activeFocusOnPress: true
-
-                    anchors {
-                        top: separatorEffect.bottom
-                        topMargin: 15
-                        left: parent.left
-                    }
-
-                    style: Theme.LabellessSvgButtonStyle {
-                        fileCache: MasticTheme.svgFileMASTIC
-
-                        pressedID: releasedID + "-pressed"
-                        releasedID: "createButton"
-                        disabledID : releasedID
-                    }
-
-                    onClicked: {
-                        if (panelController)
-                        {
-                            panelController.createNewEffect();
-                        }
-                    }
-                }
-
-
-
                 /// Effects List
                 ScrollView {
                     id : scrollView
 
                     anchors {
-                        top : addEffects.bottom
+                        top : separatorEffect.bottom
                         topMargin: 6
                         right : parent.right
                         left : parent.left
@@ -1445,7 +1408,6 @@ I2PopupBase {
                                         }
                                     }
                                 }
-
 
                                 //
                                 // Effect Details for Agent and Value
@@ -1660,8 +1622,6 @@ I2PopupBase {
                                     }
 
                                 }
-
-
 
                                 //
                                 // Effect Details for Mapping
@@ -1970,14 +1930,37 @@ I2PopupBase {
 
 
                             }
-
                         }
+
+                        // add effect
+                        Button {
+                            id: addEffects
+
+                            activeFocusOnPress: true
+
+                            anchors {
+                                left: parent.left
+                            }
+
+                            style: Theme.LabellessSvgButtonStyle {
+                                fileCache: MasticTheme.svgFileMASTIC
+
+                                pressedID: releasedID + "-pressed"
+                                releasedID: "createButton"
+                                disabledID : releasedID
+                            }
+
+                            onClicked: {
+                                if (panelController)
+                                {
+                                    panelController.createNewEffect();
+                                }
+                            }
+                        }
+
+
                     }
-
                 }
-
-
-
             }
 
 

@@ -103,10 +103,10 @@ I2PopupBase {
             anchors.fill: parent
             drag.target: rootItem
 
-            /*drag.minimumX : - faisceauEditor.width/2
-            drag.maximumX : PGIMTheme.applicationWidth - faisceauEditor.width/2
+            drag.minimumX : 0
+            drag.maximumX : rootItem.parent.width - rootItem.width
             drag.minimumY : 0
-            drag.maximumY : PGIMTheme.applicationHeight -  (dragButton.height + 30)*/
+            drag.maximumY :  rootItem.parent.height - rootItem.height
 
             onPressed: {
                 // Emit signal "bring to front"
@@ -585,6 +585,7 @@ I2PopupBase {
             }
         }
 
+
         // History List
         Item {
             id : tableHistory
@@ -860,8 +861,6 @@ I2PopupBase {
         }
 
 
-
-
         Button {
             id: okButton
 
@@ -902,7 +901,6 @@ I2PopupBase {
                 rootItem.close();
             }
         }
-
     }
 }
 

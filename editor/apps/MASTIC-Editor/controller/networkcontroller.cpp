@@ -602,11 +602,11 @@ void NetworkController::onCommandAskedToLauncher(QString command, QString hostna
 
 
 /**
- * @brief Slot when a command must be sent on the network
- * @param command
+ * @brief Slot when a command must be sent on the network to an agent
  * @param peerIdsList
+ * @param command
  */
-void NetworkController::onCommandAsked(QString command, QStringList peerIdsList)
+void NetworkController::onCommandAskedToAgent(QStringList peerIdsList, QString command)
 {
     if (!command.isEmpty() && (peerIdsList.count() > 0)) {
         foreach (QString peerId, peerIdsList)
@@ -614,28 +614,48 @@ void NetworkController::onCommandAsked(QString command, QStringList peerIdsList)
             // Send the command to a peer id of agent
             int success = zyre_whispers(agentElements->node, peerId.toStdString().c_str(), "%s", command.toStdString().c_str());
 
-            qDebug() << "Send command" << command << "for agent" << peerId << "with success ?" << success;
+            qInfo() << "Send command" << command << "for agent" << peerId << "with success ?" << success;
         }
     }
 }
 
 
 /**
- * @brief Slot when a command for an output must be sent on the network
+ * @brief Slot when a command must be sent on the network to an agent about one of its output
+ * @param peerIdsList
  * @param command
  * @param outputName
- * @param peerIdsList
  */
-void NetworkController::onCommandAskedForOutput(QString command, QString outputName, QStringList peerIdsList)
+void NetworkController::onCommandAskedToAgentAboutOutput(QStringList peerIdsList, QString command, QString outputName)
 {
     if (!command.isEmpty() && !outputName.isEmpty() && (peerIdsList.count() > 0)) {
         foreach (QString peerId, peerIdsList)
         {
-            // Send the command with the output name to a peer id of agent
+            // Send the command to a peer id of agent
             int success = zyre_whispers(agentElements->node, peerId.toStdString().c_str(), "%s %s", command.toStdString().c_str(), outputName.toStdString().c_str());
 
-            qDebug() << "Send command" << command << "for agent" << peerId << "and output" << outputName << "with success ?" << success;
+            qInfo() << "Send command" << command << "for agent" << peerId << "and output" << outputName << "with success ?" << success;
         }
+    }
+}
+
+
+/**
+ * @brief Slot when a command must be sent on the network to an agent about mapping one of its input
+ * @param peerIdsList
+ * @param command
+ * @param inputName
+ * @param outputAgentName
+ * @param outputName
+ */
+void NetworkController::onCommandAskedToAgentAboutMappingInput(QStringList peerIdsList, QString command, QString inputName, QString outputAgentName, QString outputName)
+{
+    foreach (QString peerId, peerIdsList)
+    {
+        // Send the command to a peer id of agent
+        int success = zyre_whispers(agentElements->node, peerId.toStdString().c_str(), "%s %s %s %s", command.toStdString().c_str(), inputName.toStdString().c_str(), outputAgentName.toStdString().c_str(), outputName.toStdString().c_str());
+
+        qInfo() << "Send command" << command << "for agent" << peerId << "and input" << inputName << "about mapping on agent" << outputAgentName << "and output" << outputName << "with success ?" << success;
     }
 }
 

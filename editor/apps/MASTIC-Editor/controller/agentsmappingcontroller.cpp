@@ -190,6 +190,9 @@ void AgentsMappingController::addMapBetweenAgents(AgentInMappingVM* outputAgent,
 
             // Add to the list
             _allMapInMapping.append(mapBetweenIOP);
+
+            // Emit signal "Command asked to agent about Mapping Input"
+            Q_EMIT commandAskedToAgentAboutMappingInput(inputAgent->getPeerIdsList(), "MAP", input->name(), outputAgent->name(), output->name());
         }
         else {
             if ((output->firstModel() != NULL) && (input->firstModel() != NULL)) {
