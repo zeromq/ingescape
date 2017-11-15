@@ -216,6 +216,34 @@ private Q_SLOTS:
     //void _onOutputsListRemoved(QList<OutputVM*> outputsListWillBeRemoved);
 
 
+    /**
+     * @brief Slot when the list of models of an input view model is filled (0 model -> 1 model)
+     * @param inputName
+     */
+    void _onInputModelsFilled(QString inputName);
+
+
+    /**
+     * @brief Slot when the list of models of an output view model is filled (0 model -> 1 model)
+     * @param outputName
+     */
+    void _onOutputModelsFilled(QString outputName);
+
+
+    /**
+     * @brief Slot when the list of models of an input view model is cleared (1 model -> 0 model)
+     * @param inputName
+     */
+    void _onInputModelsCleared(QString inputName);
+
+
+    /**
+     * @brief Slot when the list of models of an output view model is cleared (1 model -> 0 model)
+     * @param outputName
+     */
+    void _onOutputModelsCleared(QString outputName);
+
+
 private:
     /**
      * @brief Add new model(s) of agent to the current mapping at a specific position
