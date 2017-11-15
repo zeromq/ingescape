@@ -24,7 +24,7 @@ import MASTIC 1.0
 import "../theme" as Theme;
 
 
-Item {
+Rectangle {
     id: rootItem
 
 
@@ -47,11 +47,21 @@ Item {
 
 
 
+    // To check if our item is selected or not
+    property bool _isSelected: (controller && rootItem.agentMappingVM && (controller.selectedAgent === rootItem.agentMappingVM))
+
+
+    // Duration of expand/collapse animation in milliseconds (250 ms => default duration of QML animations)
+    property int _expandCollapseAnimationDuration: 250
+
+
+
+
     width : 258
 
-    height : (rootItem.agentMappingVM && !rootItem.isReduced)?
-                 (54 + 20*Math.max(rootItem.agentMappingVM.inputsList.count , rootItem.agentMappingVM.outputsList.count))
-               : 42
+    height : (rootItem.agentMappingVM && !rootItem.isReduced)
+              ? (54 + 20 * Math.max(rootItem.agentMappingVM.inputsList.count , rootItem.agentMappingVM.outputsList.count))
+              : 42
 
 
     // Init position of our agent
@@ -59,16 +69,20 @@ Item {
     y: (agentMappingVM && agentMappingVM.position) ? agentMappingVM.position.y : 0
 
 
-   // clip : true
+    radius: 6
+
+    color:  (dropEnabled === true) ?
+                 (mouseArea.pressed ?
+                     MasticTheme.darkGreyColor2
+                    : (rootItem.agentMappingVM && rootItem.agentMappingVM.isON) ? MasticTheme.darkBlueGreyColor : MasticTheme.veryDarkGreyColor)
+               : MasticTheme.darkGreyColor2;
 
 
+    border {
+        color: MasticTheme.selectedAgentColor
+        width: rootItem._isSelected ? 2 : 0
+    }
 
-    // To check if our item is selected or not
-    property bool _isSelected: (controller && rootItem.agentMappingVM && (controller.selectedAgent === rootItem.agentMappingVM))
-
-
-    // Duration of expand/collapse animation in milliseconds (250 ms => default duration of QML animations)
-    property int _expandCollapseAnimationDuration: 250
 
 
 
@@ -96,6 +110,13 @@ Item {
         NumberAnimation {
             duration: rootItem._expandCollapseAnimationDuration
         }
+    }
+
+
+
+    // Animate our border when our item is selected / unselected
+    Behavior on border.width {
+        NumberAnimation {}
     }
 
 
@@ -149,35 +170,655 @@ Item {
                 agentMappingVM.isReduced = !agentMappingVM.isReduced;
             }
         }
-    }
 
 
 
-    Rectangle {
-        id: background
+        //------------------------------------------
+        //
+        // Input and output slots
+        //
+        //------------------------------------------
 
-        anchors {
-            fill: parent
+
+        Item {
+            id: inputOutputSlotSection
+
+            anchors {
+                left: parent.left
+                right: parent.right
+                bottom: parent.bottom
+
+                top: separator.bottom
+
+                // When our agent is reduced, all slots must be centered on Y = AgentNodeView.height/2 = 21
+                topMargin: (!rootItem.isReduced) ? 5 : -31
+            }
+
+            visible: (opacity !== 0)
+            opacity: (!rootItem.isReduced) ? 1 : 0
+
+            Behavior on opacity {
+                NumberAnimation {
+                    duration: rootItem._expandCollapseAnimationDuration
+                }
+            }
+
+            Behavior on anchors.topMargin {
+                NumberAnimation {
+                    duration: rootItem._expandCollapseAnimationDuration
+                }
+            }
+
+
+            //
+            // Inlets / Input slots
+            //
+            CollapsibleColumn {
+                id: columnInputSlots
+
+                anchors {
+                    fill: parent
+                }
+
+                value: (rootItem.isReduced) ? 0 : 1
+
+                Behavior on value {
+                    NumberAnimation {
+                        duration: rootItem._expandCollapseAnimationDuration
+                    }
+                }
+
+
+                Repeater {
+                    // List of intput slots VM
+                    model: rootItem.agentMappingVM ? rootItem.agentMappingVM.inputsList : 0
+
+                    delegate: Item {
+                        id: inputSlotItem
+
+                        property var myModel: model.QtObject
+
+                        height: 20
+                        anchors {
+                            left: parent.left
+                            right: parent.right
+                        }
+
+                        Text {
+                            id: agentInput
+
+                            anchors {
+                                left: parent.left
+                                leftMargin: 20
+                                right: parent.horizontalCenter
+                                rightMargin: 5
+                                verticalCenter: parent.verticalCenter
+                            }
+
+                            elide: Text.ElideRight
+                            text: myModel ? myModel.name : ""
+
+                            color: (rootItem.agentMappingVM && rootItem.agentMappingVM.isON) ? MasticTheme.agentsONInputsOutputsMappingColor : MasticTheme.agentsOFFInputsOutputsMappingColor
+                            font: MasticTheme.heading2Font
+                        }
+
+                        Rectangle {
+                            id: draggablePointFROM
+
+                            height: linkPoint.height
+                            width: height
+                            radius: height/2
+
+                            property bool dragActive: mouseAreaPointFROM.drag.active;
+                            property var agentInMappingVMOfInput: rootItem.agentMappingVM;
+                            property var inputSlotModel: model.QtObject
+
+                            Drag.active: mouseAreaPointFROM.drag.active;
+                            Drag.hotSpot.x: width/2
+                            Drag.hotSpot.y: height/2
+                            Drag.keys: ["InputSlotItem"]
+
+                            border {
+                                width: 1
+                                color: draggablePointFROM.dragActive ? linkPoint.color : "transparent"
+                            }
+
+                            color: draggablePointFROM.dragActive ? MasticTheme.agentsMappingBackgroundColor : "transparent"
+
+                            parent: draggablePointFROM.dragActive ? rootItem.parent  : linkPoint
+
+                            MouseArea {
+                                id: mouseAreaPointFROM
+
+                                anchors.fill: parent
+
+                                drag.target: parent
+                                // Disable smoothed so that the Item pixel from where we started
+                                // the drag remains under the mouse cursor
+                                drag.smoothed: false
+
+                                hoverEnabled: true
+
+                                cursorShape: (draggablePointFROM.dragActive) ? Qt.ClosedHandCursor : Qt.PointingHandCursor //Qt.OpenHandCursor
+
+                                onPressed: {
+                                    draggablePointFROM.z = rootItem.parent.maxZ++;
+                                    linkDraggablePoint.z = rootItem.parent.maxZ++;
+                                }
+
+                                onReleased: {
+                                    // Drop our item
+                                    draggablePointFROM.Drag.drop();
+
+                                    // replace the draggablePointTO
+                                    draggablePointFROM.x = 0
+                                    draggablePointFROM.y = 0
+                                }
+                            }
+
+                            Link {
+                                id: linkDraggablePoint
+
+                                parent: rootItem.parent
+
+                                strokeDashArray: "5, 5"
+                                visible: draggablePointFROM.dragActive
+
+                                secondPoint: Qt.point(myModel.position.x, myModel.position.y)
+                                firstPoint: Qt.point(draggablePointFROM.x + draggablePointFROM.width/2, draggablePointFROM.y + draggablePointFROM.height/2)
+
+                                defaultColor:linkPoint.color
+                            }
+                        }
+
+
+                        Rectangle {
+                            id : linkPoint
+
+                            anchors {
+                                horizontalCenter: parent.left
+                                verticalCenter: parent.verticalCenter
+                            }
+
+                            height: 13
+                            width: height
+                            radius: height/2
+
+                            border {
+                                width : 0
+                                color : MasticTheme.lightGreyColor
+                            }
+
+                            color : if (agentMappingVM && myModel && myModel.firstModel) {
+
+                                        switch (myModel.firstModel.agentIOPValueTypeGroup)
+                                        {
+                                        case AgentIOPValueTypeGroups.NUMBER:
+                                            agentMappingVM.isON? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
+                                            break;
+                                        case AgentIOPValueTypeGroups.STRING:
+                                            agentMappingVM.isON? MasticTheme.redColor2 : MasticTheme.darkRedColor2
+                                            break;
+                                        case AgentIOPValueTypeGroups.IMPULSION:
+                                            agentMappingVM.isON? MasticTheme.purpleColor : MasticTheme.darkPurpleColor
+                                            break;
+                                        case AgentIOPValueTypeGroups.DATA:
+                                            agentMappingVM.isON? MasticTheme.greenColor : MasticTheme.darkGreenColor
+                                            break;
+                                        case AgentIOPValueTypeGroups.MIXED:
+                                            agentMappingVM.isON? MasticTheme.whiteColor : MasticTheme.darkGreyColor
+                                            break;
+                                        case AgentIOPValueTypeGroups.UNKNOWN:
+                                            "#000000"
+                                            break;
+                                        default:
+                                            "#000000"
+                                            break;
+                                        }
+
+                                    } else {
+                                        MasticTheme.whiteColor
+                                    }
+                        }
+
+
+                        DropArea {
+                            id: inputDropArea
+
+                            anchors {
+                                fill: linkPoint
+                                margins: -3
+                            }
+
+                            // Only accept drag events from output slot items
+                            keys: ["OutputSlotItem"]
+
+                            onEntered: {
+                                if (drag.source !== null)
+                                {
+                                    var dragItem = drag.source;
+
+                                    if (typeof dragItem.dragActive !== 'undefined' && dragItem.outputSlotModel.canLinkWith(inputSlotItem.myModel))
+                                    {
+                                        dragItem.color = dragItem.border.color;
+                                        linkPoint.border.width = 2
+                                    }
+                                    else
+                                    {
+                                        console.log("inputDropArea: no dragActive "+dragItem.agent)
+                                    }
+                                }
+                                else
+                                {
+                                    console.log("inputDropArea: no source "+ drag.source)
+                                }
+                            }
+
+
+                            onPositionChanged: {
+                            }
+
+
+                            onExited: {
+                                var dragItem = drag.source;
+                                if (typeof dragItem.dragActive !== 'undefined')
+                                {
+                                    dragItem.color = "transparent";
+                                    linkPoint.border.width = 0
+                                }
+                            }
+
+
+                            onDropped: {
+                                var dragItem = drag.source;
+                                if (dragItem)
+                                {
+                                    if (typeof dragItem.outputSlotModel !== 'undefined' && dragItem.agentInMappingVMOfOutput && rootItem.agentMappingVM)
+                                    {
+                                        dragItem.color = "transparent";
+                                        linkPoint.border.width = 0
+
+                                        console.log("inputDropArea: create a link from " + dragItem.outputSlotModel + " to " + inputSlotItem.myModel);
+                                        controller.addMapBetweenAgents(dragItem.agentInMappingVMOfOutput, dragItem.outputSlotModel, rootItem.agentMappingVM, inputSlotItem.myModel);
+                                    }
+                                }
+                            }
+
+                        }
+
+
+
+                        //
+                        // Bindings to save the anchor point of our input slot
+                        // i.e. the point used to draw a link
+                        //
+                        Binding {
+                            target: myModel
+
+                            property: "position"
+
+                            value: Qt.point(rootItem.x + inputOutputSlotSection.x + columnInputSlots.x + inputSlotItem.x + linkPoint.x + linkPoint.width/2,
+                                            rootItem.y + inputOutputSlotSection.y + columnInputSlots.y + inputSlotItem.y + linkPoint.y + linkPoint.height/2)
+                        }
+                    }
+                }
+            }
+
+
+
+            //
+            //
+            // Outlets / Output slots
+            //
+            CollapsibleColumn {
+                id: columnOutputSlots
+
+                anchors {
+                    fill: parent
+                }
+
+
+                visible: (value !== 0)
+                opacity: value
+
+                value: (rootItem.isReduced) ? 0 : 1
+
+                Behavior on value {
+                    NumberAnimation {
+                        duration: rootItem._expandCollapseAnimationDuration
+                    }
+                }
+
+
+                Repeater {
+                    // List of output slots VM
+                    model: (rootItem.agentMappingVM)? rootItem.agentMappingVM.outputsList : 0
+
+                    delegate: Item {
+                        id: outputSlotItem
+
+                        property var myModel: model.QtObject
+
+                        height: 20
+                        anchors {
+                            left: parent.left
+                            right: parent.right
+                        }
+
+                        Text {
+                            id : agentOutput
+
+                            anchors {
+                                left: parent.horizontalCenter
+                                leftMargin: 5
+                                right: parent.right
+                                rightMargin: 20
+                                verticalCenter: parent.verticalCenter
+                            }
+
+                            horizontalAlignment : Text.AlignRight
+
+                            elide: Text.ElideRight
+                            text: myModel ? myModel.name : ""
+
+                            color: (rootItem.agentMappingVM && rootItem.agentMappingVM.isON)? MasticTheme.agentsONInputsOutputsMappingColor : MasticTheme.agentsOFFInputsOutputsMappingColor
+                            font: MasticTheme.heading2Font
+                        }
+
+
+
+                        Rectangle {
+                            id : draggablePointTO
+
+                            height: linkPointOut.height
+                            width: height
+                            radius: height/2
+
+                            border {
+                                width : 1
+                                color : draggablePointTO.dragActive ? linkPointOut.color : "transparent"
+                            }
+
+                            property bool dragActive : mouseAreaPointTO.drag.active;
+                            property var agentInMappingVMOfOutput : rootItem.agentMappingVM
+                            property var outputSlotModel: model.QtObject
+
+                            Drag.active: draggablePointTO.dragActive;
+                            Drag.hotSpot.x: 0
+                            Drag.hotSpot.y: 0
+                            Drag.keys: ["OutputSlotItem"]
+
+                            color: draggablePointTO.dragActive ? MasticTheme.agentsMappingBackgroundColor : "transparent"
+                            parent: draggablePointTO.dragActive ? rootItem.parent  : linkPointOut
+
+                            MouseArea {
+                                id: mouseAreaPointTO
+
+                                anchors.fill: parent
+
+                                drag.target: parent
+                                // Disable smoothed so that the Item pixel from where we started
+                                // the drag remains under the mouse cursor
+                                drag.smoothed: false
+
+                                hoverEnabled: true
+
+                                cursorShape: (draggablePointTO.dragActive) ? Qt.ClosedHandCursor : Qt.PointingHandCursor //Qt.OpenHandCursor
+
+                                onPressed: {
+                                    draggablePointTO.z = rootItem.parent.maxZ++;
+                                    linkDraggablePointTO.z = rootItem.parent.maxZ++;
+                                }
+
+                                onReleased: {
+                                    // Drop our item
+                                    draggablePointTO.Drag.drop();
+
+                                    // replace the draggablePointTO
+                                    draggablePointTO.x = 0
+                                    draggablePointTO.y = 0
+                                }
+                            }
+
+
+
+                            Link {
+                                id: linkDraggablePointTO
+
+                                parent: rootItem.parent
+                                strokeDashArray: "5, 5"
+                                visible: draggablePointTO.dragActive
+
+                                firstPoint: Qt.point(myModel.position.x, myModel.position.y)
+                                secondPoint: Qt.point(draggablePointTO.x + draggablePointTO.width/2, draggablePointTO.y + draggablePointTO.height/2)
+
+                                defaultColor:linkPointOut.color
+                            }
+                        }
+
+
+
+                        Rectangle {
+                            id: linkPointOut
+
+                            anchors {
+                                horizontalCenter: parent.right
+                                verticalCenter: parent.verticalCenter
+                            }
+
+                            height: 13
+                            width: height
+                            radius: height/2
+
+                            border {
+                                width : 0
+                                color : MasticTheme.lightGreyColor
+                            }
+
+                            color: if (agentMappingVM && myModel && myModel.firstModel) {
+
+                                        switch (myModel.firstModel.agentIOPValueTypeGroup)
+                                        {
+                                        case AgentIOPValueTypeGroups.NUMBER:
+                                            (agentMappingVM.isON && !myModel.firstModel.isMuted) ? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
+                                            break;
+                                        case AgentIOPValueTypeGroups.STRING:
+                                            (agentMappingVM.isON && !myModel.firstModel.isMuted)? MasticTheme.redColor2 : MasticTheme.darkRedColor2
+                                            break;
+                                        case AgentIOPValueTypeGroups.IMPULSION:
+                                            (agentMappingVM.isON && !myModel.firstModel.isMuted)? MasticTheme.purpleColor : MasticTheme.darkPurpleColor
+                                            break;
+                                        case AgentIOPValueTypeGroups.DATA:
+                                            (agentMappingVM.isON && !myModel.firstModel.isMuted)? MasticTheme.greenColor : MasticTheme.darkGreenColor
+                                            break;
+                                        case AgentIOPValueTypeGroups.MIXED:
+                                            (agentMappingVM.isON && !myModel.firstModel.isMuted)? MasticTheme.whiteColor : MasticTheme.darkGreyColor
+                                            break;
+                                        case AgentIOPValueTypeGroups.UNKNOWN:
+                                            "#000000"
+                                            break;
+                                        default:
+                                            "#000000"
+                                            break;
+                                        }
+
+                                    } else {
+                                        MasticTheme.whiteColor
+                                    }
+
+
+
+                            I2SvgItem {
+                                anchors.centerIn: parent
+
+                                svgFileCache: MasticTheme.svgFileMASTIC
+                                svgElementId: "outputIsMuted"
+
+                                visible : myModel.firstModel && myModel.firstModel.isMuted
+                            }
+                        }
+
+
+
+                        DropArea {
+                            id: outputDropArea
+
+                            anchors {
+                                fill: linkPointOut
+                                margins: -3
+                            }
+
+                            // Only accept drag events from input slot items
+                            keys: ["InputSlotItem"]
+
+                            onEntered: {
+                                if (drag.source !== null)
+                                {
+                                    var dragItem = drag.source;
+
+                                    if (typeof dragItem.dragActive !== 'undefined'  && outputSlotItem.myModel.canLinkWith(dragItem.inputSlotModel))
+                                    {
+                                        dragItem.color = dragItem.border.color;
+                                        linkPointOut.border.width = 2
+
+                                    }
+                                    else
+                                    {
+                                        console.log("outputDropArea: no dragActive "+dragItem.agent)
+                                    }
+                                }
+                                else
+                                {
+                                    console.log("outputDropArea: no source "+ drag.source)
+                                }
+                            }
+
+
+                            onExited: {
+                                var dragItem = drag.source;
+                                if (typeof dragItem.dragActive !== 'undefined')
+                                {
+                                    dragItem.color = "transparent";
+                                    linkPointOut.border.width = 0
+                                }
+                            }
+
+                            onDropped: {
+                                var dragItem = drag.source;
+                                if (dragItem)
+                                {
+                                    if (typeof dragItem.inputSlotModel !== 'undefined' && controller && rootItem.agentMappingVM && outputSlotItem.myModel)
+                                    {
+                                        dragItem.color = "transparent";
+                                        linkPointOut.border.width = 0
+
+                                        console.log("outputDropArea: create a link from " + outputSlotItem.myModel + " to " + dragItem.inputSlotModel);
+                                        controller.addMapBetweenAgents(rootItem.agentMappingVM, outputSlotItem.myModel, dragItem.agentInMappingVMOfInput, dragItem.inputSlotModel);
+                                    }
+                                }
+                            }
+                        }
+
+
+
+
+
+                        //
+                        // Bindings to save the anchor point of our input slot
+                        // i.e. the point used to draw a link
+                        //
+                        Binding {
+                            target: myModel
+
+                            property: "position"
+
+                            value: Qt.point(rootItem.x + inputOutputSlotSection.x + columnOutputSlots.x + outputSlotItem.x + linkPointOut.x + linkPointOut.width/2,
+                                            rootItem.y + inputOutputSlotSection.y + columnOutputSlots.y + outputSlotItem.y + linkPointOut.y + linkPointOut.height/2)
+                        }
+                    }
+                }
+            }
         }
 
-        radius: 6
-
-        color:  (dropEnabled === true) ?
-                     (mouseArea.pressed ?
-                         MasticTheme.darkGreyColor2
-                        : (rootItem.agentMappingVM && rootItem.agentMappingVM.isON) ? MasticTheme.darkBlueGreyColor : MasticTheme.veryDarkGreyColor)
-                   : MasticTheme.darkGreyColor2;
 
 
-        border {
-            color: MasticTheme.selectedAgentColor
-            width: rootItem._isSelected ? 2 : 0
+        //------------------------------------------
+        //
+        // Header
+        //
+        //------------------------------------------
+
+
+        // Expand/collapse mask
+        Rectangle {
+            id: expandCollapseMask
+
+            anchors {
+                left: parent.left
+                leftMargin: 18
+                right: parent.right
+                rightMargin: 18
+
+                bottom: separator.bottom
+                top: parent.top
+                topMargin: 2
+            }
+
+            color: rootItem.color
+
+            visible: ((columnInputSlots.value !== 0) && (columnInputSlots.value !== 1))
         }
 
 
-        // Animate our border
-        Behavior on border.width {
-            NumberAnimation {}
+        // Separator
+        Rectangle {
+            id: separator
+
+            anchors {
+                left: parent.left
+                leftMargin: 18
+                right: parent.right
+                rightMargin: 18
+                top: parent.top
+                topMargin: 41
+            }
+
+            height: 2
+            color: agentName.color
+
+            opacity: (!rootItem.isReduced) ? 1 : 0
+            visible: (opacity !== 0)
+
+            Behavior on opacity {
+                NumberAnimation {
+                    duration: rootItem._expandCollapseAnimationDuration
+                }
+            }
+        }
+
+
+        // Agent Name
+        Text {
+            id: agentName
+
+            anchors {
+                left: parent.left
+                leftMargin: 20
+                right: parent.right
+                rightMargin: 20
+                verticalCenter: parent.top
+                verticalCenterOffset: 20
+            }
+
+
+            elide: Text.ElideRight
+            text: rootItem.agentName
+
+            color: (dropEnabled === true) ?
+                        (rootItem.agentMappingVM && rootItem.agentMappingVM.isON) ? MasticTheme.agentsONNameMappingColor : MasticTheme.agentsOFFNameMappingColor
+                    : MasticTheme.lightGreyColor;
+
+            font: MasticTheme.headingFont
         }
 
 
@@ -220,32 +861,13 @@ Item {
         }
 
 
-        // Agent Name
-        Text {
-            id: agentName
-
-            anchors {
-                left: parent.left
-                leftMargin: 20
-                right: parent.right
-                rightMargin: 20
-                verticalCenter: parent.top
-                verticalCenterOffset: 20
-            }
 
 
-            elide: Text.ElideRight
-            text: rootItem.agentName
-
-            color: (dropEnabled === true) ?
-                        (rootItem.agentMappingVM && rootItem.agentMappingVM.isON) ? MasticTheme.agentsONNameMappingColor : MasticTheme.agentsOFFNameMappingColor
-                    : MasticTheme.lightGreyColor;
-
-            font: MasticTheme.headingFont
-        }
-
-
+        //-------------------
+        //
         // Warnings
+        //
+        //-------------------
         Rectangle {
             id: agentWithSameName
 
@@ -282,6 +904,7 @@ Item {
             }
         }
 
+
         Rectangle {
             height: 17
             width: height
@@ -292,7 +915,7 @@ Item {
             anchors {
                 verticalCenter: agentName.verticalCenter
                 verticalCenterOffset:  2
-                left : agentWithSameName.right
+                left: agentWithSameName.right
                 leftMargin: 5
             }
 
@@ -301,11 +924,12 @@ Item {
             Text {
                 anchors {
                     centerIn: parent
-                    verticalCenterOffset:  -1
+                    verticalCenterOffset: -1
                 }
+
                 text: "!"
 
-                color : MasticTheme.whiteColor
+                color: MasticTheme.whiteColor
 
                 font {
                     family: MasticTheme.labelFontFamily
@@ -313,26 +937,6 @@ Item {
                     pixelSize: 14
                 }
             }
-        }
-
-
-        //Separator
-        Rectangle {
-            id: separator
-
-            anchors {
-                left: parent.left
-                leftMargin: 18
-                right: parent.right
-                rightMargin: 18
-                verticalCenter: parent.top
-                verticalCenterOffset: 40
-            }
-
-            height: 2
-            color: agentName.color
-
-            visible: !rootItem.isReduced
         }
 
 
@@ -351,15 +955,17 @@ Item {
         }
 
 
-        //
+
+        //-------------------
         //
         // Global Points
         //
+        //-------------------
         Rectangle {
-            id : inputGlobalPoint
+            id: inputGlobalPoint
 
             anchors {
-                horizontalCenter : parent.left
+                horizontalCenter: parent.left
                 verticalCenter: parent.verticalCenter
             }
 
@@ -396,7 +1002,14 @@ Item {
                         MasticTheme.whiteColor
                     }
 
-            visible : rootItem.isReduced && rootItem.agentMappingVM && rootItem.agentMappingVM.inputsList.count > 0
+            opacity: (rootItem.isReduced && rootItem.agentMappingVM && (rootItem.agentMappingVM.inputsList.count > 0)) ? 1 : 0
+            visible: (opacity !== 0)
+
+            Behavior on opacity {
+                NumberAnimation {
+                    duration: rootItem._expandCollapseAnimationDuration
+                }
+            }
         }
 
         Rectangle {
@@ -440,562 +1053,16 @@ Item {
                         MasticTheme.whiteColor
                     }
 
-            visible : rootItem.isReduced && rootItem.agentMappingVM && rootItem.agentMappingVM.outputsList.count > 0
-        }
+            opacity: (rootItem.isReduced && rootItem.agentMappingVM && (rootItem.agentMappingVM.outputsList.count > 0)) ? 1 : 0
+            visible: (opacity !== 0)
 
-
-        //
-        //
-        // Inlets / Input slots
-        //
-        CollapsibleColumn {
-            id: columnInputSlots
-
-            anchors {
-                left: parent.left
-                right: parent.right
-
-                top: separator.bottom
-                topMargin: 5
-                bottom: parent.bottom
-            }
-
-            visible: (value !== 0)
-            opacity: value
-
-            value: (rootItem.isReduced) ? 0 : 1
-
-            Behavior on value {
+            Behavior on opacity {
                 NumberAnimation {
                     duration: rootItem._expandCollapseAnimationDuration
                 }
             }
-
-
-            Repeater {
-                // List of intput slots VM
-                model: rootItem.agentMappingVM ? rootItem.agentMappingVM.inputsList : 0
-
-                delegate: Item {
-                    id: inputSlotItem
-
-                    property var myModel: model.QtObject
-
-                    height: 20
-                    anchors {
-                        left: parent.left
-                        right: parent.right
-                    }
-
-                    Text {
-                        id: agentInput
-
-                        anchors {
-                            left: parent.left
-                            leftMargin: 20
-                            right: parent.horizontalCenter
-                            rightMargin: 5
-                            verticalCenter: parent.verticalCenter
-                        }
-
-                        elide: Text.ElideRight
-                        text: myModel ? myModel.name : ""
-
-                        color: (rootItem.agentMappingVM && rootItem.agentMappingVM.isON)? MasticTheme.agentsONInputsOutputsMappingColor : MasticTheme.agentsOFFInputsOutputsMappingColor
-                        font: MasticTheme.heading2Font
-                    }
-
-                    Rectangle {
-                        id: draggablePointFROM
-
-                        height: linkPoint.height
-                        width: height
-                        radius: height/2
-
-                        property bool dragActive: mouseAreaPointFROM.drag.active;
-                        property var agentInMappingVMOfInput: rootItem.agentMappingVM;
-                        property var inputSlotModel: model.QtObject
-
-                        Drag.active: mouseAreaPointFROM.drag.active;
-                        Drag.hotSpot.x: width/2
-                        Drag.hotSpot.y: height/2
-                        Drag.keys: ["InputSlotItem"]
-
-                        border {
-                            width: 1
-                            color: draggablePointFROM.dragActive? linkPoint.color : "transparent"
-                        }
-
-                        color: draggablePointFROM.dragActive? MasticTheme.agentsMappingBackgroundColor : "transparent"
-
-                        parent: draggablePointFROM.dragActive? rootItem.parent  : linkPoint
-
-                        MouseArea {
-                            id: mouseAreaPointFROM
-
-                            anchors.fill: parent
-
-                            drag.target: parent
-                            // Disable smoothed so that the Item pixel from where we started
-                            // the drag remains under the mouse cursor
-                            drag.smoothed: false
-
-                            hoverEnabled: true
-
-                            cursorShape: (draggablePointFROM.dragActive)? Qt.ClosedHandCursor : Qt.PointingHandCursor //Qt.OpenHandCursor
-
-                            onPressed: {
-                                draggablePointFROM.z = rootItem.parent.maxZ++;
-                                linkDraggablePoint.z = rootItem.parent.maxZ++;
-                            }
-
-                            onReleased: {
-                                // Drop our item
-                                draggablePointFROM.Drag.drop();
-
-                                // replace the draggablePointTO
-                                draggablePointFROM.x = 0
-                                draggablePointFROM.y = 0
-                            }
-                        }
-
-                        Link {
-                            id: linkDraggablePoint
-
-                            parent: rootItem.parent
-
-                            strokeDashArray: "5, 5"
-                            visible: draggablePointFROM.dragActive
-
-                            secondPoint: Qt.point(myModel.position.x, myModel.position.y)
-                            firstPoint: Qt.point(draggablePointFROM.x + draggablePointFROM.width/2, draggablePointFROM.y + draggablePointFROM.height/2)
-
-                            defaultColor:linkPoint.color
-                        }
-                    }
-
-
-                    Rectangle {
-                        id : linkPoint
-
-                        anchors {
-                            horizontalCenter: parent.left
-                            verticalCenter: parent.verticalCenter
-                        }
-
-                        height: 13
-                        width: height
-                        radius: height/2
-
-                        border {
-                            width : 0
-                            color : MasticTheme.lightGreyColor
-                        }
-
-                        color : if (agentMappingVM && myModel && myModel.firstModel) {
-
-                                    switch (myModel.firstModel.agentIOPValueTypeGroup)
-                                    {
-                                    case AgentIOPValueTypeGroups.NUMBER:
-                                        agentMappingVM.isON? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
-                                        break;
-                                    case AgentIOPValueTypeGroups.STRING:
-                                        agentMappingVM.isON? MasticTheme.redColor2 : MasticTheme.darkRedColor2
-                                        break;
-                                    case AgentIOPValueTypeGroups.IMPULSION:
-                                        agentMappingVM.isON? MasticTheme.purpleColor : MasticTheme.darkPurpleColor
-                                        break;
-                                    case AgentIOPValueTypeGroups.DATA:
-                                        agentMappingVM.isON? MasticTheme.greenColor : MasticTheme.darkGreenColor
-                                        break;
-                                    case AgentIOPValueTypeGroups.MIXED:
-                                        agentMappingVM.isON? MasticTheme.whiteColor : MasticTheme.darkGreyColor
-                                        break;
-                                    case AgentIOPValueTypeGroups.UNKNOWN:
-                                        "#000000"
-                                        break;
-                                    default:
-                                        "#000000"
-                                        break;
-                                    }
-
-                                } else {
-                                    MasticTheme.whiteColor
-                                }
-                    }
-
-
-                    DropArea {
-                        id: inputDropArea
-
-                        anchors {
-                            fill: linkPoint
-                            margins: -3
-                        }
-
-                        // Only accept drag events from output slot items
-                        keys: ["OutputSlotItem"]
-
-                        onEntered: {
-                            if (drag.source !== null)
-                            {
-                                var dragItem = drag.source;
-
-                                if (typeof dragItem.dragActive !== 'undefined' && dragItem.outputSlotModel.canLinkWith(inputSlotItem.myModel))
-                                {
-                                    dragItem.color = dragItem.border.color;
-                                    linkPoint.border.width = 2
-                                }
-                                else
-                                {
-                                    console.log("inputDropArea: no dragActive "+dragItem.agent)
-                                }
-                            }
-                            else
-                            {
-                                console.log("inputDropArea: no source "+ drag.source)
-                            }
-                        }
-
-
-                        onPositionChanged: {
-                        }
-
-
-                        onExited: {
-                            var dragItem = drag.source;
-                            if (typeof dragItem.dragActive !== 'undefined')
-                            {
-                                dragItem.color = "transparent";
-                                linkPoint.border.width = 0
-                            }
-                        }
-
-
-                        onDropped: {
-                            var dragItem = drag.source;
-                            if (dragItem)
-                            {
-                                if (typeof dragItem.outputSlotModel !== 'undefined' && dragItem.agentInMappingVMOfOutput && rootItem.agentMappingVM)
-                                {
-                                    dragItem.color = "transparent";
-                                    linkPoint.border.width = 0
-
-                                    console.log("inputDropArea: create a link from " + dragItem.outputSlotModel + " to " + inputSlotItem.myModel);
-                                    controller.addMapBetweenAgents(dragItem.agentInMappingVMOfOutput, dragItem.outputSlotModel, rootItem.agentMappingVM, inputSlotItem.myModel);
-                                }
-                            }
-                        }
-
-                    }
-
-
-
-                    //
-                    // Bindings to save the anchor point of our input slot
-                    // i.e. the point used to draw a link
-                    //
-                    Binding {
-                        target: myModel
-
-                        property: "position"
-
-                        value: Qt.point(rootItem.x + columnInputSlots.x + background.x + inputSlotItem.x + linkPoint.x + linkPoint.width/2,
-                                        rootItem.y + columnInputSlots.y + inputSlotItem.y + linkPoint.y + linkPoint.height/2)
-                    }
-                }
-            }
         }
 
 
-
-        //
-        //
-        // Outlets / Output slots
-        //
-        CollapsibleColumn {
-            id: columnOutputSlots
-
-            anchors {
-                left: parent.left
-                right : parent.right
-                top: separator.bottom
-                topMargin: 5
-                bottom: parent.bottom
-            }
-
-
-            visible: (value !== 0)
-            opacity: value
-
-            value: (rootItem.isReduced) ? 0 : 1
-
-            Behavior on value {
-                NumberAnimation {
-                    duration: rootItem._expandCollapseAnimationDuration
-                }
-            }
-
-
-            Repeater {
-                // List of output slots VM
-                model: (rootItem.agentMappingVM)? rootItem.agentMappingVM.outputsList : 0
-
-                delegate: Item {
-                    id: outputSlotItem
-
-                    property var myModel: model.QtObject
-
-                    height: 20
-                    anchors {
-                        left: parent.left
-                        right: parent.right
-                    }
-
-                    Text {
-                        id : agentOutput
-
-                        anchors {
-                            left: parent.horizontalCenter
-                            leftMargin: 5
-                            right: parent.right
-                            rightMargin: 20
-                            verticalCenter: parent.verticalCenter
-                        }
-
-                        horizontalAlignment : Text.AlignRight
-
-                        elide: Text.ElideRight
-                        text: myModel ? myModel.name : ""
-
-                        color: (rootItem.agentMappingVM && rootItem.agentMappingVM.isON)? MasticTheme.agentsONInputsOutputsMappingColor : MasticTheme.agentsOFFInputsOutputsMappingColor
-                        font: MasticTheme.heading2Font
-                    }
-
-
-
-                    Rectangle {
-                        id : draggablePointTO
-
-                        height: linkPointOut.height
-                        width: height
-                        radius: height/2
-
-                        border {
-                            width : 1
-                            color : draggablePointTO.dragActive ? linkPointOut.color : "transparent"
-                        }
-
-                        property bool dragActive : mouseAreaPointTO.drag.active;
-                        property var agentInMappingVMOfOutput : rootItem.agentMappingVM
-                        property var outputSlotModel: model.QtObject
-
-                        Drag.active: draggablePointTO.dragActive;
-                        Drag.hotSpot.x: 0
-                        Drag.hotSpot.y: 0
-                        Drag.keys: ["OutputSlotItem"]
-
-                        color: draggablePointTO.dragActive ? MasticTheme.agentsMappingBackgroundColor : "transparent"
-                        parent: draggablePointTO.dragActive ? rootItem.parent  : linkPointOut
-
-                        MouseArea {
-                            id: mouseAreaPointTO
-
-                            anchors.fill: parent
-
-                            drag.target: parent
-                            // Disable smoothed so that the Item pixel from where we started
-                            // the drag remains under the mouse cursor
-                            drag.smoothed: false
-
-                            hoverEnabled: true
-
-                            cursorShape: (draggablePointTO.dragActive) ? Qt.ClosedHandCursor : Qt.PointingHandCursor //Qt.OpenHandCursor
-
-                            onPressed: {
-                                draggablePointTO.z = rootItem.parent.maxZ++;
-                                linkDraggablePointTO.z = rootItem.parent.maxZ++;
-                            }
-
-                            onReleased: {
-                                // Drop our item
-                                draggablePointTO.Drag.drop();
-
-                                // replace the draggablePointTO
-                                draggablePointTO.x = 0
-                                draggablePointTO.y = 0
-                            }
-                        }
-
-
-
-                        Link {
-                            id: linkDraggablePointTO
-
-                            parent: rootItem.parent
-                            strokeDashArray: "5, 5"
-                            visible: draggablePointTO.dragActive
-
-                            firstPoint: Qt.point(myModel.position.x, myModel.position.y)
-                            secondPoint: Qt.point(draggablePointTO.x + draggablePointTO.width/2, draggablePointTO.y + draggablePointTO.height/2)
-
-                            defaultColor:linkPointOut.color
-                        }
-                    }
-
-
-
-                    Rectangle {
-                        id: linkPointOut
-
-                        anchors {
-                            horizontalCenter: parent.right
-                            verticalCenter: parent.verticalCenter
-                        }
-
-                        height: 13
-                        width: height
-                        radius: height/2
-
-                        border {
-                            width : 0
-                            color : MasticTheme.lightGreyColor
-                        }
-
-                        color: if (agentMappingVM && myModel && myModel.firstModel) {
-
-                                    switch (myModel.firstModel.agentIOPValueTypeGroup)
-                                    {
-                                    case AgentIOPValueTypeGroups.NUMBER:
-                                        (agentMappingVM.isON && !myModel.firstModel.isMuted) ? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
-                                        break;
-                                    case AgentIOPValueTypeGroups.STRING:
-                                        (agentMappingVM.isON && !myModel.firstModel.isMuted)? MasticTheme.redColor2 : MasticTheme.darkRedColor2
-                                        break;
-                                    case AgentIOPValueTypeGroups.IMPULSION:
-                                        (agentMappingVM.isON && !myModel.firstModel.isMuted)? MasticTheme.purpleColor : MasticTheme.darkPurpleColor
-                                        break;
-                                    case AgentIOPValueTypeGroups.DATA:
-                                        (agentMappingVM.isON && !myModel.firstModel.isMuted)? MasticTheme.greenColor : MasticTheme.darkGreenColor
-                                        break;
-                                    case AgentIOPValueTypeGroups.MIXED:
-                                        (agentMappingVM.isON && !myModel.firstModel.isMuted)? MasticTheme.whiteColor : MasticTheme.darkGreyColor
-                                        break;
-                                    case AgentIOPValueTypeGroups.UNKNOWN:
-                                        "#000000"
-                                        break;
-                                    default:
-                                        "#000000"
-                                        break;
-                                    }
-
-                                } else {
-                                    MasticTheme.whiteColor
-                                }
-
-
-
-                        I2SvgItem {
-                            anchors.centerIn: parent
-
-                            svgFileCache: MasticTheme.svgFileMASTIC
-                            svgElementId: "outputIsMuted"
-
-                            visible : myModel.firstModel && myModel.firstModel.isMuted
-                        }
-                    }
-
-
-
-                    DropArea {
-                        id: outputDropArea
-
-                        anchors {
-                            fill: linkPointOut
-                            margins: -3
-                        }
-
-                        // Only accept drag events from input slot items
-                        keys: ["InputSlotItem"]
-
-                        onEntered: {
-                            if (drag.source !== null)
-                            {
-                                var dragItem = drag.source;
-
-                                if (typeof dragItem.dragActive !== 'undefined'  && outputSlotItem.myModel.canLinkWith(dragItem.inputSlotModel))
-                                {
-                                    dragItem.color = dragItem.border.color;
-                                    linkPointOut.border.width = 2
-
-                                }
-                                else
-                                {
-                                    console.log("outputDropArea: no dragActive "+dragItem.agent)
-                                }
-                            }
-                            else
-                            {
-                                console.log("outputDropArea: no source "+ drag.source)
-                            }
-                        }
-
-
-                        onExited: {
-                            var dragItem = drag.source;
-                            if (typeof dragItem.dragActive !== 'undefined')
-                            {
-                                dragItem.color = "transparent";
-                                linkPointOut.border.width = 0
-                            }
-                        }
-
-                        onDropped: {
-                            var dragItem = drag.source;
-                            if (dragItem)
-                            {
-                                if (typeof dragItem.inputSlotModel !== 'undefined' && controller && rootItem.agentMappingVM && outputSlotItem.myModel)
-                                {
-                                    dragItem.color = "transparent";
-                                    linkPointOut.border.width = 0
-
-                                    console.log("outputDropArea: create a link from " + outputSlotItem.myModel + " to " + dragItem.inputSlotModel);
-                                    controller.addMapBetweenAgents(rootItem.agentMappingVM, outputSlotItem.myModel, dragItem.agentInMappingVMOfInput, dragItem.inputSlotModel);
-                                }
-                            }
-                        }
-                    }
-
-
-
-
-
-                    //
-                    // Bindings to save the anchor point of our input slot
-                    // i.e. the point used to draw a link
-                    //
-                    Binding {
-                        target: myModel
-
-                        property: "position"
-
-                        // the position inside the agent is not the same if the agent is reduced or not
-                        /*
-                        value: (rootItem.agentMappingVM && !rootItem.agentMappingVM.isReduced) ?
-                                   (Qt.point(rootItem.x + columnOutputSlots.x + background.x + outputSlotItem.x + linkPointOut.x + linkPointOut.width/2,
-                                             rootItem.y + columnOutputSlots.y + outputSlotItem.y + linkPointOut.y + linkPointOut.height/2))
-                                 : (Qt.point(rootItem.x + outputGlobalPoint.x + background.x +outputGlobalPoint.width/2,
-                                             rootItem.y + outputGlobalPoint.y + outputGlobalPoint.height/2));
-                                             */
-                        value: Qt.point(rootItem.x + columnOutputSlots.x + background.x + outputSlotItem.x + linkPointOut.x + linkPointOut.width/2,
-                                        rootItem.y + columnOutputSlots.y + outputSlotItem.y + linkPointOut.y + linkPointOut.height/2)
-                    }
-                }
-            }
-        }
-
-    }
-
-
-
+     }
 }
