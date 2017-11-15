@@ -67,7 +67,7 @@ Item {
     property bool _isSelected: (controller && rootItem.agentMappingVM && (controller.selectedAgent === rootItem.agentMappingVM))
 
 
-    // Duration of expand/collapse animation
+    // Duration of expand/collapse animation in milliseconds (250 ms => default duration of QML animations)
     property int _expandCollapseAnimationDuration: 250
 
 
