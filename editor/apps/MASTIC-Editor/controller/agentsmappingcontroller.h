@@ -234,6 +234,12 @@ private:
 
 
     /**
+     * @brief Deletes all the mapBetweenIOPVM where agent in paramater is involved as agentFrom in the map.
+     * @param agentInMapping
+     */
+    void _deleteAllMappingMadeOnTargetAgent(AgentInMappingVM *agentInMapping);
+
+    /**
      * @brief Check if the map between an agent output and an agent input already exist.
      * @param agentFrom
      * @param pointFrom
@@ -254,6 +260,7 @@ private:
     // Map from agent name to a list of view models of agent in mapping
     QHash<QString, AgentInMappingVM *> _mapFromNameToAgentInMappingViewModelsList;
 
+    // Map from agentInMapping  name to a list of MapBetweenIOPVM where the agent is involved as agentFrom.
     QHash<QString, MapBetweenIOPVM*> _mapFromAgentNameToPartialMapBetweenIOPViewModelsList;
 
     // Previous list of agents in mapping

@@ -166,7 +166,6 @@ Item {
                     }
 
                     height : 2
-
                     color : actionName.color
                 }
             }
