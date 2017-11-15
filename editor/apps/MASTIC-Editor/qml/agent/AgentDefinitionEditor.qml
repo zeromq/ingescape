@@ -369,10 +369,14 @@ I2PopupBase {
                                 bottom : parent.bottom
                             }
 
+                            // Prevent drag overshoot on Windows
+                            flickableItem.boundsBehavior: Flickable.OvershootBounds
+
                             style: MasticScrollViewStyle {
                             }
 
-                            contentItem: ListView {
+                            // Content of our scrollview
+                            ListView {
                                 id : listView
 
                                 width : scrollView.width

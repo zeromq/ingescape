@@ -87,6 +87,7 @@ Item {
     //
     ScrollView {
         id : agentsListScrollView
+
         anchors {
             top: parent.top
             topMargin: 108
@@ -95,10 +96,14 @@ Item {
             right: parent.right
         }
 
+        // Prevent drag overshoot on Windows
+        flickableItem.boundsBehavior: Flickable.OvershootBounds
+
         style: MasticScrollViewStyle {
         }
 
-        contentItem: ListView {
+        // Content of our scrollview
+        ListView {
             id: agentsList
 
             model: controller.agentsList
@@ -145,6 +150,8 @@ Item {
 
         }
     }
+
+
 
     //
     // Header

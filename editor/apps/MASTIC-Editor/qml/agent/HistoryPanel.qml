@@ -337,6 +337,7 @@ I2PopupBase {
 
                 ScrollView {
                     id : _scrollView
+
                     visible: _comboButton.checked;
 
                     anchors {
@@ -346,6 +347,9 @@ I2PopupBase {
 
                     width: _comboButton.width;
                     height: ((_combolist.count < 8) ? (_combolist.count+1)*(_comboButton.height+1) : 9*(_comboButton.height+1) );
+
+                    // Prevent drag overshoot on Windows
+                    flickableItem.boundsBehavior: Flickable.OvershootBounds
 
                     style: MasticScrollViewStyle {
                     }
@@ -656,6 +660,7 @@ I2PopupBase {
             /// ****** List ***** ////
             ScrollView {
                 id : scrollView
+
                 anchors {
                     top: tableauHeaderRow.bottom
                     left : parent.left
@@ -666,7 +671,11 @@ I2PopupBase {
                 style: MasticScrollViewStyle {
                 }
 
-                contentItem: ListView {
+                // Prevent drag overshoot on Windows
+                flickableItem.boundsBehavior: Flickable.OvershootBounds
+
+                // Content of our scrollview
+                ListView {
                     model: if (controller) {
                                controller.filteredValues
                            }
@@ -674,7 +683,7 @@ I2PopupBase {
                                0
                            }
 
-                    delegate:   Item {
+                    delegate: Item {
                         anchors {
                             left : parent.left
                             right : parent.right

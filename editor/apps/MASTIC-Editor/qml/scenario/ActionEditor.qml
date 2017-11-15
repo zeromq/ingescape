@@ -439,6 +439,7 @@ I2PopupBase {
                 //
                 ScrollView {
                     id : scrollViewCondition
+
                     anchors {
                         top : addCondition.bottom
                         topMargin: 8
@@ -449,6 +450,9 @@ I2PopupBase {
 
                     style: MasticScrollViewStyle {
                     }
+
+                    // Prevent drag overshoot on Windows
+                    flickableItem.boundsBehavior: Flickable.OvershootBounds
 
 
                     //
@@ -1327,6 +1331,9 @@ I2PopupBase {
 
                     style: MasticScrollViewStyle {
                     }
+
+                    // Prevent drag overshoot on Windows
+                    flickableItem.boundsBehavior: Flickable.OvershootBounds
 
                     /// Effects List
                     contentItem: Column {

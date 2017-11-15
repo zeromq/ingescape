@@ -93,7 +93,11 @@ Item {
         style: MasticScrollViewStyle {
         }
 
-        contentItem: ListView {
+        // Prevent drag overshoot on Windows
+        flickableItem.boundsBehavior: Flickable.OvershootBounds
+
+        // Content of our item
+        ListView {
             id: actionsList
 
 

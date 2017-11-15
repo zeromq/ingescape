@@ -279,6 +279,7 @@ Item {
 
         ScrollView {
             id : _scrollView
+
             visible: comboButton.checked;
 
             anchors {
@@ -292,7 +293,11 @@ Item {
             style: MasticScrollViewStyle {
             }
 
-            contentItem: ListView {
+            // Prevent drag overshoot on Windows
+            flickableItem.boundsBehavior: Flickable.OvershootBounds
+
+            // Content of our scrollview
+            ListView {
                 id:combolist
 
                 boundsBehavior: Flickable.StopAtBounds
