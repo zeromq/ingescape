@@ -73,6 +73,22 @@ public:
     void masticLauncherExited(QString hostname);
 
 
+    /**
+     * @brief Manage the message "MUTED / UN-MUTED"
+     * @param peerId
+     * @param message
+     */
+    void manageMessageMutedUnmuted(QString peerId, QString message);
+
+
+    /**
+     * @brief Manage the message "FROZEN / UN-FROZEN"
+     * @param peerId
+     * @param message
+     */
+    void manageMessageFrozenUnfrozen(QString peerId, QString message);
+
+
 Q_SIGNALS:
 
     /**

@@ -119,14 +119,6 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
             }
             zlist_destroy(&keys);
 
-            // Subscribers
-            /*int n = HASH_COUNT(subscribers);
-            qDebug() << n << "subscribers in the list";
-            subscriber_t *sub, *tmpSub;
-            HASH_ITER(hh, subscribers, sub, tmpSub) {
-                qDebug() << "subscriber:" << sub->agentName << "with peer id" << sub->agentPeerId;
-            }*/
-
             if (isMasticPublisher && isIntPID) {
                 qDebug() << "our zyre event is about MASTIC publisher:" << pid << hostname << executionPath;
 
@@ -153,38 +145,14 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
             // MUTED / UN-MUTED
             if (message.startsWith(mutedAllPrefix))
             {
-                message.remove(0, mutedAllPrefix.length());
-
-                if (message == "0") {
-                    //qDebug() << peerName << "(" << peerId << ") UN-MUTED";
-
-                    // Emit the signal "is Muted from Agent Updated"
-                    Q_EMIT networkController->isMutedFromAgentUpdated(peerId, false);
-                }
-                else if (message == "1") {
-                    //qDebug() << peerName << "(" << peerId << ") MUTED";
-
-                    // Emit the signal "is Muted from Agent Updated"
-                    Q_EMIT networkController->isMutedFromAgentUpdated(peerId, true);
-                }
+                // Manage the message "MUTED / UN-MUTED"
+                networkController->manageMessageMutedUnmuted(peerId, message.remove(0, mutedAllPrefix.length()));
             }
             // FROZEN / UN-FROZEN
             else if (message.startsWith(frozenPrefix))
             {
-                message.remove(0, frozenPrefix.length());
-
-                if (message == "0") {
-                    //qDebug() << peerName << "(" << peerId << ") UN-FROZEN";
-
-                    // Emit the signal "is Frozen from Agent Updated"
-                    Q_EMIT networkController->isFrozenFromAgentUpdated(peerId, false);
-                }
-                else if (message == "1") {
-                    //qDebug() << peerName << "(" << peerId << ") FROZEN";
-
-                    // Emit the signal "is Frozen from Agent Updated"
-                    Q_EMIT networkController->isFrozenFromAgentUpdated(peerId, true);
-                }
+                // Manage the message "FROZEN / UN-FROZEN"
+                networkController->manageMessageFrozenUnfrozen(peerId, message.remove(0, frozenPrefix.length()));
             }
             // OUTPUT MUTED
             else if (message.startsWith(mutedOutputPrefix))
@@ -215,34 +183,18 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
             zmsg_t* msg_dup = zmsg_dup(msg);
             QString message = zmsg_popstr(msg_dup);
 
-            //
             // Definition
-            //
             if (message.startsWith(definitionPrefix))
             {
                 message.remove(0, definitionPrefix.length());
 
-                // FIXME - TEST ONLY - TO REMOVE
-                /*// Load definition from string content
-                definition* newDefinition = parser_loadDefinition(message.toStdString().c_str());
-                qDebug() << "Definition received from : " << newDefinition->name << " version : " << newDefinition->version << " description : " << newDefinition->description;
-                definition_freeDefinition(newDefinition);*/
-
                 // Emit the signal "Definition Received"
                 Q_EMIT networkController->definitionReceived(peerId, peerName, message);
             }
-            //
             // Mapping
-            //
             else if (message.startsWith(mappingPrefix))
             {
                 message.remove(0, mappingPrefix.length());
-
-                // FIXME - TEST ONLY - TO REMOVE
-                /*// Load mapping from string content
-                mapping* newMapping = parser_LoadMap((message.toStdString().c_str()));
-                qDebug() << "Mapping received from : " << newMapping->name << " version : " << newMapping->version << " description : " << newMapping->description;
-                mapping_freeMapping(newMapping);*/
 
                 // Emit the signal "Mapping Received"
                 Q_EMIT networkController->mappingReceived(peerId, peerName, message);
@@ -250,42 +202,34 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
             // MUTED / UN-MUTED
             else if (message.startsWith(mutedAllPrefix))
             {
-                message.remove(0, mutedAllPrefix.length());
-
-                if (message == "0") {
-                    //qDebug() << peerName << "(" << peerId << ") UN-MUTED";
-
-                    // Emit the signal "is Muted from Agent Updated"
-                    Q_EMIT networkController->isMutedFromAgentUpdated(peerId, false);
-                }
-                else if (message == "1") {
-                    //qDebug() << peerName << "(" << peerId << ") MUTED";
-
-                    // Emit the signal "is Muted from Agent Updated"
-                    Q_EMIT networkController->isMutedFromAgentUpdated(peerId, true);
-                }
+                // Manage the message "MUTED / UN-MUTED"
+                networkController->manageMessageMutedUnmuted(peerId, message.remove(0, mutedAllPrefix.length()));
             }
             // FROZEN / UN-FROZEN
             else if (message.startsWith(frozenPrefix))
             {
-                message.remove(0, frozenPrefix.length());
+                // Manage the message "FROZEN / UN-FROZEN"
+                networkController->manageMessageFrozenUnfrozen(peerId, message.remove(0, frozenPrefix.length()));
+            }
+            // OUTPUT MUTED
+            else if (message.startsWith(mutedOutputPrefix))
+            {
+                QString outputName = message.remove(0, mutedOutputPrefix.length());
 
-                if (message == "0") {
-                    //qDebug() << peerName << "(" << peerId << ") UN-FROZEN";
+                // Emit the signal "is Muted from OUTPUT of Agent Updated"
+                Q_EMIT networkController->isMutedFromOutputOfAgentUpdated(peerId, true, outputName);
+            }
+            // OUTPUT UN-MUTED
+            else if (message.startsWith(unmutedOutputPrefix))
+            {
+                QString outputName = message.remove(0, unmutedOutputPrefix.length());
 
-                    // Emit the signal "is Frozen from Agent Updated"
-                    Q_EMIT networkController->isFrozenFromAgentUpdated(peerId, false);
-                }
-                else if (message == "1") {
-                    //qDebug() << peerName << "(" << peerId << ") FROZEN";
-
-                    // Emit the signal "is Frozen from Agent Updated"
-                    Q_EMIT networkController->isFrozenFromAgentUpdated(peerId, true);
-                }
+                // Emit the signal "is Muted from OUTPUT of Agent Updated"
+                Q_EMIT networkController->isMutedFromOutputOfAgentUpdated(peerId, false, outputName);
             }
             else
             {
-                qDebug() << "Unknown message received:" << message;
+                qWarning() << "Not yet managed (WHISPER) message '" << message << "' for agent" << peerName << "(" << peerId << ")";
             }
 
             zmsg_destroy(&msg_dup);
@@ -581,6 +525,50 @@ void NetworkController::masticLauncherExited(QString hostname)
     qInfo() << "MASTIC Launcher on" << hostname << "exited";
 
     _mapFromHostnameToMasticLauncherPeerId.remove(hostname);
+}
+
+
+/**
+ * @brief Manage the message "MUTED / UN-MUTED"
+ * @param peerId
+ * @param message
+ */
+void NetworkController::manageMessageMutedUnmuted(QString peerId, QString message)
+{
+    if (message == "0") {
+        //qDebug() << peerName << "(" << peerId << ") UN-MUTED";
+
+        // Emit the signal "is Muted from Agent Updated"
+        Q_EMIT isMutedFromAgentUpdated(peerId, false);
+    }
+    else if (message == "1") {
+        //qDebug() << peerName << "(" << peerId << ") MUTED";
+
+        // Emit the signal "is Muted from Agent Updated"
+        Q_EMIT isMutedFromAgentUpdated(peerId, true);
+    }
+}
+
+
+/**
+ * @brief Manage the message "FROZEN / UN-FROZEN"
+ * @param peerId
+ * @param message
+ */
+void NetworkController::manageMessageFrozenUnfrozen(QString peerId, QString message)
+{
+    if (message == "0") {
+        //qDebug() << peerName << "(" << peerId << ") UN-FROZEN";
+
+        // Emit the signal "is Frozen from Agent Updated"
+        Q_EMIT isFrozenFromAgentUpdated(peerId, false);
+    }
+    else if (message == "1") {
+        //qDebug() << peerName << "(" << peerId << ") FROZEN";
+
+        // Emit the signal "is Frozen from Agent Updated"
+        Q_EMIT isFrozenFromAgentUpdated(peerId, true);
+    }
 }
 
 
