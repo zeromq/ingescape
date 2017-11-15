@@ -620,7 +620,7 @@ I2PopupBase {
                                     }
 
                                     // Agent Inputs/Outputs
-                                    MasticComboBox {
+                                    MasticComboBoxAgentsIOP {
                                         id : ioCombo
 
                                         visible : myCondition && myCondition.conditionType === ActionConditionType.VALUE
@@ -632,12 +632,8 @@ I2PopupBase {
                                         height : 25
                                         width : 148
 
-                                        model : (myCondition && myCondition.condition && myCondition.condition.agentIopList) ? myCondition.condition.agentIopList : 0
-                                        function modelToString(model)
-                                        {
-                                            return model.name;
-                                        }
-
+                                        model: (myCondition && myCondition.condition && myCondition.condition.agentIopList) ? myCondition.condition.agentIopList : 0
+                                        inputsNumber: (myCondition && myCondition.condition && myCondition.condition.agentModel)? myCondition.condition.agentModel.inputsList.count : 0;
 
                                         Binding {
                                             target : ioCombo
@@ -1501,7 +1497,7 @@ I2PopupBase {
                                     }
 
                                     // Agent Inputs/Outputs
-                                    MasticComboBox {
+                                    MasticComboBoxAgentsIOP {
                                         id : ioEffectsCombo
 
                                         visible : myEffect && myEffect.effectType === ActionEffectType.VALUE
@@ -1514,6 +1510,8 @@ I2PopupBase {
                                         width : 148
 
                                         model : (myEffect && myEffect.effect && myEffect.effect.agentIopList) ? myEffect.effect.agentIopList : 0
+                                        inputsNumber: (myEffect && myEffect.effect && myEffect.effect.agentModel)? myEffect.effect.agentModel.inputsList.count : 0;
+
                                         function modelToString(model)
                                         {
                                             return model.name;
@@ -1714,7 +1712,7 @@ I2PopupBase {
                                     }
 
                                     // Agent FROM Outputs
-                                    MasticComboBox {
+                                    MasticComboBoxAgentsIOP {
                                         id : oEffectsMappingFROMCombo
 
                                         enabled : visible
@@ -1754,7 +1752,6 @@ I2PopupBase {
                                         }
 
                                     }
-
 
                                     Item {
                                         id : disableMappingItem
@@ -1890,7 +1887,7 @@ I2PopupBase {
                                     }
 
                                     // Agent TO Intpus
-                                    MasticComboBox {
+                                    MasticComboBoxAgentsIOP {
                                         id : iEffectsMappingTOCombo
 
                                         enabled : visible
