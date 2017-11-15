@@ -249,6 +249,7 @@ void AgentsMappingController::onAgentModelWillBeDeleted(AgentM* agent)
         {
             // Remove the model
             agentInMapping->models()->remove(agent);
+            // TODO ESTIA: Remove MapBetweenIOP  unique à ce model .
 
             // If it was the last one...
             if (agentInMapping->models()->count() == 0) {
@@ -650,6 +651,8 @@ void AgentsMappingController::_deleteAgentInMapping(AgentInMappingVM* agentInMap
         // Remove from the map list
         _mapFromNameToAgentInMappingViewModelsList.remove(agentInMapping->name());
 
+        _deleteAllMappingMadeOnTargetAgent(agentInMapping);
+
         // Remove this Agent In Mapping VM from the list for the qml
         _agentInMappingVMList.remove(agentInMapping);
 
@@ -658,6 +661,74 @@ void AgentsMappingController::_deleteAgentInMapping(AgentInMappingVM* agentInMap
     }
 }
 
+/**
+ * @brief Deletes all the mapBetweenIOPVM where agent in paramater is involved.
+ * @param agentInMapping
+ */
+void AgentsMappingController::_deleteAllMappingMadeOnTargetAgent(AgentInMappingVM* agentInMapping)
+{
+    if(agentInMapping != NULL)
+    {
+         // Check among the list of all map
+         if(!_allMapInMapping.isEmpty())
+         {
+             // Temporary Partial Maps
+             QList<MapBetweenIOPVM*> newListOfPartialMap;
+
+             foreach(MapBetweenIOPVM* mapBetweenIOP, _allMapInMapping.toList())
+             {
+                 if(mapBetweenIOP != NULL){
+                     if(mapBetweenIOP->agentFrom()->name() == agentInMapping->name())
+                     {
+                         // if involved as agentFrom:
+                         // 1- remove from the list of all the map
+                         _allMapInMapping.remove(mapBetweenIOP);
+
+                         // 2 - Transform the mapping in a partial map and add to the list of all the map.
+                         // Create ghost output and agent
+                         OutputVM* ghostOutput = new OutputVM(mapBetweenIOP->pointFrom()->name());
+                         AgentInMappingVM* ghostAgent = new AgentInMappingVM(mapBetweenIOP->agentFrom()->name());
+
+                         // Edit map to be partial
+                         mapBetweenIOP->setagentFrom(ghostAgent);
+                         mapBetweenIOP->setpointFrom(ghostOutput);
+
+                         qInfo() << "Turn a MapBetweenIOPVM into a the partial MapBetweenIOPVM : " << mapBetweenIOP->agentTo()->name() << "." << mapBetweenIOP->pointTo()->name() << " -> " << ghostAgent->name() << "." << ghostOutput->name();
+                         //Add to Hash and to temp partial maps list
+                         _mapFromAgentNameToPartialMapBetweenIOPViewModelsList.insertMulti(ghostOutput->name(), mapBetweenIOP);
+                         newListOfPartialMap.append(mapBetweenIOP);
+
+                     }
+                     else if(mapBetweenIOP->agentTo()->name() == agentInMapping->name())
+                     {
+                         // if involved as agentTo:
+                         // Just destroy it.
+                         _allMapInMapping.remove(mapBetweenIOP);
+                         delete(mapBetweenIOP);
+                     }
+                 }
+             }
+
+             // Push partialMaps into internal list
+             _allPartialMapInMapping.append(newListOfPartialMap);
+         }
+
+         // Check among the list of all partial map
+         if(!_allPartialMapInMapping.isEmpty())
+         {
+             foreach (MapBetweenIOPVM* partialMapBetweenIOP, _allPartialMapInMapping.toList()) {
+                 if(partialMapBetweenIOP != NULL){
+                     if(partialMapBetweenIOP->agentTo()->name() == agentInMapping->name())
+                     {
+                         // If involved as agentTo
+                         _allMapInMapping.remove(partialMapBetweenIOP);
+                         delete(partialMapBetweenIOP);
+                     }
+                 }
+             }
+         }
+    }
+}
 
 /**
  * @brief Check if the map between an agent output and an agent input already exist.
