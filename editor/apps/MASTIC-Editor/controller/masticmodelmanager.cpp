@@ -308,8 +308,8 @@ void MasticModelManager::onValuePublished(PublishedValueM* publishedValue)
 {
     if (publishedValue != NULL)
     {
-        // Add to the list
-        _publishedValues.append(publishedValue);
+        // Add to the list at the first position
+        _publishedValues.prepend(publishedValue);
 
         QList<AgentM*> agentsList = getAgentModelsListFromName(publishedValue->agentName());
         foreach (AgentM* agent, agentsList)
