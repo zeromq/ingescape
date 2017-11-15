@@ -407,6 +407,7 @@ I2PopupBase {
                 //
                 ScrollView {
                     id : scrollViewCondition
+
                     anchors {
                         top : validityDuration.bottom
                         topMargin: 8
@@ -415,37 +416,17 @@ I2PopupBase {
                         bottom : parent.bottom
                     }
 
-                    style: ScrollViewStyle {
-                        transientScrollBars: true
-                        handle: Item {
-                            implicitWidth: 8
-                            implicitHeight: 26
-
-                            Rectangle {
-                                color: MasticTheme.lightGreyColor
-
-                                anchors {
-                                    fill: parent
-                                    topMargin: 1
-                                    leftMargin: 1
-                                    rightMargin:0
-                                    bottomMargin: 2
-                                }
-
-                                opacity : 0.8
-                                radius: 10
-                            }
-                        }
-                        scrollBarBackground: Item {
-                            implicitWidth: 8
-                            implicitHeight: 26
-                        }
+                    style: MasticScrollViewStyle {
                     }
+
+                    // Prevent drag overshoot on Windows
+                    flickableItem.boundsBehavior: Flickable.OvershootBounds
+
 
                     //
                     // Conditions List
                     //
-                    Column {
+                    contentItem: Column {
                         id : conditionsListColumn
                         spacing : 6
                         height : childrenRect.height
@@ -1302,6 +1283,7 @@ I2PopupBase {
                 /// Effects List
                 ScrollView {
                     id : scrollView
+
                     anchors {
                         top : separatorEffect.bottom
                         topMargin: 6
@@ -1309,35 +1291,15 @@ I2PopupBase {
                         left : parent.left
                         bottom : parent.bottom
                     }
-                    style: ScrollViewStyle {
-                        transientScrollBars: true
-                        handle: Item {
-                            implicitWidth: 8
-                            implicitHeight: 26
 
-                            Rectangle {
-                                color: MasticTheme.lightGreyColor
-
-                                anchors {
-                                    fill: parent
-                                    topMargin: 1
-                                    leftMargin: 1
-                                    rightMargin:0
-                                    bottomMargin: 2
-                                }
-
-                                opacity : 0.8
-                                radius: 10
-                            }
-                        }
-                        scrollBarBackground: Item {
-                            implicitWidth: 8
-                            implicitHeight: 26
-                        }
+                    style: MasticScrollViewStyle {
                     }
 
+                    // Prevent drag overshoot on Windows
+                    flickableItem.boundsBehavior: Flickable.OvershootBounds
+
                     /// Effects List
-                    Column {
+                    contentItem: Column {
                         id : effectsList
                         spacing : 6
                         height : childrenRect.height

@@ -87,6 +87,7 @@ Item {
     //
     ScrollView {
         id : agentsListScrollView
+
         anchors {
             top: parent.top
             topMargin: 108
@@ -95,33 +96,13 @@ Item {
             right: parent.right
         }
 
-        style: ScrollViewStyle {
-            transientScrollBars: true
-            handle: Item {
-                implicitWidth: 8
-                implicitHeight: 26
+        // Prevent drag overshoot on Windows
+        flickableItem.boundsBehavior: Flickable.OvershootBounds
 
-                Rectangle {
-                    color: MasticTheme.lightGreyColor
-
-                    anchors {
-                        fill: parent
-                        topMargin: 1
-                        leftMargin: 1
-                        rightMargin:0
-                        bottomMargin: 2
-                    }
-
-                    opacity : 0.8
-                    radius: 10
-                }
-            }
-            scrollBarBackground: Item {
-                implicitWidth: 8
-                implicitHeight: 26
-            }
+        style: MasticScrollViewStyle {
         }
 
+        // Content of our scrollview
         ListView {
             id: agentsList
 
@@ -169,6 +150,8 @@ Item {
 
         }
     }
+
+
 
     //
     // Header

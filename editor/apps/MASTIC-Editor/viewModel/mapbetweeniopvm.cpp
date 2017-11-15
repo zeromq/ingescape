@@ -50,7 +50,7 @@ MapBetweenIOPVM::MapBetweenIOPVM(AgentInMappingVM* agentFrom,
     if ((_agentFrom != NULL) && (_pointFrom != NULL)
             && (_agentTo != NULL) && (_pointTo != NULL))
     {
-        qInfo() << "New Map Between" << _agentFrom->name() << "." << _pointFrom->name() << "-->" << _agentTo->name() << "." << _pointTo->name();
+        qInfo() << "Create new MapBetweenIOPVM " << _agentFrom->name() << "." << _pointFrom->name() << "-->" << _agentTo->name() << "." << _pointTo->name();
     }
 }
 
@@ -60,7 +60,7 @@ MapBetweenIOPVM::MapBetweenIOPVM(AgentInMappingVM* agentFrom,
  */
 MapBetweenIOPVM::~MapBetweenIOPVM()
 {
-    qInfo() << "Map destroyed";
+    qInfo() << "Delete MapBetweenIOPVM " << _agentFrom->name() << "." << _pointFrom->name() << "-->" << _agentTo->name() << "." << _pointTo->name();
 
     if (_agentFrom != NULL) {
         AgentInMappingVM* temp = _agentFrom;

@@ -277,6 +277,7 @@ Item {
 
         ScrollView {
             id : _scrollView
+
             visible: comboButton.checked;
 
             anchors {
@@ -287,33 +288,13 @@ Item {
             width: comboButton.width;
             height: ((combolist.count < 5) ? (combolist.count)*(comboButton.height+1) : 5*(comboButton.height+1) );
 
-            style: ScrollViewStyle {
-                transientScrollBars: true
-                handle: Item {
-                    implicitWidth: 8
-                    implicitHeight: 26
-
-                    Rectangle {
-                        color: MasticTheme.lightGreyColor
-
-                        anchors {
-                            fill: parent
-                            topMargin: 1
-                            leftMargin: 1
-                            rightMargin:0
-                            bottomMargin: 2
-                        }
-
-                        opacity : 0.8
-                        radius: 10
-                    }
-                }
-                scrollBarBackground: Item {
-                    implicitWidth: 8
-                    implicitHeight: 26
-                }
+            style: MasticScrollViewStyle {
             }
 
+            // Prevent drag overshoot on Windows
+            flickableItem.boundsBehavior: Flickable.OvershootBounds
+
+            // Content of our scrollview
             ListView {
                 id:combolist
 

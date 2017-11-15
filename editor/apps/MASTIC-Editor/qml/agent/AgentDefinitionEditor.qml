@@ -361,42 +361,26 @@ I2PopupBase {
                         /// ****** List ***** ////
                         ScrollView {
                             id : scrollView
+
                             anchors {
                                 top: tableauHeaderRow.bottom
                                 left : parent.left
                                 right : parent.right
                                 bottom : parent.bottom
                             }
-                            style: ScrollViewStyle {
-                                transientScrollBars: true
-                                handle: Item {
-                                    implicitWidth: 8
-                                    implicitHeight: 26
 
-                                    Rectangle {
-                                        color: MasticTheme.lightGreyColor
+                            // Prevent drag overshoot on Windows
+                            flickableItem.boundsBehavior: Flickable.OvershootBounds
 
-                                        anchors {
-                                            fill: parent
-                                            topMargin: 1
-                                            leftMargin: 1
-                                            rightMargin:0
-                                            bottomMargin: 2
-                                        }
-
-                                        opacity : 0.8
-                                        radius: 10
-                                    }
-                                }
-                                scrollBarBackground: Item {
-                                    implicitWidth: 8
-                                    implicitHeight: 26
-                                }
+                            style: MasticScrollViewStyle {
                             }
 
+                            // Content of our scrollview
                             ListView {
                                 id : listView
+
                                 width : scrollView.width
+
                                 model: if (definition) {
                                            switch (tabs.currentIndex)
                                            {
