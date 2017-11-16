@@ -86,6 +86,30 @@ public:
 Q_SIGNALS:
 
     /**
+     * @brief Emitted to zoom-in our view
+     */
+    void zoomIn();
+
+
+    /**
+     * @brief Emitted to zoom-out our view
+     */
+    void zoomOut();
+
+
+    /**
+     * @brief Emitted to reset zoom (100%)
+     */
+    void resetZoom();
+
+
+    /**
+     * @brief Emitted to fit all nodes in our view
+     */
+    void fitToView();
+
+
+    /**
      * @brief Emitted when a new "Agent in Mapping" is added
      * @param agentName
      */
@@ -216,6 +240,34 @@ private Q_SLOTS:
     //void _onOutputsListRemoved(QList<OutputVM*> outputsListWillBeRemoved);
 
 
+    /**
+     * @brief Slot when the list of models of an input view model is filled (0 model -> 1 model)
+     * @param inputName
+     */
+    void _onInputModelsFilled(QString inputName);
+
+
+    /**
+     * @brief Slot when the list of models of an output view model is filled (0 model -> 1 model)
+     * @param outputName
+     */
+    void _onOutputModelsFilled(QString outputName);
+
+
+    /**
+     * @brief Slot when the list of models of an input view model is cleared (1 model -> 0 model)
+     * @param inputName
+     */
+    void _onInputModelsCleared(QString inputName);
+
+
+    /**
+     * @brief Slot when the list of models of an output view model is cleared (1 model -> 0 model)
+     * @param outputName
+     */
+    void _onOutputModelsCleared(QString outputName);
+
+
 private:
     /**
      * @brief Add new model(s) of agent to the current mapping at a specific position
@@ -261,7 +313,7 @@ private:
     QHash<QString, AgentInMappingVM *> _mapFromNameToAgentInMappingViewModelsList;
 
     // Map from agentInMapping  name to a list of MapBetweenIOPVM where the agent is involved as agentFrom.
-    QHash<QString, MapBetweenIOPVM*> _mapFromAgentNameToPartialMapBetweenIOPViewModelsList;
+    QHash<QString, QList<MapBetweenIOPVM*>> _mapFromAgentNameToPartialMapBetweenIOPViewModelsList;
 
     // Previous list of agents in mapping
     QList<AgentInMappingVM*> _previousListOfAgentsInMapping;

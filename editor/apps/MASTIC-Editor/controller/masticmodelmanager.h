@@ -232,10 +232,10 @@ public Q_SLOTS:
      * @param agentAddress
      * @param pid
      * @param hostname
-     * @param executionPath
+     * @param commandLine
      * @param canBeFrozen
      */
-    void onAgentEntered(QString peerId, QString agentName, QString agentAddress, int pid, QString hostname, QString executionPath, bool canBeFrozen);
+    void onAgentEntered(QString peerId, QString agentName, QString agentAddress, int pid, QString hostname, QString commandLine, bool canBeFrozen);
     
 
     /**

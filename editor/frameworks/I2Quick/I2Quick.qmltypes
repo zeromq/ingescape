@@ -266,6 +266,7 @@ Module {
         Property { name: "strokeDashOffset"; type: "double" }
         Property { name: "fuzzyColor"; type: "QColor" }
         Property { name: "fuzzyRadius"; type: "double" }
+        Property { name: "hitTestAreaMargin"; type: "double" }
         Signal {
             name: "automaticallyAdjustGeometryChanged"
             Parameter { name: "value"; type: "bool" }
@@ -308,6 +309,10 @@ Module {
         }
         Signal {
             name: "fuzzyRadiusChanged"
+            Parameter { name: "value"; type: "double" }
+        }
+        Signal {
+            name: "hitTestAreaMarginChanged"
             Parameter { name: "value"; type: "double" }
         }
         Signal {
@@ -2209,7 +2214,7 @@ Module {
         Property { name: "iconName"; type: "string" }
         Property { name: "iconSource"; type: "QUrl" }
         Property { name: "isDefault"; type: "bool" }
-        Property { name: "menu"; type: "Menu_QMLTYPE_28"; isPointer: true }
+        Property { name: "menu"; type: "Menu_QMLTYPE_32"; isPointer: true }
         Property { name: "pressed"; type: "bool"; isReadonly: true }
         Property { name: "style"; type: "QQmlComponent"; isPointer: true }
         Property { name: "text"; type: "string" }
@@ -2634,7 +2639,7 @@ Module {
         Signal { name: "longPressCanceled" }
         Method { name: "cancelPressed"; type: "QVariant" }
         Property { name: "isDefault"; type: "bool" }
-        Property { name: "menu"; type: "Menu_QMLTYPE_28"; isPointer: true }
+        Property { name: "menu"; type: "Menu_QMLTYPE_32"; isPointer: true }
         Property { name: "checkable"; type: "bool" }
         Property { name: "checked"; type: "bool" }
         Property { name: "exclusiveGroup"; type: "QQuickExclusiveGroup1"; isPointer: true }
@@ -3006,7 +3011,7 @@ Module {
         Property { name: "placeholderMarginLeft"; type: "int" }
         Property { name: "isError"; type: "bool" }
         Property { name: "hasFeedbackWhenActiveFocus"; type: "bool" }
-        Property { name: "control"; type: "TextField_QMLTYPE_77"; isReadonly: true; isPointer: true }
+        Property { name: "control"; type: "TextField_QMLTYPE_78"; isReadonly: true; isPointer: true }
         Property { name: "font"; type: "QFont" }
         Property { name: "textColor"; type: "QColor" }
         Property { name: "selectionColor"; type: "QColor" }

@@ -57,8 +57,8 @@ class AgentM : public QObject
     // HostName of our agent
     I2_QML_PROPERTY_READONLY(QString, hostname)
 
-    // Execution path of our agent
-    I2_CPP_NOSIGNAL_PROPERTY(QString, executionPath)
+    // Command line of our agent
+    I2_CPP_NOSIGNAL_PROPERTY(QString, commandLine)
 
     // Process Id of our agent
     I2_CPP_NOSIGNAL_PROPERTY(int, pid)

@@ -55,6 +55,10 @@ Item {
     readonly property int backgroundCellNumberOfSubDivisions: 5
 
 
+    // Zoom-in delta scale factor
+    readonly property real zoomInDeltaScaleFactor: 1.2
+
+
 
     //--------------------------------
     //
@@ -99,12 +103,12 @@ Item {
 
             // Check if our child must be filtered
             if (
-                    // We don't need repeaters because they don't have a valid geometry (they create items and add them to their parent)
-                    !_qmlItemIsA(child, "Repeater")
-                    &&
-                    //TEMP FIXME: remove links because AgentNodeView creates links attached to (0,0)
-                    !_qmlItemIsA(child, "Link")
-                    )
+                // We don't need repeaters because they don't have a valid geometry (they create items and add them to their parent)
+                !_qmlItemIsA(child, "Repeater")
+                &&
+                //TEMP FIXME: remove invisible links because AgentNodeView creates links attached to (0,0)
+                !_qmlItemIsA(child, "Link")
+                )
             {
                 x0 = Math.min(x0, child.x);
                 y0 = Math.min(y0, child.y);
@@ -127,6 +131,49 @@ Item {
         }
     }
 
+
+
+    // Set our zoom level
+    function setZoomLevel(zoom)
+    {
+        if (zoom > 0)
+        {
+            // Check bounds of zoom
+            zoom = Math.min(rootItem.maximumScale, Math.max(rootItem.minimumScale, zoom));
+
+            // Get position of our center in workspace
+            var viewCenterInWorkspace = rootItem.mapToItem(workspace, rootItem.width/2, rootItem.height/2);
+
+            var targetX = rootItem.width/2 - viewCenterInWorkspace.x * zoom;
+            var targetY = rootItem.height/2 - viewCenterInWorkspace.y * zoom;
+
+            workspaceXAnimation.to = targetX;
+            workspaceYAnimation.to = targetY;
+            workspaceScaleAnimation.to = zoom;
+
+            workspaceXAnimation.restart();
+            workspaceYAnimation.restart();
+            workspaceScaleAnimation.restart();
+        }
+        else
+        {
+            console.log("setZoomLevel: invalid zoom factor "+zoom)
+        }
+    }
+
+
+    // Zoom-in
+    function zoomIn()
+    {
+        setZoomLevel(workspace.scale * rootItem.zoomInDeltaScaleFactor);
+    }
+
+
+    // Zoom-out
+    function zoomOut()
+    {
+        setZoomLevel(workspace.scale / rootItem.zoomInDeltaScaleFactor);
+    }
 
 
     // Scroll our workspace to a given position (top-left corner)
@@ -194,6 +241,37 @@ Item {
         }
 
         return result;
+    }
+
+
+
+
+    //--------------------------------
+    //
+    // Behavior
+    //
+    //--------------------------------
+
+    Connections {
+        target: controller
+
+        ignoreUnknownSignals: true
+
+        onZoomIn: {
+            rootItem.zoomIn();
+        }
+
+        onZoomOut: {
+            rootItem.zoomOut();
+        }
+
+        onFitToView: {
+            rootItem.showAll();
+        }
+
+        onResetZoom: {
+            rootItem.setZoomLevel(1);
+        }
     }
 
 
@@ -348,6 +426,10 @@ Item {
         // Workspace interaction: pan & zoom
         //
         //-----------------------------------------------
+
+        //
+        // PinchArea to capture pinch gesture (zoom-in, zoom-out)
+        //
         PinchArea {
             anchors.fill: parent
 
@@ -360,12 +442,10 @@ Item {
 
 
             //
-            // MouseArea used to drag-n-drop our workspace AND handle mouse wheel events and scroll gesture events (trackpad)
+            // MouseArea to capture scroll gesture events (trackpad)
             //
             MouseArea {
                 anchors.fill: parent
-
-                drag.target: workspace
 
                 scrollGestureEnabled: true
 
@@ -376,36 +456,74 @@ Item {
                 onWheel: {
                     wheel.accepted = true;
 
-                    // Check if we have a real wheel event
                     if ((wheel.pixelDelta.x !== 0) || (wheel.pixelDelta.y !== 0))
                     {
                         //
-                        // Trackpad event
+                        // Trackpad flick gesture => scroll our workspace
                         //
 
                         workspace.x += wheel.pixelDelta.x;
                         workspace.y += wheel.pixelDelta.y;
                     }
-                    else
-                    {
-                        //
-                        // Physical mouse wheel event
-                        //
+                }
 
-                        //TODO: zoom at (x, y)
-                        if (wheel.angleDelta.y > 0)
+
+
+                //
+                // MouseArea used to drag-n-drop our workspace AND handle real mouse wheel events (zoom-in, zoom-out)
+                //
+                MouseArea {
+                    id: mouseAreaWorkspaceDragNDropAndWheelZoom
+
+                    anchors.fill: parent
+
+                    drag.target: workspace
+
+                    // 2-finger-flick gesture should pass through to our parent MouseArea
+                    scrollGestureEnabled: false
+
+                    onPressed: {
+                        rootItem.forceActiveFocus();
+                    }
+
+                    onWheel: {
+                        wheel.accepted = true;
+
+                        // Compute mouse position in our workspace
+                        var mousePositionInWorkspace = mouseAreaWorkspaceDragNDropAndWheelZoom.mapToItem(workspace, wheel.x, wheel.y);
+
+                        // Check if we must zoom-in or zoom-out
+                        if (wheel.angleDelta.y < 0)
                         {
-                            workspace.scale = Math.max(rootItem.minimumScale, workspace.scale/1.2);
+                            //
+                            // Zoom-out
+                            //
+
+                            // Update scale of our workspace
+                            workspace.scale = Math.max(rootItem.minimumScale, workspace.scale * Math.pow(1/rootItem.zoomInDeltaScaleFactor, Math.abs(wheel.angleDelta.y)/120) );
+
+                            // Center our workspace
+                            workspace.x = wheel.x - mousePositionInWorkspace.x * workspace.scale;
+                            workspace.y = wheel.y - mousePositionInWorkspace.y * workspace.scale;
                         }
-                        else if (wheel.angleDelta.y < 0)
+                        else if (wheel.angleDelta.y > 0)
                         {
-                            workspace.scale = Math.min(rootItem.maximumScale, workspace.scale * 1.2);
+                            //
+                            // Zoom-in
+                            //
+
+                            // Update scale of our workspace
+                            workspace.scale = Math.min(rootItem.maximumScale, workspace.scale * Math.pow(rootItem.zoomInDeltaScaleFactor, Math.abs(wheel.angleDelta.y)/120) );
+
+                            // Center our workspace
+                            workspace.x = wheel.x - mousePositionInWorkspace.x * workspace.scale;
+                            workspace.y = wheel.y - mousePositionInWorkspace.y * workspace.scale;
                         }
-                        // Else: wheel.angleDelta.y  == 0  => end of gesture
+                        // Else: wheel.angleDelta.y  == 0  => invalid wheel event
                     }
                 }
-            }
 
+            }
 
 
             //-----------------------------------------------

@@ -91,8 +91,12 @@ void AgentsMappingController::removeAgentFromMapping(AgentInMappingVM* agent)
  */
 void AgentsMappingController::deleteLinkBetweenTwoAgents(MapBetweenIOPVM* link)
 {
-    if ((link != NULL) && (link->agentFrom() != NULL) && (link->agentTo() != NULL)) {
+    if ((link != NULL) && (link->agentFrom() != NULL) && (link->agentTo() != NULL) && (link->pointFrom() != NULL) && (link->pointTo() != NULL))
+    {
         qInfo() << "Delete Link Between agents" << link->agentFrom()->name() << "and" << link->agentTo()->name();
+
+        // Emit signal "Command asked to agent about Mapping Input"
+        Q_EMIT commandAskedToAgentAboutMappingInput(link->agentTo()->getPeerIdsList(), "UNMAP", link->pointTo()->name(), link->agentFrom()->name(), link->pointFrom()->name());
 
         if (_selectedMapBetweenIOP == link) {
             setselectedMapBetweenIOP(NULL);
@@ -101,7 +105,8 @@ void AgentsMappingController::deleteLinkBetweenTwoAgents(MapBetweenIOPVM* link)
         // Remove from the list
         _allMapInMapping.remove(link);
 
-        // FIXME TODO: delete and free memory
+        // Free memory
+        delete link;
     }
 }
 
@@ -378,7 +383,13 @@ void AgentsMappingController::_generateAllMapBetweenIopUsingNewlyAddedInputsVM(A
                                             _allPartialMapInMapping.append(partialMap);
 
                                             //Map partial mapBetweenIOP with output agent name to active search
-                                            _mapFromAgentNameToPartialMapBetweenIOPViewModelsList.insertMulti(outputAgent->name(), partialMap);
+                                            QList<MapBetweenIOPVM*> listOfMapUnderKey;
+                                            if(_mapFromAgentNameToPartialMapBetweenIOPViewModelsList.contains(outputAgent->name()))
+                                            {
+                                                listOfMapUnderKey = _mapFromAgentNameToPartialMapBetweenIOPViewModelsList.value((outputAgent->name()));
+                                            }
+                                            listOfMapUnderKey.append(partialMap);
+                                            _mapFromAgentNameToPartialMapBetweenIOPViewModelsList.insert(outputAgent->name(), listOfMapUnderKey);
 
                                             qInfo() << "Create the partial MapBetweenIOPVM : " << currentAgentInMapping->name() << "." << inputPointVM->name() << " -> " << outputAgent->name() << "." << outputPointVM->name();
                                         }
@@ -424,7 +435,8 @@ void AgentsMappingController::_completeAllPartialMapBetweenIopUsingNewlyOutputsV
         if (_mapFromAgentNameToPartialMapBetweenIOPViewModelsList.contains(currentAgentInMapping->name()))
         {
             // Sublist of partial maps where the ghost agent is matching with the new agent in mapping VM. (Outputs that were needed to realise other agents' mappings)
-            QList<MapBetweenIOPVM*> foundPartialMapBetweenIOP  = _mapFromAgentNameToPartialMapBetweenIOPViewModelsList.values(currentAgentInMapping->name());
+            QList<MapBetweenIOPVM*> foundPartialMapBetweenIOP  = _mapFromAgentNameToPartialMapBetweenIOPViewModelsList.value(currentAgentInMapping->name());
+            _mapFromAgentNameToPartialMapBetweenIOPViewModelsList.remove(currentAgentInMapping->name());
 
             foreach (MapBetweenIOPVM* partialMap, foundPartialMapBetweenIOP)
             {
@@ -435,6 +447,9 @@ void AgentsMappingController::_completeAllPartialMapBetweenIopUsingNewlyOutputsV
                     {
                         if(missingOutput->name() == partialMap->pointFrom()->name())
                         {
+                            //Delete the output from the list since it has already been dealt with.
+                             outputsListAdded.removeOne(missingOutput);
+
                             //Set the ghost elements in the partial map with the real stuff.
                             if (partialMap->agentFrom()->isGhost())
                             {
@@ -448,26 +463,34 @@ void AgentsMappingController::_completeAllPartialMapBetweenIopUsingNewlyOutputsV
                                 delete agentToDestroy;
                                 agentToDestroy = NULL;
                             }
-                            if (partialMap->pointFrom()->isGhost())
-                            {
-                                // Get our ghost output.
-                                OutputVM* outputToDestroy = partialMap->pointFrom();
 
-                                //Set real output
-                                partialMap->setpointFrom(missingOutput);
+                            // Get our ghost output.
+                            OutputVM* outputToDestroy = partialMap->pointFrom();
 
-                                // Destroy output
-                                delete outputToDestroy;
-                                outputToDestroy = NULL;
-                            }
+                            //Set real output
+                            partialMap->setpointFrom(missingOutput);
+
+                            // Destroy output
+                            delete outputToDestroy;
+                            outputToDestroy = NULL;
+
                             //Add newly finalised MapBetweenIOP.
                             newMapBetweenIOP.append(partialMap);
 
+                            //Delete ex-partial map from temp list.
+                            foundPartialMapBetweenIOP.removeOne(partialMap);
+
+                            //Delete ex-partial map from internal list.
                             _allPartialMapInMapping.remove(partialMap);
                             qInfo() <<"Delete Partial Map; " << currentAgentInMapping->name() << "." << missingOutput->name();
                         }
                     }
                 }
+            }
+            if(!foundPartialMapBetweenIOP.isEmpty())
+            {
+                //if all the partial could not be handled then insert them back in the hash table.
+                _mapFromAgentNameToPartialMapBetweenIOPViewModelsList.insert(currentAgentInMapping->name(), foundPartialMapBetweenIOP);
             }
         }
 
@@ -509,6 +532,10 @@ void AgentsMappingController::_onAgentsInMappingChanged()
                 connect(agentInMapping, &AgentInMappingVM::inputsListAdded, this, &AgentsMappingController::_onInputsListAdded);
                 connect(agentInMapping, &AgentInMappingVM::outputsListAdded, this, &AgentsMappingController::_onOutputsListAdded);
                 //connect(agentInMapping, &AgentInMappingVM::outputsListRemoved, this, &AgentsMappingController::_onOutputsListRemoved);
+                connect(agentInMapping, &AgentInMappingVM::inputModelsFilled, this, &AgentsMappingController::_onInputModelsFilled);
+                connect(agentInMapping, &AgentInMappingVM::outputModelsFilled, this, &AgentsMappingController::_onOutputModelsFilled);
+                connect(agentInMapping, &AgentInMappingVM::inputModelsCleared, this, &AgentsMappingController::_onInputModelsCleared);
+                connect(agentInMapping, &AgentInMappingVM::outputModelsCleared, this, &AgentsMappingController::_onOutputModelsCleared);
 
                 // Emit signals "Inputs/Outputs List Added" for initial list of inputs and initial list of outputs
                 agentInMapping->inputsListAdded(agentInMapping->inputsList()->toList());
@@ -536,6 +563,10 @@ void AgentsMappingController::_onAgentsInMappingChanged()
                 disconnect(agentInMapping, &AgentInMappingVM::inputsListAdded, this, &AgentsMappingController::_onInputsListAdded);
                 disconnect(agentInMapping, &AgentInMappingVM::outputsListAdded, this, &AgentsMappingController::_onOutputsListAdded);
                 //disconnect(agentInMapping, &AgentInMappingVM::outputsListRemoved, this, &AgentsMappingController::_onOutputsListRemoved);
+                disconnect(agentInMapping, &AgentInMappingVM::inputModelsFilled, this, &AgentsMappingController::_onInputModelsFilled);
+                disconnect(agentInMapping, &AgentInMappingVM::outputModelsFilled, this, &AgentsMappingController::_onOutputModelsFilled);
+                disconnect(agentInMapping, &AgentInMappingVM::inputModelsCleared, this, &AgentsMappingController::_onInputModelsCleared);
+                disconnect(agentInMapping, &AgentInMappingVM::outputModelsCleared, this, &AgentsMappingController::_onOutputModelsCleared);
 
                 // Emit the signal "Agent in Mapping Removed"
                 Q_EMIT agentInMappingRemoved(agentInMapping->name());
@@ -591,6 +622,66 @@ void AgentsMappingController::_onOutputsListAdded(QList<OutputVM*> outputsListAd
         qDebug() << "_on Outputs List Removed from agent" << agentInMapping->name() << outputsListWillBeRemoved.count();
     }
 }*/
+
+
+/**
+ * @brief Slot when the list of models of an input view model is filled (0 model -> 1 model)
+ * @param inputName
+ */
+void AgentsMappingController::_onInputModelsFilled(QString inputName)
+{
+    AgentInMappingVM* agentInMapping = qobject_cast<AgentInMappingVM*>(sender());
+    if (agentInMapping != NULL)
+    {
+        qDebug() << "_on Input Models Filled" << agentInMapping->name() << "." << inputName;
+        // TODO ESTIA
+    }
+}
+
+
+/**
+ * @brief Slot when the list of models of an output view model is filled (0 model -> 1 model)
+ * @param outputName
+ */
+void AgentsMappingController::_onOutputModelsFilled(QString outputName)
+{
+    AgentInMappingVM* agentInMapping = qobject_cast<AgentInMappingVM*>(sender());
+    if (agentInMapping != NULL)
+    {
+        qDebug() << "_on Output Models Filled" << agentInMapping->name() << "." << outputName;
+        // TODO ESTIA
+    }
+}
+
+
+/**
+ * @brief Slot when the list of models of an input view model is cleared (1 model -> 0 model)
+ * @param inputName
+ */
+void AgentsMappingController::_onInputModelsCleared(QString inputName)
+{
+    AgentInMappingVM* agentInMapping = qobject_cast<AgentInMappingVM*>(sender());
+    if (agentInMapping != NULL)
+    {
+        qDebug() << "_on Input Models Cleared" << agentInMapping->name() << "." << inputName;
+        // TODO ESTIA
+    }
+}
+
+
+/**
+ * @brief Slot when the list of models of an output view model is cleared (1 model -> 0 model)
+ * @param outputName
+ */
+void AgentsMappingController::_onOutputModelsCleared(QString outputName)
+{
+    AgentInMappingVM* agentInMapping = qobject_cast<AgentInMappingVM*>(sender());
+    if (agentInMapping != NULL)
+    {
+        qDebug() << "_on Output Models Cleared" << agentInMapping->name() << "." << outputName;
+        // TODO ESTIA
+    }
+}
 
 
 /**
@@ -672,6 +763,32 @@ void AgentsMappingController::_deleteAllMappingMadeOnTargetAgent(AgentInMappingV
 {
     if(agentInMapping != NULL)
     {
+        // Check among the list of all partial map
+        if(!_allPartialMapInMapping.isEmpty())
+        {
+            foreach (MapBetweenIOPVM* partialMapBetweenIOP, _allPartialMapInMapping.toList())
+            {
+                if(partialMapBetweenIOP != NULL)
+                {
+                    if(partialMapBetweenIOP->agentTo()->name() == agentInMapping->name())
+                    {
+                        // Update the list of mapbetween store under the 'agentFrom' key of the hash table.
+                        QList<MapBetweenIOPVM*> listOfMapUnderKey;
+                        if(_mapFromAgentNameToPartialMapBetweenIOPViewModelsList.contains(partialMapBetweenIOP->agentFrom()->name()))
+                        {
+                            listOfMapUnderKey = _mapFromAgentNameToPartialMapBetweenIOPViewModelsList.value((partialMapBetweenIOP->agentFrom()->name()));
+                        }
+                        listOfMapUnderKey.removeOne(partialMapBetweenIOP);
+                        _mapFromAgentNameToPartialMapBetweenIOPViewModelsList.insert(partialMapBetweenIOP->agentFrom()->name(), listOfMapUnderKey);
+
+                        // If involved as agentTo
+                        _allPartialMapInMapping.remove(partialMapBetweenIOP);
+                        delete(partialMapBetweenIOP);
+                    }
+                }
+            }
+        }
+
          // Check among the list of all map
          if(!_allMapInMapping.isEmpty())
          {
@@ -697,10 +814,7 @@ void AgentsMappingController::_deleteAllMappingMadeOnTargetAgent(AgentInMappingV
                          mapBetweenIOP->setpointFrom(ghostOutput);
 
                          qInfo() << "Turn a MapBetweenIOPVM into a the partial MapBetweenIOPVM : " << mapBetweenIOP->agentTo()->name() << "." << mapBetweenIOP->pointTo()->name() << " -> " << ghostAgent->name() << "." << ghostOutput->name();
-                         //Add to Hash and to temp partial maps list
-                         _mapFromAgentNameToPartialMapBetweenIOPViewModelsList.insertMulti(ghostOutput->name(), mapBetweenIOP);
                          newListOfPartialMap.append(mapBetweenIOP);
-
                      }
                      else if(mapBetweenIOP->agentTo()->name() == agentInMapping->name())
                      {
@@ -711,23 +825,18 @@ void AgentsMappingController::_deleteAllMappingMadeOnTargetAgent(AgentInMappingV
                      }
                  }
              }
+             if(!newListOfPartialMap.isEmpty()){
+                 // Push partialMaps into internal list
+                 _allPartialMapInMapping.append(newListOfPartialMap);
 
-             // Push partialMaps into internal list
-             _allPartialMapInMapping.append(newListOfPartialMap);
-         }
-
-         // Check among the list of all partial map
-         if(!_allPartialMapInMapping.isEmpty())
-         {
-             foreach (MapBetweenIOPVM* partialMapBetweenIOP, _allPartialMapInMapping.toList()) {
-                 if(partialMapBetweenIOP != NULL){
-                     if(partialMapBetweenIOP->agentTo()->name() == agentInMapping->name())
-                     {
-                         // If involved as agentTo
-                         _allMapInMapping.remove(partialMapBetweenIOP);
-                         delete(partialMapBetweenIOP);
-                     }
+                 //Add to Hash and to temp partial maps list
+                 QList<MapBetweenIOPVM*> listOfMapUnderKey;
+                 if(_mapFromAgentNameToPartialMapBetweenIOPViewModelsList.contains(agentInMapping->name()))
+                 {
+                     listOfMapUnderKey = _mapFromAgentNameToPartialMapBetweenIOPViewModelsList.value((agentInMapping->name()));
                  }
+                 listOfMapUnderKey.append(newListOfPartialMap);
+                 _mapFromAgentNameToPartialMapBetweenIOPViewModelsList.insert(agentInMapping->name(), listOfMapUnderKey);
              }
          }
     }

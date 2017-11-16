@@ -61,6 +61,8 @@ I2CubicBezierCurve {
     // NB: Clip MUST be true to clip our mousearea
     clip: true
 
+    // allowing to increase mouse area
+    hitTestAreaMargin : 3
 
     // if the agentTo and agentFrom are reduced : global type of its inputs
     stroke: if (mapBetweenIOPVM && mapBetweenIOPVM.agentTo && mapBetweenIOPVM.agentTo.isReduced && mapBetweenIOPVM.agentFrom && mapBetweenIOPVM.agentFrom.isReduced

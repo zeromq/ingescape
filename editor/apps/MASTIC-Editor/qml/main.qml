@@ -106,24 +106,74 @@ ApplicationWindow {
                     console.log("Créer un nouveau mapping");
                 }
             }
+
             MenuItem {
                 text: qsTr("Importer un mapping")
                 onTriggered: {
                     console.log("Importer un mapping");
                 }
             }
+
             MenuItem {
                 text: qsTr("Exporter le mapping")
                 onTriggered: {
                     console.log("Exporter le mapping");
                 }
             }
+
             MenuItem {
                 text: qsTr("Exécuter le mapping")
                 onTriggered: {
                     console.log("Exécuter le mapping");
                 }
-            }   
+            }
+
+            MenuSeparator {
+            }
+
+            MenuItem {
+                text: qsTr("Zoom In")
+
+                onTriggered: {
+                    if (MasticEditorC.agentsMappingC)
+                    {
+                        MasticEditorC.agentsMappingC.zoomIn();
+                    }
+                }
+            }
+
+            MenuItem {
+                text: qsTr("Zoom Out")
+
+                onTriggered: {
+                    if (MasticEditorC.agentsMappingC)
+                    {
+                        MasticEditorC.agentsMappingC.zoomOut();
+                    }
+                }
+            }
+
+            MenuItem {
+                text: qsTr("Fit all in view")
+
+                onTriggered: {
+                    if (MasticEditorC.agentsMappingC)
+                    {
+                        MasticEditorC.agentsMappingC.fitToView();
+                    }
+                }
+            }
+
+            MenuItem {
+                text: qsTr("100%")
+
+                onTriggered: {
+                    if (MasticEditorC.agentsMappingC)
+                    {
+                        MasticEditorC.agentsMappingC.resetZoom();
+                    }
+                }
+            }
         }
 
         Menu {
