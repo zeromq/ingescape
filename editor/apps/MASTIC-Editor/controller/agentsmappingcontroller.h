@@ -86,6 +86,30 @@ public:
 Q_SIGNALS:
 
     /**
+     * @brief Emitted to zoom-in our view
+     */
+    void zoomIn();
+
+
+    /**
+     * @brief Emitted to zoom-out our view
+     */
+    void zoomOut();
+
+
+    /**
+     * @brief Emitted to reset zoom (100%)
+     */
+    void resetZoom();
+
+
+    /**
+     * @brief Emitted to fit all nodes in our view
+     */
+    void fitToView();
+
+
+    /**
      * @brief Emitted when a new "Agent in Mapping" is added
      * @param agentName
      */

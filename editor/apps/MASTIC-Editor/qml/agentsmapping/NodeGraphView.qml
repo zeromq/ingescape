@@ -55,8 +55,8 @@ Item {
     readonly property int backgroundCellNumberOfSubDivisions: 5
 
 
-    // Mouse wheel scale factor
-    readonly property real mouseWheelScaleFactor: 1.1
+    // Zoom-in delta scale factor
+    readonly property real zoomInDeltaScaleFactor: 1.2
 
 
 
@@ -103,12 +103,12 @@ Item {
 
             // Check if our child must be filtered
             if (
-                    // We don't need repeaters because they don't have a valid geometry (they create items and add them to their parent)
-                    !_qmlItemIsA(child, "Repeater")
-                    &&
-                    //TEMP FIXME: remove links because AgentNodeView creates links attached to (0,0)
-                    !_qmlItemIsA(child, "Link")
-                    )
+                // We don't need repeaters because they don't have a valid geometry (they create items and add them to their parent)
+                !_qmlItemIsA(child, "Repeater")
+                &&
+                //TEMP FIXME: remove invisible links because AgentNodeView creates links attached to (0,0)
+                !_qmlItemIsA(child, "Link")
+                )
             {
                 x0 = Math.min(x0, child.x);
                 y0 = Math.min(y0, child.y);
@@ -131,6 +131,49 @@ Item {
         }
     }
 
+
+
+    // Set our zoom level
+    function setZoomLevel(zoom)
+    {
+        if (zoom > 0)
+        {
+            // Check bounds of zoom
+            zoom = Math.min(rootItem.maximumScale, Math.max(rootItem.minimumScale, zoom));
+
+            // Get position of our center in workspace
+            var viewCenterInWorkspace = rootItem.mapToItem(workspace, rootItem.width/2, rootItem.height/2);
+
+            var targetX = rootItem.width/2 - viewCenterInWorkspace.x * zoom;
+            var targetY = rootItem.height/2 - viewCenterInWorkspace.y * zoom;
+
+            workspaceXAnimation.to = targetX;
+            workspaceYAnimation.to = targetY;
+            workspaceScaleAnimation.to = zoom;
+
+            workspaceXAnimation.restart();
+            workspaceYAnimation.restart();
+            workspaceScaleAnimation.restart();
+        }
+        else
+        {
+            console.log("setZoomLevel: invalid zoom factor "+zoom)
+        }
+    }
+
+
+    // Zoom-in
+    function zoomIn()
+    {
+        setZoomLevel(workspace.scale * rootItem.zoomInDeltaScaleFactor);
+    }
+
+
+    // Zoom-out
+    function zoomOut()
+    {
+        setZoomLevel(workspace.scale / rootItem.zoomInDeltaScaleFactor);
+    }
 
 
     // Scroll our workspace to a given position (top-left corner)
@@ -198,6 +241,37 @@ Item {
         }
 
         return result;
+    }
+
+
+
+
+    //--------------------------------
+    //
+    // Behavior
+    //
+    //--------------------------------
+
+    Connections {
+        target: controller
+
+        ignoreUnknownSignals: true
+
+        onZoomIn: {
+            rootItem.zoomIn();
+        }
+
+        onZoomOut: {
+            rootItem.zoomOut();
+        }
+
+        onFitToView: {
+            rootItem.showAll();
+        }
+
+        onResetZoom: {
+            rootItem.setZoomLevel(1);
+        }
     }
 
 
@@ -425,9 +499,8 @@ Item {
                             // Zoom-out
                             //
 
-
                             // Update scale of our workspace
-                            workspace.scale = Math.max(rootItem.minimumScale, workspace.scale * Math.pow(1/rootItem.mouseWheelScaleFactor, Math.abs(wheel.angleDelta.y)/120) );
+                            workspace.scale = Math.max(rootItem.minimumScale, workspace.scale * Math.pow(1/rootItem.zoomInDeltaScaleFactor, Math.abs(wheel.angleDelta.y)/120) );
 
                             // Center our workspace
                             workspace.x = wheel.x - mousePositionInWorkspace.x * workspace.scale;
@@ -440,7 +513,7 @@ Item {
                             //
 
                             // Update scale of our workspace
-                            workspace.scale = Math.min(rootItem.maximumScale, workspace.scale * Math.pow(rootItem.mouseWheelScaleFactor, Math.abs(wheel.angleDelta.y)/120) );
+                            workspace.scale = Math.min(rootItem.maximumScale, workspace.scale * Math.pow(rootItem.zoomInDeltaScaleFactor, Math.abs(wheel.angleDelta.y)/120) );
 
                             // Center our workspace
                             workspace.x = wheel.x - mousePositionInWorkspace.x * workspace.scale;
