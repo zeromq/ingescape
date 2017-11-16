@@ -154,7 +154,7 @@ void AgentVM::changeState()
         {
             // Check if the model has a hostname
             if ((model != NULL) && !model->hostname().isEmpty()) {
-                Q_EMIT commandAskedToLauncher("RUN", model->hostname(), model->executionPath());
+                Q_EMIT commandAskedToLauncher("RUN", model->hostname(), model->commandLine());
             }
         }
     }

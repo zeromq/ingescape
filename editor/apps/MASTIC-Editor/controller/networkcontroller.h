@@ -98,10 +98,10 @@ Q_SIGNALS:
      * @param peerAddress
      * @param pid
      * @param hostname
-     * @param executionPath
+     * @param commandLine
      * @param canBeFrozen
      */
-    void agentEntered(QString peerId, QString peerName, QString peerAddress, int pid, QString hostname, QString executionPath, bool canBeFrozen);
+    void agentEntered(QString peerId, QString peerName, QString peerAddress, int pid, QString hostname, QString commandLine, bool canBeFrozen);
 
 
     /**
@@ -168,9 +168,9 @@ public Q_SLOTS:
      * @brief Slot when a command must be sent on the network to a launcher
      * @param command
      * @param hostname
-     * @param executionPath
+     * @param commandLine
      */
-    void onCommandAskedToLauncher(QString command, QString hostname, QString executionPath);
+    void onCommandAskedToLauncher(QString command, QString hostname, QString commandLine);
 
 
     /**

@@ -146,10 +146,10 @@ void MasticModelManager::exportAgentsListToSelectedFile(QList<QPair<QString, Def
  * @param agentAddress
  * @param pid
  * @param hostname
- * @param executionPath
+ * @param commandLine
  * @param canBeFrozen
  */
-void MasticModelManager::onAgentEntered(QString peerId, QString agentName, QString agentAddress, int pid, QString hostname, QString executionPath, bool canBeFrozen)
+void MasticModelManager::onAgentEntered(QString peerId, QString agentName, QString agentAddress, int pid, QString hostname, QString commandLine, bool canBeFrozen)
 {
     if (!peerId.isEmpty() && !agentName.isEmpty() && !agentAddress.isEmpty())
     {
@@ -170,7 +170,7 @@ void MasticModelManager::onAgentEntered(QString peerId, QString agentName, QStri
             agent = new AgentM(agentName, peerId, agentAddress, this);
 
             agent->sethostname(hostname);
-            agent->setexecutionPath(executionPath);
+            agent->setcommandLine(commandLine);
             agent->setpid(pid);
             agent->setcanBeFrozen(canBeFrozen);
 

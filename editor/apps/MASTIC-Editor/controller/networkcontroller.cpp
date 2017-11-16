@@ -74,7 +74,7 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
             bool isIntPID = false;
             int pid = -1;
             bool canBeFrozen = false;
-            QString executionPath = "";
+            QString commandLine = "";
             QString hostname = "";
 
             zlist_t *keys = zhash_keys(headers);
@@ -107,8 +107,8 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
                             canBeFrozen = true;
                         }
                     }
-                    else if (key == "execpath") {
-                        executionPath = value;
+                    else if (key == "commandline") {
+                        commandLine = value;
                     }
                     else if (key == "hostname") {
                         hostname = value;
@@ -120,10 +120,10 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
             zlist_destroy(&keys);
 
             if (isMasticPublisher && isIntPID) {
-                qDebug() << "our zyre event is about MASTIC publisher:" << pid << hostname << executionPath;
+                qDebug() << "our zyre event is about MASTIC publisher:" << pid << hostname << commandLine;
 
                 // Emit the signal "Agent Entered"
-                Q_EMIT networkController->agentEntered(peerId, peerName, peerAddress, pid, hostname, executionPath, canBeFrozen);
+                Q_EMIT networkController->agentEntered(peerId, peerName, peerAddress, pid, hostname, commandLine, canBeFrozen);
             }
         }
         // JOIN (group)
@@ -576,22 +576,22 @@ void NetworkController::manageMessageFrozenUnfrozen(QString peerId, QString mess
  * @brief Slot when a command must be sent on the network to a launcher
  * @param command
  * @param hostname
- * @param executionPath
+ * @param commandLine
  */
-void NetworkController::onCommandAskedToLauncher(QString command, QString hostname, QString executionPath)
+void NetworkController::onCommandAskedToLauncher(QString command, QString hostname, QString commandLine)
 {
     //Q_UNUSED(command)
 
-    if (!hostname.isEmpty() && !executionPath.isEmpty())
+    if (!hostname.isEmpty() && !commandLine.isEmpty())
     {
         if (_mapFromHostnameToMasticLauncherPeerId.contains(hostname)) {
             QString peerId = _mapFromHostnameToMasticLauncherPeerId.value(hostname);
 
             if (!peerId.isEmpty()) {
-                // Send the command with execution path to the peer id of the launcher
-                int success = zyre_whispers(agentElements->node, peerId.toStdString().c_str(), "%s %s", command.toStdString().c_str(), executionPath.toStdString().c_str());
+                // Send the command with command line to the peer id of the launcher
+                int success = zyre_whispers(agentElements->node, peerId.toStdString().c_str(), "%s %s", command.toStdString().c_str(), commandLine.toStdString().c_str());
 
-                qInfo() << "Send command" << command << "to launcher on" << hostname << "with execution path" << executionPath << "with success ?" << success;
+                qInfo() << "Send command" << command << "to launcher on" << hostname << "with command line" << commandLine << "with success ?" << success;
             }
         }
         else {
