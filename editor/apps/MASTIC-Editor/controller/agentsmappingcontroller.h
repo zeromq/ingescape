@@ -313,7 +313,7 @@ private:
     QHash<QString, AgentInMappingVM *> _mapFromNameToAgentInMappingViewModelsList;
 
     // Map from agentInMapping  name to a list of MapBetweenIOPVM where the agent is involved as agentFrom.
-    QHash<QString, MapBetweenIOPVM*> _mapFromAgentNameToPartialMapBetweenIOPViewModelsList;
+    QHash<QString, QList<MapBetweenIOPVM*>> _mapFromAgentNameToPartialMapBetweenIOPViewModelsList;
 
     // Previous list of agents in mapping
     QList<AgentInMappingVM*> _previousListOfAgentsInMapping;
