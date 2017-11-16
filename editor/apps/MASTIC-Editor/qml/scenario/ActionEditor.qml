@@ -218,25 +218,59 @@ I2PopupBase {
                     right : parent.right
                     top : nameItem.bottom
                     topMargin: 14
-                    bottom : advModesItem.top
-                    bottomMargin: 10
+                }
+                height  : isOpened ? 230 : 37
+
+                Behavior on height {
+                    NumberAnimation {}
                 }
 
+                property bool isOpened : false
+
                 //Title
-                Text {
-                    id : titleCdt
+                MouseArea {
+                    id : titleMouseArea
                     anchors {
                         left : parent.left
                         right : parent.right
                     }
+                    height : 29
 
-                    text : "Conditions"
-
-                    color: MasticTheme.whiteColor
-                    font {
-                        family: MasticTheme.textFontFamily
-                        pixelSize: 19
+                    onClicked: {
+                        conditionsItem.isOpened = !conditionsItem.isOpened;
                     }
+
+                    I2SvgItem {
+                        id : arrow
+                        anchors {
+                            left : parent.left
+                            verticalCenter: titleCdt.verticalCenter
+                        }
+
+                        svgFileCache : MasticTheme.svgFileMASTIC;
+                        svgElementId: "arrowWhite"
+
+                        rotation: conditionsItem.isOpened? 0 : 180
+                    }
+
+                    Text {
+                        id : titleCdt
+                        anchors {
+                            left : arrow.right
+                            leftMargin: 6
+                            right : parent.right
+                            verticalCenter: parent.verticalCenter
+                        }
+
+                        text : "Conditions"
+
+                        color: titleMouseArea.containsPress? MasticTheme.lightGreyColor : MasticTheme.whiteColor
+                        font {
+                            family: MasticTheme.textFontFamily
+                            pixelSize: 19
+                        }
+                    }
+
                 }
 
                 // separator
@@ -245,8 +279,7 @@ I2PopupBase {
                     anchors {
                         left : parent.left
                         right : parent.right
-                        top : titleCdt.bottom
-                        topMargin: 5
+                        top : titleMouseArea.bottom
                     }
                     height : 1
                     color : MasticTheme.whiteColor
@@ -264,6 +297,8 @@ I2PopupBase {
 
                     height: validityDurationCombo.height
 
+                    visible : conditionsItem.isOpened
+                    enabled : visible
 
                     Text {
                         id : textValidity
@@ -415,6 +450,9 @@ I2PopupBase {
                         left : parent.left
                         bottom : parent.bottom
                     }
+
+                    visible : conditionsItem.isOpened
+                    enabled : visible
 
                     style: MasticScrollViewStyle {
                     }
@@ -814,25 +852,63 @@ I2PopupBase {
                 anchors {
                     left : parent.left
                     right : parent.right
-                    top : conditionsItem.top
-                    topMargin: 240
+                    top : conditionsItem.bottom
+                    topMargin: 10
                 }
-                height : childrenRect.height
+
+                clip : true
+                height : isOpened?
+                             (titleadvModeMouseArea.height + revertActionitem.height + revertActionitem.anchors.topMargin + rearmActionitem.height + rearmActionitem.anchors.topMargin)
+                           : 35
+
+                Behavior on height {
+                    NumberAnimation {}
+                }
+
+                property bool isOpened: false
 
                 //Title
-                Text {
-                    id : titleAdvMode
+                MouseArea {
+                    id : titleadvModeMouseArea
                     anchors {
                         left : parent.left
                         right : parent.right
                     }
+                    height : 29
 
-                    text : "Advanced modes"
+                    onClicked: {
+                        advModesItem.isOpened = !advModesItem.isOpened;
+                    }
 
-                    color: MasticTheme.whiteColor
-                    font {
-                        family: MasticTheme.textFontFamily
-                        pixelSize: 19
+                    I2SvgItem {
+                        id : arrowadvModes
+                        anchors {
+                            left : parent.left
+                            verticalCenter: titleAdvMode.verticalCenter
+                        }
+
+                        svgFileCache : MasticTheme.svgFileMASTIC;
+                        svgElementId: "arrowWhite"
+
+                        rotation: advModesItem.isOpened? 0 : 180
+                    }
+
+                    Text {
+                        id : titleAdvMode
+                        anchors {
+                            left : arrowadvModes.right
+                            leftMargin: 6
+                            right : parent.right
+                            verticalCenter: parent.verticalCenter
+                        }
+
+                        text : "Advanced modes"
+
+                        color: titleadvModeMouseArea.containsPress? MasticTheme.lightGreyColor : MasticTheme.whiteColor
+                        font {
+                            family: MasticTheme.textFontFamily
+                            pixelSize: 19
+                        }
                     }
                 }
 
@@ -842,8 +918,7 @@ I2PopupBase {
                     anchors {
                         left : parent.left
                         right : parent.right
-                        top : titleAdvMode.bottom
-                        topMargin: 5
+                        top : titleadvModeMouseArea.bottom
                     }
                     height : 1
                     color : MasticTheme.whiteColor
@@ -858,7 +933,13 @@ I2PopupBase {
                         top : separatorAdvMode.bottom
                         topMargin: 8
                     }
-                    height : childrenRect.height
+                    height : revertActionCB.checked ? revertActionTime.height : revertActionCB.height
+                    visible : advModesItem.isOpened
+                    enabled : visible
+
+                    Behavior on height {
+                        NumberAnimation {}
+                    }
 
                     CheckBox {
                         id : revertActionCB
@@ -930,9 +1011,12 @@ I2PopupBase {
                             right : parent.right
                             top: revertActionCB.top
                         }
+
+                        height : childrenRect.height
                         spacing: 6
 
                         enabled: revertActionCB.checked
+                        visible : enabled
 
                         ExclusiveGroup {
                             id : revertActionOpt
@@ -1171,7 +1255,8 @@ I2PopupBase {
                         topMargin: 17
                     }
                     height : childrenRect.height
-
+                    visible : advModesItem.isOpened
+                    enabled : visible
 
                     CheckBox {
                         id : rearmActionCB
@@ -1248,6 +1333,10 @@ I2PopupBase {
                     topMargin: 20
                     bottom : cancelButton.top
                     bottomMargin: 10
+                }
+
+                Behavior on anchors.top {
+                    NumberAnimation {}
                 }
 
                 //Title

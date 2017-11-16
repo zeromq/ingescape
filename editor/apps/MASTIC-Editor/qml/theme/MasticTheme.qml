@@ -71,6 +71,7 @@ Item {
     readonly property color blackColor: "#17191E"
 
     readonly property color redColor: "#E30513"
+    readonly property color middleDarkRedColor:"#851618"
     readonly property color darkRedColor:"#7A110E"
 
     readonly property color veryDarkGreyColor: "#282D34"

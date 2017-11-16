@@ -240,12 +240,15 @@ Item {
                         }
 
                         text : definitionName.elidedText
-                        color: (model.definition && model.definition.isVariant)?
-                                   (definitionNameBtn.pressed? MasticTheme.darkRedColor : MasticTheme.redColor)
-                                 : ((root.agent && root.agent.isON === true)?
-                                       (definitionNameBtn.pressed? MasticTheme.agentsListPressedLabel2Color : MasticTheme.agentsListLabel2Color)
-                                       : (definitionNameBtn.pressed? MasticTheme.agentOFFPressedLabel2Color : MasticTheme.agentOFFLabel2Color))
-
+                        color: if (root.agent && root.agent.isON === true) {
+                                   ((model.definition && model.definition.isVariant)?
+                                          definitionNameBtn.pressed? MasticTheme.middleDarkRedColor : MasticTheme.redColor
+                                    : definitionNameBtn.pressed? MasticTheme.agentsListPressedLabel2Color : MasticTheme.agentsListLabel2Color)
+                               } else {
+                                   ((model.definition && model.definition.isVariant)?
+                                          definitionNameBtn.pressed? MasticTheme.darkRedColor : MasticTheme.middleDarkRedColor
+                                    : definitionNameBtn.pressed? MasticTheme.agentOFFPressedLabel2Color : MasticTheme.agentOFFLabel2Color)
+                               }
                         font: MasticTheme.heading2Font
                     }
 
