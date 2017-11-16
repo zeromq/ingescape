@@ -91,8 +91,12 @@ void AgentsMappingController::removeAgentFromMapping(AgentInMappingVM* agent)
  */
 void AgentsMappingController::deleteLinkBetweenTwoAgents(MapBetweenIOPVM* link)
 {
-    if ((link != NULL) && (link->agentFrom() != NULL) && (link->agentTo() != NULL)) {
+    if ((link != NULL) && (link->agentFrom() != NULL) && (link->agentTo() != NULL) && (link->pointFrom() != NULL) && (link->pointTo() != NULL))
+    {
         qInfo() << "Delete Link Between agents" << link->agentFrom()->name() << "and" << link->agentTo()->name();
+
+        // Emit signal "Command asked to agent about Mapping Input"
+        Q_EMIT commandAskedToAgentAboutMappingInput(link->agentTo()->getPeerIdsList(), "UNMAP", link->pointTo()->name(), link->agentFrom()->name(), link->pointFrom()->name());
 
         if (_selectedMapBetweenIOP == link) {
             setselectedMapBetweenIOP(NULL);
