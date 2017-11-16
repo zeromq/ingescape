@@ -224,6 +224,8 @@ void ActionM::setshallRevert(bool shallRevert)
             setshallRevertAfterTime(false);
             setshallRevertWhenValidityIsOver(false);
             setrevertAfterTimeString("0.0");
+        } else {
+            setshallRevertWhenValidityIsOver(true);
         }
 
         emit shallRevertChanged(shallRevert);
