@@ -60,7 +60,7 @@ Rectangle {
     width : 258
 
     height : (rootItem.agentMappingVM && !rootItem.isReduced)
-              ? (54 + 20 * Math.max(rootItem.agentMappingVM.inputsList.count , rootItem.agentMappingVM.outputsList.count))
+              ? (54 + 22 * Math.max(rootItem.agentMappingVM.inputsList.count , rootItem.agentMappingVM.outputsList.count))
               : 42
 
 
@@ -238,7 +238,7 @@ Rectangle {
 
                         property var myModel: model.QtObject
 
-                        height: 20
+                        height: 22
                         anchors {
                             left: parent.left
                             right: parent.right
@@ -283,7 +283,7 @@ Rectangle {
                                 color: draggablePointFROM.dragActive ? linkPoint.color : "transparent"
                             }
 
-                            color: draggablePointFROM.dragActive ? MasticTheme.agentsMappingBackgroundColor : "transparent"
+                            color: draggablePointFROM.dragActive ? MasticTheme.blackColor : "transparent"
 
                             parent: draggablePointFROM.dragActive ? rootItem.parent  : linkPoint
 
@@ -325,7 +325,7 @@ Rectangle {
                                 visible: draggablePointFROM.dragActive
 
                                 secondPoint: Qt.point(myModel.position.x, myModel.position.y)
-                                firstPoint: Qt.point(draggablePointFROM.x + draggablePointFROM.width/2, draggablePointFROM.y + draggablePointFROM.height/2)
+                                firstPoint: Qt.point(draggablePointFROM.x + draggablePointFROM.width , draggablePointFROM.y + draggablePointFROM.height/2)
 
                                 defaultColor:linkPoint.color
                             }
@@ -340,13 +340,13 @@ Rectangle {
                                 verticalCenter: parent.verticalCenter
                             }
 
-                            height: 13
+                            height: 15
                             width: height
                             radius: height/2
 
                             border {
                                 width : 0
-                                color : MasticTheme.lightGreyColor
+                                color : MasticTheme.whiteColor
                             }
 
                             color : if (agentMappingVM && myModel && myModel.firstModel) {
@@ -402,6 +402,7 @@ Rectangle {
                                     {
                                         dragItem.color = dragItem.border.color;
                                         linkPoint.border.width = 2
+                                        linkPoint.scale = 1.2
                                     }
                                     else
                                     {
@@ -425,6 +426,7 @@ Rectangle {
                                 {
                                     dragItem.color = "transparent";
                                     linkPoint.border.width = 0
+                                    linkPoint.scale = 1
                                 }
                             }
 
@@ -437,6 +439,7 @@ Rectangle {
                                     {
                                         dragItem.color = "transparent";
                                         linkPoint.border.width = 0
+                                        linkPoint.scale = 1
 
                                         console.log("inputDropArea: create a link from " + dragItem.outputSlotModel + " to " + inputSlotItem.myModel);
                                         controller.addMapBetweenAgents(dragItem.agentInMappingVMOfOutput, dragItem.outputSlotModel, rootItem.agentMappingVM, inputSlotItem.myModel);
@@ -499,7 +502,7 @@ Rectangle {
 
                         property var myModel: model.QtObject
 
-                        height: 20
+                        height: 22
                         anchors {
                             left: parent.left
                             right: parent.right
@@ -590,7 +593,7 @@ Rectangle {
                                 visible: draggablePointTO.dragActive
 
                                 firstPoint: Qt.point(myModel.position.x, myModel.position.y)
-                                secondPoint: Qt.point(draggablePointTO.x + draggablePointTO.width/2, draggablePointTO.y + draggablePointTO.height/2)
+                                secondPoint: Qt.point(draggablePointTO.x , draggablePointTO.y + draggablePointTO.height/2)
 
                                 defaultColor:linkPointOut.color
                             }
@@ -606,13 +609,13 @@ Rectangle {
                                 verticalCenter: parent.verticalCenter
                             }
 
-                            height: 13
+                            height: 15
                             width: height
                             radius: height/2
 
                             border {
                                 width : 0
-                                color : MasticTheme.lightGreyColor
+                                color : MasticTheme.whiteColor
                             }
 
                             color: if (agentMappingVM && myModel && myModel.firstModel) {
@@ -680,7 +683,7 @@ Rectangle {
                                     {
                                         dragItem.color = dragItem.border.color;
                                         linkPointOut.border.width = 2
-
+                                        linkPointOut.scale = 1.2
                                     }
                                     else
                                     {
@@ -700,6 +703,7 @@ Rectangle {
                                 {
                                     dragItem.color = "transparent";
                                     linkPointOut.border.width = 0
+                                    linkPointOut.scale = 1
                                 }
                             }
 
@@ -711,6 +715,7 @@ Rectangle {
                                     {
                                         dragItem.color = "transparent";
                                         linkPointOut.border.width = 0
+                                        linkPointOut.scale = 1
 
                                         console.log("outputDropArea: create a link from " + outputSlotItem.myModel + " to " + dragItem.inputSlotModel);
                                         controller.addMapBetweenAgents(rootItem.agentMappingVM, outputSlotItem.myModel, dragItem.agentInMappingVMOfInput, dragItem.inputSlotModel);
