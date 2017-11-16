@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		970670DF1EDC187900CCDFDC /* mastic_private.h in Headers */ = {isa = PBXBuildFile; fileRef = 97C926AB1EB23ED100D2B0CE /* mastic_private.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		970670DF1EDC187900CCDFDC /* mastic_private.h in Headers */ = {isa = PBXBuildFile; fileRef = 97C926AB1EB23ED100D2B0CE /* mastic_private.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		9762EDDA1EAE547B002062A1 /* definition.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A79851EA7B112003153EF /* definition.c */; };
 		9762EDDB1EAE547B002062A1 /* mapping.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A79981EA7B112003153EF /* mapping.c */; };
 		9762EDDC1EAE547B002062A1 /* model.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A79991EA7B112003153EF /* model.c */; };
