@@ -55,6 +55,10 @@ Item {
     readonly property int backgroundCellNumberOfSubDivisions: 5
 
 
+    // Mouse wheel scale factor
+    readonly property real mouseWheelScaleFactor: 1.1
+
+
 
     //--------------------------------
     //
@@ -348,6 +352,10 @@ Item {
         // Workspace interaction: pan & zoom
         //
         //-----------------------------------------------
+
+        //
+        // PinchArea to capture pinch gesture (zoom-in, zoom-out)
+        //
         PinchArea {
             anchors.fill: parent
 
@@ -360,12 +368,10 @@ Item {
 
 
             //
-            // MouseArea used to drag-n-drop our workspace AND handle mouse wheel events and scroll gesture events (trackpad)
+            // MouseArea to capture scroll gesture events (trackpad)
             //
             MouseArea {
                 anchors.fill: parent
-
-                drag.target: workspace
 
                 scrollGestureEnabled: true
 
@@ -376,36 +382,75 @@ Item {
                 onWheel: {
                     wheel.accepted = true;
 
-                    // Check if we have a real wheel event
                     if ((wheel.pixelDelta.x !== 0) || (wheel.pixelDelta.y !== 0))
                     {
                         //
-                        // Trackpad event
+                        // Trackpad flick gesture => scroll our workspace
                         //
 
                         workspace.x += wheel.pixelDelta.x;
                         workspace.y += wheel.pixelDelta.y;
                     }
-                    else
-                    {
-                        //
-                        // Physical mouse wheel event
-                        //
+                }
 
-                        //TODO: zoom at (x, y)
-                        if (wheel.angleDelta.y > 0)
+
+
+                //
+                // MouseArea used to drag-n-drop our workspace AND handle real mouse wheel events (zoom-in, zoom-out)
+                //
+                MouseArea {
+                    id: mouseAreaWorkspaceDragNDropAndWheelZoom
+
+                    anchors.fill: parent
+
+                    drag.target: workspace
+
+                    // 2-finger-flick gesture should pass through to our parent MouseArea
+                    scrollGestureEnabled: false
+
+                    onPressed: {
+                        rootItem.forceActiveFocus();
+                    }
+
+                    onWheel: {
+                        wheel.accepted = true;
+
+                        // Compute mouse position in our workspace
+                        var mousePositionInWorkspace = mouseAreaWorkspaceDragNDropAndWheelZoom.mapToItem(workspace, wheel.x, wheel.y);
+
+                        // Check if we must zoom-in or zoom-out
+                        if (wheel.angleDelta.y < 0)
                         {
-                            workspace.scale = Math.max(rootItem.minimumScale, workspace.scale/1.2);
+                            //
+                            // Zoom-out
+                            //
+
+
+                            // Update scale of our workspace
+                            workspace.scale = Math.max(rootItem.minimumScale, workspace.scale * Math.pow(1/rootItem.mouseWheelScaleFactor, Math.abs(wheel.angleDelta.y)/120) );
+
+                            // Center our workspace
+                            workspace.x = wheel.x - mousePositionInWorkspace.x * workspace.scale;
+                            workspace.y = wheel.y - mousePositionInWorkspace.y * workspace.scale;
                         }
-                        else if (wheel.angleDelta.y < 0)
+                        else if (wheel.angleDelta.y > 0)
                         {
-                            workspace.scale = Math.min(rootItem.maximumScale, workspace.scale * 1.2);
+                            //
+                            // Zoom-in
+                            //
+
+                            // Update scale of our workspace
+                            workspace.scale = Math.min(rootItem.maximumScale, workspace.scale * Math.pow(rootItem.mouseWheelScaleFactor, Math.abs(wheel.angleDelta.y)/120) );
+
+                            // Center our workspace
+                            workspace.x = wheel.x - mousePositionInWorkspace.x * workspace.scale;
+                            workspace.y = wheel.y - mousePositionInWorkspace.y * workspace.scale;
                         }
-                        // Else: wheel.angleDelta.y  == 0  => end of gesture
+                        // Else: wheel.angleDelta.y  == 0  => invalid wheel event
                     }
                 }
-            }
 
+            }
 
 
             //-----------------------------------------------
