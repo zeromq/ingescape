@@ -555,12 +555,15 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 if (isFrozen){
                     zyre_whispers(agentElements->node, peer, "FROZEN=1");
                 }
-                struct agent_iop *current_iop, *tmp_iop;
-                HASH_ITER(hh, mtic_internal_definition->outputs_table, current_iop, tmp_iop) {
-                    if (current_iop->is_muted && current_iop->name != NULL){
-                        zyre_whispers(agentElements->node, peer, "OUTPUT_MUTED %s", current_iop->name);
+                if (mtic_internal_definition != NULL){
+                    struct agent_iop *current_iop, *tmp_iop;
+                    HASH_ITER(hh, mtic_internal_definition->outputs_table, current_iop, tmp_iop) {
+                        if (current_iop->is_muted && current_iop->name != NULL){
+                            zyre_whispers(agentElements->node, peer, "OUTPUT_MUTED %s", current_iop->name);
+                        }
                     }
                 }
+                
                 
                 zyreAgent_t *zagent = NULL;
                 HASH_FIND_STR(zyreAgents, peer, zagent);
