@@ -532,8 +532,6 @@ void AgentsMappingController::_onAgentsInMappingChanged()
                 connect(agentInMapping, &AgentInMappingVM::inputsListAdded, this, &AgentsMappingController::_onInputsListAdded);
                 connect(agentInMapping, &AgentInMappingVM::outputsListAdded, this, &AgentsMappingController::_onOutputsListAdded);
                 //connect(agentInMapping, &AgentInMappingVM::outputsListRemoved, this, &AgentsMappingController::_onOutputsListRemoved);
-                connect(agentInMapping, &AgentInMappingVM::inputModelsFilled, this, &AgentsMappingController::_onInputModelsFilled);
-                connect(agentInMapping, &AgentInMappingVM::outputModelsFilled, this, &AgentsMappingController::_onOutputModelsFilled);
                 connect(agentInMapping, &AgentInMappingVM::inputModelsCleared, this, &AgentsMappingController::_onInputModelsCleared);
                 connect(agentInMapping, &AgentInMappingVM::outputModelsCleared, this, &AgentsMappingController::_onOutputModelsCleared);
 
@@ -563,8 +561,6 @@ void AgentsMappingController::_onAgentsInMappingChanged()
                 disconnect(agentInMapping, &AgentInMappingVM::inputsListAdded, this, &AgentsMappingController::_onInputsListAdded);
                 disconnect(agentInMapping, &AgentInMappingVM::outputsListAdded, this, &AgentsMappingController::_onOutputsListAdded);
                 //disconnect(agentInMapping, &AgentInMappingVM::outputsListRemoved, this, &AgentsMappingController::_onOutputsListRemoved);
-                disconnect(agentInMapping, &AgentInMappingVM::inputModelsFilled, this, &AgentsMappingController::_onInputModelsFilled);
-                disconnect(agentInMapping, &AgentInMappingVM::outputModelsFilled, this, &AgentsMappingController::_onOutputModelsFilled);
                 disconnect(agentInMapping, &AgentInMappingVM::inputModelsCleared, this, &AgentsMappingController::_onInputModelsCleared);
                 disconnect(agentInMapping, &AgentInMappingVM::outputModelsCleared, this, &AgentsMappingController::_onOutputModelsCleared);
 
@@ -623,47 +619,16 @@ void AgentsMappingController::_onOutputsListAdded(QList<OutputVM*> outputsListAd
     }
 }*/
 
-
-/**
- * @brief Slot when the list of models of an input view model is filled (0 model -> 1 model)
- * @param inputName
- */
-void AgentsMappingController::_onInputModelsFilled(QString inputName)
-{
-    AgentInMappingVM* agentInMapping = qobject_cast<AgentInMappingVM*>(sender());
-    if (agentInMapping != NULL)
-    {
-        qDebug() << "_on Input Models Filled" << agentInMapping->name() << "." << inputName;
-        // TODO ESTIA
-    }
-}
-
-
-/**
- * @brief Slot when the list of models of an output view model is filled (0 model -> 1 model)
- * @param outputName
- */
-void AgentsMappingController::_onOutputModelsFilled(QString outputName)
-{
-    AgentInMappingVM* agentInMapping = qobject_cast<AgentInMappingVM*>(sender());
-    if (agentInMapping != NULL)
-    {
-        qDebug() << "_on Output Models Filled" << agentInMapping->name() << "." << outputName;
-        // TODO ESTIA
-    }
-}
-
-
 /**
  * @brief Slot when the list of models of an input view model is cleared (1 model -> 0 model)
  * @param inputName
  */
-void AgentsMappingController::_onInputModelsCleared(QString inputName)
+void AgentsMappingController::_onInputModelsCleared(QList<InputVM*> inputVM)
 {
     AgentInMappingVM* agentInMapping = qobject_cast<AgentInMappingVM*>(sender());
     if (agentInMapping != NULL)
     {
-        qDebug() << "_on Input Models Cleared" << agentInMapping->name() << "." << inputName;
+        qDebug() << "_on Input Models Cleared" << agentInMapping->name();
         // TODO ESTIA
     }
 }
@@ -673,12 +638,12 @@ void AgentsMappingController::_onInputModelsCleared(QString inputName)
  * @brief Slot when the list of models of an output view model is cleared (1 model -> 0 model)
  * @param outputName
  */
-void AgentsMappingController::_onOutputModelsCleared(QString outputName)
+void AgentsMappingController::_onOutputModelsCleared(QList<OutputVM *> outputVM)
 {
     AgentInMappingVM* agentInMapping = qobject_cast<AgentInMappingVM*>(sender());
     if (agentInMapping != NULL)
     {
-        qDebug() << "_on Output Models Cleared" << agentInMapping->name() << "." << outputName;
+        qDebug() << "_on Output Models Cleared" << agentInMapping->name();
         // TODO ESTIA
     }
 }

@@ -126,33 +126,18 @@ Q_SIGNALS:
      */
     void outputsListRemoved(QList<OutputVM*> outputsListWillBeRemoved);
 
-
-    /**
-     * @brief Signal emitted when the list of models of an input view model is filled (0 model -> 1 model)
-     * @param inputName
-     */
-    void inputModelsFilled(QString inputName);
-
-
-    /**
-     * @brief Signal emitted when the list of models of an output view model is filled (0 model -> 1 model)
-     * @param outputName
-     */
-    void outputModelsFilled(QString outputName);
-
-
     /**
      * @brief Signal emitted when the list of models of an input view model is cleared (1 model -> 0 model)
      * @param inputName
      */
-    void inputModelsCleared(QString inputName);
+    void inputModelsCleared(QList<InputVM*> inputVM);
 
 
     /**
      * @brief Signal emitted when the list of models of an output view model is cleared (1 model -> 0 model)
      * @param outputName
      */
-    void outputModelsCleared(QString outputName);
+    void outputModelsCleared(QList<OutputVM*> outputVM);
 
 
 public Q_SLOTS:

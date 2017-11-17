@@ -288,9 +288,6 @@ void AgentInMappingVM::_agentModelAdded(AgentM* model)
                 if (!_inputsList.contains(inputVM)) {
                     inputsListToAdd.append(inputVM);
                 }
-                if (inputVM->models()->count() == 1) {
-                    Q_EMIT inputModelsFilled(inputVM->name());
-                }
             }
         }
 
@@ -302,9 +299,6 @@ void AgentInMappingVM::_agentModelAdded(AgentM* model)
             {
                 if (!_outputsList.contains(outputVM)) {
                     outputsListToAdd.append(outputVM);
-                }
-                if (outputVM->models()->count() == 1) {
-                    Q_EMIT outputModelsFilled(outputVM->name());
                 }
             }
         }
@@ -329,6 +323,10 @@ void AgentInMappingVM::_agentModelRemoved(AgentM* model)
 {
     if ((model != NULL) && (model->definition() != NULL))
     {
+
+        QList<InputVM*> inputsListToRemove;
+        QList<OutputVM*> outputsListToRemove;
+
         // Traverse the list of models of inputs in the definition
         foreach (AgentIOPM* input, model->definition()->inputsList()->toList())
         {
@@ -336,9 +334,9 @@ void AgentInMappingVM::_agentModelRemoved(AgentM* model)
             if (inputVM != NULL)
             {
                 if (inputVM->models()->count() == 0) {
-                    //_inputsList.remove(inputVM);
+                   // _inputsList.remove(inputVM);
+                    inputsListToRemove.append(inputVM);
 
-                    Q_EMIT inputModelsCleared(inputVM->name());
                 }
             }
         }
@@ -350,12 +348,16 @@ void AgentInMappingVM::_agentModelRemoved(AgentM* model)
             if (outputVM != NULL)
             {
                 if (outputVM->models()->count() == 0) {
-                    //_outputsList.remove(outputVM);
+                   // _outputsList.remove(outputVM);
+                    outputsListToRemove.append(outputVM);
 
-                    Q_EMIT outputModelsCleared(outputVM->name());
                 }
             }
         }
+
+
+        Q_EMIT inputModelsCleared(inputsListToRemove);
+        Q_EMIT outputModelsCleared(outputsListToRemove);
     }
 }
 
