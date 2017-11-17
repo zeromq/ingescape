@@ -72,6 +72,10 @@ ScenarioController::ScenarioController(QString scenariosPath, QObject *parent) :
     _actionsInPaletteList.append(new ActionInPaletteVM(NULL,6));
     _actionsInPaletteList.append(new ActionInPaletteVM(NULL,7));
     _actionsInPaletteList.append(new ActionInPaletteVM(NULL,8));
+    // FIXME: instead ?
+    /*for (int i = 0; i < 9; i++) {
+        _actionsInPaletteList.append(new ActionInPaletteVM(NULL, i));
+    }*/
 
     QDate today = QDate::currentDate();
     _scenariosDefaultFilePath = QString("%1scenarios_%2.json").arg(_scenariosDirectoryPath, today.toString("ddMMyy"));

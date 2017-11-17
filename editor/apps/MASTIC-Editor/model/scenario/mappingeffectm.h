@@ -33,7 +33,7 @@ class MappingEffectM: public ActionEffectM
 {
     Q_OBJECT
 
-    // TO Agent IOP
+    // FROM Agent IOP
     I2_QML_PROPERTY(AgentIOPM *, fromAgentIOP)
 
     // TO Agent model
