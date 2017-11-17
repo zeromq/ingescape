@@ -90,7 +90,7 @@ Item {
     // Show all
     function showAll()
     {
-        //TODO get the bounding box of all nodes from our controller
+        //TODO get the bounding box of all nodes from our controller ??
         var x0 = Number.POSITIVE_INFINITY;
         var y0 = Number.POSITIVE_INFINITY;
         var x1 = Number.NEGATIVE_INFINITY;
@@ -106,8 +106,8 @@ Item {
                 // We don't need repeaters because they don't have a valid geometry (they create items and add them to their parent)
                 !_qmlItemIsA(child, "Repeater")
                 &&
-                //TEMP FIXME: remove invisible links because AgentNodeView creates links attached to (0,0)
-                !_qmlItemIsA(child, "Link")
+                // Remove invisible links because AgentNodeView creates links attached to (0,0)
+                ( !_qmlItemIsA(child, "Link") || (_qmlItemIsA(child, "Link") && child.visible) )
                 )
             {
                 x0 = Math.min(x0, child.x);
@@ -125,7 +125,6 @@ Item {
         {
             var margin = 5;
             var area = Qt.rect(x0 - margin, y0 - margin, x1 - x0 + 2 * margin, y1 - y0 + 2 * margin);
-            console.log("NodeGraphView: bounding box (+ margins) = " + area + " VS workspace.childrenRect =" + workspace.childrenRect);
 
             _showArea(area);
         }

@@ -191,7 +191,7 @@ void AgentInMappingVM::_onModelsChanged()
         for (AgentM* model : newAgentsList) {
             if ((model != NULL) && !_previousAgentsList.contains(model))
             {
-                qDebug() << "New model" << model->name() << "ADDED (" << model->peerId() << ")";
+                qDebug() << "Agent in Mapping VM: New model" << model->name() << "ADDED (" << model->peerId() << ")";
 
                 // Connect to signals from a model
                 connect(model, &AgentM::isONChanged, this, &AgentInMappingVM::_onIsONofModelChanged);
@@ -211,7 +211,7 @@ void AgentInMappingVM::_onModelsChanged()
         for (AgentM* model : _previousAgentsList) {
             if ((model != NULL) && !newAgentsList.contains(model))
             {
-                qDebug() << "Old model" << model->name() << "REMOVED (" << model->peerId() << ")";
+                qDebug() << "Agent in Mapping VM: Old model" << model->name() << "REMOVED (" << model->peerId() << ")";
 
                 // DIS-connect from signals from a model
                 disconnect(model, &AgentM::isONChanged, this, &AgentInMappingVM::_onIsONofModelChanged);
@@ -285,11 +285,9 @@ void AgentInMappingVM::_agentModelAdded(AgentM* model)
             InputVM* inputVM = _inputModelAdded(input);
             if (inputVM != NULL)
             {
+                // New view model of input
                 if (!_inputsList.contains(inputVM)) {
                     inputsListToAdd.append(inputVM);
-                }
-                if (inputVM->models()->count() == 1) {
-                    Q_EMIT inputModelsFilled(inputVM->name());
                 }
             }
         }
@@ -300,23 +298,26 @@ void AgentInMappingVM::_agentModelAdded(AgentM* model)
             OutputVM* outputVM = _outputModelAdded(output);
             if (outputVM != NULL)
             {
+                // New view model of output
                 if (!_outputsList.contains(outputVM)) {
                     outputsListToAdd.append(outputVM);
-                }
-                if (outputVM->models()->count() == 1) {
-                    Q_EMIT outputModelsFilled(outputVM->name());
                 }
             }
         }
 
-        _inputsList.append(inputsListToAdd);
-        _outputsList.append(outputsListToAdd);
+        if (inputsListToAdd.count() > 0) {
+            _inputsList.append(inputsListToAdd);
 
-        // Emit signal "Inputs List Added"
-        Q_EMIT inputsListAdded(inputsListToAdd);
+            // Emit signal "Inputs List Added"
+            Q_EMIT inputsListAdded(inputsListToAdd);
+        }
 
-        // Emit signal "Outputs List Added"
-        Q_EMIT outputsListAdded(outputsListToAdd);
+        if (outputsListToAdd.count() > 0) {
+            _outputsList.append(outputsListToAdd);
+
+            // Emit signal "Outputs List Added"
+            Q_EMIT outputsListAdded(outputsListToAdd);
+        }
     }
 }
 
@@ -329,16 +330,18 @@ void AgentInMappingVM::_agentModelRemoved(AgentM* model)
 {
     if ((model != NULL) && (model->definition() != NULL))
     {
+        QList<InputVM*> inputsListToRemove;
+        QList<OutputVM*> outputsListToRemove;
+
         // Traverse the list of models of inputs in the definition
         foreach (AgentIOPM* input, model->definition()->inputsList()->toList())
         {
             InputVM* inputVM = _inputModelRemoved(input);
             if (inputVM != NULL)
             {
+                // The view model of input is empty
                 if (inputVM->models()->count() == 0) {
-                    //_inputsList.remove(inputVM);
-
-                    Q_EMIT inputModelsCleared(inputVM->name());
+                    inputsListToRemove.append(inputVM);
                 }
             }
         }
@@ -349,11 +352,32 @@ void AgentInMappingVM::_agentModelRemoved(AgentM* model)
             OutputVM* outputVM = _outputModelRemoved(output);
             if (outputVM != NULL)
             {
+                // The view model of output is empty
                 if (outputVM->models()->count() == 0) {
-                    //_outputsList.remove(outputVM);
-
-                    Q_EMIT outputModelsCleared(outputVM->name());
+                    outputsListToRemove.append(outputVM);
                 }
+            }
+        }
+
+        if (inputsListToRemove.count() > 0) {
+            // Emit signal "Inputs List Will Be Removed"
+            Q_EMIT inputsListWillBeRemoved(inputsListToRemove);
+
+            // FIXME TODO I2 Quick: Allow to remove a QList
+            //_inputsList.remove(inputsListToRemove);
+            foreach (InputVM* inputVM, inputsListToRemove) {
+                _inputsList.remove(inputVM);
+            }
+        }
+
+        if (outputsListToRemove.count() > 0) {
+            // Emit signal "Outputs List Will Be Removed"
+            Q_EMIT outputsListWillBeRemoved(outputsListToRemove);
+
+            // FIXME TODO I2 Quick: Allow to remove a QList
+            //_outputsList.remove(outputsListToRemove);
+            foreach (OutputVM* outputVM, outputsListToRemove) {
+                _outputsList.remove(outputVM);
             }
         }
     }

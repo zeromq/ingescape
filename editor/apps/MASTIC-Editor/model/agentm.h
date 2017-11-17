@@ -45,15 +45,6 @@ class AgentM : public QObject
     // Address of our agent
     I2_QML_PROPERTY_READONLY(QString, address)
 
-    // Network device of our agent
-    //I2_QML_PROPERTY_READONLY(QString, networkDevice)
-
-    // IP address of our agent
-    //I2_QML_PROPERTY_READONLY(QString, ipAddress)
-
-    // Port of our agent
-    //I2_QML_PROPERTY_READONLY(int, port)
-
     // HostName of our agent
     I2_QML_PROPERTY_READONLY(QString, hostname)
 

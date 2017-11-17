@@ -237,35 +237,14 @@ private Q_SLOTS:
      * @brief Slot when some view models of outputs will be removed from an agent in mapping
      * @param outputsListWillBeRemoved
      */
-    //void _onOutputsListRemoved(QList<OutputVM*> outputsListWillBeRemoved);
+    void _onInputsListWillBeRemoved(QList<InputVM*> inputsListWillBeRemoved);
 
 
     /**
-     * @brief Slot when the list of models of an input view model is filled (0 model -> 1 model)
-     * @param inputName
+     * @brief Slot when some view models of outputs will be removed from an agent in mapping
+     * @param outputsListWillBeRemoved
      */
-    void _onInputModelsFilled(QString inputName);
-
-
-    /**
-     * @brief Slot when the list of models of an output view model is filled (0 model -> 1 model)
-     * @param outputName
-     */
-    void _onOutputModelsFilled(QString outputName);
-
-
-    /**
-     * @brief Slot when the list of models of an input view model is cleared (1 model -> 0 model)
-     * @param inputName
-     */
-    void _onInputModelsCleared(QString inputName);
-
-
-    /**
-     * @brief Slot when the list of models of an output view model is cleared (1 model -> 0 model)
-     * @param outputName
-     */
-    void _onOutputModelsCleared(QString outputName);
+    void _onOutputsListWillBeRemoved(QList<OutputVM*> outputsListWillBeRemoved);
 
 
 private:
