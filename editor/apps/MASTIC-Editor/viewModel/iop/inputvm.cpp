@@ -90,24 +90,24 @@ void InputVM::_onModelsChanged()
     // Model of input added
     if (_previousModelsList.count() < newModelsList.count())
     {
-        qDebug() << _previousModelsList.count() << "--> ADD --> " << newModelsList.count();
+        //qDebug() << _previousModelsList.count() << "--> ADD --> " << newModelsList.count();
 
         for (AgentIOPM* model : newModelsList) {
             if ((model != NULL) && !_previousModelsList.contains(model))
             {
-                qDebug() << "New model" << model->name() << "ADDED";
+                //qDebug() << "Input VM: New model" << model->name() << "ADDED";
             }
         }
     }
     // Model of input removed
     else if (_previousModelsList.count() > newModelsList.count())
     {
-        qDebug() << _previousModelsList.count() << "--> REMOVE --> " << newModelsList.count();
+        //qDebug() << _previousModelsList.count() << "--> REMOVE --> " << newModelsList.count();
 
         for (AgentIOPM* model : _previousModelsList) {
             if ((model != NULL) && !newModelsList.contains(model))
             {
-                qDebug() << "Old model" << model->name() << "REMOVED";
+                //qDebug() << "Input VM: Old model" << model->name() << "REMOVED";
             }
         }
     }

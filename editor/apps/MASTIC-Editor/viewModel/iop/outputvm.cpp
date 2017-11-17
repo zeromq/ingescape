@@ -130,7 +130,7 @@ void OutputVM::_onModelsChanged()
         for (OutputM* model : newModelsList) {
             if ((model != NULL) && !_previousModelsList.contains(model))
             {
-                qDebug() << "New model" << model->name() << "ADDED";
+                //qDebug() << "Output VM: New model" << model->name() << "ADDED";
 
                 // Connect to signals from this new model
                 connect(model, &OutputM::currentValueChanged, this, &OutputVM::_onCurrentValueOfModelChanged);
@@ -145,7 +145,7 @@ void OutputVM::_onModelsChanged()
         for (OutputM* model : _previousModelsList) {
             if ((model != NULL) && !newModelsList.contains(model))
             {
-                qDebug() << "Old model" << model->name() << "REMOVED";
+                //qDebug() << "Output VM: Old model" << model->name() << "REMOVED";
 
                 // DIS-connect to signals from this previous model
                 disconnect(model, &OutputM::currentValueChanged, this, &OutputVM::_onCurrentValueOfModelChanged);

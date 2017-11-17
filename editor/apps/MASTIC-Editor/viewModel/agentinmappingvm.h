@@ -121,23 +121,17 @@ Q_SIGNALS:
 
 
     /**
+     * @brief Signal emitted when some view models of inputs will be removed from our agent in mapping
+     * @param inputsListWillBeRemoved
+     */
+    void inputsListWillBeRemoved(QList<InputVM*> inputsListWillBeRemoved);
+
+
+    /**
      * @brief Signal emitted when some view models of outputs will be removed from our agent in mapping
      * @param outputsListWillBeRemoved
      */
-    void outputsListRemoved(QList<OutputVM*> outputsListWillBeRemoved);
-
-    /**
-     * @brief Signal emitted when the list of models of an input view model is cleared (1 model -> 0 model)
-     * @param inputName
-     */
-    void inputModelsCleared(QList<InputVM*> inputVM);
-
-
-    /**
-     * @brief Signal emitted when the list of models of an output view model is cleared (1 model -> 0 model)
-     * @param outputName
-     */
-    void outputModelsCleared(QList<OutputVM*> outputVM);
+    void outputsListWillBeRemoved(QList<OutputVM*> outputsListWillBeRemoved);
 
 
 public Q_SLOTS:

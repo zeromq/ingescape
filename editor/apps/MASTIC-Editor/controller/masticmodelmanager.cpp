@@ -937,7 +937,7 @@ void MasticModelManager::_updateMergedListsOfMappingElementsForAgentName(QString
         // Get the merged list of all (models of) mapping elements which connect an input of the agent
         QList<ElementMappingM*> mergedListOfInputMappingElements = getMergedListOfInputMappingElementsFromAgentName(agentName);
 
-        qDebug() << mergedListOfInputMappingElements.count() << "INPUT mapping elements";
+        qDebug() << mergedListOfInputMappingElements.count() << "INPUT mapping elements from name" << agentName;
 
         qDebug() << "AVANT: From Agent Name To Merged List of INPUT Mapping Elements:" << _mapFromAgentNameToMergedListOfInputMappingElements;
         qDebug() << "AVANT: From Agent Name To Merged List of OUTPUT Mapping Elements:" << _mapFromAgentNameToMergedListOfOutputMappingElements;
