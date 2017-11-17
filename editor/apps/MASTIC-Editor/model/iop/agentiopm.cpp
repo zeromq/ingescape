@@ -103,13 +103,13 @@ void AgentIOPM::setdefaultValue(QVariant value)
  */
 void AgentIOPM::setcurrentValue(QVariant value)
 {
-    if (_currentValue != value)
-    {
+    if (_currentValue != value) {
         _currentValue = value;
 
         // Get a displayable value: convert a variant into a string (in function of the value type)
         setdisplayableCurrentValue(Enums::getDisplayableValue(_agentIOPValueType, _currentValue));
-
-        Q_EMIT currentValueChanged(value);
     }
+
+    // Emit the signal even if the value has not changed to show the animation
+    Q_EMIT currentValueChanged(value);
 }
