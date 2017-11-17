@@ -44,18 +44,22 @@ PUBLIC int mtic_startWithDevice(const char *networkDevice, int port);
 PUBLIC int mtic_startWithIP(const char *ipAddress, int port);
 PUBLIC int mtic_stop(void);
 PUBLIC void mtic_die(void);
+
+//agent name set and get
 PUBLIC int mtic_setAgentName(const char *name);
 PUBLIC char *mtic_getAgentName(void);
+
 //Command line for the agent can be passed here for inclusion in the
 //agent's headers. If not used, header is initialized with exec path.
 PUBLIC void mtic_setCommandLine(const char *line);
 
+//By default, an agent notifies all the agent it maps. Each notification
+//makes the mapped agents publish their outputs (except for data & impulsions).
+//We allow to disable this notification to avoid side effects by agents frequently
+//changing their mapping.
+PUBLIC void mtic_setNotifyMappedAgents(bool notify);
+
 //pause and resume the agent
-/**
- * \var typedef void (*mtic_freezeCallback)(bool isPaused, void *myData)
- * \ingroup pauseResumeFct
- * \brief typedef for the callback used in freezed functions
- */
 typedef void (*mtic_freezeCallback)(bool isPaused, void *myData);
 PUBLIC int mtic_freeze(void);
 PUBLIC bool mtic_isFrozen(void);

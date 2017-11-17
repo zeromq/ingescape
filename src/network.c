@@ -75,6 +75,7 @@ bool isFrozen = false;
 bool agentCanBeFrozen = false;
 bool isWholeAgentMuted = false;
 bool mtic_Interrupted = false;
+bool network_NotifyMappedAgents = true;
 
 
 //global parameters
@@ -207,7 +208,7 @@ int network_manageSubscriberMapping(subscriber_t *subscriber){
                     //the external agent ouput on several of its inputs. This should not have any consequence.
                     subscribeToPublisherOutput(subscriber, el->output_name);
                     //mapping was successful : we set timer to notify remote agent if not already done
-                    if (!subscriber->mappedNotificationToSend){
+                    if (!subscriber->mappedNotificationToSend && network_NotifyMappedAgents){
                         subscriber->mappedNotificationToSend = true;
                         zloop_timer(agentElements->loop, 500, 1, triggerMappingNotificationToNewcomer, (void *)subscriber);
                     }
@@ -1532,4 +1533,7 @@ void mtic_setCommandLine(const char *line){
     strncpy(commandLine, line, COMMAND_LINE_LENGTH);
 }
 
+void mtic_setNotifyMappedAgents(bool notify){
+    network_NotifyMappedAgents = notify;
+}
 
