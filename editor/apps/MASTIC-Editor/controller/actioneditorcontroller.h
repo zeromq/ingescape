@@ -41,7 +41,7 @@ class ActionEditorController: public QObject
     I2_QML_PROPERTY(ActionM*, editedAction)
 
     // Agents in mapping list
-    I2_QML_PROPERTY(I2CustomItemListModel<AgentInMappingVM> *, listAgentsInMapping)
+    I2_QML_PROPERTY(I2CustomItemSortFilterListModel<AgentInMappingVM> *, listAgentsInMapping)
 
 public:
 
@@ -51,7 +51,7 @@ public:
      * @param original action
      * @param parent
      */
-    explicit ActionEditorController(QString actionName, ActionM * originalAction, I2CustomItemListModel<AgentInMappingVM> * listAgentsInMapping, QObject *parent = 0);
+    explicit ActionEditorController(QString actionName, ActionM * originalAction, I2CustomItemSortFilterListModel<AgentInMappingVM> * listAgentsInMapping, QObject *parent = 0);
 
 
     /**

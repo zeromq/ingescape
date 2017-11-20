@@ -96,6 +96,7 @@ bool MappingEffectM::setagentModel(AgentInMappingVM* agentModel)
     {
         // Clear the list
         _fromAgentIopList.clear();
+        setfromAgentIOP(NULL);
 
         if(_agentModel != NULL)
         {
@@ -133,6 +134,7 @@ void MappingEffectM::settoAgentModel(AgentInMappingVM* agentModel)
 
         // Clear the list
         _toAgentIopList.clear();
+        settoAgentIOP(NULL);
 
         if(_toAgentModel != NULL)
         {
