@@ -84,6 +84,7 @@ bool IOPValueConditionM::setagentModel(AgentInMappingVM* agentModel)
     {
         // Clear the list
         _agentIopList.clear();
+        setagentIOP(NULL);
 
         if(_agentModel != NULL)
         {
