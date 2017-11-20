@@ -1166,6 +1166,15 @@ int mtic_startWithDevice(const char *networkDevice, int port){
     strncpy(agentElements->networkDevice, networkDevice, NETWORK_DEVICE_LENGTH);
     agentElements->ipAddress[0] = '\0';
     
+#if defined (__WINDOWS__)
+    WORD version_requested = MAKEWORD (2, 2);
+    WSADATA wsa_data;
+    int rc = WSAStartup (version_requested, &wsa_data);
+    assert (rc == 0);
+    assert (LOBYTE (wsa_data.wVersion) == 2 &&
+        HIBYTE (wsa_data.wVersion) == 2);
+#endif
+
     ziflist_t *iflist = ziflist_new ();
     assert (iflist);
     const char *name = ziflist_first (iflist);
@@ -1209,6 +1218,15 @@ int mtic_startWithIP(const char *ipAddress, int port){
     agentElements = calloc(1, sizeof(zyreloopElements_t));
     strncpy(agentElements->ipAddress, ipAddress, IP_ADDRESS_LENGTH);
     
+#if defined (__WINDOWS__)
+    WORD version_requested = MAKEWORD (2, 2);
+    WSADATA wsa_data;
+    int rc = WSAStartup (version_requested, &wsa_data);
+    assert (rc == 0);
+    assert (LOBYTE (wsa_data.wVersion) == 2 &&
+        HIBYTE (wsa_data.wVersion) == 2);
+#endif
+
     ziflist_t *iflist = ziflist_new ();
     assert (iflist);
     const char *name = ziflist_first (iflist);
