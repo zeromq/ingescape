@@ -47,8 +47,9 @@ void definition_freeIOP (agent_iop* agent_iop){
     }
     
     if ((agent_iop)->callbacks != NULL){
-        mtic_observe_callback_t *cb;
-        DL_FOREACH((agent_iop)->callbacks, cb){
+        mtic_observe_callback_t *cb, *tmp;
+        DL_FOREACH_SAFE((agent_iop)->callbacks, cb, tmp){
+            DL_DELETE((agent_iop)->callbacks, cb);
             free(cb);
         }
     }
