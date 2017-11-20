@@ -62,7 +62,7 @@ class ScenarioController: public QObject
     I2_ENUM_LISTMODEL(ActionEffectType, effectsTypesList)
 
     // --- agents list in mapping
-    I2_QOBJECT_LISTMODEL(AgentInMappingVM, agentsInMappingList)
+    I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(AgentInMappingVM, agentsInMappingList)
 
 
     // List of actions in palette

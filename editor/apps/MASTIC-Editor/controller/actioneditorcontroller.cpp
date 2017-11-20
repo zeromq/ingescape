@@ -29,7 +29,7 @@
  * @brief Default constructor
  * @param parent
  */
-ActionEditorController::ActionEditorController(QString actionName, ActionM *originalAction, I2CustomItemListModel<AgentInMappingVM> * listAgentsInMapping, QObject *parent) : QObject(parent),
+ActionEditorController::ActionEditorController(QString actionName, ActionM *originalAction, I2CustomItemSortFilterListModel<AgentInMappingVM> *listAgentsInMapping, QObject *parent) : QObject(parent),
     _originalAction(originalAction),
     _editedAction(NULL),
     _listAgentsInMapping(listAgentsInMapping)

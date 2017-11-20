@@ -38,6 +38,9 @@ ScenarioController::ScenarioController(QString scenariosPath, QObject *parent) :
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
+    // Set the agent in mapping list sort by name property
+    _agentsInMappingList.setSortProperty("name");
+
     // Fill state comparisons types list
     _comparisonsAgentsTypesList.appendEnumValue(ActionComparisonValueType::ON);
     _comparisonsAgentsTypesList.appendEnumValue(ActionComparisonValueType::OFF);
@@ -63,19 +66,10 @@ ScenarioController::ScenarioController(QString scenariosPath, QObject *parent) :
     _validationDurationsTypesList.fillWithAllEnumValues();
 
     // Initialize the 9 items of the palette with NULL action
-    _actionsInPaletteList.append(new ActionInPaletteVM(NULL,0));
-    _actionsInPaletteList.append(new ActionInPaletteVM(NULL,1));
-    _actionsInPaletteList.append(new ActionInPaletteVM(NULL,2));
-    _actionsInPaletteList.append(new ActionInPaletteVM(NULL,3));
-    _actionsInPaletteList.append(new ActionInPaletteVM(NULL,4));
-    _actionsInPaletteList.append(new ActionInPaletteVM(NULL,5));
-    _actionsInPaletteList.append(new ActionInPaletteVM(NULL,6));
-    _actionsInPaletteList.append(new ActionInPaletteVM(NULL,7));
-    _actionsInPaletteList.append(new ActionInPaletteVM(NULL,8));
-    // FIXME: instead ?
-    /*for (int i = 0; i < 9; i++) {
+    for (int i = 0; i < 9; i++)
+    {
         _actionsInPaletteList.append(new ActionInPaletteVM(NULL, i));
-    }*/
+    }
 
     QDate today = QDate::currentDate();
     _scenariosDefaultFilePath = QString("%1scenarios_%2.json").arg(_scenariosDirectoryPath, today.toString("ddMMyy"));
