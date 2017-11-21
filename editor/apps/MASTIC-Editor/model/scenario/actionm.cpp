@@ -67,7 +67,8 @@ ActionM::ActionM(QString name, QObject *parent) : QObject(parent),
     _shallRevertAfterTime(false),
     _revertAfterTime(-1),
     _revertAfterTimeString("0.0"),
-    _shallRearm(false)
+    _shallRearm(false),
+    _isValid(false)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -104,6 +105,8 @@ void ActionM::copyFrom(ActionM* actionModel)
         setrevertAfterTime(actionModel->revertAfterTime());
         setrevertAfterTimeString(actionModel->revertAfterTimeString());
         setshallRearm(actionModel->shallRearm());
+        setisValid(actionModel->isValid());
+
 
         _effectsList.deleteAllItems();
         foreach (ActionEffectVM* effectVM, actionModel->effectsList()->toList())
@@ -232,5 +235,66 @@ void ActionM::setshallRevert(bool shallRevert)
     }
 }
 
+/**
+ * @brief Initialize connections for conditions
+ */
+void ActionM::initializeConditionsConnections()
+{
+    foreach (ActionConditionVM* conditionVM, _conditionsList.toList())
+    {
+        if(conditionVM->condition() != NULL)
+        {
+            // Connect the valid change
+            connect(conditionVM->condition(),&ActionConditionM::isValidChanged,this,&ActionM::_onConditionValidationChange);
+
+            // Intialize the connection
+            conditionVM->condition()->initializeConnections();
+        }
+    }
+}
+
+/**
+ * @brief Reset connections for conditions
+ */
+void ActionM::resetConditionsConnections()
+{
+    foreach (ActionConditionVM* conditionVM, _conditionsList.toList())
+    {
+        if(conditionVM->condition() != NULL)
+        {
+            disconnect(conditionVM->condition(),&ActionConditionM::isValidChanged,this,&ActionM::_onConditionValidationChange);
+
+            conditionVM->condition()->resetConnections();
+        }
+    }
+}
+
+/**
+ * @brief Slot on the condition validation change
+ */
+void ActionM::_onConditionValidationChange(bool isValid)
+{
+    Q_UNUSED(isValid)
+
+    bool actionValidation = true;
+
+    foreach (ActionConditionVM* conditionVM, _conditionsList.toList())
+    {
+        if(conditionVM->condition() != NULL)
+        {
+            bool valid = conditionVM->condition()->isValid();
+            actionValidation = valid && actionValidation;
+        }
+
+        // We leave if all conditions are not valids
+        if(actionValidation == false)
+        {
+            break;
+        }
+    }
+
+    // Set the general valid status of the action
+    setisValid(actionValidation);
+}
 
 

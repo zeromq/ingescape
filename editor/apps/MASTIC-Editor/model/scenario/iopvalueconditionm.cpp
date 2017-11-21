@@ -76,51 +76,50 @@ void IOPValueConditionM::copyFrom(ActionConditionM* condition)
 *        to fill inputs and outputs
 * @param agentModel
 */
-bool IOPValueConditionM::setagentModel(AgentInMappingVM* agentModel)
+void IOPValueConditionM::setagentModel(AgentInMappingVM* agentModel)
 {
-    bool hasChanged = ActionConditionM::setagentModel(agentModel);
+    ActionConditionM::setagentModel(agentModel);
 
-    if(hasChanged)
+    // Clear the list
+    _agentIopList.clear();
+    setagentIOP(NULL);
+
+    if(_agentModel != NULL)
     {
-        // Clear the list
-        _agentIopList.clear();
-        setagentIOP(NULL);
-
-        if(_agentModel != NULL)
+        // Fill with inputs
+        foreach (InputVM* input, _agentModel->inputsList()->toList())
         {
-            // Fill with inputs
-            foreach (InputVM* input, _agentModel->inputsList()->toList())
+            if(input->firstModel() != NULL)
             {
-                if(input->firstModel() != NULL)
-                {
-                    _agentIopList.append(input->firstModel());
-                }
-            }
-
-            // Fill with outputs
-            foreach (OutputVM* output, _agentModel->outputsList()->toList())
-            {
-                if(output->firstModel() != NULL)
-                {
-                    _agentIopList.append(output->firstModel());
-                }
-            }
-
-            // Select the first item
-            if(_agentIopList.count() > 0)
-            {
-                setagentIOP(_agentIopList.at(0));
+                _agentIopList.append(input->firstModel());
             }
         }
-    }
 
-    return hasChanged;
+        // Fill with outputs
+        foreach (OutputVM* output, _agentModel->outputsList()->toList())
+        {
+            if(output->firstModel() != NULL)
+            {
+                _agentIopList.append(output->firstModel());
+            }
+        }
+
+        // Select the first item
+        if(_agentIopList.count() > 0)
+        {
+            setagentIOP(_agentIopList.at(0));
+        }
+
+        initializeConnections();
+    } else {
+        resetConnections();
+    }
 }
 
 /**
-  * @brief Initialize the action condition. Make connections.
+  * @brief Initialize the agent connections for the action condition
   */
-void IOPValueConditionM::initialize()
+void IOPValueConditionM::initializeConnections()
 {
     if(_agentModel != NULL)
     {
@@ -128,6 +127,20 @@ void IOPValueConditionM::initialize()
         connect(_agentModel, &AgentInMappingVM::inputsListAdded, this, &IOPValueConditionM::onInputsListChange);
         connect(_agentModel, &AgentInMappingVM::outputsListWillBeRemoved, this, &IOPValueConditionM::onOutputsListChange);
         connect(_agentModel, &AgentInMappingVM::outputsListAdded, this, &IOPValueConditionM::onOutputsListChange);
+    }
+}
+
+/**
+  * @brief Reset the agent connections for the action condition
+  */
+void IOPValueConditionM::resetConnections()
+{
+    if(_agentModel != NULL)
+    {
+        disconnect(_agentModel, &AgentInMappingVM::inputsListWillBeRemoved, this, &IOPValueConditionM::onInputsListChange);
+        disconnect(_agentModel, &AgentInMappingVM::inputsListAdded, this, &IOPValueConditionM::onInputsListChange);
+        disconnect(_agentModel, &AgentInMappingVM::outputsListWillBeRemoved, this, &IOPValueConditionM::onOutputsListChange);
+        disconnect(_agentModel, &AgentInMappingVM::outputsListAdded, this, &IOPValueConditionM::onOutputsListChange);
     }
 }
 
@@ -196,4 +209,165 @@ void IOPValueConditionM::onOutputsListChange(QList<OutputVM*> outputsList)
     }
 }
 
+/**
+* @brief Custom setter for agent iop model
+* @param agent iop model
+*/
+void IOPValueConditionM::setagentIOP(AgentIOPM* agentIop)
+{
+    if(_agentIOP != agentIop)
+    {
+        if(_agentIOP != NULL)
+        {
+            // UnSubscribe to destruction
+            disconnect(_agentIOP, &AgentIOPM::destroyed, this, &IOPValueConditionM::_onAgentIopModelDestroyed);
 
+            // UnSubscribe to value change
+            disconnect(_agentIOP, &AgentIOPM::currentValueChanged, this, &IOPValueConditionM::_onCurrentValueChange);
+
+            resetConnections();
+        }
+        setisValid(false);
+
+        _agentIOP = agentIop;
+
+        if(_agentIOP != NULL)
+        {
+            // Subscribe to destruction
+            connect(_agentIOP, &AgentIOPM::destroyed, this, &IOPValueConditionM::_onAgentIopModelDestroyed);
+
+            // Subscribe to value change
+            connect(_agentIOP, &AgentIOPM::currentValueChanged, this, &IOPValueConditionM::_onCurrentValueChange);
+        }
+
+        Q_EMIT agentIOPChanged(agentIop);
+    }
+}
+
+/**
+ * @brief Called when our agent iop model is destroyed
+ * @param sender
+ */
+void IOPValueConditionM::_onAgentIopModelDestroyed(QObject* sender)
+{
+    Q_UNUSED(sender)
+
+    setagentIOP(NULL);
+}
+
+/**
+  * @brief Slot on agent iop value change
+  * @param current value
+  */
+void IOPValueConditionM::_onCurrentValueChange(QVariant currentValue)
+{
+    // Trim the condition value to compare with
+    QString valueTrimmed = _value.trimmed();
+
+    bool isValid = false;
+    if(_agentIOP != NULL)
+    {
+        //agentIOPValueType : INTEGER , DOUBLE, STRING, BOOL, IMPULSION, DATA, MIXED, UNKNOWN
+        switch(_agentIOP->agentIOPValueType())
+        {
+            case AgentIOPValueTypes::INTEGER :
+            case AgentIOPValueTypes::DOUBLE :
+            {
+                double conditionDblValue = valueTrimmed.toDouble();
+                switch(_comparison)
+                {
+                    case ActionComparisonValueType::INFERIOR_TO :
+                    {
+                        isValid = (currentValue.toDouble() < conditionDblValue);
+                        break;
+                    }
+                    case ActionComparisonValueType::SUPERIOR_TO :
+                    {
+                        isValid = (currentValue.toDouble() > conditionDblValue);
+                        break;
+                    }
+                    case ActionComparisonValueType::EQUAL_TO :
+                    {
+                        isValid = (conditionDblValue == currentValue.toDouble());
+                        break;
+                    }
+                    default :
+                    {
+                        break;
+                    }
+                }
+                break;
+            }
+            case AgentIOPValueTypes::MIXED :
+            case AgentIOPValueTypes::STRING :
+            case AgentIOPValueTypes::DATA :
+            {
+                switch(_comparison)
+                {
+                    case ActionComparisonValueType::INFERIOR_TO :
+                    {
+                        isValid = currentValue.toString().compare(valueTrimmed) < 0;
+                        break;
+                    }
+                    case ActionComparisonValueType::SUPERIOR_TO :
+                    {
+                        isValid = currentValue.toString().compare(valueTrimmed) > 0;
+                        break;
+                    }
+                    case ActionComparisonValueType::EQUAL_TO :
+                    {
+                        isValid = currentValue.toString().compare(valueTrimmed) == 0;
+                        break;
+                    }
+                    default :
+                    {
+                        break;
+                    }
+                }
+                break;
+            }
+            case AgentIOPValueTypes::BOOL :
+            {
+                bool conditionBoolValue = false;
+                if(valueTrimmed.toUpper() == "TRUE" || valueTrimmed.toInt() == 1)
+                {
+                    conditionBoolValue = true;
+                }
+                switch(_comparison)
+                {
+                    case ActionComparisonValueType::INFERIOR_TO :
+                    {
+                        isValid = currentValue.toBool() < conditionBoolValue;
+                        break;
+                    }
+                    case ActionComparisonValueType::SUPERIOR_TO :
+                    {
+                        isValid = currentValue.toBool() > conditionBoolValue;
+                        break;
+                    }
+                    case ActionComparisonValueType::EQUAL_TO :
+                    {
+                        isValid = currentValue.toBool() == conditionBoolValue;
+                        break;
+                    }
+                    default :
+                    {
+                        break;
+                    }
+                }
+
+                break;
+            }
+            default :
+            {
+                // FIXME - REMOVE
+                qDebug() << "IopValueComparison could not be done for "<< AgentIOPValueTypes::staticEnumToString(_agentIOP->agentIOPValueType())<< " type : "<<_agentModel->name()<< "." << _agentIOP->name();
+                break;
+            }
+
+        }
+    }
+
+    // Set final condition validation state
+    setisValid(isValid);
+}

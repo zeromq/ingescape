@@ -33,7 +33,7 @@ class IOPValueConditionM: public ActionConditionM
     Q_OBJECT
 
     // Agent IOP
-    I2_QML_PROPERTY(AgentIOPM* , agentIOP)
+    I2_QML_PROPERTY_CUSTOM_SETTER(AgentIOPM* , agentIOP)
 
     // value in string format
     I2_QML_PROPERTY(QString , value)
@@ -66,12 +66,17 @@ public:
     *        to fill inputs and outputs
     * @param agentModel
     */
-    bool setagentModel(AgentInMappingVM* agentModel);
+    void setagentModel(AgentInMappingVM* agentModel);
 
     /**
-      * @brief Initialize the action condition. Make connections.
+      * @brief Initialize the agent connections for the action condition
       */
-    void initialize();
+    void initializeConnections();
+
+    /**
+      * @brief Reset the agent connections for the action condition
+      */
+    void resetConnections();
 
 Q_SIGNALS:
 
@@ -88,6 +93,17 @@ public Q_SLOTS:
       */
     void onOutputsListChange(QList<OutputVM *> outputsList);
 
+protected Q_SLOTS:
+    /**
+     * @brief Called when our agent iop model is destroyed
+     * @param sender
+     */
+    void _onAgentIopModelDestroyed(QObject* sender);
+
+    /**
+      * @brief Slot on agent iop value change
+      */
+    void _onCurrentValueChange(QVariant currentValue);
 
 protected:
 
