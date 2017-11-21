@@ -90,15 +90,15 @@ char agentName[AGENT_NAME_LENGTH] = AGENT_NAME_DEFAULT;
 char agentState[AGENT_NAME_LENGTH] = "";
 char commandLine[COMMAND_LINE_LENGTH] = "";
 
-typedef struct freezeCallback {      //Need to be unique : the table hash key
-    mtic_freezeCallback callback_ptr;   //pointer on the callback
+typedef struct freezeCallback {
+    mtic_freezeCallback callback_ptr;
     void *myData;
     struct freezeCallback *prev;
     struct freezeCallback *next;
 } freezeCallback_t;
 
-typedef struct zyreCallback {      //Need to be unique : the table hash key
-    network_zyreIncoming callback_ptr;   //pointer on the callback
+typedef struct zyreCallback {
+    network_zyreIncoming callback_ptr;
     void *myData;
     struct zyreCallback *prev;
     struct zyreCallback *next;
