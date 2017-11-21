@@ -188,6 +188,9 @@ void ScenarioController::valideActionEditor(ActionEditorController* actionEditor
 
     ActionM* originalActionVM = actionEditorC->originalAction();
 
+    // Initialize connections
+    originalActionVM->initializeConditionsConnections();
+
     // We check that or editor is not already opened
     if(_actionsList.contains(originalActionVM) == false)
     {
@@ -306,6 +309,11 @@ void ScenarioController::_importScenarioFromFile(QString scenarioFilePath)
                 // Append the list of actions
                 if(scenarioToImport.first.first.count() > 0)
                 {
+                    foreach (ActionM* actionM, scenarioToImport.first.first)
+                    {
+                        actionM->initializeConditionsConnections();
+                    }
+
                     _actionsList.append(scenarioToImport.first.first);
                 }
 

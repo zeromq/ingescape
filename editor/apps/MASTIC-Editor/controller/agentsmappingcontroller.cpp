@@ -606,16 +606,31 @@ void AgentsMappingController::_onOutputsListAdded(QList<OutputVM*> outputsListAd
 
 
 /**
- * @brief Slot when some view models of outputs will be removed from an agent in mapping
- * @param outputsListWillBeRemoved
+ * @brief Slot when some view models of inputs will be removed from an agent in mapping
+ * @param inputsListWillBeRemoved
  */
 void AgentsMappingController::_onInputsListWillBeRemoved(QList<InputVM*> inputsListWillBeRemoved)
 {
+    //TODO later.
     AgentInMappingVM* agentInMapping = qobject_cast<AgentInMappingVM*>(sender());
     if ((agentInMapping != NULL) && (inputsListWillBeRemoved.count() > 0))
     {
         qDebug() << "_on Intputs List Will Be Removed from agent" << agentInMapping->name() << inputsListWillBeRemoved.count();
-        // TODO ESTIA
+//        foreach(InputVM* removedInput, inputVMs)
+//        {
+//            foreach(MapBetweenIOPVM* mapBetweenIOP, _allMapInMapping.toList())
+//            {
+//                if( (mapBetweenIOP != NULL) && (mapBetweenIOP->agentFrom()->name() == agentInMapping->name()) )
+//                {
+//                    if( (removedInput != NULL) && (mapBetweenIOP->pointTo()->name() == removedInput->name()) )
+//                    {
+//                        _allMapInMapping.remove(mapBetweenIOP);
+//                        inputsListWillBeRemoved.removeAll(removedInput);
+//                        delete(mapBetweenIOP);
+//                    }
+//                }
+//            }
+//        }
     }
 }
 
@@ -626,12 +641,59 @@ void AgentsMappingController::_onInputsListWillBeRemoved(QList<InputVM*> inputsL
  */
 void AgentsMappingController::_onOutputsListWillBeRemoved(QList<OutputVM*> outputsListWillBeRemoved)
 {
+    //TODO later.
     AgentInMappingVM* agentInMapping = qobject_cast<AgentInMappingVM*>(sender());
-    if ((agentInMapping != NULL) && (outputsListWillBeRemoved.count() > 0))
-    {
-        qDebug() << "_on Outputs List Will Be Removed from agent" << agentInMapping->name() << outputsListWillBeRemoved.count();
-        // TODO ESTIA
-    }
+     if ((agentInMapping != NULL) && (outputsListWillBeRemoved.count() > 0))
+     {
+         qDebug() << "_on Outputs List Will Be Removed from agent" << agentInMapping->name() << outputsListWillBeRemoved.count();
+
+ //        QList<MapBetweenIOPVM*> newListOfPartialMap;
+ //        foreach(OutputVM* removedOutput, outputVMs)
+ //        {
+ //            foreach(MapBetweenIOPVM* mapBetweenIOP, _allMapInMapping.toList())
+ //            {
+ //                if( (mapBetweenIOP != NULL) && (mapBetweenIOP->agentFrom()->name() == agentInMapping->name()) )
+ //                {
+ //                    if( (removedOutput != NULL) && (mapBetweenIOP->pointFrom()->name() == removedOutput->name()) )
+ //                    {
+ //                        // if involved as agentFrom:
+ //                        // 1- remove from the list of all the map
+ //                        _allMapInMapping.remove(mapBetweenIOP);
+ //                        outputsListWillBeRemoved(removedOutput);
+
+ //                        // 2 - Transform the mapping in a partial map and add to the list of all the map.
+ //                        // Create ghost output and agent
+ //                        OutputVM* ghostOutput = new OutputVM(removedOutput->name());
+ //                        AgentInMappingVM* ghostAgent = new AgentInMappingVM(agentInMapping->name());
+
+ //                        // Edit map to be partial
+ //                        mapBetweenIOP->setagentFrom(ghostAgent);
+ //                        mapBetweenIOP->setpointFrom(ghostOutput);
+
+ //                        if(!_checkIfMapBetweenIOPVMAlreadyExist(ghostAgent, ghostOutput, mapBetweenIOP->agentTo(), mapBetweenIOP->pointTo()))
+ //                        {
+ //                           qInfo() << "Turn a MapBetweenIOPVM into a the partial MapBetweenIOPVM : " << mapBetweenIOP->agentTo()->name() << "." << mapBetweenIOP->pointTo()->name() << " -> " << ghostAgent->name() << "." << ghostOutput->name();
+ //                           newListOfPartialMap.append(mapBetweenIOP);
+ //                        }
+ //                    }
+ //                }
+ //            }
+ //        }
+ //        if(!newListOfPartialMap.isEmpty())
+ //        {
+ //            // Push partialMaps into internal list
+ //            _allPartialMapInMapping.append(newListOfPartialMap);
+
+ //            //Add to Hash and to temp partial maps list
+ //            QList<MapBetweenIOPVM*> listOfMapUnderKey;
+ //            if(_mapFromAgentNameToPartialMapBetweenIOPViewModelsList.contains(agentInMapping->name()))
+ //            {
+ //                listOfMapUnderKey = _mapFromAgentNameToPartialMapBetweenIOPViewModelsList.value((agentInMapping->name()));
+ //            }
+ //            listOfMapUnderKey.append(newListOfPartialMap);
+ //            _mapFromAgentNameToPartialMapBetweenIOPViewModelsList.insert(agentInMapping->name(), listOfMapUnderKey);
+ //        }
+     }
 }
 
 

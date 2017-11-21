@@ -37,7 +37,7 @@ class ActionConditionM: public QObject
     Q_OBJECT
 
     // Agent model
-    I2_QML_PROPERTY(AgentInMappingVM*, agentModel)
+    I2_QML_PROPERTY_CUSTOM_SETTER(AgentInMappingVM*, agentModel)
 
     // Effect type
     I2_QML_PROPERTY(ActionComparisonValueType::Value, comparison)
@@ -67,9 +67,14 @@ public:
     void copyFrom(ActionConditionM* condition);
 
     /**
-      * @brief Initialize the action condition. Make connections.
+      * @brief Initialize the agent connections for the action condition
       */
-    void initialize();
+    void initializeConnections();
+
+    /**
+      * @brief Reset the agent connections for the action condition
+      */
+    void resetConnections();
 
 Q_SIGNALS:
 
@@ -80,6 +85,14 @@ public Q_SLOTS:
       * @brief Slot on IsON flag agent change
       */
     void onAgentModelIsOnChange(bool isON);
+
+protected Q_SLOTS:
+
+    /**
+     * @brief Called when our agent model is destroyed
+     * @param sender
+     */
+    void _onAgentModelDestroyed(QObject* sender);
 
 protected:
 

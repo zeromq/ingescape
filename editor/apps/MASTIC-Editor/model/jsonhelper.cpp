@@ -401,7 +401,7 @@ AgentIOPM* JsonHelper::_createModelOfAgentIOP(QJsonObject jsonObject, AgentIOPTy
                 break;
             }
 
-            //qDebug() << agentIOP->name() << "(" << AgentIOPValueTypes::staticEnumToString(agentIOP->agentIOPValueType()) << ")" << agentIOP->displayableDefaultValue();
+            //qDebug() << agentIOP->name() << "(" << AgentIOPValueTypes::staticEnumToKey(agentIOP->agentIOPValueType()) << ")" << agentIOP->displayableDefaultValue();
         }
         else {
             qCritical() << "IOP '" << jsonName.toString() << "': The value type '" << jsonType.toString() << "' is wrong (must be INTEGER, DOUBLE, STRING, BOOL, IMPULSION or DATA)";
@@ -424,7 +424,7 @@ QJsonObject JsonHelper::_getJsonFromAgentIOP(AgentIOPM* agentIOP)
     if (agentIOP != NULL)
     {
         jsonAgentIOP.insert("name", agentIOP->name());
-        jsonAgentIOP.insert("type", AgentIOPValueTypes::staticEnumToString(agentIOP->agentIOPValueType()));
+        jsonAgentIOP.insert("type", AgentIOPValueTypes::staticEnumToKey(agentIOP->agentIOPValueType()));
 
         switch (agentIOP->agentIOPValueType())
         {
@@ -556,7 +556,7 @@ QPair< QPair< QList<ActionM*>, QList<ActionInPaletteVM*> > , QList<ActionVM*> > 
                         if(jsonValue.isString())
                         {
                             int validationDurationType = ValidationDurationType::staticEnumFromKey(jsonValue.toString());
-                            actionM->setvalidityDuration((ValidationDurationType::Value)validationDurationType);
+                            actionM->setvalidityDurationType((ValidationDurationType::Value)validationDurationType);
                         }
 
                         jsonValue = jsonAction.value("validity_duration_value");
@@ -1048,7 +1048,7 @@ ActionConditionVM* JsonHelper::_parseConditionsVMFromJson(QJsonObject jsonCondit
 
                         // Check agent name and iop name exists
                         QString agentAgentName = jsonAgentName.toString();
-                        QString agentIOPName = jsonAgentName.toString();
+                        QString agentIOPName = jsonIOPName.toString();
 
                         AgentInMappingVM* agentM = NULL;
                         AgentIOPM* iopAgentM = NULL;
@@ -1201,7 +1201,7 @@ QByteArray JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<ActionI
         // Create properties
         QJsonObject jsonAgent;
         jsonAgent.insert("name",actionM->name());
-        jsonAgent.insert("validity_duration_type",ValidationDurationType::staticEnumToString(actionM->validityDurationType()));
+        jsonAgent.insert("validity_duration_type",ValidationDurationType::staticEnumToKey(actionM->validityDurationType()));
         jsonAgent.insert("validity_duration_value",actionM->validityDurationString());
         jsonAgent.insert("shall_revert",actionM->shallRevert());
         jsonAgent.insert("shall_revert_at_validity_end",actionM->shallRevertWhenValidityIsOver());
@@ -1221,7 +1221,7 @@ QByteArray JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<ActionI
             if(actionCondition != NULL)
             {
                 QJsonObject jsonCondition;
-                jsonCondition.insert("type",ActionConditionType::staticEnumToString(conditionVM->conditionType()));
+                jsonCondition.insert("type",ActionConditionType::staticEnumToKey(conditionVM->conditionType()));
                 jsonCondition.insert("agent_name", actionCondition->agentModel()->name());
 
                 switch (conditionVM->conditionType())
@@ -1232,7 +1232,7 @@ QByteArray JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<ActionI
                     if(iopCondition != NULL && iopCondition->agentIOP() != NULL)
                     {
                         jsonCondition.insert("iop_name", iopCondition->agentIOP()->name());
-                        jsonCondition.insert("operator", ActionComparisonValueType::staticEnumToString(iopCondition->comparison()));
+                        jsonCondition.insert("operator", ActionComparisonValueType::staticEnumToKey(iopCondition->comparison()));
                         jsonCondition.insert("value", iopCondition->value());
 
                         jsonFilled = true;
@@ -1244,7 +1244,7 @@ QByteArray JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<ActionI
                 {
                     if(actionCondition->agentModel() != NULL)
                     {
-                        jsonCondition.insert("value", ActionComparisonValueType::staticEnumToString(actionCondition->comparison()));
+                        jsonCondition.insert("value", ActionComparisonValueType::staticEnumToKey(actionCondition->comparison()));
 
                         jsonFilled = true;
                     }
@@ -1276,7 +1276,7 @@ QByteArray JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<ActionI
             if(actionEffect != NULL)
             {
                 QJsonObject jsonEffect;
-                jsonEffect.insert("type",ActionEffectType::staticEnumToString(effectVM->effectType()));
+                jsonEffect.insert("type",ActionEffectType::staticEnumToKey(effectVM->effectType()));
 
                 switch (effectVM->effectType())
                 {
@@ -1287,7 +1287,7 @@ QByteArray JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<ActionI
                         {
                             jsonEffect.insert("agent_name", actionEffect->agentModel()->name());
                             jsonEffect.insert("iop_name", iopEffect->agentIOP()->name());
-                            jsonEffect.insert("operator", ActionEffectValueType::staticEnumToString(iopEffect->effect()));
+                            jsonEffect.insert("operator", ActionEffectValueType::staticEnumToKey(iopEffect->effect()));
                             jsonEffect.insert("value", iopEffect->value());
 
                             jsonFilled = true;
@@ -1300,7 +1300,7 @@ QByteArray JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<ActionI
                         if(actionEffect->agentModel() != NULL)
                         {
                             jsonEffect.insert("agent_name", actionEffect->agentModel()->name());
-                            jsonEffect.insert("value", ActionEffectValueType::staticEnumToString(actionEffect->effect()));
+                            jsonEffect.insert("value", ActionEffectValueType::staticEnumToKey(actionEffect->effect()));
 
                             jsonFilled = true;
                         }
@@ -1317,7 +1317,7 @@ QByteArray JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<ActionI
                             jsonEffect.insert("from_iop_name", mappingEffect->fromAgentIOP()->name());
                             jsonEffect.insert("to_agent_name", mappingEffect->toAgentModel()->name());
                             jsonEffect.insert("to_iop_name", mappingEffect->toAgentIOP()->name());
-                            jsonEffect.insert("value", ActionEffectValueType::staticEnumToString(actionEffect->effect()));
+                            jsonEffect.insert("value", ActionEffectValueType::staticEnumToKey(actionEffect->effect()));
 
                             jsonFilled = true;
                         }

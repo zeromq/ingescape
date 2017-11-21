@@ -36,7 +36,7 @@ class ScenarioController: public QObject
     Q_OBJECT
 
     // Filtered Sorted list of actions
-    I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(ActionM, actionsList)
+    I2_QOBJECT_LISTMODEL(ActionM, actionsList)
 
     // Sorted list of ations by start time
     I2_QOBJECT_LISTMODEL(ActionEditorController, openedActionsEditorsControllers)

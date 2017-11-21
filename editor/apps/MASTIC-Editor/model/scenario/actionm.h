@@ -79,6 +79,9 @@ class ActionM: public QObject
     // List of conditions for the action
     I2_QOBJECT_LISTMODEL(ActionConditionVM, conditionsList)
 
+    // Is valid flag
+    I2_QML_PROPERTY(bool, isValid)
+
     // FIXME : Liste des temps de déclenchement (1 ou plus si réarmable) >> VP
 
 public:
@@ -101,11 +104,28 @@ public:
      */
     void copyFrom(ActionM* actionModel);
 
+    /**
+     * @brief Initialize connections for conditions
+     */
+    void initializeConditionsConnections();
+
+    /**
+     * @brief Reset connections for conditions
+     */
+    void resetConditionsConnections();
+
 
 Q_SIGNALS:
 
 
 public Q_SLOTS:
+
+protected Q_SLOTS:
+
+    /**
+     * @brief Slot on the condition validation change
+     */
+    void _onConditionValidationChange(bool isValid);
 
 
 protected:

@@ -88,9 +88,35 @@ ActionConditionM::~ActionConditionM()
     {
         disconnect(_agentModel, &AgentInMappingVM::isONChanged, this, &ActionConditionM::onAgentModelIsOnChange);
     }
+}
 
-    // Reset agent model to null
-    setagentModel(NULL);
+/**
+* @brief Custom setter for agent model
+* @param agent model
+*/
+void ActionConditionM::setagentModel(AgentInMappingVM* agentModel)
+{
+    if(_agentModel != agentModel)
+    {
+        if(_agentModel != NULL)
+        {
+            // UnSubscribe to destruction
+            disconnect(_agentModel, &AgentInMappingVM::destroyed, this, &ActionConditionM::_onAgentModelDestroyed);
+
+            resetConnections();
+        }
+        setisValid(false);
+
+        _agentModel = agentModel;
+
+        if(_agentModel != NULL)
+        {
+            // Subscribe to destruction
+            connect(_agentModel, &AgentInMappingVM::destroyed, this, &ActionConditionM::_onAgentModelDestroyed);
+        }
+
+        Q_EMIT agentModelChanged(agentModel);
+    }
 }
 
 /**
@@ -103,28 +129,20 @@ void ActionConditionM::copyFrom(ActionConditionM* condition)
     {
         setagentModel(condition->agentModel());
         setcomparison(condition->comparison());
+        setisValid(condition->isValid());
     }
 }
 
-/**
-  * @brief Initialize the action condition. Make connections.
-  */
-void ActionConditionM::initialize()
-{
-    if(_agentModel != NULL)
-    {
-        connect(_agentModel, &AgentInMappingVM::isONChanged, this, &ActionConditionM::onAgentModelIsOnChange);
-    }
-}
 
 /**
   * @brief Slot on IsON flag agent change
   */
 void ActionConditionM::onAgentModelIsOnChange(bool isON)
 {
+    qDebug() << "onAgentModelIsOnChange : " << isON;
     if((_comparison == ActionComparisonValueType::ON && isON)
                 ||
-       (_comparison == ActionComparisonValueType::OFF && isON))
+       (_comparison == ActionComparisonValueType::OFF && isON == false))
     {
         setisValid(true);
     } else
@@ -133,3 +151,42 @@ void ActionConditionM::onAgentModelIsOnChange(bool isON)
     }
 }
 
+/**
+  * @brief Initialize the agent connections for the action condition
+  */
+void ActionConditionM::initializeConnections()
+{
+    if(_agentModel != NULL)
+    {
+        // Reset the connections
+        resetConnections();
+
+        // Make connection for the futur changes
+        connect(_agentModel, &AgentInMappingVM::isONChanged, this, &ActionConditionM::onAgentModelIsOnChange);
+
+        // Initialize the action state with the current agent state
+        onAgentModelIsOnChange(_agentModel->isON());
+    }
+}
+
+/**
+  * @brief Reset the agent connections for the action condition
+  */
+void ActionConditionM::resetConnections()
+{
+    if(_agentModel != NULL)
+    {
+        disconnect(_agentModel, &AgentInMappingVM::isONChanged, this, &ActionConditionM::onAgentModelIsOnChange);
+    }
+}
+
+/**
+ * @brief Called when our agent model is destroyed
+ * @param sender
+ */
+void ActionConditionM::_onAgentModelDestroyed(QObject* sender)
+{
+    Q_UNUSED(sender)
+
+    setagentModel(NULL);
+}

@@ -234,8 +234,8 @@ private Q_SLOTS:
 
 
     /**
-     * @brief Slot when some view models of outputs will be removed from an agent in mapping
-     * @param outputsListWillBeRemoved
+     * @brief Slot when some view models of inputs will be removed from an agent in mapping
+     * @param inputsListWillBeRemoved
      */
     void _onInputsListWillBeRemoved(QList<InputVM*> inputsListWillBeRemoved);
 
