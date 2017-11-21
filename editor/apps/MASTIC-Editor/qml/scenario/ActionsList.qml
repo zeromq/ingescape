@@ -100,16 +100,6 @@ Item {
         ListView {
             id: actionsList
 
-
-            anchors {
-                top: parent.top
-                topMargin: 108
-                bottom: parent.bottom
-                left: parent.left
-                right: parent.right
-            }
-
-
             model: controller.actionsList
 
             delegate: componentActionsListItem
