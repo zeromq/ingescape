@@ -42,6 +42,9 @@ class ActionConditionM: public QObject
     // Effect type
     I2_QML_PROPERTY(ActionComparisonValueType::Value, comparison)
 
+    // Flag in case of condition validation
+    I2_QML_PROPERTY(bool, isValid)
+
 
 public:
 
@@ -63,11 +66,20 @@ public:
     */
     void copyFrom(ActionConditionM* condition);
 
+    /**
+      * @brief Initialize the action condition. Make connections.
+      */
+    void initialize();
+
 Q_SIGNALS:
 
 
 public Q_SLOTS:
 
+    /**
+      * @brief Slot on IsON flag agent change
+      */
+    void onAgentModelIsOnChange(bool isON);
 
 protected:
 

@@ -68,10 +68,25 @@ public:
     */
     bool setagentModel(AgentInMappingVM* agentModel);
 
+    /**
+      * @brief Initialize the action condition. Make connections.
+      */
+    void initialize();
+
 Q_SIGNALS:
 
 
 public Q_SLOTS:
+
+    /**
+      * @brief Slot on agent inputs list change
+      */
+    void onInputsListChange(QList<InputVM*> inputsList);
+
+    /**
+      * @brief Slot on agent outputs list change
+      */
+    void onOutputsListChange(QList<OutputVM *> outputsList);
 
 
 protected:

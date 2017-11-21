@@ -227,6 +227,16 @@ I2PopupBase {
 
                 property bool isOpened : false
 
+                Connections {
+                    target : rootItem
+                    onOpened : {
+                        // make the conditions list visible if there are conditions
+                        if (actionM && actionM.conditionsList.count > 0) {
+                            conditionsItem.isOpened = true;
+                        }
+                    }
+                }
+
                 //Title
                 MouseArea {
                     id : titleMouseArea

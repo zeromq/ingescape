@@ -117,4 +117,83 @@ bool IOPValueConditionM::setagentModel(AgentInMappingVM* agentModel)
     return hasChanged;
 }
 
+/**
+  * @brief Initialize the action condition. Make connections.
+  */
+void IOPValueConditionM::initialize()
+{
+    if(_agentModel != NULL)
+    {
+        connect(_agentModel, &AgentInMappingVM::inputsListWillBeRemoved, this, &IOPValueConditionM::onInputsListChange);
+        connect(_agentModel, &AgentInMappingVM::inputsListAdded, this, &IOPValueConditionM::onInputsListChange);
+        connect(_agentModel, &AgentInMappingVM::outputsListWillBeRemoved, this, &IOPValueConditionM::onOutputsListChange);
+        connect(_agentModel, &AgentInMappingVM::outputsListAdded, this, &IOPValueConditionM::onOutputsListChange);
+    }
+}
+
+
+/**
+  * @brief Slot on agent inputs list change
+  */
+void IOPValueConditionM::onInputsListChange(QList<InputVM*> inputsList)
+{
+    Q_UNUSED(inputsList)
+
+    if(_agentModel != NULL && _agentIOP != NULL)
+    {
+        QString agentIopName = _agentIOP->name();
+        AgentIOPM * newAgentIOP = NULL;
+
+        // Fill with inputs
+        foreach (InputVM* input, _agentModel->inputsList()->toList())
+        {
+            if(input->firstModel() != NULL)
+            {
+                if(agentIopName.isEmpty() == false && agentIopName == input->firstModel()->name())
+                {
+                    newAgentIOP = input->firstModel();
+                }
+            }
+        }
+
+        // Reset the agentIOP
+        if(newAgentIOP != _agentIOP)
+        {
+            setagentIOP(newAgentIOP);
+        }
+    }
+}
+
+/**
+  * @brief Slot on agent outputs list change
+  */
+void IOPValueConditionM::onOutputsListChange(QList<OutputVM*> outputsList)
+{
+    Q_UNUSED(outputsList)
+
+    if(_agentModel != NULL && _agentIOP != NULL)
+    {
+        QString agentIopName = _agentIOP->name();
+        AgentIOPM * newAgentIOP = NULL;
+
+        // Fill with outputs
+        foreach (OutputVM* output, _agentModel->outputsList()->toList())
+        {
+            if(output->firstModel() != NULL)
+            {
+                if(newAgentIOP == NULL && agentIopName.isEmpty() == false && agentIopName == output->firstModel()->name())
+                {
+                    newAgentIOP = output->firstModel();
+                }
+            }
+        }
+
+        // Reset the agentIOP
+        if(newAgentIOP != _agentIOP)
+        {
+            setagentIOP(newAgentIOP);
+        }
+    }
+}
+
 
