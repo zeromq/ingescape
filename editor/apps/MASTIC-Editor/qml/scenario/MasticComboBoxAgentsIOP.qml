@@ -43,10 +43,8 @@ Item {
         updateCurrentSelection();
     }
 
-
-    //selected Item & Index
+    //selected Item
     property var selectedItem;
-    property alias selectedIndex: combolist.currentIndex;
 
     //Model
     property alias model: combolist.model
@@ -66,24 +64,8 @@ Item {
     function updateCurrentSelection() {
         if (selectedItem)
         {
-            var index = 0;
-            var found = false;
-
-            while (!found && (index < combolist.count))
-            {
-                var item = combolist.model.get(index);
-                var textItem = modelToString(item);
-                if (modelToString(selectedItem) === textItem)
-                {
-                    combolist.currentIndex = index;
-                    comboText.text = textItem;
-                    found = true;
-                }
-
-                index++;
-            }
+            comboText.text = modelToString(combobox.selectedItem);
         }  else {
-            combolist.currentIndex = -1;
             comboText.text = "";
         }
     }
@@ -119,7 +101,7 @@ Item {
         Text {
             id:comboPlaceholder
 
-            visible: (comboText.text === "");
+            visible: (combobox.selectedItem === null);
             text : (combolist.count === 0 ? "- No Item -" : "- Select an item -")
             anchors {
                 verticalCenter: parent.verticalCenter;
@@ -387,7 +369,7 @@ Item {
                             right: parent.right
                         }
 
-                        color: MasticTheme.lightGreyColor
+                        color: (combobox.selectedItem === model.QtObject)?  MasticTheme.whiteColor : MasticTheme.lightGreyColor
 
                         text: model.name
                         elide: Text.ElideRight
