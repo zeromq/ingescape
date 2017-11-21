@@ -67,7 +67,8 @@ QString ActionComparisonValueType::enumToString(int value)
  */
 ActionConditionM::ActionConditionM(QObject *parent) : QObject(parent),
     _agentModel(NULL),
-    _comparison(ActionComparisonValueType::ON)
+    _comparison(ActionComparisonValueType::ON),
+    _isValid(false)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -82,6 +83,12 @@ ActionConditionM::ActionConditionM(QObject *parent) : QObject(parent),
  */
 ActionConditionM::~ActionConditionM()
 {
+    // Disconnect the agent model
+    if(_agentModel != NULL)
+    {
+        disconnect(_agentModel, &AgentInMappingVM::isONChanged, this, &ActionConditionM::onAgentModelIsOnChange);
+    }
+
     // Reset agent model to null
     setagentModel(NULL);
 }
@@ -99,4 +106,30 @@ void ActionConditionM::copyFrom(ActionConditionM* condition)
     }
 }
 
+/**
+  * @brief Initialize the action condition. Make connections.
+  */
+void ActionConditionM::initialize()
+{
+    if(_agentModel != NULL)
+    {
+        connect(_agentModel, &AgentInMappingVM::isONChanged, this, &ActionConditionM::onAgentModelIsOnChange);
+    }
+}
+
+/**
+  * @brief Slot on IsON flag agent change
+  */
+void ActionConditionM::onAgentModelIsOnChange(bool isON)
+{
+    if((_comparison == ActionComparisonValueType::ON && isON)
+                ||
+       (_comparison == ActionComparisonValueType::OFF && isON))
+    {
+        setisValid(true);
+    } else
+    {
+        setisValid(false);
+    }
+}
 
