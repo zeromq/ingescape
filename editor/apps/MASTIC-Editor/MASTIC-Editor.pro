@@ -56,7 +56,8 @@ SOURCES += main.cpp \
     model/publishedvaluem.cpp \
     model/enums.cpp \
     controller/valueshistorycontroller.cpp \
-    sortFilter/valueshistorysortfilter.cpp
+    sortFilter/valueshistorysortfilter.cpp \
+    viewModel/actionexecutionvm.cpp
 
 HEADERS += \
     model/agentm.h \
@@ -108,7 +109,8 @@ HEADERS += \
     model/publishedvaluem.h \
     model/enums.h \
     controller/valueshistorycontroller.h \
-    sortFilter/valueshistorysortfilter.h
+    sortFilter/valueshistorysortfilter.h \
+    viewModel/actionexecutionvm.h
 
 
 RESOURCES += qml.qrc
