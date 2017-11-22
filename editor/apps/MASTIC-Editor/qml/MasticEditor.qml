@@ -114,14 +114,10 @@ Item {
         fuzzyRadius: 8
 
 
-        Text {
-            anchors.centerIn: parent
 
-            text: qsTr("Scenario")
-
-            font: MasticTheme.headingFont
-
-            color: MasticTheme.whiteColor
+        Scenario.ScenarioTimeLine {
+            anchors.fill: parent
+            controller: MasticEditorC.scenarioC;
         }
     }
 
