@@ -44,6 +44,7 @@ void ActionExecutionVM::addReverseEffectsList(QString peerIdTargetAgent, ActionE
         switch (effectToReverseVM->effectType())
         { 
             case ActionEffectType::AGENT:
+            {
                 switch (effectToReverseM->effect()) {
                     case ActionEffectValueType::ON:
                         parameters = "DIE";
@@ -51,10 +52,14 @@ void ActionExecutionVM::addReverseEffectsList(QString peerIdTargetAgent, ActionE
                     case ActionEffectValueType::OFF:
                         parameters = "RUN";
                         break;
+                    default:
+                    break;
                 }
                 break;
+            }
 
             case ActionEffectType::MAPPING:
+            {
                 //Try to cast as Mapping
                 MappingEffectM* mappingEffectToReverseM = dynamic_cast<MappingEffectM*>(effectToReverseM);
                 if(mappingEffectToReverseM != NULL)
@@ -74,9 +79,12 @@ void ActionExecutionVM::addReverseEffectsList(QString peerIdTargetAgent, ActionE
                                                                 mappingEffectToReverseM->fromAgentIOP()->name());
 
                         break;
+                    default:
+                    break;
                     }
                 }
                 break;
+            }
 
 //            case ActionEffectType::VALUE:
 //                //Try to cast as Mapping
@@ -100,6 +108,9 @@ void ActionExecutionVM::addReverseEffectsList(QString peerIdTargetAgent, ActionE
 //                    }
 //                }
 //                break;
+
+            default:
+            break;
         }
 
         if(!parameters.isEmpty() || !parameters.isNull())
