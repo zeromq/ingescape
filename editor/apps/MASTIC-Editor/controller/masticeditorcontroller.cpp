@@ -36,6 +36,7 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     _networkC(NULL),
     _scenarioC(NULL),
     _valuesHistoryC(NULL),
+    _timeLineC(NULL),
     _terminationSignalWatcher(NULL)
 {
     qInfo() << "New MASTIC Editor Controller";
@@ -115,6 +116,9 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
 
     // Create the controller for the history of values
     _valuesHistoryC = new ValuesHistoryController(_modelManager, this);
+
+    // Create the controller for scenario management
+    _timeLineC = new AbstractTimeActionslineScenarioViewController(this);
 
     // Connect to signals from the network controller
     connect(_networkC, &NetworkController::agentEntered, _modelManager, &MasticModelManager::onAgentEntered);
@@ -200,6 +204,17 @@ MasticEditorController::~MasticEditorController()
     //
     // Clean-up sub-controllers
     //
+    if (_timeLineC != NULL)
+    {
+        disconnect(_timeLineC);
+
+        AbstractTimeActionslineScenarioViewController* temp = _timeLineC;
+        settimeLineC(NULL);
+        delete temp;
+        temp = NULL;
+    }
+
+
     if (_valuesHistoryC != NULL)
     {
         disconnect(_valuesHistoryC);

@@ -287,7 +287,7 @@ Item {
                     }
                 }
 
-                // Address(es) on the network of our agent(s)
+                // Hostnames (on the network) of our agents
                 Text {
                     id: agentHostnames
                     anchors {
