@@ -1,30 +1,10 @@
 #include "actionexecutionvm.h"
 
-QString ExecutionMode::enumToString(int value)
-{
-    QString string = "ExecutionMode ";
-
-    switch (value) {
-    case ValidationDurationType::NORMAL:
-        string = "Normal";
-        break;
-
-    case ValidationDurationType::REVERT:
-        string = "Revert";
-        break;
-
-    default:
-        break;
-    }
-
-    return string;
-}
-
 /**
   * @brief Constructor by default
   */
-ActionExecutionVM::ActionExecutionVM(ExecutionMode::Value executionMode, int executionTime, int reverseTime, QObject *parent):QObject(parent),
-    _executionMode(executionMode),
+ActionExecutionVM::ActionExecutionVM(bool hasRevert, int executionTime, int reverseTime, QObject *parent):QObject(parent),
+    _hasRevert(hasRevert),
     _isWaitingRevert(false),
     _isTriggered(false),
     _executionTime(executionTime),
@@ -51,25 +31,26 @@ ActionExecutionVM::~ActionExecutionVM()
 void ActionExecutionVM::addReverseEffectsList(QString peerIdTargetAgent, ActionEffectVM *effectToReverseVM)
 {
     QPair<QString, QString> newReverseEffectElement;
-    if(!peerId.isEmpty() || !peerId.isNull() || effectToReverseVM != NULL)
+    if(!peerIdTargetAgent.isEmpty() || !peerIdTargetAgent.isNull() || effectToReverseVM != NULL)
     {
         // Create first
-        newReverseEffectElement.first = peerId;
+        newReverseEffectElement.first = peerIdTargetAgent;
 
         // Create second
         QString parameters;
-        switch (effectToReverse->effectType())
-        {
-            //Get the effect
-            ActionEffectM* effectToReverseM = effectToReverse->effect();
+
+        //Get the effect
+        ActionEffectM* effectToReverseM = effectToReverseVM->effect();
+        switch (effectToReverseVM->effectType())
+        { 
             case ActionEffectType::AGENT:
                 switch (effectToReverseM->effect()) {
-                case ActionEffectValueType::ON:
-                    parameters = "DIE";
-                    break;
-                case ActionEffectValueType::OFF:
-                    parameters = "RUN";
-                    break;
+                    case ActionEffectValueType::ON:
+                        parameters = "DIE";
+                        break;
+                    case ActionEffectValueType::OFF:
+                        parameters = "RUN";
+                        break;
                 }
                 break;
 
@@ -81,48 +62,44 @@ void ActionExecutionVM::addReverseEffectsList(QString peerIdTargetAgent, ActionE
                     switch (mappingEffectToReverseM->effect()) {
                     case ActionEffectValueType::ENABLE:
                         parameters = QString("%s %s %s %S").arg("UNMAP",
-                                                                mappingEffectToReverseM->fromAgentIOP()->name(),
-                                                                mappingEffectToReverseM->toAgentModel()->name(),
-                                                                mappingEffectToReverseM->toAgentIOP()->name());
+                                                                mappingEffectToReverseM->toAgentIOP()->name(),
+                                                                mappingEffectToReverseM->agentModel()->name(),
+                                                                mappingEffectToReverseM->fromAgentIOP()->name());
                         break;
 
                     case ActionEffectValueType::DISABLE:
-                        parameters = QString("%s %s %s %S").arg("MAP", mappingEffectToReverseM->fromAgentIOP()->name(),
-                                                                mappingEffectToReverseM->toAgentModel()->name(),
-                                                                mappingEffectToReverseM->toAgentIOP()->name());
-                        break;
-                    default:
+                        parameters = QString("%s %s %s %S").arg("MAP",
+                                                                mappingEffectToReverseM->toAgentIOP()->name(),
+                                                                mappingEffectToReverseM->agentModel()->name(),
+                                                                mappingEffectToReverseM->fromAgentIOP()->name());
+
                         break;
                     }
                 }
                 break;
 
-            case ActionEffectType::VALUE:
-                //Try to cast as Mapping
-                IOPValueEffectM* valueEffectToReverseM = dynamic_cast<IOPValueEffectM*>(effectToReverseM);
-                if(valueEffectToReverseM != NULL)
-                {
-                    switch (valueEffectToReverseM->agentIOP()->agentIOPValueType()) {
-                    case AgentIOPValueTypes::BOOL:
-                        if(valueEffectToReverseM->agentIOP()->defaultValue()) parameters = "true";
-                        else parameters = "false";
-                        break;
-                    case AgentIOPValueTypes::INTEGER:
-                        parameters = QString::number(valueEffectToReverseM->agentIOP()->defaultValue());
-                        break;
-                    case AgentIOPValueTypes::DOUBLE:
-                        parameters = QString::number(valueEffectToReverseM->agentIOP()->defaultValue());
-                        break;
-                    case AgentIOPValueTypes::STRING:
-                        parameters = valueEffectToReverseM->agentIOP()->defaultValue();
-                        break;
-                    default:
-                        qCritical()<< "Value cannot be reversed because of inreversible type, i.e. DATA or IMPULSION";
-                        break;
-                    }
-                }
-
-                break;
+//            case ActionEffectType::VALUE:
+//                //Try to cast as Mapping
+//                IOPValueEffectM* valueEffectToReverseM = dynamic_cast<IOPValueEffectM*>(effectToReverseM);
+//                if(valueEffectToReverseM != NULL)
+//                {
+//                    switch (valueEffectToReverseM->agentIOP()->agentIOPValueType()) {
+//                    case AgentIOPValueTypes::BOOL:
+//                        if(valueEffectToReverseM->agentIOP()->defaultValue().toBool()) parameters = "true";
+//                        else parameters = "false";
+//                        break;
+//                    case AgentIOPValueTypes::INTEGER:
+//                        parameters = QString::number(valueEffectToReverseM->agentIOP()->defaultValue().toInt());
+//                        break;
+//                    case AgentIOPValueTypes::DOUBLE:
+//                        parameters = QString::number(valueEffectToReverseM->agentIOP()->defaultValue().toDouble());
+//                        break;
+//                    case AgentIOPValueTypes::STRING:
+//                        parameters = valueEffectToReverseM->agentIOP()->defaultValue().toString();
+//                        break;
+//                    }
+//                }
+//                break;
         }
 
         if(!parameters.isEmpty() || !parameters.isNull())

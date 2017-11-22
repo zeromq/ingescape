@@ -3,29 +3,20 @@
 
 #include <QObject>
 #include <QtQml>
-#include <QQmlEngine>
 #include <QPair>
 
 #include <I2PropertyHelpers.h>
 #include <viewModel/actioneffectvm.h>
 
 /**
-  * @brief Execution mode
-  * Types:
-  * - Normal: The process stops after the end of the action execution
-  * - Revert: The process will try to revert the effects of the action.
-  */
-I2_ENUM_CUSTOM(ExecutionMode, NORMAL, REVERT)
-
-/**
  * @brief The ActionExecutionVM class is the view model that support the representation of the action in the scenario
  */
-class ActionExecutionVM
+class ActionExecutionVM : public QObject
 {
      Q_OBJECT
 
-    // Execution mode
-    I2_QML_PROPERTY(ExecutionMode::Value, executionMode)
+    // Flag is
+    I2_QML_PROPERTY(bool, hasRevert)
 
     // Flag is waiting for the reverse effect.
     I2_QML_PROPERTY(bool, isWaitingRevert)
@@ -43,14 +34,12 @@ public:
     /**
       * @brief Constructor by default
       */
-    ActionExecutionVM(ExecutionMode::Value executionMode, int executionTime, int reverseTime, QObject *parent = NULL);
+    ActionExecutionVM(bool hasRevert, int executionTime, int reverseTime, QObject *parent = 0);
 
     /**
       * @brief Destructor by default
       */
     ~ActionExecutionVM();
-
-public:
 
     /**
      * @brief Add a new pair (peerID,parameters) to reverse the action's effect.

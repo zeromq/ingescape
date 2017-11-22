@@ -58,7 +58,7 @@ SOURCES += main.cpp \
     controller/valueshistorycontroller.cpp \
     sortFilter/valueshistorysortfilter.cpp \
     controller/abstracttimeactionslinescenarioviewcontroller.cpp \
-    model/scenario/timetickm.cpp
+    model/scenario/timetickm.cpp \
     viewModel/actionexecutionvm.cpp
 
 HEADERS += \
@@ -113,7 +113,7 @@ HEADERS += \
     controller/valueshistorycontroller.h \
     sortFilter/valueshistorysortfilter.h \
     controller/abstracttimeactionslinescenarioviewcontroller.h \
-    model/scenario/timetickm.h
+    model/scenario/timetickm.h \
     viewModel/actionexecutionvm.h
 
 
