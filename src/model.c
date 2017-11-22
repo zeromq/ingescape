@@ -44,7 +44,7 @@ void model_setIopValue(agent_iop *iop, void* value, long size){
                 free(iop->value.s);
             }
             if (value == NULL){
-                iop->value.s = "";
+                iop->value.s = strdup(""); //using strdup to be compliant with call to free just above
             }else{
                 iop->value.s = strdup(value);
             }
