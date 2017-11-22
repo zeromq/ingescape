@@ -299,7 +299,7 @@ Rectangle {
 
                                 hoverEnabled: true
 
-                                cursorShape: (draggablePointFROM.dragActive) ? Qt.ClosedHandCursor : Qt.PointingHandCursor //Qt.OpenHandCursor
+                                cursorShape: (draggablePointFROM.dragActive) ? Qt.ClosedHandCursor : Qt.PointingHandCursor
 
                                 onPressed: {
                                     draggablePointFROM.z = rootItem.parent.maxZ++;
@@ -566,7 +566,7 @@ Rectangle {
 
                                 hoverEnabled: true
 
-                                cursorShape: (draggablePointTO.dragActive) ? Qt.ClosedHandCursor : Qt.PointingHandCursor //Qt.OpenHandCursor
+                                cursorShape: (draggablePointTO.dragActive) ? Qt.ClosedHandCursor : Qt.PointingHandCursor
 
                                 onPressed: {
                                     draggablePointTO.z = rootItem.parent.maxZ++;
