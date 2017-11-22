@@ -25,10 +25,11 @@
 #include "viewModel/agentinmappingvm.h"
 #include "viewModel/actionconditionvm.h"
 #include "viewModel/actioneffectvm.h"
+#include "viewModel/actionvm.h"
 
 
 /**
- * @brief The ActionEditorController class defines the main controller of our application
+ * @brief The ActionEditorController class defines the main controller for the action editor panel
  */
 class ActionEditorController: public QObject
 {
@@ -39,6 +40,9 @@ class ActionEditorController: public QObject
 
     // Temporary action view model
     I2_QML_PROPERTY(ActionM*, editedAction)
+
+    // Action view model
+    I2_QML_PROPERTY(ActionVM*, viewModel)
 
     // Agents in mapping list
     I2_QML_PROPERTY(I2CustomItemSortFilterListModel<AgentInMappingVM> *, listAgentsInMapping)

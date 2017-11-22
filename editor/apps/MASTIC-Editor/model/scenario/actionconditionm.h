@@ -30,7 +30,7 @@ I2_ENUM_CUSTOM(ActionComparisonValueType, EQUAL_TO, SUPERIOR_TO, INFERIOR_TO, ON
 
 
 /**
- * @brief The ActionConditionM class defines the an actin condition view model
+ * @brief The ActionConditionM class defines an action condition model
  */
 class ActionConditionM: public QObject
 {

@@ -30,7 +30,7 @@ I2_ENUM(ActionInPaletteState, ENABLE, DISABLE)
 
 
 /**
- * @brief The ActionInPaletteVM class defines the main controller of our application
+ * @brief The ActionInPaletteVM class defines an action in palette view model
  */
 class ActionInPaletteVM: public QObject
 {

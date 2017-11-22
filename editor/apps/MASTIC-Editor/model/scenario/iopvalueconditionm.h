@@ -26,7 +26,7 @@
 
 
 /**
- * @brief The IOPValueConditionM class defines an action condition on iop model value
+ * @brief The IOPValueConditionM class defines an action condition on iop value
  */
 class IOPValueConditionM: public ActionConditionM
 {

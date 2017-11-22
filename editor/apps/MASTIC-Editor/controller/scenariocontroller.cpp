@@ -33,6 +33,7 @@
  */
 ScenarioController::ScenarioController(QString scenariosPath, QObject *parent) : QObject(parent),
     _selectedAction(NULL),
+    _linesNumberInTimeLine(1),
     _scenariosDirectoryPath(scenariosPath)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
@@ -95,6 +96,7 @@ ScenarioController::~ScenarioController()
     _actionsInPaletteList.deleteAllItems();
 
     // Clear the list of editor opened
+    _mapActionsEditorControllersFromActionM.clear();
     _mapActionsEditorControllersFromActionVM.clear();
     _openedActionsEditorsControllers.deleteAllItems();
 
@@ -113,7 +115,7 @@ ScenarioController::~ScenarioController()
 void ScenarioController::openActionEditor(ActionM* actionM)
 {
     // We check that or editor is not already opened
-    if(_mapActionsEditorControllersFromActionVM.contains(actionM) == false)
+    if(_mapActionsEditorControllersFromActionM.contains(actionM) == false)
     {
         // Create an empty action if we create a new one
         if(actionM != NULL)
@@ -124,7 +126,7 @@ void ScenarioController::openActionEditor(ActionM* actionM)
             ActionEditorController* actionEditorC = new ActionEditorController(_buildNewActionName(), actionM,agentsInMappingList());
 
             // Add action into our opened actions
-            _mapActionsEditorControllersFromActionVM.insert(actionM,actionEditorC);
+            _mapActionsEditorControllersFromActionM.insert(actionM,actionEditorC);
 
             // Add to list
             _openedActionsEditorsControllers.append(actionEditorC);
@@ -136,12 +138,41 @@ void ScenarioController::openActionEditor(ActionM* actionM)
             ActionEditorController* actionEditorC = new ActionEditorController(_buildNewActionName(), actionM ,agentsInMappingList());
 
             // Add action into our opened actions
-            _mapActionsEditorControllersFromActionVM.insert(actionEditorC->editedAction(),actionEditorC);
+            _mapActionsEditorControllersFromActionM.insert(actionEditorC->editedAction(),actionEditorC);
 
             // Add to list
             _openedActionsEditorsControllers.append(actionEditorC);
         }
     }
+}
+
+/**
+  * @brief Open the action editor
+  * @param action view model
+  */
+void ScenarioController::openActionEditorFromActionVM(ActionVM* actionVM)
+{
+    if(actionVM != NULL && actionVM->actionModel() != NULL)
+    {
+        // We check that or editor is not already opened
+        if(_mapActionsEditorControllersFromActionVM.contains(actionVM) == false)
+        {
+            setselectedAction(actionVM->actionModel());
+
+            // Create action editor controller
+            ActionEditorController* actionEditorC = new ActionEditorController(_buildNewActionName(), actionVM->actionModel(),agentsInMappingList());
+
+            // Set view model
+            actionEditorC->setviewModel(actionVM);
+
+            // Add action into our opened actions
+            _mapActionsEditorControllersFromActionVM.insert(actionVM,actionEditorC);
+
+            // Add to list
+            _openedActionsEditorsControllers.append(actionEditorC);
+        }
+    }
+
 }
 
 
@@ -152,17 +183,38 @@ void ScenarioController::openActionEditor(ActionM* actionM)
 void ScenarioController::deleteAction(ActionM * actionM)
 {
     // Delete the popup if necessary
-    if(actionM != NULL && _mapActionsEditorControllersFromActionVM.contains(actionM))
+    if(actionM != NULL && _mapActionsEditorControllersFromActionM.contains(actionM))
     {
-        ActionEditorController* actionEditorC = _mapActionsEditorControllersFromActionVM.value(actionM);
+        ActionEditorController* actionEditorC = _mapActionsEditorControllersFromActionM.value(actionM);
 
-        _mapActionsEditorControllersFromActionVM.remove(actionM);
+        _mapActionsEditorControllersFromActionM.remove(actionM);
         _openedActionsEditorsControllers.remove(actionEditorC);
     }
 
     // Unselect our action if needed
     if (_selectedAction == actionM) {
         setselectedAction(NULL);
+    }
+
+    // Remove action from the palette if exists
+    for (int index = 0; index < _actionsInPaletteList.count(); ++index)
+    {
+        ActionInPaletteVM* actionInPaletteVM = _actionsInPaletteList.at(index);
+        if(actionInPaletteVM->actionModel() != NULL && actionInPaletteVM->actionModel() == actionM)
+        {
+            setActionInPalette(index,NULL);
+        }
+    }
+
+    // Remove action from the timeline if exists
+    if(_mapActionsVMsInTimelineFromActionModel.contains(actionM))
+    {
+        QList<ActionVM*> actionVMList = _mapActionsVMsInTimelineFromActionModel.value(actionM);
+
+        foreach (ActionVM* actionVM, actionVMList)
+        {
+            removeActionVMFromTimeLine(actionVM);
+        }
     }
 
     // Delete the action item
@@ -175,6 +227,8 @@ void ScenarioController::deleteAction(ActionM * actionM)
         delete actionM;
         actionM = NULL;
     }
+
+
 }
 
 /**
@@ -188,8 +242,8 @@ void ScenarioController::valideActionEditor(ActionEditorController* actionEditor
 
     ActionM* originalActionVM = actionEditorC->originalAction();
 
-    // Initialize connections
-    originalActionVM->initializeConditionsConnections();
+    //FIXME Initialize connections
+    //originalActionVM->initializeConditionsConnections();
 
     // We check that or editor is not already opened
     if(_actionsList.contains(originalActionVM) == false)
@@ -213,11 +267,11 @@ void ScenarioController::closeActionEditor(ActionEditorController* actionEditorC
 {
     ActionM* actionM = actionEditorC->originalAction() != NULL ? actionEditorC->originalAction() : actionEditorC->editedAction();
     // Delete the popup if necessary
-    if(actionM != NULL && _mapActionsEditorControllersFromActionVM.contains(actionM))
+    if(actionM != NULL && _mapActionsEditorControllersFromActionM.contains(actionM))
     {
-        ActionEditorController* actionEditorC = _mapActionsEditorControllersFromActionVM.value(actionM);
+        ActionEditorController* actionEditorC = _mapActionsEditorControllersFromActionM.value(actionM);
 
-        _mapActionsEditorControllersFromActionVM.remove(actionM);
+        _mapActionsEditorControllersFromActionM.remove(actionM);
         _openedActionsEditorsControllers.remove(actionEditorC);
     }
 }
@@ -315,10 +369,11 @@ void ScenarioController::_importScenarioFromFile(QString scenarioFilePath)
                 // Append the list of actions
                 if(scenarioToImport.first.first.count() > 0)
                 {
-                    foreach (ActionM* actionM, scenarioToImport.first.first)
-                    {
-                        actionM->initializeConditionsConnections();
-                    }
+                    //FIXME
+//                    foreach (ActionM* actionM, scenarioToImport.first.first)
+//                    {
+//                        actionM->initializeConditionsConnections();
+//                    }
 
                     _actionsList.append(scenarioToImport.first.first);
                 }
@@ -395,6 +450,147 @@ void ScenarioController::_exportScenarioToFile(QString scenarioFilePath)
             qCritical() << "Can not open file" << scenarioFilePath;
         }
     }
-
 }
 
+/**
+ * @brief Add an action VM at the time in ms
+ * @param action model
+ */
+void ScenarioController::addActionVMAtTime(ActionM * actionModel, int timeInMs)
+{
+    if(actionModel != NULL)
+    {
+        ActionVM * actionVM = new ActionVM(actionModel,timeInMs);
+
+        int lineNumber = _insertActionVMIntoMapByLineNumber(actionVM);
+
+        // Set time line number of line
+        actionVM->setlineInTimeLine(lineNumber);
+
+        // Add the new action VM to our map
+        QList<ActionVM*> actionsVMsList;
+        if(_mapActionsVMsInTimelineFromActionModel.contains(actionModel) == true)
+        {
+            actionsVMsList = _mapActionsVMsInTimelineFromActionModel.value(actionModel);
+        }
+        actionsVMsList.append(actionVM);
+        _mapActionsVMsInTimelineFromActionModel.insert(actionModel,actionsVMsList);
+
+        // Add the action VM to the timeline
+        _actionsInTimeLine.append(actionVM);
+    }
+}
+
+/**
+ * @brief Add an action VM at the current date time
+ * @param action model
+ */
+void ScenarioController::addActionVMAtCurrentTime(ActionM * actionModel)
+{
+    if(actionModel != NULL)
+    {
+        // FIXME - get time from the current time of the timeline
+        int timeInMs = QDateTime::currentDateTime().time().msecsSinceStartOfDay();
+
+        addActionVMAtTime(actionModel,timeInMs);
+    }
+}
+
+/**
+ * @brief Remove an action VM from the time line
+ * @param action view model
+ */
+void ScenarioController::removeActionVMFromTimeLine(ActionVM * actionVM)
+{
+    if(actionVM != NULL && _actionsInTimeLine.contains(actionVM))
+    {
+        _actionsInTimeLine.remove(actionVM);
+
+        // Delete action vm from timeline
+        if(actionVM->actionModel() != NULL &&
+                _mapActionsVMsInTimelineFromActionModel.contains(actionVM->actionModel()))
+        {
+            QList<ActionVM*> actionsVMsList = _mapActionsVMsInTimelineFromActionModel.value(actionVM->actionModel());
+            actionsVMsList.removeAll(actionVM);
+            _mapActionsVMsInTimelineFromActionModel.insert(actionVM->actionModel(),actionsVMsList);
+        }
+
+        // Delete action view model editor if exists
+        if(_mapActionsEditorControllersFromActionVM.contains(actionVM))
+        {
+            ActionEditorController* actionEditorC = _mapActionsEditorControllersFromActionVM.value(actionVM);
+
+            _mapActionsEditorControllersFromActionVM.remove(actionVM);
+            _openedActionsEditorsControllers.remove(actionEditorC);
+        }
+
+        delete actionVM;
+        actionVM = NULL;
+    }
+}
+
+/**
+ * @brief Make conditions connections
+ */
+void ScenarioController::conditionsConnect()
+{
+    foreach (ActionVM * actionVM, _actionsInTimeLine.toList())
+    {
+        if(actionVM->actionModel() != NULL && actionVM->actionModel()->isConnected() == false)
+        {
+            actionVM->actionModel()->initializeConditionsConnections();
+        }
+    }
+}
+
+/**
+ * @brief Conditions disconnections
+ */
+void ScenarioController::conditionsDisconnect()
+{
+    foreach (ActionVM * actionVM, _actionsInTimeLine.toList())
+    {
+        if(actionVM->actionModel() != NULL && actionVM->actionModel()->isConnected())
+        {
+            actionVM->actionModel()->resetConditionsConnections();
+        }
+    }
+}
+
+
+/**
+ * @brief Insert an actionVM into our timeline
+ * @param action view model
+ * @return timeline line number
+ */
+int ScenarioController::_insertActionVMIntoMapByLineNumber(ActionVM* actionVMToInsert)
+{
+    Q_UNUSED(actionVMToInsert)
+    int availableLineNumber = 0;
+
+//    for (int lineNumber = 0; lineNumber < _linesNumberInTimeLine; ++lineNumber)
+//    {
+//        if(_mapActionsVMsInTimelineFromLineIndex.contains(lineNumber) == true)
+//        {
+//            I2CustomItemSortFilterListModel<ActionVM>* actionVMSortedList = _mapActionsVMsInTimelineFromLineIndex.value(lineIndex);
+//            foreach (ActionVM * actionVM, actionVMSortedList->toList())
+//            {
+//                int endTime = actionVM->startTime();
+
+//                if(actionVM->actionModel() != NULL && actionVM->startTime() < actionVMToInsert->startTime())
+//                {
+//                    // We skip that line since the action have a forever validity
+//                    if(actionVM->actionModel()->validityDurationType() == ValidationDurationType::FOREVER)
+//                    {
+//                        endTime = -1;
+//                        break;
+//                    } else if(actionVM->actionModel()->validityDurationType() == ValidationDurationType::CUSTOM) {
+//                        endTime += actionVM->actionModel()->validityDuration();
+//                    }
+//                }
+//            }
+//        }
+//    }
+
+    return availableLineNumber;
+}

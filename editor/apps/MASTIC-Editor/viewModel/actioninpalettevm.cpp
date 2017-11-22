@@ -45,7 +45,7 @@ ActionInPaletteVM::ActionInPaletteVM(ActionM* actionM, int indexInPanel, QObject
  */
 ActionInPaletteVM::~ActionInPaletteVM()
 {
-    setactionModel(NULL);
+
 }
 
 /**

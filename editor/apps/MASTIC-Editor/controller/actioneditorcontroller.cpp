@@ -32,6 +32,7 @@
 ActionEditorController::ActionEditorController(QString actionName, ActionM *originalAction, I2CustomItemSortFilterListModel<AgentInMappingVM> *listAgentsInMapping, QObject *parent) : QObject(parent),
     _originalAction(originalAction),
     _editedAction(NULL),
+    _viewModel(NULL),
     _listAgentsInMapping(listAgentsInMapping)
 {
     _editedAction = new ActionM(actionName, this);

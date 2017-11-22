@@ -29,7 +29,7 @@ I2_ENUM_CUSTOM(ActionEffectValueType, ON, OFF, ENABLE, DISABLE)
 
 
 /**
- * @brief The ActionEffectM class defines the main controller of our application
+ * @brief The ActionEffectM class defines an action effect model
  */
 class ActionEffectM: public QObject
 {

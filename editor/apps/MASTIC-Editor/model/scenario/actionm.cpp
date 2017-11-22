@@ -68,7 +68,8 @@ ActionM::ActionM(QString name, QObject *parent) : QObject(parent),
     _revertAfterTime(-1),
     _revertAfterTimeString("0.0"),
     _shallRearm(false),
-    _isValid(false)
+    _isValid(false),
+    _isConnected(false)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -240,20 +241,25 @@ void ActionM::setshallRevert(bool shallRevert)
  */
 void ActionM::initializeConditionsConnections()
 {
-    foreach (ActionConditionVM* conditionVM, _conditionsList.toList())
+    if(_isConnected == false)
     {
-        if(conditionVM->condition() != NULL)
+        foreach (ActionConditionVM* conditionVM, _conditionsList.toList())
         {
-            // Connect the valid change
-            connect(conditionVM->condition(),&ActionConditionM::isValidChanged,this,&ActionM::_onConditionValidationChange);
+            if(conditionVM->condition() != NULL)
+            {
+                // Connect the valid change
+                connect(conditionVM->condition(),&ActionConditionM::isValidChanged,this,&ActionM::_onConditionValidationChange);
 
-            // Intialize the connection
-            conditionVM->condition()->initializeConnections();
+                // Intialize the connection
+                conditionVM->condition()->initializeConnections();
+            }
         }
-    }
 
-    // Evaluate the action validation flag
-    _onConditionValidationChange(true);
+        // Evaluate the action validation flag
+        _onConditionValidationChange(true);
+
+        setisConnected(true);
+    }
 }
 
 /**
@@ -261,15 +267,21 @@ void ActionM::initializeConditionsConnections()
  */
 void ActionM::resetConditionsConnections()
 {
-    foreach (ActionConditionVM* conditionVM, _conditionsList.toList())
+    if(_isConnected == true)
     {
-        if(conditionVM->condition() != NULL)
+        foreach (ActionConditionVM* conditionVM, _conditionsList.toList())
         {
-            disconnect(conditionVM->condition(),&ActionConditionM::isValidChanged,this,&ActionM::_onConditionValidationChange);
+            if(conditionVM->condition() != NULL)
+            {
+                disconnect(conditionVM->condition(),&ActionConditionM::isValidChanged,this,&ActionM::_onConditionValidationChange);
 
-            conditionVM->condition()->resetConnections();
+                conditionVM->condition()->resetConnections();
+            }
         }
+
+        setisConnected(false);
     }
+
 }
 
 /**

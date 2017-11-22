@@ -43,7 +43,7 @@ ActionVM::ActionVM(ActionM *actionModel, int startTime, QObject *parent) : QObje
     {
         if(startTime >= 0)
         {
-            _startTimeString = QString::number((int)startTime/3600) + ":" + QString::number((int)startTime/60) + ":" + QString::number((int)startTime%60);
+            _startTimeString = QString::number((int)startTime/1000) + "." + QString::number((int)startTime%1000);
         }
 
         // Update valid flag
@@ -60,8 +60,7 @@ ActionVM::ActionVM(ActionM *actionModel, int startTime, QObject *parent) : QObje
  */
 ActionVM::~ActionVM()
 {
-    // Reset the action model
-    setactionModel(NULL);
+
 }
 
 

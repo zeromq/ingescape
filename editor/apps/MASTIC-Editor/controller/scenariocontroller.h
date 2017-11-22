@@ -71,6 +71,9 @@ class ScenarioController: public QObject
     // List of actions in timeline
     I2_QOBJECT_LISTMODEL(ActionVM, actionsInTimeLine)
 
+    // Number of line in our timeline
+    I2_QML_PROPERTY(int, linesNumberInTimeLine)
+
 public:
 
     /**
@@ -91,6 +94,12 @@ public:
       * @param action model
       */
     Q_INVOKABLE void openActionEditor(ActionM* actionM);
+
+    /**
+      * @brief Open the action editor
+      * @param action view model
+      */
+    Q_INVOKABLE void openActionEditorFromActionVM(ActionVM* actionVM);
 
     /**
       * @brief Delete an action from the list
@@ -127,6 +136,34 @@ public:
      */
     Q_INVOKABLE void exportScenarioToSelectedFile();
 
+    /**
+     * @brief Add an action VM at the time in ms
+     * @param action model
+     */
+    Q_INVOKABLE void addActionVMAtTime(ActionM * actionModel, int timeInMs);
+
+    /**
+     * @brief Add an action VM at the current date time
+     * @param action model
+     */
+    Q_INVOKABLE void addActionVMAtCurrentTime(ActionM * actionModel);
+
+    /**
+     * @brief Remove an action VM from the time line
+     * @param action view model
+     */
+    Q_INVOKABLE void removeActionVMFromTimeLine(ActionVM * actionVM);
+
+    /**
+     * @brief Make conditions connections
+     */
+    Q_INVOKABLE void conditionsConnect();
+
+    /**
+     * @brief Conditions disconnections
+     */
+    Q_INVOKABLE void conditionsDisconnect();
+
 Q_SIGNALS:
 
 
@@ -160,6 +197,12 @@ private :
      */
     void _exportScenarioToFile(QString scenarioFilePath);
 
+    /**
+     * @brief Insert an actionVM into our timeline
+     * @param action view model
+     * @return timeline line number
+     */
+    int _insertActionVMIntoMapByLineNumber(ActionVM* actionVMToInsert);
 
 protected:
 
@@ -170,11 +213,20 @@ protected:
     // Helper to manage JSON definitions of agents
     JsonHelper* _jsonHelper;
 
+    // Map of actions editors controllers from the actions model
+    QHash<ActionM*, ActionEditorController*> _mapActionsEditorControllersFromActionM;
+
     // Map of actions editors controllers from the actions view model
-    QHash<ActionM*, ActionEditorController*> _mapActionsEditorControllersFromActionVM;
+    QHash<ActionVM*, ActionEditorController*> _mapActionsEditorControllersFromActionVM;
 
     // Map of actions model from the action name
     QHash<QString, ActionM*> _mapActionsFromActionName;
+
+    // Map of actions VM in the timeline from the action model
+    QHash<ActionM*, QList<ActionVM*> > _mapActionsVMsInTimelineFromActionModel;
+
+    // Map of actions VM in the timeline from the line index
+    QHash<int, I2CustomItemSortFilterListModel<ActionVM>* > _mapActionsVMsInTimelineFromLineIndex;
 };
 
 QML_DECLARE_TYPE(ScenarioController)
