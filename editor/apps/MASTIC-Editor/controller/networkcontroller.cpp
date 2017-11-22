@@ -122,8 +122,17 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
             if (isMasticPublisher && isIntPID) {
                 qDebug() << "our zyre event is about MASTIC publisher:" << pid << hostname << commandLine;
 
-                // Emit the signal "Agent Entered"
-                Q_EMIT networkController->agentEntered(peerId, peerName, peerAddress, pid, hostname, commandLine, canBeFrozen);
+                // example of peerAddress: "tcp://10.0.0.17:49153"
+                if (peerAddress.length() > 6)
+                {
+                    // Remove "tcp://" and then split IP address and port
+                    QStringList ipAddressAndPort = peerAddress.remove(0, 6).split(":");
+
+                    if (ipAddressAndPort.count() == 2) {
+                        // Emit the signal "Agent Entered"
+                        Q_EMIT networkController->agentEntered(peerId, peerName, ipAddressAndPort.first(), pid, hostname, commandLine, canBeFrozen);
+                    }
+                }
             }
         }
         // JOIN (group)
