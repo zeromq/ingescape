@@ -26,7 +26,7 @@
 #include "model/scenario/actionm.h"
 
 /**
- * @brief The ScenarioM class defines the main controller of our application
+ * @brief The ScenarioM class defines a scenario model
  */
 class ScenarioM: public QObject
 {

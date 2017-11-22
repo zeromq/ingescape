@@ -28,6 +28,7 @@
 #include <controller/networkcontroller.h>
 #include <controller/scenariocontroller.h>
 #include <controller/valueshistorycontroller.h>
+#include <controller/abstracttimeactionslinescenarioviewcontroller.h>
 
 #include <misc/terminationsignalwatcher.h>
 
@@ -69,6 +70,9 @@ class MasticEditorController : public QObject
 
     // Controller for the history of values
     I2_QML_PROPERTY_READONLY(ValuesHistoryController*, valuesHistoryC)
+
+    // Controller for the time line
+    I2_QML_PROPERTY_READONLY(AbstractTimeActionslineScenarioViewController*, timeLineC)
 
 
 public:

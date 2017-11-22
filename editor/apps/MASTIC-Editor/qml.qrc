@@ -43,5 +43,7 @@
         <file>qml/agent/HistoryPanel.qml</file>
         <file>qml/theme/MasticScrollViewStyle.qml</file>
         <file>qml/scenario/MasticComboBoxAgentsIOP.qml</file>
+        <file>qml/scenario/ActionsPanel.qml</file>
+        <file>qml/scenario/ScenarioTimeLine.qml</file>
     </qresource>
 </RCC>

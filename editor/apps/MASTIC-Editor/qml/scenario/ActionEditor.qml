@@ -83,8 +83,8 @@ I2PopupBase {
 
             drag.minimumX : 0
             drag.maximumX : rootItem.parent.width - rootItem.width
-            drag.minimumY : 0
-            drag.maximumY :  rootItem.parent.height - rootItem.height
+            drag.minimumY :  - rootItem.height/2
+            drag.maximumY :  rootItem.parent.height - rootItem.height/2
 
             onPressed: {
                 // Emit signal "bring to front"
@@ -478,7 +478,7 @@ I2PopupBase {
                         id : conditionsListColumn
                         spacing : 6
                         height : childrenRect.height
-                        width : scrollViewCondition.width - 9 // scrollbar size
+                        width : scrollViewCondition.width - 9 // scrollbar size + 1
 
                         Repeater {
                             model : actionM ? actionM.conditionsList : 0
@@ -855,7 +855,7 @@ I2PopupBase {
 
 
             //
-            // Advanced mode
+            // Advanced modes
             //
             Item {
                 id : advModesItem
@@ -876,6 +876,16 @@ I2PopupBase {
                 }
 
                 property bool isOpened: false
+
+                Connections {
+                    target : rootItem
+                    onOpened : {
+                        // make the advanced modes visible if there are some modes checked
+                        if (actionM && (actionM.shallRevert || actionM.shallRearm)) {
+                            advModesItem.isOpened = true;
+                        }
+                    }
+                }
 
                 //Title
                 MouseArea {

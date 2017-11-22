@@ -26,7 +26,7 @@
 
 
 /**
- * @brief The IOPValueConditionM class defines the main controller of our application
+ * @brief The IOPValueConditionM class defines an action condition on iop model value
  */
 class IOPValueConditionM: public ActionConditionM
 {
@@ -34,6 +34,9 @@ class IOPValueConditionM: public ActionConditionM
 
     // Agent IOP
     I2_QML_PROPERTY_CUSTOM_SETTER(AgentIOPM* , agentIOP)
+
+    // Agent IOP name
+    I2_QML_PROPERTY(QString , agentIOPName)
 
     // value in string format
     I2_QML_PROPERTY(QString , value)
@@ -93,6 +96,11 @@ public Q_SLOTS:
       */
     void onOutputsListChange(QList<OutputVM *> outputsList);
 
+    /**
+      * @brief Slot on IsON flag agent change
+      */
+    void onAgentModelIsOnChange(bool isON);
+
 protected Q_SLOTS:
     /**
      * @brief Called when our agent iop model is destroyed
@@ -107,7 +115,11 @@ protected Q_SLOTS:
 
 protected:
 
-
+private:
+    /**
+    * @brief Update the selected agent iop
+    */
+    void updateAgentIOPSelected();
 
 };
 

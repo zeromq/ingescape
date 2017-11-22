@@ -37,7 +37,7 @@ I2_ENUM_CUSTOM(ValidationDurationType, IMMEDIATE, FOREVER, CUSTOM)
 
 
 /**
- * @brief The ActionM class defines the main controller of our application
+ * @brief The ActionM class defines an action main model
  */
 class ActionM: public QObject
 {

@@ -114,14 +114,10 @@ Item {
         fuzzyRadius: 8
 
 
-        Text {
-            anchors.centerIn: parent
 
-            text: qsTr("Scenario")
-
-            font: MasticTheme.headingFont
-
-            color: MasticTheme.whiteColor
+        Scenario.ScenarioTimeLine {
+            anchors.fill: parent
+            controller: MasticEditorC.scenarioC;
         }
     }
 
@@ -214,12 +210,28 @@ Item {
                     title: qsTr("ACTIONS");
                     active : false
 
-                    Scenario.ActionsList {
-                        id: actionsList
-
+                    Item {
                         anchors.fill: parent
 
-                        controller: MasticEditorC.scenarioC
+                        Scenario.ActionsList {
+                            id: actionsList
+
+                            anchors.fill: parent
+
+                            controller: MasticEditorC.scenarioC
+                        }
+
+                        Scenario.ActionsPanel {
+                            anchors {
+                                left : parent.left
+                                right: parent.right
+                                bottom : parent.bottom
+                                leftMargin: 20
+                                rightMargin: 20
+                            }
+                            height : 300
+                            controller: MasticEditorC.scenarioC
+                        }
                     }
                 }
 

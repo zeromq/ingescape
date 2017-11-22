@@ -69,7 +69,7 @@ void registerCustomQmlTypes()
     qmlRegisterUncreatableType<MasticModelManager>(uri, 1, 0, "MasticModelManager", "Internal Class");
     qmlRegisterUncreatableType<ScenarioController>(uri, 1, 0, "ScenarioController", "Internal Class");
     qmlRegisterUncreatableType<ValuesHistoryController>(uri, 1, 0, "ValuesHistoryController", "Internal Class");
-
+    qmlRegisterUncreatableType<AbstractTimeActionslineScenarioViewController>(uri, 1, 0, "AbstractTimeActionslineScenarioViewController", "Internal Class");
 
     //----------------
     //

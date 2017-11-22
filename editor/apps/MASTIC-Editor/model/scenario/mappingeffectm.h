@@ -27,7 +27,7 @@
 
 
 /**
- * @brief The MappingEffectM class defines the main controller of our application
+ * @brief The MappingEffectM class defines an action effect on a mapping between two iop value
  */
 class MappingEffectM: public ActionEffectM
 {
@@ -73,7 +73,8 @@ public:
     *        to fill inputs and outputs
     * @param agentModel
     */
-    bool setagentModel(AgentInMappingVM* agentModel);
+    void setagentModel(AgentInMappingVM* agentModel);
+
 
 Q_SIGNALS:
 
@@ -83,6 +84,11 @@ public Q_SLOTS:
 
 protected:
 
+    /**
+     * @brief Called when our "to" agent model is destroyed
+     * @param sender
+     */
+    void _onToAgentModelDestroyed(QObject* sender);
 
 
 };

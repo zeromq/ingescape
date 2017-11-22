@@ -29,7 +29,7 @@
 
 
 /**
- * @brief The ScenarioController class defines the main controller of our application
+ * @brief The ScenarioController class defines the main controller of our scenario edition
  */
 class ScenarioController: public QObject
 {
@@ -133,9 +133,14 @@ Q_SIGNALS:
 public Q_SLOTS:
 
     /**
-      * @brief slot on agents in mapping list count change
+      * @brief slot on agent added in mapping
       */
-    void onAgentsInMappingListCountChange();
+    void onAgentInMappingAdded(AgentInMappingVM* agentAdded);
+
+    /**
+      * @brief slot on agent removed in mapping
+      */
+    void onAgentInMappingRemoved(AgentInMappingVM * agentRemoved);
 
 private :
     /**

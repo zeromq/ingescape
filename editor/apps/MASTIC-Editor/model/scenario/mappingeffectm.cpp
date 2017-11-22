@@ -88,11 +88,12 @@ void MappingEffectM::copyFrom(ActionEffectM *effect)
 *        to fill inputs and outputs
 * @param agentModel
 */
-bool MappingEffectM::setagentModel(AgentInMappingVM* agentModel)
+void MappingEffectM::setagentModel(AgentInMappingVM* agentModel)
 {
-    bool hasChanged = ActionEffectM::setagentModel(agentModel);
+    AgentInMappingVM* previousAgentM = _agentModel;
+    ActionEffectM::setagentModel(agentModel);
 
-    if(hasChanged)
+     if(previousAgentM != agentModel)
     {
         // Clear the list
         _fromAgentIopList.clear();
@@ -116,8 +117,6 @@ bool MappingEffectM::setagentModel(AgentInMappingVM* agentModel)
             }
         }
     }
-
-    return hasChanged;
 }
 
 /**
@@ -129,6 +128,12 @@ void MappingEffectM::settoAgentModel(AgentInMappingVM* agentModel)
 {
     if(_toAgentModel != agentModel)
     {
+        if(_toAgentModel != NULL)
+        {
+            // UnSubscribe to destruction
+            disconnect(_toAgentModel, &AgentInMappingVM::destroyed, this, &MappingEffectM::_onToAgentModelDestroyed);
+        }
+
         // set the new value
         _toAgentModel = agentModel;
 
@@ -152,9 +157,26 @@ void MappingEffectM::settoAgentModel(AgentInMappingVM* agentModel)
             {
                 settoAgentIOP(_toAgentIopList.at(0));
             }
+
+            if(_toAgentModel != NULL)
+            {
+                // Subscribe to destruction
+                connect(_toAgentModel, &AgentInMappingVM::destroyed, this, &MappingEffectM::_onToAgentModelDestroyed);
+            }
         }
 
         emit toAgentModelChanged(_toAgentModel);
     }
+}
+
+/**
+ * @brief Called when our "to" agent model is destroyed
+ * @param sender
+ */
+void MappingEffectM::_onToAgentModelDestroyed(QObject* sender)
+{
+    Q_UNUSED(sender)
+
+    settoAgentModel(NULL);
 }
 

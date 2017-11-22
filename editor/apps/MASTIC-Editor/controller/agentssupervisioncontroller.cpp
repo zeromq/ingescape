@@ -285,7 +285,7 @@ void AgentsSupervisionController::_onAgentDefinitionChangedWithPreviousValue(Def
                                     // We replace the fake model of agent
                                     agentUsingSameDefinition->models()->replace(0, model);
 
-                                    qDebug() << "Replace model (which never appeared on network) by agent" << model->name() << "on" << model->hostname();
+                                    qDebug() << "Replace model (which never appeared on network) by agent" << model->name() << "on" << model->address() << "(" << model->hostname() << ")";
 
                                     // Delete the previous (fake) model of agent
                                     _modelManager->deleteAgentModel(modelUsingSameDefinition);
@@ -323,7 +323,7 @@ void AgentsSupervisionController::_onAgentDefinitionChangedWithPreviousValue(Def
                                 // 2.1- We replace the model
                                 agentUsingSameDefinition->models()->replace(i, model);
 
-                                qDebug() << "Replace model by agent" << model->name() << "on" << model->address();
+                                qDebug() << "Replace model by agent" << model->name() << "on" << model->address() << "(" << model->hostname() << ")";
 
                                 // Delete the previous model of agent
                                 _modelManager->deleteAgentModel(iterator);

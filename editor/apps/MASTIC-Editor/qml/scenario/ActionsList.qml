@@ -189,7 +189,6 @@ Item {
                     pressedID: releasedID + "-pressed"
                     releasedID: "creernouvelagent"
                     disabledID : releasedID + "-disabled"
-
                 }
 
                 onClicked: {
@@ -248,7 +247,7 @@ Item {
             Button {
                 id: btnExportAction
 
-                enabled: visible & (controller.selectedAction ? true : false)
+                enabled: false // visible & (controller.selectedAction ? true : false)
                 activeFocusOnPress: true
 
                 anchors {
@@ -365,8 +364,8 @@ Item {
                 property var action: model.QtObject
 
                 Drag.active: mouseArea.drag.active
-                Drag.hotSpot.x: 0
-                Drag.hotSpot.y: 0
+                Drag.hotSpot.x: mouseArea.mouseX
+                Drag.hotSpot.y: mouseArea.mouseY
                 Drag.keys: ["ActionsListItem"]
 
                 MouseArea {
@@ -378,7 +377,7 @@ Item {
 
                     drag.smoothed: false
                     drag.target: draggableItem
-                    cursorShape: (mouseArea.drag.active)? Qt.ClosedHandCursor : Qt.PointingHandCursor //Qt.OpenHandCursor
+                    cursorShape: (mouseArea.drag.active)? Qt.PointingHandCursor : Qt.OpenHandCursor //Qt.OpenHandCursor
 
                     onPressed: {
                         if (controller) {
@@ -398,6 +397,8 @@ Item {
                     }
 
                     onPositionChanged: {
+                        itemDragged.x = mouseX + 8;
+                        itemDragged.y = mouseY + 12;
                     }
 
                     onReleased: {
@@ -427,117 +428,29 @@ Item {
                         visible: !mouseArea.drag.active
                     }
 
-                    //                    AgentMapping.AgentNodeView {
-                    //                         isReduced : true
-                    //                         agentName : model.name
-                    //                         visible: mouseArea.drag.active
-                    //                         dropEnabled : false
-                    //                    }
+                    Rectangle {
+                        id : itemDragged
+                        height : nameAction.height + 20
+                        width : nameAction.width + 10
+                        color : MasticTheme.darkBlueGreyColor
+                        visible: mouseArea.drag.active
+
+                        Text {
+                            id : nameAction
+                            color : MasticTheme.lightGreyColor
+                            text : model.name
+                            anchors.centerIn: parent
+
+                            font {
+                               family : MasticTheme.textFontFamily
+                               pixelSize: 14
+                            }
+                        }
+                    }
+
                 }
 
             }
-
-
-            //            Rectangle {
-
-            //                anchors {
-            //                    fill: parent
-            //                    leftMargin: 4
-            //                    rightMargin: 4
-            //                    topMargin: 4
-            //                    bottomMargin: 4
-            //                }
-            //                radius: 5
-            //                border {
-            //                    width: 1
-            //                    color: MasticTheme.whiteColor
-            //                }
-            //                color: actionListItem.ListView.isCurrentItem ? "blue" : MasticTheme.agentsListItemBackgroundColor
-
-            //                Item {
-            //                    id: actionRow
-
-            //                    anchors {
-            //                        fill: parent
-            //                        leftMargin: 5
-            //                        topMargin: 2
-            //                    }
-
-            //                    Button {
-            //                        id: btnDeleteAction
-
-            //                        anchors {
-            //                            left: actionRow.right
-            //                            top: actionRow.top
-            //                        }
-
-            //                        visible: true
-
-            //                        text: "X"
-
-            //                        onClicked: {
-            //                            if (controller)
-            //                            {
-            //                                // Delete our action
-            //                                controller.deleteAction(model.QtObject);
-            //                            }
-            //                        }
-            //                    }
-
-            //                    Column {
-            //                        width: 175
-            //                        anchors {
-            //                            left : parent.left
-            //                        }
-
-            //                        Text {
-            //                            id: actionName
-            //                            text: model.actionModel.name
-
-            //                            height: 25
-            //                            color: MasticTheme.agentsListLabelColor
-            //                            font: MasticTheme.heading2Font
-            //                        }
-
-            //                        Text {
-            //                            id: actionStartTime
-            //                            text: model.startDateTime.toLocaleTimeString(Qt.locale(), "HH':'mm':'ss")
-
-            //                            height: 25
-            //                            color: MasticTheme.agentsListLabelColor
-            //                            font: MasticTheme.normalFont
-            //                        }
-            //                    }
-
-            //                    MouseArea {
-            //                        id: mouseAreaForSelection
-            //                        anchors.fill: parent
-
-            //                        onPressed: {
-            //                            actionsList.currentIndex = index
-            //                        }
-            //                    }
-
-            //                    Button {
-            //                        id: btnEdition
-
-            //                        text: "Edit"
-
-            //                        anchors {
-            //                            top: parent.top
-            //                            right: parent.right
-            //                        }
-            //                        width: 175
-
-            //                        onClicked: {
-            //                            if (controller) {
-            //                                // Open the action editor of our agent
-            //                                controller.openActionEditor(model.QtObject);
-            //                            }
-            //                        }
-            //                    }
-            //                }
-            //            }
         }
     }
 }

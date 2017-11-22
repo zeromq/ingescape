@@ -71,11 +71,12 @@ void IOPValueEffectM::copyFrom(ActionEffectM *effect)
 *        to fill inputs and outputs
 * @param agentModel
 */
-bool IOPValueEffectM::setagentModel(AgentInMappingVM* agentModel)
+void IOPValueEffectM::setagentModel(AgentInMappingVM* agentModel)
 {
-    bool hasChanged = ActionEffectM::setagentModel(agentModel);
+    AgentInMappingVM* previousAgentM = _agentModel;
+    ActionEffectM::setagentModel(agentModel);
 
-    if(hasChanged)
+    if(previousAgentM != agentModel)
     {
         // Clear the list
         _agentIopList.clear();
@@ -108,8 +109,6 @@ bool IOPValueEffectM::setagentModel(AgentInMappingVM* agentModel)
             }
         }
     }
-
-    return hasChanged;
 }
 
 
