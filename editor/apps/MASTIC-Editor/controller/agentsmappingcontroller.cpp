@@ -225,11 +225,24 @@ void AgentsMappingController::onIsActivatedMappingChanged(bool isActivatedMappin
                 // Get the map from agent name to list of active agents
                 QHash<QString, QList<AgentM*>> mapFromAgentNameToActiveAgentsList = _modelManager->getMapFromAgentNameToActiveAgentsList();
 
+                // Initial size of our window: 1920 x 1080
+                // Minimal size of our window: 1024 x 768
+                // Width of our left panel: 320
+                // Height of our bottom panel: 200
+                int availableMinWidth = 1920 - 320;
+                int availableMinHeight = 1080 - 200;
+                double randomMax = (double)RAND_MAX;
+
                 foreach (QString agentName, mapFromAgentNameToActiveAgentsList.keys()) {
                     QList<AgentM*> activeAgentsList = mapFromAgentNameToActiveAgentsList.value(agentName);
 
+                    double randomX = (double)qrand() / randomMax;
+                    double randomY = (double)qrand() / randomMax;
+                    QPointF position = QPointF(randomX * availableMinWidth, randomY * availableMinHeight);
+                    //qDebug() << "Random position:" << position << "for agent" << agentName << "(" << randomX << randomY << ")";
+
                     // Add new model(s) of agent to the current mapping
-                    _addAgentModelsToMappingAtPosition(agentName, activeAgentsList, QPointF());
+                    _addAgentModelsToMappingAtPosition(agentName, activeAgentsList, position);
                 }
             }
         }
