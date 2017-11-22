@@ -147,11 +147,10 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
 
     // Connect to signals from the controller for mapping of agents
     connect(_agentsMappingC, &AgentsMappingController::commandAskedToAgentAboutMappingInput, _networkC, &NetworkController::onCommandAskedToAgentAboutMappingInput);
-    //connect(_agentsMappingC, &AgentsMappingController::agentInMappingAdded, _scenarioC, &ScenarioController::onAgentInMappingAdded);
-    //connect(_agentsMappingC, &AgentsMappingController::agentInMappingRemoved, _scenarioC, &ScenarioController::onAgentInMappingRemoved);
 
     // Connect to signals from the agents mapping list to the action editor
-    connect(_agentsMappingC->agentInMappingVMList(), &AbstractI2CustomItemListModel::countChanged, _scenarioC, &ScenarioController::onAgentsInMappingListCountChange);
+    connect(_agentsMappingC, &AgentsMappingController::agentInMappingAdded, _scenarioC, &ScenarioController::onAgentInMappingAdded);
+    connect(_agentsMappingC, &AgentsMappingController::agentInMappingRemoved, _scenarioC, &ScenarioController::onAgentInMappingRemoved);
 
     // Initialize agents list from default file
     _modelManager->importAgentsListFromDefaultFile();

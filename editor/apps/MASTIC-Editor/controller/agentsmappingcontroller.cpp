@@ -528,6 +528,9 @@ void AgentsMappingController::_onAgentsInMappingChanged()
             {
                 qDebug() << "Agents Mapping Controller: Agent in mapping" << agentInMapping->name() << "ADDED";
 
+                // Emit the signal "Agent in Mapping Added"
+                Q_EMIT agentInMappingAdded(agentInMapping);
+
                 // Connect to signals from the new agent in mapping
                 connect(agentInMapping, &AgentInMappingVM::inputsListAdded, this, &AgentsMappingController::_onInputsListAdded);
                 connect(agentInMapping, &AgentInMappingVM::outputsListAdded, this, &AgentsMappingController::_onOutputsListAdded);
@@ -537,9 +540,6 @@ void AgentsMappingController::_onAgentsInMappingChanged()
                 // Emit signals "Inputs/Outputs List Added" for initial list of inputs and initial list of outputs
                 agentInMapping->inputsListAdded(agentInMapping->inputsList()->toList());
                 agentInMapping->outputsListAdded(agentInMapping->outputsList()->toList());
-
-                // Emit the signal "Agent in Mapping Added"
-                Q_EMIT agentInMappingAdded(agentInMapping->name());
             }
         }
     }
@@ -553,6 +553,9 @@ void AgentsMappingController::_onAgentsInMappingChanged()
             {
                 qDebug() << "Agents Mapping Controller: Agent in mapping" << agentInMapping->name() << "REMOVED";
 
+                // Emit the signal "Agent in Mapping Removed"
+                Q_EMIT agentInMappingRemoved(agentInMapping);
+
                 // Emit signals "Inputs/Outputs List Removed" with current list of inputs and current list of outputs
                 agentInMapping->inputsListWillBeRemoved(agentInMapping->inputsList()->toList());
                 agentInMapping->outputsListWillBeRemoved(agentInMapping->outputsList()->toList());
@@ -562,9 +565,6 @@ void AgentsMappingController::_onAgentsInMappingChanged()
                 disconnect(agentInMapping, &AgentInMappingVM::outputsListAdded, this, &AgentsMappingController::_onOutputsListAdded);
                 disconnect(agentInMapping, &AgentInMappingVM::inputsListWillBeRemoved, this, &AgentsMappingController::_onInputsListWillBeRemoved);
                 disconnect(agentInMapping, &AgentInMappingVM::outputsListWillBeRemoved, this, &AgentsMappingController::_onOutputsListWillBeRemoved);
-
-                // Emit the signal "Agent in Mapping Removed"
-                Q_EMIT agentInMappingRemoved(agentInMapping->name());
             }
         }
     }

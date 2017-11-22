@@ -31,7 +31,7 @@ I2_ENUM_CUSTOM(ActionConditionType, AGENT, VALUE)
 
 
 /**
- * @brief The ActionConditionVM class defines the main controller of our application
+ * @brief The ActionConditionVM class defines an action condition model
  */
 class ActionConditionVM: public QObject
 {

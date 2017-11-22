@@ -93,3 +93,41 @@ void ActionEffectM::copyFrom(ActionEffectM* effect)
     }
 }
 
+/**
+ * @brief Called when our agent model is destroyed
+ * @param sender
+ */
+void ActionEffectM::_onAgentModelDestroyed(QObject* sender)
+{
+    Q_UNUSED(sender)
+
+    setagentModel(NULL);
+}
+
+/**
+* @brief Custom setter for agent model
+* @param agent model
+*/
+void ActionEffectM::setagentModel(AgentInMappingVM* agentModel)
+{
+    if(_agentModel != agentModel)
+    {
+        if(_agentModel != NULL)
+        {
+            // UnSubscribe to destruction
+            disconnect(_agentModel, &AgentInMappingVM::destroyed, this, &ActionEffectM::_onAgentModelDestroyed);
+        }
+
+        _agentModel = agentModel;
+
+        if(_agentModel != NULL)
+        {
+            // Subscribe to destruction
+            connect(_agentModel, &AgentInMappingVM::destroyed, this, &ActionEffectM::_onAgentModelDestroyed);
+        }
+
+        Q_EMIT agentModelChanged(agentModel);
+    }
+}
+
+

@@ -111,16 +111,16 @@ Q_SIGNALS:
 
     /**
      * @brief Emitted when a new "Agent in Mapping" is added
-     * @param agentName
+     * @param agent
      */
-    void agentInMappingAdded(QString agentName);
+    void agentInMappingAdded(AgentInMappingVM* addedAgent);
 
 
     /**
      * @brief Emitted when an "Agent in Mapping" is removed
-     * @param agentName
+     * @param agent
      */
-    void agentInMappingRemoved(QString agentName);
+    void agentInMappingRemoved(AgentInMappingVM* removedAgent);
 
 
     /**

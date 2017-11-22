@@ -23,7 +23,7 @@
 
 
 /**
- * @brief The MasticEditorUtils class defines the main controller of our application
+ * @brief The MasticEditorUtils class defines the mastic editor utils
  */
 class MasticEditorUtils: public QObject
 {

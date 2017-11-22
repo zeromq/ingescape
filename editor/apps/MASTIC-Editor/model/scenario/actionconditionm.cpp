@@ -102,8 +102,6 @@ void ActionConditionM::setagentModel(AgentInMappingVM* agentModel)
         {
             // UnSubscribe to destruction
             disconnect(_agentModel, &AgentInMappingVM::destroyed, this, &ActionConditionM::_onAgentModelDestroyed);
-
-            resetConnections();
         }
         setisValid(false);
 

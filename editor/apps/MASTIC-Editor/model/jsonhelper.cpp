@@ -819,10 +819,6 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
                                 iopEffectM->seteffect((ActionEffectValueType::Value)ActionEffectValueType::staticEnumFromKey(jsonValue.toString().toUpper()));
                             }
 
-                            // set agent
-                            iopEffectM->setagentModel(agentM);
-                            iopEffectM->setagentIOP(iopAgentM);
-
                             // set value
                             jsonValue = jsonEffect.value("value");
                             if(jsonValue.isString())
@@ -832,6 +828,10 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
 
                             // Set the list of agent iop
                             iopEffectM->agentIopList()->append(listIOPAgents);
+
+                            // set agent
+                            iopEffectM->setagentModel(agentM);
+                            iopEffectM->setagentIOP(iopAgentM);
                         }
                     }
 
@@ -867,15 +867,16 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
                             actionEffectVM->seteffectType(ActionEffectType::AGENT);
                             actionEffectVM->seteffect(actionEffectM);
 
-                            // set agent
-                            actionEffectM->setagentModel(agentM);
-
                             // set value
                             jsonValue = jsonEffect.value("value");
                             if(jsonValue.isString())
                             {
                                 actionEffectM->seteffect((ActionEffectValueType::Value)ActionEffectValueType::staticEnumFromKey(jsonValue.toString().toUpper()));
                             }
+
+                            // set agent
+                            actionEffectM->setagentModel(agentM);
+
                         }
                     }
                     break;
@@ -1113,10 +1114,6 @@ ActionConditionVM* JsonHelper::_parseConditionsVMFromJson(QJsonObject jsonCondit
                                 iopConditionM->setcomparison((ActionComparisonValueType::Value)ActionComparisonValueType::staticEnumFromKey(jsonValue.toString().toUpper()));
                             }
 
-                            // set agent
-                            iopConditionM->setagentModel(agentM);
-                            iopConditionM->setagentIOP(iopAgentM);
-
                             // set value
                             jsonValue = jsonCondition.value("value");
                             if(jsonValue.isString())
@@ -1126,6 +1123,10 @@ ActionConditionVM* JsonHelper::_parseConditionsVMFromJson(QJsonObject jsonCondit
 
                             // Set the list of agent iop
                             iopConditionM->agentIopList()->append(listIOPAgents);
+
+                            // set agent
+                            iopConditionM->setagentModel(agentM);
+                            iopConditionM->setagentIOP(iopAgentM);                            
                         }
                     }
 
@@ -1161,15 +1162,15 @@ ActionConditionVM* JsonHelper::_parseConditionsVMFromJson(QJsonObject jsonCondit
                             actionConditionVM->setconditionType(ActionConditionType::AGENT);
                             actionConditionVM->setcondition(actionConditionM);
 
-                            // set agent
-                            actionConditionM->setagentModel(agentM);
-
                             // set value
                             jsonValue = jsonCondition.value("value");
                             if(jsonValue.isString())
                             {
                                 actionConditionM->setcomparison((ActionComparisonValueType::Value)ActionComparisonValueType::staticEnumFromKey(jsonValue.toString().toUpper()));
                             }
+
+                            // set agent
+                            actionConditionM->setagentModel(agentM);
                         }
                     }
                     break;

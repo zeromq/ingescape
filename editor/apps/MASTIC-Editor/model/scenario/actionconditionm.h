@@ -30,7 +30,7 @@ I2_ENUM_CUSTOM(ActionComparisonValueType, EQUAL_TO, SUPERIOR_TO, INFERIOR_TO, ON
 
 
 /**
- * @brief The ActionConditionM class defines the main controller of our application
+ * @brief The ActionConditionM class defines the an actin condition view model
  */
 class ActionConditionM: public QObject
 {
@@ -69,7 +69,7 @@ public:
     /**
       * @brief Initialize the agent connections for the action condition
       */
-    void initializeConnections();
+    virtual void initializeConnections();
 
     /**
       * @brief Reset the agent connections for the action condition
@@ -84,7 +84,7 @@ public Q_SLOTS:
     /**
       * @brief Slot on IsON flag agent change
       */
-    void onAgentModelIsOnChange(bool isON);
+    virtual void onAgentModelIsOnChange(bool isON);
 
 protected Q_SLOTS:
 

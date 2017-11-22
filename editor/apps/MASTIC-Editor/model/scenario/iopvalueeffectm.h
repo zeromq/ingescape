@@ -29,7 +29,7 @@
 
 
 /**
- * @brief The IOPValueEffectM class defines the main controller of our application
+ * @brief The IOPValueEffectM class defines an action effect on iop value
  */
 class IOPValueEffectM: public ActionEffectM
 {
@@ -68,7 +68,7 @@ public:
     *        to fill inputs and outputs
     * @param agentModel
     */
-    bool setagentModel(AgentInMappingVM* agentModel);
+    void setagentModel(AgentInMappingVM* agentModel);
 
 
 
