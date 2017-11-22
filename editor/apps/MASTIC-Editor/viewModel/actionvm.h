@@ -25,14 +25,14 @@
 
 
 /**
- * @brief The ActionVM class defines the main controller of our application
+ * @brief The ActionVM class defines an action view model
  */
 class ActionVM: public QObject
 {
     Q_OBJECT
 
     // Action model
-    I2_QML_PROPERTY_READONLY_DELETE_PROOF(ActionM*, actionModel)
+    I2_QML_PROPERTY_READONLY_CUSTOM_SETTER(ActionM*, actionModel)
 
     // Start time in seconds
     I2_CPP_PROPERTY(int, startTime)
@@ -45,6 +45,9 @@ class ActionVM: public QObject
 
     // Line number in timeline
     I2_QML_PROPERTY(int, lineInTimeLine)
+
+    // Is valid flag
+    I2_QML_PROPERTY(bool, isValid)
 
 public:
 
@@ -70,6 +73,11 @@ Q_SIGNALS:
 
 public Q_SLOTS:
 
+    /**
+     * @brief Slot on the is valid flag change on the action Model
+     * @param is valid flag
+     */
+    void onActionIsValidChange(bool isValid);
 
 protected:
 

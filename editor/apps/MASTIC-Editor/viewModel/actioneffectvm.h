@@ -32,7 +32,7 @@ I2_ENUM_CUSTOM(ActionEffectType, AGENT, VALUE, MAPPING)
 
 
 /**
- * @brief The ActionEffectVM class defines the main controller of our application
+ * @brief The ActionEffectVM class defines an action effect model
  */
 class ActionEffectVM: public QObject
 {

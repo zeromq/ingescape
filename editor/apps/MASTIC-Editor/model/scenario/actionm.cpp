@@ -251,6 +251,9 @@ void ActionM::initializeConditionsConnections()
             conditionVM->condition()->initializeConnections();
         }
     }
+
+    // Evaluate the action validation flag
+    _onConditionValidationChange(true);
 }
 
 /**

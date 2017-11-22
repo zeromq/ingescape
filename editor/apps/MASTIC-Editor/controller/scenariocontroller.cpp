@@ -223,18 +223,24 @@ void ScenarioController::closeActionEditor(ActionEditorController* actionEditorC
 }
 
 /**
-  * @brief slot on agents in mapping list count change
+  * @brief slot on agent added in mapping
   */
-void ScenarioController::onAgentsInMappingListCountChange()
+void ScenarioController::onAgentInMappingAdded(AgentInMappingVM * agentAdded)
 {
-    I2CustomItemListModel<AgentInMappingVM> * agentInMappingList = dynamic_cast<I2CustomItemListModel<AgentInMappingVM> *>(sender());
-    if (agentInMappingList != NULL)
+    if(_agentsInMappingList.contains(agentAdded) == false)
     {
-        // Reset the agents in mapping list
-        _agentsInMappingList.clear();
+        _agentsInMappingList.append(agentAdded);
+    }
+}
 
-        // Add the new list of agents
-        _agentsInMappingList.append(agentInMappingList->toList());
+/**
+  * @brief slot on agent removed in mapping
+  */
+void ScenarioController::onAgentInMappingRemoved(AgentInMappingVM * agentRemoved)
+{
+    if(_agentsInMappingList.contains(agentRemoved) == true)
+    {
+        _agentsInMappingList.remove(agentRemoved);
     }
 }
 

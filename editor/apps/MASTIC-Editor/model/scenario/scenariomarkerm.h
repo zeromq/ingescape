@@ -25,7 +25,7 @@
 
 
 /**
- * @brief The ScenarioMarkerM class defines the main controller of our application
+ * @brief The ScenarioMarkerM class defines a scenario marker model
  */
 class ScenarioMarkerM: public QObject
 {

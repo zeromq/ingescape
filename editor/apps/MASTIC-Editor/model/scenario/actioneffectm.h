@@ -36,7 +36,7 @@ class ActionEffectM: public QObject
     Q_OBJECT
 
     // Agent model
-    I2_QML_PROPERTY(AgentInMappingVM*, agentModel)
+    I2_QML_PROPERTY_CUSTOM_SETTER(AgentInMappingVM*, agentModel)
 
     // Effect type
     I2_QML_PROPERTY(ActionEffectValueType::Value, effect)
@@ -68,6 +68,11 @@ Q_SIGNALS:
 
 public Q_SLOTS:
 
+    /**
+     * @brief Called when our agent model is destroyed
+     * @param sender
+     */
+    void _onAgentModelDestroyed(QObject* sender);
 
 protected:
 
