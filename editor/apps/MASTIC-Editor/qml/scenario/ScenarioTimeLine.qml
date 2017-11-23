@@ -144,6 +144,7 @@ Item {
 
             contentWidth: viewController.timeTicksTotalWidth
             contentHeight: timeLineArea.height
+            clip : true
 
             Item {
                 id: timeLinesContent
@@ -159,7 +160,7 @@ Item {
                     // NB: two items to avoid complex QML bindings that
                     //     are interpreted by the Javascript stack
                     delegate : Item {
-                        x: viewController.convertTimeToAbscissaInCoordinateSystem(model.timeInSeconds, viewController.pixelsPerMinute)
+                        x: viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(model.timeInSeconds*1000, viewController.pixelsPerMinute)
                         y: 0
 
                         I2Line {
@@ -287,23 +288,23 @@ Item {
 
 
                     Repeater {
-                        model : controller ? controller.actionsInTimeLine : 0;
+                        model : 3 //controller ? controller.actionsInTimeLine : 0;
 
                         Rectangle {
-                            x : viewController.convertTimeToAbscissaInCoordinateSystem(model.startTime, viewController.pixelsPerMinute)
-                            y : rootItem.lineHeight * (index+1)
+                            x : viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(model.startTime, viewController.pixelsPerMinute)
+                            y : rootItem.lineHeight * model.lineInTimeLine
                             height :rootItem.lineHeight/2
-                            width :  if (model.actionModel) {
+                            width : if (model.actionModel) {
                                          switch (model.actionModel.validityDurationType)
                                          {
                                          case ValidationDurationType.IMMEDIATE:
                                              0;
                                              break;
                                          case ValidationDurationType.FOREVER:
-                                             (viewController.timeTicksTotalWidth - viewController.convertTimeToAbscissaInCoordinateSystem(model.startTime, viewController.pixelsPerMinute))
+                                             (viewController.timeTicksTotalWidth - viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(model.startTime, viewController.pixelsPerMinute))
                                              break;
                                          case ValidationDurationType.CUSTOM:
-                                             viewController.convertDurationInSecondsToLengthInCoordinateSystem(model.actionModel.validityDuration, viewController.pixelsPerMinute)
+                                             viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(model.actionModel.validityDuration, viewController.pixelsPerMinute)
                                              break;
                                          default:
                                              0
@@ -336,6 +337,7 @@ Item {
         }
 
         height: 27
+        clip : true
 
         // Separator
         Rectangle {
@@ -373,7 +375,7 @@ Item {
                     model:  viewController.timeTicks
 
                     delegate: Text {
-                        x: viewController.convertTimeToAbscissaInCoordinateSystem(model.timeInSeconds, viewController.pixelsPerMinute)
+                        x: viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(model.timeInSeconds*1000, viewController.pixelsPerMinute)
                         anchors.verticalCenter: columnHeadersContent.verticalCenter
                         //((model.isBigTick) ? 25 : ((model.isSmallTick) ? 33 : 29))
 

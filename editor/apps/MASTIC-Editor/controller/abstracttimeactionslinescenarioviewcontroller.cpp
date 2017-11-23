@@ -155,17 +155,17 @@ void AbstractTimeActionslineScenarioViewController::settimeTicksTotalWidth(qreal
 /**
  * @brief Convert a given time value into a X value (abscissa) of our coordinate system
  *
- * @param timeInSeconds Number of seconds since 00:00:00 of our current date
+ * @param timeInMilliSeconds Number of seconds since 00:00:00 of our current date
  * @param extraQmlUpdateField Extra QML field used to recall this function when needed (binding)
  *
  * @return
  */
-qreal AbstractTimeActionslineScenarioViewController::convertTimeToAbscissaInCoordinateSystem(int timeInSeconds, qreal extraQmlUpdateField)
+qreal AbstractTimeActionslineScenarioViewController::convertTimeInMillisecondsToAbscissaInCoordinateSystem(int timeInMilliSeconds, qreal extraQmlUpdateField)
 {
     Q_UNUSED(extraQmlUpdateField)
 
     // Compute delta in seconds between this date and our origin
-    int deltaSeconds = (timeInSeconds - _startRelativeTimeInSeconds);
+    int deltaSeconds = (timeInMilliSeconds/1000 - _startRelativeTimeInSeconds);
 
     // Round value to avoid rendering artefacts
     return qRound(_pixelsPerMinute * (_timeMarginInMinutes + deltaSeconds/60.0));
