@@ -76,12 +76,12 @@ public:
         /**
          * @brief Convert a given time value into a X value (abscissa) of our coordinate system
          *
-         * @param timeInSeconds Number of seconds since 00:00:00 of our current date
+         * @param timeInMilliSeconds Number of seconds since 00:00:00 of our current date
          * @param extraQmlUpdateField Extra QML field used to recall this function when needed (binding)
          *
          * @return
          */
-        qreal convertTimeToAbscissaInCoordinateSystem(int timeInSeconds, qreal extraQmlUpdateField);
+        qreal convertTimeInMillisecondsToAbscissaInCoordinateSystem(int timeInMilliSeconds, qreal extraQmlUpdateField);
 
 
         /**

@@ -31,5 +31,5 @@ TimeTickM::TimeTickM(int relativeDay, int hour, int minute, TimeTickTypes::Value
     _isSmallTick = (type == TimeTickTypes::SMALL_TICK);
 
     // Set our label
-    _label = QString("%1h%2").arg(_hour, 2, 10, QChar('0')).arg(_minute, 2, 10, QChar('0'));
+    _label = QString("%1:%2").arg(_hour, 2, 10, QChar('0')).arg(_minute, 2, 10, QChar('0'));
 }

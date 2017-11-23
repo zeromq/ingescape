@@ -36,8 +36,8 @@ class ActionVM: public QObject
     // Action model
     I2_QML_PROPERTY_READONLY_CUSTOM_SETTER(ActionM*, actionModel)
 
-    // Start time in seconds
-    I2_CPP_PROPERTY(int, startTime)
+    // Start time in milliseconds
+    I2_QML_PROPERTY(int, startTime)
 
     // Start date time in string format
     I2_QML_PROPERTY_CUSTOM_SETTER(QString, startTimeString)

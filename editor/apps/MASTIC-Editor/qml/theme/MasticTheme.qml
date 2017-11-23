@@ -78,6 +78,7 @@ Item {
     readonly property color darkGreyColor2: "#2B3137"
 
     readonly property color darkBlueGreyColor: "#3C424F"
+    readonly property color blueGreyColor2: "#434a58"
     readonly property color blueGreyColor : "#525A66"
 
     readonly property color lightBlueGreyColor: "#8896AA"
@@ -87,7 +88,6 @@ Item {
     readonly property color lightGreyColor : "#9D9C9C"
 
     readonly property color orangeColor: "#F39200"
-
 
     //-----------------------------------------
     //
@@ -215,7 +215,7 @@ Item {
 
 
     // Background
-    readonly property color scenarioBackgroundColor: "#3C424F"
+    readonly property color scenarioBackgroundColor: theme.veryDarkGreyColor
 
 
     // List Actions

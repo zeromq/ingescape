@@ -19,7 +19,7 @@ import QtQuick.Controls.Styles 1.4
 import I2Quick 1.0
 
 import MASTIC 1.0
-
+import "../theme" as Theme
 
 Item {
     id: rootItem
@@ -53,7 +53,7 @@ Item {
 
 
     // graphical properties
-    property int linesNumber : 15
+    property int linesNumber : controller ? controller.linesNumberInTimeLine : 0;
     property int lineHeight : 30
 
     //--------------------------------
@@ -71,13 +71,14 @@ Item {
     //
     //--------------------------------
 
+    // Timeline Content
     Item {
         id: timeLineArea
 
         anchors {
             top: columnHeadersArea.bottom
             bottom: parent.bottom
-            left: parent.left
+            left: columnHeadersArea.left
             right: parent.right
         }
 
@@ -107,22 +108,13 @@ Item {
                 Repeater {
                     model: rootItem.linesNumber
 
-                    delegate: Item {
+                    delegate: Rectangle {
                         id : backgroundActionLine
 
                         width: parent.width
                         height : rootItem.lineHeight
 
-                        // Upper separator
-                        Rectangle {
-                            anchors.left: parent.left
-                            anchors.right: parent.right
-                            anchors.top: parent.top
-
-                            height: 1
-                            color: MasticTheme.lightGreyColor
-                        }
-
+                        color : MasticTheme.blackColor
 
                         // Lower separator
                         Rectangle {
@@ -131,7 +123,7 @@ Item {
                             anchors.bottom: parent.bottom
 
                             height: 1
-                            color: MasticTheme.greyColor
+                            color: MasticTheme.veryDarkGreyColor
                         }
                     }
                 }
@@ -152,6 +144,7 @@ Item {
 
             contentWidth: viewController.timeTicksTotalWidth
             contentHeight: timeLineArea.height
+            clip : true
 
             Item {
                 id: timeLinesContent
@@ -167,20 +160,19 @@ Item {
                     // NB: two items to avoid complex QML bindings that
                     //     are interpreted by the Javascript stack
                     delegate : Item {
-                        x: viewController.convertTimeToAbscissaInCoordinateSystem(model.timeInSeconds, viewController.pixelsPerMinute)
+                        x: viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(model.timeInSeconds*1000, viewController.pixelsPerMinute)
                         y: 0
 
                         I2Line {
                             useSvgGeometry: true
-
-                            x1: -1
-                            x2: -1
+                            x1: 0
+                            x2: 0
                             y1: 0
                             y2: timeLinesContent.height
-
-                            stroke: MasticTheme.lightGreyColor
-                            strokeWidth: 2
-                            strokeDashArray: "7, 3"
+                            visible: model.isBigTick
+                            stroke: MasticTheme.veryDarkGreyColor
+                            strokeWidth: 1
+                            strokeDashArray: "3, 3"
                         }
                     }
                 }
@@ -294,6 +286,62 @@ Item {
                     height: rootItem.lineHeight * rootItem.linesNumber
 
 
+                    Repeater {
+                        model : controller ? controller.actionsInTimeLine : 0;
+
+                        Item {
+                            id : actionVM
+                            x : viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(model.startTime, viewController.pixelsPerMinute)
+                            y : rootItem.lineHeight * model.lineInTimeLine
+                            height : rootItem.lineHeight
+                            width : if (model.actionModel) {
+                                        switch (model.actionModel.validityDurationType)
+                                        {
+                                        case ValidationDurationType.IMMEDIATE:
+                                            0;
+                                            break;
+                                        case ValidationDurationType.FOREVER:
+                                            (viewController.timeTicksTotalWidth - viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(model.startTime, viewController.pixelsPerMinute))
+                                            break;
+                                        case ValidationDurationType.CUSTOM:
+                                            viewController.convertDurationInSecondsToLengthInCoordinateSystem(model.actionModel.validityDuration/1000, viewController.pixelsPerMinute)
+                                            break;
+                                        default:
+                                            0
+                                            break;
+                                        }
+                                    } else {
+                                        0;
+                                    }
+
+                            Rectangle {
+                                anchors {
+                                    top : parent.top
+                                    left : parent.left
+                                    right : parent.right
+                                }
+
+                                height : rootItem.lineHeight/2
+                                color : MasticTheme.blueGreyColor2
+                            }
+
+                            Text {
+                                anchors {
+                                    top : parent.verticalCenter
+                                    bottom : parent.top
+                                    left : parent.left
+                                    right : parent.right
+                                }
+                                verticalAlignment: Text.AlignVCenter
+                                color : MasticTheme.darkGreyColor
+                                text : model.actionModel ? model.actionModel.name : ""
+                                font {
+                                    family : textFontFamily
+                                    pixelSize: 12
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -301,26 +349,20 @@ Item {
 
 
 
-    Rectangle {
+    // Timeline Header
+    Item {
         id: columnHeadersArea
 
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.right: parent.right
-
-        height: 35
-
-        color: "#2D2D2D"
-
-        // Separator
-        Rectangle {
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.bottom: parent.bottom
-
-            height: 2
-            color:  MasticTheme.whiteColor
+        anchors {
+            top: parent.top
+            topMargin: 32
+            left: parent.left
+            leftMargin: 105
+            right: parent.right
         }
+
+        height: 30
+        clip : true
 
         // Time ticks and current time label
         Flickable {
@@ -332,14 +374,13 @@ Item {
             contentX: contentArea.contentX
 
             contentWidth: viewController.timeTicksTotalWidth
-            contentHeight: 35
+            contentHeight: columnHeadersArea.height
 
             Item {
                 id: columnHeadersContent
 
                 width: viewController.timeTicksTotalWidth
-                height: 35
-
+                height: columnHeadersArea.height
 
                 //
                 // Time ticks
@@ -347,20 +388,40 @@ Item {
                 Repeater {
                     model:  viewController.timeTicks
 
-                    delegate: Text {
-                        x: viewController.convertTimeToAbscissaInCoordinateSystem(model.timeInSeconds, viewController.pixelsPerMinute)
-                        anchors.verticalCenter: columnHeadersContent.verticalCenter
-                         //((model.isBigTick) ? 25 : ((model.isSmallTick) ? 33 : 29))
+                    delegate: Item {
+                        x: viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(model.timeInSeconds*1000, viewController.pixelsPerMinute)
+                        anchors {
+                            top : columnHeadersContent.top
+                            bottom : columnHeadersContent.bottom
+                        }
 
-                        width: 1
-                        horizontalAlignment: Text.AlignHCenter
+                        Rectangle {
+                            id : timeticks
+                            anchors {
+                                horizontalCenter: parent.left
+                                bottom : parent.bottom
+                                bottomMargin: 1
+                            }
+                            height : (model.isBigTick) ? 10 : 4
+                            width : 1
+                            color: MasticTheme.darkGreyColor
+                        }
 
-                        text: model.label
+                        Text {
+                            anchors {
+                                horizontalCenter: timeticks.horizontalCenter
+                                bottom : timeticks.top
+                            }
+                            visible : (model.isBigTick)
+                            horizontalAlignment: Text.AlignHCenter
 
-                        font.pixelSize: ((model.isBigTick) ? 20 : ((model.isSmallTick) ? 12 : 16))
-                        font.family: MasticTheme.textFontFamily
+                            text: model.label
 
-                        color: MasticTheme.whiteColor
+                            font.pixelSize: 12
+                            font.family: MasticTheme.textFontFamily
+
+                            color: MasticTheme.darkGreyColor
+                        }
                     }
                 }
 
@@ -370,6 +431,109 @@ Item {
 
     }
 
+
+    // Timeline ScrollBar
+//    Rectangle {
+//        id: scrollTimeLine
+
+//        anchors {
+//            top: parent.top
+//            topMargin: 19
+//            left: columnHeadersArea.left
+//            right: parent.right
+//        }
+
+//        height: 13
+//        color : MasticTheme.blackColor
+
+//        Flickable {
+//            id: scrollTimeLineFlickable
+
+//            anchors.fill: parent
+//            interactive: false
+
+//            contentX: contentArea.contentX
+
+//            contentWidth: viewController.timeTicksTotalWidth
+//            contentHeight: columnHeadersArea.height
+
+////            Rectangle {
+////                id : scrollBar
+////                anchors {
+////                    verticalCenter: parent.verticalCenter
+////                }
+////                height : 7
+////                color: MasticTheme.darkGreyColor
+////            }
+
+
+//            Button {
+//                id : scrollBar
+//                anchors {
+//                    verticalCenter: parent.verticalCenter
+//                }
+//                height : 7
+
+//                width : 20
+//                style : I2ColorButtonStyle {
+//                    backgroundColorDisabled: MasticTheme.darkGreyColor;
+//                    backgroundColorReleased: MasticTheme.darkGreyColor;
+//                    backgroundColorPressed: MasticTheme.veryDarkGreyColor;
+//                    borderWidth: 0;
+//                    labelMargin: 0;
+//                }
+
+//                onClicked: {
+
+//                }
+//            }
+//        }
+
+//    }
+
+
+
+    // Play Button
+    Item {
+        anchors {
+            left : parent.left
+            right : columnHeadersArea.left
+            top : parent.top
+            topMargin: 16
+        }
+
+        Button {
+            id: playScenarioBtn
+
+            anchors {
+                top: parent.top
+                horizontalCenter: parent.horizontalCenter
+            }
+
+            activeFocusOnPress: true
+            checkable: true
+
+            style: Theme.LabellessSvgButtonStyle {
+                fileCache: MasticTheme.svgFileMASTIC
+
+                pressedID: releasedID + "-pressed"
+                releasedID: (controller && controller.isPlaying)? "pause" : "play"
+                disabledID : releasedID
+            }
+
+            onClicked: {
+                if (controller) {
+                    controller.isPlaying = checked;
+                }
+            }
+
+            Binding {
+                target : playScenarioBtn
+                property : "checked"
+                value : controller? controller.isPlaying : false
+            }
+        }
+    }
 
     //--------------------------------------------------------
     //
