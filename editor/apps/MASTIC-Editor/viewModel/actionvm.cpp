@@ -34,7 +34,8 @@ ActionVM::ActionVM(ActionM *actionModel, int startTime, QObject *parent) : QObje
     _startTime(startTime),
     _startTimeString("0.0"),
     _lineInTimeLine(-1),
-    _isValid(false)
+    _isValid(false),
+    _currentActionVM(NULL)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);

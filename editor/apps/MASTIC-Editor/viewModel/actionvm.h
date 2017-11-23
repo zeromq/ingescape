@@ -22,6 +22,7 @@
 #include "I2PropertyHelpers.h"
 
 #include "model/scenario/actionm.h"
+#include "viewModel/actionexecutionvm.h"
 
 
 /**
@@ -48,6 +49,12 @@ class ActionVM: public QObject
 
     // Is valid flag
     I2_QML_PROPERTY(bool, isValid)
+
+    // Current ActionExecution
+    I2_QML_PROPERTY(ActionExecutionVM*, currentActionVM)
+
+    // Current ActionExecution
+    I2_QOBJECT_LISTMODEL(ActionExecutionVM, actionExecutionVmList)
 
 public:
 

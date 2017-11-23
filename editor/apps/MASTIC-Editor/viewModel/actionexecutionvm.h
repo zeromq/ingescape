@@ -15,7 +15,7 @@ class ActionExecutionVM : public QObject
 {
      Q_OBJECT
 
-    // Flag is
+    // Flag is using revert effect.
     I2_QML_PROPERTY(bool, hasRevert)
 
     // Flag is waiting for the reverse effect.
