@@ -32,7 +32,7 @@ I2_ENUM_CUSTOM(AgentEffectValues, ON, OFF)
 /**
  * @brief The ActionEffectM class defines an action effect model
  */
-class ActionEffectM: public QObject
+class ActionEffectM : public QObject
 {
     Q_OBJECT
 

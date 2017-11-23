@@ -34,7 +34,7 @@ I2_ENUM_CUSTOM(ActionEffectTypes, AGENT, VALUE, MAPPING)
 /**
  * @brief The ActionEffectVM class defines an action effect view model
  */
-class ActionEffectVM: public QObject
+class ActionEffectVM : public QObject
 {
     Q_OBJECT
 
