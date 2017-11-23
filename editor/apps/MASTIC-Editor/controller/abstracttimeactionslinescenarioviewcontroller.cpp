@@ -2,7 +2,7 @@
 
 
 // Margin in minutes (left and right side of our Analysis view) to ensure that labels are not truncated
-#define TIME_MARGIN_IN_MINUTES 5.0
+#define TIME_MARGIN_IN_MINUTES 1.0
 
 
 #include <QQmlEngine>
@@ -53,12 +53,11 @@ AbstractTimeActionslineScenarioViewController::AbstractTimeActionslineScenarioVi
     // Today - from 00:00 to 23:55
     for (int hours = 0; hours < 24; hours++)
     {
-        for (int minutes = 0; minutes < 60; minutes += 5)
+        for (int minutes = 0; minutes < 60; minutes += 1)
         {
-            // Check if we have a big tick or a small tick
-            bool isBigTick = ((minutes == 0) || (minutes == 30));
-            bool isSmallTick = ((minutes%10) == 5);
-            TimeTickTypes::Value type = (isBigTick ? TimeTickTypes::BIG_TICK : (isSmallTick ? TimeTickTypes::SMALL_TICK : TimeTickTypes::NORMAL_TICK));
+            // Check if we have a big tick
+            bool isBigTick = ((minutes%5) == 0);
+            TimeTickTypes::Value type = (isBigTick ? TimeTickTypes::BIG_TICK : (TimeTickTypes::NORMAL_TICK));
 
             // Create a new tick and save it
             TimeTickM* timeTick = new TimeTickM(0, hours, minutes, type);
