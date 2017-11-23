@@ -288,7 +288,7 @@ Item {
 
 
                     Repeater {
-                        model : 3 //controller ? controller.actionsInTimeLine : 0;
+                        model : controller ? controller.actionsInTimeLine : 0;
 
                         Rectangle {
                             x : viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(model.startTime, viewController.pixelsPerMinute)
