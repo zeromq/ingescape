@@ -44,7 +44,7 @@ Item {
     readonly property int leftPanelWidth: 320
 
     // Height of our bottom panel
-    readonly property int bottomPanelHeight: 200
+    readonly property int bottomPanelHeight: 260
 
 
     //-----------------------------------------
@@ -215,7 +215,7 @@ Item {
 
 
     // Background
-    readonly property color scenarioBackgroundColor: "#3C424F"
+    readonly property color scenarioBackgroundColor: theme.veryDarkGreyColor
 
 
     // List Actions

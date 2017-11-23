@@ -25,6 +25,7 @@ import "../theme" as Theme
 Item {
     id: rootItem
 
+    height : 300
 
     //--------------------------------
     //
@@ -49,7 +50,7 @@ Item {
 
         anchors {
             bottom : gridActionsPanel.top
-            bottomMargin: 8
+            bottomMargin: 25
             left : parent.left
         }
         color : MasticTheme.whiteColor
@@ -57,8 +58,8 @@ Item {
 
         font {
             family : MasticTheme.labelFontFamily
-            pixelSize: 16
-            bold : true
+            pixelSize: 18
+            weight : Font.ExtraBold
         }
     }
 
@@ -71,27 +72,26 @@ Item {
             bottom: parent.bottom
             bottomMargin: 20
         }
-
+        height : childrenRect.height
         columns : 3
         layoutDirection: Grid.LeftToRight
-        columnSpacing : 4
+        columnSpacing : 6
         rowSpacing : 4
 
         Repeater {
             model : controller.actionsInPaletteList
 
-            Rectangle {
+            I2Rectangle {
                 id : panelRectangle
                 width : (rootItem.width - (gridActionsPanel.columnSpacing* (gridActionsPanel.columns-1)))/ gridActionsPanel.columns
                 height : width
-                radius : 5
+                radiusX : 5
+                radiusY : 5
 
-                border {
-                    width : 1
-                    color : MasticTheme.lightGreyColor
-                }
-
-                color : "transparent"
+                strokeDashArray: "3, 3"
+                stroke : MasticTheme.darkGreyColor
+                strokeWidth : 1
+                fill : "transparent"
 
                 DropArea {
 
@@ -104,12 +104,12 @@ Item {
 
                     onEntered: {
                         // Restore color of panel Rectangle
-                        panelRectangle.color = MasticTheme.greyColor
+                        panelRectangle.stroke = MasticTheme.whiteColor
                     }
 
                     onExited: {
                         // Restore color of panel Rectangle
-                        panelRectangle.color = "transparent"
+                        panelRectangle.stroke = MasticTheme.darkGreyColor
                     }
 
                     onDropped: {
@@ -120,7 +120,7 @@ Item {
                             controller.setActionInPalette(index, dragItem.action);
 
                             // Restore color of panel Rectangle
-                            panelRectangle.color = "transparent";
+                            panelRectangle.stroke = MasticTheme.darkGreyColor
                         }
 
                     }
@@ -135,25 +135,27 @@ Item {
                     text :  model.actionModel?  model.actionModel.name : "";
 
                     style : I2ColorButtonStyle {
+                        backgroundColorDisabled: MasticTheme.darkBlueGreyColor;
                         backgroundColorReleased: MasticTheme.darkBlueGreyColor;
                         backgroundColorPressed: MasticTheme.darkBlueGreyColor;
+                        labelColorDisabled: MasticTheme.lightGreyColor;
                         labelColorReleased: MasticTheme.whiteColor;
                         labelColorPressed: MasticTheme.lightGreyColor;
-
-                        borderColorPressed: MasticTheme.lightGreyColor;
-                        borderColorReleased :MasticTheme.whiteColor;
-                        borderWidth: 1;
+                        borderWidth: 0;
                         cornerRadius: 5;
                         labelMargin: 0;
 
                         font {
-                            family: MasticTheme.textFontFamily;
-                            pixelSize: 16
+                            family: MasticTheme.labelFontFamily;
+                            pixelSize: 17
+                            weight : Font.Black
                         }
                     }
 
                     onClicked: {
-
+                        if (controller && model.actionModel) {
+                            controller.addActionVMAtCurrentTime(model.actionModel);
+                        }
                     }
                 }
 
@@ -165,7 +167,7 @@ Item {
                     anchors {
                         top: parent.top
                         right : parent.right
-                        margins : 3
+                        margins : -2
                     }
                     visible : model.actionModel !== null
                     enabled : visible
@@ -175,7 +177,7 @@ Item {
                         fileCache: MasticTheme.svgFileMASTIC
 
                         pressedID: releasedID + "-pressed"
-                        releasedID: "closeEditor"
+                        releasedID: "removeActionInPalette"
                         disabledID : releasedID
                     }
 
