@@ -672,7 +672,8 @@ bool ScenarioController::canInsertActionVMTo(ActionM* actionMToInsert, int time,
                                 // Try with the next line
                                 canInsert = false;
                                 break;
-                            } else if(previousActionVM->actionModel()->validityDurationType() == ValidationDurationType::CUSTOM)
+                            }
+                            else if(previousActionVM->actionModel()->validityDurationType() == ValidationDurationType::CUSTOM)
                             {
                                 prevEndTime += previousActionVM->actionModel()->validityDuration();
                             }
@@ -691,7 +692,8 @@ bool ScenarioController::canInsertActionVMTo(ActionM* actionMToInsert, int time,
                             // Try with the next line
                             canInsert = false;
                             break;
-                        } else if(actionMToInsert->validityDurationType() == ValidationDurationType::CUSTOM)
+                        }
+                        else if(actionMToInsert->validityDurationType() == ValidationDurationType::CUSTOM)
                         {
                             insertionEndTime += actionMToInsert->validityDuration();
                         }
@@ -719,7 +721,8 @@ bool ScenarioController::canInsertActionVMTo(ActionM* actionMToInsert, int time,
                 {
                     // Try with the next line
                     canInsert = false;
-                } else if(previousActionVM->actionModel()->validityDurationType() == ValidationDurationType::CUSTOM) {
+                }
+                else if(previousActionVM->actionModel()->validityDurationType() == ValidationDurationType::CUSTOM) {
                     prevEndTime += previousActionVM->actionModel()->validityDuration();
                 }
 
@@ -750,7 +753,8 @@ void ScenarioController::setisPlayingScenario(bool isPlaying)
         if(_isPlayingScenario == false)
         {
             conditionsDisconnect();
-        } else {
+        }
+        else {
             conditionsConnect();
         }
 

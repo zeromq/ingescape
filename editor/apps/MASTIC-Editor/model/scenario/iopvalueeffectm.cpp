@@ -66,9 +66,10 @@ void IOPValueEffectM::copyFrom(ActionEffectM *effect)
     }
 }
 
+
 /**
 * @brief Custom setter on set agent to fill inputs and outputs
-* @param agentModel
+* @param agent
 */
 void IOPValueEffectM::setagent(AgentInMappingVM* agent)
 {

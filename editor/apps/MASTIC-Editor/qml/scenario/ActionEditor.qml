@@ -357,7 +357,8 @@ I2PopupBase {
                                 value : if (actionM && controller)
                                         {
                                             controller.validationDurationsTypesList.getItemWithValue(actionM.validityDurationType);
-                                        } else {
+                                        }
+                                        else {
                                             null;
                                         }
                             }
@@ -623,7 +624,8 @@ I2PopupBase {
                                             value : if (myCondition && myCondition.condition)
                                                     {
                                                         myCondition.condition.agentModel;
-                                                    } else {
+                                                    }
+                                                    else {
                                                         null;
                                                     }
                                         }
@@ -661,7 +663,8 @@ I2PopupBase {
                                             value : if (myCondition && myCondition.condition)
                                                     {
                                                         myCondition.condition.agentIOP;
-                                                    } else {
+                                                    }
+                                                    else {
                                                         null;
                                                     }
                                         }
@@ -693,7 +696,8 @@ I2PopupBase {
                                             if(controller)
                                             {
                                                 (myCondition && myCondition.conditionType === ActionConditionType.VALUE) ? controller.comparisonsValuesTypesList : controller.comparisonsAgentsTypesList
-                                            } else {
+                                            }
+                                            else {
                                                 0
                                             }
 
@@ -713,7 +717,8 @@ I2PopupBase {
                                                         (myCondition && myCondition.conditionType === ActionConditionType.VALUE) ?
                                                                     controller.comparisonsValuesTypesList.getItemWithValue(myCondition.condition.comparison)
                                                                   :  controller.comparisonsAgentsTypesList.getItemWithValue(myCondition.condition.comparison);
-                                                    } else {
+                                                    }
+                                                    else {
                                                         null;
                                                     }
                                         }
@@ -1557,8 +1562,9 @@ I2PopupBase {
                                             property : "selectedItem"
                                             value : if (myEffect && myEffect.modelM)
                                                     {
-                                                        myEffect.modelM.agentModel;
-                                                    } else {
+                                                        myEffect.modelM.agent;
+                                                    }
+                                                    else {
                                                         null;
                                                     }
                                         }
@@ -1568,7 +1574,7 @@ I2PopupBase {
                                         {
                                             if (myEffect && myEffect.modelM)
                                             {
-                                                myEffect.modelM.agentModel = agentEffectCombo.selectedItem;
+                                                myEffect.modelM.agent = agentEffectCombo.selectedItem;
                                             }
                                         }
 
@@ -1587,8 +1593,8 @@ I2PopupBase {
                                         height : 25
                                         width : 148
 
-                                        model : (myEffect && myEffect.modelM && myEffect.modelM.agentIopList) ? myEffect.modelM.agentIopList : 0
-                                        inputsNumber: (myEffect && myEffect.modelM && myEffect.modelM.agentModel)? myEffect.modelM.agentModel.inputsList.count : 0;
+                                        model: (myEffect && myEffect.modelM && myEffect.modelM.agentIopList) ? myEffect.modelM.agentIopList : 0
+                                        inputsNumber: (myEffect && myEffect.modelM && myEffect.modelM.agent) ? myEffect.modelM.agent.inputsList.count : 0;
 
                                         function modelToString(model)
                                         {
@@ -1602,7 +1608,8 @@ I2PopupBase {
                                             value : if (myEffect && myEffect.modelM)
                                                     {
                                                         myEffect.modelM.agentIOP;
-                                                    } else {
+                                                    }
+                                                    else {
                                                         null;
                                                     }
                                         }
@@ -1771,8 +1778,9 @@ I2PopupBase {
                                             property : "selectedItem"
                                             value : if (myEffect && myEffect.modelM)
                                                     {
-                                                        myEffect.modelM.agentModel;
-                                                    } else {
+                                                        myEffect.modelM.agent;
+                                                    }
+                                                    else {
                                                         null;
                                                     }
                                         }
@@ -1782,7 +1790,7 @@ I2PopupBase {
                                         {
                                             if (myEffect && myEffect.modelM)
                                             {
-                                                myEffect.modelM.agentModel = agentFROMEffectMappingCombo.selectedItem;
+                                                myEffect.modelM.agent = agentFROMEffectMappingCombo.selectedItem;
                                             }
                                         }
 
@@ -1814,7 +1822,8 @@ I2PopupBase {
                                             value : if (myEffect && myEffect.modelM)
                                                     {
                                                         myEffect.modelM.fromAgentIOP;
-                                                    } else {
+                                                    }
+                                                    else {
                                                         null;
                                                     }
                                         }
@@ -1950,7 +1959,8 @@ I2PopupBase {
                                             value : if (myEffect && myEffect.modelM)
                                                     {
                                                         myEffect.modelM.inputAgent;
-                                                    } else {
+                                                    }
+                                                    else {
                                                         null;
                                                     }
                                         }
@@ -1992,7 +2002,8 @@ I2PopupBase {
                                             value : if (myEffect && myEffect.modelM)
                                                     {
                                                         myEffect.modelM.toAgentIOP;
-                                                    } else {
+                                                    }
+                                                    else {
                                                         null;
                                                     }
                                         }
@@ -2096,7 +2107,8 @@ I2PopupBase {
                 onClicked: {
                     if (controller && model && model.originalAction) {
                         controller.deleteAction(model.originalAction);
-                    } else {
+                    }
+                    else {
                         // Close our popup
                         rootItem.close();
                     }

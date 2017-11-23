@@ -310,7 +310,8 @@ Item {
                                             0
                                             break;
                                         }
-                                    } else {
+                                    }
+                                    else {
                                         0;
                                     }
 

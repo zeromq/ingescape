@@ -169,7 +169,8 @@ I2CubicBezierCurve {
         if (controller) {
             if (controller.selectedMapBetweenIOP !== model.QtObject) {
                 controller.selectedMapBetweenIOP = model.QtObject;
-            } else {
+            }
+            else {
                 controller.selectedMapBetweenIOP = null;
             }
         }

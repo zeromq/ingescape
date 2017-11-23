@@ -83,7 +83,8 @@ void ActionVM::copyFrom(ActionVM* actionVM)
             model->copyFrom(originalModel);
 
             setactionModel(model);
-        } else {
+        }
+        else {
             setactionModel(NULL);
         }
 
@@ -141,7 +142,8 @@ void ActionVM::setactionModel(ActionM * actionM)
         if(_actionModel != NULL)
         {
             connect(_actionModel,&ActionM::isValidChanged,this, &ActionVM::onActionIsValidChange);
-        } else {
+        }
+        else {
             setisValid(true);
         }
 

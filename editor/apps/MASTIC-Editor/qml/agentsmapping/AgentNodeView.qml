@@ -376,7 +376,8 @@ Rectangle {
                                             break;
                                         }
 
-                                    } else {
+                                    }
+                                    else {
                                         MasticTheme.whiteColor
                                     }
                         }
@@ -645,7 +646,8 @@ Rectangle {
                                             break;
                                         }
 
-                                    } else {
+                                    }
+                                   else {
                                         MasticTheme.whiteColor
                                     }
 
@@ -1003,7 +1005,8 @@ Rectangle {
                             MasticTheme.whiteColor;
                             break;
                         }
-                    } else {
+                    }
+                    else {
                         MasticTheme.whiteColor
                     }
 
@@ -1054,7 +1057,8 @@ Rectangle {
                             MasticTheme.whiteColor;
                             break;
                         }
-                    } else {
+                    }
+                    else {
                         MasticTheme.whiteColor
                     }
 

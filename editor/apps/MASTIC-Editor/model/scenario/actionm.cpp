@@ -197,7 +197,8 @@ void ActionM::setrevertAfterTimeString(QString revertAfterTime)
             {
                 setrevertAfterTime(QString(splittedTime.at(0)).toInt()*1000 + QString(splittedTime.at(1)).toInt());
             }
-        } else {
+        }
+        else {
             setrevertAfterTime(-1);
         }
 
@@ -223,7 +224,8 @@ void ActionM::setvalidityDurationString(QString validityDuration)
             {
                 setvalidityDuration(QString(splittedTime.at(0)).toInt()*1000 + QString(splittedTime.at(1)).toInt());
             }
-        } else {
+        }
+        else {
             setvalidityDuration(-1);
         }
 
@@ -247,7 +249,8 @@ void ActionM::setshallRevert(bool shallRevert)
             setshallRevertAfterTime(false);
             setshallRevertWhenValidityIsOver(false);
             setrevertAfterTimeString("0.0");
-        } else {
+        }
+        else {
             setshallRevertWhenValidityIsOver(true);
         }
 
