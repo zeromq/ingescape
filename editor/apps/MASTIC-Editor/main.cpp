@@ -45,13 +45,14 @@ void registerCustomQmlTypes()
     // Enums
     //
     //---------------
+    qmlRegisterSingletonType<ActionComparisonValueType>(uri, 1, 0, "ActionComparisonValueType", &ActionComparisonValueType::qmlSingleton);
+    qmlRegisterSingletonType<ActionConditionType>(uri, 1, 0, "ActionConditionType", &ActionConditionType::qmlSingleton);
+    qmlRegisterSingletonType<ActionEffectTypes>(uri, 1, 0, "ActionEffectTypes", &ActionEffectTypes::qmlSingleton);
+    qmlRegisterSingletonType<AgentEffectValues>(uri, 1, 0, "AgentEffectValues", &AgentEffectValues::qmlSingleton);
     qmlRegisterSingletonType<AgentIOPTypes>(uri, 1, 0, "AgentIOPTypes", &AgentIOPTypes::qmlSingleton);
     qmlRegisterSingletonType<AgentIOPValueTypes>(uri, 1, 0, "AgentIOPValueTypes", &AgentIOPValueTypes::qmlSingleton);
     qmlRegisterSingletonType<AgentIOPValueTypeGroups>(uri, 1, 0, "AgentIOPValueTypeGroups", &AgentIOPValueTypeGroups::qmlSingleton);
-    qmlRegisterSingletonType<ActionComparisonValueType>(uri, 1, 0, "ActionComparisonValueType", &ActionComparisonValueType::qmlSingleton);
-    qmlRegisterSingletonType<ActionEffectValueType>(uri, 1, 0, "ActionEffectValueType", &ActionEffectValueType::qmlSingleton);
-    qmlRegisterSingletonType<ActionConditionType>(uri, 1, 0, "ActionConditionType", &ActionConditionType::qmlSingleton);
-    qmlRegisterSingletonType<ActionEffectType>(uri, 1, 0, "ActionEffectType", &ActionEffectType::qmlSingleton);
+    qmlRegisterSingletonType<MappingEffectValues>(uri, 1, 0, "MappingEffectValues", &MappingEffectValues::qmlSingleton);
     qmlRegisterSingletonType<ValidationDurationType>(uri, 1, 0, "ValidationDurationType", &ValidationDurationType::qmlSingleton);
 
     //----------------

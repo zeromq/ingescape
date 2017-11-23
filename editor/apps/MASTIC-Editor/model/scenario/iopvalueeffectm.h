@@ -44,6 +44,7 @@ class IOPValueEffectM: public ActionEffectM
     // Concatened list of iop agents items
     I2_QOBJECT_LISTMODEL(AgentIOPM , agentIopList)
 
+
 public:
 
     /**
@@ -58,17 +59,18 @@ public:
       */
     ~IOPValueEffectM();
 
+
     /**
       * @brief Redefinition of action effect copy
       */
     void copyFrom(ActionEffectM* effect);
 
+
     /**
-    * @brief Custom setter on set agent model
-    *        to fill inputs and outputs
-    * @param agentModel
+    * @brief Custom setter on set agent to fill inputs and outputs
+    * @param agent
     */
-    void setagentModel(AgentInMappingVM* agentModel);
+    void setagent(AgentInMappingVM* agent);
 
 
 

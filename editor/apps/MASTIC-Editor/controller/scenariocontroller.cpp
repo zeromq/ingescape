@@ -51,13 +51,9 @@ ScenarioController::ScenarioController(QString scenariosPath, QObject *parent) :
     _comparisonsValuesTypesList.removeEnumValue(ActionComparisonValueType::ON);
     _comparisonsValuesTypesList.removeEnumValue(ActionComparisonValueType::OFF);
 
-    // Fill value effects types list
-    _effectsAgentsTypesList.appendEnumValue(ActionEffectValueType::ON);
-    _effectsAgentsTypesList.appendEnumValue(ActionEffectValueType::OFF);
-
-    // Fill link effects types list
-    _effectsLinksTypesList.appendEnumValue(ActionEffectValueType::ENABLE);
-    _effectsLinksTypesList.appendEnumValue(ActionEffectValueType::DISABLE);
+    // Fill with all values
+    _agentEffectValuesList.fillWithAllEnumValues();
+    _mappingEffectValuesList.fillWithAllEnumValues();
 
     // Fill general types
     _conditionsTypesList.fillWithAllEnumValues();

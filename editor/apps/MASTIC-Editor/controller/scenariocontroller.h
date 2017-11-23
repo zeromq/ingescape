@@ -51,15 +51,16 @@ class ScenarioController: public QObject
     I2_ENUM_LISTMODEL(ActionComparisonValueType, comparisonsAgentsTypesList)
     // --- List of validity duration type
     I2_ENUM_LISTMODEL(ValidationDurationType, validationDurationsTypesList)
-    // --- List of effects states type
-    I2_ENUM_LISTMODEL(ActionEffectValueType, effectsAgentsTypesList)
+
+    // --- List of values about effect on agent
+    I2_ENUM_LISTMODEL(AgentEffectValues, agentEffectValuesList)
     // --- List of effects links type
-    I2_ENUM_LISTMODEL(ActionEffectValueType, effectsLinksTypesList)
+    I2_ENUM_LISTMODEL(MappingEffectValues, mappingEffectValuesList)
 
     // --- List of conditions type
     I2_ENUM_LISTMODEL(ActionConditionType, conditionsTypesList)
     // --- List of effects type
-    I2_ENUM_LISTMODEL(ActionEffectType, effectsTypesList)
+    I2_ENUM_LISTMODEL(ActionEffectTypes, effectsTypesList)
 
     // --- agents list in mapping
     I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(AgentInMappingVM, agentsInMappingList)

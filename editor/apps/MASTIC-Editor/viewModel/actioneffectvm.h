@@ -1,14 +1,14 @@
-
 /*
- *	ActionEffectVM
+ *	MASTIC Editor
  *
- *  Copyright (c) 2016-2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
  *
  *
  *	Contributors:
+ *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *
  */
 
@@ -26,9 +26,9 @@
 #include "model/scenario/mappingeffectm.h"
 
 /**
-  * Action effect type : AGENT, VALUE, MAPPING
+  * Types of Action Effect : AGENT, VALUE, MAPPING
   */
-I2_ENUM_CUSTOM(ActionEffectType, AGENT, VALUE, MAPPING)
+I2_ENUM_CUSTOM(ActionEffectTypes, AGENT, VALUE, MAPPING)
 
 
 /**
@@ -39,13 +39,15 @@ class ActionEffectVM: public QObject
     Q_OBJECT
 
     // Effect model
-    I2_QML_PROPERTY(ActionEffectM*, effect)
+    I2_QML_PROPERTY(ActionEffectM*, modelM)
 
-    // Action effect type
-    I2_QML_PROPERTY_CUSTOM_SETTER(ActionEffectType::Value, effectType)
+    // Type of action effect
+    I2_QML_PROPERTY_CUSTOM_SETTER(ActionEffectTypes::Value, effectType)
 
+    // FIXME ???
     // [Optional] second agent in mapping to initalize the combobox
     I2_QML_PROPERTY(AgentInMappingVM*, secondAgentInMapping)
+
 
 public:
 
@@ -72,10 +74,7 @@ private :
     /**
      * @brief Configure action effect VM into a specific type
      */
-    void _configureToType(ActionEffectType::Value value);
-
-protected:
-
+    void _configureToType(ActionEffectTypes::Value effectType);
 
 
 };

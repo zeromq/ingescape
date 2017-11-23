@@ -1,13 +1,14 @@
 /*
- *	ActionEffectVM
+ *	MASTIC Editor
  *
- *  Copyright (c) 2016-2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
  *
  *
  *	Contributors:
+ *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *
  */
 
@@ -21,20 +22,20 @@
  * @param value
  * @return
  */
-QString ActionEffectType::enumToString(int value)
+QString ActionEffectTypes::enumToString(int value)
 {
     QString string = "Action effect type";
 
     switch (value) {
-    case ActionEffectType::VALUE:
+    case ActionEffectTypes::VALUE:
         string = "Value";
         break;
 
-    case ActionEffectType::AGENT:
+    case ActionEffectTypes::AGENT:
         string = "Agent";
         break;
 
-    case ActionEffectType::MAPPING:
+    case ActionEffectTypes::MAPPING:
         string = "Mapping";
         break;
 
@@ -57,8 +58,8 @@ QString ActionEffectType::enumToString(int value)
  * @param parent
  */
 ActionEffectVM::ActionEffectVM(QObject *parent) : QObject(parent),
-    _effect(NULL),
-    _effectType(ActionEffectType::AGENT),
+    _modelM(NULL),
+    _effectType(ActionEffectTypes::AGENT),
     _secondAgentInMapping(NULL)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
@@ -74,19 +75,20 @@ ActionEffectVM::~ActionEffectVM()
     // reset pointer
     setsecondAgentInMapping(NULL);
 
-    if(_effect != NULL)
+    if (_modelM != NULL)
     {
-        ActionEffectM* tmp = _effect;
-        seteffect(NULL);
+        ActionEffectM* tmp = _modelM;
+        setmodelM(NULL);
         delete tmp;
         tmp = NULL;
     }
 }
 
+
 /**
  * @brief Custom setter on the effect type
  */
-void ActionEffectVM::seteffectType(ActionEffectType::Value value)
+void ActionEffectVM::seteffectType(ActionEffectTypes::Value value)
 {
     if(_effectType != value)
     {
@@ -99,55 +101,53 @@ void ActionEffectVM::seteffectType(ActionEffectType::Value value)
     }
 }
 
+
 /**
  * @brief Configure action effect VM into a specific type
  */
-void ActionEffectVM::_configureToType(ActionEffectType::Value value)
+void ActionEffectVM::_configureToType(ActionEffectTypes::Value effectType)
 {
     AgentInMappingVM* agent = NULL;
 
-    // Delete the old effect if exists
-    if(_effect != NULL)
+    // Delete the old model of effect if exists
+    if(_modelM != NULL)
     {
         // Save the agent
-        agent = _effect->agentModel();
+        agent = _modelM->agent();
 
-        ActionEffectM* tmp = _effect;
-        seteffect(NULL);
+        ActionEffectM* tmp = _modelM;
+        setmodelM(NULL);
         delete tmp;
         tmp = NULL;
     }
 
     // Create the new type effect
-    switch (value)
+    switch (effectType)
     {
-        case ActionEffectType::AGENT :
+        case ActionEffectTypes::AGENT:
         {
-            seteffect(new ActionEffectM());
-            _effect->setagentModel(agent);
+            setmodelM(new ActionEffectM());
+            _modelM->setagent(agent);
             break;
         }
-
-        case ActionEffectType::VALUE :
+        case ActionEffectTypes::VALUE:
         {
-            seteffect(new IOPValueEffectM());
-            _effect->setagentModel(agent);
+            setmodelM(new IOPValueEffectM());
+            _modelM->setagent(agent);
             break;
         }
-
-        case ActionEffectType::MAPPING :
+        case ActionEffectTypes::MAPPING:
         {
             MappingEffectM * mappingEffect = new MappingEffectM();
-            seteffect(mappingEffect);
-            mappingEffect->setagentModel(agent);
+            setmodelM(mappingEffect);
+            mappingEffect->setagent(agent);
 
-            if(_secondAgentInMapping != NULL)
-            {
-                mappingEffect->settoAgentModel(_secondAgentInMapping);
-            } else {
-                mappingEffect->settoAgentModel(agent);
+            if(_secondAgentInMapping != NULL) {
+                mappingEffect->setinputAgent(_secondAgentInMapping);
             }
-
+            else {
+                mappingEffect->setinputAgent(agent);
+            }
             break;
         }
         default:
