@@ -215,7 +215,7 @@ Item {
 
 
     // Background
-    readonly property color scenarioBackgroundColor: "#3C424F"
+    readonly property color scenarioBackgroundColor: theme.veryDarkGreyColor
 
 
     // List Actions

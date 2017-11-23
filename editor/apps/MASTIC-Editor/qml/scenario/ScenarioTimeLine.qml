@@ -19,7 +19,7 @@ import QtQuick.Controls.Styles 1.4
 import I2Quick 1.0
 
 import MASTIC 1.0
-
+import "../theme" as Theme
 
 Item {
     id: rootItem
@@ -53,7 +53,7 @@ Item {
 
 
     // graphical properties
-    property int linesNumber : 15
+    property int linesNumber : controller ? controller.linesNumberInTimeLine : 0;
     property int lineHeight : 30
 
     //--------------------------------
@@ -71,13 +71,14 @@ Item {
     //
     //--------------------------------
 
+    // Timeline Content
     Item {
         id: timeLineArea
 
         anchors {
             top: columnHeadersArea.bottom
             bottom: parent.bottom
-            left: parent.left
+            left: columnHeadersArea.left
             right: parent.right
         }
 
@@ -107,22 +108,13 @@ Item {
                 Repeater {
                     model: rootItem.linesNumber
 
-                    delegate: Item {
+                    delegate: Rectangle {
                         id : backgroundActionLine
 
                         width: parent.width
                         height : rootItem.lineHeight
 
-                        // Upper separator
-                        Rectangle {
-                            anchors.left: parent.left
-                            anchors.right: parent.right
-                            anchors.top: parent.top
-
-                            height: 1
-                            color: MasticTheme.lightGreyColor
-                        }
-
+                        color : MasticTheme.blackColor
 
                         // Lower separator
                         Rectangle {
@@ -131,7 +123,7 @@ Item {
                             anchors.bottom: parent.bottom
 
                             height: 1
-                            color: MasticTheme.greyColor
+                            color: MasticTheme.veryDarkGreyColor
                         }
                     }
                 }
@@ -294,6 +286,36 @@ Item {
                     height: rootItem.lineHeight * rootItem.linesNumber
 
 
+                    Repeater {
+                        model : controller ? controller.actionsInTimeLine : 0;
+
+                        Rectangle {
+                            x : viewController.convertTimeToAbscissaInCoordinateSystem(model.startTime, viewController.pixelsPerMinute)
+                            y : rootItem.lineHeight * (index+1)
+                            height :rootItem.lineHeight/2
+                            width :  if (model.actionModel) {
+                                         switch (model.actionModel.validityDurationType)
+                                         {
+                                         case ValidationDurationType.IMMEDIATE:
+                                             0;
+                                             break;
+                                         case ValidationDurationType.FOREVER:
+                                             (viewController.timeTicksTotalWidth - viewController.convertTimeToAbscissaInCoordinateSystem(model.startTime, viewController.pixelsPerMinute))
+                                             break;
+                                         case ValidationDurationType.CUSTOM:
+                                             viewController.convertDurationInSecondsToLengthInCoordinateSystem(model.actionModel.validityDuration, viewController.pixelsPerMinute)
+                                             break;
+                                         default:
+                                             0
+                                             break;
+                                         }
+                                     } else {
+                                         0;
+                                     }
+
+                            color : "#434a58"
+                        }
+                    }
                 }
             }
         }
@@ -301,16 +323,19 @@ Item {
 
 
 
-    Rectangle {
+    // Timeline Header
+    Item {
         id: columnHeadersArea
 
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.right: parent.right
+        anchors {
+            top: parent.top
+            topMargin: 32
+            left: parent.left
+            leftMargin: 105
+            right: parent.right
+        }
 
-        height: 35
-
-        color: "#2D2D2D"
+        height: 27
 
         // Separator
         Rectangle {
@@ -350,7 +375,7 @@ Item {
                     delegate: Text {
                         x: viewController.convertTimeToAbscissaInCoordinateSystem(model.timeInSeconds, viewController.pixelsPerMinute)
                         anchors.verticalCenter: columnHeadersContent.verticalCenter
-                         //((model.isBigTick) ? 25 : ((model.isSmallTick) ? 33 : 29))
+                        //((model.isBigTick) ? 25 : ((model.isSmallTick) ? 33 : 29))
 
                         width: 1
                         horizontalAlignment: Text.AlignHCenter
@@ -370,6 +395,49 @@ Item {
 
     }
 
+
+
+    // Play Button
+    Item {
+        anchors {
+            left : parent.left
+            right : columnHeadersArea.left
+            top : parent.top
+            topMargin: 16
+        }
+
+        Button {
+            id: playScenarioBtn
+
+            anchors {
+                top: parent.top
+                horizontalCenter: parent.horizontalCenter
+            }
+
+            activeFocusOnPress: true
+            checkable: true
+
+            style: Theme.LabellessSvgButtonStyle {
+                fileCache: MasticTheme.svgFileMASTIC
+
+                pressedID: releasedID + "-pressed"
+                releasedID: (controller && controller.isPlayingScenario)? "pause" : "play"
+                disabledID : releasedID
+            }
+
+            onClicked: {
+                if (controller) {
+                    controller.isPlayingScenario = checked;
+                }
+            }
+
+            Binding {
+                target : activeMappingBtn
+                property : "checked"
+                value : controller? controller.isPlayingScenario : false
+            }
+        }
+    }
 
     //--------------------------------------------------------
     //
