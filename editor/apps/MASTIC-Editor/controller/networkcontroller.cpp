@@ -589,16 +589,14 @@ void NetworkController::manageMessageFrozenUnfrozen(QString peerId, QString mess
  */
 void NetworkController::onCommandAskedToLauncher(QString command, QString hostname, QString commandLine)
 {
-    //Q_UNUSED(command)
-
     if (!hostname.isEmpty() && !commandLine.isEmpty())
     {
         if (_mapFromHostnameToMasticLauncherPeerId.contains(hostname)) {
-            QString peerId = _mapFromHostnameToMasticLauncherPeerId.value(hostname);
+            QString masticLauncherPeerId = _mapFromHostnameToMasticLauncherPeerId.value(hostname);
 
-            if (!peerId.isEmpty()) {
+            if (!masticLauncherPeerId.isEmpty()) {
                 // Send the command with command line to the peer id of the launcher
-                int success = zyre_whispers(agentElements->node, peerId.toStdString().c_str(), "%s %s", command.toStdString().c_str(), commandLine.toStdString().c_str());
+                int success = zyre_whispers(agentElements->node, masticLauncherPeerId.toStdString().c_str(), "%s %s", command.toStdString().c_str(), commandLine.toStdString().c_str());
 
                 qInfo() << "Send command" << command << "to launcher on" << hostname << "with command line" << commandLine << "with success ?" << success;
             }
