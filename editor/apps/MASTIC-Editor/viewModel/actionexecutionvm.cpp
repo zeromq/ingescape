@@ -31,7 +31,7 @@ ActionExecutionVM::~ActionExecutionVM()
 void ActionExecutionVM::addReverseEffectsList(QString peerIdTargetAgent, ActionEffectVM *effectToReverseVM)
 {
     QPair<QString, QString> newReverseEffectElement;
-    if(!peerIdTargetAgent.isEmpty() || !peerIdTargetAgent.isNull() || effectToReverseVM != NULL)
+    if( (!peerIdTargetAgent.isEmpty()) && (effectToReverseVM != NULL))
     {
         // Create first
         newReverseEffectElement.first = peerIdTargetAgent;
@@ -62,7 +62,7 @@ void ActionExecutionVM::addReverseEffectsList(QString peerIdTargetAgent, ActionE
 
             case ActionEffectType::VALUE:
             {
-                //Try to cast as MappingEffect
+                //Try to cast as IOPValueEffect.
                 IOPValueEffectM* valueEffectToReverseM = dynamic_cast<IOPValueEffectM*>(effectToReverseM);
                 if(valueEffectToReverseM != NULL)
                 {
@@ -70,18 +70,18 @@ void ActionExecutionVM::addReverseEffectsList(QString peerIdTargetAgent, ActionE
                     switch (valueEffectToReverseM->agentIOP()->agentIOPValueType())
                     {
                         case AgentIOPValueTypes::BOOL:
-                            if(valueEffectToReverseM->agentIOP()->defaultValue().toBool())
+                            if(valueEffectToReverseM->agentIOP()->currentValue().toBool())
                                  parameters = "true";
                             else parameters = "false";
                             break;
                         case AgentIOPValueTypes::INTEGER:
-                            parameters = QString::number(valueEffectToReverseM->agentIOP()->defaultValue().toInt());
+                            parameters = QString::number(valueEffectToReverseM->agentIOP()->currentValue().toInt());
                             break;
                         case AgentIOPValueTypes::DOUBLE:
-                            parameters = QString::number(valueEffectToReverseM->agentIOP()->defaultValue().toDouble());
+                            parameters = QString::number(valueEffectToReverseM->agentIOP()->currentValue().toDouble());
                             break;
                         case AgentIOPValueTypes::STRING:
-                            parameters = valueEffectToReverseM->agentIOP()->defaultValue().toString();
+                            parameters = valueEffectToReverseM->agentIOP()->currentValue().toString();
                             break;
                         default:
                             qInfo() << "The iop is of value type DATA or IMPULSION thus the effect is irreversible!";
@@ -121,7 +121,7 @@ void ActionExecutionVM::addReverseEffectsList(QString peerIdTargetAgent, ActionE
             break;
         }
 
-        if(!parameters.isEmpty() || !parameters.isNull())
+        if(!parameters.isEmpty())
         {
             //
             newReverseEffectElement.second = parameters;
