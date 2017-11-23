@@ -229,7 +229,6 @@ Item {
                                 leftMargin: 20
                                 rightMargin: 20
                             }
-                            height : 300
                             controller: MasticEditorC.scenarioC
                         }
                     }
