@@ -78,6 +78,11 @@ ScenarioController::ScenarioController(QString scenariosPath, QObject *parent) :
     // Create the helper to manage JSON definitions of agents
     _jsonHelper = new JsonHelper(this);
 
+    // Add the first timeline line
+    I2CustomItemSortFilterListModel<ActionVM>* actionVMSortedList = new I2CustomItemSortFilterListModel<ActionVM>();
+    actionVMSortedList->setSortProperty("startTime");
+    // Add into our map
+    _mapActionsVMsInTimelineFromLineIndex.insert(0,actionVMSortedList);
 }
 
 
@@ -462,10 +467,8 @@ void ScenarioController::addActionVMAtTime(ActionM * actionModel, int timeInMs)
     {
         ActionVM * actionVM = new ActionVM(actionModel,timeInMs);
 
-        int lineNumber = _insertActionVMIntoMapByLineNumber(actionVM);
-
-        // Set time line number of line
-        actionVM->setlineInTimeLine(lineNumber);
+        // Insert the actionVM to the reight line number
+        _insertActionVMIntoMapByLineNumber(actionVM);
 
         // Add the new action VM to our map
         QList<ActionVM*> actionsVMsList;
@@ -563,34 +566,148 @@ void ScenarioController::conditionsDisconnect()
  * @param action view model
  * @return timeline line number
  */
-int ScenarioController::_insertActionVMIntoMapByLineNumber(ActionVM* actionVMToInsert)
+void ScenarioController::_insertActionVMIntoMapByLineNumber(ActionVM* actionVMToInsert)
 {
-    Q_UNUSED(actionVMToInsert)
-    int availableLineNumber = 0;
+    int insertionStartTime = actionVMToInsert->startTime();
 
-//    for (int lineNumber = 0; lineNumber < _linesNumberInTimeLine; ++lineNumber)
-//    {
-//        if(_mapActionsVMsInTimelineFromLineIndex.contains(lineNumber) == true)
-//        {
-//            I2CustomItemSortFilterListModel<ActionVM>* actionVMSortedList = _mapActionsVMsInTimelineFromLineIndex.value(lineIndex);
-//            foreach (ActionVM * actionVM, actionVMSortedList->toList())
-//            {
-//                int endTime = actionVM->startTime();
+    for (int lineNumber = 0; lineNumber < _linesNumberInTimeLine; ++lineNumber)
+    {
+        bool canInsert = canInsertActionVMTo(actionVMToInsert->actionModel(), insertionStartTime,lineNumber);
+        // Insert our item if possible
+        if(canInsert == true)
+        {
+            if(_mapActionsVMsInTimelineFromLineIndex.contains(lineNumber) == true)
+            {
+                I2CustomItemSortFilterListModel<ActionVM>* actionVMSortedList = _mapActionsVMsInTimelineFromLineIndex.value(lineNumber);
+                if(actionVMSortedList != NULL)
+                {
+                    // set the line number
+                    actionVMToInsert->setlineInTimeLine(lineNumber);
 
-//                if(actionVM->actionModel() != NULL && actionVM->startTime() < actionVMToInsert->startTime())
-//                {
-//                    // We skip that line since the action have a forever validity
-//                    if(actionVM->actionModel()->validityDurationType() == ValidationDurationType::FOREVER)
-//                    {
-//                        endTime = -1;
-//                        break;
-//                    } else if(actionVM->actionModel()->validityDurationType() == ValidationDurationType::CUSTOM) {
-//                        endTime += actionVM->actionModel()->validityDuration();
-//                    }
-//                }
-//            }
-//        }
-//    }
+                    // Insert the action
+                    actionVMSortedList->append(actionVMToInsert);
 
-    return availableLineNumber;
+                    break;
+                }
+            }
+        }
+    }
+
+    // If the action has not been inserted yet, we create a new line
+    if(actionVMToInsert->lineInTimeLine() == -1)
+    {
+        // Create the new line number
+        int newLineNumber = _linesNumberInTimeLine;
+        _linesNumberInTimeLine++;
+        actionVMToInsert->setlineInTimeLine(newLineNumber);
+
+        // Create a new list
+        I2CustomItemSortFilterListModel<ActionVM>* actionVMSortedList = new I2CustomItemSortFilterListModel<ActionVM>();
+        actionVMSortedList->setSortProperty("startTime");
+        actionVMSortedList->append(actionVMToInsert);
+
+        // Add into our map
+        _mapActionsVMsInTimelineFromLineIndex.insert(newLineNumber,actionVMSortedList);
+    }
+}
+
+
+/**
+ * @brief Test if an item can be inserted into a line number
+ * @param actionM to insert
+ * @param time into insert
+ * @param line number
+ */
+bool ScenarioController::canInsertActionVMTo(ActionM* actionMToInsert, int time, int lineNumber)
+{
+    bool canInsert = true;
+
+    if(_mapActionsVMsInTimelineFromLineIndex.contains(lineNumber) == true)
+    {
+        bool reachPosition = false;
+        ActionVM * previousActionVM = NULL;
+
+        I2CustomItemSortFilterListModel<ActionVM>* actionVMSortedList = _mapActionsVMsInTimelineFromLineIndex.value(lineNumber);
+        if(actionVMSortedList != NULL)
+        {
+            foreach (ActionVM * actionVM, actionVMSortedList->toList())
+            {
+                if(actionVM->actionModel() != NULL)
+                {
+                    if(time < actionVM->startTime())
+                    {
+                        reachPosition = true;
+
+                        // We reach the current action VM
+                        // Check with the previous actionM
+                        if(previousActionVM != NULL && previousActionVM->actionModel() != NULL)
+                        {
+                            int prevEndTime = previousActionVM->startTime();
+                            // We skip that line since the action have a forever validity
+                            if(previousActionVM->actionModel()->validityDurationType() == ValidationDurationType::FOREVER)
+                            {
+                                // Try with the next line
+                                canInsert = false;
+                                break;
+                            } else if(previousActionVM->actionModel()->validityDurationType() == ValidationDurationType::CUSTOM)
+                            {
+                                prevEndTime += previousActionVM->actionModel()->validityDuration();
+                            }
+
+                            // If the previous action ends after the beginning of the new one, we skip it
+                            if(prevEndTime >= time)
+                            {
+                                canInsert = false;
+                                break;
+                            }
+                        }
+
+                        int insertionEndTime = time;
+                        if(actionMToInsert->validityDurationType() == ValidationDurationType::FOREVER)
+                        {
+                            // Try with the next line
+                            canInsert = false;
+                            break;
+                        } else if(actionMToInsert->validityDurationType() == ValidationDurationType::CUSTOM)
+                        {
+                            insertionEndTime += actionMToInsert->validityDuration();
+                        }
+
+                        // If the next action starts after the end of the new one, we skip it
+                        if(insertionEndTime >= actionVM->startTime())
+                        {
+                            canInsert = false;
+                            break;
+                        }
+
+                        break;
+                    }
+                }
+
+                previousActionVM = actionVM;
+            }
+
+            // If we didn't reach the position, we test with the previous action
+            if(reachPosition == false && previousActionVM != NULL)
+            {
+                int prevEndTime = previousActionVM->startTime();
+                // We skip that line since the action have a forever validity
+                if(previousActionVM->actionModel()->validityDurationType() == ValidationDurationType::FOREVER)
+                {
+                    // Try with the next line
+                    canInsert = false;
+                } else if(previousActionVM->actionModel()->validityDurationType() == ValidationDurationType::CUSTOM) {
+                    prevEndTime += previousActionVM->actionModel()->validityDuration();
+                }
+
+                // If the previous action ends after the beginning of the new one, we skip it
+                if(prevEndTime >= time)
+                {
+                    canInsert = false;
+                }
+            }
+        }
+    }
+
+    return canInsert;
 }

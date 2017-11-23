@@ -164,6 +164,14 @@ public:
      */
     Q_INVOKABLE void conditionsDisconnect();
 
+    /**
+     * @brief Test if an item can be inserted into a line number
+     * @param actionM to insert
+     * @param time into insert
+     * @param line number
+     */
+    Q_INVOKABLE bool canInsertActionVMTo(ActionM *actionMToInsert, int time, int lineNumber);
+
 Q_SIGNALS:
 
 
@@ -200,9 +208,8 @@ private :
     /**
      * @brief Insert an actionVM into our timeline
      * @param action view model
-     * @return timeline line number
      */
-    int _insertActionVMIntoMapByLineNumber(ActionVM* actionVMToInsert);
+    void _insertActionVMIntoMapByLineNumber(ActionVM* actionVMToInsert);
 
 protected:
 
