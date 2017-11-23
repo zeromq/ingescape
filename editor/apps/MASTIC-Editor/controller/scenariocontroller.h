@@ -74,6 +74,9 @@ class ScenarioController: public QObject
     // Number of line in our timeline
     I2_QML_PROPERTY(int, linesNumberInTimeLine)
 
+    // Is playing scenario flag
+    I2_QML_PROPERTY_CUSTOM_SETTER(bool, isPlayingScenario)
+
 public:
 
     /**

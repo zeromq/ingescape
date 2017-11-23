@@ -34,6 +34,7 @@
 ScenarioController::ScenarioController(QString scenariosPath, QObject *parent) : QObject(parent),
     _selectedAction(NULL),
     _linesNumberInTimeLine(1),
+    _isPlayingScenario(false),
     _scenariosDirectoryPath(scenariosPath)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
@@ -516,6 +517,32 @@ void ScenarioController::removeActionVMFromTimeLine(ActionVM * actionVM)
             QList<ActionVM*> actionsVMsList = _mapActionsVMsInTimelineFromActionModel.value(actionVM->actionModel());
             actionsVMsList.removeAll(actionVM);
             _mapActionsVMsInTimelineFromActionModel.insert(actionVM->actionModel(),actionsVMsList);
+
+            // Remove the action VM from the timeline map by line number
+            if(actionVM->lineInTimeLine() != -1)
+            {
+                int lineNumber = actionVM->lineInTimeLine();
+                if(_mapActionsVMsInTimelineFromLineIndex.contains(lineNumber) == true)
+                {
+                    I2CustomItemSortFilterListModel<ActionVM>* actionVMSortedList = _mapActionsVMsInTimelineFromLineIndex.value(lineNumber);
+                    if(actionVMSortedList != NULL && actionVMSortedList->contains(actionVM) == true)
+                    {
+                        // Remove item
+                        actionVMSortedList->remove(actionVM);
+
+                        // Check if the list is empty to remove the line
+                        if(actionVMSortedList->count() == 0 && lineNumber == _linesNumberInTimeLine-1)
+                        {
+                            _mapActionsVMsInTimelineFromLineIndex.remove(lineNumber);
+                            delete actionVMSortedList;
+                            actionVMSortedList = NULL;
+
+                            // Decrement the number of lines
+                           setlinesNumberInTimeLine(_linesNumberInTimeLine-1);
+                        }
+                    }
+                }
+            }
         }
 
         // Delete action view model editor if exists
@@ -598,7 +625,7 @@ void ScenarioController::_insertActionVMIntoMapByLineNumber(ActionVM* actionVMTo
     {
         // Create the new line number
         int newLineNumber = _linesNumberInTimeLine;
-        _linesNumberInTimeLine++;
+        setlinesNumberInTimeLine(_linesNumberInTimeLine+1);
         actionVMToInsert->setlineInTimeLine(newLineNumber);
 
         // Create a new list
@@ -710,4 +737,27 @@ bool ScenarioController::canInsertActionVMTo(ActionM* actionMToInsert, int time,
     }
 
     return canInsert;
+}
+
+
+/**
+ * @brief Custom setter on is playing command for the scenario
+ * @param is playing flag
+ */
+void ScenarioController::setisPlayingScenario(bool isPlaying)
+{
+    if(_isPlayingScenario != isPlaying)
+    {
+        _isPlayingScenario = isPlaying;
+
+        // Connect/disconnect conditions connections
+        if(_isPlayingScenario == false)
+        {
+            conditionsDisconnect();
+        } else {
+            conditionsConnect();
+        }
+
+        Q_EMIT isPlayingScenarioChanged(_isPlayingScenario);
+    }
 }
