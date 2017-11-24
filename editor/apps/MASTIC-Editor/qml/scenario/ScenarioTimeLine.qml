@@ -132,7 +132,7 @@ Item {
 
 
         //
-        // Time ticks and current timeline
+        // Time ticks
         //
         Flickable {
             id: timeLines
@@ -174,28 +174,6 @@ Item {
                             strokeWidth: 1
                             strokeDashArray: "3, 3"
                         }
-                    }
-                }
-
-
-                // Current time
-                // NB: two items to avoid complex QML bindings that
-                //     are interpreted by the Javascript stack
-                Item {
-                    id: currentTimeLine
-                    x: (controller && viewController)?
-                           viewController.convertQTimeToAbscissaInCoordinateSystem(controller.currentTime, viewController.pixelsPerMinute)
-                         : 0
-                    y: 0
-
-                    Rectangle {
-                        x: -1
-                        y: 0
-
-                        width: 1
-                        height: timeLinesContent.height
-
-                        color: MasticTheme.whiteColor
                     }
                 }
 
@@ -273,7 +251,7 @@ Item {
                 id: contentArea
 
                 anchors.fill: parent
-
+                clip : true
                 contentWidth: content.width
                 contentHeight: content.height
 
@@ -328,35 +306,87 @@ Item {
                                 color : MasticTheme.blueGreyColor2
                             }
 
+                            Rectangle {
+                                anchors {
+                                    fill : actionName
+                                    leftMargin:-1
+                                    rightMargin:-1
+                                }
+                                color : MasticTheme.blackColor
+                            }
+
                             Text {
+                                id: actionName
                                 anchors {
                                     top : parent.verticalCenter
+                                    bottomMargin: 1
                                     bottom : parent.bottom
                                     left : parent.left
-                                    right : parent.right
                                 }
                                 verticalAlignment: Text.AlignVCenter
                                 color : MasticTheme.darkGreyColor
                                 text : model.actionModel ? model.actionModel.name : ""
                                 font {
                                     family : MasticTheme.textFontFamily
-                                    pixelSize: 12
+                                    pixelSize: 11
                                 }
 
-                                Rectangle {
-                                    anchors {
-                                        fill : parent
-                                        leftMargin:-1
-                                        rightMargin:-1
-                                    }
-                                    color : MasticTheme.blackColor
-                                }
+
                             }
                         }
                     }
                 }
             }
         }
+
+
+        //
+        // Current Time
+        //
+        Flickable {
+            id: currenttimeLine
+
+            anchors.fill: parent
+
+            interactive: false
+            contentX: contentArea.contentX
+
+            contentWidth: viewController.timeTicksTotalWidth
+            contentHeight: timeLineArea.height
+            clip : true
+
+            Item {
+                id: currentTimeContent
+
+                width: viewController.timeTicksTotalWidth
+                height: timeLineArea.height
+
+
+                // Current time
+                // NB: two items to avoid complex QML bindings that
+                //     are interpreted by the Javascript stack
+                Item {
+                    id: currentTimeLine
+                    x: (controller && viewController)?
+                           viewController.convertQTimeToAbscissaInCoordinateSystem(controller.currentTime, viewController.pixelsPerMinute)
+                         : 0
+                    y: 0
+
+                    Rectangle {
+                        x: -1
+                        y: 0
+
+                        width: 1
+                        height: timeLinesContent.height
+
+                        color: MasticTheme.whiteColor
+                    }
+                }
+
+            }
+        }
+
+
     }
 
 
