@@ -180,29 +180,33 @@ void ActionM::copyFrom(ActionM* actionModel)
 
 
 /**
- * @brief Set the revertAfterTime string
- * @param revertAfterTime value
+ * @brief Setter for property "revertAfterTime string"
+ * @param value
  */
-void ActionM::setrevertAfterTimeString(QString revertAfterTime)
+void ActionM::setrevertAfterTimeString(QString value)
 {
-    if(_revertAfterTimeString != revertAfterTime)
+    if(_revertAfterTimeString != value)
     {
-        _revertAfterTimeString = revertAfterTime;
+        _revertAfterTimeString = value;
 
         // Update the start date time
-        if(revertAfterTime.isEmpty() == false)
+        if(!value.isEmpty())
         {
-            QStringList splittedTime = revertAfterTime.split('.');
-            if(splittedTime.count() == 2)
-            {
-                setrevertAfterTime(QString(splittedTime.at(0)).toInt()*1000 + QString(splittedTime.at(1)).toInt());
+            QStringList splittedTime = value.split('.');
+            if(splittedTime.count() == 2) {
+                setrevertAfterTime(splittedTime.at(0).toInt() * 1000 + splittedTime.at(1).toInt());
+            }
+            else {
+                // FIXME TODO: just seconds ?
+                // test conversion succeeded before call to setrevertAfterTime
+                //_revertAfterTimeString.toInt()
             }
         }
         else {
             setrevertAfterTime(-1);
         }
 
-        emit revertAfterTimeStringChanged(revertAfterTime);
+        emit revertAfterTimeStringChanged(value);
     }
 }
 
@@ -222,7 +226,7 @@ void ActionM::setvalidityDurationString(QString validityDuration)
             QStringList splittedTime = _validityDurationString.split('.');
             if(splittedTime.count() == 2)
             {
-                setvalidityDuration(QString(splittedTime.at(0)).toInt()*1000 + QString(splittedTime.at(1)).toInt());
+                setvalidityDuration(splittedTime.at(0).toInt() * 1000 + splittedTime.at(1).toInt());
             }
         }
         else {
@@ -243,11 +247,11 @@ void ActionM::setshallRevert(bool shallRevert)
     {
         _shallRevert = shallRevert;
 
-        // Resert selection if the shall revert is unchecked
+        // Reset properties if the shall revert is unchecked
         if(_shallRevert == false)
         {
-            setshallRevertAfterTime(false);
             setshallRevertWhenValidityIsOver(false);
+            setshallRevertAfterTime(false);
             setrevertAfterTimeString("0.0");
         }
         else {
@@ -257,6 +261,7 @@ void ActionM::setshallRevert(bool shallRevert)
         emit shallRevertChanged(shallRevert);
     }
 }
+
 
 /**
  * @brief Initialize connections for conditions
