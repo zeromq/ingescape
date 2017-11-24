@@ -82,6 +82,9 @@ ScenarioController::ScenarioController(QString scenariosPath, QObject *parent) :
     // Add into our map
     _mapActionsVMsInTimelineFromLineIndex.insert(0,actionVMSortedList);
 
+    // Set the sort property for the actionVM in the time line
+    _actionsInTimeLine.setSortProperty("startTime");
+
     // Set the sort property for the active actionsVM
     _activeActionsVMList.setSortProperty("startTime");
 
