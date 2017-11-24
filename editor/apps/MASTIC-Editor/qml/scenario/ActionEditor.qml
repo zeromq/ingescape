@@ -751,7 +751,7 @@ I2PopupBase {
                                         horizontalAlignment: TextInput.AlignLeft
                                         verticalAlignment: TextInput.AlignVCenter
 
-                                        text : myCondition && myCondition.condition ? myCondition && myCondition.condition.value : ""
+                                        text : myCondition && myCondition.condition ? myCondition.condition.value : ""
 
                                         style: I2TextFieldStyle {
                                             backgroundColor: MasticTheme.darkBlueGreyColor
@@ -1694,7 +1694,7 @@ I2PopupBase {
                                         horizontalAlignment: TextInput.AlignLeft
                                         verticalAlignment: TextInput.AlignVCenter
 
-                                        text : myEffect.modelM  ? myEffect.modelM.value : ""
+                                        text : myEffect && myEffect.modelM  ? myEffect.modelM.value : ""
 
                                         style: I2TextFieldStyle {
                                             backgroundColor: MasticTheme.darkBlueGreyColor
