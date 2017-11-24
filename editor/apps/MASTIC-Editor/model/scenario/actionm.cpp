@@ -189,26 +189,47 @@ void ActionM::setrevertAfterTimeString(QString value)
     {
         _revertAfterTimeString = value;
 
-        // Update the start date time
-        if(!value.isEmpty())
+        if(!_revertAfterTimeString.isEmpty())
         {
-            QStringList splittedTime = value.split('.');
-            if(splittedTime.count() == 2) {
-                setrevertAfterTime(splittedTime.at(0).toInt() * 1000 + splittedTime.at(1).toInt());
+            bool successSeconds = false;
+            bool successMilliSeconds = false;
+
+            QStringList splittedTime = _revertAfterTimeString.split('.');
+            if(splittedTime.count() == 2)
+            {
+                int seconds = splittedTime.at(0).toInt(&successSeconds);
+                int milliSeconds = splittedTime.at(1).leftJustified(3, '0').toInt(&successMilliSeconds);
+
+                if (successSeconds && successMilliSeconds) {
+                    setrevertAfterTime(seconds * 1000 + milliSeconds);
+                    //qDebug() << "Revert After Time =" << _revertAfterTime;
+                }
+                else {
+                    setrevertAfterTime(-1);
+                    qCritical() << "Wrong 'Revert After Time':" << _revertAfterTimeString << "for action" << _name;
+                }
             }
             else {
-                // FIXME TODO: just seconds ?
-                // test conversion succeeded before call to setrevertAfterTime
-                //_revertAfterTimeString.toInt()
+                int seconds = _revertAfterTimeString.toInt(&successSeconds);
+                if (successSeconds) {
+                    setrevertAfterTime(seconds * 1000);
+                    //qDebug() << "Revert After Time =" << _revertAfterTime;
+                }
+                else {
+                    setrevertAfterTime(-1);
+                    qCritical() << "Wrong 'Revert After Time':" << _revertAfterTimeString << "for action" << _name;
+                }
             }
         }
         else {
             setrevertAfterTime(-1);
+            qCritical() << "Wrong 'Revert After Time':" << _revertAfterTimeString << "for action" << _name;
         }
 
         emit revertAfterTimeStringChanged(value);
     }
 }
+
 
 /**
  * @brief Set the validityDuration string
