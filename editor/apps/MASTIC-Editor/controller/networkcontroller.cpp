@@ -412,53 +412,36 @@ NetworkController::NetworkController(QObject *parent) : QObject(parent),
     // Set the name of our agent
     mtic_setAgentName(_editorAgentName.toStdString().c_str());
 
-    //
-    // Read our internal definition
-    //
-    QString myDefinitionPath = QString("%1definition.json").arg(MasticEditorUtils::getDataPath());
-    QFileInfo checkDefinitionFile(myDefinitionPath);
-    if (!checkDefinitionFile.exists() || !checkDefinitionFile.isFile())
-    {
-        qWarning() << "No definition has been found : " << myDefinitionPath << ". Set default definition";
-
-        // Set definition and mapping by default to editor
-        QString definitionByDefault = "{  \
-                                      \"definition\": {  \
-                                      \"name\": \""+ _editorAgentName + "\",   \
-                                      \"description\": \"Definition of " + _editorAgentName + " made by "+ organizationName +"\",  \
-                                      \"version\": \"" + version + "\",  \
-                                      \"parameters\": [],   \
-                                      \"inputs\": [],       \
-                                      \"outputs\": [] }}";
-        mtic_loadDefinition(definitionByDefault.toStdString().c_str());
-    }
-    else {
-        mtic_loadDefinitionFromPath(myDefinitionPath.toStdString().c_str());
-    }
-
+    //add zyre header to declare ouserelves as an editor
+    network_isEditor = true;
 
     //
-    // Read our internal mapping
+    // Create our internal definition
     //
-    QString myMappingPath = QString("%1mapping.json").arg(MasticEditorUtils::getDataPath());
-    QFileInfo checkMappingFile(myMappingPath);
-    if (!checkMappingFile.exists() || !checkMappingFile.isFile())
-    {
-        qWarning() << "No mapping has been found : " << myMappingPath << ". Set default mapping";
-        QString mappingByDefault = "{      \
-                                      \"mapping\": {    \
-                                      \"name\": \"" + _editorAgentName + "\",   \
-                                      \"description\": \"Mapping of " + _editorAgentName + " made by "+ organizationName + "\",  \
-                                      \"version\": \"" + version + "\",  \
-                                      \"mapping_out\": [],   \
-                                      \"mapping_cat\": [] }}";
+    // Set definition and mapping by default to editor
+    QString definitionByDefault = "{  \
+                                  \"definition\": {  \
+                                  \"name\": \""+ _editorAgentName + "\",   \
+                                  \"description\": \"Definition of " + _editorAgentName + " made by "+ organizationName +"\",  \
+                                  \"version\": \"" + version + "\",  \
+                                  \"parameters\": [],   \
+                                  \"inputs\": [],       \
+                                  \"outputs\": [] }}";
+    mtic_loadDefinition(definitionByDefault.toStdString().c_str());
+
+    //
+    // Create our internal mapping
+    //
+    QString mappingByDefault = "{      \
+                                  \"mapping\": {    \
+                                  \"name\": \"" + _editorAgentName + "\",   \
+                                  \"description\": \"Mapping of " + _editorAgentName + " made by "+ organizationName + "\",  \
+                                  \"version\": \"" + version + "\",  \
+                                  \"mapping_out\": [],   \
+                                  \"mapping_cat\": [] }}";
 
 
-        mtic_loadMapping(mappingByDefault.toStdString().c_str());
-    }
-    else {
-        mtic_loadMappingFromPath(myMappingPath.toStdString().c_str());
-    }
+    mtic_loadMapping(mappingByDefault.toStdString().c_str());
 }
 
 
