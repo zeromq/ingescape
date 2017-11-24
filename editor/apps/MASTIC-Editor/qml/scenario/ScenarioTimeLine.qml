@@ -79,7 +79,7 @@ Item {
             top: columnHeadersArea.bottom
             bottom: parent.bottom
             left: columnHeadersArea.left
-            right: parent.right
+            right: columnHeadersArea.right
         }
 
 
@@ -340,6 +340,15 @@ Item {
                                     family : MasticTheme.textFontFamily
                                     pixelSize: 12
                                 }
+
+                                Rectangle {
+                                    anchors {
+                                        fill : parent
+                                        leftMargin:-1
+                                        rightMargin:-1
+                                    }
+                                    color : MasticTheme.blackColor
+                                }
                             }
                         }
                     }
@@ -360,6 +369,7 @@ Item {
             left: parent.left
             leftMargin: 105
             right: parent.right
+            rightMargin: 35
         }
 
         height: 30
@@ -434,63 +444,55 @@ Item {
 
 
     // Timeline ScrollBar
-//    Rectangle {
-//        id: scrollTimeLine
+    Rectangle {
+        id: scrollTimeLine
 
-//        anchors {
-//            top: parent.top
-//            topMargin: 19
-//            left: columnHeadersArea.left
-//            right: parent.right
-//        }
+        anchors {
+            top: parent.top
+            topMargin: 19
+            left: columnHeadersArea.left
+            right: columnHeadersArea.right
+        }
 
-//        height: 13
-//        color : MasticTheme.blackColor
+        height: 13
+        color : MasticTheme.blackColor
 
-//        Flickable {
-//            id: scrollTimeLineFlickable
+        Rectangle {
+            id : scrollBar
+            anchors {
+                verticalCenter: parent.verticalCenter
+            }
+            height : 13
 
-//            anchors.fill: parent
-//            interactive: false
+            property var scrollBarSize: if (viewController) {
+                                            (viewController.viewportWidth*scrollTimeLine.width)/viewController.timeTicksTotalWidth
+                                        } else {
+                                            0
+                                        }
+            width : scrollBarSize
+            color:  mouseArea.containsPress? MasticTheme.veryDarkGreyColor : MasticTheme.darkGreyColor; //mouseArea.containsPress? MasticTheme.veryDarkGreyColor : MasticTheme.darkGreyColor;
+            border {
+                color : MasticTheme.blackColor;
+                width : 3
+            }
 
-//            contentX: contentArea.contentX
+            MouseArea {
+                id: mouseArea
 
-//            contentWidth: viewController.timeTicksTotalWidth
-//            contentHeight: columnHeadersArea.height
+                anchors.fill: scrollBar
 
-////            Rectangle {
-////                id : scrollBar
-////                anchors {
-////                    verticalCenter: parent.verticalCenter
-////                }
-////                height : 7
-////                color: MasticTheme.darkGreyColor
-////            }
+                hoverEnabled: true
 
+                drag.smoothed: false
+                drag.target: scrollBar
 
-//            Button {
-//                id : scrollBar
-//                anchors {
-//                    verticalCenter: parent.verticalCenter
-//                }
-//                height : 7
-
-//                width : 20
-//                style : I2ColorButtonStyle {
-//                    backgroundColorDisabled: MasticTheme.darkGreyColor;
-//                    backgroundColorReleased: MasticTheme.darkGreyColor;
-//                    backgroundColorPressed: MasticTheme.veryDarkGreyColor;
-//                    borderWidth: 0;
-//                    labelMargin: 0;
-//                }
-
-//                onClicked: {
-
-//                }
-//            }
-//        }
-
-//    }
+                drag.minimumX : 0
+                drag.maximumX : scrollTimeLine.width - scrollBar.width
+                drag.minimumY : 0
+                drag.maximumY :  0
+            }
+        }
+    }
 
 
 
@@ -551,25 +553,49 @@ Item {
         value: contentArea.contentX
     }
 
-    // ContentArea => AnalysisViewController
+    // ContentArea => ViewController
     Binding {
         target: viewController
         property: "viewportY"
         value: contentArea.contentY
     }
 
-    // ContentArea => AnalysisViewController
+    // ContentArea => ViewController
     Binding {
         target: viewController
         property: "viewportWidth"
         value: timeLineArea.width
     }
 
-    // ContentArea => AnalysisViewController
+    // ContentArea => ViewController
     Binding {
         target: viewController
         property: "viewportHeight"
         value: timeLineArea.height
+    }
+
+    // Scrollbar => contentArea
+    Binding {
+        target: contentArea
+        property: "contentX"
+        value: if (viewController) {
+                   (scrollBar.x * viewController.timeTicksTotalWidth)/scrollTimeLine.width
+               } else {
+                   0
+               }
+        when: mouseArea.drag.active
+    }
+
+    // viewController => Scrollbar
+    Binding {
+        target: scrollBar
+        property: "x"
+        value: if (viewController) {
+                   (viewController.viewportX*scrollTimeLine.width)/viewController.timeTicksTotalWidth
+               } else {
+                   0
+               }
+        when: !mouseArea.drag.active
     }
 
 
