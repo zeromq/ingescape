@@ -180,22 +180,22 @@ void ActionM::copyFrom(ActionM* actionModel)
 
 
 /**
- * @brief Setter for property "revertAfterTime string"
+ * @brief Setter for property "Revert After Time String"
  * @param value
  */
 void ActionM::setrevertAfterTimeString(QString value)
 {
-    if(_revertAfterTimeString != value)
+    if (_revertAfterTimeString != value)
     {
         _revertAfterTimeString = value;
 
-        if(!_revertAfterTimeString.isEmpty())
+        if (!_revertAfterTimeString.isEmpty())
         {
             bool successSeconds = false;
             bool successMilliSeconds = false;
 
             QStringList splittedTime = _revertAfterTimeString.split('.');
-            if(splittedTime.count() == 2)
+            if (splittedTime.count() == 2)
             {
                 int seconds = splittedTime.at(0).toInt(&successSeconds);
                 int milliSeconds = splittedTime.at(1).leftJustified(3, '0').toInt(&successMilliSeconds);
@@ -232,29 +232,53 @@ void ActionM::setrevertAfterTimeString(QString value)
 
 
 /**
- * @brief Set the validityDuration string
- * @param validityDuration value
+ * @brief Setter for property "Validity Duration String"
+ * @param value
  */
-void ActionM::setvalidityDurationString(QString validityDuration)
+void ActionM::setvalidityDurationString(QString value)
 {
-    if(_validityDurationString != validityDuration)
+    if(_validityDurationString != value)
     {
-        _validityDurationString = validityDuration;
+        _validityDurationString = value;
 
-        // Update the start date time
-        if(_validityDurationString.isEmpty() == false)
+        if (!_validityDurationString.isEmpty())
         {
+            bool successSeconds = false;
+            bool successMilliSeconds = false;
+
             QStringList splittedTime = _validityDurationString.split('.');
-            if(splittedTime.count() == 2)
+            if (splittedTime.count() == 2)
             {
-                setvalidityDuration(splittedTime.at(0).toInt() * 1000 + splittedTime.at(1).toInt());
+                int seconds = splittedTime.at(0).toInt(&successSeconds);
+                int milliSeconds = splittedTime.at(1).leftJustified(3, '0').toInt(&successMilliSeconds);
+
+                if (successSeconds && successMilliSeconds) {
+                    setvalidityDuration(seconds * 1000 + milliSeconds);
+                    //qDebug() << "Validity Duration =" << _validityDuration;
+                }
+                else {
+                    setvalidityDuration(-1);
+                    qCritical() << "Wrong 'Validity Duration':" << _validityDurationString << "for action" << _name;
+                }
+            }
+            else {
+                int seconds = _validityDurationString.toInt(&successSeconds);
+                if (successSeconds) {
+                    setvalidityDuration(seconds * 1000);
+                    //qDebug() << "Validity Duration =" << _validityDuration;
+                }
+                else {
+                    setvalidityDuration(-1);
+                    qCritical() << "Wrong 'Validity Duration':" << _validityDurationString << "for action" << _name;
+                }
             }
         }
         else {
             setvalidityDuration(-1);
+            qCritical() << "Wrong 'Validity Duration':" << _validityDurationString << "for action" << _name;
         }
 
-        emit validityDurationStringChanged(validityDuration);
+        emit validityDurationStringChanged(value);
     }
 }
 

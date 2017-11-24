@@ -139,33 +139,62 @@ void ActionVM::copyFrom(ActionVM* actionVM)
 
 
 /**
- * @brief Set the date time in string format
- * @param action VM to copy
+ * @brief Setter for property "Start Time String"
+ * @param value
  */
-void ActionVM::setstartTimeString(QString stringDateTime)
+void ActionVM::setstartTimeString(QString value)
 {
-    if(_startTimeString.compare(stringDateTime) != 0)
+    if (_startTimeString != value)
     {
-        _startTimeString = stringDateTime;
+        _startTimeString = value;
 
-        // Update the start date time
-        if(stringDateTime.isEmpty() == false)
+        if (!_startTimeString.isEmpty())
         {
-            QStringList splittedTime = stringDateTime.split('.');
-            if(splittedTime.count() == 2)
+            bool successSeconds = false;
+            bool successMilliSeconds = false;
+
+            QStringList splittedTime = _startTimeString.split('.');
+            if (splittedTime.count() == 2)
             {
-                setstartTime(QString(splittedTime.at(0)).toInt()*1000 + QString(splittedTime.at(1)).toInt());
+                int seconds = splittedTime.at(0).toInt(&successSeconds);
+                int milliSeconds = splittedTime.at(1).leftJustified(3, '0').toInt(&successMilliSeconds);
+
+                if (successSeconds && successMilliSeconds) {
+                    setstartTime(seconds * 1000 + milliSeconds);
+                    qDebug() << "Start Time =" << _startTime;
+                }
+                else {
+                    setstartTime(-1);
+                    if (_actionModel != NULL) {
+                        qCritical() << "Wrong 'Start Time':" << _startTimeString << "for action" << _actionModel->name();
+                    }
+                }
+            }
+            else {
+                int seconds = _startTimeString.toInt(&successSeconds);
+                if (successSeconds) {
+                    setstartTime(seconds * 1000);
+                    qDebug() << "Start Time =" << _startTime;
+                }
+                else {
+                    setstartTime(-1);
+                    if (_actionModel != NULL) {
+                        qCritical() << "Wrong 'Start Time':" << _startTimeString << "for action" << _actionModel->name();
+                    }
+                }
             }
         }
-        else
-        {
+        else {
             setstartTime(-1);
+            if (_actionModel != NULL) {
+                qCritical() << "Wrong 'Start Time':" << _startTimeString << "for action" << _actionModel->name();
+            }
         }
 
         // Compute the new endtime
         _computeEndTime();
 
-        emit startTimeStringChanged(stringDateTime);
+        emit startTimeStringChanged(value);
     }
 }
 
