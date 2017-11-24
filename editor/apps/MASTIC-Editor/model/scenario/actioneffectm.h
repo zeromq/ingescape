@@ -22,24 +22,26 @@
 #include "I2PropertyHelpers.h"
 #include "viewModel/agentinmappingvm.h"
 
+
 /**
-  * Effect type for an action: ON, OFF, ENABLE, DISABLE
-  */
-I2_ENUM_CUSTOM(ActionEffectValueType, ON, OFF, ENABLE, DISABLE)
+ * Values of effect on agent: ON, OFF
+ */
+I2_ENUM_CUSTOM(AgentEffectValues, ON, OFF)
 
 
 /**
  * @brief The ActionEffectM class defines an action effect model
  */
-class ActionEffectM: public QObject
+class ActionEffectM : public QObject
 {
     Q_OBJECT
 
-    // Agent model
-    I2_QML_PROPERTY_CUSTOM_SETTER(AgentInMappingVM*, agentModel)
+    // View model of agent in mapping
+    I2_QML_PROPERTY_CUSTOM_SETTER(AgentInMappingVM*, agent)
 
-    // Effect type
-    I2_QML_PROPERTY(ActionEffectValueType::Value, effect)
+    // Value of our effect on agent
+    I2_QML_PROPERTY(AgentEffectValues::Value, agentEffectValue)
+
 
 public:
 
@@ -69,10 +71,10 @@ Q_SIGNALS:
 public Q_SLOTS:
 
     /**
-     * @brief Called when our agent model is destroyed
+     * @brief Called when our agent is destroyed
      * @param sender
      */
-    void _onAgentModelDestroyed(QObject* sender);
+    void _onAgentDestroyed(QObject* sender);
 
 protected:
 

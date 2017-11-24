@@ -18,28 +18,21 @@
 #include "iopvalueeffectm.h"
 
 /**
- * @brief Effect type for an action
+ * @brief Enum "AgentEffectValues" to string
  * @param value
  * @return
  */
-QString ActionEffectValueType::enumToString(int value)
+QString AgentEffectValues::enumToString(int value)
 {
-    QString string = "Effect type";
+    QString string = "Agent Effect Value";
 
-    switch (value) {
-    case ActionEffectValueType::ENABLE:
-        string = "Enable";
-        break;
-
-    case ActionEffectValueType::DISABLE:
-        string = "Disable";
-        break;
-
-    case ActionEffectValueType::ON:
+    switch (value)
+    {
+    case AgentEffectValues::ON:
         string = "ON";
         break;
 
-    case ActionEffectValueType::OFF:
+    case AgentEffectValues::OFF:
         string = "OFF";
         break;
 
@@ -62,8 +55,8 @@ QString ActionEffectValueType::enumToString(int value)
  * @param parent
  */
 ActionEffectM::ActionEffectM(QObject *parent) : QObject(parent),
-    _agentModel(NULL),
-    _effect(ActionEffectValueType::ON)
+    _agent(NULL),
+    _agentEffectValue(AgentEffectValues::ON)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -76,8 +69,8 @@ ActionEffectM::ActionEffectM(QObject *parent) : QObject(parent),
  */
 ActionEffectM::~ActionEffectM()
 {
-    // Reset agent model to null
-    setagentModel(NULL);
+    // Reset agent to null
+    setagent(NULL);
 }
 
 /**
@@ -86,47 +79,50 @@ ActionEffectM::~ActionEffectM()
 */
 void ActionEffectM::copyFrom(ActionEffectM* effect)
 {
-    if(effect != NULL)
+    if (effect != NULL)
     {
-        setagentModel(effect->agentModel());
-        seteffect(effect->effect());
+        setagent(effect->agent());
+
+        // FIXME TO TEST !?
+        setagentEffectValue(effect->agentEffectValue());
     }
 }
 
 /**
- * @brief Called when our agent model is destroyed
+ * @brief Called when our agent is destroyed
  * @param sender
  */
-void ActionEffectM::_onAgentModelDestroyed(QObject* sender)
+void ActionEffectM::_onAgentDestroyed(QObject* sender)
 {
     Q_UNUSED(sender)
 
-    setagentModel(NULL);
+    setagent(NULL);
 }
 
+
 /**
-* @brief Custom setter for agent model
-* @param agent model
+* @brief Custom setter for agent
+* @param value
 */
-void ActionEffectM::setagentModel(AgentInMappingVM* agentModel)
+void ActionEffectM::setagent(AgentInMappingVM* value)
 {
-    if(_agentModel != agentModel)
+    if(_agent != value)
     {
-        if(_agentModel != NULL)
+        if (_agent != NULL)
         {
             // UnSubscribe to destruction
-            disconnect(_agentModel, &AgentInMappingVM::destroyed, this, &ActionEffectM::_onAgentModelDestroyed);
+            disconnect(_agent, &AgentInMappingVM::destroyed, this, &ActionEffectM::_onAgentDestroyed);
         }
 
-        _agentModel = agentModel;
+        _agent = value;
 
-        if(_agentModel != NULL)
+        if (_agent != NULL)
         {
             // Subscribe to destruction
-            connect(_agentModel, &AgentInMappingVM::destroyed, this, &ActionEffectM::_onAgentModelDestroyed);
+            connect(_agent, &AgentInMappingVM::destroyed, this, &ActionEffectM::_onAgentDestroyed);
         }
 
-        Q_EMIT agentModelChanged(agentModel);
+        Q_EMIT agentChanged(value);
     }
 }
 

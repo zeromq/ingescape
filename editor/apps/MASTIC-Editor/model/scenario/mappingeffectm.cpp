@@ -1,13 +1,14 @@
 /*
- *	MappingEffectM
+ *	MASTIC Editor
  *
- *  Copyright (c) 2016-2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
  *
  *
  *	Contributors:
+ *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *
  */
 
@@ -16,6 +17,31 @@
 
 #include <QDebug>
 
+/**
+ * @brief Enum "MappingEffectValues" to string
+ * @param value
+ * @return
+ */
+QString MappingEffectValues::enumToString(int value)
+{
+    QString string = "Mapping Effect Value";
+
+    switch (value)
+    {
+    case MappingEffectValues::MAPPED:
+        string = "MAPPED";
+        break;
+
+    case MappingEffectValues::UNMAPPED:
+        string = "UNMAPPED";
+        break;
+
+    default:
+        break;
+    }
+
+    return string;
+}
 
 
 //--------------------------------------------------------------
@@ -31,14 +57,14 @@
  */
 MappingEffectM::MappingEffectM(QObject *parent) : ActionEffectM(parent),
     _fromAgentIOP(NULL),
-    _toAgentModel(NULL),
+    _inputAgent(NULL),
     _toAgentIOP(NULL)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
     // Initialize effect
-    seteffect(ActionEffectValueType::ENABLE);
+    setmappingEffectValue(MappingEffectValues::MAPPED);
 }
 
 
@@ -54,8 +80,8 @@ MappingEffectM::~MappingEffectM()
     // Reset FROM agent model
     setfromAgentIOP(NULL);
 
-    // Reset TO agent model
-    settoAgentModel(NULL);
+    // Reset input agent
+    setinputAgent(NULL);
 
     // Reset TO agent iop
     settoAgentIOP(NULL);
@@ -78,31 +104,32 @@ void MappingEffectM::copyFrom(ActionEffectM *effect)
         _fromAgentIopList.append(mappingEffect->fromAgentIopList()->toList());
 
         setfromAgentIOP(mappingEffect->fromAgentIOP());
-        settoAgentModel(mappingEffect->toAgentModel());
+        setinputAgent(mappingEffect->inputAgent());
         settoAgentIOP(mappingEffect->toAgentIOP());
     }
 }
 
-/**
-* @brief Custom setter on set agent model
-*        to fill inputs and outputs
-* @param agentModel
-*/
-void MappingEffectM::setagentModel(AgentInMappingVM* agentModel)
-{
-    AgentInMappingVM* previousAgentM = _agentModel;
-    ActionEffectM::setagentModel(agentModel);
 
-     if(previousAgentM != agentModel)
+/**
+* @brief Custom setter on set agent to fill inputs and outputs
+* @param agent
+*/
+void MappingEffectM::setagent(AgentInMappingVM* agent)
+{
+    AgentInMappingVM* previousAgent = _agent;
+
+    ActionEffectM::setagent(agent);
+
+    if (previousAgent != agent)
     {
         // Clear the list
         _fromAgentIopList.clear();
         setfromAgentIOP(NULL);
 
-        if(_agentModel != NULL)
+        if(_agent != NULL)
         {
             // Fill with outputs
-            foreach (OutputVM* output, _agentModel->outputsList()->toList())
+            foreach (OutputVM* output, _agent->outputsList()->toList())
             {
                 if(output->firstModel() != NULL)
                 {
@@ -119,64 +146,63 @@ void MappingEffectM::setagentModel(AgentInMappingVM* agentModel)
     }
 }
 
+
 /**
-* @brief Custom setter on set to agent model
-*        to fill inputs and outputs
-* @param agentModel
+* @brief Custom setter for property "input agent" to fill inputs and outputs
+* @param value
 */
-void MappingEffectM::settoAgentModel(AgentInMappingVM* agentModel)
+void MappingEffectM::setinputAgent(AgentInMappingVM* value)
 {
-    if(_toAgentModel != agentModel)
+    if(_inputAgent != value)
     {
-        if(_toAgentModel != NULL)
+        if(_inputAgent != NULL)
         {
             // UnSubscribe to destruction
-            disconnect(_toAgentModel, &AgentInMappingVM::destroyed, this, &MappingEffectM::_onToAgentModelDestroyed);
+            disconnect(_inputAgent, &AgentInMappingVM::destroyed, this, &MappingEffectM::_onInputAgentDestroyed);
         }
 
         // set the new value
-        _toAgentModel = agentModel;
+        _inputAgent = value;
 
         // Clear the list
         _toAgentIopList.clear();
         settoAgentIOP(NULL);
 
-        if(_toAgentModel != NULL)
+        if (_inputAgent != NULL)
         {
             // Fill with inputs
-            foreach (InputVM* input, _toAgentModel->inputsList()->toList())
+            foreach (InputVM* input, _inputAgent->inputsList()->toList())
             {
-                if(input->firstModel() != NULL)
-                {
+                if (input->firstModel() != NULL) {
                     _toAgentIopList.append(input->firstModel());
                 }
             }
 
             // Select the first item
-            if(_toAgentIopList.count() > 0)
-            {
+            if (_toAgentIopList.count() > 0) {
                 settoAgentIOP(_toAgentIopList.at(0));
             }
 
-            if(_toAgentModel != NULL)
+            if(_inputAgent != NULL)
             {
                 // Subscribe to destruction
-                connect(_toAgentModel, &AgentInMappingVM::destroyed, this, &MappingEffectM::_onToAgentModelDestroyed);
+                connect(_inputAgent, &AgentInMappingVM::destroyed, this, &MappingEffectM::_onInputAgentDestroyed);
             }
         }
 
-        emit toAgentModelChanged(_toAgentModel);
+        emit inputAgentChanged(value);
     }
 }
 
+
 /**
- * @brief Called when our "to" agent model is destroyed
+ * @brief Called when our "input agent" is destroyed
  * @param sender
  */
-void MappingEffectM::_onToAgentModelDestroyed(QObject* sender)
+void MappingEffectM::_onInputAgentDestroyed(QObject* sender)
 {
     Q_UNUSED(sender)
 
-    settoAgentModel(NULL);
+    setinputAgent(NULL);
 }
 

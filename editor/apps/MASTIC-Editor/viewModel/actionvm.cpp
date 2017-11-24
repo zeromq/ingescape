@@ -1,13 +1,14 @@
 /*
- *	ActionVM
+ *	MASTIC Editor
  *
- *  Copyright (c) 2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
  *
  *
  *	Contributors:
+ *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *
  */
 
@@ -82,7 +83,8 @@ void ActionVM::copyFrom(ActionVM* actionVM)
             model->copyFrom(originalModel);
 
             setactionModel(model);
-        } else {
+        }
+        else {
             setactionModel(NULL);
         }
 
@@ -140,7 +142,8 @@ void ActionVM::setactionModel(ActionM * actionM)
         if(_actionModel != NULL)
         {
             connect(_actionModel,&ActionM::isValidChanged,this, &ActionVM::onActionIsValidChange);
-        } else {
+        }
+        else {
             setisValid(true);
         }
 

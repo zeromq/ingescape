@@ -168,7 +168,8 @@ Item {
                             MasticTheme.whiteColor;
                             break;
                         }
-                    } else {
+                    }
+                    else {
                         MasticTheme.whiteColor;
                     }
         }

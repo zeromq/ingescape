@@ -244,7 +244,8 @@ Item {
                                    ((model.definition && model.definition.isVariant)?
                                           definitionNameBtn.pressed? MasticTheme.middleDarkRedColor : MasticTheme.redColor
                                     : definitionNameBtn.pressed? MasticTheme.agentsListPressedLabel2Color : MasticTheme.agentsListLabel2Color)
-                               } else {
+                               }
+                               else {
                                    ((model.definition && model.definition.isVariant)?
                                           definitionNameBtn.pressed? MasticTheme.darkRedColor : MasticTheme.middleDarkRedColor
                                     : definitionNameBtn.pressed? MasticTheme.agentOFFPressedLabel2Color : MasticTheme.agentOFFLabel2Color)

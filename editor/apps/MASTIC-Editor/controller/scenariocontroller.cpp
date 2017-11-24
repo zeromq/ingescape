@@ -52,13 +52,9 @@ ScenarioController::ScenarioController(QString scenariosPath, QObject *parent) :
     _comparisonsValuesTypesList.removeEnumValue(ActionComparisonValueType::ON);
     _comparisonsValuesTypesList.removeEnumValue(ActionComparisonValueType::OFF);
 
-    // Fill value effects types list
-    _effectsAgentsTypesList.appendEnumValue(ActionEffectValueType::ON);
-    _effectsAgentsTypesList.appendEnumValue(ActionEffectValueType::OFF);
-
-    // Fill link effects types list
-    _effectsLinksTypesList.appendEnumValue(ActionEffectValueType::ENABLE);
-    _effectsLinksTypesList.appendEnumValue(ActionEffectValueType::DISABLE);
+    // Fill with all values
+    _agentEffectValuesList.fillWithAllEnumValues();
+    _mappingEffectValuesList.fillWithAllEnumValues();
 
     // Fill general types
     _conditionsTypesList.fillWithAllEnumValues();
@@ -716,7 +712,8 @@ bool ScenarioController::canInsertActionVMTo(ActionM* actionMToInsert, int time,
                                 // Try with the next line
                                 canInsert = false;
                                 break;
-                            } else if(previousActionVM->actionModel()->validityDurationType() == ValidationDurationType::CUSTOM)
+                            }
+                            else if(previousActionVM->actionModel()->validityDurationType() == ValidationDurationType::CUSTOM)
                             {
                                 prevEndTime += previousActionVM->actionModel()->validityDuration();
                             }
@@ -735,7 +732,8 @@ bool ScenarioController::canInsertActionVMTo(ActionM* actionMToInsert, int time,
                             // Try with the next line
                             canInsert = false;
                             break;
-                        } else if(actionMToInsert->validityDurationType() == ValidationDurationType::CUSTOM)
+                        }
+                        else if(actionMToInsert->validityDurationType() == ValidationDurationType::CUSTOM)
                         {
                             insertionEndTime += actionMToInsert->validityDuration();
                         }
@@ -763,7 +761,8 @@ bool ScenarioController::canInsertActionVMTo(ActionM* actionMToInsert, int time,
                 {
                     // Try with the next line
                     canInsert = false;
-                } else if(previousActionVM->actionModel()->validityDurationType() == ValidationDurationType::CUSTOM) {
+                }
+                else if(previousActionVM->actionModel()->validityDurationType() == ValidationDurationType::CUSTOM) {
                     prevEndTime += previousActionVM->actionModel()->validityDuration();
                 }
 
@@ -794,7 +793,8 @@ void ScenarioController::setisPlayingScenario(bool isPlaying)
         if(_isPlayingScenario == false)
         {
             conditionsDisconnect();
-        } else {
+        }
+        else {
             conditionsConnect();
         }
 

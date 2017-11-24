@@ -1,14 +1,14 @@
-
 /*
- *	MappingEffectM
+ *	MASTIC Editor
  *
- *  Copyright (c) 2016-2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
  *
  *
  *	Contributors:
+ *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *
  */
 
@@ -27,17 +27,26 @@
 
 
 /**
+ * Values of effect on mapping: ENABLE, DISABLE
+ */
+I2_ENUM_CUSTOM(MappingEffectValues, MAPPED, UNMAPPED)
+
+
+/**
  * @brief The MappingEffectM class defines an action effect on a mapping between two iop value
  */
 class MappingEffectM: public ActionEffectM
 {
     Q_OBJECT
 
+    // Value of our effect on mapping
+    I2_QML_PROPERTY(MappingEffectValues::Value, mappingEffectValue)
+
     // FROM Agent IOP
     I2_QML_PROPERTY(AgentIOPM *, fromAgentIOP)
 
-    // TO Agent model
-    I2_QML_PROPERTY_CUSTOM_SETTER(AgentInMappingVM *, toAgentModel)
+    // Input Agent
+    I2_QML_PROPERTY_CUSTOM_SETTER(AgentInMappingVM*, inputAgent)
 
     // TO Agent IOP
     I2_QML_PROPERTY(AgentIOPM *, toAgentIOP)
@@ -68,12 +77,12 @@ public:
       */
     void copyFrom(ActionEffectM* effect);
 
+
     /**
-    * @brief Custom setter on set agent model
-    *        to fill inputs and outputs
-    * @param agentModel
+    * @brief Custom setter on set agent to fill inputs and outputs
+    * @param agent
     */
-    void setagentModel(AgentInMappingVM* agentModel);
+    void setagent(AgentInMappingVM* agent);
 
 
 Q_SIGNALS:
@@ -85,10 +94,10 @@ public Q_SLOTS:
 protected:
 
     /**
-     * @brief Called when our "to" agent model is destroyed
+     * @brief Called when our "input agent" is destroyed
      * @param sender
      */
-    void _onToAgentModelDestroyed(QObject* sender);
+    void _onInputAgentDestroyed(QObject* sender);
 
 
 };

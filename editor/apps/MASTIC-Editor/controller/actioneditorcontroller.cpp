@@ -116,11 +116,11 @@ void ActionEditorController::createNewEffect()
     ActionEffectVM * effectVM = new ActionEffectVM(this);
 
     // Set an effect model
-    effectVM->seteffect(new ActionEffectM());
+    effectVM->setmodelM(new ActionEffectM());
 
     if(_listAgentsInMapping != NULL && _listAgentsInMapping->count() > 0)
     {
-        effectVM->effect()->setagentModel(_listAgentsInMapping->at(0));
+        effectVM->modelM()->setagent(_listAgentsInMapping->at(0));
 
         if(_listAgentsInMapping->count() > 1)
         {
@@ -130,6 +130,7 @@ void ActionEditorController::createNewEffect()
 
     _editedAction->effectsList()->append(effectVM);
 }
+
 
 /**
  * @brief Remove the effectVM

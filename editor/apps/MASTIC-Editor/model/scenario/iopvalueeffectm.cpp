@@ -66,26 +66,27 @@ void IOPValueEffectM::copyFrom(ActionEffectM *effect)
     }
 }
 
-/**
-* @brief Custom setter on set agent model
-*        to fill inputs and outputs
-* @param agentModel
-*/
-void IOPValueEffectM::setagentModel(AgentInMappingVM* agentModel)
-{
-    AgentInMappingVM* previousAgentM = _agentModel;
-    ActionEffectM::setagentModel(agentModel);
 
-    if(previousAgentM != agentModel)
+/**
+* @brief Custom setter on set agent to fill inputs and outputs
+* @param agent
+*/
+void IOPValueEffectM::setagent(AgentInMappingVM* agent)
+{
+    AgentInMappingVM* previousAgent = _agent;
+
+    ActionEffectM::setagent(agent);
+
+    if (previousAgent != agent)
     {
         // Clear the list
         _agentIopList.clear();
         setagentIOP(NULL);
 
-        if(_agentModel != NULL)
+        if(_agent != NULL)
         {
             // Fill with inputs
-            foreach (InputVM* input, _agentModel->inputsList()->toList())
+            foreach (InputVM* input, _agent->inputsList()->toList())
             {
                 if(input->firstModel() != NULL)
                 {
@@ -94,7 +95,7 @@ void IOPValueEffectM::setagentModel(AgentInMappingVM* agentModel)
             }
 
             // Fill with outputs
-            foreach (OutputVM* output, _agentModel->outputsList()->toList())
+            foreach (OutputVM* output, _agent->outputsList()->toList())
             {
                 if(output->firstModel() != NULL)
                 {

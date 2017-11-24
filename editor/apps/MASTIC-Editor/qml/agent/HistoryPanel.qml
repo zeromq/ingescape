@@ -437,7 +437,8 @@ I2PopupBase {
                                 if (rootItem.controller) {
                                     if (filterAllAgentCB.checked) {
                                         rootItem.controller.showValuesOfAllAgents()
-                                    } else {
+                                    }
+                                    else {
                                         rootItem.controller.hideValuesOfAllAgents()
                                     }
                                 }
@@ -542,7 +543,8 @@ I2PopupBase {
                                         if (rootItem.controller) {
                                             if (filterAgentCB.checked) {
                                                 rootItem.controller.showValuesOfAgent(modelData)
-                                            } else {
+                                            }
+                                            else {
                                                 rootItem.controller.hideValuesOfAgent(modelData)
                                             }
 

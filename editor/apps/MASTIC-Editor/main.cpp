@@ -45,13 +45,14 @@ void registerCustomQmlTypes()
     // Enums
     //
     //---------------
+    qmlRegisterSingletonType<ActionComparisonValueType>(uri, 1, 0, "ActionComparisonValueType", &ActionComparisonValueType::qmlSingleton);
+    qmlRegisterSingletonType<ActionConditionType>(uri, 1, 0, "ActionConditionType", &ActionConditionType::qmlSingleton);
+    qmlRegisterSingletonType<ActionEffectTypes>(uri, 1, 0, "ActionEffectTypes", &ActionEffectTypes::qmlSingleton);
+    qmlRegisterSingletonType<AgentEffectValues>(uri, 1, 0, "AgentEffectValues", &AgentEffectValues::qmlSingleton);
     qmlRegisterSingletonType<AgentIOPTypes>(uri, 1, 0, "AgentIOPTypes", &AgentIOPTypes::qmlSingleton);
     qmlRegisterSingletonType<AgentIOPValueTypes>(uri, 1, 0, "AgentIOPValueTypes", &AgentIOPValueTypes::qmlSingleton);
     qmlRegisterSingletonType<AgentIOPValueTypeGroups>(uri, 1, 0, "AgentIOPValueTypeGroups", &AgentIOPValueTypeGroups::qmlSingleton);
-    qmlRegisterSingletonType<ActionComparisonValueType>(uri, 1, 0, "ActionComparisonValueType", &ActionComparisonValueType::qmlSingleton);
-    qmlRegisterSingletonType<ActionEffectValueType>(uri, 1, 0, "ActionEffectValueType", &ActionEffectValueType::qmlSingleton);
-    qmlRegisterSingletonType<ActionConditionType>(uri, 1, 0, "ActionConditionType", &ActionConditionType::qmlSingleton);
-    qmlRegisterSingletonType<ActionEffectType>(uri, 1, 0, "ActionEffectType", &ActionEffectType::qmlSingleton);
+    qmlRegisterSingletonType<MappingEffectValues>(uri, 1, 0, "MappingEffectValues", &MappingEffectValues::qmlSingleton);
     qmlRegisterSingletonType<ValidationDurationType>(uri, 1, 0, "ValidationDurationType", &ValidationDurationType::qmlSingleton);
 
     //----------------
@@ -115,17 +116,17 @@ void registerCustomQmlTypes()
     // View Models
     //
     //---------------
+    qmlRegisterUncreatableType<ActionConditionVM>(uri, 1, 0, "ActionConditionVM", "Internal class");
+    qmlRegisterUncreatableType<ActionEffectVM>(uri, 1, 0, "ActionEffectVM", "Internal class");
+    qmlRegisterUncreatableType<ActionExecutionVM>(uri, 1, 0, "ActionExecutionVM", "Internal class");
+    qmlRegisterUncreatableType<ActionInPaletteVM>(uri, 1, 0, "ActionInPaletteVM", "Internal class");
+    qmlRegisterUncreatableType<ActionVM>(uri, 1, 0, "ActionVM", "Internal class");
     qmlRegisterUncreatableType<AgentInMappingVM>(uri, 1, 0, "AgentInMappingVM", "Internal class");
     qmlRegisterUncreatableType<AgentVM>(uri, 1, 0, "AgentVM", "Internal class");
     qmlRegisterUncreatableType<InputVM>(uri, 1, 0, "InputVM", "Internal class");
     qmlRegisterUncreatableType<MapBetweenIOPVM>(uri, 1, 0, "MapBetweenIOPVM", "Internal class");
     qmlRegisterUncreatableType<OutputVM>(uri, 1, 0, "OutputVM", "Internal class");
     qmlRegisterUncreatableType<PointMapVM>(uri, 1, 0, "PointMapVM", "Internal class");
-    qmlRegisterUncreatableType<ActionVM>(uri, 1, 0, "ActionVM", "Internal class");
-    qmlRegisterUncreatableType<ActionInPaletteVM>(uri, 1, 0, "ActionInPaletteVM", "Internal class");
-    qmlRegisterUncreatableType<ActionEffectVM>(uri, 1, 0, "ActionEffectVM", "Internal class");
-    qmlRegisterUncreatableType<ActionConditionVM>(uri, 1, 0, "ActionConditionVM", "Internal class");
-    qmlRegisterUncreatableType<ActionExecutionVM>(uri, 1, 0, "ActionExecutionVM", "Internal class");
 
 
     //------------------

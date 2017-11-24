@@ -88,6 +88,7 @@ ActionM::~ActionM()
     _effectsList.deleteAllItems();
 }
 
+
 /**
  * @brief Copy from another action model
  * @param action model to copy
@@ -108,32 +109,48 @@ void ActionM::copyFrom(ActionM* actionModel)
         setshallRearm(actionModel->shallRearm());
         setisValid(actionModel->isValid());
 
-
         _effectsList.deleteAllItems();
+
         foreach (ActionEffectVM* effectVM, actionModel->effectsList()->toList())
         {
             ActionEffectVM* copiedEffectVM = new ActionEffectVM();
             copiedEffectVM->seteffectType(effectVM->effectType());
 
-            IOPValueEffectM* iopEffect = dynamic_cast<IOPValueEffectM*>(effectVM->effect());
-            if(iopEffect != NULL)
+            switch (effectVM->effectType())
             {
-                IOPValueEffectM * copiedIopEffect = new IOPValueEffectM();
-                copiedIopEffect->copyFrom(iopEffect);
-                copiedEffectVM->seteffect(copiedIopEffect);
-            } else {
-                MappingEffectM* mappingEffect = dynamic_cast<MappingEffectM*>(effectVM->effect());
+            case ActionEffectTypes::AGENT: {
+                ActionEffectM* copiedEffect = new ActionEffectM();
+                copiedEffect->copyFrom(effectVM->modelM());
+
+                copiedEffectVM->setmodelM(copiedEffect);
+                break;
+            }
+            case ActionEffectTypes::VALUE: {
+                IOPValueEffectM* iopEffect = dynamic_cast<IOPValueEffectM*>(effectVM->modelM());
+                if (iopEffect != NULL)
+                {
+                    IOPValueEffectM* copiedIopEffect = new IOPValueEffectM();
+                    copiedIopEffect->copyFrom(iopEffect);
+
+                    copiedEffectVM->setmodelM(copiedIopEffect);
+                }
+                break;
+            }
+            case ActionEffectTypes::MAPPING: {
+                MappingEffectM* mappingEffect = dynamic_cast<MappingEffectM*>(effectVM->modelM());
                 if(mappingEffect != NULL)
                 {
-                    MappingEffectM * copiedMappingEffect = new MappingEffectM();
+                    MappingEffectM* copiedMappingEffect = new MappingEffectM();
                     copiedMappingEffect->copyFrom(mappingEffect);
-                    copiedEffectVM->seteffect(copiedMappingEffect);
-                } else {
-                    ActionEffectM * copiedIopEffect = new ActionEffectM();
-                    copiedIopEffect->copyFrom(effectVM->effect());
-                    copiedEffectVM->seteffect(copiedIopEffect);
+
+                    copiedEffectVM->setmodelM(copiedMappingEffect);
                 }
+                break;
             }
+            default:
+                break;
+            }
+
             _effectsList.append(copiedEffectVM);
         }
 
@@ -150,7 +167,8 @@ void ActionM::copyFrom(ActionM* actionModel)
                 IOPValueConditionM * copiedIopCondition = new IOPValueConditionM();
                 copiedIopCondition->copyFrom(iopCondition);
                 copiedConditionVM->setcondition(copiedIopCondition);
-            } else {
+            }
+            else {
                 ActionConditionM * copiedIopCondition = new ActionConditionM();
                 copiedIopCondition->copyFrom(conditionVM->condition());
                 copiedConditionVM->setcondition(copiedIopCondition);
@@ -159,6 +177,7 @@ void ActionM::copyFrom(ActionM* actionModel)
         }
     }
 }
+
 
 /**
  * @brief Set the revertAfterTime string
@@ -178,7 +197,8 @@ void ActionM::setrevertAfterTimeString(QString revertAfterTime)
             {
                 setrevertAfterTime(QString(splittedTime.at(0)).toInt()*1000 + QString(splittedTime.at(1)).toInt());
             }
-        } else {
+        }
+        else {
             setrevertAfterTime(-1);
         }
 
@@ -204,7 +224,8 @@ void ActionM::setvalidityDurationString(QString validityDuration)
             {
                 setvalidityDuration(QString(splittedTime.at(0)).toInt()*1000 + QString(splittedTime.at(1)).toInt());
             }
-        } else {
+        }
+        else {
             setvalidityDuration(-1);
         }
 
@@ -228,7 +249,8 @@ void ActionM::setshallRevert(bool shallRevert)
             setshallRevertAfterTime(false);
             setshallRevertWhenValidityIsOver(false);
             setrevertAfterTimeString("0.0");
-        } else {
+        }
+        else {
             setshallRevertWhenValidityIsOver(true);
         }
 
