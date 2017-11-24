@@ -818,7 +818,7 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
                             }
 
                             // Set the list of agent iop
-                            iopEffectM->agentIopList()->append(listIOPAgents);
+                            iopEffectM->iopMergedList()->append(listIOPAgents);
 
                             // set agent
                             iopEffectM->setagent(agent);

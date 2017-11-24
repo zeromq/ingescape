@@ -1,13 +1,14 @@
 /*
- *	IOPValueEffectM
+ *	MASTIC Editor
  *
- *  Copyright (c) 2016-2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
  *
  *
  *	Contributors:
+ *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *
  */
 
@@ -15,7 +16,6 @@
 
 
 #include <QDebug>
-
 
 
 //--------------------------------------------------------------
@@ -45,23 +45,24 @@ IOPValueEffectM::IOPValueEffectM(QObject *parent) : ActionEffectM(parent),
 IOPValueEffectM::~IOPValueEffectM()
 {
     // Clear our list
-    _agentIopList.clear();
+    _iopMergedList.clear();
 }
 
 /**
 * @brief Copy from another effect model
 * @param effect to copy
 */
-void IOPValueEffectM::copyFrom(ActionEffectM *effect)
+void IOPValueEffectM::copyFrom(ActionEffectM* effect)
 {
+    // Call mother class
     ActionEffectM::copyFrom(effect);
 
     IOPValueEffectM* iopEffect = dynamic_cast<IOPValueEffectM*>(effect);
-    if(iopEffect != NULL)
+    if (iopEffect != NULL)
     {
         setagentIOP(iopEffect->agentIOP());
-        _agentIopList.clear();
-        _agentIopList.append(iopEffect->agentIopList()->toList());
+        _iopMergedList.clear();
+        _iopMergedList.append(iopEffect->iopMergedList()->toList());
         setvalue(iopEffect->value());
     }
 }
@@ -75,38 +76,36 @@ void IOPValueEffectM::setagent(AgentInMappingVM* agent)
 {
     AgentInMappingVM* previousAgent = _agent;
 
+    // Call setter of mother class
     ActionEffectM::setagent(agent);
 
     if (previousAgent != agent)
     {
         // Clear the list
-        _agentIopList.clear();
+        _iopMergedList.clear();
         setagentIOP(NULL);
 
-        if(_agent != NULL)
+        if (_agent != NULL)
         {
             // Fill with inputs
             foreach (InputVM* input, _agent->inputsList()->toList())
             {
-                if(input->firstModel() != NULL)
-                {
-                    _agentIopList.append(input->firstModel());
+                if (input->firstModel() != NULL) {
+                    _iopMergedList.append(input->firstModel());
                 }
             }
 
             // Fill with outputs
             foreach (OutputVM* output, _agent->outputsList()->toList())
             {
-                if(output->firstModel() != NULL)
-                {
-                    _agentIopList.append(output->firstModel());
+                if (output->firstModel() != NULL) {
+                    _iopMergedList.append(output->firstModel());
                 }
             }
 
             // Select the first item
-            if(_agentIopList.count() > 0)
-            {
-                setagentIOP(_agentIopList.at(0));
+            if (_iopMergedList.count() > 0) {
+                setagentIOP(_iopMergedList.at(0));
             }
         }
     }

@@ -93,6 +93,7 @@ MappingEffectM::~MappingEffectM()
 */
 void MappingEffectM::copyFrom(ActionEffectM *effect)
 {
+    // Call mother class
     ActionEffectM::copyFrom(effect);
 
     MappingEffectM* mappingEffect = dynamic_cast<MappingEffectM*>(effect);
@@ -118,6 +119,7 @@ void MappingEffectM::setagent(AgentInMappingVM* agent)
 {
     AgentInMappingVM* previousAgent = _agent;
 
+    // Call setter of mother class
     ActionEffectM::setagent(agent);
 
     if (previousAgent != agent)
