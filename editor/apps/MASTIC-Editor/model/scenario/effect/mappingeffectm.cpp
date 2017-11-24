@@ -59,7 +59,7 @@ MappingEffectM::MappingEffectM(QObject *parent) : ActionEffectM(parent),
     _mappingEffectValue(MappingEffectValues::MAPPED),
     _output(NULL),
     _inputAgent(NULL),
-    _toAgentIOP(NULL)
+    _input(NULL)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -82,8 +82,8 @@ MappingEffectM::~MappingEffectM()
     // Reset input agent
     setinputAgent(NULL);
 
-    // Reset TO agent iop
-    settoAgentIOP(NULL);
+    // Reset input
+    setinput(NULL);
 }
 
 /**
@@ -105,7 +105,7 @@ void MappingEffectM::copyFrom(ActionEffectM *effect)
 
         setoutput(mappingEffect->output());
         setinputAgent(mappingEffect->inputAgent());
-        settoAgentIOP(mappingEffect->toAgentIOP());
+        setinput(mappingEffect->input());
     }
 }
 
@@ -167,7 +167,7 @@ void MappingEffectM::setinputAgent(AgentInMappingVM* value)
 
         // Clear the list
         _toAgentIopList.clear();
-        settoAgentIOP(NULL);
+        setinput(NULL);
 
         if (_inputAgent != NULL)
         {
@@ -181,7 +181,7 @@ void MappingEffectM::setinputAgent(AgentInMappingVM* value)
 
             // Select the first item
             if (_toAgentIopList.count() > 0) {
-                settoAgentIOP(_toAgentIopList.at(0));
+                setinput(_toAgentIopList.at(0));
             }
 
             if(_inputAgent != NULL)

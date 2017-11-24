@@ -26,7 +26,7 @@
 
 
 /**
- * Values of effect on mapping: ENABLE, DISABLE
+ * Values of effect on mapping: MAPPED, UNMAPPED
  */
 I2_ENUM_CUSTOM(MappingEffectValues, MAPPED, UNMAPPED)
 
@@ -47,8 +47,8 @@ class MappingEffectM: public ActionEffectM
     // Input Agent
     I2_QML_PROPERTY_CUSTOM_SETTER(AgentInMappingVM*, inputAgent)
 
-    // TO Agent IOP
-    I2_QML_PROPERTY(AgentIOPM*, toAgentIOP)
+    // Input of the input agent
+    I2_QML_PROPERTY(AgentIOPM*, input)
 
     // Concatened list of FROM iop agents items
     I2_QOBJECT_LISTMODEL(AgentIOPM , fromAgentIopList)
