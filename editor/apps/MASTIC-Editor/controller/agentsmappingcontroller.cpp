@@ -120,7 +120,7 @@ void AgentsMappingController::deleteLinkBetweenTwoAgents(MapBetweenIOPVM* link)
 void AgentsMappingController::dropAgentToMappingAtPosition(QString agentName, AbstractI2CustomItemListModel* list, QPointF position)
 {
     // Check that there is NOT yet an agent in the current mapping for this name
-    AgentInMappingVM* agentInMapping = getAgentInMappingForName(agentName);
+    AgentInMappingVM* agentInMapping = getAgentInMappingFromName(agentName);
     if (agentInMapping == NULL)
     {
         I2CustomItemListModel<AgentM>* agentsList = dynamic_cast<I2CustomItemListModel<AgentM>*>(list);
@@ -130,7 +130,7 @@ void AgentsMappingController::dropAgentToMappingAtPosition(QString agentName, Ab
             _addAgentModelsToMappingAtPosition(agentName, agentsList->toList(), position);
 
             // Selects this new agent
-            agentInMapping = getAgentInMappingForName(agentName);
+            agentInMapping = getAgentInMappingFromName(agentName);
             if (agentInMapping != NULL) {
                 setselectedAgent(agentInMapping);
             }
@@ -148,7 +148,7 @@ void AgentsMappingController::onIdenticalAgentModelReplaced(AgentM* previousMode
 {
     if ((previousModel != NULL) && (newModel != NULL))
     {
-        AgentInMappingVM* agentInMapping = getAgentInMappingForName(newModel->name());
+        AgentInMappingVM* agentInMapping = getAgentInMappingFromName(newModel->name());
         if (agentInMapping != NULL)
         {
             int index = agentInMapping->models()->indexOf(previousModel);
@@ -168,7 +168,7 @@ void AgentsMappingController::onIdenticalAgentModelAdded(AgentM* newModel)
 {
     if (newModel != NULL)
     {
-        AgentInMappingVM* agentInMapping = getAgentInMappingForName(newModel->name());
+        AgentInMappingVM* agentInMapping = getAgentInMappingFromName(newModel->name());
         if (agentInMapping != NULL)
         {
             agentInMapping->models()->append(newModel);
@@ -265,7 +265,7 @@ void AgentsMappingController::onAgentModelWillBeDeleted(AgentM* agent)
     if (agent != NULL)
     {
         // Get the agent in mapping for the agent name
-        AgentInMappingVM* agentInMapping = getAgentInMappingForName(agent->name());
+        AgentInMappingVM* agentInMapping = getAgentInMappingFromName(agent->name());
         if (agentInMapping != NULL)
         {
             // Remove the model
@@ -283,19 +283,20 @@ void AgentsMappingController::onAgentModelWillBeDeleted(AgentM* agent)
 
 
 /**
- * @brief Get the agent in mapping for an agent name
+ * @brief Get the agent in mapping from an agent name
  * @param name
  * @return
  */
-AgentInMappingVM* AgentsMappingController::getAgentInMappingForName(QString name)
+AgentInMappingVM* AgentsMappingController::getAgentInMappingFromName(QString name)
 {
-    if (_mapFromNameToAgentInMappingViewModelsList.contains(name)) {
-        return _mapFromNameToAgentInMappingViewModelsList.value(name);
+    if (_mapFromNameToAgentInMapping.contains(name)) {
+        return _mapFromNameToAgentInMapping.value(name);
     }
     else {
         return NULL;
     }
 }
+
 
 /**
  * @brief Slot when inside an agentInMappingVM, new inputsVM are created.
@@ -334,7 +335,7 @@ void AgentsMappingController::_generateAllMapBetweenIopUsingNewlyAddedInputsVM(A
                             if(inputPointVM->name() == currentElementMapping->input())
                             {
                                 // Search for the output agent based on the current elementMapping
-                                AgentInMappingVM* outputAgent = getAgentInMappingForName(currentElementMapping->outputAgent());
+                                AgentInMappingVM* outputAgent = getAgentInMappingFromName(currentElementMapping->outputAgent());
 
                                 OutputVM* outputPointVM = NULL;
 
@@ -720,7 +721,7 @@ void AgentsMappingController::_addAgentModelsToMappingAtPosition(QString agentNa
 {
     if (!agentName.isEmpty() && (agentsList.count() > 0))
     {
-        AgentInMappingVM* agentInMapping = getAgentInMappingForName(agentName);
+        AgentInMappingVM* agentInMapping = getAgentInMappingFromName(agentName);
 
         // The agent is defined, only add models of agent in the internal list of the agentInMappingVM
         if (agentInMapping != NULL)
@@ -742,7 +743,7 @@ void AgentsMappingController::_addAgentModelsToMappingAtPosition(QString agentNa
                                                   this);
 
             // Add in the map list
-            _mapFromNameToAgentInMappingViewModelsList.insert(agentName, agentInMapping);
+            _mapFromNameToAgentInMapping.insert(agentName, agentInMapping);
 
             // Add this new Agent In Mapping VM in the list for the qml
             _agentInMappingVMList.append(agentInMapping);
@@ -769,7 +770,7 @@ void AgentsMappingController::_deleteAgentInMapping(AgentInMappingVM* agentInMap
         }
 
         // Remove from the map list
-        _mapFromNameToAgentInMappingViewModelsList.remove(agentInMapping->name());
+        _mapFromNameToAgentInMapping.remove(agentInMapping->name());
 
         _deleteAllMappingMadeOnTargetAgent(agentInMapping);
 
