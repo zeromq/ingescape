@@ -346,7 +346,7 @@ void ActionVM::_createActionExecution(int startTime)
         }
 
         // Create a new (view model of) action execution
-        ActionExecutionVM* actionExecution = actionExecution = new ActionExecutionVM(true, startTime, reverseTime, this);
+        ActionExecutionVM* actionExecution = actionExecution = new ActionExecutionVM(_actionModel->shallRevert(), startTime, reverseTime, this);
 
         // Add to the list
         _executionsList.append(actionExecution);
