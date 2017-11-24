@@ -692,6 +692,7 @@ QPair< QPair< QList<ActionM*>, QList<ActionInPaletteVM*> > , QList<ActionVM*> > 
                     QJsonValue jsonActionName = jsonActionInTimeline.value("action_name");
                     QJsonValue jsonActionStartTime = jsonActionInTimeline.value("start_time");
                     QJsonValue jsonActionColor = jsonActionInTimeline.value("color");
+                    QJsonValue jsonActionLineInTimeline = jsonActionInTimeline.value("line_number");
                     if(jsonActionName.isString() && jsonActionStartTime.isDouble())
                     {
                         QString actionName = jsonActionName.toString();
@@ -705,6 +706,9 @@ QPair< QPair< QList<ActionM*>, QList<ActionInPaletteVM*> > , QList<ActionVM*> > 
                                 {
                                     actionVM->setcolor(jsonActionColor.toString());
                                 }
+
+                                // Set line in timeline
+                                actionVM->setlineInTimeLine(jsonActionLineInTimeline.toInt());
 
                                 // Add our action from timeline
                                 actionsInTimeLine.append(actionVM);
@@ -1374,6 +1378,7 @@ QByteArray JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<ActionI
             jsonActionsInTimeLine.insert("action_name",actionVM->actionModel()->name());
             jsonActionsInTimeLine.insert("start_time",actionVM->startTime());
             jsonActionsInTimeLine.insert("color",actionVM->color().name());
+            jsonActionsInTimeLine.insert("line_number",actionVM->lineInTimeLine());
 
             jsonActionsInTimelineArray.append(jsonActionsInTimeLine);
         }

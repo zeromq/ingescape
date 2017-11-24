@@ -402,7 +402,47 @@ void ScenarioController::_importScenarioFromFile(QString scenarioFilePath)
                 // Append the list of actions in timeline
                 if(scenarioToImport.second.count() > 0)
                 {
-                    _actionsInTimeLine.append(scenarioToImport.second);
+                    // Add each actionVM in to the right line of our timeline
+                    foreach (ActionVM* actionVM, scenarioToImport.second)
+                    {
+                        int lineNumber = actionVM->lineInTimeLine();
+
+                        // Increment actionVM into the line number
+                        if(_mapActionsVMsInTimelineFromLineIndex.contains(lineNumber) == true)
+                        {
+                            I2CustomItemSortFilterListModel<ActionVM>* actionVMSortedList = _mapActionsVMsInTimelineFromLineIndex.value(lineNumber);
+                            if(actionVMSortedList != NULL)
+                            {
+                                // Insert the action
+                                actionVMSortedList->append(actionVM);
+                            }
+                        } else {
+                            // Create a new list
+                            I2CustomItemSortFilterListModel<ActionVM>* actionVMSortedList = new I2CustomItemSortFilterListModel<ActionVM>();
+                            actionVMSortedList->setSortProperty("startTime");
+                            actionVMSortedList->append(actionVM);
+
+                            // Add into our map
+                            _mapActionsVMsInTimelineFromLineIndex.insert(lineNumber,actionVMSortedList);
+                        }
+
+                        // Add the new action VM to our map
+                        QList<ActionVM*> actionsVMsList;
+                        if(_mapActionsVMsInTimelineFromActionModel.contains(actionVM->actionModel()) == true)
+                        {
+                            actionsVMsList = _mapActionsVMsInTimelineFromActionModel.value(actionVM->actionModel());
+                        }
+                        actionsVMsList.append(actionVM);
+                        _mapActionsVMsInTimelineFromActionModel.insert(actionVM->actionModel(),actionsVMsList);
+
+                        _actionsInTimeLine.append(actionVM);
+
+                        // Increment the line number if necessary
+                        if(_linesNumberInTimeLine < lineNumber+1)
+                        {
+                            setlinesNumberInTimeLine(lineNumber+1);
+                        }
+                    }
                 }
             }
             else {
