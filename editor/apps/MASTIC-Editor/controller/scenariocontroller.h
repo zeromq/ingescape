@@ -79,7 +79,7 @@ class ScenarioController: public QObject
     I2_QOBJECT_LISTMODEL(ActionInPaletteVM, actionsInPaletteList)
 
     // List of actions in timeline
-    I2_QOBJECT_LISTMODEL(ActionVM, actionsInTimeLine)
+    I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(ActionVM, actionsInTimeLine)
 
     // Number of line in our timeline
     I2_QML_PROPERTY(int, linesNumberInTimeLine)
