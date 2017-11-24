@@ -117,6 +117,7 @@ typedef struct zyreAgent {
 
 bool network_needToSendDefinitionUpdate = false;
 bool network_needToUpdateMapping = false;
+bool network_isEditor = false;
 
 //we manage agent data as a global variables inside the network module for now
 zyreloopElements_t *agentElements = NULL;
@@ -894,6 +895,9 @@ initActor (zsock_t *pipe, void *args)
     //set headers for agent
     zyre_set_header(agentElements->node, "publisher", "%s", insert + 1);
     zyre_set_header(agentElements->node, "canBeFrozen", "%i", agentCanBeFrozen);
+    if (network_isEditor){
+        zyre_set_header(agentElements->node, "isEditor", "%d", 1);
+    }
 
 #if defined __unix__ || defined __APPLE__
     int ret;

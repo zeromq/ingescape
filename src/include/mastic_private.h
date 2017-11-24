@@ -238,6 +238,7 @@ void* model_getValueFor(const char*name_iop, iop_t type);
 
 extern bool network_needToSendDefinitionUpdate;
 extern bool network_needToUpdateMapping;
+extern bool network_isEditor;
 extern subscriber_t *subscribers;
 extern zyreloopElements_t *agentElements;
 //DO NOT DESTROY THE ZYRE_EVENT INSIDE THE CALLBACK
