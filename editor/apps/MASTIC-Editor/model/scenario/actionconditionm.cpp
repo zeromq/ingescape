@@ -137,7 +137,6 @@ void ActionConditionM::copyFrom(ActionConditionM* condition)
   */
 void ActionConditionM::onAgentModelIsOnChange(bool isON)
 {
-    qDebug() << "onAgentModelIsOnChange : " << isON;
     if ((_comparison == ActionComparisonValueType::ON && isON)
             ||
             (_comparison == ActionComparisonValueType::OFF && isON == false)) {

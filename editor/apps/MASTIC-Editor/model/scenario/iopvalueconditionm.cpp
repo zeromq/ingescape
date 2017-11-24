@@ -287,8 +287,6 @@ void IOPValueConditionM::setagentIOP(AgentIOPM* agentIop)
 
         if(_agentIOP != NULL)
         {
-            qDebug() << "action IOP name " << _agentIOP->name();
-
             setagentIOPName(_agentIOP->name());
 
             // Subscribe to destruction
@@ -322,7 +320,7 @@ void IOPValueConditionM::_onCurrentValueChange(QVariant currentValue)
     bool isValid = false;
     if(_agentIOP != NULL)
     {
-        //agentIOPValueType : INTEGER , DOUBLE, STRING, BOOL, IMPULSION, DATA, MIXED, UNKNOWN
+        // According to the iop type
         switch(_agentIOP->agentIOPValueType())
         {
             case AgentIOPValueTypes::INTEGER :
@@ -330,8 +328,7 @@ void IOPValueConditionM::_onCurrentValueChange(QVariant currentValue)
             {
                 double conditionDblValue = valueTrimmed.toDouble();
                 double currentValueDblValue = currentValue.toDouble();
-                qDebug() << "COMPARE conditionDblValue="<< QString::number(conditionDblValue,'f')
-                         << " currentValue.toDouble()="<< QString::number(currentValueDblValue,'f');
+
                 switch(_comparison)
                 {
                     case ActionComparisonValueType::INFERIOR_TO :
