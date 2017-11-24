@@ -27,7 +27,7 @@
 
 
 /**
- * @brief The ActionVM class defines an action view model
+ * @brief The ActionVM class defines a view model of action
  */
 class ActionVM: public QObject
 {
@@ -51,24 +51,31 @@ class ActionVM: public QObject
     // Is valid flag
     I2_QML_PROPERTY(bool, isValid)
 
-    // Current ActionExecution
-    I2_QML_PROPERTY(ActionExecutionVM*, currentActionVM)
+    // List of executions of our action
+    I2_QOBJECT_LISTMODEL(ActionExecutionVM, executionsList)
 
-    // Current ActionExecution
-    I2_QOBJECT_LISTMODEL(ActionExecutionVM, actionExecutionVmList)
+    // Current execution (waiting to execute)
+    I2_QML_PROPERTY(ActionExecutionVM*, currentExecution)
+
 
 public:
 
     /**
-     * @brief Default constructor
+     * @brief Constructor
+     * @param model
+     * @param startTime
      * @param parent
      */
-    explicit ActionVM(ActionM* actionModel, int startTime, QObject *parent = 0);
+    explicit ActionVM(ActionM* model,
+                      int startTime,
+                      QObject *parent = 0);
+
 
     /**
       * @brief Destructor
       */
     ~ActionVM();
+
 
     /**
      * @brief Copy from another action view model
