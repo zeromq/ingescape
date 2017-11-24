@@ -33,7 +33,7 @@
  */
 ScenarioController::ScenarioController(QString scenariosPath, QObject *parent) : QObject(parent),
     _selectedAction(NULL),
-    _linesNumberInTimeLine(1),
+    _linesNumberInTimeLine(MINIMUM_DISPLAYED_LINES_NUMBER_IN_TIMELINE),
     _isPlaying(false),
     _currentTime(QTime::fromMSecsSinceStartOfDay(0)),
     _scenariosDirectoryPath(scenariosPath)
@@ -530,6 +530,12 @@ void ScenarioController::addActionVMAtTime(ActionM * actionModel, int timeInMs)
 
         // Add the action VM to the timeline
         _actionsInTimeLine.append(actionVM);
+
+        // If scenario is playing we add the actionVM to the active ones
+        if(_isPlaying)
+        {
+            _activeActionsVMList.append(actionVM);
+        }
     }
 }
 
@@ -576,14 +582,31 @@ void ScenarioController::removeActionVMFromTimeLine(ActionVM * actionVM)
                         actionVMSortedList->remove(actionVM);
 
                         // Check if the list is empty to remove the line
-                        if(actionVMSortedList->count() == 0 && lineNumber == _linesNumberInTimeLine-1)
+                        if(actionVMSortedList->count() == 0)
                         {
+                            // We delete the last line, redice the number of display line in the limite of MINIMUM_DISPLAYED_LINES_NUMBER_IN_TIMELINE
+                            if(_linesNumberInTimeLine > MINIMUM_DISPLAYED_LINES_NUMBER_IN_TIMELINE && lineNumber+1 == _linesNumberInTimeLine)
+                            {
+                                int nbOfDecrement = 1;
+
+                                // Delete the last line, lets check if we can reduce the number of displayed lines
+                                for (int lineTmp = lineNumber-1; lineTmp >= 0 ; --lineTmp)
+                                {
+                                    if(_mapActionsVMsInTimelineFromLineIndex.contains(lineTmp) == false)
+                                    {
+                                        nbOfDecrement++;
+                                    } else {
+                                        break;
+                                    }
+                                }
+
+                                // Decrement the number of lines
+                                setlinesNumberInTimeLine(_linesNumberInTimeLine-nbOfDecrement < MINIMUM_DISPLAYED_LINES_NUMBER_IN_TIMELINE ? MINIMUM_DISPLAYED_LINES_NUMBER_IN_TIMELINE : _linesNumberInTimeLine-nbOfDecrement);
+                            }
+
                             _mapActionsVMsInTimelineFromLineIndex.remove(lineNumber);
                             delete actionVMSortedList;
                             actionVMSortedList = NULL;
-
-                            // Decrement the number of lines
-                           setlinesNumberInTimeLine(_linesNumberInTimeLine-1);
                         }
                     }
                 }
@@ -642,7 +665,8 @@ void ScenarioController::_insertActionVMIntoMapByLineNumber(ActionVM* actionVMTo
 {
     int insertionStartTime = actionVMToInsert->startTime();
 
-    for (int lineNumber = 0; lineNumber < _linesNumberInTimeLine; ++lineNumber)
+    int lineNumber = 0;
+    while (lineNumber < _linesNumberInTimeLine)
     {
         bool canInsert = canInsertActionVMTo(actionVMToInsert->actionModel(), insertionStartTime,lineNumber);
         // Insert our item if possible
@@ -661,17 +685,33 @@ void ScenarioController::_insertActionVMIntoMapByLineNumber(ActionVM* actionVMTo
 
                     break;
                 }
+            } else {
+                // Create a new list
+                I2CustomItemSortFilterListModel<ActionVM>* actionVMSortedList = new I2CustomItemSortFilterListModel<ActionVM>();
+                actionVMSortedList->setSortProperty("startTime");
+                actionVMSortedList->append(actionVMToInsert);
+
+                // Set the line number
+                actionVMToInsert->setlineInTimeLine(lineNumber);
+
+                // Add into our map
+                _mapActionsVMsInTimelineFromLineIndex.insert(lineNumber,actionVMSortedList);
+
+                break;
             }
         }
+        lineNumber++;
     }
 
     // If the action has not been inserted yet, we create a new line
     if(actionVMToInsert->lineInTimeLine() == -1)
     {
+        if(lineNumber >= _linesNumberInTimeLine)
+        {
+            setlinesNumberInTimeLine(_linesNumberInTimeLine+1);
+        }
         // Create the new line number
-        int newLineNumber = _linesNumberInTimeLine;
-        setlinesNumberInTimeLine(_linesNumberInTimeLine+1);
-        actionVMToInsert->setlineInTimeLine(newLineNumber);
+        actionVMToInsert->setlineInTimeLine(lineNumber);
 
         // Create a new list
         I2CustomItemSortFilterListModel<ActionVM>* actionVMSortedList = new I2CustomItemSortFilterListModel<ActionVM>();
@@ -679,7 +719,7 @@ void ScenarioController::_insertActionVMIntoMapByLineNumber(ActionVM* actionVMTo
         actionVMSortedList->append(actionVMToInsert);
 
         // Add into our map
-        _mapActionsVMsInTimelineFromLineIndex.insert(newLineNumber,actionVMSortedList);
+        _mapActionsVMsInTimelineFromLineIndex.insert(lineNumber,actionVMSortedList);
     }
 }
 
@@ -715,14 +755,14 @@ bool ScenarioController::canInsertActionVMTo(ActionM* actionMToInsert, int time,
                         if(previousActionVM != NULL && previousActionVM->actionModel() != NULL)
                         {
                             // If the previous action ends after the beginning of the new one, we skip it
-                            if(previousActionVM->endTime() >= time)
+                            if(previousActionVM->endTime()+MARGIN_FOR_ACTION_INSERTION_IN_MS >= time || previousActionVM->endTime() == -1)
                             {
                                 canInsert = false;
                                 break;
                             }
                         }
 
-                        int insertionEndTime = time;
+                        int insertionEndTime = time + MARGIN_FOR_ACTION_INSERTION_IN_MS;
                         if(actionMToInsert->validityDurationType() == ValidationDurationType::FOREVER)
                         {
                             // Try with the next line
@@ -752,7 +792,7 @@ bool ScenarioController::canInsertActionVMTo(ActionM* actionMToInsert, int time,
             if(reachPosition == false && previousActionVM != NULL)
             {
                 // If the previous action ends after the beginning of the new one, we skip it
-                if(previousActionVM->endTime() >= time)
+                if(previousActionVM->endTime()+MARGIN_FOR_ACTION_INSERTION_IN_MS >= time || previousActionVM->endTime() == -1)
                 {
                     canInsert = false;
                 }
@@ -797,19 +837,23 @@ void ScenarioController::_onTimeout_EvaluateActions()
     int currentTimeOfDay = QTime::currentTime().msecsSinceStartOfDay();
     setcurrentTime(_currentTime.addMSecs(currentTimeOfDay - _scenarioStartingTimeInMs));
 
-
     // Evaluate the list of actions
     foreach (ActionVM* actionVM, _activeActionsVMList.toList())
     {
         if(actionVM->startTime() <= _currentTime.msecsSinceStartOfDay())
         {
-            // evaluate the action
-            if(actionVM->isValid() == true)
+            if(actionVM->endTime() >= _currentTime.msecsSinceStartOfDay() || actionVM->endTime() == -1)
             {
-                // FIXME Activate the action effects
+                // evaluate the action
+                if(actionVM->isValid() == true)
+                {
+                    // FIXME Activate the action effects
 
 
-                // Remove the action form the list
+                    // Remove the action form the list
+                    _activeActionsVMList.remove(actionVM);
+                }
+            } else {
                 _activeActionsVMList.remove(actionVM);
             }
         } else {
