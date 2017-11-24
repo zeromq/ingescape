@@ -327,7 +327,7 @@
 		9762EDE51EAE54D6002062A1 /* libzmq.5.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libzmq.5.dylib; path = ../../../../../../../../../usr/local/lib/libzmq.5.dylib; sourceTree = "<group>"; };
 		9762EDE61EAE54D6002062A1 /* libzyre.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libzyre.1.dylib; path = ../../../../../../../../../usr/local/lib/libzyre.1.dylib; sourceTree = "<group>"; };
 		977C24791F03F4FA00CA1675 /* mastic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mastic.h; sourceTree = "<group>"; };
-		979A79781EA7B0D6003153EF /* libmastic.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libmastic.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		979A79781EA7B0D6003153EF /* libmastic-ios.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libmastic-ios.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		979A79851EA7B112003153EF /* definition.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = definition.c; sourceTree = "<group>"; };
 		979A798F1EA7B112003153EF /* libut.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libut.h; sourceTree = "<group>"; };
 		979A79901EA7B112003153EF /* ringbuf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ringbuf.h; sourceTree = "<group>"; };
@@ -1231,7 +1231,7 @@
 		979A79791EA7B0D6003153EF /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				979A79781EA7B0D6003153EF /* libmastic.a */,
+				979A79781EA7B0D6003153EF /* libmastic-ios.a */,
 				9762EDCD1EAE5414002062A1 /* mastic.framework */,
 			);
 			name = Products;
@@ -2583,9 +2583,9 @@
 			productReference = 9762EDCD1EAE5414002062A1 /* mastic.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		979A79771EA7B0D6003153EF /* mastic */ = {
+		979A79771EA7B0D6003153EF /* mastic-ios */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 979A79811EA7B0D6003153EF /* Build configuration list for PBXNativeTarget "mastic" */;
+			buildConfigurationList = 979A79811EA7B0D6003153EF /* Build configuration list for PBXNativeTarget "mastic-ios" */;
 			buildPhases = (
 				979A79741EA7B0D6003153EF /* Sources */,
 				979A79751EA7B0D6003153EF /* Frameworks */,
@@ -2599,9 +2599,9 @@
 			dependencies = (
 				97C927261EB38FE300D2B0CE /* PBXTargetDependency */,
 			);
-			name = mastic;
+			name = "mastic-ios";
 			productName = mastic;
-			productReference = 979A79781EA7B0D6003153EF /* libmastic.a */;
+			productReference = 979A79781EA7B0D6003153EF /* libmastic-ios.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 /* End PBXNativeTarget section */
@@ -2643,7 +2643,7 @@
 			);
 			projectRoot = "";
 			targets = (
-				979A79771EA7B0D6003153EF /* mastic */,
+				979A79771EA7B0D6003153EF /* mastic-ios */,
 				9762EDCC1EAE5414002062A1 /* mastic-macos */,
 			);
 		};
@@ -2934,7 +2934,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		979A79811EA7B0D6003153EF /* Build configuration list for PBXNativeTarget "mastic" */ = {
+		979A79811EA7B0D6003153EF /* Build configuration list for PBXNativeTarget "mastic-ios" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				979A79821EA7B0D6003153EF /* Debug */,

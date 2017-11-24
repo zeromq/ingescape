@@ -80,6 +80,11 @@ PUBLIC void mtic_setVerbose (bool verbose);
 PUBLIC bool mtic_getVerbose(void);
 PUBLIC void mtic_setCanBeFrozen (bool canBeFrozen);
 
+//utility function to find network adapters with broadcast capabilities
+//to be used in mtic_startWithDevice
+void mtic_getNetdevicesList(char ***devices, int *nb);
+void mtic_freeNetdevicesList(char **devices, int nb);
+
 //////////////////////////////////////////////////
 //IOP Model : Inputs, Outputs and Parameters read/write/check/observe/mute
 
