@@ -55,7 +55,7 @@ class ActionM: public QObject
     // Validity duration in milliseconds in string format
     I2_QML_PROPERTY_CUSTOM_SETTER(QString, validityDurationString)
 
-    // Shall revert the action
+    // Flag indicating if we shall revert effect(s) of our action
     I2_QML_PROPERTY_CUSTOM_SETTER(bool, shallRevert)
 
     // Shall revert action when validity is over
