@@ -2,18 +2,18 @@
 
 /**
  * @brief Constructor
- * @param hasRevert
+ * @param shallRevert
  * @param executionTime
  * @param reverseTime
  * @param parent
  */
-ActionExecutionVM::ActionExecutionVM(bool hasRevert,
+ActionExecutionVM::ActionExecutionVM(bool shallRevert,
                                      int executionTime,
                                      int reverseTime,
                                      QObject *parent) : QObject(parent),
-    _hasRevert(hasRevert),
+    _shallRevert(shallRevert),
     _isWaitingRevert(false),
-    _isTriggered(false),
+    _isExecuted(false),
     _executionTime(executionTime),
     _reverseTime(reverseTime)
 {
@@ -172,7 +172,7 @@ QList<QPair<QString, QString>> ActionExecutionVM::getCommandsForEffectsAndInitRe
             }
 
             // Reverse command (and parameters) are defined
-            if (_hasRevert && !reverseCommandAndParameters.isEmpty())
+            if (_shallRevert && !reverseCommandAndParameters.isEmpty())
             {
                 qDebug() << pairCommand.first << "Reverse Command (and parameters):" << reverseCommandAndParameters;
 

@@ -15,14 +15,14 @@ class ActionExecutionVM : public QObject
 {
      Q_OBJECT
 
-    // Flag indicating if our action has a revert effect
-    I2_QML_PROPERTY(bool, hasRevert)
+    // Flag indicating if we shall revert effect(s) of our action
+    I2_QML_PROPERTY(bool, shallRevert)
 
-    // Flag indicating if we are waiting for the revert effect
+    // Flag indicating if we are waiting to revert effect(s) of our action
     I2_QML_PROPERTY(bool, isWaitingRevert)
 
     // Flag indicating if our action has been executed
-    I2_QML_PROPERTY(bool, isTriggered)
+    I2_QML_PROPERTY(bool, isExecuted)
 
     // Execution time in millisecond
     I2_QML_PROPERTY(int, executionTime)
@@ -34,12 +34,12 @@ class ActionExecutionVM : public QObject
 public:
     /**
      * @brief Constructor
-     * @param hasRevert
+     * @param shallRevert
      * @param executionTime
      * @param reverseTime
      * @param parent
      */
-    ActionExecutionVM(bool hasRevert,
+    ActionExecutionVM(bool shallRevert,
                       int executionTime,
                       int reverseTime,
                       QObject *parent = 0);

@@ -183,14 +183,16 @@ Item {
                 //     are interpreted by the Javascript stack
                 Item {
                     id: currentTimeLine
-                    x: 0 //CregController.analysisViewController.convertDateTimeToAbscissaInCoordinateSystem(root.currentDateTime, CregController.analysisViewController.pixelsPerMinute)
+                    x: (controller && viewController)?
+                           viewController.convertQTimeToAbscissaInCoordinateSystem(controller.currentTime, viewController.pixelsPerMinute)
+                         : 0
                     y: 0
 
                     Rectangle {
                         x: -1
                         y: 0
 
-                        width: 2
+                        width: 1
                         height: timeLinesContent.height
 
                         color: MasticTheme.whiteColor
@@ -411,9 +413,8 @@ Item {
                             anchors {
                                 horizontalCenter: parent.left
                                 bottom : parent.bottom
-                                bottomMargin: 1
                             }
-                            height : (model.isBigTick) ? 10 : 4
+                            height : (model.isBigTick) ? 8 : 4
                             width : 1
                             color: MasticTheme.darkGreyColor
                         }
@@ -422,6 +423,7 @@ Item {
                             anchors {
                                 horizontalCenter: timeticks.horizontalCenter
                                 bottom : timeticks.top
+                                bottomMargin: 1
                             }
                             visible : (model.isBigTick)
                             horizontalAlignment: Text.AlignHCenter
@@ -436,6 +438,72 @@ Item {
                     }
                 }
 
+
+                //
+                // Current time
+                //
+                Item {
+                    x: (controller && viewController)?
+                           viewController.convertQTimeToAbscissaInCoordinateSystem(controller.currentTime, viewController.pixelsPerMinute)
+                         : 0
+                    anchors {
+                        bottom : columnHeadersContent.bottom
+                    }
+
+                    Rectangle {
+                        anchors {
+                            left : parent.left
+                            top : svgCurrentTime.top
+                        }
+                        width : 49
+                        height: 14
+                        color :  MasticTheme.blackColor
+                        border {
+                            width : 1
+                            color: MasticTheme.lightGreyColor
+                        }
+
+                        Text {
+                            id : currentTimeText
+                            anchors {
+                                centerIn : parent
+                                verticalCenterOffset: 1
+                            }
+
+                            text : controller ? controller.currentTime.toLocaleTimeString(Qt.locale(), "HH':'mm':'ss") : "00:00:00"
+                            color: MasticTheme.lightGreyColor
+                            font {
+                                family: MasticTheme.textFontFamily
+                                pixelSize: 12
+                            }
+
+                        }
+                    }
+
+                    I2SvgItem {
+                        id :svgCurrentTime
+                        anchors {
+                            horizontalCenter : parent.left
+                            bottom : timeticksRect.top
+                            bottomMargin: -1
+                        }
+
+                        svgFileCache : MasticTheme.svgFileMASTIC;
+                        svgElementId: "currentTime"
+                    }
+
+                    Rectangle {
+                        id : timeticksRect
+                        anchors {
+                            horizontalCenter: parent.left
+                            bottom : parent.bottom
+                        }
+                        height : 6
+                        width : 1
+                        color: MasticTheme.whiteColor
+                    }
+
+                }
 
             }
         }
@@ -470,7 +538,7 @@ Item {
                                             0
                                         }
             width : scrollBarSize
-            color:  mouseArea.containsPress? MasticTheme.veryDarkGreyColor : MasticTheme.darkGreyColor; //mouseArea.containsPress? MasticTheme.veryDarkGreyColor : MasticTheme.darkGreyColor;
+            color:  mouseArea.containsPress? MasticTheme.veryDarkGreyColor : MasticTheme.darkGreyColor;
             border {
                 color : MasticTheme.blackColor;
                 width : 3
@@ -536,6 +604,40 @@ Item {
                 value : controller? controller.isPlaying : false
             }
         }
+
+
+        Rectangle {
+            anchors {
+                left : playScenarioBtn.left
+                right : playScenarioBtn.right
+                top : playScenarioBtn.bottom
+                topMargin: 6
+            }
+            height: 22
+            color :  MasticTheme.blackColor
+            border {
+                width : 1
+                color: MasticTheme.lightGreyColor
+            }
+
+            Text {
+                id : currenTime
+                anchors {
+                    centerIn : parent
+                    verticalCenterOffset: 1
+                }
+
+                text : controller ? controller.currentTime.toLocaleTimeString(Qt.locale(), "HH':'mm':'ss") : "00:00:00"
+                color: MasticTheme.lightGreyColor
+                font {
+                    family: MasticTheme.textFontFamily
+                    pixelSize: 14
+                }
+
+            }
+        }
+
+
     }
 
     //--------------------------------------------------------
