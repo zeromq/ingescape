@@ -28,6 +28,12 @@
 #include "masticmodelmanager.h"
 
 
+// Margin in milliseconds to insert an action following another
+#define MARGIN_FOR_ACTION_INSERTION_IN_MS 2000
+
+// Minimum lines displayed into the timeline by default
+#define MINIMUM_DISPLAYED_LINES_NUMBER_IN_TIMELINE 6
+
 // Interval in milli-seconds to evaluate each actionVM conditions
 #define INTERVAL_EVALUATION_ACTIONS 500
 
@@ -73,7 +79,7 @@ class ScenarioController: public QObject
     I2_QOBJECT_LISTMODEL(ActionInPaletteVM, actionsInPaletteList)
 
     // List of actions in timeline
-    I2_QOBJECT_LISTMODEL(ActionVM, actionsInTimeLine)
+    I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(ActionVM, actionsInTimeLine)
 
     // Number of line in our timeline
     I2_QML_PROPERTY(int, linesNumberInTimeLine)

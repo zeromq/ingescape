@@ -185,7 +185,6 @@ ApplicationWindow {
                     if (MasticEditorC.scenarioC) {
                         MasticEditorC.scenarioC.importScenarioFromFile();
                     }
-                    console.log("TODO : Importer un scénario");
                 }
             }
             MenuItem {
@@ -194,7 +193,6 @@ ApplicationWindow {
                     if (MasticEditorC.scenarioC) {
                         MasticEditorC.scenarioC.exportScenarioToSelectedFile();
                     }
-                    console.log("TODO : Exporter le scénario");
                 }
             }
         }

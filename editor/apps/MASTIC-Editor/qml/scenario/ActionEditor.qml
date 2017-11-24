@@ -390,7 +390,7 @@ I2PopupBase {
 
                             text : actionM ? actionM.validityDurationString : "0.0"
                             inputMethodHints: Qt.ImhFormattedNumbersOnly
-                            validator: RegExpValidator { regExp: /(\d{1,4})([.]\d{3})?$/ }
+                            validator: RegExpValidator { regExp: /(\d{1,5})([.]\d{3})?$/ }
 
                             style: I2TextFieldStyle {
                                 backgroundColor: MasticTheme.darkBlueGreyColor
@@ -751,9 +751,7 @@ I2PopupBase {
                                         horizontalAlignment: TextInput.AlignLeft
                                         verticalAlignment: TextInput.AlignVCenter
 
-                                        text : actionM  ? actionM.validityDuration : "0.0"
-                                        //   inputMethodHints: Qt.ImhFormattedNumbersOnly
-                                        //   validator: RegExpValidator { regExp: /(\d{1,4})([.]\d{3})?$/ }
+                                        text : myCondition && myCondition.condition ? myCondition.condition.value : ""
 
                                         style: I2TextFieldStyle {
                                             backgroundColor: MasticTheme.darkBlueGreyColor
@@ -1194,7 +1192,7 @@ I2PopupBase {
 
                                 text : actionM ? actionM.revertAfterTimeString : "0.0"
                                 inputMethodHints: Qt.ImhFormattedNumbersOnly
-                                validator: RegExpValidator { regExp: /(\d{1,4})([.]\d{3})?$/ }
+                                validator: RegExpValidator { regExp: /(\d{1,5})([.]\d{3})?$/ }
 
                                 style: I2TextFieldStyle {
                                     backgroundColor: MasticTheme.darkBlueGreyColor
@@ -1696,9 +1694,7 @@ I2PopupBase {
                                         horizontalAlignment: TextInput.AlignLeft
                                         verticalAlignment: TextInput.AlignVCenter
 
-                                        text : actionM  ? actionM.validityDuration : "0.0"
-                                        //   inputMethodHints: Qt.ImhFormattedNumbersOnly
-                                        //   validator: RegExpValidator { regExp: /(\d{1,4})([.]\d{3})?$/ }
+                                        text : myEffect && myEffect.modelM  ? myEffect.modelM.value : ""
 
                                         style: I2TextFieldStyle {
                                             backgroundColor: MasticTheme.darkBlueGreyColor
