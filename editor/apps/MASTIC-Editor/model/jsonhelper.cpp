@@ -888,7 +888,7 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
                         QString toAgentIOPName = jsonToIOPName.toString();
 
                         AgentInMappingVM* fromAgentM = NULL;
-                        AgentIOPM* fromIopAgentM = NULL;
+                        AgentIOPM* output = NULL;
                         AgentInMappingVM* toAgentM = NULL;
                         AgentIOPM* toIopAgentM = NULL;
                         bool found = false;
@@ -907,7 +907,7 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
                                 {
                                     if(found == false && inputVM->name() == fromAgentIOPName)
                                     {
-                                        fromIopAgentM = inputVM->firstModel();
+                                        output = inputVM->firstModel();
                                         found = true;
                                     }
 
@@ -922,7 +922,7 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
                                 {
                                     if(found == false && outputVM->name() == fromAgentIOPName)
                                     {
-                                        fromIopAgentM = outputVM->firstModel();
+                                        output = outputVM->firstModel();
                                         found = true;
                                     }
 
@@ -969,7 +969,7 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
                             }
                         }
 
-                        if ((fromAgentM != NULL) && (fromIopAgentM != NULL) && (toAgentM != NULL) && (toIopAgentM != NULL))
+                        if ((fromAgentM != NULL) && (output != NULL) && (toAgentM != NULL) && (toIopAgentM != NULL))
                         {
                             // Create model
                             MappingEffectM* mappingEffectM = new MappingEffectM();
@@ -981,7 +981,7 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
 
                             // set from agent
                             mappingEffectM->setagent(fromAgentM);
-                            mappingEffectM->setfromAgentIOP(fromIopAgentM);
+                            mappingEffectM->setoutput(output);
                             mappingEffectM->setinputAgent(toAgentM);
                             mappingEffectM->settoAgentIOP(toIopAgentM);
 
@@ -1297,10 +1297,10 @@ QByteArray JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<ActionI
                 {
                     MappingEffectM* mappingEffect = qobject_cast<MappingEffectM*>(actionEffect);
                     if ((mappingEffect != NULL) && (mappingEffect->agent() != NULL)
-                            && (mappingEffect->inputAgent() != NULL) && (mappingEffect->toAgentIOP() != NULL) && (mappingEffect->fromAgentIOP() != NULL))
+                            && (mappingEffect->inputAgent() != NULL) && (mappingEffect->toAgentIOP() != NULL) && (mappingEffect->output() != NULL))
                     {
                         jsonEffect.insert("from_agent_name", mappingEffect->agent()->name());
-                        jsonEffect.insert("from_iop_name", mappingEffect->fromAgentIOP()->name());
+                        jsonEffect.insert("from_iop_name", mappingEffect->output()->name());
                         jsonEffect.insert("to_agent_name", mappingEffect->inputAgent()->name());
                         jsonEffect.insert("to_iop_name", mappingEffect->toAgentIOP()->name());
                         jsonEffect.insert("value", MappingEffectValues::staticEnumToKey(mappingEffect->mappingEffectValue()));

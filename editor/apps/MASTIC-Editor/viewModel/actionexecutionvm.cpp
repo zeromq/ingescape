@@ -141,18 +141,18 @@ QList<QPair<QString, QString>> ActionExecutionVM::getCommandsForEffectsAndInitRe
             {
                 // Try to cast as Mapping Effect
                 MappingEffectM* mappingEffect = qobject_cast<MappingEffectM*>(effectModel);
-                if ((mappingEffect != NULL) && (mappingEffect->toAgentIOP() != NULL) && (mappingEffect->fromAgentIOP() != NULL))
+                if ((mappingEffect != NULL) && (mappingEffect->toAgentIOP() != NULL) && (mappingEffect->output() != NULL))
                 {
                     switch (mappingEffect->mappingEffectValue())
                     {
                         case MappingEffectValues::MAPPED:
-                            commandAndParameters = QString("%1 %2 %3 %4").arg("MAP", mappingEffect->toAgentIOP()->name(), agentName, mappingEffect->fromAgentIOP()->name());
-                            reverseCommandAndParameters = QString("%1 %2 %3 %4").arg("UNMAP", mappingEffect->toAgentIOP()->name(), agentName, mappingEffect->fromAgentIOP()->name());
+                            commandAndParameters = QString("%1 %2 %3 %4").arg("MAP", mappingEffect->toAgentIOP()->name(), agentName, mappingEffect->output()->name());
+                            reverseCommandAndParameters = QString("%1 %2 %3 %4").arg("UNMAP", mappingEffect->toAgentIOP()->name(), agentName, mappingEffect->output()->name());
                             break;
 
                         case MappingEffectValues::UNMAPPED:
-                            commandAndParameters = QString("%1 %2 %3 %4").arg("UNMAP", mappingEffect->toAgentIOP()->name(), mappingEffect->agent()->name(), mappingEffect->fromAgentIOP()->name());
-                            reverseCommandAndParameters = QString("%1 %2 %3 %4").arg("MAP", mappingEffect->toAgentIOP()->name(), agentName, mappingEffect->fromAgentIOP()->name());
+                            commandAndParameters = QString("%1 %2 %3 %4").arg("UNMAP", mappingEffect->toAgentIOP()->name(), mappingEffect->agent()->name(), mappingEffect->output()->name());
+                            reverseCommandAndParameters = QString("%1 %2 %3 %4").arg("MAP", mappingEffect->toAgentIOP()->name(), agentName, mappingEffect->output()->name());
                             break;
 
                         default:

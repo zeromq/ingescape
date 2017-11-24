@@ -56,15 +56,14 @@ QString MappingEffectValues::enumToString(int value)
  * @param parent
  */
 MappingEffectM::MappingEffectM(QObject *parent) : ActionEffectM(parent),
-    _fromAgentIOP(NULL),
+    _mappingEffectValue(MappingEffectValues::MAPPED),
+    _output(NULL),
     _inputAgent(NULL),
     _toAgentIOP(NULL)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    // Initialize effect
-    setmappingEffectValue(MappingEffectValues::MAPPED);
 }
 
 
@@ -77,8 +76,8 @@ MappingEffectM::~MappingEffectM()
     _toAgentIopList.clear();
     _fromAgentIopList.clear();
 
-    // Reset FROM agent model
-    setfromAgentIOP(NULL);
+    // Reset output
+    setoutput(NULL);
 
     // Reset input agent
     setinputAgent(NULL);
@@ -104,7 +103,7 @@ void MappingEffectM::copyFrom(ActionEffectM *effect)
         _fromAgentIopList.clear();
         _fromAgentIopList.append(mappingEffect->fromAgentIopList()->toList());
 
-        setfromAgentIOP(mappingEffect->fromAgentIOP());
+        setoutput(mappingEffect->output());
         setinputAgent(mappingEffect->inputAgent());
         settoAgentIOP(mappingEffect->toAgentIOP());
     }
@@ -126,7 +125,7 @@ void MappingEffectM::setagent(AgentInMappingVM* agent)
     {
         // Clear the list
         _fromAgentIopList.clear();
-        setfromAgentIOP(NULL);
+        setoutput(NULL);
 
         if(_agent != NULL)
         {
@@ -142,7 +141,7 @@ void MappingEffectM::setagent(AgentInMappingVM* agent)
             // Select the first item
             if(_fromAgentIopList.count() > 0)
             {
-                setfromAgentIOP(_fromAgentIopList.at(0));
+                setoutput(_fromAgentIopList.at(0));
             }
         }
     }

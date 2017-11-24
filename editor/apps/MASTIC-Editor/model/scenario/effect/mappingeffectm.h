@@ -41,14 +41,14 @@ class MappingEffectM: public ActionEffectM
     // Value of our effect on mapping
     I2_QML_PROPERTY(MappingEffectValues::Value, mappingEffectValue)
 
-    // FROM Agent IOP
-    I2_QML_PROPERTY(AgentIOPM *, fromAgentIOP)
+    // Output of the output agent
+    I2_QML_PROPERTY(AgentIOPM*, output)
 
     // Input Agent
     I2_QML_PROPERTY_CUSTOM_SETTER(AgentInMappingVM*, inputAgent)
 
     // TO Agent IOP
-    I2_QML_PROPERTY(AgentIOPM *, toAgentIOP)
+    I2_QML_PROPERTY(AgentIOPM*, toAgentIOP)
 
     // Concatened list of FROM iop agents items
     I2_QOBJECT_LISTMODEL(AgentIOPM , fromAgentIopList)
@@ -70,6 +70,7 @@ public:
       * @brief Destructor
       */
     ~MappingEffectM();
+
 
     /**
       * @brief Redefinition of action effect copy

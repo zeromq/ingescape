@@ -1817,7 +1817,7 @@ I2PopupBase {
                                             property : "selectedItem"
                                             value : if (myEffect && myEffect.modelM)
                                                     {
-                                                        myEffect.modelM.fromAgentIOP;
+                                                        myEffect.modelM.output;
                                                     }
                                                     else {
                                                         null;
@@ -1829,7 +1829,7 @@ I2PopupBase {
                                         {
                                             if (myEffect && myEffect.modelM)
                                             {
-                                                myEffect.modelM.fromAgentIOP = oEffectsMappingFROMCombo.selectedItem;
+                                                myEffect.modelM.output = oEffectsMappingFROMCombo.selectedItem;
                                             }
                                         }
 
