@@ -56,36 +56,8 @@ ActionVM::ActionVM(ActionM* model,
         // Set the action model
         setactionModel(model);
 
-        // No revert by default: reverse time = start time
-        int reverseTime = _startTime;
-
-        if (_actionModel->shallRevert())
-        {
-            // Shall revert when validity is over
-            if (_actionModel->shallRevertWhenValidityIsOver()) {
-                if (_actionModel->validityDuration() > -1) {
-                    reverseTime = _startTime + _actionModel->validityDuration();
-                }
-                else {
-                    qWarning() << "Action" << _actionModel->name() << "Shall revert when validity is over but 'validity duration' is not defined";
-                }
-            }
-            // Shall revert after time
-            else if (_actionModel->shallRevertAfterTime()) {
-                if (_actionModel->revertAfterTime() > -1) {
-                    reverseTime = _startTime + _actionModel->revertAfterTime();
-                }
-                else {
-                    qWarning() << "Action" << _actionModel->name() << "Shall revert after time but 'revert after time' is not defined";
-                }
-            }
-        }
-
-        // Create the first view model of execution for our action
-        ActionExecutionVM* actionExecution = actionExecution = new ActionExecutionVM(true, _startTime, reverseTime, this);
-
-        _executionsList.append(actionExecution);
-        setcurrentExecution(actionExecution);
+        // Create the first (view model of) action execution
+        _createActionExecution(_startTime);
     }
 }
 
@@ -228,6 +200,84 @@ void ActionVM::setactionModel(ActionM * actionM)
 
 
 /**
+ * @brief Notify our action that its effects has been executed
+ * @param currentTimeInMilliSeconds
+ */
+void ActionVM::effectsExecuted(int currentTimeInMilliSeconds)
+{
+    if (_currentExecution != NULL)
+    {
+        _currentExecution->setisExecuted(true);
+
+        // Shall revert
+        if (_currentExecution->shallRevert())
+        {
+            // Update flag "Is Waiting Revert"
+            _currentExecution->setisWaitingRevert(true);
+        }
+        // No reverse
+        else
+        {
+            setcurrentExecution(NULL);
+
+            // Shall rearm
+            if (_actionModel->shallRearm())
+            {
+                // Create a new (view model of) action execution
+                _createActionExecution(currentTimeInMilliSeconds);
+            }
+        }
+    }
+}
+
+
+/**
+ * @brief Notify our action that its reverse effects has been executed
+ * @param currentTimeInMilliSeconds
+ */
+void ActionVM::reverseEffectsExecuted(int currentTimeInMilliSeconds)
+{
+    if (_currentExecution != NULL)
+    {
+        setcurrentExecution(NULL);
+
+        // Shall rearm
+        if (_actionModel->shallRearm())
+        {
+            // Create a new (view model of) action execution
+            _createActionExecution(currentTimeInMilliSeconds);
+        }
+    }
+}
+
+
+/**
+ * @brief Delay the current execution of our action
+ * @param currentTimeInMilliSeconds
+ */
+void ActionVM::delayCurrentExecution(int currentTimeInMilliSeconds)
+{
+    if (_currentExecution != NULL)
+    {
+        // Add 1 ms
+        _currentExecution->setexecutionTime(currentTimeInMilliSeconds + 1);
+
+        if ((_actionModel != NULL) && _actionModel->shallRevert() && _actionModel->shallRevertAfterTime())
+        {
+            // FIXME TODO: check reverseTime is not after validityDuration
+
+            if (_actionModel->revertAfterTime() > -1) {
+                _currentExecution->setreverseTime(currentTimeInMilliSeconds + _actionModel->revertAfterTime());
+            }
+            else {
+                qWarning() << "Action" << _actionModel->name() << "Shall revert after time but 'revert after time' is not defined";
+            }
+        }
+    }
+}
+
+
+/**
  * @brief Slot on the is valid flag change on the action Model
  * @param is valid flag
  */
@@ -235,6 +285,7 @@ void ActionVM::onActionIsValidChange(bool isValid)
 {
     setisValid(isValid);
 }
+
 
 /**
  * @brief Compute the endTime according to the action model and its type
@@ -259,5 +310,49 @@ void ActionVM::_computeEndTime()
 }
 
 
+/**
+ * @brief Create a new (view model of) action execution
+ * @param startTime
+ */
+void ActionVM::_createActionExecution(int startTime)
+{
+    if (_actionModel != NULL)
+    {
+        // No revert by default: reverse time = start time
+        int reverseTime = startTime;
 
+        if (_actionModel->shallRevert())
+        {
+            // Shall revert when validity is over
+            if (_actionModel->shallRevertWhenValidityIsOver())
+            {
+                if (_actionModel->validityDuration() > -1) {
+                    reverseTime = startTime + _actionModel->validityDuration();
+                }
+                else {
+                    qWarning() << "Action" << _actionModel->name() << "Shall revert when validity is over but 'validity duration' is not defined";
+                }
+            }
+            // Shall revert after time
+            else if (_actionModel->shallRevertAfterTime())
+            {
+                if (_actionModel->revertAfterTime() > -1) {
+                    reverseTime = startTime + _actionModel->revertAfterTime();
+                }
+                else {
+                    qWarning() << "Action" << _actionModel->name() << "Shall revert after time but 'revert after time' is not defined";
+                }
+            }
+        }
+
+        // Create a new (view model of) action execution
+        ActionExecutionVM* actionExecution = actionExecution = new ActionExecutionVM(true, startTime, reverseTime, this);
+
+        // Add to the list
+        _executionsList.append(actionExecution);
+
+        // Set as current
+        setcurrentExecution(actionExecution);
+    }
+}
 

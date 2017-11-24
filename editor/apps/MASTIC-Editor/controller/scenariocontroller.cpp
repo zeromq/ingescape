@@ -88,8 +88,8 @@ ScenarioController::ScenarioController(QString scenariosPath, QObject *parent) :
     //
     // Init the timer to evaluate the actions of our scenario
     //
-    _timerToAvaluateActions.setInterval(INTERVAL_EVALUATION_ACTIONS);
-    connect(&_timerToAvaluateActions, &QTimer::timeout, this, &ScenarioController::_onTimeout_EvaluateActions);
+    _timerToEvaluateActions.setInterval(INTERVAL_EVALUATION_ACTIONS);
+    connect(&_timerToEvaluateActions, &QTimer::timeout, this, &ScenarioController::_onTimeout_EvaluateActions);
 
 
 }
@@ -837,27 +837,91 @@ void ScenarioController::_onTimeout_EvaluateActions()
     int currentTimeOfDay = QTime::currentTime().msecsSinceStartOfDay();
     setcurrentTime(_currentTime.addMSecs(currentTimeOfDay - _scenarioStartingTimeInMs));
 
+    int currentTimeInMilliSeconds = _currentTime.msecsSinceStartOfDay();
+
     // Evaluate the list of actions
     foreach (ActionVM* actionVM, _activeActionsVMList.toList())
     {
-        if(actionVM->startTime() <= _currentTime.msecsSinceStartOfDay())
+        if ((actionVM != NULL) && (actionVM->actionModel() != NULL))
         {
-            if(actionVM->endTime() >= _currentTime.msecsSinceStartOfDay() || actionVM->endTime() == -1)
+            // View model of action is in the PRESENT OR in the PAST
+            if (actionVM->startTime() <= currentTimeInMilliSeconds)
             {
-                // evaluate the action
-                if(actionVM->isValid() == true)
+                // FIXME TODO: if the action VM has no duration
+
+                // View model of action is in the PRESENT
+                if ((actionVM->endTime() == -1) || (actionVM->endTime() >= currentTimeInMilliSeconds))
                 {
-                    // FIXME Activate the action effects
+                    ActionExecutionVM* actionExecution = actionVM->currentExecution();
+                    if (actionExecution != NULL)
+                    {
+                        // Not already executed
+                        if (!actionExecution->isExecuted())
+                        {
+                            // All conditions are met (or there is NO condition on this action)...
+                            if (actionVM->isValid())
+                            {
+                                // ...we have to execute effects
+                                QList<ActionEffectVM*> effectsList = actionVM->actionModel()->effectsList()->toList();
+                                if (effectsList.count() > 0)
+                                {
+                                    // Get the list of pairs <agent name, command>
+                                    QList<QPair<QString, QString>> commandsForAgents = actionExecution->getCommandsForEffectsAndInitReverseCommands(effectsList);
 
+                                    // Execute commands for agents
+                                    _executeCommandsForAgents(commandsForAgents);
 
-                    // Remove the action form the list
+                                    // Notify the action that its effects has been executed
+                                    actionVM->effectsExecuted(currentTimeInMilliSeconds);
+                                }
+                            }
+                            // There is at least one condition which is not respected
+                            else
+                            {
+                                // Delay the current execution of its action
+                                actionVM->delayCurrentExecution(currentTimeInMilliSeconds);
+                            }
+                        }
+                        // Action is already executed and shall revert
+                        else if (actionExecution->shallRevert())
+                        {
+                            //
+                            if (actionExecution->reverseTime() <= currentTimeInMilliSeconds)
+                            {
+                                // Get the list of pairs <agent name, reverse command>
+                                QList<QPair<QString, QString>> reverseCommandsForAgents = actionExecution->getReverseCommands();
+
+                                // Execute reverse commands for agents
+                                _executeCommandsForAgents(reverseCommandsForAgents);
+
+                                // Notify the action that its reverse effects has been executed
+                                actionVM->reverseEffectsExecuted(currentTimeInMilliSeconds);
+                            }
+                        }
+                    }
+                }
+                // View model of action is in the PAST
+                else
+                {
+                    ActionExecutionVM* actionExecution = actionVM->currentExecution();
+                    if (actionExecution != NULL)
+                    {
+                        // Remove the current execution
+                        actionVM->setcurrentExecution(NULL);
+                        actionVM->executionsList()->remove(actionExecution);
+                        delete actionExecution;
+                    }
+
+                    // Remove from the list of "active" actions
                     _activeActionsVMList.remove(actionVM);
                 }
-            } else {
-                _activeActionsVMList.remove(actionVM);
             }
-        } else {
-            break;
+            // View model of action is in the FUTURE
+            else // (actionVM->startTime() > currentTimeInMilliSeconds)
+            {
+                // Exit loop foreach
+                break;
+            }
         }
     }
 
@@ -899,7 +963,7 @@ void ScenarioController::_startScenario()
     _scenarioStartingTimeInMs = QTime::currentTime().msecsSinceStartOfDay();
 
     // Start timer
-    _timerToAvaluateActions.start();
+    _timerToEvaluateActions.start();
 }
 
 /**
@@ -913,5 +977,54 @@ void ScenarioController::_stopScenario()
     conditionsDisconnect();
 
     // Stop timer
-    _timerToAvaluateActions.stop();
+    _timerToEvaluateActions.stop();
+}
+
+
+/**
+ * @brief Get the agent in mapping from an agent name
+ * @param agentName
+ * @return
+ */
+AgentInMappingVM* ScenarioController::_getAgentInMappingFromName(QString agentName)
+{
+    /*if (_mapFromNameToAgentInMapping.contains(name)) {
+        return _mapFromNameToAgentInMapping.value(name);
+    }
+    else {
+        return NULL;
+    }*/
+
+    foreach (AgentInMappingVM* agent, _agentsInMappingList.toList()) {
+        if ((agent != NULL) && (agent->name() == agentName)) {
+            return agent;
+        }
+    }
+    return NULL;
+}
+
+
+/**
+ * @brief Execute a list of commands for agents
+ * @param commandsForAgents
+ */
+void ScenarioController::_executeCommandsForAgents(QList<QPair<QString, QString>> commandsForAgents)
+{
+    for (int i = 0; i < commandsForAgents.count(); i++)
+    {
+        QPair<QString, QString> commandForAgent = commandsForAgents.at(i);
+
+        QString agentName = commandForAgent.first;
+        QString commandAndParameters = commandForAgent.second;
+
+        AgentInMappingVM* agent = _getAgentInMappingFromName(agentName);
+        if (agent != NULL)
+        {
+            qDebug() << "Execute Commands" << commandAndParameters << "for Agent" << agentName << agent->getPeerIdsList();
+
+            // FIXME TODO: Q_EMIT...
+            // Emit signal "Command asked to agent about Mapping Input"
+            //Q_EMIT commandAskedToAgentAboutMappingInput(link->agentTo()->getPeerIdsList(), "UNMAP", link->pointTo()->name(), link->agentFrom()->name(), link->pointFrom()->name());
+        }
+    }
 }

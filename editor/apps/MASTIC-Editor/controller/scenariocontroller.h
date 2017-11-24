@@ -251,6 +251,22 @@ private :
      */
     void _stopScenario();
 
+
+    /**
+     * @brief Get the agent in mapping from an agent name
+     * @param agentName
+     * @return
+     */
+    AgentInMappingVM* _getAgentInMappingFromName(QString agentName);
+
+
+    /**
+     * @brief Execute a list of commands for agents
+     * @param commandsForAgents
+     */
+    void _executeCommandsForAgents(QList<QPair<QString, QString>> commandsForAgents);
+
+
 protected:
 
     // Path to the directory containing JSON files to save scenarios
@@ -276,7 +292,7 @@ protected:
     QHash<int, I2CustomItemSortFilterListModel<ActionVM>* > _mapActionsVMsInTimelineFromLineIndex;
 
     // Main timer to handle the scenario and evaluate actions
-    QTimer _timerToAvaluateActions;
+    QTimer _timerToEvaluateActions;
 
 private:
     // Time in milliseconds of our scenario start
