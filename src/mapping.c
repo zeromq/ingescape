@@ -637,6 +637,7 @@ int mtic_removeMappingEntryWithName(const char *fromOurInput, const char *toAgen
     }else{
         HASH_DEL(mtic_internal_mapping->map_elements, tmp);
         mapping_freeMappingElement(tmp);
+        network_needToUpdateMapping = true;
         return 1;
     }
 }
