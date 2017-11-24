@@ -57,6 +57,12 @@ class ActionVM: public QObject
     // Current ActionExecution
     I2_QOBJECT_LISTMODEL(ActionExecutionVM, actionExecutionVmList)
 
+    // End time in milliseconds (evaluated from the action type)
+    // CUSTOM : startime + validation duration
+    // FOREVER : -1
+    // IMMEDIATE : startime
+    I2_QML_PROPERTY(int, endTime)
+
 public:
 
     /**
@@ -88,6 +94,12 @@ public Q_SLOTS:
     void onActionIsValidChange(bool isValid);
 
 protected:
+
+private:
+    /**
+     * @brief Compute the endTime according to the action model and its type
+     */
+    void _computeEndTime();
 
 
 

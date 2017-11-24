@@ -183,7 +183,7 @@ Item {
                 //     are interpreted by the Javascript stack
                 Item {
                     id: currentTimeLine
-                    x: 0 //CregController.analysisViewController.convertDateTimeToAbscissaInCoordinateSystem(root.currentDateTime, CregController.analysisViewController.pixelsPerMinute)
+                    x: viewController.convertQTimeToAbscissaInCoordinateSystem(controller.currentTime, viewController.pixelsPerMinute)
                     y: 0
 
                     Rectangle {

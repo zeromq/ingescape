@@ -34,7 +34,8 @@
 ScenarioController::ScenarioController(QString scenariosPath, QObject *parent) : QObject(parent),
     _selectedAction(NULL),
     _linesNumberInTimeLine(1),
-    _isPlayingScenario(false),
+    _isPlaying(false),
+    _currentTime(QTime::fromMSecsSinceStartOfDay(0)),
     _scenariosDirectoryPath(scenariosPath)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
@@ -80,6 +81,17 @@ ScenarioController::ScenarioController(QString scenariosPath, QObject *parent) :
     actionVMSortedList->setSortProperty("startTime");
     // Add into our map
     _mapActionsVMsInTimelineFromLineIndex.insert(0,actionVMSortedList);
+
+    // Set the sort property for the active actionsVM
+    _activeActionsVMList.setSortProperty("startTime");
+
+    //
+    // Init the timer to evaluate the actions of our scenario
+    //
+    _timerToAvaluateActions.setInterval(INTERVAL_EVALUATION_ACTIONS);
+    connect(&_timerToAvaluateActions, &QTimer::timeout, this, &ScenarioController::_onTimeout_EvaluateActions);
+
+
 }
 
 
@@ -529,10 +541,7 @@ void ScenarioController::addActionVMAtCurrentTime(ActionM * actionModel)
 {
     if(actionModel != NULL)
     {
-        // FIXME - get time from the current time of the timeline
-        int timeInMs = QDateTime::currentDateTime().time().msecsSinceStartOfDay();
-
-        addActionVMAtTime(actionModel,timeInMs);
+        addActionVMAtTime(actionModel,_currentTime.msecsSinceStartOfDay());
     }
 }
 
@@ -705,21 +714,8 @@ bool ScenarioController::canInsertActionVMTo(ActionM* actionMToInsert, int time,
                         // Check with the previous actionM
                         if(previousActionVM != NULL && previousActionVM->actionModel() != NULL)
                         {
-                            int prevEndTime = previousActionVM->startTime();
-                            // We skip that line since the action have a forever validity
-                            if(previousActionVM->actionModel()->validityDurationType() == ValidationDurationType::FOREVER)
-                            {
-                                // Try with the next line
-                                canInsert = false;
-                                break;
-                            }
-                            else if(previousActionVM->actionModel()->validityDurationType() == ValidationDurationType::CUSTOM)
-                            {
-                                prevEndTime += previousActionVM->actionModel()->validityDuration();
-                            }
-
                             // If the previous action ends after the beginning of the new one, we skip it
-                            if(prevEndTime >= time)
+                            if(previousActionVM->endTime() >= time)
                             {
                                 canInsert = false;
                                 break;
@@ -755,19 +751,8 @@ bool ScenarioController::canInsertActionVMTo(ActionM* actionMToInsert, int time,
             // If we didn't reach the position, we test with the previous action
             if(reachPosition == false && previousActionVM != NULL)
             {
-                int prevEndTime = previousActionVM->startTime();
-                // We skip that line since the action have a forever validity
-                if(previousActionVM->actionModel()->validityDurationType() == ValidationDurationType::FOREVER)
-                {
-                    // Try with the next line
-                    canInsert = false;
-                }
-                else if(previousActionVM->actionModel()->validityDurationType() == ValidationDurationType::CUSTOM) {
-                    prevEndTime += previousActionVM->actionModel()->validityDuration();
-                }
-
                 // If the previous action ends after the beginning of the new one, we skip it
-                if(prevEndTime >= time)
+                if(previousActionVM->endTime() >= time)
                 {
                     canInsert = false;
                 }
@@ -783,21 +768,106 @@ bool ScenarioController::canInsertActionVMTo(ActionM* actionMToInsert, int time,
  * @brief Custom setter on is playing command for the scenario
  * @param is playing flag
  */
-void ScenarioController::setisPlayingScenario(bool isPlaying)
+void ScenarioController::setisPlaying(bool isPlaying)
 {
-    if(_isPlayingScenario != isPlaying)
+    if(_isPlaying != isPlaying)
     {
-        _isPlayingScenario = isPlaying;
+        _isPlaying = isPlaying;
 
-        // Connect/disconnect conditions connections
-        if(_isPlayingScenario == false)
+        // Start/stop scenario according to the flag
+        if(_isPlaying == false)
         {
-            conditionsDisconnect();
+            _stopScenario();
         }
-        else {
-            conditionsConnect();
+        else
+        {
+            _startScenario();
         }
 
-        Q_EMIT isPlayingScenarioChanged(_isPlayingScenario);
+        Q_EMIT isPlayingChanged(_isPlaying);
     }
+}
+
+/**
+ * @brief Called at each interval of our timer to update the current state of each zones that have at least one loudspeakers line
+ */
+void ScenarioController::_onTimeout_EvaluateActions()
+{
+    // Move the currenttime
+    int currentTimeOfDay = QTime::currentTime().msecsSinceStartOfDay();
+    setcurrentTime(_currentTime.addMSecs(currentTimeOfDay - _scenarioStartingTimeInMs));
+
+
+    // Evaluate the list of actions
+    foreach (ActionVM* actionVM, _activeActionsVMList.toList())
+    {
+        if(actionVM->startTime() <= _currentTime.msecsSinceStartOfDay())
+        {
+            // evaluate the action
+            if(actionVM->isValid() == true)
+            {
+                // FIXME Activate the action effects
+
+
+                // Remove the action form the list
+                _activeActionsVMList.remove(actionVM);
+            }
+        } else {
+            break;
+        }
+    }
+
+
+    // Save our scenario start
+    _scenarioStartingTimeInMs = currentTimeOfDay;
+}
+
+/**
+ * @brief Start the scenario by
+ *        making connections for the actions conditions
+ *        starting the action evaluation timer
+ */
+void ScenarioController::_startScenario()
+{
+    // Set the list of Actions to process at currentTime
+    _activeActionsVMList.clear();
+    // Inverve exploration since we add the futur actions first
+    QList<ActionVM*> actionListToAdd;
+    for (int index = _actionsInTimeLine.count()-1; index >= 0; --index)
+    {
+        ActionVM* actionVM = _actionsInTimeLine.at(index);
+        if(actionVM->endTime() > _currentTime.msecsSinceStartOfDay() || actionVM->endTime() == -1)
+        {
+            actionListToAdd.append(actionVM);
+        } else {
+            break;
+        }
+    }
+    if(actionListToAdd.count() > 0)
+    {
+        _activeActionsVMList.append(actionListToAdd);
+    }
+
+    // Connect actions conditions
+    conditionsConnect();
+
+    // Save our scenario start
+    _scenarioStartingTimeInMs = QTime::currentTime().msecsSinceStartOfDay();
+
+    // Start timer
+    _timerToAvaluateActions.start();
+}
+
+/**
+ * @brief Stop the scenario by
+ *        disconnecting the actions conditions
+ *        stoping the action evaluation timer
+ */
+void ScenarioController::_stopScenario()
+{
+    // Disconnect actions conditions
+    conditionsDisconnect();
+
+    // Stop timer
+    _timerToAvaluateActions.stop();
 }

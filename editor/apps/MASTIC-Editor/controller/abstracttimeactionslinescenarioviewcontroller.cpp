@@ -170,6 +170,19 @@ qreal AbstractTimeActionslineScenarioViewController::convertTimeInMillisecondsTo
     return qRound(_pixelsPerMinute * (_timeMarginInMinutes + deltaSeconds/60.0));
 }
 
+/**
+ * @brief Convert a given QTime object into a X value (abscissa) of our coordinate system
+ *
+ * @param QTime of our current time
+ * @param extraQmlUpdateField Extra QML field used to recall this function when needed (binding)
+ *
+ * @return
+ */
+qreal AbstractTimeActionslineScenarioViewController::convertQTimeToAbscissaInCoordinateSystem(QTime time, qreal extraQmlUpdateField)
+{
+    return convertTimeInMillisecondsToAbscissaInCoordinateSystem(time.msecsSinceStartOfDay(),extraQmlUpdateField);
+}
+
 
 /**
  * @brief Convert a given duration in seconds into a length value in our coordinate system

@@ -33,10 +33,11 @@
 ActionVM::ActionVM(ActionM *actionModel, int startTime, QObject *parent) : QObject(parent),
     _actionModel(NULL),
     _startTime(startTime),
-    _startTimeString("0.0"),
+   _startTimeString("0.0"),
     _lineInTimeLine(-1),
     _isValid(false),
-    _currentActionVM(NULL)
+    _currentActionVM(NULL),
+    _endTime(startTime)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -91,6 +92,7 @@ void ActionVM::copyFrom(ActionVM* actionVM)
         // Copy the view model attributes
         setcolor(actionVM->color());
         setstartTime(actionVM->startTime());
+        setendTime(actionVM->endTime());
         setlineInTimeLine(actionVM->lineInTimeLine());
         setstartTimeString(actionVM->startTimeString());
     }
@@ -120,6 +122,9 @@ void ActionVM::setstartTimeString(QString stringDateTime)
             setstartTime(-1);
         }
 
+        // Compute the new endtime
+        _computeEndTime();
+
         emit startTimeStringChanged(stringDateTime);
     }
 }
@@ -145,7 +150,11 @@ void ActionVM::setactionModel(ActionM * actionM)
         }
         else {
             setisValid(true);
+            setendTime(_startTime);
         }
+
+        // Compute the new endtime
+        _computeEndTime();
 
         Q_EMIT actionModelChanged(actionM);
     }
@@ -158,6 +167,28 @@ void ActionVM::setactionModel(ActionM * actionM)
 void ActionVM::onActionIsValidChange(bool isValid)
 {
     setisValid(isValid);
+}
+
+/**
+ * @brief Compute the endTime according to the action model and its type
+ */
+void ActionVM::_computeEndTime()
+{
+    int endTime = _startTime;
+    if(_actionModel != NULL)
+    {
+        if(_actionModel->validityDurationType() == ValidationDurationType::FOREVER)
+        {
+            endTime = -1;
+        }
+        else if(_actionModel->validityDurationType() == ValidationDurationType::CUSTOM)
+        {
+            endTime += _actionModel->validityDuration();
+        }
+    }
+
+    // Set the new value
+    setendTime(endTime);
 }
 
 

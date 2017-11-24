@@ -28,6 +28,9 @@
 #include "masticmodelmanager.h"
 
 
+// Interval in milli-seconds to evaluate each actionVM conditions
+#define INTERVAL_EVALUATION_ACTIONS 500
+
 /**
  * @brief The ScenarioController class defines the main controller of our scenario edition
  */
@@ -76,7 +79,13 @@ class ScenarioController: public QObject
     I2_QML_PROPERTY(int, linesNumberInTimeLine)
 
     // Is playing scenario flag
-    I2_QML_PROPERTY_CUSTOM_SETTER(bool, isPlayingScenario)
+    I2_QML_PROPERTY_CUSTOM_SETTER(bool, isPlaying)
+
+    // Current time (from the beginning of our scenario)
+    I2_QML_PROPERTY_READONLY(QTime, currentTime)
+
+    // List of actionsVM to evaluate each timeout of our timer linked to our scenario
+    I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(ActionVM, activeActionsVMList)
 
 public:
 
@@ -191,6 +200,13 @@ public Q_SLOTS:
       */
     void onAgentInMappingRemoved(AgentInMappingVM * agentRemoved);
 
+private Q_SLOTS:
+
+    /**
+     * @brief Called at each interval of our timer to update the current state of each zones that have at least one loudspeakers line
+     */
+    void _onTimeout_EvaluateActions();
+
 private :
     /**
      * @brief Get a new action name
@@ -215,6 +231,20 @@ private :
      */
     void _insertActionVMIntoMapByLineNumber(ActionVM* actionVMToInsert);
 
+    /**
+     * @brief Start the scenario by
+     *        making connections for the actions conditions
+     *        starting the action evaluation timer
+     */
+    void _startScenario();
+
+    /**
+     * @brief Stop the scenario by
+     *        disconnecting the actions conditions
+     *        stoping the action evaluation timer
+     */
+    void _stopScenario();
+
 protected:
 
     // Path to the directory containing JSON files to save scenarios
@@ -238,6 +268,14 @@ protected:
 
     // Map of actions VM in the timeline from the line index
     QHash<int, I2CustomItemSortFilterListModel<ActionVM>* > _mapActionsVMsInTimelineFromLineIndex;
+
+    // Main timer to handle the scenario and evaluate actions
+    QTimer _timerToAvaluateActions;
+
+private:
+    // Time in milliseconds of our scenario start
+    int _scenarioStartingTimeInMs;
+
 };
 
 QML_DECLARE_TYPE(ScenarioController)
