@@ -70,7 +70,7 @@
 
 
 //global flags
-bool verboseMode = true;
+bool verboseMode = false;
 bool isFrozen = false;
 bool agentCanBeFrozen = false;
 bool isWholeAgentMuted = false;
@@ -299,6 +299,8 @@ int manageParent (zloop_t *loop, zmq_pollitem_t *item, void *arg){
         }
         char *command = zmsg_popstr (msg);
         if (streq (command, "$TERM")){
+            free (command);
+            zmsg_destroy (&msg);
             return -1;
         } else {
             //nothing to do so far
@@ -1018,6 +1020,7 @@ initActor (zsock_t *pipe, void *args)
     mtic_debug("agent stopping...\n");
 
     //clean
+    mtic_Interrupted = true;
     zyreAgent_t *zagent, *tmpa;
     HASH_ITER(hh, zyreAgents, zagent, tmpa){
         HASH_DEL(zyreAgents, zagent);
@@ -1282,6 +1285,7 @@ int mtic_stop(){
         #ifdef _WIN32
         zsys_shutdown();
         #endif
+        mtic_debug("agent stopped.\n");
     }else{
         mtic_debug("agent already stopped\n");
     }
@@ -1559,3 +1563,44 @@ void mtic_setNotifyMappedAgents(bool notify){
     network_NotifyMappedAgents = notify;
 }
 
+#define MAX_NETDEVICE_LENGTH 16
+#define MAX_NUMBER_OF_NETDEVICES 16
+
+void mtic_getNetdevicesList(char ***devices, int *nb){
+#if defined (__WINDOWS__)
+    WORD version_requested = MAKEWORD (2, 2);
+    WSADATA wsa_data;
+    int rc = WSAStartup (version_requested, &wsa_data);
+    assert (rc == 0);
+    assert (LOBYTE (wsa_data.wVersion) == 2 &&
+            HIBYTE (wsa_data.wVersion) == 2);
+#endif
+    *devices = calloc(MAX_NUMBER_OF_NETDEVICES, sizeof(char*));
+    int currentDeviceNb = 0;
+    
+    ziflist_t *iflist = ziflist_new ();
+    assert (iflist);
+    const char *name = ziflist_first (iflist);
+    while (name) {
+        //        printf (" - name=%s address=%s netmask=%s broadcast=%s\n",
+        //                name, ziflist_address (iflist), ziflist_netmask (iflist), ziflist_broadcast (iflist));
+        (*devices)[currentDeviceNb] = calloc(MAX_NETDEVICE_LENGTH+1, sizeof(char));
+        strncpy((*devices)[currentDeviceNb], name, MAX_NETDEVICE_LENGTH);
+        currentDeviceNb++;
+        name = ziflist_next (iflist);
+    }
+    ziflist_destroy (&iflist);
+    *nb = currentDeviceNb;
+#if defined (__WINDOWS__)
+    WSACleanup();
+#endif
+}
+
+void mtic_freeNetdevicesList(char **devices, int nb){
+    for (int i=0; i < nb; i++){
+        if (strlen(devices[i]) > 0){
+            free(devices[i]);
+        }
+    }
+    free (devices);
+}
