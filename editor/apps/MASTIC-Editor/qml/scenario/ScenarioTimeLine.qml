@@ -329,7 +329,7 @@ Item {
                             Text {
                                 anchors {
                                     top : parent.verticalCenter
-                                    bottom : parent.top
+                                    bottom : parent.bottom
                                     left : parent.left
                                     right : parent.right
                                 }
@@ -337,7 +337,7 @@ Item {
                                 color : MasticTheme.darkGreyColor
                                 text : model.actionModel ? model.actionModel.name : ""
                                 font {
-                                    family : textFontFamily
+                                    family : MasticTheme.textFontFamily
                                     pixelSize: 12
                                 }
                             }
