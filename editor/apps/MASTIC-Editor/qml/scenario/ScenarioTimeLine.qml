@@ -183,14 +183,16 @@ Item {
                 //     are interpreted by the Javascript stack
                 Item {
                     id: currentTimeLine
-                    x: viewController.convertQTimeToAbscissaInCoordinateSystem(controller.currentTime, viewController.pixelsPerMinute)
+                    x: (controller && viewController)?
+                           viewController.convertQTimeToAbscissaInCoordinateSystem(controller.currentTime, viewController.pixelsPerMinute)
+                         : 0
                     y: 0
 
                     Rectangle {
                         x: -1
                         y: 0
 
-                        width: 2
+                        width: 1
                         height: timeLinesContent.height
 
                         color: MasticTheme.whiteColor
@@ -441,7 +443,9 @@ Item {
                 // Current time
                 //
                 Item {
-                    x: 80//CregController.analysisViewController.convertDateTimeToAbscissaInCoordinateSystem(root.currentDateTime, CregController.analysisViewController.pixelsPerMinute)
+                    x: (controller && viewController)?
+                           viewController.convertQTimeToAbscissaInCoordinateSystem(controller.currentTime, viewController.pixelsPerMinute)
+                         : 0
                     anchors {
                         bottom : columnHeadersContent.bottom
                     }
@@ -466,7 +470,7 @@ Item {
                                 verticalCenterOffset: 1
                             }
 
-                            text : "12:12:12"
+                            text : controller ? controller.currentTime.toLocaleTimeString(Qt.locale(), "HH':'mm':'ss") : "00:00:00"
                             color: MasticTheme.lightGreyColor
                             font {
                                 family: MasticTheme.textFontFamily
@@ -481,7 +485,7 @@ Item {
                         anchors {
                             horizontalCenter : parent.left
                             bottom : timeticksRect.top
-bottomMargin: -1
+                            bottomMargin: -1
                         }
 
                         svgFileCache : MasticTheme.svgFileMASTIC;
@@ -623,7 +627,7 @@ bottomMargin: -1
                     verticalCenterOffset: 1
                 }
 
-                text : "12:12:12"
+                text : controller ? controller.currentTime.toLocaleTimeString(Qt.locale(), "HH':'mm':'ss") : "00:00:00"
                 color: MasticTheme.lightGreyColor
                 font {
                     family: MasticTheme.textFontFamily
