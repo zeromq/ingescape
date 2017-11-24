@@ -564,7 +564,8 @@ Item {
 
             property var scrollBarSize: if (viewController) {
                                             (viewController.viewportWidth*scrollTimeLine.width)/viewController.timeTicksTotalWidth
-                                        } else {
+                                        }
+                                        else {
                                             0
                                         }
             width : scrollBarSize
@@ -712,7 +713,8 @@ Item {
         property: "contentX"
         value: if (viewController) {
                    (scrollBar.x * viewController.timeTicksTotalWidth)/scrollTimeLine.width
-               } else {
+               }
+               else {
                    0
                }
         when: mouseArea.drag.active
@@ -724,7 +726,8 @@ Item {
         property: "x"
         value: if (viewController) {
                    (viewController.viewportX*scrollTimeLine.width)/viewController.timeTicksTotalWidth
-               } else {
+               }
+               else {
                    0
                }
         when: !mouseArea.drag.active

@@ -427,7 +427,8 @@ void ScenarioController::_importScenarioFromFile(QString scenarioFilePath)
                                 // Insert the action
                                 actionVMSortedList->append(actionVM);
                             }
-                        } else {
+                        }
+                        else {
                             // Create a new list
                             I2CustomItemSortFilterListModel<ActionVM>* actionVMSortedList = new I2CustomItemSortFilterListModel<ActionVM>();
                             actionVMSortedList->setSortProperty("startTime");
@@ -598,7 +599,8 @@ void ScenarioController::removeActionVMFromTimeLine(ActionVM * actionVM)
                                     if(_mapActionsVMsInTimelineFromLineIndex.contains(lineTmp) == false)
                                     {
                                         nbOfDecrement++;
-                                    } else {
+                                    }
+                                    else {
                                         break;
                                     }
                                 }
@@ -688,7 +690,8 @@ void ScenarioController::_insertActionVMIntoMapByLineNumber(ActionVM* actionVMTo
 
                     break;
                 }
-            } else {
+            }
+            else {
                 // Create a new list
                 I2CustomItemSortFilterListModel<ActionVM>* actionVMSortedList = new I2CustomItemSortFilterListModel<ActionVM>();
                 actionVMSortedList->setSortProperty("startTime");
@@ -950,7 +953,8 @@ void ScenarioController::_startScenario()
         if(actionVM->endTime() > _currentTime.msecsSinceStartOfDay() || actionVM->endTime() == -1)
         {
             actionListToAdd.append(actionVM);
-        } else {
+        }
+        else {
             break;
         }
     }
