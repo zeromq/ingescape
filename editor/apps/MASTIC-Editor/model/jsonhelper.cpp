@@ -753,7 +753,7 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
                     if(jsonAgentName.isString() && jsonIOPName.isString())
                     {
                         // Check agent name and iop name exists
-                        QString agentAgentName = jsonAgentName.toString();
+                        QString agentName = jsonAgentName.toString();
                         QString agentIOPName = jsonIOPName.toString();
 
                         AgentInMappingVM* agent = NULL;
@@ -763,7 +763,7 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
 
                         foreach (AgentInMappingVM* iterator, listAgentsInMapping)
                         {
-                            if(iterator->name() == agentAgentName)
+                            if(iterator->name() == agentName)
                             {
                                 agent = iterator;
                                 // Go through the inputs
@@ -834,13 +834,13 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
                     if(jsonAgentName.isString())
                     {
                         // Check agent name and iop name exists
-                        QString agentAgentName = jsonAgentName.toString();
+                        QString agentName = jsonAgentName.toString();
 
                         AgentInMappingVM* agent = NULL;
 
                         foreach (AgentInMappingVM* iterator, listAgentsInMapping)
                         {
-                            if (iterator->name() == agentAgentName)
+                            if (iterator->name() == agentName)
                             {
                                 agent = iterator;
                                 break;
@@ -1034,7 +1034,7 @@ ActionConditionVM* JsonHelper::_parseConditionsVMFromJson(QJsonObject jsonCondit
                     {
 
                         // Check agent name and iop name exists
-                        QString agentAgentName = jsonAgentName.toString();
+                        QString agentName = jsonAgentName.toString();
                         QString agentIOPName = jsonIOPName.toString();
 
                         AgentInMappingVM* agentM = NULL;
@@ -1044,7 +1044,7 @@ ActionConditionVM* JsonHelper::_parseConditionsVMFromJson(QJsonObject jsonCondit
 
                         foreach (AgentInMappingVM* agent, listAgentsInMapping)
                         {
-                            if (agent->name() == agentAgentName)
+                            if (agent->name() == agentName)
                             {
                                 agentM = agent;
                                 // Go through the inputs
@@ -1125,13 +1125,13 @@ ActionConditionVM* JsonHelper::_parseConditionsVMFromJson(QJsonObject jsonCondit
                     {
 
                         // Check agent name and iop name exists
-                        QString agentAgentName = jsonAgentName.toString();
+                        QString agentName = jsonAgentName.toString();
 
                         AgentInMappingVM* agentM = NULL;
 
                         foreach (AgentInMappingVM* agent, listAgentsInMapping)
                         {
-                            if (agent->name() == agentAgentName)
+                            if (agent->name() == agentName)
                             {
                                 agentM = agent;
                                 break;
