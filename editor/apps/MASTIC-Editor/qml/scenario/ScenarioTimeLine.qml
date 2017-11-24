@@ -251,7 +251,7 @@ Item {
                 id: contentArea
 
                 anchors.fill: parent
-
+                clip : true
                 contentWidth: content.width
                 contentHeight: content.height
 
