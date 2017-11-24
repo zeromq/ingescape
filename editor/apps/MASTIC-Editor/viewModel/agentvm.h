@@ -25,7 +25,7 @@
 #include "model/agentm.h"
 #include "model/definitionm.h"
 #include "model/scenario/actionconditionm.h"
-#include "model/scenario/actioneffectm.h"
+#include <model/scenario/effect/actioneffectm.h>
 
 
 /**

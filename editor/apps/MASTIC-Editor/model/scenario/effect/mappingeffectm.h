@@ -22,8 +22,7 @@
 
 #include "I2PropertyHelpers.h"
 
-#include "model/mapping/elementmappingm.h"
-#include "model/scenario/actioneffectm.h"
+#include <model/scenario/effect/actioneffectm.h>
 
 
 /**

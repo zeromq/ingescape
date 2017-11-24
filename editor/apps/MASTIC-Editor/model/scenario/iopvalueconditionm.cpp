@@ -62,7 +62,7 @@ void IOPValueConditionM::copyFrom(ActionConditionM* condition)
 {
     ActionConditionM::copyFrom(condition);
 
-    IOPValueConditionM* iopCondition = dynamic_cast<IOPValueConditionM*>(condition);
+    IOPValueConditionM* iopCondition = qobject_cast<IOPValueConditionM*>(condition);
     if(iopCondition != NULL)
     {
         setagentIOP(iopCondition->agentIOP());

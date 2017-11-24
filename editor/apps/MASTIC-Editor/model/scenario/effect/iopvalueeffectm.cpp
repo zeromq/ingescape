@@ -14,7 +14,6 @@
 
 #include "iopvalueeffectm.h"
 
-
 #include <QDebug>
 
 
@@ -23,7 +22,6 @@
 // IOPValueEffectM
 //
 //--------------------------------------------------------------
-
 
 /**
  * @brief Default constructor
@@ -48,6 +46,7 @@ IOPValueEffectM::~IOPValueEffectM()
     _iopMergedList.clear();
 }
 
+
 /**
 * @brief Copy from another effect model
 * @param effect to copy
@@ -57,7 +56,7 @@ void IOPValueEffectM::copyFrom(ActionEffectM* effect)
     // Call mother class
     ActionEffectM::copyFrom(effect);
 
-    IOPValueEffectM* iopEffect = dynamic_cast<IOPValueEffectM*>(effect);
+    IOPValueEffectM* iopEffect = qobject_cast<IOPValueEffectM*>(effect);
     if (iopEffect != NULL)
     {
         setagentIOP(iopEffect->agentIOP());
@@ -81,9 +80,10 @@ void IOPValueEffectM::setagent(AgentInMappingVM* agent)
 
     if (previousAgent != agent)
     {
+        setagentIOP(NULL);
+
         // Clear the list
         _iopMergedList.clear();
-        setagentIOP(NULL);
 
         if (_agent != NULL)
         {

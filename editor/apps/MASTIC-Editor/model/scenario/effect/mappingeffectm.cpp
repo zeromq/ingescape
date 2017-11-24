@@ -96,7 +96,7 @@ void MappingEffectM::copyFrom(ActionEffectM *effect)
     // Call mother class
     ActionEffectM::copyFrom(effect);
 
-    MappingEffectM* mappingEffect = dynamic_cast<MappingEffectM*>(effect);
+    MappingEffectM* mappingEffect = qobject_cast<MappingEffectM*>(effect);
     if(mappingEffect != NULL)
     {
         _toAgentIopList.clear();

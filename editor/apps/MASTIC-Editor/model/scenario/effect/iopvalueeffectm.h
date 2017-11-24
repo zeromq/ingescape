@@ -23,9 +23,7 @@
 #include "I2PropertyHelpers.h"
 
 #include "model/iop/agentiopm.h"
-#include "model/scenario/actioneffectm.h"
-
-
+#include <model/scenario/effect/actioneffectm.h>
 
 
 /**
@@ -71,17 +69,6 @@ public:
     * @param agent
     */
     void setagent(AgentInMappingVM* agent);
-
-
-
-Q_SIGNALS:
-
-
-public Q_SLOTS:
-
-
-protected:
-
 
 
 };
