@@ -2,7 +2,7 @@
 
 
 // Margin in minutes (left and right side of our Analysis view) to ensure that labels are not truncated
-#define TIME_MARGIN_IN_MINUTES 1.0
+#define TIME_MARGIN_IN_MINUTES 2.0
 
 
 #include <QQmlEngine>

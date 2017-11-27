@@ -271,20 +271,23 @@ Item {
 
                         Item {
                             id : actionVM
-                            x : viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(model.startTime, viewController.pixelsPerMinute)
-                            y : rootItem.lineHeight * model.lineInTimeLine
+
+                            property  var myActionVM : model.QtObject;
+
+                            x : myActionVM? viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(myActionVM.startTime, viewController.pixelsPerMinute) : 0;
+                            y : myActionVM? (rootItem.lineHeight * myActionVM.lineInTimeLine) : à;
                             height : rootItem.lineHeight
-                            width : if (model.actionModel) {
-                                        switch (model.actionModel.validityDurationType)
+                            width : if (myActionVM && myActionVM.actionModel) {
+                                        switch (myActionVM.actionModel.validityDurationType)
                                         {
                                         case ValidationDurationType.IMMEDIATE:
                                             0;
                                             break;
                                         case ValidationDurationType.FOREVER:
-                                            (viewController.timeTicksTotalWidth - viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(model.startTime, viewController.pixelsPerMinute))
+                                            (viewController.timeTicksTotalWidth - viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(myActionVM.startTime, viewController.pixelsPerMinute))
                                             break;
                                         case ValidationDurationType.CUSTOM:
-                                            viewController.convertDurationInSecondsToLengthInCoordinateSystem(model.actionModel.validityDuration/1000, viewController.pixelsPerMinute)
+                                            viewController.convertDurationInSecondsToLengthInCoordinateSystem(myActionVM.actionModel.validityDuration/1000, viewController.pixelsPerMinute)
                                             break;
                                         default:
                                             0
@@ -296,6 +299,7 @@ Item {
                                     }
 
                             Rectangle {
+                                id : conditionsValidityRect
                                 anchors {
                                     top : parent.top
                                     left : parent.left
@@ -306,7 +310,68 @@ Item {
                                 color : MasticTheme.blueGreyColor2
                             }
 
+                            // executionsList
+                            Repeater {
+                                model : if (myActionVM) {
+                                            myActionVM.executionsList;
+                                        } else {
+                                            0;
+                                        }
+
+                                // Not revert action
+                                I2SvgItem {
+                                    x : viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(model.executionTime, viewController.pixelsPerMinute);
+                                    anchors {
+                                        verticalCenter: conditionsValidityRect.verticalCenter
+                                    }
+
+                                    visible : !model.shallRevert
+
+                                    svgFileCache : MasticTheme.svgFileMASTIC;
+                                    svgElementId: (model.isExecuted) ? "timelineAction" : "currentAction";
+                                }
+
+                                // Revert action
+                                Item {
+                                    visible : model.shallRevert
+                                    height : childrenRect.height
+                                    anchors {
+                                        verticalCenter: conditionsValidityRect.verticalCenter
+                                    }
+
+                                    I2SvgItem {
+                                        id : actionExecution
+                                        x : viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(model.executionTime, viewController.pixelsPerMinute);
+                                        y : 0
+
+                                        svgFileCache : MasticTheme.svgFileMASTIC;
+                                        svgElementId: (model.isExecuted) ? "revertAction" : "currentRevertAction";
+                                    }
+
+                                    Rectangle {
+                                        anchors {
+                                            verticalCenter: actionExecution.verticalCenter
+                                            left : actionExecution.horizontalCenter
+                                            right : revertActionExecution.horizontalCenter
+                                        }
+                                        height : 1
+                                        color : MasticTheme.whiteColor;
+
+                                    }
+
+                                    I2SvgItem {
+                                        id : revertActionExecution
+                                        x : viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(model.reverseTime, viewController.pixelsPerMinute);
+                                        y : 0
+                                        rotation : 180
+                                        svgFileCache : MasticTheme.svgFileMASTIC;
+                                        svgElementId: (model.isExecuted && !model.isWaitingRevert) ? "revertAction" : "currentRevertAction";
+                                    }
+                                }
+                            }
+
                             Rectangle {
+                                id : backgroundActionName
                                 anchors {
                                     fill : actionName
                                     leftMargin:-1
@@ -379,7 +444,7 @@ Item {
                         width: 1
                         height: timeLinesContent.height
 
-                        color: MasticTheme.whiteColor
+                        color: MasticTheme.redColor
                     }
                 }
 
@@ -397,14 +462,14 @@ Item {
 
         anchors {
             top: parent.top
-            topMargin: 32
+            topMargin: 26
             left: parent.left
             leftMargin: 105
             right: parent.right
             rightMargin: 35
         }
 
-        height: 30
+        height: 40
         clip : true
 
         // Time ticks and current time label
@@ -482,15 +547,17 @@ Item {
 
                     Rectangle {
                         anchors {
-                            left : parent.left
-                            top : svgCurrentTime.top
+                            horizontalCenter : svgCurrentTime.horizontalCenter
+                            bottom : svgCurrentTime.top
+                            bottomMargin: -1
                         }
-                        width : 49
-                        height: 14
-                        color :  MasticTheme.blackColor
+                        width : 62
+                        height: 20
+                        radius : 2
+                        color :  MasticTheme.blueGreyColor2
                         border {
                             width : 1
-                            color: MasticTheme.lightGreyColor
+                            color: MasticTheme.whiteColor
                         }
 
                         Text {
@@ -504,7 +571,7 @@ Item {
                             color: MasticTheme.lightGreyColor
                             font {
                                 family: MasticTheme.textFontFamily
-                                pixelSize: 12
+                                pixelSize: 14
                             }
 
                         }
@@ -514,24 +581,13 @@ Item {
                         id :svgCurrentTime
                         anchors {
                             horizontalCenter : parent.left
-                            bottom : timeticksRect.top
-                            bottomMargin: -1
+                            bottom : parent.bottom
                         }
 
                         svgFileCache : MasticTheme.svgFileMASTIC;
                         svgElementId: "currentTime"
                     }
 
-                    Rectangle {
-                        id : timeticksRect
-                        anchors {
-                            horizontalCenter: parent.left
-                            bottom : parent.bottom
-                        }
-                        height : 6
-                        width : 1
-                        color: MasticTheme.whiteColor
-                    }
 
                 }
 
@@ -547,7 +603,7 @@ Item {
 
         anchors {
             top: parent.top
-            topMargin: 19
+            topMargin: 13
             left: columnHeadersArea.left
             right: columnHeadersArea.right
         }
@@ -644,11 +700,12 @@ Item {
                 top : playScenarioBtn.bottom
                 topMargin: 6
             }
-            height: 22
-            color :  MasticTheme.blackColor
+            height: 21
+            radius : 2
+            color :  MasticTheme.blueGreyColor2
             border {
                 width : 1
-                color: MasticTheme.lightGreyColor
+                color: MasticTheme.whiteColor
             }
 
             Text {
