@@ -70,10 +70,16 @@ public:
 
 
     /**
-     * @brief Remove the agent from the mapping
+     * @brief Create a new Mapping
+     */
+    Q_INVOKABLE void createNewMapping();
+
+
+    /**
+     * @brief Remove the agent from the mapping and delete it
      * @param agent
      */
-    Q_INVOKABLE void removeAgentFromMapping(AgentInMappingVM* agent);
+    Q_INVOKABLE void deleteAgentInMapping(AgentInMappingVM* agent);
 
 
     /**
@@ -81,6 +87,33 @@ public:
      * @param link
      */
     Q_INVOKABLE void deleteLinkBetweenTwoAgents(MapBetweenIOPVM* link);
+
+
+    /**
+     * @brief Called when an agent from the list is dropped on the current mapping at a position
+     * @param agentName
+     * @param models
+     * @param position
+     */
+    Q_INVOKABLE void dropAgentToMappingAtPosition(QString agentName, AbstractI2CustomItemListModel* models, QPointF position);
+
+
+    /**
+     * @brief Slot when a link from an output is dropped over an input on the current mapping (or when a link to an input is dropped over an output)
+     * @param outputAgent
+     * @param output
+     * @param inputAgent
+     * @param input
+     */
+    Q_INVOKABLE void addMapBetweenAgents(AgentInMappingVM* outputAgent, OutputVM* output, AgentInMappingVM* inputAgent, InputVM* input);
+
+
+    /**
+     * @brief Get the agent in mapping from an agent name
+     * @param name
+     * @return
+     */
+    Q_INVOKABLE AgentInMappingVM* getAgentInMappingFromName(QString name);
 
 
 Q_SIGNALS:
@@ -137,15 +170,6 @@ Q_SIGNALS:
 public Q_SLOTS:
 
     /**
-     * @brief Slot when an agent from the list is dropped on the current mapping at a position
-     * @param agentName
-     * @param list
-     * @param position
-     */
-    void dropAgentToMappingAtPosition(QString agentName, AbstractI2CustomItemListModel* list, QPointF position);
-
-
-    /**
      * @brief Slot when a previous agent model is replaced by a new one strictly identical
      * @param previousModel
      * @param newModel
@@ -158,16 +182,6 @@ public Q_SLOTS:
      * @param newModel
      */
     void onIdenticalAgentModelAdded(AgentM* newModel);
-
-
-    /**
-     * @brief Slot when a link from an output is dropped over an input on the current mapping (or when a link to an input is dropped over an output)
-     * @param outputAgent
-     * @param output
-     * @param inputAgent
-     * @param input
-     */
-    void addMapBetweenAgents(AgentInMappingVM* outputAgent, OutputVM* output, AgentInMappingVM* inputAgent, InputVM* input);
 
 
     /**
@@ -184,15 +198,8 @@ public Q_SLOTS:
     void onAgentModelWillBeDeleted(AgentM* agent);
 
 
-    /**
-     * @brief Get the agent in mapping from an agent name
-     * @param name
-     * @return
-     */
-    AgentInMappingVM* getAgentInMappingFromName(QString name);
-
-
 private Q_SLOTS:
+
     /**
      * @brief Slot when inside an agentInMappingVM, new inputsVM are created.
      *      Check if a map need to be created from the element mapping list in the model manager.
@@ -203,6 +210,7 @@ private Q_SLOTS:
      */
     void _generateAllMapBetweenIopUsingNewlyAddedInputsVM(AgentInMappingVM* currentAgentInMapping, QList<InputVM*> inputsListAdded);
 
+
     /**
      * @brief Slot when inside an agentInMappingVM, new outputsVM are created.
      *      Check if a map need can be completed from internal partial maps list in the mapping controller.
@@ -212,6 +220,7 @@ private Q_SLOTS:
      * @param outputsListAdded
      */
     void _completeAllPartialMapBetweenIopUsingNewlyOutputsVM(AgentInMappingVM* currentAgentInMapping, QList<OutputVM*> outputsListAdded);
+
 
     /**
      * @brief Slot when the list of "Agents in Mapping" changed
@@ -255,13 +264,6 @@ private:
      * @param position
      */
     void _addAgentModelsToMappingAtPosition(QString agentName, QList<AgentM*> agentsList, QPointF position);
-
-
-    /**
-     * @brief Delete an Agent in Mapping
-     * @param agentInMapping
-     */
-    void _deleteAgentInMapping(AgentInMappingVM* agentInMapping);
 
 
     /**
