@@ -145,18 +145,18 @@ void AgentsMappingController::deleteLinkBetweenTwoAgents(MapBetweenIOPVM* link)
 
 
 /**
- * @brief Slot when an agent from the list is dropped on the current mapping at a position
+ * @brief Called when an agent from the list is dropped on the current mapping at a position
  * @param agentName
- * @param list
+ * @param models
  * @param position
  */
-void AgentsMappingController::dropAgentToMappingAtPosition(QString agentName, AbstractI2CustomItemListModel* list, QPointF position)
+void AgentsMappingController::dropAgentToMappingAtPosition(QString agentName, AbstractI2CustomItemListModel* models, QPointF position)
 {
     // Check that there is NOT yet an agent in the current mapping for this name
     AgentInMappingVM* agentInMapping = getAgentInMappingFromName(agentName);
     if (agentInMapping == NULL)
     {
-        I2CustomItemListModel<AgentM>* agentsList = dynamic_cast<I2CustomItemListModel<AgentM>*>(list);
+        I2CustomItemListModel<AgentM>* agentsList = dynamic_cast<I2CustomItemListModel<AgentM>*>(models);
         if (agentsList != NULL)
         {
             // Add new model(s) of agent to the current mapping at a specific position
@@ -168,6 +168,72 @@ void AgentsMappingController::dropAgentToMappingAtPosition(QString agentName, Ab
                 setselectedAgent(agentInMapping);
             }
         }
+    }
+}
+
+
+/**
+ * @brief Slot when a link from an output is dropped over an input on the current mapping (or when a link to an input is dropped over an output)
+ * @param outputAgent
+ * @param output
+ * @param inputAgent
+ * @param input
+ */
+void AgentsMappingController::addMapBetweenAgents(AgentInMappingVM* outputAgent, OutputVM* output, AgentInMappingVM* inputAgent, InputVM* input)
+{
+    if ((outputAgent != NULL) && (output != NULL) && (inputAgent != NULL) && (input != NULL))
+    {
+        // Check that the input can link to the output
+        if (input->canLinkWith(output))
+        {
+            // Search if the same link already exists
+            bool alreadyLinked = false;
+            foreach (MapBetweenIOPVM* iterator, _allMapInMapping.toList()) {
+                if ((iterator != NULL) && (iterator->agentFrom() == outputAgent) && (iterator->pointFrom() == output)
+                        && (iterator->agentTo() == inputAgent) && (iterator->pointTo() == input)) {
+                    alreadyLinked = true;
+                    break;
+                }
+            }
+
+            // Check that the same link does not yet exist
+            if (!alreadyLinked)
+            {
+                // Create a new map between agents
+                MapBetweenIOPVM* mapBetweenIOP = new MapBetweenIOPVM(outputAgent, output, inputAgent, input, this);
+
+                // Add to the list
+                _allMapInMapping.append(mapBetweenIOP);
+
+                // Emit signal "Command asked to agent about Mapping Input"
+                Q_EMIT commandAskedToAgentAboutMappingInput(inputAgent->getPeerIdsList(), "MAP", input->name(), outputAgent->name(), output->name());
+            }
+            else {
+                qWarning() << "The input" << input->name() << "(of agent" << inputAgent->name() << ") is already linked to output" << output->name() << "(of agent" << outputAgent->name() << ")";
+            }
+        }
+        else {
+            if ((output->firstModel() != NULL) && (input->firstModel() != NULL)) {
+                qDebug() << "Can not link output" << output->name() << "with type" << AgentIOPValueTypes::staticEnumToString(output->firstModel()->agentIOPValueType()) << "(of agent" << outputAgent->name() << ")"
+                         << "and input" << input->name() << "with type" << AgentIOPValueTypes::staticEnumToString(input->firstModel()->agentIOPValueType()) << "(of agent" << inputAgent->name() << ")";
+            }
+        }
+    }
+}
+
+
+/**
+ * @brief Get the agent in mapping from an agent name
+ * @param name
+ * @return
+ */
+AgentInMappingVM* AgentsMappingController::getAgentInMappingFromName(QString name)
+{
+    if (_mapFromNameToAgentInMapping.contains(name)) {
+        return _mapFromNameToAgentInMapping.value(name);
+    }
+    else {
+        return NULL;
     }
 }
 
@@ -205,38 +271,6 @@ void AgentsMappingController::onIdenticalAgentModelAdded(AgentM* newModel)
         if (agentInMapping != NULL)
         {
             agentInMapping->models()->append(newModel);
-        }
-    }
-}
-
-
-/**
- * @brief Slot when a link from an output is dropped over an input on the current mapping (or when a link to an input is dropped over an output)
- * @param outputAgent
- * @param output
- * @param inputAgent
- * @param input
- */
-void AgentsMappingController::addMapBetweenAgents(AgentInMappingVM* outputAgent, OutputVM* output, AgentInMappingVM* inputAgent, InputVM* input)
-{
-    if ((outputAgent != NULL) && (output != NULL)
-            && (inputAgent != NULL) && (input != NULL))
-    {
-        if (output->canLinkWith(input)) {
-            // Create a new map between agents
-            MapBetweenIOPVM* mapBetweenIOP = new MapBetweenIOPVM(outputAgent, output, inputAgent, input, this);
-
-            // Add to the list
-            _allMapInMapping.append(mapBetweenIOP);
-
-            // Emit signal "Command asked to agent about Mapping Input"
-            Q_EMIT commandAskedToAgentAboutMappingInput(inputAgent->getPeerIdsList(), "MAP", input->name(), outputAgent->name(), output->name());
-        }
-        else {
-            if ((output->firstModel() != NULL) && (input->firstModel() != NULL)) {
-                qDebug() << "Can not link output" << output->name() << "with type" << AgentIOPValueTypes::staticEnumToString(output->firstModel()->agentIOPValueType()) << "(of agent" << outputAgent->name() << ")"
-                         << "and input" << input->name() << "with type" << AgentIOPValueTypes::staticEnumToString(input->firstModel()->agentIOPValueType()) << "(of agent" << inputAgent->name() << ")";
-            }
         }
     }
 }
@@ -312,22 +346,6 @@ void AgentsMappingController::onAgentModelWillBeDeleted(AgentM* agent)
                 deleteAgentInMapping(agentInMapping);
             }
         }
-    }
-}
-
-
-/**
- * @brief Get the agent in mapping from an agent name
- * @param name
- * @return
- */
-AgentInMappingVM* AgentsMappingController::getAgentInMappingFromName(QString name)
-{
-    if (_mapFromNameToAgentInMapping.contains(name)) {
-        return _mapFromNameToAgentInMapping.value(name);
-    }
-    else {
-        return NULL;
     }
 }
 
