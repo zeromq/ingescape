@@ -1747,9 +1747,9 @@ I2PopupBase {
                                         bottom : parent.bottom
                                         bottomMargin: 6
                                     }
-                                    visible : myEffect && myEffect.effectType === ActionEffectTypes.MAPPING
+                                    visible: (myEffect && myEffect.effectType === ActionEffectTypes.MAPPING)
 
-                                    // Agent FROM
+                                    // Output Agent
                                     MasticComboBox {
                                         id : agentFROMEffectMappingCombo
 
@@ -1763,36 +1763,31 @@ I2PopupBase {
                                         width : 148
 
                                         model : controller ? controller.agentsInMappingList : 0
-                                        function modelToString(model)
-                                        {
+
+                                        function modelToString(model) {
                                             return model.name;
                                         }
-
 
                                         Binding {
                                             target : agentFROMEffectMappingCombo
                                             property : "selectedItem"
-                                            value : if (myEffect && myEffect.modelM)
-                                                    {
-                                                        myEffect.modelM.agent;
+                                            value : if (myEffect && myEffect.modelM) {
+                                                        myEffect.modelM.outputAgent;
                                                     }
                                                     else {
                                                         null;
                                                     }
                                         }
 
-
-                                        onSelectedItemChanged:
-                                        {
+                                        onSelectedItemChanged: {
                                             if (myEffect && myEffect.modelM)
                                             {
-                                                myEffect.modelM.agent = agentFROMEffectMappingCombo.selectedItem;
+                                                myEffect.modelM.outputAgent = agentFROMEffectMappingCombo.selectedItem;
                                             }
                                         }
-
                                     }
 
-                                    // Agent FROM Outputs
+                                    // Outputs (of output agent)
                                     MasticComboBoxAgentsIOP {
                                         id : oEffectsMappingFROMCombo
 
@@ -1806,17 +1801,15 @@ I2PopupBase {
                                         width : 148
 
                                         model : (myEffect && myEffect.modelM) ? myEffect.modelM.outputsList : 0
-                                        function modelToString(model)
-                                        {
+
+                                        function modelToString(model) {
                                             return model.name;
                                         }
-
 
                                         Binding {
                                             target : oEffectsMappingFROMCombo
                                             property : "selectedItem"
-                                            value : if (myEffect && myEffect.modelM)
-                                                    {
+                                            value : if (myEffect && myEffect.modelM) {
                                                         myEffect.modelM.output;
                                                     }
                                                     else {
@@ -1824,9 +1817,7 @@ I2PopupBase {
                                                     }
                                         }
 
-
-                                        onSelectedItemChanged:
-                                        {
+                                        onSelectedItemChanged: {
                                             if (myEffect && myEffect.modelM)
                                             {
                                                 myEffect.modelM.output = oEffectsMappingFROMCombo.selectedItem;
@@ -1871,7 +1862,6 @@ I2PopupBase {
                                                 color : MasticTheme.blackColor
                                             }
                                         }
-
 
                                         Rectangle {
                                             id : rectRight
@@ -1929,7 +1919,7 @@ I2PopupBase {
                                         }
                                     }
 
-                                    // Agent TO
+                                    // Input Agent
                                     MasticComboBox {
                                         id : agentTOEffectMappingCombo
 
@@ -1943,8 +1933,8 @@ I2PopupBase {
                                         width : 148
 
                                         model : controller ? controller.agentsInMappingList : 0
-                                        function modelToString(model)
-                                        {
+
+                                        function modelToString(model) {
                                             return model.name;
                                         }
 
@@ -1952,27 +1942,23 @@ I2PopupBase {
                                         Binding {
                                             target : agentTOEffectMappingCombo
                                             property : "selectedItem"
-                                            value : if (myEffect && myEffect.modelM)
-                                                    {
-                                                        myEffect.modelM.inputAgent;
+                                            value : if (myEffect && myEffect.modelM) {
+                                                        myEffect.modelM.agent;
                                                     }
                                                     else {
                                                         null;
                                                     }
                                         }
 
-
-                                        onSelectedItemChanged:
-                                        {
+                                        onSelectedItemChanged: {
                                             if (myEffect && myEffect.modelM)
                                             {
-                                                myEffect.modelM.inputAgent = agentTOEffectMappingCombo.selectedItem;
+                                                myEffect.modelM.agent = agentTOEffectMappingCombo.selectedItem;
                                             }
                                         }
-
                                     }
 
-                                    // Agent TO Intpus
+                                    // Intputs (of input agent)
                                     MasticComboBoxAgentsIOP {
                                         id : iEffectsMappingTOCombo
 
@@ -1986,17 +1972,15 @@ I2PopupBase {
                                         width : 148
 
                                         model : (myEffect && myEffect.modelM) ? myEffect.modelM.inputsList : 0
-                                        function modelToString(model)
-                                        {
+
+                                        function modelToString(model) {
                                             return model.name;
                                         }
-
 
                                         Binding {
                                             target : iEffectsMappingTOCombo
                                             property : "selectedItem"
-                                            value : if (myEffect && myEffect.modelM)
-                                                    {
+                                            value : if (myEffect && myEffect.modelM) {
                                                         myEffect.modelM.input;
                                                     }
                                                     else {
@@ -2004,24 +1988,20 @@ I2PopupBase {
                                                     }
                                         }
 
-
-                                        onSelectedItemChanged:
-                                        {
+                                        onSelectedItemChanged: {
                                             if (myEffect && myEffect.modelM)
                                             {
                                                 myEffect.modelM.input = iEffectsMappingTOCombo.selectedItem;
                                             }
                                         }
-
                                     }
-
 
                                 }
 
 
                                 // Delete Effect
                                 Button {
-                                    id: btnDeletEffect
+                                    id: btnDeleteEffect
 
                                     height : 10
                                     width : 10

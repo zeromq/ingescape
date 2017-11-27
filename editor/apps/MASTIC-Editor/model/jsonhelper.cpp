@@ -742,10 +742,11 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
     if(jsonValue.isString())
     {
         int effectType = ActionEffectTypes::staticEnumFromKey(jsonValue.toString().toUpper());
-        if(effectType >= 0)
+        if (effectType >= 0)
         {
             switch (effectType)
             {
+                // VALUE
                 case ActionEffectTypes::VALUE:
                 {
                     QJsonValue jsonAgentName = jsonEffect.value("agent_name");
@@ -763,20 +764,20 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
 
                         foreach (AgentInMappingVM* iterator, listAgentsInMapping)
                         {
-                            if(iterator->name() == agentName)
+                            if ((iterator != NULL) && (iterator->name() == agentName))
                             {
                                 agent = iterator;
+
                                 // Go through the inputs
                                 foreach (InputVM* inputVM, iterator->inputsList()->toList())
                                 {
-                                    if(found == false && inputVM->name() == agentIOPName)
+                                    if (!found && (inputVM->name() == agentIOPName))
                                     {
                                         iopAgentM = inputVM->firstModel();
                                         found = true;
                                     }
 
-                                    if(inputVM->firstModel() != NULL)
-                                    {
+                                    if (inputVM->firstModel() != NULL) {
                                         listIOPAgents.append(inputVM->firstModel());
                                     }
                                 }
@@ -784,14 +785,13 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
                                 // Go through the outputs
                                 foreach (OutputVM* outputVM, iterator->outputsList()->toList())
                                 {
-                                    if(found == false && outputVM->name() == agentIOPName)
+                                    if (!found && (outputVM->name() == agentIOPName))
                                     {
                                         iopAgentM = outputVM->firstModel();
                                         found = true;
                                     }
 
-                                    if(outputVM->firstModel() != NULL)
-                                    {
+                                    if (outputVM->firstModel() != NULL) {
                                         listIOPAgents.append(outputVM->firstModel());
                                     }
                                 }
@@ -799,7 +799,7 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
                             }
                         }
 
-                        if(agent != NULL && iopAgentM != NULL)
+                        if ((agent != NULL) && (iopAgentM != NULL))
                         {
                             // Create model
                             IOPValueEffectM* iopEffectM = new IOPValueEffectM();
@@ -812,15 +812,14 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
 
                             // set value
                             jsonValue = jsonEffect.value("value");
-                            if(jsonValue.isString())
-                            {
+                            if (jsonValue.isString()) {
                                 iopEffectM->setvalue(jsonValue.toString());
                             }
 
                             // Set the list of agent iop
                             iopEffectM->iopMergedList()->append(listIOPAgents);
 
-                            // set agent
+                            // set agent and I/O/P
                             iopEffectM->setagent(agent);
                             iopEffectM->setagentIOP(iopAgentM);
                         }
@@ -828,6 +827,7 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
 
                     break;
                 }
+                // AGENT
                 case ActionEffectTypes::AGENT:
                 {
                     QJsonValue jsonAgentName = jsonEffect.value("agent_name");
@@ -840,14 +840,14 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
 
                         foreach (AgentInMappingVM* iterator, listAgentsInMapping)
                         {
-                            if (iterator->name() == agentName)
+                            if ((iterator != NULL) && (iterator->name() == agentName))
                             {
                                 agent = iterator;
                                 break;
                             }
                         }
 
-                        if(agent != NULL)
+                        if (agent != NULL)
                         {
                             // Create model
                             EffectOnAgentM* effectOnAgent = new EffectOnAgentM();
@@ -855,6 +855,7 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
                             // Create view model
                             actionEffectVM = new ActionEffectVM();
                             actionEffectVM->seteffectType(ActionEffectTypes::AGENT);
+
                             actionEffectVM->setmodelM(effectOnAgent);
 
                             // set value
@@ -866,7 +867,6 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
 
                             // set agent
                             effectOnAgent->setagent(agent);
-
                         }
                     }
                     break;
@@ -887,87 +887,90 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
                         QString toAgentName = jsonToAgentName.toString();
                         QString toAgentIOPName = jsonToIOPName.toString();
 
-                        AgentInMappingVM* fromAgentM = NULL;
-                        AgentIOPM* output = NULL;
-                        AgentInMappingVM* toAgentM = NULL;
+                        AgentInMappingVM* inputAgent = NULL;
                         AgentIOPM* input = NULL;
+                        AgentInMappingVM* outputAgent = NULL;
+                        AgentIOPM* output = NULL;
                         bool found = false;
 
                         QList<AgentIOPM*> outputsList;
                         QList<AgentIOPM*> inputsList;
 
-                        foreach (AgentInMappingVM* agent, listAgentsInMapping)
+                        foreach (AgentInMappingVM* iterator, listAgentsInMapping)
                         {
-                            if (agent->name() == fromAgentName)
+                            if (iterator != NULL)
                             {
-                                fromAgentM = agent;
-                                found = false;
-
-                                // Go through the inputs
-                                foreach (InputVM* inputVM, agent->inputsList()->toList())
+                                if (iterator->name() == fromAgentName)
                                 {
-                                    if(found == false && inputVM->name() == fromAgentIOPName)
+                                    outputAgent = iterator;
+                                    found = false;
+
+                                    // Go through the inputs
+                                    foreach (InputVM* inputVM, iterator->inputsList()->toList())
                                     {
-                                        output = inputVM->firstModel();
-                                        found = true;
+                                        if(found == false && inputVM->name() == fromAgentIOPName)
+                                        {
+                                            output = inputVM->firstModel();
+                                            found = true;
+                                        }
+
+                                        if (inputVM->firstModel() != NULL) {
+                                            outputsList.append(inputVM->firstModel());
+                                        }
                                     }
 
-                                    if (inputVM->firstModel() != NULL) {
-                                        outputsList.append(inputVM->firstModel());
+                                    // Go through the outputs
+                                    foreach (OutputVM* outputVM, iterator->outputsList()->toList())
+                                    {
+                                        if(found == false && outputVM->name() == fromAgentIOPName)
+                                        {
+                                            output = outputVM->firstModel();
+                                            found = true;
+                                        }
+
+                                        if (outputVM->firstModel() != NULL) {
+                                            outputsList.append(outputVM->firstModel());
+                                        }
                                     }
                                 }
 
-                                // Go through the outputs
-                                foreach (OutputVM* outputVM, agent->outputsList()->toList())
+                                if (iterator->name() == toAgentName)
                                 {
-                                    if(found == false && outputVM->name() == fromAgentIOPName)
+                                    inputAgent = iterator;
+                                    found = false;
+
+                                    // Go through the inputs
+                                    foreach (InputVM* inputVM, iterator->inputsList()->toList())
                                     {
-                                        output = outputVM->firstModel();
-                                        found = true;
+                                        if(found == false && inputVM->name() == toAgentIOPName)
+                                        {
+                                            input = inputVM->firstModel();
+                                            found = true;
+                                        }
+
+                                        if (inputVM->firstModel() != NULL) {
+                                            inputsList.append(inputVM->firstModel());
+                                        }
                                     }
 
-                                    if (outputVM->firstModel() != NULL) {
-                                        outputsList.append(outputVM->firstModel());
-                                    }
-                                }
-                            }
-
-                            if (agent->name() == toAgentName)
-                            {
-                                toAgentM = agent;
-                                found = false;
-
-                                // Go through the inputs
-                                foreach (InputVM* inputVM, agent->inputsList()->toList())
-                                {
-                                    if(found == false && inputVM->name() == toAgentIOPName)
+                                    // Go through the outputs
+                                    foreach (OutputVM* outputVM, iterator->outputsList()->toList())
                                     {
-                                        input = inputVM->firstModel();
-                                        found = true;
-                                    }
+                                        if(found == false && outputVM->name() == toAgentIOPName)
+                                        {
+                                            input = outputVM->firstModel();
+                                            found = true;
+                                        }
 
-                                    if (inputVM->firstModel() != NULL) {
-                                        inputsList.append(inputVM->firstModel());
-                                    }
-                                }
-
-                                // Go through the outputs
-                                foreach (OutputVM* outputVM, agent->outputsList()->toList())
-                                {
-                                    if(found == false && outputVM->name() == toAgentIOPName)
-                                    {
-                                        input = outputVM->firstModel();
-                                        found = true;
-                                    }
-
-                                    if (outputVM->firstModel() != NULL) {
-                                        inputsList.append(outputVM->firstModel());
+                                        if (outputVM->firstModel() != NULL) {
+                                            inputsList.append(outputVM->firstModel());
+                                        }
                                     }
                                 }
                             }
                         }
 
-                        if ((fromAgentM != NULL) && (output != NULL) && (toAgentM != NULL) && (input != NULL))
+                        if ((inputAgent != NULL) && (input != NULL) && (outputAgent != NULL) && (output != NULL))
                         {
                             // Create model
                             MappingEffectM* mappingEffectM = new MappingEffectM();
@@ -978,10 +981,10 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
                             actionEffectVM->setmodelM(mappingEffectM);
 
                             // set from agent
-                            mappingEffectM->setagent(fromAgentM);
-                            mappingEffectM->setoutput(output);
-                            mappingEffectM->setinputAgent(toAgentM);
+                            mappingEffectM->setagent(inputAgent);
                             mappingEffectM->setinput(input);
+                            mappingEffectM->setoutputAgent(outputAgent);
+                            mappingEffectM->setoutput(output);
 
                             // set value
                             jsonValue = jsonEffect.value("value");
@@ -1294,13 +1297,13 @@ QByteArray JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<ActionI
                 case ActionEffectTypes::MAPPING:
                 {
                     MappingEffectM* mappingEffect = qobject_cast<MappingEffectM*>(actionEffect);
-                    if ((mappingEffect != NULL) && (mappingEffect->agent() != NULL)
-                            && (mappingEffect->inputAgent() != NULL) && (mappingEffect->input() != NULL) && (mappingEffect->output() != NULL))
+                    if ((mappingEffect != NULL) && (mappingEffect->agent() != NULL) && (mappingEffect->input() != NULL)
+                            && (mappingEffect->outputAgent() != NULL)  && (mappingEffect->output() != NULL))
                     {
-                        jsonEffect.insert("from_agent_name", mappingEffect->agent()->name());
-                        jsonEffect.insert("from_iop_name", mappingEffect->output()->name());
-                        jsonEffect.insert("to_agent_name", mappingEffect->inputAgent()->name());
+                        jsonEffect.insert("to_agent_name", mappingEffect->agent()->name());
                         jsonEffect.insert("to_iop_name", mappingEffect->input()->name());
+                        jsonEffect.insert("from_agent_name", mappingEffect->outputAgent()->name());
+                        jsonEffect.insert("from_iop_name", mappingEffect->output()->name());
                         jsonEffect.insert("value", MappingEffectValues::staticEnumToKey(mappingEffect->mappingEffectValue()));
 
                         jsonFilled = true;
