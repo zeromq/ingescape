@@ -257,23 +257,20 @@ void ScenarioController::valideActionEditor(ActionEditorController* actionEditor
     // Valide modification
     actionEditorC->validateModification();
 
-    ActionM* originalActionVM = actionEditorC->originalAction();
-
-    //FIXME Initialize connections
-    //originalActionVM->initializeConditionsConnections();
+    ActionM* originalActionM = actionEditorC->originalAction();
 
     // We check that or editor is not already opened
-    if(_actionsList.contains(originalActionVM) == false)
+    if(_actionsList.contains(originalActionM) == false)
     {
         // Insert in to the list
-        _actionsList.append(originalActionVM);
+        _actionsList.append(originalActionM);
 
         // Insert into the map
-        _mapActionsFromActionName.insert(originalActionVM->name(),originalActionVM);
+        _mapActionsFromActionName.insert(originalActionM->name(),originalActionM);
     }
 
     // Set selected action
-    setselectedAction(originalActionVM);
+    setselectedAction(originalActionM);
 }
 
 /**
@@ -321,7 +318,7 @@ void ScenarioController::onAgentInMappingRemoved(AgentInMappingVM * agentRemoved
 QString ScenarioController::_buildNewActionName()
 {
     // Remove the effect
-    int index = 1;
+    int index = _mapActionsFromActionName.count();
     QString tmpName = "Action_"+QString("%1").arg(index, 3,10, QChar('0'));
 
     while(_mapActionsFromActionName.contains(tmpName))
@@ -386,13 +383,18 @@ void ScenarioController::_importScenarioFromFile(QString scenarioFilePath)
                 // Append the list of actions
                 if(scenarioToImport.first.first.count() > 0)
                 {
-                    //FIXME
-//                    foreach (ActionM* actionM, scenarioToImport.first.first)
-//                    {
-//                        actionM->initializeConditionsConnections();
-//                    }
+                    // Add each actions to out list
+                    foreach (ActionM* actionM, scenarioToImport.first.first)
+                    {
+                        // Add action into the list
+                        _actionsList.append(actionM);
 
-                    _actionsList.append(scenarioToImport.first.first);
+                        // Add action into the map
+                        _mapActionsFromActionName.insert(actionM->name(),actionM);
+                    }
+
+
+
                 }
 
                 // Set the list of actions in palette
