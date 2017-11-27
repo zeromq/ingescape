@@ -70,24 +70,28 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     settings.endGroup();
 
 
-    //
-    // Agents lists & mappings
-    //
+    // Directory for agents lists
     QString agentsListPath = MasticEditorUtils::getAgentsListPath();
     QDir agentsListDir(agentsListPath);
     if (!agentsListDir.exists()) {
         qCritical() << "ERROR: could not create directory at '" << agentsListPath << "' !";
     }
 
+    // Directory for agents mappings
     QString agentsMappingsPath = MasticEditorUtils::getAgentsMappingsPath();
     QDir agentsMappingsDir(agentsMappingsPath);
     if (!agentsMappingsDir.exists()) {
         qCritical() << "ERROR: could not create directory at '" << agentsMappingsPath << "' !";
     }
 
-    //
-    // Scenarios
-    //
+    // Directory for data
+    QString dataPath = MasticEditorUtils::getDataPath();
+    QDir dataDir(dataPath);
+    if (!dataDir.exists()) {
+        qCritical() << "ERROR: could not create directory at '" << dataPath << "' !";
+    }
+
+    // Directory for scenarios
     QString scenariosPath = MasticEditorUtils::getScenariosPath();
     QDir scenariosDir(scenariosPath);
     if (!scenariosDir.exists()) {
@@ -100,7 +104,7 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     //
 
     // Create the manager for the data model of MASTIC
-    _modelManager = new MasticModelManager(agentsListPath, agentsMappingsPath, this);
+    _modelManager = new MasticModelManager(agentsListPath, agentsMappingsPath, dataPath, this);
 
     // Create the controller for network communications
     _networkC = new NetworkController(this);

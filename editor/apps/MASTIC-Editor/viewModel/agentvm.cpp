@@ -32,7 +32,8 @@ AgentVM::AgentVM(AgentM* model, QObject *parent) : QObject(parent),
     _isMuted(false),
     _canBeFrozen(false),
     _isFrozen(false),
-    _definition(NULL)
+    _definition(NULL),
+    _clonesNumber(0)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -371,14 +372,26 @@ void AgentVM::_updateWithAllModels()
 void AgentVM::_updateIsON()
 {
     bool globalIsON = false;
+    int clonesNumber = 0;
 
-    foreach (AgentM* model, _models.toList()) {
-        if ((model != NULL) && model->isON()) {
+    foreach (AgentM* model, _models.toList())
+    {
+        if ((model != NULL) && model->isON())
+        {
             globalIsON = true;
-            break;
+            //break;
+            clonesNumber++;
         }
     }
+
     setisON(globalIsON);
+
+    if (clonesNumber > 1) {
+        setclonesNumber(clonesNumber);
+    }
+    else {
+        setclonesNumber(0);
+    }
 }
 
 

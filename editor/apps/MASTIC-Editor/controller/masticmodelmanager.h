@@ -47,10 +47,12 @@ public:
      * @brief Default constructor
      * @param agentsListDirectoryPath
      * @param agentsMappingsDirectoryPath
+     * @param dataDirectoryPath
      * @param parent
      */
     explicit MasticModelManager(QString agentsListDirectoryPath,
                                 QString agentsMappingsDirectoryPath,
+                                QString dataDirectoryPath,
                                 QObject *parent = nullptr);
 
 
@@ -369,6 +371,9 @@ private:
     // Path to the directory containing JSON files to save agents mappings
     QString _agentsMappingsDirectoryPath;
     QString _agentsMappingsDefaultFilePath;
+
+    // Path to the directory containing data files
+    QString _dataDirectoryPath;
 
     // Helper to manage JSON definitions of agents
     JsonHelper* _jsonHelper;

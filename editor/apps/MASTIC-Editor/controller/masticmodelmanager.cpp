@@ -25,14 +25,17 @@
  * @brief Default constructor
  * @param agentsListDirectoryPath
  * @param agentsMappingsDirectoryPath
+ * @param dataDirectoryPath
  * @param parent
  */
 MasticModelManager::MasticModelManager(QString agentsListDirectoryPath,
                                        QString agentsMappingsDirectoryPath,
+                                       QString dataDirectoryPath,
                                        QObject *parent) : QObject(parent),
     _isActivatedMapping(false),
     _agentsListDirectoryPath(agentsListDirectoryPath),
     _agentsMappingsDirectoryPath(agentsMappingsDirectoryPath),
+    _dataDirectoryPath(dataDirectoryPath),
     _jsonHelper(NULL)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
@@ -42,8 +45,8 @@ MasticModelManager::MasticModelManager(QString agentsListDirectoryPath,
 
     QDate today = QDate::currentDate();
 
-    _agentsListDefaultFilePath = QString("%1agents_list_%2.json").arg(_agentsListDirectoryPath, today.toString("ddMMyy"));
-    _agentsMappingsDefaultFilePath = QString("%1agents_mappings_%2.json").arg(_agentsMappingsDirectoryPath, today.toString("ddMMyy"));
+    _agentsListDefaultFilePath = QString("%1agents_list_%2.json").arg(_agentsListDirectoryPath, today.toString("yyyyMMdd"));
+    _agentsMappingsDefaultFilePath = QString("%1agents_mappings_%2.json").arg(_agentsMappingsDirectoryPath, today.toString("yyyyMMdd"));
 
     // Create the helper to manage JSON definitions of agents
     _jsonHelper = new JsonHelper(this);
@@ -101,7 +104,7 @@ void MasticModelManager::importAgentFromSelectedFiles()
     // "File Dialog" to get the files (paths) to open
     QStringList agentFilesPaths = QFileDialog::getOpenFileNames(NULL,
                                                                 "Importer le fichier de définition (et de mapping) d'un agent",
-                                                                _agentsListDirectoryPath,
+                                                                _dataDirectoryPath,
                                                                 "JSON (*.json)");
 
     // Import the agent from JSON files (definition and mapping)

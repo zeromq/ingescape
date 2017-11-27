@@ -67,6 +67,9 @@ class AgentVM : public QObject
     // Definition of our agent
     I2_QML_PROPERTY_READONLY_CUSTOM_SETTER(DefinitionM*, definition)
 
+    // Number of clones
+    I2_QML_PROPERTY_READONLY(int, clonesNumber)
+
 
 public:
     /**
