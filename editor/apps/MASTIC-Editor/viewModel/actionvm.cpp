@@ -182,6 +182,10 @@ void ActionVM::setactionModel(ActionM * actionM)
         if(_actionModel != NULL)
         {
             disconnect(_actionModel, &ActionM::isValidChanged, this, &ActionVM::onActionIsValidChange);
+
+            // Endtime reevaluation disconnection
+            disconnect(_actionModel, &ActionM::validityDurationChanged, this, &ActionVM::_onValidityDurationChange);
+            disconnect(_actionModel, &ActionM::validityDurationTypeChanged, this, &ActionVM::_onValidityDurationChange);
         }
 
         _actionModel = actionM;
@@ -189,6 +193,10 @@ void ActionVM::setactionModel(ActionM * actionM)
         if(_actionModel != NULL)
         {
             connect(_actionModel, &ActionM::isValidChanged, this, &ActionVM::onActionIsValidChange);
+
+            // Endtime reevaluation connection
+            connect(_actionModel, &ActionM::validityDurationChanged, this, &ActionVM::_onValidityDurationChange);
+            connect(_actionModel, &ActionM::validityDurationTypeChanged, this, &ActionVM::_onValidityDurationChange);
         }
 
         // Compute the new endtime
@@ -286,6 +294,25 @@ void ActionVM::onActionIsValidChange(bool isValid)
     setisValid(isValid);
 }
 
+/**
+ * @brief Slot on the validity duration change
+ * @param validity duration
+ */
+void ActionVM::_onValidityDurationChange()
+{
+    _computeEndTime();
+}
+
+///**
+// * @brief Slot on the validity duration type
+// * @param validity duration type
+// */
+//void ActionVM::_onValidityDurationTypeChange()
+//{
+//    Q_UNUSED(validityDurationType)
+
+//    _computeEndTime();
+//}
 
 /**
  * @brief Compute the endTime according to the action model and its type
