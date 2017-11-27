@@ -41,11 +41,11 @@ class MappingEffectM: public ActionEffectM
     // Value of our effect on mapping
     I2_QML_PROPERTY(MappingEffectValues::Value, mappingEffectValue)
 
+    // Output Agent
+    I2_QML_PROPERTY_CUSTOM_SETTER(AgentInMappingVM*, outputAgent)
+
     // Output of the output agent
     I2_QML_PROPERTY(AgentIOPM*, output)
-
-    // Input Agent
-    I2_QML_PROPERTY_CUSTOM_SETTER(AgentInMappingVM*, inputAgent)
 
     // Input of the input agent
     I2_QML_PROPERTY(AgentIOPM*, input)
@@ -94,10 +94,10 @@ public Q_SLOTS:
 protected:
 
     /**
-     * @brief Called when our "input agent" is destroyed
+     * @brief Called when our "output agent" is destroyed
      * @param sender
      */
-    void _onInputAgentDestroyed(QObject* sender);
+    void _onOutputAgentDestroyed(QObject* sender);
 
 
 };

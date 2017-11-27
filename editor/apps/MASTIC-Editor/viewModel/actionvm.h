@@ -122,6 +122,11 @@ public Q_SLOTS:
      */
     void onActionIsValidChange(bool isValid);
 
+    /**
+     * @brief Slot on the validity duration change
+     * @param validity duration
+     */
+    void _onValidityDurationChange();
 
 private:
     /**

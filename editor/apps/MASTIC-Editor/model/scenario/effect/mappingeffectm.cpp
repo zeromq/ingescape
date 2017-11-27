@@ -57,8 +57,8 @@ QString MappingEffectValues::enumToString(int value)
  */
 MappingEffectM::MappingEffectM(QObject *parent) : ActionEffectM(parent),
     _mappingEffectValue(MappingEffectValues::MAPPED),
+    _outputAgent(NULL),
     _output(NULL),
-    _inputAgent(NULL),
     _input(NULL)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
@@ -72,19 +72,20 @@ MappingEffectM::MappingEffectM(QObject *parent) : ActionEffectM(parent),
  */
 MappingEffectM::~MappingEffectM()
 {
-    // Clear our list
+    // Clear our lists
     _inputsList.clear();
     _outputsList.clear();
+
+    // Reset output agent
+    setoutputAgent(NULL);
 
     // Reset output
     setoutput(NULL);
 
-    // Reset input agent
-    setinputAgent(NULL);
-
     // Reset input
     setinput(NULL);
 }
+
 
 /**
 * @brief Copy from another effect model
@@ -103,8 +104,8 @@ void MappingEffectM::copyFrom(ActionEffectM *effect)
         _outputsList.clear();
         _outputsList.append(mappingEffect->outputsList()->toList());
 
+        setoutputAgent(mappingEffect->outputAgent());
         setoutput(mappingEffect->output());
-        setinputAgent(mappingEffect->inputAgent());
         setinput(mappingEffect->input());
     }
 }
@@ -121,60 +122,19 @@ void MappingEffectM::setagent(AgentInMappingVM* agent)
     // Call setter of mother class
     ActionEffectM::setagent(agent);
 
-    if (previousAgent != agent)
+    if (previousAgent != _agent)
     {
-        // Clear the list
-        _outputsList.clear();
-        setoutput(NULL);
-
-        if(_agent != NULL)
-        {
-            // Fill with outputs
-            foreach (OutputVM* output, _agent->outputsList()->toList())
-            {
-                if(output->firstModel() != NULL)
-                {
-                    _outputsList.append(output->firstModel());
-                }
-            }
-
-            // Select the first item
-            if(_outputsList.count() > 0)
-            {
-                setoutput(_outputsList.at(0));
-            }
-        }
-    }
-}
-
-
-/**
-* @brief Custom setter for property "input agent" to fill inputs and outputs
-* @param value
-*/
-void MappingEffectM::setinputAgent(AgentInMappingVM* value)
-{
-    if(_inputAgent != value)
-    {
-        if(_inputAgent != NULL)
-        {
-            // UnSubscribe to destruction
-            disconnect(_inputAgent, &AgentInMappingVM::destroyed, this, &MappingEffectM::_onInputAgentDestroyed);
-        }
-
-        // set the new value
-        _inputAgent = value;
-
-        // Clear the list
+        // Clear the inputs list and the selected input
         _inputsList.clear();
         setinput(NULL);
 
-        if (_inputAgent != NULL)
+        if (_agent != NULL)
         {
-            // Fill with inputs
-            foreach (InputVM* input, _inputAgent->inputsList()->toList())
+            // Fill inputs
+            foreach (InputVM* input, _agent->inputsList()->toList())
             {
-                if (input->firstModel() != NULL) {
+                if ((input != NULL) && (input->firstModel() != NULL))
+                {
                     _inputsList.append(input->firstModel());
                 }
             }
@@ -183,27 +143,63 @@ void MappingEffectM::setinputAgent(AgentInMappingVM* value)
             if (_inputsList.count() > 0) {
                 setinput(_inputsList.at(0));
             }
-
-            if(_inputAgent != NULL)
-            {
-                // Subscribe to destruction
-                connect(_inputAgent, &AgentInMappingVM::destroyed, this, &MappingEffectM::_onInputAgentDestroyed);
-            }
         }
-
-        emit inputAgentChanged(value);
     }
 }
 
 
 /**
- * @brief Called when our "input agent" is destroyed
+* @brief Custom setter for property "output agent" to fill inputs and outputs
+* @param value
+*/
+void MappingEffectM::setoutputAgent(AgentInMappingVM* value)
+{
+    if (_outputAgent != value)
+    {
+        if (_outputAgent != NULL)
+        {
+            // UN-subscribe to destruction
+            disconnect(_outputAgent, &AgentInMappingVM::destroyed, this, &MappingEffectM::_onOutputAgentDestroyed);
+        }
+
+        // set the new value
+        _outputAgent = value;
+
+        // Clear the list and the selected output
+        _outputsList.clear();
+        setoutput(NULL);
+
+        if (_outputAgent != NULL)
+        {
+            // Subscribe to destruction
+            connect(_outputAgent, &AgentInMappingVM::destroyed, this, &MappingEffectM::_onOutputAgentDestroyed);
+
+            foreach (OutputVM* output, _outputAgent->outputsList()->toList())
+            {
+                if ((output != NULL) && (output->firstModel() != NULL)) {
+                    _outputsList.append(output->firstModel());
+                }
+            }
+
+            // Select the first item
+            if (_outputsList.count() > 0) {
+                setoutput(_outputsList.at(0));
+            }
+        }
+
+        Q_EMIT outputAgentChanged(value);
+    }
+}
+
+
+/**
+ * @brief Called when our "output agent" is destroyed
  * @param sender
  */
-void MappingEffectM::_onInputAgentDestroyed(QObject* sender)
+void MappingEffectM::_onOutputAgentDestroyed(QObject* sender)
 {
     Q_UNUSED(sender)
 
-    setinputAgent(NULL);
+    setoutputAgent(NULL);
 }
 

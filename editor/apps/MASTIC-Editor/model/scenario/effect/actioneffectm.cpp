@@ -58,18 +58,6 @@ void ActionEffectM::copyFrom(ActionEffectM* effect)
 
 
 /**
- * @brief Called when our agent is destroyed
- * @param sender
- */
-void ActionEffectM::_onAgentDestroyed(QObject* sender)
-{
-    Q_UNUSED(sender)
-
-    setagent(NULL);
-}
-
-
-/**
 * @brief Custom setter for agent
 * @param value
 */
@@ -93,6 +81,18 @@ void ActionEffectM::setagent(AgentInMappingVM* value)
 
         Q_EMIT agentChanged(value);
     }
+}
+
+
+/**
+ * @brief Called when our agent is destroyed
+ * @param sender
+ */
+void ActionEffectM::_onAgentDestroyed(QObject* sender)
+{
+    Q_UNUSED(sender)
+
+    setagent(NULL);
 }
 
 
