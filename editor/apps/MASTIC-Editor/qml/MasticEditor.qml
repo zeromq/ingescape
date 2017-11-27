@@ -294,8 +294,8 @@ Item {
             controller : MasticEditorC.scenarioC
             panelController: model.QtObject
 
-            // Center popup
-            x: (parent.width - actionEditor.width) / 2.0
+            // Place popup
+            x: (model.viewModel !== null)? ((parent.width - actionEditor.width) / 2.0) : ( MasticTheme.leftPanelWidth - actionEditor.width/2)
             y: (parent.height - actionEditor.height) / 2.0
             
             onOpened: {

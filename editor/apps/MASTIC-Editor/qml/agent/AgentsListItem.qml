@@ -308,7 +308,7 @@ Item {
             Button {
                 id: offButton
 
-                visible : (root.agent && !root.agent.neverAppearedOnNetwork)
+                visible : (root.agent && !root.agent.neverAppearedOnNetwork && model.isON)
                 activeFocusOnPress: true
                 enabled: visible
 

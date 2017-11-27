@@ -102,22 +102,50 @@ I2PopupBase {
         color: MasticTheme.editorsBackgroundColor
 
 
-        MouseArea {
-            id : dragMouseArea
-            hoverEnabled: true
-            anchors.fill: parent
-            drag.target: rootItem
+        // drag Area
+        I2CustomRectangle {
+            id : dragRect
+            anchors {
+                top : parent.top
+                left : parent.left
+                right : parent.right
+                margins : 2
+            }
+            height : 50
+            topLeftRadius : 5
+            topRightRadius : 5
 
-            drag.minimumX : 0
-            drag.maximumX : rootItem.parent.width - rootItem.width
-            drag.minimumY : 0
-            drag.maximumY :  rootItem.parent.height - rootItem.height
+            color :dragMouseArea.pressed? MasticTheme.editorsBackgroundColor : MasticTheme.darkBlueGreyColor
 
-            onPressed: {
-                // Emit signal "bring to front"
-                rootItem.bringToFront();
+            MouseArea {
+                id : dragMouseArea
+                hoverEnabled: true
+                anchors.fill: parent
+                drag.target: rootItem
+
+                drag.minimumX : 0
+                drag.maximumX : rootItem.parent.width - rootItem.width
+                drag.minimumY : 0
+                drag.maximumY :  rootItem.parent.height - rootItem.height
+
+                onPressed: {
+                    // Emit signal "bring to front"
+                    rootItem.bringToFront();
+                }
             }
         }
+
+        // separator
+        Rectangle {
+            anchors {
+                top : dragRect.bottom
+                left : dragRect.left
+                right : dragRect.right
+            }
+            height : 1
+            color : MasticTheme.editorsBackgroundBorderColor
+        }
+
 
         Button {
             id: btnCloseEditor
@@ -210,7 +238,7 @@ I2PopupBase {
             id : descriptionTxt
             anchors {
                 top : definitionNameItem.bottom
-                topMargin: 18
+                topMargin: 28
                 left : definitionNameItem.left
                 right : parent.right
                 rightMargin: 22
@@ -698,44 +726,44 @@ I2PopupBase {
             //                }
             //            }
 
-            Button {
-                id: okButton
+            //            Button {
+            //                id: okButton
 
-                property var boundingBox: MasticTheme.svgFileMASTIC.boundsOnElement("button");
-                height : boundingBox.height
-                width :  boundingBox.width
+            //                property var boundingBox: MasticTheme.svgFileMASTIC.boundsOnElement("button");
+            //                height : boundingBox.height
+            //                width :  boundingBox.width
 
-                enabled : visible
-                activeFocusOnPress: true
-                text : "OK"
+            //                enabled : visible
+            //                activeFocusOnPress: true
+            //                text : "OK"
 
-                anchors {
-                    verticalCenter: parent.verticalCenter
-                }
+            //                anchors {
+            //                    verticalCenter: parent.verticalCenter
+            //                }
 
-                style: I2SvgButtonStyle {
-                    fileCache: MasticTheme.svgFileMASTIC
+            //                style: I2SvgButtonStyle {
+            //                    fileCache: MasticTheme.svgFileMASTIC
 
-                    pressedID: releasedID + "-pressed"
-                    releasedID: "button"
-                    disabledID : releasedID
+            //                    pressedID: releasedID + "-pressed"
+            //                    releasedID: "button"
+            //                    disabledID : releasedID
 
-                    font {
-                        family: MasticTheme.textFontFamily
-                        weight : Font.Medium
-                        pixelSize : 16
-                    }
-                    labelColorPressed: MasticTheme.blackColor
-                    labelColorReleased: MasticTheme.whiteColor
-                    labelColorDisabled: MasticTheme.whiteColor
+            //                    font {
+            //                        family: MasticTheme.textFontFamily
+            //                        weight : Font.Medium
+            //                        pixelSize : 16
+            //                    }
+            //                    labelColorPressed: MasticTheme.blackColor
+            //                    labelColorReleased: MasticTheme.whiteColor
+            //                    labelColorDisabled: MasticTheme.whiteColor
 
-                }
+            //                }
 
-                onClicked: {
-                    // Close our popup
-                    rootItem.close();
-                }
-            }
+            //                onClicked: {
+            //                    // Close our popup
+            //                    rootItem.close();
+            //                }
+            //            }
 
         }
 

@@ -183,7 +183,7 @@ Item {
     readonly property color agentOFFLabelColor: theme.lightGreyColor
     readonly property color agentOFFLabel2Color: theme.lightGreyColor
     readonly property color agentOFFPressedLabel2Color: theme.greyColor
-    readonly property color agentOFFTextColor: theme.darkBlueGreyColor
+    readonly property color agentOFFTextColor: theme.blueGreyColor
 
 
     // List
@@ -277,6 +277,6 @@ Item {
     readonly property color agentsOFFNameMappingColor : theme.greyColor
 
     readonly property color agentsONInputsOutputsMappingColor : theme.whiteColor
-    readonly property color agentsOFFInputsOutputsMappingColor : theme.greyColor
+    readonly property color agentsOFFInputsOutputsMappingColor : theme.lightGreyColor
 
 }
