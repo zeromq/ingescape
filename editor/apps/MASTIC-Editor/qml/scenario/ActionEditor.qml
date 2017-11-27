@@ -1591,7 +1591,7 @@ I2PopupBase {
                                         height : 25
                                         width : 148
 
-                                        model: (myEffect && myEffect.modelM && myEffect.modelM.agentIopList) ? myEffect.modelM.agentIopList : 0
+                                        model: (myEffect && myEffect.modelM && myEffect.modelM.iopMergedList) ? myEffect.modelM.iopMergedList : 0
                                         inputsNumber: (myEffect && myEffect.modelM && myEffect.modelM.agent) ? myEffect.modelM.agent.inputsList.count : 0;
 
                                         function modelToString(model)
@@ -1805,7 +1805,7 @@ I2PopupBase {
                                         height : 25
                                         width : 148
 
-                                        model : (myEffect && myEffect.modelM) ? myEffect.modelM.fromAgentIopList : 0
+                                        model : (myEffect && myEffect.modelM) ? myEffect.modelM.outputsList : 0
                                         function modelToString(model)
                                         {
                                             return model.name;
@@ -1817,7 +1817,7 @@ I2PopupBase {
                                             property : "selectedItem"
                                             value : if (myEffect && myEffect.modelM)
                                                     {
-                                                        myEffect.modelM.fromAgentIOP;
+                                                        myEffect.modelM.output;
                                                     }
                                                     else {
                                                         null;
@@ -1829,7 +1829,7 @@ I2PopupBase {
                                         {
                                             if (myEffect && myEffect.modelM)
                                             {
-                                                myEffect.modelM.fromAgentIOP = oEffectsMappingFROMCombo.selectedItem;
+                                                myEffect.modelM.output = oEffectsMappingFROMCombo.selectedItem;
                                             }
                                         }
 
@@ -1985,7 +1985,7 @@ I2PopupBase {
                                         height : 25
                                         width : 148
 
-                                        model : (myEffect && myEffect.modelM && myEffect.modelM) ? myEffect.modelM.toAgentIopList : 0
+                                        model : (myEffect && myEffect.modelM) ? myEffect.modelM.inputsList : 0
                                         function modelToString(model)
                                         {
                                             return model.name;
@@ -1997,7 +1997,7 @@ I2PopupBase {
                                             property : "selectedItem"
                                             value : if (myEffect && myEffect.modelM)
                                                     {
-                                                        myEffect.modelM.toAgentIOP;
+                                                        myEffect.modelM.input;
                                                     }
                                                     else {
                                                         null;
@@ -2009,7 +2009,7 @@ I2PopupBase {
                                         {
                                             if (myEffect && myEffect.modelM)
                                             {
-                                                myEffect.modelM.toAgentIOP = iEffectsMappingTOCombo.selectedItem;
+                                                myEffect.modelM.input = iEffectsMappingTOCombo.selectedItem;
                                             }
                                         }
 

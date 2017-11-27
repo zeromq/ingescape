@@ -55,6 +55,7 @@ void registerCustomQmlTypes()
     qmlRegisterSingletonType<MappingEffectValues>(uri, 1, 0, "MappingEffectValues", &MappingEffectValues::qmlSingleton);
     qmlRegisterSingletonType<ValidationDurationType>(uri, 1, 0, "ValidationDurationType", &ValidationDurationType::qmlSingleton);
 
+
     //----------------
     //
     // Controllers
@@ -71,6 +72,7 @@ void registerCustomQmlTypes()
     qmlRegisterUncreatableType<ScenarioController>(uri, 1, 0, "ScenarioController", "Internal Class");
     qmlRegisterUncreatableType<ValuesHistoryController>(uri, 1, 0, "ValuesHistoryController", "Internal Class");
     qmlRegisterUncreatableType<AbstractTimeActionslineScenarioViewController>(uri, 1, 0, "AbstractTimeActionslineScenarioViewController", "Internal Class");
+
 
     //----------------
     //
@@ -99,6 +101,7 @@ void registerCustomQmlTypes()
     qmlRegisterUncreatableType<AgentM>(uri, 1, 0, "AgentM", "Internal class");
     qmlRegisterUncreatableType<AgentMappingM>(uri, 1, 0, "AgentMappingM", "Internal class");
     qmlRegisterUncreatableType<DefinitionM>(uri, 1, 0, "DefinitionM", "Internal class");
+    qmlRegisterUncreatableType<EffectOnAgentM>(uri, 1, 0, "EffectOnAgentM", "Internal class");
     qmlRegisterUncreatableType<ElementMappingM>(uri, 1, 0, "ElementMappingM", "Internal class");
     qmlRegisterUncreatableType<Enums>(uri, 1, 0, "Enums", "Internal class");
     qmlRegisterUncreatableType<OutputM>(uri, 1, 0, "OutputM", "Internal class");

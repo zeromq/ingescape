@@ -1,14 +1,14 @@
-
 /*
- *	IOPValueEffectM
+ *	MASTIC Editor
  *
- *  Copyright (c) 2016-2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
  *
  *
  *	Contributors:
+ *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *
  */
 
@@ -23,9 +23,7 @@
 #include "I2PropertyHelpers.h"
 
 #include "model/iop/agentiopm.h"
-#include "model/scenario/actioneffectm.h"
-
-
+#include <model/scenario/effect/actioneffectm.h>
 
 
 /**
@@ -38,11 +36,11 @@ class IOPValueEffectM: public ActionEffectM
     // Agent IOP
     I2_QML_PROPERTY(AgentIOPM* , agentIOP)
 
-    // value converted into string
+    // Value converted into string
     I2_QML_PROPERTY(QString, value)
 
-    // Concatened list of iop agents items
-    I2_QOBJECT_LISTMODEL(AgentIOPM , agentIopList)
+    // Merged list of Inputs and Outputs of the agent
+    I2_QOBJECT_LISTMODEL(AgentIOPM , iopMergedList)
 
 
 public:
@@ -71,17 +69,6 @@ public:
     * @param agent
     */
     void setagent(AgentInMappingVM* agent);
-
-
-
-Q_SIGNALS:
-
-
-public Q_SLOTS:
-
-
-protected:
-
 
 
 };

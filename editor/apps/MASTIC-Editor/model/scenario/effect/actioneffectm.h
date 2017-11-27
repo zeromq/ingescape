@@ -24,12 +24,6 @@
 
 
 /**
- * Values of effect on agent: ON, OFF
- */
-I2_ENUM_CUSTOM(AgentEffectValues, ON, OFF)
-
-
-/**
  * @brief The ActionEffectM class defines an action effect model
  */
 class ActionEffectM : public QObject
@@ -38,9 +32,6 @@ class ActionEffectM : public QObject
 
     // View model of agent in mapping
     I2_QML_PROPERTY_CUSTOM_SETTER(AgentInMappingVM*, agent)
-
-    // Value of our effect on agent
-    I2_QML_PROPERTY(AgentEffectValues::Value, agentEffectValue)
 
 
 public:
@@ -56,6 +47,7 @@ public:
       * @brief Destructor
       */
     virtual ~ActionEffectM();
+
 
     /**
     * @brief Copy from another effect model
@@ -75,9 +67,6 @@ public Q_SLOTS:
      * @param sender
      */
     void _onAgentDestroyed(QObject* sender);
-
-protected:
-
 
 
 };

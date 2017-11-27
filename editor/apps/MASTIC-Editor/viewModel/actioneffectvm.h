@@ -18,12 +18,14 @@
 #include <QObject>
 #include <QtQml>
 #include <QQmlEngine>
-#include <QJSEngine>
+
+#include <model/scenario/effect/actioneffectm.h>
+#include <model/scenario/effect/effectonagentm.h>
+#include <model/scenario/effect/iopvalueeffectm.h>
+#include <model/scenario/effect/mappingeffectm.h>
 
 #include "I2PropertyHelpers.h"
-#include "model/scenario/actioneffectm.h"
-#include "model/scenario/iopvalueeffectm.h"
-#include "model/scenario/mappingeffectm.h"
+
 
 /**
   * Types of Action Effect : AGENT, VALUE, MAPPING
@@ -70,7 +72,8 @@ Q_SIGNALS:
 
 public Q_SLOTS:
 
-private :
+
+private:
     /**
      * @brief Configure action effect VM into a specific type
      */

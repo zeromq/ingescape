@@ -64,14 +64,6 @@ public:
      * @return
      */
     QList<QPair<QString, QString>> getReverseCommands();
-
-
-    /**
-     * @brief Add a new pair (peerID,parameters) to reverse the action's effect.
-     * @param peerId of the target agent
-     * @param effectToReverse: VM of the effect we want to reverse
-     */
-    //void addReverseEffectsList(QString peerIdTargetAgent, ActionEffectVM* effectToReverseVM);
     
 
 private:

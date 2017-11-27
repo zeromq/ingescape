@@ -652,7 +652,7 @@ Item {
                 agentName: dropGhost.agent ? dropGhost.agent.name : ""
                 dropEnabled : (dropGhost.agent === null)
                               ||
-                              ((dropGhost.agent && MasticEditorC.agentsMappingC) && !MasticEditorC.agentsMappingC.getAgentInMappingForName(dropGhost.agent.name))
+                              ((dropGhost.agent && MasticEditorC.agentsMappingC) && !MasticEditorC.agentsMappingC.getAgentInMappingFromName(dropGhost.agent.name))
             }
         }
 

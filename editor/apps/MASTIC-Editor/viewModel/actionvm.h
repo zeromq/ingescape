@@ -89,6 +89,28 @@ public:
      */
     void copyFrom(ActionVM* actionVM);
 
+
+    /**
+     * @brief Notify our action that its effects has been executed
+     * @param currentTimeInMilliSeconds
+     */
+    void effectsExecuted(int currentTimeInMilliSeconds);
+
+
+    /**
+     * @brief Notify our action that its reverse effects has been executed
+     * @param currentTimeInMilliSeconds
+     */
+    void reverseEffectsExecuted(int currentTimeInMilliSeconds);
+
+
+    /**
+     * @brief Delay the current execution of our action
+     * @param currentTimeInMilliSeconds
+     */
+    void delayCurrentExecution(int currentTimeInMilliSeconds);
+
+
 Q_SIGNALS:
 
 
@@ -100,7 +122,6 @@ public Q_SLOTS:
      */
     void onActionIsValidChange(bool isValid);
 
-protected:
 
 private:
     /**
@@ -108,6 +129,12 @@ private:
      */
     void _computeEndTime();
 
+
+    /**
+     * @brief Create a new (view model of) action execution
+     * @param startTime
+     */
+    void _createActionExecution(int startTime);
 
 
 };

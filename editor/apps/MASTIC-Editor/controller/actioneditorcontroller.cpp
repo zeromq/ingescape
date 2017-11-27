@@ -108,6 +108,7 @@ void ActionEditorController::removeCondition(ActionConditionVM* conditionVM)
     }
 }
 
+
 /**
  * @brief Create a new effectVM
  */

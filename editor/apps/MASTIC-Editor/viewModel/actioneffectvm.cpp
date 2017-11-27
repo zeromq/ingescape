@@ -14,7 +14,6 @@
 
 #include "actioneffectvm.h"
 
-
 #include <QDebug>
 
 /**
@@ -46,12 +45,12 @@ QString ActionEffectTypes::enumToString(int value)
     return string;
 }
 
+
 //--------------------------------------------------------------
 //
 // ActionEffectVM
 //
 //--------------------------------------------------------------
-
 
 /**
  * @brief Default constructor
@@ -124,20 +123,17 @@ void ActionEffectVM::_configureToType(ActionEffectTypes::Value effectType)
     // Create the new type effect
     switch (effectType)
     {
-        case ActionEffectTypes::AGENT:
-        {
-            setmodelM(new ActionEffectM());
+        case ActionEffectTypes::AGENT: {
+            setmodelM(new EffectOnAgentM());
             _modelM->setagent(agent);
             break;
         }
-        case ActionEffectTypes::VALUE:
-        {
+        case ActionEffectTypes::VALUE: {
             setmodelM(new IOPValueEffectM());
             _modelM->setagent(agent);
             break;
         }
-        case ActionEffectTypes::MAPPING:
-        {
+        case ActionEffectTypes::MAPPING: {
             MappingEffectM * mappingEffect = new MappingEffectM();
             setmodelM(mappingEffect);
             mappingEffect->setagent(agent);

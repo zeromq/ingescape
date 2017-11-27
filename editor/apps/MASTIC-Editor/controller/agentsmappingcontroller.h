@@ -185,11 +185,11 @@ public Q_SLOTS:
 
 
     /**
-     * @brief Get the agent in mapping for an agent name
+     * @brief Get the agent in mapping from an agent name
      * @param name
      * @return
      */
-    AgentInMappingVM* getAgentInMappingForName(QString name);
+    AgentInMappingVM* getAgentInMappingFromName(QString name);
 
 
 private Q_SLOTS:
@@ -288,8 +288,8 @@ private:
     // Usefull to save it
     MasticModelManager* _modelManager;
 
-    // Map from agent name to a list of view models of agent in mapping
-    QHash<QString, AgentInMappingVM *> _mapFromNameToAgentInMappingViewModelsList;
+    // Map from agent name to the (view model of) agent in mapping
+    QHash<QString, AgentInMappingVM*> _mapFromNameToAgentInMapping;
 
     // Map from agentInMapping  name to a list of MapBetweenIOPVM where the agent is involved as agentFrom.
     QHash<QString, QList<MapBetweenIOPVM*>> _mapFromAgentNameToPartialMapBetweenIOPViewModelsList;

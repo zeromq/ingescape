@@ -13,35 +13,8 @@
 
 #include "actioneffectm.h"
 
-
 #include <QDebug>
-#include "iopvalueeffectm.h"
 
-/**
- * @brief Enum "AgentEffectValues" to string
- * @param value
- * @return
- */
-QString AgentEffectValues::enumToString(int value)
-{
-    QString string = "Agent Effect Value";
-
-    switch (value)
-    {
-    case AgentEffectValues::ON:
-        string = "ON";
-        break;
-
-    case AgentEffectValues::OFF:
-        string = "OFF";
-        break;
-
-    default:
-        break;
-    }
-
-    return string;
-}
 
 //--------------------------------------------------------------
 //
@@ -49,14 +22,12 @@ QString AgentEffectValues::enumToString(int value)
 //
 //--------------------------------------------------------------
 
-
 /**
  * @brief Default constructor
  * @param parent
  */
 ActionEffectM::ActionEffectM(QObject *parent) : QObject(parent),
-    _agent(NULL),
-    _agentEffectValue(AgentEffectValues::ON)
+    _agent(NULL)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -73,20 +44,18 @@ ActionEffectM::~ActionEffectM()
     setagent(NULL);
 }
 
+
 /**
 * @brief Copy from another effect model
 * @param effect to copy
 */
 void ActionEffectM::copyFrom(ActionEffectM* effect)
 {
-    if (effect != NULL)
-    {
+    if (effect != NULL) {
         setagent(effect->agent());
-
-        // FIXME TO TEST !?
-        setagentEffectValue(effect->agentEffectValue());
     }
 }
+
 
 /**
  * @brief Called when our agent is destroyed

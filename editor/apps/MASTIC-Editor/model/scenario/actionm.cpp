@@ -1,13 +1,14 @@
 /*
- *	ActionM
+ *	MASTIC Editor
  *
- *  Copyright (c) 2016-2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
  *
  *
  *	Contributors:
+ *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *
  */
 
@@ -119,31 +120,35 @@ void ActionM::copyFrom(ActionM* actionModel)
             switch (effectVM->effectType())
             {
             case ActionEffectTypes::AGENT: {
-                ActionEffectM* copiedEffect = new ActionEffectM();
-                copiedEffect->copyFrom(effectVM->modelM());
+                EffectOnAgentM* effectOnAgent = qobject_cast<EffectOnAgentM*>(effectVM->modelM());
+                if (effectOnAgent != NULL)
+                {
+                    EffectOnAgentM* copy = new EffectOnAgentM();
+                    copy->copyFrom(effectOnAgent);
 
-                copiedEffectVM->setmodelM(copiedEffect);
+                    copiedEffectVM->setmodelM(copy);
+                }
                 break;
             }
             case ActionEffectTypes::VALUE: {
-                IOPValueEffectM* iopEffect = dynamic_cast<IOPValueEffectM*>(effectVM->modelM());
+                IOPValueEffectM* iopEffect = qobject_cast<IOPValueEffectM*>(effectVM->modelM());
                 if (iopEffect != NULL)
                 {
-                    IOPValueEffectM* copiedIopEffect = new IOPValueEffectM();
-                    copiedIopEffect->copyFrom(iopEffect);
+                    IOPValueEffectM* copy = new IOPValueEffectM();
+                    copy->copyFrom(iopEffect);
 
-                    copiedEffectVM->setmodelM(copiedIopEffect);
+                    copiedEffectVM->setmodelM(copy);
                 }
                 break;
             }
             case ActionEffectTypes::MAPPING: {
-                MappingEffectM* mappingEffect = dynamic_cast<MappingEffectM*>(effectVM->modelM());
+                MappingEffectM* mappingEffect = qobject_cast<MappingEffectM*>(effectVM->modelM());
                 if(mappingEffect != NULL)
                 {
-                    MappingEffectM* copiedMappingEffect = new MappingEffectM();
-                    copiedMappingEffect->copyFrom(mappingEffect);
+                    MappingEffectM* copy = new MappingEffectM();
+                    copy->copyFrom(mappingEffect);
 
-                    copiedEffectVM->setmodelM(copiedMappingEffect);
+                    copiedEffectVM->setmodelM(copy);
                 }
                 break;
             }
@@ -161,7 +166,7 @@ void ActionM::copyFrom(ActionM* actionModel)
             ActionConditionVM* copiedConditionVM = new ActionConditionVM();
             copiedConditionVM->setconditionType(conditionVM->conditionType());
 
-            IOPValueConditionM* iopCondition = dynamic_cast<IOPValueConditionM*>(conditionVM->condition());
+            IOPValueConditionM* iopCondition = qobject_cast<IOPValueConditionM*>(conditionVM->condition());
             if(iopCondition != NULL)
             {
                 IOPValueConditionM * copiedIopCondition = new IOPValueConditionM();

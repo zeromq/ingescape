@@ -32,10 +32,7 @@ SOURCES += main.cpp \
     model/agentmappingm.cpp \
     model/mapping/elementmappingm.cpp \ 
     model/scenario/actionconditionm.cpp \
-    model/scenario/actioneffectm.cpp \
     model/scenario/actionm.cpp \
-    model/scenario/iopvalueeffectm.cpp \
-    model/scenario/mappingeffectm.cpp \
     model/scenario/scenariom.cpp \
     model/scenario/scenariomarkerm.cpp \
     model/scenario/iopvalueconditionm.cpp \
@@ -59,7 +56,11 @@ SOURCES += main.cpp \
     sortFilter/valueshistorysortfilter.cpp \
     controller/abstracttimeactionslinescenarioviewcontroller.cpp \
     model/scenario/timetickm.cpp \
-    viewModel/actionexecutionvm.cpp
+    viewModel/actionexecutionvm.cpp \
+    model/scenario/effect/actioneffectm.cpp \
+    model/scenario/effect/iopvalueeffectm.cpp \
+    model/scenario/effect/mappingeffectm.cpp \
+    model/scenario/effect/effectonagentm.cpp
 
 HEADERS += \
     model/agentm.h \
@@ -87,10 +88,7 @@ HEADERS += \
     model/agentmappingm.h \
     model/mapping/elementmappingm.h \
     model/scenario/actionconditionm.h \
-    model/scenario/actioneffectm.h \
     model/scenario/actionm.h \
-    model/scenario/iopvalueeffectm.h \
-    model/scenario/mappingeffectm.h \
     model/scenario/scenariom.h \
     model/scenario/scenariomarkerm.h \
     model/scenario/iopvalueconditionm.h \
@@ -114,7 +112,11 @@ HEADERS += \
     sortFilter/valueshistorysortfilter.h \
     controller/abstracttimeactionslinescenarioviewcontroller.h \
     model/scenario/timetickm.h \
-    viewModel/actionexecutionvm.h
+    viewModel/actionexecutionvm.h \
+    model/scenario/effect/actioneffectm.h \
+    model/scenario/effect/iopvalueeffectm.h \
+    model/scenario/effect/mappingeffectm.h \
+    model/scenario/effect/effectonagentm.h
 
 
 RESOURCES += qml.qrc

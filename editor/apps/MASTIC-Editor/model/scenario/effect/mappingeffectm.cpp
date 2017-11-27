@@ -56,15 +56,14 @@ QString MappingEffectValues::enumToString(int value)
  * @param parent
  */
 MappingEffectM::MappingEffectM(QObject *parent) : ActionEffectM(parent),
-    _fromAgentIOP(NULL),
+    _mappingEffectValue(MappingEffectValues::MAPPED),
+    _output(NULL),
     _inputAgent(NULL),
-    _toAgentIOP(NULL)
+    _input(NULL)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    // Initialize effect
-    setmappingEffectValue(MappingEffectValues::MAPPED);
 }
 
 
@@ -74,17 +73,17 @@ MappingEffectM::MappingEffectM(QObject *parent) : ActionEffectM(parent),
 MappingEffectM::~MappingEffectM()
 {
     // Clear our list
-    _toAgentIopList.clear();
-    _fromAgentIopList.clear();
+    _inputsList.clear();
+    _outputsList.clear();
 
-    // Reset FROM agent model
-    setfromAgentIOP(NULL);
+    // Reset output
+    setoutput(NULL);
 
     // Reset input agent
     setinputAgent(NULL);
 
-    // Reset TO agent iop
-    settoAgentIOP(NULL);
+    // Reset input
+    setinput(NULL);
 }
 
 /**
@@ -93,19 +92,20 @@ MappingEffectM::~MappingEffectM()
 */
 void MappingEffectM::copyFrom(ActionEffectM *effect)
 {
+    // Call mother class
     ActionEffectM::copyFrom(effect);
 
-    MappingEffectM* mappingEffect = dynamic_cast<MappingEffectM*>(effect);
+    MappingEffectM* mappingEffect = qobject_cast<MappingEffectM*>(effect);
     if(mappingEffect != NULL)
     {
-        _toAgentIopList.clear();
-        _toAgentIopList.append(mappingEffect->toAgentIopList()->toList());
-        _fromAgentIopList.clear();
-        _fromAgentIopList.append(mappingEffect->fromAgentIopList()->toList());
+        _inputsList.clear();
+        _inputsList.append(mappingEffect->inputsList()->toList());
+        _outputsList.clear();
+        _outputsList.append(mappingEffect->outputsList()->toList());
 
-        setfromAgentIOP(mappingEffect->fromAgentIOP());
+        setoutput(mappingEffect->output());
         setinputAgent(mappingEffect->inputAgent());
-        settoAgentIOP(mappingEffect->toAgentIOP());
+        setinput(mappingEffect->input());
     }
 }
 
@@ -118,13 +118,14 @@ void MappingEffectM::setagent(AgentInMappingVM* agent)
 {
     AgentInMappingVM* previousAgent = _agent;
 
+    // Call setter of mother class
     ActionEffectM::setagent(agent);
 
     if (previousAgent != agent)
     {
         // Clear the list
-        _fromAgentIopList.clear();
-        setfromAgentIOP(NULL);
+        _outputsList.clear();
+        setoutput(NULL);
 
         if(_agent != NULL)
         {
@@ -133,14 +134,14 @@ void MappingEffectM::setagent(AgentInMappingVM* agent)
             {
                 if(output->firstModel() != NULL)
                 {
-                    _fromAgentIopList.append(output->firstModel());
+                    _outputsList.append(output->firstModel());
                 }
             }
 
             // Select the first item
-            if(_fromAgentIopList.count() > 0)
+            if(_outputsList.count() > 0)
             {
-                setfromAgentIOP(_fromAgentIopList.at(0));
+                setoutput(_outputsList.at(0));
             }
         }
     }
@@ -165,8 +166,8 @@ void MappingEffectM::setinputAgent(AgentInMappingVM* value)
         _inputAgent = value;
 
         // Clear the list
-        _toAgentIopList.clear();
-        settoAgentIOP(NULL);
+        _inputsList.clear();
+        setinput(NULL);
 
         if (_inputAgent != NULL)
         {
@@ -174,13 +175,13 @@ void MappingEffectM::setinputAgent(AgentInMappingVM* value)
             foreach (InputVM* input, _inputAgent->inputsList()->toList())
             {
                 if (input->firstModel() != NULL) {
-                    _toAgentIopList.append(input->firstModel());
+                    _inputsList.append(input->firstModel());
                 }
             }
 
             // Select the first item
-            if (_toAgentIopList.count() > 0) {
-                settoAgentIOP(_toAgentIopList.at(0));
+            if (_inputsList.count() > 0) {
+                setinput(_inputsList.at(0));
             }
 
             if(_inputAgent != NULL)
