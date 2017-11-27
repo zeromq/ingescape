@@ -1805,7 +1805,7 @@ I2PopupBase {
                                         height : 25
                                         width : 148
 
-                                        model : (myEffect && myEffect.modelM) ? myEffect.modelM.fromAgentIopList : 0
+                                        model : (myEffect && myEffect.modelM) ? myEffect.modelM.outputsList : 0
                                         function modelToString(model)
                                         {
                                             return model.name;

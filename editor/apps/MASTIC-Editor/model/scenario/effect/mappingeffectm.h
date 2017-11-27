@@ -50,8 +50,8 @@ class MappingEffectM: public ActionEffectM
     // Input of the input agent
     I2_QML_PROPERTY(AgentIOPM*, input)
 
-    // Concatened list of FROM iop agents items
-    I2_QOBJECT_LISTMODEL(AgentIOPM , fromAgentIopList)
+    // List of outputs
+    I2_QOBJECT_LISTMODEL(AgentIOPM , outputsList)
 
     // Concatened list of TO iop agents items
     I2_QOBJECT_LISTMODEL(AgentIOPM , toAgentIopList)

@@ -74,7 +74,7 @@ MappingEffectM::~MappingEffectM()
 {
     // Clear our list
     _toAgentIopList.clear();
-    _fromAgentIopList.clear();
+    _outputsList.clear();
 
     // Reset output
     setoutput(NULL);
@@ -100,8 +100,8 @@ void MappingEffectM::copyFrom(ActionEffectM *effect)
     {
         _toAgentIopList.clear();
         _toAgentIopList.append(mappingEffect->toAgentIopList()->toList());
-        _fromAgentIopList.clear();
-        _fromAgentIopList.append(mappingEffect->fromAgentIopList()->toList());
+        _outputsList.clear();
+        _outputsList.append(mappingEffect->outputsList()->toList());
 
         setoutput(mappingEffect->output());
         setinputAgent(mappingEffect->inputAgent());
@@ -124,7 +124,7 @@ void MappingEffectM::setagent(AgentInMappingVM* agent)
     if (previousAgent != agent)
     {
         // Clear the list
-        _fromAgentIopList.clear();
+        _outputsList.clear();
         setoutput(NULL);
 
         if(_agent != NULL)
@@ -134,14 +134,14 @@ void MappingEffectM::setagent(AgentInMappingVM* agent)
             {
                 if(output->firstModel() != NULL)
                 {
-                    _fromAgentIopList.append(output->firstModel());
+                    _outputsList.append(output->firstModel());
                 }
             }
 
             // Select the first item
-            if(_fromAgentIopList.count() > 0)
+            if(_outputsList.count() > 0)
             {
-                setoutput(_fromAgentIopList.at(0));
+                setoutput(_outputsList.at(0));
             }
         }
     }
