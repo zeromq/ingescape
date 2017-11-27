@@ -59,13 +59,14 @@ ApplicationWindow {
             title: qsTr("Supervision")
 
             MenuItem {
-                text: qsTr("Créer un nouvel Agent")
+                text: qsTr("Create a new Agent")
+                enabled: false
                 onTriggered: {
                     console.log("Créer un nouvel Agent");
                 }
             }
             MenuItem {
-                text: qsTr("Importer une liste d'agents")
+                text: qsTr("Import agents")
                 onTriggered: {
                     //console.log("QML: Importer une liste d'agents");
 
@@ -75,7 +76,7 @@ ApplicationWindow {
                 }
             }
             MenuItem {
-                text: qsTr("Exporter la liste d'agents")
+                text: qsTr("Export agents")
 
                 onTriggered: {
                     //console.log("QML: Exporter la liste d'agents");
@@ -87,9 +88,9 @@ ApplicationWindow {
             }
 
             MenuItem {
-                text: qsTr("Historique")
+                text: qsTr("Show history")
                 onTriggered: {
-                    console.log("Historique");
+                    //console.log("Historique");
                     if (applicationLoader.item) {
                         applicationLoader.item.openHistory();
                     }
@@ -101,30 +102,34 @@ ApplicationWindow {
             title: qsTr("Mapping")
 
             MenuItem {
-                text: qsTr("Créer un nouveau mapping")
+                text: qsTr("Create a new mapping")
+                enabled: false
                 onTriggered: {
                     console.log("Créer un nouveau mapping");
                 }
             }
 
             MenuItem {
-                text: qsTr("Importer un mapping")
+                text: qsTr("Import mapping")
+                enabled: false
                 onTriggered: {
                     console.log("Importer un mapping");
                 }
             }
 
             MenuItem {
-                text: qsTr("Exporter le mapping")
+                text: qsTr("Export mapping")
+                enabled: false
                 onTriggered: {
                     console.log("Exporter le mapping");
                 }
             }
 
             MenuItem {
-                text: qsTr("Exécuter le mapping")
+                text: qsTr("Activate mapping")
+                enabled: false
                 onTriggered: {
-                    console.log("Exécuter le mapping");
+                    console.log("Activer le mapping");
                 }
             }
 
@@ -177,10 +182,10 @@ ApplicationWindow {
         }
 
         Menu {
-            title: qsTr("Scénario")
+            title: qsTr("Scenario")
 
             MenuItem {
-                text: qsTr("Importer un scénario")
+                text: qsTr("Import scenario")
                 onTriggered: {
                     if (MasticEditorC.scenarioC) {
                         MasticEditorC.scenarioC.importScenarioFromFile();
@@ -188,7 +193,7 @@ ApplicationWindow {
                 }
             }
             MenuItem {
-                text: qsTr("Exporter le scénario")
+                text: qsTr("Export scenario")
                 onTriggered: {
                     if (MasticEditorC.scenarioC) {
                         MasticEditorC.scenarioC.exportScenarioToSelectedFile();
@@ -197,7 +202,7 @@ ApplicationWindow {
             }
         }
 
-        Menu {
+        /*Menu {
             title: qsTr("Enregistrement")
 
             MenuItem {
@@ -212,28 +217,25 @@ ApplicationWindow {
                     console.log("Enregistrement TODO 2");
                 }
             }
-        }
+        }*/
 
         Menu {
-            title: qsTr("Paramètres")
+            title: qsTr("Tools")
 
             MenuItem {
-                text: qsTr("Prendre une capture d'écran")
+                text: qsTr("Create snapshot")
                 onTriggered: {
                     I2SnapshotHelper.saveWindowOfItem(content, Qt.size(0,0), "MASTIC");
                 }
             }
 
-            MenuSeparator {
-            }
-
-            MenuItem {
+            /*MenuItem {
                 text: qsTr("Fermer l'application")
                 onTriggered: {
                     console.info("QML: close application");
                     Qt.quit();
                 }
-            }
+            }*/
         }
     }
 
