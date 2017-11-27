@@ -270,7 +270,7 @@ Item {
                         model : controller ? controller.actionsInTimeLine : 0;
 
                         Item {
-                            id : actionVM
+                            id : actionVMItem
 
                             property  var myActionVM : model.QtObject;
 
@@ -378,6 +378,17 @@ Item {
                                     rightMargin:-1
                                 }
                                 color : MasticTheme.blackColor
+
+                                MouseArea {
+                                    id : openEditorMouseArea
+                                    anchors.fill : parent
+                                    hoverEnabled: true
+                                    onClicked: {
+                                        if (controller && actionVMItem.myActionVM) {
+                                            controller.openActionEditorFromActionVM(actionVMItem.myActionVM)
+                                        }
+                                    }
+                                }
                             }
 
                             Text {
@@ -389,11 +400,28 @@ Item {
                                     left : parent.left
                                 }
                                 verticalAlignment: Text.AlignVCenter
-                                color : MasticTheme.darkGreyColor
+                                color : openEditorMouseArea.pressed? MasticTheme.greyColor : MasticTheme.darkGreyColor
                                 text : model.actionModel ? model.actionModel.name : ""
                                 font {
                                     family : MasticTheme.textFontFamily
                                     pixelSize: 11
+                                }
+
+
+                                // underline
+                                Rectangle {
+                                    visible: openEditorMouseArea.containsMouse
+
+                                    anchors {
+                                        left : parent.left
+                                        right : parent.right
+                                        bottom : parent.bottom
+                                        bottomMargin : 1
+                                    }
+
+                                    height : 1
+
+                                    color : actionName.color
                                 }
 
 

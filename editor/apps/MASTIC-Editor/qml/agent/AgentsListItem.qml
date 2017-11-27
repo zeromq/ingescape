@@ -177,7 +177,7 @@ Item {
                         width : height
                         radius : height/2
 
-                        visible: (model && model.models) ? (model.models.count > 1) : false
+                        visible: (model.clonesNumber > 0)
 
                         anchors {
                             verticalCenter: parent.verticalCenter
@@ -190,7 +190,7 @@ Item {
 
                         Text {
                             anchors.centerIn : parent
-                            text: (model && model.models) ? model.models.count : ""
+                            text: model.clonesNumber
 
                             color : MasticTheme.whiteColor
                             font {

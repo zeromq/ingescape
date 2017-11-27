@@ -882,7 +882,7 @@ Rectangle {
             width: height
             radius: height/2
 
-            visible: (agentMappingVM && agentMappingVM.models.count > 1)
+            visible: (agentMappingVM && agentMappingVM.activeAgentsNumber > 1)
 
             anchors {
                 verticalCenter: agentName.verticalCenter
@@ -899,7 +899,7 @@ Rectangle {
                     verticalCenterOffset: -1
                 }
 
-                text: agentMappingVM? agentMappingVM.models.count : ""
+                text: agentMappingVM? agentMappingVM.activeAgentsNumber : ""
 
                 color: MasticTheme.whiteColor
 
