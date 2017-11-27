@@ -76,24 +76,51 @@ I2PopupBase {
             color: MasticTheme.editorsBackgroundBorderColor
         }
         color: MasticTheme.editorsBackgroundColor
+        clip : true
 
-        MouseArea {
-            id : dragMouseArea
-            hoverEnabled: true
-            anchors.fill: parent
-            drag.target: rootItem
+        // drag Area
+        I2CustomRectangle {
+            id : dragRect
+            anchors {
+                top : parent.top
+                left : parent.left
+                right : parent.right
+                margins : 2
+            }
+            height : 50
+            topLeftRadius : 5
+            topRightRadius : 5
 
-            drag.minimumX : 0
-            drag.maximumX : rootItem.parent.width - rootItem.width
-            drag.minimumY :  - rootItem.height/2
-            drag.maximumY :  rootItem.parent.height - rootItem.height/2
+            color :dragMouseArea.pressed? MasticTheme.editorsBackgroundColor : MasticTheme.darkBlueGreyColor
 
-            onPressed: {
-                // Emit signal "bring to front"
-                rootItem.bringToFront();
+            MouseArea {
+                id : dragMouseArea
+                hoverEnabled: true
+                anchors.fill: parent
+                drag.target: rootItem
+
+                drag.minimumX : 0
+                drag.maximumX : rootItem.parent.width - rootItem.width
+                drag.minimumY :  - rootItem.height/2
+                drag.maximumY :  rootItem.parent.height - rootItem.height/2
+
+                onPressed: {
+                    // Emit signal "bring to front"
+                    rootItem.bringToFront();
+                }
             }
         }
 
+        // separator
+        Rectangle {
+            anchors {
+                top : dragRect.bottom
+                left : dragRect.left
+                right : dragRect.right
+            }
+            height : 1
+            color : MasticTheme.editorsBackgroundBorderColor
+        }
 
         Item {
             anchors {
@@ -110,7 +137,7 @@ I2PopupBase {
                     right : parent.right
                 }
 
-                text : "Action Editor"
+                text : "Action"
                 elide: Text.ElideRight
                 color: MasticTheme.definitionEditorsLabelColor
                 font {
@@ -172,12 +199,12 @@ I2PopupBase {
 
                     style: I2TextFieldStyle {
                         backgroundColor: MasticTheme.darkBlueGreyColor
-                        borderColor: MasticTheme.lightGreyColor;
+                        borderColor: MasticTheme.whiteColor;
                         borderErrorColor: MasticTheme.redColor
                         radiusTextBox: 1
                         borderWidth: 0;
                         borderWidthActive: 1
-                        textIdleColor: MasticTheme.lightGreyColor;
+                        textIdleColor: MasticTheme.whiteColor;
                         textDisabledColor: MasticTheme.darkGreyColor;
 
                         padding.left: 3
@@ -221,7 +248,7 @@ I2PopupBase {
                     top : nameItem.bottom
                     topMargin : 15
                 }
-                height : childrenRect.height
+                height : textFieldStartTime.height
 
                 visible : actionVM !== null
 
@@ -258,12 +285,12 @@ I2PopupBase {
 
                     style: I2TextFieldStyle {
                         backgroundColor: MasticTheme.darkBlueGreyColor
-                        borderColor: MasticTheme.lightGreyColor;
+                        borderColor: MasticTheme.whiteColor;
                         borderErrorColor: MasticTheme.redColor
                         radiusTextBox: 1
                         borderWidth: 0;
                         borderWidthActive: 1
-                        textIdleColor: MasticTheme.lightGreyColor;
+                        textIdleColor: MasticTheme.whiteColor;
                         textDisabledColor: MasticTheme.darkGreyColor;
 
                         padding.left: 3
@@ -349,7 +376,7 @@ I2PopupBase {
                         svgFileCache : MasticTheme.svgFileMASTIC;
                         svgElementId: "arrowWhite"
 
-                        rotation: conditionsItem.isOpened? 0 : 180
+                        rotation: conditionsItem.isOpened? 0 : 270
                     }
 
                     Text {
@@ -406,9 +433,9 @@ I2PopupBase {
                             verticalCenter : parent.verticalCenter
                         }
 
-                        text : "Conditions check duration:"
+                        text : "Conditions shall be checked"
 
-                        color: MasticTheme.lightGreyColor
+                        color: MasticTheme.whiteColor
                         font {
                             family: MasticTheme.textFontFamily
                             pixelSize: 16
@@ -483,12 +510,12 @@ I2PopupBase {
 
                             style: I2TextFieldStyle {
                                 backgroundColor: MasticTheme.darkBlueGreyColor
-                                borderColor: MasticTheme.lightGreyColor;
+                                borderColor: MasticTheme.whiteColor;
                                 borderErrorColor: MasticTheme.redColor
                                 radiusTextBox: 1
                                 borderWidth: 0;
                                 borderWidthActive: 1
-                                textIdleColor: MasticTheme.lightGreyColor;
+                                textIdleColor: MasticTheme.whiteColor;
                                 textDisabledColor: MasticTheme.darkGreyColor;
 
                                 padding.left: 3
@@ -527,7 +554,7 @@ I2PopupBase {
                             visible : textFieldValidity.visible
                             text : "seconds"
 
-                            color: MasticTheme.lightGreyColor
+                            color: MasticTheme.whiteColor
                             font {
                                 family: MasticTheme.textFontFamily
                                 pixelSize: 15
@@ -626,7 +653,7 @@ I2PopupBase {
                                                         verticalCenter: parent.verticalCenter
                                                         verticalCenterOffset: 2
                                                     }
-                                                    color: control.checked? MasticTheme.lightGreyColor : MasticTheme.greyColor
+                                                    color: control.checked? MasticTheme.whiteColor : MasticTheme.lightGreyColor
 
                                                     text: model.name
                                                     elide: Text.ElideRight
@@ -652,7 +679,7 @@ I2PopupBase {
                                                         radius : height / 2
 
                                                         border.width: 0;
-                                                        color : MasticTheme.lightGreyColor
+                                                        color : MasticTheme.whiteColor
                                                     }
                                                 }
 
@@ -844,12 +871,12 @@ I2PopupBase {
 
                                         style: I2TextFieldStyle {
                                             backgroundColor: MasticTheme.darkBlueGreyColor
-                                            borderColor: MasticTheme.lightGreyColor;
+                                            borderColor: MasticTheme.whiteColor;
                                             borderErrorColor: MasticTheme.redColor
                                             radiusTextBox: 1
                                             borderWidth: 0;
                                             borderWidthActive: 1
-                                            textIdleColor: MasticTheme.lightGreyColor;
+                                            textIdleColor: MasticTheme.whiteColor;
                                             textDisabledColor: MasticTheme.darkGreyColor;
 
                                             padding.left: 3
@@ -960,7 +987,7 @@ I2PopupBase {
 
                 clip : true
                 height : isOpened?
-                             (titleadvModeMouseArea.height + revertActionitem.height + revertActionitem.anchors.topMargin + rearmActionitem.height + rearmActionitem.anchors.topMargin)
+                             (titleadvModeMouseArea.height + revertActionitem.height + revertActionitem.anchors.topMargin + rearmActionitem.height + rearmActionitem.anchors.topMargin + 5)
                            : 35
 
                 Behavior on height {
@@ -1002,7 +1029,7 @@ I2PopupBase {
                         svgFileCache : MasticTheme.svgFileMASTIC;
                         svgElementId: "arrowWhite"
 
-                        rotation: advModesItem.isOpened? 0 : 180
+                        rotation: advModesItem.isOpened? 0 : 270
                     }
 
                     Text {
@@ -1014,7 +1041,7 @@ I2PopupBase {
                             verticalCenter: parent.verticalCenter
                         }
 
-                        text : "Advanced modes"
+                        text : "Advanced options"
 
                         color: titleadvModeMouseArea.containsPress? MasticTheme.lightGreyColor : MasticTheme.whiteColor
                         font {
@@ -1070,7 +1097,7 @@ I2PopupBase {
                                     verticalCenterOffset: 2
                                 }
 
-                                color: control.checked? MasticTheme.lightGreyColor : MasticTheme.greyColor
+                                color: control.checked? MasticTheme.whiteColor : MasticTheme.lightGreyColor
 
                                 text: "Revert action"
                                 elide: Text.ElideRight
@@ -1149,9 +1176,9 @@ I2PopupBase {
                                         verticalCenter: parent.verticalCenter
                                         verticalCenterOffset: 2
                                     }
-                                    color: control.enabled ? (control.checked? MasticTheme.lightGreyColor : MasticTheme.greyColor) : "#3C3C3B"
+                                    color: control.enabled ? (control.checked? MasticTheme.whiteColor : MasticTheme.lightGreyColor) : "#3C3C3B"
 
-                                    text: "At end of conditions check duration"
+                                    text: "when conditions check terminates"
                                     elide: Text.ElideRight
 
                                     font {
@@ -1175,7 +1202,7 @@ I2PopupBase {
                                         radius : height / 2
 
                                         border.width: 0;
-                                        color : MasticTheme.lightGreyColor
+                                        color : MasticTheme.whiteColor
                                     }
                                 }
 
@@ -1218,9 +1245,9 @@ I2PopupBase {
                                             verticalCenter: parent.verticalCenter
                                             verticalCenterOffset: 2
                                         }
-                                        color: control.enabled ? (control.checked? MasticTheme.lightGreyColor : MasticTheme.greyColor) : "#3C3C3B"
+                                        color: control.enabled ? (control.checked? MasticTheme.whiteColor : MasticTheme.lightGreyColor) : "#3C3C3B"
 
-                                        text: "After " // space allowing to keep selection possible for the whole row
+                                        text: "after " // space allowing to keep selection possible for the whole row
 
                                         elide: Text.ElideRight
 
@@ -1245,7 +1272,7 @@ I2PopupBase {
                                             radius : height / 2
 
                                             border.width: 0;
-                                            color : MasticTheme.lightGreyColor
+                                            color : MasticTheme.whiteColor
                                         }
                                     }
 
@@ -1286,12 +1313,12 @@ I2PopupBase {
                                 style: I2TextFieldStyle {
                                     backgroundColor: MasticTheme.darkBlueGreyColor
                                     backgroundDisabledColor: "#3C3C3B"
-                                    borderColor: MasticTheme.lightGreyColor;
+                                    borderColor: MasticTheme.whiteColor;
                                     borderErrorColor: MasticTheme.redColor
                                     radiusTextBox: 1
                                     borderWidth: 0;
                                     borderWidthActive: 1
-                                    textIdleColor: MasticTheme.lightGreyColor;
+                                    textIdleColor: MasticTheme.whiteColor;
                                     textDisabledColor: MasticTheme.darkGreyColor;
 
                                     padding.left: 3
@@ -1334,7 +1361,7 @@ I2PopupBase {
                                     verticalCenter: parent.verticalCenter
                                     verticalCenterOffset: 2
                                 }
-                                color: revertActionAfterCB.enabled ? (revertActionAfterCB.checked? MasticTheme.lightGreyColor : MasticTheme.greyColor) : "#3C3C3B"
+                                color: revertActionAfterCB.enabled ? (revertActionAfterCB.checked? MasticTheme.whiteColor : MasticTheme.lightGreyColor) : "#3C3C3B"
 
                                 text: " seconds"
                                 elide: Text.ElideRight
@@ -1386,9 +1413,9 @@ I2PopupBase {
                                     verticalCenter: parent.verticalCenter
                                     verticalCenterOffset: 2
                                 }
-                                color: control.checked? MasticTheme.lightGreyColor : MasticTheme.greyColor
+                                color: control.checked? MasticTheme.whiteColor : MasticTheme.lightGreyColor
 
-                                text: "Rearm action after each execution"
+                                text: "Allow multiple effects triggers as long as conditions are verified"
                                 elide: Text.ElideRight
 
                                 font {
@@ -1562,7 +1589,7 @@ I2PopupBase {
                                                         verticalCenter: parent.verticalCenter
                                                         verticalCenterOffset: 2
                                                     }
-                                                    color: control.checked? MasticTheme.lightGreyColor : MasticTheme.greyColor
+                                                    color: control.checked? MasticTheme.whiteColor : MasticTheme.lightGreyColor
 
                                                     text: model.name
                                                     elide: Text.ElideRight
@@ -1588,7 +1615,7 @@ I2PopupBase {
                                                         radius : height / 2
 
                                                         border.width: 0;
-                                                        color : MasticTheme.lightGreyColor
+                                                        color : MasticTheme.whiteColor
                                                     }
                                                 }
 
@@ -1787,12 +1814,12 @@ I2PopupBase {
 
                                         style: I2TextFieldStyle {
                                             backgroundColor: MasticTheme.darkBlueGreyColor
-                                            borderColor: MasticTheme.lightGreyColor;
+                                            borderColor: MasticTheme.whiteColor;
                                             borderErrorColor: MasticTheme.redColor
                                             radiusTextBox: 1
                                             borderWidth: 0;
                                             borderWidthActive: 1
-                                            textIdleColor: MasticTheme.lightGreyColor;
+                                            textIdleColor: MasticTheme.whiteColor;
                                             textDisabledColor: MasticTheme.darkGreyColor;
 
                                             padding.left: 3

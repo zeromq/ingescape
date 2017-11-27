@@ -191,7 +191,7 @@ Item {
                 family: MasticTheme.textFontFamily;
             }
 
-            color : MasticTheme.lightGreyColor
+            color : MasticTheme.whiteColor
             verticalAlignment: Text.AlignVCenter;
             elide : Text.ElideRight;
         }
@@ -255,7 +255,7 @@ Item {
         Rectangle {
             id : popUpBackground
             anchors.fill : parent
-            color:  MasticTheme.darkBlueGreyColor
+            color:  "#2C333E"
         }
 
         ScrollView {

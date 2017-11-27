@@ -15,7 +15,7 @@ I2Combobox {
         borderWidthIdle : 0
         borderColorPressed: MasticTheme.darkBlueGreyColor
         borderWidthPressed: 1
-        currentTextColorIdle : MasticTheme.lightGreyColor
+        currentTextColorIdle : MasticTheme.whiteColor
         backgroundColorPressed : MasticTheme.darkGreyColor2
         radius: 1
 
@@ -24,7 +24,8 @@ I2Combobox {
             pixelSize : 15
         }
 
-        listBackgroundColorIdle : backgroundColorIdle
+        listBackgroundColorIdle : "#2C333E"
+        listBackgroundColorSelected: listBackgroundColorIdle
         listItemTextColorIdle : MasticTheme.lightGreyColor
         frameVisible : false
         listRadius: 0
