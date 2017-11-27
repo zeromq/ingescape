@@ -53,8 +53,8 @@ class MappingEffectM: public ActionEffectM
     // List of outputs
     I2_QOBJECT_LISTMODEL(AgentIOPM , outputsList)
 
-    // Concatened list of TO iop agents items
-    I2_QOBJECT_LISTMODEL(AgentIOPM , toAgentIopList)
+    // List of inputs
+    I2_QOBJECT_LISTMODEL(AgentIOPM , inputsList)
 
 
 public:

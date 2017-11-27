@@ -73,7 +73,7 @@ MappingEffectM::MappingEffectM(QObject *parent) : ActionEffectM(parent),
 MappingEffectM::~MappingEffectM()
 {
     // Clear our list
-    _toAgentIopList.clear();
+    _inputsList.clear();
     _outputsList.clear();
 
     // Reset output
@@ -98,8 +98,8 @@ void MappingEffectM::copyFrom(ActionEffectM *effect)
     MappingEffectM* mappingEffect = qobject_cast<MappingEffectM*>(effect);
     if(mappingEffect != NULL)
     {
-        _toAgentIopList.clear();
-        _toAgentIopList.append(mappingEffect->toAgentIopList()->toList());
+        _inputsList.clear();
+        _inputsList.append(mappingEffect->inputsList()->toList());
         _outputsList.clear();
         _outputsList.append(mappingEffect->outputsList()->toList());
 
@@ -166,7 +166,7 @@ void MappingEffectM::setinputAgent(AgentInMappingVM* value)
         _inputAgent = value;
 
         // Clear the list
-        _toAgentIopList.clear();
+        _inputsList.clear();
         setinput(NULL);
 
         if (_inputAgent != NULL)
@@ -175,13 +175,13 @@ void MappingEffectM::setinputAgent(AgentInMappingVM* value)
             foreach (InputVM* input, _inputAgent->inputsList()->toList())
             {
                 if (input->firstModel() != NULL) {
-                    _toAgentIopList.append(input->firstModel());
+                    _inputsList.append(input->firstModel());
                 }
             }
 
             // Select the first item
-            if (_toAgentIopList.count() > 0) {
-                setinput(_toAgentIopList.at(0));
+            if (_inputsList.count() > 0) {
+                setinput(_inputsList.at(0));
             }
 
             if(_inputAgent != NULL)

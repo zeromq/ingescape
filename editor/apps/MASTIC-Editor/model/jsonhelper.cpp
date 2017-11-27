@@ -894,7 +894,7 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
                         bool found = false;
 
                         QList<AgentIOPM*> outputsList;
-                        QList<AgentIOPM*> tolistIOPAgents;
+                        QList<AgentIOPM*> inputsList;
 
                         foreach (AgentInMappingVM* agent, listAgentsInMapping)
                         {
@@ -912,8 +912,7 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
                                         found = true;
                                     }
 
-                                    if(inputVM->firstModel() != NULL)
-                                    {
+                                    if (inputVM->firstModel() != NULL) {
                                         outputsList.append(inputVM->firstModel());
                                     }
                                 }
@@ -927,8 +926,7 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
                                         found = true;
                                     }
 
-                                    if(outputVM->firstModel() != NULL)
-                                    {
+                                    if (outputVM->firstModel() != NULL) {
                                         outputsList.append(outputVM->firstModel());
                                     }
                                 }
@@ -949,7 +947,7 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
                                     }
 
                                     if (inputVM->firstModel() != NULL) {
-                                        tolistIOPAgents.append(inputVM->firstModel());
+                                        inputsList.append(inputVM->firstModel());
                                     }
                                 }
 
@@ -963,7 +961,7 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
                                     }
 
                                     if (outputVM->firstModel() != NULL) {
-                                        tolistIOPAgents.append(outputVM->firstModel());
+                                        inputsList.append(outputVM->firstModel());
                                     }
                                 }
                             }
@@ -994,7 +992,7 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
 
                             // Set the list of agent iop
                             mappingEffectM->outputsList()->append(outputsList);
-                            mappingEffectM->toAgentIopList()->append(tolistIOPAgents);
+                            mappingEffectM->inputsList()->append(inputsList);
                         }
                     }
 
