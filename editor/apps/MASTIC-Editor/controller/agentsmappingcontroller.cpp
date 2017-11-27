@@ -67,20 +67,53 @@ AgentsMappingController::~AgentsMappingController()
 
 
 /**
- * @brief Remove the agent from the mapping
+ * @brief Create a new Mapping
+ */
+void AgentsMappingController::createNewMapping()
+{
+    qInfo() << "Clear current (previous) mapping";
+
+    // Remove all agents from the mapping and delete them
+    foreach (AgentInMappingVM* agent, _agentInMappingVMList.toList()) {
+        if (agent != NULL) {
+            deleteAgentInMapping(agent);
+        }
+    }
+
+    if (_modelManager != NULL) {
+        _modelManager->setisActivatedMapping(false);
+    }
+
+    qInfo() << "Create a new (empty) Mapping";
+}
+
+
+/**
+ * @brief Remove the agent from the mapping and delete it
  * @param agent
  */
-void AgentsMappingController::removeAgentFromMapping(AgentInMappingVM* agent)
+void AgentsMappingController::deleteAgentInMapping(AgentInMappingVM* agent)
 {
-    // FIXME TODO ? une seule méthode est nécessaire entre:
-    // - celle-ci: removeAgentFromMapping
-    // - _deleteAgentInMapping
+    if (agent != NULL)
+    {
+        qInfo() << "Delete Agent in Mapping" << agent->name();
 
-    if (agent != NULL) {
-        qInfo() << "Delete Agen in Mapping" << agent->name();
+        // Unselect our agent if needed
+        if (_selectedAgent == agent) {
+            setselectedAgent(NULL);
+        }
 
-        // Delete an Agent in Mapping
-        _deleteAgentInMapping(agent);
+        // Remove from hash table
+        _mapFromNameToAgentInMapping.remove(agent->name());
+
+        // TODO
+        _deleteAllMappingMadeOnTargetAgent(agent);
+
+        // Remove this Agent In Mapping from the list to update view (QML)
+        _agentInMappingVMList.remove(agent);
+
+        // Free memory
+        delete agent;
     }
 }
 
@@ -270,12 +303,13 @@ void AgentsMappingController::onAgentModelWillBeDeleted(AgentM* agent)
         {
             // Remove the model
             agentInMapping->models()->remove(agent);
-            // TODO ESTIA: Remove MapBetweenIOP  unique à ce model .
+            // TODO ESTIA: Remove MapBetweenIOP  unique à ce model
 
             // If it was the last one...
-            if (agentInMapping->models()->count() == 0) {
+            if (agentInMapping->models()->count() == 0)
+            {
                 // ...delete this agent in mapping
-                _deleteAgentInMapping(agentInMapping);
+                deleteAgentInMapping(agentInMapping);
             }
         }
     }
@@ -753,34 +787,6 @@ void AgentsMappingController::_addAgentModelsToMappingAtPosition(QString agentNa
     }
 }
 
-
-/**
- * @brief Delete an Agent in Mapping
- * @param agentInMapping
- */
-void AgentsMappingController::_deleteAgentInMapping(AgentInMappingVM* agentInMapping)
-{
-    if (agentInMapping != NULL)
-    {
-        qInfo() << "An agent mapping has been removed:" << agentInMapping->name();
-
-        // Unselect our agent if needed
-        if (_selectedAgent == agentInMapping) {
-            setselectedAgent(NULL);
-        }
-
-        // Remove from the map list
-        _mapFromNameToAgentInMapping.remove(agentInMapping->name());
-
-        _deleteAllMappingMadeOnTargetAgent(agentInMapping);
-
-        // Remove this Agent In Mapping VM from the list for the qml
-        _agentInMappingVMList.remove(agentInMapping);
-
-        // Free memory
-        delete agentInMapping;
-    }
-}
 
 /**
  * @brief Deletes all the mapBetweenIOPVM where agent in paramater is involved.

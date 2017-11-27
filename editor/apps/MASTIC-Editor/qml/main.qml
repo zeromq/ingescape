@@ -62,13 +62,13 @@ ApplicationWindow {
                 text: qsTr("Create a new Agent")
                 enabled: false
                 onTriggered: {
-                    console.log("Créer un nouvel Agent");
+                    //console.log("Create a new Agent");
                 }
             }
             MenuItem {
                 text: qsTr("Import agents")
                 onTriggered: {
-                    //console.log("QML: Importer une liste d'agents");
+                    //console.log("QML: Import agents");
 
                     if (MasticEditorC.modelManager) {
                         MasticEditorC.modelManager.importAgentsListFromSelectedFile();
@@ -79,7 +79,7 @@ ApplicationWindow {
                 text: qsTr("Export agents")
 
                 onTriggered: {
-                    //console.log("QML: Exporter la liste d'agents");
+                    //console.log("QML: Export agents");
 
                     if (MasticEditorC.agentsSupervisionC) {
                         MasticEditorC.agentsSupervisionC.exportAgentsListToSelectedFile();
@@ -90,7 +90,8 @@ ApplicationWindow {
             MenuItem {
                 text: qsTr("Show history")
                 onTriggered: {
-                    //console.log("Historique");
+                    //console.log("Show history");
+
                     if (applicationLoader.item) {
                         applicationLoader.item.openHistory();
                     }
@@ -103,33 +104,47 @@ ApplicationWindow {
 
             MenuItem {
                 text: qsTr("Create a new mapping")
-                enabled: false
+
                 onTriggered: {
-                    console.log("Créer un nouveau mapping");
+                    //console.log("Create a new mapping");
+
+                    if (MasticEditorC.agentsMappingC) {
+                        MasticEditorC.agentsMappingC.createNewMapping();
+                    }
                 }
             }
 
             MenuItem {
                 text: qsTr("Import mapping")
                 enabled: false
+
                 onTriggered: {
-                    console.log("Importer un mapping");
+                    console.log("Import mapping");
                 }
             }
 
             MenuItem {
                 text: qsTr("Export mapping")
                 enabled: false
+
                 onTriggered: {
-                    console.log("Exporter le mapping");
+                    console.log("Export mapping");
                 }
             }
 
             MenuItem {
-                text: qsTr("Activate mapping")
-                enabled: false
+                text: (MasticEditorC.modelManager && MasticEditorC.modelManager.isActivatedMapping) ? qsTr("Deactivate mapping") : qsTr("Activate mapping")
+                //enabled: false
+
                 onTriggered: {
-                    console.log("Activer le mapping");
+                    if (MasticEditorC.modelManager && MasticEditorC.modelManager.isActivatedMapping) {
+                        //console.log("DE-activate mapping");
+                        MasticEditorC.modelManager.isActivatedMapping = false;
+                    }
+                    else {
+                        //console.log("Activate mapping");
+                        MasticEditorC.modelManager.isActivatedMapping = true;
+                    }
                 }
             }
 

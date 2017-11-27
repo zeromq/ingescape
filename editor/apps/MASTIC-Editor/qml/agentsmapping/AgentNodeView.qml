@@ -862,7 +862,7 @@ Rectangle {
             onClicked: {
                 if (controller) {
                     // Delete our agent
-                    controller.removeAgentFromMapping(model.QtObject);
+                    controller.deleteAgentInMapping(model.QtObject);
                 }
             }
         }

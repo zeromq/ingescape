@@ -70,10 +70,16 @@ public:
 
 
     /**
-     * @brief Remove the agent from the mapping
+     * @brief Create a new Mapping
+     */
+    Q_INVOKABLE void createNewMapping();
+
+
+    /**
+     * @brief Remove the agent from the mapping and delete it
      * @param agent
      */
-    Q_INVOKABLE void removeAgentFromMapping(AgentInMappingVM* agent);
+    Q_INVOKABLE void deleteAgentInMapping(AgentInMappingVM* agent);
 
 
     /**
@@ -255,13 +261,6 @@ private:
      * @param position
      */
     void _addAgentModelsToMappingAtPosition(QString agentName, QList<AgentM*> agentsList, QPointF position);
-
-
-    /**
-     * @brief Delete an Agent in Mapping
-     * @param agentInMapping
-     */
-    void _deleteAgentInMapping(AgentInMappingVM* agentInMapping);
 
 
     /**
