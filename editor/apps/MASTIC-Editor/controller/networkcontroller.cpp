@@ -636,6 +636,27 @@ void NetworkController::onCommandAskedToAgentAboutOutput(QStringList peerIdsList
 
 
 /**
+ * @brief Slot when a command must be sent on the network to an agent about setting a value to one of its Input/Output/Parameter
+ * @param peerIdsList
+ * @param command
+ * @param agentIOPName
+ * @param value
+ */
+void NetworkController::onCommandAskedToAgentAboutSettingValue(QStringList peerIdsList, QString command, QString agentIOPName, QString value)
+{
+    if (!command.isEmpty() && !agentIOPName.isEmpty() && !value.isEmpty() && (peerIdsList.count() > 0)) {
+        foreach (QString peerId, peerIdsList)
+        {
+            // Send the command to a peer id of agent
+            int success = zyre_whispers(agentElements->node, peerId.toStdString().c_str(), "%s %s %s", command.toStdString().c_str(), agentIOPName.toStdString().c_str(), value.toStdString().c_str());
+
+            qInfo() << "Send command" << command << "for agent" << peerId << "and I/O/P" << agentIOPName << "about setting value" << value << "with success ?" << success;
+        }
+    }
+}
+
+
+/**
  * @brief Slot when a command must be sent on the network to an agent about mapping one of its input
  * @param peerIdsList
  * @param command

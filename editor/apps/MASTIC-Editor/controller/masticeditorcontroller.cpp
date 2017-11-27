@@ -121,7 +121,7 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     // Create the controller for the history of values
     _valuesHistoryC = new ValuesHistoryController(_modelManager, this);
 
-    // Create the controller for scenario management
+    // Create the controller FIXME TODO comment
     _timeLineC = new AbstractTimeActionslineScenarioViewController(this);
 
     // Connect to signals from the network controller
@@ -155,10 +155,15 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
 
     // Connect to signals from the controller for mapping of agents
     connect(_agentsMappingC, &AgentsMappingController::commandAskedToAgentAboutMappingInput, _networkC, &NetworkController::onCommandAskedToAgentAboutMappingInput);
-
-    // Connect to signals from the agents mapping list to the action editor
     connect(_agentsMappingC, &AgentsMappingController::agentInMappingAdded, _scenarioC, &ScenarioController::onAgentInMappingAdded);
     connect(_agentsMappingC, &AgentsMappingController::agentInMappingRemoved, _scenarioC, &ScenarioController::onAgentInMappingRemoved);
+
+    // Connect to signals from the agents mapping list to the action editor
+    //connect(_scenarioC, &AgentsSupervisionController::commandAskedToLauncher, _networkC, &NetworkController::onCommandAskedToLauncher);
+    //connect(_scenarioC, &AgentsSupervisionController::commandAskedToAgent, _networkC, &NetworkController::onCommandAskedToAgent);
+    //connect(_scenarioC, &ScenarioController::commandAskedToAgentAboutSettingValue, _networkC, &NetworkController::onCommandAskedToAgentAboutSettingValue);
+    //connect(_scenarioC, &ScenarioController::commandAskedToAgentAboutMappingInput, _networkC, &NetworkController::onCommandAskedToAgentAboutMappingInput);
+
 
     // Initialize agents list from default file
     _modelManager->importAgentsListFromDefaultFile();
