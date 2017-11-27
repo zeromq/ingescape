@@ -137,7 +137,7 @@ private:
 
     /**
      * @brief Create a new (view model of) action execution
-     * @param startTime
+     * @param startTime relative to our view model of action
      */
     void _createActionExecution(int startTime);
 

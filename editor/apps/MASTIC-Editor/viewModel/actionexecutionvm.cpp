@@ -20,6 +20,12 @@ ActionExecutionVM::ActionExecutionVM(bool shallRevert,
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
+    if (_shallRevert) {
+        qDebug() << "New Action Execution with REVERT at" << _executionTime << "seconds";
+    }
+    else {
+        qDebug() << "New Action Execution (without revert) at" << _executionTime << "seconds";
+    }
 }
 
 
