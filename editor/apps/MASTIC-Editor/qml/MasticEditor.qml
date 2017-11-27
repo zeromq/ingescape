@@ -162,7 +162,7 @@ Item {
                     frameOverlap: 1
                     tab: I2CustomRectangle {
                         color: styleData.selected ? MasticTheme.selectedTabsBackgroundColor : "transparent"
-                        implicitWidth: 107
+                        implicitWidth: leftPanelTabs.width/2
                         implicitHeight: 26
                         topRightRadius : 5
 
@@ -172,7 +172,7 @@ Item {
                             horizontalAlignment: Text.AlignHCenter
                             verticalAlignment: Text.AlignVCenter;
                             text: styleData.title
-                            color: styleData.selected ? MasticTheme.agentsListLabelColor : MasticTheme.selectedTabsBackgroundColor
+                            color: styleData.selected ? MasticTheme.agentsListLabelColor : MasticTheme.greyColor
                             wrapMode: Text.Wrap;
 
                             font {
@@ -234,16 +234,16 @@ Item {
                     }
                 }
 
-                Tab {
-                    title: qsTr("RECORDS");
-                    active : false
+//                Tab {
+//                    title: qsTr("RECORDS");
+//                    active : false
 
-                    Rectangle {
-                        id: records
-                        anchors.fill: parent
-                        color : "transparent"
-                    }
-                }
+//                    Rectangle {
+//                        id: records
+//                        anchors.fill: parent
+//                        color : "transparent"
+//                    }
+//                }
             }
 
         }

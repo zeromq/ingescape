@@ -39,8 +39,10 @@ I2PopupBase {
     //
     //--------------------------------
 
-    // our model is an action model
+    // action model
     property var actionM: model.editedAction;
+    // action view model
+    property var actionVM: model.viewModel
 
     // our scenario controller
     property var controller: null;
@@ -209,6 +211,93 @@ I2PopupBase {
 
 
             //
+            // Start Time
+            //
+            Item {
+                id : startTimeItem
+                anchors {
+                    left : parent.left
+                    right : parent.right
+                    top : nameItem.bottom
+                    topMargin : 15
+                }
+                height : childrenRect.height
+
+                visible : actionVM !== null
+
+                Text {
+                    id : textstartTime
+                    anchors {
+                        left : parent.left
+                        verticalCenter : parent.verticalCenter
+                    }
+
+                    text : "Start Time:"
+
+                    color: MasticTheme.lightGreyColor
+                    font {
+                        family: MasticTheme.textFontFamily
+                        pixelSize: 16
+                    }
+                }
+
+
+                TextField {
+                    id: textFieldStartTime
+
+                    anchors {
+                        left : textstartTime.right
+                        leftMargin: 10
+                        verticalCenter : parent.verticalCenter
+                    }
+
+                    height: 25
+                    width: 105
+                    verticalAlignment: TextInput.AlignVCenter
+                    text: actionVM ? actionVM.startTime : ""
+
+                    style: I2TextFieldStyle {
+                        backgroundColor: MasticTheme.darkBlueGreyColor
+                        borderColor: MasticTheme.lightGreyColor;
+                        borderErrorColor: MasticTheme.redColor
+                        radiusTextBox: 1
+                        borderWidth: 0;
+                        borderWidthActive: 1
+                        textIdleColor: MasticTheme.lightGreyColor;
+                        textDisabledColor: MasticTheme.darkGreyColor;
+
+                        padding.left: 3
+                        padding.right: 3
+
+                        font {
+                            pixelSize:15
+                            family: MasticTheme.textFontFamily
+                        }
+
+                    }
+
+                    onTextChanged: {
+                        if (activeFocus &&  actionVM ) {
+                            actionVM.startTime = text;
+                        }
+                    }
+
+                    Binding {
+                        target : textFieldName
+                        property :  "text"
+                        value : if (actionVM) {
+                                    actionVM.startTime
+                                }
+                                else {
+                                    "";
+                                }
+                    }
+                }
+
+            }
+
+
+            //
             // Conditions
             //
             Item {
@@ -216,7 +305,7 @@ I2PopupBase {
                 anchors {
                     left : parent.left
                     right : parent.right
-                    top : nameItem.bottom
+                    top : (startTimeItem.visible) ? startTimeItem.bottom : nameItem.bottom
                     topMargin: 14
                 }
                 height  : isOpened ? 230 : 37

@@ -84,7 +84,7 @@ Item {
 
         anchors {
             top: parent.top
-            topMargin: 108
+            topMargin: 78
             bottom: parent.bottom
             left: parent.left
             right: parent.right
@@ -169,7 +169,7 @@ Item {
 
             anchors {
                 top: parent.top
-                topMargin: 43
+                topMargin: 23
                 left: parent.left
                 leftMargin: 10
             }
