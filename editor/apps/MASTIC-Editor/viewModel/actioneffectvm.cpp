@@ -138,11 +138,11 @@ void ActionEffectVM::_configureToType(ActionEffectTypes::Value effectType)
             setmodelM(mappingEffect);
             mappingEffect->setagent(agent);
 
-            if(_secondAgentInMapping != NULL) {
-                mappingEffect->setinputAgent(_secondAgentInMapping);
+            if (_secondAgentInMapping != NULL) {
+                mappingEffect->setoutputAgent(_secondAgentInMapping);
             }
             else {
-                mappingEffect->setinputAgent(agent);
+                mappingEffect->setoutputAgent(agent);
             }
             break;
         }
