@@ -147,18 +147,18 @@ QList<QPair<QString, QString>> ActionExecutionVM::getCommandsForEffectsAndInitRe
             {
                 // Try to cast as Mapping Effect
                 MappingEffectM* mappingEffect = qobject_cast<MappingEffectM*>(effectModel);
-                if ((mappingEffect != NULL) && (mappingEffect->input() != NULL) && (mappingEffect->output() != NULL))
+                if ((mappingEffect != NULL) && (mappingEffect->input() != NULL) && (mappingEffect->outputAgent() != NULL) && (mappingEffect->output() != NULL))
                 {
                     switch (mappingEffect->mappingEffectValue())
                     {
                         case MappingEffectValues::MAPPED:
-                            commandAndParameters = QString("%1 %2 %3 %4").arg("MAP", mappingEffect->input()->name(), agentName, mappingEffect->output()->name());
-                            reverseCommandAndParameters = QString("%1 %2 %3 %4").arg("UNMAP", mappingEffect->input()->name(), agentName, mappingEffect->output()->name());
+                            commandAndParameters = QString("%1 %2 %3 %4").arg("MAP", mappingEffect->input()->name(), mappingEffect->outputAgent()->name(), mappingEffect->output()->name());
+                            reverseCommandAndParameters = QString("%1 %2 %3 %4").arg("UNMAP", mappingEffect->input()->name(), mappingEffect->outputAgent()->name(), mappingEffect->output()->name());
                             break;
 
                         case MappingEffectValues::UNMAPPED:
-                            commandAndParameters = QString("%1 %2 %3 %4").arg("UNMAP", mappingEffect->input()->name(), mappingEffect->agent()->name(), mappingEffect->output()->name());
-                            reverseCommandAndParameters = QString("%1 %2 %3 %4").arg("MAP", mappingEffect->input()->name(), agentName, mappingEffect->output()->name());
+                            commandAndParameters = QString("%1 %2 %3 %4").arg("UNMAP", mappingEffect->input()->name(), mappingEffect->outputAgent()->name(), mappingEffect->output()->name());
+                            reverseCommandAndParameters = QString("%1 %2 %3 %4").arg("MAP", mappingEffect->input()->name(), mappingEffect->outputAgent()->name(), mappingEffect->output()->name());
                             break;
 
                         default:
