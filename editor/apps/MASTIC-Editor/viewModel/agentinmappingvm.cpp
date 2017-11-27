@@ -31,7 +31,8 @@ AgentInMappingVM::AgentInMappingVM(QList<AgentM*> models,
     _reducedMapValueTypeGroupInInput(AgentIOPValueTypeGroups::MIXED),
     _reducedMapValueTypeGroupInOutput(AgentIOPValueTypeGroups::MIXED),
     _isGhost(false),
-    _areIdenticalsAllDefinitions(true)
+    _areIdenticalsAllDefinitions(true),
+    _activeAgentsNumber(0)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -692,14 +693,20 @@ void AgentInMappingVM::_updateWithAllModels()
 void AgentInMappingVM::_updateIsON()
 {
     bool globalIsON = false;
+    int activeAgentsNumber = 0;
 
-    foreach (AgentM* model, _models.toList()) {
-        if ((model != NULL) && model->isON()) {
+    foreach (AgentM* model, _models.toList())
+    {
+        if ((model != NULL) && model->isON())
+        {
             globalIsON = true;
-            break;
+            //break;
+            activeAgentsNumber++;
         }
     }
+
     setisON(globalIsON);
+    setactiveAgentsNumber(activeAgentsNumber);
 }
 
 

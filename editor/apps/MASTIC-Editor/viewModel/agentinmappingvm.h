@@ -67,6 +67,9 @@ class AgentInMappingVM : public QObject
     // Flag indicating if all definitions are strictly identicals
     I2_QML_PROPERTY_READONLY(bool, areIdenticalsAllDefinitions)
 
+    // Number of active agents
+    I2_QML_PROPERTY_READONLY(int, activeAgentsNumber)
+
 
 public:
     /**
