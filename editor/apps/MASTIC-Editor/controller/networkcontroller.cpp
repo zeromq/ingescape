@@ -275,6 +275,7 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
 void onObserveInputCallback(iop_t iopType, const char* name, iopType_t valueType, void* value, long valueSize, void* myData)
 {
     Q_UNUSED(value);
+    Q_UNUSED(valueSize)
 
     // Historique: on log la value et le dateTime.
     NetworkController* networkController = (NetworkController*)myData;
@@ -343,7 +344,7 @@ void onObserveInputCallback(iop_t iopType, const char* name, iopType_t valueType
                     break;
                 }
                 case DATA_T: {
-                    // On peut utiliser directement value plutôt que de re-générer un tableau de bytes ??
+                    /*// On peut utiliser directement value plutôt que de re-générer un tableau de bytes ??
                     // On stocke dans un dossier le media (eg video, son, image) et on log le path et le start time ??
                     void* data = NULL;
                     int result = mtic_readInputAsData(name, &data, &valueSize);
@@ -357,7 +358,11 @@ void onObserveInputCallback(iop_t iopType, const char* name, iopType_t valueType
                     }
                     else {
                         qCritical() << "Can NOT read input" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType) << "(DATA of size:" << valueSize << ")";
-                    }
+                    }*/
+
+                    // FIXME TODO: use mtic_readInputAsData
+                    isValid = true;
+
                     break;
                 }
                 default: {
@@ -412,7 +417,7 @@ NetworkController::NetworkController(QObject *parent) : QObject(parent),
     // Set the name of our agent
     mtic_setAgentName(_editorAgentName.toStdString().c_str());
 
-    //add zyre header to declare ouserelves as an editor
+    //add zyre header to declare ourselves as an editor
     network_isEditor = true;
 
     //
@@ -427,6 +432,7 @@ NetworkController::NetworkController(QObject *parent) : QObject(parent),
                                   \"parameters\": [],   \
                                   \"inputs\": [],       \
                                   \"outputs\": [] }}";
+
     mtic_loadDefinition(definitionByDefault.toStdString().c_str());
 
     //
@@ -439,7 +445,6 @@ NetworkController::NetworkController(QObject *parent) : QObject(parent),
                                   \"version\": \"" + version + "\",  \
                                   \"mapping_out\": [],   \
                                   \"mapping_cat\": [] }}";
-
 
     mtic_loadMapping(mappingByDefault.toStdString().c_str());
 }
@@ -674,30 +679,19 @@ void NetworkController::onAddInputsToEditorForOutputs(QString agentName, QList<O
                 switch (output->agentIOPValueType())
                 {
                 case AgentIOPValueTypes::INTEGER: {
-                    bool success = false;
-                    int defaultValue = output->defaultValue().toInt(&success);
-                    if (success) {
-                        resultCreateInput = mtic_createInput(inputName.toStdString().c_str(), INTEGER_T, &defaultValue, sizeof(int));
-                    }
+                    resultCreateInput = mtic_createInput(inputName.toStdString().c_str(), INTEGER_T, NULL, 0);
                     break;
                 }
                 case AgentIOPValueTypes::DOUBLE: {
-                    bool success = false;
-                    double defaultValue = output->defaultValue().toDouble(&success);
-                    if (success) {
-                        resultCreateInput = mtic_createInput(inputName.toStdString().c_str(), DOUBLE_T, &defaultValue, sizeof(double));
-                    }
+                    resultCreateInput = mtic_createInput(inputName.toStdString().c_str(), DOUBLE_T, NULL, 0);
                     break;
                 }
                 case AgentIOPValueTypes::STRING: {
-                    const char* defaultValue = output->defaultValue().toString().toStdString().c_str();
-                    //resultCreateInput = mtic_createInput(inputName.toStdString().c_str(), STRING_T, (void*)defaultValue, strlen(defaultValue) * sizeof(char));
-                    resultCreateInput = mtic_createInput(inputName.toStdString().c_str(), STRING_T, (void*)defaultValue, (strlen(defaultValue) + 1) * sizeof(char));
+                    resultCreateInput = mtic_createInput(inputName.toStdString().c_str(), STRING_T, NULL, 0);
                     break;
                 }
                 case AgentIOPValueTypes::BOOL: {
-                    bool defaultValue = output->defaultValue().toBool();
-                    resultCreateInput = mtic_createInput(inputName.toStdString().c_str(), BOOL_T, &defaultValue, sizeof(bool));
+                    resultCreateInput = mtic_createInput(inputName.toStdString().c_str(), BOOL_T, NULL, 0);
                     break;
                 }
                 case AgentIOPValueTypes::IMPULSION: {
@@ -705,8 +699,7 @@ void NetworkController::onAddInputsToEditorForOutputs(QString agentName, QList<O
                     break;
                 }
                 case AgentIOPValueTypes::DATA: {
-                    // FIXME TODO mtic_createInput DATA_T
-                    //resultCreateInput = mtic_createInput(inputName.toStdString().c_str(), DATA_T, &defaultValue, sizeof(...));
+                    resultCreateInput = mtic_createInput(inputName.toStdString().c_str(), DATA_T, NULL, 0);
                     break;
                 }
                 default: {
