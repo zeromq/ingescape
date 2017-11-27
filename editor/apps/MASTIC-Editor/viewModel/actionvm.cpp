@@ -303,17 +303,6 @@ void ActionVM::_onValidityDurationChange()
     _computeEndTime();
 }
 
-///**
-// * @brief Slot on the validity duration type
-// * @param validity duration type
-// */
-//void ActionVM::_onValidityDurationTypeChange()
-//{
-//    Q_UNUSED(validityDurationType)
-
-//    _computeEndTime();
-//}
-
 /**
  * @brief Compute the endTime according to the action model and its type
  */
