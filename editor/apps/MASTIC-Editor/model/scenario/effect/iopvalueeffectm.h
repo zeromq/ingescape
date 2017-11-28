@@ -34,7 +34,10 @@ class IOPValueEffectM: public ActionEffectM
     Q_OBJECT
 
     // Agent IOP
-    I2_QML_PROPERTY(AgentIOPM* , agentIOP)
+    I2_QML_PROPERTY_CUSTOM_SETTER(AgentIOPM* , agentIOP)
+
+    // Agent IOP name
+    I2_QML_PROPERTY(QString , agentIOPName)
 
     // Value converted into string
     I2_QML_PROPERTY(QString, value)
@@ -70,6 +73,30 @@ public:
     */
     void setagent(AgentInMappingVM* agent);
 
+public Q_SLOTS:
+
+    /**
+      * @brief Slot on agent inputs list change
+      */
+    void onInputsListChange(QList<InputVM*> inputsList);
+
+    /**
+      * @brief Slot on agent outputs list change
+      */
+    void onOutputsListChange(QList<OutputVM *> outputsList);
+
+protected Q_SLOTS:
+    /**
+     * @brief Called when our agent iop model is destroyed
+     * @param sender
+     */
+    void _onAgentIopModelDestroyed(QObject* sender);
+
+private:
+    /**
+    * @brief Update the selected agent iop
+    */
+    void updateAgentIOPSelected();
 
 };
 

@@ -58,7 +58,7 @@ QString ActionEffectTypes::enumToString(int value)
  */
 ActionEffectVM::ActionEffectVM(QObject *parent) : QObject(parent),
     _modelM(NULL),
-    _effectType(ActionEffectTypes::AGENT),
+    _effectType(ActionEffectTypes::VALUE),
     _secondAgentInMapping(NULL)
 {
     // Force ownership of our object, it will prevent Qml from stealing it

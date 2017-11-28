@@ -166,17 +166,17 @@ void ActionM::copyFrom(ActionM* actionModel)
             ActionConditionVM* copiedConditionVM = new ActionConditionVM();
             copiedConditionVM->setconditionType(conditionVM->conditionType());
 
-            IOPValueConditionM* iopCondition = qobject_cast<IOPValueConditionM*>(conditionVM->condition());
+            IOPValueConditionM* iopCondition = qobject_cast<IOPValueConditionM*>(conditionVM->modelM());
             if(iopCondition != NULL)
             {
                 IOPValueConditionM * copiedIopCondition = new IOPValueConditionM();
                 copiedIopCondition->copyFrom(iopCondition);
-                copiedConditionVM->setcondition(copiedIopCondition);
+                copiedConditionVM->setmodelM(copiedIopCondition);
             }
             else {
                 ActionConditionM * copiedIopCondition = new ActionConditionM();
-                copiedIopCondition->copyFrom(conditionVM->condition());
-                copiedConditionVM->setcondition(copiedIopCondition);
+                copiedIopCondition->copyFrom(conditionVM->modelM());
+                copiedConditionVM->setmodelM(copiedIopCondition);
             }
             _conditionsList.append(copiedConditionVM);
         }
@@ -320,15 +320,16 @@ void ActionM::initializeConditionsConnections()
 {
     if(_isConnected == false)
     {
+        // Initialize conditions connections
         foreach (ActionConditionVM* conditionVM, _conditionsList.toList())
         {
-            if(conditionVM->condition() != NULL)
+            if(conditionVM->modelM() != NULL)
             {
                 // Connect the valid change
-                connect(conditionVM->condition(),&ActionConditionM::isValidChanged,this,&ActionM::_onConditionValidationChange);
+                connect(conditionVM->modelM(),&ActionConditionM::isValidChanged,this,&ActionM::_onConditionValidationChange);
 
                 // Intialize the connection
-                conditionVM->condition()->initializeConnections();
+                conditionVM->modelM()->initializeConnections();
             }
         }
 
@@ -346,13 +347,14 @@ void ActionM::resetConditionsConnections()
 {
     if(_isConnected == true)
     {
+        // Initialize conditions connections
         foreach (ActionConditionVM* conditionVM, _conditionsList.toList())
         {
-            if(conditionVM->condition() != NULL)
+            if(conditionVM->modelM() != NULL)
             {
-                disconnect(conditionVM->condition(),&ActionConditionM::isValidChanged,this,&ActionM::_onConditionValidationChange);
+                disconnect(conditionVM->modelM(),&ActionConditionM::isValidChanged,this,&ActionM::_onConditionValidationChange);
 
-                conditionVM->condition()->resetConnections();
+                conditionVM->modelM()->resetConnections();
             }
         }
 
@@ -372,9 +374,9 @@ void ActionM::_onConditionValidationChange(bool isValid)
 
     foreach (ActionConditionVM* conditionVM, _conditionsList.toList())
     {
-        if(conditionVM->condition() != NULL)
+        if(conditionVM->modelM() != NULL)
         {
-            bool valid = conditionVM->condition()->isValid();
+            bool valid = conditionVM->modelM()->isValid();
             actionValidation = valid && actionValidation;
         }
 

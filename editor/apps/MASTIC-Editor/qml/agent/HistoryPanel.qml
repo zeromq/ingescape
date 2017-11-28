@@ -97,6 +97,11 @@ I2PopupBase {
         color: MasticTheme.editorsBackgroundColor
 
 
+        // catch events
+        MultiPointTouchArea {
+            anchors.fill: parent
+        }
+
         // drag Area
         I2CustomRectangle {
             id : dragRect

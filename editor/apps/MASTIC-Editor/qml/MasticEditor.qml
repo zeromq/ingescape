@@ -295,7 +295,7 @@ Item {
             panelController: model.QtObject
 
             // Place popup
-            x: (model.viewModel !== null)? ((parent.width - actionEditor.width) / 2.0) : ( MasticTheme.leftPanelWidth - actionEditor.width/2)
+            x: (model.editedViewModel !== null)? ((parent.width - actionEditor.width) / 2.0) : ( MasticTheme.leftPanelWidth - actionEditor.width/2)
             y: (parent.height - actionEditor.height) / 2.0
             
             onOpened: {

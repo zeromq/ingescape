@@ -56,7 +56,6 @@ void ActionEffectM::copyFrom(ActionEffectM* effect)
     }
 }
 
-
 /**
 * @brief Custom setter for agent
 * @param value
