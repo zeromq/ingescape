@@ -324,7 +324,8 @@ Item {
 
                                     // Not revert action
                                     I2SvgItem {
-                                        x : viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(model.executionTime, viewController.pixelsPerMinute) - width/2;
+                                        x : viewController.convertDurationInSecondsToLengthInCoordinateSystem(model.executionTime/1000, viewController.pixelsPerMinute) - width/2;
+
                                         anchors {
                                             verticalCenter: parent.verticalCenter
                                         }
@@ -345,7 +346,7 @@ Item {
 
                                         I2SvgItem {
                                             id : actionExecution
-                                            x : viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(model.executionTime, viewController.pixelsPerMinute);
+                                            x : viewController.convertDurationInSecondsToLengthInCoordinateSystem(model.executionTime/1000, viewController.pixelsPerMinute);
                                             y : 0
 
                                             svgFileCache : MasticTheme.svgFileMASTIC;
@@ -365,7 +366,7 @@ Item {
 
                                         I2SvgItem {
                                             id : revertActionExecution
-                                            x : viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(model.reverseTime, viewController.pixelsPerMinute) - width;
+                                            x : viewController.convertDurationInSecondsToLengthInCoordinateSystem(model.reverseTime/1000, viewController.pixelsPerMinute) - width;
                                             y : 0
                                             rotation : 180
                                             svgFileCache : MasticTheme.svgFileMASTIC;
@@ -431,8 +432,168 @@ Item {
 
 
                             }
+
                         }
                     }
+
+
+
+                    // allow dropping actions in timeline
+                    DropArea {
+                        anchors.fill: parent
+                        keys: ["ActionsListItem"]
+
+                        onEntered: {
+                            var dragItem = drag.source;
+                            // display ghost
+                            ghostAction.actionModelGhost = dragItem.action;
+                        }
+
+                        onPositionChanged: {
+                            var dragItem = drag.source;
+
+                            var timeInMilliSeconds = viewController.convertAbscissaInCoordinateSystemToTimeInMilliseconds(drag.x, viewController.pixelsPerMinute)
+                            var lineNumber = Math.floor(drag.y / rootItem.lineHeight)
+                            var canInsertActionVM = false;
+
+                            if (controller && (typeof dragItem.action !== 'undefined' && controller)) {
+                                // test if the drop is possible
+                                canInsertActionVM = controller.canInsertActionVMTo(dragItem.action, timeInMilliSeconds, lineNumber)
+
+                                if ( canInsertActionVM ) {
+                                    // move ghost
+                                    ghostAction.actionModelGhost = dragItem.action;
+                                    ghostAction.x = viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(timeInMilliSeconds, viewController.pixelsPerMinute);
+                                    ghostAction.y = lineNumber * rootItem.lineHeight;
+                                    ghostAction.startTime = timeInMilliSeconds;
+                                } else {
+                                    // remove ghost
+                                    ghostAction.actionModelGhost = null;
+                                }
+
+                            }
+
+                        }
+
+                        onExited: {
+                            // remove ghost
+                            ghostAction.actionModelGhost = null;
+                        }
+
+                        onDropped: {
+                            var dragItem = drag.source;
+                            var timeInMilliSeconds = viewController.convertAbscissaInCoordinateSystemToTimeInMilliseconds(drag.x, viewController.pixelsPerMinute)
+                            var lineNumber = Math.floor(drag.y / rootItem.lineHeight)
+
+                            if (typeof dragItem.action !== 'undefined' && controller)
+                            {
+
+                                controller.addActionVMAtTime(dragItem.action, timeInMilliSeconds, lineNumber);
+
+                                // remove ghost
+                                ghostAction.actionModelGhost = null;
+                            }
+
+                        }
+                    }
+
+
+                    // Ghost Action
+                    Item {
+                        id : ghostAction
+                        x: 0
+                        y : 0
+
+                        property var actionModelGhost : null;
+                        property int startTime : 0;
+                        opacity : (actionModelGhost !== null) ? 0.5 : 0
+
+                        height : rootItem.lineHeight/2
+                        width : if (actionModelGhost) {
+                                    switch (actionModelGhost.validityDurationType)
+                                    {
+                                    case ValidationDurationType.IMMEDIATE:
+                                        0;
+                                        break;
+                                    case ValidationDurationType.FOREVER:
+                                        (viewController.timeTicksTotalWidth - viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(startTime, viewController.pixelsPerMinute))
+                                        break;
+                                    case ValidationDurationType.CUSTOM:
+                                        viewController.convertDurationInSecondsToLengthInCoordinateSystem(actionModelGhost.validityDuration/1000, viewController.pixelsPerMinute)
+                                        break;
+                                    default:
+                                        0
+                                        break;
+                                    }
+                                }
+                                else {
+                                    0;
+                                }
+
+                        Rectangle {
+                            id : rect
+                            anchors {
+                                top : parent.top
+                                left : parent.left
+                                right : parent.right
+                            }
+
+                            height : rootItem.lineHeight/2
+                            color : MasticTheme.blueGreyColor2
+                        }
+
+                        // Not revert action
+                        I2SvgItem {
+                            x : - width/2;
+                            anchors {
+                                verticalCenter: parent.verticalCenter
+                            }
+
+                            visible : ghostAction.actionModelGhost && !ghostAction.actionModelGhost.shallRevert
+
+                            svgFileCache : MasticTheme.svgFileMASTIC;
+                            svgElementId: "timelineAction";
+                        }
+
+                        // Revert action
+                        Item {
+                            visible : ghostAction.actionModelGhost && ghostAction.actionModelGhost.shallRevert
+                            height : childrenRect.height
+                            anchors {
+                                verticalCenter: parent.verticalCenter
+                            }
+
+                            I2SvgItem {
+                                id : actionExecutionGhost
+                                x : 0;
+                                y : 0
+
+                                svgFileCache : MasticTheme.svgFileMASTIC;
+                                svgElementId: "revertAction"
+                            }
+
+                            Rectangle {
+                                anchors {
+                                    verticalCenter: actionExecutionGhost.verticalCenter
+                                    left : actionExecutionGhost.horizontalCenter
+                                    right : revertActionExecutionGhost.horizontalCenter
+                                }
+                                height : 1
+                                color : MasticTheme.lightGreyColor;
+
+                            }
+
+                            I2SvgItem {
+                                id : revertActionExecutionGhost
+                                x : 60 // viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(model.reverseTime, viewController.pixelsPerMinute) - width;
+                                y : 0
+                                rotation : 180
+                                svgFileCache : MasticTheme.svgFileMASTIC;
+                                svgElementId:"revertAction" ;
+                            }
+                        }
+                    }
+
                 }
             }
         }

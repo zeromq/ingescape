@@ -430,7 +430,7 @@ Item {
 
                     Rectangle {
                         id : itemDragged
-                        height : nameAction.height + 20
+                        height : nameAction.height + 10
                         width : nameAction.width + 10
                         color : MasticTheme.darkBlueGreyColor
                         visible: mouseArea.drag.active

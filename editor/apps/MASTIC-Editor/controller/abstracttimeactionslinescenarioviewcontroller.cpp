@@ -166,9 +166,31 @@ qreal AbstractTimeActionslineScenarioViewController::convertTimeInMillisecondsTo
     // Compute delta in seconds between this date and our origin
     int deltaSeconds = (timeInMilliSeconds/1000 - _startRelativeTimeInSeconds);
 
+    qDebug() << "timeInMilliSeconds" << timeInMilliSeconds << "deltaSeconds" << deltaSeconds << "return = " << qRound(_pixelsPerMinute * (_timeMarginInMinutes + deltaSeconds/60.0));
+
     // Round value to avoid rendering artefacts
     return qRound(_pixelsPerMinute * (_timeMarginInMinutes + deltaSeconds/60.0));
 }
+
+
+/**
+ * @brief Convert a given X value (abscissa) of our coordinate system into a time
+ *
+ * @param X value
+ * @param extraQmlUpdateField Extra QML field used to recall this function when needed (binding)
+ *
+ * @return
+ */
+int AbstractTimeActionslineScenarioViewController::convertAbscissaInCoordinateSystemToTimeInMilliseconds(qreal xValue, qreal extraQmlUpdateField)
+{
+    Q_UNUSED(extraQmlUpdateField)
+
+   qreal timeSeconds = ((xValue/_pixelsPerMinute) - _timeMarginInMinutes)* 60.0;
+
+    return ((timeSeconds + _startRelativeTimeInSeconds) * 1000.0);
+}
+
+
 
 /**
  * @brief Convert a given QTime object into a X value (abscissa) of our coordinate system
