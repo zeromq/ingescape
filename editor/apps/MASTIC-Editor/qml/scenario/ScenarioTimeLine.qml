@@ -333,7 +333,9 @@ Item {
                                         visible : !model.shallRevert
 
                                         svgFileCache : MasticTheme.svgFileMASTIC;
-                                        svgElementId: (model.isExecuted) ? "timelineAction" : "currentAction";
+                                        svgElementId: (model.neverExecuted)?
+                                                          "notExecutedAction"
+                                                        : ((model.isExecuted) ? "timelineAction" : "currentAction");
                                     }
 
                                     // Revert action
@@ -350,7 +352,9 @@ Item {
                                             y : 0
 
                                             svgFileCache : MasticTheme.svgFileMASTIC;
-                                            svgElementId: (model.isExecuted) ? "revertAction" : "currentRevertAction";
+                                            svgElementId: (model.neverExecuted)?
+                                                              "notExecutedRevertAction"
+                                                            : ((model.isExecuted) ? "revertAction" : "currentRevertAction");
                                         }
 
                                         Rectangle {
@@ -370,7 +374,9 @@ Item {
                                             y : 0
                                             rotation : 180
                                             svgFileCache : MasticTheme.svgFileMASTIC;
-                                            svgElementId: (model.isExecuted && !model.isWaitingRevert) ? "revertAction" : "currentRevertAction";
+                                            svgElementId: (model.neverExecuted)?
+                                                              "notExecutedRevertAction"
+                                                            : ((model.isExecuted) ? "revertAction" : "currentRevertAction");
                                         }
                                     }
                                 }
@@ -585,7 +591,20 @@ Item {
 
                             I2SvgItem {
                                 id : revertActionExecutionGhost
-                                x : 60 // viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(model.reverseTime, viewController.pixelsPerMinute) - width;
+                                x : if (ghostAction.actionModelGhost) {
+                                        if (ghostAction.actionModelGhost.shallRevertWhenValidityIsOver)
+                                        {
+                                            rect.width - width;
+                                        } else if (ghostAction.actionModelGhost.shallRevertAfterTime) {
+                                            viewController.convertDurationInSecondsToLengthInCoordinateSystem(ghostAction.actionModelGhost.revertAfterTime/1000, viewController.pixelsPerMinute) - width;
+                                        } else {
+                                            0;
+                                        }
+                                    }
+                                    else {
+                                        0;
+                                    }
+
                                 y : 0
                                 rotation : 180
                                 svgFileCache : MasticTheme.svgFileMASTIC;
