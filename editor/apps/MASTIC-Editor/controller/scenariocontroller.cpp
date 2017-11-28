@@ -800,8 +800,10 @@ bool ScenarioController::canInsertActionVMTo(ActionM* actionMToInsert, int time,
         I2CustomItemSortFilterListModel<ActionVM>* actionVMSortedList = _mapActionsVMsInTimelineFromLineIndex.value(lineNumber);
         if(actionVMSortedList != NULL)
         {
-            foreach (ActionVM * actionVM, actionVMSortedList->toList())
+            for (int indexAction = 0; indexAction < actionVMSortedList->count(); ++indexAction)
             {
+                ActionVM * actionVM = actionVMSortedList->at(indexAction);
+
                 if(actionVM->actionModel() != NULL)
                 {
                     if(time < actionVM->startTime())
@@ -821,16 +823,25 @@ bool ScenarioController::canInsertActionVMTo(ActionM* actionMToInsert, int time,
                         }
 
                         int insertionEndTime = time + MARGIN_FOR_ACTION_INSERTION_IN_MS;
+                        int itemDurationTime = 0;
+                        // If we insert a forever item and an item exists in the future, we cannot insert
                         if(actionMToInsert->validityDurationType() == ValidationDurationType::FOREVER)
                         {
                             // Try with the next line
                             canInsert = false;
                             break;
                         }
+                        // If we insert a custom temporal action, we compute the end time
                         else if(actionMToInsert->validityDurationType() == ValidationDurationType::CUSTOM)
                         {
-                            insertionEndTime += actionMToInsert->validityDuration();
+                            itemDurationTime = actionMToInsert->validityDuration();
                         }
+                        // Compare with the time before revert if selected
+                        if(actionMToInsert->shallRevertAfterTime()  && actionMToInsert->revertAfterTime() > itemDurationTime)
+                        {
+                            itemDurationTime = actionMToInsert->revertAfterTime();
+                        }
+                        insertionEndTime += itemDurationTime;
 
                         // If the next action starts after the end of the new one, we skip it
                         if(insertionEndTime >= actionVM->startTime())
