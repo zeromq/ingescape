@@ -548,8 +548,8 @@ Rectangle {
                             property var outputSlotModel: model.QtObject
 
                             Drag.active: draggablePointTO.dragActive;
-                            Drag.hotSpot.x: 0
-                            Drag.hotSpot.y: 0
+                            Drag.hotSpot.x: width/2
+                            Drag.hotSpot.y: height/2
                             Drag.keys: ["OutputSlotItem"]
 
                             color: draggablePointTO.dragActive ? MasticTheme.agentsMappingBackgroundColor : "transparent"
