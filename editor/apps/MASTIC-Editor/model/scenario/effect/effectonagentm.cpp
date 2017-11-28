@@ -87,16 +87,16 @@ void EffectOnAgentM::copyFrom(ActionEffectM* effect)
 
 
 /**
- * @brief Get the command and parameters of our effect
+ * @brief Get a pair with the agent and the command (with parameters) of our effect
  * @return
  */
-QPair<QString, QStringList> EffectOnAgentM::getCommandAndParameters()
+QPair<AgentInMappingVM*, QStringList> EffectOnAgentM::getAgentAndCommandWithParameters()
 {
-    QPair<QString, QStringList> pairCommandAndParameters;
+    QPair<AgentInMappingVM*, QStringList> pairAgentAndCommandWithParameters;
 
     if (_agent != NULL)
     {
-        pairCommandAndParameters.first = _agent->name();
+        pairAgentAndCommandWithParameters.first = _agent;
 
         QStringList commandAndParameters;
 
@@ -114,8 +114,8 @@ QPair<QString, QStringList> EffectOnAgentM::getCommandAndParameters()
             break;
         }
 
-        pairCommandAndParameters.second = commandAndParameters;
+        pairAgentAndCommandWithParameters.second = commandAndParameters;
     }
 
-    return pairCommandAndParameters;
+    return pairAgentAndCommandWithParameters;
 }

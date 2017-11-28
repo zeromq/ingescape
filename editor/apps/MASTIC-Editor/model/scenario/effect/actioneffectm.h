@@ -57,10 +57,10 @@ public:
 
 
     /**
-     * @brief Get the command and parameters of our effect
+     * @brief Get a pair with the agent and the command (with parameters) of our effect
      * @return
      */
-    virtual QPair<QString, QStringList> getCommandAndParameters() = 0;
+    virtual QPair<AgentInMappingVM*, QStringList> getAgentAndCommandWithParameters() = 0;
 
 
 Q_SIGNALS:

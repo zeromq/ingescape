@@ -166,6 +166,43 @@ void MappingEffectM::setagent(AgentInMappingVM* agent)
 
 
 /**
+ * @brief Get a pair with the agent and the command (with parameters) of our effect
+ * @return
+ */
+QPair<AgentInMappingVM*, QStringList> MappingEffectM::getAgentAndCommandWithParameters()
+{
+    QPair<AgentInMappingVM*, QStringList> pairAgentAndCommandWithParameters;
+
+    if (_agent != NULL)
+    {
+        pairAgentAndCommandWithParameters.first = _agent;
+
+        QStringList commandAndParameters;
+
+        switch (_mappingEffectValue)
+        {
+        case MappingEffectValues::MAPPED: {
+            commandAndParameters << "MAP";
+            break;
+        }
+        case MappingEffectValues::UNMAPPED: {
+            commandAndParameters << "UNMAP";
+            break;
+        }
+        default:
+            break;
+        }
+
+        commandAndParameters << _input->name() << _outputAgent->name() << _output->name();
+
+        pairAgentAndCommandWithParameters.second = commandAndParameters;
+    }
+
+    return pairAgentAndCommandWithParameters;
+}
+
+
+/**
 * @brief Custom setter for property "output agent" to fill inputs and outputs
 * @param value
 */

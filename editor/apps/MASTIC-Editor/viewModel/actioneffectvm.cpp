@@ -152,39 +152,3 @@ void ActionEffectVM::_configureToType(ActionEffectTypes::Value effectType)
 }
 
 
-/**
- * @brief Get the command and parameters of our effect
- * @return
- */
-/*QPair<QString, QStringList> ActionEffectVM::getCommandAndParameters()
-{
-    QPair<QString, QStringList> pairCommandAndParameters;
-
-    switch (_effectType)
-    {
-    // AGENT
-    case ActionEffectTypes::AGENT:
-    {
-
-        break;
-    }
-    // VALUE
-    case ActionEffectTypes::VALUE:
-    {
-
-        break;
-    }
-    // MAPPING
-    case ActionEffectTypes::MAPPING:
-    {
-
-        break;
-    }
-    default:
-        break;
-    }
-
-    return pairCommandAndParameters;
-}*/
-
-

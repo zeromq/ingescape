@@ -133,6 +133,64 @@ void IOPValueEffectM::setagent(AgentInMappingVM* agent)
 
 
 /**
+ * @brief Get a pair with the agent and the command (with parameters) of our effect
+ * @return
+ */
+QPair<AgentInMappingVM*, QStringList> IOPValueEffectM::getAgentAndCommandWithParameters()
+{
+    QPair<AgentInMappingVM*, QStringList> pairAgentAndCommandWithParameters;
+
+    if (_agent != NULL)
+    {
+        pairAgentAndCommandWithParameters.first = _agent;
+
+        QStringList commandAndParameters;
+
+        // SET_INPUT / SET_OUTPUT / SET_PARAMETER
+        QString command = QString("SET_%1").arg(AgentIOPTypes::staticEnumToString(_agentIOP->agentIOPType()));
+
+        commandAndParameters << command << _agentIOP->name();
+
+        switch (_agentIOP->agentIOPValueType())
+        {
+        case AgentIOPValueTypes::INTEGER: {
+            commandAndParameters << _value;
+            break;
+        }
+        case AgentIOPValueTypes::DOUBLE: {
+            commandAndParameters << _value;
+            break;
+        }
+        case AgentIOPValueTypes::STRING: {
+            commandAndParameters << _value;
+            break;
+        }
+        case AgentIOPValueTypes::BOOL: {
+            commandAndParameters << _value;
+            break;
+        }
+        case AgentIOPValueTypes::IMPULSION: {
+            // Simulate an invisible value
+            commandAndParameters << " ";
+            break;
+        }
+        case AgentIOPValueTypes::DATA: {
+            // Simulate a value
+            commandAndParameters << "0";
+            break;
+        }
+        default:
+            break;
+        }
+
+        pairAgentAndCommandWithParameters.second = commandAndParameters;
+    }
+
+    return pairAgentAndCommandWithParameters;
+}
+
+
+/**
   * @brief Slot on agent inputs list change
   */
 void IOPValueEffectM::onInputsListChange(QList<InputVM*> inputsList)

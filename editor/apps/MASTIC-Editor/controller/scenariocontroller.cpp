@@ -876,8 +876,11 @@ void ScenarioController::executeEffectsOfAction(ActionM* action)
         {
             if ((effectVM != NULL) && (effectVM->modelM() != NULL))
             {
-                // FIXME TODO
-                //effectVM->modelM()->getCommandAndParameter();
+                // Get the pair with the agent and the command (with parameters) of the effect
+                QPair<AgentInMappingVM*, QStringList> pairAgentAndCommandWithParameters = effectVM->modelM()->getAgentAndCommandWithParameters();
+
+                // Execute the command for the agent
+                _executeCommandForAgent(pairAgentAndCommandWithParameters.first, pairAgentAndCommandWithParameters.second);
             }
         }
     }
@@ -945,11 +948,13 @@ void ScenarioController::_onTimeout_EvaluateActions()
                                 QList<ActionEffectVM*> effectsList = actionVM->actionModel()->effectsList()->toList();
                                 if (effectsList.count() > 0)
                                 {
+                                    // FIXME TODO
+
                                     // Get the list of pairs <agent name, command (and parameters)>
-                                    QList<QPair<QString, QStringList>> commandsForAgents = actionExecution->getCommandsForEffectsAndInitReverseCommands(effectsList);
+                                    //QList<QPair<QString, QStringList>> commandsForAgents = actionExecution->getCommandsForEffectsAndInitReverseCommands(effectsList);
 
                                     // Execute commands for agents
-                                    _executeCommandsForAgents(commandsForAgents);
+                                    //_executeCommandsForAgents(commandsForAgents);
 
                                     // Notify the action that its effects has been executed
                                     actionVM->effectsExecuted(currentTimeInMilliSeconds);
@@ -968,11 +973,13 @@ void ScenarioController::_onTimeout_EvaluateActions()
                             //
                             if (actionExecution->reverseTime() <= currentTimeInMilliSeconds)
                             {
+                                // FIXME TODO
+
                                 // Get the list of pairs <agent name, reverse command (and parameters)>
-                                QList<QPair<QString, QStringList>> reverseCommandsForAgents = actionExecution->getReverseCommands();
+                                //QList<QPair<QString, QStringList>> reverseCommandsForAgents = actionExecution->getReverseCommands();
 
                                 // Execute reverse commands for agents
-                                _executeCommandsForAgents(reverseCommandsForAgents);
+                                //_executeCommandsForAgents(reverseCommandsForAgents);
 
                                 // Notify the action that its reverse effects has been executed
                                 actionVM->reverseEffectsExecuted(currentTimeInMilliSeconds);
@@ -1091,7 +1098,7 @@ AgentInMappingVM* ScenarioController::_getAgentInMappingFromName(QString agentNa
  * @brief Execute a list of commands for agents
  * @param commandsForAgents
  */
-void ScenarioController::_executeCommandsForAgents(QList<QPair<QString, QStringList>> commandsForAgents)
+/*void ScenarioController::_executeCommandsForAgents(QList<QPair<QString, QStringList>> commandsForAgents)
 {
     for (int i = 0; i < commandsForAgents.count(); i++)
     {
@@ -1109,56 +1116,75 @@ void ScenarioController::_executeCommandsForAgents(QList<QPair<QString, QStringL
             {
                 qInfo() << "Execute commands" << commandAndParameters << "for agent" << agentName << agent->getPeerIdsList();
 
-                // RUN
-                if (command == "RUN")
-                {
-                    foreach (AgentM* model, agent->models()->toList())
-                    {
-                        // Check if the model has a hostname
-                        if ((model != NULL) && !model->hostname().isEmpty())
-                        {
-                            // Emit signal "Command asked to agent"
-                            Q_EMIT commandAskedToLauncher(command, model->hostname(), model->commandLine());
-                        }
-                    }
-                }
-                // DIE
-                else if (command == "DIE")
+            }
+        }
+    }
+}*/
+
+
+/**
+ * @brief Execute a command for an agent
+ * @param agent
+ * @param commandAndParameters
+ */
+void ScenarioController::_executeCommandForAgent(AgentInMappingVM* agent, QStringList commandAndParameters)
+{
+    if ((agent != NULL) && (commandAndParameters.count() > 0))
+    {
+        QStringList peerIdsList = agent->getPeerIdsList();
+
+        qInfo() << "Execute command" << commandAndParameters << "for agent" << agent->name() << "(" << peerIdsList.count() << "peer ids)";
+
+        QString command = commandAndParameters.at(0);
+
+        // RUN
+        if (command == "RUN")
+        {
+            foreach (AgentM* model, agent->models()->toList())
+            {
+                // Check if the model has a hostname
+                if ((model != NULL) && !model->hostname().isEmpty())
                 {
                     // Emit signal "Command asked to agent"
-                    Q_EMIT commandAskedToAgent(agent->getPeerIdsList(), command);
+                    Q_EMIT commandAskedToLauncher(command, model->hostname(), model->commandLine());
                 }
-                // MAP or UNMAP
-                else if ((command == "MAP") || (command == "UNMAP"))
-                {
-                    if (commandAndParameters.count() == 4)
-                    {
-                        QString inputName = commandAndParameters.at(1);
-                        QString outputAgentName = commandAndParameters.at(2);
-                        QString outputName = commandAndParameters.at(3);
+            }
+        }
+        // DIE
+        else if (command == "DIE")
+        {
+            // Emit signal "Command asked to agent"
+            Q_EMIT commandAskedToAgent(peerIdsList, command);
+        }
+        // MAP or UNMAP
+        else if ((command == "MAP") || (command == "UNMAP"))
+        {
+            if (commandAndParameters.count() == 4)
+            {
+                QString inputName = commandAndParameters.at(1);
+                QString outputAgentName = commandAndParameters.at(2);
+                QString outputName = commandAndParameters.at(3);
 
-                        // Emit signal "Command asked to agent about Mapping Input"
-                        Q_EMIT commandAskedToAgentAboutMappingInput(agent->getPeerIdsList(), command, inputName, outputAgentName, outputName);
-                    }
-                    else {
-                        qCritical() << "Wrong number of parameters (" << commandAndParameters.count() << ") to map an input of agent" << agentName;
-                    }
-                }
-                // SET_INPUT / SET_OUTPUT / SET_PARAMETER
-                else if (command.startsWith("SET_"))
-                {
-                    if (commandAndParameters.count() == 3)
-                    {
-                        QString agentIOPName = commandAndParameters.at(1);
-                        QString value = commandAndParameters.at(2);
+                // Emit signal "Command asked to agent about Mapping Input"
+                Q_EMIT commandAskedToAgentAboutMappingInput(peerIdsList, command, inputName, outputAgentName, outputName);
+            }
+            else {
+                qCritical() << "Wrong number of parameters (" << commandAndParameters.count() << ") to map an input of agent" << agent->name();
+            }
+        }
+        // SET_INPUT / SET_OUTPUT / SET_PARAMETER
+        else if (command.startsWith("SET_"))
+        {
+            if (commandAndParameters.count() == 3)
+            {
+                QString agentIOPName = commandAndParameters.at(1);
+                QString value = commandAndParameters.at(2);
 
-                        // Emit signal "Command asked to agent about Setting Value"
-                        Q_EMIT commandAskedToAgentAboutSettingValue(agent->getPeerIdsList(), command, agentIOPName, value);
-                    }
-                    else {
-                        qCritical() << "Wrong number of parameters (" << commandAndParameters.count() << ") to set a value to agent" << agentName;
-                    }
-                }
+                // Emit signal "Command asked to agent about Setting Value"
+                Q_EMIT commandAskedToAgentAboutSettingValue(peerIdsList, command, agentIOPName, value);
+            }
+            else {
+                qCritical() << "Wrong number of parameters (" << commandAndParameters.count() << ") to set a value to agent" << agent->name();
             }
         }
     }

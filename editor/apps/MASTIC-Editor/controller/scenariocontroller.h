@@ -314,7 +314,15 @@ private :
      * @brief Execute a list of commands for agents
      * @param commandsForAgents
      */
-    void _executeCommandsForAgents(QList<QPair<QString, QStringList>> commandsForAgents);
+    //void _executeCommandsForAgents(QList<QPair<QString, QStringList>> commandsForAgents);
+
+
+    /**
+     * @brief Execute a command for an agent
+     * @param agent
+     * @param commandAndParameters
+     */
+    void _executeCommandForAgent(AgentInMappingVM* agent, QStringList commandAndParameters);
 
 
 protected:

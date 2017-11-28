@@ -108,12 +108,12 @@ QList<QPair<QString, QStringList>> ActionExecutionVM::getCommandsForEffectsAndIn
                     switch (iopValueEffect->agentIOP()->agentIOPValueType())
                     {
                     case AgentIOPValueTypes::BOOL: {
+                        commandAndParameters << iopValueEffect->value();
+
                         if (iopValueEffect->agentIOP()->currentValue().toBool()) {
-                            commandAndParameters << "false";
                             reverseCommandAndParameters << "true";
                         }
                         else {
-                            commandAndParameters << "true";
                             reverseCommandAndParameters << "false";
                         }
                         break;
