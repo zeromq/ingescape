@@ -97,22 +97,57 @@ I2PopupBase {
         color: MasticTheme.editorsBackgroundColor
 
 
-        MouseArea {
-            id : dragMouseArea
-            hoverEnabled: true
+        // catch events
+        MultiPointTouchArea {
             anchors.fill: parent
-            drag.target: rootItem
+        }
 
-            drag.minimumX : 0
-            drag.maximumX : rootItem.parent.width - rootItem.width
-            drag.minimumY : 0
-            drag.maximumY :  rootItem.parent.height - rootItem.height
+        // drag Area
+        I2CustomRectangle {
+            id : dragRect
+            anchors {
+                top : parent.top
+                left : parent.left
+                right : parent.right
+                margins : 2
+            }
+            height : 50
+            topLeftRadius : 5
+            topRightRadius : 5
 
-            onPressed: {
-                // Emit signal "bring to front"
-                rootItem.bringToFront();
+            color :dragMouseArea.pressed? MasticTheme.editorsBackgroundColor : MasticTheme.darkBlueGreyColor
+
+            MouseArea {
+                id : dragMouseArea
+                hoverEnabled: true
+                anchors.fill: parent
+                drag.target: rootItem
+
+                drag.minimumX : 0
+                drag.maximumX : rootItem.parent.width - rootItem.width
+                drag.minimumY : 0
+                drag.maximumY :  rootItem.parent.height - rootItem.height
+
+                onPressed: {
+                    // Emit signal "bring to front"
+                    rootItem.bringToFront();
+                }
             }
         }
+
+        // separator
+        Rectangle {
+            anchors {
+                top : dragRect.bottom
+                left : dragRect.left
+                right : dragRect.right
+            }
+            height : 1
+            color : MasticTheme.editorsBackgroundBorderColor
+        }
+
+
+
 
         Button {
             id: btnClose
@@ -182,7 +217,7 @@ I2PopupBase {
                 right : parent.right
                 rightMargin: 20
                 top : titleItem.bottom
-                topMargin: 20
+                topMargin: 30
             }
 
             height : 25
@@ -594,7 +629,7 @@ I2PopupBase {
 
             anchors {
                 top: parent.top
-                topMargin: 90
+                topMargin: 100
                 left: parent.left
                 leftMargin: 20
                 right: parent.right

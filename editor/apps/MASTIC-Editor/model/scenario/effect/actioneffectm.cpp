@@ -66,7 +66,7 @@ void ActionEffectM::setagent(AgentInMappingVM* value)
     {
         if (_agent != NULL)
         {
-            // UnSubscribe to destruction
+            // UN-subscribe to destruction
             disconnect(_agent, &AgentInMappingVM::destroyed, this, &ActionEffectM::_onAgentDestroyed);
         }
 

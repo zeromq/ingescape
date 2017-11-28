@@ -28,15 +28,15 @@ QString ValidationDurationType::enumToString(int value)
 
     switch (value) {
     case ValidationDurationType::CUSTOM:
-        string = "Custom";
+        string = "during";
         break;
 
     case ValidationDurationType::IMMEDIATE:
-        string = "Immediate";
+        string = "at start only";
         break;
 
     case ValidationDurationType::FOREVER:
-        string = "Forever";
+        string = "forever";
         break;
 
     default:

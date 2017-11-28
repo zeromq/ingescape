@@ -154,7 +154,8 @@ void AgentVM::changeState()
         foreach (AgentM* model, _models.toList())
         {
             // Check if the model has a hostname
-            if ((model != NULL) && !model->hostname().isEmpty()) {
+            if ((model != NULL) && !model->hostname().isEmpty())
+            {
                 Q_EMIT commandAskedToLauncher("RUN", model->hostname(), model->commandLine());
             }
         }

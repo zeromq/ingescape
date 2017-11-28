@@ -62,7 +62,7 @@ ActionVM::ActionVM(ActionM* model,
         setactionModel(model);
 
         // Create the first (view model of) action execution
-        _createActionExecution(_startTime);
+        _createActionExecution(0);
     }
 }
 
@@ -253,7 +253,7 @@ void ActionVM::effectsExecuted(int currentTimeInMilliSeconds)
             if (_actionModel->shallRearm())
             {
                 // Create a new (view model of) action execution
-                _createActionExecution(currentTimeInMilliSeconds);
+                _createActionExecution(currentTimeInMilliSeconds - _startTime);
             }
         }
     }
@@ -274,7 +274,7 @@ void ActionVM::reverseEffectsExecuted(int currentTimeInMilliSeconds)
         if (_actionModel->shallRearm())
         {
             // Create a new (view model of) action execution
-            _createActionExecution(currentTimeInMilliSeconds);
+            _createActionExecution(currentTimeInMilliSeconds - _startTime);
         }
     }
 }
@@ -349,7 +349,7 @@ void ActionVM::_computeEndTime()
 
 /**
  * @brief Create a new (view model of) action execution
- * @param startTime
+ * @param relative to our view model of action
  */
 void ActionVM::_createActionExecution(int startTime)
 {

@@ -70,7 +70,7 @@ Item {
 
         anchors {
             bottom: parent.bottom
-            bottomMargin: 20
+            bottomMargin: 18
         }
         height : childrenRect.height
         columns : 3
@@ -84,7 +84,7 @@ Item {
             I2Rectangle {
                 id : panelRectangle
                 width : (rootItem.width - (gridActionsPanel.columnSpacing* (gridActionsPanel.columns-1)))/ gridActionsPanel.columns
-                height : width
+                height : 78
                 radiusX : 5
                 radiusY : 5
 
@@ -154,7 +154,12 @@ Item {
 
                     onClicked: {
                         if (controller && model.actionModel) {
-                            controller.addActionVMAtCurrentTime(model.actionModel);
+                            if (controller.isPlaying) {
+                                controller.addActionVMAtCurrentTime(model.actionModel);
+                            } else {
+                                controller.executeEffectsOfAction(model.actionModel);
+                            }
+
                         }
                     }
                 }

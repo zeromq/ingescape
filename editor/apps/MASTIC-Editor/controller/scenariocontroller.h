@@ -191,7 +191,52 @@ public:
      */
     Q_INVOKABLE bool canInsertActionVMTo(ActionM *actionMToInsert, int time, int lineNumber);
 
+
+    /**
+     * @brief Execute all effects of the action
+     * @param action
+     */
+    Q_INVOKABLE void executeEffectsOfAction(ActionM* action);
+
+
 Q_SIGNALS:
+
+    /**
+     * @brief Signal emitted when a command must be sent on the network to a launcher
+     * @param command
+     * @param hostname
+     * @param commandLine
+     */
+    void commandAskedToLauncher(QString command, QString hostname, QString commandLine);
+
+
+    /**
+     * @brief Signal emitted when a command must be sent on the network to an agent
+     * @param peerIdsList
+     * @param command
+     */
+    void commandAskedToAgent(QStringList peerIdsList, QString command);
+
+
+    /**
+     * @brief Emitted when a command must be sent on the network to an agent about setting a value to one of its Input/Output/Parameter
+     * @param peerIdsList
+     * @param command
+     * @param agentIOPName
+     * @param value
+     */
+    void commandAskedToAgentAboutSettingValue(QStringList peerIdsList, QString command, QString agentIOPName, QString value);
+
+
+    /**
+     * @brief Emitted when a command must be sent on the network to an agent about mapping one of its input
+     * @param peerIdsList
+     * @param command
+     * @param inputName
+     * @param outputAgentName
+     * @param outputName
+     */
+    void commandAskedToAgentAboutMappingInput(QStringList peerIdsList, QString command, QString inputName, QString outputAgentName, QString outputName);
 
 
 public Q_SLOTS:
@@ -201,10 +246,12 @@ public Q_SLOTS:
       */
     void onAgentInMappingAdded(AgentInMappingVM* agentAdded);
 
+
     /**
       * @brief slot on agent removed in mapping
       */
-    void onAgentInMappingRemoved(AgentInMappingVM * agentRemoved);
+    void onAgentInMappingRemoved(AgentInMappingVM* agentRemoved);
+
 
 private Q_SLOTS:
 
@@ -212,6 +259,7 @@ private Q_SLOTS:
      * @brief Called at each interval of our timer to update the current state of each zones that have at least one loudspeakers line
      */
     void _onTimeout_EvaluateActions();
+
 
 private :
     /**
@@ -264,7 +312,7 @@ private :
      * @brief Execute a list of commands for agents
      * @param commandsForAgents
      */
-    void _executeCommandsForAgents(QList<QPair<QString, QString>> commandsForAgents);
+    void _executeCommandsForAgents(QList<QPair<QString, QStringList>> commandsForAgents);
 
 
 protected:
