@@ -333,16 +333,6 @@ void ActionM::initializeConditionsConnections()
             }
         }
 
-        // Initialize effects connections
-        foreach (ActionEffectVM* effectVM, _effectsList.toList())
-        {
-            if(effectVM->modelM() != NULL)
-            {
-                // Intialize the connection
-                effectVM->modelM()->initializeConnections();
-            }
-        }
-
         // Evaluate the action validation flag
         _onConditionValidationChange(true);
 
@@ -367,17 +357,6 @@ void ActionM::resetConditionsConnections()
                 conditionVM->modelM()->resetConnections();
             }
         }
-
-        // Initialize effects connections
-        foreach (ActionEffectVM* effectVM, _effectsList.toList())
-        {
-            if(effectVM->modelM() != NULL)
-            {
-                // Intialize the connection
-                effectVM->modelM()->resetConnections();
-            }
-        }
-
 
         setisConnected(false);
     }

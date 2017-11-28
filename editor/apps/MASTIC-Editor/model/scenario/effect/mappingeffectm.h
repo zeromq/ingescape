@@ -45,10 +45,16 @@ class MappingEffectM: public ActionEffectM
     I2_QML_PROPERTY_CUSTOM_SETTER(AgentInMappingVM*, outputAgent)
 
     // Output of the output agent
-    I2_QML_PROPERTY(AgentIOPM*, output)
+    I2_QML_PROPERTY_CUSTOM_SETTER(AgentIOPM*, output)
+
+    // Output name of the output agent
+    I2_QML_PROPERTY(QString , outputName)
 
     // Input of the input agent
-    I2_QML_PROPERTY(AgentIOPM*, input)
+    I2_QML_PROPERTY_CUSTOM_SETTER(AgentIOPM*, input)
+
+    // Input name of the input agent
+    I2_QML_PROPERTY(QString , inputName)
 
     // List of outputs
     I2_QOBJECT_LISTMODEL(AgentIOPM , outputsList)
@@ -90,14 +96,58 @@ Q_SIGNALS:
 
 public Q_SLOTS:
 
-
-protected:
-
     /**
      * @brief Called when our "output agent" is destroyed
      * @param sender
      */
     void _onOutputAgentDestroyed(QObject* sender);
+
+    /**
+     * @brief Called when our input is destroyed
+     * @param sender
+     */
+    void _onInputDestroyed(QObject* sender);
+
+    /**
+     * @brief Called when our output is destroyed
+     * @param sender
+     */
+    void _onOutputDestroyed(QObject* sender);
+
+    /**
+      * @brief Slot on agent inputs list change
+      */
+    void _onAgentIOPInputsListChange(QList<InputVM*> inputsList);
+
+    /**
+      * @brief Slot on agent outputs list change
+      */
+    void _onAgentIOPOutputsListChange(QList<OutputVM*> outputsList);
+
+    /**
+      * @brief Slot on output agent inputs list change
+      */
+    void _onOutputAgentIOPInputsListChange(QList<InputVM*> inputsList);
+
+    /**
+      * @brief Slot on output agent outputs list change
+      */
+    void _onOutputAgentIOPOutputsListChange(QList<OutputVM*> outputsList);
+
+protected:
+
+
+private:
+
+    /**
+    * @brief Update the selected input
+    */
+    void updateInputSelected();
+
+    /**
+    * @brief Update the selected output
+    */
+    void updateOutputSelected();
 
 
 };

@@ -85,6 +85,14 @@ void IOPValueEffectM::setagent(AgentInMappingVM* agent)
 
     if (previousAgent != agent)
     {
+        if(_agent != NULL)
+        {
+            disconnect(_agent, &AgentInMappingVM::inputsListWillBeRemoved, this, &IOPValueEffectM::onInputsListChange);
+            disconnect(_agent, &AgentInMappingVM::inputsListAdded, this, &IOPValueEffectM::onInputsListChange);
+            disconnect(_agent, &AgentInMappingVM::outputsListWillBeRemoved, this, &IOPValueEffectM::onOutputsListChange);
+            disconnect(_agent, &AgentInMappingVM::outputsListAdded, this, &IOPValueEffectM::onOutputsListChange);
+        }
+
         setagentIOP(NULL);
 
         // Clear the list
@@ -114,35 +122,12 @@ void IOPValueEffectM::setagent(AgentInMappingVM* agent)
             if (_iopMergedList.count() > 0) {
                 setagentIOP(_iopMergedList.at(0));
             }
+
+            connect(_agent, &AgentInMappingVM::inputsListWillBeRemoved, this, &IOPValueEffectM::onInputsListChange);
+            connect(_agent, &AgentInMappingVM::inputsListAdded, this, &IOPValueEffectM::onInputsListChange);
+            connect(_agent, &AgentInMappingVM::outputsListWillBeRemoved, this, &IOPValueEffectM::onOutputsListChange);
+            connect(_agent, &AgentInMappingVM::outputsListAdded, this, &IOPValueEffectM::onOutputsListChange);
         }
-    }
-}
-
-/**
-  * @brief Initialize the agent connections for the action effect
-  */
-void IOPValueEffectM::initializeConnections()
-{
-    if(_agent != NULL)
-    {
-        connect(_agent, &AgentInMappingVM::inputsListWillBeRemoved, this, &IOPValueEffectM::onInputsListChange);
-        connect(_agent, &AgentInMappingVM::inputsListAdded, this, &IOPValueEffectM::onInputsListChange);
-        connect(_agent, &AgentInMappingVM::outputsListWillBeRemoved, this, &IOPValueEffectM::onOutputsListChange);
-        connect(_agent, &AgentInMappingVM::outputsListAdded, this, &IOPValueEffectM::onOutputsListChange);
-    }
-}
-
-/**
-  * @brief Reset the agent connections for the action effect
-  */
-void IOPValueEffectM::resetConnections()
-{
-    if(_agent != NULL)
-    {
-        disconnect(_agent, &AgentInMappingVM::inputsListWillBeRemoved, this, &IOPValueEffectM::onInputsListChange);
-        disconnect(_agent, &AgentInMappingVM::inputsListAdded, this, &IOPValueEffectM::onInputsListChange);
-        disconnect(_agent, &AgentInMappingVM::outputsListWillBeRemoved, this, &IOPValueEffectM::onOutputsListChange);
-        disconnect(_agent, &AgentInMappingVM::outputsListAdded, this, &IOPValueEffectM::onOutputsListChange);
     }
 }
 

@@ -73,16 +73,6 @@ public:
     */
     void setagent(AgentInMappingVM* agent);
 
-    /**
-      * @brief Initialize the agent connections for the action effect
-      */
-    void initializeConnections();
-
-    /**
-      * @brief Reset the agent connections for the action effect
-      */
-    void resetConnections();
-
 public Q_SLOTS:
 
     /**

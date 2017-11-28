@@ -74,7 +74,7 @@ public:
     /**
       * @brief Reset the agent connections for the action condition
       */
-    void resetConnections();
+    virtual void resetConnections();
 
 Q_SIGNALS:
 
