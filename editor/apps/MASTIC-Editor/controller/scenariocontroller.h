@@ -88,7 +88,7 @@ class ScenarioController: public QObject
     I2_QML_PROPERTY_CUSTOM_SETTER(bool, isPlaying)
 
     // Current time (from the beginning of our scenario)
-    I2_QML_PROPERTY_READONLY(QTime, currentTime)
+    I2_QML_PROPERTY(QTime, currentTime)
 
     // List of actionsVM to evaluate each timeout of our timer linked to our scenario
     I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(ActionVM, activeActionsVMList)
@@ -198,6 +198,12 @@ public:
      * @param action
      */
     Q_INVOKABLE void executeEffectsOfAction(ActionM* action);
+
+    /**
+     * @brief Set the current time in milliseconds
+     * @param current time in milliseconds
+     */
+    Q_INVOKABLE void updateCurrentTimeInMs(int currentTimeInMs);
 
 
 Q_SIGNALS:

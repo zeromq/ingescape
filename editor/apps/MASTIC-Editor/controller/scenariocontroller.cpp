@@ -1174,3 +1174,17 @@ void ScenarioController::_executeCommandsForAgents(QList<QPair<QString, QStringL
         }
     }
 }
+
+/**
+ * @brief Set the current time in milliseconds
+ * @param current time in milliseconds
+ */
+void ScenarioController::updateCurrentTimeInMs(int currentTimeInMs)
+{
+    if(currentTimeInMs > 0)
+    {
+        setcurrentTime(QTime::fromMSecsSinceStartOfDay(currentTimeInMs));
+    } else {
+        setcurrentTime(QTime::fromMSecsSinceStartOfDay(0));
+    }
+}

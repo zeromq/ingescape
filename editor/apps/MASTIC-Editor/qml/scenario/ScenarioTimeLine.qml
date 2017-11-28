@@ -645,9 +645,7 @@ Item {
                 //     are interpreted by the Javascript stack
                 Item {
                     id: currentTimeLine
-                    x: (controller && viewController)?
-                           viewController.convertQTimeToAbscissaInCoordinateSystem(controller.currentTime, viewController.pixelsPerMinute)
-                         : 0
+                    x: currentTimeItem.x
                     y: 0
 
                     Rectangle {
@@ -751,14 +749,15 @@ Item {
                 // Current time
                 //
                 Item {
-                    x: (controller && viewController)?
-                           viewController.convertQTimeToAbscissaInCoordinateSystem(controller.currentTime, viewController.pixelsPerMinute)
-                         : 0
+                    id: currentTimeItem
+
                     anchors {
                         bottom : columnHeadersContent.bottom
                     }
 
                     Rectangle {
+                        id: currentTimeLabel
+
                         anchors {
                             horizontalCenter : svgCurrentTime.horizontalCenter
                             bottom : svgCurrentTime.top
@@ -787,6 +786,48 @@ Item {
                                 pixelSize: 14
                             }
 
+                        }
+
+                        MouseArea {
+                            id: currentTimeMouseArea
+
+                            anchors.fill: currentTimeLabel
+
+                            hoverEnabled: true
+
+                            drag.smoothed: false
+                            drag.target: currentTimeItem
+
+                            drag.minimumX : viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(0, viewController.pixelsPerMinute)
+                            drag.maximumX : viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(86400000, viewController.pixelsPerMinute)
+                            drag.minimumY : 0
+                            drag.maximumY : 0
+
+                            // viewController => CurrentTimeItem
+                            Binding {
+                                target: controller
+                                property: "currentTime"
+                                value: if (viewController) {
+                                            viewController.convertAbscissaInCoordinateSystemToQTime(currentTimeItem.x, viewController.pixelsPerMinute)
+                                       }
+                                       else {
+                                           0
+                                       }
+                                when: currentTimeMouseArea.drag.active
+                            }
+
+                            // CurrentTimeItem => Scrollbar
+                            Binding {
+                                target: currentTimeItem
+                                property: "x"
+                                value: if (controller && viewController)
+                                       {
+                                           viewController.convertQTimeToAbscissaInCoordinateSystem(controller.currentTime, viewController.pixelsPerMinute)
+                                       } else {
+                                           0
+                                       }
+                                when: !currentTimeMouseArea.drag.active
+                            }
                         }
                     }
 
@@ -928,7 +969,7 @@ Item {
                     verticalCenterOffset: 1
                 }
 
-                text : controller ? controller.currentTime.toLocaleTimeString(Qt.locale(), "HH':'mm':'ss") : "00:00:00"
+                text : currentTimeText.text
                 color: MasticTheme.lightGreyColor
                 font {
                     family: MasticTheme.textFontFamily
