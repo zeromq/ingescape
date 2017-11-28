@@ -32,7 +32,7 @@
 #define MARGIN_FOR_ACTION_INSERTION_IN_MS 2000
 
 // Minimum lines displayed into the timeline by default
-#define MINIMUM_DISPLAYED_LINES_NUMBER_IN_TIMELINE 6
+#define MINIMUM_DISPLAYED_LINES_NUMBER_IN_TIMELINE 7
 
 // Interval in milli-seconds to evaluate each actionVM conditions
 #define INTERVAL_EVALUATION_ACTIONS 500
@@ -158,8 +158,9 @@ public:
     /**
      * @brief Add an action VM at the time in ms
      * @param action model
+     * @param line number
      */
-    Q_INVOKABLE void addActionVMAtTime(ActionM * actionModel, int timeInMs);
+    Q_INVOKABLE void addActionVMAtTime(ActionM * actionModel, int timeInMs, int lineNumber = -1);
 
     /**
      * @brief Add an action VM at the current date time
@@ -282,8 +283,9 @@ private :
     /**
      * @brief Insert an actionVM into our timeline
      * @param action view model
+     * @param line number
      */
-    void _insertActionVMIntoMapByLineNumber(ActionVM* actionVMToInsert);
+    void _insertActionVMIntoMapByLineNumber(ActionVM* actionVMToInsert, int lineNumberRef);
 
     /**
      * @brief Start the scenario by

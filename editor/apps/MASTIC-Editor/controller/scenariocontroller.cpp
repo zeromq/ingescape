@@ -544,32 +544,40 @@ void ScenarioController::_exportScenarioToFile(QString scenarioFilePath)
 /**
  * @brief Add an action VM at the time in ms
  * @param action model
+ * @param line number
  */
-void ScenarioController::addActionVMAtTime(ActionM * actionModel, int timeInMs)
+void ScenarioController::addActionVMAtTime(ActionM * actionModel, int timeInMs, int lineNumber)
 {
     if(actionModel != NULL)
     {
         ActionVM * actionVM = new ActionVM(actionModel,timeInMs);
 
         // Insert the actionVM to the reight line number
-        _insertActionVMIntoMapByLineNumber(actionVM);
+        _insertActionVMIntoMapByLineNumber(actionVM, lineNumber);
 
-        // Add the new action VM to our map
-        QList<ActionVM*> actionsVMsList;
-        if(_mapActionsVMsInTimelineFromActionModel.contains(actionModel) == true)
+        // If the action VM found a line to be insert in
+        if(actionVM->lineInTimeLine() != -1)
         {
-            actionsVMsList = _mapActionsVMsInTimelineFromActionModel.value(actionModel);
-        }
-        actionsVMsList.append(actionVM);
-        _mapActionsVMsInTimelineFromActionModel.insert(actionModel,actionsVMsList);
+            // Add the new action VM to our map
+            QList<ActionVM*> actionsVMsList;
+            if(_mapActionsVMsInTimelineFromActionModel.contains(actionModel) == true)
+            {
+                actionsVMsList = _mapActionsVMsInTimelineFromActionModel.value(actionModel);
+            }
+            actionsVMsList.append(actionVM);
+            _mapActionsVMsInTimelineFromActionModel.insert(actionModel,actionsVMsList);
 
-        // Add the action VM to the timeline
-        _actionsInTimeLine.append(actionVM);
+            // Add the action VM to the timeline
+            _actionsInTimeLine.append(actionVM);
 
-        // If scenario is playing we add the actionVM to the active ones
-        if(_isPlaying)
-        {
-            _activeActionsVMList.append(actionVM);
+            // If scenario is playing we add the actionVM to the active ones
+            if(_isPlaying)
+            {
+                _activeActionsVMList.append(actionVM);
+            }
+        } else {
+            delete actionVM;
+            actionVM = NULL;
         }
     }
 }
@@ -702,11 +710,11 @@ void ScenarioController::conditionsDisconnect()
  * @param action view model
  * @return timeline line number
  */
-void ScenarioController::_insertActionVMIntoMapByLineNumber(ActionVM* actionVMToInsert)
+void ScenarioController::_insertActionVMIntoMapByLineNumber(ActionVM* actionVMToInsert, int lineNumberRef)
 {
     int insertionStartTime = actionVMToInsert->startTime();
 
-    int lineNumber = 0;
+    int lineNumber = lineNumberRef;
     while (lineNumber < _linesNumberInTimeLine)
     {
         bool canInsert = canInsertActionVMTo(actionVMToInsert->actionModel(), insertionStartTime,lineNumber);
@@ -742,11 +750,19 @@ void ScenarioController::_insertActionVMIntoMapByLineNumber(ActionVM* actionVMTo
                 break;
             }
         }
-        lineNumber++;
+
+        if(lineNumberRef == -1)
+        {
+            break;
+        } else {
+            lineNumber++;
+        }
+
     }
 
     // If the action has not been inserted yet, we create a new line
-    if(actionVMToInsert->lineInTimeLine() == -1)
+    // only if we are not dropping at a busy position the actionVM
+    if(actionVMToInsert->lineInTimeLine() == -1 && lineNumberRef == -1)
     {
         if(lineNumber >= _linesNumberInTimeLine)
         {
