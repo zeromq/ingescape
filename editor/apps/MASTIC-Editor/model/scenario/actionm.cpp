@@ -325,8 +325,8 @@ void ActionM::initializeConditionsConnections()
         {
             if(conditionVM->modelM() != NULL)
             {
-                // Connect the valid change
-                connect(conditionVM->modelM(),&ActionConditionM::isValidChanged,this,&ActionM::_onConditionValidationChange);
+                // Connect to changes on flag "is valid"
+                connect(conditionVM->modelM(), &ActionConditionM::isValidChanged, this, &ActionM::_onConditionValidationChange);
 
                 // Intialize the connection
                 conditionVM->modelM()->initializeConnections();
@@ -352,7 +352,7 @@ void ActionM::resetConditionsConnections()
         {
             if(conditionVM->modelM() != NULL)
             {
-                disconnect(conditionVM->modelM(),&ActionConditionM::isValidChanged,this,&ActionM::_onConditionValidationChange);
+                disconnect(conditionVM->modelM(), &ActionConditionM::isValidChanged, this, &ActionM::_onConditionValidationChange);
 
                 conditionVM->modelM()->resetConnections();
             }

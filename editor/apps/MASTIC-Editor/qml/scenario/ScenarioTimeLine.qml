@@ -312,11 +312,12 @@ Item {
 
                             // executionsList
                             Repeater {
-                                model : if (myActionVM) {
-                                            myActionVM.executionsList;
-                                        } else {
-                                            0;
-                                        }
+                                model: if (myActionVM) {
+                                           myActionVM.executionsList;
+                                       }
+                                       else {
+                                           0;
+                                       }
 
                                 Item {
                                     height : conditionsValidityRect.height
@@ -472,7 +473,8 @@ Item {
                                     ghostAction.x = viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(timeInMilliSeconds, viewController.pixelsPerMinute);
                                     ghostAction.y = lineNumber * rootItem.lineHeight;
                                     ghostAction.startTime = timeInMilliSeconds;
-                                } else {
+                                }
+                                else {
                                     // remove ghost
                                     ghostAction.actionModelGhost = null;
                                 }
@@ -595,9 +597,11 @@ Item {
                                         if (ghostAction.actionModelGhost.shallRevertWhenValidityIsOver)
                                         {
                                             rect.width - width;
-                                        } else if (ghostAction.actionModelGhost.shallRevertAfterTime) {
+                                        }
+                                        else if (ghostAction.actionModelGhost.shallRevertAfterTime) {
                                             viewController.convertDurationInSecondsToLengthInCoordinateSystem(ghostAction.actionModelGhost.revertAfterTime/1000, viewController.pixelsPerMinute) - width;
-                                        } else {
+                                        }
+                                        else {
                                             0;
                                         }
                                     }
@@ -823,7 +827,8 @@ Item {
                                 value: if (controller && viewController)
                                        {
                                            viewController.convertQTimeToAbscissaInCoordinateSystem(controller.currentTime, viewController.pixelsPerMinute)
-                                       } else {
+                                       }
+                                       else {
                                            0
                                        }
                                 when: !currentTimeMouseArea.drag.active

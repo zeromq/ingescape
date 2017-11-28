@@ -575,7 +575,8 @@ void ScenarioController::addActionVMAtTime(ActionM * actionModel, int timeInMs, 
             {
                 _activeActionsVMList.append(actionVM);
             }
-        } else {
+        }
+        else {
             delete actionVM;
             actionVM = NULL;
         }
@@ -754,7 +755,8 @@ void ScenarioController::_insertActionVMIntoMapByLineNumber(ActionVM* actionVMTo
         if(lineNumberRef == -1)
         {
             break;
-        } else {
+        }
+        else {
             lineNumber++;
         }
 
@@ -1200,7 +1202,8 @@ void ScenarioController::updateCurrentTimeInMs(int currentTimeInMs)
     if(currentTimeInMs > 0)
     {
         setcurrentTime(QTime::fromMSecsSinceStartOfDay(currentTimeInMs));
-    } else {
+    }
+    else {
         setcurrentTime(QTime::fromMSecsSinceStartOfDay(0));
     }
 }

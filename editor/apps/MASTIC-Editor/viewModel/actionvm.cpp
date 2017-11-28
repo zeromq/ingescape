@@ -164,13 +164,15 @@ void ActionVM::setstartTimeString(QString value)
                     totalMilliseconds += milliSeconds;
                     setstartTime(totalMilliseconds);
                     qDebug() << "Start Time =" << _startTime;
-                } else {
+                }
+                else {
                     setstartTime(-1);
                     if (_actionModel != NULL) {
                         qCritical() << "Wrong 'Start Time':" << _startTimeString << "for action" << _actionModel->name();
                     }
                 }
-            } else {
+            }
+            else {
                 setstartTime(-1);
                 if (_actionModel != NULL) {
                     qCritical() << "Wrong 'Start Time':" << _startTimeString << "for action" << _actionModel->name();
@@ -202,7 +204,7 @@ void ActionVM::setactionModel(ActionM * actionM)
     {
         if(_actionModel != NULL)
         {
-            disconnect(_actionModel, &ActionM::isValidChanged, this, &ActionVM::onActionIsValidChange);
+            disconnect(_actionModel, &ActionM::isValidChanged, this, &ActionVM::_onIsValidChangedInModel);
 
             // Endtime reevaluation disconnection
             disconnect(_actionModel, &ActionM::validityDurationChanged, this, &ActionVM::_onValidityDurationChange);
@@ -213,7 +215,7 @@ void ActionVM::setactionModel(ActionM * actionM)
 
         if(_actionModel != NULL)
         {
-            connect(_actionModel, &ActionM::isValidChanged, this, &ActionVM::onActionIsValidChange);
+            connect(_actionModel, &ActionM::isValidChanged, this, &ActionVM::_onIsValidChangedInModel);
 
             // Endtime reevaluation connection
             connect(_actionModel, &ActionM::validityDurationChanged, this, &ActionVM::_onValidityDurationChange);
@@ -307,13 +309,14 @@ void ActionVM::delayCurrentExecution(int currentTimeInMilliSeconds)
 
 
 /**
- * @brief Slot on the is valid flag change on the action Model
- * @param is valid flag
+ * @brief Slot when the flag "is valid" changed in the model of action
+ * @param isValid flag "is valid"
  */
-void ActionVM::onActionIsValidChange(bool isValid)
+void ActionVM::_onIsValidChangedInModel(bool isValid)
 {
     setisValid(isValid);
 }
+
 
 /**
  * @brief Slot on the validity duration change
@@ -323,6 +326,7 @@ void ActionVM::_onValidityDurationChange()
 {
     _computeEndTime();
 }
+
 
 /**
  * @brief Compute the endTime according to the action model and its type
