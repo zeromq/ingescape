@@ -59,20 +59,20 @@ public:
      * @param effectsList
      * @return
      */
-    QList<QPair<QString, QString>> getCommandsForEffectsAndInitReverseCommands(QList<ActionEffectVM*> effectsList);
+    QList<QPair<QString, QStringList>> getCommandsForEffectsAndInitReverseCommands(QList<ActionEffectVM*> effectsList);
 
 
     /**
      * @brief Get the list of Reverse commands
      * @return
      */
-    QList<QPair<QString, QString>> getReverseCommands();
+    QList<QPair<QString, QStringList>> getReverseCommands();
     
 
 private:
 
-    // List of pairs <agent name, reverse command>
-    QList<QPair<QString, QString>> _reverseCommandsForAgents;
+    // List of pairs <agent name, reverse command (and parameters)>
+    QList<QPair<QString, QStringList>> _reverseCommandsForAgents;
 
 };
 

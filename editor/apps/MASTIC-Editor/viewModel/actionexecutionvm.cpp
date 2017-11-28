@@ -44,10 +44,10 @@ ActionExecutionVM::~ActionExecutionVM()
  * @param effectsList
  * @return
  */
-QList<QPair<QString, QString>> ActionExecutionVM::getCommandsForEffectsAndInitReverseCommands(QList<ActionEffectVM*> effectsList)
+QList<QPair<QString, QStringList>> ActionExecutionVM::getCommandsForEffectsAndInitReverseCommands(QList<ActionEffectVM*> effectsList)
 {
-    // List of pairs <agent name, command>
-    QList<QPair<QString, QString>> commandsForAgents;
+    // List of pairs <agent name, command (and parameters)>
+    QList<QPair<QString, QStringList>> commandsForAgents;
 
     foreach (ActionEffectVM* effectVM, effectsList)
     {
@@ -56,14 +56,14 @@ QList<QPair<QString, QString>> ActionExecutionVM::getCommandsForEffectsAndInitRe
             ActionEffectM* effectModel = effectVM->modelM();
             QString agentName = effectModel->agent()->name();
 
-            QPair<QString, QString> pairCommand;
-            QPair<QString, QString> pairReverseCommand;
+            QPair<QString, QStringList> pairCommandAndParameters;
+            QPair<QString, QStringList> pairReverseCommandAndParameters;
 
-            pairCommand.first = agentName;
-            pairReverseCommand.first = agentName;
+            pairCommandAndParameters.first = agentName;
+            pairReverseCommandAndParameters.first = agentName;
 
-            QString commandAndParameters;
-            QString reverseCommandAndParameters;
+            QStringList commandAndParameters;
+            QStringList reverseCommandAndParameters;
 
             switch (effectVM->effectType())
             {
@@ -77,13 +77,13 @@ QList<QPair<QString, QString>> ActionExecutionVM::getCommandsForEffectsAndInitRe
                     switch (effectOnAgent->agentEffectValue())
                     {
                     case AgentEffectValues::ON: {
-                        commandAndParameters = "RUN";
-                        reverseCommandAndParameters = "DIE";
+                        commandAndParameters << "RUN";
+                        reverseCommandAndParameters << "DIE";
                         break;
                     }
                     case AgentEffectValues::OFF: {
-                        commandAndParameters = "DIE";
-                        reverseCommandAndParameters = "RUN";
+                        commandAndParameters << "DIE";
+                        reverseCommandAndParameters << "RUN";
                         break;
                     }
                     default:
@@ -102,38 +102,41 @@ QList<QPair<QString, QString>> ActionExecutionVM::getCommandsForEffectsAndInitRe
                     // SET_INPUT / SET_OUTPUT / SET_PARAMETER
                     QString command = QString("SET_%1").arg(AgentIOPTypes::staticEnumToString(iopValueEffect->agentIOP()->agentIOPType()));
 
-                    QString iopName = iopValueEffect->agentIOP()->name();
+                    commandAndParameters << command << iopValueEffect->agentIOP()->name();
+                    reverseCommandAndParameters << command << iopValueEffect->agentIOP()->name();
 
                     switch (iopValueEffect->agentIOP()->agentIOPValueType())
                     {
                     case AgentIOPValueTypes::BOOL: {
                         if (iopValueEffect->agentIOP()->currentValue().toBool()) {
-                            commandAndParameters = QString("%1 %2 %3").arg(command, iopName, "false");
-                            reverseCommandAndParameters = QString("%1 %2 %3").arg(command, iopName, "true");
+                            commandAndParameters << "false";
+                            reverseCommandAndParameters << "true";
                         }
                         else {
-                            commandAndParameters = QString("%1 %2 %3").arg(command, iopName, "true");
-                            reverseCommandAndParameters = QString("%1 %2 %3").arg(command, iopName, "false");
+                            commandAndParameters << "true";
+                            reverseCommandAndParameters << "false";
                         }
                         break;
                     }
                     case AgentIOPValueTypes::INTEGER: {
-                        commandAndParameters = QString("%1 %2 %3").arg(command, iopName, iopValueEffect->value());
+                        commandAndParameters << iopValueEffect->value();
+
                         // FIXME check if conversion succeeded
-                        //reverseCommandAndParameters = QString("%1 %2 %3").arg(command, iopName, QString::number(iopValueEffect->agentIOP()->currentValue().toInt()));
-                        reverseCommandAndParameters = QString("%1 %2 %3").arg(command, iopName, iopValueEffect->agentIOP()->displayableCurrentValue());
+                        //reverseCommandAndParameters << QString::number(iopValueEffect->agentIOP()->currentValue().toInt());
+                        reverseCommandAndParameters << iopValueEffect->agentIOP()->displayableCurrentValue();
                         break;
                     }
                     case AgentIOPValueTypes::DOUBLE: {
-                        commandAndParameters = QString("%1 %2 %3").arg(command, iopName, iopValueEffect->value());
+                        commandAndParameters << iopValueEffect->value();
+
                         // FIXME check if conversion succeeded
-                        //reverseCommandAndParameters = QString("%1 %2 %3").arg(command, iopName, QString::number(iopValueEffect->agentIOP()->currentValue().toDouble()));
-                        reverseCommandAndParameters = QString("%1 %2 %3").arg(command, iopName, iopValueEffect->agentIOP()->displayableCurrentValue());
+                        //reverseCommandAndParameters << QString::number(iopValueEffect->agentIOP()->currentValue().toDouble());
+                        reverseCommandAndParameters << iopValueEffect->agentIOP()->displayableCurrentValue();
                         break;
                     }
                     case AgentIOPValueTypes::STRING: {
-                        commandAndParameters = QString("%1 %2 %3").arg(command, iopName, iopValueEffect->value());
-                        reverseCommandAndParameters = QString("%1 %2 %3").arg(command, iopName, iopValueEffect->agentIOP()->currentValue().toString());
+                        commandAndParameters << iopValueEffect->value();
+                        reverseCommandAndParameters << iopValueEffect->agentIOP()->currentValue().toString();
                         break;
                     }
                     default:
@@ -150,21 +153,27 @@ QList<QPair<QString, QString>> ActionExecutionVM::getCommandsForEffectsAndInitRe
                 MappingEffectM* mappingEffect = qobject_cast<MappingEffectM*>(effectModel);
                 if ((mappingEffect != NULL) && (mappingEffect->input() != NULL) && (mappingEffect->outputAgent() != NULL) && (mappingEffect->output() != NULL))
                 {
+                    QString command = "";
+                    QString reverseCommand = "";
+
                     switch (mappingEffect->mappingEffectValue())
                     {
-                        case MappingEffectValues::MAPPED:
-                            commandAndParameters = QString("%1 %2 %3 %4").arg("MAP", mappingEffect->input()->name(), mappingEffect->outputAgent()->name(), mappingEffect->output()->name());
-                            reverseCommandAndParameters = QString("%1 %2 %3 %4").arg("UNMAP", mappingEffect->input()->name(), mappingEffect->outputAgent()->name(), mappingEffect->output()->name());
-                            break;
-
-                        case MappingEffectValues::UNMAPPED:
-                            commandAndParameters = QString("%1 %2 %3 %4").arg("UNMAP", mappingEffect->input()->name(), mappingEffect->outputAgent()->name(), mappingEffect->output()->name());
-                            reverseCommandAndParameters = QString("%1 %2 %3 %4").arg("MAP", mappingEffect->input()->name(), mappingEffect->outputAgent()->name(), mappingEffect->output()->name());
-                            break;
-
-                        default:
-                            break;
+                    case MappingEffectValues::MAPPED: {
+                        command = "MAP";
+                        reverseCommand = "UNMAP";
+                        break;
                     }
+                    case MappingEffectValues::UNMAPPED: {
+                        command = "UNMAP";
+                        reverseCommand = "MAP";
+                        break;
+                    }
+                    default:
+                        break;
+                    }
+
+                    commandAndParameters << command << mappingEffect->input()->name() << mappingEffect->outputAgent()->name() << mappingEffect->output()->name();
+                    reverseCommandAndParameters << reverseCommand << mappingEffect->input()->name() << mappingEffect->outputAgent()->name() << mappingEffect->output()->name();
                 }
                 break;
             }
@@ -173,23 +182,23 @@ QList<QPair<QString, QString>> ActionExecutionVM::getCommandsForEffectsAndInitRe
             }
 
             // Command (and parameters) are defined
-            if (!commandAndParameters.isEmpty())
+            if (commandAndParameters.count() > 0)
             {
-                qDebug() << pairCommand.first << "Command (and parameters):" << commandAndParameters;
+                qDebug() << pairCommandAndParameters.first << "Command (and parameters):" << commandAndParameters;
 
-                pairCommand.second = commandAndParameters;
+                pairCommandAndParameters.second = commandAndParameters;
 
-                commandsForAgents.append(pairCommand);
+                commandsForAgents.append(pairCommandAndParameters);
             }
 
             // Reverse command (and parameters) are defined
-            if (_shallRevert && !reverseCommandAndParameters.isEmpty())
+            if (_shallRevert && reverseCommandAndParameters.count() > 0)
             {
-                qDebug() << pairCommand.first << "Reverse Command (and parameters):" << reverseCommandAndParameters;
+                qDebug() << pairReverseCommandAndParameters.first << "Reverse Command (and parameters):" << reverseCommandAndParameters;
 
-                pairReverseCommand.second = reverseCommandAndParameters;
+                pairReverseCommandAndParameters.second = reverseCommandAndParameters;
 
-                _reverseCommandsForAgents.append(pairReverseCommand);
+                _reverseCommandsForAgents.append(pairReverseCommandAndParameters);
             }
         }
     }
@@ -202,7 +211,7 @@ QList<QPair<QString, QString>> ActionExecutionVM::getCommandsForEffectsAndInitRe
  * @brief Get the list of Reverse commands
  * @return
  */
-QList<QPair<QString, QString>> ActionExecutionVM::getReverseCommands()
+QList<QPair<QString, QStringList>> ActionExecutionVM::getReverseCommands()
 {
     return _reverseCommandsForAgents;
 }
