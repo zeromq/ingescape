@@ -166,8 +166,6 @@ qreal AbstractTimeActionslineScenarioViewController::convertTimeInMillisecondsTo
     // Compute delta in seconds between this date and our origin
     int deltaSeconds = (timeInMilliSeconds/1000 - _startRelativeTimeInSeconds);
 
-    qDebug() << "timeInMilliSeconds" << timeInMilliSeconds << "deltaSeconds" << deltaSeconds << "return = " << qRound(_pixelsPerMinute * (_timeMarginInMinutes + deltaSeconds/60.0));
-
     // Round value to avoid rendering artefacts
     return qRound(_pixelsPerMinute * (_timeMarginInMinutes + deltaSeconds/60.0));
 }
