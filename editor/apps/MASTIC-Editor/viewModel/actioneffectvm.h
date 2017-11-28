@@ -66,7 +66,6 @@ public:
     ~ActionEffectVM();
 
 
-
 Q_SIGNALS:
 
 

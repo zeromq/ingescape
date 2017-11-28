@@ -53,7 +53,22 @@ public:
     * @brief Copy from another effect model
     * @param effct to copy
     */
-    void copyFrom(ActionEffectM* effect);
+    virtual void copyFrom(ActionEffectM* effect);
+
+
+    /**
+     * @brief Get a pair with the agent and the command (with parameters) of our effect
+     * @return
+     */
+    virtual QPair<AgentInMappingVM*, QStringList> getAgentAndCommandWithParameters() = 0;
+
+
+    /**
+     * @brief Get a pair with the agent name and the reverse command (with parameters) of our effect
+     * @return
+     */
+    virtual QPair<QString, QStringList> getAgentNameAndReverseCommandWithParameters() = 0;
+
 
 Q_SIGNALS:
 

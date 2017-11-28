@@ -55,11 +55,10 @@ public:
 
 
     /**
-     * @brief Get the list of commands for the list of effects (and eventually init the list of reverse commands)
+     * @brief Initialize the reverse command (and parameters) for each effect
      * @param effectsList
-     * @return
      */
-    QList<QPair<QString, QStringList>> getCommandsForEffectsAndInitReverseCommands(QList<ActionEffectVM*> effectsList);
+    void initReverseCommandsForEffects(QList<ActionEffectVM*> effectsList);
 
 
     /**

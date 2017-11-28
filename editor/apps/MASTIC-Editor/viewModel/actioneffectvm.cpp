@@ -134,9 +134,9 @@ void ActionEffectVM::_configureToType(ActionEffectTypes::Value effectType)
             break;
         }
         case ActionEffectTypes::MAPPING: {
-            MappingEffectM * mappingEffect = new MappingEffectM();
+            MappingEffectM* mappingEffect = new MappingEffectM();
             setmodelM(mappingEffect);
-            mappingEffect->setagent(agent);
+            _modelM->setagent(agent);
 
             if (_secondAgentInMapping != NULL) {
                 mappingEffect->setoutputAgent(_secondAgentInMapping);

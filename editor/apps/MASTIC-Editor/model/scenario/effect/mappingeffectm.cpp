@@ -166,6 +166,80 @@ void MappingEffectM::setagent(AgentInMappingVM* agent)
 
 
 /**
+ * @brief Get a pair with the agent and the command (with parameters) of our effect
+ * @return
+ */
+QPair<AgentInMappingVM*, QStringList> MappingEffectM::getAgentAndCommandWithParameters()
+{
+    QPair<AgentInMappingVM*, QStringList> pairAgentAndCommandWithParameters;
+
+    if ((_agent != NULL) && (_input != NULL) && (_outputAgent != NULL) && (_output != NULL))
+    {
+        pairAgentAndCommandWithParameters.first = _agent;
+
+        QStringList commandAndParameters;
+
+        switch (_mappingEffectValue)
+        {
+        case MappingEffectValues::MAPPED: {
+            commandAndParameters << "MAP";
+            break;
+        }
+        case MappingEffectValues::UNMAPPED: {
+            commandAndParameters << "UNMAP";
+            break;
+        }
+        default:
+            break;
+        }
+
+        commandAndParameters << _input->name() << _outputAgent->name() << _output->name();
+
+        pairAgentAndCommandWithParameters.second = commandAndParameters;
+    }
+
+    return pairAgentAndCommandWithParameters;
+}
+
+
+/**
+ * @brief Get a pair with the agent name and the reverse command (with parameters) of our effect
+ * @return
+ */
+QPair<QString, QStringList> MappingEffectM::getAgentNameAndReverseCommandWithParameters()
+{
+    QPair<QString, QStringList> pairAgentNameAndReverseCommand;
+
+    if ((_agent != NULL) && (_input != NULL) && (_outputAgent != NULL) && (_output != NULL))
+    {
+        pairAgentNameAndReverseCommand.first = _agent->name();
+
+        QStringList reverseCommandAndParameters;
+
+        switch (_mappingEffectValue)
+        {
+        case MappingEffectValues::MAPPED: {
+            reverseCommandAndParameters << "UNMAP";
+            break;
+        }
+        case MappingEffectValues::UNMAPPED: {
+            reverseCommandAndParameters << "MAP";
+            break;
+        }
+        default:
+            break;
+        }
+
+        reverseCommandAndParameters << _input->name() << _outputAgent->name() << _output->name();
+
+        pairAgentNameAndReverseCommand.second = reverseCommandAndParameters;
+    }
+
+    return pairAgentNameAndReverseCommand;
+}
+
+
+/**
 * @brief Custom setter for property "output agent" to fill inputs and outputs
 * @param value
 */

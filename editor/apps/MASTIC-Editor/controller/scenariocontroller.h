@@ -317,10 +317,18 @@ private :
 
 
     /**
-     * @brief Execute a list of commands for agents
-     * @param commandsForAgents
+     * @brief Execute reverse effects of an action
+     * @param actionExecution
      */
-    void _executeCommandsForAgents(QList<QPair<QString, QStringList>> commandsForAgents);
+    void _executeReverseEffectsOfAction(ActionExecutionVM* actionExecution);
+
+
+    /**
+     * @brief Execute a command for an agent
+     * @param agent
+     * @param commandAndParameters
+     */
+    void _executeCommandForAgent(AgentInMappingVM* agent, QStringList commandAndParameters);
 
 
 protected:

@@ -34,16 +34,16 @@ class IOPValueEffectM: public ActionEffectM
     Q_OBJECT
 
     // Agent IOP
-    I2_QML_PROPERTY_CUSTOM_SETTER(AgentIOPM* , agentIOP)
+    I2_QML_PROPERTY_CUSTOM_SETTER(AgentIOPM*, agentIOP)
 
     // Agent IOP name
-    I2_QML_PROPERTY(QString , agentIOPName)
+    I2_QML_PROPERTY(QString, agentIOPName)
 
     // Value converted into string
     I2_QML_PROPERTY(QString, value)
 
     // Merged list of Inputs and Outputs of the agent
-    I2_QOBJECT_LISTMODEL(AgentIOPM , iopMergedList)
+    I2_QOBJECT_LISTMODEL(AgentIOPM, iopMergedList)
 
 
 public:
@@ -64,14 +64,29 @@ public:
     /**
       * @brief Redefinition of action effect copy
       */
-    void copyFrom(ActionEffectM* effect);
+    void copyFrom(ActionEffectM* effect) Q_DECL_OVERRIDE;
 
 
     /**
     * @brief Custom setter on set agent to fill inputs and outputs
     * @param agent
     */
-    void setagent(AgentInMappingVM* agent);
+    void setagent(AgentInMappingVM* agent) Q_DECL_OVERRIDE;
+
+
+    /**
+     * @brief Get a pair with the agent and the command (with parameters) of our effect
+     * @return
+     */
+    QPair<AgentInMappingVM*, QStringList> getAgentAndCommandWithParameters() Q_DECL_OVERRIDE;
+
+
+    /**
+     * @brief Get a pair with the agent name and the reverse command (with parameters) of our effect
+     * @return
+     */
+    QPair<QString, QStringList> getAgentNameAndReverseCommandWithParameters() Q_DECL_OVERRIDE;
+
 
 public Q_SLOTS:
 
@@ -85,12 +100,14 @@ public Q_SLOTS:
       */
     void onOutputsListChange(QList<OutputVM *> outputsList);
 
+
 protected Q_SLOTS:
     /**
      * @brief Called when our agent iop model is destroyed
      * @param sender
      */
     void _onAgentIopModelDestroyed(QObject* sender);
+
 
 private:
     /**

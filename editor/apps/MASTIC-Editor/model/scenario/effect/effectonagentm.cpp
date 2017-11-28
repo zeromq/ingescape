@@ -84,3 +84,73 @@ void EffectOnAgentM::copyFrom(ActionEffectM* effect)
         setagentEffectValue(effectOnAgent->agentEffectValue());
     }
 }
+
+
+/**
+ * @brief Get a pair with the agent and the command (with parameters) of our effect
+ * @return
+ */
+QPair<AgentInMappingVM*, QStringList> EffectOnAgentM::getAgentAndCommandWithParameters()
+{
+    QPair<AgentInMappingVM*, QStringList> pairAgentAndCommandWithParameters;
+
+    if (_agent != NULL)
+    {
+        pairAgentAndCommandWithParameters.first = _agent;
+
+        QStringList commandAndParameters;
+
+        switch (_agentEffectValue)
+        {
+        case AgentEffectValues::ON: {
+            commandAndParameters << "RUN";
+            break;
+        }
+        case AgentEffectValues::OFF: {
+            commandAndParameters << "DIE";
+            break;
+        }
+        default:
+            break;
+        }
+
+        pairAgentAndCommandWithParameters.second = commandAndParameters;
+    }
+
+    return pairAgentAndCommandWithParameters;
+}
+
+
+/**
+ * @brief Get a pair with the agent name and the reverse command (with parameters) of our effect
+ * @return
+ */
+QPair<QString, QStringList> EffectOnAgentM::getAgentNameAndReverseCommandWithParameters()
+{
+    QPair<QString, QStringList> pairAgentNameAndReverseCommand;
+
+    if (_agent != NULL)
+    {
+        pairAgentNameAndReverseCommand.first = _agent->name();
+
+        QStringList reverseCommandAndParameters;
+
+        switch (_agentEffectValue)
+        {
+        case AgentEffectValues::ON: {
+            reverseCommandAndParameters << "DIE";
+            break;
+        }
+        case AgentEffectValues::OFF: {
+            reverseCommandAndParameters << "RUN";
+            break;
+        }
+        default:
+            break;
+        }
+
+        pairAgentNameAndReverseCommand.second = reverseCommandAndParameters;
+    }
+
+    return pairAgentNameAndReverseCommand;
+}
