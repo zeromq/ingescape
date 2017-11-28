@@ -192,6 +192,13 @@ public:
     Q_INVOKABLE bool canInsertActionVMTo(ActionM *actionMToInsert, int time, int lineNumber);
 
 
+    /**
+     * @brief Execute all effects of the action
+     * @param action
+     */
+    Q_INVOKABLE void executeEffectsOfAction(ActionM* action);
+
+
 Q_SIGNALS:
 
     /**

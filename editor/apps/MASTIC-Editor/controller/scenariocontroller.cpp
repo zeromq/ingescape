@@ -813,6 +813,28 @@ bool ScenarioController::canInsertActionVMTo(ActionM* actionMToInsert, int time,
 
 
 /**
+ * @brief Execute all effects of the action
+ * @param action
+ */
+void ScenarioController::executeEffectsOfAction(ActionM* action)
+{
+    if ((action != NULL) && (action->effectsList()->count() > 0))
+    {
+        qDebug() << "Execute" << action->effectsList()->count() << "effects of action" << action->name();
+
+        foreach (ActionEffectVM* effectVM, action->effectsList()->toList())
+        {
+            if ((effectVM != NULL) && (effectVM->modelM() != NULL))
+            {
+                // FIXME TODO
+                //effectVM->modelM()->getCommandAndParameter();
+            }
+        }
+    }
+}
+
+
+/**
  * @brief Custom setter on is playing command for the scenario
  * @param is playing flag
  */
