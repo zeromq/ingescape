@@ -66,6 +66,12 @@ public:
     ~ActionEffectVM();
 
 
+    /**
+     * @brief Get the command and parameters of our effect
+     * @return
+     */
+    //QPair<QString, QStringList> getCommandAndParameters();
+
 
 Q_SIGNALS:
 

@@ -84,3 +84,38 @@ void EffectOnAgentM::copyFrom(ActionEffectM* effect)
         setagentEffectValue(effectOnAgent->agentEffectValue());
     }
 }
+
+
+/**
+ * @brief Get the command and parameters of our effect
+ * @return
+ */
+QPair<QString, QStringList> EffectOnAgentM::getCommandAndParameters()
+{
+    QPair<QString, QStringList> pairCommandAndParameters;
+
+    if (_agent != NULL)
+    {
+        pairCommandAndParameters.first = _agent->name();
+
+        QStringList commandAndParameters;
+
+        switch (_agentEffectValue)
+        {
+        case AgentEffectValues::ON: {
+            commandAndParameters << "RUN";
+            break;
+        }
+        case AgentEffectValues::OFF: {
+            commandAndParameters << "DIE";
+            break;
+        }
+        default:
+            break;
+        }
+
+        pairCommandAndParameters.second = commandAndParameters;
+    }
+
+    return pairCommandAndParameters;
+}

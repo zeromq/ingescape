@@ -134,9 +134,9 @@ void ActionEffectVM::_configureToType(ActionEffectTypes::Value effectType)
             break;
         }
         case ActionEffectTypes::MAPPING: {
-            MappingEffectM * mappingEffect = new MappingEffectM();
+            MappingEffectM* mappingEffect = new MappingEffectM();
             setmodelM(mappingEffect);
-            mappingEffect->setagent(agent);
+            _modelM->setagent(agent);
 
             if (_secondAgentInMapping != NULL) {
                 mappingEffect->setoutputAgent(_secondAgentInMapping);
@@ -150,5 +150,41 @@ void ActionEffectVM::_configureToType(ActionEffectTypes::Value effectType)
             break;
     }
 }
+
+
+/**
+ * @brief Get the command and parameters of our effect
+ * @return
+ */
+/*QPair<QString, QStringList> ActionEffectVM::getCommandAndParameters()
+{
+    QPair<QString, QStringList> pairCommandAndParameters;
+
+    switch (_effectType)
+    {
+    // AGENT
+    case ActionEffectTypes::AGENT:
+    {
+
+        break;
+    }
+    // VALUE
+    case ActionEffectTypes::VALUE:
+    {
+
+        break;
+    }
+    // MAPPING
+    case ActionEffectTypes::MAPPING:
+    {
+
+        break;
+    }
+    default:
+        break;
+    }
+
+    return pairCommandAndParameters;
+}*/
 
 

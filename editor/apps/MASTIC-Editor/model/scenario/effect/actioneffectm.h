@@ -56,6 +56,12 @@ public:
     void copyFrom(ActionEffectM* effect);
 
 
+    /**
+     * @brief Get the command and parameters of our effect
+     * @return
+     */
+    virtual QPair<QString, QStringList> getCommandAndParameters() = 0;
+
 
 Q_SIGNALS:
 

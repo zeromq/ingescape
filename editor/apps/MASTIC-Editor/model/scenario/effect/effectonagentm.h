@@ -57,6 +57,13 @@ public:
      */
     void copyFrom(ActionEffectM* effect);
 
+
+    /**
+     * @brief Get the command and parameters of our effect
+     * @return
+     */
+    QPair<QString, QStringList> getCommandAndParameters() Q_DECL_OVERRIDE;
+
 };
 
 QML_DECLARE_TYPE(EffectOnAgentM)
