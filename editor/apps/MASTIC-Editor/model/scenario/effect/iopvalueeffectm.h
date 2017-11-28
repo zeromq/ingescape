@@ -64,7 +64,7 @@ public:
     /**
       * @brief Redefinition of action effect copy
       */
-    void copyFrom(ActionEffectM* effect);
+    void copyFrom(ActionEffectM* effect) Q_DECL_OVERRIDE;
 
 
     /**
@@ -79,6 +79,13 @@ public:
      * @return
      */
     QPair<AgentInMappingVM*, QStringList> getAgentAndCommandWithParameters() Q_DECL_OVERRIDE;
+
+
+    /**
+     * @brief Get a pair with the agent name and the reverse command (with parameters) of our effect
+     * @return
+     */
+    QPair<QString, QStringList> getAgentNameAndReverseCommandWithParameters() Q_DECL_OVERRIDE;
 
 
 public Q_SLOTS:

@@ -119,3 +119,38 @@ QPair<AgentInMappingVM*, QStringList> EffectOnAgentM::getAgentAndCommandWithPara
 
     return pairAgentAndCommandWithParameters;
 }
+
+
+/**
+ * @brief Get a pair with the agent name and the reverse command (with parameters) of our effect
+ * @return
+ */
+QPair<QString, QStringList> EffectOnAgentM::getAgentNameAndReverseCommandWithParameters()
+{
+    QPair<QString, QStringList> pairAgentNameAndReverseCommand;
+
+    if (_agent != NULL)
+    {
+        pairAgentNameAndReverseCommand.first = _agent->name();
+
+        QStringList reverseCommandAndParameters;
+
+        switch (_agentEffectValue)
+        {
+        case AgentEffectValues::ON: {
+            reverseCommandAndParameters << "DIE";
+            break;
+        }
+        case AgentEffectValues::OFF: {
+            reverseCommandAndParameters << "RUN";
+            break;
+        }
+        default:
+            break;
+        }
+
+        pairAgentNameAndReverseCommand.second = reverseCommandAndParameters;
+    }
+
+    return pairAgentNameAndReverseCommand;
+}

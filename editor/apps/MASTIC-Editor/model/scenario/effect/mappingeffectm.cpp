@@ -173,7 +173,7 @@ QPair<AgentInMappingVM*, QStringList> MappingEffectM::getAgentAndCommandWithPara
 {
     QPair<AgentInMappingVM*, QStringList> pairAgentAndCommandWithParameters;
 
-    if (_agent != NULL)
+    if ((_agent != NULL) && (_input != NULL) && (_outputAgent != NULL) && (_output != NULL))
     {
         pairAgentAndCommandWithParameters.first = _agent;
 
@@ -199,6 +199,43 @@ QPair<AgentInMappingVM*, QStringList> MappingEffectM::getAgentAndCommandWithPara
     }
 
     return pairAgentAndCommandWithParameters;
+}
+
+
+/**
+ * @brief Get a pair with the agent name and the reverse command (with parameters) of our effect
+ * @return
+ */
+QPair<QString, QStringList> MappingEffectM::getAgentNameAndReverseCommandWithParameters()
+{
+    QPair<QString, QStringList> pairAgentNameAndReverseCommand;
+
+    if ((_agent != NULL) && (_input != NULL) && (_outputAgent != NULL) && (_output != NULL))
+    {
+        pairAgentNameAndReverseCommand.first = _agent->name();
+
+        QStringList reverseCommandAndParameters;
+
+        switch (_mappingEffectValue)
+        {
+        case MappingEffectValues::MAPPED: {
+            reverseCommandAndParameters << "UNMAP";
+            break;
+        }
+        case MappingEffectValues::UNMAPPED: {
+            reverseCommandAndParameters << "MAP";
+            break;
+        }
+        default:
+            break;
+        }
+
+        reverseCommandAndParameters << _input->name() << _outputAgent->name() << _output->name();
+
+        pairAgentNameAndReverseCommand.second = reverseCommandAndParameters;
+    }
+
+    return pairAgentNameAndReverseCommand;
 }
 
 

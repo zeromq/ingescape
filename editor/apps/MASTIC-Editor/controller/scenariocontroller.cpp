@@ -955,21 +955,16 @@ void ScenarioController::_onTimeout_EvaluateActions()
                             // All conditions are met (or there is NO condition on this action)...
                             if (actionVM->isValid())
                             {
-                                // ...we have to execute effects
-                                QList<ActionEffectVM*> effectsList = actionVM->actionModel()->effectsList()->toList();
-                                if (effectsList.count() > 0)
-                                {
-                                    // FIXME TODO
-
-                                    // Get the list of pairs <agent name, command (and parameters)>
-                                    //QList<QPair<QString, QStringList>> commandsForAgents = actionExecution->getCommandsForEffectsAndInitReverseCommands(effectsList);
-
-                                    // Execute commands for agents
-                                    //_executeCommandsForAgents(commandsForAgents);
-
-                                    // Notify the action that its effects has been executed
-                                    actionVM->effectsExecuted(currentTimeInMilliSeconds);
+                                if (actionExecution->shallRevert()) {
+                                    // Initialize the reverse command (and parameters) for each effect
+                                    actionExecution->initReverseCommandsForEffects(actionVM->actionModel()->effectsList()->toList());
                                 }
+
+                                // Execute all effects of the action
+                                executeEffectsOfAction(actionVM->actionModel());
+
+                                // Notify the action that its effects has been executed
+                                actionVM->effectsExecuted(currentTimeInMilliSeconds);
                             }
                             // There is at least one condition which is not respected
                             else
@@ -981,16 +976,11 @@ void ScenarioController::_onTimeout_EvaluateActions()
                         // Action is already executed and shall revert
                         else if (actionExecution->shallRevert())
                         {
-                            //
+                            // TODO
                             if (actionExecution->reverseTime() <= currentTimeInMilliSeconds)
                             {
-                                // FIXME TODO
-
-                                // Get the list of pairs <agent name, reverse command (and parameters)>
-                                //QList<QPair<QString, QStringList>> reverseCommandsForAgents = actionExecution->getReverseCommands();
-
-                                // Execute reverse commands for agents
-                                //_executeCommandsForAgents(reverseCommandsForAgents);
+                                // Execute reverse effects of the action
+                                _executeReverseEffectsOfAction(actionExecution);
 
                                 // Notify the action that its reverse effects has been executed
                                 actionVM->reverseEffectsExecuted(currentTimeInMilliSeconds);
@@ -1004,6 +994,8 @@ void ScenarioController::_onTimeout_EvaluateActions()
                     ActionExecutionVM* actionExecution = actionVM->currentExecution();
                     if (actionExecution != NULL)
                     {
+                        // FIXME TODO
+
                         // Remove the current execution
                         actionVM->setcurrentExecution(NULL);
                         actionVM->executionsList()->remove(actionExecution);
@@ -1106,31 +1098,29 @@ AgentInMappingVM* ScenarioController::_getAgentInMappingFromName(QString agentNa
 
 
 /**
- * @brief Execute a list of commands for agents
- * @param commandsForAgents
+ * @brief Execute reverse effects of an action
+ * @param actionExecution
  */
-/*void ScenarioController::_executeCommandsForAgents(QList<QPair<QString, QStringList>> commandsForAgents)
+void ScenarioController::_executeReverseEffectsOfAction(ActionExecutionVM* actionExecution)
 {
-    for (int i = 0; i < commandsForAgents.count(); i++)
+    if ((actionExecution != NULL) && actionExecution->shallRevert())
     {
-        QPair<QString, QStringList> commandForAgent = commandsForAgents.at(i);
+        // Get the list of pairs <agent name, reverse command (and parameters)>
+        QList<QPair<QString, QStringList>> reverseCommandsForAgents = actionExecution->getReverseCommands();
 
-        QString agentName = commandForAgent.first;
-        QStringList commandAndParameters = commandForAgent.second;
-
-        if (commandAndParameters.count() > 0)
+        for (int i = 0; i < reverseCommandsForAgents.count(); i++)
         {
-            QString command = commandAndParameters.at(0);
+            QPair<QString, QStringList> pairAgentNameAndReverseCommand = reverseCommandsForAgents.at(i);
 
-            AgentInMappingVM* agent = _getAgentInMappingFromName(agentName);
+            AgentInMappingVM* agent = _getAgentInMappingFromName(pairAgentNameAndReverseCommand.first);
             if (agent != NULL)
             {
-                qInfo() << "Execute commands" << commandAndParameters << "for agent" << agentName << agent->getPeerIdsList();
-
+                // Execute the (reverse) command for the agent
+                _executeCommandForAgent(agent, pairAgentNameAndReverseCommand.second);
             }
         }
     }
-}*/
+}
 
 
 /**

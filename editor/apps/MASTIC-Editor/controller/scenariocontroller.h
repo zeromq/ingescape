@@ -311,10 +311,10 @@ private :
 
 
     /**
-     * @brief Execute a list of commands for agents
-     * @param commandsForAgents
+     * @brief Execute reverse effects of an action
+     * @param actionExecution
      */
-    //void _executeCommandsForAgents(QList<QPair<QString, QStringList>> commandsForAgents);
+    void _executeReverseEffectsOfAction(ActionExecutionVM* actionExecution);
 
 
     /**

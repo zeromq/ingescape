@@ -140,7 +140,7 @@ QPair<AgentInMappingVM*, QStringList> IOPValueEffectM::getAgentAndCommandWithPar
 {
     QPair<AgentInMappingVM*, QStringList> pairAgentAndCommandWithParameters;
 
-    if (_agent != NULL)
+    if ((_agent != NULL) && (_agentIOP != NULL))
     {
         pairAgentAndCommandWithParameters.first = _agent;
 
@@ -154,10 +154,12 @@ QPair<AgentInMappingVM*, QStringList> IOPValueEffectM::getAgentAndCommandWithPar
         switch (_agentIOP->agentIOPValueType())
         {
         case AgentIOPValueTypes::INTEGER: {
+            // FIXME check that value is an INT
             commandAndParameters << _value;
             break;
         }
         case AgentIOPValueTypes::DOUBLE: {
+            // FIXME check that value is a DOUBLE
             commandAndParameters << _value;
             break;
         }
@@ -166,6 +168,7 @@ QPair<AgentInMappingVM*, QStringList> IOPValueEffectM::getAgentAndCommandWithPar
             break;
         }
         case AgentIOPValueTypes::BOOL: {
+            // FIXME check that value is a BOOL
             commandAndParameters << _value;
             break;
         }
@@ -187,6 +190,71 @@ QPair<AgentInMappingVM*, QStringList> IOPValueEffectM::getAgentAndCommandWithPar
     }
 
     return pairAgentAndCommandWithParameters;
+}
+
+
+/**
+ * @brief Get a pair with the agent name and the reverse command (with parameters) of our effect
+ * @return
+ */
+QPair<QString, QStringList> IOPValueEffectM::getAgentNameAndReverseCommandWithParameters()
+{
+    QPair<QString, QStringList> pairAgentNameAndReverseCommand;
+
+    if ((_agent != NULL) && (_agentIOP != NULL))
+    {
+        pairAgentNameAndReverseCommand.first = _agent->name();
+
+        QStringList reverseCommandAndParameters;
+
+        // SET_INPUT / SET_OUTPUT / SET_PARAMETER
+        QString command = QString("SET_%1").arg(AgentIOPTypes::staticEnumToString(_agentIOP->agentIOPType()));
+
+        reverseCommandAndParameters << command << _agentIOP->name();
+
+        switch (_agentIOP->agentIOPValueType())
+        {
+        case AgentIOPValueTypes::INTEGER: {
+            // FIXME check if conversion to INT succeeded
+            //reverseCommandAndParameters << QString::number(_agentIOP->currentValue().toInt());
+            reverseCommandAndParameters << _agentIOP->displayableCurrentValue();
+            break;
+        }
+        case AgentIOPValueTypes::DOUBLE: {
+            // FIXME check if conversion to DOUBLE succeeded
+            //reverseCommandAndParameters << QString::number(_agentIOP->currentValue().toDouble());
+            reverseCommandAndParameters << _agentIOP->displayableCurrentValue();
+            break;
+        }
+        case AgentIOPValueTypes::STRING: {
+            reverseCommandAndParameters << _agentIOP->currentValue().toString();
+            break;
+        }
+        case AgentIOPValueTypes::BOOL: {
+            if (_agentIOP->currentValue().toBool()) {
+                reverseCommandAndParameters << "true";
+            }
+            else {
+                reverseCommandAndParameters << "false";
+            }
+            break;
+        }
+        case AgentIOPValueTypes::IMPULSION: {
+            qWarning() << AgentIOPTypes::staticEnumToString(_agentIOP->agentIOPType()) << _agentIOP->name() << "has value type 'IMPULSION', thus the effect is irreversible!";
+            break;
+        }
+        case AgentIOPValueTypes::DATA: {
+            qWarning() << AgentIOPTypes::staticEnumToString(_agentIOP->agentIOPType()) << _agentIOP->name() << "has value type 'DATA', thus the effect is irreversible!";
+            break;
+        }
+        default:
+            break;
+        }
+
+        pairAgentNameAndReverseCommand.second = reverseCommandAndParameters;
+    }
+
+    return pairAgentNameAndReverseCommand;
 }
 
 
