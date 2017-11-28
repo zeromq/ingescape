@@ -289,14 +289,14 @@ void ActionVM::delayCurrentExecution(int currentTimeInMilliSeconds)
     if (_currentExecution != NULL)
     {
         // Add 1 ms
-        _currentExecution->setexecutionTime(currentTimeInMilliSeconds + 1);
+        _currentExecution->setexecutionTime(currentTimeInMilliSeconds - _startTime + 1);
 
         if ((_actionModel != NULL) && _actionModel->shallRevert() && _actionModel->shallRevertAfterTime())
         {
             // FIXME TODO: check reverseTime is not after validityDuration
 
             if (_actionModel->revertAfterTime() > -1) {
-                _currentExecution->setreverseTime(currentTimeInMilliSeconds + _actionModel->revertAfterTime());
+                _currentExecution->setreverseTime(currentTimeInMilliSeconds - _startTime + _actionModel->revertAfterTime());
             }
             else {
                 qWarning() << "Action" << _actionModel->name() << "Shall revert after time but 'revert after time' is not defined";
