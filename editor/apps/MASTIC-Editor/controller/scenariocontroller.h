@@ -34,8 +34,9 @@
 // Minimum lines displayed into the timeline by default
 #define MINIMUM_DISPLAYED_LINES_NUMBER_IN_TIMELINE 7
 
-// Interval in milli-seconds to evaluate each actionVM conditions
-#define INTERVAL_EVALUATION_ACTIONS 500
+// Interval in milli-seconds to regularly delay actions (when their conditions are not valid)
+#define INTERVAL_DELAY_ACTIONS 500
+
 
 /**
  * @brief The ScenarioController class defines the main controller of our scenario edition
@@ -263,9 +264,15 @@ public Q_SLOTS:
 private Q_SLOTS:
 
     /**
-     * @brief Called at each interval of our timer to update the current state of each zones that have at least one loudspeakers line
+     * @brief Called when our timer time out to handle the scenario and execute actions
      */
-    void _onTimeout_EvaluateActions();
+    void _onTimeout_ExecuteActions();
+
+
+    /**
+     * @brief Called at each interval of our timer to delay actions (when their conditions are not valid)
+     */
+    void _onTimeout_DelayActions();
 
 
 private :
@@ -355,8 +362,12 @@ protected:
     // Map of actions VM in the timeline from the line index
     QHash<int, I2CustomItemSortFilterListModel<ActionVM>* > _mapActionsVMsInTimelineFromLineIndex;
 
-    // Main timer to handle the scenario and evaluate actions
-    QTimer _timerToEvaluateActions;
+    // Timer to handle the scenario and execute actions
+    QTimer _timerToExecuteActions;
+
+    // Timer to regularly delay actions (when their conditions are not valid)
+    QTimer _timerToRegularlyDelayActions;
+
 
 private:
     // Time in milliseconds of our scenario start

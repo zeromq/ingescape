@@ -88,13 +88,14 @@ ScenarioController::ScenarioController(QString scenariosPath, QObject *parent) :
     // Set the sort property for the active actionsVM
     _activeActionsVMList.setSortProperty("startTime");
 
-    //
-    // Init the timer to evaluate the actions of our scenario
-    //
-    _timerToEvaluateActions.setInterval(INTERVAL_EVALUATION_ACTIONS);
-    connect(&_timerToEvaluateActions, &QTimer::timeout, this, &ScenarioController::_onTimeout_EvaluateActions);
 
+    //
+    // Init the timers
+    //
+    connect(&_timerToExecuteActions, &QTimer::timeout, this, &ScenarioController::_onTimeout_ExecuteActions);
 
+    _timerToRegularlyDelayActions.setInterval(INTERVAL_DELAY_ACTIONS);
+    connect(&_timerToRegularlyDelayActions, &QTimer::timeout, this, &ScenarioController::_onTimeout_DelayActions);
 }
 
 
@@ -103,6 +104,11 @@ ScenarioController::ScenarioController(QString scenariosPath, QObject *parent) :
  */
 ScenarioController::~ScenarioController()
 {
+    _stopScenario();
+
+    disconnect(&_timerToExecuteActions, &QTimer::timeout, this, &ScenarioController::_onTimeout_ExecuteActions);
+    disconnect(&_timerToRegularlyDelayActions, &QTimer::timeout, this, &ScenarioController::_onTimeout_DelayActions);
+
     // Clean-up current selection
     setselectedAction(NULL);
 
@@ -924,10 +930,11 @@ void ScenarioController::setisPlaying(bool isPlaying)
     }
 }
 
+
 /**
  * @brief Called at each interval of our timer to update the current state of each zones that have at least one loudspeakers line
  */
-void ScenarioController::_onTimeout_EvaluateActions()
+/*void ScenarioController::_onTimeout_EvaluateActions()
 {
     // Move the currenttime
     int currentTimeOfDay = QTime::currentTime().msecsSinceStartOfDay();
@@ -1020,6 +1027,51 @@ void ScenarioController::_onTimeout_EvaluateActions()
 
     // Save our scenario start
     _scenarioStartingTimeInMs = currentTimeOfDay;
+}*/
+
+
+/**
+ * @brief Called when our timer time out to handle the scenario and execute actions
+ */
+void ScenarioController::_onTimeout_ExecuteActions()
+{
+    qDebug() << "Timeout Execute Actions";
+}
+
+
+/**
+ * @brief Called at each interval of our timer to delay actions (when their conditions are not valid)
+ */
+void ScenarioController::_onTimeout_DelayActions()
+{
+    qDebug() << "Timeout Delay Actions";
+
+    // Move the currenttime
+    int currentTimeOfDay = QTime::currentTime().msecsSinceStartOfDay();
+
+    setcurrentTime(_currentTime.addMSecs(currentTimeOfDay - _scenarioStartingTimeInMs));
+
+    int currentTimeInMilliSeconds = _currentTime.msecsSinceStartOfDay();
+
+    foreach (ActionVM* actionVM, _activeActionsVMList.toList())
+    {
+        // View model of action is in the PRESENT
+        if ((actionVM != NULL) && (actionVM->startTime() <= currentTimeInMilliSeconds)
+                && ((actionVM->endTime() == -1) || (currentTimeInMilliSeconds <= actionVM->endTime())))
+        {
+            ActionExecutionVM* actionExecution = actionVM->currentExecution();
+
+            // Not already executed
+            if ((actionExecution != NULL) && !actionExecution->isExecuted())
+            {
+                // Delay the current execution of this action
+                actionVM->delayCurrentExecution(currentTimeInMilliSeconds);
+            }
+        }
+    }
+
+    // Save our scenario start
+    _scenarioStartingTimeInMs = currentTimeOfDay;
 }
 
 
@@ -1032,12 +1084,13 @@ void ScenarioController::_startScenario()
 {
     // Set the list of Actions to process at currentTime
     _activeActionsVMList.clear();
-    // Inverve exploration since we add the futur actions first
+
+    // Inverse exploration since we add the future actions first
     QList<ActionVM*> actionListToAdd;
     for (int index = _actionsInTimeLine.count()-1; index >= 0; --index)
     {
         ActionVM* actionVM = _actionsInTimeLine.at(index);
-        if(actionVM->endTime() > _currentTime.msecsSinceStartOfDay() || actionVM->endTime() == -1)
+        if ((actionVM->endTime() > _currentTime.msecsSinceStartOfDay()) || (actionVM->endTime() == -1))
         {
             actionListToAdd.append(actionVM);
         }
@@ -1045,7 +1098,7 @@ void ScenarioController::_startScenario()
             break;
         }
     }
-    if(actionListToAdd.count() > 0)
+    if (actionListToAdd.count() > 0)
     {
         _activeActionsVMList.append(actionListToAdd);
     }
@@ -1056,8 +1109,10 @@ void ScenarioController::_startScenario()
     // Save our scenario start
     _scenarioStartingTimeInMs = QTime::currentTime().msecsSinceStartOfDay();
 
-    // Start timer
-    _timerToEvaluateActions.start();
+    // Start timers
+    // FIXME TODO: init the timer with the time of the next action execution
+    //_timerToExecuteActions.start();
+    _timerToRegularlyDelayActions.start();
 }
 
 
@@ -1071,8 +1126,9 @@ void ScenarioController::_stopScenario()
     // Disconnect actions conditions
     conditionsDisconnect();
 
-    // Stop timer
-    _timerToEvaluateActions.stop();
+    // Stop timers
+    //_timerToExecuteActions.stop();
+    _timerToRegularlyDelayActions.stop();
 }
 
 

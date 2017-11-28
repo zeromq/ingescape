@@ -48,7 +48,7 @@ class ActionVM: public QObject
     // Line number in timeline
     I2_QML_PROPERTY(int, lineInTimeLine)
 
-    // Is valid flag
+    // Flag indicating if all conditions of our action are valid
     I2_QML_PROPERTY(bool, isValid)
 
     // List of executions of our action

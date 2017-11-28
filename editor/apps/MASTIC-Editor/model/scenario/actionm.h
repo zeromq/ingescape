@@ -79,13 +79,12 @@ class ActionM: public QObject
     // List of conditions for the action
     I2_QOBJECT_LISTMODEL(ActionConditionVM, conditionsList)
 
-    // Is valid flag
+    // Flag indicating if all conditions of our action are valid
     I2_QML_PROPERTY(bool, isValid)
 
     // Is connected flag
     I2_QML_PROPERTY(bool, isConnected)
 
-    // FIXME : Liste des temps de déclenchement (1 ou plus si réarmable) >> VP
 
 public:
 

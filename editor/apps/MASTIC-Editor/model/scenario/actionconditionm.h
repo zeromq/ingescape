@@ -42,7 +42,7 @@ class ActionConditionM: public QObject
     // Effect type
     I2_QML_PROPERTY(ActionComparisonValueType::Value, comparison)
 
-    // Flag in case of condition validation
+    // Flag indicating if our condition is valid
     I2_QML_PROPERTY(bool, isValid)
 
 
