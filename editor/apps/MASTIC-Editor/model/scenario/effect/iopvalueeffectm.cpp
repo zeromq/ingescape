@@ -170,8 +170,8 @@ QPair<AgentInMappingVM*, QStringList> IOPValueEffectM::getAgentAndCommandWithPar
             break;
         }
         case AgentIOPValueTypes::IMPULSION: {
-            // Simulate an invisible value
-            commandAndParameters << " ";
+            // Simulate a value
+            commandAndParameters << "0";
             break;
         }
         case AgentIOPValueTypes::DATA: {
