@@ -318,54 +318,59 @@ Item {
                                             0;
                                         }
 
-                                // Not revert action
-                                I2SvgItem {
-                                    x : viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(model.executionTime, viewController.pixelsPerMinute) - width/2;
-                                    anchors {
-                                        verticalCenter: conditionsValidityRect.verticalCenter
-                                    }
-
-                                    visible : !model.shallRevert
-
-                                    svgFileCache : MasticTheme.svgFileMASTIC;
-                                    svgElementId: (model.isExecuted) ? "timelineAction" : "currentAction";
-                                }
-
-                                // Revert action
                                 Item {
-                                    visible : model.shallRevert
-                                    height : childrenRect.height
-                                    anchors {
-                                        verticalCenter: conditionsValidityRect.verticalCenter
-                                    }
+                                    height : conditionsValidityRect.height
+                                    width : conditionsValidityRect.width
 
+                                    // Not revert action
                                     I2SvgItem {
-                                        id : actionExecution
-                                        x : viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(model.executionTime, viewController.pixelsPerMinute);
-                                        y : 0
-
-                                        svgFileCache : MasticTheme.svgFileMASTIC;
-                                        svgElementId: (model.isExecuted) ? "revertAction" : "currentRevertAction";
-                                    }
-
-                                    Rectangle {
+                                        x : viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(model.executionTime, viewController.pixelsPerMinute) - width/2;
                                         anchors {
-                                            verticalCenter: actionExecution.verticalCenter
-                                            left : actionExecution.horizontalCenter
-                                            right : revertActionExecution.horizontalCenter
+                                            verticalCenter: parent.verticalCenter
                                         }
-                                        height : 1
-                                        color : MasticTheme.whiteColor;
 
+                                        visible : !model.shallRevert
+
+                                        svgFileCache : MasticTheme.svgFileMASTIC;
+                                        svgElementId: (model.isExecuted) ? "timelineAction" : "currentAction";
                                     }
 
-                                    I2SvgItem {
-                                        id : revertActionExecution
-                                        x : viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(model.reverseTime, viewController.pixelsPerMinute) - width;
-                                        y : 0
-                                        rotation : 180
-                                        svgFileCache : MasticTheme.svgFileMASTIC;
-                                        svgElementId: (model.isExecuted && !model.isWaitingRevert) ? "revertAction" : "currentRevertAction";
+                                    // Revert action
+                                    Item {
+                                        visible : model.shallRevert
+                                        height : childrenRect.height
+                                        anchors {
+                                            verticalCenter: parent.verticalCenter
+                                        }
+
+                                        I2SvgItem {
+                                            id : actionExecution
+                                            x : viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(model.executionTime, viewController.pixelsPerMinute);
+                                            y : 0
+
+                                            svgFileCache : MasticTheme.svgFileMASTIC;
+                                            svgElementId: (model.isExecuted) ? "revertAction" : "currentRevertAction";
+                                        }
+
+                                        Rectangle {
+                                            anchors {
+                                                verticalCenter: actionExecution.verticalCenter
+                                                left : actionExecution.horizontalCenter
+                                                right : revertActionExecution.horizontalCenter
+                                            }
+                                            height : 1
+                                            color : MasticTheme.whiteColor;
+
+                                        }
+
+                                        I2SvgItem {
+                                            id : revertActionExecution
+                                            x : viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(model.reverseTime, viewController.pixelsPerMinute) - width;
+                                            y : 0
+                                            rotation : 180
+                                            svgFileCache : MasticTheme.svgFileMASTIC;
+                                            svgElementId: (model.isExecuted && !model.isWaitingRevert) ? "revertAction" : "currentRevertAction";
+                                        }
                                     }
                                 }
                             }
