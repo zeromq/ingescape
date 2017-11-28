@@ -30,6 +30,9 @@ class ActionExecutionVM : public QObject
     // Reverse time in millisecond.
     I2_QML_PROPERTY(int, reverseTime)
 
+    // Flag indicating if our action never executed
+    I2_QML_PROPERTY(bool, neverExecuted)
+
 
 public:
     /**
