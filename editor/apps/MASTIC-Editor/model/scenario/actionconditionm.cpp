@@ -66,7 +66,7 @@ QString ActionComparisonValueType::enumToString(int value)
  * @param parent
  */
 ActionConditionM::ActionConditionM(QObject *parent) : QObject(parent),
-    _agentModel(NULL),
+    _agent(NULL),
     _comparison(ActionComparisonValueType::ON),
     _isValid(false)
 {
@@ -84,36 +84,36 @@ ActionConditionM::ActionConditionM(QObject *parent) : QObject(parent),
 ActionConditionM::~ActionConditionM()
 {
     // Disconnect the agent model
-    if(_agentModel != NULL)
+    if(_agent != NULL)
     {
-        disconnect(_agentModel, &AgentInMappingVM::isONChanged, this, &ActionConditionM::onAgentModelIsOnChange);
+        disconnect(_agent, &AgentInMappingVM::isONChanged, this, &ActionConditionM::onAgentModelIsOnChange);
     }
 }
 
 /**
-* @brief Custom setter for agent model
-* @param agent model
+* @brief Custom setter for agent
+* @param agent
 */
-void ActionConditionM::setagentModel(AgentInMappingVM* agentModel)
+void ActionConditionM::setagent(AgentInMappingVM* value)
 {
-    if(_agentModel != agentModel)
+    if(_agent != value)
     {
-        if(_agentModel != NULL)
+        if(_agent != NULL)
         {
             // UnSubscribe to destruction
-            disconnect(_agentModel, &AgentInMappingVM::destroyed, this, &ActionConditionM::_onAgentModelDestroyed);
+            disconnect(_agent, &AgentInMappingVM::destroyed, this, &ActionConditionM::_onAgentDestroyed);
         }
         setisValid(false);
 
-        _agentModel = agentModel;
+        _agent = value;
 
-        if(_agentModel != NULL)
+        if(_agent != NULL)
         {
             // Subscribe to destruction
-            connect(_agentModel, &AgentInMappingVM::destroyed, this, &ActionConditionM::_onAgentModelDestroyed);
+            connect(_agent, &AgentInMappingVM::destroyed, this, &ActionConditionM::_onAgentDestroyed);
         }
 
-        Q_EMIT agentModelChanged(agentModel);
+        Q_EMIT agentChanged(value);
     }
 }
 
@@ -125,7 +125,7 @@ void ActionConditionM::copyFrom(ActionConditionM* condition)
 {
     if(condition != NULL)
     {
-        setagentModel(condition->agentModel());
+        setagent(condition->agent());
         setcomparison(condition->comparison());
         setisValid(condition->isValid());
     }
@@ -152,16 +152,16 @@ void ActionConditionM::onAgentModelIsOnChange(bool isON)
   */
 void ActionConditionM::initializeConnections()
 {
-    if(_agentModel != NULL)
+    if(_agent != NULL)
     {
         // Reset the connections
         resetConnections();
 
         // Make connection for the futur changes
-        connect(_agentModel, &AgentInMappingVM::isONChanged, this, &ActionConditionM::onAgentModelIsOnChange);
+        connect(_agent, &AgentInMappingVM::isONChanged, this, &ActionConditionM::onAgentModelIsOnChange);
 
         // Initialize the action state with the current agent state
-        onAgentModelIsOnChange(_agentModel->isON());
+        onAgentModelIsOnChange(_agent->isON());
     }
 }
 
@@ -170,9 +170,9 @@ void ActionConditionM::initializeConnections()
   */
 void ActionConditionM::resetConnections()
 {
-    if(_agentModel != NULL)
+    if(_agent != NULL)
     {
-        disconnect(_agentModel, &AgentInMappingVM::isONChanged, this, &ActionConditionM::onAgentModelIsOnChange);
+        disconnect(_agent, &AgentInMappingVM::isONChanged, this, &ActionConditionM::onAgentModelIsOnChange);
     }
 }
 
@@ -180,9 +180,9 @@ void ActionConditionM::resetConnections()
  * @brief Called when our agent model is destroyed
  * @param sender
  */
-void ActionConditionM::_onAgentModelDestroyed(QObject* sender)
+void ActionConditionM::_onAgentDestroyed(QObject* sender)
 {
     Q_UNUSED(sender)
 
-    setagentModel(NULL);
+    setagent(NULL);
 }

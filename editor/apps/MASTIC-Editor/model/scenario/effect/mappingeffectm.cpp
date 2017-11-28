@@ -107,6 +107,8 @@ void MappingEffectM::copyFrom(ActionEffectM *effect)
         setoutputAgent(mappingEffect->outputAgent());
         setoutput(mappingEffect->output());
         setinput(mappingEffect->input());
+
+        setmappingEffectValue(mappingEffect->mappingEffectValue());
     }
 }
 

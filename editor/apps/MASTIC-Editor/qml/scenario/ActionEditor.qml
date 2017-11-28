@@ -42,7 +42,7 @@ I2PopupBase {
     // action model
     property var actionM: model.editedAction;
     // action view model
-    property var actionVM: model.viewModel
+    property var actionVM: model.editedViewModel
 
     // our scenario controller
     property var controller: null;
@@ -221,7 +221,7 @@ I2PopupBase {
                     top : nameItem.bottom
                     topMargin : 15
                 }
-                height : childrenRect.height
+                height : textstartTime.height
 
                 visible : actionVM !== null
 
@@ -254,7 +254,10 @@ I2PopupBase {
                     height: 25
                     width: 105
                     verticalAlignment: TextInput.AlignVCenter
-                    text: actionVM ? actionVM.startTime : ""
+                    text: actionVM ? actionVM.startTimeString : "00:00:00.000"
+                    inputMask: "00:00:00.000"
+                    inputMethodHints: Qt.ImhDigitsOnly
+                    validator: RegExpValidator { regExp: /^([0-1\s]?[0-9\s]|2[0-3\s]):([0-5\s][0-9\s]):([0-5\s][0-9\s])([.]\d{3})?$/ }
 
                     style: I2TextFieldStyle {
                         backgroundColor: MasticTheme.darkBlueGreyColor
@@ -278,15 +281,15 @@ I2PopupBase {
 
                     onTextChanged: {
                         if (activeFocus &&  actionVM ) {
-                            actionVM.startTime = text;
+                            actionVM.startTimeString = text;
                         }
                     }
 
                     Binding {
-                        target : textFieldName
+                        target : textFieldStartTime
                         property :  "text"
                         value : if (actionVM) {
-                                    actionVM.startTime
+                                    actionVM.startTimeString
                                 }
                                 else {
                                     "";
@@ -710,9 +713,9 @@ I2PopupBase {
                                         Binding {
                                             target : agentCombo
                                             property : "selectedItem"
-                                            value : if (myCondition && myCondition.condition)
+                                            value : if (myCondition && myCondition.modelM)
                                                     {
-                                                        myCondition.condition.agentModel;
+                                                        myCondition.modelM.agent;
                                                     }
                                                     else {
                                                         null;
@@ -722,9 +725,9 @@ I2PopupBase {
 
                                         onSelectedItemChanged:
                                         {
-                                            if (myCondition && myCondition.condition && agentCombo.selectedItem)
+                                            if (myCondition && myCondition.modelM && agentCombo.selectedItem)
                                             {
-                                                myCondition.condition.agentModel = agentCombo.selectedItem;
+                                                myCondition.modelM.agent = agentCombo.selectedItem;
                                             }
                                         }
 
@@ -743,15 +746,15 @@ I2PopupBase {
                                         height : 25
                                         width : 148
 
-                                        model: (myCondition && myCondition.condition && myCondition.condition.agentIopList) ? myCondition.condition.agentIopList : 0
-                                        inputsNumber: (myCondition && myCondition.condition && myCondition.condition.agentModel)? myCondition.condition.agentModel.inputsList.count : 0;
+                                        model: (myCondition && myCondition.modelM && myCondition.modelM.agentIopList) ? myCondition.modelM.agentIopList : 0
+                                        inputsNumber: (myCondition && myCondition.modelM && myCondition.modelM.agent)? myCondition.modelM.agent.inputsList.count : 0;
 
                                         Binding {
                                             target : ioCombo
                                             property : "selectedItem"
-                                            value : if (myCondition && myCondition.condition)
+                                            value : if (myCondition && myCondition.modelM)
                                                     {
-                                                        myCondition.condition.agentIOP;
+                                                        myCondition.modelM.agentIOP;
                                                     }
                                                     else {
                                                         null;
@@ -761,9 +764,9 @@ I2PopupBase {
 
                                         onSelectedItemChanged:
                                         {
-                                            if (myCondition && myCondition.condition)
+                                            if (myCondition && myCondition.modelM)
                                             {
-                                                myCondition.condition.agentIOP = ioCombo.selectedItem;
+                                                myCondition.modelM.agentIOP = ioCombo.selectedItem;
                                             }
                                         }
 
@@ -801,11 +804,11 @@ I2PopupBase {
                                         Binding {
                                             target : comparisonCombo
                                             property : "selectedItem"
-                                            value : if (myCondition && myCondition.condition && controller)
+                                            value : if (myCondition && myCondition.modelM && controller)
                                                     {
                                                         (myCondition && myCondition.conditionType === ActionConditionType.VALUE) ?
-                                                                    controller.comparisonsValuesTypesList.getItemWithValue(myCondition.condition.comparison)
-                                                                  :  controller.comparisonsAgentsTypesList.getItemWithValue(myCondition.condition.comparison);
+                                                                    controller.comparisonsValuesTypesList.getItemWithValue(myCondition.modelM.comparison)
+                                                                  :  controller.comparisonsAgentsTypesList.getItemWithValue(myCondition.modelM.comparison);
                                                     }
                                                     else {
                                                         null;
@@ -815,9 +818,9 @@ I2PopupBase {
 
                                         onSelectedItemChanged:
                                         {
-                                            if (myCondition && myCondition.condition && comparisonCombo.selectedItem)
+                                            if (myCondition && myCondition.modelM && comparisonCombo.selectedItem)
                                             {
-                                                myCondition.condition.comparison = comparisonCombo.selectedItem.value;
+                                                myCondition.modelM.comparison = comparisonCombo.selectedItem.value;
                                             }
                                         }
 
@@ -840,7 +843,7 @@ I2PopupBase {
                                         horizontalAlignment: TextInput.AlignLeft
                                         verticalAlignment: TextInput.AlignVCenter
 
-                                        text : myCondition && myCondition.condition ? myCondition.condition.value : ""
+                                        text : myCondition && myCondition.modelM ? myCondition.modelM.value : ""
 
                                         style: I2TextFieldStyle {
                                             backgroundColor: MasticTheme.darkBlueGreyColor
@@ -863,16 +866,16 @@ I2PopupBase {
                                         }
 
                                         onTextChanged: {
-                                            if (activeFocus && (myCondition && myCondition.condition)) {
-                                                myCondition.condition.value = text;
+                                            if (activeFocus && (myCondition && myCondition.modelM)) {
+                                                myCondition.modelM.value = text;
                                             }
                                         }
 
                                         Binding {
                                             target : textFieldComparisonValue
                                             property :  "text"
-                                            value : if  (myCondition && myCondition.condition) {
-                                                        myCondition.condition.value
+                                            value : if  (myCondition && myCondition.modelM) {
+                                                        myCondition.modelM.value
                                                     }
                                                     else {
                                                         "";
@@ -1748,7 +1751,7 @@ I2PopupBase {
                                             property : "selectedItem"
                                             value : if (myEffect && myEffect.modelM && controller)
                                                     {
-                                                        controller.agentEffectValuesList.getItemWithValue(myEffect.modelM.effect);
+                                                        controller.agentEffectValuesList.getItemWithValue(myEffect.modelM.agentEffectValue);
                                                     }
                                                     else {
                                                         null;
@@ -1760,7 +1763,7 @@ I2PopupBase {
                                         {
                                             if (myEffect && myEffect.modelM && effectTypeCombo.selectedItem)
                                             {
-                                                myEffect.modelM.effect = effectTypeCombo.selectedItem.value;
+                                                myEffect.modelM.agentEffectValue = effectTypeCombo.selectedItem.value;
                                             }
                                         }
 

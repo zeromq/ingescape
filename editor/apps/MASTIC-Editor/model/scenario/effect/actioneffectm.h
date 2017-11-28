@@ -55,6 +55,16 @@ public:
     */
     void copyFrom(ActionEffectM* effect);
 
+    /**
+      * @brief Initialize the agent connections for the action effect
+      */
+    virtual void initializeConnections();
+
+    /**
+      * @brief Reset the agent connections for the action effect
+      */
+    void resetConnections();
+
 
 
 Q_SIGNALS:

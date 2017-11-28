@@ -53,8 +53,8 @@ QString ActionConditionType::enumToString(int value)
  * @param parent
  */
 ActionConditionVM::ActionConditionVM(QObject *parent) : QObject(parent),
-    _condition(NULL),
-    _conditionType(ActionConditionType::AGENT)
+    _modelM(NULL),
+    _conditionType(ActionConditionType::VALUE)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -66,10 +66,10 @@ ActionConditionVM::ActionConditionVM(QObject *parent) : QObject(parent),
  */
 ActionConditionVM::~ActionConditionVM()
 {
-    if(_condition != NULL)
+    if(_modelM != NULL)
     {
-        ActionConditionM* tmp = _condition;
-        setcondition(NULL);
+        ActionConditionM* tmp = _modelM;
+        setmodelM(NULL);
         delete tmp;
         tmp = NULL;
     }
@@ -99,13 +99,13 @@ void ActionConditionVM::_configureToType(ActionConditionType::Value value)
     AgentInMappingVM* agent = NULL;
 
     // Delete the old condition if exists
-    if(_condition != NULL)
+    if(_modelM != NULL)
     {
         // Save the agent
-        agent = _condition->agentModel();
+        agent = _modelM->agent();
 
-        ActionConditionM* tmp = _condition;
-        setcondition(NULL);
+        ActionConditionM* tmp = _modelM;
+        setmodelM(NULL);
         delete tmp;
         tmp = NULL;
     }
@@ -115,15 +115,15 @@ void ActionConditionVM::_configureToType(ActionConditionType::Value value)
     {
         case ActionConditionType::AGENT :
         {
-            setcondition(new ActionConditionM());
-            _condition->setagentModel(agent);
+            setmodelM(new ActionConditionM());
+            _modelM->setagent(agent);
             break;
         }
 
         case ActionConditionType::VALUE :
         {
-            setcondition(new IOPValueConditionM());
-            _condition->setagentModel(agent);
+            setmodelM(new IOPValueConditionM());
+            _modelM->setagent(agent);
             break;
         }
 

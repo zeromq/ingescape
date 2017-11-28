@@ -34,7 +34,7 @@ ActionVM::ActionVM(ActionM* model,
                    QObject *parent) : QObject(parent),
     _actionModel(NULL),
     _startTime(startTime),
-    _startTimeString("0.0"),
+    _startTimeString("00:00:00.000"),
     _lineInTimeLine(-1),
     _isValid(false),
     _currentExecution(NULL),
@@ -47,7 +47,12 @@ ActionVM::ActionVM(ActionM* model,
     {
         if (startTime >= 0)
         {
-            _startTimeString = QString::number((int)startTime / 1000) + "." + QString::number((int)startTime % 1000);
+            int hours = startTime / 3600000;
+            int minutes = (startTime - hours*3600000)/60000 ;
+            int seconds = (startTime - hours*3600000 - minutes*60000) / 1000;
+            int milliseconds = startTime%1000;
+
+            _startTimeString = QString::number(hours) + ":" + QString::number(minutes) + ":" + QString::number(seconds) + "." + QString::number(milliseconds);
         }
 
         // Update valid flag
@@ -123,36 +128,52 @@ void ActionVM::setstartTimeString(QString value)
         if (!_startTimeString.isEmpty())
         {
             bool successSeconds = false;
+            bool successMinutes = false;
+            bool successHours = false;
             bool successMilliSeconds = false;
 
-            QStringList splittedTime = _startTimeString.split('.');
-            if (splittedTime.count() == 2)
-            {
-                int seconds = splittedTime.at(0).toInt(&successSeconds);
-                int milliSeconds = splittedTime.at(1).leftJustified(3, '0').toInt(&successMilliSeconds);
+            int hours = 0;
+            int minutes = 0;
+            int seconds = 0;
+            int milliSeconds = 0;
 
-                if (successSeconds && successMilliSeconds) {
-                    setstartTime(seconds * 1000 + milliSeconds);
-                    qDebug() << "Start Time =" << _startTime;
+            // Split start time HH:MM:SS
+            QStringList splittedTime = _startTimeString.split(':');
+            if (splittedTime.count() == 3)
+            {
+                hours = splittedTime.at(0).toInt(&successHours);
+                minutes = splittedTime.at(1).toInt(&successMinutes);
+
+                // Try to split SS.zzz
+                QStringList splittedTimeSeconds = splittedTime.at(2).split('.');
+                if (splittedTimeSeconds.count() == 2)
+                {
+                    seconds = splittedTimeSeconds.at(0).toInt(&successSeconds);
+                    milliSeconds = splittedTimeSeconds.at(1).leftJustified(3, '0').toInt(&successMilliSeconds);
                 }
                 else {
-                    setstartTime(-1);
-                    if (_actionModel != NULL) {
-                        qCritical() << "Wrong 'Start Time':" << _startTimeString << "for action" << _actionModel->name();
-                    }
+                    seconds = splittedTime.at(2).toInt(&successSeconds);
                 }
             }
-            else {
-                int seconds = _startTimeString.toInt(&successSeconds);
-                if (successSeconds) {
-                    setstartTime(seconds * 1000);
+
+            if(successHours && successMinutes && successSeconds)
+            {
+                int totalMilliseconds = hours*3600000 + minutes*60000 + seconds*1000;
+                if(successMilliSeconds)
+                {
+                    totalMilliseconds += milliSeconds;
+                    setstartTime(totalMilliseconds);
                     qDebug() << "Start Time =" << _startTime;
-                }
-                else {
+                } else {
                     setstartTime(-1);
                     if (_actionModel != NULL) {
                         qCritical() << "Wrong 'Start Time':" << _startTimeString << "for action" << _actionModel->name();
                     }
+                }
+            } else {
+                setstartTime(-1);
+                if (_actionModel != NULL) {
+                    qCritical() << "Wrong 'Start Time':" << _startTimeString << "for action" << _actionModel->name();
                 }
             }
         }

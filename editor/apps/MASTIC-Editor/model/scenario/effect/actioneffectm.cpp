@@ -56,6 +56,21 @@ void ActionEffectM::copyFrom(ActionEffectM* effect)
     }
 }
 
+/**
+  * @brief Initialize the agent connections for the action effect
+  */
+void ActionEffectM::initializeConnections()
+{
+    // Nothing to do for now
+}
+
+/**
+  * @brief Reset the agent connections for the action effect
+  */
+void ActionEffectM::resetConnections()
+{
+    // Nothing to do for now
+}
 
 /**
 * @brief Custom setter for agent

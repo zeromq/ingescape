@@ -37,7 +37,7 @@ class ActionConditionM: public QObject
     Q_OBJECT
 
     // Agent model
-    I2_QML_PROPERTY_CUSTOM_SETTER(AgentInMappingVM*, agentModel)
+    I2_QML_PROPERTY_CUSTOM_SETTER(AgentInMappingVM*, agent)
 
     // Effect type
     I2_QML_PROPERTY(ActionComparisonValueType::Value, comparison)
@@ -89,10 +89,10 @@ public Q_SLOTS:
 protected Q_SLOTS:
 
     /**
-     * @brief Called when our agent model is destroyed
+     * @brief Called when our agent is destroyed
      * @param sender
      */
-    void _onAgentModelDestroyed(QObject* sender);
+    void _onAgentDestroyed(QObject* sender);
 
 protected:
 

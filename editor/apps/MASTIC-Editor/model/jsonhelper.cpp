@@ -1092,7 +1092,7 @@ ActionConditionVM* JsonHelper::_parseConditionsVMFromJson(QJsonObject jsonCondit
                             actionConditionVM = new ActionConditionVM();
                             actionConditionVM->setconditionType(ActionConditionType::VALUE);
 
-                            actionConditionVM->setcondition(iopConditionM);
+                            actionConditionVM->setmodelM(iopConditionM);
 
                             // set operator
                             jsonValue = jsonCondition.value("operator");
@@ -1112,7 +1112,7 @@ ActionConditionVM* JsonHelper::_parseConditionsVMFromJson(QJsonObject jsonCondit
                             iopConditionM->agentIopList()->append(listIOPAgents);
 
                             // set agent
-                            iopConditionM->setagentModel(agentM);
+                            iopConditionM->setagent(agentM);
                             iopConditionM->setagentIOP(iopAgentM);                            
                         }
                     }
@@ -1147,7 +1147,7 @@ ActionConditionVM* JsonHelper::_parseConditionsVMFromJson(QJsonObject jsonCondit
                             // Create view model
                             actionConditionVM = new ActionConditionVM();
                             actionConditionVM->setconditionType(ActionConditionType::AGENT);
-                            actionConditionVM->setcondition(actionConditionM);
+                            actionConditionVM->setmodelM(actionConditionM);
 
                             // set value
                             jsonValue = jsonCondition.value("value");
@@ -1157,7 +1157,7 @@ ActionConditionVM* JsonHelper::_parseConditionsVMFromJson(QJsonObject jsonCondit
                             }
 
                             // set agent
-                            actionConditionM->setagentModel(agentM);
+                            actionConditionM->setagent(agentM);
                         }
                     }
                     break;
@@ -1203,14 +1203,14 @@ QByteArray JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<ActionI
         // Create conditions view models
         foreach (ActionConditionVM* conditionVM, actionM->conditionsList()->toList())
         {
-            ActionConditionM* actionCondition = conditionVM->condition();
+            ActionConditionM* actionCondition = conditionVM->modelM();
             jsonFilled = false;
 
             if(actionCondition != NULL)
             {
                 QJsonObject jsonCondition;
                 jsonCondition.insert("type",ActionConditionType::staticEnumToKey(conditionVM->conditionType()));
-                jsonCondition.insert("agent_name", actionCondition->agentModel()->name());
+                jsonCondition.insert("agent_name", actionCondition->agent()->name());
 
                 switch (conditionVM->conditionType())
                 {
@@ -1230,7 +1230,7 @@ QByteArray JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<ActionI
                 }
                 case ActionConditionType::AGENT:
                 {
-                    if(actionCondition->agentModel() != NULL)
+                    if(actionCondition->agent() != NULL)
                     {
                         jsonCondition.insert("value", ActionComparisonValueType::staticEnumToKey(actionCondition->comparison()));
 

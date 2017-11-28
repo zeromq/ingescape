@@ -32,10 +32,11 @@
 ActionEditorController::ActionEditorController(QString actionName, ActionM *originalAction, I2CustomItemSortFilterListModel<AgentInMappingVM> *listAgentsInMapping, QObject *parent) : QObject(parent),
     _originalAction(originalAction),
     _editedAction(NULL),
-    _viewModel(NULL),
+    _originalViewModel(NULL),
+    _editedViewModel(NULL),
     _listAgentsInMapping(listAgentsInMapping)
 {
-    _editedAction = new ActionM(actionName, this);
+    _editedAction = new ActionM(actionName);
 
     if(_originalAction != NULL)
     {
@@ -53,11 +54,19 @@ ActionEditorController::ActionEditorController(QString actionName, ActionM *orig
 ActionEditorController::~ActionEditorController()
 {
     setoriginalAction(NULL);
-
     if(_editedAction != NULL)
     {
         ActionM* tmp = _editedAction;
         seteditedAction(NULL);
+        delete tmp;
+        tmp = NULL;
+    }
+
+    setoriginalViewModel(NULL);
+    if(_editedViewModel != NULL)
+    {
+        ActionVM* tmp = _editedViewModel;
+        seteditedViewModel(NULL);
         delete tmp;
         tmp = NULL;
     }
@@ -68,6 +77,7 @@ ActionEditorController::~ActionEditorController()
  */
 void ActionEditorController::validateModification()
 {
+    // Save action model changes
     if(_originalAction == NULL)
     {
         setoriginalAction(_editedAction);
@@ -76,6 +86,13 @@ void ActionEditorController::validateModification()
     else {
         _originalAction->copyFrom(_editedAction);
     }
+
+    // Save action view model changes if it's an action editor from a view model
+    if(_editedViewModel != NULL && _originalViewModel != NULL)
+    {
+        _originalViewModel->setcolor(_editedViewModel->color());
+        _originalViewModel->setstartTimeString(_editedViewModel->startTimeString());
+    }
 }
 
 /**
@@ -83,17 +100,20 @@ void ActionEditorController::validateModification()
  */
 void ActionEditorController::createNewCondition()
 {
-    ActionConditionVM * conditionVM = new ActionConditionVM(this);
+    ActionConditionVM * conditionVM = new ActionConditionVM();
 
     // Set a condition model
-    conditionVM->setcondition(new ActionConditionM());
+    conditionVM->setmodelM(new IOPValueConditionM());
 
     if(_listAgentsInMapping != NULL && _listAgentsInMapping->count() > 0)
     {
-        conditionVM->condition()->setagentModel(_listAgentsInMapping->at(0));
+        conditionVM->modelM()->setagent(_listAgentsInMapping->at(0));
     }
 
     _editedAction->conditionsList()->append(conditionVM);
+
+    // Set condition VM type
+    conditionVM->setconditionType(ActionConditionType::VALUE);
 }
 
 /**
@@ -114,10 +134,10 @@ void ActionEditorController::removeCondition(ActionConditionVM* conditionVM)
  */
 void ActionEditorController::createNewEffect()
 {
-    ActionEffectVM * effectVM = new ActionEffectVM(this);
+    ActionEffectVM * effectVM = new ActionEffectVM();
 
     // Set an effect model
-    effectVM->setmodelM(new ActionEffectM());
+    effectVM->setmodelM(new IOPValueEffectM());
 
     if(_listAgentsInMapping != NULL && _listAgentsInMapping->count() > 0)
     {
@@ -130,6 +150,9 @@ void ActionEditorController::createNewEffect()
     }
 
     _editedAction->effectsList()->append(effectVM);
+
+    // Set effect VM type
+    effectVM->seteffectType(ActionEffectTypes::VALUE);
 }
 
 

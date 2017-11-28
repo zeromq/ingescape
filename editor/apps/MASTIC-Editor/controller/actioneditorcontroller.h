@@ -42,7 +42,10 @@ class ActionEditorController: public QObject
     I2_QML_PROPERTY(ActionM*, editedAction)
 
     // Action view model
-    I2_QML_PROPERTY(ActionVM*, viewModel)
+    I2_QML_PROPERTY(ActionVM*, originalViewModel)
+
+    // Temporary view model
+    I2_QML_PROPERTY(ActionVM*, editedViewModel)
 
     // Agents in mapping list
     I2_QML_PROPERTY(I2CustomItemSortFilterListModel<AgentInMappingVM> *, listAgentsInMapping)

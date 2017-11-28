@@ -65,11 +65,11 @@ public:
     void copyFrom(ActionConditionM* condition);
 
     /**
-    * @brief Custom setter on set agent model
+    * @brief Custom setter on set agent
     *        to fill inputs and outputs
-    * @param agentModel
+    * @param agent
     */
-    void setagentModel(AgentInMappingVM* agentModel);
+    void setagent(AgentInMappingVM* agent);
 
     /**
       * @brief Initialize the agent connections for the action condition
