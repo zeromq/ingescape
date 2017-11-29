@@ -162,20 +162,6 @@ I2CubicBezierCurve {
     //
     //--------------------------------
 
-    // Emitted when there is a click
-    signal clicked();
-
-    onClicked: {
-        if (controller) {
-            if (controller.selectedMapBetweenIOP !== model.QtObject) {
-                controller.selectedMapBetweenIOP = model.QtObject;
-            }
-            else {
-                controller.selectedMapBetweenIOP = null;
-            }
-        }
-    }
-
     //--------------------------------
     //
     // Functions
@@ -240,6 +226,7 @@ I2CubicBezierCurve {
 
 
     focus: true
+    // remove selected map between IOP
     Keys.onPressed: {
         if (event.key === Qt.Key_Backspace || event.key === Qt.Key_Delete)
         {
@@ -251,6 +238,7 @@ I2CubicBezierCurve {
         }
     }
 
+    //deselect map between IOP
     onFocusChanged: {
         if (!focus) {
             if (controller && controller.selectedMapBetweenIOP) {
@@ -277,8 +265,15 @@ I2CubicBezierCurve {
         hoverEnabled: enabled
 
         onClicked: {
-            rootItem.clicked();
             rootItem.forceActiveFocus();
+            if (controller) {
+                if (controller.selectedMapBetweenIOP !== model.QtObject) {
+                    controller.selectedMapBetweenIOP = model.QtObject;
+                }
+                else {
+                    controller.selectedMapBetweenIOP = null;
+                }
+            }
         }
     }
 }

@@ -225,6 +225,10 @@ Item {
     readonly property color actionsListLabelColor: theme.whiteColor
     readonly property color actionsListPressedLabelColor: theme.greyColor
 
+
+    // Lines height in timeline
+    property int lineInTimeLineHeight : 30
+
     //-----------------------------------------
     //
     // Agents mapping UI elements

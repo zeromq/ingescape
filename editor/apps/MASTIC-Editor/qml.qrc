@@ -45,5 +45,6 @@
         <file>qml/scenario/MasticComboBoxAgentsIOP.qml</file>
         <file>qml/scenario/ActionsPanel.qml</file>
         <file>qml/scenario/ScenarioTimeLine.qml</file>
+        <file>qml/scenario/ActionInTimeLine.qml</file>
     </qresource>
 </RCC>

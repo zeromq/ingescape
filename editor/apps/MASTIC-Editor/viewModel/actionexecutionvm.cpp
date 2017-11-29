@@ -69,7 +69,7 @@ void ActionExecutionVM::initReverseCommandsForEffects(QList<ActionEffectVM*> eff
                     switch (effectOnAgent->agentEffectValue())
                     {
                     case AgentEffectValues::ON: {
-                        reverseCommandAndParameters << "DIE";
+                        reverseCommandAndParameters << "STOP";
                         break;
                     }
                     case AgentEffectValues::OFF: {

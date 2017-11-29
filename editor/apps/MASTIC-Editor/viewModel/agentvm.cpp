@@ -147,7 +147,7 @@ void AgentVM::changeState()
 {
     // is ON --> Kill all agents
     if (_isON) {
-        Q_EMIT commandAskedToAgent(_peerIdsList, "DIE");
+        Q_EMIT commandAskedToAgent(_peerIdsList, "STOP");
     }
     // is OFF --> Execute all agents
     else {

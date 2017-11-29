@@ -107,7 +107,7 @@ QPair<AgentInMappingVM*, QStringList> EffectOnAgentM::getAgentAndCommandWithPara
             break;
         }
         case AgentEffectValues::OFF: {
-            commandAndParameters << "DIE";
+            commandAndParameters << "STOP";
             break;
         }
         default:
@@ -138,7 +138,7 @@ QPair<QString, QStringList> EffectOnAgentM::getAgentNameAndReverseCommandWithPar
         switch (_agentEffectValue)
         {
         case AgentEffectValues::ON: {
-            reverseCommandAndParameters << "DIE";
+            reverseCommandAndParameters << "STOP";
             break;
         }
         case AgentEffectValues::OFF: {

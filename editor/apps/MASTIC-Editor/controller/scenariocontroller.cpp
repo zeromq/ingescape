@@ -33,6 +33,7 @@
  */
 ScenarioController::ScenarioController(QString scenariosPath, QObject *parent) : QObject(parent),
     _selectedAction(NULL),
+    _selectedActionVMInTimeline(NULL),
     _linesNumberInTimeLine(MINIMUM_DISPLAYED_LINES_NUMBER_IN_TIMELINE),
     _isPlaying(false),
     _currentTime(QTime::fromMSecsSinceStartOfDay(0)),
@@ -114,6 +115,9 @@ ScenarioController::~ScenarioController()
 
     // Delete actions VM from the timeline
     _actionsInTimeLine.deleteAllItems();
+
+    // Clean-up current selection
+    setselectedActionVMInTimeline(NULL);
 
     // Delete actions VM from the palette
     _actionsInPaletteList.deleteAllItems();
@@ -721,7 +725,7 @@ void ScenarioController::_insertActionVMIntoMapByLineNumber(ActionVM* actionVMTo
 {
     int insertionStartTime = actionVMToInsert->startTime();
 
-    int lineNumber = lineNumberRef;
+    int lineNumber = lineNumberRef != -1 ? lineNumberRef : 0;
     while (lineNumber < _linesNumberInTimeLine)
     {
         bool canInsert = canInsertActionVMTo(actionVMToInsert->actionModel(), insertionStartTime,lineNumber);
@@ -758,7 +762,7 @@ void ScenarioController::_insertActionVMIntoMapByLineNumber(ActionVM* actionVMTo
             }
         }
 
-        if(lineNumberRef == -1)
+        if(lineNumberRef != -1)
         {
             break;
         }
@@ -770,7 +774,7 @@ void ScenarioController::_insertActionVMIntoMapByLineNumber(ActionVM* actionVMTo
 
     // If the action has not been inserted yet, we create a new line
     // only if we are not dropping at a busy position the actionVM
-    if(actionVMToInsert->lineInTimeLine() == -1 && lineNumberRef == -1)
+    if(actionVMToInsert->lineInTimeLine() == -1 && lineNumberRef != -1)
     {
         if(lineNumber >= _linesNumberInTimeLine)
         {
@@ -1044,7 +1048,7 @@ void ScenarioController::_onTimeout_ExecuteActions()
  */
 void ScenarioController::_onTimeout_DelayActions()
 {
-    qDebug() << "Timeout Delay Actions";
+    qDebug() << "Timeout Delay Actions" << _activeActionsVMList.count();
 
     // Move the currenttime
     int currentTimeOfDay = QTime::currentTime().msecsSinceStartOfDay();
@@ -1053,19 +1057,46 @@ void ScenarioController::_onTimeout_DelayActions()
 
     int currentTimeInMilliSeconds = _currentTime.msecsSinceStartOfDay();
 
+    // Traverse the list of active actions
     foreach (ActionVM* actionVM, _activeActionsVMList.toList())
     {
-        // View model of action is in the PRESENT
-        if ((actionVM != NULL) && (actionVM->startTime() <= currentTimeInMilliSeconds)
-                && ((actionVM->endTime() == -1) || (currentTimeInMilliSeconds <= actionVM->endTime())))
+        // Current time is after the start time of action
+        if ((actionVM != NULL) && (actionVM->startTime() <= currentTimeInMilliSeconds))
         {
-            ActionExecutionVM* actionExecution = actionVM->currentExecution();
-
-            // Not already executed
-            if ((actionExecution != NULL) && !actionExecution->isExecuted())
+            // Action has no end or end is in the future
+            if ((actionVM->endTime() == -1) || (currentTimeInMilliSeconds <= actionVM->endTime()))
             {
-                // Delay the current execution of this action
-                actionVM->delayCurrentExecution(currentTimeInMilliSeconds);
+                ActionExecutionVM* actionExecution = actionVM->currentExecution();
+
+                // Not already executed
+                if ((actionExecution != NULL) && !actionExecution->isExecuted())
+                {
+                    // Delay the current execution of this action
+                    actionVM->delayCurrentExecution(currentTimeInMilliSeconds);
+                }
+            }
+            // Current time is after the end time of action
+            else
+            {
+                ActionExecutionVM* actionExecution = actionVM->currentExecution();
+                if (actionExecution != NULL)
+                {
+                    actionExecution->setneverExecuted(true);
+
+                    // If there is at least another execution for this action...
+                    if (actionVM->executionsList()->count() > 1)
+                    {
+                        // ...we remove the current execution
+                        actionVM->setcurrentExecution(NULL);
+                        actionVM->executionsList()->remove(actionExecution);
+
+                        // Free memory
+                        delete actionExecution;
+                    }
+                }
+
+                // Remove from the list of "active" actions
+                _activeActionsVMList.remove(actionVM);
             }
         }
     }
@@ -1209,8 +1240,8 @@ void ScenarioController::_executeCommandForAgent(AgentInMappingVM* agent, QStrin
                 }
             }
         }
-        // DIE
-        else if (command == "DIE")
+        // STOP
+        else if (command == "STOP")
         {
             // Emit signal "Command asked to agent"
             Q_EMIT commandAskedToAgent(peerIdsList, command);
