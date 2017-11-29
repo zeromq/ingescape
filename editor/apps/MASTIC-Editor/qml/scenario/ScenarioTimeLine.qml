@@ -8,7 +8,6 @@
  *
  *
  *	Contributors:
- *      Alexandre Lemort   <lemort@ingenuity.io>
  *      Justine Limoges   <limoges@ingenuity.io>
  */
 
@@ -51,17 +50,15 @@ Item {
     readonly property real zoomInDeltaScaleFactor: 1.2
 
 
-
     // graphical properties
     property int linesNumber : controller ? controller.linesNumberInTimeLine : 0;
-    property int lineHeight : 30
+    property int lineHeight : MasticTheme.lineInTimeLineHeight
 
     //--------------------------------
     //
     // Functions
     //
     //--------------------------------
-
 
 
 
@@ -269,183 +266,13 @@ Item {
                     Repeater {
                         model : controller ? controller.actionsInTimeLine : 0;
 
-                        Item {
-                            id : actionVMItem
-
-                            property  var myActionVM : model.QtObject;
-
-                            x : myActionVM? viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(myActionVM.startTime, viewController.pixelsPerMinute) : 0;
-                            y : myActionVM? (rootItem.lineHeight * myActionVM.lineInTimeLine) : à;
-                            height : rootItem.lineHeight
-                            width : if (myActionVM && myActionVM.actionModel) {
-                                        switch (myActionVM.actionModel.validityDurationType)
-                                        {
-                                        case ValidationDurationType.IMMEDIATE:
-                                            0;
-                                            break;
-                                        case ValidationDurationType.FOREVER:
-                                            (viewController.timeTicksTotalWidth - viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(myActionVM.startTime, viewController.pixelsPerMinute))
-                                            break;
-                                        case ValidationDurationType.CUSTOM:
-                                            viewController.convertDurationInSecondsToLengthInCoordinateSystem(myActionVM.actionModel.validityDuration/1000, viewController.pixelsPerMinute)
-                                            break;
-                                        default:
-                                            0
-                                            break;
-                                        }
-                                    }
-                                    else {
-                                        0;
-                                    }
-
-                            Rectangle {
-                                id : conditionsValidityRect
-                                anchors {
-                                    top : parent.top
-                                    left : parent.left
-                                    right : parent.right
-                                }
-
-                                height : rootItem.lineHeight/2
-                                color : MasticTheme.blueGreyColor2
-                            }
-
-                            // executionsList
-                            Repeater {
-                                model: if (myActionVM) {
-                                           myActionVM.executionsList;
-                                       }
-                                       else {
-                                           0;
-                                       }
-
-                                Item {
-                                    height : conditionsValidityRect.height
-                                    width : conditionsValidityRect.width
-
-                                    // Not revert action
-                                    I2SvgItem {
-                                        x : viewController.convertDurationInSecondsToLengthInCoordinateSystem(model.executionTime/1000, viewController.pixelsPerMinute) - width/2;
-
-                                        anchors {
-                                            verticalCenter: parent.verticalCenter
-                                        }
-
-                                        visible : !model.shallRevert
-
-                                        svgFileCache : MasticTheme.svgFileMASTIC;
-                                        svgElementId:  (model.neverExecuted)?
-                                                           "notExcutedAction"
-                                                         : ((model.isExecuted) ? "timelineAction" : "currentAction");
-                                    }
-
-                                    // Revert action
-                                    Item {
-                                        visible : model.shallRevert
-                                        height : childrenRect.height
-                                        anchors {
-                                            verticalCenter: parent.verticalCenter
-                                        }
-
-                                        I2SvgItem {
-                                            id : actionExecution
-                                            x : viewController.convertDurationInSecondsToLengthInCoordinateSystem(model.executionTime/1000, viewController.pixelsPerMinute);
-                                            y : 0
-
-                                            svgFileCache : MasticTheme.svgFileMASTIC;
-                                            svgElementId: (model.neverExecuted)?
-                                                              "notExecutedRevertAction"
-                                                            : ((model.isExecuted) ? "revertAction" : "currentRevertAction");
-                                        }
-
-                                        Rectangle {
-                                            anchors {
-                                                verticalCenter: actionExecution.verticalCenter
-                                                left : actionExecution.horizontalCenter
-                                                right : revertActionExecution.horizontalCenter
-                                            }
-                                            height : 1
-                                            color : MasticTheme.whiteColor;
-
-                                        }
-
-                                        I2SvgItem {
-                                            id : revertActionExecution
-                                            x : viewController.convertDurationInSecondsToLengthInCoordinateSystem(model.reverseTime/1000, viewController.pixelsPerMinute) - width;
-                                            y : 0
-                                            rotation : 180
-                                            svgFileCache : MasticTheme.svgFileMASTIC;
-                                            svgElementId: (model.neverExecuted)?
-                                                              "notExecutedRevertAction"
-                                                            : ((model.isExecuted) ? "revertAction" : "currentRevertAction");
-                                        }
-                                    }
-                                }
-                            }
-
-                            Rectangle {
-                                id : backgroundActionName
-                                anchors {
-                                    fill : actionName
-                                    leftMargin:-1
-                                    rightMargin:-1
-                                }
-                                color : MasticTheme.blackColor
-
-                                MouseArea {
-                                    id : openEditorMouseArea
-                                    anchors.fill : parent
-                                    hoverEnabled: true
-                                    onClicked: {
-                                        if (controller && actionVMItem.myActionVM) {
-                                            controller.openActionEditorFromActionVM(actionVMItem.myActionVM)
-                                        }
-                                    }
-                                }
-                            }
-
-                            Text {
-                                id: actionName
-                                anchors {
-                                    top : parent.verticalCenter
-                                    bottomMargin: 1
-                                    bottom : parent.bottom
-                                    left : parent.left
-                                }
-                                verticalAlignment: Text.AlignVCenter
-                                color : openEditorMouseArea.pressed? MasticTheme.greyColor : MasticTheme.darkGreyColor
-                                text : model.actionModel ? model.actionModel.name : ""
-                                font {
-                                    family : MasticTheme.textFontFamily
-                                    pixelSize: 11
-                                }
-
-
-                                // underline
-                                Rectangle {
-                                    visible: openEditorMouseArea.containsMouse
-
-                                    anchors {
-                                        left : parent.left
-                                        right : parent.right
-                                        bottom : parent.bottom
-                                        bottomMargin : 1
-                                    }
-
-                                    height : 1
-
-                                    color : actionName.color
-                                }
-
-
-                            }
-
+                        ActionInTimeLine {
+                                myActionVM : model.QtObject;
+                                controller : rootItem.controller
                         }
                     }
 
-
-
-                    // allow dropping actions in timeline
+                    // dropArea allow dropping actions in timeline
                     DropArea {
                         anchors.fill: parent
                         keys: ["ActionsListItem"]
@@ -504,7 +331,6 @@ Item {
 
                         }
                     }
-
 
                     // Ghost Action
                     Item {
@@ -770,10 +596,10 @@ Item {
                         width : 62
                         height: 20
                         radius : 2
-                        color :  MasticTheme.blueGreyColor2
+                        color :  currentTimeMouseArea.pressed ? MasticTheme.darkBlueGreyColor : MasticTheme.blueGreyColor2
                         border {
                             width : 1
-                            color: MasticTheme.whiteColor
+                            color: currentTimeMouseArea.pressed ? MasticTheme.lightGreyColor : MasticTheme.whiteColor
                         }
 
                         Text {
@@ -791,49 +617,6 @@ Item {
                             }
 
                         }
-
-                        MouseArea {
-                            id: currentTimeMouseArea
-
-                            anchors.fill: currentTimeLabel
-
-                            hoverEnabled: true
-
-                            drag.smoothed: false
-                            drag.target: currentTimeItem
-
-                            drag.minimumX : viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(0, viewController.pixelsPerMinute)
-                            drag.maximumX : viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(86400000, viewController.pixelsPerMinute)
-                            drag.minimumY : 0
-                            drag.maximumY : 0
-
-                            // viewController => CurrentTimeItem
-                            Binding {
-                                target: controller
-                                property: "currentTime"
-                                value: if (viewController) {
-                                            viewController.convertAbscissaInCoordinateSystemToQTime(currentTimeItem.x, viewController.pixelsPerMinute)
-                                       }
-                                       else {
-                                           0
-                                       }
-                                when: currentTimeMouseArea.drag.active
-                            }
-
-                            // CurrentTimeItem => Scrollbar
-                            Binding {
-                                target: currentTimeItem
-                                property: "x"
-                                value: if (controller && viewController)
-                                       {
-                                           viewController.convertQTimeToAbscissaInCoordinateSystem(controller.currentTime, viewController.pixelsPerMinute)
-                                       }
-                                       else {
-                                           0
-                                       }
-                                when: !currentTimeMouseArea.drag.active
-                            }
-                        }
                     }
 
                     I2SvgItem {
@@ -845,6 +628,55 @@ Item {
 
                         svgFileCache : MasticTheme.svgFileMASTIC;
                         svgElementId: "currentTime"
+                    }
+
+
+                    MouseArea {
+                        id: currentTimeMouseArea
+
+                        anchors {
+                            top : currentTimeLabel.top
+                            left: currentTimeLabel.left
+                            right: currentTimeLabel.right
+                            bottom : parent.bottom
+                        }
+
+                        hoverEnabled: true
+
+                        drag.smoothed: false
+                        drag.target: currentTimeItem
+
+                        drag.minimumX : viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(0, viewController.pixelsPerMinute)
+                        drag.maximumX : viewController.timeTicksTotalWidth
+                        drag.minimumY : 0
+                        drag.maximumY : 0
+
+                        // viewController => CurrentTimeItem
+                        Binding {
+                            target: controller
+                            property: "currentTime"
+                            value: if (viewController) {
+                                       viewController.convertAbscissaInCoordinateSystemToQTime(currentTimeItem.x, viewController.pixelsPerMinute)
+                                   }
+                                   else {
+                                       0
+                                   }
+                            when: currentTimeMouseArea.drag.active
+                        }
+
+                        // CurrentTimeItem => Scrollbar
+                        Binding {
+                            target: currentTimeItem
+                            property: "x"
+                            value: if (controller && viewController)
+                                   {
+                                       viewController.convertQTimeToAbscissaInCoordinateSystem(controller.currentTime, viewController.pixelsPerMinute)
+                                   }
+                                   else {
+                                       0
+                                   }
+                            when: !currentTimeMouseArea.drag.active
+                        }
                     }
 
 
