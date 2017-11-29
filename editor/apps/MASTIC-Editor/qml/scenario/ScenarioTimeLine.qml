@@ -334,9 +334,9 @@ Item {
                                         visible : !model.shallRevert
 
                                         svgFileCache : MasticTheme.svgFileMASTIC;
-                                        svgElementId: (model.neverExecuted)?
-                                                          "notExecutedAction"
-                                                        : ((model.isExecuted) ? "timelineAction" : "currentAction");
+                                        svgElementId:  (model.neverExecuted)?
+                                                           "notExcutedAction"
+                                                         : ((model.isExecuted) ? "timelineAction" : "currentAction");
                                     }
 
                                     // Revert action
