@@ -45,7 +45,7 @@ PUBLIC int mtic_startWithDevice(const char *networkDevice, int port);
 PUBLIC int mtic_startWithIP(const char *ipAddress, int port);
 PUBLIC int mtic_stop(void);
 
-//register a callback when the agent is asked to stop
+//register a callback when the agent is asked to stop on the network
 //NB: callbacks should execute their code in the main application thread
 typedef void (*mtic_interruptCallback)(void *myData);
 void mtic_observeInterrupt(mtic_interruptCallback cb, void *myData);
