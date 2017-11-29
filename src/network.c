@@ -76,6 +76,7 @@ bool agentCanBeFrozen = false;
 bool isWholeAgentMuted = false;
 bool mtic_Interrupted = false;
 bool network_NotifyMappedAgents = true;
+bool stoppedByNetwork = false;
 
 
 //global parameters
@@ -698,6 +699,7 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     HASH_ITER(hh, subscribers, s, tmp){
                         network_manageSubscriberMapping(s);
                     }
+                    network_needToUpdateMapping = true;
                 }
                 free(strMapping);
             }else{
@@ -723,6 +725,7 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     free(outputsList);
                 }else if (strlen("STOP") == strlen(message) && strncmp (message, "STOP", strlen("STOP")) == 0){
                     free(message);
+                    stoppedByNetwork = true;
                     //stop our zyre loop by returning -1 : this will start the cleaning process
                     return -1;
                 }else if (strlen("CLEAR_MAPPING") == strlen(message) && strncmp (message, "CLEAR_MAPPING", strlen("CLEAR_MAPPING")) == 0){
@@ -1037,8 +1040,11 @@ initActor (zsock_t *pipe, void *args)
     assert (loop == NULL);
     //call registered interruption callbacks
     interruptCalback_t *cb = NULL;
-    DL_FOREACH(interruptCallbacks, cb){
-        cb->callback_ptr(cb->myData);
+    if (stoppedByNetwork){
+        DL_FOREACH(interruptCallbacks, cb){
+            cb->callback_ptr(cb->myData);
+        }
+        stoppedByNetwork = false;
     }
 }
 
