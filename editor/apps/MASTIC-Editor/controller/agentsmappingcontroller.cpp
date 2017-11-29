@@ -126,12 +126,12 @@ void AgentsMappingController::deleteLinkBetweenTwoAgents(MapBetweenIOPVM* link)
 {
     if ((link != NULL) && (link->agentFrom() != NULL) && (link->agentTo() != NULL) && (link->pointFrom() != NULL) && (link->pointTo() != NULL))
     {
-        qInfo() << "Delete Link Between agents" << link->agentFrom()->name() << "and" << link->agentTo()->name();
+        qInfo() << "QML asked to delete the link between agents" << link->agentFrom()->name() << "and" << link->agentTo()->name();
 
         // Emit signal "Command asked to agent about Mapping Input"
         Q_EMIT commandAskedToAgentAboutMappingInput(link->agentTo()->getPeerIdsList(), "UNMAP", link->pointTo()->name(), link->agentFrom()->name(), link->pointFrom()->name());
 
-        // Unselect the link if it is the currently selected one
+        /*// Unselect the link if it is the currently selected one
         if (_selectedMapBetweenIOP == link) {
             setselectedMapBetweenIOP(NULL);
         }
@@ -140,7 +140,7 @@ void AgentsMappingController::deleteLinkBetweenTwoAgents(MapBetweenIOPVM* link)
         _allMapInMapping.remove(link);
 
         // Free memory
-        delete link;
+        delete link;*/
     }
 }
 
@@ -200,11 +200,13 @@ void AgentsMappingController::addMapBetweenAgents(AgentInMappingVM* outputAgent,
             // Check that the same link does not yet exist
             if (!alreadyLinked)
             {
+                qInfo() << "QML asked to create the link between agents" << outputAgent->name() << "and" << inputAgent->name();
+
                 // Create a new map between agents
-                MapBetweenIOPVM* mapBetweenIOP = new MapBetweenIOPVM(outputAgent, output, inputAgent, input, this);
+                //MapBetweenIOPVM* mapBetweenIOP = new MapBetweenIOPVM(outputAgent, output, inputAgent, input, this);
 
                 // Add to the list
-                _allMapInMapping.append(mapBetweenIOP);
+                //_allMapInMapping.append(mapBetweenIOP);
 
                 // Emit signal "Command asked to agent about Mapping Input"
                 Q_EMIT commandAskedToAgentAboutMappingInput(inputAgent->getPeerIdsList(), "MAP", input->name(), outputAgent->name(), output->name());
@@ -389,6 +391,8 @@ void AgentsMappingController::onMapped(ElementMappingM* mappingElement)
 
             if ((output != NULL) && (input != NULL))
             {
+                qInfo() << "MAPPED" << mappingElement->id();
+
                 // Create a new map between agents
                 MapBetweenIOPVM* link = new MapBetweenIOPVM(outputAgent, output, inputAgent, input, this);
 
@@ -426,6 +430,8 @@ void AgentsMappingController::onUnmapped(ElementMappingM* mappingElement)
 
         if (link != NULL)
         {
+            qInfo() << "UN-mapped" << mappingElement->id();
+
             // Unselect the link if it is the currently selected one
             if (_selectedMapBetweenIOP == link) {
                 setselectedMapBetweenIOP(NULL);

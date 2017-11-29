@@ -32,7 +32,7 @@ AgentMappingM::AgentMappingM(QString name,
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    qInfo() << "New Model of Agent Mapping" << _name << "with version" << _version << "about" << _description;
+    //qInfo() << "New Model of Agent Mapping" << _name << "with version" << _version << "about" << _description;
 }
 
 

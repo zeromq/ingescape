@@ -676,7 +676,7 @@ void MasticModelManager::addAgentMappingForAgentName(AgentMappingM* agentMapping
         // Update the list in the map
         _mapFromNameToAgentMappingsList.insert(mappingName, agentMappingsList);
 
-        _printMappings();
+        //_printMappings();
     }
 }
 
@@ -748,7 +748,7 @@ void MasticModelManager::deleteAgentMapping(AgentMappingM* agentMapping)
         // Free memory
         delete agentMapping;
 
-        _printMappings();
+        //_printMappings();
     }
 }
 

@@ -40,7 +40,7 @@ ElementMappingM::ElementMappingM(QString inputAgent,
     _id = QString("%1%2%3-->%4%2%5").arg(_outputAgent, SEPARATOR_AGENT_NAME_AND_IOP, _output, _input, _inputAgent);
 
     //qInfo() << "New Model of Element Mapping between Agent input: " << _inputAgent << "." << _input << " and Agent output: " << _outputAgent << "." << _output;
-    qInfo() << "New Model of Element Mapping" << _id;
+    //qInfo() << "New Model of Element Mapping" << _id;
 }
 
 
