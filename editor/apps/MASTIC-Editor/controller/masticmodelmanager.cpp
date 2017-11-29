@@ -289,8 +289,10 @@ void MasticModelManager::onMappingReceived(QString peerId, QString agentName, QS
                         if (idsOfRemovedMappingElements.count() > 0)
                         {
                             foreach (ElementMappingM* mappingElement, previousMapping->elementMappingsList()->toList()) {
-                                if ((mappingElement != NULL) && idsOfRemovedMappingElements.contains(mappingElement->id())) {
-                                    qDebug() << "Remove" << mappingElement->id();
+                                if ((mappingElement != NULL) && idsOfRemovedMappingElements.contains(mappingElement->id()))
+                                {
+                                    // Emit the signal "UN-mapped"
+                                    Q_EMIT unmapped(mappingElement);
                                 }
                             }
                         }
@@ -298,8 +300,10 @@ void MasticModelManager::onMappingReceived(QString peerId, QString agentName, QS
                         if (idsOfAddedMappingElements.count() > 0)
                         {
                             foreach (ElementMappingM* mappingElement, agentMapping->elementMappingsList()->toList()) {
-                                if ((mappingElement != NULL) && idsOfAddedMappingElements.contains(mappingElement->id())) {
-                                    qDebug() << "Add" << mappingElement->id();
+                                if ((mappingElement != NULL) && idsOfAddedMappingElements.contains(mappingElement->id()))
+                                {
+                                    // Emit the signal "Mapped"
+                                    Q_EMIT mapped(mappingElement);
                                 }
                             }
                         }

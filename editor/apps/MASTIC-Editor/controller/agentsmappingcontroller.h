@@ -198,6 +198,20 @@ public Q_SLOTS:
     void onAgentModelWillBeDeleted(AgentM* agent);
 
 
+    /**
+     * @brief Slot when two agents are mapped
+     * @param mappingElement
+     */
+    void onMapped(ElementMappingM* mappingElement);
+
+
+    /**
+     * @brief Slot when two agents are unmapped
+     * @param mappingElement
+     */
+    void onUnmapped(ElementMappingM* mappingElement);
+
+
 private Q_SLOTS:
 
     /**

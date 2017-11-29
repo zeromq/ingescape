@@ -225,6 +225,20 @@ Q_SIGNALS:
     void removeInputsToEditorForOutputs(QString agentName, QList<OutputM*> outputsList);
 
 
+    /**
+     * @brief Emitted when two agents are mapped
+     * @param mappingElement
+     */
+    void mapped(ElementMappingM* mappingElement);
+
+
+    /**
+     * @brief Emitted when two agents are unmapped
+     * @param mappingElement
+     */
+    void unmapped(ElementMappingM* mappingElement);
+
+
 public Q_SLOTS:
 
     /**

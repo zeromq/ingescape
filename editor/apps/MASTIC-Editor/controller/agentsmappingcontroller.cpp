@@ -57,7 +57,7 @@ AgentsMappingController::~AgentsMappingController()
     // Clear the previous list
     _previousListOfAgentsInMapping.clear();
 
-    //Clea all list
+    // Clear all lists
     _allMapInMapping.deleteAllItems();
     _allPartialMapInMapping.deleteAllItems();
     _agentInMappingVMList.deleteAllItems();
@@ -131,6 +131,7 @@ void AgentsMappingController::deleteLinkBetweenTwoAgents(MapBetweenIOPVM* link)
         // Emit signal "Command asked to agent about Mapping Input"
         Q_EMIT commandAskedToAgentAboutMappingInput(link->agentTo()->getPeerIdsList(), "UNMAP", link->pointTo()->name(), link->agentFrom()->name(), link->pointFrom()->name());
 
+        // Unselect the link if it is the currently selected one
         if (_selectedMapBetweenIOP == link) {
             setselectedMapBetweenIOP(NULL);
         }
@@ -345,6 +346,96 @@ void AgentsMappingController::onAgentModelWillBeDeleted(AgentM* agent)
                 // ...delete this agent in mapping
                 deleteAgentInMapping(agentInMapping);
             }
+        }
+    }
+}
+
+
+/**
+ * @brief Slot when two agents are mapped
+ * @param mappingElement
+ */
+void AgentsMappingController::onMapped(ElementMappingM* mappingElement)
+{
+    if (mappingElement != NULL)
+    {
+        AgentInMappingVM* outputAgent = getAgentInMappingFromName(mappingElement->outputAgent());
+        AgentInMappingVM* inputAgent = getAgentInMappingFromName(mappingElement->inputAgent());
+
+        if ((outputAgent != NULL) && (inputAgent != NULL))
+        {
+            OutputVM* output = NULL;
+            InputVM* input = NULL;
+
+            // Get the list of view models of output from the output name
+            QList<OutputVM*> outputsWithSameName = outputAgent->getOutputsListFromName(mappingElement->output());
+            if (outputsWithSameName.count() == 1) {
+                output = outputsWithSameName.first();
+            }
+            else {
+                qWarning() << "There are" << outputsWithSameName.count() << "outputs with the same name" << mappingElement->output() << "."
+                           << "We cannot choose and create the link" << mappingElement->outputAgent() << "." << mappingElement->output() << "-->" << mappingElement->inputAgent() << "." << mappingElement->input();
+            }
+
+            // Get the list of view models of input from the input name
+            QList<InputVM*> inputsWithSameName = inputAgent->getInputsListFromName(mappingElement->input());
+            if (inputsWithSameName.count() == 1) {
+                input = inputsWithSameName.first();
+            }
+            else {
+                qWarning() << "There are" << inputsWithSameName.count() << "inputs with the same name" << mappingElement->input() << "."
+                           << "We cannot choose and create the link" << mappingElement->outputAgent() << "." << mappingElement->output() << "-->" << mappingElement->inputAgent() << "." << mappingElement->input();
+            }
+
+            if ((output != NULL) && (input != NULL))
+            {
+                // Create a new map between agents
+                MapBetweenIOPVM* link = new MapBetweenIOPVM(outputAgent, output, inputAgent, input, this);
+
+                // Add to the list
+                _allMapInMapping.append(link);
+            }
+        }
+    }
+}
+
+
+/**
+ * @brief Slot when two agents are unmapped
+ * @param mappingElement
+ */
+void AgentsMappingController::onUnmapped(ElementMappingM* mappingElement)
+{
+    if (mappingElement != NULL)
+    {
+        MapBetweenIOPVM* link = NULL;
+
+        foreach (MapBetweenIOPVM* iterator, _allMapInMapping.toList())
+        {
+            // FIXME: An agent in mapping can have several Inputs (or Outputs) with the same name but with different types
+            if ((iterator != NULL)
+                    && (iterator->agentFrom() != NULL) && (iterator->agentFrom()->name() == mappingElement->outputAgent())
+                    && (iterator->agentTo() != NULL) && (iterator->agentTo()->name() == mappingElement->inputAgent())
+                    && (iterator->pointFrom() != NULL) && (iterator->pointFrom()->name() == mappingElement->output())
+                    && (iterator->pointTo() != NULL) && (iterator->pointTo()->name() == mappingElement->input()))
+            {
+                link = iterator;
+                break;
+            }
+        }
+
+        if (link != NULL)
+        {
+            // Unselect the link if it is the currently selected one
+            if (_selectedMapBetweenIOP == link) {
+                setselectedMapBetweenIOP(NULL);
+            }
+
+            // Remove from the list
+            _allMapInMapping.remove(link);
+
+            // Free memory
+            delete link;
         }
     }
 }
@@ -892,6 +983,7 @@ void AgentsMappingController::_deleteAllMappingMadeOnTargetAgent(AgentInMappingV
          }
     }
 }
+
 
 /**
  * @brief Check if the map between an agent output and an agent input already exist.
