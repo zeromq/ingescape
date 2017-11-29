@@ -33,6 +33,7 @@
  */
 ScenarioController::ScenarioController(QString scenariosPath, QObject *parent) : QObject(parent),
     _selectedAction(NULL),
+    _selectedActionVMInTimeline(NULL),
     _linesNumberInTimeLine(MINIMUM_DISPLAYED_LINES_NUMBER_IN_TIMELINE),
     _isPlaying(false),
     _currentTime(QTime::fromMSecsSinceStartOfDay(0)),
@@ -114,6 +115,9 @@ ScenarioController::~ScenarioController()
 
     // Delete actions VM from the timeline
     _actionsInTimeLine.deleteAllItems();
+
+    // Clean-up current selection
+    setselectedActionVMInTimeline(NULL);
 
     // Delete actions VM from the palette
     _actionsInPaletteList.deleteAllItems();

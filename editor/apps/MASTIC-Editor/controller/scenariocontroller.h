@@ -82,6 +82,9 @@ class ScenarioController: public QObject
     // List of actions in timeline
     I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(ActionVM, actionsInTimeLine)
 
+    // Selected action VM in timeline
+    I2_QML_PROPERTY_DELETE_PROOF(ActionVM*, selectedActionVMInTimeline)
+
     // Number of line in our timeline
     I2_QML_PROPERTY(int, linesNumberInTimeLine)
 
