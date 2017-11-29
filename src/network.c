@@ -104,6 +104,13 @@ typedef struct zyreCallback {
     struct zyreCallback *next;
 } zyreCallback_t;
 
+typedef struct interruptCalback {
+    mtic_interruptCallback callback_ptr;
+    void *myData;
+    struct interruptCalback *prev;
+    struct interruptCalback *next;
+} interruptCalback_t;
+
 //zyre agents storage
 #define NAME_BUFFER_SIZE 256
 typedef struct zyreAgent {
@@ -125,6 +132,7 @@ subscriber_t *subscribers = NULL;
 freezeCallback_t *freezeCallbacks = NULL;
 zyreCallback_t *zyreCallbacks = NULL;
 zyreAgent_t *zyreAgents = NULL;
+interruptCalback_t *interruptCallbacks = NULL;
 
 ////////////////////////////////////////////////////////////////////////
 // INTERNAL API
@@ -713,17 +721,9 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                         }
                     }
                     free(outputsList);
-                }else if (strlen("DIE") == strlen(message) && strncmp (message, "DIE", strlen("DIE")) == 0){
-                    //set flag for parent process
-                    mtic_Interrupted = true;
+                }else if (strlen("STOP") == strlen(message) && strncmp (message, "STOP", strlen("STOP")) == 0){
                     free(message);
-                    //send interruptin signal to parent process
-                    #ifdef _WIN32
-                    //TODO for windows
-                    #else
-                    kill(getppid(), SIGINT);
-                    #endif
-                    //stop our zyre loop by returning -1
+                    //stop our zyre loop by returning -1 : this will start the cleaning process
                     return -1;
                 }else if (strlen("CLEAR_MAPPING") == strlen(message) && strncmp (message, "CLEAR_MAPPING", strlen("CLEAR_MAPPING")) == 0){
                     mtic_clearMapping();
@@ -1035,6 +1035,11 @@ initActor (zsock_t *pipe, void *args)
     zsock_destroy(&agentElements->publisher);
     zloop_destroy (&loop);
     assert (loop == NULL);
+    //call registered interruption callbacks
+    interruptCalback_t *cb = NULL;
+    DL_FOREACH(interruptCallbacks, cb){
+        cb->callback_ptr(cb->myData);
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1292,16 +1297,6 @@ int mtic_stop(){
     mtic_Interrupted = true;
     
     return 1;
-}
-
-/**
- * \fn void mtic_die()
- * \ingroup startStopKillFct
- * \brief Stop and kill an agent.
- */
-void mtic_die(){
-    mtic_stop();
-    exit(1);
 }
 
 /**
@@ -1603,4 +1598,15 @@ void mtic_freeNetdevicesList(char **devices, int nb){
         }
     }
     free (devices);
+}
+
+void mtic_observeInterrupt(mtic_interruptCallback cb, void *myData){
+    if (cb != NULL){
+        interruptCalback_t *newCb = calloc(1, sizeof(interruptCalback_t));
+        newCb->callback_ptr = cb;
+        newCb->myData = myData;
+        DL_APPEND(interruptCallbacks, newCb);
+    }else{
+        mtic_debug("mtic_observeInterrupt: callback is null\n");
+    }
 }

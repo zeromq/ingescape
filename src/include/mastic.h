@@ -37,13 +37,18 @@
 //1- using mtic_start* and mtic_stop from the hosting app
 //2- catching SIGINT in the hosting app that is triggered by a DIE command in the agent
 //3- monitoring the status of mtic_Interrupted in the hosting app
+//4- using mtic_observeInterrupt below and providing a callback
 PUBLIC extern bool mtic_Interrupted;
 
-//start, stop & kill the agent
+//start & stop the agent
 PUBLIC int mtic_startWithDevice(const char *networkDevice, int port);
 PUBLIC int mtic_startWithIP(const char *ipAddress, int port);
 PUBLIC int mtic_stop(void);
-PUBLIC void mtic_die(void);
+
+//register a callback when the agent is interrupted or asked to die
+//NB: callbacks should try to execute their code in the main application thread
+typedef void (*mtic_interruptCallback)(void *myData);
+void mtic_observeInterrupt(mtic_interruptCallback cb, void *myData);
 
 //agent name set and get
 PUBLIC int mtic_setAgentName(const char *name);
