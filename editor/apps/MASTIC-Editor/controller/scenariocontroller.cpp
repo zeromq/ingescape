@@ -774,7 +774,7 @@ void ScenarioController::_insertActionVMIntoMapByLineNumber(ActionVM* actionVMTo
 
     // If the action has not been inserted yet, we create a new line
     // only if we are not dropping at a busy position the actionVM
-    if(actionVMToInsert->lineInTimeLine() == -1 && lineNumberRef != -1)
+    if(actionVMToInsert->lineInTimeLine() == -1 && lineNumberRef == -1)
     {
         if(lineNumber >= _linesNumberInTimeLine)
         {
@@ -968,16 +968,8 @@ void ScenarioController::setisPlaying(bool isPlaying)
                             // All conditions are met (or there is NO condition on this action)...
                             if (actionVM->isValid())
                             {
-                                if (actionExecution->shallRevert()) {
-                                    // Initialize the reverse command (and parameters) for each effect
-                                    actionExecution->initReverseCommandsForEffects(actionVM->actionModel()->effectsList()->toList());
-                                }
+                                _executeAction(actionVM,actionExecution,currentTimeInMilliSeconds);
 
-                                // Execute all effects of the action
-                                executeEffectsOfAction(actionVM->actionModel());
-
-                                // Notify the action that its effects has been executed
-                                actionVM->effectsExecuted(currentTimeInMilliSeconds);
                             }
                             // There is at least one condition which is not respected
                             else
@@ -1071,8 +1063,13 @@ void ScenarioController::_onTimeout_DelayActions()
                 // Not already executed
                 if ((actionExecution != NULL) && !actionExecution->isExecuted())
                 {
-                    // Delay the current execution of this action
-                    actionVM->delayCurrentExecution(currentTimeInMilliSeconds);
+                    if(actionVM->isValid() == false)
+                    {
+                        // Delay the current execution of this action
+                        actionVM->delayCurrentExecution(currentTimeInMilliSeconds);
+                    } else {
+                        _executeAction(actionVM, actionExecution, currentTimeInMilliSeconds);
+                    }
                 }
             }
             // Current time is after the end time of action
@@ -1292,5 +1289,28 @@ void ScenarioController::updateCurrentTimeInMs(int currentTimeInMs)
     }
     else {
         setcurrentTime(QTime::fromMSecsSinceStartOfDay(0));
+    }
+}
+
+/**
+ * @brief Exectute the action with the revert initialization if necessary
+ * @param action view model
+ * @param action execution view model
+ * @param current time in ms
+ */
+void ScenarioController::_executeAction(ActionVM* actionVM, ActionExecutionVM* actionExecution, int currentTimeInMilliSeconds)
+{
+    if(actionVM != NULL && actionExecution != NULL)
+    {
+        if (actionExecution->shallRevert()) {
+            // Initialize the reverse command (and parameters) for each effect
+            actionExecution->initReverseCommandsForEffects(actionVM->actionModel()->effectsList()->toList());
+        }
+
+        // Execute all effects of the action
+        executeEffectsOfAction(actionVM->actionModel());
+
+        // Notify the action that its effects has been executed
+        actionVM->effectsExecuted(currentTimeInMilliSeconds);
     }
 }
