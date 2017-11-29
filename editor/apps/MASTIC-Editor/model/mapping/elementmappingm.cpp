@@ -13,6 +13,7 @@
  */
 
 #include "elementmappingm.h"
+#include <model/enums.h>
 
 /**
  * @brief Constructor with input and output agent and IOP
@@ -35,7 +36,11 @@ ElementMappingM::ElementMappingM(QString inputAgent,
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
+    // Identifier with all names: [outputAgent##output-->input##inputAgent]
+    _id = QString("%1%2%3-->%4%2%5").arg(_outputAgent, SEPARATOR_AGENT_NAME_AND_IOP, _output, _input, _inputAgent);
+
     //qInfo() << "New Model of Element Mapping between Agent input: " << _inputAgent << "." << _input << " and Agent output: " << _outputAgent << "." << _output;
+    qInfo() << "New Model of Element Mapping" << _id;
 }
 
 

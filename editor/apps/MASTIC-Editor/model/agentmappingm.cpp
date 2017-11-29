@@ -45,4 +45,5 @@ AgentMappingM::~AgentMappingM()
 
     // Clear the list (no delete all)
     _elementMappingsList.clear();
+    _mappingElementsIds.clear();
 }
