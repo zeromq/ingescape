@@ -1044,6 +1044,8 @@ void ScenarioController::_onTimeout_ExecuteActions()
  */
 void ScenarioController::_onTimeout_DelayActions()
 {
+    qDebug() << "Timeout Delay Actions" << _activeActionsVMList.count();
+
     // Move the currenttime
     int currentTimeOfDay = QTime::currentTime().msecsSinceStartOfDay();
 
@@ -1234,8 +1236,8 @@ void ScenarioController::_executeCommandForAgent(AgentInMappingVM* agent, QStrin
                 }
             }
         }
-        // DIE
-        else if (command == "DIE")
+        // STOP
+        else if (command == "STOP")
         {
             // Emit signal "Command asked to agent"
             Q_EMIT commandAskedToAgent(peerIdsList, command);
