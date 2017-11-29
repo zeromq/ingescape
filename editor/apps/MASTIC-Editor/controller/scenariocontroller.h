@@ -340,6 +340,13 @@ private :
      */
     void _executeCommandForAgent(AgentInMappingVM* agent, QStringList commandAndParameters);
 
+    /**
+     * @brief Exectute the action with the revert initialization if necessary
+     * @param action view model
+     * @param action execution view model
+     * @param current time in ms
+     */
+    void _executeAction(ActionVM* actionVM, ActionExecutionVM* actionExecution, int currentTimeInMilliSeconds);
 
 protected:
 
