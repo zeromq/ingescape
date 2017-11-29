@@ -1044,8 +1044,6 @@ void ScenarioController::_onTimeout_ExecuteActions()
  */
 void ScenarioController::_onTimeout_DelayActions()
 {
-    qDebug() << "Timeout Delay Actions";
-
     // Move the currenttime
     int currentTimeOfDay = QTime::currentTime().msecsSinceStartOfDay();
 
@@ -1053,19 +1051,46 @@ void ScenarioController::_onTimeout_DelayActions()
 
     int currentTimeInMilliSeconds = _currentTime.msecsSinceStartOfDay();
 
+    // Traverse the list of active actions
     foreach (ActionVM* actionVM, _activeActionsVMList.toList())
     {
-        // View model of action is in the PRESENT
-        if ((actionVM != NULL) && (actionVM->startTime() <= currentTimeInMilliSeconds)
-                && ((actionVM->endTime() == -1) || (currentTimeInMilliSeconds <= actionVM->endTime())))
+        // Current time is after the start time of action
+        if ((actionVM != NULL) && (actionVM->startTime() <= currentTimeInMilliSeconds))
         {
-            ActionExecutionVM* actionExecution = actionVM->currentExecution();
-
-            // Not already executed
-            if ((actionExecution != NULL) && !actionExecution->isExecuted())
+            // Action has no end or end is in the future
+            if ((actionVM->endTime() == -1) || (currentTimeInMilliSeconds <= actionVM->endTime()))
             {
-                // Delay the current execution of this action
-                actionVM->delayCurrentExecution(currentTimeInMilliSeconds);
+                ActionExecutionVM* actionExecution = actionVM->currentExecution();
+
+                // Not already executed
+                if ((actionExecution != NULL) && !actionExecution->isExecuted())
+                {
+                    // Delay the current execution of this action
+                    actionVM->delayCurrentExecution(currentTimeInMilliSeconds);
+                }
+            }
+            // Current time is after the end time of action
+            else
+            {
+                ActionExecutionVM* actionExecution = actionVM->currentExecution();
+                if (actionExecution != NULL)
+                {
+                    actionExecution->setneverExecuted(true);
+
+                    // If there is at least another execution for this action...
+                    if (actionVM->executionsList()->count() > 1)
+                    {
+                        // ...we remove the current execution
+                        actionVM->setcurrentExecution(NULL);
+                        actionVM->executionsList()->remove(actionExecution);
+
+                        // Free memory
+                        delete actionExecution;
+                    }
+                }
+
+                // Remove from the list of "active" actions
+                _activeActionsVMList.remove(actionVM);
             }
         }
     }
