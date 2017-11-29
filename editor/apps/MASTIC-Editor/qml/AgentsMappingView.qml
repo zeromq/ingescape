@@ -110,24 +110,49 @@ Item {
             }
         }
 
-        Text {
+
+        Column {
             anchors {
                 verticalCenter: activeMappingBtn.verticalCenter
                 left : activeMappingBtn.right
                 leftMargin: 15
             }
 
-            visible : rootItem.controller && rootItem.controller.isEmptyMapping && !MasticEditorC.modelManager.isActivatedMapping
-            text : "No active mapping at the moment.\nClick on the button to synchronize with the environement and get the currently active mapping.\nOr create/load a mapping and click on the button to apply it to the environment."
+            Text {
+                anchors {
+                    left : parent.left
+                }
 
-            color : MasticTheme.blueGreyColor
-            font {
-                family : MasticTheme.textFontFamily
-                weight : Font.Light
-                pixelSize: 17
+                visible : rootItem.controller && rootItem.controller.isEmptyMapping && !MasticEditorC.modelManager.isActivatedMapping
+                text : "No active mapping at the moment."
+
+                color : MasticTheme.blueGreyColor
+                font {
+                    family : MasticTheme.textFontFamily
+                    bold : true
+                    pixelSize: 20
+
+                }
             }
-        }
 
+            Text {
+                anchors {
+                    left : parent.left
+                }
+
+                visible : rootItem.controller && rootItem.controller.isEmptyMapping && !MasticEditorC.modelManager.isActivatedMapping
+                text : "Click on the button to synchronize with the environement and get the currently active mapping.\nOr create/load a mapping and click on the button to apply it to the environment."
+
+                color : MasticTheme.blueGreyColor
+                font {
+                    family : MasticTheme.textFontFamily
+                    weight : Font.Light
+                    pixelSize: 17
+                }
+            }
+
+
+        }
 
 
     }

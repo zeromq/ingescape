@@ -123,10 +123,10 @@ I2PopupBase {
                 anchors.fill: parent
                 drag.target: rootItem
 
-                drag.minimumX : 0
-                drag.maximumX : rootItem.parent.width - rootItem.width
-                drag.minimumY : 0
-                drag.maximumY :  rootItem.parent.height - rootItem.height
+                drag.minimumX : - rootItem.width/2
+                drag.maximumX : rootItem.parent.width - rootItem.width/2
+                drag.minimumY :  0
+                drag.maximumY :  rootItem.parent.height - rootItem.height/2
 
                 onPressed: {
                     // Emit signal "bring to front"
