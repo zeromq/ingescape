@@ -33,6 +33,7 @@
  */
 ScenarioController::ScenarioController(QString scenariosPath, QObject *parent) : QObject(parent),
     _selectedAction(NULL),
+    _selectedActionVMInTimeline(NULL),
     _linesNumberInTimeLine(MINIMUM_DISPLAYED_LINES_NUMBER_IN_TIMELINE),
     _isPlaying(false),
     _currentTime(QTime::fromMSecsSinceStartOfDay(0)),
@@ -114,6 +115,9 @@ ScenarioController::~ScenarioController()
 
     // Delete actions VM from the timeline
     _actionsInTimeLine.deleteAllItems();
+
+    // Clean-up current selection
+    setselectedActionVMInTimeline(NULL);
 
     // Delete actions VM from the palette
     _actionsInPaletteList.deleteAllItems();
@@ -721,7 +725,7 @@ void ScenarioController::_insertActionVMIntoMapByLineNumber(ActionVM* actionVMTo
 {
     int insertionStartTime = actionVMToInsert->startTime();
 
-    int lineNumber = lineNumberRef;
+    int lineNumber = lineNumberRef != -1 ? lineNumberRef : 0;
     while (lineNumber < _linesNumberInTimeLine)
     {
         bool canInsert = canInsertActionVMTo(actionVMToInsert->actionModel(), insertionStartTime,lineNumber);
@@ -758,7 +762,7 @@ void ScenarioController::_insertActionVMIntoMapByLineNumber(ActionVM* actionVMTo
             }
         }
 
-        if(lineNumberRef == -1)
+        if(lineNumberRef != -1)
         {
             break;
         }
@@ -770,7 +774,7 @@ void ScenarioController::_insertActionVMIntoMapByLineNumber(ActionVM* actionVMTo
 
     // If the action has not been inserted yet, we create a new line
     // only if we are not dropping at a busy position the actionVM
-    if(actionVMToInsert->lineInTimeLine() == -1 && lineNumberRef == -1)
+    if(actionVMToInsert->lineInTimeLine() == -1 && lineNumberRef != -1)
     {
         if(lineNumber >= _linesNumberInTimeLine)
         {
