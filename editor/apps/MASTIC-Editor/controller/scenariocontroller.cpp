@@ -1048,7 +1048,7 @@ void ScenarioController::_onTimeout_ExecuteActions()
  */
 void ScenarioController::_onTimeout_DelayActions()
 {
-    qDebug() << "Timeout Delay Actions" << _activeActionsVMList.count();
+    //qDebug() << "Timeout Delay Actions" << _activeActionsVMList.count();
 
     // Move the currenttime
     int currentTimeOfDay = QTime::currentTime().msecsSinceStartOfDay();
