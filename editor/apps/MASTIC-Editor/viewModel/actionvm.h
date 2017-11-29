@@ -48,7 +48,7 @@ class ActionVM: public QObject
     // Line number in timeline
     I2_QML_PROPERTY(int, lineInTimeLine)
 
-    // Is valid flag
+    // Flag indicating if all conditions of our action are valid
     I2_QML_PROPERTY(bool, isValid)
 
     // List of executions of our action
@@ -114,19 +114,21 @@ public:
 Q_SIGNALS:
 
 
-public Q_SLOTS:
+private Q_SLOTS:
 
     /**
-     * @brief Slot on the is valid flag change on the action Model
-     * @param is valid flag
+     * @brief Slot when the flag "is valid" changed in the model of action
+     * @param isValid flag "is valid"
      */
-    void onActionIsValidChange(bool isValid);
+    void _onIsValidChangedInModel(bool isValid);
+
 
     /**
      * @brief Slot on the validity duration change
      * @param validity duration
      */
     void _onValidityDurationChange();
+
 
 private:
     /**

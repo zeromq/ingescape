@@ -104,9 +104,9 @@ I2PopupBase {
                 anchors.fill: parent
                 drag.target: rootItem
 
-                drag.minimumX : 0
-                drag.maximumX : rootItem.parent.width - rootItem.width
-                drag.minimumY :  - rootItem.height/2
+                drag.minimumX : - rootItem.width/2
+                drag.maximumX : rootItem.parent.width - rootItem.width/2
+                drag.minimumY :  0
                 drag.maximumY :  rootItem.parent.height - rootItem.height/2
 
                 onPressed: {
@@ -228,6 +228,18 @@ I2PopupBase {
                         }
                     }
 
+                    onActiveFocusChanged: {
+                        if (!activeFocus) {
+                            // Move cursor to our first character when we lose focus
+                            // (to always display the beginning or our text instead of
+                            // an arbitrary part if our text is too long)
+                            cursorPosition = 0;
+                        } else {
+                            textFieldName.selectAll();
+                        }
+                    }
+
+
                     Binding {
                         target : textFieldName
                         property :  "text"
@@ -310,6 +322,18 @@ I2PopupBase {
                         }
 
                     }
+
+                    onActiveFocusChanged: {
+                        if (!activeFocus) {
+                            // Move cursor to our first character when we lose focus
+                            // (to always display the beginning or our text instead of
+                            // an arbitrary part if our text is too long)
+                            cursorPosition = 0;
+                        } else {
+                            textFieldStartTime.selectAll();
+                        }
+                    }
+
 
                     onTextChanged: {
                         if (activeFocus &&  actionVM ) {
@@ -534,6 +558,17 @@ I2PopupBase {
                                     family: MasticTheme.textFontFamily
                                 }
 
+                            }
+
+                            onActiveFocusChanged: {
+                                if (!activeFocus) {
+                                    // Move cursor to our first character when we lose focus
+                                    // (to always display the beginning or our text instead of
+                                    // an arbitrary part if our text is too long)
+                                    cursorPosition = 0;
+                                } else {
+                                    textFieldValidity.selectAll();
+                                }
                             }
 
                             onTextChanged: {
@@ -895,6 +930,17 @@ I2PopupBase {
                                                 family: MasticTheme.textFontFamily
                                             }
 
+                                        }
+
+                                        onActiveFocusChanged: {
+                                            if (!activeFocus) {
+                                                // Move cursor to our first character when we lose focus
+                                                // (to always display the beginning or our text instead of
+                                                // an arbitrary part if our text is too long)
+                                                cursorPosition = 0;
+                                            } else {
+                                                textFieldComparisonValue.selectAll();
+                                            }
                                         }
 
                                         onTextChanged: {
@@ -1337,6 +1383,17 @@ I2PopupBase {
                                         family: MasticTheme.textFontFamily
                                     }
 
+                                }
+
+                                onActiveFocusChanged: {
+                                    if (!activeFocus) {
+                                        // Move cursor to our first character when we lose focus
+                                        // (to always display the beginning or our text instead of
+                                        // an arbitrary part if our text is too long)
+                                        cursorPosition = 0;
+                                    } else {
+                                        textFieldDuration.selectAll();
+                                    }
                                 }
 
                                 onTextChanged: {
@@ -1838,6 +1895,17 @@ I2PopupBase {
                                                 family: MasticTheme.textFontFamily
                                             }
 
+                                        }
+
+                                        onActiveFocusChanged: {
+                                            if (!activeFocus) {
+                                                // Move cursor to our first character when we lose focus
+                                                // (to always display the beginning or our text instead of
+                                                // an arbitrary part if our text is too long)
+                                                cursorPosition = 0;
+                                            } else {
+                                                textFieldTargetValue.selectAll();
+                                            }
                                         }
 
                                         onTextChanged: {

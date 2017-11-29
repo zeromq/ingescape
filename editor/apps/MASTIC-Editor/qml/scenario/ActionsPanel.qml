@@ -156,7 +156,8 @@ Item {
                         if (controller && model.actionModel) {
                             if (controller.isPlaying) {
                                 controller.addActionVMAtCurrentTime(model.actionModel);
-                            } else {
+                            }
+                            else {
                                 controller.executeEffectsOfAction(model.actionModel);
                             }
 
