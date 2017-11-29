@@ -1061,10 +1061,12 @@ void ScenarioController::_onTimeout_DelayActions()
     foreach (ActionVM* actionVM, _activeActionsVMList.toList())
     {
         // Current time is after the start time of action
-        if ((actionVM != NULL) && (actionVM->startTime() <= currentTimeInMilliSeconds))
+        if ((actionVM != NULL) && (actionVM->actionModel() != NULL) && (actionVM->startTime() < currentTimeInMilliSeconds))
         {
             // Action has no end or end is in the future
-            if ((actionVM->endTime() == -1) || (currentTimeInMilliSeconds <= actionVM->endTime()))
+            if ( ((actionVM->endTime() == -1) || (currentTimeInMilliSeconds < actionVM->endTime()))
+                 // And the action has a validity duration
+                 && (actionVM->actionModel()->validityDurationType() != ValidationDurationType::IMMEDIATE) )
             {
                 ActionExecutionVM* actionExecution = actionVM->currentExecution();
 
@@ -1075,7 +1077,7 @@ void ScenarioController::_onTimeout_DelayActions()
                     actionVM->delayCurrentExecution(currentTimeInMilliSeconds);
                 }
             }
-            // Current time is after the end time of action
+            // Current time is after the end time of action (or the action has no validity duration --> Immediate)
             else
             {
                 ActionExecutionVM* actionExecution = actionVM->currentExecution();
