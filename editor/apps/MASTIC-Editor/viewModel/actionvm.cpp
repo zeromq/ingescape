@@ -111,6 +111,7 @@ void ActionVM::copyFrom(ActionVM* actionVM)
         setendTime(actionVM->endTime());
         setlineInTimeLine(actionVM->lineInTimeLine());
         setstartTimeString(actionVM->startTimeString());
+        setisValid(actionVM->isValid());
     }
 }
 
