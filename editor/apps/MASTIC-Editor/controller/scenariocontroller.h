@@ -284,9 +284,9 @@ private Q_SLOTS:
 
 
     /**
-     * @brief Called at each interval of our timer to delay actions (when their conditions are not valid)
+     * @brief Called at each interval of our timer to delay actions when their conditions are not valid or execute them otherwise
      */
-    void _onTimeout_DelayActions();
+    void _onTimeout_DelayOrExecuteActions();
 
 
 private :

@@ -101,7 +101,7 @@ ScenarioController::ScenarioController(QString scenariosPath, QObject *parent) :
     connect(&_timerToExecuteActions, &QTimer::timeout, this, &ScenarioController::_onTimeout_ExecuteActions);
 
     _timerToRegularlyDelayActions.setInterval(INTERVAL_DELAY_ACTIONS);
-    connect(&_timerToRegularlyDelayActions, &QTimer::timeout, this, &ScenarioController::_onTimeout_DelayActions);
+    connect(&_timerToRegularlyDelayActions, &QTimer::timeout, this, &ScenarioController::_onTimeout_DelayOrExecuteActions);
 }
 
 
@@ -113,7 +113,7 @@ ScenarioController::~ScenarioController()
     _stopScenario();
 
     disconnect(&_timerToExecuteActions, &QTimer::timeout, this, &ScenarioController::_onTimeout_ExecuteActions);
-    disconnect(&_timerToRegularlyDelayActions, &QTimer::timeout, this, &ScenarioController::_onTimeout_DelayActions);
+    disconnect(&_timerToRegularlyDelayActions, &QTimer::timeout, this, &ScenarioController::_onTimeout_DelayOrExecuteActions);
 
     // Clean-up current selection
     setselectedAction(NULL);
@@ -1153,9 +1153,9 @@ void ScenarioController::_onTimeout_ExecuteActions()
 
 
 /**
- * @brief Called at each interval of our timer to delay actions (when their conditions are not valid)
+ * @brief Called at each interval of our timer to delay actions when their conditions are not valid or execute them otherwise
  */
-void ScenarioController::_onTimeout_DelayActions()
+void ScenarioController::_onTimeout_DelayOrExecuteActions()
 {
     // Move the currenttime
     int currentTimeOfDay = QTime::currentTime().msecsSinceStartOfDay();
