@@ -64,6 +64,13 @@ ActionVM::ActionVM(ActionM* model,
         // Create the first (view model of) action execution
         _createActionExecution(0);
     }
+
+    //
+    // Init the revert timer
+    //
+    _timerToReverse.setSingleShot(true);
+    connect(&_timerToReverse, &QTimer::timeout, this, &ActionVM::_onTimeout_ReserseAction);
+
 }
 
 
@@ -242,10 +249,15 @@ void ActionVM::effectsExecuted(int currentTimeInMilliSeconds)
         _currentExecution->setisExecuted(true);
 
         // Shall revert
-        if (_currentExecution->shallRevert())
+        if (_actionModel->shallRevertAfterTime() && _actionModel->revertAfterTime() > 0)
         {
-            // Update flag "Is Waiting Revert"
-            _currentExecution->setisWaitingRevert(true);
+            // Launch timer for revert
+            _timerToReverse.start(_actionModel->revertAfterTime());
+        }
+        else if (_actionModel->shallRevertWhenValidityIsOver())
+        {
+            // Launch timer for revert
+            _timerToReverse.start(_endTime - currentTimeInMilliSeconds);
         }
         // No reverse
         else
@@ -411,3 +423,14 @@ void ActionVM::_createActionExecution(int startTime)
     }
 }
 
+/**
+ * @brief Called when our timer time out to handle the action reversion
+ */
+void ActionVM::_onTimeout_ReserseAction()
+{
+    if(_currentExecution != NULL)
+    {
+        // Emit the signal to send the action reversion
+        Q_EMIT revertAction(_currentExecution);
+    }
+}

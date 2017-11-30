@@ -108,7 +108,6 @@ void ActionM::copyFrom(ActionM* actionModel)
         setrevertAfterTime(actionModel->revertAfterTime());
         setrevertAfterTimeString(actionModel->revertAfterTimeString());
         setshallRearm(actionModel->shallRearm());
-        setisValid(actionModel->isValid());
 
         _effectsList.deleteAllItems();
 

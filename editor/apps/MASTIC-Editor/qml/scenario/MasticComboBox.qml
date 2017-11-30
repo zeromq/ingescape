@@ -26,11 +26,11 @@ I2Combobox {
 
         listBackgroundColorIdle : "#2C333E"
         listBackgroundColorSelected: listBackgroundColorIdle
-        listItemTextColorIdle : MasticTheme.lightGreyColor
+        listItemTextColorIdle : MasticTheme.whiteColor
         frameVisible : false
         listRadius: 0
-        listItemTextColorSelected : MasticTheme.whiteColor
-        listBackgroundColorPressed : MasticTheme.darkOrangeColor2
+        listItemTextColorSelected : MasticTheme.orangeColor
+        listBackgroundColorPressed : MasticTheme.darkBlueGreyColor
 
         isI2Icon : false
         dropdownIcon : "image://I2svg/resources/SVG/mastic-pictos.svg#iconCombo"
