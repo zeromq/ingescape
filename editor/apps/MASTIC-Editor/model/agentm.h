@@ -54,9 +54,6 @@ class AgentM : public QObject
     // Process Id of our agent
     I2_CPP_NOSIGNAL_PROPERTY(int, pid)
 
-    // Publisher of our agent ???
-    //I2_CPP_NOSIGNAL_PROPERTY(int, publisher)
-
     // Flag indicating if our agent is ON (vs OFF)
     I2_QML_PROPERTY_READONLY(bool, isON)
 

@@ -214,6 +214,11 @@ AgentMappingM* JsonHelper::createModelOfAgentMapping(QString inputAgentName, QBy
                             ElementMappingM* elementMapping = _createModelOfElementMapping(inputAgentName, jsonMap.toObject());
                             if (elementMapping != NULL) {
                                 agentMapping->elementMappingsList()->append(elementMapping);
+
+                                // FIXME TODO: connect to count changed on elementMappingsList to update the property "mappingElementsIds"
+                                QStringList mappingElementsIds = agentMapping->mappingElementsIds();
+                                mappingElementsIds.append(elementMapping->id());
+                                agentMapping->setmappingElementsIds(mappingElementsIds);
                             }
                         }
                     }

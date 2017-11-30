@@ -590,6 +590,7 @@ Rectangle {
                                 id: linkDraggablePointTO
 
                                 parent: rootItem.parent
+
                                 strokeDashArray: "5, 5"
                                 visible: draggablePointTO.dragActive
 

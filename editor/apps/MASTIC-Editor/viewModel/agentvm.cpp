@@ -213,7 +213,6 @@ void AgentVM::_onModelsChanged()
                 connect(model, &AgentM::isMutedChanged, this, &AgentVM::_onIsMutedOfModelChanged);
                 connect(model, &AgentM::isFrozenChanged, this, &AgentVM::_onIsFrozenOfModelChanged);
                 connect(model, &AgentM::definitionChanged, this, &AgentVM::_onDefinitionOfModelChanged);
-                //connect(model, &AgentM::mappingChanged, this, &AgentVM::_onMappingOfModelChanged);
             }
         }
     }
@@ -232,7 +231,6 @@ void AgentVM::_onModelsChanged()
                 disconnect(model, &AgentM::isMutedChanged, this, &AgentVM::_onIsMutedOfModelChanged);
                 disconnect(model, &AgentM::isFrozenChanged, this, &AgentVM::_onIsFrozenOfModelChanged);
                 disconnect(model, &AgentM::definitionChanged, this, &AgentVM::_onDefinitionOfModelChanged);
-                //disconnect(model, &AgentM::mappingChanged, this, &AgentVM::_onMappingOfModelChanged);
             }
         }
     }

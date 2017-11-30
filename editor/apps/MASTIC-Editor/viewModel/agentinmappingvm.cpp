@@ -197,7 +197,6 @@ void AgentInMappingVM::_onModelsChanged()
                 // Connect to signals from a model
                 connect(model, &AgentM::isONChanged, this, &AgentInMappingVM::_onIsONofModelChanged);
                 //connect(model, &AgentM::definitionChanged, this, &AgentInMappingVM::_onDefinitionOfModelChanged);
-                //connect(model, &AgentM::mappingChanged, this, &AgentInMappingVM::_onMappingOfModelChanged);
 
                 // A model of agent has been added to our list
                 _agentModelAdded(model);
@@ -217,7 +216,6 @@ void AgentInMappingVM::_onModelsChanged()
                 // DIS-connect from signals from a model
                 disconnect(model, &AgentM::isONChanged, this, &AgentInMappingVM::_onIsONofModelChanged);
                 //disconnect(model, &AgentM::definitionChanged, this, &AgentInMappingVM::_onDefinitionOfModelChanged);
-                //disconnect(model, &AgentM::mappingChanged, this, &AgentInMappingVM::_onMappingOfModelChanged);
 
                 // A model of agent has been removed from our list
                 _agentModelRemoved(model);

@@ -45,10 +45,12 @@ PUBLIC int mtic_startWithDevice(const char *networkDevice, int port);
 PUBLIC int mtic_startWithIP(const char *ipAddress, int port);
 PUBLIC int mtic_stop(void);
 
+//terminate the agent and use the forcedStopCallbacks
+PUBLIC void mtic_die(void);
 //register a callback when the agent is asked to stop on the network
 //NB: callbacks should execute their code in the main application thread
-typedef void (*mtic_interruptCallback)(void *myData);
-void mtic_observeInterrupt(mtic_interruptCallback cb, void *myData);
+typedef void (*mtic_forcedStopCallback)(void *myData);
+PUBLIC void mtic_observeForcedStop(mtic_forcedStopCallback cb, void *myData);
 
 //agent name set and get
 PUBLIC int mtic_setAgentName(const char *name);

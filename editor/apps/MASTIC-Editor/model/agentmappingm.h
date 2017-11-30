@@ -42,6 +42,9 @@ class AgentMappingM : public QObject
     // List of element mapping of our agent mapping
     I2_QOBJECT_LISTMODEL(ElementMappingM, elementMappingsList)
 
+    // List of the ids of the mapping elements
+    I2_CPP_NOSIGNAL_PROPERTY(QStringList, mappingElementsIds)
+
 
 public:
         /**
