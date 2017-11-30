@@ -75,7 +75,7 @@ void IOPValueConditionM::copyFrom(ActionConditionM* condition)
 
 /**
 * @brief Custom setter on set agent
-*        to fill inputs and outputs
+*        to fill with outputs
 * @param agent
 */
 void IOPValueConditionM::setagent(AgentInMappingVM* agent)
@@ -93,15 +93,6 @@ void IOPValueConditionM::setagent(AgentInMappingVM* agent)
 
         if(_agent != NULL)
         {
-            // Fill with inputs
-            foreach (InputVM* input, _agent->inputsList()->toList())
-            {
-                if(input->firstModel() != NULL)
-                {
-                    _agentIopList.append(input->firstModel());
-                }
-            }
-
             // Fill with outputs
             foreach (OutputVM* output, _agent->outputsList()->toList())
             {
@@ -130,8 +121,6 @@ void IOPValueConditionM::initializeConnections()
     {
         ActionConditionM::initializeConnections();
 
-        connect(_agent, &AgentInMappingVM::inputsListWillBeRemoved, this, &IOPValueConditionM::onInputsListChange);
-        connect(_agent, &AgentInMappingVM::inputsListAdded, this, &IOPValueConditionM::onInputsListChange);
         connect(_agent, &AgentInMappingVM::outputsListWillBeRemoved, this, &IOPValueConditionM::onOutputsListChange);
         connect(_agent, &AgentInMappingVM::outputsListAdded, this, &IOPValueConditionM::onOutputsListChange);
 
@@ -155,8 +144,6 @@ void IOPValueConditionM::resetConnections()
     {
         ActionConditionM::resetConnections();
 
-        disconnect(_agent, &AgentInMappingVM::inputsListWillBeRemoved, this, &IOPValueConditionM::onInputsListChange);
-        disconnect(_agent, &AgentInMappingVM::inputsListAdded, this, &IOPValueConditionM::onInputsListChange);
         disconnect(_agent, &AgentInMappingVM::outputsListWillBeRemoved, this, &IOPValueConditionM::onOutputsListChange);
         disconnect(_agent, &AgentInMappingVM::outputsListAdded, this, &IOPValueConditionM::onOutputsListChange);
 
@@ -164,27 +151,6 @@ void IOPValueConditionM::resetConnections()
         {
             // UnSubscribe to value change
             disconnect(_agentIOP, &AgentIOPM::currentValueChanged, this, &IOPValueConditionM::_onCurrentValueChange);
-        }
-    }
-}
-
-
-/**
-  * @brief Slot on agent inputs list change
-  */
-void IOPValueConditionM::onInputsListChange(QList<InputVM*> inputsList)
-{
-    // If we have a selected agent iop
-    if(_agentIOPName.isEmpty() == false)
-    {
-        // Check that our input list update concern our selected agent iop
-        foreach (InputVM* inputVM, inputsList)
-        {
-            if(inputVM->name() == _agentIOPName)
-            {
-                updateAgentIOPSelected();
-                break;
-            }
         }
     }
 }
@@ -227,18 +193,6 @@ void IOPValueConditionM::updateAgentIOPSelected()
                 if(newAgentIOP == NULL && agentIopName.isEmpty() == false && agentIopName == output->firstModel()->name())
                 {
                     newAgentIOP = output->firstModel();
-                }
-            }
-        }
-
-        // Fill with inputs
-        foreach (InputVM* input, _agent->inputsList()->toList())
-        {
-            if(input->firstModel() != NULL)
-            {
-                if(agentIopName.isEmpty() == false && agentIopName == input->firstModel()->name())
-                {
-                    newAgentIOP = input->firstModel();
                 }
             }
         }
@@ -436,5 +390,5 @@ void IOPValueConditionM::onAgentModelIsOnChange(bool isON)
 {
     Q_UNUSED(isON)
 
-    onInputsListChange(QList<InputVM*>());
+    onOutputsListChange(QList<OutputVM*>());
 }
