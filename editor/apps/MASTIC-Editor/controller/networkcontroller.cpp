@@ -32,6 +32,8 @@ static const QString launcherSuffix = ".masticlauncher";
 static const QString definitionPrefix = "EXTERNAL_DEFINITION#";
 static const QString mappingPrefix = "EXTERNAL_MAPPING#";
 
+static const QString loadMappingPrefix = "LOAD_THIS_MAPPING#";
+
 static const QString mutedAllPrefix = "MUTED=";
 static const QString frozenPrefix = "FROZEN=";
 static const QString mutedOutputPrefix = "OUTPUT_MUTED ";

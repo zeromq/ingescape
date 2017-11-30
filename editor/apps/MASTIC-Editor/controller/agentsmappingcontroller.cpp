@@ -128,6 +128,10 @@ void AgentsMappingController::removeLinkBetweenTwoAgents(MapBetweenIOPVM* link)
 {
     if (link != NULL)
     {
+        if ((link->agentFrom() != NULL) && (link->agentTo() != NULL)) {
+            qInfo() << "QML asked to delete the link between agents" << link->agentFrom()->name() << "and" << link->agentTo()->name();
+        }
+
         if (link->isVirtual())
         {
             // Delete the link between two agents
@@ -138,15 +142,14 @@ void AgentsMappingController::removeLinkBetweenTwoAgents(MapBetweenIOPVM* link)
             // Set to virtual to give a feedback to the user
             link->setisVirtual(true);
 
-            if ((link->agentFrom() != NULL) && (link->agentTo() != NULL) && (link->pointFrom() != NULL) && (link->pointTo() != NULL))
+            // Mapping is activated
+            if ((_modelManager != NULL) && _modelManager->isActivatedMapping())
             {
-                qInfo() << "QML asked to delete the link between agents" << link->agentFrom()->name() << "and" << link->agentTo()->name();
-
-                // Emit signal "Command asked to agent about Mapping Input"
-                Q_EMIT commandAskedToAgentAboutMappingInput(link->agentTo()->getPeerIdsList(), "UNMAP", link->pointTo()->name(), link->agentFrom()->name(), link->pointFrom()->name());
-            }
-            else {
-                // TODO log error
+                if ((link->agentFrom() != NULL) && (link->agentTo() != NULL) && (link->pointFrom() != NULL) && (link->pointTo() != NULL))
+                {
+                    // Emit signal "Command asked to agent about Mapping Input"
+                    Q_EMIT commandAskedToAgentAboutMappingInput(link->agentTo()->getPeerIdsList(), "UNMAP", link->pointTo()->name(), link->agentFrom()->name(), link->pointFrom()->name());
+                }
             }
         }
     }
@@ -171,9 +174,33 @@ void AgentsMappingController::dropAgentToMappingAtPosition(QString agentName, Ab
             // Add new model(s) of agent to the current mapping at a specific position
             _addAgentModelsToMappingAtPosition(agentName, agentsList->toList(), position);
 
-            // Selects this new agent
             agentInMapping = getAgentInMappingFromName(agentName);
-            if (agentInMapping != NULL) {
+            if (agentInMapping != NULL)
+            {
+                // Mapping is activated
+                //if ((_modelManager != NULL) && _modelManager->isActivatedMapping()) {
+
+                //
+                foreach (AgentM* model, agentsList->toList()) {
+                    if (model != NULL)
+                    {
+                        // Model is ON
+                        if (model->isON())
+                        {
+                            QStringList peerIdsList;
+                            peerIdsList.append(model->peerId());
+
+                            // Emit the signal to send the command "CLEAR_MAPPING" on the network to the agent
+                            //Q_EMIT commandAskedToAgent(peerIdsList, "CLEAR_MAPPING");
+                        }
+                        // Model is OFF
+                        else {
+                            model->setmustClearMapping(true);
+                        }
+                    }
+                }
+
+                // Selects this new agent
                 setselectedAgent(agentInMapping);
             }
         }
@@ -216,8 +243,11 @@ void AgentsMappingController::addMapBetweenAgents(AgentInMappingVM* outputAgent,
                 // Add to the list
                 _allMapInMapping.append(link);
 
-                // Emit signal "Command asked to agent about Mapping Input"
-                Q_EMIT commandAskedToAgentAboutMappingInput(inputAgent->getPeerIdsList(), "MAP", input->name(), outputAgent->name(), output->name());
+                // Mapping is activated
+                if ((_modelManager != NULL) && _modelManager->isActivatedMapping()) {
+                    // Emit signal "Command asked to agent about Mapping Input"
+                    Q_EMIT commandAskedToAgentAboutMappingInput(inputAgent->getPeerIdsList(), "MAP", input->name(), outputAgent->name(), output->name());
+                }
             }
             else {
                 qWarning() << "The input" << input->name() << "(of agent" << inputAgent->name() << ") is already linked to output" << output->name() << "(of agent" << outputAgent->name() << ")";
@@ -329,6 +359,7 @@ void AgentsMappingController::onIsActivatedMappingChanged(bool isActivatedMappin
                     _addAgentModelsToMappingAtPosition(agentName, activeAgentsList, position);
                 }
 
+                // FIXME: à optimiser...
                 // Create all links in mapping
                 foreach (AgentInMappingVM* agent, _agentInMappingVMList.toList()) {
                     if (agent != NULL) {
@@ -346,11 +377,19 @@ void AgentsMappingController::onIsActivatedMappingChanged(bool isActivatedMappin
             }
         }
         // Mapping has some agents (and links)
-        else {
+        else
+        {
             qDebug() << "...and there are already some agents (and links) on our HMI";
 
-            // FIXME TODO:
-
+            // Ask to create all virtual links in mapping
+            foreach (MapBetweenIOPVM* link, _allMapInMapping.toList())
+            {
+                if ((link != NULL) && (link->agentFrom() != NULL) && (link->agentTo() != NULL) && (link->pointFrom() != NULL) && (link->pointTo() != NULL))
+                {
+                    // Emit signal "Command asked to agent about Mapping Input"
+                    Q_EMIT commandAskedToAgentAboutMappingInput(link->agentTo()->getPeerIdsList(), "MAP", link->pointTo()->name(), link->agentFrom()->name(), link->pointFrom()->name());
+                }
+            }
         }
     }
     else {
