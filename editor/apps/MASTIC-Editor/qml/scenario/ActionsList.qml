@@ -428,12 +428,16 @@ Item {
                         visible: !mouseArea.drag.active
                     }
 
-                    Rectangle {
+                    I2CustomRectangle{
                         id : itemDragged
                         height : nameAction.height + 10
                         width : nameAction.width + 10
                         color : MasticTheme.darkBlueGreyColor
                         visible: mouseArea.drag.active
+
+                        // - fuzzy radius around our rectangle
+                        fuzzyRadius: 2
+                        fuzzyColor : MasticTheme.blackColor
 
                         Text {
                             id : nameAction
@@ -446,6 +450,7 @@ Item {
                                pixelSize: 14
                             }
                         }
+
                     }
 
                 }

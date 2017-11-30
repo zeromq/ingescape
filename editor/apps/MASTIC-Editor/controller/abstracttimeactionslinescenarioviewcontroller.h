@@ -56,6 +56,17 @@ class AbstractTimeActionslineScenarioViewController : public QObject
     // Scale factor applied to the content of our viewport (X-axis)
     I2_QML_PROPERTY_CUSTOM_SETTER(qreal, viewportContentScaleX)
 
+    // Time margin in pixels
+    I2_QML_PROPERTY(int, timeMarginInPixels)
+
+
+    // Minimum size in pixels of a minute
+    I2_QML_PROPERTY_READONLY_FUZZY_COMPARE(qreal, minPixelsPerMinute)
+
+    // Maximum size in pixels of a minute
+    I2_QML_PROPERTY_READONLY_FUZZY_COMPARE(qreal, maxPixelsPerMinute)
+
+
 public:
         /**
          * @brief Default constructor
@@ -156,11 +167,11 @@ public:
        // Relative time in seconds associated to our last time tick (Tend)
        int _endRelativeTimeInSeconds;
 
-       // Time margin in minutes
-       qreal _timeMarginInMinutes;
 
        // Total time period in minutes (Tend - T0)
        qreal _totalTimePeriodInMinutes;
+
+
     };
 
 

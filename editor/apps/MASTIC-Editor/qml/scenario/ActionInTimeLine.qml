@@ -95,6 +95,11 @@ Item {
 
         height : actionVMItem.lineHeight/2
         color : MasticTheme.blueGreyColor2
+
+        border {
+            width : (controller && controller.selectedActionVMInTimeline && actionVMItem.myActionVM  && controller.selectedActionVMInTimeline === actionVMItem.myActionVM) ? 1 :0;
+            color : MasticTheme.orangeColor
+        }
     }
 
 
@@ -180,34 +185,6 @@ Item {
             rightMargin:-1
         }
         color : MasticTheme.blackColor
-
-        MouseArea {
-            id : openEditorMouseArea
-            anchors.fill : parent
-            hoverEnabled: true
-            onClicked: {
-                actionVMItem.forceActiveFocus()
-
-                // selection of the action VM
-                if (controller && actionVMItem.myActionVM) {
-                    if (controller.selectedActionVMInTimeline !== actionVMItem.myActionVM) {
-                        controller.selectedActionVMInTimeline = actionVMItem.myActionVM;
-                    }
-                    else {
-                        controller.selectedActionVMInTimeline = null;
-                    }
-                }
-            }
-
-            onDoubleClicked: {
-                // open action editor
-                if (controller && actionVMItem.myActionVM) {
-                    controller.openActionEditorFromActionVM(actionVMItem.myActionVM);
-                    // reset selection of the action VM
-                    //controller.selectedActionVMInTimeline = null;
-                }
-            }
-        }
     }
 
     Text {
@@ -220,32 +197,42 @@ Item {
         }
         verticalAlignment: Text.AlignVCenter
         color : (controller && controller.selectedActionVMInTimeline && actionVMItem.myActionVM  && controller.selectedActionVMInTimeline === actionVMItem.myActionVM) ?
-                     openEditorMouseArea.pressed? MasticTheme.greyColor : MasticTheme.orangeColor
-                   : openEditorMouseArea.pressed? MasticTheme.greyColor : MasticTheme.darkGreyColor
+                     openEditorMouseArea.pressed? MasticTheme.lightGreyColor : MasticTheme.orangeColor
+                   : openEditorMouseArea.pressed? MasticTheme.lightGreyColor : MasticTheme.darkGreyColor
 
         text : (actionVMItem.myActionVM && actionVMItem.myActionVM.actionModel) ? actionVMItem.myActionVM.actionModel.name : ""
         font {
             family : MasticTheme.textFontFamily
             pixelSize: 11
         }
+    }
 
-        // underline
-        Rectangle {
-            visible: openEditorMouseArea.containsMouse
+    MouseArea {
+        id : openEditorMouseArea
+        anchors.fill : actionVMItem
+        hoverEnabled: true
+        onClicked: {
+            actionVMItem.forceActiveFocus()
 
-            anchors {
-                left : parent.left
-                right : parent.right
-                bottom : parent.bottom
-                bottomMargin : 1
+            // selection of the action VM
+            if (controller && actionVMItem.myActionVM) {
+                if (controller.selectedActionVMInTimeline !== actionVMItem.myActionVM) {
+                    controller.selectedActionVMInTimeline = actionVMItem.myActionVM;
+                }
+                else {
+                    controller.selectedActionVMInTimeline = null;
+                }
             }
-
-            height : 1
-
-            color : actionName.color
         }
 
-
+        onDoubleClicked: {
+            // open action editor
+            if (controller && actionVMItem.myActionVM) {
+                controller.openActionEditorFromActionVM(actionVMItem.myActionVM);
+                // selection of the action VM
+                controller.selectedActionVMInTimeline = actionVMItem.myActionVM;
+            }
+        }
     }
 
 }

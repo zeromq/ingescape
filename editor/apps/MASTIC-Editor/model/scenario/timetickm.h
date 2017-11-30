@@ -24,14 +24,15 @@ class TimeTickM : public QObject
 {
     Q_OBJECT
 
-    // The relative day (-1: yesterday, 0: today, 1: tomorrow, etc.) associated to our tick
-    I2_QML_PROPERTY_READONLY(int, relativeDay)
 
     // The hour part (0 to 23) of the time associated to our tick
     I2_QML_PROPERTY_READONLY(int, hour)
 
     // The minute part (0 to 59) of the time associated to our tick
     I2_QML_PROPERTY_READONLY(int, minute)
+
+    // The second part (0 to 59) of the time associated to our tick
+    I2_QML_PROPERTY_READONLY(int, second)
 
     // Type of ticks
     I2_QML_PROPERTY_READONLY(TimeTickTypes::Value, type)
@@ -61,7 +62,7 @@ public:
      * @param type
      * @param parent
      */
-    explicit TimeTickM(int relativeDay, int hour, int minute, TimeTickTypes::Value type, QObject *parent = 0);
+    explicit TimeTickM(int hour, int minute, int second, TimeTickTypes::Value type, QObject *parent = 0);
 };
 
 QML_DECLARE_TYPE(TimeTickM)

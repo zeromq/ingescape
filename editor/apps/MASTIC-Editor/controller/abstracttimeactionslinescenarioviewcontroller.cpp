@@ -1,9 +1,22 @@
+
+// Margin in minutes (left and right side of our view) to ensure that labels are not truncated
+#define TIME_MARGIN_IN_PIXELS 40
+
+// The viewport of our analysis view is approximately 1335 px
+#define DEFAULT_VIEWPORT_WIDTH 1400.0
+
+// Minimum and maximum values to constrain "zoom" levels
+#define MINIMUM_TIME_RANGE 1.0
+#define MAXIMUM_TIME_RANGE 30.0
+
+// Default "time range" in minutes
+#define DEFAULT_TIME_RANGE 2.0
+
+
+// Total length of timeline in hours
+#define LENGTH_TIME_LINE 2.0
+
 #include "abstracttimeactionslinescenarioviewcontroller.h"
-
-
-// Margin in minutes (left and right side of our Analysis view) to ensure that labels are not truncated
-#define TIME_MARGIN_IN_MINUTES 2.0
-
 
 #include <QQmlEngine>
 #include <QtGlobal>
@@ -17,14 +30,16 @@
  */
 AbstractTimeActionslineScenarioViewController::AbstractTimeActionslineScenarioViewController(QObject *parent) :
     QObject(parent),
-    _pixelsPerMinute(20.0),
+    _pixelsPerMinute(DEFAULT_VIEWPORT_WIDTH/DEFAULT_TIME_RANGE),
     _timeTicksTotalWidth(1.0),
     _viewportX(-1),
     _viewportY(-1),
     _viewportWidth(0),
     _viewportHeight(0),
     _viewportContentScaleX(1.0),
-    _timeMarginInMinutes(TIME_MARGIN_IN_MINUTES),
+    _timeMarginInPixels(TIME_MARGIN_IN_PIXELS),
+    _minPixelsPerMinute(DEFAULT_VIEWPORT_WIDTH/MAXIMUM_TIME_RANGE),
+    _maxPixelsPerMinute(DEFAULT_VIEWPORT_WIDTH/MINIMUM_TIME_RANGE),
     _totalTimePeriodInMinutes(0.0)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
@@ -43,31 +58,34 @@ AbstractTimeActionslineScenarioViewController::AbstractTimeActionslineScenarioVi
     // Build our list of ticks
     QList<TimeTickM*> timeTicksList;
 
+
     // NB: We start at 00:00:00
     _startTime = QTime(0, 0, 0);
     _startRelativeTimeInSeconds = 0;
 
-    _endTime = QTime(24, 0, 0);
-    _endRelativeTimeInSeconds = 3600 * 24;
+    _endTime = QTime(LENGTH_TIME_LINE, 0, 0);
+    _endRelativeTimeInSeconds = 3600 * LENGTH_TIME_LINE;
 
     // Today - from 00:00 to 23:55
-    for (int hours = 0; hours < 24; hours++)
+    for (int hours = 0; hours < LENGTH_TIME_LINE; hours++)
     {
         for (int minutes = 0; minutes < 60; minutes += 1)
         {
-            // Check if we have a big tick
-            bool isBigTick = ((minutes%5) == 0);
-            TimeTickTypes::Value type = (isBigTick ? TimeTickTypes::BIG_TICK : (TimeTickTypes::NORMAL_TICK));
+            for (int seconds = 0; seconds < 60; seconds += 5)
+            {
+                // Check if we have a big tick
+                bool isBigTick = (seconds == 0 || seconds == 30);
+                TimeTickTypes::Value type = (isBigTick ? TimeTickTypes::BIG_TICK : (TimeTickTypes::NORMAL_TICK));
 
-            // Create a new tick and save it
-            TimeTickM* timeTick = new TimeTickM(0, hours, minutes, type);
-            timeTicksList.append(timeTick);
+                // Create a new tick and save it
+                TimeTickM* timeTick = new TimeTickM(hours, minutes, seconds, type);
+                timeTicksList.append(timeTick);
+            }
         }
     }
 
     // - Add a last time tick (for decoration purposes only)
-    // (TIME_RANGE_LAST_HOUR_OF_DAY_PLUS_ONE):00
-    TimeTickM* timeTick = new TimeTickM(1, 24, 0, TimeTickTypes::BIG_TICK);
+    TimeTickM* timeTick = new TimeTickM(LENGTH_TIME_LINE, 0, 0, TimeTickTypes::BIG_TICK);
     timeTicksList.append(timeTick);
 
     // Save our list of time ticks
@@ -75,7 +93,7 @@ AbstractTimeActionslineScenarioViewController::AbstractTimeActionslineScenarioVi
 
     // Compute time period in minutes
     // NB: we can not rely on _endDateTime and _startDateTime because _currentReferenceDate can be invalid
-    _totalTimePeriodInMinutes = 24 * 60.0;
+    _totalTimePeriodInMinutes = LENGTH_TIME_LINE * 60.0;
 
 
     // Updata our X axis
@@ -167,7 +185,7 @@ qreal AbstractTimeActionslineScenarioViewController::convertTimeInMillisecondsTo
     int deltaSeconds = (timeInMilliSeconds/1000 - _startRelativeTimeInSeconds);
 
     // Round value to avoid rendering artefacts
-    return qRound(_pixelsPerMinute * (_timeMarginInMinutes + deltaSeconds/60.0));
+    return (qRound(_pixelsPerMinute * (deltaSeconds/60.0)) + _timeMarginInPixels);
 }
 
 
@@ -183,7 +201,7 @@ int AbstractTimeActionslineScenarioViewController::convertAbscissaInCoordinateSy
 {
     Q_UNUSED(extraQmlUpdateField)
 
-   qreal timeSeconds = ((xValue/_pixelsPerMinute) - _timeMarginInMinutes)* 60.0;
+    qreal timeSeconds = ((xValue- _timeMarginInPixels)/_pixelsPerMinute) * 60.0;
 
     return ((timeSeconds + _startRelativeTimeInSeconds) * 1000.0);
 }
@@ -241,7 +259,7 @@ qreal AbstractTimeActionslineScenarioViewController::convertDurationInSecondsToL
 void AbstractTimeActionslineScenarioViewController::_updateCoordinateSystemAbscissaAxis()
 {
     // Compute the new total width of our coordinate system
-    qreal newTimeTicksTotalWidth = _pixelsPerMinute * (_totalTimePeriodInMinutes + 2 * _timeMarginInMinutes);
+    qreal newTimeTicksTotalWidth = _pixelsPerMinute * (_totalTimePeriodInMinutes) + 2 * _timeMarginInPixels;
     settimeTicksTotalWidth(newTimeTicksTotalWidth);
 
     Q_EMIT coordinateSystemAbscissaAxisChanged();

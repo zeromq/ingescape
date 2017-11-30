@@ -37,15 +37,6 @@ Item {
     property var viewController : MasticEditorC.timeLineC;
 
 
-    // Minimum scale factor
-    readonly property real minimumScale: 0.25;
-
-    // Maximum scale factor
-    readonly property real maximumScale: 4;
-
-    // Duration of automatic pan and/or zoom animations in milliseconds
-    readonly property int automaticPanZoomAnimationDuration: 300;
-
     // Zoom-in delta scale factor
     readonly property real zoomInDeltaScaleFactor: 1.2
 
@@ -244,6 +235,143 @@ Item {
             }
 
 
+
+            //
+            // MouseArea to capture scroll gesture events (trackpad)
+            //
+            MouseArea {
+                anchors.fill: parent
+
+                scrollGestureEnabled: true
+
+                onPressed: {
+                    rootItem.forceActiveFocus();
+                     contentArea.interactive = false;
+                    console.log( " pressed ");
+                    // deselect action in timeline
+                    if (controller && controller.selectedActionVMInTimeline) {
+                        controller.selectedActionVMInTimeline = null;
+
+                    }
+                }
+
+                onWheel: {
+
+                }
+
+
+
+                //
+                // MouseArea used to drag-n-drop our workspace AND handle real mouse wheel events (zoom-in, zoom-out)
+                //
+                MouseArea {
+                    id: mouseAreaWorkspaceDragNDropAndWheelZoom
+
+                    anchors.fill: parent
+
+                   // drag.target: workspace
+
+                    // 2-finger-flick gesture should pass through to our parent MouseArea
+                    scrollGestureEnabled: false
+
+                    onPressed: {
+                        rootItem.forceActiveFocus();
+                        console.log( " pressed ");
+
+                        // deselect action in timeline
+                        if (controller && controller.selectedActionVMInTimeline) {
+                            controller.selectedActionVMInTimeline = null;
+                        }
+                    }
+
+                    onWheel: {
+                        wheel.accepted = true;
+
+                        // with ctrl => zoom In and zoom out
+                        if (wheel.modifiers && Qt.ControlModifier) {
+
+                            var previousPixelsPerMinute = viewController.pixelsPerMinute;
+                            var deltaScale;
+                            var newPixelsPerMinute;
+
+                            // Check if we must zoom-in or zoom-out
+                            if (wheel.angleDelta.y < 0)
+                            {
+
+                                // Compute delta between our new scale factor and the previous one
+                                deltaScale = Math.pow(1/1.2, Math.abs(wheel.angleDelta.y)/120) ;
+
+                                // Check bounds of our delta scale
+                                newPixelsPerMinute = previousPixelsPerMinute * deltaScale;
+
+                                if (newPixelsPerMinute < viewController.minPixelsPerMinute)
+                                {
+                                    newPixelsPerMinute = viewController.minPixelsPerMinute;
+                                    deltaScale = newPixelsPerMinute/previousPixelsPerMinute;
+                                }
+                                else if (newPixelsPerMinute > viewController.maxPixelsPerMinute)
+                                {
+                                    newPixelsPerMinute = viewController.maxPixelsPerMinute;
+                                    deltaScale = newPixelsPerMinute/previousPixelsPerMinute;
+                                }
+
+                                // Resize content
+                                contentArea.resizeContent(
+                                            contentArea.contentWidth * deltaScale,
+                                            contentArea.contentHeight,
+                                            Qt.point(contentArea.contentX + contentArea.width/2, contentArea.contentY + contentArea.height/2)
+                                            );
+
+                                // Update current time unit
+                                viewController.pixelsPerMinute *= deltaScale;
+
+                            }
+                            else if (wheel.angleDelta.y > 0)
+                            {
+
+                                // Compute delta between our new scale factor and the previous one
+                                deltaScale = Math.pow(1.2, Math.abs(wheel.angleDelta.y)/120) ;
+
+                                // Check bounds of our delta scale
+                                newPixelsPerMinute = previousPixelsPerMinute * deltaScale;
+
+                                if (newPixelsPerMinute < viewController.minPixelsPerMinute)
+                                {
+                                    newPixelsPerMinute = viewController.minPixelsPerMinute;
+                                    deltaScale = newPixelsPerMinute/previousPixelsPerMinute;
+                                }
+                                else if (newPixelsPerMinute > viewController.maxPixelsPerMinute)
+                                {
+                                    newPixelsPerMinute = viewController.maxPixelsPerMinute;
+                                    deltaScale = newPixelsPerMinute/previousPixelsPerMinute;
+                                }
+
+                                // Resize content
+                                contentArea.resizeContent(
+                                            contentArea.contentWidth * deltaScale,
+                                            contentArea.contentHeight,
+                                            Qt.point(contentArea.contentX + contentArea.width/2, contentArea.contentY + contentArea.height/2)
+                                            );
+
+                                // Update current time unit
+                                viewController.pixelsPerMinute *= deltaScale;
+                            }
+                            // Else: wheel.angleDelta.y  == 0  => invalid wheel event
+                        }
+
+                        // else navigation along timeline
+                        else {
+                            var xMaxOfTimeLine = viewController.timeTicksTotalWidth - viewController.viewportWidth;
+                            var nbCranMolette = wheel.angleDelta.y/120.0;
+                            contentArea.contentX = Math.max(0, Math.min(contentArea.contentX - nbCranMolette * 100, xMaxOfTimeLine));
+                        }
+                    }
+                }
+
+            }
+
+
+
             Flickable {
                 id: contentArea
 
@@ -267,8 +395,8 @@ Item {
                         model : controller ? controller.actionsInTimeLine : 0;
 
                         ActionInTimeLine {
-                                myActionVM : model.QtObject;
-                                controller : rootItem.controller
+                            myActionVM : model.QtObject;
+                            controller : rootItem.controller
                         }
                     }
 
@@ -295,6 +423,7 @@ Item {
                                 canInsertActionVM = controller.canInsertActionVMTo(dragItem.action, timeInMilliSeconds, lineNumber)
 
                                 if ( canInsertActionVM ) {
+                                    ghostDropImpossible.visible = false;
                                     // move ghost
                                     ghostAction.actionModelGhost = dragItem.action;
                                     ghostAction.x = viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(timeInMilliSeconds, viewController.pixelsPerMinute);
@@ -304,6 +433,10 @@ Item {
                                 else {
                                     // remove ghost
                                     ghostAction.actionModelGhost = null;
+                                    // ghost drop impossible
+                                    ghostDropImpossible.x = viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(timeInMilliSeconds, viewController.pixelsPerMinute);
+                                    ghostDropImpossible.y = lineNumber * rootItem.lineHeight + (rootItem.lineHeight/2 - ghostDropImpossible.width/2);
+                                    ghostDropImpossible.visible = true;
                                 }
 
                             }
@@ -313,6 +446,7 @@ Item {
                         onExited: {
                             // remove ghost
                             ghostAction.actionModelGhost = null;
+                            ghostDropImpossible.visible = false;
                         }
 
                         onDropped: {
@@ -327,9 +461,23 @@ Item {
 
                                 // remove ghost
                                 ghostAction.actionModelGhost = null;
+                                ghostDropImpossible.visible = false;
                             }
 
                         }
+                    }
+
+
+                    // Ghost Drop Impossible
+                    I2SvgItem {
+                        id : ghostDropImpossible
+                        visible : false
+                        height : 15
+                        width : height
+                        opacity : 0.8
+
+                        svgFileCache: MasticTheme.svgFileMASTIC
+                        svgElementId: "dropImpossible"
                     }
 
                     // Ghost Action
@@ -363,6 +511,7 @@ Item {
                                 else {
                                     0;
                                 }
+
 
                         Rectangle {
                             id : rect
@@ -416,6 +565,7 @@ Item {
                                 color : MasticTheme.lightGreyColor;
 
                             }
+
 
                             I2SvgItem {
                                 id : revertActionExecutionGhost
@@ -513,17 +663,16 @@ Item {
         height: 40
         clip : true
 
+
         // Time ticks and current time label
         Flickable {
             id: columnHeaders
 
             anchors.fill: parent
-            interactive: false
-
-            contentX: contentArea.contentX
 
             contentWidth: viewController.timeTicksTotalWidth
             contentHeight: columnHeadersArea.height
+            boundsBehavior: Flickable.StopAtBounds;
 
             Item {
                 id: columnHeadersContent
@@ -593,7 +742,7 @@ Item {
                             bottom : svgCurrentTime.top
                             bottomMargin: -1
                         }
-                        width : 62
+                        width : 80
                         height: 20
                         radius : 2
                         color :  currentTimeMouseArea.pressed ? MasticTheme.darkBlueGreyColor : MasticTheme.blueGreyColor2
@@ -609,7 +758,7 @@ Item {
                                 verticalCenterOffset: 1
                             }
 
-                            text : controller ? controller.currentTime.toLocaleTimeString(Qt.locale(), "HH':'mm':'ss") : "00:00:00"
+                            text : controller ? controller.currentTime.toLocaleTimeString(Qt.locale(), "HH':'mm':'ss':'zzz") : "00:00:00.000"
                             color: MasticTheme.lightGreyColor
                             font {
                                 family: MasticTheme.textFontFamily
@@ -646,8 +795,8 @@ Item {
                         drag.smoothed: false
                         drag.target: currentTimeItem
 
-                        drag.minimumX : viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(0, viewController.pixelsPerMinute)
-                        drag.maximumX : viewController.timeTicksTotalWidth
+                        drag.minimumX : viewController.timeMarginInPixels
+                        drag.maximumX : viewController.timeTicksTotalWidth - viewController.timeMarginInPixels
                         drag.minimumY : 0
                         drag.maximumY : 0
 
@@ -787,7 +936,9 @@ Item {
         Rectangle {
             anchors {
                 left : playScenarioBtn.left
+                leftMargin: -10
                 right : playScenarioBtn.right
+                rightMargin: -10
                 top : playScenarioBtn.bottom
                 topMargin: 6
             }
@@ -854,6 +1005,24 @@ Item {
         property: "viewportHeight"
         value: timeLineArea.height
     }
+
+    // columnHeaders => contentArea
+    Binding {
+        target: columnHeaders
+        property: "contentX"
+        value: contentArea.contentX
+    }
+
+    // contentArea => columnHeaders
+    Binding {
+        target: contentArea
+        property: "contentX"
+        value: columnHeaders.contentX
+    }
+
+
+
+
 
     // Scrollbar => contentArea
     Binding {

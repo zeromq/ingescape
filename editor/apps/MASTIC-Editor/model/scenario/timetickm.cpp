@@ -13,23 +13,23 @@
  * @param type
  * @param parent
  */
-TimeTickM::TimeTickM(int relativeDay, int hour, int minute, TimeTickTypes::Value type, QObject *parent):
+TimeTickM::TimeTickM(int hour, int minute, int second, TimeTickTypes::Value type, QObject *parent):
     QObject(parent),
-    _relativeDay(relativeDay),
     _hour(hour),
     _minute(minute),
+    _second(second),
     _type(type)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
     // Set our time in seconds
-    _timeInSeconds = relativeDay * 86400 + hour * 3600 + minute * 60;
+    _timeInSeconds = hour * 3600 + minute * 60 + second;
 
     // Set our flags
     _isBigTick = (type == TimeTickTypes::BIG_TICK);
     _isSmallTick = (type == TimeTickTypes::SMALL_TICK);
 
     // Set our label
-    _label = QString("%1:%2").arg(_hour, 2, 10, QChar('0')).arg(_minute, 2, 10, QChar('0'));
+    _label = QString("%1:%2:%3").arg(_hour, 2, 10, QChar('0')).arg(_minute, 2, 10, QChar('0')).arg(_second, 2, 10, QChar('0'));
 }
