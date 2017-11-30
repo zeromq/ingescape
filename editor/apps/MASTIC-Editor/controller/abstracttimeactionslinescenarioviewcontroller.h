@@ -127,12 +127,12 @@ public:
         qreal convertQTimeToAbscissaInCoordinateSystem(QTime time, qreal extraQmlUpdateField);
 
         /**
-         * @brief Convert a given duration in seconds into a length value in our coordinate system
-         * @param durationInSeconds
+         * @brief Convert a given duration in milliseconds into a length value in our coordinate system
+         * @param durationInMilliseconds
          * @param extraQmlUpdateField Extra QML field used to recall this function when needed (binding)
          * @return
          */
-        qreal convertDurationInSecondsToLengthInCoordinateSystem(int durationInSeconds, qreal extraQmlUpdateField);
+        qreal convertDurationInMillisecondsToLengthInCoordinateSystem(int durationInMilliseconds, qreal extraQmlUpdateField);
 
     Q_SIGNALS:
        /**

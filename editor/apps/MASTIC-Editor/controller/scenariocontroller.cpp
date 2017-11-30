@@ -718,12 +718,10 @@ void ScenarioController::removeActionVMFromTimeLine(ActionVM * actionVM)
  */
 void ScenarioController::conditionsConnect()
 {
-    foreach (ActionVM * actionVM, _actionsInTimeLine.toList())
+    // COnnect all actions from the list
+    foreach (ActionM * actionM, _actionsList.toList())
     {
-        if(actionVM->actionModel() != NULL && actionVM->actionModel()->isConnected() == false)
-        {
-            actionVM->actionModel()->initializeConditionsConnections();
-        }
+        actionM->initializeConditionsConnections();
     }
 }
 
@@ -732,12 +730,10 @@ void ScenarioController::conditionsConnect()
  */
 void ScenarioController::conditionsDisconnect()
 {
-    foreach (ActionVM * actionVM, _actionsInTimeLine.toList())
+    // COnnect all actions from the list
+    foreach (ActionM * actionM, _actionsList.toList())
     {
-        if(actionVM->actionModel() != NULL && actionVM->actionModel()->isConnected())
-        {
-            actionVM->actionModel()->resetConditionsConnections();
-        }
+        actionM->resetConditionsConnections();
     }
 }
 
@@ -1189,7 +1185,8 @@ void ScenarioController::_onTimeout_DelayActions()
                     actionExecution->setneverExecuted(actionVM->executionsList()->count() <= 1 && actionExecution->isExecuted() == false);
 
                     // If there is at least another execution for this action...
-                    if (actionVM->executionsList()->count() > 1)
+                    if (actionVM->executionsList()->count() > 1 ||
+                            (actionExecution->neverExecuted() == true && actionVM->actionModel()->validityDurationType() == ValidationDurationType::CUSTOM))
                     {
                         // ...we remove the current execution
                         actionVM->setcurrentExecution(NULL);
@@ -1202,7 +1199,6 @@ void ScenarioController::_onTimeout_DelayActions()
                             // Free memory
                             delete actionExecution;
                         }
-
                     }
                 }
 
@@ -1456,7 +1452,7 @@ void ScenarioController::onRevertAction(ActionExecutionVM* actionExecution)
     ActionVM* actionVM = qobject_cast<ActionVM*>(sender());
     if ((actionVM != NULL) && (actionExecution != NULL))
     {
-        int currentTimeInMilliSeconds = _currentTime.msecsSinceStartOfDay();
+        int currentTimeInMilliSeconds = actionVM->startTime() + actionExecution->reverseTime();
 
         // Execute reverse effects of the action
         _executeReverseEffectsOfAction(actionExecution);

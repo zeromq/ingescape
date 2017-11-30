@@ -238,17 +238,17 @@ qreal AbstractTimeActionslineScenarioViewController::convertQTimeToAbscissaInCoo
 
 
 /**
- * @brief Convert a given duration in seconds into a length value in our coordinate system
- * @param durationInSeconds
+ * @brief Convert a given duration in milliseconds into a length value in our coordinate system
+ * @param durationInMilliseconds
  * @param extraQmlUpdateField Extra QML field used to recall this function when needed (binding)
  * @return
  */
-qreal AbstractTimeActionslineScenarioViewController::convertDurationInSecondsToLengthInCoordinateSystem(int durationInSeconds, qreal extraQmlUpdateField)
+qreal AbstractTimeActionslineScenarioViewController::convertDurationInMillisecondsToLengthInCoordinateSystem(int durationInMilliseconds, qreal extraQmlUpdateField)
 {
     Q_UNUSED(extraQmlUpdateField)
 
     // Round value to avoid rendering artefacts
-    return qRound( static_cast<qreal>(durationInSeconds) * _pixelsPerMinute/60.0);
+    return qRound( static_cast<qreal>(durationInMilliseconds) * _pixelsPerMinute/60000.0);
 }
 
 
