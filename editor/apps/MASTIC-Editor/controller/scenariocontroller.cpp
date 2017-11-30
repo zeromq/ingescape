@@ -1088,7 +1088,7 @@ void ScenarioController::_onTimeout_ExecuteActions()
                     // Check if an action execution exists and has not already been executed
                     if ((actionExecution != NULL) && !actionExecution->isExecuted())
                     {
-                        if( actionVM->isValid()
+                        if( actionVM->areConditionsValid()
                             // And the action has no validation duration
                             && actionVM->actionModel()->validityDurationType() == ValidationDurationType::IMMEDIATE)
                         {
@@ -1100,7 +1100,7 @@ void ScenarioController::_onTimeout_ExecuteActions()
                         }
                         else if(actionVM->actionModel()->validityDurationType() != ValidationDurationType::IMMEDIATE)
                         {
-                            if(actionVM->isValid())
+                            if(actionVM->areConditionsValid())
                             {
                                 // Execute action
                                 _executeAction(actionVM, actionExecution, currentTimeInMilliSeconds);
@@ -1181,7 +1181,7 @@ void ScenarioController::_onTimeout_DelayActions()
                 if ((actionExecution != NULL) && !actionExecution->isExecuted())
                 {
                     // Delay the current execution of this action
-                    if(actionVM->isValid() == false)
+                    if(actionVM->areConditionsValid() == false)
                     {
                         actionVM->delayCurrentExecution(currentTimeInMilliSeconds);
                     }
