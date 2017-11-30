@@ -48,7 +48,7 @@ Item {
                     (viewController.timeTicksTotalWidth - viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(myActionVM.startTime, viewController.pixelsPerMinute))
                     break;
                 case ValidationDurationType.CUSTOM:
-                    viewController.convertDurationInSecondsToLengthInCoordinateSystem(myActionVM.actionModel.validityDuration/1000, viewController.pixelsPerMinute)
+                    viewController.convertDurationInMillisecondsToLengthInCoordinateSystem(myActionVM.actionModel.validityDuration, viewController.pixelsPerMinute)
                     break;
                 default:
                     0
@@ -118,7 +118,7 @@ Item {
 
             // Not revert action
             I2SvgItem {
-                x : viewController.convertDurationInSecondsToLengthInCoordinateSystem(model.executionTime/1000, viewController.pixelsPerMinute) - width/2;
+                x : viewController.convertDurationInMillisecondsToLengthInCoordinateSystem(model.executionTime, viewController.pixelsPerMinute) - width/2;
 
                 anchors {
                     verticalCenter: parent.verticalCenter
@@ -140,17 +140,6 @@ Item {
                     verticalCenter: parent.verticalCenter
                 }
 
-                I2SvgItem {
-                    id : actionExecution
-                    x : viewController.convertDurationInSecondsToLengthInCoordinateSystem(model.executionTime/1000, viewController.pixelsPerMinute);
-                    y : 0
-
-                    svgFileCache : MasticTheme.svgFileMASTIC;
-                    svgElementId: (model.neverExecuted)?
-                                      "notExecutedRevertAction"
-                                    : ((model.isExecuted) ? "revertAction" : "currentRevertAction");
-                }
-
                 Rectangle {
                     anchors {
                         verticalCenter: actionExecution.verticalCenter
@@ -163,8 +152,21 @@ Item {
                 }
 
                 I2SvgItem {
+                    id : actionExecution
+                    x : viewController.convertDurationInMillisecondsToLengthInCoordinateSystem(model.executionTime, viewController.pixelsPerMinute);
+                    y : 0
+
+                    svgFileCache : MasticTheme.svgFileMASTIC;
+                    svgElementId: (model.neverExecuted)?
+                                      "notExecutedRevertAction"
+                                    : ((model.isExecuted) ? "revertAction" : "currentRevertAction");
+                }
+
+
+
+                I2SvgItem {
                     id : revertActionExecution
-                    x : viewController.convertDurationInSecondsToLengthInCoordinateSystem(model.reverseTime/1000, viewController.pixelsPerMinute) - width;
+                    x : viewController.convertDurationInMillisecondsToLengthInCoordinateSystem(model.reverseTime, viewController.pixelsPerMinute) - width;
                     y : 0
                     rotation : 180
                     svgFileCache : MasticTheme.svgFileMASTIC;

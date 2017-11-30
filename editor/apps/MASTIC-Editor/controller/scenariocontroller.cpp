@@ -665,7 +665,7 @@ void ScenarioController::removeActionVMFromTimeLine(ActionVM * actionVM)
                         if(actionVMSortedList->count() == 0)
                         {
                             // We delete the last line, redice the number of display line in the limite of MINIMUM_DISPLAYED_LINES_NUMBER_IN_TIMELINE
-                            if(_linesNumberInTimeLine > MINIMUM_DISPLAYED_LINES_NUMBER_IN_TIMELINE && lineNumber+1 == _linesNumberInTimeLine)
+                            if(_linesNumberInTimeLine > MINIMUM_DISPLAYED_LINES_NUMBER_IN_TIMELINE && lineNumber+2 == _linesNumberInTimeLine)
                             {
                                 int nbOfDecrement = 1;
 
@@ -718,12 +718,10 @@ void ScenarioController::removeActionVMFromTimeLine(ActionVM * actionVM)
  */
 void ScenarioController::conditionsConnect()
 {
-    foreach (ActionVM * actionVM, _actionsInTimeLine.toList())
+    // COnnect all actions from the list
+    foreach (ActionM * actionM, _actionsList.toList())
     {
-        if(actionVM->actionModel() != NULL && actionVM->actionModel()->isConnected() == false)
-        {
-            actionVM->actionModel()->initializeConditionsConnections();
-        }
+        actionM->initializeConditionsConnections();
     }
 }
 
@@ -732,12 +730,10 @@ void ScenarioController::conditionsConnect()
  */
 void ScenarioController::conditionsDisconnect()
 {
-    foreach (ActionVM * actionVM, _actionsInTimeLine.toList())
+    // COnnect all actions from the list
+    foreach (ActionM * actionM, _actionsList.toList())
     {
-        if(actionVM->actionModel() != NULL && actionVM->actionModel()->isConnected())
-        {
-            actionVM->actionModel()->resetConditionsConnections();
-        }
+        actionM->resetConditionsConnections();
     }
 }
 
@@ -769,6 +765,12 @@ void ScenarioController::_insertActionVMIntoMapByLineNumber(ActionVM* actionVMTo
                     // Insert the action
                     actionVMSortedList->append(actionVMToInsert);
 
+                    // Add an extra line if inserted our actionVM at the last line
+                    if(lineNumber >= _linesNumberInTimeLine -1)
+                    {
+                        setlinesNumberInTimeLine(lineNumber+2);
+                    }
+
                     break;
                 }
             }
@@ -783,6 +785,12 @@ void ScenarioController::_insertActionVMIntoMapByLineNumber(ActionVM* actionVMTo
 
                 // Add into our map
                 _mapActionsVMsInTimelineFromLineIndex.insert(lineNumber,actionVMSortedList);
+
+                // Add an extra line if inserted our actionVM at the last line
+                if(lineNumber >= _linesNumberInTimeLine -1)
+                {
+                    setlinesNumberInTimeLine(lineNumber+2);
+                }
 
                 break;
             }
@@ -802,10 +810,12 @@ void ScenarioController::_insertActionVMIntoMapByLineNumber(ActionVM* actionVMTo
     // only if we are not dropping at a busy position the actionVM
     if(actionVMToInsert->lineInTimeLine() == -1 && lineNumberRef == -1)
     {
-        if(lineNumber >= _linesNumberInTimeLine)
+        // Add an extra line if inserted our actionVM at the last line
+        if(lineNumber >= _linesNumberInTimeLine -1)
         {
-            setlinesNumberInTimeLine(_linesNumberInTimeLine+1);
+            setlinesNumberInTimeLine(lineNumber+2);
         }
+
         // Create the new line number
         actionVMToInsert->setlineInTimeLine(lineNumber);
 
@@ -1189,7 +1199,8 @@ void ScenarioController::_onTimeout_DelayActions()
                     actionExecution->setneverExecuted(actionVM->executionsList()->count() <= 1 && actionExecution->isExecuted() == false);
 
                     // If there is at least another execution for this action...
-                    if (actionVM->executionsList()->count() > 1)
+                    if (actionVM->executionsList()->count() > 1 ||
+                            (actionExecution->neverExecuted() == true && actionVM->actionModel()->validityDurationType() == ValidationDurationType::CUSTOM))
                     {
                         // ...we remove the current execution
                         actionVM->setcurrentExecution(NULL);
@@ -1202,7 +1213,6 @@ void ScenarioController::_onTimeout_DelayActions()
                             // Free memory
                             delete actionExecution;
                         }
-
                     }
                 }
 
@@ -1456,7 +1466,7 @@ void ScenarioController::onRevertAction(ActionExecutionVM* actionExecution)
     ActionVM* actionVM = qobject_cast<ActionVM*>(sender());
     if ((actionVM != NULL) && (actionExecution != NULL))
     {
-        int currentTimeInMilliSeconds = _currentTime.msecsSinceStartOfDay();
+        int currentTimeInMilliSeconds = actionVM->startTime() + actionExecution->reverseTime();
 
         // Execute reverse effects of the action
         _executeReverseEffectsOfAction(actionExecution);

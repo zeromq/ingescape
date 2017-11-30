@@ -509,7 +509,7 @@ Item {
                                         (viewController.timeTicksTotalWidth - viewController.convertQTimeToAbscissaInCoordinateSystem(startTime, viewController.pixelsPerMinute))
                                         break;
                                     case ValidationDurationType.CUSTOM:
-                                        viewController.convertDurationInSecondsToLengthInCoordinateSystem(actionModelGhost.validityDuration/1000, viewController.pixelsPerMinute)
+                                        viewController.convertDurationInMillisecondsToLengthInCoordinateSystem(actionModelGhost.validityDuration, viewController.pixelsPerMinute)
                                         break;
                                     default:
                                         0
@@ -554,15 +554,6 @@ Item {
                                 verticalCenter: parent.verticalCenter
                             }
 
-                            I2SvgItem {
-                                id : actionExecutionGhost
-                                x : 0;
-                                y : 0
-
-                                svgFileCache : MasticTheme.svgFileMASTIC;
-                                svgElementId: "revertAction"
-                            }
-
                             Rectangle {
                                 anchors {
                                     verticalCenter: actionExecutionGhost.verticalCenter
@@ -574,6 +565,14 @@ Item {
 
                             }
 
+                            I2SvgItem {
+                                id : actionExecutionGhost
+                                x : 0;
+                                y : 0
+
+                                svgFileCache : MasticTheme.svgFileMASTIC;
+                                svgElementId: "revertAction"
+                            }
 
                             I2SvgItem {
                                 id : revertActionExecutionGhost
@@ -583,7 +582,7 @@ Item {
                                             rect.width - width;
                                         }
                                         else if (ghostAction.actionModelGhost.shallRevertAfterTime) {
-                                            viewController.convertDurationInSecondsToLengthInCoordinateSystem(ghostAction.actionModelGhost.revertAfterTime/1000, viewController.pixelsPerMinute) - width;
+                                            viewController.convertDurationInMillisecondsToLengthInCoordinateSystem(ghostAction.actionModelGhost.revertAfterTime, viewController.pixelsPerMinute) - width;
                                         }
                                         else {
                                             0;
@@ -637,7 +636,7 @@ Item {
                     y: 0
 
                     Rectangle {
-                        x: -1
+                        x: 0
                         y: 0
 
                         width: 1
