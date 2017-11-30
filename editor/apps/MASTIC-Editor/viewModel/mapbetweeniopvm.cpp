@@ -26,17 +26,20 @@
  * @param pointFrom The link starts from this output of the agentFrom
  * @param agentTo The link ends to this agent
  * @param pointTo The link ends to this input of the agentTo
+ * @param isVirtual
  * @param parent
  */
 MapBetweenIOPVM::MapBetweenIOPVM(AgentInMappingVM* agentFrom,
                                  OutputVM *pointFrom,
                                  AgentInMappingVM* agentTo,
                                  InputVM *pointTo,
+                                 bool isVirtual,
                                  QObject *parent) : QObject(parent),
     _agentFrom(NULL),
     _pointFrom(NULL),
     _agentTo(NULL),
-    _pointTo(NULL)
+    _pointTo(NULL),
+    _isVirtual(isVirtual)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -70,8 +73,7 @@ MapBetweenIOPVM::~MapBetweenIOPVM()
         setagentFrom(NULL);
 
         // Handle ghost agent
-        if (temp->isGhost())
-        {
+        if (temp->isGhost()) {
             delete temp;
         }
     }
@@ -82,8 +84,7 @@ MapBetweenIOPVM::~MapBetweenIOPVM()
         setpointFrom(NULL);
 
         // Handle ghost output
-        if (temp->isGhost())
-        {
+        if (temp->isGhost()) {
             delete temp;
         }
     }

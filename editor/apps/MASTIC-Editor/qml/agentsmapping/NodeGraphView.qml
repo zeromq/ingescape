@@ -596,7 +596,7 @@ Item {
                 // Links between nodes
                 //
                 Repeater {
-                    model : controller? controller.allMapInMapping : 0;
+                    model : controller ? controller.allMapInMapping : 0;
 
                     Link {
                         id : link
