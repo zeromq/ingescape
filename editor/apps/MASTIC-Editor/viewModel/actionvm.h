@@ -113,6 +113,11 @@ public:
 
 Q_SIGNALS:
 
+    /**
+     * @brief Signal emitted when the action has finished its reverse period
+     * @param action execution
+     */
+    void revertAction(ActionExecutionVM* actionExecution);
 
 private Q_SLOTS:
 
@@ -129,6 +134,11 @@ private Q_SLOTS:
      */
     void _onValidityDurationChange();
 
+    /**
+     * @brief Called when our timer time out to handle the action reversion
+     */
+    void _onTimeout_ReserseAction();
+
 
 private:
     /**
@@ -143,7 +153,8 @@ private:
      */
     void _createActionExecution(int startTime);
 
-
+    // Timer to wait for action revert
+    QTimer _timerToReverse;
 };
 
 QML_DECLARE_TYPE(ActionVM)

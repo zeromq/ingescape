@@ -95,7 +95,13 @@ class ScenarioController: public QObject
     I2_QML_PROPERTY(QTime, currentTime)
 
     // List of actionsVM to evaluate each timeout of our timer linked to our scenario
+    I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(ActionVM, actionsVMToEvaluateVMList)
+
+    // List of activated actionsVM
     I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(ActionVM, activeActionsVMList)
+
+    // Next action view model to active
+    I2_QML_PROPERTY(ActionVM*, nextActionVMToActive)
 
 public:
 
@@ -262,6 +268,11 @@ public Q_SLOTS:
       * @brief slot on agent removed in mapping
       */
     void onAgentInMappingRemoved(AgentInMappingVM* agentRemoved);
+
+    /**
+      * @brief slot on the action reversion
+      */
+    void onRevertAction(ActionExecutionVM* actionExecution);
 
 
 private Q_SLOTS:

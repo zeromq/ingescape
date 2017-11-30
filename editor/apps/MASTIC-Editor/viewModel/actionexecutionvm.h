@@ -18,9 +18,6 @@ class ActionExecutionVM : public QObject
     // Flag indicating if we shall revert effect(s) of our action
     I2_QML_PROPERTY(bool, shallRevert)
 
-    // Flag indicating if we are waiting to revert effect(s) of our action
-    I2_QML_PROPERTY(bool, isWaitingRevert)
-
     // Flag indicating if our action has been executed
     I2_QML_PROPERTY(bool, isExecuted)
 

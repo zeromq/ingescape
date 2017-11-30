@@ -93,6 +93,16 @@ void ActionEditorController::validateModification()
         _originalViewModel->setcolor(_editedViewModel->color());
         _originalViewModel->setstartTimeString(_editedViewModel->startTimeString());
     }
+
+    // If the model is connected we reinitialize the conditions
+    if(_originalAction->isConnected())
+    {
+        // Reset connections
+        _originalAction->resetConditionsConnections();
+
+        // Init connections
+        _originalAction->initializeConditionsConnections();
+    }
 }
 
 /**
