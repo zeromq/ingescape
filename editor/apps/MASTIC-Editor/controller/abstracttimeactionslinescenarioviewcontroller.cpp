@@ -182,7 +182,7 @@ qreal AbstractTimeActionslineScenarioViewController::convertTimeInMillisecondsTo
     Q_UNUSED(extraQmlUpdateField)
 
     // Compute delta in seconds between this date and our origin
-    int deltaSeconds = (timeInMilliSeconds/1000 - _startRelativeTimeInSeconds);
+    qreal deltaSeconds = (timeInMilliSeconds/1000.0 - _startRelativeTimeInSeconds);
 
     // Round value to avoid rendering artefacts
     return (qRound(_pixelsPerMinute * (deltaSeconds/60.0)) + _timeMarginInPixels);

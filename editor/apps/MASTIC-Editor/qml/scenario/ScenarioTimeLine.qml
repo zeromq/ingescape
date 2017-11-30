@@ -246,13 +246,6 @@ Item {
 
                 onPressed: {
                     rootItem.forceActiveFocus();
-                     contentArea.interactive = false;
-                    console.log( " pressed ");
-                    // deselect action in timeline
-                    if (controller && controller.selectedActionVMInTimeline) {
-                        controller.selectedActionVMInTimeline = null;
-
-                    }
                 }
 
                 onWheel: {
@@ -276,12 +269,6 @@ Item {
 
                     onPressed: {
                         rootItem.forceActiveFocus();
-                        console.log( " pressed ");
-
-                        // deselect action in timeline
-                        if (controller && controller.selectedActionVMInTimeline) {
-                            controller.selectedActionVMInTimeline = null;
-                        }
                     }
 
                     onWheel: {
@@ -390,6 +377,16 @@ Item {
                     width: viewController.timeTicksTotalWidth
                     height: rootItem.lineHeight * rootItem.linesNumber
 
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            // deselect action in timeline
+                            if (controller && controller.selectedActionVMInTimeline) {
+                                controller.selectedActionVMInTimeline = null;
+
+                            }
+                        }
+                    }
 
                     Repeater {
                         model : controller ? controller.actionsInTimeLine : 0;
@@ -414,27 +411,33 @@ Item {
                         onPositionChanged: {
                             var dragItem = drag.source;
 
-                            var timeInMilliSeconds = viewController.convertAbscissaInCoordinateSystemToTimeInMilliseconds(drag.x, viewController.pixelsPerMinute)
+                            var startInQTime = viewController.convertAbscissaInCoordinateSystemToQTime(drag.x, viewController.pixelsPerMinute)
+                            var starttimeInMilliseconds = viewController.convertAbscissaInCoordinateSystemToTimeInMilliseconds(drag.x, viewController.pixelsPerMinute)
+
                             var lineNumber = Math.floor(drag.y / rootItem.lineHeight)
                             var canInsertActionVM = false;
 
                             if (controller && (typeof dragItem.action !== 'undefined' && controller)) {
                                 // test if the drop is possible
-                                canInsertActionVM = controller.canInsertActionVMTo(dragItem.action, timeInMilliSeconds, lineNumber)
+                                canInsertActionVM = controller.canInsertActionVMTo(dragItem.action, starttimeInMilliseconds, lineNumber)
 
                                 if ( canInsertActionVM ) {
                                     ghostDropImpossible.visible = false;
                                     // move ghost
                                     ghostAction.actionModelGhost = dragItem.action;
-                                    ghostAction.x = viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(timeInMilliSeconds, viewController.pixelsPerMinute);
+                                    ghostAction.x = viewController.convertQTimeToAbscissaInCoordinateSystem(startInQTime, viewController.pixelsPerMinute);
                                     ghostAction.y = lineNumber * rootItem.lineHeight;
-                                    ghostAction.startTime = timeInMilliSeconds;
+                                    ghostAction.startTime = startInQTime;
+                                    if  (typeof dragItem.temporaryStartTime !== 'undefined') {
+                                        dragItem.temporaryStartTime = startInQTime;
+                                    }
                                 }
                                 else {
                                     // remove ghost
                                     ghostAction.actionModelGhost = null;
+
                                     // ghost drop impossible
-                                    ghostDropImpossible.x = viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(timeInMilliSeconds, viewController.pixelsPerMinute);
+                                    ghostDropImpossible.x = viewController.convertQTimeToAbscissaInCoordinateSystem(startInQTime, viewController.pixelsPerMinute);
                                     ghostDropImpossible.y = lineNumber * rootItem.lineHeight + (rootItem.lineHeight/2 - ghostDropImpossible.width/2);
                                     ghostDropImpossible.visible = true;
                                 }
@@ -447,21 +450,28 @@ Item {
                             // remove ghost
                             ghostAction.actionModelGhost = null;
                             ghostDropImpossible.visible = false;
+                            var dragItem = drag.source;
+                            if  (typeof dragItem.temporaryStartTime !== 'undefined') {
+                                dragItem.temporaryStartTime = null;
+                            }
                         }
 
                         onDropped: {
                             var dragItem = drag.source;
-                            var timeInMilliSeconds = viewController.convertAbscissaInCoordinateSystemToTimeInMilliseconds(drag.x, viewController.pixelsPerMinute)
+                            var timeInMilliseconds = viewController.convertAbscissaInCoordinateSystemToTimeInMilliseconds(drag.x, viewController.pixelsPerMinute)
                             var lineNumber = Math.floor(drag.y / rootItem.lineHeight)
 
                             if (typeof dragItem.action !== 'undefined' && controller)
                             {
 
-                                controller.addActionVMAtTime(dragItem.action, timeInMilliSeconds, lineNumber);
+                                controller.addActionVMAtTime(dragItem.action, timeInMilliseconds, lineNumber);
 
                                 // remove ghost
                                 ghostAction.actionModelGhost = null;
                                 ghostDropImpossible.visible = false;
+                                if  (typeof dragItem.temporaryStartTime !== 'undefined') {
+                                    dragItem.temporaryStartTime = null;
+                                }
                             }
 
                         }
@@ -487,7 +497,7 @@ Item {
                         y : 0
 
                         property var actionModelGhost : null;
-                        property int startTime : 0;
+                        property var startTime : null;
                         opacity : (actionModelGhost !== null) ? 0.5 : 0
 
                         height : rootItem.lineHeight/2
@@ -498,7 +508,7 @@ Item {
                                         0;
                                         break;
                                     case ValidationDurationType.FOREVER:
-                                        (viewController.timeTicksTotalWidth - viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(startTime, viewController.pixelsPerMinute))
+                                        (viewController.timeTicksTotalWidth - viewController.convertQTimeToAbscissaInCoordinateSystem(startTime, viewController.pixelsPerMinute))
                                         break;
                                     case ValidationDurationType.CUSTOM:
                                         viewController.convertDurationInSecondsToLengthInCoordinateSystem(actionModelGhost.validityDuration/1000, viewController.pixelsPerMinute)
