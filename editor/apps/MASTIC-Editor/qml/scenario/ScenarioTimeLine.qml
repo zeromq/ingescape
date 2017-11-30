@@ -252,8 +252,6 @@ Item {
 
                 }
 
-
-
                 //
                 // MouseArea used to drag-n-drop our workspace AND handle real mouse wheel events (zoom-in, zoom-out)
                 //
@@ -683,6 +681,126 @@ Item {
             contentWidth: viewController.timeTicksTotalWidth
             contentHeight: columnHeadersArea.height
             boundsBehavior: Flickable.StopAtBounds;
+
+
+            //
+            // MouseArea to capture scroll gesture events (trackpad)
+            //
+            MouseArea {
+                anchors.fill: parent
+
+                scrollGestureEnabled: true
+
+                onPressed: {
+                    rootItem.forceActiveFocus();
+                }
+
+                onWheel: {
+
+                }
+
+                //
+                // MouseArea used to drag-n-drop our workspace AND handle real mouse wheel events (zoom-in, zoom-out)
+                //
+                MouseArea {
+                    anchors.fill: parent
+
+                   // drag.target: workspace
+
+                    // 2-finger-flick gesture should pass through to our parent MouseArea
+                    scrollGestureEnabled: false
+
+                    onPressed: {
+                        rootItem.forceActiveFocus();
+                    }
+
+                    onWheel: {
+                        wheel.accepted = true;
+
+                        // with ctrl => zoom In and zoom out
+                        if (wheel.modifiers && Qt.ControlModifier) {
+
+                            var previousPixelsPerMinute = viewController.pixelsPerMinute;
+                            var deltaScale;
+                            var newPixelsPerMinute;
+
+                            // Check if we must zoom-in or zoom-out
+                            if (wheel.angleDelta.y < 0)
+                            {
+
+                                // Compute delta between our new scale factor and the previous one
+                                deltaScale = Math.pow(1/1.2, Math.abs(wheel.angleDelta.y)/120) ;
+
+                                // Check bounds of our delta scale
+                                newPixelsPerMinute = previousPixelsPerMinute * deltaScale;
+
+                                if (newPixelsPerMinute < viewController.minPixelsPerMinute)
+                                {
+                                    newPixelsPerMinute = viewController.minPixelsPerMinute;
+                                    deltaScale = newPixelsPerMinute/previousPixelsPerMinute;
+                                }
+                                else if (newPixelsPerMinute > viewController.maxPixelsPerMinute)
+                                {
+                                    newPixelsPerMinute = viewController.maxPixelsPerMinute;
+                                    deltaScale = newPixelsPerMinute/previousPixelsPerMinute;
+                                }
+
+                                // Resize content
+                                contentArea.resizeContent(
+                                            contentArea.contentWidth * deltaScale,
+                                            contentArea.contentHeight,
+                                            Qt.point(contentArea.contentX + contentArea.width/2, contentArea.contentY + contentArea.height/2)
+                                            );
+
+                                // Update current time unit
+                                viewController.pixelsPerMinute *= deltaScale;
+
+                            }
+                            else if (wheel.angleDelta.y > 0)
+                            {
+
+                                // Compute delta between our new scale factor and the previous one
+                                deltaScale = Math.pow(1.2, Math.abs(wheel.angleDelta.y)/120) ;
+
+                                // Check bounds of our delta scale
+                                newPixelsPerMinute = previousPixelsPerMinute * deltaScale;
+
+                                if (newPixelsPerMinute < viewController.minPixelsPerMinute)
+                                {
+                                    newPixelsPerMinute = viewController.minPixelsPerMinute;
+                                    deltaScale = newPixelsPerMinute/previousPixelsPerMinute;
+                                }
+                                else if (newPixelsPerMinute > viewController.maxPixelsPerMinute)
+                                {
+                                    newPixelsPerMinute = viewController.maxPixelsPerMinute;
+                                    deltaScale = newPixelsPerMinute/previousPixelsPerMinute;
+                                }
+
+                                // Resize content
+                                contentArea.resizeContent(
+                                            contentArea.contentWidth * deltaScale,
+                                            contentArea.contentHeight,
+                                            Qt.point(contentArea.contentX + contentArea.width/2, contentArea.contentY + contentArea.height/2)
+                                            );
+
+                                // Update current time unit
+                                viewController.pixelsPerMinute *= deltaScale;
+                            }
+                            // Else: wheel.angleDelta.y  == 0  => invalid wheel event
+                        }
+
+                        // else navigation along timeline
+                        else {
+                            var xMaxOfTimeLine = viewController.timeTicksTotalWidth - viewController.viewportWidth;
+                            var nbCranMolette = wheel.angleDelta.y/120.0;
+                            contentArea.contentX = Math.max(0, Math.min(contentArea.contentX - nbCranMolette * 100, xMaxOfTimeLine));
+                        }
+                    }
+                }
+
+            }
+
+
 
             Item {
                 id: columnHeadersContent
