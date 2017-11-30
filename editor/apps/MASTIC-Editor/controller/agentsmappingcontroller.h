@@ -222,7 +222,7 @@ private Q_SLOTS:
      * @param currentAgentInMapping
      * @param inputsListAdded
      */
-    void _generateAllMapBetweenIopUsingNewlyAddedInputsVM(AgentInMappingVM* currentAgentInMapping, QList<InputVM*> inputsListAdded);
+    //void _generateAllMapBetweenIopUsingNewlyAddedInputsVM(AgentInMappingVM* currentAgentInMapping, QList<InputVM*> inputsListAdded);
 
 
     /**
@@ -233,7 +233,7 @@ private Q_SLOTS:
      * @param currentAgentInMapping
      * @param outputsListAdded
      */
-    void _completeAllPartialMapBetweenIopUsingNewlyOutputsVM(AgentInMappingVM* currentAgentInMapping, QList<OutputVM*> outputsListAdded);
+    //void _completeAllPartialMapBetweenIopUsingNewlyOutputsVM(AgentInMappingVM* currentAgentInMapping, QList<OutputVM*> outputsListAdded);
 
 
     /**
@@ -284,7 +284,7 @@ private:
      * @brief Deletes all the mapBetweenIOPVM where agent in paramater is involved as agentFrom in the map.
      * @param agentInMapping
      */
-    void _deleteAllMappingMadeOnTargetAgent(AgentInMappingVM *agentInMapping);
+    //void _deleteAllMappingMadeOnTargetAgent(AgentInMappingVM *agentInMapping);
 
 
     /**
@@ -295,10 +295,7 @@ private:
      * @param pointTo
      * @return
      */
-    bool _checkIfMapBetweenIOPVMAlreadyExist(AgentInMappingVM* agentFrom,
-                                             OutputVM *pointFrom,
-                                             AgentInMappingVM* agentTo,
-                                             InputVM *pointTo);
+    //bool _checkIfMapBetweenIOPVMAlreadyExist(AgentInMappingVM* agentFrom, OutputVM *pointFrom, AgentInMappingVM* agentTo, InputVM *pointTo);
 
 
     /**
@@ -314,6 +311,13 @@ private:
      * @return
      */
     MapBetweenIOPVM* _getLinkFromMappingElement(ElementMappingM* mappingElement);
+
+
+    /**
+     * @brief Remove all the links with this agent
+     * @param agent
+     */
+    void _removeAllLinksWithAgent(AgentInMappingVM* agent);
 
 
 private:

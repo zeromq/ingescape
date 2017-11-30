@@ -106,8 +106,10 @@ void AgentsMappingController::deleteAgentInMapping(AgentInMappingVM* agent)
         // Remove from hash table
         _mapFromNameToAgentInMapping.remove(agent->name());
 
-        // TODO
-        _deleteAllMappingMadeOnTargetAgent(agent);
+        //_deleteAllMappingMadeOnTargetAgent(agent);
+
+        // Remove all the links with this agent
+        _removeAllLinksWithAgent(agent);
 
         // Remove this Agent In Mapping from the list to update view (QML)
         _agentInMappingVMList.remove(agent);
@@ -313,6 +315,7 @@ void AgentsMappingController::onIsActivatedMappingChanged(bool isActivatedMappin
                 int availableMinHeight = 1080 - 200;
                 double randomMax = (double)RAND_MAX;
 
+                // Create all agents in mapping
                 foreach (QString agentName, mapFromAgentNameToActiveAgentsList.keys())
                 {
                     QList<AgentM*> activeAgentsList = mapFromAgentNameToActiveAgentsList.value(agentName);
@@ -324,6 +327,21 @@ void AgentsMappingController::onIsActivatedMappingChanged(bool isActivatedMappin
 
                     // Add new model(s) of agent to the current mapping
                     _addAgentModelsToMappingAtPosition(agentName, activeAgentsList, position);
+                }
+
+                // Create all links in mapping
+                foreach (AgentInMappingVM* agent, _agentInMappingVMList.toList()) {
+                    if (agent != NULL) {
+                        foreach (AgentM* model, agent->models()->toList()) {
+                            if ((model != NULL) && (model->mapping() != NULL)) {
+                                foreach (ElementMappingM* mappingElement, model->mapping()->elementMappingsList()->toList())
+                                {
+                                    // Simulate slot "on Mapped"
+                                    onMapped(mappingElement);
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -460,7 +478,7 @@ void AgentsMappingController::onUnmapped(ElementMappingM* mappingElement)
  * @param currentAgentInMapping
  * @param inputsListAdded
  */
-void AgentsMappingController::_generateAllMapBetweenIopUsingNewlyAddedInputsVM(AgentInMappingVM* currentAgentInMapping, QList<InputVM*> inputsListAdded)
+/*void AgentsMappingController::_generateAllMapBetweenIopUsingNewlyAddedInputsVM(AgentInMappingVM* currentAgentInMapping, QList<InputVM*> inputsListAdded)
 {
     if ((_modelManager != NULL) && (currentAgentInMapping != NULL))
     {
@@ -585,7 +603,7 @@ void AgentsMappingController::_generateAllMapBetweenIopUsingNewlyAddedInputsVM(A
             _allMapInMapping.append(newMapBetweenIOP);
         }
     }
-}
+}*/
 
 
 /**
@@ -596,7 +614,7 @@ void AgentsMappingController::_generateAllMapBetweenIopUsingNewlyAddedInputsVM(A
  * @param currentAgentInMapping
  * @param outputsListAdded
  */
-void AgentsMappingController::_completeAllPartialMapBetweenIopUsingNewlyOutputsVM(AgentInMappingVM* currentAgentInMapping, QList<OutputVM*> outputsListAdded)
+/*void AgentsMappingController::_completeAllPartialMapBetweenIopUsingNewlyOutputsVM(AgentInMappingVM* currentAgentInMapping, QList<OutputVM*> outputsListAdded)
 {
     if(currentAgentInMapping != NULL)
     {
@@ -671,7 +689,7 @@ void AgentsMappingController::_completeAllPartialMapBetweenIopUsingNewlyOutputsV
            _allMapInMapping.append(newMapBetweenIOP);
         }
     }
-}
+}*/
 
 
 /**
@@ -755,7 +773,7 @@ void AgentsMappingController::_onInputsListAdded(QList<InputVM*> inputsListAdded
     {
         qDebug() << "_on Inputs List Added from agent" << agentInMapping->name() << inputsListAdded.count();
 
-        _generateAllMapBetweenIopUsingNewlyAddedInputsVM(agentInMapping, inputsListAdded);
+        //_generateAllMapBetweenIopUsingNewlyAddedInputsVM(agentInMapping, inputsListAdded);
     }
 }
 
@@ -771,7 +789,7 @@ void AgentsMappingController::_onOutputsListAdded(QList<OutputVM*> outputsListAd
     {
         qDebug() << "_on Outputs List Added from agent" << agentInMapping->name() << outputsListAdded.count();
 
-        _completeAllPartialMapBetweenIopUsingNewlyOutputsVM(agentInMapping ,outputsListAdded);
+        //_completeAllPartialMapBetweenIopUsingNewlyOutputsVM(agentInMapping ,outputsListAdded);
     }
 }
 
@@ -787,6 +805,7 @@ void AgentsMappingController::_onInputsListWillBeRemoved(QList<InputVM*> inputsL
     if ((agentInMapping != NULL) && (inputsListWillBeRemoved.count() > 0))
     {
         qDebug() << "_on Intputs List Will Be Removed from agent" << agentInMapping->name() << inputsListWillBeRemoved.count();
+
 //        foreach(InputVM* removedInput, inputVMs)
 //        {
 //            foreach(MapBetweenIOPVM* mapBetweenIOP, _allMapInMapping.toList())
@@ -915,7 +934,7 @@ void AgentsMappingController::_addAgentModelsToMappingAtPosition(QString agentNa
  * @brief Deletes all the mapBetweenIOPVM where agent in paramater is involved.
  * @param agentInMapping
  */
-void AgentsMappingController::_deleteAllMappingMadeOnTargetAgent(AgentInMappingVM* agentInMapping)
+/*void AgentsMappingController::_deleteAllMappingMadeOnTargetAgent(AgentInMappingVM* agentInMapping)
 {
     if(agentInMapping != NULL)
     {
@@ -996,7 +1015,7 @@ void AgentsMappingController::_deleteAllMappingMadeOnTargetAgent(AgentInMappingV
              }
          }
     }
-}
+}*/
 
 
 /**
@@ -1007,7 +1026,7 @@ void AgentsMappingController::_deleteAllMappingMadeOnTargetAgent(AgentInMappingV
  * @param pointTo
  * @return
  */
-bool AgentsMappingController::_checkIfMapBetweenIOPVMAlreadyExist(AgentInMappingVM* agentFrom, OutputVM *pointFrom, AgentInMappingVM* agentTo, InputVM *pointTo)
+/*bool AgentsMappingController::_checkIfMapBetweenIOPVMAlreadyExist(AgentInMappingVM* agentFrom, OutputVM *pointFrom, AgentInMappingVM* agentTo, InputVM *pointTo)
 {
     if(pointFrom->isGhost() || agentFrom->isGhost())     // Partial Map
     {
@@ -1057,7 +1076,7 @@ bool AgentsMappingController::_checkIfMapBetweenIOPVMAlreadyExist(AgentInMapping
     }
 
     return false;
-}
+}*/
 
 
 /**
@@ -1112,3 +1131,26 @@ MapBetweenIOPVM* AgentsMappingController::_getLinkFromMappingElement(ElementMapp
     return link;
 }
 
+
+/**
+ * @brief Remove all the links with this agent
+ * @param agent
+ */
+void AgentsMappingController::_removeAllLinksWithAgent(AgentInMappingVM* agent)
+{
+    if (agent != NULL)
+    {
+        foreach (MapBetweenIOPVM* link, _allMapInMapping.toList())
+        {
+            if ( (link != NULL) &&
+                    ((link->agentFrom() == agent) || (link->agentTo() == agent)) )
+            {
+                // Remove a link between two agents from the mapping
+                removeLinkBetweenTwoAgents(link);
+
+                // Delete the link between two agents
+                _deleteLinkBetweenTwoAgents(link);
+            }
+        }
+    }
+}
