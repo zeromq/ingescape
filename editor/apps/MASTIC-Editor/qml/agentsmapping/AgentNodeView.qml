@@ -590,6 +590,7 @@ Rectangle {
                                 id: linkDraggablePointTO
 
                                 parent: rootItem.parent
+
                                 strokeDashArray: "5, 5"
                                 visible: draggablePointTO.dragActive
 
@@ -1036,19 +1037,19 @@ Rectangle {
                         switch (agentMappingVM.reducedMapValueTypeGroupInOutput)
                         {
                         case AgentIOPValueTypeGroups.NUMBER:
-                            agentMappingVM.isON? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
+                            MasticTheme.orangeColor2
                             break;
                        case AgentIOPValueTypeGroups.STRING:
-                            agentMappingVM.isON? MasticTheme.redColor2 : MasticTheme.darkRedColor2
+                            MasticTheme.redColor2
                             break;
                         case AgentIOPValueTypeGroups.IMPULSION:
-                            agentMappingVM.isON? MasticTheme.purpleColor : MasticTheme.darkPurpleColor
+                            MasticTheme.purpleColor
                             break;
                         case AgentIOPValueTypeGroups.DATA:
-                            agentMappingVM.isON? MasticTheme.greenColor : MasticTheme.darkGreenColor
+                            MasticTheme.greenColor
                             break;
                         case AgentIOPValueTypeGroups.MIXED:
-                            agentMappingVM.isON? MasticTheme.whiteColor : MasticTheme.darkGreyColor
+                            MasticTheme.whiteColor
                             break;
                         case AgentIOPValueTypeGroups.UNKNOWN:
                             "#000000"

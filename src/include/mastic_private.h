@@ -184,6 +184,7 @@ typedef struct subscriber_s{
     bool mappedNotificationToSend;
     mapping_t *mapping;
     mappingFilter_t *mappingsFilters;
+    int timerId;
     UT_hash_handle hh;
 } subscriber_t;
 

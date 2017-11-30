@@ -139,6 +139,8 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     connect(_modelManager, &MasticModelManager::isActivatedMappingChanged, _agentsMappingC, &AgentsMappingController::onIsActivatedMappingChanged);
     connect(_modelManager, &MasticModelManager::agentModelCreated, _agentsSupervisionC, &AgentsSupervisionController::onAgentModelCreated);
     connect(_modelManager, &MasticModelManager::agentModelWillBeDeleted, _agentsMappingC, &AgentsMappingController::onAgentModelWillBeDeleted);
+    connect(_modelManager, &MasticModelManager::mapped, _agentsMappingC, &AgentsMappingController::onMapped);
+    connect(_modelManager, &MasticModelManager::unmapped, _agentsMappingC, &AgentsMappingController::onUnmapped);
     connect(_modelManager, &MasticModelManager::addInputsToEditorForOutputs, _valuesHistoryC, &ValuesHistoryController::onAgentOutputsObserved);
     connect(_modelManager, &MasticModelManager::addInputsToEditorForOutputs, _networkC, &NetworkController::onAddInputsToEditorForOutputs);
     connect(_modelManager, &MasticModelManager::removeInputsToEditorForOutputs, _networkC, &NetworkController::onRemoveInputsToEditorForOutputs);
@@ -157,6 +159,7 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     connect(_agentsMappingC, &AgentsMappingController::commandAskedToAgentAboutMappingInput, _networkC, &NetworkController::onCommandAskedToAgentAboutMappingInput);
     connect(_agentsMappingC, &AgentsMappingController::agentInMappingAdded, _scenarioC, &ScenarioController::onAgentInMappingAdded);
     connect(_agentsMappingC, &AgentsMappingController::agentInMappingRemoved, _scenarioC, &ScenarioController::onAgentInMappingRemoved);
+
 
     // Connect to signals from the agents mapping list to the action editor
     connect(_scenarioC, &ScenarioController::commandAskedToLauncher, _networkC, &NetworkController::onCommandAskedToLauncher);

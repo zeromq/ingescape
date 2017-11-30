@@ -301,7 +301,7 @@ Item {
                     width:  comboButton.width
                     height: comboButton.height
 
-                    color : _mouseAreaItem.containsPress ? MasticTheme.darkOrangeColor2 : "transparent"
+                    color : _mouseAreaItem.containsPress ? MasticTheme.darkBlueGreyColor :  "transparent"
 
                     //Separator
                     Rectangle {
@@ -370,7 +370,7 @@ Item {
                             right: parent.right
                         }
 
-                        color: (combobox.selectedItem === model.QtObject)?  MasticTheme.whiteColor : MasticTheme.lightGreyColor
+                        color: (combobox.selectedItem === model.QtObject)?  MasticTheme.orangeColor : MasticTheme.whiteColor
 
                         text: model.name
                         elide: Text.ElideRight

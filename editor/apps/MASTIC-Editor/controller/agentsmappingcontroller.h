@@ -86,7 +86,7 @@ public:
      * @brief Remove a link between two agents from the mapping
      * @param link
      */
-    Q_INVOKABLE void deleteLinkBetweenTwoAgents(MapBetweenIOPVM* link);
+    Q_INVOKABLE void removeLinkBetweenTwoAgents(MapBetweenIOPVM* link);
 
 
     /**
@@ -198,6 +198,20 @@ public Q_SLOTS:
     void onAgentModelWillBeDeleted(AgentM* agent);
 
 
+    /**
+     * @brief Slot when two agents are mapped
+     * @param mappingElement
+     */
+    void onMapped(ElementMappingM* mappingElement);
+
+
+    /**
+     * @brief Slot when two agents are unmapped
+     * @param mappingElement
+     */
+    void onUnmapped(ElementMappingM* mappingElement);
+
+
 private Q_SLOTS:
 
     /**
@@ -272,6 +286,7 @@ private:
      */
     void _deleteAllMappingMadeOnTargetAgent(AgentInMappingVM *agentInMapping);
 
+
     /**
      * @brief Check if the map between an agent output and an agent input already exist.
      * @param agentFrom
@@ -284,6 +299,21 @@ private:
                                              OutputVM *pointFrom,
                                              AgentInMappingVM* agentTo,
                                              InputVM *pointTo);
+
+
+    /**
+     * @brief Delete a link between two agents
+     * @param link
+     */
+    void _deleteLinkBetweenTwoAgents(MapBetweenIOPVM* link);
+
+
+    /**
+     * @brief Get the view model of link which corresponds to a mapping element
+     * @param mappingElement
+     * @return
+     */
+    MapBetweenIOPVM* _getLinkFromMappingElement(ElementMappingM* mappingElement);
 
 
 private:

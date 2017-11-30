@@ -111,13 +111,29 @@ Item {
             }
 
 
+            // display if  conditions are verified
+            Rectangle {
+                anchors {
+                    verticalCenter: actionNameBtn.verticalCenter
+                    verticalCenterOffset: 2;
+                    right: actionNameBtn.left
+                    rightMargin: 5
+                }
+                height : 2
+                width : 2
+
+                color: MasticTheme.whiteColor
+                visible : root.action && root.action.isValid
+            }
+
+
             // Action name
             MouseArea {
                 id : actionNameBtn
 
                 anchors {
                     left : parent.left
-                    leftMargin: 45
+                    leftMargin: 25
                     verticalCenter: parent.verticalCenter
                 }
 
@@ -135,8 +151,7 @@ Item {
 
                 TextMetrics {
                     id : actName
-
-                    elideWidth: actionRow.width
+                    elideWidth: 220
                     elide: Text.ElideRight
 
                     text: (root.action)? root.action.name : ""

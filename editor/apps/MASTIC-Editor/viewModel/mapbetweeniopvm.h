@@ -42,6 +42,9 @@ class MapBetweenIOPVM : public QObject
     // View model of the input slot associated to our link
     I2_QML_PROPERTY_DELETE_PROOF(InputVM*, pointTo)
 
+    // Flag indicating if our link is virtual (agents are not really linked on the network)
+    I2_QML_PROPERTY_READONLY(bool, isVirtual)
+
 
 public:
 
@@ -51,12 +54,14 @@ public:
      * @param pointFrom The link starts from this output of the agentFrom
      * @param agentTo The link ends to this agent
      * @param pointTo The link ends to this input of the agentTo
+     * @param isVirtual
      * @param parent
      */
     explicit MapBetweenIOPVM(AgentInMappingVM* agentFrom,
                              OutputVM *pointFrom,
                              AgentInMappingVM* agentTo,
                              InputVM *pointTo,
+                             bool isVirtual,
                              QObject *parent = nullptr);
 
 
