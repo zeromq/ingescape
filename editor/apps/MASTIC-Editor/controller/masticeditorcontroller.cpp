@@ -144,6 +144,7 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     connect(_modelManager, &MasticModelManager::addInputsToEditorForOutputs, _valuesHistoryC, &ValuesHistoryController::onAgentOutputsObserved);
     connect(_modelManager, &MasticModelManager::addInputsToEditorForOutputs, _networkC, &NetworkController::onAddInputsToEditorForOutputs);
     connect(_modelManager, &MasticModelManager::removeInputsToEditorForOutputs, _networkC, &NetworkController::onRemoveInputsToEditorForOutputs);
+    connect(_modelManager, &MasticModelManager::commandAskedToAgent, _networkC, &NetworkController::onCommandAskedToAgent);
 
 
     // Connect to signals from the controller for supervision of agents

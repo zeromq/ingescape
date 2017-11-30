@@ -54,7 +54,8 @@ AgentM::AgentM(QString name,
     _canBeFrozen(false),
     _isFrozen(false),
     _definition(NULL),
-    _mapping(NULL)
+    _mapping(NULL),
+    _mustClearMapping(false)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);

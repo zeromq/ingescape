@@ -239,6 +239,14 @@ Q_SIGNALS:
     void unmapped(ElementMappingM* mappingElement);
 
 
+    /**
+     * @brief Signal emitted when a command must be sent on the network to an agent
+     * @param peerIdsList
+     * @param command
+     */
+    void commandAskedToAgent(QStringList peerIdsList, QString command);
+
+
 public Q_SLOTS:
 
     /**

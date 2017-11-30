@@ -291,13 +291,17 @@ void AgentsMappingController::onIdenticalAgentModelAdded(AgentM* newModel)
  */
 void AgentsMappingController::onIsActivatedMappingChanged(bool isActivatedMapping)
 {
-    if (isActivatedMapping) {
+    if (isActivatedMapping)
+    {
         qInfo() << "Mapping ACTIVATED !";
 
-        if (_isEmptyMapping) {
-            qDebug() << "...et il est vide, on tente d'ajouter des choses...";
+        // Empty mapping
+        if (_isEmptyMapping)
+        {
+            qDebug() << "...and it is completely EMPTY, we add agents (and links) on our HMI";
 
-            if (_modelManager != NULL) {
+            if (_modelManager != NULL)
+            {
                 // Get the map from agent name to list of active agents
                 QHash<QString, QList<AgentM*>> mapFromAgentNameToActiveAgentsList = _modelManager->getMapFromAgentNameToActiveAgentsList();
 
@@ -309,7 +313,8 @@ void AgentsMappingController::onIsActivatedMappingChanged(bool isActivatedMappin
                 int availableMinHeight = 1080 - 200;
                 double randomMax = (double)RAND_MAX;
 
-                foreach (QString agentName, mapFromAgentNameToActiveAgentsList.keys()) {
+                foreach (QString agentName, mapFromAgentNameToActiveAgentsList.keys())
+                {
                     QList<AgentM*> activeAgentsList = mapFromAgentNameToActiveAgentsList.value(agentName);
 
                     double randomX = (double)qrand() / randomMax;
@@ -322,8 +327,12 @@ void AgentsMappingController::onIsActivatedMappingChanged(bool isActivatedMappin
                 }
             }
         }
+        // Mapping has some agents (and links)
         else {
-            qDebug() << "...et il n'est PAS vide, on ne fait rien de plus";
+            qDebug() << "...and there are already some agents (and links) on our HMI";
+
+            // FIXME TODO:
+
         }
     }
     else {
