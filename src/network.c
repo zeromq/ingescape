@@ -220,7 +220,7 @@ int network_manageSubscriberMapping(subscriber_t *subscriber){
                     //mapping was successful : we set timer to notify remote agent if not already done
                     if (!subscriber->mappedNotificationToSend && network_NotifyMappedAgents){
                         subscriber->mappedNotificationToSend = true;
-                        zloop_timer(agentElements->loop, 500, 1, triggerMappingNotificationToNewcomer, (void *)subscriber);
+                        subscriber->timerId = zloop_timer(agentElements->loop, 500, 1, triggerMappingNotificationToNewcomer, (void *)subscriber);
                     }
                 }
                 //NOTE: we do not clean subscriptions here because we cannot check
@@ -281,6 +281,10 @@ void network_cleanAndFreeSubscriber(subscriber_t *subscriber){
     free(subscriber->pollItem);
     free(subscriber->subscriber);
     subscriber->subscriber = NULL;
+    if (subscriber->timerId != -1){
+        zloop_timer_end(agentElements->loop, subscriber->timerId);
+        subscriber->timerId = -2;
+    }
     HASH_DEL(subscribers, subscriber);
     free(subscriber);
     subscriber = NULL;
@@ -516,6 +520,10 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                                 subscriber->definition = NULL;
                             }
                             subscriber->subscriber = NULL;
+                            if (subscriber->timerId != -1){
+                                zloop_timer_end(agentElements->loop, subscriber->timerId);
+                                subscriber->timerId = -1;
+                            }
                             free(subscriber);
                             subscriber = NULL;
                         }
@@ -527,6 +535,7 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                         assert(subscriber->subscriber);
                         subscriber->definition = NULL;
                         subscriber->mappingsFilters = NULL;
+                        subscriber->timerId = -1;
                         HASH_ADD_STR(subscribers, agentPeerId, subscriber);
                         subscriber->pollItem = calloc(1, sizeof(zmq_pollitem_t));
                         subscriber->pollItem->socket = zsock_resolve(subscriber->subscriber);
