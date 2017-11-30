@@ -136,10 +136,10 @@ I2CubicBezierCurve {
                      MasticTheme.agentsMappingLinkDefaultWidth
                  }
 
-
+    strokeDashArray: (mapBetweenIOPVM && mapBetweenIOPVM.isVirtual) ? "5, 5" : ""
 
     // Fuzzy contour
-    fuzzyColor: (mapBetweenIOPVM && controller.selectedMapBetweenIOP === mapBetweenIOPVM) ? MasticTheme.lightGreyColor : "transparent"
+    fuzzyColor: (mapBetweenIOPVM && (controller.selectedMapBetweenIOP === mapBetweenIOPVM)) ? MasticTheme.lightGreyColor : "transparent"
     fuzzyRadius: 2
 
     opacity: mouseArea.pressed ? 0.8 : 1;
@@ -226,19 +226,20 @@ I2CubicBezierCurve {
 
 
     focus: true
-    // remove selected map between IOP
+
+    // Remove selected map between IOP
     Keys.onPressed: {
         if (event.key === Qt.Key_Backspace || event.key === Qt.Key_Delete)
         {
             if (controller && controller.selectedMapBetweenIOP) {
-                controller.deleteLinkBetweenTwoAgents(controller.selectedMapBetweenIOP);
+                controller.removeLinkBetweenTwoAgents(controller.selectedMapBetweenIOP);
             }
 
             event.accepted = true;
         }
     }
 
-    //deselect map between IOP
+    // UNselect map between IOP
     onFocusChanged: {
         if (!focus) {
             if (controller && controller.selectedMapBetweenIOP) {

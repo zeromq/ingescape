@@ -362,6 +362,8 @@ Item {
 
                 // Reference to our action that can be used by a DropArea item
                 property var action: model.QtObject
+                // StartTime of the action when it is dragged in timeline
+                property var temporaryStartTime: -1;
 
                 Drag.active: mouseArea.drag.active
                 Drag.hotSpot.x: mouseArea.mouseX
@@ -397,8 +399,8 @@ Item {
                     }
 
                     onPositionChanged: {
-                        itemDragged.x = mouseX + 8;
-                        itemDragged.y = mouseY + 12;
+                        itemDragged.x = mouseX - 12 - itemDragged.width;
+                        itemDragged.y = mouseY - 12 - itemDragged.height;
                     }
 
                     onReleased: {
@@ -428,24 +430,56 @@ Item {
                         visible: !mouseArea.drag.active
                     }
 
-                    Rectangle {
+                    I2CustomRectangle{
                         id : itemDragged
-                        height : nameAction.height + 10
-                        width : nameAction.width + 10
+                        height : columnText.height + 8
+                        width : nameAction.width + 14
                         color : MasticTheme.darkBlueGreyColor
                         visible: mouseArea.drag.active
 
-                        Text {
-                            id : nameAction
-                            color : MasticTheme.lightGreyColor
-                            text : model.name
-                            anchors.centerIn: parent
+                        // - fuzzy radius around our rectangle
+                        fuzzyRadius: 2
+                        fuzzyColor : MasticTheme.blackColor
 
-                            font {
-                               family : MasticTheme.textFontFamily
-                               pixelSize: 14
+                        Column {
+                            id : columnText
+                            height : temporaryStartTimeAction.visible ?
+                                         childrenRect.height
+                                       : nameAction.height
+                            anchors.centerIn: parent
+                            spacing: 6
+
+                            Text {
+                                id : nameAction
+                                color : MasticTheme.lightGreyColor
+                                text : model.name
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                horizontalAlignment: Text.AlignHCenter
+
+                                font {
+                                    family : MasticTheme.textFontFamily
+                                    pixelSize: 14
+                                }
+                            }
+
+                            Text {
+                                id : temporaryStartTimeAction
+                                visible: text !== ""
+                                color : MasticTheme.lightGreyColor
+                                text : draggableItem.temporaryStartTime?
+                                           draggableItem.temporaryStartTime.toLocaleString(Qt.locale(),"hh:mm:ss.zzz")
+                                         : "";
+
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                horizontalAlignment: Text.AlignHCenter
+
+                                font {
+                                    family : MasticTheme.textFontFamily
+                                    pixelSize: 14
+                                }
                             }
                         }
+
                     }
 
                 }
