@@ -36,7 +36,7 @@ ActionVM::ActionVM(ActionM* model,
     _startTime(startTime),
     _startTimeString("00:00:00.000"),
     _lineInTimeLine(-1),
-    _isValid(false),
+    _areConditionsValid(false),
     _currentExecution(NULL),
     _endTime(startTime)
 {
@@ -56,7 +56,7 @@ ActionVM::ActionVM(ActionM* model,
         }
 
         // Update valid flag
-        setisValid(model->isValid());
+        setareConditionsValid(model->isValid());
 
         // Set the action model
         setactionModel(model);
@@ -118,7 +118,7 @@ void ActionVM::copyFrom(ActionVM* actionVM)
         setendTime(actionVM->endTime());
         setlineInTimeLine(actionVM->lineInTimeLine());
         setstartTimeString(actionVM->startTimeString());
-        setisValid(actionVM->isValid());
+        setareConditionsValid(actionVM->areConditionsValid());
     }
 }
 
@@ -325,9 +325,9 @@ void ActionVM::delayCurrentExecution(int currentTimeInMilliSeconds)
  * @brief Slot when the flag "is valid" changed in the model of action
  * @param isValid flag "is valid"
  */
-void ActionVM::_onIsValidChangedInModel(bool isValid)
+void ActionVM::_onIsValidChangedInModel(bool areConditionsValid)
 {
-    setisValid(isValid);
+    setareConditionsValid(areConditionsValid);
 }
 
 
