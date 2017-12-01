@@ -37,7 +37,7 @@ OutputVM::OutputVM(QString outputName,
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
     if (modelM != NULL) {
-        qInfo() << "New Output VM" << _name << "(" << _id << ")";
+        //qInfo() << "New Output VM" << _name << "(" << _id << ")";
     }
     else {
         _isGhost = true;
@@ -70,7 +70,7 @@ OutputVM::~OutputVM()
 
     // Reset the first model
     if (_firstModel != NULL) {
-        qInfo() << "Delete Output VM" << _name << "(" << _id << ")";
+        //qInfo() << "Delete Output VM" << _name << "(" << _id << ")";
 
         setfirstModel(NULL);
     }
