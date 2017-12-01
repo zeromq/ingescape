@@ -286,6 +286,16 @@ private:
     void _updateReducedMapValueTypeGroupInOutput();
 
 
+    /**
+     * @brief Get the temporary link with same names
+     * @param inputName
+     * @param outputAgentName
+     * @param outputName
+     * @return
+     */
+    ElementMappingM* _getTemporaryLink(QString inputName, QString outputAgentName, QString outputName);
+
+
 private:
 
     // Previous list of models of agents

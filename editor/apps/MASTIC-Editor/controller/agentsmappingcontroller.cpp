@@ -377,16 +377,26 @@ void AgentsMappingController::onIsActivatedMappingChanged(bool isActivatedMappin
                     _addAgentModelsToMappingAtPosition(agentName, activeAgentsList, position);
                 }
 
-                // FIXME: à optimiser...
+                // FIXME TODO: à optimiser...
                 // Create all links in mapping
                 foreach (AgentInMappingVM* agent, _agentInMappingVMList.toList()) {
-                    if (agent != NULL) {
+                    if ((agent != NULL) && (agent->temporaryMapping() != NULL))
+                    {
+                        // Delete all "mapping elements" in the temporary mapping
+                        agent->temporaryMapping()->elementMappingsList()->deleteAllItems();
+
                         foreach (AgentM* model, agent->models()->toList()) {
-                            if ((model != NULL) && (model->mapping() != NULL)) {
-                                foreach (ElementMappingM* mappingElement, model->mapping()->elementMappingsList()->toList())
-                                {
-                                    // Simulate slot "on Mapped"
-                                    onMapped(mappingElement);
+                            if ((model != NULL) && (model->mapping() != NULL))
+                            {
+                                foreach (ElementMappingM* mappingElement, model->mapping()->elementMappingsList()->toList()) {
+                                    if (mappingElement != NULL)
+                                    {
+                                        // Add a temporary link for each real link
+                                        agent->addTemporaryLink(mappingElement->input(), mappingElement->outputAgent(), mappingElement->output());
+
+                                        // Simulate slot "on Mapped"
+                                        onMapped(mappingElement);
+                                    }
                                 }
                             }
                         }

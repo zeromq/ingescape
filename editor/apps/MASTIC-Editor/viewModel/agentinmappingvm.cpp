@@ -139,9 +139,14 @@ void AgentInMappingVM::addTemporaryLink(QString inputName, QString outputAgentNa
 {
     if (_temporaryMapping != NULL)
     {
-        ElementMappingM* temporaryLink = new ElementMappingM(_name, inputName, outputAgentName, outputName);
+        // Check that there is not already the same link
+        ElementMappingM* temporaryLink = _getTemporaryLink(inputName, outputAgentName, outputName);
+        if (temporaryLink == NULL)
+        {
+            temporaryLink = new ElementMappingM(_name, inputName, outputAgentName, outputName);
 
-        _temporaryMapping->elementMappingsList()->append(temporaryLink);
+            _temporaryMapping->elementMappingsList()->append(temporaryLink);
+        }
     }
 }
 
@@ -156,19 +161,10 @@ void AgentInMappingVM::removeTemporaryLink(QString inputName, QString outputAgen
 {
     if (_temporaryMapping != NULL)
     {
-        ElementMappingM* temporaryLink = NULL;
-
-        foreach (ElementMappingM* iterator, _temporaryMapping->elementMappingsList()->toList())
+        // Check that there is not already the same link
+        ElementMappingM* temporaryLink = _getTemporaryLink(inputName, outputAgentName, outputName);
+        if (temporaryLink != NULL)
         {
-            if ((iterator != NULL) && (iterator->inputAgent() == _name)
-                    && (iterator->input() == inputName) && (iterator->outputAgent() == outputAgentName) && (iterator->output() == outputName))
-            {
-                temporaryLink = iterator;
-                break;
-            }
-        }
-
-        if (temporaryLink != NULL) {
             _temporaryMapping->elementMappingsList()->remove(temporaryLink);
         }
     }
@@ -815,4 +811,25 @@ void AgentInMappingVM::_updateReducedMapValueTypeGroupInOutput()
         }
     }
     setreducedMapValueTypeGroupInOutput(globalReducedMapValueTypeGroupInOutput);
+}
+
+
+/**
+ * @brief Get the temporary link with same names
+ * @param inputName
+ * @param outputAgentName
+ * @param outputName
+ * @return
+ */
+ElementMappingM* AgentInMappingVM::_getTemporaryLink(QString inputName, QString outputAgentName, QString outputName)
+{
+    foreach (ElementMappingM* iterator, _temporaryMapping->elementMappingsList()->toList())
+    {
+        if ((iterator != NULL) && (iterator->inputAgent() == _name)
+                && (iterator->input() == inputName) && (iterator->outputAgent() == outputAgentName) && (iterator->output() == outputName))
+        {
+            return iterator;
+        }
+    }
+    return NULL;
 }
