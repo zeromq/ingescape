@@ -1332,6 +1332,7 @@ void ScenarioController::_stopScenario()
         {
             actionVM->timerToReverse()->stop();
         }
+        disconnect(actionVM,&ActionVM::revertAction, this, &ScenarioController::onRevertAction);
     }
 
     // Reset the next action VM to active
