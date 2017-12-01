@@ -1088,7 +1088,7 @@ void ScenarioController::_onTimeout_ExecuteActions()
                     // Check if an action execution exists and has not already been executed
                     if ((actionExecution != NULL) && !actionExecution->isExecuted())
                     {
-                        if( actionVM->areConditionsValid()
+                        if( actionVM->actionModel()->isValid()
                             // And the action has no validation duration
                             && actionVM->actionModel()->validityDurationType() == ValidationDurationType::IMMEDIATE)
                         {
@@ -1100,7 +1100,7 @@ void ScenarioController::_onTimeout_ExecuteActions()
                         }
                         else if(actionVM->actionModel()->validityDurationType() != ValidationDurationType::IMMEDIATE)
                         {
-                            if(actionVM->areConditionsValid())
+                            if(actionVM->actionModel()->isValid())
                             {
                                 // Execute action
                                 _executeAction(actionVM, actionExecution, currentTimeInMilliSeconds);
@@ -1181,7 +1181,7 @@ void ScenarioController::_onTimeout_DelayOrExecuteActions()
                 if ((actionExecution != NULL) && !actionExecution->isExecuted())
                 {
                     // Delay the current execution of this action
-                    if(actionVM->areConditionsValid() == false)
+                    if(actionVM->actionModel()->isValid() == false)
                     {
                         actionVM->delayCurrentExecution(currentTimeInMilliSeconds);
                     }
@@ -1235,33 +1235,49 @@ void ScenarioController::_onTimeout_DelayOrExecuteActions()
  */
 void ScenarioController::_startScenario()
 {
+    int currentTimeInMilliSeconds = _currentTime.msecsSinceStartOfDay();
+
     // Set the list of Actions to process at currentTime
     foreach (ActionVM* actionVM, _actionsVMToEvaluateVMList.toList())
     {
         disconnect(actionVM,&ActionVM::revertAction, this, &ScenarioController::onRevertAction);
     }
     _actionsVMToEvaluateVMList.clear();
+    _activeActionsVMList.clear();
     setnextActionVMToActive(NULL);
 
-    // Inverse exploration since we add the future actions first
-    QList<ActionVM*> actionListToAdd;
-    for (int index = _actionsInTimeLine.count()-1; index >= 0; --index)
+    // Look for the current and futures actions
+    ActionVM* nextActionToLaunch = NULL;
+    foreach (ActionVM* actionVM , _actionsInTimeLine.toList())
     {
-        ActionVM* actionVM = _actionsInTimeLine.at(index);
-        if ((actionVM->startTime() >= _currentTime.msecsSinceStartOfDay()) &&
-                ((actionVM->endTime() > _currentTime.msecsSinceStartOfDay()) || (actionVM->endTime() == -1)))
+        if ((actionVM->endTime() > currentTimeInMilliSeconds) || (actionVM->endTime() == -1))
         {
+            // Connect on the action revert signal
             connect(actionVM,&ActionVM::revertAction, this, &ScenarioController::onRevertAction);
-            actionListToAdd.append(actionVM);
-        }
-        else {
-            break;
+
+            // Initialize the action view model at a specific time.
+            actionVM->resetDataFrom(currentTimeInMilliSeconds);
+
+            if(actionVM->startTime() <= currentTimeInMilliSeconds)
+            {
+                // Add our action
+                _activeActionsVMList.append(actionVM);
+            } else {
+                // Check the next mission to launch
+                if(nextActionToLaunch == NULL || nextActionToLaunch->startTime() > actionVM->startTime())
+                {
+                    nextActionToLaunch = actionVM;
+                }
+
+                // Add our action
+                _actionsVMToEvaluateVMList.append(actionVM);
+            }
         }
     }
-    if (actionListToAdd.count() > 0)
+
+    if (nextActionToLaunch != NULL)
     {
-        setnextActionVMToActive(actionListToAdd.last());
-        _actionsVMToEvaluateVMList.append(actionListToAdd);
+        setnextActionVMToActive(nextActionToLaunch);
     }
 
     // Connect actions conditions
@@ -1288,18 +1304,29 @@ void ScenarioController::_startScenario()
  */
 void ScenarioController::_stopScenario()
 {
-    // Reset the next action VM to active
-    setnextActionVMToActive(NULL);
-
-    // Disconnect actions conditions
-    conditionsDisconnect();
-
     // Stop timers
     if(_timerToExecuteActions.isActive())
     {
         _timerToExecuteActions.stop();
     }
     _timerToRegularlyDelayActions.stop();
+
+    // Desactive revert timers
+    foreach (ActionVM* actionVM, _activeActionsVMList.toList())
+    {
+        if(actionVM->timerToReverse()->isActive())
+        {
+            actionVM->timerToReverse()->stop();
+        }
+    }
+
+    // Reset the next action VM to active
+    setnextActionVMToActive(NULL);
+
+    // Disconnect actions conditions
+    conditionsDisconnect();
+
+
 }
 
 

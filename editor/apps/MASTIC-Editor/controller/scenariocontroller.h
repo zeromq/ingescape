@@ -359,6 +359,13 @@ private :
      */
     void _executeAction(ActionVM* actionVM, ActionExecutionVM* actionExecution, int currentTimeInMilliSeconds);
 
+    /**
+      * @brief Initialize the action view model at a specific time
+      * @param action view model
+      * @param time when to initialize the action VM
+      */
+    void _initializeActionVMAt(ActionVM * actionVM, int currentTimeInMilliSeconds);
+
 protected:
 
     // Path to the directory containing JSON files to save scenarios
