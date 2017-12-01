@@ -69,6 +69,28 @@ MasticModelManager::~MasticModelManager()
 
 
 /**
+ * @brief Setter for property "is Activated Mapping"
+ * @param value
+ */
+void MasticModelManager::setisActivatedMapping(bool value)
+{
+    if (_isActivatedMapping != value)
+    {
+        _isActivatedMapping = value;
+
+        if (_isActivatedMapping) {
+            qInfo() << "Mapping Activated";
+        }
+        else {
+            qInfo() << "Mapping DE-activated";
+        }
+
+        Q_EMIT isActivatedMappingChanged(value);
+    }
+}
+
+
+/**
  * @brief Import the agents list from default file
  */
 void MasticModelManager::importAgentsListFromDefaultFile()

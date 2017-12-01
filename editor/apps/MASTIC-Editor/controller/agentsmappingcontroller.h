@@ -329,7 +329,7 @@ private:
 
 
 private:
-    // Usefull to save it
+    // Manager for the data model of MASTIC
     MasticModelManager* _modelManager;
 
     // Map from agent name to the (view model of) agent in mapping

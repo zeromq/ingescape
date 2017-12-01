@@ -325,12 +325,10 @@ void AgentsMappingController::onIsActivatedMappingChanged(bool isActivatedMappin
 {
     if (isActivatedMapping)
     {
-        qInfo() << "Mapping ACTIVATED !";
-
         // Empty mapping
         if (_isEmptyMapping)
         {
-            qDebug() << "...and it is completely EMPTY, we add agents (and links) on our HMI";
+            qDebug() << "Mapping Activated and it is completely EMPTY, we add agents (and links) on our HMI";
 
             if (_modelManager != NULL)
             {
@@ -379,7 +377,7 @@ void AgentsMappingController::onIsActivatedMappingChanged(bool isActivatedMappin
         // Mapping has some agents (and links)
         else
         {
-            qDebug() << "...and there are already some agents (and links) on our HMI";
+            qDebug() << "Mapping Activated and there are already some agents (and links) on our HMI";
 
             // Ask to create all virtual links in mapping
             foreach (MapBetweenIOPVM* link, _allMapInMapping.toList())
@@ -392,9 +390,8 @@ void AgentsMappingController::onIsActivatedMappingChanged(bool isActivatedMappin
             }
         }
     }
-    else {
-        qInfo() << "Mapping DE-activated !";
-    }
+    //else {
+    //}
 }
 
 
