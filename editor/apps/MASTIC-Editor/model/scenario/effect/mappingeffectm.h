@@ -129,24 +129,14 @@ public Q_SLOTS:
     void _onOutputDestroyed(QObject* sender);
 
     /**
-      * @brief Slot on agent inputs list change
+      * @brief Slot on agent inputs/outputs lists change
       */
-    void _onAgentIOPInputsListChange(QList<InputVM*> inputsList);
+    void _onAgentIOPInputsOutputsListChange();
 
     /**
-      * @brief Slot on agent outputs list change
+      * @brief Slot on output agent inputs/outputs lists change
       */
-    void _onAgentIOPOutputsListChange(QList<OutputVM*> outputsList);
-
-    /**
-      * @brief Slot on output agent inputs list change
-      */
-    void _onOutputAgentIOPInputsListChange(QList<InputVM*> inputsList);
-
-    /**
-      * @brief Slot on output agent outputs list change
-      */
-    void _onOutputAgentIOPOutputsListChange(QList<OutputVM*> outputsList);
+    void _onOutputAgentIOPInputsOutputsListChange();
 
 protected:
 

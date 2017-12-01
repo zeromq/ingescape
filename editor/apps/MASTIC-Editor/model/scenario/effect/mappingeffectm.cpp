@@ -130,10 +130,7 @@ void MappingEffectM::setagent(AgentInMappingVM* agent)
     {
         if(_agent != NULL)
         {
-            disconnect(_agent, &AgentInMappingVM::inputsListWillBeRemoved, this, &MappingEffectM::_onAgentIOPInputsListChange);
-            disconnect(_agent, &AgentInMappingVM::inputsListAdded, this, &MappingEffectM::_onAgentIOPInputsListChange);
-            disconnect(_agent, &AgentInMappingVM::outputsListWillBeRemoved, this, &MappingEffectM::_onAgentIOPOutputsListChange);
-            disconnect(_agent, &AgentInMappingVM::outputsListAdded, this, &MappingEffectM::_onAgentIOPOutputsListChange);
+            disconnect(_agent, &AgentInMappingVM::modelsOfInputsAndOutputsChanged, this, &MappingEffectM::_onAgentIOPInputsOutputsListChange);
         }
 
         // Clear the inputs list and the selected input
@@ -156,10 +153,7 @@ void MappingEffectM::setagent(AgentInMappingVM* agent)
                 setinput(_inputsList.at(0));
             }
 
-            connect(_agent, &AgentInMappingVM::inputsListWillBeRemoved, this, &MappingEffectM::_onAgentIOPInputsListChange);
-            connect(_agent, &AgentInMappingVM::inputsListAdded, this, &MappingEffectM::_onAgentIOPInputsListChange);
-            connect(_agent, &AgentInMappingVM::outputsListWillBeRemoved, this, &MappingEffectM::_onAgentIOPOutputsListChange);
-            connect(_agent, &AgentInMappingVM::outputsListAdded, this, &MappingEffectM::_onAgentIOPOutputsListChange);
+            connect(_agent, &AgentInMappingVM::modelsOfInputsAndOutputsChanged, this, &MappingEffectM::_onAgentIOPInputsOutputsListChange);
         }
     }
 }
@@ -253,10 +247,7 @@ void MappingEffectM::setoutputAgent(AgentInMappingVM* value)
             disconnect(_outputAgent, &AgentInMappingVM::destroyed, this, &MappingEffectM::_onOutputAgentDestroyed);
 
             // Disconnect to output agent change of inputs/ouputs iop
-            disconnect(_outputAgent, &AgentInMappingVM::inputsListWillBeRemoved, this, &MappingEffectM::_onOutputAgentIOPInputsListChange);
-            disconnect(_outputAgent, &AgentInMappingVM::inputsListAdded, this, &MappingEffectM::_onOutputAgentIOPInputsListChange);
-            disconnect(_outputAgent, &AgentInMappingVM::outputsListWillBeRemoved, this, &MappingEffectM::_onOutputAgentIOPOutputsListChange);
-            disconnect(_outputAgent, &AgentInMappingVM::outputsListAdded, this, &MappingEffectM::_onOutputAgentIOPOutputsListChange);
+            disconnect(_outputAgent, &AgentInMappingVM::modelsOfInputsAndOutputsChanged, this, &MappingEffectM::_onOutputAgentIOPInputsOutputsListChange);
         }
 
         // set the new value
@@ -284,11 +275,7 @@ void MappingEffectM::setoutputAgent(AgentInMappingVM* value)
             }
 
             // Connect to output agent change of inputs/ouputs iop
-            connect(_outputAgent, &AgentInMappingVM::inputsListWillBeRemoved, this, &MappingEffectM::_onOutputAgentIOPInputsListChange);
-            connect(_outputAgent, &AgentInMappingVM::inputsListAdded, this, &MappingEffectM::_onOutputAgentIOPInputsListChange);
-            connect(_outputAgent, &AgentInMappingVM::outputsListWillBeRemoved, this, &MappingEffectM::_onOutputAgentIOPOutputsListChange);
-            connect(_outputAgent, &AgentInMappingVM::outputsListAdded, this, &MappingEffectM::_onOutputAgentIOPOutputsListChange);
-
+            connect(_outputAgent, &AgentInMappingVM::modelsOfInputsAndOutputsChanged, this, &MappingEffectM::_onOutputAgentIOPInputsOutputsListChange);
         }
 
         Q_EMIT outputAgentChanged(value);
@@ -385,80 +372,49 @@ void MappingEffectM::_onOutputAgentDestroyed(QObject* sender)
 }
 
 /**
-  * @brief Slot on agent inputs list change
+  * @brief Slot on agent inputs/outputs lists change
   */
-void MappingEffectM::_onAgentIOPInputsListChange(QList<InputVM*> inputsList)
+void MappingEffectM::_onAgentIOPInputsOutputsListChange()
 {
     // If we have a selected agent iop
     if(_inputName.isEmpty() == false)
     {
+        _inputsList.clear();
         // Check that our input list update concern our selected agent iop
-        foreach (InputVM* inputVM, inputsList)
+        foreach (InputVM* inputVM, _agent->inputsList()->toList())
         {
-            if(inputVM->name() == _inputName)
+            if(inputVM->firstModel() != NULL)
             {
-                updateInputSelected();
-                break;
+                _inputsList.append(inputVM->firstModel());
+                if(inputVM->name() == _inputName)
+                {
+                    updateInputSelected();
+                }
             }
         }
     }
 }
 
-/**
-  * @brief Slot on agent outputs list change
-  */
-void MappingEffectM::_onAgentIOPOutputsListChange(QList<OutputVM*> outputsList)
-{
-    // If we have a selected agent iop
-    if(_inputName.isEmpty() == false)
-    {
-        // Check that our output list update concern our selected agent iop
-        foreach (OutputVM* outputVM, outputsList)
-        {
-            if(outputVM->name() == _inputName)
-            {
-                updateInputSelected();
-                break;
-            }
-        }
-    }
-}
 
 /**
-  * @brief Slot on output agent inputs list change
+  * @brief Slot on output agent inputs/outputs lists change
   */
-void MappingEffectM::_onOutputAgentIOPInputsListChange(QList<InputVM*> inputsList)
+void MappingEffectM::_onOutputAgentIOPInputsOutputsListChange()
 {
     // If we have a selected agent iop
     if(_outputName.isEmpty() == false)
     {
+        _outputsList.clear();
         // Check that our input list update concern our selected agent iop
-        foreach (InputVM* inputVM, inputsList)
+        foreach (OutputVM* outputVM, _agent->outputsList()->toList())
         {
-            if(inputVM->name() == _outputName)
+            if(outputVM->firstModel() != NULL)
             {
-                updateOutputSelected();
-                break;
-            }
-        }
-    }
-}
-
-/**
-  * @brief Slot on output agent outputs list change
-  */
-void MappingEffectM::_onOutputAgentIOPOutputsListChange(QList<OutputVM*> outputsList)
-{
-    // If we have a selected agent iop
-    if(_inputName.isEmpty() == false)
-    {
-        // Check that our output list update concern our selected agent iop
-        foreach (OutputVM* outputVM, outputsList)
-        {
-            if(outputVM->name() == _outputName)
-            {
-                updateOutputSelected();
-                break;
+                _outputsList.append(outputVM->firstModel());
+                if(outputVM->name() == _outputName)
+                {
+                    updateOutputSelected();
+                }
             }
         }
     }
