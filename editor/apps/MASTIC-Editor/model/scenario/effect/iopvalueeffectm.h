@@ -91,15 +91,9 @@ public:
 public Q_SLOTS:
 
     /**
-      * @brief Slot on agent inputs list change
+      * @brief Slot on agent inputs/outputs lists change
       */
-    void onInputsListChange(QList<InputVM*> inputsList);
-
-    /**
-      * @brief Slot on agent outputs list change
-      */
-    void onOutputsListChange(QList<OutputVM *> outputsList);
-
+    void onInputsOutputsListChange();
 
 protected Q_SLOTS:
     /**
@@ -107,13 +101,6 @@ protected Q_SLOTS:
      * @param sender
      */
     void _onAgentIopModelDestroyed(QObject* sender);
-
-
-private:
-    /**
-    * @brief Update the selected agent iop
-    */
-    void updateAgentIOPSelected();
 
 };
 

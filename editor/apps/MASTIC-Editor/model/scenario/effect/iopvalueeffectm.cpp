@@ -87,10 +87,7 @@ void IOPValueEffectM::setagent(AgentInMappingVM* agent)
     {
         if(_agent != NULL)
         {
-            disconnect(_agent, &AgentInMappingVM::inputsListWillBeRemoved, this, &IOPValueEffectM::onInputsListChange);
-            disconnect(_agent, &AgentInMappingVM::inputsListAdded, this, &IOPValueEffectM::onInputsListChange);
-            disconnect(_agent, &AgentInMappingVM::outputsListWillBeRemoved, this, &IOPValueEffectM::onOutputsListChange);
-            disconnect(_agent, &AgentInMappingVM::outputsListAdded, this, &IOPValueEffectM::onOutputsListChange);
+            disconnect(_agent, &AgentInMappingVM::modelsOfInputsAndOutputsChanged, this, &IOPValueEffectM::onInputsOutputsListChange);
         }
 
         setagentIOP(NULL);
@@ -123,11 +120,8 @@ void IOPValueEffectM::setagent(AgentInMappingVM* agent)
                 setagentIOP(_iopMergedList.at(0));
             }
 
-            connect(_agent, &AgentInMappingVM::inputsListWillBeRemoved, this, &IOPValueEffectM::onInputsListChange);
-            connect(_agent, &AgentInMappingVM::inputsListAdded, this, &IOPValueEffectM::onInputsListChange);
-            connect(_agent, &AgentInMappingVM::outputsListWillBeRemoved, this, &IOPValueEffectM::onOutputsListChange);
-            connect(_agent, &AgentInMappingVM::outputsListAdded, this, &IOPValueEffectM::onOutputsListChange);
-        }
+            connect(_agent, &AgentInMappingVM::modelsOfInputsAndOutputsChanged, this, &IOPValueEffectM::onInputsOutputsListChange);
+         }
     }
 }
 
@@ -259,85 +253,49 @@ QPair<QString, QStringList> IOPValueEffectM::getAgentNameAndReverseCommandWithPa
 
 
 /**
-  * @brief Slot on agent inputs list change
+  * @brief Slot on agent inputs/outputs lists change
   */
-void IOPValueEffectM::onInputsListChange(QList<InputVM*> inputsList)
+void IOPValueEffectM::onInputsOutputsListChange()
 {
+    AgentIOPM * newAgentIOP = NULL;
+
     // If we have a selected agent iop
     if(_agentIOPName.isEmpty() == false)
     {
+        _iopMergedList.clear();
+
         // Check that our input list update concern our selected agent iop
-        foreach (InputVM* inputVM, inputsList)
+        foreach (InputVM* inputVM, _agent->inputsList()->toList())
         {
-            if(inputVM->name() == _agentIOPName)
+            if(inputVM->firstModel() != NULL)
             {
-                updateAgentIOPSelected();
-                break;
+                _iopMergedList.append(inputVM->firstModel());
+                if(inputVM->name() == _agentIOPName)
+                {
+                    newAgentIOP = inputVM->firstModel();
+                }
             }
         }
-    }
-}
 
-/**
-  * @brief Slot on agent outputs list change
-  */
-void IOPValueEffectM::onOutputsListChange(QList<OutputVM*> outputsList)
-{
-    // If we have a selected agent iop
-    if(_agentIOPName.isEmpty() == false)
-    {
         // Check that our output list update concern our selected agent iop
-        foreach (OutputVM* outputVM, outputsList)
+        foreach (OutputVM* outputVM, _agent->outputsList()->toList())
         {
-            if(outputVM->name() == _agentIOPName)
+            if(outputVM->firstModel() != NULL)
             {
-                updateAgentIOPSelected();
-                break;
+                _iopMergedList.append(outputVM->firstModel());
+                if(outputVM->name() == _agentIOPName)
+                {
+                    newAgentIOP = outputVM->firstModel();
+                }
             }
         }
     }
-}
 
-/**
-* @brief Update the selected agent iop
-*/
-void IOPValueEffectM::updateAgentIOPSelected()
-{
-    if(_agent != NULL && _agentIOPName.isEmpty() == false)
+    // Reset the agentIOP
+    if(newAgentIOP != _agentIOP)
     {
-        QString agentIopName = _agentIOPName;
-        AgentIOPM * newAgentIOP = NULL;
-
-        // Fill with outputs
-        foreach (OutputVM* output, _agent->outputsList()->toList())
-        {
-            if(output->firstModel() != NULL)
-            {
-                if(newAgentIOP == NULL && agentIopName.isEmpty() == false && agentIopName == output->firstModel()->name())
-                {
-                    newAgentIOP = output->firstModel();
-                }
-            }
-        }
-
-        // Fill with inputs
-        foreach (InputVM* input, _agent->inputsList()->toList())
-        {
-            if(input->firstModel() != NULL)
-            {
-                if(agentIopName.isEmpty() == false && agentIopName == input->firstModel()->name())
-                {
-                    newAgentIOP = input->firstModel();
-                }
-            }
-        }
-
-        // Reset the agentIOP
-        if(newAgentIOP != _agentIOP)
-        {
-            // Set the new agent
-            setagentIOP(newAgentIOP);
-        }
+        // Set the new agent
+        setagentIOP(newAgentIOP);
     }
 }
 

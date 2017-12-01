@@ -87,9 +87,9 @@ Q_SIGNALS:
 public Q_SLOTS:
 
     /**
-      * @brief Slot on agent outputs list change
+      * @brief Slot on agent inputs/outputs list change
       */
-    void onOutputsListChange(QList<OutputVM *> outputsList);
+    void onInputsOutputsListChange();
 
     /**
       * @brief Slot on IsON flag agent change
@@ -114,7 +114,7 @@ private:
     /**
     * @brief Update the selected agent iop
     */
-    void updateAgentIOPSelected();
+    void updateAgentIOPSelected(AgentIOPM *newAgentIOP);
 
 };
 
