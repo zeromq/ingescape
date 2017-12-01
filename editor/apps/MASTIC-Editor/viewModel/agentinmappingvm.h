@@ -70,6 +70,9 @@ class AgentInMappingVM : public QObject
     // Number of active agents
     I2_QML_PROPERTY_READONLY(int, activeAgentsNumber)
 
+    // Mapping currently edited
+    I2_CPP_NOSIGNAL_PROPERTY(AgentMappingM*, mappingCurrentlyEdited)
+
 
 public:
     /**

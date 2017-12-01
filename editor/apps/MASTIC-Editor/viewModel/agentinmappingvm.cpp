@@ -32,7 +32,8 @@ AgentInMappingVM::AgentInMappingVM(QList<AgentM*> models,
     _reducedMapValueTypeGroupInOutput(AgentIOPValueTypeGroups::MIXED),
     _isGhost(false),
     _areIdenticalsAllDefinitions(true),
-    _activeAgentsNumber(0)
+    _activeAgentsNumber(0),
+    _mappingCurrentlyEdited(NULL)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -44,6 +45,10 @@ AgentInMappingVM::AgentInMappingVM(QList<AgentM*> models,
         {
             // Set the name of our agent in mapping
             _name = firstModel->name();
+
+            QString mappingName = QString("Mapping name of %1 in MASTIC Editor").arg(_name);
+            QString mappingDescription = QString("Mapping description of %1 in MASTIC Editor").arg(_name);
+            _mappingCurrentlyEdited = new AgentMappingM(mappingName, "0.0", mappingDescription);
 
             // Connect to signal "Count Changed" from the list of models
             connect(&_models, &AbstractI2CustomItemListModel::countChanged, this, &AgentInMappingVM::_onModelsChanged);
@@ -88,6 +93,10 @@ AgentInMappingVM::~AgentInMappingVM()
     disconnect(&_models, &AbstractI2CustomItemListModel::countChanged, this, &AgentInMappingVM::_onModelsChanged);
     //disconnect(&_inputsList, &AbstractI2CustomItemListModel::countChanged, this, &AgentInMappingVM::_onInputsListChanged);
     //disconnect(&_outputsList, &AbstractI2CustomItemListModel::countChanged, this, &AgentInMappingVM::_onOutputsListChanged);
+
+    if (_mappingCurrentlyEdited != NULL) {
+        delete _mappingCurrentlyEdited;
+    }
 
     // Clear maps of Inputs & Outputs
     _mapFromNameToInputsList.clear();

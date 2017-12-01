@@ -384,6 +384,8 @@ void AgentsMappingController::onIsActivatedMappingChanged(bool isActivatedMappin
             {
                 if ((link != NULL) && (link->agentFrom() != NULL) && (link->agentTo() != NULL) && (link->pointFrom() != NULL) && (link->pointTo() != NULL))
                 {
+                    // MAP or UNMAP ?
+
                     // Emit signal "Command asked to agent about Mapping Input"
                     Q_EMIT commandAskedToAgentAboutMappingInput(link->agentTo()->getPeerIdsList(), "MAP", link->pointTo()->name(), link->agentFrom()->name(), link->pointFrom()->name());
                 }
