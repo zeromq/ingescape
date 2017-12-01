@@ -2109,6 +2109,22 @@ I2PopupBase {
                                                 value : (myEffect && myEffect.modelM && myEffect.modelM.mappingEffectValue === MappingEffectValues.MAPPED) ? true : false;
                                             }
                                         }
+
+
+                                        Text {
+                                            anchors {
+                                                horizontalCenter : enabledbutton.horizontalCenter
+                                                top : enabledbutton.bottom
+                                                topMargin: 3
+                                            }
+
+                                            text : (myEffect && myEffect.modelM && myEffect.modelM.mappingEffectValue === MappingEffectValues.MAPPED) ? "Mapped" : "Not mapped"
+                                            color : MasticTheme.whiteColor
+                                            font {
+                                                family: MasticTheme.textFontFamily
+                                                pixelSize: 12
+                                            }
+                                        }
                                     }
 
                                     // Input Agent

@@ -67,7 +67,7 @@ Item {
         if (event.key === Qt.Key_Backspace || event.key === Qt.Key_Delete)
         {
             if (controller && controller.selectedActionVMInTimeline) {
-                   controller.removeActionVMFromTimeLine(controller.selectedActionVMInTimeline);
+                controller.removeActionVMFromTimeLine(controller.selectedActionVMInTimeline);
             }
 
             event.accepted = true;
@@ -102,80 +102,101 @@ Item {
         }
     }
 
+    Item {
+        id : executionsItem
+        height : conditionsValidityRect.height
+        width : childrenRect.width
 
-    // executions List
-    Repeater {
-        model: if (myActionVM) {
-                   myActionVM.executionsList;
-               }
-               else {
-                   0;
-               }
+        // executions List
+        Repeater {
+            model: if (myActionVM) {
+                       myActionVM.executionsList;
+                   }
+                   else {
+                       0;
+                   }
 
-        Item {
-            height : conditionsValidityRect.height
-            width : conditionsValidityRect.width
-
-            // Not revert action
-            I2SvgItem {
-                x : viewController.convertDurationInMillisecondsToLengthInCoordinateSystem(model.executionTime, viewController.pixelsPerMinute) - width/2;
-
-                anchors {
-                    verticalCenter: parent.verticalCenter
-                }
-
-                visible : !model.shallRevert
-
-                svgFileCache : MasticTheme.svgFileMASTIC;
-                svgElementId:  (model.neverExecuted)?
-                                   "notExcutedAction"
-                                 : ((model.isExecuted) ? "timelineAction" : "currentAction");
-            }
-
-            // Revert action
             Item {
-                visible : model.shallRevert
-                height : childrenRect.height
-                anchors {
-                    verticalCenter: parent.verticalCenter
-                }
+                height : conditionsValidityRect.height
+                width : model.shallRevert? revertItem.width : notRevertItem.width;
 
-                Rectangle {
+                // Not revert action
+                I2SvgItem {
+                    id : notRevertItem
+                    x : viewController.convertDurationInMillisecondsToLengthInCoordinateSystem(model.executionTime, viewController.pixelsPerMinute) - width/2;
+
                     anchors {
-                        verticalCenter: actionExecution.verticalCenter
-                        left : actionExecution.horizontalCenter
-                        right : revertActionExecution.horizontalCenter
+                        verticalCenter: parent.verticalCenter
                     }
-                    height : 1
-                    color : (model.neverExecuted)? MasticTheme.darkGreyColor : MasticTheme.whiteColor;
 
-                }
-
-                I2SvgItem {
-                    id : actionExecution
-                    x : viewController.convertDurationInMillisecondsToLengthInCoordinateSystem(model.executionTime, viewController.pixelsPerMinute);
-                    y : 0
+                    visible : !model.shallRevert
 
                     svgFileCache : MasticTheme.svgFileMASTIC;
-                    svgElementId: (model.neverExecuted)?
-                                      "notExecutedRevertAction"
-                                    : ((model.isExecuted) ? "revertAction" : "currentRevertAction");
+                    svgElementId:  (model.neverExecuted)?
+                                       "notExcutedAction"
+                                     : ((model.isExecuted) ? "timelineAction" : "currentAction");
+                }
+
+                // Revert action
+                Item {
+                    id : revertItem
+                    visible : model.shallRevert
+                    height : childrenRect.height
+                    width : childrenRect.width
+
+                    anchors {
+                        verticalCenter: parent.verticalCenter
+                    }
+
+                    Rectangle {
+                        anchors {
+                            verticalCenter: actionExecution.verticalCenter
+                            left : actionExecution.horizontalCenter
+                            right : revertActionExecution.horizontalCenter
+                        }
+                        height : 1
+                        color : (model.neverExecuted)? MasticTheme.darkGreyColor : MasticTheme.whiteColor;
+
+                    }
+
+                    I2SvgItem {
+                        id : actionExecution
+                        x : viewController.convertDurationInMillisecondsToLengthInCoordinateSystem(model.executionTime, viewController.pixelsPerMinute);
+                        y : 0
+
+                        svgFileCache : MasticTheme.svgFileMASTIC;
+                        svgElementId: (model.neverExecuted)?
+                                          "notExecutedRevertAction"
+                                        : ((model.isExecuted) ? "revertAction" : "currentRevertAction");
+                    }
+
+                    I2SvgItem {
+                        id : revertActionExecution
+                        x : viewController.convertDurationInMillisecondsToLengthInCoordinateSystem(model.reverseTime, viewController.pixelsPerMinute) - width;
+                        y : 0
+                        rotation : 180
+                        svgFileCache : MasticTheme.svgFileMASTIC;
+                        svgElementId: (model.neverExecuted)?
+                                          "notExecutedRevertAction"
+                                        : ((model.isExecuted) ? "revertAction" : "currentRevertAction");
+                    }
                 }
 
 
 
-                I2SvgItem {
-                    id : revertActionExecution
-                    x : viewController.convertDurationInMillisecondsToLengthInCoordinateSystem(model.reverseTime, viewController.pixelsPerMinute) - width;
-                    y : 0
-                    rotation : 180
-                    svgFileCache : MasticTheme.svgFileMASTIC;
-                    svgElementId: (model.neverExecuted)?
-                                      "notExecutedRevertAction"
-                                    : ((model.isExecuted) ? "revertAction" : "currentRevertAction");
-                }
+    //            MouseArea {
+    //                x : model.shallRevert? revertItem.x : notRevertItem.x;
+    //                anchors {
+    //                    top : parent.top
+    //                    bottom : parent.bottom
+    //                    bottomMargin: - actionVMItem.lineHeight/2
+    //                }
+    //                width : parent.width
+
+    //            }
             }
         }
+
     }
 
     // Action Name
@@ -199,8 +220,8 @@ Item {
         }
         verticalAlignment: Text.AlignVCenter
         color : (controller && controller.selectedActionVMInTimeline && actionVMItem.myActionVM  && controller.selectedActionVMInTimeline === actionVMItem.myActionVM) ?
-                     openEditorMouseArea.pressed? MasticTheme.lightGreyColor : MasticTheme.orangeColor
-                   : openEditorMouseArea.pressed? MasticTheme.lightGreyColor : MasticTheme.darkGreyColor
+                    openEditorMouseArea.pressed? MasticTheme.lightGreyColor : MasticTheme.orangeColor
+        : openEditorMouseArea.pressed? MasticTheme.lightGreyColor : MasticTheme.darkGreyColor
 
         text : (actionVMItem.myActionVM && actionVMItem.myActionVM.actionModel) ? actionVMItem.myActionVM.actionModel.name : ""
         font {
@@ -211,7 +232,14 @@ Item {
 
     MouseArea {
         id : openEditorMouseArea
-        anchors.fill : actionVMItem
+        anchors {
+            top : actionVMItem.top
+            bottom : actionVMItem.bottom
+            left : actionVMItem.left
+            leftMargin: (actionVMItem.myActionVM && actionVMItem.myActionVM.actionModel && !actionVMItem.myActionVM.actionModel.shallRevert) ? -5 : 0
+        }
+
+        width : Math.max(backgroundActionName.width, actionVMItem.width, executionsItem.width)
         hoverEnabled: true
         onClicked: {
             actionVMItem.forceActiveFocus()
