@@ -328,6 +328,14 @@ private:
     void _removeAllLinksWithAgent(AgentInMappingVM* agent);
 
 
+    /**
+     * @brief OverWrite the mapping of the model of agent (with the mapping currently edited in the agent in mapping)
+     * @param agentModel
+     * @param temporaryMapping
+     */
+    void _overWriteMappingOfAgentModel(AgentM* agentModel, AgentMappingM* temporaryMapping);
+
+
 private:
     // Manager for the data model of MASTIC
     MasticModelManager* _modelManager;

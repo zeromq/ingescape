@@ -171,39 +171,27 @@ void AgentsMappingController::dropAgentToMappingAtPosition(QString agentName, Ab
             _addAgentModelsToMappingAtPosition(agentName, agentsList->toList(), position);
 
             agentInMapping = getAgentInMappingFromName(agentName);
-            if ((agentInMapping != NULL) && (agentInMapping->temporaryMapping() != NULL) && (_modelManager != NULL))
+
+            if ((agentInMapping != NULL) && (agentInMapping->temporaryMapping() != NULL))
             {
                 // Mapping is activated
                 //if ((_modelManager != NULL) && _modelManager->isActivatedMapping()) {
 
-                // Delete all "mapping elements" in the temporary mapping
-                agentInMapping->temporaryMapping()->elementMappingsList()->deleteAllItems();
+                // Get the mapping currently edited (temporary until the user activate the mapping)
+                AgentMappingM* temporaryMapping = agentInMapping->temporaryMapping();
 
-                // Get the JSON of a mapping
-                QString jsonOfMapping = _modelManager->getJsonOfMapping(agentInMapping->temporaryMapping());
-
-                QString command = QString("LOAD_THIS_MAPPING#%1").arg(jsonOfMapping);
+                // Delete all "mapping elements" in this temporary mapping
+                temporaryMapping->elementMappingsList()->deleteAllItems();
 
                 //
                 foreach (AgentM* model, agentsList->toList()) {
                     if (model != NULL)
                     {
-                        // Model is ON
-                        if (model->isON())
-                        {
-                            QStringList peerIdsList;
-                            peerIdsList.append(model->peerId());
+                        // Emit the signal to send the command "CLEAR_MAPPING" on the network to the agent
+                        //Q_EMIT commandAskedToAgent(peerIdsList, "CLEAR_MAPPING");
 
-                            // Emit the signal to send the command "CLEAR_MAPPING" on the network to the agent
-                            //Q_EMIT commandAskedToAgent(peerIdsList, "CLEAR_MAPPING");
-
-                            // Emit signal "Command asked to agent"
-                            Q_EMIT commandAskedToAgent(peerIdsList, command);
-                        }
-                        // Model is OFF
-                        else {
-                            model->setmustClearMapping(true);
-                        }
+                        // OverWrite the mapping of the model of agent (with the mapping currently edited in the agent in mapping)
+                        _overWriteMappingOfAgentModel(model, temporaryMapping);
                     }
                 }
 
@@ -312,8 +300,12 @@ void AgentsMappingController::onIdenticalAgentModelReplaced(AgentM* previousMode
         if (agentInMapping != NULL)
         {
             int index = agentInMapping->models()->indexOf(previousModel);
-            if (index > -1) {
+            if (index > -1)
+            {
                 agentInMapping->models()->replace(index, newModel);
+
+                // OverWrite the mapping of the model of agent (with the mapping currently edited in the agent in mapping)
+                _overWriteMappingOfAgentModel(newModel, agentInMapping->temporaryMapping());
             }
         }
     }
@@ -332,6 +324,9 @@ void AgentsMappingController::onIdenticalAgentModelAdded(AgentM* newModel)
         if (agentInMapping != NULL)
         {
             agentInMapping->models()->append(newModel);
+
+            // OverWrite the mapping of the model of agent (with the mapping currently edited in the agent in mapping)
+            _overWriteMappingOfAgentModel(newModel, agentInMapping->temporaryMapping());
         }
     }
 }
@@ -377,7 +372,6 @@ void AgentsMappingController::onIsActivatedMappingChanged(bool isActivatedMappin
                     _addAgentModelsToMappingAtPosition(agentName, activeAgentsList, position);
                 }
 
-                // FIXME TODO: à optimiser...
                 // Create all links in mapping
                 foreach (AgentInMappingVM* agent, _agentInMappingVMList.toList()) {
                     if ((agent != NULL) && (agent->temporaryMapping() != NULL))
@@ -392,7 +386,7 @@ void AgentsMappingController::onIsActivatedMappingChanged(bool isActivatedMappin
                                     if (mappingElement != NULL)
                                     {
                                         // Add a temporary link for each real link
-                                        agent->addTemporaryLink(mappingElement->input(), mappingElement->outputAgent(), mappingElement->output());
+                                        //agent->addTemporaryLink(mappingElement->input(), mappingElement->outputAgent(), mappingElement->output());
 
                                         // Simulate slot "on Mapped"
                                         onMapped(mappingElement);
@@ -414,7 +408,7 @@ void AgentsMappingController::onIsActivatedMappingChanged(bool isActivatedMappin
                 // Apply all temporary mappings
                 foreach (AgentInMappingVM* agent, _agentInMappingVMList.toList())
                 {
-                    if ((agent != NULL) && (agent->temporaryMapping() != NULL) && (agent->temporaryMapping()->elementMappingsList()->count() > 0))
+                    if ((agent != NULL) && (agent->temporaryMapping() != NULL)) // && (agent->temporaryMapping()->elementMappingsList()->count() > 0)
                     {
                         // Get the JSON of a mapping
                         QString jsonOfMapping = _modelManager->getJsonOfMapping(agent->temporaryMapping());
@@ -469,13 +463,7 @@ void AgentsMappingController::onMapped(ElementMappingM* mappingElement)
         // Try to get the virtual link which corresponds to the mapping element
         MapBetweenIOPVM* link = _getLinkFromMappingElement(mappingElement);
 
-        // A virtual link already exists
-        if ((link != NULL) && link->isVirtual())
-        {
-            // Set this previously virtual link as real link
-            link->setisVirtual(false);
-        }
-        else
+        if (link == NULL)
         {
             AgentInMappingVM* outputAgent = getAgentInMappingFromName(mappingElement->outputAgent());
             AgentInMappingVM* inputAgent = getAgentInMappingFromName(mappingElement->inputAgent());
@@ -517,6 +505,15 @@ void AgentsMappingController::onMapped(ElementMappingM* mappingElement)
                 }
             }
         }
+        else {
+            // Update the flag if needed
+            link->setisVirtual(false);
+        }
+
+        if ((link != NULL) && (link->agentTo() != NULL)) {
+            // Add the temporary link that correspond to this real link (if it does not yet exist)
+            link->agentTo()->addTemporaryLink(mappingElement->input(), mappingElement->outputAgent(), mappingElement->output());
+        }
     }
 }
 
@@ -535,6 +532,11 @@ void AgentsMappingController::onUnmapped(ElementMappingM* mappingElement)
         MapBetweenIOPVM* link = _getLinkFromMappingElement(mappingElement);
         if (link != NULL)
         {
+            if (link->agentTo() != NULL) {
+                // Remove the temporary link that correspond to this real link
+                link->agentTo()->removeTemporaryLink(mappingElement->input(), mappingElement->outputAgent(), mappingElement->output());
+            }
+
             // Delete the link between two agents
             _deleteLinkBetweenTwoAgents(link);
         }
@@ -986,9 +988,7 @@ void AgentsMappingController::_addAgentModelsToMappingAtPosition(QString agentNa
         else
         {
             // Create a new Agent In Mapping
-            agentInMapping = new AgentInMappingVM(agentsList,
-                                                  position,
-                                                  this);
+            agentInMapping = new AgentInMappingVM(agentsList, position, this);
 
             // Add in the map list
             _mapFromNameToAgentInMapping.insert(agentName, agentInMapping);
@@ -1223,6 +1223,40 @@ void AgentsMappingController::_removeAllLinksWithAgent(AgentInMappingVM* agent)
                 // Delete the link between two agents
                 _deleteLinkBetweenTwoAgents(link);
             }
+        }
+    }
+}
+
+
+/**
+ * @brief OverWrite the mapping of the model of agent (with the mapping currently edited in the agent in mapping)
+ * @param agentModel
+ * @param temporaryMapping
+ */
+void AgentsMappingController::_overWriteMappingOfAgentModel(AgentM* agentModel, AgentMappingM* temporaryMapping)
+{
+    if (agentModel != NULL)
+    {
+        // Model is ON
+        if (agentModel->isON())
+        {
+            if ((_modelManager != NULL) && (temporaryMapping != NULL))
+            {
+                QStringList peerIdsList;
+                peerIdsList.append(agentModel->peerId());
+
+                // Get the JSON of a mapping
+                QString jsonOfMapping = _modelManager->getJsonOfMapping(temporaryMapping);
+
+                QString command = QString("LOAD_THIS_MAPPING#%1").arg(jsonOfMapping);
+
+                // Emit signal "Command asked to agent"
+                Q_EMIT commandAskedToAgent(peerIdsList, command);
+            }
+        }
+        // Model is OFF
+        else {
+            agentModel->setmustOverWriteMapping(true);
         }
     }
 }
