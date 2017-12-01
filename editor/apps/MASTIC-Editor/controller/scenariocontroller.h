@@ -289,9 +289,9 @@ private Q_SLOTS:
 
 
     /**
-     * @brief Called at each interval of our timer to delay actions (when their conditions are not valid)
+     * @brief Called at each interval of our timer to delay actions when their conditions are not valid or execute them otherwise
      */
-    void _onTimeout_DelayActions();
+    void _onTimeout_DelayOrExecuteActions();
 
 
 private :
@@ -363,6 +363,13 @@ private :
      * @param current time in ms
      */
     void _executeAction(ActionVM* actionVM, ActionExecutionVM* actionExecution, int currentTimeInMilliSeconds);
+
+    /**
+      * @brief Initialize the action view model at a specific time
+      * @param action view model
+      * @param time when to initialize the action VM
+      */
+    void _initializeActionVMAt(ActionVM * actionVM, int currentTimeInMilliSeconds);
 
 protected:
 

@@ -64,6 +64,9 @@ class ActionVM: public QObject
     // IMMEDIATE : startime
     I2_QML_PROPERTY(int, endTime)
 
+    // Timer to wait for action revert
+    I2_CPP_PROPERTY(QTimer*, timerToReverse)
+
 public:
 
     /**
@@ -110,6 +113,12 @@ public:
      */
     void delayCurrentExecution(int currentTimeInMilliSeconds);
 
+    /**
+      * @brief Initialize the action view model at a specific time
+      * @param time when to initialize the action VM
+      */
+    void resetDataFrom(int time);
+
 
 Q_SIGNALS:
 
@@ -152,9 +161,6 @@ private:
      * @param startTime relative to our view model of action
      */
     void _createActionExecution(int startTime);
-
-    // Timer to wait for action revert
-    QTimer _timerToReverse;
 };
 
 QML_DECLARE_TYPE(ActionVM)
