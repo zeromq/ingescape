@@ -23,6 +23,7 @@
 
 #include <QThread>
 #include <QApplication>
+#include <QCursor>
 
 
 /**
@@ -341,4 +342,17 @@ void MasticEditorController::closeActionEditor(ActionEditorController* actionEdi
 void MasticEditorController::forceCreation()
 {
     qDebug() << "Force the creation of our singleton from QML";
+}
+
+
+/**
+ * @brief Get the position of the mouse cursor in global screen coordinates
+ *
+ * @remarks You must use mapToGlobal to convert it to local coordinates
+ *
+ * @return
+ */
+QPointF MasticEditorController::getGlobalMousePosition()
+{
+    return QCursor::pos();
 }

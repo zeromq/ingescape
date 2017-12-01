@@ -104,25 +104,38 @@ public:
      static QObject* qmlSingleton(QQmlEngine* engine, QJSEngine* scriptEngine);
 
 
+
+public Q_SLOTS:
+
      /**
       * @brief Close a definition
       * @param definition
       */
-     Q_INVOKABLE void closeDefinition(DefinitionM* definition);
+     void closeDefinition(DefinitionM* definition);
+
 
      /**
       * @brief Close an action editor
       * @param action editor controller
       */
-     Q_INVOKABLE void closeActionEditor(ActionEditorController *actionEditorC);
+     void closeActionEditor(ActionEditorController *actionEditorC);
 
-
-public Q_SLOTS:
 
      /**
       * @brief Method used to force the creation of our singleton from QML
       */
      void forceCreation();
+
+
+     /**
+      * @brief Get the position of the mouse cursor in global screen coordinates
+      *
+      * @remarks You must use mapToGlobal to convert it to local coordinates
+      *
+      * @return
+      */
+     QPointF getGlobalMousePosition();
+
 
 private:
      // To subscribe to termination signals
