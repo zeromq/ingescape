@@ -390,7 +390,13 @@ Item {
 
                     onPressed: {
                         if (controller) {
-                            controller.selectedAgent = model.QtObject;
+                            if(controller.selectedAgent === model.QtObject)
+                            {
+                                controller.selectedAgent = null;
+                            } else {
+                                controller.selectedAgent = model.QtObject;
+                            }
+
                         }
 
                         // Find our layer and reparent our popup in it
