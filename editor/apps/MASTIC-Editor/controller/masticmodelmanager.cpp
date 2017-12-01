@@ -286,6 +286,14 @@ void MasticModelManager::onMappingReceived(QString peerId, QString agentName, QS
             {
                 if (agent->mapping() == NULL)
                 {
+                    foreach (ElementMappingM* mappingElement, agentMapping->elementMappingsList()->toList()) {
+                        if (mappingElement != NULL)
+                        {
+                            // Emit the signal "Mapped"
+                            Q_EMIT mapped(mappingElement);
+                        }
+                    }
+
                     // Add this new model of agent mapping
                     addAgentMappingForAgentName(agentMapping, agentName);
 
