@@ -52,7 +52,7 @@ ActionVM::ActionVM(ActionM* model,
             int seconds = (startTime - hours*3600000 - minutes*60000) / 1000;
             int milliseconds = startTime%1000;
 
-            _startTimeString = QString::number(hours) + ":" + QString::number(minutes) + ":" + QString::number(seconds) + "." + QString::number(milliseconds);
+            _startTimeString = QString::number(hours).leftJustified(2, '0') + ":" + QString::number(minutes).leftJustified(2, '0') + ":" + QString::number(seconds).leftJustified(2, '0') + "." + QString::number(milliseconds).leftJustified(3, '0');
         }
 
         // Update valid flag

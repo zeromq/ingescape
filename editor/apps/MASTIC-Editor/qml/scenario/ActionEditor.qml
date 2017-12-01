@@ -300,8 +300,8 @@ I2PopupBase {
                     verticalAlignment: TextInput.AlignVCenter
                     text: actionVM ? actionVM.startTimeString : "00:00:00.000"
                     inputMask: "00:00:00.000"
-                    inputMethodHints: Qt.ImhDigitsOnly
-                    validator: RegExpValidator { regExp: /^([0-1\s]?[0-9\s]|2[0-3\s]):([0-5\s][0-9\s]):([0-5\s][0-9\s])([.]\d{3})?$/ }
+                    inputMethodHints: Qt.ImhTime
+                    validator: RegExpValidator { regExp: /^(?:(?:([01]?\d|2[0-3]):)?([0-5]?\d):)?([0-5]?\d).([0-9\s][0-9\s][0-9\s])$/ }
 
                     style: I2TextFieldStyle {
                         backgroundColor: MasticTheme.darkBlueGreyColor
