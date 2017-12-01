@@ -27,17 +27,21 @@
 
 
 /**
- * @brief Default constructor
- * @param scenarios files path
+ * @brief Constructor
+ * @param modelManager
+ * @param scenariosPath Path of files with scenarios
  * @param parent
  */
-ScenarioController::ScenarioController(QString scenariosPath, QObject *parent) : QObject(parent),
+ScenarioController::ScenarioController(MasticModelManager* modelManager,
+                                       QString scenariosPath,
+                                       QObject *parent) : QObject(parent),
     _selectedAction(NULL),
     _selectedActionVMInTimeline(NULL),
     _linesNumberInTimeLine(MINIMUM_DISPLAYED_LINES_NUMBER_IN_TIMELINE),
     _isPlaying(false),
     _currentTime(QTime::fromMSecsSinceStartOfDay(0)),
     _nextActionVMToActive(NULL),
+    _modelManager(modelManager),
     _scenariosDirectoryPath(scenariosPath)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
@@ -137,6 +141,8 @@ ScenarioController::~ScenarioController()
 
     // Clear map
     _mapActionsFromActionName.clear();
+
+    _modelManager = NULL;
 }
 
 
@@ -929,6 +935,11 @@ void ScenarioController::executeEffectsOfAction(ActionM* action)
 {
     if ((action != NULL) && (action->effectsList()->count() > 0))
     {
+        // Active the mapping if needed
+        if ((_modelManager != NULL) && !_modelManager->isActivatedMapping()) {
+            _modelManager->setisActivatedMapping(true);
+        }
+
         // Execute the actions effects
         foreach (ActionEffectVM* effectVM, action->effectsList()->toList())
         {
@@ -955,14 +966,12 @@ void ScenarioController::setisPlaying(bool isPlaying)
     {
         _isPlaying = isPlaying;
 
-        // Start/stop scenario according to the flag
-        if(_isPlaying == false)
-        {
-            _stopScenario();
-        }
-        else
-        {
+        // Start/Stop scenario according to the flag
+        if (_isPlaying) {
             _startScenario();
+        }
+        else {
+            _stopScenario();
         }
 
         Q_EMIT isPlayingChanged(_isPlaying);
@@ -1237,6 +1246,11 @@ void ScenarioController::_startScenario()
 {
     int currentTimeInMilliSeconds = _currentTime.msecsSinceStartOfDay();
 
+    // Active the mapping if needed
+    if ((_modelManager != NULL) && !_modelManager->isActivatedMapping()) {
+        _modelManager->setisActivatedMapping(true);
+    }
+
     // Set the list of Actions to process at currentTime
     foreach (ActionVM* actionVM, _actionsVMToEvaluateVMList.toList())
     {
@@ -1247,7 +1261,7 @@ void ScenarioController::_startScenario()
     setnextActionVMToActive(NULL);
 
     // Look for the current and futures actions
-    ActionVM* nextActionToLaunch = NULL;
+    ActionVM * nextActionToLaunch = NULL;
     foreach (ActionVM* actionVM , _actionsInTimeLine.toList())
     {
         if ((actionVM->endTime() > currentTimeInMilliSeconds) || (actionVM->endTime() == -1))

@@ -69,6 +69,28 @@ MasticModelManager::~MasticModelManager()
 
 
 /**
+ * @brief Setter for property "is Activated Mapping"
+ * @param value
+ */
+void MasticModelManager::setisActivatedMapping(bool value)
+{
+    if (_isActivatedMapping != value)
+    {
+        _isActivatedMapping = value;
+
+        if (_isActivatedMapping) {
+            qInfo() << "Mapping Activated";
+        }
+        else {
+            qInfo() << "Mapping DE-activated";
+        }
+
+        Q_EMIT isActivatedMappingChanged(value);
+    }
+}
+
+
+/**
  * @brief Import the agents list from default file
  */
 void MasticModelManager::importAgentsListFromDefaultFile()
@@ -265,10 +287,10 @@ void MasticModelManager::onMappingReceived(QString peerId, QString agentName, QS
                     AgentMappingM* previousMapping = agent->mapping();
 
                     // Same name, version and description
-                    if ((agentMapping->name() == previousMapping->name())
+                    /*if ((agentMapping->name() == previousMapping->name())
                             && (agentMapping->version() == previousMapping->version())
                             && (agentMapping->description() == previousMapping->description()))
-                    {
+                    {*/
                         //qDebug() << "Previous Mapping" << previousMapping->mappingElementsIds();
                         QStringList idsOfRemovedMappingElements;
                         foreach (QString idPreviousList, previousMapping->mappingElementsIds()) {
@@ -323,10 +345,10 @@ void MasticModelManager::onMappingReceived(QString peerId, QString agentName, QS
 
                         // Delete a model of agent mapping
                         deleteAgentMapping(previousMapping);
-                    }
+                    /*}
                     else {
                         // FIXME TODO
-                    }
+                    }*/
                 }
             }
         }

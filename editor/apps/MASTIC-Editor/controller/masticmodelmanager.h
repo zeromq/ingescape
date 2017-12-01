@@ -36,7 +36,7 @@ class MasticModelManager : public QObject
     I2_QOBJECT_LISTMODEL(DefinitionM, openedDefinitions)
 
     // Flag indicating if our global mapping is activated
-    I2_QML_PROPERTY(bool, isActivatedMapping)
+    I2_QML_PROPERTY_CUSTOM_SETTER(bool, isActivatedMapping)
 
     // List of all published values
     I2_QOBJECT_LISTMODEL(PublishedValueM, publishedValues)
