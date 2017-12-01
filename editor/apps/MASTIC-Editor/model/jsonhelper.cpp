@@ -232,6 +232,48 @@ AgentMappingM* JsonHelper::createModelOfAgentMapping(QString inputAgentName, QBy
 
 
 /**
+ * @brief Get the JSON of a mapping
+ * @param agentMapping
+ * @return
+ */
+QString JsonHelper::getJsonOfMapping(AgentMappingM* agentMapping)
+{
+    QString jsonOfMapping = "";
+
+    if (agentMapping != NULL)
+    {
+        QJsonObject jsonMapping;
+        jsonMapping.insert("name", agentMapping->name());
+        jsonMapping.insert("description", agentMapping->description());
+        jsonMapping.insert("version", agentMapping->version());
+
+        QJsonArray jsonArray;
+        foreach (ElementMappingM* mappingElement, agentMapping->elementMappingsList()->toList()) {
+            if (mappingElement != NULL)
+            {
+                QJsonObject jsonMappingElement;
+                jsonMappingElement.insert("input_name", mappingElement->input());
+                jsonMappingElement.insert("agent_name", mappingElement->outputAgent());
+                jsonMappingElement.insert("output_name", mappingElement->output());
+
+                jsonArray.append(jsonMappingElement);
+            }
+        }
+
+        jsonMapping.insert("mapping_out", jsonArray);
+
+        QJsonObject jsonObject;
+        jsonObject.insert("mapping", jsonMapping);
+
+        QJsonDocument jsonDocument(jsonObject);
+        jsonOfMapping = jsonDocument.toJson(QJsonDocument::Compact);
+    }
+
+    return jsonOfMapping;
+}
+
+
+/**
  * @brief Create a model of agent definition from JSON object
  * @param jsonDefinition
  * @return

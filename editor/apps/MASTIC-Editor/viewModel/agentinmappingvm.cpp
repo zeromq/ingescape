@@ -33,7 +33,7 @@ AgentInMappingVM::AgentInMappingVM(QList<AgentM*> models,
     _isGhost(false),
     _areIdenticalsAllDefinitions(true),
     _activeAgentsNumber(0),
-    _mappingCurrentlyEdited(NULL)
+    _temporaryMapping(NULL)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -46,9 +46,12 @@ AgentInMappingVM::AgentInMappingVM(QList<AgentM*> models,
             // Set the name of our agent in mapping
             _name = firstModel->name();
 
+
+            // Create the mapping currently edited
             QString mappingName = QString("Mapping name of %1 in MASTIC Editor").arg(_name);
             QString mappingDescription = QString("Mapping description of %1 in MASTIC Editor").arg(_name);
-            _mappingCurrentlyEdited = new AgentMappingM(mappingName, "0.0", mappingDescription);
+            _temporaryMapping = new AgentMappingM(mappingName, "0.0", mappingDescription);
+
 
             // Connect to signal "Count Changed" from the list of models
             connect(&_models, &AbstractI2CustomItemListModel::countChanged, this, &AgentInMappingVM::_onModelsChanged);
@@ -94,8 +97,8 @@ AgentInMappingVM::~AgentInMappingVM()
     //disconnect(&_inputsList, &AbstractI2CustomItemListModel::countChanged, this, &AgentInMappingVM::_onInputsListChanged);
     //disconnect(&_outputsList, &AbstractI2CustomItemListModel::countChanged, this, &AgentInMappingVM::_onOutputsListChanged);
 
-    if (_mappingCurrentlyEdited != NULL) {
-        delete _mappingCurrentlyEdited;
+    if (_temporaryMapping != NULL) {
+        delete _temporaryMapping;
     }
 
     // Clear maps of Inputs & Outputs
@@ -123,6 +126,52 @@ AgentInMappingVM::~AgentInMappingVM()
 QStringList AgentInMappingVM::getPeerIdsList()
 {
     return _peerIdsList;
+}
+
+
+/**
+ * @brief Add a temporary link (this temporary link will became a real link when the user will activate the mapping)
+ * @param inputName
+ * @param outputAgentName
+ * @param outputName
+ */
+void AgentInMappingVM::addTemporaryLink(QString inputName, QString outputAgentName, QString outputName)
+{
+    if (_temporaryMapping != NULL)
+    {
+        ElementMappingM* temporaryLink = new ElementMappingM(_name, inputName, outputAgentName, outputName);
+
+        _temporaryMapping->elementMappingsList()->append(temporaryLink);
+    }
+}
+
+
+/**
+ * @brief Remove temporary link (this temporary link will be removed when the user will activate the mapping)
+ * @param inputName
+ * @param outputAgentName
+ * @param outputName
+ */
+void AgentInMappingVM::removeTemporaryLink(QString inputName, QString outputAgentName, QString outputName)
+{
+    if (_temporaryMapping != NULL)
+    {
+        ElementMappingM* temporaryLink = NULL;
+
+        foreach (ElementMappingM* iterator, _temporaryMapping->elementMappingsList()->toList())
+        {
+            if ((iterator != NULL) && (iterator->inputAgent() == _name)
+                    && (iterator->input() == inputName) && (iterator->outputAgent() == outputAgentName) && (iterator->output() == outputName))
+            {
+                temporaryLink = iterator;
+                break;
+            }
+        }
+
+        if (temporaryLink != NULL) {
+            _temporaryMapping->elementMappingsList()->remove(temporaryLink);
+        }
+    }
 }
 
 

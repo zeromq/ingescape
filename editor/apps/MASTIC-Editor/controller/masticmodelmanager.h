@@ -193,6 +193,14 @@ public:
     void exportAgentsListToSelectedFile(QList<QPair<QString, DefinitionM*>> agentsListToExport);
 
 
+    /**
+     * @brief Get the JSON of a mapping
+     * @param agentMapping
+     * @return
+     */
+    QString getJsonOfMapping(AgentMappingM* agentMapping);
+
+
 Q_SIGNALS:
 
     /**

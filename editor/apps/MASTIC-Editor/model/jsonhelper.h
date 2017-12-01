@@ -81,6 +81,15 @@ public:
      */
     AgentMappingM* createModelOfAgentMapping(QString inputAgentName, QByteArray byteArrayOfJson);
 
+
+    /**
+     * @brief Get the JSON of a mapping
+     * @param agentMapping
+     * @return
+     */
+    QString getJsonOfMapping(AgentMappingM* agentMapping);
+
+
     /**
      * @brief Initialize actions list from JSON file
      * @param byteArrayOfJson

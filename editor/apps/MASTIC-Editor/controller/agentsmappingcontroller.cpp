@@ -126,31 +126,27 @@ void AgentsMappingController::deleteAgentInMapping(AgentInMappingVM* agent)
  */
 void AgentsMappingController::removeLinkBetweenTwoAgents(MapBetweenIOPVM* link)
 {
-    if (link != NULL)
+    if ((link != NULL) && (link->agentTo() != NULL) && (link->pointTo() != NULL) && (link->agentFrom() != NULL) && (link->pointFrom() != NULL))
     {
-        if ((link->agentFrom() != NULL) && (link->agentTo() != NULL)) {
-            qInfo() << "QML asked to delete the link between agents" << link->agentFrom()->name() << "and" << link->agentTo()->name();
-        }
+        qInfo() << "QML asked to delete the link between agents" << link->agentFrom()->name() << "and" << link->agentTo()->name();
 
-        if (link->isVirtual())
-        {
-            // Delete the link between two agents
-            _deleteLinkBetweenTwoAgents(link);
-        }
-        else
+        // Mapping is activated
+        if ((_modelManager != NULL) && _modelManager->isActivatedMapping())
         {
             // Set to virtual to give a feedback to the user
             link->setisVirtual(true);
 
-            // Mapping is activated
-            if ((_modelManager != NULL) && _modelManager->isActivatedMapping())
-            {
-                if ((link->agentFrom() != NULL) && (link->agentTo() != NULL) && (link->pointFrom() != NULL) && (link->pointTo() != NULL))
-                {
-                    // Emit signal "Command asked to agent about Mapping Input"
-                    Q_EMIT commandAskedToAgentAboutMappingInput(link->agentTo()->getPeerIdsList(), "UNMAP", link->pointTo()->name(), link->agentFrom()->name(), link->pointFrom()->name());
-                }
-            }
+            // Emit signal "Command asked to agent about Mapping Input"
+            Q_EMIT commandAskedToAgentAboutMappingInput(link->agentTo()->getPeerIdsList(), "UNMAP", link->pointTo()->name(), link->agentFrom()->name(), link->pointFrom()->name());
+        }
+        // Mapping is NOT activated
+        else
+        {
+            // Remove temporary link (this temporary link will be removed when the user will activate the mapping)
+            link->agentTo()->removeTemporaryLink(link->pointTo()->name(), link->agentFrom()->name(), link->pointFrom()->name());
+
+            // Delete the link between two agents
+            _deleteLinkBetweenTwoAgents(link);
         }
     }
 }
@@ -175,10 +171,18 @@ void AgentsMappingController::dropAgentToMappingAtPosition(QString agentName, Ab
             _addAgentModelsToMappingAtPosition(agentName, agentsList->toList(), position);
 
             agentInMapping = getAgentInMappingFromName(agentName);
-            if (agentInMapping != NULL)
+            if ((agentInMapping != NULL) && (agentInMapping->temporaryMapping() != NULL) && (_modelManager != NULL))
             {
                 // Mapping is activated
                 //if ((_modelManager != NULL) && _modelManager->isActivatedMapping()) {
+
+                // Delete all "mapping elements" in the temporary mapping
+                agentInMapping->temporaryMapping()->elementMappingsList()->deleteAllItems();
+
+                // Get the JSON of a mapping
+                QString jsonOfMapping = _modelManager->getJsonOfMapping(agentInMapping->temporaryMapping());
+
+                QString command = QString("LOAD_THIS_MAPPING#%1").arg(jsonOfMapping);
 
                 //
                 foreach (AgentM* model, agentsList->toList()) {
@@ -191,7 +195,10 @@ void AgentsMappingController::dropAgentToMappingAtPosition(QString agentName, Ab
                             peerIdsList.append(model->peerId());
 
                             // Emit the signal to send the command "CLEAR_MAPPING" on the network to the agent
-                            Q_EMIT commandAskedToAgent(peerIdsList, "CLEAR_MAPPING");
+                            //Q_EMIT commandAskedToAgent(peerIdsList, "CLEAR_MAPPING");
+
+                            // Emit signal "Command asked to agent"
+                            Q_EMIT commandAskedToAgent(peerIdsList, command);
                         }
                         // Model is OFF
                         else {
@@ -215,7 +222,7 @@ void AgentsMappingController::dropAgentToMappingAtPosition(QString agentName, Ab
  * @param inputAgent
  * @param input
  */
-void AgentsMappingController::addMapBetweenAgents(AgentInMappingVM* outputAgent, OutputVM* output, AgentInMappingVM* inputAgent, InputVM* input)
+void AgentsMappingController::dropLinkBetweenAgents(AgentInMappingVM* outputAgent, OutputVM* output, AgentInMappingVM* inputAgent, InputVM* input)
 {
     if ((outputAgent != NULL) && (output != NULL) && (inputAgent != NULL) && (input != NULL))
     {
@@ -237,16 +244,29 @@ void AgentsMappingController::addMapBetweenAgents(AgentInMappingVM* outputAgent,
             {
                 qInfo() << "QML asked to create the link between agents" << outputAgent->name() << "and" << inputAgent->name();
 
-                // Create a new VIRTUAL link between agents
-                MapBetweenIOPVM* link = new MapBetweenIOPVM(outputAgent, output, inputAgent, input, true, this);
-
-                // Add to the list
-                _allMapInMapping.append(link);
-
                 // Mapping is activated
-                if ((_modelManager != NULL) && _modelManager->isActivatedMapping()) {
+                if ((_modelManager != NULL) && _modelManager->isActivatedMapping())
+                {
+                    // Create a new VIRTUAL link between agents
+                    MapBetweenIOPVM* link = new MapBetweenIOPVM(outputAgent, output, inputAgent, input, true, this);
+
+                    // Add to the list
+                    _allMapInMapping.append(link);
+
                     // Emit signal "Command asked to agent about Mapping Input"
                     Q_EMIT commandAskedToAgentAboutMappingInput(inputAgent->getPeerIdsList(), "MAP", input->name(), outputAgent->name(), output->name());
+                }
+                // Mapping is NOT activated
+                else
+                {
+                    // Add a temporary link (this temporary link will became a real link when the user will activate the mapping)
+                    inputAgent->addTemporaryLink(input->name(), outputAgent->name(), output->name());
+
+                    // Create a new link between agents
+                    MapBetweenIOPVM* link = new MapBetweenIOPVM(outputAgent, output, inputAgent, input, false, this);
+
+                    // Add to the list
+                    _allMapInMapping.append(link);
                 }
             }
             else {
@@ -379,21 +399,25 @@ void AgentsMappingController::onIsActivatedMappingChanged(bool isActivatedMappin
         {
             qDebug() << "Mapping Activated and there are already some agents (and links) on our HMI";
 
-            // Ask to create all virtual links in mapping
-            foreach (MapBetweenIOPVM* link, _allMapInMapping.toList())
+            if (_modelManager != NULL)
             {
-                if ((link != NULL) && (link->agentFrom() != NULL) && (link->agentTo() != NULL) && (link->pointFrom() != NULL) && (link->pointTo() != NULL))
+                // Apply all temporary mappings
+                foreach (AgentInMappingVM* agent, _agentInMappingVMList.toList())
                 {
-                    // MAP or UNMAP ?
+                    if ((agent != NULL) && (agent->temporaryMapping() != NULL) && (agent->temporaryMapping()->elementMappingsList()->count() > 0))
+                    {
+                        // Get the JSON of a mapping
+                        QString jsonOfMapping = _modelManager->getJsonOfMapping(agent->temporaryMapping());
 
-                    // Emit signal "Command asked to agent about Mapping Input"
-                    Q_EMIT commandAskedToAgentAboutMappingInput(link->agentTo()->getPeerIdsList(), "MAP", link->pointTo()->name(), link->agentFrom()->name(), link->pointFrom()->name());
+                        QString command = QString("LOAD_THIS_MAPPING#%1").arg(jsonOfMapping);
+
+                        // Emit signal "Command asked to agent"
+                        Q_EMIT commandAskedToAgent(agent->getPeerIdsList(), command);
+                    }
                 }
             }
         }
     }
-    //else {
-    //}
 }
 
 

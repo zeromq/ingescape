@@ -165,6 +165,22 @@ void MasticModelManager::exportAgentsListToSelectedFile(QList<QPair<QString, Def
 
 
 /**
+ * @brief Get the JSON of a mapping
+ * @param agentMapping
+ * @return
+ */
+QString MasticModelManager::getJsonOfMapping(AgentMappingM* agentMapping)
+{
+    if (_jsonHelper != NULL) {
+        return _jsonHelper->getJsonOfMapping(agentMapping);
+    }
+    else {
+        return "";
+    }
+}
+
+
+/**
  * @brief Slot called when an agent enter the network
  * @param peerId
  * @param agentName
