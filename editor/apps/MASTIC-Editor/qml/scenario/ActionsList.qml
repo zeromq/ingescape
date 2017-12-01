@@ -363,7 +363,7 @@ Item {
                 // Reference to our action that can be used by a DropArea item
                 property var action: model.QtObject
                 // StartTime of the action when it is dragged in timeline
-                property var temporaryStartTime: -1;
+                property var temporaryStartTime: null;
 
                 Drag.active: mouseArea.drag.active
                 Drag.hotSpot.x: mouseArea.mouseX

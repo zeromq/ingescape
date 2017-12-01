@@ -40,8 +40,11 @@ I2CubicBezierCurve {
     firstPoint: outputModel? outputModel.position : Qt.point(0,0)
 
 
-    // Minimum offset of control point
-    property int minimumControlPointOffset: 20
+    // Minimum offset of control points
+    property int minimumControlPointOffset: 25
+
+    // Minimum delta-Y to render a backward S shape instead of a loop (C shape)
+    property int minimumDeltaYforBackwardSshape: 125
 
     // Holds whether hover events are handled
     property alias hoverEnabled: mouseArea.hoverEnabled
@@ -58,6 +61,14 @@ I2CubicBezierCurve {
     property color pressColor: MasticTheme.agentsMappingLinkPressColor
 
 
+    // Check if we represent a link or a "brin"
+    property bool _isBrin: (
+                            mapBetweenIOPVM
+                            && mapBetweenIOPVM.agentTo && mapBetweenIOPVM.agentTo.isReduced
+                            && mapBetweenIOPVM.agentFrom && mapBetweenIOPVM.agentFrom.isReduced
+                            )
+
+
     // NB: Clip MUST be true to clip our mousearea
     clip: true
 
@@ -65,8 +76,7 @@ I2CubicBezierCurve {
     hitTestAreaMargin : 3
 
     // if the agentTo and agentFrom are reduced : global type of its inputs
-    stroke: if (mapBetweenIOPVM && mapBetweenIOPVM.agentTo && mapBetweenIOPVM.agentTo.isReduced && mapBetweenIOPVM.agentFrom && mapBetweenIOPVM.agentFrom.isReduced
-                    && outputModel)
+    stroke: if (rootItem._isBrin && outputModel)
             {
                 switch (mapBetweenIOPVM.agentFrom.reducedMapValueTypeGroupInOutput)
                 {
@@ -128,32 +138,18 @@ I2CubicBezierCurve {
             }
 
 
-    strokeWidth: if (mapBetweenIOPVM && mapBetweenIOPVM.agentTo && mapBetweenIOPVM.agentTo.isReduced
-                         && mapBetweenIOPVM.agentFrom && mapBetweenIOPVM.agentFrom.isReduced) {
-                     MasticTheme.agentsMappingBrinDefaultWidth
-                 }
-                 else {
-                     MasticTheme.agentsMappingLinkDefaultWidth
-                 }
+    strokeWidth: (rootItem._isBrin ? MasticTheme.agentsMappingBrinDefaultWidth : MasticTheme.agentsMappingLinkDefaultWidth)
 
-    strokeDashArray: (mapBetweenIOPVM && mapBetweenIOPVM.isVirtual) ? "5, 5" : ""
+    strokeDashArray: (mapBetweenIOPVM && mapBetweenIOPVM.isVirtual)
+                     ? (rootItem._isBrin ? MasticTheme.agentsMappingBrinVirtualStrokeDashArray : MasticTheme.agentsMappingLinkVirtualStrokeDashArray)
+                     : ""
 
     // Fuzzy contour
-    fuzzyColor: (mapBetweenIOPVM && (controller.selectedMapBetweenIOP === mapBetweenIOPVM)) ? MasticTheme.lightGreyColor : "transparent"
-    fuzzyRadius: 2
+    fuzzyColor: MasticTheme.lightGreyColor
+    fuzzyRadius: (mapBetweenIOPVM && controller && (controller.selectedMapBetweenIOP === mapBetweenIOPVM)) ? 2 : 0
 
     opacity: mouseArea.pressed ? 0.8 : 1;
 
-
-    //--------------------------------
-    //
-    // Behaviors
-    //
-    //--------------------------------
-    Behavior on stroke {
-        ColorAnimation {
-        }
-    }
 
 
     //--------------------------------
@@ -179,22 +175,47 @@ I2CubicBezierCurve {
         var offsetX = Math.max(Math.abs(0.5 * dx), rootItem.minimumControlPointOffset);
         var offsetY = Math.max(Math.abs(0.5 * dy), rootItem.minimumControlPointOffset);
 
+        var offsetX1 = offsetX;
+        var offsetX2 = -offsetX1;
+        var offsetY1 = offsetY;
+        var offsetY2 = -offsetY1;
+
         if (dx > 0)
         {
-            offsetY = 0;
+            offsetY1 = offsetY2 = 0;
         }
         else
         {
-            offsetX = Math.max(offsetX, offsetY);
+            offsetX1 = Math.max(offsetX, offsetY);
+            offsetX2 = -offsetX1;
 
-            if (dy < 0)
+            if (Math.abs(dy) <= rootItem.minimumDeltaYforBackwardSshape)
             {
-                offsetY = -offsetY;
+                // C shape (loop)
+                offsetY = 1.5 * rootItem.minimumDeltaYforBackwardSshape;
+
+                if (dy <= 0)
+                {
+                    offsetY = -offsetY;
+                }
+
+                offsetY1 = offsetY2 = offsetY;
+            }
+            else
+            {
+                // S shape
+                if (dy < 0)
+                {
+                    offsetY = -offsetY;
+                }
+
+                offsetY1 = offsetY;
+                offsetY2 = -offsetY1;
             }
         }
 
-        firstControlPoint = Qt.point(firstPoint.x + offsetX, firstPoint.y + offsetY);
-        secondControlPoint = Qt.point(secondPoint.x - offsetX, secondPoint.y - offsetY );
+        firstControlPoint = Qt.point(firstPoint.x + offsetX1, firstPoint.y + offsetY1);
+        secondControlPoint = Qt.point(secondPoint.x + offsetX2, secondPoint.y + offsetY2);
     }
 
 
@@ -219,7 +240,14 @@ I2CubicBezierCurve {
     }
 
 
+    // Animate stroke changes
+    Behavior on stroke {
+        ColorAnimation {
+        }
+    }
 
+
+    // Animate fuzzyRadius changes
     Behavior on fuzzyRadius {
         NumberAnimation {}
     }
@@ -247,6 +275,7 @@ I2CubicBezierCurve {
             }
         }
     }
+
 
     //--------------------------------
     //

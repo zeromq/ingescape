@@ -36,7 +36,7 @@ class MasticModelManager : public QObject
     I2_QOBJECT_LISTMODEL(DefinitionM, openedDefinitions)
 
     // Flag indicating if our global mapping is activated
-    I2_QML_PROPERTY(bool, isActivatedMapping)
+    I2_QML_PROPERTY_CUSTOM_SETTER(bool, isActivatedMapping)
 
     // List of all published values
     I2_QOBJECT_LISTMODEL(PublishedValueM, publishedValues)
@@ -150,7 +150,7 @@ public:
      * @param agentName
      * @return
      */
-    QList<ElementMappingM*> getMergedListOfInputMappingElementsFromAgentName(QString agentName);
+    //QList<ElementMappingM*> getMergedListOfInputMappingElementsFromAgentName(QString agentName);
 
 
     /**
@@ -158,7 +158,7 @@ public:
      * @param agentName
      * @return
      */
-    QList<ElementMappingM*> getMergedListOfOutputMappingElementsFromAgentName(QString agentName);
+    //QList<ElementMappingM*> getMergedListOfOutputMappingElementsFromAgentName(QString agentName);
 
 
     /**
@@ -191,6 +191,14 @@ public:
      * @param agentsListToExport list of pairs <agent name, definition>
      */
     void exportAgentsListToSelectedFile(QList<QPair<QString, DefinitionM*>> agentsListToExport);
+
+
+    /**
+     * @brief Get the JSON of a mapping
+     * @param agentMapping
+     * @return
+     */
+    QString getJsonOfMapping(AgentMappingM* agentMapping);
 
 
 Q_SIGNALS:
@@ -237,6 +245,14 @@ Q_SIGNALS:
      * @param mappingElement
      */
     void unmapped(ElementMappingM* mappingElement);
+
+
+    /**
+     * @brief Signal emitted when a command must be sent on the network to an agent
+     * @param peerIdsList
+     * @param command
+     */
+    void commandAskedToAgent(QStringList peerIdsList, QString command);
 
 
 public Q_SLOTS:
@@ -355,7 +371,7 @@ private:
      * @brief Clean merged lists of mapping elements for the agent name
      * @param agentName
      */
-    void _cleanMergedListsOfMappingElementsForAgentName(QString agentName);
+    //void _cleanMergedListsOfMappingElementsForAgentName(QString agentName);
 
 
     /**
@@ -405,10 +421,10 @@ private:
     QHash<QString, QList<AgentMappingM*>> _mapFromNameToAgentMappingsList;
 
     // Map from agent name to the merged list of all (models of) mapping elements which connect an input of the agent
-    QHash<QString, QList<ElementMappingM*>> _mapFromAgentNameToMergedListOfInputMappingElements;
+    //QHash<QString, QList<ElementMappingM*>> _mapFromAgentNameToMergedListOfInputMappingElements;
 
     // Map from agent name to the merged list of all (models of) mapping elements which connect an output of the agent
-    QHash<QString, QList<ElementMappingM*>> _mapFromAgentNameToMergedListOfOutputMappingElements;
+    //QHash<QString, QList<ElementMappingM*>> _mapFromAgentNameToMergedListOfOutputMappingElements;
 
 };
 

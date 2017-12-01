@@ -132,7 +132,7 @@ Item {
 
 
 
-    // Set our zoom level
+    // Set our zoom level to a given value
     function setZoomLevel(zoom)
     {
         if (zoom > 0)
@@ -194,17 +194,24 @@ Item {
 
         if ((areaWidth > 0) && (areaHeight > 0))
         {
+            // Calculate the required scale factor to show our area
             var scaleX = rootItem.width/areaWidth;
             var scaleY = rootItem.height/areaHeight;
+            var requiredScale = Math.min(scaleX, scaleY);
 
-            var targetScale = Math.min(scaleX, scaleY);
+            // Check bounds of our scale factor
+            var targetScale = Math.min(rootItem.maximumScale, Math.max(rootItem.minimumScale, requiredScale));
+
+            // Compute position of our worksâce
             var targetX = rootItem.width/2 - (area.x + areaWidth/2) * targetScale;
             var targetY = rootItem.height/2 - (area.y + areaHeight/2) * targetScale;
 
+            // Configure animations
             workspaceXAnimation.to = targetX;
             workspaceYAnimation.to = targetY;
             workspaceScaleAnimation.to = targetScale;
 
+            // Start animations
             workspaceXAnimation.restart();
             workspaceYAnimation.restart();
             workspaceScaleAnimation.restart();
@@ -274,17 +281,6 @@ Item {
     }
 
 
-
-    // TEMP: to test showAll
-    focus: true
-    Keys.onPressed: {
-        if (event.key === Qt.Key_Space)
-        {
-            showAll();
-
-            event.accepted = true;
-        }
-    }
 
 
     //--------------------------------
@@ -432,12 +428,26 @@ Item {
         PinchArea {
             anchors.fill: parent
 
-            pinch {
-                target: workspace
 
-                minimumScale: rootItem.minimumScale
-                maximumScale: rootItem.maximumScale
+            onPinchUpdated: {
+                // Check if we have at least two points
+                if (pinch.pointCount >= 2)
+                {
+                    // Get position of our center in workspace
+                    var viewCenterInWorkspace = rootItem.mapToItem(workspace, rootItem.width/2, rootItem.height/2);
+
+                    // Compute delta between our new scale factor and the previous one
+                    var deltaScale = pinch.scale/pinch.previousScale;
+
+                    // Check bounds of scale
+                    workspace.scale = Math.min(rootItem.maximumScale, Math.max(rootItem.minimumScale, workspace.scale * deltaScale));
+
+                    // Set position of our workspace
+                    workspace.x = rootItem.width/2 - viewCenterInWorkspace.x * workspace.scale;
+                    workspace.y = rootItem.height/2 - viewCenterInWorkspace.y * workspace.scale;
+               }
             }
+
 
 
             //
@@ -460,7 +470,6 @@ Item {
                         //
                         // Trackpad flick gesture => scroll our workspace
                         //
-
                         workspace.x += wheel.pixelDelta.x;
                         workspace.y += wheel.pixelDelta.y;
                     }
@@ -476,7 +485,10 @@ Item {
 
                     anchors.fill: parent
 
-                    drag.target: workspace
+                    drag {
+                        target: workspace
+                        smoothed: false
+                    }
 
                     // 2-finger-flick gesture should pass through to our parent MouseArea
                     scrollGestureEnabled: false
@@ -499,7 +511,9 @@ Item {
                             //
 
                             // Update scale of our workspace
-                            workspace.scale = Math.max(rootItem.minimumScale, workspace.scale * Math.pow(1/rootItem.zoomInDeltaScaleFactor, Math.abs(wheel.angleDelta.y)/120) );
+                            var numberOfWheelDeltaZoomOut = Math.abs(wheel.angleDelta.y)/120;
+                            var scaleFactorZoomOut = Math.pow(1/rootItem.zoomInDeltaScaleFactor, numberOfWheelDeltaZoomOut);
+                            workspace.scale = Math.min(rootItem.maximumScale, Math.max(rootItem.minimumScale, workspace.scale * scaleFactorZoomOut));
 
                             // Center our workspace
                             workspace.x = wheel.x - mousePositionInWorkspace.x * workspace.scale;
@@ -512,7 +526,9 @@ Item {
                             //
 
                             // Update scale of our workspace
-                            workspace.scale = Math.min(rootItem.maximumScale, workspace.scale * Math.pow(rootItem.zoomInDeltaScaleFactor, Math.abs(wheel.angleDelta.y)/120) );
+                            var numberOfWheelDeltaZoomIn = Math.abs(wheel.angleDelta.y)/120;
+                            var scaleFactorZoomIn = Math.pow(rootItem.zoomInDeltaScaleFactor, numberOfWheelDeltaZoomIn);
+                            workspace.scale = Math.min(rootItem.maximumScale, Math.max(rootItem.minimumScale, workspace.scale * scaleFactorZoomIn));
 
                             // Center our workspace
                             workspace.x = wheel.x - mousePositionInWorkspace.x * workspace.scale;

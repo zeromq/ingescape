@@ -36,7 +36,7 @@ ActionVM::ActionVM(ActionM* model,
     _startTime(startTime),
     _startTimeString("00:00:00.000"),
     _lineInTimeLine(-1),
-    _isValid(false),
+    _areConditionsValid(false),
     _currentExecution(NULL),
     _endTime(startTime)
 {
@@ -52,11 +52,11 @@ ActionVM::ActionVM(ActionM* model,
             int seconds = (startTime - hours*3600000 - minutes*60000) / 1000;
             int milliseconds = startTime%1000;
 
-            _startTimeString = QString::number(hours) + ":" + QString::number(minutes) + ":" + QString::number(seconds) + "." + QString::number(milliseconds);
+            _startTimeString = QString::number(hours).leftJustified(2, '0') + ":" + QString::number(minutes).leftJustified(2, '0') + ":" + QString::number(seconds).leftJustified(2, '0') + "." + QString::number(milliseconds).leftJustified(3, '0');
         }
 
         // Update valid flag
-        setisValid(model->isValid());
+        setareConditionsValid(model->isValid());
 
         // Set the action model
         setactionModel(model);
@@ -68,8 +68,9 @@ ActionVM::ActionVM(ActionM* model,
     //
     // Init the revert timer
     //
-    _timerToReverse.setSingleShot(true);
-    connect(&_timerToReverse, &QTimer::timeout, this, &ActionVM::_onTimeout_ReserseAction);
+    _timerToReverse = new QTimer();
+    _timerToReverse->setSingleShot(true);
+    connect(_timerToReverse, &QTimer::timeout, this, &ActionVM::_onTimeout_ReserseAction);
 
 }
 
@@ -87,6 +88,13 @@ ActionVM::~ActionVM()
 
     // Reset model of action
     setactionModel(NULL);
+
+    // Remove timer
+    if(_timerToReverse != NULL)
+    {
+        delete _timerToReverse;
+        _timerToReverse = NULL;
+    }
 }
 
 
@@ -118,7 +126,7 @@ void ActionVM::copyFrom(ActionVM* actionVM)
         setendTime(actionVM->endTime());
         setlineInTimeLine(actionVM->lineInTimeLine());
         setstartTimeString(actionVM->startTimeString());
-        setisValid(actionVM->isValid());
+        setareConditionsValid(actionVM->areConditionsValid());
     }
 }
 
@@ -252,12 +260,12 @@ void ActionVM::effectsExecuted(int currentTimeInMilliSeconds)
         if (_actionModel->shallRevertAfterTime() && _actionModel->revertAfterTime() > 0)
         {
             // Launch timer for revert
-            _timerToReverse.start(_actionModel->revertAfterTime());
+            _timerToReverse->start(_actionModel->revertAfterTime());
         }
         else if (_actionModel->shallRevertWhenValidityIsOver())
         {
             // Launch timer for revert
-            _timerToReverse.start(_endTime - currentTimeInMilliSeconds);
+            _timerToReverse->start(_endTime - currentTimeInMilliSeconds);
         }
         // No reverse
         else
@@ -325,9 +333,9 @@ void ActionVM::delayCurrentExecution(int currentTimeInMilliSeconds)
  * @brief Slot when the flag "is valid" changed in the model of action
  * @param isValid flag "is valid"
  */
-void ActionVM::_onIsValidChangedInModel(bool isValid)
+void ActionVM::_onIsValidChangedInModel(bool areConditionsValid)
 {
-    setisValid(isValid);
+    setareConditionsValid(areConditionsValid);
 }
 
 
@@ -432,5 +440,48 @@ void ActionVM::_onTimeout_ReserseAction()
     {
         // Emit the signal to send the action reversion
         Q_EMIT revertAction(_currentExecution);
+    }
+}
+
+/**
+  * @brief Initialize the action view model at a specific time
+  * @param time when to initialize the action VM
+  */
+void ActionVM::resetDataFrom(int time)
+{
+    // Update the conditions validation flag
+    if(_actionModel->isConnected())
+    {
+        setareConditionsValid(actionModel()->isValid());
+    } else {
+        setareConditionsValid(false);
+    }
+
+    // Reset the current action execution
+    setcurrentExecution(NULL);
+
+    // Get the relative time to the action view model
+    int relativeTime = time - _startTime;
+
+    // Check the actions executions
+    foreach (ActionExecutionVM* actionExecution, _executionsList.toList())
+    {
+        // The action execution is in the future
+        if(actionExecution->executionTime() >= relativeTime ||
+                (actionExecution->shallRevert()
+                                 && ((actionExecution->reverseTime() >= relativeTime))))
+        {
+            _executionsList.remove(actionExecution);
+        }
+    }
+
+    // Create the first action execution
+    if(time <= _startTime)
+    {
+        // Create the first (view model of) action execution
+        _createActionExecution(0);
+    } else {
+        // Create one default action execution in the current validation duration
+        _createActionExecution(relativeTime);
     }
 }

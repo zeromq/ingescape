@@ -66,7 +66,7 @@ public:
 
     /**
     * @brief Custom setter on set agent
-    *        to fill inputs and outputs
+    *        to fill with outputs
     * @param agent
     */
     void setagent(AgentInMappingVM* agent);
@@ -85,11 +85,6 @@ Q_SIGNALS:
 
 
 public Q_SLOTS:
-
-    /**
-      * @brief Slot on agent inputs list change
-      */
-    void onInputsListChange(QList<InputVM*> inputsList);
 
     /**
       * @brief Slot on agent outputs list change

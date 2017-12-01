@@ -105,7 +105,7 @@ public:
      * @param inputAgent
      * @param input
      */
-    Q_INVOKABLE void addMapBetweenAgents(AgentInMappingVM* outputAgent, OutputVM* output, AgentInMappingVM* inputAgent, InputVM* input);
+    Q_INVOKABLE void dropLinkBetweenAgents(AgentInMappingVM* outputAgent, OutputVM* output, AgentInMappingVM* inputAgent, InputVM* input);
 
 
     /**
@@ -154,6 +154,14 @@ Q_SIGNALS:
      * @param agent
      */
     void agentInMappingRemoved(AgentInMappingVM* removedAgent);
+
+
+    /**
+     * @brief Signal emitted when a command must be sent on the network to an agent
+     * @param peerIdsList
+     * @param command
+     */
+    void commandAskedToAgent(QStringList peerIdsList, QString command);
 
 
     /**
@@ -222,7 +230,7 @@ private Q_SLOTS:
      * @param currentAgentInMapping
      * @param inputsListAdded
      */
-    void _generateAllMapBetweenIopUsingNewlyAddedInputsVM(AgentInMappingVM* currentAgentInMapping, QList<InputVM*> inputsListAdded);
+    //void _generateAllMapBetweenIopUsingNewlyAddedInputsVM(AgentInMappingVM* currentAgentInMapping, QList<InputVM*> inputsListAdded);
 
 
     /**
@@ -233,7 +241,7 @@ private Q_SLOTS:
      * @param currentAgentInMapping
      * @param outputsListAdded
      */
-    void _completeAllPartialMapBetweenIopUsingNewlyOutputsVM(AgentInMappingVM* currentAgentInMapping, QList<OutputVM*> outputsListAdded);
+    //void _completeAllPartialMapBetweenIopUsingNewlyOutputsVM(AgentInMappingVM* currentAgentInMapping, QList<OutputVM*> outputsListAdded);
 
 
     /**
@@ -284,7 +292,7 @@ private:
      * @brief Deletes all the mapBetweenIOPVM where agent in paramater is involved as agentFrom in the map.
      * @param agentInMapping
      */
-    void _deleteAllMappingMadeOnTargetAgent(AgentInMappingVM *agentInMapping);
+    //void _deleteAllMappingMadeOnTargetAgent(AgentInMappingVM *agentInMapping);
 
 
     /**
@@ -295,10 +303,7 @@ private:
      * @param pointTo
      * @return
      */
-    bool _checkIfMapBetweenIOPVMAlreadyExist(AgentInMappingVM* agentFrom,
-                                             OutputVM *pointFrom,
-                                             AgentInMappingVM* agentTo,
-                                             InputVM *pointTo);
+    //bool _checkIfMapBetweenIOPVMAlreadyExist(AgentInMappingVM* agentFrom, OutputVM *pointFrom, AgentInMappingVM* agentTo, InputVM *pointTo);
 
 
     /**
@@ -316,8 +321,15 @@ private:
     MapBetweenIOPVM* _getLinkFromMappingElement(ElementMappingM* mappingElement);
 
 
+    /**
+     * @brief Remove all the links with this agent
+     * @param agent
+     */
+    void _removeAllLinksWithAgent(AgentInMappingVM* agent);
+
+
 private:
-    // Usefull to save it
+    // Manager for the data model of MASTIC
     MasticModelManager* _modelManager;
 
     // Map from agent name to the (view model of) agent in mapping

@@ -27,7 +27,7 @@ class ElementMappingM : public QObject
 {  
     Q_OBJECT
 
-    // Identifier with all names: [outputAgent##output-->input##inputAgent]
+    // Identifier with all names: [outputAgent##output-->inputAgent##input]
     I2_CPP_NOSIGNAL_PROPERTY(QString, id)
 
     // Input agent name

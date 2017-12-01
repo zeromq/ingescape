@@ -229,6 +229,7 @@ Item {
     // Lines height in timeline
     property int lineInTimeLineHeight : 30
 
+
     //-----------------------------------------
     //
     // Agents mapping UI elements
@@ -246,11 +247,16 @@ Item {
     //
     // Links
     //
-    // - Default state
+    // - stroke-width
     readonly property int agentsMappingLinkDefaultWidth: 3
     readonly property int agentsMappingBrinDefaultWidth: 6
 
+    // - stroke-dasharray
+    readonly property string agentsMappingLinkVirtualStrokeDashArray: "5, 5"
+    readonly property string agentsMappingBrinVirtualStrokeDashArray: "10, 10"
 
+
+    // - Default state
     readonly property color agentsMappingLinkDefaultColor: theme.whiteColor
     // - Hover state
     readonly property int agentsMappingLinkHoverFuzzyRadius: 4

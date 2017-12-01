@@ -23,6 +23,7 @@
 
 #include <QThread>
 #include <QApplication>
+#include <QCursor>
 
 
 /**
@@ -116,7 +117,7 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     _agentsMappingC = new AgentsMappingController(_modelManager, this);
 
     // Create the controller for scenario management
-    _scenarioC = new ScenarioController(scenariosPath, this);
+    _scenarioC = new ScenarioController(_modelManager, scenariosPath, this);
 
     // Create the controller for the history of values
     _valuesHistoryC = new ValuesHistoryController(_modelManager, this);
@@ -144,6 +145,7 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     connect(_modelManager, &MasticModelManager::addInputsToEditorForOutputs, _valuesHistoryC, &ValuesHistoryController::onAgentOutputsObserved);
     connect(_modelManager, &MasticModelManager::addInputsToEditorForOutputs, _networkC, &NetworkController::onAddInputsToEditorForOutputs);
     connect(_modelManager, &MasticModelManager::removeInputsToEditorForOutputs, _networkC, &NetworkController::onRemoveInputsToEditorForOutputs);
+    connect(_modelManager, &MasticModelManager::commandAskedToAgent, _networkC, &NetworkController::onCommandAskedToAgent);
 
 
     // Connect to signals from the controller for supervision of agents
@@ -156,6 +158,7 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
 
 
     // Connect to signals from the controller for mapping of agents
+    connect(_agentsMappingC, &AgentsMappingController::commandAskedToAgent, _networkC, &NetworkController::onCommandAskedToAgent);
     connect(_agentsMappingC, &AgentsMappingController::commandAskedToAgentAboutMappingInput, _networkC, &NetworkController::onCommandAskedToAgentAboutMappingInput);
     connect(_agentsMappingC, &AgentsMappingController::agentInMappingAdded, _scenarioC, &ScenarioController::onAgentInMappingAdded);
     connect(_agentsMappingC, &AgentsMappingController::agentInMappingRemoved, _scenarioC, &ScenarioController::onAgentInMappingRemoved);
@@ -339,4 +342,17 @@ void MasticEditorController::closeActionEditor(ActionEditorController* actionEdi
 void MasticEditorController::forceCreation()
 {
     qDebug() << "Force the creation of our singleton from QML";
+}
+
+
+/**
+ * @brief Get the position of the mouse cursor in global screen coordinates
+ *
+ * @remarks You must use mapToGlobal to convert it to local coordinates
+ *
+ * @return
+ */
+QPointF MasticEditorController::getGlobalMousePosition()
+{
+    return QCursor::pos();
 }

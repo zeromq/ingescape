@@ -21,11 +21,12 @@
 #include <QJSEngine>
 
 #include "I2PropertyHelpers.h"
+
+#include <controller/masticmodelmanager.h>
+#include <controller/actioneditorcontroller.h>
 #include "viewModel/actionvm.h"
 #include "viewModel/agentinmappingvm.h"
 #include "viewModel/actioninpalettevm.h"
-#include "controller/actioneditorcontroller.h"
-#include "masticmodelmanager.h"
 
 
 // Margin in milliseconds to insert an action following another
@@ -103,14 +104,18 @@ class ScenarioController: public QObject
     // Next action view model to active
     I2_QML_PROPERTY(ActionVM*, nextActionVMToActive)
 
+
 public:
 
     /**
-     * @brief Default constructor
-     * @param scenarios files path
+     * @brief Constructor
+     * @param modelManager
+     * @param scenariosPath Path of files with scenarios
      * @param parent
      */
-    explicit ScenarioController(QString scenariosPath, QObject *parent = 0);
+    explicit ScenarioController(MasticModelManager* modelManager,
+                                QString scenariosPath,
+                                QObject *parent = 0);
 
 
     /**
@@ -284,9 +289,9 @@ private Q_SLOTS:
 
 
     /**
-     * @brief Called at each interval of our timer to delay actions (when their conditions are not valid)
+     * @brief Called at each interval of our timer to delay actions when their conditions are not valid or execute them otherwise
      */
-    void _onTimeout_DelayActions();
+    void _onTimeout_DelayOrExecuteActions();
 
 
 private :
@@ -359,7 +364,17 @@ private :
      */
     void _executeAction(ActionVM* actionVM, ActionExecutionVM* actionExecution, int currentTimeInMilliSeconds);
 
+    /**
+      * @brief Initialize the action view model at a specific time
+      * @param action view model
+      * @param time when to initialize the action VM
+      */
+    void _initializeActionVMAt(ActionVM * actionVM, int currentTimeInMilliSeconds);
+
 protected:
+
+    // Manager for the data model of MASTIC
+    MasticModelManager* _modelManager;
 
     // Path to the directory containing JSON files to save scenarios
     QString _scenariosDirectoryPath;

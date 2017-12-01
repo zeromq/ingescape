@@ -154,6 +154,8 @@ ApplicationWindow {
             MenuItem {
                 text: qsTr("Zoom In")
 
+                shortcut: StandardKey.ZoomIn
+
                 onTriggered: {
                     if (MasticEditorC.agentsMappingC)
                     {
@@ -164,6 +166,8 @@ ApplicationWindow {
 
             MenuItem {
                 text: qsTr("Zoom Out")
+
+                shortcut: StandardKey.ZoomOut
 
                 onTriggered: {
                     if (MasticEditorC.agentsMappingC)

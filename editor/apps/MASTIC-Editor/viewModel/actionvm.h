@@ -49,7 +49,7 @@ class ActionVM: public QObject
     I2_QML_PROPERTY(int, lineInTimeLine)
 
     // Flag indicating if all conditions of our action are valid
-    I2_QML_PROPERTY(bool, isValid)
+    I2_QML_PROPERTY(bool, areConditionsValid)
 
     // List of executions of our action
     I2_QOBJECT_LISTMODEL(ActionExecutionVM, executionsList)
@@ -63,6 +63,9 @@ class ActionVM: public QObject
     // FOREVER : -1
     // IMMEDIATE : startime
     I2_QML_PROPERTY(int, endTime)
+
+    // Timer to wait for action revert
+    I2_CPP_PROPERTY(QTimer*, timerToReverse)
 
 public:
 
@@ -110,6 +113,12 @@ public:
      */
     void delayCurrentExecution(int currentTimeInMilliSeconds);
 
+    /**
+      * @brief Initialize the action view model at a specific time
+      * @param time when to initialize the action VM
+      */
+    void resetDataFrom(int time);
+
 
 Q_SIGNALS:
 
@@ -125,7 +134,7 @@ private Q_SLOTS:
      * @brief Slot when the flag "is valid" changed in the model of action
      * @param isValid flag "is valid"
      */
-    void _onIsValidChangedInModel(bool isValid);
+    void _onIsValidChangedInModel(bool areConditionsValid);
 
 
     /**
@@ -152,9 +161,6 @@ private:
      * @param startTime relative to our view model of action
      */
     void _createActionExecution(int startTime);
-
-    // Timer to wait for action revert
-    QTimer _timerToReverse;
 };
 
 QML_DECLARE_TYPE(ActionVM)

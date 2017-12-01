@@ -144,6 +144,7 @@ Item {
                         borderWidth: 0;
                         cornerRadius: 5;
                         labelMargin: 0;
+                        elideMode:Text.ElideRight;
 
                         font {
                             family: MasticTheme.labelFontFamily;
