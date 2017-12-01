@@ -105,7 +105,7 @@ public:
      * @param inputAgent
      * @param input
      */
-    Q_INVOKABLE void addMapBetweenAgents(AgentInMappingVM* outputAgent, OutputVM* output, AgentInMappingVM* inputAgent, InputVM* input);
+    Q_INVOKABLE void dropLinkBetweenAgents(AgentInMappingVM* outputAgent, OutputVM* output, AgentInMappingVM* inputAgent, InputVM* input);
 
 
     /**

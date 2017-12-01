@@ -70,6 +70,9 @@ class AgentInMappingVM : public QObject
     // Number of active agents
     I2_QML_PROPERTY_READONLY(int, activeAgentsNumber)
 
+    // Mapping currently edited (temporary until the user activate the mapping)
+    I2_CPP_NOSIGNAL_PROPERTY(AgentMappingM*, temporaryMapping)
+
 
 public:
     /**
@@ -105,6 +108,24 @@ public:
      * @return
      */
     QStringList getPeerIdsList();
+
+
+    /**
+     * @brief Add a temporary link (this temporary link will became a real link when the user will activate the mapping)
+     * @param inputName
+     * @param outputAgentName
+     * @param outputName
+     */
+    void addTemporaryLink(QString inputName, QString outputAgentName, QString outputName);
+
+
+    /**
+     * @brief Remove temporary link (this temporary link will be removed when the user will activate the mapping)
+     * @param inputName
+     * @param outputAgentName
+     * @param outputName
+     */
+    void removeTemporaryLink(QString inputName, QString outputAgentName, QString outputName);
 
 
 Q_SIGNALS:

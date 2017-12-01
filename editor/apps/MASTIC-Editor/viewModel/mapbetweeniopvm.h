@@ -45,6 +45,11 @@ class MapBetweenIOPVM : public QObject
     // Flag indicating if our link is virtual (agents are not really linked on the network)
     I2_QML_PROPERTY_READONLY(bool, isVirtual)
 
+    // Identifier with all names: [outputAgent##output-->inputAgent##input]
+    //I2_CPP_NOSIGNAL_PROPERTY(QString, id)
+
+    // Identifier with agents names and Input/Output ids: [outputAgent##output::type-->inputAgent##input::type]
+    //I2_CPP_NOSIGNAL_PROPERTY(QString, uid)
 
 public:
 
