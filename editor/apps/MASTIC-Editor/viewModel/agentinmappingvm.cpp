@@ -371,6 +371,9 @@ void AgentInMappingVM::_agentModelAdded(AgentM* model)
             // Emit signal "Outputs List Added"
             Q_EMIT outputsListAdded(outputsListToAdd);
         }
+
+        // Emit signal "models of Inputs and Outputs Changed"
+        Q_EMIT modelsOfInputsAndOutputsChanged();
     }
 }
 
@@ -433,6 +436,9 @@ void AgentInMappingVM::_agentModelRemoved(AgentM* model)
                 _outputsList.remove(outputVM);
             }
         }
+
+        // Emit signal "models of Inputs and Outputs Changed"
+        Q_EMIT modelsOfInputsAndOutputsChanged();
     }
 }
 

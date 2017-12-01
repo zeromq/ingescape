@@ -158,6 +158,12 @@ Q_SIGNALS:
     void outputsListWillBeRemoved(QList<OutputVM*> outputsListWillBeRemoved);
 
 
+    /**
+     * @brief Signal emitted when the models of Inputs and Outputs changed
+     */
+    void modelsOfInputsAndOutputsChanged();
+
+
 public Q_SLOTS:
 
     /**
