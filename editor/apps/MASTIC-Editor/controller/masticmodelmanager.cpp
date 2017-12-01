@@ -265,10 +265,10 @@ void MasticModelManager::onMappingReceived(QString peerId, QString agentName, QS
                     AgentMappingM* previousMapping = agent->mapping();
 
                     // Same name, version and description
-                    if ((agentMapping->name() == previousMapping->name())
+                    /*if ((agentMapping->name() == previousMapping->name())
                             && (agentMapping->version() == previousMapping->version())
                             && (agentMapping->description() == previousMapping->description()))
-                    {
+                    {*/
                         //qDebug() << "Previous Mapping" << previousMapping->mappingElementsIds();
                         QStringList idsOfRemovedMappingElements;
                         foreach (QString idPreviousList, previousMapping->mappingElementsIds()) {
@@ -323,10 +323,10 @@ void MasticModelManager::onMappingReceived(QString peerId, QString agentName, QS
 
                         // Delete a model of agent mapping
                         deleteAgentMapping(previousMapping);
-                    }
+                    /*}
                     else {
                         // FIXME TODO
-                    }
+                    }*/
                 }
             }
         }

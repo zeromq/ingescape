@@ -191,7 +191,7 @@ void AgentsMappingController::dropAgentToMappingAtPosition(QString agentName, Ab
                             peerIdsList.append(model->peerId());
 
                             // Emit the signal to send the command "CLEAR_MAPPING" on the network to the agent
-                            //Q_EMIT commandAskedToAgent(peerIdsList, "CLEAR_MAPPING");
+                            Q_EMIT commandAskedToAgent(peerIdsList, "CLEAR_MAPPING");
                         }
                         // Model is OFF
                         else {
