@@ -108,6 +108,13 @@ Item {
                         }
                     }
                 }
+
+                MouseArea {
+                    anchors.fill: parent;
+                    onClicked: {
+                        controller.selectedAction = null;
+                    }
+                }
             }
 
 

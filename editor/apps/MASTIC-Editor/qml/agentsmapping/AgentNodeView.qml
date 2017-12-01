@@ -157,7 +157,12 @@ Rectangle {
 
         onPressed: {
             if (controller && agentMappingVM) {
-                controller.selectedAgent = agentMappingVM
+                if(controller.selectedAgent === agentMappingVM)
+                {
+                    controller.selectedAgent = null;
+                } else {
+                    controller.selectedAgent = agentMappingVM;
+                }
             }
 
             // bring our agent to front

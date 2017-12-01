@@ -138,6 +138,13 @@ Item {
                     }
                 }
 
+                MouseArea {
+                    anchors.fill: parent;
+                    onClicked: {
+                        controller.selectedAgent = null;
+                    }
+                }
+
             }
 
             Column {
