@@ -33,7 +33,7 @@ class OutputM : public AgentIOPM
     I2_QML_PROPERTY(bool, isMuted)
 
     // Flag indicating if our output is muted (updated with message from the network)
-    I2_CPP_PROPERTY_CUSTOM_SETTER(bool, isMutedOutput)
+    I2_QML_PROPERTY_CUSTOM_SETTER(bool, isMutedOutput)
 
     // Flag indicating if all outputs of the agent are muted (updated with message from the network)
     I2_CPP_PROPERTY_CUSTOM_SETTER(bool, isMutedAllOutputs)

@@ -592,7 +592,8 @@ I2PopupBase {
                                                     fileCache: MasticTheme.svgFileMASTIC
 
                                                     pressedID: releasedID + "-pressed"
-                                                    releasedID: model.isMuted? "muteactif" : "muteinactif"
+                                                    releasedID: model.isMutedOutput ? "muteactif" : "muteinactif"
+
                                                     disabledID : releasedID
 
                                                 }
