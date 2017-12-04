@@ -405,7 +405,7 @@ void ScenarioController::importScenarioFromFile()
 {
     // "File Dialog" to get the files (paths) to open
     QString scenarioFilePath = QFileDialog::getOpenFileName(NULL,
-                                                                "Importer un fichier scénario",
+                                                                "Import scenario",
                                                                 _scenariosDirectoryPath,
                                                                 "JSON (*.json)");
 

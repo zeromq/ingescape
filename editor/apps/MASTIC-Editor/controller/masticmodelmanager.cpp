@@ -107,7 +107,7 @@ void MasticModelManager::importAgentsListFromSelectedFile()
 {
     // "File Dialog" to get the file (path) to open
     QString agentsListFilePath = QFileDialog::getOpenFileName(NULL,
-                                                              "Importer un fichier JSON avec une liste d'agents",
+                                                              "Import agents",
                                                               _agentsListDirectoryPath,
                                                               "JSON (*.json)");
 
@@ -125,7 +125,8 @@ void MasticModelManager::importAgentFromSelectedFiles()
 {
     // "File Dialog" to get the files (paths) to open
     QStringList agentFilesPaths = QFileDialog::getOpenFileNames(NULL,
-                                                                "Importer le fichier de définition (et de mapping) d'un agent",
+                                                                //"Import an agent definition (and an agent mapping)",
+                                                                "Import an agent definition",
                                                                 _dataDirectoryPath,
                                                                 "JSON (*.json)");
 
