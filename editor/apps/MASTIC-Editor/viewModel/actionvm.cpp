@@ -294,7 +294,7 @@ void ActionVM::reverseEffectsExecuted(int currentTimeInMilliSeconds)
         setcurrentExecution(NULL);
 
         // Shall rearm
-        if (_actionModel->shallRearm())
+        if (_actionModel->shallRearm() && (currentTimeInMilliSeconds < _endTime || _endTime == -1))
         {
             // Create a new (view model of) action execution
             _createActionExecution(currentTimeInMilliSeconds - _startTime);
