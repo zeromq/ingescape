@@ -75,8 +75,8 @@ class AgentM : public QObject
     // Mapping of our agent
     I2_QML_PROPERTY_READONLY(AgentMappingM*, mapping)
 
-    // Flag indicating if we have to clear the mapping of our agent (when it will send its mapping)
-    I2_QML_PROPERTY_READONLY(bool, mustClearMapping)
+    // Flag indicating if we have to overwrite the mapping of our agent (when it will send its mapping)
+    I2_QML_PROPERTY_READONLY(bool, mustOverWriteMapping)
 
 
 public:

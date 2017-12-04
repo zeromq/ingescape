@@ -41,7 +41,7 @@ AgentMappingM::AgentMappingM(QString name,
  */
 AgentMappingM::~AgentMappingM()
 {
-    qInfo() << "Delete Model of Agent Mapping" << _name;
+    //qInfo() << "Delete Model of Agent Mapping" << _name;
 
     // Clear the list (no delete all)
     _elementMappingsList.clear();
