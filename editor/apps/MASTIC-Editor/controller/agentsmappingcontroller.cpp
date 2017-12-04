@@ -171,27 +171,28 @@ void AgentsMappingController::dropAgentToMappingAtPosition(QString agentName, Ab
             _addAgentModelsToMappingAtPosition(agentName, agentsList->toList(), position);
 
             agentInMapping = getAgentInMappingFromName(agentName);
-
-            if ((agentInMapping != NULL) && (agentInMapping->temporaryMapping() != NULL))
+            if (agentInMapping != NULL)
             {
-                // Mapping is activated
-                //if ((_modelManager != NULL) && _modelManager->isActivatedMapping()) {
-
                 // Get the mapping currently edited (temporary until the user activate the mapping)
                 AgentMappingM* temporaryMapping = agentInMapping->temporaryMapping();
+                if (temporaryMapping != NULL)
+                {
+                    // Delete all "mapping elements" in this temporary mapping
+                    temporaryMapping->elementMappingsList()->deleteAllItems();
 
-                // Delete all "mapping elements" in this temporary mapping
-                temporaryMapping->elementMappingsList()->deleteAllItems();
-
-                //
-                foreach (AgentM* model, agentsList->toList()) {
-                    if (model != NULL)
+                    // Mapping is already activated
+                    if ((_modelManager != NULL) && _modelManager->isActivatedMapping())
                     {
-                        // Emit the signal to send the command "CLEAR_MAPPING" on the network to the agent
-                        //Q_EMIT commandAskedToAgent(peerIdsList, "CLEAR_MAPPING");
+                        foreach (AgentM* model, agentsList->toList()) {
+                            if (model != NULL)
+                            {
+                                // Emit the signal to send the command "CLEAR_MAPPING" on the network to the agent
+                                //Q_EMIT commandAskedToAgent(peerIdsList, "CLEAR_MAPPING");
 
-                        // OverWrite the mapping of the model of agent (with the mapping currently edited in the agent in mapping)
-                        _overWriteMappingOfAgentModel(model, temporaryMapping);
+                                // OverWrite the mapping of the model of agent (with the mapping currently edited in the agent in mapping)
+                                _overWriteMappingOfAgentModel(model, temporaryMapping);
+                            }
+                        }
                     }
                 }
 
