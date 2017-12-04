@@ -88,6 +88,13 @@ public:
 
 
     /**
+     * @brief Set the flag "is Muted" of all Outputs of our agent definition
+     * @param isMuted
+     */
+    void setisMutedOfAllOutputs(bool isMuted);
+
+
+    /**
      * @brief Return true if the 2 definitions are strictly identicals
      * @param definition1
      * @param definition2

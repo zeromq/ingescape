@@ -75,7 +75,21 @@ void DefinitionM::setisMutedOfOutput(bool isMuted, QString outputName)
 {
     OutputM* output = getOutputWithName(outputName);
     if (output != NULL) {
-        output->setisMuted(isMuted);
+        output->setisMutedOutput(isMuted);
+    }
+}
+
+
+/**
+ * @brief Set the flag "is Muted" of all Outputs of our agent definition
+ * @param isMuted
+ */
+void DefinitionM::setisMutedOfAllOutputs(bool isMuted)
+{
+    foreach (OutputM* output, _outputsList.toList()) {
+        if (output != NULL) {
+            output->setisMutedAllOutputs(isMuted);
+        }
     }
 }
 

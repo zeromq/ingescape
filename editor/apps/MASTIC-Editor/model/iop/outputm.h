@@ -29,8 +29,14 @@ class OutputM : public AgentIOPM
 {
     Q_OBJECT
 
-    // Flag indicating if our output is muted
+    // Flag indicating if our output is muted (for feedbacks on HMI)
     I2_QML_PROPERTY(bool, isMuted)
+
+    // Flag indicating if our output is muted (updated with message from the network)
+    I2_CPP_PROPERTY_CUSTOM_SETTER(bool, isMutedOutput)
+
+    // Flag indicating if all outputs of the agent are muted (updated with message from the network)
+    I2_CPP_PROPERTY_CUSTOM_SETTER(bool, isMutedAllOutputs)
 
 
 public:
@@ -66,6 +72,14 @@ Q_SIGNALS:
      * @param name
      */
     void commandAsked(QString command, QString name);
+
+
+private:
+
+    /**
+     * @brief Update the flag "Is Muted" (for feedbacks on HMI)
+     */
+    void _updateIsMuted();
 
 
 public Q_SLOTS:
