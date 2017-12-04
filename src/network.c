@@ -759,7 +759,7 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     name = strtok (subStr," ");
                     value = strtok (NULL," ");
                     if (name != NULL && value != NULL){
-                        mtic_writeInput(name, value, 0);
+                        mtic_writeInput(name, value, sizeof(char)*strlen(value));//last paramter is used for DATA only
                     }
                 }else if ((strncmp (message, "SET_OUTPUT ", strlen("SET_OUTPUT ")) == 0) && (strlen(message) > strlen("SET_OUTPUT ")+1)){
                     char *subStr = message + strlen("SET_OUTPUT") + 1;
@@ -767,7 +767,7 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     name = strtok (subStr," ");
                     value = strtok (NULL," ");
                     if (name != NULL && value != NULL){
-                        mtic_writeOutput(name, value, 0);
+                        mtic_writeOutput(name, value, sizeof(char)*strlen(value));//last paramter is used for DATA only
                     }
                 }else if ((strncmp (message, "SET_PARAMETER ", strlen("SET_PARAMETER ")) == 0) && (strlen(message) > strlen("SET_PARAMETER ")+1)){
                     char *subStr = message + strlen("SET_PARAMETER") + 1;
@@ -775,7 +775,7 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     name = strtok (subStr," ");
                     value = strtok (NULL," ");
                     if (name != NULL && value != NULL){
-                        mtic_writeParameter(name, value, 0);
+                        mtic_writeParameter(name, value, sizeof(char)*strlen(value));//last paramter is used for DATA only
                     }
                 }else if ((strncmp (message, "MAP ", strlen("MAP ")) == 0) && (strlen(message) > strlen("MAP ")+1)){
                     char *subStr = message + strlen("MAP") + 1;
