@@ -73,15 +73,21 @@ void AgentsMappingController::createNewMapping()
 {
     qInfo() << "Clear current (previous) mapping";
 
-    // Remove all agents from the mapping and delete them
-    foreach (AgentInMappingVM* agent, _agentInMappingVMList.toList()) {
-        if (agent != NULL) {
-            deleteAgentInMapping(agent);
-        }
-    }
-
+    // 1- First, DE-activate the mapping
     if (_modelManager != NULL) {
         _modelManager->setisActivatedMapping(false);
+    }
+
+    // 2- Delete all links
+    foreach (MapBetweenIOPVM* link, _allMapInMapping.toList())
+    {
+        // Delete the link between two agents
+        _deleteLinkBetweenTwoAgents(link);
+    }
+
+    // 3- Delete all agents in mapping
+    foreach (AgentInMappingVM* agent, _agentInMappingVMList.toList()) {
+        deleteAgentInMapping(agent);
     }
 
     qInfo() << "Create a new (empty) Mapping";

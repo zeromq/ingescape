@@ -60,7 +60,8 @@ SOURCES += main.cpp \
     model/scenario/effect/actioneffectm.cpp \
     model/scenario/effect/iopvalueeffectm.cpp \
     model/scenario/effect/mappingeffectm.cpp \
-    model/scenario/effect/effectonagentm.cpp
+    model/scenario/effect/effectonagentm.cpp \
+    controller/masticlaunchermanager.cpp
 
 HEADERS += \
     model/agentm.h \
@@ -116,7 +117,8 @@ HEADERS += \
     model/scenario/effect/actioneffectm.h \
     model/scenario/effect/iopvalueeffectm.h \
     model/scenario/effect/mappingeffectm.h \
-    model/scenario/effect/effectonagentm.h
+    model/scenario/effect/effectonagentm.h \
+    controller/masticlaunchermanager.h
 
 
 RESOURCES += qml.qrc
