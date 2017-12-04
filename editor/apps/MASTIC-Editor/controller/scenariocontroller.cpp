@@ -105,6 +105,7 @@ ScenarioController::ScenarioController(MasticModelManager* modelManager,
     connect(&_timerToExecuteActions, &QTimer::timeout, this, &ScenarioController::_onTimeout_ExecuteActions);
 
     _timerToRegularlyDelayActions.setInterval(INTERVAL_DELAY_ACTIONS);
+    _timerToRegularlyDelayActions.setSingleShot(true);
     connect(&_timerToRegularlyDelayActions, &QTimer::timeout, this, &ScenarioController::_onTimeout_DelayOrExecuteActions);
 }
 
@@ -1202,7 +1203,7 @@ void ScenarioController::_onTimeout_DelayOrExecuteActions()
             // Current time is after the end time of action (or the action has no validity duration --> Immediate)
             else if(actionVM->endTime() <= currentTimeInMilliSeconds)
             {
-                if (actionExecution != NULL)
+                if (actionExecution != NULL && actionVM->timerToReverse()->isActive() == false)
                 {
                     // the action has never been executed if there is only one Action Execution (the initial one) and its execution flag is false
                     actionExecution->setneverExecuted(actionVM->executionsList()->count() <= 1 && actionExecution->isExecuted() == false);
@@ -1225,8 +1226,11 @@ void ScenarioController::_onTimeout_DelayOrExecuteActions()
                     }
                 }
 
-                // Remove from the list of "active" actions
-                disconnect(actionVM,&ActionVM::revertAction, this, &ScenarioController::onRevertAction);
+                if(actionVM->timerToReverse()->isActive() == false)
+                {
+                    // Remove from the list of "active" actions
+                    disconnect(actionVM,&ActionVM::revertAction, this, &ScenarioController::onRevertAction);
+                }
                 _activeActionsVMList.remove(actionVM);
             }
         }
@@ -1234,6 +1238,11 @@ void ScenarioController::_onTimeout_DelayOrExecuteActions()
 
     // Save our scenario start
     _scenarioStartingTimeInMs = currentTimeOfDay;
+
+    if(_isPlaying == true)
+    {
+        _timerToRegularlyDelayActions.start(INTERVAL_DELAY_ACTIONS);
+    }
 }
 
 
@@ -1307,7 +1316,7 @@ void ScenarioController::_startScenario()
         _timerToExecuteActions.start(_nextActionVMToActive->startTime() - _currentTime.msecsSinceStartOfDay());
     }
 
-    _timerToRegularlyDelayActions.start();
+    _timerToRegularlyDelayActions.start(INTERVAL_DELAY_ACTIONS);
 }
 
 
@@ -1323,7 +1332,10 @@ void ScenarioController::_stopScenario()
     {
         _timerToExecuteActions.stop();
     }
-    _timerToRegularlyDelayActions.stop();
+    if(_timerToRegularlyDelayActions.isActive())
+    {
+        _timerToRegularlyDelayActions.stop();
+    }
 
     // Desactive revert timers
     foreach (ActionVM* actionVM, _activeActionsVMList.toList())
@@ -1515,5 +1527,15 @@ void ScenarioController::onRevertAction(ActionExecutionVM* actionExecution)
 
         // Notify the action that its reverse effects has been executed
         actionVM->reverseEffectsExecuted(currentTimeInMilliSeconds);
+
+        // The revert action has been done after the end of the action validity
+        if(actionVM->endTime() >= 0 && currentTimeInMilliSeconds >= actionVM->endTime())
+        {
+            // ...we remove the current execution
+            actionVM->setcurrentExecution(NULL);
+
+            // Remove from the list of "active" actions
+            disconnect(actionVM,&ActionVM::revertAction, this, &ScenarioController::onRevertAction);
+        }
     }
 }

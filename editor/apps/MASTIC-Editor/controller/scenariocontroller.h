@@ -36,7 +36,7 @@
 #define MINIMUM_DISPLAYED_LINES_NUMBER_IN_TIMELINE 7
 
 // Interval in milli-seconds to regularly delay actions (when their conditions are not valid)
-#define INTERVAL_DELAY_ACTIONS 200
+#define INTERVAL_DELAY_ACTIONS 25
 
 
 /**
