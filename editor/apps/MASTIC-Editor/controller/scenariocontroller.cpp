@@ -528,7 +528,7 @@ void ScenarioController::exportScenarioToSelectedFile()
 {
     // "File Dialog" to get the file (path) to save
     QString scenarioFilePath = QFileDialog::getSaveFileName(NULL,
-                                                              "Sauvegarder dans un fichier JSON e scenario",
+                                                              "Export scenario",
                                                               _scenariosDirectoryPath,
                                                               "JSON (*.json)");
 

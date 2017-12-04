@@ -153,7 +153,7 @@ void MasticModelManager::exportAgentsListToSelectedFile(QList<QPair<QString, Def
 {
     // "File Dialog" to get the file (path) to save
     QString agentsListFilePath = QFileDialog::getSaveFileName(NULL,
-                                                              "Sauvegarder dans un fichier JSON la liste d'agents",
+                                                              "Export agents",
                                                               _agentsListDirectoryPath,
                                                               "JSON (*.json)");
 
