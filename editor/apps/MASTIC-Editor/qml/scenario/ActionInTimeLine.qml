@@ -107,6 +107,9 @@ Item {
         height : conditionsValidityRect.height
         width : childrenRect.width
 
+        // capture minimum X value in order to make the clic enable on the whole actionInTimeline item when the x value is below 0;
+        property real minimunXValueInExecutionList : 0;
+
         // executions List
         Repeater {
             model: if (myActionVM) {
@@ -120,10 +123,17 @@ Item {
                 height : conditionsValidityRect.height
                 width : model.shallRevert? revertItem.width : notRevertItem.width;
 
+
                 // Not revert action
                 I2SvgItem {
                     id : notRevertItem
                     x : viewController.convertDurationInMillisecondsToLengthInCoordinateSystem(model.executionTime, viewController.pixelsPerMinute) - width/2;
+
+                    onXChanged: {
+                        if (visible) {
+                            executionsItem.minimunXValueInExecutionList = Math.min(executionsItem.minimunXValueInExecutionList, notRevertItem.x);
+                        }
+                    }
 
                     anchors {
                         verticalCenter: parent.verticalCenter
@@ -182,21 +192,8 @@ Item {
                     }
                 }
 
-
-
-    //            MouseArea {
-    //                x : model.shallRevert? revertItem.x : notRevertItem.x;
-    //                anchors {
-    //                    top : parent.top
-    //                    bottom : parent.bottom
-    //                    bottomMargin: - actionVMItem.lineHeight/2
-    //                }
-    //                width : parent.width
-
-    //            }
             }
         }
-
     }
 
     // Action Name
@@ -235,11 +232,14 @@ Item {
         anchors {
             top : actionVMItem.top
             bottom : actionVMItem.bottom
-            left : actionVMItem.left
-            leftMargin: (actionVMItem.myActionVM && actionVMItem.myActionVM.actionModel && !actionVMItem.myActionVM.actionModel.shallRevert) ? -5 : 0
         }
+        // according to the executions list executionsItem.x value could be below actionVMItem.x
+        x : Math.min(executionsItem.minimunXValueInExecutionList, 0);
 
-        width : Math.max(backgroundActionName.width, actionVMItem.width, executionsItem.width)
+        // find element with the maximum width in the actionInTimeline item : could be the name, conditions validity time or executions list
+        width : Math.max(backgroundActionName.width,
+                         actionVMItem.width,
+                         executionsItem.width) - x
         hoverEnabled: true
         onClicked: {
             actionVMItem.forceActiveFocus()

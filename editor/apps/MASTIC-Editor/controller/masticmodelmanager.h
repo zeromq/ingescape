@@ -26,7 +26,7 @@
 
 
 /**
- * @brief The MasticModelManager class defines a manager for the data model of MASTIC
+ * @brief The MasticModelManager class defines the manager for the data model of MASTIC
  */
 class MasticModelManager : public QObject
 {
