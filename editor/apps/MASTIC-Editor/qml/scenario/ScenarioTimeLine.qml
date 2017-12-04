@@ -37,10 +37,6 @@ Item {
     property var viewController : MasticEditorC.timeLineC;
 
 
-    // Zoom-in delta scale factor
-    readonly property real zoomInDeltaScaleFactor: 1.2
-
-
     // graphical properties
     property int linesNumber : controller ? controller.linesNumberInTimeLine : 0;
     property int lineHeight : MasticTheme.lineInTimeLineHeight
@@ -51,6 +47,33 @@ Item {
     //
     //--------------------------------
 
+    function updateZoomOfTimeLine(deltaScale, centerPointX, centerPointY) {
+        // Check bounds of our delta scale
+        var previousPixelsPerMinute = viewController.pixelsPerMinute;
+        var newPixelsPerMinute = previousPixelsPerMinute * deltaScale;
+
+        if (newPixelsPerMinute < viewController.minPixelsPerMinute)
+        {
+            newPixelsPerMinute = viewController.minPixelsPerMinute;
+            deltaScale = newPixelsPerMinute/previousPixelsPerMinute;
+        }
+        else if (newPixelsPerMinute > viewController.maxPixelsPerMinute)
+        {
+            newPixelsPerMinute = viewController.maxPixelsPerMinute;
+            deltaScale = newPixelsPerMinute/previousPixelsPerMinute;
+        }
+
+        // Resize content
+        contentArea.resizeContent(
+                    contentArea.contentWidth * deltaScale,
+                    contentArea.contentHeight,
+                    Qt.point(centerPointX, centerPointY)
+                  //  Qt.point(contentArea.contentX + contentArea.width/2, contentArea.contentY + contentArea.height/2)
+                    );
+
+        // Update current time unit
+        viewController.pixelsPerMinute *= deltaScale;
+    }
 
 
     //--------------------------------
@@ -199,30 +222,7 @@ Item {
                     // Compute delta between our new scale factor and the previous one
                     var deltaScale = pinch.scale/pinch.previousScale;
 
-                    // Check bounds of our delta scale
-                    var previousPixelsPerMinute = viewController.pixelsPerMinute;
-                    var newPixelsPerMinute = previousPixelsPerMinute * deltaScale;
-
-                    if (newPixelsPerMinute < viewController.minPixelsPerMinute)
-                    {
-                        newPixelsPerMinute = viewController.minPixelsPerMinute;
-                        deltaScale = newPixelsPerMinute/previousPixelsPerMinute;
-                    }
-                    else if (newPixelsPerMinute > viewController.maxPixelsPerMinute)
-                    {
-                        newPixelsPerMinute = viewController.maxPixelsPerMinute;
-                        deltaScale = newPixelsPerMinute/previousPixelsPerMinute;
-                    }
-
-                    // Resize content
-                    contentArea.resizeContent(
-                                contentArea.contentWidth * deltaScale,
-                                contentArea.contentHeight,
-                                Qt.point(contentArea.contentX + contentArea.width/2, contentArea.contentY + contentArea.height/2)
-                                );
-
-                    // Update current time unit
-                    viewController.pixelsPerMinute *= deltaScale;
+                    rootItem.updateZoomOfTimeLine (deltaScale, contentArea.contentX + contentArea.width/2, contentArea.contentY + contentArea.height/2);
                 }
             }
 
@@ -277,69 +277,23 @@ Item {
 
                             var previousPixelsPerMinute = viewController.pixelsPerMinute;
                             var deltaScale;
-                            var newPixelsPerMinute;
 
                             // Check if we must zoom-in or zoom-out
                             if (wheel.angleDelta.y < 0)
                             {
 
-                                // Compute delta between our new scale factor and the previous one
+                                // Compute delta scale according to wheel.angleDelta
                                 deltaScale = Math.pow(1/1.2, Math.abs(wheel.angleDelta.y)/120) ;
 
-                                // Check bounds of our delta scale
-                                newPixelsPerMinute = previousPixelsPerMinute * deltaScale;
-
-                                if (newPixelsPerMinute < viewController.minPixelsPerMinute)
-                                {
-                                    newPixelsPerMinute = viewController.minPixelsPerMinute;
-                                    deltaScale = newPixelsPerMinute/previousPixelsPerMinute;
-                                }
-                                else if (newPixelsPerMinute > viewController.maxPixelsPerMinute)
-                                {
-                                    newPixelsPerMinute = viewController.maxPixelsPerMinute;
-                                    deltaScale = newPixelsPerMinute/previousPixelsPerMinute;
-                                }
-
-                                // Resize content
-                                contentArea.resizeContent(
-                                            contentArea.contentWidth * deltaScale,
-                                            contentArea.contentHeight,
-                                            Qt.point(contentArea.contentX + contentArea.width/2, contentArea.contentY + contentArea.height/2)
-                                            );
-
-                                // Update current time unit
-                                viewController.pixelsPerMinute *= deltaScale;
-
+                                rootItem.updateZoomOfTimeLine (deltaScale, x, contentArea.contentY + contentArea.height/2);
                             }
                             else if (wheel.angleDelta.y > 0)
                             {
 
-                                // Compute delta between our new scale factor and the previous one
+                                // Compute delta scale according to wheel.angleDelta
                                 deltaScale = Math.pow(1.2, Math.abs(wheel.angleDelta.y)/120) ;
 
-                                // Check bounds of our delta scale
-                                newPixelsPerMinute = previousPixelsPerMinute * deltaScale;
-
-                                if (newPixelsPerMinute < viewController.minPixelsPerMinute)
-                                {
-                                    newPixelsPerMinute = viewController.minPixelsPerMinute;
-                                    deltaScale = newPixelsPerMinute/previousPixelsPerMinute;
-                                }
-                                else if (newPixelsPerMinute > viewController.maxPixelsPerMinute)
-                                {
-                                    newPixelsPerMinute = viewController.maxPixelsPerMinute;
-                                    deltaScale = newPixelsPerMinute/previousPixelsPerMinute;
-                                }
-
-                                // Resize content
-                                contentArea.resizeContent(
-                                            contentArea.contentWidth * deltaScale,
-                                            contentArea.contentHeight,
-                                            Qt.point(contentArea.contentX + contentArea.width/2, contentArea.contentY + contentArea.height/2)
-                                            );
-
-                                // Update current time unit
-                                viewController.pixelsPerMinute *= deltaScale;
+                                rootItem.updateZoomOfTimeLine (deltaScale, contentArea.contentX + contentArea.width/2, contentArea.contentY + contentArea.height/2);
                             }
                             // Else: wheel.angleDelta.y  == 0  => invalid wheel event
                         }
@@ -642,7 +596,7 @@ Item {
                         width: 1
                         height: timeLinesContent.height
 
-                        color: MasticTheme.redColor
+                        color: MasticTheme.whiteColor
                     }
                 }
 
@@ -681,7 +635,6 @@ Item {
             contentHeight: columnHeadersArea.height
             boundsBehavior: Flickable.StopAtBounds;
 
-
             //
             // MouseArea to capture scroll gesture events (trackpad)
             //
@@ -695,7 +648,6 @@ Item {
                 }
 
                 onWheel: {
-
                 }
 
                 //
@@ -713,6 +665,7 @@ Item {
                         rootItem.forceActiveFocus();
                     }
 
+
                     onWheel: {
                         wheel.accepted = true;
 
@@ -721,69 +674,23 @@ Item {
 
                             var previousPixelsPerMinute = viewController.pixelsPerMinute;
                             var deltaScale;
-                            var newPixelsPerMinute;
 
                             // Check if we must zoom-in or zoom-out
                             if (wheel.angleDelta.y < 0)
                             {
 
-                                // Compute delta between our new scale factor and the previous one
+                                // Compute delta scale according to wheel.angleDelta
                                 deltaScale = Math.pow(1/1.2, Math.abs(wheel.angleDelta.y)/120) ;
 
-                                // Check bounds of our delta scale
-                                newPixelsPerMinute = previousPixelsPerMinute * deltaScale;
-
-                                if (newPixelsPerMinute < viewController.minPixelsPerMinute)
-                                {
-                                    newPixelsPerMinute = viewController.minPixelsPerMinute;
-                                    deltaScale = newPixelsPerMinute/previousPixelsPerMinute;
-                                }
-                                else if (newPixelsPerMinute > viewController.maxPixelsPerMinute)
-                                {
-                                    newPixelsPerMinute = viewController.maxPixelsPerMinute;
-                                    deltaScale = newPixelsPerMinute/previousPixelsPerMinute;
-                                }
-
-                                // Resize content
-                                contentArea.resizeContent(
-                                            contentArea.contentWidth * deltaScale,
-                                            contentArea.contentHeight,
-                                            Qt.point(contentArea.contentX + contentArea.width/2, contentArea.contentY + contentArea.height/2)
-                                            );
-
-                                // Update current time unit
-                                viewController.pixelsPerMinute *= deltaScale;
-
+                                rootItem.updateZoomOfTimeLine (deltaScale, contentArea.contentX + contentArea.width/2, contentArea.contentY + contentArea.height/2);
                             }
                             else if (wheel.angleDelta.y > 0)
                             {
 
-                                // Compute delta between our new scale factor and the previous one
+                                // Compute delta scale according to wheel.angleDelta
                                 deltaScale = Math.pow(1.2, Math.abs(wheel.angleDelta.y)/120) ;
 
-                                // Check bounds of our delta scale
-                                newPixelsPerMinute = previousPixelsPerMinute * deltaScale;
-
-                                if (newPixelsPerMinute < viewController.minPixelsPerMinute)
-                                {
-                                    newPixelsPerMinute = viewController.minPixelsPerMinute;
-                                    deltaScale = newPixelsPerMinute/previousPixelsPerMinute;
-                                }
-                                else if (newPixelsPerMinute > viewController.maxPixelsPerMinute)
-                                {
-                                    newPixelsPerMinute = viewController.maxPixelsPerMinute;
-                                    deltaScale = newPixelsPerMinute/previousPixelsPerMinute;
-                                }
-
-                                // Resize content
-                                contentArea.resizeContent(
-                                            contentArea.contentWidth * deltaScale,
-                                            contentArea.contentHeight,
-                                            Qt.point(contentArea.contentX + contentArea.width/2, contentArea.contentY + contentArea.height/2)
-                                            );
-
-                                // Update current time unit
-                                viewController.pixelsPerMinute *= deltaScale;
+                                rootItem.updateZoomOfTimeLine (deltaScale, contentArea.contentX + contentArea.width/2, contentArea.contentY + contentArea.height/2);
                             }
                             // Else: wheel.angleDelta.y  == 0  => invalid wheel event
                         }
@@ -795,11 +702,10 @@ Item {
                             contentArea.contentX = Math.max(0, Math.min(contentArea.contentX - nbCranMolette * 100, xMaxOfTimeLine));
                         }
                     }
+
                 }
 
             }
-
-
 
             Item {
                 id: columnHeadersContent

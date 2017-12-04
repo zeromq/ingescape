@@ -52,7 +52,7 @@ ActionVM::ActionVM(ActionM* model,
             int seconds = (startTime - hours*3600000 - minutes*60000) / 1000;
             int milliseconds = startTime%1000;
 
-            _startTimeString = QString::number(hours).leftJustified(2, '0') + ":" + QString::number(minutes).leftJustified(2, '0') + ":" + QString::number(seconds).leftJustified(2, '0') + "." + QString::number(milliseconds).leftJustified(3, '0');
+            _startTimeString = QString::number(hours).rightJustified(2, '0') + ":" + QString::number(minutes).rightJustified(2, '0') + ":" + QString::number(seconds).rightJustified(2, '0') + "." + QString::number(milliseconds).leftJustified(3, '0');
         }
 
         // Update valid flag
@@ -294,7 +294,7 @@ void ActionVM::reverseEffectsExecuted(int currentTimeInMilliSeconds)
         setcurrentExecution(NULL);
 
         // Shall rearm
-        if (_actionModel->shallRearm())
+        if (_actionModel->shallRearm() && (currentTimeInMilliSeconds < _endTime || _endTime == -1))
         {
             // Create a new (view model of) action execution
             _createActionExecution(currentTimeInMilliSeconds - _startTime);

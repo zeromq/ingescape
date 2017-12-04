@@ -75,6 +75,16 @@ Item {
     //
     //--------------------------------
 
+    // allowing to deselect selected action
+    MouseArea {
+        anchors.fill: parent
+        onClicked:  {
+            if(controller.selectedAction)
+            {
+                controller.selectedAction = null;
+            }
+        }
+    }
 
     //
     // List of actions
@@ -208,7 +218,7 @@ Item {
             Button {
                 id: btnImportAction
 
-                enabled : false
+                enabled : true
                 activeFocusOnPress: true
 
                 anchors {
@@ -225,7 +235,9 @@ Item {
                 }
 
                 onClicked: {
-                    console.log("Importer Action")
+                    if (MasticEditorC.scenarioC) {
+                        MasticEditorC.scenarioC.importScenarioFromFile();
+                    }
                 }
             }
 
@@ -247,7 +259,7 @@ Item {
             Button {
                 id: btnExportAction
 
-                enabled: false // visible & (controller.selectedAction ? true : false)
+                enabled: true // visible & (controller.selectedAction ? true : false)
                 activeFocusOnPress: true
 
                 anchors {
@@ -263,9 +275,12 @@ Item {
                 }
 
                 onClicked: {
-                    console.log("Exporter l'action sélectionnée");
+                    if (MasticEditorC.scenarioC) {
+                        MasticEditorC.scenarioC.exportScenarioToSelectedFile();
+                    }
                     if (controller.selectedAction) {
                         //controller.exportAgent(controller.selectedAgent);
+
                     }
                 }
             }

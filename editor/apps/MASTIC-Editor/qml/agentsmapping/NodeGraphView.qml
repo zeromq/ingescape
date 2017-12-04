@@ -103,12 +103,12 @@ Item {
 
             // Check if our child must be filtered
             if (
-                // We don't need repeaters because they don't have a valid geometry (they create items and add them to their parent)
-                !_qmlItemIsA(child, "Repeater")
-                &&
-                // Remove invisible links because AgentNodeView creates links attached to (0,0)
-                ( !_qmlItemIsA(child, "Link") || (_qmlItemIsA(child, "Link") && child.visible) )
-                )
+                    // We don't need repeaters because they don't have a valid geometry (they create items and add them to their parent)
+                    !_qmlItemIsA(child, "Repeater")
+                    &&
+                    // Remove invisible links because AgentNodeView creates links attached to (0,0)
+                    ( !_qmlItemIsA(child, "Link") || (_qmlItemIsA(child, "Link") && child.visible) )
+                    )
             {
                 x0 = Math.min(x0, child.x);
                 y0 = Math.min(y0, child.y);
@@ -445,7 +445,7 @@ Item {
                     // Set position of our workspace
                     workspace.x = rootItem.width/2 - viewCenterInWorkspace.x * workspace.scale;
                     workspace.y = rootItem.height/2 - viewCenterInWorkspace.y * workspace.scale;
-               }
+                }
             }
 
 
@@ -460,6 +460,7 @@ Item {
 
                 onPressed: {
                     rootItem.forceActiveFocus();
+
                 }
 
                 onWheel: {
@@ -495,6 +496,10 @@ Item {
 
                     onPressed: {
                         rootItem.forceActiveFocus();
+                        if (controller && controller.selectedAgent) {
+                            controller.selectedAgent = null;
+                        }
+
                     }
 
                     onWheel: {
