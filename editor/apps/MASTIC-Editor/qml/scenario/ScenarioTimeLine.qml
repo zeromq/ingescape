@@ -642,7 +642,7 @@ Item {
                         width: 1
                         height: timeLinesContent.height
 
-                        color: MasticTheme.redColor
+                        color: MasticTheme.whiteColor
                     }
                 }
 
@@ -681,7 +681,6 @@ Item {
             contentHeight: columnHeadersArea.height
             boundsBehavior: Flickable.StopAtBounds;
 
-
             //
             // MouseArea to capture scroll gesture events (trackpad)
             //
@@ -695,7 +694,6 @@ Item {
                 }
 
                 onWheel: {
-
                 }
 
                 //

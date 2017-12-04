@@ -216,19 +216,22 @@ Item {
                         Scenario.ActionsList {
                             id: actionsList
 
-                            anchors.fill: parent
+                            anchors {
+                                fill : parent
+                                bottomMargin: actionsPanel.height
+                            }
 
                             controller: MasticEditorC.scenarioC
                         }
 
                         Scenario.ActionsPanel {
+                            id : actionsPanel
                             anchors {
                                 left : parent.left
                                 right: parent.right
                                 bottom : parent.bottom
-                                leftMargin: 20
-                                rightMargin: 20
                             }
+                            height : 320
                             controller: MasticEditorC.scenarioC
                         }
                     }

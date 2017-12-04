@@ -156,6 +156,11 @@ Rectangle {
 
 
         onPressed: {
+            // bring our agent to front
+            parent.z = rootItem.parent.maxZ++;
+        }
+
+        onClicked: {
             if (controller && agentMappingVM) {
                 if(controller.selectedAgent === agentMappingVM)
                 {
@@ -164,9 +169,6 @@ Rectangle {
                     controller.selectedAgent = agentMappingVM;
                 }
             }
-
-            // bring our agent to front
-            parent.z = rootItem.parent.maxZ++;
         }
 
 

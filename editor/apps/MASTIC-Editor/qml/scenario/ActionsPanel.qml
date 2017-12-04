@@ -25,8 +25,6 @@ import "../theme" as Theme
 Item {
     id: rootItem
 
-    height : 300
-
     //--------------------------------
     //
     // Properties
@@ -52,6 +50,7 @@ Item {
             bottom : gridActionsPanel.top
             bottomMargin: 25
             left : parent.left
+            leftMargin: 20
         }
         color : MasticTheme.whiteColor
         text : "ACTIONS PANEL"
@@ -71,6 +70,10 @@ Item {
         anchors {
             bottom: parent.bottom
             bottomMargin: 18
+            left : parent.left
+            leftMargin: 20
+            rightMargin: 20
+            right : parent.right
         }
         height : childrenRect.height
         columns : 3
@@ -83,7 +86,7 @@ Item {
 
             I2Rectangle {
                 id : panelRectangle
-                width : (rootItem.width - (gridActionsPanel.columnSpacing* (gridActionsPanel.columns-1)))/ gridActionsPanel.columns
+                width : (gridActionsPanel.width - (gridActionsPanel.columnSpacing* (gridActionsPanel.columns-1)))/ gridActionsPanel.columns
                 height : 78
                 radiusX : 5
                 radiusY : 5
