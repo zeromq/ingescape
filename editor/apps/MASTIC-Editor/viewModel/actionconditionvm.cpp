@@ -87,7 +87,7 @@ void ActionConditionVM::setconditionType(ActionConditionType::Value value)
         // configure the new type
         _configureToType(value);
 
-        emit conditionTypeChanged(value);
+        Q_EMIT conditionTypeChanged(value);
     }
 }
 

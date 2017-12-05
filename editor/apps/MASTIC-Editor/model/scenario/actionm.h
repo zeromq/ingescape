@@ -100,16 +100,19 @@ public:
       */
     ~ActionM();
 
+
     /**
      * @brief Copy from another action model
      * @param action model to copy
      */
     void copyFrom(ActionM* actionModel);
 
+
     /**
      * @brief Initialize connections for conditions
      */
     void initializeConditionsConnections();
+
 
     /**
      * @brief Reset connections for conditions

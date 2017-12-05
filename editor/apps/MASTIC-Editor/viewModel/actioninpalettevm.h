@@ -30,14 +30,14 @@ I2_ENUM(ActionInPaletteState, ENABLE, DISABLE)
 
 
 /**
- * @brief The ActionInPaletteVM class defines an action in palette view model
+ * @brief The ActionInPaletteVM class defines a view model of action in palette
  */
 class ActionInPaletteVM: public QObject
 {
     Q_OBJECT
 
-    // Action model
-    I2_QML_PROPERTY_CUSTOM_SETTER(ActionM*, actionModel)
+    // Model of our view model of action in palette
+    I2_QML_PROPERTY_CUSTOM_SETTER(ActionM*, modelM)
 
     // State
     I2_QML_PROPERTY(int, indexInPanel)

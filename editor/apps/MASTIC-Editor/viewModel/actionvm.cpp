@@ -32,7 +32,7 @@
 ActionVM::ActionVM(ActionM* model,
                    int startTime,
                    QObject *parent) : QObject(parent),
-    _actionModel(NULL),
+    _modelM(NULL),
     _startTime(startTime),
     _startTimeString("00:00:00.000"),
     _lineInTimeLine(-1),
@@ -59,7 +59,7 @@ ActionVM::ActionVM(ActionM* model,
         setareConditionsValid(model->isValid());
 
         // Set the action model
-        setactionModel(model);
+        setmodelM(model);
 
         // Create the first (view model of) action execution
         _createActionExecution(0);
@@ -87,7 +87,7 @@ ActionVM::~ActionVM()
     _executionsList.deleteAllItems();
 
     // Reset model of action
-    setactionModel(NULL);
+    setmodelM(NULL);
 
     // Remove timer
     if(_timerToReverse != NULL)
@@ -106,7 +106,7 @@ void ActionVM::copyFrom(ActionVM* actionVM)
 {
     if(actionVM != NULL)
     {
-        ActionM* originalModel = actionVM->actionModel();
+        ActionM* originalModel = actionVM->modelM();
 
         // Copy the model
         if(originalModel != NULL)
@@ -114,10 +114,10 @@ void ActionVM::copyFrom(ActionVM* actionVM)
             ActionM* model = new ActionM(originalModel->name());
             model->copyFrom(originalModel);
 
-            setactionModel(model);
+            setmodelM(model);
         }
         else {
-            setactionModel(NULL);
+            setmodelM(NULL);
         }
 
         // Copy the view model attributes
@@ -183,65 +183,65 @@ void ActionVM::setstartTimeString(QString value)
                 }
                 else {
                     setstartTime(-1);
-                    if (_actionModel != NULL) {
-                        qCritical() << "Wrong 'Start Time':" << _startTimeString << "for action" << _actionModel->name();
+                    if (_modelM != NULL) {
+                        qCritical() << "Wrong 'Start Time':" << _startTimeString << "for action" << _modelM->name();
                     }
                 }
             }
             else {
                 setstartTime(-1);
-                if (_actionModel != NULL) {
-                    qCritical() << "Wrong 'Start Time':" << _startTimeString << "for action" << _actionModel->name();
+                if (_modelM != NULL) {
+                    qCritical() << "Wrong 'Start Time':" << _startTimeString << "for action" << _modelM->name();
                 }
             }
         }
         else {
             setstartTime(-1);
-            if (_actionModel != NULL) {
-                qCritical() << "Wrong 'Start Time':" << _startTimeString << "for action" << _actionModel->name();
+            if (_modelM != NULL) {
+                qCritical() << "Wrong 'Start Time':" << _startTimeString << "for action" << _modelM->name();
             }
         }
 
         // Compute the new endtime
         _computeEndTime();
 
-        emit startTimeStringChanged(value);
+        Q_EMIT startTimeStringChanged(value);
     }
 }
 
 
 /**
- * @brief Custom setter on the action model
- * @param action model
+ * @brief Custom setter for property "modelM"
+ * @param value
  */
-void ActionVM::setactionModel(ActionM * actionM)
+void ActionVM::setmodelM(ActionM* value)
 {
-    if(_actionModel != actionM)
+    if (_modelM != value)
     {
-        if(_actionModel != NULL)
+        if(_modelM != NULL)
         {
-            disconnect(_actionModel, &ActionM::isValidChanged, this, &ActionVM::_onIsValidChangedInModel);
+            disconnect(_modelM, &ActionM::isValidChanged, this, &ActionVM::_onIsValidChangedInModel);
 
             // Endtime reevaluation disconnection
-            disconnect(_actionModel, &ActionM::validityDurationChanged, this, &ActionVM::_onValidityDurationChange);
-            disconnect(_actionModel, &ActionM::validityDurationTypeChanged, this, &ActionVM::_onValidityDurationChange);
+            disconnect(_modelM, &ActionM::validityDurationChanged, this, &ActionVM::_onValidityDurationChange);
+            disconnect(_modelM, &ActionM::validityDurationTypeChanged, this, &ActionVM::_onValidityDurationChange);
         }
 
-        _actionModel = actionM;
+        _modelM = value;
 
-        if(_actionModel != NULL)
+        if(_modelM != NULL)
         {
-            connect(_actionModel, &ActionM::isValidChanged, this, &ActionVM::_onIsValidChangedInModel);
+            connect(_modelM, &ActionM::isValidChanged, this, &ActionVM::_onIsValidChangedInModel);
 
             // Endtime reevaluation connection
-            connect(_actionModel, &ActionM::validityDurationChanged, this, &ActionVM::_onValidityDurationChange);
-            connect(_actionModel, &ActionM::validityDurationTypeChanged, this, &ActionVM::_onValidityDurationChange);
+            connect(_modelM, &ActionM::validityDurationChanged, this, &ActionVM::_onValidityDurationChange);
+            connect(_modelM, &ActionM::validityDurationTypeChanged, this, &ActionVM::_onValidityDurationChange);
         }
 
         // Compute the new endtime
         _computeEndTime();
 
-        Q_EMIT actionModelChanged(actionM);
+        Q_EMIT modelMChanged(value);
     }
 }
 
@@ -257,12 +257,12 @@ void ActionVM::effectsExecuted(int currentTimeInMilliSeconds)
         _currentExecution->setisExecuted(true);
 
         // Shall revert
-        if (_actionModel->shallRevertAfterTime() && _actionModel->revertAfterTime() > 0)
+        if (_modelM->shallRevertAfterTime() && _modelM->revertAfterTime() > 0)
         {
             // Launch timer for revert
-            _timerToReverse->start(_actionModel->revertAfterTime());
+            _timerToReverse->start(_modelM->revertAfterTime());
         }
-        else if (_actionModel->shallRevertWhenValidityIsOver())
+        else if (_modelM->shallRevertWhenValidityIsOver())
         {
             // Launch timer for revert
             _timerToReverse->start(_endTime - currentTimeInMilliSeconds);
@@ -273,7 +273,7 @@ void ActionVM::effectsExecuted(int currentTimeInMilliSeconds)
             setcurrentExecution(NULL);
 
             // Shall rearm
-            if (_actionModel->shallRearm())
+            if (_modelM->shallRearm())
             {
                 // Create a new (view model of) action execution
                 _createActionExecution(currentTimeInMilliSeconds - _startTime);
@@ -294,7 +294,7 @@ void ActionVM::reverseEffectsExecuted(int currentTimeInMilliSeconds)
         setcurrentExecution(NULL);
 
         // Shall rearm
-        if (_actionModel->shallRearm() && (currentTimeInMilliSeconds < _endTime || _endTime == -1))
+        if (_modelM->shallRearm() && (currentTimeInMilliSeconds < _endTime || _endTime == -1))
         {
             // Create a new (view model of) action execution
             _createActionExecution(currentTimeInMilliSeconds - _startTime);
@@ -314,15 +314,15 @@ void ActionVM::delayCurrentExecution(int currentTimeInMilliSeconds)
         // Add 1 ms
         _currentExecution->setexecutionTime(currentTimeInMilliSeconds - _startTime + 1);
 
-        if ((_actionModel != NULL) && _actionModel->shallRevert() && _actionModel->shallRevertAfterTime())
+        if ((_modelM != NULL) && _modelM->shallRevert() && _modelM->shallRevertAfterTime())
         {
             // FIXME TODO: check reverseTime is not after validityDuration
 
-            if (_actionModel->revertAfterTime() > -1) {
-                _currentExecution->setreverseTime(currentTimeInMilliSeconds - _startTime + _actionModel->revertAfterTime());
+            if (_modelM->revertAfterTime() > -1) {
+                _currentExecution->setreverseTime(currentTimeInMilliSeconds - _startTime + _modelM->revertAfterTime());
             }
             else {
-                qWarning() << "Action" << _actionModel->name() << "Shall revert after time but 'revert after time' is not defined";
+                qWarning() << "Action" << _modelM->name() << "Shall revert after time but 'revert after time' is not defined";
             }
         }
     }
@@ -355,22 +355,22 @@ void ActionVM::_onValidityDurationChange()
 void ActionVM::_computeEndTime()
 {
     int endTime = _startTime;
-    if(_actionModel != NULL)
+    if(_modelM != NULL)
     {
         int itemDurationTime = 0;
-        if(_actionModel->validityDurationType() == ValidationDurationType::FOREVER)
+        if(_modelM->validityDurationType() == ValidationDurationType::FOREVER)
         {
             endTime = -1;
         }
-        else if(_actionModel->validityDurationType() == ValidationDurationType::CUSTOM)
+        else if(_modelM->validityDurationType() == ValidationDurationType::CUSTOM)
         {
-            itemDurationTime = _actionModel->validityDuration();
+            itemDurationTime = _modelM->validityDuration();
         }
 
         // Compare with the time before revert if selected
-        if(_actionModel->shallRevertAfterTime() && _actionModel->revertAfterTime() > itemDurationTime)
+        if(_modelM->shallRevertAfterTime() && _modelM->revertAfterTime() > itemDurationTime)
         {
-            itemDurationTime = _actionModel->revertAfterTime();
+            itemDurationTime = _modelM->revertAfterTime();
         }
 
         // If not forever, add duration
@@ -391,37 +391,37 @@ void ActionVM::_computeEndTime()
  */
 void ActionVM::_createActionExecution(int startTime)
 {
-    if (_actionModel != NULL)
+    if (_modelM != NULL)
     {
         // No revert by default: reverse time = start time
         int reverseTime = startTime;
 
-        if (_actionModel->shallRevert())
+        if (_modelM->shallRevert())
         {
             // Shall revert when validity is over
-            if (_actionModel->shallRevertWhenValidityIsOver())
+            if (_modelM->shallRevertWhenValidityIsOver())
             {
-                if (_actionModel->validityDuration() > -1) {
-                    reverseTime = startTime + _actionModel->validityDuration();
+                if (_modelM->validityDuration() > -1) {
+                    reverseTime = startTime + _modelM->validityDuration();
                 }
                 else {
-                    qWarning() << "Action" << _actionModel->name() << "Shall revert when validity is over but 'validity duration' is not defined";
+                    qWarning() << "Action" << _modelM->name() << "Shall revert when validity is over but 'validity duration' is not defined";
                 }
             }
             // Shall revert after time
-            else if (_actionModel->shallRevertAfterTime())
+            else if (_modelM->shallRevertAfterTime())
             {
-                if (_actionModel->revertAfterTime() > -1) {
-                    reverseTime = startTime + _actionModel->revertAfterTime();
+                if (_modelM->revertAfterTime() > -1) {
+                    reverseTime = startTime + _modelM->revertAfterTime();
                 }
                 else {
-                    qWarning() << "Action" << _actionModel->name() << "Shall revert after time but 'revert after time' is not defined";
+                    qWarning() << "Action" << _modelM->name() << "Shall revert after time but 'revert after time' is not defined";
                 }
             }
         }
 
         // Create a new (view model of) action execution
-        ActionExecutionVM* actionExecution = actionExecution = new ActionExecutionVM(_actionModel->shallRevert(), startTime, reverseTime, this);
+        ActionExecutionVM* actionExecution = actionExecution = new ActionExecutionVM(_modelM->shallRevert(), startTime, reverseTime, this);
 
         // Add to the list
         _executionsList.append(actionExecution);
@@ -450,9 +450,9 @@ void ActionVM::_onTimeout_ReserseAction()
 void ActionVM::resetDataFrom(int time)
 {
     // Update the conditions validation flag
-    if(_actionModel->isConnected())
+    if(_modelM->isConnected())
     {
-        setareConditionsValid(actionModel()->isValid());
+        setareConditionsValid(modelM()->isValid());
     } else {
         setareConditionsValid(false);
     }

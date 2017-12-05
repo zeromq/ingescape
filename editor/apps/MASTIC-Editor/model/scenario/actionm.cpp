@@ -96,7 +96,7 @@ ActionM::~ActionM()
  */
 void ActionM::copyFrom(ActionM* actionModel)
 {
-    if(actionModel != NULL)
+    if (actionModel != NULL)
     {
         setname(actionModel->name());
         setvalidityDurationType(actionModel->validityDurationType());
@@ -230,7 +230,7 @@ void ActionM::setrevertAfterTimeString(QString value)
             qCritical() << "Wrong 'Revert After Time':" << _revertAfterTimeString << "for action" << _name;
         }
 
-        emit revertAfterTimeStringChanged(value);
+        Q_EMIT revertAfterTimeStringChanged(value);
     }
 }
 
@@ -282,7 +282,7 @@ void ActionM::setvalidityDurationString(QString value)
             qCritical() << "Wrong 'Validity Duration':" << _validityDurationString << "for action" << _name;
         }
 
-        emit validityDurationStringChanged(value);
+        Q_EMIT validityDurationStringChanged(value);
     }
 }
 
@@ -307,7 +307,7 @@ void ActionM::setshallRevert(bool shallRevert)
             setshallRevertWhenValidityIsOver(true);
         }
 
-        emit shallRevertChanged(shallRevert);
+        Q_EMIT shallRevertChanged(shallRevert);
     }
 }
 

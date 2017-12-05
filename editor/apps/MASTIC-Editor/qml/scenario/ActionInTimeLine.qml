@@ -35,11 +35,12 @@ Item {
     property int lineHeight : MasticTheme.lineInTimeLineHeight
 
 
-    x : myActionVM? viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(myActionVM.startTime, viewController.pixelsPerMinute) : 0;
-    y : myActionVM? (actionVMItem.lineHeight * myActionVM.lineInTimeLine) : à;
+    x : myActionVM ? viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(myActionVM.startTime, viewController.pixelsPerMinute) : 0;
+    y : myActionVM ? (actionVMItem.lineHeight * myActionVM.lineInTimeLine) : à;
     height : actionVMItem.lineHeight
-    width : if (myActionVM && myActionVM.actionModel) {
-                switch (myActionVM.actionModel.validityDurationType)
+    width : if (myActionVM && myActionVM.modelM)
+            {
+                switch (myActionVM.modelM.validityDurationType)
                 {
                 case ValidationDurationType.IMMEDIATE:
                     0;
@@ -48,10 +49,10 @@ Item {
                     (viewController.timeTicksTotalWidth - viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(myActionVM.startTime, viewController.pixelsPerMinute))
                     break;
                 case ValidationDurationType.CUSTOM:
-                    viewController.convertDurationInMillisecondsToLengthInCoordinateSystem(myActionVM.actionModel.validityDuration, viewController.pixelsPerMinute)
+                    viewController.convertDurationInMillisecondsToLengthInCoordinateSystem(myActionVM.modelM.validityDuration, viewController.pixelsPerMinute)
                     break;
                 default:
-                    0
+                    0;
                     break;
                 }
             }
@@ -220,7 +221,7 @@ Item {
                     openEditorMouseArea.pressed? MasticTheme.lightGreyColor : MasticTheme.orangeColor
         : openEditorMouseArea.pressed? MasticTheme.lightGreyColor : MasticTheme.darkGreyColor
 
-        text : (actionVMItem.myActionVM && actionVMItem.myActionVM.actionModel) ? actionVMItem.myActionVM.actionModel.name : ""
+        text : (actionVMItem.myActionVM && actionVMItem.myActionVM.modelM) ? actionVMItem.myActionVM.modelM.name : ""
         font {
             family : MasticTheme.textFontFamily
             pixelSize: 11

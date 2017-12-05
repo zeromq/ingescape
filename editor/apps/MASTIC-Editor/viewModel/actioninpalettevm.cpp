@@ -30,8 +30,10 @@
  * @param action model
  * @param parent
  */
-ActionInPaletteVM::ActionInPaletteVM(ActionM* actionM, int indexInPanel, QObject *parent) : QObject(parent),
-    _actionModel(actionM),
+ActionInPaletteVM::ActionInPaletteVM(ActionM* actionM,
+                                     int indexInPanel,
+                                     QObject *parent) : QObject(parent),
+    _modelM(actionM),
     _indexInPanel(indexInPanel)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
@@ -48,19 +50,20 @@ ActionInPaletteVM::~ActionInPaletteVM()
 
 }
 
+
 /**
- * @brief Custom setter on action model
+ * @brief Custom setter for property "modelM"
  */
-void ActionInPaletteVM::setactionModel(ActionM* actionM)
+void ActionInPaletteVM::setmodelM(ActionM* value)
 {
-    if(_actionModel != actionM)
+    if (_modelM != value)
     {
-        _actionModel = actionM;
+        _modelM = value;
 
         // Reset status
         setstatus(ActionInPaletteState::DISABLE);
 
-        emit actionModelChanged(actionM);
+        Q_EMIT modelMChanged(value);
     }
 }
 

@@ -1381,11 +1381,11 @@ QByteArray JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<ActionI
     QJsonArray jsonActionsInPaletteArray;
     foreach (ActionInPaletteVM* actionInPalette, actionsInPaletteList)
     {
-        if(actionInPalette->actionModel() != NULL)
+        if (actionInPalette->modelM() != NULL)
         {
             QJsonObject jsonActionsInPalette;
-            jsonActionsInPalette.insert("index",actionInPalette->indexInPanel());
-            jsonActionsInPalette.insert("action_name",actionInPalette->actionModel()->name());
+            jsonActionsInPalette.insert("index", actionInPalette->indexInPanel());
+            jsonActionsInPalette.insert("action_name", actionInPalette->modelM()->name());
 
             jsonActionsInPaletteArray.append(jsonActionsInPalette);
         }
@@ -1398,13 +1398,13 @@ QByteArray JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<ActionI
     QJsonArray jsonActionsInTimelineArray;
     foreach (ActionVM* actionVM, actionsInTimeLine)
     {
-        if(actionVM->actionModel() != NULL && actionVM->startTime() >= 0)
+        if (actionVM->modelM() != NULL && actionVM->startTime() >= 0)
         {
             QJsonObject jsonActionsInTimeLine;
-            jsonActionsInTimeLine.insert("action_name",actionVM->actionModel()->name());
-            jsonActionsInTimeLine.insert("start_time",actionVM->startTime());
-            jsonActionsInTimeLine.insert("color",actionVM->color().name());
-            jsonActionsInTimeLine.insert("line_number",actionVM->lineInTimeLine());
+            jsonActionsInTimeLine.insert("action_name", actionVM->modelM()->name());
+            jsonActionsInTimeLine.insert("start_time", actionVM->startTime());
+            jsonActionsInTimeLine.insert("color", actionVM->color().name());
+            jsonActionsInTimeLine.insert("line_number", actionVM->lineInTimeLine());
 
             jsonActionsInTimelineArray.append(jsonActionsInTimeLine);
         }

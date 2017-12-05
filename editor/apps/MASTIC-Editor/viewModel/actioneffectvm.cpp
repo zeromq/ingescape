@@ -96,7 +96,7 @@ void ActionEffectVM::seteffectType(ActionEffectTypes::Value value)
         // configure the new type
         _configureToType(value);
 
-        emit effectTypeChanged(value);
+        Q_EMIT effectTypeChanged(value);
     }
 }
 

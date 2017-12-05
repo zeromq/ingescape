@@ -33,8 +33,8 @@ class ActionVM: public QObject
 {
     Q_OBJECT
 
-    // Action model
-    I2_QML_PROPERTY_READONLY_CUSTOM_SETTER(ActionM*, actionModel)
+    // Model of our view model of action
+    I2_QML_PROPERTY_READONLY_CUSTOM_SETTER(ActionM*, modelM)
 
     // Start time in milliseconds
     I2_QML_PROPERTY(int, startTime)
