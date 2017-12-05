@@ -23,7 +23,7 @@
 #include <viewModel/iop/inputvm.h>
 #include <viewModel/iop/outputvm.h>
 
-#include <model/agentmappingm.h>
+#include <model/mapping/agentmappingm.h>
 #include <model/agentm.h>
 
 /**

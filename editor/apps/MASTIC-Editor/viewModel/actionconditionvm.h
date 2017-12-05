@@ -1,14 +1,14 @@
-
 /*
- *	ActionConditionVM
+ *	MASTIC Editor
  *
- *  Copyright (c) 2016-2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
  *
  *
  *	Contributors:
+ *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *
  */
 
@@ -21,8 +21,9 @@
 #include <QJSEngine>
 
 #include "I2PropertyHelpers.h"
-#include "model/scenario/actionconditionm.h"
-#include "model/scenario/iopvalueconditionm.h"
+#include <model/scenario/condition/actionconditionm.h>
+#include <model/scenario/condition/iopvalueconditionm.h>
+
 
 /**
   * Action condition type : AGENT, VALUE
@@ -31,7 +32,7 @@ I2_ENUM_CUSTOM(ActionConditionType, VALUE, AGENT)
 
 
 /**
- * @brief The ActionConditionVM class defines an action condition view model
+ * @brief The ActionConditionVM class defines a view model of action condition
  */
 class ActionConditionVM: public QObject
 {

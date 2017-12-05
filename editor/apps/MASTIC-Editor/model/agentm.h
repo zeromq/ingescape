@@ -22,7 +22,7 @@
 #include <I2PropertyHelpers.h>
 
 #include <model/definitionm.h>
-#include <model/agentmappingm.h>
+#include <model/mapping/agentmappingm.h>
 
 
 /**

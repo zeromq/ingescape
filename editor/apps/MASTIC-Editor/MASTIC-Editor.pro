@@ -29,13 +29,13 @@ SOURCES += main.cpp \
     misc/masticeditorsettings.cpp \
     misc/masticeditorutils.cpp \
     model/definitionm.cpp \
-    model/agentmappingm.cpp \
+    model/mapping/agentmappingm.cpp \
     model/mapping/elementmappingm.cpp \ 
-    model/scenario/actionconditionm.cpp \
+    model/scenario/condition/actionconditionm.cpp \
     model/scenario/actionm.cpp \
     model/scenario/scenariom.cpp \
     model/scenario/scenariomarkerm.cpp \
-    model/scenario/iopvalueconditionm.cpp \
+    model/scenario/condition/iopvalueconditionm.cpp \
     viewModel/pointmapvm.cpp \
     viewModel/agentinmappingvm.cpp \
     viewModel/mapbetweeniopvm.cpp \
@@ -61,7 +61,8 @@ SOURCES += main.cpp \
     model/scenario/effect/iopvalueeffectm.cpp \
     model/scenario/effect/mappingeffectm.cpp \
     model/scenario/effect/effectonagentm.cpp \
-    controller/masticlaunchermanager.cpp
+    controller/masticlaunchermanager.cpp \
+    viewModel/iop/parametervm.cpp
 
 HEADERS += \
     model/agentm.h \
@@ -86,13 +87,13 @@ HEADERS += \
     uthash/utstring.h \
     uthash/utvector.h \
     model/definitionm.h \
-    model/agentmappingm.h \
+    model/mapping/agentmappingm.h \
     model/mapping/elementmappingm.h \
-    model/scenario/actionconditionm.h \
+    model/scenario/condition/actionconditionm.h \
     model/scenario/actionm.h \
     model/scenario/scenariom.h \
     model/scenario/scenariomarkerm.h \
-    model/scenario/iopvalueconditionm.h \
+    model/scenario/condition/iopvalueconditionm.h \
     viewModel/pointmapvm.h \
     viewModel/agentinmappingvm.h \
     viewModel/mapbetweeniopvm.h \
@@ -118,7 +119,8 @@ HEADERS += \
     model/scenario/effect/iopvalueeffectm.h \
     model/scenario/effect/mappingeffectm.h \
     model/scenario/effect/effectonagentm.h \
-    controller/masticlaunchermanager.h
+    controller/masticlaunchermanager.h \
+    viewModel/iop/parametervm.h
 
 
 RESOURCES += qml.qrc

@@ -22,13 +22,14 @@
 
 #include <I2PropertyHelpers.h>
 
-//#include <model/agentm.h>
-#include "model/definitionm.h"
-#include "model/agentmappingm.h"
+#include <model/definitionm.h>
+#include <model/mapping/agentmappingm.h>
+
 #include "viewModel/actionvm.h"
 #include "viewModel/actioneffectvm.h"
 #include "viewModel/actionconditionvm.h"
 #include "viewModel/actioninpalettevm.h"
+
 
 /**
  * @brief The JsonHelper class defines a helper to manage JSON definitions of agents
