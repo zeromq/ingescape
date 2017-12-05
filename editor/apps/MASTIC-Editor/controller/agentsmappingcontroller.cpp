@@ -132,9 +132,9 @@ void AgentsMappingController::deleteAgentInMapping(AgentInMappingVM* agent)
  */
 void AgentsMappingController::removeLinkBetweenTwoAgents(MapBetweenIOPVM* link)
 {
-    if ((link != NULL) && (link->agentTo() != NULL) && (link->pointTo() != NULL) && (link->agentFrom() != NULL) && (link->pointFrom() != NULL))
+    if ((link != NULL) && (link->inputAgent() != NULL) && (link->input() != NULL) && (link->outputAgent() != NULL) && (link->output() != NULL))
     {
-        qInfo() << "QML asked to delete the link between agents" << link->agentFrom()->name() << "and" << link->agentTo()->name();
+        qInfo() << "QML asked to delete the link between agents" << link->outputAgent()->name() << "and" << link->inputAgent()->name();
 
         // Mapping is activated
         if ((_modelManager != NULL) && _modelManager->isActivatedMapping())
@@ -143,13 +143,13 @@ void AgentsMappingController::removeLinkBetweenTwoAgents(MapBetweenIOPVM* link)
             link->setisVirtual(true);
 
             // Emit signal "Command asked to agent about Mapping Input"
-            Q_EMIT commandAskedToAgentAboutMappingInput(link->agentTo()->getPeerIdsList(), "UNMAP", link->pointTo()->name(), link->agentFrom()->name(), link->pointFrom()->name());
+            Q_EMIT commandAskedToAgentAboutMappingInput(link->inputAgent()->getPeerIdsList(), "UNMAP", link->input()->name(), link->outputAgent()->name(), link->output()->name());
         }
         // Mapping is NOT activated
         else
         {
             // Remove temporary link (this temporary link will be removed when the user will activate the mapping)
-            link->agentTo()->removeTemporaryLink(link->pointTo()->name(), link->agentFrom()->name(), link->pointFrom()->name());
+            link->inputAgent()->removeTemporaryLink(link->input()->name(), link->outputAgent()->name(), link->output()->name());
 
             // Delete the link between two agents
             _deleteLinkBetweenTwoAgents(link);
@@ -227,8 +227,8 @@ void AgentsMappingController::dropLinkBetweenAgents(AgentInMappingVM* outputAgen
             // Search if the same link already exists
             bool alreadyLinked = false;
             foreach (MapBetweenIOPVM* iterator, _allMapInMapping.toList()) {
-                if ((iterator != NULL) && (iterator->agentFrom() == outputAgent) && (iterator->pointFrom() == output)
-                        && (iterator->agentTo() == inputAgent) && (iterator->pointTo() == input)) {
+                if ((iterator != NULL) && (iterator->outputAgent() == outputAgent) && (iterator->output() == output)
+                        && (iterator->inputAgent() == inputAgent) && (iterator->input() == input)) {
                     alreadyLinked = true;
                     break;
                 }
@@ -517,9 +517,9 @@ void AgentsMappingController::onMapped(ElementMappingM* mappingElement)
             link->setisVirtual(false);
         }
 
-        if ((link != NULL) && (link->agentTo() != NULL)) {
+        if ((link != NULL) && (link->inputAgent() != NULL)) {
             // Add the temporary link that correspond to this real link (if it does not yet exist)
-            link->agentTo()->addTemporaryLink(mappingElement->input(), mappingElement->outputAgent(), mappingElement->output());
+            link->inputAgent()->addTemporaryLink(mappingElement->input(), mappingElement->outputAgent(), mappingElement->output());
         }
     }
 }
@@ -539,9 +539,9 @@ void AgentsMappingController::onUnmapped(ElementMappingM* mappingElement)
         MapBetweenIOPVM* link = _getLinkFromMappingElement(mappingElement);
         if (link != NULL)
         {
-            if (link->agentTo() != NULL) {
+            if (link->inputAgent() != NULL) {
                 // Remove the temporary link that correspond to this real link
-                link->agentTo()->removeTemporaryLink(mappingElement->input(), mappingElement->outputAgent(), mappingElement->output());
+                link->inputAgent()->removeTemporaryLink(mappingElement->input(), mappingElement->outputAgent(), mappingElement->output());
             }
 
             // Delete the link between two agents
@@ -715,19 +715,19 @@ void AgentsMappingController::onUnmapped(ElementMappingM* mappingElement)
                 {
                     if (missingOutput != NULL)
                     {
-                        if(missingOutput->name() == partialMap->pointFrom()->name())
+                        if(missingOutput->name() == partialMap->output()->name())
                         {
                             //Delete the output from the list since it has already been dealt with.
                              outputsListAdded.removeOne(missingOutput);
 
                             //Set the ghost elements in the partial map with the real stuff.
-                            if (partialMap->agentFrom()->isGhost())
+                            if (partialMap->outputAgent()->isGhost())
                             {
                                 // Get our ghost agent
-                                AgentInMappingVM* agentToDestroy = partialMap->agentFrom();
+                                AgentInMappingVM* agentToDestroy = partialMap->outputAgent();
 
                                 //Set real agent
-                                partialMap->setagentFrom(currentAgentInMapping);
+                                partialMap->setoutputAgent(currentAgentInMapping);
 
                                 // Destroy ghost agent
                                 delete agentToDestroy;
@@ -735,10 +735,10 @@ void AgentsMappingController::onUnmapped(ElementMappingM* mappingElement)
                             }
 
                             // Get our ghost output.
-                            OutputVM* outputToDestroy = partialMap->pointFrom();
+                            OutputVM* outputToDestroy = partialMap->output();
 
                             //Set real output
-                            partialMap->setpointFrom(missingOutput);
+                            partialMap->setoutput(missingOutput);
 
                             // Destroy output
                             delete outputToDestroy;
@@ -891,9 +891,9 @@ void AgentsMappingController::_onInputsListWillBeRemoved(QList<InputVM*> inputsL
 //        {
 //            foreach(MapBetweenIOPVM* mapBetweenIOP, _allMapInMapping.toList())
 //            {
-//                if( (mapBetweenIOP != NULL) && (mapBetweenIOP->agentFrom()->name() == agentInMapping->name()) )
+//                if( (mapBetweenIOP != NULL) && (mapBetweenIOP->outputAgent()->name() == agentInMapping->name()) )
 //                {
-//                    if( (removedInput != NULL) && (mapBetweenIOP->pointTo()->name() == removedInput->name()) )
+//                    if( (removedInput != NULL) && (mapBetweenIOP->input()->name() == removedInput->name()) )
 //                    {
 //                        _allMapInMapping.remove(mapBetweenIOP);
 //                        inputsListWillBeRemoved.removeAll(removedInput);
@@ -923,11 +923,11 @@ void AgentsMappingController::_onOutputsListWillBeRemoved(QList<OutputVM*> outpu
  //        {
  //            foreach(MapBetweenIOPVM* mapBetweenIOP, _allMapInMapping.toList())
  //            {
- //                if( (mapBetweenIOP != NULL) && (mapBetweenIOP->agentFrom()->name() == agentInMapping->name()) )
+ //                if( (mapBetweenIOP != NULL) && (mapBetweenIOP->outputAgent()->name() == agentInMapping->name()) )
  //                {
- //                    if( (removedOutput != NULL) && (mapBetweenIOP->pointFrom()->name() == removedOutput->name()) )
+ //                    if( (removedOutput != NULL) && (mapBetweenIOP->output()->name() == removedOutput->name()) )
  //                    {
- //                        // if involved as agentFrom:
+ //                        // if involved as outputAgent:
  //                        // 1- remove from the list of all the map
  //                        _allMapInMapping.remove(mapBetweenIOP);
  //                        outputsListWillBeRemoved(removedOutput);
@@ -938,12 +938,12 @@ void AgentsMappingController::_onOutputsListWillBeRemoved(QList<OutputVM*> outpu
  //                        AgentInMappingVM* ghostAgent = new AgentInMappingVM(agentInMapping->name());
 
  //                        // Edit map to be partial
- //                        mapBetweenIOP->setagentFrom(ghostAgent);
- //                        mapBetweenIOP->setpointFrom(ghostOutput);
+ //                        mapBetweenIOP->setoutputAgent(ghostAgent);
+ //                        mapBetweenIOP->setoutput(ghostOutput);
 
- //                        if(!_checkIfMapBetweenIOPVMAlreadyExist(ghostAgent, ghostOutput, mapBetweenIOP->agentTo(), mapBetweenIOP->pointTo()))
+ //                        if(!_checkIfMapBetweenIOPVMAlreadyExist(ghostAgent, ghostOutput, mapBetweenIOP->inputAgent(), mapBetweenIOP->input()))
  //                        {
- //                           qInfo() << "Turn a MapBetweenIOPVM into a the partial MapBetweenIOPVM : " << mapBetweenIOP->agentTo()->name() << "." << mapBetweenIOP->pointTo()->name() << " -> " << ghostAgent->name() << "." << ghostOutput->name();
+ //                           qInfo() << "Turn a MapBetweenIOPVM into a the partial MapBetweenIOPVM : " << mapBetweenIOP->inputAgent()->name() << "." << mapBetweenIOP->input()->name() << " -> " << ghostAgent->name() << "." << ghostOutput->name();
  //                           newListOfPartialMap.append(mapBetweenIOP);
  //                        }
  //                    }
@@ -1024,18 +1024,18 @@ void AgentsMappingController::_addAgentModelsToMappingAtPosition(QString agentNa
             {
                 if(partialMapBetweenIOP != NULL)
                 {
-                    if(partialMapBetweenIOP->agentTo()->name() == agentInMapping->name())
+                    if(partialMapBetweenIOP->inputAgent()->name() == agentInMapping->name())
                     {
-                        // Update the list of mapbetween store under the 'agentFrom' key of the hash table.
+                        // Update the list of mapbetween store under the 'outputAgent' key of the hash table.
                         QList<MapBetweenIOPVM*> listOfMapUnderKey;
-                        if(_mapFromAgentNameToPartialMapBetweenIOPViewModelsList.contains(partialMapBetweenIOP->agentFrom()->name()))
+                        if(_mapFromAgentNameToPartialMapBetweenIOPViewModelsList.contains(partialMapBetweenIOP->outputAgent()->name()))
                         {
-                            listOfMapUnderKey = _mapFromAgentNameToPartialMapBetweenIOPViewModelsList.value((partialMapBetweenIOP->agentFrom()->name()));
+                            listOfMapUnderKey = _mapFromAgentNameToPartialMapBetweenIOPViewModelsList.value((partialMapBetweenIOP->outputAgent()->name()));
                         }
                         listOfMapUnderKey.removeOne(partialMapBetweenIOP);
-                        _mapFromAgentNameToPartialMapBetweenIOPViewModelsList.insert(partialMapBetweenIOP->agentFrom()->name(), listOfMapUnderKey);
+                        _mapFromAgentNameToPartialMapBetweenIOPViewModelsList.insert(partialMapBetweenIOP->outputAgent()->name(), listOfMapUnderKey);
 
-                        // If involved as agentTo
+                        // If involved as inputAgent
                         _allPartialMapInMapping.remove(partialMapBetweenIOP);
                         delete(partialMapBetweenIOP);
                     }
@@ -1052,27 +1052,27 @@ void AgentsMappingController::_addAgentModelsToMappingAtPosition(QString agentNa
              foreach(MapBetweenIOPVM* mapBetweenIOP, _allMapInMapping.toList())
              {
                  if(mapBetweenIOP != NULL){
-                     if(mapBetweenIOP->agentFrom()->name() == agentInMapping->name())
+                     if(mapBetweenIOP->outputAgent()->name() == agentInMapping->name())
                      {
-                         // if involved as agentFrom:
+                         // if involved as outputAgent:
                          // 1- remove from the list of all the map
                          _allMapInMapping.remove(mapBetweenIOP);
 
                          // 2 - Transform the mapping in a partial map and add to the list of all the map.
                          // Create ghost output and agent
-                         OutputVM* ghostOutput = new OutputVM(mapBetweenIOP->pointFrom()->name());
-                         AgentInMappingVM* ghostAgent = new AgentInMappingVM(mapBetweenIOP->agentFrom()->name());
+                         OutputVM* ghostOutput = new OutputVM(mapBetweenIOP->output()->name());
+                         AgentInMappingVM* ghostAgent = new AgentInMappingVM(mapBetweenIOP->outputAgent()->name());
 
                          // Edit map to be partial
-                         mapBetweenIOP->setagentFrom(ghostAgent);
-                         mapBetweenIOP->setpointFrom(ghostOutput);
+                         mapBetweenIOP->setoutputAgent(ghostAgent);
+                         mapBetweenIOP->setoutput(ghostOutput);
 
-                         qInfo() << "Turn a MapBetweenIOPVM into a the partial MapBetweenIOPVM : " << mapBetweenIOP->agentTo()->name() << "." << mapBetweenIOP->pointTo()->name() << " -> " << ghostAgent->name() << "." << ghostOutput->name();
+                         qInfo() << "Turn a MapBetweenIOPVM into a the partial MapBetweenIOPVM : " << mapBetweenIOP->inputAgent()->name() << "." << mapBetweenIOP->input()->name() << " -> " << ghostAgent->name() << "." << ghostOutput->name();
                          newListOfPartialMap.append(mapBetweenIOP);
                      }
-                     else if(mapBetweenIOP->agentTo()->name() == agentInMapping->name())
+                     else if(mapBetweenIOP->inputAgent()->name() == agentInMapping->name())
                      {
-                         // if involved as agentTo:
+                         // if involved as inputAgent:
                          // Just destroy it.
                          _allMapInMapping.remove(mapBetweenIOP);
                          delete(mapBetweenIOP);
@@ -1099,15 +1099,15 @@ void AgentsMappingController::_addAgentModelsToMappingAtPosition(QString agentNa
 
 /**
  * @brief Check if the map between an agent output and an agent input already exist.
- * @param agentFrom
- * @param pointFrom
- * @param agentTo
- * @param pointTo
+ * @param outputAgent
+ * @param output
+ * @param inputAgent
+ * @param input
  * @return
  */
-/*bool AgentsMappingController::_checkIfMapBetweenIOPVMAlreadyExist(AgentInMappingVM* agentFrom, OutputVM *pointFrom, AgentInMappingVM* agentTo, InputVM *pointTo)
+/*bool AgentsMappingController::_checkIfMapBetweenIOPVMAlreadyExist(AgentInMappingVM* outputAgent, OutputVM *output, AgentInMappingVM* inputAgent, InputVM *input)
 {
-    if(pointFrom->isGhost() || agentFrom->isGhost())     // Partial Map
+    if(output->isGhost() || outputAgent->isGhost())     // Partial Map
     {
         if(!_allPartialMapInMapping.isEmpty())
         {
@@ -1116,10 +1116,10 @@ void AgentsMappingController::_addAgentModelsToMappingAtPosition(QString agentNa
                 if(partialMap != NULL)
                 {
                    // pointsTo have same name && pointsFrom have same name
-                   if( (partialMap->pointTo()->name() == pointTo->name()) && (partialMap->pointFrom()->name() == pointFrom->name()) )
+                   if( (partialMap->input()->name() == input->name()) && (partialMap->output()->name() == output->name()) )
                    {
                        // agentsTo have same name && agentsFrom have same name
-                       if( (partialMap->agentTo()->name() == agentTo->name()) && (partialMap->agentFrom()->name() == agentFrom->name()) )
+                       if( (partialMap->inputAgent()->name() == inputAgent->name()) && (partialMap->outputAgent()->name() == outputAgent->name()) )
                        {
                            // Exactly same so must return true
                            return true;
@@ -1137,12 +1137,12 @@ void AgentsMappingController::_addAgentModelsToMappingAtPosition(QString agentNa
             {
                 if(map != NULL)
                 {
-                    if( !map->pointFrom()->id().isEmpty() && !map->pointTo()->id().isEmpty() )
+                    if( !map->output()->id().isEmpty() && !map->input()->id().isEmpty() )
                     {
-                        if ( (map->pointTo()->id() == pointTo->id()) && (map->pointFrom()->id() == pointFrom->id()) )
+                        if ( (map->input()->id() == input->id()) && (map->output()->id() == output->id()) )
                         {
                             // pointsTo have same name && pointsFrom have same name
-                            if((map->agentTo()->name() == agentTo->name()) && (map->agentFrom()->name() == agentFrom->name()) )
+                            if((map->inputAgent()->name() == inputAgent->name()) && (map->outputAgent()->name() == outputAgent->name()) )
                             {
                                 // Exactly same so must return true
                                 return true;
@@ -1196,10 +1196,10 @@ MapBetweenIOPVM* AgentsMappingController::_getLinkFromMappingElement(ElementMapp
             // FIXME: An agent in mapping can have several Inputs (or Outputs) with the same name but with different types
             // --> Instead, this method must return a list of MapBetweenIOPVM
             if ((iterator != NULL)
-                    && (iterator->agentFrom() != NULL) && (iterator->agentFrom()->name() == mappingElement->outputAgent())
-                    && (iterator->agentTo() != NULL) && (iterator->agentTo()->name() == mappingElement->inputAgent())
-                    && (iterator->pointFrom() != NULL) && (iterator->pointFrom()->name() == mappingElement->output())
-                    && (iterator->pointTo() != NULL) && (iterator->pointTo()->name() == mappingElement->input()))
+                    && (iterator->outputAgent() != NULL) && (iterator->outputAgent()->name() == mappingElement->outputAgent())
+                    && (iterator->inputAgent() != NULL) && (iterator->inputAgent()->name() == mappingElement->inputAgent())
+                    && (iterator->output() != NULL) && (iterator->output()->name() == mappingElement->output())
+                    && (iterator->input() != NULL) && (iterator->input()->name() == mappingElement->input()))
             {
                 link = iterator;
                 break;
@@ -1222,7 +1222,7 @@ void AgentsMappingController::_removeAllLinksWithAgent(AgentInMappingVM* agent)
         foreach (MapBetweenIOPVM* link, _allMapInMapping.toList())
         {
             if ( (link != NULL) &&
-                    ((link->agentFrom() == agent) || (link->agentTo() == agent)) )
+                    ((link->outputAgent() == agent) || (link->inputAgent() == agent)) )
             {
                 // Remove a link between two agents from the mapping
                 removeLinkBetweenTwoAgents(link);

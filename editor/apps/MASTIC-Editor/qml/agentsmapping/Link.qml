@@ -32,8 +32,8 @@ I2CubicBezierCurve {
 
     property var mapBetweenIOPVM : null
     property var controller : null
-    property var inputModel : mapBetweenIOPVM ?  mapBetweenIOPVM.pointTo : null
-    property var outputModel : mapBetweenIOPVM ?  mapBetweenIOPVM.pointFrom : null
+    property var inputModel : mapBetweenIOPVM ? mapBetweenIOPVM.input : null
+    property var outputModel : mapBetweenIOPVM ? mapBetweenIOPVM.output : null
 
 
     secondPoint: inputModel? inputModel.position : Qt.point(0,0)
@@ -64,8 +64,8 @@ I2CubicBezierCurve {
     // Check if we represent a link or a "brin"
     property bool _isBrin: (
                             mapBetweenIOPVM
-                            && mapBetweenIOPVM.agentTo && mapBetweenIOPVM.agentTo.isReduced
-                            && mapBetweenIOPVM.agentFrom && mapBetweenIOPVM.agentFrom.isReduced
+                            && mapBetweenIOPVM.inputAgent && mapBetweenIOPVM.inputAgent.isReduced
+                            && mapBetweenIOPVM.outputAgent && mapBetweenIOPVM.outputAgent.isReduced
                             )
 
 
@@ -75,10 +75,10 @@ I2CubicBezierCurve {
     // allowing to increase mouse area
     hitTestAreaMargin : 3
 
-    // if the agentTo and agentFrom are reduced : global type of its inputs
+    // if the inputAgent and outputAgent are reduced : global type of its inputs
     stroke: if (rootItem._isBrin && outputModel)
             {
-                switch (mapBetweenIOPVM.agentFrom.reducedMapValueTypeGroupInOutput)
+                switch (mapBetweenIOPVM.outputAgent.reducedMapValueTypeGroupInOutput)
                 {
                 case AgentIOPValueTypeGroups.NUMBER:
                     outputModel.isPublishedNewValue ? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
@@ -104,7 +104,7 @@ I2CubicBezierCurve {
                 }
             }
             else {
-                // if the agentTo is not reduced : type of its output
+                // if the inputAgent is not reduced : type of its output
                 if (outputModel && outputModel.firstModel)
                 {
                     switch (outputModel.firstModel.agentIOPValueTypeGroup)

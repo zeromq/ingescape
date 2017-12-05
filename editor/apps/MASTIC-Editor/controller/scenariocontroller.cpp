@@ -581,7 +581,7 @@ void ScenarioController::addActionVMAtTime(ActionM* actionM, int timeInMs, int l
         _insertActionVMIntoMapByLineNumber(actionVM, lineNumber);
 
         // If the action VM found a line to be insert in
-        if(actionVM->lineInTimeLine() != -1)
+        if (actionVM->lineInTimeLine() != -1)
         {
             // Add the new action VM to our map
             QList<ActionVM*> actionsVMsList;
