@@ -1289,8 +1289,7 @@ QByteArray JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<ActionI
                     break;
                 }
 
-                if(jsonFilled == true)
-                {
+                if (jsonFilled) {
                     jsonConditionsArray.append(jsonCondition);
                 }
 
@@ -1361,8 +1360,7 @@ QByteArray JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<ActionI
                     break;
                 }
 
-                if(jsonFilled == true)
-                {
+                if (jsonFilled) {
                     jsonEffectsArray.append(jsonEffect);
                 }
             }

@@ -377,16 +377,16 @@ void MappingEffectM::_onOutputAgentDestroyed(QObject* sender)
 void MappingEffectM::_onAgentIOPInputsOutputsListChange()
 {
     // If we have a selected agent iop
-    if(_inputName.isEmpty() == false)
+    if (!_inputName.isEmpty())
     {
         _inputsList.clear();
         // Check that our input list update concern our selected agent iop
         foreach (InputVM* inputVM, _agent->inputsList()->toList())
         {
-            if(inputVM->firstModel() != NULL)
+            if (inputVM->firstModel() != NULL)
             {
                 _inputsList.append(inputVM->firstModel());
-                if(inputVM->name() == _inputName)
+                if (inputVM->name() == _inputName)
                 {
                     updateInputSelected();
                 }
@@ -402,9 +402,10 @@ void MappingEffectM::_onAgentIOPInputsOutputsListChange()
 void MappingEffectM::_onOutputAgentIOPInputsOutputsListChange()
 {
     // If we have a selected agent iop
-    if(_outputName.isEmpty() == false)
+    if (!_outputName.isEmpty())
     {
         _outputsList.clear();
+
         // Check that our input list update concern our selected agent iop
         foreach (OutputVM* outputVM, _agent->outputsList()->toList())
         {
@@ -425,37 +426,36 @@ void MappingEffectM::_onOutputAgentIOPInputsOutputsListChange()
 */
 void MappingEffectM::updateInputSelected()
 {
-    if(_agent != NULL && _inputName.isEmpty() == false)
+    if ((_agent != NULL) && !_inputName.isEmpty())
     {
-        QString agentIopName = _inputName;
-        AgentIOPM * newAgentIOP = NULL;
+        AgentIOPM* newAgentIOP = NULL;
 
         // Fill with outputs
-        foreach (OutputVM* output, _agent->outputsList()->toList())
+        /*foreach (OutputVM* output, _agent->outputsList()->toList())
         {
-            if(output->firstModel() != NULL)
+            if (output->firstModel() != NULL)
             {
-                if(newAgentIOP == NULL && agentIopName.isEmpty() == false && agentIopName == output->firstModel()->name())
-                {
+                if ((newAgentIOP == NULL) && (_inputName == output->firstModel()->name())) {
                     newAgentIOP = output->firstModel();
+                    break;
                 }
             }
-        }
+        }*/
 
         // Fill with inputs
         foreach (InputVM* input, _agent->inputsList()->toList())
         {
             if(input->firstModel() != NULL)
             {
-                if(agentIopName.isEmpty() == false && agentIopName == input->firstModel()->name())
-                {
+                if ((newAgentIOP == NULL) && (_inputName == input->firstModel()->name())) {
                     newAgentIOP = input->firstModel();
+                    break;
                 }
             }
         }
 
         // Change the input
-        if(newAgentIOP != _input)
+        if (newAgentIOP != _input)
         {
             // Set the new agent
             setinput(newAgentIOP);
@@ -463,42 +463,41 @@ void MappingEffectM::updateInputSelected()
     }
 }
 
+
 /**
 * @brief Update the selected output
 */
 void MappingEffectM::updateOutputSelected()
 {
-    if(_agent != NULL && _outputName.isEmpty() == false)
+    if ((_agent != NULL) && !_outputName.isEmpty())
     {
-        QString agentIopName = _outputName;
-        AgentIOPM * newAgentIOP = NULL;
+        AgentIOPM* newAgentIOP = NULL;
 
         // Fill with outputs
         foreach (OutputVM* output, _agent->outputsList()->toList())
         {
-            if(output->firstModel() != NULL)
+            if (output->firstModel() != NULL)
             {
-                if(newAgentIOP == NULL && agentIopName.isEmpty() == false && agentIopName == output->firstModel()->name())
-                {
+                if ((newAgentIOP == NULL) && (_outputName == output->firstModel()->name())) {
                     newAgentIOP = output->firstModel();
+                    break;
                 }
             }
         }
 
         // Fill with inputs
-        foreach (InputVM* input, _agent->inputsList()->toList())
+        /*foreach (InputVM* input, _agent->inputsList()->toList())
         {
             if(input->firstModel() != NULL)
             {
-                if(agentIopName.isEmpty() == false && agentIopName == input->firstModel()->name())
-                {
+                if ((newAgentIOP == NULL) && (_outputName == input->firstModel()->name())) {
                     newAgentIOP = input->firstModel();
                 }
             }
-        }
+        }*/
 
         // Change the input
-        if(newAgentIOP != _output)
+        if (newAgentIOP != _output)
         {
             // Set the new agent
             setoutput(newAgentIOP);

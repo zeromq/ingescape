@@ -144,7 +144,7 @@ ScenarioController::~ScenarioController()
 void ScenarioController::openActionEditor(ActionM* actionM)
 {
     // We check that or editor is not already opened
-    if(_mapActionsEditorControllersFromActionM.contains(actionM) == false)
+    if (!_mapActionsEditorControllersFromActionM.contains(actionM))
     {
         // Create an empty action if we create a new one
         if(actionM != NULL)
@@ -185,7 +185,7 @@ void ScenarioController::openActionEditorFromActionVM(ActionVM* actionVM)
     if (actionVM != NULL && actionVM->modelM() != NULL)
     {
         // We check that or editor is not already opened
-        if(_mapActionsEditorControllersFromActionVM.contains(actionVM) == false)
+        if (!_mapActionsEditorControllersFromActionVM.contains(actionVM))
         {
             setselectedAction(actionVM->modelM());
 
@@ -283,7 +283,7 @@ void ScenarioController::valideActionEditor(ActionEditorController* actionEditor
     ActionM* originalActionM = actionEditorC->originalAction();
 
     // We check that or editor is not already opened
-    if(_actionsList.contains(originalActionM) == false)
+    if (!_actionsList.contains(originalActionM))
     {
         // Insert in to the list
         _actionsList.append(originalActionM);
@@ -335,27 +335,28 @@ void ScenarioController::closeActionEditor(ActionEditorController* actionEditorC
     }
 }
 
+
 /**
   * @brief slot on agent added in mapping
   */
 void ScenarioController::onAgentInMappingAdded(AgentInMappingVM * agentAdded)
 {
-    if(_agentsInMappingList.contains(agentAdded) == false)
-    {
+    if (!_agentsInMappingList.contains(agentAdded)) {
         _agentsInMappingList.append(agentAdded);
     }
 }
+
 
 /**
   * @brief slot on agent removed in mapping
   */
 void ScenarioController::onAgentInMappingRemoved(AgentInMappingVM * agentRemoved)
 {
-    if(_agentsInMappingList.contains(agentRemoved) == true)
-    {
+    if (_agentsInMappingList.contains(agentRemoved)) {
         _agentsInMappingList.remove(agentRemoved);
     }
 }
+
 
 /**
  * @brief Get a new action name
@@ -465,7 +466,7 @@ void ScenarioController::_importScenarioFromFile(QString scenarioFilePath)
                         int lineNumber = actionVM->lineInTimeLine();
 
                         // Increment actionVM into the line number
-                        if(_mapActionsVMsInTimelineFromLineIndex.contains(lineNumber) == true)
+                        if (_mapActionsVMsInTimelineFromLineIndex.contains(lineNumber))
                         {
                             I2CustomItemSortFilterListModel<ActionVM>* actionVMSortedList = _mapActionsVMsInTimelineFromLineIndex.value(lineNumber);
                             if(actionVMSortedList != NULL)
@@ -486,8 +487,7 @@ void ScenarioController::_importScenarioFromFile(QString scenarioFilePath)
 
                         // Add the new action VM to our map
                         QList<ActionVM*> actionsVMsList;
-                        if(_mapActionsVMsInTimelineFromActionModel.contains(actionVM->modelM()) == true)
-                        {
+                        if (_mapActionsVMsInTimelineFromActionModel.contains(actionVM->modelM())) {
                             actionsVMsList = _mapActionsVMsInTimelineFromActionModel.value(actionVM->modelM());
                         }
                         actionsVMsList.append(actionVM);
@@ -651,10 +651,10 @@ void ScenarioController::removeActionVMFromTimeLine(ActionVM * actionVM)
             if(actionVM->lineInTimeLine() != -1)
             {
                 int lineNumber = actionVM->lineInTimeLine();
-                if(_mapActionsVMsInTimelineFromLineIndex.contains(lineNumber) == true)
+                if(_mapActionsVMsInTimelineFromLineIndex.contains(lineNumber))
                 {
                     I2CustomItemSortFilterListModel<ActionVM>* actionVMSortedList = _mapActionsVMsInTimelineFromLineIndex.value(lineNumber);
-                    if(actionVMSortedList != NULL && actionVMSortedList->contains(actionVM) == true)
+                    if ((actionVMSortedList != NULL) && actionVMSortedList->contains(actionVM))
                     {
                         // Remove item
                         actionVMSortedList->remove(actionVM);
@@ -670,7 +670,7 @@ void ScenarioController::removeActionVMFromTimeLine(ActionVM * actionVM)
                                 // Delete the last line, lets check if we can reduce the number of displayed lines
                                 for (int lineTmp = lineNumber-1; lineTmp >= 0 ; --lineTmp)
                                 {
-                                    if(_mapActionsVMsInTimelineFromLineIndex.contains(lineTmp) == false)
+                                    if (!_mapActionsVMsInTimelineFromLineIndex.contains(lineTmp))
                                     {
                                         nbOfDecrement++;
                                     }
@@ -750,9 +750,9 @@ void ScenarioController::_insertActionVMIntoMapByLineNumber(ActionVM* actionVMTo
     {
         bool canInsert = canInsertActionVMTo(actionVMToInsert->modelM(), insertionStartTime, lineNumber);
         // Insert our item if possible
-        if(canInsert == true)
+        if (canInsert)
         {
-            if(_mapActionsVMsInTimelineFromLineIndex.contains(lineNumber) == true)
+            if (_mapActionsVMsInTimelineFromLineIndex.contains(lineNumber))
             {
                 I2CustomItemSortFilterListModel<ActionVM>* actionVMSortedList = _mapActionsVMsInTimelineFromLineIndex.value(lineNumber);
                 if(actionVMSortedList != NULL)
@@ -838,7 +838,7 @@ bool ScenarioController::canInsertActionVMTo(ActionM* actionMToInsert, int time,
 {
     bool canInsert = true;
 
-    if(_mapActionsVMsInTimelineFromLineIndex.contains(lineNumber) == true)
+    if (_mapActionsVMsInTimelineFromLineIndex.contains(lineNumber))
     {
         bool reachPosition = false;
         ActionVM * previousActionVM = NULL;
@@ -904,10 +904,10 @@ bool ScenarioController::canInsertActionVMTo(ActionM* actionMToInsert, int time,
             }
 
             // If we didn't reach the position, we test with the previous action
-            if(reachPosition == false && previousActionVM != NULL)
+            if (!reachPosition && (previousActionVM != NULL))
             {
                 // If the previous action ends after the beginning of the new one, we skip it
-                if(previousActionVM->endTime()+MARGIN_FOR_ACTION_INSERTION_IN_MS >= time || previousActionVM->endTime() == -1)
+                if ((previousActionVM->endTime() + MARGIN_FOR_ACTION_INSERTION_IN_MS >= time) || (previousActionVM->endTime() == -1))
                 {
                     canInsert = false;
                 }
@@ -1091,7 +1091,7 @@ void ScenarioController::_onTimeout_DelayOrExecuteActions()
                 if ((actionExecution != NULL) && !actionExecution->isExecuted())
                 {
                     // Delay the current execution of this action
-                    if (actionVM->modelM()->isValid() == false)
+                    if (!actionVM->modelM()->isValid())
                     {
                         actionVM->delayCurrentExecution(currentTimeInMilliSeconds);
                     }
@@ -1103,20 +1103,25 @@ void ScenarioController::_onTimeout_DelayOrExecuteActions()
             // Current time is after the end time of action (or the action has no validity duration --> Immediate)
             else if(actionVM->endTime() <= currentTimeInMilliSeconds)
             {
-                if (actionExecution != NULL && actionVM->timerToReverse()->isActive() == false)
+                if ((actionExecution != NULL) && !actionVM->timerToReverse()->isActive())
                 {
                     // the action has never been executed if there is only one Action Execution (the initial one) and its execution flag is false
-                    actionExecution->setneverExecuted(actionVM->executionsList()->count() <= 1 && actionExecution->isExecuted() == false);
+                    if ((actionVM->executionsList()->count() <= 1) && !actionExecution->isExecuted()) {
+                        actionExecution->setneverExecuted(true);
+                    }
+                    else {
+                        actionExecution->setneverExecuted(false);
+                    }
 
                     // If there is at least another execution for this action...
-                    if (actionVM->executionsList()->count() > 1 ||
-                            (actionExecution->neverExecuted() == true && actionVM->modelM()->validityDurationType() == ValidationDurationType::CUSTOM))
+                    if ( (actionVM->executionsList()->count() > 1)
+                            || (actionExecution->neverExecuted() && (actionVM->modelM()->validityDurationType() == ValidationDurationType::CUSTOM)) )
                     {
                         // ...we remove the current execution
                         actionVM->setcurrentExecution(NULL);
 
                         // only if the execution has not be done
-                        if(actionExecution->isExecuted() == false)
+                        if (!actionExecution->isExecuted())
                         {
                             actionVM->executionsList()->remove(actionExecution);
 
@@ -1126,7 +1131,7 @@ void ScenarioController::_onTimeout_DelayOrExecuteActions()
                     }
                 }
 
-                if(actionVM->timerToReverse()->isActive() == false)
+                if (!actionVM->timerToReverse()->isActive())
                 {
                     // Remove from the list of "active" actions
                     disconnect(actionVM,&ActionVM::revertAction, this, &ScenarioController::onRevertAction);
@@ -1139,8 +1144,7 @@ void ScenarioController::_onTimeout_DelayOrExecuteActions()
     // Save our scenario start
     _scenarioStartingTimeInMs = currentTimeOfDay;
 
-    if(_isPlaying == true)
-    {
+    if (_isPlaying) {
         _timerToRegularlyDelayActions.start(INTERVAL_DELAY_ACTIONS);
     }
 }

@@ -139,7 +139,7 @@ void ActionConditionM::onAgentModelIsOnChange(bool isON)
 {
     if ((_comparison == ActionComparisonValueType::ON && isON)
             ||
-            (_comparison == ActionComparisonValueType::OFF && isON == false)) {
+            (_comparison == ActionComparisonValueType::OFF && !isON)) {
         setisValid(true);
     }
     else {

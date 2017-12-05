@@ -297,7 +297,7 @@ void ActionM::setshallRevert(bool shallRevert)
         _shallRevert = shallRevert;
 
         // Reset properties if the shall revert is unchecked
-        if(_shallRevert == false)
+        if (!_shallRevert)
         {
             setshallRevertWhenValidityIsOver(false);
             setshallRevertAfterTime(false);
@@ -317,7 +317,7 @@ void ActionM::setshallRevert(bool shallRevert)
  */
 void ActionM::initializeConditionsConnections()
 {
-    if(_isConnected == false)
+    if (!_isConnected)
     {
         // Initialize conditions connections
         foreach (ActionConditionVM* conditionVM, _conditionsList.toList())
@@ -374,14 +374,14 @@ void ActionM::_onConditionValidationChange(bool isValid)
 
     foreach (ActionConditionVM* conditionVM, _conditionsList.toList())
     {
-        if(conditionVM->modelM() != NULL)
+        if (conditionVM->modelM() != NULL)
         {
             bool valid = conditionVM->modelM()->isValid();
             actionValidation = valid && actionValidation;
         }
 
         // We leave if all conditions are not valids
-        if(actionValidation == false)
+        if (!actionValidation)
         {
             break;
         }
