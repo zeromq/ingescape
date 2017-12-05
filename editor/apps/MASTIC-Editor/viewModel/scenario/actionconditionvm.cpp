@@ -14,7 +14,6 @@
 
 #include "actionconditionvm.h"
 
-
 #include <QDebug>
 
 /**

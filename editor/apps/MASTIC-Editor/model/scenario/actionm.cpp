@@ -339,12 +339,13 @@ void ActionM::initializeConditionsConnections()
     }
 }
 
+
 /**
  * @brief Reset connections for conditions
  */
 void ActionM::resetConditionsConnections()
 {
-    if(_isConnected == true)
+    if (_isConnected)
     {
         // Initialize conditions connections
         foreach (ActionConditionVM* conditionVM, _conditionsList.toList())
@@ -359,8 +360,8 @@ void ActionM::resetConditionsConnections()
 
         setisConnected(false);
     }
-
 }
+
 
 /**
  * @brief Slot on the condition validation change

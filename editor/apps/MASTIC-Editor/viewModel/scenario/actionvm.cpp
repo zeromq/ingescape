@@ -16,13 +16,6 @@
 
 #include <QDebug>
 
-
-//--------------------------------------------------------------
-//
-// ActionVM
-//
-//--------------------------------------------------------------
-
 /**
  * @brief Constructor
  * @param model
@@ -442,6 +435,7 @@ void ActionVM::_onTimeout_ReserseAction()
         Q_EMIT revertAction(_currentExecution);
     }
 }
+
 
 /**
   * @brief Initialize the action view model at a specific time

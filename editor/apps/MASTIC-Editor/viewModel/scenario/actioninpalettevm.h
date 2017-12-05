@@ -1,14 +1,14 @@
-
 /*
- *	ActionInPaletteVM
+ *	MASTIC Editor
  *
- *  Copyright (c) 2016-2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
  *
  *
  *	Contributors:
+ *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *
  */
 
@@ -21,12 +21,7 @@
 #include <QJSEngine>
 
 #include "I2PropertyHelpers.h"
-#include "model/scenario/actionm.h"
-
-/**
-  * Action in palette state type: ENABLE, DISABLE
-  */
-I2_ENUM(ActionInPaletteState, ENABLE, DISABLE)
+#include <model/scenario/actionm.h>
 
 
 /**
@@ -37,42 +32,27 @@ class ActionInPaletteVM: public QObject
     Q_OBJECT
 
     // Model of our view model of action in palette
-    I2_QML_PROPERTY_CUSTOM_SETTER(ActionM*, modelM)
+    I2_QML_PROPERTY(ActionM*, modelM)
 
-    // State
+    // Index in the panel "palette"
     I2_QML_PROPERTY(int, indexInPanel)
-
-    // State
-    I2_QML_PROPERTY(ActionInPaletteState::Value, status)
-
 
 
 public:
 
     /**
-     * @brief Default constructor
-     * @param action model
+     * @brief Constructor
+     * @param actionM
+     * @param indexInPanel
      * @param parent
      */
-    explicit ActionInPaletteVM(ActionM *actionM, int indexInPanel, QObject *parent = 0);
+    explicit ActionInPaletteVM(ActionM* actionM, int indexInPanel, QObject *parent = 0);
 
 
     /**
       * @brief Destructor
       */
     ~ActionInPaletteVM();
-
-
-
-Q_SIGNALS:
-
-
-public Q_SLOTS:
-
-
-protected:
-
-
 
 };
 

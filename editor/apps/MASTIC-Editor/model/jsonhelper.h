@@ -25,10 +25,10 @@
 #include <model/definitionm.h>
 #include <model/mapping/agentmappingm.h>
 
-#include "viewModel/actionvm.h"
-#include "viewModel/actioneffectvm.h"
-#include "viewModel/actionconditionvm.h"
-#include "viewModel/actioninpalettevm.h"
+#include "viewModel/scenario/actionvm.h"
+#include "viewModel/scenario/actioneffectvm.h"
+#include "viewModel/scenario/actionconditionvm.h"
+#include "viewModel/scenario/actioninpalettevm.h"
 
 
 /**

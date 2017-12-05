@@ -13,18 +13,8 @@
 
 #include "scenariocontroller.h"
 
-
 #include <QDebug>
 #include <QFileDialog>
-
-
-
-//--------------------------------------------------------------
-//
-// ScenarioController
-//
-//--------------------------------------------------------------
-
 
 /**
  * @brief Constructor

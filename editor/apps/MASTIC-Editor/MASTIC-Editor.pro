@@ -17,17 +17,24 @@ PRECOMPILED_HEADER  = stable.h
 
 
 SOURCES += main.cpp \
-    model/agentm.cpp \
-    viewModel/agentvm.cpp \
-    model/iop/agentiopm.cpp \
-    model/jsonhelper.cpp \
     controller/agentssupervisioncontroller.cpp \
     controller/agentsmappingcontroller.cpp \
     controller/masticeditorcontroller.cpp \
     controller/masticmodelmanager.cpp \
     controller/networkcontroller.cpp \
+    controller/scenariocontroller.cpp \
+    controller/actioneditorcontroller.cpp \
+    controller/valueshistorycontroller.cpp \
+    controller/abstracttimeactionslinescenarioviewcontroller.cpp \
+    controller/masticlaunchermanager.cpp \
     misc/masticeditorsettings.cpp \
     misc/masticeditorutils.cpp \
+    misc/terminationsignalwatcher.cpp \
+    misc/collapsiblecolumn.cpp \
+    model/agentm.cpp \
+    model/iop/agentiopm.cpp \
+    model/iop/outputm.cpp \
+    model/jsonhelper.cpp \
     model/definitionm.cpp \
     model/mapping/agentmappingm.cpp \
     model/mapping/elementmappingm.cpp \ 
@@ -36,47 +43,29 @@ SOURCES += main.cpp \
     model/scenario/scenariom.cpp \
     model/scenario/scenariomarkerm.cpp \
     model/scenario/condition/iopvalueconditionm.cpp \
-    viewModel/pointmapvm.cpp \
-    viewModel/agentinmappingvm.cpp \
-    viewModel/mapbetweeniopvm.cpp \
-    model/iop/outputm.cpp \
-    controller/scenariocontroller.cpp \
-    viewModel/actionvm.cpp \
-    controller/actioneditorcontroller.cpp \
-    viewModel/iop/inputvm.cpp \
-    viewModel/iop/outputvm.cpp \
-    misc/terminationsignalwatcher.cpp \
-    misc/collapsiblecolumn.cpp \
-    viewModel/actionconditionvm.cpp \
-    viewModel/actioneffectvm.cpp \
-    viewModel/actioninpalettevm.cpp \
-    model/publishedvaluem.cpp \
     model/enums.cpp \
-    controller/valueshistorycontroller.cpp \
-    sortFilter/valueshistorysortfilter.cpp \
-    controller/abstracttimeactionslinescenarioviewcontroller.cpp \
+    model/publishedvaluem.cpp \
     model/scenario/timetickm.cpp \
-    viewModel/actionexecutionvm.cpp \
     model/scenario/effect/actioneffectm.cpp \
     model/scenario/effect/iopvalueeffectm.cpp \
     model/scenario/effect/mappingeffectm.cpp \
     model/scenario/effect/effectonagentm.cpp \
-    controller/masticlaunchermanager.cpp \
+    sortFilter/valueshistorysortfilter.cpp \
+    viewModel/agentvm.cpp \
+    viewModel/pointmapvm.cpp \
+    viewModel/agentinmappingvm.cpp \
+    viewModel/mapbetweeniopvm.cpp \
+    viewModel/scenario/actionvm.cpp \
+    viewModel/iop/inputvm.cpp \
+    viewModel/iop/outputvm.cpp \
+    viewModel/scenario/actionconditionvm.cpp \
+    viewModel/scenario/actioneffectvm.cpp \
+    viewModel/scenario/actioninpalettevm.cpp \
+    viewModel/scenario/actionexecutionvm.cpp \
     viewModel/iop/parametervm.cpp
 
 HEADERS += \
-    model/agentm.h \
-    viewModel/agentvm.h \
     stable.h \
-    model/iop/agentiopm.h \
-    model/jsonhelper.h \
-    controller/agentssupervisioncontroller.h \
-    controller/agentsmappingcontroller.h \
-    controller/masticeditorcontroller.h \
-    controller/masticmodelmanager.h \
-    controller/networkcontroller.h \
-    misc/masticeditorsettings.h \
-    misc/masticeditorutils.h \
     uthash/libut.h \
     uthash/ringbuf.h \
     uthash/utarray.h \
@@ -86,6 +75,24 @@ HEADERS += \
     uthash/utringbuffer.h \
     uthash/utstring.h \
     uthash/utvector.h \
+    controller/agentssupervisioncontroller.h \
+    controller/agentsmappingcontroller.h \
+    controller/masticeditorcontroller.h \
+    controller/masticmodelmanager.h \
+    controller/networkcontroller.h \
+    controller/scenariocontroller.h \
+    controller/actioneditorcontroller.h \
+    controller/valueshistorycontroller.h \
+    controller/abstracttimeactionslinescenarioviewcontroller.h \
+    controller/masticlaunchermanager.h \
+    misc/masticeditorsettings.h \
+    misc/masticeditorutils.h \
+    misc/terminationsignalwatcher.h \
+    misc/collapsiblecolumn.h \
+    model/agentm.h \
+    model/iop/agentiopm.h \
+    model/iop/outputm.h \
+    model/jsonhelper.h \
     model/definitionm.h \
     model/mapping/agentmappingm.h \
     model/mapping/elementmappingm.h \
@@ -94,32 +101,25 @@ HEADERS += \
     model/scenario/scenariom.h \
     model/scenario/scenariomarkerm.h \
     model/scenario/condition/iopvalueconditionm.h \
-    viewModel/pointmapvm.h \
-    viewModel/agentinmappingvm.h \
-    viewModel/mapbetweeniopvm.h \
-    model/iop/outputm.h  \
-    controller/scenariocontroller.h \
-    viewModel/actionvm.h \
-    controller/actioneditorcontroller.h \
-    viewModel/iop/inputvm.h \
-    viewModel/iop/outputvm.h \
-    misc/terminationsignalwatcher.h \
-    misc/collapsiblecolumn.h \
-    viewModel/actionconditionvm.h \
-    viewModel/actioneffectvm.h \
-    viewModel/actioninpalettevm.h \
-    model/publishedvaluem.h \
     model/enums.h \
-    controller/valueshistorycontroller.h \
-    sortFilter/valueshistorysortfilter.h \
-    controller/abstracttimeactionslinescenarioviewcontroller.h \
+    model/publishedvaluem.h \
     model/scenario/timetickm.h \
-    viewModel/actionexecutionvm.h \
     model/scenario/effect/actioneffectm.h \
     model/scenario/effect/iopvalueeffectm.h \
     model/scenario/effect/mappingeffectm.h \
     model/scenario/effect/effectonagentm.h \
-    controller/masticlaunchermanager.h \
+    sortFilter/valueshistorysortfilter.h \
+    viewModel/agentvm.h \
+    viewModel/pointmapvm.h \
+    viewModel/agentinmappingvm.h \
+    viewModel/mapbetweeniopvm.h \
+    viewModel/scenario/actionvm.h \
+    viewModel/iop/inputvm.h \
+    viewModel/iop/outputvm.h \
+    viewModel/scenario/actionconditionvm.h \
+    viewModel/scenario/actioneffectvm.h \
+    viewModel/scenario/actioninpalettevm.h \
+    viewModel/scenario/actionexecutionvm.h \
     viewModel/iop/parametervm.h
 
 

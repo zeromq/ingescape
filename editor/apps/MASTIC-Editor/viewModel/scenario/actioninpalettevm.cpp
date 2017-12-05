@@ -1,33 +1,26 @@
 /*
- *	ActionInPaletteVM
+ *	MASTIC Editor
  *
- *  Copyright (c) 2016-2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
  *
  *
  *	Contributors:
+ *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *
  */
 
 #include "actioninpalettevm.h"
 
-
 #include <QDebug>
 
 
-
-//--------------------------------------------------------------
-//
-// ActionInPaletteVM
-//
-//--------------------------------------------------------------
-
-
 /**
- * @brief Default constructor
- * @param action model
+ * @brief Constructor
+ * @param actionM
+ * @param indexInPanel
  * @param parent
  */
 ActionInPaletteVM::ActionInPaletteVM(ActionM* actionM,
@@ -47,23 +40,8 @@ ActionInPaletteVM::ActionInPaletteVM(ActionM* actionM,
  */
 ActionInPaletteVM::~ActionInPaletteVM()
 {
-
-}
-
-
-/**
- * @brief Custom setter for property "modelM"
- */
-void ActionInPaletteVM::setmodelM(ActionM* value)
-{
-    if (_modelM != value)
-    {
-        _modelM = value;
-
-        // Reset status
-        setstatus(ActionInPaletteState::DISABLE);
-
-        Q_EMIT modelMChanged(value);
+    if (_modelM != NULL) {
+        setmodelM(NULL);
     }
 }
 

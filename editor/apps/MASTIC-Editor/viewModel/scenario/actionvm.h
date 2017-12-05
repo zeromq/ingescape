@@ -22,8 +22,8 @@
 
 #include "I2PropertyHelpers.h"
 
-#include "model/scenario/actionm.h"
-#include "viewModel/actionexecutionvm.h"
+#include <model/scenario/actionm.h>
+#include <viewModel/scenario/actionexecutionvm.h>
 
 
 /**

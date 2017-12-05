@@ -24,9 +24,9 @@
 
 #include <controller/masticmodelmanager.h>
 #include <controller/actioneditorcontroller.h>
-#include "viewModel/actionvm.h"
 #include "viewModel/agentinmappingvm.h"
-#include "viewModel/actioninpalettevm.h"
+#include "viewModel/scenario/actionvm.h"
+#include "viewModel/scenario/actioninpalettevm.h"
 
 
 // Margin in milliseconds to insert an action following another
