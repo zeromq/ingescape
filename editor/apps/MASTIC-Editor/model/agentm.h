@@ -57,6 +57,9 @@ class AgentM : public QObject
     // Flag indicating if our agent is ON (vs OFF)
     I2_QML_PROPERTY_READONLY(bool, isON)
 
+    // Flag indicating if our agent can be restarted (by a MASTIC launcher)
+    I2_QML_PROPERTY_READONLY(bool, canBeRestarted)
+
     // Flag indicating if our agent is muted
     I2_QML_PROPERTY_READONLY_CUSTOM_SETTER(bool, isMuted)
 

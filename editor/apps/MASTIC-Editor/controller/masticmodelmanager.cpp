@@ -21,6 +21,9 @@
 
 #include <I2Quick.h>
 
+#include "controller/masticlaunchermanager.h"
+
+
 /**
  * @brief Default constructor
  * @param agentsListDirectoryPath
@@ -213,6 +216,15 @@ void MasticModelManager::onAgentEntered(QString peerId, QString agentName, QStri
 
             agent->sethostname(hostname);
             agent->setcommandLine(commandLine);
+
+            if (!hostname.isEmpty())
+            {
+                QString peerIdMasticLauncher = MasticLauncherManager::Instance().getPeerIdOfMasticLauncherWithHostName(hostname);
+                if (!peerIdMasticLauncher.isEmpty() && !commandLine.isEmpty()) {
+                    agent->setcanBeRestarted(true);
+                }
+            }
+
             agent->setpid(pid);
             agent->setcanBeFrozen(canBeFrozen);
 
