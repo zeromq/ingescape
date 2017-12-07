@@ -24,9 +24,9 @@
 
 #include <controller/masticmodelmanager.h>
 #include <controller/actioneditorcontroller.h>
-#include "viewModel/actionvm.h"
 #include "viewModel/agentinmappingvm.h"
-#include "viewModel/actioninpalettevm.h"
+#include "viewModel/scenario/actionvm.h"
+#include "viewModel/scenario/actioninpalettevm.h"
 
 
 // Margin in milliseconds to insert an action following another
@@ -175,13 +175,13 @@ public:
      * @param action model
      * @param line number
      */
-    Q_INVOKABLE void addActionVMAtTime(ActionM * actionModel, int timeInMs, int lineNumber = -1);
+    Q_INVOKABLE void addActionVMAtTime(ActionM* actionM, int timeInMs, int lineNumber = -1);
 
     /**
      * @brief Add an action VM at the current date time
      * @param action model
      */
-    Q_INVOKABLE void addActionVMAtCurrentTime(ActionM * actionModel);
+    Q_INVOKABLE void addActionVMAtCurrentTime(ActionM* actionM);
 
     /**
      * @brief Remove an action VM from the time line

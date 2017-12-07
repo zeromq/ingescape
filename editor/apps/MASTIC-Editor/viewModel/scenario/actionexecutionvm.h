@@ -1,3 +1,17 @@
+/*
+ *	MASTIC Editor
+ *
+ *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *
+ *	See license terms for the rights and conditions
+ *	defined by copyright holders.
+ *
+ *
+ *	Contributors:
+ *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
+ *
+ */
+
 #ifndef ACTIONEXECUTIONVM_H
 #define ACTIONEXECUTIONVM_H
 
@@ -6,7 +20,7 @@
 #include <QPair>
 
 #include <I2PropertyHelpers.h>
-#include <viewModel/actioneffectvm.h>
+#include <viewModel/scenario/actioneffectvm.h>
 
 /**
  * @brief The ActionExecutionVM class is the view model that support the representation of the action in the scenario

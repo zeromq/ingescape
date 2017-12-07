@@ -22,7 +22,7 @@
 #include <I2PropertyHelpers.h>
 
 #include <model/definitionm.h>
-#include <model/agentmappingm.h>
+#include <model/mapping/agentmappingm.h>
 
 
 /**
@@ -58,7 +58,7 @@ class AgentM : public QObject
     I2_QML_PROPERTY_READONLY(bool, isON)
 
     // Flag indicating if our agent is muted
-    I2_QML_PROPERTY_READONLY(bool, isMuted)
+    I2_QML_PROPERTY_READONLY_CUSTOM_SETTER(bool, isMuted)
 
     // Flag indicating if our agent can be frozen
     I2_QML_PROPERTY_READONLY(bool, canBeFrozen)

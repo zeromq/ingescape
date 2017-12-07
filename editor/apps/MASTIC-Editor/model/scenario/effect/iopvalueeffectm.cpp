@@ -259,7 +259,7 @@ void IOPValueEffectM::onInputsOutputsListChange()
     AgentIOPM * newAgentIOP = NULL;
 
     // If we have a selected agent iop
-    if(_agentIOPName.isEmpty() == false)
+    if (!_agentIOPName.isEmpty())
     {
         _iopMergedList.clear();
 

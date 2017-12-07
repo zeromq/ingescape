@@ -97,6 +97,25 @@ AgentM::~AgentM()
 
 
 /**
+ * @brief Setter for property "is Muted"
+ * @param value
+ */
+void AgentM::setisMuted(bool value)
+{
+    if (_isMuted != value)
+    {
+        _isMuted = value;
+
+        if (_definition != NULL) {
+            _definition->setisMutedOfAllOutputs(_isMuted);
+        }
+
+        Q_EMIT isMutedChanged(value);
+    }
+}
+
+
+/**
  * @brief Set the flag "is Muted" of an Output of our agent
  * @param isMuted
  * @param outputName

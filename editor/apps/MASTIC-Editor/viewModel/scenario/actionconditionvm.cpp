@@ -1,18 +1,18 @@
 /*
- *	ActionConditionVM
+ *	MASTIC Editor
  *
- *  Copyright (c) 2016-2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
  *
  *
  *	Contributors:
+ *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *
  */
 
 #include "actionconditionvm.h"
-
 
 #include <QDebug>
 
@@ -87,7 +87,7 @@ void ActionConditionVM::setconditionType(ActionConditionType::Value value)
         // configure the new type
         _configureToType(value);
 
-        emit conditionTypeChanged(value);
+        Q_EMIT conditionTypeChanged(value);
     }
 }
 

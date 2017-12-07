@@ -101,7 +101,7 @@ Item {
                     anchors {
                         fill : parent
                     }
-                    enabled: model.actionModel === null
+                    enabled: model.modelM === null
 
                     keys: ["ActionsListItem"]
 
@@ -132,10 +132,10 @@ Item {
 
                 Button {
                     anchors.fill: parent
-                    visible : model.actionModel !== null
+                    visible : model.modelM !== null
                     enabled : visible
 
-                    text :  model.actionModel?  model.actionModel.name : "";
+                    text :  model.modelM ?  model.modelM.name : "";
 
                     style : I2ColorButtonStyle {
                         backgroundColorDisabled: MasticTheme.darkBlueGreyColor;
@@ -157,14 +157,14 @@ Item {
                     }
 
                     onClicked: {
-                        if (controller && model.actionModel) {
+                        if (controller && model.modelM)
+                        {
                             if (controller.isPlaying) {
-                                controller.addActionVMAtCurrentTime(model.actionModel);
+                                controller.addActionVMAtCurrentTime(model.modelM);
                             }
                             else {
-                                controller.executeEffectsOfAction(model.actionModel);
+                                controller.executeEffectsOfAction(model.modelM);
                             }
-
                         }
                     }
                 }
@@ -179,7 +179,7 @@ Item {
                         right : parent.right
                         margins : -2
                     }
-                    visible : model.actionModel !== null
+                    visible : model.modelM !== null
                     enabled : visible
 
                     activeFocusOnPress: true

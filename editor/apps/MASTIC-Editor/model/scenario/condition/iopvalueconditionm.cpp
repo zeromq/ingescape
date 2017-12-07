@@ -1,13 +1,14 @@
 /*
- *	IOPValueConditionM
+ *	MASTIC Editor
  *
- *  Copyright (c) 2016-2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
  *
  *
  *	Contributors:
+ *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *
  */
 
@@ -156,30 +157,34 @@ void IOPValueConditionM::resetConnections()
     }
 }
 
+
 /**
   * @brief Slot on agent outputs list change
   */
 void IOPValueConditionM::onInputsOutputsListChange()
 {
     // If we have a selected agent iop
-    if(_agentIOPName.isEmpty() == false)
+    if (!_agentIOPName.isEmpty())
     {
         _agentIopList.clear();
 
         // Check that our output list update concern our selected agent iop
         foreach (OutputVM* outputVM, _agent->outputsList()->toList())
         {
-            if(outputVM->firstModel() != NULL)
+            if ((outputVM != NULL) && (outputVM->firstModel() != NULL))
             {
                 _agentIopList.append(outputVM->firstModel());
-                if(outputVM->name() == _agentIOPName)
-                {
+
+                if (outputVM->name() == _agentIOPName) {
                     updateAgentIOPSelected(outputVM->firstModel());
                 }
             }
-        } 
+        }
+
+        // FIXME: pourquoi on ne remplit pas "_agentIopList" aussi avec la liste "_agent->inputsList()" ?
     }
 }
+
 
 /**
 * @brief Update the selected agent iop
@@ -187,7 +192,7 @@ void IOPValueConditionM::onInputsOutputsListChange()
 void IOPValueConditionM::updateAgentIOPSelected(AgentIOPM * newAgentIOP)
 {
     // Reset the agentIOP
-    if(newAgentIOP != _agentIOP)
+    if (newAgentIOP != _agentIOP)
     {
         // Disconnect old agent iop
         if(_agentIOP != NULL)

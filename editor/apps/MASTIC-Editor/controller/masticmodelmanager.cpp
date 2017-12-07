@@ -532,7 +532,7 @@ void MasticModelManager::addAgentModel(AgentM* agent)
         // Emit the signal "Agent Model Created"
         Q_EMIT agentModelCreated(agent);
 
-        _printAgents();
+        //_printAgents();
     }
 }
 
@@ -633,7 +633,7 @@ void MasticModelManager::deleteAgentModel(AgentM* agent)
         // Free memory
         delete agent;
 
-        _printAgents();
+        //_printAgents();
     }
 }
 
@@ -657,7 +657,7 @@ void MasticModelManager::addAgentDefinitionForAgentName(DefinitionM* agentDefini
         // Update the list in the map
         _mapFromNameToAgentDefinitionsList.insert(definitionName, agentDefinitionsList);
 
-        _printDefinitions();
+        //_printDefinitions();
 
         // Update definition variants of a list of definitions with the same name
         _updateDefinitionVariants(definitionName);
@@ -700,7 +700,7 @@ void MasticModelManager::deleteAgentDefinition(DefinitionM* definition)
         // Free memory
         delete definition;
 
-        _printDefinitions();
+        //_printDefinitions();
 
         // Update definition variants of a list of definitions with the same name
         _updateDefinitionVariants(definitionName);

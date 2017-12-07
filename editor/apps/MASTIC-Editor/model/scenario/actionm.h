@@ -23,8 +23,8 @@
 
 #include "I2PropertyHelpers.h"
 
-#include "viewModel/actionconditionvm.h"
-#include "viewModel/actioneffectvm.h"
+#include <viewModel/scenario/actionconditionvm.h>
+#include <viewModel/scenario/actioneffectvm.h>
 
 /**
   * @brief Validation duration type for an action
@@ -73,9 +73,11 @@ class ActionM: public QObject
     // Flag to rearm the action
     I2_QML_PROPERTY(bool, shallRearm)
 
+    // FIXME: a Model must not contain a VM
     // List of effects for the action
     I2_QOBJECT_LISTMODEL(ActionEffectVM, effectsList)
 
+    // FIXME: a Model must not contain a VM
     // List of conditions for the action
     I2_QOBJECT_LISTMODEL(ActionConditionVM, conditionsList)
 
@@ -100,16 +102,19 @@ public:
       */
     ~ActionM();
 
+
     /**
      * @brief Copy from another action model
      * @param action model to copy
      */
     void copyFrom(ActionM* actionModel);
 
+
     /**
      * @brief Initialize connections for conditions
      */
     void initializeConditionsConnections();
+
 
     /**
      * @brief Reset connections for conditions

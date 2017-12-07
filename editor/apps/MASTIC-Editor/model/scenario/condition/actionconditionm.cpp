@@ -1,21 +1,21 @@
 /*
- *	ActionConditionM
+ *	MASTIC Editor
  *
- *  Copyright (c) 2016-2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
  *
  *
  *	Contributors:
+ *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *
  */
 
 #include "actionconditionm.h"
 
-
 #include <QDebug>
-#include "iopvalueconditionm.h"
+
 
 /**
  * @brief Comparison type for an action
@@ -139,7 +139,7 @@ void ActionConditionM::onAgentModelIsOnChange(bool isON)
 {
     if ((_comparison == ActionComparisonValueType::ON && isON)
             ||
-            (_comparison == ActionComparisonValueType::OFF && isON == false)) {
+            (_comparison == ActionComparisonValueType::OFF && !isON)) {
         setisValid(true);
     }
     else {

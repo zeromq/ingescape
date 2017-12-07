@@ -22,37 +22,37 @@
 
 /**
  * @brief Default constructor
- * @param agentFrom The link starts from this agent
- * @param pointFrom The link starts from this output of the agentFrom
- * @param agentTo The link ends to this agent
- * @param pointTo The link ends to this input of the agentTo
+ * @param outputAgent The link starts from this agent
+ * @param output The link starts from this output of the output agent
+ * @param inputAgent The link ends to this agent
+ * @param input The link ends to this input of the input agent
  * @param isVirtual
  * @param parent
  */
-MapBetweenIOPVM::MapBetweenIOPVM(AgentInMappingVM* agentFrom,
-                                 OutputVM *pointFrom,
-                                 AgentInMappingVM* agentTo,
-                                 InputVM *pointTo,
+MapBetweenIOPVM::MapBetweenIOPVM(AgentInMappingVM* outputAgent,
+                                 OutputVM* output,
+                                 AgentInMappingVM* inputAgent,
+                                 InputVM* input,
                                  bool isVirtual,
                                  QObject *parent) : QObject(parent),
-    _agentFrom(NULL),
-    _pointFrom(NULL),
-    _agentTo(NULL),
-    _pointTo(NULL),
+    _outputAgent(NULL),
+    _output(NULL),
+    _inputAgent(NULL),
+    _input(NULL),
     _isVirtual(isVirtual)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
     // Allow to benefit of "DELETE PROOF"
-    setagentFrom(agentFrom);
-    setpointFrom(pointFrom);
-    setagentTo(agentTo);
-    setpointTo(pointTo);
+    setoutputAgent(outputAgent);
+    setoutput(output);
+    setinputAgent(inputAgent);
+    setinput(input);
 
-    if ((_agentFrom != NULL) && (_pointFrom != NULL) && (_agentTo != NULL) && (_pointTo != NULL))
+    if ((_outputAgent != NULL) && (_output != NULL) && (_inputAgent != NULL) && (_input != NULL))
     {
-        //qInfo() << "Create new Map Between IOP VM" << _agentFrom->name() << "." << _pointFrom->name() << "-->" << _agentTo->name() << "." << _pointTo->name();
+        //qInfo() << "Create new Map Between IOP VM" << _outputAgent->name() << "." << _output->name() << "-->" << _inputAgent->name() << "." << _input->name();
     }
 }
 
@@ -62,15 +62,15 @@ MapBetweenIOPVM::MapBetweenIOPVM(AgentInMappingVM* agentFrom,
  */
 MapBetweenIOPVM::~MapBetweenIOPVM()
 {
-    if ((_agentFrom != NULL) && (_pointFrom != NULL) && (_agentTo != NULL) && (_pointTo != NULL))
+    if ((_outputAgent != NULL) && (_output != NULL) && (_inputAgent != NULL) && (_input != NULL))
     {
-        //qInfo() << "Delete Map Between IOP VM" << _agentFrom->name() << "." << _pointFrom->name() << "-->" << _agentTo->name() << "." << _pointTo->name();
+        //qInfo() << "Delete Map Between IOP VM" << _outputAgent->name() << "." << _output->name() << "-->" << _inputAgent->name() << "." << _input->name();
     }
 
-    if (_agentFrom != NULL)
+    if (_outputAgent != NULL)
     {
-        AgentInMappingVM* temp = _agentFrom;
-        setagentFrom(NULL);
+        AgentInMappingVM* temp = _outputAgent;
+        setoutputAgent(NULL);
 
         // Handle ghost agent
         if (temp->isGhost()) {
@@ -78,10 +78,10 @@ MapBetweenIOPVM::~MapBetweenIOPVM()
         }
     }
 
-    if (_pointFrom != NULL)
+    if (_output != NULL)
     {
-        OutputVM* temp = _pointFrom;
-        setpointFrom(NULL);
+        OutputVM* temp = _output;
+        setoutput(NULL);
 
         // Handle ghost output
         if (temp->isGhost()) {
@@ -89,7 +89,7 @@ MapBetweenIOPVM::~MapBetweenIOPVM()
         }
     }
 
-    setagentTo(NULL);
-    setpointTo(NULL);
+    setinputAgent(NULL);
+    setinput(NULL);
 }
 

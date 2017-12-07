@@ -13,7 +13,6 @@
  *
  */
 
-
 #include "controller/masticeditorcontroller.h"
 
 #include "misc/masticeditorsettings.h"

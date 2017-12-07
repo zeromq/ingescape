@@ -96,7 +96,7 @@ ActionM::~ActionM()
  */
 void ActionM::copyFrom(ActionM* actionModel)
 {
-    if(actionModel != NULL)
+    if (actionModel != NULL)
     {
         setname(actionModel->name());
         setvalidityDurationType(actionModel->validityDurationType());
@@ -230,7 +230,7 @@ void ActionM::setrevertAfterTimeString(QString value)
             qCritical() << "Wrong 'Revert After Time':" << _revertAfterTimeString << "for action" << _name;
         }
 
-        emit revertAfterTimeStringChanged(value);
+        Q_EMIT revertAfterTimeStringChanged(value);
     }
 }
 
@@ -282,7 +282,7 @@ void ActionM::setvalidityDurationString(QString value)
             qCritical() << "Wrong 'Validity Duration':" << _validityDurationString << "for action" << _name;
         }
 
-        emit validityDurationStringChanged(value);
+        Q_EMIT validityDurationStringChanged(value);
     }
 }
 
@@ -297,7 +297,7 @@ void ActionM::setshallRevert(bool shallRevert)
         _shallRevert = shallRevert;
 
         // Reset properties if the shall revert is unchecked
-        if(_shallRevert == false)
+        if (!_shallRevert)
         {
             setshallRevertWhenValidityIsOver(false);
             setshallRevertAfterTime(false);
@@ -307,7 +307,7 @@ void ActionM::setshallRevert(bool shallRevert)
             setshallRevertWhenValidityIsOver(true);
         }
 
-        emit shallRevertChanged(shallRevert);
+        Q_EMIT shallRevertChanged(shallRevert);
     }
 }
 
@@ -317,7 +317,7 @@ void ActionM::setshallRevert(bool shallRevert)
  */
 void ActionM::initializeConditionsConnections()
 {
-    if(_isConnected == false)
+    if (!_isConnected)
     {
         // Initialize conditions connections
         foreach (ActionConditionVM* conditionVM, _conditionsList.toList())
@@ -339,12 +339,13 @@ void ActionM::initializeConditionsConnections()
     }
 }
 
+
 /**
  * @brief Reset connections for conditions
  */
 void ActionM::resetConditionsConnections()
 {
-    if(_isConnected == true)
+    if (_isConnected)
     {
         // Initialize conditions connections
         foreach (ActionConditionVM* conditionVM, _conditionsList.toList())
@@ -359,8 +360,8 @@ void ActionM::resetConditionsConnections()
 
         setisConnected(false);
     }
-
 }
+
 
 /**
  * @brief Slot on the condition validation change
@@ -373,14 +374,14 @@ void ActionM::_onConditionValidationChange(bool isValid)
 
     foreach (ActionConditionVM* conditionVM, _conditionsList.toList())
     {
-        if(conditionVM->modelM() != NULL)
+        if (conditionVM->modelM() != NULL)
         {
             bool valid = conditionVM->modelM()->isValid();
             actionValidation = valid && actionValidation;
         }
 
         // We leave if all conditions are not valids
-        if(actionValidation == false)
+        if (!actionValidation)
         {
             break;
         }

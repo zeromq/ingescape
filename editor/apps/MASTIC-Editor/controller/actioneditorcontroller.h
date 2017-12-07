@@ -1,14 +1,14 @@
-
 /*
- *	ActionEditorController
+ *	MASTIC Editor
  *
- *  Copyright (c) 2016-2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
  *
  *
  *	Contributors:
+ *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *
  */
 
@@ -21,11 +21,12 @@
 #include <QJSEngine>
 
 #include "I2PropertyHelpers.h"
+
 #include "model/scenario/actionm.h"
 #include "viewModel/agentinmappingvm.h"
-#include "viewModel/actionconditionvm.h"
-#include "viewModel/actioneffectvm.h"
-#include "viewModel/actionvm.h"
+#include "viewModel/scenario/actionvm.h"
+#include "viewModel/scenario/actionconditionvm.h"
+#include "viewModel/scenario/actioneffectvm.h"
 
 
 /**

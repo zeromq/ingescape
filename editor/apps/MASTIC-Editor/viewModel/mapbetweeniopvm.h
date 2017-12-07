@@ -31,16 +31,16 @@ class MapBetweenIOPVM : public QObject
     Q_OBJECT
 
     // View model of the output agent of our link (link starts from this agent)
-    I2_QML_PROPERTY_DELETE_PROOF(AgentInMappingVM*, agentFrom)
+    I2_QML_PROPERTY_DELETE_PROOF(AgentInMappingVM*, outputAgent)
 
     // View model of the output slot associated to our link
-    I2_QML_PROPERTY_DELETE_PROOF(OutputVM*, pointFrom)
+    I2_QML_PROPERTY_DELETE_PROOF(OutputVM*, output)
 
     // View model of the input agent of our link (link ends to this agent)
-    I2_QML_PROPERTY_DELETE_PROOF(AgentInMappingVM*, agentTo)
+    I2_QML_PROPERTY_DELETE_PROOF(AgentInMappingVM*, inputAgent)
 
     // View model of the input slot associated to our link
-    I2_QML_PROPERTY_DELETE_PROOF(InputVM*, pointTo)
+    I2_QML_PROPERTY_DELETE_PROOF(InputVM*, input)
 
     // Flag indicating if our link is virtual (agents are not really linked on the network)
     I2_QML_PROPERTY_READONLY(bool, isVirtual)
@@ -55,17 +55,17 @@ public:
 
     /**
      * @brief Default constructor
-     * @param agentFrom The link starts from this agent
-     * @param pointFrom The link starts from this output of the agentFrom
-     * @param agentTo The link ends to this agent
-     * @param pointTo The link ends to this input of the agentTo
+     * @param outputAgent The link starts from this agent
+     * @param output The link starts from this output of the output agent
+     * @param inputAgent The link ends to this agent
+     * @param input The link ends to this input of the input agent
      * @param isVirtual
      * @param parent
      */
-    explicit MapBetweenIOPVM(AgentInMappingVM* agentFrom,
-                             OutputVM *pointFrom,
-                             AgentInMappingVM* agentTo,
-                             InputVM *pointTo,
+    explicit MapBetweenIOPVM(AgentInMappingVM* outputAgent,
+                             OutputVM* output,
+                             AgentInMappingVM* inputAgent,
+                             InputVM* input,
                              bool isVirtual,
                              QObject *parent = nullptr);
 
