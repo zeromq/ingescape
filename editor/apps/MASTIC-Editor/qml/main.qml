@@ -66,9 +66,9 @@ ApplicationWindow {
                 }
             }
             MenuItem {
-                text: qsTr("Import agents")
+                text: qsTr("Open agents")
                 onTriggered: {
-                    //console.log("QML: Import agents");
+                    //console.log("QML: Open agents");
 
                     if (MasticEditorC.modelManager) {
                         MasticEditorC.modelManager.importAgentsListFromSelectedFile();
@@ -76,10 +76,10 @@ ApplicationWindow {
                 }
             }
             MenuItem {
-                text: qsTr("Export agents")
+                text: qsTr("Save agents")
 
                 onTriggered: {
-                    //console.log("QML: Export agents");
+                    //console.log("QML: Save agents");
 
                     if (MasticEditorC.agentsSupervisionC) {
                         MasticEditorC.agentsSupervisionC.exportAgentsListToSelectedFile();
@@ -115,20 +115,20 @@ ApplicationWindow {
             }
 
             MenuItem {
-                text: qsTr("Import mapping")
+                text: qsTr("Open mapping")
                 enabled: false
 
                 onTriggered: {
-                    console.log("Import mapping");
+                    console.log("Open mapping");
                 }
             }
 
             MenuItem {
-                text: qsTr("Export mapping")
+                text: qsTr("Save mapping")
                 enabled: false
 
                 onTriggered: {
-                    console.log("Export mapping");
+                    console.log("Save mapping");
                 }
             }
 
@@ -204,7 +204,7 @@ ApplicationWindow {
             title: qsTr("Scenario")
 
             MenuItem {
-                text: qsTr("Import scenario")
+                text: qsTr("Open scenario")
                 onTriggered: {
                     if (MasticEditorC.scenarioC) {
                         MasticEditorC.scenarioC.importScenarioFromFile();
@@ -212,7 +212,7 @@ ApplicationWindow {
                 }
             }
             MenuItem {
-                text: qsTr("Export scenario")
+                text: qsTr("Save scenario")
                 onTriggered: {
                     if (MasticEditorC.scenarioC) {
                         MasticEditorC.scenarioC.exportScenarioToSelectedFile();
