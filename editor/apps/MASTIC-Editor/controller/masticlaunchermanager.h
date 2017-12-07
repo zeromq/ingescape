@@ -18,6 +18,7 @@
 #include <QObject>
 
 #include <I2PropertyHelpers.h>
+#include <model/hostm.h>
 
 
 /**
@@ -26,6 +27,10 @@
 class MasticLauncherManager : public QObject
 {
     Q_OBJECT
+
+    // List of all hosts
+    I2_QOBJECT_LISTMODEL(HostM, hosts)
+
 
 public:
 
@@ -38,17 +43,19 @@ public:
 
     /**
      * @brief Add a Mastic Launcher
-     * @param hostName
      * @param peerId
+     * @param hostName
+     * @param ipAddress
      */
-    void addMasticLauncher(QString hostName, QString peerId);
+    void addMasticLauncher(QString peerId, QString hostName, QString ipAddress);
 
 
     /**
      * @brief Remove a Mastic Launcher
+     * @param peerId
      * @param hostName
      */
-    void removeMasticLauncher(QString hostName);
+    void removeMasticLauncher(QString peerId, QString hostName);
 
 
     /**
@@ -83,8 +90,8 @@ private:
 
 private:
 
-    // Map from "HostName" to the "Peer Id" of the corresponding MASTIC launcher
-    QHash<QString, QString> _mapFromHostNameToMasticLauncherPeerId;
+    // Map from "Name" to the "Host" of the corresponding MASTIC launcher
+    QHash<QString, HostM*> _mapFromNameToHost;
 
 };
 

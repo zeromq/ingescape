@@ -23,8 +23,10 @@
 
 #include "I2PropertyHelpers.h"
 
+#include "controller/masticlaunchermanager.h"
 #include <model/iop/outputm.h>
 #include <model/publishedvaluem.h>
+
 
 /**
  * @brief The NetworkController class defines the controller for network communications

@@ -27,25 +27,49 @@ MasticLauncherManager& MasticLauncherManager::Instance()
 
 /**
  * @brief Add a Mastic Launcher
- * @param hostName
  * @param peerId
+ * @param hostName
+ * @param ipAddress
  */
-void MasticLauncherManager::addMasticLauncher(QString hostName, QString peerId)
+void MasticLauncherManager::addMasticLauncher(QString peerId, QString hostName, QString ipAddress)
 {
-    if (!hostName.isEmpty() && !peerId.isEmpty()) {
-        _mapFromHostNameToMasticLauncherPeerId.insert(hostName, peerId);
+    if (!peerId.isEmpty() && !hostName.isEmpty())
+    {
+        if (!_mapFromNameToHost.contains(hostName))
+        {
+            // Create a new host
+            HostM* host = new HostM(hostName, peerId, ipAddress, this);
+
+            // Add to the list
+            _hosts.append(host);
+
+            // Add to the map
+            _mapFromNameToHost.insert(hostName, host);
+        }
     }
 }
 
 
 /**
  * @brief Remove a Mastic Launcher
+ * @param peerId
  * @param hostName
  */
-void MasticLauncherManager::removeMasticLauncher(QString hostName)
+void MasticLauncherManager::removeMasticLauncher(QString peerId, QString hostName)
 {
-    if (!hostName.isEmpty()) {
-        _mapFromHostNameToMasticLauncherPeerId.remove(hostName);
+    if (!peerId.isEmpty() && !hostName.isEmpty())
+    {
+        if (_mapFromNameToHost.contains(hostName))
+        {
+            HostM* host = _mapFromNameToHost.value(hostName);
+            if (host != NULL) {
+                // Remove from the list
+                _hosts.remove(host);
+            }
+
+            // Remove from the map
+            _mapFromNameToHost.remove(hostName);
+        }
     }
 }
 
@@ -59,9 +83,14 @@ QString MasticLauncherManager::getPeerIdOfMasticLauncherWithHostName(QString hos
 {
     QString peerIdMasticLauncher = "";
 
-    if (!hostName.isEmpty() && _mapFromHostNameToMasticLauncherPeerId.contains(hostName)) {
-        peerIdMasticLauncher = _mapFromHostNameToMasticLauncherPeerId.value(hostName);
+    if (!hostName.isEmpty() && _mapFromNameToHost.contains(hostName))
+    {
+        HostM* host = _mapFromNameToHost.value(hostName);
+        if (host != NULL) {
+            peerIdMasticLauncher = host->peerId();
+        }
     }
+
     return peerIdMasticLauncher;
 }
 

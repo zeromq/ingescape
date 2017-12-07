@@ -42,7 +42,7 @@ class AgentM : public QObject
     // It has only a definition (and evetually a mapping)
     I2_QML_PROPERTY_READONLY(bool, neverAppearedOnNetwork)
 
-    // Address of our agent
+    // IP address of our agent
     I2_QML_PROPERTY_READONLY(QString, address)
 
     // HostName of our agent
@@ -80,6 +80,7 @@ class AgentM : public QObject
 
 
 public:
+
     /**
      * @brief Constructor without peer id and address
      * @param name

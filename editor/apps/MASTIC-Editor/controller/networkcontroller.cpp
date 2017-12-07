@@ -24,7 +24,6 @@ extern "C" {
 
 #include "misc/masticeditorutils.h"
 #include "model/definitionm.h"
-#include "controller/masticlaunchermanager.h"
 
 
 static const QString launcherSuffix = ".masticlauncher";
@@ -59,17 +58,31 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
         QString group = zyre_event_group(zyre_event);
         zmsg_t* msg = zyre_event_msg(zyre_event);
 
+        QString hostname = "";
+        QString ipAddress = "";
+
         // ENTER
         if (event.compare("ENTER") == 0)
         {
             qDebug() << QString("--> %1 has entered the network with peer id %2 (and address %3)").arg(peerName, peerId, peerAddress);
 
+            // Get IP address (Example of peerAddress: "tcp://10.0.0.17:49153")
+            if (peerAddress.length() > 6)
+            {
+                // Remove "tcp://" and then split IP address and port
+                QStringList ipAddressAndPort = peerAddress.remove(0, 6).split(":");
+
+                if (ipAddressAndPort.count() == 2) {
+                    ipAddress = ipAddressAndPort.first();
+                }
+            }
+
             // Mastic Launcher
             if (peerName.endsWith(launcherSuffix)) {
-                QString hostname = peerName.left(peerName.length() - launcherSuffix.length());
+                hostname = peerName.left(peerName.length() - launcherSuffix.length());
 
                 // Add a Mastic Launcher
-                MasticLauncherManager::Instance().addMasticLauncher(hostname, peerId);
+                MasticLauncherManager::Instance().addMasticLauncher(peerId, hostname, ipAddress);
             }
 
             bool isMasticPublisher = false;
@@ -77,7 +90,6 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
             int pid = -1;
             bool canBeFrozen = false;
             QString commandLine = "";
-            QString hostname = "";
 
             zlist_t *keys = zhash_keys(headers);
             size_t nbKeys = zlist_size(keys);
@@ -121,20 +133,12 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
             }
             zlist_destroy(&keys);
 
-            if (isMasticPublisher && isIntPID) {
-                qDebug() << "our zyre event is about MASTIC publisher:" << pid << hostname << commandLine;
+            if (isMasticPublisher && isIntPID)
+            {
+                //qDebug() << "Our zyre event is about MASTIC publisher:" << pid << hostname << commandLine;
 
-                // example of peerAddress: "tcp://10.0.0.17:49153"
-                if (peerAddress.length() > 6)
-                {
-                    // Remove "tcp://" and then split IP address and port
-                    QStringList ipAddressAndPort = peerAddress.remove(0, 6).split(":");
-
-                    if (ipAddressAndPort.count() == 2) {
-                        // Emit the signal "Agent Entered"
-                        Q_EMIT networkController->agentEntered(peerId, peerName, ipAddressAndPort.first(), pid, hostname, commandLine, canBeFrozen);
-                    }
-                }
+                // Emit the signal "Agent Entered"
+                Q_EMIT networkController->agentEntered(peerId, peerName, ipAddress, pid, hostname, commandLine, canBeFrozen);
             }
         }
         // JOIN (group)
@@ -255,7 +259,7 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
                 QString hostname = peerName.left(peerName.length() - launcherSuffix.length());
 
                 // Remove a Mastic Launcher
-                MasticLauncherManager::Instance().removeMasticLauncher(hostname);
+                MasticLauncherManager::Instance().removeMasticLauncher(peerId, hostname);
             }
             else {
                 // Emit the signal "Agent Exited"
