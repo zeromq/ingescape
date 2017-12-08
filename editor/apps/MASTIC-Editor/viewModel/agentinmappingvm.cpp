@@ -110,6 +110,7 @@ AgentInMappingVM::~AgentInMappingVM()
     // Delete elements in the lists of Inputs & Outputs
     _inputsList.deleteAllItems();
     _outputsList.deleteAllItems();
+    _parametersList.deleteAllItems();
 
     // Clear the previous list of models
     _previousAgentsList.clear();
@@ -347,6 +348,13 @@ void AgentInMappingVM::_agentModelAdded(AgentM* model)
                 }
             }
         }
+
+        // Traverse the list of models of parameters in the definition
+        /*foreach (AgentIOPM* parameter, model->definition()->parametersList()->toList())
+        {
+            // FIXME TODO: ParameterVM
+            ParameterVM* parameterVM =
+        }*/
 
         if (inputsListToAdd.count() > 0)
         {

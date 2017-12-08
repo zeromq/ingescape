@@ -63,7 +63,8 @@ SOURCES += main.cpp \
     viewModel/scenario/actioninpalettevm.cpp \
     viewModel/scenario/actionexecutionvm.cpp \
     viewModel/iop/parametervm.cpp \
-    model/hostm.cpp
+    model/hostm.cpp \
+    viewModel/iop/agentiopvm.cpp
 
 HEADERS += \
     stable.h \
@@ -122,7 +123,8 @@ HEADERS += \
     viewModel/scenario/actioninpalettevm.h \
     viewModel/scenario/actionexecutionvm.h \
     viewModel/iop/parametervm.h \
-    model/hostm.h
+    model/hostm.h \
+    viewModel/iop/agentiopvm.h
 
 
 RESOURCES += qml.qrc

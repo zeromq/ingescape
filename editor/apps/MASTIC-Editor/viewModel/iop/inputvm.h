@@ -31,7 +31,7 @@ class InputVM : public PointMapVM
 {
     Q_OBJECT
 
-    // First model of our agent Input
+    // First model of our agent input
     I2_QML_PROPERTY_READONLY_DELETE_PROOF(AgentIOPM*, firstModel)
 
     // Models of our agent input
@@ -39,6 +39,13 @@ class InputVM : public PointMapVM
 
 
 public:
+    /**
+     * @brief Constructor
+     * @param inputName
+     * @param inputId
+     * @param modelM
+     * @param parent
+     */
     explicit InputVM(QString inputName,
                      QString inputId,
                      AgentIOPM* modelM,
@@ -71,8 +78,6 @@ private Q_SLOTS:
 
 
 private:
-    // Previous list of models
-    //QList<AgentIOPM*> _previousModelsList;
 
 };
 

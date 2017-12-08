@@ -126,10 +126,12 @@ void registerCustomQmlTypes()
     qmlRegisterUncreatableType<ActionInPaletteVM>(uri, 1, 0, "ActionInPaletteVM", "Internal class");
     qmlRegisterUncreatableType<ActionVM>(uri, 1, 0, "ActionVM", "Internal class");
     qmlRegisterUncreatableType<AgentInMappingVM>(uri, 1, 0, "AgentInMappingVM", "Internal class");
+    qmlRegisterUncreatableType<AgentIOPVM>(uri, 1, 0, "AgentIOPVM", "Internal class");
     qmlRegisterUncreatableType<AgentVM>(uri, 1, 0, "AgentVM", "Internal class");
     qmlRegisterUncreatableType<InputVM>(uri, 1, 0, "InputVM", "Internal class");
     qmlRegisterUncreatableType<MapBetweenIOPVM>(uri, 1, 0, "MapBetweenIOPVM", "Internal class");
     qmlRegisterUncreatableType<OutputVM>(uri, 1, 0, "OutputVM", "Internal class");
+    qmlRegisterUncreatableType<ParameterVM>(uri, 1, 0, "ParameterVM", "Internal class");
     qmlRegisterUncreatableType<PointMapVM>(uri, 1, 0, "PointMapVM", "Internal class");
 
 

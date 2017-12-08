@@ -22,9 +22,10 @@
 
 #include <viewModel/iop/inputvm.h>
 #include <viewModel/iop/outputvm.h>
+#include <viewModel/iop/parametervm.h>
 
-#include <model/mapping/agentmappingm.h>
 #include <model/agentm.h>
+
 
 /**
  * @brief The AgentInMappingVM class a view model of agent in the mapping
@@ -43,11 +44,14 @@ class AgentInMappingVM : public QObject
     // List of peer ids of models
     I2_CPP_NOSIGNAL_PROPERTY(QStringList, peerIdsList)
 
-    // List of VM of inputs
+    // List of view models of inputs
     I2_QOBJECT_LISTMODEL(InputVM, inputsList)
 
-    // List of VM of outputs
+    // List of view models of outputs
     I2_QOBJECT_LISTMODEL(OutputVM, outputsList)
+
+    // List of view models of parameters
+    I2_QOBJECT_LISTMODEL(ParameterVM, parametersList)
 
     // The position corresponds to the corner Top-Left of the box
     I2_QML_PROPERTY(QPointF, position)
@@ -96,8 +100,8 @@ public:
      * @param name
      * @param parent
      */
-    explicit AgentInMappingVM(QString name,
-                              QObject* parent = nullptr);
+    /*explicit AgentInMappingVM(QString name,
+                              QObject* parent = nullptr);*/
 
 
     /**

@@ -15,28 +15,31 @@
 #include "pointmapvm.h"
 
 /**
- * @brief Default constructor
+ * @brief Constructor
  * @param name
  * @param id
  * @param parent
  */
 PointMapVM::PointMapVM(QString name,
                        QString id,
-                       QObject *parent) : QObject(parent),
-    _name(name),
-    _id(id),
+                       QObject *parent) : AgentIOPVM(name,
+                                                     id,
+                                                     parent),
     _position(QPointF())
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-   // qInfo() << "New Point Map VM" << _name << "(" << _id << ")";
+    //qInfo() << "New Point Map VM" << _name << "(" << _id << ")";
 }
 
 
+/**
+ * @brief Destructor
+ */
 PointMapVM::~PointMapVM()
 {
-   // qInfo() << "Delete Point Map VM" << _name << "(" << _id << ")";
+   //qInfo() << "Delete Point Map VM" << _name << "(" << _id << ")";
 }
 
 
