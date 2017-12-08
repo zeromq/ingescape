@@ -35,7 +35,7 @@ DefinitionM::DefinitionM(QString name,
 
     qInfo() << "New Model of Agent Definition" << _name << "with version" << _version << "about" << _description;
 
-    // Connect to signal "Count Changed" from the list of outputs
+    // Connect to signal "Count Changed" from the list of Inputs/Outputs/Parameters
     connect(&_inputsList, &AbstractI2CustomItemListModel::countChanged, this, &DefinitionM::_onInputsListChanged);
     connect(&_outputsList, &AbstractI2CustomItemListModel::countChanged, this, &DefinitionM::_onOutputsListChanged);
     connect(&_parametersList, &AbstractI2CustomItemListModel::countChanged, this, &DefinitionM::_onParametersListChanged);
@@ -49,7 +49,7 @@ DefinitionM::~DefinitionM()
 {
     qInfo() << "Delete Model of Agent Definition" << _name;
 
-    // DIS-connect from signal "Count Changed" from the list of outputs
+    // DIS-connect from signal "Count Changed" from the list of Inputs/Outputs/Parameters
     disconnect(&_inputsList, &AbstractI2CustomItemListModel::countChanged, this, &DefinitionM::_onInputsListChanged);
     disconnect(&_outputsList, &AbstractI2CustomItemListModel::countChanged, this, &DefinitionM::_onOutputsListChanged);
     disconnect(&_parametersList, &AbstractI2CustomItemListModel::countChanged, this, &DefinitionM::_onParametersListChanged);

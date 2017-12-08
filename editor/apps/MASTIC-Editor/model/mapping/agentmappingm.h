@@ -36,10 +36,10 @@ class AgentMappingM : public QObject
     // Version of our agent mapping
     I2_QML_PROPERTY(QString, version)
 
-    // Description of our agent mapping description
+    // Description of our agent mapping
     I2_QML_PROPERTY(QString, description)
 
-    // List of element mapping of our agent mapping
+    // List of (mapping) elements of our agent mapping
     I2_QOBJECT_LISTMODEL(ElementMappingM, elementMappingsList)
 
     // List of the ids of the mapping elements
@@ -65,7 +65,13 @@ public:
 
 Q_SIGNALS:
 
-public Q_SLOTS:
+private Q_SLOTS:
+
+    /**
+     * @brief Slot called when the list of mapping elements changed
+     */
+    void _onMappingElementsListChanged();
+
 };
 
 QML_DECLARE_TYPE(AgentMappingM)

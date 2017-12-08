@@ -33,6 +33,9 @@ AgentMappingM::AgentMappingM(QString name,
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
     //qInfo() << "New Model of Agent Mapping" << _name << "with version" << _version << "about" << _description;
+
+    // Connect to signal "Count Changed" from the list of mapping elements
+    connect(&_elementMappingsList, &AbstractI2CustomItemListModel::countChanged, this, &AgentMappingM::_onMappingElementsListChanged);
 }
 
 
@@ -43,7 +46,28 @@ AgentMappingM::~AgentMappingM()
 {
     //qInfo() << "Delete Model of Agent Mapping" << _name;
 
-    // Clear the list (no delete all)
+    // DIS-connect to signal "Count Changed" from the list of mapping elements
+    disconnect(&_elementMappingsList, &AbstractI2CustomItemListModel::countChanged, this, &AgentMappingM::_onMappingElementsListChanged);
+
+    // Clear the list (do not delete all)
     _elementMappingsList.clear();
     _mappingElementsIds.clear();
+}
+
+
+/**
+ * @brief Slot called when the list of mapping elements changed
+ */
+void AgentMappingM::_onMappingElementsListChanged()
+{
+    _mappingElementsIds.clear();
+
+    foreach (ElementMappingM* mappingElement, _elementMappingsList.toList())
+    {
+        if ((mappingElement != NULL) && !mappingElement->id().isEmpty()) {
+            _mappingElementsIds.append(mappingElement->id());
+        }
+    }
+
+    //qDebug() << _name << "Mapping Elements Ids:" << _mappingElementsIds;
 }
