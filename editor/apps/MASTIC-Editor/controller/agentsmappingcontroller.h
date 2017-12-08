@@ -39,9 +39,9 @@ class AgentsMappingController : public QObject
     // List of all links between agents in mapping
     I2_QOBJECT_LISTMODEL(MapBetweenIOPVM, allLinksInMapping)
 
-    // List of all partial maps between agents (input and input agent are fully defined, output and output agent are ghost element)
+    // List of all partial links between agents (input and input agent are fully defined, output and output agent are ghost element)
     // This list is not empty in the case of the presence of Ghost Agents in the mapping
-    //I2_QOBJECT_LISTMODEL(MapBetweenIOPVM, allPartialMapInMapping)
+    //I2_QOBJECT_LISTMODEL(MapBetweenIOPVM, allPartialLinksInMapping)
 
     // Flag indicating if our mapping is empty
     I2_QML_PROPERTY_READONLY(bool, isEmptyMapping)
@@ -49,8 +49,8 @@ class AgentsMappingController : public QObject
     // Selected agent in the mapping
     I2_QML_PROPERTY_DELETE_PROOF(AgentInMappingVM*, selectedAgent)
 
-    // Selected map between agents in the mapping
-    I2_QML_PROPERTY_DELETE_PROOF(MapBetweenIOPVM*, selectedMapBetweenIOP)
+    // Selected link between agents in the mapping
+    I2_QML_PROPERTY_DELETE_PROOF(MapBetweenIOPVM*, selectedLink)
 
 
 public:

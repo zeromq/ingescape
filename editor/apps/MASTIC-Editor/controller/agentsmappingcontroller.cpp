@@ -28,7 +28,7 @@ AgentsMappingController::AgentsMappingController(MasticModelManager* modelManage
     : QObject(parent),
       _isEmptyMapping(true),
       _selectedAgent(NULL),
-      _selectedMapBetweenIOP(NULL),
+      _selectedLink(NULL),
       _modelManager(modelManager)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
@@ -47,19 +47,19 @@ AgentsMappingController::AgentsMappingController(MasticModelManager* modelManage
  */
 AgentsMappingController::~AgentsMappingController()
 {
-    // Clean-up current selection
+    // Clean-up current selections
     setselectedAgent(NULL);
-    setselectedMapBetweenIOP(NULL);
+    setselectedLink(NULL);
 
     // DIS-connect from signal "Count Changed" from the list of agents in mapping
     disconnect(&_allAgentsInMapping, 0, this, 0);
 
-    // Clear the previous list
-    _previousListOfAgentsInMapping.clear();
-
-    // Clear all lists
+    // Delete all links
     _allLinksInMapping.deleteAllItems();
-    //_allPartialMapInMapping.deleteAllItems();
+    //_allPartialLinksInMapping.deleteAllItems();
+
+    // Delete all agents in mapping
+    _previousListOfAgentsInMapping.clear();
     _allAgentsInMapping.deleteAllItems();
 
     _modelManager = NULL;
@@ -725,8 +725,8 @@ void AgentsMappingController::_deleteLinkBetweenTwoAgents(MapBetweenIOPVM* link)
     if (link != NULL)
     {
         // Unselect the link if it is the currently selected one
-        if (_selectedMapBetweenIOP == link) {
-            setselectedMapBetweenIOP(NULL);
+        if (_selectedLink == link) {
+            setselectedLink(NULL);
         }
 
         // Remove from the list
