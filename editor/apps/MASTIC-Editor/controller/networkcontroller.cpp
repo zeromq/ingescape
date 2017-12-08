@@ -78,67 +78,70 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
             }
 
             // Mastic Launcher
-            if (peerName.endsWith(launcherSuffix)) {
+            if (peerName.endsWith(launcherSuffix))
+            {
                 hostname = peerName.left(peerName.length() - launcherSuffix.length());
 
-                // Add a Mastic Launcher
-                MasticLauncherManager::Instance().addMasticLauncher(peerId, hostname, ipAddress);
+                // Emit the signal "Launcher Entered"
+                Q_EMIT networkController->launcherEntered(peerId, hostname, ipAddress);
             }
-
-            bool isMasticPublisher = false;
-            bool isIntPID = false;
-            int pid = -1;
-            bool canBeFrozen = false;
-            QString commandLine = "";
-
-            zlist_t *keys = zhash_keys(headers);
-            size_t nbKeys = zlist_size(keys);
-            if (nbKeys > 0)
+            else
             {
-                //qDebug() << nbKeys << "headers";
+                bool isMasticPublisher = false;
+                bool isIntPID = false;
+                int pid = -1;
+                bool canBeFrozen = false;
+                QString commandLine = "";
 
-                char *k;
-                const char *v;
-                QString key = "";
-                QString value = "";
+                zlist_t *keys = zhash_keys(headers);
+                size_t nbKeys = zlist_size(keys);
+                if (nbKeys > 0)
+                {
+                    //qDebug() << nbKeys << "headers";
 
-                while ((k = (char *)zlist_pop(keys))) {
-                    v = zyre_event_header(zyre_event, k);
+                    char *k;
+                    const char *v;
+                    QString key = "";
+                    QString value = "";
 
-                    key = QString(k);
-                    value = QString(v);
-                    //qDebug() << "key" << key << ":" << value;
+                    while ((k = (char *)zlist_pop(keys))) {
+                        v = zyre_event_header(zyre_event, k);
 
-                    // We check that the key "publisher" exists
-                    if (key == "publisher") {
-                        isMasticPublisher = true;
-                    }
-                    else if (key == "pid") {
-                        pid = value.toInt(&isIntPID);
-                    }
-                    else if (key == "canBeFrozen") {
-                        if (value == "1") {
-                            canBeFrozen = true;
+                        key = QString(k);
+                        value = QString(v);
+                        //qDebug() << "key" << key << ":" << value;
+
+                        // We check that the key "publisher" exists
+                        if (key == "publisher") {
+                            isMasticPublisher = true;
+                        }
+                        else if (key == "pid") {
+                            pid = value.toInt(&isIntPID);
+                        }
+                        else if (key == "canBeFrozen") {
+                            if (value == "1") {
+                                canBeFrozen = true;
+                            }
+                        }
+                        else if (key == "commandline") {
+                            commandLine = value;
+                        }
+                        else if (key == "hostname") {
+                            hostname = value;
                         }
                     }
-                    else if (key == "commandline") {
-                        commandLine = value;
-                    }
-                    else if (key == "hostname") {
-                        hostname = value;
-                    }
+
+                    free(k);
                 }
+                zlist_destroy(&keys);
 
-                free(k);
-            }
-            zlist_destroy(&keys);
+                if (isMasticPublisher && isIntPID)
+                {
+                    //qDebug() << "Our zyre event is about MASTIC publisher:" << pid << hostname << commandLine;
 
-            if (isMasticPublisher && isIntPID)
-            {
-                //qDebug() << "Our zyre event is about MASTIC publisher:" << pid << hostname << commandLine;
-
-                // Emit the signal "Agent Entered"
-                Q_EMIT networkController->agentEntered(peerId, peerName, ipAddress, pid, hostname, commandLine, canBeFrozen);
+                    // Emit the signal "Agent Entered"
+                    Q_EMIT networkController->agentEntered(peerId, peerName, ipAddress, pid, hostname, commandLine, canBeFrozen);
+                }
             }
         }
         // JOIN (group)
@@ -258,8 +261,8 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
             if (peerName.endsWith(launcherSuffix)) {
                 QString hostname = peerName.left(peerName.length() - launcherSuffix.length());
 
-                // Remove a Mastic Launcher
-                MasticLauncherManager::Instance().removeMasticLauncher(peerId, hostname);
+                // Emit the signal "Launcher Exited"
+                Q_EMIT networkController->launcherExited(peerId, hostname);
             }
             else {
                 // Emit the signal "Agent Exited"
@@ -564,11 +567,11 @@ void NetworkController::onCommandAskedToLauncher(QString command, QString hostna
     if (!hostname.isEmpty() && !commandLine.isEmpty())
     {
         // Get the peer id of The Mastic Launcher with a HostName
-        QString peerIdMasticLauncher = MasticLauncherManager::Instance().getPeerIdOfMasticLauncherWithHostName(hostname);
+        QString peerIdLauncher = MasticLauncherManager::Instance().getPeerIdOfLauncherWithHostName(hostname);
 
-        if (!peerIdMasticLauncher.isEmpty()) {
+        if (!peerIdLauncher.isEmpty()) {
             // Send the command with command line to the peer id of the launcher
-            int success = zyre_whispers(agentElements->node, peerIdMasticLauncher.toStdString().c_str(), "%s %s", command.toStdString().c_str(), commandLine.toStdString().c_str());
+            int success = zyre_whispers(agentElements->node, peerIdLauncher.toStdString().c_str(), "%s %s", command.toStdString().c_str(), commandLine.toStdString().c_str());
 
             qInfo() << "Send command" << command << "to launcher on" << hostname << "with command line" << commandLine << "with success ?" << success;
         }

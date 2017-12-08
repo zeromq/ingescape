@@ -59,11 +59,19 @@ public:
 
 
     /**
-     * @brief Get the peer id of The Mastic Launcher with a HostName
+     * @brief Get the host with a (Host)Name
      * @param hostName
      * @return
      */
-    QString getPeerIdOfMasticLauncherWithHostName(QString hostName);
+    HostM* getHostWithName(QString hostName);
+
+
+    /**
+     * @brief Get the peer id of a Launcher with a HostName
+     * @param hostName
+     * @return
+     */
+    QString getPeerIdOfLauncherWithHostName(QString hostName);
 
 
 private:

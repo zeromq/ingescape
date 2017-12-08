@@ -29,6 +29,7 @@
 #include <controller/scenariocontroller.h>
 #include <controller/valueshistorycontroller.h>
 #include <controller/abstracttimeactionslinescenarioviewcontroller.h>
+#include <controller/masticlaunchermanager.h>
 
 #include <misc/terminationsignalwatcher.h>
 
@@ -73,6 +74,9 @@ class MasticEditorController : public QObject
 
     // Controller for the time line
     I2_QML_PROPERTY_READONLY(AbstractTimeActionslineScenarioViewController*, timeLineC)
+
+    // Manager for launchers of MASTIC agents
+    I2_QML_PROPERTY_READONLY(MasticLauncherManager*, launcherManager)
 
 
 public:
