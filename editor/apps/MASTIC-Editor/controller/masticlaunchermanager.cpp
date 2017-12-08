@@ -26,6 +26,21 @@ MasticLauncherManager& MasticLauncherManager::Instance()
 
 
 /**
+ * @brief Destructor
+ */
+MasticLauncherManager::~MasticLauncherManager()
+{
+    qInfo() << "Delete Mastic Launcher Manager";
+
+    // Clear the map
+    _mapFromNameToHost.clear();
+
+    // Free memory
+    _hosts.deleteAllItems();
+}
+
+
+/**
  * @brief Add a Mastic Launcher
  * @param peerId
  * @param hostName

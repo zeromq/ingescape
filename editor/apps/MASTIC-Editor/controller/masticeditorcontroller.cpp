@@ -122,7 +122,7 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     // Create the controller for the history of values
     _valuesHistoryC = new ValuesHistoryController(_modelManager, this);
 
-    // Create the controller FIXME TODO comment
+    // Create the controller for the time line
     _timeLineC = new AbstractTimeActionslineScenarioViewController(this);
 
     // Create the manager for launchers of MASTIC agents
@@ -229,10 +229,10 @@ MasticEditorController::~MasticEditorController()
     {
         disconnect(_launcherManager);
 
-        MasticLauncherManager* temp = _launcherManager;
+        //MasticLauncherManager* temp = _launcherManager;
         setlauncherManager(NULL);
-        delete temp;
-        temp = NULL;
+        //delete temp;
+        //temp = NULL;
     }
 
     if (_timeLineC != NULL)

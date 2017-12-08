@@ -337,7 +337,7 @@ void MasticModelManager::onDefinitionReceived(QString peerId, QString agentName,
                      Q_EMIT addInputsToEditorForOutputs(agentName, agentDefinition->outputsList()->toList());
                  }
                  else {
-                     // FIXME TODO
+                     // FIXME TODO: Update the definition of agent
                      qWarning() << "Update the definition of agent" << agentName << "(if this definition has changed)";
                  }
             }

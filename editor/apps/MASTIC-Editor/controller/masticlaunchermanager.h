@@ -42,6 +42,12 @@ public:
 
 
     /**
+     * @brief Destructor
+     */
+    ~MasticLauncherManager();
+
+
+    /**
      * @brief Add a Mastic Launcher
      * @param peerId
      * @param hostName
