@@ -104,6 +104,7 @@ void registerCustomQmlTypes()
     qmlRegisterUncreatableType<EffectOnAgentM>(uri, 1, 0, "EffectOnAgentM", "Internal class");
     qmlRegisterUncreatableType<ElementMappingM>(uri, 1, 0, "ElementMappingM", "Internal class");
     qmlRegisterUncreatableType<Enums>(uri, 1, 0, "Enums", "Internal class");
+    qmlRegisterUncreatableType<HostM>(uri, 1, 0, "HostM", "Internal class");
     qmlRegisterUncreatableType<OutputM>(uri, 1, 0, "OutputM", "Internal class");
     qmlRegisterUncreatableType<PublishedValueM>(uri, 1, 0, "PublishedValueM", "Internal class");
     qmlRegisterUncreatableType<ActionConditionM>(uri, 1, 0, "ActionConditionM", "Internal class");

@@ -19,6 +19,7 @@ import QtQuick.Controls 1.4
 import QtQuick.Controls.Styles 1.4
 
 import I2Quick 1.0
+import QtQuick.Window 2.3
 
 import MASTIC 1.0
 
@@ -58,7 +59,7 @@ Item {
 
     // function allowing to open the history panel
     function openHistory() {
-        historyPanel.open();
+        historyPanel.show();
     }
 
 
@@ -237,16 +238,16 @@ Item {
                     }
                 }
 
-//                Tab {
-//                    title: qsTr("RECORDS");
-//                    active : false
+                //                Tab {
+                //                    title: qsTr("RECORDS");
+                //                    active : false
 
-//                    Rectangle {
-//                        id: records
-//                        anchors.fill: parent
-//                        color : "transparent"
-//                    }
-//                }
+                //                    Rectangle {
+                //                        id: records
+                //                        anchors.fill: parent
+                //                        color : "transparent"
+                //                    }
+                //                }
             }
 
         }
@@ -257,82 +258,96 @@ Item {
     Repeater {
         model: MasticEditorC.modelManager.openedDefinitions
 
-        delegate: Agent.AgentDefinitionEditor {
-            id: agentDefinitionEditor
+        delegate: Item {
+            Agent.AgentDefinitionEditor {
+                id: agentDefinitionEditor
+                visible : true
 
-            // Center popup
-            x: (parent.width - agentDefinitionEditor.width) / 2.0
-            y: (parent.height - agentDefinitionEditor.height) / 2.0
+                Component.onCompleted:  {
+                    x = rootItem.Window.window.x + rootItem.Window.width/2 - agentDefinitionEditor.width/2;
+                    y = rootItem.Window.window.y + rootItem.Window.height/2  - agentDefinitionEditor.height / 2.0;
+                }
 
-            onOpened: {
-                agentDefinitionEditor.z = rootItem.popupTopmostZIndex;
-                rootItem.popupTopmostZIndex = rootItem.popupTopmostZIndex + 1;
+                //            onOpened: {
+                //                agentDefinitionEditor.z = rootItem.popupTopmostZIndex;
+                //                rootItem.popupTopmostZIndex = rootItem.popupTopmostZIndex + 1;
 
-                x = x + (index * 40);
-                y = y + (index * 40);
-            }
+                //                x = x + (index * 40);
+                //                y = y + (index * 40);
+                //            }
 
-            onBringToFront: {
-                agentDefinitionEditor.z = rootItem.popupTopmostZIndex;
-                rootItem.popupTopmostZIndex = rootItem.popupTopmostZIndex + 1;
-            }
+                //            onBringToFront: {
+                //                agentDefinitionEditor.z = rootItem.popupTopmostZIndex;
+                //                rootItem.popupTopmostZIndex = rootItem.popupTopmostZIndex + 1;
+                //            }
 
-            onClosed: {
-                MasticEditorC.closeDefinition(model.QtObject);
-            }
+                onClosing: {
+                    MasticEditorC.closeDefinition(model.QtObject);
+                }
 
-            onOpenHistory : {
-                historyPanel.open();
+                onOpenHistory : {
+                    historyPanel.show();
+                }
             }
         }
     }
-    
+
+
     // List of "Actions Editor(s)"
     Repeater {
-        model: MasticEditorC.scenarioC ? MasticEditorC.scenarioC.openedActionsEditorsControllers : 0;
-        
-        delegate: Scenario.ActionEditor {
-            id: actionEditor
-            
-            controller : MasticEditorC.scenarioC
-            panelController: model.QtObject
+        model : MasticEditorC.scenarioC ? MasticEditorC.scenarioC.openedActionsEditorsControllers : 0;
 
-            // Place popup
-            x: (model.editedViewModel !== null)? ((parent.width - actionEditor.width) / 2.0) : ( MasticTheme.leftPanelWidth - actionEditor.width/2)
-            y: (parent.height - actionEditor.height) / 2.0
-            
-            onOpened: {
-                actionEditor.z = rootItem.popupTopmostZIndex;
-                rootItem.popupTopmostZIndex = rootItem.popupTopmostZIndex + 1;
-            }
-            
-            onBringToFront: {
-                actionEditor.z = rootItem.popupTopmostZIndex;
-                rootItem.popupTopmostZIndex = rootItem.popupTopmostZIndex + 1;
-            }
-            
-            onClosed: {
-                MasticEditorC.closeActionEditor(model.QtObject);
+        delegate: Item {
+            Scenario.ActionEditor {
+                id: actionEditor
+
+                controller : MasticEditorC.scenarioC
+                panelController: model.QtObject
+                visible : true
+
+                Component.onCompleted:  {
+                    x = rootItem.Window.window.x + rootItem.Window.width/2 - actionEditor.width/2;
+                    y = rootItem.Window.window.y + rootItem.Window.height/2 - actionEditor.height/2;
+                }
+
+                //                onOpened: {
+                //                    actionEditor.z = rootItem.popupTopmostZIndex;
+                //                    rootItem.popupTopmostZIndex = rootItem.popupTopmostZIndex + 1;
+                //                }
+
+                //                onBringToFront: {
+                //                    actionEditor.z = rootItem.popupTopmostZIndex;
+                //                    rootItem.popupTopmostZIndex = rootItem.popupTopmostZIndex + 1;
+                //                }
+
+                onClosing: {
+                    MasticEditorC.closeActionEditor(model.QtObject);
+                }
             }
         }
     }
+
+
+
 
     // AgentMappingHistory
     Agent.HistoryPanel {
         id: historyPanel
 
-        // Center popup
-        x: (parent.width - historyPanel.width) / 2.0
-        y: (parent.height - historyPanel.height) / 2.0
-
-        onOpened: {
-            historyPanel.z = rootItem.popupTopmostZIndex;
-            rootItem.popupTopmostZIndex = rootItem.popupTopmostZIndex + 1;
+        Component.onCompleted:  {
+             // Center window
+            x = rootItem.Window.window.x + rootItem.Window.width/2 - historyPanel.width/2;
+            y = rootItem.Window.window.y + rootItem.Window.height/2 - historyPanel.height/2;
         }
 
-        onBringToFront: {
-            historyPanel.z = rootItem.popupTopmostZIndex;
-            rootItem.popupTopmostZIndex = rootItem.popupTopmostZIndex + 1;
-        }
+//        onOpened: {
+//            historyPanel.z = rootItem.popupTopmostZIndex;
+//            rootItem.popupTopmostZIndex = rootItem.popupTopmostZIndex + 1;
+//        }
+
+//        onBringToFront: {
+//            historyPanel.z = rootItem.popupTopmostZIndex;
+//            rootItem.popupTopmostZIndex = rootItem.popupTopmostZIndex + 1;
+//        }
     }
 }

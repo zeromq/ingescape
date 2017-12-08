@@ -21,6 +21,9 @@
 
 #include <I2Quick.h>
 
+#include "controller/masticlaunchermanager.h"
+
+
 /**
  * @brief Default constructor
  * @param agentsListDirectoryPath
@@ -107,7 +110,7 @@ void MasticModelManager::importAgentsListFromSelectedFile()
 {
     // "File Dialog" to get the file (path) to open
     QString agentsListFilePath = QFileDialog::getOpenFileName(NULL,
-                                                              "Import agents",
+                                                              "Open agents",
                                                               _agentsListDirectoryPath,
                                                               "JSON (*.json)");
 
@@ -126,7 +129,7 @@ void MasticModelManager::importAgentFromSelectedFiles()
     // "File Dialog" to get the files (paths) to open
     QStringList agentFilesPaths = QFileDialog::getOpenFileNames(NULL,
                                                                 //"Import an agent definition (and an agent mapping)",
-                                                                "Import an agent definition",
+                                                                "Open an agent definition",
                                                                 _dataDirectoryPath,
                                                                 "JSON (*.json)");
 
@@ -154,7 +157,7 @@ void MasticModelManager::exportAgentsListToSelectedFile(QList<QPair<QString, Def
 {
     // "File Dialog" to get the file (path) to save
     QString agentsListFilePath = QFileDialog::getSaveFileName(NULL,
-                                                              "Export agents",
+                                                              "Save agents",
                                                               _agentsListDirectoryPath,
                                                               "JSON (*.json)");
 
@@ -213,6 +216,15 @@ void MasticModelManager::onAgentEntered(QString peerId, QString agentName, QStri
 
             agent->sethostname(hostname);
             agent->setcommandLine(commandLine);
+
+            if (!hostname.isEmpty())
+            {
+                QString peerIdMasticLauncher = MasticLauncherManager::Instance().getPeerIdOfMasticLauncherWithHostName(hostname);
+                if (!peerIdMasticLauncher.isEmpty() && !commandLine.isEmpty()) {
+                    agent->setcanBeRestarted(true);
+                }
+            }
+
             agent->setpid(pid);
             agent->setcanBeFrozen(canBeFrozen);
 
@@ -970,7 +982,7 @@ void MasticModelManager::_exportAgentsListToFile(QList<QPair<QString, Definition
 {
     if (!agentsListFilePath.isEmpty() && (_jsonHelper != NULL))
     {
-        qInfo() << "Export the agents list to JSON file" << agentsListFilePath;
+        qInfo() << "Save the agents list to JSON file" << agentsListFilePath;
 
         // Export the agents list
         QByteArray byteArrayOfJson = _jsonHelper->exportAgentsList(agentsListToExport);

@@ -15,6 +15,7 @@
 import QtQuick 2.8
 import QtQuick.Controls 1.4
 import QtQuick.Controls.Styles 1.4
+import QtQuick.Window 2.3
 
 import I2Quick 1.0
 
@@ -23,16 +24,22 @@ import MASTIC 1.0
 import "../theme" as Theme;
 
 
-I2PopupBase {
+Window {
     id: rootItem
 
-    width: 666
-    height: 420
+    height: minimumHeight
+    width: minimumWidth
 
-    automaticallyOpenWhenCompleted: true
-    isModal: false
-    dismissOnOutsideTap : false;
-    keepRelativePositionToInitialParent : false;
+    minimumWidth: 666
+    minimumHeight:420
+
+    flags: Qt.Tool
+
+
+//    automaticallyOpenWhenCompleted: true
+//    isModal: false
+//    dismissOnOutsideTap : false;
+//    keepRelativePositionToInitialParent : false;
 
 
     //--------------------------------
@@ -77,7 +84,7 @@ I2PopupBase {
     //--------------------------------
 
     // Emitted when user pressed our popup
-    signal bringToFront();
+    //signal bringToFront();
 
 
     // Emitted when user clicks on "istory" button
@@ -102,78 +109,79 @@ I2PopupBase {
         color: MasticTheme.editorsBackgroundColor
 
         // catch events
-        MultiPointTouchArea {
-            anchors.fill: parent
-        }
+//        MultiPointTouchArea {
+//            anchors.fill: parent
+//        }
 
-        // drag Area
-        I2CustomRectangle {
-            id : dragRect
-            anchors {
-                top : parent.top
-                left : parent.left
-                right : parent.right
-                margins : 2
-            }
-            height : 50
-            topLeftRadius : 5
-            topRightRadius : 5
+//        // drag Area
+//        I2CustomRectangle {
+//            id : dragRect
+//            anchors {
+//                top : parent.top
+//                left : parent.left
+//                right : parent.right
+//                margins : 2
+//            }
+//            height : 50
+//            topLeftRadius : 5
+//            topRightRadius : 5
 
-            color :dragMouseArea.pressed? MasticTheme.editorsBackgroundColor : MasticTheme.darkBlueGreyColor
+//            color :dragMouseArea.pressed? MasticTheme.editorsBackgroundColor : MasticTheme.darkBlueGreyColor
 
-            MouseArea {
-                id : dragMouseArea
-                hoverEnabled: true
-                anchors.fill: parent
-                drag.target: rootItem
+//            MouseArea {
+//                id : dragMouseArea
+//                hoverEnabled: true
+//                anchors.fill: parent
+//                drag.target: rootItem
 
-                drag.minimumX : - rootItem.width/2
-                drag.maximumX : rootItem.parent.width - rootItem.width/2
-                drag.minimumY :  0
-                drag.maximumY :  rootItem.parent.height - rootItem.height/2
+//                drag.minimumX : - rootItem.width/2
+//                drag.maximumX : rootItem.parent.width - rootItem.width/2
+//                drag.minimumY :  0
+//                drag.maximumY :  rootItem.parent.height - rootItem.height/2
 
-                onPressed: {
-                    // Emit signal "bring to front"
-                    rootItem.bringToFront();
-                }
-            }
-        }
+//                onPressed: {
+//                    // Emit signal "bring to front"
+//                    rootItem.bringToFront();
+//                }
+//            }
+//        }
 
         // separator
         Rectangle {
             anchors {
-                top : dragRect.bottom
-                left : dragRect.left
-                right : dragRect.right
+                top : parent.top
+                topMargin: 50
+                left : parent.left
+                right : parent.right
             }
             height : 1
             color : MasticTheme.editorsBackgroundBorderColor
         }
 
 
-        Button {
-            id: btnCloseEditor
+//        Button {
+//            id: btnCloseEditor
 
-            anchors {
-                verticalCenter: definitionNameItem.verticalCenter
-                right : parent.right
-                rightMargin: 20
-            }
+//            anchors {
+//                verticalCenter: definitionNameItem.verticalCenter
+//                right : parent.right
+//                rightMargin: 20
+//            }
 
-            activeFocusOnPress: true
-            style: Theme.LabellessSvgButtonStyle {
-                fileCache: MasticTheme.svgFileMASTIC
+//            activeFocusOnPress: true
+//            style: Theme.LabellessSvgButtonStyle {
+//                fileCache: MasticTheme.svgFileMASTIC
 
-                pressedID: releasedID + "-pressed"
-                releasedID: "closeEditor"
-                disabledID : releasedID
-            }
+//                pressedID: releasedID + "-pressed"
+//                releasedID: "closeEditor"
+//                disabledID : releasedID
+//            }
 
-            onClicked: {
-                // Close our popup
-                rootItem.close();
-            }
-        }
+//            onClicked: {
+//                // Close our popup
+//                rootItem.close();
+//            }
+//        }
 
 
         // Definition name and version
@@ -775,4 +783,10 @@ I2PopupBase {
     }
 
 
+    I2Layer {
+        id: overlayLayerComboBox
+        objectName: "overlayLayerComboBox"
+
+        anchors.fill: parent
+    }
 }

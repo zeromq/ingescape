@@ -15,7 +15,6 @@
 
 #include "networkcontroller.h"
 
-
 #include <QDebug>
 #include <QApplication>
 
@@ -59,15 +58,31 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
         QString group = zyre_event_group(zyre_event);
         zmsg_t* msg = zyre_event_msg(zyre_event);
 
+        QString hostname = "";
+        QString ipAddress = "";
+
         // ENTER
         if (event.compare("ENTER") == 0)
         {
             qDebug() << QString("--> %1 has entered the network with peer id %2 (and address %3)").arg(peerName, peerId, peerAddress);
 
+            // Get IP address (Example of peerAddress: "tcp://10.0.0.17:49153")
+            if (peerAddress.length() > 6)
+            {
+                // Remove "tcp://" and then split IP address and port
+                QStringList ipAddressAndPort = peerAddress.remove(0, 6).split(":");
+
+                if (ipAddressAndPort.count() == 2) {
+                    ipAddress = ipAddressAndPort.first();
+                }
+            }
+
             // Mastic Launcher
             if (peerName.endsWith(launcherSuffix)) {
-                QString hostname = peerName.left(peerName.length() - launcherSuffix.length());
-                networkController->masticLauncherEntered(hostname, peerId);
+                hostname = peerName.left(peerName.length() - launcherSuffix.length());
+
+                // Add a Mastic Launcher
+                MasticLauncherManager::Instance().addMasticLauncher(peerId, hostname, ipAddress);
             }
 
             bool isMasticPublisher = false;
@@ -75,7 +90,6 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
             int pid = -1;
             bool canBeFrozen = false;
             QString commandLine = "";
-            QString hostname = "";
 
             zlist_t *keys = zhash_keys(headers);
             size_t nbKeys = zlist_size(keys);
@@ -119,20 +133,12 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
             }
             zlist_destroy(&keys);
 
-            if (isMasticPublisher && isIntPID) {
-                qDebug() << "our zyre event is about MASTIC publisher:" << pid << hostname << commandLine;
+            if (isMasticPublisher && isIntPID)
+            {
+                //qDebug() << "Our zyre event is about MASTIC publisher:" << pid << hostname << commandLine;
 
-                // example of peerAddress: "tcp://10.0.0.17:49153"
-                if (peerAddress.length() > 6)
-                {
-                    // Remove "tcp://" and then split IP address and port
-                    QStringList ipAddressAndPort = peerAddress.remove(0, 6).split(":");
-
-                    if (ipAddressAndPort.count() == 2) {
-                        // Emit the signal "Agent Entered"
-                        Q_EMIT networkController->agentEntered(peerId, peerName, ipAddressAndPort.first(), pid, hostname, commandLine, canBeFrozen);
-                    }
-                }
+                // Emit the signal "Agent Entered"
+                Q_EMIT networkController->agentEntered(peerId, peerName, ipAddress, pid, hostname, commandLine, canBeFrozen);
             }
         }
         // JOIN (group)
@@ -251,11 +257,14 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
             // Mastic Launcher
             if (peerName.endsWith(launcherSuffix)) {
                 QString hostname = peerName.left(peerName.length() - launcherSuffix.length());
-                networkController->masticLauncherExited(hostname);
-            }
 
-            // Emit the signal "Agent Exited"
-            Q_EMIT networkController->agentExited(peerId, peerName);
+                // Remove a Mastic Launcher
+                MasticLauncherManager::Instance().removeMasticLauncher(peerId, hostname);
+            }
+            else {
+                // Emit the signal "Agent Exited"
+                Q_EMIT networkController->agentExited(peerId, peerName);
+            }
         }
     }
 
@@ -501,31 +510,6 @@ void NetworkController::start(QString networkDevice, QString ipAddress, int port
 
 
 /**
- * @brief Called when a MASTIC Launcher enter the network
- * @param hostname
- * @param peerId
- */
-void NetworkController::masticLauncherEntered(QString hostname, QString peerId)
-{
-    qInfo() << "MASTIC Launcher on" << hostname << "entered";
-
-    _mapFromHostnameToMasticLauncherPeerId.insert(hostname, peerId);
-}
-
-
-/**
- * @brief Called when a MASTIC Launcher exit the network
- * @param hostname
- */
-void NetworkController::masticLauncherExited(QString hostname)
-{
-    qInfo() << "MASTIC Launcher on" << hostname << "exited";
-
-    _mapFromHostnameToMasticLauncherPeerId.remove(hostname);
-}
-
-
-/**
  * @brief Manage the message "MUTED / UN-MUTED"
  * @param peerId
  * @param message
@@ -579,15 +563,14 @@ void NetworkController::onCommandAskedToLauncher(QString command, QString hostna
 {
     if (!hostname.isEmpty() && !commandLine.isEmpty())
     {
-        if (_mapFromHostnameToMasticLauncherPeerId.contains(hostname)) {
-            QString masticLauncherPeerId = _mapFromHostnameToMasticLauncherPeerId.value(hostname);
+        // Get the peer id of The Mastic Launcher with a HostName
+        QString peerIdMasticLauncher = MasticLauncherManager::Instance().getPeerIdOfMasticLauncherWithHostName(hostname);
 
-            if (!masticLauncherPeerId.isEmpty()) {
-                // Send the command with command line to the peer id of the launcher
-                int success = zyre_whispers(agentElements->node, masticLauncherPeerId.toStdString().c_str(), "%s %s", command.toStdString().c_str(), commandLine.toStdString().c_str());
+        if (!peerIdMasticLauncher.isEmpty()) {
+            // Send the command with command line to the peer id of the launcher
+            int success = zyre_whispers(agentElements->node, peerIdMasticLauncher.toStdString().c_str(), "%s %s", command.toStdString().c_str(), commandLine.toStdString().c_str());
 
-                qInfo() << "Send command" << command << "to launcher on" << hostname << "with command line" << commandLine << "with success ?" << success;
-            }
+            qInfo() << "Send command" << command << "to launcher on" << hostname << "with command line" << commandLine << "with success ?" << success;
         }
         else {
             qInfo() << "There is no launcher on" << hostname;

@@ -16,6 +16,7 @@
 import QtQuick 2.8
 import QtQuick.Controls 1.4
 import QtQuick.Controls.Styles 1.4
+import QtQuick.Window 2.3
 
 import I2Quick 1.0
 
@@ -203,6 +204,7 @@ Item {
 
                 onClicked: {
                     controller.openActionEditor(null);
+                    //actionEditor.show();
                 }
             }
 
@@ -507,4 +509,9 @@ Item {
             }
         }
     }
+
+
+
+
+
 }

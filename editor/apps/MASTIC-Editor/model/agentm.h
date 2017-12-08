@@ -42,7 +42,7 @@ class AgentM : public QObject
     // It has only a definition (and evetually a mapping)
     I2_QML_PROPERTY_READONLY(bool, neverAppearedOnNetwork)
 
-    // Address of our agent
+    // IP address of our agent
     I2_QML_PROPERTY_READONLY(QString, address)
 
     // HostName of our agent
@@ -56,6 +56,9 @@ class AgentM : public QObject
 
     // Flag indicating if our agent is ON (vs OFF)
     I2_QML_PROPERTY_READONLY(bool, isON)
+
+    // Flag indicating if our agent can be restarted (by a MASTIC launcher)
+    I2_QML_PROPERTY_READONLY(bool, canBeRestarted)
 
     // Flag indicating if our agent is muted
     I2_QML_PROPERTY_READONLY_CUSTOM_SETTER(bool, isMuted)
@@ -80,6 +83,7 @@ class AgentM : public QObject
 
 
 public:
+
     /**
      * @brief Constructor without peer id and address
      * @param name

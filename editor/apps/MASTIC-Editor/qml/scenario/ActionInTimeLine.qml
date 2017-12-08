@@ -238,6 +238,7 @@ Item {
         x : Math.min(executionsItem.minimunXValueInExecutionList, 0);
 
         // find element with the maximum width in the actionInTimeline item : could be the name, conditions validity time or executions list
+        // x could be below 0 => need to add '-x'
         width : Math.max(backgroundActionName.width,
                          actionVMItem.width,
                          executionsItem.width) - x

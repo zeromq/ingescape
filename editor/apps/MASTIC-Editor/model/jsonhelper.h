@@ -30,6 +30,17 @@
 #include "viewModel/scenario/actionconditionvm.h"
 #include "viewModel/scenario/actioninpalettevm.h"
 
+/**
+ * @brief Structure used for scenario importation from a json string
+ * @param list of actions models in the table
+ * @param list of actions in the palette
+ * @param list of actions in the timeline
+ */
+struct scenario_import_actions_lists_t {
+  QList<ActionM*>           actionsInTableList;
+  QList<ActionInPaletteVM*> actionsInPaletteList;
+  QList<ActionVM*>          actionsInTimelineList;
+};
 
 /**
  * @brief The JsonHelper class defines a helper to manage JSON definitions of agents
@@ -95,9 +106,10 @@ public:
      * @brief Initialize actions list from JSON file
      * @param byteArrayOfJson
      * @param agents list
-     * @return
+     * @return the scenario importation structure containing the list of actions
+     *         in the table, in the palette and in the timeline
      */
-    QPair< QPair< QList<ActionM*>, QList<ActionInPaletteVM*> > , QList<ActionVM*> > initActionsList(QByteArray byteArrayOfJson, QList<AgentInMappingVM*> listAgentsInMapping);
+    scenario_import_actions_lists_t * initActionsList(QByteArray byteArrayOfJson, QList<AgentInMappingVM*> listAgentsInMapping);
 
     /**
      * @brief Create an action condition VM from JSON object

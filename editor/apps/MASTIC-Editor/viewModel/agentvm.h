@@ -68,6 +68,9 @@ class AgentVM : public QObject
     // Number of clones
     I2_QML_PROPERTY_READONLY(int, clonesNumber)
 
+    // Flag indicating if our agent can be restarted (by a MASTIC launcher)
+    I2_QML_PROPERTY_READONLY(bool, canBeRestarted)
+
 
 public:
     /**
@@ -161,6 +164,13 @@ private Q_SLOTS:
 
 
     /**
+     * @brief Slot when the flag "can Be Restarted" of a model changed
+     * @param canBeRestarted
+     */
+    void _onCanBeRestartedOfModelChanged(bool canBeRestarted);
+
+
+    /**
      * @brief Slot when the flag "is Muted" of a model changed
      * @param isMuted
      */
@@ -206,6 +216,12 @@ private:
      * @brief Update the flag "is ON" in function of flags of models
      */
     void _updateIsON();
+
+
+    /**
+     * @brief Update the flag "can Be Restarted" in function of flags of models
+     */
+    void _updateCanBeRestarted();
 
 
     /**

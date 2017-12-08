@@ -564,9 +564,9 @@ ElementMappingM* JsonHelper::_createModelOfElementMapping(QString inputAgentName
  * @param byteArrayOfJson
  * @return
  */
-QPair< QPair< QList<ActionM*>, QList<ActionInPaletteVM*> > , QList<ActionVM*> > JsonHelper::initActionsList(QByteArray byteArrayOfJson, QList<AgentInMappingVM*> listAgentsInMapping)
+scenario_import_actions_lists_t *JsonHelper::initActionsList(QByteArray byteArrayOfJson, QList<AgentInMappingVM*> listAgentsInMapping)
 {
-    QPair< QPair< QList<ActionM*>, QList<ActionInPaletteVM*> > , QList<ActionVM*> > parsedResult;
+    scenario_import_actions_lists_t * scenarioImport = NULL;
     QList<ActionM*> actionsListToImport;
     QList<ActionInPaletteVM*> actionsInPalette;
     QList<ActionVM*> actionsInTimeLine;
@@ -577,6 +577,8 @@ QPair< QPair< QList<ActionM*>, QList<ActionInPaletteVM*> > , QList<ActionVM*> > 
     if (jsonFileRoot.isObject())
     {
         QJsonObject jsonActionsRoot = jsonFileRoot.object();
+
+        scenarioImport = new scenario_import_actions_lists_t();
 
         // ------
         // Actions in table list
@@ -764,14 +766,14 @@ QPair< QPair< QList<ActionM*>, QList<ActionInPaletteVM*> > , QList<ActionVM*> > 
                 }
             }
         }
+
+        // Set results
+        scenarioImport->actionsInTableList.append(actionsListToImport);
+        scenarioImport->actionsInPaletteList.append(actionsInPalette);
+        scenarioImport->actionsInTimelineList.append(actionsInTimeLine);
     }
 
-    // Set results
-    parsedResult.first.first.append(actionsListToImport);
-    parsedResult.first.second.append(actionsInPalette);
-    parsedResult.second.append(actionsInTimeLine);
-
-    return parsedResult;
+    return scenarioImport;
 }
 
 

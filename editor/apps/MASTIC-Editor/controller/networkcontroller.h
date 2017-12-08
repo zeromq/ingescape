@@ -23,8 +23,10 @@
 
 #include "I2PropertyHelpers.h"
 
+#include "controller/masticlaunchermanager.h"
 #include <model/iop/outputm.h>
 #include <model/publishedvaluem.h>
+
 
 /**
  * @brief The NetworkController class defines the controller for network communications
@@ -56,21 +58,6 @@ public:
      * @param port
      */
     void start(QString networkDevice, QString ipAddress, int port);
-
-
-    /**
-     * @brief Called when a MASTIC Launcher enter the network
-     * @param hostname
-     * @param peerId
-     */
-    void masticLauncherEntered(QString hostname, QString peerId);
-
-
-    /**
-     * @brief Called when a MASTIC Launcher exit the network
-     * @param hostname
-     */
-    void masticLauncherExited(QString hostname);
 
 
     /**
@@ -245,8 +232,6 @@ private:
     // Our Mastic agent is successfully started if the result of mtic_startWithDevice / mtic_startWithIP is 1 (O otherwise)
     int _isMasticAgentStarted;
 
-    // Map from "Hostname" to the "Peer Id" of the corresponding MASTIC launcher
-    QHash<QString, QString> _mapFromHostnameToMasticLauncherPeerId;
 
     // Map from "Input (on our editor) Name" to the number of agents in state ON
     // Variants of an agent can have some outputs with same name and some outputs with different name

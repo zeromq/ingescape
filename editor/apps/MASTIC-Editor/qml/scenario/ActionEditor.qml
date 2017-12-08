@@ -9,28 +9,36 @@
  *
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
- *
+ *      Justine Limoges <limoges@ingenuity.io>
  */
 
 import QtQuick 2.8
 import QtQuick.Controls 1.4
 import QtQuick.Controls.Styles 1.4
-
+import QtQuick.Window 2.3
 import I2Quick 1.0
 
 import MASTIC 1.0
 import "../theme" as Theme;
 
-I2PopupBase {
+Window {
     id: rootItem
 
-    width: 475
-    height: MasticTheme.appMinHeight
+    height: minimumHeight
+    width: minimumWidth
 
-    automaticallyOpenWhenCompleted: true
-    isModal: false
-    dismissOnOutsideTap : false;
-    keepRelativePositionToInitialParent : false;
+    minimumWidth: 475
+    minimumHeight: MasticTheme.appMinHeight
+
+    maximumWidth: 475
+    maximumHeight: MasticTheme.appMinHeight
+
+    flags: Qt.Tool
+
+//    automaticallyOpenWhenCompleted: true
+//    isModal: false
+//    dismissOnOutsideTap : false;
+//    keepRelativePositionToInitialParent : false;
 
 
     //--------------------------------
@@ -40,9 +48,9 @@ I2PopupBase {
     //--------------------------------
 
     // action model
-    property var actionM: model.editedAction;
+    property var actionM: panelController?  panelController.editedAction : null;
     // action view model
-    property var actionVM: model.editedViewModel
+    property var actionVM: panelController? panelController.editedViewModel : null;
 
     // our scenario controller
     property var controller: null;
@@ -57,7 +65,7 @@ I2PopupBase {
     //--------------------------------
 
     // Emitted when user pressed our popup
-    signal bringToFront();
+    //signal bringToFront();
 
     //--------------------------------
     //
@@ -76,52 +84,53 @@ I2PopupBase {
             color: MasticTheme.editorsBackgroundBorderColor
         }
         color: MasticTheme.editorsBackgroundColor
-        clip : true
+//        clip : true
 
-        // catch events
-        MultiPointTouchArea {
-            anchors.fill: parent
-        }
+//        // catch events
+//        MultiPointTouchArea {
+//            anchors.fill: parent
+//        }
 
         // drag Area
-        I2CustomRectangle {
-            id : dragRect
-            anchors {
-                top : parent.top
-                left : parent.left
-                right : parent.right
-                margins : 2
-            }
-            height : 50
-            topLeftRadius : 5
-            topRightRadius : 5
+//        I2CustomRectangle {
+//            id : dragRect
+//            anchors {
+//                top : parent.top
+//                left : parent.left
+//                right : parent.right
+//                margins : 2
+//            }
+//            height : 50
+//            topLeftRadius : 5
+//            topRightRadius : 5
 
-            color :dragMouseArea.pressed? MasticTheme.editorsBackgroundColor : MasticTheme.darkBlueGreyColor
+//            color :  /dragMouseArea.pressed? MasticTheme.editorsBackgroundColor : MasticTheme.darkBlueGreyColor
 
-            MouseArea {
-                id : dragMouseArea
-                hoverEnabled: true
-                anchors.fill: parent
-                drag.target: rootItem
+//            MouseArea {
+//                id : dragMouseArea
+//                hoverEnabled: true
+//                anchors.fill: parent
+//                drag.target: rootItem
 
-                drag.minimumX : - rootItem.width/2
-                drag.maximumX : rootItem.parent.width - rootItem.width/2
-                drag.minimumY :  0
-                drag.maximumY :  rootItem.parent.height - rootItem.height/2
+//                drag.minimumX : - rootItem.width/2
+//                drag.maximumX : rootItem.parent.width - rootItem.width/2
+//                drag.minimumY :  0
+//                drag.maximumY :  rootItem.parent.height - rootItem.height/2
 
-                onPressed: {
-                    // Emit signal "bring to front"
-                    rootItem.bringToFront();
-                }
-            }
-        }
+//                onPressed: {
+//                    // Emit signal "bring to front"
+//                    rootItem.bringToFront();
+//                }
+//            }
+//        }
 
         // separator
         Rectangle {
             anchors {
-                top : dragRect.bottom
-                left : dragRect.left
-                right : dragRect.right
+                top : parent.top
+                topMargin: 50
+                left : parent.left
+                right : parent.right
             }
             height : 1
             color : MasticTheme.editorsBackgroundBorderColor
@@ -152,28 +161,28 @@ I2PopupBase {
                 }
             }
 
-            Button {
-                id: btnCloseEditor
+//            Button {
+//                id: btnCloseEditor
 
-                anchors {
-                    top: parent.top
-                    right : parent.right
-                }
+//                anchors {
+//                    top: parent.top
+//                    right : parent.right
+//                }
 
-                activeFocusOnPress: true
-                style: Theme.LabellessSvgButtonStyle {
-                    fileCache: MasticTheme.svgFileMASTIC
+//                activeFocusOnPress: true
+//                style: Theme.LabellessSvgButtonStyle {
+//                    fileCache: MasticTheme.svgFileMASTIC
 
-                    pressedID: releasedID + "-pressed"
-                    releasedID: "closeEditor"
-                    disabledID : releasedID
-                }
+//                    pressedID: releasedID + "-pressed"
+//                    releasedID: "closeEditor"
+//                    disabledID : releasedID
+//                }
 
-                onClicked: {
-                    // Close our popup
-                    rootItem.close();
-                }
-            }
+//                onClicked: {
+//                    // Close our popup
+//                    rootItem.close();
+//                }
+//            }
 
             //
             // Name
@@ -377,7 +386,7 @@ I2PopupBase {
 
                 Connections {
                     target : rootItem
-                    onOpened : {
+                    Component.onCompleted : {
                         // make the conditions list visible if there are conditions
                         if (actionM && actionM.conditionsList.count > 0) {
                             conditionsItem.isOpened = true;
@@ -1052,7 +1061,7 @@ I2PopupBase {
 
                 Connections {
                     target : rootItem
-                    onOpened : {
+                    Component.onCompleted : {
                         // make the advanced modes visible if there are some modes checked
                         if (actionM && (actionM.shallRevert || actionM.shallRearm)) {
                             advModesItem.isOpened = true;
@@ -1943,11 +1952,11 @@ I2PopupBase {
 
                                     // Output Agent
                                     MasticComboBox {
-                                        id : agentFROMEffectMappingCombo
+                                        id : comboEffectOnMapping_OutputAgent
 
                                         anchors {
                                             left : parent.left
-                                            bottom : oEffectsMappingFROMCombo.top
+                                            bottom : comboEffectOnMapping_Output.top
                                             bottomMargin: 6
                                         }
 
@@ -1961,7 +1970,7 @@ I2PopupBase {
                                         }
 
                                         Binding {
-                                            target : agentFROMEffectMappingCombo
+                                            target : comboEffectOnMapping_OutputAgent
                                             property : "selectedItem"
                                             value : if (myEffect && myEffect.modelM) {
                                                         myEffect.modelM.outputAgent;
@@ -1974,14 +1983,14 @@ I2PopupBase {
                                         onSelectedItemChanged: {
                                             if (myEffect && myEffect.modelM)
                                             {
-                                                myEffect.modelM.outputAgent = agentFROMEffectMappingCombo.selectedItem;
+                                                myEffect.modelM.outputAgent = comboEffectOnMapping_OutputAgent.selectedItem;
                                             }
                                         }
                                     }
 
                                     // Outputs (of output agent)
                                     MasticComboBoxAgentsIOP {
-                                        id : oEffectsMappingFROMCombo
+                                        id : comboEffectOnMapping_Output
 
                                         enabled : visible
                                         anchors {
@@ -1999,7 +2008,7 @@ I2PopupBase {
                                         }
 
                                         Binding {
-                                            target : oEffectsMappingFROMCombo
+                                            target : comboEffectOnMapping_Output
                                             property : "selectedItem"
                                             value : if (myEffect && myEffect.modelM) {
                                                         myEffect.modelM.output;
@@ -2012,7 +2021,7 @@ I2PopupBase {
                                         onSelectedItemChanged: {
                                             if (myEffect && myEffect.modelM)
                                             {
-                                                myEffect.modelM.output = oEffectsMappingFROMCombo.selectedItem;
+                                                myEffect.modelM.output = comboEffectOnMapping_Output.selectedItem;
                                             }
                                         }
 
@@ -2021,9 +2030,9 @@ I2PopupBase {
                                     Item {
                                         id : disableMappingItem
                                         anchors {
-                                            left : agentFROMEffectMappingCombo.right
-                                            right : agentTOEffectMappingCombo.left
-                                            top : agentFROMEffectMappingCombo.top
+                                            left : comboEffectOnMapping_OutputAgent.right
+                                            right : comboEffectOnMapping_InputAgent.left
+                                            top : comboEffectOnMapping_OutputAgent.top
                                             bottom : parent.bottom
                                         }
                                         clip : true
@@ -2044,8 +2053,8 @@ I2PopupBase {
                                                 horizontalCenter: parent.left
                                                 top : parent.top
                                                 bottom : parent.bottom
-                                                topMargin: agentFROMEffectMappingCombo.height/2
-                                                bottomMargin: agentFROMEffectMappingCombo.height/2
+                                                topMargin: comboEffectOnMapping_OutputAgent.height/2
+                                                bottomMargin: comboEffectOnMapping_OutputAgent.height/2
                                             }
                                             width : 12
                                             color : MasticTheme.veryDarkGreyColor
@@ -2061,8 +2070,8 @@ I2PopupBase {
                                                 horizontalCenter: parent.right
                                                 top : parent.top
                                                 bottom : parent.bottom
-                                                topMargin: agentFROMEffectMappingCombo.height/2
-                                                bottomMargin: agentFROMEffectMappingCombo.height/2
+                                                topMargin: comboEffectOnMapping_OutputAgent.height/2
+                                                bottomMargin: comboEffectOnMapping_OutputAgent.height/2
                                             }
                                             width : 12
                                             color : MasticTheme.veryDarkGreyColor
@@ -2129,11 +2138,11 @@ I2PopupBase {
 
                                     // Input Agent
                                     MasticComboBox {
-                                        id : agentTOEffectMappingCombo
+                                        id : comboEffectOnMapping_InputAgent
 
                                         anchors {
                                             right : parent.right
-                                            bottom : iEffectsMappingTOCombo.top
+                                            bottom : comboEffectOnMapping_Input.top
                                             bottomMargin: 6
                                         }
 
@@ -2148,7 +2157,7 @@ I2PopupBase {
 
 
                                         Binding {
-                                            target : agentTOEffectMappingCombo
+                                            target : comboEffectOnMapping_InputAgent
                                             property : "selectedItem"
                                             value : if (myEffect && myEffect.modelM) {
                                                         myEffect.modelM.agent;
@@ -2161,14 +2170,14 @@ I2PopupBase {
                                         onSelectedItemChanged: {
                                             if (myEffect && myEffect.modelM)
                                             {
-                                                myEffect.modelM.agent = agentTOEffectMappingCombo.selectedItem;
+                                                myEffect.modelM.agent = comboEffectOnMapping_InputAgent.selectedItem;
                                             }
                                         }
                                     }
 
                                     // Intputs (of input agent)
                                     MasticComboBoxAgentsIOP {
-                                        id : iEffectsMappingTOCombo
+                                        id : comboEffectOnMapping_Input
 
                                         enabled : visible
                                         anchors {
@@ -2186,7 +2195,7 @@ I2PopupBase {
                                         }
 
                                         Binding {
-                                            target : iEffectsMappingTOCombo
+                                            target : comboEffectOnMapping_Input
                                             property : "selectedItem"
                                             value : if (myEffect && myEffect.modelM) {
                                                         myEffect.modelM.input;
@@ -2199,7 +2208,7 @@ I2PopupBase {
                                         onSelectedItemChanged: {
                                             if (myEffect && myEffect.modelM)
                                             {
-                                                myEffect.modelM.input = iEffectsMappingTOCombo.selectedItem;
+                                                myEffect.modelM.input = comboEffectOnMapping_Input.selectedItem;
                                             }
                                         }
                                     }
@@ -2276,7 +2285,7 @@ I2PopupBase {
             MouseArea {
                 id : actionDeleteBtn
                 enabled: visible
-                visible: (model && model.originalAction !== null)
+                visible: (panelController && panelController.originalAction !== null)
                 anchors {
                     left : parent.left
                     leftMargin: 15
@@ -2289,8 +2298,8 @@ I2PopupBase {
 
                 hoverEnabled: true
                 onClicked: {
-                    if (controller && model && model.originalAction) {
-                        controller.deleteAction(model.originalAction);
+                    if (controller && panelController && panelController.originalAction) {
+                        controller.deleteAction(panelController.originalAction);
                     }
                     else {
                         // Close our popup
@@ -2418,5 +2427,13 @@ I2PopupBase {
 
     }
 
+
+
+    I2Layer {
+        id: overlayLayerComboBox
+        objectName: "overlayLayerComboBox"
+
+        anchors.fill: parent
+    }
 }
 

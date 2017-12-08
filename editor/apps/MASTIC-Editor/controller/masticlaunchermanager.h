@@ -17,18 +17,84 @@
 
 #include <QObject>
 
+#include <I2PropertyHelpers.h>
+#include <model/hostm.h>
+
+
 /**
  * @brief The MasticLauncherManager class defines the manager for launchers of MASTIC agents
  */
 class MasticLauncherManager : public QObject
 {
     Q_OBJECT
+
+    // List of all hosts
+    I2_QOBJECT_LISTMODEL(HostM, hosts)
+
+
 public:
+
+    /**
+     * @brief Get our instance
+     * @return
+     */
+    static MasticLauncherManager& Instance();
+
+
+    /**
+     * @brief Add a Mastic Launcher
+     * @param peerId
+     * @param hostName
+     * @param ipAddress
+     */
+    void addMasticLauncher(QString peerId, QString hostName, QString ipAddress);
+
+
+    /**
+     * @brief Remove a Mastic Launcher
+     * @param peerId
+     * @param hostName
+     */
+    void removeMasticLauncher(QString peerId, QString hostName);
+
+
+    /**
+     * @brief Get the peer id of The Mastic Launcher with a HostName
+     * @param hostName
+     * @return
+     */
+    QString getPeerIdOfMasticLauncherWithHostName(QString hostName);
+
+
+private:
+
+    /**
+     * @brief Constructor
+     * @param parent
+     */
     explicit MasticLauncherManager(QObject *parent = nullptr);
 
-signals:
 
-public slots:
+    /**
+     * @brief Copy constructor
+     */
+    MasticLauncherManager(MasticLauncherManager const&);
+
+
+    /**
+     * @brief Assign operator
+     * @return
+     */
+    MasticLauncherManager& operator=(MasticLauncherManager const&);
+
+
+private:
+
+    // Map from "Name" to the "Host" of the corresponding MASTIC launcher
+    QHash<QString, HostM*> _mapFromNameToHost;
+
 };
+
+QML_DECLARE_TYPE(MasticLauncherManager)
 
 #endif // MASTICLAUNCHERMANAGER_H

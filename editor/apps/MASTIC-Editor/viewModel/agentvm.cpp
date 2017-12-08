@@ -15,9 +15,6 @@
 
 #include "agentvm.h"
 
-#include <QQmlEngine>
-#include <QDebug>
-
 
 /**
  * @brief Default constructor
@@ -33,7 +30,8 @@ AgentVM::AgentVM(AgentM* model, QObject *parent) : QObject(parent),
     _canBeFrozen(false),
     _isFrozen(false),
     _definition(NULL),
-    _clonesNumber(0)
+    _clonesNumber(0),
+    _canBeRestarted(false)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -210,6 +208,7 @@ void AgentVM::_onModelsChanged()
 
                 // Connect to signals from a model
                 connect(model, &AgentM::isONChanged, this, &AgentVM::_onIsONofModelChanged);
+                connect(model, &AgentM::canBeRestartedChanged, this, &AgentVM::_onCanBeRestartedOfModelChanged);
                 connect(model, &AgentM::isMutedChanged, this, &AgentVM::_onIsMutedOfModelChanged);
                 connect(model, &AgentM::isFrozenChanged, this, &AgentVM::_onIsFrozenOfModelChanged);
                 connect(model, &AgentM::definitionChanged, this, &AgentVM::_onDefinitionOfModelChanged);
@@ -228,6 +227,7 @@ void AgentVM::_onModelsChanged()
 
                 // DIS-connect from signals from a model
                 disconnect(model, &AgentM::isONChanged, this, &AgentVM::_onIsONofModelChanged);
+                disconnect(model, &AgentM::canBeRestartedChanged, this, &AgentVM::_onCanBeRestartedOfModelChanged);
                 disconnect(model, &AgentM::isMutedChanged, this, &AgentVM::_onIsMutedOfModelChanged);
                 disconnect(model, &AgentM::isFrozenChanged, this, &AgentVM::_onIsFrozenOfModelChanged);
                 disconnect(model, &AgentM::definitionChanged, this, &AgentVM::_onDefinitionOfModelChanged);
@@ -252,6 +252,19 @@ void AgentVM::_onIsONofModelChanged(bool isON)
 
     // Update the flag "is ON" in function of flags of all models
     _updateIsON();
+}
+
+
+/**
+ * @brief Slot when the flag "can Be Restarted" of a model changed
+ * @param canBeRestarted
+ */
+void AgentVM::_onCanBeRestartedOfModelChanged(bool canBeRestarted)
+{
+    Q_UNUSED(canBeRestarted)
+
+    // Update the flag "can Be Restarted" in function of flags of all models
+    _updateCanBeRestarted();
 }
 
 
@@ -357,6 +370,7 @@ void AgentVM::_updateWithAllModels()
 
     // Update flags in function of models
     _updateIsON();
+    _updateCanBeRestarted();
     _updateIsMuted();
     _updateIsFrozen();
 
@@ -378,7 +392,6 @@ void AgentVM::_updateIsON()
         if ((model != NULL) && model->isON())
         {
             globalIsON = true;
-            //break;
             clonesNumber++;
         }
     }
@@ -391,6 +404,23 @@ void AgentVM::_updateIsON()
     else {
         setclonesNumber(0);
     }
+}
+
+
+/**
+ * @brief Update the flag "can Be Restarted" in function of flags of models
+ */
+void AgentVM::_updateCanBeRestarted()
+{
+    bool globalCanBeRestarted = false;
+
+    foreach (AgentM* model, _models.toList()) {
+        if ((model != NULL) && model->canBeRestarted()) {
+            globalCanBeRestarted = true;
+            break;
+        }
+    }
+    setcanBeRestarted(globalCanBeRestarted);
 }
 
 
