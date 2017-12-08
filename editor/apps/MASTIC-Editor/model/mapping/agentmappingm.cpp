@@ -35,7 +35,7 @@ AgentMappingM::AgentMappingM(QString name,
     //qInfo() << "New Model of Agent Mapping" << _name << "with version" << _version << "about" << _description;
 
     // Connect to signal "Count Changed" from the list of mapping elements
-    connect(&_elementMappingsList, &AbstractI2CustomItemListModel::countChanged, this, &AgentMappingM::_onMappingElementsListChanged);
+    connect(&_mappingElements, &AbstractI2CustomItemListModel::countChanged, this, &AgentMappingM::_onMappingElementsListChanged);
 }
 
 
@@ -47,11 +47,11 @@ AgentMappingM::~AgentMappingM()
     //qInfo() << "Delete Model of Agent Mapping" << _name;
 
     // DIS-connect to signal "Count Changed" from the list of mapping elements
-    disconnect(&_elementMappingsList, &AbstractI2CustomItemListModel::countChanged, this, &AgentMappingM::_onMappingElementsListChanged);
+    disconnect(&_mappingElements, &AbstractI2CustomItemListModel::countChanged, this, &AgentMappingM::_onMappingElementsListChanged);
 
     // Clear the list (do not delete all)
-    _elementMappingsList.clear();
-    _mappingElementsIds.clear();
+    _mappingElements.clear();
+    _idsOfMappingElements.clear();
 }
 
 
@@ -60,14 +60,14 @@ AgentMappingM::~AgentMappingM()
  */
 void AgentMappingM::_onMappingElementsListChanged()
 {
-    _mappingElementsIds.clear();
+    _idsOfMappingElements.clear();
 
-    foreach (ElementMappingM* mappingElement, _elementMappingsList.toList())
+    foreach (ElementMappingM* mappingElement, _mappingElements.toList())
     {
         if ((mappingElement != NULL) && !mappingElement->id().isEmpty()) {
-            _mappingElementsIds.append(mappingElement->id());
+            _idsOfMappingElements.append(mappingElement->id());
         }
     }
 
-    //qDebug() << _name << "Mapping Elements Ids:" << _mappingElementsIds;
+    //qDebug() << "Mapping" << _name << "IDs:" << _idsOfMappingElements;
 }

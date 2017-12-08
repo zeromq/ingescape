@@ -221,7 +221,7 @@ AgentMappingM* JsonHelper::createModelOfAgentMapping(QString inputAgentName, QBy
                         }
                     }
                     if (mappingElements.count() > 0) {
-                        agentMapping->elementMappingsList()->append(mappingElements);
+                        agentMapping->mappingElements()->append(mappingElements);
                     }
                 }
             }
@@ -249,7 +249,7 @@ QString JsonHelper::getJsonOfMapping(AgentMappingM* agentMapping)
         jsonMapping.insert("version", agentMapping->version());
 
         QJsonArray jsonArray;
-        foreach (ElementMappingM* mappingElement, agentMapping->elementMappingsList()->toList()) {
+        foreach (ElementMappingM* mappingElement, agentMapping->mappingElements()->toList()) {
             if (mappingElement != NULL)
             {
                 QJsonObject jsonMappingElement;

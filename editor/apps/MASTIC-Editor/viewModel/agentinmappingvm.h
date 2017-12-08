@@ -40,6 +40,9 @@ class AgentInMappingVM : public QObject
     // List of models of agents
     I2_QOBJECT_LISTMODEL(AgentM, models)
 
+    // List of peer ids of models
+    I2_CPP_NOSIGNAL_PROPERTY(QStringList, peerIdsList)
+
     // List of VM of inputs
     I2_QOBJECT_LISTMODEL(InputVM, inputsList)
 
@@ -101,13 +104,6 @@ public:
      * @brief Destructor
      */
     ~AgentInMappingVM();
-
-
-    /**
-     * @brief Get the list of peer ids of our models
-     * @return
-     */
-    QStringList getPeerIdsList();
 
 
     /**
@@ -306,9 +302,6 @@ private:
 
     // Previous list of models of agents
     QList<AgentM*> _previousAgentsList;
-
-    // List of peer ids of our models
-    QStringList _peerIdsList;
 
     // Input name as key is not unique (value type can be different)
     // Map from an input name to a list of view models of inputs

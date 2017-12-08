@@ -40,10 +40,10 @@ class AgentMappingM : public QObject
     I2_QML_PROPERTY(QString, description)
 
     // List of (mapping) elements of our agent mapping
-    I2_QOBJECT_LISTMODEL(ElementMappingM, elementMappingsList)
+    I2_QOBJECT_LISTMODEL(ElementMappingM, mappingElements)
 
-    // List of the ids of the mapping elements
-    I2_CPP_NOSIGNAL_PROPERTY(QStringList, mappingElementsIds)
+    // List of the ids of mapping elements
+    I2_CPP_NOSIGNAL_PROPERTY(QStringList, idsOfMappingElements)
 
 
 public:

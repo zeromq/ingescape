@@ -143,7 +143,7 @@ void AgentsMappingController::removeLinkBetweenTwoAgents(MapBetweenIOPVM* link)
             link->setisVirtual(true);
 
             // Emit signal "Command asked to agent about Mapping Input"
-            Q_EMIT commandAskedToAgentAboutMappingInput(link->inputAgent()->getPeerIdsList(), "UNMAP", link->input()->name(), link->outputAgent()->name(), link->output()->name());
+            Q_EMIT commandAskedToAgentAboutMappingInput(link->inputAgent()->peerIdsList(), "UNMAP", link->input()->name(), link->outputAgent()->name(), link->output()->name());
         }
         // Mapping is NOT activated
         else
@@ -184,7 +184,7 @@ void AgentsMappingController::dropAgentToMappingAtPosition(QString agentName, Ab
                 if (temporaryMapping != NULL)
                 {
                     // Delete all "mapping elements" in this temporary mapping
-                    temporaryMapping->elementMappingsList()->deleteAllItems();
+                    temporaryMapping->mappingElements()->deleteAllItems();
 
                     // Mapping is already activated
                     if ((_modelManager != NULL) && _modelManager->isActivatedMapping())
@@ -249,7 +249,7 @@ void AgentsMappingController::dropLinkBetweenAgents(AgentInMappingVM* outputAgen
                     _allMapInMapping.append(link);
 
                     // Emit signal "Command asked to agent about Mapping Input"
-                    Q_EMIT commandAskedToAgentAboutMappingInput(inputAgent->getPeerIdsList(), "MAP", input->name(), outputAgent->name(), output->name());
+                    Q_EMIT commandAskedToAgentAboutMappingInput(inputAgent->peerIdsList(), "MAP", input->name(), outputAgent->name(), output->name());
                 }
                 // Mapping is NOT activated
                 else
@@ -384,12 +384,12 @@ void AgentsMappingController::onIsActivatedMappingChanged(bool isActivatedMappin
                     if ((agent != NULL) && (agent->temporaryMapping() != NULL))
                     {
                         // Delete all "mapping elements" in the temporary mapping
-                        agent->temporaryMapping()->elementMappingsList()->deleteAllItems();
+                        agent->temporaryMapping()->mappingElements()->deleteAllItems();
 
                         foreach (AgentM* model, agent->models()->toList()) {
                             if ((model != NULL) && (model->mapping() != NULL))
                             {
-                                foreach (ElementMappingM* mappingElement, model->mapping()->elementMappingsList()->toList()) {
+                                foreach (ElementMappingM* mappingElement, model->mapping()->mappingElements()->toList()) {
                                     if (mappingElement != NULL)
                                     {
                                         // Add a temporary link for each real link
@@ -415,7 +415,7 @@ void AgentsMappingController::onIsActivatedMappingChanged(bool isActivatedMappin
                 // Apply all temporary mappings
                 foreach (AgentInMappingVM* agent, _agentInMappingVMList.toList())
                 {
-                    if ((agent != NULL) && (agent->temporaryMapping() != NULL)) // && (agent->temporaryMapping()->elementMappingsList()->count() > 0)
+                    if ((agent != NULL) && (agent->temporaryMapping() != NULL)) // && (agent->temporaryMapping()->mappingElements()->count() > 0)
                     {
                         // Get the JSON of a mapping
                         QString jsonOfMapping = _modelManager->getJsonOfMapping(agent->temporaryMapping());
@@ -423,7 +423,7 @@ void AgentsMappingController::onIsActivatedMappingChanged(bool isActivatedMappin
                         QString command = QString("LOAD_THIS_MAPPING#%1").arg(jsonOfMapping);
 
                         // Emit signal "Command asked to agent"
-                        Q_EMIT commandAskedToAgent(agent->getPeerIdsList(), command);
+                        Q_EMIT commandAskedToAgent(agent->peerIdsList(), command);
                     }
                 }
             }

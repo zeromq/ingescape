@@ -14,7 +14,7 @@
  */
 
 #include "mapbetweeniopvm.h"
-
+#include <model/enums.h>
 
 #include <QQmlEngine>
 #include <QDebug>
@@ -53,6 +53,9 @@ MapBetweenIOPVM::MapBetweenIOPVM(AgentInMappingVM* outputAgent,
     if ((_outputAgent != NULL) && (_output != NULL) && (_inputAgent != NULL) && (_input != NULL))
     {
         //qInfo() << "Create new Map Between IOP VM" << _outputAgent->name() << "." << _output->name() << "-->" << _inputAgent->name() << "." << _input->name();
+
+        // Identifier with all names: [outputAgent##output-->inputAgent##input]
+        _id = QString("%1%2%3-->%4%2%5").arg(_outputAgent->name(), SEPARATOR_AGENT_NAME_AND_IOP, _output->name(), _inputAgent->name(), _input->name());
     }
 }
 
@@ -72,7 +75,7 @@ MapBetweenIOPVM::~MapBetweenIOPVM()
         AgentInMappingVM* temp = _outputAgent;
         setoutputAgent(NULL);
 
-        // Handle ghost agent
+        // Handle ghost output agent
         if (temp->isGhost()) {
             delete temp;
         }

@@ -120,16 +120,6 @@ AgentInMappingVM::~AgentInMappingVM()
 
 
 /**
- * @brief Get the list of peer ids of our models
- * @return
- */
-QStringList AgentInMappingVM::getPeerIdsList()
-{
-    return _peerIdsList;
-}
-
-
-/**
  * @brief Add a temporary link (this temporary link will became a real link when the user will activate the mapping)
  * @param inputName
  * @param outputAgentName
@@ -145,7 +135,7 @@ void AgentInMappingVM::addTemporaryLink(QString inputName, QString outputAgentNa
         {
             temporaryLink = new ElementMappingM(_name, inputName, outputAgentName, outputName);
 
-            _temporaryMapping->elementMappingsList()->append(temporaryLink);
+            _temporaryMapping->mappingElements()->append(temporaryLink);
         }
     }
 }
@@ -165,7 +155,7 @@ void AgentInMappingVM::removeTemporaryLink(QString inputName, QString outputAgen
         ElementMappingM* temporaryLink = _getTemporaryLink(inputName, outputAgentName, outputName);
         if (temporaryLink != NULL)
         {
-            _temporaryMapping->elementMappingsList()->remove(temporaryLink);
+            _temporaryMapping->mappingElements()->remove(temporaryLink);
         }
     }
 }
@@ -829,7 +819,7 @@ void AgentInMappingVM::_updateReducedMapValueTypeGroupInOutput()
  */
 ElementMappingM* AgentInMappingVM::_getTemporaryLink(QString inputName, QString outputAgentName, QString outputName)
 {
-    foreach (ElementMappingM* iterator, _temporaryMapping->elementMappingsList()->toList())
+    foreach (ElementMappingM* iterator, _temporaryMapping->mappingElements()->toList())
     {
         if ((iterator != NULL) && (iterator->inputAgent() == _name)
                 && (iterator->input() == inputName) && (iterator->outputAgent() == outputAgentName) && (iterator->output() == outputName))

@@ -367,7 +367,7 @@ void MasticModelManager::onMappingReceived(QString peerId, QString agentName, QS
             {
                 if (agent->mapping() == NULL)
                 {
-                    foreach (ElementMappingM* mappingElement, agentMapping->elementMappingsList()->toList()) {
+                    foreach (ElementMappingM* mappingElement, agentMapping->mappingElements()->toList()) {
                         if (mappingElement != NULL)
                         {
                             // Emit the signal "Mapped"
@@ -393,18 +393,16 @@ void MasticModelManager::onMappingReceived(QString peerId, QString agentName, QS
                             && (agentMapping->version() == previousMapping->version())
                             && (agentMapping->description() == previousMapping->description()))
                     {*/
-                        //qDebug() << "Previous Mapping" << previousMapping->mappingElementsIds();
                         QStringList idsOfRemovedMappingElements;
-                        foreach (QString idPreviousList, previousMapping->mappingElementsIds()) {
-                            if (!agentMapping->mappingElementsIds().contains(idPreviousList)) {
+                        foreach (QString idPreviousList, previousMapping->idsOfMappingElements()) {
+                            if (!agentMapping->idsOfMappingElements().contains(idPreviousList)) {
                                 idsOfRemovedMappingElements.append(idPreviousList);
                             }
                         }
 
-                        //qDebug() << "New Mapping" << agentMapping->mappingElementsIds();
                         QStringList idsOfAddedMappingElements;
-                        foreach (QString idNewList, agentMapping->mappingElementsIds()) {
-                            if (!previousMapping->mappingElementsIds().contains(idNewList)) {
+                        foreach (QString idNewList, agentMapping->idsOfMappingElements()) {
+                            if (!previousMapping->idsOfMappingElements().contains(idNewList)) {
                                 idsOfAddedMappingElements.append(idNewList);
                             }
                         }
@@ -414,7 +412,7 @@ void MasticModelManager::onMappingReceived(QString peerId, QString agentName, QS
                         {
                             qDebug() << "unmapped" << idsOfRemovedMappingElements;
 
-                            foreach (ElementMappingM* mappingElement, previousMapping->elementMappingsList()->toList()) {
+                            foreach (ElementMappingM* mappingElement, previousMapping->mappingElements()->toList()) {
                                 if ((mappingElement != NULL) && idsOfRemovedMappingElements.contains(mappingElement->id()))
                                 {
                                     // Emit the signal "UN-mapped"
@@ -427,7 +425,7 @@ void MasticModelManager::onMappingReceived(QString peerId, QString agentName, QS
                         {
                             qDebug() << "mapped" << idsOfAddedMappingElements;
 
-                            foreach (ElementMappingM* mappingElement, agentMapping->elementMappingsList()->toList()) {
+                            foreach (ElementMappingM* mappingElement, agentMapping->mappingElements()->toList()) {
                                 if ((mappingElement != NULL) && idsOfAddedMappingElements.contains(mappingElement->id()))
                                 {
                                     // Emit the signal "Mapped"
