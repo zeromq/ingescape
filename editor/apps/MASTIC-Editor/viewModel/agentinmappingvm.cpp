@@ -348,18 +348,20 @@ void AgentInMappingVM::_agentModelAdded(AgentM* model)
             }
         }
 
-        if (inputsListToAdd.count() > 0) {
+        if (inputsListToAdd.count() > 0)
+        {
             _inputsList.append(inputsListToAdd);
 
             // Emit signal "Inputs List Added"
-            Q_EMIT inputsListAdded(inputsListToAdd);
+            //Q_EMIT inputsListAdded(inputsListToAdd);
         }
 
-        if (outputsListToAdd.count() > 0) {
+        if (outputsListToAdd.count() > 0)
+        {
             _outputsList.append(outputsListToAdd);
 
             // Emit signal "Outputs List Added"
-            Q_EMIT outputsListAdded(outputsListToAdd);
+            //Q_EMIT outputsListAdded(outputsListToAdd);
         }
 
         // Emit signal "models of Inputs and Outputs Changed"
@@ -405,9 +407,10 @@ void AgentInMappingVM::_agentModelRemoved(AgentM* model)
             }
         }
 
-        if (inputsListToRemove.count() > 0) {
+        if (inputsListToRemove.count() > 0)
+        {
             // Emit signal "Inputs List Will Be Removed"
-            Q_EMIT inputsListWillBeRemoved(inputsListToRemove);
+            //Q_EMIT inputsListWillBeRemoved(inputsListToRemove);
 
             // FIXME TODO I2 Quick: Allow to remove a QList
             //_inputsList.remove(inputsListToRemove);
@@ -416,9 +419,10 @@ void AgentInMappingVM::_agentModelRemoved(AgentM* model)
             }
         }
 
-        if (outputsListToRemove.count() > 0) {
+        if (outputsListToRemove.count() > 0)
+        {
             // Emit signal "Outputs List Will Be Removed"
-            Q_EMIT outputsListWillBeRemoved(outputsListToRemove);
+            //Q_EMIT outputsListWillBeRemoved(outputsListToRemove);
 
             // FIXME TODO I2 Quick: Allow to remove a QList
             //_outputsList.remove(outputsListToRemove);

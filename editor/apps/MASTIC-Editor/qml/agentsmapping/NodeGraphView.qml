@@ -617,7 +617,7 @@ Item {
                 // Links between nodes
                 //
                 Repeater {
-                    model : controller ? controller.allMapInMapping : 0;
+                    model : controller ? controller.allLinksInMapping : 0;
 
                     Link {
                         id : link
@@ -630,7 +630,7 @@ Item {
                 // Nodes
                 //
                 Repeater {
-                    model : controller? controller.agentInMappingVMList : 0;
+                    model : controller ? controller.allAgentsInMapping : 0;
 
 
                     AgentNodeView {
@@ -640,7 +640,6 @@ Item {
                         controller : rootItem.controller
                     }
                 }
-
             }
         }
 

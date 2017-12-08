@@ -410,7 +410,7 @@ void MasticModelManager::onMappingReceived(QString peerId, QString agentName, QS
                         // If there are some Removed mapping elements
                         if (idsOfRemovedMappingElements.count() > 0)
                         {
-                            qDebug() << "unmapped" << idsOfRemovedMappingElements;
+                            //qDebug() << "unmapped" << idsOfRemovedMappingElements;
 
                             foreach (ElementMappingM* mappingElement, previousMapping->mappingElements()->toList()) {
                                 if ((mappingElement != NULL) && idsOfRemovedMappingElements.contains(mappingElement->id()))
@@ -423,7 +423,7 @@ void MasticModelManager::onMappingReceived(QString peerId, QString agentName, QS
                         // If there are some Added mapping elements
                         if (idsOfAddedMappingElements.count() > 0)
                         {
-                            qDebug() << "mapped" << idsOfAddedMappingElements;
+                            //qDebug() << "mapped" << idsOfAddedMappingElements;
 
                             foreach (ElementMappingM* mappingElement, agentMapping->mappingElements()->toList()) {
                                 if ((mappingElement != NULL) && idsOfAddedMappingElements.contains(mappingElement->id()))
