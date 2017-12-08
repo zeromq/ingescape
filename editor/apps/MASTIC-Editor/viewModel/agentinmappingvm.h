@@ -65,7 +65,7 @@ class AgentInMappingVM : public QObject
     I2_QML_PROPERTY_READONLY(AgentIOPValueTypeGroups::Value, reducedMapValueTypeGroupInOutput)
 
     // Flag indicating if our agent is a ghost agent
-    I2_QML_PROPERTY_READONLY(bool, isGhost)
+    //I2_QML_PROPERTY_READONLY(bool, isGhost)
 
     // Flag indicating if all definitions are strictly identicals
     I2_QML_PROPERTY_READONLY(bool, areIdenticalsAllDefinitions)

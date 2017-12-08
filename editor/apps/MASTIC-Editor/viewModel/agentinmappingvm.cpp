@@ -30,7 +30,7 @@ AgentInMappingVM::AgentInMappingVM(QList<AgentM*> models,
     _isReduced(false),
     _reducedMapValueTypeGroupInInput(AgentIOPValueTypeGroups::MIXED),
     _reducedMapValueTypeGroupInOutput(AgentIOPValueTypeGroups::MIXED),
-    _isGhost(false),
+    //_isGhost(false),
     _areIdenticalsAllDefinitions(true),
     _activeAgentsNumber(0),
     _temporaryMapping(NULL)
@@ -74,7 +74,7 @@ AgentInMappingVM::AgentInMappingVM(QList<AgentM*> models,
  * @param name
  * @param parent
  */
-AgentInMappingVM::AgentInMappingVM(QString name,
+/*AgentInMappingVM::AgentInMappingVM(QString name,
                                    QObject *parent) : AgentInMappingVM(QList<AgentM*>(),
                                                                        QPointF(),
                                                                        parent)
@@ -83,7 +83,7 @@ AgentInMappingVM::AgentInMappingVM(QString name,
     setisGhost(true);
 
     qInfo() << "New Ghost of Agent in Mapping" << _name;
-}
+}*/
 
 
 /**

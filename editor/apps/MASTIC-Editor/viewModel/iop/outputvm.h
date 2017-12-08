@@ -38,7 +38,7 @@ class OutputVM : public PointMapVM
     I2_QOBJECT_LISTMODEL(OutputM, models)
 
     // Point map name (AgentIOP name) but needed for ghost input/output
-    I2_QML_PROPERTY_READONLY(bool, isGhost)
+    //I2_QML_PROPERTY_READONLY(bool, isGhost)
 
     // Flag indicating if a new value is published on our output
     I2_QML_PROPERTY_READONLY(bool, isPublishedNewValue)
