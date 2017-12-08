@@ -412,8 +412,6 @@ void AgentInMappingVM::_agentModelRemoved(AgentM* model)
             // Emit signal "Inputs List Will Be Removed"
             //Q_EMIT inputsListWillBeRemoved(inputsListToRemove);
 
-            // FIXME TODO I2 Quick: Allow to remove a QList
-            //_inputsList.remove(inputsListToRemove);
             foreach (InputVM* inputVM, inputsListToRemove) {
                 _inputsList.remove(inputVM);
             }
@@ -424,8 +422,6 @@ void AgentInMappingVM::_agentModelRemoved(AgentM* model)
             // Emit signal "Outputs List Will Be Removed"
             //Q_EMIT outputsListWillBeRemoved(outputsListToRemove);
 
-            // FIXME TODO I2 Quick: Allow to remove a QList
-            //_outputsList.remove(outputsListToRemove);
             foreach (OutputVM* outputVM, outputsListToRemove) {
                 _outputsList.remove(outputVM);
             }
