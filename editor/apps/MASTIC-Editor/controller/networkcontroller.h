@@ -23,8 +23,10 @@
 
 #include "I2PropertyHelpers.h"
 
+#include "controller/masticlaunchermanager.h"
 #include <model/iop/outputm.h>
 #include <model/publishedvaluem.h>
+
 
 /**
  * @brief The NetworkController class defines the controller for network communications
@@ -90,6 +92,31 @@ Q_SIGNALS:
 
 
     /**
+     * @brief Signal emitted when an agent quit the network
+     * @param peer id
+     * @param peer name
+     */
+    void agentExited(QString peerId, QString peerName);
+
+
+    /**
+     * @brief Signal emitted when a launcher enter the network
+     * @param peerId
+     * @param hostname
+     * @param ipAddress
+     */
+    void launcherEntered(QString peerId, QString hostname, QString ipAddress);
+
+
+    /**
+     * @brief Signal emitted when a launcher quit the network
+     * @param peerId
+     * @param hostname
+     */
+    void launcherExited(QString peerId, QString hostname);
+
+
+    /**
      * @brief Signal emitted when an agent definition has been received
      * @param peer id
      * @param peer name
@@ -105,14 +132,6 @@ Q_SIGNALS:
      * @param mappingJSON
      */
     void mappingReceived(QString peerId, QString peerName, QString mappingJSON);
-
-
-    /**
-     * @brief Signal emitted when an agent quit the network
-     * @param peer id
-     * @param peer name
-     */
-    void agentExited(QString peerId, QString peerName);
 
 
     /**

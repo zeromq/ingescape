@@ -146,22 +146,6 @@ public:
 
 
     /**
-     * @brief Get the merged list of all (models of) mapping elements which connect an input of the agent
-     * @param agentName
-     * @return
-     */
-    //QList<ElementMappingM*> getMergedListOfInputMappingElementsFromAgentName(QString agentName);
-
-
-    /**
-     * @brief Get the merged list of all (models of) mapping elements which connect an output of the agent
-     * @param agentName
-     * @return
-     */
-    //QList<ElementMappingM*> getMergedListOfOutputMappingElementsFromAgentName(QString agentName);
-
-
-    /**
      * @brief Import the agents list from default file
      */
     void importAgentsListFromDefaultFile();
@@ -268,6 +252,31 @@ public Q_SLOTS:
      * @param canBeFrozen
      */
     void onAgentEntered(QString peerId, QString agentName, QString agentAddress, int pid, QString hostname, QString commandLine, bool canBeFrozen);
+
+
+    /**
+     * @brief Slot called when an agent quit the network
+     * @param peer Id
+     * @param agent name
+     */
+    void onAgentExited(QString peerId, QString agentName);
+
+
+    /**
+     * @brief Slot called when a launcher enter the network
+     * @param peerId
+     * @param hostname
+     * @param ipAddress
+     */
+    void onLauncherEntered(QString peerId, QString hostname, QString ipAddress);
+
+
+    /**
+     * @brief Slot called when a launcher quit the network
+     * @param peerId
+     * @param hostname
+     */
+    void onLauncherExited(QString peerId, QString hostname);
     
 
     /**
@@ -286,14 +295,6 @@ public Q_SLOTS:
      * @param mapping in JSON format
      */
     void onMappingReceived(QString peerId, QString agentName, QString mappingJSON);
-
-
-    /**
-     * @brief Slot called when an agent quit the network
-     * @param peer Id
-     * @param agent name
-     */
-    void onAgentExited(QString peerId, QString agentName);
 
 
     /**
@@ -360,21 +361,6 @@ private:
 
 
     /**
-     * @brief Update merged lists of mapping elements for the agent name
-     * @param agentName
-     * @param agentMapping
-     */
-    void _updateMergedListsOfMappingElementsForAgentName(QString agentName, AgentMappingM* agentMapping);
-
-
-    /**
-     * @brief Clean merged lists of mapping elements for the agent name
-     * @param agentName
-     */
-    //void _cleanMergedListsOfMappingElementsForAgentName(QString agentName);
-
-
-    /**
      * @brief Print all models of agents (for Debug)
      */
     void _printAgents();
@@ -419,12 +405,6 @@ private:
 
     // Map from "mapping name" to a list (of models) of agent mapping
     QHash<QString, QList<AgentMappingM*>> _mapFromNameToAgentMappingsList;
-
-    // Map from agent name to the merged list of all (models of) mapping elements which connect an input of the agent
-    //QHash<QString, QList<ElementMappingM*>> _mapFromAgentNameToMergedListOfInputMappingElements;
-
-    // Map from agent name to the merged list of all (models of) mapping elements which connect an output of the agent
-    //QHash<QString, QList<ElementMappingM*>> _mapFromAgentNameToMergedListOfOutputMappingElements;
 
 };
 

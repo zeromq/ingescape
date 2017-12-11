@@ -26,43 +26,112 @@ MasticLauncherManager& MasticLauncherManager::Instance()
 
 
 /**
- * @brief Add a Mastic Launcher
- * @param hostName
- * @param peerId
+ * @brief Destructor
  */
-void MasticLauncherManager::addMasticLauncher(QString hostName, QString peerId)
+MasticLauncherManager::~MasticLauncherManager()
 {
-    if (!hostName.isEmpty() && !peerId.isEmpty()) {
-        _mapFromHostNameToMasticLauncherPeerId.insert(hostName, peerId);
+    qInfo() << "Delete Mastic Launcher Manager";
+
+    // Clear the map
+    _mapFromNameToHost.clear();
+
+    // Free memory
+    _hosts.deleteAllItems();
+}
+
+
+/**
+ * @brief Add a Mastic Launcher
+ * @param peerId
+ * @param hostName
+ * @param ipAddress
+ */
+void MasticLauncherManager::addMasticLauncher(QString peerId, QString hostName, QString ipAddress)
+{
+    if (!hostName.isEmpty())
+    {
+        HostM* host = getHostWithName(hostName);
+        if (host == NULL)
+        {
+            // Create a new host
+            host = new HostM(hostName, peerId, ipAddress, this);
+
+            // Add to the list
+            _hosts.append(host);
+
+            // Add to the map
+            _mapFromNameToHost.insert(hostName, host);
+        }
+        else
+        {
+            // Update peer id
+            if (host->peerId() != peerId) {
+                host->setpeerId(peerId);
+            }
+
+            // Update IP address
+            if (host->ipAddress() != ipAddress) {
+                host->setipAddress(ipAddress);
+            }
+        }
     }
 }
 
 
 /**
  * @brief Remove a Mastic Launcher
+ * @param peerId
  * @param hostName
  */
-void MasticLauncherManager::removeMasticLauncher(QString hostName)
+void MasticLauncherManager::removeMasticLauncher(QString peerId, QString hostName)
 {
-    if (!hostName.isEmpty()) {
-        _mapFromHostNameToMasticLauncherPeerId.remove(hostName);
+    Q_UNUSED(peerId)
+
+    if (!hostName.isEmpty())
+    {
+        HostM* host = getHostWithName(hostName);
+        if (host != NULL)
+        {
+            // Remove from the list
+            _hosts.remove(host);
+
+            // Remove from the map
+            _mapFromNameToHost.remove(hostName);
+        }
     }
 }
 
 
 /**
- * @brief Get the peer id of The Mastic Launcher with a HostName
+ * @brief Get the host with a (Host)Name
  * @param hostName
  * @return
  */
-QString MasticLauncherManager::getPeerIdOfMasticLauncherWithHostName(QString hostName)
+HostM* MasticLauncherManager::getHostWithName(QString hostName)
 {
-    QString peerIdMasticLauncher = "";
-
-    if (!hostName.isEmpty() && _mapFromHostNameToMasticLauncherPeerId.contains(hostName)) {
-        peerIdMasticLauncher = _mapFromHostNameToMasticLauncherPeerId.value(hostName);
+    if (_mapFromNameToHost.contains(hostName)) {
+        return _mapFromNameToHost.value(hostName);
     }
-    return peerIdMasticLauncher;
+    else {
+        return NULL;
+    }
+}
+
+
+/**
+ * @brief Get the peer id of a Launcher with a HostName
+ * @param hostName
+ * @return
+ */
+QString MasticLauncherManager::getPeerIdOfLauncherWithHostName(QString hostName)
+{
+    HostM* host = getHostWithName(hostName);
+    if (host != NULL) {
+        return host->peerId();
+    }
+    else {
+        return "";
+    }
 }
 
 

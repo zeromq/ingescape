@@ -34,14 +34,14 @@ class AgentsMappingController : public QObject
     Q_OBJECT
 
     // List of all agents in mapping
-    I2_QOBJECT_LISTMODEL(AgentInMappingVM, agentInMappingVMList)
+    I2_QOBJECT_LISTMODEL(AgentInMappingVM, allAgentsInMapping)
 
-    // List of all maps between agents
-    I2_QOBJECT_LISTMODEL(MapBetweenIOPVM, allMapInMapping)
+    // List of all links between agents in mapping
+    I2_QOBJECT_LISTMODEL(MapBetweenIOPVM, allLinksInMapping)
 
-    // List of all partial maps between agents (input and input agent are fully defined, output and output agent are ghost element)
+    // List of all partial links between agents (input and input agent are fully defined, output and output agent are ghost element)
     // This list is not empty in the case of the presence of Ghost Agents in the mapping
-    I2_QOBJECT_LISTMODEL(MapBetweenIOPVM, allPartialMapInMapping)
+    //I2_QOBJECT_LISTMODEL(MapBetweenIOPVM, allPartialLinksInMapping)
 
     // Flag indicating if our mapping is empty
     I2_QML_PROPERTY_READONLY(bool, isEmptyMapping)
@@ -49,8 +49,8 @@ class AgentsMappingController : public QObject
     // Selected agent in the mapping
     I2_QML_PROPERTY_DELETE_PROOF(AgentInMappingVM*, selectedAgent)
 
-    // Selected map between agents in the mapping
-    I2_QML_PROPERTY_DELETE_PROOF(MapBetweenIOPVM*, selectedMapBetweenIOP)
+    // Selected link between agents in the mapping
+    I2_QML_PROPERTY_DELETE_PROOF(MapBetweenIOPVM*, selectedLink)
 
 
 public:
@@ -266,28 +266,28 @@ private Q_SLOTS:
      * @brief Slot when some view models of inputs have been added to an agent in mapping
      * @param inputsListAdded
      */
-    void _onInputsListAdded(QList<InputVM*> inputsListAdded);
+    //void _onInputsListAdded(QList<InputVM*> inputsListAdded);
 
 
     /**
      * @brief Slot when some view models of outputs have been added to an agent in mapping
      * @param outputsListAdded
      */
-    void _onOutputsListAdded(QList<OutputVM*> outputsListAdded);
+    //void _onOutputsListAdded(QList<OutputVM*> outputsListAdded);
 
 
     /**
      * @brief Slot when some view models of inputs will be removed from an agent in mapping
      * @param inputsListWillBeRemoved
      */
-    void _onInputsListWillBeRemoved(QList<InputVM*> inputsListWillBeRemoved);
+    //void _onInputsListWillBeRemoved(QList<InputVM*> inputsListWillBeRemoved);
 
 
     /**
      * @brief Slot when some view models of outputs will be removed from an agent in mapping
      * @param outputsListWillBeRemoved
      */
-    void _onOutputsListWillBeRemoved(QList<OutputVM*> outputsListWillBeRemoved);
+    //void _onOutputsListWillBeRemoved(QList<OutputVM*> outputsListWillBeRemoved);
 
 
 private:
@@ -298,24 +298,6 @@ private:
      * @param position
      */
     void _addAgentModelsToMappingAtPosition(QString agentName, QList<AgentM*> agentsList, QPointF position);
-
-
-    /**
-     * @brief Deletes all the mapBetweenIOPVM where agent in paramater is involved as outputAgent in the map.
-     * @param agentInMapping
-     */
-    //void _deleteAllMappingMadeOnTargetAgent(AgentInMappingVM *agentInMapping);
-
-
-    /**
-     * @brief Check if the map between an agent output and an agent input already exist.
-     * @param outputAgent
-     * @param output
-     * @param inputAgent
-     * @param input
-     * @return
-     */
-    //bool _checkIfMapBetweenIOPVMAlreadyExist(AgentInMappingVM* outputAgent, OutputVM *output, AgentInMappingVM* inputAgent, InputVM *input);
 
 
     /**
@@ -375,7 +357,7 @@ private:
     QHash<QString, AgentInMappingVM*> _mapFromNameToAgentInMapping;
 
     // Map from "agent in mapping name" to a list of MapBetweenIOPVM where the agent is involved as outputAgent
-    QHash<QString, QList<MapBetweenIOPVM*>> _mapFromAgentNameToPartialMapBetweenIOPViewModelsList;
+    //QHash<QString, QList<MapBetweenIOPVM*>> _mapFromAgentNameToPartialMapBetweenIOPViewModelsList;
 
     // Previous list of agents in mapping
     QList<AgentInMappingVM*> _previousListOfAgentsInMapping;

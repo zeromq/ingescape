@@ -1952,11 +1952,11 @@ Window {
 
                                     // Output Agent
                                     MasticComboBox {
-                                        id : agentFROMEffectMappingCombo
+                                        id : comboEffectOnMapping_OutputAgent
 
                                         anchors {
                                             left : parent.left
-                                            bottom : oEffectsMappingFROMCombo.top
+                                            bottom : comboEffectOnMapping_Output.top
                                             bottomMargin: 6
                                         }
 
@@ -1970,7 +1970,7 @@ Window {
                                         }
 
                                         Binding {
-                                            target : agentFROMEffectMappingCombo
+                                            target : comboEffectOnMapping_OutputAgent
                                             property : "selectedItem"
                                             value : if (myEffect && myEffect.modelM) {
                                                         myEffect.modelM.outputAgent;
@@ -1983,14 +1983,14 @@ Window {
                                         onSelectedItemChanged: {
                                             if (myEffect && myEffect.modelM)
                                             {
-                                                myEffect.modelM.outputAgent = agentFROMEffectMappingCombo.selectedItem;
+                                                myEffect.modelM.outputAgent = comboEffectOnMapping_OutputAgent.selectedItem;
                                             }
                                         }
                                     }
 
                                     // Outputs (of output agent)
                                     MasticComboBoxAgentsIOP {
-                                        id : oEffectsMappingFROMCombo
+                                        id : comboEffectOnMapping_Output
 
                                         enabled : visible
                                         anchors {
@@ -2008,7 +2008,7 @@ Window {
                                         }
 
                                         Binding {
-                                            target : oEffectsMappingFROMCombo
+                                            target : comboEffectOnMapping_Output
                                             property : "selectedItem"
                                             value : if (myEffect && myEffect.modelM) {
                                                         myEffect.modelM.output;
@@ -2021,7 +2021,7 @@ Window {
                                         onSelectedItemChanged: {
                                             if (myEffect && myEffect.modelM)
                                             {
-                                                myEffect.modelM.output = oEffectsMappingFROMCombo.selectedItem;
+                                                myEffect.modelM.output = comboEffectOnMapping_Output.selectedItem;
                                             }
                                         }
 
@@ -2030,9 +2030,9 @@ Window {
                                     Item {
                                         id : disableMappingItem
                                         anchors {
-                                            left : agentFROMEffectMappingCombo.right
-                                            right : agentTOEffectMappingCombo.left
-                                            top : agentFROMEffectMappingCombo.top
+                                            left : comboEffectOnMapping_OutputAgent.right
+                                            right : comboEffectOnMapping_InputAgent.left
+                                            top : comboEffectOnMapping_OutputAgent.top
                                             bottom : parent.bottom
                                         }
                                         clip : true
@@ -2053,8 +2053,8 @@ Window {
                                                 horizontalCenter: parent.left
                                                 top : parent.top
                                                 bottom : parent.bottom
-                                                topMargin: agentFROMEffectMappingCombo.height/2
-                                                bottomMargin: agentFROMEffectMappingCombo.height/2
+                                                topMargin: comboEffectOnMapping_OutputAgent.height/2
+                                                bottomMargin: comboEffectOnMapping_OutputAgent.height/2
                                             }
                                             width : 12
                                             color : MasticTheme.veryDarkGreyColor
@@ -2070,8 +2070,8 @@ Window {
                                                 horizontalCenter: parent.right
                                                 top : parent.top
                                                 bottom : parent.bottom
-                                                topMargin: agentFROMEffectMappingCombo.height/2
-                                                bottomMargin: agentFROMEffectMappingCombo.height/2
+                                                topMargin: comboEffectOnMapping_OutputAgent.height/2
+                                                bottomMargin: comboEffectOnMapping_OutputAgent.height/2
                                             }
                                             width : 12
                                             color : MasticTheme.veryDarkGreyColor
@@ -2138,11 +2138,11 @@ Window {
 
                                     // Input Agent
                                     MasticComboBox {
-                                        id : agentTOEffectMappingCombo
+                                        id : comboEffectOnMapping_InputAgent
 
                                         anchors {
                                             right : parent.right
-                                            bottom : iEffectsMappingTOCombo.top
+                                            bottom : comboEffectOnMapping_Input.top
                                             bottomMargin: 6
                                         }
 
@@ -2157,7 +2157,7 @@ Window {
 
 
                                         Binding {
-                                            target : agentTOEffectMappingCombo
+                                            target : comboEffectOnMapping_InputAgent
                                             property : "selectedItem"
                                             value : if (myEffect && myEffect.modelM) {
                                                         myEffect.modelM.agent;
@@ -2170,14 +2170,14 @@ Window {
                                         onSelectedItemChanged: {
                                             if (myEffect && myEffect.modelM)
                                             {
-                                                myEffect.modelM.agent = agentTOEffectMappingCombo.selectedItem;
+                                                myEffect.modelM.agent = comboEffectOnMapping_InputAgent.selectedItem;
                                             }
                                         }
                                     }
 
                                     // Intputs (of input agent)
                                     MasticComboBoxAgentsIOP {
-                                        id : iEffectsMappingTOCombo
+                                        id : comboEffectOnMapping_Input
 
                                         enabled : visible
                                         anchors {
@@ -2195,7 +2195,7 @@ Window {
                                         }
 
                                         Binding {
-                                            target : iEffectsMappingTOCombo
+                                            target : comboEffectOnMapping_Input
                                             property : "selectedItem"
                                             value : if (myEffect && myEffect.modelM) {
                                                         myEffect.modelM.input;
@@ -2208,7 +2208,7 @@ Window {
                                         onSelectedItemChanged: {
                                             if (myEffect && myEffect.modelM)
                                             {
-                                                myEffect.modelM.input = iEffectsMappingTOCombo.selectedItem;
+                                                myEffect.modelM.input = comboEffectOnMapping_Input.selectedItem;
                                             }
                                         }
                                     }

@@ -1333,9 +1333,7 @@ void ScenarioController::_executeCommandForAgent(AgentInMappingVM* agent, QStrin
 {
     if ((agent != NULL) && (commandAndParameters.count() > 0))
     {
-        QStringList peerIdsList = agent->getPeerIdsList();
-
-        qInfo() << "Execute command" << commandAndParameters << "for agent" << agent->name() << "(" << peerIdsList.count() << "peer ids)";
+        qInfo() << "Execute command" << commandAndParameters << "for agent" << agent->name() << "(" << agent->peerIdsList().count() << "peer ids)";
 
         QString command = commandAndParameters.at(0);
 
@@ -1356,7 +1354,7 @@ void ScenarioController::_executeCommandForAgent(AgentInMappingVM* agent, QStrin
         else if (command == "STOP")
         {
             // Emit signal "Command asked to agent"
-            Q_EMIT commandAskedToAgent(peerIdsList, command);
+            Q_EMIT commandAskedToAgent(agent->peerIdsList(), command);
         }
         // MAP or UNMAP
         else if ((command == "MAP") || (command == "UNMAP"))
@@ -1368,7 +1366,7 @@ void ScenarioController::_executeCommandForAgent(AgentInMappingVM* agent, QStrin
                 QString outputName = commandAndParameters.at(3);
 
                 // Emit signal "Command asked to agent about Mapping Input"
-                Q_EMIT commandAskedToAgentAboutMappingInput(peerIdsList, command, inputName, outputAgentName, outputName);
+                Q_EMIT commandAskedToAgentAboutMappingInput(agent->peerIdsList(), command, inputName, outputAgentName, outputName);
             }
             else {
                 qCritical() << "Wrong number of parameters (" << commandAndParameters.count() << ") to map an input of agent" << agent->name();
@@ -1383,7 +1381,7 @@ void ScenarioController::_executeCommandForAgent(AgentInMappingVM* agent, QStrin
                 QString value = commandAndParameters.at(2);
 
                 // Emit signal "Command asked to agent about Setting Value"
-                Q_EMIT commandAskedToAgentAboutSettingValue(peerIdsList, command, agentIOPName, value);
+                Q_EMIT commandAskedToAgentAboutSettingValue(agent->peerIdsList(), command, agentIOPName, value);
             }
             else {
                 qCritical() << "Wrong number of parameters (" << commandAndParameters.count() << ") to set a value to agent" << agent->name();

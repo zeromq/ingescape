@@ -21,6 +21,9 @@
 
 #include <I2Quick.h>
 
+#include "controller/masticlaunchermanager.h"
+
+
 /**
  * @brief Default constructor
  * @param agentsListDirectoryPath
@@ -220,6 +223,21 @@ void MasticModelManager::onAgentEntered(QString peerId, QString agentName, QStri
 
             agent->sethostname(hostname);
             agent->setcommandLine(commandLine);
+
+            if (!hostname.isEmpty())
+            {
+                HostM* host = MasticLauncherManager::Instance().getHostWithName(hostname);
+                if (host != NULL)
+                {
+                    // Add this agent to the host
+                    //host->agents()->append(agent);
+
+                    if (!commandLine.isEmpty()) {
+                        agent->setcanBeRestarted(true);
+                    }
+                }
+            }
+
             agent->setpid(pid);
             agent->setcanBeFrozen(canBeFrozen);
 
@@ -228,6 +246,68 @@ void MasticModelManager::onAgentEntered(QString peerId, QString agentName, QStri
 
             // Add this new model of agent
             addAgentModel(agent);
+        }
+    }
+}
+
+
+/**
+ * @brief Slot called when an agent quit the network
+ * @param peer Id
+ * @param agent name
+ */
+void MasticModelManager::onAgentExited(QString peerId, QString agentName)
+{
+    AgentM* agent = getAgentModelFromPeerId(peerId);
+    if(agent != NULL)
+    {
+        qInfo() << "The agent" << agentName << "with peer id" << peerId << "exited from the network !";
+
+        // Update the state (flag "is ON")
+        agent->setisON(false);
+
+        if (agent->definition() != NULL) {
+            // Emit the signal "Remove Inputs to Editor for Outputs"
+            Q_EMIT removeInputsToEditorForOutputs(agentName, agent->definition()->outputsList()->toList());
+        }
+    }
+}
+
+
+/**
+ * @brief Slot called when a launcher enter the network
+ * @param peerId
+ * @param hostname
+ * @param ipAddress
+ */
+void MasticModelManager::onLauncherEntered(QString peerId, QString hostname, QString ipAddress)
+{
+    // Add a Mastic Launcher to the manager
+    MasticLauncherManager::Instance().addMasticLauncher(peerId, hostname, ipAddress);
+
+    foreach (AgentM* agent, _mapFromPeerIdToAgentM.values())
+    {
+        if ((agent != NULL) && (agent->hostname() == hostname) && !agent->commandLine().isEmpty()) {
+            agent->setcanBeRestarted(true);
+        }
+    }
+}
+
+
+/**
+ * @brief Slot called when a launcher quit the network
+ * @param peerId
+ * @param hostname
+ */
+void MasticModelManager::onLauncherExited(QString peerId, QString hostname)
+{
+    // Remove a Mastic Launcher to the manager
+    MasticLauncherManager::Instance().removeMasticLauncher(peerId, hostname);
+
+    foreach (AgentM* agent, _mapFromPeerIdToAgentM.values())
+    {
+        if ((agent != NULL) && (agent->hostname() == hostname)) {
+            agent->setcanBeRestarted(false);
         }
     }
 }
@@ -264,7 +344,7 @@ void MasticModelManager::onDefinitionReceived(QString peerId, QString agentName,
                      Q_EMIT addInputsToEditorForOutputs(agentName, agentDefinition->outputsList()->toList());
                  }
                  else {
-                     // FIXME TODO
+                     // FIXME TODO: Update the definition of agent
                      qWarning() << "Update the definition of agent" << agentName << "(if this definition has changed)";
                  }
             }
@@ -294,7 +374,7 @@ void MasticModelManager::onMappingReceived(QString peerId, QString agentName, QS
             {
                 if (agent->mapping() == NULL)
                 {
-                    foreach (ElementMappingM* mappingElement, agentMapping->elementMappingsList()->toList()) {
+                    foreach (ElementMappingM* mappingElement, agentMapping->mappingElements()->toList()) {
                         if (mappingElement != NULL)
                         {
                             // Emit the signal "Mapped"
@@ -304,9 +384,6 @@ void MasticModelManager::onMappingReceived(QString peerId, QString agentName, QS
 
                     // Add this new model of agent mapping
                     addAgentMappingForAgentName(agentMapping, agentName);
-
-                    // Update the merged list of mapping elements for the agent name
-                    //_updateMergedListsOfMappingElementsForAgentName(agentName, agentMapping);
 
                     // Set this mapping to the agent
                     agent->setmapping(agentMapping);
@@ -323,18 +400,16 @@ void MasticModelManager::onMappingReceived(QString peerId, QString agentName, QS
                             && (agentMapping->version() == previousMapping->version())
                             && (agentMapping->description() == previousMapping->description()))
                     {*/
-                        //qDebug() << "Previous Mapping" << previousMapping->mappingElementsIds();
                         QStringList idsOfRemovedMappingElements;
-                        foreach (QString idPreviousList, previousMapping->mappingElementsIds()) {
-                            if (!agentMapping->mappingElementsIds().contains(idPreviousList)) {
+                        foreach (QString idPreviousList, previousMapping->idsOfMappingElements()) {
+                            if (!agentMapping->idsOfMappingElements().contains(idPreviousList)) {
                                 idsOfRemovedMappingElements.append(idPreviousList);
                             }
                         }
 
-                        //qDebug() << "New Mapping" << agentMapping->mappingElementsIds();
                         QStringList idsOfAddedMappingElements;
-                        foreach (QString idNewList, agentMapping->mappingElementsIds()) {
-                            if (!previousMapping->mappingElementsIds().contains(idNewList)) {
+                        foreach (QString idNewList, agentMapping->idsOfMappingElements()) {
+                            if (!previousMapping->idsOfMappingElements().contains(idNewList)) {
                                 idsOfAddedMappingElements.append(idNewList);
                             }
                         }
@@ -342,9 +417,9 @@ void MasticModelManager::onMappingReceived(QString peerId, QString agentName, QS
                         // If there are some Removed mapping elements
                         if (idsOfRemovedMappingElements.count() > 0)
                         {
-                            qDebug() << "unmapped" << idsOfRemovedMappingElements;
+                            //qDebug() << "unmapped" << idsOfRemovedMappingElements;
 
-                            foreach (ElementMappingM* mappingElement, previousMapping->elementMappingsList()->toList()) {
+                            foreach (ElementMappingM* mappingElement, previousMapping->mappingElements()->toList()) {
                                 if ((mappingElement != NULL) && idsOfRemovedMappingElements.contains(mappingElement->id()))
                                 {
                                     // Emit the signal "UN-mapped"
@@ -355,9 +430,9 @@ void MasticModelManager::onMappingReceived(QString peerId, QString agentName, QS
                         // If there are some Added mapping elements
                         if (idsOfAddedMappingElements.count() > 0)
                         {
-                            qDebug() << "mapped" << idsOfAddedMappingElements;
+                            //qDebug() << "mapped" << idsOfAddedMappingElements;
 
-                            foreach (ElementMappingM* mappingElement, agentMapping->elementMappingsList()->toList()) {
+                            foreach (ElementMappingM* mappingElement, agentMapping->mappingElements()->toList()) {
                                 if ((mappingElement != NULL) && idsOfAddedMappingElements.contains(mappingElement->id()))
                                 {
                                     // Emit the signal "Mapped"
@@ -369,60 +444,15 @@ void MasticModelManager::onMappingReceived(QString peerId, QString agentName, QS
                         // Add a model of agent mapping for an agent name
                         addAgentMappingForAgentName(agentMapping, agentName);
 
-                        // Update the merged list of mapping elements for the agent name
-                        //_updateMergedListsOfMappingElementsForAgentName(agentName, agentMapping);
-
                         // Set this new mapping to the agent
                         agent->setmapping(agentMapping);
 
                         // Delete a model of agent mapping
                         deleteAgentMapping(previousMapping);
-                    /*}
-                    else {
-                        // FIXME TODO
-                    }*/
+                    //}
                 }
             }
         }
-    }
-}
-
-
-/**
- * @brief Slot called when an agent quit the network
- * @param peer Id
- * @param agent name
- */
-void MasticModelManager::onAgentExited(QString peerId, QString agentName)
-{
-    AgentM* agent = getAgentModelFromPeerId(peerId);
-    if(agent != NULL)
-    {
-        qInfo() << "The agent" << agentName << "with peer id" << peerId << "exited from the network !";
-
-        // Update the state (flag "is ON")
-        agent->setisON(false);
-
-        if (agent->definition() != NULL) {
-            // Emit the signal "Remove Inputs to Editor for Outputs"
-            Q_EMIT removeInputsToEditorForOutputs(agentName, agent->definition()->outputsList()->toList());
-        }
-
-        /*// Check if all agents with this name are OFF
-        bool allAgentsAreOFF = true;
-        QList<AgentM*> agentModelsList = getAgentModelsListFromName(agentName);
-        foreach (AgentM* model, agentModelsList) {
-            if (model->isON()) {
-                allAgentsAreOFF = false;
-                break;
-            }
-        }
-
-        if (allAgentsAreOFF)
-        {
-            // Clean merged lists of mapping elements for the agent name
-            _cleanMergedListsOfMappingElementsForAgentName(agentName);
-        }*/
     }
 }
 
@@ -756,38 +786,6 @@ QList<AgentMappingM*> MasticModelManager::getAgentMappingsListFromMappingName(QS
 
 
 /**
- * @brief Get the merged list of all (models of) mapping elements which connect an input of the agent
- * @param agentName
- * @return
- */
-/*QList<ElementMappingM*> MasticModelManager::getMergedListOfInputMappingElementsFromAgentName(QString agentName)
-{
-    if (_mapFromAgentNameToMergedListOfInputMappingElements.contains(agentName)) {
-        return _mapFromAgentNameToMergedListOfInputMappingElements.value(agentName);
-    }
-    else {
-        return QList<ElementMappingM*>();
-    }
-}*/
-
-
-/**
- * @brief Get the merged list of all (models of) mapping elements which connect an output of the agent
- * @param agentName
- * @return
- */
-/*QList<ElementMappingM*> MasticModelManager::getMergedListOfOutputMappingElementsFromAgentName(QString agentName)
-{
-    if (_mapFromAgentNameToMergedListOfOutputMappingElements.contains(agentName)) {
-        return _mapFromAgentNameToMergedListOfOutputMappingElements.value(agentName);
-    }
-    else {
-        return QList<ElementMappingM*>();
-    }
-}*/
-
-
-/**
  * @brief Delete a model of agent mapping
  * @param agentMapping
  */
@@ -957,9 +955,6 @@ void MasticModelManager::_importAgentFromFiles(QStringList agentFilesPaths)
                 // Add this new model of agent mapping for the agent name
                 addAgentMappingForAgentName(agentMapping, agentName);
 
-                // Update the merged list of mapping elements for the agent name
-                //_updateMergedListsOfMappingElementsForAgentName(agentName, agentMapping);
-
                 // Set its mapping
                 agent->setmapping(agentMapping);
             }
@@ -1052,123 +1047,6 @@ void MasticModelManager::_updateDefinitionVariants(QString definitionName)
         }
     }
 }
-
-
-/**
- * @brief Update merged lists of mapping elements for the agent name
- * @param agentName
- * @param agentMapping
- */
-/*void MasticModelManager::_updateMergedListsOfMappingElementsForAgentName(QString agentName, AgentMappingM* agentMapping)
-{
-    if (!agentName.isEmpty() && (agentMapping != NULL) && (agentMapping->elementMappingsList()->count() > 0))
-    {
-        // Get the merged list of all (models of) mapping elements which connect an input of the agent
-        QList<ElementMappingM*> mergedListOfInputMappingElements = getMergedListOfInputMappingElementsFromAgentName(agentName);
-
-        qDebug() << mergedListOfInputMappingElements.count() << "INPUT mapping elements from name" << agentName;
-
-        qDebug() << "AVANT: From Agent Name To Merged List of INPUT Mapping Elements:" << _mapFromAgentNameToMergedListOfInputMappingElements;
-        qDebug() << "AVANT: From Agent Name To Merged List of OUTPUT Mapping Elements:" << _mapFromAgentNameToMergedListOfOutputMappingElements;
-
-        foreach (ElementMappingM* elementMapping, agentMapping->elementMappingsList()->toList())
-        {
-            if ((elementMapping != NULL) && (elementMapping->inputAgent() == agentName) && !elementMapping->outputAgent().isEmpty())
-            {
-                qDebug() << elementMapping->outputAgent() << "." << elementMapping->output() << "-->" << elementMapping->inputAgent() << "." << elementMapping->input();
-
-                bool isAlreadyInMergedListOfInputMappingElements = false;
-                foreach (ElementMappingM* iterator, mergedListOfInputMappingElements)
-                {
-                    // Exactly the same
-                    if ((iterator != NULL)
-                            && (iterator->outputAgent() == elementMapping->outputAgent())
-                            && (iterator->output() == elementMapping->output())
-                            && (iterator->input() == elementMapping->input())) {
-                        isAlreadyInMergedListOfInputMappingElements = true;
-                        break;
-                    }
-                }
-                // Not already in merged list of mapping elements which connect an INPUT of the agent, we add it
-                if (!isAlreadyInMergedListOfInputMappingElements) {
-                    mergedListOfInputMappingElements.append(elementMapping);
-                }
-
-
-                //
-                // Update merged list for output agent name
-                //
-                // Get the merged list of all (models of) mapping elements which connect the output agent
-                QList<ElementMappingM*> mergedListOfOutputMappingElements = getMergedListOfOutputMappingElementsFromAgentName(elementMapping->outputAgent());
-
-                bool isAlreadyInMergedListOfOutputMappingElements = false;
-                foreach (ElementMappingM* iterator, mergedListOfOutputMappingElements)
-                {
-                    // Exactly the same
-                    if ((iterator != NULL)
-                            && (iterator->inputAgent() == elementMapping->inputAgent())
-                            && (iterator->output() == elementMapping->output())
-                            && (iterator->input() == elementMapping->input())) {
-                        isAlreadyInMergedListOfOutputMappingElements = true;
-                        break;
-                    }
-                }
-                // Not already in merged list of mapping elements which connect an OUTPUT of the output agent, we add it
-                if (!isAlreadyInMergedListOfOutputMappingElements) {
-                    mergedListOfOutputMappingElements.append(elementMapping);
-
-                    // Update the merged list in the map
-                    _mapFromAgentNameToMergedListOfOutputMappingElements.insert(elementMapping->outputAgent(), mergedListOfOutputMappingElements);
-                }
-            }
-        }
-
-        // Update the merged list in the map
-        _mapFromAgentNameToMergedListOfInputMappingElements.insert(agentName, mergedListOfInputMappingElements);
-
-        qDebug() << "APRES: From Agent Name To Merged List of INPUT Mapping Elements:" << _mapFromAgentNameToMergedListOfInputMappingElements;
-        qDebug() << "APRES: From Agent Name To Merged List of OUTPUT Mapping Elements:" << _mapFromAgentNameToMergedListOfOutputMappingElements;
-    }
-}*/
-
-
-/**
- * @brief Clean merged lists of mapping elements for the agent name
- * @param agentName
- */
-/*void MasticModelManager::_cleanMergedListsOfMappingElementsForAgentName(QString agentName)
-{
-    if (!agentName.isEmpty())
-    {
-        qDebug() << "AVANT: From Agent Name To Merged List of INPUT Mapping Elements:" << _mapFromAgentNameToMergedListOfInputMappingElements;
-        qDebug() << "AVANT: From Agent Name To Merged List of OUTPUT Mapping Elements:" << _mapFromAgentNameToMergedListOfOutputMappingElements;
-
-        // Get the merged list of all (models of) mapping elements which connect an input of the agent
-        QList<ElementMappingM*> mergedListOfInputMappingElements = getMergedListOfInputMappingElementsFromAgentName(agentName);
-
-        foreach (ElementMappingM* mappingElement, mergedListOfInputMappingElements) {
-            if ((mappingElement != NULL) && (mappingElement->inputAgent() == agentName) && !mappingElement->outputAgent().isEmpty())
-            {
-                // Get the merged list of all (models of) mapping elements which connect the output agent
-                QList<ElementMappingM*> mergedListOfOutputMappingElements = getMergedListOfOutputMappingElementsFromAgentName(mappingElement->outputAgent());
-
-                mergedListOfOutputMappingElements.removeOne(mappingElement);
-
-                // Update the merged list in the map
-                _mapFromAgentNameToMergedListOfOutputMappingElements.insert(mappingElement->outputAgent(), mergedListOfOutputMappingElements);
-            }
-        }
-
-        _mapFromAgentNameToMergedListOfInputMappingElements.remove(agentName);
-
-        qDebug() << "APRES: From Agent Name To Merged List of INPUT Mapping Elements:" << _mapFromAgentNameToMergedListOfInputMappingElements;
-        qDebug() << "APRES: From Agent Name To Merged List of OUTPUT Mapping Elements:" << _mapFromAgentNameToMergedListOfOutputMappingElements;
-
-        // Free memory
-        qDeleteAll(mergedListOfInputMappingElements);
-        mergedListOfInputMappingElements.clear();
-    }
-}*/
 
 
 /**

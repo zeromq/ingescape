@@ -18,6 +18,7 @@
 #include <QObject>
 
 #include <I2PropertyHelpers.h>
+#include <model/hostm.h>
 
 
 /**
@@ -26,6 +27,10 @@
 class MasticLauncherManager : public QObject
 {
     Q_OBJECT
+
+    // List of all hosts
+    I2_QOBJECT_LISTMODEL(HostM, hosts)
+
 
 public:
 
@@ -37,26 +42,42 @@ public:
 
 
     /**
-     * @brief Add a Mastic Launcher
-     * @param hostName
-     * @param peerId
+     * @brief Destructor
      */
-    void addMasticLauncher(QString hostName, QString peerId);
+    ~MasticLauncherManager();
+
+
+    /**
+     * @brief Add a Mastic Launcher
+     * @param peerId
+     * @param hostName
+     * @param ipAddress
+     */
+    void addMasticLauncher(QString peerId, QString hostName, QString ipAddress);
 
 
     /**
      * @brief Remove a Mastic Launcher
+     * @param peerId
      * @param hostName
      */
-    void removeMasticLauncher(QString hostName);
+    void removeMasticLauncher(QString peerId, QString hostName);
 
 
     /**
-     * @brief Get the peer id of The Mastic Launcher with a HostName
+     * @brief Get the host with a (Host)Name
      * @param hostName
      * @return
      */
-    QString getPeerIdOfMasticLauncherWithHostName(QString hostName);
+    HostM* getHostWithName(QString hostName);
+
+
+    /**
+     * @brief Get the peer id of a Launcher with a HostName
+     * @param hostName
+     * @return
+     */
+    QString getPeerIdOfLauncherWithHostName(QString hostName);
 
 
 private:
@@ -83,8 +104,8 @@ private:
 
 private:
 
-    // Map from "HostName" to the "Peer Id" of the corresponding MASTIC launcher
-    QHash<QString, QString> _mapFromHostNameToMasticLauncherPeerId;
+    // Map from "Name" to the "Host" of the corresponding MASTIC launcher
+    QHash<QString, HostM*> _mapFromNameToHost;
 
 };
 

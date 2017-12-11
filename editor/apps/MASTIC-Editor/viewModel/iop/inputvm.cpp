@@ -16,6 +16,13 @@
 #include "inputvm.h"
 #include <viewModel/iop/outputvm.h>
 
+/**
+ * @brief Constructor
+ * @param inputName
+ * @param inputId
+ * @param modelM
+ * @param parent
+ */
 InputVM::InputVM(QString inputName,
                  QString inputId,
                  AgentIOPM* modelM,
@@ -84,33 +91,4 @@ void InputVM::_onModelsChanged()
     else {
         setfirstModel(NULL);
     }
-
-    /*QList<AgentIOPM*> newModelsList = _models.toList();
-
-    // Model of input added
-    if (_previousModelsList.count() < newModelsList.count())
-    {
-        //qDebug() << _previousModelsList.count() << "--> ADD --> " << newModelsList.count();
-
-        for (AgentIOPM* model : newModelsList) {
-            if ((model != NULL) && !_previousModelsList.contains(model))
-            {
-                //qDebug() << "Input VM: New model" << model->name() << "ADDED";
-            }
-        }
-    }
-    // Model of input removed
-    else if (_previousModelsList.count() > newModelsList.count())
-    {
-        //qDebug() << _previousModelsList.count() << "--> REMOVE --> " << newModelsList.count();
-
-        for (AgentIOPM* model : _previousModelsList) {
-            if ((model != NULL) && !newModelsList.contains(model))
-            {
-                //qDebug() << "Input VM: Old model" << model->name() << "REMOVED";
-            }
-        }
-    }
-
-    _previousModelsList = newModelsList;*/
 }

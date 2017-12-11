@@ -121,13 +121,6 @@ Item {
 
             delegate: componentAgentListItem
 
-            /*onCurrentIndexChanged: {
-            //console.log("onCurrentIndexChanged " + agentsList.currentIndex);
-            console.log("onCurrentIndexChanged " + model.get(agentsList.currentIndex).name);
-        }
-        onCurrentItemChanged: {
-            console.log("onCurrentItemChanged " + agentsList.currentItem);
-        }*/
 
             //
             // Transition animations

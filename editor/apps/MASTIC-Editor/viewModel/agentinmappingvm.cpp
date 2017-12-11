@@ -30,7 +30,7 @@ AgentInMappingVM::AgentInMappingVM(QList<AgentM*> models,
     _isReduced(false),
     _reducedMapValueTypeGroupInInput(AgentIOPValueTypeGroups::MIXED),
     _reducedMapValueTypeGroupInOutput(AgentIOPValueTypeGroups::MIXED),
-    _isGhost(false),
+    //_isGhost(false),
     _areIdenticalsAllDefinitions(true),
     _activeAgentsNumber(0),
     _temporaryMapping(NULL)
@@ -74,7 +74,7 @@ AgentInMappingVM::AgentInMappingVM(QList<AgentM*> models,
  * @param name
  * @param parent
  */
-AgentInMappingVM::AgentInMappingVM(QString name,
+/*AgentInMappingVM::AgentInMappingVM(QString name,
                                    QObject *parent) : AgentInMappingVM(QList<AgentM*>(),
                                                                        QPointF(),
                                                                        parent)
@@ -83,7 +83,7 @@ AgentInMappingVM::AgentInMappingVM(QString name,
     setisGhost(true);
 
     qInfo() << "New Ghost of Agent in Mapping" << _name;
-}
+}*/
 
 
 /**
@@ -110,22 +110,13 @@ AgentInMappingVM::~AgentInMappingVM()
     // Delete elements in the lists of Inputs & Outputs
     _inputsList.deleteAllItems();
     _outputsList.deleteAllItems();
+    _parametersList.deleteAllItems();
 
     // Clear the previous list of models
     _previousAgentsList.clear();
 
     // Clear the list of definition
     _models.clear();
-}
-
-
-/**
- * @brief Get the list of peer ids of our models
- * @return
- */
-QStringList AgentInMappingVM::getPeerIdsList()
-{
-    return _peerIdsList;
 }
 
 
@@ -145,7 +136,7 @@ void AgentInMappingVM::addTemporaryLink(QString inputName, QString outputAgentNa
         {
             temporaryLink = new ElementMappingM(_name, inputName, outputAgentName, outputName);
 
-            _temporaryMapping->elementMappingsList()->append(temporaryLink);
+            _temporaryMapping->mappingElements()->append(temporaryLink);
         }
     }
 }
@@ -165,7 +156,7 @@ void AgentInMappingVM::removeTemporaryLink(QString inputName, QString outputAgen
         ElementMappingM* temporaryLink = _getTemporaryLink(inputName, outputAgentName, outputName);
         if (temporaryLink != NULL)
         {
-            _temporaryMapping->elementMappingsList()->remove(temporaryLink);
+            _temporaryMapping->mappingElements()->remove(temporaryLink);
         }
     }
 }
@@ -358,18 +349,27 @@ void AgentInMappingVM::_agentModelAdded(AgentM* model)
             }
         }
 
-        if (inputsListToAdd.count() > 0) {
+        // Traverse the list of models of parameters in the definition
+        /*foreach (AgentIOPM* parameter, model->definition()->parametersList()->toList())
+        {
+            // FIXME TODO: ParameterVM
+            ParameterVM* parameterVM =
+        }*/
+
+        if (inputsListToAdd.count() > 0)
+        {
             _inputsList.append(inputsListToAdd);
 
             // Emit signal "Inputs List Added"
-            Q_EMIT inputsListAdded(inputsListToAdd);
+            //Q_EMIT inputsListAdded(inputsListToAdd);
         }
 
-        if (outputsListToAdd.count() > 0) {
+        if (outputsListToAdd.count() > 0)
+        {
             _outputsList.append(outputsListToAdd);
 
             // Emit signal "Outputs List Added"
-            Q_EMIT outputsListAdded(outputsListToAdd);
+            //Q_EMIT outputsListAdded(outputsListToAdd);
         }
 
         // Emit signal "models of Inputs and Outputs Changed"
@@ -415,9 +415,10 @@ void AgentInMappingVM::_agentModelRemoved(AgentM* model)
             }
         }
 
-        if (inputsListToRemove.count() > 0) {
+        if (inputsListToRemove.count() > 0)
+        {
             // Emit signal "Inputs List Will Be Removed"
-            Q_EMIT inputsListWillBeRemoved(inputsListToRemove);
+            //Q_EMIT inputsListWillBeRemoved(inputsListToRemove);
 
             // FIXME TODO I2 Quick: Allow to remove a QList
             //_inputsList.remove(inputsListToRemove);
@@ -426,9 +427,10 @@ void AgentInMappingVM::_agentModelRemoved(AgentM* model)
             }
         }
 
-        if (outputsListToRemove.count() > 0) {
+        if (outputsListToRemove.count() > 0)
+        {
             // Emit signal "Outputs List Will Be Removed"
-            Q_EMIT outputsListWillBeRemoved(outputsListToRemove);
+            //Q_EMIT outputsListWillBeRemoved(outputsListToRemove);
 
             // FIXME TODO I2 Quick: Allow to remove a QList
             //_outputsList.remove(outputsListToRemove);
@@ -829,7 +831,7 @@ void AgentInMappingVM::_updateReducedMapValueTypeGroupInOutput()
  */
 ElementMappingM* AgentInMappingVM::_getTemporaryLink(QString inputName, QString outputAgentName, QString outputName)
 {
-    foreach (ElementMappingM* iterator, _temporaryMapping->elementMappingsList()->toList())
+    foreach (ElementMappingM* iterator, _temporaryMapping->mappingElements()->toList())
     {
         if ((iterator != NULL) && (iterator->inputAgent() == _name)
                 && (iterator->input() == inputName) && (iterator->outputAgent() == outputAgentName) && (iterator->output() == outputName))

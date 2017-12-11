@@ -19,23 +19,58 @@
 
 #include <I2PropertyHelpers.h>
 
-//#include <viewModel/pointmapvm.h>
-#include <model/iop/agentiopm.h>
+#include <viewModel/iop/agentiopvm.h>
 
 /**
  * @brief The ParameterVM class defines a view model of parameter
  */
-class ParameterVM : public QObject
+class ParameterVM : public AgentIOPVM
 {
     Q_OBJECT
 
+    // First model of our agent parameter
+    I2_QML_PROPERTY_READONLY_DELETE_PROOF(AgentIOPM*, firstModel)
+
+    // Models of our agent parameter
+    I2_QOBJECT_LISTMODEL(AgentIOPM, models)
+
 
 public:
-    explicit ParameterVM(QObject *parent = nullptr);
+    /**
+     * @brief Constructor
+     * @param name
+     * @param id
+     * @param modelM
+     * @param parent
+     */
+    explicit ParameterVM(QString name,
+                         QString id,
+                         AgentIOPM* modelM,
+                         QObject *parent = nullptr);
 
-signals:
 
-public slots:
+    /**
+     * @brief Destructor
+     */
+    ~ParameterVM();
+
+
+Q_SIGNALS:
+
+
+public Q_SLOTS:
+
+
+private Q_SLOTS:
+    /**
+     * @brief Slot when the list of models changed
+     */
+    void _onModelsChanged();
+
+
+private:
+
+
 };
 
 QML_DECLARE_TYPE(ParameterVM)

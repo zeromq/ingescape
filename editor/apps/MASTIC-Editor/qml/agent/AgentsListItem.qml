@@ -164,7 +164,7 @@ Item {
                     elide: Text.ElideRight
 
                     text: root.agent? root.agent.name : ""
-                    color: (root.agent  && (root.agent.isON === true))? MasticTheme.agentsListLabelColor : MasticTheme.agentOFFLabelColor
+                    color: (root.agent && (root.agent.isON === true)) ? MasticTheme.agentsListLabelColor : MasticTheme.agentOFFLabelColor
 
 
                     font: MasticTheme.headingFont
@@ -239,13 +239,13 @@ Item {
                         }
 
                         text : definitionName.elidedText
-                        color: if (root.agent && root.agent.isON === true) {
-                                   ((model.definition && model.definition.isVariant)?
+                        color: if (root.agent && (root.agent.isON === true)) {
+                                   ((model.definition && model.definition.isVariant) ?
                                           definitionNameBtn.pressed? MasticTheme.middleDarkRedColor : MasticTheme.redColor
                                     : definitionNameBtn.pressed? MasticTheme.agentsListPressedLabel2Color : MasticTheme.agentsListLabel2Color)
                                }
                                else {
-                                   ((model.definition && model.definition.isVariant)?
+                                   ((model.definition && model.definition.isVariant) ?
                                           definitionNameBtn.pressed? MasticTheme.darkRedColor : MasticTheme.middleDarkRedColor
                                     : definitionNameBtn.pressed? MasticTheme.agentOFFPressedLabel2Color : MasticTheme.agentOFFLabel2Color)
                                }
@@ -298,7 +298,7 @@ Item {
 
                     text: root.agent ? root.agent.hostnames: ""
 
-                    color: (root.agent && root.agent.isON === true)? MasticTheme.agentsListTextColor : MasticTheme.agentOFFTextColor
+                    color: (root.agent && (root.agent.isON === true)) ? MasticTheme.agentsListTextColor : MasticTheme.agentOFFTextColor
                     font: MasticTheme.normalFont
                 }
 
@@ -307,7 +307,9 @@ Item {
             Button {
                 id: offButton
 
-                visible : (root.agent && !root.agent.neverAppearedOnNetwork && model.isON)
+                // Already appeared on the network AND (agent is "ON" OR agent can be restarted)
+                visible: (root.agent && !root.agent.neverAppearedOnNetwork && (root.agent.isON || root.agent.canBeRestarted))
+
                 activeFocusOnPress: true
                 enabled: visible
 

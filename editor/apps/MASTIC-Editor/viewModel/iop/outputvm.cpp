@@ -30,19 +30,19 @@ OutputVM::OutputVM(QString outputName,
                                                  outputId,
                                                  parent),
     _firstModel(NULL),
-    _isGhost(false),
+    //_isGhost(false),
     _isPublishedNewValue(false)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
     if (modelM != NULL) {
-        //qInfo() << "New Output VM" << _name << "(" << _id << ")";
+        qInfo() << "New Output VM" << _name << "(" << _id << ")";
     }
-    else {
+    /*else {
         _isGhost = true;
         qInfo() << "New ghost of Output VM" << _name;
-    }
+    }*/
 
     // Init the timer to reset the flag "is Published New Value"
     // Allows to play an animation when the value changed
@@ -70,13 +70,13 @@ OutputVM::~OutputVM()
 
     // Reset the first model
     if (_firstModel != NULL) {
-        //qInfo() << "Delete Output VM" << _name << "(" << _id << ")";
+        qInfo() << "Delete Output VM" << _name << "(" << _id << ")";
 
         setfirstModel(NULL);
     }
-    else {
+    /*else {
         qInfo() << "Delete ghost of Output VM" << _name;
-    }
+    }*/
 
     // DIS-connect to signal "Count Changed" from the list of models
     disconnect(&_models, &AbstractI2CustomItemListModel::countChanged, this, &OutputVM::_onModelsChanged);

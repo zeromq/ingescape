@@ -19,20 +19,15 @@
 
 #include <I2PropertyHelpers.h>
 
-#include "model/iop/agentiopm.h"
+#include <viewModel/iop/agentiopvm.h>
+
 
 /**
- * @brief The PointMapVM class is the base class derivated to create InputVM and OutputVM.
+ * @brief The PointMapVM class is the base class derived to create InputVM and OutputVM.
  */
-class PointMapVM : public QObject
+class PointMapVM : public AgentIOPVM
 {
     Q_OBJECT
-
-    // Name of our input / output
-    I2_QML_PROPERTY_READONLY(QString, name)
-
-    // Identifier with name and value type (can be empty when ghost)
-    I2_CPP_NOSIGNAL_PROPERTY(QString, id)
 
     // Geometry for the connector in the view
     // Position the center of the connector (Absolute coordinate)
@@ -40,8 +35,9 @@ class PointMapVM : public QObject
 
 
 public:
+
     /**
-     * @brief Default constructor
+     * @brief Constructor
      * @param name
      * @param id
      * @param parent

@@ -37,6 +37,7 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     _scenarioC(NULL),
     _valuesHistoryC(NULL),
     _timeLineC(NULL),
+    _launcherManager(NULL),
     _terminationSignalWatcher(NULL)
 {
     qInfo() << "New MASTIC Editor Controller";
@@ -121,14 +122,21 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     // Create the controller for the history of values
     _valuesHistoryC = new ValuesHistoryController(_modelManager, this);
 
-    // Create the controller FIXME TODO comment
+    // Create the controller for the time line
     _timeLineC = new AbstractTimeActionslineScenarioViewController(this);
+
+    // Create the manager for launchers of MASTIC agents
+    //_launcherManager = new MasticLauncherManager(this);
+    _launcherManager = &MasticLauncherManager::Instance();
+
 
     // Connect to signals from the network controller
     connect(_networkC, &NetworkController::agentEntered, _modelManager, &MasticModelManager::onAgentEntered);
+    connect(_networkC, &NetworkController::agentExited, _modelManager, &MasticModelManager::onAgentExited);
+    connect(_networkC, &NetworkController::launcherEntered, _modelManager, &MasticModelManager::onLauncherEntered);
+    connect(_networkC, &NetworkController::launcherExited, _modelManager, &MasticModelManager::onLauncherExited);
     connect(_networkC, &NetworkController::definitionReceived, _modelManager, &MasticModelManager::onDefinitionReceived);
     connect(_networkC, &NetworkController::mappingReceived, _modelManager, &MasticModelManager::onMappingReceived);
-    connect(_networkC, &NetworkController::agentExited, _modelManager, &MasticModelManager::onAgentExited);
     connect(_networkC, &NetworkController::valuePublished, _modelManager, &MasticModelManager::onValuePublished);
     connect(_networkC, &NetworkController::isMutedFromAgentUpdated, _modelManager, &MasticModelManager::onisMutedFromAgentUpdated);
     connect(_networkC, &NetworkController::isFrozenFromAgentUpdated, _modelManager, &MasticModelManager::onIsFrozenFromAgentUpdated);
@@ -193,9 +201,8 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
 
 
 
-
-    // TEMP sleep to display our loading screen
-    QThread::msleep(2000);
+    // FIXME: sleep to display our loading screen
+    //QThread::msleep(2000);
 }
 
 
@@ -218,6 +225,16 @@ MasticEditorController::~MasticEditorController()
     //
     // Clean-up sub-controllers
     //
+    if (_launcherManager != NULL)
+    {
+        disconnect(_launcherManager);
+
+        //MasticLauncherManager* temp = _launcherManager;
+        setlauncherManager(NULL);
+        //delete temp;
+        //temp = NULL;
+    }
+
     if (_timeLineC != NULL)
     {
         disconnect(_timeLineC);
@@ -227,7 +244,6 @@ MasticEditorController::~MasticEditorController()
         delete temp;
         temp = NULL;
     }
-
 
     if (_valuesHistoryC != NULL)
     {

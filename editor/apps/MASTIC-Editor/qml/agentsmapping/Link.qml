@@ -146,7 +146,7 @@ I2CubicBezierCurve {
 
     // Fuzzy contour
     fuzzyColor: MasticTheme.lightGreyColor
-    fuzzyRadius: (mapBetweenIOPVM && controller && (controller.selectedMapBetweenIOP === mapBetweenIOPVM)) ? 2 : 0
+    fuzzyRadius: (mapBetweenIOPVM && controller && (controller.selectedLink === mapBetweenIOPVM)) ? 2 : 0
 
     opacity: mouseArea.pressed ? 0.8 : 1;
 
@@ -259,8 +259,8 @@ I2CubicBezierCurve {
     Keys.onPressed: {
         if (event.key === Qt.Key_Backspace || event.key === Qt.Key_Delete)
         {
-            if (controller && controller.selectedMapBetweenIOP) {
-                controller.removeLinkBetweenTwoAgents(controller.selectedMapBetweenIOP);
+            if (controller && controller.selectedLink) {
+                controller.removeLinkBetweenTwoAgents(controller.selectedLink);
             }
 
             event.accepted = true;
@@ -270,8 +270,8 @@ I2CubicBezierCurve {
     // UNselect map between IOP
     onFocusChanged: {
         if (!focus) {
-            if (controller && controller.selectedMapBetweenIOP) {
-                controller.selectedMapBetweenIOP = null;
+            if (controller && controller.selectedLink) {
+                controller.selectedLink = null;
             }
         }
     }
@@ -297,11 +297,11 @@ I2CubicBezierCurve {
         onClicked: {
             rootItem.forceActiveFocus();
             if (controller) {
-                if (controller.selectedMapBetweenIOP !== model.QtObject) {
-                    controller.selectedMapBetweenIOP = model.QtObject;
+                if (controller.selectedLink !== model.QtObject) {
+                    controller.selectedLink = model.QtObject;
                 }
                 else {
-                    controller.selectedMapBetweenIOP = null;
+                    controller.selectedLink = null;
                 }
             }
         }
