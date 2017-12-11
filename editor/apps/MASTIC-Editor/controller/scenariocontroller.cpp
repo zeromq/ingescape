@@ -32,7 +32,8 @@ ScenarioController::ScenarioController(MasticModelManager* modelManager,
     _currentTime(QTime::fromMSecsSinceStartOfDay(0)),
     _nextActionVMToActive(NULL),
     _modelManager(modelManager),
-    _scenariosDirectoryPath(scenariosPath)
+    _scenariosDirectoryPath(scenariosPath),
+    _jsonHelper(NULL)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -134,6 +135,13 @@ ScenarioController::~ScenarioController()
     _mapActionsFromActionName.clear();
 
     _modelManager = NULL;
+
+    // Delete json helper
+    if(_jsonHelper != NULL)
+    {
+        delete _jsonHelper;
+        _jsonHelper = NULL;
+    }
 }
 
 

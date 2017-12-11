@@ -116,19 +116,23 @@ ApplicationWindow {
 
             MenuItem {
                 text: qsTr("Open mapping")
-                enabled: false
 
                 onTriggered: {
                     console.log("Open mapping");
+                    if (MasticEditorC.agentsMappingC) {
+                        MasticEditorC.agentsMappingC.openMapping();
+                    }
                 }
             }
 
             MenuItem {
                 text: qsTr("Save mapping")
-                enabled: false
 
                 onTriggered: {
                     console.log("Save mapping");
+                    if (MasticEditorC.agentsMappingC) {
+                        MasticEditorC.agentsMappingC.saveMapping();
+                    }
                 }
             }
 

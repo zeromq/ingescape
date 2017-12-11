@@ -65,6 +65,13 @@ MasticModelManager::~MasticModelManager()
 
     // Free memory
     _publishedValues.deleteAllItems();
+
+    // Delete json helper
+    if(_jsonHelper != NULL)
+    {
+        delete _jsonHelper;
+        _jsonHelper = NULL;
+    }
 }
 
 

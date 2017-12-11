@@ -126,44 +126,7 @@ QByteArray JsonHelper::exportAgentsList(QList<QPair<QString, DefinitionM*>> agen
             QJsonObject jsonAgent;
             jsonAgent.insert("agentName", agentName);
 
-            QJsonObject jsonDefinition;
-            jsonDefinition.insert("name", definition->name());
-            jsonDefinition.insert("version", definition->version());
-            jsonDefinition.insert("description", definition->description());
-
-            QJsonArray jsonInputs;
-            foreach (AgentIOPM* agentIOP, definition->inputsList()->toList()) {
-                if (agentIOP != NULL) {
-                    // Get JSON object from the agent Input/Output/Parameter
-                    QJsonObject jsonAgentIOP = _getJsonFromAgentIOP(agentIOP);
-
-                    jsonInputs.append(jsonAgentIOP);
-                }
-            }
-
-            QJsonArray jsonOutputs;
-            foreach (AgentIOPM* agentIOP, definition->outputsList()->toList()) {
-                if (agentIOP != NULL) {
-                    // Get JSON object from the agent Input/Output/Parameter
-                    QJsonObject jsonAgentIOP = _getJsonFromAgentIOP(agentIOP);
-
-                    jsonOutputs.append(jsonAgentIOP);
-                }
-            }
-
-            QJsonArray jsonParameters;
-            foreach (AgentIOPM* agentIOP, definition->parametersList()->toList()) {
-                if (agentIOP != NULL) {
-                    // Get JSON object from the agent Input/Output/Parameter
-                    QJsonObject jsonAgentIOP = _getJsonFromAgentIOP(agentIOP);
-
-                    jsonParameters.append(jsonAgentIOP);
-                }
-            }
-
-            jsonDefinition.insert("inputs", jsonInputs);
-            jsonDefinition.insert("outputs", jsonOutputs);
-            jsonDefinition.insert("parameters", jsonParameters);
+            QJsonObject jsonDefinition = exportAgentDefinition(definition);
 
             jsonAgent.insert("definition", jsonDefinition);
 
@@ -176,6 +139,53 @@ QByteArray JsonHelper::exportAgentsList(QList<QPair<QString, DefinitionM*>> agen
     return jsonDocument.toJson();
 }
 
+/**
+ * @brief Export the agent definition into a json format
+ * @param agent definition model
+ */
+QJsonObject JsonHelper::exportAgentDefinition(DefinitionM* definition)
+{
+    QJsonObject jsonDefinition;
+    jsonDefinition.insert("name", definition->name());
+    jsonDefinition.insert("version", definition->version());
+    jsonDefinition.insert("description", definition->description());
+
+    QJsonArray jsonInputs;
+    foreach (AgentIOPM* agentIOP, definition->inputsList()->toList()) {
+        if (agentIOP != NULL) {
+            // Get JSON object from the agent Input/Output/Parameter
+            QJsonObject jsonAgentIOP = _getJsonFromAgentIOP(agentIOP);
+
+            jsonInputs.append(jsonAgentIOP);
+        }
+    }
+
+    QJsonArray jsonOutputs;
+    foreach (AgentIOPM* agentIOP, definition->outputsList()->toList()) {
+        if (agentIOP != NULL) {
+            // Get JSON object from the agent Input/Output/Parameter
+            QJsonObject jsonAgentIOP = _getJsonFromAgentIOP(agentIOP);
+
+            jsonOutputs.append(jsonAgentIOP);
+        }
+    }
+
+    QJsonArray jsonParameters;
+    foreach (AgentIOPM* agentIOP, definition->parametersList()->toList()) {
+        if (agentIOP != NULL) {
+            // Get JSON object from the agent Input/Output/Parameter
+            QJsonObject jsonAgentIOP = _getJsonFromAgentIOP(agentIOP);
+
+            jsonParameters.append(jsonAgentIOP);
+        }
+    }
+
+    jsonDefinition.insert("inputs", jsonInputs);
+    jsonDefinition.insert("outputs", jsonOutputs);
+    jsonDefinition.insert("parameters", jsonParameters);
+
+    return jsonDefinition;
+}
 
 /**
  * @brief Create a model of agent mapping with JSON and the input agent name corresponding
@@ -192,34 +202,48 @@ AgentMappingM* JsonHelper::createModelOfAgentMapping(QString inputAgentName, QBy
     {
         QJsonObject jsonObject = jsonAgentMapping.object();
 
-        QJsonValue jsonMapping = jsonObject.value("mapping");
-        if (jsonMapping.isObject())
+        agentMapping = _createModelOfAgentMappingFromJson(inputAgentName, jsonObject);
+    }
+
+    return agentMapping;
+}
+
+/**
+ * @brief Create a model of agent mapping from JsonObject and the input agent name corresponding
+ * @param inputAgentName, byteArrayOfJson
+ * @return
+ */
+AgentMappingM* JsonHelper::_createModelOfAgentMappingFromJson(QString inputAgentName,QJsonObject jsonObject)
+{
+    AgentMappingM* agentMapping = NULL;
+
+    QJsonValue jsonMapping = jsonObject.value("mapping");
+    if (jsonMapping.isObject())
+    {
+        QJsonObject jsonSubObject = jsonMapping.toObject();
+
+        QJsonValue jsonName = jsonSubObject.value("name");
+        QJsonValue jsonDescription = jsonSubObject.value("description");
+        QJsonValue jsonVersion = jsonSubObject.value("version");
+        QJsonValue jsonMappingOut = jsonSubObject.value("mapping_out");
+
+        if (jsonName.isString() && jsonDescription.isString() && jsonVersion.isString())
         {
-            QJsonObject jsonSubObject = jsonMapping.toObject();
+            // Create the agent definition
+            agentMapping = new AgentMappingM(jsonName.toString(), jsonVersion.toString(), jsonDescription.toString());
 
-            QJsonValue jsonName = jsonSubObject.value("name");
-            QJsonValue jsonDescription = jsonSubObject.value("description");
-            QJsonValue jsonVersion = jsonSubObject.value("version");
-            QJsonValue jsonMappingOut = jsonSubObject.value("mapping_out");
+            if (jsonMappingOut.isArray()) {
+                foreach (QJsonValue jsonMap, jsonMappingOut.toArray()) {
+                    if (jsonMap.isObject())
+                    {
+                        ElementMappingM* elementMapping = _createModelOfElementMapping(inputAgentName, jsonMap.toObject());
+                        if (elementMapping != NULL) {
+                            agentMapping->elementMappingsList()->append(elementMapping);
 
-            if (jsonName.isString() && jsonDescription.isString() && jsonVersion.isString())
-            {
-                // Create the agent definition
-                agentMapping = new AgentMappingM(jsonName.toString(), jsonVersion.toString(), jsonDescription.toString());
-
-                if (jsonMappingOut.isArray()) {
-                    foreach (QJsonValue jsonMap, jsonMappingOut.toArray()) {
-                        if (jsonMap.isObject())
-                        {
-                            ElementMappingM* elementMapping = _createModelOfElementMapping(inputAgentName, jsonMap.toObject());
-                            if (elementMapping != NULL) {
-                                agentMapping->elementMappingsList()->append(elementMapping);
-
-                                // FIXME TODO: connect to count changed on elementMappingsList to update the property "mappingElementsIds"
-                                QStringList mappingElementsIds = agentMapping->mappingElementsIds();
-                                mappingElementsIds.append(elementMapping->id());
-                                agentMapping->setmappingElementsIds(mappingElementsIds);
-                            }
+                            // FIXME TODO: connect to count changed on elementMappingsList to update the property "mappingElementsIds"
+                            QStringList mappingElementsIds = agentMapping->mappingElementsIds();
+                            mappingElementsIds.append(elementMapping->id());
+                            agentMapping->setmappingElementsIds(mappingElementsIds);
                         }
                     }
                 }
@@ -230,19 +254,17 @@ AgentMappingM* JsonHelper::createModelOfAgentMapping(QString inputAgentName, QBy
     return agentMapping;
 }
 
-
 /**
- * @brief Get the JSON of a mapping
+ * @brief Export the agent mapping model into the json object
  * @param agentMapping
- * @return
+ * @return QJson object
  */
-QString JsonHelper::getJsonOfMapping(AgentMappingM* agentMapping)
+QJsonObject JsonHelper::exportMappingToJson(AgentMappingM* agentMapping)
 {
-    QString jsonOfMapping = "";
+    QJsonObject jsonMapping;
 
     if (agentMapping != NULL)
     {
-        QJsonObject jsonMapping;
         jsonMapping.insert("name", agentMapping->name());
         jsonMapping.insert("description", agentMapping->description());
         jsonMapping.insert("version", agentMapping->version());
@@ -261,6 +283,94 @@ QString JsonHelper::getJsonOfMapping(AgentMappingM* agentMapping)
         }
 
         jsonMapping.insert("mapping_out", jsonArray);
+    }
+
+    return jsonMapping;
+}
+
+/**
+ * @brief Import the mapping from the json content
+ * @param byteArrayOfJson
+ * @return list of mapping_agent_import_t objects
+ */
+QList< mapping_agent_import_t* > JsonHelper::importMapping(QByteArray byteArrayOfJson)
+{
+    QList< mapping_agent_import_t* > listAgentsMapping;
+
+    QJsonDocument jsonFileRoot = QJsonDocument::fromJson(byteArrayOfJson);
+    if (jsonFileRoot.isArray())
+    {
+        foreach (QJsonValue jsonValue, jsonFileRoot.array())
+        {
+            if (jsonValue.isObject())
+            {
+                QJsonObject jsonAllMapping = jsonValue.toObject();
+
+                // Get value for keys "agentName" and "definition"
+                QJsonValue jsonName = jsonAllMapping.value("agentName");
+                QJsonValue jsonDefinition = jsonAllMapping.value("definition");
+                QJsonValue jsonPosition = jsonAllMapping.value("position");
+
+                if (jsonName.isString() && jsonDefinition.isObject())
+                {
+                    // Create mapping and definition
+                    AgentMappingM* agentMapping = _createModelOfAgentMappingFromJson(jsonName.toString(),jsonAllMapping);
+                    DefinitionM* definition = _createModelOfDefinitionFromJSON(jsonDefinition.toObject());
+
+                    if(definition != NULL)
+                    {
+                        // Add our agent in mapping
+                        mapping_agent_import_t* mappingAgent = new mapping_agent_import_t();
+                        mappingAgent->definition = definition;
+                        mappingAgent->mapping = agentMapping;
+                        mappingAgent->name = jsonName.toString();
+                        mappingAgent->position = QPointF(0.0,0.0);
+
+                        // Load position
+                        QStringList positionStringList = jsonPosition.toString().split(',');
+                        if(positionStringList.count() == 2)
+                        {
+                            QString xStr = positionStringList.first().remove('(');
+                            QString yStr = positionStringList.last().remove(')');
+
+                            if(xStr.isEmpty() == false && yStr.isEmpty() == false)
+                            {
+                                mappingAgent->position = QPointF(xStr.toFloat(),yStr.toFloat());
+                            }
+                        }
+
+                        // Add to list
+                        listAgentsMapping.append(mappingAgent);
+                    }
+                    else
+                    {
+                        // No definition , we delete the mapping
+                        if(agentMapping != NULL)
+                        {
+                            delete agentMapping;
+                            agentMapping = NULL;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return listAgentsMapping;
+}
+
+/**
+ * @brief Get the JSON of a mapping
+ * @param agentMapping
+ * @return
+ */
+QString JsonHelper::getJsonOfMapping(AgentMappingM* agentMapping)
+{
+    QString jsonOfMapping = "";
+
+    if (agentMapping != NULL)
+    {
+        QJsonObject jsonMapping = exportMappingToJson(agentMapping);
 
         QJsonObject jsonObject;
         jsonObject.insert("mapping", jsonMapping);

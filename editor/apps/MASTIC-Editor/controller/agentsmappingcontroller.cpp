@@ -17,19 +17,24 @@
 
 #include <QQmlEngine>
 #include <QDebug>
+#include <QFileDialog>
 
 
 /**
  * @brief Default constructor
  * @param modelManager
+ * @param mapping directory path
  * @param parent
  */
-AgentsMappingController::AgentsMappingController(MasticModelManager* modelManager, QObject *parent)
+AgentsMappingController::AgentsMappingController(MasticModelManager* modelManager,
+                                                 QString mappingsPath,
+                                                 QObject *parent)
     : QObject(parent),
       _isEmptyMapping(true),
       _selectedAgent(NULL),
       _selectedMapBetweenIOP(NULL),
-      _modelManager(modelManager)
+      _modelManager(modelManager),
+      _mappingsDirectoryPath(mappingsPath)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -39,6 +44,9 @@ AgentsMappingController::AgentsMappingController(MasticModelManager* modelManage
         // Connect to signal "Count Changed" from the list of agents in mapping
         connect(&_agentInMappingVMList, &AbstractI2CustomItemListModel::countChanged, this, &AgentsMappingController::_onAgentsInMappingChanged);
     }
+
+    // Create the helper to manage JSON definitions of agents
+    _jsonHelper = new JsonHelper(this);
 }
 
 
@@ -63,6 +71,13 @@ AgentsMappingController::~AgentsMappingController()
     _agentInMappingVMList.deleteAllItems();
 
     _modelManager = NULL;
+
+    // Delete json helper
+    if(_jsonHelper != NULL)
+    {
+        delete _jsonHelper;
+        _jsonHelper = NULL;
+    }
 }
 
 
@@ -92,6 +107,171 @@ void AgentsMappingController::createNewMapping()
 
     qInfo() << "Create a new (empty) Mapping";
 }
+
+/**
+ * @brief Open a Mapping
+ */
+void AgentsMappingController::openMapping()
+{
+    // "File Dialog" to get the files (paths) to open
+    QString mappingFilePath = QFileDialog::getOpenFileName(NULL,
+                                                                "Open mapping",
+                                                                _mappingsDirectoryPath,
+                                                                "JSON (*.json)");
+
+    // Import the mapping from JSON file
+    _importMappingFromFile(mappingFilePath);
+}
+
+/**
+ * @brief Save a Mapping
+ */
+void AgentsMappingController::saveMapping()
+{
+    // "File Dialog" to get the file (path) to save
+    QString mappingFilePath = QFileDialog::getSaveFileName(NULL,
+                                                              "Save mapping",
+                                                              _mappingsDirectoryPath,
+                                                              "JSON (*.json)");
+
+    if(!mappingFilePath.isEmpty()) {
+        // Export the mapping to JSON file
+        _exportMappingToFile(mappingFilePath);
+    }
+}
+
+/**
+ * @brief Import the mapping from JSON file
+ * @param mappingFilePath
+ */
+void AgentsMappingController::_importMappingFromFile(QString mappingFilePath)
+{
+    if (!mappingFilePath.isEmpty() && (_jsonHelper != NULL))
+    {
+        qInfo() << "Import the mapping from JSON file" << mappingFilePath;
+
+        QFile jsonFile(mappingFilePath);
+        if (jsonFile.exists())
+        {
+            if (jsonFile.open(QIODevice::ReadOnly))
+            {
+                QByteArray byteArrayOfJson = jsonFile.readAll();
+                jsonFile.close();
+
+                // Initialize mapping lists from JSON file
+                QList< mapping_agent_import_t* > listMappingImported = _jsonHelper->importMapping(byteArrayOfJson);
+                if(listMappingImported.count() > 0)
+                {
+                    QList<ElementMappingM*> mappingElements;
+                    foreach (mapping_agent_import_t* importedMapping, listMappingImported)
+                    {
+                        DefinitionM* definition = importedMapping->definition;
+                        AgentMappingM* agentMapping = importedMapping->mapping;
+
+                        QList<AgentM*> agentModelList = _modelManager->getAgentModelsListFromName(importedMapping->name);
+                        if(agentModelList.count() == 0)
+                        {
+                            AgentM * newAgent = new AgentM(importedMapping->name);
+                            newAgent->setdefinition(definition);
+
+                            agentModelList.append(newAgent);
+                        }
+
+                        if(agentModelList.count() > 0)
+                        {
+                            // Create a new Agent In Mapping
+                            _addAgentModelsToMappingAtPosition(importedMapping->name,agentModelList,importedMapping->position);
+
+                            AgentInMappingVM* agentInMapping = getAgentInMappingFromName(importedMapping->name);
+                            if(agentInMapping != NULL)
+                            {
+                                // Add the link elements
+                                mappingElements.append(agentMapping->elementMappingsList()->toList());
+
+                                // Set agent mapping
+                                if(agentMapping != NULL)
+                                {
+                                    agentInMapping->settemporaryMapping(agentMapping);
+                                }
+                            }
+                        }
+                    }
+
+                    // Add links
+                    if(mappingElements.count() > 0)
+                    {
+                        // Create all mapping links
+                        foreach (ElementMappingM* elementMapping, mappingElements)
+                        {
+                            onMapped(elementMapping);
+                        }
+                    }
+                }
+            }
+            else {
+                qCritical() << "Can not open file" << mappingFilePath;
+            }
+        }
+        else {
+            qWarning() << "There is no file" << mappingFilePath;
+        }
+    }
+}
+
+/**
+ * @brief Export the mapping to JSON file
+ * @param mappingFilePath
+ */
+void AgentsMappingController::_exportMappingToFile(QString mappingFilePath)
+{
+    if (!mappingFilePath.isEmpty() && (_jsonHelper != NULL))
+    {
+        qInfo() << "Save the mapping to JSON file" << mappingFilePath;
+
+        QJsonArray jsonArray;
+
+        foreach (AgentInMappingVM* agentInMapVM, _agentInMappingVMList.toList())
+        {
+            if(agentInMapVM->temporaryMapping() != NULL && agentInMapVM->models()->count() > 0)
+            {
+                // Set agent name
+                QJsonObject jsonFullMapping;
+                jsonFullMapping.insert("agentName", agentInMapVM->name());
+                jsonFullMapping.insert("position", "("+ QString::number(agentInMapVM->position().x())+","+QString::number(agentInMapVM->position().y())+")");
+
+                // Set the mapping
+                QJsonObject jsonMapping = _jsonHelper->exportMappingToJson(agentInMapVM->temporaryMapping());
+                jsonFullMapping.insert("mapping", jsonMapping);
+
+                // Set the definition
+                QJsonObject jsonDefinition = _jsonHelper->exportAgentDefinition(agentInMapVM->models()->at(0)->definition());
+                jsonFullMapping.insert("definition", jsonDefinition);
+
+                // Append to the list of mapping agents
+                jsonArray.append(jsonFullMapping);
+            }
+        }
+
+        if(jsonArray.count() > 0)
+        {
+            // Create json document
+            QJsonDocument jsonDocument = QJsonDocument(jsonArray);
+            QByteArray byteArrayOfJson = jsonDocument.toJson();
+
+            // Write file
+            QFile jsonFile(mappingFilePath);
+            if (jsonFile.open(QIODevice::WriteOnly))
+            {
+                jsonFile.write(byteArrayOfJson);
+                jsonFile.close();
+            }
+            else {
+                qCritical() << "Can not open file" << mappingFilePath;
+            }
+        }
+    }
+}
+
 
 
 /**

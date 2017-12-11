@@ -43,6 +43,20 @@ struct scenario_import_actions_lists_t {
 };
 
 /**
+ * @brief Structure used for mapping importation from a json string
+ * @param name
+ * @param position in mapping area
+ * @param definition
+ * @param mapping
+ */
+struct mapping_agent_import_t {
+  QString               name;
+  QPointF               position;
+  DefinitionM*          definition;
+  AgentMappingM*        mapping;
+};
+
+/**
  * @brief The JsonHelper class defines a helper to manage JSON definitions of agents
  */
 class JsonHelper : public QObject
@@ -101,6 +115,12 @@ public:
      */
     QString getJsonOfMapping(AgentMappingM* agentMapping);
 
+    /**
+     * @brief Export the agent mapping model into the json object
+     * @param agentMapping
+     * @return QJson object
+     */
+    QJsonObject exportMappingToJson(AgentMappingM* agentMapping);
 
     /**
      * @brief Initialize actions list from JSON file
@@ -118,6 +138,20 @@ public:
      * @return
      */
     QByteArray exportScenario(QList<ActionM*> actionsList, QList<ActionInPaletteVM*> actionsInPaletteList, QList<ActionVM*> actionsInTimeLine);
+
+
+    /**
+     * @brief Export the agent definition into a json format
+     * @param agent definition model
+     */
+    QJsonObject exportAgentDefinition(DefinitionM* definition);
+
+    /**
+     * @brief Import the mapping from the json content
+     * @param byteArrayOfJson
+     * @return list of mapping_agent_import_t objects
+     */
+    QList<mapping_agent_import_t *> importMapping(QByteArray byteArrayOfJson);
 
 Q_SIGNALS:
 
@@ -172,6 +206,13 @@ private:
      * @return
      */
     ActionConditionVM* _parseConditionsVMFromJson(QJsonObject jsonCondition, QList<AgentInMappingVM*> listAgentsInMapping);
+
+    /**
+     * @brief Create a model of agent mapping from JsonObject and the input agent name corresponding
+     * @param inputAgentName, byteArrayOfJson
+     * @return
+     */
+    AgentMappingM* _createModelOfAgentMappingFromJson(QString inputAgentName,QJsonObject jsonObject);
 };
 
 #endif // JSONHELPER_H

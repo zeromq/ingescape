@@ -113,7 +113,7 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     _agentsSupervisionC = new AgentsSupervisionController(_modelManager, this);
 
     // Create the controller for agents mapping
-    _agentsMappingC = new AgentsMappingController(_modelManager, this);
+    _agentsMappingC = new AgentsMappingController(_modelManager, agentsMappingsPath, this);
 
     // Create the controller for scenario management
     _scenarioC = new ScenarioController(_modelManager, scenariosPath, this);

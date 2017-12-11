@@ -261,7 +261,7 @@ Item {
             Button {
                 id: btnExportAction
 
-                enabled: true // visible & (controller.selectedAction ? true : false)
+                enabled: visible & (controller.actionsList.count > 0 ? true : false)
                 activeFocusOnPress: true
 
                 anchors {
