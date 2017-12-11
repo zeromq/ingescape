@@ -106,6 +106,13 @@ public:
      */
     static QString getScenariosPath();
 
+    /**
+     * @brief Get (and create if needed) the path with files about platforms
+     * "[DocumentsLocation]/MASTIC/Platforms/"
+     * @return
+     */
+    static QString getPlatformsPath();
+
 
 protected:
     /**

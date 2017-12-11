@@ -119,8 +119,8 @@ void AgentsMappingController::openMapping()
                                                                 _mappingsDirectoryPath,
                                                                 "JSON (*.json)");
 
-    // Import the mapping from JSON file
-    _importMappingFromFile(mappingFilePath);
+    // Open the mapping from JSON file
+    _openMappingFromFile(mappingFilePath);
 }
 
 /**
@@ -135,78 +135,32 @@ void AgentsMappingController::saveMapping()
                                                               "JSON (*.json)");
 
     if(!mappingFilePath.isEmpty()) {
-        // Export the mapping to JSON file
-        _exportMappingToFile(mappingFilePath);
+        // Save the mapping to JSON file
+        _saveMappingToFile(mappingFilePath);
     }
 }
 
 /**
- * @brief Import the mapping from JSON file
+ * @brief Open the mapping from JSON file
  * @param mappingFilePath
  */
-void AgentsMappingController::_importMappingFromFile(QString mappingFilePath)
+void AgentsMappingController::_openMappingFromFile(QString mappingFilePath)
 {
     if (!mappingFilePath.isEmpty() && (_jsonHelper != NULL))
     {
-        qInfo() << "Import the mapping from JSON file" << mappingFilePath;
+        qInfo() << "Open the mapping from JSON file" << mappingFilePath;
 
         QFile jsonFile(mappingFilePath);
         if (jsonFile.exists())
         {
             if (jsonFile.open(QIODevice::ReadOnly))
             {
+
                 QByteArray byteArrayOfJson = jsonFile.readAll();
                 jsonFile.close();
 
-                // Initialize mapping lists from JSON file
-                QList< mapping_agent_import_t* > listMappingImported = _jsonHelper->importMapping(byteArrayOfJson);
-                if(listMappingImported.count() > 0)
-                {
-                    QList<ElementMappingM*> mappingElements;
-                    foreach (mapping_agent_import_t* importedMapping, listMappingImported)
-                    {
-                        DefinitionM* definition = importedMapping->definition;
-                        AgentMappingM* agentMapping = importedMapping->mapping;
-
-                        QList<AgentM*> agentModelList = _modelManager->getAgentModelsListFromName(importedMapping->name);
-                        if(agentModelList.count() == 0)
-                        {
-                            AgentM * newAgent = new AgentM(importedMapping->name);
-                            newAgent->setdefinition(definition);
-
-                            agentModelList.append(newAgent);
-                        }
-
-                        if(agentModelList.count() > 0)
-                        {
-                            // Create a new Agent In Mapping
-                            _addAgentModelsToMappingAtPosition(importedMapping->name,agentModelList,importedMapping->position);
-
-                            AgentInMappingVM* agentInMapping = getAgentInMappingFromName(importedMapping->name);
-                            if(agentInMapping != NULL)
-                            {
-                                // Add the link elements
-                                mappingElements.append(agentMapping->mappingElements()->toList());
-
-                                // Set agent mapping
-                                if(agentMapping != NULL)
-                                {
-                                    agentInMapping->settemporaryMapping(agentMapping);
-                                }
-                            }
-                        }
-                    }
-
-                    // Add links
-                    if(mappingElements.count() > 0)
-                    {
-                        // Create all mapping links
-                        foreach (ElementMappingM* elementMapping, mappingElements)
-                        {
-                            onMapped(elementMapping);
-                        }
-                    }
-                }
+                // Import the new mapping
+                importMappingFromJson(byteArrayOfJson);
             }
             else {
                 qCritical() << "Can not open file" << mappingFilePath;
@@ -219,38 +173,16 @@ void AgentsMappingController::_importMappingFromFile(QString mappingFilePath)
 }
 
 /**
- * @brief Export the mapping to JSON file
+ * @brief Save the mapping to JSON file
  * @param mappingFilePath
  */
-void AgentsMappingController::_exportMappingToFile(QString mappingFilePath)
+void AgentsMappingController::_saveMappingToFile(QString mappingFilePath)
 {
     if (!mappingFilePath.isEmpty() && (_jsonHelper != NULL))
     {
         qInfo() << "Save the mapping to JSON file" << mappingFilePath;
 
-        QJsonArray jsonArray;
-
-        foreach (AgentInMappingVM* agentInMapVM, _allAgentsInMapping.toList())
-        {
-            if(agentInMapVM->temporaryMapping() != NULL && agentInMapVM->models()->count() > 0)
-            {
-                // Set agent name
-                QJsonObject jsonFullMapping;
-                jsonFullMapping.insert("agentName", agentInMapVM->name());
-                jsonFullMapping.insert("position", "("+ QString::number(agentInMapVM->position().x())+","+QString::number(agentInMapVM->position().y())+")");
-
-                // Set the mapping
-                QJsonObject jsonMapping = _jsonHelper->exportMappingToJson(agentInMapVM->temporaryMapping());
-                jsonFullMapping.insert("mapping", jsonMapping);
-
-                // Set the definition
-                QJsonObject jsonDefinition = _jsonHelper->exportAgentDefinition(agentInMapVM->models()->at(0)->definition());
-                jsonFullMapping.insert("definition", jsonDefinition);
-
-                // Append to the list of mapping agents
-                jsonArray.append(jsonFullMapping);
-            }
-        }
+        QJsonArray jsonArray = _jsonHelper->exportAllAgentsInMapping(_allAgentsInMapping.toList());
 
         if(jsonArray.count() > 0)
         {
@@ -1002,6 +934,67 @@ void AgentsMappingController::_overWriteMappingOfAgentModel(AgentM* agentModel, 
         // Model is OFF
         else {
             agentModel->setmustOverWriteMapping(true);
+        }
+    }
+}
+
+
+/**
+  * @brief Import the mappings from the json byte content
+  * @param byte array content
+  */
+void AgentsMappingController::importMappingFromJson(QByteArray byteArrayOfJson, bool fromPlatform)
+{
+    // Clear the previous mapping
+    createNewMapping();
+
+    // Initialize mapping lists from JSON file
+    QList< mapping_agent_import_t* > listMappingImported = _jsonHelper->importMapping(byteArrayOfJson, fromPlatform);
+    if(listMappingImported.count() > 0)
+    {
+        QList<ElementMappingM*> mappingElements;
+        foreach (mapping_agent_import_t* importedMapping, listMappingImported)
+        {
+            DefinitionM* definition = importedMapping->definition;
+            AgentMappingM* agentMapping = importedMapping->mapping;
+
+            QList<AgentM*> agentModelList = _modelManager->getAgentModelsListFromName(importedMapping->name);
+            if(agentModelList.count() == 0)
+            {
+                AgentM * newAgent = new AgentM(importedMapping->name);
+                newAgent->setdefinition(definition);
+
+                agentModelList.append(newAgent);
+            }
+
+            if(agentModelList.count() > 0)
+            {
+                // Create a new Agent In Mapping
+                _addAgentModelsToMappingAtPosition(importedMapping->name,agentModelList,importedMapping->position);
+
+                AgentInMappingVM* agentInMapping = getAgentInMappingFromName(importedMapping->name);
+                if(agentInMapping != NULL)
+                {
+                    // Add the link elements
+                    mappingElements.append(agentMapping->mappingElements()->toList());
+
+                    // Set agent mapping
+                    if(agentMapping != NULL)
+                    {
+                        agentInMapping->settemporaryMapping(agentMapping);
+                    }
+                }
+            }
+        }
+
+        // Add links
+        if(mappingElements.count() > 0)
+        {
+            // Create all mapping links
+            foreach (ElementMappingM* elementMapping, mappingElements)
+            {
+                onMapped(elementMapping);
+            }
         }
     }
 }

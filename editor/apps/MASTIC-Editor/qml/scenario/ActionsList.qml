@@ -238,7 +238,7 @@ Item {
 
                 onClicked: {
                     if (MasticEditorC.scenarioC) {
-                        MasticEditorC.scenarioC.importScenarioFromFile();
+                        MasticEditorC.scenarioC.openScenarioFromFile();
                     }
                 }
             }
@@ -278,11 +278,7 @@ Item {
 
                 onClicked: {
                     if (MasticEditorC.scenarioC) {
-                        MasticEditorC.scenarioC.exportScenarioToSelectedFile();
-                    }
-                    if (controller.selectedAction) {
-                        //controller.exportAgent(controller.selectedAgent);
-
+                        MasticEditorC.scenarioC.saveScenarioToSelectedFile();
                     }
                 }
             }

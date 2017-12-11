@@ -132,13 +132,13 @@ public:
     scenario_import_actions_lists_t * initActionsList(QByteArray byteArrayOfJson, QList<AgentInMappingVM*> listAgentsInMapping);
 
     /**
-     * @brief Create an action condition VM from JSON object
-     * @param jsonObject
-     * @param list of agents in mapping
+     * @brief Export the actions lists into json object
+     * @param actions list in table
+     * @param actions list in the palette
+     * @param actions list in the timeline
      * @return
      */
-    QByteArray exportScenario(QList<ActionM*> actionsList, QList<ActionInPaletteVM*> actionsInPaletteList, QList<ActionVM*> actionsInTimeLine);
-
+    QJsonObject exportScenario(QList<ActionM*> actionsList, QList<ActionInPaletteVM*> actionsInPaletteList, QList<ActionVM*> actionsInTimeLine);
 
     /**
      * @brief Export the agent definition into a json format
@@ -151,7 +151,14 @@ public:
      * @param byteArrayOfJson
      * @return list of mapping_agent_import_t objects
      */
-    QList<mapping_agent_import_t *> importMapping(QByteArray byteArrayOfJson);
+    QList<mapping_agent_import_t *> importMapping(QByteArray byteArrayOfJson, bool fromPlatform = false);
+
+    /**
+     * @brief Export the agents in mapping list into json array object
+     * @param agents in mapping list
+     * @return
+     */
+    QJsonArray exportAllAgentsInMapping(QList<AgentInMappingVM*> agentsInMapping);
 
 Q_SIGNALS:
 

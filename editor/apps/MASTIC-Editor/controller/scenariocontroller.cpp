@@ -401,9 +401,9 @@ void ScenarioController::setActionInPalette(int index, ActionM* actionM)
 
 
 /**
- * @brief Import a scenario a file (actions, palette, timeline actions )
+ * @brief Open a scenario a file (actions, palette, timeline actions )
  */
-void ScenarioController::importScenarioFromFile()
+void ScenarioController::openScenarioFromFile()
 {
     // "File Dialog" to get the files (paths) to open
     QString scenarioFilePath = QFileDialog::getOpenFileName(NULL,
@@ -411,19 +411,19 @@ void ScenarioController::importScenarioFromFile()
                                                                 _scenariosDirectoryPath,
                                                                 "JSON (*.json)");
 
-    // Import the scenario from JSON file
-    _importScenarioFromFile(scenarioFilePath);
+    // Open the scenario from JSON file
+    _openScenarioFromFile(scenarioFilePath);
 }
 
 /**
- * @brief Import the scenario from JSON file
+ * @brief Open the scenario from JSON file
  * @param scenarioFilePath
  */
-void ScenarioController::_importScenarioFromFile(QString scenarioFilePath)
+void ScenarioController::_openScenarioFromFile(QString scenarioFilePath)
 {
     if (!scenarioFilePath.isEmpty() && (_jsonHelper != NULL))
     {
-        qInfo() << "Import the scenario from JSON file" << scenarioFilePath;
+        qInfo() << "Open the scenario from JSON file" << scenarioFilePath;
 
         QFile jsonFile(scenarioFilePath);
         if (jsonFile.exists())
@@ -433,89 +433,7 @@ void ScenarioController::_importScenarioFromFile(QString scenarioFilePath)
                 QByteArray byteArrayOfJson = jsonFile.readAll();
                 jsonFile.close();
 
-                // Initialize agents lists from JSON file
-                scenario_import_actions_lists_t * scenarioToImport = _jsonHelper->initActionsList(byteArrayOfJson, _agentsInMappingList.toList());
-                if(scenarioToImport != NULL)
-                {
-                    // Append the list of actions
-                    if(scenarioToImport->actionsInTableList.count() > 0)
-                    {
-                        // Add each actions to out list
-                        foreach (ActionM* actionM, scenarioToImport->actionsInTableList)
-                        {
-                            // Add action into the list
-                            _actionsList.append(actionM);
-
-                            // Add action into the map
-                            _mapActionsFromActionName.insert(actionM->name(),actionM);
-                        }
-                    }
-
-                    // Set the list of actions in palette
-                    if(scenarioToImport->actionsInPaletteList.count() > 0)
-                    {
-                        foreach (ActionInPaletteVM* actionInPalette, scenarioToImport->actionsInPaletteList)
-                        {
-                            if(actionInPalette->modelM() != NULL)
-                            {
-                                setActionInPalette(actionInPalette->indexInPanel(), actionInPalette->modelM());
-                            }
-
-                            delete actionInPalette;
-                            actionInPalette = NULL;
-                        }
-                    }
-
-                    // Append the list of actions in timeline
-                    if(scenarioToImport->actionsInTimelineList.count() > 0)
-                    {
-                        // Add each actionVM in to the right line of our timeline
-                        foreach (ActionVM* actionVM, scenarioToImport->actionsInTimelineList)
-                        {
-                            int lineNumber = actionVM->lineInTimeLine();
-
-                            // Increment actionVM into the line number
-                            if (_mapActionsVMsInTimelineFromLineIndex.contains(lineNumber))
-                            {
-                                I2CustomItemSortFilterListModel<ActionVM>* actionVMSortedList = _mapActionsVMsInTimelineFromLineIndex.value(lineNumber);
-                                if(actionVMSortedList != NULL)
-                                {
-                                    // Insert the action
-                                    actionVMSortedList->append(actionVM);
-                                }
-                            }
-                            else {
-                                // Create a new list
-                                I2CustomItemSortFilterListModel<ActionVM>* actionVMSortedList = new I2CustomItemSortFilterListModel<ActionVM>();
-                                actionVMSortedList->setSortProperty("startTime");
-                                actionVMSortedList->append(actionVM);
-
-                                // Add into our map
-                                _mapActionsVMsInTimelineFromLineIndex.insert(lineNumber,actionVMSortedList);
-                            }
-
-                            // Add the new action VM to our map
-                            QList<ActionVM*> actionsVMsList;
-                            if (_mapActionsVMsInTimelineFromActionModel.contains(actionVM->modelM())) {
-                                actionsVMsList = _mapActionsVMsInTimelineFromActionModel.value(actionVM->modelM());
-                            }
-                            actionsVMsList.append(actionVM);
-                            _mapActionsVMsInTimelineFromActionModel.insert(actionVM->modelM(), actionsVMsList);
-
-                            _actionsInTimeLine.append(actionVM);
-
-                            // Increment the line number if necessary
-                            if(_linesNumberInTimeLine < lineNumber+1)
-                            {
-                                setlinesNumberInTimeLine(lineNumber+1);
-                            }
-                        }
-                    }
-
-                    delete scenarioToImport;
-                    scenarioToImport = NULL;
-                }
-
+                importScenarioFromJson(byteArrayOfJson);
             }
             else {
                 qCritical() << "Can not open file" << scenarioFilePath;
@@ -529,9 +447,9 @@ void ScenarioController::_importScenarioFromFile(QString scenarioFilePath)
 }
 
 /**
- * @brief Export a scenario to the default file (actions, palette, timeline actions)
+ * @brief Save a scenario to the default file (actions, palette, timeline actions)
  */
-void ScenarioController::exportScenarioToSelectedFile()
+void ScenarioController::saveScenarioToSelectedFile()
 {
     // "File Dialog" to get the file (path) to save
     QString scenarioFilePath = QFileDialog::getSaveFileName(NULL,
@@ -540,23 +458,26 @@ void ScenarioController::exportScenarioToSelectedFile()
                                                               "JSON (*.json)");
 
     if(!scenarioFilePath.isEmpty()) {
-        // Export the scenario to JSON file
-        _exportScenarioToFile(scenarioFilePath);
+        // Save the scenario to JSON file
+        _saveScenarioToFile(scenarioFilePath);
     }
 }
 
 /**
- * @brief Export the scenario to JSON file
+ * @brief Save the scenario to JSON file
  * @param scenarioFilePath
  */
-void ScenarioController::_exportScenarioToFile(QString scenarioFilePath)
+void ScenarioController::_saveScenarioToFile(QString scenarioFilePath)
 {
     if (!scenarioFilePath.isEmpty() && (_jsonHelper != NULL))
     {
         qInfo() << "Save the scenario to JSON file" << scenarioFilePath;
 
-        // Export the scenario
-        QByteArray byteArrayOfJson = _jsonHelper->exportScenario(_actionsList.toList(),_actionsInPaletteList.toList(),_actionsInTimeLine.toList());
+        // Save the scenario
+        QJsonObject scenarioJsonObject = _jsonHelper->exportScenario(_actionsList.toList(),_actionsInPaletteList.toList(),_actionsInTimeLine.toList());
+
+        // Conversion into byteArray
+        QByteArray byteArrayOfJson = QJsonDocument(scenarioJsonObject).toJson();
 
         QFile jsonFile(scenarioFilePath);
         if (jsonFile.open(QIODevice::WriteOnly))
@@ -1454,5 +1375,96 @@ void ScenarioController::onRevertAction(ActionExecutionVM* actionExecution)
             // Remove from the list of "active" actions
             disconnect(actionVM,&ActionVM::revertAction, this, &ScenarioController::onRevertAction);
         }
+    }
+}
+
+
+/**
+  * @brief Import the scenario lists structure from the json byte content
+  * @param byte array content
+  */
+void ScenarioController::importScenarioFromJson(QByteArray byteArrayOfJson)
+{
+    // Initialize agents lists from JSON file
+    scenario_import_actions_lists_t * scenarioToImport = _jsonHelper->initActionsList(byteArrayOfJson, _agentsInMappingList.toList());
+    if(scenarioToImport != NULL)
+    {
+        // Append the list of actions
+        if(scenarioToImport->actionsInTableList.count() > 0)
+        {
+            // Add each actions to out list
+            foreach (ActionM* actionM, scenarioToImport->actionsInTableList)
+            {
+                // Add action into the list
+                _actionsList.append(actionM);
+
+                // Add action into the map
+                _mapActionsFromActionName.insert(actionM->name(),actionM);
+            }
+        }
+
+        // Set the list of actions in palette
+        if(scenarioToImport->actionsInPaletteList.count() > 0)
+        {
+            foreach (ActionInPaletteVM* actionInPalette, scenarioToImport->actionsInPaletteList)
+            {
+                if(actionInPalette->modelM() != NULL)
+                {
+                    setActionInPalette(actionInPalette->indexInPanel(), actionInPalette->modelM());
+                }
+
+                delete actionInPalette;
+                actionInPalette = NULL;
+            }
+        }
+
+        // Append the list of actions in timeline
+        if(scenarioToImport->actionsInTimelineList.count() > 0)
+        {
+            // Add each actionVM in to the right line of our timeline
+            foreach (ActionVM* actionVM, scenarioToImport->actionsInTimelineList)
+            {
+                int lineNumber = actionVM->lineInTimeLine();
+
+                // Increment actionVM into the line number
+                if (_mapActionsVMsInTimelineFromLineIndex.contains(lineNumber))
+                {
+                    I2CustomItemSortFilterListModel<ActionVM>* actionVMSortedList = _mapActionsVMsInTimelineFromLineIndex.value(lineNumber);
+                    if(actionVMSortedList != NULL)
+                    {
+                        // Insert the action
+                        actionVMSortedList->append(actionVM);
+                    }
+                }
+                else {
+                    // Create a new list
+                    I2CustomItemSortFilterListModel<ActionVM>* actionVMSortedList = new I2CustomItemSortFilterListModel<ActionVM>();
+                    actionVMSortedList->setSortProperty("startTime");
+                    actionVMSortedList->append(actionVM);
+
+                    // Add into our map
+                    _mapActionsVMsInTimelineFromLineIndex.insert(lineNumber,actionVMSortedList);
+                }
+
+                // Add the new action VM to our map
+                QList<ActionVM*> actionsVMsList;
+                if (_mapActionsVMsInTimelineFromActionModel.contains(actionVM->modelM())) {
+                    actionsVMsList = _mapActionsVMsInTimelineFromActionModel.value(actionVM->modelM());
+                }
+                actionsVMsList.append(actionVM);
+                _mapActionsVMsInTimelineFromActionModel.insert(actionVM->modelM(), actionsVMsList);
+
+                _actionsInTimeLine.append(actionVM);
+
+                // Increment the line number if necessary
+                if(_linesNumberInTimeLine < lineNumber+1)
+                {
+                    setlinesNumberInTimeLine(lineNumber+1);
+                }
+            }
+        }
+
+        delete scenarioToImport;
+        scenarioToImport = NULL;
     }
 }

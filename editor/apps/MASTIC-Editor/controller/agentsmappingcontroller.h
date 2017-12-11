@@ -70,6 +70,11 @@ public:
      */
     ~AgentsMappingController();
 
+    /**
+      * @brief Import the mappings from the json byte content
+      * @param byte array content
+      */
+    void importMappingFromJson(QByteArray byteArrayOfJson, bool fromPlatform = false);
 
     /**
      * @brief Create a new Mapping
@@ -126,7 +131,6 @@ public:
      * @return
      */
     Q_INVOKABLE AgentInMappingVM* getAgentInMappingFromName(QString name);
-
 
 Q_SIGNALS:
 
@@ -330,16 +334,16 @@ private:
     void _overWriteMappingOfAgentModel(AgentM* agentModel, AgentMappingM* temporaryMapping);
 
     /**
-     * @brief Import the mapping from JSON file
+     * @brief Open the mapping from JSON file
      * @param mappingFilePath
      */
-    void _importMappingFromFile(QString mappingFilePath);
+    void _openMappingFromFile(QString mappingFilePath);
 
     /**
-     * @brief Export the mapping to JSON file
+     * @brief Save the mapping to JSON file
      * @param mappingFilePath
      */
-    void _exportMappingToFile(QString mappingFilePath);
+    void _saveMappingToFile(QString mappingFilePath);
 
 
 private:

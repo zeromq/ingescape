@@ -295,14 +295,29 @@ QJsonObject JsonHelper::exportMappingToJson(AgentMappingM* agentMapping)
  * @param byteArrayOfJson
  * @return list of mapping_agent_import_t objects
  */
-QList< mapping_agent_import_t* > JsonHelper::importMapping(QByteArray byteArrayOfJson)
+QList< mapping_agent_import_t* > JsonHelper::importMapping(QByteArray byteArrayOfJson, bool fromPlatform)
 {
     QList< mapping_agent_import_t* > listAgentsMapping;
 
     QJsonDocument jsonFileRoot = QJsonDocument::fromJson(byteArrayOfJson);
-    if (jsonFileRoot.isArray())
+    if ((fromPlatform == false && jsonFileRoot.isArray()) || (fromPlatform == true && jsonFileRoot.isObject()))
     {
-        foreach (QJsonValue jsonValue, jsonFileRoot.array())
+        // Take into account the origin of the opening
+        // if mapping is from a patform file, we get the mappings value
+        // if not we get directly the value.
+        QJsonArray jsonArray;
+        if(fromPlatform == true)
+        {
+            QJsonValue mappingsValue = jsonFileRoot.object().value("mappings");
+            if(mappingsValue.isArray())
+            {
+                jsonArray = mappingsValue.toArray();
+            }
+        } else {
+            jsonArray = jsonFileRoot.array();
+        }
+
+        foreach (QJsonValue jsonValue, jsonArray)
         {
             if (jsonValue.isObject())
             {
@@ -1332,12 +1347,13 @@ ActionConditionVM* JsonHelper::_parseConditionsVMFromJson(QJsonObject jsonCondit
 }
 
 /**
- * @brief Create an action condition VM from JSON object
- * @param jsonObject
- * @param list of agents in mapping
+ * @brief Export the actions lists into json object
+ * @param actions list in table
+ * @param actions list in the palette
+ * @param actions list in the timeline
  * @return
  */
-QByteArray JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<ActionInPaletteVM*> actionsInPaletteList, QList<ActionVM*> actionsInTimeLine)
+QJsonObject JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<ActionInPaletteVM*> actionsInPaletteList, QList<ActionVM*> actionsInTimeLine)
 {
     QJsonObject jsonScenario;
 
@@ -1524,7 +1540,39 @@ QByteArray JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<ActionI
     }
     jsonScenario.insert("actions_timeline", jsonActionsInTimelineArray);
 
-    QJsonDocument jsonDocument = QJsonDocument(jsonScenario);
+    return jsonScenario;
+}
 
-    return jsonDocument.toJson();
+/**
+ * @brief Export the agents in mapping list into json array object
+ * @param agents in mapping list
+ * @return
+ */
+QJsonArray JsonHelper::exportAllAgentsInMapping(QList<AgentInMappingVM*> agentsInMapping)
+{
+    QJsonArray jsonArray;
+
+    foreach (AgentInMappingVM* agentInMapVM, agentsInMapping)
+    {
+        if(agentInMapVM->temporaryMapping() != NULL && agentInMapVM->models()->count() > 0)
+        {
+            // Set agent name
+            QJsonObject jsonFullMapping;
+            jsonFullMapping.insert("agentName", agentInMapVM->name());
+            jsonFullMapping.insert("position", "("+ QString::number(agentInMapVM->position().x())+","+QString::number(agentInMapVM->position().y())+")");
+
+            // Set the mapping
+            QJsonObject jsonMapping = exportMappingToJson(agentInMapVM->temporaryMapping());
+            jsonFullMapping.insert("mapping", jsonMapping);
+
+            // Set the definition
+            QJsonObject jsonDefinition = exportAgentDefinition(agentInMapVM->models()->at(0)->definition());
+            jsonFullMapping.insert("definition", jsonDefinition);
+
+            // Append to the list of mapping agents
+            jsonArray.append(jsonFullMapping);
+        }
+    }
+
+    return jsonArray;
 }

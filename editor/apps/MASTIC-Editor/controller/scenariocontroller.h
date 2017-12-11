@@ -124,6 +124,12 @@ public:
     ~ScenarioController();
 
     /**
+      * @brief Import the scenario lists structure from the json byte content
+      * @param byte array content
+      */
+    void importScenarioFromJson(QByteArray byteArrayOfJson);
+
+    /**
       * @brief Open the action editor
       * @param action model
       */
@@ -161,14 +167,14 @@ public:
     Q_INVOKABLE void setActionInPalette(int index, ActionM* actionM);
 
     /**
-     * @brief Import a scenario a file (actions, palette, timeline actions )
+     * @brief Open a scenario a file (actions, palette, timeline actions )
      */
-    Q_INVOKABLE void importScenarioFromFile();
+    Q_INVOKABLE void openScenarioFromFile();
 
     /**
-     * @brief Export a scenario to a selected file (actions, palette, timeline actions)
+     * @brief Save a scenario to a selected file (actions, palette, timeline actions)
      */
-    Q_INVOKABLE void exportScenarioToSelectedFile();
+    Q_INVOKABLE void saveScenarioToSelectedFile();
 
     /**
      * @brief Add an action VM at the time in ms
@@ -301,16 +307,16 @@ private :
     QString _buildNewActionName();
 
     /**
-     * @brief Import the scenario from JSON file
+     * @brief Open the scenario from JSON file
      * @param scenarioFilePath
      */
-    void _importScenarioFromFile(QString scenarioFilePath);
+    void _openScenarioFromFile(QString scenarioFilePath);
 
     /**
-     * @brief Export the scenario to JSON file
+     * @brief Save the scenario to JSON file
      * @param scenarioFilePath
      */
-    void _exportScenarioToFile(QString scenarioFilePath);
+    void _saveScenarioToFile(QString scenarioFilePath);
 
     /**
      * @brief Insert an actionVM into our timeline

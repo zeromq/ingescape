@@ -107,7 +107,15 @@ public:
      */
      static QObject* qmlSingleton(QQmlEngine* engine, QJSEngine* scriptEngine);
 
+     /**
+      * @brief Open a platform file (actions, palette, timeline actions, mappings)
+      */
+     Q_INVOKABLE void openPlatformFromFile();
 
+     /**
+      * @brief Save a platform to a selected file (actions, palette, timeline actions, mappings)
+      */
+     Q_INVOKABLE void savePlatformToSelectedFile();
 
 public Q_SLOTS:
 
@@ -140,10 +148,30 @@ public Q_SLOTS:
       */
      QPointF getGlobalMousePosition();
 
-
 private:
+
+     /**
+      * @brief Open the platform from JSON file
+      * @param platformFilePath
+      */
+     void _openPlatformFromFile(QString platformFilePath);
+
+     /**
+      * @brief Save the platform to JSON file
+      * @param platformFilePath
+      */
+     void _savePlatformToFile(QString platformFilePath);
+
+
      // To subscribe to termination signals
      TerminationSignalWatcher *_terminationSignalWatcher;
+
+     // Path to the directory containing JSON files to save platform
+     QString _platformDirectoryPath;
+
+     // Helper to manage JSON the saving/opening platform files
+     JsonHelper* _jsonHelper;
+
 };
 
 QML_DECLARE_TYPE(MasticEditorController)

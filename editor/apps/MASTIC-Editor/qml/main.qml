@@ -211,7 +211,7 @@ ApplicationWindow {
                 text: qsTr("Open scenario")
                 onTriggered: {
                     if (MasticEditorC.scenarioC) {
-                        MasticEditorC.scenarioC.importScenarioFromFile();
+                        MasticEditorC.scenarioC.openScenarioFromFile();
                     }
                 }
             }
@@ -219,7 +219,28 @@ ApplicationWindow {
                 text: qsTr("Save scenario")
                 onTriggered: {
                     if (MasticEditorC.scenarioC) {
-                        MasticEditorC.scenarioC.exportScenarioToSelectedFile();
+                        MasticEditorC.scenarioC.saveScenarioToSelectedFile();
+                    }
+                }
+            }
+        }
+
+        Menu {
+            title: qsTr("Platform")
+
+            MenuItem {
+                text: qsTr("Open platform")
+                onTriggered: {
+                    if (MasticEditorC.scenarioC) {
+                        MasticEditorC.openPlatformFromFile();
+                    }
+                }
+            }
+            MenuItem {
+                text: qsTr("Save platform")
+                onTriggered: {
+                    if (MasticEditorC.scenarioC) {
+                        MasticEditorC.savePlatformToSelectedFile();
                     }
                 }
             }

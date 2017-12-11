@@ -164,6 +164,15 @@ QString MasticEditorUtils::getScenariosPath()
     return MasticEditorUtils::_getSubDirectoryPath("Scenarios");
 }
 
+/**
+ * @brief Get (and create if needed) the path with files about platforms
+ * "[DocumentsLocation]/MASTIC/Platforms/"
+ * @return
+ */
+QString MasticEditorUtils::getPlatformsPath()
+{
+    return MasticEditorUtils::_getSubDirectoryPath("Platforms");
+}
 
 /**
  * @brief Get (and create if needed) the fullpath of a given sub-directory

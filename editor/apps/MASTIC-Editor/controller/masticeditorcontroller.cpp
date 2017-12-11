@@ -20,6 +20,7 @@
 
 #include <I2Quick.h>
 
+#include <QFileDialog>
 #include <QThread>
 #include <QApplication>
 #include <QCursor>
@@ -38,7 +39,9 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     _valuesHistoryC(NULL),
     _timeLineC(NULL),
     _launcherManager(NULL),
-    _terminationSignalWatcher(NULL)
+    _terminationSignalWatcher(NULL),
+    _platformDirectoryPath(""),
+    _jsonHelper(NULL)
 {
     qInfo() << "New MASTIC Editor Controller";
 
@@ -99,6 +102,17 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
         qCritical() << "ERROR: could not create directory at '" << scenariosPath << "' !";
     }
 
+    // Directory for platform files
+    QString platformPath = MasticEditorUtils::getPlatformsPath();
+    QDir platformDir(platformPath);
+    if (!platformDir.exists()) {
+        qCritical() << "ERROR: could not create directory at '" << platformPath << "' !";
+    } else {
+        _platformDirectoryPath = platformPath;
+    }
+
+    // Create the helper to manage JSON definitions of agents
+    _jsonHelper = new JsonHelper(this);
 
     //
     // Create sub-controllers
@@ -128,7 +142,6 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     // Create the manager for launchers of MASTIC agents
     //_launcherManager = new MasticLauncherManager(this);
     _launcherManager = &MasticLauncherManager::Instance();
-
 
     // Connect to signals from the network controller
     connect(_networkC, &NetworkController::agentEntered, _modelManager, &MasticModelManager::onAgentEntered);
@@ -305,6 +318,13 @@ MasticEditorController::~MasticEditorController()
         temp = NULL;
     }
 
+    // Delete json helper
+    if(_jsonHelper != NULL)
+    {
+        delete _jsonHelper;
+        _jsonHelper = NULL;
+    }
+
     qInfo() << "Delete MASTIC Editor Controller";
 }
 
@@ -370,4 +390,121 @@ void MasticEditorController::forceCreation()
 QPointF MasticEditorController::getGlobalMousePosition()
 {
     return QCursor::pos();
+}
+
+/**
+ * @brief Open a platform file (actions, palette, timeline actions, mappings)
+ */
+void MasticEditorController::openPlatformFromFile()
+{
+    // "File Dialog" to get the files (paths) to open
+    QString platformFilePath = QFileDialog::getOpenFileName(NULL,
+                                                                "Open platform",
+                                                                _platformDirectoryPath,
+                                                                "JSON (*.json)");
+
+    // Open the platform from JSON file
+    _openPlatformFromFile(platformFilePath);
+}
+
+/**
+ * @brief Open the platform from JSON file
+ * @param platformFilePath
+ */
+void MasticEditorController::_openPlatformFromFile(QString platformFilePath)
+{
+    if (!platformFilePath.isEmpty() && (_jsonHelper != NULL))
+    {
+        qInfo() << "Open the platform from JSON file" << platformFilePath;
+
+        QFile jsonFile(platformFilePath);
+        if (jsonFile.exists())
+        {
+            if (jsonFile.open(QIODevice::ReadOnly))
+            {
+                QByteArray byteArrayOfJson = jsonFile.readAll();
+                jsonFile.close();
+
+                // Import mapping
+                if(_agentsMappingC != NULL)
+                {
+                    _agentsMappingC->importMappingFromJson(byteArrayOfJson, true);
+                }
+
+                // Import scenario
+                if(_scenarioC != NULL)
+                {
+                    _scenarioC->importScenarioFromJson(byteArrayOfJson);
+                }
+            }
+            else {
+                qCritical() << "Can not open file" << platformFilePath;
+            }
+        }
+        else {
+            qWarning() << "There is no file" << platformFilePath;
+        }
+    }
+
+}
+
+/**
+ * @brief Save a platform to a selected file (actions, palette, timeline actions, mappings)
+ */
+void MasticEditorController::savePlatformToSelectedFile()
+{
+    // "File Dialog" to get the file (path) to save
+    QString platformFilePath = QFileDialog::getSaveFileName(NULL,
+                                                              "Save platform",
+                                                              _platformDirectoryPath,
+                                                              "JSON (*.json)");
+
+    if(!platformFilePath.isEmpty()) {
+        // Save the platform to JSON file
+        _savePlatformToFile(platformFilePath);
+    }
+}
+
+/**
+ * @brief Save the platform to JSON file
+ * @param platformFilePath
+ */
+void MasticEditorController::_savePlatformToFile(QString platformFilePath)
+{
+    if (!platformFilePath.isEmpty() && (_jsonHelper != NULL))
+    {
+        qInfo() << "Save the scenario to JSON file" << platformFilePath;
+
+        QJsonObject platformJsonObject;
+
+        // Save the scenario
+        if(_scenarioC != NULL)
+        {
+            platformJsonObject = _jsonHelper->exportScenario(_scenarioC->actionsList()->toList(),_scenarioC->actionsInPaletteList()->toList(),_scenarioC->actionsInTimeLine()->toList());
+        }
+
+        // Save mapping
+        if(_agentsMappingC != NULL)
+        {
+            QJsonArray jsonArray = _jsonHelper->exportAllAgentsInMapping(_agentsMappingC->allAgentsInMapping()->toList());
+
+            if(jsonArray.count() > 0)
+            {
+                platformJsonObject.insert("mappings",jsonArray);
+            }
+        }
+
+        // Conversion into byteArray
+        QByteArray byteArrayOfJson = QJsonDocument(platformJsonObject).toJson();
+
+        QFile jsonFile(platformFilePath);
+        if (jsonFile.open(QIODevice::WriteOnly))
+        {
+            jsonFile.write(byteArrayOfJson);
+            jsonFile.close();
+        }
+        else {
+            qCritical() << "Can not open file" << platformFilePath;
+        }
+    }
 }
