@@ -213,26 +213,41 @@ AgentMappingM* JsonHelper::createModelOfAgentMapping(QString inputAgentName, QBy
  * @param inputAgentName, byteArrayOfJson
  * @return
  */
-AgentMappingM* JsonHelper::_createModelOfAgentMappingFromJson(QString inputAgentName,QJsonObject jsonObject)
+AgentMappingM* JsonHelper::_createModelOfAgentMappingFromJson(QString inputAgentName, QJsonObject jsonObject)
 {
     AgentMappingM* agentMapping = NULL;
 
-                if (jsonMappingOut.isArray())
-                {
-                    QList<ElementMappingM*> mappingElements;
+    QJsonValue jsonMapping = jsonObject.value("mapping");
+    if (jsonMapping.isObject())
+    {
+        QJsonObject jsonSubObject = jsonMapping.toObject();
 
-                    foreach (QJsonValue jsonMap, jsonMappingOut.toArray()) {
-                        if (jsonMap.isObject())
-                        {
-                            ElementMappingM* mappingElement = _createModelOfElementMapping(inputAgentName, jsonMap.toObject());
-                            if (mappingElement != NULL) {
-                                mappingElements.append(mappingElement);
-                            }
+        QJsonValue jsonName = jsonSubObject.value("name");
+        QJsonValue jsonDescription = jsonSubObject.value("description");
+        QJsonValue jsonVersion = jsonSubObject.value("version");
+        QJsonValue jsonMappingOut = jsonSubObject.value("mapping_out");
+
+        if (jsonName.isString() && jsonDescription.isString() && jsonVersion.isString())
+        {
+            // Create the agent definition
+            agentMapping = new AgentMappingM(jsonName.toString(), jsonVersion.toString(), jsonDescription.toString());
+
+            if (jsonMappingOut.isArray()) {
+                QList<ElementMappingM*> mappingElements;
+
+                foreach (QJsonValue jsonMap, jsonMappingOut.toArray())
+                {
+                    if (jsonMap.isObject())
+                    {
+                        ElementMappingM* mappingElement = _createModelOfElementMapping(inputAgentName, jsonMap.toObject());
+                        if (mappingElement != NULL) {
+                            mappingElements.append(mappingElement);
                         }
                     }
-                    if (mappingElements.count() > 0) {
-                        agentMapping->mappingElements()->append(mappingElements);
-                    }
+                }
+                if (mappingElements.count() > 0)
+                {
+                    agentMapping->mappingElements()->append(mappingElements);
                 }
             }
         }

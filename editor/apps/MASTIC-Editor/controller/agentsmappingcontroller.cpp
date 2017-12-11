@@ -33,7 +33,8 @@ AgentsMappingController::AgentsMappingController(MasticModelManager* modelManage
       _isEmptyMapping(true),
       _selectedAgent(NULL),
       _selectedLink(NULL),
-      _modelManager(modelManager)
+      _modelManager(modelManager),
+      _mappingsDirectoryPath(mappingsPath)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -185,7 +186,7 @@ void AgentsMappingController::_importMappingFromFile(QString mappingFilePath)
                             if(agentInMapping != NULL)
                             {
                                 // Add the link elements
-                                mappingElements.append(agentMapping->elementMappingsList()->toList());
+                                mappingElements.append(agentMapping->mappingElements()->toList());
 
                                 // Set agent mapping
                                 if(agentMapping != NULL)
@@ -229,7 +230,7 @@ void AgentsMappingController::_exportMappingToFile(QString mappingFilePath)
 
         QJsonArray jsonArray;
 
-        foreach (AgentInMappingVM* agentInMapVM, _agentInMappingVMList.toList())
+        foreach (AgentInMappingVM* agentInMapVM, _allAgentsInMapping.toList())
         {
             if(agentInMapVM->temporaryMapping() != NULL && agentInMapVM->models()->count() > 0)
             {
