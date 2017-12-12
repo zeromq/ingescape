@@ -26,89 +26,62 @@
 #endif
 
 //////////////////////////////////////////////////
-//initialization and configuration
-
-//This flag can be used to check if the Mastic internal thread
-//has been interrupted or not. The flag is updated when using the
-//mtic_start* (set to true) and mtic_stop (set to false) functions,
-//and also when a DIE command is received by the agent (set to false).
-//There three non-exclusive ways to check & control the execution of the mastic
-//instance and its hosting application:
-//1- using mtic_start* and mtic_stop from the hosting app
-//2- catching SIGINT in the hosting app that is triggered by a DIE command in the agent
-//3- monitoring the status of mtic_Interrupted in the hosting app
-//4- using mtic_observeInterrupt below and providing a callback
-PUBLIC extern bool mtic_Interrupted;
+//initialization and control
 
 //start & stop the agent
 PUBLIC int mtic_startWithDevice(const char *networkDevice, int port);
 PUBLIC int mtic_startWithIP(const char *ipAddress, int port);
 PUBLIC int mtic_stop(void);
 
-//terminate the agent and use the forcedStopCallbacks
-PUBLIC void mtic_die(void);
-//register a callback when the agent is asked to stop on the network
-//NB: callbacks should execute their code in the main application thread
-typedef void (*mtic_forcedStopCallback)(void *myData);
-PUBLIC void mtic_observeForcedStop(mtic_forcedStopCallback cb, void *myData);
-
 //agent name set and get
 PUBLIC int mtic_setAgentName(const char *name);
 PUBLIC char *mtic_getAgentName(void);
-
-//Command line for the agent can be passed here for inclusion in the
-//agent's headers. If not used, header is initialized with exec path.
-PUBLIC void mtic_setCommandLine(const char *line);
-
-//By default, an agent notifies all the agent it maps. Each notification
-//makes the mapped agents publish their outputs (except for data & impulsions).
-//We allow to disable this notification to avoid side effects by agents frequently
-//changing their mapping.
-PUBLIC void mtic_setNotifyMappedAgents(bool notify);
-
-//pause and resume the agent
-typedef void (*mtic_freezeCallback)(bool isPaused, void *myData);
-PUBLIC int mtic_freeze(void);
-PUBLIC bool mtic_isFrozen(void);
-PUBLIC int mtic_unfreeze(void);
-PUBLIC int mtic_observeFreeze(mtic_freezeCallback cb, void *myData);
 
 //control agent state
 PUBLIC int mtic_setAgentState(const char *state);
 PUBLIC char *mtic_getAgentState(void);
 
-//mute the agent
+//mute the agent ouputs
 PUBLIC int mtic_mute(void);
 PUBLIC int mtic_unmute(void);
 PUBLIC bool mtic_isMuted(void);
 
-//set/get library parameters
-PUBLIC void mtic_setVerbose (bool verbose);
-PUBLIC bool mtic_getVerbose(void);
-PUBLIC void mtic_setCanBeFrozen (bool canBeFrozen);
+//freeze and unfreeze the agent
+//When freezed, agent will not send anything on its outputs and
+//its inputs are not reactive to external data.
+//NB: the internal semantics of freeze and unfreeze for a given agenent
+//are up to the developer and can be controlled using callbacks and mtic_observeFreeze
+PUBLIC int mtic_freeze(void);
+PUBLIC bool mtic_isFrozen(void);
+PUBLIC int mtic_unfreeze(void);
+typedef void (*mtic_freezeCallback)(bool isPaused, void *myData);
+PUBLIC int mtic_observeFreeze(mtic_freezeCallback cb, void *myData);
+PUBLIC void mtic_setCanBeFrozen(bool canBeFrozen);
 
-//utility function to find network adapters with broadcast capabilities
-//to be used in mtic_startWithDevice
-void mtic_getNetdevicesList(char ***devices, int *nb);
-void mtic_freeNetdevicesList(char **devices, int nb);
+//There are three non-exclusive ways to check & control the execution of the mastic
+//instance and its hosting application:
+//1- using mtic_start* and mtic_stop from the hosting app
+//2- monitoring the status of mtic_Interrupted in the hosting app
+//3- using mtic_observeForcedStop below and providing a callback
+
+PUBLIC extern bool mtic_Interrupted;
+//register a callback when the agent is asked to stop on the network
+//NB: callbacks should execute their code in the main hosting application thread
+typedef void (*mtic_forcedStopCallback)(void *myData);
+PUBLIC void mtic_observeForcedStop(mtic_forcedStopCallback cb, void *myData);
+
+//terminate the agent and trigger the forcedStopCallbacks
+PUBLIC void mtic_die(void);
 
 //////////////////////////////////////////////////
 //IOP Model : Inputs, Outputs and Parameters read/write/check/observe/mute
 
-/**
- * \enum iop_t
- * \brief type of agent's inputs / outputs / parameters
- */
 typedef enum {
     INPUT_T = 1, ///< input of an agent.
     OUTPUT_T,    ///< output of an agent.
     PARAMETER_T  ///< parameter of an agent.
 } iop_t;
 
-/**
- * \enum iopType_t
- * \brief type of the value of the inputs / outputs / parameters
- */
 typedef enum {
     INTEGER_T = 1,  ///< integer value type
     DOUBLE_T,       ///< double value type
@@ -186,11 +159,6 @@ PUBLIC bool mtic_checkOutputExistence(const char *name);
 PUBLIC bool mtic_checkParameterExistence(const char *name);
 
 //observe IOP
-/**
- * \var typedef void (*mtic_observeCallback)(iop_t iopType, const char *name, iopType_t valueType, void *value, void * myData)
- * \ingroup observefct
- * \brief typedef for the callback used in observe functions
- */
 typedef void (*mtic_observeCallback)(iop_t iopType, const char* name, iopType_t valueType, void* value, long valueSize, void* myData);
 PUBLIC int mtic_observeInput(const char *name, mtic_observeCallback cb, void *myData);
 PUBLIC int mtic_observeOutput(const char *name, mtic_observeCallback cb, void * myData);
@@ -226,10 +194,6 @@ PUBLIC int mtic_removeOutput(const char *name);
 PUBLIC int mtic_removeParameter(const char *name);
 
 //////////////////////////////////////////////////
-//categories
-//TODO: later
-
-//////////////////////////////////////////////////
 //mapping
 
 //load / set / get mapping
@@ -249,5 +213,55 @@ PUBLIC int mtic_getMappingEntriesNumber(void); //number of entries in the mappin
 PUBLIC unsigned long mtic_addMappingEntry(const char *fromOurInput, const char *toAgent, const char *withOutput); //returns mapping id or zero or below if creation failed
 PUBLIC int mtic_removeMappingEntryWithId(unsigned long theId);
 PUBLIC int mtic_removeMappingEntryWithName(const char *fromOurInput, const char *toAgent, const char *withOutput);
+
+
+//////////////////////////////////////////////////
+//administration, configuration & utilities
+
+//utility function to find network adapters with broadcast capabilities
+//to be used in mtic_startWithDevice
+void mtic_getNetdevicesList(char ***devices, int *nb);
+void mtic_freeNetdevicesList(char **devices, int nb);
+
+//Command line for the agent can be passed here for inclusion in the
+//agent's headers. If not set, header is initialized with exec path.
+PUBLIC void mtic_setCommandLine(const char *line);
+
+//By default, an agent notifies all the agent it maps. Each notification
+//makes the mapped agents publish their outputs (except for data & impulsions).
+//We allow to disable this notification to avoid side effects by agents frequently
+//changing their mapping.
+PUBLIC void mtic_setNotifyMappedAgents(bool notify);
+
+//logs and debug messages
+PUBLIC void mtic_setVerbose(bool verbose); //log in console
+PUBLIC void mtic_setLogInFile(bool useLogFile); //log in file
+PUBLIC void mtic_setUseColorVerbose (bool useColor); //use color in console
+void mtic_setLogPath(const char *path);
+typedef enum {
+    MTIC_LOG_TRACE = 0,
+    MTIC_LOG_DEBUG,
+    MTIC_LOG_INFO,
+    MTIC_LOG_WARN,
+    MTIC_LOG_ERROR,
+    MTIC_LOG_FATAL
+} mtic_logLevel_t;
+void mtic_setLogLevel (mtic_logLevel_t level);
+
+//void mtic_debug(const char*fmt, ...);
+void mtic_log(mtic_logLevel_t, const char*fmt, ...);
+#define mtic_trace(...) mtic_log(MTIC_LOG_TRACE, __VA_ARGS__)
+#define mtic_debug(...) mtic_log(MTIC_LOG_DEBUG, __VA_ARGS__)
+#define mtic_info(...)  mtic_log(MTIC_LOG_INFO,  __VA_ARGS__)
+#define mtic_warn(...)  mtic_log(MTIC_LOG_WARN,  __VA_ARGS__)
+#define mtic_error(...) mtic_log(MTIC_LOG_ERROR, __VA_ARGS__)
+#define mtic_fatal(...) mtic_log(MTIC_LOG_FATAL, __VA_ARGS__)
+
+//resources file management
+void mtic_setDefinitionPath(const char *path);
+void mtic_setMappingPath(const char *path);
+void mtic_writeDefinitionToPath(void);
+void mtic_writeMappingToPath(void);
+
 
 #endif /* mastic_public_h */

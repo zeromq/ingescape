@@ -1,5 +1,5 @@
 //
-//  mtic_parseur.c
+//  mtic_parser.c
 //
 //  Created by Mathieu Poirier
 //  Modified by Patxi Berard
@@ -33,6 +33,8 @@
 #define MAP_NO_NAME "NO_NAME"
 #define MAP_NO_DESCRIPTION "NO_DESCRIPTION"
 #define MAP_NO_VERSION "NO_VERSION"
+
+char definitionPath[1024] = "";
 
 iopType_t string_to_value_type(const char* str) {
     
@@ -1234,6 +1236,7 @@ int mtic_loadDefinitionFromPath (const char* file_path){
         mtic_debug("mtic_loadDefinitionFromPath : %s caused an error and was ignored\n", file_path);
         return -1;
     }else{
+        strncpy(definitionPath, file_path, 1023);
         if (mtic_internal_definition != NULL){
             definition_freeDefinition(mtic_internal_definition);
             mtic_internal_definition = NULL;

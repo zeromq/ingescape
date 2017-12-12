@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		970670DF1EDC187900CCDFDC /* mastic_private.h in Headers */ = {isa = PBXBuildFile; fileRef = 97C926AB1EB23ED100D2B0CE /* mastic_private.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		972A52641FD1733E00711352 /* admin.c in Sources */ = {isa = PBXBuildFile; fileRef = 972A52631FD1733E00711352 /* admin.c */; };
+		972A52651FD1733E00711352 /* admin.c in Sources */ = {isa = PBXBuildFile; fileRef = 972A52631FD1733E00711352 /* admin.c */; };
 		9762EDDA1EAE547B002062A1 /* definition.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A79851EA7B112003153EF /* definition.c */; };
 		9762EDDB1EAE547B002062A1 /* mapping.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A79981EA7B112003153EF /* mapping.c */; };
 		9762EDDC1EAE547B002062A1 /* model.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A79991EA7B112003153EF /* model.c */; };
@@ -320,6 +322,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		972A52631FD1733E00711352 /* admin.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = admin.c; sourceTree = "<group>"; };
 		9762EDCD1EAE5414002062A1 /* mastic.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = mastic.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9762EDD01EAE5414002062A1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9762EDE31EAE54D6002062A1 /* libczmq.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libczmq.3.dylib; path = ../../../../../../../../../usr/local/lib/libczmq.3.dylib; sourceTree = "<group>"; };
@@ -1246,6 +1249,7 @@
 				979A79991EA7B112003153EF /* model.c */,
 				979A799A1EA7B112003153EF /* network.c */,
 				979A799C1EA7B112003153EF /* parser.c */,
+				972A52631FD1733E00711352 /* admin.c */,
 			);
 			name = src;
 			path = ../src;
@@ -2684,6 +2688,7 @@
 				9762EDDA1EAE547B002062A1 /* definition.c in Sources */,
 				9762EDDB1EAE547B002062A1 /* mapping.c in Sources */,
 				9762EDDC1EAE547B002062A1 /* model.c in Sources */,
+				972A52651FD1733E00711352 /* admin.c in Sources */,
 				9762EDDD1EAE547B002062A1 /* network.c in Sources */,
 				9762EDDF1EAE547B002062A1 /* parser.c in Sources */,
 			);
@@ -2696,6 +2701,7 @@
 				979A79A11EA7B112003153EF /* network.c in Sources */,
 				979A79A01EA7B112003153EF /* model.c in Sources */,
 				979A799F1EA7B112003153EF /* mapping.c in Sources */,
+				972A52641FD1733E00711352 /* admin.c in Sources */,
 				979A79A31EA7B112003153EF /* parser.c in Sources */,
 				979A799E1EA7B112003153EF /* definition.c in Sources */,
 			);
