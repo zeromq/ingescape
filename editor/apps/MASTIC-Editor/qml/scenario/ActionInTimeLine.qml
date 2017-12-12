@@ -35,8 +35,18 @@ Item {
     property int lineHeight : MasticTheme.lineInTimeLineHeight
 
 
+    //ghost temporary start time when drag is active
+    property var temporaryStartTime: null;
+
+
+    Drag.active: actionVMMouseArea.drag.active
+    Drag.hotSpot.x: (actionVMMouseArea.mouseX + actionVMMouseArea.x)
+    Drag.hotSpot.y: actionVMMouseArea.mouseY
+    Drag.keys: ["ActionInTimeLine"]
+
+
     x : myActionVM ? viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(myActionVM.startTime, viewController.pixelsPerMinute) : 0;
-    y : myActionVM ? (actionVMItem.lineHeight * myActionVM.lineInTimeLine) : à;
+    y : myActionVM ? (actionVMItem.lineHeight * myActionVM.lineInTimeLine) : 0;
     height : actionVMItem.lineHeight
     width : if (myActionVM && myActionVM.modelM)
             {
@@ -84,6 +94,33 @@ Item {
         }
     }
 
+    //
+    // Functions
+    //
+    // Find a root layer by its object name
+    function findLayerRootByObjectName(startingObject, layerObjectName)
+    {
+        var currentObject = startingObject;
+        var layerRoot = null;
+
+        while ((currentObject !== null) && (layerRoot == null))
+        {
+            var index = 0;
+            while ((index < currentObject.data.length) && (layerRoot == null))
+            {
+                if (currentObject.data[index].objectName === layerObjectName)
+                {
+                    layerRoot = currentObject.data[index];
+                }
+                index++;
+            }
+
+            currentObject = currentObject.parent;
+        }
+
+        return layerRoot;
+    }
+
 
     // rectangle representing the validity conditions time
     Rectangle {
@@ -93,6 +130,9 @@ Item {
             left : parent.left
             right : parent.right
         }
+
+        //see only the ghost when the drag is active
+        visible: !actionVMMouseArea.drag.active
 
         height : actionVMItem.lineHeight/2
         color : MasticTheme.blueGreyColor2
@@ -107,6 +147,8 @@ Item {
         id : executionsItem
         height : conditionsValidityRect.height
         width : childrenRect.width
+        //see only the ghost when the drag is active
+        visible: !actionVMMouseArea.drag.active
 
         // capture minimum X value in order to make the clic enable on the whole actionInTimeline item when the x value is below 0;
         property real minimunXValueInExecutionList : 0;
@@ -200,6 +242,9 @@ Item {
     // Action Name
     Rectangle {
         id : backgroundActionName
+        //see only the ghost when the drag is active
+        visible: !actionVMMouseArea.drag.active
+
         anchors {
             fill : actionName
             leftMargin:-1
@@ -210,6 +255,9 @@ Item {
 
     Text {
         id: actionName
+        //see only the ghost when the drag is active
+        visible: !actionVMMouseArea.drag.active
+
         anchors {
             top : parent.verticalCenter
             bottomMargin: 1
@@ -218,8 +266,8 @@ Item {
         }
         verticalAlignment: Text.AlignVCenter
         color : (controller && controller.selectedActionVMInTimeline && actionVMItem.myActionVM  && controller.selectedActionVMInTimeline === actionVMItem.myActionVM) ?
-                    openEditorMouseArea.pressed? MasticTheme.lightGreyColor : MasticTheme.orangeColor
-        : openEditorMouseArea.pressed? MasticTheme.lightGreyColor : MasticTheme.darkGreyColor
+                    actionVMMouseArea.pressed? MasticTheme.lightGreyColor : MasticTheme.orangeColor
+        : actionVMMouseArea.pressed? MasticTheme.lightGreyColor : MasticTheme.darkGreyColor
 
         text : (actionVMItem.myActionVM && actionVMItem.myActionVM.modelM) ? actionVMItem.myActionVM.modelM.name : ""
         font {
@@ -228,8 +276,10 @@ Item {
         }
     }
 
+
+   // Mouse Area allows opening the editor, selecting the action VM and dragging it
     MouseArea {
-        id : openEditorMouseArea
+        id : actionVMMouseArea
         anchors {
             top : actionVMItem.top
             bottom : actionVMItem.bottom
@@ -243,6 +293,32 @@ Item {
                          actionVMItem.width,
                          executionsItem.width) - x
         hoverEnabled: true
+
+        drag.smoothed: false
+        drag.target: actionVMItem
+        cursorShape: (actionVMMouseArea.drag.active)? Qt.PointingHandCursor : Qt.OpenHandCursor //Qt.OpenHandCursor
+
+        onPressed: {
+        }
+
+        onPositionChanged: {
+            itemDragged.x = mouseX - 12 - itemDragged.width + actionVMMouseArea.x;
+            itemDragged.y = mouseY - 12 - itemDragged.height;
+        }
+
+        onReleased: {
+            actionVMItem.Drag.drop();
+
+            //
+            // Reset the position of our action
+            //
+            if (actionVMItem.myActionVM) {
+                actionVMItem.x = viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(myActionVM.startTime, viewController.pixelsPerMinute);
+                actionVMItem.y = (actionVMItem.lineHeight * myActionVM.lineInTimeLine);
+            }
+        }
+
+
         onClicked: {
             actionVMItem.forceActiveFocus()
 
@@ -266,6 +342,60 @@ Item {
             }
         }
     }
+
+
+    // ghost appearing when the action vm is dragging in the timeline
+    I2CustomRectangle{
+        id : itemDragged
+        height : columnText.height + 8
+        width : nameAction.width + 14
+        color : MasticTheme.darkBlueGreyColor
+        visible: actionVMMouseArea.drag.active
+
+        // - fuzzy radius around our rectangle
+        fuzzyRadius: 2
+        fuzzyColor : MasticTheme.blackColor
+
+        Column {
+            id : columnText
+            height : (nameAction.height + temporaryStartTimeAction.height) + 3
+
+            anchors.centerIn: parent
+            spacing: 6
+
+            Text {
+                id : nameAction
+                color : MasticTheme.lightGreyColor
+                text : (actionVMItem.myActionVM && actionVMItem.myActionVM.modelM) ? actionVMItem.myActionVM.modelM.name : ""
+                anchors.horizontalCenter: parent.horizontalCenter
+                horizontalAlignment: Text.AlignHCenter
+
+                font {
+                    family : MasticTheme.textFontFamily
+                    pixelSize: 14
+                }
+            }
+
+            Text {
+                id : temporaryStartTimeAction
+                visible: text !== ""
+                color : MasticTheme.lightGreyColor
+                text : actionVMItem.temporaryStartTime?
+                           actionVMItem.temporaryStartTime.toLocaleString(Qt.locale(),"hh:mm:ss.zzz")
+                         : "";
+
+                anchors.horizontalCenter: parent.horizontalCenter
+                horizontalAlignment: Text.AlignHCenter
+
+                font {
+                    family : MasticTheme.textFontFamily
+                    pixelSize: 14
+                }
+            }
+        }
+
+    }
+
 
 }
 

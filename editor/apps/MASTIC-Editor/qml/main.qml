@@ -55,46 +55,26 @@ ApplicationWindow {
     //----------------------------------
 
     menuBar: MenuBar {
+
         Menu {
-            title: qsTr("Supervision")
+            title: qsTr("Platform")
 
             MenuItem {
-                text: qsTr("Create a new Agent")
-                enabled: false
+                text: qsTr("Start a new platform description")
                 onTriggered: {
-                    //console.log("Create a new Agent");
+                    MasticEditorC.createNewPlatform();
                 }
             }
             MenuItem {
-                text: qsTr("Open agents")
+                text: qsTr("Open platform description")
                 onTriggered: {
-                    //console.log("QML: Open agents");
-
-                    if (MasticEditorC.modelManager) {
-                        MasticEditorC.modelManager.importAgentsListFromSelectedFile();
-                    }
+                    MasticEditorC.openPlatformFromFile();
                 }
             }
             MenuItem {
-                text: qsTr("Save agents")
-
+                text: qsTr("Save platform description")
                 onTriggered: {
-                    //console.log("QML: Save agents");
-
-                    if (MasticEditorC.agentsSupervisionC) {
-                        MasticEditorC.agentsSupervisionC.exportAgentsListToSelectedFile();
-                    }
-                }
-            }
-
-            MenuItem {
-                text: qsTr("Show history")
-                onTriggered: {
-                    //console.log("Show history");
-
-                    if (applicationLoader.item) {
-                        applicationLoader.item.openHistory();
-                    }
+                    MasticEditorC.savePlatformToSelectedFile();
                 }
             }
         }
@@ -103,41 +83,7 @@ ApplicationWindow {
             title: qsTr("Mapping")
 
             MenuItem {
-                text: qsTr("Create a new mapping")
-
-                onTriggered: {
-                    //console.log("Create a new mapping");
-
-                    if (MasticEditorC.agentsMappingC) {
-                        MasticEditorC.agentsMappingC.createNewMapping();
-                    }
-                }
-            }
-
-            MenuItem {
-                text: qsTr("Open mapping")
-
-                onTriggered: {
-                    console.log("Open mapping");
-                    if (MasticEditorC.agentsMappingC) {
-                        MasticEditorC.agentsMappingC.openMapping();
-                    }
-                }
-            }
-
-            MenuItem {
-                text: qsTr("Save mapping")
-
-                onTriggered: {
-                    console.log("Save mapping");
-                    if (MasticEditorC.agentsMappingC) {
-                        MasticEditorC.agentsMappingC.saveMapping();
-                    }
-                }
-            }
-
-            MenuItem {
-                text: (MasticEditorC.modelManager && MasticEditorC.modelManager.isActivatedMapping) ? qsTr("Deactivate mapping") : qsTr("Activate mapping")
+                text: (MasticEditorC.modelManager && MasticEditorC.modelManager.isActivatedMapping) ? qsTr("Unplug mapping") : qsTr("Plug mapping")
                 //enabled: false
 
                 onTriggered: {
@@ -204,48 +150,6 @@ ApplicationWindow {
             }
         }
 
-        Menu {
-            title: qsTr("Scenario")
-
-            MenuItem {
-                text: qsTr("Open scenario")
-                onTriggered: {
-                    if (MasticEditorC.scenarioC) {
-                        MasticEditorC.scenarioC.openScenarioFromFile();
-                    }
-                }
-            }
-            MenuItem {
-                text: qsTr("Save scenario")
-                onTriggered: {
-                    if (MasticEditorC.scenarioC) {
-                        MasticEditorC.scenarioC.saveScenarioToSelectedFile();
-                    }
-                }
-            }
-        }
-
-        Menu {
-            title: qsTr("Platform")
-
-            MenuItem {
-                text: qsTr("Open platform")
-                onTriggered: {
-                    if (MasticEditorC.scenarioC) {
-                        MasticEditorC.openPlatformFromFile();
-                    }
-                }
-            }
-            MenuItem {
-                text: qsTr("Save platform")
-                onTriggered: {
-                    if (MasticEditorC.scenarioC) {
-                        MasticEditorC.savePlatformToSelectedFile();
-                    }
-                }
-            }
-        }
-
         /*Menu {
             title: qsTr("Enregistrement")
 
@@ -262,6 +166,47 @@ ApplicationWindow {
                 }
             }
         }*/
+
+
+
+        Menu {
+            title: qsTr("Supervision")
+
+            MenuItem {
+                text: qsTr("Create a new Agent")
+                enabled: false
+                onTriggered: {
+                    //console.log("Create a new Agent");
+                }
+            }
+            MenuItem {
+                text: qsTr("Import agents")
+                onTriggered: {
+                    if (MasticEditorC.modelManager) {
+                        MasticEditorC.modelManager.importAgentsListFromSelectedFile();
+                    }
+                }
+            }
+            MenuItem {
+                text: qsTr("Export agents")
+
+                onTriggered: {
+                    if (MasticEditorC.agentsSupervisionC) {
+                        MasticEditorC.agentsSupervisionC.exportAgentsListToSelectedFile();
+                    }
+                }
+            }
+
+            MenuItem {
+                text: qsTr("Show history")
+                onTriggered: {
+                    if (applicationLoader.item) {
+                        applicationLoader.item.openHistory();
+                    }
+                }
+            }
+        }
+
 
         Menu {
             title: qsTr("Tools")

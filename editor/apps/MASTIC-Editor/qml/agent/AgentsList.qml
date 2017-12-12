@@ -205,7 +205,7 @@ Item {
                 }
 
                 onClicked: {
-                    console.log("Nouvel Agent")
+                    console.log("Create a new Agent")
                     // TODO
                 }
             }

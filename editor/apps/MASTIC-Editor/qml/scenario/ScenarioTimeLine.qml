@@ -68,7 +68,7 @@ Item {
                     contentArea.contentWidth * deltaScale,
                     contentArea.contentHeight,
                     Qt.point(centerPointX, centerPointY)
-                  //  Qt.point(contentArea.contentX + contentArea.width/2, contentArea.contentY + contentArea.height/2)
+                    //  Qt.point(contentArea.contentX + contentArea.width/2, contentArea.contentY + contentArea.height/2)
                     );
 
         // Update current time unit
@@ -260,7 +260,7 @@ Item {
 
                     anchors.fill: parent
 
-                   // drag.target: workspace
+                    // drag.target: workspace
 
                     // 2-finger-flick gesture should pass through to our parent MouseArea
                     scrollGestureEnabled: false
@@ -352,12 +352,14 @@ Item {
                     // dropArea allow dropping actions in timeline
                     DropArea {
                         anchors.fill: parent
-                        keys: ["ActionsListItem"]
+                        keys: ["ActionsListItem", "ActionInTimeLine"]
 
                         onEntered: {
                             var dragItem = drag.source;
                             // display ghost
-                            ghostAction.actionModelGhost = dragItem.action;
+                            if (typeof dragItem.action !== 'undefined') {
+                                ghostAction.actionModelGhost = dragItem.action;
+                            }
                         }
 
                         onPositionChanged: {
@@ -369,11 +371,12 @@ Item {
                             var lineNumber = Math.floor(drag.y / rootItem.lineHeight)
                             var canInsertActionVM = false;
 
-                            if (controller && (typeof dragItem.action !== 'undefined' && controller)) {
+                            // action comes from the actions list
+                            if (controller && (typeof dragItem.action !== 'undefined')) {
                                 // test if the drop is possible
                                 canInsertActionVM = controller.canInsertActionVMTo(dragItem.action, starttimeInMilliseconds, lineNumber)
 
-                                if ( canInsertActionVM ) {
+                                if (canInsertActionVM) {
                                     ghostDropImpossible.visible = false;
                                     // move ghost
                                     ghostAction.actionModelGhost = dragItem.action;
@@ -396,6 +399,36 @@ Item {
 
                             }
 
+                            // action comes from the timeline
+                            if (controller && (typeof dragItem.myActionVM !== 'undefined' && dragItem.myActionVM.modelM !== null)) {
+                                // test if the drop is possible
+                                canInsertActionVM = controller.canInsertActionVMTo(dragItem.myActionVM.modelM, starttimeInMilliseconds, lineNumber)
+
+                                if (canInsertActionVM) {
+                                    ghostDropImpossible.visible = false;
+                                    // move ghost
+                                    ghostAction.actionModelGhost = dragItem.myActionVM.modelM;
+                                    ghostAction.x = viewController.convertQTimeToAbscissaInCoordinateSystem(startInQTime, viewController.pixelsPerMinute);
+                                    ghostAction.y = lineNumber * rootItem.lineHeight;
+                                    ghostAction.startTime = startInQTime;
+                                    if  (typeof dragItem.temporaryStartTime !== 'undefined') {
+                                        dragItem.temporaryStartTime = startInQTime;
+                                    }
+                                }
+                                else {
+                                    // remove ghost
+                                    ghostAction.actionModelGhost = null;
+
+                                    // ghost drop impossible
+                                    ghostDropImpossible.x = viewController.convertQTimeToAbscissaInCoordinateSystem(startInQTime, viewController.pixelsPerMinute);
+                                    ghostDropImpossible.y = lineNumber * rootItem.lineHeight + (rootItem.lineHeight/2 - ghostDropImpossible.width/2);
+                                    ghostDropImpossible.visible = true;
+                                }
+
+                            }
+
+
+
                         }
 
                         onExited: {
@@ -413,17 +446,24 @@ Item {
                             var timeInMilliseconds = viewController.convertAbscissaInCoordinateSystemToTimeInMilliseconds(drag.x, viewController.pixelsPerMinute)
                             var lineNumber = Math.floor(drag.y / rootItem.lineHeight)
 
+                            // action comes from the actions list : add the action on the time line
                             if (typeof dragItem.action !== 'undefined' && controller)
                             {
-
                                 controller.addActionVMAtTime(dragItem.action, timeInMilliseconds, lineNumber);
+                            }
 
-                                // remove ghost
-                                ghostAction.actionModelGhost = null;
-                                ghostDropImpossible.visible = false;
-                                if  (typeof dragItem.temporaryStartTime !== 'undefined') {
-                                    dragItem.temporaryStartTime = null;
-                                }
+                            // action comes from the timeline : update start time and line number
+                            if (typeof dragItem.myActionVM !== 'undefined' && dragItem.myActionVM.modelM !== null)
+                            {
+                                controller.moveActionVMAtTimeAndLine(dragItem.myActionVM, timeInMilliseconds, lineNumber);
+                            }
+
+
+                            // remove ghost
+                            ghostAction.actionModelGhost = null;
+                            ghostDropImpossible.visible = false;
+                            if  (typeof dragItem.temporaryStartTime !== 'undefined') {
+                                dragItem.temporaryStartTime = null;
                             }
 
                         }
@@ -489,7 +529,7 @@ Item {
 
                         // Not revert action
                         I2SvgItem {
-                            x : - width/2;
+                            x : - width /2.0;
                             anchors {
                                 verticalCenter: parent.verticalCenter
                             }
@@ -656,7 +696,7 @@ Item {
                 MouseArea {
                     anchors.fill: parent
 
-                   // drag.target: workspace
+                    // drag.target: workspace
 
                     // 2-finger-flick gesture should pass through to our parent MouseArea
                     scrollGestureEnabled: false

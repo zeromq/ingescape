@@ -264,8 +264,8 @@ Item {
                 visible : true
 
                 Component.onCompleted:  {
-                    x = rootItem.Window.window.x + rootItem.Window.width/2 - agentDefinitionEditor.width/2;
-                    y = rootItem.Window.window.y + rootItem.Window.height/2  - agentDefinitionEditor.height / 2.0;
+                    x = rootItem.Window.window.x + rootItem.Window.width/2 - agentDefinitionEditor.width/2 + (index * 40);
+                    y = rootItem.Window.window.y + rootItem.Window.height/2  - agentDefinitionEditor.height / 2.0 + (index * 40);
                 }
 
                 //            onOpened: {
@@ -306,8 +306,9 @@ Item {
                 visible : true
 
                 Component.onCompleted:  {
-                    x = rootItem.Window.window.x + rootItem.Window.width/2 - actionEditor.width/2;
-                    y = rootItem.Window.window.y + rootItem.Window.height/2 - actionEditor.height/2;
+                    x = rootItem.Window.window.x + rootItem.Window.width/2 - actionEditor.width/2  + (index * 40);
+                    y = rootItem.Window.window.y + rootItem.Window.height/2 - actionEditor.height/2 + (index * 40);
+
                 }
 
                 //                onOpened: {

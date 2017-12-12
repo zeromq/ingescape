@@ -208,41 +208,6 @@ Item {
                 }
             }
 
-            Rectangle {
-                anchors {
-                    verticalCenter: parent.verticalCenter
-                }
-                height : btnAddAction.height
-                width : 1
-                color : MasticTheme.blueGreyColor
-            }
-
-            Button {
-                id: btnImportAction
-
-                enabled : true
-                activeFocusOnPress: true
-
-                anchors {
-                    verticalCenter: parent.verticalCenter
-                }
-
-                style: Theme.LabellessSvgButtonStyle {
-                    fileCache: MasticTheme.svgFileMASTIC
-
-                    pressedID: releasedID + "-pressed"
-                    releasedID: "importer"
-                    disabledID : releasedID + "-disabled"
-
-                }
-
-                onClicked: {
-                    if (MasticEditorC.scenarioC) {
-                        MasticEditorC.scenarioC.openScenarioFromFile();
-                    }
-                }
-            }
-
         }
 
         Row {
@@ -256,43 +221,6 @@ Item {
                 right : parent.right
                 rightMargin: 10
             }
-
-
-            Button {
-                id: btnExportAction
-
-                enabled: visible & (controller.actionsList.count > 0 ? true : false)
-                activeFocusOnPress: true
-
-                anchors {
-                    verticalCenter: parent.verticalCenter
-                }
-
-                style: Theme.LabellessSvgButtonStyle {
-                    fileCache: MasticTheme.svgFileMASTIC
-
-                    pressedID: releasedID + "-pressed"
-                    releasedID: "exporter"
-                    disabledID : releasedID + "-disabled"
-                }
-
-                onClicked: {
-                    if (MasticEditorC.scenarioC) {
-                        MasticEditorC.scenarioC.saveScenarioToSelectedFile();
-                    }
-                }
-            }
-
-
-            Rectangle {
-                anchors {
-                    verticalCenter: parent.verticalCenter
-                }
-                height : btnRemoveAction.height
-                width : 1
-                color : MasticTheme.blueGreyColor
-            }
-
 
             Button {
                 id: btnRemoveAction
@@ -421,6 +349,20 @@ Item {
                         itemDragged.y = mouseY - 12 - itemDragged.height;
                     }
 
+                    onCanceled:  {
+                        draggableItem.Drag.drop();
+
+                        //
+                        // Reset the position of our draggable item
+                        //
+                        // - restore our parent if needed
+                        draggableItem.parent = actionListItem;
+
+                        // - restore our previous position in parent
+                        draggableItem.x = 0;
+                        draggableItem.y = 0;
+                    }
+
                     onReleased: {
                         draggableItem.Drag.drop();
 
@@ -462,7 +404,7 @@ Item {
                         Column {
                             id : columnText
                             height : temporaryStartTimeAction.visible ?
-                                         childrenRect.height
+                                         (nameAction.height + temporaryStartTimeAction.height) + 3
                                        : nameAction.height
                             anchors.centerIn: parent
                             spacing: 6
