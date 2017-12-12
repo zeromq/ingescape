@@ -411,7 +411,7 @@ Item {
                                     // action comes from the timeline
                                     if (controller && (typeof dragItem.myActionVM !== 'undefined' && dragItem.myActionVM.modelM !== null)) {
                                         // test if the drop is possible
-                                        canInsertActionVM = controller.canInsertActionVMTo(dragItem.myActionVM.modelM, starttimeInMilliseconds, lineNumber)
+                                        canInsertActionVM = controller.canInsertActionVMTo(dragItem.myActionVM.modelM, starttimeInMilliseconds, lineNumber, dragItem.myActionVM)
 
                                         if (canInsertActionVM) {
                                             ghostDropImpossible.visible = false;
@@ -461,10 +461,11 @@ Item {
                                         controller.addActionVMAtTime(dragItem.action, timeInMilliseconds, lineNumber);
                                     }
 
+
                                     // action comes from the timeline : update start time and line number
                                     if (typeof dragItem.myActionVM !== 'undefined' && dragItem.myActionVM.modelM !== null)
                                     {
-                                        controller.moveActionVMAtTimeAndLine(dragItem.myActionVM, timeInMilliseconds, lineNumber);
+                                         controller.moveActionVMAtTimeAndLine(dragItem.myActionVM, timeInMilliseconds, lineNumber);
                                     }
 
 
