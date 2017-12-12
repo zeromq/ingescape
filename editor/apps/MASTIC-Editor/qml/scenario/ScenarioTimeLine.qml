@@ -193,9 +193,7 @@ Item {
 
 
 
-        //
-        // Content associated to our train stations ("passages desservis", "emcombrements quai", "manoeuvres", etc.)
-        //
+
         // NB: Flickable is inside PinchArea to avoid input issues on Linux
         //     i.e. sometimes PinchArea does not detect two fingers
         //          only one finger is detected and handled by our Flickable
@@ -228,7 +226,7 @@ Item {
 
             onPinchFinished: {
                 // Re-enable our flickable
-                contentArea.interactive = true;
+                //contentArea.interactive = true;
 
                 // Move content of our flickable within bounds
                 contentArea.returnToBounds();
@@ -249,7 +247,17 @@ Item {
                 }
 
                 onWheel: {
+                    wheel.accepted = true;
 
+                    if ((wheel.pixelDelta.x !== 0) || (wheel.pixelDelta.y !== 0))
+                    {
+                        //
+                        // Trackpad flick gesture => scroll our workspace
+                        //
+                        contentArea.contentX += wheel.pixelDelta.x;
+                        contentArea.contentY += wheel.pixelDelta.y;
+                        contentArea.returnToBounds();
+                    }
                 }
 
                 //
@@ -260,8 +268,6 @@ Item {
 
                     anchors.fill: parent
 
-                    // drag.target: workspace
-
                     // 2-finger-flick gesture should pass through to our parent MouseArea
                     scrollGestureEnabled: false
 
@@ -269,12 +275,18 @@ Item {
                         rootItem.forceActiveFocus();
                     }
 
+                    onPositionChanged: {
+                        if (pressed) {
+
+                        }
+                    }
+
+
                     onWheel: {
                         wheel.accepted = true;
 
                         // with ctrl => zoom In and zoom out
                         if (wheel.modifiers && Qt.ControlModifier) {
-
                             var previousPixelsPerMinute = viewController.pixelsPerMinute;
                             var deltaScale;
 
@@ -285,7 +297,7 @@ Item {
                                 // Compute delta scale according to wheel.angleDelta
                                 deltaScale = Math.pow(1/1.2, Math.abs(wheel.angleDelta.y)/120) ;
 
-                                rootItem.updateZoomOfTimeLine (deltaScale, x, contentArea.contentY + contentArea.height/2);
+                                rootItem.updateZoomOfTimeLine (deltaScale, contentArea.contentX + wheel.x,  contentArea.contentY + contentArea.height/2);
                             }
                             else if (wheel.angleDelta.y > 0)
                             {
@@ -293,310 +305,328 @@ Item {
                                 // Compute delta scale according to wheel.angleDelta
                                 deltaScale = Math.pow(1.2, Math.abs(wheel.angleDelta.y)/120) ;
 
-                                rootItem.updateZoomOfTimeLine (deltaScale, contentArea.contentX + contentArea.width/2, contentArea.contentY + contentArea.height/2);
+                                rootItem.updateZoomOfTimeLine (deltaScale, contentArea.contentX + wheel.x,  contentArea.contentY + contentArea.height/2);
                             }
                             // Else: wheel.angleDelta.y  == 0  => invalid wheel event
                         }
 
-                        // else navigation along timeline
+                        // else navigation in vertical
                         else {
-                            var xMaxOfTimeLine = viewController.timeTicksTotalWidth - viewController.viewportWidth;
+                            var yMaxOfTimeLine = rootItem.lineHeight * rootItem.linesNumber - viewController.viewportHeight;
                             var nbCranMolette = wheel.angleDelta.y/120.0;
-                            contentArea.contentX = Math.max(0, Math.min(contentArea.contentX - nbCranMolette * 100, xMaxOfTimeLine));
+                            contentArea.contentY = Math.max(0, Math.min(contentArea.contentY - nbCranMolette * 100, yMaxOfTimeLine));
                         }
                     }
-                }
-
-            }
 
 
+                    Flickable {
+                        id: contentArea
 
-            Flickable {
-                id: contentArea
-
-                anchors.fill: parent
-                clip : true
-                contentWidth: content.width
-                contentHeight: content.height
-
-                boundsBehavior: Flickable.OvershootBounds;
-
-                //
-                // Dynamic content of our view
-                //
-                Item {
-                    id: content
-                    width: viewController.timeTicksTotalWidth
-                    height: rootItem.lineHeight * rootItem.linesNumber
-
-                    MouseArea {
                         anchors.fill: parent
-                        onClicked: {
-                            // deselect action in timeline
-                            if (controller && controller.selectedActionVMInTimeline) {
-                                controller.selectedActionVMInTimeline = null;
+                        clip : true
+                        contentWidth: content.width
+                        contentHeight: content.height
+                        interactive: false
 
-                            }
-                        }
-                    }
+                        boundsBehavior: Flickable.StopAtBounds;
 
-                    Repeater {
-                        model : controller ? controller.actionsInTimeLine : 0;
-
-                        ActionInTimeLine {
-                            myActionVM : model.QtObject;
-                            controller : rootItem.controller
-                        }
-                    }
-
-                    // dropArea allow dropping actions in timeline
-                    DropArea {
-                        anchors.fill: parent
-                        keys: ["ActionsListItem", "ActionInTimeLine"]
-
-                        onEntered: {
-                            var dragItem = drag.source;
-                            // display ghost
-                            if (typeof dragItem.action !== 'undefined') {
-                                ghostAction.actionModelGhost = dragItem.action;
-                            }
-                        }
-
-                        onPositionChanged: {
-                            var dragItem = drag.source;
-
-                            var startInQTime = viewController.convertAbscissaInCoordinateSystemToQTime(drag.x, viewController.pixelsPerMinute)
-                            var starttimeInMilliseconds = viewController.convertAbscissaInCoordinateSystemToTimeInMilliseconds(drag.x, viewController.pixelsPerMinute)
-
-                            var lineNumber = Math.floor(drag.y / rootItem.lineHeight)
-                            var canInsertActionVM = false;
-
-                            // action comes from the actions list
-                            if (controller && (typeof dragItem.action !== 'undefined')) {
-                                // test if the drop is possible
-                                canInsertActionVM = controller.canInsertActionVMTo(dragItem.action, starttimeInMilliseconds, lineNumber)
-
-                                if (canInsertActionVM) {
-                                    ghostDropImpossible.visible = false;
-                                    // move ghost
-                                    ghostAction.actionModelGhost = dragItem.action;
-                                    ghostAction.x = viewController.convertQTimeToAbscissaInCoordinateSystem(startInQTime, viewController.pixelsPerMinute);
-                                    ghostAction.y = lineNumber * rootItem.lineHeight;
-                                    ghostAction.startTime = startInQTime;
-                                    if  (typeof dragItem.temporaryStartTime !== 'undefined') {
-                                        dragItem.temporaryStartTime = startInQTime;
-                                    }
-                                }
-                                else {
-                                    // remove ghost
-                                    ghostAction.actionModelGhost = null;
-
-                                    // ghost drop impossible
-                                    ghostDropImpossible.x = viewController.convertQTimeToAbscissaInCoordinateSystem(startInQTime, viewController.pixelsPerMinute);
-                                    ghostDropImpossible.y = lineNumber * rootItem.lineHeight + (rootItem.lineHeight/2 - ghostDropImpossible.width/2);
-                                    ghostDropImpossible.visible = true;
-                                }
-
-                            }
-
-                            // action comes from the timeline
-                            if (controller && (typeof dragItem.myActionVM !== 'undefined' && dragItem.myActionVM.modelM !== null)) {
-                                // test if the drop is possible
-                                canInsertActionVM = controller.canInsertActionVMTo(dragItem.myActionVM.modelM, starttimeInMilliseconds, lineNumber)
-
-                                if (canInsertActionVM) {
-                                    ghostDropImpossible.visible = false;
-                                    // move ghost
-                                    ghostAction.actionModelGhost = dragItem.myActionVM.modelM;
-                                    ghostAction.x = viewController.convertQTimeToAbscissaInCoordinateSystem(startInQTime, viewController.pixelsPerMinute);
-                                    ghostAction.y = lineNumber * rootItem.lineHeight;
-                                    ghostAction.startTime = startInQTime;
-                                    if  (typeof dragItem.temporaryStartTime !== 'undefined') {
-                                        dragItem.temporaryStartTime = startInQTime;
-                                    }
-                                }
-                                else {
-                                    // remove ghost
-                                    ghostAction.actionModelGhost = null;
-
-                                    // ghost drop impossible
-                                    ghostDropImpossible.x = viewController.convertQTimeToAbscissaInCoordinateSystem(startInQTime, viewController.pixelsPerMinute);
-                                    ghostDropImpossible.y = lineNumber * rootItem.lineHeight + (rootItem.lineHeight/2 - ghostDropImpossible.width/2);
-                                    ghostDropImpossible.visible = true;
-                                }
-
-                            }
-
-
-
-                        }
-
-                        onExited: {
-                            // remove ghost
-                            ghostAction.actionModelGhost = null;
-                            ghostDropImpossible.visible = false;
-                            var dragItem = drag.source;
-                            if  (typeof dragItem.temporaryStartTime !== 'undefined') {
-                                dragItem.temporaryStartTime = null;
-                            }
-                        }
-
-                        onDropped: {
-                            var dragItem = drag.source;
-                            var timeInMilliseconds = viewController.convertAbscissaInCoordinateSystemToTimeInMilliseconds(drag.x, viewController.pixelsPerMinute)
-                            var lineNumber = Math.floor(drag.y / rootItem.lineHeight)
-
-                            // action comes from the actions list : add the action on the time line
-                            if (typeof dragItem.action !== 'undefined' && controller)
-                            {
-                                controller.addActionVMAtTime(dragItem.action, timeInMilliseconds, lineNumber);
-                            }
-
-                            // action comes from the timeline : update start time and line number
-                            if (typeof dragItem.myActionVM !== 'undefined' && dragItem.myActionVM.modelM !== null)
-                            {
-                                controller.moveActionVMAtTimeAndLine(dragItem.myActionVM, timeInMilliseconds, lineNumber);
-                            }
-
-
-                            // remove ghost
-                            ghostAction.actionModelGhost = null;
-                            ghostDropImpossible.visible = false;
-                            if  (typeof dragItem.temporaryStartTime !== 'undefined') {
-                                dragItem.temporaryStartTime = null;
-                            }
-
-                        }
-                    }
-
-
-                    // Ghost Drop Impossible
-                    I2SvgItem {
-                        id : ghostDropImpossible
-                        visible : false
-                        height : 15
-                        width : height
-                        opacity : 0.8
-
-                        svgFileCache: MasticTheme.svgFileMASTIC
-                        svgElementId: "dropImpossible"
-                    }
-
-                    // Ghost Action
-                    Item {
-                        id : ghostAction
-                        x: 0
-                        y : 0
-
-                        property var actionModelGhost : null;
-                        property var startTime : null;
-                        opacity : (actionModelGhost !== null) ? 0.5 : 0
-
-                        height : rootItem.lineHeight/2
-                        width : if (actionModelGhost) {
-                                    switch (actionModelGhost.validityDurationType)
-                                    {
-                                    case ValidationDurationType.IMMEDIATE:
-                                        0;
-                                        break;
-                                    case ValidationDurationType.FOREVER:
-                                        (viewController.timeTicksTotalWidth - viewController.convertQTimeToAbscissaInCoordinateSystem(startTime, viewController.pixelsPerMinute))
-                                        break;
-                                    case ValidationDurationType.CUSTOM:
-                                        viewController.convertDurationInMillisecondsToLengthInCoordinateSystem(actionModelGhost.validityDuration, viewController.pixelsPerMinute)
-                                        break;
-                                    default:
-                                        0
-                                        break;
-                                    }
-                                }
-                                else {
-                                    0;
-                                }
-
-
-                        Rectangle {
-                            id : rect
-                            anchors {
-                                top : parent.top
-                                left : parent.left
-                                right : parent.right
-                            }
-
-                            height : rootItem.lineHeight/2
-                            color : MasticTheme.blueGreyColor2
-                        }
-
-                        // Not revert action
-                        I2SvgItem {
-                            x : - width /2.0;
-                            anchors {
-                                verticalCenter: parent.verticalCenter
-                            }
-
-                            visible : ghostAction.actionModelGhost && !ghostAction.actionModelGhost.shallRevert
-
-                            svgFileCache : MasticTheme.svgFileMASTIC;
-                            svgElementId: "timelineAction";
-                        }
-
-                        // Revert action
+                        //
+                        // Dynamic content of our view
+                        //
                         Item {
-                            visible : ghostAction.actionModelGhost && ghostAction.actionModelGhost.shallRevert
-                            height : childrenRect.height
-                            anchors {
-                                verticalCenter: parent.verticalCenter
-                            }
+                            id: content
+                            width: viewController.timeTicksTotalWidth
+                            height: rootItem.lineHeight * rootItem.linesNumber
 
-                            Rectangle {
-                                anchors {
-                                    verticalCenter: actionExecutionGhost.verticalCenter
-                                    left : actionExecutionGhost.horizontalCenter
-                                    right : revertActionExecutionGhost.horizontalCenter
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: {
+                                    // deselect action in timeline
+                                    if (controller && controller.selectedActionVMInTimeline) {
+                                        controller.selectedActionVMInTimeline = null;
+
+                                    }
                                 }
-                                height : 1
-                                color : MasticTheme.lightGreyColor;
-
                             }
 
+                            Repeater {
+                                model : controller ? controller.actionsInTimeLine : 0;
+
+                                ActionInTimeLine {
+                                    myActionVM : model.QtObject;
+                                    controller : rootItem.controller
+                                }
+                            }
+
+                            // dropArea allow dropping actions in timeline
+                            DropArea {
+                                anchors.fill: parent
+                                keys: ["ActionsListItem", "ActionInTimeLine"]
+
+                                onEntered: {
+                                    var dragItem = drag.source;
+                                    // display ghost
+                                    if (typeof dragItem.action !== 'undefined') {
+                                        ghostAction.actionModelGhost = dragItem.action;
+                                    }
+                                }
+
+                                onPositionChanged: {
+                                    var dragItem = drag.source;
+
+                                    var startInQTime = viewController.convertAbscissaInCoordinateSystemToQTime(drag.x, viewController.pixelsPerMinute)
+                                    var starttimeInMilliseconds = viewController.convertAbscissaInCoordinateSystemToTimeInMilliseconds(drag.x, viewController.pixelsPerMinute)
+
+                                    var lineNumber = Math.floor(drag.y / rootItem.lineHeight)
+                                    var canInsertActionVM = false;
+
+                                    // action comes from the actions list
+                                    if (controller && (typeof dragItem.action !== 'undefined')) {
+                                        // test if the drop is possible
+                                        canInsertActionVM = controller.canInsertActionVMTo(dragItem.action, starttimeInMilliseconds, lineNumber)
+
+                                        if (canInsertActionVM) {
+                                            ghostDropImpossible.visible = false;
+                                            // move ghost
+                                            ghostAction.actionModelGhost = dragItem.action;
+                                            ghostAction.x = viewController.convertQTimeToAbscissaInCoordinateSystem(startInQTime, viewController.pixelsPerMinute);
+                                            ghostAction.y = lineNumber * rootItem.lineHeight;
+                                            ghostAction.startTime = startInQTime;
+                                            if  (typeof dragItem.temporaryStartTime !== 'undefined') {
+                                                dragItem.temporaryStartTime = startInQTime;
+                                            }
+                                        }
+                                        else {
+                                            // remove ghost
+                                            ghostAction.actionModelGhost = null;
+
+                                            // ghost drop impossible
+                                            ghostDropImpossible.x = viewController.convertQTimeToAbscissaInCoordinateSystem(startInQTime, viewController.pixelsPerMinute);
+                                            ghostDropImpossible.y = lineNumber * rootItem.lineHeight + (rootItem.lineHeight/2 - ghostDropImpossible.width/2);
+                                            ghostDropImpossible.visible = true;
+                                        }
+
+                                    }
+
+                                    // action comes from the timeline
+                                    if (controller && (typeof dragItem.myActionVM !== 'undefined' && dragItem.myActionVM.modelM !== null)) {
+                                        // test if the drop is possible
+                                        canInsertActionVM = controller.canInsertActionVMTo(dragItem.myActionVM.modelM, starttimeInMilliseconds, lineNumber)
+
+                                        if (canInsertActionVM) {
+                                            ghostDropImpossible.visible = false;
+                                            // move ghost
+                                            ghostAction.actionModelGhost = dragItem.myActionVM.modelM;
+                                            ghostAction.x = viewController.convertQTimeToAbscissaInCoordinateSystem(startInQTime, viewController.pixelsPerMinute);
+                                            ghostAction.y = lineNumber * rootItem.lineHeight;
+                                            ghostAction.startTime = startInQTime;
+                                            if  (typeof dragItem.temporaryStartTime !== 'undefined') {
+                                                dragItem.temporaryStartTime = startInQTime;
+                                            }
+                                        }
+                                        else {
+                                            // remove ghost
+                                            ghostAction.actionModelGhost = null;
+
+                                            // ghost drop impossible
+                                            ghostDropImpossible.x = viewController.convertQTimeToAbscissaInCoordinateSystem(startInQTime, viewController.pixelsPerMinute);
+                                            ghostDropImpossible.y = lineNumber * rootItem.lineHeight + (rootItem.lineHeight/2 - ghostDropImpossible.width/2);
+                                            ghostDropImpossible.visible = true;
+                                        }
+
+                                    }
+
+
+
+                                }
+
+                                onExited: {
+                                    // remove ghost
+                                    ghostAction.actionModelGhost = null;
+                                    ghostDropImpossible.visible = false;
+                                    var dragItem = drag.source;
+                                    if  (typeof dragItem.temporaryStartTime !== 'undefined') {
+                                        dragItem.temporaryStartTime = null;
+                                    }
+                                }
+
+                                onDropped: {
+                                    var dragItem = drag.source;
+                                    var timeInMilliseconds = viewController.convertAbscissaInCoordinateSystemToTimeInMilliseconds(drag.x, viewController.pixelsPerMinute)
+                                    var lineNumber = Math.floor(drag.y / rootItem.lineHeight)
+
+                                    // action comes from the actions list : add the action on the time line
+                                    if (typeof dragItem.action !== 'undefined' && controller)
+                                    {
+                                        controller.addActionVMAtTime(dragItem.action, timeInMilliseconds, lineNumber);
+                                    }
+
+                                    // action comes from the timeline : update start time and line number
+                                    if (typeof dragItem.myActionVM !== 'undefined' && dragItem.myActionVM.modelM !== null)
+                                    {
+                                        controller.moveActionVMAtTimeAndLine(dragItem.myActionVM, timeInMilliseconds, lineNumber);
+                                    }
+
+
+                                    // remove ghost
+                                    ghostAction.actionModelGhost = null;
+                                    ghostDropImpossible.visible = false;
+                                    if  (typeof dragItem.temporaryStartTime !== 'undefined') {
+                                        dragItem.temporaryStartTime = null;
+                                    }
+
+                                }
+                            }
+
+
+                            // Ghost Drop Impossible
                             I2SvgItem {
-                                id : actionExecutionGhost
-                                x : 0;
+                                id : ghostDropImpossible
+                                visible : false
+                                height : 15
+                                width : height
+                                opacity : 0.8
+
+                                svgFileCache: MasticTheme.svgFileMASTIC
+                                svgElementId: "dropImpossible"
+                            }
+
+                            // Ghost Action
+                            Item {
+                                id : ghostAction
+                                x: 0
                                 y : 0
 
-                                svgFileCache : MasticTheme.svgFileMASTIC;
-                                svgElementId: "revertAction"
-                            }
+                                property var actionModelGhost : null;
+                                property var startTime : null;
+                                opacity : (actionModelGhost !== null) ? 0.5 : 0
 
-                            I2SvgItem {
-                                id : revertActionExecutionGhost
-                                x : if (ghostAction.actionModelGhost) {
-                                        if (ghostAction.actionModelGhost.shallRevertWhenValidityIsOver)
-                                        {
-                                            rect.width - width;
-                                        }
-                                        else if (ghostAction.actionModelGhost.shallRevertAfterTime) {
-                                            viewController.convertDurationInMillisecondsToLengthInCoordinateSystem(ghostAction.actionModelGhost.revertAfterTime, viewController.pixelsPerMinute) - width;
+                                height : rootItem.lineHeight/2
+                                width : if (actionModelGhost) {
+                                            switch (actionModelGhost.validityDurationType)
+                                            {
+                                            case ValidationDurationType.IMMEDIATE:
+                                                0;
+                                                break;
+                                            case ValidationDurationType.FOREVER:
+                                                (viewController.timeTicksTotalWidth - viewController.convertQTimeToAbscissaInCoordinateSystem(startTime, viewController.pixelsPerMinute))
+                                                break;
+                                            case ValidationDurationType.CUSTOM:
+                                                viewController.convertDurationInMillisecondsToLengthInCoordinateSystem(actionModelGhost.validityDuration, viewController.pixelsPerMinute)
+                                                break;
+                                            default:
+                                                0
+                                                break;
+                                            }
                                         }
                                         else {
                                             0;
                                         }
-                                    }
-                                    else {
-                                        0;
+
+
+                                Rectangle {
+                                    id : rect
+                                    anchors {
+                                        top : parent.top
+                                        left : parent.left
+                                        right : parent.right
                                     }
 
-                                y : 0
-                                rotation : 180
-                                svgFileCache : MasticTheme.svgFileMASTIC;
-                                svgElementId:"revertAction" ;
+                                    height : rootItem.lineHeight/2
+                                    color : MasticTheme.blueGreyColor2
+                                }
+
+                                // Not revert action
+                                I2SvgItem {
+                                    x : - width /2.0;
+                                    anchors {
+                                        verticalCenter: parent.verticalCenter
+                                    }
+
+                                    visible : ghostAction.actionModelGhost && !ghostAction.actionModelGhost.shallRevert
+
+                                    svgFileCache : MasticTheme.svgFileMASTIC;
+                                    svgElementId: "timelineAction";
+                                }
+
+                                // Revert action
+                                Item {
+                                    visible : ghostAction.actionModelGhost && ghostAction.actionModelGhost.shallRevert
+                                    height : childrenRect.height
+                                    anchors {
+                                        verticalCenter: parent.verticalCenter
+                                    }
+
+                                    Rectangle {
+                                        anchors {
+                                            verticalCenter: actionExecutionGhost.verticalCenter
+                                            left : actionExecutionGhost.horizontalCenter
+                                            right : revertActionExecutionGhost.horizontalCenter
+                                        }
+                                        height : 1
+                                        color : MasticTheme.lightGreyColor;
+
+                                    }
+
+                                    I2SvgItem {
+                                        id : actionExecutionGhost
+                                        x : 0;
+                                        y : 0
+
+                                        svgFileCache : MasticTheme.svgFileMASTIC;
+                                        svgElementId: "revertAction"
+                                    }
+
+                                    I2SvgItem {
+                                        id : revertActionExecutionGhost
+                                        x : if (ghostAction.actionModelGhost) {
+                                                if (ghostAction.actionModelGhost.shallRevertWhenValidityIsOver)
+                                                {
+                                                    rect.width - width;
+                                                }
+                                                else if (ghostAction.actionModelGhost.shallRevertAfterTime) {
+                                                    viewController.convertDurationInMillisecondsToLengthInCoordinateSystem(ghostAction.actionModelGhost.revertAfterTime, viewController.pixelsPerMinute) - width;
+                                                }
+                                                else {
+                                                    0;
+                                                }
+                                            }
+                                            else {
+                                                0;
+                                            }
+
+                                        y : 0
+                                        rotation : 180
+                                        svgFileCache : MasticTheme.svgFileMASTIC;
+                                        svgElementId:"revertAction" ;
+                                    }
+                                }
                             }
+
                         }
                     }
-
                 }
+
+
             }
+
         }
+
+
+
+        //            ScrollView {
+        //                id : contentAreaScrollView
+        //                anchors.fill: parent
+        //                horizontalScrollBarPolicy : Qt.ScrollBarAlwaysOff
+
+        //                style: MasticScrollViewStyle {
+        //                }
+
+        //                // Prevent drag overshoot on Windows
+        //                flickableItem.boundsBehavior: Flickable.OvershootBounds
+
+
+        //      }
 
 
         //
@@ -722,7 +752,7 @@ Item {
                                 // Compute delta scale according to wheel.angleDelta
                                 deltaScale = Math.pow(1/1.2, Math.abs(wheel.angleDelta.y)/120) ;
 
-                                rootItem.updateZoomOfTimeLine (deltaScale, contentArea.contentX + contentArea.width/2, contentArea.contentY + contentArea.height/2);
+                                rootItem.updateZoomOfTimeLine (deltaScale,  wheel.x,  wheel.y);
                             }
                             else if (wheel.angleDelta.y > 0)
                             {
@@ -730,7 +760,7 @@ Item {
                                 // Compute delta scale according to wheel.angleDelta
                                 deltaScale = Math.pow(1.2, Math.abs(wheel.angleDelta.y)/120) ;
 
-                                rootItem.updateZoomOfTimeLine (deltaScale, contentArea.contentX + contentArea.width/2, contentArea.contentY + contentArea.height/2);
+                                rootItem.updateZoomOfTimeLine (deltaScale, wheel.x,  wheel.y);
                             }
                             // Else: wheel.angleDelta.y  == 0  => invalid wheel event
                         }
