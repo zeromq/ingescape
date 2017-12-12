@@ -210,8 +210,9 @@ public:
      * @param actionM to insert
      * @param time into insert
      * @param line number
+     * @param optional excluded actionVM from the check
      */
-    Q_INVOKABLE bool canInsertActionVMTo(ActionM *actionMToInsert, int time, int lineNumber);
+    Q_INVOKABLE bool canInsertActionVMTo(ActionM *actionMToInsert, int time, int lineNumber, ActionVM* excludedActionVM = NULL);
 
 
     /**
@@ -225,6 +226,19 @@ public:
      * @param current time in milliseconds
      */
     Q_INVOKABLE void updateCurrentTimeInMs(int currentTimeInMs);
+
+    /**
+     * @brief Clear the list of actions in the table / palette / timeline
+     */
+    Q_INVOKABLE void clearScenario();
+
+    /**
+     * @brief Move an actionVM to a start time position in ms and a specific line number
+     * @param action VM
+     * @param time in milliseconds
+     * @param line number
+     */
+    Q_INVOKABLE void moveActionVMAtTimeAndLine(ActionVM* actionVM, int timeInMilliseconds, int lineNumber);
 
 
 Q_SIGNALS:

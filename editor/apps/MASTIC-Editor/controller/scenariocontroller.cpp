@@ -106,34 +106,16 @@ ScenarioController::ScenarioController(MasticModelManager* modelManager,
  */
 ScenarioController::~ScenarioController()
 {
-    _stopScenario();
-
     disconnect(&_timerToExecuteActions, &QTimer::timeout, this, &ScenarioController::_onTimeout_ExecuteActions);
     disconnect(&_timerToRegularlyDelayActions, &QTimer::timeout, this, &ScenarioController::_onTimeout_DelayOrExecuteActions);
 
-    // Clean-up current selection
-    setselectedAction(NULL);
-
-    // Delete actions VM from the timeline
-    _actionsInTimeLine.deleteAllItems();
-
-    // Clean-up current selection
-    setselectedActionVMInTimeline(NULL);
+    // Clear all scenario and delete objects
+    clearScenario();
 
     // Delete actions VM from the palette
     _actionsInPaletteList.deleteAllItems();
 
-    // Clear the list of editor opened
-    _mapActionsEditorControllersFromActionM.clear();
-    _mapActionsEditorControllersFromActionVM.clear();
-    _openedActionsEditorsControllers.deleteAllItems();
-
-    // Delete actions Vm List
-    _actionsList.deleteAllItems();
-
-    // Clear map
-    _mapActionsFromActionName.clear();
-
+    // Reset model manager
     _modelManager = NULL;
 
     // Delete json helper
@@ -768,8 +750,9 @@ void ScenarioController::_insertActionVMIntoMapByLineNumber(ActionVM* actionVMTo
  * @param actionM to insert
  * @param time into insert
  * @param line number
+ * @param optional excluded actionVM from the check
  */
-bool ScenarioController::canInsertActionVMTo(ActionM* actionMToInsert, int time, int lineNumber)
+bool ScenarioController::canInsertActionVMTo(ActionM* actionMToInsert, int time, int lineNumber, ActionVM* excludedActionVM)
 {
     bool canInsert = true;
 
@@ -785,7 +768,7 @@ bool ScenarioController::canInsertActionVMTo(ActionM* actionMToInsert, int time,
             {
                 ActionVM * actionVM = actionVMSortedList->at(indexAction);
 
-                if(actionVM->modelM() != NULL)
+                if(actionVM->modelM() != NULL && (excludedActionVM == NULL || excludedActionVM != actionVM))
                 {
                     if(time < actionVM->startTime())
                     {
@@ -839,7 +822,7 @@ bool ScenarioController::canInsertActionVMTo(ActionM* actionMToInsert, int time,
             }
 
             // If we didn't reach the position, we test with the previous action
-            if (!reachPosition && (previousActionVM != NULL))
+            if (!reachPosition && (previousActionVM != NULL) && (excludedActionVM == NULL || excludedActionVM != previousActionVM))
             {
                 // If the previous action ends after the beginning of the new one, we skip it
                 if ((previousActionVM->endTime() + MARGIN_FOR_ACTION_INSERTION_IN_MS >= time) || (previousActionVM->endTime() == -1))
@@ -1152,7 +1135,7 @@ void ScenarioController::_startScenario()
     // init the timer with the time of the next action execution
     if(_nextActionVMToActive != NULL)
     {
-        _timerToExecuteActions.start(_nextActionVMToActive->startTime() - _currentTime.msecsSinceStartOfDay());
+        _timerToExecuteActions.start(_nextActionVMToActive->startTime() - currentTimeInMilliSeconds);
     }
 
     _timerToRegularlyDelayActions.start(INTERVAL_DELAY_ACTIONS);
@@ -1466,5 +1449,188 @@ void ScenarioController::importScenarioFromJson(QByteArray byteArrayOfJson)
 
         delete scenarioToImport;
         scenarioToImport = NULL;
+    }
+}
+
+/**
+ * @brief Clear the list of actions in the table / palette / timeline
+ */
+void ScenarioController::clearScenario()
+{
+    _stopScenario();
+
+    // Clean-up current selection
+    setselectedAction(NULL);
+
+    // Delete actions VM from the timeline
+    _actionsInTimeLine.deleteAllItems();
+
+    // Clean-up current selection
+    setselectedActionVMInTimeline(NULL);
+
+    // Clear the list of editor opened
+    _mapActionsEditorControllersFromActionM.clear();
+    _mapActionsEditorControllersFromActionVM.clear();
+    _openedActionsEditorsControllers.deleteAllItems();
+
+    // Delete actions Vm List
+    _actionsList.deleteAllItems();
+
+    // Clear map
+    _mapActionsFromActionName.clear();
+
+    // Reset actions in palette
+    foreach (ActionInPaletteVM* actionInPalette, _actionsInPaletteList.toList())
+    {
+        actionInPalette->setmodelM(NULL);
+    }
+}
+
+/**
+ * @brief Move an actionVM to a start time position in ms and a specific line number
+ * @param action VM
+ * @param time in milliseconds
+ * @param line number
+ */
+void ScenarioController::moveActionVMAtTimeAndLine(ActionVM* actionVM, int timeInMilliseconds, int lineNumber)
+{
+    if(actionVM != NULL && timeInMilliseconds >= 0 && lineNumber >= 0)
+    {
+        bool canInsert = canInsertActionVMTo(actionVM->modelM(), timeInMilliseconds, lineNumber,actionVM);
+        // Insert our item if possible
+        if (canInsert)
+        {
+            qDebug() << "C++ canInsert"<<canInsert <<" original lineNumber"<< actionVM->lineInTimeLine() << " new" <<lineNumber;
+            _timerToRegularlyDelayActions.stop();
+
+            // Reset connections
+            // Connect the revert action
+            if(actionVM->timerToReverse()->isActive())
+            {
+                actionVM->timerToReverse()->stop();
+            }
+            disconnect(actionVM,&ActionVM::revertAction, this, &ScenarioController::onRevertAction);
+
+            if(_actionsVMToEvaluateVMList.contains(actionVM))
+            {
+                _actionsVMToEvaluateVMList.remove(actionVM);
+            }
+            if(_activeActionsVMList.contains(actionVM))
+            {
+                _activeActionsVMList.remove(actionVM);
+            }
+
+            // Set the new start time
+            int hours = timeInMilliseconds / 3600000;
+            int minutes = (timeInMilliseconds - hours*3600000)/60000 ;
+            int seconds = (timeInMilliseconds - hours*3600000 - minutes*60000) / 1000;
+            int milliseconds = timeInMilliseconds%1000;
+            actionVM->setstartTimeString(QString::number(hours).rightJustified(2, '0') + ":" + QString::number(minutes).rightJustified(2, '0') + ":" + QString::number(seconds).rightJustified(2, '0') + "." + QString::number(milliseconds).leftJustified(3, '0'));
+
+            // If the mine number has changed
+            if(actionVM->lineInTimeLine() != lineNumber)
+            {
+                // Remove the actionVM from the previous line if different
+                if (_mapActionsVMsInTimelineFromLineIndex.contains(actionVM->lineInTimeLine()))
+                {
+                    I2CustomItemSortFilterListModel<ActionVM>* actionVMSortedList = _mapActionsVMsInTimelineFromLineIndex.value(actionVM->lineInTimeLine());
+                    if(actionVMSortedList != NULL)
+                    {
+                        actionVMSortedList->remove(actionVM);
+                    }
+                }
+
+                // Insert in the right line number
+                if (_mapActionsVMsInTimelineFromLineIndex.contains(lineNumber))
+                {
+                    I2CustomItemSortFilterListModel<ActionVM>* actionVMSortedList = _mapActionsVMsInTimelineFromLineIndex.value(lineNumber);
+                    if(actionVMSortedList != NULL)
+                    {
+                        // set the line number
+                        actionVM->setlineInTimeLine(lineNumber);
+
+                        qDebug() << "C++ canInsert set to EXISTS lineNumber"<< lineNumber;
+                        // Insert the action
+                        actionVMSortedList->append(actionVM);
+
+                        // Add an extra line if inserted our actionVM at the last line
+                        if(lineNumber >= _linesNumberInTimeLine -1)
+                        {
+                            setlinesNumberInTimeLine(lineNumber+2);
+                        }
+                    }
+                }
+                else {
+                    // Create a new list
+                    I2CustomItemSortFilterListModel<ActionVM>* actionVMSortedList = new I2CustomItemSortFilterListModel<ActionVM>();
+                    actionVMSortedList->setSortProperty("startTime");
+                    actionVMSortedList->append(actionVM);
+
+                    // Set the line number
+                    actionVM->setlineInTimeLine(lineNumber);
+
+                    qDebug() << "C++ canInsert set to NEW lineNumber"<< lineNumber;
+                    // Add into our map
+                    _mapActionsVMsInTimelineFromLineIndex.insert(lineNumber,actionVMSortedList);
+
+                    // Add an extra line if inserted our actionVM at the last line
+                    if(lineNumber >= _linesNumberInTimeLine -1)
+                    {
+                        setlinesNumberInTimeLine(lineNumber+2);
+                    }
+                }
+            }
+
+            // If scenario is playing we add the actionVM to the active ones
+//            if(_isPlaying)
+//            {
+//                int currentTimeInMilliSeconds = _currentTime.msecsSinceStartOfDay();
+
+//                if ((actionVM->endTime() > currentTimeInMilliSeconds) || (actionVM->endTime() == -1))
+//                {
+//                    // Connect on the action revert signal
+//                    connect(actionVM,&ActionVM::revertAction, this, &ScenarioController::onRevertAction);
+
+//                    // Initialize the action view model at a specific time.
+//                    actionVM->resetDataFrom(currentTimeInMilliSeconds);
+
+//                    if(actionVM->startTime() <= currentTimeInMilliSeconds)
+//                    {
+//                        // Add our action
+//                        _activeActionsVMList.append(actionVM);
+//                    } else {
+//                        // Add our action
+//                        _actionsVMToEvaluateVMList.append(actionVM);
+//                    }
+//                }
+
+//                if(_nextActionVMToActive == actionVM)
+//                {
+//                    if(_timerToExecuteActions.isActive())
+//                    {
+//                        _timerToExecuteActions.stop();//(_nextActionVMToActive->startTime() - _currentTime.msecsSinceStartOfDay());
+//                    }
+
+//                    if(_actionsVMToEvaluateVMList.count() > 0)
+//                    {
+//                        setnextActionVMToActive(_actionsVMToEvaluateVMList.at(0));
+
+//                        _timerToExecuteActions.start(_nextActionVMToActive->startTime() - currentTimeInMilliSeconds);
+
+//                    } else {
+//                        setnextActionVMToActive(NULL);
+//                    }
+//                }
+//            }
+
+            _timerToRegularlyDelayActions.start(INTERVAL_DELAY_ACTIONS);
+
+            qDebug() << "C++ canInsert"<<canInsert <<" FINAL lineNumber"<< actionVM->lineInTimeLine();
+
+        } else {
+            qDebug() << "C++ NOT canInsert"<<canInsert << lineNumber;
+
+        }
+
     }
 }
