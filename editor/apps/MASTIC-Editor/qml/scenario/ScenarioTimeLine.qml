@@ -402,7 +402,7 @@ Item {
                             // action comes from the timeline
                             if (controller && (typeof dragItem.myActionVM !== 'undefined' && dragItem.myActionVM.modelM !== null)) {
                                 // test if the drop is possible
-                                canInsertActionVM = controller.canInsertActionVMTo(dragItem.myActionVM.modelM, starttimeInMilliseconds, lineNumber)
+                                canInsertActionVM = controller.canInsertActionVMTo(dragItem.myActionVM.modelM, starttimeInMilliseconds, lineNumber, dragItem.myActionVM)
 
                                 if (canInsertActionVM) {
                                     ghostDropImpossible.visible = false;

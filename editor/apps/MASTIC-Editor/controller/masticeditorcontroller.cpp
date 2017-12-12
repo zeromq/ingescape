@@ -434,6 +434,10 @@ void MasticEditorController::_openPlatformFromFile(QString platformFilePath)
                 // Import scenario
                 if(_scenarioC != NULL)
                 {
+                    // Clear scenario
+                    _scenarioC->clearScenario();
+
+                    // Import new scenario
                     _scenarioC->importScenarioFromJson(byteArrayOfJson);
                 }
             }
