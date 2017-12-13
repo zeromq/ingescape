@@ -1437,9 +1437,9 @@ void ScenarioController::importScenarioFromJson(QByteArray byteArrayOfJson)
                 _actionsInTimeLine.append(actionVM);
 
                 // Increment the line number if necessary
-                if(_linesNumberInTimeLine < lineNumber+1)
+                if(_linesNumberInTimeLine < lineNumber+2)
                 {
-                    setlinesNumberInTimeLine(lineNumber+1);
+                    setlinesNumberInTimeLine(lineNumber+2);
                 }
             }
         }
