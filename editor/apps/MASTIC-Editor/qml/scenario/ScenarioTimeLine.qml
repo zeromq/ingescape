@@ -254,9 +254,32 @@ Item {
                         //
                         // Trackpad flick gesture => scroll our workspace
                         //
-                        contentArea.contentX += wheel.pixelDelta.x;
-                        contentArea.contentY += wheel.pixelDelta.y;
-                        contentArea.returnToBounds();
+                        var maxXOfTimeline = contentArea.contentWidth - contentArea.width;
+                        var maxYOfTimeline = contentArea.contentHeight - contentArea.height;
+
+                        if (maxXOfTimeline > 0) {
+                            if ((contentArea.contentX + wheel.pixelDelta.x >= 0)
+                                    && (contentArea.contentX + wheel.pixelDelta.x <= maxXOfTimeline)) {
+                                contentArea.contentX += wheel.pixelDelta.x;
+                            } else if (contentArea.contentX + wheel.pixelDelta.x < 0) {
+                                contentArea.contentX = 0;
+                            } else if (contentArea.contentX + wheel.pixelDelta.x > maxXOfTimeline) {
+                                contentArea.contentX = maxXOfTimeline;
+                            }
+                        }
+
+                        if (maxYOfTimeline > 0) {
+                            if ((contentArea.contentY + wheel.pixelDelta.y >= 0)
+                                    && (contentArea.contentY + wheel.pixelDelta.y <= maxYOfTimeline)) {
+                                contentArea.contentY += wheel.pixelDelta.y;
+                            } else if (contentArea.contentY + wheel.pixelDelta.y < 0) {
+                                contentArea.contentY = 0;
+                            } else if (contentArea.contentY + wheel.pixelDelta.y > maxYOfTimeline) {
+                                contentArea.contentY = maxYOfTimeline;
+                            }
+                        }
+
+
                     }
                 }
 
