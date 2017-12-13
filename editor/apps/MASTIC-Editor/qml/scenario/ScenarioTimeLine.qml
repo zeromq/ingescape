@@ -76,6 +76,36 @@ Item {
     }
 
 
+    function dragViewWithDelta (deltaX, deltaY) {
+
+        var maxXOfTimeline = contentArea.contentWidth - contentArea.width;
+        var maxYOfTimeline = contentArea.contentHeight - contentArea.height;
+
+        if (maxXOfTimeline > 0) {
+            if ((contentArea.contentX + deltaX >= 0)
+                    && (contentArea.contentX + deltaX <= maxXOfTimeline)) {
+                contentArea.contentX += deltaX;
+            } else if (contentArea.contentX + deltaX < 0) {
+                contentArea.contentX = 0;
+            } else if (contentArea.contentX + deltaX > maxXOfTimeline) {
+                contentArea.contentX = maxXOfTimeline;
+            }
+        }
+
+        if (maxYOfTimeline > 0) {
+            if ((contentArea.contentY + deltaY >= 0)
+                    && (contentArea.contentY + deltaY <= maxYOfTimeline)) {
+                contentArea.contentY += deltaY;
+            } else if (contentArea.contentY + deltaY < 0) {
+                contentArea.contentY = 0;
+            } else if (contentArea.contentY + deltaY > maxYOfTimeline) {
+                contentArea.contentY = maxYOfTimeline;
+            }
+        }
+
+    }
+
+
     //--------------------------------
     //
     // Content
@@ -243,7 +273,6 @@ Item {
                 scrollGestureEnabled: true
 
                 onPressed: {
-                    rootItem.forceActiveFocus();
                 }
 
                 onWheel: {
@@ -254,32 +283,7 @@ Item {
                         //
                         // Trackpad flick gesture => scroll our workspace
                         //
-                        var maxXOfTimeline = contentArea.contentWidth - contentArea.width;
-                        var maxYOfTimeline = contentArea.contentHeight - contentArea.height;
-
-                        if (maxXOfTimeline > 0) {
-                            if ((contentArea.contentX + wheel.pixelDelta.x >= 0)
-                                    && (contentArea.contentX + wheel.pixelDelta.x <= maxXOfTimeline)) {
-                                contentArea.contentX += wheel.pixelDelta.x;
-                            } else if (contentArea.contentX + wheel.pixelDelta.x < 0) {
-                                contentArea.contentX = 0;
-                            } else if (contentArea.contentX + wheel.pixelDelta.x > maxXOfTimeline) {
-                                contentArea.contentX = maxXOfTimeline;
-                            }
-                        }
-
-                        if (maxYOfTimeline > 0) {
-                            if ((contentArea.contentY + wheel.pixelDelta.y >= 0)
-                                    && (contentArea.contentY + wheel.pixelDelta.y <= maxYOfTimeline)) {
-                                contentArea.contentY += wheel.pixelDelta.y;
-                            } else if (contentArea.contentY + wheel.pixelDelta.y < 0) {
-                                contentArea.contentY = 0;
-                            } else if (contentArea.contentY + wheel.pixelDelta.y > maxYOfTimeline) {
-                                contentArea.contentY = maxYOfTimeline;
-                            }
-                        }
-
-
+                        rootItem.dragViewWithDelta (wheel.pixelDelta.x, wheel.pixelDelta.y)
                     }
                 }
 
@@ -293,17 +297,36 @@ Item {
 
                     // 2-finger-flick gesture should pass through to our parent MouseArea
                     scrollGestureEnabled: false
+                    hoverEnabled: true
+
+                    property real previousPositionX : 0.0;
+                    property real previousPositionY : 0.0;
 
                     onPressed: {
                         rootItem.forceActiveFocus();
+                        previousPositionX = mouse.x;
+                        previousPositionY = mouse.y;
                     }
 
                     onPositionChanged: {
                         if (pressed) {
+                            var deltaX = previousPositionX - mouse.x;
+                            var deltaY = previousPositionY - mouse.y;
 
+                            rootItem.dragViewWithDelta (deltaX, deltaY)
+
+                            previousPositionX = mouse.x;
+                            previousPositionY = mouse.y;
                         }
                     }
 
+                    onClicked: {
+                        // deselect action in timeline
+                        if (controller && controller.selectedActionVMInTimeline) {
+                            controller.selectedActionVMInTimeline = null;
+
+                        }
+                    }
 
                     onWheel: {
                         wheel.accepted = true;
@@ -360,17 +383,6 @@ Item {
                             id: content
                             width: viewController.timeTicksTotalWidth
                             height: rootItem.lineHeight * rootItem.linesNumber
-
-                            MouseArea {
-                                anchors.fill: parent
-                                onClicked: {
-                                    // deselect action in timeline
-                                    if (controller && controller.selectedActionVMInTimeline) {
-                                        controller.selectedActionVMInTimeline = null;
-
-                                    }
-                                }
-                            }
 
                             Repeater {
                                 model : controller ? controller.actionsInTimeLine : 0;
@@ -488,7 +500,7 @@ Item {
                                     // action comes from the timeline : update start time and line number
                                     if (typeof dragItem.myActionVM !== 'undefined' && dragItem.myActionVM.modelM !== null)
                                     {
-                                         controller.moveActionVMAtTimeAndLine(dragItem.myActionVM, timeInMilliseconds, lineNumber);
+                                        controller.moveActionVMAtTimeAndLine(dragItem.myActionVM, timeInMilliseconds, lineNumber);
                                     }
 
 
@@ -637,22 +649,6 @@ Item {
         }
 
 
-
-        //            ScrollView {
-        //                id : contentAreaScrollView
-        //                anchors.fill: parent
-        //                horizontalScrollBarPolicy : Qt.ScrollBarAlwaysOff
-
-        //                style: MasticScrollViewStyle {
-        //                }
-
-        //                // Prevent drag overshoot on Windows
-        //                flickableItem.boundsBehavior: Flickable.OvershootBounds
-
-
-        //      }
-
-
         //
         // Current Time
         //
@@ -742,6 +738,15 @@ Item {
                 }
 
                 onWheel: {
+                    wheel.accepted = true;
+
+                    if ((wheel.pixelDelta.x !== 0) || (wheel.pixelDelta.y !== 0))
+                    {
+                        //
+                        // Trackpad flick gesture => scroll our workspace
+                        //
+                        rootItem.dragViewWithDelta (wheel.pixelDelta.x, wheel.pixelDelta.y)
+                    }
                 }
 
                 //
