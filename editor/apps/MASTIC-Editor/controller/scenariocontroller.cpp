@@ -378,22 +378,6 @@ void ScenarioController::setActionInPalette(int index, ActionM* actionM)
     }
 }
 
-
-/**
- * @brief Open a scenario a file (actions, palette, timeline actions )
- */
-void ScenarioController::openScenarioFromFile()
-{
-    // "File Dialog" to get the files (paths) to open
-    QString scenarioFilePath = QFileDialog::getOpenFileName(NULL,
-                                                                "Open scenario",
-                                                                _scenariosDirectoryPath,
-                                                                "JSON (*.json)");
-
-    // Open the scenario from JSON file
-    _openScenarioFromFile(scenarioFilePath);
-}
-
 /**
  * @brief Open the scenario from JSON file
  * @param scenarioFilePath
@@ -423,23 +407,6 @@ void ScenarioController::_openScenarioFromFile(QString scenarioFilePath)
         }
     }
 
-}
-
-/**
- * @brief Save a scenario to the default file (actions, palette, timeline actions)
- */
-void ScenarioController::saveScenarioToSelectedFile()
-{
-    // "File Dialog" to get the file (path) to save
-    QString scenarioFilePath = QFileDialog::getSaveFileName(NULL,
-                                                              "Save scenario",
-                                                              _scenariosDirectoryPath,
-                                                              "JSON (*.json)");
-
-    if(!scenarioFilePath.isEmpty()) {
-        // Save the scenario to JSON file
-        _saveScenarioToFile(scenarioFilePath);
-    }
 }
 
 /**

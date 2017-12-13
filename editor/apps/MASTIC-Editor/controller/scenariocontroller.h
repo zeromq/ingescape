@@ -167,16 +167,6 @@ public:
     Q_INVOKABLE void setActionInPalette(int index, ActionM* actionM);
 
     /**
-     * @brief Open a scenario a file (actions, palette, timeline actions )
-     */
-    Q_INVOKABLE void openScenarioFromFile();
-
-    /**
-     * @brief Save a scenario to a selected file (actions, palette, timeline actions)
-     */
-    Q_INVOKABLE void saveScenarioToSelectedFile();
-
-    /**
      * @brief Add an action VM at the time in ms
      * @param action model
      * @param line number
