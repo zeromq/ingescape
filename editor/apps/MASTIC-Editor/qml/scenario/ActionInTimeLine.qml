@@ -44,6 +44,31 @@ Item {
     Drag.hotSpot.y: actionVMMouseArea.mouseY
     Drag.keys: ["ActionInTimeLine"]
 
+    Binding {
+        target: actionVMItem
+        property: "y"
+        value: if (myActionVM)
+               {
+                   actionVMItem.lineHeight * myActionVM.lineInTimeLine
+               }
+               else {
+                   0
+               }
+        when: !actionVMMouseArea.drag.active
+    }
+
+    Binding {
+        target: actionVMItem
+        property: "x"
+        value: if (myActionVM)
+               {
+                    viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(myActionVM.startTime, viewController.pixelsPerMinute)
+               }
+               else {
+                   0
+               }
+        when: !actionVMMouseArea.drag.active
+    }
 
     x : myActionVM ? viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(myActionVM.startTime, viewController.pixelsPerMinute) : 0;
     y : myActionVM ? (actionVMItem.lineHeight * myActionVM.lineInTimeLine) : 0;
@@ -295,7 +320,7 @@ Item {
         hoverEnabled: true
 
         drag.smoothed: false
-        drag.target: actionVMItem
+        drag.target: !controller.isPlaying ? actionVMItem : null
         cursorShape: (actionVMMouseArea.drag.active)? Qt.PointingHandCursor : Qt.OpenHandCursor //Qt.OpenHandCursor
 
         onPressed: {
