@@ -513,6 +513,9 @@ void AgentsMappingController::onIsActivatedMappingChanged(bool isActivatedMappin
                         }
                     }
                 }
+
+                // Notify the QML to fit the view
+                Q_EMIT fitToView();
             }
         }
         // Mapping has some agents (and links)
@@ -538,9 +541,6 @@ void AgentsMappingController::onIsActivatedMappingChanged(bool isActivatedMappin
                 }
             }
         }
-
-        // Notify the QML to fit the view
-        Q_EMIT fitToView();
     }
 }
 
