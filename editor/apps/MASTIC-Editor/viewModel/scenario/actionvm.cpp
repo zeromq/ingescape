@@ -65,6 +65,14 @@ ActionVM::ActionVM(ActionM* model,
     _timerToReverse->setSingleShot(true);
     connect(_timerToReverse, &QTimer::timeout, this, &ActionVM::_onTimeout_ReserseAction);
 
+    //
+    // Init the rearm timer
+    //
+    _timerToRearm = new QTimer();
+    _timerToRearm->setSingleShot(true);
+    connect(_timerToRearm, &QTimer::timeout, this, &ActionVM::_onTimeout_RearmAction);
+
+
 }
 
 
@@ -82,11 +90,18 @@ ActionVM::~ActionVM()
     // Reset model of action
     setmodelM(NULL);
 
-    // Remove timer
+    // Remove revert timer
     if(_timerToReverse != NULL)
     {
         delete _timerToReverse;
         _timerToReverse = NULL;
+    }
+
+    // Remove rearm timer
+    if(_timerToRearm != NULL)
+    {
+        delete _timerToRearm;
+        _timerToRearm = NULL;
     }
 }
 
@@ -268,8 +283,7 @@ void ActionVM::effectsExecuted(int currentTimeInMilliSeconds)
             // Shall rearm
             if (_modelM->shallRearm())
             {
-                // Create a new (view model of) action execution
-                _createActionExecution(currentTimeInMilliSeconds - _startTime);
+                _timerToRearm->start(_modelM->rearmAfterTime());
             }
         }
     }
@@ -289,11 +303,21 @@ void ActionVM::reverseEffectsExecuted(int currentTimeInMilliSeconds)
         // Shall rearm
         if (_modelM->shallRearm() && (currentTimeInMilliSeconds < _endTime || _endTime == -1))
         {
-            // Create a new (view model of) action execution
-            _createActionExecution(currentTimeInMilliSeconds - _startTime);
+            _timerToRearm->start(_modelM->rearmAfterTime());
         }
     }
 }
+
+/**
+ * @brief Notify our action that it need to be rearmed
+ * @param currentTimeInMilliSeconds
+ */
+void ActionVM::rearmCurrentActionExecution(int currentTimeInMilliSeconds)
+{
+    // Create a new (view model of) action execution
+    _createActionExecution(currentTimeInMilliSeconds);
+}
+
 
 
 /**
@@ -434,6 +458,15 @@ void ActionVM::_onTimeout_ReserseAction()
         // Emit the signal to send the action reversion
         Q_EMIT revertAction(_currentExecution);
     }
+}
+
+/**
+ * @brief Called when our timer time out to handle the action rearm
+ */
+void ActionVM::_onTimeout_RearmAction()
+{
+    // Emit the signal to send the action rearm
+    Q_EMIT rearmAction();
 }
 
 

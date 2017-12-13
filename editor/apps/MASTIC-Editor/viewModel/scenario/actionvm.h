@@ -67,6 +67,9 @@ class ActionVM: public QObject
     // Timer to wait for action revert
     I2_CPP_PROPERTY(QTimer*, timerToReverse)
 
+    // Timer to wait for action rearm
+    I2_CPP_PROPERTY(QTimer*, timerToRearm)
+
 public:
 
     /**
@@ -106,6 +109,11 @@ public:
      */
     void reverseEffectsExecuted(int currentTimeInMilliSeconds);
 
+    /**
+     * @brief Notify our action that it need to be rearmed
+     * @param currentTimeInMilliSeconds
+     */
+    void rearmCurrentActionExecution(int currentTimeInMilliSeconds);
 
     /**
      * @brief Delay the current execution of our action
@@ -128,6 +136,12 @@ Q_SIGNALS:
      */
     void revertAction(ActionExecutionVM* actionExecution);
 
+    /**
+     * @brief Signal emitted when the action has finished its rearm period
+     */
+    void rearmAction();
+
+
 private Q_SLOTS:
 
     /**
@@ -148,6 +162,10 @@ private Q_SLOTS:
      */
     void _onTimeout_ReserseAction();
 
+    /**
+     * @brief Called when our timer time out to handle the action rearm
+     */
+    void _onTimeout_RearmAction();
 
 private:
     /**

@@ -289,6 +289,10 @@ public Q_SLOTS:
       */
     void onRevertAction(ActionExecutionVM* actionExecution);
 
+    /**
+      * @brief slot on the action rearm
+      */
+    void onRearmAction();
 
 private Q_SLOTS:
 

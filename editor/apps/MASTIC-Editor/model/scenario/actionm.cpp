@@ -69,6 +69,8 @@ ActionM::ActionM(QString name, QObject *parent) : QObject(parent),
     _revertAfterTime(-1),
     _revertAfterTimeString("0.0"),
     _shallRearm(false),
+    _rearmAfterTime(200),
+    _rearmAfterTimeString("0.200"),
     _isValid(false),
     _isConnected(false)
 {
@@ -108,6 +110,8 @@ void ActionM::copyFrom(ActionM* actionModel)
         setrevertAfterTime(actionModel->revertAfterTime());
         setrevertAfterTimeString(actionModel->revertAfterTimeString());
         setshallRearm(actionModel->shallRearm());
+        setrearmAfterTime(actionModel->rearmAfterTime());
+        setrearmAfterTimeString(actionModel->rearmAfterTimeString());
 
         _effectsList.deleteAllItems();
 
@@ -234,6 +238,56 @@ void ActionM::setrevertAfterTimeString(QString value)
     }
 }
 
+/**
+ * @brief Setter for property "Rearm After Time String"
+ * @param value
+ */
+void ActionM::setrearmAfterTimeString(QString value)
+{
+    if (_rearmAfterTimeString != value)
+    {
+        _rearmAfterTimeString = value;
+
+        if (!_rearmAfterTimeString.isEmpty())
+        {
+            bool successSeconds = false;
+            bool successMilliSeconds = false;
+
+            QStringList splittedTime = _rearmAfterTimeString.split('.');
+            if (splittedTime.count() == 2)
+            {
+                int seconds = splittedTime.at(0).toInt(&successSeconds);
+                int milliSeconds = splittedTime.at(1).leftJustified(3, '0').toInt(&successMilliSeconds);
+
+                if (successSeconds && successMilliSeconds) {
+                    setrearmAfterTime(seconds * 1000 + milliSeconds);
+                    //qDebug() << "Rearm After Time =" << _revertAfterTime;
+                }
+                else {
+                    setrearmAfterTime(-1);
+                    qCritical() << "Wrong 'Rearm After Time':" << _rearmAfterTimeString << "for action" << _name;
+                }
+            }
+            else {
+                int seconds = _rearmAfterTimeString.toInt(&successSeconds);
+                if (successSeconds) {
+                    setrearmAfterTime(seconds * 1000);
+                    //qDebug() << "Rearm After Time =" << _revertAfterTime;
+                }
+                else {
+                    setrearmAfterTime(-1);
+                    qCritical() << "Wrong 'Rearm After Time':" << _rearmAfterTimeString << "for action" << _name;
+                }
+            }
+        }
+        else {
+            setrearmAfterTime(-1);
+            qCritical() << "Wrong 'Rearm After Time':" << _rearmAfterTimeString << "for action" << _name;
+        }
+
+        Q_EMIT rearmAfterTimeStringChanged(value);
+    }
+}
 
 /**
  * @brief Setter for property "Validity Duration String"

@@ -473,6 +473,7 @@ void ScenarioController::addActionVMAtTime(ActionM* actionM, int timeInMs, int l
 
                 // Connect the revert action
                 connect(actionVM,&ActionVM::revertAction, this, &ScenarioController::onRevertAction);
+                connect(actionVM,&ActionVM::rearmAction, this, &ScenarioController::onRearmAction);
 
                 // Add action to the ones to check
                 _actionsVMToEvaluateVMList.append(actionVM);
@@ -889,6 +890,7 @@ void ScenarioController::_onTimeout_ExecuteActions()
 
                             // Disconnect before removing from the list
                             disconnect(actionVM,&ActionVM::revertAction, this, &ScenarioController::onRevertAction);
+                            disconnect(actionVM,&ActionVM::rearmAction, this, &ScenarioController::onRearmAction);
                         }
                         else if (actionVM->modelM()->validityDurationType() != ValidationDurationType::IMMEDIATE)
                         {
@@ -1015,8 +1017,13 @@ void ScenarioController::_onTimeout_DelayOrExecuteActions()
 
                 if (!actionVM->timerToReverse()->isActive())
                 {
-                    // Remove from the list of "active" actions
+                    // Disconnect the revert action signal
                     disconnect(actionVM,&ActionVM::revertAction, this, &ScenarioController::onRevertAction);
+                }
+                if(!actionVM->timerToRearm()->isActive())
+                {
+                    // Disconnect the rearm action signal
+                    disconnect(actionVM,&ActionVM::rearmAction, this, &ScenarioController::onRearmAction);
                 }
                 _activeActionsVMList.remove(actionVM);
             }
@@ -1050,6 +1057,7 @@ void ScenarioController::_startScenario()
     foreach (ActionVM* actionVM, _actionsVMToEvaluateVMList.toList())
     {
         disconnect(actionVM,&ActionVM::revertAction, this, &ScenarioController::onRevertAction);
+        disconnect(actionVM,&ActionVM::rearmAction, this, &ScenarioController::onRearmAction);
     }
     _actionsVMToEvaluateVMList.clear();
     _activeActionsVMList.clear();
@@ -1063,6 +1071,7 @@ void ScenarioController::_startScenario()
         {
             // Connect on the action revert signal
             connect(actionVM,&ActionVM::revertAction, this, &ScenarioController::onRevertAction);
+            connect(actionVM,&ActionVM::rearmAction, this, &ScenarioController::onRearmAction);
 
             // Initialize the action view model at a specific time.
             actionVM->resetDataFrom(currentTimeInMilliSeconds);
@@ -1126,11 +1135,19 @@ void ScenarioController::_stopScenario()
     // Desactive revert timers
     foreach (ActionVM* actionVM, _activeActionsVMList.toList())
     {
+        // Disconnect revert action
         if(actionVM->timerToReverse()->isActive())
         {
             actionVM->timerToReverse()->stop();
         }
         disconnect(actionVM,&ActionVM::revertAction, this, &ScenarioController::onRevertAction);
+
+        // Disconnect rearm action
+        if(actionVM->timerToRearm()->isActive())
+        {
+            actionVM->timerToRearm()->stop();
+        }
+        disconnect(actionVM,&ActionVM::rearmAction, this, &ScenarioController::onRearmAction);
     }
 
     // Reset the next action VM to active
@@ -1321,6 +1338,49 @@ void ScenarioController::onRevertAction(ActionExecutionVM* actionExecution)
 
             // Remove from the list of "active" actions
             disconnect(actionVM,&ActionVM::revertAction, this, &ScenarioController::onRevertAction);
+            disconnect(actionVM,&ActionVM::rearmAction, this, &ScenarioController::onRearmAction);
+        }
+    }
+}
+
+/**
+  * @brief slot on the action rearm
+  */
+void ScenarioController::onRearmAction()
+{
+    ActionVM* actionVM = qobject_cast<ActionVM*>(sender());
+    qDebug() << "onRearmAction actionVM is "<< (actionVM == NULL ? "NULL" : "NOT NULL");
+    if (actionVM != NULL)
+    {
+        // Initialize the start time
+        int currentTimeInMilliSeconds = _currentTime.msecsSinceStartOfDay() - actionVM->startTime();
+
+        // Define the exact start time for the next action execution
+        if(actionVM->executionsList()->toList().count() > 0)
+        {
+            ActionExecutionVM * lastActionExecution = actionVM->executionsList()->toList().last();
+            currentTimeInMilliSeconds = lastActionExecution->executionTime();
+            if(lastActionExecution->shallRevert() == true)
+            {
+                currentTimeInMilliSeconds += actionVM->modelM()->revertAfterTime();
+            }
+            if(actionVM->modelM()->shallRearm() == true)
+            {
+                currentTimeInMilliSeconds += actionVM->modelM()->rearmAfterTime();
+            }
+        }
+        // Rearm the action
+        actionVM->rearmCurrentActionExecution(currentTimeInMilliSeconds);
+
+        // The rearm action has been done after the end of the action validity
+        if(actionVM->endTime() >= 0 && currentTimeInMilliSeconds >= actionVM->endTime())
+        {
+            // ...we remove the current execution
+            actionVM->setcurrentExecution(NULL);
+
+            // Remove from the list of "active" actions
+            disconnect(actionVM,&ActionVM::revertAction, this, &ScenarioController::onRevertAction);
+            disconnect(actionVM,&ActionVM::rearmAction, this, &ScenarioController::onRearmAction);
         }
     }
 }
@@ -1474,6 +1534,7 @@ void ScenarioController::moveActionVMAtTimeAndLine(ActionVM* actionVM, int timeI
                 actionVM->timerToReverse()->stop();
             }
             disconnect(actionVM,&ActionVM::revertAction, this, &ScenarioController::onRevertAction);
+            disconnect(actionVM,&ActionVM::rearmAction, this, &ScenarioController::onRearmAction);
 
             if(_actionsVMToEvaluateVMList.contains(actionVM))
             {

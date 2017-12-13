@@ -73,6 +73,12 @@ class ActionM: public QObject
     // Flag to rearm the action
     I2_QML_PROPERTY(bool, shallRearm)
 
+    // Rearm after time in milliseconds
+    I2_QML_PROPERTY(int, rearmAfterTime)
+
+    // Rearm after time in string format
+    I2_QML_PROPERTY_CUSTOM_SETTER(QString, rearmAfterTimeString)
+
     // FIXME: a Model must not contain a VM
     // List of effects for the action
     I2_QOBJECT_LISTMODEL(ActionEffectVM, effectsList)
