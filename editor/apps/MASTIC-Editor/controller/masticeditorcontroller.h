@@ -164,6 +164,13 @@ public Q_SLOTS:
       */
      QPointF getGlobalMousePosition();
 
+signals:
+
+     /**
+      * @brief Reset the mapping and timeline views
+      */
+     void resetMappindAndTimeLineViews();
+
 private:
 
      /**

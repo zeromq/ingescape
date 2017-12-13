@@ -446,6 +446,9 @@ void MasticEditorController::_openPlatformFromFile(QString platformFilePath)
                     // Import new scenario
                     _scenarioC->importScenarioFromJson(byteArrayOfJson);
                 }
+
+                // Notify QML to reset view
+                Q_EMIT resetMappindAndTimeLineViews();
             }
             else {
                 qCritical() << "Can not open file" << platformFilePath;
@@ -548,6 +551,9 @@ void MasticEditorController::createNewPlatform()
         // Reset scenario
         _scenarioC->clearScenario();
     }
+
+    // Notify QML to reset view
+    Q_EMIT resetMappindAndTimeLineViews();
 }
 
 /**

@@ -1481,6 +1481,9 @@ void ScenarioController::clearScenario()
     {
         actionInPalette->setmodelM(NULL);
     }
+
+    // Reset current time
+    setcurrentTime(QTime::fromMSecsSinceStartOfDay(0));
 }
 
 /**

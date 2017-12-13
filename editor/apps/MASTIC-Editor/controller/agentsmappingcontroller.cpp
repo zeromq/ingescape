@@ -538,6 +538,9 @@ void AgentsMappingController::onIsActivatedMappingChanged(bool isActivatedMappin
                 }
             }
         }
+
+        // Notify the QML to fit the view
+        Q_EMIT fitToView();
     }
 }
 
