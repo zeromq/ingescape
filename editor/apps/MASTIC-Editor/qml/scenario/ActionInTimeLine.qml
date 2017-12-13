@@ -39,6 +39,32 @@ Item {
     property var temporaryStartTime: null;
 
 
+    // Find a root layer by its object name
+    function findLayerRootByObjectName(startingObject, layerObjectName)
+    {
+        var currentObject = startingObject;
+        var layerRoot = null;
+
+        while ((currentObject !== null) && (layerRoot == null))
+        {
+            var index = 0;
+            while ((index < currentObject.data.length) && (layerRoot == null))
+            {
+                if (currentObject.data[index].objectName === layerObjectName)
+                {
+                    layerRoot = currentObject.data[index];
+                }
+                index++;
+            }
+
+            currentObject = currentObject.parent;
+        }
+
+        return layerRoot;
+    }
+
+
+
     Drag.active: actionVMMouseArea.drag.active
     Drag.hotSpot.x: (actionVMMouseArea.mouseX + actionVMMouseArea.x)
     Drag.hotSpot.y: actionVMMouseArea.mouseY
@@ -117,33 +143,6 @@ Item {
                 controller.selectedActionVMInTimeline = null;
             }
         }
-    }
-
-    //
-    // Functions
-    //
-    // Find a root layer by its object name
-    function findLayerRootByObjectName(startingObject, layerObjectName)
-    {
-        var currentObject = startingObject;
-        var layerRoot = null;
-
-        while ((currentObject !== null) && (layerRoot == null))
-        {
-            var index = 0;
-            while ((index < currentObject.data.length) && (layerRoot == null))
-            {
-                if (currentObject.data[index].objectName === layerObjectName)
-                {
-                    layerRoot = currentObject.data[index];
-                }
-                index++;
-            }
-
-            currentObject = currentObject.parent;
-        }
-
-        return layerRoot;
     }
 
 
@@ -324,11 +323,17 @@ Item {
         cursorShape: (actionVMMouseArea.drag.active)? Qt.PointingHandCursor : Qt.OpenHandCursor //Qt.OpenHandCursor
 
         onPressed: {
+            // Find our layer and reparent our popup in it
+            itemDragged.parent = actionVMItem.findLayerRootByObjectName(itemDragged, "overlayLayerDraggableItem");
         }
 
-        onPositionChanged: {
-            itemDragged.x = mouseX - 12 - itemDragged.width + actionVMMouseArea.x;
-            itemDragged.y = mouseY - 12 - itemDragged.height;
+        onPositionChanged: {// Compute new position if needed
+            if (itemDragged.parent !== null)
+            {
+                var newPosition = actionVMItem.mapToItem(itemDragged.parent, mouse.x - 12 - itemDragged.width + actionVMMouseArea.x, mouse.y - 12 - itemDragged.height);
+                itemDragged.x = newPosition.x;
+                itemDragged.y = newPosition.y;
+            }
         }
 
         onReleased: {
@@ -337,10 +342,13 @@ Item {
             //
             // Reset the position of our action
             //
+            itemDragged.parent = actionVMItem;
+
             if (actionVMItem.myActionVM) {
                 actionVMItem.x = viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(myActionVM.startTime, viewController.pixelsPerMinute);
                 actionVMItem.y = (actionVMItem.lineHeight * myActionVM.lineInTimeLine);
             }
+
         }
 
 
@@ -383,7 +391,9 @@ Item {
 
         Column {
             id : columnText
-            height : (nameAction.height + temporaryStartTimeAction.height) + 3
+            height : temporaryStartTimeAction.visible ?
+                         (nameAction.height + temporaryStartTimeAction.height) + 3
+                       : nameAction.height
 
             anchors.centerIn: parent
             spacing: 6
