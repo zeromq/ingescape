@@ -67,9 +67,6 @@ ScenarioController::ScenarioController(MasticModelManager* modelManager,
         _actionsInPaletteList.append(new ActionInPaletteVM(NULL, i));
     }
 
-    QDate today = QDate::currentDate();
-    _scenariosDefaultFilePath = QString("%1scenarios_%2.json").arg(_scenariosDirectoryPath, today.toString("ddMMyy"));
-
     // Create the helper to manage JSON definitions of agents
     _jsonHelper = new JsonHelper(this);
 

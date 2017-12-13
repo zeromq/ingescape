@@ -398,7 +398,6 @@ protected:
 
     // Path to the directory containing JSON files to save scenarios
     QString _scenariosDirectoryPath;
-    QString _scenariosDefaultFilePath;
 
     // Helper to manage JSON definitions of agents
     JsonHelper* _jsonHelper;

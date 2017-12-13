@@ -117,6 +117,22 @@ public:
       */
      Q_INVOKABLE void savePlatformToSelectedFile();
 
+     /**
+      * @brief Save a platform to the default file (actions, palette, timeline actions, mappings)
+      */
+     void savePlatformToDefaultFile();
+
+     /**
+      * @brief Create a new platform (actions, palette, timeline actions, mappings)
+      *        by deleting all existing data
+      */
+     Q_INVOKABLE void createNewPlatform();
+
+     /**
+      * @brief Actions to perform before the application closing
+      */
+     Q_INVOKABLE void processBeforeClosing();
+
 public Q_SLOTS:
 
      /**
@@ -168,6 +184,7 @@ private:
 
      // Path to the directory containing JSON files to save platform
      QString _platformDirectoryPath;
+     QString _platformDefaultFilePath;
 
      // Helper to manage JSON the saving/opening platform files
      JsonHelper* _jsonHelper;

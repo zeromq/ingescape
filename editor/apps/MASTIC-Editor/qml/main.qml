@@ -243,8 +243,8 @@ ApplicationWindow {
     // When user clicks on window close button
     onClosing: {
         console.info("QML: Close Window");
-        if (MasticEditorC.agentsSupervisionC) {
-            MasticEditorC.agentsSupervisionC.exportAgentsListToDefaultFile();
+        if (MasticEditorC) {
+            MasticEditorC.processBeforeClosing();
         }
     }
 

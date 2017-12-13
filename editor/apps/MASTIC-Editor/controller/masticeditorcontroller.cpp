@@ -111,6 +111,9 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
         _platformDirectoryPath = platformPath;
     }
 
+    QDate today = QDate::currentDate();
+    _platformDefaultFilePath = QString("%1platform_%2.json").arg(_platformDirectoryPath, today.toString("ddMMyy"));
+
     // Create the helper to manage JSON definitions of agents
     _jsonHelper = new JsonHelper(this);
 
@@ -193,6 +196,9 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
 
     // Initialize agents list from default file
     _modelManager->importAgentsListFromDefaultFile();
+
+    // Initialize platform from default file
+    _openPlatformFromFile(_platformDefaultFilePath);
 
     // Start our MASTIC agent with a network device (or an IP address) and a port
     _networkC->start(_networkDevice, _ipAddress, _port);
@@ -470,6 +476,17 @@ void MasticEditorController::savePlatformToSelectedFile()
 }
 
 /**
+ * @brief Save a platform to the default file (actions, palette, timeline actions, mappings)
+ */
+void MasticEditorController::savePlatformToDefaultFile()
+{
+    if(!_platformDefaultFilePath.isEmpty()) {
+        // Save the platform to JSON file
+        _savePlatformToFile(_platformDefaultFilePath);
+    }
+}
+
+/**
  * @brief Save the platform to JSON file
  * @param platformFilePath
  */
@@ -512,3 +529,39 @@ void MasticEditorController::_savePlatformToFile(QString platformFilePath)
         }
     }
 }
+
+/**
+ * @brief Create a new platform (actions, palette, timeline actions, mappings)
+ *        by deleting all existing data
+ */
+void MasticEditorController::createNewPlatform()
+{
+    // Create new mapping
+    if(_agentsMappingC != NULL)
+    {
+        _agentsMappingC->createNewMapping();
+    }
+
+    // Create new scenario
+    if(_scenarioC != NULL)
+    {
+        // Reset scenario
+        _scenarioC->clearScenario();
+    }
+}
+
+/**
+ * @brief Actions to perform before the application closing
+ */
+void MasticEditorController::processBeforeClosing()
+{
+    // Save the agent list
+    if(_agentsSupervisionC != NULL)
+    {
+        _agentsSupervisionC->exportAgentsListToDefaultFile();
+    }
+
+    // Save the platform to the default file
+    savePlatformToDefaultFile();
+}
+
