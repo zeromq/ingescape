@@ -67,9 +67,6 @@ ScenarioController::ScenarioController(MasticModelManager* modelManager,
         _actionsInPaletteList.append(new ActionInPaletteVM(NULL, i));
     }
 
-    QDate today = QDate::currentDate();
-    _scenariosDefaultFilePath = QString("%1scenarios_%2.json").arg(_scenariosDirectoryPath, today.toString("ddMMyy"));
-
     // Create the helper to manage JSON definitions of agents
     _jsonHelper = new JsonHelper(this);
 
@@ -1500,9 +1497,6 @@ void ScenarioController::moveActionVMAtTimeAndLine(ActionVM* actionVM, int timeI
         // Insert our item if possible
         if (canInsert)
         {
-            qDebug() << "C++ canInsert"<<canInsert <<" original lineNumber"<< actionVM->lineInTimeLine() << " new" <<lineNumber;
-            _timerToRegularlyDelayActions.stop();
-
             // Reset connections
             // Connect the revert action
             if(actionVM->timerToReverse()->isActive())
@@ -1549,7 +1543,6 @@ void ScenarioController::moveActionVMAtTimeAndLine(ActionVM* actionVM, int timeI
                         // set the line number
                         actionVM->setlineInTimeLine(lineNumber);
 
-                        qDebug() << "C++ canInsert set to EXISTS lineNumber"<< lineNumber;
                         // Insert the action
                         actionVMSortedList->append(actionVM);
 
@@ -1569,7 +1562,6 @@ void ScenarioController::moveActionVMAtTimeAndLine(ActionVM* actionVM, int timeI
                     // Set the line number
                     actionVM->setlineInTimeLine(lineNumber);
 
-                    qDebug() << "C++ canInsert set to NEW lineNumber"<< lineNumber;
                     // Add into our map
                     _mapActionsVMsInTimelineFromLineIndex.insert(lineNumber,actionVMSortedList);
 
@@ -1580,57 +1572,6 @@ void ScenarioController::moveActionVMAtTimeAndLine(ActionVM* actionVM, int timeI
                     }
                 }
             }
-
-            // If scenario is playing we add the actionVM to the active ones
-//            if(_isPlaying)
-//            {
-//                int currentTimeInMilliSeconds = _currentTime.msecsSinceStartOfDay();
-
-//                if ((actionVM->endTime() > currentTimeInMilliSeconds) || (actionVM->endTime() == -1))
-//                {
-//                    // Connect on the action revert signal
-//                    connect(actionVM,&ActionVM::revertAction, this, &ScenarioController::onRevertAction);
-
-//                    // Initialize the action view model at a specific time.
-//                    actionVM->resetDataFrom(currentTimeInMilliSeconds);
-
-//                    if(actionVM->startTime() <= currentTimeInMilliSeconds)
-//                    {
-//                        // Add our action
-//                        _activeActionsVMList.append(actionVM);
-//                    } else {
-//                        // Add our action
-//                        _actionsVMToEvaluateVMList.append(actionVM);
-//                    }
-//                }
-
-//                if(_nextActionVMToActive == actionVM)
-//                {
-//                    if(_timerToExecuteActions.isActive())
-//                    {
-//                        _timerToExecuteActions.stop();//(_nextActionVMToActive->startTime() - _currentTime.msecsSinceStartOfDay());
-//                    }
-
-//                    if(_actionsVMToEvaluateVMList.count() > 0)
-//                    {
-//                        setnextActionVMToActive(_actionsVMToEvaluateVMList.at(0));
-
-//                        _timerToExecuteActions.start(_nextActionVMToActive->startTime() - currentTimeInMilliSeconds);
-
-//                    } else {
-//                        setnextActionVMToActive(NULL);
-//                    }
-//                }
-//            }
-
-            _timerToRegularlyDelayActions.start(INTERVAL_DELAY_ACTIONS);
-
-            qDebug() << "C++ canInsert"<<canInsert <<" FINAL lineNumber"<< actionVM->lineInTimeLine();
-
-        } else {
-            qDebug() << "C++ NOT canInsert"<<canInsert << lineNumber;
-
         }
-
     }
 }

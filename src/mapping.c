@@ -16,7 +16,7 @@
 #include "mastic_private.h"
 
 mapping_t* mtic_internal_mapping = NULL;
-
+char mappingPath[1024] = "";
 
 ////////////////////////////////////////////////////////////////////////
 // INTERNAL FUNCTIONS
@@ -268,6 +268,7 @@ int mtic_loadMappingFromPath (const char* file_path){
         mtic_debug("mtic_loadMappingFromPath : mapping could not be loaded from path %s\n", file_path );
         return -1;
     }else{
+        strncpy(mappingPath, file_path, 1023);
         mtic_internal_mapping = tmp;
         network_needToUpdateMapping = true;
     }

@@ -23,7 +23,7 @@ else
 endif
 
 
-SRCS = definition.c mapping.c model.c network.c parser.c
+SRCS = definition.c mapping.c model.c network.c parser.c admin.c
 OBJS = $(SRCS:.c=.o)
 
 .PHONY: all

@@ -36,6 +36,9 @@
 
 #include "mastic.h"
 
+extern char definitionPath[1024];
+extern char mappingPath[1024];
+
 //////////////////  STRUCTURES AND ENUMS   //////////////////
 
 typedef struct mtic_observe_callback {
@@ -248,7 +251,6 @@ typedef int (*network_zyreIncoming) (const zyre_event_t *zyre_event, void *arg);
 int network_observeZyre(network_zyreIncoming cb, void *myData);
 #define AGENT_NAME_DEFAULT "mtic_noname"
 int network_publishOutput (const char* output_name);
-void mtic_debug(const char*fmt, ...);
 
 // parser
 

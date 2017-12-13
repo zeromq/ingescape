@@ -4,6 +4,7 @@ SOURCES += \
     $$PWD/../src/model.c \
     $$PWD/../src/network.c \
     $$PWD/../src/parser.c \
+    $$PWD/../src/admin.c
 
 HEADERS += \
     $$PWD/../src/include/uthash/uthash.h \

@@ -70,7 +70,6 @@
 
 
 //global flags
-bool verboseMode = false;
 bool isFrozen = false;
 bool agentCanBeFrozen = false;
 bool isWholeAgentMuted = false;
@@ -796,6 +795,47 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                         mtic_removeMappingEntryWithName(input, agent, output);
                     }
                 }
+                //admin API
+                else if ((strncmp (message, "SET_LOG_PATH ", strlen("SET_LOG_PATH ")) == 0) && (strlen(message) > strlen("SET_LOG_PATH ")+1)){
+                    char *subStr = message + strlen("SET_LOG_PATH") + 1;
+                    mtic_setLogPath(subStr);
+                }
+                else if ((strncmp (message, "SET_DEFINITION_PATH ", strlen("SET_DEFINITION_PATH ")) == 0)
+                         && (strlen(message) > strlen("SET_DEFINITION_PATH ")+1)){
+                    char *subStr = message + strlen("SET_DEFINITION_PATH") + 1;
+                    strncpy(definitionPath, subStr, 1023);
+                }
+                else if ((strncmp (message, "SET_MAPPING_PATH ", strlen("SET_MAPPING_PATH ")) == 0)
+                         && (strlen(message) > strlen("SET_MAPPING_PATH ")+1)){
+                    char *subStr = message + strlen("SET_MAPPING_PATH") + 1;
+                    strncpy(mappingPath, subStr, 1023);
+                }
+                else if (strlen("SAVE_DEFINITION_TO_PATH") == strlen(message) && strncmp (message, "SAVE_DEFINITION_TO_PATH", strlen("SAVE_DEFINITION_TO_PATH")) == 0){
+                    FILE *fp = NULL;
+                    fp = fopen (definitionPath,"w+");
+                    if (fp == NULL){
+                        mtic_error("error when trying to open %s for writing\n", definitionPath);
+                    }else{
+                        char *def = parser_export_definition(mtic_internal_definition);
+                        fprintf(fp, "%s", def);
+                        fflush(fp);
+                        fclose(fp);
+                        free(def);
+                    }
+                }
+                else if (strlen("SAVE_MAPPING_TO_PATH") == strlen(message) && strncmp (message, "SAVE_MAPPING_TO_PATH", strlen("SAVE_MAPPING_TO_PATH")) == 0){
+                    FILE *fp = NULL;
+                    fp = fopen (mappingPath,"w+");
+                    if (fp == NULL){
+                        mtic_error("error when trying to open %s for writing\n", mappingPath);
+                    }else{
+                        char *map = parser_export_mapping(mtic_internal_mapping);
+                        fprintf(fp, "%s", map);
+                        fflush(fp);
+                        fclose(fp);
+                        free(map);
+                    }
+                }
             }
             free(message);
         } else if (streq (event, "EXIT")){
@@ -1060,28 +1100,6 @@ initActor (zsock_t *pipe, void *args)
 ////////////////////////////////////////////////////////////////////////
 // PRIVATE API
 ////////////////////////////////////////////////////////////////////////
-
-void mtic_debug(const char *fmt, ...)
-{
-    if(verboseMode)
-    {
-        va_list ar;
-        va_start(ar, fmt);
-        
-        // Add prefix
-        fprintf(stderr, "[Debug] : ");
-        
-        // Add message
-        vfprintf(stderr, fmt,ar);
-        
-        // Add more information in debug mode
-#ifdef DEBUG
-        //fprintf(stderr, "           ... in %s (%s, line %d).\n", __func__, __FILE__, __LINE__);
-#endif // DEBUG
-        
-        va_end(ar);
-    }
-}
 
 int network_publishOutput (const char* output_name)
 {
@@ -1481,30 +1499,6 @@ char *mtic_getAgentState(){
     return strdup(agentState);
 }
 
-/**
- *  \defgroup setGetLibraryFct Agent: Get / Set general parameters
- *
- */
-
-/**
- * \fn void mtic_setVerbose (bool verbose)
- * \ingroup setGetLibraryFct
- * \brief set or unset verbose mode on the agent to get more details informations.
- * \param verbose is a bool to set or unset the verbose mode
- */
-void mtic_setVerbose (bool verbose){
-    verboseMode = verbose;
-}
-
-/**
- * \fn bool mtic_getVerbose ()
- * \ingroup setGetLibraryFct
- * \brief get current verbose mode of agent.
- * \return true is verbose mode is set or false.
- */
-bool mtic_getVerbose (){
-    return verboseMode;
-}
 
 /**
  * \fn void mtic_setCanBeFrozen (bool canBeFrozen)
