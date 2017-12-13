@@ -776,7 +776,7 @@ Item {
                                 // Compute delta scale according to wheel.angleDelta
                                 deltaScale = Math.pow(1/1.2, Math.abs(wheel.angleDelta.y)/120) ;
 
-                                rootItem.updateZoomOfTimeLine (deltaScale,  wheel.x,  wheel.y);
+                                rootItem.updateZoomOfTimeLine (deltaScale,  wheel.x,  contentArea.contentY + contentArea.height/2);
                             }
                             else if (wheel.angleDelta.y > 0)
                             {
@@ -784,7 +784,7 @@ Item {
                                 // Compute delta scale according to wheel.angleDelta
                                 deltaScale = Math.pow(1.2, Math.abs(wheel.angleDelta.y)/120) ;
 
-                                rootItem.updateZoomOfTimeLine (deltaScale, wheel.x,  wheel.y);
+                                rootItem.updateZoomOfTimeLine (deltaScale, wheel.x,  contentArea.contentY + contentArea.height/2);
                             }
                             // Else: wheel.angleDelta.y  == 0  => invalid wheel event
                         }
