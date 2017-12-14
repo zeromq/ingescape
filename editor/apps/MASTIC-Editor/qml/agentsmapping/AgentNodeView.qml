@@ -869,8 +869,14 @@ Rectangle {
 
             onClicked: {
                 if (controller) {
-                    // Delete our agent
-                    controller.deleteAgentInMapping(model.QtObject);
+                    if(MasticEditorC.canDeleteAgentInMapping(model.QtObject))
+                    {
+                        // Delete our agent
+                        controller.deleteAgentInMapping(model.QtObject);
+                    } else {
+                        console.log("FIXME OPEN CONFIRMATION: remove agent from mapping "+model.name);
+                    }
+
                 }
             }
         }

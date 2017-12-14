@@ -1498,7 +1498,7 @@ Window {
                                     }
                                     color: control.checked? MasticTheme.whiteColor : MasticTheme.lightGreyColor
 
-                                    text: "Allow multiple effects triggers as long as conditions are verified"
+                                    text: "Allow multiple triggers as long as conditions are verified"
                                     elide: Text.ElideRight
 
                                     font {
@@ -1543,6 +1543,7 @@ Window {
 
                             anchors {
                                 left: parent.left;
+                                leftMargin: 18
                             }
 
                             height: 25
@@ -1551,11 +1552,12 @@ Window {
                                 anchors {
                                     verticalCenter: parent.verticalCenter
                                     verticalCenterOffset: 2
+
                                 }
 
                                 color: rearmActionCB.enabled ? (rearmActionCB.checked? MasticTheme.whiteColor : MasticTheme.lightGreyColor) : "#3C3C3B"
 
-                                text: "after "
+                                text: "with trigger every "
                                 elide: Text.ElideRight
 
                                 font {

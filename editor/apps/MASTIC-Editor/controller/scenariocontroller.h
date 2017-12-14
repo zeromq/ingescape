@@ -130,6 +130,12 @@ public:
     void importScenarioFromJson(QByteArray byteArrayOfJson);
 
     /**
+      * @brief Check if an agent is defined into tha actions (conditions and effects)
+      * @param agent name
+      */
+    bool isAgentDefinedInActions(QString agentName);
+
+    /**
       * @brief Open the action editor
       * @param action model
       */
@@ -229,6 +235,13 @@ public:
      * @param line number
      */
     Q_INVOKABLE void moveActionVMAtTimeAndLine(ActionVM* actionVM, int timeInMilliseconds, int lineNumber);
+
+    /**
+     * @brief Can delete an action from the list
+     *        Check dependencies in the timeline
+     * @param action to delete
+     */
+    Q_INVOKABLE bool canDeleteActionFromList(ActionM* actionM);
 
 
 Q_SIGNALS:

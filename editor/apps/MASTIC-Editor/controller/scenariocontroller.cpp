@@ -1606,3 +1606,59 @@ void ScenarioController::moveActionVMAtTimeAndLine(ActionVM* actionVM, int timeI
         }
     }
 }
+
+/**
+  * @brief Check if an agent is defined into tha actions (conditions and effects)
+  * @param agent name
+  */
+bool ScenarioController::isAgentDefinedInActions(QString agentName)
+{
+    bool exists = false;
+
+    foreach (ActionM* actionM, _actionsList.toList())
+    {
+        // Check the action conditions
+        foreach (ActionConditionVM* conditionVM, actionM->conditionsList()->toList())
+        {
+            if(conditionVM->modelM() != NULL && conditionVM->modelM()->agent() != NULL
+                    && conditionVM->modelM()->agent()->name() == agentName)
+            {
+                exists = true;
+                break;
+            }
+        }
+
+        // Check the action effects
+        if(exists == false)
+        {
+            foreach (ActionEffectVM* effectVM, actionM->effectsList()->toList())
+            {
+                if(effectVM->modelM() != NULL && effectVM->modelM()->agent() != NULL
+                        && effectVM->modelM()->agent()->name() == agentName)
+                {
+                    exists = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    return exists;
+}
+
+/**
+ * @brief Can delete an action from the list
+ *        Check dependencies in the timeline
+ * @param action to delete
+ */
+bool ScenarioController::canDeleteActionFromList(ActionM* actionM)
+{
+    bool canBeDeleted = true;
+
+    if(actionM != NULL)
+    {
+        canBeDeleted = !_mapActionsVMsInTimelineFromActionModel.contains(actionM);
+    }
+
+    return canBeDeleted;
+}

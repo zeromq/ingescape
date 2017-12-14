@@ -132,8 +132,13 @@ Item {
                     onClicked: {
                         if (controller)
                         {
-                            // Delete our agent
-                            controller.deleteAgent(model.QtObject);
+                            if(MasticEditorC.canDeleteAgentVMFromList(model.QtObject))
+                            {
+                                // Delete our agent
+                                controller.deleteAgent(model.QtObject);
+                            } else {
+                                console.log("FIXME OPEN CONFIRMATION: remove agent from list "+model.name);
+                            }
                         }
                     }
                 }

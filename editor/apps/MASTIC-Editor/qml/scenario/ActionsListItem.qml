@@ -103,8 +103,14 @@ Item {
                     onClicked: {
                         if (controller)
                         {
-                            // Delete our action
-                            controller.deleteAction(model.QtObject);
+                            if(controller.canDeleteActionFromList(model.QtObject))
+                            {
+                                // Delete our action
+                                controller.deleteAction(model.QtObject);
+                            } else {
+                                console.log("FIXME OPEN CONFIRMATION: remove action from list "+model.name);
+                            }
+
                         }
                     }
                 }

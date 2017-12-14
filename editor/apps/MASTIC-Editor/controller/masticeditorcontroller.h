@@ -133,6 +133,21 @@ public:
       */
      Q_INVOKABLE void processBeforeClosing();
 
+     /**
+      * @brief Can delete an agent view model from the list function
+      *        Check dependencies in the mapping and in the actions (conditions, effects)
+      * @param agent to delete
+      */
+     Q_INVOKABLE bool canDeleteAgentVMFromList(AgentVM* agent);
+
+     /**
+      * @brief Can delete an agent in mapping from the mapping view
+      *        Check dependencies in the actions (conditions, effects)
+      * @param agent in mapping to delete
+      */
+     Q_INVOKABLE bool canDeleteAgentInMapping(AgentInMappingVM* agentInMapping);
+
+
 public Q_SLOTS:
 
      /**
