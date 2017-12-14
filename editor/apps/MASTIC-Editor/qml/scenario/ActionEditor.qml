@@ -1453,6 +1453,7 @@ Window {
                                     }
                                 }
                             }
+
                         }
 
                     }
@@ -1467,67 +1468,214 @@ Window {
                         top : revertActionitem.bottom
                         topMargin: 17
                     }
-                    height : childrenRect.height
+                    height : 50
                     visible : advModesItem.isOpened
                     enabled : visible
 
-                    CheckBox {
-                        id : rearmActionCB
+                    Column {
                         anchors {
                             left: parent.left;
+                            right: parent.right;
                             top : parent.top
                         }
 
-                        checked : actionM && actionM.v;
-                        activeFocusOnPress: true;
 
-                        style: CheckBoxStyle {
-                            label: Text {
+                        CheckBox {
+                            id : rearmActionCB
+                            anchors {
+                                left: parent.left;
+                            }
+
+                            checked : actionM && actionM.shallRearm;
+                            activeFocusOnPress: true;
+                            height: 25
+
+                            style: CheckBoxStyle {
+                                label: Text {
+                                    anchors {
+                                        verticalCenter: parent.verticalCenter
+                                        verticalCenterOffset: 2
+                                    }
+                                    color: control.checked? MasticTheme.whiteColor : MasticTheme.lightGreyColor
+
+                                    text: "Allow multiple effects triggers as long as conditions are verified"
+                                    elide: Text.ElideRight
+
+                                    font {
+                                        family: MasticTheme.textFontFamily
+                                        pixelSize: 16
+                                    }
+                                }
+
+                                indicator: Rectangle {
+                                    implicitWidth: 14
+                                    implicitHeight: 14
+                                    border.width: 0;
+                                    color : MasticTheme.darkBlueGreyColor
+
+                                    I2SvgItem {
+                                        visible : control.checked
+                                        anchors.centerIn: parent
+
+                                        svgFileCache : MasticTheme.svgFileMASTIC;
+                                        svgElementId:  "check";
+
+                                    }
+                                }
+
+                            }
+
+                            onCheckedChanged : {
+                                if (actionM) {
+                                    actionM.shallRearm = checked
+                                }
+                            }
+
+
+                            Binding {
+                                target : rearmActionCB
+                                property : "checked"
+                                value : (actionM && actionM.shallRearm)
+                            }
+                        }
+
+                        Row {
+
+                            anchors {
+                                left: parent.left;
+                            }
+
+                            height: 25
+
+                            Text {
                                 anchors {
                                     verticalCenter: parent.verticalCenter
                                     verticalCenterOffset: 2
                                 }
-                                color: control.checked? MasticTheme.whiteColor : MasticTheme.lightGreyColor
 
-                                text: "Allow multiple effects triggers as long as conditions are verified"
+                                color: rearmActionCB.enabled ? (rearmActionCB.checked? MasticTheme.whiteColor : MasticTheme.lightGreyColor) : "#3C3C3B"
+
+                                text: "after "
                                 elide: Text.ElideRight
 
                                 font {
                                     family: MasticTheme.textFontFamily
                                     pixelSize: 16
                                 }
+
+                                MouseArea {
+                                    anchors.fill: parent
+
+                                    onPressed: {
+                                        rearmActionCB.checked = true;
+                                    }
+                                }
                             }
 
-                            indicator: Rectangle {
-                                implicitWidth: 14
-                                implicitHeight: 14
-                                border.width: 0;
-                                color : MasticTheme.darkBlueGreyColor
+                            TextField {
+                                id: textFieldTimeBeforeRearm
 
-                                I2SvgItem {
-                                    visible : control.checked
-                                    anchors.centerIn: parent
+                                anchors {
+                                    verticalCenter: parent.verticalCenter
+                                    verticalCenterOffset: 2
+                                }
 
-                                    svgFileCache : MasticTheme.svgFileMASTIC;
-                                    svgElementId:  "check";
+                                height: 25
+                                width: 57
+                                enabled: rearmActionCB.enabled
+                                horizontalAlignment: TextInput.AlignLeft
+                                verticalAlignment: TextInput.AlignVCenter
 
+                                text : actionM ? actionM.rearmAfterTimeString : "0.0"
+                                inputMethodHints: Qt.ImhFormattedNumbersOnly
+                                validator: RegExpValidator { regExp: /(\d{1,5})([.]\d{3})?$/ }
+
+                                style: I2TextFieldStyle {
+                                    backgroundColor: MasticTheme.darkBlueGreyColor
+                                    backgroundDisabledColor: "#3C3C3B"
+                                    borderColor: MasticTheme.whiteColor;
+                                    borderErrorColor: MasticTheme.redColor
+                                    radiusTextBox: 1
+                                    borderWidth: 0;
+                                    borderWidthActive: 1
+                                    textIdleColor: MasticTheme.whiteColor;
+                                    textDisabledColor: MasticTheme.darkGreyColor;
+
+                                    padding.left: 3
+                                    padding.right: 3
+
+                                    font {
+                                        pixelSize:14
+                                        family: MasticTheme.textFontFamily
+                                    }
+
+                                }
+
+                                onActiveFocusChanged: {
+                                    if (!activeFocus) {
+                                        // Move cursor to our first character when we lose focus
+                                        // (to always display the beginning or our text instead of
+                                        // an arbitrary part if our text is too long)
+                                        cursorPosition = 0;
+                                    } else {
+                                        textFieldTimeBeforeRearm.selectAll();
+                                    }
+                                }
+
+                                onTextChanged: {
+                                    if (activeFocus &&  actionM ) {
+                                        actionM.rearmAfterTimeString = text;
+                                    }
+                                }
+
+                                Binding {
+                                    target : textFieldTimeBeforeRearm
+                                    property :  "text"
+                                    value : if (actionM) {
+                                                actionM.rearmAfterTimeString
+                                            }
+                                            else {
+                                                "";
+                                            }
+                                }
+
+                                onFocusChanged: {
+                                    if (focus) {
+                                        rearmActionCB.checked = true;
+                                    }
+                                }
+                            }
+
+
+                            Text {
+                                anchors {
+                                    verticalCenter: parent.verticalCenter
+                                    verticalCenterOffset: 2
+                                }
+
+                                color: rearmActionCB.enabled ? (rearmActionCB.checked? MasticTheme.whiteColor : MasticTheme.lightGreyColor) : "#3C3C3B"
+
+                                text: " seconds"
+                                elide: Text.ElideRight
+
+                                font {
+                                    family: MasticTheme.textFontFamily
+                                    pixelSize: 16
+                                }
+
+                                MouseArea {
+                                    anchors.fill: parent
+
+                                    onPressed: {
+                                        rearmActionCB.checked = true;
+                                    }
                                 }
                             }
 
                         }
 
-                        onCheckedChanged : {
-                            if (actionM) {
-                                actionM.shallRearm = checked
-                            }
-                        }
 
 
-                        Binding {
-                            target : rearmActionCB
-                            property : "checked"
-                            value : (actionM && actionM.shallRearm)
-                        }
                     }
 
                 }
