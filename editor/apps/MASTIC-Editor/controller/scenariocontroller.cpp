@@ -1349,7 +1349,7 @@ void ScenarioController::onRevertAction(ActionExecutionVM* actionExecution)
 void ScenarioController::onRearmAction()
 {
     ActionVM* actionVM = qobject_cast<ActionVM*>(sender());
-    qDebug() << "onRearmAction actionVM is "<< (actionVM == NULL ? "NULL" : "NOT NULL");
+
     if (actionVM != NULL)
     {
         // Initialize the start time

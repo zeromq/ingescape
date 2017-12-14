@@ -502,13 +502,18 @@ void ActionVM::resetDataFrom(int time)
         }
     }
 
-    // Create the first action execution
-    if(time <= _startTime)
+    // If the action is empty or the rearm is asked, we can create a new action execution
+    if(_executionsList.count() == 0 || _modelM->shallRearm())
     {
-        // Create the first (view model of) action execution
-        _createActionExecution(0);
-    } else {
-        // Create one default action execution in the current validation duration
-        _createActionExecution(relativeTime);
+        // Create the first action execution
+        if(time <= _startTime)
+        {
+            // Create the first (view model of) action execution
+            _createActionExecution(0);
+        } else {
+            // Create one default action execution in the current validation duration
+            _createActionExecution(relativeTime);
+        }
     }
+
 }
