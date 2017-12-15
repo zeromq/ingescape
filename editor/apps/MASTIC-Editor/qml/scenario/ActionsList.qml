@@ -390,6 +390,11 @@ Item {
 
                         actionItemIsHovered : mouseArea.containsMouse
                         visible: !mouseArea.drag.active
+
+                        onNeedConfirmationtoDeleteAction :  {
+                            deleteConfirmationPopup.myAction = action;
+                            deleteConfirmationPopup.open();
+                        }
                     }
 
                     I2CustomRectangle{
@@ -456,10 +461,7 @@ Item {
     //
     Connections {
         target : controller
-        onDeleteActionConfirmationNeeded :  {
-            deleteConfirmationPopup.myAction = actionConcerned;
-            deleteConfirmationPopup.open();
-        }
+
     }
 
     Editor.DeleteConfirmationPopup {

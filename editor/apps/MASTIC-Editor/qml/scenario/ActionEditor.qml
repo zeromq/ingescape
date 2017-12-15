@@ -20,6 +20,7 @@ import I2Quick 1.0
 
 import MASTIC 1.0
 import "../theme" as Theme;
+import ".." as Editor;
 
 Window {
     id: rootItem
@@ -780,6 +781,9 @@ Window {
                                         width : 148
 
                                         model : controller ? controller.agentsInMappingList : 0
+                                        enabled: (controller && controller.agentsInMappingList.count !== 0 )
+                                        placeholderText : (controller && controller.agentsInMappingList.count === 0 ? "- No Item -" : "- Select an item -")
+
                                         function modelToString(model)
                                         {
                                             return model.name;
@@ -1889,6 +1893,9 @@ Window {
                                         width : 148
 
                                         model : controller ? controller.agentsInMappingList : 0
+                                        enabled: (controller && controller.agentsInMappingList.count !== 0 )
+                                        placeholderText : (controller && controller.agentsInMappingList.count === 0 ? "- No Item -" : "- Select an item -")
+
                                         function modelToString(model)
                                         {
                                             return model.name;
@@ -2301,6 +2308,9 @@ Window {
 
                                         model : controller ? controller.agentsInMappingList : 0
 
+                                        enabled: (controller && controller.agentsInMappingList.count !== 0 )
+                                        placeholderText : (controller && controller.agentsInMappingList.count === 0 ? "- No Item -" : "- Select an item -")
+
                                         function modelToString(model) {
                                             return model.name;
                                         }
@@ -2449,7 +2459,16 @@ Window {
                 hoverEnabled: true
                 onClicked: {
                     if (controller && panelController && panelController.originalAction) {
-                        controller.askToDeleteActionFromList(panelController.originalAction);
+                        if(MasticEditorC.canDeleteActionFromList(panelController.originalAction))
+                        {
+                            if (controller)
+                            {
+                                // Delete our action
+                                controller.deleteAction(panelController.originalAction);
+                            }
+                        } else {
+                            deleteConfirmationPopup.open();
+                        }
                     }
                 }
 
@@ -2574,10 +2593,33 @@ Window {
     }
 
 
+    //
+    // Delete Confirmation
+    //
+    Editor.DeleteConfirmationPopup {
+        id : deleteConfirmationPopup
+
+        confirmationText : "This action is used in the scenario.\nDo you want to completely delete it?"
+        onDeleteConfirmed: {
+            if (panelController.originalAction) {
+                // Delete our action
+                controller.deleteAction(panelController.originalAction);
+            }
+
+        }
+    }
+
 
     I2Layer {
         id: overlayLayerComboBox
         objectName: "overlayLayerComboBox"
+
+        anchors.fill: parent
+    }
+
+    I2Layer {
+        id: overlayLayer
+        objectName: "overlayLayer"
 
         anchors.fill: parent
     }

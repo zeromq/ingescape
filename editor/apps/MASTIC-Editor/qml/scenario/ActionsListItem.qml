@@ -29,6 +29,10 @@ Item {
     height: 42
 
 
+
+    // signal emitted when the delete confirmation popup is needed because the action is already used in the platform
+    signal needConfirmationtoDeleteAction(var action);
+
     //--------------------------------
     //
     // Content
@@ -101,11 +105,17 @@ Item {
                     }
 
                     onClicked: {
-                        if (controller)
-                        {
-                           controller.askToDeleteActionFromList(model.QtObject);
+                         if(MasticEditorC.canDeleteActionFromList(panelController.originalAction))
+                            {
+                                if (controller)
+                                {
+                                    // Delete our action
+                                    controller.deleteAction(panelController.originalAction);
+                                }
+                            } else {
+                                root.needConfirmationtoDeleteAction(panelController.originalAction);
+                            }
                         }
-                    }
                 }
             }
 
