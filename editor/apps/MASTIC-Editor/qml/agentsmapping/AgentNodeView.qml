@@ -127,6 +127,8 @@ Rectangle {
     //--------------------------------
 
 
+    // signal emitted when the delete confirmation popup is needed because the agent is already used in the platform
+    signal needConfirmationtoDeleteAgentInMapping();
 
 
     //--------------------------------
@@ -874,9 +876,8 @@ Rectangle {
                         // Delete our agent
                         controller.deleteAgentInMapping(model.QtObject);
                     } else {
-                        console.log("FIXME OPEN CONFIRMATION: remove agent from mapping "+model.name);
+                        rootItem.needConfirmationtoDeleteAgentInMapping();
                     }
-
                 }
             }
         }

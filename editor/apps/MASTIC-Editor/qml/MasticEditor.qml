@@ -268,19 +268,6 @@ Item {
                     y = rootItem.Window.window.y + rootItem.Window.height/2  - agentDefinitionEditor.height / 2.0 + (index * 40);
                 }
 
-                //            onOpened: {
-                //                agentDefinitionEditor.z = rootItem.popupTopmostZIndex;
-                //                rootItem.popupTopmostZIndex = rootItem.popupTopmostZIndex + 1;
-
-                //                x = x + (index * 40);
-                //                y = y + (index * 40);
-                //            }
-
-                //            onBringToFront: {
-                //                agentDefinitionEditor.z = rootItem.popupTopmostZIndex;
-                //                rootItem.popupTopmostZIndex = rootItem.popupTopmostZIndex + 1;
-                //            }
-
                 onClosing: {
                     MasticEditorC.closeDefinition(model.QtObject);
                 }
@@ -311,16 +298,6 @@ Item {
 
                 }
 
-                //                onOpened: {
-                //                    actionEditor.z = rootItem.popupTopmostZIndex;
-                //                    rootItem.popupTopmostZIndex = rootItem.popupTopmostZIndex + 1;
-                //                }
-
-                //                onBringToFront: {
-                //                    actionEditor.z = rootItem.popupTopmostZIndex;
-                //                    rootItem.popupTopmostZIndex = rootItem.popupTopmostZIndex + 1;
-                //                }
-
                 onClosing: {
                     MasticEditorC.closeActionEditor(model.QtObject);
                 }
@@ -340,15 +317,5 @@ Item {
             x = rootItem.Window.window.x + rootItem.Window.width/2 - historyPanel.width/2;
             y = rootItem.Window.window.y + rootItem.Window.height/2 - historyPanel.height/2;
         }
-
-//        onOpened: {
-//            historyPanel.z = rootItem.popupTopmostZIndex;
-//            rootItem.popupTopmostZIndex = rootItem.popupTopmostZIndex + 1;
-//        }
-
-//        onBringToFront: {
-//            historyPanel.z = rootItem.popupTopmostZIndex;
-//            rootItem.popupTopmostZIndex = rootItem.popupTopmostZIndex + 1;
-//        }
     }
 }

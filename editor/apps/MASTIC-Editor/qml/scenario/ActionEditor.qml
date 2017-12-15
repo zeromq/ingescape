@@ -2449,11 +2449,7 @@ Window {
                 hoverEnabled: true
                 onClicked: {
                     if (controller && panelController && panelController.originalAction) {
-                        controller.deleteAction(panelController.originalAction);
-                    }
-                    else {
-                        // Close our popup
-                        rootItem.close();
+                        // controller.askToDeleteActionFromList(panelController.originalAction);
                     }
                 }
 
