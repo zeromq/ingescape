@@ -475,7 +475,10 @@ Item {
     Editor.DeleteConfirmationPopup {
         id : deleteConfirmationPopup
         onDeleteConfirmed: {
-
+            if(controller)
+            {
+                controller.deleteSelectedAgent();
+            }
         }
     }
 

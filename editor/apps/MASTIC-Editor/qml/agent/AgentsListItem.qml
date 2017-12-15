@@ -137,8 +137,8 @@ Item {
                         {
                             if (controller)
                             {
-                                // Delete our agent
-                                controller.deleteAgent(model.QtObject);
+                                // Delete selected agent
+                                controller.deleteSelectedAgent();
                             }
                         } else {
                             root.needConfirmationtoDeleteAgent();

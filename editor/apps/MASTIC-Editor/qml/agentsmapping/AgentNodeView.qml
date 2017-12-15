@@ -874,7 +874,7 @@ Rectangle {
                     if(MasticEditorC.canDeleteAgentInMapping(model.QtObject))
                     {
                         // Delete our agent
-                        controller.deleteAgentInMapping(model.QtObject);
+                        controller.deleteSelectedAgentInMapping();
                     } else {
                         rootItem.needConfirmationtoDeleteAgentInMapping();
                     }

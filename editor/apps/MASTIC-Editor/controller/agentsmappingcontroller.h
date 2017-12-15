@@ -100,6 +100,12 @@ public:
 
 
     /**
+     * @brief Remove the selected agent from the mapping and delete it
+     */
+    Q_INVOKABLE void deleteSelectedAgentInMapping();
+
+
+    /**
      * @brief Remove a link between two agents from the mapping
      * @param link
      */

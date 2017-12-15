@@ -237,11 +237,13 @@ public:
     Q_INVOKABLE void moveActionVMAtTimeAndLine(ActionVM* actionVM, int timeInMilliseconds, int lineNumber);
 
     /**
-     * @brief Can delete an action from the list
+     * @brief Ask to delete an action from the list
      *        Check dependencies in the timeline
+     *        If possible, the deletion is done, if not a signal is emitted to the QML
+     *        to display a confirmation popup
      * @param action to delete
      */
-    Q_INVOKABLE bool canDeleteActionFromList(ActionM* actionM);
+    Q_INVOKABLE void askToDeleteActionFromList(ActionM* actionM);
 
 
 Q_SIGNALS:
@@ -283,6 +285,11 @@ Q_SIGNALS:
      */
     void commandAskedToAgentAboutMappingInput(QStringList peerIdsList, QString command, QString inputName, QString outputAgentName, QString outputName);
 
+    /**
+     * @brief Emitted when an action deletion is asked
+     * @param action model
+     */
+    void deleteActionConfirmationNeeded(ActionM* actionConcerned);
 
 public Q_SLOTS:
 
