@@ -127,6 +127,16 @@ public:
      */
     void resetConditionsConnections();
 
+    /**
+     * @brief Add effect to the list
+     */
+    void addEffectToList(ActionEffectVM* effectVM);
+
+    /**
+     * @brief Add condition to the list
+     */
+    void addConditionToList(ActionConditionVM* conditionVM);
+
 
 Q_SIGNALS:
 
@@ -140,6 +150,17 @@ protected Q_SLOTS:
      */
     void _onConditionValidationChange(bool isValid);
 
+    /**
+     * @brief Triggered when an agent model associated to an effect has been destroyed from the mapping
+     *        The effect does not need to exist anymore, we can delete it
+     */
+    void _onEffectDestructionAsked();
+
+    /**
+     * @brief Triggered when an agent model associated to a condition has been destroyed from the mapping
+     *        The condition does not need to exist anymore, we can delete it
+     */
+    void _onConditionDestructionAsked();
 
 protected:
 

@@ -78,6 +78,10 @@ public:
 
 Q_SIGNALS:
 
+    /**
+     * @brief Signal the parent that the action condition can be destroyed and removed from the list
+     */
+    void askForDestruction();
 
 public Q_SLOTS:
 

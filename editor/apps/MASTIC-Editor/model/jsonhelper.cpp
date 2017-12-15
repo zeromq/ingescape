@@ -781,7 +781,7 @@ scenario_import_actions_lists_t *JsonHelper::initActionsList(QByteArray byteArra
 
                                     if(effectVM != NULL)
                                     {
-                                        actionM->effectsList()->append(effectVM);
+                                        actionM->addEffectToList(effectVM);
                                     }
                                 }
                             }
@@ -799,7 +799,7 @@ scenario_import_actions_lists_t *JsonHelper::initActionsList(QByteArray byteArra
 
                                     if(conditionVM != NULL)
                                     {
-                                        actionM->conditionsList()->append(conditionVM);
+                                        actionM->addConditionToList(conditionVM);
                                     }
                                 }
                             }

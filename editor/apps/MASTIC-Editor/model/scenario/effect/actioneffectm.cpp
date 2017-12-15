@@ -92,6 +92,8 @@ void ActionEffectM::_onAgentDestroyed(QObject* sender)
     Q_UNUSED(sender)
 
     setagent(NULL);
+
+     Q_EMIT askForDestruction();
 }
 
 
