@@ -29,6 +29,9 @@ import "../agentsmapping" as AgentMapping
 // theme sub-directory
 import "../theme" as Theme;
 
+// parent-directory
+import ".." as Editor;
+
 
 Item {
     id: rootItem
@@ -44,6 +47,8 @@ Item {
     // Controller associated to our view
     property var controller : null;
 
+
+    //
 
     //-----------------------------------------
     //
@@ -443,6 +448,10 @@ Item {
 
                         agentItemIsHovered : mouseArea.containsMouse
                         visible: !mouseArea.drag.active
+
+                        onNeedConfirmationtoDeleteAgent : {
+                             deleteConfirmationPopup.open();
+                        }
                     }
 
                     AgentMapping.AgentNodeView {
@@ -457,6 +466,17 @@ Item {
 
         }
 
+    }
+
+
+    //
+    // Delete Confirmation
+    //
+    Editor.DeleteConfirmationPopup {
+        id : deleteConfirmationPopup
+        onDeleteConfirmed: {
+
+        }
     }
 
 
