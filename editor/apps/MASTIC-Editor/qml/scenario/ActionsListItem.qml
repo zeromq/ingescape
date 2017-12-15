@@ -105,17 +105,18 @@ Item {
                     }
 
                     onClicked: {
-                         if(MasticEditorC.canDeleteActionFromList(panelController.originalAction))
+                        if (controller)
+                        {
+                            if(controller.canDeleteActionFromList(panelController.originalAction))
                             {
-                                if (controller)
-                                {
-                                    // Delete our action
-                                    controller.deleteAction(panelController.originalAction);
-                                }
-                            } else {
+
+                                // Delete our action
+                                controller.deleteAction(panelController.originalAction);
+                            }else {
                                 root.needConfirmationtoDeleteAction(panelController.originalAction);
                             }
                         }
+                    }
                 }
             }
 

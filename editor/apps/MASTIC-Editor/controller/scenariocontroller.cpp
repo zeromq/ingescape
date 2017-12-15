@@ -1646,13 +1646,12 @@ bool ScenarioController::isAgentDefinedInActions(QString agentName)
 }
 
 /**
- * @brief Ask to delete an action from the list
+ * @brief Can delete an action from the list
  *        Check dependencies in the timeline
- *        If possible, the deletion is done, if not a signal is emitted to the QML
- *        to display a confirmation popup
  * @param action to delete
+ * @return can delete response
  */
-void ScenarioController::askToDeleteActionFromList(ActionM* actionM)
+bool ScenarioController::canDeleteActionFromList(ActionM* actionM)
 {
     bool canBeDeleted = true;
 
@@ -1661,10 +1660,5 @@ void ScenarioController::askToDeleteActionFromList(ActionM* actionM)
         canBeDeleted = !_mapActionsVMsInTimelineFromActionModel.contains(actionM);
     }
 
-    if(canBeDeleted == true)
-    {
-        deleteAction(actionM);
-    } else {
-        Q_EMIT deleteActionConfirmationNeeded(actionM);
-    }
+    return canBeDeleted;
 }

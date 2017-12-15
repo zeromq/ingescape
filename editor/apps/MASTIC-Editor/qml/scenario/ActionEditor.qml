@@ -2459,7 +2459,7 @@ Window {
                 hoverEnabled: true
                 onClicked: {
                     if (controller && panelController && panelController.originalAction) {
-                        if(MasticEditorC.canDeleteActionFromList(panelController.originalAction))
+                        if(controller.canDeleteActionFromList(panelController.originalAction))
                         {
                             if (controller)
                             {
