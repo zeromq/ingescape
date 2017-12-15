@@ -33,7 +33,7 @@ Window {
     maximumWidth: 475
     maximumHeight: MasticTheme.appMinHeight
 
-    flags: Qt.Tool
+    flags: Qt.Dialog
 
 //    automaticallyOpenWhenCompleted: true
 //    isModal: false
@@ -161,28 +161,28 @@ Window {
                 }
             }
 
-//            Button {
-//                id: btnCloseEditor
+            Button {
+                id: btnCloseEditor
 
-//                anchors {
-//                    top: parent.top
-//                    right : parent.right
-//                }
+                anchors {
+                    top: parent.top
+                    right : parent.right
+                }
 
-//                activeFocusOnPress: true
-//                style: Theme.LabellessSvgButtonStyle {
-//                    fileCache: MasticTheme.svgFileMASTIC
+                activeFocusOnPress: true
+                style: Theme.LabellessSvgButtonStyle {
+                    fileCache: MasticTheme.svgFileMASTIC
 
-//                    pressedID: releasedID + "-pressed"
-//                    releasedID: "closeEditor"
-//                    disabledID : releasedID
-//                }
+                    pressedID: releasedID + "-pressed"
+                    releasedID: "closeEditor"
+                    disabledID : releasedID
+                }
 
-//                onClicked: {
-//                    // Close our popup
-//                    rootItem.close();
-//                }
-//            }
+                onClicked: {
+                    // Close our popup
+                    rootItem.close();
+                }
+            }
 
             //
             // Name

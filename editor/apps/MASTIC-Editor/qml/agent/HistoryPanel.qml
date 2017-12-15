@@ -33,7 +33,7 @@ Window {
     minimumHeight: 545
 
 
-     flags: Qt.Tool
+    flags: Qt.Dialog
 
 //    isModal: false
 //    dismissOnOutsideTap : false;
@@ -155,30 +155,29 @@ Window {
 
 
 
+        Button {
+            id: btnClose
 
-//        Button {
-//            id: btnClose
+            anchors {
+                verticalCenter: titleItem.verticalCenter
+                right : parent.right
+                rightMargin: 20
+            }
 
-//            anchors {
-//                verticalCenter: titleItem.verticalCenter
-//                right : parent.right
-//                rightMargin: 20
-//            }
+            activeFocusOnPress: true
+            style: Theme.LabellessSvgButtonStyle {
+                fileCache: MasticTheme.svgFileMASTIC
 
-//            activeFocusOnPress: true
-//            style: Theme.LabellessSvgButtonStyle {
-//                fileCache: MasticTheme.svgFileMASTIC
+                pressedID: releasedID + "-pressed"
+                releasedID: "closeEditor"
+                disabledID : releasedID
+            }
 
-//                pressedID: releasedID + "-pressed"
-//                releasedID: "closeEditor"
-//                disabledID : releasedID
-//            }
-
-//            onClicked: {
-//                // Close our popup
-//                rootItem.close();
-//            }
-//        }
+            onClicked: {
+                // Close our popup
+                rootItem.close();
+            }
+        }
 
 
         // Title
