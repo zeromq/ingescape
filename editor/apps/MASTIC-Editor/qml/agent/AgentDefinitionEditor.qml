@@ -146,16 +146,16 @@ Window {
 //        }
 
         // separator
-        Rectangle {
-            anchors {
-                top : parent.top
-                topMargin: 50
-                left : parent.left
-                right : parent.right
-            }
-            height : 1
-            color : MasticTheme.editorsBackgroundBorderColor
-        }
+//        Rectangle {
+//            anchors {
+//                top : parent.top
+//                topMargin: 50
+//                left : parent.left
+//                right : parent.right
+//            }
+//            height : 1
+//            color : MasticTheme.editorsBackgroundBorderColor
+//        }
 
 
         Button {

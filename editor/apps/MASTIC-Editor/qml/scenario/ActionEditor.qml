@@ -36,10 +36,10 @@ Window {
 
     flags: Qt.Dialog
 
-//    automaticallyOpenWhenCompleted: true
-//    isModal: false
-//    dismissOnOutsideTap : false;
-//    keepRelativePositionToInitialParent : false;
+    //    automaticallyOpenWhenCompleted: true
+    //    isModal: false
+    //    dismissOnOutsideTap : false;
+    //    keepRelativePositionToInitialParent : false;
 
 
     //--------------------------------
@@ -85,57 +85,57 @@ Window {
             color: MasticTheme.editorsBackgroundBorderColor
         }
         color: MasticTheme.editorsBackgroundColor
-//        clip : true
+        //        clip : true
 
-//        // catch events
-//        MultiPointTouchArea {
-//            anchors.fill: parent
-//        }
+        //        // catch events
+        //        MultiPointTouchArea {
+        //            anchors.fill: parent
+        //        }
 
         // drag Area
-//        I2CustomRectangle {
-//            id : dragRect
-//            anchors {
-//                top : parent.top
-//                left : parent.left
-//                right : parent.right
-//                margins : 2
-//            }
-//            height : 50
-//            topLeftRadius : 5
-//            topRightRadius : 5
+        //        I2CustomRectangle {
+        //            id : dragRect
+        //            anchors {
+        //                top : parent.top
+        //                left : parent.left
+        //                right : parent.right
+        //                margins : 2
+        //            }
+        //            height : 50
+        //            topLeftRadius : 5
+        //            topRightRadius : 5
 
-//            color :  /dragMouseArea.pressed? MasticTheme.editorsBackgroundColor : MasticTheme.darkBlueGreyColor
+        //            color :  /dragMouseArea.pressed? MasticTheme.editorsBackgroundColor : MasticTheme.darkBlueGreyColor
 
-//            MouseArea {
-//                id : dragMouseArea
-//                hoverEnabled: true
-//                anchors.fill: parent
-//                drag.target: rootItem
+        //            MouseArea {
+        //                id : dragMouseArea
+        //                hoverEnabled: true
+        //                anchors.fill: parent
+        //                drag.target: rootItem
 
-//                drag.minimumX : - rootItem.width/2
-//                drag.maximumX : rootItem.parent.width - rootItem.width/2
-//                drag.minimumY :  0
-//                drag.maximumY :  rootItem.parent.height - rootItem.height/2
+        //                drag.minimumX : - rootItem.width/2
+        //                drag.maximumX : rootItem.parent.width - rootItem.width/2
+        //                drag.minimumY :  0
+        //                drag.maximumY :  rootItem.parent.height - rootItem.height/2
 
-//                onPressed: {
-//                    // Emit signal "bring to front"
-//                    rootItem.bringToFront();
-//                }
-//            }
-//        }
+        //                onPressed: {
+        //                    // Emit signal "bring to front"
+        //                    rootItem.bringToFront();
+        //                }
+        //            }
+        //        }
 
         // separator
-        Rectangle {
-            anchors {
-                top : parent.top
-                topMargin: 50
-                left : parent.left
-                right : parent.right
-            }
-            height : 1
-            color : MasticTheme.editorsBackgroundBorderColor
-        }
+        //        Rectangle {
+        //            anchors {
+        //                top : parent.top
+        //                topMargin: 50
+        //                left : parent.left
+        //                right : parent.right
+        //            }
+        //            height : 1
+        //            color : MasticTheme.editorsBackgroundBorderColor
+        //        }
 
         Item {
             anchors {
@@ -378,6 +378,7 @@ Window {
                     topMargin: 14
                 }
                 height  : isOpened ? 230 : 37
+                clip : true
 
                 Behavior on height {
                     NumberAnimation {}
@@ -387,9 +388,9 @@ Window {
 
                 Connections {
                     target : rootItem
-                    Component.onCompleted : {
+                    onActiveChanged : {
                         // make the conditions list visible if there are conditions
-                        if (actionM && actionM.conditionsList.count > 0) {
+                        if (rootItem.active && actionM && actionM.conditionsList.count > 0) {
                             conditionsItem.isOpened = true;
                         }
                     }
@@ -628,17 +629,17 @@ Window {
                         topMargin: 8
                         right : parent.right
                         left : parent.left
-                        bottom : parent.bottom
+                        bottom : conditionsItem.bottom
                     }
 
-                    visible : conditionsItem.isOpened
-                    enabled : visible
+                    enabled: conditionsItem.isOpened
 
                     style: MasticScrollViewStyle {
                     }
 
                     // Prevent drag overshoot on Windows
                     flickableItem.boundsBehavior: Flickable.OvershootBounds
+
 
 
                     //
@@ -651,7 +652,7 @@ Window {
                         width : scrollViewCondition.width - 9 // scrollbar size + 1
 
                         Repeater {
-                            model : actionM ? actionM.conditionsList : 0
+                            model : (actionM &&  conditionsItem.isOpened) ? actionM.conditionsList : 0
 
                             Rectangle {
                                 height : 62
@@ -2121,6 +2122,9 @@ Window {
                                         width : 148
 
                                         model : controller ? controller.agentsInMappingList : 0
+
+                                        enabled: (controller && controller.agentsInMappingList.count !== 0 )
+                                        placeholderText : (controller && controller.agentsInMappingList.count === 0 ? "- No Item -" : "- Select an item -")
 
                                         function modelToString(model) {
                                             return model.name;
