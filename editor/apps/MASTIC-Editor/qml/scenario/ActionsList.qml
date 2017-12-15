@@ -454,13 +454,13 @@ Item {
     //
     // Delete Confirmation
     //
-//    Connections {
-//        target : controller
-//        onDeleteActionConfirmationNeeded :  {
-//            deleteConfirmationPopup.myAction = actionConcerned;
-//            deleteConfirmationPopup.open();
-//        }
-//    }
+    Connections {
+        target : controller
+        onDeleteActionConfirmationNeeded :  {
+            deleteConfirmationPopup.myAction = actionConcerned;
+            deleteConfirmationPopup.open();
+        }
+    }
 
     Editor.DeleteConfirmationPopup {
         id : deleteConfirmationPopup

@@ -2449,7 +2449,7 @@ Window {
                 hoverEnabled: true
                 onClicked: {
                     if (controller && panelController && panelController.originalAction) {
-                        // controller.askToDeleteActionFromList(panelController.originalAction);
+                        controller.askToDeleteActionFromList(panelController.originalAction);
                     }
                 }
 

@@ -103,7 +103,7 @@ Item {
                     onClicked: {
                         if (controller)
                         {
-                           // controller.askToDeleteActionFromList(model.QtObject);
+                           controller.askToDeleteActionFromList(model.QtObject);
                         }
                     }
                 }

@@ -64,7 +64,7 @@ public:
     /**
      * @brief Delete the selected agent from the list
      */
-    void deleteSelectedAgent();
+    Q_INVOKABLE void deleteSelectedAgent();
 
 
     /**

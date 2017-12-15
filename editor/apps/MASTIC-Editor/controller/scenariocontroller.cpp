@@ -208,14 +208,14 @@ void ScenarioController::deleteAction(ActionM * actionM)
     // Delete the popup if necessary
     if(actionM != NULL && _mapActionsEditorControllersFromActionM.contains(actionM))
     {
-        _mapActionsEditorControllersFromActionM.remove(actionM);
         ActionEditorController* actionEditorC = _mapActionsEditorControllersFromActionM.value(actionM);
         if(actionEditorC != NULL)
         {
             _openedActionsEditorsControllers.remove(actionEditorC);
             delete actionEditorC;
-            actionEditorC = NULL;
+            actionEditorC = NULL;      
         }
+        _mapActionsEditorControllersFromActionM.remove(actionM);
     }
 
     // Unselect our action if needed
@@ -577,7 +577,6 @@ void ScenarioController::removeActionVMFromTimeLine(ActionVM * actionVM)
         // Delete action view model editor if exists
         if(_mapActionsEditorControllersFromActionVM.contains(actionVM))
         {
-            _mapActionsEditorControllersFromActionVM.remove(actionVM);
             ActionEditorController* actionEditorC = _mapActionsEditorControllersFromActionVM.value(actionVM);
             if(actionEditorC != NULL)
             {
@@ -585,7 +584,7 @@ void ScenarioController::removeActionVMFromTimeLine(ActionVM * actionVM)
                 delete actionEditorC;
                 actionEditorC = NULL;
             }
-
+            _mapActionsEditorControllersFromActionVM.remove(actionVM);
         }
 
         delete actionVM;
@@ -1647,11 +1646,13 @@ bool ScenarioController::isAgentDefinedInActions(QString agentName)
 }
 
 /**
- * @brief Can delete an action from the list
+ * @brief Ask to delete an action from the list
  *        Check dependencies in the timeline
+ *        If possible, the deletion is done, if not a signal is emitted to the QML
+ *        to display a confirmation popup
  * @param action to delete
  */
-bool ScenarioController::canDeleteActionFromList(ActionM* actionM)
+void ScenarioController::askToDeleteActionFromList(ActionM* actionM)
 {
     bool canBeDeleted = true;
 
@@ -1660,5 +1661,10 @@ bool ScenarioController::canDeleteActionFromList(ActionM* actionM)
         canBeDeleted = !_mapActionsVMsInTimelineFromActionModel.contains(actionM);
     }
 
-    return canBeDeleted;
+    if(canBeDeleted == true)
+    {
+        deleteAction(actionM);
+    } else {
+        Q_EMIT deleteActionConfirmationNeeded(actionM);
+    }
 }
