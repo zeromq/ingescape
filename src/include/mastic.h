@@ -58,11 +58,12 @@ typedef void (*mtic_freezeCallback)(bool isPaused, void *myData);
 PUBLIC int mtic_observeFreeze(mtic_freezeCallback cb, void *myData);
 PUBLIC void mtic_setCanBeFrozen(bool canBeFrozen);
 
-//There are three non-exclusive ways to check & control the execution of the mastic
+//There are four non-exclusive ways to check & control the execution of the mastic
 //instance and its hosting application:
 //1- using mtic_start* and mtic_stop from the hosting app
 //2- monitoring the status of mtic_Interrupted in the hosting app
-//3- using mtic_observeForcedStop below and providing a callback
+//3- using mtic_observeForcedStop below and providing a callback using parent thread
+//4- setting mtic_Interrupted from Mastic callbacks and arranging to call mtic_stop from main thread when mtic_Interrupted is set to true
 
 PUBLIC extern bool mtic_Interrupted;
 //register a callback when the agent is asked to stop on the network
