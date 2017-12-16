@@ -127,6 +127,8 @@ Rectangle {
     //--------------------------------
 
 
+    // signal emitted when the delete confirmation popup is needed because the agent is already used in the platform
+    signal needConfirmationtoDeleteAgentInMapping();
 
 
     //--------------------------------
@@ -869,8 +871,13 @@ Rectangle {
 
             onClicked: {
                 if (controller) {
-                    // Delete our agent
-                    controller.deleteAgentInMapping(model.QtObject);
+                    if(MasticEditorC.canDeleteAgentInMapping(model.QtObject))
+                    {
+                        // Delete our agent
+                        controller.deleteSelectedAgentInMapping();
+                    } else {
+                        rootItem.needConfirmationtoDeleteAgentInMapping();
+                    }
                 }
             }
         }

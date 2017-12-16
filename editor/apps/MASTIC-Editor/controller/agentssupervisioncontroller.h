@@ -51,7 +51,7 @@ public:
      * @brief Destructor
      */
     ~AgentsSupervisionController();
-    
+
 
     /**
      * @brief Get the list of view models of agent from a name
@@ -62,10 +62,9 @@ public:
 
 
     /**
-     * @brief Delete an agent from the list
-     * @param agent to delete
+     * @brief Delete the selected agent from the list
      */
-    Q_INVOKABLE void deleteAgent(AgentVM* agent);
+    Q_INVOKABLE void deleteSelectedAgent();
 
 
     /**

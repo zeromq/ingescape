@@ -75,7 +75,6 @@ Item {
         viewController.pixelsPerMinute *= deltaScale;
     }
 
-
     function dragViewWithDelta (deltaX, deltaY) {
 
         var maxXOfTimeline = contentArea.contentWidth - contentArea.width;
@@ -105,6 +104,19 @@ Item {
 
     }
 
+
+    //--------------------------------
+    //
+    // Behavior
+    //
+    //--------------------------------
+    Connections {
+        target: MasticEditorC
+        onResetMappindAndTimeLineViews : {
+            contentArea.contentX = 0;
+            contentArea.contentY = 0;
+        }
+    }
 
     //--------------------------------
     //

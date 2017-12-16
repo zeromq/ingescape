@@ -20,6 +20,7 @@ import I2Quick 1.0
 
 import MASTIC 1.0
 import "../theme" as Theme;
+import ".." as Editor;
 
 Window {
     id: rootItem
@@ -33,12 +34,12 @@ Window {
     maximumWidth: 475
     maximumHeight: MasticTheme.appMinHeight
 
-    flags: Qt.Tool
+    flags: Qt.Dialog
 
-//    automaticallyOpenWhenCompleted: true
-//    isModal: false
-//    dismissOnOutsideTap : false;
-//    keepRelativePositionToInitialParent : false;
+    //    automaticallyOpenWhenCompleted: true
+    //    isModal: false
+    //    dismissOnOutsideTap : false;
+    //    keepRelativePositionToInitialParent : false;
 
 
     //--------------------------------
@@ -84,57 +85,57 @@ Window {
             color: MasticTheme.editorsBackgroundBorderColor
         }
         color: MasticTheme.editorsBackgroundColor
-//        clip : true
+        //        clip : true
 
-//        // catch events
-//        MultiPointTouchArea {
-//            anchors.fill: parent
-//        }
+        //        // catch events
+        //        MultiPointTouchArea {
+        //            anchors.fill: parent
+        //        }
 
         // drag Area
-//        I2CustomRectangle {
-//            id : dragRect
-//            anchors {
-//                top : parent.top
-//                left : parent.left
-//                right : parent.right
-//                margins : 2
-//            }
-//            height : 50
-//            topLeftRadius : 5
-//            topRightRadius : 5
+        //        I2CustomRectangle {
+        //            id : dragRect
+        //            anchors {
+        //                top : parent.top
+        //                left : parent.left
+        //                right : parent.right
+        //                margins : 2
+        //            }
+        //            height : 50
+        //            topLeftRadius : 5
+        //            topRightRadius : 5
 
-//            color :  /dragMouseArea.pressed? MasticTheme.editorsBackgroundColor : MasticTheme.darkBlueGreyColor
+        //            color :  /dragMouseArea.pressed? MasticTheme.editorsBackgroundColor : MasticTheme.darkBlueGreyColor
 
-//            MouseArea {
-//                id : dragMouseArea
-//                hoverEnabled: true
-//                anchors.fill: parent
-//                drag.target: rootItem
+        //            MouseArea {
+        //                id : dragMouseArea
+        //                hoverEnabled: true
+        //                anchors.fill: parent
+        //                drag.target: rootItem
 
-//                drag.minimumX : - rootItem.width/2
-//                drag.maximumX : rootItem.parent.width - rootItem.width/2
-//                drag.minimumY :  0
-//                drag.maximumY :  rootItem.parent.height - rootItem.height/2
+        //                drag.minimumX : - rootItem.width/2
+        //                drag.maximumX : rootItem.parent.width - rootItem.width/2
+        //                drag.minimumY :  0
+        //                drag.maximumY :  rootItem.parent.height - rootItem.height/2
 
-//                onPressed: {
-//                    // Emit signal "bring to front"
-//                    rootItem.bringToFront();
-//                }
-//            }
-//        }
+        //                onPressed: {
+        //                    // Emit signal "bring to front"
+        //                    rootItem.bringToFront();
+        //                }
+        //            }
+        //        }
 
         // separator
-        Rectangle {
-            anchors {
-                top : parent.top
-                topMargin: 50
-                left : parent.left
-                right : parent.right
-            }
-            height : 1
-            color : MasticTheme.editorsBackgroundBorderColor
-        }
+        //        Rectangle {
+        //            anchors {
+        //                top : parent.top
+        //                topMargin: 50
+        //                left : parent.left
+        //                right : parent.right
+        //            }
+        //            height : 1
+        //            color : MasticTheme.editorsBackgroundBorderColor
+        //        }
 
         Item {
             anchors {
@@ -161,28 +162,28 @@ Window {
                 }
             }
 
-//            Button {
-//                id: btnCloseEditor
+            Button {
+                id: btnCloseEditor
 
-//                anchors {
-//                    top: parent.top
-//                    right : parent.right
-//                }
+                anchors {
+                    top: parent.top
+                    right : parent.right
+                }
 
-//                activeFocusOnPress: true
-//                style: Theme.LabellessSvgButtonStyle {
-//                    fileCache: MasticTheme.svgFileMASTIC
+                activeFocusOnPress: true
+                style: Theme.LabellessSvgButtonStyle {
+                    fileCache: MasticTheme.svgFileMASTIC
 
-//                    pressedID: releasedID + "-pressed"
-//                    releasedID: "closeEditor"
-//                    disabledID : releasedID
-//                }
+                    pressedID: releasedID + "-pressed"
+                    releasedID: "closeEditor"
+                    disabledID : releasedID
+                }
 
-//                onClicked: {
-//                    // Close our popup
-//                    rootItem.close();
-//                }
-//            }
+                onClicked: {
+                    // Close our popup
+                    rootItem.close();
+                }
+            }
 
             //
             // Name
@@ -377,6 +378,7 @@ Window {
                     topMargin: 14
                 }
                 height  : isOpened ? 230 : 37
+                clip : true
 
                 Behavior on height {
                     NumberAnimation {}
@@ -386,9 +388,9 @@ Window {
 
                 Connections {
                     target : rootItem
-                    Component.onCompleted : {
+                    onActiveChanged : {
                         // make the conditions list visible if there are conditions
-                        if (actionM && actionM.conditionsList.count > 0) {
+                        if (rootItem.active && actionM && actionM.conditionsList.count > 0) {
                             conditionsItem.isOpened = true;
                         }
                     }
@@ -627,17 +629,17 @@ Window {
                         topMargin: 8
                         right : parent.right
                         left : parent.left
-                        bottom : parent.bottom
+                        bottom : conditionsItem.bottom
                     }
 
-                    visible : conditionsItem.isOpened
-                    enabled : visible
+                    enabled: conditionsItem.isOpened
 
                     style: MasticScrollViewStyle {
                     }
 
                     // Prevent drag overshoot on Windows
                     flickableItem.boundsBehavior: Flickable.OvershootBounds
+
 
 
                     //
@@ -650,7 +652,7 @@ Window {
                         width : scrollViewCondition.width - 9 // scrollbar size + 1
 
                         Repeater {
-                            model : actionM ? actionM.conditionsList : 0
+                            model : (actionM &&  conditionsItem.isOpened) ? actionM.conditionsList : 0
 
                             Rectangle {
                                 height : 62
@@ -780,6 +782,9 @@ Window {
                                         width : 148
 
                                         model : controller ? controller.agentsInMappingList : 0
+                                        enabled: (controller && controller.agentsInMappingList.count !== 0 )
+                                        placeholderText : (controller && controller.agentsInMappingList.count === 0 ? "- No Item -" : "- Select an item -")
+
                                         function modelToString(model)
                                         {
                                             return model.name;
@@ -1498,7 +1503,7 @@ Window {
                                     }
                                     color: control.checked? MasticTheme.whiteColor : MasticTheme.lightGreyColor
 
-                                    text: "Allow multiple effects triggers as long as conditions are verified"
+                                    text: "Allow multiple triggers as long as conditions are verified"
                                     elide: Text.ElideRight
 
                                     font {
@@ -1543,6 +1548,7 @@ Window {
 
                             anchors {
                                 left: parent.left;
+                                leftMargin: 18
                             }
 
                             height: 25
@@ -1551,11 +1557,12 @@ Window {
                                 anchors {
                                     verticalCenter: parent.verticalCenter
                                     verticalCenterOffset: 2
+
                                 }
 
                                 color: rearmActionCB.enabled ? (rearmActionCB.checked? MasticTheme.whiteColor : MasticTheme.lightGreyColor) : "#3C3C3B"
 
-                                text: "after "
+                                text: "with trigger every "
                                 elide: Text.ElideRight
 
                                 font {
@@ -1887,6 +1894,9 @@ Window {
                                         width : 148
 
                                         model : controller ? controller.agentsInMappingList : 0
+                                        enabled: (controller && controller.agentsInMappingList.count !== 0 )
+                                        placeholderText : (controller && controller.agentsInMappingList.count === 0 ? "- No Item -" : "- Select an item -")
+
                                         function modelToString(model)
                                         {
                                             return model.name;
@@ -2113,6 +2123,9 @@ Window {
 
                                         model : controller ? controller.agentsInMappingList : 0
 
+                                        enabled: (controller && controller.agentsInMappingList.count !== 0 )
+                                        placeholderText : (controller && controller.agentsInMappingList.count === 0 ? "- No Item -" : "- Select an item -")
+
                                         function modelToString(model) {
                                             return model.name;
                                         }
@@ -2299,6 +2312,9 @@ Window {
 
                                         model : controller ? controller.agentsInMappingList : 0
 
+                                        enabled: (controller && controller.agentsInMappingList.count !== 0 )
+                                        placeholderText : (controller && controller.agentsInMappingList.count === 0 ? "- No Item -" : "- Select an item -")
+
                                         function modelToString(model) {
                                             return model.name;
                                         }
@@ -2447,11 +2463,16 @@ Window {
                 hoverEnabled: true
                 onClicked: {
                     if (controller && panelController && panelController.originalAction) {
-                        controller.deleteAction(panelController.originalAction);
-                    }
-                    else {
-                        // Close our popup
-                        rootItem.close();
+                        if(controller.canDeleteActionFromList(panelController.originalAction))
+                        {
+                            if (controller)
+                            {
+                                // Delete our action
+                                controller.deleteAction(panelController.originalAction);
+                            }
+                        } else {
+                            deleteConfirmationPopup.open();
+                        }
                     }
                 }
 
@@ -2576,10 +2597,33 @@ Window {
     }
 
 
+    //
+    // Delete Confirmation
+    //
+    Editor.DeleteConfirmationPopup {
+        id : deleteConfirmationPopup
+
+        confirmationText : "This action is used in the scenario.\nDo you want to completely delete it?"
+        onDeleteConfirmed: {
+            if (panelController.originalAction) {
+                // Delete our action
+                controller.deleteAction(panelController.originalAction);
+            }
+
+        }
+    }
+
 
     I2Layer {
         id: overlayLayerComboBox
         objectName: "overlayLayerComboBox"
+
+        anchors.fill: parent
+    }
+
+    I2Layer {
+        id: overlayLayer
+        objectName: "overlayLayer"
 
         anchors.fill: parent
     }

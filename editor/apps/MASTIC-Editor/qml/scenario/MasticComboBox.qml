@@ -12,16 +12,25 @@ I2Combobox {
 
     style : I2ComboboxStyle {
         backgroundColorIdle : MasticTheme.darkBlueGreyColor
+        backgroundColorDisabled: MasticTheme.darkBlueGreyColor
         borderWidthIdle : 0
         borderColorPressed: MasticTheme.darkBlueGreyColor
         borderWidthPressed: 1
         currentTextColorIdle : MasticTheme.whiteColor
+        placeholderTextColor: MasticTheme.greyColor
+        currentTextColorDisabled:  MasticTheme.greyColor
         backgroundColorPressed : MasticTheme.darkGreyColor2
         radius: 1
 
         font {
             family : MasticTheme.textFontFamily
             pixelSize : 15
+        }
+
+        placeholderFont {
+            family : MasticTheme.textFontFamily
+            pixelSize : 15
+            italic : true
         }
 
         listBackgroundColorIdle : "#2C333E"

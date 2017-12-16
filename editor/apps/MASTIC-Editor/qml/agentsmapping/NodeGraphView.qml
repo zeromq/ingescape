@@ -20,7 +20,8 @@ import I2Quick 1.0
 
 import MASTIC 1.0
 
-
+// parent-directory
+import ".." as Editor;
 
 Item {
     id: rootItem
@@ -281,6 +282,12 @@ Item {
     }
 
 
+    Connections {
+        target: MasticEditorC
+        onResetMappindAndTimeLineViews : {
+            rootItem.showAll();
+        }
+    }
 
 
     //--------------------------------
@@ -638,6 +645,10 @@ Item {
 
                         agentMappingVM : model.QtObject
                         controller : rootItem.controller
+
+                        onNeedConfirmationtoDeleteAgentInMapping : {
+                             deleteConfirmationPopup.open();
+                        }
                     }
                 }
             }
@@ -677,4 +688,23 @@ Item {
         }
 
     }
+
+
+
+    //
+    // Delete Confirmation
+    //
+    Editor.DeleteConfirmationPopup {
+        id : deleteConfirmationPopup
+
+        confirmationText : "This agent is used in the actions.\nDo you want to delete it?"
+        onDeleteConfirmed: {
+            if(controller)
+            {
+                // Delete our agent
+                controller.deleteSelectedAgentInMapping();
+            }
+        }
+    }
+
 }

@@ -235,6 +235,17 @@ void AgentsMappingController::deleteAgentInMapping(AgentInMappingVM* agent)
     }
 }
 
+/**
+ * @brief Remove the selected agent from the mapping and delete it
+ */
+void AgentsMappingController::deleteSelectedAgentInMapping()
+{
+    if(_selectedAgent != NULL)
+    {
+        deleteAgentInMapping(_selectedAgent);
+    }
+}
+
 
 /**
  * @brief Remove a link between two agents from the mapping

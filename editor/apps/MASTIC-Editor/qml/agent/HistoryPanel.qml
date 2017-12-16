@@ -33,7 +33,7 @@ Window {
     minimumHeight: 545
 
 
-     flags: Qt.Tool
+    flags: Qt.Dialog
 
 //    isModal: false
 //    dismissOnOutsideTap : false;
@@ -142,43 +142,42 @@ Window {
 //        }
 
         // separator
-        Rectangle {
-            anchors {
-                top : parent.top
-                topMargin: 50
-                left : parent.left
-                right : parent.right
-            }
-            height : 1
-            color : MasticTheme.editorsBackgroundBorderColor
-        }
-
-
-
-
-//        Button {
-//            id: btnClose
-
+//        Rectangle {
 //            anchors {
-//                verticalCenter: titleItem.verticalCenter
+//                top : parent.top
+//                topMargin: 50
+//                left : parent.left
 //                right : parent.right
-//                rightMargin: 20
 //            }
-
-//            activeFocusOnPress: true
-//            style: Theme.LabellessSvgButtonStyle {
-//                fileCache: MasticTheme.svgFileMASTIC
-
-//                pressedID: releasedID + "-pressed"
-//                releasedID: "closeEditor"
-//                disabledID : releasedID
-//            }
-
-//            onClicked: {
-//                // Close our popup
-//                rootItem.close();
-//            }
+//            height : 1
+//            color : MasticTheme.editorsBackgroundBorderColor
 //        }
+
+
+
+        Button {
+            id: btnClose
+
+            anchors {
+                verticalCenter: titleItem.verticalCenter
+                right : parent.right
+                rightMargin: 20
+            }
+
+            activeFocusOnPress: true
+            style: Theme.LabellessSvgButtonStyle {
+                fileCache: MasticTheme.svgFileMASTIC
+
+                pressedID: releasedID + "-pressed"
+                releasedID: "closeEditor"
+                disabledID : releasedID
+            }
+
+            onClicked: {
+                // Close our popup
+                rootItem.close();
+            }
+        }
 
 
         // Title

@@ -19,6 +19,8 @@ import QtQuick.Controls.Styles 1.4
 import QtQuick.Window 2.3
 
 import I2Quick 1.0
+// parent-directory
+import ".." as Editor;
 
 import MASTIC 1.0
 import "../theme" as Theme
@@ -388,6 +390,11 @@ Item {
 
                         actionItemIsHovered : mouseArea.containsMouse
                         visible: !mouseArea.drag.active
+
+                        onNeedConfirmationtoDeleteAction :  {
+                            deleteConfirmationPopup.myAction = action;
+                            deleteConfirmationPopup.open();
+                        }
                     }
 
                     I2CustomRectangle{
@@ -449,7 +456,27 @@ Item {
     }
 
 
+    //
+    // Delete Confirmation
+    //
+    Connections {
+        target : controller
 
+    }
+
+    Editor.DeleteConfirmationPopup {
+        id : deleteConfirmationPopup
+        property var myAction : null;
+
+        confirmationText : "This action is used in the scenario.\nDo you want to completely delete it?"
+        onDeleteConfirmed: {
+            if (myAction) {
+                // Delete our action
+                controller.deleteAction(myAction);
+            }
+
+        }
+    }
 
 
 }

@@ -112,7 +112,7 @@ void ActionEditorController::createNewCondition()
         conditionVM->modelM()->setagent(_listAgentsInMapping->at(0));
     }
 
-    _editedAction->conditionsList()->append(conditionVM);
+    _editedAction->addConditionToList(conditionVM);
 
     // Set condition VM type
     conditionVM->setconditionType(ActionConditionType::VALUE);
@@ -151,7 +151,7 @@ void ActionEditorController::createNewEffect()
         }
     }
 
-    _editedAction->effectsList()->append(effectVM);
+    _editedAction->addEffectToList(effectVM);
 
     // Set effect VM type
     effectVM->seteffectType(ActionEffectTypes::VALUE);

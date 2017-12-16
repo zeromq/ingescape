@@ -81,19 +81,19 @@ I2CubicBezierCurve {
                 switch (mapBetweenIOPVM.outputAgent.reducedMapValueTypeGroupInOutput)
                 {
                 case AgentIOPValueTypeGroups.NUMBER:
-                    outputModel.isPublishedNewValue ? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
+                    (outputModel.isPublishedNewValue && MasticEditorC.modelManager.isActivatedMapping) ? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
                     break;
                 case AgentIOPValueTypeGroups.STRING:
-                    outputModel.isPublishedNewValue ? MasticTheme.redColor2 : MasticTheme.darkRedColor2
+                    (outputModel.isPublishedNewValue && MasticEditorC.modelManager.isActivatedMapping) ? MasticTheme.redColor2 : MasticTheme.darkRedColor2
                     break;
                 case AgentIOPValueTypeGroups.IMPULSION:
-                    outputModel.isPublishedNewValue ? MasticTheme.purpleColor : MasticTheme.darkPurpleColor
+                    (outputModel.isPublishedNewValue && MasticEditorC.modelManager.isActivatedMapping) ? MasticTheme.purpleColor : MasticTheme.darkPurpleColor
                     break;
                 case AgentIOPValueTypeGroups.DATA:
-                    outputModel.isPublishedNewValue ? MasticTheme.greenColor : MasticTheme.darkGreenColor
+                    (outputModel.isPublishedNewValue && MasticEditorC.modelManager.isActivatedMapping) ? MasticTheme.greenColor : MasticTheme.darkGreenColor
                     break;
                 case AgentIOPValueTypeGroups.MIXED:
-                    outputModel.isPublishedNewValue ? MasticTheme.whiteColor : MasticTheme.darkGreyColor
+                    (outputModel.isPublishedNewValue && MasticEditorC.modelManager.isActivatedMapping) ? MasticTheme.whiteColor : MasticTheme.darkGreyColor
                     break;
                 case AgentIOPValueTypeGroups.UNKNOWN:
                     "#000000"
@@ -110,19 +110,19 @@ I2CubicBezierCurve {
                     switch (outputModel.firstModel.agentIOPValueTypeGroup)
                     {
                     case AgentIOPValueTypeGroups.NUMBER:
-                        outputModel.isPublishedNewValue ? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
+                        (outputModel.isPublishedNewValue && MasticEditorC.modelManager.isActivatedMapping) ? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
                         break;
                     case AgentIOPValueTypeGroups.STRING:
-                        outputModel.isPublishedNewValue ? MasticTheme.redColor2 : MasticTheme.darkRedColor2
+                        (outputModel.isPublishedNewValue && MasticEditorC.modelManager.isActivatedMapping) ? MasticTheme.redColor2 : MasticTheme.darkRedColor2
                         break;
                     case AgentIOPValueTypeGroups.IMPULSION:
-                        outputModel.isPublishedNewValue ? MasticTheme.purpleColor : MasticTheme.darkPurpleColor
+                        (outputModel.isPublishedNewValue && MasticEditorC.modelManager.isActivatedMapping) ? MasticTheme.purpleColor : MasticTheme.darkPurpleColor
                         break;
                     case AgentIOPValueTypeGroups.DATA:
-                        outputModel.isPublishedNewValue ? MasticTheme.greenColor : MasticTheme.darkGreenColor
+                        (outputModel.isPublishedNewValue && MasticEditorC.modelManager.isActivatedMapping) ? MasticTheme.greenColor : MasticTheme.darkGreenColor
                         break;
                     case AgentIOPValueTypeGroups.MIXED:
-                        outputModel.isPublishedNewValue ? MasticTheme.whiteColor : MasticTheme.darkGreyColor
+                        (outputModel.isPublishedNewValue && MasticEditorC.modelManager.isActivatedMapping) ? MasticTheme.whiteColor : MasticTheme.darkGreyColor
                         break;
                     case AgentIOPValueTypeGroups.UNKNOWN:
                         "#000000"

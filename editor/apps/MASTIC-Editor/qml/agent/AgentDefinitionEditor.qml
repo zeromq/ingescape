@@ -33,8 +33,7 @@ Window {
     minimumWidth: 666
     minimumHeight:420
 
-    flags: Qt.Tool
-
+    flags: Qt.Dialog
 
 //    automaticallyOpenWhenCompleted: true
 //    isModal: false
@@ -84,7 +83,7 @@ Window {
     //--------------------------------
 
     // Emitted when user pressed our popup
-    //signal bringToFront();
+    // signal bringToFront();
 
 
     // Emitted when user clicks on "istory" button
@@ -147,41 +146,41 @@ Window {
 //        }
 
         // separator
-        Rectangle {
-            anchors {
-                top : parent.top
-                topMargin: 50
-                left : parent.left
-                right : parent.right
-            }
-            height : 1
-            color : MasticTheme.editorsBackgroundBorderColor
-        }
-
-
-//        Button {
-//            id: btnCloseEditor
-
+//        Rectangle {
 //            anchors {
-//                verticalCenter: definitionNameItem.verticalCenter
+//                top : parent.top
+//                topMargin: 50
+//                left : parent.left
 //                right : parent.right
-//                rightMargin: 20
 //            }
-
-//            activeFocusOnPress: true
-//            style: Theme.LabellessSvgButtonStyle {
-//                fileCache: MasticTheme.svgFileMASTIC
-
-//                pressedID: releasedID + "-pressed"
-//                releasedID: "closeEditor"
-//                disabledID : releasedID
-//            }
-
-//            onClicked: {
-//                // Close our popup
-//                rootItem.close();
-//            }
+//            height : 1
+//            color : MasticTheme.editorsBackgroundBorderColor
 //        }
+
+
+        Button {
+            id: btnCloseEditor
+
+            anchors {
+                verticalCenter: definitionNameItem.verticalCenter
+                right : parent.right
+                rightMargin: 20
+            }
+
+            activeFocusOnPress: true
+            style: Theme.LabellessSvgButtonStyle {
+                fileCache: MasticTheme.svgFileMASTIC
+
+                pressedID: releasedID + "-pressed"
+                releasedID: "closeEditor"
+                disabledID : releasedID
+            }
+
+            onClicked: {
+                // Close our popup
+                rootItem.close();
+            }
+        }
 
 
         // Definition name and version

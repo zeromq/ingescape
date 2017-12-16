@@ -571,3 +571,49 @@ void MasticEditorController::processBeforeClosing()
     savePlatformToDefaultFile();
 }
 
+/**
+ * @brief Can delete an agent view model from the list function
+ *        Check dependencies in the mapping and in the actions (conditions, effects)
+ * @param agent to delete
+ */
+bool MasticEditorController::canDeleteAgentVMFromList(AgentVM* agent)
+{
+    bool canBeDeleted = true;
+
+    // Check if the agent is in the curent mapping
+    if (_agentsMappingC && (agent != NULL))
+    {
+        AgentInMappingVM* agentInMapping = _agentsMappingC->getAgentInMappingFromName(agent->name());
+        if(agentInMapping != NULL)
+        {
+            canBeDeleted = false;
+        }
+    }
+
+    // Check if the agent is in action condition or effect
+    if(canBeDeleted == true && _scenarioC != NULL)
+    {
+        canBeDeleted = !_scenarioC->isAgentDefinedInActions(agent->name());
+
+    }
+
+    return canBeDeleted;
+}
+
+/**
+ * @brief Can delete an agent in mapping from the mapping view
+ *        Check dependencies in the actions (conditions, effects)
+ * @param agent in mapping to delete
+ */
+bool MasticEditorController::canDeleteAgentInMapping(AgentInMappingVM* agentInMapping)
+{
+    bool canBeDeleted = true;
+
+    // Check if the agent is in action condition or effect
+    if(_scenarioC != NULL)
+    {
+        canBeDeleted = !_scenarioC->isAgentDefinedInActions(agentInMapping->name());
+    }
+
+    return canBeDeleted;
+}

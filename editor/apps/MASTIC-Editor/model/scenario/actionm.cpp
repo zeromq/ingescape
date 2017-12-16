@@ -159,7 +159,7 @@ void ActionM::copyFrom(ActionM* actionModel)
                 break;
             }
 
-            _effectsList.append(copiedEffectVM);
+            addEffectToList(copiedEffectVM);
         }
 
 
@@ -181,7 +181,7 @@ void ActionM::copyFrom(ActionM* actionModel)
                 copiedIopCondition->copyFrom(conditionVM->modelM());
                 copiedConditionVM->setmodelM(copiedIopCondition);
             }
-            _conditionsList.append(copiedConditionVM);
+            addConditionToList(copiedConditionVM);
         }
     }
 }
@@ -445,4 +445,76 @@ void ActionM::_onConditionValidationChange(bool isValid)
     setisValid(actionValidation);
 }
 
+
+/**
+ * @brief Add effect to the list
+ */
+void ActionM::addEffectToList(ActionEffectVM* effectVM)
+{
+    if(effectVM != NULL && effectVM->modelM())
+    {
+        connect(effectVM->modelM(), &ActionEffectM::askForDestruction, this, &ActionM::_onEffectDestructionAsked);
+    }
+
+    _effectsList.append(effectVM);
+}
+
+/**
+ * @brief Add condition to the list
+ */
+void ActionM::addConditionToList(ActionConditionVM* conditionVM)
+{
+    if(conditionVM != NULL && conditionVM->modelM())
+    {
+        connect(conditionVM->modelM(), &ActionConditionM::askForDestruction, this, &ActionM::_onConditionDestructionAsked);
+    }
+
+    _conditionsList.append(conditionVM);
+}
+
+/**
+ * @brief Triggered when an agent model associated to an effect has been destroyed from the mapping
+ *        The effect does not need to exist anymore, we can delete it
+ */
+void ActionM::_onEffectDestructionAsked()
+{
+    ActionEffectM* actionEffect = qobject_cast<ActionEffectM*>(sender());
+    if (actionEffect != NULL)
+    {
+        disconnect(actionEffect, &ActionEffectM::askForDestruction, this, &ActionM::_onEffectDestructionAsked);
+
+        foreach (ActionEffectVM * effectVM, _effectsList.toList())
+        {
+            if(effectVM != NULL && effectVM->modelM() == actionEffect)
+            {
+                _effectsList.remove(effectVM);
+                delete effectVM;
+                effectVM = NULL;
+            }
+        }
+    }
+}
+
+/**
+ * @brief Triggered when an agent model associated to a condition has been destroyed from the mapping
+ *        The condition does not need to exist anymore, we can delete it
+ */
+void ActionM::_onConditionDestructionAsked()
+{
+    ActionConditionM* actionCondition = qobject_cast<ActionConditionM*>(sender());
+    if (actionCondition != NULL)
+    {
+        disconnect(actionCondition, &ActionConditionM::askForDestruction, this, &ActionM::_onConditionDestructionAsked);
+
+        foreach (ActionConditionVM * conditionVM, _conditionsList.toList())
+        {
+            if(conditionVM != NULL && conditionVM->modelM() == actionCondition)
+            {
+                _conditionsList.remove(conditionVM);
+                delete conditionVM;
+                conditionVM = NULL;
+            }
+        }
+    }
+}
 

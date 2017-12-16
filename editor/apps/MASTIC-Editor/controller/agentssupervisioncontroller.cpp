@@ -81,29 +81,28 @@ QList<AgentVM*> AgentsSupervisionController::getAgentViewModelsListFromName(QStr
 
 
 /**
- * @brief Delete an agent from the list
- * @param agent to delete
+ * @brief Delete the selected agent from the list
  */
-void AgentsSupervisionController::deleteAgent(AgentVM* agent)
+void AgentsSupervisionController::deleteSelectedAgent()
 {
-    if ((_modelManager != NULL) && (agent != NULL))
+    if ((_modelManager != NULL) && (_selectedAgent != NULL))
     {
-        qDebug() << "Delete agent" << agent->name();
+        qDebug() << "Delete _selectedAgent " << _selectedAgent->name();
 
         // Remove it from the list
-        _agentsList.remove(agent);
+        _agentsList.remove(_selectedAgent);
 
         // Reset its definition
-        agent->setdefinition(NULL);
+        _selectedAgent->setdefinition(NULL);
 
-        // Delete each model of agent
-        foreach (AgentM* model, agent->models()->toList()) {
+        // Delete each model of _selectedAgent
+        foreach (AgentM* model, _selectedAgent->models()->toList()) {
             _modelManager->deleteAgentModel(model);
         }
 
-        // Delete the view model of agent
-        _deleteAgentViewModel(agent);
-        agent = NULL;
+        // Delete the view model of _selectedAgent
+        _deleteAgentViewModel(_selectedAgent);
+        setselectedAgent(NULL);
     }
 }
 

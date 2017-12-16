@@ -208,14 +208,14 @@ void ScenarioController::deleteAction(ActionM * actionM)
     // Delete the popup if necessary
     if(actionM != NULL && _mapActionsEditorControllersFromActionM.contains(actionM))
     {
-        _mapActionsEditorControllersFromActionM.remove(actionM);
         ActionEditorController* actionEditorC = _mapActionsEditorControllersFromActionM.value(actionM);
         if(actionEditorC != NULL)
         {
             _openedActionsEditorsControllers.remove(actionEditorC);
             delete actionEditorC;
-            actionEditorC = NULL;
+            actionEditorC = NULL;      
         }
+        _mapActionsEditorControllersFromActionM.remove(actionM);
     }
 
     // Unselect our action if needed
@@ -577,7 +577,6 @@ void ScenarioController::removeActionVMFromTimeLine(ActionVM * actionVM)
         // Delete action view model editor if exists
         if(_mapActionsEditorControllersFromActionVM.contains(actionVM))
         {
-            _mapActionsEditorControllersFromActionVM.remove(actionVM);
             ActionEditorController* actionEditorC = _mapActionsEditorControllersFromActionVM.value(actionVM);
             if(actionEditorC != NULL)
             {
@@ -585,7 +584,7 @@ void ScenarioController::removeActionVMFromTimeLine(ActionVM * actionVM)
                 delete actionEditorC;
                 actionEditorC = NULL;
             }
-
+            _mapActionsEditorControllersFromActionVM.remove(actionVM);
         }
 
         delete actionVM;
@@ -1605,4 +1604,61 @@ void ScenarioController::moveActionVMAtTimeAndLine(ActionVM* actionVM, int timeI
             }
         }
     }
+}
+
+/**
+  * @brief Check if an agent is defined into tha actions (conditions and effects)
+  * @param agent name
+  */
+bool ScenarioController::isAgentDefinedInActions(QString agentName)
+{
+    bool exists = false;
+
+    foreach (ActionM* actionM, _actionsList.toList())
+    {
+        // Check the action conditions
+        foreach (ActionConditionVM* conditionVM, actionM->conditionsList()->toList())
+        {
+            if(conditionVM->modelM() != NULL && conditionVM->modelM()->agent() != NULL
+                    && conditionVM->modelM()->agent()->name() == agentName)
+            {
+                exists = true;
+                break;
+            }
+        }
+
+        // Check the action effects
+        if(exists == false)
+        {
+            foreach (ActionEffectVM* effectVM, actionM->effectsList()->toList())
+            {
+                if(effectVM->modelM() != NULL && effectVM->modelM()->agent() != NULL
+                        && effectVM->modelM()->agent()->name() == agentName)
+                {
+                    exists = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    return exists;
+}
+
+/**
+ * @brief Can delete an action from the list
+ *        Check dependencies in the timeline
+ * @param action to delete
+ * @return can delete response
+ */
+bool ScenarioController::canDeleteActionFromList(ActionM* actionM)
+{
+    bool canBeDeleted = true;
+
+    if(actionM != NULL)
+    {
+        canBeDeleted = !_mapActionsVMsInTimelineFromActionModel.contains(actionM);
+    }
+
+    return canBeDeleted;
 }
