@@ -34,6 +34,9 @@ class TimeTickM : public QObject
     // The second part (0 to 59) of the time associated to our tick
     I2_QML_PROPERTY_READONLY(int, second)
 
+    // The millisecond part (0 to 99) of the time associated to our tick
+    I2_QML_PROPERTY_READONLY(int, millisecond)
+
     // Type of ticks
     I2_QML_PROPERTY_READONLY(TimeTickTypes::Value, type)
 
@@ -46,7 +49,7 @@ class TimeTickM : public QObject
     I2_QML_PROPERTY_READONLY(bool, isSmallTick)
 
     // Relative time in seconds associated to our tick (0: today at 00:00:00)
-    I2_QML_PROPERTY_READONLY(int, timeInSeconds)
+    I2_QML_PROPERTY_READONLY(int, timeInMilliSeconds)
 
     // Textual representation (label) of our time value
     // NB: to avoid useless computations in QML
@@ -57,12 +60,11 @@ public:
      * @brief Default constructor
      *
      * @param relativeDay
-     * @param hour
-     * @param minute
+     * @param milliseconds
      * @param type
      * @param parent
      */
-    explicit TimeTickM(int hour, int minute, int second, TimeTickTypes::Value type, QObject *parent = 0);
+    explicit TimeTickM(int milliseconds, TimeTickTypes::Value type, QObject *parent = 0);
 };
 
 QML_DECLARE_TYPE(TimeTickM)
