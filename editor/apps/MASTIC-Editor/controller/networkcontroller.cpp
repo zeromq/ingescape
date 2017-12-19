@@ -426,6 +426,9 @@ NetworkController::NetworkController(QObject *parent) : QObject(parent),
     // Set trace mode
     mtic_setVerbose(true);
 
+    // Avoid editor to trigger output publising on mapped agents
+    mtic_setNotifyMappedAgents(false);
+
     // Set the name of our agent
     mtic_setAgentName(_editorAgentName.toStdString().c_str());
 
