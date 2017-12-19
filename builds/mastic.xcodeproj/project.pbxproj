@@ -2896,6 +2896,7 @@
 					"$(SRCROOT)/../dependencies/ios/ios/include/",
 					"$(SRCROOT)/../src/include/",
 				);
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/../dependencies/ios/ios/lib/";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = mastic;
@@ -2912,6 +2913,7 @@
 					"$(SRCROOT)/../dependencies/ios/ios/include/",
 					"$(SRCROOT)/../src/include/",
 				);
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/../dependencies/ios/ios/lib/";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = mastic;
