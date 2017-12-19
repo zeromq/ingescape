@@ -59,7 +59,6 @@ class AbstractTimeActionslineScenarioViewController : public QObject
     // Time margin in pixels
     I2_QML_PROPERTY(int, timeMarginInPixels)
 
-
     // Minimum size in pixels of a minute
     I2_QML_PROPERTY_READONLY_FUZZY_COMPARE(qreal, minPixelsPerMinute)
 
@@ -83,6 +82,12 @@ public:
 
 
     public Q_SLOTS:
+
+        /**
+         * @brief Update time coordinates of X axis according to zoom levels
+         * @return
+         */
+        void updateTimeCoordinatesOfTimeTicks();
 
         /**
          * @brief Convert a given time value into a X value (abscissa) of our coordinate system
@@ -164,13 +169,12 @@ public:
        // Our last date-time value (Tend) i.e. the last time tick
        QTime _endTime;
 
-       // Relative time in seconds associated to our last time tick (Tend)
-       int _endRelativeTimeInSeconds;
-
-
        // Total time period in minutes (Tend - T0)
        qreal _totalTimePeriodInMinutes;
 
+
+       // Time in seconds between two time ticks in X axis
+       int _timeRangeBetweenTimeTicksInMilliSeconds;
 
     };
 

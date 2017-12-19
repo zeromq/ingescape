@@ -105,15 +105,14 @@ Item {
                     }
 
                     onClicked: {
-                        if (controller)
+                        if (controller && root.action)
                         {
-                            if(controller.canDeleteActionFromList(panelController.originalAction))
+                            if(controller.canDeleteActionFromList(root.action))
                             {
-
                                 // Delete our action
-                                controller.deleteAction(panelController.originalAction);
+                                controller.deleteAction(root.action);
                             }else {
-                                root.needConfirmationtoDeleteAction(panelController.originalAction);
+                                root.needConfirmationtoDeleteAction(root.action);
                             }
                         }
                     }

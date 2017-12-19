@@ -8,23 +8,26 @@
  * @brief Default constructor
  *
  * @param relativeDay
- * @param hour
- * @param minute
+ * @param milliseconds
  * @param type
  * @param parent
  */
-TimeTickM::TimeTickM(int hour, int minute, int second, TimeTickTypes::Value type, QObject *parent):
+TimeTickM::TimeTickM(int milliseconds, TimeTickTypes::Value type, QObject *parent):
     QObject(parent),
-    _hour(hour),
-    _minute(minute),
-    _second(second),
     _type(type)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
     // Set our time in seconds
-    _timeInSeconds = hour * 3600 + minute * 60 + second;
+    _timeInMilliSeconds = milliseconds;
+
+    // set hour minute and second
+    QTime time = QTime::fromMSecsSinceStartOfDay(_timeInMilliSeconds);
+
+    _hour = time.hour();
+    _minute = time.minute();
+    _second = time.second();
 
     // Set our flags
     _isBigTick = (type == TimeTickTypes::BIG_TICK);

@@ -213,7 +213,7 @@ Item {
                     // NB: two items to avoid complex QML bindings that
                     //     are interpreted by the Javascript stack
                     delegate : Item {
-                        x: viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(model.timeInSeconds*1000, viewController.pixelsPerMinute)
+                        x: viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(model.timeInMilliSeconds, viewController.pixelsPerMinute)
                         y: 0
 
                         I2Line {
@@ -249,10 +249,6 @@ Item {
             enabled: true;
 
             onPinchStarted: {
-                // Disable our flickable to avoid issues while we're pinching
-                // i.e. we want to avoid that our flickable somehow figures out
-                // that it should flick if we move our touch points too much
-                contentArea.interactive = false;
             }
 
             onPinchUpdated: {
@@ -267,11 +263,15 @@ Item {
             }
 
             onPinchFinished: {
-                // Re-enable our flickable
-                //contentArea.interactive = true;
+                // update time coordinates X axis
+                if (viewController)
+                {
+                    viewController.updateTimeCoordinatesOfTimeTicks();
+                }
 
                 // Move content of our flickable within bounds
                 contentArea.returnToBounds();
+
             }
 
 
@@ -366,6 +366,13 @@ Item {
                                 rootItem.updateZoomOfTimeLine (deltaScale, contentArea.contentX + wheel.x,  contentArea.contentY + contentArea.height/2);
                             }
                             // Else: wheel.angleDelta.y  == 0  => invalid wheel event
+
+
+                            // update time coordinates X axis
+                            if (viewController)
+                            {
+                                viewController.updateTimeCoordinatesOfTimeTicks();
+                            }
                         }
 
                         // else navigation in vertical
@@ -387,6 +394,7 @@ Item {
                         interactive: false
 
                         boundsBehavior: Flickable.StopAtBounds;
+
 
                         //
                         // Dynamic content of our view
@@ -652,6 +660,26 @@ Item {
                             }
 
                         }
+
+
+                    }
+
+                    //
+                    // Vertical scroll bar
+                    //
+                    Rectangle {
+                        id : scrollBarVertical
+                        y: contentArea.visibleArea.yPosition * contentArea.height
+                        anchors {
+                            right : contentArea.right
+                        }
+                        width : 8
+                        height: contentArea.visibleArea.heightRatio * contentArea.height
+
+                        color: MasticTheme.lightGreyColor
+                        opacity : 0.8
+                        radius: 10
+                        visible : contentArea.visibleArea.heightRatio < 1
                     }
                 }
 
@@ -804,6 +832,13 @@ Item {
                                 rootItem.updateZoomOfTimeLine (deltaScale, wheel.x,  contentArea.contentY + contentArea.height/2);
                             }
                             // Else: wheel.angleDelta.y  == 0  => invalid wheel event
+
+
+                            // update time coordinates X axis
+                            if (viewController)
+                            {
+                                viewController.updateTimeCoordinatesOfTimeTicks();
+                            }
                         }
 
                         // else navigation along timeline
@@ -831,7 +866,7 @@ Item {
                     model:  viewController.timeTicks
 
                     delegate: Item {
-                        x: viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(model.timeInSeconds*1000, viewController.pixelsPerMinute)
+                        x: viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(model.timeInMilliSeconds, viewController.pixelsPerMinute)
                         anchors {
                             top : columnHeadersContent.top
                             bottom : columnHeadersContent.bottom
@@ -957,7 +992,7 @@ Item {
                             when: currentTimeMouseArea.drag.active
                         }
 
-                        // CurrentTimeItem => Scrollbar
+                        // CurrentTimeItem => viewController
                         Binding {
                             target: currentTimeItem
                             property: "x"
@@ -996,7 +1031,7 @@ Item {
         color : MasticTheme.blackColor
 
         Rectangle {
-            id : scrollBar
+            id : scrollBarHorizontal
             anchors {
                 verticalCenter: parent.verticalCenter
             }
@@ -1018,15 +1053,15 @@ Item {
             MouseArea {
                 id: mouseArea
 
-                anchors.fill: scrollBar
+                anchors.fill: scrollBarHorizontal
 
                 hoverEnabled: true
 
                 drag.smoothed: false
-                drag.target: scrollBar
+                drag.target: scrollBarHorizontal
 
                 drag.minimumX : 0
-                drag.maximumX : scrollTimeLine.width - scrollBar.width
+                drag.maximumX : scrollTimeLine.width - scrollBarHorizontal.width
                 drag.minimumY : 0
                 drag.maximumY :  0
             }
@@ -1168,12 +1203,12 @@ Item {
 
 
 
-    // Scrollbar => contentArea
+    // scrollBarHorizontal => contentArea
     Binding {
         target: contentArea
         property: "contentX"
         value: if (viewController) {
-                   (scrollBar.x * viewController.timeTicksTotalWidth)/scrollTimeLine.width
+                   (scrollBarHorizontal.x * viewController.timeTicksTotalWidth)/scrollTimeLine.width
                }
                else {
                    0
@@ -1181,9 +1216,9 @@ Item {
         when: mouseArea.drag.active
     }
 
-    // viewController => Scrollbar
+    // viewController => scrollBarHorizontal
     Binding {
-        target: scrollBar
+        target: scrollBarHorizontal
         property: "x"
         value: if (viewController) {
                    (viewController.viewportX*scrollTimeLine.width)/viewController.timeTicksTotalWidth

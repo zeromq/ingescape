@@ -6,8 +6,8 @@
 #define DEFAULT_VIEWPORT_WIDTH 1400.0
 
 // Minimum and maximum values to constrain "zoom" levels
-#define MINIMUM_TIME_RANGE 1.0
-#define MAXIMUM_TIME_RANGE 30.0
+#define MINIMUM_TIME_RANGE 0.1
+#define MAXIMUM_TIME_RANGE 60.0
 
 // Default "time range" in minutes
 #define DEFAULT_TIME_RANGE 2.0
@@ -15,6 +15,13 @@
 
 // Total length of timeline in hours
 #define LENGTH_TIME_LINE 2.0
+
+// time ranges number
+#define TIME_RANGES_COUNT 8
+// time ranges for time ticks
+int TIME_RANGES[TIME_RANGES_COUNT] = {1, 2, 5, 10, 30, 60, 120, 300};
+
+
 
 #include "abstracttimeactionslinescenarioviewcontroller.h"
 
@@ -64,37 +71,30 @@ AbstractTimeActionslineScenarioViewController::AbstractTimeActionslineScenarioVi
     _startRelativeTimeInSeconds = 0;
 
     _endTime = QTime(LENGTH_TIME_LINE, 0, 0);
-    _endRelativeTimeInSeconds = 3600 * LENGTH_TIME_LINE;
 
-    // Today - from 00:00 to 23:55
-    for (int hours = 0; hours < LENGTH_TIME_LINE; hours++)
+    // Compute time period in minutes
+    _totalTimePeriodInMinutes = LENGTH_TIME_LINE * 60.0;
+
+    // range per default
+    _timeRangeBetweenTimeTicksInMilliSeconds = TIME_RANGES[4]*1000;
+
+    for (int milliseconds = 0; milliseconds < (_totalTimePeriodInMinutes*60000.0); milliseconds += _timeRangeBetweenTimeTicksInMilliSeconds/3)
     {
-        for (int minutes = 0; minutes < 60; minutes += 1)
-        {
-            for (int seconds = 0; seconds < 60; seconds += 5)
-            {
-                // Check if we have a big tick
-                bool isBigTick = (seconds == 0 || seconds == 30);
-                TimeTickTypes::Value type = (isBigTick ? TimeTickTypes::BIG_TICK : (TimeTickTypes::NORMAL_TICK));
+        // Check if we have a normal tick
+        bool isBigTick = ((milliseconds%_timeRangeBetweenTimeTicksInMilliSeconds) == 0);
+        TimeTickTypes::Value type = (isBigTick ? TimeTickTypes::BIG_TICK : TimeTickTypes::NORMAL_TICK);
 
-                // Create a new tick and save it
-                TimeTickM* timeTick = new TimeTickM(hours, minutes, seconds, type);
-                timeTicksList.append(timeTick);
-            }
-        }
+        // Create a new tick and save it
+        TimeTickM* timeTick = new TimeTickM(milliseconds, type);
+        timeTicksList.append(timeTick);
     }
 
     // - Add a last time tick (for decoration purposes only)
-    TimeTickM* timeTick = new TimeTickM(LENGTH_TIME_LINE, 0, 0, TimeTickTypes::BIG_TICK);
+    TimeTickM* timeTick = new TimeTickM((_totalTimePeriodInMinutes*60000.0), TimeTickTypes::BIG_TICK);
     timeTicksList.append(timeTick);
 
     // Save our list of time ticks
     _timeTicks.append(timeTicksList);
-
-    // Compute time period in minutes
-    // NB: we can not rely on _endDateTime and _startDateTime because _currentReferenceDate can be invalid
-    _totalTimePeriodInMinutes = LENGTH_TIME_LINE * 60.0;
-
 
     // Updata our X axis
     _updateCoordinateSystemAbscissaAxis();
@@ -108,6 +108,72 @@ AbstractTimeActionslineScenarioViewController::~AbstractTimeActionslineScenarioV
 {
     // Clean-up our list of time ticks
     _timeTicks.deleteAllItems();
+}
+
+
+
+/**
+ * @brief Update time coordinates of X axis according to zoom levels
+ * @return
+ */
+void AbstractTimeActionslineScenarioViewController::updateTimeCoordinatesOfTimeTicks() {
+
+    // change time coordinates if needed
+    qreal viewportTimeRangeInSeconds =  DEFAULT_VIEWPORT_WIDTH/(_pixelsPerMinute/60.0);
+
+    qreal minDeltaBetweenTicks = viewportTimeRangeInSeconds/12.0;
+    qreal previousTimeRange = _timeRangeBetweenTimeTicksInMilliSeconds;
+
+    for (int index = 0; index < TIME_RANGES_COUNT; index ++)
+    {
+        if (minDeltaBetweenTicks < TIME_RANGES[index])
+        {
+            _timeRangeBetweenTimeTicksInMilliSeconds = TIME_RANGES[index]*1000;
+            break;
+        }
+    }
+
+    // change time ticks list if the range has changed
+    if (_timeRangeBetweenTimeTicksInMilliSeconds != previousTimeRange)
+    {
+        // clear the ticks list
+        _timeTicks.deleteAllItems();
+
+        // Build our list of ticks
+        QList<TimeTickM*> timeTicksList;
+
+        // the number of small ticks is different according to the time range between big ticks
+        int rangeForSmallTicks;
+        if ( (_timeRangeBetweenTimeTicksInMilliSeconds/1000) == 5 || (_timeRangeBetweenTimeTicksInMilliSeconds/1000) == 300) {
+            rangeForSmallTicks = _timeRangeBetweenTimeTicksInMilliSeconds/5;
+        } else if ((_timeRangeBetweenTimeTicksInMilliSeconds/1000) == 30)  {
+            rangeForSmallTicks = _timeRangeBetweenTimeTicksInMilliSeconds/3;
+        } else {
+            rangeForSmallTicks = _timeRangeBetweenTimeTicksInMilliSeconds/2;
+        }
+
+        for (int milliseconds = 0; milliseconds < (_totalTimePeriodInMinutes*60000.0); milliseconds += rangeForSmallTicks)
+        {
+            // Check if we have a normal tick or a big one
+            bool isBigTick = ((milliseconds%_timeRangeBetweenTimeTicksInMilliSeconds) == 0);
+            TimeTickTypes::Value type = (isBigTick ? TimeTickTypes::BIG_TICK : TimeTickTypes::NORMAL_TICK);
+
+            // Create a new tick and save it
+            TimeTickM* timeTick = new TimeTickM(milliseconds, type);
+            timeTicksList.append(timeTick);
+        }
+
+        // - Add a last time tick (for decoration purposes only)
+        TimeTickM* timeTick = new TimeTickM((_totalTimePeriodInMinutes*60000.0), TimeTickTypes::BIG_TICK);
+        timeTicksList.append(timeTick);
+
+        // Save our new list of time ticks
+        _timeTicks.append(timeTicksList);
+    }
+
+
+    // Updata our X axis
+    _updateCoordinateSystemAbscissaAxis();
 }
 
 
@@ -252,7 +318,6 @@ qreal AbstractTimeActionslineScenarioViewController::convertDurationInMillisecon
 }
 
 
-
 /**
   * @brief Called when the abscissa axis of our coordinate system needs to be updated
   */
@@ -265,6 +330,9 @@ void AbstractTimeActionslineScenarioViewController::_updateCoordinateSystemAbsci
     Q_EMIT coordinateSystemAbscissaAxisChanged();
     Q_EMIT coordinateSystemAbscissaAndOrdinateAxesChanged();
 }
+
+
+
 
 
 
