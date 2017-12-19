@@ -459,18 +459,13 @@ Item {
     //
     // Delete Confirmation
     //
-    Connections {
-        target : controller
-
-    }
-
     Editor.DeleteConfirmationPopup {
         id : deleteConfirmationPopup
         property var myAction : null;
 
         confirmationText : "This action is used in the scenario.\nDo you want to completely delete it?"
         onDeleteConfirmed: {
-            if (myAction) {
+            if (myAction && controller) {
                 // Delete our action
                 controller.deleteAction(myAction);
             }

@@ -84,10 +84,10 @@ public:
     public Q_SLOTS:
 
         /**
-         * @brief Update time coordonnates of X axis according to zoom levels
+         * @brief Update time coordinates of X axis according to zoom levels
          * @return
          */
-        void updateTimeCoordonnatesOfTimeTicks();
+        void updateTimeCoordinatesOfTimeTicks();
 
         /**
          * @brief Convert a given time value into a X value (abscissa) of our coordinate system

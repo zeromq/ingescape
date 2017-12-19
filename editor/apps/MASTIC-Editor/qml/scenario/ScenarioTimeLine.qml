@@ -395,6 +395,7 @@ Item {
 
                         boundsBehavior: Flickable.StopAtBounds;
 
+
                         //
                         // Dynamic content of our view
                         //
@@ -659,6 +660,26 @@ Item {
                             }
 
                         }
+
+
+                    }
+
+                    //
+                    // Vertical scroll bar
+                    //
+                    Rectangle {
+                        id : scrollBarVertical
+                        y: contentArea.visibleArea.yPosition * contentArea.height
+                        anchors {
+                            right : contentArea.right
+                        }
+                        width : 8
+                        height: contentArea.visibleArea.heightRatio * contentArea.height
+
+                        color: MasticTheme.lightGreyColor
+                        opacity : 0.8
+                        radius: 10
+                        visible : contentArea.visibleArea.heightRatio < 1
                     }
                 }
 
@@ -971,7 +992,7 @@ Item {
                             when: currentTimeMouseArea.drag.active
                         }
 
-                        // CurrentTimeItem => Scrollbar
+                        // CurrentTimeItem => viewController
                         Binding {
                             target: currentTimeItem
                             property: "x"
@@ -1010,7 +1031,7 @@ Item {
         color : MasticTheme.blackColor
 
         Rectangle {
-            id : scrollBar
+            id : scrollBarHorizontal
             anchors {
                 verticalCenter: parent.verticalCenter
             }
@@ -1032,15 +1053,15 @@ Item {
             MouseArea {
                 id: mouseArea
 
-                anchors.fill: scrollBar
+                anchors.fill: scrollBarHorizontal
 
                 hoverEnabled: true
 
                 drag.smoothed: false
-                drag.target: scrollBar
+                drag.target: scrollBarHorizontal
 
                 drag.minimumX : 0
-                drag.maximumX : scrollTimeLine.width - scrollBar.width
+                drag.maximumX : scrollTimeLine.width - scrollBarHorizontal.width
                 drag.minimumY : 0
                 drag.maximumY :  0
             }
@@ -1182,12 +1203,12 @@ Item {
 
 
 
-    // Scrollbar => contentArea
+    // scrollBarHorizontal => contentArea
     Binding {
         target: contentArea
         property: "contentX"
         value: if (viewController) {
-                   (scrollBar.x * viewController.timeTicksTotalWidth)/scrollTimeLine.width
+                   (scrollBarHorizontal.x * viewController.timeTicksTotalWidth)/scrollTimeLine.width
                }
                else {
                    0
@@ -1195,9 +1216,9 @@ Item {
         when: mouseArea.drag.active
     }
 
-    // viewController => Scrollbar
+    // viewController => scrollBarHorizontal
     Binding {
-        target: scrollBar
+        target: scrollBarHorizontal
         property: "x"
         value: if (viewController) {
                    (viewController.viewportX*scrollTimeLine.width)/viewController.timeTicksTotalWidth
