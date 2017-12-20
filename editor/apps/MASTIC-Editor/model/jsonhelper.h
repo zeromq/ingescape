@@ -82,7 +82,7 @@ public:
      * @param byteArrayOfJson
      * @return
      */
-    QList<QPair<QString, DefinitionM*>> initAgentsList(QByteArray byteArrayOfJson);
+    QList<QPair<QStringList, DefinitionM*>> initAgentsList(QByteArray byteArrayOfJson);
 
 
     /**
@@ -95,9 +95,9 @@ public:
 
     /**
      * @brief Export the agents list
-     * @param agentsListToExport list of pairs <agent name, definition>
+     * @param agentsListToExport list of pairs <agent name (and parameters to restart), definition>
      */
-    QByteArray exportAgentsList(QList<QPair<QString, DefinitionM*>> agentsListToExport);
+    QByteArray exportAgentsList(QList<QPair<QStringList, DefinitionM*>> agentsListToExport);
 
 
     /**

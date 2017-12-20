@@ -316,8 +316,8 @@ Item {
         Button {
             id: offButton
 
-            // Already appeared on the network AND (agent is "ON" OR agent can be restarted)
-            visible: (root.agent && !root.agent.neverAppearedOnNetwork && (root.agent.isON || root.agent.canBeRestarted))
+            // Agent is "ON" OR Agent can be restarted
+            visible: (root.agent && (root.agent.isON || root.agent.canBeRestarted))
 
             activeFocusOnPress: true
             enabled: visible
