@@ -100,27 +100,17 @@ Item {
     //
     // Bottom panel
     //
-    I2CustomRectangle {
-        id: bottomPanel
-
+    Scenario.ScenarioTimeLine {
+        id : bottomPanel
         anchors {
             left: leftPanel.right
             right: parent.right
             bottom: parent.bottom
         }
-
         height: MasticTheme.bottomPanelHeight
-
-        color: MasticTheme.scenarioBackgroundColor
-        fuzzyRadius: 8
-
-
-
-        Scenario.ScenarioTimeLine {
-            anchors.fill: parent
-            controller: MasticEditorC.scenarioC;
-        }
+        controller: MasticEditorC.scenarioC;
     }
+
 
 
 
@@ -313,7 +303,7 @@ Item {
         id: historyPanel
 
         Component.onCompleted:  {
-             // Center window
+            // Center window
             x = rootItem.Window.window.x + rootItem.Window.width/2 - historyPanel.width/2;
             y = rootItem.Window.window.y + rootItem.Window.height/2 - historyPanel.height/2;
         }
