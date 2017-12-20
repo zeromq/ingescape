@@ -216,7 +216,7 @@ Item {
 
                 // Time ticks
                 Repeater {
-                    model: viewController.timeTicks
+                    model: viewController.filteredListTimeTicks
 
                     // NB: two items to avoid complex QML bindings that
                     //     are interpreted by the Javascript stack
@@ -413,7 +413,7 @@ Item {
                             height: rootItem.lineHeight * rootItem.linesNumber
 
                             Repeater {
-                                model : controller ? controller.actionsInTimeLine : 0;
+                                model : controller ? controller.filteredListActionsInTimeLine : 0;
 
                                 ActionInTimeLine {
                                     myActionVM : model.QtObject;
@@ -871,7 +871,7 @@ Item {
                 // Time ticks
                 //
                 Repeater {
-                    model:  viewController.timeTicks
+                    model:  viewController.filteredListTimeTicks
 
                     delegate: Item {
                         x: viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(model.timeInMilliSeconds, viewController.pixelsPerMinute)
