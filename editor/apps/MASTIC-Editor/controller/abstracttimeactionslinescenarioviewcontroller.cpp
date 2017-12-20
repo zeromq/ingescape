@@ -52,6 +52,9 @@ AbstractTimeActionslineScenarioViewController::AbstractTimeActionslineScenarioVi
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
+    // Configure our filtered list of "time ticks"
+    _filteredListTimeTicks.setSourceModel(&_timeTicks);
+
 
     //----------------------
     //
@@ -190,6 +193,9 @@ void AbstractTimeActionslineScenarioViewController::setpixelsPerMinute(qreal val
 
         // Updata our X axis
         _updateCoordinateSystemAbscissaAxis();
+
+        // Update the time tick filtered time range
+        _updateFilteredTimeTicksListTimeRange();
 
         // Notify change
         Q_EMIT pixelsPerMinuteChanged(value);
@@ -331,7 +337,53 @@ void AbstractTimeActionslineScenarioViewController::_updateCoordinateSystemAbsci
     Q_EMIT coordinateSystemAbscissaAndOrdinateAxesChanged();
 }
 
+/**
+  * @brief Custom setter on viewport X
+  */
+void AbstractTimeActionslineScenarioViewController::setviewportX(int value)
+{
+    if(_viewportX != value)
+    {
+        _viewportX = value;
 
+        // Update time ticks list time range
+        _updateFilteredTimeTicksListTimeRange();
+
+        Q_EMIT viewportXChanged(value);
+    }
+}
+
+/**
+  * @brief Custom setter on viewport width
+  */
+void AbstractTimeActionslineScenarioViewController::setviewportWidth(int value)
+{
+    if(_viewportWidth != value)
+    {
+        _viewportWidth = value;
+
+        // Update time ticks list time range
+        _updateFilteredTimeTicksListTimeRange();
+
+        Q_EMIT viewportWidthChanged(value);
+    }
+}
+
+/**
+  * @brief Update the filtered list of time ticks by computing the visible windows
+  */
+void AbstractTimeActionslineScenarioViewController::_updateFilteredTimeTicksListTimeRange()
+{
+    // Compute the viewport range in misslisecond with right and left margin of 20 pixels
+    qreal viewportTimeRangeStartInMilliseconds =  (_viewportX-_timeMarginInPixels-20)/(_pixelsPerMinute/60000.0);
+    qreal viewportTimeRangeEndInMilliseconds =  (_viewportX+_viewportWidth+20)/(_pixelsPerMinute/60000.0);
+
+    // Set the new time range
+    _filteredListTimeTicks.setTimeRange(viewportTimeRangeStartInMilliseconds,viewportTimeRangeEndInMilliseconds);
+
+    // Emit the change for actions view models
+    Q_EMIT timeRangeChanged(viewportTimeRangeStartInMilliseconds,viewportTimeRangeEndInMilliseconds);
+}
 
 
 

@@ -64,7 +64,8 @@ SOURCES += main.cpp \
     viewModel/scenario/actionexecutionvm.cpp \
     viewModel/iop/parametervm.cpp \
     model/hostm.cpp \
-    viewModel/iop/agentiopvm.cpp
+    viewModel/iop/agentiopvm.cpp \
+    sortFilter/abstracttimerangefilter.cpp
 
 HEADERS += \
     stable.h \
@@ -124,7 +125,8 @@ HEADERS += \
     viewModel/scenario/actionexecutionvm.h \
     viewModel/iop/parametervm.h \
     model/hostm.h \
-    viewModel/iop/agentiopvm.h
+    viewModel/iop/agentiopvm.h \
+    sortFilter/abstracttimerangefilter.h
 
 
 RESOURCES += qml.qrc
