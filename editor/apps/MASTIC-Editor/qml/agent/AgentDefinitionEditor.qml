@@ -55,17 +55,47 @@ Window {
     // Columns with a fixed size
     // - Type
     property int widthColumnType: 135
-    // - Definition Value
-    property int widthColumnDefaultValue: 140
-    // - Mapping Value
-    property int widthColumnCurrentValue: 140
     // - Mute
     property int widthColumnMute: 40
+
+
+    // Minimum widht of resizable columns
+    // - Name
+    property int minWidthColumnName: 143
+    // - Definition Value
+    property int minWidthColumnDefaultValue: 150
+    // - Mapping Value
+    property int minWidthColumnCurrentValue: 150
+
+    // Maximum widht of resizable columns
+    // - Name
+    property int maxWidthColumnName: 230
+
 
     // Resizable columns
     // - Name
     // 8 <=> scrollbar width
-    property int widthColumnName: (tabs.width - 8 - widthColumnType - widthColumnDefaultValue - widthColumnCurrentValue - widthColumnMute)
+    // - Available extra width that can be splitted between our 3 resizable columns
+    property int splittableAvailableWidth: (tabs.width - 8 - widthColumnType - minWidthColumnDefaultValue - minWidthColumnCurrentValue - minWidthColumnName - widthColumnMute)
+    property int extraWidthForResizableColumns: Math.max(0, (splittableAvailableWidth/3))
+    property int extraWidthForValuesOnly : if (widthColumnName === maxWidthColumnName) {
+                                              Math.max(0, ((splittableAvailableWidth - (maxWidthColumnName - minWidthColumnName))/2));
+                                          } else {
+                                              0;
+                                          }
+
+    // - Width Resizable Columns
+    property int widthColumnName: ((minWidthColumnName + extraWidthForResizableColumns) > maxWidthColumnName) ? maxWidthColumnName : (minWidthColumnName + extraWidthForResizableColumns);
+    property int widthColumnDefaultValue:  if (widthColumnName === maxWidthColumnName) {
+                                               minWidthColumnDefaultValue + extraWidthForValuesOnly;
+                                           } else {
+                                               minWidthColumnDefaultValue + extraWidthForResizableColumns;
+                                           }
+    property int widthColumnCurrentValue: if (widthColumnName === maxWidthColumnName) {
+                                       minWidthColumnCurrentValue + extraWidthForValuesOnly;
+                                   } else {
+                                       minWidthColumnCurrentValue + extraWidthForResizableColumns;
+                                   }
 
     // List of widths
     property var widthsOfColumns: [
