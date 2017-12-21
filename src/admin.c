@@ -21,6 +21,7 @@
 #include "mastic_private.h"
 
 FILE *fp = NULL;
+bool admin_logInStream = false;
 bool logInFile = false;
 bool logInConsole = false;
 bool useColorInConsole = false;
@@ -159,6 +160,9 @@ void mtic_log(mtic_logLevel_t level, const char *fmt, ...){
             fprintf(stderr,"%-5s;%s", log_levels[logLevel], logContent);
         }
     }
+    if (admin_logInStream && agentElements != NULL && agentElements->logger != NULL){
+        zstr_sendf(agentElements->logger, "%-5s;%s", log_levels[logLevel], logContent);
+    }
     admin_unlock();
     
 }
@@ -174,6 +178,18 @@ void mtic_setVerbose (bool allow){
 }
 void mtic_setUseColorVerbose (bool allow){
     useColorInConsole = allow;
+}
+
+void mtic_setLogStream(bool stream){
+    if (agentElements != NULL){
+        if (stream){
+            mtic_warn("mtic_setLogStream: agent is already started, log stream cannot be created anymore\n");
+        }else{
+            mtic_warn("mtic_setLogStream: agent is already started, log stream cannot be destroyed anymore\n");
+        }
+        return;
+    }
+    admin_logInStream = stream;
 }
 
 void mtic_setLogPath(const char *path){

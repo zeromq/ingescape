@@ -201,6 +201,7 @@ typedef struct zyreloopElements{
     zactor_t *agentActor;
     zyre_t *node;
     zsock_t *publisher;
+    zsock_t *logger;
     zloop_t *loop;
 } zyreloopElements_t;
 
@@ -260,5 +261,8 @@ char* parser_export_definition (definition* def);
 char* parser_export_mapping(mapping_t* mapp);
 mapping_t* parser_LoadMap (const char* json_str);
 mapping_t* parser_LoadMapFromPath (const char* load_file);
+
+// admin
+extern bool admin_logInStream;
 
 #endif /* mastic_private_h */

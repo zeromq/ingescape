@@ -236,6 +236,7 @@ PUBLIC void mtic_setNotifyMappedAgents(bool notify);
 
 //logs and debug messages
 PUBLIC void mtic_setVerbose(bool verbose); //log in console
+PUBLIC void mtic_setLogStream(bool stream); //log in socket
 PUBLIC void mtic_setLogInFile(bool useLogFile); //log in file
 PUBLIC void mtic_setUseColorVerbose (bool useColor); //use color in console
 void mtic_setLogPath(const char *path);
