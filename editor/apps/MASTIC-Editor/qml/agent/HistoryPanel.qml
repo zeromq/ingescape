@@ -29,15 +29,15 @@ Window {
     height: minimumHeight
     width: minimumWidth
 
-    minimumWidth: 600
+    minimumWidth: 640
     minimumHeight: 545
 
 
     flags: Qt.Dialog
 
-//    isModal: false
-//    dismissOnOutsideTap : false;
-//    keepRelativePositionToInitialParent : false;
+    //    isModal: false
+    //    dismissOnOutsideTap : false;
+    //    keepRelativePositionToInitialParent : false;
 
 
     //--------------------------------
@@ -49,18 +49,46 @@ Window {
     property var controller : MasticEditorC.valuesHistoryC
 
     // Columns with a fixed size
-    // - Agent
-    property int widthColumnAgent: 125
+
     // - Type
     property int widthColumnType: 110
-    // - Definition Value
-    property int widthColumnValue: 140
     // - Mapping Value
     property int widthColumnDate: 100
 
-    // Resizable columns
+    // Minimum widht of resizable columns
     // - Name
-    property int widthColumnName: (tableHistory.width - widthColumnType - widthColumnAgent - widthColumnValue - widthColumnDate)
+    property int minWidthColumnName: 140
+    // - Agent
+    property int minWidthColumnAgent: 110
+    // - Value
+    property int minWidthColumnValue: 140
+
+    // Maximum widht of resizable columns
+    // - Name
+    property int maxWidthColumnName: 230
+    // - Agent
+    property int maxWidthColumnAgent: 200
+
+
+    // Resizable columns
+    // - Available extra width that can be splitted between our 3 resizable columns
+    property real splittableAvailableWidth: (tableHistory.width - widthColumnType - widthColumnDate - minWidthColumnName - minWidthColumnAgent - minWidthColumnValue)
+    property int extraWidthForResizableColumns: Math.max(0, Math.round(splittableAvailableWidth/3))
+    property int extraWidthForValueOnly : if (widthColumnName === maxWidthColumnName && widthColumnAgent === maxWidthColumnAgent) {
+                                              Math.max(0, (tableHistory.width - widthColumnType - widthColumnDate - maxWidthColumnName - maxWidthColumnAgent - minWidthColumnValue));
+                                          } else {
+                                              0;
+                                          }
+
+    // - Width Resizable Columns
+    property int widthColumnName: ((minWidthColumnName + extraWidthForResizableColumns) > maxWidthColumnName) ? maxWidthColumnName : (minWidthColumnName + extraWidthForResizableColumns);
+    property int widthColumnAgent: ((minWidthColumnAgent + extraWidthForResizableColumns) > maxWidthColumnAgent) ? maxWidthColumnAgent : (minWidthColumnAgent + extraWidthForResizableColumns);
+    property int widthColumnValue: if (widthColumnName === maxWidthColumnName && widthColumnAgent === maxWidthColumnAgent) {
+                                       minWidthColumnValue + extraWidthForValueOnly;
+                                   } else {
+                                       minWidthColumnValue + extraWidthForResizableColumns;
+                                   }
+
 
     // List of widths
     property var widthsOfColumns: [
@@ -78,7 +106,7 @@ Window {
     //--------------------------------
 
     // Emitted when user pressed our popup
-   // signal bringToFront();
+    // signal bringToFront();
 
 
     // Emitted when "All Agents" is selected or unselected
@@ -103,55 +131,55 @@ Window {
         color: MasticTheme.editorsBackgroundColor
 
 
-//        // catch events
-//        MultiPointTouchArea {
-//            anchors.fill: parent
-//        }
+        //        // catch events
+        //        MultiPointTouchArea {
+        //            anchors.fill: parent
+        //        }
 
-//        // drag Area
-//        I2CustomRectangle {
-//            id : dragRect
-//            anchors {
-//                top : parent.top
-//                left : parent.left
-//                right : parent.right
-//                margins : 2
-//            }
-//            height : 50
-//            topLeftRadius : 5
-//            topRightRadius : 5
+        //        // drag Area
+        //        I2CustomRectangle {
+        //            id : dragRect
+        //            anchors {
+        //                top : parent.top
+        //                left : parent.left
+        //                right : parent.right
+        //                margins : 2
+        //            }
+        //            height : 50
+        //            topLeftRadius : 5
+        //            topRightRadius : 5
 
-//            color :dragMouseArea.pressed? MasticTheme.editorsBackgroundColor : MasticTheme.darkBlueGreyColor
+        //            color :dragMouseArea.pressed? MasticTheme.editorsBackgroundColor : MasticTheme.darkBlueGreyColor
 
-//            MouseArea {
-//                id : dragMouseArea
-//                hoverEnabled: true
-//                anchors.fill: parent
-//                drag.target: rootItem
+        //            MouseArea {
+        //                id : dragMouseArea
+        //                hoverEnabled: true
+        //                anchors.fill: parent
+        //                drag.target: rootItem
 
-//                drag.minimumX : - rootItem.width/2
-//                drag.maximumX : rootItem.parent.width - rootItem.width/2
-//                drag.minimumY :  0
-//                drag.maximumY :  rootItem.parent.height - rootItem.height/2
+        //                drag.minimumX : - rootItem.width/2
+        //                drag.maximumX : rootItem.parent.width - rootItem.width/2
+        //                drag.minimumY :  0
+        //                drag.maximumY :  rootItem.parent.height - rootItem.height/2
 
-//                onPressed: {
-//                    // Emit signal "bring to front"
-//                    rootItem.bringToFront();
-//                }
-//            }
-//        }
+        //                onPressed: {
+        //                    // Emit signal "bring to front"
+        //                    rootItem.bringToFront();
+        //                }
+        //            }
+        //        }
 
         // separator
-//        Rectangle {
-//            anchors {
-//                top : parent.top
-//                topMargin: 50
-//                left : parent.left
-//                right : parent.right
-//            }
-//            height : 1
-//            color : MasticTheme.editorsBackgroundBorderColor
-//        }
+        //        Rectangle {
+        //            anchors {
+        //                top : parent.top
+        //                topMargin: 50
+        //                left : parent.left
+        //                right : parent.right
+        //            }
+        //            height : 1
+        //            color : MasticTheme.editorsBackgroundBorderColor
+        //        }
 
 
 

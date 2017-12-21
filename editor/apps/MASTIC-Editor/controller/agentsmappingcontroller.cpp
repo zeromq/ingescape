@@ -901,7 +901,7 @@ MapBetweenIOPVM* AgentsMappingController::_getLinkFromMappingElement(ElementMapp
  */
 void AgentsMappingController::_removeAllLinksWithAgent(AgentInMappingVM* agent)
 {
-    if (agent != NULL)
+    if ((agent != NULL) && (_modelManager != NULL))
     {
         foreach (MapBetweenIOPVM* link, _allLinksInMapping.toList())
         {
@@ -911,8 +911,12 @@ void AgentsMappingController::_removeAllLinksWithAgent(AgentInMappingVM* agent)
                 // Remove a link between two agents from the mapping
                 removeLinkBetweenTwoAgents(link);
 
-                // Delete the link between two agents
-                _deleteLinkBetweenTwoAgents(link);
+                // Mapping is activated
+                if (_modelManager->isActivatedMapping())
+                {
+                    // We have to delete the link to clean our HMI (even if we do not have yet received the message "UNMAPPED")
+                    _deleteLinkBetweenTwoAgents(link);
+                }
             }
         }
     }

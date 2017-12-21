@@ -38,6 +38,9 @@ ScenarioController::ScenarioController(MasticModelManager* modelManager,
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
+    // Configure our filtered list of "actionVM in timeline"
+    _filteredListActionsInTimeLine.setSourceModel(&_actionsInTimeLine);
+
     // Set the agent in mapping list sort by name property
     _agentsInMappingList.setSortProperty("name");
 
@@ -1662,3 +1665,12 @@ bool ScenarioController::canDeleteActionFromList(ActionM* actionM)
 
     return canBeDeleted;
 }
+
+/**
+  * @brief slot on the time line range change
+  */
+void ScenarioController::ontimeRangeChange(int startTimeInMilliseconds, int endTimeInMilliseconds)
+{
+    _filteredListActionsInTimeLine.setTimeRange(startTimeInMilliseconds,endTimeInMilliseconds);
+}
+

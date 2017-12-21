@@ -147,9 +147,9 @@ void MasticModelManager::importAgentFromSelectedFiles()
 
 /**
  * @brief Export the agents list to default file
- * @param agentsListToExport list of pairs <agent name, definition>
+ * @param agentsListToExport list of pairs <agent name (and parameters to restart), definition>
  */
-void MasticModelManager::exportAgentsListToDefaultFile(QList<QPair<QString, DefinitionM*>> agentsListToExport)
+void MasticModelManager::exportAgentsListToDefaultFile(QList<QPair<QStringList, DefinitionM*>> agentsListToExport)
 {
     // Export the agents list to JSON file
     _exportAgentsListToFile(agentsListToExport, _agentsListDefaultFilePath);
@@ -158,9 +158,9 @@ void MasticModelManager::exportAgentsListToDefaultFile(QList<QPair<QString, Defi
 
 /**
  * @brief Export the agents list to selected file
- * @param agentsListToExport list of pairs <agent name, definition>
+ * @param agentsListToExport list of pairs <agent name (and parameters to restart), definition>
  */
-void MasticModelManager::exportAgentsListToSelectedFile(QList<QPair<QString, DefinitionM*>> agentsListToExport)
+void MasticModelManager::exportAgentsListToSelectedFile(QList<QPair<QStringList, DefinitionM*>> agentsListToExport)
 {
     // "File Dialog" to get the file (path) to save
     QString agentsListFilePath = QFileDialog::getSaveFileName(NULL,
@@ -285,10 +285,16 @@ void MasticModelManager::onLauncherEntered(QString peerId, QString hostname, QSt
     // Add a Mastic Launcher to the manager
     MasticLauncherManager::Instance().addMasticLauncher(peerId, hostname, ipAddress);
 
-    foreach (AgentM* agent, _mapFromPeerIdToAgentM.values())
+    // Traverse the list of all agents
+    foreach (QString agentName, _mapFromNameToAgentModelsList.keys())
     {
-        if ((agent != NULL) && (agent->hostname() == hostname) && !agent->commandLine().isEmpty()) {
-            agent->setcanBeRestarted(true);
+        QList<AgentM*> agentModelsList = getAgentModelsListFromName(agentName);
+
+        foreach (AgentM* agent, agentModelsList)
+        {
+            if ((agent != NULL) && (agent->hostname() == hostname) && !agent->commandLine().isEmpty()) {
+                agent->setcanBeRestarted(true);
+            }
         }
     }
 }
@@ -304,10 +310,16 @@ void MasticModelManager::onLauncherExited(QString peerId, QString hostname)
     // Remove a Mastic Launcher to the manager
     MasticLauncherManager::Instance().removeMasticLauncher(peerId, hostname);
 
-    foreach (AgentM* agent, _mapFromPeerIdToAgentM.values())
+    // Traverse the list of all agents
+    foreach (QString agentName, _mapFromNameToAgentModelsList.keys())
     {
-        if ((agent != NULL) && (agent->hostname() == hostname)) {
-            agent->setcanBeRestarted(false);
+        QList<AgentM*> agentModelsList = getAgentModelsListFromName(agentName);
+
+        foreach (AgentM* agent, agentModelsList)
+        {
+            if ((agent != NULL) && (agent->hostname() == hostname)) {
+                agent->setcanBeRestarted(false);
+            }
         }
     }
 }
@@ -827,18 +839,43 @@ void MasticModelManager::_importAgentsListFromFile(QString agentsListFilePath)
                 jsonFile.close();
 
                 // Initialize agents list from JSON file
-                QList<QPair<QString, DefinitionM*>> agentsListToImport = _jsonHelper->initAgentsList(byteArrayOfJson);
+                QList<QPair<QStringList, DefinitionM*>> agentsListToImport = _jsonHelper->initAgentsList(byteArrayOfJson);
 
                 for (int i = 0; i < agentsListToImport.count(); i++)
                 {
-                    QPair<QString, DefinitionM*> pair = agentsListToImport.at(i);
-                    QString agentName = pair.first;
+                    QPair<QStringList, DefinitionM*> pair = agentsListToImport.at(i);
+                    QStringList agentNameAndParametersToRestart = pair.first;
                     DefinitionM* agentDefinition = pair.second;
+
+                    QString agentName = agentNameAndParametersToRestart.first();
 
                     if (!agentName.isEmpty() && (agentDefinition != NULL))
                     {
                         // Create a new model of agent with the name
                         AgentM* agent = new AgentM(agentName, this);
+
+                        if (agentNameAndParametersToRestart.count() == 3)
+                        {
+                            QString hostname = agentNameAndParametersToRestart.at(1);
+                            QString commandLine = agentNameAndParametersToRestart.at(2);
+
+                            agent->sethostname(hostname);
+                            agent->setcommandLine(commandLine);
+
+                            if (!hostname.isEmpty())
+                            {
+                                HostM* host = MasticLauncherManager::Instance().getHostWithName(hostname);
+                                if (host != NULL)
+                                {
+                                    // Add this agent to the host
+                                    //host->agents()->append(agent);
+
+                                    if (!commandLine.isEmpty()) {
+                                        agent->setcanBeRestarted(true);
+                                    }
+                                }
+                            }
+                        }
 
                         // Add this new model of agent
                         addAgentModel(agent);
@@ -965,10 +1002,10 @@ void MasticModelManager::_importAgentFromFiles(QStringList agentFilesPaths)
 
 /**
  * @brief Export the agents list to JSON file
- * @param agentsListToExport list of pairs <agent name, definition>
+ * @param agentsListToExport list of pairs <agent name (and parameters to restart), definition>
  * @param agentsListFilePath
  */
-void MasticModelManager::_exportAgentsListToFile(QList<QPair<QString, DefinitionM*>> agentsListToExport, QString agentsListFilePath)
+void MasticModelManager::_exportAgentsListToFile(QList<QPair<QStringList, DefinitionM*>> agentsListToExport, QString agentsListFilePath)
 {
     if (!agentsListFilePath.isEmpty() && (_jsonHelper != NULL))
     {

@@ -41,9 +41,9 @@ JsonHelper::~JsonHelper()
  * @param byteArrayOfJson
  * @return
  */
-QList<QPair<QString, DefinitionM*>> JsonHelper::initAgentsList(QByteArray byteArrayOfJson)
+QList<QPair<QStringList, DefinitionM*>> JsonHelper::initAgentsList(QByteArray byteArrayOfJson)
 {
-    QList<QPair<QString, DefinitionM*>> agentsListToImport;
+    QList<QPair<QStringList, DefinitionM*>> agentsListToImport;
 
     QJsonDocument jsonAgentsList = QJsonDocument::fromJson(byteArrayOfJson);
     if (jsonAgentsList.isArray())
@@ -64,9 +64,22 @@ QList<QPair<QString, DefinitionM*>> JsonHelper::initAgentsList(QByteArray byteAr
                     {
                         qDebug() << "Initialize agent" << jsonName.toString() << "with definition" << definition->name();
 
+                        QStringList agentNameAndParametersToRestart;
+                        agentNameAndParametersToRestart.append(jsonName.toString());
+
+                        QJsonValue jsonHostname = jsonAgent.value("hostname");
+                        QJsonValue jsonCommandLine = jsonAgent.value("commandLine");
+
+                        if (jsonHostname.isString() && jsonCommandLine.isString())
+                        {
+                            agentNameAndParametersToRestart.append(jsonHostname.toString());
+                            agentNameAndParametersToRestart.append(jsonCommandLine.toString());
+                        }
+
                         // Create a pair with agent name and definition
-                        QPair<QString, DefinitionM*> pair;
-                        pair.first = jsonName.toString();
+                        QPair<QStringList, DefinitionM*> pair;
+
+                        pair.first = agentNameAndParametersToRestart;
                         pair.second = definition;
 
                         // Add the pair to the list
@@ -109,22 +122,32 @@ DefinitionM* JsonHelper::createModelOfDefinition(QByteArray byteArrayOfJson)
 
 /**
  * @brief Export the agents list
- * @param agentsListToExport list of pairs <agent name, definition>
+ * @param agentsListToExport list of pairs <agent name (and parameters to restart), definition>
  */
-QByteArray JsonHelper::exportAgentsList(QList<QPair<QString, DefinitionM*>> agentsListToExport)
+QByteArray JsonHelper::exportAgentsList(QList<QPair<QStringList, DefinitionM*>> agentsListToExport)
 {
     QJsonArray jsonArray;
 
     for (int i = 0; i < agentsListToExport.count(); i++)
     {
-        QPair<QString, DefinitionM*> pair = agentsListToExport.at(i);
-        QString agentName = pair.first;
+        QPair<QStringList, DefinitionM*> pair = agentsListToExport.at(i);
+        QStringList agentNameAndParametersToRestart = pair.first;
         DefinitionM* definition = pair.second;
+
+        QString agentName = agentNameAndParametersToRestart.first();
 
         if (!agentName.isEmpty() && (definition != NULL))
         {
             QJsonObject jsonAgent;
             jsonAgent.insert("agentName", agentName);
+
+            if (agentNameAndParametersToRestart.count() == 3)
+            {
+                QString hostname = agentNameAndParametersToRestart.at(1);
+                QString commandLine = agentNameAndParametersToRestart.at(2);
+                jsonAgent.insert("hostname", hostname);
+                jsonAgent.insert("commandLine", commandLine);
+            }
 
             QJsonObject jsonDefinition = exportAgentDefinition(definition);
 

@@ -23,8 +23,6 @@ import "../theme" as Theme
 Item {
     id: rootItem
 
-    anchors.fill: parent
-
     //--------------------------------
     //
     // Properties
@@ -123,6 +121,16 @@ Item {
     // Content
     //
     //--------------------------------
+    // Background
+    I2CustomRectangle {
+        id: background
+
+        anchors {
+            fill : parent
+        }
+        color: MasticTheme.scenarioBackgroundColor
+        fuzzyRadius: 8
+    }
 
     // Timeline Content
     Item {
@@ -208,7 +216,7 @@ Item {
 
                 // Time ticks
                 Repeater {
-                    model: viewController.timeTicks
+                    model: viewController.filteredListTimeTicks
 
                     // NB: two items to avoid complex QML bindings that
                     //     are interpreted by the Javascript stack
@@ -405,7 +413,7 @@ Item {
                             height: rootItem.lineHeight * rootItem.linesNumber
 
                             Repeater {
-                                model : controller ? controller.actionsInTimeLine : 0;
+                                model : controller ? controller.filteredListActionsInTimeLine : 0;
 
                                 ActionInTimeLine {
                                     myActionVM : model.QtObject;
@@ -863,7 +871,7 @@ Item {
                 // Time ticks
                 //
                 Repeater {
-                    model:  viewController.timeTicks
+                    model:  viewController.filteredListTimeTicks
 
                     delegate: Item {
                         x: viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(model.timeInMilliSeconds, viewController.pixelsPerMinute)
@@ -1069,6 +1077,46 @@ Item {
     }
 
 
+    //Zone allowing to change height of the time lineHeight
+    Rectangle {
+        id : resizeRectangle
+        anchors {
+            left : parent.left
+            right : parent.right
+            verticalCenter : parent.top
+        }
+        height : 10
+
+        color :  mouseAreaResizeTimeLine.pressed? MasticTheme.darkBlueGreyColor : MasticTheme.editorsBackgroundColor
+
+        MouseArea {
+            id : mouseAreaResizeTimeLine
+
+            anchors.fill: parent
+            hoverEnabled: true
+            drag.target: resizeRectangle
+            property real previousPositionY : 0.0;
+
+            onPressed: {
+                rootItem.forceActiveFocus();
+                previousPositionY = mouse.y;
+            }
+
+            onPositionChanged: {
+                if (mouseAreaResizeTimeLine.pressed) {
+                    var deltaY = previousPositionY - mouse.y;
+
+                    if (rootItem.height + deltaY > MasticTheme.bottomPanelHeight) {
+                        rootItem.height += deltaY;
+                    }
+                    else {
+                        rootItem.height = MasticTheme.bottomPanelHeight;
+                    }
+                }
+            }
+
+        }
+    }
 
     // Play Button
     Item {

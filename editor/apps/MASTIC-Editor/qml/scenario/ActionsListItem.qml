@@ -111,7 +111,7 @@ Item {
                             {
                                 // Delete our action
                                 controller.deleteAction(root.action);
-                            }else {
+                            } else {
                                 root.needConfirmationtoDeleteAction(root.action);
                             }
                         }
