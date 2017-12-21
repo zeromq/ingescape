@@ -44,7 +44,7 @@ Item {
     readonly property int leftPanelWidth: 320
 
     // Height of our bottom panel
-    readonly property int bottomPanelHeight: 280
+    readonly property int bottomPanelHeight: 300
 
 
     //-----------------------------------------
@@ -227,7 +227,7 @@ Item {
 
 
     // Lines height in timeline
-    property int lineInTimeLineHeight : 30
+    property int lineInTimeLineHeight : 37
 
 
     //-----------------------------------------

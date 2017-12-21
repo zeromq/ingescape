@@ -33,7 +33,7 @@
 #define MARGIN_FOR_ACTION_INSERTION_IN_MS 2000
 
 // Minimum lines displayed into the timeline by default
-#define MINIMUM_DISPLAYED_LINES_NUMBER_IN_TIMELINE 7
+#define MINIMUM_DISPLAYED_LINES_NUMBER_IN_TIMELINE 6
 
 // Interval in milli-seconds to regularly delay actions (when their conditions are not valid)
 #define INTERVAL_DELAY_ACTIONS 25

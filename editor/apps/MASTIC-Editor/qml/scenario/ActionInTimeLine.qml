@@ -158,7 +158,7 @@ Item {
         //see only the ghost when the drag is active
         visible: !actionVMMouseArea.drag.active
 
-        height : actionVMItem.lineHeight/2
+        height : (actionVMItem.lineHeight-7)/2
         color : MasticTheme.blueGreyColor2
 
         border {
@@ -291,12 +291,12 @@ Item {
         verticalAlignment: Text.AlignVCenter
         color : (controller && controller.selectedActionVMInTimeline && actionVMItem.myActionVM  && controller.selectedActionVMInTimeline === actionVMItem.myActionVM) ?
                     actionVMMouseArea.pressed? MasticTheme.lightGreyColor : MasticTheme.orangeColor
-        : actionVMMouseArea.pressed? MasticTheme.lightGreyColor : MasticTheme.darkGreyColor
+        : actionVMMouseArea.pressed? MasticTheme.greyColor : MasticTheme.lightGreyColor
 
         text : (actionVMItem.myActionVM && actionVMItem.myActionVM.modelM) ? actionVMItem.myActionVM.modelM.name : ""
         font {
             family : MasticTheme.textFontFamily
-            pixelSize: 11
+            pixelSize: 16
         }
     }
 

@@ -776,8 +776,40 @@
 	</g>
 </g>
 <g id="currentTime">
-	<polygon fill="#B2B2B2" stroke="#FFFFFF" stroke-width="1.0379" stroke-miterlimit="10" points="1043.6,486.5 1043.6,481.2 
-		1054.6,481.2 1054.6,486.5 1049.1,489.2 	"/>
+	<polygon fill="#B2B2B2" stroke="#FFFFFF" stroke-miterlimit="10" points="1043.3,495.6 1043.3,490 1054.9,490 1054.9,495.6 
+		1049.1,498.4 	"/>
+</g>
+<g id="resizeTimeline">
+	<g>
+		<g>
+			<line fill="none" stroke="#706F6F" stroke-width="2" stroke-miterlimit="10" x1="1187.3" y1="471.5" x2="1187.3" y2="476.5"/>
+			<line fill="none" stroke="#706F6F" stroke-width="2" stroke-miterlimit="10" x1="1190.2" y1="471.5" x2="1190.2" y2="476.5"/>
+			<line fill="none" stroke="#706F6F" stroke-width="2" stroke-miterlimit="10" x1="1193.2" y1="471.5" x2="1193.2" y2="476.5"/>
+			<line fill="none" stroke="#706F6F" stroke-width="2" stroke-miterlimit="10" x1="1196.2" y1="471.5" x2="1196.2" y2="476.5"/>
+			<line fill="none" stroke="#706F6F" stroke-width="2" stroke-miterlimit="10" x1="1199.2" y1="471.5" x2="1199.2" y2="476.5"/>
+			<line fill="none" stroke="#706F6F" stroke-width="2" stroke-miterlimit="10" x1="1202.2" y1="471.5" x2="1202.2" y2="476.5"/>
+			<line fill="none" stroke="#706F6F" stroke-width="2" stroke-miterlimit="10" x1="1205.2" y1="471.5" x2="1205.2" y2="476.5"/>
+			<line fill="none" stroke="#706F6F" stroke-width="2" stroke-miterlimit="10" x1="1208.2" y1="471.5" x2="1208.2" y2="476.5"/>
+		</g>
+		<line fill="none" stroke="#706F6F" stroke-width="2" stroke-miterlimit="10" x1="1211.2" y1="471.5" x2="1211.2" y2="476.5"/>
+		<line fill="none" stroke="#706F6F" stroke-width="2" stroke-miterlimit="10" x1="1214.2" y1="471.5" x2="1214.2" y2="476.5"/>
+	</g>
+</g>
+<g id="reduceTimeline">
+	<g>
+		<polygon fill="#706F6F" points="1199.6,483.1 1194.7,486.4 1189.7,483.1 		"/>
+		<polygon fill="#706F6F" points="1199.6,487.1 1194.7,490.4 1189.7,487.1 		"/>
+	</g>
+</g>
+<g id="bulleInfos">
+	<polygon fill="#CDCCCC" points="1278.9,541.5 1288.4,552.5 1297.9,541.5 	"/>
+	<path fill="#CDCCCC" d="M1300.1,545.4H1135c-2.2,0-4-1.8-4-4v-29.7c0-2.2,1.8-4,4-4h165.1c2.2,0,4,1.8,4,4v29.7
+		C1304.1,543.6,1302.3,545.4,1300.1,545.4z"/>
+</g>
+<g id="warningActionEditor">
+	<path fill="#B2B2B2" stroke="#B2B2B2" stroke-miterlimit="10" d="M1221.6,557.7c-5,0-9,4-9,9c0,5,4,9,9,9c5,0,9-4,9-9
+		C1230.6,561.7,1226.5,557.7,1221.6,557.7z M1223.1,560.5l-0.4,9h-2.3l-0.4-9H1223.1z M1221.6,572.9c-1.1,0-1.6-0.5-1.6-1.5
+		c0-1,0.5-1.5,1.6-1.5s1.6,0.5,1.6,1.5C1223.2,572.4,1222.6,572.9,1221.6,572.9z"/>
 </g>
 <g id="currentAction">
 	<g>

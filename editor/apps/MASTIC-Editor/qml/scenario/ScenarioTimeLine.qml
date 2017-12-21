@@ -946,7 +946,7 @@ Item {
                             }
 
                             text : controller ? controller.currentTime.toLocaleTimeString(Qt.locale(), "HH':'mm':'ss':'zzz") : "00:00:00.000"
-                            color: MasticTheme.lightGreyColor
+                            color: MasticTheme.whiteColor
                             font {
                                 family: MasticTheme.textFontFamily
                                 pixelSize: 14
@@ -1030,7 +1030,7 @@ Item {
 
         anchors {
             top: parent.top
-            topMargin: 13
+            topMargin: 18
             left: columnHeadersArea.left
             right: columnHeadersArea.right
         }
@@ -1046,7 +1046,7 @@ Item {
             height : 13
 
             property var scrollBarSize: if (viewController) {
-                                            (viewController.viewportWidth*scrollTimeLine.width)/viewController.timeTicksTotalWidth
+                                           Math.max(2,(viewController.viewportWidth*scrollTimeLine.width)/viewController.timeTicksTotalWidth);
                                         }
                                         else {
                                             0
@@ -1085,9 +1085,26 @@ Item {
             right : parent.right
             verticalCenter : parent.top
         }
-        height : 10
+        height : 14
 
         color :  mouseAreaResizeTimeLine.pressed? MasticTheme.darkBlueGreyColor : MasticTheme.editorsBackgroundColor
+
+        I2SvgItem {
+            anchors.centerIn: parent
+
+            svgFileCache: MasticTheme.svgFileMASTIC
+            svgElementId: "resizeTimeline"
+        }
+
+        Rectangle {
+            anchors {
+                left : parent.left
+                right : parent.right
+                bottom : parent.bottom
+            }
+            height : 1
+            color : MasticTheme.blackColor
+        }
 
         MouseArea {
             id : mouseAreaResizeTimeLine
@@ -1185,7 +1202,7 @@ Item {
                 }
 
                 text : currentTimeText.text
-                color: MasticTheme.lightGreyColor
+                color: MasticTheme.whiteColor
                 font {
                     family: MasticTheme.textFontFamily
                     pixelSize: 14
