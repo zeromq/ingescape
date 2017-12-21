@@ -210,7 +210,7 @@ typedef struct zyreloopElements{
 
 extern definition* mtic_internal_definition;
 
-char* definition_getIOPValueAsString (agent_iop* iop);
+char* definition_getIOPValueAsString (agent_iop* iop); //returned value must be freed by user
 void definition_freeDefinition (definition* definition);
 
 

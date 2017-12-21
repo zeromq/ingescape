@@ -1136,15 +1136,15 @@ int network_publishOutput (const char* output_name)
                 result = 1;
             }else{
                 char* str_value = definition_getIOPValueAsString(found_iop);
-                if(strlen(str_value) > 0)
+                if(str_value != NULL && strlen(str_value) > 0)
                 {
                     mtic_debug("publish %s -> %s\n",found_iop->name,str_value);
                     if (zstr_sendx(agentElements->publisher, found_iop->name, str_value, NULL) != 0){
                         mtic_debug("Error while publishing output %s\n",output_name);
                     }
                     result = 1;
+                    free(str_value);
                 }
-                free(str_value);
             }
             
         } else {

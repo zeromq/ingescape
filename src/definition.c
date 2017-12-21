@@ -223,40 +223,44 @@ int definition_addIopToDefinition(agent_iop *iop, iop_t iop_type, definition *de
 ////////////////////////////////////////////////////////////////////////
 char* definition_getIOPValueAsString (agent_iop* iop)
 {
-    char str_value[BUFSIZ];
+    char *str_value = NULL;
     if(iop != NULL)
     {
         switch (iop->value_type) {
             case INTEGER_T:
-                sprintf(str_value,"%i",iop->value.i);
+                str_value = calloc(1, 256);
+                snprintf(str_value, 255,"%i",iop->value.i);
                 break;
             case DOUBLE_T:
-                sprintf(str_value,"%lf",iop->value.d);
+                str_value = calloc(1, 256);
+                snprintf(str_value, 255,"%lf",iop->value.d);
                 break;
             case BOOL_T:
-                if(iop->value.b == true)
-                {
-                    sprintf(str_value,"%s","true");
+                str_value = calloc(1, 8);
+                if(iop->value.b == true){
+                    snprintf(str_value, 8, "%s","true");
                     
                 } else {
-                    sprintf(str_value,"%s","false");
+                    snprintf(str_value, 8, "%s","false");
                     
                 }
                 break;
             case STRING_T:
-                sprintf(str_value,"%s",iop->value.s);
+                str_value = calloc(1, strlen(iop->value.s)+1);
+                snprintf(str_value, strlen(iop->value.s)+1, "%s",iop->value.s);
                 break;
             case IMPULSION_T:
                 break;
             case DATA_T:
-                sprintf(str_value,"%s", (char*) iop->value.data);
+                str_value = calloc(1, 256);
+                snprintf(str_value, 255, "%s", (char*) iop->value.data);
                 break;
             default:
                 break;
         }
     }
     
-    return strdup(str_value);
+    return str_value;
 }
 
 void definition_freeDefinition (definition* def) {
