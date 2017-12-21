@@ -193,6 +193,8 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     connect(_scenarioC, &ScenarioController::commandAskedToAgentAboutSettingValue, _networkC, &NetworkController::onCommandAskedToAgentAboutSettingValue);
     connect(_scenarioC, &ScenarioController::commandAskedToAgentAboutMappingInput, _networkC, &NetworkController::onCommandAskedToAgentAboutMappingInput);
 
+    // Connect to signals from the time line time line visible range change to the scenario controller to filter the action view models
+    connect(_timeLineC, &AbstractTimeActionslineScenarioViewController::timeRangeChanged, _scenarioC, &ScenarioController::ontimeRangeChange);
 
     // Initialize agents list from default file
     _modelManager->importAgentsListFromDefaultFile();

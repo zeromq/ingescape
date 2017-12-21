@@ -10,6 +10,7 @@
 #include "I2PropertyHelpers.h"
 
 #include <model/scenario/timetickm.h>
+#include <sortFilter/abstracttimerangefilter.h>
 
 
 /**
@@ -28,6 +29,9 @@ class AbstractTimeActionslineScenarioViewController : public QObject
     // List of time ticks
     I2_QOBJECT_LISTMODEL(TimeTickM, timeTicks)
 
+    // List of "time ticks" filtered with a given time range
+    Q_PROPERTY(AbstractTimeRangeFilter* filteredListTimeTicks READ filteredListTimeTicks CONSTANT)
+
 
     //--------------------------------------
     //
@@ -42,13 +46,13 @@ class AbstractTimeActionslineScenarioViewController : public QObject
     I2_QML_PROPERTY_READONLY_CUSTOM_SETTER(qreal, timeTicksTotalWidth)
 
     // Viewport start abscissa in pixels (left-side of our viewport)
-    I2_QML_PROPERTY(int, viewportX)
+    I2_QML_PROPERTY_CUSTOM_SETTER(int, viewportX)
 
     // Viewpot start ordinate in pixels (left-side of our viewport)
     I2_QML_PROPERTY(int, viewportY)
 
     // Viewport width in pixels
-    I2_QML_PROPERTY(int, viewportWidth)
+    I2_QML_PROPERTY_CUSTOM_SETTER(int, viewportWidth)
 
     // Viewport height in pixels
     I2_QML_PROPERTY(int, viewportHeight)
@@ -79,6 +83,15 @@ public:
           * @brief Destructor
           */
         ~AbstractTimeActionslineScenarioViewController();
+
+        /**
+        * @brief Get our filtered list of "time ticks"
+        * @return
+        */
+        AbstractTimeRangeFilter* filteredListTimeTicks()
+        {
+            return &_filteredListTimeTicks;
+        }
 
 
     public Q_SLOTS:
@@ -146,11 +159,15 @@ public:
         */
        void coordinateSystemAbscissaAxisChanged();
 
-
        /**
         * @brief Will be triggered when both the abscissa axis and the ordinate axis of our coordinate system change
         */
        void coordinateSystemAbscissaAndOrdinateAxesChanged();
+
+       /**
+        * @brief Emitted when the visible time range of our timeline has changed
+        */
+       void timeRangeChanged(int viewportTimeRangeStartInMilliseconds,int viewportTimeRangeEndInMilliseconds);
 
 
     protected:
@@ -158,6 +175,12 @@ public:
           * @brief Called when the abscissa axis of our coordinate system needs to be updated
           */
        void _updateCoordinateSystemAbscissaAxis();
+
+       /**
+         * @brief Update the filtered list of time ticks by computing the visible windows
+         */
+       void _updateFilteredTimeTicksListTimeRange();
+
 
     protected:
        // Our origin date-time value (T0) i.e. the first time tick
@@ -175,6 +198,10 @@ public:
 
        // Time in seconds between two time ticks in X axis
        int _timeRangeBetweenTimeTicksInMilliSeconds;
+
+       // List of time ticks filtered with a given time range in milliseconds
+       AbstractTimeRangeFilter _filteredListTimeTicks;
+
 
     };
 

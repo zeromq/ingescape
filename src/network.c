@@ -945,9 +945,22 @@ initActor (zsock_t *pipe, void *args)
     while (*insert != ':' && insert > endpoint) {
         insert--;
     }
-    
-    //set headers for agent
     zyre_set_header(agentElements->node, "publisher", "%s", insert + 1);
+    
+    
+    //start logger stream if needed
+    if (admin_logInStream){
+        sprintf(endpoint, "tcp://%s:*", agentElements->ipAddress);
+        agentElements->logger = zsock_new_pub(endpoint);
+        strncpy(endpoint, zsock_endpoint(agentElements->logger), 256);
+        char *insert = endpoint + strlen(endpoint) - 1;
+        while (*insert != ':' && insert > endpoint) {
+            insert--;
+        }
+        zyre_set_header(agentElements->node, "logger", "%s", insert + 1);
+    }
+    
+    //set other headers for agent
     zyre_set_header(agentElements->node, "canBeFrozen", "%i", agentCanBeFrozen);
     if (network_isEditor){
         zyre_set_header(agentElements->node, "isEditor", "%d", 1);
@@ -1085,6 +1098,9 @@ initActor (zsock_t *pipe, void *args)
     zclock_sleep (100);
     zyre_destroy (&agentElements->node);
     zsock_destroy(&agentElements->publisher);
+    if (agentElements->logger != NULL){
+        zsock_destroy(&agentElements->logger);
+    }
     zloop_destroy (&loop);
     assert (loop == NULL);
     //call registered interruption callbacks
@@ -1136,15 +1152,15 @@ int network_publishOutput (const char* output_name)
                 result = 1;
             }else{
                 char* str_value = definition_getIOPValueAsString(found_iop);
-                if(strlen(str_value) > 0)
+                if(str_value != NULL && strlen(str_value) > 0)
                 {
                     mtic_debug("publish %s -> %s\n",found_iop->name,str_value);
                     if (zstr_sendx(agentElements->publisher, found_iop->name, str_value, NULL) != 0){
                         mtic_debug("Error while publishing output %s\n",output_name);
                     }
                     result = 1;
+                    free(str_value);
                 }
-                free(str_value);
             }
             
         } else {

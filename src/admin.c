@@ -21,6 +21,7 @@
 #include "mastic_private.h"
 
 FILE *fp = NULL;
+bool admin_logInStream = false;
 bool logInFile = false;
 bool logInConsole = false;
 bool useColorInConsole = false;
@@ -46,6 +47,34 @@ static const char *log_colors[] = {
 ////////////////////////////////////////////////////////////////////////
 // INTERNAL FUNCTIONS
 ////////////////////////////////////////////////////////////////////////
+
+#ifdef WIN32
+    #define W_OK 02
+    //cf : https://stackoverflow.com/questions/10905892/equivalent-of-gettimeday-for-windows
+    int gettimeofday(struct timeval * tp, struct timezone * tzp)
+        {
+            // Note: some broken versions only have 8 trailing zero's, the correct epoch has 9 trailing zero's
+            // This magic number is the number of 100 nanosecond intervals since January 1, 1601 (UTC)
+            // until 00:00:00 January 1, 1970
+            static const uint64_t EPOCH = ((uint64_t) 116444736000000000ULL);
+
+            SYSTEMTIME  system_time;
+            FILETIME    file_time;
+            uint64_t    time;
+
+            GetSystemTime( &system_time );
+            SystemTimeToFileTime( &system_time, &file_time );
+            time =  ((uint64_t)file_time.dwLowDateTime )      ;
+            time += ((uint64_t)file_time.dwHighDateTime) << 32;
+
+            tp->tv_sec  = (long) ((time - EPOCH) / 10000000L);
+            tp->tv_usec = (long) (system_time.wMilliseconds * 1000);
+            return 0;
+        }
+#else
+
+#endif
+
 void admin_computeTime(char *dest)
 {
     struct timeval tick;
@@ -159,6 +188,9 @@ void mtic_log(mtic_logLevel_t level, const char *fmt, ...){
             fprintf(stderr,"%-5s;%s", log_levels[logLevel], logContent);
         }
     }
+    if (admin_logInStream && agentElements != NULL && agentElements->logger != NULL){
+        zstr_sendf(agentElements->logger, "%-5s;%s", log_levels[logLevel], logContent);
+    }
     admin_unlock();
     
 }
@@ -174,6 +206,18 @@ void mtic_setVerbose (bool allow){
 }
 void mtic_setUseColorVerbose (bool allow){
     useColorInConsole = allow;
+}
+
+void mtic_setLogStream(bool stream){
+    if (agentElements != NULL){
+        if (stream){
+            mtic_warn("mtic_setLogStream: agent is already started, log stream cannot be created anymore\n");
+        }else{
+            mtic_warn("mtic_setLogStream: agent is already started, log stream cannot be destroyed anymore\n");
+        }
+        return;
+    }
+    admin_logInStream = stream;
 }
 
 void mtic_setLogPath(const char *path){

@@ -27,6 +27,7 @@
 #include "viewModel/agentinmappingvm.h"
 #include "viewModel/scenario/actionvm.h"
 #include "viewModel/scenario/actioninpalettevm.h"
+#include "sortFilter/abstracttimerangefilter.h"
 
 
 // Margin in milliseconds to insert an action following another
@@ -83,6 +84,9 @@ class ScenarioController: public QObject
     // List of actions in timeline
     I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(ActionVM, actionsInTimeLine)
 
+    // List of "actionVM in timeline" filtered with a given time range
+    Q_PROPERTY(AbstractTimeRangeFilter* filteredListActionsInTimeLine READ filteredListActionsInTimeLine CONSTANT)
+
     // Selected action VM in timeline
     I2_QML_PROPERTY_DELETE_PROOF(ActionVM*, selectedActionVMInTimeline)
 
@@ -122,6 +126,15 @@ public:
       * @brief Destructor
       */
     ~ScenarioController();
+
+    /**
+    * @brief Get our filtered list of "time ticks"
+    * @return
+    */
+    AbstractTimeRangeFilter* filteredListActionsInTimeLine()
+    {
+        return &_filteredListActionsInTimeLine;
+    }
 
     /**
       * @brief Import the scenario lists structure from the json byte content
@@ -307,6 +320,11 @@ public Q_SLOTS:
       */
     void onRearmAction();
 
+    /**
+      * @brief slot on the time line range change
+      */
+    void ontimeRangeChange(int startTimeInMilliseconds, int endTimeInMilliseconds);
+
 private Q_SLOTS:
 
     /**
@@ -434,6 +452,9 @@ protected:
 private:
     // Time in milliseconds of our scenario start
     int _scenarioStartingTimeInMs;
+
+    // List of actionVM in timeline filtered with a given time range in milliseconds
+    AbstractTimeRangeFilter _filteredListActionsInTimeLine;
 
 };
 

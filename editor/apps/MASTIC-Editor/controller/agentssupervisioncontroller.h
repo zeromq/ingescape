@@ -166,9 +166,9 @@ private:
 
     /**
      * @brief Get the agents list to export
-     * @return List of pairs <agent name, definition>
+     * @return List of pairs <agent name (and parameters to restart), definition>
      */
-    QList<QPair<QString, DefinitionM*>> _getAgentsListToExport();
+    QList<QPair<QStringList, DefinitionM*>> _getAgentsListToExport();
 
 
 private:

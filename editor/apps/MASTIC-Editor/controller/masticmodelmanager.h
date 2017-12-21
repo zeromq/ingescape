@@ -165,16 +165,16 @@ public:
 
     /**
      * @brief Export the agents list to default file
-     * @param agentsListToExport list of pairs <agent name, definition>
+     * @param agentsListToExport list of pairs <agent name (and parameters to restart), definition>
      */
-    void exportAgentsListToDefaultFile(QList<QPair<QString, DefinitionM*>> agentsListToExport);
+    void exportAgentsListToDefaultFile(QList<QPair<QStringList, DefinitionM*>> agentsListToExport);
 
 
     /**
      * @brief Export the agents list to selected file
-     * @param agentsListToExport list of pairs <agent name, definition>
+     * @param agentsListToExport list of pairs <agent name (and parameters to restart), definition>
      */
-    void exportAgentsListToSelectedFile(QList<QPair<QString, DefinitionM*>> agentsListToExport);
+    void exportAgentsListToSelectedFile(QList<QPair<QStringList, DefinitionM*>> agentsListToExport);
 
 
     /**
@@ -347,10 +347,10 @@ private:
 
     /**
      * @brief Export the agents list to JSON file
-     * @param agentsListToExport list of pairs <agent name, definition>
+     * @param agentsListToExport list of pairs <agent name (and parameters to restart), definition>
      * @param agentsListFilePath
      */
-    void _exportAgentsListToFile(QList<QPair<QString, DefinitionM*>> agentsListToExport, QString agentsListFilePath);
+    void _exportAgentsListToFile(QList<QPair<QStringList, DefinitionM*>> agentsListToExport, QString agentsListFilePath);
 
 
     /**
