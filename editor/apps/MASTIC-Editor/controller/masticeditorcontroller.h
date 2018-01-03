@@ -94,122 +94,118 @@ public:
     ~MasticEditorController();
 
 
-    // Unix signal handlers.
-    //static void hupSignalHandler(int unused);
-    //static void termSignalHandler(int unused);
-
-
     /**
      * @brief Method used to provide a singleton to QML
      * @param engine
      * @param scriptEngine
      * @return
      */
-     static QObject* qmlSingleton(QQmlEngine* engine, QJSEngine* scriptEngine);
+    static QObject* qmlSingleton(QQmlEngine* engine, QJSEngine* scriptEngine);
 
-     /**
+
+    /**
       * @brief Open a platform file (actions, palette, timeline actions, mappings)
       */
-     Q_INVOKABLE void openPlatformFromFile();
+    Q_INVOKABLE void openPlatformFromFile();
 
-     /**
+    /**
       * @brief Save a platform to a selected file (actions, palette, timeline actions, mappings)
       */
-     Q_INVOKABLE void savePlatformToSelectedFile();
+    Q_INVOKABLE void savePlatformToSelectedFile();
 
-     /**
+    /**
       * @brief Save a platform to the default file (actions, palette, timeline actions, mappings)
       */
-     void savePlatformToDefaultFile();
+    void savePlatformToDefaultFile();
 
-     /**
+    /**
       * @brief Create a new platform (actions, palette, timeline actions, mappings)
       *        by deleting all existing data
       */
-     Q_INVOKABLE void createNewPlatform();
+    Q_INVOKABLE void createNewPlatform();
 
-     /**
+    /**
       * @brief Actions to perform before the application closing
       */
-     Q_INVOKABLE void processBeforeClosing();
+    Q_INVOKABLE void processBeforeClosing();
 
-     /**
+    /**
       * @brief Can delete an agent view model from the list function
       *        Check dependencies in the mapping and in the actions (conditions, effects)
       * @param agent to delete
       */
-     Q_INVOKABLE bool canDeleteAgentVMFromList(AgentVM* agent);
+    Q_INVOKABLE bool canDeleteAgentVMFromList(AgentVM* agent);
 
-     /**
+    /**
       * @brief Can delete an agent in mapping from the mapping view
       *        Check dependencies in the actions (conditions, effects)
       * @param agent in mapping to delete
       */
-     Q_INVOKABLE bool canDeleteAgentInMapping(AgentInMappingVM* agentInMapping);
+    Q_INVOKABLE bool canDeleteAgentInMapping(AgentInMappingVM* agentInMapping);
 
 
 public Q_SLOTS:
 
-     /**
+    /**
       * @brief Close a definition
       * @param definition
       */
-     void closeDefinition(DefinitionM* definition);
+    void closeDefinition(DefinitionM* definition);
 
 
-     /**
+    /**
       * @brief Close an action editor
       * @param action editor controller
       */
-     void closeActionEditor(ActionEditorController *actionEditorC);
+    void closeActionEditor(ActionEditorController *actionEditorC);
 
 
-     /**
+    /**
       * @brief Method used to force the creation of our singleton from QML
       */
-     void forceCreation();
+    void forceCreation();
 
 
-     /**
+    /**
       * @brief Get the position of the mouse cursor in global screen coordinates
       *
       * @remarks You must use mapToGlobal to convert it to local coordinates
       *
       * @return
       */
-     QPointF getGlobalMousePosition();
+    QPointF getGlobalMousePosition();
 
 signals:
 
-     /**
+    /**
       * @brief Reset the mapping and timeline views
       */
-     void resetMappindAndTimeLineViews();
+    void resetMappindAndTimeLineViews();
 
 private:
 
-     /**
+    /**
       * @brief Open the platform from JSON file
       * @param platformFilePath
       */
-     void _openPlatformFromFile(QString platformFilePath);
+    void _openPlatformFromFile(QString platformFilePath);
 
-     /**
+    /**
       * @brief Save the platform to JSON file
       * @param platformFilePath
       */
-     void _savePlatformToFile(QString platformFilePath);
+    void _savePlatformToFile(QString platformFilePath);
 
 
-     // To subscribe to termination signals
-     TerminationSignalWatcher *_terminationSignalWatcher;
+    // To subscribe to termination signals
+    TerminationSignalWatcher *_terminationSignalWatcher;
 
-     // Path to the directory containing JSON files to save platform
-     QString _platformDirectoryPath;
-     QString _platformDefaultFilePath;
+    // Path to the directory containing JSON files to save platform
+    QString _platformDirectoryPath;
+    QString _platformDefaultFilePath;
 
-     // Helper to manage JSON the saving/opening platform files
-     JsonHelper* _jsonHelper;
+    // Helper to manage JSON the saving/opening platform files
+    JsonHelper* _jsonHelper;
 
 };
 
