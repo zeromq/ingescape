@@ -75,62 +75,16 @@ I2CubicBezierCurve {
     // allowing to increase mouse area
     hitTestAreaMargin : 3
 
-    // if the inputAgent and outputAgent are reduced : global type of its inputs
+    // if the inputAgent and outputAgent are reduced : global type of its outputs
     stroke: if (rootItem._isBrin && outputModel)
             {
-                switch (mapBetweenIOPVM.outputAgent.reducedMapValueTypeGroupInOutput)
-                {
-                case AgentIOPValueTypeGroups.NUMBER:
-                    (outputModel.isPublishedNewValue && MasticEditorC.modelManager.isActivatedMapping) ? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
-                    break;
-                case AgentIOPValueTypeGroups.STRING:
-                    (outputModel.isPublishedNewValue && MasticEditorC.modelManager.isActivatedMapping) ? MasticTheme.redColor2 : MasticTheme.darkRedColor2
-                    break;
-                case AgentIOPValueTypeGroups.IMPULSION:
-                    (outputModel.isPublishedNewValue && MasticEditorC.modelManager.isActivatedMapping) ? MasticTheme.purpleColor : MasticTheme.darkPurpleColor
-                    break;
-                case AgentIOPValueTypeGroups.DATA:
-                    (outputModel.isPublishedNewValue && MasticEditorC.modelManager.isActivatedMapping) ? MasticTheme.greenColor : MasticTheme.darkGreenColor
-                    break;
-                case AgentIOPValueTypeGroups.MIXED:
-                    (outputModel.isPublishedNewValue && MasticEditorC.modelManager.isActivatedMapping) ? MasticTheme.whiteColor : MasticTheme.darkGreyColor
-                    break;
-                case AgentIOPValueTypeGroups.UNKNOWN:
-                    "#000000"
-                    break;
-                default:
-                    defaultColor;
-                    break;
-                }
+                MasticTheme.colorOfIOPTypeWithConditions(mapBetweenIOPVM.outputAgent.reducedMapValueTypeGroupInOutput, (outputModel.isPublishedNewValue && MasticEditorC.modelManager.isActivatedMapping));
             }
             else {
                 // if the inputAgent is not reduced : type of its output
                 if (outputModel && outputModel.firstModel)
                 {
-                    switch (outputModel.firstModel.agentIOPValueTypeGroup)
-                    {
-                    case AgentIOPValueTypeGroups.NUMBER:
-                        (outputModel.isPublishedNewValue && MasticEditorC.modelManager.isActivatedMapping) ? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
-                        break;
-                    case AgentIOPValueTypeGroups.STRING:
-                        (outputModel.isPublishedNewValue && MasticEditorC.modelManager.isActivatedMapping) ? MasticTheme.redColor2 : MasticTheme.darkRedColor2
-                        break;
-                    case AgentIOPValueTypeGroups.IMPULSION:
-                        (outputModel.isPublishedNewValue && MasticEditorC.modelManager.isActivatedMapping) ? MasticTheme.purpleColor : MasticTheme.darkPurpleColor
-                        break;
-                    case AgentIOPValueTypeGroups.DATA:
-                        (outputModel.isPublishedNewValue && MasticEditorC.modelManager.isActivatedMapping) ? MasticTheme.greenColor : MasticTheme.darkGreenColor
-                        break;
-                    case AgentIOPValueTypeGroups.MIXED:
-                        (outputModel.isPublishedNewValue && MasticEditorC.modelManager.isActivatedMapping) ? MasticTheme.whiteColor : MasticTheme.darkGreyColor
-                        break;
-                    case AgentIOPValueTypeGroups.UNKNOWN:
-                        "#000000"
-                        break;
-                    default:
-                        MasticTheme.whiteColor;
-                        break;
-                    }
+                    MasticTheme.colorOfIOPTypeWithConditions(outputModel.firstModel.agentIOPValueTypeGroup, (outputModel.isPublishedNewValue && MasticEditorC.modelManager.isActivatedMapping));
                 }
                 else {
                     defaultColor;

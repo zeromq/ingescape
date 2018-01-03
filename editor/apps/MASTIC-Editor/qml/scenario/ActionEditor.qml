@@ -2093,6 +2093,74 @@ Window {
                                         }
                                     }
 
+
+                                    Button {
+                                        anchors {
+                                            verticalCenter: parent.verticalCenter
+                                        }
+
+                                        visible : myEffect && myEffect.effectType === ActionEffectTypes.VALUE
+                                        activeFocusOnPress: true
+                                        checkable: true
+
+                                        style: Theme.LabellessSvgButtonStyle {
+                                            fileCache: MasticTheme.svgFileMASTIC
+
+                                            pressedID: releasedID + "-pressed"
+                                            releasedID: "warningActionEditor"
+                                            disabledID : releasedID
+                                        }
+
+                                        onClicked: {
+                                            infosBulle.open();
+                                        }
+
+
+
+                                        I2PopupBase {
+                                            id : infosBulle
+
+                                            height : backgroundPopup.height
+                                            width : backgroundPopup.width
+                                            keepRelativePositionToInitialParent: true
+                                            layerColor : 'transparent'
+
+                                            onOpened: {
+                                                infosBulle.visible = true
+                                                infosBulle.x = infosBulle.x - infosBulle.width + 25
+                                                infosBulle.y = infosBulle.y - infosBulle.height - 3
+                                            }
+
+                                            onClosed: {
+                                                // the pop up moves otherwise before being not visible
+                                                infosBulle.visible = false
+                                            }
+
+                                            I2SvgItem {
+                                                id : backgroundPopup
+
+                                                svgFileCache : MasticTheme.svgFileMASTIC;
+                                                svgElementId: "bulleInfos"
+                                            }
+
+                                            Text {
+                                                id : textInfos
+                                                anchors {
+                                                    fill : parent
+                                                    margins: 6
+                                                }
+
+                                                color : MasticTheme.veryDarkGreyColor
+                                                wrapMode: Text.Wrap
+                                                text : qsTr("Writing to inputs or parameters cannot be reverted.")
+                                                font {
+                                                    family : MasticTheme.textFontFamily
+                                                    pixelSize: 13
+                                                }
+                                            }
+                                        }
+
+                                    }
                                 }
 
                                 //
@@ -2378,6 +2446,11 @@ Window {
                                     }
 
                                 }
+
+
+                                //
+                                //
+                                //
 
 
                                 // Delete Effect

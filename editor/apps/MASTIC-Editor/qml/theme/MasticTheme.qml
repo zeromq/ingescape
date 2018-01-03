@@ -15,9 +15,9 @@
  */
 
 pragma Singleton
-import QtQuick 2.5
+import QtQuick 2.8
 import I2Quick 1.0
-
+//import MASTIC 1.0
 
 /**
   * Singleton that provides access to standard colors, fonts, etc.
@@ -45,6 +45,7 @@ Item {
 
     // Height of our bottom panel
     readonly property int bottomPanelHeight: 300
+
 
 
     //-----------------------------------------
@@ -267,18 +268,50 @@ Item {
 
 
     // links colors
-    readonly property color orangeColor2 : "#e37724"
-    readonly property color darkOrangeColor2 : "#53382c"
+//    readonly property color orangeColor2 : "#e37724"
+//    readonly property color darkOrangeColor2 : "#53382c"
 
-    readonly property color redColor2 : "#cf4f56"
-    readonly property color darkRedColor2 : "#4d3033"
+//    readonly property color redColor2 : "#cf4f56"
+//    readonly property color darkRedColor2 : "#4d3033"
 
-    readonly property color purpleColor : "#8e71b0"
-    readonly property color darkPurpleColor : "#3b3649"
+//    readonly property color purpleColor : "#8e71b0"
+//    readonly property color darkPurpleColor : "#3b3649"
 
-    readonly property color greenColor : "#14b2ad"
-    readonly property color darkGreenColor : "#214848"
+//    readonly property color greenColor : "#14b2ad"
+//    readonly property color darkGreenColor : "#214848"
 
+        readonly property color yellowColor : "#ECB52E" // "#FFEE0B"
+        readonly property color darkYellowColor : "#936F20"
+
+        readonly property color redColor2 : "#E33E36" //"#E02424"
+        readonly property color darkRedColor2 :  "#672B28"
+
+        readonly property color purpleColor : "#854D97"
+        readonly property color darkPurpleColor : "#483059"
+
+        readonly property color greenColor : "#00AE8B"
+        readonly property color darkGreenColor : "#1E564F"
+
+
+    function colorOfIOPTypeWithConditions(iOPType, conditions) {
+        switch (iOPType)
+        {
+        case 0: //AgentIOPValueTypeGroups.NUMBER:
+            return (conditions === true)? theme.yellowColor : theme.darkYellowColor
+        case 1 : //AgentIOPValueTypeGroups.STRING:
+            return (conditions === true)? theme.greenColor : theme.darkGreenColor
+        case 2 : //AgentIOPValueTypeGroups.IMPULSION:
+           return (conditions === true)? theme.purpleColor : theme.darkPurpleColor
+        case 3 :  //AgentIOPValueTypeGroups.DATA:
+            return (conditions === true)? theme.redColor2 : theme.darkRedColor2
+        case 4 : //AgentIOPValueTypeGroups.MIXED:
+            return (conditions === true)? theme.whiteColor : theme.darkGreyColor
+        case 5 : //AgentIOPValueTypeGroups.UNKNOWN:
+            return "#000000";
+        default:
+            return "#000000";
+        }
+    }
 
     //
     // Agents
@@ -288,5 +321,4 @@ Item {
 
     readonly property color agentsONInputsOutputsMappingColor : theme.whiteColor
     readonly property color agentsOFFInputsOutputsMappingColor : theme.lightGreyColor
-
 }

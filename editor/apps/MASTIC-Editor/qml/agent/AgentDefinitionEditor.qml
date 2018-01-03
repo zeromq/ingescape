@@ -520,30 +520,7 @@ Window {
                                                 height : width
                                                 radius : width/2
 
-                                                color : switch (model.agentIOPValueTypeGroup)
-                                                        {
-                                                        case AgentIOPValueTypeGroups.NUMBER:
-                                                            MasticTheme.orangeColor2
-                                                            break;
-                                                        case AgentIOPValueTypeGroups.STRING:
-                                                            MasticTheme.redColor2
-                                                            break;
-                                                        case AgentIOPValueTypeGroups.IMPULSION:
-                                                            MasticTheme.purpleColor
-                                                            break;
-                                                        case AgentIOPValueTypeGroups.DATA:
-                                                            MasticTheme.greenColor
-                                                            break;
-                                                        case AgentIOPValueTypeGroups.MIXED:
-                                                            MasticTheme.whiteColor
-                                                            break;
-                                                        case AgentIOPValueTypeGroups.UNKNOWN:
-                                                            "#000000"
-                                                            break;
-                                                        default:
-                                                            MasticTheme.whiteColor;
-                                                            break;
-                                                        }
+                                                color : MasticTheme.colorOfIOPTypeWithConditions(model.agentIOPValueTypeGroup, true);
                                             }
 
                                             Text {

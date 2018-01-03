@@ -39,6 +39,20 @@ Item {
     property int linesNumber : controller ? controller.linesNumberInTimeLine : 0;
     property int lineHeight : MasticTheme.lineInTimeLineHeight
 
+    property bool isReduced : true;
+
+    onIsReducedChanged : {
+        if (isReduced) {
+            rootItem.height = 0;
+        } else {
+            rootItem.height = MasticTheme.bottomPanelHeight;
+        }
+    }
+
+    Behavior on height {
+        NumberAnimation {}
+    }
+
     //--------------------------------
     //
     // Functions
@@ -751,8 +765,7 @@ Item {
         id: columnHeadersArea
 
         anchors {
-            top: parent.top
-            topMargin: 26
+            top: scrollTimeLine.bottom
             left: parent.left
             leftMargin: 105
             right: parent.right
@@ -1030,7 +1043,7 @@ Item {
 
         anchors {
             top: parent.top
-            topMargin: 18
+            topMargin: 22
             left: columnHeadersArea.left
             right: columnHeadersArea.right
         }
@@ -1046,7 +1059,7 @@ Item {
             height : 13
 
             property var scrollBarSize: if (viewController) {
-                                           Math.max(2,(viewController.viewportWidth*scrollTimeLine.width)/viewController.timeTicksTotalWidth);
+                                           Math.max(8,(viewController.viewportWidth*scrollTimeLine.width)/viewController.timeTicksTotalWidth);
                                         }
                                         else {
                                             0
@@ -1077,13 +1090,47 @@ Item {
     }
 
 
-    //Zone allowing to change height of the time lineHeight
+    // Button to reduce timeline
+    I2CustomRectangle {
+        anchors {
+            right : parent.right
+            bottom : parent.top
+            rightMargin: 40
+        }
+        height : 20
+        width : 77
+
+        topLeftRadius: 5
+        topRightRadius: 5
+
+        color :  mouseAreaReduceTimeLine.pressed? MasticTheme.darkBlueGreyColor : MasticTheme.editorsBackgroundColor
+
+        I2SvgItem {
+            anchors.centerIn: parent
+
+            svgFileCache: MasticTheme.svgFileMASTIC
+            svgElementId: "reduceTimeline"
+
+            rotation : (rootItem.isReduced) ? 180 : 0;
+        }
+
+        MouseArea {
+            id : mouseAreaReduceTimeLine
+            anchors.fill: parent
+
+            onClicked: {
+                rootItem.isReduced = !rootItem.isReduced
+            }
+        }
+    }
+
+    //Zone allowing to change height of the time line
     Rectangle {
         id : resizeRectangle
         anchors {
             left : parent.left
             right : parent.right
-            verticalCenter : parent.top
+            top : parent.top
         }
         height : 14
 
@@ -1141,7 +1188,7 @@ Item {
             left : parent.left
             right : columnHeadersArea.left
             top : parent.top
-            topMargin: 16
+            topMargin: 20
         }
 
         Button {
@@ -1286,7 +1333,7 @@ Item {
         target: scrollBarHorizontal
         property: "x"
         value: if (viewController) {
-                   (viewController.viewportX*scrollTimeLine.width)/viewController.timeTicksTotalWidth
+                   Math.max(0, (viewController.viewportX*scrollTimeLine.width)/viewController.timeTicksTotalWidth);
                }
                else {
                    0

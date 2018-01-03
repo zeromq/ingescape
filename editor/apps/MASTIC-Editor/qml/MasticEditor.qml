@@ -107,8 +107,10 @@ Item {
             right: parent.right
             bottom: parent.bottom
         }
-        height: MasticTheme.bottomPanelHeight
+        height: 0
         controller: MasticEditorC.scenarioC;
+
+
     }
 
 

@@ -60,8 +60,8 @@ Rectangle {
     width : 258
 
     height : (rootItem.agentMappingVM && !rootItem.isReduced)
-              ? (54 + 22 * Math.max(rootItem.agentMappingVM.inputsList.count , rootItem.agentMappingVM.outputsList.count))
-              : 42
+             ? (54 + 22 * Math.max(rootItem.agentMappingVM.inputsList.count , rootItem.agentMappingVM.outputsList.count))
+             : 42
 
 
     // Init position of our agent
@@ -72,15 +72,15 @@ Rectangle {
     radius: 6
 
     color:  (dropEnabled === true) ?
-                 (mouseArea.pressed ?
+                (mouseArea.pressed ?
                      MasticTheme.darkGreyColor2
-                    : (rootItem.agentMappingVM && rootItem.agentMappingVM.isON) ? MasticTheme.darkBlueGreyColor : MasticTheme.veryDarkGreyColor)
-               : MasticTheme.darkGreyColor2;
+                   : (rootItem.agentMappingVM && rootItem.agentMappingVM.isON) ? MasticTheme.darkBlueGreyColor : MasticTheme.veryDarkGreyColor)
+              : MasticTheme.darkGreyColor2;
 
 
     border {
         color: MasticTheme.selectedAgentColor
-        width: rootItem._isSelected ? 2 : 0
+        width: rootItem._isSelected ? 1 : 0
     }
 
 
@@ -359,32 +359,7 @@ Rectangle {
                             }
 
                             color : if (agentMappingVM && myModel && myModel.firstModel) {
-
-                                        switch (myModel.firstModel.agentIOPValueTypeGroup)
-                                        {
-                                        case AgentIOPValueTypeGroups.NUMBER:
-                                            MasticTheme.orangeColor2
-                                            break;
-                                        case AgentIOPValueTypeGroups.STRING:
-                                            MasticTheme.redColor2
-                                            break;
-                                        case AgentIOPValueTypeGroups.IMPULSION:
-                                             MasticTheme.purpleColor
-                                            break;
-                                        case AgentIOPValueTypeGroups.DATA:
-                                            MasticTheme.greenColor
-                                            break;
-                                        case AgentIOPValueTypeGroups.MIXED:
-                                            MasticTheme.darkGreyColor
-                                            break;
-                                        case AgentIOPValueTypeGroups.UNKNOWN:
-                                            "#000000"
-                                            break;
-                                        default:
-                                            "#000000"
-                                            break;
-                                        }
-
+                                        MasticTheme.colorOfIOPTypeWithConditions(myModel.firstModel.agentIOPValueTypeGroup, true);
                                     }
                                     else {
                                         MasticTheme.whiteColor
@@ -630,36 +605,11 @@ Rectangle {
                             }
 
                             color: if (agentMappingVM && myModel && myModel.firstModel) {
-
-                                        switch (myModel.firstModel.agentIOPValueTypeGroup)
-                                        {
-                                        case AgentIOPValueTypeGroups.NUMBER:
-                                            (!myModel.firstModel.isMuted) ? MasticTheme.orangeColor2 : MasticTheme.darkOrangeColor2
-                                            break;
-                                        case AgentIOPValueTypeGroups.STRING:
-                                            (!myModel.firstModel.isMuted)? MasticTheme.redColor2 : MasticTheme.darkRedColor2
-                                            break;
-                                        case AgentIOPValueTypeGroups.IMPULSION:
-                                            (!myModel.firstModel.isMuted)? MasticTheme.purpleColor : MasticTheme.darkPurpleColor
-                                            break;
-                                        case AgentIOPValueTypeGroups.DATA:
-                                            (!myModel.firstModel.isMuted)? MasticTheme.greenColor : MasticTheme.darkGreenColor
-                                            break;
-                                        case AgentIOPValueTypeGroups.MIXED:
-                                            (!myModel.firstModel.isMuted)? MasticTheme.whiteColor : MasticTheme.darkGreyColor
-                                            break;
-                                        case AgentIOPValueTypeGroups.UNKNOWN:
-                                            "#000000"
-                                            break;
-                                        default:
-                                            "#000000"
-                                            break;
-                                        }
-
-                                    }
+                                       MasticTheme.colorOfIOPTypeWithConditions(myModel.firstModel.agentIOPValueTypeGroup, (!myModel.firstModel.isMuted));
+                                   }
                                    else {
-                                        MasticTheme.whiteColor
-                                    }
+                                       MasticTheme.whiteColor
+                                   }
 
 
 
@@ -832,8 +782,8 @@ Rectangle {
             text: rootItem.agentName
 
             color: (dropEnabled === true) ?
-                        (rootItem.agentMappingVM && rootItem.agentMappingVM.isON) ? MasticTheme.agentsONNameMappingColor : MasticTheme.agentsOFFNameMappingColor
-                    : MasticTheme.lightGreyColor;
+                       (rootItem.agentMappingVM && rootItem.agentMappingVM.isON) ? MasticTheme.agentsONNameMappingColor : MasticTheme.agentsOFFNameMappingColor
+            : MasticTheme.lightGreyColor;
 
             font: MasticTheme.headingFont
         }
@@ -965,9 +915,9 @@ Rectangle {
         // Drop Impossible
         I2SvgItem {
             anchors {
-              right: parent.right
-              top: parent.top
-              margins: 2
+                right: parent.right
+                top: parent.top
+                margins: 2
             }
 
             svgFileCache: MasticTheme.svgFileMASTIC
@@ -996,30 +946,7 @@ Rectangle {
             radius : height/2
 
             color : if (agentMappingVM) {
-                        switch (agentMappingVM.reducedMapValueTypeGroupInInput)
-                        {
-                        case AgentIOPValueTypeGroups.NUMBER:
-                            MasticTheme.orangeColor2
-                            break;
-                        case AgentIOPValueTypeGroups.STRING:
-                            MasticTheme.redColor2
-                            break;
-                        case AgentIOPValueTypeGroups.IMPULSION:
-                            MasticTheme.purpleColor
-                            break;
-                        case AgentIOPValueTypeGroups.DATA:
-                            MasticTheme.greenColor
-                            break;
-                        case AgentIOPValueTypeGroups.MIXED:
-                            MasticTheme.whiteColor
-                            break;
-                        case AgentIOPValueTypeGroups.UNKNOWN:
-                            "#000000"
-                            break;
-                        default:
-                            MasticTheme.whiteColor;
-                            break;
-                        }
+                        MasticTheme.colorOfIOPTypeWithConditions(agentMappingVM.reducedMapValueTypeGroupInInput, true);
                     }
                     else {
                         MasticTheme.whiteColor
@@ -1048,30 +975,7 @@ Rectangle {
             radius : height/2
 
             color : if (agentMappingVM) {
-                        switch (agentMappingVM.reducedMapValueTypeGroupInOutput)
-                        {
-                        case AgentIOPValueTypeGroups.NUMBER:
-                            MasticTheme.orangeColor2
-                            break;
-                       case AgentIOPValueTypeGroups.STRING:
-                            MasticTheme.redColor2
-                            break;
-                        case AgentIOPValueTypeGroups.IMPULSION:
-                            MasticTheme.purpleColor
-                            break;
-                        case AgentIOPValueTypeGroups.DATA:
-                            MasticTheme.greenColor
-                            break;
-                        case AgentIOPValueTypeGroups.MIXED:
-                            MasticTheme.whiteColor
-                            break;
-                        case AgentIOPValueTypeGroups.UNKNOWN:
-                            "#000000"
-                            break;
-                        default:
-                            MasticTheme.whiteColor;
-                            break;
-                        }
+                        MasticTheme.colorOfIOPTypeWithConditions(agentMappingVM.reducedMapValueTypeGroupInOutput, true);
                     }
                     else {
                         MasticTheme.whiteColor
@@ -1088,5 +992,5 @@ Rectangle {
         }
 
 
-     }
+    }
 }

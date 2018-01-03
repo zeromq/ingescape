@@ -141,13 +141,13 @@ Item {
                         switch (combobox.selectedItem.agentIOPValueType)
                         {
                         case AgentIOPValueTypes.INTEGER:
-                            MasticTheme.orangeColor2
+                            MasticTheme.yellowColor
                             break;
                         case AgentIOPValueTypes.BOOL:
-                            MasticTheme.orangeColor2
+                            MasticTheme.yellowColor
                             break;
                         case AgentIOPValueTypes.DOUBLE:
-                            MasticTheme.orangeColor2
+                            MasticTheme.yellowColor
                             break;
                         case AgentIOPValueTypes.STRING:
                             MasticTheme.redColor2
@@ -332,13 +332,13 @@ Item {
                         color : switch (model.agentIOPValueType)
                                 {
                                 case AgentIOPValueTypes.INTEGER:
-                                    MasticTheme.orangeColor2
+                                    MasticTheme.yellowColor
                                     break;
                                 case AgentIOPValueTypes.BOOL:
-                                    MasticTheme.orangeColor2
+                                    MasticTheme.yellowColor
                                     break;
                                 case AgentIOPValueTypes.DOUBLE:
-                                    MasticTheme.orangeColor2
+                                    MasticTheme.yellowColor
                                     break;
                                 case AgentIOPValueTypes.STRING:
                                     MasticTheme.redColor2
