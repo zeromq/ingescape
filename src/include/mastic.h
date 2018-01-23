@@ -101,20 +101,20 @@ PUBLIC int mtic_readParameter(const char *name, void **value, long *size);
 PUBLIC bool mtic_readInputAsBool(const char *name);
 PUBLIC int mtic_readInputAsInt(const char *name);
 PUBLIC double mtic_readInputAsDouble(const char *name);
-PUBLIC char* mtic_readInputAsString(const char *name);
-PUBLIC int mtic_readInputAsData(const char *name, void **data, long *size);
+PUBLIC char* mtic_readInputAsString(const char *name); //char* must be freed by caller
+PUBLIC int mtic_readInputAsData(const char *name, void **data, long *size); //data must be freed by caller
 
 PUBLIC bool mtic_readOutputAsBool(const char *name);
 PUBLIC int mtic_readOutputAsInt(const char *name);
 PUBLIC double mtic_readOutputAsDouble(const char *name);
-PUBLIC char* mtic_readOutputAsString(const char *name);
-PUBLIC int mtic_readOutputAsData(const char *name, void **data, long *size);
+PUBLIC char* mtic_readOutputAsString(const char *name); //char* must be freed by caller
+PUBLIC int mtic_readOutputAsData(const char *name, void **data, long *size); //data must be freed by caller
 
 PUBLIC bool mtic_readParameterAsBool(const char *name);
 PUBLIC int mtic_readParameterAsInt(const char *name);
 PUBLIC double mtic_readParameterAsDouble(const char *name);
-PUBLIC char* mtic_readParameterAsString(const char *name);
-PUBLIC int mtic_readParameterAsData(const char *name, void **data, long *size);
+PUBLIC char* mtic_readParameterAsString(const char *name); //char* must be freed by caller
+PUBLIC int mtic_readParameterAsData(const char *name, void **data, long *size); //data must be freed by caller
 
 //write using values in a string format
 PUBLIC int mtic_writeInput(const char *name, char *value, long size);

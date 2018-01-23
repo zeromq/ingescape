@@ -222,7 +222,7 @@ int network_manageSubscriberMapping(subscriber_t *subscriber){
                         subscriber->timerId = zloop_timer(agentElements->loop, 500, 1, triggerMappingNotificationToNewcomer, (void *)subscriber);
                     }
                 }
-                //NOTE: we do not clean subscriptions here because we cannot check
+                //NOTE: we do not clean subscriptions here because we cannot check if
                 //an output is not used in another mapping element
             }
         }
@@ -353,6 +353,8 @@ int manageSubscription (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 
                 //NOTE: we rely on the external agent definition exclusively to get
                 //the output type. This type is then used to convert the received data.
+                //TODO: we can optimize the code below by including the output type inside the message
+                //but this would break retrocompatibility
                 definition * externalDefinition = foundSubscriber->definition;
 
                 if(externalDefinition != NULL){
@@ -1127,7 +1129,6 @@ int network_publishOutput (const char* output_name)
     {
         if(!isWholeAgentMuted && !found_iop->is_muted && found_iop->name != NULL && !isFrozen)
         {
-            //FIXME: test return code for zmsg_send
             if (found_iop->value_type == DATA_T){
                 void *data = NULL;
                 long size = 0;
