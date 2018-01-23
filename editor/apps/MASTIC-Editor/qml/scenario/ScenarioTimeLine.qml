@@ -39,19 +39,36 @@ Item {
     property int linesNumber : controller ? controller.linesNumberInTimeLine : 0;
     property int lineHeight : MasticTheme.lineInTimeLineHeight
 
+    // flag indicating if our component is reduced or expanded
     property bool isReduced : true;
 
     onIsReducedChanged : {
-        if (isReduced) {
+        // Allow resize animations
+        rootItem._canPerformResizeAnimations = true;
+
+        // Set our new height
+        if (isReduced)
+        {
             rootItem.height = 0;
-        } else {
+        }
+        else
+        {
             rootItem.height = MasticTheme.bottomPanelHeight;
         }
     }
 
+
+
+    // Flag used to check if we can perform resize animations
+    // NB: this flag is used to avoid animations during a drag-n-drop
+    property bool _canPerformResizeAnimations: true
+
     Behavior on height {
+        enabled: rootItem._canPerformResizeAnimations
+
         NumberAnimation {}
     }
+
 
     //--------------------------------
     //
@@ -1157,13 +1174,19 @@ Item {
             id : mouseAreaResizeTimeLine
 
             anchors.fill: parent
+
             hoverEnabled: true
-            drag.target: resizeRectangle
+
+            smooth: false
+
             property real previousPositionY : 0.0;
 
             onPressed: {
                 rootItem.forceActiveFocus();
                 previousPositionY = mouse.y;
+
+                // Disable resize animations
+                rootItem._canPerformResizeAnimations = false;
             }
 
             onPositionChanged: {
@@ -1179,6 +1202,10 @@ Item {
                 }
             }
 
+            onReleased: {
+                // Restore resize animations
+                rootItem._canPerformResizeAnimations = true;
+            }
         }
     }
 
