@@ -219,10 +219,12 @@ PUBLIC int mtic_removeMappingEntryWithName(const char *fromOurInput, const char 
 //////////////////////////////////////////////////
 //administration, configuration & utilities
 
+PUBLIC int mtic_version(void);
+
 //utility function to find network adapters with broadcast capabilities
 //to be used in mtic_startWithDevice
-void mtic_getNetdevicesList(char ***devices, int *nb);
-void mtic_freeNetdevicesList(char **devices, int nb);
+PUBLIC void mtic_getNetdevicesList(char ***devices, int *nb);
+PUBLIC void mtic_freeNetdevicesList(char **devices, int nb);
 
 //Command line for the agent can be passed here for inclusion in the
 //agent's headers. If not set, header is initialized with exec path.

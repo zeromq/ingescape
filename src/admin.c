@@ -20,6 +20,11 @@
 #include "mastic.h"
 #include "mastic_private.h"
 
+#define MASTIC_MAJOR 0
+#define MASTIC_MINOR 8
+#define MASTIC_MICRO 0
+#define MASTIC_VERSION ((MASTIC_MAJOR * 10000) + (MASTIC_MINOR * 100) + MASTIC_MICRO)
+
 FILE *fp = NULL;
 bool admin_logInStream = false;
 bool logInFile = false;
@@ -136,6 +141,11 @@ void admin_unlock(void) {
 ////////////////////////////////////////////////////////////////////////
 // PUBLIC API
 ////////////////////////////////////////////////////////////////////////
+
+int mtic_version(void){
+    printf("Mastic version : %d.%d.%d\n", MASTIC_MAJOR, MASTIC_MINOR, MASTIC_MICRO);
+    return MASTIC_VERSION;
+}
 
 void mtic_log(mtic_logLevel_t level, const char *fmt, ...){
     admin_lock();
