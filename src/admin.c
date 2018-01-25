@@ -43,7 +43,7 @@ pthread_mutex_t *lock = NULL;
 #endif
 
 static const char *log_levels[] = {
-    "TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"
+    "TRACE", "DEBUG", "INFO", "WARNING", "ERROR", "FATAL"
 };
 static const char *log_colors[] = {
     "\x1b[94m", "\x1b[36m", "\x1b[32m", "\x1b[33m", "\x1b[31m", "\x1b[35m"
@@ -193,9 +193,9 @@ void mtic_log(mtic_logLevel_t level, const char *fmt, ...){
     }
     if (logInConsole && level >= logLevel){
         if (useColorInConsole){
-            fprintf(stderr,"%s%-5s\x1b[0m;%s", log_colors[logLevel], log_levels[logLevel], logContent);
+            fprintf(stderr,"%s%s\x1b[0m;%s", log_colors[logLevel], log_levels[level], logContent);
         }else{
-            fprintf(stderr,"%-5s;%s", log_levels[logLevel], logContent);
+            fprintf(stderr,"%s;%s", log_levels[level], logContent);
         }
     }
     if (admin_logInStream && agentElements != NULL && agentElements->logger != NULL){
