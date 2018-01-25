@@ -161,7 +161,18 @@ agent_iop* definition_createIop(const char *name, iop_t type, iopType_t value_ty
     //Create the iop
     agent_iop *iop = NULL;
     iop = calloc (1, sizeof (struct agent_iop));
-    iop->name = strdup(name);
+    char *n = strndup(name, MAX_IOP_NAME_LENGTH);
+    bool spaceInName = false;
+    for (int i = 0; i < strlen(n); i++){
+        if (n[i] == ' '){
+            n[i] = '_';
+            spaceInName = true;
+        }
+    }
+    if (spaceInName){
+        mtic_warn("Spaces are not allowed in IOP: %s has been renamed to %s\n", name, n);
+    }
+    iop->name = n;
     iop->type = type;
     iop->value_type = value_type;
 
@@ -491,6 +502,11 @@ int mtic_setDefinitionVersion(char *version){
  */
 
 int mtic_createInput(const char *name, iopType_t value_type, void *value, long size){
+    if (name == NULL){
+        mtic_error("%s called with NULL name parameter\n", __func__);
+        return -1;
+    }
+    
     if(mtic_internal_definition == NULL){
         mtic_internal_definition = calloc(1, sizeof(struct definition));
     }
@@ -521,6 +537,11 @@ int mtic_createInput(const char *name, iopType_t value_type, void *value, long s
  */
 
 int mtic_createOutput(const char *name, iopType_t value_type, void *value, long size){
+    if (name == NULL){
+        mtic_error("%s called with NULL name parameter\n", __func__);
+        return -1;
+    }
+    
     if(mtic_internal_definition == NULL){
         mtic_internal_definition = calloc(1, sizeof(struct definition));
     }
@@ -550,6 +571,11 @@ int mtic_createOutput(const char *name, iopType_t value_type, void *value, long 
  * \return The error. 1 is OK, 0 not able to add in definition loaded, -1 not able to add in definition live
  */
 int mtic_createParameter(const char *name, iopType_t value_type, void *value, long size){
+    if (name == NULL){
+        mtic_error("%s called with NULL name parameter\n", __func__);
+        return -1;
+    }
+    
     if(mtic_internal_definition == NULL){
         mtic_internal_definition = calloc(1, sizeof(struct definition));
     }
@@ -577,6 +603,11 @@ int mtic_createParameter(const char *name, iopType_t value_type, void *value, lo
  * \return The error. 1 is OK, 0 Definition loaded is NULL, -1 Definition live is NULL, -2 An error occurs while finding the iop by name
  */
 int mtic_removeInput(const char *name){
+    if (name == NULL){
+        mtic_error("%s called with NULL name parameter\n", __func__);
+        return -1;
+    }
+    
 
     //check if def live iexist
     if(mtic_internal_definition == NULL){
@@ -611,6 +642,11 @@ int mtic_removeInput(const char *name){
  * \return The error. 1 is OK, 0 Definition loaded is NULL, -1 Definition live is NULL, -2 An error occurs while finding the iop by name
  */
 int mtic_removeOutput(const char *name){
+    if (name == NULL){
+        mtic_error("%s called with NULL name parameter\n", __func__);
+        return -1;
+    }
+    
     //check if def exists
     if(mtic_internal_definition == NULL){
         mtic_debug("Internal definition has not been defined.");
@@ -644,6 +680,10 @@ int mtic_removeOutput(const char *name){
  * \return The error. 1 is OK, 0 Definition loaded is NULL, -1 Definition live is NULL, -2 An error occurs while finding the iop by name
  */
 int mtic_removeParameter(const char *name){
+    if (name == NULL){
+        mtic_error("%s called with NULL name parameter\n", __func__);
+        return -1;
+    }
 
     //check if def exists
     if(mtic_internal_definition == NULL){

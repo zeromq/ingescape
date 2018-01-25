@@ -120,7 +120,18 @@ static void json_add_data_to_hash (struct agent_iop ** hasht,iop_t type,
     HASH_FIND_STR(*hasht, name , data);
     if (data == NULL) {
         data = calloc (1, sizeof (struct agent_iop));
-        data->name = strdup (name);
+        char *n = strndup(name, MAX_IOP_NAME_LENGTH);
+        bool spaceInName = false;
+        for (int i = 0; i < strlen(n); i++){
+            if (n[i] == ' '){
+                n[i] = '_';
+                spaceInName = true;
+            }
+        }
+        if (spaceInName){
+            mtic_warn("Spaces are not allowed in IOP: %s has been renamed to %s\n", name, n);
+        }
+        data->name = n;
 
         data->value_type = string_to_value_type (YAJL_GET_STRING(obj->u.object.values[1]));
         switch (data->value_type) {
@@ -399,12 +410,34 @@ static void json_add_map_out_to_hash (mapping_element_t** hasht,
     if (v){
         input_name = YAJL_GET_STRING(v);
     }
+    char *reviewedFromOurInput = strndup(input_name, MAX_IOP_NAME_LENGTH);
+    bool spaceInName = false;
+    for (int i = 0; i < strlen(reviewedFromOurInput); i++){
+        if (reviewedFromOurInput[i] == ' '){
+            reviewedFromOurInput[i] = '_';
+            spaceInName = true;
+        }
+    }
+    if (spaceInName){
+        mtic_warn("Mapping parser : spaces are not allowed in IOP: %s has been renamed to %s\n", input_name, reviewedFromOurInput);
+    }
     
     //agent_name
     path_in_current[0] = "agent_name";
     v = yajl_tree_get(current_map_out, path_in_current, yajl_t_any);
     if (v){
         agent_name = YAJL_GET_STRING(v);
+    }
+    char *reviewedToAgent = strndup(agent_name, MAX_IOP_NAME_LENGTH);
+    spaceInName = false;
+    for (int i = 0; i < strlen(reviewedToAgent); i++){
+        if (reviewedToAgent[i] == ' '){
+            reviewedToAgent[i] = '_';
+            spaceInName = true;
+        }
+    }
+    if (spaceInName){
+        mtic_warn("Mapping parser : spaces are not allowed in agent name: %s has been renamed to %s\n", agent_name, reviewedToAgent);
     }
     
     //output_name
@@ -413,14 +446,25 @@ static void json_add_map_out_to_hash (mapping_element_t** hasht,
     if (v){
         output_name = YAJL_GET_STRING(v);
     }
+    char *reviewedWithOutput = strndup(output_name, MAX_IOP_NAME_LENGTH);
+    spaceInName = false;
+    for (int i = 0; i < strlen(reviewedWithOutput); i++){
+        if (reviewedWithOutput[i] == ' '){
+            reviewedWithOutput[i] = '_';
+            spaceInName = true;
+        }
+    }
+    if (spaceInName){
+        mtic_warn("Mapping parser : spaces are not allowed in IOP: %s has been renamed to %s\n", output_name, reviewedWithOutput);
+    }
     
-    unsigned long len = strlen(input_name)+strlen(agent_name)+strlen(output_name)+3+1;
+    unsigned long len = strlen(reviewedFromOurInput)+strlen(reviewedToAgent)+strlen(reviewedWithOutput)+3+1;
     char *mashup = calloc(1, len*sizeof(char));
-    strcpy(mashup, input_name);
+    strcpy(mashup, reviewedFromOurInput);
     strcat(mashup, ".");//separator
-    strcat(mashup, agent_name);
+    strcat(mashup, reviewedToAgent);
     strcat(mashup, ".");//separator
-    strcat(mashup, output_name);
+    strcat(mashup, reviewedWithOutput);
     mashup[len -1] = '\0';
     unsigned long h = djb2_hash((unsigned char *)mashup);
     free (mashup);
@@ -431,10 +475,13 @@ static void json_add_map_out_to_hash (mapping_element_t** hasht,
     }
     if (tmp == NULL){
         //element does not exist yet : create and register it
-        mapping_element_t *new = mapping_createMappingElement(input_name, agent_name, output_name);
+        mapping_element_t *new = mapping_createMappingElement(reviewedFromOurInput, reviewedToAgent, reviewedWithOutput);
         new->id = h;
         HASH_ADD(hh, *hasht, id, sizeof(unsigned long), new);
     }
+    free(reviewedFromOurInput);
+    free(reviewedToAgent);
+    free(reviewedWithOutput);
 }
 
 /*

@@ -84,10 +84,9 @@ static const char *definitionPrefix = "EXTERNAL_DEFINITION#";
 static const char *mappingPrefix = "EXTERNAL_MAPPING#";
 static const char *loadMappingPrefix = "LOAD_THIS_MAPPING#";
 static const char *loadDefinitionPrefix = "LOAD_THIS_DEFINITION#";
-#define AGENT_NAME_LENGTH 256
 #define COMMAND_LINE_LENGTH 2048
-char agentName[AGENT_NAME_LENGTH] = AGENT_NAME_DEFAULT;
-char agentState[AGENT_NAME_LENGTH] = "";
+char agentName[MAX_AGENT_NAME_LENGTH] = AGENT_NAME_DEFAULT;
+char agentState[MAX_AGENT_NAME_LENGTH] = "";
 char commandLine[COMMAND_LINE_LENGTH] = "";
 
 typedef struct freezeCallback {
@@ -1358,7 +1357,7 @@ int mtic_stop(){
  */
 int mtic_setAgentName(const char *name){
     if (strlen(name) == 0){
-        mtic_debug("mtic_setAgentName : Agent name cannot be empty\n");
+        mtic_error("mtic_setAgentName : Agent name cannot be empty\n");
         return 0;
     }
     if (strcmp(agentName, name) == 0){
@@ -1377,8 +1376,18 @@ int mtic_setAgentName(const char *name){
         mtic_stop();
         needRestart = true;
     }
-    
-    strncpy(agentName, name, AGENT_NAME_LENGTH);
+    char *n = strndup(name, MAX_AGENT_NAME_LENGTH);
+    bool spaceInName = false;
+    for (int i = 0; i < strlen(n); i++){
+        if (n[i] == ' '){
+            n[i] = '_';
+            spaceInName = true;
+        }
+    }
+    if (spaceInName){
+        mtic_warn("Spaces are not allowed in agent name: %s has been renamed to %s\n", name, n);
+    }
+    strncpy(agentName, n, MAX_AGENT_NAME_LENGTH);
     
     if (needRestart){
         mtic_startWithIP(ipAddress, zyrePort);
@@ -1497,7 +1506,7 @@ int mtic_observeFreeze(mtic_freezeCallback cb, void *myData){
  */
 int mtic_setAgentState(const char *state){
     if (strcmp(state, agentState) != 0){
-        strncpy(agentState, state, AGENT_NAME_LENGTH);
+        strncpy(agentState, state, MAX_AGENT_NAME_LENGTH);
         if (agentElements != NULL && agentElements->node != NULL){
             zyre_shouts(agentElements->node, CHANNEL, "STATE=%s", agentState);
         }

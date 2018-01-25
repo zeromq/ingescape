@@ -256,8 +256,8 @@ void mtic_setLogLevel (mtic_logLevel_t level);
 void mtic_log(mtic_logLevel_t, const char*fmt, ...);
 #define mtic_trace(...) mtic_log(MTIC_LOG_TRACE, __VA_ARGS__)
 #define mtic_debug(...) mtic_log(MTIC_LOG_DEBUG, __VA_ARGS__)
-#define mtic_info(...)  mtic_log(MTIC_LOG_INFO,  __VA_ARGS__)
-#define mtic_warn(...)  mtic_log(MTIC_LOG_WARN,  __VA_ARGS__)
+#define mtic_info(...)  mtic_log(MTIC_LOG_INFO, __VA_ARGS__)
+#define mtic_warn(...)  mtic_log(MTIC_LOG_WARN, __VA_ARGS__)
 #define mtic_error(...) mtic_log(MTIC_LOG_ERROR, __VA_ARGS__)
 #define mtic_fatal(...) mtic_log(MTIC_LOG_FATAL, __VA_ARGS__)
 
