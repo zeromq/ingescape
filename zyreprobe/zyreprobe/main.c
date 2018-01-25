@@ -42,8 +42,8 @@ char *paramText = NULL;
 //data storage
 #define NAME_BUFFER_SIZE 256
 typedef struct agent {
-    char uuid[NAME_BUFFER_SIZE];
-    char name[NAME_BUFFER_SIZE];
+    char *uuid;
+    char *name;
     int reconnected;
     UT_hash_handle hh;
 } agent;
@@ -80,6 +80,8 @@ int manageParent (zloop_t *loop, zmq_pollitem_t *item, void *args){
                 char *group = zmsg_popstr (msg);
                 char *string = zmsg_popstr (msg);
                 zyre_shouts (node, group, "%s", string);
+                free(group);
+                free(string);
             }
             else if (streq (command, "WHISPER")) {
                 char *peer = zmsg_popstr (msg);
@@ -87,11 +89,13 @@ int manageParent (zloop_t *loop, zmq_pollitem_t *item, void *args){
                 agent *a = NULL;
                 for(a = zEl->agents; a != NULL; a = a->hh.next) {
                     if (strcmp(a->name, peer) == 0 || strcmp(a->uuid, peer) == 0){
-                        peer = a->uuid;
-                        break;
+                        //NB: no break here beacause we allow whispering several agents
+                        //having the same name
+                        zyre_whispers (node, a->uuid, "%s", string);
                     }
                 }
-                zyre_whispers (node, peer, "%s", string);
+                free(peer);
+                free(string);
             }
             else if (streq (command, "WHISPERALL")) {
                 char *string = zmsg_popstr (msg);
@@ -99,11 +103,12 @@ int manageParent (zloop_t *loop, zmq_pollitem_t *item, void *args){
                 for(a = zEl->agents; a != NULL; a = a->hh.next) {
                     zyre_whispers (node, a->uuid, "%s", string);
                 }
-                
+                free(string);
             }
             else if(streq (command, "LEAVE")){
                 char *group = zmsg_popstr (msg);
                 zyre_leave (node, group);
+                free(group);
             }
             else if(streq (command, "LEAVEALL")){
                 char *p;
@@ -117,6 +122,7 @@ int manageParent (zloop_t *loop, zmq_pollitem_t *item, void *args){
             else if(streq (command, "JOIN")){
                 char *group = zmsg_popstr (msg);
                 zyre_join (node, group);
+                free(group);
             }
             else if(streq (command, "JOINALL")){
                 char *p;
@@ -192,7 +198,6 @@ int manageIncoming (zloop_t *loop, zmq_pollitem_t *item, void *args){
         const char *peer = zyre_event_peer_uuid(zyre_event);
         const char *name = zyre_event_peer_name (zyre_event);
         const char *address = zyre_event_peer_addr (zyre_event);
-        zhash_t *headers = zyre_event_headers (zyre_event);
         const char *group = zyre_event_group (zyre_event);
         zmsg_t *msg = zyre_event_msg (zyre_event);
         //size_t msg_size = zmsg_content_size(msg);
@@ -209,15 +214,17 @@ int manageIncoming (zloop_t *loop, zmq_pollitem_t *item, void *args){
             if (a == NULL){
                 a = calloc(1, sizeof(agent));
                 a->reconnected = 0;
-                strncpy(a->uuid, peer, NAME_BUFFER_SIZE);
+                a->uuid = strndup(peer, NAME_BUFFER_SIZE);
+                a->name = strndup(name, NAME_BUFFER_SIZE);
                 HASH_ADD_STR(zEl->agents, uuid, a);
             }else{
                 //Agent already exists, we set its reconnected flag
                 //(this is used below to avoid agent destruction on EXIT received after timeout)
                 a->reconnected++;
             }
-            strncpy(a->name, name, NAME_BUFFER_SIZE);
             
+            
+            zhash_t *headers = zyre_event_headers (zyre_event);
             assert(headers);
             char *k;
             const char *v;
@@ -264,9 +271,13 @@ int manageIncoming (zloop_t *loop, zmq_pollitem_t *item, void *args){
                     a->reconnected--;
                 }else{
                     HASH_DEL(zEl->agents, a);
+                    free(a->name);
+                    free(a->uuid);
                     free(a);
                 }
             }
+        } else if (streq (event, "EVASIVE")){
+            printf ("%s (%s) is being evasive\n", name, peer);
         }
         zyre_event_destroy(&zyre_event);
     }
@@ -381,6 +392,8 @@ zyre_actor (zsock_t *pipe, void *args)
     agent *current, *tmp;
     HASH_ITER(hh, zEl->agents, current, tmp) {
         HASH_DEL(zEl->agents,current);
+        free(current->name);
+        free(current->uuid);
         free(current);
     }
     zyre_stop (node);
@@ -409,9 +422,10 @@ void print_usage(){
     printf("an endpoint looks like : tcp://10.0.0.7:49155\n");
     printf("--gossipbind endpoint : our address as a gossip endpoint\n");
     printf("--gossipconnect endpoint : address of a gossip endpoint to use\n");
-    printf("NB: if gossip endpoint restarts, others depending on it will not see it coming back\n");
-    printf("NB: in gossip mode, leaving agents are not detected by others\n");
+    printf("\tNB: if gossip endpoint restarts, others depending on it will not see it coming back\n");
+    printf("\tNB: in gossip mode, leaving agents are not detected by others\n");
     printf("--endpoint endpoint : optional custom zyre endpoint address (overrides --netdevice and --port)\n");
+    printf("\tNB: forcing the endpoint disables autodiscovery and gossip must be used\n");
 }
 
 void print_commands(){
@@ -531,9 +545,6 @@ int main (int argc, char *argv [])
             clean_matches(&my_matches);
         }
     }
-    
-   
-    
     
     //init zyre
     zactor_t *beaconActor = NULL;
