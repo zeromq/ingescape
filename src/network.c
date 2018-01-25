@@ -151,7 +151,7 @@ int subscribeToPublisherOutput(subscriber_t *subscriber, const char *outputName)
         }
         if (!filterAlreadyExists){
             // Set subscriber to the output filter
-            mtic_debug("subscribe to agent %s output %s\n",agentName,outputName);
+            mtic_debug("subscribe to agent %s output %s\n",subscriber->agentName,outputName);
             zsock_set_subscribe(subscriber->subscriber, outputName);
             mappingFilter_t *f = calloc(1, sizeof(mappingFilter_t));
             strncpy(f->filter, outputName, MAX_FILTER_SIZE);
