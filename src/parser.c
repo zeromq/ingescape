@@ -122,7 +122,8 @@ static void json_add_data_to_hash (struct agent_iop ** hasht,iop_t type,
         data = calloc (1, sizeof (struct agent_iop));
         char *n = strndup(name, MAX_IOP_NAME_LENGTH);
         bool spaceInName = false;
-        for (int i = 0; i < strlen(n); i++){
+        size_t lengthOfN = strlen(n);
+        for (size_t i = 0; i < lengthOfN; i++){
             if (n[i] == ' '){
                 n[i] = '_';
                 spaceInName = true;
@@ -412,7 +413,8 @@ static void json_add_map_out_to_hash (mapping_element_t** hasht,
     }
     char *reviewedFromOurInput = strndup(input_name, MAX_IOP_NAME_LENGTH);
     bool spaceInName = false;
-    for (int i = 0; i < strlen(reviewedFromOurInput); i++){
+    size_t lengthOfReviewedFromOurInput = strlen(reviewedFromOurInput);
+    for (size_t i = 0; i < lengthOfReviewedFromOurInput; i++){
         if (reviewedFromOurInput[i] == ' '){
             reviewedFromOurInput[i] = '_';
             spaceInName = true;
@@ -429,8 +431,9 @@ static void json_add_map_out_to_hash (mapping_element_t** hasht,
         agent_name = YAJL_GET_STRING(v);
     }
     char *reviewedToAgent = strndup(agent_name, MAX_IOP_NAME_LENGTH);
+    size_t lengthOfReviewedToAgent = strlen(reviewedToAgent);
     spaceInName = false;
-    for (int i = 0; i < strlen(reviewedToAgent); i++){
+    for (size_t i = 0; i < lengthOfReviewedToAgent; i++){
         if (reviewedToAgent[i] == ' '){
             reviewedToAgent[i] = '_';
             spaceInName = true;
@@ -447,8 +450,9 @@ static void json_add_map_out_to_hash (mapping_element_t** hasht,
         output_name = YAJL_GET_STRING(v);
     }
     char *reviewedWithOutput = strndup(output_name, MAX_IOP_NAME_LENGTH);
+    size_t lengthOfReviewedWithOutput = strlen(reviewedWithOutput);
     spaceInName = false;
-    for (int i = 0; i < strlen(reviewedWithOutput); i++){
+    for (size_t i = 0; i < lengthOfReviewedWithOutput; i++){
         if (reviewedWithOutput[i] == ' '){
             reviewedWithOutput[i] = '_';
             spaceInName = true;
