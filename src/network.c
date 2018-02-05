@@ -1244,7 +1244,7 @@ int mtic_startWithDevice(const char *networkDevice, int port){
 //                name, ziflist_address (iflist), ziflist_netmask (iflist), ziflist_broadcast (iflist));
         if (strcmp(name, networkDevice) == 0){
             strncpy(agentElements->ipAddress, ziflist_address (iflist), IP_ADDRESS_LENGTH-1);
-            mtic_debug("Connection with ip address %s on device %s\n", agentElements->ipAddress, networkDevice);
+            mtic_debug("Connection with ip address %s and port %d on device %s\n", agentElements->ipAddress, port, networkDevice);
         }
         name = ziflist_next (iflist);
     }
