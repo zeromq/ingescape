@@ -1,3 +1,10 @@
+#####################################################################
+#
+# Generic (multi-platform) rules
+#
+#####################################################################
+
+
 SOURCES += \
     $$PWD/../src/definition.c \
     $$PWD/../src/mapping.c \
@@ -12,6 +19,16 @@ HEADERS += \
     $$PWD/../src/include/mastic_private.h \
 
 INCLUDEPATH += $$PWD/../src/include
+
+
+
+
+#####################################################################
+#
+# OS specific rules
+#
+#####################################################################
+
 
 #add librairies zyre, czmq, zmq + yajl and configurate only for VS 2015 x86 (32 bits)
 win32:{
@@ -46,20 +63,44 @@ win32:{
     LIBS += -L$$C:/Windows/System32 -lws2_32
 }
 
+
+
+#
+# Mac and iOS
+#
 mac:{
-    message("Compilation macx scope ...")
+    message("Compilation macOs and iOS scope ...")
 
-    # FIXME: chemin en dur car il manque la lib sodium dans dep/zyre/bin/Macos
-    libzyre_path = $$PWD/zyre/bin/Macos
-    #libzyre_path = /usr/local/lib
+    # NB: use ios { } for ios sub-rules
 
-    libyajl_path = $$PWD/yajl/lloyd-yajl-2.1.0/Macos/lib
 
-    #Add librairies
-    LIBS += -L$$libzyre_path -lzmq -lczmq -lzyre \
-            -L$$libyajl_path -lyajl
+    #
+    # Include paths
+    #
+
+    # zyre, zmq, czmq, sodium
+    INCLUDEPATH += /usr/local/include
+
+    # Yajl
+    #INCLUDEPATH += /usr/local/include
+
+
+    #
+    # List of libraries to be linked into the project
+    #
+
+    # zyre, zmq, czmq, sodium
+    LIBS += -L/usr/local/lib -lzmq -lczmq -lzyre
+
+    # Yajl
+    LIBS += -L/usr/local/lib -lyajl
 }
 
+
+
+#
+# Unix except macOS and iOS
+#
 unix:!mac {
     raspberry_compilation {
         ############ Raspberry ###########
@@ -110,18 +151,5 @@ unix:!mac {
             -L$$libyajl_path -lyajl
     }
 }
-
-#--------- COMMON ---------#
-
-##Add headers from dependencies
-INCLUDEPATH += $$PWD/libzmq/include \
-               $$PWD/czmq/include \
-               $$PWD/zyre/include \
-               $$PWD/yajl/lloyd-yajl-2.1.0/include \
-
-DEPENDPATH += $$PWD/libzmq/include \
-              $$PWD/czmq/include \
-              $$PWD/zyre/include \
-              $$PWD/yajl/lloyd-yajl-2.1.0/include \
 
 

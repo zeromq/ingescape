@@ -1378,7 +1378,8 @@ int mtic_setAgentName(const char *name){
     }
     char *n = strndup(name, MAX_AGENT_NAME_LENGTH);
     bool spaceInName = false;
-    for (int i = 0; i < strlen(n); i++){
+    size_t lengthOfN = strlen(n);
+    for (size_t i = 0; i < lengthOfN; i++){
         if (n[i] == ' '){
             n[i] = '_';
             spaceInName = true;

@@ -163,7 +163,8 @@ agent_iop* definition_createIop(const char *name, iop_t type, iopType_t value_ty
     iop = calloc (1, sizeof (struct agent_iop));
     char *n = strndup(name, MAX_IOP_NAME_LENGTH);
     bool spaceInName = false;
-    for (int i = 0; i < strlen(n); i++){
+    size_t lengthOfN = strlen(n);
+    for (size_t i = 0; i < lengthOfN; i++){
         if (n[i] == ' '){
             n[i] = '_';
             spaceInName = true;

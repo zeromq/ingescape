@@ -484,7 +484,8 @@ unsigned long mtic_addMappingEntry(const char *fromOurInput, const char *toAgent
     }
     char *reviewedFromOurInput = strndup(fromOurInput, MAX_IOP_NAME_LENGTH);
     bool spaceInName = false;
-    for (int i = 0; i < strlen(reviewedFromOurInput); i++){
+    size_t lengthOfReviewedFromOurInput = strlen(reviewedFromOurInput);
+    for (size_t i = 0; i < lengthOfReviewedFromOurInput; i++){
         if (reviewedFromOurInput[i] == ' '){
             reviewedFromOurInput[i] = '_';
             spaceInName = true;
@@ -500,8 +501,9 @@ unsigned long mtic_addMappingEntry(const char *fromOurInput, const char *toAgent
         return 0;
     }
     char *reviewedToAgent = strndup(toAgent, MAX_IOP_NAME_LENGTH);
+    size_t lengthOfReviewedToAgent = strlen(reviewedToAgent);
     spaceInName = false;
-    for (int i = 0; i < strlen(reviewedToAgent); i++){
+    for (size_t i = 0; i < lengthOfReviewedToAgent; i++){
         if (reviewedToAgent[i] == ' '){
             reviewedToAgent[i] = '_';
             spaceInName = true;
@@ -517,8 +519,9 @@ unsigned long mtic_addMappingEntry(const char *fromOurInput, const char *toAgent
         return 0;
     }
     char *reviewedWithOutput = strndup(withOutput, MAX_IOP_NAME_LENGTH);
+    size_t lengthOfReviewedWithOutput = strlen(reviewedWithOutput);
     spaceInName = false;
-    for (int i = 0; i < strlen(reviewedWithOutput); i++){
+    for (size_t i = 0; i < lengthOfReviewedWithOutput; i++){
         if (reviewedWithOutput[i] == ' '){
             reviewedWithOutput[i] = '_';
             spaceInName = true;
