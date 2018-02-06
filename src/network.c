@@ -675,9 +675,9 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
             else if (strlen(message) > strlen(loadDefinitionPrefix) && strncmp (message, loadDefinitionPrefix, strlen(loadDefinitionPrefix)) == 0)
             {
                 // Extract definition from message
-                char* strDefinition = calloc(strlen(message)- strlen(definitionPrefix)+1, sizeof(char));
-                memcpy(strDefinition, &message[strlen(definitionPrefix)], strlen(message)- strlen(definitionPrefix));
-                strDefinition[strlen(message)- strlen(definitionPrefix)] = '\0';
+                char* strDefinition = calloc(strlen(message)- strlen(loadDefinitionPrefix)+1, sizeof(char));
+                memcpy(strDefinition, &message[strlen(loadDefinitionPrefix)], strlen(message)- strlen(loadDefinitionPrefix));
+                strDefinition[strlen(message)- strlen(loadDefinitionPrefix)] = '\0';
                 
                 //load definition
                 mtic_loadDefinition(strDefinition);
@@ -692,7 +692,7 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
             else if (strlen(message) > strlen(loadMappingPrefix) && strncmp (message, loadMappingPrefix, strlen(loadMappingPrefix)) == 0)
             {
                 // Extract mapping from message
-                char* strMapping = calloc(strlen(message)- strlen(definitionPrefix)+1, sizeof(char));
+                char* strMapping = calloc(strlen(message)- strlen(loadMappingPrefix)+1, sizeof(char));
                 memcpy(strMapping, &message[strlen(loadMappingPrefix)], strlen(message)- strlen(loadMappingPrefix));
                 strMapping[strlen(message)- strlen(loadMappingPrefix)] = '\0';
                 
