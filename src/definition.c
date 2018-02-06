@@ -388,7 +388,7 @@ char *mtic_getDefinitionVersion(void){
         return NULL;
     }
 }
-int mtic_setDefinitionName(char *name){
+int mtic_setDefinitionName(const char *name){
     if(name == NULL){
         mtic_debug("mtic_setDefinitionDescription : Agent name cannot be NULL \n");
         return 0;
@@ -423,7 +423,7 @@ int mtic_setDefinitionName(char *name){
  * \param description The string which contains the description of the agent. Can't be NULL.
  * \return The error. 1 is OK, 0 Agent description is NULL, -1 Agent description is empty
  */
-int mtic_setDefinitionDescription(char *description){
+int mtic_setDefinitionDescription(const char *description){
 
     if(description == NULL){
         mtic_debug("mtic_setDefinitionDescription : Agent description cannot be NULL \n");
@@ -458,7 +458,7 @@ int mtic_setDefinitionDescription(char *description){
  * \param version The string which contains the version of the agent. Can't be NULL.
  * \return The error. 1 is OK, 0 Agent version is NULL, -1 Agent version is empty
  */
-int mtic_setDefinitionVersion(char *version){
+int mtic_setDefinitionVersion(const char *version){
 
     if(version == NULL){
         mtic_debug("mtic_setDefinitionVersion : Agent version cannot be NULL \n");

@@ -181,9 +181,9 @@ PUBLIC char* mtic_getDefinition(void); //returns json string, must be freed by c
 PUBLIC char *mtic_getDefinitionName(void); // must be freed by caller
 PUBLIC char *mtic_getDefinitionDescription(void); // must be freed by caller
 PUBLIC char *mtic_getDefinitionVersion(void); // must be freed by caller
-PUBLIC int mtic_setDefinitionName(char *name); 
-PUBLIC int mtic_setDefinitionDescription(char *description);
-PUBLIC int mtic_setDefinitionVersion(char *version);
+PUBLIC int mtic_setDefinitionName(const char *name);
+PUBLIC int mtic_setDefinitionDescription(const char *description);
+PUBLIC int mtic_setDefinitionVersion(const char *version);
 
 //edit the definition using the API
 PUBLIC int mtic_createInput(const char *name, iopType_t value_type, void *value, long size);
@@ -207,9 +207,9 @@ PUBLIC char *mtic_getMappingDescription(void); // must be freed by caller
 PUBLIC char *mtic_getMappingVersion(void); // must be freed by caller
 
 //edit mapping using the API
-PUBLIC int mtic_setMappingName(char *name);
-PUBLIC int mtic_setMappingDescription(char *description);
-PUBLIC int mtic_setMappingVersion(char *version);
+PUBLIC int mtic_setMappingName(const char *name);
+PUBLIC int mtic_setMappingDescription(const char *description);
+PUBLIC int mtic_setMappingVersion(const char *version);
 PUBLIC int mtic_getMappingEntriesNumber(void); //number of entries in the mapping output type
 PUBLIC unsigned long mtic_addMappingEntry(const char *fromOurInput, const char *toAgent, const char *withOutput); //returns mapping id or zero or below if creation failed
 PUBLIC int mtic_removeMappingEntryWithId(unsigned long theId);
@@ -257,7 +257,7 @@ typedef enum {
 void mtic_setLogLevel (mtic_logLevel_t level); //default is MTIC_LOG_TRACE
 
 //void mtic_debug(const char*fmt, ...);
-void mtic_log(mtic_logLevel_t, const char*fmt, ...);
+void mtic_log(mtic_logLevel_t, const char *fmt, ...);
 #define mtic_trace(...) mtic_log(MTIC_LOG_TRACE, __VA_ARGS__)
 #define mtic_debug(...) mtic_log(MTIC_LOG_DEBUG, __VA_ARGS__)
 #define mtic_info(...)  mtic_log(MTIC_LOG_INFO, __VA_ARGS__)

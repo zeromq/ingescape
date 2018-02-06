@@ -355,7 +355,7 @@ char *mtic_getMappingVersion(void){
  * \param name The string which contains the name of the agent's mapping. Can't be NULL.
  * \return The error. 1 is OK, 0 Mapping name is NULL, -1 Mapping name is empty
  */
-int mtic_setMappingName(char *name){
+int mtic_setMappingName(const char *name){
     if(name == NULL){
         mtic_debug("mtic_setMappingName : mapping name cannot be NULL \n");
         return 0;
@@ -387,7 +387,7 @@ int mtic_setMappingName(char *name){
  * \param description The string which contains the description of the agent's mapping. Can't be NULL.
  * \return The error. 1 is OK, 0 Mapping description is NULL, -1 Mapping description is empty
  */
-int mtic_setMappingDescription(char *description){
+int mtic_setMappingDescription(const char *description){
     if(description == NULL){
         mtic_debug("Mapping description cannot be NULL \n");
         return 0;
@@ -420,7 +420,7 @@ int mtic_setMappingDescription(char *description){
  * \param version The string which contains the version of the agent's mapping. Can't be NULL.
  * \return The error. 1 is OK, 0 Mapping version is NULL, -1 Mapping version is empty
  */
-int mtic_setMappingVersion(char *version){
+int mtic_setMappingVersion(const char *version){
     if(version == NULL){
         mtic_debug("Mapping version cannot be NULL \n");
         return 0;
