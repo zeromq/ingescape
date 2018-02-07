@@ -231,7 +231,7 @@ void mtic_setLogStream(bool stream){
 }
 
 void mtic_setLogPath(const char *path){
-    if (path != NULL && strlen(path) > 0){
+    if ((path != NULL) && (strlen(path) > 0)){
         bool needToResetFile = false;
         if (fp != NULL){
             //we need to close previous and initiate new one

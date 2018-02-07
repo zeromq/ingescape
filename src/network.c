@@ -1356,8 +1356,8 @@ int mtic_stop(){
  * \return 1 if ok, else 0
  */
 int mtic_setAgentName(const char *name){
-    if (strlen(name) == 0){
-        mtic_error("mtic_setAgentName : Agent name cannot be empty\n");
+    if ((name == NULL) || (strlen(name) == 0)){
+        mtic_error("mtic_setAgentName : Agent name cannot be NULL or empty\n");
         return 0;
     }
     if (strcmp(agentName, name) == 0){

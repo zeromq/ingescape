@@ -390,13 +390,13 @@ char *mtic_getDefinitionVersion(void){
     }
 }
 int mtic_setDefinitionName(const char *name){
-    if(name == NULL){
-        mtic_debug("mtic_setDefinitionDescription : Agent name cannot be NULL \n");
+    if (name == NULL){
+        mtic_debug("mtic_setDefinitionDescription : Defintion name cannot be NULL \n");
         return 0;
     }
     
     if (strlen(name) == 0){
-        mtic_debug("mtic_setDefinitionDescription : Agent name cannot be empty\n");
+        mtic_debug("mtic_setDefinitionDescription : Definition name cannot be empty\n");
         return -1;
     }
     
