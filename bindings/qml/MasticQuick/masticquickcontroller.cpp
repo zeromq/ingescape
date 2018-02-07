@@ -396,26 +396,22 @@ MasticQuickController::MasticQuickController(QObject *parent) : QObject(parent),
 
 
     // Init inputs
-    _inputs = new QQmlPropertyMap(this);
-    if (_inputs != NULL)
-    {
-        connect(_inputs, &QQmlPropertyMap::valueChanged, this, &MasticQuickController::_onInputUpdatedFromFromQML);
-    }
+    _inputs = new MasticQuickQmlPropertyMap(true, this);
 
 
     // Init outputs
-    _outputs = new QQmlPropertyMap(this);
+    _outputs = new MasticQuickQmlPropertyMap(false, this);
     if (_outputs != NULL)
     {
-        connect(_outputs, &QQmlPropertyMap::valueChanged, this, &MasticQuickController::_onOutputUpdatedFromFromQML);
+        connect(_outputs, &MasticQuickQmlPropertyMap::valueChanged, this, &MasticQuickController::_onOutputUpdatedFromFromQML);
     }
 
 
     // Init parameters
-    _parameters = new QQmlPropertyMap(this);
+    _parameters = new MasticQuickQmlPropertyMap(false, this);
     if (_parameters != NULL)
     {
-        connect(_parameters, &QQmlPropertyMap::valueChanged, this, &MasticQuickController::_onParameterUpdatedFromFromQML);
+        connect(_parameters, &MasticQuickQmlPropertyMap::valueChanged, this, &MasticQuickController::_onParameterUpdatedFromFromQML);
     }
 }
 
@@ -434,11 +430,8 @@ MasticQuickController::~MasticQuickController()
     // Clean-up inputs
     if (_inputs != NULL)
     {
-        // Unsubscribe to signals
-        disconnect(_inputs, &QQmlPropertyMap::valueChanged, this, &MasticQuickController::_onInputUpdatedFromFromQML);
-
         // Clean-up
-        QQmlPropertyMap* temp = _inputs;
+        MasticQuickQmlPropertyMap* temp = _inputs;
         setinputs(NULL);
         delete temp;
     }
@@ -447,10 +440,10 @@ MasticQuickController::~MasticQuickController()
     if (_outputs != NULL)
     {
         // Unsubscribe to signals
-        disconnect(_outputs, &QQmlPropertyMap::valueChanged, this, &MasticQuickController::_onOutputUpdatedFromFromQML);
+        disconnect(_outputs, &MasticQuickQmlPropertyMap::valueChanged, this, &MasticQuickController::_onOutputUpdatedFromFromQML);
 
         // Clean-up
-        QQmlPropertyMap* temp = _outputs;
+        MasticQuickQmlPropertyMap* temp = _outputs;
         setoutputs(NULL);
         delete temp;
     }
@@ -459,10 +452,10 @@ MasticQuickController::~MasticQuickController()
     if (_parameters != NULL)
     {
         // Unsubcribe to signals
-        disconnect(_parameters, &QQmlPropertyMap::valueChanged, this, &MasticQuickController::_onParameterUpdatedFromFromQML);
+        disconnect(_parameters, &MasticQuickQmlPropertyMap::valueChanged, this, &MasticQuickController::_onParameterUpdatedFromFromQML);
 
         // Clean-up
-        QQmlPropertyMap* temp = _parameters;
+        MasticQuickQmlPropertyMap* temp = _parameters;
         setparameters(NULL);
         delete temp;
     }
@@ -1998,20 +1991,6 @@ void MasticQuickController::_onForceStop()
 
 
 /**
- * @brief Called when an input is updated from QML
- * @param key
- * @param value
- */
-void MasticQuickController::_onInputUpdatedFromFromQML(const QString &key, const QVariant &value)
-{
-    Q_UNUSED(value)
-
-    // Inputs MUST not be updated from QML
-    qWarning() << "MasticController warning: inputs must not be updated from QML - input" << key << "has been wrongly changed";
-}
-
-
-/**
  * @brief Called when an output is updated from QML
  * @param key
  * @param value
@@ -2099,5 +2078,5 @@ void MasticQuickController::_onParameterUpdatedFromFromQML(const QString &key, c
     Q_UNUSED(key)
     Q_UNUSED(value)
 
-    qInfo() << "MasticController info: QML updates parameter" << key;
+    qInfo() << "MasticController info: QML updates parameter" << key <<" BUT this function is NOT YET IMPLEMENTED";
 }

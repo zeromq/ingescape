@@ -19,7 +19,6 @@
 #include <QtQml>
 #include <QQmlEngine>
 #include <QJSEngine>
-#include <QQmlPropertyMap>
 
 #include "masticquick_helpers.h"
 #include "masticquickqmlpropertymap.h"
@@ -69,13 +68,13 @@ class MasticQuickController : public QObject
     MASTIC_QML_PROPERTY_CUSTOM_SETTER(MasticLogLevel::Value, logLevel)
 
     // Inputs
-    MASTIC_QML_PROPERTY_READONLY(QQmlPropertyMap*, inputs)
+    MASTIC_QML_PROPERTY_READONLY(MasticQuickQmlPropertyMap*, inputs)
 
     // Outputs
-    MASTIC_QML_PROPERTY_READONLY(QQmlPropertyMap*, outputs)
+    MASTIC_QML_PROPERTY_READONLY(MasticQuickQmlPropertyMap*, outputs)
 
     // Parameters
-    MASTIC_QML_PROPERTY_READONLY(QQmlPropertyMap*, parameters)
+    MASTIC_QML_PROPERTY_READONLY(MasticQuickQmlPropertyMap*, parameters)
 
 
 public:
@@ -597,14 +596,6 @@ protected Q_SLOTS:
       * @brief Called when our agent is asked to stop on the network
       */
      void _onForceStop();
-
-
-     /**
-      * @brief Called when an input is updated from QML
-      * @param key
-      * @param value
-      */
-     void _onInputUpdatedFromFromQML(const QString &key, const QVariant &value);
 
 
      /**

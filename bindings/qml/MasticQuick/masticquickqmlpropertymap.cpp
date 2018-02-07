@@ -39,7 +39,15 @@ MasticQuickQmlPropertyMap::MasticQuickQmlPropertyMap(bool propertiesAreReadOnlyF
  */
 QVariant MasticQuickQmlPropertyMap::updateValue(const QString &key, const QVariant &newQmlValue)
 {
-    qDebug() << "UPDATE FROM QML" << key << "=>" << newQmlValue;
-
-    return newQmlValue;
+    // Check if our properties are read-only for QML
+    if (_propertiesAreReadOnlyForQml)
+    {
+        // Return our previous value to preserve it
+        return value(key);
+    }
+    else
+    {
+        // We can update our property
+        return newQmlValue;
+    }
 }
