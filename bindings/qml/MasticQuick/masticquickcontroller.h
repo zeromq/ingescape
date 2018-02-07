@@ -522,6 +522,14 @@ public Q_SLOTS:
 
 protected:
      /**
+      * @brief Check if an IOP name is valid or if it can create conflicts with Qt internal symbols
+      * @param name
+      * @return
+      */
+     bool _validIopName(const QString& name);
+
+
+     /**
       * @brief Create a new input
       *
       * @param name

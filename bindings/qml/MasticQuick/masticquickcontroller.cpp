@@ -1567,6 +1567,28 @@ bool MasticQuickController::isOutputMuted(QString name, QVariant qmlUpdateExtraP
 //-------------------------------------------------------------------
 
 
+/**
+ * @brief Check if an IOP name is valid or if it can create conflicts with Qt internal symbols
+ * @param name
+ * @return
+ */
+bool MasticQuickController::_validIopName(const QString& name)
+{
+    return (
+             (name != QLatin1String("QObject"))
+             &
+             (name != QLatin1String("destroyed"))
+             &&
+             (name != QLatin1String("deleteLater"))
+             &&
+             (name != QLatin1String("keys"))
+             &&
+             (name != QLatin1String("valueChanged"))
+            );
+}
+
+
+
 
 /**
  * @brief Create a new input
@@ -1583,49 +1605,58 @@ bool MasticQuickController::_createInput(QString name, MasticIopType::Value type
 {
     bool result = false;
 
+    // Check if we have a name
     if (!name.isEmpty())
     {
-        // Check if our list of inputs is defined
-        if (_inputs != NULL)
+        // Check if it is a valid IOP name
+        if (_validIopName(name))
         {
-            // Update QML
-            // NB: special case for impulsion properties because we don't want to trigger them at startup
-            if (type == MasticIopType::IMPULSION)
+            // Check if our list of inputs is defined
+            if (_inputs != NULL)
             {
-                _inputs->blockSignals(true);
-                _inputs->insert(name, qmlValue);
-                _inputs->blockSignals(false);
-            }
-            else
-            {
-                _inputs->insert(name, qmlValue);
-            }
-
-            // Check if we must create a Mastic input
-            const char* cName = name.toStdString().c_str();
-            if (!mtic_checkInputExistence(cName))
-            {
-                if (mtic_createInput(cName, enumMasticIopTypeToEnumIopType_t(type), cValue, cSize) == 1)
+                // Update QML
+                // NB: special case for impulsion properties because we don't want to trigger them at startup
+                if (type == MasticIopType::IMPULSION)
                 {
-                    result = true;
+                    _inputs->blockSignals(true);
+                    _inputs->insert(name, qmlValue);
+                    _inputs->blockSignals(false);
+                }
+                else
+                {
+                    _inputs->insert(name, qmlValue);
+                }
 
-                    // Observe this new input
-                    if (mtic_observeInput(cName, &MasticQuickController_callbackObserveInput, this) != 1)
+                // Check if we must create a Mastic input
+                const char* cName = name.toStdString().c_str();
+                if (!mtic_checkInputExistence(cName))
+                {
+                    if (mtic_createInput(cName, enumMasticIopTypeToEnumIopType_t(type), cValue, cSize) == 1)
                     {
-                        qWarning() << Q_FUNC_INFO << "warning: fail to observe input" << name;
+                        result = true;
+
+                        // Observe this new input
+                        if (mtic_observeInput(cName, &MasticQuickController_callbackObserveInput, this) != 1)
+                        {
+                            qWarning() << Q_FUNC_INFO << "warning: fail to observe input" << name;
+                        }
+                    }
+                    else
+                    {
+                        qWarning() << Q_FUNC_INFO << "warning: fail to create input" << name;
                     }
                 }
                 else
                 {
-                    qWarning() << Q_FUNC_INFO << "warning: fail to create input" << name;
+                    qWarning() << Q_FUNC_INFO << "warning: input" << name << "already exists";
                 }
             }
-            else
-            {
-                qWarning() << Q_FUNC_INFO << "warning: input" << name << "already exists";
-            }
+            // Else: should not happen
         }
-        // Else: should not happen
+        else
+        {
+            qWarning() << Q_FUNC_INFO << "warning: '" << name << "' is an invalid input name, it conflicts with Qt internal symbols";
+        }
     }
     else
     {
@@ -1651,33 +1682,42 @@ bool MasticQuickController::_createOutput(QString name, MasticIopType::Value typ
 {
     bool result = false;
 
+    // Check if we have a name
     if (!name.isEmpty())
     {
-        // Check if our list of outputs is defined
-        if (_outputs != NULL)
+        // Check if it is a valid IOP name
+        if (_validIopName(name))
         {
-            // Update QML
-            _outputs->insert(name, qmlValue);
-
-            // Check if we must create a Mastic input
-            const char* cName = name.toStdString().c_str();
-            if (!mtic_checkOutputExistence(cName))
+            // Check if our list of outputs is defined
+            if (_outputs != NULL)
             {
-                if (mtic_createOutput(cName, enumMasticIopTypeToEnumIopType_t(type), cValue, cSize) == 1)
+                // Update QML
+                _outputs->insert(name, qmlValue);
+
+                // Check if we must create a Mastic input
+                const char* cName = name.toStdString().c_str();
+                if (!mtic_checkOutputExistence(cName))
                 {
-                    result = true;
+                    if (mtic_createOutput(cName, enumMasticIopTypeToEnumIopType_t(type), cValue, cSize) == 1)
+                    {
+                        result = true;
+                    }
+                    else
+                    {
+                        qWarning() << Q_FUNC_INFO << "warning: fail to create output" << name;
+                    }
                 }
                 else
                 {
-                    qWarning() << Q_FUNC_INFO << "warning: fail to create output" << name;
+                    qWarning() << Q_FUNC_INFO << "warning: output" << name << "already exists";
                 }
             }
-            else
-            {
-                qWarning() << Q_FUNC_INFO << "warning: output" << name << "already exists";
-            }
+            // Else: should not happen
         }
-        // Else: should not happen
+        else
+        {
+            qWarning() << Q_FUNC_INFO << "warning: '" << name << "' is an invalid output name, it conflicts with Qt internal symbols";
+        }
     }
     else
     {
@@ -1701,43 +1741,50 @@ bool MasticQuickController::_createOutput(QString name, MasticIopType::Value typ
  */
 bool MasticQuickController::_createParameter(QString name, MasticIopType::Value type, QVariant qmlValue, void* cValue, long cSize)
 {
-    Q_UNUSED(qmlValue)
-
     bool result = false;
 
+    // Check if we have a name
     if (!name.isEmpty())
     {
-        // Check if our list of parameters is defined
-        if (_parameters != NULL)
+        // Check if it is a valid IOP name
+        if (_validIopName(name))
         {
-            // Update QML
-            _parameters->insert(name, qmlValue);
-
-            // Check if we must create a Mastic input
-            const char* cName = name.toStdString().c_str();
-            if (!mtic_checkParameterExistence(cName))
+            // Check if our list of parameters is defined
+            if (_parameters != NULL)
             {
-                if (mtic_createParameter(cName, enumMasticIopTypeToEnumIopType_t(type), cValue, cSize) == 1)
-                {
-                    result = true;
+                // Update QML
+                _parameters->insert(name, qmlValue);
 
-                    // Observe this new parameter
-                     if (mtic_observeParameter(cName, &MasticQuickController_callbackObserveParameter, this) != 1)
+                // Check if we must create a Mastic input
+                const char* cName = name.toStdString().c_str();
+                if (!mtic_checkParameterExistence(cName))
+                {
+                    if (mtic_createParameter(cName, enumMasticIopTypeToEnumIopType_t(type), cValue, cSize) == 1)
                     {
-                        qWarning() << Q_FUNC_INFO << "warning: fail to observe parameter" << name;
+                        result = true;
+
+                        // Observe this new parameter
+                         if (mtic_observeParameter(cName, &MasticQuickController_callbackObserveParameter, this) != 1)
+                        {
+                            qWarning() << Q_FUNC_INFO << "warning: fail to observe parameter" << name;
+                        }
+                    }
+                    else
+                    {
+                        qWarning() << Q_FUNC_INFO << "warning: fail to create parameter" << name;
                     }
                 }
                 else
                 {
-                    qWarning() << Q_FUNC_INFO << "warning: fail to create parameter" << name;
+                    qWarning() << Q_FUNC_INFO << "warning: parameter" << name << "already exists";
                 }
             }
-            else
-            {
-                qWarning() << Q_FUNC_INFO << "warning: parameter" << name << "already exists";
-            }
+            // Else: should not happen
         }
-        // Else: should not happen
+        else
+        {
+            qWarning() << Q_FUNC_INFO << "warning: '" << name << "' is an invalid parameter name, it conflicts with Qt internal symbols";
+         }
     }
     else
     {

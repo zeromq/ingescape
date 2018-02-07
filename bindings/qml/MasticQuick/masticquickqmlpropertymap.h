@@ -30,15 +30,28 @@ public:
     /**
      * @brief Default constructor
      *
-     * @param readOnly
+     * @param propertiesAreReadOnlyForQml
      * @param parent
      */
-    explicit MasticQuickQmlPropertyMap(bool readOnly, QObject *parent = nullptr);
+    explicit MasticQuickQmlPropertyMap(bool propertiesAreReadOnlyForQml, QObject *parent = nullptr);
 
 
 protected:
-    // Flag indicating if our properties are read-only
-    bool _readOnly;
+    /**
+     * @brief Method provided to intercept updates to a property from QML
+     *
+     * @param key          Name of the property
+     * @param newQmlValue  The new value provided by QML
+     *
+     * @return the value that will really be stored in our property
+     */
+    QVariant updateValue(const QString &key, const QVariant &newQmlValue) Q_DECL_OVERRIDE;
+
+
+protected:
+    // Flag indicating if our properties are read-only for QML
+    // i.e. if we prevent QML from updating them or not
+    bool _propertiesAreReadOnlyForQml;
 };
 
 #endif // _MASTICQUICKQMLPROPERTYMAP_H_
