@@ -19,7 +19,12 @@
 #include <QDir>
 #include <QDebug>
 
+
+// Check if MasticQuick is included via a .pri file OR if it is used as a QML extension plugin library
+#ifdef MASTICQUICK_INCLUDED_VIA_PRI
 #include <MasticQuick.h>
+#endif
+
 
 
 /**
@@ -80,8 +85,14 @@ int main(int argc, char *argv[])
     //------------------------------
     QQmlApplicationEngine engine;
 
-    // Register our MasticQuick plugin
-    MasticQuick::registerTypes();
+
+    // Check if MasticQuick is included via a .pri file OR if it is used as a QML extension plugin library
+    #ifdef MASTICQUICK_INCLUDED_VIA_PRI
+        // Register our MasticQuick plugin
+        MasticQuick::registerTypes();
+    #else
+        qWarning() << "MasticQuick MUST be installed as a QML extension plugin library, otherwise this application will not work";
+    #endif
 
 
     //
