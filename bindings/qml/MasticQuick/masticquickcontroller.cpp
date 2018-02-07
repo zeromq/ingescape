@@ -1,0 +1,2056 @@
+/*
+ *  Mastic - QML binding
+ *
+ *  Copyright (c) 2018 Ingenuity i/o. All rights reserved.
+ *
+ *  See license terms for the rights and conditions
+ *  defined by copyright holders.
+ *
+ *
+ *  Contributors:
+ *      Alexandre Lemort <lemort@ingenuity.io>
+ *
+ */
+
+#include "masticquickcontroller.h"
+
+#include <QDebug>
+#include <QCoreApplication>
+
+
+extern "C" {
+#include <mastic.h>
+}
+
+
+
+
+
+//-------------------------------------------------------------------
+//
+//
+//  MasticIopType
+//
+//
+//-------------------------------------------------------------------
+
+
+/**
+ * @brief MasticIopType enumToString
+ * @param value
+ * @return
+ */
+QString MasticIopType::enumToString(int value)
+{
+    QString result;
+
+    switch (value)
+    {
+        case MasticIopType::INTEGER:
+            result = tr("Integer");
+            break;
+
+        case MasticIopType::DOUBLE:
+            result = tr("Double");
+            break;
+
+        case MasticIopType::STRING:
+            result = tr("String");
+            break;
+
+        case MasticIopType::BOOLEAN:
+            result = tr("Boolean");
+            break;
+
+        case MasticIopType::IMPULSION:
+            result = tr("Impulsion");
+            break;
+
+        case MasticIopType::DATA:
+            result = tr("Data");
+            break;
+
+        default:
+            break;
+    }
+
+    return result;
+}
+
+
+
+
+//-------------------------------------------------------------------
+//
+//
+//  Static functions
+//
+//
+//-------------------------------------------------------------------
+
+
+
+/**
+ * @brief Convert a MasticIopType::Value into an iopType_t value
+ * @param value
+ * @return
+ */
+static iopType_t enumMasticIopTypeToEnumIopType_t(MasticIopType::Value value)
+{
+    iopType_t result = INTEGER_T;
+
+    switch(value)
+    {
+        case MasticIopType::INTEGER:
+            result = INTEGER_T;
+            break;
+
+        case MasticIopType::DOUBLE:
+            result = DOUBLE_T;
+            break;
+
+        case MasticIopType::STRING:
+            result = STRING_T;
+            break;
+
+        case MasticIopType::BOOLEAN:
+            result = BOOL_T;
+            break;
+
+        case MasticIopType::IMPULSION:
+            result = IMPULSION_T;
+            break;
+
+        case MasticIopType::DATA:
+            result = DATA_T;
+            break;
+
+        default:
+            break;
+    }
+
+    return result;
+}
+
+
+
+/**
+ * @brief Callback used to observe inputs
+ *
+ * @param iopType
+ * @param name
+ * @param valueType
+ * @param value
+ * @param valueSize
+ * @param customData
+ */
+void MasticQuickController_callbackObserveInput(iop_t iopType, const char *name, iopType_t valueType, void* value, long valueSize, void *customData)
+{
+    Q_UNUSED(valueSize)
+
+    // Ensure that our callback is called by the required IOP category
+    if (iopType == INPUT_T)
+    {
+        // Try to cast our custom data
+        MasticQuickController* controller = (MasticQuickController *)customData;
+        if ((controller != NULL) && (controller->inputs() != NULL))
+        {
+            QString qmlName(name);
+            if (!qmlName.isEmpty())
+            {
+                switch(valueType)
+                {
+                    case INTEGER_T:
+                        {
+                            int newValue = *((int *)value);
+                            controller->inputs()->insert(qmlName, QVariant(newValue));
+                        }
+                        break;
+
+                    case DOUBLE_T:
+                        {
+                            double newValue = *((double *)value);
+                            controller->inputs()->insert(qmlName, QVariant(newValue));
+                        }
+                        break;
+
+                    case STRING_T:
+                        {
+                            char* newCValue = (char *)value;
+                            if (newCValue != NULL)
+                            {
+                                QString newValue(newCValue);
+                                controller->inputs()->insert(qmlName, QVariant(newValue));
+                                // NB: we don't need to free newValue because we don't own it
+                            }
+                            else
+                            {
+                                controller->inputs()->insert(qmlName, QVariant(""));
+                            }
+                        }
+                        break;
+
+                    case BOOL_T:
+                        {
+                            bool newValue = *((bool *)value);
+                            controller->inputs()->insert(qmlName, QVariant(newValue));
+                        }
+                        break;
+
+                    case IMPULSION_T:
+                        {
+                            // Hack to force the update of our property
+                            // We disable signals then we clear its value to detect a valud change when we set an empty value
+                            controller->inputs()->blockSignals(true);
+                            controller->inputs()->clear(qmlName);
+                            controller->inputs()->blockSignals(false);
+
+                            // Set an empty value to trigger an update
+                            controller->inputs()->insert(qmlName, QVariant(""));
+                        }
+                        break;
+
+                    case DATA_T:
+                        {
+
+                        }
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+            else
+            {
+                qWarning() << "MasticQuickController warning: can not update an input with an empty name";
+            }
+        }
+        // Else: invalid custom data
+    }
+    // Else: something went wrong
+}
+
+
+
+
+/**
+ * @brief Callback used to observe parameters
+ *
+ * @param iopType
+ * @param name
+ * @param valueType
+ * @param value
+ * @param valueSize
+ * @param customData
+ */
+void MasticQuickController_callbackObserveParameter(iop_t iopType, const char *name, iopType_t valueType, void* value, long valueSize, void *customData)
+{
+    Q_UNUSED(valueSize)
+
+    // Ensure that our callback is called by the required IOP category
+    if (iopType == PARAMETER_T)
+    {
+        // Try to cast our custom data
+        MasticQuickController* controller = (MasticQuickController *)customData;
+        if ((controller != NULL) && (controller->parameters() != NULL))
+        {
+            QString qmlName(name);
+            if (!qmlName.isEmpty())
+            {
+                switch(valueType)
+                {
+                    case INTEGER_T:
+                        {
+                            int newValue = *((int *)value);
+                            controller->parameters()->insert(qmlName, QVariant(newValue));
+                        }
+                        break;
+
+                    case DOUBLE_T:
+                        {
+                            double newValue = *((double *)value);
+                            controller->parameters()->insert(qmlName, QVariant(newValue));
+                        }
+                        break;
+
+                    case STRING_T:
+                        {
+                            char* newCValue = (char *)value;
+                            if (newCValue != NULL)
+                            {
+                                QString newValue(newCValue);
+                                controller->parameters()->insert(qmlName, QVariant(newValue));
+                                // NB: we don't need to free newValue because we don't own it
+                            }
+                            else
+                            {
+                                controller->parameters()->insert(qmlName, QVariant(""));
+                            }
+                        }
+                        break;
+
+                    case BOOL_T:
+                        {
+                            bool newValue = *((bool *)value);
+                            controller->parameters()->insert(qmlName, QVariant(newValue));
+                        }
+                        break;
+
+                    case IMPULSION_T:
+                        {
+                            // Hack to force the update of our property
+                            // We disable signals then we clear its value to detect a valud change when we set an empty value
+                            controller->parameters()->blockSignals(true);
+                            controller->parameters()->clear(qmlName);
+                            controller->parameters()->blockSignals(false);
+
+                            // Set an empty value to trigger an update
+                            controller->parameters()->insert(qmlName, QVariant(""));
+                        }
+                        break;
+
+                    case DATA_T:
+                        {
+
+                        }
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+            else
+            {
+                qWarning() << "MasticQuickController warning: can not update a parameter with an empty name";
+            }
+        }
+        // Else: invalid custom data
+    }
+    // Else: something went wrong
+}
+
+
+
+/**
+ * @brief Callback used to observe force stop
+ * @param customData
+ */
+void MasticQuickController_callbackForcedStop(void *customData)
+{
+    // Try to cast our custom data
+    MasticQuickController* controller = (MasticQuickController *)customData;
+    if (controller != NULL)
+    {
+        Q_EMIT controller->forceStop();
+    }
+}
+
+
+
+//-------------------------------------------------------------------
+//
+//
+//  MasticController
+//
+//
+//-------------------------------------------------------------------
+
+
+/**
+ * @brief Default constructor
+ * @param parent
+ */
+MasticQuickController::MasticQuickController(QObject *parent) : QObject(parent),
+    _isMuted(false),
+    _isStarted(false),
+    _isVerbose(false),
+    _logLevel(MasticLogLevel::LOG_TRACE),
+    _inputs(NULL),
+    _outputs(NULL),
+    _parameters(NULL)
+{    
+    // Set our default agent name
+    setagentName(QCoreApplication::applicationName());
+
+    // Set our default definition
+    setdefinitionName(QCoreApplication::applicationName());
+    setdefinitionVersion("0.0");
+    setdefinitionDescription(tr("Definition of %1").arg(QCoreApplication::applicationName()));
+
+    // isMuted flag
+    setisMuted(mtic_isMuted());
+
+    // Verbose mode by default in debug mode
+#ifdef QT_DEBUG
+    setisVerbose(true);
+#endif
+
+    // Set log level
+    mtic_setLogLevel(MTIC_LOG_TRACE);
+
+
+    // Observe force stop
+    connect(this, &MasticQuickController::forceStop, this, &MasticQuickController::_onForceStop);
+    mtic_observeForcedStop(&MasticQuickController_callbackForcedStop, this);
+
+
+
+    // Init inputs
+    _inputs = new QQmlPropertyMap(this);
+    if (_inputs != NULL)
+    {
+        connect(_inputs, &QQmlPropertyMap::valueChanged, this, &MasticQuickController::_onInputUpdatedFromFromQML);
+    }
+
+
+    // Init outputs
+    _outputs = new QQmlPropertyMap(this);
+    if (_outputs != NULL)
+    {
+        connect(_outputs, &QQmlPropertyMap::valueChanged, this, &MasticQuickController::_onOutputUpdatedFromFromQML);
+    }
+
+
+    // Init parameters
+    _parameters = new QQmlPropertyMap(this);
+    if (_parameters != NULL)
+    {
+        connect(_parameters, &QQmlPropertyMap::valueChanged, this, &MasticQuickController::_onParameterUpdatedFromFromQML);
+    }
+}
+
+
+/**
+ * @brief Destructor
+ */
+MasticQuickController::~MasticQuickController()
+{
+    // Unsubscribe to Masric signals
+    disconnect(this, &MasticQuickController::forceStop, this, &MasticQuickController::_onForceStop);
+
+    // Stop our agent
+    stop();
+
+    // Clean-up inputs
+    if (_inputs != NULL)
+    {
+        // Unsubscribe to signals
+        disconnect(_inputs, &QQmlPropertyMap::valueChanged, this, &MasticQuickController::_onInputUpdatedFromFromQML);
+
+        // Clean-up
+        QQmlPropertyMap* temp = _inputs;
+        setinputs(NULL);
+        delete temp;
+    }
+
+    // Clean-up outputs
+    if (_outputs != NULL)
+    {
+        // Unsubscribe to signals
+        disconnect(_outputs, &QQmlPropertyMap::valueChanged, this, &MasticQuickController::_onOutputUpdatedFromFromQML);
+
+        // Clean-up
+        QQmlPropertyMap* temp = _outputs;
+        setoutputs(NULL);
+        delete temp;
+    }
+
+    // Clean-up parameters
+    if (_parameters != NULL)
+    {
+        // Unsubcribe to signals
+        disconnect(_parameters, &QQmlPropertyMap::valueChanged, this, &MasticQuickController::_onParameterUpdatedFromFromQML);
+
+        // Clean-up
+        QQmlPropertyMap* temp = _parameters;
+        setparameters(NULL);
+        delete temp;
+    }
+}
+
+
+/**
+ * @brief Method used to provide a singleton to QML
+ * @param engine
+ * @param scriptEngine
+ * @return
+ */
+QObject* MasticQuickController::qmlSingleton(QQmlEngine* engine, QJSEngine* scriptEngine)
+{
+    Q_UNUSED(engine)
+    Q_UNUSED(scriptEngine);
+
+    // NOTE: A QObject singleton type instance returned from a singleton type provider is
+    // owned by the QML engine. For this reason, the singleton type provider function should
+    // not be implemented as a singleton factory.
+    return new MasticQuickController();
+}
+
+
+
+//-------------------------------------------------------------------
+//
+// Custom setters
+//
+//-------------------------------------------------------------------
+
+
+
+/**
+ * @brief Set our agent name
+ * @param value
+ */
+void MasticQuickController::setagentName(QString value)
+{
+    if (_agentName != value)
+    {
+        // Save value
+        _agentName = value;
+
+        // Set our agent name
+        mtic_setAgentName(value.toStdString().c_str());
+
+        // Notify change
+        Q_EMIT agentNameChanged(value);
+    }
+}
+
+
+/**
+ * @brief Set the name of our definition
+ * @param value
+ */
+void MasticQuickController::setdefinitionName(QString value)
+{
+    if (_definitionName != value)
+    {
+        // Save value
+        _definitionName = value;
+
+        // Set our definition name
+        mtic_setDefinitionName(value.toStdString().c_str());
+
+        // Notify change
+        Q_EMIT definitionNameChanged(value);
+    }
+}
+
+
+/**
+ * @brief Set the version of our definition
+ * @param value
+ */
+void MasticQuickController::setdefinitionVersion(QString value)
+{
+    if (_definitionVersion != value)
+    {
+        // Save value
+        _definitionVersion = value;
+
+        // Set our definition version
+        mtic_setDefinitionVersion(value.toStdString().c_str());
+
+        // Notify change
+        Q_EMIT definitionVersionChanged(value);
+    }
+}
+
+
+/**
+ * @brief Set the description of our definition
+ * @param value
+ */
+void MasticQuickController::setdefinitionDescription(QString value)
+{
+    if (_definitionDescription != value)
+    {
+        // Save value
+        _definitionDescription = value;
+
+        // Set our definition description
+        mtic_setDefinitionDescription(value.toStdString().c_str());
+
+        // Notify change
+        Q_EMIT definitionDescriptionChanged(value);
+    }
+}
+
+
+/**
+ * @brief Set our isMuted flag
+ * @param value
+ */
+void MasticQuickController::setisMuted(bool value)
+{
+    if (_isMuted != value)
+    {
+        // Save value
+        _isMuted = value;
+
+        // Set our isMuted flag
+        if (_isMuted)
+        {
+            mtic_mute();
+        }
+        else
+        {
+            mtic_unmute();
+        }
+
+        // Notify change
+        Q_EMIT isMutedChanged(value);
+    }
+}
+
+
+/**
+ * @brief Set our isVerbose flag
+ * @param value
+ */
+void MasticQuickController::setisVerbose(bool value)
+{
+    if (_isVerbose != value)
+    {
+        // Save value
+        _isVerbose = value;
+
+        // Set our verbose flag
+        mtic_setVerbose(value);
+
+        // Notify change
+        Q_EMIT isVerboseChanged(value);
+    }
+}
+
+
+
+/**
+ * @brief Set our log lebvel
+ * @param value
+ */
+void MasticQuickController::setlogLevel(MasticLogLevel::Value value)
+{
+    if (_logLevel != value)
+    {
+        // Save value
+        _logLevel = value;
+
+        // Set out log level
+        switch (value)
+        {
+            case MasticLogLevel::LOG_TRACE:
+                mtic_setLogLevel(MTIC_LOG_TRACE);
+                break;
+
+            case MasticLogLevel::LOG_DEBUG:
+                mtic_setLogLevel(MTIC_LOG_DEBUG);
+                break;
+
+            case MasticLogLevel::LOG_INFO:
+                mtic_setLogLevel(MTIC_LOG_INFO);
+                break;
+
+            case MasticLogLevel::LOG_WARNING:
+                mtic_setLogLevel(MTIC_LOG_WARN);
+                break;
+
+            case MasticLogLevel::LOG_ERROR:
+                mtic_setLogLevel(MTIC_LOG_ERROR);
+                break;
+
+            case MasticLogLevel::LOG_FATAL:
+                mtic_setLogLevel(MTIC_LOG_FATAL);
+                break;
+
+            default:
+                break;
+        }
+
+        // Notify change
+        Q_EMIT logLevelChanged(value);
+    }
+}
+
+
+//-------------------------------------------------------------------
+//
+// Start or stop our agent
+//
+//-------------------------------------------------------------------
+
+/**
+ * @brief Start our agent with a given network device and port
+ *
+ * @param networkDevice
+ * @param port
+ */
+bool MasticQuickController::startWithDevice(QString networkDevice, int port)
+{
+    bool result = false;
+
+    // Check if we must stop our agent
+    if (_isStarted)
+    {
+        stop();
+    }
+
+    // Try to start Mastic
+    if (mtic_startWithDevice(networkDevice.toStdString().c_str(), port) == 1)
+    {
+        setisStarted(true);
+        result = true;
+    }
+
+    return result;
+}
+
+
+/**
+ * @brief Start our agent with a given IP address and port
+ *
+ * @param ipAddress
+ * @param port
+ */
+bool MasticQuickController::startWithIP(QString ipAddress, int port)
+{
+    bool result = false;
+
+    // Check if we must stop our agent
+    if (_isStarted)
+    {
+        stop();
+    }
+
+    // Try to start Mastic
+    if (mtic_startWithIP(ipAddress.toStdString().c_str(), port) == 1)
+    {
+        setisStarted(true);
+        result = true;
+    }
+
+    return result;
+}
+
+
+/**
+ * @brief Stop our agent
+ */
+bool MasticQuickController::stop()
+{
+    bool result = false;
+
+    // Check if our agent is started
+    if (_isStarted)
+    {
+        if (mtic_stop() == 1)
+        {
+            setisStarted(false);
+            result = true;
+        }
+    }
+
+    return result;
+}
+
+
+
+
+//-------------------------------------------------------------------
+//
+// Create or remove IOP (inoput, output, parameter)
+//
+//-------------------------------------------------------------------
+
+/**
+ * @brief Create a new integer input
+ *
+ * @param name
+ * @param value
+ *
+ * @return true if an input is created, false otherwise (i.e. we already have an input with this name)
+ */
+bool MasticQuickController::createInputInteger(QString name, int value)
+{
+    return _createInput(name, MasticIopType::INTEGER, QVariant(value), &value, sizeof(int));
+}
+
+
+/**
+ * @brief Create a new double input
+ *
+ * @param name
+ * @param value
+ *
+ * @return true if an input is created, false otherwise (i.e. we already have an input with this name)
+ */
+bool MasticQuickController::createInputDouble(QString name, double value)
+{
+    return _createInput(name, MasticIopType::DOUBLE, QVariant(value), &value, sizeof(double));
+}
+
+
+/**
+ * @brief Create a new string input
+ *
+ * @param name
+ * @param value
+ *
+ * @return true if an input is created, false otherwise (i.e. we already have an input with this name)
+ */
+bool MasticQuickController::createInputString(QString name, QString value)
+{
+    const char* cValue = value.toStdString().c_str();
+    int cValueLength = ((cValue != NULL) ? strlen(cValue) : 0);
+
+    return _createInput(name, MasticIopType::STRING, QVariant(value), (void *)cValue, (cValueLength + 1) * sizeof(char));
+}
+
+
+/**
+ * @brief Create a new boolean input
+ *
+ * @param name
+ * @param value
+ *
+ * @return true if an input is created, false otherwise (i.e. we already have an input with this name)
+ */
+bool MasticQuickController::createInputBoolean(QString name, bool value)
+{
+    return _createInput(name, MasticIopType::BOOLEAN, QVariant(value), &value, sizeof(bool));
+}
+
+
+/**
+ * @brief Create a new impulsion input
+ *
+ * @param name
+ *
+ * @return true if an input is created, false otherwise (i.e. we already have an input with this name)
+ */
+bool MasticQuickController::createInputImpulsion(QString name)
+{
+    return _createInput(name, MasticIopType::IMPULSION, QVariant(""), 0, 0);
+}
+
+
+/**
+ * @brief Create a new data input
+ *
+ * @param name
+ * @param value
+ *
+ * @return true if an input is created, false otherwise (i.e. we already have an input with this name)
+ */
+bool MasticQuickController::createInputData(QString name, void* value)
+{
+    Q_UNUSED(name)
+    Q_UNUSED(value)
+
+    bool result = false;
+
+    qDebug() << Q_FUNC_INFO << "NOT YET IMPLEMENTED. Can not create input" << name;
+
+    return result;
+}
+
+
+/**
+ * @brief Create a new integer output
+ *
+ * @param name
+ * @param value
+ *
+ * @return true if an output is created, false otherwise (i.e. we already have an output with this name)
+ */
+bool MasticQuickController::createOutputInteger(QString name, int value)
+{
+    return _createOutput(name, MasticIopType::INTEGER, QVariant(value), &value, sizeof(int));
+}
+
+
+/**
+ * @brief Create a new double output
+ *
+ * @param name
+ * @param value
+ *
+ * @return true if an output is created, false otherwise (i.e. we already have an output with this name)
+ */
+bool MasticQuickController::createOutputDouble(QString name, double value)
+{
+    return _createOutput(name, MasticIopType::DOUBLE, QVariant(value), &value, sizeof(double));
+}
+
+
+/**
+ * @brief Create a new string output
+ *
+ * @param name
+ * @param value
+ *
+ * @return true if an output is created, false otherwise (i.e. we already have an output with this name)
+ */
+bool MasticQuickController::createOutputString(QString name, QString value)
+{
+    const char* cValue = value.toStdString().c_str();
+    int cValueLength = ((cValue != NULL) ? strlen(cValue) : 0);
+
+    return _createOutput(name, MasticIopType::STRING, QVariant(value), (void *)cValue, (cValueLength + 1) * sizeof(char));
+}
+
+
+/**
+ * @brief Create a new boolean output
+ *
+ * @param name
+ * @param value
+ *
+ * @return true if an output is created, false otherwise (i.e. we already have an output with this name)
+ */
+bool MasticQuickController::createOutputBoolean(QString name, bool value)
+{
+    return _createOutput(name, MasticIopType::BOOLEAN, QVariant(value), &value, sizeof(bool));
+}
+
+
+/**
+ * @brief Create a new impulsion output
+ *
+ * @param name
+ *
+ * @return true if an output is created, false otherwise (i.e. we already have an output with this name)
+ */
+bool MasticQuickController::createOutputImpulsion(QString name)
+{
+    return _createOutput(name, MasticIopType::IMPULSION, QVariant(""), 0, 0);
+}
+
+
+/**
+ * @brief Create a new data output
+ *
+ * @param name
+ * @param value
+ *
+ * @return true if an output is created, false otherwise (i.e. we already have an output with this name)
+ */
+bool MasticQuickController::createOutputData(QString name, void* value)
+{
+    Q_UNUSED(name)
+    Q_UNUSED(value)
+
+    bool result = false;
+
+    qDebug() << Q_FUNC_INFO << "NOT YET IMPLEMENTED. Can not create output" << name;
+
+    return result;
+}
+
+
+/**
+ * @brief Create a new integer parameter
+ *
+ * @param name
+ * @param value
+ *
+ * @return true if a parameter is created, false otherwise (i.e. we already have a parameter with this name)
+ */
+bool MasticQuickController::createParameterInteger(QString name, int value)
+{
+    return _createParameter(name, MasticIopType::INTEGER, QVariant(value), &value, sizeof(int));
+}
+
+
+/**
+ * @brief Create a new double parameter
+ *
+ * @param name
+ * @param value
+ *
+ * @return true if a parameter is created, false otherwise (i.e. we already have a parameter with this name)
+ */
+bool MasticQuickController::createParameterDouble(QString name, double value)
+{
+    return _createParameter(name, MasticIopType::DOUBLE, QVariant(value), &value, sizeof(double));
+}
+
+
+/**
+ * @brief Create a new string parameter
+ *
+ * @param name
+ * @param value
+ *
+ * @return true if a parameter is created, false otherwise (i.e. we already have a parameter with this name)
+ */
+bool MasticQuickController::createParameterString(QString name, QString value)
+{
+    const char* cValue = value.toStdString().c_str();
+    int cValueLength = ((cValue != NULL) ? strlen(cValue) : 0);
+
+    return _createParameter(name, MasticIopType::STRING, QVariant(value), (void *)cValue, (cValueLength + 1) * sizeof(char));
+}
+
+
+/**
+ * @brief Create a new boolean parameter
+ *
+ * @param name
+ * @param value
+ *
+ * @return true if a parameter is created, false otherwise (i.e. we already have a parameter with this name)
+ */
+bool MasticQuickController::createParameterBoolean(QString name, bool value)
+{
+    return _createParameter(name, MasticIopType::BOOLEAN, QVariant(value), &value, sizeof(bool));
+}
+
+
+/**
+ * @brief Create a new data parameter
+ *
+ * @param name
+ * @param value
+ *
+ * @return true if a parameter is created, false otherwise (i.e. we already have a parameter with this name)
+ */
+bool MasticQuickController::createParameterData(QString name, void* value)
+{
+    Q_UNUSED(name)
+    Q_UNUSED(value)
+
+    bool result = false;
+
+    qDebug() << Q_FUNC_INFO << "NOT YET IMPLEMENTED. Can not create parameter" << name;
+
+    return result;
+}
+
+
+/**
+ * @brief Remove an input
+ *
+ * @param name
+ *
+ * @return true if this input is removed, false otherwise
+ */
+bool MasticQuickController::removeInput(QString name)
+{
+    bool result = false;
+
+    // Ensure that we have a valid name
+    if (!name.isEmpty())
+    {
+        // Try to remove input
+        if (mtic_removeInput(name.toStdString().c_str()) == 1)
+        {
+            result = true;
+        }
+        else
+        {
+            qWarning() << Q_FUNC_INFO << "warning: fail to remove input" << name;
+        }
+    }
+    else
+    {
+        qWarning() << Q_FUNC_INFO << "warning: can not remove an input without a name";
+    }
+
+    return result;
+}
+
+
+/**
+ * @brief Remove an output
+ *
+ * @param name
+ *
+ * @return true if this output is removed, false otherwise
+ */
+bool MasticQuickController::removeOutput(QString name)
+{
+    bool result = false;
+
+    // Ensure that we have a valid name
+    if (!name.isEmpty())
+    {
+        // Try to remove ouput
+        if (mtic_removeOutput(name.toStdString().c_str()) == 1)
+        {
+            result = true;
+        }
+        else
+        {
+            qWarning() << Q_FUNC_INFO << "warning: fail to remove output" << name;
+        }
+    }
+    else
+    {
+        qWarning() << Q_FUNC_INFO << "warning: can not remove an output without a name";
+    }
+
+    return result;
+}
+
+
+/**
+ * @brief Remove a parameter
+ *
+ * @param name
+ *
+ * @return true if this parameter is removed, false otherwise
+ */
+bool MasticQuickController::removeParameter(QString name)
+{
+    bool result = false;
+
+    // Ensure that we have a valid name
+    if (!name.isEmpty())
+    {
+        // Try to remove parameter
+        if (mtic_removeParameter(name.toStdString().c_str()) == 1)
+        {
+            result = true;
+        }
+        else
+        {
+            qWarning() << Q_FUNC_INFO << "warning: fail to remove parameter" << name;
+        }
+    }
+    else
+    {
+        qWarning() << Q_FUNC_INFO << "warning: can not remove a parameter without a name";
+    }
+
+    return result;
+}
+
+
+/**
+ * @brief Write a given output as an integer
+ *
+ * @param name
+ * @param value
+ *
+ * @return  true if everything is ok, false otherwise
+ */
+bool MasticQuickController::writeOutputAsInteger(QString name, int value)
+{
+    bool result = false;
+
+    // Ensure that we have a valid name
+    if (!name.isEmpty())
+    {
+        // Try to write value
+        if (mtic_writeOutputAsInt(name.toStdString().c_str(), value) == 1)
+        {
+            result = true;
+
+            // Update QML
+            _updateQmlOutput(name);
+        }
+        else
+        {
+            qWarning() << Q_FUNC_INFO << "warning: fail to write output" << name;
+        }
+    }
+    else
+    {
+        qWarning() << Q_FUNC_INFO << "warning: can not write an output without a name";
+    }
+
+    return result;
+}
+
+
+/**
+ * @brief Write a given output as a double
+ *
+ * @param name
+ * @param value
+ *
+ * @return  true if everything is ok, false otherwise
+ */
+bool MasticQuickController::writeOutputAsDouble(QString name, double value)
+{
+    bool result = false;
+
+    // Ensure that we have a valid name
+    if (!name.isEmpty())
+    {
+        // Try to write value
+        if (mtic_writeOutputAsDouble(name.toStdString().c_str(), value) == 1)
+        {
+            result = true;
+
+            // Update QML
+            _updateQmlOutput(name);
+        }
+        else
+        {
+            qWarning() << Q_FUNC_INFO << "warning: fail to write output" << name;
+        }
+    }
+    else
+    {
+        qWarning() << Q_FUNC_INFO << "warning: can not write an output without a name";
+    }
+
+    return result;
+}
+
+
+/**
+ * @brief Write a given output as a string
+ *
+ * @param name
+ * @param value
+ *
+ * @return  true if everything is ok, false otherwise
+ */
+bool MasticQuickController::writeOutputAsString(QString name, QString value)
+{
+    bool result = false;
+
+    // Ensure that we have a valid name
+    if (!name.isEmpty())
+    {
+        // Try to write value
+        if (mtic_writeOutputAsString(name.toStdString().c_str(), (char *)value.toStdString().c_str()) == 1)
+        {
+            result = true;
+
+            // Update QML
+            _updateQmlOutput(name);
+        }
+        else
+        {
+            qWarning() << Q_FUNC_INFO << "warning: fail to write output" << name;
+        }
+    }
+    else
+    {
+        qWarning() << Q_FUNC_INFO << "warning: can not write an output without a name";
+    }
+
+    return result;
+}
+
+
+/**
+ * @brief Write a given output as a boolean
+ *
+ * @param name
+ * @param value
+ *
+ * @return  true if everything is ok, false otherwise
+ */
+bool MasticQuickController::writeOutputAsBoolean(QString name, bool value)
+{
+    bool result = false;
+
+    // Ensure that we have a valid name
+    if (!name.isEmpty())
+    {
+        // Try to write value
+        if (mtic_writeOutputAsBool(name.toStdString().c_str(), value) == 1)
+        {
+            result = true;
+
+            // Update QML
+            _updateQmlOutput(name);
+        }
+        else
+        {
+            qWarning() << Q_FUNC_INFO << "warning: fail to write output" << name;
+        }
+    }
+    else
+    {
+        qWarning() << Q_FUNC_INFO << "warning: can not write an output without a name";
+    }
+
+    return result;
+}
+
+
+/**
+ * @brief Write a given output as an impulsion
+ *
+ * @param name
+ *
+ * @return  true if everything is ok, false otherwise
+ */
+bool MasticQuickController::writeOutputAsImpulsion(QString name)
+{
+    bool result = false;
+
+    // Ensure that we have a valid name
+    if (!name.isEmpty())
+    {
+        // Try to write value
+        if (mtic_writeOutputAsImpulsion(name.toStdString().c_str()) == 1)
+        {
+            result = true;
+
+            // Update QML
+            _updateQmlOutput(name);
+        }
+        else
+        {
+            qWarning() << Q_FUNC_INFO << "warning: fail to write output" << name;
+        }
+    }
+    else
+    {
+        qWarning() << Q_FUNC_INFO << "warning: can not write an output without a name";
+    }
+
+    return result;
+}
+
+
+/**
+ * @brief Write a given output as data
+ *
+ * @param name
+ * @param value
+ *
+ * @return  true if everything is ok, false otherwise
+ */
+bool MasticQuickController::writeOutputAsData(QString name, void* value)
+{
+    Q_UNUSED(name)
+    Q_UNUSED(value)
+
+    bool result = false;
+
+    qDebug() << Q_FUNC_INFO << "NOT YET IMPLEMENTED. Can not write output" << name;
+
+    return result;
+}
+
+
+/**
+ * @brief Write a given parameter as an integer
+ *
+ * @param name
+ * @param value
+ *
+ * @return  true if everything is ok, false otherwise
+ */
+bool MasticQuickController::writeParameterAsInteger(QString name, int value)
+{
+    bool result = false;
+
+    // Ensure that we have a valid name
+    if (!name.isEmpty())
+    {
+        // Try to write value
+        if (mtic_writeParameterAsInt(name.toStdString().c_str(), value) == 1)
+        {
+            result = true;
+
+            // Update QML
+            _updateQmlParameter(name);
+        }
+        else
+        {
+            qWarning() << Q_FUNC_INFO << "warning: fail to write parameter" << name;
+        }
+    }
+    else
+    {
+        qWarning() << Q_FUNC_INFO << "warning: can not write a parameter without a name";
+    }
+
+    return result;
+}
+
+
+/**
+ * @brief Write a given parameter as a double
+ *
+ * @param name
+ * @param value
+ *
+ * @return  true if everything is ok, false otherwise
+ */
+bool MasticQuickController::writeParameterAsDouble(QString name, double value)
+{
+    bool result = false;
+
+    // Ensure that we have a valid name
+    if (!name.isEmpty())
+    {
+        // Try to write value
+        if (mtic_writeParameterAsDouble(name.toStdString().c_str(), value) == 1)
+        {
+            result = true;
+
+            // Update QML
+            _updateQmlParameter(name);
+        }
+        else
+        {
+            qWarning() << Q_FUNC_INFO << "warning: fail to write parameter" << name;
+        }
+    }
+    else
+    {
+        qWarning() << Q_FUNC_INFO << "warning: can not write a parameter without a name";
+    }
+
+    return result;
+}
+
+
+/**
+ * @brief Write a given parameter as a string
+ *
+ * @param name
+ * @param value
+ *
+ * @return  true if everything is ok, false otherwise
+ */
+bool MasticQuickController::writeParameterAsString(QString name, QString value)
+{
+    bool result = false;
+
+    // Ensure that we have a valid name
+    if (!name.isEmpty())
+    {
+        // Try to write value
+        if (mtic_writeParameterAsString(name.toStdString().c_str(), (char *)value.toStdString().c_str()) == 1)
+        {
+            result = true;
+
+            // Update QML
+            _updateQmlParameter(name);
+        }
+        else
+        {
+            qWarning() << Q_FUNC_INFO << "warning: fail to write parameter" << name;
+        }
+    }
+    else
+    {
+        qWarning() << Q_FUNC_INFO << "warning: can not write a parametrer without a name";
+    }
+
+    return result;
+}
+
+
+/**
+ * @brief Write a given parameter as a boolean
+ *
+ * @param name
+ * @param value
+ *
+ * @return  true if everything is ok, false otherwise
+ */
+bool MasticQuickController::writeParameterAsBoolean(QString name, bool value)
+{
+    bool result = false;
+
+    // Ensure that we have a valid name
+    if (!name.isEmpty())
+    {
+        // Try to write value
+        if (mtic_writeParameterAsBool(name.toStdString().c_str(), value) == 1)
+        {
+            result = true;
+
+            // Update QML
+            _updateQmlParameter(name);
+        }
+        else
+        {
+            qWarning() << Q_FUNC_INFO << "warning: fail to write parameter" << name;
+        }
+    }
+    else
+    {
+        qWarning() << Q_FUNC_INFO << "warning: can not write a parameter without a name";
+    }
+
+    return result;
+}
+
+
+/**
+ * @brief Write a given parameter as data
+ *
+ * @param name
+ * @param value
+ *
+ * @return  true if everything is ok, false otherwise
+ */
+bool MasticQuickController::writeParameterAsData(QString name, void* value)
+{
+    Q_UNUSED(name)
+    Q_UNUSED(value)
+
+    bool result = false;
+
+    qDebug() << Q_FUNC_INFO << "NOT YET IMPLEMENTED. Can not write parameter" << name;
+
+    return result;
+}
+
+
+
+//-------------------------------------------------------------------
+//
+// Mute/unmute outputs
+//
+//-------------------------------------------------------------------
+
+
+/**
+ * @brief Mute a given output
+ *
+ * @param name
+ *
+ * @return  true if everything is ok, false otherwise
+ */
+bool MasticQuickController::muteOuput(QString name)
+{
+    Q_UNUSED(name)
+    bool result = false;
+
+    return result;
+}
+
+
+/**
+ * @brief Mute a given output
+ *
+ * @param name
+ *
+ * @return  true if everything is ok, false otherwise
+ */
+bool MasticQuickController::unmuteOuput(QString name)
+{
+    Q_UNUSED(name)
+    bool result = false;
+
+    return result;
+}
+
+
+/**
+ * @brief Check if a given output is muted
+ *
+ * @param name
+ * @param qmlUpdateExtraParameter Extra parameter used to call this function in a QML binding
+ *
+ * @return true if this output is muted, false otherwise
+ */
+bool MasticQuickController::isOutputMuted(QString name, QVariant qmlUpdateExtraParameter)
+{
+    Q_UNUSED(name)
+    Q_UNUSED(qmlUpdateExtraParameter)
+    bool result = false;
+
+    return result;
+}
+
+
+
+
+//-------------------------------------------------------------------
+//
+// Protected methods
+//
+//-------------------------------------------------------------------
+
+
+
+/**
+ * @brief Create a new input
+ *
+ * @param name
+ * @param type
+ * @param qmlValue
+ * @param cValue
+ * @param cSize
+ *
+ * @return true if an input is created, false otherwise
+ */
+bool MasticQuickController::_createInput(QString name, MasticIopType::Value type, QVariant qmlValue, void* cValue, long cSize)
+{
+    bool result = false;
+
+    if (!name.isEmpty())
+    {
+        // Check if our list of inputs is defined
+        if (_inputs != NULL)
+        {
+            // Update QML
+            // NB: special case for impulsion properties because we don't want to trigger them at startup
+            if (type == MasticIopType::IMPULSION)
+            {
+                _inputs->blockSignals(true);
+                _inputs->insert(name, qmlValue);
+                _inputs->blockSignals(false);
+            }
+            else
+            {
+                _inputs->insert(name, qmlValue);
+            }
+
+            // Check if we must create a Mastic input
+            const char* cName = name.toStdString().c_str();
+            if (!mtic_checkInputExistence(cName))
+            {
+                if (mtic_createInput(cName, enumMasticIopTypeToEnumIopType_t(type), cValue, cSize) == 1)
+                {
+                    result = true;
+
+                    // Observe this new input
+                    if (mtic_observeInput(cName, &MasticQuickController_callbackObserveInput, this) != 1)
+                    {
+                        qWarning() << Q_FUNC_INFO << "warning: fail to observe input" << name;
+                    }
+                }
+                else
+                {
+                    qWarning() << Q_FUNC_INFO << "warning: fail to create input" << name;
+                }
+            }
+            else
+            {
+                qWarning() << Q_FUNC_INFO << "warning: input" << name << "already exists";
+            }
+        }
+        // Else: should not happen
+    }
+    else
+    {
+        qWarning() << Q_FUNC_INFO << "warning: can not create an input with an empty name";
+    }
+
+    return result;
+}
+
+
+/**
+ * @brief Create a new output
+ *
+ * @param name
+ * @param type
+ * @param qmlValue
+ * @param cValue
+ * @param cSize
+ *
+ * @return true if an output is created, false otherwise
+ */
+bool MasticQuickController::_createOutput(QString name, MasticIopType::Value type, QVariant qmlValue, void* cValue, long cSize)
+{
+    bool result = false;
+
+    if (!name.isEmpty())
+    {
+        // Check if our list of outputs is defined
+        if (_outputs != NULL)
+        {
+            // Update QML
+            _outputs->insert(name, qmlValue);
+
+            // Check if we must create a Mastic input
+            const char* cName = name.toStdString().c_str();
+            if (!mtic_checkOutputExistence(cName))
+            {
+                if (mtic_createOutput(cName, enumMasticIopTypeToEnumIopType_t(type), cValue, cSize) == 1)
+                {
+                    result = true;
+                }
+                else
+                {
+                    qWarning() << Q_FUNC_INFO << "warning: fail to create output" << name;
+                }
+            }
+            else
+            {
+                qWarning() << Q_FUNC_INFO << "warning: output" << name << "already exists";
+            }
+        }
+        // Else: should not happen
+    }
+    else
+    {
+        qWarning() << Q_FUNC_INFO << "warning: can not create an output with an empty name";
+    }
+
+    return result;
+}
+
+
+/**
+ * @brief Create a new paramater
+ *
+ * @param name
+ * @param type
+ * @param qmlValue
+ * @param cValue
+ * @param cSize
+ *
+ * @return true if a parameter is created, false otherwise
+ */
+bool MasticQuickController::_createParameter(QString name, MasticIopType::Value type, QVariant qmlValue, void* cValue, long cSize)
+{
+    Q_UNUSED(qmlValue)
+
+    bool result = false;
+
+    if (!name.isEmpty())
+    {
+        // Check if our list of parameters is defined
+        if (_parameters != NULL)
+        {
+            // Update QML
+            _parameters->insert(name, qmlValue);
+
+            // Check if we must create a Mastic input
+            const char* cName = name.toStdString().c_str();
+            if (!mtic_checkParameterExistence(cName))
+            {
+                if (mtic_createParameter(cName, enumMasticIopTypeToEnumIopType_t(type), cValue, cSize) == 1)
+                {
+                    result = true;
+
+                    // Observe this new parameter
+                     if (mtic_observeParameter(cName, &MasticQuickController_callbackObserveParameter, this) != 1)
+                    {
+                        qWarning() << Q_FUNC_INFO << "warning: fail to observe parameter" << name;
+                    }
+                }
+                else
+                {
+                    qWarning() << Q_FUNC_INFO << "warning: fail to create parameter" << name;
+                }
+            }
+            else
+            {
+                qWarning() << Q_FUNC_INFO << "warning: parameter" << name << "already exists";
+            }
+        }
+        // Else: should not happen
+    }
+    else
+    {
+        qWarning() << Q_FUNC_INFO << "warning: can not create a parameter with an empty name";
+    }
+
+    return result;
+}
+
+
+
+
+/**
+ * @brief Update a QML output property
+ *
+ * @param name
+ *
+ * @return true if everything is ok, false otherwise
+ */
+bool MasticQuickController::_updateQmlOutput(QString name)
+{
+    bool result = false;
+
+    if (!name.isEmpty())
+    {
+        // Check if this output exists
+        const char* cName = name.toStdString().c_str();
+        if (mtic_checkOutputExistence(cName) && (_outputs != NULL))
+        {
+            iopType_t type = mtic_getTypeForOutput(cName);
+
+            switch(type)
+            {
+                case INTEGER_T:
+                    {
+                        int newValue = mtic_readOutputAsInt(cName);
+                        _outputs->insert(name, QVariant(newValue));
+                    }
+                    break;
+
+                case DOUBLE_T:
+                    {
+                        double newValue = mtic_readOutputAsDouble(cName);
+                        _outputs->insert(name, QVariant(newValue));
+                    }
+                    break;
+
+                case STRING_T:
+                    {
+                        char* newCValue = mtic_readOutputAsString(cName);
+                        if (newCValue != NULL)
+                        {
+                            QString newValue(newCValue);
+                            _outputs->insert(name, QVariant(newValue));
+                            free(newCValue);
+                            newCValue = NULL;
+                        }
+                        else
+                        {
+                            _outputs->insert(name, QVariant(""));
+                        }
+                    }
+                    break;
+
+                case BOOL_T:
+                    {
+                        bool newValue = mtic_readOutputAsBool(cName);
+                        _outputs->insert(name, QVariant(newValue));
+                    }
+                    break;
+
+                case IMPULSION_T:
+                    {
+                        // Hack to force the update of our property
+                        // We disable signals then we clear its value to detect a valud change when we set an empty value
+                        _outputs->blockSignals(true);
+                        _outputs->clear(name);
+                        _outputs->blockSignals(false);
+
+                        // Set an empty value to trigger an update
+                        _outputs->insert(name, QVariant(""));
+                    }
+                    break;
+
+                case DATA_T:
+                    {
+                        qWarning() << Q_FUNC_INFO << "NOT YET IMPLEMENTED. Can not update output" << name;
+                    }
+                    break;
+
+                default:
+                    qWarning() << Q_FUNC_INFO << "warning: unhandled output type. Can not update output" << name;
+                    break;
+            }
+        }
+    }
+    else
+    {
+        qWarning() << Q_FUNC_INFO << "warning: can not update an output without a name";
+    }
+
+    return result;
+}
+
+
+/**
+ * @brief Update a QML parameter property
+ *
+ * @param name
+ *
+ * @return true if everything is ok, false otherwise
+ */
+bool MasticQuickController::_updateQmlParameter(QString name)
+{
+    bool result = false;
+
+    if (!name.isEmpty())
+    {
+        // Check if this parameter exists
+        const char* cName = name.toStdString().c_str();
+        if (mtic_checkParameterExistence(cName) && (_parameters != NULL))
+        {
+            iopType_t type = mtic_getTypeForParameter(cName);
+
+            switch(type)
+            {
+                case INTEGER_T:
+                    {
+                        int newValue = mtic_readParameterAsInt(cName);
+                        _parameters->insert(name, QVariant(newValue));
+                    }
+                    break;
+
+                case DOUBLE_T:
+                    {
+                        double newValue = mtic_readParameterAsDouble(cName);
+                        _parameters->insert(name, QVariant(newValue));
+                    }
+                    break;
+
+                case STRING_T:
+                    {
+                        char* newCValue = mtic_readParameterAsString(cName);
+                        if (newCValue != NULL)
+                        {
+                            QString newValue(newCValue);
+                            _parameters->insert(name, QVariant(newValue));
+                            free(newCValue);
+                            newCValue = NULL;
+                        }
+                        else
+                        {
+                            _parameters->insert(name, QVariant(""));
+                        }
+                    }
+                    break;
+
+                case BOOL_T:
+                    {
+                        bool newValue = mtic_readParameterAsBool(cName);
+                        _parameters->insert(name, QVariant(newValue));
+                    }
+                    break;
+
+                case IMPULSION_T:
+                    {
+                        qWarning() << Q_FUNC_INFO << "NOT YET IMPLEMENTED. Can not update parameter" << name;
+                    }
+                    break;
+
+                case DATA_T:
+                    {
+                        qWarning() << Q_FUNC_INFO << "NOT YET IMPLEMENTED. Can not update parameter" << name;
+                    }
+                    break;
+
+                default:
+                    qWarning() << Q_FUNC_INFO << "warning: unhandled output type. Can not update parameter" << name;
+                    break;
+            }
+        }
+    }
+    else
+    {
+        qWarning() << Q_FUNC_INFO << "warning: can not update a parameter without a name";
+    }
+
+    return result;
+}
+
+
+
+//-------------------------------------------------------------------
+//
+// Protected Q_SLOTS
+//
+//-------------------------------------------------------------------
+
+
+/**
+ * @brief Called when our agent is asked to stop on the network
+ */
+void MasticQuickController::_onForceStop()
+{
+    // Stop our Mastic agent
+    stop();
+
+    // Quit our application
+    QCoreApplication::exit(0);
+}
+
+
+/**
+ * @brief Called when an input is updated from QML
+ * @param key
+ * @param value
+ */
+void MasticQuickController::_onInputUpdatedFromFromQML(const QString &key, const QVariant &value)
+{
+    Q_UNUSED(value)
+
+    // Inputs MUST not be updated from QML
+    qWarning() << "MasticController warning: inputs must not be updated from QML - input" << key << "has been wrongly changed";
+}
+
+
+/**
+ * @brief Called when an output is updated from QML
+ * @param key
+ * @param value
+ */
+void MasticQuickController::_onOutputUpdatedFromFromQML(const QString &key, const QVariant &value)
+{
+    // Ensure that we have a valid key
+    if (!key.isEmpty())
+    {
+        // We must update our Mastic output
+        const char* name = key.toStdString().c_str();
+
+        // Ensure that this output exists
+        if (mtic_checkOutputExistence(name))
+        {
+            iopType_t type = mtic_getTypeForOutput(name);
+
+            switch(type)
+            {
+                case INTEGER_T:
+                    {
+                        bool ok = false;
+                        int cValue = value.toInt(&ok);
+
+                        if (ok)
+                        {
+                            mtic_writeOutputAsInt(name, cValue);
+                        }
+                        else
+                        {
+                            qWarning() << "MasticController warning: invalid value" << value << "for output" << key;
+                        }
+                    }
+                    break;
+
+                case DOUBLE_T:
+                    {
+                        bool ok = false;
+                        double cValue = value.toDouble(&ok);
+
+                        if (ok)
+                        {
+                            mtic_writeOutputAsDouble(name, cValue);
+                        }
+                        else
+                        {
+                            qWarning() << "MasticController warning: invalid value" << value << "for output" << key;
+                        }
+                    }
+                    break;
+
+                case STRING_T:
+                    {
+                        QString qmlValue = value.toString();
+                        const char* cValue = qmlValue.toStdString().c_str();
+
+                        mtic_writeOutputAsString(name, (char *)cValue);
+                    }
+                    break;
+
+                case BOOL_T:
+                    mtic_writeOutputAsBool(name, value.toBool());
+                    break;
+
+                case IMPULSION_T:
+                    mtic_writeOutputAsImpulsion(name);
+                    break;
+
+                default:
+                    qWarning() << "MasticController warning: unhandled output type. Can not update output" << key;
+                    break;
+            }
+        }
+    }
+}
+
+
+/**
+ * @brief Called when a parameter is updated from QML
+ * @param key
+ * @param value
+ */
+void MasticQuickController::_onParameterUpdatedFromFromQML(const QString &key, const QVariant &value)
+{
+    Q_UNUSED(key)
+    Q_UNUSED(value)
+
+    qInfo() << "MasticController info: QML updates parameter" << key;
+}
