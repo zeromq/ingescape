@@ -331,6 +331,7 @@ ApplicationWindow {
             anchors.fill: parent
         }
 
+        // Overlay layer used by comboboxes
         I2Layer {
             id: overlayLayerComboBox
             objectName: "overlayLayerComboBox"
