@@ -496,6 +496,8 @@ static void json_add_map_out_to_hash (mapping_element_t** hasht,
 
 static void json_add_map_cat_to_hash (mapping_element_t** hasht,
                                        yajl_val current_map_out){
+    MASTIC_UNUSED(hasht)
+    MASTIC_UNUSED(current_map_out)
 
     return;
 //    const char* agent_name;

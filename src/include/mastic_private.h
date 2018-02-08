@@ -20,6 +20,14 @@
 #define MASTICAPI_COMMON_DLLSPEC
 #endif
 
+
+/*
+ * Macro to avoid "unused parameter" warnings
+ */
+#define MASTIC_UNUSED(x) (void)x;
+
+
+
 #include <stdbool.h>
 #include <string.h>
 #include <zyre.h>

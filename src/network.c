@@ -183,6 +183,9 @@ int unsubscribeToPublisherOutput(subscriber_t *subscriber, const char *outputNam
 
 //Timer callback to send MAPPED notification for agents we subscribed to
 int triggerMappingNotificationToNewcomer(zloop_t *loop, int timer_id, void *arg){
+    MASTIC_UNUSED(loop)
+    MASTIC_UNUSED(timer_id)
+
     subscriber_t *subscriber = (subscriber_t *) arg;
     if (subscriber->mappedNotificationToSend){
         zyre_whispers(agentElements->node, subscriber->agentPeerId, "MAPPED");
@@ -300,6 +303,8 @@ void network_cleanAndFreeSubscriber(subscriber_t *subscriber){
 
 //manage messages from the parent thread
 int manageParent (zloop_t *loop, zmq_pollitem_t *item, void *arg){
+    MASTIC_UNUSED(loop)
+    MASTIC_UNUSED(arg)
 
     if (item->revents & ZMQ_POLLIN)
     {
@@ -325,6 +330,8 @@ int manageParent (zloop_t *loop, zmq_pollitem_t *item, void *arg){
 
 //manage incoming messages from one of the publisher agents we subscribed to
 int manageSubscription (zloop_t *loop, zmq_pollitem_t *item, void *arg){
+    MASTIC_UNUSED(loop)
+
     //get subscriber id
     char *subscriberPeerId = (char *)arg;
 
@@ -437,6 +444,8 @@ int manageSubscription (zloop_t *loop, zmq_pollitem_t *item, void *arg){
 
 //manage messages received on the bus
 int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
+    MASTIC_UNUSED(arg)
+
     zyre_t *node = agentElements->node;
     if (item->revents & ZMQ_POLLIN)
     {
@@ -874,6 +883,10 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
 
 //Timer callback to (re)send our definition to agents present on the private channel
 int triggerDefinitionUpdate(zloop_t *loop, int timer_id, void *arg){
+    MASTIC_UNUSED(loop)
+    MASTIC_UNUSED(timer_id)
+    MASTIC_UNUSED(arg)
+
     if (network_needToSendDefinitionUpdate){
         char * definitionStr = NULL;
         definitionStr = parser_export_definition(mtic_internal_definition);
@@ -895,6 +908,10 @@ int triggerDefinitionUpdate(zloop_t *loop, int timer_id, void *arg){
 
 //Timer callback to update and (re)send our mapping to agents on the private channel
 int triggerMappingUpdate(zloop_t *loop, int timer_id, void *arg){
+    MASTIC_UNUSED(loop)
+    MASTIC_UNUSED(timer_id)
+    MASTIC_UNUSED(arg)
+
     if (network_needToUpdateMapping){
         char *mappingStr = NULL;
         mappingStr = parser_export_mapping(mtic_internal_mapping);
@@ -919,6 +936,8 @@ int triggerMappingUpdate(zloop_t *loop, int timer_id, void *arg){
 static void
 initActor (zsock_t *pipe, void *args)
 {
+    MASTIC_UNUSED(args)
+
     //Ae are (re)starting : we disable the timer flags because
     //all network connections are going to be (re)started.
     //Each agent will be mapped if needed when receiving its definition.
