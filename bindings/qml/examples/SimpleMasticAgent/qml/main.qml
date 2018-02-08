@@ -109,12 +109,16 @@ ApplicationWindow {
 
 
         //
-        // Check for existence and get type of an input
+        // MasticQuick API: check for existence and get type of an input
         //
         console.log("Input circleCx exists ? " + Mastic.checkInputExistence("circleCx"));
         var typeOfCircleCx = Mastic.getTypeForInput("circleCx");
         console.log("Type of input circleCx is: " + typeOfCircleCx + " == " + MasticIopType.enumToString(typeOfCircleCx));
 
+
+        // MasticQuick API: log something
+        Mastic.log(MasticLogLevel.LOG_TRACE, "Hello world\n");
+        Mastic.info("Our agent will be started\n");
 
         // MasticQuick API: start our Mastic agent
         Mastic.startWithDevice(root.masticNetworkDevice, root.masticPort);
