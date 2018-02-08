@@ -150,24 +150,6 @@ ApplicationWindow {
             }
         }
 
-        /*Menu {
-            title: qsTr("Enregistrement")
-
-            MenuItem {
-                text: qsTr("TODO 1")
-                onTriggered: {
-                    console.log("Enregistrement TODO 1");
-                }
-            }
-            MenuItem {
-                text: qsTr("TODO 2")
-                onTriggered: {
-                    console.log("Enregistrement TODO 2");
-                }
-            }
-        }*/
-
-
 
         Menu {
             title: qsTr("Supervision")
@@ -218,13 +200,6 @@ ApplicationWindow {
                 }
             }
 
-            /*MenuItem {
-                text: qsTr("Fermer l'application")
-                onTriggered: {
-                    console.info("QML: close application");
-                    Qt.quit();
-                }
-            }*/
         }
     }
 
@@ -283,7 +258,7 @@ ApplicationWindow {
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
 
-            text: qsTr("Erreur QML fatale !!");
+            text: qsTr("!! QML FATAL ERROR !!");
 
             color: "red"
 

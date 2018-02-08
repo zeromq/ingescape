@@ -110,24 +110,6 @@ Item {
     //
     //----------------------------
 
-    /*I2SvgItem {
-        svgFileCache: MasticTheme.svgFileMASTIC
-        svgElementId: "login-chargement"
-
-        anchors {
-            verticalCenter: parent.verticalCenter
-            horizontalCenter: parent.horizontalCenter
-        }
-
-        RotationAnimator on rotation {
-            //easing.type: Easing.InOutSine
-            loops: Animation.Infinite
-            //easing.amplitude:
-            from: 0;
-            to: 360;
-            duration: 2000
-        }
-    }*/
 
     Item {
         id: mastic
