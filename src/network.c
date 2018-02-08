@@ -1536,6 +1536,12 @@ int mtic_observeFreeze(mtic_freezeCallback cb, void *myData){
  * \param state is the name of the state you want to send.
  */
 int mtic_setAgentState(const char *state){
+    if (state == NULL)
+    {
+        mtic_debug("mtic_setAgentState: state can not be NULL\n");
+        return 0;
+    }
+    
     if (strcmp(state, agentState) != 0){
         strncpy(agentState, state, MAX_AGENT_NAME_LENGTH);
         if (agentElements != NULL && agentElements->node != NULL){
