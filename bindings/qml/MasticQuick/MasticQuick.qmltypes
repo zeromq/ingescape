@@ -486,6 +486,35 @@ Module {
             type: "bool"
             Parameter { name: "name"; type: "string" }
         }
+        Method {
+            name: "log"
+            Parameter { name: "logLevel"; type: "MasticLogLevel::Value" }
+            Parameter { name: "text"; type: "string" }
+        }
+        Method {
+            name: "trace"
+            Parameter { name: "text"; type: "string" }
+        }
+        Method {
+            name: "debug"
+            Parameter { name: "text"; type: "string" }
+        }
+        Method {
+            name: "info"
+            Parameter { name: "text"; type: "string" }
+        }
+        Method {
+            name: "warn"
+            Parameter { name: "text"; type: "string" }
+        }
+        Method {
+            name: "error"
+            Parameter { name: "text"; type: "string" }
+        }
+        Method {
+            name: "fatal"
+            Parameter { name: "text"; type: "string" }
+        }
     }
     Component {
         name: "MasticQuickQmlPropertyMap"
