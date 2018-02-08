@@ -140,7 +140,7 @@ Module {
             name: "parametersChanged"
             Parameter { name: "value"; type: "MasticQuickQmlPropertyMap"; isPointer: true }
         }
-        Signal { name: "forceStop" }
+        Signal { name: "forcedStop" }
         Method {
             name: "startWithDevice"
             type: "bool"

@@ -342,5 +342,15 @@ ApplicationWindow {
                 myCirclePulseAnimation.start();
             }
         }
+
+
+        // MasticQuick API: subscribe to forceStop
+        Connections {
+            target: Mastic
+
+            onForcedStop: {
+                console.log("Forced stop");
+            }
+        }
     }
 }

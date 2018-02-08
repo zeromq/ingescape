@@ -341,7 +341,7 @@ void MasticQuickController_callbackForcedStop(void *customData)
     MasticQuickController* controller = (MasticQuickController *)customData;
     if (controller != NULL)
     {
-        Q_EMIT controller->forceStop();
+        Q_EMIT controller->forcedStop();
     }
 }
 
@@ -390,7 +390,7 @@ MasticQuickController::MasticQuickController(QObject *parent) : QObject(parent),
 
 
     // Observe force stop
-    connect(this, &MasticQuickController::forceStop, this, &MasticQuickController::_onForceStop);
+    connect(this, &MasticQuickController::forcedStop, this, &MasticQuickController::_onForcedStop);
     mtic_observeForcedStop(&MasticQuickController_callbackForcedStop, this);
 
 
@@ -422,7 +422,7 @@ MasticQuickController::MasticQuickController(QObject *parent) : QObject(parent),
 MasticQuickController::~MasticQuickController()
 {
     // Unsubscribe to Masric signals
-    disconnect(this, &MasticQuickController::forceStop, this, &MasticQuickController::_onForceStop);
+    disconnect(this, &MasticQuickController::forcedStop, this, &MasticQuickController::_onForcedStop);
 
     // Stop our agent
     stop();
@@ -1980,7 +1980,7 @@ bool MasticQuickController::_updateQmlParameter(QString name)
 /**
  * @brief Called when our agent is asked to stop on the network
  */
-void MasticQuickController::_onForceStop()
+void MasticQuickController::_onForcedStop()
 {
     // Stop our Mastic agent
     stop();

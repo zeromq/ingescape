@@ -109,7 +109,7 @@ ApplicationWindow {
 
 
         // MasticQuick API: start our Mastic agent
-        Mastic.startWithDevice(root.masticNetworkDevice, root.masticPort)
+        Mastic.startWithDevice(root.masticNetworkDevice, root.masticPort);
     }
 
 

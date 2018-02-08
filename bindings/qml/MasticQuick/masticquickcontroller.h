@@ -104,7 +104,7 @@ Q_SIGNALS:
      /**
      * @brief Triggered when our agent is asked to stop on the network
      */
-    void forceStop();
+    void forcedStop();
 
 
 
@@ -595,7 +595,7 @@ protected Q_SLOTS:
      /**
       * @brief Called when our agent is asked to stop on the network
       */
-     void _onForceStop();
+     void _onForcedStop();
 
 
      /**
