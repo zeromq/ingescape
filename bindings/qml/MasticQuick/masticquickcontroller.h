@@ -598,6 +598,64 @@ public Q_SLOTS:
 
 //---------------------------------------------------
 //
+// Logs
+//
+//---------------------------------------------------
+
+     /**
+      * @brief Print (or save) debugging information
+      * @param logLevel
+      * @param text
+      */
+     void log(MasticLogLevel::Value logLevel, QString text);
+
+
+     /**
+      * @brief Print (or save) debugging information (loglevel = trace)
+      * @param text
+      */
+     void trace(QString text);
+
+
+     /**
+      * @brief Print (or save) debugging information (loglevel = debug)
+      * @param text
+      */
+     void debug(QString text);
+
+
+     /**
+      * @brief Print (or save) debugging information (loglevel = info)
+      * @param text
+      */
+     void info(QString text);
+
+
+     /**
+      * @brief Print (or save) debugging information (loglevel = warn)
+      * @param text
+      */
+     void warn(QString text);
+
+
+     /**
+      * @brief Print (or save) debugging information (loglevel = error)
+      * @param text
+      */
+     void error(QString text);
+
+
+     /**
+      * @brief Print (or save) debugging information (loglevel = fatal)
+      * @param text
+      */
+     void fatal(QString text);
+
+
+
+
+//---------------------------------------------------
+//
 // Protected methods
 //
 //---------------------------------------------------

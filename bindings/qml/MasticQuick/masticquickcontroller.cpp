@@ -125,6 +125,50 @@ static MasticIopType::Value enumIopType_tToMasticIopType(iopType_t value)
 
 
 /**
+ * @brief Convert a MasticLogLevel::Value into a mtic_logLevel_t value
+ * @param value
+ * @return
+ */
+static mtic_logLevel_t enumMasticLogLevelToEnumMticlogLevel_t(MasticLogLevel::Value value)
+{
+    mtic_logLevel_t result = MTIC_LOG_TRACE;
+
+    switch (value)
+    {
+        case MasticLogLevel::LOG_TRACE:
+            result = MTIC_LOG_TRACE;
+            break;
+
+        case MasticLogLevel::LOG_DEBUG:
+            result = MTIC_LOG_DEBUG;
+            break;
+
+        case MasticLogLevel::LOG_INFO:
+            result = MTIC_LOG_INFO;
+            break;
+
+        case MasticLogLevel::LOG_WARNING:
+            result = MTIC_LOG_WARN;
+            break;
+
+        case MasticLogLevel::LOG_ERROR:
+            result = MTIC_LOG_ERROR;
+            break;
+
+        case MasticLogLevel::LOG_FATAL:
+            result = MTIC_LOG_FATAL;
+            break;
+
+        default:
+            break;
+    }
+
+    return result;
+}
+
+
+
+/**
  * @brief Callback used to observe inputs
  *
  * @param iopType
@@ -726,35 +770,7 @@ void MasticQuickController::setlogLevel(MasticLogLevel::Value value)
         _logLevel = value;
 
         // Set out log level
-        switch (value)
-        {
-            case MasticLogLevel::LOG_TRACE:
-                mtic_setLogLevel(MTIC_LOG_TRACE);
-                break;
-
-            case MasticLogLevel::LOG_DEBUG:
-                mtic_setLogLevel(MTIC_LOG_DEBUG);
-                break;
-
-            case MasticLogLevel::LOG_INFO:
-                mtic_setLogLevel(MTIC_LOG_INFO);
-                break;
-
-            case MasticLogLevel::LOG_WARNING:
-                mtic_setLogLevel(MTIC_LOG_WARN);
-                break;
-
-            case MasticLogLevel::LOG_ERROR:
-                mtic_setLogLevel(MTIC_LOG_ERROR);
-                break;
-
-            case MasticLogLevel::LOG_FATAL:
-                mtic_setLogLevel(MTIC_LOG_FATAL);
-                break;
-
-            default:
-                break;
-        }
+        mtic_setLogLevel( enumMasticLogLevelToEnumMticlogLevel_t(value) );
 
         // Notify change
         Q_EMIT logLevelChanged(value);
@@ -1786,6 +1802,84 @@ bool MasticQuickController::isOutputMuted(QString name, QVariant qmlUpdateExtraP
     bool result = false;
 
     return result;
+}
+
+
+
+//---------------------------------------------------
+//
+// Logs
+//
+//---------------------------------------------------
+
+/**
+ * @brief Print (or save) debugging information
+ * @param logLevel
+ * @param text
+ */
+void MasticQuickController::log(MasticLogLevel::Value logLevel, QString text)
+{
+    mtic_log( enumMasticLogLevelToEnumMticlogLevel_t(logLevel), text.toStdString().c_str());
+}
+
+
+/**
+ * @brief Print (or save) debugging information (loglevel = trace)
+ * @param text
+ */
+void MasticQuickController::trace(QString text)
+{
+    log(MasticLogLevel::LOG_TRACE, text);
+}
+
+
+/**
+ * @brief Print (or save) debugging information (loglevel = debug)
+ * @param text
+ */
+void MasticQuickController::debug(QString text)
+{
+    log(MasticLogLevel::LOG_DEBUG, text);
+}
+
+
+/**
+ * @brief Print (or save) debugging information (loglevel = info)
+ * @param text
+ */
+void MasticQuickController::info(QString text)
+{
+    log(MasticLogLevel::LOG_INFO, text);
+}
+
+
+/**
+ * @brief Print (or save) debugging information (loglevel = warn)
+ * @param text
+ */
+void MasticQuickController::warn(QString text)
+{
+    log(MasticLogLevel::LOG_WARNING, text);
+}
+
+
+/**
+ * @brief Print (or save) debugging information (loglevel = error)
+ * @param text
+ */
+void MasticQuickController::error(QString text)
+{
+    log(MasticLogLevel::LOG_ERROR, text);
+}
+
+
+/**
+ * @brief Print (or save) debugging information (loglevel = fatal)
+ * @param text
+ */
+void MasticQuickController::fatal(QString text)
+{
+    log(MasticLogLevel::LOG_FATAL, text);
 }
 
 
