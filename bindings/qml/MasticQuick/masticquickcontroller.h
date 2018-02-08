@@ -46,6 +46,9 @@ class MasticQuickController : public QObject
     // Agent name
     MASTIC_QML_PROPERTY_CUSTOM_SETTER(QString, agentName)
 
+    // Agent state
+    MASTIC_QML_PROPERTY_CUSTOM_SETTER(QString, agentState)
+
     // Definition name
     MASTIC_QML_PROPERTY_CUSTOM_SETTER(QString, definitionName)
 

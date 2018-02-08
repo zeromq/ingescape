@@ -394,10 +394,24 @@ MasticQuickController::MasticQuickController(QObject *parent) : QObject(parent),
     setdefinitionVersion("0.0");
     setdefinitionDescription(tr("Definition of %1").arg(QCoreApplication::applicationName()));
 
-    // isFrozen flag
+
+    //
+    // Get initial values of Mastic internal properties
+    //
+
+    // - agent state
+    char* cAgentState = mtic_getAgentName();
+    if (cAgentState != NULL)
+    {
+        _agentState = QString(cAgentState);
+        free(cAgentState);
+        cAgentState = NULL;
+    }
+
+    // - isFrozen flag
     _isFrozen = mtic_isFrozen();
 
-    // isMuted flag
+    // - isMuted flag
     _isMuted = mtic_isMuted();
 
 
@@ -530,6 +544,26 @@ void MasticQuickController::setagentName(QString value)
 
         // Notify change
         Q_EMIT agentNameChanged(value);
+    }
+}
+
+
+/**
+ * @brief Set our agent state
+ * @param value
+ */
+void MasticQuickController::setagentState(QString value)
+{
+    if (_agentState != value)
+    {
+        // Save our new state
+        _agentState = value;
+
+        // Set our new state
+        mtic_setAgentState(_agentState.toStdString().c_str());
+
+        // Notify change
+        Q_EMIT agentStateChanged(value);
     }
 }
 
@@ -766,6 +800,10 @@ bool MasticQuickController::startWithDevice(QString networkDevice, int port)
         setisStarted(true);
         result = true;
     }
+    else
+    {
+        qWarning() << Q_FUNC_INFO << "warning: fail to start our agent";
+    }
 
     return result;
 }
@@ -793,6 +831,10 @@ bool MasticQuickController::startWithIP(QString ipAddress, int port)
         setisStarted(true);
         result = true;
     }
+    else
+    {
+        qWarning() << Q_FUNC_INFO << "warning: fail to start our agent";
+    }
 
     return result;
 }
@@ -812,6 +854,10 @@ bool MasticQuickController::stop()
         {
             setisStarted(false);
             result = true;
+        }
+        else
+        {
+            qWarning() << Q_FUNC_INFO << "warning: fail to stop our agent";
         }
     }
 

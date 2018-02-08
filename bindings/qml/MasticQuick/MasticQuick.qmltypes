@@ -81,10 +81,13 @@ Module {
         isSingleton: true
         exportMetaObjectRevisions: [0]
         Property { name: "agentName"; type: "string" }
+        Property { name: "agentState"; type: "string" }
         Property { name: "definitionName"; type: "string" }
         Property { name: "definitionVersion"; type: "string" }
         Property { name: "definitionDescription"; type: "string" }
         Property { name: "isMuted"; type: "bool" }
+        Property { name: "isFrozen"; type: "bool" }
+        Property { name: "canBeFrozen"; type: "bool" }
         Property { name: "isStarted"; type: "bool"; isReadonly: true }
         Property { name: "isVerbose"; type: "bool" }
         Property { name: "logLevel"; type: "MasticLogLevel::Value" }
@@ -101,6 +104,10 @@ Module {
             Parameter { name: "value"; type: "string" }
         }
         Signal {
+            name: "agentStateChanged"
+            Parameter { name: "value"; type: "string" }
+        }
+        Signal {
             name: "definitionNameChanged"
             Parameter { name: "value"; type: "string" }
         }
@@ -114,6 +121,14 @@ Module {
         }
         Signal {
             name: "isMutedChanged"
+            Parameter { name: "value"; type: "bool" }
+        }
+        Signal {
+            name: "isFrozenChanged"
+            Parameter { name: "value"; type: "bool" }
+        }
+        Signal {
+            name: "canBeFrozenChanged"
             Parameter { name: "value"; type: "bool" }
         }
         Signal {
