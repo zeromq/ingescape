@@ -29,60 +29,6 @@ extern "C" {
 //-------------------------------------------------------------------
 //
 //
-//  MasticIopType
-//
-//
-//-------------------------------------------------------------------
-
-
-/**
- * @brief MasticIopType enumToString
- * @param value
- * @return
- */
-QString MasticIopType::enumToString(int value)
-{
-    QString result;
-
-    switch (value)
-    {
-        case MasticIopType::INTEGER:
-            result = tr("Integer");
-            break;
-
-        case MasticIopType::DOUBLE:
-            result = tr("Double");
-            break;
-
-        case MasticIopType::STRING:
-            result = tr("String");
-            break;
-
-        case MasticIopType::BOOLEAN:
-            result = tr("Boolean");
-            break;
-
-        case MasticIopType::IMPULSION:
-            result = tr("Impulsion");
-            break;
-
-        case MasticIopType::DATA:
-            result = tr("Data");
-            break;
-
-        default:
-            break;
-    }
-
-    return result;
-}
-
-
-
-
-//-------------------------------------------------------------------
-//
-//
 //  Static functions
 //
 //
@@ -123,6 +69,49 @@ static iopType_t enumMasticIopTypeToEnumIopType_t(MasticIopType::Value value)
 
         case MasticIopType::DATA:
             result = DATA_T;
+            break;
+
+        default:
+            break;
+    }
+
+    return result;
+}
+
+
+/**
+ * @brief Convert an iopType_t value into a MasticIopType::Value
+ * @param value
+ * @return
+ */
+static MasticIopType::Value enumIopType_tToMasticIopType(iopType_t value)
+{
+    MasticIopType::Value result = MasticIopType::INVALID;
+
+    switch (value)
+    {
+        case INTEGER_T:
+            result = MasticIopType::INTEGER;
+            break;
+
+        case DOUBLE_T:
+            result = MasticIopType::DOUBLE;
+            break;
+
+        case STRING_T:
+            result = MasticIopType::STRING;
+            break;
+
+        case BOOL_T:
+            result = MasticIopType::BOOLEAN;
+            break;
+
+        case IMPULSION_T:
+            result = MasticIopType::IMPULSION;
+            break;
+
+        case DATA_T:
+            result = MasticIopType::DATA;
             break;
 
         default:
@@ -869,373 +858,10 @@ bool MasticQuickController::stop()
 
 //-------------------------------------------------------------------
 //
-// Create or remove IOP (inoput, output, parameter)
+// Write per type
 //
 //-------------------------------------------------------------------
 
-/**
- * @brief Create a new integer input
- *
- * @param name
- * @param value
- *
- * @return true if an input is created, false otherwise (i.e. we already have an input with this name)
- */
-bool MasticQuickController::createInputInteger(QString name, int value)
-{
-    return _createInput(name, MasticIopType::INTEGER, QVariant(value), &value, sizeof(int));
-}
-
-
-/**
- * @brief Create a new double input
- *
- * @param name
- * @param value
- *
- * @return true if an input is created, false otherwise (i.e. we already have an input with this name)
- */
-bool MasticQuickController::createInputDouble(QString name, double value)
-{
-    return _createInput(name, MasticIopType::DOUBLE, QVariant(value), &value, sizeof(double));
-}
-
-
-/**
- * @brief Create a new string input
- *
- * @param name
- * @param value
- *
- * @return true if an input is created, false otherwise (i.e. we already have an input with this name)
- */
-bool MasticQuickController::createInputString(QString name, QString value)
-{
-    const char* cValue = value.toStdString().c_str();
-    int cValueLength = ((cValue != NULL) ? strlen(cValue) : 0);
-
-    return _createInput(name, MasticIopType::STRING, QVariant(value), (void *)cValue, (cValueLength + 1) * sizeof(char));
-}
-
-
-/**
- * @brief Create a new boolean input
- *
- * @param name
- * @param value
- *
- * @return true if an input is created, false otherwise (i.e. we already have an input with this name)
- */
-bool MasticQuickController::createInputBoolean(QString name, bool value)
-{
-    return _createInput(name, MasticIopType::BOOLEAN, QVariant(value), &value, sizeof(bool));
-}
-
-
-/**
- * @brief Create a new impulsion input
- *
- * @param name
- *
- * @return true if an input is created, false otherwise (i.e. we already have an input with this name)
- */
-bool MasticQuickController::createInputImpulsion(QString name)
-{
-    return _createInput(name, MasticIopType::IMPULSION, QVariant(""), 0, 0);
-}
-
-
-/**
- * @brief Create a new data input
- *
- * @param name
- * @param value
- *
- * @return true if an input is created, false otherwise (i.e. we already have an input with this name)
- */
-bool MasticQuickController::createInputData(QString name, void* value)
-{
-    Q_UNUSED(name)
-    Q_UNUSED(value)
-
-    bool result = false;
-
-    qDebug() << Q_FUNC_INFO << "NOT YET IMPLEMENTED. Can not create input" << name;
-
-    return result;
-}
-
-
-/**
- * @brief Create a new integer output
- *
- * @param name
- * @param value
- *
- * @return true if an output is created, false otherwise (i.e. we already have an output with this name)
- */
-bool MasticQuickController::createOutputInteger(QString name, int value)
-{
-    return _createOutput(name, MasticIopType::INTEGER, QVariant(value), &value, sizeof(int));
-}
-
-
-/**
- * @brief Create a new double output
- *
- * @param name
- * @param value
- *
- * @return true if an output is created, false otherwise (i.e. we already have an output with this name)
- */
-bool MasticQuickController::createOutputDouble(QString name, double value)
-{
-    return _createOutput(name, MasticIopType::DOUBLE, QVariant(value), &value, sizeof(double));
-}
-
-
-/**
- * @brief Create a new string output
- *
- * @param name
- * @param value
- *
- * @return true if an output is created, false otherwise (i.e. we already have an output with this name)
- */
-bool MasticQuickController::createOutputString(QString name, QString value)
-{
-    const char* cValue = value.toStdString().c_str();
-    int cValueLength = ((cValue != NULL) ? strlen(cValue) : 0);
-
-    return _createOutput(name, MasticIopType::STRING, QVariant(value), (void *)cValue, (cValueLength + 1) * sizeof(char));
-}
-
-
-/**
- * @brief Create a new boolean output
- *
- * @param name
- * @param value
- *
- * @return true if an output is created, false otherwise (i.e. we already have an output with this name)
- */
-bool MasticQuickController::createOutputBoolean(QString name, bool value)
-{
-    return _createOutput(name, MasticIopType::BOOLEAN, QVariant(value), &value, sizeof(bool));
-}
-
-
-/**
- * @brief Create a new impulsion output
- *
- * @param name
- *
- * @return true if an output is created, false otherwise (i.e. we already have an output with this name)
- */
-bool MasticQuickController::createOutputImpulsion(QString name)
-{
-    return _createOutput(name, MasticIopType::IMPULSION, QVariant(""), 0, 0);
-}
-
-
-/**
- * @brief Create a new data output
- *
- * @param name
- * @param value
- *
- * @return true if an output is created, false otherwise (i.e. we already have an output with this name)
- */
-bool MasticQuickController::createOutputData(QString name, void* value)
-{
-    Q_UNUSED(name)
-    Q_UNUSED(value)
-
-    bool result = false;
-
-    qDebug() << Q_FUNC_INFO << "NOT YET IMPLEMENTED. Can not create output" << name;
-
-    return result;
-}
-
-
-/**
- * @brief Create a new integer parameter
- *
- * @param name
- * @param value
- *
- * @return true if a parameter is created, false otherwise (i.e. we already have a parameter with this name)
- */
-bool MasticQuickController::createParameterInteger(QString name, int value)
-{
-    return _createParameter(name, MasticIopType::INTEGER, QVariant(value), &value, sizeof(int));
-}
-
-
-/**
- * @brief Create a new double parameter
- *
- * @param name
- * @param value
- *
- * @return true if a parameter is created, false otherwise (i.e. we already have a parameter with this name)
- */
-bool MasticQuickController::createParameterDouble(QString name, double value)
-{
-    return _createParameter(name, MasticIopType::DOUBLE, QVariant(value), &value, sizeof(double));
-}
-
-
-/**
- * @brief Create a new string parameter
- *
- * @param name
- * @param value
- *
- * @return true if a parameter is created, false otherwise (i.e. we already have a parameter with this name)
- */
-bool MasticQuickController::createParameterString(QString name, QString value)
-{
-    const char* cValue = value.toStdString().c_str();
-    int cValueLength = ((cValue != NULL) ? strlen(cValue) : 0);
-
-    return _createParameter(name, MasticIopType::STRING, QVariant(value), (void *)cValue, (cValueLength + 1) * sizeof(char));
-}
-
-
-/**
- * @brief Create a new boolean parameter
- *
- * @param name
- * @param value
- *
- * @return true if a parameter is created, false otherwise (i.e. we already have a parameter with this name)
- */
-bool MasticQuickController::createParameterBoolean(QString name, bool value)
-{
-    return _createParameter(name, MasticIopType::BOOLEAN, QVariant(value), &value, sizeof(bool));
-}
-
-
-/**
- * @brief Create a new data parameter
- *
- * @param name
- * @param value
- *
- * @return true if a parameter is created, false otherwise (i.e. we already have a parameter with this name)
- */
-bool MasticQuickController::createParameterData(QString name, void* value)
-{
-    Q_UNUSED(name)
-    Q_UNUSED(value)
-
-    bool result = false;
-
-    qDebug() << Q_FUNC_INFO << "NOT YET IMPLEMENTED. Can not create parameter" << name;
-
-    return result;
-}
-
-
-/**
- * @brief Remove an input
- *
- * @param name
- *
- * @return true if this input is removed, false otherwise
- */
-bool MasticQuickController::removeInput(QString name)
-{
-    bool result = false;
-
-    // Ensure that we have a valid name
-    if (!name.isEmpty())
-    {
-        // Try to remove input
-        if (mtic_removeInput(name.toStdString().c_str()) == 1)
-        {
-            result = true;
-        }
-        else
-        {
-            qWarning() << Q_FUNC_INFO << "warning: fail to remove input" << name;
-        }
-    }
-    else
-    {
-        qWarning() << Q_FUNC_INFO << "warning: can not remove an input without a name";
-    }
-
-    return result;
-}
-
-
-/**
- * @brief Remove an output
- *
- * @param name
- *
- * @return true if this output is removed, false otherwise
- */
-bool MasticQuickController::removeOutput(QString name)
-{
-    bool result = false;
-
-    // Ensure that we have a valid name
-    if (!name.isEmpty())
-    {
-        // Try to remove ouput
-        if (mtic_removeOutput(name.toStdString().c_str()) == 1)
-        {
-            result = true;
-        }
-        else
-        {
-            qWarning() << Q_FUNC_INFO << "warning: fail to remove output" << name;
-        }
-    }
-    else
-    {
-        qWarning() << Q_FUNC_INFO << "warning: can not remove an output without a name";
-    }
-
-    return result;
-}
-
-
-/**
- * @brief Remove a parameter
- *
- * @param name
- *
- * @return true if this parameter is removed, false otherwise
- */
-bool MasticQuickController::removeParameter(QString name)
-{
-    bool result = false;
-
-    // Ensure that we have a valid name
-    if (!name.isEmpty())
-    {
-        // Try to remove parameter
-        if (mtic_removeParameter(name.toStdString().c_str()) == 1)
-        {
-            result = true;
-        }
-        else
-        {
-            qWarning() << Q_FUNC_INFO << "warning: fail to remove parameter" << name;
-        }
-    }
-    else
-    {
-        qWarning() << Q_FUNC_INFO << "warning: can not remove a parameter without a name";
-    }
-
-    return result;
-}
 
 
 /**
@@ -1607,6 +1233,496 @@ bool MasticQuickController::writeParameterAsData(QString name, void* value)
     bool result = false;
 
     qDebug() << Q_FUNC_INFO << "NOT YET IMPLEMENTED. Can not write parameter" << name;
+
+    return result;
+}
+
+
+
+//-------------------------------------------------------------------
+//
+// Check IOP type and existence
+//
+//-------------------------------------------------------------------
+
+
+/**
+ * @brief Get type of a given input
+ * @param name
+ * @return
+ */
+MasticIopType::Value MasticQuickController::getTypeForInput(QString name)
+{
+    MasticIopType::Value result = MasticIopType::INVALID;
+
+    if (!name.isEmpty())
+    {
+        const char* cName = name.toStdString().c_str();
+        if (mtic_checkInputExistence(cName))
+        {
+            result = enumIopType_tToMasticIopType( mtic_getTypeForInput(cName) );
+        }
+    }
+    else
+    {
+        qWarning() << Q_FUNC_INFO << "warning: name can not be empty";
+    }
+
+    return result;
+}
+
+
+/**
+ * @brief Get type of a given output
+ * @param name
+ * @return
+ */
+MasticIopType::Value MasticQuickController::getTypeForOutput(QString name)
+{
+    MasticIopType::Value result = MasticIopType::INVALID;
+
+    if (!name.isEmpty())
+    {
+        const char* cName = name.toStdString().c_str();
+        if (mtic_checkOutputExistence(cName))
+        {
+            result = enumIopType_tToMasticIopType( mtic_getTypeForOutput(cName) );
+        }
+    }
+    else
+    {
+        qWarning() << Q_FUNC_INFO << "warning: name can not be empty";
+    }
+
+    return result;
+}
+
+
+/**
+ * @brief Get type of a given parameter
+ * @param name
+ * @return
+ */
+MasticIopType::Value MasticQuickController::getTypeForParameter(QString name)
+{
+    MasticIopType::Value result = MasticIopType::INVALID;
+
+    if (!name.isEmpty())
+    {
+        const char* cName = name.toStdString().c_str();
+        if (mtic_checkParameterExistence(cName))
+        {
+            result = enumIopType_tToMasticIopType( mtic_getTypeForParameter(cName) );
+        }
+    }
+    else
+    {
+        qWarning() << Q_FUNC_INFO << "warning: name can not be empty";
+    }
+
+    return result;
+}
+
+
+/**
+ * @brief Check if our agent has an input with this name
+ * @param name
+ * @return
+ */
+bool MasticQuickController::checkInputExistence(QString name)
+{
+    return mtic_checkInputExistence(name.toStdString().c_str());
+}
+
+
+/**
+ * @brief Check if our agent has an output with this name
+ * @param name
+ * @return
+ */
+bool MasticQuickController::checkOutputExistence(QString name)
+{
+    return mtic_checkOutputExistence(name.toStdString().c_str());
+}
+
+
+/**
+ * @brief Check if our agent has a parameter with this name
+ * @param name
+ * @return
+ */
+bool MasticQuickController::checkParameterExistence(QString name)
+{
+    return mtic_checkParameterExistence(name.toStdString().c_str());
+}
+
+
+//-------------------------------------------------------------------
+//
+// Create or remove IOP (inoput, output, parameter)
+//
+//-------------------------------------------------------------------
+
+/**
+ * @brief Create a new integer input
+ *
+ * @param name
+ * @param value
+ *
+ * @return true if an input is created, false otherwise (i.e. we already have an input with this name)
+ */
+bool MasticQuickController::createInputInteger(QString name, int value)
+{
+    return _createInput(name, MasticIopType::INTEGER, QVariant(value), &value, sizeof(int));
+}
+
+
+/**
+ * @brief Create a new double input
+ *
+ * @param name
+ * @param value
+ *
+ * @return true if an input is created, false otherwise (i.e. we already have an input with this name)
+ */
+bool MasticQuickController::createInputDouble(QString name, double value)
+{
+    return _createInput(name, MasticIopType::DOUBLE, QVariant(value), &value, sizeof(double));
+}
+
+
+/**
+ * @brief Create a new string input
+ *
+ * @param name
+ * @param value
+ *
+ * @return true if an input is created, false otherwise (i.e. we already have an input with this name)
+ */
+bool MasticQuickController::createInputString(QString name, QString value)
+{
+    const char* cValue = value.toStdString().c_str();
+    int cValueLength = ((cValue != NULL) ? strlen(cValue) : 0);
+
+    return _createInput(name, MasticIopType::STRING, QVariant(value), (void *)cValue, (cValueLength + 1) * sizeof(char));
+}
+
+
+/**
+ * @brief Create a new boolean input
+ *
+ * @param name
+ * @param value
+ *
+ * @return true if an input is created, false otherwise (i.e. we already have an input with this name)
+ */
+bool MasticQuickController::createInputBoolean(QString name, bool value)
+{
+    return _createInput(name, MasticIopType::BOOLEAN, QVariant(value), &value, sizeof(bool));
+}
+
+
+/**
+ * @brief Create a new impulsion input
+ *
+ * @param name
+ *
+ * @return true if an input is created, false otherwise (i.e. we already have an input with this name)
+ */
+bool MasticQuickController::createInputImpulsion(QString name)
+{
+    return _createInput(name, MasticIopType::IMPULSION, QVariant(""), 0, 0);
+}
+
+
+/**
+ * @brief Create a new data input
+ *
+ * @param name
+ * @param value
+ *
+ * @return true if an input is created, false otherwise (i.e. we already have an input with this name)
+ */
+bool MasticQuickController::createInputData(QString name, void* value)
+{
+    Q_UNUSED(name)
+    Q_UNUSED(value)
+
+    bool result = false;
+
+    qDebug() << Q_FUNC_INFO << "NOT YET IMPLEMENTED. Can not create input" << name;
+
+    return result;
+}
+
+
+/**
+ * @brief Create a new integer output
+ *
+ * @param name
+ * @param value
+ *
+ * @return true if an output is created, false otherwise (i.e. we already have an output with this name)
+ */
+bool MasticQuickController::createOutputInteger(QString name, int value)
+{
+    return _createOutput(name, MasticIopType::INTEGER, QVariant(value), &value, sizeof(int));
+}
+
+
+/**
+ * @brief Create a new double output
+ *
+ * @param name
+ * @param value
+ *
+ * @return true if an output is created, false otherwise (i.e. we already have an output with this name)
+ */
+bool MasticQuickController::createOutputDouble(QString name, double value)
+{
+    return _createOutput(name, MasticIopType::DOUBLE, QVariant(value), &value, sizeof(double));
+}
+
+
+/**
+ * @brief Create a new string output
+ *
+ * @param name
+ * @param value
+ *
+ * @return true if an output is created, false otherwise (i.e. we already have an output with this name)
+ */
+bool MasticQuickController::createOutputString(QString name, QString value)
+{
+    const char* cValue = value.toStdString().c_str();
+    int cValueLength = ((cValue != NULL) ? strlen(cValue) : 0);
+
+    return _createOutput(name, MasticIopType::STRING, QVariant(value), (void *)cValue, (cValueLength + 1) * sizeof(char));
+}
+
+
+/**
+ * @brief Create a new boolean output
+ *
+ * @param name
+ * @param value
+ *
+ * @return true if an output is created, false otherwise (i.e. we already have an output with this name)
+ */
+bool MasticQuickController::createOutputBoolean(QString name, bool value)
+{
+    return _createOutput(name, MasticIopType::BOOLEAN, QVariant(value), &value, sizeof(bool));
+}
+
+
+/**
+ * @brief Create a new impulsion output
+ *
+ * @param name
+ *
+ * @return true if an output is created, false otherwise (i.e. we already have an output with this name)
+ */
+bool MasticQuickController::createOutputImpulsion(QString name)
+{
+    return _createOutput(name, MasticIopType::IMPULSION, QVariant(""), 0, 0);
+}
+
+
+/**
+ * @brief Create a new data output
+ *
+ * @param name
+ * @param value
+ *
+ * @return true if an output is created, false otherwise (i.e. we already have an output with this name)
+ */
+bool MasticQuickController::createOutputData(QString name, void* value)
+{
+    Q_UNUSED(name)
+    Q_UNUSED(value)
+
+    bool result = false;
+
+    qDebug() << Q_FUNC_INFO << "NOT YET IMPLEMENTED. Can not create output" << name;
+
+    return result;
+}
+
+
+/**
+ * @brief Create a new integer parameter
+ *
+ * @param name
+ * @param value
+ *
+ * @return true if a parameter is created, false otherwise (i.e. we already have a parameter with this name)
+ */
+bool MasticQuickController::createParameterInteger(QString name, int value)
+{
+    return _createParameter(name, MasticIopType::INTEGER, QVariant(value), &value, sizeof(int));
+}
+
+
+/**
+ * @brief Create a new double parameter
+ *
+ * @param name
+ * @param value
+ *
+ * @return true if a parameter is created, false otherwise (i.e. we already have a parameter with this name)
+ */
+bool MasticQuickController::createParameterDouble(QString name, double value)
+{
+    return _createParameter(name, MasticIopType::DOUBLE, QVariant(value), &value, sizeof(double));
+}
+
+
+/**
+ * @brief Create a new string parameter
+ *
+ * @param name
+ * @param value
+ *
+ * @return true if a parameter is created, false otherwise (i.e. we already have a parameter with this name)
+ */
+bool MasticQuickController::createParameterString(QString name, QString value)
+{
+    const char* cValue = value.toStdString().c_str();
+    int cValueLength = ((cValue != NULL) ? strlen(cValue) : 0);
+
+    return _createParameter(name, MasticIopType::STRING, QVariant(value), (void *)cValue, (cValueLength + 1) * sizeof(char));
+}
+
+
+/**
+ * @brief Create a new boolean parameter
+ *
+ * @param name
+ * @param value
+ *
+ * @return true if a parameter is created, false otherwise (i.e. we already have a parameter with this name)
+ */
+bool MasticQuickController::createParameterBoolean(QString name, bool value)
+{
+    return _createParameter(name, MasticIopType::BOOLEAN, QVariant(value), &value, sizeof(bool));
+}
+
+
+/**
+ * @brief Create a new data parameter
+ *
+ * @param name
+ * @param value
+ *
+ * @return true if a parameter is created, false otherwise (i.e. we already have a parameter with this name)
+ */
+bool MasticQuickController::createParameterData(QString name, void* value)
+{
+    Q_UNUSED(name)
+    Q_UNUSED(value)
+
+    bool result = false;
+
+    qDebug() << Q_FUNC_INFO << "NOT YET IMPLEMENTED. Can not create parameter" << name;
+
+    return result;
+}
+
+
+/**
+ * @brief Remove an input
+ *
+ * @param name
+ *
+ * @return true if this input is removed, false otherwise
+ */
+bool MasticQuickController::removeInput(QString name)
+{
+    bool result = false;
+
+    // Ensure that we have a valid name
+    if (!name.isEmpty())
+    {
+        // Try to remove input
+        if (mtic_removeInput(name.toStdString().c_str()) == 1)
+        {
+            result = true;
+        }
+        else
+        {
+            qWarning() << Q_FUNC_INFO << "warning: fail to remove input" << name;
+        }
+    }
+    else
+    {
+        qWarning() << Q_FUNC_INFO << "warning: can not remove an input without a name";
+    }
+
+    return result;
+}
+
+
+/**
+ * @brief Remove an output
+ *
+ * @param name
+ *
+ * @return true if this output is removed, false otherwise
+ */
+bool MasticQuickController::removeOutput(QString name)
+{
+    bool result = false;
+
+    // Ensure that we have a valid name
+    if (!name.isEmpty())
+    {
+        // Try to remove ouput
+        if (mtic_removeOutput(name.toStdString().c_str()) == 1)
+        {
+            result = true;
+        }
+        else
+        {
+            qWarning() << Q_FUNC_INFO << "warning: fail to remove output" << name;
+        }
+    }
+    else
+    {
+        qWarning() << Q_FUNC_INFO << "warning: can not remove an output without a name";
+    }
+
+    return result;
+}
+
+
+/**
+ * @brief Remove a parameter
+ *
+ * @param name
+ *
+ * @return true if this parameter is removed, false otherwise
+ */
+bool MasticQuickController::removeParameter(QString name)
+{
+    bool result = false;
+
+    // Ensure that we have a valid name
+    if (!name.isEmpty())
+    {
+        // Try to remove parameter
+        if (mtic_removeParameter(name.toStdString().c_str()) == 1)
+        {
+            result = true;
+        }
+        else
+        {
+            qWarning() << Q_FUNC_INFO << "warning: fail to remove parameter" << name;
+        }
+    }
+    else
+    {
+        qWarning() << Q_FUNC_INFO << "warning: can not remove a parameter without a name";
+    }
 
     return result;
 }

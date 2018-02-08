@@ -27,7 +27,7 @@
 /**
   * @brief Enum for IOP types
   */
-MASTIC_QML_ENUM_CUSTOM(MasticIopType, INTEGER, DOUBLE, STRING, BOOLEAN, IMPULSION, DATA)
+MASTIC_QML_ENUM(MasticIopType, INVALID, INTEGER, DOUBLE, STRING, BOOLEAN, IMPULSION, DATA)
 
 
 /**
@@ -117,9 +117,12 @@ Q_SIGNALS:
 
 
 
+
+//---------------------------------------------------
 //
 // Start or stop our agent
 //
+//---------------------------------------------------
 public Q_SLOTS:
      /**
       * @brief Start our agent with a given network device and port
@@ -146,11 +149,194 @@ public Q_SLOTS:
 
 
 
+//---------------------------------------------------
+//
+// Write per type
+//
+//---------------------------------------------------
+public Q_SLOTS:
+
+     /**
+      * @brief Write a given output as an integer
+      *
+      * @param name
+      * @param value
+      *
+      * @return  true if everything is ok, false otherwise
+      */
+     bool writeOutputAsInteger(QString name, int value);
 
 
+     /**
+      * @brief Write a given output as a double
+      *
+      * @param name
+      * @param value
+      *
+      * @return  true if everything is ok, false otherwise
+      */
+     bool writeOutputAsDouble(QString name, double value);
+
+
+     /**
+      * @brief Write a given output as a string
+      *
+      * @param name
+      * @param value
+      *
+      * @return  true if everything is ok, false otherwise
+      */
+     bool writeOutputAsString(QString name, QString value);
+
+
+     /**
+      * @brief Write a given output as a boolean
+      *
+      * @param name
+      * @param value
+      *
+      * @return  true if everything is ok, false otherwise
+      */
+     bool writeOutputAsBoolean(QString name, bool value);
+
+
+     /**
+      * @brief Write a given output as an impulsion
+      *
+      * @param name
+      *
+      * @return  true if everything is ok, false otherwise
+      */
+     bool writeOutputAsImpulsion(QString name);
+
+
+     /**
+      * @brief Write a given output as data
+      *
+      * @param name
+      * @param value
+      *
+      * @return  true if everything is ok, false otherwise
+      */
+     bool writeOutputAsData(QString name, void* value);
+
+
+     /**
+      * @brief Write a given parameter as an integer
+      *
+      * @param name
+      * @param value
+      *
+      * @return  true if everything is ok, false otherwise
+      */
+     bool writeParameterAsInteger(QString name, int value);
+
+
+     /**
+      * @brief Write a given parameter as a double
+      *
+      * @param name
+      * @param value
+      *
+      * @return  true if everything is ok, false otherwise
+      */
+     bool writeParameterAsDouble(QString name, double value);
+
+
+     /**
+      * @brief Write a given parameter as a string
+      *
+      * @param name
+      * @param value
+      *
+      * @return  true if everything is ok, false otherwise
+      */
+     bool writeParameterAsString(QString name, QString value);
+
+
+     /**
+      * @brief Write a given parameter as a boolean
+      *
+      * @param name
+      * @param value
+      *
+      * @return  true if everything is ok, false otherwise
+      */
+     bool writeParameterAsBoolean(QString name, bool value);
+
+
+     /**
+      * @brief Write a given parameter as data
+      *
+      * @param name
+      * @param value
+      *
+      * @return  true if everything is ok, false otherwise
+      */
+     bool writeParameterAsData(QString name, void* value);
+
+
+
+//---------------------------------------------------
+//
+// Check IOP type and existence
+//
+//---------------------------------------------------
+public Q_SLOTS:
+     /**
+      * @brief Get type of a given input
+      * @param name
+      * @return
+      */
+     MasticIopType::Value getTypeForInput(QString name);
+
+
+     /**
+      * @brief Get type of a given output
+      * @param name
+      * @return
+      */
+     MasticIopType::Value getTypeForOutput(QString name);
+
+
+     /**
+      * @brief Get type of a given parameter
+      * @param name
+      * @return
+      */
+     MasticIopType::Value getTypeForParameter(QString name);
+
+
+     /**
+      * @brief Check if our agent has an input with this name
+      * @param name
+      * @return
+      */
+     bool checkInputExistence(QString name);
+
+
+     /**
+      * @brief Check if our agent has an output with this name
+      * @param name
+      * @return
+      */
+     bool checkOutputExistence(QString name);
+
+
+     /**
+      * @brief Check if our agent has a parameter with this name
+      * @param name
+      * @return
+      */
+     bool checkParameterExistence(QString name);
+
+
+
+//---------------------------------------------------
 //
 // Create or remove IOP (input, output, parameter)
 //
+//---------------------------------------------------
 public Q_SLOTS:
      /**
       * @brief Create a new integer input
@@ -368,134 +554,12 @@ public Q_SLOTS:
 
 
 
-//
-// Write outputs and parameters
-//
-public Q_SLOTS:
-     /**
-      * @brief Write a given output as an integer
-      *
-      * @param name
-      * @param value
-      *
-      * @return  true if everything is ok, false otherwise
-      */
-     bool writeOutputAsInteger(QString name, int value);
 
-
-     /**
-      * @brief Write a given output as a double
-      *
-      * @param name
-      * @param value
-      *
-      * @return  true if everything is ok, false otherwise
-      */
-     bool writeOutputAsDouble(QString name, double value);
-
-
-     /**
-      * @brief Write a given output as a string
-      *
-      * @param name
-      * @param value
-      *
-      * @return  true if everything is ok, false otherwise
-      */
-     bool writeOutputAsString(QString name, QString value);
-
-
-     /**
-      * @brief Write a given output as a boolean
-      *
-      * @param name
-      * @param value
-      *
-      * @return  true if everything is ok, false otherwise
-      */
-     bool writeOutputAsBoolean(QString name, bool value);
-
-
-     /**
-      * @brief Write a given output as an impulsion
-      *
-      * @param name
-      *
-      * @return  true if everything is ok, false otherwise
-      */
-     bool writeOutputAsImpulsion(QString name);
-
-
-     /**
-      * @brief Write a given output as data
-      *
-      * @param name
-      * @param value
-      *
-      * @return  true if everything is ok, false otherwise
-      */
-     bool writeOutputAsData(QString name, void* value);
-
-
-     /**
-      * @brief Write a given parameter as an integer
-      *
-      * @param name
-      * @param value
-      *
-      * @return  true if everything is ok, false otherwise
-      */
-     bool writeParameterAsInteger(QString name, int value);
-
-
-     /**
-      * @brief Write a given parameter as a double
-      *
-      * @param name
-      * @param value
-      *
-      * @return  true if everything is ok, false otherwise
-      */
-     bool writeParameterAsDouble(QString name, double value);
-
-
-     /**
-      * @brief Write a given parameter as a string
-      *
-      * @param name
-      * @param value
-      *
-      * @return  true if everything is ok, false otherwise
-      */
-     bool writeParameterAsString(QString name, QString value);
-
-
-     /**
-      * @brief Write a given parameter as a boolean
-      *
-      * @param name
-      * @param value
-      *
-      * @return  true if everything is ok, false otherwise
-      */
-     bool writeParameterAsBoolean(QString name, bool value);
-
-
-     /**
-      * @brief Write a given parameter as data
-      *
-      * @param name
-      * @param value
-      *
-      * @return  true if everything is ok, false otherwise
-      */
-     bool writeParameterAsData(QString name, void* value);
-
-
-
+//---------------------------------------------------
 //
 // Mute/unmuted outputs
 //
+//---------------------------------------------------
 public Q_SLOTS:
      /**
       * @brief Mute a given output
@@ -528,6 +592,12 @@ public Q_SLOTS:
      bool isOutputMuted(QString name, QVariant qmlUpdateExtraParameter = QVariant());
 
 
+
+//---------------------------------------------------
+//
+// Protected methods
+//
+//---------------------------------------------------
 protected:
      /**
       * @brief Check if an IOP name is valid or if it can create conflicts with Qt internal symbols

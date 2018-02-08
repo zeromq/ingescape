@@ -177,7 +177,9 @@
             name instance; \
             return instance.allValues(); \
         } \
-    };
+    }; \
+    QML_DECLARE_TYPE(name) \
+    Q_DECLARE_METATYPE(name::Value)
 
 
 
@@ -239,7 +241,9 @@
             name instance; \
             return instance.allValues(); \
         } \
-    };
+    }; \
+    QML_DECLARE_TYPE(name) \
+    Q_DECLARE_METATYPE(name::Value)
 
 
 
