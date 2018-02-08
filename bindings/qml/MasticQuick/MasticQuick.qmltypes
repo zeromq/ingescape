@@ -486,6 +486,7 @@ Module {
             type: "bool"
             Parameter { name: "name"; type: "string" }
         }
+        Method { name: "getNetdevicesList"; type: "QStringList" }
         Method {
             name: "log"
             Parameter { name: "logLevel"; type: "MasticLogLevel::Value" }
