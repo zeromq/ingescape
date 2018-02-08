@@ -43,6 +43,9 @@ class MasticQuickController : public QObject
 {
     Q_OBJECT
 
+    // Version of the Masrtic API
+    MASTIC_QML_PROPERTY_READONLY(int, version)
+
     // Agent name
     MASTIC_QML_PROPERTY_CUSTOM_SETTER(QString, agentName)
 

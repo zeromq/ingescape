@@ -79,6 +79,7 @@ static iopType_t enumMasticIopTypeToEnumIopType_t(MasticIopType::Value value)
 }
 
 
+
 /**
  * @brief Convert an iopType_t value into a MasticIopType::Value
  * @param value
@@ -375,6 +376,9 @@ MasticQuickController::MasticQuickController(QObject *parent) : QObject(parent),
     _outputs(NULL),
     _parameters(NULL)
 {    
+    // Version of Mastic
+    _version = mtic_version();
+
     // Set our default agent name
     setagentName(QCoreApplication::applicationName());
 
@@ -389,7 +393,7 @@ MasticQuickController::MasticQuickController(QObject *parent) : QObject(parent),
     //
 
     // - agent state
-    char* cAgentState = mtic_getAgentName();
+    char* cAgentState = mtic_getAgentState();
     if (cAgentState != NULL)
     {
         _agentState = QString(cAgentState);
@@ -420,7 +424,6 @@ MasticQuickController::MasticQuickController(QObject *parent) : QObject(parent),
     // Observe forced stop
     connect(this, &MasticQuickController::forcedStop, this, &MasticQuickController::_onForcedStop);
     mtic_observeForcedStop(&MasticQuickController_callbackForcedStop, this);
-
 
 
     // Init inputs
