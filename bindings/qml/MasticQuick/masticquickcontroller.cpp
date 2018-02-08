@@ -1838,9 +1838,34 @@ bool MasticQuickController::isOutputMuted(QString name, QVariant qmlUpdateExtraP
 
 //---------------------------------------------------
 //
-// Logs
+// Administration, configuration & utilities
 //
 //---------------------------------------------------
+
+/**
+ * @brief Get network adapters with broadcast capabilities
+ * @return
+ */
+QStringList MasticQuickController::getNetdevicesList()
+{
+    QStringList result;
+
+    // Get all devices
+    char **devices = NULL;
+    int numberOfDevices = 0;
+
+    mtic_getNetdevicesList(&devices, &numberOfDevices);
+    for (int index = 0; index < numberOfDevices; index++)
+    {
+        result.append( QString(devices[index]) );
+    }
+
+    // Clean-up
+    mtic_freeNetdevicesList(devices, numberOfDevices);
+
+    return result;
+}
+
 
 /**
  * @brief Print (or save) debugging information
@@ -1944,7 +1969,6 @@ bool MasticQuickController::_validIopName(const QString& name)
 
 
 
-
 /**
  * @brief Create a new input
  *
@@ -2022,6 +2046,7 @@ bool MasticQuickController::_createInput(QString name, MasticIopType::Value type
 }
 
 
+
 /**
  * @brief Create a new output
  *
@@ -2081,6 +2106,7 @@ bool MasticQuickController::_createOutput(QString name, MasticIopType::Value typ
 
     return result;
 }
+
 
 
 /**
@@ -2148,7 +2174,6 @@ bool MasticQuickController::_createParameter(QString name, MasticIopType::Value 
 
     return result;
 }
-
 
 
 
@@ -2243,6 +2268,7 @@ bool MasticQuickController::_updateQmlOutput(QString name)
 
     return result;
 }
+
 
 
 /**

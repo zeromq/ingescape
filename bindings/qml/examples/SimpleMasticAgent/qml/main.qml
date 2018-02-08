@@ -120,6 +120,10 @@ ApplicationWindow {
         Mastic.log(MasticLogLevel.LOG_TRACE, "Hello world\n");
         Mastic.info("Our agent will be started\n");
 
+        // MasticQuick API: get the list of network devices
+        var networkDevices = Mastic.getNetdevicesList();
+        console.log("Network devices: "+networkDevices);
+
         // MasticQuick API: start our Mastic agent
         Mastic.startWithDevice(root.masticNetworkDevice, root.masticPort);
     }

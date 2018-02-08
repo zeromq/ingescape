@@ -598,9 +598,16 @@ public Q_SLOTS:
 
 //---------------------------------------------------
 //
-// Logs
+// Administration, configuration & utilities
 //
 //---------------------------------------------------
+public Q_SLOTS:
+     /**
+      * @brief Get network adapters with broadcast capabilities
+      * @return
+      */
+     QStringList getNetdevicesList();
+
 
      /**
       * @brief Print (or save) debugging information
