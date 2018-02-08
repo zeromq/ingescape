@@ -56,7 +56,13 @@ class MasticQuickController : public QObject
     MASTIC_QML_PROPERTY_CUSTOM_SETTER(QString, definitionDescription)
 
     // Flag indicating if our agent is muted
-     MASTIC_QML_PROPERTY_CUSTOM_SETTER(bool, isMuted)
+    MASTIC_QML_PROPERTY_CUSTOM_SETTER(bool, isMuted)
+
+    // Flag indicating if our agent is frozen
+    MASTIC_QML_PROPERTY_CUSTOM_SETTER(bool, isFrozen)
+
+    // Flag indicating if our agent can be frozen
+    MASTIC_QML_PROPERTY_CUSTOM_SETTER(bool, canBeFrozen)
 
     // Flag indicating if our agent is started
     MASTIC_QML_PROPERTY_READONLY(bool, isStarted)

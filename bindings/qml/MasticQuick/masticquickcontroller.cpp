@@ -232,7 +232,6 @@ void MasticQuickController_callbackObserveInput(iop_t iopType, const char *name,
 
 
 
-
 /**
  * @brief Callback used to observe parameters
  *
@@ -332,6 +331,23 @@ void MasticQuickController_callbackObserveParameter(iop_t iopType, const char *n
 
 
 /**
+ * @brief Callback used to observe freeze/unfreeze
+ * @param isPause
+ * @param customData
+ */
+void MasticQuickController_callbackObserveFreeze(bool isFrozen, void* customData)
+{
+    // Try to cast our custom data
+    MasticQuickController* controller = (MasticQuickController *)customData;
+    if (controller != NULL)
+    {
+        controller->setisFrozen(isFrozen);
+    }
+}
+
+
+
+/**
  * @brief Callback used to observe force stop
  * @param customData
  */
@@ -344,6 +360,7 @@ void MasticQuickController_callbackForcedStop(void *customData)
         Q_EMIT controller->forcedStop();
     }
 }
+
 
 
 
@@ -361,7 +378,7 @@ void MasticQuickController_callbackForcedStop(void *customData)
  * @param parent
  */
 MasticQuickController::MasticQuickController(QObject *parent) : QObject(parent),
-    _isMuted(false),
+    _canBeFrozen(false),
     _isStarted(false),
     _isVerbose(false),
     _logLevel(MasticLogLevel::LOG_TRACE),
@@ -377,8 +394,12 @@ MasticQuickController::MasticQuickController(QObject *parent) : QObject(parent),
     setdefinitionVersion("0.0");
     setdefinitionDescription(tr("Definition of %1").arg(QCoreApplication::applicationName()));
 
+    // isFrozen flag
+    _isFrozen = mtic_isFrozen();
+
     // isMuted flag
-    setisMuted(mtic_isMuted());
+    _isMuted = mtic_isMuted();
+
 
     // Verbose mode by default in debug mode
 #ifdef QT_DEBUG
@@ -389,7 +410,11 @@ MasticQuickController::MasticQuickController(QObject *parent) : QObject(parent),
     mtic_setLogLevel(MTIC_LOG_TRACE);
 
 
-    // Observe force stop
+    // Observe freeze
+    mtic_observeFreeze(&MasticQuickController_callbackObserveFreeze, this);
+
+
+    // Observe forced stop
     connect(this, &MasticQuickController::forcedStop, this, &MasticQuickController::_onForcedStop);
     mtic_observeForcedStop(&MasticQuickController_callbackForcedStop, this);
 
@@ -577,11 +602,8 @@ void MasticQuickController::setisMuted(bool value)
 {
     if (_isMuted != value)
     {
-        // Save value
-        _isMuted = value;
-
         // Set our isMuted flag
-        if (_isMuted)
+        if (value)
         {
             mtic_mute();
         }
@@ -590,8 +612,58 @@ void MasticQuickController::setisMuted(bool value)
             mtic_unmute();
         }
 
+        // Get our new value
+        _isMuted = mtic_isMuted();
+
         // Notify change
-        Q_EMIT isMutedChanged(value);
+        Q_EMIT isMutedChanged(_isMuted);
+    }
+}
+
+
+/**
+ * @brief Set our isFrozen flag
+ * @param value
+ */
+void MasticQuickController::setisFrozen(bool value)
+{
+    if (_isFrozen != value)
+    {
+        // Set our isFrozen flag
+        if (value)
+        {
+            mtic_freeze();
+        }
+        else
+        {
+            mtic_unfreeze();
+        }
+
+        // Get our new value
+        _isFrozen = mtic_isFrozen();
+
+        // Notify change
+        Q_EMIT isFrozenChanged(_isFrozen);
+    }
+}
+
+
+/**
+ * @brief Set if our agent can be frozen or not
+ * @param value
+ */
+void MasticQuickController::setcanBeFrozen(bool value)
+{
+    if (_canBeFrozen != value)
+    {
+        // Save our new value
+        _canBeFrozen = value;
+
+        // Set our canBeFrozen property
+        mtic_setCanBeFrozen(value);
+
+        // Notify change
+        Q_EMIT canBeFrozenChanged(value);
     }
 }
 
@@ -614,7 +686,6 @@ void MasticQuickController::setisVerbose(bool value)
         Q_EMIT isVerboseChanged(value);
     }
 }
-
 
 
 /**
@@ -663,6 +734,8 @@ void MasticQuickController::setlogLevel(MasticLogLevel::Value value)
         Q_EMIT logLevelChanged(value);
     }
 }
+
+
 
 
 //-------------------------------------------------------------------
