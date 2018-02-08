@@ -38,18 +38,14 @@ Module {
         Enum {
             name: "Value"
             values: {
-                "INTEGER": 0,
-                "DOUBLE": 1,
-                "STRING": 2,
-                "BOOLEAN": 3,
-                "IMPULSION": 4,
-                "DATA": 5
+                "INVALID": 0,
+                "INTEGER": 1,
+                "DOUBLE": 2,
+                "STRING": 3,
+                "BOOLEAN": 4,
+                "IMPULSION": 5,
+                "DATA": 6
             }
-        }
-        Method {
-            name: "enumToString"
-            type: "string"
-            Parameter { name: "value"; type: "int" }
         }
         Method { name: "allValues"; type: "QList<MasticIopType::Value>" }
     }
@@ -80,6 +76,7 @@ Module {
         isCreatable: false
         isSingleton: true
         exportMetaObjectRevisions: [0]
+        Property { name: "version"; type: "int"; isReadonly: true }
         Property { name: "agentName"; type: "string" }
         Property { name: "agentState"; type: "string" }
         Property { name: "definitionName"; type: "string" }
@@ -98,6 +95,10 @@ Module {
             type: "MasticQuickQmlPropertyMap"
             isReadonly: true
             isPointer: true
+        }
+        Signal {
+            name: "versionChanged"
+            Parameter { name: "value"; type: "int" }
         }
         Signal {
             name: "agentNameChanged"
@@ -179,6 +180,101 @@ Module {
             Parameter { name: "ipAddress"; type: "string" }
         }
         Method { name: "stop"; type: "bool" }
+        Method {
+            name: "writeOutputAsInteger"
+            type: "bool"
+            Parameter { name: "name"; type: "string" }
+            Parameter { name: "value"; type: "int" }
+        }
+        Method {
+            name: "writeOutputAsDouble"
+            type: "bool"
+            Parameter { name: "name"; type: "string" }
+            Parameter { name: "value"; type: "double" }
+        }
+        Method {
+            name: "writeOutputAsString"
+            type: "bool"
+            Parameter { name: "name"; type: "string" }
+            Parameter { name: "value"; type: "string" }
+        }
+        Method {
+            name: "writeOutputAsBoolean"
+            type: "bool"
+            Parameter { name: "name"; type: "string" }
+            Parameter { name: "value"; type: "bool" }
+        }
+        Method {
+            name: "writeOutputAsImpulsion"
+            type: "bool"
+            Parameter { name: "name"; type: "string" }
+        }
+        Method {
+            name: "writeOutputAsData"
+            type: "bool"
+            Parameter { name: "name"; type: "string" }
+            Parameter { name: "value"; type: "void"; isPointer: true }
+        }
+        Method {
+            name: "writeParameterAsInteger"
+            type: "bool"
+            Parameter { name: "name"; type: "string" }
+            Parameter { name: "value"; type: "int" }
+        }
+        Method {
+            name: "writeParameterAsDouble"
+            type: "bool"
+            Parameter { name: "name"; type: "string" }
+            Parameter { name: "value"; type: "double" }
+        }
+        Method {
+            name: "writeParameterAsString"
+            type: "bool"
+            Parameter { name: "name"; type: "string" }
+            Parameter { name: "value"; type: "string" }
+        }
+        Method {
+            name: "writeParameterAsBoolean"
+            type: "bool"
+            Parameter { name: "name"; type: "string" }
+            Parameter { name: "value"; type: "bool" }
+        }
+        Method {
+            name: "writeParameterAsData"
+            type: "bool"
+            Parameter { name: "name"; type: "string" }
+            Parameter { name: "value"; type: "void"; isPointer: true }
+        }
+        Method {
+            name: "getTypeForInput"
+            type: "MasticIopType::Value"
+            Parameter { name: "name"; type: "string" }
+        }
+        Method {
+            name: "getTypeForOutput"
+            type: "MasticIopType::Value"
+            Parameter { name: "name"; type: "string" }
+        }
+        Method {
+            name: "getTypeForParameter"
+            type: "MasticIopType::Value"
+            Parameter { name: "name"; type: "string" }
+        }
+        Method {
+            name: "checkInputExistence"
+            type: "bool"
+            Parameter { name: "name"; type: "string" }
+        }
+        Method {
+            name: "checkOutputExistence"
+            type: "bool"
+            Parameter { name: "name"; type: "string" }
+        }
+        Method {
+            name: "checkParameterExistence"
+            type: "bool"
+            Parameter { name: "name"; type: "string" }
+        }
         Method {
             name: "createInputInteger"
             type: "bool"
@@ -368,71 +464,6 @@ Module {
             name: "removeParameter"
             type: "bool"
             Parameter { name: "name"; type: "string" }
-        }
-        Method {
-            name: "writeOutputAsInteger"
-            type: "bool"
-            Parameter { name: "name"; type: "string" }
-            Parameter { name: "value"; type: "int" }
-        }
-        Method {
-            name: "writeOutputAsDouble"
-            type: "bool"
-            Parameter { name: "name"; type: "string" }
-            Parameter { name: "value"; type: "double" }
-        }
-        Method {
-            name: "writeOutputAsString"
-            type: "bool"
-            Parameter { name: "name"; type: "string" }
-            Parameter { name: "value"; type: "string" }
-        }
-        Method {
-            name: "writeOutputAsBoolean"
-            type: "bool"
-            Parameter { name: "name"; type: "string" }
-            Parameter { name: "value"; type: "bool" }
-        }
-        Method {
-            name: "writeOutputAsImpulsion"
-            type: "bool"
-            Parameter { name: "name"; type: "string" }
-        }
-        Method {
-            name: "writeOutputAsData"
-            type: "bool"
-            Parameter { name: "name"; type: "string" }
-            Parameter { name: "value"; type: "void"; isPointer: true }
-        }
-        Method {
-            name: "writeParameterAsInteger"
-            type: "bool"
-            Parameter { name: "name"; type: "string" }
-            Parameter { name: "value"; type: "int" }
-        }
-        Method {
-            name: "writeParameterAsDouble"
-            type: "bool"
-            Parameter { name: "name"; type: "string" }
-            Parameter { name: "value"; type: "double" }
-        }
-        Method {
-            name: "writeParameterAsString"
-            type: "bool"
-            Parameter { name: "name"; type: "string" }
-            Parameter { name: "value"; type: "string" }
-        }
-        Method {
-            name: "writeParameterAsBoolean"
-            type: "bool"
-            Parameter { name: "name"; type: "string" }
-            Parameter { name: "value"; type: "bool" }
-        }
-        Method {
-            name: "writeParameterAsData"
-            type: "bool"
-            Parameter { name: "name"; type: "string" }
-            Parameter { name: "value"; type: "void"; isPointer: true }
         }
         Method {
             name: "muteOuput"
