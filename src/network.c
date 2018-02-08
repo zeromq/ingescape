@@ -1235,6 +1235,11 @@ int network_observeZyre(network_zyreIncoming cb, void *myData){
  * \return 1 if ok, else 0.
  */
 int mtic_startWithDevice(const char *networkDevice, int port){
+    if ((networkDevice == NULL) || (strlen(networkDevice) == 0))
+    {
+        mtic_debug("mtic_startWithDevice : networkDevice cannot be NULL or empty \n");
+        return 0;
+    }
     
     if (agentElements != NULL){
         //Agent is already active : need to stop it first
@@ -1290,6 +1295,12 @@ int mtic_startWithDevice(const char *networkDevice, int port){
  * \return 1 if ok, else 0.
  */
 int mtic_startWithIP(const char *ipAddress, int port){
+    if ((ipAddress == NULL) || (strlen(ipAddress) == 0))
+    {
+        mtic_debug("mtic_startWithIP : IP cannot be NULL or empty \n");
+        return 0;
+    }
+    
     if (agentElements != NULL){
         //Agent is already active : need to stop it first
         mtic_stop();
