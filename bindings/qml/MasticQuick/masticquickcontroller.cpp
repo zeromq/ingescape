@@ -1764,8 +1764,19 @@ bool MasticQuickController::removeParameter(QString name)
  */
 bool MasticQuickController::muteOuput(QString name)
 {
-    Q_UNUSED(name)
     bool result = false;
+
+    if (!name.isEmpty())
+    {
+        if (mtic_muteOutput(name.toStdString().c_str()) == 1)
+        {
+            result = true;
+        }
+    }
+    else
+    {
+        qWarning() << Q_FUNC_INFO << "warning: name can not be empty";
+    }
 
     return result;
 }
@@ -1780,8 +1791,19 @@ bool MasticQuickController::muteOuput(QString name)
  */
 bool MasticQuickController::unmuteOuput(QString name)
 {
-    Q_UNUSED(name)
     bool result = false;
+
+    if (!name.isEmpty())
+    {
+        if (mtic_unmuteOutput(name.toStdString().c_str()) == 1)
+        {
+            result = true;
+        }
+    }
+    else
+    {
+        qWarning() << Q_FUNC_INFO << "warning: name can not be empty";
+    }
 
     return result;
 }
@@ -1797,9 +1819,17 @@ bool MasticQuickController::unmuteOuput(QString name)
  */
 bool MasticQuickController::isOutputMuted(QString name, QVariant qmlUpdateExtraParameter)
 {
-    Q_UNUSED(name)
     Q_UNUSED(qmlUpdateExtraParameter)
     bool result = false;
+
+    if (!name.isEmpty())
+    {
+        result = mtic_isOutputMuted(name.toStdString().c_str());
+    }
+    else
+    {
+        qWarning() << Q_FUNC_INFO << "warning: name can not be empty";
+    }
 
     return result;
 }
