@@ -139,6 +139,19 @@ public:
      static QObject* qmlSingleton(QQmlEngine* engine, QJSEngine* scriptEngine);
 
 
+     /**
+      * @brief Set our isMuted flag based on observeMute
+      * @param value
+      */
+     void _internalSetIsMuted(bool value);
+
+
+     /**
+      * @brief Set our isFrozen flag based on observeFreeze
+      * @param value
+      */
+     void _internalSetIsFrozen(bool value);
+
 
 Q_SIGNALS:
      /**

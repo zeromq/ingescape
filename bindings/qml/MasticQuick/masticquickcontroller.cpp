@@ -375,7 +375,7 @@ void MasticQuickController_callbackObserveFreeze(bool isFrozen, void* customData
     MasticQuickController* controller = (MasticQuickController *)customData;
     if (controller != NULL)
     {
-        controller->setisFrozen(isFrozen);
+        controller->_internalSetIsFrozen(isFrozen);
     }
 }
 
@@ -392,7 +392,7 @@ void MasticQuickController_callbackObserveMute(bool isMuted, void* customData)
     MasticQuickController* controller = (MasticQuickController *)customData;
     if (controller != NULL)
     {
-        controller->setisMuted(isMuted);
+        controller->_internalSetIsMuted(isMuted);
     }
 }
 
@@ -710,6 +710,24 @@ void MasticQuickController::setisMuted(bool value)
 }
 
 
+
+/**
+ * @brief Set our isMuted flag based on observeMute
+ * @param value
+ */
+void MasticQuickController::_internalSetIsMuted(bool value)
+{
+    if (_isMuted != value)
+    {
+        _isMuted = value;
+
+        // Notify change
+        Q_EMIT isMutedChanged(value);
+    }
+}
+
+
+
 /**
  * @brief Set our isFrozen flag
  * @param value
@@ -735,6 +753,24 @@ void MasticQuickController::setisFrozen(bool value)
         Q_EMIT isFrozenChanged(_isFrozen);
     }
 }
+
+
+
+/**
+ * @brief Set our isFrozen flag based on observeFreeze
+ * @param value
+ */
+void MasticQuickController::_internalSetIsFrozen(bool value)
+{
+    if (_isFrozen != value)
+    {
+        _isFrozen = value;
+
+        // Notify change
+        Q_EMIT isFrozenChanged(value);
+    }
+}
+
 
 
 /**
