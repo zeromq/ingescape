@@ -318,23 +318,6 @@ ApplicationWindow {
                 }
 
             }
-
-
-            ListView {
-               width: 100
-               height: 300
-
-               model: Mastic.inputs.keys()
-
-               delegate: Rectangle {
-                   color: "red"
-                   width: 100
-                   height: 30
-                   radius: 20
-
-                   border.width: 2
-               }
-            }
         }
 
 

@@ -7,7 +7,7 @@ import QtQuick.tooling 1.2
 // 'qmlplugindump -nonrelocatable MasticQuick 1.0 .'
 
 Module {
-    dependencies: ["QtQuick 2.0"]
+    dependencies: ["QtQuick 2.8"]
     Component {
         name: "AbstractMasticQuickEnumClass"
         prototype: "QObject"
@@ -88,11 +88,21 @@ Module {
         Property { name: "isStarted"; type: "bool"; isReadonly: true }
         Property { name: "verbose"; type: "bool" }
         Property { name: "logLevel"; type: "MasticLogLevel::Value" }
-        Property { name: "inputs"; type: "MasticQuickQmlPropertyMap"; isReadonly: true; isPointer: true }
-        Property { name: "outputs"; type: "MasticQuickQmlPropertyMap"; isReadonly: true; isPointer: true }
+        Property {
+            name: "inputs"
+            type: "MasticQuickInputsPropertyMap"
+            isReadonly: true
+            isPointer: true
+        }
+        Property {
+            name: "outputs"
+            type: "MasticQuickOutputsPropertyMap"
+            isReadonly: true
+            isPointer: true
+        }
         Property {
             name: "parameters"
-            type: "MasticQuickQmlPropertyMap"
+            type: "MasticQuickParametersPropertyMap"
             isReadonly: true
             isPointer: true
         }
@@ -146,15 +156,15 @@ Module {
         }
         Signal {
             name: "inputsChanged"
-            Parameter { name: "value"; type: "MasticQuickQmlPropertyMap"; isPointer: true }
+            Parameter { name: "value"; type: "MasticQuickInputsPropertyMap"; isPointer: true }
         }
         Signal {
             name: "outputsChanged"
-            Parameter { name: "value"; type: "MasticQuickQmlPropertyMap"; isPointer: true }
+            Parameter { name: "value"; type: "MasticQuickOutputsPropertyMap"; isPointer: true }
         }
         Signal {
             name: "parametersChanged"
-            Parameter { name: "value"; type: "MasticQuickQmlPropertyMap"; isPointer: true }
+            Parameter { name: "value"; type: "MasticQuickParametersPropertyMap"; isPointer: true }
         }
         Signal { name: "forcedStop" }
         Method {
@@ -518,9 +528,23 @@ Module {
         }
     }
     Component {
-        name: "MasticQuickQmlPropertyMap"
+        name: "MasticQuickInputsPropertyMap"
         prototype: "QQmlPropertyMap"
-        exports: ["MasticQuick/MasticQuickQmlPropertyMap 1.0"]
+        exports: ["MasticQuick/MasticQuickInputsPropertyMap 1.0"]
+        isCreatable: false
+        exportMetaObjectRevisions: [0]
+    }
+    Component {
+        name: "MasticQuickOutputsPropertyMap"
+        prototype: "QQmlPropertyMap"
+        exports: ["MasticQuick/MasticQuickOutputsPropertyMap 1.0"]
+        isCreatable: false
+        exportMetaObjectRevisions: [0]
+    }
+    Component {
+        name: "MasticQuickParametersPropertyMap"
+        prototype: "QQmlPropertyMap"
+        exports: ["MasticQuick/MasticQuickParametersPropertyMap 1.0"]
         isCreatable: false
         exportMetaObjectRevisions: [0]
     }
