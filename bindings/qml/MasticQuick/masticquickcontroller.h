@@ -33,7 +33,7 @@ MASTIC_QML_ENUM(MasticIopType, INVALID, INTEGER, DOUBLE, STRING, BOOLEAN, IMPULS
 /**
  * @brief Enum for log levels
  */
-MASTIC_QML_ENUM(MasticLogLevel, LOG_TRACE, LOG_DEBUG, LOG_INFO, LOG_WARNING, LOG_ERROR, LOG_FATAL)
+MASTIC_QML_ENUM(MasticLogLevel, LOG_TRACE, LOG_DEBUG, LOG_INFO, LOG_WARN, LOG_ERROR, LOG_FATAL)
 
 
 /**
@@ -74,7 +74,7 @@ class MasticQuickController : public QObject
     MASTIC_QML_PROPERTY_READONLY(bool, isStarted)
 
     // Flag indicating if Mastic is verbose or not
-    MASTIC_QML_PROPERTY_CUSTOM_SETTER(bool, isVerbose)
+    MASTIC_QML_PROPERTY_CUSTOM_SETTER(bool, verbose)
 
     // Log level
     MASTIC_QML_PROPERTY_CUSTOM_SETTER(MasticLogLevel::Value, logLevel)
@@ -154,6 +154,16 @@ public Q_SLOTS:
 
 //---------------------------------------------------
 //
+// Read per type
+//
+//---------------------------------------------------
+public Q_SLOTS:
+
+
+
+
+//---------------------------------------------------
+//
 // Write per type
 //
 //---------------------------------------------------
@@ -167,7 +177,7 @@ public Q_SLOTS:
       *
       * @return  true if everything is ok, false otherwise
       */
-     bool writeOutputAsInteger(QString name, int value);
+     bool writeOutputAsInt(QString name, int value);
 
 
      /**
@@ -200,7 +210,7 @@ public Q_SLOTS:
       *
       * @return  true if everything is ok, false otherwise
       */
-     bool writeOutputAsBoolean(QString name, bool value);
+     bool writeOutputAsBool(QString name, bool value);
 
 
      /**
@@ -232,7 +242,7 @@ public Q_SLOTS:
       *
       * @return  true if everything is ok, false otherwise
       */
-     bool writeParameterAsInteger(QString name, int value);
+     bool writeParameterAsInt(QString name, int value);
 
 
      /**
@@ -265,7 +275,7 @@ public Q_SLOTS:
       *
       * @return  true if everything is ok, false otherwise
       */
-     bool writeParameterAsBoolean(QString name, bool value);
+     bool writeParameterAsBool(QString name, bool value);
 
 
      /**
@@ -282,7 +292,7 @@ public Q_SLOTS:
 
 //---------------------------------------------------
 //
-// Check IOP type and existence
+// Get IOP type and check existence
 //
 //---------------------------------------------------
 public Q_SLOTS:
@@ -337,7 +347,55 @@ public Q_SLOTS:
 
 //---------------------------------------------------
 //
-// Create or remove IOP (input, output, parameter)
+// Mute/unmuted outputs
+//
+//---------------------------------------------------
+public Q_SLOTS:
+     /**
+      * @brief Mute a given output
+      *
+      * @param name
+      *
+      * @return  true if everything is ok, false otherwise
+      */
+     bool muteOuput(QString name);
+
+
+     /**
+      * @brief Mute a given output
+      *
+      * @param name
+      *
+      * @return  true if everything is ok, false otherwise
+      */
+     bool unmuteOuput(QString name);
+
+
+     /**
+      * @brief Check if a given output is muted
+      *
+      * @param name
+      * @param qmlUpdateExtraParameter Extra parameter used to call this function in a QML binding
+      *
+      * @return true if this output is muted, false otherwise
+      */
+     bool isOutputMuted(QString name, QVariant qmlUpdateExtraParameter = QVariant());
+
+
+
+//---------------------------------------------------
+//
+// Load / set / get definition
+//
+//---------------------------------------------------
+public Q_SLOTS:
+
+
+
+
+//---------------------------------------------------
+//
+// Edit the definition: create or remove IOP (input, output, parameter)
 //
 //---------------------------------------------------
 public Q_SLOTS:
@@ -349,7 +407,7 @@ public Q_SLOTS:
       *
       * @return true if an input is created, false otherwise (i.e. we already have an input with this name)
       */
-     bool createInputInteger(QString name, int value = 0);
+     bool createInputInt(QString name, int value = 0);
 
 
      /**
@@ -382,7 +440,7 @@ public Q_SLOTS:
       *
       * @return true if an input is created, false otherwise (i.e. we already have an input with this name)
       */
-     bool createInputBoolean(QString name, bool value = false);
+     bool createInputBool(QString name, bool value = false);
 
 
      /**
@@ -414,7 +472,7 @@ public Q_SLOTS:
       *
       * @return true if an output is created, false otherwise (i.e. we already have an output with this name)
       */
-     bool createOutputInteger(QString name, int value = 0);
+     bool createOutputInt(QString name, int value = 0);
 
 
      /**
@@ -447,7 +505,7 @@ public Q_SLOTS:
       *
       * @return true if an output is created, false otherwise (i.e. we already have an output with this name)
       */
-     bool createOutputBoolean(QString name, bool value = false);
+     bool createOutputBool(QString name, bool value = false);
 
 
      /**
@@ -479,7 +537,7 @@ public Q_SLOTS:
       *
       * @return true if a parameter is created, false otherwise (i.e. we already have a parameter with this name)
       */
-     bool createParameterInteger(QString name, int value = 0);
+     bool createParameterInt(QString name, int value = 0);
 
 
      /**
@@ -512,7 +570,7 @@ public Q_SLOTS:
       *
       * @return true if a parameter is created, false otherwise (i.e. we already have a parameter with this name)
       */
-     bool createParameterBoolean(QString name, bool value = false);
+     bool createParameterBool(QString name, bool value = false);
 
 
      /**
@@ -557,42 +615,14 @@ public Q_SLOTS:
 
 
 
-
 //---------------------------------------------------
 //
-// Mute/unmuted outputs
+// Mapping
 //
 //---------------------------------------------------
-public Q_SLOTS:
-     /**
-      * @brief Mute a given output
-      *
-      * @param name
-      *
-      * @return  true if everything is ok, false otherwise
-      */
-     bool muteOuput(QString name);
 
 
-     /**
-      * @brief Mute a given output
-      *
-      * @param name
-      *
-      * @return  true if everything is ok, false otherwise
-      */
-     bool unmuteOuput(QString name);
 
-
-     /**
-      * @brief Check if a given output is muted
-      *
-      * @param name
-      * @param qmlUpdateExtraParameter Extra parameter used to call this function in a QML binding
-      *
-      * @return true if this output is muted, false otherwise
-      */
-     bool isOutputMuted(QString name, QVariant qmlUpdateExtraParameter = QVariant());
 
 
 

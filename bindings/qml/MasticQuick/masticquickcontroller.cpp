@@ -147,7 +147,7 @@ static mtic_logLevel_t enumMasticLogLevelToEnumMticlogLevel_t(MasticLogLevel::Va
             result = MTIC_LOG_INFO;
             break;
 
-        case MasticLogLevel::LOG_WARNING:
+        case MasticLogLevel::LOG_WARN:
             result = MTIC_LOG_WARN;
             break;
 
@@ -414,7 +414,7 @@ void MasticQuickController_callbackForcedStop(void *customData)
 MasticQuickController::MasticQuickController(QObject *parent) : QObject(parent),
     _canBeFrozen(false),
     _isStarted(false),
-    _isVerbose(false),
+    _verbose(false),
     _logLevel(MasticLogLevel::LOG_TRACE),
     _inputs(NULL),
     _outputs(NULL),
@@ -454,7 +454,7 @@ MasticQuickController::MasticQuickController(QObject *parent) : QObject(parent),
 
     // Verbose mode by default in debug mode
 #ifdef QT_DEBUG
-    setisVerbose(true);
+    setverbose(true);
 #endif
 
     // Set log level
@@ -742,18 +742,18 @@ void MasticQuickController::setcanBeFrozen(bool value)
  * @brief Set our isVerbose flag
  * @param value
  */
-void MasticQuickController::setisVerbose(bool value)
+void MasticQuickController::setverbose(bool value)
 {
-    if (_isVerbose != value)
+    if (_verbose != value)
     {
         // Save value
-        _isVerbose = value;
+        _verbose = value;
 
         // Set our verbose flag
         mtic_setVerbose(value);
 
         // Notify change
-        Q_EMIT isVerboseChanged(value);
+        Q_EMIT verboseChanged(value);
     }
 }
 
@@ -874,13 +874,21 @@ bool MasticQuickController::stop()
 
 
 
+//-------------------------------------------------------------------
+//
+// Read per type
+//
+//-------------------------------------------------------------------
+
+
+
+
 
 //-------------------------------------------------------------------
 //
 // Write per type
 //
 //-------------------------------------------------------------------
-
 
 
 /**
@@ -891,7 +899,7 @@ bool MasticQuickController::stop()
  *
  * @return  true if everything is ok, false otherwise
  */
-bool MasticQuickController::writeOutputAsInteger(QString name, int value)
+bool MasticQuickController::writeOutputAsInt(QString name, int value)
 {
     bool result = false;
 
@@ -1002,7 +1010,7 @@ bool MasticQuickController::writeOutputAsString(QString name, QString value)
  *
  * @return  true if everything is ok, false otherwise
  */
-bool MasticQuickController::writeOutputAsBoolean(QString name, bool value)
+bool MasticQuickController::writeOutputAsBool(QString name, bool value)
 {
     bool result = false;
 
@@ -1096,7 +1104,7 @@ bool MasticQuickController::writeOutputAsData(QString name, void* value)
  *
  * @return  true if everything is ok, false otherwise
  */
-bool MasticQuickController::writeParameterAsInteger(QString name, int value)
+bool MasticQuickController::writeParameterAsInt(QString name, int value)
 {
     bool result = false;
 
@@ -1207,7 +1215,7 @@ bool MasticQuickController::writeParameterAsString(QString name, QString value)
  *
  * @return  true if everything is ok, false otherwise
  */
-bool MasticQuickController::writeParameterAsBoolean(QString name, bool value)
+bool MasticQuickController::writeParameterAsBool(QString name, bool value)
 {
     bool result = false;
 
@@ -1376,9 +1384,110 @@ bool MasticQuickController::checkParameterExistence(QString name)
 }
 
 
+
+
 //-------------------------------------------------------------------
 //
-// Create or remove IOP (inoput, output, parameter)
+// Mute/unmute outputs
+//
+//-------------------------------------------------------------------
+
+
+/**
+ * @brief Mute a given output
+ *
+ * @param name
+ *
+ * @return  true if everything is ok, false otherwise
+ */
+bool MasticQuickController::muteOuput(QString name)
+{
+    bool result = false;
+
+    if (!name.isEmpty())
+    {
+        if (mtic_muteOutput(name.toStdString().c_str()) == 1)
+        {
+            result = true;
+        }
+    }
+    else
+    {
+        qWarning() << Q_FUNC_INFO << "warning: name can not be empty";
+    }
+
+    return result;
+}
+
+
+/**
+ * @brief Mute a given output
+ *
+ * @param name
+ *
+ * @return  true if everything is ok, false otherwise
+ */
+bool MasticQuickController::unmuteOuput(QString name)
+{
+    bool result = false;
+
+    if (!name.isEmpty())
+    {
+        if (mtic_unmuteOutput(name.toStdString().c_str()) == 1)
+        {
+            result = true;
+        }
+    }
+    else
+    {
+        qWarning() << Q_FUNC_INFO << "warning: name can not be empty";
+    }
+
+    return result;
+}
+
+
+/**
+ * @brief Check if a given output is muted
+ *
+ * @param name
+ * @param qmlUpdateExtraParameter Extra parameter used to call this function in a QML binding
+ *
+ * @return true if this output is muted, false otherwise
+ */
+bool MasticQuickController::isOutputMuted(QString name, QVariant qmlUpdateExtraParameter)
+{
+    Q_UNUSED(qmlUpdateExtraParameter)
+    bool result = false;
+
+    if (!name.isEmpty())
+    {
+        result = mtic_isOutputMuted(name.toStdString().c_str());
+    }
+    else
+    {
+        qWarning() << Q_FUNC_INFO << "warning: name can not be empty";
+    }
+
+    return result;
+}
+
+
+
+
+//-------------------------------------------------------------------
+//
+// Load / set / get definition
+//
+//-------------------------------------------------------------------
+
+
+
+
+
+//-------------------------------------------------------------------
+//
+// Edit the definition: create or remove IOP (inoput, output, parameter)
 //
 //-------------------------------------------------------------------
 
@@ -1390,7 +1499,7 @@ bool MasticQuickController::checkParameterExistence(QString name)
  *
  * @return true if an input is created, false otherwise (i.e. we already have an input with this name)
  */
-bool MasticQuickController::createInputInteger(QString name, int value)
+bool MasticQuickController::createInputInt(QString name, int value)
 {
     return _createInput(name, MasticIopType::INTEGER, QVariant(value), &value, sizeof(int));
 }
@@ -1435,7 +1544,7 @@ bool MasticQuickController::createInputString(QString name, QString value)
  *
  * @return true if an input is created, false otherwise (i.e. we already have an input with this name)
  */
-bool MasticQuickController::createInputBoolean(QString name, bool value)
+bool MasticQuickController::createInputBool(QString name, bool value)
 {
     return _createInput(name, MasticIopType::BOOLEAN, QVariant(value), &value, sizeof(bool));
 }
@@ -1483,7 +1592,7 @@ bool MasticQuickController::createInputData(QString name, void* value)
  *
  * @return true if an output is created, false otherwise (i.e. we already have an output with this name)
  */
-bool MasticQuickController::createOutputInteger(QString name, int value)
+bool MasticQuickController::createOutputInt(QString name, int value)
 {
     return _createOutput(name, MasticIopType::INTEGER, QVariant(value), &value, sizeof(int));
 }
@@ -1528,7 +1637,7 @@ bool MasticQuickController::createOutputString(QString name, QString value)
  *
  * @return true if an output is created, false otherwise (i.e. we already have an output with this name)
  */
-bool MasticQuickController::createOutputBoolean(QString name, bool value)
+bool MasticQuickController::createOutputBool(QString name, bool value)
 {
     return _createOutput(name, MasticIopType::BOOLEAN, QVariant(value), &value, sizeof(bool));
 }
@@ -1576,7 +1685,7 @@ bool MasticQuickController::createOutputData(QString name, void* value)
  *
  * @return true if a parameter is created, false otherwise (i.e. we already have a parameter with this name)
  */
-bool MasticQuickController::createParameterInteger(QString name, int value)
+bool MasticQuickController::createParameterInt(QString name, int value)
 {
     return _createParameter(name, MasticIopType::INTEGER, QVariant(value), &value, sizeof(int));
 }
@@ -1621,7 +1730,7 @@ bool MasticQuickController::createParameterString(QString name, QString value)
  *
  * @return true if a parameter is created, false otherwise (i.e. we already have a parameter with this name)
  */
-bool MasticQuickController::createParameterBoolean(QString name, bool value)
+bool MasticQuickController::createParameterBool(QString name, bool value)
 {
     return _createParameter(name, MasticIopType::BOOLEAN, QVariant(value), &value, sizeof(bool));
 }
@@ -1748,91 +1857,17 @@ bool MasticQuickController::removeParameter(QString name)
 
 
 
-//-------------------------------------------------------------------
+
+//---------------------------------------------------
 //
-// Mute/unmute outputs
+// Mapping
 //
-//-------------------------------------------------------------------
+//---------------------------------------------------
 
 
-/**
- * @brief Mute a given output
- *
- * @param name
- *
- * @return  true if everything is ok, false otherwise
- */
-bool MasticQuickController::muteOuput(QString name)
-{
-    bool result = false;
-
-    if (!name.isEmpty())
-    {
-        if (mtic_muteOutput(name.toStdString().c_str()) == 1)
-        {
-            result = true;
-        }
-    }
-    else
-    {
-        qWarning() << Q_FUNC_INFO << "warning: name can not be empty";
-    }
-
-    return result;
-}
 
 
-/**
- * @brief Mute a given output
- *
- * @param name
- *
- * @return  true if everything is ok, false otherwise
- */
-bool MasticQuickController::unmuteOuput(QString name)
-{
-    bool result = false;
 
-    if (!name.isEmpty())
-    {
-        if (mtic_unmuteOutput(name.toStdString().c_str()) == 1)
-        {
-            result = true;
-        }
-    }
-    else
-    {
-        qWarning() << Q_FUNC_INFO << "warning: name can not be empty";
-    }
-
-    return result;
-}
-
-
-/**
- * @brief Check if a given output is muted
- *
- * @param name
- * @param qmlUpdateExtraParameter Extra parameter used to call this function in a QML binding
- *
- * @return true if this output is muted, false otherwise
- */
-bool MasticQuickController::isOutputMuted(QString name, QVariant qmlUpdateExtraParameter)
-{
-    Q_UNUSED(qmlUpdateExtraParameter)
-    bool result = false;
-
-    if (!name.isEmpty())
-    {
-        result = mtic_isOutputMuted(name.toStdString().c_str());
-    }
-    else
-    {
-        qWarning() << Q_FUNC_INFO << "warning: name can not be empty";
-    }
-
-    return result;
-}
 
 
 
@@ -1914,7 +1949,7 @@ void MasticQuickController::info(QString text)
  */
 void MasticQuickController::warn(QString text)
 {
-    log(MasticLogLevel::LOG_WARNING, text);
+    log(MasticLogLevel::LOG_WARN, text);
 }
 
 

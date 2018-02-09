@@ -62,7 +62,7 @@ Module {
                 "LOG_TRACE": 0,
                 "LOG_DEBUG": 1,
                 "LOG_INFO": 2,
-                "LOG_WARNING": 3,
+                "LOG_WARN": 3,
                 "LOG_ERROR": 4,
                 "LOG_FATAL": 5
             }
@@ -86,7 +86,7 @@ Module {
         Property { name: "isFrozen"; type: "bool" }
         Property { name: "canBeFrozen"; type: "bool" }
         Property { name: "isStarted"; type: "bool"; isReadonly: true }
-        Property { name: "isVerbose"; type: "bool" }
+        Property { name: "verbose"; type: "bool" }
         Property { name: "logLevel"; type: "MasticLogLevel::Value" }
         Property { name: "inputs"; type: "MasticQuickQmlPropertyMap"; isReadonly: true; isPointer: true }
         Property { name: "outputs"; type: "MasticQuickQmlPropertyMap"; isReadonly: true; isPointer: true }
@@ -137,7 +137,7 @@ Module {
             Parameter { name: "value"; type: "bool" }
         }
         Signal {
-            name: "isVerboseChanged"
+            name: "verboseChanged"
             Parameter { name: "value"; type: "bool" }
         }
         Signal {
@@ -181,7 +181,7 @@ Module {
         }
         Method { name: "stop"; type: "bool" }
         Method {
-            name: "writeOutputAsInteger"
+            name: "writeOutputAsInt"
             type: "bool"
             Parameter { name: "name"; type: "string" }
             Parameter { name: "value"; type: "int" }
@@ -199,7 +199,7 @@ Module {
             Parameter { name: "value"; type: "string" }
         }
         Method {
-            name: "writeOutputAsBoolean"
+            name: "writeOutputAsBool"
             type: "bool"
             Parameter { name: "name"; type: "string" }
             Parameter { name: "value"; type: "bool" }
@@ -216,7 +216,7 @@ Module {
             Parameter { name: "value"; type: "void"; isPointer: true }
         }
         Method {
-            name: "writeParameterAsInteger"
+            name: "writeParameterAsInt"
             type: "bool"
             Parameter { name: "name"; type: "string" }
             Parameter { name: "value"; type: "int" }
@@ -234,7 +234,7 @@ Module {
             Parameter { name: "value"; type: "string" }
         }
         Method {
-            name: "writeParameterAsBoolean"
+            name: "writeParameterAsBool"
             type: "bool"
             Parameter { name: "name"; type: "string" }
             Parameter { name: "value"; type: "bool" }
@@ -276,13 +276,34 @@ Module {
             Parameter { name: "name"; type: "string" }
         }
         Method {
-            name: "createInputInteger"
+            name: "muteOuput"
+            type: "bool"
+            Parameter { name: "name"; type: "string" }
+        }
+        Method {
+            name: "unmuteOuput"
+            type: "bool"
+            Parameter { name: "name"; type: "string" }
+        }
+        Method {
+            name: "isOutputMuted"
+            type: "bool"
+            Parameter { name: "name"; type: "string" }
+            Parameter { name: "qmlUpdateExtraParameter"; type: "QVariant" }
+        }
+        Method {
+            name: "isOutputMuted"
+            type: "bool"
+            Parameter { name: "name"; type: "string" }
+        }
+        Method {
+            name: "createInputInt"
             type: "bool"
             Parameter { name: "name"; type: "string" }
             Parameter { name: "value"; type: "int" }
         }
         Method {
-            name: "createInputInteger"
+            name: "createInputInt"
             type: "bool"
             Parameter { name: "name"; type: "string" }
         }
@@ -309,13 +330,13 @@ Module {
             Parameter { name: "name"; type: "string" }
         }
         Method {
-            name: "createInputBoolean"
+            name: "createInputBool"
             type: "bool"
             Parameter { name: "name"; type: "string" }
             Parameter { name: "value"; type: "bool" }
         }
         Method {
-            name: "createInputBoolean"
+            name: "createInputBool"
             type: "bool"
             Parameter { name: "name"; type: "string" }
         }
@@ -336,13 +357,13 @@ Module {
             Parameter { name: "name"; type: "string" }
         }
         Method {
-            name: "createOutputInteger"
+            name: "createOutputInt"
             type: "bool"
             Parameter { name: "name"; type: "string" }
             Parameter { name: "value"; type: "int" }
         }
         Method {
-            name: "createOutputInteger"
+            name: "createOutputInt"
             type: "bool"
             Parameter { name: "name"; type: "string" }
         }
@@ -369,13 +390,13 @@ Module {
             Parameter { name: "name"; type: "string" }
         }
         Method {
-            name: "createOutputBoolean"
+            name: "createOutputBool"
             type: "bool"
             Parameter { name: "name"; type: "string" }
             Parameter { name: "value"; type: "bool" }
         }
         Method {
-            name: "createOutputBoolean"
+            name: "createOutputBool"
             type: "bool"
             Parameter { name: "name"; type: "string" }
         }
@@ -396,13 +417,13 @@ Module {
             Parameter { name: "name"; type: "string" }
         }
         Method {
-            name: "createParameterInteger"
+            name: "createParameterInt"
             type: "bool"
             Parameter { name: "name"; type: "string" }
             Parameter { name: "value"; type: "int" }
         }
         Method {
-            name: "createParameterInteger"
+            name: "createParameterInt"
             type: "bool"
             Parameter { name: "name"; type: "string" }
         }
@@ -429,13 +450,13 @@ Module {
             Parameter { name: "name"; type: "string" }
         }
         Method {
-            name: "createParameterBoolean"
+            name: "createParameterBool"
             type: "bool"
             Parameter { name: "name"; type: "string" }
             Parameter { name: "value"; type: "bool" }
         }
         Method {
-            name: "createParameterBoolean"
+            name: "createParameterBool"
             type: "bool"
             Parameter { name: "name"; type: "string" }
         }
@@ -462,27 +483,6 @@ Module {
         }
         Method {
             name: "removeParameter"
-            type: "bool"
-            Parameter { name: "name"; type: "string" }
-        }
-        Method {
-            name: "muteOuput"
-            type: "bool"
-            Parameter { name: "name"; type: "string" }
-        }
-        Method {
-            name: "unmuteOuput"
-            type: "bool"
-            Parameter { name: "name"; type: "string" }
-        }
-        Method {
-            name: "isOutputMuted"
-            type: "bool"
-            Parameter { name: "name"; type: "string" }
-            Parameter { name: "qmlUpdateExtraParameter"; type: "QVariant" }
-        }
-        Method {
-            name: "isOutputMuted"
             type: "bool"
             Parameter { name: "name"; type: "string" }
         }
