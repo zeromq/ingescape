@@ -100,7 +100,7 @@ ApplicationWindow {
         Mastic.createOutputDouble("y", 0);
 
         // MasticQuick API: start our Mastic agent
-        Mastic.startWithDevice(root.masticNetworkDevice, root.masticPort)
+        Mastic.startWithDevice(root.masticNetworkDevice, root.masticPort);
     }
 
 
@@ -317,6 +317,23 @@ ApplicationWindow {
                      }
                 }
 
+            }
+
+
+            ListView {
+               width: 100
+               height: 300
+
+               model: Mastic.inputs.keys()
+
+               delegate: Rectangle {
+                   color: "red"
+                   width: 100
+                   height: 30
+                   radius: 20
+
+                   border.width: 2
+               }
             }
         }
 

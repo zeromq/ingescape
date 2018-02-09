@@ -20,6 +20,11 @@
 
 #include "masticquickcontroller.h"
 
+#include "masticquickinputspropertymap.h"
+#include "masticquickoutputspropertymap.h"
+#include "masticquickparameterspropertymap.h"
+
+
 
 #define MASTICQUICK_VERSION_MAJOR 1
 #define MASTICQUICK_VERSION_MINOR 0
@@ -49,7 +54,10 @@ void MasticQuick::registerTypes(const char* uri)
     //
     // Register uncreatable types
     //
-    qmlRegisterUncreatableType<MasticQuickQmlPropertyMap>(uri, MASTICQUICK_VERSION_MAJOR, MASTICQUICK_VERSION_MINOR, "MasticQuickQmlPropertyMap", "Internal class");
+    qmlRegisterUncreatableType<MasticQuickInputsPropertyMap>(uri, MASTICQUICK_VERSION_MAJOR, MASTICQUICK_VERSION_MINOR, "MasticQuickInputsPropertyMap", "Internal class");
+    qmlRegisterUncreatableType<MasticQuickOutputsPropertyMap>(uri, MASTICQUICK_VERSION_MAJOR, MASTICQUICK_VERSION_MINOR, "MasticQuickOutputsPropertyMap", "Internal class");
+    qmlRegisterUncreatableType<MasticQuickParametersPropertyMap>(uri, MASTICQUICK_VERSION_MAJOR, MASTICQUICK_VERSION_MINOR, "MasticQuickParametersPropertyMap", "Internal class");
+
 
 
     //

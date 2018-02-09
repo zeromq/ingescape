@@ -12,28 +12,28 @@
  *
  */
 
-#ifndef _MASTICQUICKQMLPROPERTYMAP_H_
-#define _MASTICQUICKQMLPROPERTYMAP_H_
+#ifndef _MASTICQUICKPARAMETERSPROPERTYMAP_H_
+#define _MASTICQUICKPARAMETERSPROPERTYMAP_H_
 
 #include <QObject>
+#include <QtQml>
 #include <QQmlPropertyMap>
 
 
 /**
- * @brief The MasticQuickQmlPropertyMap class defines a custom QQmlPropertyMap that can be read-only if needed
+ * @brief The MasticQuickParametersPropertyMap class defines a custom QQmlPropertyMap that is used to access Mastic parameters
  */
-class MasticQuickQmlPropertyMap : public QQmlPropertyMap
+class MasticQuickParametersPropertyMap : public QQmlPropertyMap
 {
     Q_OBJECT
+
 
 public:
     /**
      * @brief Default constructor
-     *
-     * @param propertiesAreReadOnlyForQml
      * @param parent
      */
-    explicit MasticQuickQmlPropertyMap(bool propertiesAreReadOnlyForQml, QObject *parent = nullptr);
+    explicit MasticQuickParametersPropertyMap(QObject *parent = nullptr);
 
 
 protected:
@@ -47,11 +47,8 @@ protected:
      */
     QVariant updateValue(const QString &key, const QVariant &newQmlValue) Q_DECL_OVERRIDE;
 
-
-protected:
-    // Flag indicating if our properties are read-only for QML
-    // i.e. if we prevent QML from updating them or not
-    bool _propertiesAreReadOnlyForQml;
 };
 
-#endif // _MASTICQUICKQMLPROPERTYMAP_H_
+QML_DECLARE_TYPE(MasticQuickParametersPropertyMap)
+
+#endif // _MASTICQUICKPARAMETERSPROPERTYMAP_H_

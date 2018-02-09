@@ -19,11 +19,15 @@ HEADERS += \
     $$PWD/masticquick_global.h \
     $$PWD/masticquick_helpers.h \
     $$PWD/masticquickcontroller.h \
-    $$PWD/masticquickqmlpropertymap.h
+    $$PWD/masticquickinputspropertymap.h \
+    $$PWD/masticquickoutputspropertymap.h \
+    $$PWD/masticquickparameterspropertymap.h
 
 
 SOURCES += \
     $$PWD/masticquick.cpp \
     $$PWD/masticquick_helpers.cpp \
     $$PWD/masticquickcontroller.cpp \
-    $$PWD/masticquickqmlpropertymap.cpp
+    $$PWD/masticquickinputspropertymap.cpp \
+    $$PWD/masticquickoutputspropertymap.cpp \
+    $$PWD/masticquickparameterspropertymap.cpp

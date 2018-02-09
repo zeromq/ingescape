@@ -471,22 +471,22 @@ MasticQuickController::MasticQuickController(QObject *parent) : QObject(parent),
 
 
     // Init inputs
-    _inputs = new MasticQuickQmlPropertyMap(true, this);
+    _inputs = new MasticQuickInputsPropertyMap(this);
 
 
     // Init outputs
-    _outputs = new MasticQuickQmlPropertyMap(false, this);
+    _outputs = new MasticQuickOutputsPropertyMap(this);
     if (_outputs != NULL)
     {
-        connect(_outputs, &MasticQuickQmlPropertyMap::valueChanged, this, &MasticQuickController::_onOutputUpdatedFromFromQML);
+        connect(_outputs, &MasticQuickOutputsPropertyMap::valueChanged, this, &MasticQuickController::_onOutputUpdatedFromFromQML);
     }
 
 
     // Init parameters
-    _parameters = new MasticQuickQmlPropertyMap(false, this);
+    _parameters = new MasticQuickParametersPropertyMap(this);
     if (_parameters != NULL)
     {
-        connect(_parameters, &MasticQuickQmlPropertyMap::valueChanged, this, &MasticQuickController::_onParameterUpdatedFromFromQML);
+        connect(_parameters, &MasticQuickParametersPropertyMap::valueChanged, this, &MasticQuickController::_onParameterUpdatedFromFromQML);
     }
 }
 
@@ -506,7 +506,7 @@ MasticQuickController::~MasticQuickController()
     if (_inputs != NULL)
     {
         // Clean-up
-        MasticQuickQmlPropertyMap* temp = _inputs;
+        MasticQuickInputsPropertyMap* temp = _inputs;
         setinputs(NULL);
         delete temp;
     }
@@ -515,10 +515,10 @@ MasticQuickController::~MasticQuickController()
     if (_outputs != NULL)
     {
         // Unsubscribe to signals
-        disconnect(_outputs, &MasticQuickQmlPropertyMap::valueChanged, this, &MasticQuickController::_onOutputUpdatedFromFromQML);
+        disconnect(_outputs, &MasticQuickOutputsPropertyMap::valueChanged, this, &MasticQuickController::_onOutputUpdatedFromFromQML);
 
         // Clean-up
-        MasticQuickQmlPropertyMap* temp = _outputs;
+        MasticQuickOutputsPropertyMap* temp = _outputs;
         setoutputs(NULL);
         delete temp;
     }
@@ -527,10 +527,10 @@ MasticQuickController::~MasticQuickController()
     if (_parameters != NULL)
     {
         // Unsubcribe to signals
-        disconnect(_parameters, &MasticQuickQmlPropertyMap::valueChanged, this, &MasticQuickController::_onParameterUpdatedFromFromQML);
+        disconnect(_parameters, &MasticQuickParametersPropertyMap::valueChanged, this, &MasticQuickController::_onParameterUpdatedFromFromQML);
 
         // Clean-up
-        MasticQuickQmlPropertyMap* temp = _parameters;
+        MasticQuickParametersPropertyMap* temp = _parameters;
         setparameters(NULL);
         delete temp;
     }

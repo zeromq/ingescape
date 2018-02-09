@@ -21,19 +21,44 @@
 #include <QJSEngine>
 
 #include "masticquick_helpers.h"
-#include "masticquickqmlpropertymap.h"
+
+#include "masticquickinputspropertymap.h"
+#include "masticquickoutputspropertymap.h"
+#include "masticquickparameterspropertymap.h"
+
+
+//-------------------------------------------------------------------
+//
+//
+//  Enums
+//
+//
+//-------------------------------------------------------------------
 
 
 /**
   * @brief Enum for IOP types
   */
-MASTIC_QML_ENUM(MasticIopType, INVALID, INTEGER, DOUBLE, STRING, BOOLEAN, IMPULSION, DATA)
+MASTIC_QML_ENUM(MasticIopType, INVALID = 0, INTEGER, DOUBLE, STRING, BOOLEAN, IMPULSION, DATA)
+
 
 
 /**
  * @brief Enum for log levels
  */
-MASTIC_QML_ENUM(MasticLogLevel, LOG_TRACE, LOG_DEBUG, LOG_INFO, LOG_WARN, LOG_ERROR, LOG_FATAL)
+MASTIC_QML_ENUM(MasticLogLevel, LOG_TRACE = 0, LOG_DEBUG, LOG_INFO, LOG_WARN, LOG_ERROR, LOG_FATAL)
+
+
+
+
+
+//-------------------------------------------------------------------
+//
+//
+//  MasticController
+//
+//
+//-------------------------------------------------------------------
 
 
 /**
@@ -80,13 +105,13 @@ class MasticQuickController : public QObject
     MASTIC_QML_PROPERTY_CUSTOM_SETTER(MasticLogLevel::Value, logLevel)
 
     // Inputs
-    MASTIC_QML_PROPERTY_READONLY(MasticQuickQmlPropertyMap*, inputs)
+    MASTIC_QML_PROPERTY_READONLY(MasticQuickInputsPropertyMap*, inputs)
 
     // Outputs
-    MASTIC_QML_PROPERTY_READONLY(MasticQuickQmlPropertyMap*, outputs)
+    MASTIC_QML_PROPERTY_READONLY(MasticQuickOutputsPropertyMap*, outputs)
 
     // Parameters
-    MASTIC_QML_PROPERTY_READONLY(MasticQuickQmlPropertyMap*, parameters)
+    MASTIC_QML_PROPERTY_READONLY(MasticQuickParametersPropertyMap*, parameters)
 
 
 public:
@@ -97,10 +122,12 @@ public:
     explicit MasticQuickController(QObject *parent = 0);
 
 
+
     /**
       * @brief Destructor
       */
     ~MasticQuickController();
+
 
 
     /**
@@ -110,6 +137,7 @@ public:
      * @return
      */
      static QObject* qmlSingleton(QQmlEngine* engine, QJSEngine* scriptEngine);
+
 
 
 Q_SIGNALS:
@@ -136,6 +164,7 @@ public Q_SLOTS:
      bool startWithDevice(QString networkDevice, int port = 5670);
 
 
+
      /**
       * @brief Start our agent with a given IP address and port
       *
@@ -143,6 +172,7 @@ public Q_SLOTS:
       * @param port
       */
      bool startWithIP(QString ipAddress, int port = 5670);
+
 
 
      /**
@@ -180,6 +210,7 @@ public Q_SLOTS:
      bool writeOutputAsInt(QString name, int value);
 
 
+
      /**
       * @brief Write a given output as a double
       *
@@ -189,6 +220,7 @@ public Q_SLOTS:
       * @return  true if everything is ok, false otherwise
       */
      bool writeOutputAsDouble(QString name, double value);
+
 
 
      /**
@@ -202,6 +234,7 @@ public Q_SLOTS:
      bool writeOutputAsString(QString name, QString value);
 
 
+
      /**
       * @brief Write a given output as a boolean
       *
@@ -213,6 +246,7 @@ public Q_SLOTS:
      bool writeOutputAsBool(QString name, bool value);
 
 
+
      /**
       * @brief Write a given output as an impulsion
       *
@@ -221,6 +255,7 @@ public Q_SLOTS:
       * @return  true if everything is ok, false otherwise
       */
      bool writeOutputAsImpulsion(QString name);
+
 
 
      /**
@@ -234,6 +269,7 @@ public Q_SLOTS:
      bool writeOutputAsData(QString name, void* value);
 
 
+
      /**
       * @brief Write a given parameter as an integer
       *
@@ -243,6 +279,7 @@ public Q_SLOTS:
       * @return  true if everything is ok, false otherwise
       */
      bool writeParameterAsInt(QString name, int value);
+
 
 
      /**
@@ -256,6 +293,7 @@ public Q_SLOTS:
      bool writeParameterAsDouble(QString name, double value);
 
 
+
      /**
       * @brief Write a given parameter as a string
       *
@@ -267,6 +305,7 @@ public Q_SLOTS:
      bool writeParameterAsString(QString name, QString value);
 
 
+
      /**
       * @brief Write a given parameter as a boolean
       *
@@ -276,6 +315,7 @@ public Q_SLOTS:
       * @return  true if everything is ok, false otherwise
       */
      bool writeParameterAsBool(QString name, bool value);
+
 
 
      /**
@@ -304,12 +344,14 @@ public Q_SLOTS:
      MasticIopType::Value getTypeForInput(QString name);
 
 
+
      /**
       * @brief Get type of a given output
       * @param name
       * @return
       */
      MasticIopType::Value getTypeForOutput(QString name);
+
 
 
      /**
@@ -320,6 +362,7 @@ public Q_SLOTS:
      MasticIopType::Value getTypeForParameter(QString name);
 
 
+
      /**
       * @brief Check if our agent has an input with this name
       * @param name
@@ -328,12 +371,14 @@ public Q_SLOTS:
      bool checkInputExistence(QString name);
 
 
+
      /**
       * @brief Check if our agent has an output with this name
       * @param name
       * @return
       */
      bool checkOutputExistence(QString name);
+
 
 
      /**
@@ -361,6 +406,7 @@ public Q_SLOTS:
      bool muteOuput(QString name);
 
 
+
      /**
       * @brief Mute a given output
       *
@@ -369,6 +415,7 @@ public Q_SLOTS:
       * @return  true if everything is ok, false otherwise
       */
      bool unmuteOuput(QString name);
+
 
 
      /**
@@ -410,6 +457,7 @@ public Q_SLOTS:
      bool createInputInt(QString name, int value = 0);
 
 
+
      /**
       * @brief Create a new double input
       *
@@ -419,6 +467,7 @@ public Q_SLOTS:
       * @return true if an input is created, false otherwise (i.e. we already have an input with this name)
       */
      bool createInputDouble(QString name, double value = 0.0);
+
 
 
      /**
@@ -432,6 +481,7 @@ public Q_SLOTS:
      bool createInputString(QString name, QString value = "");
 
 
+
      /**
       * @brief Create a new boolean input
       *
@@ -443,6 +493,7 @@ public Q_SLOTS:
      bool createInputBool(QString name, bool value = false);
 
 
+
      /**
       * @brief Create a new impulsion input
       *
@@ -451,6 +502,7 @@ public Q_SLOTS:
       * @return true if an input is created, false otherwise (i.e. we already have an input with this name)
       */
      bool createInputImpulsion(QString name);
+
 
 
      /**
@@ -464,6 +516,7 @@ public Q_SLOTS:
      bool createInputData(QString name, void* value = NULL);
 
 
+
      /**
       * @brief Create a new integer output
       *
@@ -473,6 +526,7 @@ public Q_SLOTS:
       * @return true if an output is created, false otherwise (i.e. we already have an output with this name)
       */
      bool createOutputInt(QString name, int value = 0);
+
 
 
      /**
@@ -486,6 +540,7 @@ public Q_SLOTS:
      bool createOutputDouble(QString name, double value = 0.0);
 
 
+
      /**
       * @brief Create a new string output
       *
@@ -495,6 +550,7 @@ public Q_SLOTS:
       * @return true if an output is created, false otherwise (i.e. we already have an output with this name)
       */
      bool createOutputString(QString name, QString value = "");
+
 
 
      /**
@@ -508,6 +564,7 @@ public Q_SLOTS:
      bool createOutputBool(QString name, bool value = false);
 
 
+
      /**
       * @brief Create a new impulsion output
       *
@@ -516,6 +573,7 @@ public Q_SLOTS:
       * @return true if an output is created, false otherwise (i.e. we already have an output with this name)
       */
      bool createOutputImpulsion(QString name);
+
 
 
      /**
@@ -529,6 +587,7 @@ public Q_SLOTS:
      bool createOutputData(QString name, void* value = NULL);
 
 
+
      /**
       * @brief Create a new integer parameter
       *
@@ -538,6 +597,7 @@ public Q_SLOTS:
       * @return true if a parameter is created, false otherwise (i.e. we already have a parameter with this name)
       */
      bool createParameterInt(QString name, int value = 0);
+
 
 
      /**
@@ -551,6 +611,7 @@ public Q_SLOTS:
      bool createParameterDouble(QString name, double value = 0.0);
 
 
+
      /**
       * @brief Create a new string parameter
       *
@@ -560,6 +621,7 @@ public Q_SLOTS:
       * @return true if a parameter is created, false otherwise (i.e. we already have a parameter with this name)
       */
      bool createParameterString(QString name, QString value = "");
+
 
 
      /**
@@ -573,6 +635,7 @@ public Q_SLOTS:
      bool createParameterBool(QString name, bool value = false);
 
 
+
      /**
       * @brief Create a new data parameter
       *
@@ -582,6 +645,7 @@ public Q_SLOTS:
       * @return true if a parameter is created, false otherwise (i.e. we already have a parameter with this name)
       */
      bool createParameterData(QString name, void* value = NULL);
+
 
 
      /**
@@ -594,6 +658,7 @@ public Q_SLOTS:
      bool removeInput(QString name);
 
 
+
      /**
       * @brief Remove an output
       *
@@ -602,6 +667,7 @@ public Q_SLOTS:
       * @return true if this output is removed, false otherwise
       */
      bool removeOutput(QString name);
+
 
 
      /**
@@ -639,12 +705,14 @@ public Q_SLOTS:
      QStringList getNetdevicesList();
 
 
+
      /**
       * @brief Print (or save) debugging information
       * @param logLevel
       * @param text
       */
      void log(MasticLogLevel::Value logLevel, QString text);
+
 
 
      /**
@@ -654,11 +722,13 @@ public Q_SLOTS:
      void trace(QString text);
 
 
+
      /**
       * @brief Print (or save) debugging information (loglevel = debug)
       * @param text
       */
      void debug(QString text);
+
 
 
      /**
@@ -668,11 +738,13 @@ public Q_SLOTS:
      void info(QString text);
 
 
+
      /**
       * @brief Print (or save) debugging information (loglevel = warn)
       * @param text
       */
      void warn(QString text);
+
 
 
      /**
@@ -682,11 +754,21 @@ public Q_SLOTS:
      void error(QString text);
 
 
+
      /**
       * @brief Print (or save) debugging information (loglevel = fatal)
       * @param text
       */
      void fatal(QString text);
+
+
+
+//---------------------------------------------------
+//
+// QML specific API
+//
+//---------------------------------------------------
+public Q_SLOTS:
 
 
 
@@ -705,6 +787,7 @@ protected:
      bool _validIopName(const QString& name);
 
 
+
      /**
       * @brief Create a new input
       *
@@ -717,6 +800,7 @@ protected:
       * @return true if an input is created, false otherwise
       */
      bool _createInput(QString name, MasticIopType::Value type, QVariant qmlValue, void* cValue, long cSize);
+
 
 
      /**
@@ -733,6 +817,7 @@ protected:
      bool _createOutput(QString name, MasticIopType::Value type, QVariant qmlValue, void* cValue, long cSize);
 
 
+
      /**
       * @brief Create a new paramater
       *
@@ -747,6 +832,7 @@ protected:
      bool _createParameter(QString name, MasticIopType::Value type, QVariant qmlValue, void* cValue, long cSize);
 
 
+
      /**
       * @brief Update a QML output property
       *
@@ -755,6 +841,7 @@ protected:
       * @return true if everything is ok, false otherwise
       */
      bool _updateQmlOutput(QString name);
+
 
 
      /**
@@ -775,6 +862,7 @@ protected Q_SLOTS:
      void _onForcedStop();
 
 
+
      /**
       * @brief Called when an output is updated from QML
       * @param key
@@ -783,12 +871,16 @@ protected Q_SLOTS:
      void _onOutputUpdatedFromFromQML(const QString &key, const QVariant &value);
 
 
+
      /**
       * @brief Called when a parameter is updated from QML
       * @param key
       * @param value
       */
      void _onParameterUpdatedFromFromQML(const QString &key, const QVariant &value);
+
+
+
 };
 
 QML_DECLARE_TYPE(MasticQuickController)
