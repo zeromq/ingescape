@@ -219,7 +219,7 @@ void mtic_setLogInFile (bool allow){
 void mtic_setVerbose (bool allow){
     logInConsole = allow;
 }
-bool mtic_getVerbose (void) {
+bool mtic_isVerbose (void) {
     return logInConsole;
 }
 

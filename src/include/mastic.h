@@ -247,7 +247,7 @@ PUBLIC void mtic_setNotifyMappedAgents(bool notify);
 
 //logs and debug messages
 PUBLIC void mtic_setVerbose(bool verbose); //log in console
-PUBLIC bool mtic_getVerbose(void);
+PUBLIC bool mtic_isVerbose(void);
 PUBLIC void mtic_setLogStream(bool stream); //log in socket
 PUBLIC void mtic_setLogInFile(bool useLogFile); //log in file
 PUBLIC void mtic_setUseColorVerbose (bool useColor); //use colors in console
@@ -261,7 +261,7 @@ typedef enum {
     MTIC_LOG_FATAL
 } mtic_logLevel_t;
 PUBLIC void mtic_setLogLevel (mtic_logLevel_t level); //default is MTIC_LOG_TRACE
-PUBLIC mtic_logLevel_t mtic_getLoglevel(void);
+PUBLIC mtic_logLevel_t mtic_getLogLevel(void);
 
 //void mtic_debug(const char*fmt, ...);
 PUBLIC void mtic_log(mtic_logLevel_t, const char *fmt, ...);
