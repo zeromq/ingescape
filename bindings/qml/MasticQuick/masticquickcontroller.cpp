@@ -382,6 +382,23 @@ void MasticQuickController_callbackObserveFreeze(bool isFrozen, void* customData
 
 
 /**
+ * @brief Callback used to observe mute/unmute
+ * @param isPause
+ * @param customData
+ */
+void MasticQuickController_callbackObserveMute(bool isMuted, void* customData)
+{
+    // Try to cast our custom data
+    MasticQuickController* controller = (MasticQuickController *)customData;
+    if (controller != NULL)
+    {
+        controller->setisMuted(isMuted);
+    }
+}
+
+
+
+/**
  * @brief Callback used to observe force stop
  * @param customData
  */
@@ -460,8 +477,10 @@ MasticQuickController::MasticQuickController(QObject *parent) : QObject(parent),
     // Set log level
     mtic_setLogLevel(MTIC_LOG_TRACE);
 
+    // Observe mute/unmute
+    mtic_observeMute(&MasticQuickController_callbackObserveMute, this);
 
-    // Observe freeze
+    // Observe freeze/unfreeze
     mtic_observeFreeze(&MasticQuickController_callbackObserveFreeze, this);
 
 

@@ -47,6 +47,9 @@ PUBLIC char *mtic_getAgentState(void); //char* must be freed by caller
 PUBLIC int mtic_mute(void);
 PUBLIC int mtic_unmute(void);
 PUBLIC bool mtic_isMuted(void);
+typedef void (*mtic_muteCallback)(bool isMuted, void *myData);
+PUBLIC int mtic_observeMute(mtic_muteCallback cb, void *myData);
+
 
 //freeze and unfreeze the agent
 //When freezed, agent will not send anything on its outputs and

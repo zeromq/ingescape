@@ -89,6 +89,14 @@ char agentName[MAX_AGENT_NAME_LENGTH] = AGENT_NAME_DEFAULT;
 char agentState[MAX_AGENT_NAME_LENGTH] = "";
 char commandLine[COMMAND_LINE_LENGTH] = "";
 
+
+typedef struct muteCallback {
+    mtic_muteCallback callback_ptr;
+    void *myData;
+    struct muteCallback *prev;
+    struct muteCallback *next;
+} muteCallback_t;
+
 typedef struct freezeCallback {
     mtic_freezeCallback callback_ptr;
     void *myData;
@@ -128,6 +136,7 @@ bool network_isEditor = false;
 //we manage agent data as a global variables inside the network module for now
 zyreloopElements_t *agentElements = NULL;
 subscriber_t *subscribers = NULL;
+muteCallback_t *muteCallbacks = NULL;
 freezeCallback_t *freezeCallbacks = NULL;
 zyreCallback_t *zyreCallbacks = NULL;
 zyreAgent_t *zyreAgents = NULL;
@@ -1457,7 +1466,7 @@ int mtic_freeze(){
     if(isFrozen == false)
     {
         mtic_debug("Agent Frozen\n");
-        if (agentElements != NULL && agentElements->node != NULL){
+        if ((agentElements != NULL) && (agentElements->node != NULL)){
             zyre_shouts(agentElements->node, CHANNEL, "FROZEN=1");
         }
         isFrozen = true;
@@ -1490,7 +1499,7 @@ int mtic_unfreeze(){
     if(isFrozen == true)
     {
         mtic_debug("Agent resumed\n");
-        if (agentElements != NULL && agentElements->node != NULL){
+        if ((agentElements != NULL) && (agentElements->node != NULL)){
             zyre_shouts(agentElements->node, CHANNEL, "FROZEN=0");
         }
         isFrozen = false;
@@ -1591,9 +1600,16 @@ void mtic_setCanBeFrozen (bool canBeFrozen){
  * \return 1 if ok else 0.
  */
 int mtic_mute(){
-    isWholeAgentMuted = true;
-    if (agentElements != NULL && agentElements->node != NULL){
-        zyre_shouts(agentElements->node, CHANNEL, "MUTED=%i", isWholeAgentMuted);
+    if (!isWholeAgentMuted)
+    {
+        isWholeAgentMuted = true;
+        if ((agentElements != NULL) && (agentElements->node != NULL)){
+            zyre_shouts(agentElements->node, CHANNEL, "MUTED=%i", isWholeAgentMuted);
+        }
+        muteCallback_t *elt;
+        DL_FOREACH(muteCallbacks,elt){
+            elt->callback_ptr(isWholeAgentMuted, elt->myData);
+        }
     }
     return 1;
 }
@@ -1605,9 +1621,16 @@ int mtic_mute(){
  * \return 1 if ok or 0.
  */
 int mtic_unmute(){
-    isWholeAgentMuted = false;
-    if (agentElements != NULL && agentElements->node != NULL){
-        zyre_shouts(agentElements->node, CHANNEL, "MUTED=%i", isWholeAgentMuted);
+    if (isWholeAgentMuted)
+    {
+        isWholeAgentMuted = false;
+        if ((agentElements != NULL) && (agentElements->node != NULL)){
+            zyre_shouts(agentElements->node, CHANNEL, "MUTED=%i", isWholeAgentMuted);
+        }
+        muteCallback_t *elt;
+        DL_FOREACH(muteCallbacks,elt){
+            elt->callback_ptr(isWholeAgentMuted, elt->myData);
+        }
     }
     return 1;
 }
@@ -1621,6 +1644,30 @@ int mtic_unmute(){
 bool mtic_isMuted(){
     return isWholeAgentMuted;
 }
+
+
+/**
+ * \fn int mtic_observeMute(mtic_muteCallback cb, void *myData)
+ * \ingroup muteAgentFct
+ * \brief Add a mtic_muteCallback on an agent.
+ * \param cb is a pointer to a mtic_muteCallback
+ * \param myData is pointer to user data is needed.
+ * \return 1 if ok, else 0.
+ */
+int mtic_observeMute(mtic_muteCallback cb, void *myData){
+    if (cb != NULL){
+        muteCallback_t *newCb = calloc(1, sizeof(muteCallback_t));
+        newCb->callback_ptr = cb;
+        newCb->myData = myData;
+        DL_APPEND(muteCallbacks, newCb);
+    }
+    else{
+        mtic_debug("mtic_observeMute: callback is null\n");
+        return 0;
+    }
+    return 1;
+}
+
 
 void mtic_die(){
     forcedStop = true;
