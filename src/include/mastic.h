@@ -247,10 +247,11 @@ PUBLIC void mtic_setNotifyMappedAgents(bool notify);
 
 //logs and debug messages
 PUBLIC void mtic_setVerbose(bool verbose); //log in console
+PUBLIC bool mtic_getVerbose(void);
 PUBLIC void mtic_setLogStream(bool stream); //log in socket
 PUBLIC void mtic_setLogInFile(bool useLogFile); //log in file
 PUBLIC void mtic_setUseColorVerbose (bool useColor); //use colors in console
-void mtic_setLogPath(const char *path); //for log file
+PUBLIC void mtic_setLogPath(const char *path); //for log file
 typedef enum {
     MTIC_LOG_TRACE = 0,
     MTIC_LOG_DEBUG,
@@ -259,10 +260,11 @@ typedef enum {
     MTIC_LOG_ERROR,
     MTIC_LOG_FATAL
 } mtic_logLevel_t;
-void mtic_setLogLevel (mtic_logLevel_t level); //default is MTIC_LOG_TRACE
+PUBLIC void mtic_setLogLevel (mtic_logLevel_t level); //default is MTIC_LOG_TRACE
+PUBLIC mtic_logLevel_t mtic_getLoglevel(void);
 
 //void mtic_debug(const char*fmt, ...);
-void mtic_log(mtic_logLevel_t, const char *fmt, ...);
+PUBLIC void mtic_log(mtic_logLevel_t, const char *fmt, ...);
 #define mtic_trace(...) mtic_log(MTIC_LOG_TRACE, __VA_ARGS__)
 #define mtic_debug(...) mtic_log(MTIC_LOG_DEBUG, __VA_ARGS__)
 #define mtic_info(...)  mtic_log(MTIC_LOG_INFO, __VA_ARGS__)
@@ -271,10 +273,10 @@ void mtic_log(mtic_logLevel_t, const char *fmt, ...);
 #define mtic_fatal(...) mtic_log(MTIC_LOG_FATAL, __VA_ARGS__)
 
 //resources file management
-void mtic_setDefinitionPath(const char *path);
-void mtic_setMappingPath(const char *path);
-void mtic_writeDefinitionToPath(void);
-void mtic_writeMappingToPath(void);
+PUBLIC void mtic_setDefinitionPath(const char *path);
+PUBLIC void mtic_setMappingPath(const char *path);
+PUBLIC void mtic_writeDefinitionToPath(void);
+PUBLIC void mtic_writeMappingToPath(void);
 
 
 #endif /* mastic_public_h */

@@ -208,12 +208,21 @@ void mtic_log(mtic_logLevel_t level, const char *fmt, ...){
 void mtic_setLogLevel (mtic_logLevel_t level){
     logLevel = level;
 }
+mtic_logLevel_t mtic_getLogLevel (void){
+    return logLevel;
+}
+
 void mtic_setLogInFile (bool allow){
     logInFile = allow;
 }
+
 void mtic_setVerbose (bool allow){
     logInConsole = allow;
 }
+bool mtic_getVerbose (void) {
+    return logInConsole;
+}
+
 void mtic_setUseColorVerbose (bool allow){
     useColorInConsole = allow;
 }
