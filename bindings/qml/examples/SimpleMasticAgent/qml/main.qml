@@ -11,6 +11,24 @@ import MasticQuick 1.0
 ApplicationWindow {
     id: root
 
+
+    //----------------------------------
+    //
+    // Settings
+    //
+    //----------------------------------
+
+    // Mastic settings
+    Settings {
+        category: "Mastic"
+
+        // Network device and port used by our Mastic agent
+        property alias networkDevice: root.masticNetworkDevice
+        property alias port: root.masticPort
+    }
+
+
+
     //----------------------------------
     //
     // Properties
@@ -123,33 +141,38 @@ ApplicationWindow {
         console.log("Type of input circleCx is: " + typeOfCircleCx + " == " + MasticIopType.enumToString(typeOfCircleCx));
 
 
-        // MasticQuick API: log something
-        Mastic.log(MasticLogLevel.LOG_TRACE, "Hello world\n");
-        Mastic.info("Our agent will be started\n");
+        // MasticQuick API: list of inputs
+        console.log("List of inputs: " + Mastic.inputsList);
+
+        // MasticQuick API: list of outputs
+        console.log("List of outputs:");
+        var outputsList = Mastic.outputsList;
+        for(var index = 0; index < outputsList.length; index++)
+        {
+            var outputName = outputsList[index];
+            console.log(
+                        " - Output "+ outputName
+                        + ", type = " + MasticIopType.enumToString( Mastic.getTypeForOutput(outputName) )
+                        + ", value = " + Mastic.outputs[outputName]
+                        );
+        }
+
+        // MasticQuick API: list of parameters
+         console.log("List of parameters: " + Mastic.parametersList);
+
 
         // MasticQuick API: get the list of network devices
         var networkDevices = Mastic.getNetdevicesList();
         console.log("Network devices: "+networkDevices);
 
+
+        // MasticQuick API: log something
+        Mastic.log(MasticLogLevel.LOG_TRACE, "Hello world\n");
+        Mastic.info("Our agent will be started\n");
+
+
         // MasticQuick API: start our Mastic agent
         Mastic.startWithDevice(root.masticNetworkDevice, root.masticPort);
-    }
-
-
-
-    //----------------------------------
-    //
-    // Settings
-    //
-    //----------------------------------
-
-    // Mastic settings
-    Settings {
-        category: "Mastic"
-
-        // Network device and port used by our Mastic agent
-        property alias networkDevice: root.masticNetworkDevice
-        property alias port: root.masticPort
     }
 
 
@@ -398,14 +421,14 @@ ApplicationWindow {
                 Rectangle {
                     anchors.centerIn: parent
 
-                    width: 40
+                    width: 50
                     height: width
                     radius: width/2
 
                     color: "tomato"
 
                     border {
-                        width: 2
+                        width: 3
                         color: "black"
                     }
                 }

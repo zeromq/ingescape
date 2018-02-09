@@ -11,6 +11,26 @@ import MasticQuick 1.0
 ApplicationWindow {
     id: root
 
+
+
+    //----------------------------------
+    //
+    // Settings
+    //
+    //----------------------------------
+
+    // Mastic settings
+    Settings {
+        category: "Mastic"
+
+        // Network device and port used by our Mastic agent
+        property alias networkDevice: root.masticNetworkDevice
+        property alias port: root.masticPort
+    }
+
+
+
+
     //----------------------------------
     //
     // Properties
@@ -110,21 +130,6 @@ ApplicationWindow {
     }
 
 
-
-    //----------------------------------
-    //
-    // Settings
-    //
-    //----------------------------------
-
-    // Mastic settings
-    Settings {
-        category: "Mastic"
-
-        // Network device and port used by our Mastic agent
-        property alias networkDevice: root.masticNetworkDevice
-        property alias port: root.masticPort
-    }
 
 
 
