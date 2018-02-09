@@ -129,7 +129,7 @@ static MasticIopType::Value enumIopType_tToMasticIopType(iopType_t value)
  * @param value
  * @return
  */
-static mtic_logLevel_t enumMasticLogLevelToEnumMticlogLevel_t(MasticLogLevel::Value value)
+static mtic_logLevel_t enumMasticLogLevelToEnumMticLogLevel_t(MasticLogLevel::Value value)
 {
     mtic_logLevel_t result = MTIC_LOG_TRACE;
 
@@ -157,6 +157,50 @@ static mtic_logLevel_t enumMasticLogLevelToEnumMticlogLevel_t(MasticLogLevel::Va
 
         case MasticLogLevel::LOG_FATAL:
             result = MTIC_LOG_FATAL;
+            break;
+
+        default:
+            break;
+    }
+
+    return result;
+}
+
+
+
+/**
+ * @brief Convert a mtic_logLevel_t value into a MasticLogLevel::Value
+ * @param value
+ * @return
+ */
+static MasticLogLevel::Value enumMticLogLevel_tToMasticLogLevel(mtic_logLevel_t value)
+{
+    MasticLogLevel::Value result = MasticLogLevel::LOG_TRACE;
+
+    switch(value)
+    {
+        case MTIC_LOG_TRACE:
+            result = MasticLogLevel::LOG_TRACE;
+            break;
+
+        case MTIC_LOG_DEBUG:
+            result = MasticLogLevel::LOG_DEBUG;
+            break;
+
+        case MTIC_LOG_INFO:
+            result = MasticLogLevel::LOG_INFO;
+            break;
+
+        case MTIC_LOG_WARN:
+            result = MasticLogLevel::LOG_WARN;
+            break;
+
+        case MTIC_LOG_ERROR:
+            result = MasticLogLevel::LOG_ERROR;
+            break;
+
+        case MTIC_LOG_FATAL:
+            result = MasticLogLevel::LOG_FATAL;
             break;
 
         default:
@@ -431,15 +475,10 @@ void MasticQuickController_callbackForcedStop(void *customData)
 MasticQuickController::MasticQuickController(QObject *parent) : QObject(parent),
     _canBeFrozen(false),
     _isStarted(false),
-    _verbose(false),
-    _logLevel(MasticLogLevel::LOG_TRACE),
     _inputs(NULL),
     _outputs(NULL),
     _parameters(NULL)
 {    
-    // Version of Mastic
-    _version = mtic_version();
-
     // Set our default agent name
     setagentName(QCoreApplication::applicationName());
 
@@ -452,6 +491,9 @@ MasticQuickController::MasticQuickController(QObject *parent) : QObject(parent),
     //
     // Get initial values of Mastic internal properties
     //
+
+    // - version of Mastic
+    _version = mtic_version();
 
     // - agent state
     char* cAgentState = mtic_getAgentState();
@@ -468,14 +510,16 @@ MasticQuickController::MasticQuickController(QObject *parent) : QObject(parent),
     // - isMuted flag
     _isMuted = mtic_isMuted();
 
+    // - isVerbose
+    _isVerbose = mtic_isVerbose();
 
-    // Verbose mode by default in debug mode
-#ifdef QT_DEBUG
-    setverbose(true);
-#endif
+    // - log level
+    _logLevel = enumMticLogLevel_tToMasticLogLevel( mtic_getLogLevel() );
 
-    // Set log level
-    mtic_setLogLevel(MTIC_LOG_TRACE);
+
+    //
+    // Add mastic observers
+    //
 
     // Observe mute/unmute
     mtic_observeMute(&MasticQuickController_callbackObserveMute, this);
@@ -489,19 +533,22 @@ MasticQuickController::MasticQuickController(QObject *parent) : QObject(parent),
     mtic_observeForcedStop(&MasticQuickController_callbackForcedStop, this);
 
 
-    // Init inputs
+
+    //
+    // Init dynamic properties
+    //
+
+    // - inputs
     _inputs = new MasticQuickInputsPropertyMap(this);
 
-
-    // Init outputs
+    // - outputs
     _outputs = new MasticQuickOutputsPropertyMap(this);
     if (_outputs != NULL)
     {
         connect(_outputs, &MasticQuickOutputsPropertyMap::valueChanged, this, &MasticQuickController::_onOutputUpdatedFromFromQML);
     }
 
-
-    // Init parameters
+    // - parameters
     _parameters = new MasticQuickParametersPropertyMap(this);
     if (_parameters != NULL)
     {
@@ -515,7 +562,7 @@ MasticQuickController::MasticQuickController(QObject *parent) : QObject(parent),
  */
 MasticQuickController::~MasticQuickController()
 {
-    // Unsubscribe to Masric signals
+    // Unsubscribe to Mastic signals
     disconnect(this, &MasticQuickController::forcedStop, this, &MasticQuickController::_onForcedStop);
 
     // Stop our agent
@@ -553,7 +600,16 @@ MasticQuickController::~MasticQuickController()
         setparameters(NULL);
         delete temp;
     }
+
+
+    //
+    // Clean-up our simple lists
+    //
+    _inputsList.clear();
+    _outputsList.clear();
+    _parametersList.clear();
 }
+
 
 
 /**
@@ -568,8 +624,8 @@ QObject* MasticQuickController::qmlSingleton(QQmlEngine* engine, QJSEngine* scri
     Q_UNUSED(scriptEngine);
 
     // NOTE: A QObject singleton type instance returned from a singleton type provider is
-    // owned by the QML engine. For this reason, the singleton type provider function should
-    // not be implemented as a singleton factory.
+    //       owned by the QML engine. For this reason, the singleton type provider function
+    //       should not be implemented as a singleton factory.
     return new MasticQuickController();
 }
 
@@ -603,6 +659,7 @@ void MasticQuickController::setagentName(QString value)
 }
 
 
+
 /**
  * @brief Set our agent state
  * @param value
@@ -621,6 +678,7 @@ void MasticQuickController::setagentState(QString value)
         Q_EMIT agentStateChanged(value);
     }
 }
+
 
 
 /**
@@ -663,6 +721,7 @@ void MasticQuickController::setdefinitionVersion(QString value)
 }
 
 
+
 /**
  * @brief Set the description of our definition
  * @param value
@@ -681,6 +740,7 @@ void MasticQuickController::setdefinitionDescription(QString value)
         Q_EMIT definitionDescriptionChanged(value);
     }
 }
+
 
 
 /**
@@ -793,24 +853,26 @@ void MasticQuickController::setcanBeFrozen(bool value)
 }
 
 
+
 /**
  * @brief Set our isVerbose flag
  * @param value
  */
-void MasticQuickController::setverbose(bool value)
+void MasticQuickController::setisVerbose(bool value)
 {
-    if (_verbose != value)
+    if (_isVerbose != value)
     {
         // Save value
-        _verbose = value;
+        _isVerbose = value;
 
         // Set our verbose flag
         mtic_setVerbose(value);
 
         // Notify change
-        Q_EMIT verboseChanged(value);
+        Q_EMIT isVerboseChanged(value);
     }
 }
+
 
 
 /**
@@ -825,7 +887,7 @@ void MasticQuickController::setlogLevel(MasticLogLevel::Value value)
         _logLevel = value;
 
         // Set out log level
-        mtic_setLogLevel( enumMasticLogLevelToEnumMticlogLevel_t(value) );
+        mtic_setLogLevel( enumMasticLogLevelToEnumMticLogLevel_t(value) );
 
         // Notify change
         Q_EMIT logLevelChanged(value);
@@ -1964,7 +2026,7 @@ QStringList MasticQuickController::getNetdevicesList()
  */
 void MasticQuickController::log(MasticLogLevel::Value logLevel, QString text)
 {
-    mtic_log( enumMasticLogLevelToEnumMticlogLevel_t(logLevel), text.toStdString().c_str());
+    mtic_log( enumMasticLogLevelToEnumMticLogLevel_t(logLevel), text.toStdString().c_str());
 }
 
 
@@ -2080,47 +2142,55 @@ bool MasticQuickController::_createInput(QString name, MasticIopType::Value type
         // Check if it is a valid IOP name
         if (_validIopName(name))
         {
-            // Check if our list of inputs is defined
-            if (_inputs != NULL)
+            // Check if we must create a Mastic input
+            const char* cName = name.toStdString().c_str();
+            if (!mtic_checkInputExistence(cName))
             {
-                // Update QML
-                // NB: special case for impulsion properties because we don't want to trigger them at startup
-                if (type == MasticIopType::IMPULSION)
+                if (mtic_createInput(cName, enumMasticIopTypeToEnumIopType_t(type), cValue, cSize) == 1)
                 {
-                    _inputs->blockSignals(true);
-                    _inputs->insert(name, qmlValue);
-                    _inputs->blockSignals(false);
-                }
-                else
-                {
-                    _inputs->insert(name, qmlValue);
-                }
-
-                // Check if we must create a Mastic input
-                const char* cName = name.toStdString().c_str();
-                if (!mtic_checkInputExistence(cName))
-                {
-                    if (mtic_createInput(cName, enumMasticIopTypeToEnumIopType_t(type), cValue, cSize) == 1)
+                    // Observe this new input
+                    if (mtic_observeInput(cName, &MasticQuickController_callbackObserveInput, this) != 1)
                     {
-                        result = true;
+                        qWarning() << Q_FUNC_INFO << "warning: fail to observe input" << name;
+                    }
 
-                        // Observe this new input
-                        if (mtic_observeInput(cName, &MasticQuickController_callbackObserveInput, this) != 1)
+
+                    // Add it to the list of QML dynamic properties
+                    if (_inputs != NULL)
+                    {
+                        // Update QML
+                        // NB: special case for impulsion properties because we don't want to trigger them at startup
+                        if (type == MasticIopType::IMPULSION)
                         {
-                            qWarning() << Q_FUNC_INFO << "warning: fail to observe input" << name;
+                            _inputs->blockSignals(true);
+                            _inputs->insert(name, qmlValue);
+                            _inputs->blockSignals(false);
+                        }
+                        else
+                        {
+                            _inputs->insert(name, qmlValue);
                         }
                     }
-                    else
-                    {
-                        qWarning() << Q_FUNC_INFO << "warning: fail to create input" << name;
-                    }
+                    // Else: should not happen. Otherwise, it means that our controller is destroyed
+
+
+                    // Update our list of inputs
+                    _inputsList.append(name);
+                    Q_EMIT inputsListChanged(_inputsList);
+
+
+                    // Everything is ok
+                    result = true;
                 }
                 else
                 {
-                    qWarning() << Q_FUNC_INFO << "warning: input" << name << "already exists";
+                    qWarning() << Q_FUNC_INFO << "warning: fail to create input" << name;
                 }
             }
-            // Else: should not happen
+            else
+            {
+                qWarning() << Q_FUNC_INFO << "warning: input" << name << "already exists";
+            }
         }
         else
         {
@@ -2158,31 +2228,48 @@ bool MasticQuickController::_createOutput(QString name, MasticIopType::Value typ
         // Check if it is a valid IOP name
         if (_validIopName(name))
         {
-            // Check if our list of outputs is defined
-            if (_outputs != NULL)
+            // Check if we must create a Mastic input
+            const char* cName = name.toStdString().c_str();
+            if (!mtic_checkOutputExistence(cName))
             {
-                // Update QML
-                _outputs->insert(name, qmlValue);
-
-                // Check if we must create a Mastic input
-                const char* cName = name.toStdString().c_str();
-                if (!mtic_checkOutputExistence(cName))
+                if (mtic_createOutput(cName, enumMasticIopTypeToEnumIopType_t(type), cValue, cSize) == 1)
                 {
-                    if (mtic_createOutput(cName, enumMasticIopTypeToEnumIopType_t(type), cValue, cSize) == 1)
+                    // Add it to the list of QML dynamic properties
+                    if (_outputs != NULL)
                     {
-                        result = true;
+                        // Update QML
+                        // NB: special case for impulsion properties because we don't want to trigger them at startup
+                        if (type == MasticIopType::IMPULSION)
+                        {
+                            _outputs->blockSignals(true);
+                            _outputs->insert(name, qmlValue);
+                            _outputs->blockSignals(false);
+                        }
+                        else
+                        {
+                            _outputs->insert(name, qmlValue);
+                        }
                     }
-                    else
-                    {
-                        qWarning() << Q_FUNC_INFO << "warning: fail to create output" << name;
-                    }
+                    // Else: should not happen. Otherwise, it means that our controller is destroyed
+
+
+                    // Update our list of outputs
+                    _outputsList.append(name);
+                    Q_EMIT outputsListChanged(_outputsList);
+
+
+                    // Everything is ok
+                    result = true;
                 }
                 else
                 {
-                    qWarning() << Q_FUNC_INFO << "warning: output" << name << "already exists";
+                    qWarning() << Q_FUNC_INFO << "warning: fail to create output" << name;
                 }
             }
-            // Else: should not happen
+            else
+            {
+                qWarning() << Q_FUNC_INFO << "warning: output" << name << "already exists";
+            }
         }
         else
         {
@@ -2220,37 +2307,54 @@ bool MasticQuickController::_createParameter(QString name, MasticIopType::Value 
         // Check if it is a valid IOP name
         if (_validIopName(name))
         {
-            // Check if our list of parameters is defined
-            if (_parameters != NULL)
+            // Check if we must create a Mastic input
+            const char* cName = name.toStdString().c_str();
+            if (!mtic_checkParameterExistence(cName))
             {
-                // Update QML
-                _parameters->insert(name, qmlValue);
-
-                // Check if we must create a Mastic input
-                const char* cName = name.toStdString().c_str();
-                if (!mtic_checkParameterExistence(cName))
+                if (mtic_createParameter(cName, enumMasticIopTypeToEnumIopType_t(type), cValue, cSize) == 1)
                 {
-                    if (mtic_createParameter(cName, enumMasticIopTypeToEnumIopType_t(type), cValue, cSize) == 1)
+                    // Observe this new parameter
+                    if (mtic_observeParameter(cName, &MasticQuickController_callbackObserveParameter, this) != 1)
                     {
-                        result = true;
+                        qWarning() << Q_FUNC_INFO << "warning: fail to observe parameter" << name;
+                    }
 
-                        // Observe this new parameter
-                         if (mtic_observeParameter(cName, &MasticQuickController_callbackObserveParameter, this) != 1)
+                     // Add it to the list of QML dynamic properties
+                    if (_parameters != NULL)
+                    {
+                        // Update QML
+                        // NB: special case for impulsion properties because we don't want to trigger them at startup
+                        if (type == MasticIopType::IMPULSION)
                         {
-                            qWarning() << Q_FUNC_INFO << "warning: fail to observe parameter" << name;
+                            _parameters->blockSignals(true);
+                            _parameters->insert(name, qmlValue);
+                            _parameters->blockSignals(false);
+                        }
+                        else
+                        {
+                            _parameters->insert(name, qmlValue);
                         }
                     }
-                    else
-                    {
-                        qWarning() << Q_FUNC_INFO << "warning: fail to create parameter" << name;
-                    }
+                    // Else: should not happen. Otherwise, it means that our controller is destroyed
+
+
+                    // Update our list of parameters
+                    _parametersList.append(name);
+                    Q_EMIT parametersListChanged(_parametersList);
+
+
+                    // Everything is ok
+                    result = true;
                 }
                 else
                 {
-                    qWarning() << Q_FUNC_INFO << "warning: parameter" << name << "already exists";
+                    qWarning() << Q_FUNC_INFO << "warning: fail to create parameter" << name;
                 }
             }
-            // Else: should not happen
+            else
+            {
+                qWarning() << Q_FUNC_INFO << "warning: parameter" << name << "already exists";
+            }
         }
         else
         {
@@ -2444,6 +2548,84 @@ bool MasticQuickController::_updateQmlParameter(QString name)
     }
 
     return result;
+}
+
+
+
+/**
+ * @brief Update our list of inputs
+ */
+void MasticQuickController::_updateInputsList()
+{
+    QStringList newInputsList;
+
+    // Get our inputs
+    long numberOfInputs;
+    char **inputs = mtic_getInputsList(&numberOfInputs);
+    if (inputs != NULL)
+    {
+        for (long index = 0; index < numberOfInputs; index++)
+        {
+            newInputsList.append( inputs[index] );
+            free( inputs[index] );
+        }
+        free(inputs);
+    }
+
+    // Update our list of inputs
+    setinputsList(newInputsList);
+}
+
+
+
+/**
+ * @brief Update our list of outputs
+ */
+void MasticQuickController::_updateOutputsList()
+{
+    QStringList newOutputsList;
+
+    // Get our outputs
+    long numberOfOutputs;
+    char **outputs = mtic_getOutputsList(&numberOfOutputs);
+    if (outputs != NULL)
+    {
+        for (long index = 0; index < numberOfOutputs; index++)
+        {
+            newOutputsList.append( outputs[index] );
+            free( outputs[index] );
+        }
+        free(outputs);
+    }
+
+    // Update our list of outputs
+    setoutputsList(newOutputsList);
+}
+
+
+
+/**
+ * @brief Update our list of parameters
+ */
+void MasticQuickController::_updateParametersList()
+{
+    QStringList newParametersList;
+
+    // Get our parameters
+    long numberOfParameters;
+    char **parameters = mtic_getParametersList(&numberOfParameters);
+    if (parameters != NULL)
+    {
+        for (long index = 0; index < numberOfParameters; index++)
+        {
+            newParametersList.append( parameters[index] );
+            free( parameters[index] );
+        }
+        free(parameters);
+    }
+
+    // Update our list of parameters
+    setparametersList(newParametersList);
 }
 
 

@@ -84,6 +84,13 @@ ApplicationWindow {
     //----------------------------------
 
     Component.onCompleted: {
+        // MasticQuick API: mastic version
+        console.log("Mastic version is " + Mastic.version);
+
+        // MasticQuick API: verbose mode
+        Mastic.isVerbose = true;
+
+
         // MasticQuick API: set definition
         Mastic.definitionName = Qt.application.name;
         Mastic.definitionVersion = Qt.application.version;
@@ -285,6 +292,16 @@ ApplicationWindow {
                         onClicked: {
                             // MastickQuick API: mute/unmute our agent
                             Mastic.isMuted = !Mastic.isMuted;
+                        }
+                    }
+
+                    Button {
+                        // MasticQuick API: check if our agent is verbose
+                        text: Mastic.isVerbose ? qsTr("Disable verbose mode") : qsTr("Enable verbose mode")
+
+                        onClicked: {
+                            // MastickQuick API: switch verbose mode
+                            Mastic.isVerbose = !Mastic.isVerbose;
                         }
                     }
 

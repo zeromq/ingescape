@@ -99,10 +99,19 @@ class MasticQuickController : public QObject
     MASTIC_QML_PROPERTY_READONLY(bool, isStarted)
 
     // Flag indicating if Mastic is verbose or not
-    MASTIC_QML_PROPERTY_CUSTOM_SETTER(bool, verbose)
+    MASTIC_QML_PROPERTY_CUSTOM_SETTER(bool, isVerbose)
 
     // Log level
     MASTIC_QML_PROPERTY_CUSTOM_SETTER(MasticLogLevel::Value, logLevel)
+
+    // List of input names
+    MASTIC_QML_PROPERTY_READONLY(QStringList, inputsList)
+
+    // List of output names
+    MASTIC_QML_PROPERTY_READONLY(QStringList, outputsList)
+
+    // List of parameter names
+    MASTIC_QML_PROPERTY_READONLY(QStringList, parametersList)
 
     // Inputs
     MASTIC_QML_PROPERTY_READONLY(MasticQuickInputsPropertyMap*, inputs)
@@ -112,6 +121,8 @@ class MasticQuickController : public QObject
 
     // Parameters
     MASTIC_QML_PROPERTY_READONLY(MasticQuickParametersPropertyMap*, parameters)
+
+
 
 
 public:
@@ -865,6 +876,27 @@ protected:
       * @return true if everything is ok, false otherwise
       */
      bool _updateQmlParameter(QString name);
+
+
+
+     /**
+      * @brief Update our list of inputs
+      */
+     void _updateInputsList();
+
+
+
+     /**
+      * @brief Update our list of outputs
+      */
+     void _updateOutputsList();
+
+
+
+     /**
+      * @brief Update our list of parameters
+      */
+     void _updateParametersList();
 
 
 

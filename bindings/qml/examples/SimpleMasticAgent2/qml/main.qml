@@ -84,6 +84,12 @@ ApplicationWindow {
     //----------------------------------
 
     Component.onCompleted: {
+        // MasticQuick API: mastic version
+        console.log("Mastic version is " + Mastic.version);
+
+        // MasticQuick API: verbose mode
+        Mastic.isVerbose = true;
+
         // MasticQuick API: set definition
         Mastic.definitionName = Qt.application.name;
         Mastic.definitionVersion = Qt.application.version;
@@ -312,7 +318,7 @@ ApplicationWindow {
 
                         running: false
 
-                        NumberAnimation { target: myCircleUI; property: "scale"; to: 2; }
+                        NumberAnimation { target: myCircleUI; property: "scale"; to: 3; }
                         NumberAnimation { target: myCircleUI; property: "scale"; to: 1; }
                      }
                 }
