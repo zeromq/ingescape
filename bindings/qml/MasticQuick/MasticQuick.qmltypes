@@ -7,7 +7,7 @@ import QtQuick.tooling 1.2
 // 'qmlplugindump -nonrelocatable MasticQuick 1.0 .'
 
 Module {
-    dependencies: ["QtQuick 2.8"]
+    dependencies: ["QtQuick 2.0"]
     Component {
         name: "AbstractMasticQuickEnumClass"
         prototype: "QObject"
@@ -86,8 +86,11 @@ Module {
         Property { name: "isFrozen"; type: "bool" }
         Property { name: "canBeFrozen"; type: "bool" }
         Property { name: "isStarted"; type: "bool"; isReadonly: true }
-        Property { name: "verbose"; type: "bool" }
+        Property { name: "isVerbose"; type: "bool" }
         Property { name: "logLevel"; type: "MasticLogLevel::Value" }
+        Property { name: "inputsList"; type: "QStringList"; isReadonly: true }
+        Property { name: "outputsList"; type: "QStringList"; isReadonly: true }
+        Property { name: "parametersList"; type: "QStringList"; isReadonly: true }
         Property {
             name: "inputs"
             type: "MasticQuickInputsPropertyMap"
@@ -147,12 +150,24 @@ Module {
             Parameter { name: "value"; type: "bool" }
         }
         Signal {
-            name: "verboseChanged"
+            name: "isVerboseChanged"
             Parameter { name: "value"; type: "bool" }
         }
         Signal {
             name: "logLevelChanged"
             Parameter { name: "value"; type: "MasticLogLevel::Value" }
+        }
+        Signal {
+            name: "inputsListChanged"
+            Parameter { name: "value"; type: "QStringList" }
+        }
+        Signal {
+            name: "outputsListChanged"
+            Parameter { name: "value"; type: "QStringList" }
+        }
+        Signal {
+            name: "parametersListChanged"
+            Parameter { name: "value"; type: "QStringList" }
         }
         Signal {
             name: "inputsChanged"
@@ -495,6 +510,11 @@ Module {
             name: "removeParameter"
             type: "bool"
             Parameter { name: "name"; type: "string" }
+        }
+        Method {
+            name: "getNetdevicesList"
+            type: "QStringList"
+            Parameter { name: "qmlUpdateExtraParameter"; type: "QVariant" }
         }
         Method { name: "getNetdevicesList"; type: "QStringList" }
         Method {
