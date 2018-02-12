@@ -681,4 +681,20 @@ int mtic_removeMappingEntryWithName(const char *fromOurInput, const char *toAgen
     }
 }
 
+void mtic_setMappingPath(const char *path){
+    strncpy(mappingPath, path, 1023);
+}
 
+void mtic_writeMappingToPath(void){
+    FILE *fp = NULL;
+    fp = fopen (mappingPath,"w+");
+    if (fp == NULL){
+        mtic_error("error when trying to open %s for writing\n", mappingPath);
+    }else{
+        char *map = parser_export_mapping(mtic_internal_mapping);
+        fprintf(fp, "%s", map);
+        fflush(fp);
+        fclose(fp);
+        free(map);
+    }
+}

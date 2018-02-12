@@ -822,38 +822,18 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 else if ((strncmp (message, "SET_DEFINITION_PATH ", strlen("SET_DEFINITION_PATH ")) == 0)
                          && (strlen(message) > strlen("SET_DEFINITION_PATH ")+1)){
                     char *subStr = message + strlen("SET_DEFINITION_PATH") + 1;
-                    strncpy(definitionPath, subStr, 1023);
+                    mtic_setDefinitionPath(subStr);
                 }
                 else if ((strncmp (message, "SET_MAPPING_PATH ", strlen("SET_MAPPING_PATH ")) == 0)
                          && (strlen(message) > strlen("SET_MAPPING_PATH ")+1)){
                     char *subStr = message + strlen("SET_MAPPING_PATH") + 1;
-                    strncpy(mappingPath, subStr, 1023);
+                    mtic_setMappingPath(subStr);
                 }
                 else if (strlen("SAVE_DEFINITION_TO_PATH") == strlen(message) && strncmp (message, "SAVE_DEFINITION_TO_PATH", strlen("SAVE_DEFINITION_TO_PATH")) == 0){
-                    FILE *fp = NULL;
-                    fp = fopen (definitionPath,"w+");
-                    if (fp == NULL){
-                        mtic_error("error when trying to open %s for writing\n", definitionPath);
-                    }else{
-                        char *def = parser_export_definition(mtic_internal_definition);
-                        fprintf(fp, "%s", def);
-                        fflush(fp);
-                        fclose(fp);
-                        free(def);
-                    }
+                    mtic_writeDefinitionToPath();
                 }
                 else if (strlen("SAVE_MAPPING_TO_PATH") == strlen(message) && strncmp (message, "SAVE_MAPPING_TO_PATH", strlen("SAVE_MAPPING_TO_PATH")) == 0){
-                    FILE *fp = NULL;
-                    fp = fopen (mappingPath,"w+");
-                    if (fp == NULL){
-                        mtic_error("error when trying to open %s for writing\n", mappingPath);
-                    }else{
-                        char *map = parser_export_mapping(mtic_internal_mapping);
-                        fprintf(fp, "%s", map);
-                        fflush(fp);
-                        fclose(fp);
-                        free(map);
-                    }
+                    mtic_writeMappingToPath();
                 }
             }
             free(message);

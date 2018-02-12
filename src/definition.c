@@ -709,3 +709,21 @@ int mtic_removeParameter(const char *name){
 
     return 1;
 }
+
+void mtic_setDefinitionPath(const char *path){
+    strncpy(definitionPath, path, 1023);
+}
+
+void mtic_writeDefinitionToPath(void){
+    FILE *fp = NULL;
+    fp = fopen (definitionPath,"w+");
+    if (fp == NULL){
+        mtic_error("error when trying to open %s for writing\n", definitionPath);
+    }else{
+        char *def = parser_export_definition(mtic_internal_definition);
+        fprintf(fp, "%s", def);
+        fflush(fp);
+        fclose(fp);
+        free(def);
+    }
+}
