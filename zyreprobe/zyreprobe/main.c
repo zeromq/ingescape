@@ -44,7 +44,14 @@ char *paramText = NULL;
 typedef struct agent {
     char *uuid;
     char *name;
+    char *endpoint;
     int reconnected;
+    char *publisherPort;
+    char *logPort;
+    zsock_t *subscriber;
+    zmq_pollitem_t *subscriberPoller;
+    zsock_t *logger;
+    zmq_pollitem_t *loggerPoller;
     UT_hash_handle hh;
 } agent;
 
@@ -58,6 +65,47 @@ typedef struct zyreloopElements{
     agent *agents;
     bool useGossip;
 } zyreloopElements_t;
+
+//manage incoming messages from one of the publisher agent we subscribed to
+int manageSubscription (zloop_t *loop, zmq_pollitem_t *item, void *arg){
+    agent *a = (agent *)arg;
+    if (item->revents & ZMQ_POLLIN ){
+        zmsg_t *msg = zmsg_recv(a->subscriber);
+        size_t s = zmsg_size(msg);
+        printf("%s published : ", a->name);
+        for (int i = 0; i < s; i++){
+            char *part = zmsg_popstr(msg);
+            if (part == NULL){
+                part = strdup("NULL");
+            }
+            printf(" %s", part);
+            free(part);
+        }
+        printf("\n");
+        zmsg_destroy(&msg);
+    }
+    return 0;
+}
+
+//manage incoming messages from one of the logger agent we subscribed to
+int manageLog (zloop_t *loop, zmq_pollitem_t *item, void *arg){
+    agent *a = (agent *)arg;
+    if (item->revents & ZMQ_POLLIN ){
+        zmsg_t *msg = zmsg_recv(a->logger);
+        size_t s = zmsg_size(msg);
+        printf("%s logged : ", a->name);
+        for (int i = 0; i < s; i++){
+            char *part = zmsg_popstr(msg);
+            if (part == NULL){
+                part = strdup("NULL");
+            }
+            printf(" %s", part);
+            free(part);
+        }
+        zmsg_destroy(&msg);
+    }
+    return 0;
+}
 
 //manage commands entered on the command line from the parent
 int manageParent (zloop_t *loop, zmq_pollitem_t *item, void *args){
@@ -175,6 +223,92 @@ int manageParent (zloop_t *loop, zmq_pollitem_t *item, void *args){
             else if(streq (command, "VERBOSE")){
                 zyre_set_verbose(node);
             }
+            else if (streq (command, "SUBSCRIBE")) {
+                char *peer = zmsg_popstr (msg);
+                agent *a = NULL;
+                for(a = zEl->agents; a != NULL; a = a->hh.next) {
+                    if (strcmp(a->name, peer) == 0 || strcmp(a->uuid, peer) == 0){
+                        if (a->publisherPort == NULL){
+                            printf("Found peer %s but its publisher port is NULL : command has been ignored\n", peer);
+                            continue;
+                        }
+                        //NB: no break here beacause we allow subscribing to several agents
+                        //having the same name
+                        char endpointAddress[128];
+                        strncpy(endpointAddress, a->endpoint, 128);
+                        
+                        // IP adress extraction
+                        char *insert = endpointAddress + strlen(endpointAddress);
+                        bool extractOK = true;
+                        while (*insert != ':'){
+                            insert--;
+                            if (insert == endpointAddress){
+                                printf("Error: could not extract port from address %s", a->endpoint);
+                                extractOK = false;
+                                break;
+                            }
+                        }
+                        if (extractOK){
+                            *(insert + 1) = '\0';
+                            strcat(endpointAddress, a->publisherPort);
+                            a->subscriber = zsock_new_sub(endpointAddress, NULL);
+                            zsock_set_subscribe(a->subscriber, "");
+                            zmq_pollitem_t *poller = a->subscriberPoller = calloc(1, sizeof(zmq_pollitem_t));;
+                            poller->socket = zsock_resolve(a->subscriber);
+                            poller->fd = 0;
+                            poller->events = ZMQ_POLLIN;
+                            poller->revents = 0;
+                            zloop_poller (loop, poller, manageSubscription, (void*)a);
+                            zloop_poller_set_tolerant(loop, poller);
+                            printf("Subscriber created for %s\n", a->name);
+                        }
+                    }
+                }
+                free(peer);
+            }
+            else if (streq (command, "LOG")) {
+                char *peer = zmsg_popstr (msg);
+                agent *a = NULL;
+                for(a = zEl->agents; a != NULL; a = a->hh.next) {
+                    if (strcmp(a->name, peer) == 0 || strcmp(a->uuid, peer) == 0){
+                        if (a->logPort == NULL){
+                            printf("Found peer %s but its log port is NULL : command has been ignored\n", peer);
+                            continue;
+                        }
+                        //NB: no break here beacause we allow subscribing to several agents
+                        //having the same name
+                        char endpointAddress[128];
+                        strncpy(endpointAddress, a->endpoint, 128);
+                        
+                        // IP adress extraction
+                        char *insert = endpointAddress + strlen(endpointAddress);
+                        bool extractOK = true;
+                        while (*insert != ':'){
+                            insert--;
+                            if (insert == endpointAddress){
+                                printf("Error: could not extract port from address %s", a->endpoint);
+                                extractOK = false;
+                                break;
+                            }
+                        }
+                        if (extractOK){
+                            *(insert + 1) = '\0';
+                            strcat(endpointAddress, a->logPort);
+                            a->logger = zsock_new_sub(endpointAddress, NULL);
+                            zsock_set_subscribe(a->logger, "");
+                            zmq_pollitem_t *poller = a->loggerPoller = calloc(1, sizeof(zmq_pollitem_t));;
+                            poller->socket = zsock_resolve(a->logger);
+                            poller->fd = 0;
+                            poller->events = ZMQ_POLLIN;
+                            poller->revents = 0;
+                            zloop_poller (loop, poller, manageLog, (void*)a);
+                            zloop_poller_set_tolerant(loop, poller);
+                            printf("Log watcher created for %s\n", a->name);
+                        }
+                    }
+                }
+                free(peer);
+            }
             else {
                 printf("Error: invalid command to actor\n%s\n", command);
                 assert (false);
@@ -204,11 +338,11 @@ int manageIncoming (zloop_t *loop, zmq_pollitem_t *item, void *args){
         
         if (streq (event, "ENTER")){
             if (!zEl->useGossip){
-                printf ("B->%s has entered the network with peer id %s and address %s\n", name, peer, address);
+                printf ("B->%s has entered the network with peer id %s and endpoint %s\n", name, peer, address);
             }else{
-                printf ("G->%s has entered the network with peer id %s and address %s\n", name, peer, address);
+                printf ("G->%s has entered the network with peer id %s and endpoint %s\n", name, peer, address);
             }
-            //printf ("->%s has entered the network with peer id %s and address %s\n", name, peer, address);
+            //printf ("->%s has entered the network with peer id %s and endpoint %s\n", name, peer, address);
             agent *a = NULL;
             HASH_FIND_STR(zEl->agents, peer, a);
             if (a == NULL){
@@ -216,6 +350,7 @@ int manageIncoming (zloop_t *loop, zmq_pollitem_t *item, void *args){
                 a->reconnected = 0;
                 a->uuid = strndup(peer, NAME_BUFFER_SIZE);
                 a->name = strndup(name, NAME_BUFFER_SIZE);
+                a->endpoint = strndup(address, NAME_BUFFER_SIZE);
                 HASH_ADD_STR(zEl->agents, uuid, a);
             }else{
                 //Agent already exists, we set its reconnected flag
@@ -235,6 +370,23 @@ int manageIncoming (zloop_t *loop, zmq_pollitem_t *item, void *args){
             }
             while ((k = (char *)zlist_pop(keys))) {
                 v = zyre_event_header (zyre_event,k);
+                if(strncmp(k,"publisher", strlen("publisher")) == 0){
+                    //this is a mastic agent, we store its publishing port
+                    if (a != NULL){
+                        if (a->publisherPort != NULL) {
+                            free(a->publisherPort);
+                        }
+                        a->publisherPort = strndup(v,6); //port is 5 digits max
+                    }
+                }else if(strncmp(k,"logger", strlen("logger")) == 0){
+                    //this is a mastic agent, we store its publishing port
+                    if (a != NULL){
+                        if (a->logPort != NULL) {
+                            free(a->logPort);
+                        }
+                        a->logPort = strndup(v,6); //port is 5 digits max
+                    }
+                }
                 printf("\t%s -> %s\n", k, v);
                 free(k);
             }
@@ -273,6 +425,27 @@ int manageIncoming (zloop_t *loop, zmq_pollitem_t *item, void *args){
                     HASH_DEL(zEl->agents, a);
                     free(a->name);
                     free(a->uuid);
+                    free(a->endpoint);
+                    if (a->publisherPort != NULL){
+                        free(a->publisherPort);
+                    }
+                    if (a->subscriber != NULL){
+                        zloop_poller_end(loop, a->subscriberPoller);
+                        zsock_destroy(&(a->subscriber));
+                    }
+                    if (a->subscriberPoller != NULL){
+                        free(a->subscriberPoller);
+                    }
+                    if (a->logPort != NULL){
+                        free(a->logPort);
+                    }
+                    if (a->logger != NULL){
+                        zloop_poller_end(loop, a->loggerPoller);
+                        zsock_destroy(&(a->logger));
+                    }
+                    if (a->loggerPoller != NULL){
+                        free(a->loggerPoller);
+                    }
                     free(a);
                 }
             }
@@ -394,6 +567,25 @@ zyre_actor (zsock_t *pipe, void *args)
         HASH_DEL(zEl->agents,current);
         free(current->name);
         free(current->uuid);
+        free(current->endpoint);
+        if (current->publisherPort != NULL){
+            free(current->publisherPort);
+        }
+        if (current->subscriber != NULL){
+            zsock_destroy(&(current->subscriber));
+        }
+        if (current->subscriberPoller != NULL){
+            free(current->subscriberPoller);
+        }
+        if (current->logPort != NULL){
+            free(current->logPort);
+        }
+        if (current->logger != NULL){
+            zsock_destroy(&(current->logger));
+        }
+        if (current->loggerPoller != NULL){
+            free(current->loggerPoller);
+        }
         free(current);
     }
     zyre_stop (node);
@@ -440,9 +632,11 @@ void print_commands(){
     printf("/joinall : join all existing groups at the time\n");
     printf("/leave group_name : leave a specific group\n");
     printf("/leaveall : leave all existing groups at the time\n");
-    printf("/whisper peer_name message : sends a message to a specific peer\n\t(peer can be designated by name or uuid)\n");
+    printf("/whisper peer message : sends a message to a specific peer\n\t(peer can be name or uuid)\n");
     printf("/shout channel_name message : sends a message to a specific group\n");
     printf("/whisperall message : sends a message to all peers individually\n");
+    printf("/subscribe peer : subscribes to mastic agent outputs\n\t(peer can be  name or uuid)\n");
+    printf("/log peer : subscribes to mastic agent log stream\n\t(peer can be name or uuid)\n");
     printf("\n");
 }
 
@@ -656,6 +850,20 @@ int main (int argc, char *argv [])
                         }
                         if (gossipActor != NULL){
                             zstr_sendx (gossipActor, "WHISPERALL", parameter, NULL);
+                        }
+                    }else if (strcmp(command, "subscribe") == 0){
+                        if (beaconActor != NULL){
+                            zstr_sendx (beaconActor, "SUBSCRIBE", parameter, NULL);
+                        }
+                        if (gossipActor != NULL){
+                            zstr_sendx (gossipActor, "SUBSCRIBE", parameter, NULL);
+                        }
+                    }else if (strcmp(command, "log") == 0){
+                        if (beaconActor != NULL){
+                            zstr_sendx (beaconActor, "LOG", parameter, NULL);
+                        }
+                        if (gossipActor != NULL){
+                            zstr_sendx (gossipActor, "LOG", parameter, NULL);
                         }
                     }
                     clean_matches(&my_matches);
