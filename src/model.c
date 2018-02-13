@@ -18,7 +18,7 @@
 
 void model_setIopValue(agent_iop *iop, void* value, long size){
     if (iop == NULL){
-        mtic_debug("model_setIopValue called with NULL iop\n");
+        mtic_error("model_setIopValue called with NULL iop\n");
         return;
     }
     
@@ -70,6 +70,7 @@ void model_setIopValue(agent_iop *iop, void* value, long size){
         }
             break;
         default:
+            mtic_error("%s has an invalid value type %d (check your mtic_create* calls)\n", iop->name, iop->value_type);
             break;
     }
 }

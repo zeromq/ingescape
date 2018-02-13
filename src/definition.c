@@ -161,7 +161,19 @@ agent_iop* definition_createIop(const char *name, iop_t type, iopType_t value_ty
     //Create the iop
     agent_iop *iop = NULL;
     iop = calloc (1, sizeof (struct agent_iop));
-    iop->name = strdup(name);
+    char *n = strndup(name, MAX_IOP_NAME_LENGTH);
+    bool spaceInName = false;
+    size_t lengthOfN = strlen(n);
+    for (size_t i = 0; i < lengthOfN; i++){
+        if (n[i] == ' '){
+            n[i] = '_';
+            spaceInName = true;
+        }
+    }
+    if (spaceInName){
+        mtic_warn("Spaces are not allowed in IOP: %s has been renamed to %s\n", name, n);
+    }
+    iop->name = n;
     iop->type = type;
     iop->value_type = value_type;
 
@@ -377,14 +389,14 @@ char *mtic_getDefinitionVersion(void){
         return NULL;
     }
 }
-int mtic_setDefinitionName(char *name){
-    if(name == NULL){
-        mtic_debug("mtic_setDefinitionDescription : Agent name cannot be NULL \n");
+int mtic_setDefinitionName(const char *name){
+    if (name == NULL){
+        mtic_debug("mtic_setDefinitionDescription : Defintion name cannot be NULL \n");
         return 0;
     }
     
     if (strlen(name) == 0){
-        mtic_debug("mtic_setDefinitionDescription : Agent name cannot be empty\n");
+        mtic_debug("mtic_setDefinitionDescription : Definition name cannot be empty\n");
         return -1;
     }
     
@@ -412,7 +424,7 @@ int mtic_setDefinitionName(char *name){
  * \param description The string which contains the description of the agent. Can't be NULL.
  * \return The error. 1 is OK, 0 Agent description is NULL, -1 Agent description is empty
  */
-int mtic_setDefinitionDescription(char *description){
+int mtic_setDefinitionDescription(const char *description){
 
     if(description == NULL){
         mtic_debug("mtic_setDefinitionDescription : Agent description cannot be NULL \n");
@@ -447,7 +459,7 @@ int mtic_setDefinitionDescription(char *description){
  * \param version The string which contains the version of the agent. Can't be NULL.
  * \return The error. 1 is OK, 0 Agent version is NULL, -1 Agent version is empty
  */
-int mtic_setDefinitionVersion(char *version){
+int mtic_setDefinitionVersion(const char *version){
 
     if(version == NULL){
         mtic_debug("mtic_setDefinitionVersion : Agent version cannot be NULL \n");
@@ -491,6 +503,11 @@ int mtic_setDefinitionVersion(char *version){
  */
 
 int mtic_createInput(const char *name, iopType_t value_type, void *value, long size){
+    if (name == NULL){
+        mtic_error("%s called with NULL name parameter\n", __func__);
+        return -1;
+    }
+    
     if(mtic_internal_definition == NULL){
         mtic_internal_definition = calloc(1, sizeof(struct definition));
     }
@@ -521,6 +538,11 @@ int mtic_createInput(const char *name, iopType_t value_type, void *value, long s
  */
 
 int mtic_createOutput(const char *name, iopType_t value_type, void *value, long size){
+    if (name == NULL){
+        mtic_error("%s called with NULL name parameter\n", __func__);
+        return -1;
+    }
+    
     if(mtic_internal_definition == NULL){
         mtic_internal_definition = calloc(1, sizeof(struct definition));
     }
@@ -550,6 +572,11 @@ int mtic_createOutput(const char *name, iopType_t value_type, void *value, long 
  * \return The error. 1 is OK, 0 not able to add in definition loaded, -1 not able to add in definition live
  */
 int mtic_createParameter(const char *name, iopType_t value_type, void *value, long size){
+    if (name == NULL){
+        mtic_error("%s called with NULL name parameter\n", __func__);
+        return -1;
+    }
+    
     if(mtic_internal_definition == NULL){
         mtic_internal_definition = calloc(1, sizeof(struct definition));
     }
@@ -577,6 +604,11 @@ int mtic_createParameter(const char *name, iopType_t value_type, void *value, lo
  * \return The error. 1 is OK, 0 Definition loaded is NULL, -1 Definition live is NULL, -2 An error occurs while finding the iop by name
  */
 int mtic_removeInput(const char *name){
+    if (name == NULL){
+        mtic_error("%s called with NULL name parameter\n", __func__);
+        return -1;
+    }
+    
 
     //check if def live iexist
     if(mtic_internal_definition == NULL){
@@ -611,6 +643,11 @@ int mtic_removeInput(const char *name){
  * \return The error. 1 is OK, 0 Definition loaded is NULL, -1 Definition live is NULL, -2 An error occurs while finding the iop by name
  */
 int mtic_removeOutput(const char *name){
+    if (name == NULL){
+        mtic_error("%s called with NULL name parameter\n", __func__);
+        return -1;
+    }
+    
     //check if def exists
     if(mtic_internal_definition == NULL){
         mtic_debug("Internal definition has not been defined.");
@@ -644,6 +681,10 @@ int mtic_removeOutput(const char *name){
  * \return The error. 1 is OK, 0 Definition loaded is NULL, -1 Definition live is NULL, -2 An error occurs while finding the iop by name
  */
 int mtic_removeParameter(const char *name){
+    if (name == NULL){
+        mtic_error("%s called with NULL name parameter\n", __func__);
+        return -1;
+    }
 
     //check if def exists
     if(mtic_internal_definition == NULL){
@@ -667,4 +708,22 @@ int mtic_removeParameter(const char *name){
     network_needToSendDefinitionUpdate = true;
 
     return 1;
+}
+
+void mtic_setDefinitionPath(const char *path){
+    strncpy(definitionPath, path, 1023);
+}
+
+void mtic_writeDefinitionToPath(void){
+    FILE *fp = NULL;
+    fp = fopen (definitionPath,"w+");
+    if (fp == NULL){
+        mtic_error("error when trying to open %s for writing\n", definitionPath);
+    }else{
+        char *def = parser_export_definition(mtic_internal_definition);
+        fprintf(fp, "%s", def);
+        fflush(fp);
+        fclose(fp);
+        free(def);
+    }
 }

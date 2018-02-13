@@ -37,16 +37,17 @@ Item {
     // Duration of an animation step in milliseconds
     property int animationStepDurationInMilliseconds: 150
 
-    // Size of of block
+    // Size of of block in pixels
     property int blockSize: 15
 
-    // Radius of a block
+    // Radius of a block in pixels
     property int blockRadius: 2
 
-    // Spacing between blocks
+    // Spacing between blocks in pixels
     property int blockSpacing: 1
 
-    // colors of blocks column by colum (top-down, left-right)  #00932B
+    // colors of blocks column by colum (top-down, left-right)
+    // NB: the array must have verticalBlockCount * horizontalBlockCount values
     readonly property var colorsOfBlocks: [
 "#009543", "#009543", "#009543", "#DC241F", "#DC241F", "#DC241F", "#DC241F", "#DC241F", "#DC241F", "#DC241F", "#DC241F", "#FFFFFF", "#FFFFFF", "#DC241F", "#DC241F", "#DC241F", "#DC241F", "#DC241F", "#DC241F", "#DC241F", "#DC241F", "#009543", "#009543", "#009543",
 "#009543", "#009543", "#009543", "#009543", "#009543", "#DC241F", "#DC241F", "#DC241F", "#DC241F", "#DC241F", "#DC241F", "#FFFFFF", "#FFFFFF", "#DC241F", "#DC241F", "#DC241F", "#DC241F", "#DC241F", "#DC241F", "#009543", "#009543", "#009543", "#009543", "#009543",
@@ -128,7 +129,7 @@ Item {
 
                         SequentialAnimation {
                             loops: Animation.Infinite
-                            running: true
+                            running: rect.visible
 
                             RotationAnimator {
                                 target: block

@@ -20,6 +20,11 @@
 #include "mastic.h"
 #include "mastic_private.h"
 
+#define MASTIC_MAJOR 0
+#define MASTIC_MINOR 8
+#define MASTIC_MICRO 0
+#define MASTIC_VERSION ((MASTIC_MAJOR * 10000) + (MASTIC_MINOR * 100) + MASTIC_MICRO)
+
 FILE *fp = NULL;
 bool admin_logInStream = false;
 bool logInFile = false;
@@ -38,7 +43,7 @@ pthread_mutex_t *lock = NULL;
 #endif
 
 static const char *log_levels[] = {
-    "TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"
+    "TRACE", "DEBUG", "INFO", "WARNING", "ERROR", "FATAL"
 };
 static const char *log_colors[] = {
     "\x1b[94m", "\x1b[36m", "\x1b[32m", "\x1b[33m", "\x1b[31m", "\x1b[35m"
@@ -137,6 +142,11 @@ void admin_unlock(void) {
 // PUBLIC API
 ////////////////////////////////////////////////////////////////////////
 
+int mtic_version(void){
+    printf("Mastic version : %d.%d.%d\n", MASTIC_MAJOR, MASTIC_MINOR, MASTIC_MICRO);
+    return MASTIC_VERSION;
+}
+
 void mtic_log(mtic_logLevel_t level, const char *fmt, ...){
     admin_lock();
     
@@ -183,13 +193,13 @@ void mtic_log(mtic_logLevel_t level, const char *fmt, ...){
     }
     if (logInConsole && level >= logLevel){
         if (useColorInConsole){
-            fprintf(stderr,"%s%-5s\x1b[0m;%s", log_colors[logLevel], log_levels[logLevel], logContent);
+            fprintf(stderr,"%s%s\x1b[0m;%s", log_colors[logLevel], log_levels[level], logContent);
         }else{
-            fprintf(stderr,"%-5s;%s", log_levels[logLevel], logContent);
+            fprintf(stderr,"%s;%s", log_levels[level], logContent);
         }
     }
     if (admin_logInStream && agentElements != NULL && agentElements->logger != NULL){
-        zstr_sendf(agentElements->logger, "%-5s;%s", log_levels[logLevel], logContent);
+        zstr_sendf(agentElements->logger, "%s;%s", log_levels[level], logContent);
     }
     admin_unlock();
     
@@ -198,12 +208,21 @@ void mtic_log(mtic_logLevel_t level, const char *fmt, ...){
 void mtic_setLogLevel (mtic_logLevel_t level){
     logLevel = level;
 }
+mtic_logLevel_t mtic_getLogLevel (void){
+    return logLevel;
+}
+
 void mtic_setLogInFile (bool allow){
     logInFile = allow;
 }
+
 void mtic_setVerbose (bool allow){
     logInConsole = allow;
 }
+bool mtic_isVerbose (void) {
+    return logInConsole;
+}
+
 void mtic_setUseColorVerbose (bool allow){
     useColorInConsole = allow;
 }
@@ -221,7 +240,7 @@ void mtic_setLogStream(bool stream){
 }
 
 void mtic_setLogPath(const char *path){
-    if (path != NULL && strlen(path) > 0){
+    if ((path != NULL) && (strlen(path) > 0)){
         bool needToResetFile = false;
         if (fp != NULL){
             //we need to close previous and initiate new one

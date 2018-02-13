@@ -6,7 +6,19 @@
 
 TEMPLATE = app
 
-QT += qml quick quick-private svg xml concurrent core-private gui-private
+
+# Application version
+VERSION_MAJOR = 0
+VERSION_MINOR = 0
+VERSION_BUILD = 0
+VERSION_PATCH = 0
+
+VERSION = $${VERSION_MAJOR}.$${VERSION_MINOR}.$${VERSION_BUILD}.$${VERSION_PATCH}
+
+
+# Qt modules used by our application and/or its dependencies
+QT += qml quick quick-private svg xml concurrent sql core-private gui-private
+
 CONFIG += c++11 precompiled_header
 
 # Warnings = error
@@ -173,8 +185,8 @@ INCLUDEPATH += ../../frameworks/I2Quick/include
 
 
 # Include MASTIC library
-!include(../../../dependencies/mastic_embedded.pri) {
-    error(Could not load mastic_embedded.pri)
+!include(../../../builds/mastic.pri) {
+    error(Could not load mastic.pri)
 }
 
 
@@ -191,7 +203,7 @@ INCLUDEPATH += ../../frameworks/I2Quick/include
 #
 #------------------------
 mac {
-    message(OSX specific rules)
+    message(macOS and iOS specific rules)
 
 
     # Compute the LFLAG associated to our frameworks
@@ -200,14 +212,16 @@ mac {
 
     # Copy libraries into the MacOS directory of our application
     librariesToCopy.files += ../../frameworks/I2Quick/Mac/libI2Quick.$${QMAKE_EXTENSION_SHLIB}
-    librariesToCopy.path = Contents/MacOS
+    librariesToCopy.path = Contents/Frameworks
     QMAKE_BUNDLE_DATA += librariesToCopy
+    # NB: libzyre, libzmq, libczmq, libsodium, libyajl will be copied by macdeployqt
+    #     because they are installed in a standard directory (/usr/local/lib)
 
 
     # Release / debug specific rules
     CONFIG(release, debug|release) {
         # We must call install_name_tool to create a valid link. Otherwise, our application will not found our library
-        QMAKE_POST_LINK += $$quote(install_name_tool -change libI2Quick.$${QMAKE_EXTENSION_SHLIB} @executable_path/libI2Quick.$${QMAKE_EXTENSION_SHLIB} $${OUT_PWD}/$${TARGET}.app/Contents/MacOS/$${TARGET} $$escape_expand(\\n\\t))
+        QMAKE_POST_LINK += $$quote(install_name_tool -change libI2Quick.$${QMAKE_EXTENSION_SHLIB} @executable_path/../Frameworks/libI2Quick.$${QMAKE_EXTENSION_SHLIB} $${OUT_PWD}/$${TARGET}.app/Contents/MacOS/$${TARGET} $$escape_expand(\\n\\t))
 
         # Release only: copy Qt libs and plugins inside our application to create a standalone application
         # NB: macdeployqt only runs qmlimportscanner correctly when run from Qt bin directory
@@ -220,7 +234,7 @@ mac {
     }
 
 
-    # Set icons
+    # Set icon of our executable
     ICON = icon.icns
 }
 
@@ -269,7 +283,7 @@ win32 {
 
         # Copy Qt dlls
         # NB: Some Qt libs must be explictly referenced because their are used by I2Quick.dll and not our .exe
-        QMAKE_POST_LINK += windeployqt $${DESTDIR}/$${TARGET}.exe -xml -concurrent -printsupport -qmldir=$${PWD} $$escape_expand(\n\t)
+        QMAKE_POST_LINK += windeployqt $${DESTDIR}/$${TARGET}.exe -xml -concurrent -printsupport -sql -qmldir=$${PWD} $$escape_expand(\n\t)
     }
     else {
         # copy I2Quick (if we don't call make install)
@@ -277,15 +291,14 @@ win32 {
     }
 
 
-    # Set icons
+    # Set icon of our executable
     RC_ICONS = icon.ico
 
     # Set application info
-    VERSION = 0.0.0.0
     QMAKE_TARGET_COMPANY = Ingenuity i/o
     QMAKE_TARGET_PRODUCT = $${TARGET}
     QMAKE_TARGET_DESCRIPTION = MASTIC-EDITOR
-    QMAKE_TARGET_COPYRIGHT = Copyright (c) 2017, Ingenuity i/o
+    QMAKE_TARGET_COPYRIGHT = Copyright (c) 2017-2018, Ingenuity i/o
 }
 
 

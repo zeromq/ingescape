@@ -1,9 +1,17 @@
-//
-//  zregex.h
-//
-//  Created by Stephane Vales on 06/04/2016.
-//  Copyright © 2016 Ingenuity i/o. All rights reserved.
-//
+/*
+ *	ZYREPROBE
+ *
+ *  Copyright (c) 2016 Ingenuity i/o. All rights reserved.
+ *
+ *	See license terms for the rights and conditions
+ *	defined by copyright holders.
+ *
+ *
+ *	Contributors:
+ *      Stephane Vales <vales@ingenuity.io>
+ *
+ *
+ */
 
 #ifndef zregex_h
 #define zregex_h

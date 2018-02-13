@@ -355,7 +355,7 @@ char *mtic_getMappingVersion(void){
  * \param name The string which contains the name of the agent's mapping. Can't be NULL.
  * \return The error. 1 is OK, 0 Mapping name is NULL, -1 Mapping name is empty
  */
-int mtic_setMappingName(char *name){
+int mtic_setMappingName(const char *name){
     if(name == NULL){
         mtic_debug("mtic_setMappingName : mapping name cannot be NULL \n");
         return 0;
@@ -387,7 +387,7 @@ int mtic_setMappingName(char *name){
  * \param description The string which contains the description of the agent's mapping. Can't be NULL.
  * \return The error. 1 is OK, 0 Mapping description is NULL, -1 Mapping description is empty
  */
-int mtic_setMappingDescription(char *description){
+int mtic_setMappingDescription(const char *description){
     if(description == NULL){
         mtic_debug("Mapping description cannot be NULL \n");
         return 0;
@@ -420,7 +420,7 @@ int mtic_setMappingDescription(char *description){
  * \param version The string which contains the version of the agent's mapping. Can't be NULL.
  * \return The error. 1 is OK, 0 Mapping version is NULL, -1 Mapping version is empty
  */
-int mtic_setMappingVersion(char *version){
+int mtic_setMappingVersion(const char *version){
     if(version == NULL){
         mtic_debug("Mapping version cannot be NULL \n");
         return 0;
@@ -482,17 +482,53 @@ unsigned long mtic_addMappingEntry(const char *fromOurInput, const char *toAgent
         mtic_debug("mtic_addMappingEntry : input name to be mapped cannot be NULL or empty\n");
         return 0;
     }
+    char *reviewedFromOurInput = strndup(fromOurInput, MAX_IOP_NAME_LENGTH);
+    bool spaceInName = false;
+    size_t lengthOfReviewedFromOurInput = strlen(reviewedFromOurInput);
+    for (size_t i = 0; i < lengthOfReviewedFromOurInput; i++){
+        if (reviewedFromOurInput[i] == ' '){
+            reviewedFromOurInput[i] = '_';
+            spaceInName = true;
+        }
+    }
+    if (spaceInName){
+        mtic_warn("%s : spaces are not allowed in IOP: %s has been renamed to %s\n", __func__, fromOurInput, reviewedFromOurInput);
+    }
 
     //toAgent
     if((toAgent == NULL) || (strlen(toAgent) == 0)){
         mtic_debug("mtic_addMappingEntry : agent name to be mapped cannot be NULL or empty\n");
         return 0;
     }
+    char *reviewedToAgent = strndup(toAgent, MAX_IOP_NAME_LENGTH);
+    size_t lengthOfReviewedToAgent = strlen(reviewedToAgent);
+    spaceInName = false;
+    for (size_t i = 0; i < lengthOfReviewedToAgent; i++){
+        if (reviewedToAgent[i] == ' '){
+            reviewedToAgent[i] = '_';
+            spaceInName = true;
+        }
+    }
+    if (spaceInName){
+        mtic_warn("%s : spaces are not allowed in agent name: %s has been renamed to %s\n", __func__, toAgent, reviewedToAgent);
+    }
 
     //withOutput
     if((withOutput == NULL) || (strlen(withOutput) == 0)){
         mtic_debug("mtic_addMappingEntry : agent output name to be mapped cannot be NULL or empty\n");
         return 0;
+    }
+    char *reviewedWithOutput = strndup(withOutput, MAX_IOP_NAME_LENGTH);
+    size_t lengthOfReviewedWithOutput = strlen(reviewedWithOutput);
+    spaceInName = false;
+    for (size_t i = 0; i < lengthOfReviewedWithOutput; i++){
+        if (reviewedWithOutput[i] == ' '){
+            reviewedWithOutput[i] = '_';
+            spaceInName = true;
+        }
+    }
+    if (spaceInName){
+        mtic_warn("%s : spaces are not allowed in IOP: %s has been renamed to %s\n", __func__, withOutput, reviewedWithOutput);
     }
 
     //Check if already initialized, and do it if not
@@ -503,11 +539,11 @@ unsigned long mtic_addMappingEntry(const char *fromOurInput, const char *toAgent
     //Add the new mapping element if not already there
     unsigned long len = strlen(fromOurInput)+strlen(toAgent)+strlen(withOutput)+3+1;
     char *mashup = calloc(1, len*sizeof(char));
-    strcpy(mashup, fromOurInput);
+    strcpy(mashup, reviewedFromOurInput);
     strcat(mashup, ".");//separator
-    strcat(mashup, toAgent);
+    strcat(mashup, reviewedToAgent);
     strcat(mashup, ".");//separator
-    strcat(mashup, withOutput);
+    strcat(mashup, reviewedWithOutput);
     mashup[len -1] = '\0';
     unsigned long h = djb2_hash((unsigned char *)mashup);
     free (mashup);
@@ -519,15 +555,17 @@ unsigned long mtic_addMappingEntry(const char *fromOurInput, const char *toAgent
     if (tmp == NULL){
         //element does not exist yet : create and register it
         //TODO: check input against definition and reject if input does not exist in definition
-        mapping_element_t *new = mapping_createMappingElement(fromOurInput, toAgent, withOutput);
+        mapping_element_t *new = mapping_createMappingElement(reviewedFromOurInput, reviewedToAgent, reviewedWithOutput);
         new->id = h;
         HASH_ADD(hh, mtic_internal_mapping->map_elements, id, sizeof(unsigned long), new);
         network_needToUpdateMapping = true;
-        return h;
     }else{
-        mtic_debug("mtic_addMappingEntry : mapping combination (%s,%s%s) already exists\n", fromOurInput, toAgent, withOutput);
-        return h;
+        mtic_debug("mtic_addMappingEntry : mapping combination (%s,%s,%s) already exists\n", reviewedFromOurInput, reviewedToAgent, reviewedWithOutput);
     }
+    free(reviewedFromOurInput);
+    free(reviewedToAgent);
+    free(reviewedWithOutput);
+    return h;
 }
 
 /**
@@ -643,4 +681,20 @@ int mtic_removeMappingEntryWithName(const char *fromOurInput, const char *toAgen
     }
 }
 
+void mtic_setMappingPath(const char *path){
+    strncpy(mappingPath, path, 1023);
+}
 
+void mtic_writeMappingToPath(void){
+    FILE *fp = NULL;
+    fp = fopen (mappingPath,"w+");
+    if (fp == NULL){
+        mtic_error("error when trying to open %s for writing\n", mappingPath);
+    }else{
+        char *map = parser_export_mapping(mtic_internal_mapping);
+        fprintf(fp, "%s", map);
+        fflush(fp);
+        fclose(fp);
+        free(map);
+    }
+}

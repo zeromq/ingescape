@@ -20,6 +20,14 @@
 #define MASTICAPI_COMMON_DLLSPEC
 #endif
 
+
+/*
+ * Macro to avoid "unused parameter" warnings
+ */
+#define MASTIC_UNUSED(x) (void)x;
+
+
+
 #include <stdbool.h>
 #include <string.h>
 #include <zyre.h>
@@ -35,6 +43,9 @@
 #endif
 
 #include "mastic.h"
+
+#define MAX_IOP_NAME_LENGTH 256
+#define MAX_AGENT_NAME_LENGTH 256
 
 extern char definitionPath[1024];
 extern char mappingPath[1024];

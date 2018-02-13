@@ -37,19 +37,20 @@ Item {
     // Duration of an animation step in milliseconds
     property int animationStepDurationInMilliseconds: 200
 
-    // Size of of block
+    // Size of of block in pixels
     property int blockSize: 50
 
-    // Radius of a block
+    // Radius of a block in pixels
     property int blockRadius: 3
 
-    // Spacing between blocks
+    // Spacing between blocks in pixels
     property int blockSpacing: 10
 
     // Color of a block
     property color blockColor: "white"
 
     // Visibility flags of blocks column by colum (top-down, left-right)
+    // NB: the array must have verticalBlockCount * horizontalBlockCount values
     property var visibilitiesOfBlock: [
                                        true, true, true, true, true,
                                        true, true, true, true, true,

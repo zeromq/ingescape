@@ -8,10 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		978D6DF11CB26F9B0082016E /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 978D6DF01CB26F9B0082016E /* main.c */; };
-		978D6DFB1CB2705E0082016E /* libczmq.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 978D6DF71CB2705E0082016E /* libczmq.a */; };
-		978D6DFC1CB2705E0082016E /* libsodium.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 978D6DF81CB2705E0082016E /* libsodium.a */; };
-		978D6DFD1CB2705E0082016E /* libzmq.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 978D6DF91CB2705E0082016E /* libzmq.a */; };
-		978D6DFE1CB2705E0082016E /* libzyre.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 978D6DFA1CB2705E0082016E /* libzyre.a */; };
+		979A728A1F792C2200AF0FC8 /* libzyre.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 978D6DFA1CB2705E0082016E /* libzyre.a */; };
+		979A728E1F792C2300AF0FC8 /* libzmq.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 979A728B1F792C2300AF0FC8 /* libzmq.a */; };
+		979A728F1F792C2300AF0FC8 /* libczmq.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 979A728C1F792C2300AF0FC8 /* libczmq.a */; };
+		979A72901F792C2300AF0FC8 /* libsodium.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 979A728D1F792C2300AF0FC8 /* libsodium.a */; };
 		97D1AF321CD3B4DA00C6B742 /* zregex.c in Sources */ = {isa = PBXBuildFile; fileRef = 97D1AF301CD3B4DA00C6B742 /* zregex.c */; };
 /* End PBXBuildFile section */
 
@@ -28,12 +28,24 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		972F6B051CDBA1BF00CF2CF4 /* libut.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libut.h; sourceTree = "<group>"; };
+		972F6B061CDBA1BF00CF2CF4 /* ringbuf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ringbuf.h; sourceTree = "<group>"; };
+		972F6B071CDBA1BF00CF2CF4 /* utarray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utarray.h; sourceTree = "<group>"; };
+		972F6B081CDBA1BF00CF2CF4 /* uthash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = uthash.h; sourceTree = "<group>"; };
+		972F6B091CDBA1BF00CF2CF4 /* utlist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utlist.h; sourceTree = "<group>"; };
+		972F6B0A1CDBA1BF00CF2CF4 /* utmm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utmm.h; sourceTree = "<group>"; };
+		972F6B0B1CDBA1BF00CF2CF4 /* utringbuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utringbuffer.h; sourceTree = "<group>"; };
+		972F6B0C1CDBA1BF00CF2CF4 /* utstring.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utstring.h; sourceTree = "<group>"; };
+		972F6B0D1CDBA1BF00CF2CF4 /* utvector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utvector.h; sourceTree = "<group>"; };
 		978D6DED1CB26F9B0082016E /* zyreprobe */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = zyreprobe; sourceTree = BUILT_PRODUCTS_DIR; };
 		978D6DF01CB26F9B0082016E /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		978D6DF71CB2705E0082016E /* libczmq.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libczmq.a; path = /usr/local/Cellar/czmq/3.0.2_3/lib/libczmq.a; sourceTree = "<absolute>"; };
 		978D6DF81CB2705E0082016E /* libsodium.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsodium.a; path = /usr/local/Cellar/libsodium/1.0.8/lib/libsodium.a; sourceTree = "<absolute>"; };
 		978D6DF91CB2705E0082016E /* libzmq.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libzmq.a; path = /usr/local/Cellar/zeromq/4.1.4/lib/libzmq.a; sourceTree = "<absolute>"; };
 		978D6DFA1CB2705E0082016E /* libzyre.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libzyre.a; path = /usr/local/lib/libzyre.a; sourceTree = "<absolute>"; };
+		979A728B1F792C2300AF0FC8 /* libzmq.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libzmq.a; path = ../../../../../../../../usr/local/lib/libzmq.a; sourceTree = "<group>"; };
+		979A728C1F792C2300AF0FC8 /* libczmq.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libczmq.a; path = ../../../../../../../../usr/local/lib/libczmq.a; sourceTree = "<group>"; };
+		979A728D1F792C2300AF0FC8 /* libsodium.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsodium.a; path = ../../../../../../../../usr/local/lib/libsodium.a; sourceTree = "<group>"; };
 		97D1AF301CD3B4DA00C6B742 /* zregex.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = zregex.c; sourceTree = "<group>"; };
 		97D1AF311CD3B4DA00C6B742 /* zregex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = zregex.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -43,22 +55,39 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				978D6DFB1CB2705E0082016E /* libczmq.a in Frameworks */,
-				978D6DFC1CB2705E0082016E /* libsodium.a in Frameworks */,
-				978D6DFD1CB2705E0082016E /* libzmq.a in Frameworks */,
-				978D6DFE1CB2705E0082016E /* libzyre.a in Frameworks */,
+				979A728E1F792C2300AF0FC8 /* libzmq.a in Frameworks */,
+				979A728F1F792C2300AF0FC8 /* libczmq.a in Frameworks */,
+				979A72901F792C2300AF0FC8 /* libsodium.a in Frameworks */,
+				979A728A1F792C2200AF0FC8 /* libzyre.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		972F6B041CDBA1BF00CF2CF4 /* uthash */ = {
+			isa = PBXGroup;
+			children = (
+				972F6B051CDBA1BF00CF2CF4 /* libut.h */,
+				972F6B061CDBA1BF00CF2CF4 /* ringbuf.h */,
+				972F6B071CDBA1BF00CF2CF4 /* utarray.h */,
+				972F6B081CDBA1BF00CF2CF4 /* uthash.h */,
+				972F6B091CDBA1BF00CF2CF4 /* utlist.h */,
+				972F6B0A1CDBA1BF00CF2CF4 /* utmm.h */,
+				972F6B0B1CDBA1BF00CF2CF4 /* utringbuffer.h */,
+				972F6B0C1CDBA1BF00CF2CF4 /* utstring.h */,
+				972F6B0D1CDBA1BF00CF2CF4 /* utvector.h */,
+			);
+			path = uthash;
+			sourceTree = "<group>";
+		};
 		978D6DE41CB26F9B0082016E = {
 			isa = PBXGroup;
 			children = (
 				978D6DFF1CB270640082016E /* dependencies */,
 				978D6DEF1CB26F9B0082016E /* zyreprobe */,
 				978D6DEE1CB26F9B0082016E /* Products */,
+				979A72891F792C2200AF0FC8 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -73,6 +102,7 @@
 		978D6DEF1CB26F9B0082016E /* zyreprobe */ = {
 			isa = PBXGroup;
 			children = (
+				972F6B041CDBA1BF00CF2CF4 /* uthash */,
 				97D1AF301CD3B4DA00C6B742 /* zregex.c */,
 				97D1AF311CD3B4DA00C6B742 /* zregex.h */,
 				978D6DF01CB26F9B0082016E /* main.c */,
@@ -89,6 +119,16 @@
 				978D6DFA1CB2705E0082016E /* libzyre.a */,
 			);
 			name = dependencies;
+			sourceTree = "<group>";
+		};
+		979A72891F792C2200AF0FC8 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				979A728C1F792C2300AF0FC8 /* libczmq.a */,
+				979A728D1F792C2300AF0FC8 /* libsodium.a */,
+				979A728B1F792C2300AF0FC8 /* libzmq.a */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -117,7 +157,7 @@
 		978D6DE51CB26F9B0082016E /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0730;
+				LastUpgradeCheck = 0900;
 				ORGANIZATIONNAME = "Ingenuity i/o";
 				TargetAttributes = {
 					978D6DEC1CB26F9B0082016E = {
@@ -164,13 +204,21 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "-";
@@ -208,13 +256,21 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "-";
@@ -240,12 +296,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				HEADER_SEARCH_PATHS = /usr/local/include/;
-				LIBRARY_SEARCH_PATHS = (
-					/usr/local/lib/,
-					/usr/local/Cellar/czmq/3.0.2_3/lib,
-					/usr/local/Cellar/libsodium/1.0.8/lib,
-					/usr/local/Cellar/zeromq/4.1.4/lib,
-				);
+				LIBRARY_SEARCH_PATHS = /usr/local/lib/;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -254,12 +305,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				HEADER_SEARCH_PATHS = /usr/local/include/;
-				LIBRARY_SEARCH_PATHS = (
-					/usr/local/lib/,
-					/usr/local/Cellar/czmq/3.0.2_3/lib,
-					/usr/local/Cellar/libsodium/1.0.8/lib,
-					/usr/local/Cellar/zeromq/4.1.4/lib,
-				);
+				LIBRARY_SEARCH_PATHS = /usr/local/lib/;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
