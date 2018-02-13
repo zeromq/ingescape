@@ -16,6 +16,7 @@
 
 #include <QDebug>
 #include <QCoreApplication>
+#include <QMutex>
 
 
 extern "C" {
@@ -468,6 +469,28 @@ void MasticQuickController_callbackForcedStop(void *customData)
 //-------------------------------------------------------------------
 
 
+//
+// Define our singleton instance
+//
+// NB: we can not use Q_GLOBAL_STATIC because Mastic MUST be stopped in our mainloop.
+//     Otherwise, Mastic can not terminate ZMQ safely and the application will crash
+//
+static MasticQuickController* _MASTICQUICKCONTROLLER_SINGLETON = NULL;
+
+
+//
+// Flag indicating if we have already instantiate a singleton
+//
+static bool _MASTICQUICKCONTROLLER_SINGLETON_INITIALIZED = false;
+
+
+//
+// Define a mutex to protect our singleton instance
+//
+static QMutex _MASTICQUICKCONTROLLER_SINGLETON_MUTEX;
+
+
+
 /**
  * @brief Default constructor
  * @param parent
@@ -561,7 +584,7 @@ MasticQuickController::MasticQuickController(QObject *parent) : QObject(parent),
  * @brief Destructor
  */
 MasticQuickController::~MasticQuickController()
-{
+{qDebug() << "deleting MasticQuickController";
     // Unsubscribe to Mastic signals
     disconnect(this, &MasticQuickController::forcedStop, this, &MasticQuickController::_onForcedStop);
 
@@ -608,6 +631,51 @@ MasticQuickController::~MasticQuickController()
     _inputsList.clear();
     _outputsList.clear();
     _parametersList.clear();
+
+
+
+    //
+    // Clean-up our singleton
+    //
+    _MASTICQUICKCONTROLLER_SINGLETON_MUTEX.lock();
+    if (_MASTICQUICKCONTROLLER_SINGLETON == this)
+    {
+        _MASTICQUICKCONTROLLER_SINGLETON = NULL;
+    }
+    _MASTICQUICKCONTROLLER_SINGLETON_MUTEX.unlock();
+}
+
+
+
+/**
+ * @brief Get our singleton instance
+ * @return
+ *
+ * @remark Our singleton is owned by the QML engine. Thus, it is unsafe to keep a reference that points to it
+ */
+MasticQuickController* MasticQuickController::instance()
+{
+    // Thread-safe init
+    _MASTICQUICKCONTROLLER_SINGLETON_MUTEX.lock();
+
+    if (_MASTICQUICKCONTROLLER_SINGLETON == NULL)
+    {
+        // Check if it is our first singleton
+        if (_MASTICQUICKCONTROLLER_SINGLETON_INITIALIZED)
+        {
+            qWarning() << Q_FUNC_INFO << "warning: a singleton has already been created and destroyed."
+                       << "Please do not try to access MasticQuickController after its destruction";
+        }
+        else
+        {
+            _MASTICQUICKCONTROLLER_SINGLETON = new MasticQuickController();
+            _MASTICQUICKCONTROLLER_SINGLETON_INITIALIZED = true;
+        }
+    }
+
+    _MASTICQUICKCONTROLLER_SINGLETON_MUTEX.unlock();
+
+    return _MASTICQUICKCONTROLLER_SINGLETON;
 }
 
 
@@ -623,10 +691,8 @@ QObject* MasticQuickController::qmlSingleton(QQmlEngine* engine, QJSEngine* scri
     Q_UNUSED(engine)
     Q_UNUSED(scriptEngine);
 
-    // NOTE: A QObject singleton type instance returned from a singleton type provider is
-    //       owned by the QML engine. For this reason, the singleton type provider function
-    //       should not be implemented as a singleton factory.
-    return new MasticQuickController();
+    // NOTE: our singleton is owned by the QML engine
+    return instance();
 }
 
 

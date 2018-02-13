@@ -142,12 +142,23 @@ public:
 
 
     /**
+     * @brief Get our singleton instance
+     * @return
+     *
+     * @remark Our singleton is owned by the QML engine. Thus, it is unsafe to keep a reference that points to it
+     */
+    static MasticQuickController* instance();
+
+
+
+    /**
      * @brief Method used to provide a singleton to QML
      * @param engine
      * @param scriptEngine
      * @return
      */
      static QObject* qmlSingleton(QQmlEngine* engine, QJSEngine* scriptEngine);
+
 
 
      /**
@@ -157,11 +168,13 @@ public:
      void _internalSetIsMuted(bool value);
 
 
+
      /**
       * @brief Set our isFrozen flag based on observeFreeze
       * @param value
       */
      void _internalSetIsFrozen(bool value);
+
 
 
 Q_SIGNALS:
