@@ -204,13 +204,11 @@ unix:{
 #--------- COMMON ---------#
 
 ##Add headers from dependencies
-INCLUDEPATH += $$PWD/libzmq/include \
-               $$PWD/czmq/include \
+INCLUDEPATH += $$PWD/czmq/include \
                $$PWD/zyre/include \
                $$PWD/yajl/lloyd-yajl-2.1.0/include \
 
-DEPENDPATH += $$PWD/libzmq/include \
-              $$PWD/czmq/include \
+DEPENDPATH += $$PWD/czmq/include \
               $$PWD/zyre/include \
               $$PWD/yajl/lloyd-yajl-2.1.0/include \
 
