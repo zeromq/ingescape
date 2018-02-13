@@ -70,7 +70,7 @@ Module {
         Method { name: "allValues"; type: "QList<MasticLogLevel::Value>" }
     }
     Component {
-        name: "MasticQuickController"
+        name: "MasticQuick"
         prototype: "QObject"
         exports: ["MasticQuick/Mastic 1.0"]
         isCreatable: false

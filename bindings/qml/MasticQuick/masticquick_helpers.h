@@ -19,8 +19,10 @@
 
 #include <QObject>
 #include <QtQml>
+#include <QQmlEngine>
 #include <QQmlProperty>
 #include <QtGlobal>
+#include <QMetaType>
 
 
 
@@ -177,6 +179,10 @@
             name instance; \
             return instance.allValues(); \
         } \
+        static void qmlRegister(const char* uri, int versionMajor, int versionMinor, const char* qmlName = #name) { \
+            qmlRegisterSingletonType<name>(uri, versionMajor, versionMinor, qmlName, &name::qmlSingleton); \
+            registerMetaType<name::Value>(); \
+        } \
     }; \
     QML_DECLARE_TYPE(name) \
     Q_DECLARE_METATYPE(name::Value)
@@ -241,6 +247,10 @@
             name instance; \
             return instance.allValues(); \
         } \
+        static void qmlRegister(const char* uri, int versionMajor, int versionMinor, const char* qmlName = #name) { \
+            qmlRegisterSingletonType<name>(uri, versionMajor, versionMinor, qmlName, &name::qmlSingleton); \
+            registerMetaType<name::Value>(); \
+        } \
     }; \
     QML_DECLARE_TYPE(name) \
     Q_DECLARE_METATYPE(name::Value)
@@ -257,11 +267,26 @@ class MASTICQUICK_EXPORT AbstractMasticQuickEnumClass: public QObject {
 public:
     AbstractMasticQuickEnumClass(QObject *parent = 0);
 
+
+    /**
+     * @brief Call this function to register the type T
+     *
+     * @remark We use this function as a proxy to qRegisterMetaType because we can not call
+     *         qRegisterMetaType in macros. Otherwise, it does not compile due to
+     *         "explicit specialization of 'QMetaTypeId<MasticLogLevel::Value>' after instantiation" errors
+     */
+    template <class T> static void registerMetaType()
+    {
+        qRegisterMetaType<T>();
+    }
+
+
     /**
      * @brief Get index of our enumerator
      * @return
      */
     virtual int getEnumeratorIndex() = 0;
+
 
     /**
      * @brief Get a given enumerator
