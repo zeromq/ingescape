@@ -15,19 +15,17 @@ DEFINES += MASTICQUICK_INCLUDED_VIA_PRI
 
 
 HEADERS += \
-    $$PWD/MasticQuick.h \
     $$PWD/masticquick_global.h \
     $$PWD/masticquick_helpers.h \
-    $$PWD/masticquickcontroller.h \
     $$PWD/masticquickinputspropertymap.h \
     $$PWD/masticquickoutputspropertymap.h \
-    $$PWD/masticquickparameterspropertymap.h
+    $$PWD/masticquickparameterspropertymap.h \
+    $$PWD/MasticQuick.h
 
 
 SOURCES += \
-    $$PWD/masticquick.cpp \
     $$PWD/masticquick_helpers.cpp \
-    $$PWD/masticquickcontroller.cpp \
     $$PWD/masticquickinputspropertymap.cpp \
     $$PWD/masticquickoutputspropertymap.cpp \
-    $$PWD/masticquickparameterspropertymap.cpp
+    $$PWD/masticquickparameterspropertymap.cpp \
+    $$PWD/masticquick.cpp
