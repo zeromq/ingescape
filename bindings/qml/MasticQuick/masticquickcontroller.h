@@ -724,9 +724,12 @@ public Q_SLOTS:
 public Q_SLOTS:
      /**
       * @brief Get network adapters with broadcast capabilities
+      *
+      * @param qmlUpdateExtraParameter Extra parameter used to call this function in a QML binding
+      *
       * @return
       */
-     QStringList getNetdevicesList();
+     QStringList getNetdevicesList(QVariant qmlUpdateExtraParameter = QVariant());
 
 
 

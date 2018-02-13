@@ -1996,10 +1996,15 @@ bool MasticQuickController::removeParameter(QString name)
 
 /**
  * @brief Get network adapters with broadcast capabilities
+ *
+ * @param qmlUpdateExtraParameter Extra parameter used to call this function in a QML binding
+ *
  * @return
  */
-QStringList MasticQuickController::getNetdevicesList()
+QStringList MasticQuickController::getNetdevicesList(QVariant qmlUpdateExtraParameter)
 {
+    Q_UNUSED(qmlUpdateExtraParameter)
+
     QStringList result;
 
     // Get all devices
@@ -2019,6 +2024,7 @@ QStringList MasticQuickController::getNetdevicesList()
 }
 
 
+
 /**
  * @brief Print (or save) debugging information
  * @param logLevel
@@ -2028,6 +2034,7 @@ void MasticQuickController::log(MasticLogLevel::Value logLevel, QString text)
 {
     mtic_log( enumMasticLogLevelToEnumMticLogLevel_t(logLevel), text.toStdString().c_str());
 }
+
 
 
 /**
@@ -2040,6 +2047,7 @@ void MasticQuickController::trace(QString text)
 }
 
 
+
 /**
  * @brief Print (or save) debugging information (loglevel = debug)
  * @param text
@@ -2048,6 +2056,7 @@ void MasticQuickController::debug(QString text)
 {
     log(MasticLogLevel::LOG_DEBUG, text);
 }
+
 
 
 /**
@@ -2060,6 +2069,7 @@ void MasticQuickController::info(QString text)
 }
 
 
+
 /**
  * @brief Print (or save) debugging information (loglevel = warn)
  * @param text
@@ -2070,6 +2080,7 @@ void MasticQuickController::warn(QString text)
 }
 
 
+
 /**
  * @brief Print (or save) debugging information (loglevel = error)
  * @param text
@@ -2078,6 +2089,7 @@ void MasticQuickController::error(QString text)
 {
     log(MasticLogLevel::LOG_ERROR, text);
 }
+
 
 
 /**
@@ -2399,6 +2411,7 @@ bool MasticQuickController::_updateQmlOutput(QString name)
                     }
                     break;
 
+
                 case DOUBLE_T:
                     {
                         double newValue = mtic_readOutputAsDouble(cName);
@@ -2406,22 +2419,28 @@ bool MasticQuickController::_updateQmlOutput(QString name)
                     }
                     break;
 
+
                 case STRING_T:
                     {
                         char* newCValue = mtic_readOutputAsString(cName);
                         if (newCValue != NULL)
                         {
+                            // Update value
                             QString newValue(newCValue);
                             _outputs->insert(name, QVariant(newValue));
+
+                            // Clean-up
                             free(newCValue);
                             newCValue = NULL;
                         }
                         else
                         {
+                            // Update value with an empty string
                             _outputs->insert(name, QVariant(""));
                         }
                     }
                     break;
+
 
                 case BOOL_T:
                     {
@@ -2430,24 +2449,27 @@ bool MasticQuickController::_updateQmlOutput(QString name)
                     }
                     break;
 
+
                 case IMPULSION_T:
                     {
                         // Hack to force the update of our property
-                        // We disable signals then we clear its value to detect a valud change when we set an empty value
+                        // - We disable signals then we clear its value to detect a value change when we set an empty value
                         _outputs->blockSignals(true);
                         _outputs->clear(name);
                         _outputs->blockSignals(false);
 
-                        // Set an empty value to trigger an update
+                        // - Set an empty value to trigger an update
                         _outputs->insert(name, QVariant(""));
                     }
                     break;
+
 
                 case DATA_T:
                     {
                         qWarning() << Q_FUNC_INFO << "NOT YET IMPLEMENTED. Can not update output" << name;
                     }
                     break;
+
 
                 default:
                     qWarning() << Q_FUNC_INFO << "warning: unhandled output type. Can not update output" << name;
@@ -2493,6 +2515,7 @@ bool MasticQuickController::_updateQmlParameter(QString name)
                     }
                     break;
 
+
                 case DOUBLE_T:
                     {
                         double newValue = mtic_readParameterAsDouble(cName);
@@ -2500,22 +2523,28 @@ bool MasticQuickController::_updateQmlParameter(QString name)
                     }
                     break;
 
+
                 case STRING_T:
                     {
                         char* newCValue = mtic_readParameterAsString(cName);
                         if (newCValue != NULL)
                         {
+                            // Update our value
                             QString newValue(newCValue);
                             _parameters->insert(name, QVariant(newValue));
+
+                            // Clean-up
                             free(newCValue);
                             newCValue = NULL;
                         }
                         else
                         {
+                            // Update our value with an empty string
                             _parameters->insert(name, QVariant(""));
                         }
                     }
                     break;
+
 
                 case BOOL_T:
                     {
@@ -2524,17 +2553,20 @@ bool MasticQuickController::_updateQmlParameter(QString name)
                     }
                     break;
 
+
                 case IMPULSION_T:
                     {
                         qWarning() << Q_FUNC_INFO << "NOT YET IMPLEMENTED. Can not update parameter" << name;
                     }
                     break;
 
+
                 case DATA_T:
                     {
                         qWarning() << Q_FUNC_INFO << "NOT YET IMPLEMENTED. Can not update parameter" << name;
                     }
                     break;
+
 
                 default:
                     qWarning() << Q_FUNC_INFO << "warning: unhandled output type. Can not update parameter" << name;
@@ -2650,6 +2682,7 @@ void MasticQuickController::_onForcedStop()
 }
 
 
+
 /**
  * @brief Called when an output is updated from QML
  * @param key
@@ -2686,6 +2719,7 @@ void MasticQuickController::_onOutputUpdatedFromFromQML(const QString &key, cons
                     }
                     break;
 
+
                 case DOUBLE_T:
                     {
                         bool ok = false;
@@ -2702,6 +2736,7 @@ void MasticQuickController::_onOutputUpdatedFromFromQML(const QString &key, cons
                     }
                     break;
 
+
                 case STRING_T:
                     {
                         QString qmlValue = value.toString();
@@ -2711,13 +2746,16 @@ void MasticQuickController::_onOutputUpdatedFromFromQML(const QString &key, cons
                     }
                     break;
 
+
                 case BOOL_T:
                     mtic_writeOutputAsBool(name, value.toBool());
                     break;
 
+
                 case IMPULSION_T:
                     mtic_writeOutputAsImpulsion(name);
                     break;
+
 
                 default:
                     qWarning() << "MasticController warning: unhandled output type. Can not update output" << key;
@@ -2728,6 +2766,7 @@ void MasticQuickController::_onOutputUpdatedFromFromQML(const QString &key, cons
 }
 
 
+
 /**
  * @brief Called when a parameter is updated from QML
  * @param key
@@ -2735,8 +2774,77 @@ void MasticQuickController::_onOutputUpdatedFromFromQML(const QString &key, cons
  */
 void MasticQuickController::_onParameterUpdatedFromFromQML(const QString &key, const QVariant &value)
 {
-    Q_UNUSED(key)
-    Q_UNUSED(value)
+    // Ensure that we have a valid key
+    if (!key.isEmpty())
+    {
+        // We must update our Mastic output
+        const char* name = key.toStdString().c_str();
 
-    qInfo() << "MasticController info: QML updates parameter" << key <<" BUT this function is NOT YET IMPLEMENTED";
+        // Ensure that this parameter exists
+        if (mtic_checkParameterExistence(name))
+        {
+            iopType_t type = mtic_getTypeForParameter(name);
+
+            switch(type)
+            {
+                case INTEGER_T:
+                    {
+                        bool ok = false;
+                        int cValue = value.toInt(&ok);
+
+                        if (ok)
+                        {
+                            mtic_writeParameterAsInt(name, cValue);
+                        }
+                        else
+                        {
+                            qWarning() << "MasticController warning: invalid value" << value << "for parameter" << key;
+                        }
+                    }
+                    break;
+
+
+                case DOUBLE_T:
+                    {
+                        bool ok = false;
+                        double cValue = value.toDouble(&ok);
+
+                        if (ok)
+                        {
+                            mtic_writeParameterAsDouble(name, cValue);
+                        }
+                        else
+                        {
+                            qWarning() << "MasticController warning: invalid value" << value << "for parameter" << key;
+                        }
+                    }
+                    break;
+
+
+                case STRING_T:
+                    {
+                        QString qmlValue = value.toString();
+                        const char* cValue = qmlValue.toStdString().c_str();
+
+                        mtic_writeParameterAsString(name, (char *)cValue);
+                    }
+                    break;
+
+
+                case BOOL_T:
+                    mtic_writeParameterAsBool(name, value.toBool());
+                    break;
+
+
+                case IMPULSION_T:
+                    qWarning() << "MasticController warning: invalid parameter type IMPULSION. Can not update parameter" << key;
+                    break;
+
+
+                default:
+                    qWarning() << "MasticController warning: unhandled parameter type. Can not update parameter" << key;
+                    break;
+            }
+        }
+    }
 }
