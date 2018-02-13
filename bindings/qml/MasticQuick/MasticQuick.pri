@@ -20,7 +20,8 @@ HEADERS += \
     $$PWD/masticquickinputspropertymap.h \
     $$PWD/masticquickoutputspropertymap.h \
     $$PWD/masticquickparameterspropertymap.h \
-    $$PWD/MasticQuick.h
+    $$PWD/MasticQuick.h \
+    $$PWD/masticquickinputbinding.h
 
 
 SOURCES += \
@@ -28,4 +29,5 @@ SOURCES += \
     $$PWD/masticquickinputspropertymap.cpp \
     $$PWD/masticquickoutputspropertymap.cpp \
     $$PWD/masticquickparameterspropertymap.cpp \
-    $$PWD/masticquick.cpp
+    $$PWD/masticquick.cpp \
+    $$PWD/masticquickinputbinding.cpp

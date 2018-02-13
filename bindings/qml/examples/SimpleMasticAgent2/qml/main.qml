@@ -108,7 +108,7 @@ ApplicationWindow {
         console.log("Mastic version is " + Mastic.version);
 
         // MasticQuick API: verbose mode
-        Mastic.isVerbose = true;
+        Mastic.isVerbose = false;
 
         // MasticQuick API: set definition
         Mastic.definitionName = Qt.application.name;
@@ -327,7 +327,42 @@ ApplicationWindow {
                         NumberAnimation { target: myCircleUI; property: "scale"; to: 1; }
                      }
                 }
+            }
 
+
+
+            Rectangle {
+                id: myRectangle
+
+                x: 100
+                y: 100
+                width: 60
+                height: 60
+
+                border {
+                    width: 3
+                    color: "#CC000000"
+                }
+
+                color: "#CCFF0000"
+
+                MasticInputBinding on x {
+                    inputsPrefix: "rect"
+                    properties: "x, y"
+                }
+
+                MasticInputBinding on y {
+                    inputsPrefix: "rect"
+                }
+
+
+                MasticInputBinding {
+                    target: myRectangle
+
+                    properties: "width, height"
+
+                    inputsPrefix: "rect"
+                }
             }
         }
 

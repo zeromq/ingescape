@@ -18,6 +18,9 @@
 #include <QCoreApplication>
 #include <QMutex>
 
+#include "masticquickinputbinding.h"
+
+
 
 extern "C" {
 #include <mastic.h>
@@ -734,6 +737,11 @@ void MasticQuick::registerTypes(const char* uri)
     qmlRegisterUncreatableType<MasticQuickOutputsPropertyMap>(uri, MASTICQUICK_VERSION_MAJOR, MASTICQUICK_VERSION_MINOR, "MasticQuickOutputsPropertyMap", "Internal class");
     qmlRegisterUncreatableType<MasticQuickParametersPropertyMap>(uri, MASTICQUICK_VERSION_MAJOR, MASTICQUICK_VERSION_MINOR, "MasticQuickParametersPropertyMap", "Internal class");
 
+
+    //
+    // Register creatable types
+    //
+    qmlRegisterType<MasticQuickInputBinding>(uri, MASTICQUICK_VERSION_MAJOR, MASTICQUICK_VERSION_MINOR, "MasticInputBinding");
 
 
     //
