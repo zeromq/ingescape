@@ -722,11 +722,9 @@ void MasticQuick::registerTypes(const char* uri)
     // Register enums
     //
     // - IOP types
-    qmlRegisterSingletonType<MasticIopType>(uri, MASTICQUICK_VERSION_MAJOR, MASTICQUICK_VERSION_MINOR, "MasticIopType", &MasticIopType::qmlSingleton);
-    qRegisterMetaType<MasticIopType::Value>();
+    MasticIopType::qmlRegister(uri, MASTICQUICK_VERSION_MAJOR, MASTICQUICK_VERSION_MINOR);
     // - Log levels
-    qmlRegisterSingletonType<MasticLogLevel>(uri, MASTICQUICK_VERSION_MAJOR, MASTICQUICK_VERSION_MINOR, "MasticLogLevel", &MasticLogLevel::qmlSingleton);
-    qRegisterMetaType<MasticLogLevel::Value>();
+    MasticLogLevel::qmlRegister(uri, MASTICQUICK_VERSION_MAJOR, MASTICQUICK_VERSION_MINOR);
 
 
     //
