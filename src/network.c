@@ -470,7 +470,7 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
         
         //parse event
         if (streq (event, "ENTER")){
-            mtic_debug("->%s has entered the network with peer id %s and address %s\n", name, peer, address);
+            mtic_debug("->%s has entered the network with peer id %s and endpoint %s\n", name, peer, address);
             zyreAgent_t *zagent = NULL;
             HASH_FIND_STR(zyreAgents, peer, zagent);
             if (zagent == NULL){
