@@ -27,6 +27,7 @@
  */
 MasticQuickInputBinding::MasticQuickInputBinding(QObject *parent) : QObject(parent),
     _target(NULL),
+    _when(true),
     _isCompleted(false),
     _isUsedAsQQmlPropertyValueSource(false)
 {
@@ -208,11 +209,15 @@ void MasticQuickInputBinding::_ontargetDestroyed(QObject *sender)
  */
 void MasticQuickInputBinding::_onMasticObserveInput(QString name, QVariant value)
 {
-    // Check if we are interested by this input
-    if (_qmlPropertiesByMasticInputName.contains(name))
-    {qDebug() << "ObserveInput" << name << value;
-        QQmlProperty property = _qmlPropertiesByMasticInputName.value(name);
-        property.write(value);
+    // Check if our binding is active
+    if (_when)
+    {
+        // Check if we are interested by this input
+        if (_qmlPropertiesByMasticInputName.contains(name))
+        {
+            QQmlProperty property = _qmlPropertiesByMasticInputName.value(name);
+            property.write(value);
+        }
     }
 }
 
