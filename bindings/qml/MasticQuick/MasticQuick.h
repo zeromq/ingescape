@@ -22,6 +22,7 @@
 
 #include "masticquick_global.h"
 #include "masticquick_helpers.h"
+#include "masticquick_enums.h"
 
 #include "masticquickinputspropertymap.h"
 #include "masticquickoutputspropertymap.h"
@@ -34,29 +35,6 @@
 //
 #define DEFAULT_MASTICQUICK_URI "MasticQuick"
 
-
-
-
-//-------------------------------------------------------------------
-//
-//
-//  Enums
-//
-//
-//-------------------------------------------------------------------
-
-
-/**
-  * @brief Enum for IOP types
-  */
-MASTIC_QML_ENUM(MasticIopType, INVALID = 0, INTEGER, DOUBLE, STRING, BOOLEAN, IMPULSION, DATA)
-
-
-
-/**
- * @brief Enum for log levels
- */
-MASTIC_QML_ENUM(MasticLogLevel, LOG_TRACE = 0, LOG_DEBUG, LOG_INFO, LOG_WARN, LOG_ERROR, LOG_FATAL)
 
 
 

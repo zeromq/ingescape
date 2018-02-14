@@ -107,6 +107,21 @@
 
 
 
+/*!
+   Define a constant
+*/
+#define MASTIC_QML_PROPERTY_CONSTANT(type, name) \
+        Q_PROPERTY (type name READ name CONSTANT) \
+    public: \
+        type name () const { \
+            return _##name ; \
+        } \
+    protected: \
+        type _##name;
+
+
+
+
 
 /*
  **************************************************************

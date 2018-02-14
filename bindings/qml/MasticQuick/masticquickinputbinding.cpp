@@ -14,8 +14,9 @@
 
 #include "masticquickinputbinding.h"
 
-
 #include <QDebug>
+
+#include "masticquickbinding.h"
 
 
 /**
@@ -37,14 +38,17 @@ MasticQuickInputBinding::MasticQuickInputBinding(QObject *parent) : QObject(pare
  */
 MasticQuickInputBinding::~MasticQuickInputBinding()
 {
+    // Reset our isCompleted flag to be able to use setters
+    _isCompleted = false;
+
     // Unsubscribe to our target
     if (_target != NULL)
     {
-        disconnect(_target, &QObject::destroyed, this, &MasticQuickInputBinding::_ontargetDestroyed);
+        settarget(NULL);
     }
 
-    // clear our hashtable of properties
-    _qmlPropertiesByName.clear();
+    // Clear internal data
+    _clear();
 }
 
 
@@ -64,20 +68,31 @@ void MasticQuickInputBinding::settarget(QObject *value)
 {
     if (_target != value)
     {
-        // Unsubscribe to our previous target
+        // Unsubscribe to our previous target if needed
         if (_target != NULL)
         {
             disconnect(_target, &QObject::destroyed, this, &MasticQuickInputBinding::_ontargetDestroyed);
         }
 
+        // Save our new value
         _target = value;
 
-        // Subscribe to our new target
+        // Subscribe to our new target if needed
         if (_target != NULL)
         {
             connect(_target, &QObject::destroyed, this, &MasticQuickInputBinding::_ontargetDestroyed);
         }
 
+        // Check if we can use this value
+        if (!_isUsedAsQQmlPropertyValueSource)
+        {
+            // Update internal data
+            _update();
+        }
+        else
+        {
+            qmlWarning(this) << "target can not be set when our item is used as a property value source";
+        }
 
         // Notify change
         Q_EMIT targetChanged(value);
@@ -94,20 +109,23 @@ void MasticQuickInputBinding::setproperties(QString value)
 {
     if (_properties != value)
     {
-        // Check if we can save this value
+        // Save our new value
+        _properties = value;
+
+        // Check if we can use this value
         if (!_isUsedAsQQmlPropertyValueSource)
         {
-            _properties = value;
-
-
-            // Notify change
-            Q_EMIT propertiesChanged(value);
+            // Update internal data
+            _update();
         }
         else
         {
-            qWarning() << "MasticInputBinding warning: properties can not be set when our item is used as a property value source (invalid value:"
-                       << _properties << ")";
+            qmlWarning(this) << "properties can not be set when our item is used as a property value source (invalid value: "
+                              << _properties << " )";
         }
+
+        // Notify change
+        Q_EMIT propertiesChanged(value);
     }
 }
 
@@ -121,8 +139,11 @@ void MasticQuickInputBinding::setinputsPrefix(QString value)
 {
     if (_inputsPrefix != value)
     {
+        // Save our new value
         _inputsPrefix = value;
 
+        // Update internal data
+        _update();
 
         // Notify change
         Q_EMIT inputsPrefixChanged(value);
@@ -146,7 +167,14 @@ void MasticQuickInputBinding::setinputsPrefix(QString value)
 void MasticQuickInputBinding::_ontargetDestroyed(QObject *sender)
 {
     Q_UNUSED(sender)
+
+    // Reset our target
     _target = NULL;
+
+    // Update internal data
+    _update();
+
+    // Notify that our target is destroyed
     Q_EMIT targetChanged(NULL);
 }
 
@@ -176,17 +204,27 @@ void MasticQuickInputBinding::setTarget(const QQmlProperty &property)
         // Check if this property is writable
         if (property.isWritable())
         {
-            qDebug() << "setTarget:" << property.name();
+            // Save this property
+            _propertyValueSourceTarget = property;
         }
         else
         {
-            qWarning() << "MasticInputBinding warning: can only be associated to a writable property." << property.name() << "is not a writable";
+            // Reset value
+            _propertyValueSourceTarget = QQmlProperty();
+
+            qmlWarning(this) << "can only be associated to a writable property. " << property.name() << " is not a writable";
         }
     }
     else
     {
-        qWarning() << "MasticInputBinding warning: can only be associated to a property." << property.name() << "is not a property";
+        // Reset value
+        _propertyValueSourceTarget = QQmlProperty();
+
+        qmlWarning(this) << "can only be associated to a property. " << property.name() << " is not a property";
     }
+
+    // Update internal data
+    _update();
 }
 
 
@@ -204,21 +242,149 @@ void MasticQuickInputBinding::classBegin()
  */
 void MasticQuickInputBinding::componentComplete()
 {
-    // Our component is completed
-    _isCompleted = true;
-
     // Check if everything is ok
     if (_isUsedAsQQmlPropertyValueSource)
     {
         // Check if properties is empty
         if (!_properties.isEmpty())
         {
-            qWarning() << "MasticInputBinding warning: properties can not be set when our item is used as a property value source (invalid value:"
-                       << _properties << ")";
+            qmlWarning(this) << "properties can not be set when our item is used as a property value source (invalid value: "
+                             << _properties << " )";
+        }
 
-            // Reset
-            _properties = "";
-            Q_EMIT propertiesChanged(_properties);
+        // Check if target is NULL
+        if (_target != NULL)
+        {
+            qmlWarning(this) << "target can ot be set when our item is used as a property value source";
         }
     }
+
+    // Our component is completed
+    _isCompleted = true;
+
+
+    // Update internal data
+    _update();
+}
+
+
+
+/**
+ * @brief Clear internal data
+ */
+void MasticQuickInputBinding::_clear()
+{
+    // clear our hashtable of properties
+    _qmlPropertiesByName.clear();
+}
+
+
+
+/**
+ * @brief Update internal data
+ */
+void MasticQuickInputBinding::_update()
+{
+    // Ensure that our component is completed
+    if (_isCompleted)
+    {
+        // Clean-up previous data
+        _clear();
+
+
+        // Check if our item is used as as property value source or a standard QML item
+        if (_isUsedAsQQmlPropertyValueSource)
+        {
+            //
+            // Property value source
+            //
+
+            // Add our QML property to our hashtable if needed
+            if (_propertyValueSourceTarget.isValid())
+            {
+                _qmlPropertiesByName.insert( _propertyValueSourceTarget.name(), _propertyValueSourceTarget);
+            }
+        }
+        else
+        {
+            //
+            // Standard QML item
+            //
+
+            // Check if we have a target and a list of properties
+            QString properties = _properties.trimmed();
+            if ((_target != NULL) && !properties.isEmpty())
+            {
+                // Check if we have a specific set of properties OR all properties
+                if ((MasticQuickBinding::instance() != NULL) && (properties == MasticQuickBinding::instance()->AllProperties()))
+                {
+                    qmlWarning(this) << "'properties: MasticBinding.AllProperties' is not yet implemented";
+                }
+                else
+                {
+                    //
+                    // Specific set of properties
+                    //
+
+                    // Parse our list of properties
+                    QStringList listOfPropertyNames = _properties.split(QLatin1Char(','));
+                    int numberOfPropertyNames = listOfPropertyNames.count();
+                    for (int index = 0; index < numberOfPropertyNames; index++)
+                    {
+                        // Clean-up the name of the current property
+                        QString propertyName = listOfPropertyNames.at(index).trimmed();
+
+                        // Create a property
+                        QQmlProperty property = QQmlProperty(_target, propertyName);
+
+                        // Check if this property exists
+                        if (property.isValid() && property.isProperty())
+                        {
+                            // Check if this property is writable
+                            if (property.isWritable())
+                            {
+                                // Check if the type of our property is supported
+                                if (MasticQuickBinding::checkIfPropertyIsSupported(property))
+                                {
+                                    // Save property
+                                    _qmlPropertiesByName.insert(propertyName, property);
+                                }
+                                else
+                                {
+                                    qmlWarning(this) << "property '" << propertyName << "' on "
+                                                     << MasticQuickBinding::prettyTypeName(_target)
+                                                     << " has type '" << property.propertyTypeName()
+                                                     << "' that is not supported by MasticQuick";
+
+                                }
+                            }
+                            else
+                            {
+                                qmlWarning(this) << "property '" << propertyName << "' on "
+                                                 << MasticQuickBinding::prettyTypeName(_target) << " is read-only";
+                            }
+                        }
+                        else
+                        {
+                            qmlWarning(this) << "property '" << propertyName << "' does not exist on "
+                                             << MasticQuickBinding::prettyTypeName(_target);
+                        }
+                    }
+                }
+            }
+            // Else: no target or no properties => nothing to do
+        }
+
+
+        // Check if we have at least one valid property
+        if (_qmlPropertiesByName.count() > 0)
+        {
+            foreach(const QString &propertyName, _qmlPropertiesByName.keys())
+            {
+                Q_UNUSED(propertyName)
+            }
+        }
+        // Else: no valid property => nothing to do
+    }
+    // Else: our component is not completed yet, we do nothing to avoid useless computations
 }

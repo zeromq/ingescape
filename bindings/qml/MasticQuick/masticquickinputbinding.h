@@ -96,12 +96,27 @@ protected:
     void componentComplete() Q_DECL_OVERRIDE;
 
 
+    /**
+     * @brief Clear internal data
+     */
+    void _clear();
+
+
+    /**
+     * @brief Update internal data
+     */
+    void _update();
+
+
 protected:
     // Flag indicating if our component is completed
      bool _isCompleted;
 
      // Flag indicating if our component is used has a QQmlPropertyValueSource
      bool _isUsedAsQQmlPropertyValueSource;
+
+     // Target property when our component is used as a property value source
+     QQmlProperty _propertyValueSourceTarget;
 
      // Hashtable of QML properties
      QHash<QString, QQmlProperty> _qmlPropertiesByName;

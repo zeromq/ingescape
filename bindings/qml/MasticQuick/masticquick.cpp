@@ -18,6 +18,8 @@
 #include <QCoreApplication>
 #include <QMutex>
 
+
+#include "masticquickbinding.h"
 #include "masticquickinputbinding.h"
 
 
@@ -745,8 +747,9 @@ void MasticQuick::registerTypes(const char* uri)
 
 
     //
-    // Register our main singleton
+    // Register singletons
     //
+    qmlRegisterSingletonType<MasticQuickBinding>(uri, MASTICQUICK_VERSION_MAJOR, MASTICQUICK_VERSION_MINOR, "MasticBinding", &MasticQuickBinding::qmlSingleton);
     qmlRegisterSingletonType<MasticQuick>(uri, MASTICQUICK_VERSION_MAJOR, MASTICQUICK_VERSION_MINOR, "Mastic", &MasticQuick::qmlSingleton);
 }
 

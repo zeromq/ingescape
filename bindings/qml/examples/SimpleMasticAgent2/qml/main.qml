@@ -359,10 +359,11 @@ ApplicationWindow {
                 MasticInputBinding {
                     target: myRectangle
 
-                    properties: "width, height"
+                    properties: "width, height, color, border.color, border.width"
 
                     inputsPrefix: "rect"
                 }
+
             }
         }
 
