@@ -390,6 +390,9 @@ ApplicationWindow {
                     inputsPrefix: "rect_"
                 }
 
+                Component.onCompleted: {
+                    console.log("Test "+Mastic.inputs["rect_border.width"]);
+                }
             }
         }
 

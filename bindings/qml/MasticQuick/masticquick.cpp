@@ -359,14 +359,20 @@ void MasticQuick_callbackObserveParameter(iop_t iopType, const char *name, iopTy
                     case INTEGER_T:
                         {
                             int newValue = *((int *)value);
-                            controller->parameters()->insert(qmlName, QVariant(newValue));
+                            QVariant qmlValue = QVariant(newValue);
+
+                            controller->parameters()->insert(qmlName, qmlValue);
+                            Q_EMIT controller->observeParameter(qmlName, qmlValue);
                         }
                         break;
 
                     case DOUBLE_T:
                         {
                             double newValue = *((double *)value);
+                            QVariant qmlValue = QVariant(newValue);
+
                             controller->parameters()->insert(qmlName, QVariant(newValue));
+                            Q_EMIT controller->observeParameter(qmlName, qmlValue);
                         }
                         break;
 
@@ -376,12 +382,16 @@ void MasticQuick_callbackObserveParameter(iop_t iopType, const char *name, iopTy
                             if (newCValue != NULL)
                             {
                                 QString newValue(newCValue);
-                                controller->parameters()->insert(qmlName, QVariant(newValue));
+                                QVariant qmlValue = QVariant(newValue);
+
+                                controller->parameters()->insert(qmlName, qmlValue);
+                                Q_EMIT controller->observeParameter(qmlName, qmlValue);
                                 // NB: we don't need to free newValue because we don't own it
                             }
                             else
                             {
                                 controller->parameters()->insert(qmlName, QVariant(""));
+                                Q_EMIT controller->observeParameter(qmlName, QVariant(""));
                             }
                         }
                         break;
@@ -389,26 +399,23 @@ void MasticQuick_callbackObserveParameter(iop_t iopType, const char *name, iopTy
                     case BOOL_T:
                         {
                             bool newValue = *((bool *)value);
-                            controller->parameters()->insert(qmlName, QVariant(newValue));
+                            QVariant qmlValue = QVariant(newValue);
+
+                            controller->parameters()->insert(qmlName, qmlValue);
+                            Q_EMIT controller->observeParameter(qmlName, qmlValue);
                         }
                         break;
 
                     case IMPULSION_T:
                         {
-                            // Hack to force the update of our property
-                            // We disable signals then we clear its value to detect a valud change when we set an empty value
-                            controller->parameters()->blockSignals(true);
-                            controller->parameters()->clear(qmlName);
-                            controller->parameters()->blockSignals(false);
-
-                            // Set an empty value to trigger an update
-                            controller->parameters()->insert(qmlName, QVariant(""));
+                            // Should not happen because a paramater can not be an impulsion
+                            qWarning() << "MasticQuick warning: can not update a parameter with type IMPULSION";
                         }
                         break;
 
                     case DATA_T:
                         {
-
+                            qWarning() << "MasticQuick warning: can not update a parameter with type DATA (not yet implemented)";
                         }
                         break;
 

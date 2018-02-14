@@ -207,10 +207,10 @@ void MasticQuickInputBinding::_ontargetDestroyed(QObject *sender)
  * @param value
  */
 void MasticQuickInputBinding::_onMasticObserveInput(QString name, QVariant value)
-{qDebug() << "ObserveInput" << name;
+{
     // Check if we are interested by this input
     if (_qmlPropertiesByMasticInputName.contains(name))
-    {
+    {qDebug() << "ObserveInput" << name << value;
         QQmlProperty property = _qmlPropertiesByMasticInputName.value(name);
         property.write(value);
     }
