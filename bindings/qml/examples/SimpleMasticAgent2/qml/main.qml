@@ -108,7 +108,7 @@ ApplicationWindow {
         console.log("Mastic version is " + Mastic.version);
 
         // MasticQuick API: verbose mode
-        Mastic.isVerbose = true;
+        Mastic.isVerbose = false;
 
         // MasticQuick API: set definition
         Mastic.definitionName = Qt.application.name;
@@ -295,6 +295,20 @@ ApplicationWindow {
             }
 
 
+            Image {
+                id: myImage
+
+                source: "https://i2.wp.com/ingenuity.io/wp-content/uploads/2017/10/logo-I2-site-05.png"
+
+
+                // MasticQuick API: automatically bind a QML property to a Mastic input
+                // here, the 'source' property will be binded to a Mastic input named 'image_source'
+                MasticInputBinding on source {
+                    inputsPrefix: "image_"
+                }
+            }
+
+
             Item {
                 id: myCircle
 
@@ -327,7 +341,58 @@ ApplicationWindow {
                         NumberAnimation { target: myCircleUI; property: "scale"; to: 1; }
                      }
                 }
+            }
 
+
+            Rectangle {
+                id: myRectangle
+
+                property bool myBool: true
+                property int myInt: 0
+                property double myDouble: 0.0
+                property real myReal: 0.0
+                property url myUrl: "qrc:/qml/main.qml"
+                property string myString: "hello"
+                property var myVar;
+                property variant myVariant: Item {}
+                property color myColor: "red"
+                property date myDate: new Date()
+
+
+                x: 100
+                y: 100
+                width: 60
+                height: 100
+
+                border {
+                    width: 3
+                    color: "#CC000000"
+                }
+
+                color: "#CCFF0000"
+
+                MasticInputBinding on x {
+                    inputsPrefix: "rect_"
+                    properties: "x, y"
+                }
+
+                MasticInputBinding on y {
+                    inputsPrefix: "rect_"
+                }
+
+
+                MasticInputBinding {
+                    target: myRectangle
+
+                    properties: "width, height, color, border.color, border.width"
+                + ", myBool, myInt, myDouble, myReal, myUrl, myString, myVar, myVariant, myColor, myDate"
+
+                    inputsPrefix: "rect_"
+                }
+
+                Component.onCompleted: {
+                    console.log("Test "+Mastic.inputs["rect_border.width"]);
+                }
             }
         }
 

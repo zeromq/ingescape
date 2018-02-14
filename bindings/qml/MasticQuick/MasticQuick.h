@@ -22,6 +22,7 @@
 
 #include "masticquick_global.h"
 #include "masticquick_helpers.h"
+#include "masticquick_enums.h"
 
 #include "masticquickinputspropertymap.h"
 #include "masticquickoutputspropertymap.h"
@@ -34,29 +35,6 @@
 //
 #define DEFAULT_MASTICQUICK_URI "MasticQuick"
 
-
-
-
-//-------------------------------------------------------------------
-//
-//
-//  Enums
-//
-//
-//-------------------------------------------------------------------
-
-
-/**
-  * @brief Enum for IOP types
-  */
-MASTIC_QML_ENUM(MasticIopType, INVALID = 0, INTEGER, DOUBLE, STRING, BOOLEAN, IMPULSION, DATA)
-
-
-
-/**
- * @brief Enum for log levels
- */
-MASTIC_QML_ENUM(MasticLogLevel, LOG_TRACE = 0, LOG_DEBUG, LOG_INFO, LOG_WARN, LOG_ERROR, LOG_FATAL)
 
 
 
@@ -179,28 +157,38 @@ public:
 
 
 
-     /**
-      * @brief Set our isMuted flag based on observeMute
-      * @param value
-      */
-     void _internalSetIsMuted(bool value);
-
-
-
-     /**
-      * @brief Set our isFrozen flag based on observeFreeze
-      * @param value
-      */
-     void _internalSetIsFrozen(bool value);
-
-
-
 Q_SIGNALS:
      /**
      * @brief Triggered when our agent is asked to stop on the network
      */
     void forcedStop();
 
+
+
+    /**
+     * @brief Triggered when a Mastic input changes
+     * @param name
+     * @param value
+     */
+    void observeInput(QString name, QVariant value);
+
+
+
+    /**
+     * @brief Triggered when a Mastic ouput changes
+     * @param name
+     * @param value
+     */
+    void observeOutput(QString name, QVariant value);
+
+
+
+    /**
+     * @brief Triggered when a Mastic parameter changes
+     * @param name
+     * @param value
+     */
+    void observeParameter(QString name, QVariant value);
 
 
 
@@ -507,7 +495,7 @@ public Q_SLOTS:
       * @param name
       * @param value
       *
-      * @return true if an input is created, false otherwise (i.e. we already have an input with this name)
+      * @return true if an input is created or already exists with the same type, false otherwise
       */
      bool createInputInt(QString name, int value = 0);
 
@@ -519,7 +507,7 @@ public Q_SLOTS:
       * @param name
       * @param value
       *
-      * @return true if an input is created, false otherwise (i.e. we already have an input with this name)
+      * @return true if an input is created or already exists with the same type, false otherwise
       */
      bool createInputDouble(QString name, double value = 0.0);
 
@@ -531,7 +519,7 @@ public Q_SLOTS:
       * @param name
       * @param value
       *
-      * @return true if an input is created, false otherwise (i.e. we already have an input with this name)
+      * @return true if an input is created or already exists with the same type, false otherwise
       */
      bool createInputString(QString name, QString value = "");
 
@@ -543,7 +531,7 @@ public Q_SLOTS:
       * @param name
       * @param value
       *
-      * @return true if an input is created, false otherwise (i.e. we already have an input with this name)
+      * @return true if an input is created or already exists with the same type, false otherwise
       */
      bool createInputBool(QString name, bool value = false);
 
@@ -554,7 +542,7 @@ public Q_SLOTS:
       *
       * @param name
       *
-      * @return true if an input is created, false otherwise (i.e. we already have an input with this name)
+      * @return true if an input is created or already exists with the same type, false otherwise
       */
      bool createInputImpulsion(QString name);
 
@@ -566,7 +554,7 @@ public Q_SLOTS:
       * @param name
       * @param value
       *
-      * @return true if an input is created, false otherwise (i.e. we already have an input with this name)
+      * @return true if an input is created or already exists with the same type, false otherwise
       */
      bool createInputData(QString name, void* value = NULL);
 
@@ -578,7 +566,7 @@ public Q_SLOTS:
       * @param name
       * @param value
       *
-      * @return true if an output is created, false otherwise (i.e. we already have an output with this name)
+      * @return true if an output is created or already exists with the same type, false otherwise
       */
      bool createOutputInt(QString name, int value = 0);
 
@@ -590,7 +578,7 @@ public Q_SLOTS:
       * @param name
       * @param value
       *
-      * @return true if an output is created, false otherwise (i.e. we already have an output with this name)
+      * @return true if an output is created or already exists with the same type, false otherwise
       */
      bool createOutputDouble(QString name, double value = 0.0);
 
@@ -602,7 +590,7 @@ public Q_SLOTS:
       * @param name
       * @param value
       *
-      * @return true if an output is created, false otherwise (i.e. we already have an output with this name)
+      * @return true if an output is created or already exists with the same type, false otherwise
       */
      bool createOutputString(QString name, QString value = "");
 
@@ -614,7 +602,7 @@ public Q_SLOTS:
       * @param name
       * @param value
       *
-      * @return true if an output is created, false otherwise (i.e. we already have an output with this name)
+      * @return true if an output is created or already exists with the same type, false otherwise
       */
      bool createOutputBool(QString name, bool value = false);
 
@@ -625,7 +613,7 @@ public Q_SLOTS:
       *
       * @param name
       *
-      * @return true if an output is created, false otherwise (i.e. we already have an output with this name)
+      * @return true if an output is created or already exists with the same type, false otherwise
       */
      bool createOutputImpulsion(QString name);
 
@@ -637,7 +625,7 @@ public Q_SLOTS:
       * @param name
       * @param value
       *
-      * @return true if an output is created, false otherwise (i.e. we already have an output with this name)
+      * @return true if an output is created or already exists with the same type, false otherwise
       */
      bool createOutputData(QString name, void* value = NULL);
 
@@ -649,7 +637,7 @@ public Q_SLOTS:
       * @param name
       * @param value
       *
-      * @return true if a parameter is created, false otherwise (i.e. we already have a parameter with this name)
+      * @return true if a parameter is created or already exists with the same type, false otherwise
       */
      bool createParameterInt(QString name, int value = 0);
 
@@ -661,7 +649,7 @@ public Q_SLOTS:
       * @param name
       * @param value
       *
-      * @return true if a parameter is created, false otherwise (i.e. we already have a parameter with this name)
+      * @return true if a parameter is created or already exists with the same type, false otherwise
       */
      bool createParameterDouble(QString name, double value = 0.0);
 
@@ -673,7 +661,7 @@ public Q_SLOTS:
       * @param name
       * @param value
       *
-      * @return true if a parameter is created, false otherwise (i.e. we already have a parameter with this name)
+      * @return true if a parameter is created or already exists with the same type, false otherwise
       */
      bool createParameterString(QString name, QString value = "");
 
@@ -685,7 +673,7 @@ public Q_SLOTS:
       * @param name
       * @param value
       *
-      * @return true if a parameter is created, false otherwise (i.e. we already have a parameter with this name)
+      * @return true if a parameter is created or already exists with the same type, false otherwise
       */
      bool createParameterBool(QString name, bool value = false);
 
@@ -697,7 +685,7 @@ public Q_SLOTS:
       * @param name
       * @param value
       *
-      * @return true if a parameter is created, false otherwise (i.e. we already have a parameter with this name)
+      * @return true if a parameter is created or already exists with the same type, false otherwise
       */
      bool createParameterData(QString name, void* value = NULL);
 
@@ -821,13 +809,53 @@ public Q_SLOTS:
 
 
 
-//---------------------------------------------------
-//
-// QML specific API
-//
-//---------------------------------------------------
-public Q_SLOTS:
 
+//--------------------------------------------------------
+//
+// Extra QML API
+//
+//--------------------------------------------------------
+
+public Q_SLOTS:
+     /**
+      * @brief Check if an IOP name is valid or if it can create conflicts with Qt internal symbols
+      * @param name
+      * @return
+      */
+     bool checkIfIopNameIsValid(const QString& name);
+
+
+
+
+//--------------------------------------------------------
+//
+// Internal API - MUST not be used outside of MasticQuick
+//
+//--------------------------------------------------------
+
+public:
+     /**
+      * @brief Set our isMuted flag based on observeMute
+      * @param value
+      */
+     void _internal_setIsMuted(bool value);
+
+
+
+     /**
+      * @brief Set our isFrozen flag based on observeFreeze
+      * @param value
+      */
+     void _internal_setIsFrozen(bool value);
+
+
+     /**
+      * @brief _internal_tryToCreateInput
+      * @param name
+      * @param type
+      * @param qmlValue
+      */
+     void _internal_tryToCreateInput(QString name, MasticIopType::Value type, QVariant qmlValue);
 
 
 
@@ -838,15 +866,6 @@ public Q_SLOTS:
 //---------------------------------------------------
 protected:
      /**
-      * @brief Check if an IOP name is valid or if it can create conflicts with Qt internal symbols
-      * @param name
-      * @return
-      */
-     bool _validIopName(const QString& name);
-
-
-
-     /**
       * @brief Create a new input
       *
       * @param name
@@ -855,7 +874,7 @@ protected:
       * @param cValue
       * @param cSize
       *
-      * @return true if an input is created, false otherwise
+      * @return true if an input is created or already exists with the same type, false otherwise
       */
      bool _createInput(QString name, MasticIopType::Value type, QVariant qmlValue, void* cValue, long cSize);
 
@@ -870,7 +889,7 @@ protected:
       * @param cValue
       * @param cSize
       *
-      * @return true if an output is created, false otherwise
+      * @return true if an output is created or already exists with the same type, false otherwise
       */
      bool _createOutput(QString name, MasticIopType::Value type, QVariant qmlValue, void* cValue, long cSize);
 
@@ -885,7 +904,7 @@ protected:
       * @param cValue
       * @param cSize
       *
-      * @return true if a parameter is created, false otherwise
+      * @return true if a parameter is created or already exists with the same type, false otherwise
       */
      bool _createParameter(QString name, MasticIopType::Value type, QVariant qmlValue, void* cValue, long cSize);
 

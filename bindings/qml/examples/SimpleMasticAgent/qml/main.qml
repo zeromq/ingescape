@@ -122,8 +122,9 @@ ApplicationWindow {
         // MasticQuick API: create outputs
         Mastic.createOutputDouble("rectX", myRectangle.x);
         Mastic.createOutputDouble("rectY", myRectangle.y);
-        Mastic.createOutputString("currentColor", content.currentColor)
+        Mastic.createOutputString("currentColor", content.currentColor);
         Mastic.createOutputImpulsion("impulsion");
+        Mastic.createOutputString("image", "https://pbs.twimg.com/profile_images/502064538108166144/ih48MCFK_400x400.png");
 
         // MasticQuick API: create parameters
         Mastic.createParameterString("myColor", "mediumaquamarine");
