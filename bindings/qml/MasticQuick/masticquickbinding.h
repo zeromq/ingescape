@@ -61,7 +61,7 @@ public:
       * @param object
       * @return
       */
-     static QString prettyTypeName(QObject* object);
+     static QString prettyObjectTypeName(QObject* object);
 
 
      /**
@@ -73,11 +73,29 @@ public:
 
 
      /**
-      * @brief Get the MasticIopType of a given property
+      * @brief Get the pretty name of a given property
       * @param property
       * @return
       */
-     static MasticIopType::Value getPropertyType(const QQmlProperty &property);
+     static QString prettyPropertyTypeName(const QQmlProperty &property);
+
+
+     /**
+      * @brief Get the MasticIopType of a given property
+      * @param property
+      * @return
+      *
+      * @remarks we assume that checkIfPropertyIsSupported has been called before using this method
+      */
+     static MasticIopType::Value getMasticIOPTypeForProperty(const QQmlProperty &property);
+
+
+protected:
+     // List of supported types for MasticIopType.INTEGER
+     static QList<QMetaType::Type> _supportedTypesForMasticIopTypeInteger;
+
+     // List of supported types for MasticIopType.DOUBLE
+     static QList<QMetaType::Type> _supportedTypesForMasticIopTypeDouble;
 };
 
 QML_DECLARE_TYPE(MasticQuickBinding)

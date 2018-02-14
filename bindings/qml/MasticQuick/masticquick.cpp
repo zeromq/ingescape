@@ -247,14 +247,20 @@ void MasticQuick_callbackObserveInput(iop_t iopType, const char *name, iopType_t
                     case INTEGER_T:
                         {
                             int newValue = *((int *)value);
-                            controller->inputs()->insert(qmlName, QVariant(newValue));
+                            QVariant qmlValue = QVariant(newValue);
+
+                            controller->inputs()->insert(qmlName, qmlValue);
+                            Q_EMIT controller->observeInput(qmlName, qmlValue);
                         }
                         break;
 
                     case DOUBLE_T:
                         {
                             double newValue = *((double *)value);
+                            QVariant qmlValue = QVariant(newValue);
+
                             controller->inputs()->insert(qmlName, QVariant(newValue));
+                            Q_EMIT controller->observeInput(qmlName, qmlValue);
                         }
                         break;
 
@@ -264,12 +270,16 @@ void MasticQuick_callbackObserveInput(iop_t iopType, const char *name, iopType_t
                             if (newCValue != NULL)
                             {
                                 QString newValue(newCValue);
-                                controller->inputs()->insert(qmlName, QVariant(newValue));
+                                QVariant qmlValue = QVariant(newValue);
+
+                                controller->inputs()->insert(qmlName, qmlValue);
+                                Q_EMIT controller->observeInput(qmlName, qmlValue);
                                 // NB: we don't need to free newValue because we don't own it
                             }
                             else
                             {
                                 controller->inputs()->insert(qmlName, QVariant(""));
+                                Q_EMIT controller->observeInput(qmlName, QVariant(""));
                             }
                         }
                         break;
@@ -277,7 +287,10 @@ void MasticQuick_callbackObserveInput(iop_t iopType, const char *name, iopType_t
                     case BOOL_T:
                         {
                             bool newValue = *((bool *)value);
-                            controller->inputs()->insert(qmlName, QVariant(newValue));
+                            QVariant qmlValue = QVariant(newValue);
+
+                            controller->inputs()->insert(qmlName, qmlValue);
+                            Q_EMIT controller->observeInput(qmlName, qmlValue);
                         }
                         break;
 
@@ -291,12 +304,13 @@ void MasticQuick_callbackObserveInput(iop_t iopType, const char *name, iopType_t
 
                             // Set an empty value to trigger an update
                             controller->inputs()->insert(qmlName, QVariant(""));
+                            Q_EMIT controller->observeInput(qmlName, QVariant(""));
                         }
                         break;
 
                     case DATA_T:
                         {
-
+                            qWarning() << "MasticQuick warning: can not update an input with type DATA (not yet implemented)";
                         }
                         break;
 
@@ -425,7 +439,7 @@ void MasticQuick_callbackObserveFreeze(bool isFrozen, void* customData)
     MasticQuick* controller = (MasticQuick *)customData;
     if (controller != NULL)
     {
-        controller->_internalSetIsFrozen(isFrozen);
+        controller->_internal_setIsFrozen(isFrozen);
     }
 }
 
@@ -442,7 +456,7 @@ void MasticQuick_callbackObserveMute(bool isMuted, void* customData)
     MasticQuick* controller = (MasticQuick *)customData;
     if (controller != NULL)
     {
-        controller->_internalSetIsMuted(isMuted);
+        controller->_internal_setIsMuted(isMuted);
     }
 }
 
@@ -827,6 +841,7 @@ void MasticQuick::setdefinitionName(QString value)
 }
 
 
+
 /**
  * @brief Set the version of our definition
  * @param value
@@ -898,23 +913,6 @@ void MasticQuick::setisMuted(bool value)
 
 
 /**
- * @brief Set our isMuted flag based on observeMute
- * @param value
- */
-void MasticQuick::_internalSetIsMuted(bool value)
-{
-    if (_isMuted != value)
-    {
-        _isMuted = value;
-
-        // Notify change
-        Q_EMIT isMutedChanged(value);
-    }
-}
-
-
-
-/**
  * @brief Set our isFrozen flag
  * @param value
  */
@@ -937,23 +935,6 @@ void MasticQuick::setisFrozen(bool value)
 
         // Notify change
         Q_EMIT isFrozenChanged(_isFrozen);
-    }
-}
-
-
-
-/**
- * @brief Set our isFrozen flag based on observeFreeze
- * @param value
- */
-void MasticQuick::_internalSetIsFrozen(bool value)
-{
-    if (_isFrozen != value)
-    {
-        _isFrozen = value;
-
-        // Notify change
-        Q_EMIT isFrozenChanged(value);
     }
 }
 
@@ -1060,6 +1041,7 @@ bool MasticQuick::startWithDevice(QString networkDevice, int port)
 }
 
 
+
 /**
  * @brief Start our agent with a given IP address and port
  *
@@ -1091,6 +1073,7 @@ bool MasticQuick::startWithIP(QString ipAddress, int port)
 }
 
 
+
 /**
  * @brief Stop our agent
  */
@@ -1114,6 +1097,7 @@ bool MasticQuick::stop()
 
     return result;
 }
+
 
 
 
@@ -1171,6 +1155,7 @@ bool MasticQuick::writeOutputAsInt(QString name, int value)
 }
 
 
+
 /**
  * @brief Write a given output as a double
  *
@@ -1206,6 +1191,7 @@ bool MasticQuick::writeOutputAsDouble(QString name, double value)
 
     return result;
 }
+
 
 
 /**
@@ -1245,6 +1231,7 @@ bool MasticQuick::writeOutputAsString(QString name, QString value)
 }
 
 
+
 /**
  * @brief Write a given output as a boolean
  *
@@ -1280,6 +1267,7 @@ bool MasticQuick::writeOutputAsBool(QString name, bool value)
 
     return result;
 }
+
 
 
 /**
@@ -1318,6 +1306,7 @@ bool MasticQuick::writeOutputAsImpulsion(QString name)
 }
 
 
+
 /**
  * @brief Write a given output as data
  *
@@ -1337,6 +1326,7 @@ bool MasticQuick::writeOutputAsData(QString name, void* value)
 
     return result;
 }
+
 
 
 /**
@@ -1376,6 +1366,7 @@ bool MasticQuick::writeParameterAsInt(QString name, int value)
 }
 
 
+
 /**
  * @brief Write a given parameter as a double
  *
@@ -1411,6 +1402,7 @@ bool MasticQuick::writeParameterAsDouble(QString name, double value)
 
     return result;
 }
+
 
 
 /**
@@ -1450,6 +1442,7 @@ bool MasticQuick::writeParameterAsString(QString name, QString value)
 }
 
 
+
 /**
  * @brief Write a given parameter as a boolean
  *
@@ -1485,6 +1478,7 @@ bool MasticQuick::writeParameterAsBool(QString name, bool value)
 
     return result;
 }
+
 
 
 /**
@@ -1542,6 +1536,7 @@ MasticIopType::Value MasticQuick::getTypeForInput(QString name)
 }
 
 
+
 /**
  * @brief Get type of a given output
  * @param name
@@ -1566,6 +1561,7 @@ MasticIopType::Value MasticQuick::getTypeForOutput(QString name)
 
     return result;
 }
+
 
 
 /**
@@ -1594,6 +1590,7 @@ MasticIopType::Value MasticQuick::getTypeForParameter(QString name)
 }
 
 
+
 /**
  * @brief Check if our agent has an input with this name
  * @param name
@@ -1605,6 +1602,7 @@ bool MasticQuick::checkInputExistence(QString name)
 }
 
 
+
 /**
  * @brief Check if our agent has an output with this name
  * @param name
@@ -1614,6 +1612,7 @@ bool MasticQuick::checkOutputExistence(QString name)
 {
     return mtic_checkOutputExistence(name.toStdString().c_str());
 }
+
 
 
 /**
@@ -1663,6 +1662,7 @@ bool MasticQuick::muteOuput(QString name)
 }
 
 
+
 /**
  * @brief Mute a given output
  *
@@ -1688,6 +1688,7 @@ bool MasticQuick::unmuteOuput(QString name)
 
     return result;
 }
+
 
 
 /**
@@ -1748,6 +1749,7 @@ bool MasticQuick::createInputInt(QString name, int value)
 }
 
 
+
 /**
  * @brief Create a new double input
  *
@@ -1760,6 +1762,7 @@ bool MasticQuick::createInputDouble(QString name, double value)
 {
     return _createInput(name, MasticIopType::DOUBLE, QVariant(value), &value, sizeof(double));
 }
+
 
 
 /**
@@ -1779,6 +1782,7 @@ bool MasticQuick::createInputString(QString name, QString value)
 }
 
 
+
 /**
  * @brief Create a new boolean input
  *
@@ -1793,6 +1797,7 @@ bool MasticQuick::createInputBool(QString name, bool value)
 }
 
 
+
 /**
  * @brief Create a new impulsion input
  *
@@ -1804,6 +1809,7 @@ bool MasticQuick::createInputImpulsion(QString name)
 {
     return _createInput(name, MasticIopType::IMPULSION, QVariant(""), 0, 0);
 }
+
 
 
 /**
@@ -1827,6 +1833,7 @@ bool MasticQuick::createInputData(QString name, void* value)
 }
 
 
+
 /**
  * @brief Create a new integer output
  *
@@ -1841,6 +1848,7 @@ bool MasticQuick::createOutputInt(QString name, int value)
 }
 
 
+
 /**
  * @brief Create a new double output
  *
@@ -1853,6 +1861,7 @@ bool MasticQuick::createOutputDouble(QString name, double value)
 {
     return _createOutput(name, MasticIopType::DOUBLE, QVariant(value), &value, sizeof(double));
 }
+
 
 
 /**
@@ -1872,6 +1881,7 @@ bool MasticQuick::createOutputString(QString name, QString value)
 }
 
 
+
 /**
  * @brief Create a new boolean output
  *
@@ -1884,6 +1894,7 @@ bool MasticQuick::createOutputBool(QString name, bool value)
 {
     return _createOutput(name, MasticIopType::BOOLEAN, QVariant(value), &value, sizeof(bool));
 }
+
 
 
 /**
@@ -1920,6 +1931,7 @@ bool MasticQuick::createOutputData(QString name, void* value)
 }
 
 
+
 /**
  * @brief Create a new integer parameter
  *
@@ -1934,6 +1946,7 @@ bool MasticQuick::createParameterInt(QString name, int value)
 }
 
 
+
 /**
  * @brief Create a new double parameter
  *
@@ -1946,6 +1959,7 @@ bool MasticQuick::createParameterDouble(QString name, double value)
 {
     return _createParameter(name, MasticIopType::DOUBLE, QVariant(value), &value, sizeof(double));
 }
+
 
 
 /**
@@ -1965,6 +1979,7 @@ bool MasticQuick::createParameterString(QString name, QString value)
 }
 
 
+
 /**
  * @brief Create a new boolean parameter
  *
@@ -1977,6 +1992,7 @@ bool MasticQuick::createParameterBool(QString name, bool value)
 {
     return _createParameter(name, MasticIopType::BOOLEAN, QVariant(value), &value, sizeof(bool));
 }
+
 
 
 /**
@@ -1998,6 +2014,7 @@ bool MasticQuick::createParameterData(QString name, void* value)
 
     return result;
 }
+
 
 
 /**
@@ -2033,6 +2050,7 @@ bool MasticQuick::removeInput(QString name)
 }
 
 
+
 /**
  * @brief Remove an output
  *
@@ -2064,6 +2082,7 @@ bool MasticQuick::removeOutput(QString name)
 
     return result;
 }
+
 
 
 /**
@@ -2232,7 +2251,7 @@ void MasticQuick::fatal(QString text)
 
 //-------------------------------------------------------------------
 //
-// Protected methods
+// Extra QML API
 //
 //-------------------------------------------------------------------
 
@@ -2242,7 +2261,7 @@ void MasticQuick::fatal(QString text)
  * @param name
  * @return
  */
-bool MasticQuick::_validIopName(const QString& name)
+bool MasticQuick::checkIfIopNameIsValid(const QString& name)
 {
     return (
              (name != QLatin1String("QObject"))
@@ -2256,6 +2275,57 @@ bool MasticQuick::_validIopName(const QString& name)
              (name != QLatin1String("valueChanged"))
             );
 }
+
+
+
+
+//--------------------------------------------------------
+//
+// Internal API - MUST not be used outside of MasticQuick
+//
+//--------------------------------------------------------
+
+
+/**
+ * @brief Set our isMuted flag based on observeMute
+ * @param value
+ */
+void MasticQuick::_internal_setIsMuted(bool value)
+{
+    if (_isMuted != value)
+    {
+        _isMuted = value;
+
+        // Notify change
+        Q_EMIT isMutedChanged(value);
+    }
+}
+
+
+
+/**
+ * @brief Set our isFrozen flag based on observeFreeze
+ * @param value
+ */
+void MasticQuick::_internal_setIsFrozen(bool value)
+{
+    if (_isFrozen != value)
+    {
+        _isFrozen = value;
+
+        // Notify change
+        Q_EMIT isFrozenChanged(value);
+    }
+}
+
+
+
+
+//-------------------------------------------------------------------
+//
+// Protected methods
+//
+//-------------------------------------------------------------------
 
 
 
@@ -2278,7 +2348,7 @@ bool MasticQuick::_createInput(QString name, MasticIopType::Value type, QVariant
     if (!name.isEmpty())
     {
         // Check if it is a valid IOP name
-        if (_validIopName(name))
+        if (checkIfIopNameIsValid(name))
         {
             // Check if we must create a Mastic input
             const char* cName = name.toStdString().c_str();
@@ -2364,7 +2434,7 @@ bool MasticQuick::_createOutput(QString name, MasticIopType::Value type, QVarian
     if (!name.isEmpty())
     {
         // Check if it is a valid IOP name
-        if (_validIopName(name))
+        if (checkIfIopNameIsValid(name))
         {
             // Check if we must create a Mastic input
             const char* cName = name.toStdString().c_str();
@@ -2443,7 +2513,7 @@ bool MasticQuick::_createParameter(QString name, MasticIopType::Value type, QVar
     if (!name.isEmpty())
     {
         // Check if it is a valid IOP name
-        if (_validIopName(name))
+        if (checkIfIopNameIsValid(name))
         {
             // Check if we must create a Mastic input
             const char* cName = name.toStdString().c_str();

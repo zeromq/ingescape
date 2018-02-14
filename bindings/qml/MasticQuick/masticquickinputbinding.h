@@ -43,6 +43,9 @@ class MasticQuickInputBinding : public QObject, public QQmlPropertyValueSource, 
     // Prefix of Mastic inputs
     MASTIC_QML_PROPERTY_CUSTOM_SETTER(QString, inputsPrefix)
 
+    // Suffix of Mastic inputs
+    MASTIC_QML_PROPERTY_CUSTOM_SETTER(QString, inputsSuffix)
+
 
 public:
     /**
@@ -71,6 +74,14 @@ protected Q_SLOTS:
      * @param sender
      */
     void _ontargetDestroyed(QObject *sender);
+
+
+    /**
+     * @brief Called when a Mastic input changes
+     * @param name
+     * @param value
+     */
+    void _onMasticObserveInput(QString name, QVariant value);
 
 
 protected:
@@ -118,8 +129,11 @@ protected:
      // Target property when our component is used as a property value source
      QQmlProperty _propertyValueSourceTarget;
 
-     // Hashtable of QML properties
+     // Hashtable of QML properties by name
      QHash<QString, QQmlProperty> _qmlPropertiesByName;
+
+     // Hashtable (Mastic input name, property name)
+     QHash<QString, QQmlProperty> _qmlPropertiesByMasticInputName;
 };
 
 QML_DECLARE_TYPE(MasticQuickInputBinding)

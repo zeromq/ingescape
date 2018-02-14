@@ -17,6 +17,8 @@
 #include <QDebug>
 
 #include "masticquickbinding.h"
+#include "MasticQuick.h"
+
 
 
 /**
@@ -28,7 +30,6 @@ MasticQuickInputBinding::MasticQuickInputBinding(QObject *parent) : QObject(pare
     _isCompleted(false),
     _isUsedAsQQmlPropertyValueSource(false)
 {
-
 }
 
 
@@ -152,6 +153,26 @@ void MasticQuickInputBinding::setinputsPrefix(QString value)
 
 
 
+/**
+ * @brief Set the suffix of Mastic inputs
+ * @param value
+ */
+void MasticQuickInputBinding::setinputsSuffix(QString value)
+{
+    if (_inputsSuffix != value)
+    {
+        // Save our new value
+        _inputsSuffix = value;
+
+        // Update internal data
+        _update();
+
+        // Notify change
+        Q_EMIT inputsSuffixChanged(value);
+    }
+}
+
+
 
 //-------------------------------------------------------------------
 //
@@ -179,6 +200,25 @@ void MasticQuickInputBinding::_ontargetDestroyed(QObject *sender)
 }
 
 
+
+/**
+ * @brief Called when a Mastic input changes
+ * @param name
+ * @param value
+ */
+void MasticQuickInputBinding::_onMasticObserveInput(QString name, QVariant value)
+{qDebug() << "ObserveInput" << name;
+    // Check if we are interested by this input
+    if (_qmlPropertiesByMasticInputName.contains(name))
+    {
+        QQmlProperty property = _qmlPropertiesByMasticInputName.value(name);
+        property.write(value);
+    }
+}
+
+
+
+
 //-------------------------------------------------------------------
 //
 // Protected methods
@@ -204,8 +244,21 @@ void MasticQuickInputBinding::setTarget(const QQmlProperty &property)
         // Check if this property is writable
         if (property.isWritable())
         {
-            // Save this property
-            _propertyValueSourceTarget = property;
+            // Check if the type of our property is supported
+            if (MasticQuickBinding::checkIfPropertyIsSupported(property))
+            {
+                // Save this property
+                _propertyValueSourceTarget = property;
+            }
+            else
+            {
+                // Reset value
+                _propertyValueSourceTarget = QQmlProperty();
+
+                qmlWarning(this) << "property '" << property.name() << "' has type '"
+                                 << MasticQuickBinding::prettyPropertyTypeName(property)
+                                 << "' that is not supported by MasticQuick";
+            }
         }
         else
         {
@@ -274,8 +327,16 @@ void MasticQuickInputBinding::componentComplete()
  */
 void MasticQuickInputBinding::_clear()
 {
-    // clear our hashtable of properties
+    // Unsubscribe to MasticQuick if needed
+    MasticQuick* masticQuick = MasticQuick::instance();
+    if ((masticQuick != NULL) && (_qmlPropertiesByMasticInputName.count() > 0))
+    {
+        disconnect(masticQuick, &MasticQuick::observeInput, this, &MasticQuickInputBinding::_onMasticObserveInput);
+    }
+
+    // Clear our hashtables
     _qmlPropertiesByName.clear();
+    _qmlPropertiesByMasticInputName.clear();
 }
 
 
@@ -352,8 +413,8 @@ void MasticQuickInputBinding::_update()
                                 else
                                 {
                                     qmlWarning(this) << "property '" << propertyName << "' on "
-                                                     << MasticQuickBinding::prettyTypeName(_target)
-                                                     << " has type '" << property.propertyTypeName()
+                                                     << MasticQuickBinding::prettyObjectTypeName(_target)
+                                                     << " has type '" << MasticQuickBinding::prettyPropertyTypeName(property)
                                                      << "' that is not supported by MasticQuick";
 
                                 }
@@ -361,13 +422,13 @@ void MasticQuickInputBinding::_update()
                             else
                             {
                                 qmlWarning(this) << "property '" << propertyName << "' on "
-                                                 << MasticQuickBinding::prettyTypeName(_target) << " is read-only";
+                                                 << MasticQuickBinding::prettyObjectTypeName(_target) << " is read-only";
                             }
                         }
                         else
                         {
                             qmlWarning(this) << "property '" << propertyName << "' does not exist on "
-                                             << MasticQuickBinding::prettyTypeName(_target);
+                                             << MasticQuickBinding::prettyObjectTypeName(_target);
                         }
                     }
                 }
@@ -379,9 +440,86 @@ void MasticQuickInputBinding::_update()
         // Check if we have at least one valid property
         if (_qmlPropertiesByName.count() > 0)
         {
-            foreach(const QString &propertyName, _qmlPropertiesByName.keys())
+            MasticQuick* masticQuick = MasticQuick::instance();
+            if (masticQuick != NULL)
             {
-                Q_UNUSED(propertyName)
+                // Try to create a Mastic input for each property
+                foreach(const QString propertyName, _qmlPropertiesByName.keys())
+                {
+                    // Get our property
+                    QQmlProperty property = _qmlPropertiesByName.value(propertyName);
+
+                    // Name of our MasticInput
+                    QString masticInputName = _inputsPrefix + propertyName + _inputsSuffix;
+
+                    // Get MasticIOP type
+                    MasticIopType::Value masticIopType = MasticQuickBinding::getMasticIOPTypeForProperty(property);
+
+                    // Try to build a Mastic input
+                    bool succeeded = false;
+                    switch(masticIopType)
+                    {
+                        case MasticIopType::INVALID:
+                            // Should not happen because we should have filter invalid properties
+                            break;
+
+                        case MasticIopType::INTEGER:
+                            {
+                                succeeded = masticQuick->createInputInt(masticInputName, 0);
+                            }
+                            break;
+
+                        case MasticIopType::DOUBLE:
+                            {
+                                succeeded = masticQuick->createInputDouble(masticInputName, 0);
+                            }
+                            break;
+
+                        case MasticIopType::STRING:
+                            {
+                                succeeded = masticQuick->createInputString(masticInputName, "");
+                            }
+                            break;
+
+                        case MasticIopType::BOOLEAN:
+                            {
+                                succeeded = masticQuick->createInputBool(masticInputName, false);
+                            }
+                            break;
+
+                        case MasticIopType::IMPULSION:
+                            // Should not happen because QML properties can not have the type impulsion
+                            break;
+
+                        case MasticIopType::DATA:
+                            {
+                                succeeded = masticQuick->createInputData(masticInputName, NULL);
+                            }
+                            break;
+
+                        default:
+                            break;
+                    }
+
+
+                    // Check if we have succeeded
+                    if (succeeded)
+                    {
+                        _qmlPropertiesByMasticInputName.insert(masticInputName, property);
+                    }
+                    else
+                    {
+                        qmlWarning(this) << "failed to create Mastic input '" << masticInputName
+                                         << "' with type=" << MasticIopType::staticEnumToString(masticIopType);
+                    }
+                }
+
+
+                // Check if we need to subscribe to MasticQuick
+                if (_qmlPropertiesByMasticInputName.count() > 0)
+                {
+                    connect(masticQuick, &MasticQuick::observeInput, this, &MasticQuickInputBinding::_onMasticObserveInput);
+                }
             }
         }
         // Else: no valid property => nothing to do
