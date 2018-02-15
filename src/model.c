@@ -46,7 +46,7 @@ void model_setIopValue(agent_iop *iop, void* value, long size){
             if (value == NULL){
                 iop->value.s = strdup(""); //using strdup to be compliant with call to free just above
             }else{
-                iop->value.s = strdup(value);
+                iop->value.s = strndup(value, size);
             }
             iop->valueSize = (strlen(iop->value.s) + 1)*sizeof(char);
             mtic_debug("set %s to %s (length: %d)\n", iop->name, iop->value.s, iop->valueSize - 1);
@@ -1495,19 +1495,22 @@ int mtic_writeInputAsBool(const char *name, bool value){
     }
     
     double v = 0;
-    
+    int ret = 0;
     switch (iop->value_type) {
         case BOOL_T:
             //the easy case
             model_setIopValue(iop, (void*) &value, sizeof(bool));
+            ret = 1;
             break;
         case INTEGER_T:
             //the other easy case
             model_setIopValue(iop, (void*) &value, sizeof(int));
+            ret = 1;
             break;
         case DOUBLE_T:
             v = value;
             model_setIopValue(iop, (void*) &v, sizeof(double));
+            ret = 1;
             break;
         case STRING_T:
             if (value){
@@ -1515,18 +1518,19 @@ int mtic_writeInputAsBool(const char *name, bool value){
             }else{
                 model_setIopValue(iop, (void*) "false", 0);
             }
+            ret = 1;
             break;
         case DATA_T:
             mtic_debug("%s: input '%s' is not compatible with bool values", __FUNCTION__,  name);
             return 0;
         case IMPULSION_T:
-            return mtic_writeInputAsImpulsion(name);
+            ret = mtic_writeInputAsImpulsion(name);
     }
 
     // call the callbacks associated to if it exist
     model_runObserveCallbacksForIOP(iop, (void*) &value, sizeof(bool));
 
-    return 1;
+    return ret;
 
 }
 
@@ -1552,20 +1556,24 @@ int mtic_writeInputAsInt(const char *name, int value){
 
     double dbl = 0;
     char* str = NULL;
+    int ret = 0;
 
     switch (iop->value_type) {
         case BOOL_T:
             //Different of 0 is true else is false;
             model_setIopValue(iop, (void*) &value, sizeof(bool));
+            ret = 1;
             break;
         case INTEGER_T:
             //Direct
             model_setIopValue(iop, (void*) &value, sizeof(int));
+            ret = 1;
             break;
         case DOUBLE_T:
             //Cast int to double
             dbl = value;
             model_setIopValue(iop, (void*) &dbl, sizeof(double));
+            ret = 1;
             break;
         case STRING_T:
             str = model_IntToString(value);
@@ -1579,18 +1587,19 @@ int mtic_writeInputAsInt(const char *name, int value){
                 free(str);
                 return 0;
             }
+            ret = 1;
             break;
         case DATA_T:
             mtic_debug("%s: input '%s' is not compatible with int values", __FUNCTION__,  name);
             return 0;
         case IMPULSION_T:
-            return mtic_writeInputAsImpulsion(name);
+            ret = mtic_writeInputAsImpulsion(name);
     }
 
     // call the callbacks associated to if it exist
     model_runObserveCallbacksForIOP(iop, (void*) &value, sizeof(int));
     
-    return 1;
+    return ret;
 }
 
 /**
@@ -1615,11 +1624,13 @@ int mtic_writeInputAsDouble(const char *name, double value){
 
     int integer = 0;
     char* str = NULL;
+    int ret = 0;
 
     switch (iop->value_type) {
         case BOOL_T:
             //Different of 0 is true else is false;
             model_setIopValue(iop, (void*) &value, sizeof(bool));
+            ret = 1;
             break;
         case INTEGER_T:
             // Round to lower value
@@ -1630,10 +1641,12 @@ int mtic_writeInputAsDouble(const char *name, double value){
                 integer = (int) (value + 0.5);
             }
             model_setIopValue(iop, (void*) &integer, sizeof(int));
+            ret = 1;
             break;
         case DOUBLE_T:
             //Direct
             model_setIopValue(iop, (void*) &value, sizeof(double));
+            ret = 1;
             break;
         case STRING_T:
             // if str is NULL Conversion fail
@@ -1647,18 +1660,19 @@ int mtic_writeInputAsDouble(const char *name, double value){
                 free(str);
                 return 0;
             }
+            ret = 1;
             break;
         case DATA_T:
             mtic_debug("%s: input '%s' is not compatible with double values", __FUNCTION__,  name);
             return 0;
         case IMPULSION_T:
-            return mtic_writeInputAsImpulsion(name);
+            ret = mtic_writeInputAsImpulsion(name);
     }
 
     // call the callbacks associated to if it exist
     model_runObserveCallbacksForIOP(iop, (void*) &value, sizeof(double));
     
-    return 1;
+    return ret;
 }
 
 /**
@@ -1680,7 +1694,7 @@ int mtic_writeInputAsString(const char *name, char *value){
         mtic_debug("%s : input '%s' not found\n", __FUNCTION__, name);
         return 0;
     }
-
+    int ret = 0;
     switch (iop->value_type) {
         case BOOL_T:
             mtic_debug("%s: input '%s' is not compatible with string values", __FUNCTION__,  name);
@@ -1693,18 +1707,19 @@ int mtic_writeInputAsString(const char *name, char *value){
             return 0;
         case STRING_T:
             model_setIopValue(iop, (void*) value, (strlen(value)+1)*sizeof(char));
+            ret = 1;
             break;
         case DATA_T:
             mtic_debug("%s: input '%s' is not compatible with string values", __FUNCTION__,  name);
             return 0;
         case IMPULSION_T:
-            return mtic_writeInputAsImpulsion(name);
+            ret =  mtic_writeInputAsImpulsion(name);
     }
 
     // call the callbacks associated to if it exist
     model_runObserveCallbacksForIOP(iop, (void*)value, (strlen(value)+1)*sizeof(char));
     
-    return 1;
+    return ret;
 }
 
 /**
@@ -1765,13 +1780,7 @@ int mtic_writeInputAsData(const char *name, void *value, long size){
         mtic_debug("%s : input %s not found\n", __FUNCTION__, name);
         return 0;
     }
-
-    //Check the value type as data
-    if(iop->value_type != DATA_T){
-        mtic_debug("%s: input '%s' is not a data and will not be written\n", __FUNCTION__,  name);
-        return 0;
-    }
-
+    
     //Update the value in the definition
     model_setIopValue(iop,value,size);
 
@@ -1802,19 +1811,22 @@ int mtic_writeOutputAsBool(const char *name, bool value){
     }
 
     double dbl = 0;
-
+    int ret = 0;
     switch (iop->value_type) {
         case BOOL_T:
             //the easy case
             model_setIopValue(iop, (void*) &value, sizeof(bool));
+            ret = 1;
             break;
         case INTEGER_T:
             //the other easy case
             model_setIopValue(iop, (void*) &value, sizeof(int));
+            ret = 1;
             break;
         case DOUBLE_T:
             dbl = value;
             model_setIopValue(iop, (void*) &dbl, sizeof(double));
+            ret = 1;
             break;
         case STRING_T:
             if (value){
@@ -1822,12 +1834,13 @@ int mtic_writeOutputAsBool(const char *name, bool value){
             }else{
                 model_setIopValue(iop, (void*) "false", 0);
             }
+            ret = 1;
             break;
         case DATA_T:
             mtic_debug("%s: output '%s' is not compatible with bool values", __FUNCTION__,  name);
             return 0;
         case IMPULSION_T:
-            return mtic_writeOutputAsImpulsion(name);
+            ret = mtic_writeOutputAsImpulsion(name);
     }
 
     // call the callbacks associated to if it exist
@@ -1836,7 +1849,7 @@ int mtic_writeOutputAsBool(const char *name, bool value){
     // iop is output : publish
     network_publishOutput(name);
 
-    return 1;
+    return ret;
 }
 
 /**
@@ -1861,20 +1874,23 @@ int mtic_writeOutputAsInt(const char *name, int value){
 
     double dbl = 0;
     char* str = NULL;
-
+    int ret = 0;
     switch (iop->value_type) {
         case BOOL_T:
             //Different of 0 is true else is false;
             model_setIopValue(iop, (void*) &value, sizeof(bool));
+            ret = 1;
             break;
         case INTEGER_T:
             //Direct
             model_setIopValue(iop, (void*) &value, sizeof(int));
+            ret = 1;
             break;
         case DOUBLE_T:
             //Cast int to double
             dbl = value;
             model_setIopValue(iop, (void*) &dbl, sizeof(double));
+            ret = 1;
             break;
         case STRING_T:
             str = model_IntToString(value);
@@ -1888,12 +1904,13 @@ int mtic_writeOutputAsInt(const char *name, int value){
                 free(str);
                 return 0;
             }
+            ret = 1;
             break;
         case DATA_T:
             mtic_debug("%s: output '%s' is not compatible with int values", __FUNCTION__,  name);
             return 0;
         case IMPULSION_T:
-            return mtic_writeOutputAsImpulsion(name);
+            ret = mtic_writeOutputAsImpulsion(name);
     }
     
     // call the callbacks associated to if it exist
@@ -1902,7 +1919,7 @@ int mtic_writeOutputAsInt(const char *name, int value){
     // iop is output : publish
     network_publishOutput(name);
 
-    return 1;
+    return ret;
 
 }
 
@@ -1928,11 +1945,12 @@ int mtic_writeOutputAsDouble(const char *name, double value){
 
     int integer = 0;
     char* str = NULL;
-
+    int ret = 0;
     switch (iop->value_type) {
         case BOOL_T:
             //Different of 0 is true else is false;
             model_setIopValue(iop, (void*) &value, sizeof(bool));
+            ret = 1;
             break;
         case INTEGER_T:
             // Round to lower value
@@ -1943,10 +1961,12 @@ int mtic_writeOutputAsDouble(const char *name, double value){
                 integer = (int) (value + 0.5);
             }
             model_setIopValue(iop, (void*) &integer, sizeof(int));
+            ret = 1;
             break;
         case DOUBLE_T:
             //Direct
             model_setIopValue(iop, (void*) &value, sizeof(double));
+            ret = 1;
             break;
         case STRING_T:
             // if str is NULL Conversion fail
@@ -1960,12 +1980,13 @@ int mtic_writeOutputAsDouble(const char *name, double value){
                 free(str);
                 return 0;
             }
+            ret = 1;
             break;
         case DATA_T:
             mtic_debug("%s: output '%s' is not compatible with double values", __FUNCTION__,  name);
             return 0;
         case IMPULSION_T:
-            return mtic_writeOutputAsImpulsion(name);
+            ret = mtic_writeOutputAsImpulsion(name);
     }
     
     // call the callbacks associated to if it exist
@@ -1974,7 +1995,7 @@ int mtic_writeOutputAsDouble(const char *name, double value){
     // iop is output : publish
     network_publishOutput(name);
 
-    return 1;
+    return ret;
 }
 
 /**
@@ -2086,12 +2107,6 @@ int mtic_writeOutputAsData(const char *name, void *value, long size){
         mtic_debug("%s : output %s not found\n", __FUNCTION__, name);
         return 0;
     }
-    
-    //Check the value type as an impulsion.
-    if(iop->value_type != DATA_T){
-        mtic_debug("%s: output '%s' is not a data and will not be written\n", __FUNCTION__,  name);
-        return 0;
-    }
 
     //Update the value in the definition
     model_setIopValue(iop,value,size);
@@ -2126,19 +2141,22 @@ int mtic_writeParameterAsBool(const char *name, bool value){
     }
 
     double dbl = 0;
-
+    int ret = 0;
     switch (iop->value_type) {
         case BOOL_T:
             //the easy case
             model_setIopValue(iop, (void*) &value, sizeof(bool));
+            ret = 1;
             break;
         case INTEGER_T:
             //the other easy case
             model_setIopValue(iop, (void*) &value, sizeof(int));
+            ret = 1;
             break;
         case DOUBLE_T:
             dbl = value;
             model_setIopValue(iop, (void*) &dbl, sizeof(double));
+            ret = 1;
             break;
         case STRING_T:
             if (value){
@@ -2146,18 +2164,19 @@ int mtic_writeParameterAsBool(const char *name, bool value){
             }else{
                 model_setIopValue(iop, (void*) "false", 0);
             }
+            ret = 1;
             break;
         case DATA_T:
             mtic_debug("%s: parameter '%s' is not compatible with bool values", __FUNCTION__,  name);
             return 0;
         case IMPULSION_T:
-            return mtic_writeOutputAsImpulsion(name);
+            ret = mtic_writeOutputAsImpulsion(name);
     }
     
     // call the callbacks associated to if it exist
     model_runObserveCallbacksForIOP(iop, (void*) &value, sizeof(bool));
 
-    return 1;
+    return ret;
 }
 
 /**
@@ -2182,20 +2201,23 @@ int mtic_writeParameterAsInt(const char *name, int value){
 
     double dbl = 0;
     char* str = NULL;
-
+    int ret = 0;
     switch (iop->value_type) {
         case BOOL_T:
             //Different of 0 is true else is false;
             model_setIopValue(iop, (void*) &value, sizeof(bool));
+            ret = 1;
             break;
         case INTEGER_T:
             //Direct
             model_setIopValue(iop, (void*) &value, sizeof(int));
+            ret = 1;
             break;
         case DOUBLE_T:
             //Cast int to double
             dbl = value;
             model_setIopValue(iop, (void*) &dbl, sizeof(double));
+            ret = 1;
             break;
         case STRING_T:
             str = model_IntToString(value);
@@ -2209,19 +2231,19 @@ int mtic_writeParameterAsInt(const char *name, int value){
                 free(str);
                 return 0;
             }
-            break;
+            ret = 1;
             break;
         case DATA_T:
             mtic_debug("%s: output '%s' is not compatible with int values", __FUNCTION__,  name);
             return 0;
         case IMPULSION_T:
-            return mtic_writeOutputAsImpulsion(name);
+            ret = mtic_writeOutputAsImpulsion(name);
     }
     
     // call the callbacks associated to if it exist
     model_runObserveCallbacksForIOP(iop, (void*) &value, sizeof(int));
 
-    return 1;
+    return ret;
 }
 
 /**
@@ -2246,11 +2268,12 @@ int mtic_writeParameterAsDouble(const char *name, double value){
 
     int integer = 0;
     char* str = NULL;
-
+    int ret = 0;
     switch (iop->value_type) {
         case BOOL_T:
             //Different of 0 is true else is false;
             model_setIopValue(iop, (void*) &value, sizeof(bool));
+            ret = 1;
             break;
         case INTEGER_T:
             // Round to lower value
@@ -2261,10 +2284,12 @@ int mtic_writeParameterAsDouble(const char *name, double value){
                 integer = (int) (value + 0.5);
             }
             model_setIopValue(iop, (void*) &integer, sizeof(int));
+            ret = 1;
             break;
         case DOUBLE_T:
             //Direct
             model_setIopValue(iop, (void*) &value, sizeof(double));
+            ret = 1;
             break;
         case STRING_T:
         // if str is NULL Conversion fail
@@ -2278,18 +2303,19 @@ int mtic_writeParameterAsDouble(const char *name, double value){
                 free(str);
                 return 0;
             }
+            ret = 1;
             break;
         case DATA_T:
             mtic_debug("%s: parameter '%s' is not compatible with double values", __FUNCTION__,  name);
             return 0;
         case IMPULSION_T:
-            return mtic_writeOutputAsImpulsion(name);
+            ret = mtic_writeOutputAsImpulsion(name);
     }
     
     // call the callbacks associated to if it exist
     model_runObserveCallbacksForIOP(iop, (void*) &value, sizeof(double));
 
-    return 1;
+    return ret;
 }
 
 /**
@@ -2345,12 +2371,6 @@ int mtic_writeParameterAsData(const char *name, void *value, long size){
     // Check if the iop has been returned.
     if(iop == NULL){
         mtic_debug("%s : parameter %s not found\n", __FUNCTION__, name);
-        return 0;
-    }
-    
-    //Check the value type as data
-    if(iop->value_type != DATA_T){
-        mtic_debug("%s: parameter '%s' is not a data and will not be written\n", __FUNCTION__,  name);
         return 0;
     }
 
