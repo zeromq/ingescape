@@ -175,6 +175,28 @@ void MasticQuickInputBinding::setinputsSuffix(QString value)
 
 
 
+/**
+ * @brief Flag indicating if our binding is active or not
+ * @param value
+ */
+void MasticQuickInputBinding::setwhen(bool value)
+{
+    if (_when != value)
+    {
+        // Save our new value
+        _when = value;
+
+        // Connect or disconnect to MasticQuick
+        _connectOrDisconnectToMasticQuick();
+
+        // Notify change
+        Q_EMIT whenChanged(value);
+    }
+}
+
+
+
+
 //-------------------------------------------------------------------
 //
 // Protected slots
@@ -216,9 +238,15 @@ void MasticQuickInputBinding::_onMasticObserveInput(QString name, QVariant value
         if (_qmlPropertiesByMasticInputName.contains(name))
         {
             QQmlProperty property = _qmlPropertiesByMasticInputName.value(name);
-            property.write(value);
+            if (!property.write(value))
+            {
+                qmlWarning(this) << "failed to update property '" << property.name()
+                                 << "' on " << MasticQuickBinding::prettyObjectTypeName(_target)
+                                 << " binded to Mastic input '" << name << "' with value=" << value;
+            }
         }
     }
+    // Else: our binding is not active
 }
 
 
@@ -521,13 +549,40 @@ void MasticQuickInputBinding::_update()
 
 
                 // Check if we need to subscribe to MasticQuick
-                if (_qmlPropertiesByMasticInputName.count() > 0)
+                if ((_qmlPropertiesByMasticInputName.count() > 0) && _when)
                 {
-                    connect(masticQuick, &MasticQuick::observeInput, this, &MasticQuickInputBinding::_onMasticObserveInput);
+                    connect(masticQuick, &MasticQuick::observeInput, this, &MasticQuickInputBinding::_onMasticObserveInput, Qt::UniqueConnection);
                 }
             }
         }
         // Else: no valid property => nothing to do
     }
     // Else: our component is not completed yet, we do nothing to avoid useless computations
+}
+
+
+
+/**
+ * @brief Manage connect/disconnect calls to associate our item to MasticQuick
+ */
+void MasticQuickInputBinding::_connectOrDisconnectToMasticQuick()
+{
+    if (_isCompleted)
+    {
+        // Subscribe or unsubscribe to MasticQuick if needed
+        MasticQuick* masticQuick = MasticQuick::instance();
+        if ((masticQuick != NULL) && (_qmlPropertiesByMasticInputName.count() > 0))
+        {
+            if (_when)
+            {
+                // Subscribe
+                connect(masticQuick, &MasticQuick::observeInput, this, &MasticQuickInputBinding::_onMasticObserveInput, Qt::UniqueConnection);
+            }
+            else
+            {
+                // Unsubscribe
+                disconnect(masticQuick, &MasticQuick::observeInput, this, &MasticQuickInputBinding::_onMasticObserveInput);
+            }
+        }
+    }
 }
