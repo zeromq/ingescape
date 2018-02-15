@@ -239,11 +239,11 @@ PUBLIC void mtic_freeNetdevicesList(char **devices, int nb);
 //with exec path without any parameter.
 PUBLIC void mtic_setCommandLine(const char *line);
 
-//By default, an agent notifies all the agents it maps. Each notification
-//makes the mapped agents publish their outputs (except for data & impulsions).
-//We allow to disable this notification to avoid side effects by agents frequently
-//changing their mapping.
-PUBLIC void mtic_setNotifyMappedAgents(bool notify);
+//When mapping an agent setting the option below requests the
+//mapped agent to send its outputs (except for data & impulsions)
+//to us through a private communication for our proper initialization.
+//By default, this behavior is set to false.
+PUBLIC void mtic_setRequestOutputsFromMappedAgents(bool notify);
 
 //logs and debug messages
 PUBLIC void mtic_setVerbose(bool verbose); //log in console
