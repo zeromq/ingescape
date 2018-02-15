@@ -19,53 +19,31 @@ win32:{
 
     QMAKE_CXXFLAGS += -std=c11
 
-#    INCLUDEPATH += $$PWD/getopt \
-
-#    HEADERS += $$PWD/getopt/getopt_win32.h
-#    SOURCES += $$PWD/getopt/getopt_win32.c
-
     CONFIG(debug, debug|release){
         #configuration DEBUG
         DESTDIR = $$OUT_PWD/debug
-        libzyre_path = $$PWD/zyre/bin/Win32/Debug/v140/dynamic
-        libyajl_path = $$PWD/yajl/lloyd-yajl-2.1.0/MSVS/VS2013/x86/DebugDLL
-        install_libs.path += "C:/mastic/lib/debug"
+        libs_path = $$PWD/../dependencies/windows/libs/win32/Debug
     }else {
         #configuration RELEASE
         DESTDIR = $$OUT_PWD/release
-        libzyre_path = $$PWD/zyre/bin/Win32/Release/v140/dynamic
-        libyajl_path = $$PWD/yajl/lloyd-yajl-2.1.0/MSVS/VS2013/x86/ReleaseDLL
-        install_libs.path += "C:/mastic/lib/release"
+        libs_path = $$PWD/../dependencies/windows/libs/win32/Release
     }
 
-    #Copy includes
-#    install_headers.files += $$PWD/../src/include/*.h \
-#                             $$PWD/../src/include/uthash \
-#                             $$PWD/getopt
-    install_headers.path += "C:/mastic/include"
-    install_headers.files += $$PWD/../src/include/mastic.h \
+    #UNIX functions
+    SOURCES += $$PWD/../dependencies/windows/unix/unixfunctions.c \
 
+    HEADERS += $$PWD/../dependencies/windows/unix/unixfunctions.h \
 
-    #Add the make step 'install' to copy the dll files to the output folder
-    install_libs.files += $$libzyre_path/* \
-                          $$libyajl_path/* \
-                          $$DESTDIR/*
-
-
-    #Add installation options
-    INSTALLS += install_libs \
-                install_headers
+    INCLUDEPATH += $$PWD/../dependencies/windows/unix \
 
     #Add librairies
-    LIBS += -L$$libzyre_path -llibzmq \
-            -L$$libzyre_path -llibczmq \
-            -L$$libzyre_path -llibzyre \
-            -L$$libyajl_path -lyajl
+    LIBS += -L$$libs_path -llibzyre -llibczmq -lyajl
 
-    #to get the Ip address into the network.c
-    LIBS += -L$$C:/Windows/System32 -lwsock32
-    LIBS += -L$$C:/Windows/System32 -lIPHLPAPI
-    LIBS += -L$$C:/Windows/System32 -lws2_32
+    #To get the Ip address into the network.c
+    LIBS += -L$$C:/Windows/System32 -lwsock32 -lIPHLPAPI -lws2_32
+
+    #include the pri to copy files to C:\
+    include ("$$PWD/../dependencies/windows/common/pri/mastic-job-copy.pri")
 }
 
 macx:{
@@ -204,12 +182,13 @@ unix:{
 #--------- COMMON ---------#
 
 ##Add headers from dependencies
-INCLUDEPATH += $$PWD/czmq/include \
-               $$PWD/zyre/include \
-               $$PWD/yajl/lloyd-yajl-2.1.0/include \
+zyre_include_path = $$PWD/../dependencies/windows/headers/zyre_suite
+yajl_include_path = $$PWD/../dependencies/yajl/src/api
 
-DEPENDPATH += $$PWD/czmq/include \
-              $$PWD/zyre/include \
-              $$PWD/yajl/lloyd-yajl-2.1.0/include \
+INCLUDEPATH += $$zyre_include_path \
+               $$yajl_include_path \
+
+DEPENDPATH += $$zyre_include_path \
+              $$yajl_include_path \
 
 

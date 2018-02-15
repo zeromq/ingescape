@@ -23,5 +23,5 @@ win32:{
 #CONFIG+=raspberry_compilation
 
 
-include ('../dependencies/mastic_api_crossplateform.pri')
+include ('mastic-dev.pri')
 

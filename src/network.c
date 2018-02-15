@@ -29,6 +29,9 @@
 
 #include <zyre.h>
 #include <czmq.h>
+#ifdef _WIN32
+#include "unixfunctions.h"
+#endif
 #include "uthash/uthash.h"
 #include "uthash/utlist.h"
 #include "mastic_private.h"
