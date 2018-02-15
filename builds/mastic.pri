@@ -78,22 +78,17 @@ mac:{
     # Include paths
     #
 
-    # zyre, zmq, czmq, sodium
+    # zyre, zmq, czmq, sodium, yajl
     INCLUDEPATH += /usr/local/include
-
-    # Yajl
-    #INCLUDEPATH += /usr/local/include
 
 
     #
     # List of libraries to be linked into the project
     #
 
-    # zyre, zmq, czmq, sodium
-    LIBS += -L/usr/local/lib -lzmq -lczmq -lzyre
+    # zyre, zmq, czmq, sodium, yajl
+    LIBS += -L/usr/local/lib -lzmq -lczmq -lzyre -lyajl
 
-    # Yajl
-    LIBS += -L/usr/local/lib -lyajl
 }
 
 
