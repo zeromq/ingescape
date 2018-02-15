@@ -74,7 +74,7 @@ bool isFrozen = false;
 bool agentCanBeFrozen = false;
 bool isWholeAgentMuted = false;
 bool mtic_Interrupted = false;
-bool network_NotifyMappedAgents = true;
+bool network_RequestOutputsFromMappedAgents = false;
 bool forcedStop = false;
 
 
@@ -190,14 +190,14 @@ int unsubscribeToPublisherOutput(subscriber_t *subscriber, const char *outputNam
     return -1;
 }
 
-//Timer callback to send MAPPED notification for agents we subscribed to
+//Timer callback to send REQUEST_OUPUTS notification for agents we subscribed to
 int triggerMappingNotificationToNewcomer(zloop_t *loop, int timer_id, void *arg){
     MASTIC_UNUSED(loop)
     MASTIC_UNUSED(timer_id)
 
     subscriber_t *subscriber = (subscriber_t *) arg;
     if (subscriber->mappedNotificationToSend){
-        zyre_whispers(agentElements->node, subscriber->agentPeerId, "MAPPED");
+        zyre_whispers(agentElements->node, subscriber->agentPeerId, "REQUEST_OUPUTS");
         subscriber->mappedNotificationToSend = false;
     }
     return 0;
@@ -228,7 +228,7 @@ int network_manageSubscriberMapping(subscriber_t *subscriber){
                     //the external agent ouput on several of its inputs. This should not have any consequence.
                     subscribeToPublisherOutput(subscriber, el->output_name);
                     //mapping was successful : we set timer to notify remote agent if not already done
-                    if (!subscriber->mappedNotificationToSend && network_NotifyMappedAgents){
+                    if (!subscriber->mappedNotificationToSend && network_RequestOutputsFromMappedAgents){
                         subscriber->mappedNotificationToSend = true;
                         subscriber->timerId = zloop_timer(agentElements->loop, 500, 1, triggerMappingNotificationToNewcomer, (void *)subscriber);
                     }
@@ -337,6 +337,89 @@ int manageParent (zloop_t *loop, zmq_pollitem_t *item, void *arg){
     return 0;
 }
 
+//function actually handling messages from one of the publisher agents we subscribed to
+int handleSubscriptionMessage(zmsg_t *msg, const char *subscriberPeerId){
+    
+    // Try to find the subscriber object
+    subscriber_t * foundSubscriber = NULL;
+    HASH_FIND_STR(subscribers, subscriberPeerId, foundSubscriber);
+    
+    if(foundSubscriber == NULL){
+        mtic_debug("%s : could not find subscriber structure for agent %s\n", __func__, subscriberPeerId);
+    }
+    if(isFrozen == true){
+        mtic_debug("Message received from agent %s but all traffic in our agent has been frozen\n", foundSubscriber->agentName);
+        return 0;
+    }
+    
+    size_t size = zmsg_size(msg);
+    char *output = NULL;
+    char *vType = NULL;
+    iopType_t valueType = 0;
+    for (int i = 0; i < size; i += 3){
+        // Message must contain 3 elements
+        // 1 : output name
+        // 2 : output ioptType
+        // 3 : value of the output
+        output = zmsg_popstr(msg);
+        vType = zmsg_popstr(msg);
+        valueType = atoi(vType);
+        free(vType);
+        vType = NULL;
+        
+        zframe_t *frame = NULL;
+        void *data = NULL;
+        long size = 0;
+        char * value = NULL;
+        //get data before iterating to all the mapping elements using it
+        if (valueType == STRING_T){
+            value = zmsg_popstr(msg);
+        }else{
+            frame = zmsg_pop(msg);
+            data = zframe_data(frame);
+            size = zframe_size(frame);
+        }
+        //try to find mapping elements matching with this subscriber's output
+        //and update mapped input(s) value accordingly
+        //TODO : some day, optimize mapping storage to avoid iterating
+        mapping_element_t *elmt, *tmp;
+        HASH_ITER(hh, mtic_internal_mapping->map_elements, elmt, tmp) {
+            if (strcmp(elmt->agent_name, foundSubscriber->agentName) == 0
+                && strcmp(elmt->output_name, output) == 0){
+                //we have a match on emitting agent name and its ouput name :
+                //still need to check the targeted input existence in our definition
+                agent_iop *foundInput = NULL;
+                if (mtic_internal_definition->inputs_table != NULL){
+                    HASH_FIND_STR(mtic_internal_definition->inputs_table, elmt->input_name, foundInput);
+                }
+                if (foundInput == NULL){
+                    mtic_debug("manageSubscription : input %s missing in our definition for use in a mapping with %s.%s\n",
+                               elmt->input_name,
+                               elmt->agent_name,
+                               elmt->output_name);
+                }else{
+                    //we have a fully matching mapping element : write from received output to our input
+                    if (valueType == STRING_T){
+                        mtic_writeInputAsString(elmt->input_name, value);
+                    }else{
+                        mtic_writeInputAsData(elmt->input_name, data, size);
+                    }
+                }
+            }
+        }
+        if (frame != NULL){
+            zframe_destroy(&frame);
+        }
+        if (value != NULL){
+            free(value);
+        }
+        free(output);
+        output = NULL;
+    }
+    
+    return 0;
+}
+
 //manage incoming messages from one of the publisher agents we subscribed to
 int manageSubscription (zloop_t *loop, zmq_pollitem_t *item, void *arg){
     MASTIC_UNUSED(loop)
@@ -344,103 +427,10 @@ int manageSubscription (zloop_t *loop, zmq_pollitem_t *item, void *arg){
     //get subscriber id
     char *subscriberPeerId = (char *)arg;
 
-    if (item->revents & ZMQ_POLLIN && strlen(subscriberPeerId) > 0)
-    {
-        // Try to find the subscriber object
-        subscriber_t * foundSubscriber = NULL;
-        HASH_FIND_STR(subscribers, subscriberPeerId, foundSubscriber);
-        
-        if(foundSubscriber != NULL)
-        {
-            zmsg_t *msg = zmsg_recv(foundSubscriber->subscriber);
-            // Message must contain 2 elements
-            // 1 : output name
-            // 2 : value of the output
-            if(zmsg_size(msg) == 2 && !isFrozen)
-            {
-                char * output = zmsg_popstr(msg);
-                
-                //NOTE: we rely on the external agent definition exclusively to get
-                //the output type. This type is then used to convert the received data.
-                //TODO: we can optimize the code below by including the output type inside the message
-                //but this would break retrocompatibility
-                definition * externalDefinition = foundSubscriber->definition;
-
-                if(externalDefinition != NULL){
-                    agent_iop * foundOutput = NULL;
-                    if (externalDefinition->outputs_table != NULL){
-                        HASH_FIND_STR(externalDefinition->outputs_table, output, foundOutput);
-                    }
-                    if(foundOutput != NULL){
-                        zframe_t *frame = NULL;
-                        void *data = NULL;
-                        long size = 0;
-                        char * value = NULL;
-                        //get data before iterating to all the mapping elements using it
-                        if (foundOutput->value_type == DATA_T){
-                            frame = zmsg_pop(msg);
-                            data = zframe_data(frame);
-                            size = zframe_size(frame);
-                        }else{
-                            value = zmsg_popstr(msg);
-                        }
-                        //try to find mapping elements matching with this subscriber's output
-                        //and update mapped input(s) value accordingly
-                        mapping_element_t *elmt, *tmp;
-                        HASH_ITER(hh, mtic_internal_mapping->map_elements, elmt, tmp) {
-                            if (strcmp(elmt->agent_name, foundSubscriber->agentName) == 0
-                                && strcmp(elmt->output_name, output) == 0){
-                                //we have a match on emitting agent name and its ouput name :
-                                //still need to check the targeted input existence in our definition
-                                agent_iop *foundInput = NULL;
-                                if (mtic_internal_definition->inputs_table != NULL){
-                                    HASH_FIND_STR(mtic_internal_definition->inputs_table, elmt->input_name, foundInput);
-                                }
-                                if (foundInput == NULL){
-                                    mtic_debug("manageSubscription : input %s missing in our definition for use in a mapping with %s.%s\n",
-                                               elmt->input_name,
-                                               elmt->agent_name,
-                                               elmt->output_name);
-                                }else{
-                                    //we have a fully matching mapping element : write from received output to our input
-                                    if (foundOutput->value_type == DATA_T){
-                                        //If the remote output is data, we write our input as data : no type conversion
-                                        //mtic_writeInputAsData will reject writing if our input is not data
-                                        mtic_writeInputAsData(elmt->input_name, data, size);
-                                    }else if (foundOutput->value_type == IMPULSION_T){
-                                        //If the remote output is impulsion, we write our input as impulsion :
-                                        //this is an implicit type conversion and the received value is not used
-                                        mtic_writeInputAsImpulsion(elmt->input_name);
-                                    }else{
-                                        //conversion from string to actual type is achieved in mtic_writeInput
-                                        mtic_writeInput(elmt->input_name, value, 0); //size is not used for these types
-                                    }
-                                }
-                            }
-                        }
-                        if (frame != NULL){
-                            zframe_destroy(&frame);
-                        }
-                        if (value != NULL){
-                            free(value);
-                        }
-                    }else{
-                        mtic_debug("manageSubscription : output %s missing in %s definition for use in a mapping element\n", output, foundSubscriber->agentName);
-                    }
-                }else{
-                    mtic_debug("manageSubscription : no definition received for %s yet\n", foundSubscriber->agentName);
-                }
-                free(output);
-            } else {
-                //ignore the message
-                if(isFrozen == true){
-                    mtic_debug("Message received from agent %s but all traffic in our agent has been frozen\n", foundSubscriber->agentName);
-                }
-            }
-            zmsg_destroy(&msg);
-        }else{
-            mtic_debug("manageSubscription : could not find subscriber for agent %s\n", subscriberPeerId);
-        }
+    if (item->revents & ZMQ_POLLIN && strlen(subscriberPeerId) > 0){
+        zmsg_t *msg = zmsg_recv(item->socket);
+        handleSubscriptionMessage(msg, subscriberPeerId);
+        zmsg_destroy(&msg);
     }
     return 0;
 }
@@ -648,8 +638,7 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 free(strDefinition);
             }
             //check if message is an EXTERNAL mapping
-            else if(strlen(message) > strlen(mappingPrefix) && strncmp (message, mappingPrefix, strlen(mappingPrefix)) == 0)
-            {
+            else if(strlen(message) > strlen(mappingPrefix) && strncmp (message, mappingPrefix, strlen(mappingPrefix)) == 0){
                 // Extract mapping from message
                 char* strMapping = calloc(strlen(message)- strlen(mappingPrefix)+1, sizeof(char));
                 memcpy(strMapping, &message[strlen(mappingPrefix)], strlen(message)- strlen(mappingPrefix));
@@ -684,8 +673,8 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 free(strMapping);
             }
             //check if message is DEFINITION TO BE LOADED
-            else if (strlen(message) > strlen(loadDefinitionPrefix) && strncmp (message, loadDefinitionPrefix, strlen(loadDefinitionPrefix)) == 0)
-            {
+            else if (strlen(message) > strlen(loadDefinitionPrefix)
+                     && strncmp (message, loadDefinitionPrefix, strlen(loadDefinitionPrefix)) == 0){
                 // Extract definition from message
                 char* strDefinition = calloc(strlen(message)- strlen(loadDefinitionPrefix)+1, sizeof(char));
                 memcpy(strDefinition, &message[strlen(loadDefinitionPrefix)], strlen(message)- strlen(loadDefinitionPrefix));
@@ -701,8 +690,8 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 free(strDefinition);
             }
             //check if message is MAPPING TO BE LOADED
-            else if (strlen(message) > strlen(loadMappingPrefix) && strncmp (message, loadMappingPrefix, strlen(loadMappingPrefix)) == 0)
-            {
+            else if (strlen(message) > strlen(loadMappingPrefix)
+                     && strncmp (message, loadMappingPrefix, strlen(loadMappingPrefix)) == 0){
                 // Extract mapping from message
                 char* strMapping = calloc(strlen(message)- strlen(loadMappingPrefix)+1, sizeof(char));
                 memcpy(strMapping, &message[strlen(loadMappingPrefix)], strlen(message)- strlen(loadMappingPrefix));
@@ -725,26 +714,64 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 free(strMapping);
             }else{
                 //other supported messages
-                if (strlen("MAPPED") == strlen(message) && strncmp (message, "MAPPED", strlen("MAPPED")) == 0){
-                    mtic_debug("Mapping notification received from %s\n", name);
-                    //TODO: optimize to rewrite only outputs actually involved in the mapping
-                    //OR send all outputs via whisper to agent that mapped us
+                if (strlen("REQUEST_OUPUTS") == strlen(message) && strncmp (message, "REQUEST_OUPUTS", strlen("REQUEST_OUPUTS")) == 0){
+                    mtic_debug("Outputs request received from %s\n", name);
+                    //send all outputs via whisper to agent that mapped us
                     long nbOutputs = 0;
                     char **outputsList = NULL;
                     outputsList = mtic_getOutputsList(&nbOutputs);
                     int i = 0;
+                    zmsg_t *omsg = zmsg_new();
+                    zmsg_addstr(omsg, "OUTPUTS");
                     for (i = 0; i < nbOutputs; i++){
                         agent_iop * found_iop = model_findIopByName(outputsList[i],OUTPUT_T);
-                        if (found_iop != NULL
-                            && found_iop->value_type != IMPULSION_T
-                            && found_iop->value_type != DATA_T){
-                            //we exclude impulsions and data from the update flow to avoid
-                            //false information (for impulsions) and data storage issues (for data)
-                            network_publishOutput(outputsList[i]);
+                        if (found_iop != NULL){
+                            switch (found_iop->value_type) {
+                                case INTEGER_T:
+                                    zmsg_addstr(omsg, found_iop->name);
+                                    zmsg_addstrf(omsg, "%d", found_iop->type);
+                                    zmsg_addmem(omsg, &(found_iop->value.i), sizeof(int));
+                                    break;
+                                case DOUBLE_T:
+                                    zmsg_addstr(omsg, found_iop->name);
+                                    zmsg_addstrf(omsg, "%d", found_iop->type);
+                                    zmsg_addmem(omsg, &(found_iop->value.d), sizeof(double));
+                                    break;
+                                case STRING_T:
+                                    zmsg_addstr(omsg, found_iop->name);
+                                    zmsg_addstrf(omsg, "%d", found_iop->type);
+                                    zmsg_addmem(omsg, &(found_iop->value.s), strlen(found_iop->value.s)+1);
+                                    break;
+                                case BOOL_T:
+                                    zmsg_addstr(omsg, found_iop->name);
+                                    zmsg_addstrf(omsg, "%d", found_iop->type);
+                                    zmsg_addmem(omsg, &(found_iop->value.b), sizeof(bool));
+                                    break;
+                                case IMPULSION_T:
+                                    //disabled
+//                                    zmsg_addstr(omsg, found_iop->name);
+//                                    zmsg_addstrf(omsg, "%d", found_iop->type);
+//                                    zmsg_addmem(omsg, NULL, 0);
+                                    break;
+                                case DATA_T:
+                                    //disabled
+//                                    zmsg_addstr(omsg, found_iop->name);
+//                                    zmsg_addstrf(omsg, "%d", found_iop->type);
+//                                    zmsg_addmem(omsg, &(found_iop->value.data), found_iop->valueSize);
+                                    break;
+                                    
+                                default:
+                                    break;
+                            }
+                            
+                            
                             free(outputsList[i]);
                         }
                     }
+                    zyre_whisper(node, peer, &omsg);
                     free(outputsList);
+                }else if (strlen("OUTPUTS") == strlen(message) && strncmp (message, "OUTPUTS", strlen("OUTPUTS")) == 0){
+                    handleSubscriptionMessage(msgDuplicate, peer);
                 }else if (strlen("STOP") == strlen(message) && strncmp (message, "STOP", strlen("STOP")) == 0){
                     free(message);
                     forcedStop = true;
@@ -1121,70 +1148,74 @@ initActor (zsock_t *pipe, void *args)
 // PRIVATE API
 ////////////////////////////////////////////////////////////////////////
 
-int network_publishOutput (const char* output_name)
-{
+int network_publishOutput (const char* output_name){
     int result = 0;
-    
     agent_iop * found_iop = model_findIopByName(output_name,OUTPUT_T);
     
     if(agentElements != NULL && agentElements->publisher != NULL && found_iop != NULL)
     {
         if(!isWholeAgentMuted && !found_iop->is_muted && found_iop->name != NULL && !isFrozen)
         {
-            if (found_iop->value_type == DATA_T){
-                void *data = NULL;
-                long size = 0;
-                mtic_readOutputAsData(output_name, &data, &size);
-                //TODO: decide if we should delete the data after use or keep it in memory
-                //suggestion: we might add a clearOutputData function available to the developer
-                //for use when publishing large size data to free memory after publishing.
-                //TODO: document ZMQ high water marks and how to change them
-                zmsg_t *msg = zmsg_new();
-                zmsg_pushstr(msg, output_name);
-                zframe_t *frame = zframe_new(data, size);
-                zmsg_append(msg, &frame);
-                mtic_debug("publish data %s\n",found_iop->name);
-                if (zmsg_send(&msg, agentElements->publisher) != 0){
-                    mtic_debug("Error while publishing output %s\n",output_name);
-                }
-            }else if (found_iop->value_type == IMPULSION_T){
-                mtic_debug("publish impulsion %s\n",found_iop->name);
-                if (zstr_sendx(agentElements->publisher, found_iop->name, "0", NULL) != 0){
-                    mtic_debug("Error while publishing output %s\n",output_name);
-                }
-                result = 1;
+            zmsg_t *msg = zmsg_new();
+            zmsg_addstr(msg, output_name);
+            zmsg_addstrf(msg, "%d", found_iop->value_type);
+            void *data = NULL;
+            long size = 0;
+            switch (found_iop->value_type) {
+                case INTEGER_T:
+                    zmsg_addmem(msg, &(found_iop->value.i), sizeof(int));
+                    mtic_debug("publish %s -> %d\n",found_iop->name,found_iop->value.i);
+                    break;
+                case DOUBLE_T:
+                    zmsg_addmem(msg, &(found_iop->value.d), sizeof(double));
+                    mtic_debug("publish %s -> %f\n",found_iop->name,found_iop->value.d);
+                    break;
+                case BOOL_T:
+                    zmsg_addmem(msg, &(found_iop->value.b), sizeof(bool));
+                    mtic_debug("publish %s -> %d\n",found_iop->name,found_iop->value.b);
+                    break;
+                case STRING_T:
+                    zmsg_addstr(msg, found_iop->value.s);
+                    mtic_debug("publish %s -> %s\n",found_iop->name,found_iop->value.s);
+                    break;
+                case IMPULSION_T:
+                    zmsg_addmem(msg, NULL, 0);
+                    mtic_debug("publish impulsion %s\n",found_iop->name);
+                    break;
+                case DATA_T:
+                    mtic_readOutputAsData(output_name, &data, &size);
+                    //TODO: decide if we should delete the data after use or keep it in memory
+                    //suggestion: we might add a clearOutputData function available to the developer
+                    //for use when publishing large size data to free memory after publishing.
+                    //TODO: document ZMQ high water marks and how to change them
+                    zframe_t *frame = zframe_new(data, size);
+                    zmsg_append(msg, &frame);
+                    mtic_debug("publish data %s\n",found_iop->name);
+                    break;
+                default:
+                    break;
+            }
+            if (zmsg_send(&msg, agentElements->publisher) != 0){
+                mtic_debug("Error while publishing output %s\n",output_name);
             }else{
-                char* str_value = definition_getIOPValueAsString(found_iop);
-                if(str_value != NULL && strlen(str_value) > 0)
-                {
-                    mtic_debug("publish %s -> %s\n",found_iop->name,str_value);
-                    if (zstr_sendx(agentElements->publisher, found_iop->name, str_value, NULL) != 0){
-                        mtic_debug("Error while publishing output %s\n",output_name);
-                    }
-                    result = 1;
-                    free(str_value);
-                }
+                result = 1;
             }
             
-        } else {
-            if(found_iop == NULL)
-            {
+        }else{
+            if(found_iop == NULL){
                 mtic_debug("Output %s is unknown\n", output_name);
             }
             if (isWholeAgentMuted){
                 mtic_debug("Should publish output %s but the agent has been muted\n",found_iop->name);
             }
-            if(found_iop->is_muted)
-            {
+            if(found_iop->is_muted){
                 mtic_debug("Should publish output %s but it has been muted\n",found_iop->name);
             }
-            if(isFrozen == true)
-            {
+            if(isFrozen == true){
                 mtic_debug("Should publish output %s but the agent has been frozen\n",found_iop->name);
             }
         }
     }
-    
     return result;
 }
 
@@ -1653,8 +1684,8 @@ void mtic_setCommandLine(const char *line){
     strncpy(commandLine, line, COMMAND_LINE_LENGTH);
 }
 
-void mtic_setNotifyMappedAgents(bool notify){
-    network_NotifyMappedAgents = notify;
+void mtic_setRequestOutputsFromMappedAgents(bool notify){
+    network_RequestOutputsFromMappedAgents = notify;
 }
 
 #define MAX_NETDEVICE_LENGTH 16
