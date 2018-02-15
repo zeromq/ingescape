@@ -26,7 +26,7 @@
  * @param parent
  */
 MasticQuickInputBinding::MasticQuickInputBinding(QObject *parent)
-    : MasticQuickAbstractIOPBinding(parent)
+    : MasticQuickAbstractIOPBinding(true, parent)
 {
 }
 
@@ -193,7 +193,7 @@ void MasticQuickInputBinding::_updateInternalData()
                 // Get our property
                 QQmlProperty property = _qmlPropertiesByName.value(propertyName);
 
-                // Name of our MasticInput
+                // Name of our Mastic input
                 QString masticInputName = _inputsPrefix + propertyName + _inputsSuffix;
 
                 // Get MasticIOP type

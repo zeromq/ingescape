@@ -45,9 +45,10 @@ class MasticQuickAbstractIOPBinding : public QObject, public QQmlPropertyValueSo
 public:
     /**
      * @brief Default constructor
+     * @param qmlPropertiesMustBeWritable
      * @param parent
      */
-    explicit MasticQuickAbstractIOPBinding(QObject *parent = nullptr);
+    explicit MasticQuickAbstractIOPBinding(bool qmlPropertiesMustBeWritable = false, QObject *parent = nullptr);
 
 
     /**

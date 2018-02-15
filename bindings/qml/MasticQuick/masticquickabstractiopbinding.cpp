@@ -24,15 +24,16 @@
 
 /**
  * @brief Default constructor
+ * @param qmlPropertiesMustBeWritable
  * @param parent
  */
-MasticQuickAbstractIOPBinding::MasticQuickAbstractIOPBinding(QObject *parent)
+MasticQuickAbstractIOPBinding::MasticQuickAbstractIOPBinding(bool qmlPropertiesMustBeWritable, QObject *parent)
     : QObject(parent),
     _target(NULL),
     _when(true),
     _isCompleted(false),
     _isUsedAsQQmlPropertyValueSource(false),
-    _qmlPropertiesMustBeWritable(false)
+    _qmlPropertiesMustBeWritable(qmlPropertiesMustBeWritable)
 {
 }
 
