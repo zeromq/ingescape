@@ -13,6 +13,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#ifdef _WIN32
+#include "unixfunctions.h"
+#endif
 #include "mastic_private.h"
 
 mapping_t* mtic_internal_mapping = NULL;

@@ -46,6 +46,9 @@ class MasticQuickInputBinding : public QObject, public QQmlPropertyValueSource, 
     // Suffix of Mastic inputs
     MASTIC_QML_PROPERTY_CUSTOM_SETTER(QString, inputsSuffix)
 
+    // Flag indicating if our binding is active or not
+    MASTIC_QML_PROPERTY_CUSTOM_SETTER(bool, when)
+
 
 public:
     /**
@@ -117,6 +120,12 @@ protected:
      * @brief Update internal data
      */
     void _update();
+
+
+    /**
+     * @brief Manage connect/disconnect calls to associate our item to MasticQuick
+     */
+    void _connectOrDisconnectToMasticQuick();
 
 
 protected:
