@@ -359,7 +359,7 @@ int handleSubscriptionMessage(zmsg_t *msg, const char *subscriberPeerId){
     char *output = NULL;
     char *vType = NULL;
     iopType_t valueType = 0;
-    for (int i = 0; i < size; i += 3){
+    for (unsigned long i = 0; i < size; i += 3){
         // Message must contain 3 elements
         // 1 : output name
         // 2 : output ioptType
