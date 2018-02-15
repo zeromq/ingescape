@@ -19,8 +19,9 @@
 #include <QMutex>
 
 
-#include "masticquickbinding.h"
+#include "masticquickbindingsingleton.h"
 #include "masticquickinputbinding.h"
+#include "masticquickoutputbinding.h"
 
 
 
@@ -765,12 +766,13 @@ void MasticQuick::registerTypes(const char* uri)
     // Register creatable types
     //
     qmlRegisterType<MasticQuickInputBinding>(uri, MASTICQUICK_VERSION_MAJOR, MASTICQUICK_VERSION_MINOR, "MasticInputBinding");
+    qmlRegisterType<MasticQuickOutputBinding>(uri, MASTICQUICK_VERSION_MAJOR, MASTICQUICK_VERSION_MINOR, "MasticOutputBinding");
 
 
     //
     // Register singletons
     //
-    qmlRegisterSingletonType<MasticQuickBinding>(uri, MASTICQUICK_VERSION_MAJOR, MASTICQUICK_VERSION_MINOR, "MasticBinding", &MasticQuickBinding::qmlSingleton);
+    qmlRegisterSingletonType<MasticQuickBindingSingleton>(uri, MASTICQUICK_VERSION_MAJOR, MASTICQUICK_VERSION_MINOR, "MasticBinding", &MasticQuickBindingSingleton::qmlSingleton);
     qmlRegisterSingletonType<MasticQuick>(uri, MASTICQUICK_VERSION_MAJOR, MASTICQUICK_VERSION_MINOR, "Mastic", &MasticQuick::qmlSingleton);
 }
 
@@ -2917,7 +2919,8 @@ void MasticQuick::_onOutputUpdatedFromFromQML(const QString &key, const QVariant
                         }
                         else
                         {
-                            qWarning() << "MasticController warning: invalid value" << value << "for output" << key;
+                            qWarning() << "MasticQuick warning: invalid value" << value
+                                       << "for Mastic output" << key << "with type INTEGER";
                         }
                     }
                     break;
@@ -2934,7 +2937,8 @@ void MasticQuick::_onOutputUpdatedFromFromQML(const QString &key, const QVariant
                         }
                         else
                         {
-                            qWarning() << "MasticController warning: invalid value" << value << "for output" << key;
+                            qWarning() << "MasticQuick warning: invalid value" << value
+                                       << "for Mastic output" << key << "with type DOUBLE";
                         }
                     }
                     break;
@@ -2961,7 +2965,7 @@ void MasticQuick::_onOutputUpdatedFromFromQML(const QString &key, const QVariant
 
 
                 default:
-                    qWarning() << "MasticController warning: unhandled output type. Can not update output" << key;
+                    qWarning() << "MasticQuick warning: unhandled output type. Can not update output" << key;
                     break;
             }
         }
@@ -3001,7 +3005,8 @@ void MasticQuick::_onParameterUpdatedFromFromQML(const QString &key, const QVari
                         }
                         else
                         {
-                            qWarning() << "MasticController warning: invalid value" << value << "for parameter" << key;
+                            qWarning() << "MasticQuick warning: invalid value" << value
+                                       << "for Mastic parameter" << key << "with type INTEGER";
                         }
                     }
                     break;
@@ -3018,7 +3023,8 @@ void MasticQuick::_onParameterUpdatedFromFromQML(const QString &key, const QVari
                         }
                         else
                         {
-                            qWarning() << "MasticController warning: invalid value" << value << "for parameter" << key;
+                            qWarning() << "MasticQuick warning: invalid value" << value
+                                       << "for Mastic parameter" << key << "with type DOUBLE";
                         }
                     }
                     break;
@@ -3040,12 +3046,12 @@ void MasticQuick::_onParameterUpdatedFromFromQML(const QString &key, const QVari
 
 
                 case IMPULSION_T:
-                    qWarning() << "MasticController warning: invalid parameter type IMPULSION. Can not update parameter" << key;
+                    qWarning() << "MasticQuick warning: invalid parameter type IMPULSION. Can not update parameter" << key;
                     break;
 
 
                 default:
-                    qWarning() << "MasticController warning: unhandled parameter type. Can not update parameter" << key;
+                    qWarning() << "MasticQuick warning: unhandled parameter type. Can not update parameter" << key;
                     break;
             }
         }

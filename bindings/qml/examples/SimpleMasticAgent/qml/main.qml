@@ -124,7 +124,7 @@ ApplicationWindow {
         Mastic.createOutputDouble("rectY", myRectangle.y);
         Mastic.createOutputString("currentColor", content.currentColor);
         Mastic.createOutputImpulsion("impulsion");
-        Mastic.createOutputString("image", "https://pbs.twimg.com/profile_images/502064538108166144/ih48MCFK_400x400.png");
+        Mastic.createOutputString("currentImage", content.currentImage);
 
         // MasticQuick API: create parameters
         Mastic.createParameterString("myColor", "mediumaquamarine");
@@ -132,6 +132,7 @@ ApplicationWindow {
 
         // MasticQuick API: create a binding in javascript to update a Mastic output
         Mastic.outputs.currentColor = Qt.binding(function() { return content.currentColor;});
+        Mastic.outputs.currentImage = Qt.binding(function() { return content.currentImage;});
 
 
         //
@@ -191,9 +192,11 @@ ApplicationWindow {
 
         anchors.fill: parent
 
-        // Color of our current item
+        // Current color
         property color currentColor: "white"
 
+        // Current image
+        property string currentImage: "https://pbs.twimg.com/profile_images/502064538108166144/ih48MCFK_400x400.png"
 
 
         // Controls
@@ -297,6 +300,105 @@ ApplicationWindow {
                         }
                     }
 
+                }
+
+
+                Item {
+                    anchors {
+                        left: parent.left
+                        right: parent.right
+                    }
+
+                    height: 80
+
+                    Text {
+                        id: currentImageLabel
+
+                        anchors {
+                            top: parent.top
+                            bottom: parent.bottom
+                        }
+
+                        text: qsTr("Current image")
+
+                        verticalAlignment: Text.AlignVCenter
+
+                        font {
+                            pixelSize: 14
+                        }
+                    }
+
+                    Row {
+                        anchors {
+                            left: currentImageLabel.right
+                            leftMargin: 20
+                             verticalCenter: parent.verticalCenter
+                        }
+
+                        spacing: 20
+
+                        Repeater {
+                            model: [
+                                     "https://pbs.twimg.com/profile_images/502064538108166144/ih48MCFK_400x400.png",
+                                     "https://i2.wp.com/ingenuity.io/wp-content/uploads/2017/10/logo-I2-site-05.png",
+                                     "https://i0.wp.com/ingenuity.io/wp-content/uploads/2017/08/offre2-01-1.png"
+                                   ]
+
+                            delegate: Rectangle {
+                                width: 90
+                                height: 70
+
+                                Image {
+                                    id: image
+
+                                    anchors.fill: parent
+
+                                    fillMode: Image.PreserveAspectFit
+                                    horizontalAlignment: Image.AlignHCenter
+                                    verticalAlignment: Image.AlignVCenter
+
+                                    source: modelData
+                                }
+
+                                Rectangle {
+                                    anchors.fill: parent
+
+                                    color: "transparent"
+
+                                    border {
+                                        width: (content.currentImage === modelData) ? 4 : 1
+                                        color: "black"
+                                    }
+
+                                    Behavior on border.width {
+                                        NumberAnimation {}
+                                    }
+
+                                    MouseArea {
+                                        anchors.fill: parent
+
+                                        onClicked: {
+                                            content.currentImage = modelData;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                }
+
+                Rectangle {
+                    anchors {
+                        left: parent.left
+                        right: parent.right
+                        leftMargin: 10
+                        rightMargin: 10
+                    }
+
+                    height: 2
+
+                    color: "black"
                 }
 
 

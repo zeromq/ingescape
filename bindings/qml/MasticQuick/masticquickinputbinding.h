@@ -20,6 +20,7 @@
 #include <QtQml>
 
 #include "masticquick_helpers.h"
+#include "masticquickabstractiopbinding.h"
 
 
 
@@ -28,26 +29,15 @@
  *         of a given QML item (target) when Mastic inputs change
  *
  */
-class MasticQuickInputBinding : public QObject, public QQmlPropertyValueSource, public QQmlParserStatus
+class MasticQuickInputBinding : public MasticQuickAbstractIOPBinding
 {
     Q_OBJECT
-    Q_INTERFACES(QQmlParserStatus)
-    Q_INTERFACES(QQmlPropertyValueSource)
-
-    // Target: the object to be updated
-    MASTIC_QML_PROPERTY_CUSTOM_SETTER(QObject*, target)
-
-    // List of properties of our object
-    MASTIC_QML_PROPERTY_CUSTOM_SETTER(QString, properties)
 
     // Prefix of Mastic inputs
     MASTIC_QML_PROPERTY_CUSTOM_SETTER(QString, inputsPrefix)
 
     // Suffix of Mastic inputs
     MASTIC_QML_PROPERTY_CUSTOM_SETTER(QString, inputsSuffix)
-
-    // Flag indicating if our binding is active or not
-    MASTIC_QML_PROPERTY_CUSTOM_SETTER(bool, when)
 
 
 public:
@@ -64,21 +54,8 @@ public:
     ~MasticQuickInputBinding();
 
 
-Q_SIGNALS:
-
-public Q_SLOTS:
-
-
-
 
 protected Q_SLOTS:
-    /**
-     * @brief Called when the object associated to our target property is destroyed
-     * @param sender
-     */
-    void _ontargetDestroyed(QObject *sender);
-
-
     /**
      * @brief Called when a Mastic input changes
      * @param name
@@ -89,58 +66,30 @@ protected Q_SLOTS:
 
 protected:
     /**
-     * @brief QQmlPropertyValueSource API: This method will be called by the QML engine when assigning a value source
-     *        with the following syntax    MasticQuickInputBinding on property { }
-     *
-     * @param property
+     * @brief Connect to MasticQuick
      */
-    void setTarget(const QQmlProperty &property) Q_DECL_OVERRIDE;
+    void _connectToMasticQuick() Q_DECL_OVERRIDE;
 
 
     /**
-     * @brief QQmlParserStatus API: Invoked after class creation, but before any properties have been set
+     * @brief Disconnect to MasticQuick
      */
-    void classBegin() Q_DECL_OVERRIDE;
-
-
-    /**
-     * @brief QQmlParserStatus API: Invoked after the root component that caused this instantiation has completed construction.
-     *        At this point all static values and binding values have been assigned to the class.
-     */
-    void componentComplete() Q_DECL_OVERRIDE;
+    void _disconnectToMasticQuick() Q_DECL_OVERRIDE;
 
 
     /**
      * @brief Clear internal data
      */
-    void _clear();
+    void _clearInternalData() Q_DECL_OVERRIDE;
 
 
     /**
      * @brief Update internal data
      */
-    void _update();
-
-
-    /**
-     * @brief Manage connect/disconnect calls to associate our item to MasticQuick
-     */
-    void _connectOrDisconnectToMasticQuick();
+    void _updateInternalData() Q_DECL_OVERRIDE;
 
 
 protected:
-    // Flag indicating if our component is completed
-     bool _isCompleted;
-
-     // Flag indicating if our component is used has a QQmlPropertyValueSource
-     bool _isUsedAsQQmlPropertyValueSource;
-
-     // Target property when our component is used as a property value source
-     QQmlProperty _propertyValueSourceTarget;
-
-     // Hashtable of QML properties by name
-     QHash<QString, QQmlProperty> _qmlPropertiesByName;
-
      // Hashtable (Mastic input name, property name)
      QHash<QString, QQmlProperty> _qmlPropertiesByMasticInputName;
 };

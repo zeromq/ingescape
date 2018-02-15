@@ -12,8 +12,8 @@
  *
  */
 
-#ifndef _MASTICQUICKBINDING_H_
-#define _MASTICQUICKBINDING_H_
+#ifndef _MASTICQUICKBINDINGSINGLETON_H_
+#define _MASTICQUICKBINDINGSINGLETON_H_
 
 #include <QObject>
 #include <QtQml>
@@ -23,9 +23,9 @@
 
 
 /**
- * @brief The MasticQuickBinding class defines a singleton that provides constants
+ * @brief The MasticQuickBindingSingleton class defines a singleton that provides constants
  */
-class MasticQuickBinding : public QObject
+class MasticQuickBindingSingleton : public QObject
 {
     Q_OBJECT
 
@@ -37,7 +37,7 @@ public:
      * @brief Default constructor
      * @param parent
      */
-    explicit MasticQuickBinding(QObject *parent = nullptr);
+    explicit MasticQuickBindingSingleton(QObject *parent = nullptr);
 
 
     /**
@@ -53,7 +53,7 @@ public:
       * @brief Get our singleton instance
       * @return
       */
-     static MasticQuickBinding* instance();
+     static MasticQuickBindingSingleton* instance();
 
 
      /**
@@ -98,6 +98,6 @@ protected:
      static QList<QMetaType::Type> _supportedTypesForMasticIopTypeDouble;
 };
 
-QML_DECLARE_TYPE(MasticQuickBinding)
+QML_DECLARE_TYPE(MasticQuickBindingSingleton)
 
-#endif // _MASTICQUICKBINDING_H_
+#endif // _MASTICQUICKBINDINGSINGLETON_H_

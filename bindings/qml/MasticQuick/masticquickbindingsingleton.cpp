@@ -13,13 +13,13 @@
  */
 
 
-#include "masticquickbinding.h"
+#include "masticquickbindingsingleton.h"
 
 
 //
 // Define our singleton instance
 //
-Q_GLOBAL_STATIC(MasticQuickBinding, _singletonInstance)
+Q_GLOBAL_STATIC(MasticQuickBindingSingleton, _singletonInstance)
 
 
 
@@ -27,7 +27,7 @@ Q_GLOBAL_STATIC(MasticQuickBinding, _singletonInstance)
 // List of supported types
 //
 // List of supported types for MasticIopType.INTEGER
-QList<QMetaType::Type> MasticQuickBinding::_supportedTypesForMasticIopTypeInteger = QList<QMetaType::Type>()
+QList<QMetaType::Type> MasticQuickBindingSingleton::_supportedTypesForMasticIopTypeInteger = QList<QMetaType::Type>()
         << QMetaType::Int
         << QMetaType::UInt
         << QMetaType::Long
@@ -39,7 +39,7 @@ QList<QMetaType::Type> MasticQuickBinding::_supportedTypesForMasticIopTypeIntege
          ;
 
 // List of supported types for MasticIopType.DOUBLE
-QList<QMetaType::Type> MasticQuickBinding::_supportedTypesForMasticIopTypeDouble = QList<QMetaType::Type>()
+QList<QMetaType::Type> MasticQuickBindingSingleton::_supportedTypesForMasticIopTypeDouble = QList<QMetaType::Type>()
         << QMetaType::Double
         << QMetaType::Float
          ;
@@ -59,7 +59,7 @@ QList<QMetaType::Type> MasticQuickBinding::_supportedTypesForMasticIopTypeDouble
  * @brief Default constructor
  * @param parent
  */
-MasticQuickBinding::MasticQuickBinding(QObject *parent) : QObject(parent),
+MasticQuickBindingSingleton::MasticQuickBindingSingleton(QObject *parent) : QObject(parent),
     _AllProperties("/* ALL PROPERTIES */")
 {
     // Force C++ ownership, otherwise our singleton will be owned by the QML engine
@@ -74,7 +74,7 @@ MasticQuickBinding::MasticQuickBinding(QObject *parent) : QObject(parent),
  * @param scriptEngine
  * @return
  */
- QObject* MasticQuickBinding::qmlSingleton(QQmlEngine* engine, QJSEngine* scriptEngine)
+ QObject* MasticQuickBindingSingleton::qmlSingleton(QQmlEngine* engine, QJSEngine* scriptEngine)
  {
      Q_UNUSED(engine)
      Q_UNUSED(scriptEngine);
@@ -89,7 +89,7 @@ MasticQuickBinding::MasticQuickBinding(QObject *parent) : QObject(parent),
   * @brief Get our singleton instance
   * @return
   */
- MasticQuickBinding* MasticQuickBinding::instance()
+ MasticQuickBindingSingleton* MasticQuickBindingSingleton::instance()
  {
      return _singletonInstance();
  }
@@ -101,7 +101,7 @@ MasticQuickBinding::MasticQuickBinding(QObject *parent) : QObject(parent),
   * @param object
   * @return
   */
- QString MasticQuickBinding::prettyObjectTypeName(QObject* object)
+ QString MasticQuickBindingSingleton::prettyObjectTypeName(QObject* object)
  {
     QString result;
 
@@ -131,7 +131,7 @@ MasticQuickBinding::MasticQuickBinding(QObject *parent) : QObject(parent),
   * @param property
   * @return
   */
-bool MasticQuickBinding::checkIfPropertyIsSupported(const QQmlProperty &property)
+bool MasticQuickBindingSingleton::checkIfPropertyIsSupported(const QQmlProperty &property)
 {
     bool result = false;
 
@@ -171,7 +171,7 @@ bool MasticQuickBinding::checkIfPropertyIsSupported(const QQmlProperty &property
  * @param property
  * @return
  */
-QString MasticQuickBinding::prettyPropertyTypeName(const QQmlProperty &property)
+QString MasticQuickBindingSingleton::prettyPropertyTypeName(const QQmlProperty &property)
 {
     QString result;
 
@@ -207,7 +207,7 @@ QString MasticQuickBinding::prettyPropertyTypeName(const QQmlProperty &property)
   *
   * @remarks we assume that checkIfPropertyIsSupported has been called before using this method
   */
-MasticIopType::Value MasticQuickBinding::getMasticIOPTypeForProperty(const QQmlProperty &property)
+MasticIopType::Value MasticQuickBindingSingleton::getMasticIOPTypeForProperty(const QQmlProperty &property)
 {
     MasticIopType::Value result = MasticIopType::INVALID;
 
