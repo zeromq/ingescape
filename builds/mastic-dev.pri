@@ -183,7 +183,7 @@ unix:{
 
 ##Add headers from dependencies
 zyre_include_path = $$PWD/../dependencies/windows/headers/zyre_suite
-yajl_include_path = $$PWD/../dependencies/yajl/src/api
+yajl_include_path = $$PWD/../dependencies/windows/headers/
 
 INCLUDEPATH += $$zyre_include_path \
                $$yajl_include_path \
