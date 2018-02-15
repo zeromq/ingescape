@@ -860,4 +860,3 @@ dependencies/ios/ios/perPlatform/x86_64/share/zproject/czmq/ztrie.api
 dependencies/ios/ios/perPlatform/x86_64/share/zproject/czmq/zuuid.api
 dependencies/ios/ios/perPlatform/x86_64/share/zproject/zyre/zyre.api
 dependencies/ios/ios/perPlatform/x86_64/share/zproject/zyre/zyre_event.api
-zyreprobe.pro
