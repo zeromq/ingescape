@@ -234,6 +234,15 @@ yajl_gen_double(yajl_gen g, double number)
     if (strspn(i, "0123456789-") == strlen(i)) {
         strcat(i, ".0");
     }
+    else
+    {
+        // Localization: check if we must replace a comma by a dot
+        char* comma = strchr(i, ',');
+        if (comma != NULL)
+        {
+            *comma = '.';
+        }
+    }
     g->print(g->ctx, i, (unsigned int)strlen(i));
     APPENDED_ATOM;
     FINAL_NEWLINE;
