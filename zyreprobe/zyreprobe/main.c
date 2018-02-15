@@ -32,6 +32,16 @@ const char *gossipbind = NULL;//"tcp://10.0.0.7:12345";
 const char *gossipconnect = NULL;
 const char *endpoint = NULL;
 
+typedef enum {
+    INTEGER_T = 1,  ///< integer value type
+    DOUBLE_T,       ///< double value type
+    STRING_T,       ///< string value type
+    BOOL_T,         ///< bool value type
+    IMPULSION_T,    ///< impulsion value type
+    DATA_T          ///< data value type
+} outputType_t;
+
+char *outputTypes[] = {"INT", "DOUBLE", "STRING", "BOOL", "IMPULS", "DATA"};
 
 //for message passed as run parameter
 char *paramMessage = NULL;
@@ -72,16 +82,69 @@ int manageSubscription (zloop_t *loop, zmq_pollitem_t *item, void *arg){
     if (item->revents & ZMQ_POLLIN ){
         zmsg_t *msg = zmsg_recv(a->subscriber);
         size_t s = zmsg_size(msg);
+        char *string = NULL;
+        zframe_t *frame = NULL;
+        void *data = NULL;
+        size_t size = 0;
+        int type = 0;
         printf("%s published : ", a->name);
-        for (int i = 0; i < s; i++){
-            char *part = zmsg_popstr(msg);
-            if (part == NULL){
-                part = strdup("NULL");
+        if (s == 2){
+            //old mastic protocol
+            string = zmsg_popstr(msg); //output name
+            printf("%s", string);
+            free(string);
+            string = zmsg_popstr(msg); //output value as string
+            printf(" %s\n", string);
+            free(string);
+        } else if (s == 3){
+            //new mastic protocol
+            string = zmsg_popstr(msg); //output name
+            printf("%s", string);
+            free(string);
+            string = zmsg_popstr(msg); //output type as string
+            type = atoi(string);
+            free(string);
+            printf(" %s", outputTypes[type-1]);
+            frame = zmsg_pop(msg);
+            data = zframe_data(frame);
+            size = zframe_size(frame);
+            switch (type) {
+                case INTEGER_T:
+                    printf(" %d\n", *((int *)data));
+                    break;
+                case DOUBLE_T:
+                    printf(" %f\n", *((double *)data));
+                    break;
+                case BOOL_T:
+                    printf(" %d\n", *((bool *)data));
+                    break;
+                case STRING_T:
+                    printf(" %s\n", (char *)data);
+                    break;
+                case IMPULSION_T:
+                    printf("\n");
+                    break;
+                case DATA_T:
+                    string = zframe_strhex(frame);
+                    printf(" (%lu bytes) %.64s\n", strlen(string), string);
+                    free(string);
+                    break;
+                    
+                default:
+                    break;
             }
-            printf(" %s", part);
-            free(part);
+            zframe_destroy(&frame);
+        }else{
+            for (int i = 0; i < s; i++){
+                char *part = zmsg_popstr(msg);
+                if (part == NULL){
+                    part = strdup("NULL");
+                }
+                printf(" %s", part);
+                free(part);
+            }
+            printf(" (unknown protocol version)\n");
         }
-        printf("\n");
         zmsg_destroy(&msg);
     }
     return 0;
