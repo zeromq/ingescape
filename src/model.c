@@ -13,6 +13,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "unixfunctions.h"
 #include "mastic_private.h"
 #include "uthash/utlist.h"
 
