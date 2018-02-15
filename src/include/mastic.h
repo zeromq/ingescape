@@ -250,8 +250,8 @@ PUBLIC void mtic_setVerbose(bool verbose); //log in console
 PUBLIC bool mtic_isVerbose(void);
 PUBLIC void mtic_setLogStream(bool stream); //log in socket
 PUBLIC void mtic_setLogInFile(bool useLogFile); //log in file
-PUBLIC void mtic_setUseColorVerbose (bool useColor); //use colors in console
-PUBLIC void mtic_setLogPath(const char *path); //for log file
+PUBLIC void mtic_setUseColorVerbose(bool useColor); //use colors in console
+PUBLIC void mtic_setLogPath(const char *path); //default is ~/ on UNIX systems and current PATH on Windows
 typedef enum {
     MTIC_LOG_TRACE = 0,
     MTIC_LOG_DEBUG,

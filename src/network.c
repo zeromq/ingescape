@@ -349,23 +349,17 @@ int manageSubscription (zloop_t *loop, zmq_pollitem_t *item, void *arg){
 
     if (item->revents & ZMQ_POLLIN && strlen(subscriberPeerId) > 0)
     {
-        subscriber_t * foundSubscriber = NULL;
-
         // Try to find the subscriber object
+        subscriber_t * foundSubscriber = NULL;
         HASH_FIND_STR(subscribers, subscriberPeerId, foundSubscriber);
-//        int n = HASH_COUNT(subscribers);
-//        mtic_debug("%d subscribers in the list\n", n);
-//        subscriber_t *s, *tmp;
-//        HASH_ITER(hh, subscribers, s, tmp){
-//            mtic_debug("\tsubscriber : %s - %s\n", s->agentName, s->agentPeerId);
-//        }
+        
         if(foundSubscriber != NULL)
         {
             zmsg_t *msg = zmsg_recv(foundSubscriber->subscriber);
             // Message must contain 2 elements
             // 1 : output name
             // 2 : value of the output
-            if(zmsg_size(msg) == 2 && isFrozen == false)
+            if(zmsg_size(msg) == 2 && !isFrozen)
             {
                 char * output = zmsg_popstr(msg);
                 
@@ -737,6 +731,7 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 if (strlen("MAPPED") == strlen(message) && strncmp (message, "MAPPED", strlen("MAPPED")) == 0){
                     mtic_debug("Mapping notification received from %s\n", name);
                     //TODO: optimize to rewrite only outputs actually involved in the mapping
+                    //OR send all outputs via whisper to agent that mapped us
                     long nbOutputs = 0;
                     char **outputsList = NULL;
                     outputsList = mtic_getOutputsList(&nbOutputs);

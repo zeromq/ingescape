@@ -235,7 +235,7 @@ void mtic_setLogStream(bool stream){
         if (stream){
             mtic_warn("mtic_setLogStream: agent is already started, log stream cannot be created anymore\n");
         }else{
-            mtic_warn("mtic_setLogStream: agent is already started, log stream cannot be destroyed anymore\n");
+            mtic_warn("mtic_setLogStream: agent is already started, log stream cannot be disabled anymore\n");
         }
         return;
     }
