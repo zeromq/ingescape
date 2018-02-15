@@ -13,7 +13,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#ifdef _WIN32
 #include "unixfunctions.h"
+#endif
 #include "mastic_private.h"
 #include "uthash/utlist.h"
 
