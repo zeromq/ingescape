@@ -120,10 +120,7 @@ ApplicationWindow {
         Mastic.createInputDouble("circleCy", 20);
         Mastic.createInputString("canvasColor", canvas.color);
         Mastic.createInputImpulsion("impulsion");
-        // - test predefined imageRotationInDegrees
-        var toto = "hello";
-        Mastic.createInputDouble("imageRotationInDegrees", 0, toto);
-        console.log("test "+toto)
+
 
         // MasticQuick API: create outputs
         Mastic.createOutputDouble("x", 0);

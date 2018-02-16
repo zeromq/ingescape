@@ -2102,6 +2102,7 @@ bool MasticQuick::createInputString(QString name, QString value, QString* warnin
  *
  * @param name
  * @param value
+ * @param warning Warning message if something went wrong
  *
  * @return true if an input is created, false otherwise (i.e. we already have an input with this name)
  */
@@ -2116,6 +2117,7 @@ bool MasticQuick::createInputBool(QString name, bool value, QString* warning)
  * @brief Create a new impulsion input
  *
  * @param name
+ * @param warning Warning message if something went wrong
  *
  * @return true if an input is created, false otherwise (i.e. we already have an input with this name)
  */
@@ -2131,6 +2133,7 @@ bool MasticQuick::createInputImpulsion(QString name, QString* warning)
  *
  * @param name
  * @param value
+ * @param warning Warning message if something went wrong
  *
  * @return true if an input is created, false otherwise (i.e. we already have an input with this name)
  */
@@ -2154,12 +2157,13 @@ bool MasticQuick::createInputData(QString name, void* value, QString* warning)
  *
  * @param name
  * @param value
+ * @param warning Warning message if something went wrong
  *
  * @return true if an output is created, false otherwise (i.e. we already have an output with this name)
  */
-bool MasticQuick::createOutputInt(QString name, int value)
+bool MasticQuick::createOutputInt(QString name, int value, QString* warning)
 {
-    return _createOutput(name, MasticIopType::INTEGER, QVariant(value), &value, sizeof(int));
+    return _createOutput(name, MasticIopType::INTEGER, QVariant(value), &value, sizeof(int), warning);
 }
 
 
@@ -2169,12 +2173,13 @@ bool MasticQuick::createOutputInt(QString name, int value)
  *
  * @param name
  * @param value
+ * @param warning Warning message if something went wrong
  *
  * @return true if an output is created, false otherwise (i.e. we already have an output with this name)
  */
-bool MasticQuick::createOutputDouble(QString name, double value)
+bool MasticQuick::createOutputDouble(QString name, double value, QString* warning)
 {
-    return _createOutput(name, MasticIopType::DOUBLE, QVariant(value), &value, sizeof(double));
+    return _createOutput(name, MasticIopType::DOUBLE, QVariant(value), &value, sizeof(double), warning);
 }
 
 
@@ -2184,16 +2189,17 @@ bool MasticQuick::createOutputDouble(QString name, double value)
  *
  * @param name
  * @param value
+ * @param warning Warning message if something went wrong
  *
  * @return true if an output is created, false otherwise (i.e. we already have an output with this name)
  */
-bool MasticQuick::createOutputString(QString name, QString value)
+bool MasticQuick::createOutputString(QString name, QString value, QString* warning)
 {
     std::string stdString = value.toStdString();
     const char* cValue = stdString.c_str();
     int cValueLength = ((cValue != NULL) ? strlen(cValue) : 0);
 
-    return _createOutput(name, MasticIopType::STRING, QVariant(value), (void *)cValue, (cValueLength + 1) * sizeof(char));
+    return _createOutput(name, MasticIopType::STRING, QVariant(value), (void *)cValue, (cValueLength + 1) * sizeof(char), warning);
 }
 
 
@@ -2203,12 +2209,13 @@ bool MasticQuick::createOutputString(QString name, QString value)
  *
  * @param name
  * @param value
+ * @param warning Warning message if something went wrong
  *
  * @return true if an output is created, false otherwise (i.e. we already have an output with this name)
  */
-bool MasticQuick::createOutputBool(QString name, bool value)
+bool MasticQuick::createOutputBool(QString name, bool value, QString* warning)
 {
-    return _createOutput(name, MasticIopType::BOOLEAN, QVariant(value), &value, sizeof(bool));
+    return _createOutput(name, MasticIopType::BOOLEAN, QVariant(value), &value, sizeof(bool), warning);
 }
 
 
@@ -2217,12 +2224,13 @@ bool MasticQuick::createOutputBool(QString name, bool value)
  * @brief Create a new impulsion output
  *
  * @param name
+ * @param warning Warning message if something went wrong
  *
  * @return true if an output is created, false otherwise (i.e. we already have an output with this name)
  */
-bool MasticQuick::createOutputImpulsion(QString name)
+bool MasticQuick::createOutputImpulsion(QString name, QString* warning)
 {
-    return _createOutput(name, MasticIopType::IMPULSION, QVariant(""), 0, 0);
+    return _createOutput(name, MasticIopType::IMPULSION, QVariant(""), 0, 0, warning);
 }
 
 
@@ -2231,13 +2239,15 @@ bool MasticQuick::createOutputImpulsion(QString name)
  *
  * @param name
  * @param value
+ * @param warning Warning message if something went wrong
  *
  * @return true if an output is created, false otherwise (i.e. we already have an output with this name)
  */
-bool MasticQuick::createOutputData(QString name, void* value)
+bool MasticQuick::createOutputData(QString name, void* value, QString* warning)
 {
     Q_UNUSED(name)
     Q_UNUSED(value)
+    Q_UNUSED(warning)
 
     bool result = false;
 
@@ -2253,12 +2263,13 @@ bool MasticQuick::createOutputData(QString name, void* value)
  *
  * @param name
  * @param value
+ * @param warning Warning message if something went wrong
  *
  * @return true if a parameter is created, false otherwise (i.e. we already have a parameter with this name)
  */
-bool MasticQuick::createParameterInt(QString name, int value)
+bool MasticQuick::createParameterInt(QString name, int value, QString* warning)
 {
-    return _createParameter(name, MasticIopType::INTEGER, QVariant(value), &value, sizeof(int));
+    return _createParameter(name, MasticIopType::INTEGER, QVariant(value), &value, sizeof(int), warning);
 }
 
 
@@ -2268,12 +2279,13 @@ bool MasticQuick::createParameterInt(QString name, int value)
  *
  * @param name
  * @param value
+ * @param warning Warning message if something went wrong
  *
  * @return true if a parameter is created, false otherwise (i.e. we already have a parameter with this name)
  */
-bool MasticQuick::createParameterDouble(QString name, double value)
+bool MasticQuick::createParameterDouble(QString name, double value, QString* warning)
 {
-    return _createParameter(name, MasticIopType::DOUBLE, QVariant(value), &value, sizeof(double));
+    return _createParameter(name, MasticIopType::DOUBLE, QVariant(value), &value, sizeof(double), warning);
 }
 
 
@@ -2283,16 +2295,17 @@ bool MasticQuick::createParameterDouble(QString name, double value)
  *
  * @param name
  * @param value
+ * @param warning Warning message if something went wrong
  *
  * @return true if a parameter is created, false otherwise (i.e. we already have a parameter with this name)
  */
-bool MasticQuick::createParameterString(QString name, QString value)
+bool MasticQuick::createParameterString(QString name, QString value, QString* warning)
 {
     std::string stdString = value.toStdString();
     const char* cValue = stdString.c_str();
     int cValueLength = ((cValue != NULL) ? strlen(cValue) : 0);
 
-    return _createParameter(name, MasticIopType::STRING, QVariant(value), (void *)cValue, (cValueLength + 1) * sizeof(char));
+    return _createParameter(name, MasticIopType::STRING, QVariant(value), (void *)cValue, (cValueLength + 1) * sizeof(char), warning);
  }
 
 
@@ -2302,12 +2315,13 @@ bool MasticQuick::createParameterString(QString name, QString value)
  *
  * @param name
  * @param value
+ * @param warning Warning message if something went wrong
  *
  * @return true if a parameter is created, false otherwise (i.e. we already have a parameter with this name)
  */
-bool MasticQuick::createParameterBool(QString name, bool value)
+bool MasticQuick::createParameterBool(QString name, bool value, QString* warning)
 {
-    return _createParameter(name, MasticIopType::BOOLEAN, QVariant(value), &value, sizeof(bool));
+    return _createParameter(name, MasticIopType::BOOLEAN, QVariant(value), &value, sizeof(bool), warning);
 }
 
 
@@ -2317,13 +2331,15 @@ bool MasticQuick::createParameterBool(QString name, bool value)
  *
  * @param name
  * @param value
+ * @param warning Warning message if something went wrong
  *
  * @return true if a parameter is created, false otherwise (i.e. we already have a parameter with this name)
  */
-bool MasticQuick::createParameterData(QString name, void* value)
+bool MasticQuick::createParameterData(QString name, void* value, QString* warning)
 {
     Q_UNUSED(name)
     Q_UNUSED(value)
+    Q_UNUSED(warning)
 
     bool result = false;
 
@@ -2929,10 +2945,11 @@ bool MasticQuick::_createInput(QString name, MasticIopType::Value type, QVariant
  * @param qmlValue
  * @param cValue
  * @param cSize
+ * @param warning Warning message if something went wrong
  *
  * @return true if an output is created, false otherwise
  */
-bool MasticQuick::_createOutput(QString name, MasticIopType::Value type, QVariant qmlValue, void* cValue, long cSize)
+bool MasticQuick::_createOutput(QString name, MasticIopType::Value type, QVariant qmlValue, void* cValue, long cSize, QString* warning)
 {
     bool result = false;
 
@@ -2942,17 +2959,31 @@ bool MasticQuick::_createOutput(QString name, MasticIopType::Value type, QVarian
         // Check if it is a valid IOP name
         if (checkIfIopNameIsValid(name))
         {
-            // Check if we must create a Mastic input
             std::string stdName = name.toStdString();
             const char* cName = stdName.c_str();
-            if (!mtic_checkOutputExistence(cName))
+
+            // Check if we must create a Mastic output
+            iopType_t existingIopType = mtic_getTypeForOutput(cName);
+            if (existingIopType <= 0)
             {
+                //
+                // This mastic output does not exists
+                //
+
+                // Try to create a new output
                 if (mtic_createOutput(cName, enumMasticIopTypeToEnumIopType_t(type), cValue, cSize) == 1)
                 {
                     // Observe this new output
                     if (mtic_observeOutput(cName, &MasticQuick_callbackObserveOutput, this) != 1)
                     {
-                        qWarning() << Q_FUNC_INFO << "warning: failed to observe output" << name;
+                        QString warningMessage = QString("failed to observe output '%1' with type %2").arg(name).arg(MasticIopType::staticEnumToKey(type));
+
+                        qWarning() << "MasticQuick warning:" << warningMessage;
+
+                        if (warning != NULL)
+                        {
+                            *warning = warningMessage;
+                        }
                     }
 
 
@@ -2977,7 +3008,7 @@ bool MasticQuick::_createOutput(QString name, MasticIopType::Value type, QVarian
 
                     // Update our list of outputs
                     _outputsList.append(name);
-                    Q_EMIT outputsListChanged(_outputsList);
+                    Q_EMIT inputsListChanged(_outputsList);
 
 
                     // Everything is ok
@@ -2985,22 +3016,191 @@ bool MasticQuick::_createOutput(QString name, MasticIopType::Value type, QVarian
                 }
                 else
                 {
-                    qWarning() << Q_FUNC_INFO << "warning: failed to create output" << name;
+                    QString warningMessage = QString("failed to create output '%1' with type %2").arg(name).arg(MasticIopType::staticEnumToKey(type));
+
+                    qWarning() << "MasticQuick warning:" << warningMessage;
+
+                    if (warning != NULL)
+                    {
+                        *warning = warningMessage;
+                    }
                 }
             }
             else
             {
-                qWarning() << Q_FUNC_INFO << "warning: output" << name << "already exists";
+                //
+                // This mastic input already exists
+                //
+
+                // Check if the existing property is compatible
+                MasticIopType::Value existingMasticIopType = enumIopType_tToMasticIopType(existingIopType);
+                if (type == existingMasticIopType)
+                {
+                    //
+                    // Same type
+                    //
+
+                    // Check if we must add it to the list of QML dynamic properties
+                    if (_outputs != NULL)
+                    {
+                        // Update QML if needed
+                        if (!_outputs->contains(name))
+                        {
+                            // NB: special case for impulsion properties because we don't want to trigger them at startup
+                            if (type == MasticIopType::IMPULSION)
+                            {
+                                _outputs->blockSignals(true);
+                                _outputs->insert(name, qmlValue);
+                                _outputs->blockSignals(false);
+                            }
+                            else
+                            {
+                                _outputs->insert(name, qmlValue);
+                            }
+                        }
+                        else
+                        {
+                            // Nothing to do
+
+                            QString warningMessage = QString("output '%1' already exists with the same type (%2)").arg(name).arg(MasticIopType::staticEnumToKey(type));
+
+                            qWarning() << "MasticQuick warning:" << warningMessage << "- Its initial value will not be changed to" << qmlValue;
+
+                            if (warning != NULL)
+                            {
+                                *warning = warningMessage;
+                            }
+                        }
+                    }
+                    // Else: should not happen. Otherwise, it means that our controller is destroyed
+
+
+                    // Update our list of outputs if needed
+                    if (!_outputsList.contains(name))
+                    {
+                        _outputsList.append(name);
+                        Q_EMIT inputsListChanged(_outputsList);
+                    }
+
+
+                    // Everything is ok
+                    result = true;
+                }
+                else
+                {
+                    //
+                    // Different types
+                    //
+
+                    // Check if types are compatible
+                    if (MasticQuickUtils::checkIfIopTypesAreCompatible(type, existingMasticIopType))
+                    {
+                        //
+                        // Compatible types
+                        //
+
+                        // Check if we must add it to the list of QML dynamic properties
+                        if (_inputs != NULL)
+                        {
+                            // Update QML if needed
+                            if (!_outputs->contains(name))
+                            {
+                                // NB: special case for impulsion properties because we don't want to trigger them at startup
+                                if (type == MasticIopType::IMPULSION)
+                                {
+                                    _outputs->blockSignals(true);
+                                    _outputs->insert(name, qmlValue);
+                                    _outputs->blockSignals(false);
+                                }
+                                else
+                                {
+                                    _outputs->insert(name, qmlValue);
+                                }
+                            }
+                            else
+                            {
+                                // Nothing to do
+
+                                QString warningMessage = QString("output '%1' already exists with a compatible type %2 - Its type will not be changed to %3")
+                                        .arg(name)
+                                        .arg(MasticIopType::staticEnumToKey(existingMasticIopType))
+                                        .arg(MasticIopType::staticEnumToKey(type));
+
+                                qWarning() << "MasticQuick warning:" << warningMessage <<  "and its initial value will not be changed to" << qmlValue;
+
+                                if (warning != NULL)
+                                {
+                                    *warning = warningMessage;
+                                }
+                            }
+                        }
+                        // Else: should not happen. Otherwise, it means that our controller is destroyed
+
+
+                        // Update our list of outputs if needed
+                        if (!_outputsList.contains(name))
+                        {
+                            _outputsList.append(name);
+                            Q_EMIT inputsListChanged(_outputsList);
+                        }
+
+
+                        // Everything is ok
+                        result = true;
+                    }
+                    else
+                    {
+                        //
+                        // Incompatible types
+                        //
+
+                        QString warningMessage = QString("output '%1' already exists with type %2 that is not compatible with the required type %3")
+                                .arg(name)
+                                .arg(MasticIopType::staticEnumToKey(existingMasticIopType))
+                                .arg(MasticIopType::staticEnumToKey(type));
+
+                        qWarning() << "MasticQuick warning:" << warningMessage;
+
+                        if (warning != NULL)
+                        {
+                            *warning = warningMessage;
+                        }
+                    }
+                }
+                // End of if (type == existingMasticIopType)
             }
+            // End of if (existingIopType <= 0)
         }
         else
         {
-            qWarning() << Q_FUNC_INFO << "warning: '" << name << "' is an invalid output name, it conflicts with Qt internal symbols";
-        }
+            //
+            // Invalid name for Qt
+            //
+
+            QString warningMessage = QString("can not create output - '%1' is an invalid output name, it conflicts with Qt internal symbols").arg(name);
+
+            qWarning() << "MasticQuick warning:" << warningMessage;
+
+            if (warning != NULL)
+            {
+                *warning = warningMessage;
+            }
+         }
     }
     else
     {
-        qWarning() << Q_FUNC_INFO << "warning: can not create an output with an empty name";
+        //
+        // Empty name
+        //
+
+         QString warningMessage = QString("can not create an output with an empty name");
+
+         qWarning() << "MasticQuick warning:" << warningMessage;
+
+         if (warning != NULL)
+         {
+             *warning = warningMessage;
+         }
     }
 
     return result;
@@ -3016,10 +3216,11 @@ bool MasticQuick::_createOutput(QString name, MasticIopType::Value type, QVarian
  * @param qmlValue
  * @param cValue
  * @param cSize
+ * @param warning Warning message if something went wrong
  *
  * @return true if a parameter is created, false otherwise
  */
-bool MasticQuick::_createParameter(QString name, MasticIopType::Value type, QVariant qmlValue, void* cValue, long cSize)
+bool MasticQuick::_createParameter(QString name, MasticIopType::Value type, QVariant qmlValue, void* cValue, long cSize, QString* warning)
 {
     bool result = false;
 
@@ -3029,19 +3230,35 @@ bool MasticQuick::_createParameter(QString name, MasticIopType::Value type, QVar
         // Check if it is a valid IOP name
         if (checkIfIopNameIsValid(name))
         {
-            // Check if we must create a Mastic input
-            const char* cName = name.toStdString().c_str();
-            if (!mtic_checkParameterExistence(cName))
+            std::string stdName = name.toStdString();
+            const char* cName = stdName.c_str();
+
+            // Check if we must create a Mastic parameter
+            iopType_t existingIopType = mtic_getTypeForParameter(cName);
+            if (existingIopType <= 0)
             {
+                //
+                // This mastic parameter does not exists
+                //
+
+                // Try to create a new parameter
                 if (mtic_createParameter(cName, enumMasticIopTypeToEnumIopType_t(type), cValue, cSize) == 1)
                 {
                     // Observe this new parameter
                     if (mtic_observeParameter(cName, &MasticQuick_callbackObserveParameter, this) != 1)
                     {
-                        qWarning() << Q_FUNC_INFO << "warning: failed to observe parameter" << name;
+                        QString warningMessage = QString("failed to observe parameter '%1' with type %2").arg(name).arg(MasticIopType::staticEnumToKey(type));
+
+                        qWarning() << "MasticQuick warning:" << warningMessage;
+
+                        if (warning != NULL)
+                        {
+                            *warning = warningMessage;
+                        }
                     }
 
-                     // Add it to the list of QML dynamic properties
+
+                    // Add it to the list of QML dynamic properties
                     if (_parameters != NULL)
                     {
                         // Update QML
@@ -3062,7 +3279,7 @@ bool MasticQuick::_createParameter(QString name, MasticIopType::Value type, QVar
 
                     // Update our list of parameters
                     _parametersList.append(name);
-                    Q_EMIT parametersListChanged(_parametersList);
+                    Q_EMIT inputsListChanged(_parametersList);
 
 
                     // Everything is ok
@@ -3070,22 +3287,191 @@ bool MasticQuick::_createParameter(QString name, MasticIopType::Value type, QVar
                 }
                 else
                 {
-                    qWarning() << Q_FUNC_INFO << "warning: failed to create parameter" << name;
+                    QString warningMessage = QString("failed to create parameter '%1' with type %2").arg(name).arg(MasticIopType::staticEnumToKey(type));
+
+                    qWarning() << "MasticQuick warning:" << warningMessage;
+
+                    if (warning != NULL)
+                    {
+                        *warning = warningMessage;
+                    }
                 }
             }
             else
             {
-                qWarning() << Q_FUNC_INFO << "warning: parameter" << name << "already exists";
+                //
+                // This mastic parameter already exists
+                //
+
+                // Check if the existing property is compatible
+                MasticIopType::Value existingMasticIopType = enumIopType_tToMasticIopType(existingIopType);
+                if (type == existingMasticIopType)
+                {
+                    //
+                    // Same type
+                    //
+
+                    // Check if we must add it to the list of QML dynamic properties
+                    if (_parameters != NULL)
+                    {
+                        // Update QML if needed
+                        if (!_parameters->contains(name))
+                        {
+                            // NB: special case for impulsion properties because we don't want to trigger them at startup
+                            if (type == MasticIopType::IMPULSION)
+                            {
+                                _parameters->blockSignals(true);
+                                _parameters->insert(name, qmlValue);
+                                _parameters->blockSignals(false);
+                            }
+                            else
+                            {
+                                _parameters->insert(name, qmlValue);
+                            }
+                        }
+                        else
+                        {
+                            // Nothing to do
+
+                            QString warningMessage = QString("parameter '%1' already exists with the same type (%2)").arg(name).arg(MasticIopType::staticEnumToKey(type));
+
+                            qWarning() << "MasticQuick warning:" << warningMessage << "- Its initial value will not be changed to" << qmlValue;
+
+                            if (warning != NULL)
+                            {
+                                *warning = warningMessage;
+                            }
+                        }
+                    }
+                    // Else: should not happen. Otherwise, it means that our controller is destroyed
+
+
+                    // Update our list of parameters if needed
+                    if (!_parametersList.contains(name))
+                    {
+                        _parametersList.append(name);
+                        Q_EMIT inputsListChanged(_parametersList);
+                    }
+
+
+                    // Everything is ok
+                    result = true;
+                }
+                else
+                {
+                    //
+                    // Different types
+                    //
+
+                    // Check if types are compatible
+                    if (MasticQuickUtils::checkIfIopTypesAreCompatible(type, existingMasticIopType))
+                    {
+                        //
+                        // Compatible types
+                        //
+
+                        // Check if we must add it to the list of QML dynamic properties
+                        if (_parameters != NULL)
+                        {
+                            // Update QML if needed
+                            if (!_parameters->contains(name))
+                            {
+                                // NB: special case for impulsion properties because we don't want to trigger them at startup
+                                if (type == MasticIopType::IMPULSION)
+                                {
+                                    _parameters->blockSignals(true);
+                                    _parameters->insert(name, qmlValue);
+                                    _parameters->blockSignals(false);
+                                }
+                                else
+                                {
+                                    _parameters->insert(name, qmlValue);
+                                }
+                            }
+                            else
+                            {
+                                // Nothing to do
+
+                                QString warningMessage = QString("parameter '%1' already exists with a compatible type %2 - Its type will not be changed to %3")
+                                        .arg(name)
+                                        .arg(MasticIopType::staticEnumToKey(existingMasticIopType))
+                                        .arg(MasticIopType::staticEnumToKey(type));
+
+                                qWarning() << "MasticQuick warning:" << warningMessage <<  "and its initial value will not be changed to" << qmlValue;
+
+                                if (warning != NULL)
+                                {
+                                    *warning = warningMessage;
+                                }
+                            }
+                        }
+                        // Else: should not happen. Otherwise, it means that our controller is destroyed
+
+
+                        // Update our list of parameters if needed
+                        if (!_parametersList.contains(name))
+                        {
+                            _parametersList.append(name);
+                            Q_EMIT inputsListChanged(_parametersList);
+                        }
+
+
+                        // Everything is ok
+                        result = true;
+                    }
+                    else
+                    {
+                        //
+                        // Incompatible types
+                        //
+
+                        QString warningMessage = QString("parameter '%1' already exists with type %2 that is not compatible with the required type %3")
+                                .arg(name)
+                                .arg(MasticIopType::staticEnumToKey(existingMasticIopType))
+                                .arg(MasticIopType::staticEnumToKey(type));
+
+                        qWarning() << "MasticQuick warning:" << warningMessage;
+
+                        if (warning != NULL)
+                        {
+                            *warning = warningMessage;
+                        }
+                    }
+                }
+                // End of if (type == existingMasticIopType)
             }
+            // End of if (existingIopType <= 0)
         }
         else
         {
-            qWarning() << Q_FUNC_INFO << "warning: '" << name << "' is an invalid parameter name, it conflicts with Qt internal symbols";
+            //
+            // Invalid name for Qt
+            //
+
+            QString warningMessage = QString("can not create parameter - '%1' is an invalid parameter name, it conflicts with Qt internal symbols").arg(name);
+
+            qWarning() << "MasticQuick warning:" << warningMessage;
+
+            if (warning != NULL)
+            {
+                *warning = warningMessage;
+            }
          }
     }
     else
     {
-        qWarning() << Q_FUNC_INFO << "warning: can not create a parameter with an empty name";
+        //
+        // Empty name
+        //
+
+         QString warningMessage = QString("can not create a parameter with an empty name");
+
+         qWarning() << "MasticQuick warning:" << warningMessage;
+
+         if (warning != NULL)
+         {
+             *warning = warningMessage;
+         }
     }
 
     return result;
