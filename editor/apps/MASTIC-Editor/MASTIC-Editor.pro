@@ -28,6 +28,12 @@ QMAKE_CXXFLAGS += -Werror
 PRECOMPILED_HEADER  = stable.h
 
 
+# To build temp files (*.o, moc_*.cpp and qrc_*.cpp) in a temp dir
+OBJECTS_DIR = tmp
+MOC_DIR = tmp
+RCC_DIR = tmp
+
+
 SOURCES += main.cpp \
     controller/agentssupervisioncontroller.cpp \
     controller/agentsmappingcontroller.cpp \
