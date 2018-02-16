@@ -860,3 +860,5 @@ dependencies/ios/ios/perPlatform/x86_64/share/zproject/czmq/ztrie.api
 dependencies/ios/ios/perPlatform/x86_64/share/zproject/czmq/zuuid.api
 dependencies/ios/ios/perPlatform/x86_64/share/zproject/zyre/zyre.api
 dependencies/ios/ios/perPlatform/x86_64/share/zproject/zyre/zyre_event.api
+dependencies/windows/libs/~$to_Compilation_Win32_Libsodium_Zyre_Yajl.docx
+dependencies/yajl/build/

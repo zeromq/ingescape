@@ -1,4 +1,4 @@
-SOURCES += \
+ SOURCES += \
     $$PWD/../src/definition.c \
     $$PWD/../src/mapping.c \
     $$PWD/../src/model.c \
@@ -35,6 +35,8 @@ win32:{
     HEADERS += $$PWD/../dependencies/windows/unix/unixfunctions.h \
 
     INCLUDEPATH += $$PWD/../dependencies/windows/unix \
+                   $$PWD/../dependencies/windows/headers \
+                   $$PWD/../dependencies/windows/zyre_suite \
 
     #Add librairies
     LIBS += -L$$libs_path -llibzyre -llibczmq -lyajl
