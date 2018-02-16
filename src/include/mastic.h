@@ -245,7 +245,7 @@ PUBLIC void mtic_setCommandLine(const char *line);
 //to us through a private communication for our proper initialization.
 //By default, this behavior is set to false.
 PUBLIC void mtic_setRequestOutputsFromMappedAgents(bool notify);
-PUBLIC bool mtic_getRequestOutputsFromMappedAgents();
+PUBLIC bool mtic_getRequestOutputsFromMappedAgents(void);
 
 //logs and debug messages
 PUBLIC void mtic_setVerbose(bool verbose); //log in console
