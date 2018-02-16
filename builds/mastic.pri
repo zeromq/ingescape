@@ -74,21 +74,45 @@ mac:{
     # NB: use ios { } for ios sub-rules
 
 
+    #------------------------------------------------
     #
     # Include paths
     #
+    #------------------------------------------------
 
     # zyre, zmq, czmq, sodium, yajl
     INCLUDEPATH += /usr/local/include
 
 
+    #------------------------------------------------
     #
     # List of libraries to be linked into the project
     #
+    # i.e. zyre, zmq, czmq, sodium, yajl
+    #
+    #------------------------------------------------
 
-    # zyre, zmq, czmq, sodium, yajl
-    LIBS += -L/usr/local/lib -lzmq -lczmq -lzyre -lyajl
+    #
+    # Option 1: generic version (relative paths)
+    # - pros: add /usr/local/lib to the list of search directories of our application
+    #         It can help it to find extra librairies
+    #
+    # - cons: may create a conflict with brew installs (libjpeg, libpng, libtiff)
 
+    #LIBS += -L/usr/local/lib -lzmq -lczmq -lzyre -lyajl
+
+
+    #
+    # Option 2: specific version (absolute paths)
+    # - pros: avoid to add /usr/local/lib to the list of search directories of our application
+    #         It prevents conflict with brew installs (libjpeg, libpng, libtiff)
+    #
+    # - cons: all required librairies must be linked explictly
+    #         AND does not work if libraries are installed in another directory
+    LIBS += /usr/local/lib/libzmq.dylib
+    LIBS += /usr/local/lib/libczmq.dylib
+    LIBS += /usr/local/lib/libzyre.dylib
+    LIBS += /usr/local/lib/libyajl.dylib
 }
 
 
