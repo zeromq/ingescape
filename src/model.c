@@ -2411,7 +2411,7 @@ iopType_t mtic_getTypeForInput(const char *name){
     //Find the Iop
     agent_iop *inputFound = NULL;
 
-    //check if def live iexist
+    //check if def live exists
     if(mtic_internal_definition == NULL){
         mtic_debug("Definition live is NULL.");
         return -1;
