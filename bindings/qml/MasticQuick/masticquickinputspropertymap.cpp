@@ -58,7 +58,7 @@ QVariant MasticQuickInputsPropertyMap::updateValue(const QString &key, const QVa
     {
         // This input does not exist. It may be a typo
         qWarning() << "MasticQuick warning:" << QString("Mastic.inputs.%1").arg(key) << "is invalid because input"
-                   << key << "does not exist. It may be a typo or this input has not been created or has been removed";
+                   << key << "does not exist. It may be a typo or this input it not yet created or has been removed";
 
         // Return an empty QVariant
         return QVariant();

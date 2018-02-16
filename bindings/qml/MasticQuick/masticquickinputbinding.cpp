@@ -26,7 +26,7 @@
  * @param parent
  */
 MasticQuickInputBinding::MasticQuickInputBinding(QObject *parent)
-    : MasticQuickAbstractIOPBinding(true, parent)
+    : MasticQuickAbstractIOPBinding(parent, true)
 {
 }
 
@@ -221,7 +221,7 @@ void MasticQuickInputBinding::_updateInternalData()
 
                 // Get MasticIOP type
                 MasticIopType::Value masticIopType = getMasticIOPTypeForProperty(property);
-qDebug() << "CREATE INPUT" << masticInputName;
+
                 // Try to build a Mastic input
                 bool succeeded = false;
                 switch(masticIopType)

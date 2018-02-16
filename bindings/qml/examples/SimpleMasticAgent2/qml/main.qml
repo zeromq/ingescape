@@ -105,7 +105,7 @@ ApplicationWindow {
 
     Component.onCompleted: {
         // MasticQuick API: mastic version
-        console.log("Mastic version is " + Mastic.version);
+        console.log("Mastic version is " + Mastic.version + " (" + Mastic.versionString + ")");
 
         // MasticQuick API: verbose mode
         Mastic.isVerbose = false;
@@ -415,7 +415,7 @@ ApplicationWindow {
                 }
 
                 Component.onCompleted: {
-                    console.log("Test to read value of rect_border.width" + Mastic.inputs["rect_border.width"]);
+                    console.log("Test to read value of rect_border.width = " + Mastic.inputs["rect_border.width"]);
                 }
             }
         }

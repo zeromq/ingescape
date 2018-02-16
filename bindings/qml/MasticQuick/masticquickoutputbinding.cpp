@@ -26,7 +26,7 @@
  * @param parent
  */
 MasticQuickOutputBinding::MasticQuickOutputBinding(QObject *parent)
-    : MasticQuickAbstractIOPBinding(false, parent)
+    : MasticQuickAbstractIOPBinding(parent, false)
 {
     // Get index of our callback called when a QML property changed
     const QMetaObject* myMetaObject = metaObject();

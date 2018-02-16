@@ -58,10 +58,10 @@ QList<QMetaType::Type> MasticQuickAbstractIOPBinding::_supportedTypesForMasticIo
 
 /**
  * @brief Default constructor
- * @param qmlPropertiesMustBeWritable
  * @param parent
+ * @param qmlPropertiesMustBeWritable
  */
-MasticQuickAbstractIOPBinding::MasticQuickAbstractIOPBinding(bool qmlPropertiesMustBeWritable, QObject *parent)
+MasticQuickAbstractIOPBinding::MasticQuickAbstractIOPBinding(QObject *parent, bool qmlPropertiesMustBeWritable)
     : QObject(parent),
     _target(NULL),
     _when(true),
