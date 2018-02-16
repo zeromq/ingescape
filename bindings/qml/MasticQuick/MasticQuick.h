@@ -52,8 +52,11 @@ class MASTICQUICK_EXPORT MasticQuick : public QObject
 {
     Q_OBJECT
 
-    // Version of the Masrtic API
+    // Version of the Mastic API
     MASTIC_QML_PROPERTY_READONLY(int, version)
+
+    // Version of the Mastic API - pretty print string
+    MASTIC_QML_PROPERTY_READONLY(QString, versionString)
 
     // Agent name
     MASTIC_QML_PROPERTY_CUSTOM_SETTER(QString, agentName)
@@ -82,16 +85,28 @@ class MASTICQUICK_EXPORT MasticQuick : public QObject
     // Flag indicating if our agent is started
     MASTIC_QML_PROPERTY_READONLY(bool, isStarted)
 
-    // Flag indicating if Mastic is verbose or not
-    MASTIC_QML_PROPERTY_CUSTOM_SETTER(bool, isVerbose)
-
-    // Log level
-    MASTIC_QML_PROPERTY_CUSTOM_SETTER(MasticLogLevel::Value, logLevel)
-
     // When mapping an agent setting we may request the mapped agent
     // to send its outputs (except for data & impulsions) to us through
     // a private communication for our proper initialization
     MASTIC_QML_PROPERTY_CUSTOM_SETTER(bool, requestOutputsFromMappedAgents)
+
+    // Flag indicating if Mastic is verbose or not
+    MASTIC_QML_PROPERTY_CUSTOM_SETTER(bool, isVerbose)
+
+    // Flag indicating if Mastic must log stream
+    MASTIC_QML_PROPERTY_CUSTOM_SETTER(bool, logStream)
+
+    // Flag indicating if Mastic uses a log file
+    MASTIC_QML_PROPERTY_CUSTOM_SETTER(bool, logInFile)
+
+    // Flag indicating if Mastic uses colors in console
+    MASTIC_QML_PROPERTY_CUSTOM_SETTER(bool, useColorVerbose)
+
+    // Path of our log file
+    MASTIC_QML_PROPERTY_CUSTOM_SETTER(QString, logPath)
+
+    // Log level
+    MASTIC_QML_PROPERTY_CUSTOM_SETTER(MasticLogLevel::Value, logLevel)
 
     // List of input names
     MASTIC_QML_PROPERTY_READONLY(QStringList, inputsList)

@@ -103,7 +103,7 @@ ApplicationWindow {
 
     Component.onCompleted: {
         // MasticQuick API: mastic version
-        console.log("Mastic version is " + Mastic.version);
+        console.log("Mastic version is " + Mastic.versionString);
 
         // MasticQuick API: verbose mode
         Mastic.isVerbose = false;

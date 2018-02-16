@@ -648,7 +648,6 @@ static QMutex _MASTICQUICK_SINGLETON_MUTEX;
  * @param parent
  */
 MasticQuick::MasticQuick(QObject *parent) : QObject(parent),
-    _canBeFrozen(false),
     _isStarted(false),
     _inputs(NULL),
     _outputs(NULL),
@@ -669,8 +668,13 @@ MasticQuick::MasticQuick(QObject *parent) : QObject(parent),
     //
     //-------------------------------------------------
 
-    // - version of Mastic
+    // - version of Mastic  
     _version = mtic_version();
+    // MASTIC_VERSION ((MASTIC_MAJOR * 10000) + (MASTIC_MINOR * 100) + MASTIC_MICRO)
+    int versionMajor = _version/10000;
+    int versionMinor = (_version - versionMajor * 10000)/100;
+    int versionMicro = (_version - (versionMajor * 10000 + versionMinor * 100));
+    _versionString = QString("%1.%2.%3").arg(versionMajor).arg(versionMinor).arg(versionMicro);
 
     // - agent state
     char* cAgentState = mtic_getAgentState();
@@ -684,17 +688,39 @@ MasticQuick::MasticQuick(QObject *parent) : QObject(parent),
     // - isFrozen flag
     _isFrozen = mtic_isFrozen();
 
+    // - canBeFrozen flag
+    _canBeFrozen = mtic_canBeFrozen();
+
     // - isMuted flag
     _isMuted = mtic_isMuted();
+
+    // - requestOutputsFromMappedAgents
+    _requestOutputsFromMappedAgents = mtic_getRequestOutputsFromMappedAgents();
 
     // - isVerbose
     _isVerbose = mtic_isVerbose();
 
+    // - log stream
+    _logStream = mtic_getLogStream();
+
+    // - log in file
+    _logInFile = mtic_getLogInFile();
+
+    // - use color
+    _useColorVerbose = mtic_getUseColorVerbose();
+
+    // - log path
+    char* cLogPath = mtic_getLogPath();
+    if (cLogPath != NULL)
+    {
+        _logPath = QString(cLogPath);
+        delete cLogPath;
+        cLogPath = NULL;
+    }
+
     // - log level
     _logLevel = enumMticLogLevel_tToMasticLogLevel( mtic_getLogLevel() );
 
-    // - requestOutputsFromMappedAgents
-    _requestOutputsFromMappedAgents = mtic_getRequestOutputsFromMappedAgents();
 
 
     //-------------------------------------------------
@@ -1151,6 +1177,30 @@ void MasticQuick::setcanBeFrozen(bool value)
 
 
 /**
+ * @brief When mapping an agent setting we may request the mapped agent
+ *         to send its outputs (except for data & impulsions) to us through
+ *         a private communication for our proper initialization
+ *
+ * @param value
+ */
+void MasticQuick::setrequestOutputsFromMappedAgents(bool value)
+{
+    if (_requestOutputsFromMappedAgents != value)
+    {
+        // Save value
+        _requestOutputsFromMappedAgents = value;
+
+        // Set our flag
+        mtic_setRequestOutputsFromMappedAgents(value);
+
+        // Notify change
+        Q_EMIT requestOutputsFromMappedAgentsChanged(value);
+    }
+}
+
+
+
+/**
  * @brief Set our isVerbose flag
  * @param value
  */
@@ -1172,7 +1222,91 @@ void MasticQuick::setisVerbose(bool value)
 
 
 /**
- * @brief Set our log lebvel
+ * @briefSet our logStream flag
+ * @param value
+ */
+void MasticQuick::setlogStream(bool value)
+{
+    if (_logStream != value)
+    {
+        // Save value
+        _logStream = value;
+
+        // Set our flag
+        mtic_setLogStream(value);
+
+        // Notify change
+        Q_EMIT logStreamChanged(value);
+    }
+}
+
+
+
+/**
+ * @brief Set our logInFile flag
+ * @param value
+ */
+void MasticQuick::setlogInFile(bool value)
+{
+    if (_logInFile != value)
+    {
+        // Save value
+        _logInFile = value;
+
+        // Set our flag
+        mtic_setLogInFile(value);
+
+        // Notify change
+        Q_EMIT logInFileChanged(value);
+    }
+}
+
+
+
+/**
+ * @brief Set our useColorVerbose flag
+ * @param value
+ */
+void MasticQuick::setuseColorVerbose(bool value)
+{
+    if (_useColorVerbose != value)
+    {
+        // Save value
+        _useColorVerbose = value;
+
+        // Set our flag
+        mtic_setUseColorVerbose(value);
+
+        // Notify change
+        Q_EMIT useColorVerboseChanged(value);
+    }
+}
+
+
+
+/**
+ * @brief Set path of our log file
+ * @param value
+ */
+void MasticQuick::setlogPath(QString value)
+{
+    if (_logPath != value)
+    {
+        // Save value
+        _logPath = value;
+
+        // Set our new log path
+        mtic_setLogPath(value.toStdString().c_str());
+
+        // Notify change
+        Q_EMIT logPathChanged(value);
+    }
+}
+
+
+
+/**
+ * @brief Set our log level
  * @param value
  */
 void MasticQuick::setlogLevel(MasticLogLevel::Value value)
@@ -1191,28 +1325,6 @@ void MasticQuick::setlogLevel(MasticLogLevel::Value value)
 }
 
 
-
-/**
- * @brief When mapping an agent setting we may request the mapped agent
- *         to send its outputs (except for data & impulsions) to us through
- *         a private communication for our proper initialization
- *
- * @param value
- */
-void MasticQuick::setrequestOutputsFromMappedAgents(bool value)
-{
-    if (_requestOutputsFromMappedAgents != value)
-    {
-        // Save value
-        _requestOutputsFromMappedAgents = value;
-
-        // Set our flag
-        mtic_setRequestOutputsFromMappedAgents(value);
-
-        // Notify change
-        Q_EMIT requestOutputsFromMappedAgentsChanged(value);
-    }
-}
 
 
 
