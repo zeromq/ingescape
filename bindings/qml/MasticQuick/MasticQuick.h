@@ -559,7 +559,7 @@ public Q_SLOTS:
       *
       * @return true if an input is created or already exists with the same type, false otherwise
       */
-     bool createInputInt(QString name, int value = 0);
+     bool createInputInt(QString name, int value = 0, QString* warning = NULL);
 
 
 
@@ -571,7 +571,7 @@ public Q_SLOTS:
       *
       * @return true if an input is created or already exists with the same type, false otherwise
       */
-     bool createInputDouble(QString name, double value = 0.0);
+     bool createInputDouble(QString name, double value = 0.0, QString* warning = NULL);
 
 
 
@@ -583,7 +583,7 @@ public Q_SLOTS:
       *
       * @return true if an input is created or already exists with the same type, false otherwise
       */
-     bool createInputString(QString name, QString value = "");
+     bool createInputString(QString name, QString value = "", QString* warning = NULL);
 
 
 
@@ -595,7 +595,7 @@ public Q_SLOTS:
       *
       * @return true if an input is created or already exists with the same type, false otherwise
       */
-     bool createInputBool(QString name, bool value = false);
+     bool createInputBool(QString name, bool value = false, QString* warning = NULL);
 
 
 
@@ -606,7 +606,7 @@ public Q_SLOTS:
       *
       * @return true if an input is created or already exists with the same type, false otherwise
       */
-     bool createInputImpulsion(QString name);
+     bool createInputImpulsion(QString name, QString* warning = NULL);
 
 
 
@@ -618,7 +618,7 @@ public Q_SLOTS:
       *
       * @return true if an input is created or already exists with the same type, false otherwise
       */
-     bool createInputData(QString name, void* value = NULL);
+     bool createInputData(QString name, void* value = NULL, QString* warning = NULL);
 
 
 
@@ -911,6 +911,7 @@ public:
      void _internal_setIsFrozen(bool value);
 
 
+
      /**
       * @brief _internal_tryToCreateInput
       * @param name
@@ -918,7 +919,6 @@ public:
       * @param qmlValue
       */
      void _internal_tryToCreateInput(QString name, MasticIopType::Value type, QVariant qmlValue);
-
 
 
 //---------------------------------------------------
@@ -938,7 +938,7 @@ protected:
       *
       * @return true if an input is created or already exists with the same type, false otherwise
       */
-     bool _createInput(QString name, MasticIopType::Value type, QVariant qmlValue, void* cValue, long cSize);
+     bool _createInput(QString name, MasticIopType::Value type, QVariant qmlValue, void* cValue, long cSize, QString* warning);
 
 
 

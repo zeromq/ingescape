@@ -120,6 +120,8 @@ ApplicationWindow {
         Mastic.createInputDouble("circleCy", 20);
         Mastic.createInputString("canvasColor", canvas.color);
         Mastic.createInputImpulsion("impulsion");
+        // - test predefined imageRotationInDegrees
+        Mastic.createInputDouble("imageRotationInDegrees", 0);
 
         // MasticQuick API: create outputs
         Mastic.createOutputDouble("x", 0);
@@ -303,6 +305,7 @@ ApplicationWindow {
                 id: myImage
 
                 property real opacityInPercent: 100.0
+                property string myString;
 
                 opacity: Math.max(Math.min(opacityInPercent/100.0, 1), 0.0)
 
@@ -312,6 +315,9 @@ ApplicationWindow {
                 // MasticQuick API: automatically bind a QML property to a Mastic input
                 // here, the 'source' property will be binded to a Mastic input named 'imageSource'
                 MasticInputBinding on source {
+                    inputName: "imageSource"
+                }
+                MasticInputBinding on visible {
                     inputName: "imageSource"
                 }
 

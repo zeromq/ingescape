@@ -304,7 +304,7 @@ void MasticQuickInputBinding::_updateInternalData()
 
                 // Try to build a Mastic input
                 bool succeeded = false;
-                switch(masticIopType)
+                switch (masticIopType)
                 {
                     case MasticIopType::INVALID:
                         // Should not happen because we should have filter invalid properties
@@ -324,7 +324,12 @@ void MasticQuickInputBinding::_updateInternalData()
                             }
 
                             // Try to create a Mastic input
-                            succeeded = masticQuick->createInputInt(masticInputName, cValue);
+                            QString warning;
+                            succeeded = masticQuick->createInputInt(masticInputName, cValue, &warning);
+                            if (succeeded && !warning.isEmpty())
+                            {
+                                qmlWarning(this) << warning;
+                            }
                         }
                         break;
 
@@ -342,7 +347,12 @@ void MasticQuickInputBinding::_updateInternalData()
                             }
 
                             // Try to create a Mastic input
-                            succeeded = masticQuick->createInputDouble(masticInputName, cValue);
+                            QString warning;
+                            succeeded = masticQuick->createInputDouble(masticInputName, cValue, &warning);
+                            if (succeeded && !warning.isEmpty())
+                            {
+                                qmlWarning(this) << warning;
+                            }
                         }
                         break;
 
@@ -352,7 +362,12 @@ void MasticQuickInputBinding::_updateInternalData()
                             QVariant qmlValue = property.read();
 
                             // Try to create a Mastic input
-                            succeeded = masticQuick->createInputString(masticInputName, qmlValue.toString());
+                            QString warning;
+                            succeeded = masticQuick->createInputString(masticInputName, qmlValue.toString(), &warning);
+                            if (succeeded && !warning.isEmpty())
+                            {
+                                qmlWarning(this) << warning;
+                            }
                         }
                         break;
 
@@ -362,7 +377,12 @@ void MasticQuickInputBinding::_updateInternalData()
                             QVariant qmlValue = property.read();
 
                             // Try to create a Mastic input
-                            succeeded = masticQuick->createInputBool(masticInputName, qmlValue.toBool());
+                            QString warning;
+                            succeeded = masticQuick->createInputBool(masticInputName, qmlValue.toBool(), &warning);
+                            if (succeeded && !warning.isEmpty())
+                            {
+                                qmlWarning(this) << warning;
+                            }
                         }
                         break;
 
@@ -372,7 +392,13 @@ void MasticQuickInputBinding::_updateInternalData()
 
                     case MasticIopType::DATA:
                         {
-                            succeeded = masticQuick->createInputData(masticInputName, NULL);
+                            // Try to create a Mastic input
+                            QString warning;
+                            succeeded = masticQuick->createInputData(masticInputName, NULL, &warning);
+                            if (succeeded && !warning.isEmpty())
+                            {
+                                qmlWarning(this) << warning;
+                            }
                         }
                         break;
 

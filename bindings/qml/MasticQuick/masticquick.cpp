@@ -2056,9 +2056,9 @@ bool MasticQuick::isOutputMuted(QString name, QVariant qmlUpdateExtraParameter)
  *
  * @return true if an input is created, false otherwise (i.e. we already have an input with this name)
  */
-bool MasticQuick::createInputInt(QString name, int value)
+bool MasticQuick::createInputInt(QString name, int value, QString* warning)
 {
-    return _createInput(name, MasticIopType::INTEGER, QVariant(value), &value, sizeof(int));
+    return _createInput(name, MasticIopType::INTEGER, QVariant(value), &value, sizeof(int), warning);
 }
 
 
@@ -2071,9 +2071,9 @@ bool MasticQuick::createInputInt(QString name, int value)
  *
  * @return true if an input is created, false otherwise (i.e. we already have an input with this name)
  */
-bool MasticQuick::createInputDouble(QString name, double value)
+bool MasticQuick::createInputDouble(QString name, double value, QString* warning)
 {
-    return _createInput(name, MasticIopType::DOUBLE, QVariant(value), &value, sizeof(double));
+    return _createInput(name, MasticIopType::DOUBLE, QVariant(value), &value, sizeof(double), warning);
 }
 
 
@@ -2086,13 +2086,13 @@ bool MasticQuick::createInputDouble(QString name, double value)
  *
  * @return true if an input is created, false otherwise (i.e. we already have an input with this name)
  */
-bool MasticQuick::createInputString(QString name, QString value)
+bool MasticQuick::createInputString(QString name, QString value, QString* warning)
 {
     std::string stdString = value.toStdString();
     const char* cValue = stdString.c_str();
     int cValueLength = ((cValue != NULL) ? strlen(cValue) : 0);
 
-    return _createInput(name, MasticIopType::STRING, QVariant(value), (void *)cValue, (cValueLength + 1) * sizeof(char));
+    return _createInput(name, MasticIopType::STRING, QVariant(value), (void *)cValue, (cValueLength + 1) * sizeof(char), warning);
 }
 
 
@@ -2105,9 +2105,9 @@ bool MasticQuick::createInputString(QString name, QString value)
  *
  * @return true if an input is created, false otherwise (i.e. we already have an input with this name)
  */
-bool MasticQuick::createInputBool(QString name, bool value)
+bool MasticQuick::createInputBool(QString name, bool value, QString* warning)
 {
-    return _createInput(name, MasticIopType::BOOLEAN, QVariant(value), &value, sizeof(bool));
+    return _createInput(name, MasticIopType::BOOLEAN, QVariant(value), &value, sizeof(bool), warning);
 }
 
 
@@ -2119,9 +2119,9 @@ bool MasticQuick::createInputBool(QString name, bool value)
  *
  * @return true if an input is created, false otherwise (i.e. we already have an input with this name)
  */
-bool MasticQuick::createInputImpulsion(QString name)
+bool MasticQuick::createInputImpulsion(QString name, QString* warning)
 {
-    return _createInput(name, MasticIopType::IMPULSION, QVariant(""), 0, 0);
+    return _createInput(name, MasticIopType::IMPULSION, QVariant(""), NULL, 0, warning);
 }
 
 
@@ -2134,10 +2134,11 @@ bool MasticQuick::createInputImpulsion(QString name)
  *
  * @return true if an input is created, false otherwise (i.e. we already have an input with this name)
  */
-bool MasticQuick::createInputData(QString name, void* value)
+bool MasticQuick::createInputData(QString name, void* value, QString* warning)
 {
     Q_UNUSED(name)
     Q_UNUSED(value)
+    Q_UNUSED(warning)
 
     bool result = false;
 
@@ -2661,7 +2662,7 @@ void MasticQuick::_internal_setIsFrozen(bool value)
  *
  * @return true if an input is created, false otherwise
  */
-bool MasticQuick::_createInput(QString name, MasticIopType::Value type, QVariant qmlValue, void* cValue, long cSize)
+bool MasticQuick::_createInput(QString name, MasticIopType::Value type, QVariant qmlValue, void* cValue, long cSize, QString* warning)
 {
     bool result = false;
 
@@ -2671,17 +2672,31 @@ bool MasticQuick::_createInput(QString name, MasticIopType::Value type, QVariant
         // Check if it is a valid IOP name
         if (checkIfIopNameIsValid(name))
         {
-            // Check if we must create a Mastic input
             std::string stdName = name.toStdString();
             const char* cName = stdName.c_str();
-            if (!mtic_checkInputExistence(cName))
+
+            // Check if we must create a Mastic input
+            iopType_t existingIopType = mtic_getTypeForInput(cName);
+            if (existingIopType <= 0)
             {
+                //
+                // This mastic input does not exists
+                //
+
+                // Try to create a new input
                 if (mtic_createInput(cName, enumMasticIopTypeToEnumIopType_t(type), cValue, cSize) == 1)
                 {
                     // Observe this new input
                     if (mtic_observeInput(cName, &MasticQuick_callbackObserveInput, this) != 1)
                     {
-                        qWarning() << Q_FUNC_INFO << "warning: failed to observe input" << name;
+                        QString warningMessage = QString("failed to observe input '%1' with type %2").arg(name).arg(MasticIopType::staticEnumToKey(type));
+
+                        qWarning() << "MasticQuick warning:" << warningMessage;
+
+                        if (warning != NULL)
+                        {
+                            *warning = warningMessage;
+                        }
                     }
 
 
@@ -2714,22 +2729,191 @@ bool MasticQuick::_createInput(QString name, MasticIopType::Value type, QVariant
                 }
                 else
                 {
-                    qWarning() << Q_FUNC_INFO << "warning: failed to create input" << name;
+                    QString warningMessage = QString("failed to create input '%1' with type %2").arg(name).arg(MasticIopType::staticEnumToKey(type));
+
+                    qWarning() << "MasticQuick warning:" << warningMessage;
+
+                    if (warning != NULL)
+                    {
+                        *warning = warningMessage;
+                    }
                 }
             }
             else
             {
-                qWarning() << Q_FUNC_INFO << "warning: input" << name << "already exists";
+                //
+                // This mastic input already exists
+                //
+
+                // Check if the existing property
+                MasticIopType::Value existingMasticIopType = enumIopType_tToMasticIopType(existingIopType);
+                if (type == existingMasticIopType)
+                {
+                    //
+                    // Same type
+                    //
+
+                    // Check if we must add it to the list of QML dynamic properties
+                    if (_inputs != NULL)
+                    {
+                        // Update QML if needed
+                        if (!_inputs->contains(name))
+                        {
+                            // NB: special case for impulsion properties because we don't want to trigger them at startup
+                            if (type == MasticIopType::IMPULSION)
+                            {
+                                _inputs->blockSignals(true);
+                                _inputs->insert(name, qmlValue);
+                                _inputs->blockSignals(false);
+                            }
+                            else
+                            {
+                                _inputs->insert(name, qmlValue);
+                            }
+                        }
+                        else
+                        {
+                            // Nothing to do
+
+                            QString warningMessage = QString("input '%1' already exists with same type %2").arg(name).arg(MasticIopType::staticEnumToKey(type));
+
+                            qWarning() << "MasticQuick warning:" << warningMessage << "- Its initial value will not be changed to" << qmlValue;
+
+                            if (warning != NULL)
+                            {
+                                *warning = warningMessage;
+                            }
+                        }
+                    }
+                    // Else: should not happen. Otherwise, it means that our controller is destroyed
+
+
+                    // Update our list of inputs if needed
+                    if (!_inputsList.contains(name))
+                    {
+                        _inputsList.append(name);
+                        Q_EMIT inputsListChanged(_inputsList);
+                    }
+
+
+                    // Everything is ok
+                    result = true;
+                }
+                else
+                {
+                    //
+                    // Different types
+                    //
+
+                    // Check if types are compatible
+                    if (MasticQuickUtils::checkIfIopTypesAreCompatible(type, existingMasticIopType))
+                    {
+                        //
+                        // Compatible types
+                        //
+
+                        // Check if we must add it to the list of QML dynamic properties
+                        if (_inputs != NULL)
+                        {
+                            // Update QML if needed
+                            if (!_inputs->contains(name))
+                            {
+                                // NB: special case for impulsion properties because we don't want to trigger them at startup
+                                if (type == MasticIopType::IMPULSION)
+                                {
+                                    _inputs->blockSignals(true);
+                                    _inputs->insert(name, qmlValue);
+                                    _inputs->blockSignals(false);
+                                }
+                                else
+                                {
+                                    _inputs->insert(name, qmlValue);
+                                }
+                            }
+                            else
+                            {
+                                // Nothing to do
+
+                                QString warningMessage = QString("input '%1' already exists with a compatible type %2 - Its type will not be changed to %3")
+                                        .arg(name)
+                                        .arg(MasticIopType::staticEnumToKey(existingMasticIopType))
+                                        .arg(MasticIopType::staticEnumToKey(type));
+
+                                qWarning() << "MasticQuick warning:" << warningMessage <<  "and its initial value will not be changed to" << qmlValue;
+
+                                if (warning != NULL)
+                                {
+                                    *warning = warningMessage;
+                                }
+                            }
+                        }
+                        // Else: should not happen. Otherwise, it means that our controller is destroyed
+
+
+                        // Update our list of inputs if needed
+                        if (!_inputsList.contains(name))
+                        {
+                            _inputsList.append(name);
+                            Q_EMIT inputsListChanged(_inputsList);
+                        }
+
+
+                        // Everything is ok
+                        result = true;
+                    }
+                    else
+                    {
+                        //
+                        // Incompatible types
+                        //
+
+                        QString warningMessage = QString("input '%1' already exists with type %2 that is not compatible with the required type %3")
+                                .arg(name)
+                                .arg(MasticIopType::staticEnumToKey(existingMasticIopType))
+                                .arg(MasticIopType::staticEnumToKey(type));
+
+                        qWarning() << "MasticQuick warning:" << warningMessage;
+
+                        if (warning != NULL)
+                        {
+                            *warning = warningMessage;
+                        }
+                    }
+                }
+                // End of if (type == existingMasticIopType)
             }
+            // End of if (existingIopType <= 0)
         }
         else
         {
-            qWarning() << Q_FUNC_INFO << "warning: '" << name << "' is an invalid input name, it conflicts with Qt internal symbols";
-        }
+            //
+            // Invalid name for Qt
+            //
+
+            QString warningMessage = QString("can not create input - '%1' is an invalid input name, it conflicts with Qt internal symbols").arg(name);
+
+            qWarning() << "MasticQuick warning:" << warningMessage;
+
+            if (warning != NULL)
+            {
+                *warning = warningMessage;
+            }
+         }
     }
     else
     {
-        qWarning() << Q_FUNC_INFO << "warning: can not create an input with an empty name";
+        //
+        // Empty name
+        //
+
+         QString warningMessage = QString("can not create an input with an empty name");
+
+         qWarning() << "MasticQuick warning:" << warningMessage;
+
+         if (warning != NULL)
+         {
+             *warning = warningMessage;
+         }
     }
 
     return result;
