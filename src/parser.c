@@ -9,6 +9,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#ifdef _WIN32
+#include "unixfunctions.h"
+#endif
 
 #include "yajl/yajl_tree.h"
 #include "yajl/yajl_gen.h"

@@ -11,6 +11,9 @@
 #include <stdarg.h>
 #include <string.h>
 #include <time.h>
+#ifdef _WIN32
+#include "unixfunctions.h"
+#endif
 
 #if defined(__unix__) || defined(__unix) || \
 (defined(__APPLE__) && defined(__MACH__))
@@ -22,7 +25,7 @@
 
 #define MASTIC_MAJOR 0
 #define MASTIC_MINOR 8
-#define MASTIC_MICRO 0
+#define MASTIC_MICRO 1
 #define MASTIC_VERSION ((MASTIC_MAJOR * 10000) + (MASTIC_MINOR * 100) + MASTIC_MICRO)
 
 FILE *fp = NULL;
@@ -84,7 +87,7 @@ void admin_computeTime(char *dest)
 {
     struct timeval tick;
     gettimeofday(&tick, NULL);
-    struct tm *tm = localtime(&tick.tv_sec);
+      struct tm *tm = localtime(&tick.tv_sec);
     snprintf(dest,128,"%02d/%02d/%d;%02d:%02d:%02d.%06d",
              tm->tm_mday, tm->tm_mon + 1, tm->tm_year + 1900, tm->tm_hour, tm->tm_min, tm->tm_sec, tick.tv_usec);
 }

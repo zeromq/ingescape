@@ -16,6 +16,9 @@
 #include "mastic_private.h"
 #include "uthash/uthash.h"
 #include "uthash/utlist.h"
+#ifdef _WIN32
+#include "unixfunctions.h"
+#endif
 
 definition * mtic_internal_definition = NULL;
 
