@@ -43,7 +43,7 @@ win32:{
     }else {
         #configuration RELEASE
         libzyre_path = $$PWD/../dependencies\windows\libs\win32\Release
-        libyajl_path = $$PWD/../dependencies\windows\libs\yajl\DebugDLL
+        libyajl_path = $$PWD/../dependencies\windows\libs\yajl\ReleaseDLL
     }
 
     #Add librairies
