@@ -2775,7 +2775,7 @@ bool MasticQuick::_createInput(QString name, MasticIopType::Value type, QVariant
                         {
                             // Nothing to do
 
-                            QString warningMessage = QString("input '%1' already exists with same type %2").arg(name).arg(MasticIopType::staticEnumToKey(type));
+                            QString warningMessage = QString("input '%1' already exists with the same type (%2)").arg(name).arg(MasticIopType::staticEnumToKey(type));
 
                             qWarning() << "MasticQuick warning:" << warningMessage << "- Its initial value will not be changed to" << qmlValue;
 
