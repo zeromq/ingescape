@@ -40,9 +40,18 @@ QMAKE_CXXFLAGS += -Werror
 # Use Precompiled headers (PCH)
 PRECOMPILED_HEADER  = stable.h
 
+# To build temp files (*.o, moc_*.cpp and qrc_*.cpp) in a temp dir
+OBJECTS_DIR = tmp
+MOC_DIR = tmp
+RCC_DIR = tmp
 
 
 SOURCES += main.cpp
+
+
+HEADERS += \
+    stable.h
+
 
 RESOURCES += qml.qrc
 
@@ -85,5 +94,22 @@ win32 {
     QMAKE_CXXFLAGS += /WX
 }
 
-HEADERS += \
-    stable.h
+
+
+
+#
+# Mac and iOS
+#
+mac {
+    message(macOS and iOS specific rules)
+
+    !ios {
+        # Release build
+        CONFIG(release, debug|release) {
+            # Release only: copy Qt libs and plugins inside our application to create a standalone application
+            # NB: macdeployqt only runs qmlimportscanner correctly when run from Qt bin directory
+            QMAKE_POST_LINK += $$quote(cd `dirname $(QMAKE)` && macdeployqt $${OUT_PWD}/$${TARGET}.app -qmldir=$${PWD} $$escape_expand(\n\t))
+        }
+    }
+}
+
