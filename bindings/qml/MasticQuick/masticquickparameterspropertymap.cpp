@@ -49,7 +49,7 @@ QVariant MasticQuickParametersPropertyMap::updateValue(const QString &key, const
     else
     {
         // This output does not exist. It may be a typo
-        qWarning() << "Mastic warning:" << QString("Mastic.parameters.%1").arg(key) << "is invalid because parameter"
+        qWarning() << "MasticQuick warning:" << QString("Mastic.parameters.%1").arg(key) << "is invalid because parameter"
                    << key << "does not exist. It may be a typo or this parameter has not been created or has been removed";
 
         // Return an empty QVariant

@@ -21,6 +21,8 @@
 #include "uthash/uthash.h"
 #include "zregex.h"
 
+#define UNUSED(x) (void)x;
+
 //global application options
 int port = 5670;
 const char *name = "zyreprobe";
@@ -78,6 +80,7 @@ typedef struct zyreloopElements{
 
 //manage incoming messages from one of the publisher agent we subscribed to
 int manageSubscription (zloop_t *loop, zmq_pollitem_t *item, void *arg){
+    UNUSED(loop);
     agent *a = (agent *)arg;
     if (item->revents & ZMQ_POLLIN ){
         zmsg_t *msg = zmsg_recv(a->subscriber);
@@ -135,7 +138,7 @@ int manageSubscription (zloop_t *loop, zmq_pollitem_t *item, void *arg){
             }
             zframe_destroy(&frame);
         }else{
-            for (int i = 0; i < s; i++){
+            for (unsigned long i = 0; i < s; i++){
                 char *part = zmsg_popstr(msg);
                 if (part == NULL){
                     part = strdup("NULL");
@@ -152,12 +155,13 @@ int manageSubscription (zloop_t *loop, zmq_pollitem_t *item, void *arg){
 
 //manage incoming messages from one of the logger agent we subscribed to
 int manageLog (zloop_t *loop, zmq_pollitem_t *item, void *arg){
+    UNUSED(loop);
     agent *a = (agent *)arg;
     if (item->revents & ZMQ_POLLIN ){
         zmsg_t *msg = zmsg_recv(a->logger);
         size_t s = zmsg_size(msg);
         printf("%s logged : ", a->name);
-        for (int i = 0; i < s; i++){
+        for (unsigned long i = 0; i < s; i++){
             char *part = zmsg_popstr(msg);
             if (part == NULL){
                 part = strdup("NULL");
@@ -630,6 +634,8 @@ int manageIncoming (zloop_t *loop, zmq_pollitem_t *item, void *args){
 
 //manage message passed as run parameter
 int triggerMessageSend(zloop_t *loop, int timer_id, void *args){
+    UNUSED(loop);
+    UNUSED(timer_id);
     zyreloopElements_t *zEl = (zyreloopElements_t *)args;
     zyre_t *node = zEl->node;
     if (paramChannel != NULL && strlen(paramChannel) > 0){

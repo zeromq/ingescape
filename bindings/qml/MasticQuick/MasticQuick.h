@@ -19,15 +19,11 @@
 #include <QtQml>
 #include <QQmlEngine>
 #include <QJSEngine>
+#include <QQmlPropertyMap>
 
 #include "masticquick_global.h"
 #include "masticquick_helpers.h"
 #include "masticquick_enums.h"
-
-#include "masticquickinputspropertymap.h"
-#include "masticquickoutputspropertymap.h"
-#include "masticquickparameterspropertymap.h"
-
 
 
 //
@@ -92,6 +88,11 @@ class MASTICQUICK_EXPORT MasticQuick : public QObject
     // Log level
     MASTIC_QML_PROPERTY_CUSTOM_SETTER(MasticLogLevel::Value, logLevel)
 
+    // When mapping an agent setting we may request the mapped agent
+    // to send its outputs (except for data & impulsions) to us through
+    // a private communication for our proper initialization
+    MASTIC_QML_PROPERTY_CUSTOM_SETTER(bool, requestOutputsFromMappedAgents)
+
     // List of input names
     MASTIC_QML_PROPERTY_READONLY(QStringList, inputsList)
 
@@ -102,14 +103,13 @@ class MASTICQUICK_EXPORT MasticQuick : public QObject
     MASTIC_QML_PROPERTY_READONLY(QStringList, parametersList)
 
     // Inputs
-    MASTIC_QML_PROPERTY_READONLY(MasticQuickInputsPropertyMap*, inputs)
+    Q_PROPERTY(QQmlPropertyMap* inputs READ inputs NOTIFY inputsChanged)
 
     // Outputs
-    MASTIC_QML_PROPERTY_READONLY(MasticQuickOutputsPropertyMap*, outputs)
+    Q_PROPERTY(QQmlPropertyMap* outputs READ outputs NOTIFY outputsChanged)
 
     // Parameters
-    MASTIC_QML_PROPERTY_READONLY(MasticQuickParametersPropertyMap*, parameters)
-
+    Q_PROPERTY(QQmlPropertyMap* parameters READ parameters NOTIFY parametersChanged)
 
 
 
@@ -156,9 +156,52 @@ public:
      static void registerTypes(const char *uri = DEFAULT_MASTICQUICK_URI);
 
 
+public:
+    /**
+     * @brief Get our inputs property
+     * @return
+     */
+    QQmlPropertyMap* inputs() const;
+
+
+    /**
+     * @brief Get our outputs property
+     * @return
+     */
+    QQmlPropertyMap* outputs() const;
+
+
+    /**
+     * @brief Get our parameters property
+     * @return
+     */
+    QQmlPropertyMap* parameters() const;
+
+
 
 Q_SIGNALS:
-     /**
+    /**
+     * @brief Call out our inputs property changes
+     * @param value
+     */
+    void inputsChanged(QQmlPropertyMap* value);
+
+
+    /**
+     * @brief Call out our outputs property changes
+     * @param value
+     */
+    void outputsChanged(QQmlPropertyMap* value);
+
+
+    /**
+     * @brief Call out our parameters property changes
+     * @param value
+     */
+    void parametersChanged(QQmlPropertyMap* value);
+
+
+    /**
      * @brief Triggered when our agent is asked to stop on the network
      */
     void forcedStop();
@@ -911,28 +954,6 @@ protected:
 
 
      /**
-      * @brief Update a QML output property
-      *
-      * @param name
-      *
-      * @return true if everything is ok, false otherwise
-      */
-     bool _updateQmlOutput(QString name);
-
-
-
-     /**
-      * @brief Update a QML parameter property
-      *
-      * @param name
-      *
-      * @return true if everything is ok, false otherwise
-      */
-     bool _updateQmlParameter(QString name);
-
-
-
-     /**
       * @brief Update our list of inputs
       */
      void _updateInputsList();
@@ -978,6 +999,15 @@ protected Q_SLOTS:
      void _onParameterUpdatedFromFromQML(const QString &key, const QVariant &value);
 
 
+protected:
+     // Inputs
+     QQmlPropertyMap* _inputs;
+
+     // Outputs
+     QQmlPropertyMap* _outputs;
+
+     // Parameters
+     QQmlPropertyMap* _parameters;
 };
 
 QML_DECLARE_TYPE(MasticQuick)

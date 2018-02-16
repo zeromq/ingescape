@@ -50,7 +50,7 @@ QVariant MasticQuickOutputsPropertyMap::updateValue(const QString &key, const QV
     else
     {
         // This output does not exist. It may be a typo
-        qWarning() << "Mastic warning:" << QString("Mastic.outputs.%1").arg(key) << "is invalid because output"
+        qWarning() << "MasticQuick warning:" << QString("Mastic.outputs.%1").arg(key) << "is invalid because output"
                    << key << "does not exist. It may be a typo or this output has not been created or has been removed";
 
         // Return an empty QVariant

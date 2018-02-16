@@ -632,7 +632,13 @@ static void json_dump_iop (yajl_gen *g, agent_iop* aiop) {
             yajl_gen_string(*g, (const unsigned char *) boolean_to_string(aiop->value.b), strlen(boolean_to_string(aiop->value.b)));
             break;
         case STRING_T:
-            yajl_gen_string(*g, (const unsigned char *) aiop->value.s, strlen(aiop->value.s));
+            {
+                if (yajl_gen_string(*g, (const unsigned char *) aiop->value.s, strlen(aiop->value.s)) == yajl_gen_invalid_string)
+                {
+                    mtic_warn("Mapping parser : json_dump_iop failed to dump a string value - it may not be a valid UTF8 string - %s\n", aiop->value.s);
+                    yajl_gen_string(*g, (const unsigned char *) "", 0);
+                }
+            }
             break;
         case IMPULSION_T:
             yajl_gen_string(*g, (const unsigned char *) "", 0);

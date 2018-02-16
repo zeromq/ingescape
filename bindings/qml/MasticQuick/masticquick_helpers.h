@@ -41,31 +41,6 @@
 
 
 /*!
-   Define a property that is readable/writable from QML with a standard setter method
-*/
-#define MASTIC_QML_PROPERTY(type, name) \
-        Q_PROPERTY (type name READ name WRITE set##name NOTIFY name##Changed) \
-    public: \
-        type name () const { \
-            return _##name ; \
-        } \
-        virtual bool set##name (type value) { \
-            bool hasChanged = false; \
-            if (_##name != value) { \
-                _##name = value; \
-                hasChanged = true; \
-                Q_EMIT name##Changed(value); \
-            } \
-            return hasChanged; \
-        } \
-    Q_SIGNALS: \
-        void name##Changed (type value); \
-    protected: \
-        type _##name;
-
-
-
-/*!
    Define a property that is readable/writable from QML with a custom setter method
 */
 #define MASTIC_QML_PROPERTY_CUSTOM_SETTER(type, name) \
@@ -133,76 +108,6 @@
 
 
 
-
-/*!
-  Defines a new class that provides an enumeration to QML (and C++)
-  with generic methods to convert an enum value to string and vice-versa
-
-  \param name The name of our enum class
-  \param list of all values
-
-  */
-#define MASTIC_QML_ENUM(name, ...) \
-    class name : public AbstractMasticQuickEnumClass { \
-        Q_OBJECT \
-    public: \
-        explicit name(QObject* parent = 0) : AbstractMasticQuickEnumClass(parent) { \
-        } \
-        enum Value { __VA_ARGS__ }; \
-        Q_ENUMS (Value) \
-        static QObject *qmlSingleton(QQmlEngine *engine, QJSEngine *scriptEngine) { \
-            Q_UNUSED(engine); \
-            Q_UNUSED(scriptEngine); \
-            return new name (); \
-        } \
-        int getEnumeratorIndex() Q_DECL_OVERRIDE { \
-            return staticMetaObject.indexOfEnumerator("Value"); \
-        } \
-        QMetaEnum getEnumerator(int index) Q_DECL_OVERRIDE { \
-            return staticMetaObject.enumerator(index); \
-        } \
-        Q_INVOKABLE QList<name::Value> allValues() { \
-            QList<name::Value> result; \
-            static int enumIndex = getEnumeratorIndex(); \
-            if (enumIndex != -1) { \
-                QMetaEnum enumType = getEnumerator(enumIndex); \
-                for (int index = 0; index < enumType.keyCount(); ++index) { \
-                    name::Value currentEnumItemValue = static_cast<name::Value>(enumType.value(index)); \
-                    result.append(currentEnumItemValue); \
-                } \
-            } \
-            return result; \
-        } \
-        static QString staticEnumToString(int value) { \
-            name instance; \
-            return instance.enumToString(value); \
-        } \
-        static QString staticEnumToKey(int value) { \
-            name instance; \
-            return instance.enumToKey(value); \
-        } \
-        static int staticEnumFromKey(QString key) { \
-            name instance; \
-            return instance.enumFromKey(key); \
-        } \
-        static QStringList staticAllKeys() { \
-            name instance; \
-            return instance.allKeys(); \
-        } \
-        static QList<name::Value> staticAllValues() { \
-            name instance; \
-            return instance.allValues(); \
-        } \
-        static void qmlRegister(const char* uri, int versionMajor, int versionMinor, const char* qmlName = #name) { \
-            qmlRegisterSingletonType<name>(uri, versionMajor, versionMinor, qmlName, &name::qmlSingleton); \
-            registerMetaType<name::Value>(); \
-        } \
-    }; \
-    QML_DECLARE_TYPE(name) \
-    Q_DECLARE_METATYPE(name::Value)
-
-
-
 /*!
   Defines a new class that provides an enumeration to QML (and C++)
   with a custom 'enumToString' method
@@ -211,7 +116,7 @@
   \param list of all values
 
   */
-#define MASTIC_QML_ENUM_CUSTOM(name, ...) \
+#define MASTIC_QML_ENUM(name, ...) \
     class name : public AbstractMasticQuickEnumClass { \
         Q_OBJECT \
     public: \
@@ -279,6 +184,10 @@ class MASTICQUICK_EXPORT AbstractMasticQuickEnumClass: public QObject {
     Q_OBJECT
 
 public:
+    /**
+     * @brief Default constructor
+     * @param parent
+     */
     AbstractMasticQuickEnumClass(QObject *parent = 0);
 
 
@@ -395,7 +304,6 @@ public:
         return result;
     }
 };
-
 
 
 

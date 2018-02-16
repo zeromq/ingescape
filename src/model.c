@@ -13,7 +13,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#ifdef _WIN32
 #include "unixfunctions.h"
+#endif
 #include "mastic_private.h"
 #include "uthash/utlist.h"
 
@@ -2040,7 +2042,7 @@ int mtic_writeOutputAsString(const char *name, char *value){
     }
     
     // call the callbacks associated to if it exist
-    model_runObserveCallbacksForIOP(iop, (void*) &value, (strlen(value)+1)*sizeof(char));
+    model_runObserveCallbacksForIOP(iop, (void*) value, (strlen(value)+1)*sizeof(char));
 
     // iop is output : publish
     network_publishOutput(name);
@@ -2349,7 +2351,7 @@ int mtic_writeParameterAsString(const char *name, char *value){
     model_setIopValue(iop, (void*) value, (strlen(value)+1)*sizeof(char));
     
     // call the callbacks associated to if it exist
-    model_runObserveCallbacksForIOP(iop, (void*) &value, (strlen(value)+1)*sizeof(char));
+    model_runObserveCallbacksForIOP(iop, (void*) value, (strlen(value)+1)*sizeof(char));
 
     return 1;
 }

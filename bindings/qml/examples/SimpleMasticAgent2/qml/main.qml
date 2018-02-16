@@ -276,9 +276,13 @@ ApplicationWindow {
         }
 
 
+        //
         // Pseudo canvas
+        //
         Rectangle {
             id: canvas
+
+            clip: true
 
             anchors {
                 left: parent.left
@@ -298,6 +302,10 @@ ApplicationWindow {
             Image {
                 id: myImage
 
+                property real opacityInPercent: 100.0
+
+                opacity: Math.max(Math.min(opacityInPercent/100.0, 1), 0.0)
+
                 source: "https://i2.wp.com/ingenuity.io/wp-content/uploads/2017/10/logo-I2-site-05.png"
 
 
@@ -305,6 +313,37 @@ ApplicationWindow {
                 // here, the 'source' property will be binded to a Mastic input named 'image_source'
                 MasticInputBinding on source {
                     inputsPrefix: "image_"
+
+                }
+
+                // MasticQuick API: automatically bind a QML property to a Mastic input
+                // here, the 'rotation' property will be binded to a Mastic input named 'image_rotation_in_degrees'
+                MasticInputBinding on rotation {
+                    inputsPrefix: "image_"
+                    inputsSuffix: "_in_degrees"
+
+                }
+
+                // MasticQuick API: automatically bind a Mastic output to a QML property
+                // here, the 'opacityInPercent' property be binded to a Mastic inputnamed 'image_opacityInPercent'
+                MasticInputBinding on opacityInPercent {
+                    inputsPrefix: "image_"
+                }
+
+
+
+                // MasticQuick API: automatically bind a Mastic output to a QML property
+                // here, the 'source' property will update the Mastic output named 'sourceOfImage'
+                MasticOutputBinding on source {
+                    outputsSuffix: "OfImage"
+
+                }
+
+                // MasticQuick API: automatically bind a Mastic output to a QML property
+                // here, the 'opacityInPercent' property will update the Mastic output named 'opacityInPercentOfImage'
+                MasticOutputBinding on opacityInPercent {
+                    outputsSuffix: "OfImage"
+
                 }
             }
 
@@ -347,18 +386,6 @@ ApplicationWindow {
             Rectangle {
                 id: myRectangle
 
-                property bool myBool: true
-                property int myInt: 0
-                property double myDouble: 0.0
-                property real myReal: 0.0
-                property url myUrl: "qrc:/qml/main.qml"
-                property string myString: "hello"
-                property var myVar;
-                property variant myVariant: Item {}
-                property color myColor: "red"
-                property date myDate: new Date()
-
-
                 x: 100
                 y: 100
                 width: 60
@@ -371,27 +398,24 @@ ApplicationWindow {
 
                 color: "#CCFF0000"
 
+
+                // MasticQuick API: automatically bind a QML property to a Mastic input
+                // here, the 'x' property will be binded to a Mastic input named 'rect_x'
                 MasticInputBinding on x {
                     inputsPrefix: "rect_"
-                    properties: "x, y"
-                }
-
-                MasticInputBinding on y {
-                    inputsPrefix: "rect_"
                 }
 
 
+                // MasticQuick API: automatically bind a set of QML properties to a set of Mastic inputs
                 MasticInputBinding {
                     target: myRectangle
 
-                    properties: "width, height, color, border.color, border.width"
-                + ", myBool, myInt, myDouble, myReal, myUrl, myString, myVar, myVariant, myColor, myDate"
-
+                    properties: "y, width, height, color, border.color, border.width"
                     inputsPrefix: "rect_"
                 }
 
                 Component.onCompleted: {
-                    console.log("Test "+Mastic.inputs["rect_border.width"]);
+                    console.log("Test to read value of rect_border.width" + Mastic.inputs["rect_border.width"]);
                 }
             }
         }
@@ -402,30 +426,34 @@ ApplicationWindow {
             target: Mastic.inputs
 
             onCanvasColorChanged: {
-                console.log("Input canvasColor has changed - new value is " + Mastic.inputs.canvasColor);
+                console.log("Mastic input canvasColor has changed - new value is " + Mastic.inputs.canvasColor);
             }
 
             onCircleXChanged: {
-                console.log("Input circleX has changed - new value is " + Mastic.inputs.circleX);
+                console.log("Mastic input circleX has changed - new value is " + Mastic.inputs.circleX);
             }
 
             onCircleYChanged: {
-                console.log("Input circleY has changed - new value is " + Mastic.inputs.circleY);
+                console.log("Mastic input circleY has changed - new value is " + Mastic.inputs.circleY);
             }
 
             onImpulsionChanged: {
-                console.log("Input impulsion has changed - new value is " + Mastic.inputs.impulsion);
+                console.log("Mastic input impulsion has changed - new value is " + Mastic.inputs.impulsion);
                 myCirclePulseAnimation.start();
             }
         }
 
 
-        // MasticQuick API: subscribe to forceStop
+        // MasticQuick API: subscribe to forceStop and observeOutput
         Connections {
             target: Mastic
 
             onForcedStop: {
                 console.log("Forced stop");
+            }
+
+            onObserveOutput: {
+                console.log("Mastic output " + name +" has changed - new value is " + value);
             }
         }
     }

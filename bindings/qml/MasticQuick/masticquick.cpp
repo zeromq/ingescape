@@ -19,8 +19,13 @@
 #include <QMutex>
 
 
-#include "masticquickbinding.h"
+#include "masticquickinputspropertymap.h"
+#include "masticquickoutputspropertymap.h"
+#include "masticquickparameterspropertymap.h"
+
+#include "masticquickbindingsingleton.h"
 #include "masticquickinputbinding.h"
+#include "masticquickoutputbinding.h"
 
 
 
@@ -310,7 +315,7 @@ void MasticQuick_callbackObserveInput(iop_t iopType, const char *name, iopType_t
 
                     case DATA_T:
                         {
-                            qWarning() << "MasticQuick warning: can not update an input with type DATA (not yet implemented)";
+                            qWarning() << "MasticQuick warning: can not update input" << qmlName <<  "with type DATA (not yet implemented)";
                         }
                         break;
 
@@ -321,6 +326,118 @@ void MasticQuick_callbackObserveInput(iop_t iopType, const char *name, iopType_t
             else
             {
                 qWarning() << "MasticQuick warning: can not update an input with an empty name";
+            }
+        }
+        // Else: invalid custom data
+    }
+    // Else: something went wrong
+}
+
+
+
+/**
+ * @brief Callback used to observe outputs
+ *
+ * @param iopType
+ * @param name
+ * @param valueType
+ * @param value
+ * @param valueSize
+ * @param customData
+ */
+void MasticQuick_callbackObserveOutput(iop_t iopType, const char *name, iopType_t valueType, void* value, long valueSize, void *customData)
+{
+    Q_UNUSED(valueSize)
+
+    // Ensure that our callback is called by the required IOP category
+    if (iopType == OUTPUT_T)
+    {
+        // Try to cast our custom data
+        MasticQuick* controller = (MasticQuick *)customData;
+        if ((controller != NULL) && (controller->outputs() != NULL))
+        {
+            QString qmlName(name);
+            if (!qmlName.isEmpty())
+            {
+                switch(valueType)
+                {
+                    case INTEGER_T:
+                        {
+                            int newValue = *((int *)value);
+                            QVariant qmlValue = QVariant(newValue);
+
+                            controller->outputs()->insert(qmlName, qmlValue);
+                            Q_EMIT controller->observeOutput(qmlName, qmlValue);
+                        }
+                        break;
+
+                    case DOUBLE_T:
+                        {
+                            double newValue = *((double *)value);
+                            QVariant qmlValue = QVariant(newValue);
+
+                            controller->outputs()->insert(qmlName, QVariant(newValue));
+                            Q_EMIT controller->observeOutput(qmlName, qmlValue);
+                        }
+                        break;
+
+                    case STRING_T:
+                        {
+                            char* newCValue = (char *)value;
+                            if (newCValue != NULL)
+                            {
+                                QString newValue(newCValue);
+                                QVariant qmlValue = QVariant(newValue);
+
+                                controller->outputs()->insert(qmlName, qmlValue);
+                                Q_EMIT controller->observeOutput(qmlName, qmlValue);
+                                // NB: we don't need to free newValue because we don't own it
+                            }
+                            else
+                            {
+                                controller->outputs()->insert(qmlName, QVariant(""));
+                                Q_EMIT controller->observeOutput(qmlName, QVariant(""));
+                            }
+                        }
+                        break;
+
+                    case BOOL_T:
+                        {
+                            bool newValue = *((bool *)value);
+                            QVariant qmlValue = QVariant(newValue);
+
+                            controller->outputs()->insert(qmlName, qmlValue);
+                            Q_EMIT controller->observeOutput(qmlName, qmlValue);
+                        }
+                        break;
+
+                    case IMPULSION_T:
+                        {
+                            // Hack to force the update of our property
+                            // We disable signals then we clear its value to detect a valud change when we set an empty value
+                            controller->outputs()->blockSignals(true);
+                            controller->outputs()->clear(qmlName);
+                            controller->outputs()->blockSignals(false);
+
+                            // Set an empty value to trigger an update
+                            controller->outputs()->insert(qmlName, QVariant(""));
+                            Q_EMIT controller->observeOutput(qmlName, QVariant(""));
+                        }
+                        break;
+
+                    case DATA_T:
+                        {
+                            qWarning() << "MasticQuick warning: can not update output" << qmlName << "with type DATA (not yet implemented)";
+                        }
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+            else
+            {
+                qWarning() << "MasticQuick warning: can not update an output with an empty name";
             }
         }
         // Else: invalid custom data
@@ -409,13 +526,13 @@ void MasticQuick_callbackObserveParameter(iop_t iopType, const char *name, iopTy
                     case IMPULSION_T:
                         {
                             // Should not happen because a paramater can not be an impulsion
-                            qWarning() << "MasticQuick warning: can not update a parameter with type IMPULSION";
+                            qWarning() << "MasticQuick warning: can not update parameter" << qmlName << "with type IMPULSION";
                         }
                         break;
 
                     case DATA_T:
                         {
-                            qWarning() << "MasticQuick warning: can not update a parameter with type DATA (not yet implemented)";
+                            qWarning() << "MasticQuick warning: can not update parameter" << qmlName << "with type DATA (not yet implemented)";
                         }
                         break;
 
@@ -546,9 +663,11 @@ MasticQuick::MasticQuick(QObject *parent) : QObject(parent),
     setdefinitionDescription(tr("Definition of %1").arg(QCoreApplication::applicationName()));
 
 
+    //-------------------------------------------------
     //
     // Get initial values of Mastic internal properties
     //
+    //-------------------------------------------------
 
     // - version of Mastic
     _version = mtic_version();
@@ -574,10 +693,15 @@ MasticQuick::MasticQuick(QObject *parent) : QObject(parent),
     // - log level
     _logLevel = enumMticLogLevel_tToMasticLogLevel( mtic_getLogLevel() );
 
+    // - requestOutputsFromMappedAgents
+    _requestOutputsFromMappedAgents = mtic_getRequestOutputsFromMappedAgents();
 
+
+    //-------------------------------------------------
     //
     // Add mastic observers
     //
+    //-------------------------------------------------
 
     // Observe mute/unmute
     mtic_observeMute(&MasticQuick_callbackObserveMute, this);
@@ -592,9 +716,11 @@ MasticQuick::MasticQuick(QObject *parent) : QObject(parent),
 
 
 
+    //-------------------------------------------------
     //
     // Init dynamic properties
     //
+    //-------------------------------------------------
 
     // - inputs
     _inputs = new MasticQuickInputsPropertyMap(this);
@@ -603,14 +729,14 @@ MasticQuick::MasticQuick(QObject *parent) : QObject(parent),
     _outputs = new MasticQuickOutputsPropertyMap(this);
     if (_outputs != NULL)
     {
-        connect(_outputs, &MasticQuickOutputsPropertyMap::valueChanged, this, &MasticQuick::_onOutputUpdatedFromFromQML);
+        connect(_outputs, &QQmlPropertyMap::valueChanged, this, &MasticQuick::_onOutputUpdatedFromFromQML);
     }
 
     // - parameters
     _parameters = new MasticQuickParametersPropertyMap(this);
     if (_parameters != NULL)
     {
-        connect(_parameters, &MasticQuickParametersPropertyMap::valueChanged, this, &MasticQuick::_onParameterUpdatedFromFromQML);
+        connect(_parameters, &QQmlPropertyMap::valueChanged, this, &MasticQuick::_onParameterUpdatedFromFromQML);
     }
 }
 
@@ -629,9 +755,14 @@ MasticQuick::~MasticQuick()
     // Clean-up inputs
     if (_inputs != NULL)
     {
-        // Clean-up
-        MasticQuickInputsPropertyMap* temp = _inputs;
-        setinputs(NULL);
+        // Save our value
+        QQmlPropertyMap* temp = _inputs;
+
+        // QML clean-up
+        _inputs = NULL;
+        Q_EMIT inputsChanged(NULL);
+
+        // Memory clean-up
         delete temp;
     }
 
@@ -639,11 +770,16 @@ MasticQuick::~MasticQuick()
     if (_outputs != NULL)
     {
         // Unsubscribe to signals
-        disconnect(_outputs, &MasticQuickOutputsPropertyMap::valueChanged, this, &MasticQuick::_onOutputUpdatedFromFromQML);
+        disconnect(_outputs, &QQmlPropertyMap::valueChanged, this, &MasticQuick::_onOutputUpdatedFromFromQML);
 
-        // Clean-up
-        MasticQuickOutputsPropertyMap* temp = _outputs;
-        setoutputs(NULL);
+        // Save our value
+        QQmlPropertyMap* temp = _outputs;
+
+        // QML clean-up
+        _outputs = NULL;
+        Q_EMIT outputsChanged(NULL);
+
+        // Memory clean-up
         delete temp;
     }
 
@@ -651,11 +787,16 @@ MasticQuick::~MasticQuick()
     if (_parameters != NULL)
     {
         // Unsubcribe to signals
-        disconnect(_parameters, &MasticQuickParametersPropertyMap::valueChanged, this, &MasticQuick::_onParameterUpdatedFromFromQML);
+        disconnect(_parameters, &QQmlPropertyMap::valueChanged, this, &MasticQuick::_onParameterUpdatedFromFromQML);
 
-        // Clean-up
-        MasticQuickParametersPropertyMap* temp = _parameters;
-        setparameters(NULL);
+        // Save our value
+        QQmlPropertyMap* temp = _parameters;
+
+        // QML clean-up
+        _parameters = NULL;
+        Q_EMIT parametersChanged(NULL);
+
+        // Memory clean-up
         delete temp;
     }
 
@@ -698,7 +839,7 @@ MasticQuick* MasticQuick::instance()
         // Check if it is our first singleton
         if (_MASTICQUICK_SINGLETON_INITIALIZED)
         {
-            qWarning() << Q_FUNC_INFO << "warning: a singleton has already been created and destroyed."
+            qWarning() << "MasticQuick warning: a singleton has already been created and destroyed."
                        << "Please do not try to access MasticQuick after its destruction by QML";
         }
         else
@@ -765,13 +906,54 @@ void MasticQuick::registerTypes(const char* uri)
     // Register creatable types
     //
     qmlRegisterType<MasticQuickInputBinding>(uri, MASTICQUICK_VERSION_MAJOR, MASTICQUICK_VERSION_MINOR, "MasticInputBinding");
+    qmlRegisterType<MasticQuickOutputBinding>(uri, MASTICQUICK_VERSION_MAJOR, MASTICQUICK_VERSION_MINOR, "MasticOutputBinding");
 
 
     //
     // Register singletons
     //
-    qmlRegisterSingletonType<MasticQuickBinding>(uri, MASTICQUICK_VERSION_MAJOR, MASTICQUICK_VERSION_MINOR, "MasticBinding", &MasticQuickBinding::qmlSingleton);
+    qmlRegisterSingletonType<MasticQuickBindingSingleton>(uri, MASTICQUICK_VERSION_MAJOR, MASTICQUICK_VERSION_MINOR, "MasticBinding", &MasticQuickBindingSingleton::qmlSingleton);
     qmlRegisterSingletonType<MasticQuick>(uri, MASTICQUICK_VERSION_MAJOR, MASTICQUICK_VERSION_MINOR, "Mastic", &MasticQuick::qmlSingleton);
+}
+
+
+
+
+
+//-------------------------------------------------------------------
+//
+// Custom getters
+//
+//-------------------------------------------------------------------
+
+
+/**
+ * @brief Get our inputs property
+ * @return
+ */
+QQmlPropertyMap* MasticQuick::inputs() const
+{
+    return _inputs;
+}
+
+
+/**
+ * @brief Get our outputs property
+ * @return
+ */
+QQmlPropertyMap* MasticQuick::outputs() const
+{
+    return _outputs;
+}
+
+
+/**
+ * @brief Get our parameters property
+ * @return
+ */
+QQmlPropertyMap* MasticQuick::parameters() const
+{
+    return _parameters;
 }
 
 
@@ -1010,6 +1192,29 @@ void MasticQuick::setlogLevel(MasticLogLevel::Value value)
 
 
 
+/**
+ * @brief When mapping an agent setting we may request the mapped agent
+ *         to send its outputs (except for data & impulsions) to us through
+ *         a private communication for our proper initialization
+ *
+ * @param value
+ */
+void MasticQuick::setrequestOutputsFromMappedAgents(bool value)
+{
+    if (_requestOutputsFromMappedAgents != value)
+    {
+        // Save value
+        _requestOutputsFromMappedAgents = value;
+
+        // Set our flag
+        mtic_setRequestOutputsFromMappedAgents(value);
+
+        // Notify change
+        Q_EMIT requestOutputsFromMappedAgentsChanged(value);
+    }
+}
+
+
 
 //-------------------------------------------------------------------
 //
@@ -1041,7 +1246,8 @@ bool MasticQuick::startWithDevice(QString networkDevice, int port)
     }
     else
     {
-        qWarning() << Q_FUNC_INFO << "warning: fail to start our agent";
+        qWarning() << "MasticQuick warning: fail to start our agent via startWithDevice("
+                   << networkDevice << "," << port << ")";
     }
 
     return result;
@@ -1073,7 +1279,8 @@ bool MasticQuick::startWithIP(QString ipAddress, int port)
     }
     else
     {
-        qWarning() << Q_FUNC_INFO << "warning: fail to start our agent";
+        qWarning() << "MasticQuick warning: fail to start our agent via startWithIP("
+                   << ipAddress << "," << port << ")";
     }
 
     return result;
@@ -1098,7 +1305,7 @@ bool MasticQuick::stop()
         }
         else
         {
-            qWarning() << Q_FUNC_INFO << "warning: fail to stop our agent";
+            qWarning() << "MasticQuick warning: fail to stop our agent";
         }
     }
 
@@ -1144,18 +1351,16 @@ bool MasticQuick::writeOutputAsInt(QString name, int value)
         if (mtic_writeOutputAsInt(name.toStdString().c_str(), value) == 1)
         {
             result = true;
-
-            // Update QML
-            _updateQmlOutput(name);
         }
         else
         {
-            qWarning() << Q_FUNC_INFO << "warning: fail to write output" << name;
+            qWarning() << "MasticQuick warning: fail to write Mastic output"
+                       << name << "via writeOutputAsInt";
         }
     }
     else
     {
-        qWarning() << Q_FUNC_INFO << "warning: can not write an output without a name";
+        qWarning() << "MasticQuick warning: writeOutputAsInt() can not write an output without a name";
     }
 
     return result;
@@ -1182,18 +1387,16 @@ bool MasticQuick::writeOutputAsDouble(QString name, double value)
         if (mtic_writeOutputAsDouble(name.toStdString().c_str(), value) == 1)
         {
             result = true;
-
-            // Update QML
-            _updateQmlOutput(name);
         }
         else
         {
-            qWarning() << Q_FUNC_INFO << "warning: fail to write output" << name;
+            qWarning() << "MasticQuick warning: fail to write output"
+                       << name << "via writeOutputAsDouble";
         }
     }
     else
     {
-        qWarning() << Q_FUNC_INFO << "warning: can not write an output without a name";
+        qWarning() << "MasticQuick warning: writeOutputAsDouble() can not write an output without a name";
     }
 
     return result;
@@ -1220,18 +1423,16 @@ bool MasticQuick::writeOutputAsString(QString name, QString value)
         if (mtic_writeOutputAsString(name.toStdString().c_str(), (char *)value.toStdString().c_str()) == 1)
         {
             result = true;
-
-            // Update QML
-            _updateQmlOutput(name);
         }
         else
         {
-            qWarning() << Q_FUNC_INFO << "warning: fail to write output" << name;
+            qWarning() << "MasticQuick warning: fail to write output"
+                       << name << "via writeOutputAsString";
         }
     }
     else
     {
-        qWarning() << Q_FUNC_INFO << "warning: can not write an output without a name";
+        qWarning() << "MasticQuick warning: writeOutputAsString() can not write an output without a name";
     }
 
     return result;
@@ -1258,18 +1459,16 @@ bool MasticQuick::writeOutputAsBool(QString name, bool value)
         if (mtic_writeOutputAsBool(name.toStdString().c_str(), value) == 1)
         {
             result = true;
-
-            // Update QML
-            _updateQmlOutput(name);
         }
         else
         {
-            qWarning() << Q_FUNC_INFO << "warning: fail to write output" << name;
+            qWarning() << "MasticQuick warning: fail to write output"
+                       << name << "via writeOutputAsBool";
         }
     }
     else
     {
-        qWarning() << Q_FUNC_INFO << "warning: can not write an output without a name";
+        qWarning() << "MasticQuick warning: writeOutputAsBool() can not write an output without a name";
     }
 
     return result;
@@ -1295,18 +1494,16 @@ bool MasticQuick::writeOutputAsImpulsion(QString name)
         if (mtic_writeOutputAsImpulsion(name.toStdString().c_str()) == 1)
         {
             result = true;
-
-            // Update QML
-            _updateQmlOutput(name);
         }
         else
         {
-            qWarning() << Q_FUNC_INFO << "warning: fail to write output" << name;
+            qWarning() << "MasticQuick warning: fail to write output"
+                       << name << "via writeOutputAsImpulsion";
         }
     }
     else
     {
-        qWarning() << Q_FUNC_INFO << "warning: can not write an output without a name";
+        qWarning() << "MasticQuick warning: writeOutputAsImpulsion() can not write an output without a name";
     }
 
     return result;
@@ -1329,7 +1526,8 @@ bool MasticQuick::writeOutputAsData(QString name, void* value)
 
     bool result = false;
 
-    qDebug() << Q_FUNC_INFO << "NOT YET IMPLEMENTED. Can not write output" << name;
+    qWarning() << "MasticQuick warning: NOT YET IMPLEMENTED. Can not write output"
+               << name << "with type DATA" << "via writeOutputAsData()";
 
     return result;
 }
@@ -1355,18 +1553,16 @@ bool MasticQuick::writeParameterAsInt(QString name, int value)
         if (mtic_writeParameterAsInt(name.toStdString().c_str(), value) == 1)
         {
             result = true;
-
-            // Update QML
-            _updateQmlParameter(name);
         }
         else
         {
-            qWarning() << Q_FUNC_INFO << "warning: fail to write parameter" << name;
+            qWarning() << "MasticQuick warning: fail to write parameter"
+                       << name << "via writeParameterAsInt";
         }
     }
     else
     {
-        qWarning() << Q_FUNC_INFO << "warning: can not write a parameter without a name";
+        qWarning() << "MasticQuick warning: writeParameterAsInt() can not write a parameter without a name";
     }
 
     return result;
@@ -1393,18 +1589,16 @@ bool MasticQuick::writeParameterAsDouble(QString name, double value)
         if (mtic_writeParameterAsDouble(name.toStdString().c_str(), value) == 1)
         {
             result = true;
-
-            // Update QML
-            _updateQmlParameter(name);
         }
         else
         {
-            qWarning() << Q_FUNC_INFO << "warning: fail to write parameter" << name;
+            qWarning() << "MasticQuick warning: fail to write parameter"
+                       << name << "via writeParameterAsDouble";
         }
     }
     else
     {
-        qWarning() << Q_FUNC_INFO << "warning: can not write a parameter without a name";
+        qWarning() << "MasticQuick warning: writeParameterAsDouble() can not write a parameter without a name";
     }
 
     return result;
@@ -1431,18 +1625,16 @@ bool MasticQuick::writeParameterAsString(QString name, QString value)
         if (mtic_writeParameterAsString(name.toStdString().c_str(), (char *)value.toStdString().c_str()) == 1)
         {
             result = true;
-
-            // Update QML
-            _updateQmlParameter(name);
         }
         else
         {
-            qWarning() << Q_FUNC_INFO << "warning: fail to write parameter" << name;
+            qWarning() << "MasticQuick warning: fail to write parameter"
+                       << name << "via writeParameterAsString";
         }
     }
     else
     {
-        qWarning() << Q_FUNC_INFO << "warning: can not write a parametrer without a name";
+        qWarning() << "MasticQuick warning: writeParameterAsString() can not write a parametrer without a name";
     }
 
     return result;
@@ -1469,18 +1661,16 @@ bool MasticQuick::writeParameterAsBool(QString name, bool value)
         if (mtic_writeParameterAsBool(name.toStdString().c_str(), value) == 1)
         {
             result = true;
-
-            // Update QML
-            _updateQmlParameter(name);
         }
         else
         {
-            qWarning() << Q_FUNC_INFO << "warning: fail to write parameter" << name;
+            qWarning() << "MasticQuick warning: fail to write parameter"
+                       << name << "via writeParameterAsBool";
         }
     }
     else
     {
-        qWarning() << Q_FUNC_INFO << "warning: can not write a parameter without a name";
+        qWarning() << "MasticQuick warning: writeParameterAsBool() can not write a parameter without a name";
     }
 
     return result;
@@ -1503,7 +1693,8 @@ bool MasticQuick::writeParameterAsData(QString name, void* value)
 
     bool result = false;
 
-    qDebug() << Q_FUNC_INFO << "NOT YET IMPLEMENTED. Can not write parameter" << name;
+    qWarning() << "MasticQuick warning: NOT YET IMPLEMENTED. Can not write parameter"
+               << name << "with type DATA via writeParameterAsData";
 
     return result;
 }
@@ -1528,7 +1719,8 @@ MasticIopType::Value MasticQuick::getTypeForInput(QString name)
 
     if (!name.isEmpty())
     {
-        const char* cName = name.toStdString().c_str();
+        std::string stdName = name.toStdString();
+        const char* cName = stdName.c_str();
         if (mtic_checkInputExistence(cName))
         {
             result = enumIopType_tToMasticIopType( mtic_getTypeForInput(cName) );
@@ -1536,7 +1728,7 @@ MasticIopType::Value MasticQuick::getTypeForInput(QString name)
     }
     else
     {
-        qWarning() << Q_FUNC_INFO << "warning: name can not be empty";
+        qWarning() << "MasticQuick warning: getTypeForInput() - name can not be empty";
     }
 
     return result;
@@ -1555,7 +1747,8 @@ MasticIopType::Value MasticQuick::getTypeForOutput(QString name)
 
     if (!name.isEmpty())
     {
-        const char* cName = name.toStdString().c_str();
+        std::string stdName = name.toStdString();
+        const char* cName = stdName.c_str();
         if (mtic_checkOutputExistence(cName))
         {
             result = enumIopType_tToMasticIopType( mtic_getTypeForOutput(cName) );
@@ -1563,7 +1756,7 @@ MasticIopType::Value MasticQuick::getTypeForOutput(QString name)
     }
     else
     {
-        qWarning() << Q_FUNC_INFO << "warning: name can not be empty";
+        qWarning() << "MasticQuick warning: getTypeForOutput() - name can not be empty";
     }
 
     return result;
@@ -1582,7 +1775,8 @@ MasticIopType::Value MasticQuick::getTypeForParameter(QString name)
 
     if (!name.isEmpty())
     {
-        const char* cName = name.toStdString().c_str();
+        std::string stdName = name.toStdString();
+        const char* cName = stdName.c_str();
         if (mtic_checkParameterExistence(cName))
         {
             result = enumIopType_tToMasticIopType( mtic_getTypeForParameter(cName) );
@@ -1590,7 +1784,7 @@ MasticIopType::Value MasticQuick::getTypeForParameter(QString name)
     }
     else
     {
-        qWarning() << Q_FUNC_INFO << "warning: name can not be empty";
+        qWarning() << "MasticQuick warning: getTypeForParameter() - name can not be empty";
     }
 
     return result;
@@ -1662,7 +1856,7 @@ bool MasticQuick::muteOuput(QString name)
     }
     else
     {
-        qWarning() << Q_FUNC_INFO << "warning: name can not be empty";
+        qWarning() << "MasticQuick warning: muteOuput() - name can not be empty";
     }
 
     return result;
@@ -1690,7 +1884,7 @@ bool MasticQuick::unmuteOuput(QString name)
     }
     else
     {
-        qWarning() << Q_FUNC_INFO << "warning: name can not be empty";
+        qWarning() << "MasticQuick warning: unmuteOuput() - name can not be empty";
     }
 
     return result;
@@ -1717,7 +1911,7 @@ bool MasticQuick::isOutputMuted(QString name, QVariant qmlUpdateExtraParameter)
     }
     else
     {
-        qWarning() << Q_FUNC_INFO << "warning: name can not be empty";
+        qWarning() << "MasticQuick warning: isOutputMuted() - name can not be empty";
     }
 
     return result;
@@ -1782,7 +1976,8 @@ bool MasticQuick::createInputDouble(QString name, double value)
  */
 bool MasticQuick::createInputString(QString name, QString value)
 {
-    const char* cValue = value.toStdString().c_str();
+    std::string stdString = value.toStdString();
+    const char* cValue = stdString.c_str();
     int cValueLength = ((cValue != NULL) ? strlen(cValue) : 0);
 
     return _createInput(name, MasticIopType::STRING, QVariant(value), (void *)cValue, (cValueLength + 1) * sizeof(char));
@@ -1834,7 +2029,7 @@ bool MasticQuick::createInputData(QString name, void* value)
 
     bool result = false;
 
-    qDebug() << Q_FUNC_INFO << "NOT YET IMPLEMENTED. Can not create input" << name;
+    qDebug() << Q_FUNC_INFO << "NOT YET IMPLEMENTED. Can not create input" << name << "with type DATA";
 
     return result;
 }
@@ -1881,7 +2076,8 @@ bool MasticQuick::createOutputDouble(QString name, double value)
  */
 bool MasticQuick::createOutputString(QString name, QString value)
 {
-    const char* cValue = value.toStdString().c_str();
+    std::string stdString = value.toStdString();
+    const char* cValue = stdString.c_str();
     int cValueLength = ((cValue != NULL) ? strlen(cValue) : 0);
 
     return _createOutput(name, MasticIopType::STRING, QVariant(value), (void *)cValue, (cValueLength + 1) * sizeof(char));
@@ -1932,7 +2128,7 @@ bool MasticQuick::createOutputData(QString name, void* value)
 
     bool result = false;
 
-    qDebug() << Q_FUNC_INFO << "NOT YET IMPLEMENTED. Can not create output" << name;
+    qWarning() << "MasticQuick warning: createOutputData() NOT YET IMPLEMENTED. Can not create output" << name << "with type DATA";
 
     return result;
 }
@@ -1979,11 +2175,12 @@ bool MasticQuick::createParameterDouble(QString name, double value)
  */
 bool MasticQuick::createParameterString(QString name, QString value)
 {
-    const char* cValue = value.toStdString().c_str();
+    std::string stdString = value.toStdString();
+    const char* cValue = stdString.c_str();
     int cValueLength = ((cValue != NULL) ? strlen(cValue) : 0);
 
     return _createParameter(name, MasticIopType::STRING, QVariant(value), (void *)cValue, (cValueLength + 1) * sizeof(char));
-}
+ }
 
 
 
@@ -2017,7 +2214,7 @@ bool MasticQuick::createParameterData(QString name, void* value)
 
     bool result = false;
 
-    qDebug() << Q_FUNC_INFO << "NOT YET IMPLEMENTED. Can not create parameter" << name;
+    qDebug() << "MasticQuick warning: createParameterData() NOT YET IMPLEMENTED. Can not create parameter" << name << "with type DATA";
 
     return result;
 }
@@ -2045,12 +2242,13 @@ bool MasticQuick::removeInput(QString name)
         }
         else
         {
-            qWarning() << Q_FUNC_INFO << "warning: fail to remove input" << name;
+            qWarning() << "MasticQuick warning: failed to remove input"
+                       << name << "via removeInput";
         }
     }
     else
     {
-        qWarning() << Q_FUNC_INFO << "warning: can not remove an input without a name";
+        qWarning() << "MasticQuick warning: removeInput() can not remove an input without a name";
     }
 
     return result;
@@ -2079,12 +2277,13 @@ bool MasticQuick::removeOutput(QString name)
         }
         else
         {
-            qWarning() << Q_FUNC_INFO << "warning: fail to remove output" << name;
+            qWarning() << "MasticQuick warning: failed to remove output"
+                       << name << "via removeOutput";
         }
     }
     else
     {
-        qWarning() << Q_FUNC_INFO << "warning: can not remove an output without a name";
+        qWarning() << "MasticQuick warning: removeOutput() can not remove an output without a name";
     }
 
     return result;
@@ -2113,12 +2312,13 @@ bool MasticQuick::removeParameter(QString name)
         }
         else
         {
-            qWarning() << Q_FUNC_INFO << "warning: fail to remove parameter" << name;
+            qWarning() << "MasticQuick warning: failed to remove parameter"
+                       << name << "via removeParameter";
         }
     }
     else
     {
-        qWarning() << Q_FUNC_INFO << "warning: can not remove a parameter without a name";
+        qWarning() << "MasticQuick warning: removeParameter() can not remove a parameter without a name";
     }
 
     return result;
@@ -2301,6 +2501,7 @@ void MasticQuick::_internal_setIsMuted(bool value)
 {
     if (_isMuted != value)
     {
+        // Save value
         _isMuted = value;
 
         // Notify change
@@ -2318,6 +2519,7 @@ void MasticQuick::_internal_setIsFrozen(bool value)
 {
     if (_isFrozen != value)
     {
+        // Save value
         _isFrozen = value;
 
         // Notify change
@@ -2358,7 +2560,8 @@ bool MasticQuick::_createInput(QString name, MasticIopType::Value type, QVariant
         if (checkIfIopNameIsValid(name))
         {
             // Check if we must create a Mastic input
-            const char* cName = name.toStdString().c_str();
+            std::string stdName = name.toStdString();
+            const char* cName = stdName.c_str();
             if (!mtic_checkInputExistence(cName))
             {
                 if (mtic_createInput(cName, enumMasticIopTypeToEnumIopType_t(type), cValue, cSize) == 1)
@@ -2366,7 +2569,7 @@ bool MasticQuick::_createInput(QString name, MasticIopType::Value type, QVariant
                     // Observe this new input
                     if (mtic_observeInput(cName, &MasticQuick_callbackObserveInput, this) != 1)
                     {
-                        qWarning() << Q_FUNC_INFO << "warning: fail to observe input" << name;
+                        qWarning() << Q_FUNC_INFO << "warning: failed to observe input" << name;
                     }
 
 
@@ -2399,7 +2602,7 @@ bool MasticQuick::_createInput(QString name, MasticIopType::Value type, QVariant
                 }
                 else
                 {
-                    qWarning() << Q_FUNC_INFO << "warning: fail to create input" << name;
+                    qWarning() << Q_FUNC_INFO << "warning: failed to create input" << name;
                 }
             }
             else
@@ -2444,11 +2647,19 @@ bool MasticQuick::_createOutput(QString name, MasticIopType::Value type, QVarian
         if (checkIfIopNameIsValid(name))
         {
             // Check if we must create a Mastic input
-            const char* cName = name.toStdString().c_str();
+            std::string stdName = name.toStdString();
+            const char* cName = stdName.c_str();
             if (!mtic_checkOutputExistence(cName))
             {
                 if (mtic_createOutput(cName, enumMasticIopTypeToEnumIopType_t(type), cValue, cSize) == 1)
                 {
+                    // Observe this new output
+                    if (mtic_observeOutput(cName, &MasticQuick_callbackObserveOutput, this) != 1)
+                    {
+                        qWarning() << Q_FUNC_INFO << "warning: failed to observe output" << name;
+                    }
+
+
                     // Add it to the list of QML dynamic properties
                     if (_outputs != NULL)
                     {
@@ -2478,7 +2689,7 @@ bool MasticQuick::_createOutput(QString name, MasticIopType::Value type, QVarian
                 }
                 else
                 {
-                    qWarning() << Q_FUNC_INFO << "warning: fail to create output" << name;
+                    qWarning() << Q_FUNC_INFO << "warning: failed to create output" << name;
                 }
             }
             else
@@ -2531,7 +2742,7 @@ bool MasticQuick::_createParameter(QString name, MasticIopType::Value type, QVar
                     // Observe this new parameter
                     if (mtic_observeParameter(cName, &MasticQuick_callbackObserveParameter, this) != 1)
                     {
-                        qWarning() << Q_FUNC_INFO << "warning: fail to observe parameter" << name;
+                        qWarning() << Q_FUNC_INFO << "warning: failed to observe parameter" << name;
                     }
 
                      // Add it to the list of QML dynamic properties
@@ -2563,7 +2774,7 @@ bool MasticQuick::_createParameter(QString name, MasticIopType::Value type, QVar
                 }
                 else
                 {
-                    qWarning() << Q_FUNC_INFO << "warning: fail to create parameter" << name;
+                    qWarning() << Q_FUNC_INFO << "warning: failed to create parameter" << name;
                 }
             }
             else
@@ -2579,207 +2790,6 @@ bool MasticQuick::_createParameter(QString name, MasticIopType::Value type, QVar
     else
     {
         qWarning() << Q_FUNC_INFO << "warning: can not create a parameter with an empty name";
-    }
-
-    return result;
-}
-
-
-
-/**
- * @brief Update a QML output property
- *
- * @param name
- *
- * @return true if everything is ok, false otherwise
- */
-bool MasticQuick::_updateQmlOutput(QString name)
-{
-    bool result = false;
-
-    if (!name.isEmpty())
-    {
-        // Check if this output exists
-        const char* cName = name.toStdString().c_str();
-        if (mtic_checkOutputExistence(cName) && (_outputs != NULL))
-        {
-            iopType_t type = mtic_getTypeForOutput(cName);
-
-            switch(type)
-            {
-                case INTEGER_T:
-                    {
-                        int newValue = mtic_readOutputAsInt(cName);
-                        _outputs->insert(name, QVariant(newValue));
-                    }
-                    break;
-
-
-                case DOUBLE_T:
-                    {
-                        double newValue = mtic_readOutputAsDouble(cName);
-                        _outputs->insert(name, QVariant(newValue));
-                    }
-                    break;
-
-
-                case STRING_T:
-                    {
-                        char* newCValue = mtic_readOutputAsString(cName);
-                        if (newCValue != NULL)
-                        {
-                            // Update value
-                            QString newValue(newCValue);
-                            _outputs->insert(name, QVariant(newValue));
-
-                            // Clean-up
-                            free(newCValue);
-                            newCValue = NULL;
-                        }
-                        else
-                        {
-                            // Update value with an empty string
-                            _outputs->insert(name, QVariant(""));
-                        }
-                    }
-                    break;
-
-
-                case BOOL_T:
-                    {
-                        bool newValue = mtic_readOutputAsBool(cName);
-                        _outputs->insert(name, QVariant(newValue));
-                    }
-                    break;
-
-
-                case IMPULSION_T:
-                    {
-                        // Hack to force the update of our property
-                        // - We disable signals then we clear its value to detect a value change when we set an empty value
-                        _outputs->blockSignals(true);
-                        _outputs->clear(name);
-                        _outputs->blockSignals(false);
-
-                        // - Set an empty value to trigger an update
-                        _outputs->insert(name, QVariant(""));
-                    }
-                    break;
-
-
-                case DATA_T:
-                    {
-                        qWarning() << Q_FUNC_INFO << "NOT YET IMPLEMENTED. Can not update output" << name;
-                    }
-                    break;
-
-
-                default:
-                    qWarning() << Q_FUNC_INFO << "warning: unhandled output type. Can not update output" << name;
-                    break;
-            }
-        }
-    }
-    else
-    {
-        qWarning() << Q_FUNC_INFO << "warning: can not update an output without a name";
-    }
-
-    return result;
-}
-
-
-
-/**
- * @brief Update a QML parameter property
- *
- * @param name
- *
- * @return true if everything is ok, false otherwise
- */
-bool MasticQuick::_updateQmlParameter(QString name)
-{
-    bool result = false;
-
-    if (!name.isEmpty())
-    {
-        // Check if this parameter exists
-        const char* cName = name.toStdString().c_str();
-        if (mtic_checkParameterExistence(cName) && (_parameters != NULL))
-        {
-            iopType_t type = mtic_getTypeForParameter(cName);
-
-            switch(type)
-            {
-                case INTEGER_T:
-                    {
-                        int newValue = mtic_readParameterAsInt(cName);
-                        _parameters->insert(name, QVariant(newValue));
-                    }
-                    break;
-
-
-                case DOUBLE_T:
-                    {
-                        double newValue = mtic_readParameterAsDouble(cName);
-                        _parameters->insert(name, QVariant(newValue));
-                    }
-                    break;
-
-
-                case STRING_T:
-                    {
-                        char* newCValue = mtic_readParameterAsString(cName);
-                        if (newCValue != NULL)
-                        {
-                            // Update our value
-                            QString newValue(newCValue);
-                            _parameters->insert(name, QVariant(newValue));
-
-                            // Clean-up
-                            free(newCValue);
-                            newCValue = NULL;
-                        }
-                        else
-                        {
-                            // Update our value with an empty string
-                            _parameters->insert(name, QVariant(""));
-                        }
-                    }
-                    break;
-
-
-                case BOOL_T:
-                    {
-                        bool newValue = mtic_readParameterAsBool(cName);
-                        _parameters->insert(name, QVariant(newValue));
-                    }
-                    break;
-
-
-                case IMPULSION_T:
-                    {
-                        qWarning() << Q_FUNC_INFO << "NOT YET IMPLEMENTED. Can not update parameter" << name;
-                    }
-                    break;
-
-
-                case DATA_T:
-                    {
-                        qWarning() << Q_FUNC_INFO << "NOT YET IMPLEMENTED. Can not update parameter" << name;
-                    }
-                    break;
-
-
-                default:
-                    qWarning() << Q_FUNC_INFO << "warning: unhandled output type. Can not update parameter" << name;
-                    break;
-            }
-        }
-    }
-    else
-    {
-        qWarning() << Q_FUNC_INFO << "warning: can not update a parameter without a name";
     }
 
     return result;
@@ -2896,13 +2906,13 @@ void MasticQuick::_onOutputUpdatedFromFromQML(const QString &key, const QVariant
     // Ensure that we have a valid key
     if (!key.isEmpty())
     {
-        // We must update our Mastic output
-        const char* name = key.toStdString().c_str();
+        std::string stdName = key.toStdString();
+        const char* cName = stdName.c_str();
 
         // Ensure that this output exists
-        if (mtic_checkOutputExistence(name))
+        if (mtic_checkOutputExistence(cName))
         {
-            iopType_t type = mtic_getTypeForOutput(name);
+            iopType_t type = mtic_getTypeForOutput(cName);
 
             switch(type)
             {
@@ -2913,11 +2923,12 @@ void MasticQuick::_onOutputUpdatedFromFromQML(const QString &key, const QVariant
 
                         if (ok)
                         {
-                            mtic_writeOutputAsInt(name, cValue);
+                            mtic_writeOutputAsInt(cName, cValue);
                         }
                         else
                         {
-                            qWarning() << "MasticController warning: invalid value" << value << "for output" << key;
+                            qWarning() << "MasticQuick warning: invalid value" << value
+                                       << "for Mastic output" << key << "with type INTEGER";
                         }
                     }
                     break;
@@ -2930,11 +2941,12 @@ void MasticQuick::_onOutputUpdatedFromFromQML(const QString &key, const QVariant
 
                         if (ok)
                         {
-                            mtic_writeOutputAsDouble(name, cValue);
+                            mtic_writeOutputAsDouble(cName, cValue);
                         }
                         else
                         {
-                            qWarning() << "MasticController warning: invalid value" << value << "for output" << key;
+                            qWarning() << "MasticQuick warning: invalid value" << value
+                                       << "for Mastic output" << key << "with type DOUBLE";
                         }
                     }
                     break;
@@ -2943,25 +2955,34 @@ void MasticQuick::_onOutputUpdatedFromFromQML(const QString &key, const QVariant
                 case STRING_T:
                     {
                         QString qmlValue = value.toString();
-                        const char* cValue = qmlValue.toStdString().c_str();
-
-                        mtic_writeOutputAsString(name, (char *)cValue);
+                        mtic_writeOutputAsString(cName, (char *)qmlValue.toStdString().c_str());
                     }
                     break;
 
 
                 case BOOL_T:
-                    mtic_writeOutputAsBool(name, value.toBool());
+                    {
+                        mtic_writeOutputAsBool(cName, value.toBool());
+                    }
                     break;
 
 
                 case IMPULSION_T:
-                    mtic_writeOutputAsImpulsion(name);
+                    {
+                        mtic_writeOutputAsImpulsion(cName);
+                    }
                     break;
 
+                case DATA_T:
+                    {
+                        qWarning() << "MasticQuick warning: can not update output" << key <<  "with type DATA (not yet implemented)";
+                    }
+                    break;
 
                 default:
-                    qWarning() << "MasticController warning: unhandled output type. Can not update output" << key;
+                    {
+                        qWarning() << "MasticQuick warning: unhandled output type. Can not update output" << key;
+                    }
                     break;
             }
         }
@@ -2980,13 +3001,13 @@ void MasticQuick::_onParameterUpdatedFromFromQML(const QString &key, const QVari
     // Ensure that we have a valid key
     if (!key.isEmpty())
     {
-        // We must update our Mastic output
-        const char* name = key.toStdString().c_str();
+        std::string stdName = key.toStdString();
+        const char* cName = stdName.c_str();
 
         // Ensure that this parameter exists
-        if (mtic_checkParameterExistence(name))
+        if (mtic_checkParameterExistence(cName))
         {
-            iopType_t type = mtic_getTypeForParameter(name);
+            iopType_t type = mtic_getTypeForParameter(cName);
 
             switch(type)
             {
@@ -2997,11 +3018,12 @@ void MasticQuick::_onParameterUpdatedFromFromQML(const QString &key, const QVari
 
                         if (ok)
                         {
-                            mtic_writeParameterAsInt(name, cValue);
+                            mtic_writeParameterAsInt(cName, cValue);
                         }
                         else
                         {
-                            qWarning() << "MasticController warning: invalid value" << value << "for parameter" << key;
+                            qWarning() << "MasticQuick warning: invalid value" << value
+                                       << "for Mastic parameter" << key << "with type INTEGER";
                         }
                     }
                     break;
@@ -3014,11 +3036,12 @@ void MasticQuick::_onParameterUpdatedFromFromQML(const QString &key, const QVari
 
                         if (ok)
                         {
-                            mtic_writeParameterAsDouble(name, cValue);
+                            mtic_writeParameterAsDouble(cName, cValue);
                         }
                         else
                         {
-                            qWarning() << "MasticController warning: invalid value" << value << "for parameter" << key;
+                            qWarning() << "MasticQuick warning: invalid value" << value
+                                       << "for Mastic parameter" << key << "with type DOUBLE";
                         }
                     }
                     break;
@@ -3027,25 +3050,29 @@ void MasticQuick::_onParameterUpdatedFromFromQML(const QString &key, const QVari
                 case STRING_T:
                     {
                         QString qmlValue = value.toString();
-                        const char* cValue = qmlValue.toStdString().c_str();
-
-                        mtic_writeParameterAsString(name, (char *)cValue);
+                        mtic_writeParameterAsString(cName, (char *)qmlValue.toStdString().c_str());
                     }
                     break;
 
 
                 case BOOL_T:
-                    mtic_writeParameterAsBool(name, value.toBool());
+                    {
+                        mtic_writeParameterAsBool(cName, value.toBool());
+                    }
                     break;
 
 
                 case IMPULSION_T:
-                    qWarning() << "MasticController warning: invalid parameter type IMPULSION. Can not update parameter" << key;
+                    {
+                        qWarning() << "MasticQuick warning: invalid parameter type IMPULSION. Can not update parameter" << key;
+                    }
                     break;
 
 
                 default:
-                    qWarning() << "MasticController warning: unhandled parameter type. Can not update parameter" << key;
+                    {
+                        qWarning() << "MasticQuick warning: unhandled parameter type. Can not update parameter" << key;
+                    }
                     break;
             }
         }
