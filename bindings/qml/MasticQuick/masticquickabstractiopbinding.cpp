@@ -22,6 +22,40 @@
 
 
 
+
+//
+// List of supported types
+//
+// List of supported types for MasticIopType.INTEGER
+QList<QMetaType::Type> MasticQuickAbstractIOPBinding::_supportedTypesForMasticIopTypeInteger = QList<QMetaType::Type>()
+        << QMetaType::Int
+        << QMetaType::UInt
+        << QMetaType::Long
+        << QMetaType::LongLong
+        << QMetaType::Short
+        << QMetaType::ULong
+        << QMetaType::ULongLong
+        << QMetaType::UShort
+         ;
+
+// List of supported types for MasticIopType.DOUBLE
+QList<QMetaType::Type> MasticQuickAbstractIOPBinding::_supportedTypesForMasticIopTypeDouble = QList<QMetaType::Type>()
+        << QMetaType::Double
+        << QMetaType::Float
+         ;
+
+
+
+
+//-------------------------------------------------------------------
+//
+//
+//  MasticQuickAbstractIOPBinding
+//
+//
+//-------------------------------------------------------------------
+
+
 /**
  * @brief Default constructor
  * @param qmlPropertiesMustBeWritable
@@ -43,17 +77,17 @@ MasticQuickAbstractIOPBinding::MasticQuickAbstractIOPBinding(bool qmlPropertiesM
  */
 MasticQuickAbstractIOPBinding::~MasticQuickAbstractIOPBinding()
 {
+    // Clear internal data
+    clear();
+
     // Reset our isCompleted flag to be able to use setters
     _isCompleted = false;
 
-    // Unsubscribe to our target
+    // Reset our target
     if (_target != NULL)
     {
         settarget(NULL);
     }
-
-    // Clear
-    clear();
 }
 
 
@@ -211,7 +245,7 @@ void MasticQuickAbstractIOPBinding::setTarget(const QQmlProperty &property)
         if (!_qmlPropertiesMustBeWritable || property.isWritable())
         {
             // Check if the type of our property is supported
-            if (MasticQuickBindingSingleton::checkIfPropertyIsSupported(property))
+            if (checkIfPropertyIsSupported(property))
             {
                 // Save this property
                 _propertyValueSourceTarget = property;
@@ -222,7 +256,7 @@ void MasticQuickAbstractIOPBinding::setTarget(const QQmlProperty &property)
                 _propertyValueSourceTarget = QQmlProperty();
 
                 qmlWarning(this) << "property '" << property.name() << "' has type '"
-                                 << MasticQuickBindingSingleton::prettyPropertyTypeName(property)
+                                 << prettyPropertyTypeName(property)
                                  << "' that is not supported by MasticQuick";
             }
         }
@@ -286,6 +320,153 @@ void MasticQuickAbstractIOPBinding::componentComplete()
 
     // Update internal data
     update();
+}
+
+
+
+/**
+ * @brief Get the pretty type name of a given object
+ * @param object
+ * @return
+ */
+QString MasticQuickAbstractIOPBinding::prettyObjectTypeName(QObject* object)
+{
+   QString result;
+
+   if (object != NULL)
+   {
+       if (object->metaObject() != NULL)
+       {
+           result = object->metaObject()->className();
+       }
+       else if (!object->objectName().isEmpty())
+       {
+           result = QString("objectName=%1").arg(object->objectName());
+       }
+       else
+       {
+           result = "UNKNOWN_CLASS";
+       }
+   }
+
+   return result;
+}
+
+
+
+/**
+ * @brief Check if a given property is supported by Mastic
+ * @param property
+ * @return
+ */
+bool MasticQuickAbstractIOPBinding::checkIfPropertyIsSupported(const QQmlProperty &property)
+{
+   bool result = false;
+
+   // Check if we have a valid property
+   if (property.type() == QQmlProperty::Property)
+   {
+       // Check its type category
+       if (property.propertyTypeCategory() == QQmlProperty::Normal)
+       {
+           // Read value to check if we can convert its type to a supported type
+           QVariant value = property.read();
+           if (
+               value.canConvert<int>()
+               ||
+               value.canConvert<QString>()
+               ||
+               value.canConvert<double>()
+               ||
+               value.canConvert<bool>()
+               )
+           {
+               result = true;
+           }
+           // Else: not yet implemented or not supported
+       }
+       // Else: not yet implemented or not supported (QQmlProperty::Object, QQmlProperty::List)
+   }
+   // Else: invalid property or signal => nothing to do
+
+   return result;
+}
+
+
+
+/**
+ * @brief Get the pretty name of a given property
+ * @param property
+ * @return
+ */
+QString MasticQuickAbstractIOPBinding::prettyPropertyTypeName(const QQmlProperty &property)
+{
+    QString result;
+
+    // Check if we have a QVariant i.e. a generic container type
+    if (property.propertyType() == QMetaType::QVariant)
+    {
+        // Read our value to get our real type
+        QVariant value = property.read();
+        if (value.type() == QVariant::Invalid)
+        {
+            result = QString("QVariant::Invalid");
+        }
+        else
+        {
+            result = QString("QVariant::%1").arg(value.typeName());
+        }
+    }
+    else
+    {
+        result = property.propertyTypeName();
+    }
+
+    return result;
+}
+
+
+/**
+ * @brief Get the MasticIopType of a given property
+ * @param property
+ * @return
+ *
+ * @remarks we assume that checkIfPropertyIsSupported has been called before using this method
+ */
+MasticIopType::Value MasticQuickAbstractIOPBinding::getMasticIOPTypeForProperty(const QQmlProperty &property)
+{
+   MasticIopType::Value result = MasticIopType::INVALID;
+
+   // Ensure that we have a property
+   if (property.type() == QQmlProperty::Property)
+   {
+       QMetaType::Type propertyType = static_cast<QMetaType::Type>(property.propertyType());
+
+       if (propertyType == QMetaType::Bool)
+       {
+           result = MasticIopType::BOOLEAN;
+       }
+       else if (_supportedTypesForMasticIopTypeDouble.contains(propertyType))
+       {
+           result = MasticIopType::DOUBLE;
+       }
+       else if (_supportedTypesForMasticIopTypeInteger.contains(propertyType))
+       {
+           result = MasticIopType::INTEGER;
+       }
+       else
+       {
+           // Read value to check if we can convert its type to QString
+           QVariant value = property.read();
+           if (value.canConvert<QString>())
+           {
+               result = MasticIopType::STRING;
+           }
+       }
+   }
+   // Else: It is not a valid property
+
+   return result;
 }
 
 
@@ -358,7 +539,7 @@ void MasticQuickAbstractIOPBinding::update()
                             if (!_qmlPropertiesMustBeWritable || property.isWritable())
                             {
                                 // Check if the type of our property is supported
-                                if (MasticQuickBindingSingleton::checkIfPropertyIsSupported(property))
+                                if (checkIfPropertyIsSupported(property))
                                 {
                                     // Save property
                                     _qmlPropertiesByName.insert(propertyName, property);
@@ -366,8 +547,8 @@ void MasticQuickAbstractIOPBinding::update()
                                 else
                                 {
                                     qmlWarning(this) << "property '" << propertyName << "' on "
-                                                     << MasticQuickBindingSingleton::prettyObjectTypeName(_target)
-                                                     << " has type '" << MasticQuickBindingSingleton::prettyPropertyTypeName(property)
+                                                     << prettyObjectTypeName(_target)
+                                                     << " has type '" << prettyPropertyTypeName(property)
                                                      << "' that is not supported by MasticQuick";
 
                                 }
@@ -375,13 +556,13 @@ void MasticQuickAbstractIOPBinding::update()
                             else
                             {
                                 qmlWarning(this) << "can only be associated to a writable property - property '" << propertyName << "' on "
-                                                 << MasticQuickBindingSingleton::prettyObjectTypeName(_target) << " is read-only";
+                                                 << prettyObjectTypeName(_target) << " is read-only";
                             }
                         }
                         else
                         {
                             qmlWarning(this) << "property '" << propertyName << "' does not exist on "
-                                             << MasticQuickBindingSingleton::prettyObjectTypeName(_target);
+                                             << prettyObjectTypeName(_target);
                         }
                     }
                 }
@@ -419,11 +600,11 @@ void MasticQuickAbstractIOPBinding::clear()
     // Unsubscribe to MasticQuick
     _disconnectToMasticQuick();
 
-    // Clear our hashtable
-    _qmlPropertiesByName.clear();
-
     // Clear additional data
     _clearInternalData();
+
+    // Clear our own data
+    _qmlPropertiesByName.clear();
 }
 
 

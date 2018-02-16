@@ -28,6 +28,16 @@
 MasticQuickOutputBinding::MasticQuickOutputBinding(QObject *parent)
     : MasticQuickAbstractIOPBinding(false, parent)
 {
+    // Get index of our callback called when a QML property changed
+    const QMetaObject* myMetaObject = metaObject();
+    if (myMetaObject != NULL)
+    {
+        _onQmlPropertyChangedMetaMethod = myMetaObject->method(myMetaObject->indexOfMethod("_onQmlPropertyChanged()"));
+    }
+    else
+    {
+        qmlWarning(this) << "failed to get metaObject";
+    }
 }
 
 
@@ -92,6 +102,30 @@ void MasticQuickOutputBinding::setoutputsSuffix(QString value)
 
 
 
+/**
+ * @brief Set the name of our Mastic output
+ * @remarks only when our component is used as a property value source OR if a single property is referenced by 'properties'
+ *
+ * @param value
+ */
+void MasticQuickOutputBinding::setoutputName(QString value)
+{
+    if (_outputName != value)
+    {
+        // Save our new value
+        _outputName = value;
+
+        // Update our component
+        update();
+
+        // Notify change
+        Q_EMIT outputNameChanged(value);
+    }
+}
+
+
+
+
 //-------------------------------------------------------------------
 //
 // Protected slots
@@ -102,18 +136,122 @@ void MasticQuickOutputBinding::setoutputsSuffix(QString value)
 
 /**
  * @brief Called when a QML property changes
- * @param name
- * @param value
  */
-void MasticQuickOutputBinding::_onQmlPropertyChanged(QString name, QVariant value)
+void MasticQuickOutputBinding::_onQmlPropertyChanged()
 {
-    Q_UNUSED(name)
-    Q_UNUSED(value)
-
     // Check if our binding is active
     if (_when)
     {
+        // Get signal index
+        int signalIndex = senderSignalIndex();
 
+        // Check if it is our our hashtable
+        if (_qmlPropertiesByNotifySignalIndex.contains(signalIndex))
+        {
+            // Get our QML property
+            QQmlProperty property = _qmlPropertiesByNotifySignalIndex.value(signalIndex);
+
+            // Get its Mastic output
+            if (_masticOutputsByQmlProperty.contains(property))
+            {
+                // Get info about our Mastic output
+                QPair<QString, MasticIopType::Value> masticOutputInfo = _masticOutputsByQmlProperty.value(property);
+                QString masticOutputName = masticOutputInfo.first;
+                MasticIopType::Value masticIopType = masticOutputInfo.second;
+
+                // Get value of our property
+                QVariant qmlValue = property.read();
+
+                // Try to update our Mastic output
+                bool succeeded = false;
+                switch (masticIopType)
+                {
+                    case MasticIopType::INVALID:
+                        // Should not happen because we should have filter invalid properties
+                        break;
+
+                    case MasticIopType::INTEGER:
+                        {
+                            // Convert value to int
+                            bool ok = false;
+                            int value = qmlValue.toInt(&ok);
+
+                            // Update our Mastic output if everything is ok
+                            if (ok)
+                            {
+                                MasticQuick* masticQuick = MasticQuick::instance();
+                                if (masticQuick != NULL)
+                                {
+                                    succeeded = masticQuick->writeOutputAsInt(masticOutputName, value);
+                                }
+                            }
+                        }
+                        break;
+
+                    case MasticIopType::DOUBLE:
+                        {
+                            // Convert value to double
+                            bool ok = false;
+                            double value = qmlValue.toDouble(&ok);
+
+                            // Update our Mastic output if everything is ok
+                            if (ok)
+                            {
+                                MasticQuick* masticQuick = MasticQuick::instance();
+                                if (masticQuick != NULL)
+                                {
+                                    succeeded = masticQuick->writeOutputAsDouble(masticOutputName, value);
+                                }
+                            }
+                        }
+                        break;
+
+                    case MasticIopType::STRING:
+                        {
+                             // Update our Mastic output
+                             MasticQuick* masticQuick = MasticQuick::instance();
+                             if (masticQuick != NULL)
+                             {
+                                succeeded = masticQuick->writeOutputAsString(masticOutputName, qmlValue.toString());
+                             }
+                        }
+                        break;
+
+                    case MasticIopType::BOOLEAN:
+                        {
+                             // Update our Mastic output
+                             MasticQuick* masticQuick = MasticQuick::instance();
+                             if (masticQuick != NULL)
+                             {
+                                succeeded = masticQuick->writeOutputAsBool(masticOutputName, qmlValue.toBool());
+                             }
+                        }
+                        break;
+
+                    case MasticIopType::IMPULSION:
+                        // Should not happen because QML properties can not have the type impulsion
+                        break;
+
+                    case MasticIopType::DATA:
+                        {
+                            qmlWarning(this) << "can not update a Mastic output with type DATA (not yet implemented)";
+                        }
+                        break;
+
+                    default:
+                        break;
+                }
+
+                // Warning message if needed
+                if (!succeeded)
+                {
+                    qmlWarning(this) << "failed to update Mastic output '" << masticOutputName
+                                     << "binded to property '" << property.name()
+                                     << "' on " << prettyObjectTypeName(_target)
+                                     << " with value=" << qmlValue;
+                }
+            }
+        }
     }
     // Else: our binding is not active
 }
@@ -133,7 +271,57 @@ void MasticQuickOutputBinding::_onQmlPropertyChanged(QString name, QVariant valu
  */
 void MasticQuickOutputBinding::_connectToMasticQuick()
 {
+    // Check if we have at least one valid Mastic output
+    if (_masticOutputsByQmlProperty.count() > 0)
+    {
+        for (QQmlProperty property : _masticOutputsByQmlProperty.keys())
+        {
+            // Check if our property has a notify signal
+            if (property.hasNotifySignal())
+            {
+                //
+                // NB: we can not use QQmlProperty::connectNotifySignal because
+                //     there is no public way to call disconnect
+                //
+
+                // Get its object
+                QObject* propertyObject = property.object();
+                if (propertyObject != NULL)
+                {
+                    // Get its meta object
+                    const QMetaObject* metaObject = propertyObject->metaObject();
+                    if (metaObject != NULL)
+                    {
+                        // Get index of our property
+                        int propertyIndex = property.index();
+
+                        // Get its meta property
+                        QMetaProperty metaProperty = metaObject->property(propertyIndex);
+                        if (metaProperty.hasNotifySignal())
+                        {
+                            // Get its notify signal index
+                            int notifySignalIndex = metaProperty.notifySignalIndex();
+
+                            // Save it
+                            _qmlPropertiesByNotifySignalIndex.insert(notifySignalIndex, property);
+
+                            // Subscribe to this signal
+                            QMetaMethod notifySignal = metaObject->method(notifySignalIndex);
+
+                            // NB: Qt::UniqueConnection to ensure that we only subscribe once to each property
+                            connect (propertyObject, notifySignal, this, _onQmlPropertyChangedMetaMethod, Qt::UniqueConnection);
+                        }
+                        // Else: should not happen because our QQmlProperty has a notify signal
+                    }
+                    // Else: should not happen
+                }
+                // Else: should not happen, otherwise our property is invalid
+            }
+            // Else: nothing to do
+        }
+    }
 }
+
 
 
 /**
@@ -141,6 +329,31 @@ void MasticQuickOutputBinding::_connectToMasticQuick()
  */
 void MasticQuickOutputBinding::_disconnectToMasticQuick()
 {
+    // Check if we have at least one coonection to a QML property
+    if (_qmlPropertiesByNotifySignalIndex.count() > 0)
+    {
+        for(int notifySignalIndex : _qmlPropertiesByNotifySignalIndex.keys())
+        {
+            // Get our porperty
+            QQmlProperty property = _qmlPropertiesByNotifySignalIndex.value(notifySignalIndex);
+
+            // Get its object
+            QObject* propertyObject = property.object();
+            if (propertyObject != NULL)
+            {
+                // Get its meta object
+                const QMetaObject* metaObject = propertyObject->metaObject();
+                if (metaObject != NULL)
+                {
+                    // Unsubscribe to this signal
+                    QMetaMethod notifySignal = metaObject->method(notifySignalIndex);
+                    disconnect (propertyObject, notifySignal, this, _onQmlPropertyChangedMetaMethod);
+                }
+                // Else: should not happen
+            }
+            // Else: should not happen, otherwise our property is invalid
+        }
+    }
 }
 
 
@@ -151,6 +364,8 @@ void MasticQuickOutputBinding::_disconnectToMasticQuick()
 void MasticQuickOutputBinding::_clearInternalData()
 {
     // Clear our additional data
+    _qmlPropertiesByNotifySignalIndex.clear();
+    _masticOutputsByQmlProperty.clear();
 
 }
 
@@ -177,7 +392,7 @@ void MasticQuickOutputBinding::_updateInternalData()
                 QString masticOutputName = _outputsPrefix + propertyName + _outputsSuffix;
 
                 // Get MasticIOP type
-                MasticIopType::Value masticIopType = MasticQuickBindingSingleton::getMasticIOPTypeForProperty(property);
+                MasticIopType::Value masticIopType = getMasticIOPTypeForProperty(property);
 
                 // Try to build a Mastic input
                 bool succeeded = false;
@@ -197,7 +412,8 @@ void MasticQuickOutputBinding::_updateInternalData()
                             {
                                 cValue = 0;
                                 qmlWarning(this) << "invalid value " << qmlValue
-                                                 << " to create a Mastic output with type INTEGER";
+                                                 << " to create a Mastic output with type INTEGER."
+                                                 << " Mastic output '" << masticOutputName << "' will be initialized with 0";
                             }
 
                             // Try to create a Mastic output
@@ -215,7 +431,8 @@ void MasticQuickOutputBinding::_updateInternalData()
                             {
                                 cValue = 0.0;
                                 qmlWarning(this) << "invalid value " << qmlValue
-                                                 << " to create a Mastic output with type DOUBLE";
+                                                 << " to create a Mastic output with type DOUBLE."
+                                                 << " Mastic output '" << masticOutputName << "' will be initialized with 0.0";
                             }
 
                             // Try to create a Mastic output
@@ -261,7 +478,7 @@ void MasticQuickOutputBinding::_updateInternalData()
                 // Check if we have succeeded
                 if (succeeded)
                 {
-                   // _qmlPropertiesByMasticInputName.insert(masticInputName, property);
+                    _masticOutputsByQmlProperty.insert(property, QPair<QString, MasticIopType::Value>(masticOutputName, masticIopType));
                 }
                 else
                 {

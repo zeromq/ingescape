@@ -92,6 +92,29 @@ void MasticQuickInputBinding::setinputsSuffix(QString value)
 
 
 
+/**
+ * @brief Set the name of our Mastic input
+ * @remarks only when our component is used as a property value source OR if a single property is referenced by 'properties'
+ *
+ * @param value
+ */
+void MasticQuickInputBinding::setinputName(QString value)
+{
+    if (_inputName != value)
+    {
+        // Save our new value
+        _inputName = value;
+
+        // Update our component
+        update();
+
+        // Notify change
+        Q_EMIT inputNameChanged(value);
+    }
+}
+
+
+
 //-------------------------------------------------------------------
 //
 // Protected slots
@@ -116,7 +139,7 @@ void MasticQuickInputBinding::_onMasticObserveInput(QString name, QVariant value
             if (!property.write(value))
             {
                 qmlWarning(this) << "failed to update property '" << property.name()
-                                 << "' on " << MasticQuickBindingSingleton::prettyObjectTypeName(_target)
+                                 << "' on " << prettyObjectTypeName(_target)
                                  << " binded to Mastic input '" << name << "' with value=" << value;
             }
         }
@@ -197,8 +220,8 @@ void MasticQuickInputBinding::_updateInternalData()
                 QString masticInputName = _inputsPrefix + propertyName + _inputsSuffix;
 
                 // Get MasticIOP type
-                MasticIopType::Value masticIopType = MasticQuickBindingSingleton::getMasticIOPTypeForProperty(property);
-
+                MasticIopType::Value masticIopType = getMasticIOPTypeForProperty(property);
+qDebug() << "CREATE INPUT" << masticInputName;
                 // Try to build a Mastic input
                 bool succeeded = false;
                 switch(masticIopType)

@@ -106,7 +106,7 @@ ApplicationWindow {
         console.log("Mastic version is " + Mastic.version);
 
         // MasticQuick API: verbose mode
-        Mastic.isVerbose = true;
+        Mastic.isVerbose = false;
 
 
         // MasticQuick API: set definition
@@ -449,7 +449,9 @@ ApplicationWindow {
         }
 
 
+        //
         // Pseudo canvas
+        //
         Item {
             id: canvas
 
@@ -535,6 +537,20 @@ ApplicationWindow {
                         color: "black"
                     }
                 }
+            }
+        }
+
+
+        // MasticQuick API: subscribe to forceStop and observeOutput
+        Connections {
+            target: Mastic
+
+            onForcedStop: {
+                console.log("Forced stop");
+            }
+
+            onObserveOutput: {
+                console.log("Mastic output " + name +" has changed - new value is " + value);
             }
         }
     }

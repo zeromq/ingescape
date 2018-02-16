@@ -49,7 +49,7 @@ QVariant MasticQuickInputsPropertyMap::updateValue(const QString &key, const QVa
     if (mtic_checkInputExistence(key.toStdString().c_str()))
     {
         // Inputs are read-only
-        qWarning() << "Mastic warning: inputs are read-only." <<  QString("Mastic.inputs.%1").arg(key) << "can not be updated from QML";
+        qWarning() << "MasticQuick warning: inputs are read-only." <<  QString("Mastic.inputs.%1").arg(key) << "can not be updated from QML";
 
         // Return our previous value to preserve it
         return value(key);
@@ -57,7 +57,7 @@ QVariant MasticQuickInputsPropertyMap::updateValue(const QString &key, const QVa
     else
     {
         // This input does not exist. It may be a typo
-        qWarning() << "Mastic warning:" << QString("Mastic.inputs.%1").arg(key) << "is invalid because input"
+        qWarning() << "MasticQuick warning:" << QString("Mastic.inputs.%1").arg(key) << "is invalid because input"
                    << key << "does not exist. It may be a typo or this input has not been created or has been removed";
 
         // Return an empty QVariant

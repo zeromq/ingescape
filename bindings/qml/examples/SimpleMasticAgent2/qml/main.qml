@@ -302,6 +302,10 @@ ApplicationWindow {
             Image {
                 id: myImage
 
+                property real opacityInPercent: 100.0
+
+                opacity: Math.max(Math.min(opacityInPercent/100.0, 1), 0.0)
+
                 source: "https://i2.wp.com/ingenuity.io/wp-content/uploads/2017/10/logo-I2-site-05.png"
 
 
@@ -312,6 +316,21 @@ ApplicationWindow {
 
                 }
 
+                // MasticQuick API: automatically bind a QML property to a Mastic input
+                // here, the 'rotation' property will be binded to a Mastic input named 'image_rotation_in_degrees'
+                MasticInputBinding on rotation {
+                    inputsPrefix: "image_"
+                    inputsSuffix: "_in_degrees"
+
+                }
+
+                // MasticQuick API: automatically bind a Mastic output to a QML property
+                // here, the 'opacityInPercent' property be binded to a Mastic inputnamed 'image_opacityInPercent'
+                MasticInputBinding on opacityInPercent {
+                    inputsPrefix: "image_"
+                }
+
+
 
                 // MasticQuick API: automatically bind a Mastic output to a QML property
                 // here, the 'source' property will update the Mastic output named 'sourceOfImage'
@@ -320,12 +339,10 @@ ApplicationWindow {
 
                 }
 
-
-                // MasticQuick API: automatically bind a QML property to a Mastic input
-                // here, the 'rotation' property will be binded to a Mastic input named 'image_rotation_in_degrees'
-                MasticInputBinding on rotation {
-                    inputsPrefix: "image_"
-                    inputsSuffix: "_in_degrees"
+                // MasticQuick API: automatically bind a Mastic output to a QML property
+                // here, the 'opacityInPercent' property will update the Mastic output named 'opacityInPercentOfImage'
+                MasticOutputBinding on opacityInPercent {
+                    outputsSuffix: "OfImage"
 
                 }
             }
@@ -398,7 +415,7 @@ ApplicationWindow {
                 }
 
                 Component.onCompleted: {
-                    console.log("Test "+Mastic.inputs["rect_border.width"]);
+                    console.log("Test to read value of rect_border.width" + Mastic.inputs["rect_border.width"]);
                 }
             }
         }
@@ -427,12 +444,16 @@ ApplicationWindow {
         }
 
 
-        // MasticQuick API: subscribe to forceStop
+        // MasticQuick API: subscribe to forceStop and observeOutput
         Connections {
             target: Mastic
 
             onForcedStop: {
                 console.log("Forced stop");
+            }
+
+            onObserveOutput: {
+                console.log("Mastic output " + name +" has changed - new value is " + value);
             }
         }
     }

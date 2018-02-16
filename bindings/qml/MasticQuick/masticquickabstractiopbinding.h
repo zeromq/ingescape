@@ -20,6 +20,7 @@
 #include <QtQml>
 
 #include "masticquick_helpers.h"
+#include "masticquick_enums.h"
 
 
 /**
@@ -66,6 +67,7 @@ protected Q_SLOTS:
     void _ontargetDestroyed(QObject *sender);
 
 
+
 protected:
     /**
      * @brief QQmlPropertyValueSource API: This method will be called by the QML engine when assigning a value source
@@ -86,11 +88,45 @@ protected:
      * @brief QQmlParserStatus API: Invoked after the root component that caused this instantiation has completed construction.
      *        At this point all static values and binding values have been assigned to the class.
      */
-    void componentComplete() Q_DECL_OVERRIDE;
+    virtual void componentComplete() Q_DECL_OVERRIDE;
 
 
 
 protected:
+    /**
+     * @brief Get the pretty type name of a given object
+     * @param object
+     * @return
+     */
+    QString prettyObjectTypeName(QObject* object);
+
+
+    /**
+     * @brief Check if a given property is supported by Mastic
+     * @param property
+     * @return
+     */
+    bool checkIfPropertyIsSupported(const QQmlProperty &property);
+
+
+    /**
+     * @brief Get the pretty name of a given property
+     * @param property
+     * @return
+     */
+    QString prettyPropertyTypeName(const QQmlProperty &property);
+
+
+    /**
+     * @brief Get the MasticIopType of a given property
+     * @param property
+     * @return
+     *
+     * @remarks we assume that checkIfPropertyIsSupported has been called before using this method
+     */
+    MasticIopType::Value getMasticIOPTypeForProperty(const QQmlProperty &property);
+
+
     /**
      * @brief Update our component
      *
@@ -102,7 +138,7 @@ protected:
     /**
      * @brief Clear our component
      *
-     * @remarks this function will call _clearInternalData();
+     * @remarks this function will call _clearInternalData() and _disconnectToMasticQuick()
      */
     void clear();
 
@@ -115,6 +151,13 @@ protected:
     void connectOrDisconnectToMasticQuick();
 
 
+
+
+//---------------------------------------------------
+//
+// Methods to override in derived classes
+//
+//---------------------------------------------------
 protected:
     /**
      * @brief Connect to MasticQuick
@@ -155,6 +198,15 @@ protected:
 
      // Hashtable of QML properties by name
      QHash<QString, QQmlProperty> _qmlPropertiesByName;
+
+
+
+protected:
+     // List of supported types for MasticIopType.INTEGER
+     static QList<QMetaType::Type> _supportedTypesForMasticIopTypeInteger;
+
+     // List of supported types for MasticIopType.DOUBLE
+     static QList<QMetaType::Type> _supportedTypesForMasticIopTypeDouble;
 };
 
 QML_DECLARE_TYPE(MasticQuickAbstractIOPBinding)

@@ -20,6 +20,7 @@
 #include <QtQml>
 
 #include "masticquick_helpers.h"
+#include "masticquick_enums.h"
 #include "masticquickabstractiopbinding.h"
 
 
@@ -32,10 +33,15 @@ class MasticQuickOutputBinding : public MasticQuickAbstractIOPBinding
 {
     Q_OBJECT
 
+    // Prefix of Mastic outputs
     MASTIC_QML_PROPERTY_CUSTOM_SETTER(QString, outputsPrefix)
 
     // Suffix of Mastic outputs
     MASTIC_QML_PROPERTY_CUSTOM_SETTER(QString, outputsSuffix)
+
+    // Name of our Mastic output
+    // (only when our component is used as a property value source OR if a single property is referenced by 'properties')
+    MASTIC_QML_PROPERTY_CUSTOM_SETTER(QString, outputName)
 
 
 public:
@@ -56,10 +62,8 @@ public:
 protected Q_SLOTS:
     /**
      * @brief Called when a QML property changes
-     * @param name
-     * @param value
      */
-    void _onQmlPropertyChanged(QString name, QVariant value);
+    void _onQmlPropertyChanged();
 
 
 protected:
@@ -88,7 +92,14 @@ protected:
 
 
 protected:
+    // List of Mastic outputs (name, type) by QML property
+    QHash<QQmlProperty, QPair<QString, MasticIopType::Value>> _masticOutputsByQmlProperty;
 
+    // List of QML property by notify signal index
+    QHash<int, QQmlProperty> _qmlPropertiesByNotifySignalIndex;
+
+    // Meta method associated to our _onQmlPropertyChanged callback
+    QMetaMethod _onQmlPropertyChangedMetaMethod;
 };
 
 QML_DECLARE_TYPE(MasticQuickOutputBinding)

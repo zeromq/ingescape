@@ -39,6 +39,10 @@ class MasticQuickInputBinding : public MasticQuickAbstractIOPBinding
     // Suffix of Mastic inputs
     MASTIC_QML_PROPERTY_CUSTOM_SETTER(QString, inputsSuffix)
 
+    // Name of our Mastic Input
+    // (only when our component is used as a property value source OR if a single property is referenced by 'properties')
+    MASTIC_QML_PROPERTY_CUSTOM_SETTER(QString, inputName)
+
 
 public:
     /**

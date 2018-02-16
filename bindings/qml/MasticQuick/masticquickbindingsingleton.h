@@ -32,6 +32,10 @@ class MasticQuickBindingSingleton : public QObject
     // Constant used to associated all properties to a MasticBinding (input or output)
     MASTIC_QML_PROPERTY_CONSTANT(QString, AllProperties)
 
+    // Constant used to reset a "properties" property
+    MASTIC_QML_PROPERTY_CONSTANT(QString, NoProperty)
+
+
 public:
     /**
      * @brief Default constructor
@@ -56,46 +60,6 @@ public:
      static MasticQuickBindingSingleton* instance();
 
 
-     /**
-      * @brief Get the pretty type name of a given object
-      * @param object
-      * @return
-      */
-     static QString prettyObjectTypeName(QObject* object);
-
-
-     /**
-      * @brief Check if a given property is supported by Mastic
-      * @param property
-      * @return
-      */
-     static bool checkIfPropertyIsSupported(const QQmlProperty &property);
-
-
-     /**
-      * @brief Get the pretty name of a given property
-      * @param property
-      * @return
-      */
-     static QString prettyPropertyTypeName(const QQmlProperty &property);
-
-
-     /**
-      * @brief Get the MasticIopType of a given property
-      * @param property
-      * @return
-      *
-      * @remarks we assume that checkIfPropertyIsSupported has been called before using this method
-      */
-     static MasticIopType::Value getMasticIOPTypeForProperty(const QQmlProperty &property);
-
-
-protected:
-     // List of supported types for MasticIopType.INTEGER
-     static QList<QMetaType::Type> _supportedTypesForMasticIopTypeInteger;
-
-     // List of supported types for MasticIopType.DOUBLE
-     static QList<QMetaType::Type> _supportedTypesForMasticIopTypeDouble;
 };
 
 QML_DECLARE_TYPE(MasticQuickBindingSingleton)
