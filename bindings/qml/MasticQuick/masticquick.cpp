@@ -663,9 +663,11 @@ MasticQuick::MasticQuick(QObject *parent) : QObject(parent),
     setdefinitionDescription(tr("Definition of %1").arg(QCoreApplication::applicationName()));
 
 
+    //-------------------------------------------------
     //
     // Get initial values of Mastic internal properties
     //
+    //-------------------------------------------------
 
     // - version of Mastic
     _version = mtic_version();
@@ -691,10 +693,15 @@ MasticQuick::MasticQuick(QObject *parent) : QObject(parent),
     // - log level
     _logLevel = enumMticLogLevel_tToMasticLogLevel( mtic_getLogLevel() );
 
+    // - requestOutputsFromMappedAgents
+    _requestOutputsFromMappedAgents = mtic_getRequestOutputsFromMappedAgents();
 
+
+    //-------------------------------------------------
     //
     // Add mastic observers
     //
+    //-------------------------------------------------
 
     // Observe mute/unmute
     mtic_observeMute(&MasticQuick_callbackObserveMute, this);
@@ -709,9 +716,11 @@ MasticQuick::MasticQuick(QObject *parent) : QObject(parent),
 
 
 
+    //-------------------------------------------------
     //
     // Init dynamic properties
     //
+    //-------------------------------------------------
 
     // - inputs
     _inputs = new MasticQuickInputsPropertyMap(this);
@@ -1181,6 +1190,29 @@ void MasticQuick::setlogLevel(MasticLogLevel::Value value)
     }
 }
 
+
+
+/**
+ * @brief When mapping an agent setting we may request the mapped agent
+ *         to send its outputs (except for data & impulsions) to us through
+ *         a private communication for our proper initialization
+ *
+ * @param value
+ */
+void MasticQuick::setrequestOutputsFromMappedAgents(bool value)
+{
+    if (_requestOutputsFromMappedAgents != value)
+    {
+        // Save value
+        _requestOutputsFromMappedAgents = value;
+
+        // Set our flag
+        mtic_setRequestOutputsFromMappedAgents(value);
+
+        // Notify change
+        Q_EMIT requestOutputsFromMappedAgentsChanged(value);
+    }
+}
 
 
 

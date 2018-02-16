@@ -88,6 +88,11 @@ class MASTICQUICK_EXPORT MasticQuick : public QObject
     // Log level
     MASTIC_QML_PROPERTY_CUSTOM_SETTER(MasticLogLevel::Value, logLevel)
 
+    // When mapping an agent setting we may request the mapped agent
+    // to send its outputs (except for data & impulsions) to us through
+    // a private communication for our proper initialization
+    MASTIC_QML_PROPERTY_CUSTOM_SETTER(bool, requestOutputsFromMappedAgents)
+
     // List of input names
     MASTIC_QML_PROPERTY_READONLY(QStringList, inputsList)
 
