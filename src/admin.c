@@ -211,7 +211,8 @@ void mtic_log(mtic_logLevel_t level, const char *fmt, ...){
 void mtic_setLogLevel (mtic_logLevel_t level){
     logLevel = level;
 }
-mtic_logLevel_t mtic_getLogLevel (void){
+
+mtic_logLevel_t mtic_getLogLevel (void) {
     return logLevel;
 }
 
@@ -219,15 +220,24 @@ void mtic_setLogInFile (bool allow){
     logInFile = allow;
 }
 
+bool mtic_getLogInFile (void) {
+    return logInFile;
+}
+
 void mtic_setVerbose (bool allow){
     logInConsole = allow;
 }
+
 bool mtic_isVerbose (void) {
     return logInConsole;
 }
 
 void mtic_setUseColorVerbose (bool allow){
     useColorInConsole = allow;
+}
+
+bool mtic_getUseColorVerbose (void) {
+    return useColorInConsole;
 }
 
 void mtic_setLogStream(bool stream){
@@ -240,6 +250,10 @@ void mtic_setLogStream(bool stream){
         return;
     }
     admin_logInStream = stream;
+}
+
+bool mtic_getLogStream (void) {
+    return admin_logInStream;
 }
 
 void mtic_setLogPath(const char *path){
@@ -269,4 +283,8 @@ void mtic_setLogPath(const char *path){
     }else{
         printf("mtic_setLogPath : passed path cannot be NULL or with length equal to zero\n");
     }
+}
+
+char* mtic_getLogPath (void) {
+    return strdup(logFile);
 }

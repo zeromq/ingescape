@@ -62,6 +62,7 @@ PUBLIC int mtic_unfreeze(void);
 typedef void (*mtic_freezeCallback)(bool isPaused, void *myData);
 PUBLIC int mtic_observeFreeze(mtic_freezeCallback cb, void *myData);
 PUBLIC void mtic_setCanBeFrozen(bool canBeFrozen);
+PUBLIC bool mtic_canBeFrozen(void);
 
 //There are four non-exclusive ways to check & control the execution of the mastic
 //instance and its hosting application:
@@ -250,9 +251,13 @@ PUBLIC bool mtic_getRequestOutputsFromMappedAgents(void);
 PUBLIC void mtic_setVerbose(bool verbose); //log in console
 PUBLIC bool mtic_isVerbose(void);
 PUBLIC void mtic_setLogStream(bool stream); //log in socket
+PUBLIC bool mtic_getLogStream(void);
 PUBLIC void mtic_setLogInFile(bool useLogFile); //log in file
+PUBLIC bool mtic_getLogInFile(void);
 PUBLIC void mtic_setUseColorVerbose(bool useColor); //use colors in console
+PUBLIC bool mtic_getUseColorVerbose(void);
 PUBLIC void mtic_setLogPath(const char *path); //default is ~/ on UNIX systems and current PATH on Windows
+PUBLIC char* mtic_getLogPath(void); // must be freed by caller
 typedef enum {
     MTIC_LOG_TRACE = 0,
     MTIC_LOG_DEBUG,
