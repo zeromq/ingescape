@@ -1691,6 +1691,10 @@ void mtic_setRequestOutputsFromMappedAgents(bool notify){
     network_RequestOutputsFromMappedAgents = notify;
 }
 
+bool mtic_getRequestOutputsFromMappedAgents(){
+    return network_RequestOutputsFromMappedAgents;
+}
+
 #define MAX_NETDEVICE_LENGTH 16
 #define MAX_NUMBER_OF_NETDEVICES 16
 
