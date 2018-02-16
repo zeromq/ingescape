@@ -15,10 +15,10 @@ HEADERS += \
 
 unix: {
     message(UNIX specific rules)
-    LIBS += -L/usr/local/lib/ -lczmq -lzmq -lsodium -lzyre
+    LIBS += -L/usr/local/lib/ /usr/local/lib/libczmq.a /usr/local/lib/libzmq.a /usr/local/lib/libsodium.a /usr/local/lib/libzyre.a #-lczmq -lzmq -lsodium -lzyre
     INCLUDEPATH += /usr/local/include
     DEPENDPATH += /usr/local/include
-    PRE_TARGETDEPS += /usr/local/lib/libczmq.a /usr/local/lib/libzmq.a /usr/local/lib/libsodium.a /usr/local/lib/libzyre.a
+    #PRE_TARGETDEPS += /usr/local/lib/libczmq.a /usr/local/lib/libzmq.a /usr/local/lib/libsodium.a /usr/local/lib/libzyre.a
 }
 
 
