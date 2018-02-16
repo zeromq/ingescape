@@ -1598,6 +1598,16 @@ void mtic_setCanBeFrozen (bool canBeFrozen){
 }
 
 /**
+ * \fn void mtic_canBeFrozen (void)
+ * \ingroup setGetLibraryFct
+ * \brief check if our agent can be frozen
+ */
+bool mtic_canBeFrozen (void){
+    return agentCanBeFrozen;
+}
+
+
+/**
  *  \defgroup muteAgentFct Agent: Mute functions
  *
  */
