@@ -36,31 +36,31 @@ win32:{
 
     QMAKE_CXXFLAGS += -std=c11
 
-#    INCLUDEPATH += $$PWD/getopt \
-
-#    HEADERS += $$PWD/getopt/getopt_win32.h
-#    SOURCES += $$PWD/getopt/getopt_win32.c
-
     CONFIG(debug, debug|release){
         #configuration DEBUG
-        libzyre_path = $$PWD/zyre/bin/Win32/Debug/v140/dynamic
-        libyajl_path = $$PWD/yajl/lloyd-yajl-2.1.0/MSVS/VS2013/x86/DebugDLL
+        libzyre_path = $$PWD/../dependencies\windows\libs\win32\Debug
+        libyajl_path = $$PWD/../dependencies\windows\libs\yajl\DebugDLL
     }else {
         #configuration RELEASE
-        libzyre_path = $$PWD/zyre/bin/Win32/Release/v140/dynamic
-        libyajl_path = $$PWD/yajl/lloyd-yajl-2.1.0/MSVS/VS2013/x86/ReleaseDLL
+        libzyre_path = $$PWD/../dependencies\windows\libs\win32\Release
+        libyajl_path = $$PWD/../dependencies\windows\libs\yajl\DebugDLL
     }
 
     #Add librairies
-    LIBS += -L$$libzyre_path -llibzmq \
-            -L$$libzyre_path -llibczmq \
-            -L$$libzyre_path -llibzyre \
+    LIBS += -L$$libzyre_path -llibzmq -llibczmq -llibzyre \
             -L$$libyajl_path -lyajl
 
     #to get the Ip address into the network.c
-    LIBS += -L$$C:/Windows/System32 -lwsock32
-    LIBS += -L$$C:/Windows/System32 -lIPHLPAPI
-    LIBS += -L$$C:/Windows/System32 -lws2_32
+    LIBS += -L$$C:/Windows/System32 -lwsock32 -lIPHLPAPI -lws2_32
+
+    INCLUDEPATH += $$PWD/../dependencies/windows/headers/zyre_suite \
+                   $$PWD/../dependencies/windows/headers \
+                   $$PWD/../dependencies/windows/unix \
+
+    #UNIX functions
+    SOURCES += $$PWD/../dependencies/windows/unix/unixfunctions.c \
+
+    HEADERS += $$PWD/../dependencies/windows/unix/unixfunctions.h \
 }
 
 
