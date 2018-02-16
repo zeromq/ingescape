@@ -71,8 +71,17 @@ void MasticQuickOutputBinding::setoutputsPrefix(QString value)
         // Save our new value
         _outputsPrefix = value;
 
-        // Update our component
-        update();
+        // Check if we can use this value
+        if (!_isUsedAsQQmlPropertyValueSource)
+        {
+            // Update our component
+            update();
+        }
+        else
+        {
+            qmlWarning(this) << "'outputsPrefix' can not be set when our item is used as a property value source (invalid value: '"
+                              << _outputsPrefix << "' )";
+        }
 
         // Notify change
         Q_EMIT outputsPrefixChanged(value);
@@ -92,8 +101,17 @@ void MasticQuickOutputBinding::setoutputsSuffix(QString value)
         // Save our new value
         _outputsSuffix = value;
 
-        // Update our component
-        update();
+        // Check if we can use this value
+        if (!_isUsedAsQQmlPropertyValueSource)
+        {
+            // Update our component
+            update();
+        }
+        else
+        {
+            qmlWarning(this) << "'outputsSuffix' can not be set when our item is used as a property value source (invalid value: '"
+                              << _outputsSuffix << "' )";
+        }
 
         // Notify change
         Q_EMIT outputsSuffixChanged(value);
@@ -115,8 +133,17 @@ void MasticQuickOutputBinding::setoutputName(QString value)
         // Save our new value
         _outputName = value;
 
-        // Update our component
-        update();
+        // Check if we can use this value
+        if (_isUsedAsQQmlPropertyValueSource || !_isCompleted)
+        {
+            // Update our component
+            update();
+        }
+        else
+        {
+            qmlWarning(this) << "'outputName' can not be set when our item is not used as a property value source (invalid value: '"
+                              << _outputName << "' )";
+        }
 
         // Notify change
         Q_EMIT outputNameChanged(value);
@@ -266,6 +293,46 @@ void MasticQuickOutputBinding::_onQmlPropertyChanged()
 //-------------------------------------------------------------------
 
 
+
+/**
+ * @brief QQmlParserStatus API: Invoked after the root component that caused this instantiation has completed construction.
+ *        At this point all static values and binding values have been assigned to the class.
+ */
+void MasticQuickOutputBinding::componentComplete()
+{
+    // Check if everything is ok
+    if (_isUsedAsQQmlPropertyValueSource)
+    {
+        // Check if "oututsPrefix" is empty
+        if (!_outputsPrefix.isEmpty())
+        {
+            qmlWarning(this) << "'outputsPrefix' can not be set when our item is used as a property value source (invalid value: '"
+                             << _outputsPrefix << "' )";
+        }
+
+        // Check if "outputsSuffix" is empty
+        if (!_outputsSuffix.isEmpty())
+        {
+            qmlWarning(this) << "'outputsSuffix' can not be set when our item is used as a property value source (invalid value: '"
+                             << _outputsSuffix << "' )";
+        }
+    }
+    else
+    {
+        // Check if "outputName" is empty
+        if (!_outputName.isEmpty())
+        {
+            qmlWarning(this) << "'outputName' can not be set when our item is not used as a property value source (invalid value: '"
+                             << _outputName << "' )";
+        }
+    }
+
+    // Call method of our parent class
+    MasticQuickAbstractIOPBinding::componentComplete();
+}
+
+
+
 /**
  * @brief Connect to MasticQuick
  */
@@ -382,6 +449,11 @@ void MasticQuickOutputBinding::_updateInternalData()
         MasticQuick* masticQuick = MasticQuick::instance();
         if (masticQuick != NULL)
         {
+            // Trim prefix, suffix, outputName
+            QString prefix = _outputsPrefix.trimmed();
+            QString suffix = _outputsSuffix.trimmed();
+            QString outputName = _outputName.trimmed();
+
             // Try to create a Mastic input for each property
             foreach(const QString propertyName, _qmlPropertiesByName.keys())
             {
@@ -389,7 +461,15 @@ void MasticQuickOutputBinding::_updateInternalData()
                 QQmlProperty property = _qmlPropertiesByName.value(propertyName);
 
                 // Name of our Mastic output
-                QString masticOutputName = _outputsPrefix + propertyName + _outputsSuffix;
+                QString masticOutputName;
+                if (_isUsedAsQQmlPropertyValueSource)
+                {
+                    masticOutputName = (outputName.isEmpty() ? propertyName : outputName);
+                }
+                else
+                {
+                    masticOutputName = prefix + propertyName + suffix;
+                }
 
                 // Get MasticIOP type
                 MasticIopType::Value masticIopType = getMasticIOPTypeForProperty(property);

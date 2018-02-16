@@ -66,6 +66,16 @@ protected Q_SLOTS:
     void _onQmlPropertyChanged();
 
 
+
+protected:
+    /**
+     * @brief QQmlParserStatus API: Invoked after the root component that caused this instantiation has completed construction.
+     *        At this point all static values and binding values have been assigned to the class.
+     */
+    virtual void componentComplete() Q_DECL_OVERRIDE;
+
+
+
 protected:
     /**
      * @brief Connect to MasticQuick

@@ -78,10 +78,12 @@ protected:
     void setTarget(const QQmlProperty &property) Q_DECL_OVERRIDE;
 
 
+
     /**
      * @brief QQmlParserStatus API: Invoked after class creation, but before any properties have been set
      */
     void classBegin() Q_DECL_OVERRIDE;
+
 
 
     /**

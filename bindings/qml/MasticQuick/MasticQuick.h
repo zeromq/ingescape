@@ -148,7 +148,8 @@ public:
      * @brief Get our singleton instance
      * @return
      *
-     * @remark Our singleton is owned by the QML engine. Thus, it is unsafe to keep a reference that points to it
+     * @remark Our singleton is owned by the QML engine.
+     *         Thus, it is unsafe to keep a reference that points to it if you don't subscribe to is destroyed() signal
      */
     static MasticQuick* instance();
 
@@ -166,7 +167,10 @@ public:
 
      /**
       * @brief Register new QML types
+      *
       * @param uri
+      *
+      * @remark You MUST call this method if you don't use MasticQuick as a QML plugin
       */
      static void registerTypes(const char *uri = DEFAULT_MASTICQUICK_URI);
 

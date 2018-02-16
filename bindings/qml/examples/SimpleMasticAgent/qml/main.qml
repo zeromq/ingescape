@@ -432,6 +432,16 @@ ApplicationWindow {
                     }
 
                     Button {
+                        // MasticQuick API: check if our agent logs in a file
+                        text: Mastic.logInFile ? qsTr("Don't log in file") : qsTr("Log in file")
+
+                        onClicked: {
+                            // MastickQuick API: switch our logInFile flag
+                            Mastic.logInFile = !Mastic.logInFile;
+                        }
+                    }
+
+                    Button {
                         text: qsTr("Send 'impulsion'")
 
                         onClicked: {

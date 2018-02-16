@@ -310,40 +310,35 @@ ApplicationWindow {
 
 
                 // MasticQuick API: automatically bind a QML property to a Mastic input
-                // here, the 'source' property will be binded to a Mastic input named 'image_source'
+                // here, the 'source' property will be binded to a Mastic input named 'imageSource'
                 MasticInputBinding on source {
-                    inputsPrefix: "image_"
-
+                    inputName: "imageSource"
                 }
 
                 // MasticQuick API: automatically bind a QML property to a Mastic input
-                // here, the 'rotation' property will be binded to a Mastic input named 'image_rotation_in_degrees'
+                // here, the 'rotation' property will be binded to a Mastic input named 'imageRotationInDegrees'
                 MasticInputBinding on rotation {
-                    inputsPrefix: "image_"
-                    inputsSuffix: "_in_degrees"
-
+                    inputName: "imageRotationInDegrees"
                 }
 
                 // MasticQuick API: automatically bind a Mastic output to a QML property
-                // here, the 'opacityInPercent' property be binded to a Mastic inputnamed 'image_opacityInPercent'
+                // here, the 'opacityInPercent' property be binded to a Mastic input named 'imageOpacityInPercent'
                 MasticInputBinding on opacityInPercent {
-                    inputsPrefix: "image_"
+                    inputName: "imageOpacityInPercent"
                 }
 
 
 
                 // MasticQuick API: automatically bind a Mastic output to a QML property
-                // here, the 'source' property will update the Mastic output named 'sourceOfImage'
+                // here, the 'source' property will update the Mastic output named 'imageSource'
                 MasticOutputBinding on source {
-                    outputsSuffix: "OfImage"
-
+                    outputName: "imageSource"
                 }
 
                 // MasticQuick API: automatically bind a Mastic output to a QML property
-                // here, the 'opacityInPercent' property will update the Mastic output named 'opacityInPercentOfImage'
+                // here, the 'opacityInPercent' property will update the Mastic output named 'imageOpacityInPercent'
                 MasticOutputBinding on opacityInPercent {
-                    outputsSuffix: "OfImage"
-
+                    outputName: "imageOpacityInPercent"
                 }
             }
 
@@ -402,7 +397,7 @@ ApplicationWindow {
                 // MasticQuick API: automatically bind a QML property to a Mastic input
                 // here, the 'x' property will be binded to a Mastic input named 'rect_x'
                 MasticInputBinding on x {
-                    inputsPrefix: "rect_"
+                    inputName: "rect_x"
                 }
 
 

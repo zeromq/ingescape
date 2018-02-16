@@ -61,8 +61,17 @@ void MasticQuickInputBinding::setinputsPrefix(QString value)
         // Save our new value
         _inputsPrefix = value;
 
-        // Update our component
-        update();
+        // Check if we can use this value
+        if (!_isUsedAsQQmlPropertyValueSource)
+        {
+            // Update our component
+            update();
+        }
+        else
+        {
+            qmlWarning(this) << "'inputsPrefix' can not be set when our item is used as a property value source (invalid value: '"
+                              << _inputsPrefix << "' )";
+        }
 
         // Notify change
         Q_EMIT inputsPrefixChanged(value);
@@ -82,8 +91,17 @@ void MasticQuickInputBinding::setinputsSuffix(QString value)
         // Save our new value
         _inputsSuffix = value;
 
-        // Update our component
-        update();
+        // Check if we can use this value
+        if (!_isUsedAsQQmlPropertyValueSource)
+        {
+            // Update our component
+            update();
+        }
+        else
+        {
+            qmlWarning(this) << "'inputsSuffix' can not be set when our item is used as a property value source (invalid value: '"
+                              << _inputsSuffix << "' )";
+        }
 
         // Notify change
         Q_EMIT inputsSuffixChanged(value);
@@ -105,8 +123,17 @@ void MasticQuickInputBinding::setinputName(QString value)
         // Save our new value
         _inputName = value;
 
-        // Update our component
-        update();
+        // Check if we can use this value
+        if (_isUsedAsQQmlPropertyValueSource || !_isCompleted)
+        {
+            // Update our component
+            update();
+        }
+        else
+        {
+            qmlWarning(this) << "'inputName' can not be set when our item is not used as a property value source (invalid value: '"
+                              << _inputName << "' )";
+        }
 
         // Notify change
         Q_EMIT inputNameChanged(value);
@@ -155,6 +182,46 @@ void MasticQuickInputBinding::_onMasticObserveInput(QString name, QVariant value
 // Protected methods
 //
 //-------------------------------------------------------------------
+
+
+
+/**
+ * @brief QQmlParserStatus API: Invoked after the root component that caused this instantiation has completed construction.
+ *        At this point all static values and binding values have been assigned to the class.
+ */
+void MasticQuickInputBinding::componentComplete()
+{
+    // Check if everything is ok
+    if (_isUsedAsQQmlPropertyValueSource)
+    {
+        // Check if "inputsPrefix" is empty
+        if (!_inputsPrefix.isEmpty())
+        {
+            qmlWarning(this) << "'inputsPrefix' can not be set when our item is used as a property value source (invalid value: '"
+                             << _inputsPrefix << "' )";
+        }
+
+        // Check if "inputsSuffix" is empty
+        if (!_inputsSuffix.isEmpty())
+        {
+            qmlWarning(this) << "'inputsSuffix' can not be set when our item is used as a property value source (invalid value: '"
+                             << _inputsSuffix << "' )";
+        }
+    }
+    else
+    {
+        // Check if "inputName" is empty
+        if (!_inputName.isEmpty())
+        {
+            qmlWarning(this) << "'inputName' can not be set when our item is not used as a property value source (invalid value: '"
+                             << _inputName << "' )";
+        }
+    }
+
+    // Call method of our parent class
+    MasticQuickAbstractIOPBinding::componentComplete();
+}
+
 
 
 
@@ -210,6 +277,11 @@ void MasticQuickInputBinding::_updateInternalData()
         MasticQuick* masticQuick = MasticQuick::instance();
         if (masticQuick != NULL)
         {
+            // Trim prefix, suffix, inputName
+            QString prefix = _inputsPrefix.trimmed();
+            QString suffix = _inputsSuffix.trimmed();
+            QString inputName = _inputName.trimmed();
+
             // Try to create a Mastic input for each property
             foreach(const QString propertyName, _qmlPropertiesByName.keys())
             {
@@ -217,7 +289,15 @@ void MasticQuickInputBinding::_updateInternalData()
                 QQmlProperty property = _qmlPropertiesByName.value(propertyName);
 
                 // Name of our Mastic input
-                QString masticInputName = _inputsPrefix + propertyName + _inputsSuffix;
+                QString masticInputName;
+                if (_isUsedAsQQmlPropertyValueSource)
+                {
+                    masticInputName = (inputName.isEmpty() ? propertyName : inputName);
+                }
+                else
+                {
+                    masticInputName = prefix + propertyName + suffix;
+                }
 
                 // Get MasticIOP type
                 MasticIopType::Value masticIopType = getMasticIOPTypeForProperty(property);

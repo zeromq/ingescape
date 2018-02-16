@@ -159,8 +159,8 @@ void MasticQuickAbstractIOPBinding::setproperties(QString value)
         }
         else
         {
-            qmlWarning(this) << "properties can not be set when our item is used as a property value source (invalid value: "
-                              << _properties << " )";
+            qmlWarning(this) << "'properties' can not be set when our item is used as a property value source (invalid value: '"
+                              << _properties << "' )";
         }
 
         // Notify change
@@ -303,8 +303,8 @@ void MasticQuickAbstractIOPBinding::componentComplete()
         // Check if "properties" is empty
         if (!_properties.isEmpty())
         {
-            qmlWarning(this) << "properties can not be set when our item is used as a property value source (invalid value: "
-                             << _properties << " )";
+            qmlWarning(this) << "'properties' can not be set when our item is used as a property value source (invalid value: '"
+                             << _properties << "' )";
         }
 
         // Check if "target" is NULL
