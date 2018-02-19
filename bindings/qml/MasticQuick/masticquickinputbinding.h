@@ -104,7 +104,7 @@ protected:
 
 
 protected:
-     // Hashtable (Mastic input name, property name)
+     // Hashtable (Mastic input name, QML property)
      QHash<QString, QQmlProperty> _qmlPropertiesByMasticInputName;
 };
 

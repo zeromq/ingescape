@@ -141,7 +141,7 @@ void MasticQuickAbstractIOPBinding::settarget(QObject *value)
 
 
 /**
- * @brief Set properties
+ * @brief Set our list of properties
  * @param value
  */
 void MasticQuickAbstractIOPBinding::setproperties(QString value)
@@ -229,7 +229,7 @@ void MasticQuickAbstractIOPBinding::_ontargetDestroyed(QObject *sender)
 
 /**
  * @brief QQmlPropertyValueSource API: This method will be called by the QML engine when assigning a value source
- *        with the following syntax    MasticXXXXXBinding on property { }
+ *        with the following syntax: MasticInputBinding on property { } or MasticOutputBinding on property { }
  *
  * @param property
  */
@@ -279,7 +279,6 @@ void MasticQuickAbstractIOPBinding::setTarget(const QQmlProperty &property)
     // Update our component
     update();
 }
-
 
 
 
@@ -356,21 +355,21 @@ QString MasticQuickAbstractIOPBinding::prettyObjectTypeName(QObject* object)
 
 /**
  * @brief Check if a given property is supported by Mastic
- * @param property
+ * @param qmlProperty
  * @return
  */
-bool MasticQuickAbstractIOPBinding::checkIfPropertyIsSupported(const QQmlProperty &property)
+bool MasticQuickAbstractIOPBinding::checkIfPropertyIsSupported(const QQmlProperty &qmlProperty)
 {
    bool result = false;
 
-   // Check if we have a valid property
-   if (property.type() == QQmlProperty::Property)
+   // Check if we have a property
+   if (qmlProperty.isProperty())
    {
        // Check its type category
-       if (property.propertyTypeCategory() == QQmlProperty::Normal)
+       if (qmlProperty.propertyTypeCategory() == QQmlProperty::Normal)
        {
            // Read value to check if we can convert its type to a supported type
-           QVariant value = property.read();
+           QVariant value = qmlProperty.read();
            if (
                value.canConvert<int>()
                ||
@@ -522,33 +521,33 @@ void MasticQuickAbstractIOPBinding::update()
                     //
 
                     // Parse our list of properties
-                    QStringList listOfPropertyNames = _properties.split(QLatin1Char(','));
+                    QStringList listOfPropertyNames = properties.split(QLatin1Char(','));
                     int numberOfPropertyNames = listOfPropertyNames.count();
                     for (int index = 0; index < numberOfPropertyNames; index++)
                     {
                         // Clean-up the name of the current property
                         QString propertyName = listOfPropertyNames.at(index).trimmed();
 
-                        // Create a property
-                        QQmlProperty property = QQmlProperty(_target, propertyName);
+                        // Create a QML property
+                        QQmlProperty qmlProperty = QQmlProperty(_target, propertyName);
 
                         // Check if this property exists
-                        if (property.isValid() && property.isProperty())
+                        if (qmlProperty.isValid() && qmlProperty.isProperty())
                         {
                             // Check if we need a writable property
-                            if (!_qmlPropertiesMustBeWritable || property.isWritable())
+                            if (!_qmlPropertiesMustBeWritable || qmlProperty.isWritable())
                             {
                                 // Check if the type of our property is supported
-                                if (checkIfPropertyIsSupported(property))
+                                if (checkIfPropertyIsSupported(qmlProperty))
                                 {
                                     // Save property
-                                    _qmlPropertiesByName.insert(propertyName, property);
+                                    _qmlPropertiesByName.insert(propertyName, qmlProperty);
                                 }
                                 else
                                 {
                                     qmlWarning(this) << "property '" << propertyName << "' on "
                                                      << prettyObjectTypeName(_target)
-                                                     << " has type '" << prettyPropertyTypeName(property)
+                                                     << " has type '" << prettyPropertyTypeName(qmlProperty)
                                                      << "' that is not supported by MasticQuick";
 
                                 }
@@ -635,6 +634,7 @@ void MasticQuickAbstractIOPBinding::connectOrDisconnectToMasticQuick()
 void MasticQuickAbstractIOPBinding::_connectToMasticQuick()
 {
 }
+
 
 
 /**

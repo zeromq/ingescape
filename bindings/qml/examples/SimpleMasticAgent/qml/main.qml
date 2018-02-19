@@ -118,6 +118,7 @@ ApplicationWindow {
         // MasticQuick API: create inputs
         Mastic.createInputDouble("circleCx", 300);
         Mastic.createInputDouble("circleCy", 200);
+        Mastic.createInputImpulsion("impulsion");
 
         // MasticQuick API: create outputs
         Mastic.createOutputDouble("rectX", myRectangle.x);
@@ -534,6 +535,8 @@ ApplicationWindow {
                 y: Mastic.inputs.circleCy
 
                 Rectangle {
+                    id: myCircleUI
+
                     anchors.centerIn: parent
 
                     width: 50
@@ -546,6 +549,15 @@ ApplicationWindow {
                         width: 3
                         color: "black"
                     }
+
+                    SequentialAnimation {
+                        id: myCirclePulseAnimation
+
+                        running: false
+
+                        NumberAnimation { target: myCircleUI; property: "scale"; to: 3; }
+                        NumberAnimation { target: myCircleUI; property: "scale"; to: 1; }
+                     }
                 }
             }
         }
@@ -561,6 +573,16 @@ ApplicationWindow {
 
             onObserveOutput: {
                 console.log("Mastic output " + name +" has changed - new value is " + value);
+            }
+        }
+
+
+        // MasticQuick API: use a Connections item to subscribe to Mastic input changes
+        Connections {
+            target: Mastic.inputs
+
+            onImpulsionChanged: {
+                myCirclePulseAnimation.start();
             }
         }
     }
