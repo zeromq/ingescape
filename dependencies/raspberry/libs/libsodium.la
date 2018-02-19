@@ -5,10 +5,10 @@
 # It is necessary for linking the library.
 
 # The name that we can dlopen(3).
-dlname='libsodium.so.18'
+dlname='libsodium.so.23'
 
 # Names of this library.
-library_names='libsodium.so.18.2.0 libsodium.so.18 libsodium.so'
+library_names='libsodium.so.23.1.0 libsodium.so.23 libsodium.so'
 
 # The name of the static archive.
 old_library='libsodium.a'
@@ -23,8 +23,8 @@ dependency_libs=''
 weak_library_names=''
 
 # Version information for libsodium.
-current=20
-age=2
+current=24
+age=1
 revision=0
 
 # Is this an already installed library?
