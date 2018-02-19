@@ -292,6 +292,59 @@ void MasticQuickOutputBinding::_onQmlPropertyChanged()
 //
 //-------------------------------------------------------------------
 
+/**
+ * @brief QQmlPropertyValueSource API: This method will be called by the QML engine when assigning a value source
+ *        with the following syntax    MasticXXXXXBinding on property { }
+ *
+ * @param property
+ */
+void MasticQuickOutputBinding::setTarget(const QQmlProperty &property)
+{
+    // Our component is used as a property value source
+    _isUsedAsQQmlPropertyValueSource = true;
+
+    // Check if we have a property
+    if (property.isProperty())
+    {
+        // Check if we need a writable property
+        if (!_qmlPropertiesMustBeWritable || property.isWritable())
+        {
+            // Check if the type of our property is supported
+            if (checkIfPropertyIsSupported(property))
+            {
+                // Save this property
+                _propertyValueSourceTarget = property;
+            }
+            else
+            {
+                // Reset value
+                _propertyValueSourceTarget = QQmlProperty();
+
+                qmlWarning(this) << "property '" << property.name() << "' has type '"
+                                 << prettyPropertyTypeName(property)
+                                 << "' that is not supported by MasticQuick";
+            }
+        }
+        else
+        {
+            // Reset value
+            _propertyValueSourceTarget = QQmlProperty();
+
+            qmlWarning(this) << "can only be associated to a writable property - " << property.name() << " is read-only";
+        }
+    }
+    else
+    {
+        // Reset value
+        _propertyValueSourceTarget = QQmlProperty();
+
+        qmlWarning(this) << "can only be associated to a property. " << property.name() << " is not a property";
+    }
+
+    // Update our component
+    update();
+}
+
 
 
 /**

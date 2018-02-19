@@ -27,11 +27,11 @@
  * @brief The MasticQuickAbstractIOPBinding class is the base class of custom Binding item to bind QML properties
  *        to Mastic IOP
  */
-class MasticQuickAbstractIOPBinding : public QObject, public QQmlPropertyValueSource, public QQmlParserStatus
+class MasticQuickAbstractIOPBinding : public QObject, public QQmlParserStatus
 {
     Q_OBJECT
     Q_INTERFACES(QQmlParserStatus)
-    Q_INTERFACES(QQmlPropertyValueSource)
+
 
     // Target: the object associated to our binding
     MASTIC_QML_PROPERTY_CUSTOM_SETTER(QObject*, target)
@@ -69,16 +69,6 @@ protected Q_SLOTS:
 
 
 protected:
-    /**
-     * @brief QQmlPropertyValueSource API: This method will be called by the QML engine when assigning a value source
-     *        with the following syntax    MasticInputBinding on property { }
-     *
-     * @param property
-     */
-    void setTarget(const QQmlProperty &property) Q_DECL_OVERRIDE;
-
-
-
     /**
      * @brief QQmlParserStatus API: Invoked after class creation, but before any properties have been set
      */

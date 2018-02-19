@@ -29,9 +29,11 @@
  *         of a given QML item (target) when Mastic inputs change
  *
  */
-class MasticQuickInputBinding : public MasticQuickAbstractIOPBinding
+class MasticQuickInputBinding : public MasticQuickAbstractIOPBinding, public QQmlPropertyValueSource
 {
     Q_OBJECT
+    Q_INTERFACES(QQmlPropertyValueSource)
+
 
     // Prefix of Mastic inputs
     MASTIC_QML_PROPERTY_CUSTOM_SETTER(QString, inputsPrefix)
@@ -70,6 +72,16 @@ protected Q_SLOTS:
 
 
 protected:
+    /**
+     * @brief QQmlPropertyValueSource API: This method will be called by the QML engine when assigning a value source
+     *        with the following syntax    MasticInputBinding on property { }
+     *
+     * @param property
+     */
+    void setTarget(const QQmlProperty &property) Q_DECL_OVERRIDE;
+
+
+
     /**
      * @brief QQmlParserStatus API: Invoked after the root component that caused this instantiation has completed construction.
      *        At this point all static values and binding values have been assigned to the class.

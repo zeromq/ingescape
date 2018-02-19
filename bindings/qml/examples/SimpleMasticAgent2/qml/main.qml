@@ -342,6 +342,14 @@ ApplicationWindow {
                 MasticOutputBinding on opacityInPercent {
                     outputName: "imageOpacityInPercent"
                 }
+
+
+                Behavior on activeFocus {
+                }
+
+                Binding on activeFocus {
+
+                }
             }
 
 
