@@ -32,6 +32,26 @@ win32:{
 }
 
 unix:{
+
+    raspberry_compilation{
+        #
+        # !! TO COPY YOU NEED TO make install !!
+        #
+
+        #Copy all zyre includes
+        install_headers.files += $$PWD/../src/include/*.h \
+                                 $$PWD/../src/include/uthash #to future developpement of agents
+        install_headers.path += $$/usr/local/include/mastic
+
+        #Copy zyre and friends libs + yajl
+        install_libs.files += $$libs_path/*
+        install_libs.path += $$DESTDIR
+
+        #Add installation options
+        INSTALLS += install_headers
+        INSTALLS += install_libs
+    }
+
     android_compilation{
         dependencies_src_path = $$shell_path($$clean_path($$absolute_path( $${libs_path}/lib*)))
         mastic_lib_src_path = $$shell_path($$clean_path($$absolute_path( $$OUT_PWD/libmastic.so)))
