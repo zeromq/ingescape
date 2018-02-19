@@ -928,14 +928,18 @@ public:
      void _internal_setIsFrozen(bool value);
 
 
+     /**
+      * @brief Check if we need to update QML in our observeOuput callback
+      * @return
+      */
+     bool _internal_needsToUpdateQmlInObserveOutput();
+
 
      /**
-      * @brief _internal_tryToCreateInput
-      * @param name
-      * @param type
-      * @param qmlValue
+      * @brief Check if we need to update QML in our observeParameter callback
+      * @return
       */
-     void _internal_tryToCreateInput(QString name, MasticIopType::Value type, QVariant qmlValue);
+     bool _internal_needsToUpdateQmlInObserveParameter();
 
 
 //---------------------------------------------------
@@ -1026,7 +1030,7 @@ protected Q_SLOTS:
       * @param key
       * @param value
       */
-     void _onOutputUpdatedFromFromQML(const QString &key, const QVariant &value);
+     void _onOutputUpdatedFromQML(const QString &key, const QVariant &value);
 
 
 
@@ -1035,7 +1039,7 @@ protected Q_SLOTS:
       * @param key
       * @param value
       */
-     void _onParameterUpdatedFromFromQML(const QString &key, const QVariant &value);
+     void _onParameterUpdatedFromQML(const QString &key, const QVariant &value);
 
 
 protected:
@@ -1047,6 +1051,14 @@ protected:
 
      // Parameters
      QQmlPropertyMap* _parameters;
+
+     // Flag indicating if we need to update QML in observeOutput
+     bool _observeOutputNeedToUpdateQML;
+     QMutex _observeOutputNeedToUpdateQMLMutex;
+
+     // Flag indicating if we need to update QML in observeParameter
+     bool _observeParameterNeedToUpdateQML;
+     QMutex _observeParameterNeedToUpdateQMLMutex;
 };
 
 QML_DECLARE_TYPE(MasticQuick)

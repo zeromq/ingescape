@@ -356,46 +356,81 @@ void MasticQuick_callbackObserveOutput(iop_t iopType, const char *name, iopType_
         MasticQuick* controller = (MasticQuick *)customData;
         if ((controller != NULL) && (controller->outputs() != NULL))
         {
+            // Check if we have a valid name
             QString qmlName(name);
             if (!qmlName.isEmpty())
             {
+                // Check if we need to update QML
+                bool needToUpdateQML = controller->_internal_needsToUpdateQmlInObserveOutput();
+
+                // Check type of output
                 switch(valueType)
                 {
                     case INTEGER_T:
                         {
+                            // Cast our new value
                             int newValue = *((int *)value);
                             QVariant qmlValue = QVariant(newValue);
 
-                            controller->outputs()->insert(qmlName, qmlValue);
+                            // Update QML
+                            if (needToUpdateQML)
+                            {
+                                controller->outputs()->insert(qmlName, qmlValue);
+                            }
+
+                            // Notify that an output has changed
                             Q_EMIT controller->observeOutput(qmlName, qmlValue);
                         }
                         break;
 
                     case DOUBLE_T:
                         {
+                            // Cast our new value
                             double newValue = *((double *)value);
                             QVariant qmlValue = QVariant(newValue);
 
-                            controller->outputs()->insert(qmlName, QVariant(newValue));
+                            // Update QML
+                            if (needToUpdateQML)
+                            {
+                                controller->outputs()->insert(qmlName, QVariant(newValue));
+                            }
+
+                            // Notify that an output has changed
                             Q_EMIT controller->observeOutput(qmlName, qmlValue);
                         }
                         break;
 
                     case STRING_T:
                         {
+                            // Check if we have a non NULL value
                             char* newCValue = (char *)value;
                             if (newCValue != NULL)
                             {
+                                // Cast our new value
                                 QString newValue(newCValue);
                                 QVariant qmlValue = QVariant(newValue);
 
-                                controller->outputs()->insert(qmlName, qmlValue);
+                                // Update QML
+                                if (needToUpdateQML)
+                                {
+                                    controller->outputs()->insert(qmlName, qmlValue);
+                                }
+
+                                // Notify that an output has changed
                                 Q_EMIT controller->observeOutput(qmlName, qmlValue);
+
+
                                 // NB: we don't need to free newValue because we don't own it
                             }
                             else
                             {
-                                controller->outputs()->insert(qmlName, QVariant(""));
+                                // Update QML
+                                if (needToUpdateQML)
+                                {
+                                    controller->outputs()->insert(qmlName, QVariant(""));
+                                }
+
+                                // Notify that an output has changed
                                 Q_EMIT controller->observeOutput(qmlName, QVariant(""));
                             }
                         }
@@ -403,24 +438,37 @@ void MasticQuick_callbackObserveOutput(iop_t iopType, const char *name, iopType_
 
                     case BOOL_T:
                         {
+                            // Cast our new value
                             bool newValue = *((bool *)value);
                             QVariant qmlValue = QVariant(newValue);
 
-                            controller->outputs()->insert(qmlName, qmlValue);
+                            // Update QML
+                            if (needToUpdateQML)
+                            {
+                                controller->outputs()->insert(qmlName, qmlValue);
+                            }
+
+                            // Notify that an output has changed
                             Q_EMIT controller->observeOutput(qmlName, qmlValue);
                         }
                         break;
 
                     case IMPULSION_T:
                         {
-                            // Hack to force the update of our property
-                            // We disable signals then we clear its value to detect a valud change when we set an empty value
-                            controller->outputs()->blockSignals(true);
-                            controller->outputs()->clear(qmlName);
-                            controller->outputs()->blockSignals(false);
+                            // Update QML
+                            if (needToUpdateQML)
+                            {
+                                // Hack to force the update of our property
+                                // We disable signals then we clear its value to detect a valud change when we set an empty value
+                                controller->outputs()->blockSignals(true);
+                                controller->outputs()->clear(qmlName);
+                                controller->outputs()->blockSignals(false);
 
-                            // Set an empty value to trigger an update
-                            controller->outputs()->insert(qmlName, QVariant(""));
+                                // Set an empty value to trigger an update
+                                controller->outputs()->insert(qmlName, QVariant(""));
+                            }
+
+                            // Notify that an output has changed
                             Q_EMIT controller->observeOutput(qmlName, QVariant(""));
                         }
                         break;
@@ -468,46 +516,80 @@ void MasticQuick_callbackObserveParameter(iop_t iopType, const char *name, iopTy
         MasticQuick* controller = (MasticQuick *)customData;
         if ((controller != NULL) && (controller->parameters() != NULL))
         {
+            // Check if we have a valid name
             QString qmlName(name);
             if (!qmlName.isEmpty())
             {
+                // Check if we need to update QML
+                bool needToUpdateQML = controller->_internal_needsToUpdateQmlInObserveParameter();
+
+                // Check type of parameter
                 switch(valueType)
                 {
                     case INTEGER_T:
                         {
+                            // Cast our new value
                             int newValue = *((int *)value);
                             QVariant qmlValue = QVariant(newValue);
 
-                            controller->parameters()->insert(qmlName, qmlValue);
+                            // Update QML
+                            if (needToUpdateQML)
+                            {
+                                controller->parameters()->insert(qmlName, qmlValue);
+                            }
+
+                            // Notify that a parameter has changed
                             Q_EMIT controller->observeParameter(qmlName, qmlValue);
                         }
                         break;
 
                     case DOUBLE_T:
                         {
+                            // Cast our new value
                             double newValue = *((double *)value);
                             QVariant qmlValue = QVariant(newValue);
 
-                            controller->parameters()->insert(qmlName, QVariant(newValue));
+                            // Update QML
+                            if (needToUpdateQML)
+                            {
+                                controller->parameters()->insert(qmlName, QVariant(newValue));
+                            }
+
+                            // Notify that a parameter has changed
                             Q_EMIT controller->observeParameter(qmlName, qmlValue);
                         }
                         break;
 
                     case STRING_T:
                         {
+                            // Check if our new value is NULL or not
                             char* newCValue = (char *)value;
                             if (newCValue != NULL)
                             {
+                                // Cast our new value
                                 QString newValue(newCValue);
                                 QVariant qmlValue = QVariant(newValue);
 
-                                controller->parameters()->insert(qmlName, qmlValue);
+                                // Update QML
+                                if (needToUpdateQML)
+                                {
+                                    controller->parameters()->insert(qmlName, qmlValue);
+                                }
+
+                                // Notify that a parameter has changed
                                 Q_EMIT controller->observeParameter(qmlName, qmlValue);
+
                                 // NB: we don't need to free newValue because we don't own it
                             }
                             else
                             {
-                                controller->parameters()->insert(qmlName, QVariant(""));
+                                // Update QML
+                                if (needToUpdateQML)
+                                {
+                                    controller->parameters()->insert(qmlName, QVariant(""));
+                                }
+
+                                // Notify that a parameter has changed
                                 Q_EMIT controller->observeParameter(qmlName, QVariant(""));
                             }
                         }
@@ -515,10 +597,17 @@ void MasticQuick_callbackObserveParameter(iop_t iopType, const char *name, iopTy
 
                     case BOOL_T:
                         {
+                            // Cast our new value
                             bool newValue = *((bool *)value);
                             QVariant qmlValue = QVariant(newValue);
 
-                            controller->parameters()->insert(qmlName, qmlValue);
+                            // Update QML
+                            if (needToUpdateQML)
+                            {
+                                controller->parameters()->insert(qmlName, qmlValue);
+                            }
+
+                            // Notify that a parameter has changed
                             Q_EMIT controller->observeParameter(qmlName, qmlValue);
                         }
                         break;
@@ -651,8 +740,20 @@ MasticQuick::MasticQuick(QObject *parent) : QObject(parent),
     _isStarted(false),
     _inputs(NULL),
     _outputs(NULL),
-    _parameters(NULL)
+    _parameters(NULL),
+    _observeOutputNeedToUpdateQML(true),
+    _observeOutputNeedToUpdateQMLMutex(QMutex::Recursive),
+    _observeParameterNeedToUpdateQML(true),
+    _observeParameterNeedToUpdateQMLMutex(QMutex::Recursive)
 {    
+
+    //-------------------------------------------------
+    //
+    // Mastic agent info
+    //
+    //-------------------------------------------------
+
+
     // Set our default agent name
     setagentName(QCoreApplication::applicationName());
 
@@ -755,14 +856,14 @@ MasticQuick::MasticQuick(QObject *parent) : QObject(parent),
     _outputs = new MasticQuickOutputsPropertyMap(this);
     if (_outputs != NULL)
     {
-        connect(_outputs, &QQmlPropertyMap::valueChanged, this, &MasticQuick::_onOutputUpdatedFromFromQML);
+        connect(_outputs, &QQmlPropertyMap::valueChanged, this, &MasticQuick::_onOutputUpdatedFromQML);
     }
 
     // - parameters
     _parameters = new MasticQuickParametersPropertyMap(this);
     if (_parameters != NULL)
     {
-        connect(_parameters, &QQmlPropertyMap::valueChanged, this, &MasticQuick::_onParameterUpdatedFromFromQML);
+        connect(_parameters, &QQmlPropertyMap::valueChanged, this, &MasticQuick::_onParameterUpdatedFromQML);
     }
 }
 
@@ -796,7 +897,7 @@ MasticQuick::~MasticQuick()
     if (_outputs != NULL)
     {
         // Unsubscribe to signals
-        disconnect(_outputs, &QQmlPropertyMap::valueChanged, this, &MasticQuick::_onOutputUpdatedFromFromQML);
+        disconnect(_outputs, &QQmlPropertyMap::valueChanged, this, &MasticQuick::_onOutputUpdatedFromQML);
 
         // Save our value
         QQmlPropertyMap* temp = _outputs;
@@ -813,7 +914,7 @@ MasticQuick::~MasticQuick()
     if (_parameters != NULL)
     {
         // Unsubcribe to signals
-        disconnect(_parameters, &QQmlPropertyMap::valueChanged, this, &MasticQuick::_onParameterUpdatedFromFromQML);
+        disconnect(_parameters, &QQmlPropertyMap::valueChanged, this, &MasticQuick::_onParameterUpdatedFromQML);
 
         // Save our value
         QQmlPropertyMap* temp = _parameters;
@@ -2657,6 +2758,37 @@ void MasticQuick::_internal_setIsFrozen(bool value)
 }
 
 
+/**
+ * @brief Check if we need to update QML in our observeOuput callback
+ * @return
+ */
+bool MasticQuick::_internal_needsToUpdateQmlInObserveOutput()
+{
+    bool result = false;
+
+    _observeOutputNeedToUpdateQMLMutex.lock();
+    result = _observeOutputNeedToUpdateQML;
+    _observeOutputNeedToUpdateQMLMutex.unlock();
+
+    return result;
+}
+
+
+/**
+ * @brief Check if we need to update QML in our observeParameter callback
+ * @return
+ */
+bool MasticQuick::_internal_needsToUpdateQmlInObserveParameter()
+{
+    bool result = false;
+
+    _observeParameterNeedToUpdateQMLMutex.lock();
+    result = _observeParameterNeedToUpdateQML;
+    _observeParameterNeedToUpdateQMLMutex.unlock();
+
+    return result;
+}
+
 
 
 //-------------------------------------------------------------------
@@ -3583,7 +3715,7 @@ void MasticQuick::_onForcedStop()
  * @param key
  * @param value
  */
-void MasticQuick::_onOutputUpdatedFromFromQML(const QString &key, const QVariant &value)
+void MasticQuick::_onOutputUpdatedFromQML(const QString &key, const QVariant &value)
 {
     // Ensure that we have a valid key
     if (!key.isEmpty())
@@ -3605,7 +3737,13 @@ void MasticQuick::_onOutputUpdatedFromFromQML(const QString &key, const QVariant
 
                         if (ok)
                         {
+                            _observeOutputNeedToUpdateQMLMutex.lock();
+                            _observeOutputNeedToUpdateQML = false;
+
                             mtic_writeOutputAsInt(cName, cValue);
+
+                            _observeOutputNeedToUpdateQML = true;
+                            _observeOutputNeedToUpdateQMLMutex.unlock();
                         }
                         else
                         {
@@ -3623,7 +3761,13 @@ void MasticQuick::_onOutputUpdatedFromFromQML(const QString &key, const QVariant
 
                         if (ok)
                         {
+                            _observeOutputNeedToUpdateQMLMutex.lock();
+                            _observeOutputNeedToUpdateQML = false;
+
                             mtic_writeOutputAsDouble(cName, cValue);
+
+                            _observeOutputNeedToUpdateQML = true;
+                            _observeOutputNeedToUpdateQMLMutex.unlock();
                         }
                         else
                         {
@@ -3636,22 +3780,39 @@ void MasticQuick::_onOutputUpdatedFromFromQML(const QString &key, const QVariant
 
                 case STRING_T:
                     {
-                        QString qmlValue = value.toString();
-                        mtic_writeOutputAsString(cName, (char *)qmlValue.toStdString().c_str());
+                        _observeOutputNeedToUpdateQMLMutex.lock();
+                        _observeOutputNeedToUpdateQML = false;
+
+                        mtic_writeOutputAsString(cName, (char *)value.toString().toStdString().c_str());
+
+                        _observeOutputNeedToUpdateQML = true;
+                        _observeOutputNeedToUpdateQMLMutex.unlock();
                     }
                     break;
 
 
                 case BOOL_T:
                     {
+                        _observeOutputNeedToUpdateQMLMutex.lock();
+                        _observeOutputNeedToUpdateQML = false;
+
                         mtic_writeOutputAsBool(cName, value.toBool());
+
+                        _observeOutputNeedToUpdateQML = true;
+                        _observeOutputNeedToUpdateQMLMutex.unlock();
                     }
                     break;
 
 
                 case IMPULSION_T:
                     {
+                        _observeOutputNeedToUpdateQMLMutex.lock();
+                        _observeOutputNeedToUpdateQML = false;
+
                         mtic_writeOutputAsImpulsion(cName);
+
+                        _observeOutputNeedToUpdateQML = true;
+                        _observeOutputNeedToUpdateQMLMutex.unlock();
                     }
                     break;
 
@@ -3678,7 +3839,7 @@ void MasticQuick::_onOutputUpdatedFromFromQML(const QString &key, const QVariant
  * @param key
  * @param value
  */
-void MasticQuick::_onParameterUpdatedFromFromQML(const QString &key, const QVariant &value)
+void MasticQuick::_onParameterUpdatedFromQML(const QString &key, const QVariant &value)
 {
     // Ensure that we have a valid key
     if (!key.isEmpty())
@@ -3700,7 +3861,13 @@ void MasticQuick::_onParameterUpdatedFromFromQML(const QString &key, const QVari
 
                         if (ok)
                         {
+                            _observeParameterNeedToUpdateQMLMutex.lock();
+                            _observeParameterNeedToUpdateQML = false;
+
                             mtic_writeParameterAsInt(cName, cValue);
+
+                            _observeParameterNeedToUpdateQML = true;
+                            _observeParameterNeedToUpdateQMLMutex.unlock();
                         }
                         else
                         {
@@ -3718,7 +3885,13 @@ void MasticQuick::_onParameterUpdatedFromFromQML(const QString &key, const QVari
 
                         if (ok)
                         {
+                            _observeParameterNeedToUpdateQMLMutex.lock();
+                            _observeParameterNeedToUpdateQML = false;
+
                             mtic_writeParameterAsDouble(cName, cValue);
+
+                            _observeParameterNeedToUpdateQML = true;
+                            _observeParameterNeedToUpdateQMLMutex.unlock();
                         }
                         else
                         {
@@ -3731,15 +3904,26 @@ void MasticQuick::_onParameterUpdatedFromFromQML(const QString &key, const QVari
 
                 case STRING_T:
                     {
-                        QString qmlValue = value.toString();
-                        mtic_writeParameterAsString(cName, (char *)qmlValue.toStdString().c_str());
+                        _observeParameterNeedToUpdateQMLMutex.lock();
+                        _observeParameterNeedToUpdateQML = false;
+
+                        mtic_writeParameterAsString(cName, (char *)value.toString().toStdString().c_str());
+
+                        _observeParameterNeedToUpdateQML = true;
+                        _observeParameterNeedToUpdateQMLMutex.unlock();
                     }
                     break;
 
 
                 case BOOL_T:
                     {
+                        _observeParameterNeedToUpdateQMLMutex.lock();
+                        _observeParameterNeedToUpdateQML = false;
+
                         mtic_writeParameterAsBool(cName, value.toBool());
+
+                        _observeParameterNeedToUpdateQML = true;
+                        _observeParameterNeedToUpdateQMLMutex.unlock();
                     }
                     break;
 
