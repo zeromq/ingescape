@@ -467,11 +467,25 @@ Module {
             type: "bool"
             Parameter { name: "name"; type: "string" }
             Parameter { name: "value"; type: "int" }
+            Parameter { name: "warning"; type: "string"; isPointer: true }
         }
         Method {
             name: "createOutputInt"
             type: "bool"
             Parameter { name: "name"; type: "string" }
+            Parameter { name: "value"; type: "int" }
+        }
+        Method {
+            name: "createOutputInt"
+            type: "bool"
+            Parameter { name: "name"; type: "string" }
+        }
+        Method {
+            name: "createOutputDouble"
+            type: "bool"
+            Parameter { name: "name"; type: "string" }
+            Parameter { name: "value"; type: "double" }
+            Parameter { name: "warning"; type: "string"; isPointer: true }
         }
         Method {
             name: "createOutputDouble"
@@ -489,11 +503,25 @@ Module {
             type: "bool"
             Parameter { name: "name"; type: "string" }
             Parameter { name: "value"; type: "string" }
+            Parameter { name: "warning"; type: "string"; isPointer: true }
         }
         Method {
             name: "createOutputString"
             type: "bool"
             Parameter { name: "name"; type: "string" }
+            Parameter { name: "value"; type: "string" }
+        }
+        Method {
+            name: "createOutputString"
+            type: "bool"
+            Parameter { name: "name"; type: "string" }
+        }
+        Method {
+            name: "createOutputBool"
+            type: "bool"
+            Parameter { name: "name"; type: "string" }
+            Parameter { name: "value"; type: "bool" }
+            Parameter { name: "warning"; type: "string"; isPointer: true }
         }
         Method {
             name: "createOutputBool"
@@ -510,6 +538,19 @@ Module {
             name: "createOutputImpulsion"
             type: "bool"
             Parameter { name: "name"; type: "string" }
+            Parameter { name: "warning"; type: "string"; isPointer: true }
+        }
+        Method {
+            name: "createOutputImpulsion"
+            type: "bool"
+            Parameter { name: "name"; type: "string" }
+        }
+        Method {
+            name: "createOutputData"
+            type: "bool"
+            Parameter { name: "name"; type: "string" }
+            Parameter { name: "value"; type: "void"; isPointer: true }
+            Parameter { name: "warning"; type: "string"; isPointer: true }
         }
         Method {
             name: "createOutputData"
@@ -527,11 +568,25 @@ Module {
             type: "bool"
             Parameter { name: "name"; type: "string" }
             Parameter { name: "value"; type: "int" }
+            Parameter { name: "warning"; type: "string"; isPointer: true }
         }
         Method {
             name: "createParameterInt"
             type: "bool"
             Parameter { name: "name"; type: "string" }
+            Parameter { name: "value"; type: "int" }
+        }
+        Method {
+            name: "createParameterInt"
+            type: "bool"
+            Parameter { name: "name"; type: "string" }
+        }
+        Method {
+            name: "createParameterDouble"
+            type: "bool"
+            Parameter { name: "name"; type: "string" }
+            Parameter { name: "value"; type: "double" }
+            Parameter { name: "warning"; type: "string"; isPointer: true }
         }
         Method {
             name: "createParameterDouble"
@@ -549,6 +604,13 @@ Module {
             type: "bool"
             Parameter { name: "name"; type: "string" }
             Parameter { name: "value"; type: "string" }
+            Parameter { name: "warning"; type: "string"; isPointer: true }
+        }
+        Method {
+            name: "createParameterString"
+            type: "bool"
+            Parameter { name: "name"; type: "string" }
+            Parameter { name: "value"; type: "string" }
         }
         Method {
             name: "createParameterString"
@@ -560,11 +622,25 @@ Module {
             type: "bool"
             Parameter { name: "name"; type: "string" }
             Parameter { name: "value"; type: "bool" }
+            Parameter { name: "warning"; type: "string"; isPointer: true }
         }
         Method {
             name: "createParameterBool"
             type: "bool"
             Parameter { name: "name"; type: "string" }
+            Parameter { name: "value"; type: "bool" }
+        }
+        Method {
+            name: "createParameterBool"
+            type: "bool"
+            Parameter { name: "name"; type: "string" }
+        }
+        Method {
+            name: "createParameterData"
+            type: "bool"
+            Parameter { name: "name"; type: "string" }
+            Parameter { name: "value"; type: "void"; isPointer: true }
+            Parameter { name: "warning"; type: "string"; isPointer: true }
         }
         Method {
             name: "createParameterData"
@@ -660,7 +736,7 @@ Module {
         isSingleton: true
         exportMetaObjectRevisions: [0]
         Property { name: "AllProperties"; type: "string"; isReadonly: true }
-        Property { name: "NoProperty"; type: "string"; isReadonly: true }
+        Property { name: "None"; type: "string"; isReadonly: true }
     }
     Component {
         name: "MasticQuickInputBinding"
@@ -698,6 +774,7 @@ Module {
         Property { name: "outputsPrefix"; type: "string" }
         Property { name: "outputsSuffix"; type: "string" }
         Property { name: "outputName"; type: "string" }
+        Property { name: "signalHandlers"; type: "string" }
         Signal {
             name: "outputsPrefixChanged"
             Parameter { name: "value"; type: "string" }
@@ -708,6 +785,10 @@ Module {
         }
         Signal {
             name: "outputNameChanged"
+            Parameter { name: "value"; type: "string" }
+        }
+        Signal {
+            name: "signalHandlersChanged"
             Parameter { name: "value"; type: "string" }
         }
     }
