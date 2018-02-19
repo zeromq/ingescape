@@ -44,6 +44,9 @@ class MasticQuickOutputBinding : public MasticQuickAbstractIOPBinding
     // (only when our component is used as a property value source OR if a single property is referenced by 'properties')
     MASTIC_QML_PROPERTY_CUSTOM_SETTER(QString, outputName)
 
+    // List of signal handlers associated to our target (set via our "target" property and not via setTarget (QQmlPropertyValueSource API))
+    // NB: our property is not named "signals" because "signals" is a Qt keyword
+    MASTIC_QML_PROPERTY_CUSTOM_SETTER(QString, signalHandlers)
 
 public:
     /**
@@ -62,9 +65,10 @@ public:
 
 protected Q_SLOTS:
     /**
-     * @brief Called when a QML property changes
+     * @brief Called when the value of a QML property changes (if its type is Property)
+     *        or when a signal is triggered (if its type is PropertySignal)
      */
-    void _onQmlPropertyChanged();
+    void _onQmlPropertySignal();
 
 
 
@@ -110,8 +114,8 @@ protected:
     // List of QML property by notify signal index
     QHash<int, QQmlProperty> _qmlPropertiesByNotifySignalIndex;
 
-    // Meta method associated to our _onQmlPropertyChanged callback
-    QMetaMethod _onQmlPropertyChangedMetaMethod;
+    // Meta method associated to our _onQmlPropertySignal callback
+    QMetaMethod _onQmlPropertySignalMetaMethod;
 };
 
 QML_DECLARE_TYPE(MasticQuickOutputBinding)
