@@ -736,6 +736,7 @@ Module {
         isSingleton: true
         exportMetaObjectRevisions: [0]
         Property { name: "AllProperties"; type: "string"; isReadonly: true }
+        Property { name: "AllSignalHandlers"; type: "string"; isReadonly: true }
         Property { name: "None"; type: "string"; isReadonly: true }
     }
     Component {
