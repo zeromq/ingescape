@@ -29,10 +29,9 @@
  * @brief The MasticQuickOutputBinding class defines a custom binding item to update Mastic outputs
  *        when properties of a given QML item (target) change
  */
-class MasticQuickOutputBinding : public MasticQuickAbstractIOPBinding, public QQmlPropertyValueSource
+class MasticQuickOutputBinding : public MasticQuickAbstractIOPBinding
 {
     Q_OBJECT
-    Q_INTERFACES(QQmlPropertyValueSource)
 
 
     // Prefix of Mastic outputs
@@ -70,15 +69,6 @@ protected Q_SLOTS:
 
 
 protected:
-    /**
-     * @brief QQmlPropertyValueSource API: This method will be called by the QML engine when assigning a value source
-     *        with the following syntax    MasticInputBinding on property { }
-     *
-     * @param property
-     */
-    void setTarget(const QQmlProperty &property) Q_DECL_OVERRIDE;
-
-
 
     /**
      * @brief QQmlParserStatus API: Invoked after the root component that caused this instantiation has completed construction.

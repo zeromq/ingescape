@@ -2,8 +2,6 @@ INCLUDEPATH += $$PWD
 
 # Qt modules used by MasticQuick
 QT += qml quick
-# NB: to be able to use QQmlPropertyValueInterceptor (and not only QQmlPropertyValueSource that only works with writable properties)
-QT += quick-private
 
 
 # Defines MASTICQUICK_INCLUDED_VIA_PRI (by default, we don't want to export symbols when MasticQuick is included in another .pro file)
