@@ -318,26 +318,6 @@ ApplicationWindow {
             }
 
 
-            // MasticQuick API: automatically bind all properties to Mastic inputs
-            MasticInputBinding {
-                target: canvas
-
-                properties: MasticBinding.AllProperties;
-
-                inputsPrefix: "canvas_"
-            }
-
-
-            // MasticQuick API: automatically bind all properties to Mastic outputs
-            MasticOutputBinding {
-                target: canvas
-
-                properties: MasticBinding.AllProperties;
-
-                outputsPrefix: "canvas_"
-            }
-
-
 
             Image {
                 id: myImage

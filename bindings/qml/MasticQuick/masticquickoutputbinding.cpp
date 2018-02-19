@@ -685,76 +685,143 @@ void MasticQuickOutputBinding::_updateInternalData()
         if ((_target != NULL) && !signalHandlers.isEmpty())
         {
             //
-            // Parse our list of QML signal handlers
+            // Build our list of signal handlers
             //
-            QStringList listOfSignalHandlerNames = signalHandlers.split(QLatin1Char(','));
-            std::sort(listOfSignalHandlerNames.begin(), listOfSignalHandlerNames.end());
+            QStringList listOfSignalHandlerNames;
 
-
-            // Try to create a Mastic output of type IMPULSION for each signal handler
-            int numberOfSignalHandlerNames = listOfSignalHandlerNames.count();
-            for (int index = 0; index < numberOfSignalHandlerNames; index++)
+            // Check if its a keyword of MasticQuickBindingSingleton
+            MasticQuickBindingSingleton* masticQuickBindingSingleton = MasticQuickBindingSingleton::instance();
+            if ((masticQuickBindingSingleton != NULL) && masticQuickBindingSingleton->isKeyword(signalHandlers))
             {
-                // Get name of our current signal handler
-                QString signalHandlerName = listOfSignalHandlerNames.at(index).trimmed();
-
-                // Check if we have a valid signal name
-                if (
-                    // The "onXXX" syntax requires at least 3 characters
-                    (signalHandlerName.length() < 3)
-                    ||
-                    // A QML signal always starts with "on"
-                    !signalHandlerName.startsWith(QLatin1String("on"))
-                    ||
-                    // The third letter of a QML signal is always uppercase
-                    !signalHandlerName.at(2).isUpper()
-                    )
+                if (signalHandlers == masticQuickBindingSingleton->AllSignalHandlers())
                 {
-                    qmlWarning(this) << "invalid value in 'signalHandler' - '" << signalHandlerName << "' is not a signal handler"
-                                     << " - signal handlers are named on<Signal> where <Signal> is the name of a signal with the first letter capitalized.";
+                    // Get meta object of our target
+                    const QMetaObject* metaObject = _target->metaObject();
+                    if (metaObject != NULL)
+                    {
+                        // Get the number of methods
+                        int numberOfMethods = metaObject->methodCount();
+                        for (int index = 0; index < numberOfMethods; index++)
+                        {
+                            // Check if this method is a valid signal
+                            QMetaMethod metaMethod = metaObject->method(index);
+                            QString methodName = metaMethod.name();
+                            if (
+                                (metaMethod.methodType() == QMetaMethod::Signal)
+                                &&
+                                !methodName.isEmpty()
+                                &&
+                                !_signalsExcludedFromIntrospection.contains(methodName)
+                               )
+                            {
+                                // Build name of our signal handler
+                                methodName[0] = methodName[0].toUpper();
+                                QString signalHandlerName = QString("on%1").arg(methodName);
+
+                                // Add it to our list if needed
+                                if (!listOfSignalHandlerNames.contains(signalHandlerName))
+                                {
+                                    listOfSignalHandlerNames.append(signalHandlerName);
+                                }
+                            }
+                        }
+                    }
+                    // Else: should not happen because a QObject always has a meta object
+                }
+                else if (signalHandlers == masticQuickBindingSingleton->None())
+                {
+                    // No signal handlers => nothing to do
                 }
                 else
                 {
-                    //
-                    // We have a valid signal name
-                    //
+                    qmlWarning(this) << "invalid value 'MasticBinding." << masticQuickBindingSingleton->getKeyword(signalHandlers)
+                                      << "' for 'signalHandlers'";
+                }
+            }
+            else
+            {
+                //
+                // Specific set of signal handlers
+                //
+                listOfSignalHandlerNames = signalHandlers.split(QLatin1Char(','));
+            }
 
-                    // Create a QML property
-                    QQmlProperty qmlProperty = QQmlProperty(_target, signalHandlerName);
-                    if (qmlProperty.isValid() && qmlProperty.isSignalProperty())
+
+            //
+            // Check if we have at least one signal handler
+            //
+            int numberOfSignalHandlerNames = listOfSignalHandlerNames.count();
+            if (numberOfSignalHandlerNames > 0)
+            {
+                // Sort our list
+                std::sort(listOfSignalHandlerNames.begin(), listOfSignalHandlerNames.end());
+
+
+                // Try to create a Mastic output of type IMPULSION for each signal handler
+                for (int index = 0; index < numberOfSignalHandlerNames; index++)
+                {
+                    // Get name of our current signal handler
+                    QString signalHandlerName = listOfSignalHandlerNames.at(index).trimmed();
+
+                    // Check if we have a valid signal name
+                    if (
+                        // The "onXXX" syntax requires at least 3 characters
+                        (signalHandlerName.length() < 3)
+                        ||
+                        // A QML signal always starts with "on"
+                        !signalHandlerName.startsWith(QLatin1String("on"))
+                        ||
+                        // The third letter of a QML signal is always uppercase
+                        !signalHandlerName.at(2).isUpper()
+                        )
                     {
-                        // Name of our Mastic output
-                        QString masticOutputName = prefix + signalHandlerName + suffix;
-
-
-                        // Try to create a Mastic output
-                        QString warning;
-                        bool succeeded = masticQuick->createOutputImpulsion(masticOutputName, &warning);
-                        if (succeeded)
-                        {
-                            // Print a QML warning if needed
-                            if (!warning.isEmpty())
-                            {
-                                qmlWarning(this) << warning;
-                            }
-
-                            // Save it
-                            _masticOutputsByQmlProperty.insert(qmlProperty, QPair<QString, MasticIopType::Value>(masticOutputName, MasticIopType::IMPULSION));
-                        }
-                        else
-                        {
-                            qmlWarning(this) << "failed to create Mastic output '" << masticOutputName
-                                             << "' with type IMPULSION";
-                        }
+                        qmlWarning(this) << "invalid value in 'signalHandler' - '" << signalHandlerName << "' is not a signal handler"
+                                         << " - signal handlers are named on<Signal> where <Signal> is the name of a signal with the first letter capitalized.";
                     }
                     else
                     {
-                        qmlWarning(this) << "invalid value in 'signalHandler' - '" << signalHandlerName << "' is not a signal handler";
+                        //
+                        // We have a valid signal name
+                        //
+
+                        // Create a QML property
+                        QQmlProperty qmlProperty = QQmlProperty(_target, signalHandlerName);
+                        if (qmlProperty.isValid() && qmlProperty.isSignalProperty())
+                        {
+                            // Name of our Mastic output
+                            QString masticOutputName = prefix + signalHandlerName + suffix;
+
+
+                            // Try to create a Mastic output
+                            QString warning;
+                            bool succeeded = masticQuick->createOutputImpulsion(masticOutputName, &warning);
+                            if (succeeded)
+                            {
+                                // Print a QML warning if needed
+                                if (!warning.isEmpty())
+                                {
+                                    qmlWarning(this) << warning;
+                                }
+
+                                // Save it
+                                _masticOutputsByQmlProperty.insert(qmlProperty, QPair<QString, MasticIopType::Value>(masticOutputName, MasticIopType::IMPULSION));
+                            }
+                            else
+                            {
+                                qmlWarning(this) << "failed to create Mastic output '" << masticOutputName
+                                                 << "' with type IMPULSION";
+                            }
+                        }
+                        else
+                        {
+                            qmlWarning(this) << "invalid value in 'signalHandler' - '" << signalHandlerName << "' is not a signal handler";
+                        }
                     }
                 }
             }
+            // Else: empty list of signal handlers => nothing to do
         }
-        // Else: empty list of impulsions => nothing to do
+        // Else: empty 'signalHandlers' property => nothing to do
     }
     // Else: MasticQuick does not exist => should not happen
 }

@@ -38,6 +38,7 @@ Q_GLOBAL_STATIC(MasticQuickBindingSingleton, _singletonInstance)
  */
 MasticQuickBindingSingleton::MasticQuickBindingSingleton(QObject *parent) : QObject(parent),
     _AllProperties("/*! MasticBinding ALL PROPERTIES !*/"),
+    _AllSignalHandlers("/*! MasticBinding ALL SIGNAL HANDLERS !*/"),
     _None("/*! MasticBinding NOTHING !*/")
 {
     // Force C++ ownership, otherwise our singleton will be owned by the QML engine
@@ -84,6 +85,8 @@ bool MasticQuickBindingSingleton::isKeyword(QString value)
     return (
             (value == _AllProperties)
             ||
+            (value == _AllSignalHandlers)
+            ||
             (value == _None)
             );
 }
@@ -101,6 +104,10 @@ QString MasticQuickBindingSingleton::getKeyword(QString value)
     if (value == _AllProperties)
     {
         result = "AllProperties";
+    }
+    else if (value == _AllSignalHandlers)
+    {
+        result = "AllSignalHandlers";
     }
     else if (value == _None)
     {

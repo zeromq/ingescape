@@ -32,6 +32,9 @@ class MasticQuickBindingSingleton : public QObject
     // Constant used to associated all properties to a MasticBinding (input or output)
     MASTIC_QML_PROPERTY_CONSTANT(QString, AllProperties)
 
+    // Constant used to associated all signals to a MasticOutputBinding
+    MASTIC_QML_PROPERTY_CONSTANT(QString, AllSignalHandlers)
+
     // Constant used to reset a binding
     MASTIC_QML_PROPERTY_CONSTANT(QString, None)
 
