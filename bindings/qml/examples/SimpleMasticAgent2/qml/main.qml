@@ -295,6 +295,7 @@ ApplicationWindow {
             // MasticQuick API: simple binding to subscribe to a Mastic input
             color: Mastic.inputs.canvasColor
 
+
             Behavior on color {
                 ColorAnimation {}
             }

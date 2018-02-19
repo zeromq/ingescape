@@ -26,6 +26,7 @@
 // List of properties excluded from introspection
 //
 QList<QString> MasticQuickAbstractIOPBinding::_propertiesExcludedFromIntrospection = QList<QString>()
+        << "parent"
         << "objectName"
          ;
 
@@ -713,45 +714,43 @@ void MasticQuickAbstractIOPBinding::_buildListOfQmlPropertiesByIntrospection(QOb
                     // Create a QML property
                     QQmlProperty qmlProperty = QQmlProperty(object, propertyName);
 
-                    // Check if we need a writable property
-                    if (!_qmlPropertiesMustBeWritable || qmlProperty.isWritable())
+                    // Check if we can use this property (first approach)
+                    bool writableRequirements = (!_qmlPropertiesMustBeWritable || qmlProperty.isWritable());
+                    bool typeIsSupported = checkIfPropertyIsSupported(qmlProperty);
+                    if (writableRequirements && typeIsSupported)
                     {
-                        // Check if the type of our property is supported
-                        if (checkIfPropertyIsSupported(qmlProperty))
-                        {
-                            // Save property
-                            _qmlPropertiesByName.insert(prefix + propertyName, qmlProperty);
-                        }
-                        // Else: type is not supported
+                        // Save property
+                        _qmlPropertiesByName.insert(prefix + propertyName, qmlProperty);
+                    }
+                    else
+                    {
+                        // Either our property is not writable (and we require wreitable properties) o
+                        // or this type is not supported
+
                         /*
-                        else
+                        if (!typeIsSupported)
                         {
                             qmlWarning(this) << "property '" << propertyName << "' on "
                                              << prettyObjectTypeName(_target)
                                              << " has type '" << prettyPropertyTypeName(qmlProperty)
                                              << "' that is not supported by MasticQuick";
-
                         }
                         */
-                    }
-                    else
-                    {
-                        //
-                        // This property is not writable
-                        //
 
-                        // Check if this property references an object
-                        if (qmlProperty.propertyTypeCategory() == QQmlProperty::Object)
+
+                        // Check if this property references a non-writable object
+                        if ((qmlProperty.propertyTypeCategory() == QQmlProperty::Object) && !qmlProperty.isWritable())
                         {
                             QVariant qmlValue = qmlProperty.read();
                             QObject* objectValue = qmlValue.value<QObject*>();
                             if (objectValue != NULL)
                             {
                                 QString newPrefix = (prefix.isEmpty() ? QString("%1.").arg(propertyName) : QString("%1.%2.").arg(prefix, propertyName));
+
                                 _buildListOfQmlPropertiesByIntrospection(objectValue, newPrefix);
                             }
                         }
-                        // Else: we can't do anything
+
                     }
                 }
                 // Else: property is excluded to avoid side-effects
