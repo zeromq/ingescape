@@ -81,33 +81,22 @@ unix:{
         ############ Raspberry ###########
     message("Compilation raspberry scope ...")
 
-    libyajl_path = $$PWD/yajl/yajl-2.1.1/Raspberry
-    libzyre_path = $$PWD/zyre/bin/Raspberry
+    QMAKE_CFLAGS_DEBUG = \
+        -std=gnu99
+
+    QMAKE_CFLAGS_RELEASE = \
+        -std=gnu99
+
+    libs_path = $$PWD/../dependencies/raspberry/libs
 
     #Destination repository for our librairy
     DESTDIR = /usr/local/lib
 
     #Add librairies
-    LIBS += -L$$libzyre_path -lzmq -lczmq -lzyre \
-            -L$$libyajl_path/lib -lyajl
+    LIBS += -L$$libs_path -lzmq -lczmq -lzyre -lyajl
 
-    #Copy all zyre includes
-    install_headers.files += $$PWD/../src/include/*.h \
-                             $$PWD/../src/include/uthash
-    install_headers.path += $$/usr/local/include/mastic
-
-    #Copy zyre and friends libs
-    install_zyre_libs.files += $$libzyre_path/*
-    install_zyre_libs.path += $$DESTDIR
-
-    #Copy yajl libs
-    install_yajl_libs.files += $$libyajl_path/lib/*
-    install_yajl_libs.path += $$DESTDIR
-
-    #Add installation options
-    INSTALLS += install_headers
-    INSTALLS += install_zyre_libs
-    INSTALLS += install_yajl_libs
+    #include the pri to copy files to usr/local/libs
+    include ("$$PWD/../dependencies/windows/common/pri/mastic-job-copy.pri")
     }
 
     android_compilation {

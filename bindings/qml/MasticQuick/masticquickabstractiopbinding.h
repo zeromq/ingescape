@@ -36,7 +36,7 @@ class MasticQuickAbstractIOPBinding : public QObject, public QQmlPropertyValueSo
     // Target: the object associated to our binding
     MASTIC_QML_PROPERTY_CUSTOM_SETTER(QObject*, target)
 
-    // List of properties of our object
+    // List of properties of our target (set via our "target" property and not via setTarget (QQmlPropertyValueSource API))
     MASTIC_QML_PROPERTY_CUSTOM_SETTER(QString, properties)
 
     // Flag indicating if our binding is active or not
@@ -71,7 +71,7 @@ protected Q_SLOTS:
 protected:
     /**
      * @brief QQmlPropertyValueSource API: This method will be called by the QML engine when assigning a value source
-     *        with the following syntax    MasticInputBinding on property { }
+     *        with the following syntax: MasticInputBinding on property { } or  MasticOutputBinding on property { }
      *
      * @param property
      */

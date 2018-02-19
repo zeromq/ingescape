@@ -300,6 +300,22 @@ ApplicationWindow {
             }
 
 
+            MouseArea {
+                id: canvasMouseArea
+
+                anchors.fill: parent
+            }
+
+
+            // MasticQuick API: automatically bind QML signals to Mastic outputs
+            MasticOutputBinding {
+                target: canvasMouseArea
+
+                signalHandlers: "onClicked"
+            }
+
+
+
             Image {
                 id: myImage
 
@@ -435,7 +451,6 @@ ApplicationWindow {
             }
 
             onImpulsionChanged: {
-                console.log("Mastic input impulsion has changed - new value is " + Mastic.inputs.impulsion);
                 myCirclePulseAnimation.start();
             }
         }
