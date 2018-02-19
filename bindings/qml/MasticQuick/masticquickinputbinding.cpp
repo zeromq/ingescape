@@ -282,8 +282,12 @@ void MasticQuickInputBinding::_updateInternalData()
             QString suffix = _inputsSuffix.trimmed();
             QString inputName = _inputName.trimmed();
 
+            // Sort properties
+            QList<QString> properties = _qmlPropertiesByName.keys();
+            std::sort(properties.begin(), properties.end());
+
             // Try to create a Mastic input for each property
-            foreach(const QString propertyName, _qmlPropertiesByName.keys())
+            foreach(const QString propertyName, properties)
             {
                 // Get our property
                 QQmlProperty property = _qmlPropertiesByName.value(propertyName);

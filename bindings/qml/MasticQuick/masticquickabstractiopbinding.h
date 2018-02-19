@@ -59,7 +59,7 @@ public:
 
 
 
-protected Q_SLOTS:
+private Q_SLOTS:
     /**
      * @brief Called when the object associated to our target property is destroyed
      * @param sender
@@ -185,6 +185,17 @@ protected:
      virtual void _updateInternalData();
 
 
+
+private:
+    /**
+     * @brief Build our list of QML properties by introspection
+     * @param object
+     * @param prefix
+     */
+    void _buildListOfQmlPropertiesByIntrospection(QObject* object, QString prefix);
+
+
+
 protected:
     // Flag indicating if our component is completed
      bool _isCompleted;
@@ -204,6 +215,9 @@ protected:
 
 
 protected:
+     // List of properties excluded from introspection
+     static QList<QString> _propertiesExcludedFromIntrospection;
+
      // List of supported types for MasticIopType.INTEGER
      static QList<QMetaType::Type> _supportedTypesForMasticIopTypeInteger;
 

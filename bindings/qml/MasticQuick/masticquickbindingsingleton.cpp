@@ -37,8 +37,8 @@ Q_GLOBAL_STATIC(MasticQuickBindingSingleton, _singletonInstance)
  * @param parent
  */
 MasticQuickBindingSingleton::MasticQuickBindingSingleton(QObject *parent) : QObject(parent),
-    _AllProperties("/*! ALL PROPERTIES !*/"),
-    _NoProperty("/*! NO PROPERTY !*/")
+    _AllProperties("/*! MasticBinding ALL PROPERTIES !*/"),
+    _None("/*! MasticBinding NOTHING !*/")
 {
     // Force C++ ownership, otherwise our singleton will be owned by the QML engine
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -72,3 +72,40 @@ MasticQuickBindingSingleton* MasticQuickBindingSingleton::instance()
     return _singletonInstance();
 }
 
+
+
+/**
+ * @brief Check if a given value is a keyword of our singleton
+ * @param value
+ * @return
+ */
+bool MasticQuickBindingSingleton::isKeyword(QString value)
+{
+    return (
+            (value == _AllProperties)
+            ||
+            (value == _None)
+            );
+}
+
+
+/**
+ * @brief Get the keyword associated to a given value
+ * @param value
+ * @return
+ */
+QString MasticQuickBindingSingleton::getKeyword(QString value)
+{
+    QString result;
+
+    if (value == _AllProperties)
+    {
+        result = "AllProperties";
+    }
+    else if (value == _None)
+    {
+        result = "None";
+    }
+
+    return result;
+}

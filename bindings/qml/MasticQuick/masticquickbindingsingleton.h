@@ -32,8 +32,8 @@ class MasticQuickBindingSingleton : public QObject
     // Constant used to associated all properties to a MasticBinding (input or output)
     MASTIC_QML_PROPERTY_CONSTANT(QString, AllProperties)
 
-    // Constant used to reset a "properties" property
-    MASTIC_QML_PROPERTY_CONSTANT(QString, NoProperty)
+    // Constant used to reset a binding
+    MASTIC_QML_PROPERTY_CONSTANT(QString, None)
 
 
 public:
@@ -59,6 +59,21 @@ public:
       */
      static MasticQuickBindingSingleton* instance();
 
+
+     /**
+      * @brief Check if a given value is a keyword of our singleton
+      * @param value
+      * @return
+      */
+     bool isKeyword(QString value);
+
+
+     /**
+      * @brief Get the keyword associated to a given value
+      * @param value
+      * @return
+      */
+     QString getKeyword(QString value);
 
 };
 

@@ -22,11 +22,19 @@
 
 
 
+//
+// List of properties excluded from introspection
+//
+QList<QString> MasticQuickAbstractIOPBinding::_propertiesExcludedFromIntrospection = QList<QString>()
+        << "objectName"
+         ;
+
+
 
 //
 // List of supported types
 //
-// List of supported types for MasticIopType.INTEGER
+// - List of supported types for MasticIopType.INTEGER
 QList<QMetaType::Type> MasticQuickAbstractIOPBinding::_supportedTypesForMasticIopTypeInteger = QList<QMetaType::Type>()
         << QMetaType::Int
         << QMetaType::UInt
@@ -38,7 +46,7 @@ QList<QMetaType::Type> MasticQuickAbstractIOPBinding::_supportedTypesForMasticIo
         << QMetaType::UShort
          ;
 
-// List of supported types for MasticIopType.DOUBLE
+// - List of supported types for MasticIopType.DOUBLE
 QList<QMetaType::Type> MasticQuickAbstractIOPBinding::_supportedTypesForMasticIopTypeDouble = QList<QMetaType::Type>()
         << QMetaType::Double
         << QMetaType::Float
@@ -509,10 +517,24 @@ void MasticQuickAbstractIOPBinding::update()
             QString properties = _properties.trimmed();
             if ((_target != NULL) && !properties.isEmpty())
             {
-                // Check if we have a specific set of properties OR all properties
-                if ((MasticQuickBindingSingleton::instance() != NULL) && (properties == MasticQuickBindingSingleton::instance()->AllProperties()))
+                MasticQuickBindingSingleton* masticQuickBindingSingleton = MasticQuickBindingSingleton::instance();
+
+                // Check if its a keyword of MasticQuickBindingSingleton
+                if ((masticQuickBindingSingleton != NULL) && masticQuickBindingSingleton->isKeyword(properties))
                 {
-                    qmlWarning(this) << "'properties: MasticBinding.AllProperties' is not yet implemented";
+                    if (properties == masticQuickBindingSingleton->AllProperties())
+                    {
+                        _buildListOfQmlPropertiesByIntrospection(_target, "");
+                    }
+                    else if (properties == masticQuickBindingSingleton->None())
+                    {
+                        // No property required => nothing to do
+                    }
+                    else
+                    {
+                        qmlWarning(this) << "invalid value 'MasticBinding." << masticQuickBindingSingleton->getKeyword(properties)
+                                          << "' for 'properties'";
+                    }
                 }
                 else
                 {
@@ -663,6 +685,83 @@ void MasticQuickAbstractIOPBinding::_updateInternalData()
 }
 
 
+/**
+ * @brief Build our list of QML properties by introspection
+ * @param object
+ * @param prefix
+ */
+void MasticQuickAbstractIOPBinding::_buildListOfQmlPropertiesByIntrospection(QObject* object, QString prefix)
+{
+    // Check if we have an object
+    if (object != NULL)
+    {
+        // Get meta object of our target
+        const QMetaObject* metaObject = object->metaObject();
+        if (metaObject != NULL)
+        {
+            // Get the number of properties
+            int numberOfProperties = metaObject->propertyCount();
+            for (int index = 0; index < numberOfProperties; index++)
+            {
+                // Get meta property
+                QMetaProperty metaProperty = metaObject->property(index);
+                QString propertyName(metaProperty.name());
+
+                // Check if this property is excluded or not
+                if (!_propertiesExcludedFromIntrospection.contains(propertyName))
+                {
+                    // Create a QML property
+                    QQmlProperty qmlProperty = QQmlProperty(object, propertyName);
+
+                    // Check if we need a writable property
+                    if (!_qmlPropertiesMustBeWritable || qmlProperty.isWritable())
+                    {
+                        // Check if the type of our property is supported
+                        if (checkIfPropertyIsSupported(qmlProperty))
+                        {
+                            // Save property
+                            _qmlPropertiesByName.insert(prefix + propertyName, qmlProperty);
+                        }
+                        // Else: type is not supported
+                        /*
+                        else
+                        {
+                            qmlWarning(this) << "property '" << propertyName << "' on "
+                                             << prettyObjectTypeName(_target)
+                                             << " has type '" << prettyPropertyTypeName(qmlProperty)
+                                             << "' that is not supported by MasticQuick";
+
+                        }
+                        */
+                    }
+                    else
+                    {
+                        //
+                        // This property is not writable
+                        //
+
+                        // Check if this property references an object
+                        if (qmlProperty.propertyTypeCategory() == QQmlProperty::Object)
+                        {
+                            QVariant qmlValue = qmlProperty.read();
+                            QObject* objectValue = qmlValue.value<QObject*>();
+                            if (objectValue != NULL)
+                            {
+                                QString newPrefix = (prefix.isEmpty() ? QString("%1.").arg(propertyName) : QString("%1.%2.").arg(prefix, propertyName));
+                                _buildListOfQmlPropertiesByIntrospection(objectValue, newPrefix);
+                            }
+                        }
+                        // Else: we can't do anything
+                    }
+                }
+                // Else: property is excluded to avoid side-effects
+            }
+            // End  for (int index = 0; index < numberOfProperties; index++)
+        }
+        // Else: should not happen because a QObject always has a meta object
+    }
+    // Else: NULL reference => nothing to do
+}
 
 
 

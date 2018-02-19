@@ -521,6 +521,8 @@ void MasticQuickOutputBinding::_updateInternalData()
         QString suffix = _outputsSuffix.trimmed();
 
 
+
+
         //
         // Check if we have at least one valid QML property
         //
@@ -529,8 +531,13 @@ void MasticQuickOutputBinding::_updateInternalData()
             // Trim outputName
             QString outputName = _outputName.trimmed();
 
+            // Sort properties
+            QList<QString> properties = _qmlPropertiesByName.keys();
+            std::sort(properties.begin(), properties.end());
+
+
             // Try to create a Mastic input for each property
-            foreach(const QString propertyName, _qmlPropertiesByName.keys())
+            foreach(const QString propertyName, properties)
             {
                 // Get our property
                 QQmlProperty property = _qmlPropertiesByName.value(propertyName);
@@ -677,8 +684,14 @@ void MasticQuickOutputBinding::_updateInternalData()
         QString signalHandlers = _signalHandlers.trimmed();
         if ((_target != NULL) && !signalHandlers.isEmpty())
         {
+            //
             // Parse our list of QML signal handlers
+            //
             QStringList listOfSignalHandlerNames = signalHandlers.split(QLatin1Char(','));
+            std::sort(listOfSignalHandlerNames.begin(), listOfSignalHandlerNames.end());
+
+
+            // Try to create a Mastic output of type IMPULSION for each signal handler
             int numberOfSignalHandlerNames = listOfSignalHandlerNames.count();
             for (int index = 0; index < numberOfSignalHandlerNames; index++)
             {
