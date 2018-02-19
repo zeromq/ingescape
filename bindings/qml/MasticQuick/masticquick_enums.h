@@ -48,21 +48,22 @@ MASTIC_QML_ENUM(MasticLogLevel, LOG_TRACE = 0, LOG_DEBUG, LOG_INFO, LOG_WARN, LO
 
 
 /**
- * @brief Fake class to avoid vtable compilation errors
+ * @brief MasticQuickUtils defines a set of utility functions
  */
-class MasticEnums : public QObject
+class MasticQuickUtils : public QObject
 {
     Q_OBJECT
 
 public:
     /**
-     * @brief Default constructor
-     * @param parent
+     * @brief Check if Iop type "fromType" can be written to Iop type "toType"
+     * @param from
+     * @param to
+     * @return
      */
-    explicit MasticEnums(QObject *parent = nullptr) : QObject(parent)
-    {
-    }
+    static bool checkIfIopTypesAreCompatible(MasticIopType::Value fromType, MasticIopType::Value toType);
 
 };
+
 
 #endif // _MASTICQUICK_ENUMS_H_

@@ -497,7 +497,12 @@ void MasticQuickOutputBinding::_updateInternalData()
                             }
 
                             // Try to create a Mastic output
-                            succeeded = masticQuick->createOutputInt(masticOutputName, cValue);
+                            QString warning;
+                            succeeded = masticQuick->createOutputInt(masticOutputName, cValue, &warning);
+                            if (succeeded && !warning.isEmpty())
+                            {
+                                qmlWarning(this) << warning;
+                            }
                         }
                         break;
 
@@ -516,7 +521,12 @@ void MasticQuickOutputBinding::_updateInternalData()
                             }
 
                             // Try to create a Mastic output
-                            succeeded = masticQuick->createOutputDouble(masticOutputName, cValue);
+                            QString warning;
+                            succeeded = masticQuick->createOutputDouble(masticOutputName, cValue, &warning);
+                            if (succeeded && !warning.isEmpty())
+                            {
+                                qmlWarning(this) << warning;
+                            }
                         }
                         break;
 
@@ -526,7 +536,12 @@ void MasticQuickOutputBinding::_updateInternalData()
                             QVariant qmlValue = property.read();
 
                             // Try to create a Mastic output
-                            succeeded = masticQuick->createOutputString(masticOutputName, qmlValue.toString());
+                            QString warning;
+                            succeeded = masticQuick->createOutputString(masticOutputName, qmlValue.toString(), &warning);
+                            if (succeeded && !warning.isEmpty())
+                            {
+                                qmlWarning(this) << warning;
+                            }
                         }
                         break;
 
@@ -536,7 +551,12 @@ void MasticQuickOutputBinding::_updateInternalData()
                             QVariant qmlValue = property.read();
 
                             // Try to create a Mastic output
-                            succeeded = masticQuick->createOutputBool(masticOutputName, qmlValue.toBool());
+                            QString warning;
+                            succeeded = masticQuick->createOutputBool(masticOutputName, qmlValue.toBool(), &warning);
+                            if (succeeded && !warning.isEmpty())
+                            {
+                                qmlWarning(this) << warning;
+                            }
                         }
                         break;
 
@@ -546,7 +566,13 @@ void MasticQuickOutputBinding::_updateInternalData()
 
                     case MasticIopType::DATA:
                         {
-                            succeeded = masticQuick->createOutputData(masticOutputName, NULL);
+                            // Try to create a Mastic output
+                            QString warning;
+                            succeeded = masticQuick->createOutputData(masticOutputName, NULL, &warning);
+                            if (succeeded && !warning.isEmpty())
+                            {
+                                qmlWarning(this) << warning;
+                            }
                         }
                         break;
 

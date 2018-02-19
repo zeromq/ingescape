@@ -121,6 +121,7 @@ ApplicationWindow {
         Mastic.createInputString("canvasColor", canvas.color);
         Mastic.createInputImpulsion("impulsion");
 
+
         // MasticQuick API: create outputs
         Mastic.createOutputDouble("x", 0);
         Mastic.createOutputDouble("y", 0);
@@ -314,6 +315,7 @@ ApplicationWindow {
                 MasticInputBinding on source {
                     inputName: "imageSource"
                 }
+
 
                 // MasticQuick API: automatically bind a QML property to a Mastic input
                 // here, the 'rotation' property will be binded to a Mastic input named 'imageRotationInDegrees'
