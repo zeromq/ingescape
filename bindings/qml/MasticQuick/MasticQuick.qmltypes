@@ -715,6 +715,7 @@ Module {
         Property { name: "target"; type: "QObject"; isPointer: true }
         Property { name: "properties"; type: "string" }
         Property { name: "when"; type: "bool" }
+        Property { name: "removeOnUpdatesAndDestruction"; type: "bool" }
         Signal {
             name: "targetChanged"
             Parameter { name: "value"; type: "QObject"; isPointer: true }
@@ -725,6 +726,10 @@ Module {
         }
         Signal {
             name: "whenChanged"
+            Parameter { name: "value"; type: "bool" }
+        }
+        Signal {
+            name: "removeOnUpdatesAndDestructionChanged"
             Parameter { name: "value"; type: "bool" }
         }
     }
