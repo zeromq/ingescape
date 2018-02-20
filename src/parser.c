@@ -98,11 +98,14 @@ const char* value_type_to_string (iopType_t type) {
     return "";
 }
 
-const char* boolean_to_string (bool boole) {
-    if (boole)
-        return "true";
-    else
-        return "false";
+
+/**
+ * @brief Get the string representation of a boolean
+ * @param boolean
+ * @return
+ */
+const char* boolean_to_string (bool boolean) {
+    return (boolean ? "true" : "false");
 }
 
 
@@ -625,12 +628,15 @@ static void json_dump_iop (yajl_gen *g, agent_iop* aiop) {
         case INTEGER_T:
             yajl_gen_integer(*g, aiop->value.i);
             break;
+
         case DOUBLE_T:
             yajl_gen_double(*g, aiop->value.d);
             break;
+
         case BOOL_T:
             yajl_gen_string(*g, (const unsigned char *) boolean_to_string(aiop->value.b), strlen(boolean_to_string(aiop->value.b)));
             break;
+
         case STRING_T:
             {
                 if (yajl_gen_string(*g, (const unsigned char *) aiop->value.s, strlen(aiop->value.s)) == yajl_gen_invalid_string)
@@ -640,14 +646,20 @@ static void json_dump_iop (yajl_gen *g, agent_iop* aiop) {
                 }
             }
             break;
+
         case IMPULSION_T:
             yajl_gen_string(*g, (const unsigned char *) "", 0);
             break;
+
         case DATA_T:
             yajl_gen_string(*g, (const unsigned char *) "", 0);
             break;
+
         default:
-            fprintf(stderr, "%s - ERROR -  unknown data type to convert in string\n", __FUNCTION__);
+            {
+                fprintf(stderr, "%s - ERROR -  unknown data type to convert in string\n", __FUNCTION__);
+                yajl_gen_string(*g, (const unsigned char *) "", 0);
+            }
             break;
     }
     yajl_gen_map_close(*g);
