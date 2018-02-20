@@ -108,12 +108,16 @@ ApplicationWindow {
         console.log("Mastic version is " + Mastic.versionString);
 
         // MasticQuick API: verbose mode
-        Mastic.isVerbose = false;
+        Mastic.isVerbose = true;
 
         // MasticQuick API: set definition
         Mastic.definitionName = Qt.application.name;
         Mastic.definitionVersion = Qt.application.version;
         Mastic.definitionDescription = "Definition of " + Qt.application.name;
+
+        // MasticQuick API: request outputs from mapped agents
+        Mastic.requestOutputsFromMappedAgents = true;
+
 
         // MasticQuick API: list of inputs
         console.log("List of intputs:");
