@@ -221,8 +221,8 @@ protected:
      // List of properties excluded from introspection
      static QList<QString> _propertiesExcludedFromIntrospection;
 
-     // List of signals excluded from introspection
-     static QList<QString> _signalsExcludedFromIntrospection;
+     // List of signal handlers excluded from introspection
+     static QList<QString> _signalHandlersExcludedFromIntrospection;
 
      // List of supported types for MasticIopType.INTEGER
      static QList<QMetaType::Type> _supportedTypesForMasticIopTypeInteger;

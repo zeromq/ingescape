@@ -27,14 +27,15 @@
 //
 QList<QString> MasticQuickAbstractIOPBinding::_propertiesExcludedFromIntrospection = QList<QString>()
         << "parent"
+        << "objectName"
          ;
 
 
 //
 // List of signals excluded from introspection
 //
-QList<QString> MasticQuickAbstractIOPBinding::_signalsExcludedFromIntrospection = QList<QString>()
-        << "destroyed"
+QList<QString> MasticQuickAbstractIOPBinding::_signalHandlersExcludedFromIntrospection = QList<QString>()
+        << "onDestroyed"
            ;
 
 

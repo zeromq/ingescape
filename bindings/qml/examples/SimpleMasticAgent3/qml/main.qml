@@ -60,20 +60,6 @@ ApplicationWindow {
     width: 800
     height: 600
 
-    color: "white"
-
-    // NB: we must override the style of our ApplicationWindow if we want a white background!
-    // Because someone at Qt thinks that white means no background color and thus default system color
-    // (i.e. light gray)
-    // property QtObject styleData: QtObject {
-    //    readonly property bool hasColor: window.color != "#ffffff"
-    // }
-    //
-    style: ApplicationWindowStyle {
-        background: Item {
-        }
-    }
-
 
     //----------------------------------
     //

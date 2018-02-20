@@ -735,18 +735,20 @@ void MasticQuickOutputBinding::_updateInternalData()
                                 (metaMethod.methodType() == QMetaMethod::Signal)
                                 &&
                                 !methodName.isEmpty()
-                                &&
-                                !_signalsExcludedFromIntrospection.contains(methodName)
                                )
                             {
                                 // Build name of our signal handler
                                 methodName[0] = methodName[0].toUpper();
                                 QString signalHandlerName = QString("on%1").arg(methodName);
 
-                                // Add it to our list if needed
-                                if (!listOfSignalHandlerNames.contains(signalHandlerName))
+                                // Check if we can add it
+                                if (!_signalHandlersExcludedFromIntrospection.contains(signalHandlerName))
                                 {
-                                    listOfSignalHandlerNames.append(signalHandlerName);
+                                    // Add it to our list if needed
+                                    if (!listOfSignalHandlerNames.contains(signalHandlerName))
+                                    {
+                                        listOfSignalHandlerNames.append(signalHandlerName);
+                                    }
                                 }
                             }
                         }
