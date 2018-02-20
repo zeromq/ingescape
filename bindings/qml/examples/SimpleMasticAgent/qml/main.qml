@@ -175,6 +175,7 @@ ApplicationWindow {
 
 
         // MasticQuick API: start our Mastic agent
+        console.log("Starting Mastic on device " + root.masticNetworkDevice + " with port " + root.masticPort);
         Mastic.startWithDevice(root.masticNetworkDevice, root.masticPort);
     }
 
@@ -453,6 +454,21 @@ ApplicationWindow {
 
                             // Option 2: use writeOutputAsImpulsion
                             Mastic.writeOutputAsImpulsion("impulsion");
+                        }
+                    }
+
+                    Button {
+                        id: buttonPressMe
+
+                        text: qsTr("Press me")
+
+                        // MasticQuick API: export our 'pressed' property
+                        MasticOutputBinding {
+                            target: buttonPressMe
+
+                            properties: "pressed"
+
+                            outputsPrefix: "button_"
                         }
                     }
                 }

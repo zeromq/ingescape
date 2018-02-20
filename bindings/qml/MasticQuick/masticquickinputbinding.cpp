@@ -272,10 +272,14 @@ void MasticQuickInputBinding::_clearInternalData()
         {
             for (QString inputName : _qmlPropertiesByMasticInputName.keys())
             {
-                if (!masticQuick->removeInput( inputName ))
+                if (!inputName.isEmpty())
                 {
-                    qmlWarning(this) << "failed to remove input " << inputName;
+                    if (!masticQuick->removeInput( inputName ))
+                    {
+                        qmlWarning(this) << "failed to remove input " << inputName;
+                    }
                 }
+                // Else: should not happen. Otherwise, it means that we have stored an invalid data
             }
         }
     }

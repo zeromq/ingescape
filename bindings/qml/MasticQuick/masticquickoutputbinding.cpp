@@ -512,11 +512,14 @@ void MasticQuickOutputBinding::_clearInternalData()
             for ( QPair<QString, MasticIopType::Value> masticOutputInfo : _masticOutputsByQmlProperty.values())
             {
                 QString outputName = masticOutputInfo.first;
-
-                if (!masticQuick->removeOutput( outputName ))
+                if (!outputName.isEmpty())
                 {
-                    qmlWarning(this) << "failed to remove output " << outputName;
+                    if (!masticQuick->removeOutput( outputName ))
+                    {
+                        qmlWarning(this) << "failed to remove output " << outputName;
+                    }
                 }
+                // Else: should not happen. Otherwise, it means that we have stored an invalid data
             }
         }
     }
@@ -797,7 +800,7 @@ void MasticQuickOutputBinding::_updateInternalData()
                         !signalHandlerName.at(2).isUpper()
                         )
                     {
-                        qmlWarning(this) << "invalid value in 'signalHandler' - '" << signalHandlerName << "' is not a signal handler"
+                        qmlWarning(this) << "invalid value in 'signalHandlers' - '" << signalHandlerName << "' is not a signal handler"
                                          << " - signal handlers are named on<Signal> where <Signal> is the name of a signal with the first letter capitalized.";
                     }
                     else
@@ -836,7 +839,7 @@ void MasticQuickOutputBinding::_updateInternalData()
                         }
                         else
                         {
-                            qmlWarning(this) << "invalid value in 'signalHandler' - '" << signalHandlerName << "' is not a signal handler";
+                            qmlWarning(this) << "invalid value in 'signalHandlers' - '" << signalHandlerName << "' is not a signal handler";
                         }
                     }
                 }
@@ -846,5 +849,9 @@ void MasticQuickOutputBinding::_updateInternalData()
         // Else: empty 'signalHandlers' property => nothing to do
     }
     // Else: MasticQuick does not exist => should not happen
+    else
+    {
+        qDebug() << "NO MASTICKQUICK";
+    }
 }
 

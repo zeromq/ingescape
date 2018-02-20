@@ -33,12 +33,14 @@ QList<QString> MasticQuickAbstractIOPBinding::_propertiesExcludedFromIntrospecti
 //
 // List of signals excluded from introspection
 //
-QList<QString> MasticQuickAbstractIOPBinding::_signalsExcludedFromIntrospection = QList<QString>();
+QList<QString> MasticQuickAbstractIOPBinding::_signalsExcludedFromIntrospection = QList<QString>()
+        << "destroyed"
+           ;
 
 
 
 //
-// List of supported types
+// List of supported types by IOP type
 //
 // - List of supported types for MasticIopType.INTEGER
 QList<QMetaType::Type> MasticQuickAbstractIOPBinding::_supportedTypesForMasticIopTypeInteger = QList<QMetaType::Type>()
@@ -87,6 +89,7 @@ MasticQuickAbstractIOPBinding::MasticQuickAbstractIOPBinding(QObject *parent, bo
     _qmlPropertiesMustBeWritable(qmlPropertiesMustBeWritable)
 {
 }
+
 
 
 /**
@@ -460,6 +463,7 @@ QString MasticQuickAbstractIOPBinding::prettyPropertyTypeName(const QQmlProperty
 }
 
 
+
 /**
  * @brief Get the MasticIopType of a given property
  * @param property
@@ -662,6 +666,7 @@ void MasticQuickAbstractIOPBinding::clear()
  */
 void MasticQuickAbstractIOPBinding::connectOrDisconnectToMasticQuick()
 {
+    // Check if component is completed
     if (_isCompleted)
     {
         if (_when)
@@ -673,6 +678,7 @@ void MasticQuickAbstractIOPBinding::connectOrDisconnectToMasticQuick()
             _disconnectToMasticQuick();
         }
     }
+    // Else: our component is not completed, we do nothing to avoid useless computations
 }
 
 
@@ -710,6 +716,7 @@ void MasticQuickAbstractIOPBinding::_clearInternalData()
 void MasticQuickAbstractIOPBinding::_updateInternalData()
 {
 }
+
 
 
 /**

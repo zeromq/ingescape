@@ -127,6 +127,7 @@ ApplicationWindow {
         Mastic.createOutputDouble("y", 0);
 
         // MasticQuick API: start our Mastic agent
+        console.log("Starting Mastic on device " + root.masticNetworkDevice + " with port " + root.masticPort);
         Mastic.startWithDevice(root.masticNetworkDevice, root.masticPort);
     }
 
@@ -305,18 +306,16 @@ ApplicationWindow {
                 id: canvasMouseArea
 
                 anchors.fill: parent
+
+                // MasticQuick API: automatically bind QML signals to Mastic outputs
+                MasticOutputBinding {
+                    target: canvasMouseArea
+
+                    signalHandlers: "onClicked"
+
+                    outputsPrefix: "canvas_"
+                }
             }
-
-
-            // MasticQuick API: automatically bind QML signals to Mastic outputs
-            MasticOutputBinding {
-                target: canvasMouseArea
-
-                signalHandlers: "onClicked"
-
-                outputsPrefix: "canvas_"
-            }
-
 
 
             Image {
