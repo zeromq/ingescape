@@ -67,7 +67,7 @@ bool string_to_boolean(const char* str) {
         return false;
     
     fprintf(stderr, "%s - ERROR -  unknown string \"%s\" to convert\n", __FUNCTION__, str);
-    return -1;
+    return false;
 }
 
 const char* value_type_to_string (iopType_t type) {
