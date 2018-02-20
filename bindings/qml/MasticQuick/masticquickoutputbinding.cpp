@@ -499,7 +499,29 @@ void MasticQuickOutputBinding::_disconnectToMasticQuick()
  */
 void MasticQuickOutputBinding::_clearInternalData()
 {
+    //
     // Clear our additional data
+    //
+
+    // Check if we need to remove outputs
+    if (_removeOnUpdatesAndDestruction)
+    {
+        MasticQuick* masticQuick = MasticQuick::instance();
+        if (masticQuick != NULL)
+        {
+            for ( QPair<QString, MasticIopType::Value> masticOutputInfo : _masticOutputsByQmlProperty.values())
+            {
+                QString outputName = masticOutputInfo.first;
+
+                if (!masticQuick->removeOutput( outputName ))
+                {
+                    qmlWarning(this) << "failed to remove output " << outputName;
+                }
+            }
+        }
+    }
+
+    // Clear our hashtables
     _qmlPropertiesByNotifySignalIndex.clear();
     _masticOutputsByQmlProperty.clear();
 
@@ -537,7 +559,7 @@ void MasticQuickOutputBinding::_updateInternalData()
 
 
             // Try to create a Mastic input for each property
-            foreach(const QString propertyName, properties)
+            for (QString propertyName : properties)
             {
                 // Get our property
                 QQmlProperty property = _qmlPropertiesByName.value(propertyName);

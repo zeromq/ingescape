@@ -77,8 +77,11 @@ QList<QMetaType::Type> MasticQuickAbstractIOPBinding::_supportedTypesForMasticIo
  */
 MasticQuickAbstractIOPBinding::MasticQuickAbstractIOPBinding(QObject *parent, bool qmlPropertiesMustBeWritable)
     : QObject(parent),
+    // QML properties
     _target(NULL),
     _when(true),
+    _removeOnUpdatesAndDestruction(true),
+    // Protected properties
     _isCompleted(false),
     _isUsedAsQQmlPropertyValueSource(false),
     _qmlPropertiesMustBeWritable(qmlPropertiesMustBeWritable)
@@ -200,6 +203,24 @@ void MasticQuickAbstractIOPBinding::setwhen(bool value)
 
         // Notify change
         Q_EMIT whenChanged(value);
+    }
+}
+
+
+
+/**
+ * @brief Set if we need to remove inpiuts/outputs on updates and destruction
+ * @param value
+ */
+void MasticQuickAbstractIOPBinding::setremoveOnUpdatesAndDestruction(bool value)
+{
+    if (_removeOnUpdatesAndDestruction != value)
+    {
+        // Save our new value
+        _removeOnUpdatesAndDestruction = value;
+
+        // Notify change
+        Q_EMIT removeOnUpdatesAndDestructionChanged(value);
     }
 }
 

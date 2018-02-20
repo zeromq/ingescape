@@ -103,6 +103,7 @@ protected:
     void _updateInternalData() Q_DECL_OVERRIDE;
 
 
+
 protected:
      // Hashtable (Mastic input name, QML property)
      QHash<QString, QQmlProperty> _qmlPropertiesByMasticInputName;

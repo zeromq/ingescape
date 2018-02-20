@@ -42,6 +42,9 @@ class MasticQuickAbstractIOPBinding : public QObject, public QQmlPropertyValueSo
     // Flag indicating if our binding is active or not
     MASTIC_QML_PROPERTY_CUSTOM_SETTER(bool, when)
 
+    // Remove Mastic IOPs created by our component when needed i.e. when its properties are updated or when it is destroyed
+    MASTIC_QML_PROPERTY_CUSTOM_SETTER(bool, removeOnUpdatesAndDestruction)
+
 
 public:
     /**

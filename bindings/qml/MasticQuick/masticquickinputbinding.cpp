@@ -260,7 +260,27 @@ void MasticQuickInputBinding::_disconnectToMasticQuick()
  */
 void MasticQuickInputBinding::_clearInternalData()
 {
+    //
     // Clear our additional data
+    //
+
+    // Check if we need to remove inputs
+    if (_removeOnUpdatesAndDestruction)
+    {
+        MasticQuick* masticQuick = MasticQuick::instance();
+        if (masticQuick != NULL)
+        {
+            for (QString inputName : _qmlPropertiesByMasticInputName.keys())
+            {
+                if (!masticQuick->removeInput( inputName ))
+                {
+                    qmlWarning(this) << "failed to remove input " << inputName;
+                }
+            }
+        }
+    }
+
+    // Clear our hashtable
     _qmlPropertiesByMasticInputName.clear();
 }
 
@@ -287,7 +307,7 @@ void MasticQuickInputBinding::_updateInternalData()
             std::sort(properties.begin(), properties.end());
 
             // Try to create a Mastic input for each property
-            foreach(const QString propertyName, properties)
+            for (QString propertyName : properties)
             {
                 // Get our property
                 QQmlProperty property = _qmlPropertiesByName.value(propertyName);
