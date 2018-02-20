@@ -83,10 +83,6 @@ rotation: 10
 
             duration: 1000.0 * (to - from)/360.0
 
-            onDurationChanged: {
-                console.log("Duration "+duration)
-            }
-
             from: wheel.rotation
             to: 360
         }
