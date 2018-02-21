@@ -36,6 +36,8 @@ QList<QString> MasticQuickAbstractIOPBinding::_propertiesExcludedFromIntrospecti
 //
 QList<QString> MasticQuickAbstractIOPBinding::_signalHandlersExcludedFromIntrospection = QList<QString>()
         << "onDestroyed"
+        << "onImplicitWidthChanged2"
+        << "onImplicitHeightChanged2"
            ;
 
 
