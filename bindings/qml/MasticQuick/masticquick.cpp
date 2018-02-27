@@ -1054,34 +1054,6 @@ void MasticQuick::registerTypes(const char* uri)
 //-------------------------------------------------------------------
 
 
-/**
- * @brief Get our inputs property
- * @return
- */
-QQmlPropertyMap* MasticQuick::inputs() const
-{
-    return _inputs;
-}
-
-
-/**
- * @brief Get our outputs property
- * @return
- */
-QQmlPropertyMap* MasticQuick::outputs() const
-{
-    return _outputs;
-}
-
-
-/**
- * @brief Get our parameters property
- * @return
- */
-QQmlPropertyMap* MasticQuick::parameters() const
-{
-    return _parameters;
-}
 
 
 
@@ -2124,6 +2096,131 @@ bool MasticQuick::isOutputMuted(QString name, QVariant qmlUpdateExtraParameter)
 //
 //-------------------------------------------------------------------
 
+
+/**
+ * @brief Clear our definition (i.e. remove inputs, outputs, etc.)
+ * @return
+ */
+bool MasticQuick::clearDefinition()
+{
+    bool result = false;
+
+    if (mtic_clearDefinition() == 1)
+    {
+        //-------------------------------
+        //
+        // Clean-up internal data
+        //
+        //-------------------------------
+
+        // Clean-up inputs
+        if (_inputs != NULL)
+        {
+            // Save our previous value
+            QQmlPropertyMap* temp = _inputs;
+
+            // Create a new inputs map
+            setinputs( new MasticQuickInputsPropertyMap(this) );
+
+            // Clean-up our previous value
+            delete temp;
+        }
+        else
+        {
+            // Create a new inputs map
+            setinputs( new MasticQuickInputsPropertyMap(this) );
+        }
+        // NB: OR simply clear our property map ??
+
+
+        // Clean-up outputs
+        if (_outputs != NULL)
+        {
+            // Unsubscribe to signals
+            disconnect(_outputs, &QQmlPropertyMap::valueChanged, this, &MasticQuick::_onOutputUpdatedFromQML);
+
+            // Save our previous value
+            QQmlPropertyMap* temp = _outputs;
+
+            // Create a new outputs map
+            QQmlPropertyMap* newValue = new MasticQuickOutputsPropertyMap(this);
+            setoutputs( newValue );
+            if (newValue != NULL)
+            {
+                connect(newValue, &QQmlPropertyMap::valueChanged, this, &MasticQuick::_onOutputUpdatedFromQML);
+            }
+
+            // Clean-up our previous value
+            delete temp;
+        }
+        else
+        {
+            // Create a new outputs map
+            QQmlPropertyMap* newValue = new MasticQuickOutputsPropertyMap(this);
+            setoutputs( newValue );
+
+            if (newValue != NULL)
+            {
+                connect(newValue, &QQmlPropertyMap::valueChanged, this, &MasticQuick::_onOutputUpdatedFromQML);
+            }
+        }
+        // NB: OR simply clear our property map ??
+
+
+        // Clean-up parameters
+        if (_parameters != NULL)
+        {
+            // Unsubcribe to signals
+            disconnect(_parameters, &QQmlPropertyMap::valueChanged, this, &MasticQuick::_onParameterUpdatedFromQML);
+
+            // Save our previous value
+            QQmlPropertyMap* temp = _parameters;
+
+            // Create a new parameter map
+            QQmlPropertyMap* newValue = new MasticQuickParametersPropertyMap(this);
+            setparameters( newValue );
+            if (newValue != NULL)
+            {
+               connect(newValue, &QQmlPropertyMap::valueChanged, this, &MasticQuick::_onParameterUpdatedFromQML);
+            }
+
+            // Clean-up our previous value
+            delete temp;
+        }
+        else
+        {
+             // Create a new parameter map
+             QQmlPropertyMap* newValue = new MasticQuickParametersPropertyMap(this);
+             setparameters( newValue );
+             if (newValue != NULL)
+             {
+                connect(newValue, &QQmlPropertyMap::valueChanged, this, &MasticQuick::_onParameterUpdatedFromQML);
+             }
+        }
+        // NB: OR simply clear our property map ??
+
+
+        //
+        // Clean-up our simple lists
+        //
+        _inputsList.clear();
+        Q_EMIT inputsListChanged(_inputsList);
+        _outputsList.clear();
+        Q_EMIT outputsListChanged(_outputsList);
+        _parametersList.clear();
+        Q_EMIT parametersListChanged(_parametersList);
+
+
+        // Notify that our definition has been cleared
+        Q_EMIT definitionCleared();
+    }
+    else
+    {
+        qWarning() << "MasticQuick warning: failed to clear definition";
+    }
+
+    return result;
+}
 
 
 

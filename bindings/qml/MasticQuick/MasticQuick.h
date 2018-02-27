@@ -118,13 +118,13 @@ class MASTICQUICK_EXPORT MasticQuick : public QObject
     MASTIC_QML_PROPERTY_READONLY(QStringList, parametersList)
 
     // Inputs
-    Q_PROPERTY(QQmlPropertyMap* inputs READ inputs NOTIFY inputsChanged)
+    MASTIC_QML_PROPERTY_READONLY(QQmlPropertyMap*, inputs)
 
     // Outputs
-    Q_PROPERTY(QQmlPropertyMap* outputs READ outputs NOTIFY outputsChanged)
+    MASTIC_QML_PROPERTY_READONLY(QQmlPropertyMap*, outputs)
 
     // Parameters
-    Q_PROPERTY(QQmlPropertyMap* parameters READ parameters NOTIFY parametersChanged)
+    MASTIC_QML_PROPERTY_READONLY(QQmlPropertyMap*, parameters)
 
 
 
@@ -134,6 +134,7 @@ protected:
      * @param parent
      */
     explicit MasticQuick(QObject *parent = 0);
+
 
 
 public:
@@ -175,51 +176,8 @@ public:
      static void registerTypes(const char *uri = DEFAULT_MASTICQUICK_URI);
 
 
-public:
-    /**
-     * @brief Get our inputs property
-     * @return
-     */
-    QQmlPropertyMap* inputs() const;
-
-
-    /**
-     * @brief Get our outputs property
-     * @return
-     */
-    QQmlPropertyMap* outputs() const;
-
-
-    /**
-     * @brief Get our parameters property
-     * @return
-     */
-    QQmlPropertyMap* parameters() const;
-
-
 
 Q_SIGNALS:
-    /**
-     * @brief Call out our inputs property changes
-     * @param value
-     */
-    void inputsChanged(QQmlPropertyMap* value);
-
-
-    /**
-     * @brief Call out our outputs property changes
-     * @param value
-     */
-    void outputsChanged(QQmlPropertyMap* value);
-
-
-    /**
-     * @brief Call out our parameters property changes
-     * @param value
-     */
-    void parametersChanged(QQmlPropertyMap* value);
-
-
     /**
      * @brief Triggered when our agent is asked to stop on the network
      */
@@ -251,6 +209,13 @@ Q_SIGNALS:
      * @param value
      */
     void observeParameter(QString name, QVariant value);
+
+
+
+    /**
+     * @brief Triggered when our definition is cleared
+     */
+    void definitionCleared();
 
 
 
@@ -541,7 +506,11 @@ public Q_SLOTS:
 //
 //---------------------------------------------------
 public Q_SLOTS:
-
+    /**
+     * @brief Clear our definition (i.e. remove inputs, outputs, etc.)
+     * @return
+     */
+    bool clearDefinition();
 
 
 
@@ -1043,15 +1012,6 @@ protected Q_SLOTS:
 
 
 protected:
-     // Inputs
-     QQmlPropertyMap* _inputs;
-
-     // Outputs
-     QQmlPropertyMap* _outputs;
-
-     // Parameters
-     QQmlPropertyMap* _parameters;
-
      // Flag indicating if we need to update QML in observeOutput
      bool _observeOutputNeedToUpdateQML;
      QMutex _observeOutputNeedToUpdateQMLMutex;

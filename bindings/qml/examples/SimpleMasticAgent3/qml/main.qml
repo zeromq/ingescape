@@ -104,7 +104,6 @@ ApplicationWindow {
         // MasticQuick API: request outputs from mapped agents
         Mastic.requestOutputsFromMappedAgents = true;
 
-
         // MasticQuick API: list of inputs
         console.log("List of intputs:");
         var inputsList = Mastic.inputsList;
@@ -197,6 +196,9 @@ ApplicationWindow {
 
             Component.onCompleted: console.log("text completed")
         }
+
+
+
 
 
         //
