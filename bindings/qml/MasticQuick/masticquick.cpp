@@ -1054,34 +1054,6 @@ void MasticQuick::registerTypes(const char* uri)
 //-------------------------------------------------------------------
 
 
-/**
- * @brief Get our inputs property
- * @return
- */
-QQmlPropertyMap* MasticQuick::inputs() const
-{
-    return _inputs;
-}
-
-
-/**
- * @brief Get our outputs property
- * @return
- */
-QQmlPropertyMap* MasticQuick::outputs() const
-{
-    return _outputs;
-}
-
-
-/**
- * @brief Get our parameters property
- * @return
- */
-QQmlPropertyMap* MasticQuick::parameters() const
-{
-    return _parameters;
-}
 
 
 
@@ -1932,16 +1904,11 @@ MasticIopType::Value MasticQuick::getTypeForInput(QString name)
 
     if (!name.isEmpty())
     {
-        std::string stdName = name.toStdString();
-        const char* cName = stdName.c_str();
-        if (mtic_checkInputExistence(cName))
-        {
-            result = enumIopType_tToMasticIopType( mtic_getTypeForInput(cName) );
-        }
+        result = enumIopType_tToMasticIopType( mtic_getTypeForInput(name.toStdString().c_str()) );
     }
     else
     {
-        qWarning() << "MasticQuick warning: getTypeForInput() - name can not be empty";
+        qWarning() << "MasticQuick warning: getTypeForInput( name ) - name can not be empty";
     }
 
     return result;
@@ -1960,16 +1927,11 @@ MasticIopType::Value MasticQuick::getTypeForOutput(QString name)
 
     if (!name.isEmpty())
     {
-        std::string stdName = name.toStdString();
-        const char* cName = stdName.c_str();
-        if (mtic_checkOutputExistence(cName))
-        {
-            result = enumIopType_tToMasticIopType( mtic_getTypeForOutput(cName) );
-        }
+        result = enumIopType_tToMasticIopType( mtic_getTypeForOutput(name.toStdString().c_str()) );
     }
     else
     {
-        qWarning() << "MasticQuick warning: getTypeForOutput() - name can not be empty";
+        qWarning() << "MasticQuick warning: getTypeForOutput( name ) - name can not be empty";
     }
 
     return result;
@@ -1988,12 +1950,7 @@ MasticIopType::Value MasticQuick::getTypeForParameter(QString name)
 
     if (!name.isEmpty())
     {
-        std::string stdName = name.toStdString();
-        const char* cName = stdName.c_str();
-        if (mtic_checkParameterExistence(cName))
-        {
-            result = enumIopType_tToMasticIopType( mtic_getTypeForParameter(cName) );
-        }
+        result = enumIopType_tToMasticIopType( mtic_getTypeForParameter(name.toStdString().c_str()) );
     }
     else
     {
@@ -2139,6 +2096,131 @@ bool MasticQuick::isOutputMuted(QString name, QVariant qmlUpdateExtraParameter)
 //
 //-------------------------------------------------------------------
 
+
+/**
+ * @brief Clear our definition (i.e. remove inputs, outputs, etc.)
+ * @return
+ */
+bool MasticQuick::clearDefinition()
+{
+    bool result = false;
+
+    if (mtic_clearDefinition() == 1)
+    {
+        //-------------------------------
+        //
+        // Clean-up internal data
+        //
+        //-------------------------------
+
+        // Clean-up inputs
+        if (_inputs != NULL)
+        {
+            // Save our previous value
+            QQmlPropertyMap* temp = _inputs;
+
+            // Create a new inputs map
+            setinputs( new MasticQuickInputsPropertyMap(this) );
+
+            // Clean-up our previous value
+            delete temp;
+        }
+        else
+        {
+            // Create a new inputs map
+            setinputs( new MasticQuickInputsPropertyMap(this) );
+        }
+        // NB: OR simply clear our property map ??
+
+
+        // Clean-up outputs
+        if (_outputs != NULL)
+        {
+            // Unsubscribe to signals
+            disconnect(_outputs, &QQmlPropertyMap::valueChanged, this, &MasticQuick::_onOutputUpdatedFromQML);
+
+            // Save our previous value
+            QQmlPropertyMap* temp = _outputs;
+
+            // Create a new outputs map
+            QQmlPropertyMap* newValue = new MasticQuickOutputsPropertyMap(this);
+            setoutputs( newValue );
+            if (newValue != NULL)
+            {
+                connect(newValue, &QQmlPropertyMap::valueChanged, this, &MasticQuick::_onOutputUpdatedFromQML);
+            }
+
+            // Clean-up our previous value
+            delete temp;
+        }
+        else
+        {
+            // Create a new outputs map
+            QQmlPropertyMap* newValue = new MasticQuickOutputsPropertyMap(this);
+            setoutputs( newValue );
+
+            if (newValue != NULL)
+            {
+                connect(newValue, &QQmlPropertyMap::valueChanged, this, &MasticQuick::_onOutputUpdatedFromQML);
+            }
+        }
+        // NB: OR simply clear our property map ??
+
+
+        // Clean-up parameters
+        if (_parameters != NULL)
+        {
+            // Unsubcribe to signals
+            disconnect(_parameters, &QQmlPropertyMap::valueChanged, this, &MasticQuick::_onParameterUpdatedFromQML);
+
+            // Save our previous value
+            QQmlPropertyMap* temp = _parameters;
+
+            // Create a new parameter map
+            QQmlPropertyMap* newValue = new MasticQuickParametersPropertyMap(this);
+            setparameters( newValue );
+            if (newValue != NULL)
+            {
+               connect(newValue, &QQmlPropertyMap::valueChanged, this, &MasticQuick::_onParameterUpdatedFromQML);
+            }
+
+            // Clean-up our previous value
+            delete temp;
+        }
+        else
+        {
+             // Create a new parameter map
+             QQmlPropertyMap* newValue = new MasticQuickParametersPropertyMap(this);
+             setparameters( newValue );
+             if (newValue != NULL)
+             {
+                connect(newValue, &QQmlPropertyMap::valueChanged, this, &MasticQuick::_onParameterUpdatedFromQML);
+             }
+        }
+        // NB: OR simply clear our property map ??
+
+
+        //
+        // Clean-up our simple lists
+        //
+        _inputsList.clear();
+        Q_EMIT inputsListChanged(_inputsList);
+        _outputsList.clear();
+        Q_EMIT outputsListChanged(_outputsList);
+        _parametersList.clear();
+        Q_EMIT parametersListChanged(_parametersList);
+
+
+        // Notify that our definition has been cleared
+        Q_EMIT definitionCleared();
+    }
+    else
+    {
+        qWarning() << "MasticQuick warning: failed to clear definition";
+    }
+
+    return result;
+}
 
 
 
@@ -3723,111 +3805,107 @@ void MasticQuick::_onOutputUpdatedFromQML(const QString &key, const QVariant &va
         std::string stdName = key.toStdString();
         const char* cName = stdName.c_str();
 
-        // Ensure that this output exists
-        if (mtic_checkOutputExistence(cName))
+        // Get type of this output
+        iopType_t type = mtic_getTypeForOutput(cName);
+        switch(type)
         {
-            iopType_t type = mtic_getTypeForOutput(cName);
-
-            switch(type)
+            case INTEGER_T:
             {
-                case INTEGER_T:
-                    {
-                        bool ok = false;
-                        int cValue = value.toInt(&ok);
+                bool ok = false;
+                int cValue = value.toInt(&ok);
 
-                        if (ok)
-                        {
-                            _observeOutputNeedToUpdateQMLMutex.lock();
-                            _observeOutputNeedToUpdateQML = false;
+                if (ok)
+                {
+                    _observeOutputNeedToUpdateQMLMutex.lock();
+                    _observeOutputNeedToUpdateQML = false;
 
-                            mtic_writeOutputAsInt(cName, cValue);
+                    mtic_writeOutputAsInt(cName, cValue);
 
-                            _observeOutputNeedToUpdateQML = true;
-                            _observeOutputNeedToUpdateQMLMutex.unlock();
-                        }
-                        else
-                        {
-                            qWarning() << "MasticQuick warning: invalid value" << value
-                                       << "for Mastic output" << key << "with type INTEGER";
-                        }
-                    }
-                    break;
-
-
-                case DOUBLE_T:
-                    {
-                        bool ok = false;
-                        double cValue = value.toDouble(&ok);
-
-                        if (ok)
-                        {
-                            _observeOutputNeedToUpdateQMLMutex.lock();
-                            _observeOutputNeedToUpdateQML = false;
-
-                            mtic_writeOutputAsDouble(cName, cValue);
-
-                            _observeOutputNeedToUpdateQML = true;
-                            _observeOutputNeedToUpdateQMLMutex.unlock();
-                        }
-                        else
-                        {
-                            qWarning() << "MasticQuick warning: invalid value" << value
-                                       << "for Mastic output" << key << "with type DOUBLE";
-                        }
-                    }
-                    break;
-
-
-                case STRING_T:
-                    {
-                        _observeOutputNeedToUpdateQMLMutex.lock();
-                        _observeOutputNeedToUpdateQML = false;
-
-                        mtic_writeOutputAsString(cName, (char *)value.toString().toStdString().c_str());
-
-                        _observeOutputNeedToUpdateQML = true;
-                        _observeOutputNeedToUpdateQMLMutex.unlock();
-                    }
-                    break;
-
-
-                case BOOL_T:
-                    {
-                        _observeOutputNeedToUpdateQMLMutex.lock();
-                        _observeOutputNeedToUpdateQML = false;
-
-                        mtic_writeOutputAsBool(cName, value.toBool());
-
-                        _observeOutputNeedToUpdateQML = true;
-                        _observeOutputNeedToUpdateQMLMutex.unlock();
-                    }
-                    break;
-
-
-                case IMPULSION_T:
-                    {
-                        _observeOutputNeedToUpdateQMLMutex.lock();
-                        _observeOutputNeedToUpdateQML = false;
-
-                        mtic_writeOutputAsImpulsion(cName);
-
-                        _observeOutputNeedToUpdateQML = true;
-                        _observeOutputNeedToUpdateQMLMutex.unlock();
-                    }
-                    break;
-
-                case DATA_T:
-                    {
-                        qWarning() << "MasticQuick warning: can not update output" << key <<  "with type DATA (not yet implemented)";
-                    }
-                    break;
-
-                default:
-                    {
-                        qWarning() << "MasticQuick warning: unhandled output type. Can not update output" << key;
-                    }
-                    break;
+                    _observeOutputNeedToUpdateQML = true;
+                    _observeOutputNeedToUpdateQMLMutex.unlock();
+                }
+                else
+                {
+                    qWarning() << "MasticQuick warning: invalid value" << value
+                               << "for Mastic output" << key << "with type INTEGER";
+                }
             }
+            break;
+
+
+            case DOUBLE_T:
+            {
+                bool ok = false;
+                double cValue = value.toDouble(&ok);
+
+                if (ok)
+                {
+                    _observeOutputNeedToUpdateQMLMutex.lock();
+                    _observeOutputNeedToUpdateQML = false;
+
+                    mtic_writeOutputAsDouble(cName, cValue);
+
+                    _observeOutputNeedToUpdateQML = true;
+                    _observeOutputNeedToUpdateQMLMutex.unlock();
+                }
+                else
+                {
+                    qWarning() << "MasticQuick warning: invalid value" << value
+                               << "for Mastic output" << key << "with type DOUBLE";
+                }
+            }
+            break;
+
+
+            case STRING_T:
+            {
+                _observeOutputNeedToUpdateQMLMutex.lock();
+                _observeOutputNeedToUpdateQML = false;
+
+                mtic_writeOutputAsString(cName, (char *)value.toString().toStdString().c_str());
+
+                _observeOutputNeedToUpdateQML = true;
+                _observeOutputNeedToUpdateQMLMutex.unlock();
+            }
+            break;
+
+
+            case BOOL_T:
+            {
+                _observeOutputNeedToUpdateQMLMutex.lock();
+                _observeOutputNeedToUpdateQML = false;
+
+                mtic_writeOutputAsBool(cName, value.toBool());
+
+                _observeOutputNeedToUpdateQML = true;
+                _observeOutputNeedToUpdateQMLMutex.unlock();
+            }
+            break;
+
+
+            case IMPULSION_T:
+            {
+                _observeOutputNeedToUpdateQMLMutex.lock();
+                _observeOutputNeedToUpdateQML = false;
+
+                mtic_writeOutputAsImpulsion(cName);
+
+                _observeOutputNeedToUpdateQML = true;
+                _observeOutputNeedToUpdateQMLMutex.unlock();
+            }
+            break;
+
+            case DATA_T:
+            {
+                qWarning() << "MasticQuick warning: can not update output" << key <<  "with type DATA (not yet implemented)";
+            }
+            break;
+
+            default:
+            {
+                qWarning() << "MasticQuick warning: unhandled output type. Can not update output" << key;
+            }
+            break;
         }
     }
 }
@@ -3847,100 +3925,96 @@ void MasticQuick::_onParameterUpdatedFromQML(const QString &key, const QVariant 
         std::string stdName = key.toStdString();
         const char* cName = stdName.c_str();
 
-        // Ensure that this parameter exists
-        if (mtic_checkParameterExistence(cName))
+        // Get type of this parameter
+        iopType_t type = mtic_getTypeForParameter(cName);
+        switch(type)
         {
-            iopType_t type = mtic_getTypeForParameter(cName);
-
-            switch(type)
+            case INTEGER_T:
             {
-                case INTEGER_T:
-                    {
-                        bool ok = false;
-                        int cValue = value.toInt(&ok);
+                bool ok = false;
+                int cValue = value.toInt(&ok);
 
-                        if (ok)
-                        {
-                            _observeParameterNeedToUpdateQMLMutex.lock();
-                            _observeParameterNeedToUpdateQML = false;
+                if (ok)
+                {
+                    _observeParameterNeedToUpdateQMLMutex.lock();
+                    _observeParameterNeedToUpdateQML = false;
 
-                            mtic_writeParameterAsInt(cName, cValue);
+                    mtic_writeParameterAsInt(cName, cValue);
 
-                            _observeParameterNeedToUpdateQML = true;
-                            _observeParameterNeedToUpdateQMLMutex.unlock();
-                        }
-                        else
-                        {
-                            qWarning() << "MasticQuick warning: invalid value" << value
-                                       << "for Mastic parameter" << key << "with type INTEGER";
-                        }
-                    }
-                    break;
-
-
-                case DOUBLE_T:
-                    {
-                        bool ok = false;
-                        double cValue = value.toDouble(&ok);
-
-                        if (ok)
-                        {
-                            _observeParameterNeedToUpdateQMLMutex.lock();
-                            _observeParameterNeedToUpdateQML = false;
-
-                            mtic_writeParameterAsDouble(cName, cValue);
-
-                            _observeParameterNeedToUpdateQML = true;
-                            _observeParameterNeedToUpdateQMLMutex.unlock();
-                        }
-                        else
-                        {
-                            qWarning() << "MasticQuick warning: invalid value" << value
-                                       << "for Mastic parameter" << key << "with type DOUBLE";
-                        }
-                    }
-                    break;
-
-
-                case STRING_T:
-                    {
-                        _observeParameterNeedToUpdateQMLMutex.lock();
-                        _observeParameterNeedToUpdateQML = false;
-
-                        mtic_writeParameterAsString(cName, (char *)value.toString().toStdString().c_str());
-
-                        _observeParameterNeedToUpdateQML = true;
-                        _observeParameterNeedToUpdateQMLMutex.unlock();
-                    }
-                    break;
-
-
-                case BOOL_T:
-                    {
-                        _observeParameterNeedToUpdateQMLMutex.lock();
-                        _observeParameterNeedToUpdateQML = false;
-
-                        mtic_writeParameterAsBool(cName, value.toBool());
-
-                        _observeParameterNeedToUpdateQML = true;
-                        _observeParameterNeedToUpdateQMLMutex.unlock();
-                    }
-                    break;
-
-
-                case IMPULSION_T:
-                    {
-                        qWarning() << "MasticQuick warning: invalid parameter type IMPULSION. Can not update parameter" << key;
-                    }
-                    break;
-
-
-                default:
-                    {
-                        qWarning() << "MasticQuick warning: unhandled parameter type. Can not update parameter" << key;
-                    }
-                    break;
+                    _observeParameterNeedToUpdateQML = true;
+                    _observeParameterNeedToUpdateQMLMutex.unlock();
+                }
+                else
+                {
+                    qWarning() << "MasticQuick warning: invalid value" << value
+                               << "for Mastic parameter" << key << "with type INTEGER";
+                }
             }
+            break;
+
+
+            case DOUBLE_T:
+            {
+                bool ok = false;
+                double cValue = value.toDouble(&ok);
+
+                if (ok)
+                {
+                    _observeParameterNeedToUpdateQMLMutex.lock();
+                    _observeParameterNeedToUpdateQML = false;
+
+                    mtic_writeParameterAsDouble(cName, cValue);
+
+                    _observeParameterNeedToUpdateQML = true;
+                    _observeParameterNeedToUpdateQMLMutex.unlock();
+                }
+                else
+                {
+                    qWarning() << "MasticQuick warning: invalid value" << value
+                               << "for Mastic parameter" << key << "with type DOUBLE";
+                }
+            }
+            break;
+
+
+            case STRING_T:
+            {
+                _observeParameterNeedToUpdateQMLMutex.lock();
+                _observeParameterNeedToUpdateQML = false;
+
+                mtic_writeParameterAsString(cName, (char *)value.toString().toStdString().c_str());
+
+                _observeParameterNeedToUpdateQML = true;
+                _observeParameterNeedToUpdateQMLMutex.unlock();
+            }
+            break;
+
+
+            case BOOL_T:
+            {
+                _observeParameterNeedToUpdateQMLMutex.lock();
+                _observeParameterNeedToUpdateQML = false;
+
+                mtic_writeParameterAsBool(cName, value.toBool());
+
+                _observeParameterNeedToUpdateQML = true;
+                _observeParameterNeedToUpdateQMLMutex.unlock();
+            }
+            break;
+
+
+            case IMPULSION_T:
+            {
+                qWarning() << "MasticQuick warning: invalid parameter type IMPULSION. Can not update parameter" << key;
+            }
+            break;
+
+
+            default:
+            {
+                qWarning() << "MasticQuick warning: unhandled parameter type. Can not update parameter" << key;
+            }
+            break;
         }
     }
 }
