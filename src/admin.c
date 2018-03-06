@@ -43,6 +43,10 @@ static int nb_of_entries = 0; //for fflush rotation
 #if defined(__unix__) || defined(__unix) || \
 (defined(__APPLE__) && defined(__MACH__))
 pthread_mutex_t *lock = NULL;
+#else
+#define W_OK 02
+#define pthread_mutex_t HANDLE
+pthread_mutex_t *lock = NULL;
 #endif
 
 static const char *log_levels[] = {
@@ -56,41 +60,65 @@ static const char *log_colors[] = {
 // INTERNAL FUNCTIONS
 ////////////////////////////////////////////////////////////////////////
 
-#ifdef WIN32
-    #define W_OK 02
-    //cf : https://stackoverflow.com/questions/10905892/equivalent-of-gettimeday-for-windows
-    int gettimeofday(struct timeval * tp, struct timezone * tzp)
-        {
-            // Note: some broken versions only have 8 trailing zero's, the correct epoch has 9 trailing zero's
-            // This magic number is the number of 100 nanosecond intervals since January 1, 1601 (UTC)
-            // until 00:00:00 January 1, 1970
-            static const uint64_t EPOCH = ((uint64_t) 116444736000000000ULL);
+#if defined(_WIN32)
+    int gettimeofday(struct timeval* p, void* tz) {
+        ULARGE_INTEGER ul; // As specified on MSDN.
+        FILETIME ft;
 
-            SYSTEMTIME  system_time;
-            FILETIME    file_time;
-            uint64_t    time;
+        // Returns a 64-bit value representing the number of
+        // 100-nanosecond intervals since January 1, 1601 (UTC).
+        GetSystemTimeAsFileTime(&ft);
 
-            GetSystemTime( &system_time );
-            SystemTimeToFileTime( &system_time, &file_time );
-            time =  ((uint64_t)file_time.dwLowDateTime )      ;
-            time += ((uint64_t)file_time.dwHighDateTime) << 32;
+        // Fill ULARGE_INTEGER low and high parts.
+        ul.LowPart = ft.dwLowDateTime;
+        ul.HighPart = ft.dwHighDateTime;
+        // Convert to microseconds.
+        ul.QuadPart /= 10ULL;
+        // Remove Windows to UNIX Epoch delta.
+        ul.QuadPart -= 11644473600000000ULL;
+        // Modulo to retrieve the microseconds.
+        p->tv_usec = (long) (ul.QuadPart % 1000000LL);
+        // Divide to retrieve the seconds.
+        p->tv_sec = (long) (ul.QuadPart / 1000000LL);
 
-            tp->tv_sec  = (long) ((time - EPOCH) / 10000000L);
-            tp->tv_usec = (long) (system_time.wMilliseconds * 1000);
-            return 0;
+        return 0;
+    }
+
+    int pthread_mutex_init(pthread_mutex_t *mutex)
+    {
+        mutex=CreateMutex(NULL,FALSE, NULL);
+        if (mutex==NULL) return 1; else return 0;
+    }
+    int pthread_mutex_lock(pthread_mutex_t *mutex)
+    {
+        while (OpenMutex(MUTEX_ALL_ACCESS,FALSE,NULL)==NULL) {
+                WaitForSingleObject(mutex,INFINITE);
         }
-#else
-
+        return 0;
+    }
+    int pthread_mutex_unlock(pthread_mutex_t *mutex)
+    {
+        ReleaseMutex(*mutex);
+        return 0;
+    }
 #endif
 
-void admin_computeTime(char *dest)
-{
+void admin_computeTime(char *dest){
+#if defined(_WIN32)
     struct timeval tick;
     gettimeofday(&tick, NULL);
-      struct tm *tm = localtime(&tick.tv_sec);
+    time_t t = tick.tv_sec;
+    struct tm *tm = localtime(&t);
+    snprintf(dest,128,"%02d/%02d/%d;%02d:%02d:%02d.%06ld",
+             tm->tm_mday, tm->tm_mon + 1, tm->tm_year + 1900, tm->tm_hour, tm->tm_min, tm->tm_sec, tick.tv_usec);
+#else
+   struct timeval tick;
+    gettimeofday(&tick, NULL);
+    struct tm *tm = localtime(&tick.tv_sec);
     snprintf(dest,128,"%02d/%02d/%d;%02d:%02d:%02d.%06d",
              tm->tm_mday, tm->tm_mon + 1, tm->tm_year + 1900, tm->tm_hour, tm->tm_min, tm->tm_sec, tick.tv_usec);
-}
+#endif
+    }
 
 void admin_makeFilePath(const char *from, char *to, size_t size_of_to)
 {
@@ -123,6 +151,14 @@ void admin_lock(void)   {
         }
     }
     pthread_mutex_lock(lock);
+#else
+    if (lock == NULL){
+        if (pthread_mutex_init(lock) != 0)
+        {
+            printf("error: mutex init failed\n");
+            return;
+        }
+    }
 #endif
 }
 
@@ -130,6 +166,10 @@ void admin_unlock(void) {
     //TODO: see what to do for Windows
 #if defined(__unix__) || defined(__unix) || \
 (defined(__APPLE__) && defined(__MACH__))
+    if (lock != NULL){
+        pthread_mutex_unlock(lock);
+    }
+#else
     if (lock != NULL){
         pthread_mutex_unlock(lock);
     }
@@ -152,12 +192,12 @@ int mtic_version(void){
 
 void mtic_log(mtic_logLevel_t level, const char *fmt, ...){
     admin_lock();
-    
+
     va_list list;
     va_start(list, fmt);
     vsnprintf(logContent, 2047, fmt, list);
     va_end(list);
-    
+
     if (logInFile){
         //create default path if current is empty
         if (strlen(logFile) == 0){
@@ -178,8 +218,11 @@ void mtic_log(mtic_logLevel_t level, const char *fmt, ...){
         }
         if (access(logFile, W_OK) == -1){
             printf("creating log file: %s\n", logFile);
+#if defined(__unix__) || defined(__unix) || \
+    (defined(__APPLE__) && defined(__MACH__))
             fclose(fp);
             fp = NULL;
+#endif
         }
         if (fp == NULL){
             fp = fopen (logFile,"a");
@@ -205,7 +248,7 @@ void mtic_log(mtic_logLevel_t level, const char *fmt, ...){
         zstr_sendf(agentElements->logger, "%s;%s", log_levels[level], logContent);
     }
     admin_unlock();
-    
+
 }
 
 void mtic_setLogLevel (mtic_logLevel_t level){
