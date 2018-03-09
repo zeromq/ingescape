@@ -61,8 +61,17 @@ void MasticQuickInputBinding::setinputsPrefix(QString value)
         // Save our new value
         _inputsPrefix = value;
 
-        // Update our component
-        update();
+        // Check if we can use this value
+        if (!_isUsedAsQQmlPropertyValueSource)
+        {
+            // Update our component
+            update();
+        }
+        else
+        {
+            qmlWarning(this) << "'inputsPrefix' can not be set when our item is used as a property value source (invalid value: '"
+                              << _inputsPrefix << "' )";
+        }
 
         // Notify change
         Q_EMIT inputsPrefixChanged(value);
@@ -82,8 +91,17 @@ void MasticQuickInputBinding::setinputsSuffix(QString value)
         // Save our new value
         _inputsSuffix = value;
 
-        // Update our component
-        update();
+        // Check if we can use this value
+        if (!_isUsedAsQQmlPropertyValueSource)
+        {
+            // Update our component
+            update();
+        }
+        else
+        {
+            qmlWarning(this) << "'inputsSuffix' can not be set when our item is used as a property value source (invalid value: '"
+                              << _inputsSuffix << "' )";
+        }
 
         // Notify change
         Q_EMIT inputsSuffixChanged(value);
@@ -105,8 +123,17 @@ void MasticQuickInputBinding::setinputName(QString value)
         // Save our new value
         _inputName = value;
 
-        // Update our component
-        update();
+        // Check if we can use this value
+        if (_isUsedAsQQmlPropertyValueSource || !_isCompleted)
+        {
+            // Update our component
+            update();
+        }
+        else
+        {
+            qmlWarning(this) << "'inputName' can not be set when our item is not used as a property value source (invalid value: '"
+                              << _inputName << "' )";
+        }
 
         // Notify change
         Q_EMIT inputNameChanged(value);
@@ -159,6 +186,46 @@ void MasticQuickInputBinding::_onMasticObserveInput(QString name, QVariant value
 
 
 /**
+ * @brief QQmlParserStatus API: Invoked after the root component that caused this instantiation has completed construction.
+ *        At this point all static values and binding values have been assigned to the class.
+ */
+void MasticQuickInputBinding::componentComplete()
+{
+    // Check if everything is ok
+    if (_isUsedAsQQmlPropertyValueSource)
+    {
+        // Check if "inputsPrefix" is empty
+        if (!_inputsPrefix.isEmpty())
+        {
+            qmlWarning(this) << "'inputsPrefix' can not be set when our item is used as a property value source (invalid value: '"
+                             << _inputsPrefix << "' )";
+        }
+
+        // Check if "inputsSuffix" is empty
+        if (!_inputsSuffix.isEmpty())
+        {
+            qmlWarning(this) << "'inputsSuffix' can not be set when our item is used as a property value source (invalid value: '"
+                             << _inputsSuffix << "' )";
+        }
+    }
+    else
+    {
+        // Check if "inputName" is empty
+        if (!_inputName.isEmpty())
+        {
+            qmlWarning(this) << "'inputName' can not be set when our item is not used as a property value source (invalid value: '"
+                             << _inputName << "' )";
+        }
+    }
+
+    // Call method of our parent class
+    MasticQuickAbstractIOPBinding::componentComplete();
+}
+
+
+
+
+/**
  * @brief Connect to MasticQuick
  */
 void MasticQuickInputBinding::_connectToMasticQuick()
@@ -193,7 +260,31 @@ void MasticQuickInputBinding::_disconnectToMasticQuick()
  */
 void MasticQuickInputBinding::_clearInternalData()
 {
+    //
     // Clear our additional data
+    //
+
+    // Check if we need to remove inputs
+    if (_removeOnUpdatesAndDestruction)
+    {
+        MasticQuick* masticQuick = MasticQuick::instance();
+        if (masticQuick != NULL)
+        {
+            for (QString inputName : _qmlPropertiesByMasticInputName.keys())
+            {
+                if (!inputName.isEmpty())
+                {
+                    if (!masticQuick->removeInput( inputName ))
+                    {
+                        qmlWarning(this) << "failed to remove input " << inputName;
+                    }
+                }
+                // Else: should not happen. Otherwise, it means that we have stored an invalid data
+            }
+        }
+    }
+
+    // Clear our hashtable
     _qmlPropertiesByMasticInputName.clear();
 }
 
@@ -210,21 +301,38 @@ void MasticQuickInputBinding::_updateInternalData()
         MasticQuick* masticQuick = MasticQuick::instance();
         if (masticQuick != NULL)
         {
+            // Trim prefix, suffix, inputName
+            QString prefix = _inputsPrefix.trimmed();
+            QString suffix = _inputsSuffix.trimmed();
+            QString inputName = _inputName.trimmed();
+
+            // Sort properties
+            QList<QString> properties = _qmlPropertiesByName.keys();
+            std::sort(properties.begin(), properties.end());
+
             // Try to create a Mastic input for each property
-            foreach(const QString propertyName, _qmlPropertiesByName.keys())
+            for (QString propertyName : properties)
             {
                 // Get our property
                 QQmlProperty property = _qmlPropertiesByName.value(propertyName);
 
                 // Name of our Mastic input
-                QString masticInputName = _inputsPrefix + propertyName + _inputsSuffix;
+                QString masticInputName;
+                if (_isUsedAsQQmlPropertyValueSource)
+                {
+                    masticInputName = (inputName.isEmpty() ? propertyName : inputName);
+                }
+                else
+                {
+                    masticInputName = prefix + propertyName + suffix;
+                }
 
                 // Get MasticIOP type
                 MasticIopType::Value masticIopType = getMasticIOPTypeForProperty(property);
 
                 // Try to build a Mastic input
                 bool succeeded = false;
-                switch(masticIopType)
+                switch (masticIopType)
                 {
                     case MasticIopType::INVALID:
                         // Should not happen because we should have filter invalid properties
@@ -244,7 +352,12 @@ void MasticQuickInputBinding::_updateInternalData()
                             }
 
                             // Try to create a Mastic input
-                            succeeded = masticQuick->createInputInt(masticInputName, cValue);
+                            QString warning;
+                            succeeded = masticQuick->createInputInt(masticInputName, cValue, &warning);
+                            if (succeeded && !warning.isEmpty())
+                            {
+                                qmlWarning(this) << warning;
+                            }
                         }
                         break;
 
@@ -262,7 +375,12 @@ void MasticQuickInputBinding::_updateInternalData()
                             }
 
                             // Try to create a Mastic input
-                            succeeded = masticQuick->createInputDouble(masticInputName, cValue);
+                            QString warning;
+                            succeeded = masticQuick->createInputDouble(masticInputName, cValue, &warning);
+                            if (succeeded && !warning.isEmpty())
+                            {
+                                qmlWarning(this) << warning;
+                            }
                         }
                         break;
 
@@ -272,7 +390,12 @@ void MasticQuickInputBinding::_updateInternalData()
                             QVariant qmlValue = property.read();
 
                             // Try to create a Mastic input
-                            succeeded = masticQuick->createInputString(masticInputName, qmlValue.toString());
+                            QString warning;
+                            succeeded = masticQuick->createInputString(masticInputName, qmlValue.toString(), &warning);
+                            if (succeeded && !warning.isEmpty())
+                            {
+                                qmlWarning(this) << warning;
+                            }
                         }
                         break;
 
@@ -282,7 +405,12 @@ void MasticQuickInputBinding::_updateInternalData()
                             QVariant qmlValue = property.read();
 
                             // Try to create a Mastic input
-                            succeeded = masticQuick->createInputBool(masticInputName, qmlValue.toBool());
+                            QString warning;
+                            succeeded = masticQuick->createInputBool(masticInputName, qmlValue.toBool(), &warning);
+                            if (succeeded && !warning.isEmpty())
+                            {
+                                qmlWarning(this) << warning;
+                            }
                         }
                         break;
 
@@ -292,7 +420,13 @@ void MasticQuickInputBinding::_updateInternalData()
 
                     case MasticIopType::DATA:
                         {
-                            succeeded = masticQuick->createInputData(masticInputName, NULL);
+                            // Try to create a Mastic input
+                            QString warning;
+                            succeeded = masticQuick->createInputData(masticInputName, NULL, &warning);
+                            if (succeeded && !warning.isEmpty())
+                            {
+                                qmlWarning(this) << warning;
+                            }
                         }
                         break;
 

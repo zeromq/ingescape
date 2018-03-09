@@ -118,13 +118,13 @@ class MASTICQUICK_EXPORT MasticQuick : public QObject
     MASTIC_QML_PROPERTY_READONLY(QStringList, parametersList)
 
     // Inputs
-    Q_PROPERTY(QQmlPropertyMap* inputs READ inputs NOTIFY inputsChanged)
+    MASTIC_QML_PROPERTY_READONLY(QQmlPropertyMap*, inputs)
 
     // Outputs
-    Q_PROPERTY(QQmlPropertyMap* outputs READ outputs NOTIFY outputsChanged)
+    MASTIC_QML_PROPERTY_READONLY(QQmlPropertyMap*, outputs)
 
     // Parameters
-    Q_PROPERTY(QQmlPropertyMap* parameters READ parameters NOTIFY parametersChanged)
+    MASTIC_QML_PROPERTY_READONLY(QQmlPropertyMap*, parameters)
 
 
 
@@ -134,6 +134,7 @@ protected:
      * @param parent
      */
     explicit MasticQuick(QObject *parent = 0);
+
 
 
 public:
@@ -148,7 +149,8 @@ public:
      * @brief Get our singleton instance
      * @return
      *
-     * @remark Our singleton is owned by the QML engine. Thus, it is unsafe to keep a reference that points to it
+     * @remark Our singleton is owned by the QML engine.
+     *         Thus, it is unsafe to keep a reference that points to it if you don't subscribe to is destroyed() signal
      */
     static MasticQuick* instance();
 
@@ -166,56 +168,16 @@ public:
 
      /**
       * @brief Register new QML types
+      *
       * @param uri
+      *
+      * @remark You MUST call this method if you don't use MasticQuick as a QML plugin
       */
      static void registerTypes(const char *uri = DEFAULT_MASTICQUICK_URI);
 
 
-public:
-    /**
-     * @brief Get our inputs property
-     * @return
-     */
-    QQmlPropertyMap* inputs() const;
-
-
-    /**
-     * @brief Get our outputs property
-     * @return
-     */
-    QQmlPropertyMap* outputs() const;
-
-
-    /**
-     * @brief Get our parameters property
-     * @return
-     */
-    QQmlPropertyMap* parameters() const;
-
-
 
 Q_SIGNALS:
-    /**
-     * @brief Call out our inputs property changes
-     * @param value
-     */
-    void inputsChanged(QQmlPropertyMap* value);
-
-
-    /**
-     * @brief Call out our outputs property changes
-     * @param value
-     */
-    void outputsChanged(QQmlPropertyMap* value);
-
-
-    /**
-     * @brief Call out our parameters property changes
-     * @param value
-     */
-    void parametersChanged(QQmlPropertyMap* value);
-
-
     /**
      * @brief Triggered when our agent is asked to stop on the network
      */
@@ -247,6 +209,13 @@ Q_SIGNALS:
      * @param value
      */
     void observeParameter(QString name, QVariant value);
+
+
+
+    /**
+     * @brief Triggered when our definition is cleared
+     */
+    void definitionCleared();
 
 
 
@@ -537,7 +506,11 @@ public Q_SLOTS:
 //
 //---------------------------------------------------
 public Q_SLOTS:
-
+    /**
+     * @brief Clear our definition (i.e. remove inputs, outputs, etc.)
+     * @return
+     */
+    bool clearDefinition();
 
 
 
@@ -552,10 +525,11 @@ public Q_SLOTS:
       *
       * @param name
       * @param value
+      * @param warning Warning message if something went wrong
       *
       * @return true if an input is created or already exists with the same type, false otherwise
       */
-     bool createInputInt(QString name, int value = 0);
+     bool createInputInt(QString name, int value = 0, QString* warning = NULL);
 
 
 
@@ -564,10 +538,11 @@ public Q_SLOTS:
       *
       * @param name
       * @param value
+      * @param warning Warning message if something went wrong
       *
       * @return true if an input is created or already exists with the same type, false otherwise
       */
-     bool createInputDouble(QString name, double value = 0.0);
+     bool createInputDouble(QString name, double value = 0.0, QString* warning = NULL);
 
 
 
@@ -576,10 +551,11 @@ public Q_SLOTS:
       *
       * @param name
       * @param value
+      * @param warning Warning message if something went wrong
       *
       * @return true if an input is created or already exists with the same type, false otherwise
       */
-     bool createInputString(QString name, QString value = "");
+     bool createInputString(QString name, QString value = "", QString* warning = NULL);
 
 
 
@@ -588,10 +564,11 @@ public Q_SLOTS:
       *
       * @param name
       * @param value
+      * @param warning Warning message if something went wrong
       *
       * @return true if an input is created or already exists with the same type, false otherwise
       */
-     bool createInputBool(QString name, bool value = false);
+     bool createInputBool(QString name, bool value = false, QString* warning = NULL);
 
 
 
@@ -599,10 +576,11 @@ public Q_SLOTS:
       * @brief Create a new impulsion input
       *
       * @param name
+      * @param warning Warning message if something went wrong
       *
       * @return true if an input is created or already exists with the same type, false otherwise
       */
-     bool createInputImpulsion(QString name);
+     bool createInputImpulsion(QString name, QString* warning = NULL);
 
 
 
@@ -611,10 +589,11 @@ public Q_SLOTS:
       *
       * @param name
       * @param value
+      * @param warning Warning message if something went wrong
       *
       * @return true if an input is created or already exists with the same type, false otherwise
       */
-     bool createInputData(QString name, void* value = NULL);
+     bool createInputData(QString name, void* value = NULL, QString* warning = NULL);
 
 
 
@@ -623,10 +602,11 @@ public Q_SLOTS:
       *
       * @param name
       * @param value
+      * @param warning Warning message if something went wrong
       *
       * @return true if an output is created or already exists with the same type, false otherwise
       */
-     bool createOutputInt(QString name, int value = 0);
+     bool createOutputInt(QString name, int value = 0, QString* warning = NULL);
 
 
 
@@ -635,10 +615,11 @@ public Q_SLOTS:
       *
       * @param name
       * @param value
+      * @param warning Warning message if something went wrong
       *
       * @return true if an output is created or already exists with the same type, false otherwise
       */
-     bool createOutputDouble(QString name, double value = 0.0);
+     bool createOutputDouble(QString name, double value = 0.0, QString* warning = NULL);
 
 
 
@@ -647,10 +628,11 @@ public Q_SLOTS:
       *
       * @param name
       * @param value
+      * @param warning Warning message if something went wrong
       *
       * @return true if an output is created or already exists with the same type, false otherwise
       */
-     bool createOutputString(QString name, QString value = "");
+     bool createOutputString(QString name, QString value = "", QString* warning = NULL);
 
 
 
@@ -659,10 +641,11 @@ public Q_SLOTS:
       *
       * @param name
       * @param value
+      * @param warning Warning message if something went wrong
       *
       * @return true if an output is created or already exists with the same type, false otherwise
       */
-     bool createOutputBool(QString name, bool value = false);
+     bool createOutputBool(QString name, bool value = false, QString* warning = NULL);
 
 
 
@@ -670,10 +653,11 @@ public Q_SLOTS:
       * @brief Create a new impulsion output
       *
       * @param name
+      * @param warning Warning message if something went wrong
       *
       * @return true if an output is created or already exists with the same type, false otherwise
       */
-     bool createOutputImpulsion(QString name);
+     bool createOutputImpulsion(QString name, QString* warning = NULL);
 
 
 
@@ -682,10 +666,11 @@ public Q_SLOTS:
       *
       * @param name
       * @param value
+      * @param warning Warning message if something went wrong
       *
       * @return true if an output is created or already exists with the same type, false otherwise
       */
-     bool createOutputData(QString name, void* value = NULL);
+     bool createOutputData(QString name, void* value = NULL, QString* warning = NULL);
 
 
 
@@ -694,10 +679,11 @@ public Q_SLOTS:
       *
       * @param name
       * @param value
+      * @param warning Warning message if something went wrong
       *
       * @return true if a parameter is created or already exists with the same type, false otherwise
       */
-     bool createParameterInt(QString name, int value = 0);
+     bool createParameterInt(QString name, int value = 0, QString* warning = NULL);
 
 
 
@@ -706,10 +692,11 @@ public Q_SLOTS:
       *
       * @param name
       * @param value
+      * @param warning Warning message if something went wrong
       *
       * @return true if a parameter is created or already exists with the same type, false otherwise
       */
-     bool createParameterDouble(QString name, double value = 0.0);
+     bool createParameterDouble(QString name, double value = 0.0, QString* warning = NULL);
 
 
 
@@ -718,10 +705,11 @@ public Q_SLOTS:
       *
       * @param name
       * @param value
+      * @param warning Warning message if something went wrong
       *
       * @return true if a parameter is created or already exists with the same type, false otherwise
       */
-     bool createParameterString(QString name, QString value = "");
+     bool createParameterString(QString name, QString value = "", QString* warning = NULL);
 
 
 
@@ -730,10 +718,11 @@ public Q_SLOTS:
       *
       * @param name
       * @param value
+      * @param warning Warning message if something went wrong
       *
       * @return true if a parameter is created or already exists with the same type, false otherwise
       */
-     bool createParameterBool(QString name, bool value = false);
+     bool createParameterBool(QString name, bool value = false, QString* warning = NULL);
 
 
 
@@ -742,10 +731,11 @@ public Q_SLOTS:
       *
       * @param name
       * @param value
+      * @param warning Warning message if something went wrong
       *
       * @return true if a parameter is created or already exists with the same type, false otherwise
       */
-     bool createParameterData(QString name, void* value = NULL);
+     bool createParameterData(QString name, void* value = NULL, QString* warning = NULL);
 
 
 
@@ -908,13 +898,17 @@ public:
 
 
      /**
-      * @brief _internal_tryToCreateInput
-      * @param name
-      * @param type
-      * @param qmlValue
+      * @brief Check if we need to update QML in our observeOuput callback
+      * @return
       */
-     void _internal_tryToCreateInput(QString name, MasticIopType::Value type, QVariant qmlValue);
+     bool _internal_needsToUpdateQmlInObserveOutput();
 
+
+     /**
+      * @brief Check if we need to update QML in our observeParameter callback
+      * @return
+      */
+     bool _internal_needsToUpdateQmlInObserveParameter();
 
 
 //---------------------------------------------------
@@ -931,10 +925,11 @@ protected:
       * @param qmlValue
       * @param cValue
       * @param cSize
+      * @param warning Warning message if something went wrong
       *
       * @return true if an input is created or already exists with the same type, false otherwise
       */
-     bool _createInput(QString name, MasticIopType::Value type, QVariant qmlValue, void* cValue, long cSize);
+     bool _createInput(QString name, MasticIopType::Value type, QVariant qmlValue, void* cValue, long cSize, QString* warning);
 
 
 
@@ -946,10 +941,11 @@ protected:
       * @param qmlValue
       * @param cValue
       * @param cSize
+      * @param warning Warning message if something went wrong
       *
       * @return true if an output is created or already exists with the same type, false otherwise
       */
-     bool _createOutput(QString name, MasticIopType::Value type, QVariant qmlValue, void* cValue, long cSize);
+     bool _createOutput(QString name, MasticIopType::Value type, QVariant qmlValue, void* cValue, long cSize, QString* warning);
 
 
 
@@ -961,10 +957,11 @@ protected:
       * @param qmlValue
       * @param cValue
       * @param cSize
+      * @param warning Warning message if something went wrong
       *
       * @return true if a parameter is created or already exists with the same type, false otherwise
       */
-     bool _createParameter(QString name, MasticIopType::Value type, QVariant qmlValue, void* cValue, long cSize);
+     bool _createParameter(QString name, MasticIopType::Value type, QVariant qmlValue, void* cValue, long cSize, QString* warning);
 
 
 
@@ -1002,7 +999,7 @@ protected Q_SLOTS:
       * @param key
       * @param value
       */
-     void _onOutputUpdatedFromFromQML(const QString &key, const QVariant &value);
+     void _onOutputUpdatedFromQML(const QString &key, const QVariant &value);
 
 
 
@@ -1011,18 +1008,17 @@ protected Q_SLOTS:
       * @param key
       * @param value
       */
-     void _onParameterUpdatedFromFromQML(const QString &key, const QVariant &value);
+     void _onParameterUpdatedFromQML(const QString &key, const QVariant &value);
 
 
 protected:
-     // Inputs
-     QQmlPropertyMap* _inputs;
+     // Flag indicating if we need to update QML in observeOutput
+     bool _observeOutputNeedToUpdateQML;
+     QMutex _observeOutputNeedToUpdateQMLMutex;
 
-     // Outputs
-     QQmlPropertyMap* _outputs;
-
-     // Parameters
-     QQmlPropertyMap* _parameters;
+     // Flag indicating if we need to update QML in observeParameter
+     bool _observeParameterNeedToUpdateQML;
+     QMutex _observeParameterNeedToUpdateQMLMutex;
 };
 
 QML_DECLARE_TYPE(MasticQuick)

@@ -99,6 +99,11 @@ int main(int argc, char *argv[])
     // Load our main QML file
     //
     engine.load(QUrl(QStringLiteral("qrc:/qml/main.qml")));
+    if (engine.rootObjects().isEmpty())
+    {
+        qWarning() << "Failed to load QML main file";
+        return -1;
+    }
 
 
     //------------------------------

@@ -121,11 +121,13 @@ ApplicationWindow {
         Mastic.createInputString("canvasColor", canvas.color);
         Mastic.createInputImpulsion("impulsion");
 
+
         // MasticQuick API: create outputs
         Mastic.createOutputDouble("x", 0);
         Mastic.createOutputDouble("y", 0);
 
         // MasticQuick API: start our Mastic agent
+        console.log("Starting Mastic on device " + root.masticNetworkDevice + " with port " + root.masticPort);
         Mastic.startWithDevice(root.masticNetworkDevice, root.masticPort);
     }
 
@@ -294,8 +296,25 @@ ApplicationWindow {
             // MasticQuick API: simple binding to subscribe to a Mastic input
             color: Mastic.inputs.canvasColor
 
+
             Behavior on color {
                 ColorAnimation {}
+            }
+
+
+            MouseArea {
+                id: canvasMouseArea
+
+                anchors.fill: parent
+
+                // MasticQuick API: automatically bind QML signals to Mastic outputs
+                MasticOutputBinding {
+                    target: canvasMouseArea
+
+                    signalHandlers: "onClicked"
+
+                    outputsPrefix: "canvas_"
+                }
             }
 
 
@@ -310,40 +329,36 @@ ApplicationWindow {
 
 
                 // MasticQuick API: automatically bind a QML property to a Mastic input
-                // here, the 'source' property will be binded to a Mastic input named 'image_source'
+                // here, the 'source' property will be binded to a Mastic input named 'imageSource'
                 MasticInputBinding on source {
-                    inputsPrefix: "image_"
-
+                    inputName: "imageSource"
                 }
+
 
                 // MasticQuick API: automatically bind a QML property to a Mastic input
-                // here, the 'rotation' property will be binded to a Mastic input named 'image_rotation_in_degrees'
+                // here, the 'rotation' property will be binded to a Mastic input named 'imageRotationInDegrees'
                 MasticInputBinding on rotation {
-                    inputsPrefix: "image_"
-                    inputsSuffix: "_in_degrees"
-
+                    inputName: "imageRotationInDegrees"
                 }
 
                 // MasticQuick API: automatically bind a Mastic output to a QML property
-                // here, the 'opacityInPercent' property be binded to a Mastic inputnamed 'image_opacityInPercent'
+                // here, the 'opacityInPercent' property be binded to a Mastic input named 'imageOpacityInPercent'
                 MasticInputBinding on opacityInPercent {
-                    inputsPrefix: "image_"
+                    inputName: "imageOpacityInPercent"
                 }
 
 
 
                 // MasticQuick API: automatically bind a Mastic output to a QML property
-                // here, the 'source' property will update the Mastic output named 'sourceOfImage'
+                // here, the 'source' property will update the Mastic output named 'imageSource'
                 MasticOutputBinding on source {
-                    outputsSuffix: "OfImage"
-
+                    outputName: "imageSource"
                 }
 
                 // MasticQuick API: automatically bind a Mastic output to a QML property
-                // here, the 'opacityInPercent' property will update the Mastic output named 'opacityInPercentOfImage'
+                // here, the 'opacityInPercent' property will update the Mastic output named 'imageOpacityInPercent'
                 MasticOutputBinding on opacityInPercent {
-                    outputsSuffix: "OfImage"
-
+                    outputName: "imageOpacityInPercent"
                 }
             }
 
@@ -402,7 +417,7 @@ ApplicationWindow {
                 // MasticQuick API: automatically bind a QML property to a Mastic input
                 // here, the 'x' property will be binded to a Mastic input named 'rect_x'
                 MasticInputBinding on x {
-                    inputsPrefix: "rect_"
+                    inputName: "rect_x"
                 }
 
 
@@ -438,7 +453,6 @@ ApplicationWindow {
             }
 
             onImpulsionChanged: {
-                console.log("Mastic input impulsion has changed - new value is " + Mastic.inputs.impulsion);
                 myCirclePulseAnimation.start();
             }
         }

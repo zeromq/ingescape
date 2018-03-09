@@ -36,11 +36,14 @@ class MasticQuickAbstractIOPBinding : public QObject, public QQmlPropertyValueSo
     // Target: the object associated to our binding
     MASTIC_QML_PROPERTY_CUSTOM_SETTER(QObject*, target)
 
-    // List of properties of our object
+    // List of properties of our target (set via our "target" property and not via setTarget (QQmlPropertyValueSource API))
     MASTIC_QML_PROPERTY_CUSTOM_SETTER(QString, properties)
 
     // Flag indicating if our binding is active or not
     MASTIC_QML_PROPERTY_CUSTOM_SETTER(bool, when)
+
+    // Remove Mastic IOPs created by our component when needed i.e. when its properties are updated or when it is destroyed
+    MASTIC_QML_PROPERTY_CUSTOM_SETTER(bool, removeOnUpdatesAndDestruction)
 
 
 public:
@@ -59,7 +62,7 @@ public:
 
 
 
-protected Q_SLOTS:
+private Q_SLOTS:
     /**
      * @brief Called when the object associated to our target property is destroyed
      * @param sender
@@ -71,17 +74,19 @@ protected Q_SLOTS:
 protected:
     /**
      * @brief QQmlPropertyValueSource API: This method will be called by the QML engine when assigning a value source
-     *        with the following syntax    MasticInputBinding on property { }
+     *        with the following syntax: MasticInputBinding on property { } or  MasticOutputBinding on property { }
      *
      * @param property
      */
     void setTarget(const QQmlProperty &property) Q_DECL_OVERRIDE;
 
 
+
     /**
      * @brief QQmlParserStatus API: Invoked after class creation, but before any properties have been set
      */
     void classBegin() Q_DECL_OVERRIDE;
+
 
 
     /**
@@ -183,6 +188,17 @@ protected:
      virtual void _updateInternalData();
 
 
+
+private:
+    /**
+     * @brief Build our list of QML properties by introspection
+     * @param object
+     * @param prefix
+     */
+    void _buildListOfQmlPropertiesByIntrospection(QObject* object, QString prefix);
+
+
+
 protected:
     // Flag indicating if our component is completed
      bool _isCompleted;
@@ -202,6 +218,12 @@ protected:
 
 
 protected:
+     // List of properties excluded from introspection
+     static QList<QString> _propertiesExcludedFromIntrospection;
+
+     // List of signal handlers excluded from introspection
+     static QList<QString> _signalHandlersExcludedFromIntrospection;
+
      // List of supported types for MasticIopType.INTEGER
      static QList<QMetaType::Type> _supportedTypesForMasticIopTypeInteger;
 

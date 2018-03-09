@@ -47,6 +47,11 @@ Module {
                 "DATA": 6
             }
         }
+        Method {
+            name: "enumToString"
+            type: "string"
+            Parameter { name: "value"; type: "int" }
+        }
         Method { name: "allValues"; type: "QList<MasticIopType::Value>" }
     }
     Component {
@@ -67,6 +72,11 @@ Module {
                 "LOG_FATAL": 5
             }
         }
+        Method {
+            name: "enumToString"
+            type: "string"
+            Parameter { name: "value"; type: "int" }
+        }
         Method { name: "allValues"; type: "QList<MasticLogLevel::Value>" }
     }
     Component {
@@ -77,6 +87,7 @@ Module {
         isSingleton: true
         exportMetaObjectRevisions: [0]
         Property { name: "version"; type: "int"; isReadonly: true }
+        Property { name: "versionString"; type: "string"; isReadonly: true }
         Property { name: "agentName"; type: "string" }
         Property { name: "agentState"; type: "string" }
         Property { name: "definitionName"; type: "string" }
@@ -86,32 +97,26 @@ Module {
         Property { name: "isFrozen"; type: "bool" }
         Property { name: "canBeFrozen"; type: "bool" }
         Property { name: "isStarted"; type: "bool"; isReadonly: true }
+        Property { name: "requestOutputsFromMappedAgents"; type: "bool" }
         Property { name: "isVerbose"; type: "bool" }
+        Property { name: "logStream"; type: "bool" }
+        Property { name: "logInFile"; type: "bool" }
+        Property { name: "useColorVerbose"; type: "bool" }
+        Property { name: "logPath"; type: "string" }
         Property { name: "logLevel"; type: "MasticLogLevel::Value" }
         Property { name: "inputsList"; type: "QStringList"; isReadonly: true }
         Property { name: "outputsList"; type: "QStringList"; isReadonly: true }
         Property { name: "parametersList"; type: "QStringList"; isReadonly: true }
-        Property {
-            name: "inputs"
-            type: "MasticQuickInputsPropertyMap"
-            isReadonly: true
-            isPointer: true
-        }
-        Property {
-            name: "outputs"
-            type: "MasticQuickOutputsPropertyMap"
-            isReadonly: true
-            isPointer: true
-        }
-        Property {
-            name: "parameters"
-            type: "MasticQuickParametersPropertyMap"
-            isReadonly: true
-            isPointer: true
-        }
+        Property { name: "inputs"; type: "QQmlPropertyMap"; isReadonly: true; isPointer: true }
+        Property { name: "outputs"; type: "QQmlPropertyMap"; isReadonly: true; isPointer: true }
+        Property { name: "parameters"; type: "QQmlPropertyMap"; isReadonly: true; isPointer: true }
         Signal {
             name: "versionChanged"
             Parameter { name: "value"; type: "int" }
+        }
+        Signal {
+            name: "versionStringChanged"
+            Parameter { name: "value"; type: "string" }
         }
         Signal {
             name: "agentNameChanged"
@@ -150,8 +155,28 @@ Module {
             Parameter { name: "value"; type: "bool" }
         }
         Signal {
+            name: "requestOutputsFromMappedAgentsChanged"
+            Parameter { name: "value"; type: "bool" }
+        }
+        Signal {
             name: "isVerboseChanged"
             Parameter { name: "value"; type: "bool" }
+        }
+        Signal {
+            name: "logStreamChanged"
+            Parameter { name: "value"; type: "bool" }
+        }
+        Signal {
+            name: "logInFileChanged"
+            Parameter { name: "value"; type: "bool" }
+        }
+        Signal {
+            name: "useColorVerboseChanged"
+            Parameter { name: "value"; type: "bool" }
+        }
+        Signal {
+            name: "logPathChanged"
+            Parameter { name: "value"; type: "string" }
         }
         Signal {
             name: "logLevelChanged"
@@ -171,17 +196,32 @@ Module {
         }
         Signal {
             name: "inputsChanged"
-            Parameter { name: "value"; type: "MasticQuickInputsPropertyMap"; isPointer: true }
+            Parameter { name: "value"; type: "QQmlPropertyMap"; isPointer: true }
         }
         Signal {
             name: "outputsChanged"
-            Parameter { name: "value"; type: "MasticQuickOutputsPropertyMap"; isPointer: true }
+            Parameter { name: "value"; type: "QQmlPropertyMap"; isPointer: true }
         }
         Signal {
             name: "parametersChanged"
-            Parameter { name: "value"; type: "MasticQuickParametersPropertyMap"; isPointer: true }
+            Parameter { name: "value"; type: "QQmlPropertyMap"; isPointer: true }
         }
         Signal { name: "forcedStop" }
+        Signal {
+            name: "observeInput"
+            Parameter { name: "name"; type: "string" }
+            Parameter { name: "value"; type: "QVariant" }
+        }
+        Signal {
+            name: "observeOutput"
+            Parameter { name: "name"; type: "string" }
+            Parameter { name: "value"; type: "QVariant" }
+        }
+        Signal {
+            name: "observeParameter"
+            Parameter { name: "name"; type: "string" }
+            Parameter { name: "value"; type: "QVariant" }
+        }
         Method {
             name: "startWithDevice"
             type: "bool"
@@ -326,11 +366,25 @@ Module {
             type: "bool"
             Parameter { name: "name"; type: "string" }
             Parameter { name: "value"; type: "int" }
+            Parameter { name: "warning"; type: "string"; isPointer: true }
         }
         Method {
             name: "createInputInt"
             type: "bool"
             Parameter { name: "name"; type: "string" }
+            Parameter { name: "value"; type: "int" }
+        }
+        Method {
+            name: "createInputInt"
+            type: "bool"
+            Parameter { name: "name"; type: "string" }
+        }
+        Method {
+            name: "createInputDouble"
+            type: "bool"
+            Parameter { name: "name"; type: "string" }
+            Parameter { name: "value"; type: "double" }
+            Parameter { name: "warning"; type: "string"; isPointer: true }
         }
         Method {
             name: "createInputDouble"
@@ -348,11 +402,25 @@ Module {
             type: "bool"
             Parameter { name: "name"; type: "string" }
             Parameter { name: "value"; type: "string" }
+            Parameter { name: "warning"; type: "string"; isPointer: true }
         }
         Method {
             name: "createInputString"
             type: "bool"
             Parameter { name: "name"; type: "string" }
+            Parameter { name: "value"; type: "string" }
+        }
+        Method {
+            name: "createInputString"
+            type: "bool"
+            Parameter { name: "name"; type: "string" }
+        }
+        Method {
+            name: "createInputBool"
+            type: "bool"
+            Parameter { name: "name"; type: "string" }
+            Parameter { name: "value"; type: "bool" }
+            Parameter { name: "warning"; type: "string"; isPointer: true }
         }
         Method {
             name: "createInputBool"
@@ -369,6 +437,19 @@ Module {
             name: "createInputImpulsion"
             type: "bool"
             Parameter { name: "name"; type: "string" }
+            Parameter { name: "warning"; type: "string"; isPointer: true }
+        }
+        Method {
+            name: "createInputImpulsion"
+            type: "bool"
+            Parameter { name: "name"; type: "string" }
+        }
+        Method {
+            name: "createInputData"
+            type: "bool"
+            Parameter { name: "name"; type: "string" }
+            Parameter { name: "value"; type: "void"; isPointer: true }
+            Parameter { name: "warning"; type: "string"; isPointer: true }
         }
         Method {
             name: "createInputData"
@@ -386,11 +467,25 @@ Module {
             type: "bool"
             Parameter { name: "name"; type: "string" }
             Parameter { name: "value"; type: "int" }
+            Parameter { name: "warning"; type: "string"; isPointer: true }
         }
         Method {
             name: "createOutputInt"
             type: "bool"
             Parameter { name: "name"; type: "string" }
+            Parameter { name: "value"; type: "int" }
+        }
+        Method {
+            name: "createOutputInt"
+            type: "bool"
+            Parameter { name: "name"; type: "string" }
+        }
+        Method {
+            name: "createOutputDouble"
+            type: "bool"
+            Parameter { name: "name"; type: "string" }
+            Parameter { name: "value"; type: "double" }
+            Parameter { name: "warning"; type: "string"; isPointer: true }
         }
         Method {
             name: "createOutputDouble"
@@ -408,11 +503,25 @@ Module {
             type: "bool"
             Parameter { name: "name"; type: "string" }
             Parameter { name: "value"; type: "string" }
+            Parameter { name: "warning"; type: "string"; isPointer: true }
         }
         Method {
             name: "createOutputString"
             type: "bool"
             Parameter { name: "name"; type: "string" }
+            Parameter { name: "value"; type: "string" }
+        }
+        Method {
+            name: "createOutputString"
+            type: "bool"
+            Parameter { name: "name"; type: "string" }
+        }
+        Method {
+            name: "createOutputBool"
+            type: "bool"
+            Parameter { name: "name"; type: "string" }
+            Parameter { name: "value"; type: "bool" }
+            Parameter { name: "warning"; type: "string"; isPointer: true }
         }
         Method {
             name: "createOutputBool"
@@ -429,6 +538,19 @@ Module {
             name: "createOutputImpulsion"
             type: "bool"
             Parameter { name: "name"; type: "string" }
+            Parameter { name: "warning"; type: "string"; isPointer: true }
+        }
+        Method {
+            name: "createOutputImpulsion"
+            type: "bool"
+            Parameter { name: "name"; type: "string" }
+        }
+        Method {
+            name: "createOutputData"
+            type: "bool"
+            Parameter { name: "name"; type: "string" }
+            Parameter { name: "value"; type: "void"; isPointer: true }
+            Parameter { name: "warning"; type: "string"; isPointer: true }
         }
         Method {
             name: "createOutputData"
@@ -446,11 +568,25 @@ Module {
             type: "bool"
             Parameter { name: "name"; type: "string" }
             Parameter { name: "value"; type: "int" }
+            Parameter { name: "warning"; type: "string"; isPointer: true }
         }
         Method {
             name: "createParameterInt"
             type: "bool"
             Parameter { name: "name"; type: "string" }
+            Parameter { name: "value"; type: "int" }
+        }
+        Method {
+            name: "createParameterInt"
+            type: "bool"
+            Parameter { name: "name"; type: "string" }
+        }
+        Method {
+            name: "createParameterDouble"
+            type: "bool"
+            Parameter { name: "name"; type: "string" }
+            Parameter { name: "value"; type: "double" }
+            Parameter { name: "warning"; type: "string"; isPointer: true }
         }
         Method {
             name: "createParameterDouble"
@@ -468,6 +604,13 @@ Module {
             type: "bool"
             Parameter { name: "name"; type: "string" }
             Parameter { name: "value"; type: "string" }
+            Parameter { name: "warning"; type: "string"; isPointer: true }
+        }
+        Method {
+            name: "createParameterString"
+            type: "bool"
+            Parameter { name: "name"; type: "string" }
+            Parameter { name: "value"; type: "string" }
         }
         Method {
             name: "createParameterString"
@@ -479,11 +622,25 @@ Module {
             type: "bool"
             Parameter { name: "name"; type: "string" }
             Parameter { name: "value"; type: "bool" }
+            Parameter { name: "warning"; type: "string"; isPointer: true }
         }
         Method {
             name: "createParameterBool"
             type: "bool"
             Parameter { name: "name"; type: "string" }
+            Parameter { name: "value"; type: "bool" }
+        }
+        Method {
+            name: "createParameterBool"
+            type: "bool"
+            Parameter { name: "name"; type: "string" }
+        }
+        Method {
+            name: "createParameterData"
+            type: "bool"
+            Parameter { name: "name"; type: "string" }
+            Parameter { name: "value"; type: "void"; isPointer: true }
+            Parameter { name: "warning"; type: "string"; isPointer: true }
         }
         Method {
             name: "createParameterData"
@@ -546,6 +703,67 @@ Module {
             name: "fatal"
             Parameter { name: "text"; type: "string" }
         }
+        Method {
+            name: "checkIfIopNameIsValid"
+            type: "bool"
+            Parameter { name: "name"; type: "string" }
+        }
+    }
+    Component {
+        name: "MasticQuickAbstractIOPBinding"
+        prototype: "QObject"
+        Property { name: "target"; type: "QObject"; isPointer: true }
+        Property { name: "properties"; type: "string" }
+        Property { name: "when"; type: "bool" }
+        Property { name: "removeOnUpdatesAndDestruction"; type: "bool" }
+        Signal {
+            name: "targetChanged"
+            Parameter { name: "value"; type: "QObject"; isPointer: true }
+        }
+        Signal {
+            name: "propertiesChanged"
+            Parameter { name: "value"; type: "string" }
+        }
+        Signal {
+            name: "whenChanged"
+            Parameter { name: "value"; type: "bool" }
+        }
+        Signal {
+            name: "removeOnUpdatesAndDestructionChanged"
+            Parameter { name: "value"; type: "bool" }
+        }
+    }
+    Component {
+        name: "MasticQuickBindingSingleton"
+        prototype: "QObject"
+        exports: ["MasticQuick/MasticBinding 1.0"]
+        isCreatable: false
+        isSingleton: true
+        exportMetaObjectRevisions: [0]
+        Property { name: "AllProperties"; type: "string"; isReadonly: true }
+        Property { name: "AllSignalHandlers"; type: "string"; isReadonly: true }
+        Property { name: "None"; type: "string"; isReadonly: true }
+    }
+    Component {
+        name: "MasticQuickInputBinding"
+        prototype: "MasticQuickAbstractIOPBinding"
+        exports: ["MasticQuick/MasticInputBinding 1.0"]
+        exportMetaObjectRevisions: [0]
+        Property { name: "inputsPrefix"; type: "string" }
+        Property { name: "inputsSuffix"; type: "string" }
+        Property { name: "inputName"; type: "string" }
+        Signal {
+            name: "inputsPrefixChanged"
+            Parameter { name: "value"; type: "string" }
+        }
+        Signal {
+            name: "inputsSuffixChanged"
+            Parameter { name: "value"; type: "string" }
+        }
+        Signal {
+            name: "inputNameChanged"
+            Parameter { name: "value"; type: "string" }
+        }
     }
     Component {
         name: "MasticQuickInputsPropertyMap"
@@ -553,6 +771,32 @@ Module {
         exports: ["MasticQuick/MasticQuickInputsPropertyMap 1.0"]
         isCreatable: false
         exportMetaObjectRevisions: [0]
+    }
+    Component {
+        name: "MasticQuickOutputBinding"
+        prototype: "MasticQuickAbstractIOPBinding"
+        exports: ["MasticQuick/MasticOutputBinding 1.0"]
+        exportMetaObjectRevisions: [0]
+        Property { name: "outputsPrefix"; type: "string" }
+        Property { name: "outputsSuffix"; type: "string" }
+        Property { name: "outputName"; type: "string" }
+        Property { name: "signalHandlers"; type: "string" }
+        Signal {
+            name: "outputsPrefixChanged"
+            Parameter { name: "value"; type: "string" }
+        }
+        Signal {
+            name: "outputsSuffixChanged"
+            Parameter { name: "value"; type: "string" }
+        }
+        Signal {
+            name: "outputNameChanged"
+            Parameter { name: "value"; type: "string" }
+        }
+        Signal {
+            name: "signalHandlersChanged"
+            Parameter { name: "value"; type: "string" }
+        }
     }
     Component {
         name: "MasticQuickOutputsPropertyMap"

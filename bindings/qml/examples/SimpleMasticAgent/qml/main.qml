@@ -52,8 +52,8 @@ ApplicationWindow {
 
     title: qsTr("%1 - v%2").arg(Qt.application.name).arg(Qt.application.version)
 
-    minimumWidth: 320
-    minimumHeight: 240
+    minimumWidth: 640
+    minimumHeight: 480
 
     width: 800
     height: 600
@@ -118,21 +118,24 @@ ApplicationWindow {
         // MasticQuick API: create inputs
         Mastic.createInputDouble("circleCx", 300);
         Mastic.createInputDouble("circleCy", 200);
+        Mastic.createInputImpulsion("impulsion");
 
         // MasticQuick API: create outputs
         Mastic.createOutputDouble("rectX", myRectangle.x);
         Mastic.createOutputDouble("rectY", myRectangle.y);
         Mastic.createOutputString("currentColor", content.currentColor);
-        Mastic.createOutputImpulsion("impulsion");
         Mastic.createOutputString("currentImage", content.currentImage);
+        Mastic.createOutputString("currentFont", content.currentFont);
+        Mastic.createOutputImpulsion("impulsion");
 
         // MasticQuick API: create parameters
         Mastic.createParameterString("myColor", "mediumaquamarine");
 
 
-        // MasticQuick API: create a binding in javascript to update a Mastic output
+        // MasticQuick API: create a binding in javascript to update Mastic outputs
         Mastic.outputs.currentColor = Qt.binding(function() { return content.currentColor;});
         Mastic.outputs.currentImage = Qt.binding(function() { return content.currentImage;});
+        Mastic.outputs.currentFont = Qt.binding(function() { return content.currentFont;});
 
 
         //
@@ -174,6 +177,7 @@ ApplicationWindow {
 
 
         // MasticQuick API: start our Mastic agent
+        console.log("Starting Mastic on device " + root.masticNetworkDevice + " with port " + root.masticPort);
         Mastic.startWithDevice(root.masticNetworkDevice, root.masticPort);
     }
 
@@ -197,6 +201,10 @@ ApplicationWindow {
 
         // Current image
         property string currentImage: "https://pbs.twimg.com/profile_images/502064538108166144/ih48MCFK_400x400.png"
+
+        // Current font
+        property font currentFont: Qt.font({family: "Helvetica", pixelSize: 12});
+
 
 
         // Controls
@@ -270,7 +278,7 @@ ApplicationWindow {
                         spacing: 20
 
                         Repeater {
-                            model: ["white", "lightgreen", "burlywood", "palevioletred", "salmon", "darkorange", "deepskyblue"]
+                            model: ["white", "lightgreen", "burlywood", "palevioletred", "salmon", "darkorange", "deepskyblue", "black"]
 
                             delegate: Rectangle {
                                 width: 40
@@ -282,7 +290,7 @@ ApplicationWindow {
 
                                 border {
                                     width: Qt.colorEqual(content.currentColor, modelData) ? 4 : 0
-                                    color: "black"
+                                    color: Qt.colorEqual("black", modelData) ? "white" : "black"
                                 }
 
                                 Behavior on border.width {
@@ -301,6 +309,99 @@ ApplicationWindow {
                     }
 
                 }
+
+
+                Item {
+                    anchors {
+                        left: parent.left
+                        right: parent.right
+                    }
+
+                    height: 50
+
+                    Text {
+                        id: currentFontLabel
+
+                        anchors {
+                            top: parent.top
+                            bottom: parent.bottom
+                        }
+
+                        text: qsTr("Current font")
+
+                        verticalAlignment: Text.AlignVCenter
+
+                        font {
+                            pixelSize: 14
+                        }
+                    }
+
+                    Row {
+                        anchors {
+                            left: currentFontLabel.right
+                            leftMargin: 20
+                             verticalCenter: parent.verticalCenter
+                        }
+
+                        spacing: 20
+
+                        Repeater {
+                            model: [
+                                    Qt.font({family: "Helvetica", pixelSize: 12}),
+                                    Qt.font({family: "Helvetica", pixelSize: 14}),
+                                    Qt.font({family: "Helvetica", pixelSize: 24, bold: true}),
+                                    Qt.font({family: "Wingdings", pixelSize: 18, bold: true})
+                                    ]
+
+                            delegate: Rectangle {
+                                width: 120
+                                height: 40
+
+                                radius: 5
+
+                                color: "white"
+
+                                border {
+                                    width: (content.currentFont === modelData) ? 4 : 0
+                                    color: "black"
+                                }
+
+                                Behavior on border.width {
+                                    NumberAnimation {}
+                                }
+
+                                Text {
+                                    anchors {
+                                        fill: parent
+                                        margins: 4
+                                    }
+
+                                    text: modelData.family + "\n" +
+                                          modelData.pixelSize + "px, bold:" + modelData.bold
+
+                                    horizontalAlignment: Text.AlignHCenter
+                                    verticalAlignment: Text.AlignVCenter
+
+
+                                    font {
+                                        pixelSize: 12
+                                    }
+                                }
+
+                                MouseArea {
+                                    anchors.fill: parent
+
+                                    onClicked: {
+                                        content.currentFont = modelData;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                }
+
+
 
 
                 Item {
@@ -351,7 +452,10 @@ ApplicationWindow {
                                 Image {
                                     id: image
 
-                                    anchors.fill: parent
+                                    anchors {
+                                        fill: parent
+                                        margins: 4
+                                    }
 
                                     fillMode: Image.PreserveAspectFit
                                     horizontalAlignment: Image.AlignHCenter
@@ -432,6 +536,16 @@ ApplicationWindow {
                     }
 
                     Button {
+                        // MasticQuick API: check if our agent logs in a file
+                        text: Mastic.logInFile ? qsTr("Don't log in file") : qsTr("Log in file")
+
+                        onClicked: {
+                            // MastickQuick API: switch our logInFile flag
+                            Mastic.logInFile = !Mastic.logInFile;
+                        }
+                    }
+
+                    Button {
                         text: qsTr("Send 'impulsion'")
 
                         onClicked: {
@@ -442,6 +556,21 @@ ApplicationWindow {
 
                             // Option 2: use writeOutputAsImpulsion
                             Mastic.writeOutputAsImpulsion("impulsion");
+                        }
+                    }
+
+                    Button {
+                        id: buttonPressMe
+
+                        text: qsTr("Press me")
+
+                        // MasticQuick API: export our 'pressed' property
+                        MasticOutputBinding {
+                            target: buttonPressMe
+
+                            properties: "pressed"
+
+                            outputsPrefix: "button_"
                         }
                     }
                 }
@@ -524,6 +653,8 @@ ApplicationWindow {
                 y: Mastic.inputs.circleCy
 
                 Rectangle {
+                    id: myCircleUI
+
                     anchors.centerIn: parent
 
                     width: 50
@@ -536,6 +667,15 @@ ApplicationWindow {
                         width: 3
                         color: "black"
                     }
+
+                    SequentialAnimation {
+                        id: myCirclePulseAnimation
+
+                        running: false
+
+                        NumberAnimation { target: myCircleUI; property: "scale"; to: 3; }
+                        NumberAnimation { target: myCircleUI; property: "scale"; to: 1; }
+                     }
                 }
             }
         }
@@ -551,6 +691,16 @@ ApplicationWindow {
 
             onObserveOutput: {
                 console.log("Mastic output " + name +" has changed - new value is " + value);
+            }
+        }
+
+
+        // MasticQuick API: use a Connections item to subscribe to Mastic input changes
+        Connections {
+            target: Mastic.inputs
+
+            onImpulsionChanged: {
+                myCirclePulseAnimation.start();
             }
         }
     }

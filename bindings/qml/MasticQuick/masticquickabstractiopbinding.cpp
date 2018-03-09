@@ -22,11 +22,30 @@
 
 
 
+//
+// List of properties excluded from introspection
+//
+QList<QString> MasticQuickAbstractIOPBinding::_propertiesExcludedFromIntrospection = QList<QString>()
+        << "parent"
+        << "objectName"
+         ;
+
 
 //
-// List of supported types
+// List of signals excluded from introspection
 //
-// List of supported types for MasticIopType.INTEGER
+QList<QString> MasticQuickAbstractIOPBinding::_signalHandlersExcludedFromIntrospection = QList<QString>()
+        << "onDestroyed"
+        << "onImplicitWidthChanged2"
+        << "onImplicitHeightChanged2"
+           ;
+
+
+
+//
+// List of supported types by IOP type
+//
+// - List of supported types for MasticIopType.INTEGER
 QList<QMetaType::Type> MasticQuickAbstractIOPBinding::_supportedTypesForMasticIopTypeInteger = QList<QMetaType::Type>()
         << QMetaType::Int
         << QMetaType::UInt
@@ -38,7 +57,7 @@ QList<QMetaType::Type> MasticQuickAbstractIOPBinding::_supportedTypesForMasticIo
         << QMetaType::UShort
          ;
 
-// List of supported types for MasticIopType.DOUBLE
+// - List of supported types for MasticIopType.DOUBLE
 QList<QMetaType::Type> MasticQuickAbstractIOPBinding::_supportedTypesForMasticIopTypeDouble = QList<QMetaType::Type>()
         << QMetaType::Double
         << QMetaType::Float
@@ -63,13 +82,17 @@ QList<QMetaType::Type> MasticQuickAbstractIOPBinding::_supportedTypesForMasticIo
  */
 MasticQuickAbstractIOPBinding::MasticQuickAbstractIOPBinding(QObject *parent, bool qmlPropertiesMustBeWritable)
     : QObject(parent),
+    // QML properties
     _target(NULL),
     _when(true),
+    _removeOnUpdatesAndDestruction(true),
+    // Protected properties
     _isCompleted(false),
     _isUsedAsQQmlPropertyValueSource(false),
     _qmlPropertiesMustBeWritable(qmlPropertiesMustBeWritable)
 {
 }
+
 
 
 /**
@@ -141,7 +164,7 @@ void MasticQuickAbstractIOPBinding::settarget(QObject *value)
 
 
 /**
- * @brief Set properties
+ * @brief Set our list of properties
  * @param value
  */
 void MasticQuickAbstractIOPBinding::setproperties(QString value)
@@ -159,8 +182,8 @@ void MasticQuickAbstractIOPBinding::setproperties(QString value)
         }
         else
         {
-            qmlWarning(this) << "properties can not be set when our item is used as a property value source (invalid value: "
-                              << _properties << " )";
+            qmlWarning(this) << "'properties' can not be set when our item is used as a property value source (invalid value: '"
+                              << _properties << "' )";
         }
 
         // Notify change
@@ -186,6 +209,24 @@ void MasticQuickAbstractIOPBinding::setwhen(bool value)
 
         // Notify change
         Q_EMIT whenChanged(value);
+    }
+}
+
+
+
+/**
+ * @brief Set if we need to remove inpiuts/outputs on updates and destruction
+ * @param value
+ */
+void MasticQuickAbstractIOPBinding::setremoveOnUpdatesAndDestruction(bool value)
+{
+    if (_removeOnUpdatesAndDestruction != value)
+    {
+        // Save our new value
+        _removeOnUpdatesAndDestruction = value;
+
+        // Notify change
+        Q_EMIT removeOnUpdatesAndDestructionChanged(value);
     }
 }
 
@@ -229,7 +270,7 @@ void MasticQuickAbstractIOPBinding::_ontargetDestroyed(QObject *sender)
 
 /**
  * @brief QQmlPropertyValueSource API: This method will be called by the QML engine when assigning a value source
- *        with the following syntax    MasticXXXXXBinding on property { }
+ *        with the following syntax: MasticInputBinding on property { } or MasticOutputBinding on property { }
  *
  * @param property
  */
@@ -282,7 +323,6 @@ void MasticQuickAbstractIOPBinding::setTarget(const QQmlProperty &property)
 
 
 
-
 /**
  * @brief QQmlParserStatus API: Invoked after class creation, but before any properties have been set
  */
@@ -303,8 +343,8 @@ void MasticQuickAbstractIOPBinding::componentComplete()
         // Check if "properties" is empty
         if (!_properties.isEmpty())
         {
-            qmlWarning(this) << "properties can not be set when our item is used as a property value source (invalid value: "
-                             << _properties << " )";
+            qmlWarning(this) << "'properties' can not be set when our item is used as a property value source (invalid value: '"
+                             << _properties << "' )";
         }
 
         // Check if "target" is NULL
@@ -356,21 +396,21 @@ QString MasticQuickAbstractIOPBinding::prettyObjectTypeName(QObject* object)
 
 /**
  * @brief Check if a given property is supported by Mastic
- * @param property
+ * @param qmlProperty
  * @return
  */
-bool MasticQuickAbstractIOPBinding::checkIfPropertyIsSupported(const QQmlProperty &property)
+bool MasticQuickAbstractIOPBinding::checkIfPropertyIsSupported(const QQmlProperty &qmlProperty)
 {
    bool result = false;
 
-   // Check if we have a valid property
-   if (property.type() == QQmlProperty::Property)
+   // Check if we have a property
+   if (qmlProperty.isProperty())
    {
        // Check its type category
-       if (property.propertyTypeCategory() == QQmlProperty::Normal)
+       if (qmlProperty.propertyTypeCategory() == QQmlProperty::Normal)
        {
            // Read value to check if we can convert its type to a supported type
-           QVariant value = property.read();
+           QVariant value = qmlProperty.read();
            if (
                value.canConvert<int>()
                ||
@@ -424,6 +464,7 @@ QString MasticQuickAbstractIOPBinding::prettyPropertyTypeName(const QQmlProperty
 
     return result;
 }
+
 
 
 /**
@@ -510,10 +551,24 @@ void MasticQuickAbstractIOPBinding::update()
             QString properties = _properties.trimmed();
             if ((_target != NULL) && !properties.isEmpty())
             {
-                // Check if we have a specific set of properties OR all properties
-                if ((MasticQuickBindingSingleton::instance() != NULL) && (properties == MasticQuickBindingSingleton::instance()->AllProperties()))
+                MasticQuickBindingSingleton* masticQuickBindingSingleton = MasticQuickBindingSingleton::instance();
+
+                // Check if its a keyword of MasticQuickBindingSingleton
+                if ((masticQuickBindingSingleton != NULL) && masticQuickBindingSingleton->isKeyword(properties))
                 {
-                    qmlWarning(this) << "'properties: MasticBinding.AllProperties' is not yet implemented";
+                    if (properties == masticQuickBindingSingleton->AllProperties())
+                    {
+                        _buildListOfQmlPropertiesByIntrospection(_target, "");
+                    }
+                    else if (properties == masticQuickBindingSingleton->None())
+                    {
+                        // No property required => nothing to do
+                    }
+                    else
+                    {
+                        qmlWarning(this) << "invalid value 'MasticBinding." << masticQuickBindingSingleton->getKeyword(properties)
+                                          << "' for 'properties'";
+                    }
                 }
                 else
                 {
@@ -522,33 +577,33 @@ void MasticQuickAbstractIOPBinding::update()
                     //
 
                     // Parse our list of properties
-                    QStringList listOfPropertyNames = _properties.split(QLatin1Char(','));
+                    QStringList listOfPropertyNames = properties.split(QLatin1Char(','));
                     int numberOfPropertyNames = listOfPropertyNames.count();
                     for (int index = 0; index < numberOfPropertyNames; index++)
                     {
                         // Clean-up the name of the current property
                         QString propertyName = listOfPropertyNames.at(index).trimmed();
 
-                        // Create a property
-                        QQmlProperty property = QQmlProperty(_target, propertyName);
+                        // Create a QML property
+                        QQmlProperty qmlProperty = QQmlProperty(_target, propertyName);
 
                         // Check if this property exists
-                        if (property.isValid() && property.isProperty())
+                        if (qmlProperty.isValid() && qmlProperty.isProperty())
                         {
                             // Check if we need a writable property
-                            if (!_qmlPropertiesMustBeWritable || property.isWritable())
+                            if (!_qmlPropertiesMustBeWritable || qmlProperty.isWritable())
                             {
                                 // Check if the type of our property is supported
-                                if (checkIfPropertyIsSupported(property))
+                                if (checkIfPropertyIsSupported(qmlProperty))
                                 {
                                     // Save property
-                                    _qmlPropertiesByName.insert(propertyName, property);
+                                    _qmlPropertiesByName.insert(propertyName, qmlProperty);
                                 }
                                 else
                                 {
                                     qmlWarning(this) << "property '" << propertyName << "' on "
                                                      << prettyObjectTypeName(_target)
-                                                     << " has type '" << prettyPropertyTypeName(property)
+                                                     << " has type '" << prettyPropertyTypeName(qmlProperty)
                                                      << "' that is not supported by MasticQuick";
 
                                 }
@@ -614,6 +669,7 @@ void MasticQuickAbstractIOPBinding::clear()
  */
 void MasticQuickAbstractIOPBinding::connectOrDisconnectToMasticQuick()
 {
+    // Check if component is completed
     if (_isCompleted)
     {
         if (_when)
@@ -625,6 +681,7 @@ void MasticQuickAbstractIOPBinding::connectOrDisconnectToMasticQuick()
             _disconnectToMasticQuick();
         }
     }
+    // Else: our component is not completed, we do nothing to avoid useless computations
 }
 
 
@@ -635,6 +692,7 @@ void MasticQuickAbstractIOPBinding::connectOrDisconnectToMasticQuick()
 void MasticQuickAbstractIOPBinding::_connectToMasticQuick()
 {
 }
+
 
 
 /**
@@ -663,6 +721,82 @@ void MasticQuickAbstractIOPBinding::_updateInternalData()
 }
 
 
+
+/**
+ * @brief Build our list of QML properties by introspection
+ * @param object
+ * @param prefix
+ */
+void MasticQuickAbstractIOPBinding::_buildListOfQmlPropertiesByIntrospection(QObject* object, QString prefix)
+{
+    // Check if we have an object
+    if (object != NULL)
+    {
+        // Get meta object of our target
+        const QMetaObject* metaObject = object->metaObject();
+        if (metaObject != NULL)
+        {
+            // Get the number of properties
+            int numberOfProperties = metaObject->propertyCount();
+            for (int index = 0; index < numberOfProperties; index++)
+            {
+                // Get meta property
+                QMetaProperty metaProperty = metaObject->property(index);
+                QString propertyName(metaProperty.name());
+
+                // Check if this property is excluded or not
+                if (!_propertiesExcludedFromIntrospection.contains(propertyName))
+                {
+                    // Create a QML property
+                    QQmlProperty qmlProperty = QQmlProperty(object, propertyName);
+
+                    // Check if we can use this property (first approach)
+                    bool writableRequirements = (!_qmlPropertiesMustBeWritable || qmlProperty.isWritable());
+                    bool typeIsSupported = checkIfPropertyIsSupported(qmlProperty);
+                    if (writableRequirements && typeIsSupported)
+                    {
+                        // Save property
+                        _qmlPropertiesByName.insert(prefix + propertyName, qmlProperty);
+                    }
+                    else
+                    {
+                        // Either our property is not writable (and we require wreitable properties) o
+                        // or this type is not supported
+
+                        /*
+                        if (!typeIsSupported)
+                        {
+                            qmlWarning(this) << "property '" << propertyName << "' on "
+                                             << prettyObjectTypeName(_target)
+                                             << " has type '" << prettyPropertyTypeName(qmlProperty)
+                                             << "' that is not supported by MasticQuick";
+                        }
+                        */
+
+
+                        // Check if this property references a non-writable object
+                        if ((qmlProperty.propertyTypeCategory() == QQmlProperty::Object) && !qmlProperty.isWritable())
+                        {
+                            QVariant qmlValue = qmlProperty.read();
+                            QObject* objectValue = qmlValue.value<QObject*>();
+                            if (objectValue != NULL)
+                            {
+                                QString newPrefix = (prefix.isEmpty() ? QString("%1.").arg(propertyName) : QString("%1.%2.").arg(prefix, propertyName));
+
+                                _buildListOfQmlPropertiesByIntrospection(objectValue, newPrefix);
+                            }
+                        }
+
+                    }
+                }
+                // Else: property is excluded to avoid side-effects
+            }
+            // End  for (int index = 0; index < numberOfProperties; index++)
+        }
+        // Else: should not happen because a QObject always has a meta object
+    }
+    // Else: NULL reference => nothing to do
+}
 
 
 

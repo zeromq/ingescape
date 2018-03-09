@@ -743,7 +743,7 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                                 case STRING_T:
                                     zmsg_addstr(omsg, found_iop->name);
                                     zmsg_addstrf(omsg, "%d", found_iop->type);
-                                    zmsg_addmem(omsg, &(found_iop->value.s), strlen(found_iop->value.s)+1);
+                                    zmsg_addmem(omsg, (found_iop->value.s), strlen(found_iop->value.s)+1);
                                     break;
                                 case BOOL_T:
                                     zmsg_addstr(omsg, found_iop->name);
@@ -760,7 +760,7 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                                     //disabled
 //                                    zmsg_addstr(omsg, found_iop->name);
 //                                    zmsg_addstrf(omsg, "%d", found_iop->type);
-//                                    zmsg_addmem(omsg, &(found_iop->value.data), found_iop->valueSize);
+//                                    zmsg_addmem(omsg, (found_iop->value.data), found_iop->valueSize);
                                     break;
                                     
                                 default:

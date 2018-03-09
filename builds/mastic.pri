@@ -38,17 +38,14 @@ win32:{
 
     CONFIG(debug, debug|release){
         #configuration DEBUG
-        libzyre_path = $$PWD/../dependencies\windows\libs\win32\Debug
-        libyajl_path = $$PWD/../dependencies\windows\libs\yajl\DebugDLL
+        librairies_path = $$PWD/../dependencies\windows\libs\win32\Debug
     }else {
         #configuration RELEASE
-        libzyre_path = $$PWD/../dependencies\windows\libs\win32\Release
-        libyajl_path = $$PWD/../dependencies\windows\libs\yajl\ReleaseDLL
+        librairies_path = $$PWD/../dependencies\windows\libs\win32\Release
     }
 
     #Add librairies
-    LIBS += -L$$libzyre_path -llibzmq -llibczmq -llibzyre \
-            -L$$libyajl_path -lyajl
+    LIBS += -L$$librairies_path -llibzmq -llibczmq -llibzyre -lyajl
 
     #to get the Ip address into the network.c
     LIBS += -L$$C:/Windows/System32 -lwsock32 -lIPHLPAPI -lws2_32
@@ -126,10 +123,10 @@ unix:!mac {
     message("Compilation raspberry scope ...")
 
     libyajl_path = $$PWD/yajl/yajl-2.1.1/Raspberry
-    libzyre_path = $$PWD/zyre/bin/Raspberry
+    librairies_path = $$PWD/zyre/bin/Raspberry
 
     #Add librairies
-    LIBS += -L$$libzyre_path -lzmq -lczmq -lzyre \
+    LIBS += -L$$librairies_path -lzmq -lczmq -lzyre \
             -L$$libyajl_path/lib -lyajl
     }
 
