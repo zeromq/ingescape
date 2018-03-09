@@ -1425,6 +1425,9 @@ int mtic_setAgentName(const char *name){
         needRestart = true;
     }
     char *n = strndup(name, MAX_AGENT_NAME_LENGTH);
+    if (strlen(name) > MAX_AGENT_NAME_LENGTH){
+        mtic_warn("Agent name '%s' exceeds maximum size and will be truncated to '%s'", name, n);
+    }
     bool spaceInName = false;
     size_t lengthOfN = strlen(n);
     for (size_t i = 0; i < lengthOfN; i++){
@@ -1437,6 +1440,7 @@ int mtic_setAgentName(const char *name){
         mtic_warn("Spaces are not allowed in agent name: %s has been renamed to %s\n", name, n);
     }
     strncpy(agentName, n, MAX_AGENT_NAME_LENGTH);
+    free(n);
     
     if (needRestart){
         mtic_startWithIP(ipAddress, zyrePort);
