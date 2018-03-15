@@ -349,6 +349,7 @@ int handleSubscriptionMessage(zmsg_t *msg, const char *subscriberPeerId){
     
     if(foundSubscriber == NULL){
         mtic_debug("%s : could not find subscriber structure for agent %s\n", __func__, subscriberPeerId);
+        return -1;
     }
     if(isFrozen == true){
         mtic_debug("Message received from agent %s but all traffic in our agent has been frozen\n", foundSubscriber->agentName);
