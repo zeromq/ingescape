@@ -98,7 +98,7 @@ typedef enum {
     DATA_T          ///< data value type
 } iopType_t;
 
-//read/write IOP using void*
+//read IOP using void*
 PUBLIC int mtic_readInput(const char *name, void **value, long *size);
 PUBLIC int mtic_readOutput(const char *name, void **value, long *size);
 PUBLIC int mtic_readParameter(const char *name, void **value, long *size);
