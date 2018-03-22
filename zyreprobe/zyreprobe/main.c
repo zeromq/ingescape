@@ -1152,5 +1152,10 @@ int main (int argc, char *argv [])
     }
     zactor_destroy (&beaconActor);
     zactor_destroy (&gossipActor);
+
+    #ifdef _WIN32
+    zsys_shutdown();
+    #endif
+
     return 0;
 }
