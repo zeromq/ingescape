@@ -17,7 +17,12 @@
 #define zregex_h
 
 #include <stdio.h>
+#ifdef _WIN32
 #include "regex.h"
+#else
+#include <regex.h>
+#endif
+
 
 //size of a buffer to contain any error messages
 //encountered when the regular expression is compiled

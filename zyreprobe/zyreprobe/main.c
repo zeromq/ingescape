@@ -29,9 +29,9 @@
 #define UNUSED(x) (void)x;
 
 //global application options
-int port = 5672;
+int port = 5670;
 const char *name = "zyreprobe";
-char *netdevice = "Ethernet";
+char *netdevice = NULL;
 bool verbose = false;
 bool keepRunning = false;
 bool proxy = false;
@@ -179,8 +179,8 @@ int manageLog (zloop_t *loop, zmq_pollitem_t *item, void *arg){
     return 0;
 }
 
-// Aims at defining a cross-platform sleep method
-void cross_sleep(int duration)
+// cross-platform sleep method
+void crossSleep(unsigned int duration)
 {
 #ifdef _WIN32
     Sleep(duration*1000);
@@ -299,7 +299,7 @@ int manageParent (zloop_t *loop, zmq_pollitem_t *item, void *args){
             else if(streq (command, "RESTART")){
                 //FIXME: find out what needs to be done for a proper stop+start
                 zyre_stop (node);
-                cross_sleep(1);
+                crossSleep(1);
                 zyre_start (node);
             }
             else if(streq (command, "VERBOSE")){
@@ -970,7 +970,7 @@ int main (int argc, char *argv [])
             if (zsys_interrupted){
                 break;
             }
-            cross_sleep(1);
+            crossSleep(1);
         }
     }else{
         //mainloop
