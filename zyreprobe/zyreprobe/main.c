@@ -16,17 +16,22 @@
 
 #include <zyre.h>
 #include <zyre_event.h>
-#include <regex.h>
-#include <getopt.h>
+
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
+#include "regex.h"
 #include "uthash/uthash.h"
 #include "zregex.h"
+#include "getopt.h"
 
 #define UNUSED(x) (void)x;
 
 //global application options
-int port = 5670;
+int port = 5672;
 const char *name = "zyreprobe";
-char *netdevice = NULL;
+char *netdevice = "Ethernet";
 bool verbose = false;
 bool keepRunning = false;
 bool proxy = false;
@@ -174,6 +179,16 @@ int manageLog (zloop_t *loop, zmq_pollitem_t *item, void *arg){
     return 0;
 }
 
+// Aims at defining a cross-platform sleep method
+void cross_sleep(int duration)
+{
+#ifdef _WIN32
+    Sleep(duration*1000);
+#else
+    sleep(duration);
+#endif
+}
+
 //manage commands entered on the command line from the parent
 int manageParent (zloop_t *loop, zmq_pollitem_t *item, void *args){
     zyreloopElements_t *zEl = (zyreloopElements_t *)args;
@@ -284,7 +299,7 @@ int manageParent (zloop_t *loop, zmq_pollitem_t *item, void *args){
             else if(streq (command, "RESTART")){
                 //FIXME: find out what needs to be done for a proper stop+start
                 zyre_stop (node);
-                sleep(1);
+                cross_sleep(1);
                 zyre_start (node);
             }
             else if(streq (command, "VERBOSE")){
@@ -955,7 +970,7 @@ int main (int argc, char *argv [])
             if (zsys_interrupted){
                 break;
             }
-            sleep(1);
+            cross_sleep(1);
         }
     }else{
         //mainloop

@@ -17,7 +17,7 @@
 #define zregex_h
 
 #include <stdio.h>
-#include <regex.h>
+#include "regex.h"
 
 //size of a buffer to contain any error messages
 //encountered when the regular expression is compiled
