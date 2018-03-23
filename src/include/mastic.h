@@ -250,7 +250,7 @@ PUBLIC bool mtic_getRequestOutputsFromMappedAgents(void);
 //logs and debug messages
 PUBLIC void mtic_setVerbose(bool verbose); //log in console
 PUBLIC bool mtic_isVerbose(void);
-PUBLIC void mtic_setLogStream(bool stream); //log in socket
+PUBLIC void mtic_setLogStream(bool useLogStream); //log in socket
 PUBLIC bool mtic_getLogStream(void);
 PUBLIC void mtic_setLogInFile(bool useLogFile); //log in file
 PUBLIC bool mtic_getLogInFile(void);
@@ -266,7 +266,7 @@ typedef enum {
     MTIC_LOG_ERROR,
     MTIC_LOG_FATAL
 } mtic_logLevel_t;
-PUBLIC void mtic_setLogLevel (mtic_logLevel_t level); //default is MTIC_LOG_TRACE
+PUBLIC void mtic_setLogLevel (mtic_logLevel_t level); //set log level in console, default is MTIC_LOG_TRACE
 PUBLIC mtic_logLevel_t mtic_getLogLevel(void);
 
 //void mtic_debug(const char*fmt, ...);
