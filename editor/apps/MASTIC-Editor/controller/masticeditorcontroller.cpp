@@ -130,6 +130,9 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     // Create the controller for agents supervision
     _agentsSupervisionC = new AgentsSupervisionController(_modelManager, this);
 
+    // Create the controller for hosts supervision
+    _hostsSupervisionC = new HostsSupervisionController(_launcherManager, this);
+
     // Create the controller for agents mapping
     _agentsMappingC = new AgentsMappingController(_modelManager, agentsMappingsPath, this);
 
@@ -179,6 +182,12 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     connect(_agentsSupervisionC, &AgentsSupervisionController::identicalAgentModelAdded, _agentsMappingC, &AgentsMappingController::onIdenticalAgentModelAdded);
     connect(_agentsSupervisionC, &AgentsSupervisionController::openValuesHistoryOfAgent, _valuesHistoryC, &ValuesHistoryController::filterValuesToShowOnlyAgent);
 
+    // Connect to signals from the mastic launcher manager
+    connect(_launcherManager, &MasticLauncherManager::hostModelCreated, _hostsSupervisionC, &HostsSupervisionController::onHostModelCreated);
+    connect(_launcherManager, &MasticLauncherManager::hostModelWillBeRemoved, _hostsSupervisionC, &HostsSupervisionController::onHostModelWillBeRemoved);
+
+    // Connect to signals from the controller for supervision of hosts
+    connect(_hostsSupervisionC, &HostsSupervisionController::commandAskedToHost, _networkC, &NetworkController::onCommandAskedToLauncher);
 
     // Connect to signals from the controller for mapping of agents
     connect(_agentsMappingC, &AgentsMappingController::commandAskedToAgent, _networkC, &NetworkController::onCommandAskedToAgent);

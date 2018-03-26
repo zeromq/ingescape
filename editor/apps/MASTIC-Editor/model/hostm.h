@@ -29,10 +29,13 @@ class HostM : public QObject
     I2_QML_PROPERTY_READONLY(QString, name)
 
     // Peer ID of our host (unique identifier)
-    I2_CPP_NOSIGNAL_PROPERTY(QString, peerId)
+    I2_QML_PROPERTY_READONLY(QString, peerId)
 
     // IP address of our host
     I2_QML_PROPERTY_READONLY(QString, ipAddress)
+
+    // Streaming port of the host
+    I2_QML_PROPERTY_READONLY(QString, streamingPort)
 
     // Flag indicating if our host is ON (vs OFF)
     //I2_QML_PROPERTY_READONLY(bool, isON)
@@ -49,6 +52,7 @@ public:
     explicit HostM(QString name,
                    QString peerId,
                    QString ipAddress,
+                   QString streamingPort,
                    QObject *parent = nullptr);
 
 

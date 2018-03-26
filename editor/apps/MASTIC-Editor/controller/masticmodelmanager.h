@@ -268,7 +268,7 @@ public Q_SLOTS:
      * @param hostname
      * @param ipAddress
      */
-    void onLauncherEntered(QString peerId, QString hostname, QString ipAddress);
+    void onLauncherEntered(QString peerId, QString hostname, QString ipAddress, QString streamingPort);
 
 
     /**

@@ -24,10 +24,12 @@
 HostM::HostM(QString name,
              QString peerId,
              QString ipAddress,
+             QString streamingPort,
              QObject *parent) : QObject(parent),
     _name(name),
     _peerId(peerId),
-    _ipAddress(ipAddress)
+    _ipAddress(ipAddress),
+    _streamingPort(streamingPort)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);

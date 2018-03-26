@@ -105,7 +105,7 @@ Q_SIGNALS:
      * @param hostname
      * @param ipAddress
      */
-    void launcherEntered(QString peerId, QString hostname, QString ipAddress);
+    void launcherEntered(QString peerId, QString hostname, QString ipAddress, QString streamingPort);
 
 
     /**
@@ -172,9 +172,9 @@ public Q_SLOTS:
      * @brief Slot when a command must be sent on the network to a launcher
      * @param command
      * @param hostname
-     * @param commandLine
+     * @param commandParameter
      */
-    void onCommandAskedToLauncher(QString command, QString hostname, QString commandLine);
+    void onCommandAskedToLauncher(QString command, QString hostname, QString commandParameter);
 
 
     /**

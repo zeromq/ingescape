@@ -55,7 +55,7 @@ SOURCES += main.cpp \
     model/jsonhelper.cpp \
     model/definitionm.cpp \
     model/mapping/agentmappingm.cpp \
-    model/mapping/elementmappingm.cpp \ 
+    model/mapping/elementmappingm.cpp \
     model/scenario/condition/actionconditionm.cpp \
     model/scenario/actionm.cpp \
     model/scenario/scenariom.cpp \
@@ -83,7 +83,9 @@ SOURCES += main.cpp \
     viewModel/iop/parametervm.cpp \
     model/hostm.cpp \
     viewModel/iop/agentiopvm.cpp \
-    sortFilter/abstracttimerangefilter.cpp
+    sortFilter/abstracttimerangefilter.cpp \
+    controller/hostssupervisioncontroller.cpp \
+    viewModel/hostvm.cpp \
 
 HEADERS += \
     stable.h \
@@ -144,7 +146,9 @@ HEADERS += \
     viewModel/iop/parametervm.h \
     model/hostm.h \
     viewModel/iop/agentiopvm.h \
-    sortFilter/abstracttimerangefilter.h
+    sortFilter/abstracttimerangefilter.h \
+    controller/hostssupervisioncontroller.h \
+    viewModel/hostvm.h \
 
 
 RESOURCES += qml.qrc
@@ -212,9 +216,23 @@ mac {
     message(macOS and iOS specific rules)
 
 
+    # Include Gstreamer hearders
+    # GST not included ins master branch
+#    INCLUDEPATH += /usr/local/include/gstreamer-1.0
+#    INCLUDEPATH += /usr/local/include/glib-2.0
+#    INCLUDEPATH += /usr/local/lib/glib-2.0/include
+
     # Compute the LFLAG associated to our frameworks
     LIBS += -L../../frameworks/I2Quick/Mac -lI2Quick
 
+    # Add gstreamer libs
+    # GST not included ins master branch
+#    LIBS += -L/usr/local/lib -lglib-2.0.0
+#    LIBS += -L/usr/local/lib -lgstreamer-1.0.0
+#    LIBS += -L/usr/local/lib -lgobject-2.0.0
+#    LIBS += -L/usr/local/lib -lgstvideo-1.0.0
+#    LIBS += -L/usr/local/lib -lgstbase-1.0.0
+#    LIBS += -L/usr/local/lib -lgstapp-1.0.0
 
     # Copy libraries into the MacOS directory of our application
     librariesToCopy.files += ../../frameworks/I2Quick/Mac/libI2Quick.$${QMAKE_EXTENSION_SHLIB}
@@ -322,5 +340,3 @@ unix:!mac {
 
     # TODO if needed
 }
-
-

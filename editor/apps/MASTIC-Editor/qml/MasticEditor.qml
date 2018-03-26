@@ -27,6 +27,9 @@ import MASTIC 1.0
 // agent sub-directory
 import "agent" as Agent
 
+// host sub-directory
+import "host" as Host
+
 // scenario sub-directory
 import "scenario" as Scenario
 
@@ -155,7 +158,7 @@ Item {
                     frameOverlap: 1
                     tab: I2CustomRectangle {
                         color: styleData.selected ? MasticTheme.selectedTabsBackgroundColor : "transparent"
-                        implicitWidth: leftPanelTabs.width/2
+                        implicitWidth: leftPanelTabs.width/3
                         implicitHeight: 26
                         topRightRadius : 5
 
@@ -186,16 +189,27 @@ Item {
                 onCurrentIndexChanged: {
                 }
 
-                Tab {
-                    title: qsTr("SUPERVISION");
-                    active : true
 
+                Tab {
+                    title: qsTr("Agents");
+                    active : true
                     Agent.AgentsList {
                         id: agentsList
 
                         anchors.fill: parent
 
                         controller: MasticEditorC.agentsSupervisionC
+                    }
+                }
+
+                Tab {
+                    title: qsTr("Hosts");
+                    Host.HostsList {
+                        id: hostsList
+
+                        anchors.fill: parent
+
+                        controller: MasticEditorC.hostsSupervisionC
                     }
                 }
 
@@ -308,6 +322,23 @@ Item {
             // Center window
             x = rootItem.Window.window.x + rootItem.Window.width/2 - historyPanel.width/2;
             y = rootItem.Window.window.y + rootItem.Window.height/2 - historyPanel.height/2;
+        }
+    }
+
+
+    // Overlay layer used to display streaming
+    I2Layer {
+        id: streamingLayer
+
+        objectName: "streamingLayer"
+
+        anchors
+        {
+            left:leftPanel.right
+            top:parent.top
+            bottom:bottomPanel.top
+            right:parent.right
+            fill: null
         }
     }
 }

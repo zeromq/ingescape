@@ -77,64 +77,67 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
                 }
             }
 
+            // Initialize properties related to message headers
+            bool isMasticPublisher = false;
+            bool isIntPID = false;
+            int pid = -1;
+            bool canBeFrozen = false;
+            QString commandLine = "";
+            QString streamingPort = "";
+
+            zlist_t *keys = zhash_keys(headers);
+            size_t nbKeys = zlist_size(keys);
+            if (nbKeys > 0)
+            {
+                char *k;
+                const char *v;
+                QString key = "";
+                QString value = "";
+
+                while ((k = (char *)zlist_pop(keys))) {
+                    v = zyre_event_header(zyre_event, k);
+
+                    key = QString(k);
+                    value = QString(v);
+
+                    // We check that the key "publisher" exists
+                    if (key == "publisher") {
+                        isMasticPublisher = true;
+                    }
+                    else if (key == "pid") {
+                        pid = value.toInt(&isIntPID);
+                    }
+                    else if (key == "canBeFrozen") {
+                        if (value == "1") {
+                            canBeFrozen = true;
+                        }
+                    }
+                    else if (key == "commandline") {
+                        commandLine = value;
+                    }
+                    else if (key == "hostname") {
+                        hostname = value;
+                    }
+                    else if (key == "videoStream") {
+                        streamingPort = value;
+                    }
+                }
+
+                free(k);
+            }
+            zlist_destroy(&keys);
+
+
             // Mastic Launcher
             if (peerName.endsWith(launcherSuffix))
             {
                 hostname = peerName.left(peerName.length() - launcherSuffix.length());
 
                 // Emit the signal "Launcher Entered"
-                Q_EMIT networkController->launcherEntered(peerId, hostname, ipAddress);
+                Q_EMIT networkController->launcherEntered(peerId, hostname, ipAddress, streamingPort);
             }
             else
             {
-                bool isMasticPublisher = false;
-                bool isIntPID = false;
-                int pid = -1;
-                bool canBeFrozen = false;
-                QString commandLine = "";
-
-                zlist_t *keys = zhash_keys(headers);
-                size_t nbKeys = zlist_size(keys);
-                if (nbKeys > 0)
-                {
-                    //qDebug() << nbKeys << "headers";
-
-                    char *k;
-                    const char *v;
-                    QString key = "";
-                    QString value = "";
-
-                    while ((k = (char *)zlist_pop(keys))) {
-                        v = zyre_event_header(zyre_event, k);
-
-                        key = QString(k);
-                        value = QString(v);
-                        //qDebug() << "key" << key << ":" << value;
-
-                        // We check that the key "publisher" exists
-                        if (key == "publisher") {
-                            isMasticPublisher = true;
-                        }
-                        else if (key == "pid") {
-                            pid = value.toInt(&isIntPID);
-                        }
-                        else if (key == "canBeFrozen") {
-                            if (value == "1") {
-                                canBeFrozen = true;
-                            }
-                        }
-                        else if (key == "commandline") {
-                            commandLine = value;
-                        }
-                        else if (key == "hostname") {
-                            hostname = value;
-                        }
-                    }
-
-                    free(k);
-                }
-                zlist_destroy(&keys);
-
                 if (isMasticPublisher && isIntPID)
                 {
                     //qDebug() << "Our zyre event is about MASTIC publisher:" << pid << hostname << commandLine;
@@ -562,18 +565,18 @@ void NetworkController::manageMessageFrozenUnfrozen(QString peerId, QString mess
  * @param hostname
  * @param commandLine
  */
-void NetworkController::onCommandAskedToLauncher(QString command, QString hostname, QString commandLine)
+void NetworkController::onCommandAskedToLauncher(QString command, QString hostname, QString commandParameter)
 {
-    if (!hostname.isEmpty() && !commandLine.isEmpty())
+    if (!hostname.isEmpty())
     {
         // Get the peer id of The Mastic Launcher with a HostName
         QString peerIdLauncher = MasticLauncherManager::Instance().getPeerIdOfLauncherWithHostName(hostname);
 
         if (!peerIdLauncher.isEmpty()) {
             // Send the command with command line to the peer id of the launcher
-            int success = zyre_whispers(agentElements->node, peerIdLauncher.toStdString().c_str(), "%s %s", command.toStdString().c_str(), commandLine.toStdString().c_str());
+            int success = zyre_whispers(agentElements->node, peerIdLauncher.toStdString().c_str(), "%s %s", command.toStdString().c_str(), commandParameter.toStdString().c_str());
 
-            qInfo() << "Send command" << command << "to launcher on" << hostname << "with command line" << commandLine << "with success ?" << success;
+            qInfo() << "Send command" << command << "to launcher on" << hostname << "with command parameter" << commandParameter << "with success ?" << success;
         }
         else {
             qInfo() << "There is no launcher on" << hostname;
