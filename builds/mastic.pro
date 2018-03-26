@@ -23,5 +23,7 @@ win32:{
 #CONFIG+=raspberry_compilation
 
 
-include ('mastic-dev.pri')
+#include ('mastic-dev.pri')
+
+include('mastic.pri')
 
