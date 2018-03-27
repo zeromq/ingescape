@@ -1722,7 +1722,6 @@ bool mtic_getRequestOutputsFromMappedAgents(){
     return network_RequestOutputsFromMappedAgents;
 }
 
-#define MAX_NETDEVICE_LENGTH 16
 #define MAX_NUMBER_OF_NETDEVICES 16
 
 void mtic_getNetdevicesList(char ***devices, int *nb){
@@ -1743,8 +1742,8 @@ void mtic_getNetdevicesList(char ***devices, int *nb){
     while (name) {
         //        printf (" - name=%s address=%s netmask=%s broadcast=%s\n",
         //                name, ziflist_address (iflist), ziflist_netmask (iflist), ziflist_broadcast (iflist));
-        (*devices)[currentDeviceNb] = calloc(MAX_NETDEVICE_LENGTH+1, sizeof(char));
-        strncpy((*devices)[currentDeviceNb], name, MAX_NETDEVICE_LENGTH);
+        (*devices)[currentDeviceNb] = calloc(NETWORK_DEVICE_LENGTH+1, sizeof(char));
+        strncpy((*devices)[currentDeviceNb], name, NETWORK_DEVICE_LENGTH);
         currentDeviceNb++;
         name = ziflist_next (iflist);
     }

@@ -198,7 +198,7 @@ typedef struct subscriber_s{
 } subscriber_t;
 
 //network internal structure
-#define NETWORK_DEVICE_LENGTH 16
+#define NETWORK_DEVICE_LENGTH 256
 #define IP_ADDRESS_LENGTH 256
 typedef struct zyreloopElements{
     char networkDevice[NETWORK_DEVICE_LENGTH];
