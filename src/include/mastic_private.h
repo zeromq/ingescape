@@ -33,17 +33,16 @@
 #include <winsock2.h>
 #include <Ws2tcpip.h>
 #include <iphlpapi.h>
-#else
-#define MAX_PATH 260
 #endif
 
 #include "mastic.h"
 
+#define MAX_PATH 2048
 #define MAX_IOP_NAME_LENGTH 256
 #define MAX_AGENT_NAME_LENGTH 256
 
-extern char definitionPath[1024];
-extern char mappingPath[1024];
+extern char definitionPath[MAX_PATH];
+extern char mappingPath[MAX_PATH];
 
 //////////////////  STRUCTURES AND ENUMS   //////////////////
 
@@ -216,8 +215,6 @@ typedef struct zyreloopElements{
 //  definition
 
 extern definition* mtic_internal_definition;
-
-char* definition_getIOPValueAsString (agent_iop* iop); //returned value must be freed by user
 void definition_freeDefinition (definition* definition);
 
 
@@ -236,12 +233,9 @@ bool mapping_checkCompatibilityInputOutput(agent_iop *foundInput, agent_iop *fou
 
 extern bool isWholeAgentMuted;
 
-void model_setIopValue(agent_iop *iop, void* value, long size);
+int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void* value, long size);
 agent_iop* model_findIopByName(const char* name, iop_t type);
-agent_iop* model_findInputByName(const char* name);
-agent_iop* model_findOutputByName(const char* name);
-agent_iop* model_findParameterByName(const char* name);
-void* model_getValueFor(const char*name_iop, iop_t type);
+char* model_getIOPValueAsString (agent_iop* iop); //returned value must be freed by user
 
 
 // network
