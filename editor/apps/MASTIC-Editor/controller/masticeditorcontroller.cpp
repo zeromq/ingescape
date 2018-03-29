@@ -185,6 +185,8 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     // Connect to signals from the mastic launcher manager
     connect(_launcherManager, &MasticLauncherManager::hostModelCreated, _hostsSupervisionC, &HostsSupervisionController::onHostModelCreated);
     connect(_launcherManager, &MasticLauncherManager::hostModelWillBeRemoved, _hostsSupervisionC, &HostsSupervisionController::onHostModelWillBeRemoved);
+    connect(_modelManager, &MasticModelManager::agentModelCreated, _hostsSupervisionC, &HostsSupervisionController::onAgentModelCreated);
+    connect(_modelManager, &MasticModelManager::agentModelWillBeDeleted, _hostsSupervisionC, &HostsSupervisionController::onAgentModelWillBeDeleted);
 
     // Connect to signals from the controller for supervision of hosts
     connect(_hostsSupervisionC, &HostsSupervisionController::commandAskedToHost, _networkC, &NetworkController::onCommandAskedToLauncher);

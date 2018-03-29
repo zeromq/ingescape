@@ -9,7 +9,7 @@
  *
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
- *      Alexandre Lemort   <lemort@ingenuity.io>
+ *      Bruno Lemenicier   <lemenicier@ingenuity.io>
  *
  */
 
@@ -81,6 +81,18 @@ public Q_SLOTS:
      */
     void onHostModelWillBeRemoved(HostM* hostModel);
 
+    /**
+     * @brief Slot when a new model of agent has been created
+     * @param agent
+     */
+    void onAgentModelCreated(AgentM* agent);
+
+    /**
+     * @brief Slot when a model of agent will be deleted
+     * @param agent
+     */
+    void onAgentModelWillBeDeleted(AgentM* agent);
+
 private Q_SLOTS:
 
 
@@ -93,8 +105,11 @@ private:
     // Manager for the Mastic launchers
     MasticLauncherManager* _masticLauncherManager;
 
-    // Map from agent name to a list of view models of agent
+    // Map from host name to a list of view models of host
     QHash<HostM*, HostVM*> _mapFromHostModelToViewModel;
+
+    // List of all agents
+    QList<AgentM*> _agentsList;
 };
 
 QML_DECLARE_TYPE(HostsSupervisionController)

@@ -47,6 +47,7 @@ Item {
 
 
 
+
     //--------------------------------
     //
     // Content
@@ -179,8 +180,8 @@ Item {
 
         Item {
             id : hostItem
-//            border.width: 0
-//            color: "#33FFFFFF"
+
+            property var agentmodel: model.listOfAgents
 
             property int margin: 5
 
@@ -189,6 +190,19 @@ Item {
             anchors {
                 left : parent.left
                 right : parent.right
+            }
+
+            // separator
+            Rectangle {
+                anchors {
+                    bottom: parent.bottom
+                    left: parent.left
+                    right: parent.right
+                }
+
+                color: MasticTheme.leftPanelBackgroundColor
+
+                height: 1
             }
 
             Column
@@ -219,6 +233,7 @@ Item {
                     color: MasticTheme.agentsListLabelColor
                     font: MasticTheme.headingFont
                 }
+
                 // IP address
                 Text {
                     id: hostIP
@@ -233,19 +248,33 @@ Item {
                     color: MasticTheme.agentsListTextColor
                     font: MasticTheme.heading2Font
                 }
-                // Peer ID
-                Text {
-                    id: hostPeer
 
-                    anchors {
-                        left : parent.left
-                        right : parent.right
+                // List of associated agents
+                ListView {
+                    id:listAgents
+                    model: agentmodel
+                    interactive: false
+
+                    delegate: Text {
+
+                        anchors {
+                            left : parent.left
+                            leftMargin: 10
+                        }
+                        elide: Text.ElideRight
+
+                        text: qsTr("- %1").arg(model.name)
+                        color: model.isON ? MasticTheme.agentsListLabelColor : MasticTheme.agentOFFLabelColor
+                        font: MasticTheme.normalFont
                     }
-                    elide: Text.ElideRight
 
-                    text: model.hostModel.peerId
-                    color: MasticTheme.agentsListLabelColor
-                    font: MasticTheme.normalFont
+                    height: contentHeight
+
+                    anchors
+                    {
+                        left:parent.left
+                        right:parent.right
+                    }
                 }
             }
 

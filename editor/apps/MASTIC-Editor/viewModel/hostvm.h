@@ -20,6 +20,7 @@
 #include <I2PropertyHelpers.h>
 
 #include "model/hostm.h"
+#include "model/agentm.h"
 
 /**
  * @brief The HostVM class defines a view model of host in the supervision list
@@ -30,6 +31,9 @@ class HostVM : public QObject
 
     // Model of our host
     I2_QML_PROPERTY(HostM*, hostModel)
+
+    // List of associated Agents
+    I2_QOBJECT_LISTMODEL(AgentM, listOfAgents)
 
     // Flag indicating if our agent can be frozen
     I2_QML_PROPERTY_READONLY(bool, canProvideStream)

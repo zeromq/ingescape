@@ -9,7 +9,7 @@
  *
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
- *      Alexandre Lemort   <lemort@ingenuity.io>
+ *      Bruno Lemenicier   <lemenicier@ingenuity.io>
  *
  */
 
@@ -45,7 +45,7 @@ HostsSupervisionController::~HostsSupervisionController()
 
     _mapFromHostModelToViewModel.clear();
 
-    // Delete all VM of agents
+    // Delete all VM of host
     _hostsList.deleteAllItems();
 
     _masticLauncherManager = NULL;
@@ -64,6 +64,16 @@ void HostsSupervisionController::onHostModelCreated(HostM* hostModel)
         _mapFromHostModelToViewModel.insert(hostModel, newHost);
 
         connect(newHost, &HostVM::commandAskedToHost, this, &HostsSupervisionController::commandAskedToHost);
+
+        // associate host with existing agents if necessary
+        foreach (AgentM* agent, _agentsList) {
+            if(newHost->hostModel()->ipAddress() == agent->address() && !newHost->listOfAgents()->contains(agent))
+            {
+                qDebug() << "Add agent " << agent->name() << " to host " << newHost->hostModel()->name();
+
+                newHost->listOfAgents()->append(agent);
+            }
+        }
     }
 }
 
@@ -85,6 +95,53 @@ void HostsSupervisionController::onHostModelWillBeRemoved(HostM* hostModel)
                 _hostsList.remove(hostToRemove);
 
             _mapFromHostModelToViewModel.remove(hostModel);
+        }
+    }
+}
+
+/**
+ * @brief Slot when a new model of agent has been created
+ * @param agent
+ */
+void HostsSupervisionController::onAgentModelCreated(AgentM* agent)
+{
+    if (agent != NULL)
+    {
+        if(!_agentsList.contains(agent))
+            _agentsList.append(agent);
+
+        // try to get the involved hostVM with agent's host name
+        foreach (HostVM* host, _hostsList.toList()) {
+            if(host->hostModel()->ipAddress() == agent->address() && !host->listOfAgents()->contains(agent))
+            {
+                host->listOfAgents()->append(agent);
+                qDebug() << "Add agent " << agent->name() << " to host " << host->hostModel()->name();
+                break;
+            }
+        }
+    }
+}
+
+/**
+ * @brief Slot when a model of agent will be deleted
+ * @param agent
+ */
+void HostsSupervisionController::onAgentModelWillBeDeleted(AgentM* agent)
+{
+    if (agent != NULL)
+    {
+        int indexOfAgent = _agentsList.indexOf(agent);
+        if(indexOfAgent != -1)
+            _agentsList.removeAt(indexOfAgent);
+
+        // try to get the involved hostVM with agent's host name
+        foreach (HostVM* host, _hostsList.toList()) {
+            if(host->listOfAgents()->contains(agent))
+            {
+                host->listOfAgents()->remove(agent);
+                qDebug() << "Remove agent " << agent->name() << " from host " << host->hostModel()->name();
+                break;
+            }
         }
     }
 }
