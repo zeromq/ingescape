@@ -33,7 +33,7 @@ bool admin_logInStream = false;
 bool logInFile = false;
 bool logInConsole = false;
 bool useColorInConsole = false;
-mtic_logLevel_t logLevel = MTIC_LOG_TRACE;
+mtic_logLevel_t logLevel = MTIC_LOG_INFO;
 char logFile[1024] = "";
 char logContent[2048] = "";
 char logTime[128] = "";
@@ -186,17 +186,23 @@ void admin_unlock(void) {
 ////////////////////////////////////////////////////////////////////////
 
 int mtic_version(void){
-    printf("Mastic version : %d.%d.%d\n", MASTIC_MAJOR, MASTIC_MINOR, MASTIC_MICRO);
+    mtic_info("Mastic version : %d.%d.%d\n", MASTIC_MAJOR, MASTIC_MINOR, MASTIC_MICRO);
     return MASTIC_VERSION;
 }
 
-void mtic_log(mtic_logLevel_t level, const char *fmt, ...){
+void mtic_log(mtic_logLevel_t level, const char *function, const char *fmt, ...){
     admin_lock();
 
     va_list list;
     va_start(list, fmt);
     vsnprintf(logContent, 2047, fmt, list);
     va_end(list);
+    
+    //remove final \n if needed
+    //TODO: scan the whole string to remove unallowed characters
+    if (logContent[strlen(logContent) - 1] == '\n'){
+        logContent[strlen(logContent) - 1] = '\0';
+    }
 
     if (logInFile){
         //create default path if current is empty
@@ -231,21 +237,21 @@ void mtic_log(mtic_logLevel_t level, const char *fmt, ...){
             }
         }
         admin_computeTime(logTime);
-        fprintf(fp,"%s;%s;%s", logTime, log_levels[level], logContent);
+        fprintf(fp,"%s;%s;%s;%s\n", logTime, log_levels[level], function, logContent);
         if (++nb_of_entries > NUMBER_OF_LOGS_FOR_FFLUSH){
             nb_of_entries = 0;
             fflush(fp);
         }
     }
-    if (logInConsole && level >= logLevel){
+    if ((logInConsole && level >= logLevel) || level >= MTIC_LOG_ERROR){
         if (useColorInConsole){
-            fprintf(stderr,"%s%s\x1b[0m;%s", log_colors[logLevel], log_levels[level], logContent);
+            fprintf(stderr,"%s%s\x1b[0m;%s\n", log_colors[logLevel], log_levels[level], logContent);
         }else{
-            fprintf(stderr,"%s;%s", log_levels[level], logContent);
+            fprintf(stderr,"%s;%s;%s\n", log_levels[level], function, logContent);
         }
     }
     if (admin_logInStream && agentElements != NULL && agentElements->logger != NULL){
-        zstr_sendf(agentElements->logger, "%s;%s", log_levels[level], logContent);
+        zstr_sendf(agentElements->logger, "%s;%s;%s", log_levels[level], function, logContent);
     }
     admin_unlock();
 
@@ -286,9 +292,9 @@ bool mtic_getUseColorVerbose (void) {
 void mtic_setLogStream(bool stream){
     if (agentElements != NULL){
         if (stream){
-            mtic_warn("mtic_setLogStream: agent is already started, log stream cannot be created anymore\n");
+            mtic_warn("agent is already started, log stream cannot be created anymore");
         }else{
-            mtic_warn("mtic_setLogStream: agent is already started, log stream cannot be disabled anymore\n");
+            mtic_warn("agent is already started, log stream cannot be disabled anymore");
         }
         return;
     }
@@ -313,18 +319,18 @@ void mtic_setLogPath(const char *path){
             fclose(fp);
             fp = NULL;
             if (access(logFile, W_OK) == -1){
-                printf("creating log file: %s\n", logFile);
+                mtic_info("creating new log file: %s", logFile);
             }
             fp = fopen (logFile,"a");
             if (fp == NULL){
-                printf("error when trying to initiate log file: %s\n", logFile);
+                mtic_error("error when trying to initiate log file at path %s", logFile);
             }else{
-                printf("switching to new log file: %s\n", logFile);
+                mtic_info("switching to new log file: %s", logFile);
             }
             admin_unlock();
         }
     }else{
-        printf("mtic_setLogPath : passed path cannot be NULL or with length equal to zero\n");
+        mtic_error("passed path cannot be NULL or with length equal to zero");
     }
 }
 
