@@ -270,7 +270,7 @@ void sendMappingToAgent(const char *peerId, const char *mapping)
 }
 
 void network_cleanAndFreeSubscriber(subscriber_t *subscriber){
-    mtic_debug("cleaning subscription to %s\n", subscriber->agentName);
+    mtic_info("cleaning subscription to %s\n", subscriber->agentName);
     // clean the agent definition
     if(subscriber->definition != NULL){
         definition_freeDefinition(subscriber->definition);
@@ -731,34 +731,34 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                             switch (found_iop->value_type) {
                                 case INTEGER_T:
                                     zmsg_addstr(omsg, found_iop->name);
-                                    zmsg_addstrf(omsg, "%d", found_iop->type);
+                                    zmsg_addstrf(omsg, "%d", found_iop->value_type);
                                     zmsg_addmem(omsg, &(found_iop->value.i), sizeof(int));
                                     break;
                                 case DOUBLE_T:
                                     zmsg_addstr(omsg, found_iop->name);
-                                    zmsg_addstrf(omsg, "%d", found_iop->type);
+                                    zmsg_addstrf(omsg, "%d", found_iop->value_type);
                                     zmsg_addmem(omsg, &(found_iop->value.d), sizeof(double));
                                     break;
                                 case STRING_T:
                                     zmsg_addstr(omsg, found_iop->name);
-                                    zmsg_addstrf(omsg, "%d", found_iop->type);
+                                    zmsg_addstrf(omsg, "%d", found_iop->value_type);
                                     zmsg_addstr(omsg, found_iop->value.s);
                                     break;
                                 case BOOL_T:
                                     zmsg_addstr(omsg, found_iop->name);
-                                    zmsg_addstrf(omsg, "%d", found_iop->type);
+                                    zmsg_addstrf(omsg, "%d", found_iop->value_type);
                                     zmsg_addmem(omsg, &(found_iop->value.b), sizeof(bool));
                                     break;
                                 case IMPULSION_T:
                                     //disabled
 //                                    zmsg_addstr(omsg, found_iop->name);
-//                                    zmsg_addstrf(omsg, "%d", found_iop->type);
+//                                    zmsg_addstrf(omsg, "%d", found_iop->value_type);
 //                                    zmsg_addmem(omsg, NULL, 0);
                                     break;
                                 case DATA_T:
                                     //disabled
 //                                    zmsg_addstr(omsg, found_iop->name);
-//                                    zmsg_addstrf(omsg, "%d", found_iop->type);
+//                                    zmsg_addstrf(omsg, "%d", found_iop->value_type);
 //                                    zmsg_addmem(omsg, (found_iop->value.data), found_iop->valueSize);
                                     break;
                                     
