@@ -4,7 +4,8 @@
 //  Created by Mathieu Poirier
 //  Modified by Patxi Berard
 //  Modified by Vincent Deliencourt
-//  Copyright © 2016 IKKY WP4.8. All rights reserved.
+//  Modified by Stephane Vales
+//  Copyright © 2017 Ingenuity i/o. All rights reserved.
 //
 
 #include <stdio.h>
@@ -37,7 +38,7 @@
 #define MAP_NO_DESCRIPTION "NO_DESCRIPTION"
 #define MAP_NO_VERSION "NO_VERSION"
 
-char definitionPath[1024] = "";
+char definitionPath[MAX_PATH] = "";
 
 iopType_t string_to_value_type(const char* str) {
     
@@ -1310,7 +1311,7 @@ int mtic_loadDefinitionFromPath (const char* file_path){
         mtic_debug("mtic_loadDefinitionFromPath : %s caused an error and was ignored\n", file_path);
         return -1;
     }else{
-        strncpy(definitionPath, file_path, 1023);
+        strncpy(definitionPath, file_path, MAX_PATH - 1);
         if (mtic_internal_definition != NULL){
             definition_freeDefinition(mtic_internal_definition);
             mtic_internal_definition = NULL;
