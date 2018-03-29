@@ -230,34 +230,47 @@ PUBLIC int mtic_removeMappingEntryWithName(const char *fromOurInput, const char 
 //displays MAJOR.MINOR.MICRO in console
 PUBLIC int mtic_version(void);
 
-//Utility function to find network adapters with broadcast capabilities
+
+//Utility functions to find network adapters with broadcast capabilities
 //to be used in mtic_startWithDevice
 PUBLIC void mtic_getNetdevicesList(char ***devices, int *nb);
 PUBLIC void mtic_freeNetdevicesList(char **devices, int nb);
 
+
 //Agent command line can be passed here for inclusion in the
-//agent's headers. If not set, command line is initialized
-//with exec path without any parameter.
+//agent's headers and to be used by masticLauncher. If not set,
+//command line is initialized with exec path without any parameter.
 PUBLIC void mtic_setCommandLine(const char *line);
+
 
 //When mapping an agent setting the option below requests the
 //mapped agent to send its outputs (except for data & impulsions)
 //to us through a private communication for our proper initialization.
-//By default, this behavior is set to false.
+//By default, this behavior is disabled.
 PUBLIC void mtic_setRequestOutputsFromMappedAgents(bool notify);
 PUBLIC bool mtic_getRequestOutputsFromMappedAgents(void);
 
-//logs and debug messages
-PUBLIC void mtic_setVerbose(bool verbose); //log in console
+
+//logs management
+PUBLIC void mtic_setVerbose(bool verbose); //enable log in console (enabled by default)
 PUBLIC bool mtic_isVerbose(void);
-PUBLIC void mtic_setLogStream(bool useLogStream); //log in socket
-PUBLIC bool mtic_getLogStream(void);
-PUBLIC void mtic_setLogInFile(bool useLogFile); //log in file
-PUBLIC bool mtic_getLogInFile(void);
 PUBLIC void mtic_setUseColorVerbose(bool useColor); //use colors in console
 PUBLIC bool mtic_getUseColorVerbose(void);
+PUBLIC void mtic_setLogStream(bool useLogStream); //enable log in socket
+PUBLIC bool mtic_getLogStream(void);
+PUBLIC void mtic_setLogInFile(bool useLogFile); //enable log in file
+PUBLIC bool mtic_getLogInFile(void);
 PUBLIC void mtic_setLogPath(const char *path); //default is ~/ on UNIX systems and current PATH on Windows
 PUBLIC char* mtic_getLogPath(void); // must be freed by caller
+
+/* Logs policy
+ - fatal : Events that force application termination.
+ - error : Events that are fatal to the current operation but not the whole application.
+ - warning : Events that can potentially cause application anomalies but that can be recovered automatically (by circumventing or retrying).
+ - info : Generally useful information to log (service start/stop, configuration assumptions, etc.).
+ - debug : Information that is diagnostically helpful to people more than just developers but useless for system monitoring.
+ - trace : Information about parts of functions, for detailed diagnostic only.
+ */
 typedef enum {
     MTIC_LOG_TRACE = 0,
     MTIC_LOG_DEBUG,
@@ -266,17 +279,16 @@ typedef enum {
     MTIC_LOG_ERROR,
     MTIC_LOG_FATAL
 } mtic_logLevel_t;
-PUBLIC void mtic_setLogLevel (mtic_logLevel_t level); //set log level in console, default is MTIC_LOG_TRACE
+PUBLIC void mtic_setLogLevel (mtic_logLevel_t level); //set log level in console, default is MTIC_LOG_INFO
 PUBLIC mtic_logLevel_t mtic_getLogLevel(void);
+PUBLIC void mtic_log(mtic_logLevel_t, const char *function, const char *fmt, ...);
+#define mtic_trace(...) mtic_log(MTIC_LOG_TRACE, __func__, __VA_ARGS__)
+#define mtic_debug(...) mtic_log(MTIC_LOG_DEBUG, __func__, __VA_ARGS__)
+#define mtic_info(...)  mtic_log(MTIC_LOG_INFO, __func__, __VA_ARGS__)
+#define mtic_warn(...)  mtic_log(MTIC_LOG_WARN, __func__, __VA_ARGS__)
+#define mtic_error(...) mtic_log(MTIC_LOG_ERROR, __func__, __VA_ARGS__)
+#define mtic_fatal(...) mtic_log(MTIC_LOG_FATAL, __func__, __VA_ARGS__)
 
-//void mtic_debug(const char*fmt, ...);
-PUBLIC void mtic_log(mtic_logLevel_t, const char *fmt, ...);
-#define mtic_trace(...) mtic_log(MTIC_LOG_TRACE, __VA_ARGS__)
-#define mtic_debug(...) mtic_log(MTIC_LOG_DEBUG, __VA_ARGS__)
-#define mtic_info(...)  mtic_log(MTIC_LOG_INFO, __VA_ARGS__)
-#define mtic_warn(...)  mtic_log(MTIC_LOG_WARN, __VA_ARGS__)
-#define mtic_error(...) mtic_log(MTIC_LOG_ERROR, __VA_ARGS__)
-#define mtic_fatal(...) mtic_log(MTIC_LOG_FATAL, __VA_ARGS__)
 
 //resources file management
 PUBLIC void mtic_setDefinitionPath(const char *path);
