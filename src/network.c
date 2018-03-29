@@ -213,12 +213,12 @@ int network_manageSubscriberMapping(subscriber_t *subscriber){
             if (strcmp(subscriber->agentName, el->agent_name)==0 || strcmp(el->agent_name, "*") == 0){
                 //mapping element is compatible with subscriber name
                 //check if we find a compatible output in subscriber definition
-                agent_iop *foundOutput = NULL;
+                agent_iop_t *foundOutput = NULL;
                 if (subscriber->definition != NULL){
                     HASH_FIND_STR(subscriber->definition->outputs_table, el->output_name, foundOutput);
                 }
                 //check if we find a valid input in our own definition
-                agent_iop *foundInput = NULL;
+                agent_iop_t *foundInput = NULL;
                 if (mtic_internal_definition != NULL){
                     HASH_FIND_STR(mtic_internal_definition->inputs_table, el->input_name, foundInput);
                 }
@@ -391,7 +391,7 @@ int handleSubscriptionMessage(zmsg_t *msg, const char *subscriberPeerId){
                 && strcmp(elmt->output_name, output) == 0){
                 //we have a match on emitting agent name and its ouput name :
                 //still need to check the targeted input existence in our definition
-                agent_iop *foundInput = NULL;
+                agent_iop_t *foundInput = NULL;
                 if (mtic_internal_definition->inputs_table != NULL){
                     HASH_FIND_STR(mtic_internal_definition->inputs_table, elmt->input_name, foundInput);
                 }
@@ -582,7 +582,7 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     zyre_whispers(agentElements->node, peer, "FROZEN=1");
                 }
                 if (mtic_internal_definition != NULL){
-                    struct agent_iop *current_iop, *tmp_iop;
+                    agent_iop_t *current_iop, *tmp_iop;
                     HASH_ITER(hh, mtic_internal_definition->outputs_table, current_iop, tmp_iop) {
                         if (current_iop->is_muted && current_iop->name != NULL){
                             zyre_whispers(agentElements->node, peer, "OUTPUT_MUTED %s", current_iop->name);
@@ -726,7 +726,7 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     zmsg_t *omsg = zmsg_new();
                     zmsg_addstr(omsg, "OUTPUTS");
                     for (i = 0; i < nbOutputs; i++){
-                        agent_iop * found_iop = model_findIopByName(outputsList[i],OUTPUT_T);
+                        agent_iop_t * found_iop = model_findIopByName(outputsList[i],OUTPUT_T);
                         if (found_iop != NULL){
                             switch (found_iop->value_type) {
                                 case INTEGER_T:
@@ -1166,7 +1166,7 @@ initActor (zsock_t *pipe, void *args)
 
 int network_publishOutput (const char* output_name){
     int result = 0;
-    agent_iop * found_iop = model_findIopByName(output_name,OUTPUT_T);
+    agent_iop_t * found_iop = model_findIopByName(output_name,OUTPUT_T);
     
     if(agentElements != NULL && agentElements->publisher != NULL && found_iop != NULL)
     {

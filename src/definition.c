@@ -27,35 +27,35 @@ typedef struct agent_port_t {
 ////////////////////////////////////////////////////////////////////////
 // INTERNAL FUNCTIONS
 ////////////////////////////////////////////////////////////////////////
-void definition_freeIOP (agent_iop* agent_iop){
-    if (agent_iop == NULL){
+void definition_freeIOP (agent_iop_t* iop){
+    if (iop == NULL){
         return;
     }
-    if ((agent_iop)->name != NULL){
-        free((char*)(agent_iop)->name);
+    if ((iop)->name != NULL){
+        free((char*)(iop)->name);
     }
-    if ((agent_iop)->value.s != NULL){
-        free((char*)(agent_iop)->value.s);
+    if ((iop)->value.s != NULL){
+        free((char*)(iop)->value.s);
     }
-    if ((agent_iop)->value.data != NULL){
-        free((agent_iop)->value.data);
+    if ((iop)->value.data != NULL){
+        free((iop)->value.data);
     }
-    if ((agent_iop)->callbacks != NULL){
+    if ((iop)->callbacks != NULL){
         mtic_observe_callback_t *cb, *tmp;
-        DL_FOREACH_SAFE((agent_iop)->callbacks, cb, tmp){
-            DL_DELETE((agent_iop)->callbacks, cb);
+        DL_FOREACH_SAFE((iop)->callbacks, cb, tmp){
+            DL_DELETE((iop)->callbacks, cb);
             free(cb);
         }
     }
-    free(agent_iop);
+    free(iop);
 }
 
-int definition_addIopToDefinition(agent_iop *iop, iop_t iop_type, definition *def){
+int definition_addIopToDefinition(agent_iop_t *iop, iop_t iop_type, definition *def){
     if(def == NULL){
         mtic_error("Cannot add IOP %s to NULL definition", iop->name);
         return 0;
     }
-    agent_iop *previousIOP = NULL;
+    agent_iop_t *previousIOP = NULL;
     switch (iop_type) {
         case INPUT_T:
             HASH_FIND_STR(def->inputs_table, iop->name , previousIOP);
@@ -89,13 +89,13 @@ int definition_addIopToDefinition(agent_iop *iop, iop_t iop_type, definition *de
     return 1;
 }
 
-agent_iop* definition_createIop(const char *name, iop_t type, iopType_t value_type, void *value, long size){
+agent_iop_t* definition_createIop(const char *name, iop_t type, iopType_t value_type, void *value, long size){
     if (mtic_internal_definition == NULL){
         mtic_error("Cannot add IOP %s to NULL definition", name);
         return NULL;
     }
-    agent_iop *iop = NULL;
-    iop = calloc (1, sizeof(agent_iop));
+    agent_iop_t *iop = NULL;
+    iop = calloc (1, sizeof(agent_iop_t));
     char *n = strndup(name, MAX_IOP_NAME_LENGTH);
     bool spaceInName = false;
     size_t lengthOfN = strlen(n);
@@ -142,7 +142,7 @@ agent_iop* definition_createIop(const char *name, iop_t type, iopType_t value_ty
 // PRIVATE API
 ////////////////////////////////////////////////////////////////////////
 void definition_freeDefinition (definition* def) {
-    struct agent_iop *current_iop, *tmp_iop;
+    agent_iop_t *current_iop, *tmp_iop;
     if (def->name != NULL){
         free((char*)def->name);
         def->name = NULL;
@@ -197,7 +197,7 @@ int mtic_clearDefinition(){
     if(mtic_internal_definition != NULL){
         definition_freeDefinition(mtic_internal_definition);
     }
-    mtic_internal_definition = calloc(1, sizeof(struct definition));
+    mtic_internal_definition = calloc(1, sizeof(definition));
     mtic_internal_definition->name = mtic_getAgentName();
     mtic_internal_definition->description = NULL;
     mtic_internal_definition->version = NULL;
@@ -291,7 +291,7 @@ int mtic_setDefinitionVersion(const char *version){
         return -1;
     }
     if(mtic_internal_definition == NULL){
-        mtic_internal_definition = calloc(1, sizeof(struct definition));
+        mtic_internal_definition = calloc(1, sizeof(definition));
     }
     if(mtic_internal_definition->version != NULL){
         free((char*)mtic_internal_definition->version);
@@ -325,7 +325,7 @@ int mtic_createInput(const char *name, iopType_t value_type, void *value, long s
     if(mtic_internal_definition == NULL){
         mtic_internal_definition = calloc(1, sizeof(definition));
     }
-    agent_iop *iop = definition_createIop(name, INPUT_T, value_type, value, size);
+    agent_iop_t *iop = definition_createIop(name, INPUT_T, value_type, value, size);
     if (iop == NULL){
         return -1;
     }
@@ -352,7 +352,7 @@ int mtic_createOutput(const char *name, iopType_t value_type, void *value, long 
     if(mtic_internal_definition == NULL){
         mtic_internal_definition = calloc(1, sizeof(definition));
     }
-    agent_iop* iop = definition_createIop(name, OUTPUT_T, value_type, value, size);
+    agent_iop_t* iop = definition_createIop(name, OUTPUT_T, value_type, value, size);
     if (iop == NULL){
         return -1;
     }
@@ -378,7 +378,7 @@ int mtic_createParameter(const char *name, iopType_t value_type, void *value, lo
     if(mtic_internal_definition == NULL){
         mtic_internal_definition = calloc(1, sizeof(definition));
     }
-    agent_iop* iop = definition_createIop(name, PARAMETER_T, value_type, value, size);
+    agent_iop_t* iop = definition_createIop(name, PARAMETER_T, value_type, value, size);
     if (iop == NULL){
         return -1;
     }
@@ -403,7 +403,7 @@ int mtic_removeInput(const char *name){
         mtic_error("No definition available yet");
         return -1;
     }
-    agent_iop * iop = model_findIopByName(name,INPUT_T);
+    agent_iop_t * iop = model_findIopByName(name,INPUT_T);
     if(iop == NULL){
         mtic_warn("The input %s could not be found", name);
         return -2;
@@ -431,7 +431,7 @@ int mtic_removeOutput(const char *name){
         mtic_error("No definition available yet");
         return -1;
     }
-    agent_iop * iop = model_findIopByName(name,OUTPUT_T);
+    agent_iop_t * iop = model_findIopByName(name,OUTPUT_T);
     if(iop == NULL){
         mtic_warn("The output %s could not be found", name);
         return -2;
@@ -459,7 +459,7 @@ int mtic_removeParameter(const char *name){
         mtic_error("No definition available yet");
         return -1;
     }
-    agent_iop * iop = model_findIopByName(name,PARAMETER_T);
+    agent_iop_t * iop = model_findIopByName(name,PARAMETER_T);
     if(iop == NULL){
         mtic_warn("The parameter %s could not be found", name);
         return -2;

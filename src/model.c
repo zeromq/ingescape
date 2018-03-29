@@ -20,7 +20,7 @@
 // INTERNAL FUNCTIONS
 ////////////////////////////////////////////////////////////////////////
 
-void model_runObserveCallbacksForIOP(agent_iop *iop, void *value, long valueSize){
+void model_runObserveCallbacksForIOP(agent_iop_t *iop, void *value, long valueSize){
     mtic_observe_callback_t *cb;
     DL_FOREACH(iop->callbacks, cb){
         cb->callback_ptr(iop->type, iop->name, iop->value_type, value, valueSize, cb->data);
@@ -50,7 +50,7 @@ char* model_doubleToString(const double value){
 static int model_observe(const char* name, iop_t iopType, mtic_observeCallback cb, void* myData){
 
     //find the iop
-    agent_iop *iop = model_findIopByName((char*) name, iopType);
+    agent_iop_t *iop = model_findIopByName((char*) name, iopType);
 
     // Check if the input has been returned.
     if(iop == NULL){
@@ -84,7 +84,7 @@ iopType_t model_getTypeForIOP(const char *name, iop_t type){
         return -1;
     }
     
-    agent_iop *iop = NULL;
+    agent_iop_t *iop = NULL;
     if (type == INPUT_T){
         HASH_FIND_STR(mtic_internal_definition->inputs_table, name, iop);
         if(iop == NULL){
@@ -111,8 +111,8 @@ iopType_t model_getTypeForIOP(const char *name, iop_t type){
     return iop->value_type;
 }
 
-agent_iop *model_findInputByName(const char *name){
-    agent_iop *found = NULL;
+agent_iop_t *model_findInputByName(const char *name){
+    agent_iop_t *found = NULL;
     if(name != NULL && mtic_internal_definition != NULL){
         HASH_FIND_STR( mtic_internal_definition->inputs_table, name, found );
     }else{
@@ -125,8 +125,8 @@ agent_iop *model_findInputByName(const char *name){
     return found;
 }
 
-agent_iop *model_findOutputByName(const char *name){
-    agent_iop *found = NULL;
+agent_iop_t *model_findOutputByName(const char *name){
+    agent_iop_t *found = NULL;
     if(name != NULL && mtic_internal_definition != NULL){
         HASH_FIND_STR( mtic_internal_definition->outputs_table, name, found );
     }else{
@@ -139,8 +139,8 @@ agent_iop *model_findOutputByName(const char *name){
     return found;
 }
 
-agent_iop *model_findParameterByName(const char *name){
-    agent_iop *found = NULL;
+agent_iop_t *model_findParameterByName(const char *name){
+    agent_iop_t *found = NULL;
     if(name != NULL && mtic_internal_definition != NULL){
         HASH_FIND_STR( mtic_internal_definition->params_table, name, found );
     }else{
@@ -154,7 +154,7 @@ agent_iop *model_findParameterByName(const char *name){
 }
 
 void* model_getValueFor(const char *name, iop_t type){
-    agent_iop *iop = model_findIopByName((char*) name,type);
+    agent_iop_t *iop = model_findIopByName((char*) name,type);
     if(iop == NULL){
         mtic_error("%s not found", name);
         return NULL;
@@ -186,7 +186,7 @@ void* model_getValueFor(const char *name, iop_t type){
 }
 
 int mtic_readIOP(const char *name, iop_t type, void **value, long *size){
-    agent_iop *iop = model_findIopByName((char*) name, type);
+    agent_iop_t *iop = model_findIopByName((char*) name, type);
     if(iop == NULL){
         mtic_error("%s not found", name);
         return 0;
@@ -203,7 +203,7 @@ int mtic_readIOP(const char *name, iop_t type, void **value, long *size){
 }
 
 bool model_readIopAsBool (const char *name, iop_t type){
-    agent_iop *iop = model_findIopByName(name, type);
+    agent_iop_t *iop = model_findIopByName(name, type);
     if(iop != NULL){
         switch(iop->value_type){
             case BOOL_T:
@@ -246,7 +246,7 @@ bool model_readIopAsBool (const char *name, iop_t type){
 }
 
 int model_readIopAsInt (const char *name, iop_t type){
-    agent_iop *iop = model_findIopByName(name, type);
+    agent_iop_t *iop = model_findIopByName(name, type);
     if(iop != NULL){
         switch(iop->value_type){
             case BOOL_T:
@@ -284,7 +284,7 @@ int model_readIopAsInt (const char *name, iop_t type){
 }
 
 double model_readIopAsDouble (const char *name, iop_t type){
-    agent_iop *iop = model_findIopByName(name, type);
+    agent_iop_t *iop = model_findIopByName(name, type);
     if(iop != NULL){
         switch(iop->value_type){
             case BOOL_T:
@@ -318,7 +318,7 @@ double model_readIopAsDouble (const char *name, iop_t type){
 }
 
 char *model_readIopAsString (const char *name, iop_t type){
-    agent_iop *iop = model_findIopByName(name,INPUT_T);
+    agent_iop_t *iop = model_findIopByName(name, type);
     if(iop != NULL){
         switch(iop->value_type){
             case STRING_T:
@@ -352,7 +352,7 @@ char *model_readIopAsString (const char *name, iop_t type){
 }
 
 int model_readIopAsData (const char *name, iop_t type, void **value, long *size){
-    agent_iop *iop = model_findIopByName((char*) name, type);
+    agent_iop_t *iop = model_findIopByName((char*) name, type);
     if(iop == NULL){
         mtic_error("%s not found", name);
         *value = NULL;
@@ -371,8 +371,8 @@ int model_readIopAsData (const char *name, iop_t type, void **value, long *size)
     return 1;
 }
 
-bool model_checkIOPExistence(const char *name, agent_iop *hash){
-    agent_iop *iop = NULL;
+bool model_checkIOPExistence(const char *name, agent_iop_t *hash){
+    agent_iop_t *iop = NULL;
     if(mtic_internal_definition == NULL){
         mtic_error("Definition is NULL");
         return false;
@@ -389,7 +389,7 @@ char **model_getIopList(long *nbOfElements, iop_t type){
         mtic_error("Definition is NULL");
         return NULL;
     }
-    agent_iop *hash = NULL;
+    agent_iop_t *hash = NULL;
     switch (type) {
         case INPUT_T:
             hash = mtic_internal_definition->inputs_table;
@@ -409,7 +409,7 @@ char **model_getIopList(long *nbOfElements, iop_t type){
         return NULL;
     
     char ** list = (char**) malloc( N * sizeof(char*));
-    agent_iop *current_iop;
+    agent_iop_t *current_iop;
     int index = 0;
     for(current_iop = hash; current_iop != NULL; current_iop = current_iop->hh.next) {
         list[index] = strdup(current_iop->name);
@@ -421,7 +421,7 @@ char **model_getIopList(long *nbOfElements, iop_t type){
 ////////////////////////////////////////////////////////////////////////
 // PRIVATE API
 ////////////////////////////////////////////////////////////////////////
-char* model_getIOPValueAsString (agent_iop* iop){
+char* model_getIOPValueAsString (agent_iop_t* iop){
     char *str_value = NULL;
     if(iop != NULL){
         switch (iop->value_type) {
@@ -459,7 +459,7 @@ char* model_getIOPValueAsString (agent_iop* iop){
 }
 
 int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void* value, long size){
-    agent_iop *iop = model_findIopByName((char*) iopName, iopType);
+    agent_iop_t *iop = model_findIopByName((char*) iopName, iopType);
     if(iop == NULL){
         mtic_error("%s not found for writing", iopName);
         return 0;
@@ -755,8 +755,8 @@ int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void*
     return ret;
 }
 
-agent_iop * model_findIopByName(const char *name, iop_t type){
-    agent_iop *found = NULL;
+agent_iop_t * model_findIopByName(const char *name, iop_t type){
+    agent_iop_t *found = NULL;
     
     switch (type) {
         case INPUT_T:
@@ -1139,7 +1139,7 @@ int mtic_observeParameter(const char *name, mtic_observeCallback cb, void * myDa
 
 
 int mtic_muteOutput(const char *name){
-    agent_iop *iop = model_findIopByName((char*) name, OUTPUT_T);
+    agent_iop_t *iop = model_findIopByName((char*) name, OUTPUT_T);
     if(iop == NULL || iop->type != OUTPUT_T){
         mtic_warn("Output '%s' not found", name);
         return 0;
@@ -1152,7 +1152,7 @@ int mtic_muteOutput(const char *name){
 }
 
 int mtic_unmuteOutput(const char *name){
-    agent_iop *iop = model_findIopByName((char*) name,OUTPUT_T);
+    agent_iop_t *iop = model_findIopByName((char*) name,OUTPUT_T);
     if(iop == NULL || iop->type != OUTPUT_T){
         mtic_warn("Output '%s' not found", name);
         return 0;
@@ -1165,7 +1165,7 @@ int mtic_unmuteOutput(const char *name){
 }
 
 bool mtic_isOutputMuted(const char *name){
-    agent_iop *iop = model_findIopByName((char*) name,OUTPUT_T);
+    agent_iop_t *iop = model_findIopByName((char*) name,OUTPUT_T);
     if(iop == NULL || iop->type != OUTPUT_T){
         mtic_warn("Output '%s' not found", name);
         return 0;
