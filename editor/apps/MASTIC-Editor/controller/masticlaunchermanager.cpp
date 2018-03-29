@@ -46,21 +46,25 @@ MasticLauncherManager::~MasticLauncherManager()
  * @param hostName
  * @param ipAddress
  */
-void MasticLauncherManager::addMasticLauncher(QString peerId, QString hostName, QString ipAddress)
+void MasticLauncherManager::addMasticLauncher(QString peerId, QString hostName, QString ipAddress, QString streamingPort)
 {
     if (!hostName.isEmpty())
     {
+        // For test purposes, we create a host each time there is a new launcher detected
         HostM* host = getHostWithName(hostName);
         if (host == NULL)
         {
             // Create a new host
-            host = new HostM(hostName, peerId, ipAddress, this);
+            host = new HostM(hostName, peerId, ipAddress, streamingPort, this);
 
             // Add to the list
             _hosts.append(host);
 
             // Add to the map
             _mapFromNameToHost.insert(hostName, host);
+
+            // Emit signal that a new  host model has been created
+            Q_EMIT hostModelCreated(host);
         }
         else
         {
@@ -72,6 +76,11 @@ void MasticLauncherManager::addMasticLauncher(QString peerId, QString hostName, 
             // Update IP address
             if (host->ipAddress() != ipAddress) {
                 host->setipAddress(ipAddress);
+            }
+
+            // Update streaming port
+            if (host->streamingPort() != streamingPort) {
+                host->setstreamingPort(streamingPort);
             }
         }
     }
@@ -92,6 +101,9 @@ void MasticLauncherManager::removeMasticLauncher(QString peerId, QString hostNam
         HostM* host = getHostWithName(hostName);
         if (host != NULL)
         {
+            // Emit signal that the host model will be removed
+            Q_EMIT hostModelWillBeRemoved(host);
+
             // Remove from the list
             _hosts.remove(host);
 

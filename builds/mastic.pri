@@ -38,26 +38,38 @@ win32:{
 
     CONFIG(debug, debug|release){
         #configuration DEBUG
-        librairies_path = $$PWD/../dependencies\windows\libs\win32\Debug
+        DESTDIR = $$OUT_PWD/debug
+        libs_path = $$PWD/../dependencies/windows/libs/win32/Debug
     }else {
         #configuration RELEASE
-        librairies_path = $$PWD/../dependencies\windows\libs\win32\Release
+        DESTDIR = $$OUT_PWD/release
+        libs_path = $$PWD/../dependencies/windows/libs/win32/Release
     }
-
-    #Add librairies
-    LIBS += -L$$librairies_path -llibzmq -llibczmq -llibzyre -lyajl
-
-    #to get the Ip address into the network.c
-    LIBS += -L$$C:/Windows/System32 -lwsock32 -lIPHLPAPI -lws2_32
-
-    INCLUDEPATH += $$PWD/../dependencies/windows/headers/zyre_suite \
-                   $$PWD/../dependencies/windows/headers \
-                   $$PWD/../dependencies/windows/unix \
 
     #UNIX functions
     SOURCES += $$PWD/../dependencies/windows/unix/unixfunctions.c \
 
     HEADERS += $$PWD/../dependencies/windows/unix/unixfunctions.h \
+
+    #Add librairies
+    LIBS += -L$$libs_path -llibzyre -llibczmq -lyajl
+
+    #To get the Ip address into the network.c
+    LIBS += -L$$C:/Windows/System32 -lwsock32 -lIPHLPAPI -lws2_32
+
+    ##Add headers from dependencies
+    zyre_include_path = $$PWD/../dependencies/windows/headers/zyre_suite
+    yajl_include_path = $$PWD/../dependencies/windows/headers/
+
+    INCLUDEPATH += $$zyre_include_path \
+                   $$yajl_include_path \
+                   $$PWD/../dependencies/windows/unix \
+
+    DEPENDPATH += $$zyre_include_path \
+                  $$yajl_include_path \
+
+    #include the pri to copy files to C:\
+    include ("$$PWD/../dependencies/windows/common/pri/mastic-job-copy.pri")
 }
 
 
@@ -122,38 +134,51 @@ unix:!mac {
         ############ Raspberry ###########
     message("Compilation raspberry scope ...")
 
-    libyajl_path = $$PWD/yajl/yajl-2.1.1/Raspberry
-    librairies_path = $$PWD/zyre/bin/Raspberry
+    QMAKE_CFLAGS_DEBUG = \
+        -std=gnu99
+
+    QMAKE_CFLAGS_RELEASE = \
+        -std=gnu99
+
+    libs_path = $$PWD/../dependencies/raspberry/libs
+
+    #Destination repository for our librairy
+    DESTDIR = /usr/local/lib
 
     #Add librairies
-    LIBS += -L$$librairies_path -lzmq -lczmq -lzyre \
-            -L$$libyajl_path/lib -lyajl
+    LIBS += -L$$libs_path -lzmq -lczmq -lzyre -lyajl
+
+    #include the pri to copy files to usr/local/libs
+    include ("$$PWD/../dependencies/windows/common/pri/mastic-job-copy.pri")
     }
 
     android_compilation {
         ############ Android ###########
     message("Compilation android scope ...")
 
+    QMAKE_CFLAGS_DEBUG = \
+        -std=gnu99
+
+    QMAKE_CFLAGS_RELEASE = \
+        -std=gnu99
+
     # This define is used in "network.c" to use the "ifaddrs.h" for android but only to pass the compilation
     # After we need to use the newest functions : "mtic_start_ip" & "init_actor_ip" instead of "mtic_start" & "init_actor"
     # Because getting the Ip Address dynamically by "ifaddrs.c" doesnt work
     DEFINES +=  ANDROID
 
-    INCLUDEPATH += $$PWD/android-ifaddrs-master/ \
+    INCLUDEPATH += $$PWD/../dependencies/android/android-ifaddrs-master/ \
 
-    SOURCES += $$PWD/android-ifaddrs-master/ifaddrs.c \
+    SOURCES += $$PWD/../dependencies/android/android-ifaddrs-master/ifaddrs.c \
 
-    HEADERS += $$PWD/android-ifaddrs-master/ifaddrs.h \
+    HEADERS += $$PWD/../dependencies/android/android-ifaddrs-master/ifaddrs.h \
 
-    #android_libs_path = $$PWD/../builds/android/libs/armeabi-v7a
-    android_libzyre_path = $$PWD/zyre/bin/Android/armeabi-v7a
-    android_libyajl_path = $$PWD/yajl/lloyd-yajl-2.1.0/Android/armeabi-v7a
-
-    LIBS += -L$$android_libzyre_path/ -lzmq -lczmq -lzyre \
-            -L$$android_libyajl_path/ -lyajl
+    libs_path = $$PWD/../dependencies/android/libs-armeabi-v7a
+    LIBS += $$quote(-L$$libs_path/) -lzmq -lczmq -lzyre -lyajl \
 
     ############ Copy needed in C:\ ############
-    #NB: Copy includes normally already with windows
+    #include the pri to copy files to C:\
+    include ("$$PWD/../dependencies/windows/common/pri/mastic-job-copy.pri")
     }
 
     !raspberry_compilation:!android_compilation {
@@ -165,7 +190,23 @@ unix:!mac {
 
     LIBS += -L$$libzyre_path -lzmq -lczmq -lzyre \
             -L$$libyajl_path -lyajl
+
+
+    #Destination repository for our librairy
+    DESTDIR = /usr/local/lib
+
+    #Copy includes
+    install_headers.files += $$PWD/../src/include/*.h \
+                             $$PWD/../src/include/uthash
+    install_headers.path += /usr/local/include/mastic
+
+    #Copy libraries
+    install_libs.files += $$libzyre_path/*.dylib \
+                          $$libyajl_path/*.dylib
+    install_libs.path += $$DESTDIR
+
+    #Add installation options
+    INSTALLS += install_libs \
+                install_headers
     }
 }
-
-

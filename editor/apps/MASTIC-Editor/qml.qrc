@@ -47,5 +47,6 @@
         <file>qml/scenario/ScenarioTimeLine.qml</file>
         <file>qml/scenario/ActionInTimeLine.qml</file>
         <file>qml/DeleteConfirmationPopup.qml</file>
+        <file>qml/host/HostsList.qml</file>
     </qresource>
 </RCC>

@@ -53,7 +53,7 @@ public:
      * @param hostName
      * @param ipAddress
      */
-    void addMasticLauncher(QString peerId, QString hostName, QString ipAddress);
+    void addMasticLauncher(QString peerId, QString hostName, QString ipAddress, QString streamingPort);
 
 
     /**
@@ -79,6 +79,20 @@ public:
      */
     QString getPeerIdOfLauncherWithHostName(QString hostName);
 
+
+Q_SIGNALS:
+
+    /**
+     * @brief Signal emitted when a new model of host has been created
+     * @param agent
+     */
+    void hostModelCreated(HostM* host);
+
+    /**
+     * @brief Signal emitted when a model of host has been removed
+     * @param agent
+     */
+    void hostModelWillBeRemoved(HostM* host);
 
 private:
 

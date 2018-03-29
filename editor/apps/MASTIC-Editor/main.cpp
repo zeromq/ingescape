@@ -68,6 +68,7 @@ void registerCustomQmlTypes()
     qmlRegisterUncreatableType<ActionEditorController>(uri, 1, 0, "ActionEditorController", "Internal Class");
     qmlRegisterUncreatableType<AgentsMappingController>(uri, 1, 0, "AgentsMappingController", "Internal Class");
     qmlRegisterUncreatableType<AgentsSupervisionController>(uri, 1, 0, "AgentsSupervisionController", "Internal Class");
+    qmlRegisterUncreatableType<HostsSupervisionController>(uri, 1, 0, "HostsSupervisionController", "Internal Class");
     qmlRegisterUncreatableType<MasticModelManager>(uri, 1, 0, "MasticModelManager", "Internal Class");
     qmlRegisterUncreatableType<ScenarioController>(uri, 1, 0, "ScenarioController", "Internal Class");
     qmlRegisterUncreatableType<ValuesHistoryController>(uri, 1, 0, "ValuesHistoryController", "Internal Class");
@@ -89,6 +90,9 @@ void registerCustomQmlTypes()
     //----------------
 
     qmlRegisterType<CollapsibleColumn>(uri, 1, 0, "CollapsibleColumn");
+
+    // GST not included in master branch
+    // qmlRegisterType<GstVideoReceiver>(uri, 1, 0, "GstVideoReceiver");
 
 
 
@@ -283,6 +287,9 @@ int main(int argc, char *argv[])
     // - Display error images when SVG items are missing (source: "image://I2svg/.....")
     I2SVGImageProvider::showErrorsAsImage = true;
 
+    // Init streaming capability
+    // GST not included ins master branch
+    // gst_init (NULL , NULL);
 
     //
     // Register our custom QML types

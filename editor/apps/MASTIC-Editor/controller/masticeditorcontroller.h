@@ -24,6 +24,7 @@
 
 #include <controller/masticmodelmanager.h>
 #include <controller/agentssupervisioncontroller.h>
+#include <controller/hostssupervisioncontroller.h>
 #include <controller/agentsmappingcontroller.h>
 #include <controller/networkcontroller.h>
 #include <controller/scenariocontroller.h>
@@ -59,6 +60,9 @@ class MasticEditorController : public QObject
 
     // Controller for agents supervision
     I2_QML_PROPERTY_READONLY(AgentsSupervisionController*, agentsSupervisionC)
+
+    // Controller for hosts supervision
+    I2_QML_PROPERTY_READONLY(HostsSupervisionController*, hostsSupervisionC)
 
     // Controller for agents mapping
     I2_QML_PROPERTY_READONLY(AgentsMappingController*, agentsMappingC)

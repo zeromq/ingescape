@@ -280,10 +280,10 @@ void MasticModelManager::onAgentExited(QString peerId, QString agentName)
  * @param hostname
  * @param ipAddress
  */
-void MasticModelManager::onLauncherEntered(QString peerId, QString hostname, QString ipAddress)
+void MasticModelManager::onLauncherEntered(QString peerId, QString hostname, QString ipAddress, QString streamingPort)
 {
     // Add a Mastic Launcher to the manager
-    MasticLauncherManager::Instance().addMasticLauncher(peerId, hostname, ipAddress);
+    MasticLauncherManager::Instance().addMasticLauncher(peerId, hostname, ipAddress, streamingPort);
 
     // Traverse the list of all agents
     foreach (QString agentName, _mapFromNameToAgentModelsList.keys())
