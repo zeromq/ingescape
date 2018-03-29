@@ -251,7 +251,7 @@ void mtic_log(mtic_logLevel_t level, const char *function, const char *fmt, ...)
         }
     }
     if (admin_logInStream && agentElements != NULL && agentElements->logger != NULL){
-        zstr_sendf(agentElements->logger, "%s;%s;%s", log_levels[level], function, logContent);
+        zstr_sendf(agentElements->logger, "%s;%s;%s\n", log_levels[level], function, logContent);
     }
     admin_unlock();
 
