@@ -13,7 +13,7 @@
  *
  */
 
-#include "HostsSupervisionController.h"
+#include "hostssupervisioncontroller.h"
 
 #include <QQmlEngine>
 #include <QDebug>
