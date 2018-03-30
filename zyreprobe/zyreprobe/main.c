@@ -938,7 +938,7 @@ int main (int argc, char *argv [])
     //init zyre
     zactor_t *beaconActor = NULL;
     zactor_t *gossipActor = NULL;
-    if (!proxy || (gossipconnect == NULL && gossipbind == NULL && endpoint == NULL)){
+    if ((gossipconnect == NULL && gossipbind == NULL && endpoint == NULL)){
         zyreloopElements_t *zEl = calloc(1, sizeof(zyreloopElements_t));
         assert(zEl);
         zEl->name = strdup(name);
@@ -947,7 +947,7 @@ int main (int argc, char *argv [])
         beaconActor = zactor_new (zyre_actor, zEl);
         assert (beaconActor);
     }
-    if (proxy || gossipconnect != NULL || gossipbind != NULL || endpoint != NULL){
+    if (gossipconnect != NULL || gossipbind != NULL || endpoint != NULL){
         if (endpoint != NULL && gossipconnect == NULL && gossipbind == NULL){
             printf("warning : endpoint specified but no attached gossip information, %s won't reach any other agent", name);
         }
