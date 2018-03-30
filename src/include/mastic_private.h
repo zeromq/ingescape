@@ -155,6 +155,7 @@ typedef struct subscriber_s{
 typedef struct zyreloopElements{
     char networkDevice[NETWORK_DEVICE_LENGTH];
     char ipAddress[IP_ADDRESS_LENGTH];
+    char brokerEndPoint[IP_ADDRESS_LENGTH];
     int zyrePort;
     zactor_t *agentActor;
     zyre_t *node;

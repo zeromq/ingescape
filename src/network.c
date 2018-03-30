@@ -972,13 +972,21 @@ initActor (zsock_t *pipe, void *args)
     bool canContinue = true;
     //start zyre
     agentElements->node = zyre_new (agentName);
-    zyre_set_interface(agentElements->node, agentElements->networkDevice);
-    zyre_set_port(agentElements->node, agentElements->zyrePort);
-    if (agentElements->node == NULL){
-        mtic_error("Could not create bus node : Agent will interrupt immediately.");
+    if (strlen(agentElements->brokerEndPoint) > 0){
+        zyre_gossip_connect(agentElements->node,
+                            "%s", agentElements->brokerEndPoint);
+    }else{
+        zyre_set_interface(agentElements->node, agentElements->networkDevice);
+        zyre_set_port(agentElements->node, agentElements->zyrePort);
+        if (agentElements->node == NULL){
+            mtic_error("Could not create bus node : Agent will interrupt immediately.");
+            canContinue = false;
+        }
+    }
+    if (zyre_start (agentElements->node) == -1){
+        mtic_error("Could not start bus node : Agent will interrupt immediately.");
         canContinue = false;
     }
-    zyre_start (agentElements->node);
     zyre_join(agentElements->node, CHANNEL);
     zsock_signal (pipe, 0); //notify main thread that we are ready
 
@@ -1265,7 +1273,7 @@ int network_observeZyre(network_zyreIncoming cb, void *myData){
  * \param port is the network port number used
  * \return 1 if ok, else 0.
  */
-int mtic_startWithDevice(const char *networkDevice, int port){
+int mtic_startWithDevice(const char *networkDevice, unsigned int port){
     if ((networkDevice == NULL) || (strlen(networkDevice) == 0)){
         mtic_error("networkDevice cannot be NULL or empty");
         return 0;
@@ -1279,6 +1287,7 @@ int mtic_startWithDevice(const char *networkDevice, int port){
     
     agentElements = calloc(1, sizeof(zyreloopElements_t));
     strncpy(agentElements->networkDevice, networkDevice, NETWORK_DEVICE_LENGTH);
+    agentElements->brokerEndPoint[0] = '\0';
     agentElements->ipAddress[0] = '\0';
     
 #if defined (__WINDOWS__)
@@ -1298,14 +1307,15 @@ int mtic_startWithDevice(const char *networkDevice, int port){
 //                name, ziflist_address (iflist), ziflist_netmask (iflist), ziflist_broadcast (iflist));
         if (strcmp(name, networkDevice) == 0){
             strncpy(agentElements->ipAddress, ziflist_address (iflist), IP_ADDRESS_LENGTH-1);
-            mtic_info("Started with ip address %s and port %d on device %s", agentElements->ipAddress, port, networkDevice);
+            mtic_info("Starting with ip address %s and port %d on device %s", agentElements->ipAddress, port, networkDevice);
         }
         name = ziflist_next (iflist);
     }
     ziflist_destroy (&iflist);
     
     if (strlen(agentElements->ipAddress) == 0){
-        mtic_error("IP address could not be determined on device %s : our agent will NOT start.", networkDevice);
+        mtic_error("IP address could not be determined on device %s : our agent will NOT start", networkDevice);
+        free(agentElements);
         return 0;
     }
     
@@ -1324,9 +1334,8 @@ int mtic_startWithDevice(const char *networkDevice, int port){
  * \param port s the network port number used
  * \return 1 if ok, else 0.
  */
-int mtic_startWithIP(const char *ipAddress, int port){
-    if ((ipAddress == NULL) || (strlen(ipAddress) == 0))
-    {
+int mtic_startWithIP(const char *ipAddress, unsigned int port){
+    if ((ipAddress == NULL) || (strlen(ipAddress) == 0)){
         mtic_error("IP address cannot be NULL or empty");
         return 0;
     }
@@ -1337,6 +1346,7 @@ int mtic_startWithIP(const char *ipAddress, int port){
     }
     mtic_Interrupted = false;
     agentElements = calloc(1, sizeof(zyreloopElements_t));
+    agentElements->brokerEndPoint[0] = '\0';
     strncpy(agentElements->ipAddress, ipAddress, IP_ADDRESS_LENGTH);
     
 #if defined (__WINDOWS__)
@@ -1356,28 +1366,82 @@ int mtic_startWithIP(const char *ipAddress, int port){
 //                name, ziflist_address (iflist), ziflist_netmask (iflist), ziflist_broadcast (iflist));
         if (strcmp(ziflist_address (iflist), ipAddress) == 0){
             strncpy(agentElements->networkDevice, name, 15);
-            mtic_info("Started with ip address %s and port %d on device %s", ipAddress, port, agentElements->networkDevice);
+            mtic_info("Starting with ip address %s and port %d on device %s", ipAddress, port, agentElements->networkDevice);
         }
         name = ziflist_next (iflist);
     }
     ziflist_destroy (&iflist);
     
     if (strlen(agentElements->networkDevice) == 0){
-        mtic_error("Device name could not be determined for IP address %s : our agent will NOT start.", ipAddress);
+        mtic_error("Device name could not be determined for IP address %s : our agent will NOT start", ipAddress);
+        free(agentElements);
         return 0;
     }
     
     agentElements->zyrePort = port;
     agentElements->agentActor = zactor_new (initActor, agentElements);
     assert (agentElements->agentActor);
+ 
+    return 1;
+}
+
+int mtic_startWithDeviceOnBroker(const char *networkDevice, const char *brokerIpAddress){
+    //TODO: manage a list of brokers instead of just one
+    if ((brokerIpAddress == NULL) || (strlen(brokerIpAddress) == 0)){
+        mtic_error("brokerIpAddress cannot be NULL or empty");
+        return 0;
+    }
+    if ((networkDevice == NULL) || (strlen(networkDevice) == 0)){
+        mtic_error("networkDevice cannot be NULL or empty");
+        return 0;
+    }
     
-//    // Set sleep time for connection
-//    // to leave time for the connection, to be able to send the definition by the publisher
-//#ifdef _WIN32
-//    Sleep(1);
-//#else
-//    usleep(1000);
-//#endif
+    if (agentElements != NULL){
+        mtic_stop();
+    }
+    mtic_Interrupted = false;
+    
+    agentElements = calloc(1, sizeof(zyreloopElements_t));
+    strncpy(agentElements->brokerEndPoint, brokerIpAddress, IP_ADDRESS_LENGTH);
+    strncpy(agentElements->networkDevice, networkDevice, NETWORK_DEVICE_LENGTH);
+    agentElements->ipAddress[0] = '\0';
+    
+#if defined (__WINDOWS__)
+    WORD version_requested = MAKEWORD (2, 2);
+    WSADATA wsa_data;
+    int rc = WSAStartup (version_requested, &wsa_data);
+    assert (rc == 0);
+    assert (LOBYTE (wsa_data.wVersion) == 2 &&
+            HIBYTE (wsa_data.wVersion) == 2);
+#endif
+    
+    ziflist_t *iflist = ziflist_new ();
+    assert (iflist);
+    const char *name = ziflist_first (iflist);
+    while (name) {
+        //        printf (" - name=%s address=%s netmask=%s broadcast=%s\n",
+        //                name, ziflist_address (iflist), ziflist_netmask (iflist), ziflist_broadcast (iflist));
+        if (strcmp(name, networkDevice) == 0){
+            strncpy(agentElements->ipAddress, ziflist_address (iflist), IP_ADDRESS_LENGTH-1);
+            mtic_info("Starting with ip address %s on device %s with broker %s",
+                      agentElements->ipAddress,
+                      networkDevice,
+                      agentElements->brokerEndPoint);
+        }
+        name = ziflist_next (iflist);
+    }
+    ziflist_destroy (&iflist);
+    
+    if (strlen(agentElements->ipAddress) == 0){
+        mtic_error("IP address could not be determined on device %s : our agent will NOT start", networkDevice);
+        free(agentElements);
+        return 0;
+    }
+    
+    agentElements->zyrePort = 0;
+    agentElements->agentActor = zactor_new (initActor, agentElements);
+    assert (agentElements->agentActor);
+    
     return 1;
 }
 
