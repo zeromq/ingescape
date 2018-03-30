@@ -874,7 +874,7 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
             }
             free(message);
         } else if (streq (event, "EXIT")){
-            mtic_info("<-%s exited", name);
+            mtic_info("<-%s (%s) exited", name, peer);
             zyreAgent_t *a = NULL;
             HASH_FIND_STR(zyreAgents, peer, a);
             if (a != NULL){
@@ -959,18 +959,14 @@ int triggerMappingUpdate(zloop_t *loop, int timer_id, void *arg){
 }
 
 static void
-initActor (zsock_t *pipe, void *args)
-{
+initActor (zsock_t *pipe, void *args){
     MASTIC_UNUSED(args)
 
-    //Ae are (re)starting : we disable the timer flags because
-    //all network connections are going to be (re)started.
-    //Each agent will be mapped if needed when receiving its definition.
     network_needToSendDefinitionUpdate = false;
     network_needToUpdateMapping = false;
 
     bool canContinue = true;
-    //start zyre
+    //prepare zyre
     agentElements->node = zyre_new (agentName);
     if (strlen(agentElements->brokerEndPoint) > 0){
         zyre_gossip_connect(agentElements->node,
@@ -983,13 +979,7 @@ initActor (zsock_t *pipe, void *args)
             canContinue = false;
         }
     }
-    if (zyre_start (agentElements->node) == -1){
-        mtic_error("Could not start bus node : Agent will interrupt immediately.");
-        canContinue = false;
-    }
-    zyre_join(agentElements->node, CHANNEL);
-    zsock_signal (pipe, 0); //notify main thread that we are ready
-
+    
     //start publisher
     char endpoint[256];
     sprintf(endpoint, "tcp://%s:*", agentElements->ipAddress);
@@ -1095,6 +1085,14 @@ initActor (zsock_t *pipe, void *args)
 //        mtic_debug("hostname: %s\n", p->ai_canonname);
 //    }
 //    freeaddrinfo(info);
+    
+    //finally start zyre now that everything is set
+    if (zyre_start (agentElements->node) == -1){
+        mtic_error("Could not start bus node : Agent will interrupt immediately.");
+        canContinue = false;
+    }
+    zyre_join(agentElements->node, CHANNEL);
+    zsock_signal (pipe, 0); //notify main thread that we are ready
     
     zmq_pollitem_t zpipePollItem;
     zmq_pollitem_t zyrePollItem;
