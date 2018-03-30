@@ -31,8 +31,8 @@
 //initialization and control
 
 //start & stop the agent
-PUBLIC int mtic_startWithDevice(const char *networkDevice, int port);
-PUBLIC int mtic_startWithIP(const char *ipAddress, int port);
+PUBLIC int mtic_startWithDevice(const char *networkDevice, unsigned int port);
+PUBLIC int mtic_startWithIP(const char *ipAddress, unsigned int port);
 PUBLIC int mtic_stop(void);
 
 //agent name set and get
