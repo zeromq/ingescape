@@ -681,9 +681,13 @@ int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void*
                         free(iop->value.data);
                     }
                     iop->value.data = NULL;
-                    size_t s = (strlen(iop->value.s) + 1)*sizeof(char);
-                    iop->value.data = calloc (1, s);
-                    memcpy(iop->value.data, value, s);
+                    size_t s = 0;
+                    if (value != NULL){
+                        //warning : when copying string to data, we remove the final '\0'
+                        s = strlen(iop->value.s)*sizeof(char);
+                        iop->value.data = calloc (1, s);
+                        memcpy(iop->value.data, value, s);
+                    }
                     iop->valueSize = s;
                     mtic_info("set %s data (length: %d)", iopName, s);
                 }
@@ -855,30 +859,6 @@ int mtic_readParameterAsData(const char *name, void **data, long *size){
 }
 
 // --------------------------------  WRITE ------------------------------------//
-
-int mtic_writeInput(const char *name, char *value, long size){
-    if (name == NULL || strlen(name) == 0){
-        mtic_error("Input name cannot be NULL or empty");
-        return 0;
-    }
-    return model_writeIOP(name, INPUT_T, DATA_T, value, size);
-}
-
-int mtic_writeOutput(const char *name, char *value, long size){
-    if (name == NULL || strlen(name) == 0){
-        mtic_error("Output name cannot be NULL or empty");
-        return 0;
-    }
-    return model_writeIOP(name, OUTPUT_T, DATA_T, value, size);
-}
-
-int mtic_writeParameter(const char *name, char *value, long size){
-    if (name == NULL || strlen(name) == 0){
-        mtic_error("Parameter name cannot be NULL or empty");
-        return 0;
-    }
-    return model_writeIOP(name, PARAMETER_T, DATA_T, value, size);
-}
 
 int mtic_writeInputAsBool(const char *name, bool value){
     if (name == NULL || strlen(name) == 0){
