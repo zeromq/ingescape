@@ -13,7 +13,7 @@
 # all dependencies listed in LDFLAGS shall be installed before running this Makefile
 
 CC = gcc
-CFLAGS = -g -I./include -I/usr/local/include/ -fPIC -Wextra -O2 #-Wall
+CFLAGS = -g -I./include -I/usr/local/include/ -fPIC -Wextra -O2 -std=gnu99 -Wall
 LDFLAGS = -shared -L/usr/local/lib -lsodium -lzmq -lczmq -lzyre -lyajl
 RM = rm -f
 ifeq ($(shell uname -s), Darwin)

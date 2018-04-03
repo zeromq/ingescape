@@ -2,8 +2,7 @@
 //  mtic_network.c
 //
 //  Created by Stephane Vales on 10/06/2016.
-//  Modified by Vincent Deliencourt
-//  Copyright © 2016 IKKY WP4.8. All rights reserved.
+//  Copyright © 2017 Ingenuity i/o. All rights reserved.
 //
 
 /**
@@ -162,7 +161,7 @@ int subscribeToPublisherOutput(subscriber_t *subscriber, const char *outputName)
         }
         if (!filterAlreadyExists){
             // Set subscriber to the output filter
-            mtic_debug("subscribe to agent %s output %s\n",subscriber->agentName,outputName);
+            mtic_info("Subscribe to agent %s output %s",subscriber->agentName,outputName);
             zsock_set_subscribe(subscriber->subscriber, outputName);
             mappingFilter_t *f = calloc(1, sizeof(mappingFilter_t));
             strncpy(f->filter, outputName, MAX_FILTER_SIZE);
@@ -182,7 +181,7 @@ int unsubscribeToPublisherOutput(subscriber_t *subscriber, const char *outputNam
         mappingFilter_t *filter = NULL;
         DL_FOREACH(subscriber->mappingsFilters, filter){
             if (strcmp(filter->filter, outputName) == 0){
-                mtic_debug("unsubscribe to agent %s output %s\n",agentName,outputName);
+                mtic_info("Unsubscribe to agent %s output %s",agentName,outputName);
                 zsock_set_unsubscribe(subscriber->subscriber, outputName);
                 DL_DELETE(subscriber->mappingsFilters, filter);
                 break;
@@ -214,12 +213,12 @@ int network_manageSubscriberMapping(subscriber_t *subscriber){
             if (strcmp(subscriber->agentName, el->agent_name)==0 || strcmp(el->agent_name, "*") == 0){
                 //mapping element is compatible with subscriber name
                 //check if we find a compatible output in subscriber definition
-                agent_iop *foundOutput = NULL;
+                agent_iop_t *foundOutput = NULL;
                 if (subscriber->definition != NULL){
                     HASH_FIND_STR(subscriber->definition->outputs_table, el->output_name, foundOutput);
                 }
                 //check if we find a valid input in our own definition
-                agent_iop *foundInput = NULL;
+                agent_iop_t *foundInput = NULL;
                 if (mtic_internal_definition != NULL){
                     HASH_FIND_STR(mtic_internal_definition->inputs_table, el->input_name, foundInput);
                 }
@@ -252,7 +251,7 @@ void sendDefinitionToAgent(const char *peerId, const char *definition)
         {
             zyre_whispers(agentElements->node, peerId, "%s%s", definitionPrefix, definition);
         } else {
-            mtic_debug("Error : could not send our definition to %s : our agent is not connected\n",peerId);
+            mtic_warn("Could not send our definition to %s : our agent is not connected",peerId);
         }
     }
 }
@@ -265,13 +264,13 @@ void sendMappingToAgent(const char *peerId, const char *mapping)
         {
             zyre_whispers(agentElements->node, peerId, "%s%s", mappingPrefix, mapping);
         } else {
-            mtic_debug("Error : could not send our mapping to %s : our agent is not connected\n",peerId);
+            mtic_warn("Could not send our mapping to %s : our agent is not connected",peerId);
         }
     }
 }
 
 void network_cleanAndFreeSubscriber(subscriber_t *subscriber){
-    mtic_debug("cleaning subscription to %s\n", subscriber->agentName);
+    mtic_info("cleaning subscription to %s\n", subscriber->agentName);
     // clean the agent definition
     if(subscriber->definition != NULL){
         definition_freeDefinition(subscriber->definition);
@@ -322,8 +321,8 @@ int manageParent (zloop_t *loop, zmq_pollitem_t *item, void *arg){
     {
         zmsg_t *msg = zmsg_recv ((zsock_t *)item->socket);
         if (!msg){
-            printf("Error while reading message from main thread... exiting.");
-            exit(EXIT_FAILURE); //Interrupted
+            mtic_error("Could not read message from main thread : Agent will interrupt immediately.");
+            return -1;
         }
         char *command = zmsg_popstr (msg);
         if (streq (command, "$TERM")){
@@ -348,11 +347,11 @@ int handleSubscriptionMessage(zmsg_t *msg, const char *subscriberPeerId){
     HASH_FIND_STR(subscribers, subscriberPeerId, foundSubscriber);
     
     if(foundSubscriber == NULL){
-        mtic_debug("%s : could not find subscriber structure for agent %s\n", __func__, subscriberPeerId);
+        mtic_error("Could not find subscriber structure for agent %s", subscriberPeerId);
         return -1;
     }
     if(isFrozen == true){
-        mtic_debug("Message received from agent %s but all traffic in our agent has been frozen\n", foundSubscriber->agentName);
+        mtic_info("Message received from agent %s but all traffic in our agent has been frozen", foundSubscriber->agentName);
         return 0;
     }
     
@@ -361,10 +360,10 @@ int handleSubscriptionMessage(zmsg_t *msg, const char *subscriberPeerId){
     char *vType = NULL;
     iopType_t valueType = 0;
     for (unsigned long i = 0; i < size; i += 3){
-        // Message must contain 3 elements
+        // Each message part must contain 3 elements
         // 1 : output name
         // 2 : output ioptType
-        // 3 : value of the output
+        // 3 : value of the output as a string or zframe
         output = zmsg_popstr(msg);
         vType = zmsg_popstr(msg);
         valueType = atoi(vType);
@@ -392,21 +391,21 @@ int handleSubscriptionMessage(zmsg_t *msg, const char *subscriberPeerId){
                 && strcmp(elmt->output_name, output) == 0){
                 //we have a match on emitting agent name and its ouput name :
                 //still need to check the targeted input existence in our definition
-                agent_iop *foundInput = NULL;
+                agent_iop_t *foundInput = NULL;
                 if (mtic_internal_definition->inputs_table != NULL){
                     HASH_FIND_STR(mtic_internal_definition->inputs_table, elmt->input_name, foundInput);
                 }
                 if (foundInput == NULL){
-                    mtic_debug("manageSubscription : input %s missing in our definition for use in a mapping with %s.%s\n",
+                    mtic_error("Input %s is missing in our definition but expected in our mapping with %s.%s",
                                elmt->input_name,
                                elmt->agent_name,
                                elmt->output_name);
                 }else{
                     //we have a fully matching mapping element : write from received output to our input
                     if (valueType == STRING_T){
-                        mtic_writeInputAsString(elmt->input_name, value);
+                        model_writeIOP(elmt->input_name, INPUT_T, valueType, value, strlen(value)+1);
                     }else{
-                        mtic_writeInputAsData(elmt->input_name, data, size);
+                        model_writeIOP(elmt->input_name, INPUT_T, valueType, data, size);
                     }
                 }
             }
@@ -458,7 +457,7 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
         
         //parse event
         if (streq (event, "ENTER")){
-            mtic_debug("->%s has entered the network with peer id %s and endpoint %s\n", name, peer, address);
+            mtic_info("->%s has entered the network with peer id %s and endpoint %s", name, peer, address);
             zyreAgent_t *zagent = NULL;
             HASH_FIND_STR(zyreAgents, peer, zagent);
             if (zagent == NULL){
@@ -480,11 +479,11 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
             zlist_t *keys = zhash_keys(headers);
             size_t s = zlist_size(keys);
             if (s > 0){
-                mtic_debug("@%s's headers are:\n", name);
+                mtic_info("Handling headers for agent %s", name);
             }
             while ((k = (char *)zlist_pop(keys))) {
                 v = zyre_event_header (zyre_event,k);
-                mtic_debug("\t%s -> %s\n", k, v);
+                mtic_info("\t%s -> %s", k, v);
 
                 // we extract the publisher adress to subscribe to from the zyre message header
                 if(strncmp(k,"publisher", strlen("publisher")) == 0)
@@ -498,7 +497,7 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     while (*insert != ':'){
                         insert--;
                         if (insert == endpointAddress){
-                            mtic_debug("Error: could not extract port from address %s", address);
+                            mtic_error("Could not extract port from address %s", address);
                             extractOK = false;
                             break;
                         }
@@ -513,7 +512,7 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                         
                         if (subscriber != NULL){
                             //we have a reconnection with same peerId
-                            mtic_debug("Peer id %s was connected before with agent name %s : reset and recreate subscription\n", peer, subscriber->agentName);
+                            mtic_info("Peer id %s was connected before with agent name %s : reset and recreate subscription", peer, subscriber->agentName);
                             HASH_DEL(subscribers, subscriber);
                             zloop_poller_end(agentElements->loop , subscriber->pollItem);
                             zsock_destroy(&subscriber->subscriber);
@@ -550,15 +549,14 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                         subscriber->pollItem->revents = 0;
                         zloop_poller (agentElements->loop, subscriber->pollItem, manageSubscription, (void*)subscriber->agentPeerId);
                         zloop_poller_set_tolerant(loop, subscriber->pollItem);
-                        mtic_debug("\t\tSubscriber created for %s at %s.\n",subscriber->agentName,endpointAddress);
+                        mtic_info("Subscription created for %s at %s",subscriber->agentName,endpointAddress);
                     }
                 }
-
                 free(k);
             }
             zlist_destroy(&keys);
         } else if (streq (event, "JOIN")){
-            mtic_debug("+%s has joined %s\n", name, group);
+            mtic_info("+%s has joined %s", name, group);
             if (streq(group, CHANNEL)){
                 //definition is sent to every newcomer on the channel (whether it is a mastic agent or not)
                 char * definitionStr = NULL;
@@ -584,7 +582,7 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     zyre_whispers(agentElements->node, peer, "FROZEN=1");
                 }
                 if (mtic_internal_definition != NULL){
-                    struct agent_iop *current_iop, *tmp_iop;
+                    agent_iop_t *current_iop, *tmp_iop;
                     HASH_ITER(hh, mtic_internal_definition->outputs_table, current_iop, tmp_iop) {
                         if (current_iop->is_muted && current_iop->name != NULL){
                             zyre_whispers(agentElements->node, peer, "OUTPUT_MUTED %s", current_iop->name);
@@ -600,7 +598,7 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 }
             }
         } else if (streq (event, "LEAVE")){
-            mtic_debug("-%s has left %s\n", name, group);
+            mtic_info("-%s has left %s", name, group);
         } else if (streq (event, "SHOUT")){
             //nothing to do so far
         } else if(streq (event, "WHISPER")){
@@ -622,18 +620,18 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 if (newDefinition != NULL && newDefinition->name != NULL && subscriber != NULL){
                     // Look if this agent already has a definition
                     if(subscriber->definition != NULL) {
-                        mtic_debug("definition already exists for agent %s : new definition will overwrite the previous one...\n", name);
+                        mtic_info("Definition already exists for agent %s : new definition will overwrite the previous one...", name);
                         definition_freeDefinition(subscriber->definition);
                         subscriber->definition = NULL;
                     }
                     
-                    mtic_debug("Store definition for agent %s\n", name);
+                    mtic_info("Store definition for agent %s", name);
                     subscriber->definition = newDefinition;
                     //Check the involvement of this new agent and its definition in our mapping and update subscriptions
                     //we check here because subscriber definition is required to handle received data
                     network_manageSubscriberMapping(subscriber);
                 }else{
-                    mtic_debug("ERROR: definition is NULL or has no name for agent %s\n", name);
+                    mtic_error("Received definition from agent %s is NULL or has no name", name);
                     if(newDefinition != NULL) {
                         definition_freeDefinition(newDefinition);
                         newDefinition = NULL;
@@ -656,15 +654,15 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 if (newMapping != NULL && newMapping->name != NULL && subscriber != NULL){
                     // Look if this agent already has a mapping
                     if(subscriber->mapping != NULL){
-                        mtic_debug("mapping already exists for agent %s : new mapping will overwrite the previous one...\n", name);
+                        mtic_info("Mapping already exists for agent %s : new mapping will overwrite the previous one...", name);
                         mapping_freeMapping(subscriber->mapping);
                         subscriber->mapping = NULL;
                     }
                     
-                    mtic_debug("Store mapping for agent %s\n", name);
+                    mtic_info("Store mapping for agent %s", name);
                     subscriber->mapping = newMapping;
                 }else{
-                    mtic_debug("ERROR: mapping is NULL or has no name for agent %s\n", name);
+                    mtic_error("Received mapping from agent %s is NULL or has no name", name);
                     if(subscriber != NULL && subscriber->mapping != NULL) {
                         mapping_freeMapping(subscriber->mapping);
                         subscriber->mapping = NULL;
@@ -719,7 +717,7 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
             }else{
                 //other supported messages
                 if (strlen("REQUEST_OUPUTS") == strlen(message) && strncmp (message, "REQUEST_OUPUTS", strlen("REQUEST_OUPUTS")) == 0){
-                    mtic_debug("Outputs request received from %s\n", name);
+                    mtic_info("Responding to outputs request received from %s", name);
                     //send all outputs via whisper to agent that mapped us
                     long nbOutputs = 0;
                     char **outputsList = NULL;
@@ -728,39 +726,39 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     zmsg_t *omsg = zmsg_new();
                     zmsg_addstr(omsg, "OUTPUTS");
                     for (i = 0; i < nbOutputs; i++){
-                        agent_iop * found_iop = model_findIopByName(outputsList[i],OUTPUT_T);
+                        agent_iop_t * found_iop = model_findIopByName(outputsList[i],OUTPUT_T);
                         if (found_iop != NULL){
                             switch (found_iop->value_type) {
                                 case INTEGER_T:
                                     zmsg_addstr(omsg, found_iop->name);
-                                    zmsg_addstrf(omsg, "%d", found_iop->type);
+                                    zmsg_addstrf(omsg, "%d", found_iop->value_type);
                                     zmsg_addmem(omsg, &(found_iop->value.i), sizeof(int));
                                     break;
                                 case DOUBLE_T:
                                     zmsg_addstr(omsg, found_iop->name);
-                                    zmsg_addstrf(omsg, "%d", found_iop->type);
+                                    zmsg_addstrf(omsg, "%d", found_iop->value_type);
                                     zmsg_addmem(omsg, &(found_iop->value.d), sizeof(double));
                                     break;
                                 case STRING_T:
                                     zmsg_addstr(omsg, found_iop->name);
-                                    zmsg_addstrf(omsg, "%d", found_iop->type);
-                                    zmsg_addmem(omsg, (found_iop->value.s), strlen(found_iop->value.s)+1);
+                                    zmsg_addstrf(omsg, "%d", found_iop->value_type);
+                                    zmsg_addstr(omsg, found_iop->value.s);
                                     break;
                                 case BOOL_T:
                                     zmsg_addstr(omsg, found_iop->name);
-                                    zmsg_addstrf(omsg, "%d", found_iop->type);
+                                    zmsg_addstrf(omsg, "%d", found_iop->value_type);
                                     zmsg_addmem(omsg, &(found_iop->value.b), sizeof(bool));
                                     break;
                                 case IMPULSION_T:
                                     //disabled
 //                                    zmsg_addstr(omsg, found_iop->name);
-//                                    zmsg_addstrf(omsg, "%d", found_iop->type);
+//                                    zmsg_addstrf(omsg, "%d", found_iop->value_type);
 //                                    zmsg_addmem(omsg, NULL, 0);
                                     break;
                                 case DATA_T:
                                     //disabled
 //                                    zmsg_addstr(omsg, found_iop->name);
-//                                    zmsg_addstrf(omsg, "%d", found_iop->type);
+//                                    zmsg_addstrf(omsg, "%d", found_iop->value_type);
 //                                    zmsg_addmem(omsg, (found_iop->value.data), found_iop->valueSize);
                                     break;
                                     
@@ -803,7 +801,7 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     name = strtok (subStr," ");
                     value = strtok (NULL," ");
                     if (name != NULL && value != NULL){
-                        mtic_writeInput(name, value, sizeof(char)*strlen(value));//last parameter is used for DATA only
+                        mtic_writeInputAsString(name, value);//last parameter is used for DATA only
                     }
                 }else if ((strncmp (message, "SET_OUTPUT ", strlen("SET_OUTPUT ")) == 0) && (strlen(message) > strlen("SET_OUTPUT ")+1)){
                     char *subStr = message + strlen("SET_OUTPUT") + 1;
@@ -811,7 +809,7 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     name = strtok (subStr," ");
                     value = strtok (NULL," ");
                     if (name != NULL && value != NULL){
-                        mtic_writeOutput(name, value, sizeof(char)*strlen(value));//last paramter is used for DATA only
+                        mtic_writeOutputAsString(name, value);//last paramter is used for DATA only
                     }
                 }else if ((strncmp (message, "SET_PARAMETER ", strlen("SET_PARAMETER ")) == 0) && (strlen(message) > strlen("SET_PARAMETER ")+1)){
                     char *subStr = message + strlen("SET_PARAMETER") + 1;
@@ -819,7 +817,7 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     name = strtok (subStr," ");
                     value = strtok (NULL," ");
                     if (name != NULL && value != NULL){
-                        mtic_writeParameter(name, value, sizeof(char)*strlen(value));//last paramter is used for DATA only
+                        mtic_writeParameterAsString(name, value);//last paramter is used for DATA only
                     }
                 }else if ((strncmp (message, "MAP ", strlen("MAP ")) == 0) && (strlen(message) > strlen("MAP ")+1)){
                     char *subStr = message + strlen("MAP") + 1;
@@ -876,7 +874,7 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
             }
             free(message);
         } else if (streq (event, "EXIT")){
-            mtic_debug("<-%s exited\n", name);
+            mtic_info("<-%s (%s) exited", name, peer);
             zyreAgent_t *a = NULL;
             HASH_FIND_STR(zyreAgents, peer, a);
             if (a != NULL){
@@ -961,28 +959,27 @@ int triggerMappingUpdate(zloop_t *loop, int timer_id, void *arg){
 }
 
 static void
-initActor (zsock_t *pipe, void *args)
-{
+initActor (zsock_t *pipe, void *args){
     MASTIC_UNUSED(args)
 
-    //Ae are (re)starting : we disable the timer flags because
-    //all network connections are going to be (re)started.
-    //Each agent will be mapped if needed when receiving its definition.
     network_needToSendDefinitionUpdate = false;
     network_needToUpdateMapping = false;
 
-    //start zyre
+    bool canContinue = true;
+    //prepare zyre
     agentElements->node = zyre_new (agentName);
-    zyre_set_interface(agentElements->node, agentElements->networkDevice);
-    zyre_set_port(agentElements->node, agentElements->zyrePort);
-    if (agentElements->node == NULL){
-        mtic_debug("Error : could not create zyre node... exiting.\n");
-        exit(EXIT_FAILURE);
+    if (strlen(agentElements->brokerEndPoint) > 0){
+        zyre_gossip_connect(agentElements->node,
+                            "%s", agentElements->brokerEndPoint);
+    }else{
+        zyre_set_interface(agentElements->node, agentElements->networkDevice);
+        zyre_set_port(agentElements->node, agentElements->zyrePort);
+        if (agentElements->node == NULL){
+            mtic_error("Could not create bus node : Agent will interrupt immediately.");
+            canContinue = false;
+        }
     }
-    zyre_start (agentElements->node);
-    zyre_join(agentElements->node, CHANNEL);
-    zsock_signal (pipe, 0); //notify main thread that we are ready
-
+    
     //start publisher
     char endpoint[256];
     sprintf(endpoint, "tcp://%s:*", agentElements->ipAddress);
@@ -1034,10 +1031,9 @@ initActor (zsock_t *pipe, void *args)
         ret = readlink("/proc/self/exe", pathbuf, sizeof(pathbuf));
 #endif
         if ( ret <= 0 ) {
-            mtic_debug("PID %d: proc_pidpath ();\n", pid);
-            mtic_debug("    %s\n", strerror(errno));
+            mtic_error("PID %d: proc_pidpath () - %s", pid, strerror(errno));
         } else {
-            mtic_debug("proc %d: %s\n", pid, pathbuf);
+            mtic_trace("proc %d: %s", pid, pathbuf);
         }
         zyre_set_header(agentElements->node, "commandline", "%s", pathbuf);
     }else{
@@ -1090,14 +1086,22 @@ initActor (zsock_t *pipe, void *args)
 //    }
 //    freeaddrinfo(info);
     
+    //finally start zyre now that everything is set
+    if (zyre_start (agentElements->node) == -1){
+        mtic_error("Could not start bus node : Agent will interrupt immediately.");
+        canContinue = false;
+    }
+    zyre_join(agentElements->node, CHANNEL);
+    zsock_signal (pipe, 0); //notify main thread that we are ready
+    
     zmq_pollitem_t zpipePollItem;
     zmq_pollitem_t zyrePollItem;
 
     //main zmq socket (i.e. main thread)
     void *zpipe = zsock_resolve(pipe);
     if (zpipe == NULL){
-        mtic_debug("Error : could not get the pipe descriptor for polling... exiting.\n");
-        exit(EXIT_FAILURE);
+        mtic_error("Could not get the pipe descriptor to the main thread for polling : Agent will interrupt immediately.");
+        canContinue = false;
     }
     zpipePollItem.socket = zpipe;
     zpipePollItem.fd = 0;
@@ -1107,8 +1111,8 @@ initActor (zsock_t *pipe, void *args)
     //zyre socket
     void *zsock = zsock_resolve(zyre_socket (agentElements->node));
     if (zsock == NULL){
-        mtic_debug("Error : could not get the zyre socket for polling... exiting.\n");
-        exit(EXIT_FAILURE);
+        mtic_error("Could not get the bus socket for polling : Agent will interrupt immediately.");
+        canContinue = false;
     }
     zyrePollItem.socket = zsock;
     zyrePollItem.fd = 0;
@@ -1127,9 +1131,11 @@ initActor (zsock_t *pipe, void *args)
     zloop_timer(agentElements->loop, 1000, 0, triggerDefinitionUpdate, NULL);
     zloop_timer(agentElements->loop, 1000, 0, triggerMappingUpdate, NULL);
 
-    zloop_start (loop); //start returns when one of the pollers returns -1
-
-    mtic_debug("agent stopping...\n");
+    if (canContinue){
+        zloop_start (loop); //start returns when one of the pollers returns -1
+    }
+    
+    mtic_info("Agent stopping...");
 
     //clean
     mtic_Interrupted = true;
@@ -1166,7 +1172,7 @@ initActor (zsock_t *pipe, void *args)
 
 int network_publishOutput (const char* output_name){
     int result = 0;
-    agent_iop * found_iop = model_findIopByName(output_name,OUTPUT_T);
+    agent_iop_t * found_iop = model_findIopByName(output_name,OUTPUT_T);
     
     if(agentElements != NULL && agentElements->publisher != NULL && found_iop != NULL)
     {
@@ -1180,23 +1186,23 @@ int network_publishOutput (const char* output_name){
             switch (found_iop->value_type) {
                 case INTEGER_T:
                     zmsg_addmem(msg, &(found_iop->value.i), sizeof(int));
-                    mtic_debug("publish %s -> %d\n",found_iop->name,found_iop->value.i);
+                    mtic_info("publish %s -> %d",found_iop->name,found_iop->value.i);
                     break;
                 case DOUBLE_T:
                     zmsg_addmem(msg, &(found_iop->value.d), sizeof(double));
-                    mtic_debug("publish %s -> %f\n",found_iop->name,found_iop->value.d);
+                    mtic_info("publish %s -> %f",found_iop->name,found_iop->value.d);
                     break;
                 case BOOL_T:
                     zmsg_addmem(msg, &(found_iop->value.b), sizeof(bool));
-                    mtic_debug("publish %s -> %d\n",found_iop->name,found_iop->value.b);
+                    mtic_info("publish %s -> %d",found_iop->name,found_iop->value.b);
                     break;
                 case STRING_T:
                     zmsg_addstr(msg, found_iop->value.s);
-                    mtic_debug("publish %s -> %s\n",found_iop->name,found_iop->value.s);
+                    mtic_info("publish %s -> %s",found_iop->name,found_iop->value.s);
                     break;
                 case IMPULSION_T:
                     zmsg_addmem(msg, NULL, 0);
-                    mtic_debug("publish impulsion %s\n",found_iop->name);
+                    mtic_info("publish impulsion %s",found_iop->name);
                     break;
                 case DATA_T:
                     mtic_readOutputAsData(output_name, &data, &size);
@@ -1206,29 +1212,29 @@ int network_publishOutput (const char* output_name){
                     //TODO: document ZMQ high water marks and how to change them
                     zframe_t *frame = zframe_new(data, size);
                     zmsg_append(msg, &frame);
-                    mtic_debug("publish data %s\n",found_iop->name);
+                    mtic_info("publish data %s",found_iop->name);
                     break;
                 default:
                     break;
             }
             if (zmsg_send(&msg, agentElements->publisher) != 0){
-                mtic_debug("Error while publishing output %s\n",output_name);
+                mtic_error("Could not publish output %s on the network\n",output_name);
             }else{
                 result = 1;
             }
             
         }else{
             if(found_iop == NULL){
-                mtic_debug("Output %s is unknown\n", output_name);
+                mtic_error("Output %s is unknown", output_name);
             }
             if (isWholeAgentMuted){
-                mtic_debug("Should publish output %s but the agent has been muted\n",found_iop->name);
+                mtic_info("Should publish output %s but the agent has been muted",found_iop->name);
             }
             if(found_iop->is_muted){
-                mtic_debug("Should publish output %s but it has been muted\n",found_iop->name);
+                mtic_info("Should publish output %s but it has been muted",found_iop->name);
             }
             if(isFrozen == true){
-                mtic_debug("Should publish output %s but the agent has been frozen\n",found_iop->name);
+                mtic_info("Should publish output %s but the agent has been frozen",found_iop->name);
             }
         }
     }
@@ -1242,7 +1248,7 @@ int network_observeZyre(network_zyreIncoming cb, void *myData){
         newCb->myData = myData;
         DL_APPEND(zyreCallbacks, newCb);
     }else{
-        mtic_debug("network_observeZyre: callback is null\n");
+        mtic_warn("callback is null");
         return 0;
     }
     return 1;
@@ -1265,10 +1271,9 @@ int network_observeZyre(network_zyreIncoming cb, void *myData){
  * \param port is the network port number used
  * \return 1 if ok, else 0.
  */
-int mtic_startWithDevice(const char *networkDevice, int port){
-    if ((networkDevice == NULL) || (strlen(networkDevice) == 0))
-    {
-        mtic_debug("mtic_startWithDevice : networkDevice cannot be NULL or empty \n");
+int mtic_startWithDevice(const char *networkDevice, unsigned int port){
+    if ((networkDevice == NULL) || (strlen(networkDevice) == 0)){
+        mtic_error("networkDevice cannot be NULL or empty");
         return 0;
     }
     
@@ -1280,6 +1285,7 @@ int mtic_startWithDevice(const char *networkDevice, int port){
     
     agentElements = calloc(1, sizeof(zyreloopElements_t));
     strncpy(agentElements->networkDevice, networkDevice, NETWORK_DEVICE_LENGTH);
+    agentElements->brokerEndPoint[0] = '\0';
     agentElements->ipAddress[0] = '\0';
     
 #if defined (__WINDOWS__)
@@ -1299,15 +1305,16 @@ int mtic_startWithDevice(const char *networkDevice, int port){
 //                name, ziflist_address (iflist), ziflist_netmask (iflist), ziflist_broadcast (iflist));
         if (strcmp(name, networkDevice) == 0){
             strncpy(agentElements->ipAddress, ziflist_address (iflist), IP_ADDRESS_LENGTH-1);
-            mtic_debug("Connection with ip address %s and port %d on device %s\n", agentElements->ipAddress, port, networkDevice);
+            mtic_info("Starting with ip address %s and port %d on device %s", agentElements->ipAddress, port, networkDevice);
         }
         name = ziflist_next (iflist);
     }
     ziflist_destroy (&iflist);
     
     if (strlen(agentElements->ipAddress) == 0){
-        fprintf(stderr, "IP address could not be determined on device %s... exiting.\n", networkDevice);
-        exit(EXIT_FAILURE);
+        mtic_error("IP address could not be determined on device %s : our agent will NOT start", networkDevice);
+        free(agentElements);
+        return 0;
     }
     
     agentElements->zyrePort = port;
@@ -1325,10 +1332,9 @@ int mtic_startWithDevice(const char *networkDevice, int port){
  * \param port s the network port number used
  * \return 1 if ok, else 0.
  */
-int mtic_startWithIP(const char *ipAddress, int port){
-    if ((ipAddress == NULL) || (strlen(ipAddress) == 0))
-    {
-        mtic_debug("mtic_startWithIP : IP cannot be NULL or empty \n");
+int mtic_startWithIP(const char *ipAddress, unsigned int port){
+    if ((ipAddress == NULL) || (strlen(ipAddress) == 0)){
+        mtic_error("IP address cannot be NULL or empty");
         return 0;
     }
     
@@ -1338,6 +1344,7 @@ int mtic_startWithIP(const char *ipAddress, int port){
     }
     mtic_Interrupted = false;
     agentElements = calloc(1, sizeof(zyreloopElements_t));
+    agentElements->brokerEndPoint[0] = '\0';
     strncpy(agentElements->ipAddress, ipAddress, IP_ADDRESS_LENGTH);
     
 #if defined (__WINDOWS__)
@@ -1357,28 +1364,82 @@ int mtic_startWithIP(const char *ipAddress, int port){
 //                name, ziflist_address (iflist), ziflist_netmask (iflist), ziflist_broadcast (iflist));
         if (strcmp(ziflist_address (iflist), ipAddress) == 0){
             strncpy(agentElements->networkDevice, name, 15);
-            printf("Connection with ip address %s on device %s\n", ipAddress, agentElements->networkDevice);
+            mtic_info("Starting with ip address %s and port %d on device %s", ipAddress, port, agentElements->networkDevice);
         }
         name = ziflist_next (iflist);
     }
     ziflist_destroy (&iflist);
     
     if (strlen(agentElements->networkDevice) == 0){
-        fprintf(stderr, "Device name could not be determined for IP address %s... exiting.\n", ipAddress);
-        exit(EXIT_FAILURE);
+        mtic_error("Device name could not be determined for IP address %s : our agent will NOT start", ipAddress);
+        free(agentElements);
+        return 0;
     }
     
     agentElements->zyrePort = port;
     agentElements->agentActor = zactor_new (initActor, agentElements);
     assert (agentElements->agentActor);
+ 
+    return 1;
+}
+
+int mtic_startWithDeviceOnBroker(const char *networkDevice, const char *brokerIpAddress){
+    //TODO: manage a list of brokers instead of just one
+    if ((brokerIpAddress == NULL) || (strlen(brokerIpAddress) == 0)){
+        mtic_error("brokerIpAddress cannot be NULL or empty");
+        return 0;
+    }
+    if ((networkDevice == NULL) || (strlen(networkDevice) == 0)){
+        mtic_error("networkDevice cannot be NULL or empty");
+        return 0;
+    }
     
-//    // Set sleep time for connection
-//    // to leave time for the connection, to be able to send the definition by the publisher
-//#ifdef _WIN32
-//    Sleep(1);
-//#else
-//    usleep(1000);
-//#endif
+    if (agentElements != NULL){
+        mtic_stop();
+    }
+    mtic_Interrupted = false;
+    
+    agentElements = calloc(1, sizeof(zyreloopElements_t));
+    strncpy(agentElements->brokerEndPoint, brokerIpAddress, IP_ADDRESS_LENGTH);
+    strncpy(agentElements->networkDevice, networkDevice, NETWORK_DEVICE_LENGTH);
+    agentElements->ipAddress[0] = '\0';
+    
+#if defined (__WINDOWS__)
+    WORD version_requested = MAKEWORD (2, 2);
+    WSADATA wsa_data;
+    int rc = WSAStartup (version_requested, &wsa_data);
+    assert (rc == 0);
+    assert (LOBYTE (wsa_data.wVersion) == 2 &&
+            HIBYTE (wsa_data.wVersion) == 2);
+#endif
+    
+    ziflist_t *iflist = ziflist_new ();
+    assert (iflist);
+    const char *name = ziflist_first (iflist);
+    while (name) {
+        //        printf (" - name=%s address=%s netmask=%s broadcast=%s\n",
+        //                name, ziflist_address (iflist), ziflist_netmask (iflist), ziflist_broadcast (iflist));
+        if (strcmp(name, networkDevice) == 0){
+            strncpy(agentElements->ipAddress, ziflist_address (iflist), IP_ADDRESS_LENGTH-1);
+            mtic_info("Starting with ip address %s on device %s with broker %s",
+                      agentElements->ipAddress,
+                      networkDevice,
+                      agentElements->brokerEndPoint);
+        }
+        name = ziflist_next (iflist);
+    }
+    ziflist_destroy (&iflist);
+    
+    if (strlen(agentElements->ipAddress) == 0){
+        mtic_error("IP address could not be determined on device %s : our agent will NOT start", networkDevice);
+        free(agentElements);
+        return 0;
+    }
+    
+    agentElements->zyrePort = 0;
+    agentElements->agentActor = zactor_new (initActor, agentElements);
+    assert (agentElements->agentActor);
+    
     return 1;
 }
 
@@ -1400,9 +1461,9 @@ int mtic_stop(){
         #ifdef _WIN32
         zsys_shutdown();
         #endif
-        mtic_debug("agent stopped.\n");
+        mtic_info("Agent stopped");
     }else{
-        mtic_debug("agent already stopped\n");
+        mtic_info("Agent already stopped");
     }
     mtic_Interrupted = true;
     
@@ -1418,7 +1479,7 @@ int mtic_stop(){
  */
 int mtic_setAgentName(const char *name){
     if ((name == NULL) || (strlen(name) == 0)){
-        mtic_error("mtic_setAgentName : Agent name cannot be NULL or empty\n");
+        mtic_error("Agent name cannot be NULL or empty");
         return 0;
     }
     if (strcmp(agentName, name) == 0){
@@ -1450,7 +1511,7 @@ int mtic_setAgentName(const char *name){
         }
     }
     if (spaceInName){
-        mtic_warn("Spaces are not allowed in agent name: %s has been renamed to %s\n", name, n);
+        mtic_warn("Spaces are not allowed in agent name: %s has been renamed to %s", name, n);
     }
     strncpy(agentName, n, MAX_AGENT_NAME_LENGTH);
     free(n);
@@ -1458,7 +1519,7 @@ int mtic_setAgentName(const char *name){
     if (needRestart){
         mtic_startWithIP(ipAddress, zyrePort);
     }
-    
+    mtic_info("Agent name is %s", agentName);
     return 1;
 }
 
@@ -1487,11 +1548,12 @@ char *mtic_getAgentName(){
  */
 int mtic_freeze(){
     if (!agentCanBeFrozen){
-        mtic_debug("warning: agent has been Frozen but is set to 'can't be Frozen'\n");
+        mtic_error("agent is requested to be frozen but is still set to 'can't be Frozen' : call mtic_setCanBeFrozen to change this");
+        return 0;
     }
     if(isFrozen == false)
     {
-        mtic_debug("Agent Frozen\n");
+        mtic_info("Agent frozen");
         if ((agentElements != NULL) && (agentElements->node != NULL)){
             zyre_shouts(agentElements->node, CHANNEL, "FROZEN=1");
         }
@@ -1524,7 +1586,7 @@ bool mtic_isFrozen(){
 int mtic_unfreeze(){
     if(isFrozen == true)
     {
-        mtic_debug("Agent resumed\n");
+        mtic_info("Agent resumed (unfrozen)");
         if ((agentElements != NULL) && (agentElements->node != NULL)){
             zyre_shouts(agentElements->node, CHANNEL, "FROZEN=0");
         }
@@ -1552,7 +1614,7 @@ int mtic_observeFreeze(mtic_freezeCallback cb, void *myData){
         newCb->myData = myData;
         DL_APPEND(freezeCallbacks, newCb);
     }else{
-        mtic_debug("mtic_observeFreeze: callback is null\n");
+        mtic_warn("callback is null");
         return 0;
     }
     return 1;
@@ -1573,7 +1635,7 @@ int mtic_observeFreeze(mtic_freezeCallback cb, void *myData){
 int mtic_setAgentState(const char *state){
     if (state == NULL)
     {
-        mtic_debug("mtic_setAgentState: state can not be NULL\n");
+        mtic_error("state can not be NULL");
         return 0;
     }
     
@@ -1611,6 +1673,7 @@ void mtic_setCanBeFrozen (bool canBeFrozen){
         zyre_set_header(agentElements->node, "canBeFrozen", "%i", agentCanBeFrozen);
         //send real time notification for agents already there
         zyre_shouts(agentElements->node, CHANNEL, "CANBEFROZEN=%i", canBeFrozen);
+        mtic_info("changed to %d", canBeFrozen);
     }
 }
 
@@ -1698,7 +1761,7 @@ int mtic_observeMute(mtic_muteCallback cb, void *myData){
         DL_APPEND(muteCallbacks, newCb);
     }
     else{
-        mtic_debug("mtic_observeMute: callback is null\n");
+        mtic_warn("callback is null");
         return 0;
     }
     return 1;
@@ -1712,10 +1775,12 @@ void mtic_die(){
 
 void mtic_setCommandLine(const char *line){
     strncpy(commandLine, line, COMMAND_LINE_LENGTH);
+    mtic_info("Command line set to %s", commandLine);
 }
 
 void mtic_setRequestOutputsFromMappedAgents(bool notify){
     network_RequestOutputsFromMappedAgents = notify;
+    mtic_info("changed to %d", notify);
 }
 
 bool mtic_getRequestOutputsFromMappedAgents(){
@@ -1756,7 +1821,7 @@ void mtic_getNetdevicesList(char ***devices, int *nb){
 
 void mtic_freeNetdevicesList(char **devices, int nb){
     for (int i=0; i < nb; i++){
-        if (strlen(devices[i]) > 0){
+        if (devices[i] != NULL && strlen(devices[i]) > 0){
             free(devices[i]);
         }
     }
@@ -1770,6 +1835,6 @@ void mtic_observeForcedStop(mtic_forcedStopCallback cb, void *myData){
         newCb->myData = myData;
         DL_APPEND(forcedStopCalbacks, newCb);
     }else{
-        mtic_debug("mtic_observeForcedStop: callback is null\n");
+        mtic_warn("callback is null");
     }
 }

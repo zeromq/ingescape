@@ -692,11 +692,11 @@ zyre_actor (zsock_t *pipe, void *args)
         }
         if (gossipconnect != NULL){
             zyre_gossip_connect(node, "%s", gossipconnect);
-            printf("connecting to gossip node at %s\n", gossipconnect);
+            printf("connecting to P2P node at %s\n", gossipconnect);
         }
         if (gossipbind != NULL){
             zyre_gossip_bind(node, "%s", gossipbind);
-            printf("creating gossip node %s\n", gossipbind);
+            printf("creating P2P node %s\n", gossipbind);
         }
     }
     
@@ -798,18 +798,23 @@ void print_usage(){
     printf("--noninteractiveloop : non-interactive loop for use as a background application\n");
     printf("--message \"[#channel|peer] message\" : message to send to a channel (indicated with #) or a peer (peer id) at startup and then stop\n");
     //printf("\n--proxy : run both beacon and gossip instances (default : false)\n");
-    printf("beacon broadcast configuration :\n");
-    printf("--netdevice : name of the network device to be used (shall be used if several devices available)\n");
+    
+    printf("\nUDP discovery configuration :\n");
+    printf("--netdevice : name of the network device to be used (shall be set if several devices available)\n");
     printf("--port port_number : port used for autodiscovery between peers (default : 5670)\n");
-    printf("OR\n");
-    printf("gossip and fixed endepoint configuration :\n");
-    printf("an endpoint looks like : tcp://10.0.0.7:49155\n");
-    printf("--gossipbind endpoint : our address as a gossip endpoint\n");
-    printf("--gossipconnect endpoint : address of a gossip endpoint to use\n");
-    printf("\tNB: if gossip endpoint restarts, others depending on it will not see it coming back\n");
-    printf("\tNB: in gossip mode, leaving agents are not detected by others\n");
+    
+    printf("\nOR");
+    printf("\nP2P discovery and fixed endpoint configuration :\n");
+    printf("an endpoint looks like : tcp://10.0.0.7:49155 or ipc:///tmp/feeds/0 or inproc://my-endpoint\n");
+    printf("(ipc is for UNIX systems only)\n");
+    printf("(inproc is for inter-thread communication only)\n");
+    printf("--bind endpoint : our address as a P2P known node\n");
+    printf("--connect endpoint : address of a P2P node to use\n");
+    printf("\tNB: if P2P endpoint restarts, others depending on it may not see it coming back\n");
+    printf("\tNB: in P2P mode, leaving agents are not detected by others\n");
     printf("--endpoint endpoint : optional custom zyre endpoint address (overrides --netdevice and --port)\n");
-    printf("\tNB: forcing the endpoint disables autodiscovery and gossip must be used\n");
+    printf("\tNB: forcing the endpoint disables UDP discovery and P2P must be used\n");
+    printf("\tNB: zyre endpoint can be tcp, ipc or inproc\n");
 }
 
 void print_commands(){
@@ -856,8 +861,8 @@ int main (int argc, char *argv [])
         {"message",      required_argument, 0,  'm' },
         {"noninteractiveloop",      no_argument, 0,  'i' },
         {"help",      no_argument, 0,  'h' },
-        {"gossipbind",      required_argument, 0,  's' },
-        {"gossipconnect",      required_argument, 0,  'g' },
+        {"bind",      required_argument, 0,  's' },
+        {"connect",      required_argument, 0,  'g' },
         {"endpoint",      required_argument, 0,  'e' },
     };
     
@@ -938,7 +943,7 @@ int main (int argc, char *argv [])
     //init zyre
     zactor_t *beaconActor = NULL;
     zactor_t *gossipActor = NULL;
-    if (!proxy || (gossipconnect == NULL && gossipbind == NULL && endpoint == NULL)){
+    if ((gossipconnect == NULL && gossipbind == NULL && endpoint == NULL)){
         zyreloopElements_t *zEl = calloc(1, sizeof(zyreloopElements_t));
         assert(zEl);
         zEl->name = strdup(name);
@@ -946,13 +951,9 @@ int main (int argc, char *argv [])
         zEl->agents = NULL;
         beaconActor = zactor_new (zyre_actor, zEl);
         assert (beaconActor);
-    }
-    if (proxy || gossipconnect != NULL || gossipbind != NULL || endpoint != NULL){
+    }else{
         if (endpoint != NULL && gossipconnect == NULL && gossipbind == NULL){
-            printf("warning : endpoint specified but no attached gossip information, %s won't reach any other agent", name);
-        }
-        if (endpoint == NULL && gossipconnect == NULL && gossipbind == NULL){
-            printf("warning : running in proxy mode without gossip parameters, gossip won't be started for %s", name);
+            printf("warning : endpoint specified but no attached P2P parameters, %s won't reach any other agent", name);
         }else{
             zyreloopElements_t *zEl = calloc(1, sizeof(zyreloopElements_t));
             assert(zEl);

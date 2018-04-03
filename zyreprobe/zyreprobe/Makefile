@@ -19,7 +19,7 @@ DYNLIBS = -lzyre -lczmq -lzmq -lsodium
 STATICLIBS = -static ${LIBDIRLOCAL}/libzyre.a ${LIBDIRLOCAL}/libczmq.a ${LIBDIRLOCAL}/libzmq.a ${LIBDIRLOCAL}/libsodium.a  
 
 CC = gcc
-CFLAGS = -W -Wall -g $(INCDIRS) -std=gnu99
+CFLAGS = -g $(INCDIRS) -std=gnu99 -fPIC -Wextra -O2 -std=gnu99 -Wall
 LDFLAGS = -L$(LIBDIRLOCAL) $(DYNLIBS)
 
 

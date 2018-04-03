@@ -33,17 +33,16 @@
 #include <winsock2.h>
 #include <Ws2tcpip.h>
 #include <iphlpapi.h>
-#else
-#define MAX_PATH 260
 #endif
 
 #include "mastic.h"
 
+#define MAX_PATH 2048
 #define MAX_IOP_NAME_LENGTH 256
 #define MAX_AGENT_NAME_LENGTH 256
 
-extern char definitionPath[1024];
-extern char mappingPath[1024];
+extern char definitionPath[MAX_PATH];
+extern char mappingPath[MAX_PATH];
 
 //////////////////  STRUCTURES AND ENUMS   //////////////////
 
@@ -55,7 +54,7 @@ typedef struct mtic_observe_callback {
 } mtic_observe_callback_t;
 
 /*
- * Define the structure agent_iop (input, output, parameter) :
+ * Define the structure agent_iop_t (input, output, parameter) :
  * 'name'       : the input/output/parameter's name. Need to be unique in each type of iop (input/output/parameter)
  * 'value_type' : the type of the value (int, double, string, impulsion ...)
  * 'type'       : the type of the iop : input / output / parameter
@@ -63,7 +62,7 @@ typedef struct mtic_observe_callback {
  * 'valueSize'  : the size of the value
  * 'is_muted'   : flag indicated if the iop is muted (specially used for outputs)
  */
-struct agent_iop {
+typedef struct agent_iop {
     const char* name;
     iopType_t value_type;
     iop_t type;          //Size of pointer on data
@@ -78,11 +77,7 @@ struct agent_iop {
     bool is_muted;
     mtic_observe_callback_t *callbacks;
     UT_hash_handle hh;         /* makes this structure hashable */
-};
-
-typedef struct agent_iop agent_iop;
-typedef struct category category;
-typedef struct definition definition;
+} agent_iop_t;
 
 /*
  * Define the structure DEFINITION :
@@ -98,38 +93,11 @@ typedef struct definition {
     const char* description;
     const char* version;
 //    category* categories;
-    agent_iop* params_table;
-    agent_iop* inputs_table;
-    agent_iop* outputs_table;
+    agent_iop_t* params_table;
+    agent_iop_t* inputs_table;
+    agent_iop_t* outputs_table;
     UT_hash_handle hh;
 } definition;
-
-/*
- * Define the structure CATEGORY :
- * 'name'                   : name of the category
- * 'version'                : version of the category
- * 'parameters'             : list of parameters which describe the category
- * 'inputs'                 : list of inputs which describe the category
- * 'outputs'                : list of outputs which describe the category
- */
-typedef struct category {
-    const char* name;
-    const char* version;
-    agent_iop* params_table;
-    agent_iop* inputs_table;
-    agent_iop* outputs_table;
-    UT_hash_handle hh;
-} category;
-
-/*
- * Define the state during the checking of a category
- */
-typedef enum {
-    GLOBAL_CAT,
-    OUTPUT_CAT,
-    INPUT_CAT
-} category_check_type;
-
 
 /*
  * Define the structure 'mapping_element' which contains mapping between an input and an (one or all) external agent's output :
@@ -138,7 +106,6 @@ typedef enum {
  * 'agent name to connect'  : external agent's name to connect with (one or all)
  * 'output name to connect' : external agent(s) output name to connect with
  */
-
 typedef struct mapping_element {
     unsigned long id;
     char* input_name;
@@ -146,20 +113,6 @@ typedef struct mapping_element {
     char* output_name;
     UT_hash_handle hh;
 } mapping_element_t;
-
-/*
- * Define the structure 'mapping_cat' which contains mapping between an input and an (one or all) external agent's category :
- * 'map_id'                         : the key of the table. Need to be unique : the table hash key
- * 'agent name to connect'          : external agent's name to connect with (one or all)
- * 'category unique name to connect': external agent(s) category to connect with
- */
-//typedef struct mapping_cat {
-//    int map_cat_id;
-//    char* agent_name;
-//    char*category_name;
-//    map_state state;
-//    UT_hash_handle hh;
-//} mapping_cat_t;
 
 /*
  * Define the structure 'mapping' which contains the json description of all mapping (output & category):
@@ -174,7 +127,6 @@ typedef struct mapping {
     char* description;
     char* version;
     mapping_element_t* map_elements;
-//    mapping_cat* map_cat;
     UT_hash_handle hh;
 } mapping_t;
 
@@ -184,6 +136,7 @@ typedef struct mappingFilter {
     struct mappingFilter *next, *prev;
 } mappingFilter_t;
 
+//network internal structures
 typedef struct subscriber_s{
     const char *agentName;
     const char *agentPeerId;
@@ -197,12 +150,12 @@ typedef struct subscriber_s{
     UT_hash_handle hh;
 } subscriber_t;
 
-//network internal structure
 #define NETWORK_DEVICE_LENGTH 256
 #define IP_ADDRESS_LENGTH 256
 typedef struct zyreloopElements{
     char networkDevice[NETWORK_DEVICE_LENGTH];
     char ipAddress[IP_ADDRESS_LENGTH];
+    char brokerEndPoint[IP_ADDRESS_LENGTH];
     int zyrePort;
     zactor_t *agentActor;
     zyre_t *node;
@@ -216,8 +169,6 @@ typedef struct zyreloopElements{
 //  definition
 
 extern definition* mtic_internal_definition;
-
-char* definition_getIOPValueAsString (agent_iop* iop); //returned value must be freed by user
 void definition_freeDefinition (definition* definition);
 
 
@@ -230,18 +181,15 @@ mapping_element_t * mapping_createMappingElement(const char * input_name,
                                                  const char *agent_name,
                                                  const char* output_name);
 unsigned long djb2_hash (unsigned char *str);
-bool mapping_checkCompatibilityInputOutput(agent_iop *foundInput, agent_iop *foundOutput);
+bool mapping_checkCompatibilityInputOutput(agent_iop_t *foundInput, agent_iop_t *foundOutput);
 
 // model
 
 extern bool isWholeAgentMuted;
 
-void model_setIopValue(agent_iop *iop, void* value, long size);
-agent_iop* model_findIopByName(const char* name, iop_t type);
-agent_iop* model_findInputByName(const char* name);
-agent_iop* model_findOutputByName(const char* name);
-agent_iop* model_findParameterByName(const char* name);
-void* model_getValueFor(const char*name_iop, iop_t type);
+int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void* value, long size);
+agent_iop_t* model_findIopByName(const char* name, iop_t type);
+char* model_getIOPValueAsString (agent_iop_t* iop); //returned value must be freed by user
 
 
 // network
