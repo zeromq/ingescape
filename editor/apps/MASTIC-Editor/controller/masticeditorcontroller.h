@@ -179,6 +179,13 @@ public Q_SLOTS:
       */
     QPointF getGlobalMousePosition();
 
+private Q_SLOTS:
+
+    /**
+     * @brief Slot when the timer time out
+     */
+    void _onTimeout();
+
 signals:
 
     /**
@@ -210,6 +217,9 @@ private:
 
     // Helper to manage JSON the saving/opening platform files
     JsonHelper* _jsonHelper;
+
+    // timer to let agents to connect before setting the application in "mapped" mode
+    QTimer _timer;
 
 };
 

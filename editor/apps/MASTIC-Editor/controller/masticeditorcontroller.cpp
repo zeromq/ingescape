@@ -210,12 +210,8 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     // Initialize agents list from default file
     _modelManager->importAgentsListFromDefaultFile();
 
-    // Initialize platform from default file
-    _openPlatformFromFile(_platformDefaultFilePath);
-
     // Start our MASTIC agent with a network device (or an IP address) and a port
     _networkC->start(_networkDevice, _ipAddress, _port);
-
 
     //
     // Subscribe to system signals to interceipt interruption and termination signals
@@ -235,6 +231,11 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
 
     // FIXME: sleep to display our loading screen
     //QThread::msleep(2000);
+
+    // Init the timer to let agents to connect before setting the application in "mapped" mode
+    _timer.setInterval(2000);
+    connect(&_timer, &QTimer::timeout, this, &MasticEditorController::_onTimeout);
+    _timer.start();
 }
 
 
@@ -629,4 +630,14 @@ bool MasticEditorController::canDeleteAgentInMapping(AgentInMappingVM* agentInMa
     }
 
     return canBeDeleted;
+}
+
+/**
+ * @brief Aims at initializing editor in "Mapped" mode
+ */
+void MasticEditorController::_onTimeout()
+{
+    // Initialize platform from online mapping
+    _modelManager->setisActivatedMapping(true);
+    _timer.stop();
 }
