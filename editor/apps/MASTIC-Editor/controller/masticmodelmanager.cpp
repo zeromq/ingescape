@@ -559,6 +559,19 @@ void MasticModelManager::onIsMutedFromOutputOfAgentUpdated(QString peerId, bool 
     }
 }
 
+/**
+ * @brief Slot called when the state of an agent changes
+ * @param peerId
+ * @param stateName
+ */
+void MasticModelManager::onAgentStateChanged(QString peerId, QString stateName)
+{
+    AgentM* agent = getAgentModelFromPeerId(peerId);
+    if(agent != NULL) {
+        agent->setstate(stateName);
+    }
+}
+
 
 /**
  * @brief Add a model of agent

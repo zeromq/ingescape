@@ -65,6 +65,9 @@ class AgentVM : public QObject
     // Definition of our agent
     I2_QML_PROPERTY_READONLY_CUSTOM_SETTER(DefinitionM*, definition)
 
+    // Hostname(s) on the network of our agent(s)
+    I2_QML_PROPERTY(QString, state)
+
     // Number of clones
     I2_QML_PROPERTY_READONLY(int, clonesNumber)
 
@@ -190,6 +193,11 @@ private Q_SLOTS:
      */
     void _onDefinitionOfModelChanged(DefinitionM* definition);
 
+    /**
+     * @brief Slot when the state of a model changed
+     * @param state
+     */
+    void _onStateOfModelChanged(QString state);
 
     /**
      * @brief Slot when a command must be sent on the network to an agent about one of its output
@@ -240,6 +248,11 @@ private:
      * @brief Update with the definition of first model
      */
     void _updateWithDefinitionOfFirstModel();
+
+    /**
+     * @brief Update with the state of first model
+     */
+    void _updateWithStateOfFirstModel();
 
 
 private:

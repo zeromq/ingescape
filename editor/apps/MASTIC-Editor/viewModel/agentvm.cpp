@@ -207,11 +207,12 @@ void AgentVM::_onModelsChanged()
                 //qDebug() << "New model" << model->name() << "ADDED (" << model->peerId() << ")";
 
                 // Connect to signals from a model
-                connect(model, &AgentM::isONChanged, this, &AgentVM::_onIsONofModelChanged);
-                connect(model, &AgentM::canBeRestartedChanged, this, &AgentVM::_onCanBeRestartedOfModelChanged);
-                connect(model, &AgentM::isMutedChanged, this, &AgentVM::_onIsMutedOfModelChanged);
-                connect(model, &AgentM::isFrozenChanged, this, &AgentVM::_onIsFrozenOfModelChanged);
-                connect(model, &AgentM::definitionChanged, this, &AgentVM::_onDefinitionOfModelChanged);
+                connect(model, &AgentM::isONChanged, this, &AgentVM::_onIsONofModelChanged, Qt::UniqueConnection);
+                connect(model, &AgentM::canBeRestartedChanged, this, &AgentVM::_onCanBeRestartedOfModelChanged, Qt::UniqueConnection);
+                connect(model, &AgentM::isMutedChanged, this, &AgentVM::_onIsMutedOfModelChanged, Qt::UniqueConnection);
+                connect(model, &AgentM::isFrozenChanged, this, &AgentVM::_onIsFrozenOfModelChanged, Qt::UniqueConnection);
+                connect(model, &AgentM::definitionChanged, this, &AgentVM::_onDefinitionOfModelChanged, Qt::UniqueConnection);
+                connect(model, &AgentM::stateChanged, this, &AgentVM::_onStateOfModelChanged, Qt::UniqueConnection);
             }
         }
     }
@@ -231,6 +232,7 @@ void AgentVM::_onModelsChanged()
                 disconnect(model, &AgentM::isMutedChanged, this, &AgentVM::_onIsMutedOfModelChanged);
                 disconnect(model, &AgentM::isFrozenChanged, this, &AgentVM::_onIsFrozenOfModelChanged);
                 disconnect(model, &AgentM::definitionChanged, this, &AgentVM::_onDefinitionOfModelChanged);
+                disconnect(model, &AgentM::stateChanged, this, &AgentVM::_onStateOfModelChanged);
             }
         }
     }
@@ -304,6 +306,18 @@ void AgentVM::_onDefinitionOfModelChanged(DefinitionM* definition)
 
     // Update with the definition of first model
     _updateWithDefinitionOfFirstModel();
+}
+
+/**
+ * @brief Slot when the state of a model changed
+ * @param state
+ */
+void AgentVM::_onStateOfModelChanged(QString state)
+{
+    Q_UNUSED(state)
+
+    // Update with the state of first model
+    _updateWithStateOfFirstModel();
 }
 
 
@@ -471,4 +485,17 @@ void AgentVM::_updateWithDefinitionOfFirstModel()
          }
     }
     setdefinition(definition);
+}
+
+/**
+ * @brief Update with the state of first model
+ */
+void AgentVM::_updateWithStateOfFirstModel()
+{
+    if (_models.count() > 0) {
+         AgentM* model = _models.at(0);
+         if (model != NULL) {
+             setstate(model->state());
+         }
+    }
 }

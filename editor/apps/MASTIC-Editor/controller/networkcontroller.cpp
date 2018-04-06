@@ -35,6 +35,7 @@ static const QString mutedAllPrefix = "MUTED=";
 static const QString frozenPrefix = "FROZEN=";
 static const QString mutedOutputPrefix = "OUTPUT_MUTED ";
 static const QString unmutedOutputPrefix = "OUTPUT_UNMUTED ";
+static const QString statePrefix = "STATE=";
 
 
 /**
@@ -190,6 +191,14 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
 
                 // Emit the signal "is Muted from OUTPUT of Agent Updated"
                 Q_EMIT networkController->isMutedFromOutputOfAgentUpdated(peerId, false, outputName);
+            }
+            // STATE
+            else if (message.startsWith(statePrefix))
+            {
+                QString stateName = message.remove(0, statePrefix.length());
+
+                // Emit the signal "State changed"
+                Q_EMIT networkController->agentStateChanged(peerId, stateName);
             }
             else
             {
