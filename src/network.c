@@ -258,10 +258,8 @@ void sendDefinitionToAgent(const char *peerId, const char *definition)
 
 void sendMappingToAgent(const char *peerId, const char *mapping)
 {
-    if(peerId != NULL &&  mapping != NULL)
-    {
-        if(agentElements->node != NULL)
-        {
+    if(peerId != NULL &&  mapping != NULL){
+        if(agentElements->node != NULL){
             zyre_whispers(agentElements->node, peerId, "%s%s", mappingPrefix, mapping);
         } else {
             mtic_warn("Could not send our mapping to %s : our agent is not connected",peerId);
@@ -575,11 +573,12 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 //we also send our frozen and muted states
                 if (isWholeAgentMuted){
                     zyre_whispers(agentElements->node, peer, "MUTED=1");
-                }else{
-                    
                 }
                 if (isFrozen){
                     zyre_whispers(agentElements->node, peer, "FROZEN=1");
+                }
+                if (strlen(agentState) > 0){
+                    zyre_whispers(agentElements->node, peer, "STATE=%s", agentState);
                 }
                 if (mtic_internal_definition != NULL){
                     agent_iop_t *current_iop, *tmp_iop;
@@ -1633,14 +1632,14 @@ int mtic_observeFreeze(mtic_freezeCallback cb, void *myData){
  * \param state is the name of the state you want to send.
  */
 int mtic_setAgentState(const char *state){
-    if (state == NULL)
-    {
+    if (state == NULL){
         mtic_error("state can not be NULL");
         return 0;
     }
     
     if (strcmp(state, agentState) != 0){
         strncpy(agentState, state, MAX_AGENT_NAME_LENGTH);
+        mtic_info("changed to %s", agentState);
         if (agentElements != NULL && agentElements->node != NULL){
             zyre_shouts(agentElements->node, CHANNEL, "STATE=%s", agentState);
         }
