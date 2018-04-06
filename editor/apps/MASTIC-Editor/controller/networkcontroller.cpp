@@ -257,6 +257,14 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
                 // Emit the signal "is Muted from OUTPUT of Agent Updated"
                 Q_EMIT networkController->isMutedFromOutputOfAgentUpdated(peerId, false, outputName);
             }
+            // STATE
+            else if (message.startsWith(statePrefix))
+            {
+                QString stateName = message.remove(0, statePrefix.length());
+
+                // Emit the signal "State changed"
+                Q_EMIT networkController->agentStateChanged(peerId, stateName);
+            }
             else
             {
                 qWarning() << "Not yet managed (WHISPER) message '" << message << "' for agent" << peerName << "(" << peerId << ")";
