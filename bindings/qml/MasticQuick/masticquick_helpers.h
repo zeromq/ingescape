@@ -166,9 +166,8 @@
             name instance; \
             return instance.allValues(); \
         } \
-        static void qmlRegister(const char* uri, int versionMajor, int versionMinor, const char* qmlName = #name) { \
-            qmlRegisterSingletonType<name>(uri, versionMajor, versionMinor, qmlName, &name::qmlSingleton); \
-            registerMetaType<name::Value>(); \
+        static void registerMetaType() { \
+            _registerMetaType<name::Value>(); \
         } \
     }; \
     QML_DECLARE_TYPE(name) \
@@ -198,7 +197,7 @@ public:
      *         qRegisterMetaType in macros. Otherwise, it does not compile due to
      *         "explicit specialization of 'QMetaTypeId<MasticLogLevel::Value>' after instantiation" errors
      */
-    template <class T> static void registerMetaType()
+    template <class T> static void _registerMetaType()
     {
         qRegisterMetaType<T>();
     }

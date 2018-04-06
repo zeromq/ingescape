@@ -26,14 +26,6 @@
 #include "masticquick_enums.h"
 
 
-//
-// URI associated to our QML plugin (used in import)
-//
-#define DEFAULT_MASTICQUICK_URI "MasticQuick"
-
-
-
-
 
 
 //-------------------------------------------------------------------
@@ -173,7 +165,7 @@ public:
       *
       * @remark You MUST call this method if you don't use MasticQuick as a QML plugin
       */
-     static void registerTypes(const char *uri = DEFAULT_MASTICQUICK_URI);
+     static void registerTypes(const char *uri = "MasticQuick");
 
 
 
@@ -797,16 +789,6 @@ public Q_SLOTS:
       * @return
       */
      QStringList getNetdevicesList(QVariant qmlUpdateExtraParameter = QVariant());
-
-
-
-     /**
-      * @brief Print (or save) debugging information
-      * @param logLevel
-      * @param text
-      */
-     void log(MasticLogLevel::Value logLevel, QString text);
-
 
 
      /**

@@ -172,7 +172,7 @@ ApplicationWindow {
 
 
         // MasticQuick API: log something
-        Mastic.log(MasticLogLevel.LOG_TRACE, "Hello world\n");
+        Mastic.trace("Hello world\n");
         Mastic.info("Our agent will be started\n");
 
 
