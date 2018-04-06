@@ -226,7 +226,7 @@ mac {
     LIBS += -L../../frameworks/I2Quick/Mac -lI2Quick
 
     # Add gstreamer libs
-    # GST not included ins master branch
+    # GST not included in master branch
 #    LIBS += -L/usr/local/lib -lglib-2.0.0
 #    LIBS += -L/usr/local/lib -lgstreamer-1.0.0
 #    LIBS += -L/usr/local/lib -lgobject-2.0.0

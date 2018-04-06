@@ -140,6 +140,7 @@
 		979A7D931EA8A9CB003153EF /* version.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79FA1EA8A86F003153EF /* version.h */; };
 		97C927271EB38FE800D2B0CE /* libyajl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 97C927221EB38FD900D2B0CE /* libyajl.a */; };
 		97C9272A1EB38FF300D2B0CE /* yajl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 97C927241EB38FD900D2B0CE /* yajl.framework */; };
+		97D978B2207761240097E027 /* yajl.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 97C927241EB38FD900D2B0CE /* yajl.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -316,6 +317,16 @@
 				979A7D911EA8A9CB003153EF /* runtime.h in CopyFiles */,
 				979A7D921EA8A9CB003153EF /* utils.h in CopyFiles */,
 				979A7D931EA8A9CB003153EF /* version.h in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		97D978B1207761170097E027 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				97D978B2207761240097E027 /* yajl.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2575,7 +2586,7 @@
 				9762EDC81EAE5414002062A1 /* Sources */,
 				9762EDC91EAE5414002062A1 /* Frameworks */,
 				9762EDCA1EAE5414002062A1 /* Headers */,
-				9762EDCB1EAE5414002062A1 /* Resources */,
+				97D978B1207761170097E027 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -2669,16 +2680,6 @@
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
-
-/* Begin PBXResourcesBuildPhase section */
-		9762EDCB1EAE5414002062A1 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		9762EDC81EAE5414002062A1 /* Sources */ = {
