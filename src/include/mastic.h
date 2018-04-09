@@ -8,10 +8,6 @@
 //  Copyright © 2016 IKKY WP4.8. All rights reserved.
 //
 
-/**
-  * \file ../../src/include/mastic.h
-  */
-
 #ifndef mastic_public_h
 #define mastic_public_h
 

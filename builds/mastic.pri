@@ -11,12 +11,14 @@ SOURCES += \
     $$PWD/../src/model.c \
     $$PWD/../src/network.c \
     $$PWD/../src/parser.c \
-    $$PWD/../src/admin.c
+    $$PWD/../src/admin.c \
+    $$PWD/../src/bus.c
 
 HEADERS += \
     $$PWD/../src/include/uthash/uthash.h \
     $$PWD/../src/include/mastic.h \
-    $$PWD/../src/include/mastic_private.h \
+    $$PWD/../src/include/mastic_advanced.h \
+    $$PWD/../src/include/mastic_private.h
 
 INCLUDEPATH += $$PWD/../src/include
 

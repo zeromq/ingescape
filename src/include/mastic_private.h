@@ -164,6 +164,24 @@ typedef struct zyreloopElements{
     zloop_t *loop;
 } zyreloopElements_t;
 
+//zyre agents storage
+#define NAME_BUFFER_SIZE 256
+typedef struct zyreAgent {
+    char peerId[NAME_BUFFER_SIZE];
+    char name[NAME_BUFFER_SIZE];
+    subscriber_t *subscriber;
+    int reconnected;
+    bool hasJoinedPrivateChannel;
+    UT_hash_handle hh;
+} zyreAgent_t;
+
+//zyre headers for service description
+typedef struct serviceHeader {
+    const char *key;
+    const char *value;
+    UT_hash_handle hh;
+} serviceHeader_t;
+
 //////////////////  FUNCTIONS  //////////////////
 
 //  definition
@@ -194,17 +212,13 @@ char* model_getIOPValueAsString (agent_iop_t* iop); //returned value must be fre
 
 // network
 #define CHANNEL "MASTIC_PRIVATE"
+#define AGENT_NAME_DEFAULT "mtic_noname"
 
+extern zyreAgent_t *zyreAgents;
 extern bool network_needToSendDefinitionUpdate;
 extern bool network_needToUpdateMapping;
-extern bool network_isEditor;
 extern subscriber_t *subscribers;
 extern zyreloopElements_t *agentElements;
-//DO NOT DESTROY THE ZYRE_EVENT INSIDE THE CALLBACK
-typedef int (*network_zyreIncoming) (const zyre_event_t *zyre_event, void *arg);
-
-int network_observeZyre(network_zyreIncoming cb, void *myData);
-#define AGENT_NAME_DEFAULT "mtic_noname"
 int network_publishOutput (const char* output_name);
 
 // parser
@@ -218,5 +232,8 @@ mapping_t* parser_LoadMapFromPath (const char* load_file);
 
 // admin
 extern bool admin_logInStream;
+
+//bus
+extern serviceHeader_t *serviceHeaders;
 
 #endif /* mastic_private_h */
