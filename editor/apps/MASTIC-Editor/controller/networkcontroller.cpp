@@ -20,6 +20,7 @@
 
 extern "C" {
 #include <mastic_advanced.h>
+#include <mastic_private.h>
 #include <czmq.h>
 }
 
