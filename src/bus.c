@@ -127,7 +127,7 @@ void mtic_busAddServiceDescription(const char *key, const char *value){
         }
         header = calloc(1, sizeof(serviceHeader_t));
         header->key = strndup(key, MAX_STRING_MSG_LENGTH);
-        header->value = strndup(value, MAX_STRING_MSG_LENGTH);
+        header->value = strndup(value, MAX_STRING_MSG_LENGTH * 16);
         HASH_ADD_STR(serviceHeaders, key, header);
     }else{
         mtic_warn("service key '%s' is reserved and cannot be edited", key);
