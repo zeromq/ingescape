@@ -35,7 +35,7 @@ public:
     * @brief Called to register the new QML types
     * @param uri
     */
-    void registerTypes(const char *uri = DEFAULT_MASTICQUICK_URI);
+    void registerTypes(const char *uri = "MasticQuick");
 };
 
 
