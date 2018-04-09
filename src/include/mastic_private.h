@@ -177,8 +177,8 @@ typedef struct zyreAgent {
 
 //zyre headers for service description
 typedef struct serviceHeader {
-    const char *key;
-    const char *value;
+    char *key;
+    char *value;
     UT_hash_handle hh;
 } serviceHeader_t;
 

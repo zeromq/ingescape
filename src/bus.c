@@ -24,6 +24,10 @@ void mtic_busLeaveChannel(const char *channel){
 }
 
 int mtic_busSendStringToChannel(const char *channel, const char *msg, ...){
+    if (strcmp(CHANNEL, channel) == 0){
+        mtic_error("channel name %s is reserved and cannot be used", channel);
+        return -1;
+    }
     int res = 1;
     char content[MAX_STRING_MSG_LENGTH] = "";
     va_list list;
@@ -36,6 +40,10 @@ int mtic_busSendStringToChannel(const char *channel, const char *msg, ...){
 }
 
 int mtic_busSendDataToChannel(const char *channel, void *data, long size){
+    if (strcmp(CHANNEL, channel) == 0){
+        mtic_error("channel name %s is reserved and cannot be used", channel);
+        return -1;
+    }
     int res = 1;
     zframe_t *frame = zframe_new(data, size);
     zmsg_t *msg = zmsg_new();
@@ -46,6 +54,10 @@ int mtic_busSendDataToChannel(const char *channel, void *data, long size){
 }
 
 int mtic_busSendZMQMsgToChannel(const char *channel, zmsg_t **msg_p){
+    if (strcmp(CHANNEL, channel) == 0){
+        mtic_error("channel name %s is reserved and cannot be used", channel);
+        return -1;
+    }
     int res = 1;
     if (zyre_shout(agentElements->node, channel, msg_p) != 0)
         res = -1;
@@ -99,11 +111,18 @@ int mtic_busSendZMQMsgToAgent(const char *agentNameOrPeerID, zmsg_t **msg_p){
 }
 
 void mtic_busAddServiceDescription(const char *key, const char *value){
-    if (strcmp(key, "") != 0){
+    if (strcmp(key, "publisher") != 0
+        && strcmp(key, "logger") != 0
+        && strcmp(key, "canBeFrozen") != 0
+        && strcmp(key, "pid") != 0
+        && strcmp(key, "commandline") != 0
+        && strcmp(key, "hostname") != 0
+        && strcmp(key, "isEditor") != 0)
+    {
         serviceHeader_t *header;
         HASH_FIND_STR(serviceHeaders, key, header);
         if (header != NULL){
-            mtic_error("service key %s already defined : new value will be ignored");
+            mtic_error("service key '%s' already defined : new value will be ignored", key);
             return;
         }
         header = calloc(1, sizeof(serviceHeader_t));
@@ -111,7 +130,33 @@ void mtic_busAddServiceDescription(const char *key, const char *value){
         header->value = strndup(value, MAX_STRING_MSG_LENGTH);
         HASH_ADD_STR(serviceHeaders, key, header);
     }else{
-        mtic_warn("service key %s is reserved and cannot be used");
+        mtic_warn("service key '%s' is reserved and cannot be edited", key);
     }
-    
+}
+
+void mtic_busRemoveServiceDescription(const char *key){
+    if (strcmp(key, "publisher") != 0
+        && strcmp(key, "logger") != 0
+        && strcmp(key, "canBeFrozen") != 0
+        && strcmp(key, "pid") != 0
+        && strcmp(key, "commandline") != 0
+        && strcmp(key, "hostname") != 0
+        && strcmp(key, "isEditor") != 0)
+    {
+        serviceHeader_t *header;
+        HASH_FIND_STR(serviceHeaders, key, header);
+        if (header == NULL){
+            mtic_warn("service key '%s' does not exist");
+            return;
+        }
+        HASH_DEL(serviceHeaders, header);
+        free(header->key);
+        free(header->value);
+        free(header);
+        if (agentElements != NULL && agentElements->node != NULL){
+            mtic_warn("agent is started : restart the agent to actually remove the service");
+        }
+    }else{
+        mtic_warn("service key '%s' is reserved and cannot be removed", key);
+    }
 }

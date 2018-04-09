@@ -26,7 +26,7 @@
 //network configuration
 //void mtic_setBusEndpoint(const char *endpoint); //usefull only with gossip discovery - TODO
 //void mtic_connectAgentOnEndpoint(const char *endpoint); //not officially supported in Zyre 2.0.x yet
-PUBLIC void mtic_setPublishingPort(unsigned int port); //warning if called after start
+PUBLIC void mtic_setPublishingPort(unsigned int port);
 PUBLIC void mtic_setDiscoveryInterval(unsigned int interval); //in milliseconds
 PUBLIC void mtic_setAgentTimeout(unsigned int duration); //in milliseconds
 
@@ -56,6 +56,7 @@ PUBLIC int mtic_busSendDataToAgent(const char *agentNameOrPeerID, void *data, un
 PUBLIC int mtic_busSendZMQMsgToAgent(const char *agentNameOrPeerID, zmsg_t **msg_p); //destroys message after sending it
 
 PUBLIC void mtic_busAddServiceDescription(const char *key, const char *value);
+PUBLIC void mtic_busRemoveServiceDescription(const char *key);
 
 //security
 //TODO when officially supported in Zyre 2.0.x
