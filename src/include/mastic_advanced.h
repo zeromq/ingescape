@@ -20,7 +20,6 @@
 #endif
 
 #include <zyre.h>
-#include "mastic.h"
 
 #define MAX_STRING_MSG_LENGTH 4096
 
