@@ -58,7 +58,7 @@ BorderImage {
 
     Image {
         id: wheel
-rotation: 10
+        rotation: 10
         anchors {
             horizontalCenter: pole.horizontalCenter
             bottom: pole.top

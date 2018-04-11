@@ -34,6 +34,7 @@
 #include "uthash/uthash.h"
 #include "uthash/utlist.h"
 #include "mastic_private.h"
+#include "mastic_advanced.h"
 
 #ifdef _WIN32
     #define MALLOC(x) HeapAlloc(GetProcessHeap(), 0, (x))
@@ -107,7 +108,7 @@ typedef struct freezeCallback {
 } freezeCallback_t;
 
 typedef struct zyreCallback {
-    network_zyreIncoming callback_ptr;
+    mtic_BusMessageIncoming callback_ptr;
     void *myData;
     struct zyreCallback *prev;
     struct zyreCallback *next;
@@ -120,20 +121,11 @@ typedef struct forcedStopCalback {
     struct forcedStopCalback *next;
 } forcedStopCalback_t;
 
-//zyre agents storage
-#define NAME_BUFFER_SIZE 256
-typedef struct zyreAgent {
-    char peerId[NAME_BUFFER_SIZE];
-    char name[NAME_BUFFER_SIZE];
-    subscriber_t *subscriber;
-    int reconnected;
-    bool hasJoinedPrivateChannel;
-    UT_hash_handle hh;
-} zyreAgent_t;
-
 bool network_needToSendDefinitionUpdate = false;
 bool network_needToUpdateMapping = false;
-bool network_isEditor = false;
+unsigned int network_discoveryInterval = 1000;
+unsigned int network_agentTimeout = 30000;
+unsigned int network_publishingPort = 0;
 
 //we manage agent data as a global variables inside the network module for now
 zyreloopElements_t *agentElements = NULL;
@@ -437,15 +429,15 @@ int manageSubscription (zloop_t *loop, zmq_pollitem_t *item, void *arg){
 }
 
 //manage messages received on the bus
-int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
+int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
     MASTIC_UNUSED(arg)
 
     zyre_t *node = agentElements->node;
     if (item->revents & ZMQ_POLLIN)
     {
         zyre_event_t *zyre_event = zyre_event_new (node);
-        const char *event = zyre_event_type(zyre_event);
-        const char *peer = zyre_event_peer_uuid(zyre_event);
+        const char *event = zyre_event_type (zyre_event);
+        const char *peer = zyre_event_peer_uuid (zyre_event);
         const char *name = zyre_event_peer_name (zyre_event);
         const char *address = zyre_event_peer_addr (zyre_event);
         zhash_t *headers = zyre_event_headers (zyre_event);
@@ -773,28 +765,38 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     free(outputsList);
                 }else if (strlen("OUTPUTS") == strlen(message) && strncmp (message, "OUTPUTS", strlen("OUTPUTS")) == 0){
                     handleSubscriptionMessage(msgDuplicate, peer);
+                    mtic_info("privately received output values from %s (%s)", name, peer);
                 }else if (strlen("STOP") == strlen(message) && strncmp (message, "STOP", strlen("STOP")) == 0){
                     free(message);
                     forcedStop = true;
+                    mtic_info("received STOP command from %s (%s)", name, peer);
                     //stop our zyre loop by returning -1 : this will start the cleaning process
                     return -1;
                 }else if (strlen("CLEAR_MAPPING") == strlen(message) && strncmp (message, "CLEAR_MAPPING", strlen("CLEAR_MAPPING")) == 0){
+                    mtic_info("received CLEAR_MAPPING command from %s (%s)", name, peer);
                     mtic_clearMapping();
                 }else if (strlen("FREEZE") == strlen(message) && strncmp (message, "FREEZE", strlen("FREEZE")) == 0){
+                    mtic_info("received FREEZE command from %s (%s)", name, peer);
                     mtic_freeze();
                 }else if (strlen("UNFREEZE") == strlen(message) && strncmp (message, "UNFREEZE", strlen("UNFREEZE")) == 0){
+                    mtic_info("received UNFREEZE command from %s (%s)", name, peer);
                     mtic_unfreeze();
                 }else if (strlen("MUTE_ALL") == strlen(message) && strncmp (message, "MUTE_ALL", strlen("MUTE_ALL")) == 0){
+                    mtic_info("received MUTE_ALL command from %s (%s)", name, peer);
                     mtic_mute();
                 }else if (strlen("UNMUTE_ALL") == strlen(message) && strncmp (message, "UNMUTE_ALL", strlen("UNMUTE_ALL")) == 0){
+                    mtic_info("received UNMUTE_ALL command from %s (%s)", name, peer);
                     mtic_unmute();
                 }else if ((strncmp (message, "MUTE ", strlen("MUTE ")) == 0) && (strlen(message) > strlen("MUTE ")+1)){
+                    mtic_info("received MUTE command from %s (%s)", name, peer);
                     char *subStr = message + strlen("MUTE") + 1;
                     mtic_muteOutput(subStr);
                 }else if ((strncmp (message, "UNMUTE ", strlen("UNMUTE ")) == 0) && (strlen(message) > strlen("UNMUTE ")+1)){
+                    mtic_info("received UNMUTE command from %s (%s)", name, peer);
                     char *subStr = message + strlen("UNMUTE") + 1;
                     mtic_unmuteOutput(subStr);
                 }else if ((strncmp (message, "SET_INPUT ", strlen("SET_INPUT ")) == 0) && (strlen(message) > strlen("SET_INPUT ")+1)){
+                    mtic_info("received SET_INPUT command from %s (%s)", name, peer);
                     char *subStr = message + strlen("SET_INPUT") + 1;
                     char *name, *value;
                     name = strtok (subStr," ");
@@ -803,6 +805,7 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                         mtic_writeInputAsString(name, value);//last parameter is used for DATA only
                     }
                 }else if ((strncmp (message, "SET_OUTPUT ", strlen("SET_OUTPUT ")) == 0) && (strlen(message) > strlen("SET_OUTPUT ")+1)){
+                    mtic_info("received SET_OUTPUT command from %s (%s)", name, peer);
                     char *subStr = message + strlen("SET_OUTPUT") + 1;
                     char *name, *value;
                     name = strtok (subStr," ");
@@ -811,6 +814,7 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                         mtic_writeOutputAsString(name, value);//last paramter is used for DATA only
                     }
                 }else if ((strncmp (message, "SET_PARAMETER ", strlen("SET_PARAMETER ")) == 0) && (strlen(message) > strlen("SET_PARAMETER ")+1)){
+                    mtic_info("received SET_PARAMETER command from %s (%s)", name, peer);
                     char *subStr = message + strlen("SET_PARAMETER") + 1;
                     char *name, *value;
                     name = strtok (subStr," ");
@@ -819,6 +823,7 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                         mtic_writeParameterAsString(name, value);//last paramter is used for DATA only
                     }
                 }else if ((strncmp (message, "MAP ", strlen("MAP ")) == 0) && (strlen(message) > strlen("MAP ")+1)){
+                    mtic_info("received MAP command from %s (%s)", name, peer);
                     char *subStr = message + strlen("MAP") + 1;
                     char *input, *agent, *output;
                     input = strtok (subStr," ");
@@ -828,6 +833,7 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                         mtic_addMappingEntry(input, agent, output);
                     }
                 }else if ((strncmp (message, "UNMAP ", strlen("UNMAP ")) == 0) && (strlen(message) > strlen("UNMAP ")+1)){
+                    mtic_info("received UNMAP command from %s (%s)", name, peer);
                     char *subStr = message + strlen("UNMAP") + 1;
                     char *input, *agent, *output;
                     input = strtok (subStr," ");
@@ -839,35 +845,44 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 }
                 //admin API
                 else if (strlen("ENABLE_LOG_STREAM") == strlen(message) && strncmp (message, "ENABLE_LOG_STREAM", strlen("ENABLE_LOG_STREAM")) == 0){
+                    mtic_info("received ENABLE_LOG_STREAM command from %s (%s)", name, peer);
                     mtic_setLogStream(true);
                 }
                 else if (strlen("DISABLE_LOG_STREAM") == strlen(message) && strncmp (message, "DISABLE_LOG_STREAM", strlen("DISABLE_LOG_STREAM")) == 0){
+                    mtic_info("received DISABLE_LOG_STREAM command from %s (%s)", name, peer);
                     mtic_setLogStream(false);
                 }
                 else if (strlen("ENABLE_LOG_FILE") == strlen(message) && strncmp (message, "ENABLE_LOG_FILE", strlen("ENABLE_LOG_FILE")) == 0){
+                    mtic_info("received ENABLE_LOG_FILE command from %s (%s)", name, peer);
                     mtic_setLogInFile(true);
                 }
                 else if (strlen("DISABLE_LOG_FILE") == strlen(message) && strncmp (message, "DISABLE_LOG_FILE", strlen("DISABLE_LOG_FILE")) == 0){
+                    mtic_info("received DISABLE_LOG_FILE command from %s (%s)", name, peer);
                     mtic_setLogInFile(false);
                 }
                 else if ((strncmp (message, "SET_LOG_PATH ", strlen("SET_LOG_PATH ")) == 0) && (strlen(message) > strlen("SET_LOG_PATH ")+1)){
+                    mtic_info("received SET_LOG_PATH command from %s (%s)", name, peer);
                     char *subStr = message + strlen("SET_LOG_PATH") + 1;
                     mtic_setLogPath(subStr);
                 }
                 else if ((strncmp (message, "SET_DEFINITION_PATH ", strlen("SET_DEFINITION_PATH ")) == 0)
                          && (strlen(message) > strlen("SET_DEFINITION_PATH ")+1)){
+                    mtic_info("received SET_DEFINITION_PATH command from %s (%s)", name, peer);
                     char *subStr = message + strlen("SET_DEFINITION_PATH") + 1;
                     mtic_setDefinitionPath(subStr);
                 }
                 else if ((strncmp (message, "SET_MAPPING_PATH ", strlen("SET_MAPPING_PATH ")) == 0)
                          && (strlen(message) > strlen("SET_MAPPING_PATH ")+1)){
+                    mtic_info("received SET_MAPPING_PATH command from %s (%s)", name, peer);
                     char *subStr = message + strlen("SET_MAPPING_PATH") + 1;
                     mtic_setMappingPath(subStr);
                 }
                 else if (strlen("SAVE_DEFINITION_TO_PATH") == strlen(message) && strncmp (message, "SAVE_DEFINITION_TO_PATH", strlen("SAVE_DEFINITION_TO_PATH")) == 0){
+                    mtic_info("received SAVE_DEFINITION_TO_PATH command from %s (%s)", name, peer);
                     mtic_writeDefinitionToPath();
                 }
                 else if (strlen("SAVE_MAPPING_TO_PATH") == strlen(message) && strncmp (message, "SAVE_MAPPING_TO_PATH", strlen("SAVE_MAPPING_TO_PATH")) == 0){
+                    mtic_info("received SAVE_MAPPING_TO_PATH command from %s (%s)", name, peer);
                     mtic_writeMappingToPath();
                 }
             }
@@ -897,7 +912,14 @@ int manageZyreIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
         //handle callbacks
         zyreCallback_t *elt;
         DL_FOREACH(zyreCallbacks,elt){
-            elt->callback_ptr(zyre_event, elt->myData);
+            if (zyre_event != NULL){
+                zmsg_t *dup = zmsg_dup(msg);
+                elt->callback_ptr(event, peer, name, address, group, headers, dup, elt->myData);
+                zmsg_destroy(&dup);
+            }else{
+                mtic_error("previous callback certainly destroyed the bus event : next callbacks will not be executed");
+                break;
+            }
         }
         zmsg_destroy(&msgDuplicate);
         zyre_event_destroy(&zyre_event);
@@ -978,18 +1000,36 @@ initActor (zsock_t *pipe, void *args){
             canContinue = false;
         }
     }
+    zyre_set_interval(agentElements->node, network_discoveryInterval);
+    zyre_set_expired_timeout(agentElements->node, network_agentTimeout);
+    
+    //Add stored headers to zyre
+    if (canContinue){
+        serviceHeader_t *el, *tmp;
+        HASH_ITER(hh, serviceHeaders, el, tmp){
+            zyre_set_header(agentElements->node, el->key, "%s", el->value);
+        }
+    }
     
     //start publisher
     char endpoint[256];
-    sprintf(endpoint, "tcp://%s:*", agentElements->ipAddress);
-    agentElements->publisher = zsock_new_pub(endpoint);
-    strncpy(endpoint, zsock_endpoint(agentElements->publisher), 256);
-    char *insert = endpoint + strlen(endpoint) - 1;
-    while (*insert != ':' && insert > endpoint) {
-        insert--;
+    if (network_publishingPort == 0){
+        sprintf(endpoint, "tcp://%s:*", agentElements->ipAddress);
+    }else{
+        sprintf(endpoint, "tcp://%s:%d", agentElements->ipAddress, network_publishingPort);
     }
-    zyre_set_header(agentElements->node, "publisher", "%s", insert + 1);
-    
+    agentElements->publisher = zsock_new_pub(endpoint);
+    if (agentElements->publisher == NULL){
+        mtic_error("Could not create publishing socket : Agent will interrupt immediately.");
+        canContinue = false;
+    }else{
+        strncpy(endpoint, zsock_endpoint(agentElements->publisher), 256);
+        char *insert = endpoint + strlen(endpoint) - 1;
+        while (*insert != ':' && insert > endpoint) {
+            insert--;
+        }
+        zyre_set_header(agentElements->node, "publisher", "%s", insert + 1);
+    }
     
     //start logger stream if needed
     if (admin_logInStream){
@@ -1005,9 +1045,6 @@ initActor (zsock_t *pipe, void *args){
     
     //set other headers for agent
     zyre_set_header(agentElements->node, "canBeFrozen", "%i", agentCanBeFrozen);
-    if (network_isEditor){
-        zyre_set_header(agentElements->node, "isEditor", "%d", 1);
-    }
 
 #if defined __unix__ || defined __APPLE__
     int ret;
@@ -1124,7 +1161,7 @@ initActor (zsock_t *pipe, void *args){
 
     zloop_poller (loop, &zpipePollItem, manageParent, agentElements);
     zloop_poller_set_tolerant(loop, &zpipePollItem);
-    zloop_poller (loop, &zyrePollItem, manageZyreIncoming, agentElements);
+    zloop_poller (loop, &zyrePollItem, manageBusIncoming, agentElements);
     zloop_poller_set_tolerant(loop, &zyrePollItem);
     
     zloop_timer(agentElements->loop, 1000, 0, triggerDefinitionUpdate, NULL);
@@ -1240,14 +1277,14 @@ int network_publishOutput (const char* output_name){
     return result;
 }
 
-int network_observeZyre(network_zyreIncoming cb, void *myData){
+int mtic_observeBus(mtic_BusMessageIncoming cb, void *myData){
     if (cb != NULL){
         zyreCallback_t *newCb = calloc(1, sizeof(zyreCallback_t));
         newCb->callback_ptr = cb;
         newCb->myData = myData;
         DL_APPEND(zyreCallbacks, newCb);
     }else{
-        mtic_warn("callback is null");
+        mtic_error("callback is null");
         return 0;
     }
     return 1;
@@ -1836,4 +1873,26 @@ void mtic_observeForcedStop(mtic_forcedStopCallback cb, void *myData){
     }else{
         mtic_warn("callback is null");
     }
+}
+
+void mtic_setDiscoveryInterval(unsigned int interval){
+    if (agentElements != NULL && agentElements->node != NULL){
+        zyre_set_interval(agentElements->node, interval);
+    }
+    network_discoveryInterval = interval;
+}
+
+void mtic_setAgentTimeout(unsigned int duration){
+    if (agentElements != NULL && agentElements->node != NULL){
+        zyre_set_expired_timeout(agentElements->node, duration);
+    }
+    network_agentTimeout = duration;
+}
+
+void mtic_setPublishingPort(unsigned int port){
+    if (agentElements != NULL && agentElements->publisher != NULL){
+        mtic_warn("agent is already started : stop it first to change its publishing port");
+        return;
+    }
+    network_publishingPort = port;
 }

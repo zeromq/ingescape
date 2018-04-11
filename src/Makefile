@@ -23,7 +23,7 @@ else
 endif
 STARGET_LIB = libmastic.a
 
-SRCS = definition.c mapping.c model.c network.c parser.c admin.c
+SRCS = definition.c mapping.c model.c network.c parser.c admin.c bus.c
 OBJS = $(SRCS:.c=.o)
 
 .PHONY: all

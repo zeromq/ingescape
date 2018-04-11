@@ -19,7 +19,9 @@
 #include <QApplication>
 
 extern "C" {
+#include <mastic_advanced.h>
 #include <mastic_private.h>
+#include <czmq.h>
 }
 
 #include "misc/masticeditorutils.h"
@@ -44,23 +46,20 @@ static const QString statePrefix = "STATE=";
  * @param arg
  * @return
  */
-int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg)
+void onIncommingZyreMessageCallback(const char *evt, const char *peer, const char *name,
+                                   const char *address, const char *channel,
+                                   zhash_t *headers, zmsg_t *msg, void *myData)
 {
-    NetworkController* networkController = (NetworkController*)arg;
+    Q_UNUSED(channel)
+    NetworkController* networkController = (NetworkController*)myData;
     if (networkController != NULL)
     {
-        zyre_event_t* zyre_event = (zyre_event_t *)cst_zyre_event;
-
-        QString event = zyre_event_type(zyre_event);
-        QString peerId = zyre_event_peer_uuid(zyre_event);
-        QString peerName = zyre_event_peer_name(zyre_event);
-        QString peerAddress = zyre_event_peer_addr(zyre_event);
-        zhash_t* headers = zyre_event_headers(zyre_event);
-        QString group = zyre_event_group(zyre_event);
-        zmsg_t* msg = zyre_event_msg(zyre_event);
-
         QString hostname = "";
         QString ipAddress = "";
+        QString event = evt;
+        QString peerAddress = address;
+        QString peerName = name;
+        QString peerId = peer;
 
         // ENTER
         if (event.compare("ENTER") == 0)
@@ -96,7 +95,7 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
                 QString value = "";
 
                 while ((k = (char *)zlist_pop(keys))) {
-                    v = zyre_event_header(zyre_event, k);
+                    v = (char *)zhash_lookup(headers, k);
 
                     key = QString(k);
                     value = QString(v);
@@ -290,8 +289,6 @@ int onIncommingZyreMessageCallback(const zyre_event_t *cst_zyre_event, void *arg
             }
         }
     }
-
-    return 0;
 }
 
 
@@ -449,8 +446,8 @@ NetworkController::NetworkController(QObject *parent) : QObject(parent),
     // Set the name of our agent
     mtic_setAgentName(_editorAgentName.toStdString().c_str());
 
-    //add zyre header to declare ourselves as an editor
-    network_isEditor = true;
+    //add  header to declare ourselves as an editor
+    mtic_busAddServiceDescription("isEditor", "1");
 
     //
     // Create our internal definition
@@ -519,7 +516,7 @@ void NetworkController::start(QString networkDevice, QString ipAddress, int port
             qInfo() << "Mastic Agent" << _editorAgentName << "started";
 
             // Begin the observe on transiting zyre messages
-            int result = network_observeZyre(&onIncommingZyreMessageCallback, this);
+            int result = mtic_observeBus(&onIncommingZyreMessageCallback, this);
 
             if (result == 0) {
                 qCritical() << "The callback on zyre messages has NOT been registered !";
@@ -591,8 +588,9 @@ void NetworkController::onCommandAskedToLauncher(QString command, QString hostna
 
         if (!peerIdLauncher.isEmpty()) {
             // Send the command with command line to the peer id of the launcher
-            int success = zyre_whispers(agentElements->node, peerIdLauncher.toStdString().c_str(), "%s %s", command.toStdString().c_str(), commandParameter.toStdString().c_str());
-
+            int success = mtic_busSendStringToAgent(peerIdLauncher.toStdString().c_str(), "%s %s",
+                                                    command.toStdString().c_str(),
+                                                    commandParameter.toStdString().c_str());
             qInfo() << "Send command" << command << "to launcher on" << hostname << "with command parameter" << commandParameter << "with success ?" << success;
         }
         else {
@@ -613,7 +611,7 @@ void NetworkController::onCommandAskedToAgent(QStringList peerIdsList, QString c
         foreach (QString peerId, peerIdsList)
         {
             // Send the command to a peer id of agent
-            int success = zyre_whispers(agentElements->node, peerId.toStdString().c_str(), "%s", command.toStdString().c_str());
+            int success = mtic_busSendStringToAgent(peerId.toStdString().c_str(), "%s", command.toStdString().c_str());
 
             qInfo() << "Send command" << command << "for agent" << peerId << "with success ?" << success;
         }
@@ -633,7 +631,9 @@ void NetworkController::onCommandAskedToAgentAboutOutput(QStringList peerIdsList
         foreach (QString peerId, peerIdsList)
         {
             // Send the command to a peer id of agent
-            int success = zyre_whispers(agentElements->node, peerId.toStdString().c_str(), "%s %s", command.toStdString().c_str(), outputName.toStdString().c_str());
+            int success = mtic_busSendStringToAgent(peerId.toStdString().c_str(), "%s %s",
+                                                    command.toStdString().c_str(),
+                                                    outputName.toStdString().c_str());
 
             qInfo() << "Send command" << command << "for agent" << peerId << "and output" << outputName << "with success ?" << success;
         }
@@ -654,7 +654,10 @@ void NetworkController::onCommandAskedToAgentAboutSettingValue(QStringList peerI
         foreach (QString peerId, peerIdsList)
         {
             // Send the command to a peer id of agent
-            int success = zyre_whispers(agentElements->node, peerId.toStdString().c_str(), "%s %s %s", command.toStdString().c_str(), agentIOPName.toStdString().c_str(), value.toStdString().c_str());
+            int success = mtic_busSendStringToAgent(peerId.toStdString().c_str(), "%s %s %s",
+                                                    command.toStdString().c_str(),
+                                                    agentIOPName.toStdString().c_str(),
+                                                    value.toStdString().c_str());
 
             qInfo() << "Send command" << command << "for agent" << peerId << "and I/O/P" << agentIOPName << "about setting value" << value << "with success ?" << success;
         }
@@ -675,7 +678,11 @@ void NetworkController::onCommandAskedToAgentAboutMappingInput(QStringList peerI
     foreach (QString peerId, peerIdsList)
     {
         // Send the command to a peer id of agent
-        int success = zyre_whispers(agentElements->node, peerId.toStdString().c_str(), "%s %s %s %s", command.toStdString().c_str(), inputName.toStdString().c_str(), outputAgentName.toStdString().c_str(), outputName.toStdString().c_str());
+        int success = mtic_busSendStringToAgent(peerId.toStdString().c_str(), "%s %s %s %s",
+                                                command.toStdString().c_str(),
+                                                inputName.toStdString().c_str(),
+                                                outputAgentName.toStdString().c_str(),
+                                                outputName.toStdString().c_str());
 
         qInfo() << "Send command" << command << "for agent" << peerId << "and input" << inputName << "about mapping on agent" << outputAgentName << "and output" << outputName << "with success ?" << success;
     }

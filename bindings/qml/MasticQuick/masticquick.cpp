@@ -723,14 +723,6 @@ static QMutex _MASTICQUICK_SINGLETON_MUTEX;
 
 
 
-//
-// MasticQuick version
-//
-#define MASTICQUICK_VERSION_MAJOR 1
-#define MASTICQUICK_VERSION_MINOR 0
-
-
-
 
 /**
  * @brief Default constructor
@@ -1008,39 +1000,40 @@ QObject* MasticQuick::qmlSingleton(QQmlEngine* engine, QJSEngine* scriptEngine)
  */
 void MasticQuick::registerTypes(const char* uri)
 {
-    // Check our URI
-    Q_ASSERT(uri == QLatin1String(DEFAULT_MASTICQUICK_URI));
+    Q_UNUSED(uri)
 
 
     //
     // Register enums
     //
     // - IOP types
-    MasticIopType::qmlRegister(uri, MASTICQUICK_VERSION_MAJOR, MASTICQUICK_VERSION_MINOR);
+    qmlRegisterSingletonType<MasticIopType>("MasticQuick", 1, 0, "MasticIopType", &MasticIopType::qmlSingleton);
+    MasticIopType::registerMetaType();
     // - Log levels
-    MasticLogLevel::qmlRegister(uri, MASTICQUICK_VERSION_MAJOR, MASTICQUICK_VERSION_MINOR);
+    qmlRegisterSingletonType<MasticLogLevel>("MasticQuick", 1, 0, "MasticLogLevel", &MasticLogLevel::qmlSingleton);
+    MasticLogLevel::registerMetaType();
 
 
     //
     // Register uncreatable types
     //
-    qmlRegisterUncreatableType<MasticQuickInputsPropertyMap>(uri, MASTICQUICK_VERSION_MAJOR, MASTICQUICK_VERSION_MINOR, "MasticQuickInputsPropertyMap", "Internal class");
-    qmlRegisterUncreatableType<MasticQuickOutputsPropertyMap>(uri, MASTICQUICK_VERSION_MAJOR, MASTICQUICK_VERSION_MINOR, "MasticQuickOutputsPropertyMap", "Internal class");
-    qmlRegisterUncreatableType<MasticQuickParametersPropertyMap>(uri, MASTICQUICK_VERSION_MAJOR, MASTICQUICK_VERSION_MINOR, "MasticQuickParametersPropertyMap", "Internal class");
+    qmlRegisterUncreatableType<MasticQuickInputsPropertyMap>("MasticQuick", 1, 0, "MasticQuickInputsPropertyMap", "Internal class");
+    qmlRegisterUncreatableType<MasticQuickOutputsPropertyMap>("MasticQuick", 1, 0, "MasticQuickOutputsPropertyMap", "Internal class");
+    qmlRegisterUncreatableType<MasticQuickParametersPropertyMap>("MasticQuick", 1, 0, "MasticQuickParametersPropertyMap", "Internal class");
 
 
     //
     // Register creatable types
     //
-    qmlRegisterType<MasticQuickInputBinding>(uri, MASTICQUICK_VERSION_MAJOR, MASTICQUICK_VERSION_MINOR, "MasticInputBinding");
-    qmlRegisterType<MasticQuickOutputBinding>(uri, MASTICQUICK_VERSION_MAJOR, MASTICQUICK_VERSION_MINOR, "MasticOutputBinding");
+    qmlRegisterType<MasticQuickInputBinding>("MasticQuick", 1, 0, "MasticInputBinding");
+    qmlRegisterType<MasticQuickOutputBinding>("MasticQuick", 1, 0, "MasticOutputBinding");
 
 
     //
     // Register singletons
     //
-    qmlRegisterSingletonType<MasticQuickBindingSingleton>(uri, MASTICQUICK_VERSION_MAJOR, MASTICQUICK_VERSION_MINOR, "MasticBinding", &MasticQuickBindingSingleton::qmlSingleton);
-    qmlRegisterSingletonType<MasticQuick>(uri, MASTICQUICK_VERSION_MAJOR, MASTICQUICK_VERSION_MINOR, "Mastic", &MasticQuick::qmlSingleton);
+    qmlRegisterSingletonType<MasticQuickBindingSingleton>("MasticQuick", 1, 0, "MasticBinding", &MasticQuickBindingSingleton::qmlSingleton);
+    qmlRegisterSingletonType<MasticQuick>("MasticQuick", 1, 0, "Mastic", &MasticQuick::qmlSingleton);
 }
 
 
@@ -2690,24 +2683,12 @@ QStringList MasticQuick::getNetdevicesList(QVariant qmlUpdateExtraParameter)
 
 
 /**
- * @brief Print (or save) debugging information
- * @param logLevel
- * @param text
- */
-void MasticQuick::log(MasticLogLevel::Value logLevel, QString text)
-{
-    mtic_log( enumMasticLogLevelToEnumMticLogLevel_t(logLevel), text.toStdString().c_str());
-}
-
-
-
-/**
  * @brief Print (or save) debugging information (loglevel = trace)
  * @param text
  */
 void MasticQuick::trace(QString text)
 {
-    log(MasticLogLevel::LOG_TRACE, text);
+    mtic_trace(text.toStdString().c_str());
 }
 
 
@@ -2718,7 +2699,7 @@ void MasticQuick::trace(QString text)
  */
 void MasticQuick::debug(QString text)
 {
-    log(MasticLogLevel::LOG_DEBUG, text);
+    mtic_debug(text.toStdString().c_str());
 }
 
 
@@ -2729,7 +2710,7 @@ void MasticQuick::debug(QString text)
  */
 void MasticQuick::info(QString text)
 {
-    log(MasticLogLevel::LOG_INFO, text);
+    mtic_info(text.toStdString().c_str());
 }
 
 
@@ -2740,7 +2721,7 @@ void MasticQuick::info(QString text)
  */
 void MasticQuick::warn(QString text)
 {
-    log(MasticLogLevel::LOG_WARN, text);
+    mtic_warn(text.toStdString().c_str());
 }
 
 
@@ -2751,7 +2732,7 @@ void MasticQuick::warn(QString text)
  */
 void MasticQuick::error(QString text)
 {
-    log(MasticLogLevel::LOG_ERROR, text);
+    mtic_error(text.toStdString().c_str());
 }
 
 
@@ -2762,7 +2743,7 @@ void MasticQuick::error(QString text)
  */
 void MasticQuick::fatal(QString text)
 {
-    log(MasticLogLevel::LOG_FATAL, text);
+    mtic_fatal(text.toStdString().c_str());
 }
 
 

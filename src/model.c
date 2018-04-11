@@ -10,6 +10,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <czmq.h>
 #ifdef _WIN32
 #include "unixfunctions.h"
 #endif
@@ -818,6 +819,16 @@ int mtic_readInputAsData(const char *name, void **data, long *size){
     return model_readIopAsData(name, INPUT_T, data, size);
 }
 
+int mtic_readInputAsZMQMsg(const char *name, zmsg_t **msg){
+    void *data = NULL;
+    long size = 0;
+    int ret = model_readIopAsData(name, INPUT_T, &data, &size);
+    zframe_t *frame = zframe_new(data, size);
+    *msg = zmsg_decode(frame);
+    zframe_destroy(&frame);
+    return ret;
+}
+
 bool mtic_readOutputAsBool(const char *name){
     return model_readIopAsBool(name, OUTPUT_T);
 }
@@ -972,6 +983,20 @@ int mtic_writeOutputAsData(const char *name, void *value, long size){
     int ret = model_writeIOP(name, OUTPUT_T, DATA_T, value, size);
     network_publishOutput(name);
     
+    return ret;
+}
+
+int mtic_writeOutputAsZMQMsg(const char *name, zmsg_t *msg){
+    if (name == NULL || strlen(name) == 0){
+        mtic_error("Output name cannot be NULL or empty");
+        return 0;
+    }
+    zframe_t *frame = zmsg_encode(msg);
+    void *value = zframe_data(frame);
+    long size = zframe_size(frame);
+    int ret = model_writeIOP(name, OUTPUT_T, DATA_T, value, size);
+    network_publishOutput(name);
+    zframe_destroy(&frame);
     return ret;
 }
 
