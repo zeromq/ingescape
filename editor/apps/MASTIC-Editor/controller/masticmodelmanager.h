@@ -328,6 +328,12 @@ public Q_SLOTS:
      */
     void onIsMutedFromOutputOfAgentUpdated(QString peerId, bool isMuted, QString outputName);
 
+    /**
+     * @brief Slot called when the state of an agent changes
+     * @param peerId
+     * @param stateName
+     */
+    void onAgentStateChanged(QString peerId, QString stateName);
 
 private:
 

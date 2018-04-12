@@ -69,6 +69,9 @@ class AgentM : public QObject
     // Flag indicating if our agent is frozen
     I2_QML_PROPERTY_READONLY(bool, isFrozen)
 
+    // State of our agent
+    I2_QML_PROPERTY(QString, state)
+
     // Status defined by the agent
     //I2_QML_PROPERTY_READONLY(QString, status)
 

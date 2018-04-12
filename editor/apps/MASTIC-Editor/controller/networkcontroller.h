@@ -165,6 +165,12 @@ Q_SIGNALS:
      */
     void isMutedFromOutputOfAgentUpdated(QString peerId, bool isMuted, QString outputName);
 
+    /**
+     * @brief Signal emitted when the state of an agent changes
+     * @param peerId
+     * @param stateName
+     */
+    void agentStateChanged(QString peerId, QString stateName);
 
 public Q_SLOTS:
 

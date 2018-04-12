@@ -168,7 +168,6 @@ Item {
 
                 anchors {
                     left : parent.left
-                    right : parent.right
                 }
                 elide: Text.ElideRight
 
@@ -178,6 +177,23 @@ Item {
 
                 font: MasticTheme.headingFont
 
+                Text {
+                    anchors
+                    {
+                        left:parent.right
+                        leftMargin:5
+                        baseline:parent.baseline
+                    }
+
+                    text:  model.state !== "" ? qsTr("(%1)").arg(model.state): ""
+
+                    color : MasticTheme.whiteColor
+                    font {
+                        family: MasticTheme.labelFontFamily
+                        pixelSize : 12
+                        italic: true
+                    }
+                }
 
                 // clones
                 Rectangle {
