@@ -49,7 +49,7 @@
         type name () const { \
             return _##name ; \
         } \
-        virtual void set##name (type value); \
+        void set##name (type value); \
     Q_SIGNALS: \
         void name##Changed (type value); \
     protected: \
@@ -66,14 +66,11 @@
         type name () const { \
             return _##name ; \
         } \
-        bool set##name (type value) { \
-            bool hasChanged = false; \
+        void set##name (type value) { \
             if (_##name != value) { \
                 _##name = value; \
-                hasChanged = true; \
                 Q_EMIT name##Changed(value); \
             } \
-            return hasChanged; \
         } \
     Q_SIGNALS: \
         void name##Changed (type value); \

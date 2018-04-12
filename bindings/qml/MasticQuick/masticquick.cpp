@@ -1419,6 +1419,7 @@ bool MasticQuick::startWithDevice(QString networkDevice, int port)
     // Try to start Mastic
     if (mtic_startWithDevice(networkDevice.toStdString().c_str(), port) == 1)
     {
+        qInfo() << "MasticQuick: Mastic started on device" << networkDevice << "with port" << port;
         setisStarted(true);
         result = true;
     }
@@ -1452,6 +1453,7 @@ bool MasticQuick::startWithIP(QString ipAddress, int port)
     // Try to start Mastic
     if (mtic_startWithIP(ipAddress.toStdString().c_str(), port) == 1)
     {
+        qInfo() << "MasticQuick: Mastic started on IP" << ipAddress << "with port" << port;
         setisStarted(true);
         result = true;
     }
@@ -1478,6 +1480,7 @@ bool MasticQuick::stop()
     {
         if (mtic_stop() == 1)
         {
+            qInfo() << "MasticQuick: Mastic stopped";
             setisStarted(false);
             result = true;
         }
@@ -2202,6 +2205,30 @@ bool MasticQuick::clearDefinition()
         Q_EMIT outputsListChanged(_outputsList);
         _parametersList.clear();
         Q_EMIT parametersListChanged(_parametersList);
+
+
+        //
+        // Restore data
+        //
+        // - Name of our definition
+        QString tempDefinitionName = definitionName();
+        if (!tempDefinitionName.isEmpty())
+        {
+            setdefinitionName(tempDefinitionName.toStdString().c_str());
+        }
+        // - Descripton of our definition
+        QString tempDefinitionDescription = definitionDescription();
+        if (!tempDefinitionDescription.isEmpty())
+        {
+            mtic_setDefinitionDescription(tempDefinitionDescription.toStdString().c_str());
+        }
+        // - Version of our description
+        QString tempDefinitionVersion = definitionVersion();
+        if (!tempDefinitionVersion.isEmpty())
+        {
+            mtic_setDefinitionVersion(tempDefinitionVersion.toStdString().c_str());
+        }
+
 
 
         // Notify that our definition has been cleared
