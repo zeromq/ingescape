@@ -466,24 +466,29 @@ int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void*
         return 0;
     }
     int ret = 1;
+    void *outValue = NULL;
+    long outSize = 0;
     
     //TODO optimize if value is NULL
     switch (valType) {
         case INTEGER_T:{
             switch (iop->value_type) {
                 case INTEGER_T:
-                    iop->valueSize = sizeof(int);
+                    outSize = iop->valueSize = sizeof(int);
                     iop->value.i = (value == NULL)?0:*(int*)(value);
+                    outValue = &(iop->value.i);
                     mtic_info("set %s to %i", iopName, iop->value.i);
                     break;
                 case DOUBLE_T:
-                    iop->valueSize = sizeof(double);
+                    outSize = iop->valueSize = sizeof(double);
                     iop->value.d = (value == NULL)?0:*(int*)(value);
+                    outValue = &(iop->value.d);
                     mtic_info("set %s to %lf", iopName, iop->value.d);
                     break;
                 case BOOL_T:
-                    iop->valueSize = sizeof(bool);
+                    outSize = iop->valueSize = sizeof(bool);
                     iop->value.b = (value == NULL)?false:((*(int*)(value))?true:false);
+                    outValue = &(iop->value.b);
                     mtic_info("set %s to %i", iopName, iop->value.b);
                     break;
                 case STRING_T:
@@ -498,13 +503,14 @@ int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void*
                         snprintf(buf, 31, "%d", (value == NULL)?0:*(int*)(value));
                         iop->value.s = strdup(buf);
                     }
-                    iop->valueSize = (strlen(iop->value.s) + 1)*sizeof(char);
+                    outSize = iop->valueSize = (strlen(iop->value.s) + 1)*sizeof(char);
+                    outValue = iop->value.s;
                     mtic_info("set %s to %s (length: %d)", iopName, iop->value.s, iop->valueSize - 1);
                 }
                     break;
                 case IMPULSION_T:
                     //nothing to do
-                    iop->valueSize = 0;
+                    outSize = iop->valueSize = 0;
                     mtic_info("set impulsion %s", iopName);
                     break;
                 case DATA_T:
@@ -515,7 +521,8 @@ int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void*
                     iop->value.data = NULL;
                     iop->value.data = calloc (1, sizeof(int));
                     memcpy(iop->value.data, value, sizeof(int));
-                    iop->valueSize = sizeof(int);
+                    outSize = iop->valueSize = sizeof(int);
+                    outValue = iop->value.data;
                     mtic_info("set %s data (length: %d)", iopName, iop->valueSize);
                 }
                     break;
@@ -529,18 +536,21 @@ int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void*
         case DOUBLE_T:{
             switch (iop->value_type) {
                 case INTEGER_T:
-                    iop->valueSize = sizeof(int);
+                    outSize = iop->valueSize = sizeof(int);
                     iop->value.i = (value == NULL)?0:*(int*)(value);
+                    outValue = &(iop->value.i);
                     mtic_info("set %s to %i", iopName, iop->value.i);
                     break;
                 case DOUBLE_T:
-                    iop->valueSize = sizeof(double);
+                    outSize = iop->valueSize = sizeof(double);
                     iop->value.d = (value == NULL)?0:*(double*)(value);
+                    outValue = &(iop->value.d);
                     mtic_info("set %s to %lf", iopName, iop->value.d);
                     break;
                 case BOOL_T:
-                    iop->valueSize = sizeof(bool);
+                    outSize = iop->valueSize = sizeof(bool);
                     iop->value.b = (value == NULL)?false:((*(int*)(value))?true:false);
+                    outValue = &(iop->value.b);
                     mtic_info("set %s to %i", iopName, iop->value.b);
                     break;
                 case STRING_T:
@@ -555,13 +565,14 @@ int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void*
                         snprintf(buf, 63, "%lf", (value == NULL)?0:*(double*)(value));
                         iop->value.s = strdup(buf);
                     }
-                    iop->valueSize = (strlen(iop->value.s) + 1)*sizeof(char);
+                    outSize = iop->valueSize = (strlen(iop->value.s) + 1)*sizeof(char);
+                    outValue = iop->value.s;
                     mtic_info("set %s to %s (length: %d)", iopName, iop->value.s, iop->valueSize - 1);
                 }
                     break;
                 case IMPULSION_T:
                     //nothing to do
-                    iop->valueSize = 0;
+                    outSize = iop->valueSize = 0;
                     mtic_info("set impulsion %s", iopName);
                     break;
                 case DATA_T:
@@ -572,7 +583,8 @@ int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void*
                     iop->value.data = NULL;
                     iop->value.data = calloc (1, sizeof(double));
                     memcpy(iop->value.data, value, sizeof(double));
-                    iop->valueSize = sizeof(double);
+                    outSize = iop->valueSize = sizeof(double);
+                    outValue = iop->value.data;
                     mtic_info("set %s data (length: %d)", iopName, iop->valueSize);
                 }
                     break;
@@ -586,18 +598,21 @@ int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void*
         case BOOL_T:{
             switch (iop->value_type) {
                 case INTEGER_T:
-                    iop->valueSize = sizeof(int);
+                    outSize = iop->valueSize = sizeof(int);
                     iop->value.i = (value == NULL)?0:*(bool*)(value);
+                    outValue = &(iop->value.i);
                     mtic_info("set %s to %i", iopName, iop->value.i);
                     break;
                 case DOUBLE_T:
-                    iop->valueSize = sizeof(double);
+                    outSize = iop->valueSize = sizeof(double);
                     iop->value.d = (value == NULL)?0:*(bool*)(value);
+                    outValue = &(iop->value.d);
                     mtic_info("set %s to %lf", iopName, iop->value.d);
                     break;
                 case BOOL_T:
-                    iop->valueSize = sizeof(bool);
+                    outSize = iop->valueSize = sizeof(bool);
                     iop->value.b = (value == NULL)?false:*(bool*)value;
+                    outValue = &(iop->value.b);
                     mtic_info("set %s to %i", iopName, iop->value.b);
                     break;
                 case STRING_T:
@@ -612,13 +627,14 @@ int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void*
                         snprintf(buf, 31, "%d", (value == NULL)?0:*(bool*)value);
                         iop->value.s = strdup(buf);
                     }
-                    iop->valueSize = (strlen(iop->value.s) + 1)*sizeof(char);
+                    outSize = iop->valueSize = (strlen(iop->value.s) + 1)*sizeof(char);
+                    outValue = iop->value.s;
                     mtic_info("set %s to %s (length: %d)", iopName, iop->value.s, iop->valueSize - 1);
                 }
                     break;
                 case IMPULSION_T:
                     //nothing to do
-                    iop->valueSize = 0;
+                    outSize = iop->valueSize = 0;
                     mtic_info("set impulsion %s", iopName);
                     break;
                 case DATA_T:
@@ -629,7 +645,8 @@ int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void*
                     iop->value.data = NULL;
                     iop->value.data = calloc (1, sizeof(bool));
                     memcpy(iop->value.data, value, sizeof(bool));
-                    iop->valueSize = sizeof(bool);
+                    outSize = iop->valueSize = sizeof(bool);
+                    outValue = iop->value.data;
                     mtic_info("set %s data (length: %d)", iopName, iop->valueSize);
                 }
                     break;
@@ -643,18 +660,21 @@ int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void*
         case STRING_T:{
             switch (iop->value_type) {
                 case INTEGER_T:
-                    iop->valueSize = sizeof(int);
+                    outSize = iop->valueSize = sizeof(int);
                     iop->value.i = (value == NULL)?0:atoi((char*)value);
+                    outValue = &(iop->value.i);
                     mtic_info("set %s to %i", iopName, iop->value.i);
                     break;
                 case DOUBLE_T:
-                    iop->valueSize = sizeof(double);
+                    outSize = iop->valueSize = sizeof(double);
                     iop->value.d = (value == NULL)?0:atof((char*)value);
+                    outValue = &(iop->value.d);
                     mtic_info("set %s to %lf", iopName, iop->value.d);
                     break;
                 case BOOL_T:
-                    iop->valueSize = sizeof(bool);
+                    outSize = iop->valueSize = sizeof(bool);
                     iop->value.b = (value == NULL)?false:(atoi((char*)value)?true:false);
+                    outValue = &(iop->value.b);
                     mtic_info("set %s to %i", iopName, iop->value.b);
                     break;
                 case STRING_T:
@@ -667,13 +687,14 @@ int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void*
                     }else{
                         iop->value.s = strdup((char *)value);
                     }
-                    iop->valueSize = (strlen(iop->value.s) + 1)*sizeof(char);
+                    outSize = iop->valueSize = (strlen(iop->value.s) + 1)*sizeof(char);
+                    outValue = iop->value.s;
                     mtic_info("set %s to %s (length: %d)", iopName, iop->value.s, iop->valueSize - 1);
                 }
                     break;
                 case IMPULSION_T:
                     //nothing to do
-                    iop->valueSize = 0;
+                    outSize = iop->valueSize = 0;
                     mtic_info("set impulsion %s", iopName);
                     break;
                 case DATA_T:
@@ -689,7 +710,8 @@ int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void*
                         iop->value.data = calloc (1, s);
                         memcpy(iop->value.data, value, s);
                     }
-                    iop->valueSize = s;
+                    outSize = iop->valueSize = s;
+                    outValue = iop->value.data;
                     mtic_info("set %s data (length: %d)", iopName, s);
                 }
                     break;
@@ -702,7 +724,7 @@ int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void*
             break;
         case IMPULSION_T:{
             //nothing to do
-            iop->valueSize = 0;
+            outSize = iop->valueSize = 0;
             mtic_info("set impulsion %s", iopName);
         }
             break;
@@ -728,7 +750,7 @@ int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void*
                     break;
                 case IMPULSION_T:
                     //nothing to do
-                    iop->valueSize = 0;
+                    outSize = iop->valueSize = 0;
                     mtic_info("set impulsion %s", iopName);
                     break;
                 case DATA_T:
@@ -739,7 +761,8 @@ int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void*
                     iop->value.data = NULL;
                     iop->value.data = calloc (1, size);
                     memcpy(iop->value.data, value, size);
-                    iop->valueSize = size;
+                    outSize = iop->valueSize = size;
+                    outValue = iop->value.data;
                     mtic_info("set %s data (length: %d)", iopName, size);
                 }
                     break;
@@ -755,7 +778,7 @@ int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void*
     }
     
     if (ret){
-        model_runObserveCallbacksForIOP(iop, value, size);
+        model_runObserveCallbacksForIOP(iop, outValue, outSize);
     }
     return ret;
 }
