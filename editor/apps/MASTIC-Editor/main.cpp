@@ -1,7 +1,7 @@
 /*
  *	MASTIC Editor
  *
- *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -36,24 +36,21 @@
  */
 void registerCustomQmlTypes()
 {
-    // Our custom QML namespace
-    const char *uri = "MASTIC";
-
 
     //---------------
     //
     // Enums
     //
     //---------------
-    qmlRegisterSingletonType<ActionComparisonValueType>(uri, 1, 0, "ActionComparisonValueType", &ActionComparisonValueType::qmlSingleton);
-    qmlRegisterSingletonType<ActionConditionType>(uri, 1, 0, "ActionConditionType", &ActionConditionType::qmlSingleton);
-    qmlRegisterSingletonType<ActionEffectTypes>(uri, 1, 0, "ActionEffectTypes", &ActionEffectTypes::qmlSingleton);
-    qmlRegisterSingletonType<AgentEffectValues>(uri, 1, 0, "AgentEffectValues", &AgentEffectValues::qmlSingleton);
-    qmlRegisterSingletonType<AgentIOPTypes>(uri, 1, 0, "AgentIOPTypes", &AgentIOPTypes::qmlSingleton);
-    qmlRegisterSingletonType<AgentIOPValueTypes>(uri, 1, 0, "AgentIOPValueTypes", &AgentIOPValueTypes::qmlSingleton);
-    qmlRegisterSingletonType<AgentIOPValueTypeGroups>(uri, 1, 0, "AgentIOPValueTypeGroups", &AgentIOPValueTypeGroups::qmlSingleton);
-    qmlRegisterSingletonType<MappingEffectValues>(uri, 1, 0, "MappingEffectValues", &MappingEffectValues::qmlSingleton);
-    qmlRegisterSingletonType<ValidationDurationType>(uri, 1, 0, "ValidationDurationType", &ValidationDurationType::qmlSingleton);
+    qmlRegisterSingletonType<ActionComparisonValueType>("MASTIC", 1, 0, "ActionComparisonValueType", &ActionComparisonValueType::qmlSingleton);
+    qmlRegisterSingletonType<ActionConditionType>("MASTIC", 1, 0, "ActionConditionType", &ActionConditionType::qmlSingleton);
+    qmlRegisterSingletonType<ActionEffectTypes>("MASTIC", 1, 0, "ActionEffectTypes", &ActionEffectTypes::qmlSingleton);
+    qmlRegisterSingletonType<AgentEffectValues>("MASTIC", 1, 0, "AgentEffectValues", &AgentEffectValues::qmlSingleton);
+    qmlRegisterSingletonType<AgentIOPTypes>("MASTIC", 1, 0, "AgentIOPTypes", &AgentIOPTypes::qmlSingleton);
+    qmlRegisterSingletonType<AgentIOPValueTypes>("MASTIC", 1, 0, "AgentIOPValueTypes", &AgentIOPValueTypes::qmlSingleton);
+    qmlRegisterSingletonType<AgentIOPValueTypeGroups>("MASTIC", 1, 0, "AgentIOPValueTypeGroups", &AgentIOPValueTypeGroups::qmlSingleton);
+    qmlRegisterSingletonType<MappingEffectValues>("MASTIC", 1, 0, "MappingEffectValues", &MappingEffectValues::qmlSingleton);
+    qmlRegisterSingletonType<ValidationDurationType>("MASTIC", 1, 0, "ValidationDurationType", &ValidationDurationType::qmlSingleton);
 
 
     //----------------
@@ -62,17 +59,17 @@ void registerCustomQmlTypes()
     //
     //----------------
     // Singleton used as primary access point to our controllers
-    qmlRegisterSingletonType<MasticEditorController>(uri, 1, 0, "MasticEditorC", &MasticEditorController::qmlSingleton);
+    qmlRegisterSingletonType<MasticEditorController>("MASTIC", 1, 0, "MasticEditorC", &MasticEditorController::qmlSingleton);
 
     // sub-controllers
-    qmlRegisterUncreatableType<ActionEditorController>(uri, 1, 0, "ActionEditorController", "Internal Class");
-    qmlRegisterUncreatableType<AgentsMappingController>(uri, 1, 0, "AgentsMappingController", "Internal Class");
-    qmlRegisterUncreatableType<AgentsSupervisionController>(uri, 1, 0, "AgentsSupervisionController", "Internal Class");
-    qmlRegisterUncreatableType<HostsSupervisionController>(uri, 1, 0, "HostsSupervisionController", "Internal Class");
-    qmlRegisterUncreatableType<MasticModelManager>(uri, 1, 0, "MasticModelManager", "Internal Class");
-    qmlRegisterUncreatableType<ScenarioController>(uri, 1, 0, "ScenarioController", "Internal Class");
-    qmlRegisterUncreatableType<ValuesHistoryController>(uri, 1, 0, "ValuesHistoryController", "Internal Class");
-    qmlRegisterUncreatableType<AbstractTimeActionslineScenarioViewController>(uri, 1, 0, "AbstractTimeActionslineScenarioViewController", "Internal Class");
+    qmlRegisterUncreatableType<ActionEditorController>("MASTIC", 1, 0, "ActionEditorController", "Internal Class");
+    qmlRegisterUncreatableType<AgentsMappingController>("MASTIC", 1, 0, "AgentsMappingController", "Internal Class");
+    qmlRegisterUncreatableType<AgentsSupervisionController>("MASTIC", 1, 0, "AgentsSupervisionController", "Internal Class");
+    qmlRegisterUncreatableType<HostsSupervisionController>("MASTIC", 1, 0, "HostsSupervisionController", "Internal Class");
+    qmlRegisterUncreatableType<MasticModelManager>("MASTIC", 1, 0, "MasticModelManager", "Internal Class");
+    qmlRegisterUncreatableType<ScenarioController>("MASTIC", 1, 0, "ScenarioController", "Internal Class");
+    qmlRegisterUncreatableType<ValuesHistoryController>("MASTIC", 1, 0, "ValuesHistoryController", "Internal Class");
+    qmlRegisterUncreatableType<AbstractTimeActionslineScenarioViewController>("MASTIC", 1, 0, "AbstractTimeActionslineScenarioViewController", "Internal Class");
 
 
     //----------------
@@ -80,7 +77,7 @@ void registerCustomQmlTypes()
     // Sort and Filter
     //
     //----------------
-    qmlRegisterUncreatableType<ValuesHistorySortFilter>(uri, 1, 0, "ValuesHistorySortFilter", "Internal class");
+    qmlRegisterUncreatableType<ValuesHistorySortFilter>("MASTIC", 1, 0, "ValuesHistorySortFilter", "Internal class");
 
 
     //----------------
@@ -89,10 +86,10 @@ void registerCustomQmlTypes()
     //
     //----------------
 
-    qmlRegisterType<CollapsibleColumn>(uri, 1, 0, "CollapsibleColumn");
+    qmlRegisterType<CollapsibleColumn>("MASTIC", 1, 0, "CollapsibleColumn");
 
     // GST not included in master branch
-    // qmlRegisterType<GstVideoReceiver>(uri, 1, 0, "GstVideoReceiver");
+    // qmlRegisterType<GstVideoReceiver>("MASTIC", 1, 0, "GstVideoReceiver");
 
 
 
@@ -101,22 +98,22 @@ void registerCustomQmlTypes()
     // Models
     //
     //----------------
-    qmlRegisterUncreatableType<AgentIOPM>(uri, 1, 0, "AgentIOPM", "Internal class");
-    qmlRegisterUncreatableType<AgentM>(uri, 1, 0, "AgentM", "Internal class");
-    qmlRegisterUncreatableType<AgentMappingM>(uri, 1, 0, "AgentMappingM", "Internal class");
-    qmlRegisterUncreatableType<DefinitionM>(uri, 1, 0, "DefinitionM", "Internal class");
-    qmlRegisterUncreatableType<EffectOnAgentM>(uri, 1, 0, "EffectOnAgentM", "Internal class");
-    qmlRegisterUncreatableType<ElementMappingM>(uri, 1, 0, "ElementMappingM", "Internal class");
-    qmlRegisterUncreatableType<Enums>(uri, 1, 0, "Enums", "Internal class");
-    qmlRegisterUncreatableType<HostM>(uri, 1, 0, "HostM", "Internal class");
-    qmlRegisterUncreatableType<OutputM>(uri, 1, 0, "OutputM", "Internal class");
-    qmlRegisterUncreatableType<PublishedValueM>(uri, 1, 0, "PublishedValueM", "Internal class");
-    qmlRegisterUncreatableType<ActionConditionM>(uri, 1, 0, "ActionConditionM", "Internal class");
-    qmlRegisterUncreatableType<ActionEffectM>(uri, 1, 0, "ActionEffectM", "Internal class");
-    qmlRegisterUncreatableType<ActionM>(uri, 1, 0, "ActionM", "Internal class");
-    qmlRegisterUncreatableType<IOPValueConditionM>(uri, 1, 0, "IOPValueConditionM", "Internal class");
-    qmlRegisterUncreatableType<IOPValueEffectM>(uri, 1, 0, "IOPValueEffectM", "Internal class");
-    qmlRegisterUncreatableType<MappingEffectM>(uri, 1, 0, "MappingEffectM", "Internal class");
+    qmlRegisterUncreatableType<AgentIOPM>("MASTIC", 1, 0, "AgentIOPM", "Internal class");
+    qmlRegisterUncreatableType<AgentM>("MASTIC", 1, 0, "AgentM", "Internal class");
+    qmlRegisterUncreatableType<AgentMappingM>("MASTIC", 1, 0, "AgentMappingM", "Internal class");
+    qmlRegisterUncreatableType<DefinitionM>("MASTIC", 1, 0, "DefinitionM", "Internal class");
+    qmlRegisterUncreatableType<EffectOnAgentM>("MASTIC", 1, 0, "EffectOnAgentM", "Internal class");
+    qmlRegisterUncreatableType<ElementMappingM>("MASTIC", 1, 0, "ElementMappingM", "Internal class");
+    qmlRegisterUncreatableType<Enums>("MASTIC", 1, 0, "Enums", "Internal class");
+    qmlRegisterUncreatableType<HostM>("MASTIC", 1, 0, "HostM", "Internal class");
+    qmlRegisterUncreatableType<OutputM>("MASTIC", 1, 0, "OutputM", "Internal class");
+    qmlRegisterUncreatableType<PublishedValueM>("MASTIC", 1, 0, "PublishedValueM", "Internal class");
+    qmlRegisterUncreatableType<ActionConditionM>("MASTIC", 1, 0, "ActionConditionM", "Internal class");
+    qmlRegisterUncreatableType<ActionEffectM>("MASTIC", 1, 0, "ActionEffectM", "Internal class");
+    qmlRegisterUncreatableType<ActionM>("MASTIC", 1, 0, "ActionM", "Internal class");
+    qmlRegisterUncreatableType<IOPValueConditionM>("MASTIC", 1, 0, "IOPValueConditionM", "Internal class");
+    qmlRegisterUncreatableType<IOPValueEffectM>("MASTIC", 1, 0, "IOPValueEffectM", "Internal class");
+    qmlRegisterUncreatableType<MappingEffectM>("MASTIC", 1, 0, "MappingEffectM", "Internal class");
 
 
     //---------------
@@ -124,19 +121,19 @@ void registerCustomQmlTypes()
     // View Models
     //
     //---------------
-    qmlRegisterUncreatableType<ActionConditionVM>(uri, 1, 0, "ActionConditionVM", "Internal class");
-    qmlRegisterUncreatableType<ActionEffectVM>(uri, 1, 0, "ActionEffectVM", "Internal class");
-    qmlRegisterUncreatableType<ActionExecutionVM>(uri, 1, 0, "ActionExecutionVM", "Internal class");
-    qmlRegisterUncreatableType<ActionInPaletteVM>(uri, 1, 0, "ActionInPaletteVM", "Internal class");
-    qmlRegisterUncreatableType<ActionVM>(uri, 1, 0, "ActionVM", "Internal class");
-    qmlRegisterUncreatableType<AgentInMappingVM>(uri, 1, 0, "AgentInMappingVM", "Internal class");
-    qmlRegisterUncreatableType<AgentIOPVM>(uri, 1, 0, "AgentIOPVM", "Internal class");
-    qmlRegisterUncreatableType<AgentVM>(uri, 1, 0, "AgentVM", "Internal class");
-    qmlRegisterUncreatableType<InputVM>(uri, 1, 0, "InputVM", "Internal class");
-    qmlRegisterUncreatableType<MapBetweenIOPVM>(uri, 1, 0, "MapBetweenIOPVM", "Internal class");
-    qmlRegisterUncreatableType<OutputVM>(uri, 1, 0, "OutputVM", "Internal class");
-    qmlRegisterUncreatableType<ParameterVM>(uri, 1, 0, "ParameterVM", "Internal class");
-    qmlRegisterUncreatableType<PointMapVM>(uri, 1, 0, "PointMapVM", "Internal class");
+    qmlRegisterUncreatableType<ActionConditionVM>("MASTIC", 1, 0, "ActionConditionVM", "Internal class");
+    qmlRegisterUncreatableType<ActionEffectVM>("MASTIC", 1, 0, "ActionEffectVM", "Internal class");
+    qmlRegisterUncreatableType<ActionExecutionVM>("MASTIC", 1, 0, "ActionExecutionVM", "Internal class");
+    qmlRegisterUncreatableType<ActionInPaletteVM>("MASTIC", 1, 0, "ActionInPaletteVM", "Internal class");
+    qmlRegisterUncreatableType<ActionVM>("MASTIC", 1, 0, "ActionVM", "Internal class");
+    qmlRegisterUncreatableType<AgentInMappingVM>("MASTIC", 1, 0, "AgentInMappingVM", "Internal class");
+    qmlRegisterUncreatableType<AgentIOPVM>("MASTIC", 1, 0, "AgentIOPVM", "Internal class");
+    qmlRegisterUncreatableType<AgentVM>("MASTIC", 1, 0, "AgentVM", "Internal class");
+    qmlRegisterUncreatableType<InputVM>("MASTIC", 1, 0, "InputVM", "Internal class");
+    qmlRegisterUncreatableType<MapBetweenIOPVM>("MASTIC", 1, 0, "MapBetweenIOPVM", "Internal class");
+    qmlRegisterUncreatableType<OutputVM>("MASTIC", 1, 0, "OutputVM", "Internal class");
+    qmlRegisterUncreatableType<ParameterVM>("MASTIC", 1, 0, "ParameterVM", "Internal class");
+    qmlRegisterUncreatableType<PointMapVM>("MASTIC", 1, 0, "PointMapVM", "Internal class");
 
 
     //------------------
@@ -145,10 +142,10 @@ void registerCustomQmlTypes()
     //
     //------------------
     // - Singleton used to enable consistent app styling through predefined colors, fonts, etc.
-    qmlRegisterSingletonType(QUrl("qrc:/qml/theme/MasticTheme.qml"), uri, 1, 0, "MasticTheme");
+    qmlRegisterSingletonType(QUrl("qrc:/qml/theme/MasticTheme.qml"), "MASTIC", 1, 0, "MasticTheme");
 
     // - Srollview style
-    qmlRegisterType(QUrl("qrc:/qml/theme/MasticScrollViewStyle.qml"), uri, 1, 0, "MasticScrollViewStyle");
+    qmlRegisterType(QUrl("qrc:/qml/theme/MasticScrollViewStyle.qml"), "MASTIC", 1, 0, "MasticScrollViewStyle");
 
 }
 

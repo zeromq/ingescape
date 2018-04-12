@@ -20,7 +20,7 @@ import I2Quick 1.0
 
 import MASTIC 1.0
 
-import "/theme" as Theme;
+import "theme" as Theme;
 
 I2PopupBase {
     id: rootItem
