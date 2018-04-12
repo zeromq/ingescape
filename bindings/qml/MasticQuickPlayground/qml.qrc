@@ -17,5 +17,9 @@
         <file>resources/examples/DragNDrop.qml</file>
         <file>resources/examples/VirtualJoystick.qml</file>
         <file>resources/examples/Clock.qml</file>
+        <file>resources/images/gear1.png</file>
+        <file>resources/images/hole.png</file>
+        <file>resources/images/gear2.png</file>
+        <file>resources/images/gear3.png</file>
     </qresource>
 </RCC>

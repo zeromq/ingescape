@@ -68,6 +68,7 @@ Item {
 
         // X and Y are exposed as Mastic outputs named 'rect_x' and 'rect_x'
         MasticOutputBinding {
+            target: myRectangle
             properties: "x, y"
             outputsPrefix: "rect_"
         }
