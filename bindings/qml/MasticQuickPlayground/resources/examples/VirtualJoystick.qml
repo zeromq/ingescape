@@ -1,5 +1,4 @@
 import QtQuick 2.9
-import QtGraphicalEffects 1.0
 
 import MasticQuick 1.0
 
@@ -36,6 +35,7 @@ Item {
         Mastic.definitionDescription = "Definition of " + Mastic.agentName;
         Mastic.definitionVersion = "0.0";
     }
+
 
     //----------------
     //
