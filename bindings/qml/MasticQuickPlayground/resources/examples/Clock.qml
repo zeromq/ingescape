@@ -28,6 +28,12 @@ Item {
     }
 
 
+    // Bind local properties to Mastic inputs
+    property int hours: Mastic.inputs.hours
+    property int minutes: Mastic.inputs.minutes
+    property int seconds: Mastic.inputs.seconds
+
+
     //----------------
     //
     // Content
@@ -93,9 +99,8 @@ Item {
             smooth: true
 
             transformOrigin: Item.Bottom
-            rotation: 30.0 * (Mastic.inputs.hours + (Mastic.inputs.minutes/60.0))
 
-            onRotationChanged: console.log("rotation: " + rotation + " hours "+Mastic.inputs.hours+" minutes "+Mastic.inputs.minutes)
+            rotation: 30.0 * (root.hours + (root.minutes/60.0))
         }
 
 
@@ -116,7 +121,8 @@ Item {
             smooth: true
 
             transformOrigin: Item.Bottom
-            rotation: 6.0 * (Mastic.inputs.minutes + (Mastic.inputs.seconds/60.0))
+
+            rotation: 6.0 * (root.minutes + (root.seconds/60.0))
         }
 
 
@@ -136,7 +142,8 @@ Item {
             smooth: true
 
             transformOrigin: Item.Bottom
-            rotation: Mastic.inputs.seconds * 6.0
+
+            rotation: root.seconds * 6.0
         }
 
 
@@ -150,7 +157,5 @@ Item {
             color: "black"
             smooth: true
         }
-
     }
-
 }
