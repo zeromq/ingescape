@@ -90,6 +90,8 @@ Item {
 
         visible: ((opacity !== 0) && (width !== 0))
 
+        clip: demoCodeView.visible
+
         onContentLoaded: {
             root.liveViewLoaded();
         }
