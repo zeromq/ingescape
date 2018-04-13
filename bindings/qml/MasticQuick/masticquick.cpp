@@ -2447,7 +2447,7 @@ bool MasticQuick::createInputData(QString name, void* value, QString* warning)
  */
 bool MasticQuick::createOutputInt(QString name, int value)
 {
-    return createInputInt(name, value, NULL);
+    return createOutputInt(name, value, NULL);
 }
 
 
