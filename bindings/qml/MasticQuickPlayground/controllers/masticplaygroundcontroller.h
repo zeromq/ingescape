@@ -58,7 +58,7 @@ class MasticPlaygroundController : public QObject
     PLAYGROUND_QML_PROPERTY_READONLY(QStringList, viewModes)
 
     // Current file
-    PLAYGROUND_QML_PROPERTY_READONLY(QUrl, currentSourceFile)
+    PLAYGROUND_QML_PROPERTY_READONLY_CUSTOM_SETTER(QUrl, currentSourceFile)
 
     // Content of our edited source file
     PLAYGROUND_QML_PROPERTY_CUSTOM_SETTER(QString, editedSourceContent)
@@ -268,6 +268,21 @@ protected:
      * @return
      */
     QString _qurlToQString(const QUrl& fileUrl);
+
+
+
+    /**
+     * @brief Remove import paths associated to a given file
+     * @param url
+     */
+    void _removeImportPathsForFile(const QUrl& url);
+
+
+    /**
+     * @brief Add import paths associated to a given file
+     * @param url
+     */
+    void _addImportPathsForFile(const QUrl& url);
 
 
 protected Q_SLOTS:

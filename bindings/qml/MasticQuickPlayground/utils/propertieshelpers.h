@@ -97,6 +97,21 @@
         type _##name;
 
 
+/*!
+   Define a property that is read-only from QML with a custom setter
+*/
+#define PLAYGROUND_QML_PROPERTY_READONLY_CUSTOM_SETTER(type, name) \
+        Q_PROPERTY (type name READ name NOTIFY name##Changed) \
+    public: \
+        type name () const { \
+            return _##name ; \
+        } \
+        void set##name (type value); \
+    Q_SIGNALS: \
+        void name##Changed (type value); \
+    protected: \
+        type _##name;
+
 
 /*!
    Define a constant

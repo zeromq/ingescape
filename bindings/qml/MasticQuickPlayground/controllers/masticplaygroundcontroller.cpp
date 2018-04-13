@@ -134,7 +134,7 @@ QObject* MasticPlaygroundController::qmlSingleton(QQmlEngine* engine, QJSEngine*
 
 //------------------------------------------------------------
 //
-// Public methods
+// Custom setters and getters
 //
 //------------------------------------------------------------
 
@@ -161,6 +161,28 @@ void MasticPlaygroundController::setautoSave(bool value)
     }
 }
 
+
+/**
+ * @brief Set URL of our current source file
+ * @param value
+ */
+void MasticPlaygroundController::setcurrentSourceFile(QUrl value)
+{
+    if (_currentSourceFile != value)
+    {
+        // Clean-up
+        _removeImportPathsForFile(_currentSourceFile);
+
+        // Save our new value
+        _currentSourceFile = value;
+
+        // Update QQmlEngine and our file system watcher if needed
+        _addImportPathsForFile(_currentSourceFile);
+
+        // Notify change
+        Q_EMIT currentSourceFileChanged(value);
+    }
+}
 
 
 /**
@@ -224,6 +246,12 @@ QQmlListProperty<PlaygroundExample> MasticPlaygroundController::examples()
 }
 
 
+
+//------------------------------------------------------------
+//
+// Public methods
+//
+//------------------------------------------------------------
 
 
 /**
@@ -474,7 +502,7 @@ void MasticPlaygroundController::_triggerReload()
 
 
     // NB: QML needs a small delay to delete its content
-    QTimer::singleShot(10, [=] {
+    QTimer::singleShot(50, [=] {
         //
         // Clean-up Mastic and QML if needed
         //
@@ -711,7 +739,7 @@ QPair<bool, QString> MasticPlaygroundController::_loadFile(QUrl url)
        if (!(filePath.isEmpty()))
        {
            QFile file(filePath);
-           //TODO: test if we really neeed this test
+           //NB: we must check if file exists, otherwise QFile::open will try to create a new file before opening it
            if (file.exists())
            {
               if (file.open(QFile::ReadOnly | QFile::Text))
@@ -808,6 +836,93 @@ QString MasticPlaygroundController::_qurlToQString(const QUrl& fileUrl)
 
     return result;
 }
+
+
+
+/**
+ * @brief Remove import paths associated to a given file
+ * @param url
+ */
+void MasticPlaygroundController::_removeImportPathsForFile(const QUrl& url)
+{
+    if (url.isValid())
+    {
+        // Check if we have a local file
+        if (url.isLocalFile())
+        {
+            QString stringURL = _qurlToQString(url);
+            QFileInfo fileInfo(stringURL);
+            QDir directory = fileInfo.absoluteDir();
+
+            // QQmlEngine
+            if (_qmlEngine != NULL)
+            {
+                QStringList importPathsList = _qmlEngine->importPathList();
+                importPathsList.removeAll( directory.absolutePath());
+                _qmlEngine->setImportPathList(importPathsList);
+            }
+
+            // File system watcher
+            // TODO
+        }
+        else if (QString::compare(url.scheme(), "qrc", Qt::CaseInsensitive) == 0)
+        {
+            // Embedded file
+            // => Nothing to do
+            //    We MUST remove nothing because its import path is the one of our application
+        }
+        else
+        {
+            // Remote file (http, ftp, etc.)
+
+            // TODO: remove import paths if we add import paths
+        }
+    }
+    // Else: invalid URL => nothing to remove
+}
+
+
+/**
+ * @brief Add import paths associated to a given file
+ * @param url
+ */
+void MasticPlaygroundController::_addImportPathsForFile(const QUrl& url)
+{
+    if (url.isValid())
+    {
+        // Check if we have a local file
+        if (url.isLocalFile())
+        {
+            QString stringURL = _qurlToQString(url);
+            QFileInfo fileInfo(stringURL);
+            QDir directory = fileInfo.absoluteDir();
+qDebug() << "stringurl" << stringURL;
+            // QQmlEngine
+            if (_qmlEngine != NULL)
+            {
+                _qmlEngine->addImportPath(directory.absolutePath());
+                qDebug() << "After " << _qmlEngine->importPathList();
+            }
+
+            // File system watcher
+            // TODO
+        }
+        else if (QString::compare(url.scheme(), "qrc", Qt::CaseInsensitive) == 0)
+        {
+            // Embedded file
+            // => Nothing to do
+            //    We MUST add nothing because its import path is the one of our application
+        }
+        else
+        {
+            // Remote file (http, ftp, etc.)
+
+            // TODO: add import paths if needed
+        }
+    }
+    // Else: invalid URL => nothing to do
+}
+
 
 
 

@@ -25,7 +25,9 @@
 
 
 
-
+/**
+ * @brief Categories of syntax elements
+ */
 PLAYGROUND_QML_ENUM(QMLSyntaxColor,
                     DEFAULT,
                     COMMENT,

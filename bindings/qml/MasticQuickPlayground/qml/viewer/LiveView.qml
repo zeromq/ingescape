@@ -24,14 +24,16 @@ Item {
     // Source code
     property string sourceCode
 
+    // File path of our source code
+    // It is used to report errors and resolve relative URLs (images, etc.)
+    property url sourceCodeFilePath
+
 
     // Component model that we try to load
     property var _componentModel: null
 
-    // Innstance of our component model
+    // Instance of our component model
     property var _componentInstance: null
-
-
 
 
     //-------------------------------------------
@@ -121,11 +123,11 @@ Item {
                     (_componentModel.status === Component.Error)
                    )
                 {
-                    componentLoadedFromFile()
+                    componentLoadedFromFile();
                 }
                 else
                 {
-                    _componentModel.statusChanged.connect(_componentLoadedFromFile)
+                    _componentModel.statusChanged.connect(_componentLoadedFromFile);
                 }
             }
         }
@@ -139,7 +141,7 @@ Item {
         {
             if (_componentModel.status === Component.Ready)
             {
-                errorMessage.text = ""
+                errorMessage.text = "";
                 _componentInstance = _componentModel.createObject(content, {});
 
                 root.contentLoaded();
@@ -155,7 +157,7 @@ Item {
         }
         else
         {
-            errorMessage.text = ""
+            errorMessage.text = "";
 
             root.contentLoaded();
         }
@@ -164,24 +166,28 @@ Item {
 
 
     // Load our component from a string
-    function loadComponentFromString()
+    function loadComponentFromString(code, filePath)
     {
         // Clean-up
        clearContent();
 
-        // Load content after a short delay TO BE SURE that our previous content is destroyed
-        throttle(timerLoadContent, 10, function() {
-            _loadComponentFromString();
-        });
+        if (code.length !== 0)
+        {
+            // Load content after a short delay TO BE SURE that our previous content is destroyed
+            throttle(timerLoadContent, 10, function() {
+                _loadComponentFromString(code, filePath);
+            });
+        }
+        // Else: no neet to create an empty component
     }
 
 
     // Load our component from a string
-    function _loadComponentFromString()
+    function _loadComponentFromString(code, filePath)
     {
         try
         {
-            _componentInstance = Qt.createQmlObject(sourceCode, content);
+            _componentInstance = Qt.createQmlObject(code, content, sourceCodeFilePath);
 
             root.contentLoaded();
         }
@@ -203,6 +209,7 @@ Item {
 
 
 
+
     //-------------------------------------------
     //
     // Behavior
@@ -210,16 +217,14 @@ Item {
     //-------------------------------------------
 
     onSourceChanged: {
-        errorMessage.text = ""
-
-        loadComponentFromFile()
+      errorMessage.text = "";
+      loadComponentFromFile();
     }
 
 
     onSourceCodeChanged: {
-        errorMessage.text = ""
-
-        loadComponentFromString()
+        errorMessage.text = "";
+        loadComponentFromString(sourceCode, sourceCodeFilePath);
     }
 
 

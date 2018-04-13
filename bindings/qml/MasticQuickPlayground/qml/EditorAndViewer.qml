@@ -41,6 +41,52 @@ Item {
     //
     //-------------------------------------------
 
+
+    //
+    // Live view i.e. rendering of our demo
+    //
+    Viewer.LiveView {
+        id: demoLiveView
+
+        anchors {
+            top: parent.top
+            bottom: parent.bottom
+            right: parent.right
+        }
+
+        width: root.width/2
+
+        visible: ((opacity !== 0) && (width !== 0))
+
+        clip: (visible && demoCodeView.visible)
+
+        onContentLoaded: {
+            root.liveViewLoaded();
+        }
+
+        onContentError: {
+            root.liveViewError();
+        }
+
+        Connections {
+            target: MasticPlaygroundController
+
+            onClearLiveView: {
+                // Just in case, our user opens a file with the same content
+                // => it will force "sourceCodeChanged" when we set sourceCode in onReloadLiveView
+                demoLiveView.sourceCode = "";
+            }
+
+            onReloadLiveView: {
+                console.log("Reload live view")
+                demoLiveView.sourceCodeFilePath = MasticPlaygroundController.currentSourceFile;
+                demoLiveView.sourceCode = MasticPlaygroundController.editedSourceContent;
+            }
+        }
+    }
+
+
+
     //
     // Editor view i.e. source code of our demo
     //
@@ -71,49 +117,6 @@ Item {
             }
         }
     }
-
-
-
-    //
-    // Live view i.e. rendering of our demo
-    //
-    Viewer.LiveView {
-        id: demoLiveView
-
-        anchors {
-            top: parent.top
-            bottom: parent.bottom
-            right: parent.right
-        }
-
-        width: root.width/2
-
-        visible: ((opacity !== 0) && (width !== 0))
-
-        clip: demoCodeView.visible
-
-        onContentLoaded: {
-            root.liveViewLoaded();
-        }
-
-        onContentError: {
-            root.liveViewError();
-        }
-
-        Connections {
-            target: MasticPlaygroundController
-
-            onClearLiveView: {
-                demoLiveView.clearContent();
-            }
-
-            onReloadLiveView: {
-                console.log("Reload live view")
-                demoLiveView.sourceCode = MasticPlaygroundController.editedSourceContent;
-            }
-        }
-    }
-
 
 
     //-------------------------------------------
