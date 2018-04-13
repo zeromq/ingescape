@@ -34,6 +34,13 @@
 
 
 
+//------------------------------------------------------------
+//
+// MasticPlaygroundController
+//
+//------------------------------------------------------------
+
+
 /**
  * @brief Default constructor
  *
@@ -122,6 +129,14 @@ QObject* MasticPlaygroundController::qmlSingleton(QQmlEngine* engine, QJSEngine*
 {
     return new MasticPlaygroundController(engine, scriptEngine);
 }
+
+
+
+//------------------------------------------------------------
+//
+// Public methods
+//
+//------------------------------------------------------------
 
 
 /**
@@ -423,6 +438,14 @@ void MasticPlaygroundController::setRequiredFileToSave(QUrl url)
 
 
 
+//------------------------------------------------------------
+//
+// Protected methods
+//
+//------------------------------------------------------------
+
+
+
 /**
  * @brief Internal setter for editedSourceContent
  * @param value
@@ -499,14 +522,20 @@ void MasticPlaygroundController::_triggerReload()
  */
 void MasticPlaygroundController::_tryToAutoSave()
 {
+    // Check if we have a valid URL
     if (_currentSourceFile.isValid())
     {
+        // Check if we have opened a local file
         if (!_currentSourceFile.isLocalFile())
         {
+            // Embedded file (qrc://...) or remote file (http, ftp, etc.)
+            // => Our end-user must define a local file to save changes
             Q_EMIT userMustDefineSaveFile();
         }
         else
         {
+            // Local file
+            // FIXME: we assume that our file is writable
             _autoSaveWithFile(_currentSourceFile);
         }
     }
@@ -527,15 +556,14 @@ void MasticPlaygroundController::_tryToAutoSave()
  */
 void MasticPlaygroundController::_autoSaveWithFile(QUrl url)
 {
+    // Ensure that we have a valid URL
     if (url.isValid())
     {
-        if (url.isValid())
-        {
-            // Create a watcher to monitor our async task
-            QFutureWatcher<bool>* futureWatcher = new QFutureWatcher<bool>();
-            connect(
-                    futureWatcher, &QFutureWatcher<bool>::finished,
-                    this, [this, futureWatcher, url]() {
+        // Create a watcher to monitor our async task
+        QFutureWatcher<bool>* futureWatcher = new QFutureWatcher<bool>();
+        connect(
+                futureWatcher, &QFutureWatcher<bool>::finished,
+                this, [this, futureWatcher, url]() {
                         // Get result of our future
                         QFuture<bool> future = futureWatcher->future();
                         bool result = future.result();
@@ -572,11 +600,11 @@ void MasticPlaygroundController::_autoSaveWithFile(QUrl url)
                     });
 
 
-            // Create our async task
-            QFuture<bool> future = QtConcurrent::run(this, &MasticPlaygroundController::_asyncWriteContentToFile, _editedSourceContent, url);
-            futureWatcher->setFuture(future);
-        }
+        // Create our async task
+        QFuture<bool> future = QtConcurrent::run(this, &MasticPlaygroundController::_asyncWriteContentToFile, _editedSourceContent, url);
+        futureWatcher->setFuture(future);
     }
+    // Else: invalid URL
 }
 
 
@@ -587,19 +615,25 @@ void MasticPlaygroundController::_autoSaveWithFile(QUrl url)
  */
 void MasticPlaygroundController::_addToRecentFiles(QUrl url)
 {
+    // Ensure that we have a valid URL
     if (url.isValid())
     {
         QVariant variantURL = QVariant(url.toString());
-        QVariantList newRecentFiles = QVariantList(_recentFiles);
 
+        // Add it to our list of recent files
+        // NB: we remove all previous occurrences to avoid multiple entries for the same file
+        QVariantList newRecentFiles = QVariantList(_recentFiles);
         if (newRecentFiles.contains(variantURL))
         {
             newRecentFiles.removeAll(variantURL);
         }
+
+        // The first item is the most recent file
         newRecentFiles.prepend(variantURL);
 
         setrecentFiles( newRecentFiles );
     }
+    // Else: invalid URL
 }
 
 
@@ -668,13 +702,16 @@ QPair<bool, QString> MasticPlaygroundController::_loadFile(QUrl url)
 {
    QPair<bool, QString> result =  QPair<bool, QString>(false, "");
 
+   // Check if we have a valid URL
    if (url.isValid())
    {
        QString filePath = _qurlToQString(url);
 
+       // Check if we have a valid file path
        if (!(filePath.isEmpty()))
        {
            QFile file(filePath);
+           //TODO: test if we really neeed this test
            if (file.exists())
            {
               if (file.open(QFile::ReadOnly | QFile::Text))
@@ -685,7 +722,7 @@ QPair<bool, QString> MasticPlaygroundController::_loadFile(QUrl url)
               }
               else
               {
-                qWarning() << "MasticPlaygroundController warning: can not read file " << filePath;
+                  qWarning() << "MasticPlaygroundController warning: can not read file " << filePath;
               }
            }
            else
@@ -712,6 +749,7 @@ bool MasticPlaygroundController::_asyncWriteContentToFile(const QString &content
 {
     bool result = false;
 
+    // Check if we have a valid URL
     if (url.isValid())
     {
         // Open our file
@@ -759,13 +797,14 @@ QString MasticPlaygroundController::_qurlToQString(const QUrl& fileUrl)
             {
                 // A lot of Qt objects (QFileSystemWatcher, QFile, etc.) don't accept URLs
                 // starting with 'qrc://'
-                // We must replace 'qrc://' by a simple '://'
+                // We must replace 'qrc://' by a simple '://' to avoid issues
                 filePath = filePath.mid(3);
             }
 
             result = filePath;
         }
     }
+    // Else: empty or invalid URL
 
     return result;
 }
