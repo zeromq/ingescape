@@ -38,6 +38,8 @@ class HostsSupervisionController : public QObject
     // Selected host in the hosts list
     I2_QML_PROPERTY_DELETE_PROOF(HostVM*, selectedHost)
 
+    // Reference to our Mastic launcher manager
+    I2_CPP_NOSIGNAL_PROPERTY_DELETE_PROOF(MasticLauncherManager*, masticLauncherManager)
 
 public:
     /**
@@ -93,18 +95,8 @@ public Q_SLOTS:
      */
     void onAgentModelWillBeDeleted(AgentM* agent);
 
-private Q_SLOTS:
-
-
-
 
 private:
-
-
-private:
-    // Manager for the Mastic launchers
-    MasticLauncherManager* _masticLauncherManager;
-
     // Map from host name to a list of view models of host
     QHash<HostM*, HostVM*> _mapFromHostModelToViewModel;
 

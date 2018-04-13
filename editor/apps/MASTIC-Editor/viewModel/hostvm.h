@@ -30,7 +30,7 @@ class HostVM : public QObject
     Q_OBJECT
 
     // Model of our host
-    I2_QML_PROPERTY(HostM*, hostModel)
+    I2_QML_PROPERTY_DELETE_PROOF(HostM*, hostModel)
 
     // List of associated Agents
     I2_QOBJECT_LISTMODEL(AgentM, listOfAgents)
@@ -59,7 +59,7 @@ public:
      */
     Q_INVOKABLE void changeState();
 
-signals:
+Q_SIGNALS:
 
     /**
      * @brief Signal emitted when a command must be sent on the network to a launcher
@@ -69,7 +69,6 @@ signals:
      */
     void commandAskedToHost(QString command, QString hostname, QString commandLine);
 
-public slots:
 };
 
 QML_DECLARE_TYPE(HostVM)
