@@ -20,6 +20,7 @@
 #include <QFutureWatcher>
 #include <QtConcurrent>
 #include <QFileDialog>
+#include <QDirIterator>
 
 #include "MasticQuick.h"
 
@@ -770,4 +771,21 @@ QString MasticPlaygroundController::_qurlToQString(const QUrl& fileUrl)
 }
 
 
+
+/**
+ * @brief Call when our file system watcher detects a file change
+ */
+void MasticPlaygroundController::_onFileSystemWatcherFileChanged(const QString &path)
+{
+    Q_UNUSED(path)
+}
+
+
+/**
+ * @brief Call when our file system watcher detects a directory change
+ */
+void MasticPlaygroundController::_onFileSystemWatcherDirectoryChanged(const QString &path)
+{
+    Q_UNUSED(path)
+}
 
