@@ -803,7 +803,7 @@ int mtic_init_mapping (const char* mapping_file_path)
 /*
  * Function: mtic_init_internal_data
  * ----------------------------
- *   read definition from file path and init inernal agent data
+ *   read definition from file path and init internal agent data
  *   initialize definition_load and mtic_internal_definition data structures
  *
  *   definition_file_path : path to the agent definiton file

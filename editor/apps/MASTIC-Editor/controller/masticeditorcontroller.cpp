@@ -1,7 +1,7 @@
 /*
  *	MASTIC Editor
  *
- *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -10,6 +10,7 @@
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *      Alexandre Lemort   <lemort@ingenuity.io>
+ *      Bruno Lemenicier   <lemenicier@ingenuity.io>
  *
  */
 
@@ -626,7 +627,7 @@ bool MasticEditorController::canDeleteAgentInMapping(AgentInMappingVM* agentInMa
     bool canBeDeleted = true;
 
     // Check if the agent is in action condition or effect
-    if(_scenarioC != NULL)
+    if (_scenarioC != NULL)
     {
         canBeDeleted = !_scenarioC->isAgentDefinedInActions(agentInMapping->name());
     }
@@ -639,7 +640,12 @@ bool MasticEditorController::canDeleteAgentInMapping(AgentInMappingVM* agentInMa
  */
 void MasticEditorController::_onTimeout()
 {
-    // Initialize platform from online mapping
-    _modelManager->setisActivatedMapping(true);
+    // Stop our timer
     _timer.stop();
+
+    // Initialize platform from online mapping
+    if (_modelManager != NULL)
+    {
+        _modelManager->setisActivatedMapping(true);
+    }
 }

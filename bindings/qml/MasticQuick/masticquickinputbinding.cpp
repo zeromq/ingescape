@@ -358,6 +358,10 @@ void MasticQuickInputBinding::_updateInternalData()
                             {
                                 qmlWarning(this) << warning;
                             }
+                            else if (!succeeded)
+                            {
+                               qmlWarning(this) << "error";
+                            }
                         }
                         break;
 
@@ -380,6 +384,10 @@ void MasticQuickInputBinding::_updateInternalData()
                             if (succeeded && !warning.isEmpty())
                             {
                                 qmlWarning(this) << warning;
+                            }
+                            else if (!succeeded)
+                            {
+                               qmlWarning(this) << "error";
                             }
                         }
                         break;

@@ -224,6 +224,13 @@ ApplicationWindow {
     }
 
 
+    //----------------------------------
+    //
+    // Content
+    //
+    //----------------------------------
+
+
     // Content of our window
     Item {
         id: content

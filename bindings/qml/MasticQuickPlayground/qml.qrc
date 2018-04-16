@@ -1,0 +1,25 @@
+<RCC>
+    <qresource prefix="/">
+        <file>qml/main.qml</file>
+        <file>qml/Playground.qml</file>
+        <file>qml/LoadingScreen.qml</file>
+        <file>resources/settings.ini</file>
+        <file>qml/EditorAndViewer.qml</file>
+        <file>qml/editor/CodeView.qml</file>
+        <file>qml/viewer/LiveView.qml</file>
+        <file>qml/PlaygroundToolbar.qml</file>
+        <file>resources/dictionaries/items.txt</file>
+        <file>resources/dictionaries/javascript.txt</file>
+        <file>resources/dictionaries/keywords.txt</file>
+        <file>resources/dictionaries/properties.txt</file>
+        <file>resources/NewFile.qml</file>
+        <file>qml/editor/CodeScrollViewStyle.qml</file>
+        <file>resources/examples/DragNDrop.qml</file>
+        <file>resources/examples/VirtualJoystick.qml</file>
+        <file>resources/examples/Clock.qml</file>
+        <file>resources/images/gear1.png</file>
+        <file>resources/images/hole.png</file>
+        <file>resources/images/gear2.png</file>
+        <file>resources/images/gear3.png</file>
+    </qresource>
+</RCC>
