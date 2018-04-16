@@ -983,6 +983,7 @@ void AgentsMappingController::importMappingFromJson(QByteArray byteArrayOfJson, 
                 newAgent->setdefinition(definition);
 
                 agentModelList.append(newAgent);
+                Q_EMIT agentCreatedByMapping(newAgent);
             }
 
             if(agentModelList.count() > 0)

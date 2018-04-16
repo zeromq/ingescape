@@ -197,6 +197,7 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     connect(_agentsMappingC, &AgentsMappingController::commandAskedToAgentAboutMappingInput, _networkC, &NetworkController::onCommandAskedToAgentAboutMappingInput);
     connect(_agentsMappingC, &AgentsMappingController::agentInMappingAdded, _scenarioC, &ScenarioController::onAgentInMappingAdded);
     connect(_agentsMappingC, &AgentsMappingController::agentInMappingRemoved, _scenarioC, &ScenarioController::onAgentInMappingRemoved);
+    connect(_agentsMappingC, &AgentsMappingController::agentCreatedByMapping, _modelManager, &MasticModelManager::addAgentModel);
 
 
     // Connect to signals from the agents mapping list to the action editor
