@@ -219,6 +219,12 @@ private Q_SLOTS:
      */
     void _onIsONofModelChanged(bool isON);
 
+    /**
+     * @brief Slot when the flag "is ON" of a model changed
+     * @param isON
+     */
+    void _onDefinitionOfModelChanged(DefinitionM* definition);
+
 
 private:
 
