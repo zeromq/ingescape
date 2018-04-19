@@ -196,6 +196,11 @@ Q_SIGNALS:
      */
     void commandAskedToAgentAboutMappingInput(QStringList peerIdsList, QString command, QString inputName, QString outputAgentName, QString outputName);
 
+    /**
+     * @brief Emitted when the mapping creates an agent on its side
+     * @param agent
+     */
+    void agentCreatedByMapping(AgentM* agent);
 
 public Q_SLOTS:
 

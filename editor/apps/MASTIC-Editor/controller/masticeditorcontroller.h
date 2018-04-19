@@ -1,7 +1,7 @@
 /*
  *	MASTIC Editor
  *
- *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
@@ -9,6 +9,8 @@
  *
  *	Contributors:
  *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
+ *      Alexandre Lemort <lemort@ingenuity.io>
+ *      Bruno Lemenicier <lemenicier@ingenuity.io>
  *
  */
 
@@ -179,6 +181,7 @@ public Q_SLOTS:
       */
     QPointF getGlobalMousePosition();
 
+
 private Q_SLOTS:
 
     /**
@@ -186,12 +189,13 @@ private Q_SLOTS:
      */
     void _onTimeout();
 
-signals:
 
+Q_SIGNALS:
     /**
       * @brief Reset the mapping and timeline views
       */
     void resetMappindAndTimeLineViews();
+
 
 private:
 

@@ -1,5 +1,5 @@
 /*
- *  Mastic - QML binding
+ *  Mastic - QML playground
  *
  *  Copyright (c) 2018 Ingenuity i/o. All rights reserved.
  *
@@ -13,8 +13,8 @@
  */
 
 
-#ifndef _MASTICQUICK_HELPERS_H_
-#define _MASTICQUICK_HELPERS_H_
+#ifndef _PROPERTIES_HELPERS_H_
+#define _PROPERTIES_HELPERS_H_
 
 
 #include <QObject>
@@ -26,42 +26,21 @@
 
 
 
-#include "masticquick_global.h"
-
-
 
 /*
  **************************************************************
  *
- *  Basic QML properties (number, string, object)
+ *  Basic QML properties (number, string, etc.)
  *
  **************************************************************
  */
 
 
-
 /*!
-   Define a property that is readable/writable from QML with a custom setter method
+   Define a property that is readable/writable from QML
 */
-#define MASTIC_QML_PROPERTY_CUSTOM_SETTER(type, name) \
+#define PLAYGROUND_QML_PROPERTY(type, name) \
         Q_PROPERTY (type name READ name WRITE set##name NOTIFY name##Changed) \
-    public: \
-        type name () const { \
-            return _##name ; \
-        } \
-        void set##name (type value); \
-    Q_SIGNALS: \
-        void name##Changed (type value); \
-    protected: \
-        type _##name;
-
-
-
-/*!
-   Define a property that is read-only from QML
-*/
-#define MASTIC_QML_PROPERTY_READONLY(type, name) \
-        Q_PROPERTY (type name READ name NOTIFY name##Changed) \
     public: \
         type name () const { \
             return _##name ; \
@@ -79,10 +58,65 @@
 
 
 
+
+/*!
+   Define a property that is readable/writable from QML with a custom setter method
+*/
+#define PLAYGROUND_QML_PROPERTY_CUSTOM_SETTER(type, name) \
+        Q_PROPERTY (type name READ name WRITE set##name NOTIFY name##Changed) \
+    public: \
+        type name () const { \
+            return _##name ; \
+        } \
+        void set##name (type value); \
+    Q_SIGNALS: \
+        void name##Changed (type value); \
+    protected: \
+        type _##name;
+
+
+
+/*!
+   Define a property that is read-only from QML
+*/
+#define PLAYGROUND_QML_PROPERTY_READONLY(type, name) \
+        Q_PROPERTY (type name READ name NOTIFY name##Changed) \
+    public: \
+        type name () const { \
+            return _##name ; \
+        } \
+        void set##name (type value) { \
+            if (_##name != value) { \
+                _##name = value; \
+                Q_EMIT name##Changed(value); \
+            } \
+        } \
+    Q_SIGNALS: \
+        void name##Changed (type value); \
+    protected: \
+        type _##name;
+
+
+/*!
+   Define a property that is read-only from QML with a custom setter
+*/
+#define PLAYGROUND_QML_PROPERTY_READONLY_CUSTOM_SETTER(type, name) \
+        Q_PROPERTY (type name READ name NOTIFY name##Changed) \
+    public: \
+        type name () const { \
+            return _##name ; \
+        } \
+        void set##name (type value); \
+    Q_SIGNALS: \
+        void name##Changed (type value); \
+    protected: \
+        type _##name;
+
+
 /*!
    Define a constant
 */
-#define MASTIC_QML_PROPERTY_CONSTANT(type, name) \
+#define PLAYGROUND_QML_PROPERTY_CONSTANT(type, name) \
         Q_PROPERTY (type name READ name CONSTANT) \
     public: \
         type name () const { \
@@ -90,6 +124,82 @@
         } \
     protected: \
         type _##name;
+
+
+
+
+/*
+ **************************************************************
+ *
+ *  Pointers
+ *
+ **************************************************************
+ */
+
+/*!
+   Define a property that is readable/writable from QML
+*/
+#define PLAYGROUND_QML_PROPERTY_DELETE_PROOF(type, name) \
+        Q_PROPERTY (type name READ name WRITE set##name NOTIFY name##Changed) \
+    public: \
+        type name () const { \
+            return _##name ; \
+        } \
+        void set##name (type value) { \
+            if (_##name != value) { \
+                if (_##name != NULL) { \
+                    disconnect(_##name, SIGNAL(destroyed(QObject *)), this, 0); \
+                } \
+                _##name = value; \
+                if (_##name != NULL) { \
+                    connect(_##name, SIGNAL(destroyed(QObject *)), this, SLOT(_on##name##Destroyed(QObject *))); \
+                } \
+                Q_EMIT name##Changed(value); \
+            } \
+        } \
+    Q_SIGNALS: \
+        void name##Changed (type value); \
+    private Q_SLOTS: \
+        void _on##name##Destroyed(QObject*) { \
+            _##name = NULL; \
+            Q_EMIT name##Changed(NULL); \
+        } \
+    protected: \
+        type _##name;
+
+
+
+/*!
+   Define a property that is read-only from QML
+*/
+#define PLAYGROUND_QML_PROPERTY_READONLY_DELETE_PROOF(type, name) \
+        Q_PROPERTY (type name READ name NOTIFY name##Changed) \
+    public: \
+        type name () const { \
+            return _##name ; \
+        } \
+        void set##name (type value) { \
+            if (_##name != value) { \
+                if (_##name != NULL) {\
+                    disconnect(_##name, SIGNAL(destroyed(QObject *)), this, 0); \
+                } \
+                _##name = value; \
+                if (_##name != NULL) { \
+                    connect(_##name, SIGNAL(destroyed(QObject *)), this, SLOT(_on##name##Destroyed(QObject *))); \
+                } \
+                Q_EMIT name##Changed(value); \
+            } \
+        } \
+    Q_SIGNALS: \
+        void name##Changed (type value); \
+    private Q_SLOTS: \
+        void _on##name##Destroyed(QObject*) { \
+            _##name = NULL; \
+            Q_EMIT name##Changed(NULL); \
+        } \
+    protected: \
+        type _##name;
+
 
 
 
@@ -113,8 +223,8 @@
   \param list of all values
 
   */
-#define MASTIC_QML_ENUM(name, ...) \
-    class name : public AbstractMasticQuickEnumClass { \
+#define PLAYGROUND_QML_ENUM(name, ...) \
+    class name : public AbstractPlaygroundEnumClass { \
         Q_OBJECT \
     public: \
         enum Value { __VA_ARGS__ }; \
@@ -176,7 +286,7 @@
 /*!
     Base class of enums
  */
-class MASTICQUICK_EXPORT AbstractMasticQuickEnumClass: public QObject {
+class AbstractPlaygroundEnumClass: public QObject {
     Q_OBJECT
 
 public:
@@ -184,7 +294,7 @@ public:
      * @brief Default constructor
      * @param parent
      */
-    AbstractMasticQuickEnumClass(QObject *parent = 0);
+    AbstractPlaygroundEnumClass(QObject *parent = 0);
 
 
     /**
@@ -304,4 +414,4 @@ public:
 
 
 
-#endif // _MASTICQUICK_HELPERS_H_
+#endif // _PROPERTIES_HELPERS_H_

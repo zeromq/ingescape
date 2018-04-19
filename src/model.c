@@ -537,7 +537,7 @@ int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void*
             switch (iop->value_type) {
                 case INTEGER_T:
                     outSize = iop->valueSize = sizeof(int);
-                    iop->value.i = (value == NULL)?0:*(int*)(value);
+                    iop->value.i = (value == NULL)?0:*(double*)(value);
                     outValue = &(iop->value.i);
                     mtic_info("set %s to %i", iopName, iop->value.i);
                     break;
@@ -549,7 +549,7 @@ int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void*
                     break;
                 case BOOL_T:
                     outSize = iop->valueSize = sizeof(bool);
-                    iop->value.b = (value == NULL)?false:((*(int*)(value))?true:false);
+                    iop->value.b = (value == NULL)?false:((*(double*)(value))?true:false);
                     outValue = &(iop->value.b);
                     mtic_info("set %s to %i", iopName, iop->value.b);
                     break;

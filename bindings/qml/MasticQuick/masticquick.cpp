@@ -1419,6 +1419,7 @@ bool MasticQuick::startWithDevice(QString networkDevice, int port)
     // Try to start Mastic
     if (mtic_startWithDevice(networkDevice.toStdString().c_str(), port) == 1)
     {
+        qInfo() << "MasticQuick: Mastic started on device" << networkDevice << "with port" << port;
         setisStarted(true);
         result = true;
     }
@@ -1452,6 +1453,7 @@ bool MasticQuick::startWithIP(QString ipAddress, int port)
     // Try to start Mastic
     if (mtic_startWithIP(ipAddress.toStdString().c_str(), port) == 1)
     {
+        qInfo() << "MasticQuick: Mastic started on IP" << ipAddress << "with port" << port;
         setisStarted(true);
         result = true;
     }
@@ -1478,6 +1480,7 @@ bool MasticQuick::stop()
     {
         if (mtic_stop() == 1)
         {
+            qInfo() << "MasticQuick: Mastic stopped";
             setisStarted(false);
             result = true;
         }
@@ -2204,6 +2207,30 @@ bool MasticQuick::clearDefinition()
         Q_EMIT parametersListChanged(_parametersList);
 
 
+        //
+        // Restore data
+        //
+        // - Name of our definition
+        QString tempDefinitionName = definitionName();
+        if (!tempDefinitionName.isEmpty())
+        {
+            setdefinitionName(tempDefinitionName.toStdString().c_str());
+        }
+        // - Descripton of our definition
+        QString tempDefinitionDescription = definitionDescription();
+        if (!tempDefinitionDescription.isEmpty())
+        {
+            mtic_setDefinitionDescription(tempDefinitionDescription.toStdString().c_str());
+        }
+        // - Version of our description
+        QString tempDefinitionVersion = definitionVersion();
+        if (!tempDefinitionVersion.isEmpty())
+        {
+            mtic_setDefinitionVersion(tempDefinitionVersion.toStdString().c_str());
+        }
+
+
+
         // Notify that our definition has been cleared
         Q_EMIT definitionCleared();
     }
@@ -2232,11 +2259,25 @@ bool MasticQuick::clearDefinition()
  *
  * @return true if an input is created, false otherwise (i.e. we already have an input with this name)
  */
+bool MasticQuick::createInputInt(QString name, int value)
+{
+    return createInputInt(name, value, NULL);
+}
+
+
+/**
+ * @brief Create a new integer input
+ *
+ * @param name
+ * @param value
+ * @param warning
+ *
+ * @return true if an input is created, false otherwise (i.e. we already have an input with this name)
+ */
 bool MasticQuick::createInputInt(QString name, int value, QString* warning)
 {
     return _createInput(name, MasticIopType::INTEGER, QVariant(value), &value, sizeof(int), warning);
 }
-
 
 
 /**
@@ -2247,11 +2288,25 @@ bool MasticQuick::createInputInt(QString name, int value, QString* warning)
  *
  * @return true if an input is created, false otherwise (i.e. we already have an input with this name)
  */
+bool MasticQuick::createInputDouble(QString name, double value)
+{
+    return createInputDouble(name, value, NULL);
+}
+
+
+/**
+ * @brief Create a new double input
+ *
+ * @param name
+ * @param value
+ * @param warning
+ *
+ * @return true if an input is created, false otherwise (i.e. we already have an input with this name)
+ */
 bool MasticQuick::createInputDouble(QString name, double value, QString* warning)
 {
     return _createInput(name, MasticIopType::DOUBLE, QVariant(value), &value, sizeof(double), warning);
 }
-
 
 
 /**
@@ -2259,6 +2314,22 @@ bool MasticQuick::createInputDouble(QString name, double value, QString* warning
  *
  * @param name
  * @param value
+ * @param warning
+ *
+ * @return true if an input is created, false otherwise (i.e. we already have an input with this name)
+ */
+bool MasticQuick::createInputString(QString name, QString value)
+{
+    return createInputString(name, value, NULL);
+}
+
+
+/**
+ * @brief Create a new string input
+ *
+ * @param name
+ * @param value
+ * @param warning
  *
  * @return true if an input is created, false otherwise (i.e. we already have an input with this name)
  */
@@ -2271,6 +2342,19 @@ bool MasticQuick::createInputString(QString name, QString value, QString* warnin
     return _createInput(name, MasticIopType::STRING, QVariant(value), (void *)cValue, (cValueLength + 1) * sizeof(char), warning);
 }
 
+
+/**
+ * @brief Create a new boolean input
+ *
+ * @param name
+ * @param value
+ *
+ * @return true if an input is created, false otherwise (i.e. we already have an input with this name)
+ */
+bool MasticQuick::createInputBool(QString name, bool value)
+{
+    return createInputBool(name, value, NULL);
+}
 
 
 /**
@@ -2288,6 +2372,18 @@ bool MasticQuick::createInputBool(QString name, bool value, QString* warning)
 }
 
 
+/**
+ * @brief Create a new impulsion input
+ *
+ * @param name
+ *
+ * @return true if an input is created, false otherwise (i.e. we already have an input with this name)
+ */
+bool MasticQuick::createInputImpulsion(QString name)
+{
+    return createInputImpulsion(name, NULL);
+}
+
 
 /**
  * @brief Create a new impulsion input
@@ -2302,6 +2398,19 @@ bool MasticQuick::createInputImpulsion(QString name, QString* warning)
     return _createInput(name, MasticIopType::IMPULSION, QVariant(""), NULL, 0, warning);
 }
 
+
+/**
+ * @brief Create a new data input
+ *
+ * @param name
+ * @param value
+ *
+ * @return true if an input is created, false otherwise (i.e. we already have an input with this name)
+ */
+bool MasticQuick::createInputData(QString name, void* value)
+{
+    return createInputData(name, value, NULL);
+}
 
 
 /**
@@ -2333,6 +2442,20 @@ bool MasticQuick::createInputData(QString name, void* value, QString* warning)
  *
  * @param name
  * @param value
+ *
+ * @return true if an output is created, false otherwise (i.e. we already have an output with this name)
+ */
+bool MasticQuick::createOutputInt(QString name, int value)
+{
+    return createOutputInt(name, value, NULL);
+}
+
+
+/**
+ * @brief Create a new integer output
+ *
+ * @param name
+ * @param value
  * @param warning Warning message if something went wrong
  *
  * @return true if an output is created, false otherwise (i.e. we already have an output with this name)
@@ -2342,6 +2465,19 @@ bool MasticQuick::createOutputInt(QString name, int value, QString* warning)
     return _createOutput(name, MasticIopType::INTEGER, QVariant(value), &value, sizeof(int), warning);
 }
 
+
+/**
+ * @brief Create a new double output
+ *
+ * @param name
+ * @param value
+ *
+ * @return true if an output is created, false otherwise (i.e. we already have an output with this name)
+ */
+bool MasticQuick::createOutputDouble(QString name, double value)
+{
+    return createOutputDouble(name, value, NULL);
+}
 
 
 /**
@@ -2358,6 +2494,19 @@ bool MasticQuick::createOutputDouble(QString name, double value, QString* warnin
     return _createOutput(name, MasticIopType::DOUBLE, QVariant(value), &value, sizeof(double), warning);
 }
 
+
+/**
+ * @brief Create a new string output
+ *
+ * @param name
+ * @param value
+ *
+ * @return true if an output is created, false otherwise (i.e. we already have an output with this name)
+ */
+bool MasticQuick::createOutputString(QString name, QString value)
+{
+    return createOutputString(name, value, NULL);
+}
 
 
 /**
@@ -2379,6 +2528,19 @@ bool MasticQuick::createOutputString(QString name, QString value, QString* warni
 }
 
 
+/**
+ * @brief Create a new boolean output
+ *
+ * @param name
+ * @param value
+ *
+ * @return true if an output is created, false otherwise (i.e. we already have an output with this name)
+ */
+bool MasticQuick::createOutputBool(QString name, bool value)
+{
+    return createOutputBool(name, value, NULL);
+}
+
 
 /**
  * @brief Create a new boolean output
@@ -2395,6 +2557,18 @@ bool MasticQuick::createOutputBool(QString name, bool value, QString* warning)
 }
 
 
+/**
+ * @brief Create a new impulsion output
+ *
+ * @param name
+ *
+ * @return true if an output is created, false otherwise (i.e. we already have an output with this name)
+ */
+bool MasticQuick::createOutputImpulsion(QString name)
+{
+    return createOutputImpulsion(name, NULL);
+}
+
 
 /**
  * @brief Create a new impulsion output
@@ -2407,6 +2581,20 @@ bool MasticQuick::createOutputBool(QString name, bool value, QString* warning)
 bool MasticQuick::createOutputImpulsion(QString name, QString* warning)
 {
     return _createOutput(name, MasticIopType::IMPULSION, QVariant(""), 0, 0, warning);
+}
+
+
+/**
+ * @brief Create a new data output
+ *
+ * @param name
+ * @param value
+ *
+ * @return true if an output is created, false otherwise (i.e. we already have an output with this name)
+ */
+bool MasticQuick::createOutputData(QString name, void* value)
+{
+    return createOutputData(name, value, NULL);
 }
 
 
@@ -2434,6 +2622,21 @@ bool MasticQuick::createOutputData(QString name, void* value, QString* warning)
 
 
 
+
+/**
+ * @brief Create a new integer parameter
+ *
+ * @param name
+ * @param value
+ *
+ * @return true if a parameter is created, false otherwise (i.e. we already have a parameter with this name)
+ */
+bool MasticQuick::createParameterInt(QString name, int value)
+{
+    return createParameterInt(name, value, NULL);
+}
+
+
 /**
  * @brief Create a new integer parameter
  *
@@ -2448,6 +2651,19 @@ bool MasticQuick::createParameterInt(QString name, int value, QString* warning)
     return _createParameter(name, MasticIopType::INTEGER, QVariant(value), &value, sizeof(int), warning);
 }
 
+
+/**
+ * @brief Create a new double parameter
+ *
+ * @param name
+ * @param value
+ *
+ * @return true if a parameter is created, false otherwise (i.e. we already have a parameter with this name)
+ */
+bool MasticQuick::createParameterDouble(QString name, double value)
+{
+    return createParameterDouble(name, value, NULL);
+}
 
 
 /**
@@ -2464,6 +2680,19 @@ bool MasticQuick::createParameterDouble(QString name, double value, QString* war
     return _createParameter(name, MasticIopType::DOUBLE, QVariant(value), &value, sizeof(double), warning);
 }
 
+
+/**
+ * @brief Create a new string parameter
+ *
+ * @param name
+ * @param value
+ *
+ * @return true if a parameter is created, false otherwise (i.e. we already have a parameter with this name)
+ */
+bool MasticQuick::createParameterString(QString name, QString value)
+{
+    return createParameterString(name, value, NULL);
+}
 
 
 /**
@@ -2485,6 +2714,19 @@ bool MasticQuick::createParameterString(QString name, QString value, QString* wa
  }
 
 
+/**
+ * @brief Create a new boolean parameter
+ *
+ * @param name
+ * @param value
+ *
+ * @return true if a parameter is created, false otherwise (i.e. we already have a parameter with this name)
+ */
+bool MasticQuick::createParameterBool(QString name, bool value)
+{
+    return createParameterBool(name, value, NULL);
+}
+
 
 /**
  * @brief Create a new boolean parameter
@@ -2500,6 +2742,19 @@ bool MasticQuick::createParameterBool(QString name, bool value, QString* warning
     return _createParameter(name, MasticIopType::BOOLEAN, QVariant(value), &value, sizeof(bool), warning);
 }
 
+
+/**
+ * @brief Create a new data parameter
+ *
+ * @param name
+ * @param value
+ *
+ * @return true if a parameter is created, false otherwise (i.e. we already have a parameter with this name)
+ */
+bool MasticQuick::createParameterData(QString name, void* value)
+{
+    return createParameterData(name, value, NULL);
+}
 
 
 /**

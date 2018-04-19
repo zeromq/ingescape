@@ -517,11 +517,10 @@ public Q_SLOTS:
       *
       * @param name
       * @param value
-      * @param warning Warning message if something went wrong
       *
       * @return true if an input is created or already exists with the same type, false otherwise
       */
-     bool createInputInt(QString name, int value = 0, QString* warning = NULL);
+     bool createInputInt(QString name, int value = 0);
 
 
 
@@ -530,11 +529,10 @@ public Q_SLOTS:
       *
       * @param name
       * @param value
-      * @param warning Warning message if something went wrong
       *
       * @return true if an input is created or already exists with the same type, false otherwise
       */
-     bool createInputDouble(QString name, double value = 0.0, QString* warning = NULL);
+     bool createInputDouble(QString name, double value = 0.0);
 
 
 
@@ -543,11 +541,10 @@ public Q_SLOTS:
       *
       * @param name
       * @param value
-      * @param warning Warning message if something went wrong
       *
       * @return true if an input is created or already exists with the same type, false otherwise
       */
-     bool createInputString(QString name, QString value = "", QString* warning = NULL);
+     bool createInputString(QString name, QString value = "");
 
 
 
@@ -556,11 +553,10 @@ public Q_SLOTS:
       *
       * @param name
       * @param value
-      * @param warning Warning message if something went wrong
       *
       * @return true if an input is created or already exists with the same type, false otherwise
       */
-     bool createInputBool(QString name, bool value = false, QString* warning = NULL);
+     bool createInputBool(QString name, bool value = false);
 
 
 
@@ -568,11 +564,10 @@ public Q_SLOTS:
       * @brief Create a new impulsion input
       *
       * @param name
-      * @param warning Warning message if something went wrong
       *
       * @return true if an input is created or already exists with the same type, false otherwise
       */
-     bool createInputImpulsion(QString name, QString* warning = NULL);
+     bool createInputImpulsion(QString name);
 
 
 
@@ -581,11 +576,10 @@ public Q_SLOTS:
       *
       * @param name
       * @param value
-      * @param warning Warning message if something went wrong
       *
       * @return true if an input is created or already exists with the same type, false otherwise
       */
-     bool createInputData(QString name, void* value = NULL, QString* warning = NULL);
+     bool createInputData(QString name, void* value = NULL);
 
 
 
@@ -594,11 +588,10 @@ public Q_SLOTS:
       *
       * @param name
       * @param value
-      * @param warning Warning message if something went wrong
       *
       * @return true if an output is created or already exists with the same type, false otherwise
       */
-     bool createOutputInt(QString name, int value = 0, QString* warning = NULL);
+     bool createOutputInt(QString name, int value = 0);
 
 
 
@@ -607,11 +600,10 @@ public Q_SLOTS:
       *
       * @param name
       * @param value
-      * @param warning Warning message if something went wrong
       *
       * @return true if an output is created or already exists with the same type, false otherwise
       */
-     bool createOutputDouble(QString name, double value = 0.0, QString* warning = NULL);
+     bool createOutputDouble(QString name, double value = 0.0);
 
 
 
@@ -620,11 +612,10 @@ public Q_SLOTS:
       *
       * @param name
       * @param value
-      * @param warning Warning message if something went wrong
       *
       * @return true if an output is created or already exists with the same type, false otherwise
       */
-     bool createOutputString(QString name, QString value = "", QString* warning = NULL);
+     bool createOutputString(QString name, QString value = "");
 
 
 
@@ -633,11 +624,10 @@ public Q_SLOTS:
       *
       * @param name
       * @param value
-      * @param warning Warning message if something went wrong
       *
       * @return true if an output is created or already exists with the same type, false otherwise
       */
-     bool createOutputBool(QString name, bool value = false, QString* warning = NULL);
+     bool createOutputBool(QString name, bool value = false);
 
 
 
@@ -645,11 +635,10 @@ public Q_SLOTS:
       * @brief Create a new impulsion output
       *
       * @param name
-      * @param warning Warning message if something went wrong
       *
       * @return true if an output is created or already exists with the same type, false otherwise
       */
-     bool createOutputImpulsion(QString name, QString* warning = NULL);
+     bool createOutputImpulsion(QString name);
 
 
 
@@ -658,11 +647,10 @@ public Q_SLOTS:
       *
       * @param name
       * @param value
-      * @param warning Warning message if something went wrong
       *
       * @return true if an output is created or already exists with the same type, false otherwise
       */
-     bool createOutputData(QString name, void* value = NULL, QString* warning = NULL);
+     bool createOutputData(QString name, void* value = NULL);
 
 
 
@@ -671,11 +659,10 @@ public Q_SLOTS:
       *
       * @param name
       * @param value
-      * @param warning Warning message if something went wrong
       *
       * @return true if a parameter is created or already exists with the same type, false otherwise
       */
-     bool createParameterInt(QString name, int value = 0, QString* warning = NULL);
+     bool createParameterInt(QString name, int value = 0);
 
 
 
@@ -684,11 +671,10 @@ public Q_SLOTS:
       *
       * @param name
       * @param value
-      * @param warning Warning message if something went wrong
       *
       * @return true if a parameter is created or already exists with the same type, false otherwise
       */
-     bool createParameterDouble(QString name, double value = 0.0, QString* warning = NULL);
+     bool createParameterDouble(QString name, double value = 0.0);
 
 
 
@@ -697,11 +683,10 @@ public Q_SLOTS:
       *
       * @param name
       * @param value
-      * @param warning Warning message if something went wrong
       *
       * @return true if a parameter is created or already exists with the same type, false otherwise
       */
-     bool createParameterString(QString name, QString value = "", QString* warning = NULL);
+     bool createParameterString(QString name, QString value = "");
 
 
 
@@ -710,11 +695,10 @@ public Q_SLOTS:
       *
       * @param name
       * @param value
-      * @param warning Warning message if something went wrong
       *
       * @return true if a parameter is created or already exists with the same type, false otherwise
       */
-     bool createParameterBool(QString name, bool value = false, QString* warning = NULL);
+     bool createParameterBool(QString name, bool value = false);
 
 
 
@@ -723,11 +707,10 @@ public Q_SLOTS:
       *
       * @param name
       * @param value
-      * @param warning Warning message if something went wrong
       *
       * @return true if a parameter is created or already exists with the same type, false otherwise
       */
-     bool createParameterData(QString name, void* value = NULL, QString* warning = NULL);
+     bool createParameterData(QString name, void* value = NULL);
 
 
 
@@ -761,6 +744,225 @@ public Q_SLOTS:
       * @return true if this parameter is removed, false otherwise
       */
      bool removeParameter(QString name);
+
+
+public:
+     /**
+      * @brief Create a new integer input
+      *
+      * @param name
+      * @param value
+      * @param warning Warning message if something went wrong
+      *
+      * @return true if an input is created or already exists with the same type, false otherwise
+      */
+     bool createInputInt(QString name, int value, QString* warning);
+
+
+
+     /**
+      * @brief Create a new double input
+      *
+      * @param name
+      * @param value
+      * @param warning Warning message if something went wrong
+      *
+      * @return true if an input is created or already exists with the same type, false otherwise
+      */
+     bool createInputDouble(QString name, double value, QString* warning);
+
+
+
+     /**
+      * @brief Create a new string input
+      *
+      * @param name
+      * @param value
+      * @param warning Warning message if something went wrong
+      *
+      * @return true if an input is created or already exists with the same type, false otherwise
+      */
+     bool createInputString(QString name, QString value, QString* warning);
+
+
+
+     /**
+      * @brief Create a new boolean input
+      *
+      * @param name
+      * @param value
+      * @param warning Warning message if something went wrong
+      *
+      * @return true if an input is created or already exists with the same type, false otherwise
+      */
+     bool createInputBool(QString name, bool value, QString* warning);
+
+
+
+     /**
+      * @brief Create a new impulsion input
+      *
+      * @param name
+      * @param warning Warning message if something went wrong
+      *
+      * @return true if an input is created or already exists with the same type, false otherwise
+      */
+     bool createInputImpulsion(QString name, QString* warning);
+
+
+
+     /**
+      * @brief Create a new data input
+      *
+      * @param name
+      * @param value
+      * @param warning Warning message if something went wrong
+      *
+      * @return true if an input is created or already exists with the same type, false otherwise
+      */
+     bool createInputData(QString name, void* value, QString* warning);
+
+
+
+     /**
+      * @brief Create a new integer output
+      *
+      * @param name
+      * @param value
+      * @param warning Warning message if something went wrong
+      *
+      * @return true if an output is created or already exists with the same type, false otherwise
+      */
+     bool createOutputInt(QString name, int value, QString* warning);
+
+
+
+     /**
+      * @brief Create a new double output
+      *
+      * @param name
+      * @param value
+      * @param warning Warning message if something went wrong
+      *
+      * @return true if an output is created or already exists with the same type, false otherwise
+      */
+     bool createOutputDouble(QString name, double value, QString* warning);
+
+
+
+     /**
+      * @brief Create a new string output
+      *
+      * @param name
+      * @param value
+      * @param warning Warning message if something went wrong
+      *
+      * @return true if an output is created or already exists with the same type, false otherwise
+      */
+     bool createOutputString(QString name, QString value, QString* warning);
+
+
+
+     /**
+      * @brief Create a new boolean output
+      *
+      * @param name
+      * @param value
+      * @param warning Warning message if something went wrong
+      *
+      * @return true if an output is created or already exists with the same type, false otherwise
+      */
+     bool createOutputBool(QString name, bool value, QString* warning);
+
+
+
+     /**
+      * @brief Create a new impulsion output
+      *
+      * @param name
+      * @param warning Warning message if something went wrong
+      *
+      * @return true if an output is created or already exists with the same type, false otherwise
+      */
+     bool createOutputImpulsion(QString name, QString* warning);
+
+
+
+     /**
+      * @brief Create a new data output
+      *
+      * @param name
+      * @param value
+      * @param warning Warning message if something went wrong
+      *
+      * @return true if an output is created or already exists with the same type, false otherwise
+      */
+     bool createOutputData(QString name, void* value, QString* warning);
+
+
+
+     /**
+      * @brief Create a new integer parameter
+      *
+      * @param name
+      * @param value
+      * @param warning Warning message if something went wrong
+      *
+      * @return true if a parameter is created or already exists with the same type, false otherwise
+      */
+     bool createParameterInt(QString name, int value, QString* warning);
+
+
+
+     /**
+      * @brief Create a new double parameter
+      *
+      * @param name
+      * @param value
+      * @param warning Warning message if something went wrong
+      *
+      * @return true if a parameter is created or already exists with the same type, false otherwise
+      */
+     bool createParameterDouble(QString name, double value, QString* warning);
+
+
+
+     /**
+      * @brief Create a new string parameter
+      *
+      * @param name
+      * @param value
+      * @param warning Warning message if something went wrong
+      *
+      * @return true if a parameter is created or already exists with the same type, false otherwise
+      */
+     bool createParameterString(QString name, QString value, QString* warning);
+
+
+
+     /**
+      * @brief Create a new boolean parameter
+      *
+      * @param name
+      * @param value
+      * @param warning Warning message if something went wrong
+      *
+      * @return true if a parameter is created or already exists with the same type, false otherwise
+      */
+     bool createParameterBool(QString name, bool value, QString* warning);
+
+
+
+     /**
+      * @brief Create a new data parameter
+      *
+      * @param name
+      * @param value
+      * @param warning Warning message if something went wrong
+      *
+      * @return true if a parameter is created or already exists with the same type, false otherwise
+      */
+     bool createParameterData(QString name, void* value, QString* warning);
 
 
 

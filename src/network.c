@@ -1350,6 +1350,7 @@ int mtic_startWithDevice(const char *networkDevice, unsigned int port){
     if (strlen(agentElements->ipAddress) == 0){
         mtic_error("IP address could not be determined on device %s : our agent will NOT start", networkDevice);
         free(agentElements);
+        agentElements = NULL;
         return 0;
     }
     
@@ -1469,6 +1470,7 @@ int mtic_startWithDeviceOnBroker(const char *networkDevice, const char *brokerIp
     if (strlen(agentElements->ipAddress) == 0){
         mtic_error("IP address could not be determined on device %s : our agent will NOT start", networkDevice);
         free(agentElements);
+        agentElements = NULL;
         return 0;
     }
     
