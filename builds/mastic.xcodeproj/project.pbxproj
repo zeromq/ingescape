@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		970670DF1EDC187900CCDFDC /* mastic_private.h in Headers */ = {isa = PBXBuildFile; fileRef = 97C926AB1EB23ED100D2B0CE /* mastic_private.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		970670DF1EDC187900CCDFDC /* mastic_private.h in Headers */ = {isa = PBXBuildFile; fileRef = 97C926AB1EB23ED100D2B0CE /* mastic_private.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		972A52641FD1733E00711352 /* admin.c in Sources */ = {isa = PBXBuildFile; fileRef = 972A52631FD1733E00711352 /* admin.c */; };
 		972A52651FD1733E00711352 /* admin.c in Sources */ = {isa = PBXBuildFile; fileRef = 972A52631FD1733E00711352 /* admin.c */; };
 		973DC283207A479F004C1D80 /* mastic_advanced.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 975512902078EF1900720931 /* mastic_advanced.h */; };
@@ -2743,7 +2743,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
+				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = 56DRT9MG9S;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -2774,7 +2774,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
+				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = 56DRT9MG9S;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
