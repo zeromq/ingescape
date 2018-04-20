@@ -88,7 +88,7 @@ Q_SIGNALS:
      * @param commandLine
      * @param canBeFrozen
      */
-    void agentEntered(QString peerId, QString peerName, QString peerAddress, int pid, QString hostname, QString commandLine, bool canBeFrozen);
+    void agentEntered(QString peerId, QString peerName, QString peerAddress, int pid, QString hostname, QString commandLine, bool canBeFrozen, bool isRecorder);
 
 
     /**

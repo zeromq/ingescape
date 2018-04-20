@@ -251,7 +251,7 @@ public Q_SLOTS:
      * @param commandLine
      * @param canBeFrozen
      */
-    void onAgentEntered(QString peerId, QString agentName, QString agentAddress, int pid, QString hostname, QString commandLine, bool canBeFrozen);
+    void onAgentEntered(QString peerId, QString agentName, QString agentAddress, int pid, QString hostname, QString commandLine, bool canBeFrozen, bool isRecorder);
 
 
     /**

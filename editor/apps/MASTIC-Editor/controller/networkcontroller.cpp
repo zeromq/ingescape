@@ -79,6 +79,7 @@ void onIncommingZyreMessageCallback(const char *evt, const char *peer, const cha
 
             // Initialize properties related to message headers
             bool isMasticPublisher = false;
+            bool isMasticRecorder = false;
             bool isIntPID = false;
             int pid = -1;
             bool canBeFrozen = false;
@@ -103,6 +104,11 @@ void onIncommingZyreMessageCallback(const char *evt, const char *peer, const cha
                     // We check that the key "publisher" exists
                     if (key == "publisher") {
                         isMasticPublisher = true;
+                    }
+                    else if (key == "isRecorder") {
+                        if (value == "1") {
+                            isMasticRecorder = true;
+                        }
                     }
                     else if (key == "pid") {
                         pid = value.toInt(&isIntPID);
@@ -136,15 +142,12 @@ void onIncommingZyreMessageCallback(const char *evt, const char *peer, const cha
                 // Emit the signal "Launcher Entered"
                 Q_EMIT networkController->launcherEntered(peerId, hostname, ipAddress, streamingPort);
             }
-            else
+            else if (isMasticPublisher && isIntPID)
             {
-                if (isMasticPublisher && isIntPID)
-                {
-                    //qDebug() << "Our zyre event is about MASTIC publisher:" << pid << hostname << commandLine;
+                //qDebug() << "Our zyre event is about MASTIC publisher:" << pid << hostname << commandLine;
 
-                    // Emit the signal "Agent Entered"
-                    Q_EMIT networkController->agentEntered(peerId, peerName, ipAddress, pid, hostname, commandLine, canBeFrozen);
-                }
+                // Emit the signal "Agent Entered"
+                Q_EMIT networkController->agentEntered(peerId, peerName, ipAddress, pid, hostname, commandLine, canBeFrozen, isMasticRecorder);
             }
         }
         // JOIN (group)

@@ -201,7 +201,7 @@ QString MasticModelManager::getJsonOfMapping(AgentMappingM* agentMapping)
  * @param commandLine
  * @param canBeFrozen
  */
-void MasticModelManager::onAgentEntered(QString peerId, QString agentName, QString agentAddress, int pid, QString hostname, QString commandLine, bool canBeFrozen)
+void MasticModelManager::onAgentEntered(QString peerId, QString agentName, QString agentAddress, int pid, QString hostname, QString commandLine, bool canBeFrozen, bool isRecorder)
 {
     if (!peerId.isEmpty() && !agentName.isEmpty() && !agentAddress.isEmpty())
     {
@@ -223,8 +223,9 @@ void MasticModelManager::onAgentEntered(QString peerId, QString agentName, QStri
 
             agent->sethostname(hostname);
             agent->setcommandLine(commandLine);
+            agent->setisRecorder(isRecorder);
 
-            if (!hostname.isEmpty())
+            if (!hostname.isEmpty() && !isRecorder)
             {
                 HostM* host = MasticLauncherManager::Instance().getHostWithName(hostname);
                 if (host != NULL)
