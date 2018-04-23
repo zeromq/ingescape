@@ -1,6 +1,3 @@
-[submodule "doc/themes/kube"]
-	path = doc/themes/kube
-	url = https://github.com/jeblister/kube.git
 [submodule "doc/themes/osprey"]
 	path = doc/themes/osprey
 	url = https://github.com/tomanistor/osprey.git
