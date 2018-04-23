@@ -185,7 +185,7 @@ void AgentsSupervisionController::exportAgentsListToSelectedFile()
  */
 void AgentsSupervisionController::onAgentModelCreated(AgentM* model)
 {
-    if (model != NULL)
+    if (model != NULL && !model->isRecorder())
     {
         // Get the list of view models of agent from a name
         QList<AgentVM*> agentViewModelsList = getAgentViewModelsListFromName(model->name());

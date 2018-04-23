@@ -66,6 +66,9 @@ class AgentM : public QObject
     // Flag indicating if our agent can be frozen
     I2_QML_PROPERTY_READONLY(bool, canBeFrozen)
 
+    // Command line of our agent
+    I2_CPP_NOSIGNAL_PROPERTY(bool, isRecorder)
+
     // Flag indicating if our agent is frozen
     I2_QML_PROPERTY_READONLY(bool, isFrozen)
 

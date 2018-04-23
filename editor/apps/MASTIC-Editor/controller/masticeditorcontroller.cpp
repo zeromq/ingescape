@@ -168,6 +168,7 @@ MasticEditorController::MasticEditorController(QObject *parent) : QObject(parent
     connect(_modelManager, &MasticModelManager::isActivatedMappingChanged, _agentsMappingC, &AgentsMappingController::onIsActivatedMappingChanged);
     connect(_modelManager, &MasticModelManager::agentModelCreated, _agentsSupervisionC, &AgentsSupervisionController::onAgentModelCreated);
     connect(_modelManager, &MasticModelManager::agentModelWillBeDeleted, _agentsMappingC, &AgentsMappingController::onAgentModelWillBeDeleted);
+    connect(_modelManager, &MasticModelManager::agentModelCreated, _scenarioC, &ScenarioController::onAgentModelCreated);
     connect(_modelManager, &MasticModelManager::mapped, _agentsMappingC, &AgentsMappingController::onMapped);
     connect(_modelManager, &MasticModelManager::unmapped, _agentsMappingC, &AgentsMappingController::onUnmapped);
     connect(_modelManager, &MasticModelManager::addInputsToEditorForOutputs, _valuesHistoryC, &ValuesHistoryController::onAgentOutputsObserved);

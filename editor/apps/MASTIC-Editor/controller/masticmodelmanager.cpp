@@ -201,7 +201,7 @@ QString MasticModelManager::getJsonOfMapping(AgentMappingM* agentMapping)
  * @param commandLine
  * @param canBeFrozen
  */
-void MasticModelManager::onAgentEntered(QString peerId, QString agentName, QString agentAddress, int pid, QString hostname, QString commandLine, bool canBeFrozen)
+void MasticModelManager::onAgentEntered(QString peerId, QString agentName, QString agentAddress, int pid, QString hostname, QString commandLine, bool canBeFrozen, bool isRecorder)
 {
     if (!peerId.isEmpty() && !agentName.isEmpty() && !agentAddress.isEmpty())
     {
@@ -223,8 +223,9 @@ void MasticModelManager::onAgentEntered(QString peerId, QString agentName, QStri
 
             agent->sethostname(hostname);
             agent->setcommandLine(commandLine);
+            agent->setisRecorder(isRecorder);
 
-            if (!hostname.isEmpty())
+            if (!hostname.isEmpty() && !isRecorder)
             {
                 HostM* host = MasticLauncherManager::Instance().getHostWithName(hostname);
                 if (host != NULL)
@@ -356,8 +357,31 @@ void MasticModelManager::onDefinitionReceived(QString peerId, QString agentName,
                      Q_EMIT addInputsToEditorForOutputs(agentName, agentDefinition->outputsList()->toList());
                  }
                  else {
-                     // FIXME TODO: Update the definition of agent
-                     qWarning() << "Update the definition of agent" << agentName << "(if this definition has changed)";
+                     // remove existing definition name
+                     QString definitionName = agent->definition()->name();
+
+                     QList<DefinitionM*> agentDefinitionsList = getAgentDefinitionsListFromDefinitionName(definitionName);
+
+                     int indexOfDefinition = agentDefinitionsList.indexOf(agent->definition());
+                     if(indexOfDefinition != -1)
+                         agentDefinitionsList.removeAt(indexOfDefinition);
+
+                     // Update the list in the map
+                     _mapFromNameToAgentDefinitionsList.remove(definitionName);
+
+
+
+
+
+
+                     // Add this new model of agent definition for the agent name
+                     addAgentDefinitionForAgentName(agentDefinition, agentName);
+
+                     // Set this definition to the agent
+                     agent->setdefinition(agentDefinition);
+
+                     // Emit the signal "Add Inputs to Editor for Outputs"
+                     Q_EMIT addInputsToEditorForOutputs(agentName, agentDefinition->outputsList()->toList());
                  }
             }
         }

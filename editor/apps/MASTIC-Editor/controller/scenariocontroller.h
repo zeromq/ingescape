@@ -108,6 +108,11 @@ class ScenarioController: public QObject
     // Next action view model to active
     I2_QML_PROPERTY(ActionVM*, nextActionVMToActive)
 
+    // Indicating if a recorder agent is currently recording
+    I2_QML_PROPERTY_CUSTOM_SETTER(bool, isRecording)
+
+    // Reference on recorder agent
+    I2_QML_PROPERTY(AgentM*, recorderAgent)
 
 public:
 
@@ -325,6 +330,13 @@ public Q_SLOTS:
       */
     void ontimeRangeChange(int startTimeInMilliseconds, int endTimeInMilliseconds);
 
+    /**
+     * @brief Slot when a new model of agent has been created
+     * @param agent
+     */
+    void onAgentModelCreated(AgentM* model);
+
+
 private Q_SLOTS:
 
     /**
@@ -455,6 +467,7 @@ private:
 
     // List of actionVM in timeline filtered with a given time range in milliseconds
     AbstractTimeRangeFilter _filteredListActionsInTimeLine;
+
 
 };
 

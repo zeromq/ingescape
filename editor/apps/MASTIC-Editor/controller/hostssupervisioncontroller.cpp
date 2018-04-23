@@ -122,7 +122,7 @@ void HostsSupervisionController::onHostModelWillBeRemoved(HostM* hostModel)
  */
 void HostsSupervisionController::onAgentModelCreated(AgentM* agent)
 {
-    if (agent != NULL)
+    if (agent != NULL && !agent->isRecorder())
     {
         if (!_agentsList.contains(agent))
             _agentsList.append(agent);

@@ -241,7 +241,7 @@ void AgentInMappingVM::_onModelsChanged()
 
                 // Connect to signals from a model
                 connect(model, &AgentM::isONChanged, this, &AgentInMappingVM::_onIsONofModelChanged);
-                //connect(model, &AgentM::definitionChanged, this, &AgentInMappingVM::_onDefinitionOfModelChanged);
+                connect(model, &AgentM::definitionChanged, this, &AgentInMappingVM::_onDefinitionOfModelChanged);
 
                 // A model of agent has been added to our list
                 _agentModelAdded(model);
@@ -260,7 +260,7 @@ void AgentInMappingVM::_onModelsChanged()
 
                 // DIS-connect from signals from a model
                 disconnect(model, &AgentM::isONChanged, this, &AgentInMappingVM::_onIsONofModelChanged);
-                //disconnect(model, &AgentM::definitionChanged, this, &AgentInMappingVM::_onDefinitionOfModelChanged);
+                disconnect(model, &AgentM::definitionChanged, this, &AgentInMappingVM::_onDefinitionOfModelChanged);
 
                 // A model of agent has been removed from our list
                 _agentModelRemoved(model);
@@ -309,6 +309,105 @@ void AgentInMappingVM::_onIsONofModelChanged(bool isON)
 
     // Update the flag "is ON" in function of flags of all models
     _updateIsON();
+}
+
+/**
+ * @brief Slot when the flag "is ON" of a model changed
+ * @param isON
+ */
+void AgentInMappingVM::_onDefinitionOfModelChanged(DefinitionM* definition)
+{
+    if(definition != NULL)
+    {
+        // First remove existing inputs and outputs
+        QList<InputVM*> inputsListToRemove;
+        QList<OutputVM*> outputsListToRemove;
+
+        // Traverse the list of models of inputs in the definition
+        foreach (AgentIOPM* input, definition->inputsList()->toList())
+        {
+            InputVM* inputVM = _inputModelRemoved(input);
+            if (inputVM != NULL)
+            {
+                // The view model of input is empty
+                if (inputVM->models()->count() == 0) {
+                    inputsListToRemove.append(inputVM);
+                }
+            }
+        }
+
+        // Traverse the list of models of outputs in the definition
+        foreach (OutputM* output, definition->outputsList()->toList())
+        {
+            OutputVM* outputVM = _outputModelRemoved(output);
+            if (outputVM != NULL)
+            {
+                // The view model of output is empty
+                if (outputVM->models()->count() == 0) {
+                    outputsListToRemove.append(outputVM);
+                }
+            }
+        }
+
+        // remove inputs
+        if (inputsListToRemove.count() > 0)
+        {
+            foreach (InputVM* inputVM, inputsListToRemove) {
+                _inputsList.remove(inputVM);
+            }
+        }
+
+        // remove outputs
+        if (outputsListToRemove.count() > 0)
+        {
+            foreach (OutputVM* outputVM, outputsListToRemove) {
+                _outputsList.remove(outputVM);
+            }
+        }
+
+
+        // Add inputs and outputs of the new definition
+        QList<InputVM*> inputsListToAdd;
+        QList<OutputVM*> outputsListToAdd;
+
+        // Traverse the list of models of inputs in the definition
+        foreach (AgentIOPM* input, definition->inputsList()->toList())
+        {
+            InputVM* inputVM = _inputModelAdded(input);
+            if (inputVM != NULL)
+            {
+                // New view model of input
+                if (!_inputsList.contains(inputVM)) {
+                    inputsListToAdd.append(inputVM);
+                }
+            }
+        }
+
+        // Traverse the list of models of outputs in the definition
+        foreach (OutputM* output, definition->outputsList()->toList())
+        {
+            OutputVM* outputVM = _outputModelAdded(output);
+            if (outputVM != NULL)
+            {
+                // New view model of output
+                if (!_outputsList.contains(outputVM)) {
+                    outputsListToAdd.append(outputVM);
+                }
+            }
+        }
+
+        if (inputsListToAdd.count() > 0)
+        {
+            _inputsList.append(inputsListToAdd);
+        }
+
+        if (outputsListToAdd.count() > 0)
+        {
+            _outputsList.append(outputsListToAdd);
+        }
+
+        Q_EMIT modelsOfInputsAndOutputsChanged();
+    }
 }
 
 
