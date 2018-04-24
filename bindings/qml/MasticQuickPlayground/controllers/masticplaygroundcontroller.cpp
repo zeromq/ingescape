@@ -62,7 +62,18 @@ MasticPlaygroundController::MasticPlaygroundController(QQmlEngine* engine, QJSEn
     setqmlEngine(engine);
 
 
-     //-------------------------------
+
+    //-------------------------------
+    //
+    // Subcribe to directory and file changes
+    //
+    //-------------------------------
+
+    connect(&_fileSystemWatcher, &QFileSystemWatcher::directoryChanged, this, &MasticPlaygroundController::_onFileSystemWatcherDirectoryChanged);
+    connect(&_fileSystemWatcher, &QFileSystemWatcher::fileChanged, this, &MasticPlaygroundController::_onFileSystemWatcherFileChanged);
+
+
+    //-------------------------------
     //
     // View modes
     //
@@ -95,9 +106,13 @@ MasticPlaygroundController::MasticPlaygroundController(QQmlEngine* engine, QJSEn
 
     // - V2: custom description for each example
     _examples
+            << new PlaygroundExample("MultiplyBy2.qml", "Multiply a number by 2")
+            << new PlaygroundExample("MultiplyBy2_alternativeVersion1.qml", "Multiply a number by 2 (alternative version 1)")
+            << new PlaygroundExample("MultiplyBy2_alternativeVersion2.qml", "Multiply a number by 2 (alternative version 2)")
             << new PlaygroundExample("Clock.qml", "Clock: set time based on inputs")
             << new PlaygroundExample("DragNDrop.qml", "Drag-n-drop: send 2D absolute coordinates")
             << new PlaygroundExample("VirtualJoystick.qml", "Virtual joystick: send 2D relative coordinates")
+            << new PlaygroundExample("Gauges.qml", "Gauges: circular and vertical gauges")
             ;
 
 }
@@ -109,6 +124,11 @@ MasticPlaygroundController::MasticPlaygroundController(QQmlEngine* engine, QJSEn
   */
 MasticPlaygroundController::~MasticPlaygroundController()
 {
+    // Unsubscribe to directory and file changes
+    disconnect(&_fileSystemWatcher, &QFileSystemWatcher::directoryChanged, this, &MasticPlaygroundController::_onFileSystemWatcherDirectoryChanged);
+    disconnect(&_fileSystemWatcher, &QFileSystemWatcher::fileChanged, this, &MasticPlaygroundController::_onFileSystemWatcherFileChanged);
+
+
     // Clean-up examples
     QList<PlaygroundExample*> tempExamples = _examples;
     _examples.clear();
@@ -896,7 +916,7 @@ void MasticPlaygroundController::_addImportPathsForFile(const QUrl& url)
             QString stringURL = _qurlToQString(url);
             QFileInfo fileInfo(stringURL);
             QDir directory = fileInfo.absoluteDir();
-qDebug() << "stringurl" << stringURL;
+
             // QQmlEngine
             if (_qmlEngine != NULL)
             {

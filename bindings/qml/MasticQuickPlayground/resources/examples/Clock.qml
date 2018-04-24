@@ -14,7 +14,7 @@ Item {
 
 
     // Behavior
-    Component.onCompleted: {Mastic.isVerbose = true;
+    Component.onCompleted: {
         // Set agent name and definition info
         Mastic.agentName = "QmlClock-agent"
         Mastic.definitionName = Mastic.agentName;

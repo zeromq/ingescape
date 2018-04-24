@@ -21,5 +21,9 @@
         <file>resources/images/hole.png</file>
         <file>resources/images/gear2.png</file>
         <file>resources/images/gear3.png</file>
+        <file>resources/examples/MultiplyBy2.qml</file>
+        <file>resources/examples/MultiplyBy2_alternativeVersion1.qml</file>
+        <file>resources/examples/MultiplyBy2_alternativeVersion2.qml</file>
+        <file>resources/examples/Gauges.qml</file>
     </qresource>
 </RCC>
