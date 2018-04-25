@@ -126,6 +126,7 @@ PlaygroundController::PlaygroundController(QQmlEngine* engine, QJSEngine* script
             << new PlaygroundExample("DragNDrop.qml", "Drag-n-drop: send 2D absolute coordinates")
             << new PlaygroundExample("VirtualJoystick.qml", "Virtual joystick: send 2D relative coordinates")
             << new PlaygroundExample("Gauges.qml", "Gauges: circular and vertical gauges")
+            << new PlaygroundExample("SimpleMap.qml", "Simple map: pan and zoom")
             ;
 
 }

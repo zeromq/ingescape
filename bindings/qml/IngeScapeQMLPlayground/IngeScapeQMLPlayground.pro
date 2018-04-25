@@ -16,7 +16,7 @@ VERSION_PATCH = 0
 VERSION = $${VERSION_MAJOR}.$${VERSION_MINOR}.$${VERSION_BUILD}.$${VERSION_PATCH}
 
 # Qt modules used by our application
-QT += quick widgets concurrent
+QT += qml quick widgets concurrent svg xml scxml positioning
 
 CONFIG += c++11 precompiled_header
 
@@ -115,7 +115,18 @@ win32 {
     QMAKE_TARGET_DESCRIPTION = Playground to code ingeScape agents with QML
     QMAKE_TARGET_COPYRIGHT = Copyright (c) 2018, Ingenuity i/o
 
- # TODO: release build
+
+    # Release only: copy Qt libs and plugins next to our application to create a standalone application
+    CONFIG(release, debug|release) {
+        #NB: use a custom directory because OUT_PWD contains cpp (moc_) and obj files
+        DESTDIR = $${OUT_PWD}/bin
+
+        # Copy Qt DLLs and required files
+        QMAKE_POST_LINK += windeployqt $${DESTDIR}/$${TARGET}.exe -qmldir=$${PWD}
+
+        # TODO: copy ingeScape dependencies
+    }
+
 }
 
 

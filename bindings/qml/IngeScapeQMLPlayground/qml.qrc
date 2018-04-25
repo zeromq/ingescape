@@ -25,5 +25,6 @@
         <file>resources/examples/MultiplyBy2_alternativeVersion1.qml</file>
         <file>resources/examples/MultiplyBy2_alternativeVersion2.qml</file>
         <file>resources/examples/Gauges.qml</file>
+        <file>resources/examples/SimpleMap.qml</file>
     </qresource>
 </RCC>
