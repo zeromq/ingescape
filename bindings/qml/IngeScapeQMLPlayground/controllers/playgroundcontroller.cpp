@@ -1,5 +1,5 @@
 /*
- *  Mastic - QML playground
+ *  ingeScape - QML playground
  *
  *  Copyright (c) 2018 Ingenuity i/o. All rights reserved.
  *
@@ -13,7 +13,7 @@
  */
 
 
-#include "masticplaygroundcontroller.h"
+#include "playgroundcontroller.h"
 
 #include <QDebug>
 #include <QFuture>
@@ -44,7 +44,7 @@
 
 //------------------------------------------------------------
 //
-// MasticPlaygroundController
+// PlaygroundController
 //
 //------------------------------------------------------------
 
@@ -56,7 +56,7 @@
  * @param scriptEngine
  * @param parent
  */
-MasticPlaygroundController::MasticPlaygroundController(QQmlEngine* engine, QJSEngine* scriptEngine, QObject *parent)
+PlaygroundController::PlaygroundController(QQmlEngine* engine, QJSEngine* scriptEngine, QObject *parent)
     : QObject(parent),
       _qmlEngine(NULL),
       _autoSave(true),
@@ -79,11 +79,11 @@ MasticPlaygroundController::MasticPlaygroundController(QQmlEngine* engine, QJSEn
 
     _timerReloadOnFileSystemChanges.setSingleShot(true);
     _timerReloadOnFileSystemChanges.setInterval(RELOAD_TIMER_INTERVAL_IN_MILLISECONDS);
-    connect(&_timerReloadOnFileSystemChanges, &QTimer::timeout, this, &MasticPlaygroundController::_onTimerReloadOnFileSystemChangesTimeout);
+    connect(&_timerReloadOnFileSystemChanges, &QTimer::timeout, this, &PlaygroundController::_onTimerReloadOnFileSystemChangesTimeout);
 
 
-    connect(&_fileSystemWatcher, &QFileSystemWatcher::directoryChanged, this, &MasticPlaygroundController::_onFileSystemWatcherDirectoryChanged);
-    connect(&_fileSystemWatcher, &QFileSystemWatcher::fileChanged, this, &MasticPlaygroundController::_onFileSystemWatcherFileChanged);
+    connect(&_fileSystemWatcher, &QFileSystemWatcher::directoryChanged, this, &PlaygroundController::_onFileSystemWatcherDirectoryChanged);
+    connect(&_fileSystemWatcher, &QFileSystemWatcher::fileChanged, this, &PlaygroundController::_onFileSystemWatcherFileChanged);
 
 
     //-------------------------------
@@ -135,16 +135,16 @@ MasticPlaygroundController::MasticPlaygroundController(QQmlEngine* engine, QJSEn
 /**
   * @brief Destructor
   */
-MasticPlaygroundController::~MasticPlaygroundController()
+PlaygroundController::~PlaygroundController()
 {
     // Unsubscribe to directory and file changes
-    disconnect(&_fileSystemWatcher, &QFileSystemWatcher::directoryChanged, this, &MasticPlaygroundController::_onFileSystemWatcherDirectoryChanged);
-    disconnect(&_fileSystemWatcher, &QFileSystemWatcher::fileChanged, this, &MasticPlaygroundController::_onFileSystemWatcherFileChanged);
+    disconnect(&_fileSystemWatcher, &QFileSystemWatcher::directoryChanged, this, &PlaygroundController::_onFileSystemWatcherDirectoryChanged);
+    disconnect(&_fileSystemWatcher, &QFileSystemWatcher::fileChanged, this, &PlaygroundController::_onFileSystemWatcherFileChanged);
 
 
     // Stop our _timerReloadOnFileSystemChanges timer
     _timerReloadOnFileSystemChanges.stop();
-    disconnect(&_timerReloadOnFileSystemChanges, &QTimer::timeout, this, &MasticPlaygroundController::_onTimerReloadOnFileSystemChangesTimeout);
+    disconnect(&_timerReloadOnFileSystemChanges, &QTimer::timeout, this, &PlaygroundController::_onTimerReloadOnFileSystemChangesTimeout);
 
 
     // Clean-up examples
@@ -163,9 +163,9 @@ MasticPlaygroundController::~MasticPlaygroundController()
  * @param scriptEngine
  * @return
  */
-QObject* MasticPlaygroundController::qmlSingleton(QQmlEngine* engine, QJSEngine* scriptEngine)
+QObject* PlaygroundController::qmlSingleton(QQmlEngine* engine, QJSEngine* scriptEngine)
 {
-    return new MasticPlaygroundController(engine, scriptEngine);
+    return new PlaygroundController(engine, scriptEngine);
 }
 
 
@@ -181,7 +181,7 @@ QObject* MasticPlaygroundController::qmlSingleton(QQmlEngine* engine, QJSEngine*
  * @brief Set our autoSave flag
  * @param value
  */
-void MasticPlaygroundController::setautoSave(bool value)
+void PlaygroundController::setautoSave(bool value)
 {
     if (_autoSave != value)
     {
@@ -204,7 +204,7 @@ void MasticPlaygroundController::setautoSave(bool value)
  * @brief Set URL of our current source file
  * @param value
  */
-void MasticPlaygroundController::setcurrentSourceFile(QUrl value)
+void PlaygroundController::setcurrentSourceFile(QUrl value)
 {
     if (_currentSourceFile != value)
     {
@@ -227,7 +227,7 @@ void MasticPlaygroundController::setcurrentSourceFile(QUrl value)
  * @brief Set our list of recent files
  * @param value
  */
-void MasticPlaygroundController::setrecentFiles(QVariantList value)
+void PlaygroundController::setrecentFiles(QVariantList value)
 {
     // Remove all invalid values
     value.removeAll(QVariant());
@@ -248,10 +248,10 @@ void MasticPlaygroundController::setrecentFiles(QVariantList value)
 
 
 /**
- * @brief MasticPlaygroundController::seteditedSourceContent
+ * @brief Set our source content
  * @param value
  */
-void MasticPlaygroundController::seteditedSourceContent(QString value)
+void PlaygroundController::seteditedSourceContent(QString value)
 {
     if (_editedSourceContent != value)
     {
@@ -278,7 +278,7 @@ void MasticPlaygroundController::seteditedSourceContent(QString value)
  * @brief Get our list of examples
  * @return
  */
-QQmlListProperty<PlaygroundExample> MasticPlaygroundController::examples()
+QQmlListProperty<PlaygroundExample> PlaygroundController::examples()
 {
     return QQmlListProperty<PlaygroundExample>(this, _examples);
 }
@@ -295,7 +295,7 @@ QQmlListProperty<PlaygroundExample> MasticPlaygroundController::examples()
 /**
  * @brief Method used to force the creation of our singleton from QML
  */
-void MasticPlaygroundController::forceCreation()
+void PlaygroundController::forceCreation()
 {
 }
 
@@ -303,7 +303,7 @@ void MasticPlaygroundController::forceCreation()
 /**
  * @brief init
  */
-void MasticPlaygroundController::init()
+void PlaygroundController::init()
 {
     // Check if we have at least one recent file
     if (_recentFiles.count() > 0)
@@ -324,7 +324,7 @@ void MasticPlaygroundController::init()
  * @brief Open a given file
  * @param url
  */
-void MasticPlaygroundController::openFile(QUrl url)
+void PlaygroundController::openFile(QUrl url)
 {
     if ((url != _currentSourceFile) && url.isValid())
     {
@@ -346,7 +346,7 @@ void MasticPlaygroundController::openFile(QUrl url)
 /**
  * @brief Create a new file
  */
-void MasticPlaygroundController::newFile()
+void PlaygroundController::newFile()
 {
     // Open our template file
     // NB: we don't want to add it to our recent files
@@ -358,7 +358,7 @@ void MasticPlaygroundController::newFile()
  * @brief Open a given example
  * @param example
  */
-void MasticPlaygroundController::openExample(QString example)
+void PlaygroundController::openExample(QString example)
 {
     if (!example.isEmpty())
     {
@@ -372,7 +372,7 @@ void MasticPlaygroundController::openExample(QString example)
 /**
  * @brief Save current file
  */
-void MasticPlaygroundController::saveCurrentFile()
+void PlaygroundController::saveCurrentFile()
 {
     if (_currentSourceFile.isValid())
     {
@@ -421,7 +421,7 @@ void MasticPlaygroundController::saveCurrentFile()
 
 
             // Create our async task
-            QFuture<bool> future = QtConcurrent::run(this, &MasticPlaygroundController::_asyncWriteContentToFile, _editedSourceContent, _currentSourceFile);
+            QFuture<bool> future = QtConcurrent::run(this, &PlaygroundController::_asyncWriteContentToFile, _editedSourceContent, _currentSourceFile);
             futureWatcher->setFuture(future);
         }
     }
@@ -440,7 +440,7 @@ void MasticPlaygroundController::saveCurrentFile()
  *
  * @param url
  */
-void MasticPlaygroundController::saveCurrentFileAs(QUrl url)
+void PlaygroundController::saveCurrentFileAs(QUrl url)
 {
     if (url.isValid())
     {
@@ -479,7 +479,7 @@ void MasticPlaygroundController::saveCurrentFileAs(QUrl url)
 
 
         // Create our async task
-        QFuture<bool> future = QtConcurrent::run(this, &MasticPlaygroundController::_asyncWriteContentToFile, _editedSourceContent, url);
+        QFuture<bool> future = QtConcurrent::run(this, &PlaygroundController::_asyncWriteContentToFile, _editedSourceContent, url);
         futureWatcher->setFuture(future);
     }
     else
@@ -497,7 +497,7 @@ void MasticPlaygroundController::saveCurrentFileAs(QUrl url)
  *
  * @remarks only called for embedded resources or remote (http, ftp, etc.) files
  */
-void MasticPlaygroundController::setRequiredFileToSave(QUrl url)
+void PlaygroundController::setRequiredFileToSave(QUrl url)
 {
     _autoSaveWithFile(url);
 }
@@ -516,7 +516,7 @@ void MasticPlaygroundController::setRequiredFileToSave(QUrl url)
  * @brief Internal setter for editedSourceContent
  * @param value
  */
-void MasticPlaygroundController::_seteditedSourceContent(QString value)
+void PlaygroundController::_seteditedSourceContent(QString value)
 {
     if (_editedSourceContent != value)
     {
@@ -533,7 +533,7 @@ void MasticPlaygroundController::_seteditedSourceContent(QString value)
 /**
  * @brief Trigger a reload event
  */
-void MasticPlaygroundController::_triggerReload()
+void PlaygroundController::_triggerReload()
 {
     // Clean-up our live view
     Q_EMIT clearLiveView();
@@ -586,7 +586,7 @@ void MasticPlaygroundController::_triggerReload()
 /**
  * @brief Try to autosave our content
  */
-void MasticPlaygroundController::_tryToAutoSave()
+void PlaygroundController::_tryToAutoSave()
 {
     // Check if we have a valid URL
     if (_currentSourceFile.isValid())
@@ -620,7 +620,7 @@ void MasticPlaygroundController::_tryToAutoSave()
  * @param url
  *
  */
-void MasticPlaygroundController::_autoSaveWithFile(QUrl url)
+void PlaygroundController::_autoSaveWithFile(QUrl url)
 {qDebug() << "autosve";
     // Ensure that we have a valid URL
     if (url.isValid())
@@ -678,7 +678,7 @@ void MasticPlaygroundController::_autoSaveWithFile(QUrl url)
 
 
         // Create our async task and execute it
-        QFuture<bool> future = QtConcurrent::run(this, &MasticPlaygroundController::_asyncWriteContentToFile, _editedSourceContent, url);
+        QFuture<bool> future = QtConcurrent::run(this, &PlaygroundController::_asyncWriteContentToFile, _editedSourceContent, url);
         futureWatcher->setFuture(future);
     }
     // Else: invalid URL
@@ -690,7 +690,7 @@ void MasticPlaygroundController::_autoSaveWithFile(QUrl url)
  * @brief Add an item to recent files
  * @param url
  */
-void MasticPlaygroundController::_addToRecentFiles(QUrl url)
+void PlaygroundController::_addToRecentFiles(QUrl url)
 {
     // Ensure that we have a valid URL
     if (url.isValid())
@@ -718,7 +718,7 @@ void MasticPlaygroundController::_addToRecentFiles(QUrl url)
 * @brief Open a given file
 * @param url
 */
-void MasticPlaygroundController::_openFile(QUrl url)
+void PlaygroundController::_openFile(QUrl url)
 {
     // Create a future wacther and subscribe to it
     QFutureWatcher<QPair<bool, QString>>* futureWatcher = new QFutureWatcher<QPair<bool, QString>>();
@@ -767,7 +767,7 @@ void MasticPlaygroundController::_openFile(QUrl url)
 
 
     // Create an async task and link it to our watcher
-    QFuture<QPair<bool, QString>> future = QtConcurrent::run(this, &MasticPlaygroundController::_loadFile, url);
+    QFuture<QPair<bool, QString>> future = QtConcurrent::run(this, &PlaygroundController::_loadFile, url);
     futureWatcher->setFuture(future);
 }
 
@@ -778,7 +778,7 @@ void MasticPlaygroundController::_openFile(QUrl url)
  * @param url
  * @return
  */
-QPair<bool, QString> MasticPlaygroundController::_loadFile(QUrl url)
+QPair<bool, QString> PlaygroundController::_loadFile(QUrl url)
 {
    QPair<bool, QString> result =  QPair<bool, QString>(false, "");
 
@@ -802,12 +802,12 @@ QPair<bool, QString> MasticPlaygroundController::_loadFile(QUrl url)
               }
               else
               {
-                  qWarning() << "MasticPlaygroundController warning: can not read file " << filePath;
+                  qWarning() << "PlaygroundController warning: can not read file " << filePath;
               }
            }
            else
            {
-               qWarning() << "MasticPlaygroundController warning: file " << filePath << " does not exist";
+               qWarning() << "PlaygroundController warning: file " << filePath << " does not exist";
            }
        }
    }
@@ -825,7 +825,7 @@ QPair<bool, QString> MasticPlaygroundController::_loadFile(QUrl url)
  *
  * @return
  */
-bool MasticPlaygroundController::_asyncWriteContentToFile(const QString &content, const QUrl &url)
+bool PlaygroundController::_asyncWriteContentToFile(const QString &content, const QUrl &url)
 {
     bool result = false;
 
@@ -859,7 +859,7 @@ bool MasticPlaygroundController::_asyncWriteContentToFile(const QString &content
  * @param fileUrl
  * @return
  */
-QString MasticPlaygroundController::_qurlToQString(const QUrl& fileUrl)
+QString PlaygroundController::_qurlToQString(const QUrl& fileUrl)
 {
     QString result;
 
@@ -895,7 +895,7 @@ QString MasticPlaygroundController::_qurlToQString(const QUrl& fileUrl)
  * @brief Remove import paths associated to a given file
  * @param url
  */
-void MasticPlaygroundController::_removeImportPathsForFile(const QUrl& url)
+void PlaygroundController::_removeImportPathsForFile(const QUrl& url)
 {
     if (url.isValid())
     {
@@ -942,7 +942,7 @@ void MasticPlaygroundController::_removeImportPathsForFile(const QUrl& url)
  * @brief Add import paths associated to a given file
  * @param url
  */
-void MasticPlaygroundController::_addImportPathsForFile(const QUrl& url)
+void PlaygroundController::_addImportPathsForFile(const QUrl& url)
 {
     if (url.isValid())
     {
@@ -994,7 +994,7 @@ void MasticPlaygroundController::_addImportPathsForFile(const QUrl& url)
 /**
  * @brief Call when our file system watcher detects a file change
  */
-void MasticPlaygroundController::_onFileSystemWatcherFileChanged(const QString &path)
+void PlaygroundController::_onFileSystemWatcherFileChanged(const QString &path)
 {
     Q_UNUSED(path)
 
@@ -1005,7 +1005,7 @@ void MasticPlaygroundController::_onFileSystemWatcherFileChanged(const QString &
 /**
  * @brief Call when our file system watcher detects a directory change
  */
-void MasticPlaygroundController::_onFileSystemWatcherDirectoryChanged(const QString &path)
+void PlaygroundController::_onFileSystemWatcherDirectoryChanged(const QString &path)
 {
     Q_UNUSED(path)
 
@@ -1019,7 +1019,7 @@ void MasticPlaygroundController::_onFileSystemWatcherDirectoryChanged(const QStr
 /**
  * @brief Called when our _timerReloadOnFileSystemChanges triggers a timeout
  */
-void MasticPlaygroundController::_onTimerReloadOnFileSystemChangesTimeout()
+void PlaygroundController::_onTimerReloadOnFileSystemChangesTimeout()
 {
     _openFile( _currentSourceFile );
 }

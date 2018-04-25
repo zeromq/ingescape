@@ -1,5 +1,5 @@
 /*
- *  Mastic - QML playground
+ *  ingeScape - QML playground
  *
  *  Copyright (c) 2018 Ingenuity i/o. All rights reserved.
  *
@@ -24,7 +24,7 @@
 #include <MasticQuick.h>
 
 
-#include "controllers/masticplaygroundcontroller.h"
+#include "controllers/playgroundcontroller.h"
 
 #include "utils/resourcehelpers.h"
 #include "utils/qmlsyntaxhighlighter.h"
@@ -41,7 +41,7 @@ void registerCustomQmlTypes()
     // Models
     //
     //----------------
-    qmlRegisterUncreatableType<PlaygroundExample>("MasticPlayground", 1, 0, "PlaygroundExample", "Internal class");
+    qmlRegisterUncreatableType<PlaygroundExample>("IngeScapePlayground", 1, 0, "PlaygroundExample", "Internal class");
 
 
     //----------------
@@ -49,7 +49,7 @@ void registerCustomQmlTypes()
     // Utils
     //
     //----------------
-    qmlRegisterType<QMLSyntaxHighlighter>("MasticPlayground", 1, 0, "QMLSyntaxHighlighter");
+    qmlRegisterType<QMLSyntaxHighlighter>("IngeScapePlayground", 1, 0, "QMLSyntaxHighlighter");
 
 
     //----------------
@@ -58,7 +58,7 @@ void registerCustomQmlTypes()
     //
     //----------------
 
-    qmlRegisterSingletonType<MasticPlaygroundController>("MasticPlayground", 1, 0, "MasticPlaygroundController", &MasticPlaygroundController::qmlSingleton);
+    qmlRegisterSingletonType<PlaygroundController>("IngeScapePlayground", 1, 0, "PlaygroundController", &PlaygroundController::qmlSingleton);
 }
 
 
@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
     app.setOrganizationName("Ingenuity i/o");
     app.setOrganizationDomain("ingenuity.io");
-    app.setApplicationName("MasticQuickPlayground");
+    app.setApplicationName("IngeScapeQMLPlayground");
     app.setApplicationVersion("0.0.0.0");
 
     // - behavior when our last window is closed

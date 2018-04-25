@@ -47,6 +47,8 @@ Rectangle {
             minimumValue: 0
             maximumValue: 100
 
+            value: 0
+
             // Link our "value" property to a Mastic input named 'absoluteCX'
             MasticInputBinding on value {
                 inputName: "absoluteCX"
@@ -64,6 +66,8 @@ Rectangle {
 
             minimumValue: -1
             maximumValue: 1
+
+            value: 0
 
             style: CircularGaugeStyle {
                 tickmarkStepSize: 0.25
@@ -100,6 +104,8 @@ Rectangle {
             minimumValue: 0
             maximumValue: 100
 
+            value: 0
+
             // Link our "value" property to a Mastic input named 'absoluteX'
             MasticInputBinding on value {
                 inputName: "absoluteX"
@@ -117,6 +123,8 @@ Rectangle {
             minimumValue: -1
             maximumValue: 1
             tickmarkStepSize: 0.25
+
+            value: 0
 
             // Link our "value" property to a Mastic input named 'relativeX'
             MasticInputBinding on value {

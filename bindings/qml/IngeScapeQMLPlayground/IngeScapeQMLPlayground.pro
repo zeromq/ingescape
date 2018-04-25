@@ -47,20 +47,20 @@ RCC_DIR = tmp
 
 
 SOURCES += main.cpp \
-    controllers/masticplaygroundcontroller.cpp \
     utils/resourcehelpers.cpp \
     utils/qmlsyntaxhighlighter.cpp \
     utils/propertieshelpers.cpp \
-    models/playgroundexample.cpp
+    models/playgroundexample.cpp \
+    controllers/playgroundcontroller.cpp
 
 
 HEADERS += \
     stable.h \
-    controllers/masticplaygroundcontroller.h \
     utils/propertieshelpers.h \
     utils/resourcehelpers.h \
     utils/qmlsyntaxhighlighter.h \
-    models/playgroundexample.h
+    models/playgroundexample.h \
+    controllers/playgroundcontroller.h
 
 
 RESOURCES += qml.qrc
@@ -112,8 +112,10 @@ win32 {
     # Set application info
     QMAKE_TARGET_COMPANY = Ingenuity i/o
     QMAKE_TARGET_PRODUCT = $${TARGET}
-    QMAKE_TARGET_DESCRIPTION = Playground to code Mastic agents with QML
+    QMAKE_TARGET_DESCRIPTION = Playground to code ingeScape agents with QML
     QMAKE_TARGET_COPYRIGHT = Copyright (c) 2018, Ingenuity i/o
+
+ # TODO: release build
 }
 
 

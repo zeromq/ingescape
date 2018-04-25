@@ -4,7 +4,7 @@ import QtQuick.Controls 1.4
 import QtQuick.Controls.Styles 1.4
 import QtQuick.Dialogs 1.2
 
-import MasticPlayground 1.0
+import IngeScapePlayground 1.0
 
 
 ApplicationWindow {
@@ -30,7 +30,7 @@ ApplicationWindow {
     height: 768
 
 
-    title: qsTr("MASTIC Playground - %1").arg(mainWindow.editedFile)
+    title: qsTr("ingeScape QML Playground - %1").arg(mainWindow.editedFile)
 
 
     // NB: we must override the style of our ApplicationWindow if we want a white background!
@@ -67,7 +67,7 @@ ApplicationWindow {
                 shortcut: StandardKey.New
 
                 onTriggered: {
-                    MasticPlaygroundController.newFile();
+                    PlaygroundController.newFile();
                 }
             }
 
@@ -92,7 +92,7 @@ ApplicationWindow {
                 enabled: !autoSaveMenuItem.checked
 
                 onTriggered: {
-                    MasticPlaygroundController.saveCurrentFile();
+                    PlaygroundController.saveCurrentFile();
                 }
             }
 
@@ -114,7 +114,7 @@ ApplicationWindow {
                 checkable: true
 
                 onTriggered: {
-                    MasticPlaygroundController.autoSave = checked;
+                    PlaygroundController.autoSave = checked;
                 }
             }
 
@@ -170,7 +170,7 @@ ApplicationWindow {
                 text: modelData
 
                 onTriggered: {
-                    MasticPlaygroundController.openFile(modelData);
+                    PlaygroundController.openFile(modelData);
                 }
             }
         }
@@ -198,7 +198,7 @@ ApplicationWindow {
                 text: model.description
 
                 onTriggered: {
-                    MasticPlaygroundController.openExample(model.file);
+                    PlaygroundController.openExample(model.file);
                 }
             }
         }
@@ -226,12 +226,12 @@ ApplicationWindow {
                 exclusiveGroup: viewModesGroup
 
                 checkable: true
-                checked: (modelData === MasticPlaygroundController.currentViewMode)
+                checked: (modelData === PlaygroundController.currentViewMode)
 
                 text: modelData
 
                 onTriggered: {
-                    MasticPlaygroundController.currentViewMode = modelData;
+                    PlaygroundController.currentViewMode = modelData;
                 }
             }
         }
@@ -353,19 +353,19 @@ ApplicationWindow {
 
             onStopped: {
                 // Init controller
-                MasticPlaygroundController.forceCreation();
+                PlaygroundController.forceCreation();
 
                 // Update connections
-                connectionToPlaygroundSignals.target = MasticPlaygroundController;
+                connectionToPlaygroundSignals.target = PlaygroundController;
 
                 // Update edited file
-                mainWindow.editedFile = Qt.binding(function() { return MasticPlaygroundController.currentSourceFile; });
+                mainWindow.editedFile = Qt.binding(function() { return PlaygroundController.currentSourceFile; });
 
                 // Update our menus
-                recentFilesMenuRepeater.model = Qt.binding(function() { return MasticPlaygroundController.recentFiles; });
-                examplesMenuRepeater.model = MasticPlaygroundController.examples;
-                viewModesMenuRepeater.model = Qt.binding(function() { return MasticPlaygroundController.viewModes; });
-                autoSaveMenuItem.checked = Qt.binding(function() { return MasticPlaygroundController.autoSave; });
+                recentFilesMenuRepeater.model = Qt.binding(function() { return PlaygroundController.recentFiles; });
+                examplesMenuRepeater.model = PlaygroundController.examples;
+                viewModesMenuRepeater.model = Qt.binding(function() { return PlaygroundController.viewModes; });
+                autoSaveMenuItem.checked = Qt.binding(function() { return PlaygroundController.autoSave; });
 
                 // Load our QML UI
                 applicationLoader.source = "Playground.qml";
@@ -400,7 +400,7 @@ ApplicationWindow {
         onAccepted: {
             if (fileUrls.length > 0)
             {
-                MasticPlaygroundController.openFile(fileUrls[0]);
+                PlaygroundController.openFile(fileUrls[0]);
             }
         }
 
@@ -439,11 +439,11 @@ ApplicationWindow {
             {
                 if ( _openedViaSignalUserMustDefineSaveFile)
                 {
-                    MasticPlaygroundController.setRequiredFileToSave(fileUrls[0]);
+                    PlaygroundController.setRequiredFileToSave(fileUrls[0]);
                 }
                 else
                 {
-                    MasticPlaygroundController.saveCurrentFileAs(fileUrls[0]);
+                    PlaygroundController.saveCurrentFileAs(fileUrls[0]);
                 }
             }
 

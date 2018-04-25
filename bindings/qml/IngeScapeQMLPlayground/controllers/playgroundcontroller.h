@@ -1,5 +1,5 @@
 /*
- *  Mastic - QML playground
+ *  ingeScape - QML playground
  *
  *  Copyright (c) 2018 Ingenuity i/o. All rights reserved.
  *
@@ -13,8 +13,8 @@
  */
 
 
-#ifndef MASTICPLAYGROUNDCONTROLLER_H
-#define MASTICPLAYGROUNDCONTROLLER_H
+#ifndef PLAYGROUNDCONTROLLER_H
+#define PLAYGROUNDCONTROLLER_H
 
 #include <QObject>
 #include <QtQml>
@@ -32,7 +32,7 @@
 /**
  * @brief The MasticPlaygroundController class defines the main controller of our playground application
  */
-class MasticPlaygroundController : public QObject
+class PlaygroundController : public QObject
 {
     Q_OBJECT
 
@@ -78,13 +78,13 @@ public:
      * @param scriptEngine
      * @param parent
      */
-    explicit MasticPlaygroundController(QQmlEngine* engine, QJSEngine* scriptEngine, QObject *parent = nullptr);
+    explicit PlaygroundController(QQmlEngine* engine, QJSEngine* scriptEngine, QObject *parent = nullptr);
 
 
     /**
       * @brief Destructor
       */
-    ~MasticPlaygroundController();
+    ~PlaygroundController();
 
 
     /**
@@ -325,7 +325,7 @@ protected:
 };
 
 
-QML_DECLARE_TYPE(MasticPlaygroundController)
+QML_DECLARE_TYPE(PlaygroundController)
 
 
-#endif // MASTICPLAYGROUNDCONTROLLER_H
+#endif // PLAYGROUNDCONTROLLER_H
