@@ -19,7 +19,7 @@ Item {
         // Create an output
         Mastic.createOutputDouble("result");
 
-        // Link our input and our output value
+        // Link our input and our output
         Mastic.outputs.result = Qt.binding(function() {
                 return Mastic.inputs.operand * 2;
         });
