@@ -140,7 +140,7 @@ gcc -o myFirstAgent main.o -L/usr/local/lib -lmastic
 ### Compiling on macOS (two methods)
 The first compilation method is the same as the one for Linux, exactly with the same assumptions for header and library location.
 
-The other method is the use of Apple Xcode with a dedicated project. To save your time, such a project, including the code above, can be found [here](/code/firstAgent.zip).
+The other method is the use of Apple Xcode with a dedicated project. To save your time, such a project, including the code above, is available [here](/code/firstAgent.zip).
 
 ### Compiling on Microsoft Windows
 *TODO*
