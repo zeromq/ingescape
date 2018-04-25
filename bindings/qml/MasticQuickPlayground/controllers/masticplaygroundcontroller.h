@@ -287,16 +287,21 @@ protected:
 
 protected Q_SLOTS:
     /**
-     * @brief Call when our file system watcher detects a file change
+     * @brief Called when our file system watcher detects a file change
      */
     void _onFileSystemWatcherFileChanged(const QString &path);
 
 
     /**
-     * @brief Call when our file system watcher detects a directory change
+     * @brief Called when our file system watcher detects a directory change
      */
     void _onFileSystemWatcherDirectoryChanged(const QString &path);
 
+
+    /**
+     * @brief Called when our _timerReloadOnFileSystemChanges triggers a timeout
+     */
+    void _onTimerReloadOnFileSystemChangesTimeout();
 
 
 protected:
@@ -311,6 +316,9 @@ protected:
 
     // File watcher to detect external changes i.e. if the source code is edited in an IDE such as Qt Creator, Xcode, Visual Studio, etc.
     QFileSystemWatcher _fileSystemWatcher;
+
+    // Timer used to reload our content when a file or a directory changes
+    QTimer _timerReloadOnFileSystemChanges;
 
     // List of examples
     QList<PlaygroundExample*> _examples;

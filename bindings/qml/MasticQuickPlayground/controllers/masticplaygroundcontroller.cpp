@@ -33,6 +33,14 @@
 #define QRC_EXAMPLES_DIRECTORY ":/resources/examples/"
 
 
+// Interval in milliseconds of our reload timer
+#define RELOAD_TIMER_INTERVAL_IN_MILLISECONDS 100
+
+
+// Delay in milliseconds before executing a queued action
+#define QUEUED_ACTION_DELAY_IN_MILLISECONDS 50
+
+
 
 //------------------------------------------------------------
 //
@@ -65,9 +73,14 @@ MasticPlaygroundController::MasticPlaygroundController(QQmlEngine* engine, QJSEn
 
     //-------------------------------
     //
-    // Subcribe to directory and file changes
+    // Subscribe to file system changes
     //
     //-------------------------------
+
+    _timerReloadOnFileSystemChanges.setSingleShot(true);
+    _timerReloadOnFileSystemChanges.setInterval(RELOAD_TIMER_INTERVAL_IN_MILLISECONDS);
+    connect(&_timerReloadOnFileSystemChanges, &QTimer::timeout, this, &MasticPlaygroundController::_onTimerReloadOnFileSystemChangesTimeout);
+
 
     connect(&_fileSystemWatcher, &QFileSystemWatcher::directoryChanged, this, &MasticPlaygroundController::_onFileSystemWatcherDirectoryChanged);
     connect(&_fileSystemWatcher, &QFileSystemWatcher::fileChanged, this, &MasticPlaygroundController::_onFileSystemWatcherFileChanged);
@@ -127,6 +140,11 @@ MasticPlaygroundController::~MasticPlaygroundController()
     // Unsubscribe to directory and file changes
     disconnect(&_fileSystemWatcher, &QFileSystemWatcher::directoryChanged, this, &MasticPlaygroundController::_onFileSystemWatcherDirectoryChanged);
     disconnect(&_fileSystemWatcher, &QFileSystemWatcher::fileChanged, this, &MasticPlaygroundController::_onFileSystemWatcherFileChanged);
+
+
+    // Stop our _timerReloadOnFileSystemChanges timer
+    _timerReloadOnFileSystemChanges.stop();
+    disconnect(&_timerReloadOnFileSystemChanges, &QTimer::timeout, this, &MasticPlaygroundController::_onTimerReloadOnFileSystemChangesTimeout);
 
 
     // Clean-up examples
@@ -522,7 +540,7 @@ void MasticPlaygroundController::_triggerReload()
 
 
     // NB: QML needs a small delay to delete its content
-    QTimer::singleShot(50, [=] {
+    QTimer::singleShot(QUEUED_ACTION_DELAY_IN_MILLISECONDS, [=] {
         //
         // Clean-up Mastic and QML if needed
         //
@@ -603,10 +621,15 @@ void MasticPlaygroundController::_tryToAutoSave()
  *
  */
 void MasticPlaygroundController::_autoSaveWithFile(QUrl url)
-{
+{qDebug() << "autosve";
     // Ensure that we have a valid URL
     if (url.isValid())
     {
+        // Block file system signals
+        // => we don't want to trigger a change while saving our file
+        _fileSystemWatcher.blockSignals(true);
+
+
         // Create a watcher to monitor our async task
         QFutureWatcher<bool>* futureWatcher = new QFutureWatcher<bool>();
         connect(
@@ -642,13 +665,19 @@ void MasticPlaygroundController::_autoSaveWithFile(QUrl url)
                             Q_EMIT errorMessage(error);
                         }
 
+
+                        // Restore file system signals after a short delay
+                        QTimer::singleShot(QUEUED_ACTION_DELAY_IN_MILLISECONDS, [=] {
+                            _fileSystemWatcher.blockSignals(false);
+                        });
+
                         // Clean-up
                         disconnect(futureWatcher, 0, this, 0);
                         futureWatcher->deleteLater();
                     });
 
 
-        // Create our async task
+        // Create our async task and execute it
         QFuture<bool> future = QtConcurrent::run(this, &MasticPlaygroundController::_asyncWriteContentToFile, _editedSourceContent, url);
         futureWatcher->setFuture(future);
     }
@@ -720,9 +749,12 @@ void MasticPlaygroundController::_openFile(QUrl url)
                     QString success = tr("Source file %1 opened").arg(url.toString());
                     Q_EMIT successMessage(success);
                 }
-                // Else: failure
                 else
                 {
+                    //
+                    // Failure
+                    //
+
                     QString error = tr("Read error: can not read content of source file %1").arg(url.toString());
                     Q_EMIT errorMessage(error);
                 }
@@ -882,8 +914,12 @@ void MasticPlaygroundController::_removeImportPathsForFile(const QUrl& url)
                 _qmlEngine->setImportPathList(importPathsList);
             }
 
+
+            //
             // File system watcher
-            // TODO
+            //
+            _fileSystemWatcher.removePaths(_fileSystemWatcher.files());
+            _fileSystemWatcher.removePaths(_fileSystemWatcher.directories());
         }
         else if (QString::compare(url.scheme(), "qrc", Qt::CaseInsensitive) == 0)
         {
@@ -916,16 +952,25 @@ void MasticPlaygroundController::_addImportPathsForFile(const QUrl& url)
             QString stringURL = _qurlToQString(url);
             QFileInfo fileInfo(stringURL);
             QDir directory = fileInfo.absoluteDir();
+            QString directoryPath = directory.absolutePath();
 
             // QQmlEngine
             if (_qmlEngine != NULL)
             {
-                _qmlEngine->addImportPath(directory.absolutePath());
-                qDebug() << "After " << _qmlEngine->importPathList();
+                _qmlEngine->addImportPath(directoryPath);
             }
 
+
+            //
             // File system watcher
-            // TODO
+            //
+            _fileSystemWatcher.addPath(directoryPath);
+
+            QDirIterator directoryIterator(directoryPath, QDir::AllEntries | QDir::NoDotAndDotDot, QDirIterator::Subdirectories | QDirIterator::FollowSymlinks);
+            while (directoryIterator.hasNext())
+            {
+                _fileSystemWatcher.addPath(directoryIterator.next());
+            }
         }
         else if (QString::compare(url.scheme(), "qrc", Qt::CaseInsensitive) == 0)
         {
@@ -952,6 +997,8 @@ void MasticPlaygroundController::_addImportPathsForFile(const QUrl& url)
 void MasticPlaygroundController::_onFileSystemWatcherFileChanged(const QString &path)
 {
     Q_UNUSED(path)
+
+    _timerReloadOnFileSystemChanges.start();
 }
 
 
@@ -961,5 +1008,21 @@ void MasticPlaygroundController::_onFileSystemWatcherFileChanged(const QString &
 void MasticPlaygroundController::_onFileSystemWatcherDirectoryChanged(const QString &path)
 {
     Q_UNUSED(path)
+
+    _removeImportPathsForFile( _currentSourceFile );
+    _addImportPathsForFile( _currentSourceFile );
+
+    _timerReloadOnFileSystemChanges.start();
 }
+
+
+/**
+ * @brief Called when our _timerReloadOnFileSystemChanges triggers a timeout
+ */
+void MasticPlaygroundController::_onTimerReloadOnFileSystemChangesTimeout()
+{
+    _openFile( _currentSourceFile );
+}
+
+
 
