@@ -16,7 +16,7 @@ VERSION_PATCH = 0
 VERSION = $${VERSION_MAJOR}.$${VERSION_MINOR}.$${VERSION_BUILD}.$${VERSION_PATCH}
 
 # Qt modules used by our application
-QT += qml quick widgets concurrent svg xml scxml positioning
+QT += qml quick widgets concurrent svg xml scxml location positioning
 
 CONFIG += c++11 precompiled_header
 
@@ -143,6 +143,7 @@ mac {
         CONFIG(release, debug|release) {
             # Release only: copy Qt libs and plugins inside our application to create a standalone application
             # NB: macdeployqt only runs qmlimportscanner correctly when run from Qt bin directory
+            # TODO: find a way to deploy geoservices plugins (osm, etc.)
             QMAKE_POST_LINK += $$quote(cd `dirname $(QMAKE)` && macdeployqt $${OUT_PWD}/$${TARGET}.app -qmldir=$${PWD} $$escape_expand(\n\t))
         }
     }
