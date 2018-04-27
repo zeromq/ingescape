@@ -22,9 +22,10 @@
         <file>resources/images/gear2.png</file>
         <file>resources/images/gear3.png</file>
         <file>resources/examples/MultiplyBy2.qml</file>
-        <file>resources/examples/MultiplyBy2_alternativeVersion1.qml</file>
-        <file>resources/examples/MultiplyBy2_alternativeVersion2.qml</file>
         <file>resources/examples/Gauges.qml</file>
         <file>resources/examples/SimpleMap.qml</file>
+        <file>resources/examples/MultiplyBy2_alternativeVersion1.qml</file>
+        <file>resources/examples/MultiplyBy2_alternativeVersion2.qml</file>
+        <file>resources/examples/MultiplyBy2_alternativeVersion3.qml</file>
     </qresource>
 </RCC>

@@ -8,7 +8,7 @@ Item {
     // Behavior
     Component.onCompleted: {
         // Set agent name and definition info
-        Mastic.agentName = "MultiplyBy2-agent-alternativeVersion1"
+        Mastic.agentName = "MultiplyBy2-agent-alternativeVersion3"
         Mastic.definitionName = Mastic.agentName;
         Mastic.definitionDescription = "Definition of " + Mastic.agentName;
         Mastic.definitionVersion = "0.0";
@@ -18,16 +18,14 @@ Item {
 
         // Create an output
         Mastic.createOutputDouble("result");
-    }
 
-    // Use a Connection to observe a specific input
-    Connections {
-        target: Mastic.inputs
-
-        onOperandChanged: {
+        // Observe inputs (javascript)
+        Mastic.observeInput.connect(function(name, value) {
+           console.log("Input " + name + " has changed - its new value is " + value);
             Mastic.outputs.result = Mastic.inputs.operand * 2;
-        }
+        });
     }
+
 
     // Feedback
     Text {

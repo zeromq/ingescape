@@ -122,6 +122,7 @@ PlaygroundController::PlaygroundController(QQmlEngine* engine, QJSEngine* script
             << new PlaygroundExample("MultiplyBy2.qml", "Multiply a number by 2")
             << new PlaygroundExample("MultiplyBy2_alternativeVersion1.qml", "Multiply a number by 2 (alternative version 1)")
             << new PlaygroundExample("MultiplyBy2_alternativeVersion2.qml", "Multiply a number by 2 (alternative version 2)")
+            << new PlaygroundExample("MultiplyBy2_alternativeVersion3.qml", "Multiply a number by 2 (alternative version 3)")
             << new PlaygroundExample("Clock.qml", "Clock: set time based on inputs")
             << new PlaygroundExample("DragNDrop.qml", "Drag-n-drop: send 2D absolute coordinates")
             << new PlaygroundExample("VirtualJoystick.qml", "Virtual joystick: send 2D relative coordinates")
