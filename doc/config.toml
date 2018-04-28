@@ -28,7 +28,9 @@ credit = false
 customCSS = false
 cacheBustCSS = false
 cacheBustJS = false
-ajaxFormspree = true
+ajaxFormspree = false
+ajaxFormspreeGold = false
+ajaxBasin = "https://usebasin.com/f/d23020079791"
 
 [[menu.main]]
 name = "Overview"

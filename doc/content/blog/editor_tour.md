@@ -1,7 +1,7 @@
 ---
 title: "ingeScape editor, take the tour !"
 date: 2018-04-23T15:35:00+02:00
-draft: true
+draft: false
 ---
 
 This article presents the high-level features of the ingeScape editor. We do not go into details here but you will have a good overview of this application after your read.
