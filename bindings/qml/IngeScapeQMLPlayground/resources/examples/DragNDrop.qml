@@ -1,6 +1,6 @@
 import QtQuick 2.9
 
-import MasticQuick 1.0
+import IngeScapeQuick 1.0
 
 
 Item {
@@ -12,10 +12,10 @@ Item {
     // Behavior
     Component.onCompleted: {
         // Set agent name and definition info
-        Mastic.agentName = "Simple-dragNDrop-agent"
-        Mastic.definitionName = Mastic.agentName;
-        Mastic.definitionDescription = "Definition of " + Mastic.agentName;
-        Mastic.definitionVersion = "0.0";
+        IngeScape.agentName = "Simple-dragNDrop-agent"
+        IngeScape.definitionName = IngeScape.agentName;
+        IngeScape.definitionDescription = "Definition of " + IngeScape.agentName;
+        IngeScape.definitionVersion = "0.0";
     }
 
 
@@ -61,13 +61,13 @@ Item {
         }
 
 
-        // Color is exposed as a Mastic input named 'rect_color'
-        MasticInputBinding on color {
+        // Color is exposed as a IngeScape input named 'rect_color'
+        IngeScapeInputBinding on color {
             inputName: "rect_color"
         }
 
-        // X and Y are exposed as Mastic outputs named 'rect_x' and 'rect_x'
-        MasticOutputBinding {
+        // X and Y are exposed as IngeScape outputs named 'rect_x' and 'rect_x'
+        IngeScapeOutputBinding {
             target: myRectangle
             properties: "x, y"
             outputsPrefix: "rect_"

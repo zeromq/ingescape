@@ -1,7 +1,7 @@
-// Mastic Quick
-Mastic
-MasticInputBinding
-MasticOutputBinding
+// IngeScape Quick
+IngeScape
+IngeScapeInputBinding
+IngeScapeOutputBinding
 
 
 // Qt Quick

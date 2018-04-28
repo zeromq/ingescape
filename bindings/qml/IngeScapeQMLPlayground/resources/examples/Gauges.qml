@@ -2,7 +2,7 @@ import QtQuick 2.0
 import QtQuick.Extras 1.4
 import QtQuick.Controls.Styles 1.4
 
-import MasticQuick 1.0
+import IngeScapeQuick 1.0
 
 Rectangle {
     id: root
@@ -14,10 +14,10 @@ Rectangle {
     // Behavior
     Component.onCompleted: {
         // Set agent name and definition info
-        Mastic.agentName = "Gauges-agent"
-        Mastic.definitionName = Mastic.agentName;
-        Mastic.definitionDescription = "Definition of " + Mastic.agentName;
-        Mastic.definitionVersion = "0.0";
+        IngeScape.agentName = "Gauges-agent"
+        IngeScape.definitionName = IngeScape.agentName;
+        IngeScape.definitionDescription = "Definition of " + IngeScape.agentName;
+        IngeScape.definitionVersion = "0.0";
     }
 
 
@@ -49,8 +49,8 @@ Rectangle {
 
             value: 0
 
-            // Link our "value" property to a Mastic input named 'absoluteCX'
-            MasticInputBinding on value {
+            // Link our "value" property to a IngeScape input named 'absoluteCX'
+            IngeScapeInputBinding on value {
                 inputName: "absoluteCX"
             }
         }
@@ -73,8 +73,8 @@ Rectangle {
                 tickmarkStepSize: 0.25
             }
 
-            // Link our "value" property to a Mastic input named 'relativeCX'
-            MasticInputBinding on value {
+            // Link our "value" property to a IngeScape input named 'relativeCX'
+            IngeScapeInputBinding on value {
                 inputName: "relativeCX"
             }
         }
@@ -106,8 +106,8 @@ Rectangle {
 
             value: 0
 
-            // Link our "value" property to a Mastic input named 'absoluteX'
-            MasticInputBinding on value {
+            // Link our "value" property to a IngeScape input named 'absoluteX'
+            IngeScapeInputBinding on value {
                 inputName: "absoluteX"
             }
         }
@@ -126,8 +126,8 @@ Rectangle {
 
             value: 0
 
-            // Link our "value" property to a Mastic input named 'relativeX'
-            MasticInputBinding on value {
+            // Link our "value" property to a IngeScape input named 'relativeX'
+            IngeScapeInputBinding on value {
                 inputName: "relativeX"
             }
         }

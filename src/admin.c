@@ -1,6 +1,6 @@
 //
 //  admin.c
-//  mastic
+//  ingescape
 //
 //  Created by Stephane Vales on 01/12/2017.
 //  Copyright © 2017 Ingenuity i/o. All rights reserved.
@@ -20,20 +20,20 @@
 #include <pthread.h>
 #endif
 
-#include "mastic.h"
-#include "mastic_private.h"
+#include "ingescape.h"
+#include "ingescape_private.h"
 
-#define MASTIC_MAJOR 0
-#define MASTIC_MINOR 8
-#define MASTIC_MICRO 1
-#define MASTIC_VERSION ((MASTIC_MAJOR * 10000) + (MASTIC_MINOR * 100) + MASTIC_MICRO)
+#define INGESCAPE_MAJOR 0
+#define INGESCAPE_MINOR 8
+#define INGESCAPE_MICRO 1
+#define INGESCAPE_VERSION ((INGESCAPE_MAJOR * 10000) + (INGESCAPE_MINOR * 100) + INGESCAPE_MICRO)
 
 FILE *fp = NULL;
 bool admin_logInStream = false;
 bool logInFile = false;
 bool logInConsole = false;
 bool useColorInConsole = false;
-mtic_logLevel_t logLevel = MTIC_LOG_INFO;
+igs_logLevel_t logLevel = MTIC_LOG_INFO;
 char logFile[1024] = "";
 char logContent[2048] = "";
 char logTime[128] = "";
@@ -185,12 +185,12 @@ void admin_unlock(void) {
 // PUBLIC API
 ////////////////////////////////////////////////////////////////////////
 
-int mtic_version(void){
-    mtic_info("Mastic version : %d.%d.%d\n", MASTIC_MAJOR, MASTIC_MINOR, MASTIC_MICRO);
-    return MASTIC_VERSION;
+int igs_version(void){
+    igs_info("IngeScape version : %d.%d.%d\n", INGESCAPE_MAJOR, INGESCAPE_MINOR, INGESCAPE_MICRO);
+    return INGESCAPE_VERSION;
 }
 
-void mtic_log(mtic_logLevel_t level, const char *function, const char *fmt, ...){
+void igs_log(igs_logLevel_t level, const char *function, const char *fmt, ...){
     admin_lock();
 
     va_list list;
@@ -207,7 +207,7 @@ void mtic_log(mtic_logLevel_t level, const char *function, const char *fmt, ...)
     if (logInFile){
         //create default path if current is empty
         if (strlen(logFile) == 0){
-            char *name = mtic_getAgentName();
+            char *name = igs_getAgentName();
 #if defined(__unix__) || defined(__unix) || \
 (defined(__APPLE__) && defined(__MACH__))
             snprintf(logFile, 1023, "~/%s_log.csv", name);
@@ -257,55 +257,55 @@ void mtic_log(mtic_logLevel_t level, const char *function, const char *fmt, ...)
 
 }
 
-void mtic_setLogLevel (mtic_logLevel_t level){
+void igs_setLogLevel (igs_logLevel_t level){
     logLevel = level;
 }
 
-mtic_logLevel_t mtic_getLogLevel (void) {
+igs_logLevel_t igs_getLogLevel (void) {
     return logLevel;
 }
 
-void mtic_setLogInFile (bool allow){
+void igs_setLogInFile (bool allow){
     logInFile = allow;
 }
 
-bool mtic_getLogInFile (void) {
+bool igs_getLogInFile (void) {
     return logInFile;
 }
 
-void mtic_setVerbose (bool allow){
+void igs_setVerbose (bool allow){
     logInConsole = allow;
 }
 
-bool mtic_isVerbose (void) {
+bool igs_isVerbose (void) {
     return logInConsole;
 }
 
-void mtic_setUseColorVerbose (bool allow){
+void igs_setUseColorVerbose (bool allow){
     useColorInConsole = allow;
 }
 
-bool mtic_getUseColorVerbose (void) {
+bool igs_getUseColorVerbose (void) {
     return useColorInConsole;
 }
 
-void mtic_setLogStream(bool stream){
+void igs_setLogStream(bool stream){
     if (agentElements != NULL){
         if (stream){
-            mtic_warn("agent is already started, log stream cannot be created anymore");
+            igs_warn("agent is already started, log stream cannot be created anymore");
         }else{
-            mtic_warn("agent is already started, log stream cannot be disabled anymore");
+            igs_warn("agent is already started, log stream cannot be disabled anymore");
         }
         return;
     }
     admin_logInStream = stream;
 }
 
-bool mtic_getLogStream (void) {
+bool igs_getLogStream (void) {
     return admin_logInStream;
 }
 
-void mtic_setLogPath(const char *path){
+void igs_setLogPath(const char *path){
     if ((path != NULL) && (strlen(path) > 0)){
         bool needToResetFile = false;
         if (fp != NULL){
@@ -319,21 +319,21 @@ void mtic_setLogPath(const char *path){
             fclose(fp);
             fp = NULL;
             if (access(logFile, W_OK) == -1){
-                mtic_info("creating new log file: %s", logFile);
+                igs_info("creating new log file: %s", logFile);
             }
             fp = fopen (logFile,"a");
             if (fp == NULL){
-                mtic_error("error when trying to initiate log file at path %s", logFile);
+                igs_error("error when trying to initiate log file at path %s", logFile);
             }else{
-                mtic_info("switching to new log file: %s", logFile);
+                igs_info("switching to new log file: %s", logFile);
             }
             admin_unlock();
         }
     }else{
-        mtic_error("passed path cannot be NULL or with length equal to zero");
+        igs_error("passed path cannot be NULL or with length equal to zero");
     }
 }
 
-char* mtic_getLogPath (void) {
+char* igs_getLogPath (void) {
     return strdup(logFile);
 }

@@ -1,5 +1,5 @@
 import QtQuick 2.9
-import MasticQuick 1.0
+import IngeScapeQuick 1.0
 
 
 Item {
@@ -15,13 +15,13 @@ Item {
     property real joystickX: 0
     property real joystickY: 0
 
-    // Expose our joystickX property as a Mastic output named 'x'
-    MasticOutputBinding on joystickX {
+    // Expose our joystickX property as a IngeScape output named 'x'
+    IngeScapeOutputBinding on joystickX {
         outputName: "x"
     }
 
-    // Expose our joystickY property as a Mastic output named 'y'
-    MasticOutputBinding on joystickY {
+    // Expose our joystickY property as a IngeScape output named 'y'
+    IngeScapeOutputBinding on joystickY {
         outputName: "y"
     }
 
@@ -29,10 +29,10 @@ Item {
     // Behavior
     Component.onCompleted: {
         // Set agent name and definition info
-        Mastic.agentName = "QmlVirtualJoystick-agent"
-        Mastic.definitionName = Mastic.agentName;
-        Mastic.definitionDescription = "Definition of " + Mastic.agentName;
-        Mastic.definitionVersion = "0.0";
+        IngeScape.agentName = "QmlVirtualJoystick-agent"
+        IngeScape.definitionName = IngeScape.agentName;
+        IngeScape.definitionDescription = "Definition of " + IngeScape.agentName;
+        IngeScape.definitionVersion = "0.0";
     }
 
 

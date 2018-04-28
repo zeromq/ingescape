@@ -1,0 +1,173 @@
+/*
+ *	IngeScape Editor
+ *
+ *  Copyright © 2017 Ingenuity i/o. All rights reserved.
+ *
+ *	See license terms for the rights and conditions
+ *	defined by copyright holders.
+ *
+ *
+ *	Contributors:
+ *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
+ *
+ */
+
+#ifndef ACTIONM_H
+#define ACTIONM_H
+
+#include <QObject>
+#include <QtQml>
+#include <QQmlEngine>
+#include <QJSEngine>
+#include <QColor>
+
+#include "I2PropertyHelpers.h"
+
+#include <viewModel/scenario/actionconditionvm.h>
+#include <viewModel/scenario/actioneffectvm.h>
+
+/**
+  * @brief Validation duration type for an action
+  * Types:
+  * - Custom
+  * - Immediate
+  * - Forever
+  */
+I2_ENUM_CUSTOM(ValidationDurationType, IMMEDIATE, FOREVER, CUSTOM)
+
+
+/**
+ * @brief The ActionM class defines an action main model
+ */
+class ActionM: public QObject
+{
+    Q_OBJECT
+
+    // Action name
+    I2_QML_PROPERTY(QString, name)
+
+    // Validity duration type
+    I2_QML_PROPERTY(ValidationDurationType::Value, validityDurationType)
+
+    // Validity duration in milliseconds
+    I2_QML_PROPERTY(int, validityDuration)
+
+    // Validity duration in milliseconds in string format
+    I2_QML_PROPERTY_CUSTOM_SETTER(QString, validityDurationString)
+
+    // Flag indicating if we shall revert effect(s) of our action
+    I2_QML_PROPERTY_CUSTOM_SETTER(bool, shallRevert)
+
+    // Shall revert action when validity is over
+    I2_QML_PROPERTY(bool, shallRevertWhenValidityIsOver)
+
+    // Shall revert after date time flag
+    I2_QML_PROPERTY(bool, shallRevertAfterTime)
+
+    // Revert after time in milliseconds
+    I2_QML_PROPERTY(int, revertAfterTime)
+
+    // Revert after time in string format
+    I2_QML_PROPERTY_CUSTOM_SETTER(QString, revertAfterTimeString)
+
+    // Flag to rearm the action
+    I2_QML_PROPERTY(bool, shallRearm)
+
+    // Rearm after time in milliseconds
+    I2_QML_PROPERTY(int, rearmAfterTime)
+
+    // Rearm after time in string format
+    I2_QML_PROPERTY_CUSTOM_SETTER(QString, rearmAfterTimeString)
+
+    // FIXME: a Model must not contain a VM
+    // List of effects for the action
+    I2_QOBJECT_LISTMODEL(ActionEffectVM, effectsList)
+
+    // FIXME: a Model must not contain a VM
+    // List of conditions for the action
+    I2_QOBJECT_LISTMODEL(ActionConditionVM, conditionsList)
+
+    // Flag indicating if all conditions of our action are valid
+    I2_QML_PROPERTY(bool, isValid)
+
+    // Is connected flag
+    I2_QML_PROPERTY(bool, isConnected)
+
+
+public:
+
+    /**
+     * @brief Default constructor
+     * @param parent
+     */
+    explicit ActionM(QString name, QObject *parent = 0);
+
+
+    /**
+      * @brief Destructor
+      */
+    ~ActionM();
+
+
+    /**
+     * @brief Copy from another action model
+     * @param action model to copy
+     */
+    void copyFrom(ActionM* actionModel);
+
+
+    /**
+     * @brief Initialize connections for conditions
+     */
+    void initializeConditionsConnections();
+
+
+    /**
+     * @brief Reset connections for conditions
+     */
+    void resetConditionsConnections();
+
+    /**
+     * @brief Add effect to the list
+     */
+    void addEffectToList(ActionEffectVM* effectVM);
+
+    /**
+     * @brief Add condition to the list
+     */
+    void addConditionToList(ActionConditionVM* conditionVM);
+
+
+Q_SIGNALS:
+
+
+public Q_SLOTS:
+
+protected Q_SLOTS:
+
+    /**
+     * @brief Slot on the condition validation change
+     */
+    void _onConditionValidationChange(bool isValid);
+
+    /**
+     * @brief Triggered when an agent model associated to an effect has been destroyed from the mapping
+     *        The effect does not need to exist anymore, we can delete it
+     */
+    void _onEffectDestructionAsked();
+
+    /**
+     * @brief Triggered when an agent model associated to a condition has been destroyed from the mapping
+     *        The condition does not need to exist anymore, we can delete it
+     */
+    void _onConditionDestructionAsked();
+
+protected:
+
+
+
+};
+
+QML_DECLARE_TYPE(ActionM)
+
+#endif // ACTIONM_H

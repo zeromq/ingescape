@@ -1,0 +1,337 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		9709EE1E2094B2270056023F /* libczmq.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9709EE1A2094B2270056023F /* libczmq.a */; };
+		9709EE1F2094B2270056023F /* libsodium.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9709EE1B2094B2270056023F /* libsodium.a */; };
+		9709EE202094B2270056023F /* libzmq.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9709EE1C2094B2270056023F /* libzmq.a */; };
+		9709EE212094B2270056023F /* libzyre.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9709EE1D2094B2270056023F /* libzyre.a */; };
+		978D6DF11CB26F9B0082016E /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 978D6DF01CB26F9B0082016E /* main.c */; };
+		97D1AF321CD3B4DA00C6B742 /* zregex.c in Sources */ = {isa = PBXBuildFile; fileRef = 97D1AF301CD3B4DA00C6B742 /* zregex.c */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		978D6DEB1CB26F9B0082016E /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		9709EE1A2094B2270056023F /* libczmq.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libczmq.a; path = ../../../../../../../../usr/local/Cellar/czmq/4.1.1/lib/libczmq.a; sourceTree = "<group>"; };
+		9709EE1B2094B2270056023F /* libsodium.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsodium.a; path = ../../../../../../../../usr/local/Cellar/libsodium/1.0.16/lib/libsodium.a; sourceTree = "<group>"; };
+		9709EE1C2094B2270056023F /* libzmq.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libzmq.a; path = ../../../../../../../../usr/local/Cellar/zeromq/4.2.5/lib/libzmq.a; sourceTree = "<group>"; };
+		9709EE1D2094B2270056023F /* libzyre.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libzyre.a; path = ../../../../../../../../usr/local/Cellar/zyre/2.0.0/lib/libzyre.a; sourceTree = "<group>"; };
+		972F6B051CDBA1BF00CF2CF4 /* libut.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libut.h; sourceTree = "<group>"; };
+		972F6B061CDBA1BF00CF2CF4 /* ringbuf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ringbuf.h; sourceTree = "<group>"; };
+		972F6B071CDBA1BF00CF2CF4 /* utarray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utarray.h; sourceTree = "<group>"; };
+		972F6B081CDBA1BF00CF2CF4 /* uthash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = uthash.h; sourceTree = "<group>"; };
+		972F6B091CDBA1BF00CF2CF4 /* utlist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utlist.h; sourceTree = "<group>"; };
+		972F6B0A1CDBA1BF00CF2CF4 /* utmm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utmm.h; sourceTree = "<group>"; };
+		972F6B0B1CDBA1BF00CF2CF4 /* utringbuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utringbuffer.h; sourceTree = "<group>"; };
+		972F6B0C1CDBA1BF00CF2CF4 /* utstring.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utstring.h; sourceTree = "<group>"; };
+		972F6B0D1CDBA1BF00CF2CF4 /* utvector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utvector.h; sourceTree = "<group>"; };
+		978D6DED1CB26F9B0082016E /* ingeprobe */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ingeprobe; sourceTree = BUILT_PRODUCTS_DIR; };
+		978D6DF01CB26F9B0082016E /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		97D1AF301CD3B4DA00C6B742 /* zregex.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = zregex.c; sourceTree = "<group>"; };
+		97D1AF311CD3B4DA00C6B742 /* zregex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = zregex.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		978D6DEA1CB26F9B0082016E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9709EE1E2094B2270056023F /* libczmq.a in Frameworks */,
+				9709EE1F2094B2270056023F /* libsodium.a in Frameworks */,
+				9709EE202094B2270056023F /* libzmq.a in Frameworks */,
+				9709EE212094B2270056023F /* libzyre.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		9709EE192094B2270056023F /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				9709EE1A2094B2270056023F /* libczmq.a */,
+				9709EE1B2094B2270056023F /* libsodium.a */,
+				9709EE1C2094B2270056023F /* libzmq.a */,
+				9709EE1D2094B2270056023F /* libzyre.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		972F6B041CDBA1BF00CF2CF4 /* uthash */ = {
+			isa = PBXGroup;
+			children = (
+				972F6B051CDBA1BF00CF2CF4 /* libut.h */,
+				972F6B061CDBA1BF00CF2CF4 /* ringbuf.h */,
+				972F6B071CDBA1BF00CF2CF4 /* utarray.h */,
+				972F6B081CDBA1BF00CF2CF4 /* uthash.h */,
+				972F6B091CDBA1BF00CF2CF4 /* utlist.h */,
+				972F6B0A1CDBA1BF00CF2CF4 /* utmm.h */,
+				972F6B0B1CDBA1BF00CF2CF4 /* utringbuffer.h */,
+				972F6B0C1CDBA1BF00CF2CF4 /* utstring.h */,
+				972F6B0D1CDBA1BF00CF2CF4 /* utvector.h */,
+			);
+			path = uthash;
+			sourceTree = "<group>";
+		};
+		978D6DE41CB26F9B0082016E = {
+			isa = PBXGroup;
+			children = (
+				978D6DEF1CB26F9B0082016E /* ingeprobe */,
+				978D6DEE1CB26F9B0082016E /* Products */,
+				9709EE192094B2270056023F /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		978D6DEE1CB26F9B0082016E /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				978D6DED1CB26F9B0082016E /* ingeprobe */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		978D6DEF1CB26F9B0082016E /* ingeprobe */ = {
+			isa = PBXGroup;
+			children = (
+				972F6B041CDBA1BF00CF2CF4 /* uthash */,
+				97D1AF301CD3B4DA00C6B742 /* zregex.c */,
+				97D1AF311CD3B4DA00C6B742 /* zregex.h */,
+				978D6DF01CB26F9B0082016E /* main.c */,
+			);
+			path = ingeprobe;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		978D6DEC1CB26F9B0082016E /* ingeprobe */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 978D6DF41CB26F9B0082016E /* Build configuration list for PBXNativeTarget "ingeprobe" */;
+			buildPhases = (
+				978D6DE91CB26F9B0082016E /* Sources */,
+				978D6DEA1CB26F9B0082016E /* Frameworks */,
+				978D6DEB1CB26F9B0082016E /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ingeprobe;
+			productName = zyreprobe;
+			productReference = 978D6DED1CB26F9B0082016E /* ingeprobe */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		978D6DE51CB26F9B0082016E /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0900;
+				ORGANIZATIONNAME = "Ingenuity i/o";
+				TargetAttributes = {
+					978D6DEC1CB26F9B0082016E = {
+						CreatedOnToolsVersion = 7.3;
+					};
+				};
+			};
+			buildConfigurationList = 978D6DE81CB26F9B0082016E /* Build configuration list for PBXProject "ingeprobe" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 978D6DE41CB26F9B0082016E;
+			productRefGroup = 978D6DEE1CB26F9B0082016E /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				978D6DEC1CB26F9B0082016E /* ingeprobe */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		978D6DE91CB26F9B0082016E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				97D1AF321CD3B4DA00C6B742 /* zregex.c in Sources */,
+				978D6DF11CB26F9B0082016E /* main.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		978D6DF21CB26F9B0082016E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		978D6DF31CB26F9B0082016E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		978D6DF51CB26F9B0082016E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				HEADER_SEARCH_PATHS = /usr/local/include/;
+				LIBRARY_SEARCH_PATHS = (
+					/usr/local/lib/,
+					"$(PROJECT_DIR)",
+					/usr/local/Cellar/czmq/4.1.1/lib,
+					/usr/local/Cellar/libsodium/1.0.16/lib,
+					/usr/local/Cellar/zeromq/4.2.5/lib,
+					/usr/local/Cellar/zyre/2.0.0/lib,
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		978D6DF61CB26F9B0082016E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				HEADER_SEARCH_PATHS = /usr/local/include/;
+				LIBRARY_SEARCH_PATHS = (
+					/usr/local/lib/,
+					"$(PROJECT_DIR)",
+					/usr/local/Cellar/czmq/4.1.1/lib,
+					/usr/local/Cellar/libsodium/1.0.16/lib,
+					/usr/local/Cellar/zeromq/4.2.5/lib,
+					/usr/local/Cellar/zyre/2.0.0/lib,
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		978D6DE81CB26F9B0082016E /* Build configuration list for PBXProject "ingeprobe" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				978D6DF21CB26F9B0082016E /* Debug */,
+				978D6DF31CB26F9B0082016E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		978D6DF41CB26F9B0082016E /* Build configuration list for PBXNativeTarget "ingeprobe" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				978D6DF51CB26F9B0082016E /* Debug */,
+				978D6DF61CB26F9B0082016E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 978D6DE51CB26F9B0082016E /* Project object */;
+}

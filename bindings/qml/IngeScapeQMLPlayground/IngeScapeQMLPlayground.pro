@@ -73,9 +73,9 @@ QML_IMPORT_PATH = ../ .
 QML_DESIGNER_IMPORT_PATH =
 
 
-# Include MasticQuick
-!include(../MasticQuick/MasticQuick.pri) {
-    error(Could not load MasticQuick.pri)
+# Include IngeScapeQuick
+!include(../IngeScapeQuick/IngeScapeQuick.pri) {
+    error(Could not load IngeScapeQuick.pri)
 }
 
 

@@ -14,7 +14,7 @@
 #ifdef _WIN32
 #include "unixfunctions.h"
 #endif
-#include "mastic_private.h"
+#include "ingescape_private.h"
 #include "uthash/utlist.h"
 
 ////////////////////////////////////////////////////////////////////////
@@ -22,7 +22,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 void model_runObserveCallbacksForIOP(agent_iop_t *iop, void *value, long valueSize){
-    mtic_observe_callback_t *cb;
+    igs_observe_callback_t *cb;
     DL_FOREACH(iop->callbacks, cb){
         cb->callback_ptr(iop->type, iop->name, iop->value_type, value, valueSize, cb->data);
     }
@@ -48,64 +48,64 @@ char* model_doubleToString(const double value){
     return str;
 }
 
-static int model_observe(const char* name, iop_t iopType, mtic_observeCallback cb, void* myData){
+static int model_observe(const char* name, iop_t iopType, igs_observeCallback cb, void* myData){
 
     //find the iop
     agent_iop_t *iop = model_findIopByName((char*) name, iopType);
 
     // Check if the input has been returned.
     if(iop == NULL){
-        mtic_error("Cannot find %s with type %d", name, iopType);
+        igs_error("Cannot find %s with type %d", name, iopType);
         return 0;
     }
 
     //callback not defined
     if(cb == NULL) {
-        mtic_error("Callback cannot be NULL (called for %s)", name);
+        igs_error("Callback cannot be NULL (called for %s)", name);
         return 0;
     }
 
-    mtic_observe_callback_t *new_callback = malloc(sizeof(mtic_observe_callback_t));
+    igs_observe_callback_t *new_callback = malloc(sizeof(igs_observe_callback_t));
     new_callback->callback_ptr = cb;
     new_callback->data = myData;
     DL_APPEND(iop->callbacks, new_callback);
 
-    //mtic_trace("observe iop with name %s and type %d\n", name, iopType);
+    //igs_trace("observe iop with name %s and type %d\n", name, iopType);
 
     return 1;
 }
 
 iopType_t model_getTypeForIOP(const char *name, iop_t type){
     if((name == NULL) || (strlen(name) == 0)){
-        mtic_error("Name cannot be NULL or empty");
+        igs_error("Name cannot be NULL or empty");
         return 0;
     }
-    if(mtic_internal_definition == NULL){
-        mtic_error("Definition is NULL");
+    if(igs_internal_definition == NULL){
+        igs_error("Definition is NULL");
         return -1;
     }
     
     agent_iop_t *iop = NULL;
     if (type == INPUT_T){
-        HASH_FIND_STR(mtic_internal_definition->inputs_table, name, iop);
+        HASH_FIND_STR(igs_internal_definition->inputs_table, name, iop);
         if(iop == NULL){
-            mtic_error("Input %s cannot be found", name);
+            igs_error("Input %s cannot be found", name);
             return -1;
         }
     } else if (type == OUTPUT_T){
-        HASH_FIND_STR(mtic_internal_definition->outputs_table, name, iop);
+        HASH_FIND_STR(igs_internal_definition->outputs_table, name, iop);
         if(iop == NULL){
-            mtic_error("Output %s cannot be found", name);
+            igs_error("Output %s cannot be found", name);
             return -1;
         }
     } else if (type == PARAMETER_T){
-        HASH_FIND_STR(mtic_internal_definition->params_table, name, iop);
+        HASH_FIND_STR(igs_internal_definition->params_table, name, iop);
         if(iop == NULL){
-            mtic_error("Parameter %s cannot be found", name);
+            igs_error("Parameter %s cannot be found", name);
             return -1;
         }
     }else{
-        mtic_error("Unknown IOP type %d", type);
+        igs_error("Unknown IOP type %d", type);
         return -1;
     }
     
@@ -114,13 +114,13 @@ iopType_t model_getTypeForIOP(const char *name, iop_t type){
 
 agent_iop_t *model_findInputByName(const char *name){
     agent_iop_t *found = NULL;
-    if(name != NULL && mtic_internal_definition != NULL){
-        HASH_FIND_STR( mtic_internal_definition->inputs_table, name, found );
+    if(name != NULL && igs_internal_definition != NULL){
+        HASH_FIND_STR( igs_internal_definition->inputs_table, name, found );
     }else{
         if (name == NULL || strlen(name) == 0){
-            mtic_error("Input name cannot be NULL or empty");
+            igs_error("Input name cannot be NULL or empty");
         }else{
-            mtic_error("Definition is NULL");
+            igs_error("Definition is NULL");
         }
     }
     return found;
@@ -128,13 +128,13 @@ agent_iop_t *model_findInputByName(const char *name){
 
 agent_iop_t *model_findOutputByName(const char *name){
     agent_iop_t *found = NULL;
-    if(name != NULL && mtic_internal_definition != NULL){
-        HASH_FIND_STR( mtic_internal_definition->outputs_table, name, found );
+    if(name != NULL && igs_internal_definition != NULL){
+        HASH_FIND_STR( igs_internal_definition->outputs_table, name, found );
     }else{
         if (name == NULL || strlen(name) == 0){
-            mtic_error("Output name cannot be NULL or empty");
+            igs_error("Output name cannot be NULL or empty");
         }else{
-            mtic_error("Definition is NULL");
+            igs_error("Definition is NULL");
         }
     }
     return found;
@@ -142,13 +142,13 @@ agent_iop_t *model_findOutputByName(const char *name){
 
 agent_iop_t *model_findParameterByName(const char *name){
     agent_iop_t *found = NULL;
-    if(name != NULL && mtic_internal_definition != NULL){
-        HASH_FIND_STR( mtic_internal_definition->params_table, name, found );
+    if(name != NULL && igs_internal_definition != NULL){
+        HASH_FIND_STR( igs_internal_definition->params_table, name, found );
     }else{
         if (name == NULL || strlen(name) == 0){
-            mtic_error("Parameter name cannot be NULL or empty");
+            igs_error("Parameter name cannot be NULL or empty");
         }else{
-            mtic_error("Definition is NULL");
+            igs_error("Definition is NULL");
         }
     }
     return found;
@@ -157,7 +157,7 @@ agent_iop_t *model_findParameterByName(const char *name){
 void* model_getValueFor(const char *name, iop_t type){
     agent_iop_t *iop = model_findIopByName((char*) name,type);
     if(iop == NULL){
-        mtic_error("%s not found", name);
+        igs_error("%s not found", name);
         return NULL;
     }
     switch (iop->value_type) {
@@ -180,16 +180,16 @@ void* model_getValueFor(const char *name, iop_t type){
             return iop->value.data;
             break;
         default:
-            mtic_error("Unknown value type for %s", name);
+            igs_error("Unknown value type for %s", name);
             break;
     }
     return NULL;
 }
 
-int mtic_readIOP(const char *name, iop_t type, void **value, long *size){
+int igs_readIOP(const char *name, iop_t type, void **value, long *size){
     agent_iop_t *iop = model_findIopByName((char*) name, type);
     if(iop == NULL){
-        mtic_error("%s not found", name);
+        igs_error("%s not found", name);
         return 0;
     }
     if (iop->value_type == IMPULSION_T){
@@ -212,36 +212,36 @@ bool model_readIopAsBool (const char *name, iop_t type){
                 break;
                 
             case INTEGER_T:
-                mtic_warn("Implicit conversion from int to bool for %s", name);
+                igs_warn("Implicit conversion from int to bool for %s", name);
                 return (iop->value.i == 0)?false:true;
                 break;
                 
             case DOUBLE_T:
-                mtic_warn("Implicit conversion from double to bool for %s", name);
+                igs_warn("Implicit conversion from double to bool for %s", name);
                 return (iop->value.d == 0)?false:true;
                 break;
                 
             case STRING_T:
                 if (strcmp(iop->value.s, "true") == 0){
-                    mtic_warn("Implicit conversion from string to bool for %s", name);
+                    igs_warn("Implicit conversion from string to bool for %s", name);
                     return true;
                 }
                 else if (strcmp(iop->value.s, "false") == 0){
-                    mtic_warn("Implicit conversion from string to bool for %s", name);
+                    igs_warn("Implicit conversion from string to bool for %s", name);
                     return false;
                 }else{
-                    mtic_warn("Implicit conversion from double to bool for %s (string value is %s and false was returned)", name, iop->value.s);
+                    igs_warn("Implicit conversion from double to bool for %s (string value is %s and false was returned)", name, iop->value.s);
                     return false;
                 }
                 break;
                 
             default:
-                mtic_error("No implicit conversion possible for %s (false was returned)", name);
+                igs_error("No implicit conversion possible for %s (false was returned)", name);
                 return false;
                 break;
         }
     }else{
-        mtic_error("%s not found", name);
+        igs_error("%s not found", name);
         return false;
     }
 }
@@ -251,7 +251,7 @@ int model_readIopAsInt (const char *name, iop_t type){
     if(iop != NULL){
         switch(iop->value_type){
             case BOOL_T:
-                mtic_warn("Implicit conversion from bool to int for %s", name);
+                igs_warn("Implicit conversion from bool to int for %s", name);
                 return (iop->value.b)?1:0;
                 break;
                 
@@ -260,7 +260,7 @@ int model_readIopAsInt (const char *name, iop_t type){
                 break;
                 
             case DOUBLE_T:
-                mtic_warn("Implicit conversion from double to int for %s", name);
+                igs_warn("Implicit conversion from double to int for %s", name);
                 if(iop->value.d < 0) {
                     return (int) (iop->value.d - 0.5);
                 }else {
@@ -269,17 +269,17 @@ int model_readIopAsInt (const char *name, iop_t type){
                 break;
                 
             case STRING_T:
-                mtic_warn("Implicit conversion from string %s to int for %s", iop->value.s, name);
+                igs_warn("Implicit conversion from string %s to int for %s", iop->value.s, name);
                 return atoi(iop->value.s);
                 break;
                 
             default:
-                mtic_error("No implicit conversion possible for %s (0 was returned)", name);
+                igs_error("No implicit conversion possible for %s (0 was returned)", name);
                 return 0;
                 break;
         }
     }else{
-        mtic_error("%s not found", name);
+        igs_error("%s not found", name);
         return 0;
     }
 }
@@ -289,12 +289,12 @@ double model_readIopAsDouble (const char *name, iop_t type){
     if(iop != NULL){
         switch(iop->value_type){
             case BOOL_T:
-                mtic_warn("Implicit conversion from bool to double for %s", name);
+                igs_warn("Implicit conversion from bool to double for %s", name);
                 return (iop->value.b)?1:0;
                 break;
                 
             case INTEGER_T:
-                mtic_warn("Implicit conversion from int to double for %s", name);
+                igs_warn("Implicit conversion from int to double for %s", name);
                 return iop->value.i;
                 break;
                 
@@ -303,17 +303,17 @@ double model_readIopAsDouble (const char *name, iop_t type){
                 break;
                 
             case STRING_T:
-                mtic_warn("Implicit conversion from string %s to double for %s", iop->value.s, name);
+                igs_warn("Implicit conversion from string %s to double for %s", iop->value.s, name);
                 return atof(iop->value.s);
                 break;
                 
             default:
-                mtic_error("No implicit conversion possible for %s (0 was returned)", name);
+                igs_error("No implicit conversion possible for %s (0 was returned)", name);
                 return 0;
                 break;
         }
     }else{
-        mtic_error("%s not found", name);
+        igs_error("%s not found", name);
         return 0;
     }
 }
@@ -327,27 +327,27 @@ char *model_readIopAsString (const char *name, iop_t type){
                 break;
                 
             case BOOL_T:
-                mtic_warn("Implicit conversion from bool to string for %s", name);
+                igs_warn("Implicit conversion from bool to string for %s", name);
                 return iop->value.b ? strdup("true") : strdup("false");
                 break;
                 
             case INTEGER_T:
-                mtic_warn("Implicit conversion from int to string for %s", name);
+                igs_warn("Implicit conversion from int to string for %s", name);
                 return model_intToString(iop->value.i);
                 break;
                 
             case DOUBLE_T:
-                mtic_warn("Implicit conversion from double to string for %s", name);
+                igs_warn("Implicit conversion from double to string for %s", name);
                 return model_doubleToString(iop->value.d);
                 break;
                 
             default:
-                mtic_error("No implicit conversion possible for %s (NULL was returned)", name);
+                igs_error("No implicit conversion possible for %s (NULL was returned)", name);
                 return NULL;
                 break;
         }
     }else{
-        mtic_error("%s not found", name);
+        igs_error("%s not found", name);
         return NULL;
     }
 }
@@ -355,13 +355,13 @@ char *model_readIopAsString (const char *name, iop_t type){
 int model_readIopAsData (const char *name, iop_t type, void **value, long *size){
     agent_iop_t *iop = model_findIopByName((char*) name, type);
     if(iop == NULL){
-        mtic_error("%s not found", name);
+        igs_error("%s not found", name);
         *value = NULL;
         *size = 0;
         return 0;
     }
     if(iop->value_type != DATA_T){
-        mtic_error("No implicit conversion possible for %s (NULL was returned)", name);
+        igs_error("No implicit conversion possible for %s (NULL was returned)", name);
         *value = NULL;
         *size = 0;
         return 0;
@@ -374,8 +374,8 @@ int model_readIopAsData (const char *name, iop_t type, void **value, long *size)
 
 bool model_checkIOPExistence(const char *name, agent_iop_t *hash){
     agent_iop_t *iop = NULL;
-    if(mtic_internal_definition == NULL){
-        mtic_error("Definition is NULL");
+    if(igs_internal_definition == NULL){
+        igs_error("Definition is NULL");
         return false;
     }
     HASH_FIND_STR(hash, name, iop);
@@ -386,20 +386,20 @@ bool model_checkIOPExistence(const char *name, agent_iop_t *hash){
 }
 
 char **model_getIopList(long *nbOfElements, iop_t type){
-    if(mtic_internal_definition == NULL){
-        mtic_error("Definition is NULL");
+    if(igs_internal_definition == NULL){
+        igs_error("Definition is NULL");
         return NULL;
     }
     agent_iop_t *hash = NULL;
     switch (type) {
         case INPUT_T:
-            hash = mtic_internal_definition->inputs_table;
+            hash = igs_internal_definition->inputs_table;
             break;
         case OUTPUT_T:
-            hash = mtic_internal_definition->outputs_table;
+            hash = igs_internal_definition->outputs_table;
             break;
         case PARAMETER_T:
-            hash = mtic_internal_definition->params_table;
+            hash = igs_internal_definition->params_table;
             break;
             
         default:
@@ -462,7 +462,7 @@ char* model_getIOPValueAsString (agent_iop_t* iop){
 int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void* value, long size){
     agent_iop_t *iop = model_findIopByName((char*) iopName, iopType);
     if(iop == NULL){
-        mtic_error("%s not found for writing", iopName);
+        igs_error("%s not found for writing", iopName);
         return 0;
     }
     int ret = 1;
@@ -477,19 +477,19 @@ int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void*
                     outSize = iop->valueSize = sizeof(int);
                     iop->value.i = (value == NULL)?0:*(int*)(value);
                     outValue = &(iop->value.i);
-                    mtic_info("set %s to %i", iopName, iop->value.i);
+                    igs_info("set %s to %i", iopName, iop->value.i);
                     break;
                 case DOUBLE_T:
                     outSize = iop->valueSize = sizeof(double);
                     iop->value.d = (value == NULL)?0:*(int*)(value);
                     outValue = &(iop->value.d);
-                    mtic_info("set %s to %lf", iopName, iop->value.d);
+                    igs_info("set %s to %lf", iopName, iop->value.d);
                     break;
                 case BOOL_T:
                     outSize = iop->valueSize = sizeof(bool);
                     iop->value.b = (value == NULL)?false:((*(int*)(value))?true:false);
                     outValue = &(iop->value.b);
-                    mtic_info("set %s to %i", iopName, iop->value.b);
+                    igs_info("set %s to %i", iopName, iop->value.b);
                     break;
                 case STRING_T:
                 {
@@ -505,13 +505,13 @@ int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void*
                     }
                     outSize = iop->valueSize = (strlen(iop->value.s) + 1)*sizeof(char);
                     outValue = iop->value.s;
-                    mtic_info("set %s to %s (length: %d)", iopName, iop->value.s, iop->valueSize - 1);
+                    igs_info("set %s to %s (length: %d)", iopName, iop->value.s, iop->valueSize - 1);
                 }
                     break;
                 case IMPULSION_T:
                     //nothing to do
                     outSize = iop->valueSize = 0;
-                    mtic_info("set impulsion %s", iopName);
+                    igs_info("set impulsion %s", iopName);
                     break;
                 case DATA_T:
                 {
@@ -523,11 +523,11 @@ int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void*
                     memcpy(iop->value.data, value, sizeof(int));
                     outSize = iop->valueSize = sizeof(int);
                     outValue = iop->value.data;
-                    mtic_info("set %s data (length: %d)", iopName, iop->valueSize);
+                    igs_info("set %s data (length: %d)", iopName, iop->valueSize);
                 }
                     break;
                 default:
-                    mtic_error("%s has an invalid value type %d", iopName, iop->value_type);
+                    igs_error("%s has an invalid value type %d", iopName, iop->value_type);
                     ret = 0;
                     break;
             }
@@ -539,19 +539,19 @@ int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void*
                     outSize = iop->valueSize = sizeof(int);
                     iop->value.i = (value == NULL)?0:*(double*)(value);
                     outValue = &(iop->value.i);
-                    mtic_info("set %s to %i", iopName, iop->value.i);
+                    igs_info("set %s to %i", iopName, iop->value.i);
                     break;
                 case DOUBLE_T:
                     outSize = iop->valueSize = sizeof(double);
                     iop->value.d = (value == NULL)?0:*(double*)(value);
                     outValue = &(iop->value.d);
-                    mtic_info("set %s to %lf", iopName, iop->value.d);
+                    igs_info("set %s to %lf", iopName, iop->value.d);
                     break;
                 case BOOL_T:
                     outSize = iop->valueSize = sizeof(bool);
                     iop->value.b = (value == NULL)?false:((*(double*)(value))?true:false);
                     outValue = &(iop->value.b);
-                    mtic_info("set %s to %i", iopName, iop->value.b);
+                    igs_info("set %s to %i", iopName, iop->value.b);
                     break;
                 case STRING_T:
                 {
@@ -567,13 +567,13 @@ int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void*
                     }
                     outSize = iop->valueSize = (strlen(iop->value.s) + 1)*sizeof(char);
                     outValue = iop->value.s;
-                    mtic_info("set %s to %s (length: %d)", iopName, iop->value.s, iop->valueSize - 1);
+                    igs_info("set %s to %s (length: %d)", iopName, iop->value.s, iop->valueSize - 1);
                 }
                     break;
                 case IMPULSION_T:
                     //nothing to do
                     outSize = iop->valueSize = 0;
-                    mtic_info("set impulsion %s", iopName);
+                    igs_info("set impulsion %s", iopName);
                     break;
                 case DATA_T:
                 {
@@ -585,11 +585,11 @@ int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void*
                     memcpy(iop->value.data, value, sizeof(double));
                     outSize = iop->valueSize = sizeof(double);
                     outValue = iop->value.data;
-                    mtic_info("set %s data (length: %d)", iopName, iop->valueSize);
+                    igs_info("set %s data (length: %d)", iopName, iop->valueSize);
                 }
                     break;
                 default:
-                    mtic_error("%s has an invalid value type %d", iopName, iop->value_type);
+                    igs_error("%s has an invalid value type %d", iopName, iop->value_type);
                     ret = 0;
                     break;
             }
@@ -601,19 +601,19 @@ int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void*
                     outSize = iop->valueSize = sizeof(int);
                     iop->value.i = (value == NULL)?0:*(bool*)(value);
                     outValue = &(iop->value.i);
-                    mtic_info("set %s to %i", iopName, iop->value.i);
+                    igs_info("set %s to %i", iopName, iop->value.i);
                     break;
                 case DOUBLE_T:
                     outSize = iop->valueSize = sizeof(double);
                     iop->value.d = (value == NULL)?0:*(bool*)(value);
                     outValue = &(iop->value.d);
-                    mtic_info("set %s to %lf", iopName, iop->value.d);
+                    igs_info("set %s to %lf", iopName, iop->value.d);
                     break;
                 case BOOL_T:
                     outSize = iop->valueSize = sizeof(bool);
                     iop->value.b = (value == NULL)?false:*(bool*)value;
                     outValue = &(iop->value.b);
-                    mtic_info("set %s to %i", iopName, iop->value.b);
+                    igs_info("set %s to %i", iopName, iop->value.b);
                     break;
                 case STRING_T:
                 {
@@ -629,13 +629,13 @@ int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void*
                     }
                     outSize = iop->valueSize = (strlen(iop->value.s) + 1)*sizeof(char);
                     outValue = iop->value.s;
-                    mtic_info("set %s to %s (length: %d)", iopName, iop->value.s, iop->valueSize - 1);
+                    igs_info("set %s to %s (length: %d)", iopName, iop->value.s, iop->valueSize - 1);
                 }
                     break;
                 case IMPULSION_T:
                     //nothing to do
                     outSize = iop->valueSize = 0;
-                    mtic_info("set impulsion %s", iopName);
+                    igs_info("set impulsion %s", iopName);
                     break;
                 case DATA_T:
                 {
@@ -647,11 +647,11 @@ int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void*
                     memcpy(iop->value.data, value, sizeof(bool));
                     outSize = iop->valueSize = sizeof(bool);
                     outValue = iop->value.data;
-                    mtic_info("set %s data (length: %d)", iopName, iop->valueSize);
+                    igs_info("set %s data (length: %d)", iopName, iop->valueSize);
                 }
                     break;
                 default:
-                    mtic_error("%s has an invalid value type %d", iopName, iop->value_type);
+                    igs_error("%s has an invalid value type %d", iopName, iop->value_type);
                     ret = 0;
                     break;
             }
@@ -663,19 +663,19 @@ int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void*
                     outSize = iop->valueSize = sizeof(int);
                     iop->value.i = (value == NULL)?0:atoi((char*)value);
                     outValue = &(iop->value.i);
-                    mtic_info("set %s to %i", iopName, iop->value.i);
+                    igs_info("set %s to %i", iopName, iop->value.i);
                     break;
                 case DOUBLE_T:
                     outSize = iop->valueSize = sizeof(double);
                     iop->value.d = (value == NULL)?0:atof((char*)value);
                     outValue = &(iop->value.d);
-                    mtic_info("set %s to %lf", iopName, iop->value.d);
+                    igs_info("set %s to %lf", iopName, iop->value.d);
                     break;
                 case BOOL_T:
                     outSize = iop->valueSize = sizeof(bool);
                     iop->value.b = (value == NULL)?false:(atoi((char*)value)?true:false);
                     outValue = &(iop->value.b);
-                    mtic_info("set %s to %i", iopName, iop->value.b);
+                    igs_info("set %s to %i", iopName, iop->value.b);
                     break;
                 case STRING_T:
                 {
@@ -689,13 +689,13 @@ int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void*
                     }
                     outSize = iop->valueSize = (strlen(iop->value.s) + 1)*sizeof(char);
                     outValue = iop->value.s;
-                    mtic_info("set %s to %s (length: %d)", iopName, iop->value.s, iop->valueSize - 1);
+                    igs_info("set %s to %s (length: %d)", iopName, iop->value.s, iop->valueSize - 1);
                 }
                     break;
                 case IMPULSION_T:
                     //nothing to do
                     outSize = iop->valueSize = 0;
-                    mtic_info("set impulsion %s", iopName);
+                    igs_info("set impulsion %s", iopName);
                     break;
                 case DATA_T:
                 {
@@ -712,11 +712,11 @@ int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void*
                     }
                     outSize = iop->valueSize = s;
                     outValue = iop->value.data;
-                    mtic_info("set %s data (length: %d)", iopName, s);
+                    igs_info("set %s data (length: %d)", iopName, s);
                 }
                     break;
                 default:
-                    mtic_error("%s has an invalid value type %d", iopName, iop->value_type);
+                    igs_error("%s has an invalid value type %d", iopName, iop->value_type);
                     ret = 0;
                     break;
             }
@@ -725,33 +725,33 @@ int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void*
         case IMPULSION_T:{
             //nothing to do
             outSize = iop->valueSize = 0;
-            mtic_info("set impulsion %s", iopName);
+            igs_info("set impulsion %s", iopName);
         }
             break;
         case DATA_T:{
             switch (iop->value_type) {
                 case INTEGER_T:
-                    mtic_warn("Cannot write data into integer IOP %s", iopName);
+                    igs_warn("Cannot write data into integer IOP %s", iopName);
                     ret = 0;
                     break;
                 case DOUBLE_T:
-                    mtic_warn("Cannot write data into double IOP %s", iopName);
+                    igs_warn("Cannot write data into double IOP %s", iopName);
                     ret = 0;
                     break;
                 case BOOL_T:
-                    mtic_warn("Cannot write data into boolean IOP %s", iopName);
+                    igs_warn("Cannot write data into boolean IOP %s", iopName);
                     ret = 0;
                     break;
                 case STRING_T:
                 {
-                    mtic_warn("Cannot write data into string IOP %s", iopName);
+                    igs_warn("Cannot write data into string IOP %s", iopName);
                     ret = 0;
                 }
                     break;
                 case IMPULSION_T:
                     //nothing to do
                     outSize = iop->valueSize = 0;
-                    mtic_info("set impulsion %s", iopName);
+                    igs_info("set impulsion %s", iopName);
                     break;
                 case DATA_T:
                 {
@@ -763,11 +763,11 @@ int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void*
                     memcpy(iop->value.data, value, size);
                     outSize = iop->valueSize = size;
                     outValue = iop->value.data;
-                    mtic_info("set %s data (length: %d)", iopName, size);
+                    igs_info("set %s data (length: %d)", iopName, size);
                 }
                     break;
                 default:
-                    mtic_error("%s has an invalid value type %d", iopName, iop->value_type);
+                    igs_error("%s has an invalid value type %d", iopName, iop->value_type);
                     ret = 0;
                     break;
             }
@@ -797,7 +797,7 @@ agent_iop_t * model_findIopByName(const char *name, iop_t type){
             return model_findParameterByName(name);
             break;
         default:
-            mtic_error("Unknown IOP type %d", type);
+            igs_error("Unknown IOP type %d", type);
             break;
     }
     
@@ -810,39 +810,39 @@ agent_iop_t * model_findIopByName(const char *name, iop_t type){
 
 // --------------------------------  READ ------------------------------------//
 
-int mtic_readInput(const char *name, void **value, long *size){
-    return mtic_readIOP(name, INPUT_T, value, size);
+int igs_readInput(const char *name, void **value, long *size){
+    return igs_readIOP(name, INPUT_T, value, size);
 }
 
-int mtic_readOutput(const char *name, void **value, long *size){
-    return mtic_readIOP(name, OUTPUT_T, value, size);
+int igs_readOutput(const char *name, void **value, long *size){
+    return igs_readIOP(name, OUTPUT_T, value, size);
 }
 
-int mtic_readParameter(const char *name, void **value, long *size){
-    return mtic_readIOP(name, PARAMETER_T, value, size);
+int igs_readParameter(const char *name, void **value, long *size){
+    return igs_readIOP(name, PARAMETER_T, value, size);
 }
 
-bool mtic_readInputAsBool(const char *name){
+bool igs_readInputAsBool(const char *name){
     return model_readIopAsBool(name, INPUT_T);
 }
 
-int mtic_readInputAsInt(const char *name){
+int igs_readInputAsInt(const char *name){
     return model_readIopAsInt(name, INPUT_T);
 }
 
-double mtic_readInputAsDouble(const char *name){
+double igs_readInputAsDouble(const char *name){
     return model_readIopAsDouble(name, INPUT_T);
 }
 
-char* mtic_readInputAsString(const char *name){
+char* igs_readInputAsString(const char *name){
     return model_readIopAsString(name, INPUT_T);
 }
 
-int mtic_readInputAsData(const char *name, void **data, long *size){
+int igs_readInputAsData(const char *name, void **data, long *size){
     return model_readIopAsData(name, INPUT_T, data, size);
 }
 
-int mtic_readInputAsZMQMsg(const char *name, zmsg_t **msg){
+int igs_readInputAsZMQMsg(const char *name, zmsg_t **msg){
     void *data = NULL;
     long size = 0;
     int ret = model_readIopAsData(name, INPUT_T, &data, &size);
@@ -852,99 +852,99 @@ int mtic_readInputAsZMQMsg(const char *name, zmsg_t **msg){
     return ret;
 }
 
-bool mtic_readOutputAsBool(const char *name){
+bool igs_readOutputAsBool(const char *name){
     return model_readIopAsBool(name, OUTPUT_T);
 }
 
-int mtic_readOutputAsInt(const char *name){
+int igs_readOutputAsInt(const char *name){
     return model_readIopAsInt(name, OUTPUT_T);
 }
 
-double mtic_readOutputAsDouble(const char *name){
+double igs_readOutputAsDouble(const char *name){
     return model_readIopAsDouble(name, OUTPUT_T);
 }
 
-char* mtic_readOutputAsString(const char *name){
+char* igs_readOutputAsString(const char *name){
     return model_readIopAsString(name, OUTPUT_T);
 }
 
-int mtic_readOutputAsData(const char *name, void **data, long *size){
+int igs_readOutputAsData(const char *name, void **data, long *size){
     return model_readIopAsData(name, OUTPUT_T, data, size);
 }
 
-bool mtic_readParameterAsBool(const char *name){
+bool igs_readParameterAsBool(const char *name){
     return model_readIopAsBool(name, PARAMETER_T);
 }
 
-int mtic_readParameterAsInt(const char *name){
+int igs_readParameterAsInt(const char *name){
     return model_readIopAsInt(name, PARAMETER_T);
 }
 
-double mtic_readParameterAsDouble(const char *name){
+double igs_readParameterAsDouble(const char *name){
     return model_readIopAsDouble(name, PARAMETER_T);
 }
 
-char* mtic_readParameterAsString(const char *name){
+char* igs_readParameterAsString(const char *name){
     return model_readIopAsString(name, PARAMETER_T);
 }
 
-int mtic_readParameterAsData(const char *name, void **data, long *size){
+int igs_readParameterAsData(const char *name, void **data, long *size){
     return model_readIopAsData(name, PARAMETER_T, data, size);
 }
 
 // --------------------------------  WRITE ------------------------------------//
 
-int mtic_writeInputAsBool(const char *name, bool value){
+int igs_writeInputAsBool(const char *name, bool value){
     if (name == NULL || strlen(name) == 0){
-        mtic_error("Input name cannot be NULL or empty");
+        igs_error("Input name cannot be NULL or empty");
         return 0;
     }
     return model_writeIOP(name, INPUT_T, BOOL_T, &value, sizeof(bool));
 }
 
-int mtic_writeInputAsInt(const char *name, int value){
+int igs_writeInputAsInt(const char *name, int value){
     if (name == NULL || strlen(name) == 0){
-        mtic_error("Input name cannot be NULL or empty");
+        igs_error("Input name cannot be NULL or empty");
         return 0;
     }
     return model_writeIOP(name, INPUT_T, INTEGER_T, &value, sizeof(int));
 }
 
-int mtic_writeInputAsDouble(const char *name, double value){
+int igs_writeInputAsDouble(const char *name, double value){
     if (name == NULL || strlen(name) == 0){
-        mtic_error("Input name cannot be NULL or empty");
+        igs_error("Input name cannot be NULL or empty");
         return 0;
     }
     return model_writeIOP(name, INPUT_T, DOUBLE_T, &value, sizeof(double));
 }
 
-int mtic_writeInputAsString(const char *name, char *value){
+int igs_writeInputAsString(const char *name, char *value){
     if (name == NULL || strlen(name) == 0){
-        mtic_error("Input name cannot be NULL or empty");
+        igs_error("Input name cannot be NULL or empty");
         return 0;
     }
     return model_writeIOP(name, INPUT_T, STRING_T, value, strlen(value)+1);
 }
 
-int mtic_writeInputAsImpulsion(const char *name){
+int igs_writeInputAsImpulsion(const char *name){
     if (name == NULL || strlen(name) == 0){
-        mtic_error("Input name cannot be NULL or empty");
+        igs_error("Input name cannot be NULL or empty");
         return 0;
     }
     return model_writeIOP(name, INPUT_T, IMPULSION_T, NULL, 0);
 }
 
-int mtic_writeInputAsData(const char *name, void *value, long size){
+int igs_writeInputAsData(const char *name, void *value, long size){
     if (name == NULL || strlen(name) == 0){
-        mtic_error("Input name cannot be NULL or empty");
+        igs_error("Input name cannot be NULL or empty");
         return 0;
     }
     return model_writeIOP(name, INPUT_T, DATA_T, value, size);
 }
 
-int mtic_writeOutputAsBool(const char *name, bool value){
+int igs_writeOutputAsBool(const char *name, bool value){
     if (name == NULL || strlen(name) == 0){
-        mtic_error("Output name cannot be NULL or empty");
+        igs_error("Output name cannot be NULL or empty");
         return 0;
     }
     int ret = model_writeIOP(name, OUTPUT_T, BOOL_T, &value, sizeof(bool));
@@ -953,9 +953,9 @@ int mtic_writeOutputAsBool(const char *name, bool value){
     return ret;
 }
 
-int mtic_writeOutputAsInt(const char *name, int value){
+int igs_writeOutputAsInt(const char *name, int value){
     if (name == NULL || strlen(name) == 0){
-        mtic_error("Output name cannot be NULL or empty");
+        igs_error("Output name cannot be NULL or empty");
         return 0;
     }
     int ret = model_writeIOP(name, OUTPUT_T, INTEGER_T, &value, sizeof(int));
@@ -965,9 +965,9 @@ int mtic_writeOutputAsInt(const char *name, int value){
 
 }
 
-int mtic_writeOutputAsDouble(const char *name, double value){
+int igs_writeOutputAsDouble(const char *name, double value){
     if (name == NULL || strlen(name) == 0){
-        mtic_error("Output name cannot be NULL or empty");
+        igs_error("Output name cannot be NULL or empty");
         return 0;
     }
     int ret = model_writeIOP(name, OUTPUT_T, DOUBLE_T, &value, sizeof(double));
@@ -976,9 +976,9 @@ int mtic_writeOutputAsDouble(const char *name, double value){
     return ret;
 }
 
-int mtic_writeOutputAsString(const char *name, char *value){
+int igs_writeOutputAsString(const char *name, char *value){
     if (name == NULL || strlen(name) == 0){
-        mtic_error("Output name cannot be NULL or empty");
+        igs_error("Output name cannot be NULL or empty");
         return 0;
     }
     int ret = model_writeIOP(name, OUTPUT_T, STRING_T, value, strlen(value)+1);
@@ -987,9 +987,9 @@ int mtic_writeOutputAsString(const char *name, char *value){
     return ret;
 }
 
-int mtic_writeOutputAsImpulsion(const char *name){
+int igs_writeOutputAsImpulsion(const char *name){
     if (name == NULL || strlen(name) == 0){
-        mtic_error("Output name cannot be NULL or empty");
+        igs_error("Output name cannot be NULL or empty");
         return 0;
     }
     int ret = model_writeIOP(name, OUTPUT_T, IMPULSION_T, NULL, 0);
@@ -998,9 +998,9 @@ int mtic_writeOutputAsImpulsion(const char *name){
     return ret;
 }
 
-int mtic_writeOutputAsData(const char *name, void *value, long size){
+int igs_writeOutputAsData(const char *name, void *value, long size){
     if (name == NULL || strlen(name) == 0){
-        mtic_error("Output name cannot be NULL or empty");
+        igs_error("Output name cannot be NULL or empty");
         return 0;
     }
     int ret = model_writeIOP(name, OUTPUT_T, DATA_T, value, size);
@@ -1009,9 +1009,9 @@ int mtic_writeOutputAsData(const char *name, void *value, long size){
     return ret;
 }
 
-int mtic_writeOutputAsZMQMsg(const char *name, zmsg_t *msg){
+int igs_writeOutputAsZMQMsg(const char *name, zmsg_t *msg){
     if (name == NULL || strlen(name) == 0){
-        mtic_error("Output name cannot be NULL or empty");
+        igs_error("Output name cannot be NULL or empty");
         return 0;
     }
     zframe_t *frame = zmsg_encode(msg);
@@ -1023,41 +1023,41 @@ int mtic_writeOutputAsZMQMsg(const char *name, zmsg_t *msg){
     return ret;
 }
 
-int mtic_writeParameterAsBool(const char *name, bool value){
+int igs_writeParameterAsBool(const char *name, bool value){
     if (name == NULL || strlen(name) == 0){
-        mtic_error("Parameter name cannot be NULL or empty");
+        igs_error("Parameter name cannot be NULL or empty");
         return 0;
     }
     return model_writeIOP(name, PARAMETER_T, BOOL_T, &value, sizeof(bool));
 }
 
-int mtic_writeParameterAsInt(const char *name, int value){
+int igs_writeParameterAsInt(const char *name, int value){
     if (name == NULL || strlen(name) == 0){
-        mtic_error("Parameter name cannot be NULL or empty");
+        igs_error("Parameter name cannot be NULL or empty");
         return 0;
     }
     return model_writeIOP(name, PARAMETER_T, INTEGER_T, &value, sizeof(int));
 }
 
-int mtic_writeParameterAsDouble(const char *name, double value){
+int igs_writeParameterAsDouble(const char *name, double value){
     if (name == NULL || strlen(name) == 0){
-        mtic_error("Parameter name cannot be NULL or empty");
+        igs_error("Parameter name cannot be NULL or empty");
         return 0;
     }
     return model_writeIOP(name, PARAMETER_T, DOUBLE_T, &value, sizeof(double));
 }
 
-int mtic_writeParameterAsString(const char *name, char *value){
+int igs_writeParameterAsString(const char *name, char *value){
     if (name == NULL || strlen(name) == 0){
-        mtic_error("Parameter name cannot be NULL or empty");
+        igs_error("Parameter name cannot be NULL or empty");
         return 0;
     }
     return model_writeIOP(name, PARAMETER_T, STRING_T, value, strlen(value)+1);
 }
 
-int mtic_writeParameterAsData(const char *name, void *value, long size){
+int igs_writeParameterAsData(const char *name, void *value, long size){
     if (name == NULL || strlen(name) == 0){
-        mtic_error("Parameter name cannot be NULL or empty");
+        igs_error("Parameter name cannot be NULL or empty");
         return 0;
     }
     return model_writeIOP(name, PARAMETER_T, DATA_T, value, size);
@@ -1065,111 +1065,111 @@ int mtic_writeParameterAsData(const char *name, void *value, long size){
 
 // --------------------------------  INTROSPECTION ------------------------------------//
 
-iopType_t mtic_getTypeForInput(const char *name){
+iopType_t igs_getTypeForInput(const char *name){
     if((name == NULL) || (strlen(name) == 0)){
-        mtic_error("Input name cannot be NULL or empty");
+        igs_error("Input name cannot be NULL or empty");
         return 0;
     }
     return model_getTypeForIOP(name, INPUT_T);
 }
 
-iopType_t mtic_getTypeForOutput(const char *name){
+iopType_t igs_getTypeForOutput(const char *name){
     if((name == NULL) || (strlen(name) == 0)){
-        mtic_error("Output name cannot be NULL or empty");
+        igs_error("Output name cannot be NULL or empty");
         return 0;
     }
     return model_getTypeForIOP(name, OUTPUT_T);
 }
 
-iopType_t mtic_getTypeForParameter(const char *name){
+iopType_t igs_getTypeForParameter(const char *name){
     if((name == NULL) || (strlen(name) == 0)){
-        mtic_error("Parameter name cannot be NULL or empty");
+        igs_error("Parameter name cannot be NULL or empty");
         return 0;
     }
     return model_getTypeForIOP(name, PARAMETER_T);
 }
 
-int mtic_getInputsNumber(){
-    if(mtic_internal_definition == NULL){
-        mtic_error("Definition is NULL");
+int igs_getInputsNumber(){
+    if(igs_internal_definition == NULL){
+        igs_error("Definition is NULL");
         return -1;
     }
-    return HASH_COUNT(mtic_internal_definition->inputs_table);
+    return HASH_COUNT(igs_internal_definition->inputs_table);
 }
 
-int mtic_getOutputsNumber(){
-    if(mtic_internal_definition == NULL){
-        mtic_error("Definition is NULL");
+int igs_getOutputsNumber(){
+    if(igs_internal_definition == NULL){
+        igs_error("Definition is NULL");
         return -1;
     }
-    return HASH_COUNT(mtic_internal_definition->outputs_table);
+    return HASH_COUNT(igs_internal_definition->outputs_table);
 }
 
-int mtic_getParametersNumber(){
-    if(mtic_internal_definition == NULL){
-        mtic_error("Definition is NULL");
+int igs_getParametersNumber(){
+    if(igs_internal_definition == NULL){
+        igs_error("Definition is NULL");
         return -1;
     }
-    return HASH_COUNT(mtic_internal_definition->params_table);
+    return HASH_COUNT(igs_internal_definition->params_table);
 }
 
-char ** mtic_getInputsList(long *nbOfElements){
+char ** igs_getInputsList(long *nbOfElements){
     return model_getIopList(nbOfElements, INPUT_T);
 }
 
-char ** mtic_getOutputsList(long *nbOfElements){
+char ** igs_getOutputsList(long *nbOfElements){
     return model_getIopList(nbOfElements, OUTPUT_T);
 }
 
-char ** mtic_getParametersList(long *nbOfElements){
+char ** igs_getParametersList(long *nbOfElements){
     return model_getIopList(nbOfElements, PARAMETER_T);
 }
 
-bool mtic_checkInputExistence(const char *name){
+bool igs_checkInputExistence(const char *name){
     if((name == NULL) || (strlen(name) == 0)){
-        mtic_error("Input name cannot be NULL or empty\n");
+        igs_error("Input name cannot be NULL or empty\n");
         return false;
     }
-    return model_checkIOPExistence(name, mtic_internal_definition->inputs_table);
+    return model_checkIOPExistence(name, igs_internal_definition->inputs_table);
 }
 
-bool mtic_checkOutputExistence(const char *name){
+bool igs_checkOutputExistence(const char *name){
     if((name == NULL) || (strlen(name) == 0)){
-        mtic_warn("Output name cannot be NULL or empty");
+        igs_warn("Output name cannot be NULL or empty");
         return false;
     }
-    return model_checkIOPExistence(name, mtic_internal_definition->outputs_table);
+    return model_checkIOPExistence(name, igs_internal_definition->outputs_table);
 }
 
-bool mtic_checkParameterExistence(const char *name){
+bool igs_checkParameterExistence(const char *name){
     if((name == NULL) || (strlen(name) == 0)){
-        mtic_warn("Parameter name cannot be NULL or empty");
+        igs_warn("Parameter name cannot be NULL or empty");
         return false;
     }
-    return model_checkIOPExistence(name, mtic_internal_definition->params_table);
+    return model_checkIOPExistence(name, igs_internal_definition->params_table);
 }
 
 // --------------------------------  OBSERVE ------------------------------------//
 
-int mtic_observeInput(const char *name, mtic_observeCallback cb, void *myData){
+int igs_observeInput(const char *name, igs_observeCallback cb, void *myData){
     return model_observe(name, INPUT_T, cb, myData);
 }
 
-int mtic_observeOutput(const char *name, mtic_observeCallback cb, void * myData){
+int igs_observeOutput(const char *name, igs_observeCallback cb, void * myData){
     return model_observe(name, OUTPUT_T, cb, myData);
 }
 
-int mtic_observeParameter(const char *name, mtic_observeCallback cb, void * myData){
+int igs_observeParameter(const char *name, igs_observeCallback cb, void * myData){
     return model_observe(name, PARAMETER_T, cb, myData);
 }
 
 // --------------------------------  MUTE ------------------------------------//
 
 
-int mtic_muteOutput(const char *name){
+int igs_muteOutput(const char *name){
     agent_iop_t *iop = model_findIopByName((char*) name, OUTPUT_T);
     if(iop == NULL || iop->type != OUTPUT_T){
-        mtic_warn("Output '%s' not found", name);
+        igs_warn("Output '%s' not found", name);
         return 0;
     }
     iop->is_muted = true;
@@ -1179,10 +1179,10 @@ int mtic_muteOutput(const char *name){
     return 1;
 }
 
-int mtic_unmuteOutput(const char *name){
+int igs_unmuteOutput(const char *name){
     agent_iop_t *iop = model_findIopByName((char*) name,OUTPUT_T);
     if(iop == NULL || iop->type != OUTPUT_T){
-        mtic_warn("Output '%s' not found", name);
+        igs_warn("Output '%s' not found", name);
         return 0;
     }
     iop->is_muted = false;
@@ -1192,10 +1192,10 @@ int mtic_unmuteOutput(const char *name){
     return 1;
 }
 
-bool mtic_isOutputMuted(const char *name){
+bool igs_isOutputMuted(const char *name){
     agent_iop_t *iop = model_findIopByName((char*) name,OUTPUT_T);
     if(iop == NULL || iop->type != OUTPUT_T){
-        mtic_warn("Output '%s' not found", name);
+        igs_warn("Output '%s' not found", name);
         return 0;
     }
     return iop->is_muted;

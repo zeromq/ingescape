@@ -1,5 +1,5 @@
 //
-//  mtic_parser.c
+//  igs_parser.c
 //
 //  Created by Mathieu Poirier
 //  Modified by Patxi Berard
@@ -16,7 +16,7 @@
 
 #include "yajl/yajl_tree.h"
 #include "yajl/yajl_gen.h"
-#include "mastic_private.h"
+#include "ingescape_private.h"
 
 #define STR_CATEGORY "category"
 #define STR_DEFINITION "definition"
@@ -137,7 +137,7 @@ static void json_add_data_to_hash (agent_iop_t ** hasht,iop_t type,
             }
         }
         if (spaceInName){
-            mtic_warn("Spaces are not allowed in IOP: %s has been renamed to %s\n", name, n);
+            igs_warn("Spaces are not allowed in IOP: %s has been renamed to %s\n", name, n);
         }
         data->name = n;
 
@@ -351,7 +351,7 @@ static void json_add_map_out_to_hash (mapping_element_t** hasht,
         }
     }
     if (spaceInName){
-        mtic_warn("Mapping parser : spaces are not allowed in IOP: %s has been renamed to %s\n", input_name, reviewedFromOurInput);
+        igs_warn("Mapping parser : spaces are not allowed in IOP: %s has been renamed to %s\n", input_name, reviewedFromOurInput);
     }
     
     //agent_name
@@ -370,7 +370,7 @@ static void json_add_map_out_to_hash (mapping_element_t** hasht,
         }
     }
     if (spaceInName){
-        mtic_warn("Mapping parser : spaces are not allowed in agent name: %s has been renamed to %s\n", agent_name, reviewedToAgent);
+        igs_warn("Mapping parser : spaces are not allowed in agent name: %s has been renamed to %s\n", agent_name, reviewedToAgent);
     }
     
     //output_name
@@ -389,7 +389,7 @@ static void json_add_map_out_to_hash (mapping_element_t** hasht,
         }
     }
     if (spaceInName){
-        mtic_warn("Mapping parser : spaces are not allowed in IOP: %s has been renamed to %s\n", output_name, reviewedWithOutput);
+        igs_warn("Mapping parser : spaces are not allowed in IOP: %s has been renamed to %s\n", output_name, reviewedWithOutput);
     }
     
     unsigned long len = strlen(reviewedFromOurInput)+strlen(reviewedToAgent)+strlen(reviewedWithOutput)+3+1;
@@ -426,8 +426,8 @@ static void json_add_map_out_to_hash (mapping_element_t** hasht,
 
 static void json_add_map_cat_to_hash (mapping_element_t** hasht,
                                        yajl_val current_map_out){
-    MASTIC_UNUSED(hasht)
-    MASTIC_UNUSED(current_map_out)
+    INGESCAPE_UNUSED(hasht)
+    INGESCAPE_UNUSED(current_map_out)
 
     return;
 //    const char* agent_name;
@@ -565,7 +565,7 @@ static void json_dump_iop (yajl_gen *g, agent_iop_t* aiop) {
             {
                 if (yajl_gen_string(*g, (const unsigned char *) aiop->value.s, strlen(aiop->value.s)) == yajl_gen_invalid_string)
                 {
-                    mtic_warn("Mapping parser : json_dump_iop failed to dump a string value - it may not be a valid UTF8 string - %s\n", aiop->value.s);
+                    igs_warn("Mapping parser : json_dump_iop failed to dump a string value - it may not be a valid UTF8 string - %s\n", aiop->value.s);
                     yajl_gen_string(*g, (const unsigned char *) "", 0);
                 }
             }
@@ -781,14 +781,14 @@ static void json_dump_mapping (yajl_gen *g, mapping_t* mapp) {
  *
  */
 
-int mtic_init_mapping (const char* mapping_file_path)
+int igs_init_mapping (const char* mapping_file_path)
 {
     int errorCode = -1;
 
     if (mapping_file_path != NULL){
         // Init definition
-        mtic_internal_mapping = parser_LoadMapFromPath(mapping_file_path);
-        if(mtic_internal_mapping == NULL)
+        igs_internal_mapping = parser_LoadMapFromPath(mapping_file_path);
+        if(igs_internal_mapping == NULL)
         {
             fprintf(stderr, "Error : Mapping file has not been loaded : %s\n", mapping_file_path );
             exit(EXIT_FAILURE);
@@ -801,26 +801,26 @@ int mtic_init_mapping (const char* mapping_file_path)
 }
 
 /*
- * Function: mtic_init_internal_data
+ * Function: igs_init_internal_data
  * ----------------------------
  *   read definition from file path and init internal agent data
- *   initialize definition_load and mtic_internal_definition data structures
+ *   initialize definition_load and igs_internal_definition data structures
  *
  *   definition_file_path : path to the agent definiton file
  *
  */
 
-int mtic_init_internal_data (const char* definition_file_path)
+int igs_init_internal_data (const char* definition_file_path)
 {
     int errorCode = -1;
     if (definition_file_path != NULL){
         // Init definition
-        mtic_internal_definition = parser_loadDefinitionFromPath(definition_file_path);
+        igs_internal_definition = parser_loadDefinitionFromPath(definition_file_path);
 
-        if(mtic_internal_definition != NULL)
+        if(igs_internal_definition != NULL)
         {
             // Live data corresponds to a copy of the initial definition
-            mtic_internal_definition = calloc(1, sizeof(definition));
+            igs_internal_definition = calloc(1, sizeof(definition));
             errorCode = 0;
         } else {
             fprintf(stderr, "Error : Definition file has not been loaded : %s\n", definition_file_path );
@@ -1031,20 +1031,20 @@ mapping_t* parser_LoadMapFromPath (const char* path){
 ////////////////////////////////////////////////////////////////////////
 
 /**
- * \fn int mtic_loadDefinition (const char* json_str)
+ * \fn int igs_loadDefinition (const char* json_str)
  * \ingroup loadSetGetDefFct
- * \brief load definition in variable 'mtic_definition_loaded' & copy in 'mtic_internal_definition"
+ * \brief load definition in variable 'igs_definition_loaded' & copy in 'igs_internal_definition"
  *      from a json string
  *
  * \param json_str String in json format. Can't be NULL.
  * \return The error. 1 is OK, 0 json string is NULL, -1 Definition file has not been loaded
  */
-int mtic_loadDefinition (const char* json_str){
+int igs_loadDefinition (const char* json_str){
     
     //Check if the json string is null
     if(json_str == NULL)
     {
-        mtic_debug("mtic_loadDefinition : json string is null \n");
+        igs_debug("igs_loadDefinition : json string is null \n");
         return 0;
     }
 
@@ -1053,19 +1053,19 @@ int mtic_loadDefinition (const char* json_str){
 
     if(tmp == NULL)
     {
-        mtic_debug("mtic_loadDefinition : json string caused an error and was ignored\n%s\n", json_str );
+        igs_debug("igs_loadDefinition : json string caused an error and was ignored\n%s\n", json_str );
         return -1;
     }else{
-        if (mtic_internal_definition != NULL){
-            definition_freeDefinition(mtic_internal_definition);
-            mtic_internal_definition = NULL;
+        if (igs_internal_definition != NULL){
+            definition_freeDefinition(igs_internal_definition);
+            igs_internal_definition = NULL;
         }
-        mtic_internal_definition = tmp;
+        igs_internal_definition = tmp;
         //Check the name of agent from network layer
-        char *name = mtic_getAgentName();
+        char *name = igs_getAgentName();
         if(strcmp(name, AGENT_NAME_DEFAULT) == 0){
             //The name of the agent is default : we change it to definition name
-            mtic_setAgentName(mtic_internal_definition->name);
+            igs_setAgentName(igs_internal_definition->name);
         }//else
             //The agent name was assigned by the developer : we keep it untouched
         free(name);
@@ -1076,20 +1076,20 @@ int mtic_loadDefinition (const char* json_str){
 }
 
 /**
- * \fn int mtic_loadDefinitionFromPath (const char* file_path)
+ * \fn int igs_loadDefinitionFromPath (const char* file_path)
  * \ingroup loadSetGetDefFct
- * \brief load definition in variable 'mtic_definition_loaded' & copy in 'mtic_internal_definition"
+ * \brief load definition in variable 'igs_definition_loaded' & copy in 'igs_internal_definition"
  *      from a file path
  *
  * \param file_path The string which contains the json file path. Can't be NULL.
  * \return The error. 1 is OK, 0 json string is NULL, -1 Definition file has not been loaded
  */
-int mtic_loadDefinitionFromPath (const char* file_path){
+int igs_loadDefinitionFromPath (const char* file_path){
     
     //Check if the json string is null
     if(file_path == NULL)
     {
-        mtic_debug("Error : file path is null \n");
+        igs_debug("Error : file path is null \n");
         return 0;
     }
 
@@ -1099,20 +1099,20 @@ int mtic_loadDefinitionFromPath (const char* file_path){
 
     if(tmp == NULL)
     {
-        mtic_debug("mtic_loadDefinitionFromPath : %s caused an error and was ignored\n", file_path);
+        igs_debug("igs_loadDefinitionFromPath : %s caused an error and was ignored\n", file_path);
         return -1;
     }else{
         strncpy(definitionPath, file_path, MAX_PATH - 1);
-        if (mtic_internal_definition != NULL){
-            definition_freeDefinition(mtic_internal_definition);
-            mtic_internal_definition = NULL;
+        if (igs_internal_definition != NULL){
+            definition_freeDefinition(igs_internal_definition);
+            igs_internal_definition = NULL;
         }
-        mtic_internal_definition = tmp;
+        igs_internal_definition = tmp;
         //Check the name of agent from network layer
-        char *name = mtic_getAgentName();
+        char *name = igs_getAgentName();
         if(strcmp(name, AGENT_NAME_DEFAULT) == 0){
             //The name of the agent is default : we change it to definition name
-            mtic_setAgentName(mtic_internal_definition->name);
+            igs_setAgentName(igs_internal_definition->name);
         }//else
             //The agent name was assigned by the developer : we keep it untouched
         free(name);

@@ -1,6 +1,6 @@
 import QtQuick 2.9
 
-import MasticQuick 1.0
+import IngeScapeQuick 1.0
 
 
 Item {
@@ -16,22 +16,22 @@ Item {
     // Behavior
     Component.onCompleted: {
         // Set agent name and definition info
-        Mastic.agentName = "QmlClock-agent"
-        Mastic.definitionName = Mastic.agentName;
-        Mastic.definitionDescription = "Definition of " + Mastic.agentName;
-        Mastic.definitionVersion = "0.0";
+        IngeScape.agentName = "QmlClock-agent"
+        IngeScape.definitionName = IngeScape.agentName;
+        IngeScape.definitionDescription = "Definition of " + IngeScape.agentName;
+        IngeScape.definitionVersion = "0.0";
 
-        // Create Mastic inputs
-        Mastic.createInputInt("hours", 10);
-        Mastic.createInputInt("minutes", 10);
-        Mastic.createInputInt("seconds", 30);
+        // Create IngeScape inputs
+        IngeScape.createInputInt("hours", 10);
+        IngeScape.createInputInt("minutes", 10);
+        IngeScape.createInputInt("seconds", 30);
     }
 
 
-    // Bind local properties to Mastic inputs
-    property int hours: Mastic.inputs.hours
-    property int minutes: Mastic.inputs.minutes
-    property int seconds: Mastic.inputs.seconds
+    // Bind local properties to IngeScape inputs
+    property int hours: IngeScape.inputs.hours
+    property int minutes: IngeScape.inputs.minutes
+    property int seconds: IngeScape.inputs.seconds
 
 
     //----------------

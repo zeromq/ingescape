@@ -1,0 +1,4 @@
+module IngeScapeQuick
+plugin IngeScapeQuick
+classname IngeScapeQuickPlugin
+typeinfo IngeScapeQuick.qmltypes

@@ -32,7 +32,7 @@ DOXYFILE_ENCODING      = UTF-8
 # title of most generated pages and in a few other places.
 # The default value is: My Project.
 
-PROJECT_NAME           = Mastic
+PROJECT_NAME           = IngeScape
 
 # The PROJECT_NUMBER tag can be used to enter a project or revision number. This
 # could be handy for archiving the generated documentation or if some version
@@ -58,7 +58,7 @@ PROJECT_LOGO           =
 # entered, it will be relative to the location where doxygen was started. If
 # left blank the current directory will be used.
 
-OUTPUT_DIRECTORY       = /home/lii/Documents/IKKY/mastic/builds/doxygen
+OUTPUT_DIRECTORY       = /home/lii/Documents/IKKY/ingescape/builds/doxygen
 
 # If the CREATE_SUBDIRS tag is set to YES then doxygen will create 4096 sub-
 # directories (in 2 levels) under the output directory of each output format and
@@ -776,7 +776,7 @@ WARN_LOGFILE           =
 # spaces. See also FILE_PATTERNS and EXTENSION_MAPPING
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  = /home/lii/Documents/IKKY/mastic/src
+INPUT                  = /home/lii/Documents/IKKY/ingescape/src
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
@@ -857,7 +857,7 @@ RECURSIVE              = YES
 # Note that relative paths are relative to the directory from which doxygen is
 # run.
 
-EXCLUDE                = ../../src/include/mastic_private.h \
+EXCLUDE                = ../../src/include/ingescape_private.h \
                          ../../src/include/tests.h \
                          ../../src/include/uthash/libut.h \
                          ../../src/include/uthash/ringbuf.h \

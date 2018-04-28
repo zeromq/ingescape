@@ -1,7 +1,7 @@
 import QtQuick 2.9
 import QtLocation 5.9
 import QtPositioning 5.8
-import MasticQuick 1.0
+import IngeScapeQuick 1.0
 
 
 Item {
@@ -15,26 +15,26 @@ Item {
     // Behavior
     Component.onCompleted: {
         // Set agent name and definition info
-        Mastic.agentName = "SimpleMap-agent"
-        Mastic.definitionName = Mastic.agentName;
-        Mastic.definitionDescription = "Definition of " + Mastic.agentName;
-        Mastic.definitionVersion = "0.0";
+        IngeScape.agentName = "SimpleMap-agent"
+        IngeScape.definitionName = IngeScape.agentName;
+        IngeScape.definitionDescription = "Definition of " + IngeScape.agentName;
+        IngeScape.definitionVersion = "0.0";
 
         // Create inputs
-        Mastic.createInputDouble("deltaX");
-        Mastic.createInputDouble("deltaY");
-        Mastic.createInputDouble("deltaZoom");
+        IngeScape.createInputDouble("deltaX");
+        IngeScape.createInputDouble("deltaY");
+        IngeScape.createInputDouble("deltaZoom");
 
         // Create outputs
-        Mastic.createOutputDouble("longitude", map.center.longitude);
-        Mastic.createOutputDouble("latitude", map.center.latitude);
-        Mastic.createOutputDouble("zoomLevel", map.zoomLevel);
+        IngeScape.createOutputDouble("longitude", map.center.longitude);
+        IngeScape.createOutputDouble("latitude", map.center.latitude);
+        IngeScape.createOutputDouble("zoomLevel", map.zoomLevel);
     }
 
 
     // Subscribe to inputs
     Connections {
-        target: Mastic.inputs
+        target: IngeScape.inputs
 
         onDeltaXChanged: {
             updateMapCenter();
@@ -53,7 +53,7 @@ Item {
         }
 
         onDeltaZoomChanged: {
-            zoomMap( Mastic.inputs.deltaZoom );
+            zoomMap( IngeScape.inputs.deltaZoom );
         }
     }
 
@@ -68,8 +68,8 @@ Item {
     // Update our map
     function updateMapCenter()
     {
-        var dx = Mastic.inputs.deltaX;
-        var dy = Mastic.inputs.deltaY;
+        var dx = IngeScape.inputs.deltaX;
+        var dy = IngeScape.inputs.deltaY;
 
         dx = Math.min(1.0, Math.max(-1.0, dx));
         dy = Math.min(1.0, Math.max(-1.0, dy));
@@ -170,13 +170,13 @@ Item {
 
         // Update outputs when our center changes
         onCenterChanged: {
-            Mastic.outputs.longitude = center.longitude;
-            Mastic.outputs.latitude = center.latitude;
+            IngeScape.outputs.longitude = center.longitude;
+            IngeScape.outputs.latitude = center.latitude;
         }
 
         // Update outputs when our zoom level changes
         onZoomLevelChanged: {
-            Mastic.outputs.zoomLevel = zoomLevel;
+            IngeScape.outputs.zoomLevel = zoomLevel;
         }
 
 

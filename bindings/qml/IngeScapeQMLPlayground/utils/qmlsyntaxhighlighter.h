@@ -1,5 +1,5 @@
 /*
- *  Mastic - QML playground
+ *  IngeScape - QML playground
  *
  *  Copyright (c) 2018 Ingenuity i/o. All rights reserved.
  *

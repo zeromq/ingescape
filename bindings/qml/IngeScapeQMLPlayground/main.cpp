@@ -20,8 +20,8 @@
 #include <QDebug>
 
 
-// MasticQuick MUST be included via a .pri file
-#include <MasticQuick.h>
+// IngeScapeQuick MUST be included via a .pri file
+#include <IngeScapeQuick.h>
 
 
 #include "controllers/playgroundcontroller.h"
@@ -127,8 +127,8 @@ int main(int argc, char *argv[])
     //------------------------------
     QQmlApplicationEngine engine;
 
-    // Register our MasticQuick plugin
-    MasticQuick::registerTypes();
+    // Register our IngeScapeQuick plugin
+    IngeScapeQuick::registerTypes();
 
     // Register custom QML types
     registerCustomQmlTypes();

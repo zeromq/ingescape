@@ -7,7 +7,7 @@ import Qt.labs.settings 1.0
 
 import IngeScapePlayground 1.0
 
-import MasticQuick 1.0
+import IngeScapeQuick 1.0
 
 
 Item {
@@ -34,18 +34,18 @@ Item {
     //
     //-------------------------------------------
 
-    // Auto-restart Mastic if needed
-    function autoRestartMasticIfNeeded()
+    // Auto-restart IngeScape if needed
+    function autoRestartIngeScapeIfNeeded()
     {
         if (
-            // We are allowed to restart Mastic
-            PlaygroundController.needToRestartMastic
+            // We are allowed to restart IngeScape
+            PlaygroundController.needToRestartIngeScape
             &&
-            // We have values to restart Mastic
+            // We have values to restart IngeScape
             ((currentNetworkDevice.text.length !== 0) && (currentPort.text.length !== 0))
             )
         {
-            Mastic.startWithDevice(currentNetworkDevice.text, currentPort.text);
+            IngeScape.startWithDevice(currentNetworkDevice.text, currentPort.text);
         }
     }
 
@@ -164,10 +164,10 @@ Item {
 
 
         //
-        // Mastic
+        // IngeScape
         //
         Item {
-            id: masticCommands
+            id: ingescapeCommands
 
             anchors {
                 top: parent.top
@@ -214,7 +214,7 @@ Item {
 
                         width: 70
 
-                        enabled: !(Mastic.isStarted)
+                        enabled: !(IngeScape.isStarted)
                     }
                 }
 
@@ -249,7 +249,7 @@ Item {
 
                         validator: IntValidator {bottom: 1; top: 65535;}
 
-                        enabled: !(Mastic.isStarted)
+                        enabled: !(IngeScape.isStarted)
                     }
                 }
 
@@ -260,22 +260,22 @@ Item {
                 Button {
                     anchors.verticalCenter: parent.verticalCenter
 
-                    text: Mastic.isStarted ? qsTr("Stop") : qsTr("Start")
+                    text: IngeScape.isStarted ? qsTr("Stop") : qsTr("Start")
 
                     enabled: (
-                              Mastic.isStarted
+                              IngeScape.isStarted
                               ||
                               ((currentNetworkDevice.text.length !== 0) && (currentPort.text.length !== 0))
                               )
 
                     onClicked: {
-                        if (Mastic.isStarted)
+                        if (IngeScape.isStarted)
                         {
-                            Mastic.stop();
+                            IngeScape.stop();
                         }
                         else
                         {
-                            Mastic.startWithDevice(currentNetworkDevice.text, currentPort.text);
+                            IngeScape.startWithDevice(currentNetworkDevice.text, currentPort.text);
                         }
                     }
                 }
@@ -289,10 +289,10 @@ Item {
 
                     text: qsTr("Auto\nrestart")
 
-                    checked: PlaygroundController.autoRestartMastic
+                    checked: PlaygroundController.autoRestartIngeScape
 
                     onCheckedChanged: {
-                        PlaygroundController.autoRestartMastic = checked;
+                        PlaygroundController.autoRestartIngeScape = checked;
                     }
 
                     style: CheckBoxStyle {
@@ -313,10 +313,10 @@ Item {
                 Button {
                     anchors.verticalCenter: parent.verticalCenter
 
-                    text: Mastic.isMuted ? qsTr("Unmute") : qsTr("Mute")
+                    text: IngeScape.isMuted ? qsTr("Unmute") : qsTr("Mute")
 
                     onClicked: {
-                        Mastic.isMuted = !Mastic.isMuted;
+                        IngeScape.isMuted = !IngeScape.isMuted;
                     }
                 }
             }
@@ -332,7 +332,7 @@ Item {
     //-------------------------------------------
 
     Settings {
-        category: "Mastic"
+        category: "IngeScape"
 
         property alias networkDevice: currentNetworkDevice.text
         property alias port: currentPort.text

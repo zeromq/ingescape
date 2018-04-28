@@ -1,8 +1,8 @@
 ﻿  ConfigurationType : DynamicLibrary
   Configuration     : DebugDLL
   PlatformToolset   : v140
-  TargetPath        : U:\IKKY\SOURCES_MASTIC_Demo_Dec_2017\czmq\builds\msvc\vs2015\libczmq\..\..\..\..\bin\Win32\Debug\v140\dynamic\libczmq.dll
-  Will copy U:\IKKY\SOURCES_MASTIC_Demo_Dec_2017\czmq\builds\msvc\vs2015\libczmq\..\..\platform.h -> U:\IKKY\SOURCES_MASTIC_Demo_Dec_2017\czmq\builds\msvc\vs2015\libczmq\..\..\..\..\include\platform.h
+  TargetPath        : U:\IKKY\SOURCES_INGESCAPE_Demo_Dec_2017\czmq\builds\msvc\vs2015\libczmq\..\..\..\..\bin\Win32\Debug\v140\dynamic\libczmq.dll
+  Will copy U:\IKKY\SOURCES_INGESCAPE_Demo_Dec_2017\czmq\builds\msvc\vs2015\libczmq\..\..\platform.h -> U:\IKKY\SOURCES_INGESCAPE_Demo_Dec_2017\czmq\builds\msvc\vs2015\libczmq\..\..\..\..\include\platform.h
   Linkage-libzmq: dynamic
           1 fichier(s) copié(s).
   zactor.c
@@ -40,7 +40,7 @@
   zproxy.c
   zrex.c
   zgossip_msg.c
-     Création de la bibliothèque U:\IKKY\SOURCES_MASTIC_Demo_Dec_2017\czmq\builds\msvc\vs2015\libczmq\..\..\..\..\bin\Win32\Debug\v140\dynamic\libczmq.lib et de l'objet U:\IKKY\SOURCES_MASTIC_Demo_Dec_2017\czmq\builds\msvc\vs2015\libczmq\..\..\..\..\bin\Win32\Debug\v140\dynamic\libczmq.exp
-  libczmq.vcxproj -> U:\IKKY\SOURCES_MASTIC_Demo_Dec_2017\czmq\builds\msvc\vs2015\libczmq\..\..\..\..\bin\Win32\Debug\v140\dynamic\libczmq.dll
-  Copying libzmq.dll -> U:\IKKY\SOURCES_MASTIC_Demo_Dec_2017\czmq\bin\Win32\Debug\v140\dynamic\libzmq.dll
-  Copying libzmq.pdb -> U:\IKKY\SOURCES_MASTIC_Demo_Dec_2017\czmq\bin\Win32\Debug\v140\dynamic\libzmq.pdb
+     Création de la bibliothèque U:\IKKY\SOURCES_INGESCAPE_Demo_Dec_2017\czmq\builds\msvc\vs2015\libczmq\..\..\..\..\bin\Win32\Debug\v140\dynamic\libczmq.lib et de l'objet U:\IKKY\SOURCES_INGESCAPE_Demo_Dec_2017\czmq\builds\msvc\vs2015\libczmq\..\..\..\..\bin\Win32\Debug\v140\dynamic\libczmq.exp
+  libczmq.vcxproj -> U:\IKKY\SOURCES_INGESCAPE_Demo_Dec_2017\czmq\builds\msvc\vs2015\libczmq\..\..\..\..\bin\Win32\Debug\v140\dynamic\libczmq.dll
+  Copying libzmq.dll -> U:\IKKY\SOURCES_INGESCAPE_Demo_Dec_2017\czmq\bin\Win32\Debug\v140\dynamic\libzmq.dll
+  Copying libzmq.pdb -> U:\IKKY\SOURCES_INGESCAPE_Demo_Dec_2017\czmq\bin\Win32\Debug\v140\dynamic\libzmq.pdb

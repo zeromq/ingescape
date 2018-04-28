@@ -1,4 +1,0 @@
-module MasticQuick
-plugin MasticQuick
-classname MasticQuickPlugin
-typeinfo MasticQuick.qmltypes

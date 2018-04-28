@@ -30,7 +30,7 @@
 
 
 /**
- * @brief The MasticPlaygroundController class defines the main controller of our playground application
+ * @brief The IngeScapePlaygroundController class defines the main controller of our playground application
  */
 class PlaygroundController : public QObject
 {
@@ -42,11 +42,11 @@ class PlaygroundController : public QObject
     // Auto-save
     PLAYGROUND_QML_PROPERTY_CUSTOM_SETTER(bool, autoSave)
 
-    // Auto-restart Mastic
-    PLAYGROUND_QML_PROPERTY(bool, autoRestartMastic)
+    // Auto-restart IngeScape
+    PLAYGROUND_QML_PROPERTY(bool, autoRestartIngeScape)
 
-    // Flag indicating if we need to restart Mastic
-    PLAYGROUND_QML_PROPERTY_READONLY(bool, needToRestartMastic)
+    // Flag indicating if we need to restart IngeScape
+    PLAYGROUND_QML_PROPERTY_READONLY(bool, needToRestartIngeScape)
 
     // Current view mode
     PLAYGROUND_QML_PROPERTY(QString, currentViewMode)
@@ -305,8 +305,8 @@ protected Q_SLOTS:
 
 
 protected:
-    // Flag indicating if we need to reset QML and Mastic
-    bool _needToResetQmlAndMastic;
+    // Flag indicating if we need to reset QML and IngeScape
+    bool _needToResetQmlAndIngeScape;
 
     // File path of our current file
     QString _currentFilePath;

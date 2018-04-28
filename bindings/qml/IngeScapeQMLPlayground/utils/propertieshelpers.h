@@ -1,5 +1,5 @@
 /*
- *  Mastic - QML playground
+ *  IngeScape - QML playground
  *
  *  Copyright (c) 2018 Ingenuity i/o. All rights reserved.
  *
@@ -302,7 +302,7 @@ public:
      *
      * @remark We use this function as a proxy to qRegisterMetaType because we can not call
      *         qRegisterMetaType in macros. Otherwise, it does not compile due to
-     *         "explicit specialization of 'QMetaTypeId<MasticLogLevel::Value>' after instantiation" errors
+     *         "explicit specialization of 'QMetaTypeId<IngeScapeLogLevel::Value>' after instantiation" errors
      */
     template <class T> static void _registerMetaType()
     {

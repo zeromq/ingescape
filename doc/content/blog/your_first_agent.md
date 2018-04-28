@@ -43,12 +43,12 @@ We recommend that you immediately copy and paste the code below in your favorite
 
 {{< highlight c "linenos=table,linenostart=1" >}}
 #include <stdio.h>
-#include <mastic/mastic.h> //this is the only include required for ingeScape
+#include <ingescape/ingescape.h> //this is the only include required for ingeScape
 
 /*
  This is a callback function that runs everytime the
  input "input1" is written. The callback is linked to
- the input by the use of mtic_observeInput below.
+ the input by the use of igs_observeInput below.
  The behavior of this agent is very simple:
  - reading the changed input
  - printing the new value
@@ -64,9 +64,9 @@ void myIOPCallback(iop_t iopType, const char* name, iopType_t valueType, void* v
      - the actual memory size of the value
      - optional data passed from the call to observeInput
      */
-    int r = mtic_readInputAsInt(name);
+    int r = igs_readInputAsInt(name);
     printf("%s changed to %d\n", name, r);
-    mtic_writeOutputAsInt("output1", 2*r);
+    igs_writeOutputAsInt("output1", 2*r);
 }
 
 /*
@@ -80,48 +80,48 @@ int main(int argc, const char * argv[]) {
      Use ingeScape function to find compatible network devices
      on your computer.
      You need to use one of the returned results in the
-     mtic_startWithDevice call below for your agent to start.
+     igs_startWithDevice call below for your agent to start.
      */
     char **devices = NULL;
     int nb = 0;
-    mtic_getNetdevicesList(&devices, &nb);
+    igs_getNetdevicesList(&devices, &nb);
     for (int i = 0; i < nb; i++){
         printf("device: %s\n", devices[i]);
     }
-    mtic_freeNetdevicesList(devices, nb);
+    igs_freeNetdevicesList(devices, nb);
     
     //set the agent name
     if (argc == 2){
         //either by using the argument on the command line
-        mtic_setAgentName(argv[1]);
+        igs_setAgentName(argv[1]);
     }else{
         //or by giving a default name if no argument was passed
-        mtic_setAgentName("simpleDemoAgent");
+        igs_setAgentName("simpleDemoAgent");
     }
     
     //Create an input and an ouput: both are of integer type
     //with default value set to zero.
-    mtic_createInput("input1", INTEGER_T, 0, 0);
-    mtic_createOutput("output1", INTEGER_T, 0, 0);
+    igs_createInput("input1", INTEGER_T, 0, 0);
+    igs_createOutput("output1", INTEGER_T, 0, 0);
     
     //Set the definition information (optional)
-    mtic_setDefinitionName("myDef");
-    mtic_setDefinitionVersion("1.0");
-    mtic_setDefinitionDescription("Definition for our first agent.");
+    igs_setDefinitionName("myDef");
+    igs_setDefinitionVersion("1.0");
+    igs_setDefinitionDescription("Definition for our first agent.");
     
     //Attach the callback to our agent's input
     //NB: callbacks can be attached to any IOP
-    mtic_observeInput("input1", myIOPCallback, NULL);
+    igs_observeInput("input1", myIOPCallback, NULL);
     
     //Actually and finally start the agent
     //First argument is the network device name to use
     //Second argument is the network port used by all the agents of your system
-    mtic_startWithDevice("en0", 5669);
+    igs_startWithDevice("en0", 5669);
     
     getchar();
     
     //Stop the agent properly before terminating the program
-    mtic_stop();
+    igs_stop();
     
     return 0;
 }
@@ -134,7 +134,7 @@ If so, copy the code in a *main.c* file and type the following commands in a ter
 
 {{< highlight shell "linenos=inline" >}}
 gcc -W -Wall -g -I/usr/local/include/ -std=gnu99 -o main.o -c main.c
-gcc -o myFirstAgent main.o -L/usr/local/lib -lmastic
+gcc -o myFirstAgent main.o -L/usr/local/lib -lingescape
 {{< / highlight >}}
 
 ### Compiling on macOS (two methods)

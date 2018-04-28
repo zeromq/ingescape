@@ -1,7 +1,7 @@
 ﻿  ConfigurationType : DynamicLibrary
   Configuration     : DebugDLL
   PlatformToolset   : v140
-  TargetPath        : U:\IKKY\SOURCES_MASTIC_Demo_Dec_2017\libzmq\builds\msvc\vs2015\libzmq\..\..\..\..\bin\Win32\Debug\v140\dynamic\libzmq.dll
+  TargetPath        : U:\IKKY\SOURCES_INGESCAPE_Demo_Dec_2017\libzmq\builds\msvc\vs2015\libzmq\..\..\..\..\bin\Win32\Debug\v140\dynamic\libzmq.dll
   Option-tweet      : true
   Option-sodium     : 
   Option-openpgm    : 
@@ -104,5 +104,5 @@
   zmq.cpp
   zmq_utils.cpp
   tweetnacl.c
-     Création de la bibliothèque U:\IKKY\SOURCES_MASTIC_Demo_Dec_2017\libzmq\builds\msvc\vs2015\libzmq\..\..\..\..\bin\Win32\Debug\v140\dynamic\libzmq.lib et de l'objet U:\IKKY\SOURCES_MASTIC_Demo_Dec_2017\libzmq\builds\msvc\vs2015\libzmq\..\..\..\..\bin\Win32\Debug\v140\dynamic\libzmq.exp
-  libzmq.vcxproj -> U:\IKKY\SOURCES_MASTIC_Demo_Dec_2017\libzmq\builds\msvc\vs2015\libzmq\..\..\..\..\bin\Win32\Debug\v140\dynamic\libzmq.dll
+     Création de la bibliothèque U:\IKKY\SOURCES_INGESCAPE_Demo_Dec_2017\libzmq\builds\msvc\vs2015\libzmq\..\..\..\..\bin\Win32\Debug\v140\dynamic\libzmq.lib et de l'objet U:\IKKY\SOURCES_INGESCAPE_Demo_Dec_2017\libzmq\builds\msvc\vs2015\libzmq\..\..\..\..\bin\Win32\Debug\v140\dynamic\libzmq.exp
+  libzmq.vcxproj -> U:\IKKY\SOURCES_INGESCAPE_Demo_Dec_2017\libzmq\builds\msvc\vs2015\libzmq\..\..\..\..\bin\Win32\Debug\v140\dynamic\libzmq.dll

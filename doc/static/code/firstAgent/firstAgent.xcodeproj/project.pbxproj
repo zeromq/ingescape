@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		9766A8D8208E28C50046C63F /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 9766A8D7208E28C50046C63F /* main.c */; };
-		9766A8DC208E29640046C63F /* libmastic.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 9766A8CF208E28770046C63F /* libmastic.dylib */; };
+		9766A8DC208E29640046C63F /* libingescape.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 9766A8CF208E28770046C63F /* libingescape.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -24,7 +24,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		9766A8CF208E28770046C63F /* libmastic.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libmastic.dylib; path = ../../../../../../../../../../../../usr/local/lib/libmastic.dylib; sourceTree = "<group>"; };
+		9766A8CF208E28770046C63F /* libingescape.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libingescape.dylib; path = ../../../../../../../../../../../../usr/local/lib/libingescape.dylib; sourceTree = "<group>"; };
 		9766A8D5208E28C50046C63F /* firstAgent */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = firstAgent; sourceTree = BUILT_PRODUCTS_DIR; };
 		9766A8D7208E28C50046C63F /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -34,7 +34,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9766A8DC208E29640046C63F /* libmastic.dylib in Frameworks */,
+				9766A8DC208E29640046C63F /* libingescape.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -69,7 +69,7 @@
 		97783FA11FC8734200B9B356 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				9766A8CF208E28770046C63F /* libmastic.dylib */,
+				9766A8CF208E28770046C63F /* libingescape.dylib */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";

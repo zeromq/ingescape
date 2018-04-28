@@ -17,11 +17,11 @@ CFLAGS = -g -I./include -I/usr/local/include/ -fPIC -Wextra -O2 -std=gnu99 -Wall
 LDFLAGS = -shared -L/usr/local/lib -lsodium -lzmq -lczmq -lzyre -lyajl
 RM = rm -f
 ifeq ($(shell uname -s), Darwin)
-    TARGET_LIB = libmastic.dylib
+    TARGET_LIB = libingescape.dylib
 else
-    TARGET_LIB = libmastic.so
+    TARGET_LIB = libingescape.so
 endif
-STARGET_LIB = libmastic.a
+STARGET_LIB = libingescape.a
 
 SRCS = definition.c mapping.c model.c network.c parser.c admin.c bus.c
 OBJS = $(SRCS:.c=.o)
@@ -48,13 +48,13 @@ PREFIX = /usr/local
 .PHONY: install
 install: $(TARGET_LIB) $(STARGET_LIB)
 	mkdir -p $(PREFIX)/lib
-	mkdir -p $(PREFIX)/include/mastic
+	mkdir -p $(PREFIX)/include/ingescape
 	install $(TARGET_LIB) $(DESTDIR)$(PREFIX)/lib/$(TARGET_LIB)
 	install $(STARGET_LIB) $(DESTDIR)$(PREFIX)/lib/$(STARGET_LIB)
-	install ./include/mastic.h $(DESTDIR)$(PREFIX)/include/mastic/
+	install ./include/ingescape.h $(DESTDIR)$(PREFIX)/include/ingescape/
 
 .PHONY: uninstall
 uninstall:
 	rm -f $(PREFIX)/lib/$(TARGET_LIB)
 	rm -f $(PREFIX)/lib/$(STARGET_LIB)
-	rm -Rf $(PREFIX)/include/mastic
+	rm -Rf $(PREFIX)/include/ingescape

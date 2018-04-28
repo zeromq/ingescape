@@ -27,8 +27,8 @@ Item {
     // Auto-save
     property bool autoSave: PlaygroundController.autoSave
 
-    // Auto-restart Mastic
-    property bool autoRestartMastic: PlaygroundController.autoRestartMastic
+    // Auto-restart IngeScape
+    property bool autoRestartIngeScape: PlaygroundController.autoRestartIngeScape
 
 
     //-------------------------------------------
@@ -47,8 +47,8 @@ Item {
         PlaygroundController.autoSave = root.autoSave;
     }
 
-    onAutoRestartMasticChanged: {
-        PlaygroundController.autoRestartMastic = root.autoRestartMastic;
+    onAutoRestartIngeScapeChanged: {
+        PlaygroundController.autoRestartIngeScape = root.autoRestartIngeScape;
     }
 
 
@@ -114,7 +114,7 @@ Item {
             }
 
             onLiveViewLoaded: {
-                toolbar.autoRestartMasticIfNeeded();
+                toolbar.autoRestartIngeScapeIfNeeded();
             }
         }
 
@@ -174,6 +174,6 @@ Item {
 
         property alias autoSave: root.autoSave
 
-        property alias autoRestartMastic: root.autoRestartMastic
+        property alias autoRestartIngeScape: root.autoRestartIngeScape
     }
 }

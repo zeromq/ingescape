@@ -22,7 +22,7 @@
 #include <QFileDialog>
 #include <QDirIterator>
 
-#include "MasticQuick.h"
+#include "IngeScapeQuick.h"
 
 
 // Maximum number of recent files
@@ -60,9 +60,9 @@ PlaygroundController::PlaygroundController(QQmlEngine* engine, QJSEngine* script
     : QObject(parent),
       _qmlEngine(NULL),
       _autoSave(true),
-      _autoRestartMastic(false),
-      _needToRestartMastic(false),
-      _needToResetQmlAndMastic(false)
+      _autoRestartIngeScape(false),
+      _needToRestartIngeScape(false),
+      _needToResetQmlAndIngeScape(false)
 {
     Q_UNUSED(scriptEngine)
 
@@ -544,22 +544,22 @@ void PlaygroundController::_triggerReload()
     // NB: QML needs a small delay to delete its content
     QTimer::singleShot(QUEUED_ACTION_DELAY_IN_MILLISECONDS, [=] {
         //
-        // Clean-up Mastic and QML if needed
+        // Clean-up IngeScape and QML if needed
         //
-        if (_needToResetQmlAndMastic)
+        if (_needToResetQmlAndIngeScape)
         {
-            // Clean Mastic quick
-            MasticQuick* masticQuick = MasticQuick::instance();
-            if (masticQuick != NULL)
+            // Clean IngeScape quick
+            IngeScapeQuick* ingescapeQuick = IngeScapeQuick::instance();
+            if (ingescapeQuick != NULL)
             {
-                // Set our needToRestartMastic flag
-                setneedToRestartMastic( masticQuick->isStarted() && _autoRestartMastic );
+                // Set our needToRestartIngeScape flag
+                setneedToRestartIngeScape( ingescapeQuick->isStarted() && _autoRestartIngeScape );
 
-                // Stop Mastic properly
-                masticQuick->stop();
+                // Stop IngeScape properly
+                ingescapeQuick->stop();
 
                 // Clear definition
-                masticQuick->clearDefinition();
+                ingescapeQuick->clearDefinition();
             }
 
             // Clean-up QML
@@ -571,11 +571,11 @@ void PlaygroundController::_triggerReload()
         else
         {
             // It is our first call to _triggerReload()
-            // We will need to reset QML and Mastic before rendering a second file
-            _needToResetQmlAndMastic = true;
+            // We will need to reset QML and IngeScape before rendering a second file
+            _needToResetQmlAndIngeScape = true;
 
-            // Set our needToRestartMastic flag
-            setneedToRestartMastic( _autoRestartMastic );
+            // Set our needToRestartIngeScape flag
+            setneedToRestartIngeScape( _autoRestartIngeScape );
         }
 
         // Reload our live view

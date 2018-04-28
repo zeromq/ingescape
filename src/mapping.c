@@ -1,5 +1,5 @@
 //
-//  mtic_mapping.c
+//  igs_mapping.c
 //
 //  Created by Patxi Berard
 //  Modified by Mathieu Poirier
@@ -13,9 +13,9 @@
 #ifdef _WIN32
 #include "unixfunctions.h"
 #endif
-#include "mastic_private.h"
+#include "ingescape_private.h"
 
-mapping_t* mtic_internal_mapping = NULL;
+mapping_t* igs_internal_mapping = NULL;
 char mappingPath[MAX_PATH] = "";
 
 ////////////////////////////////////////////////////////////////////////
@@ -89,15 +89,15 @@ mapping_element_t * mapping_createMappingElement(const char * input_name,
                                                  const char *agent_name,
                                                  const char* output_name){
     if (input_name == NULL){
-        mtic_error("Input name is NULL");
+        igs_error("Input name is NULL");
         return NULL;
     }
     if (agent_name == NULL){
-        mtic_error("Agent name is NULL");
+        igs_error("Agent name is NULL");
         return NULL;
     }
     if (output_name == NULL){
-        mtic_error("Output name is NULL");
+        igs_error("Output name is NULL");
         return NULL;
     }
     
@@ -117,7 +117,7 @@ bool mapping_checkCompatibilityInputOutput(agent_iop_t *input, agent_iop_t *outp
     if (output->value_type == DATA_T){
         if (type != DATA_T && type != IMPULSION_T){
             isCompatible = false;
-            mtic_warn("DATA inputs can only be mapped to DATA or IMPULSION outputs");
+            igs_warn("DATA inputs can only be mapped to DATA or IMPULSION outputs");
         }
     }
     return isCompatible;
@@ -133,113 +133,113 @@ bool mapping_checkCompatibilityInputOutput(agent_iop_t *input, agent_iop_t *outp
  */
 
 /**
- * \fn int mtic_loadMapping (const char* json_str)
+ * \fn int igs_loadMapping (const char* json_str)
  * \ingroup loadClearGetMapFct
- * \brief load mapping in variable 'mtic_internal_mapping' from a json string
+ * \brief load mapping in variable 'igs_internal_mapping' from a json string
  *
  * \param json_str String in json format. Can't be NULL.
  * \return The error. 1 is OK, 0 json string is NULL or empty, -1 Mapping has not been loaded
  */
-int mtic_loadMapping (const char* json_str){
+int igs_loadMapping (const char* json_str){
     if(json_str == NULL || strlen(json_str) == 0){
-        mtic_error("Json string is null or empty");
+        igs_error("Json string is null or empty");
         return 0;
     }
     mapping_t *tmp = parser_LoadMap(json_str);
     if(tmp == NULL){
-        mtic_error("Mapping could not be loaded from json string : %s", json_str);
+        igs_error("Mapping could not be loaded from json string : %s", json_str);
         return -1;
     }else{
-        mtic_internal_mapping = tmp;
+        igs_internal_mapping = tmp;
         network_needToUpdateMapping = true;
     }
     return 1;
 }
 
 /**
- * \fn int mtic_loadMappingFromPath (const char* file_path)
+ * \fn int igs_loadMappingFromPath (const char* file_path)
  * \ingroup loadClearGetMapFct
- * \brief load mapping in variable 'mtic_internal_mapping' from a file path
+ * \brief load mapping in variable 'igs_internal_mapping' from a file path
  *
  * \param file_path The string which contains the json file path. Can't be NULL.
  * \return The error. 1 is OK, 0 file path is NULL or empty, -1 Definition file has not been loaded
  */
-int mtic_loadMappingFromPath (const char* file_path){
+int igs_loadMappingFromPath (const char* file_path){
     if(file_path == NULL || strlen(file_path) == 0){
-        mtic_error("Json file path is null or empty");
+        igs_error("Json file path is null or empty");
         return 0;
     }
     mapping_t *tmp = parser_LoadMapFromPath(file_path);
     if(tmp == NULL){
-        mtic_error("Mapping could not be loaded from path %s", file_path);
+        igs_error("Mapping could not be loaded from path %s", file_path);
         return -1;
     }else{
         strncpy(mappingPath, file_path, MAX_PATH);
-        mtic_internal_mapping = tmp;
+        igs_internal_mapping = tmp;
         network_needToUpdateMapping = true;
     }
     return 1;
 }
 
 /**
- * \fn int mtic_clearMapping()
+ * \fn int igs_clearMapping()
  * \ingroup loadClearGetMapFct
- * \brief Clear the variable 'mtic_internal_mapping' and free all structures inside and itself
+ * \brief Clear the variable 'igs_internal_mapping' and free all structures inside and itself
  *
  * \return The error. 1 is OK,
  * 0 file path is NULL or empty
  */
-int mtic_clearMapping(){
-    mtic_info("Clear current mapping if needed and initiate an empty one");
-    if(mtic_internal_mapping != NULL){
-        mapping_freeMapping(mtic_internal_mapping);
+int igs_clearMapping(){
+    igs_info("Clear current mapping if needed and initiate an empty one");
+    if(igs_internal_mapping != NULL){
+        mapping_freeMapping(igs_internal_mapping);
     }
-    mtic_internal_mapping = calloc(1, sizeof(struct mapping));
-    mtic_internal_mapping->name = NULL;
-    mtic_internal_mapping->description = NULL;
-    mtic_internal_mapping->version = NULL;
-    mtic_internal_mapping->map_elements = NULL;
+    igs_internal_mapping = calloc(1, sizeof(struct mapping));
+    igs_internal_mapping->name = NULL;
+    igs_internal_mapping->description = NULL;
+    igs_internal_mapping->version = NULL;
+    igs_internal_mapping->map_elements = NULL;
     network_needToUpdateMapping = true;
     return 1;
 }
 
 /**
- * \fn char* mtic_getMapping()
+ * \fn char* igs_getMapping()
  * \ingroup loadClearGetMapFct
  * \brief the agent mapping getter
  *
- * \return The loaded mapping string in json format. NULL if mtic_internal_mapping was not initialized.
+ * \return The loaded mapping string in json format. NULL if igs_internal_mapping was not initialized.
  * \warning Allocate memory that should be freed by the user.
  */
-char* mtic_getMapping(){
+char* igs_getMapping(){
     char * mappingJson = NULL;
-    if(mtic_internal_mapping == NULL){
-        mtic_warn("No mapping defined yet");
+    if(igs_internal_mapping == NULL){
+        igs_warn("No mapping defined yet");
         return NULL;
     }
-    mappingJson = parser_export_mapping(mtic_internal_mapping);
+    mappingJson = parser_export_mapping(igs_internal_mapping);
     return mappingJson;
 }
 
-char* mtic_getMappingName(void){
-    if (mtic_internal_mapping != NULL && mtic_internal_mapping->name != NULL){
-        return strdup(mtic_internal_mapping->name);
+char* igs_getMappingName(void){
+    if (igs_internal_mapping != NULL && igs_internal_mapping->name != NULL){
+        return strdup(igs_internal_mapping->name);
     }else{
         return NULL;
     }
 }
 
-char* mtic_getMappingDescription(void){
-    if (mtic_internal_mapping != NULL && mtic_internal_mapping->description != NULL){
-        return strdup(mtic_internal_mapping->description);
+char* igs_getMappingDescription(void){
+    if (igs_internal_mapping != NULL && igs_internal_mapping->description != NULL){
+        return strdup(igs_internal_mapping->description);
     }else{
         return NULL;
     }
 }
 
-char* mtic_getMappingVersion(void){
-    if (mtic_internal_mapping != NULL && mtic_internal_mapping->version != NULL){
-        return strdup(mtic_internal_mapping->version);
+char* igs_getMappingVersion(void){
+    if (igs_internal_mapping != NULL && igs_internal_mapping->version != NULL){
+        return strdup(igs_internal_mapping->version);
     }else{
         return NULL;
     }
@@ -251,103 +251,103 @@ char* mtic_getMappingVersion(void){
  */
 
 /**
- * \fn int mtic_setMappingName(char *name)
+ * \fn int igs_setMappingName(char *name)
  * \ingroup EditMapFct
  * \brief the agent mapping name setter
  *
  * \param name The string which contains the name of the agent's mapping. Can't be NULL.
  * \return The error. 1 is OK, 0 Mapping name is NULL, -1 Mapping name is empty
  */
-int mtic_setMappingName(const char *name){
+int igs_setMappingName(const char *name){
     if(name == NULL){
-        mtic_error("Mapping name cannot be NULL");
+        igs_error("Mapping name cannot be NULL");
         return 0;
     }
     if (strlen(name) == 0){
-        mtic_error("Mapping name cannot be empty");
+        igs_error("Mapping name cannot be empty");
         return -1;
     }
-    if(mtic_internal_mapping == NULL){
-        mtic_clearMapping();
+    if(igs_internal_mapping == NULL){
+        igs_clearMapping();
     }
-    if(mtic_internal_mapping->name != NULL){
-        free(mtic_internal_mapping->name);
+    if(igs_internal_mapping->name != NULL){
+        free(igs_internal_mapping->name);
     }
-    mtic_internal_mapping->name = strdup(name);
+    igs_internal_mapping->name = strdup(name);
     return 1;
 }
 
 /**
- * \fn int mtic_setMappingDescription(char *description)
+ * \fn int igs_setMappingDescription(char *description)
  * \ingroup EditMapFct
  * \brief the agent mapping description setter
  *
  * \param description The string which contains the description of the agent's mapping. Can't be NULL.
  * \return The error. 1 is OK, 0 Mapping description is NULL, -1 Mapping description is empty
  */
-int mtic_setMappingDescription(const char *description){
+int igs_setMappingDescription(const char *description){
     if(description == NULL){
-        mtic_error("Mapping description cannot be NULL");
+        igs_error("Mapping description cannot be NULL");
         return 0;
     }
     if (strlen(description) == 0){
-        mtic_error("Mapping description cannot be empty");
+        igs_error("Mapping description cannot be empty");
         return -1;
     }
-    if(mtic_internal_mapping == NULL){
-        mtic_clearMapping();
+    if(igs_internal_mapping == NULL){
+        igs_clearMapping();
     }
-    if(mtic_internal_mapping->description != NULL){
-        free(mtic_internal_mapping->description);
+    if(igs_internal_mapping->description != NULL){
+        free(igs_internal_mapping->description);
     }
-    mtic_internal_mapping->description = strdup(description);
+    igs_internal_mapping->description = strdup(description);
     return 1;
 }
 
 /**
- * \fn int mtic_setMappingVersion(char *version)
+ * \fn int igs_setMappingVersion(char *version)
  * \ingroup EditMapFct
  * \brief the agent mapping version setter
  *
  * \param version The string which contains the version of the agent's mapping. Can't be NULL.
  * \return The error. 1 is OK, 0 Mapping version is NULL, -1 Mapping version is empty
  */
-int mtic_setMappingVersion(const char *version){
+int igs_setMappingVersion(const char *version){
     if(version == NULL){
-        mtic_error("Mapping version cannot be NULL");
+        igs_error("Mapping version cannot be NULL");
         return 0;
     }
     if (strlen(version) == 0){
-        mtic_error("Mapping version cannot be empty");
+        igs_error("Mapping version cannot be empty");
         return -1;
     }
-    if(mtic_internal_mapping == NULL){
-        mtic_clearMapping();
+    if(igs_internal_mapping == NULL){
+        igs_clearMapping();
     }
-    if(mtic_internal_mapping->version != NULL){
-        free(mtic_internal_mapping->version);
+    if(igs_internal_mapping->version != NULL){
+        free(igs_internal_mapping->version);
     }
-    mtic_internal_mapping->version = strdup(version);
+    igs_internal_mapping->version = strdup(version);
     return 1;
 }
 
 /**
- * \fn int mtic_getMappingEntriesNumber()
+ * \fn int igs_getMappingEntriesNumber()
  * \ingroup EditMapFct
  * \brief the agent mapping entries number getter
  *
- * \return The number of mapping type output entries. If -1 The structure mtic_internal_mapping is NULL.
+ * \return The number of mapping type output entries. If -1 The structure igs_internal_mapping is NULL.
  */
-int mtic_getMappingEntriesNumber(){
-    if(mtic_internal_mapping == NULL){
-        mtic_warn("No mapping defined yet");
+int igs_getMappingEntriesNumber(){
+    if(igs_internal_mapping == NULL){
+        igs_warn("No mapping defined yet");
         return 0;
     }
-    return HASH_COUNT(mtic_internal_mapping->map_elements);;
+    return HASH_COUNT(igs_internal_mapping->map_elements);;
 }
 
 /**
- * \fn int mtic_addMappingEntry(char *fromOurInput, char *toAgent, char *withOutput)
+ * \fn int igs_addMappingEntry(char *fromOurInput, char *toAgent, char *withOutput)
  * \ingroup EditMapFct
  * \brief this function allows the user to add a new mapping entry dynamically
  *
@@ -359,12 +359,12 @@ int mtic_getMappingEntriesNumber(){
  * -1 Agent name to be mapped cannot be NULL or empty.
  * -2 Extern agent output name to be mapped cannot be NULL or empty.
  */
-unsigned long mtic_addMappingEntry(const char *fromOurInput,
+unsigned long igs_addMappingEntry(const char *fromOurInput,
                                    const char *toAgent,
                                    const char *withOutput){
     //fromOurInput
     if(fromOurInput == NULL || strlen(fromOurInput) == 0){
-        mtic_error("Input name to be mapped cannot be NULL or empty");
+        igs_error("Input name to be mapped cannot be NULL or empty");
         return 0;
     }
     char *reviewedFromOurInput = strndup(fromOurInput, MAX_IOP_NAME_LENGTH);
@@ -377,12 +377,12 @@ unsigned long mtic_addMappingEntry(const char *fromOurInput,
         }
     }
     if (spaceInName){
-        mtic_warn("Spaces are not allowed in IOP name : %s has been renamed to %s\n", fromOurInput, reviewedFromOurInput);
+        igs_warn("Spaces are not allowed in IOP name : %s has been renamed to %s\n", fromOurInput, reviewedFromOurInput);
     }
 
     //toAgent
     if(toAgent == NULL || strlen(toAgent) == 0){
-        mtic_error("Agent name to be mapped cannot be NULL or empty");
+        igs_error("Agent name to be mapped cannot be NULL or empty");
         return 0;
     }
     char *reviewedToAgent = strndup(toAgent, MAX_IOP_NAME_LENGTH);
@@ -395,12 +395,12 @@ unsigned long mtic_addMappingEntry(const char *fromOurInput,
         }
     }
     if (spaceInName){
-        mtic_warn("Spaces are not allowed in agent name: %s has been renamed to %s", toAgent, reviewedToAgent);
+        igs_warn("Spaces are not allowed in agent name: %s has been renamed to %s", toAgent, reviewedToAgent);
     }
 
     //withOutput
     if((withOutput == NULL) || (strlen(withOutput) == 0)){
-        mtic_error("Agent output name to be mapped cannot be NULL or empty");
+        igs_error("Agent output name to be mapped cannot be NULL or empty");
         return 0;
     }
     char *reviewedWithOutput = strndup(withOutput, MAX_IOP_NAME_LENGTH);
@@ -413,12 +413,12 @@ unsigned long mtic_addMappingEntry(const char *fromOurInput,
         }
     }
     if (spaceInName){
-        mtic_warn("Spaces are not allowed in IOP: %s has been renamed to %s", withOutput, reviewedWithOutput);
+        igs_warn("Spaces are not allowed in IOP: %s has been renamed to %s", withOutput, reviewedWithOutput);
     }
 
     //Check if already initialized, and do it if not
-    if(mtic_internal_mapping == NULL){
-        mtic_clearMapping();
+    if(igs_internal_mapping == NULL){
+        igs_clearMapping();
     }
 
     //Add the new mapping element if not already there
@@ -434,19 +434,19 @@ unsigned long mtic_addMappingEntry(const char *fromOurInput,
     free (mashup);
     
     mapping_element_t *tmp = NULL;
-    if (mtic_internal_mapping->map_elements != NULL){
-        HASH_FIND(hh, mtic_internal_mapping->map_elements, &h, sizeof(unsigned long), tmp);
+    if (igs_internal_mapping->map_elements != NULL){
+        HASH_FIND(hh, igs_internal_mapping->map_elements, &h, sizeof(unsigned long), tmp);
     }
     if (tmp == NULL){
         //element does not exist yet : create and register it
         //check input against definition and reject if input does not exist in definition
-        if (mtic_checkInputExistence(reviewedFromOurInput)){
+        if (igs_checkInputExistence(reviewedFromOurInput)){
             mapping_element_t *new = mapping_createMappingElement(reviewedFromOurInput, reviewedToAgent, reviewedWithOutput);
             new->id = h;
-            HASH_ADD(hh, mtic_internal_mapping->map_elements, id, sizeof(unsigned long), new);
+            HASH_ADD(hh, igs_internal_mapping->map_elements, id, sizeof(unsigned long), new);
             network_needToUpdateMapping = true;
         }else{
-            mtic_error("Input %s does not exist in our definition : cannot create mapping entry for it", reviewedFromOurInput);
+            igs_error("Input %s does not exist in our definition : cannot create mapping entry for it", reviewedFromOurInput);
             free(reviewedFromOurInput);
             free(reviewedToAgent);
             free(reviewedWithOutput);
@@ -454,7 +454,7 @@ unsigned long mtic_addMappingEntry(const char *fromOurInput,
         }
         
     }else{
-        mtic_warn("Mapping combination %s.%s->%s already exists", reviewedFromOurInput, reviewedToAgent, reviewedWithOutput);
+        igs_warn("Mapping combination %s.%s->%s already exists", reviewedFromOurInput, reviewedToAgent, reviewedWithOutput);
     }
     free(reviewedFromOurInput);
     free(reviewedToAgent);
@@ -463,32 +463,32 @@ unsigned long mtic_addMappingEntry(const char *fromOurInput,
 }
 
 /**
- * \fn int mtic_removeMappingEntryWithId(int theId)
+ * \fn int igs_removeMappingEntryWithId(int theId)
  * \ingroup EditMapFct
  * \brief this function allows the user to remove a mapping in table by its id
  *
  * \param theId The id of the mapping. Cannot be negative.
  * \return The error. 1 is OK.
  * 0 The id of the mapping cannot be negative.
- * -1 The structure mtic_internal_mapping is NULL.
+ * -1 The structure igs_internal_mapping is NULL.
  * -2 The structure mapping out is NULL.
  */
-int mtic_removeMappingEntryWithId(unsigned long theId){
+int igs_removeMappingEntryWithId(unsigned long theId){
     mapping_element_t *el = NULL;
-    if(mtic_internal_mapping == NULL){
-        mtic_error("No mapping defined yet");
+    if(igs_internal_mapping == NULL){
+        igs_error("No mapping defined yet");
         return -1;
     }
-    if(mtic_internal_mapping->map_elements == NULL){
-        mtic_error("No mapping elements defined yet");
+    if(igs_internal_mapping->map_elements == NULL){
+        igs_error("No mapping elements defined yet");
         return -2;
     }
-    HASH_FIND(hh, mtic_internal_mapping->map_elements, &theId, sizeof(unsigned long), el);
+    HASH_FIND(hh, igs_internal_mapping->map_elements, &theId, sizeof(unsigned long), el);
     if(el == NULL){
-        mtic_warn("id %ld is not part of the current mapping", theId);
+        igs_warn("id %ld is not part of the current mapping", theId);
         return 0;
     }else{
-        HASH_DEL(mtic_internal_mapping->map_elements, el);
+        HASH_DEL(igs_internal_mapping->map_elements, el);
         mapping_freeMappingElement(el);
         network_needToUpdateMapping = true;
     }
@@ -496,7 +496,7 @@ int mtic_removeMappingEntryWithId(unsigned long theId){
 }
 
 /**
- * \fn int mtic_removeMappingEntryWithName(char *fromOurInput, char *toAgent, char *withOutput)
+ * \fn int igs_removeMappingEntryWithName(char *fromOurInput, char *toAgent, char *withOutput)
  * \ingroup EditMapFct
  * \brief this function allows the user to remove a mapping in table by the input name, the extern agent's name, the extern agent's output
  *
@@ -507,29 +507,29 @@ int mtic_removeMappingEntryWithId(unsigned long theId){
  *  0 Our input name to be mapped cannot be NULL or empty.
  * -1 Agent name to be mapped cannot be NULL or empty.
  * -2 Extern agent output name to be mapped cannot be NULL or empty.
- * -3 The structure mtic_internal_mapping is NULL.
+ * -3 The structure igs_internal_mapping is NULL.
  * -4 The structure mapping out is NULL.
  */
-int mtic_removeMappingEntryWithName(const char *fromOurInput, const char *toAgent, const char *withOutput){
+int igs_removeMappingEntryWithName(const char *fromOurInput, const char *toAgent, const char *withOutput){
     if(fromOurInput == NULL || strlen(fromOurInput) == 0){
-        mtic_error("Input name to be mapped cannot be NULL or empty");
+        igs_error("Input name to be mapped cannot be NULL or empty");
         return 0;
     }
     if(toAgent == NULL || strlen(toAgent) == 0){
-        mtic_error("Agent name to be mapped cannot be NULL or empty");
+        igs_error("Agent name to be mapped cannot be NULL or empty");
         return -1;
     }
     if(withOutput == NULL || strlen(withOutput) == 0){
-        mtic_error("Agent output name to be mapped cannot be NULL or empty");
+        igs_error("Agent output name to be mapped cannot be NULL or empty");
         return -2;
     }
-    if(mtic_internal_mapping == NULL){
-        mtic_clearMapping();
-        mtic_error("No mapping defined yet");
+    if(igs_internal_mapping == NULL){
+        igs_clearMapping();
+        igs_error("No mapping defined yet");
         return -3;
     }
-    if(mtic_internal_mapping->map_elements == NULL){
-        mtic_error("No mapping elements defined yet");
+    if(igs_internal_mapping->map_elements == NULL){
+        igs_error("No mapping elements defined yet");
         return -4;
     }
 
@@ -545,31 +545,31 @@ int mtic_removeMappingEntryWithName(const char *fromOurInput, const char *toAgen
     free (mashup);
     
     mapping_element_t *tmp = NULL;
-    if (mtic_internal_mapping->map_elements != NULL){
-        HASH_FIND(hh, mtic_internal_mapping->map_elements, &h, sizeof(unsigned long), tmp);
+    if (igs_internal_mapping->map_elements != NULL){
+        HASH_FIND(hh, igs_internal_mapping->map_elements, &h, sizeof(unsigned long), tmp);
     }
     if (tmp == NULL){
-        mtic_warn("Mapping combination %s.%s->%s does NOT exist", fromOurInput, toAgent, withOutput);
+        igs_warn("Mapping combination %s.%s->%s does NOT exist", fromOurInput, toAgent, withOutput);
         return -5;
     }else{
-        HASH_DEL(mtic_internal_mapping->map_elements, tmp);
+        HASH_DEL(igs_internal_mapping->map_elements, tmp);
         mapping_freeMappingElement(tmp);
         network_needToUpdateMapping = true;
         return 1;
     }
 }
 
-void mtic_setMappingPath(const char *path){
+void igs_setMappingPath(const char *path){
     strncpy(mappingPath, path, MAX_PATH - 1);
 }
 
-void mtic_writeMappingToPath(void){
+void igs_writeMappingToPath(void){
     FILE *fp = NULL;
     fp = fopen (mappingPath,"w+");
     if (fp == NULL){
-        mtic_error("Could not open %s for writing", mappingPath);
+        igs_error("Could not open %s for writing", mappingPath);
     }else{
-        char *map = parser_export_mapping(mtic_internal_mapping);
+        char *map = parser_export_mapping(igs_internal_mapping);
         fprintf(fp, "%s", map);
         fflush(fp);
         fclose(fp);

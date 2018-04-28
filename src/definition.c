@@ -1,5 +1,5 @@
 //
-//  mtic_definition.c
+//  igs_definition.c
 //
 //  Created by Patxi Berard
 //  Modified by Mathieu Poirier
@@ -9,14 +9,14 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "mastic_private.h"
+#include "ingescape_private.h"
 #include "uthash/uthash.h"
 #include "uthash/utlist.h"
 #ifdef _WIN32
 #include "unixfunctions.h"
 #endif
 
-definition * mtic_internal_definition = NULL;
+definition * igs_internal_definition = NULL;
 
 typedef struct agent_port_t {
     const char * name;          //Needs to be unique : the table hash key
@@ -41,7 +41,7 @@ void definition_freeIOP (agent_iop_t* iop){
         free((iop)->value.data);
     }
     if ((iop)->callbacks != NULL){
-        mtic_observe_callback_t *cb, *tmp;
+        igs_observe_callback_t *cb, *tmp;
         DL_FOREACH_SAFE((iop)->callbacks, cb, tmp){
             DL_DELETE((iop)->callbacks, cb);
             free(cb);
@@ -52,7 +52,7 @@ void definition_freeIOP (agent_iop_t* iop){
 
 int definition_addIopToDefinition(agent_iop_t *iop, iop_t iop_type, definition *def){
     if(def == NULL){
-        mtic_error("Cannot add IOP %s to NULL definition", iop->name);
+        igs_error("Cannot add IOP %s to NULL definition", iop->name);
         return 0;
     }
     agent_iop_t *previousIOP = NULL;
@@ -70,7 +70,7 @@ int definition_addIopToDefinition(agent_iop_t *iop, iop_t iop_type, definition *
             break;
     }
     if(previousIOP != NULL){
-        mtic_error("%s already exists and cannot be overwritten", iop->name);
+        igs_error("%s already exists and cannot be overwritten", iop->name);
         return 0;
     }
     switch (iop_type) {
@@ -90,8 +90,8 @@ int definition_addIopToDefinition(agent_iop_t *iop, iop_t iop_type, definition *
 }
 
 agent_iop_t* definition_createIop(const char *name, iop_t type, iopType_t value_type, void *value, long size){
-    if (mtic_internal_definition == NULL){
-        mtic_error("Cannot add IOP %s to NULL definition", name);
+    if (igs_internal_definition == NULL){
+        igs_error("Cannot add IOP %s to NULL definition", name);
         return NULL;
     }
     agent_iop_t *iop = NULL;
@@ -106,26 +106,26 @@ agent_iop_t* definition_createIop(const char *name, iop_t type, iopType_t value_
         }
     }
     if (spaceInName){
-        mtic_warn("Spaces are not allowed in IOP: %s has been renamed to %s", name, n);
+        igs_warn("Spaces are not allowed in IOP: %s has been renamed to %s", name, n);
     }
     iop->name = n;
     iop->type = type;
     iop->value_type = value_type;
     switch (type) {
         case INPUT_T:
-            if (definition_addIopToDefinition(iop, INPUT_T, mtic_internal_definition) < 1){
+            if (definition_addIopToDefinition(iop, INPUT_T, igs_internal_definition) < 1){
                 definition_freeIOP(iop);
                 return NULL;
             }
             break;
         case OUTPUT_T:
-            if (definition_addIopToDefinition(iop, OUTPUT_T, mtic_internal_definition) < 1){
+            if (definition_addIopToDefinition(iop, OUTPUT_T, igs_internal_definition) < 1){
                 definition_freeIOP(iop);
                 return NULL;
             }
             break;
         case PARAMETER_T:
-            if (definition_addIopToDefinition(iop, PARAMETER_T, mtic_internal_definition) < 1){
+            if (definition_addIopToDefinition(iop, PARAMETER_T, igs_internal_definition) < 1){
                 definition_freeIOP(iop);
                 return NULL;
             }
@@ -183,120 +183,120 @@ void definition_freeDefinition (definition* def) {
  */
 
 /**
- * \fn int mtic_clearDefinition()
+ * \fn int igs_clearDefinition()
  * \ingroup loadSetGetDefFct
  * \brief Clear the internal definition of the agent.
- *        Free all members of the structure mtic_definition_loaded & mtic_internal_definition.
+ *        Free all members of the structure igs_definition_loaded & igs_internal_definition.
  *        But the pointer of these structure is not free and stay allocated.
  * \return 1 if ok else 0
  */
-int mtic_clearDefinition(){
+int igs_clearDefinition(){
 
     //Free the structure definition loaded
-    mtic_info("Clear our definition and initiate an empty one");
-    if(mtic_internal_definition != NULL){
-        definition_freeDefinition(mtic_internal_definition);
+    igs_info("Clear our definition and initiate an empty one");
+    if(igs_internal_definition != NULL){
+        definition_freeDefinition(igs_internal_definition);
     }
-    mtic_internal_definition = calloc(1, sizeof(definition));
-    mtic_internal_definition->name = mtic_getAgentName();
-    mtic_internal_definition->description = NULL;
-    mtic_internal_definition->version = NULL;
-    mtic_internal_definition->params_table = NULL;
-    mtic_internal_definition->inputs_table = NULL;
-    mtic_internal_definition->outputs_table = NULL;
+    igs_internal_definition = calloc(1, sizeof(definition));
+    igs_internal_definition->name = igs_getAgentName();
+    igs_internal_definition->description = NULL;
+    igs_internal_definition->version = NULL;
+    igs_internal_definition->params_table = NULL;
+    igs_internal_definition->inputs_table = NULL;
+    igs_internal_definition->outputs_table = NULL;
     network_needToSendDefinitionUpdate = true;
     return 1;
 }
 
-char* mtic_getDefinition(){
+char* igs_getDefinition(){
     char * def = NULL;
-    if(mtic_internal_definition == NULL)
+    if(igs_internal_definition == NULL)
         return NULL;
-    def = parser_export_definition(mtic_internal_definition);
+    def = parser_export_definition(igs_internal_definition);
     return def;
 }
 
-char *mtic_getDefinitionName(void){
-    if (mtic_internal_definition != NULL && mtic_internal_definition->name != NULL){
-        return strdup(mtic_internal_definition->name);
+char *igs_getDefinitionName(void){
+    if (igs_internal_definition != NULL && igs_internal_definition->name != NULL){
+        return strdup(igs_internal_definition->name);
     }else{
         return NULL;
     }
 }
 
-char *mtic_getDefinitionDescription(void){
-    if (mtic_internal_definition != NULL && mtic_internal_definition->description != NULL){
-        return strdup(mtic_internal_definition->description);
+char *igs_getDefinitionDescription(void){
+    if (igs_internal_definition != NULL && igs_internal_definition->description != NULL){
+        return strdup(igs_internal_definition->description);
     }else{
         return NULL;
     }
 }
 
-char *mtic_getDefinitionVersion(void){
-    if (mtic_internal_definition != NULL && mtic_internal_definition->version != NULL){
-        return strdup(mtic_internal_definition->version);
+char *igs_getDefinitionVersion(void){
+    if (igs_internal_definition != NULL && igs_internal_definition->version != NULL){
+        return strdup(igs_internal_definition->version);
     }else{
         return NULL;
     }
 }
 
-int mtic_setDefinitionName(const char *name){
+int igs_setDefinitionName(const char *name){
     if (name == NULL){
-        mtic_error("Definition name cannot be NULL");
+        igs_error("Definition name cannot be NULL");
         return 0;
     }
     if (strlen(name) == 0){
-        mtic_error("Definition name cannot be empty");
+        igs_error("Definition name cannot be empty");
         return -1;
     }
     
-    if(mtic_internal_definition == NULL){
-        mtic_internal_definition = calloc(1, sizeof(definition));
+    if(igs_internal_definition == NULL){
+        igs_internal_definition = calloc(1, sizeof(definition));
     }
-    if(mtic_internal_definition->name != NULL){
-        free((char*)mtic_internal_definition->name);
+    if(igs_internal_definition->name != NULL){
+        free((char*)igs_internal_definition->name);
     }
-    mtic_internal_definition->name = strdup(name);
+    igs_internal_definition->name = strdup(name);
     network_needToSendDefinitionUpdate = true;
     return 1;
 }
 
-int mtic_setDefinitionDescription(const char *description){
+int igs_setDefinitionDescription(const char *description){
     if(description == NULL){
-        mtic_error("Definition description cannot be NULL");
+        igs_error("Definition description cannot be NULL");
         return 0;
     }
     if (strlen(description) == 0){
-        mtic_error("Definition description cannot be empty\n");
+        igs_error("Definition description cannot be empty\n");
         return -1;
     }
-    if(mtic_internal_definition == NULL){
-        mtic_internal_definition = calloc(1, sizeof(definition));
+    if(igs_internal_definition == NULL){
+        igs_internal_definition = calloc(1, sizeof(definition));
     }
-    if(mtic_internal_definition->description != NULL){
-        free((char*)mtic_internal_definition->description);
+    if(igs_internal_definition->description != NULL){
+        free((char*)igs_internal_definition->description);
     }
-    mtic_internal_definition->description = strdup(description);
+    igs_internal_definition->description = strdup(description);
     network_needToSendDefinitionUpdate = true;
     return 1;
 }
 
-int mtic_setDefinitionVersion(const char *version){
+int igs_setDefinitionVersion(const char *version){
     if(version == NULL){
-        mtic_error("Definition version cannot be NULL");
+        igs_error("Definition version cannot be NULL");
         return 0;
     }
     if (strlen(version) == 0){
-        mtic_error("Definition version cannot be empty");
+        igs_error("Definition version cannot be empty");
         return -1;
     }
-    if(mtic_internal_definition == NULL){
-        mtic_internal_definition = calloc(1, sizeof(definition));
+    if(igs_internal_definition == NULL){
+        igs_internal_definition = calloc(1, sizeof(definition));
     }
-    if(mtic_internal_definition->version != NULL){
-        free((char*)mtic_internal_definition->version);
+    if(igs_internal_definition->version != NULL){
+        free((char*)igs_internal_definition->version);
     }
-    mtic_internal_definition->version = strdup(version);
+    igs_internal_definition->version = strdup(version);
     network_needToSendDefinitionUpdate = true;
     return 1;
 }
@@ -307,7 +307,7 @@ int mtic_setDefinitionVersion(const char *version){
  */
 
 /**
- * \fn mtic_createInput(const char *name, iopType_t type, void *value)
+ * \fn igs_createInput(const char *name, iopType_t type, void *value)
  * \ingroup EditDefFct
  * \brief Create and add an input for the agent
  *
@@ -317,13 +317,13 @@ int mtic_setDefinitionVersion(const char *version){
  * \return The error. 1 is OK, 0 not able to add in definition loaded, -1 not able to add in definition live
  */
 
-int mtic_createInput(const char *name, iopType_t value_type, void *value, long size){
+int igs_createInput(const char *name, iopType_t value_type, void *value, long size){
     if (name == NULL || strlen (name) == 0){
-        mtic_error("Input name cannot be NULL or empty");
+        igs_error("Input name cannot be NULL or empty");
         return -1;
     }
-    if(mtic_internal_definition == NULL){
-        mtic_internal_definition = calloc(1, sizeof(definition));
+    if(igs_internal_definition == NULL){
+        igs_internal_definition = calloc(1, sizeof(definition));
     }
     agent_iop_t *iop = definition_createIop(name, INPUT_T, value_type, value, size);
     if (iop == NULL){
@@ -334,7 +334,7 @@ int mtic_createInput(const char *name, iopType_t value_type, void *value, long s
 }
 
 /**
- * \fn mtic_createOutput(const char *name, iopType_t type, void *value)
+ * \fn igs_createOutput(const char *name, iopType_t type, void *value)
  * \ingroup EditDefFct
  * \brief Create and add a output for the agent
  *
@@ -344,13 +344,13 @@ int mtic_createInput(const char *name, iopType_t value_type, void *value, long s
  * \return The error. 1 is OK, 0 not able to add in definition loaded, -1 not able to add in definition live
  */
 
-int mtic_createOutput(const char *name, iopType_t value_type, void *value, long size){
+int igs_createOutput(const char *name, iopType_t value_type, void *value, long size){
     if (name == NULL || strlen (name) == 0){
-        mtic_error("Output name cannot be NULL or empty");
+        igs_error("Output name cannot be NULL or empty");
         return -1;
     }
-    if(mtic_internal_definition == NULL){
-        mtic_internal_definition = calloc(1, sizeof(definition));
+    if(igs_internal_definition == NULL){
+        igs_internal_definition = calloc(1, sizeof(definition));
     }
     agent_iop_t* iop = definition_createIop(name, OUTPUT_T, value_type, value, size);
     if (iop == NULL){
@@ -361,7 +361,7 @@ int mtic_createOutput(const char *name, iopType_t value_type, void *value, long 
 }
 
 /**
- * \fn mtic_createParameter(const char *name, iopType_t type, void *value)
+ * \fn igs_createParameter(const char *name, iopType_t type, void *value)
  * \ingroup EditDefFct
  * \brief Create and add a parameter for the agent
  *
@@ -370,13 +370,13 @@ int mtic_createOutput(const char *name, iopType_t value_type, void *value, long 
  * \param value The pointer on the value (the value will be copied)
  * \return The error. 1 is OK, 0 not able to add in definition loaded, -1 not able to add in definition live
  */
-int mtic_createParameter(const char *name, iopType_t value_type, void *value, long size){
+int igs_createParameter(const char *name, iopType_t value_type, void *value, long size){
     if (name == NULL || strlen (name) == 0){
-        mtic_error("Parameter name cannot be NULL or empty");
+        igs_error("Parameter name cannot be NULL or empty");
         return -1;
     }
-    if(mtic_internal_definition == NULL){
-        mtic_internal_definition = calloc(1, sizeof(definition));
+    if(igs_internal_definition == NULL){
+        igs_internal_definition = calloc(1, sizeof(definition));
     }
     agent_iop_t* iop = definition_createIop(name, PARAMETER_T, value_type, value, size);
     if (iop == NULL){
@@ -387,100 +387,100 @@ int mtic_createParameter(const char *name, iopType_t value_type, void *value, lo
 }
 
 /**
- * \fn mtic_removeInput(const char *name)
+ * \fn igs_removeInput(const char *name)
  * \ingroup EditDefFct
  * \brief Remove and free an input for the agent
  *
  * \param name The name of the Iop
  * \return The error. 1 is OK, 0 Definition loaded is NULL, -1 Definition live is NULL, -2 An error occurs while finding the iop by name
  */
-int mtic_removeInput(const char *name){
+int igs_removeInput(const char *name){
     if (name == NULL){
-        mtic_error("Input name cannot be NULL or empty");
+        igs_error("Input name cannot be NULL or empty");
         return -1;
     }
-    if(mtic_internal_definition == NULL){
-        mtic_error("No definition available yet");
+    if(igs_internal_definition == NULL){
+        igs_error("No definition available yet");
         return -1;
     }
     agent_iop_t * iop = model_findIopByName(name,INPUT_T);
     if(iop == NULL){
-        mtic_warn("The input %s could not be found", name);
+        igs_warn("The input %s could not be found", name);
         return -2;
     }
-    HASH_DEL(mtic_internal_definition->inputs_table, iop);
+    HASH_DEL(igs_internal_definition->inputs_table, iop);
     definition_freeIOP(iop);
     network_needToSendDefinitionUpdate = true;
     return 1;
 }
 
 /**
- * \fn mtic_removeOutput(const char *name)
+ * \fn igs_removeOutput(const char *name)
  * \ingroup EditDefFct
  * \brief Remove and free a output for the agent
  *
  * \param name The name of the Iop
  * \return The error. 1 is OK, 0 Definition loaded is NULL, -1 Definition live is NULL, -2 An error occurs while finding the iop by name
  */
-int mtic_removeOutput(const char *name){
+int igs_removeOutput(const char *name){
     if (name == NULL){
-        mtic_error("Output name cannot be NULL or empty");
+        igs_error("Output name cannot be NULL or empty");
         return -1;
     }
-    if(mtic_internal_definition == NULL){
-        mtic_error("No definition available yet");
+    if(igs_internal_definition == NULL){
+        igs_error("No definition available yet");
         return -1;
     }
     agent_iop_t * iop = model_findIopByName(name,OUTPUT_T);
     if(iop == NULL){
-        mtic_warn("The output %s could not be found", name);
+        igs_warn("The output %s could not be found", name);
         return -2;
     }
-    HASH_DEL(mtic_internal_definition->outputs_table, iop);
+    HASH_DEL(igs_internal_definition->outputs_table, iop);
     definition_freeIOP(iop);
     network_needToSendDefinitionUpdate = true;
     return 1;
 }
 
 /**
- * \fn mtic_removeParameter(const char *name)
+ * \fn igs_removeParameter(const char *name)
  * \ingroup EditDefFct
  * \brief Remove and free a output for the agent
  *
  * \param name The name of the Iop
  * \return The error. 1 is OK, 0 Definition loaded is NULL, -1 Definition live is NULL, -2 An error occurs while finding the iop by name
  */
-int mtic_removeParameter(const char *name){
+int igs_removeParameter(const char *name){
     if (name == NULL){
-        mtic_error("Parameter name cannot be NULL or empty");
+        igs_error("Parameter name cannot be NULL or empty");
         return -1;
     }
-    if(mtic_internal_definition == NULL){
-        mtic_error("No definition available yet");
+    if(igs_internal_definition == NULL){
+        igs_error("No definition available yet");
         return -1;
     }
     agent_iop_t * iop = model_findIopByName(name,PARAMETER_T);
     if(iop == NULL){
-        mtic_warn("The parameter %s could not be found", name);
+        igs_warn("The parameter %s could not be found", name);
         return -2;
     }
-    HASH_DEL(mtic_internal_definition->params_table, iop);
+    HASH_DEL(igs_internal_definition->params_table, iop);
     definition_freeIOP(iop);
     network_needToSendDefinitionUpdate = true;
     return 1;
 }
 
-void mtic_setDefinitionPath(const char *path){
+void igs_setDefinitionPath(const char *path){
     strncpy(definitionPath, path, MAX_PATH - 1);
 }
 
-void mtic_writeDefinitionToPath(void){
+void igs_writeDefinitionToPath(void){
     FILE *fp = NULL;
     fp = fopen (definitionPath,"w+");
     if (fp == NULL){
-        mtic_error("Could not open %s for writing", definitionPath);
+        igs_error("Could not open %s for writing", definitionPath);
     }else{
-        char *def = parser_export_definition(mtic_internal_definition);
+        char *def = parser_export_definition(igs_internal_definition);
         fprintf(fp, "%s", def);
         fflush(fp);
         fclose(fp);
