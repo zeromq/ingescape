@@ -188,7 +188,7 @@ Item {
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
 
-                text: qsTr("Mastic\nQML Playground")
+                text: qsTr("ingeScape\nQML Playground")
 
                 color: "#005EB8"
 

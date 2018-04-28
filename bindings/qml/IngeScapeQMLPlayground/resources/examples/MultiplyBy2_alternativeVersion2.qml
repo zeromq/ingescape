@@ -8,7 +8,7 @@ Item {
     // Behavior
     Component.onCompleted: {
         // Set agent name and definition info
-        Mastic.agentName = "MultiplyBy2-agent"
+        Mastic.agentName = "MultiplyBy2-agent-alternativeVersion2"
         Mastic.definitionName = Mastic.agentName;
         Mastic.definitionDescription = "Definition of " + Mastic.agentName;
         Mastic.definitionVersion = "0.0";
@@ -18,13 +18,16 @@ Item {
 
         // Create an output
         Mastic.createOutputDouble("result");
-
-        // Link our input and our output value
-        Mastic.outputs.result = Qt.binding(function() {
-                return Mastic.inputs.operand * 2;
-        });
     }
 
+    // Use a Connection to observe all inputs
+    Connections {
+        target: Mastic
+
+        onObserveInput: {
+            Mastic.outputs.result = Mastic.inputs.operand * 2;
+        }
+    }
 
     // Feedback
     Text {

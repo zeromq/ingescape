@@ -4,7 +4,7 @@ import QtQuick.Controls.Styles 1.4
 
 import Qt.labs.settings 1.0
 
-import MasticPlayground 1.0
+import IngeScapePlayground 1.0
 
 
 Item {
@@ -22,13 +22,13 @@ Item {
 
 
     // Recent files
-    property var recentFiles: MasticPlaygroundController.recentFiles
+    property var recentFiles: PlaygroundController.recentFiles
 
     // Auto-save
-    property bool autoSave: MasticPlaygroundController.autoSave
+    property bool autoSave: PlaygroundController.autoSave
 
     // Auto-restart Mastic
-    property bool autoRestartMastic: MasticPlaygroundController.autoRestartMastic
+    property bool autoRestartMastic: PlaygroundController.autoRestartMastic
 
 
     //-------------------------------------------
@@ -39,21 +39,21 @@ Item {
 
 
     onRecentFilesChanged: {
-        MasticPlaygroundController.recentFiles = root.recentFiles;
+        PlaygroundController.recentFiles = root.recentFiles;
     }
 
 
     onAutoSaveChanged: {
-        MasticPlaygroundController.autoSave = root.autoSave;
+        PlaygroundController.autoSave = root.autoSave;
     }
 
     onAutoRestartMasticChanged: {
-        MasticPlaygroundController.autoRestartMastic = root.autoRestartMastic;
+        PlaygroundController.autoRestartMastic = root.autoRestartMastic;
     }
 
 
     Component.onCompleted: {
-        MasticPlaygroundController.init();
+        PlaygroundController.init();
     }
 
 
@@ -90,7 +90,7 @@ Item {
                 if ((drop.proposedAction == Qt.MoveAction) || (drop.proposedAction == Qt.CopyAction))
                 {
                     // Open file
-                    MasticPlaygroundController.openFile(Qt.resolvedUrl(drop.text));
+                    PlaygroundController.openFile(Qt.resolvedUrl(drop.text));
 
                     drop.acceptProposedAction()
                 }

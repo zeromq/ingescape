@@ -1,5 +1,5 @@
 /*
- *  Mastic - QML playground
+ *  ingeScape - QML playground
  *
  *  Copyright (c) 2018 Ingenuity i/o. All rights reserved.
  *
@@ -13,8 +13,8 @@
  */
 
 
-#ifndef MASTICPLAYGROUNDCONTROLLER_H
-#define MASTICPLAYGROUNDCONTROLLER_H
+#ifndef PLAYGROUNDCONTROLLER_H
+#define PLAYGROUNDCONTROLLER_H
 
 #include <QObject>
 #include <QtQml>
@@ -32,7 +32,7 @@
 /**
  * @brief The MasticPlaygroundController class defines the main controller of our playground application
  */
-class MasticPlaygroundController : public QObject
+class PlaygroundController : public QObject
 {
     Q_OBJECT
 
@@ -78,13 +78,13 @@ public:
      * @param scriptEngine
      * @param parent
      */
-    explicit MasticPlaygroundController(QQmlEngine* engine, QJSEngine* scriptEngine, QObject *parent = nullptr);
+    explicit PlaygroundController(QQmlEngine* engine, QJSEngine* scriptEngine, QObject *parent = nullptr);
 
 
     /**
       * @brief Destructor
       */
-    ~MasticPlaygroundController();
+    ~PlaygroundController();
 
 
     /**
@@ -287,16 +287,21 @@ protected:
 
 protected Q_SLOTS:
     /**
-     * @brief Call when our file system watcher detects a file change
+     * @brief Called when our file system watcher detects a file change
      */
     void _onFileSystemWatcherFileChanged(const QString &path);
 
 
     /**
-     * @brief Call when our file system watcher detects a directory change
+     * @brief Called when our file system watcher detects a directory change
      */
     void _onFileSystemWatcherDirectoryChanged(const QString &path);
 
+
+    /**
+     * @brief Called when our _timerReloadOnFileSystemChanges triggers a timeout
+     */
+    void _onTimerReloadOnFileSystemChangesTimeout();
 
 
 protected:
@@ -312,12 +317,15 @@ protected:
     // File watcher to detect external changes i.e. if the source code is edited in an IDE such as Qt Creator, Xcode, Visual Studio, etc.
     QFileSystemWatcher _fileSystemWatcher;
 
+    // Timer used to reload our content when a file or a directory changes
+    QTimer _timerReloadOnFileSystemChanges;
+
     // List of examples
     QList<PlaygroundExample*> _examples;
 };
 
 
-QML_DECLARE_TYPE(MasticPlaygroundController)
+QML_DECLARE_TYPE(PlaygroundController)
 
 
-#endif // MASTICPLAYGROUNDCONTROLLER_H
+#endif // PLAYGROUNDCONTROLLER_H

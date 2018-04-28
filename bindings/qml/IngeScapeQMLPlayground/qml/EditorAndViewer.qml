@@ -5,7 +5,7 @@ import QtQuick.Controls.Styles 1.4
 import "editor" as Editor
 import "viewer" as Viewer
 
-import MasticPlayground 1.0
+import IngeScapePlayground 1.0
 
 
 
@@ -18,7 +18,7 @@ Item {
     //
     //-------------------------------------------
 
-    state: MasticPlaygroundController.currentViewMode
+    state: PlaygroundController.currentViewMode
 
 
     //-------------------------------------------
@@ -69,7 +69,7 @@ Item {
         }
 
         Connections {
-            target: MasticPlaygroundController
+            target: PlaygroundController
 
             onClearLiveView: {
                 // Just in case, our user opens a file with the same content
@@ -79,8 +79,8 @@ Item {
 
             onReloadLiveView: {
                 console.log("Reload live view")
-                demoLiveView.sourceCodeFilePath = MasticPlaygroundController.currentSourceFile;
-                demoLiveView.sourceCode = MasticPlaygroundController.editedSourceContent;
+                demoLiveView.sourceCodeFilePath = PlaygroundController.currentSourceFile;
+                demoLiveView.sourceCode = PlaygroundController.editedSourceContent;
             }
         }
     }
@@ -103,17 +103,17 @@ Item {
 
         visible: ((opacity !== 0) && (width !== 0))
 
-        sourceCode: MasticPlaygroundController.editedSourceContent
+        sourceCode: PlaygroundController.editedSourceContent
 
         onSourceCodeChanged: {
-            MasticPlaygroundController.editedSourceContent = sourceCode;
+            PlaygroundController.editedSourceContent = sourceCode;
          }
 
         Connections {
-            target: MasticPlaygroundController
+            target: PlaygroundController
 
             onReloadLiveView: {
-                demoCodeView.sourceCode = Qt.binding(function() {return  MasticPlaygroundController.editedSourceContent; });
+                demoCodeView.sourceCode = Qt.binding(function() {return  PlaygroundController.editedSourceContent; });
             }
         }
     }
@@ -127,7 +127,7 @@ Item {
 
     states: [
         State {
-            name: MasticPlaygroundController.viewModeBoth
+            name: PlaygroundController.viewModeBoth
 
             PropertyChanges {
                 target: demoCodeView
@@ -141,7 +141,7 @@ Item {
         },
 
         State {
-            name: MasticPlaygroundController.viewModeCodeOnly
+            name: PlaygroundController.viewModeCodeOnly
 
             PropertyChanges {
                 target: demoCodeView
@@ -155,7 +155,7 @@ Item {
         },
 
         State {
-            name: MasticPlaygroundController.viewModeViewerOnly
+            name: PlaygroundController.viewModeViewerOnly
 
             PropertyChanges {
                 target: demoCodeView

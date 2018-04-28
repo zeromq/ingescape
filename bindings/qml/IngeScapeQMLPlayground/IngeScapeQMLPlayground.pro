@@ -16,7 +16,7 @@ VERSION_PATCH = 0
 VERSION = $${VERSION_MAJOR}.$${VERSION_MINOR}.$${VERSION_BUILD}.$${VERSION_PATCH}
 
 # Qt modules used by our application
-QT += quick widgets concurrent
+QT += qml quick widgets concurrent svg xml scxml location positioning
 
 CONFIG += c++11 precompiled_header
 
@@ -47,20 +47,20 @@ RCC_DIR = tmp
 
 
 SOURCES += main.cpp \
-    controllers/masticplaygroundcontroller.cpp \
     utils/resourcehelpers.cpp \
     utils/qmlsyntaxhighlighter.cpp \
     utils/propertieshelpers.cpp \
-    models/playgroundexample.cpp
+    models/playgroundexample.cpp \
+    controllers/playgroundcontroller.cpp
 
 
 HEADERS += \
     stable.h \
-    controllers/masticplaygroundcontroller.h \
     utils/propertieshelpers.h \
     utils/resourcehelpers.h \
     utils/qmlsyntaxhighlighter.h \
-    models/playgroundexample.h
+    models/playgroundexample.h \
+    controllers/playgroundcontroller.h
 
 
 RESOURCES += qml.qrc
@@ -112,8 +112,21 @@ win32 {
     # Set application info
     QMAKE_TARGET_COMPANY = Ingenuity i/o
     QMAKE_TARGET_PRODUCT = $${TARGET}
-    QMAKE_TARGET_DESCRIPTION = Playground to code Mastic agents with QML
+    QMAKE_TARGET_DESCRIPTION = Playground to code ingeScape agents with QML
     QMAKE_TARGET_COPYRIGHT = Copyright (c) 2018, Ingenuity i/o
+
+
+    # Release only: copy Qt libs and plugins next to our application to create a standalone application
+    CONFIG(release, debug|release) {
+        #NB: use a custom directory because OUT_PWD contains cpp (moc_) and obj files
+        DESTDIR = $${OUT_PWD}/bin
+
+        # Copy Qt DLLs and required files
+        QMAKE_POST_LINK += windeployqt $${DESTDIR}/$${TARGET}.exe -qmldir=$${PWD}
+
+        # TODO: copy ingeScape dependencies
+    }
+
 }
 
 
@@ -130,6 +143,7 @@ mac {
         CONFIG(release, debug|release) {
             # Release only: copy Qt libs and plugins inside our application to create a standalone application
             # NB: macdeployqt only runs qmlimportscanner correctly when run from Qt bin directory
+            # TODO: find a way to deploy geoservices plugins (osm, etc.)
             QMAKE_POST_LINK += $$quote(cd `dirname $(QMAKE)` && macdeployqt $${OUT_PWD}/$${TARGET}.app -qmldir=$${PWD} $$escape_expand(\n\t))
         }
     }

@@ -5,7 +5,7 @@ import QtQuick.Controls.Styles 1.4
 import Qt.labs.settings 1.0
 
 
-import MasticPlayground 1.0
+import IngeScapePlayground 1.0
 
 import MasticQuick 1.0
 
@@ -39,7 +39,7 @@ Item {
     {
         if (
             // We are allowed to restart Mastic
-            MasticPlaygroundController.needToRestartMastic
+            PlaygroundController.needToRestartMastic
             &&
             // We have values to restart Mastic
             ((currentNetworkDevice.text.length !== 0) && (currentPort.text.length !== 0))
@@ -109,19 +109,19 @@ Item {
             }
 
             Repeater {
-                model: MasticPlaygroundController.viewModes
+                model: PlaygroundController.viewModes
 
                 delegate: RadioButton {
                     exclusiveGroup: viewModeGroup
 
                     text: modelData
 
-                    checked: (modelData === MasticPlaygroundController.currentViewMode)
+                    checked: (modelData === PlaygroundController.currentViewMode)
 
                     onCheckedChanged: {
                         if (checked)
                         {
-                            MasticPlaygroundController.currentViewMode = modelData;
+                            PlaygroundController.currentViewMode = modelData;
                         }
                     }
 
@@ -289,10 +289,10 @@ Item {
 
                     text: qsTr("Auto\nrestart")
 
-                    checked: MasticPlaygroundController.autoRestartMastic
+                    checked: PlaygroundController.autoRestartMastic
 
                     onCheckedChanged: {
-                        MasticPlaygroundController.autoRestartMastic = checked;
+                        PlaygroundController.autoRestartMastic = checked;
                     }
 
                     style: CheckBoxStyle {
