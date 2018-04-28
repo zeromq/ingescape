@@ -33,7 +33,7 @@ bool admin_logInStream = false;
 bool logInFile = false;
 bool logInConsole = false;
 bool useColorInConsole = false;
-igs_logLevel_t logLevel = MTIC_LOG_INFO;
+igs_logLevel_t logLevel = IGS_LOG_INFO;
 char logFile[1024] = "";
 char logContent[2048] = "";
 char logTime[128] = "";
@@ -243,7 +243,7 @@ void igs_log(igs_logLevel_t level, const char *function, const char *fmt, ...){
             fflush(fp);
         }
     }
-    if ((logInConsole && level >= logLevel) || level >= MTIC_LOG_ERROR){
+    if ((logInConsole && level >= logLevel) || level >= IGS_LOG_ERROR){
         if (useColorInConsole){
             fprintf(stderr,"%s%s\x1b[0m;%s\n", log_colors[logLevel], log_levels[level], logContent);
         }else{

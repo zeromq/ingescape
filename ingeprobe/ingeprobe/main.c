@@ -40,12 +40,12 @@ const char *gossipconnect = NULL;
 const char *endpoint = NULL;
 
 typedef enum {
-    INTEGER_T = 1,  ///< integer value type
-    DOUBLE_T,       ///< double value type
-    STRING_T,       ///< string value type
-    BOOL_T,         ///< bool value type
-    IMPULSION_T,    ///< impulsion value type
-    DATA_T          ///< data value type
+    IGS_INTEGER_T = 1,  ///< integer value type
+    IGS_DOUBLE_T,       ///< double value type
+    IGS_STRING_T,       ///< string value type
+    IGS_BOOL_T,         ///< bool value type
+    IGS_IMPULSION_T,    ///< impulsion value type
+    IGS_DATA_T          ///< data value type
 } outputType_t;
 
 char *outputTypes[] = {"INT", "DOUBLE", "STRING", "BOOL", "IMPULS", "DATA"};
@@ -117,22 +117,22 @@ int manageSubscription (zloop_t *loop, zmq_pollitem_t *item, void *arg){
             data = zframe_data(frame);
             size = zframe_size(frame);
             switch (type) {
-                case INTEGER_T:
+                case IGS_INTEGER_T:
                     printf(" %d\n", *((int *)data));
                     break;
-                case DOUBLE_T:
+                case IGS_DOUBLE_T:
                     printf(" %f\n", *((double *)data));
                     break;
-                case BOOL_T:
+                case IGS_BOOL_T:
                     printf(" %d\n", *((bool *)data));
                     break;
-                case STRING_T:
+                case IGS_STRING_T:
                     printf(" %s\n", (char *)data);
                     break;
-                case IMPULSION_T:
+                case IGS_IMPULSION_T:
                     printf("\n");
                     break;
-                case DATA_T:
+                case IGS_DATA_T:
                     string = zframe_strhex(frame);
                     printf(" (%lu bytes) %.64s\n", strlen(string), string);
                     free(string);

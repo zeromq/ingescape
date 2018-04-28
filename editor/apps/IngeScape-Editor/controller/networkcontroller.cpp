@@ -313,7 +313,7 @@ void onObserveInputCallback(iop_t iopType, const char* name, iopType_t valueType
     NetworkController* networkController = (NetworkController*)myData;
     if (networkController != NULL)
     {
-        if (iopType == INPUT_T)
+        if (iopType == IGS_INPUT_T)
         {
             QString inputName = name;
 
@@ -329,7 +329,7 @@ void onObserveInputCallback(iop_t iopType, const char* name, iopType_t valueType
 
                 switch (valueType)
                 {
-                case INTEGER_T: {
+                case IGS_INTEGER_T: {
                     //int* newValue = (int*)value;
                     int newValue = igs_readInputAsInt(name);
 
@@ -339,7 +339,7 @@ void onObserveInputCallback(iop_t iopType, const char* name, iopType_t valueType
                     //qDebug() << "New value" << newValue << "received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
                     break;
                 }
-                case DOUBLE_T: {
+                case IGS_DOUBLE_T: {
                     //double* newValue = (double*)value;
                     double newValue = igs_readInputAsDouble(name);
 
@@ -349,7 +349,7 @@ void onObserveInputCallback(iop_t iopType, const char* name, iopType_t valueType
                     //qDebug() << "New value" << newValue << "received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
                     break;
                 }
-                case STRING_T: {
+                case IGS_STRING_T: {
                     //QString newValue = QString((char*)value);
                     QString newValue = igs_readInputAsString(name);
 
@@ -359,7 +359,7 @@ void onObserveInputCallback(iop_t iopType, const char* name, iopType_t valueType
                     //qDebug() << "New value" << newValue << "received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
                     break;
                 }
-                case BOOL_T: {
+                case IGS_BOOL_T: {
                     //bool* newValue = (bool*)value;
                     bool newValue = igs_readInputAsBool(name);
 
@@ -369,13 +369,13 @@ void onObserveInputCallback(iop_t iopType, const char* name, iopType_t valueType
                     //qDebug() << "New value" << newValue << "received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
                     break;
                 }
-                case IMPULSION_T: {
+                case IGS_IMPULSION_T: {
                     isValid = true;
 
                     //qDebug() << "New IMPULSION received on" << inputName << "with type" << AgentIOPValueTypes::staticEnumToString(agentIOPValueType);
                     break;
                 }
-                case DATA_T: {
+                case IGS_DATA_T: {
                     /*// On peut utiliser directement value plutôt que de re-générer un tableau de bytes ??
                     // On stocke dans un dossier le media (eg video, son, image) et on log le path et le start time ??
                     void* data = NULL;
@@ -716,27 +716,27 @@ void NetworkController::onAddInputsToEditorForOutputs(QString agentName, QList<O
                 switch (output->agentIOPValueType())
                 {
                 case AgentIOPValueTypes::INTEGER: {
-                    resultCreateInput = igs_createInput(inputName.toStdString().c_str(), INTEGER_T, NULL, 0);
+                    resultCreateInput = igs_createInput(inputName.toStdString().c_str(), IGS_INTEGER_T, NULL, 0);
                     break;
                 }
                 case AgentIOPValueTypes::DOUBLE: {
-                    resultCreateInput = igs_createInput(inputName.toStdString().c_str(), DOUBLE_T, NULL, 0);
+                    resultCreateInput = igs_createInput(inputName.toStdString().c_str(), IGS_DOUBLE_T, NULL, 0);
                     break;
                 }
                 case AgentIOPValueTypes::STRING: {
-                    resultCreateInput = igs_createInput(inputName.toStdString().c_str(), STRING_T, NULL, 0);
+                    resultCreateInput = igs_createInput(inputName.toStdString().c_str(), IGS_STRING_T, NULL, 0);
                     break;
                 }
                 case AgentIOPValueTypes::BOOL: {
-                    resultCreateInput = igs_createInput(inputName.toStdString().c_str(), BOOL_T, NULL, 0);
+                    resultCreateInput = igs_createInput(inputName.toStdString().c_str(), IGS_BOOL_T, NULL, 0);
                     break;
                 }
                 case AgentIOPValueTypes::IMPULSION: {
-                    resultCreateInput = igs_createInput(inputName.toStdString().c_str(), IMPULSION_T, NULL, 0);
+                    resultCreateInput = igs_createInput(inputName.toStdString().c_str(), IGS_IMPULSION_T, NULL, 0);
                     break;
                 }
                 case AgentIOPValueTypes::DATA: {
-                    resultCreateInput = igs_createInput(inputName.toStdString().c_str(), DATA_T, NULL, 0);
+                    resultCreateInput = igs_createInput(inputName.toStdString().c_str(), IGS_DATA_T, NULL, 0);
                     break;
                 }
                 default: {

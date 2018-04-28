@@ -114,8 +114,8 @@ bool mapping_checkCompatibilityInputOutput(agent_iop_t *input, agent_iop_t *outp
     //the rest is handled correctly in model_writeIOP
     bool isCompatible = true;
     iopType_t type = input->value_type;
-    if (output->value_type == DATA_T){
-        if (type != DATA_T && type != IMPULSION_T){
+    if (output->value_type == IGS_DATA_T){
+        if (type != IGS_DATA_T && type != IGS_IMPULSION_T){
             isCompatible = false;
             igs_warn("DATA inputs can only be mapped to DATA or IMPULSION outputs");
         }

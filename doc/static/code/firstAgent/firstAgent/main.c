@@ -62,8 +62,8 @@ int main(int argc, const char * argv[]) {
     
     //Create an input and an ouput: both are of integer type
     //with default value set to zero.
-    igs_createInput("input1", INTEGER_T, 0, 0);
-    igs_createOutput("output1", INTEGER_T, 0, 0);
+    igs_createInput("input1", IGS_INTEGER_T, 0, 0);
+    igs_createOutput("output1", IGS_INTEGER_T, 0, 0);
     
     //Set the definition information (optional)
     igs_setDefinitionName("myDef");

@@ -43,17 +43,17 @@ char definitionPath[MAX_PATH] = "";
 iopType_t string_to_value_type(const char* str) {
     
     if (!strcmp(str, "INTEGER"))
-        return INTEGER_T;
+        return IGS_INTEGER_T;
     if (!strcmp(str, "DOUBLE"))
-        return DOUBLE_T;
+        return IGS_DOUBLE_T;
     if (!strcmp(str, "STRING"))
-        return STRING_T;
+        return IGS_STRING_T;
     if (!strcmp(str, "BOOL"))
-        return BOOL_T;
+        return IGS_BOOL_T;
     if (!strcmp(str, "IMPULSION"))
-        return IMPULSION_T;
+        return IGS_IMPULSION_T;
     if (!strcmp(str, "DATA"))
-        return DATA_T;
+        return IGS_DATA_T;
     
     fprintf(stderr, "%s - ERROR -  unknown string \"%s\" to convert\n", __FUNCTION__, str);
     return -1;
@@ -73,22 +73,22 @@ bool string_to_boolean(const char* str) {
 
 const char* value_type_to_string (iopType_t type) {
     switch (type) {
-        case INTEGER_T:
+        case IGS_INTEGER_T:
             return "INTEGER";
             break;
-        case DOUBLE_T:
+        case IGS_DOUBLE_T:
             return "DOUBLE";
             break;
-        case STRING_T:
+        case IGS_STRING_T:
             return "STRING";
             break;
-        case BOOL_T:
+        case IGS_BOOL_T:
             return "BOOL";
             break;
-        case IMPULSION_T:
+        case IGS_IMPULSION_T:
             return "IMPULSION";
             break;
-        case DATA_T:
+        case IGS_DATA_T:
             return "DATA";
             break;
         default:
@@ -143,22 +143,22 @@ static void json_add_data_to_hash (agent_iop_t ** hasht,iop_t type,
 
         data->value_type = string_to_value_type (YAJL_GET_STRING(obj->u.object.values[1]));
         switch (data->value_type) {
-            case INTEGER_T:
+            case IGS_INTEGER_T:
                 data->value.i =(int) YAJL_GET_INTEGER (obj->u.object.values[2]);
                 break;
-            case DOUBLE_T:
+            case IGS_DOUBLE_T:
                 data->value.d = YAJL_GET_DOUBLE (obj->u.object.values[2]);
                 break;
-            case BOOL_T:
+            case IGS_BOOL_T:
                 data->value.b = string_to_boolean (YAJL_GET_STRING(obj->u.object.values[2]));
                 break;
-            case STRING_T:
+            case IGS_STRING_T:
                 data->value.s = strdup (YAJL_IS_STRING(obj->u.object.values[2]) ? obj->u.object.values[2]->u.string : "");
                 break;
-            case IMPULSION_T:
+            case IGS_IMPULSION_T:
                 //IMPULSION has no value
                 break;
-            case DATA_T:
+            case IGS_DATA_T:
                 //FIXME : we store data as string but we should check it convert it to hexa
                 //data->value.s = strdup (YAJL_IS_STRING(obj->u.object.values[2]) ? obj->u.object.values[2]->u.string : "");
                 break;
@@ -298,13 +298,13 @@ static definition* json_parse_definition (yajl_val node) {
         def->version = strdup (YAJL_IS_STRING(v) ? (v)->u.string : "");
 
     path[1] = STR_INPUTS;
-    json_add_data (node, path,INPUT_T, &def->inputs_table);
+    json_add_data (node, path,IGS_INPUT_T, &def->inputs_table);
 
     path[1] = STR_OUTPUTS;
-    json_add_data (node, path,OUTPUT_T, &def->outputs_table);
+    json_add_data (node, path,IGS_OUTPUT_T, &def->outputs_table);
 
     path[1] = STR_PARAMETERS;
-    json_add_data (node, path,PARAMETER_T, &def->params_table);
+    json_add_data (node, path,IGS_PARAMETER_T, &def->params_table);
 
     path[1] = STR_CATEGORIES;
     v = yajl_tree_get(node, path, yajl_t_array);
@@ -549,19 +549,19 @@ static void json_dump_iop (yajl_gen *g, agent_iop_t* aiop) {
     yajl_gen_string(*g, (const unsigned char *) STR_VALUE, strlen(STR_VALUE));
     
     switch (aiop->value_type) {
-        case INTEGER_T:
+        case IGS_INTEGER_T:
             yajl_gen_integer(*g, aiop->value.i);
             break;
 
-        case DOUBLE_T:
+        case IGS_DOUBLE_T:
             yajl_gen_double(*g, aiop->value.d);
             break;
 
-        case BOOL_T:
+        case IGS_BOOL_T:
             yajl_gen_string(*g, (const unsigned char *) boolean_to_string(aiop->value.b), strlen(boolean_to_string(aiop->value.b)));
             break;
 
-        case STRING_T:
+        case IGS_STRING_T:
             {
                 if (yajl_gen_string(*g, (const unsigned char *) aiop->value.s, strlen(aiop->value.s)) == yajl_gen_invalid_string)
                 {
@@ -571,11 +571,11 @@ static void json_dump_iop (yajl_gen *g, agent_iop_t* aiop) {
             }
             break;
 
-        case IMPULSION_T:
+        case IGS_IMPULSION_T:
             yajl_gen_string(*g, (const unsigned char *) "", 0);
             break;
 
-        case DATA_T:
+        case IGS_DATA_T:
             yajl_gen_string(*g, (const unsigned char *) "", 0);
             break;
 

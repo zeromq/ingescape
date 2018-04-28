@@ -54,32 +54,32 @@ extern "C" {
  */
 static iopType_t enumIngeScapeIopTypeToEnumIopType_t(IngeScapeIopType::Value value)
 {
-    iopType_t result = INTEGER_T;
+    iopType_t result = IGS_INTEGER_T;
 
     switch(value)
     {
         case IngeScapeIopType::INTEGER:
-            result = INTEGER_T;
+            result = IGS_INTEGER_T;
             break;
 
         case IngeScapeIopType::DOUBLE:
-            result = DOUBLE_T;
+            result = IGS_DOUBLE_T;
             break;
 
         case IngeScapeIopType::STRING:
-            result = STRING_T;
+            result = IGS_STRING_T;
             break;
 
         case IngeScapeIopType::BOOLEAN:
-            result = BOOL_T;
+            result = IGS_BOOL_T;
             break;
 
         case IngeScapeIopType::IMPULSION:
-            result = IMPULSION_T;
+            result = IGS_IMPULSION_T;
             break;
 
         case IngeScapeIopType::DATA:
-            result = DATA_T;
+            result = IGS_DATA_T;
             break;
 
         default:
@@ -102,27 +102,27 @@ static IngeScapeIopType::Value enumIopType_tToIngeScapeIopType(iopType_t value)
 
     switch (value)
     {
-        case INTEGER_T:
+        case IGS_INTEGER_T:
             result = IngeScapeIopType::INTEGER;
             break;
 
-        case DOUBLE_T:
+        case IGS_DOUBLE_T:
             result = IngeScapeIopType::DOUBLE;
             break;
 
-        case STRING_T:
+        case IGS_STRING_T:
             result = IngeScapeIopType::STRING;
             break;
 
-        case BOOL_T:
+        case IGS_BOOL_T:
             result = IngeScapeIopType::BOOLEAN;
             break;
 
-        case IMPULSION_T:
+        case IGS_IMPULSION_T:
             result = IngeScapeIopType::IMPULSION;
             break;
 
-        case DATA_T:
+        case IGS_DATA_T:
             result = IngeScapeIopType::DATA;
             break;
 
@@ -142,32 +142,32 @@ static IngeScapeIopType::Value enumIopType_tToIngeScapeIopType(iopType_t value)
  */
 static igs_logLevel_t enumIngeScapeLogLevelToEnumMticLogLevel_t(IngeScapeLogLevel::Value value)
 {
-    igs_logLevel_t result = MTIC_LOG_TRACE;
+    igs_logLevel_t result = IGS_LOG_TRACE;
 
     switch (value)
     {
         case IngeScapeLogLevel::LOG_TRACE:
-            result = MTIC_LOG_TRACE;
+            result = IGS_LOG_TRACE;
             break;
 
         case IngeScapeLogLevel::LOG_DEBUG:
-            result = MTIC_LOG_DEBUG;
+            result = IGS_LOG_DEBUG;
             break;
 
         case IngeScapeLogLevel::LOG_INFO:
-            result = MTIC_LOG_INFO;
+            result = IGS_LOG_INFO;
             break;
 
         case IngeScapeLogLevel::LOG_WARN:
-            result = MTIC_LOG_WARN;
+            result = IGS_LOG_WARN;
             break;
 
         case IngeScapeLogLevel::LOG_ERROR:
-            result = MTIC_LOG_ERROR;
+            result = IGS_LOG_ERROR;
             break;
 
         case IngeScapeLogLevel::LOG_FATAL:
-            result = MTIC_LOG_FATAL;
+            result = IGS_LOG_FATAL;
             break;
 
         default:
@@ -190,27 +190,27 @@ static IngeScapeLogLevel::Value enumMticLogLevel_tToIngeScapeLogLevel(igs_logLev
 
     switch(value)
     {
-        case MTIC_LOG_TRACE:
+        case IGS_LOG_TRACE:
             result = IngeScapeLogLevel::LOG_TRACE;
             break;
 
-        case MTIC_LOG_DEBUG:
+        case IGS_LOG_DEBUG:
             result = IngeScapeLogLevel::LOG_DEBUG;
             break;
 
-        case MTIC_LOG_INFO:
+        case IGS_LOG_INFO:
             result = IngeScapeLogLevel::LOG_INFO;
             break;
 
-        case MTIC_LOG_WARN:
+        case IGS_LOG_WARN:
             result = IngeScapeLogLevel::LOG_WARN;
             break;
 
-        case MTIC_LOG_ERROR:
+        case IGS_LOG_ERROR:
             result = IngeScapeLogLevel::LOG_ERROR;
             break;
 
-        case MTIC_LOG_FATAL:
+        case IGS_LOG_FATAL:
             result = IngeScapeLogLevel::LOG_FATAL;
             break;
 
@@ -238,7 +238,7 @@ void IngeScapeQuick_callbackObserveInput(iop_t iopType, const char *name, iopTyp
     Q_UNUSED(valueSize)
 
     // Ensure that our callback is called by the required IOP category
-    if (iopType == INPUT_T)
+    if (iopType == IGS_INPUT_T)
     {
         // Try to cast our custom data
         IngeScapeQuick* controller = (IngeScapeQuick *)customData;
@@ -249,7 +249,7 @@ void IngeScapeQuick_callbackObserveInput(iop_t iopType, const char *name, iopTyp
             {
                 switch(valueType)
                 {
-                    case INTEGER_T:
+                    case IGS_INTEGER_T:
                         {
                             int newValue = *((int *)value);
                             QVariant qmlValue = QVariant(newValue);
@@ -259,7 +259,7 @@ void IngeScapeQuick_callbackObserveInput(iop_t iopType, const char *name, iopTyp
                         }
                         break;
 
-                    case DOUBLE_T:
+                    case IGS_DOUBLE_T:
                         {
                             double newValue = *((double *)value);
                             QVariant qmlValue = QVariant(newValue);
@@ -269,7 +269,7 @@ void IngeScapeQuick_callbackObserveInput(iop_t iopType, const char *name, iopTyp
                         }
                         break;
 
-                    case STRING_T:
+                    case IGS_STRING_T:
                         {
                             char* newCValue = (char *)value;
                             if (newCValue != NULL)
@@ -289,7 +289,7 @@ void IngeScapeQuick_callbackObserveInput(iop_t iopType, const char *name, iopTyp
                         }
                         break;
 
-                    case BOOL_T:
+                    case IGS_BOOL_T:
                         {
                             bool newValue = *((bool *)value);
                             QVariant qmlValue = QVariant(newValue);
@@ -299,7 +299,7 @@ void IngeScapeQuick_callbackObserveInput(iop_t iopType, const char *name, iopTyp
                         }
                         break;
 
-                    case IMPULSION_T:
+                    case IGS_IMPULSION_T:
                         {
                             // Hack to force the update of our property
                             // We disable signals then we clear its value to detect a valud change when we set an empty value
@@ -313,7 +313,7 @@ void IngeScapeQuick_callbackObserveInput(iop_t iopType, const char *name, iopTyp
                         }
                         break;
 
-                    case DATA_T:
+                    case IGS_DATA_T:
                         {
                             qWarning() << "IngeScapeQuick warning: can not update input" << qmlName <<  "with type DATA (not yet implemented)";
                         }
@@ -350,7 +350,7 @@ void IngeScapeQuick_callbackObserveOutput(iop_t iopType, const char *name, iopTy
     Q_UNUSED(valueSize)
 
     // Ensure that our callback is called by the required IOP category
-    if (iopType == OUTPUT_T)
+    if (iopType == IGS_OUTPUT_T)
     {
         // Try to cast our custom data
         IngeScapeQuick* controller = (IngeScapeQuick *)customData;
@@ -366,7 +366,7 @@ void IngeScapeQuick_callbackObserveOutput(iop_t iopType, const char *name, iopTy
                 // Check type of output
                 switch(valueType)
                 {
-                    case INTEGER_T:
+                    case IGS_INTEGER_T:
                         {
                             // Cast our new value
                             int newValue = *((int *)value);
@@ -383,7 +383,7 @@ void IngeScapeQuick_callbackObserveOutput(iop_t iopType, const char *name, iopTy
                         }
                         break;
 
-                    case DOUBLE_T:
+                    case IGS_DOUBLE_T:
                         {
                             // Cast our new value
                             double newValue = *((double *)value);
@@ -400,7 +400,7 @@ void IngeScapeQuick_callbackObserveOutput(iop_t iopType, const char *name, iopTy
                         }
                         break;
 
-                    case STRING_T:
+                    case IGS_STRING_T:
                         {
                             // Check if we have a non NULL value
                             char* newCValue = (char *)value;
@@ -436,7 +436,7 @@ void IngeScapeQuick_callbackObserveOutput(iop_t iopType, const char *name, iopTy
                         }
                         break;
 
-                    case BOOL_T:
+                    case IGS_BOOL_T:
                         {
                             // Cast our new value
                             bool newValue = *((bool *)value);
@@ -453,7 +453,7 @@ void IngeScapeQuick_callbackObserveOutput(iop_t iopType, const char *name, iopTy
                         }
                         break;
 
-                    case IMPULSION_T:
+                    case IGS_IMPULSION_T:
                         {
                             // Update QML
                             if (needToUpdateQML)
@@ -473,7 +473,7 @@ void IngeScapeQuick_callbackObserveOutput(iop_t iopType, const char *name, iopTy
                         }
                         break;
 
-                    case DATA_T:
+                    case IGS_DATA_T:
                         {
                             qWarning() << "IngeScapeQuick warning: can not update output" << qmlName << "with type DATA (not yet implemented)";
                         }
@@ -510,7 +510,7 @@ void IngeScapeQuick_callbackObserveParameter(iop_t iopType, const char *name, io
     Q_UNUSED(valueSize)
 
     // Ensure that our callback is called by the required IOP category
-    if (iopType == PARAMETER_T)
+    if (iopType == IGS_PARAMETER_T)
     {
         // Try to cast our custom data
         IngeScapeQuick* controller = (IngeScapeQuick *)customData;
@@ -526,7 +526,7 @@ void IngeScapeQuick_callbackObserveParameter(iop_t iopType, const char *name, io
                 // Check type of parameter
                 switch(valueType)
                 {
-                    case INTEGER_T:
+                    case IGS_INTEGER_T:
                         {
                             // Cast our new value
                             int newValue = *((int *)value);
@@ -543,7 +543,7 @@ void IngeScapeQuick_callbackObserveParameter(iop_t iopType, const char *name, io
                         }
                         break;
 
-                    case DOUBLE_T:
+                    case IGS_DOUBLE_T:
                         {
                             // Cast our new value
                             double newValue = *((double *)value);
@@ -560,7 +560,7 @@ void IngeScapeQuick_callbackObserveParameter(iop_t iopType, const char *name, io
                         }
                         break;
 
-                    case STRING_T:
+                    case IGS_STRING_T:
                         {
                             // Check if our new value is NULL or not
                             char* newCValue = (char *)value;
@@ -595,7 +595,7 @@ void IngeScapeQuick_callbackObserveParameter(iop_t iopType, const char *name, io
                         }
                         break;
 
-                    case BOOL_T:
+                    case IGS_BOOL_T:
                         {
                             // Cast our new value
                             bool newValue = *((bool *)value);
@@ -612,14 +612,14 @@ void IngeScapeQuick_callbackObserveParameter(iop_t iopType, const char *name, io
                         }
                         break;
 
-                    case IMPULSION_T:
+                    case IGS_IMPULSION_T:
                         {
                             // Should not happen because a paramater can not be an impulsion
                             qWarning() << "IngeScapeQuick warning: can not update parameter" << qmlName << "with type IMPULSION";
                         }
                         break;
 
-                    case DATA_T:
+                    case IGS_DATA_T:
                         {
                             qWarning() << "IngeScapeQuick warning: can not update parameter" << qmlName << "with type DATA (not yet implemented)";
                         }
@@ -4045,7 +4045,7 @@ void IngeScapeQuick::_onOutputUpdatedFromQML(const QString &key, const QVariant 
         iopType_t type = igs_getTypeForOutput(cName);
         switch(type)
         {
-            case INTEGER_T:
+            case IGS_INTEGER_T:
             {
                 bool ok = false;
                 int cValue = value.toInt(&ok);
@@ -4069,7 +4069,7 @@ void IngeScapeQuick::_onOutputUpdatedFromQML(const QString &key, const QVariant 
             break;
 
 
-            case DOUBLE_T:
+            case IGS_DOUBLE_T:
             {
                 bool ok = false;
                 double cValue = value.toDouble(&ok);
@@ -4093,7 +4093,7 @@ void IngeScapeQuick::_onOutputUpdatedFromQML(const QString &key, const QVariant 
             break;
 
 
-            case STRING_T:
+            case IGS_STRING_T:
             {
                 _observeOutputNeedToUpdateQMLMutex.lock();
                 _observeOutputNeedToUpdateQML = false;
@@ -4106,7 +4106,7 @@ void IngeScapeQuick::_onOutputUpdatedFromQML(const QString &key, const QVariant 
             break;
 
 
-            case BOOL_T:
+            case IGS_BOOL_T:
             {
                 _observeOutputNeedToUpdateQMLMutex.lock();
                 _observeOutputNeedToUpdateQML = false;
@@ -4119,7 +4119,7 @@ void IngeScapeQuick::_onOutputUpdatedFromQML(const QString &key, const QVariant 
             break;
 
 
-            case IMPULSION_T:
+            case IGS_IMPULSION_T:
             {
                 _observeOutputNeedToUpdateQMLMutex.lock();
                 _observeOutputNeedToUpdateQML = false;
@@ -4131,7 +4131,7 @@ void IngeScapeQuick::_onOutputUpdatedFromQML(const QString &key, const QVariant 
             }
             break;
 
-            case DATA_T:
+            case IGS_DATA_T:
             {
                 qWarning() << "IngeScapeQuick warning: can not update output" << key <<  "with type DATA (not yet implemented)";
             }
@@ -4165,7 +4165,7 @@ void IngeScapeQuick::_onParameterUpdatedFromQML(const QString &key, const QVaria
         iopType_t type = igs_getTypeForParameter(cName);
         switch(type)
         {
-            case INTEGER_T:
+            case IGS_INTEGER_T:
             {
                 bool ok = false;
                 int cValue = value.toInt(&ok);
@@ -4189,7 +4189,7 @@ void IngeScapeQuick::_onParameterUpdatedFromQML(const QString &key, const QVaria
             break;
 
 
-            case DOUBLE_T:
+            case IGS_DOUBLE_T:
             {
                 bool ok = false;
                 double cValue = value.toDouble(&ok);
@@ -4213,7 +4213,7 @@ void IngeScapeQuick::_onParameterUpdatedFromQML(const QString &key, const QVaria
             break;
 
 
-            case STRING_T:
+            case IGS_STRING_T:
             {
                 _observeParameterNeedToUpdateQMLMutex.lock();
                 _observeParameterNeedToUpdateQML = false;
@@ -4226,7 +4226,7 @@ void IngeScapeQuick::_onParameterUpdatedFromQML(const QString &key, const QVaria
             break;
 
 
-            case BOOL_T:
+            case IGS_BOOL_T:
             {
                 _observeParameterNeedToUpdateQMLMutex.lock();
                 _observeParameterNeedToUpdateQML = false;
@@ -4239,7 +4239,7 @@ void IngeScapeQuick::_onParameterUpdatedFromQML(const QString &key, const QVaria
             break;
 
 
-            case IMPULSION_T:
+            case IGS_IMPULSION_T:
             {
                 qWarning() << "IngeScapeQuick warning: invalid parameter type IMPULSION. Can not update parameter" << key;
             }

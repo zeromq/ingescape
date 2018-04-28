@@ -24,8 +24,8 @@ int main(int argc, const char * argv[]) {
         igs_setAgentName("simpleDemoAgent");
     }
     
-    igs_createInput("input1", INTEGER_T, 0, 0);
-    igs_createOutput("output1", INTEGER_T, 0, 0);
+    igs_createInput("input1", IGS_INTEGER_T, 0, 0);
+    igs_createOutput("output1", IGS_INTEGER_T, 0, 0);
     
     igs_setDefinitionName("myDef");
     igs_setDefinitionVersion("1.0");

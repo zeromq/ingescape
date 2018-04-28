@@ -365,7 +365,7 @@ int handleSubscriptionMessage(zmsg_t *msg, const char *subscriberPeerId){
         long size = 0;
         char * value = NULL;
         //get data before iterating to all the mapping elements using it
-        if (valueType == STRING_T){
+        if (valueType == IGS_STRING_T){
             value = zmsg_popstr(msg);
         }else{
             frame = zmsg_pop(msg);
@@ -392,10 +392,10 @@ int handleSubscriptionMessage(zmsg_t *msg, const char *subscriberPeerId){
                                elmt->output_name);
                 }else{
                     //we have a fully matching mapping element : write from received output to our input
-                    if (valueType == STRING_T){
-                        model_writeIOP(elmt->input_name, INPUT_T, valueType, value, strlen(value)+1);
+                    if (valueType == IGS_STRING_T){
+                        model_writeIOP(elmt->input_name, IGS_INPUT_T, valueType, value, strlen(value)+1);
                     }else{
-                        model_writeIOP(elmt->input_name, INPUT_T, valueType, data, size);
+                        model_writeIOP(elmt->input_name, IGS_INPUT_T, valueType, data, size);
                     }
                 }
             }
@@ -717,36 +717,36 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     zmsg_t *omsg = zmsg_new();
                     zmsg_addstr(omsg, "OUTPUTS");
                     for (i = 0; i < nbOutputs; i++){
-                        agent_iop_t * found_iop = model_findIopByName(outputsList[i],OUTPUT_T);
+                        agent_iop_t * found_iop = model_findIopByName(outputsList[i],IGS_OUTPUT_T);
                         if (found_iop != NULL){
                             switch (found_iop->value_type) {
-                                case INTEGER_T:
+                                case IGS_INTEGER_T:
                                     zmsg_addstr(omsg, found_iop->name);
                                     zmsg_addstrf(omsg, "%d", found_iop->value_type);
                                     zmsg_addmem(omsg, &(found_iop->value.i), sizeof(int));
                                     break;
-                                case DOUBLE_T:
+                                case IGS_DOUBLE_T:
                                     zmsg_addstr(omsg, found_iop->name);
                                     zmsg_addstrf(omsg, "%d", found_iop->value_type);
                                     zmsg_addmem(omsg, &(found_iop->value.d), sizeof(double));
                                     break;
-                                case STRING_T:
+                                case IGS_STRING_T:
                                     zmsg_addstr(omsg, found_iop->name);
                                     zmsg_addstrf(omsg, "%d", found_iop->value_type);
                                     zmsg_addstr(omsg, found_iop->value.s);
                                     break;
-                                case BOOL_T:
+                                case IGS_BOOL_T:
                                     zmsg_addstr(omsg, found_iop->name);
                                     zmsg_addstrf(omsg, "%d", found_iop->value_type);
                                     zmsg_addmem(omsg, &(found_iop->value.b), sizeof(bool));
                                     break;
-                                case IMPULSION_T:
+                                case IGS_IMPULSION_T:
                                     //disabled
 //                                    zmsg_addstr(omsg, found_iop->name);
 //                                    zmsg_addstrf(omsg, "%d", found_iop->value_type);
 //                                    zmsg_addmem(omsg, NULL, 0);
                                     break;
-                                case DATA_T:
+                                case IGS_DATA_T:
                                     //disabled
 //                                    zmsg_addstr(omsg, found_iop->name);
 //                                    zmsg_addstrf(omsg, "%d", found_iop->value_type);
@@ -1208,7 +1208,7 @@ initActor (zsock_t *pipe, void *args){
 
 int network_publishOutput (const char* output_name){
     int result = 0;
-    agent_iop_t * found_iop = model_findIopByName(output_name,OUTPUT_T);
+    agent_iop_t * found_iop = model_findIopByName(output_name,IGS_OUTPUT_T);
     
     if(agentElements != NULL && agentElements->publisher != NULL && found_iop != NULL)
     {
@@ -1220,27 +1220,27 @@ int network_publishOutput (const char* output_name){
             void *data = NULL;
             long size = 0;
             switch (found_iop->value_type) {
-                case INTEGER_T:
+                case IGS_INTEGER_T:
                     zmsg_addmem(msg, &(found_iop->value.i), sizeof(int));
                     igs_info("publish %s -> %d",found_iop->name,found_iop->value.i);
                     break;
-                case DOUBLE_T:
+                case IGS_DOUBLE_T:
                     zmsg_addmem(msg, &(found_iop->value.d), sizeof(double));
                     igs_info("publish %s -> %f",found_iop->name,found_iop->value.d);
                     break;
-                case BOOL_T:
+                case IGS_BOOL_T:
                     zmsg_addmem(msg, &(found_iop->value.b), sizeof(bool));
                     igs_info("publish %s -> %d",found_iop->name,found_iop->value.b);
                     break;
-                case STRING_T:
+                case IGS_STRING_T:
                     zmsg_addstr(msg, found_iop->value.s);
                     igs_info("publish %s -> %s",found_iop->name,found_iop->value.s);
                     break;
-                case IMPULSION_T:
+                case IGS_IMPULSION_T:
                     zmsg_addmem(msg, NULL, 0);
                     igs_info("publish impulsion %s",found_iop->name);
                     break;
-                case DATA_T:
+                case IGS_DATA_T:
                     igs_readOutputAsData(output_name, &data, &size);
                     //TODO: decide if we should delete the data after use or keep it in memory
                     //suggestion: we might add a clearOutputData function available to the developer

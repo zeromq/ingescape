@@ -80,18 +80,18 @@ PUBLIC void igs_die(void);
 //IOP Model : Inputs, Outputs and Parameters read/write/check/observe/mute
 
 typedef enum {
-    INPUT_T = 1, ///< input of an agent.
-    OUTPUT_T,    ///< output of an agent.
-    PARAMETER_T  ///< parameter of an agent.
+    IGS_INPUT_T = 1, ///< input of an agent.
+    IGS_OUTPUT_T,    ///< output of an agent.
+    IGS_PARAMETER_T  ///< parameter of an agent.
 } iop_t;
 
 typedef enum {
-    INTEGER_T = 1,  ///< integer value type
-    DOUBLE_T,       ///< double value type
-    STRING_T,       ///< string value type
-    BOOL_T,         ///< bool value type
-    IMPULSION_T,    ///< impulsion value type
-    DATA_T          ///< data value type
+    IGS_INTEGER_T = 1,  ///< integer value type
+    IGS_DOUBLE_T,       ///< double value type
+    IGS_STRING_T,       ///< string value type
+    IGS_BOOL_T,         ///< bool value type
+    IGS_IMPULSION_T,    ///< impulsion value type
+    IGS_DATA_T          ///< data value type
 } iopType_t;
 
 //read IOP using void*
@@ -263,22 +263,22 @@ PUBLIC char* igs_getLogPath(void); // must be freed by caller
  - trace : Information about parts of functions, for detailed diagnostic only.
  */
 typedef enum {
-    MTIC_LOG_TRACE = 0,
-    MTIC_LOG_DEBUG,
-    MTIC_LOG_INFO,
-    MTIC_LOG_WARN,
-    MTIC_LOG_ERROR,
-    MTIC_LOG_FATAL
+    IGS_LOG_TRACE = 0,
+    IGS_LOG_DEBUG,
+    IGS_LOG_INFO,
+    IGS_LOG_WARN,
+    IGS_LOG_ERROR,
+    IGS_LOG_FATAL
 } igs_logLevel_t;
-PUBLIC void igs_setLogLevel (igs_logLevel_t level); //set log level in console, default is MTIC_LOG_INFO
+PUBLIC void igs_setLogLevel (igs_logLevel_t level); //set log level in console, default is IGS_LOG_INFO
 PUBLIC igs_logLevel_t igs_getLogLevel(void);
 PUBLIC void igs_log(igs_logLevel_t, const char *function, const char *fmt, ...);
-#define igs_trace(...) igs_log(MTIC_LOG_TRACE, __func__, __VA_ARGS__)
-#define igs_debug(...) igs_log(MTIC_LOG_DEBUG, __func__, __VA_ARGS__)
-#define igs_info(...)  igs_log(MTIC_LOG_INFO, __func__, __VA_ARGS__)
-#define igs_warn(...)  igs_log(MTIC_LOG_WARN, __func__, __VA_ARGS__)
-#define igs_error(...) igs_log(MTIC_LOG_ERROR, __func__, __VA_ARGS__)
-#define igs_fatal(...) igs_log(MTIC_LOG_FATAL, __func__, __VA_ARGS__)
+#define igs_trace(...) igs_log(IGS_LOG_TRACE, __func__, __VA_ARGS__)
+#define igs_debug(...) igs_log(IGS_LOG_DEBUG, __func__, __VA_ARGS__)
+#define igs_info(...)  igs_log(IGS_LOG_INFO, __func__, __VA_ARGS__)
+#define igs_warn(...)  igs_log(IGS_LOG_WARN, __func__, __VA_ARGS__)
+#define igs_error(...) igs_log(IGS_LOG_ERROR, __func__, __VA_ARGS__)
+#define igs_fatal(...) igs_log(IGS_LOG_FATAL, __func__, __VA_ARGS__)
 
 
 //resources file management

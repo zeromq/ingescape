@@ -57,13 +57,13 @@ int definition_addIopToDefinition(agent_iop_t *iop, iop_t iop_type, definition *
     }
     agent_iop_t *previousIOP = NULL;
     switch (iop_type) {
-        case INPUT_T:
+        case IGS_INPUT_T:
             HASH_FIND_STR(def->inputs_table, iop->name , previousIOP);
             break;
-        case OUTPUT_T:
+        case IGS_OUTPUT_T:
             HASH_FIND_STR(def->outputs_table, iop->name , previousIOP);
             break;
-        case PARAMETER_T:
+        case IGS_PARAMETER_T:
             HASH_FIND_STR(def->params_table, iop->name , previousIOP);
             break;
         default:
@@ -74,13 +74,13 @@ int definition_addIopToDefinition(agent_iop_t *iop, iop_t iop_type, definition *
         return 0;
     }
     switch (iop_type) {
-        case INPUT_T:
+        case IGS_INPUT_T:
             HASH_ADD_STR(def->inputs_table, name, iop);
             break;
-        case OUTPUT_T:
+        case IGS_OUTPUT_T:
             HASH_ADD_STR(def->outputs_table, name, iop);
             break;
-        case PARAMETER_T:
+        case IGS_PARAMETER_T:
             HASH_ADD_STR(def->params_table, name, iop);
             break;
         default:
@@ -112,20 +112,20 @@ agent_iop_t* definition_createIop(const char *name, iop_t type, iopType_t value_
     iop->type = type;
     iop->value_type = value_type;
     switch (type) {
-        case INPUT_T:
-            if (definition_addIopToDefinition(iop, INPUT_T, igs_internal_definition) < 1){
+        case IGS_INPUT_T:
+            if (definition_addIopToDefinition(iop, IGS_INPUT_T, igs_internal_definition) < 1){
                 definition_freeIOP(iop);
                 return NULL;
             }
             break;
-        case OUTPUT_T:
-            if (definition_addIopToDefinition(iop, OUTPUT_T, igs_internal_definition) < 1){
+        case IGS_OUTPUT_T:
+            if (definition_addIopToDefinition(iop, IGS_OUTPUT_T, igs_internal_definition) < 1){
                 definition_freeIOP(iop);
                 return NULL;
             }
             break;
-        case PARAMETER_T:
-            if (definition_addIopToDefinition(iop, PARAMETER_T, igs_internal_definition) < 1){
+        case IGS_PARAMETER_T:
+            if (definition_addIopToDefinition(iop, IGS_PARAMETER_T, igs_internal_definition) < 1){
                 definition_freeIOP(iop);
                 return NULL;
             }
@@ -325,7 +325,7 @@ int igs_createInput(const char *name, iopType_t value_type, void *value, long si
     if(igs_internal_definition == NULL){
         igs_internal_definition = calloc(1, sizeof(definition));
     }
-    agent_iop_t *iop = definition_createIop(name, INPUT_T, value_type, value, size);
+    agent_iop_t *iop = definition_createIop(name, IGS_INPUT_T, value_type, value, size);
     if (iop == NULL){
         return -1;
     }
@@ -352,7 +352,7 @@ int igs_createOutput(const char *name, iopType_t value_type, void *value, long s
     if(igs_internal_definition == NULL){
         igs_internal_definition = calloc(1, sizeof(definition));
     }
-    agent_iop_t* iop = definition_createIop(name, OUTPUT_T, value_type, value, size);
+    agent_iop_t* iop = definition_createIop(name, IGS_OUTPUT_T, value_type, value, size);
     if (iop == NULL){
         return -1;
     }
@@ -378,7 +378,7 @@ int igs_createParameter(const char *name, iopType_t value_type, void *value, lon
     if(igs_internal_definition == NULL){
         igs_internal_definition = calloc(1, sizeof(definition));
     }
-    agent_iop_t* iop = definition_createIop(name, PARAMETER_T, value_type, value, size);
+    agent_iop_t* iop = definition_createIop(name, IGS_PARAMETER_T, value_type, value, size);
     if (iop == NULL){
         return -1;
     }
@@ -403,7 +403,7 @@ int igs_removeInput(const char *name){
         igs_error("No definition available yet");
         return -1;
     }
-    agent_iop_t * iop = model_findIopByName(name,INPUT_T);
+    agent_iop_t * iop = model_findIopByName(name,IGS_INPUT_T);
     if(iop == NULL){
         igs_warn("The input %s could not be found", name);
         return -2;
@@ -431,7 +431,7 @@ int igs_removeOutput(const char *name){
         igs_error("No definition available yet");
         return -1;
     }
-    agent_iop_t * iop = model_findIopByName(name,OUTPUT_T);
+    agent_iop_t * iop = model_findIopByName(name,IGS_OUTPUT_T);
     if(iop == NULL){
         igs_warn("The output %s could not be found", name);
         return -2;
@@ -459,7 +459,7 @@ int igs_removeParameter(const char *name){
         igs_error("No definition available yet");
         return -1;
     }
-    agent_iop_t * iop = model_findIopByName(name,PARAMETER_T);
+    agent_iop_t * iop = model_findIopByName(name,IGS_PARAMETER_T);
     if(iop == NULL){
         igs_warn("The parameter %s could not be found", name);
         return -2;
