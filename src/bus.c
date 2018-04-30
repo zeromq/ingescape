@@ -116,8 +116,7 @@ void igs_busAddServiceDescription(const char *key, const char *value){
         && strcmp(key, "canBeFrozen") != 0
         && strcmp(key, "pid") != 0
         && strcmp(key, "commandline") != 0
-        && strcmp(key, "hostname") != 0
-        && strcmp(key, "isEditor") != 0)
+        && strcmp(key, "hostname") != 0)
     {
         serviceHeader_t *header;
         HASH_FIND_STR(serviceHeaders, key, header);
@@ -140,8 +139,7 @@ void igs_busRemoveServiceDescription(const char *key){
         && strcmp(key, "canBeFrozen") != 0
         && strcmp(key, "pid") != 0
         && strcmp(key, "commandline") != 0
-        && strcmp(key, "hostname") != 0
-        && strcmp(key, "isEditor") != 0)
+        && strcmp(key, "hostname") != 0)
     {
         serviceHeader_t *header;
         HASH_FIND_STR(serviceHeaders, key, header);
