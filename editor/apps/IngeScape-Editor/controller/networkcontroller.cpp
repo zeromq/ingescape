@@ -304,7 +304,7 @@ void onIncommingZyreMessageCallback(const char *evt, const char *peer, const cha
  * @param valueSize
  * @param myData
  */
-void onObserveInputCallback(iop_t iopType, const char* name, iopType_t valueType, void* value, long valueSize, void* myData)
+void onObserveInputCallback(iop_t iopType, const char* name, iopType_t valueType, void* value, size_t valueSize, void* myData)
 {
     Q_UNUSED(value);
     Q_UNUSED(valueSize)
@@ -749,7 +749,7 @@ void NetworkController::onAddInputsToEditorForOutputs(QString agentName, QList<O
                     qDebug() << "Create input" << inputName << "on agent" << _editorAgentName;
 
                     // Begin the observe of this input
-                    int resultObserveInput = igs_observeInput(inputName.toStdString().c_str(), &onObserveInputCallback, this);
+                    int resultObserveInput = igs_observeInput(inputName.toStdString().c_str(), onObserveInputCallback, this);
 
                     if (resultObserveInput == 1) {
                         qDebug() << "Observe input" << inputName << "on agent" << _editorAgentName;

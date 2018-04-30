@@ -233,7 +233,7 @@ static IngeScapeLogLevel::Value enumMticLogLevel_tToIngeScapeLogLevel(igs_logLev
  * @param valueSize
  * @param customData
  */
-void IngeScapeQuick_callbackObserveInput(iop_t iopType, const char *name, iopType_t valueType, void* value, long valueSize, void *customData)
+void IngeScapeQuick_callbackObserveInput(iop_t iopType, const char *name, iopType_t valueType, void* value, size_t valueSize, void *customData)
 {
     Q_UNUSED(valueSize)
 
@@ -345,7 +345,7 @@ void IngeScapeQuick_callbackObserveInput(iop_t iopType, const char *name, iopTyp
  * @param valueSize
  * @param customData
  */
-void IngeScapeQuick_callbackObserveOutput(iop_t iopType, const char *name, iopType_t valueType, void* value, long valueSize, void *customData)
+void IngeScapeQuick_callbackObserveOutput(iop_t iopType, const char *name, iopType_t valueType, void* value, size_t valueSize, void *customData)
 {
     Q_UNUSED(valueSize)
 
@@ -505,7 +505,7 @@ void IngeScapeQuick_callbackObserveOutput(iop_t iopType, const char *name, iopTy
  * @param valueSize
  * @param customData
  */
-void IngeScapeQuick_callbackObserveParameter(iop_t iopType, const char *name, iopType_t valueType, void* value, long valueSize, void *customData)
+void IngeScapeQuick_callbackObserveParameter(iop_t iopType, const char *name, iopType_t valueType, void* value, size_t valueSize, void *customData)
 {
     Q_UNUSED(valueSize)
 
@@ -3153,7 +3153,7 @@ bool IngeScapeQuick::_createInput(QString name, IngeScapeIopType::Value type, QV
                 if (igs_createInput(cName, enumIngeScapeIopTypeToEnumIopType_t(type), cValue, cSize) == 1)
                 {
                     // Observe this new input
-                    if (igs_observeInput(cName, &IngeScapeQuick_callbackObserveInput, this) != 1)
+                    if (igs_observeInput(cName, IngeScapeQuick_callbackObserveInput, this) != 1)
                     {
                         QString warningMessage = QString("failed to observe input '%1' with type %2").arg(name).arg(IngeScapeIopType::staticEnumToKey(type));
 
@@ -3424,7 +3424,7 @@ bool IngeScapeQuick::_createOutput(QString name, IngeScapeIopType::Value type, Q
                 if (igs_createOutput(cName, enumIngeScapeIopTypeToEnumIopType_t(type), cValue, cSize) == 1)
                 {
                     // Observe this new output
-                    if (igs_observeOutput(cName, &IngeScapeQuick_callbackObserveOutput, this) != 1)
+                    if (igs_observeOutput(cName, IngeScapeQuick_callbackObserveOutput, this) != 1)
                     {
                         QString warningMessage = QString("failed to observe output '%1' with type %2").arg(name).arg(IngeScapeIopType::staticEnumToKey(type));
 
@@ -3695,7 +3695,7 @@ bool IngeScapeQuick::_createParameter(QString name, IngeScapeIopType::Value type
                 if (igs_createParameter(cName, enumIngeScapeIopTypeToEnumIopType_t(type), cValue, cSize) == 1)
                 {
                     // Observe this new parameter
-                    if (igs_observeParameter(cName, &IngeScapeQuick_callbackObserveParameter, this) != 1)
+                    if (igs_observeParameter(cName, IngeScapeQuick_callbackObserveParameter, this) != 1)
                     {
                         QString warningMessage = QString("failed to observe parameter '%1' with type %2").arg(name).arg(IngeScapeIopType::staticEnumToKey(type));
 
