@@ -623,7 +623,7 @@ void PlaygroundController::_tryToAutoSave()
  *
  */
 void PlaygroundController::_autoSaveWithFile(QUrl url)
-{qDebug() << "autosve";
+{
     // Ensure that we have a valid URL
     if (url.isValid())
     {
