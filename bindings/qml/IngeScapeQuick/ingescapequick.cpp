@@ -3128,7 +3128,7 @@ bool IngeScapeQuick::_internal_needsToUpdateQmlInObserveParameter()
  *
  * @return true if an input is created, false otherwise
  */
-bool IngeScapeQuick::_createInput(QString name, IngeScapeIopType::Value type, QVariant qmlValue, void* cValue, long cSize, QString* warning)
+bool IngeScapeQuick::_createInput(QString name, IngeScapeIopType::Value type, QVariant qmlValue, void* cValue, size_t cSize, QString* warning)
 {
     bool result = false;
 
@@ -3399,7 +3399,7 @@ bool IngeScapeQuick::_createInput(QString name, IngeScapeIopType::Value type, QV
  *
  * @return true if an output is created, false otherwise
  */
-bool IngeScapeQuick::_createOutput(QString name, IngeScapeIopType::Value type, QVariant qmlValue, void* cValue, long cSize, QString* warning)
+bool IngeScapeQuick::_createOutput(QString name, IngeScapeIopType::Value type, QVariant qmlValue, void* cValue, size_t cSize, QString* warning)
 {
     bool result = false;
 
@@ -3670,7 +3670,7 @@ bool IngeScapeQuick::_createOutput(QString name, IngeScapeIopType::Value type, Q
  *
  * @return true if a parameter is created, false otherwise
  */
-bool IngeScapeQuick::_createParameter(QString name, IngeScapeIopType::Value type, QVariant qmlValue, void* cValue, long cSize, QString* warning)
+bool IngeScapeQuick::_createParameter(QString name, IngeScapeIopType::Value type, QVariant qmlValue, void* cValue, size_t cSize, QString* warning)
 {
     bool result = false;
 

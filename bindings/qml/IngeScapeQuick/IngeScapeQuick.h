@@ -1113,7 +1113,7 @@ protected:
       *
       * @return true if an input is created or already exists with the same type, false otherwise
       */
-     bool _createInput(QString name, IngeScapeIopType::Value type, QVariant qmlValue, void* cValue, long cSize, QString* warning);
+     bool _createInput(QString name, IngeScapeIopType::Value type, QVariant qmlValue, void* cValue, size_t cSize, QString* warning);
 
 
 
@@ -1129,7 +1129,7 @@ protected:
       *
       * @return true if an output is created or already exists with the same type, false otherwise
       */
-     bool _createOutput(QString name, IngeScapeIopType::Value type, QVariant qmlValue, void* cValue, long cSize, QString* warning);
+     bool _createOutput(QString name, IngeScapeIopType::Value type, QVariant qmlValue, void* cValue, size_t cSize, QString* warning);
 
 
 
@@ -1145,7 +1145,7 @@ protected:
       *
       * @return true if a parameter is created or already exists with the same type, false otherwise
       */
-     bool _createParameter(QString name, IngeScapeIopType::Value type, QVariant qmlValue, void* cValue, long cSize, QString* warning);
+     bool _createParameter(QString name, IngeScapeIopType::Value type, QVariant qmlValue, void* cValue, size_t cSize, QString* warning);
 
 
 
