@@ -3142,8 +3142,8 @@ bool IngeScapeQuick::_createInput(QString name, IngeScapeIopType::Value type, QV
             const char* cName = stdName.c_str();
 
             // Check if we must create a IngeScape input
-            iopType_t existingIopType = igs_getTypeForInput(cName);
-            if (existingIopType <= 0)
+            bool inputExists = igs_checkInputExistence(cName);
+            if (!inputExists)
             {
                 //
                 // This ingescape input does not exists
@@ -3211,7 +3211,8 @@ bool IngeScapeQuick::_createInput(QString name, IngeScapeIopType::Value type, QV
                 // This ingescape input already exists
                 //
 
-                // Check if the existing property
+                // Check if the existing IOP is compatible
+                iopType_t existingIopType = igs_getTypeForInput(cName);
                 IngeScapeIopType::Value existingIngeScapeIopType = enumIopType_tToIngeScapeIopType(existingIopType);
                 if (type == existingIngeScapeIopType)
                 {
@@ -3413,8 +3414,8 @@ bool IngeScapeQuick::_createOutput(QString name, IngeScapeIopType::Value type, Q
             const char* cName = stdName.c_str();
 
             // Check if we must create a IngeScape output
-            iopType_t existingIopType = igs_getTypeForOutput(cName);
-            if (existingIopType <= 0)
+            bool outputExists = igs_checkOutputExistence(cName);
+            if (!outputExists)
             {
                 //
                 // This ingescape output does not exists
@@ -3482,7 +3483,8 @@ bool IngeScapeQuick::_createOutput(QString name, IngeScapeIopType::Value type, Q
                 // This ingescape input already exists
                 //
 
-                // Check if the existing property is compatible
+                // Check if the existing IOP is compatible
+                iopType_t existingIopType = igs_getTypeForOutput(cName);
                 IngeScapeIopType::Value existingIngeScapeIopType = enumIopType_tToIngeScapeIopType(existingIopType);
                 if (type == existingIngeScapeIopType)
                 {
@@ -3684,8 +3686,8 @@ bool IngeScapeQuick::_createParameter(QString name, IngeScapeIopType::Value type
             const char* cName = stdName.c_str();
 
             // Check if we must create a IngeScape parameter
-            iopType_t existingIopType = igs_getTypeForParameter(cName);
-            if (existingIopType <= 0)
+            bool parameterExists = igs_checkParameterExistence(cName);
+            if (!parameterExists)
             {
                 //
                 // This ingescape parameter does not exists
@@ -3754,6 +3756,7 @@ bool IngeScapeQuick::_createParameter(QString name, IngeScapeIopType::Value type
                 //
 
                 // Check if the existing property is compatible
+                iopType_t existingIopType = igs_getTypeForParameter(cName);
                 IngeScapeIopType::Value existingIngeScapeIopType = enumIopType_tToIngeScapeIopType(existingIopType);
                 if (type == existingIngeScapeIopType)
                 {
