@@ -89,7 +89,7 @@ int definition_addIopToDefinition(agent_iop_t *iop, iop_t iop_type, definition *
     return 1;
 }
 
-agent_iop_t* definition_createIop(const char *name, iop_t type, iopType_t value_type, void *value, long size){
+agent_iop_t* definition_createIop(const char *name, iop_t type, iopType_t value_type, void *value, size_t size){
     if (igs_internal_definition == NULL){
         igs_error("Cannot add IOP %s to NULL definition", name);
         return NULL;

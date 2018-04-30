@@ -362,7 +362,7 @@ int handleSubscriptionMessage(zmsg_t *msg, const char *subscriberPeerId){
         
         zframe_t *frame = NULL;
         void *data = NULL;
-        long size = 0;
+        size_t size = 0;
         char * value = NULL;
         //get data before iterating to all the mapping elements using it
         if (valueType == IGS_STRING_T){

@@ -39,7 +39,7 @@ int igs_busSendStringToChannel(const char *channel, const char *msg, ...){
     return res;
 }
 
-int igs_busSendDataToChannel(const char *channel, void *data, long size){
+int igs_busSendDataToChannel(const char *channel, void *data, size_t size){
     if (strcmp(CHANNEL, channel) == 0){
         igs_error("channel name %s is reserved and cannot be used", channel);
         return -1;
@@ -81,7 +81,7 @@ int igs_busSendStringToAgent(const char *agentNameOrPeerID, const char *msg, ...
     return res;
 }
 
-int igs_busSendDataToAgent(const char *agentNameOrPeerID, void *data, unsigned long size){
+int igs_busSendDataToAgent(const char *agentNameOrPeerID, void *data, size_t size){
     zyreAgent_t *el, *tmp;
     int res = 1;
     HASH_ITER(hh, zyreAgents, el, tmp){

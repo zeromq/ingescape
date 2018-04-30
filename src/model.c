@@ -21,7 +21,7 @@
 // INTERNAL FUNCTIONS
 ////////////////////////////////////////////////////////////////////////
 
-void model_runObserveCallbacksForIOP(agent_iop_t *iop, void *value, long valueSize){
+void model_runObserveCallbacksForIOP(agent_iop_t *iop, void *value, size_t valueSize){
     igs_observe_callback_t *cb;
     DL_FOREACH(iop->callbacks, cb){
         cb->callback_ptr(iop->type, iop->name, iop->value_type, value, valueSize, cb->data);
@@ -459,7 +459,7 @@ char* model_getIOPValueAsString (agent_iop_t* iop){
     return str_value;
 }
 
-int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void* value, long size){
+int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void* value, size_t size){
     agent_iop_t *iop = model_findIopByName((char*) iopName, iopType);
     if(iop == NULL){
         igs_error("%s not found for writing", iopName);
@@ -1016,7 +1016,7 @@ int igs_writeOutputAsZMQMsg(const char *name, zmsg_t *msg){
     }
     zframe_t *frame = zmsg_encode(msg);
     void *value = zframe_data(frame);
-    long size = zframe_size(frame);
+    size_t size = zframe_size(frame);
     int ret = model_writeIOP(name, IGS_OUTPUT_T, IGS_DATA_T, value, size);
     network_publishOutput(name);
     zframe_destroy(&frame);

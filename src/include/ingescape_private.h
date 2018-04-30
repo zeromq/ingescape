@@ -205,7 +205,7 @@ bool mapping_checkCompatibilityInputOutput(agent_iop_t *foundInput, agent_iop_t 
 
 extern bool isWholeAgentMuted;
 
-int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void* value, long size);
+int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void* value, size_t size);
 agent_iop_t* model_findIopByName(const char* name, iop_t type);
 char* model_getIOPValueAsString (agent_iop_t* iop); //returned value must be freed by user
 

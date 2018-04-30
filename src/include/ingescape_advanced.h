@@ -47,12 +47,12 @@ PUBLIC void igs_busJoinChannel(const char *channel);
 PUBLIC void igs_busLeaveChannel(const char *channel);
 
 PUBLIC int igs_busSendStringToChannel(const char *channel, const char *msg, ...);
-PUBLIC int igs_busSendDataToChannel(const char *channel, void *data, long size);
+PUBLIC int igs_busSendDataToChannel(const char *channel, void *data, size_t size);
 PUBLIC int igs_busSendZMQMsgToChannel(const char *channel, zmsg_t **msg_p); //destroys message after sending it
 
 // the functions below support mutiple agents with same name
 PUBLIC int igs_busSendStringToAgent(const char *agentNameOrPeerID, const char *msg, ...);
-PUBLIC int igs_busSendDataToAgent(const char *agentNameOrPeerID, void *data, unsigned long size);
+PUBLIC int igs_busSendDataToAgent(const char *agentNameOrPeerID, void *data, size_t size);
 PUBLIC int igs_busSendZMQMsgToAgent(const char *agentNameOrPeerID, zmsg_t **msg_p); //destroys message after sending it
 
 PUBLIC void igs_busAddServiceDescription(const char *key, const char *value);
