@@ -186,7 +186,7 @@ void* model_getValueFor(const char *name, iop_t type){
     return NULL;
 }
 
-int igs_readIOP(const char *name, iop_t type, void **value, long *size){
+int igs_readIOP(const char *name, iop_t type, void **value, size_t *size){
     agent_iop_t *iop = model_findIopByName((char*) name, type);
     if(iop == NULL){
         igs_error("%s not found", name);
@@ -352,7 +352,7 @@ char *model_readIopAsString (const char *name, iop_t type){
     }
 }
 
-int model_readIopAsData (const char *name, iop_t type, void **value, long *size){
+int model_readIopAsData (const char *name, iop_t type, void **value, size_t *size){
     agent_iop_t *iop = model_findIopByName((char*) name, type);
     if(iop == NULL){
         igs_error("%s not found", name);
@@ -810,15 +810,15 @@ agent_iop_t * model_findIopByName(const char *name, iop_t type){
 
 // --------------------------------  READ ------------------------------------//
 
-int igs_readInput(const char *name, void **value, long *size){
+int igs_readInput(const char *name, void **value, size_t *size){
     return igs_readIOP(name, IGS_INPUT_T, value, size);
 }
 
-int igs_readOutput(const char *name, void **value, long *size){
+int igs_readOutput(const char *name, void **value, size_t *size){
     return igs_readIOP(name, IGS_OUTPUT_T, value, size);
 }
 
-int igs_readParameter(const char *name, void **value, long *size){
+int igs_readParameter(const char *name, void **value, size_t *size){
     return igs_readIOP(name, IGS_PARAMETER_T, value, size);
 }
 
@@ -838,13 +838,13 @@ char* igs_readInputAsString(const char *name){
     return model_readIopAsString(name, IGS_INPUT_T);
 }
 
-int igs_readInputAsData(const char *name, void **data, long *size){
+int igs_readInputAsData(const char *name, void **data, size_t *size){
     return model_readIopAsData(name, IGS_INPUT_T, data, size);
 }
 
 int igs_readInputAsZMQMsg(const char *name, zmsg_t **msg){
     void *data = NULL;
-    long size = 0;
+    size_t size = 0;
     int ret = model_readIopAsData(name, IGS_INPUT_T, &data, &size);
     zframe_t *frame = zframe_new(data, size);
     *msg = zmsg_decode(frame);
@@ -868,7 +868,7 @@ char* igs_readOutputAsString(const char *name){
     return model_readIopAsString(name, IGS_OUTPUT_T);
 }
 
-int igs_readOutputAsData(const char *name, void **data, long *size){
+int igs_readOutputAsData(const char *name, void **data, size_t *size){
     return model_readIopAsData(name, IGS_OUTPUT_T, data, size);
 }
 
@@ -888,7 +888,7 @@ char* igs_readParameterAsString(const char *name){
     return model_readIopAsString(name, IGS_PARAMETER_T);
 }
 
-int igs_readParameterAsData(const char *name, void **data, long *size){
+int igs_readParameterAsData(const char *name, void **data, size_t *size){
     return model_readIopAsData(name, IGS_PARAMETER_T, data, size);
 }
 
@@ -934,7 +934,7 @@ int igs_writeInputAsImpulsion(const char *name){
     return model_writeIOP(name, IGS_INPUT_T, IGS_IMPULSION_T, NULL, 0);
 }
 
-int igs_writeInputAsData(const char *name, void *value, long size){
+int igs_writeInputAsData(const char *name, void *value, size_t size){
     if (name == NULL || strlen(name) == 0){
         igs_error("Input name cannot be NULL or empty");
         return 0;
@@ -998,7 +998,7 @@ int igs_writeOutputAsImpulsion(const char *name){
     return ret;
 }
 
-int igs_writeOutputAsData(const char *name, void *value, long size){
+int igs_writeOutputAsData(const char *name, void *value, size_t size){
     if (name == NULL || strlen(name) == 0){
         igs_error("Output name cannot be NULL or empty");
         return 0;
@@ -1055,7 +1055,7 @@ int igs_writeParameterAsString(const char *name, char *value){
     return model_writeIOP(name, IGS_PARAMETER_T, IGS_STRING_T, value, strlen(value)+1);
 }
 
-int igs_writeParameterAsData(const char *name, void *value, long size){
+int igs_writeParameterAsData(const char *name, void *value, size_t size){
     if (name == NULL || strlen(name) == 0){
         igs_error("Parameter name cannot be NULL or empty");
         return 0;
@@ -1123,6 +1123,16 @@ char ** igs_getOutputsList(long *nbOfElements){
 
 char ** igs_getParametersList(long *nbOfElements){
     return model_getIopList(nbOfElements, IGS_PARAMETER_T);
+}
+
+void igs_freeIOPList(char ***list, long nbOfElements){
+    if (nbOfElements < 1)
+        return;
+    for (int i = 0; i < nbOfElements; i++){
+        free((*list)[i]);
+    }
+    free(*list);
+    *list = NULL;
 }
 
 bool igs_checkInputExistence(const char *name){

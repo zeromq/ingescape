@@ -317,7 +317,7 @@ int igs_setDefinitionVersion(const char *version){
  * \return The error. 1 is OK, 0 not able to add in definition loaded, -1 not able to add in definition live
  */
 
-int igs_createInput(const char *name, iopType_t value_type, void *value, long size){
+int igs_createInput(const char *name, iopType_t value_type, void *value, size_t size){
     if (name == NULL || strlen (name) == 0){
         igs_error("Input name cannot be NULL or empty");
         return -1;
@@ -344,7 +344,7 @@ int igs_createInput(const char *name, iopType_t value_type, void *value, long si
  * \return The error. 1 is OK, 0 not able to add in definition loaded, -1 not able to add in definition live
  */
 
-int igs_createOutput(const char *name, iopType_t value_type, void *value, long size){
+int igs_createOutput(const char *name, iopType_t value_type, void *value, size_t size){
     if (name == NULL || strlen (name) == 0){
         igs_error("Output name cannot be NULL or empty");
         return -1;
@@ -370,7 +370,7 @@ int igs_createOutput(const char *name, iopType_t value_type, void *value, long s
  * \param value The pointer on the value (the value will be copied)
  * \return The error. 1 is OK, 0 not able to add in definition loaded, -1 not able to add in definition live
  */
-int igs_createParameter(const char *name, iopType_t value_type, void *value, long size){
+int igs_createParameter(const char *name, iopType_t value_type, void *value, size_t size){
     if (name == NULL || strlen (name) == 0){
         igs_error("Parameter name cannot be NULL or empty");
         return -1;

@@ -1218,7 +1218,7 @@ int network_publishOutput (const char* output_name){
             zmsg_addstr(msg, output_name);
             zmsg_addstrf(msg, "%d", found_iop->value_type);
             void *data = NULL;
-            long size = 0;
+            size_t size = 0;
             switch (found_iop->value_type) {
                 case IGS_INTEGER_T:
                     zmsg_addmem(msg, &(found_iop->value.i), sizeof(int));
