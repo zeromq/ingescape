@@ -134,7 +134,7 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
                 }
 
                 free(k);
-                free(v);
+                //free(v);
             }
             zlist_destroy(&keys);
 
@@ -511,7 +511,6 @@ void NetworkController::start(QString networkDevice, QString ipAddress, int port
     {
         // Begin to observe incoming messages on the bus
         int result = igs_observeBus(&onIncommingBusMessageCallback, this);
-
         if (result == 0) {
             qCritical() << "The callback on zyre messages has NOT been registered !";
         }
