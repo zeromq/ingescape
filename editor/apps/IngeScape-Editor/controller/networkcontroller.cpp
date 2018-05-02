@@ -27,7 +27,6 @@ extern "C" {
 #include "misc/ingescapeeditorutils.h"
 #include "model/definitionm.h"
 
-
 static const QString launcherSuffix = ".ingescapelauncher";
 
 static const QString definitionPrefix = "EXTERNAL_DEFINITION#";
@@ -41,30 +40,33 @@ static const QString statePrefix = "STATE=";
 
 
 /**
- * @brief Callback for Incomming Zyre Messages
- * @param cst_zyre_event
- * @param arg
- * @return
+ * @brief Callback for incomming messages on the bus
+ * @param evt
+ * @param peer
+ * @param name
+ * @param address
+ * @param channel
+ * @param headers
+ * @param msg
+ * @param myData
  */
-void onIncommingZyreMessageCallback(const char *evt, const char *peer, const char *name,
-                                   const char *address, const char *channel,
-                                   zhash_t *headers, zmsg_t *msg, void *myData)
+void onIncommingBusMessageCallback(const char *event, const char *peer, const char *name, const char *address, const char *channel, zhash_t *headers, zmsg_t *msg, void *myData)
 {
     Q_UNUSED(channel)
+
     NetworkController* networkController = (NetworkController*)myData;
     if (networkController != NULL)
     {
-        QString hostname = "";
-        QString ipAddress = "";
-        QString event = evt;
-        QString peerAddress = address;
-        QString peerName = name;
-        QString peerId = peer;
+        QString peerId = QString(peer);
+        QString peerName = QString(name);
+        QString peerAddress = QString(address);
 
         // ENTER
-        if (event.compare("ENTER") == 0)
+        if (streq(event, "ENTER"))
         {
             qDebug() << QString("--> %1 has entered the network with peer id %2 (and address %3)").arg(peerName, peerId, peerAddress);
+
+            QString ipAddress = "";
 
             // Get IP address (Example of peerAddress: "tcp://10.0.0.17:49153")
             if (peerAddress.length() > 6)
@@ -83,6 +85,7 @@ void onIncommingZyreMessageCallback(const char *evt, const char *peer, const cha
             bool isIntPID = false;
             int pid = -1;
             bool canBeFrozen = false;
+            QString hostname = "";
             QString commandLine = "";
             QString streamingPort = "";
 
@@ -91,11 +94,12 @@ void onIncommingZyreMessageCallback(const char *evt, const char *peer, const cha
             if (nbKeys > 0)
             {
                 char *k;
-                const char *v;
+                char *v;
                 QString key = "";
                 QString value = "";
 
-                while ((k = (char *)zlist_pop(keys))) {
+                while ((k = (char *)zlist_pop(keys)))
+                {
                     v = (char *)zhash_lookup(headers, k);
 
                     key = QString(k);
@@ -130,6 +134,7 @@ void onIncommingZyreMessageCallback(const char *evt, const char *peer, const cha
                 }
 
                 free(k);
+                free(v);
             }
             zlist_destroy(&keys);
 
@@ -151,17 +156,17 @@ void onIncommingZyreMessageCallback(const char *evt, const char *peer, const cha
             }
         }
         // JOIN (group)
-        else if (event.compare("JOIN") == 0)
+        else if (streq(event, "JOIN"))
         {
             //qDebug() << QString("++ %1 has joined %2").arg(peerName, group);
         }
         // LEAVE (group)
-        else if (event.compare("LEAVE") == 0)
+        else if (streq(event, "LEAVE"))
         {
             //qDebug() << QString("-- %1 has left %2").arg(peerName, group);
         }
         // SHOUT
-        else if (event.compare("SHOUT") == 0)
+        else if (streq(event, "SHOUT"))
         {
             zmsg_t* msg_dup = zmsg_dup(msg);
             QString message = zmsg_popstr(msg_dup);
@@ -210,7 +215,7 @@ void onIncommingZyreMessageCallback(const char *evt, const char *peer, const cha
             zmsg_destroy(&msg_dup);
         }
         // WHISPER
-        else if (event.compare("WHISPER") == 0)
+        else if (streq(event, "WHISPER"))
         {
             zmsg_t* msg_dup = zmsg_dup(msg);
             QString message = zmsg_popstr(msg_dup);
@@ -275,7 +280,7 @@ void onIncommingZyreMessageCallback(const char *evt, const char *peer, const cha
             zmsg_destroy(&msg_dup);
         }
         // EXIT
-        else if (event.compare("EXIT") == 0)
+        else if (streq(event, "EXIT"))
         {
             qDebug() << QString("<-- %1 (%2) exited").arg(peerName, peerId);
 
@@ -504,6 +509,13 @@ void NetworkController::start(QString networkDevice, QString ipAddress, int port
 {
     if (_isIngeScapeAgentStarted == 0)
     {
+        // Begin to observe incoming messages on the bus
+        int result = igs_observeBus(&onIncommingBusMessageCallback, this);
+
+        if (result == 0) {
+            qCritical() << "The callback on zyre messages has NOT been registered !";
+        }
+
         // Start service with network device
         if (!networkDevice.isEmpty()) {
             _isIngeScapeAgentStarted = igs_startWithDevice(networkDevice.toStdString().c_str(), port);
@@ -517,13 +529,6 @@ void NetworkController::start(QString networkDevice, QString ipAddress, int port
         if (_isIngeScapeAgentStarted == 1)
         {
             qInfo() << "IngeScape Agent" << _editorAgentName << "started";
-
-            // Begin the observe on transiting zyre messages
-            int result = igs_observeBus(&onIncommingZyreMessageCallback, this);
-
-            if (result == 0) {
-                qCritical() << "The callback on zyre messages has NOT been registered !";
-            }
         }
         else {
             qCritical() << "The network has NOT been initialized on" << networkDevice << "or" << ipAddress << "and port" << QString::number(port);
