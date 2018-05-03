@@ -73,11 +73,35 @@ Item {
         }
 
 
-
-
         //
         // Mapping Activation
         //
+        Item {
+            id: arcBehindMappingActivationBtn
+
+            anchors {
+                bottom: parent.bottom
+                left: parent.left
+                leftMargin: 10
+                bottomMargin: 10
+            }
+
+            width: 80
+            height: 80
+
+            I2PieSlice {
+                anchors.fill: parent
+
+                color: "white"
+
+                innerRadiusX: 39
+                innerRadiusY: 39
+
+                startAngle: -10
+                sweepAngle: 310
+            }
+        }
+
         Button {
             id: activeMappingBtn
 
@@ -85,7 +109,7 @@ Item {
                 bottom: parent.bottom
                 left: parent.left
                 leftMargin: 23
-                bottomMargin: 20
+                bottomMargin: 23
             }
 
             activeFocusOnPress: true
@@ -95,7 +119,7 @@ Item {
                 fileCache: IngeScapeTheme.svgFileINGESCAPE
 
                 pressedID: releasedID + "-pressed"
-                releasedID: IngeScapeEditorC.modelManager.isActivatedMapping? "mappingActivation-activated" : "mappingActivation"
+                releasedID: IngeScapeEditorC.modelManager.isActivatedMapping ? "connect-on" : "connect-off"
                 disabledID : releasedID
             }
 
@@ -107,6 +131,87 @@ Item {
                 target : activeMappingBtn
                 property : "checked"
                 value : IngeScapeEditorC.modelManager.isActivatedMapping
+            }
+        }
+
+        Button {
+            id: typeMappingBtn
+            visible: true
+
+            anchors {
+                bottom: parent.bottom
+                left: parent.left
+                leftMargin: 78
+                bottomMargin: 70
+            }
+
+            activeFocusOnPress: true
+            checkable: true
+
+            style: Theme.LabellessSvgButtonStyle {
+                fileCache: IngeScapeTheme.svgFileINGESCAPE
+
+                pressedID: releasedID + "-pressed"
+                releasedID: IngeScapeEditorC.modelManager.isControlledMapping ? "control" : "observe"
+                disabledID : releasedID
+            }
+
+            onClicked: {
+                // Show choose mapping type
+                chooseMappingType.visible = true;
+
+                // Hide our feedback button
+                typeMappingBtn.visible = false;
+            }
+        }
+
+        Column {
+            id: chooseMappingType
+            visible: false
+
+            anchors {
+                bottom: parent.bottom
+                left: parent.left
+                leftMargin: 78
+                bottomMargin: 64
+            }
+
+            ExclusiveGroup {
+                id: typeMappingGroup
+            }
+            RadioButton {
+                text: "OBSERVE"
+                exclusiveGroup: typeMappingGroup
+                checked: !IngeScapeEditorC.modelManager.isControlledMapping
+
+                onCheckedChanged: {
+                    if (checked) {
+                        IngeScapeEditorC.modelManager.isControlledMapping = false;
+
+                        // Show feedback button
+                        typeMappingBtn.visible = true;
+
+                        // Hide choose mapping type
+                        chooseMappingType.visible = false;
+                    }
+                }
+            }
+            RadioButton {
+                text: "CONTROL"
+                exclusiveGroup: typeMappingGroup
+                checked: IngeScapeEditorC.modelManager.isControlledMapping
+
+                onCheckedChanged: {
+                    if (checked) {
+                        IngeScapeEditorC.modelManager.isControlledMapping = true;
+
+                        // Show feedback button
+                        typeMappingBtn.visible = true;
+
+                        // Hide choose mapping type
+                        chooseMappingType.visible = false;
+                    }
+                }
             }
         }
 

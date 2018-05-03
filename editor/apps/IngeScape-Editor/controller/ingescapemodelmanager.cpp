@@ -36,6 +36,7 @@ IngeScapeModelManager::IngeScapeModelManager(QString agentsListDirectoryPath,
                                        QString dataDirectoryPath,
                                        QObject *parent) : QObject(parent),
     _isActivatedMapping(false),
+    _isControlledMapping(false),
     _agentsListDirectoryPath(agentsListDirectoryPath),
     _agentsMappingsDirectoryPath(agentsMappingsDirectoryPath),
     _dataDirectoryPath(dataDirectoryPath),
@@ -96,6 +97,28 @@ void IngeScapeModelManager::setisActivatedMapping(bool value)
         }
 
         Q_EMIT isActivatedMappingChanged(value);
+    }
+}
+
+
+/**
+ * @brief Setter for property "is Controlled Mapping"
+ * @param value
+ */
+void IngeScapeModelManager::setisControlledMapping(bool value)
+{
+    if (_isControlledMapping != value)
+    {
+        _isControlledMapping = value;
+
+        if (_isControlledMapping) {
+            qInfo() << "Mapping Controlled";
+        }
+        else {
+            qInfo() << "Mapping Observed";
+        }
+
+        Q_EMIT isControlledMappingChanged(value);
     }
 }
 

@@ -38,6 +38,9 @@ class IngeScapeModelManager : public QObject
     // Flag indicating if our global mapping is activated
     I2_QML_PROPERTY_CUSTOM_SETTER(bool, isActivatedMapping)
 
+    // Flag indicating if our global mapping is controlled (or passive)
+    I2_QML_PROPERTY_CUSTOM_SETTER(bool, isControlledMapping)
+
     // List of all published values
     I2_QOBJECT_LISTMODEL(PublishedValueM, publishedValues)
 
