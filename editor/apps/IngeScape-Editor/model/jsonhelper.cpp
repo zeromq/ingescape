@@ -119,6 +119,60 @@ DefinitionM* JsonHelper::createModelOfDefinition(QByteArray byteArrayOfJson)
     return definition;
 }
 
+/**
+ * @brief Create a model of record from JSON data
+ * @param byteArrayOfJson
+ * @return
+ */
+QList<RecordM*> JsonHelper::createRecordModelList(QByteArray byteArrayOfJson)
+{
+    QList<RecordM*> recordsList;
+
+    QJsonDocument jsonAgentDefinition = QJsonDocument::fromJson(byteArrayOfJson);
+    if (jsonAgentDefinition.isObject())
+    {
+        QJsonArray jsonArray;
+
+        QJsonDocument jsonFileRoot = QJsonDocument::fromJson(byteArrayOfJson);
+        QJsonValue recordsValue = jsonFileRoot.object().value("Records");
+
+        if(recordsValue.isArray())
+        {
+            jsonArray = recordsValue.toArray();
+        }
+
+        foreach (QJsonValue jsonValue, jsonArray)
+        {
+            if (jsonValue.isObject())
+            {
+                QJsonObject jsonAllMapping = jsonValue.toObject();
+
+                // Get value for keys "agentName" and "definition"
+                QJsonValue jsonId = jsonAllMapping.value("id");
+                QJsonValue jsonName = jsonAllMapping.value("name_record");
+                QJsonValue jsonBeginDate = jsonAllMapping.value("year_month_day_beg");
+                QJsonValue jsonBeginTime = jsonAllMapping.value("time_of_day_beg");
+                QJsonValue jsonEndDate = jsonAllMapping.value("year_month_day_end");
+                QJsonValue jsonEndTime = jsonAllMapping.value("time_of_day_end");
+
+                if (jsonName.isString() && jsonId.isString())
+                {
+                    // Create mapping and definition
+                    RecordM* record = new RecordM();
+                    record->setid(jsonId.toString());
+                    record->setname(jsonName.toString());
+                    record->setbeginDate(jsonBeginDate.toString());
+                    record->setbeginTime(jsonBeginTime.toString());
+                    record->setendDate(jsonEndDate.toString());
+                    record->setendTime(jsonEndTime.toString());
+                    recordsList.append(record);
+                }
+            }
+        }
+    }
+
+    return recordsList;
+}
 
 /**
  * @brief Export the agents list
@@ -230,6 +284,7 @@ AgentMappingM* JsonHelper::createModelOfAgentMapping(QString inputAgentName, QBy
 
     return agentMapping;
 }
+
 
 /**
  * @brief Create a model of agent mapping from JsonObject and the input agent name corresponding
@@ -486,6 +541,7 @@ DefinitionM* JsonHelper::_createModelOfDefinitionFromJSON(QJsonObject jsonDefini
 
     return definition;
 }
+
 
 
 /**

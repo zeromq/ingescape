@@ -492,6 +492,22 @@ void IngeScapeModelManager::onMappingReceived(QString peerId, QString agentName,
     }
 }
 
+/**
+ * @brief Occurs when records from DB have been received
+ * @param mappingJSON
+ */
+void IngeScapeModelManager::onAllRecordsReceived(QString recordsJSON)
+{
+    if (!recordsJSON.isEmpty())
+    {
+        QByteArray byteArrayOfJson = recordsJSON.toUtf8();
+        _recordsList = _jsonHelper->createRecordModelList(byteArrayOfJson);
+
+        Q_EMIT recordsListChanged(_recordsList);
+    }
+}
+
+
 
 /**
  * @brief Slot called when a new value is published

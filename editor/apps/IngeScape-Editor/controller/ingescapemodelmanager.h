@@ -238,6 +238,11 @@ Q_SIGNALS:
      */
     void commandAskedToAgent(QStringList peerIdsList, QString command);
 
+    /**
+     * @brief Emitted when the list of records changes
+     * @param records
+     */
+    void recordsListChanged(QList<RecordM*> records);
 
 public Q_SLOTS:
 
@@ -296,6 +301,11 @@ public Q_SLOTS:
      */
     void onMappingReceived(QString peerId, QString agentName, QString mappingJSON);
 
+    /**
+     * @brief Slot called when all records of DB have been received and must be processed
+     * @param mapping in JSON format
+     */
+    void onAllRecordsReceived(QString mappingJSON);
 
     /**
      * @brief Slot called when a new value is published
@@ -334,6 +344,7 @@ public Q_SLOTS:
      * @param stateName
      */
     void onAgentStateChanged(QString peerId, QString stateName);
+
 
 private:
 
@@ -411,6 +422,9 @@ private:
 
     // Map from "mapping name" to a list (of models) of agent mapping
     QHash<QString, QList<AgentMappingM*>> _mapFromNameToAgentMappingsList;
+
+    // List of records from DB
+    QList<RecordM*> _recordsList;
 
 };
 

@@ -86,6 +86,9 @@ SOURCES += main.cpp \
     sortFilter/abstracttimerangefilter.cpp \
     controller/hostssupervisioncontroller.cpp \
     viewModel/hostvm.cpp \
+    model/recordm.cpp \
+    controller/recordssupervisioncontroller.cpp \
+    viewModel/recordvm.cpp
 
 HEADERS += \
     stable.h \
@@ -149,6 +152,9 @@ HEADERS += \
     sortFilter/abstracttimerangefilter.h \
     controller/hostssupervisioncontroller.h \
     viewModel/hostvm.h \
+    model/recordm.h \
+    controller/recordssupervisioncontroller.h \
+    viewModel/recordvm.h
 
 
 RESOURCES += qml.qrc
