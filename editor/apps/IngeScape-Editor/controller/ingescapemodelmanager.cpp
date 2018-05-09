@@ -526,7 +526,7 @@ void IngeScapeModelManager::onAllRecordsReceived(QString recordsJSON)
         QByteArray byteArrayOfJson = recordsJSON.toUtf8();
         _recordsList = _jsonHelper->createRecordModelList(byteArrayOfJson);
 
-        Q_EMIT recordsListChanged(_recordsList);
+        //Q_EMIT recordsListChanged(_recordsList);
     }
 }
 
