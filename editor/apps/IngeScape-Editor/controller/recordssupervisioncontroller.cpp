@@ -38,7 +38,7 @@ RecordsSupervisionController::RecordsSupervisionController(QObject *parent) : QO
  * @brief RecordsSupervisionController::onRecordsListChanged
  * @param records
  */
-void RecordsSupervisionController::onRecordsListChanged(QList<RecordM *> records)
+void RecordsSupervisionController::onRecordsListChanged(QList<RecordM*> records)
 {
     _recordsList.clear();
 

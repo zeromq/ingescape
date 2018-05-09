@@ -251,6 +251,7 @@ Item {
                     title: qsTr("Records");
 
                     Record.RecordsList {
+                        controller: IngeScapeEditorC.recordsSupervisionC
                         id: recordsList
                         anchors.fill: parent
                     }

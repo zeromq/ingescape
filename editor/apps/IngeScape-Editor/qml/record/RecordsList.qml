@@ -53,15 +53,15 @@ Item {
     //--------------------------------
 
     // allowing to deselect selected host
-    MouseArea {
-        anchors.fill: parent
-        onClicked:  {
-            if(controller.selectedHost)
-            {
-                controller.selectedHost = null;
-            }
-        }
-    }
+//    MouseArea {
+//        anchors.fill: parent
+//        onClicked:  {
+//            if(controller.selectedHost)
+//            {
+//                controller.selectedHost = null;
+//            }
+//        }
+//    }
 
     //
     // List of records
