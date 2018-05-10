@@ -980,7 +980,7 @@ int triggerMappingUpdate(zloop_t *loop, int timer_id, void *arg){
 }
 
 static void
-initActor (zsock_t *pipe, void *args){
+initLoop (zsock_t *pipe, void *args){
     INGESCAPE_UNUSED(args)
 
     network_needToSendDefinitionUpdate = false;
@@ -1171,7 +1171,7 @@ initActor (zsock_t *pipe, void *args){
         zloop_start (loop); //start returns when one of the pollers returns -1
     }
     
-    igs_info("Agent stopping...");
+    igs_info("loop stopping...");
 
     //clean
     igs_Interrupted = true;
@@ -1200,6 +1200,7 @@ initActor (zsock_t *pipe, void *args){
         }
         forcedStop = false;
     }
+    igs_info("loop stopped");
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1355,7 +1356,7 @@ int igs_startWithDevice(const char *networkDevice, unsigned int port){
     }
     
     agentElements->zyrePort = port;
-    agentElements->agentActor = zactor_new (initActor, agentElements);
+    agentElements->agentActor = zactor_new (initLoop, agentElements);
     assert (agentElements->agentActor);
     
     return 1;
@@ -1414,7 +1415,7 @@ int igs_startWithIP(const char *ipAddress, unsigned int port){
     }
     
     agentElements->zyrePort = port;
-    agentElements->agentActor = zactor_new (initActor, agentElements);
+    agentElements->agentActor = zactor_new (initLoop, agentElements);
     assert (agentElements->agentActor);
  
     return 1;
@@ -1475,7 +1476,7 @@ int igs_startWithDeviceOnBroker(const char *networkDevice, const char *brokerIpA
     }
     
     agentElements->zyrePort = 0;
-    agentElements->agentActor = zactor_new (initActor, agentElements);
+    agentElements->agentActor = zactor_new (initLoop, agentElements);
     assert (agentElements->agentActor);
     
     return 1;
@@ -1491,7 +1492,11 @@ int igs_stop(){
     if (agentElements != NULL){
         //interrupting and destroying ingescape thread and zyre layer
         //this will also clean all subscribers
-        zstr_sendx (agentElements->agentActor, "$TERM", NULL);
+        if (agentElements->node != NULL){
+            //we send message only if zactor is still active, i.e.
+            //if its node still exists
+            zstr_sendx (agentElements->agentActor, "$TERM", NULL);
+        }
         zactor_destroy (&agentElements->agentActor);
         //cleaning agent
         free (agentElements);
