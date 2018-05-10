@@ -1,8 +1,10 @@
----
-title: "ingeScape editor, take the tour !"
-date: 2018-04-23T15:35:00+02:00
-draft: false
----
++++
+title = "ingeScape editor, take the tour !"
+date = "2018-04-23T15:35:00+02:00"
+tags = ["editor","start"]
+categories = ["start"]
+banner = "img/banners/banner-1.jpg"
++++
 
 This article presents the high-level features of the ingeScape editor. We do not go into details here but you will have a good overview of this application after your read.
 

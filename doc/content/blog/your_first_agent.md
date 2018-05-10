@@ -1,8 +1,10 @@
----
-title: "Your first ingeScape agent"
-date: 2018-04-23T11:36:41+02:00
-draft: false
----
++++
+title = "Your first ingeScape agent"
+date = "2018-04-23T11:36:41+02:00"
+tags = ["agents","start"]
+categories = ["start"]
+banner = "img/banners/banner-1.jpg"
++++
 
 Our main goal when building the ingeScape API was to make it extremely simple for most common situations and very progressive when fine tuning and advanced features become necessary.
 
@@ -128,7 +130,7 @@ int main(int argc, const char * argv[]) {
 {{< / highlight >}}
 
 ### Compiling on Linux
-As a prerequesite, you need to have the ingeScape library installed on your computer. We suppose the ingeScape header is installed in */usr/local/include/* and the library in */usr/local/lib/*, which is pretty standard on most Linux environments. 
+As a prerequisite, you need to have the ingeScape library installed on your computer. We suppose the ingeScape header is installed in */usr/local/include/* and the library in */usr/local/lib/*, which is pretty standard on most Linux environments. 
 
 If so, copy the code in a *main.c* file and type the following commands in a terminal where your *main.c* file is located:
 
