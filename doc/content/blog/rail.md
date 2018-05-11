@@ -1,8 +1,9 @@
----
-title: "Innovative operational supervision environment for RATP RER Ligne A in Paris"
-date: 2018-04-25T11:56:31+02:00
-draft: false
----
++++
+title = "Innovative operational supervision environment for RATP RER Ligne A in Paris"
+date = "2018-04-20T11:57:11+02:00"
+categories = ["works"]
+banner = "images/ratp.png"
++++
 by [Ingenuity i/o](https://ingenuity.io)
 
 This is a "real world" operational project involving active communication with critical rail systems. It introduces innovative paperless multitouch interactive workstations enabling to command and control operational equipments and to monitor all the human and train resources for the exploitation of the line. It can be seen as **a combination of a large IoT network and a Big Data system** with lots of data sources to be merged in order to insure proper situation awareness and control means for the operators.

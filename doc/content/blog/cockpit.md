@@ -1,8 +1,9 @@
----
-title: "Interactive environment for simulation and human factor experiments in aircraft cockpits"
-date: 2018-04-25T11:56:11+02:00
-draft: false
----
++++
+title = "Interactive environment for simulation and human factor experiments in aircraft cockpits"
+date = "2018-04-20T11:58:11+02:00"
+categories = ["works"]
+banner = "img/banners/cockpit.png"
++++
 by [Ingenuity i/o](https://ingenuity.io)
 
 This project was developed as a prototype to demonstrate new methods and techniques for digital collaborative interactions in aircraft cockpits based on multimodality and a large set of i/o devices (leap motion, tobii eye tracker, speech recognition, etc.).

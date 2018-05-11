@@ -1,8 +1,9 @@
----
-title: "Public Announce monitoring system"
-date: 2018-04-25T11:56:31+02:00
-draft: false
----
++++
+title = "Public Announce monitoring system"
+date = "2018-04-20T11:56:11+02:00"
+categories = ["works"]
+banner = "images/pa.png"
++++
 by [Ingenuity i/o](https://ingenuity.io)
 
 This operational project resulted in an ecosystem of applications dedicated to programming, monitoring and operating Public Announce systems in all kinds of places (malls, train stations, schools, public places, etc.). Each site is equipped with various types of devices from speakers to command and monitoring boxes. 

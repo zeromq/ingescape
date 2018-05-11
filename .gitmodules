@@ -1,3 +1,12 @@
 [submodule "doc/themes/osprey"]
 	path = doc/themes/osprey
 	url = https://github.com/tomanistor/osprey.git
+[submodule "doc/themes/hugo-universal"]
+	path = doc/themes/hugo-universal
+	url = https://github.com/devcows/hugo-universal-theme
+[submodule "doc/themes/airspace"]
+	path = doc/themes/airspace
+	url = https://github.com/karju-dev/airspace-hugo.git
+[submodule "doc/themes/fresh"]
+	path = doc/themes/fresh
+	url = https://github.com/lucperkins/hugo-fresh

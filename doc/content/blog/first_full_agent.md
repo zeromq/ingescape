@@ -1,12 +1,13 @@
 +++
-title = "Your first full agent"
-date = "2018-04-23T15:35:41+02:00"
-tags = ["agents","start"]
-categories = ["start"]
-banner = "img/banners/banner-1.jpg"
+title = "Your first complete agent"
+date = "2018-04-21T16:36:41+02:00"
+tags = ["agents"]
+categories = ["learn"]
+banner = "img/banners/first_full_agent.png"
+genre = "article"
 +++
 
-***ingeScape*** is designed to support both industrial and experimental environments. [Your first ingeScape agent](./blog/your_first_agent) illustrates the basics for both worlds. We provide here a more advanced example that can serve as a boiler plate for any agent to be used with command lines in a terminal and developed in C without any other dependency.
+***ingeScape*** is designed to support both industrial and experimental environments. [Your first ingeScape agent](/blog/your_first_agent) illustrates the basics for both worlds. We provide here a more advanced example that can serve as a boiler plate for any real-world agent to be used with command lines in a terminal and developed in C without any other dependency.
 
 This agent can receive parameters when started and commands when running. It is composed of three files:
 
@@ -150,7 +151,7 @@ Agents are interactive software. As such, they need to continue their execution 
 
 Should you need more sophisticated mainloops, we advise you to use the ***select*** function available in ***<sys/select.h>*** or the mainloop extension capabilities of the framework you are using. Please note that ingeScape uses its own mainloop and threads that will not interfere with the one you are using. With some frameworks though, it will be necessary  to wrap the code in your callbacks to execute it into your frameworks's main thread or main queue. Check the ingeScape documentation for more details about this.
 
-In this example, depending on the use of the **--noninteractiveloop** command line parameter, two different loops can be activated. Both are based on a simple infinite *while* loop.
+In this example, depending on the use of the *- - noninteractiveloop* command line parameter, two different loops can be activated. Both are based on a simple infinite *while* loop.
 
 By default, the interactive loop mode is activated, i.e. the one enabling the use of commands inside the terminal once the agent is running. This loop is based on ***fgets*** function from ***<stdio.h>***, which has the capability to wait until some text is input in the terminal. In the case where the user uses the *Ctrl + c* key combination, this function returns *false*, which we use to break the infinite loop we have created. Here is the code for this loop:
 
@@ -187,6 +188,7 @@ The problem is how and when to call the *igs_stop* function, as there are many c
 
 For each of these cases, there a good practices to follow in order to avoid any dead lock between your application's threads and the ingeScape thread.
 
+<br>
 #### Which thread am i in ?
 
 When using ingeScape, you are in your application's threads except when executing code in an ingeScape callback, wether it is an IOP observation callback or any other. When executing code in an ingeScape callback, you need to keep in mind that in some situations, it is necessary to wrap some or all of the code in a callback so that it may be executed in your application's threads. Most industrial frameworks such as Microsoft .Net, Apple's Cocoa, Qt, etc. provide methods to do that easily.
@@ -195,10 +197,12 @@ When using a simple C program as it is the case here, your application has only 
 
 As all threads in an application share the same memory, most of the time, it is transparent for the developer to be executing code in an ingeScape callback or not. But when stopping the agent, one needs to pay extra attention because calling the *igs_stop* function from an ingeScape thread will result in a deadlock. The agent will stop anyway but the stop will not be perfectly clean.
 
+<br>
 #### Stop from any application's thread
 
 If you are certain that you are not in an ingeScape callback, and thus not in an ingeScape thread, a simple call to the *igs_stop* function is sufficient to cleanly stop your agent. This is the easy case.
 
+<br>
 #### Handle system interruptions
 
 The most common way to interrupt a program in a terminal is to press Ctrl + C in the terminal. This will send a SIGINT signal to your application. 
@@ -232,12 +236,12 @@ while (1) {
 }
 {{< / highlight >}}
 
-
+<br>
 #### Stop from an ingeScape callback
 
-***It is important that the *igs_stop* function is never called from an ingeScape callback.*** This can be avoided by using a global flag that is set to true in the callback and induces the stop of the main loop, and/or a function call in the main thread that actually executes a call to the *igs_stop* function.
+**It is important that the *igs_stop* function is never called from an ingeScape callback.** This can be avoided by using a global flag that is set to true in the callback and induces the stop of the main loop, and/or a function call in the main thread that actually executes a call to the *igs_stop* function.
 
-
+<br>
 #### Handle stop request from other agents
 
 Some special agents can remotely stop any other agent. This has the effect to stop the ingeScape loop and threads. But some additional code is required for your application to stop properly as well.
@@ -251,13 +255,13 @@ the igs_stop function shall not be used***.
 
 In addition to command line parameters, it may be useful to pass commands to an agent when it is running into a terminal. Such commands can be helpful to get various informations from the agent or to configure it on the fly. Commands can be atomic ones or ones with one or more parameters.
 
-This is where we will use our regexp files to handle what is typed into the terminal. In this example, it is necessary to end any keyboard input by the entry key. And we try to interpret commands only if they start by '/' and provide at least one character.
+This is where we will use our *regexp.h* and *regexp.c* files to handle what is typed into the terminal. In this example, it is necessary to end any keyboard input by the entry key. And we try to interpret commands only if they start by '/' and provide at least one additional character.
 
 This example uses three different regular expressions, respectively capturing a command with :
 
 - zero parameter, 
 - one parameter,
-- one parameter and a string of characters. 
+- one parameter followed by a string of characters. 
 
 Feel free to extend them according to your needs and improve their reliability if needed.
 
@@ -270,7 +274,7 @@ const char *reg2 = "/([[:alnum:]]+)[[:space:]]{1}([^ ]+)";
 const char *reg3 = "/([[:alnum:]]+)[[:space:]]{1}([^ ]+)[[:space:]]{1}([[:print:]]+)"; 
 {{< / highlight >}}
 <br>
-In the code, regular expressions are checked from the most complex to the simplest one, as checking the simplest one first would not allow more complex ones to be matched. Here is the code checking and handling the three regular expressions:
+In the code, regular expressions are checked from the most complex to the simplest one, as checking the simplest one first would never allow more complex ones to be matched. Here is the code checking and handling the three regular expressions:
 
 {{< highlight c "linenos=table,linenostart=1" >}}
                 //command + parameter + string
@@ -311,14 +315,16 @@ In the code, regular expressions are checked from the most complex to the simple
                 }
 {{< / highlight >}}
 
+<br>
+*NB:* in this example we only have one actually implemented command which is **/quit**.
 
 ### ingeScape logging support
 
 ingeScape supports a versatile logging mechanism that can display and store logs into the terminal console, log files and a log stream available in the ingeScape editor.
 
-Logs contain a priority level that is common with most other logging systems. Logging functions work like the famous *printf* function with a variable number of parameters.
+Logs contain priority levels, from *trace* to *fatal* that are common with most other logging systems. Logging functions work like the famous *printf* function with a variable number of parameters and the same matching syntax.
 
-When displayed in the console, logs can use colors.
+When displayed in the console, logs can use colors if *igs_setUseColorVerbose* is passed *true*.
 
 Here is how to configure and use logs:
 
@@ -339,7 +345,7 @@ Here is how to configure and use logs:
     igs_fatal("this is a fatale %s", example);
 {{< / highlight >}}
 
-### Compiling on Linux
+### Compile on Linux
 As a prerequisite, you need to have the ingeScape library installed on your computer. We suppose the ingeScape header is installed in */usr/local/include/* and the library in */usr/local/lib/*, which is pretty standard on most Linux environments. 
 
 The example can be downloaded [here](/code/firstFullAgent.zip). It provides a Makefile to compile the example and install it on your system if you want to.
@@ -353,10 +359,10 @@ make
 /quit
 {{< / highlight >}}
 
-### Compiling on macOS (two methods)
+### Compile on macOS (two methods)
 The first compilation method is the same as the one for Linux, exactly with the same assumptions for header and library location.
 
 The other method is the use of Apple Xcode with a dedicated project. To save your time, such a project, including the code above, is available [here](/code/firstFullAgent.zip).
 
-### Compiling on Microsoft Windows
+### Compile on Microsoft Windows
 *TODO*
