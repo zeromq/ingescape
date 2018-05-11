@@ -24,6 +24,7 @@
 
 #include <model/definitionm.h>
 #include <model/mapping/agentmappingm.h>
+#include <model/recordm.h>
 
 #include "viewModel/scenario/actionvm.h"
 #include "viewModel/scenario/actioneffectvm.h"
@@ -92,13 +93,11 @@ public:
      */
     DefinitionM* createModelOfDefinition(QByteArray byteArrayOfJson);
 
-
     /**
      * @brief Export the agents list
      * @param agentsListToExport list of pairs <agent name (and parameters to restart), definition>
      */
     QByteArray exportAgentsList(QList<QPair<QStringList, DefinitionM*>> agentsListToExport);
-
 
     /**
      * @brief Create a model of agent mapping with JSON and the input agent name corresponding
@@ -107,6 +106,12 @@ public:
      */
     AgentMappingM* createModelOfAgentMapping(QString inputAgentName, QByteArray byteArrayOfJson);
 
+    /**
+     * @brief Create a model of record from JSON data
+     * @param byteArrayOfJson
+     * @return
+     */
+    QList<RecordM*> createRecordModelList(QByteArray byteArrayOfJson);
 
     /**
      * @brief Get the JSON of a mapping

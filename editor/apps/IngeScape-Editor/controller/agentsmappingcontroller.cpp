@@ -809,6 +809,8 @@ void AgentsMappingController::_onAgentsInMappingChanged()
  */
 void AgentsMappingController::_addAgentModelsToMappingAtPosition(QString agentName, QList<AgentM*> agentsList, QPointF position)
 {
+
+
     if (!agentName.isEmpty() && (agentsList.count() > 0))
     {
         AgentInMappingVM* agentInMapping = getAgentInMappingFromName(agentName);

@@ -31,6 +31,7 @@ static const QString launcherSuffix = ".ingescapelauncher";
 
 static const QString definitionPrefix = "EXTERNAL_DEFINITION#";
 static const QString mappingPrefix = "EXTERNAL_MAPPING#";
+static const QString allRecordsPrefix = "RECORDS_LIST#";
 
 static const QString mutedAllPrefix = "MUTED=";
 static const QString frozenPrefix = "FROZEN=";
@@ -112,6 +113,9 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
                     else if (key == "isRecorder") {
                         if (value == "1") {
                             isIngeScapeRecorder = true;
+
+                            // Retrieve all records
+                            igs_busSendStringToAgent(peerId.toStdString().c_str(), "GET_RECORDS");
                         }
                     }
                     else if (key == "pid") {
@@ -235,6 +239,17 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
 
                 // Emit the signal "Mapping Received"
                 Q_EMIT networkController->mappingReceived(peerId, peerName, message);
+            }
+            // All records
+            else if (message.startsWith(allRecordsPrefix))
+            {
+                qDebug() << "** RECORDSS ***";
+                qDebug() << message;
+                qDebug() << "*****";
+                message.remove(0, allRecordsPrefix.length());
+
+                // Emit the signal "All records Received"
+                Q_EMIT networkController->allrecordsReceived(message);
             }
             // MUTED / UN-MUTED
             else if (message.startsWith(mutedAllPrefix))

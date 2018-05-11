@@ -30,6 +30,9 @@ import "agent" as Agent
 // host sub-directory
 import "host" as Host
 
+// record sub-directory
+import "record" as Record
+
 // scenario sub-directory
 import "scenario" as Scenario
 
@@ -158,7 +161,7 @@ Item {
                     frameOverlap: 1
                     tab: I2CustomRectangle {
                         color: styleData.selected ? IngeScapeTheme.selectedTabsBackgroundColor : "transparent"
-                        implicitWidth: leftPanelTabs.width/3
+                        implicitWidth: leftPanelTabs.width/4
                         implicitHeight: 26
                         topRightRadius : 5
 
@@ -244,16 +247,15 @@ Item {
                     }
                 }
 
-                //                Tab {
-                //                    title: qsTr("RECORDS");
-                //                    active : false
+                Tab {
+                    title: qsTr("Records");
 
-                //                    Rectangle {
-                //                        id: records
-                //                        anchors.fill: parent
-                //                        color : "transparent"
-                //                    }
-                //                }
+                    Record.RecordsList {
+                        controller: IngeScapeEditorC.recordsSupervisionC
+                        id: recordsList
+                        anchors.fill: parent
+                    }
+                }
             }
 
         }
