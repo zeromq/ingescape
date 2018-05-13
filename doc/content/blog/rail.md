@@ -2,7 +2,7 @@
 title = "Innovative operational supervision environment for RATP RER Ligne A in Paris"
 date = "2018-04-20T11:57:11+02:00"
 categories = ["works"]
-banner = "images/ratp.png"
+banner = "img/banners/ratp.png"
 +++
 by [Ingenuity i/o](https://ingenuity.io)
 

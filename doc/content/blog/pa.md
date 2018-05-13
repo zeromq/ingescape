@@ -2,7 +2,7 @@
 title = "Public Announce monitoring system"
 date = "2018-04-20T11:56:11+02:00"
 categories = ["works"]
-banner = "images/pa.png"
+banner = "/img/banners/pa.png"
 +++
 by [Ingenuity i/o](https://ingenuity.io)
 
