@@ -75,18 +75,19 @@ Item {
     readonly property color middleDarkRedColor:"#851618"
     readonly property color darkRedColor:"#7A110E"
 
-    readonly property color veryDarkGreyColor: "#282D34"
-    readonly property color darkGreyColor2: "#2B3137"
-
     readonly property color darkBlueGreyColor: "#3C424F"
     readonly property color blueGreyColor2: "#434a58"
     readonly property color blueGreyColor : "#525A66"
 
     readonly property color lightBlueGreyColor: "#8896AA"
 
+    readonly property color veryDarkGreyColor: "#282D34"
+    readonly property color darkGreyColor2: "#2B3137"
     readonly property color darkGreyColor : "#575756"
     readonly property color greyColor : "#706f6f"
+    readonly property color greyColor2 : "#878787"
     readonly property color lightGreyColor : "#9D9C9C"
+    readonly property color veryLightGreyColor : "#ECECEC"
 
     readonly property color orangeColor: "#F39200"
 
