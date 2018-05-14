@@ -91,9 +91,11 @@ Item {
 
             I2PieSlice {
                 id: pieSlice
+                visible: IngeScapeEditorC.modelManager.isActivatedMapping
+
                 anchors.fill: parent
 
-                color: "white"
+                color: IngeScapeTheme.lightGreyColor
 
                 innerRadiusX: 39
                 innerRadiusY: 39
@@ -150,9 +152,11 @@ Item {
             }
         }
 
-        Button {
-            id: typeMappingBtn
-            visible: true
+        Rectangle {
+            visible: IngeScapeEditorC.modelManager.isActivatedMapping
+            color: "transparent"
+            width: childrenRect.width
+            height: childrenRect.height
 
             anchors {
                 bottom: parent.bottom
@@ -161,25 +165,30 @@ Item {
                 bottomMargin: 64 + (IngeScapeEditorC.modelManager.isControlledMapping ? 0 : 2)
             }
 
-            activeFocusOnPress: true
-            checkable: true
+            Button {
+                id: typeMappingBtn
+                visible: true
 
-            style: Theme.LabellessSvgButtonStyle {
-                fileCache: IngeScapeTheme.svgFileINGESCAPE
+                activeFocusOnPress: true
+                checkable: true
 
-                pressedID: releasedID + "-pressed"
-                releasedID: IngeScapeEditorC.modelManager.isControlledMapping ? "control" : "observe"
-                disabledID : releasedID
-            }
+                style: Theme.LabellessSvgButtonStyle {
+                    fileCache: IngeScapeTheme.svgFileINGESCAPE
 
-            onClicked: {
-                openAnimation.running = true;
+                    pressedID: releasedID + "-pressed"
+                    releasedID: IngeScapeEditorC.modelManager.isControlledMapping ? "control" : "observe"
+                    disabledID : releasedID
+                }
 
-                // Show choose mapping type
-                chooseMappingType.visible = true;
+                onClicked: {
+                    openAnimation.running = true;
 
-                // Hide our feedback button
-                typeMappingBtn.visible = false;
+                    // Show choose mapping type
+                    chooseMappingType.visible = true;
+
+                    // Hide our feedback button
+                    typeMappingBtn.visible = false;
+                }
             }
         }
 
