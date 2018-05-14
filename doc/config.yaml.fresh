@@ -1,0 +1,138 @@
+baseURL: https://ingescape.com/
+languageCode: en-us
+title: IngeScape
+theme: fresh
+
+params:
+  hero:
+    tagline: distributed software made easy (and powerful)
+    subTagline:
+    buttonText:
+    image: illustrations/worker.svg
+    bottomIcons:
+    - logos/clients/systek.svg
+    - logos/clients/tribe.svg
+    - logos/clients/kromo.svg
+    - logos/clients/infinite.svg
+    - logos/clients/gutwork.svg
+  navbar:
+    buttonText: Sign up
+    logo:
+      src: logos/fresh.svg
+      alt: Main navbar logo
+    links:
+    - text: Blog
+      url: /blog/editor_tour/
+    - text: Pricing
+      url: /
+    - text: Dropdown
+      dropdown: true
+      links:
+      - Dropdown item 1
+      - Dropdown item 2
+      - Dropdown item 3
+  features:
+    tagline: Great power comes with great Responsibility
+    subTagline: Lorem ipsum sit dolor amet is a dummy text used by typography industry
+    panels:
+    - title: Online App builder
+      image: illustrations/icons/mouse-globe.svg
+      text: This is some explanatory text that is on two rows
+      button:
+        text: Free Trial
+        url: /
+      delay: 1
+    - title: Cloud deployment
+      image: illustrations/icons/laptop-cloud.svg
+      text: This is some explanatory text that is on two rows
+      button:
+        text: Free Trial
+        url: /
+      delay: 2
+    - title: Pluggable tools
+      image: illustrations/icons/plug-cloud.svg
+      text: This is some explanatory text that is on two rows
+      button:
+        text: Free Trial
+        url: /
+      delay: 3
+  sellingPoints:
+    tagline: You're here because you want the best
+    points:
+    - title: Powerful and unified interface
+      description: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ornare magna eros, eu pellentesque tortor vestibulum ut. Maecenas non massa sem. Etiam finibus odio quis feugiat facilisis.
+      icon: laptop-globe
+    - title: Cross device Synchronisation
+      description: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ornare magna eros, eu pellentesque tortor vestibulum ut. Maecenas non massa sem. Etiam finibus odio quis feugiat facilisis.
+      icon: doc-sync
+    - title: Nomad System
+      description: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ornare magna eros, eu pellentesque tortor vestibulum ut. Maecenas non massa sem. Etiam finibus odio quis feugiat facilisis.
+      icon: mobile-feed
+  platform:
+    image: illustrations/mockups/app-mockup.png
+    tagline: One Platform to rule them All
+    subTagline: Lorem ipsum sit dolor amet is a dummy text used by typography industry
+    buttonText: Get Started
+  clients:
+    tagline: Our Clients love us!
+    subTagline: Lorem ipsum sit dolor amet is a dummy text used by typography industry
+    clientExamples:
+    - name: Irma Walters
+      position: Accountant
+      quote: Lorem ipsum dolor sit amet, elit deleniti dissentias quo eu, hinc minim appetere te usu, ea case duis scribentur has. Duo te consequat elaboraret, has quando suavitate at.
+      image: 1.png
+    - name: John Bradley
+      position: Financial Analyst
+      quote: Lorem ipsum dolor sit amet, elit deleniti dissentias quo eu, hinc minim appetere te usu, ea case duis scribentur has. Duo te consequat elaboraret, has quando suavitate at.
+      image: 2.png
+    - name: Gary Blackman
+      position: HR Manager
+      quote: Lorem ipsum dolor sit amet, elit deleniti dissentias quo eu, hinc minim appetere te usu, ea case duis scribentur has. Duo te consequat elaboraret, has quando suavitate at.
+      image: 3.png
+  contact:
+    tagline: Drop us a line or two!
+  footer:
+    image: fresh-white.svg
+    columns:
+    - title: Product
+      links:
+      - name: Discover features
+        url: "#"
+      - name: Why choose our Product?
+        url: "#"
+      - name: Compare features
+        url: "#"
+      - name: Our Roadmap
+        url: "#"
+      - name: Request features
+        url: "#"
+    - title: Docs
+      links:
+      - name: Get Started
+        url: "#"
+      - name: User guides
+        url: "#"
+      - name: Admin guide
+        url: "#"
+      - name: Developers
+        url: "#"
+    - title: Blogroll
+      links:
+      - name: Latest News
+        url: "#"
+      - name: Tech articles
+        url: "#"
+      - name: Video Blog
+        url: "#"
+    followUs:
+    - icon: github
+      url: "https://github.com/lucperkins"
+    - icon: dribbble
+      url: "#"
+    - icon: facebook
+      url: "#"
+    - icon: twitter
+      url: "https://twitter.com/lucperkins"
+    - icon: bitbucket
+      url: "#"
+

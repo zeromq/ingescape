@@ -70,8 +70,8 @@ typedef struct agent_iop {
         int i;                  //in accordance to type IGS_INTEGER_T ex. '10'
         double d;               //in accordance to type IGS_DOUBLE_T ex. '10.01'
         char* s;                //in accordance to type IGS_STRING_T ex. 'display the image'
-        bool b;                 //in accordante to type IGS_BOOL_T ex. 'true' or 'false'
-        void* data;             //in accordance to type IGS_DATA_T ex. '{int:x, int:y, string:gesture_name} <=> {int:10, int:45, string:swap}
+        bool b;                 //in accordante to type IGS_BOOL_T ex. 0 or 1
+        void* data;             //in accordance to type IGS_DATA_T i.e. binary memory space
     } value;
     long valueSize;
     bool is_muted;

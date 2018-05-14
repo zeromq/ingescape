@@ -60,16 +60,16 @@ PUBLIC int igs_observeFreeze(igs_freezeCallback cb, void *myData);
 PUBLIC void igs_setCanBeFrozen(bool canBeFrozen);
 PUBLIC bool igs_canBeFrozen(void);
 
-//There are four non-exclusive ways to check & control the execution of the ingescape
+//There are three non-exclusive ways to check & stop the execution of the ingescape
 //instance and its hosting application:
 //1- using igs_start* and igs_stop from the hosting app
 //2- monitoring the status of igs_Interrupted in the hosting app
-//3- using igs_observeForcedStop below and providing a callback *using the parent thread*
-//4- setting igs_Interrupted from IngeScape callbacks and arranging to call igs_stop from parent thread when igs_Interrupted is set to true
+//3- setting igs_Interrupted from IngeScape callbacks and arranging to call igs_stop from parent thread when igs_Interrupted is set to true
+//In any case, igs_stop MUST NEVER BE CALLED from any ingeScape callback, as it would cause a thread dead lock.
 
 PUBLIC extern bool igs_Interrupted;
 //register a callback when the agent is asked to stop on the network
-//NB: callbacks should execute their code in the main hosting application thread
+//NB: NEVER CALL igs_stop from such a callback
 typedef void (*igs_forcedStopCallback)(void *myData);
 PUBLIC void igs_observeForcedStop(igs_forcedStopCallback cb, void *myData);
 
@@ -253,7 +253,7 @@ PUBLIC void igs_setLogStream(bool useLogStream); //enable log in socket
 PUBLIC bool igs_getLogStream(void);
 PUBLIC void igs_setLogInFile(bool useLogFile); //enable log in file
 PUBLIC bool igs_getLogInFile(void);
-PUBLIC void igs_setLogPath(const char *path); //default is ~/ on UNIX systems and current PATH on Windows
+PUBLIC void igs_setLogPath(const char *path); //default directory is ~/ on UNIX systems and current PATH on Windows
 PUBLIC char* igs_getLogPath(void); // must be freed by caller
 
 /* Logs policy

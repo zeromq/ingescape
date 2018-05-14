@@ -387,7 +387,8 @@ bool model_checkIOPExistence(const char *name, agent_iop_t *hash){
 
 char **model_getIopList(long *nbOfElements, iop_t type){
     if(igs_internal_definition == NULL){
-        igs_error("Definition is NULL");
+        igs_warn("Definition is NULL");
+        *nbOfElements = 0;
         return NULL;
     }
     agent_iop_t *hash = NULL;

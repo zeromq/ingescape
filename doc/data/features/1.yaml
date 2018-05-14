@@ -1,0 +1,4 @@
+weight: 1
+name: "Portable software library"
+icon: "fa fa-code"
+description: "to build software agents for your specific needs, in multi-OS (Linux, Windows, macOS, Android, iOS, etc.) and multi-language (C, C++, Objective-C, Python, QML, etc.) contexts."

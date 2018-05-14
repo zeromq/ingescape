@@ -15,7 +15,8 @@
  - printing the new value
  - multiplying the value by 2 and writing the result to the output
  */
-void myIOPCallback(iop_t iopType, const char* name, iopType_t valueType, void* value, long valueSize, void* myData){
+void myIOPCallback(iop_t iopType, const char* name, iopType_t valueType,
+                   void* value, size_t valueSize, void* myData){
     /*
      This callback is fed with all the information necessary:
      - the IOP type : input, output or parameter

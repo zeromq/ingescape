@@ -1,8 +1,11 @@
----
-title: "Your first ingeScape agent"
-date: 2018-04-23T11:36:41+02:00
-draft: false
----
++++
+title = "Your first ingeScape agent"
+date = "2018-04-23T11:36:41+02:00"
+tags = ["agents"]
+categories = ["learn"]
+banner = "img/banners/your_first_agent.png"
+genre = "article"
++++
 
 Our main goal when building the ingeScape API was to make it extremely simple for most common situations and very progressive when fine tuning and advanced features become necessary.
 
@@ -36,7 +39,7 @@ The whole set of IOPs for an agent is called the agent's ***definition***. Defin
 Agents are connected to one another by ***mapping*** outputs from agents to inputs of other agents. The set of ***mappings*** in a system composes the actual system communication architecture. We'll come back to this in further articles. The concept of *mapping* is not mandatory to understand this first example.
 
 
-### Jumping into the code
+### Jump into the code
 Here we are, this is all you need to know to design your first agent. The example below is developed in C. The code is filled with comments enabling to understand each function and each code block. Just after the code example are several resources to help you compile it on different operating systems dans developing environments.
 
 We recommend that you immediately copy and paste the code below in your favorite editor.
@@ -127,20 +130,20 @@ int main(int argc, const char * argv[]) {
 }
 {{< / highlight >}}
 
-### Compiling on Linux
-As a prerequesite, you need to have the ingeScape library installed on your computer. We suppose the ingeScape header is installed in */usr/local/include/* and the library in */usr/local/lib/*, which is pretty standard on most Linux environments. 
+### Compile on Linux
+As a prerequisite, you need to have the ingeScape library installed on your computer. We suppose the ingeScape header is installed in */usr/local/include/* and the library in */usr/local/lib/*, which is pretty standard on most Linux environments. 
 
-If so, copy the code in a *main.c* file and type the following commands in a terminal where your *main.c* file is located:
+When ready, copy the code in a *main.c* file and type the following commands in a terminal where your *main.c* file is located:
 
 {{< highlight shell "linenos=inline" >}}
 gcc -W -Wall -g -I/usr/local/include/ -std=gnu99 -o main.o -c main.c
 gcc -o myFirstAgent main.o -L/usr/local/lib -lingescape
 {{< / highlight >}}
 
-### Compiling on macOS (two methods)
+### Compile on macOS (two methods)
 The first compilation method is the same as the one for Linux, exactly with the same assumptions for header and library location.
 
 The other method is the use of Apple Xcode with a dedicated project. To save your time, such a project, including the code above, is available [here](/code/firstAgent.zip).
 
-### Compiling on Microsoft Windows
+### Compile on Microsoft Windows
 *TODO*
