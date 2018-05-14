@@ -311,7 +311,7 @@ Item {
             anchors {
                 verticalCenter: activeMappingBtn.verticalCenter
                 left : activeMappingBtn.right
-                leftMargin: 50
+                leftMargin: 75
             }
 
             Text {
