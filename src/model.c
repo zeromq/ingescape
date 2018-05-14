@@ -55,7 +55,22 @@ static int model_observe(const char* name, iop_t iopType, igs_observeCallback cb
 
     // Check if the input has been returned.
     if(iop == NULL){
-        igs_error("Cannot find %s with type %d", name, iopType);
+        char *t = NULL;
+        switch (iopType) {
+            case IGS_INPUT_T:
+                t = "input";
+                break;
+            case IGS_OUTPUT_T:
+                t = "output";
+                break;
+            case IGS_PARAMETER_T:
+                t = "parameter";
+                break;
+                
+            default:
+                break;
+        }
+        igs_error("Cannot find %s %s", t, name);
         return 0;
     }
 
