@@ -21,12 +21,19 @@
  * @param ipAddress
  * @param parent
  */
-RecordM::RecordM(QObject *parent) : QObject(parent)
+RecordM::RecordM(QString id,
+                 QString name,
+                 QDateTime beginDate,
+                 QDateTime endDate,
+                 QObject *parent) : QObject(parent),
+    _id(id),
+    _name(name),
+    _beginDateTime(beginDate),
+    _endDateTime(endDate)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    qInfo() << "New Model of record" << _name << "(" << _id << ")";
 }
 
 
