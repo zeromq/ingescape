@@ -34,7 +34,7 @@ Even though they are manipulated in the same way, the IOPs do not share the same
 - ***Outputs*** enable agents to distribute information (i.e. output values) to other agents.
 - ***Parameters*** enable users of your agent to change its internal behavior. Exposed parameters are optional and shall be chosen and handled carefully as they are your agent's configuration settings.
 
-The whole set of IOPs for an agent is called the agent's ***definition***. Definitions can be created programmatically but also but writing JSON files ou even by using the editor. Definitions can be enriched with a name (that can be different from the agent name), a version and a description. We'll come back to this in further articles.
+The whole set of IOPs for an agent is called the agent's ***definition***. Definitions can be created programmatically but also by writing JSON files or even by using the editor. Definitions can be enriched with a name (that can be different from the agent name), a version and a description. We'll come back to this in further articles.
 
 Agents are connected to one another by ***mapping*** outputs from agents to inputs of other agents. The set of ***mappings*** in a system composes the actual system communication architecture. We'll come back to this in further articles. The concept of *mapping* is not mandatory to understand this first example.
 

@@ -83,7 +83,7 @@ void myIOPCallback(iop_t iopType, const char* name, iopType_t valueType,
             case IGS_STRING_T:
             {
                 char *stringValue = igs_readInputAsString(name);
-                printf(" to %s\n", (char *)value);
+                printf(" to %s\n", (char *)stringValue);
                 free(stringValue);
                 break;
             }
