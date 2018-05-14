@@ -243,9 +243,6 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
             // All records
             else if (message.startsWith(allRecordsPrefix))
             {
-                qDebug() << "** RECORDSS ***";
-                qDebug() << message;
-                qDebug() << "*****";
                 message.remove(0, allRecordsPrefix.length());
 
                 // Emit the signal "All records Received"

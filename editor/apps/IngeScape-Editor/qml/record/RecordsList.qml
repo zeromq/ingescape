@@ -52,13 +52,13 @@ Item {
     //
     //--------------------------------
 
-    // allowing to deselect selected host
+    // allowing to deselect selected record
 //    MouseArea {
 //        anchors.fill: parent
 //        onClicked:  {
-//            if(controller.selectedHost)
+//            if(controller.selectedRecord)
 //            {
-//                controller.selectedHost = null;
+//                controller.selectedRecord = null;
 //            }
 //        }
 //    }
@@ -177,13 +177,13 @@ Item {
 
 
         Item {
-            id : hostItem
+            id : recordItem
 
             property var agentmodel: model.listOfAgents
 
             property int margin: 5
 
-            height: hostInfos.height + margin*2
+            height: recordInfos.height + margin*2
 
             anchors {
                 left : parent.left
@@ -205,7 +205,7 @@ Item {
 
             Column
             {
-                id:hostInfos
+                id:recordInfos
                 y: margin
 
                 anchors {
@@ -219,7 +219,7 @@ Item {
 
                 // Name
                 Text {
-                    id: hostName
+                    id: recordName
 
                     anchors {
                         left : parent.left
@@ -232,99 +232,25 @@ Item {
                     font: IngeScapeTheme.headingFont
                 }
 
-//                // IP address
-//                Text {
-//                    id: hostIP
+                // IP address
+                Text {
+                    id: recordIP
 
-//                    anchors {
-//                        left : parent.left
-//                        right : parent.right
-//                    }
-//                    elide: Text.ElideRight
+                    anchors {
+                        left : parent.left
+                        right : parent.right
+                    }
+                    elide: Text.ElideRight
 
-//                    text: model.hostModel.ipAddress
-//                    color: IngeScapeTheme.agentsListTextColor
-//                    font: IngeScapeTheme.heading2Font
-//                }
+                    text: qsTr("%1 %2").arg(Qt.formatDate(model.recordModel.beginDateTime, "dd/MM/yyyy")).arg(Qt.formatTime(model.recordModel.beginDateTime, "HH:mm"))
+                    color: IngeScapeTheme.agentsListTextColor
+                    font: IngeScapeTheme.heading2Font
+                }
 
 
             }
-
-            Button {
-                id: streamButton
-
-                visible: model.canProvideStream
-
-                activeFocusOnPress: true
-                enabled: visible
-
-                anchors {
-                    right: parent.right
-                    verticalCenter: parent.verticalCenter
-                    rightMargin: 5
-                }
-
-                style: Theme.LabellessSvgButtonStyle {
-                    fileCache: IngeScapeTheme.svgFileINGESCAPE
-
-                    pressedID: releasedID + "-pressed"
-                    releasedID: model.isStreaming ? "on" : "off"
-                    disabledID : releasedID
-                }
-
-                onClicked: {
-                    if(model.isStreaming)
-                    {
-                        streamPopup.close();
-                        receiver.stop();
-                    }
-                    else
-                    {
-                        streamPopup.show();
-                        streamPopup.title = model.hostModel.name;
-                        receiver.start();
-                    }
-                    model.QtObject.changeState();
-                }
-            }
-
-            // GST not included in master branch
-//            Connections {
-//                    target: streamPopup
-//                    onClosing: {
-//                        receiver.stop();
-//                        model.QtObject.changeState();
-//                        close.accepted = true;
-//                    }
-//            }
        }
     }
-
-    //
-    // popup displaying stream: GST not included in master branch
-    //
-    /*
-    Window {
-        id: streamPopup
-        width: 400
-        height: 250
-
-        Rectangle {
-
-            anchors.fill: parent
-
-            color: IngeScapeTheme.editorsBackgroundColor
-
-            GstVideoReceiver{
-                id:receiver
-                anchors.margins: 10
-                anchors.fill: parent
-                endpoint: "tcp://10.0.0.10:5660"
-            }
-        }
-    }
-    */
-
 }
 
 

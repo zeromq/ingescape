@@ -32,21 +32,19 @@ class RecordM : public QObject
     I2_QML_PROPERTY_READONLY(QString, name)
 
     // Date of the beginning of the record
-    I2_QML_PROPERTY_READONLY(QString, beginDate)
-
-    // Time of the beginning of the record
-    I2_QML_PROPERTY_READONLY(QString, beginTime)
+    I2_QML_PROPERTY_READONLY(QDateTime, beginDateTime)
 
     // Date of the end of the record
-    I2_QML_PROPERTY_READONLY(QString, endDate)
-
-    // Time of the end of the record
-    I2_QML_PROPERTY_READONLY(QString, endTime)
+    I2_QML_PROPERTY_READONLY(QDateTime, endDateTime)
 
 
 
 public:
-    explicit RecordM(QObject *parent = nullptr);
+    explicit RecordM(QString id,
+                     QString name,
+                     QDateTime begin,
+                     QDateTime end,
+                     QObject *parent = nullptr);
 
 
     /**
