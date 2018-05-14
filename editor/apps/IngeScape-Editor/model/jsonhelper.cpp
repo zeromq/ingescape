@@ -150,22 +150,20 @@ QList<RecordM*> JsonHelper::createRecordModelList(QByteArray byteArrayOfJson)
                 // Get value for keys "agentName" and "definition"
                 QJsonValue jsonId = jsonAllMapping.value("id");
                 QJsonValue jsonName = jsonAllMapping.value("name_record");
-                QJsonValue jsonBeginDate = jsonAllMapping.value("year_month_day_beg");
-                QJsonValue jsonBeginTime = jsonAllMapping.value("time_of_day_beg");
-                QJsonValue jsonEndDate = jsonAllMapping.value("year_month_day_end");
-                QJsonValue jsonEndTime = jsonAllMapping.value("time_of_day_end");
+                QJsonValue jsonBeginDateTime = jsonAllMapping.value("time_beg");
+                QJsonValue jsonEndDateTime = jsonAllMapping.value("time_end");
 
                 if (jsonName.isString() && jsonId.isString())
                 {
-                    // Create mapping and definition
-                    RecordM* record = new RecordM();
-                    record->setid(jsonId.toString());
-                    record->setname(jsonName.toString());
-                    record->setbeginDate(jsonBeginDate.toString());
-                    record->setbeginTime(jsonBeginTime.toString());
-                    record->setendDate(jsonEndDate.toString());
-                    record->setendTime(jsonEndTime.toString());
+                    // Create record
+                    RecordM* record = new RecordM(jsonId.toString(),
+                                                  jsonName.toString(),
+                                                  QDateTime::fromSecsSinceEpoch(jsonBeginDateTime.toDouble()),
+                                                  QDateTime::fromSecsSinceEpoch(jsonEndDateTime.toDouble()));
+
+
                     recordsList.append(record);
+
                 }
             }
         }
