@@ -140,6 +140,7 @@ Q_SIGNALS:
      */
     void allrecordsReceived(QString recordsJSON);
 
+
     /**
      * @brief Signal emitted when a new value is published
      * @param publishedValue
@@ -171,12 +172,14 @@ Q_SIGNALS:
      */
     void isMutedFromOutputOfAgentUpdated(QString peerId, bool isMuted, QString outputName);
 
+
     /**
      * @brief Signal emitted when the state of an agent changes
      * @param peerId
      * @param stateName
      */
     void agentStateChanged(QString peerId, QString stateName);
+
 
 public Q_SLOTS:
 

@@ -2677,6 +2677,7 @@ Window {
         id : deleteConfirmationPopup
 
         confirmationText : "This action is used in the scenario.\nDo you want to completely delete it?"
+
         onDeleteConfirmed: {
             if (panelController.originalAction) {
                 // Delete our action
