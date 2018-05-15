@@ -91,6 +91,7 @@ static const char *loadDefinitionPrefix = "LOAD_THIS_DEFINITION#";
 char agentName[MAX_AGENT_NAME_LENGTH] = AGENT_NAME_DEFAULT;
 char agentState[MAX_AGENT_NAME_LENGTH] = "";
 char commandLine[COMMAND_LINE_LENGTH] = "";
+char replayChannel[MAX_AGENT_NAME_LENGTH + 16] = "";
 
 
 typedef struct muteCallback {
@@ -433,8 +434,7 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
     INGESCAPE_UNUSED(arg)
 
     zyre_t *node = agentElements->node;
-    if (item->revents & ZMQ_POLLIN)
-    {
+    if (item->revents & ZMQ_POLLIN){
         zyre_event_t *zyre_event = zyre_event_new (node);
         const char *event = zyre_event_type (zyre_event);
         const char *peer = zyre_event_peer_uuid (zyre_event);
@@ -591,7 +591,36 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
         } else if (streq (event, "LEAVE")){
             igs_info("-%s has left %s", name, group);
         } else if (streq (event, "SHOUT")){
-            //nothing to do so far
+            if (strcmp(group, replayChannel) == 0){
+                //this is a replay message for one of our inputs
+                char *input = zmsg_popstr (msgDuplicate);
+                iopType_t inputType = igs_getTypeForInput(input);
+                
+                if (inputType > 0){
+                    zframe_t *frame = NULL;
+                    void *data = NULL;
+                    size_t size = 0;
+                    char * value = NULL;
+                    if (inputType == IGS_STRING_T){
+                        value = zmsg_popstr(msgDuplicate);
+                        igs_writeInputAsString(input, value);
+                    }else{
+                        frame = zmsg_pop(msgDuplicate);
+                        data = zframe_data(frame);
+                        size = zframe_size(frame);
+                        model_writeIOP(input, IGS_INPUT_T, inputType, data, size);
+                    }
+                    if (frame != NULL){
+                        zframe_destroy(&frame);
+                    }
+                    if (value != NULL){
+                        free(value);
+                    }
+                }
+                if (input != NULL){
+                    free(input);
+                }
+            }
         } else if(streq (event, "WHISPER")){
             char *message = zmsg_popstr (msgDuplicate);
             
@@ -1002,6 +1031,10 @@ initLoop (zsock_t *pipe, void *args){
     }
     zyre_set_interval(agentElements->node, network_discoveryInterval);
     zyre_set_expired_timeout(agentElements->node, network_agentTimeout);
+    
+    //create channel for replay
+    snprintf(replayChannel, MAX_AGENT_NAME_LENGTH + 15, "%s-IGS-REPLAY", agentName);
+    zyre_join(agentElements->node, replayChannel);
     
     //Add stored headers to zyre
     if (canContinue){
