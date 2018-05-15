@@ -72,7 +72,7 @@ If the IOP is an ***Input***, functions for each specific type can be used. They
             case IGS_STRING_T:
             {
                 char *stringValue = igs_readInputAsString(name);
-                printf(" to %s\n", (char *)value);
+                printf(" to %s\n", (char *)stringValue);
                 free(stringValue);
                 break;
             }
@@ -149,11 +149,11 @@ Here is the code to do so:
 
 Agents are interactive software. As such, they need to continue their execution as long as something does not explicitly make them interrupt and stop. Interactive programs rely on at least one mainloop so that they won't stop by themselves. Because of the variety of loops in the various operating systems and industrial frameworks, we decided not to force the use of yet another mainloop mechanism in ingeScape. However, it is very easy to create your own infinite loop if you need to. This example shows two different ways of doing this.
 
-Should you need more sophisticated mainloops, we advise you to use the ***select*** function available in ***<sys/select.h>*** or the mainloop extension capabilities of the framework you are using. Please note that ingeScape uses its own mainloop and threads that will not interfere with the one you are using. With some frameworks though, it will be necessary  to wrap the code in your callbacks to execute it into your frameworks's main thread or main queue. Check the ingeScape documentation for more details about this.
+Should you need more sophisticated mainloops, we advise you to use the ***select*** function available in ***\<sys/select.h\>*** or the mainloop extension capabilities of the framework you are using. Please note that ingeScape uses its own mainloop and threads that will not interfere with the one you are using. With some frameworks though, it will be necessary  to wrap the code in your callbacks to execute it into your frameworks's main thread or main queue. Check the ingeScape documentation for more details about this.
 
 In this example, depending on the use of the *- - noninteractiveloop* command line parameter, two different loops can be activated. Both are based on a simple infinite *while* loop.
 
-By default, the interactive loop mode is activated, i.e. the one enabling the use of commands inside the terminal once the agent is running. This loop is based on ***fgets*** function from ***<stdio.h>***, which has the capability to wait until some text is input in the terminal. In the case where the user uses the *Ctrl + c* key combination, this function returns *false*, which we use to break the infinite loop we have created. Here is the code for this loop:
+By default, the interactive loop mode is activated, i.e. the one enabling the use of commands inside the terminal once the agent is running. This loop is based on ***fgets*** function from ***\<stdio.h\>***, which has the capability to wait until some text is input in the terminal. In the case where the user uses the *Ctrl + c* key combination, this function returns *false*, which we use to break the infinite loop we have created. Here is the code for this loop:
 
 {{< highlight c "linenos=table,linenostart=1" >}}
 while (1) {
@@ -253,9 +253,9 @@ the igs_stop function shall not be used***.
 
 ### Pass commands through the terminal
 
-In addition to command line parameters, it may be useful to pass commands to an agent when it is running into a terminal. Such commands can be helpful to get various informations from the agent or to configure it on the fly. Commands can be atomic ones or ones with one or more parameters.
+In addition to command line parameters, it may be useful to pass commands to an agent when it is running into a terminal. Such commands can be helpful to get various informations from the agent or to configure it on the fly. Commands can be atomic or be composed of one or more parameters.
 
-This is where we will use our *regexp.h* and *regexp.c* files to handle what is typed into the terminal. In this example, it is necessary to end any keyboard input by the entry key. And we try to interpret commands only if they start by '/' and provide at least one additional character.
+This is where we will use our *regexp.h* and *regexp.c* files to handle and parse what is typed into the terminal. In this example, it is necessary to end any keyboard input by the entry key. And we try to interpret commands only if they start by '/' and provide at least one additional character.
 
 This example uses three different regular expressions, respectively capturing a command with :
 
