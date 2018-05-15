@@ -108,11 +108,10 @@ DefinitionM* JsonHelper::createModelOfDefinition(QByteArray byteArrayOfJson)
     {
         QJsonObject jsonObject = jsonAgentDefinition.object();
 
-        QJsonValue jsonDefinition = jsonObject.value("definition");
-        if (jsonDefinition.isObject())
+        if (jsonObject.contains("definition"))
         {
             // Create a model of agent definition from JSON object
-            definition = _createModelOfDefinitionFromJSON(jsonDefinition.toObject());
+            definition = _createModelOfDefinitionFromJSON(jsonObject.value("definition").toObject());
         }
     }
 

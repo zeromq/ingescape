@@ -225,7 +225,7 @@ Item {
             }
 
             Button {
-                id: btnImportAgent
+                id: btnImportAgentOrAgentsList
 
                 anchors {
                     verticalCenter: parent.verticalCenter
@@ -242,8 +242,13 @@ Item {
                 }
 
                 onClicked: {
-                    //console.log("Open Agent")
-                    IngeScapeEditorC.modelManager.importAgentFromSelectedFiles();
+                    if (IngeScapeEditorC.modelManager) {
+                        //console.log("Import Agent(s)")
+                        var success = IngeScapeEditorC.modelManager.importAgentOrAgentsListFromSelectedFile();
+                        if (!success) {
+                            popupErrorMessage.open();
+                        }
+                    }
                 }
             }
 
@@ -263,7 +268,7 @@ Item {
 
 
             Button {
-                id: btnExportAgent
+                id: btnExportAgentsList
 
                 enabled: visible & (controller.agentsList.count > 0 ? true : false)
                 activeFocusOnPress: true
@@ -282,6 +287,7 @@ Item {
 
                 onClicked: {
                     if (IngeScapeEditorC.agentsSupervisionC) {
+                        //console.log("Export Agent(s)")
                         IngeScapeEditorC.agentsSupervisionC.exportAgentsListToSelectedFile();
                     }
                 }
@@ -318,7 +324,7 @@ Item {
                 }
 
                 onClicked: {
-                    console.log("Supprimer Agent")
+                    console.log("Remove Agent")
                     // TODO
                 }
             }
@@ -450,7 +456,7 @@ Item {
                         visible: !mouseArea.drag.active
 
                         onNeedConfirmationtoDeleteAgent : {
-                             deleteConfirmationPopup.open();
+                            deleteConfirmationPopup.open();
                         }
                     }
 
@@ -461,11 +467,8 @@ Item {
                         dropEnabled : false
                     }
                 }
-
             }
-
         }
-
     }
 
 
@@ -474,8 +477,11 @@ Item {
     //
     Editor.DeleteConfirmationPopup {
         id : deleteConfirmationPopup
+
+        confirmationText : "This agent is used in the platform.\nDo you want to completely delete it?"
+
         onDeleteConfirmed: {
-            if(controller)
+            if (controller)
             {
                 controller.deleteSelectedAgent();
             }
@@ -483,8 +489,89 @@ Item {
     }
 
 
+    //
+    // Popup for Error messages
+    //
+    I2PopupBase {
+        id: popupErrorMessage
+
+        height: 150
+        width: 350
+        anchors.centerIn: parent
+
+        isModal: true
+        dismissOnOutsideTap : true
+        keepRelativePositionToInitialParent : false
+
+        Rectangle {
+
+            anchors.fill: parent
+            radius: 5
+            border {
+                width: 2
+                color: IngeScapeTheme.editorsBackgroundBorderColor
+            }
+            color: IngeScapeTheme.editorsBackgroundColor
+
+            Text {
+                id: popupText
+
+                text: "The file does not contain an agent definition !"
+
+                anchors {
+                    left : parent.left
+                    right : parent.right
+                    verticalCenter: parent.verticalCenter
+                    verticalCenterOffset: -20
+                }
+
+                horizontalAlignment: Text.AlignHCenter
+                lineHeight: 24
+                lineHeightMode: Text.FixedHeight
+                color: IngeScapeTheme.whiteColor
+
+                font {
+                    family: IngeScapeTheme.textFontFamily
+                    pixelSize: 16
+                }
+            }
+
+            Button {
+                anchors {
+                    horizontalCenter: parent.horizontalCenter
+                    bottom : parent.bottom
+                    bottomMargin: 16
+                }
+
+                property var boundingBox: IngeScapeTheme.svgFileINGESCAPE.boundsOnElement("button");
+                height: boundingBox.height
+                width:  boundingBox.width
+
+                activeFocusOnPress: true
+                text: "OK"
+
+                style: I2SvgButtonStyle {
+                    fileCache: IngeScapeTheme.svgFileINGESCAPE
+
+                    pressedID: releasedID + "-pressed"
+                    releasedID: "button"
+                    disabledID : releasedID
+
+                    font {
+                        family: IngeScapeTheme.textFontFamily
+                        weight : Font.Medium
+                        pixelSize : 16
+                    }
+                    labelColorPressed: IngeScapeTheme.blackColor
+                    labelColorReleased: IngeScapeTheme.whiteColor
+                    labelColorDisabled: IngeScapeTheme.whiteColor
+                }
+
+                onClicked: {
+                    // Close our popup
+                    popupErrorMessage.close();
+                }
+            }
+        }
+    }
 }
-
-
-
-

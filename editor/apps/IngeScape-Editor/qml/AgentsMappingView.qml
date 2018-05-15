@@ -91,7 +91,7 @@ Item {
 
             I2PieSlice {
                 id: pieSlice
-                visible: IngeScapeEditorC.modelManager.isActivatedMapping
+                //visible: IngeScapeEditorC.modelManager.isActivatedMapping
 
                 anchors.fill: parent
 
@@ -153,7 +153,7 @@ Item {
         }
 
         Rectangle {
-            visible: IngeScapeEditorC.modelManager.isActivatedMapping
+            //visible: IngeScapeEditorC.modelManager.isActivatedMapping
             color: "transparent"
             width: childrenRect.width
             height: childrenRect.height

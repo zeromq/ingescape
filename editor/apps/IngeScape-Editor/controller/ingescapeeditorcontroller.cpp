@@ -607,21 +607,21 @@ bool IngeScapeEditorController::canDeleteAgentVMFromList(AgentVM* agent)
     if (_agentsMappingC && (agent != NULL))
     {
         AgentInMappingVM* agentInMapping = _agentsMappingC->getAgentInMappingFromName(agent->name());
-        if(agentInMapping != NULL)
+        if (agentInMapping != NULL)
         {
             canBeDeleted = false;
         }
     }
 
     // Check if the agent is in action condition or effect
-    if(canBeDeleted == true && _scenarioC != NULL)
+    if (canBeDeleted && (_scenarioC != NULL))
     {
         canBeDeleted = !_scenarioC->isAgentDefinedInActions(agent->name());
-
     }
 
     return canBeDeleted;
 }
+
 
 /**
  * @brief Can delete an agent in mapping from the mapping view
@@ -640,6 +640,7 @@ bool IngeScapeEditorController::canDeleteAgentInMapping(AgentInMappingVM* agentI
 
     return canBeDeleted;
 }
+
 
 /**
  * @brief Aims at initializing editor in "Mapped" mode

@@ -698,6 +698,7 @@ Item {
         id : deleteConfirmationPopup
 
         confirmationText : "This agent is used in the actions.\nDo you want to delete it?"
+
         onDeleteConfirmed: {
             if(controller)
             {

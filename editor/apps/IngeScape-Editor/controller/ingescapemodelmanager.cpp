@@ -144,7 +144,8 @@ void IngeScapeModelManager::importAgentsListFromSelectedFile()
                                                               _agentsListDirectoryPath,
                                                               "JSON (*.json)");
 
-    if(!agentsListFilePath.isEmpty()) {
+    if (!agentsListFilePath.isEmpty())
+    {
         // Import the agents list from JSON file
         _importAgentsListFromFile(agentsListFilePath);
     }
@@ -152,19 +153,69 @@ void IngeScapeModelManager::importAgentsListFromSelectedFile()
 
 
 /**
- * @brief Import an agent from selected files (definition and mapping)
+ * @brief Import an agent or an agents list from selected file (definition)
  */
-void IngeScapeModelManager::importAgentFromSelectedFiles()
+bool IngeScapeModelManager::importAgentOrAgentsListFromSelectedFile()
 {
-    // "File Dialog" to get the files (paths) to open
-    QStringList agentFilesPaths = QFileDialog::getOpenFileNames(NULL,
-                                                                //"Import an agent definition (and an agent mapping)",
-                                                                "Open an agent definition",
-                                                                _dataDirectoryPath,
-                                                                "JSON (*.json)");
+    bool success = true;
 
-    // Import the agent from JSON files (definition and mapping)
-    _importAgentFromFiles(agentFilesPaths);
+    // "File Dialog" to get the file (path) to open
+    QString agentFilePath = QFileDialog::getOpenFileName(NULL,
+                                                         "Open an agent(s) definition",
+                                                         _dataDirectoryPath,
+                                                         "JSON (*.json)");
+
+    if (!agentFilePath.isEmpty())
+    {
+        QFile jsonFile(agentFilePath);
+        if (jsonFile.open(QIODevice::ReadOnly))
+        {
+            QByteArray byteArrayOfJson = jsonFile.readAll();
+            jsonFile.close();
+
+            QJsonDocument jsonDocument = QJsonDocument::fromJson(byteArrayOfJson);
+
+            // One JSON object
+            if (jsonDocument.isObject())
+            {
+                // Create a model of agent definition with JSON
+                DefinitionM* agentDefinition = _jsonHelper->createModelOfDefinition(byteArrayOfJson);
+                if (agentDefinition != NULL)
+                {
+                    QString agentName = agentDefinition->name();
+
+                    // Create a new model of agent with the name of the definition
+                    AgentM* agent = new AgentM(agentName, this);
+
+                    // Add this new model of agent
+                    addAgentModel(agent);
+
+                    // Add this new model of agent definition for the agent name
+                    addAgentDefinitionForAgentName(agentDefinition, agentName);
+
+                    // Set its definition
+                    agent->setdefinition(agentDefinition);
+                }
+                // An error occured, the definition is NULL
+                else {
+                    qWarning() << "The file" << agentFilePath << "does not contain an agent definition !";
+                    success = false;
+                }
+            }
+            // Several JSON objects
+            else if (jsonDocument.isArray())
+            {
+                // Import the agents list from JSON file
+                _importAgentsListFromFile(agentFilePath);
+            }
+        }
+        else {
+            qCritical() << "Can not open file" << agentFilePath;
+            success = false;
+        }
+    }
+
+    return success;
 }
 
 
@@ -970,107 +1021,6 @@ void IngeScapeModelManager::_importAgentsListFromFile(QString agentsListFilePath
         }
         else {
             qWarning() << "There is no file" << agentsListFilePath;
-        }
-    }
-}
-
-
-/**
- * @brief Import an agent from JSON files (definition and mapping)
- * @param subDirectoryPath
- */
-void IngeScapeModelManager::_importAgentFromFiles(QStringList agentFilesPaths)
-{
-    if ((agentFilesPaths.count() == 1) || (agentFilesPaths.count() == 2))
-    {
-        DefinitionM* agentDefinition = NULL;
-        AgentMappingM* agentMapping = NULL;
-
-        // Only 1 file, it must be the definition
-        if (agentFilesPaths.count() == 1)
-        {
-            QString agentFilePath = agentFilesPaths.first();
-
-            QFile jsonFile(agentFilePath);
-            if (jsonFile.open(QIODevice::ReadOnly))
-            {
-                QByteArray byteArrayOfJson = jsonFile.readAll();
-                jsonFile.close();
-
-                // Create a model of agent definition with JSON
-                agentDefinition = _jsonHelper->createModelOfDefinition(byteArrayOfJson);
-            }
-            else {
-                qCritical() << "Can not open file" << agentFilePath;
-            }
-        }
-        // 2 files, they must be the definition and the mapping
-        else if (agentFilesPaths.count() == 2)
-        {
-            QString agentFilePath1 = agentFilesPaths.at(0);
-            QString agentFilePath2 = agentFilesPaths.at(1);
-
-            QFile jsonFile1(agentFilePath1);
-            QFile jsonFile2(agentFilePath2);
-
-            if (jsonFile1.open(QIODevice::ReadOnly) && jsonFile2.open(QIODevice::ReadOnly))
-            {
-                QByteArray byteArrayOfJson1 = jsonFile1.readAll();
-                jsonFile1.close();
-
-                QByteArray byteArrayOfJson2 = jsonFile2.readAll();
-                jsonFile2.close();
-
-                // Try to create a model of agent definition with the first JSON
-                agentDefinition = _jsonHelper->createModelOfDefinition(byteArrayOfJson1);
-
-                // If succeeded
-                if (agentDefinition != NULL)
-                {
-                    // Create a model of agent mapping with the second JSON
-                    agentMapping = _jsonHelper->createModelOfAgentMapping(agentDefinition->name(), byteArrayOfJson2);
-                }
-                else
-                {
-                    // Try to create a model of agent definition with the second JSON
-                    agentDefinition = _jsonHelper->createModelOfDefinition(byteArrayOfJson2);
-
-                    // If succeeded
-                    if (agentDefinition != NULL)
-                    {
-                        // Create a model of agent mapping with the first JSON
-                        agentMapping = _jsonHelper->createModelOfAgentMapping(agentDefinition->name(), byteArrayOfJson1);
-                    }
-                }
-            }
-            else {
-                qCritical() << "Can not open 2 files" << agentFilePath1 << "and" << agentFilePath2;
-            }
-        }
-
-        if (agentDefinition != NULL)
-        {
-            QString agentName = agentDefinition->name();
-
-            // Create a new model of agent with the name of the definition
-            AgentM* agent = new AgentM(agentName, this);
-
-            // Add this new model of agent
-            addAgentModel(agent);
-
-            // Add this new model of agent definition for the agent name
-            addAgentDefinitionForAgentName(agentDefinition, agentName);
-
-            // Set its definition
-            agent->setdefinition(agentDefinition);
-
-            if (agentMapping != NULL) {
-                // Add this new model of agent mapping for the agent name
-                addAgentMappingForAgentName(agentMapping, agentName);
-
-                // Set its mapping
-                agent->setmapping(agentMapping);
-            }
         }
     }
 }
