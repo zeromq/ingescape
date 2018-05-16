@@ -30,7 +30,6 @@ AgentInMappingVM::AgentInMappingVM(QList<AgentM*> models,
     _isReduced(false),
     _reducedMapValueTypeGroupInInput(AgentIOPValueTypeGroups::MIXED),
     _reducedMapValueTypeGroupInOutput(AgentIOPValueTypeGroups::MIXED),
-    //_isGhost(false),
     _areIdenticalsAllDefinitions(true),
     _activeAgentsNumber(0),
     _temporaryMapping(NULL)
@@ -66,24 +65,6 @@ AgentInMappingVM::AgentInMappingVM(QList<AgentM*> models,
         }
     }
 }
-
-
-/**
- * @brief Ghost Constructor: model (and definition) is not defined.
- * The agent is an empty shell only defined by a name.
- * @param name
- * @param parent
- */
-/*AgentInMappingVM::AgentInMappingVM(QString name,
-                                   QObject *parent) : AgentInMappingVM(QList<AgentM*>(),
-                                                                       QPointF(),
-                                                                       parent)
-{
-    setname(name);
-    setisGhost(true);
-
-    qInfo() << "New Ghost of Agent in Mapping" << _name;
-}*/
 
 
 /**
@@ -311,13 +292,14 @@ void AgentInMappingVM::_onIsONofModelChanged(bool isON)
     _updateIsON();
 }
 
+
 /**
- * @brief Slot when the flag "is ON" of a model changed
- * @param isON
+ * @brief Slot when the definition of a model changed
+ * @param definition
  */
 void AgentInMappingVM::_onDefinitionOfModelChanged(DefinitionM* definition)
 {
-    if(definition != NULL)
+    if (definition != NULL)
     {
         // First remove existing inputs and outputs
         QList<InputVM*> inputsListToRemove;
@@ -330,7 +312,7 @@ void AgentInMappingVM::_onDefinitionOfModelChanged(DefinitionM* definition)
             if (inputVM != NULL)
             {
                 // The view model of input is empty
-                if (inputVM->models()->count() == 0) {
+                if (inputVM->models()->isEmpty()) {
                     inputsListToRemove.append(inputVM);
                 }
             }
@@ -343,7 +325,7 @@ void AgentInMappingVM::_onDefinitionOfModelChanged(DefinitionM* definition)
             if (outputVM != NULL)
             {
                 // The view model of output is empty
-                if (outputVM->models()->count() == 0) {
+                if (outputVM->models()->isEmpty()) {
                     outputsListToRemove.append(outputVM);
                 }
             }
@@ -396,13 +378,11 @@ void AgentInMappingVM::_onDefinitionOfModelChanged(DefinitionM* definition)
             }
         }
 
-        if (inputsListToAdd.count() > 0)
-        {
+        if (inputsListToAdd.count() > 0) {
             _inputsList.append(inputsListToAdd);
         }
 
-        if (outputsListToAdd.count() > 0)
-        {
+        if (outputsListToAdd.count() > 0) {
             _outputsList.append(outputsListToAdd);
         }
 

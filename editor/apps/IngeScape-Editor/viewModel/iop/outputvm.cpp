@@ -30,7 +30,6 @@ OutputVM::OutputVM(QString outputName,
                                                  outputId,
                                                  parent),
     _firstModel(NULL),
-    //_isGhost(false),
     _isPublishedNewValue(false)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
@@ -39,10 +38,6 @@ OutputVM::OutputVM(QString outputName,
     if (modelM != NULL) {
         qInfo() << "New Output VM" << _name << "(" << _id << ")";
     }
-    /*else {
-        _isGhost = true;
-        qInfo() << "New ghost of Output VM" << _name;
-    }*/
 
     // Init the timer to reset the flag "is Published New Value"
     // Allows to play an animation when the value changed

@@ -475,6 +475,13 @@ void AgentsMappingController::onIsMappingActivatedChanged(bool isMappingActivate
 
             if (_modelManager != NULL)
             {
+                if (_modelManager->isMappingControlled()) {
+                    qDebug() << "Mapping Activated in mode CONTROL";
+                }
+                else {
+                    qDebug() << "Mapping Activated in mode OBSERVE";
+                }
+
                 // Get the map from agent name to list of active agents
                 QHash<QString, QList<AgentM*>> mapFromAgentNameToActiveAgentsList = _modelManager->getMapFromAgentNameToActiveAgentsList();
 
@@ -538,6 +545,13 @@ void AgentsMappingController::onIsMappingActivatedChanged(bool isMappingActivate
 
             if (_modelManager != NULL)
             {
+                if (_modelManager->isMappingControlled()) {
+                    qDebug() << "Mapping Activated in mode CONTROL";
+                }
+                else {
+                    qDebug() << "Mapping Activated in mode OBSERVE";
+                }
+
                 // Apply all temporary mappings
                 foreach (AgentInMappingVM* agent, _allAgentsInMapping.toList())
                 {
@@ -555,6 +569,16 @@ void AgentsMappingController::onIsMappingActivatedChanged(bool isMappingActivate
             }
         }
     }
+}
+
+
+/**
+ * @brief Slot when the flag "is Mapping Controlled" changed
+ * @param isMappingControlled
+ */
+void AgentsMappingController::onIsMappingControlledChanged(bool isMappingControlled)
+{
+    qDebug() << "Mapping Ctrl Is Mapping Controlled Changed to" << isMappingControlled;
 }
 
 
@@ -811,9 +835,7 @@ void AgentsMappingController::_onAgentsInMappingChanged()
  */
 void AgentsMappingController::_addAgentModelsToMappingAtPosition(QString agentName, QList<AgentM*> agentsList, QPointF position)
 {
-
-
-    if (!agentName.isEmpty() && (agentsList.count() > 0))
+    if (!agentName.isEmpty() && !agentsList.isEmpty())
     {
         AgentInMappingVM* agentInMapping = getAgentInMappingFromName(agentName);
 

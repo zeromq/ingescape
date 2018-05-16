@@ -196,11 +196,13 @@ Q_SIGNALS:
      */
     void commandAskedToAgentAboutMappingInput(QStringList peerIdsList, QString command, QString inputName, QString outputAgentName, QString outputName);
 
+
     /**
      * @brief Emitted when the mapping creates an agent on its side
      * @param agent
      */
     void agentCreatedByMapping(AgentM* agent);
+
 
 public Q_SLOTS:
 
@@ -224,6 +226,13 @@ public Q_SLOTS:
      * @param isMappingActivated
      */
     void onIsMappingActivatedChanged(bool isMappingActivated);
+
+
+    /**
+     * @brief Slot when the flag "is Mapping Controlled" changed
+     * @param isMappingControlled
+     */
+    void onIsMappingControlledChanged(bool isMappingControlled);
 
 
     /**

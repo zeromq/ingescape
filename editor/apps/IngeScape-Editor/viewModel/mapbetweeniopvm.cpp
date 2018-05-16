@@ -74,22 +74,12 @@ MapBetweenIOPVM::~MapBetweenIOPVM()
     {
         //AgentInMappingVM* temp = _outputAgent;
         setoutputAgent(NULL);
-
-        // Handle ghost output agent
-        /*if (temp->isGhost()) {
-            delete temp;
-        }*/
     }
 
     if (_output != NULL)
     {
         //OutputVM* temp = _output;
         setoutput(NULL);
-
-        // Handle ghost output
-        /*if (temp->isGhost()) {
-            delete temp;
-        }*/
     }
 
     setinputAgent(NULL);

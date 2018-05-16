@@ -170,6 +170,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
 
     // Connect to signals from the model manager
     connect(_modelManager, &IngeScapeModelManager::isMappingActivatedChanged, _agentsMappingC, &AgentsMappingController::onIsMappingActivatedChanged);
+    connect(_modelManager, &IngeScapeModelManager::isMappingControlledChanged, _agentsMappingC, &AgentsMappingController::onIsMappingControlledChanged);
 
     connect(_modelManager, &IngeScapeModelManager::agentModelCreated, _agentsSupervisionC, &AgentsSupervisionController::onAgentModelCreated);
     connect(_modelManager, &IngeScapeModelManager::agentModelCreated, _scenarioC, &ScenarioController::onAgentModelCreated);

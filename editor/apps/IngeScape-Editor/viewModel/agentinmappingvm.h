@@ -68,9 +68,6 @@ class AgentInMappingVM : public QObject
     // Group of value type of the reduced map (= brin) in output of the agent
     I2_QML_PROPERTY_READONLY(AgentIOPValueTypeGroups::Value, reducedMapValueTypeGroupInOutput)
 
-    // Flag indicating if our agent is a ghost agent
-    //I2_QML_PROPERTY_READONLY(bool, isGhost)
-
     // Flag indicating if all definitions are strictly identicals
     I2_QML_PROPERTY_READONLY(bool, areIdenticalsAllDefinitions)
 
@@ -92,16 +89,6 @@ public:
     explicit AgentInMappingVM(QList<AgentM*> models,
                               QPointF position,
                               QObject* parent = nullptr);
-
-
-    /**
-     * @brief Ghost Constructor: model (and definition) is not defined.
-     * The agent is an empty shell only defined by a name.
-     * @param name
-     * @param parent
-     */
-    /*explicit AgentInMappingVM(QString name,
-                              QObject* parent = nullptr);*/
 
 
     /**
@@ -219,9 +206,10 @@ private Q_SLOTS:
      */
     void _onIsONofModelChanged(bool isON);
 
+
     /**
-     * @brief Slot when the flag "is ON" of a model changed
-     * @param isON
+     * @brief Slot when the definition of a model changed
+     * @param definition
      */
     void _onDefinitionOfModelChanged(DefinitionM* definition);
 

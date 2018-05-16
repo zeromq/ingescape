@@ -430,23 +430,10 @@ void IngeScapeModelManager::onDefinitionReceived(QString peerId, QString agentNa
                      // Emit the signal "Add Inputs to Editor for Outputs"
                      Q_EMIT addInputsToEditorForOutputs(agentName, agentDefinition->outputsList()->toList());
                  }
-                 else {
-                     // remove existing definition name
-                     QString definitionName = agent->definition()->name();
-
-                     QList<DefinitionM*> agentDefinitionsList = getAgentDefinitionsListFromDefinitionName(definitionName);
-
-                     int indexOfDefinition = agentDefinitionsList.indexOf(agent->definition());
-                     if(indexOfDefinition != -1)
-                         agentDefinitionsList.removeAt(indexOfDefinition);
-
-                     // Update the list in the map
-                     _mapFromNameToAgentDefinitionsList.remove(definitionName);
-
-
-
-
-
+                 // Update with the new definition
+                 else
+                 {
+                     DefinitionM* previousDefinition = agent->definition();
 
                      // Add this new model of agent definition for the agent name
                      addAgentDefinitionForAgentName(agentDefinition, agentName);
@@ -456,6 +443,10 @@ void IngeScapeModelManager::onDefinitionReceived(QString peerId, QString agentNa
 
                      // Emit the signal "Add Inputs to Editor for Outputs"
                      Q_EMIT addInputsToEditorForOutputs(agentName, agentDefinition->outputsList()->toList());
+
+                     if (previousDefinition != NULL) {
+                         deleteAgentDefinition(previousDefinition);
+                     }
                  }
             }
         }
