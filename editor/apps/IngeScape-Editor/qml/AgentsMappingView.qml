@@ -91,7 +91,7 @@ Item {
 
             I2PieSlice {
                 id: pieSlice
-                //visible: IngeScapeEditorC.modelManager.isActivatedMapping
+                //visible: IngeScapeEditorC.modelManager.isMappingActivated
 
                 anchors.fill: parent
 
@@ -137,23 +137,23 @@ Item {
                 fileCache: IngeScapeTheme.svgFileINGESCAPE
 
                 pressedID: releasedID + "-pressed"
-                releasedID: IngeScapeEditorC.modelManager.isActivatedMapping ? "connect-on" : "connect-off"
+                releasedID: IngeScapeEditorC.modelManager.isMappingActivated ? "connect-on" : "connect-off"
                 disabledID : releasedID
             }
 
             onClicked: {
-                IngeScapeEditorC.modelManager.isActivatedMapping = checked;
+                IngeScapeEditorC.modelManager.isMappingActivated = checked;
             }
 
             Binding {
                 target : activeMappingBtn
                 property : "checked"
-                value : IngeScapeEditorC.modelManager.isActivatedMapping
+                value : IngeScapeEditorC.modelManager.isMappingActivated
             }
         }
 
         Rectangle {
-            //visible: IngeScapeEditorC.modelManager.isActivatedMapping
+            //visible: IngeScapeEditorC.modelManager.isMappingActivated
             color: "transparent"
             width: childrenRect.width
             height: childrenRect.height
@@ -161,8 +161,8 @@ Item {
             anchors {
                 bottom: parent.bottom
                 left: parent.left
-                leftMargin: 74 + (IngeScapeEditorC.modelManager.isControlledMapping ? 5 : 0)
-                bottomMargin: 64 + (IngeScapeEditorC.modelManager.isControlledMapping ? 0 : 2)
+                leftMargin: 74 + (IngeScapeEditorC.modelManager.isMappingControlled ? 5 : 0)
+                bottomMargin: 64 + (IngeScapeEditorC.modelManager.isMappingControlled ? 0 : 2)
             }
 
             Button {
@@ -176,7 +176,7 @@ Item {
                     fileCache: IngeScapeTheme.svgFileINGESCAPE
 
                     pressedID: releasedID + "-pressed"
-                    releasedID: IngeScapeEditorC.modelManager.isControlledMapping ? "control" : "observe"
+                    releasedID: IngeScapeEditorC.modelManager.isMappingControlled ? "control" : "observe"
                     disabledID : releasedID
                 }
 
@@ -213,7 +213,7 @@ Item {
             CheckBox {
                 exclusiveGroup: typeMappingGroup
 
-                checked: !IngeScapeEditorC.modelManager.isControlledMapping
+                checked: !IngeScapeEditorC.modelManager.isMappingControlled
 
                 style: CheckBoxStyle {
                     label: Text {
@@ -252,7 +252,7 @@ Item {
 
                 onClicked: {
                     if (checked) {
-                        IngeScapeEditorC.modelManager.isControlledMapping = false;
+                        IngeScapeEditorC.modelManager.isMappingControlled = false;
                     }
 
                     // Show feedback button
@@ -268,7 +268,7 @@ Item {
             CheckBox {
                 exclusiveGroup: typeMappingGroup
 
-                checked: IngeScapeEditorC.modelManager.isControlledMapping
+                checked: IngeScapeEditorC.modelManager.isMappingControlled
 
                 style: CheckBoxStyle {
                     label: Text {
@@ -307,7 +307,7 @@ Item {
 
                 onClicked: {
                     if (checked) {
-                        IngeScapeEditorC.modelManager.isControlledMapping = true;
+                        IngeScapeEditorC.modelManager.isMappingControlled = true;
                     }
 
                     // Show feedback button
@@ -334,7 +334,7 @@ Item {
                     left : parent.left
                 }
 
-                visible : rootItem.controller && rootItem.controller.isEmptyMapping && !IngeScapeEditorC.modelManager.isActivatedMapping
+                visible : rootItem.controller && rootItem.controller.isEmptyMapping && !IngeScapeEditorC.modelManager.isMappingActivated
                 text : "No active mapping at the moment."
 
                 color : IngeScapeTheme.blueGreyColor
@@ -351,7 +351,7 @@ Item {
                     left : parent.left
                 }
 
-                visible : rootItem.controller && rootItem.controller.isEmptyMapping && !IngeScapeEditorC.modelManager.isActivatedMapping
+                visible : rootItem.controller && rootItem.controller.isEmptyMapping && !IngeScapeEditorC.modelManager.isMappingActivated
                 text : "Click on the button to synchronize with the environement and get the currently active mapping.\nOr create/load a mapping and click on the button to apply it to the environment."
 
                 color : IngeScapeTheme.blueGreyColor

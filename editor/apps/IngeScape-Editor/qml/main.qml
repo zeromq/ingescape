@@ -83,17 +83,17 @@ ApplicationWindow {
             title: qsTr("Mapping")
 
             MenuItem {
-                text: (IngeScapeEditorC.modelManager && IngeScapeEditorC.modelManager.isActivatedMapping) ? qsTr("Unplug mapping") : qsTr("Plug mapping")
+                text: (IngeScapeEditorC.modelManager && IngeScapeEditorC.modelManager.isMappingActivated) ? qsTr("Unplug mapping") : qsTr("Plug mapping")
                 //enabled: false
 
                 onTriggered: {
-                    if (IngeScapeEditorC.modelManager && IngeScapeEditorC.modelManager.isActivatedMapping) {
+                    if (IngeScapeEditorC.modelManager && IngeScapeEditorC.modelManager.isMappingActivated) {
                         //console.log("DE-activate mapping");
-                        IngeScapeEditorC.modelManager.isActivatedMapping = false;
+                        IngeScapeEditorC.modelManager.isMappingActivated = false;
                     }
                     else {
                         //console.log("Activate mapping");
-                        IngeScapeEditorC.modelManager.isActivatedMapping = true;
+                        IngeScapeEditorC.modelManager.isMappingActivated = true;
                     }
                 }
             }

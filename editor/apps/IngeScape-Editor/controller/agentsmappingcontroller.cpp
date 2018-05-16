@@ -90,7 +90,7 @@ void AgentsMappingController::createNewMapping()
 
     // 1- First, DE-activate the mapping
     if (_modelManager != NULL) {
-        _modelManager->setisActivatedMapping(false);
+        _modelManager->setisMappingActivated(false);
     }
 
     // 2- Delete all links
@@ -258,7 +258,7 @@ void AgentsMappingController::removeLinkBetweenTwoAgents(MapBetweenIOPVM* link)
         qInfo() << "QML asked to delete the link between agents" << link->outputAgent()->name() << "and" << link->inputAgent()->name();
 
         // Mapping is activated
-        if ((_modelManager != NULL) && _modelManager->isActivatedMapping())
+        if ((_modelManager != NULL) && _modelManager->isMappingActivated())
         {
             // Set to virtual to give a feedback to the user
             link->setisVirtual(true);
@@ -308,7 +308,7 @@ void AgentsMappingController::dropAgentToMappingAtPosition(QString agentName, Ab
                     temporaryMapping->mappingElements()->deleteAllItems();
 
                     // Mapping is already activated
-                    if ((_modelManager != NULL) && _modelManager->isActivatedMapping())
+                    if ((_modelManager != NULL) && _modelManager->isMappingActivated())
                     {
                         foreach (AgentM* model, agentsList->toList()) {
                             if (model != NULL)
@@ -361,7 +361,7 @@ void AgentsMappingController::dropLinkBetweenAgents(AgentInMappingVM* outputAgen
                 qInfo() << "QML asked to create the link between agents" << outputAgent->name() << "and" << inputAgent->name();
 
                 // Mapping is activated
-                if ((_modelManager != NULL) && _modelManager->isActivatedMapping())
+                if ((_modelManager != NULL) && _modelManager->isMappingActivated())
                 {
                     // Create a new VIRTUAL link between agents
                     MapBetweenIOPVM* link = new MapBetweenIOPVM(outputAgent, output, inputAgent, input, true, this);
@@ -461,12 +461,12 @@ void AgentsMappingController::onIdenticalAgentModelAdded(AgentM* newModel)
 
 
 /**
- * @brief Slot when the flag "is Activated Mapping" changed
- * @param isActivatedMapping
+ * @brief Slot when the flag "is Mapping Activated" changed
+ * @param isMappingActivated
  */
-void AgentsMappingController::onIsActivatedMappingChanged(bool isActivatedMapping)
+void AgentsMappingController::onIsMappingActivatedChanged(bool isMappingActivated)
 {
-    if (isActivatedMapping)
+    if (isMappingActivated)
     {
         // Empty mapping
         if (_isEmptyMapping)
@@ -914,7 +914,7 @@ void AgentsMappingController::_removeAllLinksWithAgent(AgentInMappingVM* agent)
                 removeLinkBetweenTwoAgents(link);
 
                 // Mapping is activated
-                if (_modelManager->isActivatedMapping())
+                if (_modelManager->isMappingActivated())
                 {
                     // We have to delete the link to clean our HMI (even if we do not have yet received the message "UNMAPPED")
                     _deleteLinkBetweenTwoAgents(link);

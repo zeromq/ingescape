@@ -78,13 +78,13 @@ I2CubicBezierCurve {
     // if the inputAgent and outputAgent are reduced : global type of its outputs
     stroke: if (rootItem._isBrin && outputModel)
             {
-                IngeScapeTheme.colorOfIOPTypeWithConditions(mapBetweenIOPVM.outputAgent.reducedMapValueTypeGroupInOutput, (outputModel.isPublishedNewValue && IngeScapeEditorC.modelManager.isActivatedMapping));
+                IngeScapeTheme.colorOfIOPTypeWithConditions(mapBetweenIOPVM.outputAgent.reducedMapValueTypeGroupInOutput, (outputModel.isPublishedNewValue && IngeScapeEditorC.modelManager.isMappingActivated));
             }
             else {
                 // if the inputAgent is not reduced : type of its output
                 if (outputModel && outputModel.firstModel)
                 {
-                    IngeScapeTheme.colorOfIOPTypeWithConditions(outputModel.firstModel.agentIOPValueTypeGroup, (outputModel.isPublishedNewValue && IngeScapeEditorC.modelManager.isActivatedMapping));
+                    IngeScapeTheme.colorOfIOPTypeWithConditions(outputModel.firstModel.agentIOPValueTypeGroup, (outputModel.isPublishedNewValue && IngeScapeEditorC.modelManager.isMappingActivated));
                 }
                 else {
                     defaultColor;

@@ -826,8 +826,8 @@ void ScenarioController::executeEffectsOfAction(ActionM* action)
     if ((action != NULL) && (action->effectsList()->count() > 0))
     {
         // Active the mapping if needed
-        if ((_modelManager != NULL) && !_modelManager->isActivatedMapping()) {
-            _modelManager->setisActivatedMapping(true);
+        if ((_modelManager != NULL) && !_modelManager->isMappingActivated()) {
+            _modelManager->setisMappingActivated(true);
         }
 
         // Execute the actions effects
@@ -1084,8 +1084,8 @@ void ScenarioController::_startScenario()
     int currentTimeInMilliSeconds = _currentTime.msecsSinceStartOfDay();
 
     // Active the mapping if needed
-    if ((_modelManager != NULL) && !_modelManager->isActivatedMapping()) {
-        _modelManager->setisActivatedMapping(true);
+    if ((_modelManager != NULL) && !_modelManager->isMappingActivated()) {
+        _modelManager->setisMappingActivated(true);
     }
 
     // Set the list of Actions to process at currentTime

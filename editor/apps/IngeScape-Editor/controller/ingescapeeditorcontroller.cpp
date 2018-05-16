@@ -169,7 +169,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
 
 
     // Connect to signals from the model manager
-    connect(_modelManager, &IngeScapeModelManager::isActivatedMappingChanged, _agentsMappingC, &AgentsMappingController::onIsActivatedMappingChanged);
+    connect(_modelManager, &IngeScapeModelManager::isMappingActivatedChanged, _agentsMappingC, &AgentsMappingController::onIsMappingActivatedChanged);
     connect(_modelManager, &IngeScapeModelManager::agentModelCreated, _agentsSupervisionC, &AgentsSupervisionController::onAgentModelCreated);
     connect(_modelManager, &IngeScapeModelManager::agentModelWillBeDeleted, _agentsMappingC, &AgentsMappingController::onAgentModelWillBeDeleted);
     connect(_modelManager, &IngeScapeModelManager::agentModelCreated, _scenarioC, &ScenarioController::onAgentModelCreated);
@@ -657,6 +657,6 @@ void IngeScapeEditorController::_onTimeout()
     // Initialize platform from online mapping
     if (_modelManager != NULL)
     {
-        _modelManager->setisActivatedMapping(true);
+        _modelManager->setisMappingActivated(true);
     }
 }

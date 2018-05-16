@@ -220,10 +220,10 @@ public Q_SLOTS:
 
 
     /**
-     * @brief Slot when the flag "is Activated Mapping" changed
-     * @param isActivatedMapping
+     * @brief Slot when the flag "is Mapping Activated" changed
+     * @param isMappingActivated
      */
-    void onIsActivatedMappingChanged(bool isActivatedMapping);
+    void onIsMappingActivatedChanged(bool isMappingActivated);
 
 
     /**

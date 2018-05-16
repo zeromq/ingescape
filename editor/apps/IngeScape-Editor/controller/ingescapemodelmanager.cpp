@@ -35,8 +35,8 @@ IngeScapeModelManager::IngeScapeModelManager(QString agentsListDirectoryPath,
                                        QString agentsMappingsDirectoryPath,
                                        QString dataDirectoryPath,
                                        QObject *parent) : QObject(parent),
-    _isActivatedMapping(false),
-    _isControlledMapping(false),
+    _isMappingActivated(false),
+    _isMappingControlled(false),
     _agentsListDirectoryPath(agentsListDirectoryPath),
     _agentsMappingsDirectoryPath(agentsMappingsDirectoryPath),
     _dataDirectoryPath(dataDirectoryPath),
@@ -83,20 +83,20 @@ IngeScapeModelManager::~IngeScapeModelManager()
  * @brief Setter for property "is Activated Mapping"
  * @param value
  */
-void IngeScapeModelManager::setisActivatedMapping(bool value)
+void IngeScapeModelManager::setisMappingActivated(bool value)
 {
-    if (_isActivatedMapping != value)
+    if (_isMappingActivated != value)
     {
-        _isActivatedMapping = value;
+        _isMappingActivated = value;
 
-        if (_isActivatedMapping) {
+        if (_isMappingActivated) {
             qInfo() << "Mapping Activated";
         }
         else {
             qInfo() << "Mapping DE-activated";
         }
 
-        Q_EMIT isActivatedMappingChanged(value);
+        Q_EMIT isMappingActivatedChanged(value);
     }
 }
 
@@ -105,20 +105,20 @@ void IngeScapeModelManager::setisActivatedMapping(bool value)
  * @brief Setter for property "is Controlled Mapping"
  * @param value
  */
-void IngeScapeModelManager::setisControlledMapping(bool value)
+void IngeScapeModelManager::setisMappingControlled(bool value)
 {
-    if (_isControlledMapping != value)
+    if (_isMappingControlled != value)
     {
-        _isControlledMapping = value;
+        _isMappingControlled = value;
 
-        if (_isControlledMapping) {
+        if (_isMappingControlled) {
             qInfo() << "Mapping Controlled";
         }
         else {
             qInfo() << "Mapping Observed";
         }
 
-        Q_EMIT isControlledMappingChanged(value);
+        Q_EMIT isMappingControlledChanged(value);
     }
 }
 
