@@ -53,15 +53,15 @@ Item {
     //--------------------------------
 
     // allowing to deselect selected record
-//    MouseArea {
-//        anchors.fill: parent
-//        onClicked:  {
-//            if(controller.selectedRecord)
-//            {
-//                controller.selectedRecord = null;
-//            }
-//        }
-//    }
+    MouseArea {
+        anchors.fill: parent
+        onClicked:  {
+            if(controller.selectedRecord)
+            {
+                controller.selectedRecord = null;
+            }
+        }
+    }
 
     //
     // List of records
@@ -176,80 +176,151 @@ Item {
         id: componentRecordListItem
 
 
-        Item {
-            id : recordItem
 
-            property var agentmodel: model.listOfAgents
+            Item {
+                id : recordItem
 
-            property int margin: 5
+                property var agentmodel: model.listOfAgents
 
-            height: recordInfos.height + margin*2
+                property int margin: 5
 
-            anchors {
-                left : parent.left
-                right : parent.right
-            }
-
-            // separator
-            Rectangle {
-                anchors {
-                    bottom: parent.bottom
-                    left: parent.left
-                    right: parent.right
-                }
-
-                color: IngeScapeTheme.leftPanelBackgroundColor
-
-                height: 1
-            }
-
-            Column
-            {
-                id:recordInfos
-                y: margin
+                height: recordInfos.height + margin*2
 
                 anchors {
                     left : parent.left
                     right : parent.right
-                    leftMargin: 28
-                    rightMargin: 12
                 }
 
-                spacing : 4
+                // separator
+                Rectangle {
+                    anchors {
+                        bottom: parent.bottom
+                        left: parent.left
+                        right: parent.right
+                    }
 
-                // Name
-                Text {
-                    id: recordName
+                    color: IngeScapeTheme.leftPanelBackgroundColor
+
+                    height: 1
+                }
+
+                Column
+                {
+                    id:recordInfos
+                    y: margin
 
                     anchors {
                         left : parent.left
                         right : parent.right
+                        leftMargin: 28
+                        rightMargin: 12
                     }
-                    elide: Text.ElideRight
 
-                    text: model.recordModel.name
-                    color: IngeScapeTheme.agentsListLabelColor
-                    font: IngeScapeTheme.headingFont
+                    spacing : 4
+
+                    // Name
+                    Text {
+                        id: recordName
+
+                        anchors {
+                            left : parent.left
+                            right : parent.right
+                        }
+                        elide: Text.ElideRight
+
+                        text: model.recordModel.name
+                        color: IngeScapeTheme.agentsListLabelColor
+                        font: IngeScapeTheme.headingFont
+                    }
+
+                    // IP address
+                    Text {
+                        id: recordIP
+
+                        anchors {
+                            left : parent.left
+                            right : parent.right
+                        }
+                        elide: Text.ElideRight
+
+                        text: qsTr("%1 %2").arg(Qt.formatDate(model.recordModel.beginDateTime, "dd/MM/yyyy")).arg(Qt.formatTime(model.recordModel.beginDateTime, "HH:mm"))
+                        color: IngeScapeTheme.agentsListTextColor
+                        font: IngeScapeTheme.heading2Font
+                    }
                 }
 
-                // IP address
-                Text {
-                    id: recordIP
 
-                    anchors {
-                        left : parent.left
-                        right : parent.right
+                // Record can be clicked
+                MouseArea
+                {
+                    anchors.fill: parent
+
+                    onPressed: {
+                        if (controller) {
+                            if(controller.selectedRecord === model.QtObject)
+                            {
+                                controller.selectedRecord = null;
+                            } else {
+                                controller.selectedRecord = model.QtObject;
+                            }
+                        }
                     }
-                    elide: Text.ElideRight
-
-                    text: qsTr("%1 %2").arg(Qt.formatDate(model.recordModel.beginDateTime, "dd/MM/yyyy")).arg(Qt.formatTime(model.recordModel.beginDateTime, "HH:mm"))
-                    color: IngeScapeTheme.agentsListTextColor
-                    font: IngeScapeTheme.heading2Font
                 }
+
+                // Selected Record feedback
+                Item {
+                    anchors.fill: parent
+                    visible : controller && (controller.selectedRecord === model.QtObject);
+
+                    Rectangle {
+                        anchors {
+                            left : parent.left
+                            top : parent.top
+                            bottom: parent.bottom
+                        }
+
+                        width : 6
+                        color : IngeScapeTheme.selectedAgentColor
+                    }
+
+                    Button {
+                        id: removeButton
+
+                        activeFocusOnPress: true
+
+                        anchors {
+                            top: parent.top
+                            topMargin: 10
+                            right : parent.right
+                            rightMargin: 12
+                        }
+
+                        style: Theme.LabellessSvgButtonStyle {
+                            fileCache: IngeScapeTheme.svgFileINGESCAPE
+
+                            pressedID: releasedID + "-pressed"
+                            releasedID: "supprimer"
+                            disabledID : releasedID
+                        }
+
+                        onClicked: {
+
+                            if (controller)
+                            {
+                                // Delete selected record
+                                controller.deleteSelectedRecord();
+                            }
+                        }
+                    }
+                }
+
 
 
             }
-       }
+
+
+
+
     }
 }
 

@@ -44,7 +44,7 @@ RecordVM::~RecordVM()
 {
     if (_recordModel != NULL)
     {
-        qInfo() << "Delete View Model of Host" << _recordModel->name();
+        qInfo() << "Delete View Model of Record" << _recordModel->name();
     }
     setrecordModel(NULL);
 }

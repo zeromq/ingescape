@@ -762,6 +762,22 @@ void IngeScapeModelManager::deleteAgentModel(AgentM* agent)
     }
 }
 
+/**
+ * @brief Delete a model of Record
+ * @param agent
+ */
+void IngeScapeModelManager::deleteRecordModel(RecordM* record)
+{
+    if (record != NULL)
+    {
+        int indexOfRecord = _recordsList.indexOf(record);
+        if(indexOfRecord != -1)
+            _recordsList.removeAt(indexOfRecord);
+
+        // Free memory
+        delete record;
+    }
+}
 
 /**
  * @brief Add a model of agent definition for an agent name
