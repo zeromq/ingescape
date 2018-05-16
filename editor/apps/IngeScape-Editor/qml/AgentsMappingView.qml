@@ -217,7 +217,8 @@ Item {
 
                 style: CheckBoxStyle {
                     label: Text {
-                        color: control.checked ? IngeScapeTheme.veryLightGreyColor : IngeScapeTheme.greyColor2
+                        color: control.checked ? (control.pressed ? IngeScapeTheme.orangeColor : IngeScapeTheme.veryLightGreyColor)
+                                               : (control.pressed ? IngeScapeTheme.orangeColor : IngeScapeTheme.greyColor2)
 
                         text: qsTr("OBSERVE")
 
@@ -242,7 +243,9 @@ Item {
                         I2SvgItem {
                             anchors.centerIn: parent;
                             svgFileCache: IngeScapeTheme.svgFileINGESCAPE
-                            svgElementId: control.checked ? "radio_observe_on" : "radio_observe_off"
+                            //svgElementId: control.checked ? "radio_observe_on" : "radio_observe_off"
+                            svgElementId: control.checked ? (control.pressed ? "radio_observe_on" : "radio_observe_blanc")
+                                                          : (control.pressed ? "radio_observe_on" : "radio_observe_off");
                         }
                     }
                 }
@@ -269,7 +272,8 @@ Item {
 
                 style: CheckBoxStyle {
                     label: Text {
-                        color: control.checked ? IngeScapeTheme.veryLightGreyColor : IngeScapeTheme.greyColor2
+                        color: control.checked ? (control.pressed ? IngeScapeTheme.orangeColor : IngeScapeTheme.veryLightGreyColor)
+                                               : (control.pressed ? IngeScapeTheme.orangeColor : IngeScapeTheme.greyColor2)
 
                         text: qsTr("CONTROL")
 
@@ -294,7 +298,9 @@ Item {
                         I2SvgItem {
                             anchors.centerIn: parent;
                             svgFileCache: IngeScapeTheme.svgFileINGESCAPE
-                            svgElementId: control.checked ? "radio_control_on" : "radio_control_off"
+                            //svgElementId: control.checked ? "radio_control_on" : "radio_control_off"
+                            svgElementId: control.checked ? (control.pressed ? "radio_control_on" : "radio_control_blanc")
+                                                          : (control.pressed ? "radio_control_on" : "radio_control_off");
                         }
                     }
                 }

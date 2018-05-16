@@ -49,14 +49,16 @@ Window {
     //--------------------------------
 
     // action model
-    property var actionM: panelController?  panelController.editedAction : null;
+    property var actionM: panelController ?  panelController.editedAction : null;
     // action view model
-    property var actionVM: panelController? panelController.editedViewModel : null;
+    property var actionVM: panelController ? panelController.editedViewModel : null;
 
     // our scenario controller
     property var controller: null;
     // our panel controller
     property var panelController: null;
+
+    property var heightStartTime: (startTimeItem.visible ? (startTimeItem.height + startTimeItem.anchors.topMargin) : 0)
 
 
     //--------------------------------
@@ -138,6 +140,8 @@ Window {
         //        }
 
         Item {
+            id: mainItem
+
             anchors {
                 fill : parent
                 margins : 20
@@ -269,6 +273,7 @@ Window {
             //
             Item {
                 id : startTimeItem
+
                 anchors {
                     left : parent.left
                     right : parent.right
@@ -367,1329 +372,6 @@ Window {
 
 
             //
-            // Conditions
-            //
-            Item {
-                id : conditionsItem
-                anchors {
-                    left : parent.left
-                    right : parent.right
-                    top : (startTimeItem.visible) ? startTimeItem.bottom : nameItem.bottom
-                    topMargin: 14
-                }
-                height  : isOpened ? 230 : 37
-                clip : true
-
-                Behavior on height {
-                    NumberAnimation {}
-                }
-
-                property bool isOpened : false
-
-                Connections {
-                    target : rootItem
-                    onActiveChanged : {
-                        // make the conditions list visible if there are conditions
-                        if (rootItem.active && actionM && actionM.conditionsList.count > 0) {
-                            conditionsItem.isOpened = true;
-                        }
-                    }
-                }
-
-                //Title
-                MouseArea {
-                    id : titleMouseArea
-                    anchors {
-                        left : parent.left
-                        right : parent.right
-                    }
-                    height : 29
-
-                    onClicked: {
-                        conditionsItem.isOpened = !conditionsItem.isOpened;
-                    }
-
-                    I2SvgItem {
-                        id : arrow
-                        anchors {
-                            left : parent.left
-                            verticalCenter: titleCdt.verticalCenter
-                        }
-
-                        svgFileCache : IngeScapeTheme.svgFileINGESCAPE;
-                        svgElementId: "arrowWhite"
-
-                        rotation: conditionsItem.isOpened? 0 : 270
-                    }
-
-                    Text {
-                        id : titleCdt
-                        anchors {
-                            left : arrow.right
-                            leftMargin: 6
-                            right : parent.right
-                            verticalCenter: parent.verticalCenter
-                        }
-
-                        text : "Conditions"
-
-                        color: titleMouseArea.containsPress? IngeScapeTheme.lightGreyColor : IngeScapeTheme.whiteColor
-                        font {
-                            family: IngeScapeTheme.textFontFamily
-                            pixelSize: 19
-                        }
-                    }
-
-                }
-
-                // separator
-                Rectangle {
-                    id : separatorCdt
-                    anchors {
-                        left : parent.left
-                        right : parent.right
-                        top : titleMouseArea.bottom
-                    }
-                    height : 1
-                    color : IngeScapeTheme.whiteColor
-                }
-
-                /// Validity duration
-                Item {
-                    id : validityDuration
-                    anchors {
-                        left : parent.left
-                        right : parent.right
-                        top : separatorCdt.bottom
-                        topMargin: 8
-                    }
-
-                    height: validityDurationCombo.height
-
-                    visible : conditionsItem.isOpened
-                    enabled : visible
-
-                    Text {
-                        id : textValidity
-                        anchors {
-                            left : parent.left
-                            verticalCenter : parent.verticalCenter
-                        }
-
-                        text : "Conditions shall be checked"
-
-                        color: IngeScapeTheme.whiteColor
-                        font {
-                            family: IngeScapeTheme.textFontFamily
-                            pixelSize: 16
-                        }
-                    }
-
-                    Row {
-                        anchors {
-                            verticalCenter : parent.verticalCenter
-                            left : textValidity.right
-                            leftMargin: 10
-                        }
-                        spacing : 6
-
-                        IngeScapeComboBox {
-                            id : validityDurationCombo
-
-                            anchors {
-                                verticalCenter : parent.verticalCenter
-                            }
-
-                            height : 25
-                            width : 115
-
-                            model : controller ? controller.validationDurationsTypesList : 0
-                            function modelToString(model)
-                            {
-                                return model.name;
-                            }
-
-
-                            Binding {
-                                target : validityDurationCombo
-                                property : "selectedItem"
-                                value : if (actionM && controller)
-                                        {
-                                            controller.validationDurationsTypesList.getItemWithValue(actionM.validityDurationType);
-                                        }
-                                        else {
-                                            null;
-                                        }
-                            }
-
-
-                            onSelectedItemChanged:
-                            {
-                                if (actionM)
-                                {
-                                    actionM.validityDurationType = validityDurationCombo.selectedItem.value;
-                                }
-                            }
-
-                        }
-
-                        TextField {
-                            id: textFieldValidity
-
-                            anchors {
-                                verticalCenter : parent.verticalCenter
-                            }
-
-                            visible :  actionM && actionM.validityDurationType === ValidationDurationType.CUSTOM
-                            enabled: visible
-                            height: 25
-                            width: 57
-                            horizontalAlignment: TextInput.AlignLeft
-                            verticalAlignment: TextInput.AlignVCenter
-
-                            text : actionM ? actionM.validityDurationString : "0.0"
-                            inputMethodHints: Qt.ImhFormattedNumbersOnly
-                            validator: RegExpValidator { regExp: /(\d{1,5})([.]\d{3})?$/ }
-
-                            style: I2TextFieldStyle {
-                                backgroundColor: IngeScapeTheme.darkBlueGreyColor
-                                borderColor: IngeScapeTheme.whiteColor;
-                                borderErrorColor: IngeScapeTheme.redColor
-                                radiusTextBox: 1
-                                borderWidth: 0;
-                                borderWidthActive: 1
-                                textIdleColor: IngeScapeTheme.whiteColor;
-                                textDisabledColor: IngeScapeTheme.darkGreyColor;
-
-                                padding.left: 3
-                                padding.right: 3
-
-                                font {
-                                    pixelSize:15
-                                    family: IngeScapeTheme.textFontFamily
-                                }
-
-                            }
-
-                            onActiveFocusChanged: {
-                                if (!activeFocus) {
-                                    // Move cursor to our first character when we lose focus
-                                    // (to always display the beginning or our text instead of
-                                    // an arbitrary part if our text is too long)
-                                    cursorPosition = 0;
-                                } else {
-                                    textFieldValidity.selectAll();
-                                }
-                            }
-
-                            onTextChanged: {
-                                if (activeFocus &&  actionM ) {
-                                    actionM.validityDurationString = text;
-                                }
-                            }
-
-                            Binding {
-                                target : textFieldValidity
-                                property :  "text"
-                                value : if (actionM) {
-                                            actionM.validityDurationString
-                                        }
-                                        else {
-                                            "";
-                                        }
-                            }
-                        }
-
-                        Text {
-                            anchors {
-                                verticalCenter : parent.verticalCenter
-                            }
-
-                            visible : textFieldValidity.visible
-                            text : "seconds"
-
-                            color: IngeScapeTheme.whiteColor
-                            font {
-                                family: IngeScapeTheme.textFontFamily
-                                pixelSize: 15
-                            }
-                        }
-
-                    }
-                }
-
-                //
-                // Conditions List
-                //
-                ScrollView {
-                    id : scrollViewCondition
-
-                    anchors {
-                        top : validityDuration.bottom
-                        topMargin: 8
-                        right : parent.right
-                        left : parent.left
-                        bottom : conditionsItem.bottom
-                    }
-
-                    enabled: conditionsItem.isOpened
-
-                    style: IngeScapeScrollViewStyle {
-                    }
-
-                    // Prevent drag overshoot on Windows
-                    flickableItem.boundsBehavior: Flickable.OvershootBounds
-
-
-
-                    //
-                    // Conditions List
-                    //
-                    contentItem: Column {
-                        id : conditionsListColumn
-                        spacing : 6
-                        height : childrenRect.height
-                        width : scrollViewCondition.width - 9 // scrollbar size + 1
-
-                        Repeater {
-                            model : (actionM &&  conditionsItem.isOpened) ? actionM.conditionsList : 0
-
-                            Rectangle {
-                                height : 62
-                                anchors {
-                                    right : parent.right
-                                    left : parent.left
-                                }
-
-                                color : "transparent"
-                                radius: 5
-                                border {
-                                    width : 1
-                                    color : IngeScapeTheme.blackColor
-                                }
-
-                                // my condition
-                                property var myCondition: model.QtObject
-
-                                // Condition Type
-                                Row {
-                                    id : rowConditionsTypes
-                                    anchors {
-                                        right : parent.right
-                                        left : parent.left
-                                        leftMargin: 10
-                                        top : parent.top
-                                        topMargin: 6
-                                    }
-                                    height : 14
-                                    spacing : 15
-
-                                    ExclusiveGroup {
-                                        id : cdtTypesExclusifGroup
-                                    }
-
-                                    Repeater {
-                                        model : controller? controller.conditionsTypesList : 0
-
-                                        CheckBox {
-                                            id : conditionsTypeCB
-                                            anchors {
-                                                verticalCenter: parent.verticalCenter;
-                                            }
-
-                                            checked : myCondition && myCondition.conditionType === model.value;
-                                            exclusiveGroup: cdtTypesExclusifGroup
-                                            activeFocusOnPress: true;
-
-                                            style: CheckBoxStyle {
-                                                label: Text {
-                                                    anchors {
-                                                        verticalCenter: parent.verticalCenter
-                                                        verticalCenterOffset: 2
-                                                    }
-                                                    color: control.checked? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor
-
-                                                    text: model.name
-                                                    elide: Text.ElideRight
-
-                                                    font {
-                                                        family: IngeScapeTheme.textFontFamily
-                                                        pixelSize: 15
-                                                    }
-                                                }
-
-                                                indicator: Rectangle {
-                                                    implicitWidth: 14
-                                                    implicitHeight: 14
-                                                    radius : height / 2
-                                                    border.width: 0;
-                                                    color : IngeScapeTheme.darkBlueGreyColor
-
-                                                    Rectangle {
-                                                        anchors.centerIn: parent
-                                                        visible : control.checked
-                                                        width: 8
-                                                        height: 8
-                                                        radius : height / 2
-
-                                                        border.width: 0;
-                                                        color : IngeScapeTheme.whiteColor
-                                                    }
-                                                }
-
-                                            }
-
-                                            onCheckedChanged : {
-                                                if (myCondition && checked) {
-                                                    myCondition.conditionType = model.value
-                                                }
-                                            }
-
-
-                                            Binding {
-                                                target : conditionsTypeCB
-                                                property : "checked"
-                                                value : (myCondition && myCondition.conditionType === model.value)
-                                            }
-                                        }
-                                    }
-
-                                }
-
-                                //
-                                // Conditions Details
-                                //
-                                Row {
-                                    anchors {
-                                        right : parent.right
-                                        rightMargin: 10
-                                        left : rowConditionsTypes.left
-                                        bottom : parent.bottom
-                                        bottomMargin: 6
-                                    }
-                                    height : agentCombo.height
-                                    spacing : 6
-
-                                    // Agent
-                                    IngeScapeComboBox {
-                                        id : agentCombo
-
-                                        anchors {
-                                            verticalCenter : parent.verticalCenter
-                                        }
-
-                                        height : 25
-                                        width : 148
-
-                                        model : controller ? controller.agentsInMappingList : 0
-                                        enabled: (controller && controller.agentsInMappingList.count !== 0 )
-                                        placeholderText : (controller && controller.agentsInMappingList.count === 0 ? "- No Item -" : "- Select an item -")
-
-                                        function modelToString(model)
-                                        {
-                                            return model.name;
-                                        }
-
-
-                                        Binding {
-                                            target : agentCombo
-                                            property : "selectedItem"
-                                            value : if (myCondition && myCondition.modelM)
-                                                    {
-                                                        myCondition.modelM.agent;
-                                                    }
-                                                    else {
-                                                        null;
-                                                    }
-                                        }
-
-
-                                        onSelectedItemChanged:
-                                        {
-                                            if (myCondition && myCondition.modelM && agentCombo.selectedItem)
-                                            {
-                                                myCondition.modelM.agent = agentCombo.selectedItem;
-                                            }
-                                        }
-
-                                    }
-
-                                    // Agent Inputs/Outputs
-                                    IngeScapeComboBoxAgentsIOP {
-                                        id : ioCombo
-
-                                        visible : myCondition && myCondition.conditionType === ActionConditionType.VALUE
-                                        enabled : visible
-                                        anchors {
-                                            verticalCenter : parent.verticalCenter
-                                        }
-
-                                        height : 25
-                                        width : 148
-
-                                        model: (myCondition && myCondition.modelM && myCondition.modelM.agentIopList) ? myCondition.modelM.agentIopList : 0
-                                        inputsNumber: (myCondition && myCondition.modelM && myCondition.modelM.agent)? myCondition.modelM.agent.inputsList.count : 0;
-
-                                        Binding {
-                                            target : ioCombo
-                                            property : "selectedItem"
-                                            value : if (myCondition && myCondition.modelM)
-                                                    {
-                                                        myCondition.modelM.agentIOP;
-                                                    }
-                                                    else {
-                                                        null;
-                                                    }
-                                        }
-
-
-                                        onSelectedItemChanged:
-                                        {
-                                            if (myCondition && myCondition.modelM)
-                                            {
-                                                myCondition.modelM.agentIOP = ioCombo.selectedItem;
-                                            }
-                                        }
-
-                                    }
-
-                                    // Comparison Type
-                                    IngeScapeComboBox {
-                                        id : comparisonCombo
-                                        enabled : visible
-                                        anchors {
-                                            verticalCenter : parent.verticalCenter
-                                        }
-
-                                        height : 25
-                                        width : (myCondition && myCondition.conditionType === ActionConditionType.VALUE) ? 44 : 78
-
-                                        model :
-                                        {
-                                            if(controller)
-                                            {
-                                                (myCondition && myCondition.conditionType === ActionConditionType.VALUE) ? controller.comparisonsValuesTypesList : controller.comparisonsAgentsTypesList
-                                            }
-                                            else {
-                                                0
-                                            }
-
-                                        }
-
-                                        function modelToString(model)
-                                        {
-                                            return model.name;
-                                        }
-
-
-                                        Binding {
-                                            target : comparisonCombo
-                                            property : "selectedItem"
-                                            value : if (myCondition && myCondition.modelM && controller)
-                                                    {
-                                                        (myCondition && myCondition.conditionType === ActionConditionType.VALUE) ?
-                                                                    controller.comparisonsValuesTypesList.getItemWithValue(myCondition.modelM.comparison)
-                                                                  :  controller.comparisonsAgentsTypesList.getItemWithValue(myCondition.modelM.comparison);
-                                                    }
-                                                    else {
-                                                        null;
-                                                    }
-                                        }
-
-
-                                        onSelectedItemChanged:
-                                        {
-                                            if (myCondition && myCondition.modelM && comparisonCombo.selectedItem)
-                                            {
-                                                myCondition.modelM.comparison = comparisonCombo.selectedItem.value;
-                                            }
-                                        }
-
-                                    }
-
-                                    // Comparison Value
-                                    TextField {
-                                        id: textFieldComparisonValue
-
-                                        anchors {
-                                            verticalCenter : parent.verticalCenter
-                                        }
-
-                                        visible : myCondition && myCondition.conditionType === ActionConditionType.VALUE
-
-                                        enabled : visible
-                                        height: 25
-                                        width: 49
-
-                                        horizontalAlignment: TextInput.AlignLeft
-                                        verticalAlignment: TextInput.AlignVCenter
-
-                                        text : myCondition && myCondition.modelM ? myCondition.modelM.value : ""
-
-                                        style: I2TextFieldStyle {
-                                            backgroundColor: IngeScapeTheme.darkBlueGreyColor
-                                            borderColor: IngeScapeTheme.whiteColor;
-                                            borderErrorColor: IngeScapeTheme.redColor
-                                            radiusTextBox: 1
-                                            borderWidth: 0;
-                                            borderWidthActive: 1
-                                            textIdleColor: IngeScapeTheme.whiteColor;
-                                            textDisabledColor: IngeScapeTheme.darkGreyColor;
-
-                                            padding.left: 3
-                                            padding.right: 3
-
-                                            font {
-                                                pixelSize:15
-                                                family: IngeScapeTheme.textFontFamily
-                                            }
-
-                                        }
-
-                                        onActiveFocusChanged: {
-                                            if (!activeFocus) {
-                                                // Move cursor to our first character when we lose focus
-                                                // (to always display the beginning or our text instead of
-                                                // an arbitrary part if our text is too long)
-                                                cursorPosition = 0;
-                                            } else {
-                                                textFieldComparisonValue.selectAll();
-                                            }
-                                        }
-
-                                        onTextChanged: {
-                                            if (activeFocus && (myCondition && myCondition.modelM)) {
-                                                myCondition.modelM.value = text;
-                                            }
-                                        }
-
-                                        Binding {
-                                            target : textFieldComparisonValue
-                                            property :  "text"
-                                            value : if  (myCondition && myCondition.modelM) {
-                                                        myCondition.modelM.value
-                                                    }
-                                                    else {
-                                                        "";
-                                                    }
-                                        }
-                                    }
-
-                                }
-
-
-                                // Delete Condition
-                                Button {
-                                    id: btnDeleteCondition
-
-                                    height : 10
-                                    width : 10
-                                    anchors {
-                                        top: parent.top
-                                        right : parent.right
-                                        margins: 5
-                                    }
-
-                                    activeFocusOnPress: true
-                                    style: Theme.LabellessSvgButtonStyle {
-                                        fileCache: IngeScapeTheme.svgFileINGESCAPE
-
-                                        pressedID: releasedID + "-pressed"
-                                        releasedID: "closeEditor"
-                                        disabledID : releasedID
-                                    }
-
-                                    onClicked: {
-                                        if (panelController && myCondition)
-                                        {
-                                            panelController.removeCondition(myCondition);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        // add conditions
-                        Button {
-                            id: addCondition
-
-                            activeFocusOnPress: true
-
-                            anchors {
-                                left: parent.left
-                            }
-
-                            style: Theme.LabellessSvgButtonStyle {
-                                fileCache: IngeScapeTheme.svgFileINGESCAPE
-
-                                pressedID: releasedID + "-pressed"
-                                releasedID: "createButton"
-                                disabledID : releasedID
-                            }
-
-                            onClicked: {
-                                if (panelController)
-                                {
-                                    panelController.createNewCondition();
-                                }
-                            }
-                        }
-
-                    }
-                }
-
-            }
-
-
-            //
-            // Advanced modes
-            //
-            Item {
-                id : advModesItem
-                anchors {
-                    left : parent.left
-                    right : parent.right
-                    top : conditionsItem.bottom
-                    topMargin: 10
-                }
-
-                clip : true
-                height : isOpened?
-                             (titleadvModeMouseArea.height + revertActionitem.height + revertActionitem.anchors.topMargin + rearmActionitem.height + rearmActionitem.anchors.topMargin + 5)
-                           : 35
-
-                Behavior on height {
-                    NumberAnimation {}
-                }
-
-                property bool isOpened: false
-
-                Connections {
-                    target : rootItem
-                    Component.onCompleted : {
-                        // make the advanced modes visible if there are some modes checked
-                        if (actionM && (actionM.shallRevert || actionM.shallRearm)) {
-                            advModesItem.isOpened = true;
-                        }
-                    }
-                }
-
-                //Title
-                MouseArea {
-                    id : titleadvModeMouseArea
-                    anchors {
-                        left : parent.left
-                        right : parent.right
-                    }
-                    height : 29
-
-                    onClicked: {
-                        advModesItem.isOpened = !advModesItem.isOpened;
-                    }
-
-                    I2SvgItem {
-                        id : arrowadvModes
-                        anchors {
-                            left : parent.left
-                            verticalCenter: titleAdvMode.verticalCenter
-                        }
-
-                        svgFileCache : IngeScapeTheme.svgFileINGESCAPE;
-                        svgElementId: "arrowWhite"
-
-                        rotation: advModesItem.isOpened? 0 : 270
-                    }
-
-                    Text {
-                        id : titleAdvMode
-                        anchors {
-                            left : arrowadvModes.right
-                            leftMargin: 6
-                            right : parent.right
-                            verticalCenter: parent.verticalCenter
-                        }
-
-                        text : "Advanced options"
-
-                        color: titleadvModeMouseArea.containsPress? IngeScapeTheme.lightGreyColor : IngeScapeTheme.whiteColor
-                        font {
-                            family: IngeScapeTheme.textFontFamily
-                            pixelSize: 19
-                        }
-                    }
-                }
-
-                // separator
-                Rectangle {
-                    id : separatorAdvMode
-                    anchors {
-                        left : parent.left
-                        right : parent.right
-                        top : titleadvModeMouseArea.bottom
-                    }
-                    height : 1
-                    color : IngeScapeTheme.whiteColor
-                }
-
-                // Revert Action
-                Item {
-                    id : revertActionitem
-                    anchors {
-                        left: parent.left;
-                        right: parent.right;
-                        top : separatorAdvMode.bottom
-                        topMargin: 8
-                    }
-                    height : revertActionCB.checked ? revertActionTime.height : revertActionCB.height
-                    visible : advModesItem.isOpened
-                    enabled : visible
-
-                    Behavior on height {
-                        NumberAnimation {}
-                    }
-
-                    CheckBox {
-                        id : revertActionCB
-                        anchors {
-                            left: parent.left;
-                            top : parent.top
-                        }
-
-                        checked : actionM && actionM.shallRevert;
-                        activeFocusOnPress: true;
-
-                        style: CheckBoxStyle {
-                            label:  Text {
-                                anchors {
-                                    verticalCenter: parent.verticalCenter
-                                    verticalCenterOffset: 2
-                                }
-
-                                color: control.checked? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor
-
-                                text: "Revert action"
-                                elide: Text.ElideRight
-
-                                font {
-                                    family: IngeScapeTheme.textFontFamily
-                                    pixelSize: 16
-                                }
-
-                            }
-
-                            indicator: Rectangle {
-                                implicitWidth: 14
-                                implicitHeight: 14
-                                border.width: 0;
-                                color : IngeScapeTheme.darkBlueGreyColor
-
-                                I2SvgItem {
-                                    visible : control.checked
-                                    anchors.centerIn: parent
-
-                                    svgFileCache : IngeScapeTheme.svgFileINGESCAPE;
-                                    svgElementId:  "check";
-
-                                }
-                            }
-
-                        }
-
-                        onCheckedChanged : {
-                            if (actionM) {
-                                actionM.shallRevert = checked
-                            }
-                        }
-
-
-                        Binding {
-                            target : revertActionCB
-                            property : "checked"
-                            value : (actionM && actionM.shallRevert)
-                        }
-                    }
-
-                    Column {
-                        id : revertActionTime
-
-                        anchors {
-                            left : revertActionCB.right
-                            leftMargin: 14
-                            right : parent.right
-                            top: revertActionCB.top
-                        }
-
-                        height : childrenRect.height
-                        spacing: 6
-
-                        enabled: revertActionCB.checked
-                        visible : enabled
-
-                        ExclusiveGroup {
-                            id : revertActionOpt
-                        }
-
-                        CheckBox {
-                            id : revertActionTimeCB
-                            anchors {
-                                left: parent.left;
-                            }
-                            checked : actionM && actionM.shallRevertWhenValidityIsOver;
-                            exclusiveGroup: revertActionOpt
-                            activeFocusOnPress: true;
-
-                            style: CheckBoxStyle {
-                                label: Text {
-                                    anchors {
-                                        verticalCenter: parent.verticalCenter
-                                        verticalCenterOffset: 2
-                                    }
-                                    color: control.enabled ? (control.checked? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor) : "#3C3C3B"
-
-                                    text: "when conditions check terminates"
-                                    elide: Text.ElideRight
-
-                                    font {
-                                        family: IngeScapeTheme.textFontFamily
-                                        pixelSize: 16
-                                    }
-                                }
-
-                                indicator: Rectangle {
-                                    implicitWidth: 14
-                                    implicitHeight: 14
-                                    radius : height / 2
-                                    border.width: 0;
-                                    color : control.enabled ?  IngeScapeTheme.darkBlueGreyColor : "#3C3C3B"
-
-                                    Rectangle {
-                                        anchors.centerIn: parent
-                                        visible : control.checked
-                                        width: 8
-                                        height: 8
-                                        radius : height / 2
-
-                                        border.width: 0;
-                                        color : IngeScapeTheme.whiteColor
-                                    }
-                                }
-
-                            }
-
-                            onCheckedChanged : {
-                                if (actionM) {
-                                    actionM.shallRevertWhenValidityIsOver = checked
-                                }
-                            }
-
-
-                            Binding {
-                                target : revertActionTimeCB
-                                property : "checked"
-                                value : (actionM && actionM.shallRevertWhenValidityIsOver)
-                            }
-                        }
-
-                        Row {
-                            anchors {
-                                left: parent.left;
-                                right :parent.right
-                            }
-                            height : 25
-
-                            CheckBox {
-                                id : revertActionAfterCB
-                                anchors {
-                                    verticalCenter: parent.verticalCenter
-                                }
-
-                                checked : actionM && actionM.shallRevertAfterTime;
-                                exclusiveGroup: revertActionOpt
-                                activeFocusOnPress: true;
-
-                                style: CheckBoxStyle {
-                                    label: Text {
-                                        anchors {
-                                            verticalCenter: parent.verticalCenter
-                                            verticalCenterOffset: 2
-                                        }
-                                        color: control.enabled ? (control.checked? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor) : "#3C3C3B"
-
-                                        text: "after " // space allowing to keep selection possible for the whole row
-
-                                        elide: Text.ElideRight
-
-                                        font {
-                                            family: IngeScapeTheme.textFontFamily
-                                            pixelSize: 16
-                                        }
-                                    }
-
-                                    indicator: Rectangle {
-                                        implicitWidth: 14
-                                        implicitHeight: 14
-                                        radius : height / 2
-                                        border.width: 0;
-                                        color : control.enabled ?  IngeScapeTheme.darkBlueGreyColor : "#3C3C3B"
-
-                                        Rectangle {
-                                            anchors.centerIn: parent
-                                            visible : control.checked
-                                            width: 8
-                                            height: 8
-                                            radius : height / 2
-
-                                            border.width: 0;
-                                            color : IngeScapeTheme.whiteColor
-                                        }
-                                    }
-
-                                }
-
-                                onCheckedChanged : {
-                                    if (actionM) {
-                                        actionM.shallRevertAfterTime = checked
-                                    }
-                                }
-
-                                Binding {
-                                    target : revertActionAfterCB
-                                    property : "checked"
-                                    value : (actionM && actionM.shallRevertAfterTime)
-                                }
-                            }
-
-
-                            TextField {
-                                id: textFieldDuration
-
-                                anchors {
-                                    verticalCenter: parent.verticalCenter
-                                    verticalCenterOffset: 2
-                                }
-
-                                height: 25
-                                width: 57
-                                enabled: revertActionAfterCB.enabled
-                                horizontalAlignment: TextInput.AlignLeft
-                                verticalAlignment: TextInput.AlignVCenter
-
-                                text : actionM ? actionM.revertAfterTimeString : "0.0"
-                                inputMethodHints: Qt.ImhFormattedNumbersOnly
-                                validator: RegExpValidator { regExp: /(\d{1,5})([.]\d{3})?$/ }
-
-                                style: I2TextFieldStyle {
-                                    backgroundColor: IngeScapeTheme.darkBlueGreyColor
-                                    backgroundDisabledColor: "#3C3C3B"
-                                    borderColor: IngeScapeTheme.whiteColor;
-                                    borderErrorColor: IngeScapeTheme.redColor
-                                    radiusTextBox: 1
-                                    borderWidth: 0;
-                                    borderWidthActive: 1
-                                    textIdleColor: IngeScapeTheme.whiteColor;
-                                    textDisabledColor: IngeScapeTheme.darkGreyColor;
-
-                                    padding.left: 3
-                                    padding.right: 3
-
-                                    font {
-                                        pixelSize:14
-                                        family: IngeScapeTheme.textFontFamily
-                                    }
-
-                                }
-
-                                onActiveFocusChanged: {
-                                    if (!activeFocus) {
-                                        // Move cursor to our first character when we lose focus
-                                        // (to always display the beginning or our text instead of
-                                        // an arbitrary part if our text is too long)
-                                        cursorPosition = 0;
-                                    } else {
-                                        textFieldDuration.selectAll();
-                                    }
-                                }
-
-                                onTextChanged: {
-                                    if (activeFocus &&  actionM ) {
-                                        actionM.revertAfterTimeString = text;
-                                    }
-                                }
-
-                                Binding {
-                                    target : textFieldDuration
-                                    property :  "text"
-                                    value : if (actionM) {
-                                                actionM.revertAfterTimeString
-                                            }
-                                            else {
-                                                "";
-                                            }
-                                }
-
-                                onFocusChanged: {
-                                    if (focus) {
-                                        revertActionAfterCB.checked = true;
-                                    }
-                                }
-                            }
-
-
-                            Text {
-                                anchors {
-                                    verticalCenter: parent.verticalCenter
-                                    verticalCenterOffset: 2
-                                }
-                                color: revertActionAfterCB.enabled ? (revertActionAfterCB.checked? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor) : "#3C3C3B"
-
-                                text: " seconds"
-                                elide: Text.ElideRight
-
-                                font {
-                                    family: IngeScapeTheme.textFontFamily
-                                    pixelSize: 16
-                                }
-
-                                MouseArea {
-                                    anchors.fill: parent
-
-                                    onPressed: {
-                                        revertActionAfterCB.checked = true;
-                                    }
-                                }
-                            }
-
-                        }
-
-                    }
-                }
-
-                // Rearm Action
-                Item {
-                    id : rearmActionitem
-                    anchors {
-                        left: parent.left;
-                        right: parent.right;
-                        top : revertActionitem.bottom
-                        topMargin: 17
-                    }
-                    height : 50
-                    visible : advModesItem.isOpened
-                    enabled : visible
-
-                    Column {
-                        anchors {
-                            left: parent.left;
-                            right: parent.right;
-                            top : parent.top
-                        }
-
-
-                        CheckBox {
-                            id : rearmActionCB
-                            anchors {
-                                left: parent.left;
-                            }
-
-                            checked : actionM && actionM.shallRearm;
-                            activeFocusOnPress: true;
-                            height: 25
-
-                            style: CheckBoxStyle {
-                                label: Text {
-                                    anchors {
-                                        verticalCenter: parent.verticalCenter
-                                        verticalCenterOffset: 2
-                                    }
-                                    color: control.checked? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor
-
-                                    text: "Allow multiple triggers as long as conditions are verified"
-                                    elide: Text.ElideRight
-
-                                    font {
-                                        family: IngeScapeTheme.textFontFamily
-                                        pixelSize: 16
-                                    }
-                                }
-
-                                indicator: Rectangle {
-                                    implicitWidth: 14
-                                    implicitHeight: 14
-                                    border.width: 0;
-                                    color : IngeScapeTheme.darkBlueGreyColor
-
-                                    I2SvgItem {
-                                        visible : control.checked
-                                        anchors.centerIn: parent
-
-                                        svgFileCache : IngeScapeTheme.svgFileINGESCAPE;
-                                        svgElementId:  "check";
-
-                                    }
-                                }
-
-                            }
-
-                            onCheckedChanged : {
-                                if (actionM) {
-                                    actionM.shallRearm = checked
-                                }
-                            }
-
-
-                            Binding {
-                                target : rearmActionCB
-                                property : "checked"
-                                value : (actionM && actionM.shallRearm)
-                            }
-                        }
-
-                        Row {
-
-                            anchors {
-                                left: parent.left;
-                                leftMargin: 18
-                            }
-
-                            height: 25
-
-                            Text {
-                                anchors {
-                                    verticalCenter: parent.verticalCenter
-                                    verticalCenterOffset: 2
-
-                                }
-
-                                color: rearmActionCB.enabled ? (rearmActionCB.checked? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor) : "#3C3C3B"
-
-                                text: "with trigger every "
-                                elide: Text.ElideRight
-
-                                font {
-                                    family: IngeScapeTheme.textFontFamily
-                                    pixelSize: 16
-                                }
-
-                                MouseArea {
-                                    anchors.fill: parent
-
-                                    onPressed: {
-                                        rearmActionCB.checked = true;
-                                    }
-                                }
-                            }
-
-                            TextField {
-                                id: textFieldTimeBeforeRearm
-
-                                anchors {
-                                    verticalCenter: parent.verticalCenter
-                                    verticalCenterOffset: 2
-                                }
-
-                                height: 25
-                                width: 57
-                                enabled: rearmActionCB.enabled
-                                horizontalAlignment: TextInput.AlignLeft
-                                verticalAlignment: TextInput.AlignVCenter
-
-                                text : actionM ? actionM.rearmAfterTimeString : "0.0"
-                                inputMethodHints: Qt.ImhFormattedNumbersOnly
-                                validator: RegExpValidator { regExp: /(\d{1,5})([.]\d{3})?$/ }
-
-                                style: I2TextFieldStyle {
-                                    backgroundColor: IngeScapeTheme.darkBlueGreyColor
-                                    backgroundDisabledColor: "#3C3C3B"
-                                    borderColor: IngeScapeTheme.whiteColor;
-                                    borderErrorColor: IngeScapeTheme.redColor
-                                    radiusTextBox: 1
-                                    borderWidth: 0;
-                                    borderWidthActive: 1
-                                    textIdleColor: IngeScapeTheme.whiteColor;
-                                    textDisabledColor: IngeScapeTheme.darkGreyColor;
-
-                                    padding.left: 3
-                                    padding.right: 3
-
-                                    font {
-                                        pixelSize:14
-                                        family: IngeScapeTheme.textFontFamily
-                                    }
-
-                                }
-
-                                onActiveFocusChanged: {
-                                    if (!activeFocus) {
-                                        // Move cursor to our first character when we lose focus
-                                        // (to always display the beginning or our text instead of
-                                        // an arbitrary part if our text is too long)
-                                        cursorPosition = 0;
-                                    } else {
-                                        textFieldTimeBeforeRearm.selectAll();
-                                    }
-                                }
-
-                                onTextChanged: {
-                                    if (activeFocus &&  actionM ) {
-                                        actionM.rearmAfterTimeString = text;
-                                    }
-                                }
-
-                                Binding {
-                                    target : textFieldTimeBeforeRearm
-                                    property :  "text"
-                                    value : if (actionM) {
-                                                actionM.rearmAfterTimeString
-                                            }
-                                            else {
-                                                "";
-                                            }
-                                }
-
-                                onFocusChanged: {
-                                    if (focus) {
-                                        rearmActionCB.checked = true;
-                                    }
-                                }
-                            }
-
-
-                            Text {
-                                anchors {
-                                    verticalCenter: parent.verticalCenter
-                                    verticalCenterOffset: 2
-                                }
-
-                                color: rearmActionCB.enabled ? (rearmActionCB.checked? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor) : "#3C3C3B"
-
-                                text: " seconds"
-                                elide: Text.ElideRight
-
-                                font {
-                                    family: IngeScapeTheme.textFontFamily
-                                    pixelSize: 16
-                                }
-
-                                MouseArea {
-                                    anchors.fill: parent
-
-                                    onPressed: {
-                                        rearmActionCB.checked = true;
-                                    }
-                                }
-                            }
-
-                        }
-
-
-
-                    }
-
-                }
-            }
-
-
-            //
             // Effects
             //
             Item {
@@ -1697,17 +379,22 @@ Window {
                 anchors {
                     left : parent.left
                     right : parent.right
-                    top : advModesItem.bottom
-                    topMargin: 20
-                    bottom : cancelButton.top
-                    bottomMargin: 10
+                    top : (startTimeItem.visible) ? startTimeItem.bottom : nameItem.bottom
+                    topMargin: 15
                 }
+                height: Math.min(titleEffects.height + 6 + scrollView.anchors.topMargin + scrollView.contentItem.height,
+                                 mainItem.height - (titleTxt.height + nameItem.height + nameItem.anchors.topMargin + heightStartTime + effectsListItem.anchors.topMargin + conditionsItem.height + conditionsItem.anchors.topMargin + advancedModesItem.height + advancedModesItem.anchors.topMargin + 10 + okButton.height))
 
-                Behavior on anchors.top {
+                Behavior on height {
                     NumberAnimation {}
                 }
 
-                //Title
+//                Rectangle {
+//                    color: "red"
+//                    anchors.fill: parent
+//                }
+
+                // Title
                 Text {
                     id : titleEffects
                     anchors {
@@ -2448,11 +1135,6 @@ Window {
                                 }
 
 
-                                //
-                                //
-                                //
-
-
                                 // Delete Effect
                                 Button {
                                     id: btnDeleteEffect
@@ -2511,8 +1193,1340 @@ Window {
                                 }
                             }
                         }
+                    }
+                }
+            }
 
 
+            //
+            // Conditions
+            //
+            Item {
+                id : conditionsItem
+                anchors {
+                    left : parent.left
+                    right : parent.right
+                    top : effectsListItem.bottom
+                    topMargin: 15
+                }
+                height: isOpened ? Math.min(230, titleConditionsMouseArea.height + 1 + validityDuration.height + validityDuration.anchors.topMargin + scrollViewConditions.contentItem.height + scrollViewConditions.anchors.topMargin)
+                                 : titleConditionsMouseArea.height + 1
+                clip: true
+
+                Behavior on anchors.top {
+                    NumberAnimation {}
+                }
+                Behavior on height {
+                    NumberAnimation {}
+                }
+
+                property bool isOpened : false
+
+                Connections {
+                    target : rootItem
+
+                    onActiveChanged : {
+                        // make the conditions list visible if there are conditions
+                        if (rootItem.active && actionM && actionM.conditionsList.count > 0) {
+                            conditionsItem.isOpened = true;
+                        }
+                    }
+                }
+
+//                Rectangle {
+//                    color: "red"
+//                    anchors.fill: parent
+//                }
+
+                // Title
+                MouseArea {
+                    id : titleConditionsMouseArea
+                    anchors {
+                        left : parent.left
+                        right : parent.right
+                    }
+                    height : 29
+
+                    onClicked: {
+                        conditionsItem.isOpened = !conditionsItem.isOpened;
+                    }
+
+                    I2SvgItem {
+                        id : arrow
+                        anchors {
+                            left : parent.left
+                            verticalCenter: titleCdt.verticalCenter
+                        }
+
+                        svgFileCache : IngeScapeTheme.svgFileINGESCAPE;
+                        svgElementId: "arrowWhite"
+
+                        rotation: conditionsItem.isOpened? 0 : 270
+                    }
+
+                    Text {
+                        id : titleCdt
+                        anchors {
+                            left : arrow.right
+                            leftMargin: 6
+                            right : parent.right
+                            verticalCenter: parent.verticalCenter
+                        }
+
+                        text: qsTr("Conditions for this action")
+
+                        color: titleConditionsMouseArea.containsPress ? IngeScapeTheme.lightGreyColor : IngeScapeTheme.whiteColor
+                        font {
+                            family: IngeScapeTheme.textFontFamily
+                            pixelSize: 19
+                        }
+                    }
+
+                }
+
+                // separator
+                Rectangle {
+                    id : separatorCdt
+                    anchors {
+                        left : parent.left
+                        right : parent.right
+                        top : titleConditionsMouseArea.bottom
+                    }
+                    height : 1
+                    color : IngeScapeTheme.whiteColor
+                }
+
+                /// Validity duration
+                Item {
+                    id : validityDuration
+                    anchors {
+                        left : parent.left
+                        right : parent.right
+                        top : separatorCdt.bottom
+                        topMargin: 8
+                    }
+
+                    height: validityDurationCombo.height
+
+                    visible : conditionsItem.isOpened
+                    enabled : visible
+
+                    Text {
+                        id : textValidity
+                        anchors {
+                            left : parent.left
+                            verticalCenter : parent.verticalCenter
+                        }
+
+                        text : "Conditions shall be checked"
+
+                        color: IngeScapeTheme.whiteColor
+                        font {
+                            family: IngeScapeTheme.textFontFamily
+                            pixelSize: 16
+                        }
+                    }
+
+                    Row {
+                        anchors {
+                            verticalCenter : parent.verticalCenter
+                            left : textValidity.right
+                            leftMargin: 10
+                        }
+                        spacing : 6
+
+                        IngeScapeComboBox {
+                            id : validityDurationCombo
+
+                            anchors {
+                                verticalCenter : parent.verticalCenter
+                            }
+
+                            height : 25
+                            width : 115
+
+                            model : controller ? controller.validationDurationsTypesList : 0
+                            function modelToString(model)
+                            {
+                                return model.name;
+                            }
+
+
+                            Binding {
+                                target : validityDurationCombo
+                                property : "selectedItem"
+                                value : if (actionM && controller)
+                                        {
+                                            controller.validationDurationsTypesList.getItemWithValue(actionM.validityDurationType);
+                                        }
+                                        else {
+                                            null;
+                                        }
+                            }
+
+
+                            onSelectedItemChanged:
+                            {
+                                if (actionM)
+                                {
+                                    actionM.validityDurationType = validityDurationCombo.selectedItem.value;
+                                }
+                            }
+
+                        }
+
+                        TextField {
+                            id: textFieldValidity
+
+                            anchors {
+                                verticalCenter : parent.verticalCenter
+                            }
+
+                            visible :  actionM && actionM.validityDurationType === ValidationDurationType.CUSTOM
+                            enabled: visible
+                            height: 25
+                            width: 57
+                            horizontalAlignment: TextInput.AlignLeft
+                            verticalAlignment: TextInput.AlignVCenter
+
+                            text : actionM ? actionM.validityDurationString : "0.0"
+                            inputMethodHints: Qt.ImhFormattedNumbersOnly
+                            validator: RegExpValidator { regExp: /(\d{1,5})([.]\d{3})?$/ }
+
+                            style: I2TextFieldStyle {
+                                backgroundColor: IngeScapeTheme.darkBlueGreyColor
+                                borderColor: IngeScapeTheme.whiteColor;
+                                borderErrorColor: IngeScapeTheme.redColor
+                                radiusTextBox: 1
+                                borderWidth: 0;
+                                borderWidthActive: 1
+                                textIdleColor: IngeScapeTheme.whiteColor;
+                                textDisabledColor: IngeScapeTheme.darkGreyColor;
+
+                                padding.left: 3
+                                padding.right: 3
+
+                                font {
+                                    pixelSize:15
+                                    family: IngeScapeTheme.textFontFamily
+                                }
+
+                            }
+
+                            onActiveFocusChanged: {
+                                if (!activeFocus) {
+                                    // Move cursor to our first character when we lose focus
+                                    // (to always display the beginning or our text instead of
+                                    // an arbitrary part if our text is too long)
+                                    cursorPosition = 0;
+                                } else {
+                                    textFieldValidity.selectAll();
+                                }
+                            }
+
+                            onTextChanged: {
+                                if (activeFocus &&  actionM ) {
+                                    actionM.validityDurationString = text;
+                                }
+                            }
+
+                            Binding {
+                                target : textFieldValidity
+                                property :  "text"
+                                value : if (actionM) {
+                                            actionM.validityDurationString
+                                        }
+                                        else {
+                                            "";
+                                        }
+                            }
+                        }
+
+                        Text {
+                            anchors {
+                                verticalCenter : parent.verticalCenter
+                            }
+
+                            visible : textFieldValidity.visible
+                            text : "seconds"
+
+                            color: IngeScapeTheme.whiteColor
+                            font {
+                                family: IngeScapeTheme.textFontFamily
+                                pixelSize: 15
+                            }
+                        }
+
+                    }
+                }
+
+                //
+                // Conditions List
+                //
+                ScrollView {
+                    id : scrollViewConditions
+
+                    anchors {
+                        top : validityDuration.bottom
+                        topMargin: 8
+                        right : parent.right
+                        left : parent.left
+                        bottom : conditionsItem.bottom
+                    }
+
+                    enabled: conditionsItem.isOpened
+
+                    style: IngeScapeScrollViewStyle {
+                    }
+
+                    // Prevent drag overshoot on Windows
+                    flickableItem.boundsBehavior: Flickable.OvershootBounds
+
+
+
+                    //
+                    // Conditions List
+                    //
+                    contentItem: Column {
+                        id : conditionsListColumn
+                        spacing : 6
+                        height : childrenRect.height
+                        width : scrollViewConditions.width - 9 // scrollbar size + 1
+
+                        Repeater {
+                            model : (actionM &&  conditionsItem.isOpened) ? actionM.conditionsList : 0
+
+                            Rectangle {
+                                height : 62
+                                anchors {
+                                    right : parent.right
+                                    left : parent.left
+                                }
+
+                                color : "transparent"
+                                radius: 5
+                                border {
+                                    width : 1
+                                    color : IngeScapeTheme.blackColor
+                                }
+
+                                // my condition
+                                property var myCondition: model.QtObject
+
+                                // Condition Type
+                                Row {
+                                    id : rowConditionsTypes
+                                    anchors {
+                                        right : parent.right
+                                        left : parent.left
+                                        leftMargin: 10
+                                        top : parent.top
+                                        topMargin: 6
+                                    }
+                                    height : 14
+                                    spacing : 15
+
+                                    ExclusiveGroup {
+                                        id : cdtTypesExclusifGroup
+                                    }
+
+                                    Repeater {
+                                        model : controller? controller.conditionsTypesList : 0
+
+                                        CheckBox {
+                                            id : conditionsTypeCB
+                                            anchors {
+                                                verticalCenter: parent.verticalCenter;
+                                            }
+
+                                            checked : myCondition && myCondition.conditionType === model.value;
+                                            exclusiveGroup: cdtTypesExclusifGroup
+                                            activeFocusOnPress: true;
+
+                                            style: CheckBoxStyle {
+                                                label: Text {
+                                                    anchors {
+                                                        verticalCenter: parent.verticalCenter
+                                                        verticalCenterOffset: 2
+                                                    }
+                                                    color: control.checked? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor
+
+                                                    text: model.name
+                                                    elide: Text.ElideRight
+
+                                                    font {
+                                                        family: IngeScapeTheme.textFontFamily
+                                                        pixelSize: 15
+                                                    }
+                                                }
+
+                                                indicator: Rectangle {
+                                                    implicitWidth: 14
+                                                    implicitHeight: 14
+                                                    radius : height / 2
+                                                    border.width: 0;
+                                                    color : IngeScapeTheme.darkBlueGreyColor
+
+                                                    Rectangle {
+                                                        anchors.centerIn: parent
+                                                        visible : control.checked
+                                                        width: 8
+                                                        height: 8
+                                                        radius : height / 2
+
+                                                        border.width: 0;
+                                                        color : IngeScapeTheme.whiteColor
+                                                    }
+                                                }
+
+                                            }
+
+                                            onCheckedChanged : {
+                                                if (myCondition && checked) {
+                                                    myCondition.conditionType = model.value
+                                                }
+                                            }
+
+
+                                            Binding {
+                                                target : conditionsTypeCB
+                                                property : "checked"
+                                                value : (myCondition && myCondition.conditionType === model.value)
+                                            }
+                                        }
+                                    }
+
+                                }
+
+                                //
+                                // Conditions Details
+                                //
+                                Row {
+                                    anchors {
+                                        right : parent.right
+                                        rightMargin: 10
+                                        left : rowConditionsTypes.left
+                                        bottom : parent.bottom
+                                        bottomMargin: 6
+                                    }
+                                    height : agentCombo.height
+                                    spacing : 6
+
+                                    // Agent
+                                    IngeScapeComboBox {
+                                        id : agentCombo
+
+                                        anchors {
+                                            verticalCenter : parent.verticalCenter
+                                        }
+
+                                        height : 25
+                                        width : 148
+
+                                        model : controller ? controller.agentsInMappingList : 0
+                                        enabled: (controller && controller.agentsInMappingList.count !== 0 )
+                                        placeholderText : (controller && controller.agentsInMappingList.count === 0 ? "- No Item -" : "- Select an item -")
+
+                                        function modelToString(model)
+                                        {
+                                            return model.name;
+                                        }
+
+
+                                        Binding {
+                                            target : agentCombo
+                                            property : "selectedItem"
+                                            value : if (myCondition && myCondition.modelM)
+                                                    {
+                                                        myCondition.modelM.agent;
+                                                    }
+                                                    else {
+                                                        null;
+                                                    }
+                                        }
+
+
+                                        onSelectedItemChanged:
+                                        {
+                                            if (myCondition && myCondition.modelM && agentCombo.selectedItem)
+                                            {
+                                                myCondition.modelM.agent = agentCombo.selectedItem;
+                                            }
+                                        }
+
+                                    }
+
+                                    // Agent Inputs/Outputs
+                                    IngeScapeComboBoxAgentsIOP {
+                                        id : ioCombo
+
+                                        visible : myCondition && myCondition.conditionType === ActionConditionType.VALUE
+                                        enabled : visible
+                                        anchors {
+                                            verticalCenter : parent.verticalCenter
+                                        }
+
+                                        height : 25
+                                        width : 148
+
+                                        model: (myCondition && myCondition.modelM && myCondition.modelM.agentIopList) ? myCondition.modelM.agentIopList : 0
+                                        inputsNumber: (myCondition && myCondition.modelM && myCondition.modelM.agent)? myCondition.modelM.agent.inputsList.count : 0;
+
+                                        Binding {
+                                            target : ioCombo
+                                            property : "selectedItem"
+                                            value : if (myCondition && myCondition.modelM)
+                                                    {
+                                                        myCondition.modelM.agentIOP;
+                                                    }
+                                                    else {
+                                                        null;
+                                                    }
+                                        }
+
+
+                                        onSelectedItemChanged:
+                                        {
+                                            if (myCondition && myCondition.modelM)
+                                            {
+                                                myCondition.modelM.agentIOP = ioCombo.selectedItem;
+                                            }
+                                        }
+
+                                    }
+
+                                    // Comparison Type
+                                    IngeScapeComboBox {
+                                        id : comparisonCombo
+                                        enabled : visible
+                                        anchors {
+                                            verticalCenter : parent.verticalCenter
+                                        }
+
+                                        height : 25
+                                        width : (myCondition && myCondition.conditionType === ActionConditionType.VALUE) ? 44 : 78
+
+                                        model :
+                                        {
+                                            if(controller)
+                                            {
+                                                (myCondition && myCondition.conditionType === ActionConditionType.VALUE) ? controller.comparisonsValuesTypesList : controller.comparisonsAgentsTypesList
+                                            }
+                                            else {
+                                                0
+                                            }
+
+                                        }
+
+                                        function modelToString(model)
+                                        {
+                                            return model.name;
+                                        }
+
+
+                                        Binding {
+                                            target : comparisonCombo
+                                            property : "selectedItem"
+                                            value : if (myCondition && myCondition.modelM && controller)
+                                                    {
+                                                        (myCondition && myCondition.conditionType === ActionConditionType.VALUE) ?
+                                                                    controller.comparisonsValuesTypesList.getItemWithValue(myCondition.modelM.comparison)
+                                                                  :  controller.comparisonsAgentsTypesList.getItemWithValue(myCondition.modelM.comparison);
+                                                    }
+                                                    else {
+                                                        null;
+                                                    }
+                                        }
+
+
+                                        onSelectedItemChanged:
+                                        {
+                                            if (myCondition && myCondition.modelM && comparisonCombo.selectedItem)
+                                            {
+                                                myCondition.modelM.comparison = comparisonCombo.selectedItem.value;
+                                            }
+                                        }
+
+                                    }
+
+                                    // Comparison Value
+                                    TextField {
+                                        id: textFieldComparisonValue
+
+                                        anchors {
+                                            verticalCenter : parent.verticalCenter
+                                        }
+
+                                        visible : myCondition && myCondition.conditionType === ActionConditionType.VALUE
+
+                                        enabled : visible
+                                        height: 25
+                                        width: 49
+
+                                        horizontalAlignment: TextInput.AlignLeft
+                                        verticalAlignment: TextInput.AlignVCenter
+
+                                        text : myCondition && myCondition.modelM ? myCondition.modelM.value : ""
+
+                                        style: I2TextFieldStyle {
+                                            backgroundColor: IngeScapeTheme.darkBlueGreyColor
+                                            borderColor: IngeScapeTheme.whiteColor;
+                                            borderErrorColor: IngeScapeTheme.redColor
+                                            radiusTextBox: 1
+                                            borderWidth: 0;
+                                            borderWidthActive: 1
+                                            textIdleColor: IngeScapeTheme.whiteColor;
+                                            textDisabledColor: IngeScapeTheme.darkGreyColor;
+
+                                            padding.left: 3
+                                            padding.right: 3
+
+                                            font {
+                                                pixelSize:15
+                                                family: IngeScapeTheme.textFontFamily
+                                            }
+
+                                        }
+
+                                        onActiveFocusChanged: {
+                                            if (!activeFocus) {
+                                                // Move cursor to our first character when we lose focus
+                                                // (to always display the beginning or our text instead of
+                                                // an arbitrary part if our text is too long)
+                                                cursorPosition = 0;
+                                            } else {
+                                                textFieldComparisonValue.selectAll();
+                                            }
+                                        }
+
+                                        onTextChanged: {
+                                            if (activeFocus && (myCondition && myCondition.modelM)) {
+                                                myCondition.modelM.value = text;
+                                            }
+                                        }
+
+                                        Binding {
+                                            target : textFieldComparisonValue
+                                            property :  "text"
+                                            value : if  (myCondition && myCondition.modelM) {
+                                                        myCondition.modelM.value
+                                                    }
+                                                    else {
+                                                        "";
+                                                    }
+                                        }
+                                    }
+
+                                }
+
+
+                                // Delete Condition
+                                Button {
+                                    id: btnDeleteCondition
+
+                                    height : 10
+                                    width : 10
+                                    anchors {
+                                        top: parent.top
+                                        right : parent.right
+                                        margins: 5
+                                    }
+
+                                    activeFocusOnPress: true
+                                    style: Theme.LabellessSvgButtonStyle {
+                                        fileCache: IngeScapeTheme.svgFileINGESCAPE
+
+                                        pressedID: releasedID + "-pressed"
+                                        releasedID: "closeEditor"
+                                        disabledID : releasedID
+                                    }
+
+                                    onClicked: {
+                                        if (panelController && myCondition)
+                                        {
+                                            panelController.removeCondition(myCondition);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        // add conditions
+                        Button {
+                            id: addCondition
+
+                            activeFocusOnPress: true
+
+                            anchors {
+                                left: parent.left
+                            }
+
+                            style: Theme.LabellessSvgButtonStyle {
+                                fileCache: IngeScapeTheme.svgFileINGESCAPE
+
+                                pressedID: releasedID + "-pressed"
+                                releasedID: "createButton"
+                                disabledID : releasedID
+                            }
+
+                            onClicked: {
+                                if (panelController)
+                                {
+                                    panelController.createNewCondition();
+                                }
+                            }
+                        }
+
+                    }
+                }
+
+            }
+
+
+            //
+            // Advanced modes
+            //
+            Item {
+                id : advancedModesItem
+                anchors {
+                    left : parent.left
+                    right : parent.right
+                    top : conditionsItem.bottom
+                    topMargin: 15
+                }
+                clip : true
+                height: isOpened ? (titleadvModeMouseArea.height + 1 + revertActionitem.height + revertActionitem.anchors.topMargin + rearmActionitem.height + rearmActionitem.anchors.topMargin)
+                                 : titleadvModeMouseArea.height + 1
+
+//                Rectangle {
+//                    color: "red"
+//                    anchors.fill: parent
+//                }
+
+                Behavior on anchors.top {
+                    NumberAnimation {}
+                }
+                Behavior on height {
+                    NumberAnimation {}
+                }
+
+                property bool isOpened: false
+
+                Connections {
+                    target : rootItem
+                    Component.onCompleted : {
+                        // make the advanced modes visible if there are some modes checked
+                        if (actionM && (actionM.shallRevert || actionM.shallRearm)) {
+                            advancedModesItem.isOpened = true;
+                        }
+                    }
+                }
+
+                //Title
+                MouseArea {
+                    id : titleadvModeMouseArea
+                    anchors {
+                        left : parent.left
+                        right : parent.right
+                    }
+                    height : 29
+
+                    onClicked: {
+                        advancedModesItem.isOpened = !advancedModesItem.isOpened;
+                    }
+
+                    I2SvgItem {
+                        id : arrowadvModes
+                        anchors {
+                            left : parent.left
+                            verticalCenter: titleAdvMode.verticalCenter
+                        }
+
+                        svgFileCache : IngeScapeTheme.svgFileINGESCAPE;
+                        svgElementId: "arrowWhite"
+
+                        rotation: advancedModesItem.isOpened? 0 : 270
+                    }
+
+                    Text {
+                        id : titleAdvMode
+                        anchors {
+                            left : arrowadvModes.right
+                            leftMargin: 6
+                            right : parent.right
+                            verticalCenter: parent.verticalCenter
+                        }
+
+                        text : "Advanced options"
+
+                        color: titleadvModeMouseArea.containsPress ? IngeScapeTheme.lightGreyColor : IngeScapeTheme.whiteColor
+                        font {
+                            family: IngeScapeTheme.textFontFamily
+                            pixelSize: 19
+                        }
+                    }
+                }
+
+                // separator
+                Rectangle {
+                    id : separatorAdvMode
+                    anchors {
+                        left : parent.left
+                        right : parent.right
+                        top : titleadvModeMouseArea.bottom
+                    }
+                    height : 1
+                    color : IngeScapeTheme.whiteColor
+                }
+
+                // Revert Action
+                Item {
+                    id : revertActionitem
+                    anchors {
+                        left: parent.left;
+                        right: parent.right;
+                        top : separatorAdvMode.bottom
+                        topMargin: 8
+                    }
+                    height : revertActionCB.checked ? revertActionTime.height : revertActionCB.height
+                    visible : advancedModesItem.isOpened
+                    enabled : visible
+
+                    Behavior on height {
+                        NumberAnimation {}
+                    }
+
+                    CheckBox {
+                        id : revertActionCB
+                        anchors {
+                            left: parent.left;
+                            top : parent.top
+                        }
+
+                        checked : actionM && actionM.shallRevert;
+                        activeFocusOnPress: true;
+
+                        style: CheckBoxStyle {
+                            label:  Text {
+                                anchors {
+                                    verticalCenter: parent.verticalCenter
+                                    verticalCenterOffset: 2
+                                }
+
+                                color: control.checked? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor
+
+                                text: "Revert action"
+                                elide: Text.ElideRight
+
+                                font {
+                                    family: IngeScapeTheme.textFontFamily
+                                    pixelSize: 16
+                                }
+
+                            }
+
+                            indicator: Rectangle {
+                                implicitWidth: 14
+                                implicitHeight: 14
+                                border.width: 0;
+                                color : IngeScapeTheme.darkBlueGreyColor
+
+                                I2SvgItem {
+                                    visible : control.checked
+                                    anchors.centerIn: parent
+
+                                    svgFileCache : IngeScapeTheme.svgFileINGESCAPE;
+                                    svgElementId:  "check";
+
+                                }
+                            }
+
+                        }
+
+                        onCheckedChanged : {
+                            if (actionM) {
+                                actionM.shallRevert = checked
+                            }
+                        }
+
+
+                        Binding {
+                            target : revertActionCB
+                            property : "checked"
+                            value : (actionM && actionM.shallRevert)
+                        }
+                    }
+
+                    Column {
+                        id : revertActionTime
+
+                        anchors {
+                            left : revertActionCB.right
+                            leftMargin: 14
+                            right : parent.right
+                            top: revertActionCB.top
+                        }
+
+                        height : childrenRect.height
+                        spacing: 6
+
+                        enabled: revertActionCB.checked
+                        visible : enabled
+
+                        ExclusiveGroup {
+                            id : revertActionOpt
+                        }
+
+                        CheckBox {
+                            id : revertActionTimeCB
+                            anchors {
+                                left: parent.left;
+                            }
+                            checked : actionM && actionM.shallRevertWhenValidityIsOver;
+                            exclusiveGroup: revertActionOpt
+                            activeFocusOnPress: true;
+
+                            style: CheckBoxStyle {
+                                label: Text {
+                                    anchors {
+                                        verticalCenter: parent.verticalCenter
+                                        verticalCenterOffset: 2
+                                    }
+                                    color: control.enabled ? (control.checked? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor) : "#3C3C3B"
+
+                                    text: "when conditions check terminates"
+                                    elide: Text.ElideRight
+
+                                    font {
+                                        family: IngeScapeTheme.textFontFamily
+                                        pixelSize: 16
+                                    }
+                                }
+
+                                indicator: Rectangle {
+                                    implicitWidth: 14
+                                    implicitHeight: 14
+                                    radius : height / 2
+                                    border.width: 0;
+                                    color : control.enabled ?  IngeScapeTheme.darkBlueGreyColor : "#3C3C3B"
+
+                                    Rectangle {
+                                        anchors.centerIn: parent
+                                        visible : control.checked
+                                        width: 8
+                                        height: 8
+                                        radius : height / 2
+
+                                        border.width: 0;
+                                        color : IngeScapeTheme.whiteColor
+                                    }
+                                }
+
+                            }
+
+                            onCheckedChanged : {
+                                if (actionM) {
+                                    actionM.shallRevertWhenValidityIsOver = checked
+                                }
+                            }
+
+
+                            Binding {
+                                target : revertActionTimeCB
+                                property : "checked"
+                                value : (actionM && actionM.shallRevertWhenValidityIsOver)
+                            }
+                        }
+
+                        Row {
+                            anchors {
+                                left: parent.left;
+                                right :parent.right
+                            }
+                            height : 25
+
+                            CheckBox {
+                                id : revertActionAfterCB
+                                anchors {
+                                    verticalCenter: parent.verticalCenter
+                                }
+
+                                checked : actionM && actionM.shallRevertAfterTime;
+                                exclusiveGroup: revertActionOpt
+                                activeFocusOnPress: true;
+
+                                style: CheckBoxStyle {
+                                    label: Text {
+                                        anchors {
+                                            verticalCenter: parent.verticalCenter
+                                            verticalCenterOffset: 2
+                                        }
+                                        color: control.enabled ? (control.checked? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor) : "#3C3C3B"
+
+                                        text: "after " // space allowing to keep selection possible for the whole row
+
+                                        elide: Text.ElideRight
+
+                                        font {
+                                            family: IngeScapeTheme.textFontFamily
+                                            pixelSize: 16
+                                        }
+                                    }
+
+                                    indicator: Rectangle {
+                                        implicitWidth: 14
+                                        implicitHeight: 14
+                                        radius : height / 2
+                                        border.width: 0;
+                                        color : control.enabled ?  IngeScapeTheme.darkBlueGreyColor : "#3C3C3B"
+
+                                        Rectangle {
+                                            anchors.centerIn: parent
+                                            visible : control.checked
+                                            width: 8
+                                            height: 8
+                                            radius : height / 2
+
+                                            border.width: 0;
+                                            color : IngeScapeTheme.whiteColor
+                                        }
+                                    }
+
+                                }
+
+                                onCheckedChanged : {
+                                    if (actionM) {
+                                        actionM.shallRevertAfterTime = checked
+                                    }
+                                }
+
+                                Binding {
+                                    target : revertActionAfterCB
+                                    property : "checked"
+                                    value : (actionM && actionM.shallRevertAfterTime)
+                                }
+                            }
+
+
+                            TextField {
+                                id: textFieldDuration
+
+                                anchors {
+                                    verticalCenter: parent.verticalCenter
+                                    verticalCenterOffset: 2
+                                }
+
+                                height: 25
+                                width: 57
+                                enabled: revertActionAfterCB.enabled
+                                horizontalAlignment: TextInput.AlignLeft
+                                verticalAlignment: TextInput.AlignVCenter
+
+                                text : actionM ? actionM.revertAfterTimeString : "0.0"
+                                inputMethodHints: Qt.ImhFormattedNumbersOnly
+                                validator: RegExpValidator { regExp: /(\d{1,5})([.]\d{3})?$/ }
+
+                                style: I2TextFieldStyle {
+                                    backgroundColor: IngeScapeTheme.darkBlueGreyColor
+                                    backgroundDisabledColor: "#3C3C3B"
+                                    borderColor: IngeScapeTheme.whiteColor;
+                                    borderErrorColor: IngeScapeTheme.redColor
+                                    radiusTextBox: 1
+                                    borderWidth: 0;
+                                    borderWidthActive: 1
+                                    textIdleColor: IngeScapeTheme.whiteColor;
+                                    textDisabledColor: IngeScapeTheme.darkGreyColor;
+
+                                    padding.left: 3
+                                    padding.right: 3
+
+                                    font {
+                                        pixelSize:14
+                                        family: IngeScapeTheme.textFontFamily
+                                    }
+
+                                }
+
+                                onActiveFocusChanged: {
+                                    if (!activeFocus) {
+                                        // Move cursor to our first character when we lose focus
+                                        // (to always display the beginning or our text instead of
+                                        // an arbitrary part if our text is too long)
+                                        cursorPosition = 0;
+                                    } else {
+                                        textFieldDuration.selectAll();
+                                    }
+                                }
+
+                                onTextChanged: {
+                                    if (activeFocus &&  actionM ) {
+                                        actionM.revertAfterTimeString = text;
+                                    }
+                                }
+
+                                Binding {
+                                    target : textFieldDuration
+                                    property :  "text"
+                                    value : if (actionM) {
+                                                actionM.revertAfterTimeString
+                                            }
+                                            else {
+                                                "";
+                                            }
+                                }
+
+                                onFocusChanged: {
+                                    if (focus) {
+                                        revertActionAfterCB.checked = true;
+                                    }
+                                }
+                            }
+
+
+                            Text {
+                                anchors {
+                                    verticalCenter: parent.verticalCenter
+                                    verticalCenterOffset: 2
+                                }
+                                color: revertActionAfterCB.enabled ? (revertActionAfterCB.checked? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor) : "#3C3C3B"
+
+                                text: " seconds"
+                                elide: Text.ElideRight
+
+                                font {
+                                    family: IngeScapeTheme.textFontFamily
+                                    pixelSize: 16
+                                }
+
+                                MouseArea {
+                                    anchors.fill: parent
+
+                                    onPressed: {
+                                        revertActionAfterCB.checked = true;
+                                    }
+                                }
+                            }
+
+                        }
+
+                    }
+                }
+
+                // Rearm Action
+                Item {
+                    id : rearmActionitem
+                    anchors {
+                        left: parent.left;
+                        right: parent.right;
+                        top : revertActionitem.bottom
+                        topMargin: 17
+                    }
+                    height : 50
+                    visible : advancedModesItem.isOpened
+                    enabled : visible
+
+                    Column {
+                        anchors {
+                            left: parent.left;
+                            right: parent.right;
+                            top : parent.top
+                        }
+
+
+                        CheckBox {
+                            id : rearmActionCB
+                            anchors {
+                                left: parent.left;
+                            }
+
+                            checked : actionM && actionM.shallRearm;
+                            activeFocusOnPress: true;
+                            height: 25
+
+                            style: CheckBoxStyle {
+                                label: Text {
+                                    anchors {
+                                        verticalCenter: parent.verticalCenter
+                                        verticalCenterOffset: 2
+                                    }
+                                    color: control.checked? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor
+
+                                    text: "Allow multiple triggers as long as conditions are verified"
+                                    elide: Text.ElideRight
+
+                                    font {
+                                        family: IngeScapeTheme.textFontFamily
+                                        pixelSize: 16
+                                    }
+                                }
+
+                                indicator: Rectangle {
+                                    implicitWidth: 14
+                                    implicitHeight: 14
+                                    border.width: 0;
+                                    color : IngeScapeTheme.darkBlueGreyColor
+
+                                    I2SvgItem {
+                                        visible : control.checked
+                                        anchors.centerIn: parent
+
+                                        svgFileCache : IngeScapeTheme.svgFileINGESCAPE;
+                                        svgElementId:  "check";
+
+                                    }
+                                }
+
+                            }
+
+                            onCheckedChanged : {
+                                if (actionM) {
+                                    actionM.shallRearm = checked
+                                }
+                            }
+
+
+                            Binding {
+                                target : rearmActionCB
+                                property : "checked"
+                                value : (actionM && actionM.shallRearm)
+                            }
+                        }
+
+                        Row {
+
+                            anchors {
+                                left: parent.left;
+                                leftMargin: 18
+                            }
+
+                            height: 25
+
+                            Text {
+                                anchors {
+                                    verticalCenter: parent.verticalCenter
+                                    verticalCenterOffset: 2
+
+                                }
+
+                                color: rearmActionCB.enabled ? (rearmActionCB.checked? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor) : "#3C3C3B"
+
+                                text: "with trigger every "
+                                elide: Text.ElideRight
+
+                                font {
+                                    family: IngeScapeTheme.textFontFamily
+                                    pixelSize: 16
+                                }
+
+                                MouseArea {
+                                    anchors.fill: parent
+
+                                    onPressed: {
+                                        rearmActionCB.checked = true;
+                                    }
+                                }
+                            }
+
+                            TextField {
+                                id: textFieldTimeBeforeRearm
+
+                                anchors {
+                                    verticalCenter: parent.verticalCenter
+                                    verticalCenterOffset: 2
+                                }
+
+                                height: 25
+                                width: 57
+                                enabled: rearmActionCB.enabled
+                                horizontalAlignment: TextInput.AlignLeft
+                                verticalAlignment: TextInput.AlignVCenter
+
+                                text : actionM ? actionM.rearmAfterTimeString : "0.0"
+                                inputMethodHints: Qt.ImhFormattedNumbersOnly
+                                validator: RegExpValidator { regExp: /(\d{1,5})([.]\d{3})?$/ }
+
+                                style: I2TextFieldStyle {
+                                    backgroundColor: IngeScapeTheme.darkBlueGreyColor
+                                    backgroundDisabledColor: "#3C3C3B"
+                                    borderColor: IngeScapeTheme.whiteColor;
+                                    borderErrorColor: IngeScapeTheme.redColor
+                                    radiusTextBox: 1
+                                    borderWidth: 0;
+                                    borderWidthActive: 1
+                                    textIdleColor: IngeScapeTheme.whiteColor;
+                                    textDisabledColor: IngeScapeTheme.darkGreyColor;
+
+                                    padding.left: 3
+                                    padding.right: 3
+
+                                    font {
+                                        pixelSize:14
+                                        family: IngeScapeTheme.textFontFamily
+                                    }
+
+                                }
+
+                                onActiveFocusChanged: {
+                                    if (!activeFocus) {
+                                        // Move cursor to our first character when we lose focus
+                                        // (to always display the beginning or our text instead of
+                                        // an arbitrary part if our text is too long)
+                                        cursorPosition = 0;
+                                    } else {
+                                        textFieldTimeBeforeRearm.selectAll();
+                                    }
+                                }
+
+                                onTextChanged: {
+                                    if (activeFocus &&  actionM ) {
+                                        actionM.rearmAfterTimeString = text;
+                                    }
+                                }
+
+                                Binding {
+                                    target : textFieldTimeBeforeRearm
+                                    property :  "text"
+                                    value : if (actionM) {
+                                                actionM.rearmAfterTimeString
+                                            }
+                                            else {
+                                                "";
+                                            }
+                                }
+
+                                onFocusChanged: {
+                                    if (focus) {
+                                        rearmActionCB.checked = true;
+                                    }
+                                }
+                            }
+
+
+                            Text {
+                                anchors {
+                                    verticalCenter: parent.verticalCenter
+                                    verticalCenterOffset: 2
+                                }
+
+                                color: rearmActionCB.enabled ? (rearmActionCB.checked? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor) : "#3C3C3B"
+
+                                text: " seconds"
+                                elide: Text.ElideRight
+
+                                font {
+                                    family: IngeScapeTheme.textFontFamily
+                                    pixelSize: 16
+                                }
+
+                                MouseArea {
+                                    anchors.fill: parent
+
+                                    onPressed: {
+                                        rearmActionCB.checked = true;
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -2582,6 +2596,7 @@ Window {
             }
 
 
+            // Button "Cancel"
             Button {
                 id: cancelButton
                 activeFocusOnPress: true
@@ -2622,6 +2637,7 @@ Window {
                 }
             }
 
+            // Button "OK"
             Button {
                 id: okButton
 
