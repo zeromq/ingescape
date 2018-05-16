@@ -429,6 +429,9 @@ void IngeScapeModelManager::onDefinitionReceived(QString peerId, QString agentNa
 
                      // Emit the signal "Add Inputs to Editor for Outputs"
                      Q_EMIT addInputsToEditorForOutputs(agentName, agentDefinition->outputsList()->toList());
+
+                     // Emit the signal "Active Agent Defined"
+                     Q_EMIT activeAgentDefined(agent);
                  }
                  // Update with the new definition
                  else
@@ -447,13 +450,6 @@ void IngeScapeModelManager::onDefinitionReceived(QString peerId, QString agentNa
                      if (previousDefinition != NULL) {
                          deleteAgentDefinition(previousDefinition);
                      }
-                 }
-
-                 // Our global mapping is passive (NOT controlled)
-                 // The agent is ON
-                 if (!_isMappingControlled && agent->isON() && (agent->definition() != NULL))
-                 {
-                     Q_EMIT observeActiveAgent(agent);
                  }
             }
         }

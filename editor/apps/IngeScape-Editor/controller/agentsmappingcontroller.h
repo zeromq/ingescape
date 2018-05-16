@@ -249,10 +249,10 @@ public Q_SLOTS:
 
 
     /**
-     * @brief Slot when an active agent (with a definition) must be observed
+     * @brief Slot when an active agent has been defined
      * @param agent
      */
-    void onObserveActiveAgent(AgentM* agent);
+    void onActiveAgentDefined(AgentM* agent);
 
 
     /**

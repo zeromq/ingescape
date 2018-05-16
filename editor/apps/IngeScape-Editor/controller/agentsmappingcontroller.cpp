@@ -609,47 +609,57 @@ void AgentsMappingController::onAgentModelWillBeDeleted(AgentM* agent)
 
 
 /**
- * @brief Slot when an active agent (with a definition) must be observed
+ * @brief Slot when an active agent has been defined
  * @param agent
  */
-void AgentsMappingController::onObserveActiveAgent(AgentM* agent)
+void AgentsMappingController::onActiveAgentDefined(AgentM* agent)
 {
-    if (agent != NULL)
+    if ((agent != NULL) && (_modelManager != NULL))
     {
         QString agentName = agent->name();
 
-        // Initial size of our window: 1920 x 1080
-        // - Width of our left panel: 320
-        int availableMinWidth = 1920 - 320;
-        // - Height of our bottom panel: 200
-        int availableMinHeight = 1080 - 200;
-
-        double randomMax = (double)RAND_MAX;
-
-        // Get the agent in mapping for the agent name
-        AgentInMappingVM* agentInMapping = getAgentInMappingFromName(agentName);
-        if (agentInMapping == NULL)
+        // CONTROL
+        if (_modelManager->isMappingControlled())
         {
-            qDebug() << agentName << "is not yet in the mapping !";
-
-            QList<AgentM*> activeAgentsList = QList<AgentM*>();
-            activeAgentsList.append(agent);
-
-            double randomX = (double)qrand() / randomMax;
-            double randomY = (double)qrand() / randomMax;
-            QPointF position = QPointF(randomX * availableMinWidth, randomY * availableMinHeight);
-            //qDebug() << "Random position:" << position << "for agent" << agentName << "(" << randomX << randomY << ")";
-
-            // Add new model(s) of agent to the current mapping
-            _addAgentModelsToMappingAtPosition(agentName, activeAgentsList, position);
+            // Emit the signal to send the command "CLEAR_MAPPING" on the network to the agent
+            //Q_EMIT commandAskedToAgent(peerIdsList, "CLEAR_MAPPING");
         }
+        // OBSERVE
         else
         {
-            if (!agentInMapping->models()->contains(agent))
+            // Initial size of our window: 1920 x 1080
+            // - Width of our left panel: 320
+            int availableMinWidth = 1920 - 320;
+            // - Height of our bottom panel: 200
+            int availableMinHeight = 1080 - 200;
+
+            double randomMax = (double)RAND_MAX;
+
+            // Get the agent in mapping for the agent name
+            AgentInMappingVM* agentInMapping = getAgentInMappingFromName(agentName);
+            if (agentInMapping == NULL)
             {
-                qDebug() << agentName << "is already in the mapping but not this new model !";
-                // FIXME: TODO
-                //agentInMapping->models()->append(agent);
+                qDebug() << agentName << "is not yet in the mapping !";
+
+                QList<AgentM*> activeAgentsList = QList<AgentM*>();
+                activeAgentsList.append(agent);
+
+                double randomX = (double)qrand() / randomMax;
+                double randomY = (double)qrand() / randomMax;
+                QPointF position = QPointF(randomX * availableMinWidth, randomY * availableMinHeight);
+                //qDebug() << "Random position:" << position << "for agent" << agentName << "(" << randomX << randomY << ")";
+
+                // Add new model(s) of agent to the current mapping
+                _addAgentModelsToMappingAtPosition(agentName, activeAgentsList, position);
+            }
+            else
+            {
+                if (!agentInMapping->models()->contains(agent))
+                {
+                    qDebug() << agentName << "is already in the mapping but not this new model !";
+                    // FIXME: TODO
+                    //agentInMapping->models()->append(agent);
+                }
             }
         }
     }

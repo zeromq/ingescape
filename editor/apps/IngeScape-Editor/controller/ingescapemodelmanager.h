@@ -227,10 +227,10 @@ Q_SIGNALS:
 
 
     /**
-     * @brief Signal emitted when an active agent (with a definition) must be observed
+     * @brief Signal emitted when an active agent has been defined
      * @param agent
      */
-    void observeActiveAgent(AgentM* agent);
+    void activeAgentDefined(AgentM* agent);
 
 
     /**
