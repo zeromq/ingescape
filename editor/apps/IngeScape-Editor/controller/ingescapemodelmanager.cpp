@@ -579,6 +579,26 @@ void IngeScapeModelManager::onAllRecordsReceived(QString recordsJSON)
     }
 }
 
+/**
+ * @brief Occurs when records from DB have been received
+ * @param mappingJSON
+ */
+void IngeScapeModelManager::onNewRecordReceived(QString recordJSON)
+{
+    if (!recordJSON.isEmpty())
+    {
+        QByteArray byteArrayOfJson = recordJSON.toUtf8();
+        QList<RecordM*> tmpRecords = _jsonHelper->createRecordModelList(byteArrayOfJson);
+
+        if(tmpRecords.count() > 0)
+        {
+            RecordM* newRecord = tmpRecords.at(0);
+            _recordsList.insert(0, newRecord);
+            Q_EMIT recordAdded(newRecord);
+        }
+    }
+}
+
 
 
 /**

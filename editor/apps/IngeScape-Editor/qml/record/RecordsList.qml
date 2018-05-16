@@ -175,8 +175,6 @@ Item {
     Component {
         id: componentRecordListItem
 
-
-
             Item {
                 id : recordItem
 
@@ -184,7 +182,7 @@ Item {
 
                 property int margin: 5
 
-                height: recordInfos.height + margin*2
+                height: 60//recordInfos.height + margin*2
 
                 anchors {
                     left : parent.left

@@ -76,17 +76,30 @@ public Q_SLOTS:
 
 
     /**
-     * @brief Slot when a model of agent will be deleted
+     * @brief Slot when the list of records model changes
      * @param records
      */
     void onRecordsListChanged(QList<RecordM*> records);
 
+    /**
+     * @brief Slot when a new model of record has been added
+     * @param records
+     */
+    void onRecordAdded(RecordM* record);
 
     /**
      * @brief Slot when a new model of agent has been created
      * @param agent
      */
     void onAgentModelCreated(AgentM* model);
+
+private:
+
+    /**
+     * @brief Aims at deleting VM and model of a record
+     * @param record
+     */
+    void _deleteRecordVM(RecordVM* record);
 
 private:
 

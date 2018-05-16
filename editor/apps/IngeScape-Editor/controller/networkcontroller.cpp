@@ -32,6 +32,7 @@ static const QString launcherSuffix = ".ingescapelauncher";
 static const QString definitionPrefix = "EXTERNAL_DEFINITION#";
 static const QString mappingPrefix = "EXTERNAL_MAPPING#";
 static const QString allRecordsPrefix = "RECORDS_LIST#";
+static const QString newRecordPrefix = "NEW_RECORD#";
 
 static const QString mutedAllPrefix = "MUTED=";
 static const QString frozenPrefix = "FROZEN=";
@@ -246,7 +247,15 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
                 message.remove(0, allRecordsPrefix.length());
 
                 // Emit the signal "All records Received"
-                Q_EMIT networkController->allrecordsReceived(message);
+                Q_EMIT networkController->allRecordsReceived(message);
+            }
+            // New record
+            else if (message.startsWith(newRecordPrefix))
+            {
+                message.remove(0, newRecordPrefix.length());
+
+                // Emit the signal "New record Received"
+                Q_EMIT networkController->newRecordReceived(message);
             }
             // MUTED / UN-MUTED
             else if (message.startsWith(mutedAllPrefix))

@@ -34,20 +34,6 @@ RecordsSupervisionController::RecordsSupervisionController(IngeScapeModelManager
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 }
 
-/**
- * @brief RecordsSupervisionController::onRecordsListChanged
- * @param records
- */
-void RecordsSupervisionController::onRecordsListChanged(QList<RecordM*> records)
-{
-    _recordsList.clear();
-
-    foreach (RecordM* model, records) {
-        RecordVM* vm = new RecordVM(model);
-        _recordsList.append(vm);
-    }
-}
-
 
 /**
  * @brief Destructor
@@ -64,6 +50,40 @@ RecordsSupervisionController::~RecordsSupervisionController()
 
     _modelManager = NULL;
 }
+
+/**
+ * @brief Slot when the list of records model changes
+ * @param records
+ */
+void RecordsSupervisionController::onRecordsListChanged(QList<RecordM*> newRecords)
+{
+    QList<RecordVM*> recordsToDelete = _recordsList.toList();
+    _recordsList.clear();
+
+    foreach (RecordVM* vm, recordsToDelete) {
+        _deleteRecordVM(vm);
+    }
+
+    QList<RecordVM*> recordsToAdd;
+    foreach (RecordM* model, newRecords) {
+        RecordVM* vm = new RecordVM(model);
+        recordsToAdd.append(vm);
+    }
+
+    _recordsList.append(recordsToAdd);
+}
+
+
+/**
+ * @brief Slot when a new model of record has been added
+ * @param record
+ */
+void RecordsSupervisionController::onRecordAdded(RecordM* model)
+{
+    RecordVM* vm = new RecordVM(model);
+    _recordsList.insert(0, vm);
+}
+
 
 /**
  * @brief Slot when a new model of agent has been created
@@ -96,14 +116,27 @@ void RecordsSupervisionController::deleteSelectedRecord()
         // Remove it from the list
         _recordsList.remove(_selectedRecord);
 
-        // Delete each model of _selectedRecord
+        // Delete each model of record
         _modelManager->deleteRecordModel(_selectedRecord->recordModel());
 
-        // Delete the view model of _selectedAgent
+        // Delete the view model of record
         delete _selectedRecord;
+
         setselectedRecord(NULL);
     }
 }
 
+/**
+ * @brief Aims at deleting VM and model of a record
+ * @param record
+ */
+void RecordsSupervisionController::_deleteRecordVM(RecordVM* record)
+{
+    // Delete each model of record
+    _modelManager->deleteRecordModel(record->recordModel());
+
+    // Delete the view model of record
+    delete record;
+}
 
 
