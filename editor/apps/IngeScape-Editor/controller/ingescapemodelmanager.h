@@ -101,6 +101,12 @@ public:
      */
     void deleteAgentModel(AgentM* agent);
 
+    /**
+     * @brief Delete a model of Record
+     * @param record
+     */
+    void deleteRecordModel(RecordM* record);
+
 
     /**
      * @brief Add a model of agent definition for an agent name

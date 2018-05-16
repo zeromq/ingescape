@@ -135,7 +135,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _hostsSupervisionC = new HostsSupervisionController(_launcherManager, this);
 
     // Create the controller for records supervision
-    _recordsSupervisionC = new RecordsSupervisionController(this);
+    _recordsSupervisionC = new RecordsSupervisionController(_modelManager, this);
 
     // Create the controller for agents mapping
     _agentsMappingC = new AgentsMappingController(_modelManager, agentsMappingsPath, this);
@@ -195,6 +195,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(_launcherManager, &IngeScapeLauncherManager::hostModelWillBeRemoved, _hostsSupervisionC, &HostsSupervisionController::onHostModelWillBeRemoved);
     connect(_modelManager, &IngeScapeModelManager::agentModelCreated, _hostsSupervisionC, &HostsSupervisionController::onAgentModelCreated);
     connect(_modelManager, &IngeScapeModelManager::agentModelWillBeDeleted, _hostsSupervisionC, &HostsSupervisionController::onAgentModelWillBeDeleted);
+    connect(_modelManager, &IngeScapeModelManager::agentModelCreated, _recordsSupervisionC, &RecordsSupervisionController::onAgentModelCreated);
 
     // Connect to signals from the controller for supervision of hosts
     connect(_hostsSupervisionC, &HostsSupervisionController::commandAskedToHost, _networkC, &NetworkController::onCommandAskedToLauncher);
@@ -215,6 +216,9 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
 
     // Connect to signals from the time line time line visible range change to the scenario controller to filter the action view models
     connect(_timeLineC, &AbstractTimeActionslineScenarioViewController::timeRangeChanged, _scenarioC, &ScenarioController::ontimeRangeChange);
+
+    // Connect to signals from Record supervision controller
+    connect(_recordsSupervisionC, &RecordsSupervisionController::commandAskedToAgent, _networkC, &NetworkController::onCommandAskedToAgent);
 
     // Initialize agents list from default file
     _modelManager->importAgentsListFromDefaultFile();
