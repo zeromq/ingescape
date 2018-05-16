@@ -191,10 +191,11 @@ private Q_SLOTS:
     /**
      * @brief Slot when the timer time out
      */
-    void _onTimeout();
+    //void _onTimeout();
 
 
 Q_SIGNALS:
+
     /**
       * @brief Reset the mapping and timeline views
       */
@@ -227,7 +228,7 @@ private:
     JsonHelper* _jsonHelper;
 
     // timer to let agents to connect before setting the application in "mapped" mode
-    QTimer _timer;
+    //QTimer _timer;
 
 };
 

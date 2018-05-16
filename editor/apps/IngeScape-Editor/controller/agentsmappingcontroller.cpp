@@ -501,7 +501,8 @@ void AgentsMappingController::onIsMappingActivatedChanged(bool isMappingActivate
                 }
 
                 // Create all links in mapping
-                foreach (AgentInMappingVM* agent, _allAgentsInMapping.toList()) {
+                foreach (AgentInMappingVM* agent, _allAgentsInMapping.toList())
+                {
                     if ((agent != NULL) && (agent->temporaryMapping() != NULL))
                     {
                         // Delete all "mapping elements" in the temporary mapping
@@ -510,7 +511,8 @@ void AgentsMappingController::onIsMappingActivatedChanged(bool isMappingActivate
                         foreach (AgentM* model, agent->models()->toList()) {
                             if ((model != NULL) && (model->mapping() != NULL))
                             {
-                                foreach (ElementMappingM* mappingElement, model->mapping()->mappingElements()->toList()) {
+                                foreach (ElementMappingM* mappingElement, model->mapping()->mappingElements()->toList())
+                                {
                                     if (mappingElement != NULL)
                                     {
                                         // Add a temporary link for each real link

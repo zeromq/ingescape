@@ -170,14 +170,22 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
 
     // Connect to signals from the model manager
     connect(_modelManager, &IngeScapeModelManager::isMappingActivatedChanged, _agentsMappingC, &AgentsMappingController::onIsMappingActivatedChanged);
+
     connect(_modelManager, &IngeScapeModelManager::agentModelCreated, _agentsSupervisionC, &AgentsSupervisionController::onAgentModelCreated);
-    connect(_modelManager, &IngeScapeModelManager::agentModelWillBeDeleted, _agentsMappingC, &AgentsMappingController::onAgentModelWillBeDeleted);
     connect(_modelManager, &IngeScapeModelManager::agentModelCreated, _scenarioC, &ScenarioController::onAgentModelCreated);
+    connect(_modelManager, &IngeScapeModelManager::agentModelCreated, _hostsSupervisionC, &HostsSupervisionController::onAgentModelCreated);
+    connect(_modelManager, &IngeScapeModelManager::agentModelCreated, _recordsSupervisionC, &RecordsSupervisionController::onAgentModelCreated);
+
+    connect(_modelManager, &IngeScapeModelManager::agentModelWillBeDeleted, _agentsMappingC, &AgentsMappingController::onAgentModelWillBeDeleted);
+    connect(_modelManager, &IngeScapeModelManager::agentModelWillBeDeleted, _hostsSupervisionC, &HostsSupervisionController::onAgentModelWillBeDeleted);
+
     connect(_modelManager, &IngeScapeModelManager::mapped, _agentsMappingC, &AgentsMappingController::onMapped);
     connect(_modelManager, &IngeScapeModelManager::unmapped, _agentsMappingC, &AgentsMappingController::onUnmapped);
+
     connect(_modelManager, &IngeScapeModelManager::addInputsToEditorForOutputs, _valuesHistoryC, &ValuesHistoryController::onAgentOutputsObserved);
     connect(_modelManager, &IngeScapeModelManager::addInputsToEditorForOutputs, _networkC, &NetworkController::onAddInputsToEditorForOutputs);
     connect(_modelManager, &IngeScapeModelManager::removeInputsToEditorForOutputs, _networkC, &NetworkController::onRemoveInputsToEditorForOutputs);
+
     connect(_modelManager, &IngeScapeModelManager::commandAskedToAgent, _networkC, &NetworkController::onCommandAskedToAgent);
     connect(_modelManager, &IngeScapeModelManager::recordsListChanged, _recordsSupervisionC, &RecordsSupervisionController::onRecordsListChanged);
 
@@ -193,9 +201,6 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     // Connect to signals from the ingescape launcher manager
     connect(_launcherManager, &IngeScapeLauncherManager::hostModelCreated, _hostsSupervisionC, &HostsSupervisionController::onHostModelCreated);
     connect(_launcherManager, &IngeScapeLauncherManager::hostModelWillBeRemoved, _hostsSupervisionC, &HostsSupervisionController::onHostModelWillBeRemoved);
-    connect(_modelManager, &IngeScapeModelManager::agentModelCreated, _hostsSupervisionC, &HostsSupervisionController::onAgentModelCreated);
-    connect(_modelManager, &IngeScapeModelManager::agentModelWillBeDeleted, _hostsSupervisionC, &HostsSupervisionController::onAgentModelWillBeDeleted);
-    connect(_modelManager, &IngeScapeModelManager::agentModelCreated, _recordsSupervisionC, &RecordsSupervisionController::onAgentModelCreated);
 
     // Connect to signals from the controller for supervision of hosts
     connect(_hostsSupervisionC, &HostsSupervisionController::commandAskedToHost, _networkC, &NetworkController::onCommandAskedToLauncher);
@@ -224,7 +229,14 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _modelManager->importAgentsListFromDefaultFile();
 
     // Start our INGESCAPE agent with a network device (or an IP address) and a port
-    _networkC->start(_networkDevice, _ipAddress, _port);
+    bool isStarted = _networkC->start(_networkDevice, _ipAddress, _port);
+
+    if (isStarted && (_modelManager != NULL))
+    {
+        // Initialize platform from online mapping
+        _modelManager->setisMappingActivated(true);
+    }
+
 
     //
     // Subscribe to system signals to interceipt interruption and termination signals
@@ -246,9 +258,9 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     //QThread::msleep(2000);
 
     // Init the timer to let agents to connect before setting the application in "mapped" mode
-    _timer.setInterval(2000);
+    /*_timer.setInterval(2000);
     connect(&_timer, &QTimer::timeout, this, &IngeScapeEditorController::_onTimeout);
-    _timer.start();
+    _timer.start();*/
 }
 
 
@@ -425,6 +437,7 @@ QPointF IngeScapeEditorController::getGlobalMousePosition()
     return QCursor::pos();
 }
 
+
 /**
  * @brief Open a platform file (actions, palette, timeline actions, mappings)
  */
@@ -439,6 +452,7 @@ void IngeScapeEditorController::openPlatformFromFile()
     // Open the platform from JSON file
     _openPlatformFromFile(platformFilePath);
 }
+
 
 /**
  * @brief Open the platform from JSON file
@@ -488,6 +502,7 @@ void IngeScapeEditorController::_openPlatformFromFile(QString platformFilePath)
 
 }
 
+
 /**
  * @brief Save a platform to a selected file (actions, palette, timeline actions, mappings)
  */
@@ -499,18 +514,19 @@ void IngeScapeEditorController::savePlatformToSelectedFile()
                                                               _platformDirectoryPath,
                                                               "JSON (*.json)");
 
-    if(!platformFilePath.isEmpty()) {
+    if (!platformFilePath.isEmpty()) {
         // Save the platform to JSON file
         _savePlatformToFile(platformFilePath);
     }
 }
+
 
 /**
  * @brief Save a platform to the default file (actions, palette, timeline actions, mappings)
  */
 void IngeScapeEditorController::savePlatformToDefaultFile()
 {
-    if(!_platformDefaultFilePath.isEmpty()) {
+    if (!_platformDefaultFilePath.isEmpty()) {
         // Save the platform to JSON file
         _savePlatformToFile(_platformDefaultFilePath);
     }
@@ -560,6 +576,7 @@ void IngeScapeEditorController::_savePlatformToFile(QString platformFilePath)
     }
 }
 
+
 /**
  * @brief Create a new platform (actions, palette, timeline actions, mappings)
  *        by deleting all existing data
@@ -567,13 +584,13 @@ void IngeScapeEditorController::_savePlatformToFile(QString platformFilePath)
 void IngeScapeEditorController::createNewPlatform()
 {
     // Create new mapping
-    if(_agentsMappingC != NULL)
+    if (_agentsMappingC != NULL)
     {
         _agentsMappingC->createNewMapping();
     }
 
     // Create new scenario
-    if(_scenarioC != NULL)
+    if (_scenarioC != NULL)
     {
         // Reset scenario
         _scenarioC->clearScenario();
@@ -583,13 +600,14 @@ void IngeScapeEditorController::createNewPlatform()
     Q_EMIT resetMappindAndTimeLineViews();
 }
 
+
 /**
  * @brief Actions to perform before the application closing
  */
 void IngeScapeEditorController::processBeforeClosing()
 {
     // Save the agent list
-    if(_agentsSupervisionC != NULL)
+    if (_agentsSupervisionC != NULL)
     {
         _agentsSupervisionC->exportAgentsListToDefaultFile();
     }
@@ -597,6 +615,7 @@ void IngeScapeEditorController::processBeforeClosing()
     // Save the platform to the default file
     savePlatformToDefaultFile();
 }
+
 
 /**
  * @brief Can delete an agent view model from the list function
@@ -649,7 +668,7 @@ bool IngeScapeEditorController::canDeleteAgentInMapping(AgentInMappingVM* agentI
 /**
  * @brief Aims at initializing editor in "Mapped" mode
  */
-void IngeScapeEditorController::_onTimeout()
+/*void IngeScapeEditorController::_onTimeout()
 {
     // Stop our timer
     _timer.stop();
@@ -659,4 +678,4 @@ void IngeScapeEditorController::_onTimeout()
     {
         _modelManager->setisMappingActivated(true);
     }
-}
+}*/

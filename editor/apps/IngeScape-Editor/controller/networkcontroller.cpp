@@ -516,8 +516,9 @@ NetworkController::~NetworkController()
  * @param networkDevice
  * @param ipAddress
  * @param port
+ * @return
  */
-void NetworkController::start(QString networkDevice, QString ipAddress, int port)
+bool NetworkController::start(QString networkDevice, QString ipAddress, int port)
 {
     if (_isIngeScapeAgentStarted == 0)
     {
@@ -545,6 +546,8 @@ void NetworkController::start(QString networkDevice, QString ipAddress, int port
             qCritical() << "The network has NOT been initialized on" << networkDevice << "or" << ipAddress << "and port" << QString::number(port);
         }
     }
+
+    return _isIngeScapeAgentStarted;
 }
 
 

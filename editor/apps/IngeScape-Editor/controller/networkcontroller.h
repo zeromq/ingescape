@@ -56,8 +56,9 @@ public:
      * @param networkDevice
      * @param ipAddress
      * @param port
+     * @return
      */
-    void start(QString networkDevice, QString ipAddress, int port);
+    bool start(QString networkDevice, QString ipAddress, int port);
 
 
     /**
