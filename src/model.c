@@ -55,7 +55,22 @@ static int model_observe(const char* name, iop_t iopType, igs_observeCallback cb
 
     // Check if the input has been returned.
     if(iop == NULL){
-        igs_error("Cannot find %s with type %d", name, iopType);
+        char *t = NULL;
+        switch (iopType) {
+            case IGS_INPUT_T:
+                t = "input";
+                break;
+            case IGS_OUTPUT_T:
+                t = "output";
+                break;
+            case IGS_PARAMETER_T:
+                t = "parameter";
+                break;
+                
+            default:
+                break;
+        }
+        igs_error("Cannot find %s %s", t, name);
         return 0;
     }
 
@@ -82,7 +97,7 @@ iopType_t model_getTypeForIOP(const char *name, iop_t type){
     }
     if(igs_internal_definition == NULL){
         igs_error("Definition is NULL");
-        return -1;
+        return 0;
     }
     
     agent_iop_t *iop = NULL;
@@ -90,23 +105,23 @@ iopType_t model_getTypeForIOP(const char *name, iop_t type){
         HASH_FIND_STR(igs_internal_definition->inputs_table, name, iop);
         if(iop == NULL){
             igs_error("Input %s cannot be found", name);
-            return -1;
+            return 0;
         }
     } else if (type == IGS_OUTPUT_T){
         HASH_FIND_STR(igs_internal_definition->outputs_table, name, iop);
         if(iop == NULL){
             igs_error("Output %s cannot be found", name);
-            return -1;
+            return 0;
         }
     } else if (type == IGS_PARAMETER_T){
         HASH_FIND_STR(igs_internal_definition->params_table, name, iop);
         if(iop == NULL){
             igs_error("Parameter %s cannot be found", name);
-            return -1;
+            return 0;
         }
     }else{
         igs_error("Unknown IOP type %d", type);
-        return -1;
+        return 0;
     }
     
     return iop->value_type;

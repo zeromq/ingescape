@@ -167,9 +167,9 @@ public:
 
 
     /**
-     * @brief Import an agent from selected files (definition and mapping)
+     * @brief Import an agent or an agents list from selected file (definition)
      */
-    Q_INVOKABLE void importAgentFromSelectedFiles();
+    Q_INVOKABLE bool importAgentOrAgentsListFromSelectedFile();
 
 
     /**
@@ -252,6 +252,7 @@ Q_SIGNALS:
      * @param records
      */
     void recordsListChanged(QList<RecordM*> records);
+
 
 public Q_SLOTS:
 
@@ -362,13 +363,6 @@ private:
      * @param agentsListFilePath
      */
     void _importAgentsListFromFile(QString agentsListFilePath);
-
-
-    /**
-     * @brief Import an agent from JSON files (definition and mapping)
-     * @param subDirectoryPath
-     */
-    void _importAgentFromFiles(QStringList agentFilesPaths);
 
 
     /**

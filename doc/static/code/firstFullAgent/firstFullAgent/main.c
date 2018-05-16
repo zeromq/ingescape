@@ -83,7 +83,7 @@ void myIOPCallback(iop_t iopType, const char* name, iopType_t valueType,
             case IGS_STRING_T:
             {
                 char *stringValue = igs_readInputAsString(name);
-                printf(" to %s\n", (char *)value);
+                printf(" to %s\n", (char *)stringValue);
                 free(stringValue);
                 break;
             }
@@ -226,24 +226,23 @@ int main(int argc, const char * argv[]) {
     printf("Inputs :\n");
     for (int i = 0; i< numberOfEntries; i++){
         printf("\t%s\n", myEntries[i]);
+        igs_observeInput(myEntries[i], myIOPCallback, NULL);
     }
     igs_freeIOPList(&myEntries, numberOfEntries);
     myEntries = igs_getOutputsList(&numberOfEntries);
     printf("Outputs :\n");
     for (int i = 0; i< numberOfEntries; i++){
         printf("\t%s\n", myEntries[i]);
+        igs_observeOutput(myEntries[i], myIOPCallback, NULL);
     }
     igs_freeIOPList(&myEntries, numberOfEntries);
     myEntries = igs_getParametersList(&numberOfEntries);
     printf("Parameters :\n");
     for (int i = 0; i< numberOfEntries; i++){
         printf("\t%s\n", myEntries[i]);
+        igs_observeParameter(myEntries[i], myIOPCallback, NULL);
     }
     igs_freeIOPList(&myEntries, numberOfEntries);
-    
-    igs_observeInput("input1", myIOPCallback, NULL);
-    igs_observeInput("input2", myIOPCallback, NULL);
-    igs_observeInput("input3", myIOPCallback, NULL);
     
     igs_startWithDevice(networkDevice, port);
     
