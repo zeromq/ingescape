@@ -70,21 +70,18 @@ public:
      */
     ~AgentsMappingController();
 
-    /**
-      * @brief Import the mappings from the json byte content
-      * @param byte array content
-      */
-    void importMappingFromJson(QByteArray byteArrayOfJson, bool fromPlatform = false);
 
     /**
      * @brief Create a new Mapping
      */
     Q_INVOKABLE void createNewMapping();
 
+
     /**
      * @brief Open a Mapping
      */
     Q_INVOKABLE void openMapping();
+
 
     /**
      * @brief Save a Mapping
@@ -137,6 +134,15 @@ public:
      * @return
      */
     Q_INVOKABLE AgentInMappingVM* getAgentInMappingFromName(QString name);
+
+
+    /**
+     * @brief Import the mappings from the json byte content
+     * @param byteArrayOfJson
+     * @param fromPlatform
+     */
+    void importMappingFromJson(QByteArray byteArrayOfJson, bool fromPlatform = false);
+
 
 Q_SIGNALS:
 
@@ -240,6 +246,13 @@ public Q_SLOTS:
      * @param agent
      */
     void onAgentModelWillBeDeleted(AgentM* agent);
+
+
+    /**
+     * @brief Slot when an active agent (with a definition) must be observed
+     * @param agent
+     */
+    void onObserveActiveAgent(AgentM* agent);
 
 
     /**

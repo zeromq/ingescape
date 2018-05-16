@@ -596,13 +596,60 @@ void AgentsMappingController::onAgentModelWillBeDeleted(AgentM* agent)
         {
             // Remove the model
             agentInMapping->models()->remove(agent);
-            // TODO ESTIA: Remove MapBetweenIOP  unique à ce model
 
             // If it was the last one...
             if (agentInMapping->models()->count() == 0)
             {
                 // ...delete this agent in mapping
                 deleteAgentInMapping(agentInMapping);
+            }
+        }
+    }
+}
+
+
+/**
+ * @brief Slot when an active agent (with a definition) must be observed
+ * @param agent
+ */
+void AgentsMappingController::onObserveActiveAgent(AgentM* agent)
+{
+    if (agent != NULL)
+    {
+        QString agentName = agent->name();
+
+        // Initial size of our window: 1920 x 1080
+        // - Width of our left panel: 320
+        int availableMinWidth = 1920 - 320;
+        // - Height of our bottom panel: 200
+        int availableMinHeight = 1080 - 200;
+
+        double randomMax = (double)RAND_MAX;
+
+        // Get the agent in mapping for the agent name
+        AgentInMappingVM* agentInMapping = getAgentInMappingFromName(agentName);
+        if (agentInMapping == NULL)
+        {
+            qDebug() << agentName << "is not yet in the mapping !";
+
+            QList<AgentM*> activeAgentsList = QList<AgentM*>();
+            activeAgentsList.append(agent);
+
+            double randomX = (double)qrand() / randomMax;
+            double randomY = (double)qrand() / randomMax;
+            QPointF position = QPointF(randomX * availableMinWidth, randomY * availableMinHeight);
+            //qDebug() << "Random position:" << position << "for agent" << agentName << "(" << randomX << randomY << ")";
+
+            // Add new model(s) of agent to the current mapping
+            _addAgentModelsToMappingAtPosition(agentName, activeAgentsList, position);
+        }
+        else
+        {
+            if (!agentInMapping->models()->contains(agent))
+            {
+                qDebug() << agentName << "is already in the mapping but not this new model !";
+                // FIXME: TODO
+                //agentInMapping->models()->append(agent);
             }
         }
     }
@@ -617,6 +664,8 @@ void AgentsMappingController::onMapped(ElementMappingM* mappingElement)
 {
     if (mappingElement != NULL)
     {
+        qDebug() << "MAPPED" << mappingElement->outputAgent() << "." << mappingElement->output() << "-->" << mappingElement->inputAgent() << "." << mappingElement->input();
+
         // Try to get the virtual link which corresponds to the mapping element
         MapBetweenIOPVM* link = _getLinkFromMappingElement(mappingElement);
 
@@ -984,9 +1033,10 @@ void AgentsMappingController::_overWriteMappingOfAgentModel(AgentM* agentModel, 
 
 
 /**
-  * @brief Import the mappings from the json byte content
-  * @param byte array content
-  */
+ * @brief Import the mappings from the json byte content
+ * @param byteArrayOfJson
+ * @param fromPlatform
+ */
 void AgentsMappingController::importMappingFromJson(QByteArray byteArrayOfJson, bool fromPlatform)
 {
     // Clear the previous mapping
@@ -1015,7 +1065,7 @@ void AgentsMappingController::importMappingFromJson(QByteArray byteArrayOfJson, 
             if(agentModelList.count() > 0)
             {
                 // Create a new Agent In Mapping
-                _addAgentModelsToMappingAtPosition(importedMapping->name,agentModelList,importedMapping->position);
+                _addAgentModelsToMappingAtPosition(importedMapping->name, agentModelList, importedMapping->position);
 
                 AgentInMappingVM* agentInMapping = getAgentInMappingFromName(importedMapping->name);
                 if(agentInMapping != NULL)
@@ -1033,7 +1083,7 @@ void AgentsMappingController::importMappingFromJson(QByteArray byteArrayOfJson, 
         }
 
         // Add links
-        if(mappingElements.count() > 0)
+        if (mappingElements.count() > 0)
         {
             // Create all mapping links
             foreach (ElementMappingM* elementMapping, mappingElements)

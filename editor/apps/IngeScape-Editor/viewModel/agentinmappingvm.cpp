@@ -299,6 +299,7 @@ void AgentInMappingVM::_onIsONofModelChanged(bool isON)
  */
 void AgentInMappingVM::_onDefinitionOfModelChanged(DefinitionM* definition)
 {
+    // FIXME: ne tient pas compte du fait que chaque modèle a sa propre définition et qu'elles peuvent être différentes !
     if (definition != NULL)
     {
         // First remove existing inputs and outputs

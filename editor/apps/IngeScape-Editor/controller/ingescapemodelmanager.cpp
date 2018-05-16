@@ -448,6 +448,13 @@ void IngeScapeModelManager::onDefinitionReceived(QString peerId, QString agentNa
                          deleteAgentDefinition(previousDefinition);
                      }
                  }
+
+                 // Our global mapping is passive (NOT controlled)
+                 // The agent is ON
+                 if (!_isMappingControlled && agent->isON() && (agent->definition() != NULL))
+                 {
+                     Q_EMIT observeActiveAgent(agent);
+                 }
             }
         }
     }

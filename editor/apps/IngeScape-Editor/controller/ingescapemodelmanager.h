@@ -227,6 +227,13 @@ Q_SIGNALS:
 
 
     /**
+     * @brief Signal emitted when an active agent (with a definition) must be observed
+     * @param agent
+     */
+    void observeActiveAgent(AgentM* agent);
+
+
+    /**
      * @brief Emitted when two agents are mapped
      * @param mappingElement
      */
