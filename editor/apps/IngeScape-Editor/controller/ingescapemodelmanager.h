@@ -253,6 +253,12 @@ Q_SIGNALS:
      */
     void recordsListChanged(QList<RecordM*> records);
 
+    /**
+     * @brief Emitted when a record has been added
+     * @param record
+     */
+    void recordAdded(RecordM* record);
+
 
 public Q_SLOTS:
 
@@ -313,9 +319,15 @@ public Q_SLOTS:
 
     /**
      * @brief Slot called when all records of DB have been received and must be processed
-     * @param mapping in JSON format
+     * @param records in JSON format
      */
-    void onAllRecordsReceived(QString mappingJSON);
+    void onAllRecordsReceived(QString records);
+
+    /**
+     * @brief Slot called when a new record has been stored into DB
+     * @param record in JSON format
+     */
+    void onNewRecordReceived(QString record);
 
     /**
      * @brief Slot called when a new value is published

@@ -136,9 +136,16 @@ Q_SIGNALS:
 
     /**
      * @brief Signal emitted when all records from DB have been received
-     * @param mappingJSON
+     * @param recordsJSON
      */
-    void allrecordsReceived(QString recordsJSON);
+    void allRecordsReceived(QString recordsJSON);
+
+
+    /**
+     * @brief Signal emitted when a new record has been received
+     * @param recordJSON
+     */
+    void newRecordReceived(QString recordJSON);
 
 
     /**

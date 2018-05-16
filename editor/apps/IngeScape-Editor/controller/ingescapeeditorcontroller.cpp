@@ -160,7 +160,8 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(_networkC, &NetworkController::launcherExited, _modelManager, &IngeScapeModelManager::onLauncherExited);
     connect(_networkC, &NetworkController::definitionReceived, _modelManager, &IngeScapeModelManager::onDefinitionReceived);
     connect(_networkC, &NetworkController::mappingReceived, _modelManager, &IngeScapeModelManager::onMappingReceived);
-    connect(_networkC, &NetworkController::allrecordsReceived, _modelManager, &IngeScapeModelManager::onAllRecordsReceived);
+    connect(_networkC, &NetworkController::allRecordsReceived, _modelManager, &IngeScapeModelManager::onAllRecordsReceived);
+    connect(_networkC, &NetworkController::newRecordReceived, _modelManager, &IngeScapeModelManager::onNewRecordReceived);
     connect(_networkC, &NetworkController::valuePublished, _modelManager, &IngeScapeModelManager::onValuePublished);
     connect(_networkC, &NetworkController::isMutedFromAgentUpdated, _modelManager, &IngeScapeModelManager::onisMutedFromAgentUpdated);
     connect(_networkC, &NetworkController::isFrozenFromAgentUpdated, _modelManager, &IngeScapeModelManager::onIsFrozenFromAgentUpdated);
@@ -180,6 +181,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(_modelManager, &IngeScapeModelManager::removeInputsToEditorForOutputs, _networkC, &NetworkController::onRemoveInputsToEditorForOutputs);
     connect(_modelManager, &IngeScapeModelManager::commandAskedToAgent, _networkC, &NetworkController::onCommandAskedToAgent);
     connect(_modelManager, &IngeScapeModelManager::recordsListChanged, _recordsSupervisionC, &RecordsSupervisionController::onRecordsListChanged);
+    connect(_modelManager, &IngeScapeModelManager::recordAdded, _recordsSupervisionC, &RecordsSupervisionController::onRecordAdded);
 
 
     // Connect to signals from the controller for supervision of agents
