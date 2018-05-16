@@ -596,7 +596,7 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 char *input = zmsg_popstr (msgDuplicate);
                 iopType_t inputType = igs_getTypeForInput(input);
                 
-                if (inputType > 0){
+                if (inputType > 0 && zmsg_size(msgDuplicate) > 0){
                     zframe_t *frame = NULL;
                     void *data = NULL;
                     size_t size = 0;
@@ -616,6 +616,8 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     if (value != NULL){
                         free(value);
                     }
+                }else{
+                    igs_warn("replay message for input %s is not correct and was ignored", input);
                 }
                 if (input != NULL){
                     free(input);
