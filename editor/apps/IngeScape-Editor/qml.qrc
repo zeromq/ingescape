@@ -49,5 +49,6 @@
         <file>qml/host/HostsList.qml</file>
         <file>settings/IngeScape-Editor.ini</file>
         <file>qml/record/RecordsList.qml</file>
+        <file>qml/NetworkConfiguration.qml</file>
     </qresource>
 </RCC>

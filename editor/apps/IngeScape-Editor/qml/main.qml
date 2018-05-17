@@ -191,7 +191,18 @@ ApplicationWindow {
 
 
         Menu {
-            title: qsTr("Tools")
+            title: qsTr("Options")
+
+            MenuItem {
+                text: qsTr("Configure network")
+
+                onTriggered: {
+                    if (IngeScapeEditorC) {
+                        console.log("Configure network");
+                        networkConfiguration.visible = true;
+                    }
+                }
+            }
 
             MenuItem {
                 text: qsTr("Create snapshot")
@@ -293,6 +304,15 @@ ApplicationWindow {
                     easing.type: Easing.OutQuad;
                 }
             }
+        }
+
+
+        NetworkConfiguration {
+            id: networkConfiguration
+
+            visible: false
+
+            anchors.centerIn: parent
         }
 
 

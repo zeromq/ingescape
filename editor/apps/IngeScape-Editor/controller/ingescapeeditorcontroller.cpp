@@ -260,11 +260,6 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
 
     // FIXME: sleep to display our loading screen
     //QThread::msleep(2000);
-
-    // Init the timer to let agents to connect before setting the application in "mapped" mode
-    /*_timer.setInterval(2000);
-    connect(&_timer, &QTimer::timeout, this, &IngeScapeEditorController::_onTimeout);
-    _timer.start();*/
 }
 
 
@@ -667,19 +662,3 @@ bool IngeScapeEditorController::canDeleteAgentInMapping(AgentInMappingVM* agentI
 
     return canBeDeleted;
 }
-
-
-/**
- * @brief Aims at initializing editor in "Mapped" mode
- */
-/*void IngeScapeEditorController::_onTimeout()
-{
-    // Stop our timer
-    _timer.stop();
-
-    // Initialize platform from online mapping
-    if (_modelManager != NULL)
-    {
-        _modelManager->setisMappingActivated(true);
-    }
-}*/
