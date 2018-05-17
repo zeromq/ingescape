@@ -33,6 +33,10 @@ class AgentsMappingController : public QObject
 {
     Q_OBJECT
 
+    // Size of the mapping view
+    I2_QML_PROPERTY(double, viewWidth)
+    I2_QML_PROPERTY(double, viewHeight)
+
     // List of all agents in mapping
     I2_QOBJECT_LISTMODEL(AgentInMappingVM, allAgentsInMapping)
 

@@ -60,6 +60,17 @@ Item {
 
         anchors.fill: parent
 
+        onWidthChanged: {
+            if (controller) {
+                controller.viewWidth = width;
+            }
+        }
+        onHeightChanged: {
+            if (controller) {
+                controller.viewHeight = height;
+            }
+        }
+
 
         //
         // Node graph view
