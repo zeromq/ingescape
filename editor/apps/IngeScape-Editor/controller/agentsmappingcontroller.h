@@ -39,10 +39,6 @@ class AgentsMappingController : public QObject
     // List of all links between agents in mapping
     I2_QOBJECT_LISTMODEL(MapBetweenIOPVM, allLinksInMapping)
 
-    // List of all partial links between agents (input and input agent are fully defined, output and output agent are ghost element)
-    // This list is not empty in the case of the presence of Ghost Agents in the mapping
-    //I2_QOBJECT_LISTMODEL(MapBetweenIOPVM, allPartialLinksInMapping)
-
     // Flag indicating if our mapping is empty
     I2_QML_PROPERTY_READONLY(bool, isEmptyMapping)
 
@@ -393,11 +389,11 @@ private:
     // Map from agent name to the (view model of) agent in mapping
     QHash<QString, AgentInMappingVM*> _mapFromNameToAgentInMapping;
 
-    // Map from "agent in mapping name" to a list of MapBetweenIOPVM where the agent is involved as outputAgent
-    //QHash<QString, QList<MapBetweenIOPVM*>> _mapFromAgentNameToPartialMapBetweenIOPViewModelsList;
-
     // Previous list of agents in mapping
     QList<AgentInMappingVM*> _previousListOfAgentsInMapping;
+
+    // Hash table from "agent name" to a list of waiting links (where the agent is involved as "Output Agent")
+    QHash<QString, QList<ElementMappingM*>> _hashFromAgentNameToListOfWaitingLinks;
 };
 
 QML_DECLARE_TYPE(AgentsMappingController)

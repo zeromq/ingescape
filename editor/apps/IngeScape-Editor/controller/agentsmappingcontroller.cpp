@@ -64,7 +64,7 @@ AgentsMappingController::~AgentsMappingController()
 
     // Delete all links
     _allLinksInMapping.deleteAllItems();
-    //_allPartialLinksInMapping.deleteAllItems();
+    _hashFromAgentNameToListOfWaitingLinks.clear();
 
     // Delete all agents in mapping
     _previousListOfAgentsInMapping.clear();
@@ -473,7 +473,7 @@ void AgentsMappingController::onIsMappingActivatedChanged(bool isMappingActivate
         {
             qDebug() << "Mapping Activated and it is completely EMPTY, we add agents (and links) on our HMI";
 
-            if (_modelManager != NULL)
+            /*if (_modelManager != NULL)
             {
                 if (_modelManager->isMappingControlled()) {
                     qDebug() << "Mapping Activated in mode CONTROL";
@@ -536,7 +536,7 @@ void AgentsMappingController::onIsMappingActivatedChanged(bool isMappingActivate
 
                 // Notify the QML to fit the view
                 Q_EMIT fitToView();
-            }
+            }*/
         }
         // Mapping has some agents (and links)
         else
@@ -659,7 +659,22 @@ void AgentsMappingController::onActiveAgentDefined(AgentM* agent)
                 // Add new model(s) of agent to the current mapping
                 _addAgentModelsToMappingAtPosition(agentName, activeAgentsList, position);
             }
-            // Else: Nothing to do (because the model has already been added to the models list of this "Agent in Mapping VM")
+            //else {
+                // Nothing to do (because the model has already been added to the models list of this "Agent in Mapping VM")
+            //}
+
+            // If there are waiting links (where this agent is involved as "Output Agent")
+            if (_hashFromAgentNameToListOfWaitingLinks.contains(agentName))
+            {
+                QList<ElementMappingM*> listOfWaitingLinks = _hashFromAgentNameToListOfWaitingLinks.value(agentName);
+                for (ElementMappingM* mappingElement : listOfWaitingLinks)
+                {
+                    qDebug() << "Create waiting MAP..." << mappingElement->outputAgent() << "." << mappingElement->output() << "-->" << mappingElement->inputAgent() << "." << mappingElement->input();
+
+                    // Create the link corresponding to the mapping element
+                    onMapped(mappingElement);
+                }
+            }
         }
     }
 }
@@ -673,7 +688,7 @@ void AgentsMappingController::onMapped(ElementMappingM* mappingElement)
 {
     if (mappingElement != NULL)
     {
-        qDebug() << "MAPPED" << mappingElement->outputAgent() << "." << mappingElement->output() << "-->" << mappingElement->inputAgent() << "." << mappingElement->input();
+        //qDebug() << "MAPPED" << mappingElement->outputAgent() << "." << mappingElement->output() << "-->" << mappingElement->inputAgent() << "." << mappingElement->input();
 
         // Try to get the virtual link which corresponds to the mapping element
         MapBetweenIOPVM* link = _getLinkFromMappingElement(mappingElement);
@@ -717,7 +732,40 @@ void AgentsMappingController::onMapped(ElementMappingM* mappingElement)
 
                     // Add to the list
                     _allLinksInMapping.append(link);
+
+                    qDebug() << "MAP has been created:" << mappingElement->outputAgent() << "." << mappingElement->output() << "-->" << mappingElement->inputAgent() << "." << mappingElement->input();
+
+                    // If there is a list of waiting links (where the agent is involved as "Output Agent")
+                    if (_hashFromAgentNameToListOfWaitingLinks.contains(mappingElement->outputAgent()))
+                    {
+                        QList<ElementMappingM*> listOfWaitingLinks = _hashFromAgentNameToListOfWaitingLinks.value(mappingElement->outputAgent());
+                        if (listOfWaitingLinks.contains(mappingElement))
+                        {
+                            // Remove the mapping element from the list because the corresponding link is really created
+                            listOfWaitingLinks.removeOne(mappingElement);
+
+                            // Update the hash table
+                            _hashFromAgentNameToListOfWaitingLinks.insert(mappingElement->outputAgent(), listOfWaitingLinks);
+                        }
+                    }
                 }
+            }
+            // Output agent is not yet in the mapping
+            else if (inputAgent != NULL) // && (outputAgent == NULL)
+            {
+                QList<ElementMappingM*> listOfWaitingLinks = QList<ElementMappingM*>();
+
+                if (_hashFromAgentNameToListOfWaitingLinks.contains(mappingElement->outputAgent())) {
+                    listOfWaitingLinks = _hashFromAgentNameToListOfWaitingLinks.value(mappingElement->outputAgent());
+                }
+
+                // Add the mapping element to the list to create the corresponding link later
+                listOfWaitingLinks.append(mappingElement);
+
+                // Update the hash table
+                _hashFromAgentNameToListOfWaitingLinks.insert(mappingElement->outputAgent(), listOfWaitingLinks);
+
+                qDebug() << "MAP will be created later:" << mappingElement->outputAgent() << "." << mappingElement->output() << "-->" << mappingElement->inputAgent() << "." << mappingElement->input();
             }
         }
         else {
