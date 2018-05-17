@@ -217,7 +217,7 @@ void ValuesHistoryController::_updateFilters()
         qDebug() << AgentIOPTypes::staticEnumToString(agentIOPType);
     }*/
 
-    qDebug() << "All agents" << _allAgentNamesList << "-- selected agents" << _selectedAgentNamesList;
+    //qDebug() << "All agents" << _allAgentNamesList << "-- selected agents" << _selectedAgentNamesList;
 
     // Update the list of agent names of the filter
     _filteredValues.setselectedAgentNamesList(_selectedAgentNamesList);

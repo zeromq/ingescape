@@ -621,12 +621,19 @@ void AgentsMappingController::onActiveAgentDefined(AgentM* agent)
         // CONTROL
         if (_modelManager->isMappingControlled())
         {
+            qDebug() << "CONTROL: Model of" << agentName << "is defined. CLEAR its MAPPING !";
+
+            QStringList peerIdsList;
+            peerIdsList.append(agent->peerId());
+
             // Emit the signal to send the command "CLEAR_MAPPING" on the network to the agent
-            //Q_EMIT commandAskedToAgent(peerIdsList, "CLEAR_MAPPING");
+            Q_EMIT commandAskedToAgent(peerIdsList, "CLEAR_MAPPING");
         }
         // OBSERVE
         else
         {
+            qDebug() << "OBSERVE: Model of" << agentName << "is defined. ADD in MAPPING view !" << agent;
+
             // Initial size of our window: 1920 x 1080
             // - Width of our left panel: 320
             int availableMinWidth = 1920 - 320;
@@ -652,15 +659,7 @@ void AgentsMappingController::onActiveAgentDefined(AgentM* agent)
                 // Add new model(s) of agent to the current mapping
                 _addAgentModelsToMappingAtPosition(agentName, activeAgentsList, position);
             }
-            else
-            {
-                if (!agentInMapping->models()->contains(agent))
-                {
-                    qDebug() << agentName << "is already in the mapping but not this new model !";
-                    // FIXME: TODO
-                    //agentInMapping->models()->append(agent);
-                }
-            }
+            // Else: Nothing to do (because the model has already been added to the models list of this "Agent in Mapping VM")
         }
     }
 }
