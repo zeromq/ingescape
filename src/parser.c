@@ -581,7 +581,7 @@ static void json_dump_iop (yajl_gen *g, agent_iop_t* aiop) {
 
         default:
             {
-                fprintf(stderr, "%s - ERROR -  unknown data type to convert in string\n", __FUNCTION__);
+                igs_warn("unknown data type to convert in string (%d)", aiop->value_type);
                 yajl_gen_string(*g, (const unsigned char *) "", 0);
             }
             break;
