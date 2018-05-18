@@ -685,6 +685,60 @@ void AgentsMappingController::onActiveAgentDefined(AgentM* agent)
 
 
 /**
+ * @brief Slot called when the mapping of an active agent has been defined
+ * @param agent
+ */
+void AgentsMappingController::onActiveAgentMappingDefined(AgentM* agent)
+{
+    if ((agent != NULL) && (agent->mapping() != NULL))
+    {
+        AgentInMappingVM* agentInMapping = getAgentInMappingFromName(agent->name());
+        if ((agentInMapping != NULL) && (agentInMapping->temporaryMapping() != NULL))
+        {
+            QStringList idsOfRemovedMappingElements;
+            foreach (QString idPreviousList, agentInMapping->temporaryMapping()->idsOfMappingElements()) {
+                if (!agent->mapping()->idsOfMappingElements().contains(idPreviousList)) {
+                    idsOfRemovedMappingElements.append(idPreviousList);
+                }
+            }
+
+            QStringList idsOfAddedMappingElements;
+            foreach (QString idNewList, agent->mapping()->idsOfMappingElements()) {
+                if (!agentInMapping->temporaryMapping()->idsOfMappingElements().contains(idNewList)) {
+                    idsOfAddedMappingElements.append(idNewList);
+                }
+            }
+
+            // If there are some Removed mapping elements
+            if (!idsOfRemovedMappingElements.isEmpty())
+            {
+                qDebug() << "unmapped" << idsOfRemovedMappingElements;
+
+                foreach (ElementMappingM* mappingElement, agentInMapping->temporaryMapping()->mappingElements()->toList()) {
+                    if ((mappingElement != NULL) && idsOfRemovedMappingElements.contains(mappingElement->id()))
+                    {
+                        onUnmapped(mappingElement);
+                    }
+                }
+            }
+            // If there are some Added mapping elements
+            if (!idsOfAddedMappingElements.isEmpty())
+            {
+                qDebug() << "mapped" << idsOfAddedMappingElements;
+
+                foreach (ElementMappingM* mappingElement, agent->mapping()->mappingElements()->toList()) {
+                    if ((mappingElement != NULL) && idsOfAddedMappingElements.contains(mappingElement->id()))
+                    {
+                        onMapped(mappingElement);
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+/**
  * @brief Slot when two agents are mapped
  * @param mappingElement
  */
