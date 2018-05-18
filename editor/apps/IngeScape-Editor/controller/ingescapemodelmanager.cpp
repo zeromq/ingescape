@@ -465,100 +465,96 @@ void IngeScapeModelManager::onDefinitionReceived(QString peerId, QString agentNa
  */
 void IngeScapeModelManager::onMappingReceived(QString peerId, QString agentName, QString mappingJSON)
 {
-    if (!mappingJSON.isEmpty())
+    AgentM* agent = getAgentModelFromPeerId(peerId);
+    if (agent != NULL)
     {
-        AgentM* agent = getAgentModelFromPeerId(peerId);
-        if (agent != NULL)
-        {
-            QByteArray byteArrayOfJson = mappingJSON.toUtf8();
+        AgentMappingM* agentMapping = NULL;
 
+        if (mappingJSON.isEmpty())
+        {
+            QString mappingName = QString("EMPTY MAPPING of %1").arg(agentName);
+            agentMapping = new AgentMappingM(mappingName, "", "");
+        }
+        else
+        {
             // Create a model of agent mapping with JSON
-            AgentMappingM* agentMapping = _jsonHelper->createModelOfAgentMapping(agentName, byteArrayOfJson);
-            if (agentMapping != NULL)
+            agentMapping = _jsonHelper->createModelOfAgentMapping(agentName, mappingJSON.toUtf8());
+        }
+
+        if (agentMapping != NULL)
+        {
+            if (agent->mapping() == NULL)
             {
-                if (agent->mapping() == NULL)
+                // Add this new model of agent mapping
+                addAgentMappingForAgentName(agentMapping, agentName);
+
+                // Set this mapping to the agent
+                agent->setmapping(agentMapping);
+
+                // Emit the signal "Active Agent Mapping Defined"
+                Q_EMIT activeAgentMappingDefined(agent);
+            }
+            // There is already a mapping for this agent
+            else
+            {
+                qWarning() << "Update the mapping of agent" << agentName << "(if this mapping has changed)";
+
+                AgentMappingM* previousMapping = agent->mapping();
+
+                QStringList idsOfRemovedMappingElements;
+                foreach (QString idPreviousList, previousMapping->idsOfMappingElements()) {
+                    if (!agentMapping->idsOfMappingElements().contains(idPreviousList)) {
+                        idsOfRemovedMappingElements.append(idPreviousList);
+                    }
+                }
+
+                QStringList idsOfAddedMappingElements;
+                foreach (QString idNewList, agentMapping->idsOfMappingElements()) {
+                    if (!previousMapping->idsOfMappingElements().contains(idNewList)) {
+                        idsOfAddedMappingElements.append(idNewList);
+                    }
+                }
+
+                // If there are some Removed mapping elements
+                if (idsOfRemovedMappingElements.count() > 0)
                 {
+                    //qDebug() << "unmapped" << idsOfRemovedMappingElements;
+
+                    foreach (ElementMappingM* mappingElement, previousMapping->mappingElements()->toList()) {
+                        if ((mappingElement != NULL) && idsOfRemovedMappingElements.contains(mappingElement->id()))
+                        {
+                            // Emit the signal "UN-mapped"
+                            Q_EMIT unmapped(mappingElement);
+                        }
+                    }
+                }
+                // If there are some Added mapping elements
+                if (idsOfAddedMappingElements.count() > 0)
+                {
+                    //qDebug() << "mapped" << idsOfAddedMappingElements;
+
                     foreach (ElementMappingM* mappingElement, agentMapping->mappingElements()->toList()) {
-                        if (mappingElement != NULL)
+                        if ((mappingElement != NULL) && idsOfAddedMappingElements.contains(mappingElement->id()))
                         {
                             // Emit the signal "Mapped"
                             Q_EMIT mapped(mappingElement);
                         }
                     }
-
-                    // Add this new model of agent mapping
-                    addAgentMappingForAgentName(agentMapping, agentName);
-
-                    // Set this mapping to the agent
-                    agent->setmapping(agentMapping);
                 }
-                // There is already a mapping for this agent
-                else
-                {
-                    qWarning() << "Update the mapping of agent" << agentName << "(if this mapping has changed)";
 
-                    AgentMappingM* previousMapping = agent->mapping();
+                // Add a model of agent mapping for an agent name
+                addAgentMappingForAgentName(agentMapping, agentName);
 
-                    // Same name, version and description
-                    /*if ((agentMapping->name() == previousMapping->name())
-                            && (agentMapping->version() == previousMapping->version())
-                            && (agentMapping->description() == previousMapping->description()))
-                    {*/
-                        QStringList idsOfRemovedMappingElements;
-                        foreach (QString idPreviousList, previousMapping->idsOfMappingElements()) {
-                            if (!agentMapping->idsOfMappingElements().contains(idPreviousList)) {
-                                idsOfRemovedMappingElements.append(idPreviousList);
-                            }
-                        }
+                // Set this new mapping to the agent
+                agent->setmapping(agentMapping);
 
-                        QStringList idsOfAddedMappingElements;
-                        foreach (QString idNewList, agentMapping->idsOfMappingElements()) {
-                            if (!previousMapping->idsOfMappingElements().contains(idNewList)) {
-                                idsOfAddedMappingElements.append(idNewList);
-                            }
-                        }
-
-                        // If there are some Removed mapping elements
-                        if (idsOfRemovedMappingElements.count() > 0)
-                        {
-                            //qDebug() << "unmapped" << idsOfRemovedMappingElements;
-
-                            foreach (ElementMappingM* mappingElement, previousMapping->mappingElements()->toList()) {
-                                if ((mappingElement != NULL) && idsOfRemovedMappingElements.contains(mappingElement->id()))
-                                {
-                                    // Emit the signal "UN-mapped"
-                                    Q_EMIT unmapped(mappingElement);
-                                }
-                            }
-                        }
-                        // If there are some Added mapping elements
-                        if (idsOfAddedMappingElements.count() > 0)
-                        {
-                            //qDebug() << "mapped" << idsOfAddedMappingElements;
-
-                            foreach (ElementMappingM* mappingElement, agentMapping->mappingElements()->toList()) {
-                                if ((mappingElement != NULL) && idsOfAddedMappingElements.contains(mappingElement->id()))
-                                {
-                                    // Emit the signal "Mapped"
-                                    Q_EMIT mapped(mappingElement);
-                                }
-                            }
-                        }
-
-                        // Add a model of agent mapping for an agent name
-                        addAgentMappingForAgentName(agentMapping, agentName);
-
-                        // Set this new mapping to the agent
-                        agent->setmapping(agentMapping);
-
-                        // Delete a model of agent mapping
-                        deleteAgentMapping(previousMapping);
-                    //}
-                }
+                // Delete a model of agent mapping
+                deleteAgentMapping(previousMapping);
             }
         }
     }
 }
+
 
 /**
  * @brief Occurs when records from DB have been received

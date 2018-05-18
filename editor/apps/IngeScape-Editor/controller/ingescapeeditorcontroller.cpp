@@ -184,6 +184,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(_modelManager, &IngeScapeModelManager::agentModelWillBeDeleted, _hostsSupervisionC, &HostsSupervisionController::onAgentModelWillBeDeleted);
 
     connect(_modelManager, &IngeScapeModelManager::activeAgentDefined, _agentsMappingC, &AgentsMappingController::onActiveAgentDefined);
+    connect(_modelManager, &IngeScapeModelManager::activeAgentMappingDefined, _agentsMappingC, &AgentsMappingController::onActiveAgentMappingDefined);
     connect(_modelManager, &IngeScapeModelManager::mapped, _agentsMappingC, &AgentsMappingController::onMapped);
     connect(_modelManager, &IngeScapeModelManager::unmapped, _agentsMappingC, &AgentsMappingController::onUnmapped);
 

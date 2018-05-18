@@ -256,6 +256,13 @@ public Q_SLOTS:
 
 
     /**
+     * @brief Slot called when the mapping of an active agent has been defined
+     * @param agent
+     */
+    void onActiveAgentMappingDefined(AgentM* agent);
+
+
+    /**
      * @brief Slot when two agents are mapped
      * @param mappingElement
      */

@@ -234,6 +234,13 @@ Q_SIGNALS:
 
 
     /**
+     * @brief Signal emitted when the mapping of an active agent has been defined
+     * @param agent
+     */
+    void activeAgentMappingDefined(AgentM* agent);
+
+
+    /**
      * @brief Emitted when two agents are mapped
      * @param mappingElement
      */
