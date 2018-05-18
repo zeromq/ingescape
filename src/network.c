@@ -664,19 +664,36 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 free(strDefinition);
             }
             //check if message is an EXTERNAL mapping
-            else if(strlen(message) > strlen(mappingPrefix) && strncmp (message, mappingPrefix, strlen(mappingPrefix)) == 0){
-                // Extract mapping from message
-                char* strMapping = calloc(strlen(message)- strlen(mappingPrefix)+1, sizeof(char));
-                memcpy(strMapping, &message[strlen(mappingPrefix)], strlen(message)- strlen(mappingPrefix));
-                strMapping[strlen(message)- strlen(mappingPrefix)] = '\0';
-                
-                // Load mapping from string content
-                mapping_t *newMapping = parser_LoadMap(strMapping);
-                subscriber_t *subscriber;
+            else if(strlen(message) >= strlen(mappingPrefix) && strncmp (message, mappingPrefix, strlen(mappingPrefix)) == 0){
+                subscriber_t *subscriber = NULL;
                 HASH_FIND_STR(subscribers, peer, subscriber);
+                if (subscriber == NULL){
+                    igs_error("Could not find internal structure for agent %s", name);
+                }
                 
-                if (newMapping != NULL && newMapping->name != NULL && subscriber != NULL){
-                    // Look if this agent already has a mapping
+                char* strMapping = NULL;
+                mapping_t *newMapping = NULL;
+                if (strlen(message) != strlen(mappingPrefix)){
+                    //extract mapping from message
+                    strMapping = calloc(strlen(message)- strlen(mappingPrefix)+1, sizeof(char));
+                    memcpy(strMapping, &message[strlen(mappingPrefix)], strlen(message)- strlen(mappingPrefix));
+                    strMapping[strlen(message)- strlen(mappingPrefix)] = '\0';
+                    
+                    //load mapping from string content
+                    newMapping = parser_LoadMap(strMapping);
+                    if (newMapping == NULL){
+                        igs_error("Received mapping for agent %s could not be parsed properly", name);
+                    }
+                }else{
+                    igs_info("Received mapping from agent %s is empty", name);
+                    if(subscriber != NULL && subscriber->mapping != NULL) {
+                        mapping_freeMapping(subscriber->mapping);
+                        subscriber->mapping = NULL;
+                    }
+                }
+                
+                if (newMapping != NULL && subscriber != NULL){
+                    //look if this agent already has a mapping
                     if(subscriber->mapping != NULL){
                         igs_info("Mapping already exists for agent %s : new mapping will overwrite the previous one...", name);
                         mapping_freeMapping(subscriber->mapping);
@@ -686,11 +703,6 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     igs_info("Store mapping for agent %s", name);
                     subscriber->mapping = newMapping;
                 }else{
-                    igs_error("Received mapping from agent %s is NULL or has no name", name);
-                    if(subscriber != NULL && subscriber->mapping != NULL) {
-                        mapping_freeMapping(subscriber->mapping);
-                        subscriber->mapping = NULL;
-                    }
                     if(newMapping != NULL) {
                         mapping_freeMapping(newMapping);
                         newMapping = NULL;
