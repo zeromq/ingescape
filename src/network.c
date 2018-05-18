@@ -561,6 +561,8 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 if (mappingStr != NULL){
                     sendMappingToAgent(peer, mappingStr);
                     free(mappingStr);
+                }else{
+                    sendMappingToAgent(peer, "");
                 }
                 //we also send our frozen and muted states
                 if (isWholeAgentMuted){
