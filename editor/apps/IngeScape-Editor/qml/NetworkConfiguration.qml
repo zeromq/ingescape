@@ -29,27 +29,119 @@ Item {
     Rectangle {
         anchors.fill: parent
 
-        color: IngeScapeTheme.greyColor
+        color: IngeScapeTheme.darkGreyColor
 
     }
 
     Column {
+        anchors {
+            fill: parent
+            margins: 20
+        }
+
+        spacing: 10
+
         Text {
             id: title
 
             text: qsTr("Configure network")
+
+            color: IngeScapeTheme.whiteColor
+            font {
+                family: IngeScapeTheme.textFontFamily
+                weight : Font.Medium
+                pixelSize : 20
+            }
         }
 
         Text {
-            id: port
+            id: currentPort
 
             text: qsTr("Current port: %1").arg(IngeScapeEditorC.port)
+
+            color: IngeScapeTheme.whiteColor
+            font {
+                family: IngeScapeTheme.textFontFamily
+                weight : Font.Medium
+                pixelSize : 16
+            }
         }
 
+        TextField {
+            id: newPort
+
+            /*anchors {
+                left : parent.left
+                verticalCenter : parent.verticalCenter
+            }*/
+
+            height: 25
+            width: 185
+            verticalAlignment: TextInput.AlignVCenter
+            text: IngeScapeEditorC ? IngeScapeEditorC.temporaryPort : "0"
+
+            style: I2TextFieldStyle {
+                backgroundColor: IngeScapeTheme.darkBlueGreyColor
+                borderColor: IngeScapeTheme.whiteColor;
+                borderErrorColor: IngeScapeTheme.redColor
+                radiusTextBox: 1
+                borderWidth: 0;
+                borderWidthActive: 1
+                textIdleColor: IngeScapeTheme.whiteColor;
+                textDisabledColor: IngeScapeTheme.darkGreyColor;
+
+                padding.left: 3
+                padding.right: 3
+
+                font {
+                    pixelSize:15
+                    family: IngeScapeTheme.textFontFamily
+                }
+
+            }
+
+            onTextChanged: {
+                if (activeFocus && IngeScapeEditorC) {
+                    IngeScapeEditorC.temporaryPort = text;
+                }
+            }
+
+            /*onActiveFocusChanged: {
+                if (!activeFocus) {
+                    // Move cursor to our first character when we lose focus
+                    // (to always display the beginning or our text instead of
+                    // an arbitrary part if our text is too long)
+                    cursorPosition = 0;
+                } else {
+                    textFieldName.selectAll();
+                }
+            }*/
+
+
+            Binding {
+                target: newPort
+                property:  "text"
+                value: if (IngeScapeEditorC) {
+                           IngeScapeEditorC.temporaryPort
+                       }
+                       else {
+                           "0";
+                       }
+            }
+        }
+
+
         Text {
-            id: networkDevice
+            id: currentNetworkDevice
 
             text: qsTr("Current network device: %1").arg(IngeScapeEditorC.networkDevice)
+
+            color: IngeScapeTheme.whiteColor
+            font {
+                family: IngeScapeTheme.textFontFamily
+                weight : Font.Medium
+                pixelSize : 16
+            }
         }
 
         /*ListView {

@@ -55,6 +55,9 @@ class IngeScapeEditorController : public QObject
     // Network settings - port
     I2_QML_PROPERTY_READONLY(int, port)
 
+    // Network settings - temporary port (before OK/Cancel)
+    I2_QML_PROPERTY(int, temporaryPort)
+
     // List of available network devices
     I2_QML_PROPERTY_READONLY(QStringList, availableNetworkDevices)
 

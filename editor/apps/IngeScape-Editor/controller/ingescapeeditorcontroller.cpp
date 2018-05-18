@@ -74,6 +74,8 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     qInfo() << "Network Device:" << _networkDevice << "-- IP address:" << _ipAddress << "-- Port" << QString::number(_port);
     settings.endGroup();
 
+    _temporaryPort = _port;
+
 
     // Directory for agents lists
     QString agentsListPath = IngeScapeEditorUtils::getAgentsListPath();
