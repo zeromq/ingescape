@@ -35,6 +35,9 @@ class NetworkController: public QObject
 {
     Q_OBJECT
 
+    // List of available network devices
+    I2_QML_PROPERTY_READONLY(QStringList, availableNetworkDevices)
+
 
 public:
 
@@ -59,6 +62,12 @@ public:
      * @return
      */
     bool start(QString networkDevice, QString ipAddress, int port);
+
+
+    /**
+     * @brief Stop our INGESCAPE agent
+     */
+    void stop();
 
 
     /**

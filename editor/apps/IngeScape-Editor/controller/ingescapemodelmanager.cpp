@@ -266,6 +266,20 @@ QString IngeScapeModelManager::getJsonOfMapping(AgentMappingM* agentMapping)
 
 
 /**
+ * @brief Simulate an exit for each agent
+ */
+void IngeScapeModelManager::simulateExitForEachActiveAgent()
+{
+    for (AgentM* agent : _mapFromPeerIdToAgentM.values())
+    {
+        if (agent != NULL) {
+            onAgentExited(agent->peerId(), agent->name());
+        }
+    }
+}
+
+
+/**
  * @brief Slot called when an agent enter the network
  * @param peerId
  * @param agentName

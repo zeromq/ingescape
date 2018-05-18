@@ -197,9 +197,9 @@ ApplicationWindow {
                 text: qsTr("Configure network")
 
                 onTriggered: {
-                    if (IngeScapeEditorC) {
+                    if (applicationLoader.item) {
                         console.log("Configure network");
-                        networkConfiguration.visible = true;
+                        applicationLoader.item.openNetworkConfiguration();
                     }
                 }
             }
@@ -229,9 +229,7 @@ ApplicationWindow {
     // When user clicks on window close button
     onClosing: {
         console.info("QML: Close Window");
-        if (IngeScapeEditorC) {
-            IngeScapeEditorC.processBeforeClosing();
-        }
+        IngeScapeEditorC.processBeforeClosing();
     }
 
 
@@ -304,15 +302,6 @@ ApplicationWindow {
                     easing.type: Easing.OutQuad;
                 }
             }
-        }
-
-
-        NetworkConfiguration {
-            id: networkConfiguration
-
-            visible: false
-
-            anchors.centerIn: parent
         }
 
 

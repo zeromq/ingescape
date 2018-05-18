@@ -32,6 +32,9 @@
  * @param parent
  */
 IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(parent),
+    _networkDevice(""),
+    _ipAddress(""),
+    _port(0),
     _modelManager(NULL),
     _agentsSupervisionC(NULL),
     _agentsMappingC(NULL),
@@ -73,8 +76,6 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _port = settings.value("port").toInt();
     qInfo() << "Network Device:" << _networkDevice << "-- IP address:" << _ipAddress << "-- Port" << QString::number(_port);
     settings.endGroup();
-
-    _temporaryPort = _port;
 
 
     // Directory for agents lists
@@ -664,4 +665,62 @@ bool IngeScapeEditorController::canDeleteAgentInMapping(AgentInMappingVM* agentI
     }
 
     return canBeDeleted;
+}
+
+
+/**
+ * @brief Re-Start the network with a port and a network device
+ * @param strPort
+ * @param networkDevice
+ * @return true when success
+ */
+bool IngeScapeEditorController::restartNetwork(QString strPort, QString networkDevice)
+{
+    bool success = false;
+
+    if ((_networkC != NULL) && (_modelManager != NULL))
+    {
+        bool isInt = false;
+        int nPort = strPort.toInt(&isInt);
+        if (isInt)
+        {
+            // Port and Network device have not changed...
+            if ((nPort == _port) && (networkDevice == _networkDevice))
+            {
+                // Nothing to do
+            }
+            // Port and Network device
+            else
+            {
+                qInfo() << "Restart the network on" << networkDevice << "with" << strPort;
+
+                _modelManager->setisMappingActivated(false);
+                _modelManager->setisMappingControlled(false);
+
+                // Stop our INGESCAPE agent
+                _networkC->stop();
+
+                // Update properties
+                setnetworkDevice(networkDevice);
+                setport(nPort);
+
+                // Create a new empty platform by deleting all existing data
+                createNewPlatform();
+
+                // Simulate an exit for each agent
+                _modelManager->simulateExitForEachActiveAgent();
+
+                // Start our INGESCAPE agent with the network device and the port
+                success = _networkC->start(networkDevice, "", nPort);
+
+                if (success) {
+                    _modelManager->setisMappingActivated(true);
+                }
+            }
+        }
+        else {
+            qWarning() << "Port" << strPort << "is not an int !";
+        }
+    }
+    return success;
 }

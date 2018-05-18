@@ -475,7 +475,7 @@ NetworkController::NetworkController(QObject *parent) : QObject(parent),
     // Set the name of our agent
     igs_setAgentName(_editorAgentName.toStdString().c_str());
 
-    //add  header to declare ourselves as an editor
+    // Add  header to declare ourselves as an editor
     igs_busAddServiceDescription("isEditor", "1");
 
     //
@@ -505,6 +505,21 @@ NetworkController::NetworkController(QObject *parent) : QObject(parent),
                                   \"mapping_cat\": [] }}";
 
     igs_loadMapping(mappingByDefault.toStdString().c_str());
+
+
+    QStringList networkDevices;
+    char **devices = NULL;
+    int nb = 0;
+    igs_getNetdevicesList(&devices, &nb);
+    for (int i = 0; i < nb; i++)
+    {
+        QString availableNetworkDevice = QString(devices[i]);
+        networkDevices.append(availableNetworkDevice);
+    }
+    igs_freeNetdevicesList(devices, nb);
+
+    setavailableNetworkDevices(networkDevices);
+    qInfo() << "Available Network Devices:" << _availableNetworkDevices;
 }
 
 
@@ -513,10 +528,8 @@ NetworkController::NetworkController(QObject *parent) : QObject(parent),
  */
 NetworkController::~NetworkController()
 {
-    if (_isIngeScapeAgentStarted == 1) {
-        // Stop network services
-        igs_stop();
-    }
+    // Stop our INGESCAPE agent
+    stop();
 }
 
 
@@ -557,6 +570,21 @@ bool NetworkController::start(QString networkDevice, QString ipAddress, int port
     }
 
     return _isIngeScapeAgentStarted;
+}
+
+
+/**
+ * @brief Stop our INGESCAPE agent
+ */
+void NetworkController::stop()
+{
+    if (_isIngeScapeAgentStarted == 1)
+    {
+        // Stop network services
+        igs_stop();
+
+        _isIngeScapeAgentStarted = 0;
+    }
 }
 
 

@@ -96,9 +96,7 @@ void AgentsMappingController::createNewMapping()
     }
 
     // 2- Delete all links
-    foreach (MapBetweenIOPVM* link, _allLinksInMapping.toList())
-    {
-        // Delete the link between two agents
+    foreach (MapBetweenIOPVM* link, _allLinksInMapping.toList()) {
         _deleteLinkBetweenTwoAgents(link);
     }
 
@@ -109,6 +107,7 @@ void AgentsMappingController::createNewMapping()
 
     qInfo() << "Create a new (empty) Mapping";
 }
+
 
 /**
  * @brief Open a Mapping

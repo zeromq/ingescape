@@ -101,6 +101,7 @@ public:
      */
     void deleteAgentModel(AgentM* agent);
 
+
     /**
      * @brief Delete a model of Record
      * @param record
@@ -192,6 +193,12 @@ public:
      * @return
      */
     QString getJsonOfMapping(AgentMappingM* agentMapping);
+
+
+    /**
+     * @brief Simulate an exit for each agent
+     */
+    void simulateExitForEachActiveAgent();
 
 
 Q_SIGNALS:

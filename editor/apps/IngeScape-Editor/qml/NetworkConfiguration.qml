@@ -20,17 +20,35 @@ import I2Quick 1.0
 
 import INGESCAPE 1.0
 
-Item {
+// scenario sub-directory
+import "scenario" as Scenario
+
+I2PopupBase {
     id: rootItem
 
-    width: 400
-    height: 600
+    width: 300
+    height: 400
+
+    dismissOnOutsideTap: false
+
+    // our main controller
+    //property var controller: null;
+
+    onOpened: {
+        combobox.selectedItem = IngeScapeEditorC.networkDevice;
+    }
 
     Rectangle {
         anchors.fill: parent
 
-        color: IngeScapeTheme.darkGreyColor
+        color: IngeScapeTheme.veryDarkGreyColor
 
+        border {
+            width: 2
+            color: IngeScapeTheme.editorsBackgroundBorderColor
+        }
+
+        radius: 5
     }
 
     Column {
@@ -50,14 +68,19 @@ Item {
             font {
                 family: IngeScapeTheme.textFontFamily
                 weight : Font.Medium
-                pixelSize : 20
+                pixelSize : 23
             }
         }
 
-        Text {
-            id: currentPort
+        Rectangle {
+            id: space1
+            color: "transparent"
+            width: 10
+            height: 10
+        }
 
-            text: qsTr("Current port: %1").arg(IngeScapeEditorC.port)
+        Text {
+            text: qsTr("Port:")
 
             color: IngeScapeTheme.whiteColor
             font {
@@ -68,17 +91,12 @@ Item {
         }
 
         TextField {
-            id: newPort
-
-            /*anchors {
-                left : parent.left
-                verticalCenter : parent.verticalCenter
-            }*/
+            id: txtPort
 
             height: 25
-            width: 185
+            width: 200
             verticalAlignment: TextInput.AlignVCenter
-            text: IngeScapeEditorC ? IngeScapeEditorC.temporaryPort : "0"
+            text: IngeScapeEditorC.port
 
             style: I2TextFieldStyle {
                 backgroundColor: IngeScapeTheme.darkBlueGreyColor
@@ -100,41 +118,22 @@ Item {
 
             }
 
-            onTextChanged: {
-                if (activeFocus && IngeScapeEditorC) {
-                    IngeScapeEditorC.temporaryPort = text;
-                }
-            }
-
-            /*onActiveFocusChanged: {
-                if (!activeFocus) {
-                    // Move cursor to our first character when we lose focus
-                    // (to always display the beginning or our text instead of
-                    // an arbitrary part if our text is too long)
-                    cursorPosition = 0;
-                } else {
-                    textFieldName.selectAll();
-                }
-            }*/
-
-
             Binding {
-                target: newPort
-                property:  "text"
-                value: if (IngeScapeEditorC) {
-                           IngeScapeEditorC.temporaryPort
-                       }
-                       else {
-                           "0";
-                       }
+                target: txtPort
+                property: "text"
+                value: IngeScapeEditorC.port
             }
         }
 
+        Rectangle {
+            id: space2
+            color: "transparent"
+            width: 10
+            height: 10
+        }
 
         Text {
-            id: currentNetworkDevice
-
-            text: qsTr("Current network device: %1").arg(IngeScapeEditorC.networkDevice)
+            text: qsTr("Network device:")
 
             color: IngeScapeTheme.whiteColor
             font {
@@ -144,10 +143,21 @@ Item {
             }
         }
 
-        /*ListView {
 
-        }*/
+        // ComboBox to choose the network device
+        Scenario.IngeScapeComboBox {
+            id : combobox
+
+            height : 25
+            width : 200
+
+            model: IngeScapeEditorC.networkC ? IngeScapeEditorC.networkC.availableNetworkDevices : 0
+            useQStringList: true
+
+            //placeholderText: (IngeScapeEditorC.networkC && IngeScapeEditorC.networkC.availableNetworkDevices.count === 0 ? "- No network device -" : "- Select a network device -")
+        }
     }
+
 
     Row {
         anchors {
@@ -191,7 +201,8 @@ Item {
             }
 
             onClicked: {
-                console.log("Cancel")
+                //console.log("Cancel")
+                rootItem.close();
             }
         }
 
@@ -228,7 +239,26 @@ Item {
             }
 
             onClicked: {
-                console.log("OK")
+                //console.log("OK")
+
+                var selectedNetworkDevice = "";
+
+                if (typeof combobox.selectedItem === "string") {
+                    selectedNetworkDevice = combobox.selectedItem;
+                }
+                else {
+                    selectedNetworkDevice = combobox.selectedItem.modelData;
+                }
+
+                // Re-Start the Network
+                var success = IngeScapeEditorC.restartNetwork(txtPort.text, selectedNetworkDevice);
+                if (success === true)
+                {
+                    rootItem.close();
+                }
+                else {
+                    console.error("Network cannot be (re)started on device " + combobox.selectedItem.modelData + " and port " + txtPort.text);
+                }
             }
         }
     }

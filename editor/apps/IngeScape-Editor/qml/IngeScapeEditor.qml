@@ -68,6 +68,11 @@ Item {
         historyPanel.show();
     }
 
+    // function allowing to open the network configuration popup
+    function openNetworkConfiguration() {
+        networkConfigurationPopup.open();
+    }
+
 
 
     //--------------------------------------------------------
@@ -314,9 +319,9 @@ Item {
     }
 
 
-
-
-    // AgentMappingHistory
+    //
+    // History Panel
+    //
     Agent.HistoryPanel {
         id: historyPanel
 
@@ -325,6 +330,16 @@ Item {
             x = rootItem.Window.window.x + rootItem.Window.width/2 - historyPanel.width/2;
             y = rootItem.Window.window.y + rootItem.Window.height/2 - historyPanel.height/2;
         }
+    }
+
+
+    //
+    // Network Configuration (Popup)
+    //
+    NetworkConfiguration {
+        id: networkConfigurationPopup
+
+        anchors.centerIn: parent
     }
 
 
