@@ -704,6 +704,16 @@ bool IngeScapeEditorController::restartNetwork(QString strPort, QString networkD
                 setnetworkDevice(networkDevice);
                 setport(nPort);
 
+                // Update settings file
+                IngeScapeEditorSettings& settings = IngeScapeEditorSettings::Instance();
+                settings.beginGroup("network");
+                settings.setValue("networkDevice", networkDevice);
+                settings.setValue("port", nPort);
+                settings.endGroup();
+                // Save new values
+                settings.sync();
+
+
                 // Create a new empty platform by deleting all existing data
                 createNewPlatform();
 
