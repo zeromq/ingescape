@@ -315,9 +315,6 @@ void AgentsMappingController::dropAgentToMappingAtPosition(QString agentName, Ab
                         foreach (AgentM* model, agentsList->toList()) {
                             if (model != NULL)
                             {
-                                // Emit the signal to send the command "CLEAR_MAPPING" on the network to the agent
-                                //Q_EMIT commandAskedToAgent(peerIdsList, "CLEAR_MAPPING");
-
                                 // OverWrite the mapping of the model of agent (with the mapping currently edited in the agent in mapping)
                                 _overWriteMappingOfAgentModel(model, temporaryMapping);
                             }
@@ -434,8 +431,11 @@ void AgentsMappingController::onIdenticalAgentModelReplaced(AgentM* previousMode
             {
                 agentInMapping->models()->replace(index, newModel);
 
-                // OverWrite the mapping of the model of agent (with the mapping currently edited in the agent in mapping)
-                _overWriteMappingOfAgentModel(newModel, agentInMapping->temporaryMapping());
+                // Our global mapping is controlled
+                if (_modelManager && _modelManager->isMappingControlled()) {
+                    // OverWrite the mapping of the model of agent (with the mapping currently edited in the agent in mapping)
+                    _overWriteMappingOfAgentModel(newModel, agentInMapping->temporaryMapping());
+                }
             }
         }
     }
@@ -455,8 +455,11 @@ void AgentsMappingController::onIdenticalAgentModelAdded(AgentM* newModel)
         {
             agentInMapping->models()->append(newModel);
 
-            // OverWrite the mapping of the model of agent (with the mapping currently edited in the agent in mapping)
-            _overWriteMappingOfAgentModel(newModel, agentInMapping->temporaryMapping());
+            // Our global mapping is controlled
+            if (_modelManager && _modelManager->isMappingControlled()) {
+                // OverWrite the mapping of the model of agent (with the mapping currently edited in the agent in mapping)
+                _overWriteMappingOfAgentModel(newModel, agentInMapping->temporaryMapping());
+            }
         }
     }
 }
@@ -541,26 +544,27 @@ void AgentsMappingController::onIsMappingActivatedChanged(bool isMappingActivate
 
             if (_modelManager != NULL)
             {
-                if (_modelManager->isMappingControlled()) {
+                if (_modelManager->isMappingControlled())
+                {
                     qDebug() << "Mapping Activated in mode CONTROL";
+
+                    // Apply all temporary mappings
+                    foreach (AgentInMappingVM* agent, _allAgentsInMapping.toList())
+                    {
+                        if ((agent != NULL) && (agent->temporaryMapping() != NULL)) // && (agent->temporaryMapping()->mappingElements()->count() > 0)
+                        {
+                            // Get the JSON of a mapping
+                            QString jsonOfMapping = _modelManager->getJsonOfMapping(agent->temporaryMapping());
+
+                            QString command = QString("LOAD_THIS_MAPPING#%1").arg(jsonOfMapping);
+
+                            // Emit signal "Command asked to agent"
+                            Q_EMIT commandAskedToAgent(agent->peerIdsList(), command);
+                        }
+                    }
                 }
                 else {
                     qDebug() << "Mapping Activated in mode OBSERVE";
-                }
-
-                // Apply all temporary mappings
-                foreach (AgentInMappingVM* agent, _allAgentsInMapping.toList())
-                {
-                    if ((agent != NULL) && (agent->temporaryMapping() != NULL)) // && (agent->temporaryMapping()->mappingElements()->count() > 0)
-                    {
-                        // Get the JSON of a mapping
-                        QString jsonOfMapping = _modelManager->getJsonOfMapping(agent->temporaryMapping());
-
-                        QString command = QString("LOAD_THIS_MAPPING#%1").arg(jsonOfMapping);
-
-                        // Emit signal "Command asked to agent"
-                        Q_EMIT commandAskedToAgent(agent->peerIdsList(), command);
-                    }
                 }
             }
         }
@@ -622,8 +626,19 @@ void AgentsMappingController::onActiveAgentDefined(AgentM* agent)
             QStringList peerIdsList;
             peerIdsList.append(agent->peerId());
 
-            // Emit the signal to send the command "CLEAR_MAPPING" on the network to the agent
-            Q_EMIT commandAskedToAgent(peerIdsList, "CLEAR_MAPPING");
+            // Get the agent in mapping for the agent name
+            AgentInMappingVM* agentInMapping = getAgentInMappingFromName(agentName);
+            if (agentInMapping != NULL)
+            {
+                // OverWrite the mapping of the model of agent (with the mapping currently edited in the agent in mapping)
+                //_overWriteMappingOfAgentModel(newModel, agentInMapping->temporaryMapping());
+            }
+            // The agent is not in the mapping...
+            else
+            {
+                // Send the command "CLEAR_MAPPING" on the network to this agent
+                Q_EMIT commandAskedToAgent(peerIdsList, "CLEAR_MAPPING");
+            }
         }
         // OBSERVE
         else
