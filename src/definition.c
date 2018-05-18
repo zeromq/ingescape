@@ -256,7 +256,7 @@ int igs_setDefinitionName(const char *name){
     if(igs_internal_definition->name != NULL){
         free((char*)igs_internal_definition->name);
     }
-    igs_internal_definition->name = strdup(name);
+    igs_internal_definition->name = strndup(name, MAX_DEFINITION_NAME_LENGTH);
     network_needToSendDefinitionUpdate = true;
     return 1;
 }
@@ -276,7 +276,7 @@ int igs_setDefinitionDescription(const char *description){
     if(igs_internal_definition->description != NULL){
         free((char*)igs_internal_definition->description);
     }
-    igs_internal_definition->description = strdup(description);
+    igs_internal_definition->description = strndup(description, MAX_DEFINITION_DESCRIPTION_LENGTH);
     network_needToSendDefinitionUpdate = true;
     return 1;
 }
@@ -296,7 +296,7 @@ int igs_setDefinitionVersion(const char *version){
     if(igs_internal_definition->version != NULL){
         free((char*)igs_internal_definition->version);
     }
-    igs_internal_definition->version = strdup(version);
+    igs_internal_definition->version = strndup(version, 64);
     network_needToSendDefinitionUpdate = true;
     return 1;
 }

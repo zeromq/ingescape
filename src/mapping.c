@@ -273,7 +273,7 @@ int igs_setMappingName(const char *name){
     if(igs_internal_mapping->name != NULL){
         free(igs_internal_mapping->name);
     }
-    igs_internal_mapping->name = strdup(name);
+    igs_internal_mapping->name = strndup(name, MAX_MAPPING_NAME_LENGTH);
     return 1;
 }
 
@@ -300,7 +300,7 @@ int igs_setMappingDescription(const char *description){
     if(igs_internal_mapping->description != NULL){
         free(igs_internal_mapping->description);
     }
-    igs_internal_mapping->description = strdup(description);
+    igs_internal_mapping->description = strndup(description, MAX_MAPPING_DESCRIPTION_LENGTH);
     return 1;
 }
 
@@ -327,7 +327,7 @@ int igs_setMappingVersion(const char *version){
     if(igs_internal_mapping->version != NULL){
         free(igs_internal_mapping->version);
     }
-    igs_internal_mapping->version = strdup(version);
+    igs_internal_mapping->version = strndup(version, 64);
     return 1;
 }
 

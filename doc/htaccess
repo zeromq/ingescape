@@ -1,0 +1,5 @@
+RewriteEngine  on
+
+RewriteCond %{HTTPS} off [OR]
+RewriteCond %{HTTP_HOST} ^www\. [NC]
+RewriteRule ^ https://ingescape.com%{REQUEST_URI} [R=301,L,NE]
