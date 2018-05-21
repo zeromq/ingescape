@@ -7,13 +7,19 @@ banner = "img/banners/your_first_agent.png"
 genre = "article"
 +++
 
-Our main goal when building the ingeScape API was to make it extremely simple for most common situations and very progressive when fine tuning and advanced features become necessary.
+This article gives you an introduction to the ingeScape library, in order to create a first software agent to be integrated in any ingeScape environment. 
+
+Creating your own agents is the key step to building the services that will make your future systems based on ingeScape.
+
+### Forewords
+
+Our main goal when building the ingeScape API was to make it extremely simple for most usual situations, and very progressive when fine-tuning and advanced features become necessary.
 
 Below is a first example producing a fully functional agent, with a very simple behavior. But before jumping into the code, we need to explain the core concepts of an agent: its *name*, its *inputs*, its *outputs* and its *parameters*.
 
 **image here**
 
-The name of the agent is how it is addressed by other agents in your system and seen in the ingeScape editor. We advise it to be unique in a given system even ingeScape supports multiple agents with the same name, as it is sometimes useful and relevant.
+The name of the agent is how it is addressed by other agents in your system and seen in the ingeScape editor. We advise it to be unique in a given system, even ingeScape supports multiple agents with the same name, as it may be useful and relevant in some contexts.
 
 
 ### **I**nputs, **O**utputs and **P**arameters : the IOPs
@@ -39,10 +45,10 @@ The whole set of IOPs for an agent is called the agent's ***definition***. Defin
 Agents are connected to one another by ***mapping*** outputs from agents to inputs of other agents. The set of ***mappings*** in a system composes the actual system communication architecture. We'll come back to this in further articles. The concept of *mapping* is not mandatory to understand this first example.
 
 
-### Jump into the code
+### The code
 Here we are, this is all you need to know to design your first agent. The example below is developed in C. The code is filled with comments enabling to understand each function and each code block. Just after the code example are several resources to help you compile it on different operating systems dans developing environments.
 
-We recommend that you immediately copy and paste the code below in your favorite editor.
+We recommend that you immediately copy and paste this code in your favorite C code editor.
 
 {{< highlight c "linenos=table,linenostart=1" >}}
 #include <stdio.h>
@@ -143,7 +149,7 @@ gcc -o myFirstAgent main.o -L/usr/local/lib -lingescape
 ### Compile on macOS (two methods)
 The first compilation method is the same as the one for Linux, exactly with the same assumptions for header and library location.
 
-The other method is the use of Apple Xcode with a dedicated project. To save your time, such a project, including the code above, is available [here](/code/firstAgent.zip).
+The other method is the use of Apple Xcode with a dedicated project. To save your time, such a project, including the code, is available [here](/code/firstAgent.zip).
 
 ### Compile on Microsoft Windows
 *TODO*
