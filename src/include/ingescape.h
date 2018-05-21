@@ -23,6 +23,14 @@
 #define PUBLIC
 #endif
 
+//  GCC and clang support validating format strings for functions that act like printf
+// this is used to check the logging functions
+#if defined (__GNUC__) && (__GNUC__ >= 2)
+#   define CHECK_PRINTF(a)   __attribute__((format (printf, a, a + 1)))
+#else
+#   define CHECK_PRINTF(a)
+#endif
+
 //////////////////////////////////////////////////
 //initialization and control
 
@@ -274,7 +282,7 @@ typedef enum {
 } igs_logLevel_t;
 PUBLIC void igs_setLogLevel (igs_logLevel_t level); //set log level in console, default is IGS_LOG_INFO
 PUBLIC igs_logLevel_t igs_getLogLevel(void);
-PUBLIC void igs_log(igs_logLevel_t, const char *function, const char *fmt, ...);
+PUBLIC void igs_log(igs_logLevel_t, const char *function, const char *format, ...)  CHECK_PRINTF (3);
 #define igs_trace(...) igs_log(IGS_LOG_TRACE, __func__, __VA_ARGS__)
 #define igs_debug(...) igs_log(IGS_LOG_DEBUG, __func__, __VA_ARGS__)
 #define igs_info(...)  igs_log(IGS_LOG_INFO, __func__, __VA_ARGS__)
