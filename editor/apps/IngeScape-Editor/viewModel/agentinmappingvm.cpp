@@ -300,15 +300,15 @@ void AgentInMappingVM::_onIsONofModelChanged(bool isON)
  */
 void AgentInMappingVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(DefinitionM* previousValue, DefinitionM* newValue)
 {
-    // FIXME: ne tient pas compte du fait que chaque modèle a sa propre définition et qu'elles peuvent être différentes !
-    if ((previousValue != NULL) && (newValue != NULL))
+    //AgentM* agent = qobject_cast<AgentM*>(sender());
+    if ((previousValue != NULL) && (newValue != NULL)) // && (agent != NULL)
     {
         //
         // Check if input(s) have been removed
         //
         for (AgentIOPM* input : previousValue->inputsList()->toList())
         {
-            if ((input != NULL) && !newValue->inputsIdsList().contains(input->id()))
+            if ((input != NULL) && !input->id().isEmpty() && !newValue->inputsIdsList().contains(input->id()))
             {
                 InputVM* inputVM = _inputModelRemoved(input);
                 if (inputVM != NULL)
@@ -327,7 +327,7 @@ void AgentInMappingVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(Defin
         //
         for (OutputM* output : previousValue->outputsList()->toList())
         {
-            if ((output != NULL) && !newValue->outputsIdsList().contains(output->id()))
+            if ((output != NULL) && !output->id().isEmpty() && !newValue->outputsIdsList().contains(output->id()))
             {
                 OutputVM* outputVM = _outputModelRemoved(output);
                 if (outputVM != NULL)
@@ -347,7 +347,7 @@ void AgentInMappingVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(Defin
         QList<InputVM*> inputsListToAdd;
         for (AgentIOPM* input : newValue->inputsList()->toList())
         {
-            if (input != NULL)
+            if ((input != NULL) && !input->id().isEmpty())
             {
                 InputVM* inputVM = NULL;
 
@@ -386,7 +386,7 @@ void AgentInMappingVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(Defin
         QList<OutputVM*> outputsListToAdd;
         for (OutputM* output : newValue->outputsList()->toList())
         {
-            if (output != NULL)
+            if ((output != NULL) && !output->id().isEmpty())
             {
                 OutputVM* outputVM = NULL;
 
@@ -422,96 +422,6 @@ void AgentInMappingVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(Defin
         // Emit signal "models of Inputs and Outputs Changed"
         Q_EMIT modelsOfInputsAndOutputsChanged();
     }
-
-    /*if (definition != NULL)
-    {
-        // First remove existing inputs and outputs
-        QList<InputVM*> inputsListToRemove;
-        QList<OutputVM*> outputsListToRemove;
-
-        // Traverse the list of models of inputs in the definition
-        foreach (AgentIOPM* input, definition->inputsList()->toList())
-        {
-            InputVM* inputVM = _inputModelRemoved(input);
-            if (inputVM != NULL)
-            {
-                // The view model of input is empty
-                if (inputVM->models()->isEmpty()) {
-                    inputsListToRemove.append(inputVM);
-                }
-            }
-        }
-
-        // Traverse the list of models of outputs in the definition
-        foreach (OutputM* output, definition->outputsList()->toList())
-        {
-            OutputVM* outputVM = _outputModelRemoved(output);
-            if (outputVM != NULL)
-            {
-                // The view model of output is empty
-                if (outputVM->models()->isEmpty()) {
-                    outputsListToRemove.append(outputVM);
-                }
-            }
-        }
-
-        // remove inputs
-        if (inputsListToRemove.count() > 0)
-        {
-            foreach (InputVM* inputVM, inputsListToRemove) {
-                _inputsList.remove(inputVM);
-            }
-        }
-
-        // remove outputs
-        if (outputsListToRemove.count() > 0)
-        {
-            foreach (OutputVM* outputVM, outputsListToRemove) {
-                _outputsList.remove(outputVM);
-            }
-        }
-
-
-        // Add inputs and outputs of the new definition
-        QList<InputVM*> inputsListToAdd;
-        QList<OutputVM*> outputsListToAdd;
-
-        // Traverse the list of models of inputs in the definition
-        foreach (AgentIOPM* input, definition->inputsList()->toList())
-        {
-            InputVM* inputVM = _inputModelAdded(input);
-            if (inputVM != NULL)
-            {
-                // New view model of input
-                if (!_inputsList.contains(inputVM)) {
-                    inputsListToAdd.append(inputVM);
-                }
-            }
-        }
-
-        // Traverse the list of models of outputs in the definition
-        foreach (OutputM* output, definition->outputsList()->toList())
-        {
-            OutputVM* outputVM = _outputModelAdded(output);
-            if (outputVM != NULL)
-            {
-                // New view model of output
-                if (!_outputsList.contains(outputVM)) {
-                    outputsListToAdd.append(outputVM);
-                }
-            }
-        }
-
-        if (inputsListToAdd.count() > 0) {
-            _inputsList.append(inputsListToAdd);
-        }
-
-        if (outputsListToAdd.count() > 0) {
-            _outputsList.append(outputsListToAdd);
-        }
-
-        Q_EMIT modelsOfInputsAndOutputsChanged();
-    }*/
 }
 
 

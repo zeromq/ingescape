@@ -262,7 +262,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
 
 
 
-    // FIXME: sleep to display our loading screen
+    // Sleep to display our loading screen
     //QThread::msleep(2000);
 }
 
