@@ -887,6 +887,10 @@ void AgentsMappingController::_onAgentsInMappingChanged()
 
                 // Emit the signal "Agent in Mapping Added"
                 Q_EMIT agentInMappingAdded(agentInMapping);
+
+                // Connect to signals from the new agent in mapping
+                connect(agentInMapping, &AgentInMappingVM::inputsListWillBeRemoved, this, &AgentsMappingController::_onInputsListWillBeRemoved);
+                connect(agentInMapping, &AgentInMappingVM::outputsListWillBeRemoved, this, &AgentsMappingController::_onOutputsListWillBeRemoved);
             }
         }
     }
@@ -902,11 +906,82 @@ void AgentsMappingController::_onAgentsInMappingChanged()
 
                 // Emit the signal "Agent in Mapping Removed"
                 Q_EMIT agentInMappingRemoved(agentInMapping);
+
+                // DIS-connect to signals from the previous agent in mapping
+                disconnect(agentInMapping, &AgentInMappingVM::inputsListWillBeRemoved, this, &AgentsMappingController::_onInputsListWillBeRemoved);
+                disconnect(agentInMapping, &AgentInMappingVM::outputsListWillBeRemoved, this, &AgentsMappingController::_onOutputsListWillBeRemoved);
+
             }
         }
     }
 
     _previousListOfAgentsInMapping = newListOfAgentsInMapping;
+}
+
+
+/**
+ * @brief Slot when some view models of inputs will be removed from an agent in mapping
+ * @param inputsListWillBeRemoved
+ */
+void AgentsMappingController::_onInputsListWillBeRemoved(QList<InputVM*> inputsListWillBeRemoved)
+{
+    AgentInMappingVM* agentInMapping = qobject_cast<AgentInMappingVM*>(sender());
+    if ((agentInMapping != NULL) && !inputsListWillBeRemoved.isEmpty())
+    {
+        //qDebug() << "_on Intputs List Will Be Removed from agent" << agentInMapping->name() << inputsListWillBeRemoved.count();
+
+        for (MapBetweenIOPVM* link : _allLinksInMapping.toList())
+        {
+            if ((link != NULL) && (link->inputAgent() != NULL) && (link->inputAgent() == agentInMapping)
+                    && (link->input() != NULL) && inputsListWillBeRemoved.contains(link->input()))
+            {
+                inputsListWillBeRemoved.removeOne(link->input());
+
+                // Remove the link between two agents from the mapping
+                //removeLinkBetweenTwoAgents(link);
+
+                // Delete the link between two agents
+                _deleteLinkBetweenTwoAgents(link);
+
+                if (inputsListWillBeRemoved.isEmpty()) {
+                    break;
+                }
+            }
+        }
+    }
+}
+
+
+/**
+ * @brief Slot when some view models of outputs will be removed from an agent in mapping
+ * @param outputsListWillBeRemoved
+ */
+void AgentsMappingController::_onOutputsListWillBeRemoved(QList<OutputVM*> outputsListWillBeRemoved)
+{
+    AgentInMappingVM* agentInMapping = qobject_cast<AgentInMappingVM*>(sender());
+    if ((agentInMapping != NULL) && !outputsListWillBeRemoved.isEmpty())
+    {
+        //qDebug() << "_on Outputs List Will Be Removed from agent" << agentInMapping->name() << outputsListWillBeRemoved.count();
+
+        for (MapBetweenIOPVM* link : _allLinksInMapping.toList())
+        {
+            if ((link != NULL) && (link->outputAgent() != NULL) && (link->outputAgent() == agentInMapping)
+                    && (link->output() != NULL) && outputsListWillBeRemoved.contains(link->output()))
+            {
+                outputsListWillBeRemoved.removeOne(link->output());
+
+                // Remove the link between two agents from the mapping
+                //removeLinkBetweenTwoAgents(link);
+
+                // Delete the link between two agents
+                _deleteLinkBetweenTwoAgents(link);
+
+                if (outputsListWillBeRemoved.isEmpty()) {
+                    break;
+                }
+            }
+        }
+    }
 }
 
 

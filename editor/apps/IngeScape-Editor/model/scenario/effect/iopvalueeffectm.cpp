@@ -291,12 +291,13 @@ void IOPValueEffectM::onInputsOutputsListChange()
     }
 
     // Reset the agentIOP
-    if(newAgentIOP != _agentIOP)
+    if (newAgentIOP != _agentIOP)
     {
         // Set the new agent
         setagentIOP(newAgentIOP);
     }
 }
+
 
 /**
 * @brief Custom setter for agent iop model

@@ -284,6 +284,20 @@ private Q_SLOTS:
     void _onAgentsInMappingChanged();
 
 
+    /**
+     * @brief Slot when some view models of inputs will be removed from an agent in mapping
+     * @param inputsListWillBeRemoved
+     */
+    void _onInputsListWillBeRemoved(QList<InputVM*> inputsListWillBeRemoved);
+
+
+    /**
+     * @brief Slot when some view models of outputs will be removed from an agent in mapping
+     * @param outputsListWillBeRemoved
+     */
+    void _onOutputsListWillBeRemoved(QList<OutputVM*> outputsListWillBeRemoved);
+
+
 private:
     /**
      * @brief Add new model(s) of agent to the current mapping at a specific position
@@ -337,6 +351,7 @@ private:
 
 
 private:
+
     // Manager for the data model of INGESCAPE
     IngeScapeModelManager* _modelManager;
 

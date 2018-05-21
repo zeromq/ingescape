@@ -132,8 +132,10 @@ void AgentM::setdefinition(DefinitionM *value)
 
         Q_EMIT definitionChanged(value);
 
-        // Emit the signal "Definition Changed" with previous and new values
-        Q_EMIT definitionChangedWithPreviousAndNewValues(previousValue, value);
+        if (previousValue != NULL) {
+            // Emit the signal "Definition Changed" with previous and new values
+            Q_EMIT definitionChangedWithPreviousAndNewValues(previousValue, value);
+        }
     }
 }
 

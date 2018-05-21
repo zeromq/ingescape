@@ -306,6 +306,7 @@ void AgentInMappingVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(Defin
         //
         // Check if input(s) have been removed
         //
+        QList<InputVM*> inputsListToRemove;
         for (AgentIOPM* input : previousValue->inputsList()->toList())
         {
             if ((input != NULL) && !input->id().isEmpty() && !newValue->inputsIdsList().contains(input->id()))
@@ -315,9 +316,20 @@ void AgentInMappingVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(Defin
                 {
                     // The view model of input is empty
                     if (inputVM->models()->isEmpty()) {
-                        _inputsList.remove(inputVM);
+                        inputsListToRemove.append(inputVM);
                     }
                 }
+            }
+        }
+        if (!inputsListToRemove.isEmpty())
+        {
+            // Emit signal "Inputs List Will Be Removed"
+            Q_EMIT inputsListWillBeRemoved(inputsListToRemove);
+
+            // FIXME TODO I2 Quick: Allow to remove a QList
+            //_inputsList.remove(inputsListToRemove);
+            foreach (InputVM* inputVM, inputsListToRemove) {
+                _inputsList.remove(inputVM);
             }
         }
 
@@ -325,6 +337,7 @@ void AgentInMappingVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(Defin
         //
         // Check if output(s) have been removed
         //
+        QList<OutputVM*> outputsListToRemove;
         for (OutputM* output : previousValue->outputsList()->toList())
         {
             if ((output != NULL) && !output->id().isEmpty() && !newValue->outputsIdsList().contains(output->id()))
@@ -334,9 +347,20 @@ void AgentInMappingVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(Defin
                 {
                     // The view model of output is empty
                     if (outputVM->models()->isEmpty()) {
-                        _outputsList.remove(outputVM);
+                        outputsListToRemove.append(outputVM);
                     }
                 }
+            }
+        }
+        if (!outputsListToRemove.isEmpty())
+        {
+            // Emit signal "Outputs List Will Be Removed"
+            Q_EMIT outputsListWillBeRemoved(outputsListToRemove);
+
+            // FIXME TODO I2 Quick: Allow to remove a QList
+            //_outputsList.remove(outputsListToRemove);
+            foreach (OutputVM* outputVM, outputsListToRemove) {
+                _outputsList.remove(outputVM);
             }
         }
 
@@ -491,10 +515,10 @@ void AgentInMappingVM::_agentModelRemoved(AgentM* model)
 {
     if ((model != NULL) && (model->definition() != NULL))
     {
-        QList<InputVM*> inputsListToRemove;
-        QList<OutputVM*> outputsListToRemove;
-
+        //
         // Traverse the list of models of inputs in the definition
+        //
+        QList<InputVM*> inputsListToRemove;
         foreach (AgentIOPM* input, model->definition()->inputsList()->toList())
         {
             InputVM* inputVM = _inputModelRemoved(input);
@@ -506,8 +530,23 @@ void AgentInMappingVM::_agentModelRemoved(AgentM* model)
                 }
             }
         }
+        if (!inputsListToRemove.isEmpty())
+        {
+            // Emit signal "Inputs List Will Be Removed"
+            Q_EMIT inputsListWillBeRemoved(inputsListToRemove);
 
+            // FIXME TODO I2 Quick: Allow to remove a QList
+            //_inputsList.remove(inputsListToRemove);
+            foreach (InputVM* inputVM, inputsListToRemove) {
+                _inputsList.remove(inputVM);
+            }
+        }
+
+
+        //
         // Traverse the list of models of outputs in the definition
+        //
+        QList<OutputVM*> outputsListToRemove;
         foreach (OutputM* output, model->definition()->outputsList()->toList())
         {
             OutputVM* outputVM = _outputModelRemoved(output);
@@ -519,24 +558,18 @@ void AgentInMappingVM::_agentModelRemoved(AgentM* model)
                 }
             }
         }
-
-        if (!inputsListToRemove.isEmpty())
-        {
-            // FIXME TODO I2 Quick: Allow to remove a QList
-            //_inputsList.remove(inputsListToRemove);
-            foreach (InputVM* inputVM, inputsListToRemove) {
-                _inputsList.remove(inputVM);
-            }
-        }
-
         if (!outputsListToRemove.isEmpty())
         {
+            // Emit signal "Outputs List Will Be Removed"
+            Q_EMIT outputsListWillBeRemoved(outputsListToRemove);
+
             // FIXME TODO I2 Quick: Allow to remove a QList
             //_outputsList.remove(outputsListToRemove);
             foreach (OutputVM* outputVM, outputsListToRemove) {
                 _outputsList.remove(outputVM);
             }
         }
+
 
         // Emit signal "models of Inputs and Outputs Changed"
         Q_EMIT modelsOfInputsAndOutputsChanged();
