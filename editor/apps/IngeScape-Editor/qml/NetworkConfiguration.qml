@@ -20,42 +20,144 @@ import I2Quick 1.0
 
 import INGESCAPE 1.0
 
-Item {
+// scenario sub-directory
+import "scenario" as Scenario
+
+I2PopupBase {
     id: rootItem
 
-    width: 400
-    height: 600
+    width: 300
+    height: 400
+
+    dismissOnOutsideTap: false
+
+    // our main controller
+    //property var controller: null;
+
+    onOpened: {
+        combobox.selectedItem = IngeScapeEditorC.networkDevice;
+    }
 
     Rectangle {
         anchors.fill: parent
 
-        color: IngeScapeTheme.greyColor
+        color: IngeScapeTheme.veryDarkGreyColor
 
+        border {
+            width: 2
+            color: IngeScapeTheme.editorsBackgroundBorderColor
+        }
+
+        radius: 5
     }
 
     Column {
+        anchors {
+            fill: parent
+            margins: 20
+        }
+
+        spacing: 10
+
         Text {
             id: title
 
             text: qsTr("Configure network")
+
+            color: IngeScapeTheme.whiteColor
+            font {
+                family: IngeScapeTheme.textFontFamily
+                weight : Font.Medium
+                pixelSize : 23
+            }
+        }
+
+        Rectangle {
+            id: space1
+            color: "transparent"
+            width: 10
+            height: 10
         }
 
         Text {
-            id: port
+            text: qsTr("Port:")
 
-            text: qsTr("Current port: %1").arg(IngeScapeEditorC.port)
+            color: IngeScapeTheme.whiteColor
+            font {
+                family: IngeScapeTheme.textFontFamily
+                weight : Font.Medium
+                pixelSize : 16
+            }
+        }
+
+        TextField {
+            id: txtPort
+
+            height: 25
+            width: 200
+            verticalAlignment: TextInput.AlignVCenter
+            text: IngeScapeEditorC.port
+
+            style: I2TextFieldStyle {
+                backgroundColor: IngeScapeTheme.darkBlueGreyColor
+                borderColor: IngeScapeTheme.whiteColor;
+                borderErrorColor: IngeScapeTheme.redColor
+                radiusTextBox: 1
+                borderWidth: 0;
+                borderWidthActive: 1
+                textIdleColor: IngeScapeTheme.whiteColor;
+                textDisabledColor: IngeScapeTheme.darkGreyColor;
+
+                padding.left: 3
+                padding.right: 3
+
+                font {
+                    pixelSize:15
+                    family: IngeScapeTheme.textFontFamily
+                }
+
+            }
+
+            Binding {
+                target: txtPort
+                property: "text"
+                value: IngeScapeEditorC.port
+            }
+        }
+
+        Rectangle {
+            id: space2
+            color: "transparent"
+            width: 10
+            height: 10
         }
 
         Text {
-            id: networkDevice
+            text: qsTr("Network device:")
 
-            text: qsTr("Current network device: %1").arg(IngeScapeEditorC.networkDevice)
+            color: IngeScapeTheme.whiteColor
+            font {
+                family: IngeScapeTheme.textFontFamily
+                weight : Font.Medium
+                pixelSize : 16
+            }
         }
 
-        /*ListView {
 
-        }*/
+        // ComboBox to choose the network device
+        Scenario.IngeScapeComboBox {
+            id : combobox
+
+            height : 25
+            width : 200
+
+            model: IngeScapeEditorC.networkC ? IngeScapeEditorC.networkC.availableNetworkDevices : 0
+            useQStringList: true
+
+            //placeholderText: (IngeScapeEditorC.networkC && IngeScapeEditorC.networkC.availableNetworkDevices.count === 0 ? "- No network device -" : "- Select a network device -")
+        }
     }
+
 
     Row {
         anchors {
@@ -99,7 +201,8 @@ Item {
             }
 
             onClicked: {
-                console.log("Cancel")
+                //console.log("Cancel")
+                rootItem.close();
             }
         }
 
@@ -136,7 +239,26 @@ Item {
             }
 
             onClicked: {
-                console.log("OK")
+                //console.log("OK")
+
+                var selectedNetworkDevice = "";
+
+                if (typeof combobox.selectedItem === "string") {
+                    selectedNetworkDevice = combobox.selectedItem;
+                }
+                else {
+                    selectedNetworkDevice = combobox.selectedItem.modelData;
+                }
+
+                // Re-Start the Network
+                var success = IngeScapeEditorC.restartNetwork(txtPort.text, selectedNetworkDevice);
+                if (success === true)
+                {
+                    rootItem.close();
+                }
+                else {
+                    console.error("Network cannot be (re)started on device " + combobox.selectedItem.modelData + " and port " + txtPort.text);
+                }
             }
         }
     }

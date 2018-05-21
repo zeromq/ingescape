@@ -308,6 +308,7 @@ void AgentVM::_onDefinitionOfModelChanged(DefinitionM* definition)
     _updateWithDefinitionOfFirstModel();
 }
 
+
 /**
  * @brief Slot when the state of a model changed
  * @param state
@@ -486,6 +487,7 @@ void AgentVM::_updateWithDefinitionOfFirstModel()
     }
     setdefinition(definition);
 }
+
 
 /**
  * @brief Update with the state of first model

@@ -96,9 +96,7 @@ void AgentsMappingController::createNewMapping()
     }
 
     // 2- Delete all links
-    foreach (MapBetweenIOPVM* link, _allLinksInMapping.toList())
-    {
-        // Delete the link between two agents
+    foreach (MapBetweenIOPVM* link, _allLinksInMapping.toList()) {
         _deleteLinkBetweenTwoAgents(link);
     }
 
@@ -109,6 +107,7 @@ void AgentsMappingController::createNewMapping()
 
     qInfo() << "Create a new (empty) Mapping";
 }
+
 
 /**
  * @brief Open a Mapping
@@ -621,20 +620,16 @@ void AgentsMappingController::onActiveAgentDefined(AgentM* agent)
         // CONTROL
         if (_modelManager->isMappingControlled())
         {
-            qDebug() << "CONTROL: Model of" << agentName << "is defined. CLEAR its MAPPING !";
+            //qDebug() << "CONTROL: Model of" << agentName << "is defined. CLEAR its MAPPING !";
 
             QStringList peerIdsList;
             peerIdsList.append(agent->peerId());
 
             // Get the agent in mapping for the agent name
             AgentInMappingVM* agentInMapping = getAgentInMappingFromName(agentName);
-            if (agentInMapping != NULL)
-            {
-                // OverWrite the mapping of the model of agent (with the mapping currently edited in the agent in mapping)
-                //_overWriteMappingOfAgentModel(newModel, agentInMapping->temporaryMapping());
-            }
+
             // The agent is not in the mapping...
-            else
+            if (agentInMapping == NULL)
             {
                 // Send the command "CLEAR_MAPPING" on the network to this agent
                 Q_EMIT commandAskedToAgent(peerIdsList, "CLEAR_MAPPING");
@@ -643,14 +638,14 @@ void AgentsMappingController::onActiveAgentDefined(AgentM* agent)
         // OBSERVE
         else
         {
-            qDebug() << "OBSERVE: Model of" << agentName << "is defined. ADD in MAPPING view !" << agent;
+            //qDebug() << "OBSERVE: Model of" << agentName << "is defined. ADD in MAPPING view !" << agent;
 
             // Get the agent in mapping for the agent name
             AgentInMappingVM* agentInMapping = getAgentInMappingFromName(agentName);
+
+            // The agent is not in the mapping...
             if (agentInMapping == NULL)
             {
-                qDebug() << agentName << "is not yet in the mapping !";
-
                 QList<AgentM*> activeAgentsList = QList<AgentM*>();
                 activeAgentsList.append(agent);
 

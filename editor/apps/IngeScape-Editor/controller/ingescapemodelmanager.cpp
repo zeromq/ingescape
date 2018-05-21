@@ -266,6 +266,20 @@ QString IngeScapeModelManager::getJsonOfMapping(AgentMappingM* agentMapping)
 
 
 /**
+ * @brief Simulate an exit for each agent
+ */
+void IngeScapeModelManager::simulateExitForEachActiveAgent()
+{
+    for (AgentM* agent : _mapFromPeerIdToAgentM.values())
+    {
+        if (agent != NULL) {
+            onAgentExited(agent->peerId(), agent->name());
+        }
+    }
+}
+
+
+/**
  * @brief Slot called when an agent enter the network
  * @param peerId
  * @param agentName
@@ -429,9 +443,6 @@ void IngeScapeModelManager::onDefinitionReceived(QString peerId, QString agentNa
 
                      // Emit the signal "Add Inputs to Editor for Outputs"
                      Q_EMIT addInputsToEditorForOutputs(agentName, agentDefinition->outputsList()->toList());
-
-                     // Emit the signal "Active Agent Defined"
-                     Q_EMIT activeAgentDefined(agent);
                  }
                  // Update with the new definition
                  else
@@ -451,6 +462,9 @@ void IngeScapeModelManager::onDefinitionReceived(QString peerId, QString agentNa
                          deleteAgentDefinition(previousDefinition);
                      }
                  }
+
+                 // Emit the signal "Active Agent Defined"
+                 Q_EMIT activeAgentDefined(agent);
             }
         }
     }

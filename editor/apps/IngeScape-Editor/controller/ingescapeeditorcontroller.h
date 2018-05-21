@@ -55,9 +55,6 @@ class IngeScapeEditorController : public QObject
     // Network settings - port
     I2_QML_PROPERTY_READONLY(int, port)
 
-    // List of available network devices
-    I2_QML_PROPERTY_READONLY(QStringList, availableNetworkDevices)
-
     // Snapshot Directory
     I2_QML_PROPERTY_READONLY(QString, snapshotDirectory)
 
@@ -155,6 +152,15 @@ public:
       * @param agent in mapping to delete
       */
     Q_INVOKABLE bool canDeleteAgentInMapping(AgentInMappingVM* agentInMapping);
+
+
+    /**
+     * @brief Re-Start the network with a port and a network device
+     * @param strPort
+     * @param networkDevice
+     * @return true when success
+     */
+    Q_INVOKABLE bool restartNetwork(QString strPort, QString networkDevice);
 
 
 public Q_SLOTS:
