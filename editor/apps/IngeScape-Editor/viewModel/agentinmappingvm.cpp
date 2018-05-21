@@ -222,7 +222,7 @@ void AgentInMappingVM::_onModelsChanged()
 
                 // Connect to signals from a model
                 connect(model, &AgentM::isONChanged, this, &AgentInMappingVM::_onIsONofModelChanged);
-                connect(model, &AgentM::definitionChanged, this, &AgentInMappingVM::_onDefinitionOfModelChanged);
+                connect(model, &AgentM::definitionChangedWithPreviousAndNewValues, this, &AgentInMappingVM::_onDefinitionOfModelChangedWithPreviousAndNewValues);
 
                 // A model of agent has been added to our list
                 _agentModelAdded(model);
@@ -241,7 +241,7 @@ void AgentInMappingVM::_onModelsChanged()
 
                 // DIS-connect from signals from a model
                 disconnect(model, &AgentM::isONChanged, this, &AgentInMappingVM::_onIsONofModelChanged);
-                disconnect(model, &AgentM::definitionChanged, this, &AgentInMappingVM::_onDefinitionOfModelChanged);
+                disconnect(model, &AgentM::definitionChangedWithPreviousAndNewValues, this, &AgentInMappingVM::_onDefinitionOfModelChangedWithPreviousAndNewValues);
 
                 // A model of agent has been removed from our list
                 _agentModelRemoved(model);
@@ -294,13 +294,136 @@ void AgentInMappingVM::_onIsONofModelChanged(bool isON)
 
 
 /**
- * @brief Slot when the definition of a model changed
- * @param definition
+ * @brief Slot called when the definition of a model changed (with previous and new values)
+ * @param previousValue
+ * @param newValue
  */
-void AgentInMappingVM::_onDefinitionOfModelChanged(DefinitionM* definition)
+void AgentInMappingVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(DefinitionM* previousValue, DefinitionM* newValue)
 {
     // FIXME: ne tient pas compte du fait que chaque modèle a sa propre définition et qu'elles peuvent être différentes !
-    if (definition != NULL)
+    if ((previousValue != NULL) && (newValue != NULL))
+    {
+        //
+        // Check if input(s) have been removed
+        //
+        for (AgentIOPM* input : previousValue->inputsList()->toList())
+        {
+            if ((input != NULL) && !newValue->inputsIdsList().contains(input->id()))
+            {
+                InputVM* inputVM = _inputModelRemoved(input);
+                if (inputVM != NULL)
+                {
+                    // The view model of input is empty
+                    if (inputVM->models()->isEmpty()) {
+                        _inputsList.remove(inputVM);
+                    }
+                }
+            }
+        }
+
+
+        //
+        // Check if output(s) have been removed
+        //
+        for (OutputM* output : previousValue->outputsList()->toList())
+        {
+            if ((output != NULL) && !newValue->outputsIdsList().contains(output->id()))
+            {
+                OutputVM* outputVM = _outputModelRemoved(output);
+                if (outputVM != NULL)
+                {
+                    // The view model of output is empty
+                    if (outputVM->models()->isEmpty()) {
+                        _outputsList.remove(outputVM);
+                    }
+                }
+            }
+        }
+
+
+        //
+        // Check if input(s) have been added
+        //
+        QList<InputVM*> inputsListToAdd;
+        for (AgentIOPM* input : newValue->inputsList()->toList())
+        {
+            if (input != NULL)
+            {
+                InputVM* inputVM = NULL;
+
+                // This input was already in the previous definition (just replace the model)
+                if (previousValue->inputsIdsList().contains(input->id()))
+                {
+                    AgentIOPM* previousModelOfInput = previousValue->getInputWithName(input->name());
+                    inputVM = getInputFromId(input->id());
+
+                    if ((inputVM != NULL) && (previousModelOfInput != NULL))
+                    {
+                        int index = inputVM->models()->indexOf(previousModelOfInput);
+                        if (index > -1) {
+                            inputVM->models()->replace(index, input);
+                        }
+                    }
+                }
+                // This input is a new one
+                else
+                {
+                    inputVM = _inputModelAdded(input);
+                    if ((inputVM != NULL) && !_inputsList.contains(inputVM)) {
+                        inputsListToAdd.append(inputVM);
+                    }
+                }
+            }
+        }
+        if (!inputsListToAdd.isEmpty()) {
+            _inputsList.append(inputsListToAdd);
+        }
+
+
+        //
+        // Check if output(s) have been added
+        //
+        QList<OutputVM*> outputsListToAdd;
+        for (OutputM* output : newValue->outputsList()->toList())
+        {
+            if (output != NULL)
+            {
+                OutputVM* outputVM = NULL;
+
+                // This output was already in the previous definition (just replace the model)
+                if (previousValue->outputsIdsList().contains(output->id()))
+                {
+                    OutputM* previousModelOfOutput = previousValue->getOutputWithName(output->name());
+                    outputVM = getOutputFromId(output->id());
+
+                    if ((outputVM != NULL)  && (previousModelOfOutput != NULL))
+                    {
+                        int index = outputVM->models()->indexOf(previousModelOfOutput);
+                        if (index > -1) {
+                            outputVM->models()->replace(index, output);
+                        }
+                    }
+                }
+                // This output is a new one
+                else
+                {
+                    outputVM = _outputModelAdded(output);
+                    if ((outputVM != NULL) && !_outputsList.contains(outputVM)) {
+                        outputsListToAdd.append(outputVM);
+                    }
+                }
+            }
+        }
+        if (!outputsListToAdd.isEmpty()) {
+            _outputsList.append(outputsListToAdd);
+        }
+
+
+        // Emit signal "models of Inputs and Outputs Changed"
+        Q_EMIT modelsOfInputsAndOutputsChanged();
+    }
+
+    /*if (definition != NULL)
     {
         // First remove existing inputs and outputs
         QList<InputVM*> inputsListToRemove;
@@ -388,7 +511,7 @@ void AgentInMappingVM::_onDefinitionOfModelChanged(DefinitionM* definition)
         }
 
         Q_EMIT modelsOfInputsAndOutputsChanged();
-    }
+    }*/
 }
 
 
@@ -436,20 +559,12 @@ void AgentInMappingVM::_agentModelAdded(AgentM* model)
             ParameterVM* parameterVM =
         }*/
 
-        if (inputsListToAdd.count() > 0)
-        {
+        if (!inputsListToAdd.isEmpty()) {
             _inputsList.append(inputsListToAdd);
-
-            // Emit signal "Inputs List Added"
-            //Q_EMIT inputsListAdded(inputsListToAdd);
         }
 
-        if (outputsListToAdd.count() > 0)
-        {
+        if (!outputsListToAdd.isEmpty()) {
             _outputsList.append(outputsListToAdd);
-
-            // Emit signal "Outputs List Added"
-            //Q_EMIT outputsListAdded(outputsListToAdd);
         }
 
         // Emit signal "models of Inputs and Outputs Changed"
@@ -476,7 +591,7 @@ void AgentInMappingVM::_agentModelRemoved(AgentM* model)
             if (inputVM != NULL)
             {
                 // The view model of input is empty
-                if (inputVM->models()->count() == 0) {
+                if (inputVM->models()->isEmpty()) {
                     inputsListToRemove.append(inputVM);
                 }
             }
@@ -489,17 +604,14 @@ void AgentInMappingVM::_agentModelRemoved(AgentM* model)
             if (outputVM != NULL)
             {
                 // The view model of output is empty
-                if (outputVM->models()->count() == 0) {
+                if (outputVM->models()->isEmpty()) {
                     outputsListToRemove.append(outputVM);
                 }
             }
         }
 
-        if (inputsListToRemove.count() > 0)
+        if (!inputsListToRemove.isEmpty())
         {
-            // Emit signal "Inputs List Will Be Removed"
-            //Q_EMIT inputsListWillBeRemoved(inputsListToRemove);
-
             // FIXME TODO I2 Quick: Allow to remove a QList
             //_inputsList.remove(inputsListToRemove);
             foreach (InputVM* inputVM, inputsListToRemove) {
@@ -507,11 +619,8 @@ void AgentInMappingVM::_agentModelRemoved(AgentM* model)
             }
         }
 
-        if (outputsListToRemove.count() > 0)
+        if (!outputsListToRemove.isEmpty())
         {
-            // Emit signal "Outputs List Will Be Removed"
-            //Q_EMIT outputsListWillBeRemoved(outputsListToRemove);
-
             // FIXME TODO I2 Quick: Allow to remove a QList
             //_outputsList.remove(outputsListToRemove);
             foreach (OutputVM* outputVM, outputsListToRemove) {
@@ -810,7 +919,8 @@ void AgentInMappingVM::_updateWithAllModels()
                     firstDefinition = model->definition();
                 }
                 else if ((firstDefinition != NULL) && (model->definition() != NULL)
-                         && !DefinitionM::areIdenticals(firstDefinition, model->definition())) {
+                         && !DefinitionM::areIdenticals(firstDefinition, model->definition()))
+                {
                     areIdenticalsAllDefinitions = false;
                 }
             }
@@ -865,7 +975,8 @@ void AgentInMappingVM::_updateReducedMapValueTypeGroupInInput()
                 globalReducedMapValueTypeGroupInInput = input->firstModel()->agentIOPValueTypeGroup();
             }
             else {
-                if (globalReducedMapValueTypeGroupInInput != input->firstModel()->agentIOPValueTypeGroup()) {
+                if (globalReducedMapValueTypeGroupInInput != input->firstModel()->agentIOPValueTypeGroup())
+                {
                     globalReducedMapValueTypeGroupInInput = AgentIOPValueTypeGroups::MIXED;
                     break;
                 }
@@ -891,7 +1002,8 @@ void AgentInMappingVM::_updateReducedMapValueTypeGroupInOutput()
                 globalReducedMapValueTypeGroupInOutput = output->firstModel()->agentIOPValueTypeGroup();
             }
             else {
-                if (globalReducedMapValueTypeGroupInOutput != output->firstModel()->agentIOPValueTypeGroup()) {
+                if (globalReducedMapValueTypeGroupInOutput != output->firstModel()->agentIOPValueTypeGroup())
+                {
                     globalReducedMapValueTypeGroupInOutput = AgentIOPValueTypeGroups::MIXED;
                     break;
                 }

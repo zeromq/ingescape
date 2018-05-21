@@ -462,14 +462,19 @@ void IngeScapeModelManager::onDefinitionReceived(QString peerId, QString agentNa
                  {
                      DefinitionM* previousDefinition = agent->definition();
 
+                     // FIXME: Remove Inputs to Editor for each REMOVED Output (between previous mapping and the new one)
+                     // Emit the signal "Remove Inputs to Editor for Outputs"
+                     //Q_EMIT removeInputsToEditorForOutputs(agentName, previousDefinition->outputsList()->toList());
+
                      // Add this new model of agent definition for the agent name
                      addAgentDefinitionForAgentName(agentDefinition, agentName);
 
                      // Set this definition to the agent
                      agent->setdefinition(agentDefinition);
 
+                     // FIXME: Add Inputs to Editor for each ADDED Output (between previous mapping and the new one)
                      // Emit the signal "Add Inputs to Editor for Outputs"
-                     Q_EMIT addInputsToEditorForOutputs(agentName, agentDefinition->outputsList()->toList());
+                     //Q_EMIT addInputsToEditorForOutputs(agentName, agentDefinition->outputsList()->toList());
 
                      if (previousDefinition != NULL) {
                          deleteAgentDefinition(previousDefinition);
@@ -543,10 +548,8 @@ void IngeScapeModelManager::onMappingReceived(QString peerId, QString agentName,
                 }
 
                 // If there are some Removed mapping elements
-                if (idsOfRemovedMappingElements.count() > 0)
+                if (!idsOfRemovedMappingElements.isEmpty())
                 {
-                    //qDebug() << "unmapped" << idsOfRemovedMappingElements;
-
                     foreach (ElementMappingM* mappingElement, previousMapping->mappingElements()->toList()) {
                         if ((mappingElement != NULL) && idsOfRemovedMappingElements.contains(mappingElement->id()))
                         {
@@ -556,10 +559,8 @@ void IngeScapeModelManager::onMappingReceived(QString peerId, QString agentName,
                     }
                 }
                 // If there are some Added mapping elements
-                if (idsOfAddedMappingElements.count() > 0)
+                if (!idsOfAddedMappingElements.isEmpty())
                 {
-                    //qDebug() << "mapped" << idsOfAddedMappingElements;
-
                     foreach (ElementMappingM* mappingElement, agentMapping->mappingElements()->toList()) {
                         if ((mappingElement != NULL) && idsOfAddedMappingElements.contains(mappingElement->id()))
                         {
@@ -709,6 +710,7 @@ void IngeScapeModelManager::onIsMutedFromOutputOfAgentUpdated(QString peerId, bo
         agent->setisMutedOfOutput(isMuted, outputName);
     }
 }
+
 
 /**
  * @brief Slot called when the state of an agent changes

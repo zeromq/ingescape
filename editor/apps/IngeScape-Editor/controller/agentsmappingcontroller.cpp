@@ -887,16 +887,6 @@ void AgentsMappingController::_onAgentsInMappingChanged()
 
                 // Emit the signal "Agent in Mapping Added"
                 Q_EMIT agentInMappingAdded(agentInMapping);
-
-                // Connect to signals from the new agent in mapping
-                //connect(agentInMapping, &AgentInMappingVM::inputsListAdded, this, &AgentsMappingController::_onInputsListAdded);
-                //connect(agentInMapping, &AgentInMappingVM::outputsListAdded, this, &AgentsMappingController::_onOutputsListAdded);
-                //connect(agentInMapping, &AgentInMappingVM::inputsListWillBeRemoved, this, &AgentsMappingController::_onInputsListWillBeRemoved);
-                //connect(agentInMapping, &AgentInMappingVM::outputsListWillBeRemoved, this, &AgentsMappingController::_onOutputsListWillBeRemoved);
-
-                // Emit signals "Inputs/Outputs List Added" for initial list of inputs and initial list of outputs
-                //agentInMapping->inputsListAdded(agentInMapping->inputsList()->toList());
-                //agentInMapping->outputsListAdded(agentInMapping->outputsList()->toList());
             }
         }
     }
@@ -912,78 +902,12 @@ void AgentsMappingController::_onAgentsInMappingChanged()
 
                 // Emit the signal "Agent in Mapping Removed"
                 Q_EMIT agentInMappingRemoved(agentInMapping);
-
-                // Emit signals "Inputs/Outputs List Removed" with current list of inputs and current list of outputs
-                //agentInMapping->inputsListWillBeRemoved(agentInMapping->inputsList()->toList());
-                //agentInMapping->outputsListWillBeRemoved(agentInMapping->outputsList()->toList());
-
-                // DIS-connect to signals from the previous agent in mapping
-                //disconnect(agentInMapping, &AgentInMappingVM::inputsListAdded, this, &AgentsMappingController::_onInputsListAdded);
-                //disconnect(agentInMapping, &AgentInMappingVM::outputsListAdded, this, &AgentsMappingController::_onOutputsListAdded);
-                //disconnect(agentInMapping, &AgentInMappingVM::inputsListWillBeRemoved, this, &AgentsMappingController::_onInputsListWillBeRemoved);
-                //disconnect(agentInMapping, &AgentInMappingVM::outputsListWillBeRemoved, this, &AgentsMappingController::_onOutputsListWillBeRemoved);
             }
         }
     }
 
     _previousListOfAgentsInMapping = newListOfAgentsInMapping;
 }
-
-
-/**
- * @brief Slot when some view models of inputs have been added to an agent in mapping
- * @param inputsListAdded
- */
-/*void AgentsMappingController::_onInputsListAdded(QList<InputVM*> inputsListAdded)
-{
-    AgentInMappingVM* agentInMapping = qobject_cast<AgentInMappingVM*>(sender());
-    if ((agentInMapping != NULL) && (inputsListAdded.count() > 0))
-    {
-        qDebug() << "_on Inputs List Added from agent" << agentInMapping->name() << inputsListAdded.count();
-    }
-}*/
-
-
-/**
- * @brief Slot when some view models of outputs have been added to an agent in mapping
- * @param outputsListAdded
- */
-/*void AgentsMappingController::_onOutputsListAdded(QList<OutputVM*> outputsListAdded)
-{
-    AgentInMappingVM* agentInMapping = qobject_cast<AgentInMappingVM*>(sender());
-    if ((agentInMapping != NULL) && (outputsListAdded.count() > 0))
-    {
-        qDebug() << "_on Outputs List Added from agent" << agentInMapping->name() << outputsListAdded.count();
-    }
-}*/
-
-
-/**
- * @brief Slot when some view models of inputs will be removed from an agent in mapping
- * @param inputsListWillBeRemoved
- */
-/*void AgentsMappingController::_onInputsListWillBeRemoved(QList<InputVM*> inputsListWillBeRemoved)
-{
-    AgentInMappingVM* agentInMapping = qobject_cast<AgentInMappingVM*>(sender());
-    if ((agentInMapping != NULL) && (inputsListWillBeRemoved.count() > 0))
-    {
-        qDebug() << "_on Intputs List Will Be Removed from agent" << agentInMapping->name() << inputsListWillBeRemoved.count();
-    }
-}*/
-
-
-/**
- * @brief Slot when some view models of outputs will be removed from an agent in mapping
- * @param outputsListWillBeRemoved
- */
-/*void AgentsMappingController::_onOutputsListWillBeRemoved(QList<OutputVM*> outputsListWillBeRemoved)
-{
-    AgentInMappingVM* agentInMapping = qobject_cast<AgentInMappingVM*>(sender());
-    if ((agentInMapping != NULL) && (outputsListWillBeRemoved.count() > 0))
-    {
-        qDebug() << "_on Outputs List Will Be Removed from agent" << agentInMapping->name() << outputsListWillBeRemoved.count();
-    }
-}*/
 
 
 /**

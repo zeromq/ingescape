@@ -119,6 +119,26 @@ void AgentM::setisMuted(bool value)
 
 
 /**
+ * @brief Setter for property "Definition"
+ * @param value
+ */
+void AgentM::setdefinition(DefinitionM *value)
+{
+    if (_definition != value)
+    {
+        DefinitionM* previousValue = _definition;
+
+        _definition = value;
+
+        Q_EMIT definitionChanged(value);
+
+        // Emit the signal "Definition Changed" with previous and new values
+        Q_EMIT definitionChangedWithPreviousAndNewValues(previousValue, value);
+    }
+}
+
+
+/**
  * @brief Set the flag "is Muted" of an Output of our agent
  * @param isMuted
  * @param outputName

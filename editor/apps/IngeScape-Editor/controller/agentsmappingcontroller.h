@@ -279,59 +279,9 @@ public Q_SLOTS:
 private Q_SLOTS:
 
     /**
-     * @brief Slot when inside an agentInMappingVM, new inputsVM are created.
-     *      Check if a map need to be created from the element mapping list in the model manager.
-     *      A missing agent is substituted by a ghost agent with same name. > create a partial map.
-     *      A missing output is substituted by a ghost output with same name. > create partial map.
-     * @param currentAgentInMapping
-     * @param inputsListAdded
-     */
-    //void _generateAllMapBetweenIopUsingNewlyAddedInputsVM(AgentInMappingVM* currentAgentInMapping, QList<InputVM*> inputsListAdded);
-
-
-    /**
-     * @brief Slot when inside an agentInMappingVM, new outputsVM are created.
-     *      Check if a map need can be completed from internal partial maps list in the mapping controller.
-     *      A missing agent is substituted by a ghost agent with same name. > create a partial map.
-     *      A missing output is substituted by a ghost output with same name. > create partial map.
-     * @param currentAgentInMapping
-     * @param outputsListAdded
-     */
-    //void _completeAllPartialMapBetweenIopUsingNewlyOutputsVM(AgentInMappingVM* currentAgentInMapping, QList<OutputVM*> outputsListAdded);
-
-
-    /**
      * @brief Slot when the list of "Agents in Mapping" changed
      */
     void _onAgentsInMappingChanged();
-
-
-    /**
-     * @brief Slot when some view models of inputs have been added to an agent in mapping
-     * @param inputsListAdded
-     */
-    //void _onInputsListAdded(QList<InputVM*> inputsListAdded);
-
-
-    /**
-     * @brief Slot when some view models of outputs have been added to an agent in mapping
-     * @param outputsListAdded
-     */
-    //void _onOutputsListAdded(QList<OutputVM*> outputsListAdded);
-
-
-    /**
-     * @brief Slot when some view models of inputs will be removed from an agent in mapping
-     * @param inputsListWillBeRemoved
-     */
-    //void _onInputsListWillBeRemoved(QList<InputVM*> inputsListWillBeRemoved);
-
-
-    /**
-     * @brief Slot when some view models of outputs will be removed from an agent in mapping
-     * @param outputsListWillBeRemoved
-     */
-    //void _onOutputsListWillBeRemoved(QList<OutputVM*> outputsListWillBeRemoved);
 
 
 private:

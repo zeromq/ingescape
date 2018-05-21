@@ -73,7 +73,7 @@ class AgentM : public QObject
     I2_QML_PROPERTY_READONLY(bool, isFrozen)
 
     // Definition of our agent
-    I2_QML_PROPERTY_READONLY(DefinitionM*, definition)
+    I2_QML_PROPERTY_READONLY_CUSTOM_SETTER(DefinitionM*, definition)
 
     // Mapping of our agent
     I2_QML_PROPERTY_READONLY(AgentMappingM*, mapping)
@@ -124,6 +124,15 @@ public:
 
 
 Q_SIGNALS:
+
+
+    /**
+     * @brief Signal emitted when the definition changed (with previous and new values)
+     * @param previousValue
+     * @param newValue
+     */
+    void definitionChangedWithPreviousAndNewValues(DefinitionM* previousValue, DefinitionM* newValue);
+
 
 public Q_SLOTS:
 };

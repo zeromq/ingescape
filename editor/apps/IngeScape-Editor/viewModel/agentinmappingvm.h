@@ -118,34 +118,6 @@ public:
 Q_SIGNALS:
 
     /**
-     * @brief Signal emitted when some view models of inputs have been added to our agent in mapping
-     * @param inputsListAdded
-     */
-    //void inputsListAdded(QList<InputVM*> inputsListAdded);
-
-
-    /**
-     * @brief Signal emitted when some view models of outputs have been added to our agent in mapping
-     * @param outputsListAdded
-     */
-    //void outputsListAdded(QList<OutputVM*> outputsListAdded);
-
-
-    /**
-     * @brief Signal emitted when some view models of inputs will be removed from our agent in mapping
-     * @param inputsListWillBeRemoved
-     */
-    //void inputsListWillBeRemoved(QList<InputVM*> inputsListWillBeRemoved);
-
-
-    /**
-     * @brief Signal emitted when some view models of outputs will be removed from our agent in mapping
-     * @param outputsListWillBeRemoved
-     */
-    //void outputsListWillBeRemoved(QList<OutputVM*> outputsListWillBeRemoved);
-
-
-    /**
      * @brief Signal emitted when the models of Inputs and Outputs changed
      */
     void modelsOfInputsAndOutputsChanged();
@@ -208,10 +180,11 @@ private Q_SLOTS:
 
 
     /**
-     * @brief Slot when the definition of a model changed
-     * @param definition
+     * @brief Slot called when the definition of a model changed (with previous and new values)
+     * @param previousValue
+     * @param newValue
      */
-    void _onDefinitionOfModelChanged(DefinitionM* definition);
+    void _onDefinitionOfModelChangedWithPreviousAndNewValues(DefinitionM* previousValue, DefinitionM* newValue);
 
 
 private:
