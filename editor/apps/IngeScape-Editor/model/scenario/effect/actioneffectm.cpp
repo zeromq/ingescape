@@ -93,7 +93,7 @@ void ActionEffectM::_onAgentDestroyed(QObject* sender)
 
     setagent(NULL);
 
-     Q_EMIT askForDestruction();
+    Q_EMIT askForDestruction();
 }
 
 

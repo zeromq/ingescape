@@ -118,6 +118,20 @@ public:
 Q_SIGNALS:
 
     /**
+     * @brief Signal emitted when some view models of inputs have been added to our agent in mapping
+     * @param inputsListHaveBeenAdded
+     */
+    void inputsListHaveBeenAdded(QList<InputVM*> inputsListHaveBeenAdded);
+
+
+    /**
+     * @brief Signal emitted when some view models of outputs have been added to our agent in mapping
+     * @param outputsListHaveBeenAdded
+     */
+    void outputsListHaveBeenAdded(QList<OutputVM*> outputsListHaveBeenAdded);
+
+
+    /**
      * @brief Signal emitted when some view models of inputs will be removed from our agent in mapping
      * @param inputsListWillBeRemoved
      */

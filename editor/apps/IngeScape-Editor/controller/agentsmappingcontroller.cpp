@@ -889,6 +889,8 @@ void AgentsMappingController::_onAgentsInMappingChanged()
                 Q_EMIT agentInMappingAdded(agentInMapping);
 
                 // Connect to signals from the new agent in mapping
+                connect(agentInMapping, &AgentInMappingVM::inputsListHaveBeenAdded, this, &AgentsMappingController::_onInputsListHaveBeenAdded);
+                connect(agentInMapping, &AgentInMappingVM::outputsListHaveBeenAdded, this, &AgentsMappingController::_onOutputsListHaveBeenAdded);
                 connect(agentInMapping, &AgentInMappingVM::inputsListWillBeRemoved, this, &AgentsMappingController::_onInputsListWillBeRemoved);
                 connect(agentInMapping, &AgentInMappingVM::outputsListWillBeRemoved, this, &AgentsMappingController::_onOutputsListWillBeRemoved);
             }
@@ -908,6 +910,8 @@ void AgentsMappingController::_onAgentsInMappingChanged()
                 Q_EMIT agentInMappingRemoved(agentInMapping);
 
                 // DIS-connect to signals from the previous agent in mapping
+                disconnect(agentInMapping, &AgentInMappingVM::inputsListHaveBeenAdded, this, &AgentsMappingController::_onInputsListHaveBeenAdded);
+                disconnect(agentInMapping, &AgentInMappingVM::outputsListHaveBeenAdded, this, &AgentsMappingController::_onOutputsListHaveBeenAdded);
                 disconnect(agentInMapping, &AgentInMappingVM::inputsListWillBeRemoved, this, &AgentsMappingController::_onInputsListWillBeRemoved);
                 disconnect(agentInMapping, &AgentInMappingVM::outputsListWillBeRemoved, this, &AgentsMappingController::_onOutputsListWillBeRemoved);
 
@@ -916,6 +920,26 @@ void AgentsMappingController::_onAgentsInMappingChanged()
     }
 
     _previousListOfAgentsInMapping = newListOfAgentsInMapping;
+}
+
+
+/**
+ * @brief Slot called when some view models of inputs have been added to an agent in mapping
+ * @param inputsListHaveBeenAdded
+ */
+void AgentsMappingController::_onInputsListHaveBeenAdded(QList<InputVM*> inputsListHaveBeenAdded)
+{
+    // TODO
+}
+
+
+/**
+ * @brief Slot called when some view models of outputs have been added to an agent in mapping
+ * @param outputsListHaveBeenAdded
+ */
+void AgentsMappingController::_onOutputsListHaveBeenAdded(QList<OutputVM*> outputsListHaveBeenAdded)
+{
+    // TODO
 }
 
 
