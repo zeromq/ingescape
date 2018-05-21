@@ -72,12 +72,6 @@ class AgentM : public QObject
     // Flag indicating if our agent is frozen
     I2_QML_PROPERTY_READONLY(bool, isFrozen)
 
-    // State of our agent
-    I2_QML_PROPERTY(QString, state)
-
-    // Status defined by the agent
-    //I2_QML_PROPERTY_READONLY(QString, status)
-
     // Definition of our agent
     I2_QML_PROPERTY_READONLY(DefinitionM*, definition)
 
@@ -86,6 +80,9 @@ class AgentM : public QObject
 
     // Flag indicating if we have to overwrite the mapping of our agent (when it will send its mapping)
     I2_QML_PROPERTY_READONLY(bool, mustOverWriteMapping)
+
+    // State of our agent
+    I2_QML_PROPERTY(QString, state)
 
 
 public:

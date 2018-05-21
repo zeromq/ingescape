@@ -59,20 +59,17 @@ class AgentVM : public QObject
     // Flag indicating if our agent is frozen
     I2_QML_PROPERTY_READONLY(bool, isFrozen)
 
-    // Status defined by the agent
-    //I2_QML_PROPERTY_READONLY(QString, status)
-
     // Definition of our agent
     I2_QML_PROPERTY_READONLY_CUSTOM_SETTER(DefinitionM*, definition)
-
-    // Hostname(s) on the network of our agent(s)
-    I2_QML_PROPERTY(QString, state)
 
     // Number of clones
     I2_QML_PROPERTY_READONLY(int, clonesNumber)
 
     // Flag indicating if our agent can be restarted (by a INGESCAPE launcher)
     I2_QML_PROPERTY_READONLY(bool, canBeRestarted)
+
+    // State of our agent
+    I2_QML_PROPERTY(QString, state)
 
 
 public:
@@ -193,11 +190,13 @@ private Q_SLOTS:
      */
     void _onDefinitionOfModelChanged(DefinitionM* definition);
 
+
     /**
      * @brief Slot when the state of a model changed
      * @param state
      */
     void _onStateOfModelChanged(QString state);
+
 
     /**
      * @brief Slot when a command must be sent on the network to an agent about one of its output

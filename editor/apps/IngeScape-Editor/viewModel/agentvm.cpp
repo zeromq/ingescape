@@ -31,7 +31,8 @@ AgentVM::AgentVM(AgentM* model, QObject *parent) : QObject(parent),
     _isFrozen(false),
     _definition(NULL),
     _clonesNumber(0),
-    _canBeRestarted(false)
+    _canBeRestarted(false),
+    _state("")
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
