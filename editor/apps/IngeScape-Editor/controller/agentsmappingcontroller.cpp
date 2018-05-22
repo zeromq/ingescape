@@ -709,7 +709,8 @@ void AgentsMappingController::onActiveAgentMappingDefined(AgentM* agent)
             {
                 qDebug() << "unmapped" << idsOfRemovedMappingElements;
 
-                foreach (ElementMappingM* mappingElement, agentInMapping->temporaryMapping()->mappingElements()->toList()) {
+                foreach (ElementMappingM* mappingElement, agentInMapping->temporaryMapping()->mappingElements()->toList())
+                {
                     if ((mappingElement != NULL) && idsOfRemovedMappingElements.contains(mappingElement->id()))
                     {
                         onUnmapped(mappingElement);
@@ -721,7 +722,8 @@ void AgentsMappingController::onActiveAgentMappingDefined(AgentM* agent)
             {
                 qDebug() << "mapped" << idsOfAddedMappingElements;
 
-                foreach (ElementMappingM* mappingElement, agent->mapping()->mappingElements()->toList()) {
+                foreach (ElementMappingM* mappingElement, agent->mapping()->mappingElements()->toList())
+                {
                     if ((mappingElement != NULL) && idsOfAddedMappingElements.contains(mappingElement->id()))
                     {
                         onMapped(mappingElement);
@@ -929,7 +931,28 @@ void AgentsMappingController::_onAgentsInMappingChanged()
  */
 void AgentsMappingController::_onInputsListHaveBeenAdded(QList<InputVM*> inputsListHaveBeenAdded)
 {
-    // TODO
+    AgentInMappingVM* agentInMapping = qobject_cast<AgentInMappingVM*>(sender());
+    if ((agentInMapping != NULL) && !inputsListHaveBeenAdded.isEmpty())
+    {
+        QStringList namesOfInputs;
+        for (InputVM* input : inputsListHaveBeenAdded) {
+            if (input != NULL) {
+                namesOfInputs.append(input->name());
+            }
+        }
+
+        if (agentInMapping->temporaryMapping() != NULL)
+        {
+            foreach (ElementMappingM* mappingElement, agentInMapping->temporaryMapping()->mappingElements()->toList())
+            {
+                if ((mappingElement != NULL) && namesOfInputs.contains(mappingElement->input()))
+                {
+                    // Try to create the link corresponding to the mapping element
+                    onMapped(mappingElement);
+                }
+            }
+        }
+    }
 }
 
 
@@ -939,7 +962,31 @@ void AgentsMappingController::_onInputsListHaveBeenAdded(QList<InputVM*> inputsL
  */
 void AgentsMappingController::_onOutputsListHaveBeenAdded(QList<OutputVM*> outputsListHaveBeenAdded)
 {
-    // TODO
+    AgentInMappingVM* agentInMapping = qobject_cast<AgentInMappingVM*>(sender());
+    if ((agentInMapping != NULL) && !outputsListHaveBeenAdded.isEmpty())
+    {
+        QStringList namesOfOutputs;
+        for (OutputVM* output : outputsListHaveBeenAdded) {
+            if (output != NULL) {
+                namesOfOutputs.append(output->name());
+            }
+        }
+
+        for (AgentInMappingVM* iterator : _allAgentsInMapping.toList())
+        {
+            if ((iterator != NULL) && (iterator != agentInMapping) && (iterator->temporaryMapping() != NULL))
+            {
+                foreach (ElementMappingM* mappingElement, iterator->temporaryMapping()->mappingElements()->toList())
+                {
+                    if ((mappingElement != NULL) && (mappingElement->outputAgent() == agentInMapping->name()) && namesOfOutputs.contains(mappingElement->output()))
+                    {
+                        // Try to create the link corresponding to the mapping element
+                        onMapped(mappingElement);
+                    }
+                }
+            }
+        }
+    }
 }
 
 
@@ -959,17 +1006,11 @@ void AgentsMappingController::_onInputsListWillBeRemoved(QList<InputVM*> inputsL
             if ((link != NULL) && (link->inputAgent() != NULL) && (link->inputAgent() == agentInMapping)
                     && (link->input() != NULL) && inputsListWillBeRemoved.contains(link->input()))
             {
-                inputsListWillBeRemoved.removeOne(link->input());
-
                 // Remove the link between two agents from the mapping
                 //removeLinkBetweenTwoAgents(link);
 
                 // Delete the link between two agents
                 _deleteLinkBetweenTwoAgents(link);
-
-                if (inputsListWillBeRemoved.isEmpty()) {
-                    break;
-                }
             }
         }
     }
@@ -992,17 +1033,11 @@ void AgentsMappingController::_onOutputsListWillBeRemoved(QList<OutputVM*> outpu
             if ((link != NULL) && (link->outputAgent() != NULL) && (link->outputAgent() == agentInMapping)
                     && (link->output() != NULL) && outputsListWillBeRemoved.contains(link->output()))
             {
-                outputsListWillBeRemoved.removeOne(link->output());
-
                 // Remove the link between two agents from the mapping
                 //removeLinkBetweenTwoAgents(link);
 
                 // Delete the link between two agents
                 _deleteLinkBetweenTwoAgents(link);
-
-                if (outputsListWillBeRemoved.isEmpty()) {
-                    break;
-                }
             }
         }
     }
