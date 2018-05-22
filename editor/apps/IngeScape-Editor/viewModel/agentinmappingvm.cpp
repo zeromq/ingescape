@@ -399,8 +399,12 @@ void AgentInMappingVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(Defin
                 }
             }
         }
-        if (!inputsListToAdd.isEmpty()) {
+        if (!inputsListToAdd.isEmpty())
+        {
             _inputsList.append(inputsListToAdd);
+
+            // Emit signal "Inputs List Have Been Added"
+            Q_EMIT inputsListHaveBeenAdded(inputsListToAdd);
         }
 
 
@@ -438,8 +442,12 @@ void AgentInMappingVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(Defin
                 }
             }
         }
-        if (!outputsListToAdd.isEmpty()) {
+        if (!outputsListToAdd.isEmpty())
+        {
             _outputsList.append(outputsListToAdd);
+
+            // Emit signal "Outputs List Have Been Added"
+            Q_EMIT outputsListHaveBeenAdded(outputsListToAdd);
         }
 
 

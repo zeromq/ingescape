@@ -687,6 +687,7 @@ bool IngeScapeEditorController::restartNetwork(QString strPort, QString networkD
             if ((nPort == _port) && (networkDevice == _networkDevice))
             {
                 // Nothing to do
+                success = true;
             }
             // Port and Network device
             else
