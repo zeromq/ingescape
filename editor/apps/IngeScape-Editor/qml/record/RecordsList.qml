@@ -149,6 +149,45 @@ Item {
         }
 
         color : IngeScapeTheme.selectedTabsBackgroundColor
+
+
+
+        Button {
+            id : startStopRecordButton
+            anchors
+            {
+                verticalCenter:parent.verticalCenter
+                left:parent.left
+                leftMargin:25
+            }
+
+            style: I2SvgToggleButtonStyle {
+                fileCache: IngeScapeTheme.svgFileINGESCAPE
+
+                toggleCheckedReleasedID :  "stop";
+                toggleCheckedPressedID :  "stopped_pressed";
+                toggleUncheckedReleasedID : "record";
+                toggleUncheckedPressedID : "record_pressed";
+
+                // No disabled states
+                toggleCheckedDisabledID: ""
+                toggleUncheckedDisabledID: ""
+
+                labelMargin: 0;
+            }
+
+            onCheckedChanged: {
+                if (controller) {
+                    controller.isRecording = checked;
+                }
+            }
+
+//            Binding {
+//                target : enabledbutton
+//                property : "checked"
+//                value : (myEffect && myEffect.modelM && myEffect.modelM.mappingEffectValue === MappingEffectValues.MAPPED) ? true : false;
+//            }
+        }
     }
 
 
@@ -210,7 +249,7 @@ Item {
                     anchors {
                         left : parent.left
                         right : parent.right
-                        leftMargin: 28
+                        leftMargin: 70
                         rightMargin: 12
                     }
 
@@ -241,9 +280,13 @@ Item {
                         }
                         elide: Text.ElideRight
 
-                        text: qsTr("%1 %2").arg(Qt.formatDate(model.recordModel.beginDateTime, "dd/MM/yyyy")).arg(Qt.formatTime(model.recordModel.beginDateTime, "HH:mm"))
+                        text: qsTr("%1 %2 - %3 %4").arg(Qt.formatDate(model.recordModel.beginDateTime, "dd/MM/yyyy"))
+                                                    .arg(Qt.formatTime(model.recordModel.beginDateTime, "HH:mm"))
+                                                    .arg(Qt.formatDate(model.recordModel.endDateTime, "dd/MM/yyyy"))
+                                                    .arg(Qt.formatTime(model.recordModel.endDateTime, "HH:mm"))
+
                         color: IngeScapeTheme.agentsListTextColor
-                        font: IngeScapeTheme.heading2Font
+                        font: IngeScapeTheme.normalFont
                     }
                 }
 
@@ -264,6 +307,48 @@ Item {
                         }
                     }
                 }
+
+
+                // Play record button
+                Button {
+                    id : playPauseRecordButton
+                    anchors
+                    {
+                        verticalCenter:parent.verticalCenter
+                        left:parent.left
+                        leftMargin:25
+                    }
+
+                    style: I2SvgToggleButtonStyle {
+                        fileCache: IngeScapeTheme.svgFileINGESCAPE
+
+                        toggleCheckedReleasedID :  "pause_actif";
+                        toggleCheckedPressedID :  "pause_actif_pressed";
+                        toggleUncheckedReleasedID : "play_actif";
+                        toggleUncheckedPressedID : "play_actif_pressed";
+
+                        // No disabled states
+                        toggleCheckedDisabledID: ""
+                        toggleUncheckedDisabledID: ""
+
+                        labelMargin: 0;
+                    }
+
+                    onCheckedChanged: {
+                        if (controller) {
+                            controller.controlRecord(model.recordModel.id, checked)
+                        }
+                    }
+
+        //            Binding {
+        //                target : enabledbutton
+        //                property : "checked"
+        //                value : (myEffect && myEffect.modelM && myEffect.modelM.mappingEffectValue === MappingEffectValues.MAPPED) ? true : false;
+        //            }
+                }
+
+
+
 
                 // Selected Record feedback
                 Item {

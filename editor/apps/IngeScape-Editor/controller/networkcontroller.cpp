@@ -114,9 +114,6 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
                     else if (key == "isRecorder") {
                         if (value == "1") {
                             isIngeScapeRecorder = true;
-
-                            // Retrieve all records
-                            igs_busSendStringToAgent(peerId.toStdString().c_str(), "GET_RECORDS");
                         }
                     }
                     else if (key == "pid") {

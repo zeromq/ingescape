@@ -177,7 +177,6 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(_modelManager, &IngeScapeModelManager::isMappingControlledChanged, _agentsMappingC, &AgentsMappingController::onIsMappingControlledChanged);
 
     connect(_modelManager, &IngeScapeModelManager::agentModelCreated, _agentsSupervisionC, &AgentsSupervisionController::onAgentModelCreated);
-    connect(_modelManager, &IngeScapeModelManager::agentModelCreated, _scenarioC, &ScenarioController::onAgentModelCreated);
     connect(_modelManager, &IngeScapeModelManager::agentModelCreated, _hostsSupervisionC, &HostsSupervisionController::onAgentModelCreated);
     connect(_modelManager, &IngeScapeModelManager::agentModelCreated, _recordsSupervisionC, &RecordsSupervisionController::onAgentModelCreated);
 

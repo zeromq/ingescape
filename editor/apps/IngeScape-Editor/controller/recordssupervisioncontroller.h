@@ -42,6 +42,9 @@ class RecordsSupervisionController : public QObject
     // Selected Record in the Records list
     I2_QML_PROPERTY_DELETE_PROOF(RecordVM*, selectedRecord)
 
+    // Indicating if a recorder agent is currently recording
+    I2_QML_PROPERTY_CUSTOM_SETTER(bool, isRecording)
+
 public:
     /**
      * @brief Default constructor
@@ -61,6 +64,12 @@ public:
      * @brief Delete the selected record from the list
      */
     Q_INVOKABLE void deleteSelectedRecord();
+
+
+    /**
+     * @brief Controls the selected record from the list
+     */
+    Q_INVOKABLE void controlRecord(QString recordId, bool startPlaying);
 
 Q_SIGNALS:
 
@@ -92,6 +101,7 @@ public Q_SLOTS:
      * @param agent
      */
     void onAgentModelCreated(AgentM* model);
+
 
 private:
 
