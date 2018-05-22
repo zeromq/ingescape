@@ -28,6 +28,7 @@
 RecordsSupervisionController::RecordsSupervisionController(IngeScapeModelManager* modelManager, QObject *parent) : QObject(parent),
     _recorderAgent(NULL),
     _selectedRecord(NULL),
+    _isRecording(false),
     _modelManager(modelManager)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
@@ -91,9 +92,13 @@ void RecordsSupervisionController::onRecordAdded(RecordM* model)
  */
 void RecordsSupervisionController::onAgentModelCreated(AgentM* model)
 {
-    if (model != NULL && model->isRecorder())
+    if (model != NULL && model->isRecorder() && model != _recorderAgent)
     {
-        _recorderAgent = model;
+        setrecorderAgent(model);
+
+        // Retrieve all records
+        Q_EMIT commandAskedToAgent(_recorderAgent->peerId().split(","), "GET_RECORDS");
+        qDebug() << "New recorder on the network, get all its records";
     }
 }
 
@@ -125,6 +130,41 @@ void RecordsSupervisionController::deleteSelectedRecord()
         setselectedRecord(NULL);
     }
 }
+
+
+/**
+ * @brief Delete the selected agent from the list
+ */
+void RecordsSupervisionController::controlRecord(QString recordId, bool startPlaying)
+{
+    if(_recorderAgent != NULL)
+    {
+        QString command = startPlaying? "PLAY_RECORD#" : "PAUSE_RECORD#";
+        Q_EMIT commandAskedToAgent(_recorderAgent->peerId().split(","), QString("%1%2").arg(command).arg(recordId));
+    }
+}
+
+
+/**
+ * @brief Custom setter on is recording command for the scenario
+ * @param is recording flag
+ */
+void RecordsSupervisionController::setisRecording(bool isRecording)
+{
+    if(_isRecording != isRecording)
+    {
+        _isRecording = isRecording;
+
+        Q_EMIT isRecordingChanged(_isRecording);
+
+        if(_recorderAgent != NULL)
+        {
+            QString command = _isRecording? "START_RECORD" : "STOP_RECORD";
+            Q_EMIT commandAskedToAgent(_recorderAgent->peerId().split(","), command);
+        }
+    }
+}
+
 
 /**
  * @brief Aims at deleting VM and model of a record
