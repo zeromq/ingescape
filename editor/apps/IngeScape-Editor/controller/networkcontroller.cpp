@@ -520,6 +520,13 @@ NetworkController::NetworkController(QObject *parent) : QObject(parent),
 
     setavailableNetworkDevices(networkDevices);
     qInfo() << "Available Network Devices:" << _availableNetworkDevices;
+
+
+    // Begin to observe incoming messages on the bus
+    int result = igs_observeBus(&onIncommingBusMessageCallback, this);
+    if (result == 0) {
+        qCritical() << "The callback on zyre messages has NOT been registered !";
+    }
 }
 
 
@@ -544,12 +551,6 @@ bool NetworkController::start(QString networkDevice, QString ipAddress, int port
 {
     if (_isIngeScapeAgentStarted == 0)
     {
-        // Begin to observe incoming messages on the bus
-        int result = igs_observeBus(&onIncommingBusMessageCallback, this);
-        if (result == 0) {
-            qCritical() << "The callback on zyre messages has NOT been registered !";
-        }
-
         // Start service with network device
         if (!networkDevice.isEmpty()) {
             _isIngeScapeAgentStarted = igs_startWithDevice(networkDevice.toStdString().c_str(), port);
