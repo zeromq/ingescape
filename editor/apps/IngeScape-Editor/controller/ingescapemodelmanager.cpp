@@ -278,13 +278,15 @@ void IngeScapeModelManager::simulateExitForEachActiveAgent()
             onAgentExited(agent->peerId(), agent->name());
 
             // Reset the peer id and address
-            if (!agent->peerId().isEmpty()) {
+            if (!agent->peerId().isEmpty())
+            {
                 _mapFromPeerIdToAgentM.remove(agent->peerId());
 
                 agent->setpeerId("");
                 agent->setaddress("");
             }
 
+            // Reset the mapping
             if (agent->mapping() != NULL)
             {
                 AgentMappingM* mapping = agent->mapping();
