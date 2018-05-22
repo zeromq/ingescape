@@ -540,9 +540,6 @@ void AgentInMappingVM::_agentModelRemoved(AgentM* model)
         }
         if (!inputsListToRemove.isEmpty())
         {
-            // Emit signal "Inputs List Will Be Removed"
-            Q_EMIT inputsListWillBeRemoved(inputsListToRemove);
-
             // FIXME TODO I2 Quick: Allow to remove a QList
             //_inputsList.remove(inputsListToRemove);
             foreach (InputVM* inputVM, inputsListToRemove) {
@@ -568,9 +565,6 @@ void AgentInMappingVM::_agentModelRemoved(AgentM* model)
         }
         if (!outputsListToRemove.isEmpty())
         {
-            // Emit signal "Outputs List Will Be Removed"
-            Q_EMIT outputsListWillBeRemoved(outputsListToRemove);
-
             // FIXME TODO I2 Quick: Allow to remove a QList
             //_outputsList.remove(outputsListToRemove);
             foreach (OutputVM* outputVM, outputsListToRemove) {
@@ -852,7 +846,7 @@ void AgentInMappingVM::_updateWithAllModels()
     _peerIdsList.clear();
     bool areIdenticalsAllDefinitions = true;
 
-    if (_models.count() > 0)
+    if (!_models.isEmpty())
     {
         QList<AgentM*> modelsList = _models.toList();
         DefinitionM* firstDefinition = NULL;

@@ -1167,7 +1167,8 @@ void IngeScapeModelManager::_updateDefinitionVariants(QString definitionName)
             QList<DefinitionM*> definitionsListForVersion;
 
             // Other(s) definition(s) have the same version (and the same name)
-            if (mapFromVersionToDefinitionsList.contains(version)) {
+            if (mapFromVersionToDefinitionsList.contains(version))
+            {
                 definitionsListForVersion = mapFromVersionToDefinitionsList.value(version);
 
                 // The lists of I/O/P must be different to have a variant !

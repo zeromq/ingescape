@@ -130,12 +130,11 @@ void AgentM::setdefinition(DefinitionM *value)
 
         _definition = value;
 
+        // Emit default signal for QML
         Q_EMIT definitionChanged(value);
 
-        if (previousValue != NULL) {
-            // Emit the signal "Definition Changed" with previous and new values
-            Q_EMIT definitionChangedWithPreviousAndNewValues(previousValue, value);
-        }
+        // Emit the signal "Definition Changed" with previous and new values
+        Q_EMIT definitionChangedWithPreviousAndNewValues(previousValue, value);
     }
 }
 

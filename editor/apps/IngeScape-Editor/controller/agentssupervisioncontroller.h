@@ -148,11 +148,11 @@ public Q_SLOTS:
 private Q_SLOTS:
 
     /**
-     * @brief Slot when the definition of a view model of agent changed
+     * @brief Slot when the definition of a view model of agent changed (with previous and new values)
      * @param previousValue
      * @param newValue
      */
-    void _onAgentDefinitionChangedWithPreviousValue(DefinitionM* previousValue, DefinitionM* newValue);
+    void _onAgentDefinitionChangedWithPreviousAndNewValues(DefinitionM* previousValue, DefinitionM* newValue);
 
 
 private:

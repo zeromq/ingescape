@@ -108,11 +108,11 @@ public:
 Q_SIGNALS:
 
     /**
-     * @brief Signal emitted when the definition changed
+     * @brief Signal emitted when the definition changed (with previous and new values)
      * @param previousValue
      * @param newValue
      */
-    void definitionChangedWithPreviousValue(DefinitionM* previousValue, DefinitionM* newValue);
+    void definitionChangedWithPreviousAndNewValues(DefinitionM* previousValue, DefinitionM* newValue);
 
 
     /**
@@ -244,12 +244,13 @@ private:
 
 
     /**
-     * @brief Update with the definition of first model
+     * @brief Update with the definition of the first model
      */
     void _updateWithDefinitionOfFirstModel();
 
+
     /**
-     * @brief Update with the state of first model
+     * @brief Update with the state of the first model
      */
     void _updateWithStateOfFirstModel();
 

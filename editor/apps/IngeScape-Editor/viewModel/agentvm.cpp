@@ -115,7 +115,8 @@ void AgentVM::setdefinition(DefinitionM* value)
         DefinitionM* previousValue = _definition;
 
         // Previous value
-        if (previousValue != NULL) {
+        if (previousValue != NULL)
+        {
             // DIS-connect from signals from the previous definition
             disconnect(previousValue, &DefinitionM::commandAskedForOutput, this, &AgentVM::_onCommandAskedToAgentAboutOutput);
             disconnect(previousValue, &DefinitionM::openValuesHistoryOfAgent, this, &AgentVM::_onOpenValuesHistoryOfAgent);
@@ -124,17 +125,18 @@ void AgentVM::setdefinition(DefinitionM* value)
         _definition = value;
 
         // New value
-        if (_definition != NULL) {
+        if (_definition != NULL)
+        {
             // Connect to signal from the new definition
             connect(_definition, &DefinitionM::commandAskedForOutput, this, &AgentVM::_onCommandAskedToAgentAboutOutput);
             connect(_definition, &DefinitionM::openValuesHistoryOfAgent, this, &AgentVM::_onOpenValuesHistoryOfAgent);
         }
 
-        // Emit simple signal for QML
+        // Emit default signal for QML
         Q_EMIT definitionChanged(value);
 
-        // Emit signal with previous value
-        Q_EMIT definitionChangedWithPreviousValue(previousValue, _definition);
+        // Emit the signal "Definition Changed" with previous and new values
+        Q_EMIT definitionChangedWithPreviousAndNewValues(previousValue, value);
     }
 }
 
@@ -149,7 +151,8 @@ void AgentVM::changeState()
         Q_EMIT commandAskedToAgent(_peerIdsList, "STOP");
     }
     // is OFF --> Execute all agents
-    else {
+    else
+    {
         foreach (AgentM* model, _models.toList())
         {
             // Check if the model has a hostname
@@ -213,6 +216,7 @@ void AgentVM::_onModelsChanged()
                 connect(model, &AgentM::isMutedChanged, this, &AgentVM::_onIsMutedOfModelChanged, Qt::UniqueConnection);
                 connect(model, &AgentM::isFrozenChanged, this, &AgentVM::_onIsFrozenOfModelChanged, Qt::UniqueConnection);
                 connect(model, &AgentM::definitionChanged, this, &AgentVM::_onDefinitionOfModelChanged, Qt::UniqueConnection);
+                //connect(model, &AgentM::definitionChangedWithPreviousAndNewValues, this, &AgentVM::_onDefinitionOfModelChangedWithPreviousAndNewValues, Qt::UniqueConnection);
                 connect(model, &AgentM::stateChanged, this, &AgentVM::_onStateOfModelChanged, Qt::UniqueConnection);
             }
         }
@@ -475,12 +479,13 @@ void AgentVM::_updateIsFrozen()
 
 
 /**
- * @brief Update with the definition of first model
+ * @brief Update with the definition of the first model
  */
 void AgentVM::_updateWithDefinitionOfFirstModel()
 {
     DefinitionM* definition = NULL;
-    if (_models.count() > 0) {
+    if (!_models.isEmpty())
+    {
          AgentM* model = _models.at(0);
          if (model != NULL) {
              definition = model->definition();
@@ -491,11 +496,12 @@ void AgentVM::_updateWithDefinitionOfFirstModel()
 
 
 /**
- * @brief Update with the state of first model
+ * @brief Update with the state of the first model
  */
 void AgentVM::_updateWithStateOfFirstModel()
 {
-    if (_models.count() > 0) {
+    if (!_models.isEmpty())
+    {
          AgentM* model = _models.at(0);
          if (model != NULL) {
              setstate(model->state());
