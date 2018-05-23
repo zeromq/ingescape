@@ -231,7 +231,6 @@ void AgentsSupervisionController::_onAgentDefinitionChangedWithPreviousAndNewVal
             QList<AgentVM*> agentViewModelsList = getAgentViewModelsListFromName(agent->name());
 
             AgentVM* agentUsingSameDefinition = NULL;
-            DefinitionM* sameDefinition = NULL;
 
             foreach (AgentVM* iterator, agentViewModelsList)
             {
@@ -244,13 +243,12 @@ void AgentsSupervisionController::_onAgentDefinitionChangedWithPreviousAndNewVal
                     qDebug() << "There is exactly the same agent definition for name" << newDefinition->name() << "and version" << newDefinition->version();
 
                     agentUsingSameDefinition = iterator;
-                    sameDefinition = iterator->definition();
                     break;
                 }
             }
 
             // Exactly the same definition
-            if ((agentUsingSameDefinition != NULL) && (sameDefinition != NULL))
+            if (agentUsingSameDefinition != NULL)
             {
                 // It must have only one model of agent
                 if (agent->models()->count() == 1)
@@ -385,7 +383,13 @@ void AgentsSupervisionController::_onDifferentDefinitionDetectedOnModelOfAgent(A
             }
         }
 
-        if (agentUsingSameDefinition != NULL)
+        if (agentUsingSameDefinition == NULL)
+        {
+            // Allows to create a new view model of agent for this model
+            onAgentModelCreated(model);
+        }
+        // A view model of agent already exists with exactly the same definition
+        else
         {
             // View model never yet appeared on the network
             if (agentUsingSameDefinition->neverAppearedOnNetwork() && (agentUsingSameDefinition->models()->count() == 1))
@@ -412,12 +416,10 @@ void AgentsSupervisionController::_onDifferentDefinitionDetectedOnModelOfAgent(A
             {
                 // Add the model of agent to the list of the view model
                 agentUsingSameDefinition->models()->append(model);
+
+                // Emit signal "Identical Agent Model Added"
+                //Q_EMIT identicalAgentModelAdded(model);
             }
-        }
-        else
-        {
-            // Allows to create a new view model of agent for this model
-            onAgentModelCreated(model);
         }
     }
 }
@@ -449,6 +451,7 @@ void AgentsSupervisionController::_checkHaveToMergeAgent(AgentVM* agent)
                 }
             }
 
+            // A view model of agent already exists with exactly the same definition
             if (agentUsingSameDefinition != NULL)
             {
                 // The previous view model of agent is useless, we have to remove it from the list
@@ -486,6 +489,9 @@ void AgentsSupervisionController::_checkHaveToMergeAgent(AgentVM* agent)
                 {
                     // Add the model of agent to the list of the new view model
                     agentUsingSameDefinition->models()->append(model);
+
+                    // Emit signal "Identical Agent Model Added"
+                    //Q_EMIT identicalAgentModelAdded(model);
                 }
             }
         }

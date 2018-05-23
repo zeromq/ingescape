@@ -450,7 +450,8 @@ void AgentsMappingController::onIdenticalAgentModelAdded(AgentM* newModel)
     if (newModel != NULL)
     {
         AgentInMappingVM* agentInMapping = getAgentInMappingFromName(newModel->name());
-        if (agentInMapping != NULL)
+
+        if ((agentInMapping != NULL) && !agentInMapping->models()->contains(newModel))
         {
             agentInMapping->models()->append(newModel);
 
