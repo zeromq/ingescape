@@ -16,7 +16,7 @@ The communication between ingeScape agents relies on a software bus, which is hi
 
 ### Fully decentralized, asynchronous and scalable
 
-Most software buses and network systems use central brokers to make applications connect to the others. Some other solutions use hardcoded adresses and ports for these connections. The ingeScape community had the strong objective to provide a **fully decentralized** solution, and thus avoid theses two practices, or at least not make them mandatory. 
+Most software buses and network systems use central brokers to make applications connect to the others. Some other solutions use hardcoded adresses and ports for these connections. The ingeScape community had the strong objective to provide a **fully decentralized** solution, and thus avoid these two practices, or at least not make them mandatory. 
 
 That is why ingeScape environments are extremely flexible and insure that:
 

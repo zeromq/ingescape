@@ -191,7 +191,7 @@ For each of these cases, there a good practices to follow in order to avoid any 
 <br>
 #### Which thread am i in ?
 
-When using ingeScape, you are in your application's threads except when executing code in an ingeScape callback, wether it is an IOP observation callback or any other. When executing code in an ingeScape callback, you need to keep in mind that in some situations, it is necessary to wrap some or all of the code in a callback so that it may be executed in your application's threads. Most industrial frameworks such as Microsoft .Net, Apple's Cocoa, Qt, etc. provide methods to do that easily.
+When using ingeScape, you are in your application's threads except when executing code in an ingeScape callback, whether it is an IOP observation callback or any other. When executing code in an ingeScape callback, you need to keep in mind that in some situations, it is necessary to wrap some or all of the code in a callback so that it may be executed in your application's threads. Most industrial frameworks such as Microsoft .Net, Apple's Cocoa, Qt, etc. provide methods to do that easily.
 
 When using a simple C program as it is the case here, your application has only one main thread, plus the ones in ingeScape that you encounter in your callbacks code.
 

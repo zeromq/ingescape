@@ -105,7 +105,7 @@ At startup, the ingeScape editor connects to a system on a given network port an
 
 ![mapping](/snapshots/mapping.png)
 
-The mapping view is a zoomable infinite workspace where users can draw and organize their agents and associated mapping links. When the editor is connected to a system, mapping links can be added or removed dynamically and the systems updates itself automatically to implement the new mapping.
+The mapping view is a zoomable infinite workspace where users can draw and organize their agents and associated mapping links. When the editor is connected to a system, mapping links can be added or removed dynamically and the system updates itself automatically to implement the new mapping.
 
 When agents exchange data, i.e. when an agent's output is written, the existing mappings from this output to inputs of other agents are highlighted, providing a feedback of the circulating data. The editor is also able to show the actual values that are exchanged, whatever their format is (numbers, text, etc.).
 
@@ -160,7 +160,7 @@ Any combination of mappings is allowed. An output can be connected to as many in
 
 ## Scenarios edition and execution
 
-The previous paragraphs present how the ingeScape editor gives facilities for the core ingeScpae concepts. Above this, the editor brings concepts of its own for non-developers wanting to create and execute behaviors on a given system.
+The previous paragraphs present how the ingeScape editor gives facilities for the core ingeScape concepts. Above this, the editor brings concepts of its own for non-developers wanting to create and execute behaviors on a given system.
 
 The editor introduces the concept of ***action*** to be executed in your system. Actions are composed of *effects*, *conditions* and advanced parameters:
 
@@ -182,7 +182,7 @@ Support for actions and scenarios in the editor is still evolving quickly and wi
 
 ## Platform data record and replay
 
-A dedicated ingeScape agent gives record and replay capabilities to any ingScape system. When present, the editor is extended with record and replay control features. A system can be recorded at any time wether running a scenario or just executing on its own. 
+A dedicated ingeScape agent gives record and replay capabilities to any ingeScape system. When present, the editor is extended with record and replay control features. A system can be recorded at any time whether running a scenario or just executing on its own. 
 
 Previous records are available for replay with several possibilities for the behavior of the agents towards recorded date. Previous records can also be exported for exploitation in third-party tools, for test campaigns or human factors experiments.
 
