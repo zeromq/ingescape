@@ -413,8 +413,9 @@ void AgentVM::_updateWithAllModels()
     _updateIsMuted();
     _updateIsFrozen();
 
-    // Update with the definition of first model
+    // Update with the first model
     _updateWithDefinitionOfFirstModel();
+    _updateWithStateOfFirstModel();
 }
 
 
@@ -521,9 +522,9 @@ void AgentVM::_updateWithStateOfFirstModel()
 {
     if (!_models.isEmpty())
     {
-         AgentM* model = _models.at(0);
-         if (model != NULL) {
-             setstate(model->state());
-         }
+        AgentM* model = _models.at(0);
+        if (model != NULL) {
+            setstate(model->state());
+        }
     }
 }
