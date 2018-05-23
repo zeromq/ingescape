@@ -387,8 +387,32 @@ void AgentsSupervisionController::_onDifferentDefinitionDetectedOnModelOfAgent(A
 
         if (agentUsingSameDefinition != NULL)
         {
-            // Add the model of agent to the list of the view model
-            agentUsingSameDefinition->models()->append(model);
+            // View model never yet appeared on the network
+            if (agentUsingSameDefinition->neverAppearedOnNetwork() && (agentUsingSameDefinition->models()->count() == 1))
+            {
+                AgentM* modelUsingSameDefinition = agentUsingSameDefinition->models()->at(0);
+                if (modelUsingSameDefinition != NULL)
+                {
+                    // Emit signal "Identical Agent Model Replaced"
+                    //Q_EMIT identicalAgentModelReplaced(modelUsingSameDefinition, model);
+
+                    // We replace the fake model of agent
+                    agentUsingSameDefinition->models()->replace(0, model);
+
+                    qDebug() << "Replace model (which never appeared on network) by agent" << model->name() << "on" << model->address() << "(" << model->hostname() << ")";
+
+                    // Delete the previous (fake) model of agent
+                    _modelManager->deleteAgentModel(modelUsingSameDefinition);
+
+                    // Update the flag "Never Appeared on the Network"
+                    agentUsingSameDefinition->setneverAppearedOnNetwork(false);
+                }
+            }
+            else
+            {
+                // Add the model of agent to the list of the view model
+                agentUsingSameDefinition->models()->append(model);
+            }
         }
         else
         {
@@ -405,37 +429,65 @@ void AgentsSupervisionController::_onDifferentDefinitionDetectedOnModelOfAgent(A
  */
 void AgentsSupervisionController::_checkHaveToMergeAgent(AgentVM* agent)
 {
-    if ((agent != NULL) && (agent->definition() != NULL))
+    if ((agent != NULL) && (agent->definition() != NULL) && (agent->models()->count() == 1))
     {
-        AgentVM* agentUsingSameDefinition = NULL;
-
-        // Get the list of view models of agent from a name
-        QList<AgentVM*> agentViewModelsList = getAgentViewModelsListFromName(agent->name());
-        for (AgentVM* iterator : agentViewModelsList)
+        AgentM* model = agent->models()->at(0);
+        if (model != NULL)
         {
-            if ((iterator != NULL) && (iterator != agent) && (iterator->definition() != NULL)
-                    // The 2 definitions are strictly identicals
-                    && DefinitionM::areIdenticals(iterator->definition(), agent->definition()))
+            AgentVM* agentUsingSameDefinition = NULL;
+
+            // Get the list of view models of agent from a name
+            QList<AgentVM*> agentViewModelsList = getAgentViewModelsListFromName(agent->name());
+            for (AgentVM* iterator : agentViewModelsList)
             {
-                agentUsingSameDefinition = iterator;
-                break;
+                if ((iterator != NULL) && (iterator != agent) && (iterator->definition() != NULL)
+                        // The 2 definitions are strictly identicals
+                        && DefinitionM::areIdenticals(iterator->definition(), agent->definition()))
+                {
+                    agentUsingSameDefinition = iterator;
+                    break;
+                }
             }
-        }
 
-        if (agentUsingSameDefinition != NULL)
-        {
-            // Add the model(s) of agent to the list of the new view model
-            agentUsingSameDefinition->models()->append(agent->models()->toList());
+            if (agentUsingSameDefinition != NULL)
+            {
+                // The previous view model of agent is useless, we have to remove it from the list
+                _agentsList.remove(agent);
 
-            // The previous view model of agent is useless, we have to remove it from the list
-            _agentsList.remove(agent);
+                // Reset its definition
+                agent->setdefinition(NULL);
 
-            // Reset its definition
-            agent->setdefinition(NULL);
+                // Delete it
+                _deleteAgentViewModel(agent);
+                agent = NULL;
 
-            // Delete it
-            _deleteAgentViewModel(agent);
-            agent = NULL;
+                // View model never yet appeared on the network
+                if (agentUsingSameDefinition->neverAppearedOnNetwork() && (agentUsingSameDefinition->models()->count() == 1))
+                {
+                    AgentM* modelUsingSameDefinition = agentUsingSameDefinition->models()->at(0);
+                    if (modelUsingSameDefinition != NULL)
+                    {
+                        // Emit signal "Identical Agent Model Replaced"
+                        //Q_EMIT identicalAgentModelReplaced(modelUsingSameDefinition, model);
+
+                        // We replace the fake model of agent
+                        agentUsingSameDefinition->models()->replace(0, model);
+
+                        qDebug() << "Replace model (which never appeared on network) by agent" << model->name() << "on" << model->address() << "(" << model->hostname() << ")";
+
+                        // Delete the previous (fake) model of agent
+                        _modelManager->deleteAgentModel(modelUsingSameDefinition);
+
+                        // Update the flag "Never Appeared on the Network"
+                        agentUsingSameDefinition->setneverAppearedOnNetwork(false);
+                    }
+                }
+                else
+                {
+                    // Add the model of agent to the list of the new view model
+                    agentUsingSameDefinition->models()->append(model);
+                }
+            }
         }
     }
 }
