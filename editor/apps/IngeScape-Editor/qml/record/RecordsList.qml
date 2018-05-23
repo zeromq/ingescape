@@ -158,7 +158,7 @@ Item {
             {
                 verticalCenter:parent.verticalCenter
                 left:parent.left
-                leftMargin:25
+                leftMargin:15
             }
 
             style: I2SvgToggleButtonStyle {
@@ -181,12 +181,22 @@ Item {
                     controller.isRecording = checked;
                 }
             }
+        }
 
-//            Binding {
-//                target : enabledbutton
-//                property : "checked"
-//                value : (myEffect && myEffect.modelM && myEffect.modelM.mappingEffectValue === MappingEffectValues.MAPPED) ? true : false;
-//            }
+        Text {
+            id : currentTimeText
+            anchors {
+                left : startStopRecordButton.right
+                leftMargin: 10
+                verticalCenter: parent.verticalCenter
+            }
+
+            text : controller ? controller.currentRecordTime.toLocaleTimeString(Qt.locale(), "HH':'mm':'ss':'zzz") : "00:00:00.000"
+            color: IngeScapeTheme.whiteColor
+            font {
+                family: IngeScapeTheme.textFontFamily
+                pixelSize: 14
+            }
         }
     }
 
@@ -396,9 +406,6 @@ Item {
                         }
                     }
                 }
-
-
-
             }
 
 
