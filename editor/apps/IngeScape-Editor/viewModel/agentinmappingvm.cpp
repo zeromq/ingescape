@@ -393,8 +393,12 @@ void AgentInMappingVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(Defin
                 else
                 {
                     inputVM = _inputModelAdded(input);
-                    if ((inputVM != NULL) && !_inputsList.contains(inputVM)) {
-                        inputsListToAdd.append(inputVM);
+                    if (inputVM != NULL)
+                    {
+                        // New view model of input
+                        if (!_inputsList.contains(inputVM)) {
+                            inputsListToAdd.append(inputVM);
+                        }
                     }
                 }
             }
@@ -436,8 +440,12 @@ void AgentInMappingVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(Defin
                 else
                 {
                     outputVM = _outputModelAdded(output);
-                    if ((outputVM != NULL) && !_outputsList.contains(outputVM)) {
-                        outputsListToAdd.append(outputVM);
+                    if (outputVM != NULL)
+                    {
+                        // New view model of output
+                        if (!_outputsList.contains(outputVM)) {
+                            outputsListToAdd.append(outputVM);
+                        }
                     }
                 }
             }
@@ -456,7 +464,10 @@ void AgentInMappingVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(Defin
 
 
         // Update the flag "Are Identicals All Definitions"
-        _updateAreIdenticalsAllDefinitions();
+        //_updateAreIdenticalsAllDefinitions();
+
+        // Update the flag "Are Identicals All Definitions"
+        _updateIsDefinedInAllDefinitionsForEachInputOutput();
     }
 }
 
@@ -515,6 +526,9 @@ void AgentInMappingVM::_agentModelAdded(AgentM* model)
 
         // Emit signal "models of Inputs and Outputs Changed"
         Q_EMIT modelsOfInputsAndOutputsChanged();
+
+        // Update the flag "Are Identicals All Definitions"
+        _updateIsDefinedInAllDefinitionsForEachInputOutput();
     }
 }
 
@@ -576,9 +590,11 @@ void AgentInMappingVM::_agentModelRemoved(AgentM* model)
             }
         }
 
-
         // Emit signal "models of Inputs and Outputs Changed"
         Q_EMIT modelsOfInputsAndOutputsChanged();
+
+        // Update the flag "Are Identicals All Definitions"
+        _updateIsDefinedInAllDefinitionsForEachInputOutput();
     }
 }
 
@@ -861,7 +877,7 @@ void AgentInMappingVM::_updateWithAllModels()
 
     // Update flags in function of models
     _updateIsON();
-    _updateAreIdenticalsAllDefinitions();
+    //_updateAreIdenticalsAllDefinitions();
 
     // Update the group (of value type) of the reduced map (= brin) in input and in output of our agent
     _updateReducedMapValueTypeGroupInInput();
@@ -923,6 +939,43 @@ void AgentInMappingVM::_updateAreIdenticalsAllDefinitions()
         }
     }
     setareIdenticalsAllDefinitions(areIdenticalsAllDefinitions);
+}
+
+
+/**
+ * @brief Update the flag "Is Defined in All Definitions" for each Input/Output
+ */
+void AgentInMappingVM::_updateIsDefinedInAllDefinitionsForEachInputOutput()
+{
+    int numberOfModels = _models.count();
+
+    // Update the flag "Is Defined in All Definitions" for each input
+    for (InputVM* input : _inputsList.toList())
+    {
+        if (input != NULL)
+        {
+            if (input->models()->count() == numberOfModels) {
+                input->setisDefinedInAllDefinitions(true);
+            }
+            else {
+                input->setisDefinedInAllDefinitions(false);
+            }
+        }
+    }
+
+    // Update the flag "Is Defined in All Definitions" for each output
+    for (OutputVM* output : _outputsList.toList())
+    {
+        if (output != NULL)
+        {
+            if (output->models()->count() == numberOfModels) {
+                output->setisDefinedInAllDefinitions(true);
+            }
+            else {
+                output->setisDefinedInAllDefinitions(false);
+            }
+        }
+    }
 }
 
 
