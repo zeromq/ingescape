@@ -129,13 +129,6 @@ Q_SIGNALS:
     void identicalAgentModelReplaced(AgentM* previousModel, AgentM* newModel);
 
 
-    /**
-     * @brief Signal emitted when an identical agent model is added
-     * @param newModel
-     */
-    void identicalAgentModelAdded(AgentM* newModel);
-
-
 public Q_SLOTS:
 
     /**

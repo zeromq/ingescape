@@ -276,6 +276,12 @@ private:
 
 
     /**
+     * @brief Update the flag "Are Identicals All Definitions"
+     */
+    void _updateAreIdenticalsAllDefinitions();
+
+
+    /**
      * @brief Update the group (of value type) of the reduced map (= brin) in input of our agent
      */
     void _updateReducedMapValueTypeGroupInInput();

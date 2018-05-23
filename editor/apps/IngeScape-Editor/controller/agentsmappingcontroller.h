@@ -221,13 +221,6 @@ public Q_SLOTS:
 
 
     /**
-     * @brief Slot when an identical agent model is added
-     * @param newModel
-     */
-    void onIdenticalAgentModelAdded(AgentM* newModel);
-
-
-    /**
      * @brief Slot when the flag "is Mapping Activated" changed
      * @param isMappingActivated
      */

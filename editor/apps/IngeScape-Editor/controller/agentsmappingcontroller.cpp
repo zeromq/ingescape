@@ -442,30 +442,6 @@ void AgentsMappingController::onIdenticalAgentModelReplaced(AgentM* previousMode
 
 
 /**
- * @brief Slot when an identical agent model is added
- * @param newModel
- */
-void AgentsMappingController::onIdenticalAgentModelAdded(AgentM* newModel)
-{
-    if (newModel != NULL)
-    {
-        AgentInMappingVM* agentInMapping = getAgentInMappingFromName(newModel->name());
-
-        if ((agentInMapping != NULL) && !agentInMapping->models()->contains(newModel))
-        {
-            agentInMapping->models()->append(newModel);
-
-            // Our global mapping is controlled
-            if (_modelManager && _modelManager->isMappingControlled()) {
-                // OverWrite the mapping of the model of agent (with the mapping currently edited in the agent in mapping)
-                _overWriteMappingOfAgentModel(newModel, agentInMapping->temporaryMapping());
-            }
-        }
-    }
-}
-
-
-/**
  * @brief Slot when the flag "is Mapping Activated" changed
  * @param isMappingActivated
  */
@@ -629,11 +605,21 @@ void AgentsMappingController::onActiveAgentDefined(AgentM* agent)
             // Get the agent in mapping for the agent name
             AgentInMappingVM* agentInMapping = getAgentInMappingFromName(agentName);
 
-            // The agent is not in the mapping...
+            // The agent is not yet in the mapping...
             if (agentInMapping == NULL)
             {
                 // Send the command "CLEAR_MAPPING" on the network to this agent
                 Q_EMIT commandAskedToAgent(peerIdsList, "CLEAR_MAPPING");
+            }
+            // The agent is already in the mapping
+            else
+            {
+                if (!agentInMapping->models()->contains(agent)) {
+                    agentInMapping->models()->append(agent);
+
+                    // OverWrite the mapping of the model of agent (with the mapping currently edited in the agent in mapping)
+                    _overWriteMappingOfAgentModel(agent, agentInMapping->temporaryMapping());
+                }
             }
         }
         // OBSERVE
@@ -644,7 +630,7 @@ void AgentsMappingController::onActiveAgentDefined(AgentM* agent)
             // Get the agent in mapping for the agent name
             AgentInMappingVM* agentInMapping = getAgentInMappingFromName(agentName);
 
-            // The agent is not in the mapping...
+            // The agent is not yet in the mapping...
             if (agentInMapping == NULL)
             {
                 QList<AgentM*> activeAgentsList = QList<AgentM*>();
@@ -659,9 +645,13 @@ void AgentsMappingController::onActiveAgentDefined(AgentM* agent)
                 // Add new model(s) of agent to the current mapping
                 _addAgentModelsToMappingAtPosition(agentName, activeAgentsList, position);
             }
-            //else {
-                // Nothing to do (because the model has already been added to the models list of this "Agent in Mapping VM")
-            //}
+            // The agent is already in the mapping
+            else
+            {
+                if (!agentInMapping->models()->contains(agent)) {
+                    agentInMapping->models()->append(agent);
+                }
+            }
 
             // If there are waiting links (where this agent is involved as "Output Agent")
             if (_hashFromAgentNameToListOfWaitingLinks.contains(agentName))

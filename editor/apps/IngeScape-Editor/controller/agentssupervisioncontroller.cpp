@@ -336,9 +336,6 @@ void AgentsSupervisionController::_onAgentDefinitionChangedWithPreviousAndNewVal
                                 agentUsingSameDefinition->models()->append(model);
 
                                 qDebug() << "Add model of agent" << model->name() << "on" << model->address();
-
-                                // Emit signal "Identical Agent Model Added"
-                                Q_EMIT identicalAgentModelAdded(model);
                             }
                         }
                     }
@@ -397,9 +394,6 @@ void AgentsSupervisionController::_onDifferentDefinitionDetectedOnModelOfAgent(A
                 AgentM* modelUsingSameDefinition = agentUsingSameDefinition->models()->at(0);
                 if (modelUsingSameDefinition != NULL)
                 {
-                    // Emit signal "Identical Agent Model Replaced"
-                    //Q_EMIT identicalAgentModelReplaced(modelUsingSameDefinition, model);
-
                     // We replace the fake model of agent
                     agentUsingSameDefinition->models()->replace(0, model);
 
@@ -416,9 +410,6 @@ void AgentsSupervisionController::_onDifferentDefinitionDetectedOnModelOfAgent(A
             {
                 // Add the model of agent to the list of the view model
                 agentUsingSameDefinition->models()->append(model);
-
-                // Emit signal "Identical Agent Model Added"
-                //Q_EMIT identicalAgentModelAdded(model);
             }
         }
     }
@@ -470,9 +461,6 @@ void AgentsSupervisionController::_checkHaveToMergeAgent(AgentVM* agent)
                     AgentM* modelUsingSameDefinition = agentUsingSameDefinition->models()->at(0);
                     if (modelUsingSameDefinition != NULL)
                     {
-                        // Emit signal "Identical Agent Model Replaced"
-                        //Q_EMIT identicalAgentModelReplaced(modelUsingSameDefinition, model);
-
                         // We replace the fake model of agent
                         agentUsingSameDefinition->models()->replace(0, model);
 
@@ -489,9 +477,6 @@ void AgentsSupervisionController::_checkHaveToMergeAgent(AgentVM* agent)
                 {
                     // Add the model of agent to the list of the new view model
                     agentUsingSameDefinition->models()->append(model);
-
-                    // Emit signal "Identical Agent Model Added"
-                    //Q_EMIT identicalAgentModelAdded(model);
                 }
             }
         }
