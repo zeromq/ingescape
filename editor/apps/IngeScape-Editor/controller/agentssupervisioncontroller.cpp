@@ -185,7 +185,7 @@ void AgentsSupervisionController::exportAgentsListToSelectedFile()
  */
 void AgentsSupervisionController::onAgentModelCreated(AgentM* model)
 {
-    if (model != NULL && !model->isRecorder())
+    if ((model != NULL) && !model->isRecorder())
     {
         // Get the list of view models of agent from a name
         QList<AgentVM*> agentViewModelsList = getAgentViewModelsListFromName(model->name());
@@ -195,6 +195,7 @@ void AgentsSupervisionController::onAgentModelCreated(AgentM* model)
 
         // Connect to signals from this new view model of agent
         connect(agent, &AgentVM::definitionChangedWithPreviousAndNewValues, this, &AgentsSupervisionController::_onAgentDefinitionChangedWithPreviousAndNewValues);
+        connect(agent, &AgentVM::differentDefinitionDetectedOnModelOfAgent, this, &AgentsSupervisionController::_onDifferentDefinitionDetectedOnModelOfAgent);
         connect(agent, &AgentVM::commandAskedToLauncher, this, &AgentsSupervisionController::commandAskedToLauncher);
         connect(agent, &AgentVM::commandAskedToAgent, this, &AgentsSupervisionController::commandAskedToAgent);
         connect(agent, &AgentVM::commandAskedToAgentAboutOutput, this, &AgentsSupervisionController::commandAskedToAgentAboutOutput);
@@ -252,7 +253,8 @@ void AgentsSupervisionController::_onAgentDefinitionChangedWithPreviousAndNewVal
             if ((agentUsingSameDefinition != NULL) && (sameDefinition != NULL))
             {
                 // It must have only one model of agent
-                if (agent->models()->count() == 1) {
+                if (agent->models()->count() == 1)
+                {
                     AgentM* model = agent->models()->at(0);
                     if (model != NULL)
                     {
@@ -346,9 +348,95 @@ void AgentsSupervisionController::_onAgentDefinitionChangedWithPreviousAndNewVal
             }
         }
         // The previous definition was already defined (and the new definition is defined)
-        /*else
+        else
         {
-        }*/
+            // Check if we have to merge this agent with another one that have the same definition
+            _checkHaveToMergeAgent(agent);
+        }
+    }
+}
+
+
+/**
+ * @brief Slot called when a different definition is detected on a model of agent
+ * (compared to the definition of our view model)
+ * @param model
+ */
+void AgentsSupervisionController::_onDifferentDefinitionDetectedOnModelOfAgent(AgentM* model)
+{
+    AgentVM* agent = qobject_cast<AgentVM*>(sender());
+    if ((agent != NULL) && (model != NULL) && (agent->definition() != NULL) && (model->definition() != NULL))
+    {
+        // Remove the model of agent from the list of the view model
+        agent->models()->remove(model);
+
+        AgentVM* agentUsingSameDefinition = NULL;
+
+        // Get the list of view models of agent from a name
+        QList<AgentVM*> agentViewModelsList = getAgentViewModelsListFromName(model->name());
+        for (AgentVM* iterator : agentViewModelsList)
+        {
+            if ((iterator != NULL) && (iterator->definition() != NULL)
+                    // The 2 definitions are strictly identicals
+                    && DefinitionM::areIdenticals(iterator->definition(), model->definition()))
+            {
+                agentUsingSameDefinition = iterator;
+                break;
+            }
+        }
+
+        if (agentUsingSameDefinition != NULL)
+        {
+            // Add the model of agent to the list of the view model
+            agentUsingSameDefinition->models()->append(model);
+        }
+        else
+        {
+            // Allows to create a new view model of agent for this model
+            onAgentModelCreated(model);
+        }
+    }
+}
+
+
+/**
+ * @brief Check if we have to merge an agent with another one that have the same definition
+ * @param agent
+ */
+void AgentsSupervisionController::_checkHaveToMergeAgent(AgentVM* agent)
+{
+    if ((agent != NULL) && (agent->definition() != NULL))
+    {
+        AgentVM* agentUsingSameDefinition = NULL;
+
+        // Get the list of view models of agent from a name
+        QList<AgentVM*> agentViewModelsList = getAgentViewModelsListFromName(agent->name());
+        for (AgentVM* iterator : agentViewModelsList)
+        {
+            if ((iterator != NULL) && (iterator != agent) && (iterator->definition() != NULL)
+                    // The 2 definitions are strictly identicals
+                    && DefinitionM::areIdenticals(iterator->definition(), agent->definition()))
+            {
+                agentUsingSameDefinition = iterator;
+                break;
+            }
+        }
+
+        if (agentUsingSameDefinition != NULL)
+        {
+            // Add the model(s) of agent to the list of the new view model
+            agentUsingSameDefinition->models()->append(agent->models()->toList());
+
+            // The previous view model of agent is useless, we have to remove it from the list
+            _agentsList.remove(agent);
+
+            // Reset its definition
+            agent->setdefinition(NULL);
+
+            // Delete it
+            _deleteAgentViewModel(agent);
+            agent = NULL;
+        }
     }
 }
 
@@ -375,6 +463,7 @@ void AgentsSupervisionController::_deleteAgentViewModel(AgentVM* agent)
 
         // DIS-connect from signals from this old view model of agent
         disconnect(agent, &AgentVM::definitionChangedWithPreviousAndNewValues, this, &AgentsSupervisionController::_onAgentDefinitionChangedWithPreviousAndNewValues);
+        disconnect(agent, &AgentVM::differentDefinitionDetectedOnModelOfAgent, this, &AgentsSupervisionController::_onDifferentDefinitionDetectedOnModelOfAgent);
         disconnect(agent, &AgentVM::commandAskedToLauncher, this, &AgentsSupervisionController::commandAskedToLauncher);
         disconnect(agent, &AgentVM::commandAskedToAgent, this, &AgentsSupervisionController::commandAskedToAgent);
         disconnect(agent, &AgentVM::commandAskedToAgentAboutOutput, this, &AgentsSupervisionController::commandAskedToAgentAboutOutput);

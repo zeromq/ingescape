@@ -237,6 +237,7 @@ void AgentVM::_onModelsChanged()
                 disconnect(model, &AgentM::isMutedChanged, this, &AgentVM::_onIsMutedOfModelChanged);
                 disconnect(model, &AgentM::isFrozenChanged, this, &AgentVM::_onIsFrozenOfModelChanged);
                 disconnect(model, &AgentM::definitionChanged, this, &AgentVM::_onDefinitionOfModelChanged);
+                //disconnect(model, &AgentM::definitionChangedWithPreviousAndNewValues, this, &AgentVM::_onDefinitionOfModelChangedWithPreviousAndNewValues, Qt::UniqueConnection);
                 disconnect(model, &AgentM::stateChanged, this, &AgentVM::_onStateOfModelChanged);
             }
         }
@@ -307,10 +308,27 @@ void AgentVM::_onIsFrozenOfModelChanged(bool isFrozen)
  */
 void AgentVM::_onDefinitionOfModelChanged(DefinitionM* definition)
 {
-    Q_UNUSED(definition)
-
-    // Update with the definition of first model
-    _updateWithDefinitionOfFirstModel();
+    if ((_models.count() > 1) && (_definition != NULL) && (definition != NULL))
+    {
+        // The modified definition is different from the definition of our view model of agent
+        if (!DefinitionM::areIdenticals(_definition, definition))
+        {
+            AgentM* agent = qobject_cast<AgentM*>(sender());
+            if (agent != NULL)
+            {
+                // Emit the signal "Different Definition Detected on this model of Agent"
+                Q_EMIT differentDefinitionDetectedOnModelOfAgent(agent);
+            }
+        }
+        else {
+            // Update with the definition of first model
+            _updateWithDefinitionOfFirstModel();
+        }
+    }
+    else {
+        // Update with the definition of first model
+        _updateWithDefinitionOfFirstModel();
+    }
 }
 
 
@@ -358,7 +376,8 @@ void AgentVM::_updateWithAllModels()
     QStringList hostnamesList;
     bool globalCanBeFrozen = true;
 
-    foreach (AgentM* model, _models.toList()) {
+    foreach (AgentM* model, _models.toList())
+    {
         if (model != NULL)
         {
             if (!model->peerId().isEmpty()) {

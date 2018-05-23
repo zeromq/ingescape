@@ -148,6 +148,14 @@ Q_SIGNALS:
     void openValuesHistoryOfAgent(QString agentName);
 
 
+    /**
+     * @brief Signal emitted when a different definition is detected on a model of agent
+     * (compared to the definition of our view model)
+     * @param agent
+     */
+    void differentDefinitionDetectedOnModelOfAgent(AgentM* agent);
+
+
 private Q_SLOTS:
 
     /**

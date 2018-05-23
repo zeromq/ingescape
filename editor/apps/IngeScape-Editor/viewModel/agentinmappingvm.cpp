@@ -864,6 +864,7 @@ void AgentInMappingVM::_updateWithAllModels()
                     firstDefinition = model->definition();
                 }
                 else if ((firstDefinition != NULL) && (model->definition() != NULL)
+                         // Definitions are differents
                          && !DefinitionM::areIdenticals(firstDefinition, model->definition()))
                 {
                     areIdenticalsAllDefinitions = false;
