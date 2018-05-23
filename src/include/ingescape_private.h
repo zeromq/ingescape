@@ -77,7 +77,7 @@ typedef struct agent_iop {
         bool b;                 //in accordante to type IGS_BOOL_T ex. 0 or 1
         void* data;             //in accordance to type IGS_DATA_T i.e. binary memory space
     } value;
-    long valueSize;
+    size_t valueSize;
     bool is_muted;
     igs_observe_callback_t *callbacks;
     UT_hash_handle hh;         /* makes this structure hashable */
