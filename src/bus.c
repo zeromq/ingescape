@@ -144,7 +144,7 @@ void igs_busRemoveServiceDescription(const char *key){
         serviceHeader_t *header;
         HASH_FIND_STR(serviceHeaders, key, header);
         if (header == NULL){
-            igs_warn("service key '%s' does not exist");
+            igs_warn("service key '%s' does not exist", key);
             return;
         }
         HASH_DEL(serviceHeaders, header);
