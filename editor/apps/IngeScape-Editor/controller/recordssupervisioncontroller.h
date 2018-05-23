@@ -45,6 +45,10 @@ class RecordsSupervisionController : public QObject
     // Indicating if a recorder agent is currently recording
     I2_QML_PROPERTY_CUSTOM_SETTER(bool, isRecording)
 
+    // Current elapsed time of our record
+    I2_QML_PROPERTY(QTime, currentRecordTime)
+
+
 public:
     /**
      * @brief Default constructor
@@ -103,6 +107,13 @@ public Q_SLOTS:
     void onAgentModelCreated(AgentM* model);
 
 
+private Q_SLOTS:
+
+    /**
+     * @brief Called at each interval of our timer to display elapsed time
+     */
+    void _onTimeout_DisplayTime();
+
 private:
 
     /**
@@ -118,6 +129,9 @@ private:
 
     // Map from record name to a list of view models of record
     QHash<RecordM*, RecordVM*> _mapFromRecordModelToViewModel;
+
+    // Timer to rdisplay elapsed time on current record
+    QTimer _timerToDisplayTime;
 };
 
 QML_DECLARE_TYPE(RecordsSupervisionController)

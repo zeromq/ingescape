@@ -19,6 +19,8 @@
 #include <QQmlEngine>
 #include <QDebug>
 
+// Interval in milli-seconds to display current record elapsed time
+#define INTERVAL_ELAPSED_TIME 25
 
 /**
  * @brief Default constructor
@@ -29,10 +31,15 @@ RecordsSupervisionController::RecordsSupervisionController(IngeScapeModelManager
     _recorderAgent(NULL),
     _selectedRecord(NULL),
     _isRecording(false),
+    _currentRecordTime(QTime::fromMSecsSinceStartOfDay(0)),
     _modelManager(modelManager)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
+
+    // init display timer
+    _timerToDisplayTime.setInterval(INTERVAL_ELAPSED_TIME);
+    connect(&_timerToDisplayTime, &QTimer::timeout, this, &RecordsSupervisionController::_onTimeout_DisplayTime);
 }
 
 
@@ -45,6 +52,8 @@ RecordsSupervisionController::~RecordsSupervisionController()
     setselectedRecord(NULL);
 
     _mapFromRecordModelToViewModel.clear();
+
+    disconnect(&_timerToDisplayTime, &QTimer::timeout, this, &RecordsSupervisionController::_onTimeout_DisplayTime);
 
     // Delete all VM of host
     _recordsList.deleteAllItems();
@@ -162,9 +171,28 @@ void RecordsSupervisionController::setisRecording(bool isRecording)
             QString command = _isRecording? "START_RECORD" : "STOP_RECORD";
             Q_EMIT commandAskedToAgent(_recorderAgent->peerId().split(","), command);
         }
+
+        // Update display of elapsed time
+        if(isRecording)
+        {
+            _timerToDisplayTime.start();
+        }
+        else
+        {
+            _timerToDisplayTime.stop();
+            setcurrentRecordTime(QTime::fromMSecsSinceStartOfDay(0));
+        }
     }
 }
 
+
+/**
+ * @brief Called at each interval of our timer to display elapsed time
+ */
+void RecordsSupervisionController::_onTimeout_DisplayTime()
+{
+    setcurrentRecordTime(_currentRecordTime.addMSecs(INTERVAL_ELAPSED_TIME));
+}
 
 /**
  * @brief Aims at deleting VM and model of a record
