@@ -35,6 +35,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _networkDevice(""),
     _ipAddress(""),
     _port(0),
+    _errorMessageWhenConnectionFailed(""),
     _modelManager(NULL),
     _agentsSupervisionC(NULL),
     _agentsMappingC(NULL),
@@ -238,10 +239,13 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     // Start our INGESCAPE agent with a network device (or an IP address) and a port
     bool isStarted = _networkC->start(_networkDevice, _ipAddress, _port);
 
-    if (isStarted && (_modelManager != NULL))
+    if (isStarted)
     {
         // Initialize platform from online mapping
         _modelManager->setisMappingActivated(true);
+    }
+    else {
+        seterrorMessageWhenConnectionFailed(tr("Failed to connect with network device %1 on port %2").arg(_networkDevice, QString::number(_port)));
     }
 
 
@@ -677,11 +681,14 @@ bool IngeScapeEditorController::restartNetwork(QString strPort, QString networkD
 {
     bool success = false;
 
+    // Reset the error message
+    seterrorMessageWhenConnectionFailed("");
+
     if ((_networkC != NULL) && (_modelManager != NULL))
     {
         bool isInt = false;
         int nPort = strPort.toInt(&isInt);
-        if (isInt)
+        if (isInt && (nPort > 0))
         {
             // Port and Network device have not changed...
             if ((nPort == _port) && (networkDevice == _networkDevice))
@@ -729,8 +736,18 @@ bool IngeScapeEditorController::restartNetwork(QString strPort, QString networkD
             }
         }
         else {
-            qWarning() << "Port" << strPort << "is not an int !";
+            if (!isInt) {
+                qWarning() << "Port" << strPort << "is not an int !";
+            }
+            else if (nPort <= 0) {
+                qWarning() << "Port" << strPort << "is negative or null !";
+            }
         }
     }
+
+    if (!success) {
+        seterrorMessageWhenConnectionFailed(tr("Failed to connect with network device %1 on port %2").arg(networkDevice, strPort));
+    }
+
     return success;
 }
