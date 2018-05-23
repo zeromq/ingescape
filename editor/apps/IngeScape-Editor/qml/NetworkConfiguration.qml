@@ -98,6 +98,11 @@ I2PopupBase {
             verticalAlignment: TextInput.AlignVCenter
             text: IngeScapeEditorC.port
 
+            validator: IntValidator {
+                bottom: 1;
+                top: 65535;
+            }
+
             style: I2TextFieldStyle {
                 backgroundColor: IngeScapeTheme.darkBlueGreyColor
                 borderColor: IngeScapeTheme.whiteColor;
@@ -155,6 +160,33 @@ I2PopupBase {
             useQStringList: true
 
             //placeholderText: (IngeScapeEditorC.networkC && IngeScapeEditorC.networkC.availableNetworkDevices.count === 0 ? "- No network device -" : "- Select a network device -")
+        }
+
+        Rectangle {
+            id: space3
+            color: "transparent"
+            width: 10
+            height: 10
+        }
+
+        Text {
+            id: error
+
+            anchors {
+                left: parent.left
+                right: parent.right
+            }
+            horizontalAlignment: Text.AlignHCenter
+            wrapMode: Text.WordWrap
+
+            text: IngeScapeEditorC.errorMessageWhenConnectionFailed
+
+            color: IngeScapeTheme.redColor
+            font {
+                family: IngeScapeTheme.textFontFamily
+                weight : Font.Medium
+                pixelSize : 16
+            }
         }
     }
 

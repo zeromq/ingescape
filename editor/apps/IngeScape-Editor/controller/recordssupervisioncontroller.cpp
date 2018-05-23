@@ -19,6 +19,8 @@
 #include <QQmlEngine>
 #include <QDebug>
 
+// Interval in milli-seconds to display current record elapsed time
+#define INTERVAL_ELAPSED_TIME 25
 
 /**
  * @brief Default constructor
@@ -28,10 +30,16 @@
 RecordsSupervisionController::RecordsSupervisionController(IngeScapeModelManager* modelManager, QObject *parent) : QObject(parent),
     _recorderAgent(NULL),
     _selectedRecord(NULL),
+    _isRecording(false),
+    _currentRecordTime(QTime::fromMSecsSinceStartOfDay(0)),
     _modelManager(modelManager)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
+
+    // init display timer
+    _timerToDisplayTime.setInterval(INTERVAL_ELAPSED_TIME);
+    connect(&_timerToDisplayTime, &QTimer::timeout, this, &RecordsSupervisionController::_onTimeout_DisplayTime);
 }
 
 
@@ -44,6 +52,8 @@ RecordsSupervisionController::~RecordsSupervisionController()
     setselectedRecord(NULL);
 
     _mapFromRecordModelToViewModel.clear();
+
+    disconnect(&_timerToDisplayTime, &QTimer::timeout, this, &RecordsSupervisionController::_onTimeout_DisplayTime);
 
     // Delete all VM of host
     _recordsList.deleteAllItems();
@@ -91,9 +101,13 @@ void RecordsSupervisionController::onRecordAdded(RecordM* model)
  */
 void RecordsSupervisionController::onAgentModelCreated(AgentM* model)
 {
-    if (model != NULL && model->isRecorder())
+    if (model != NULL && model->isRecorder() && model != _recorderAgent)
     {
-        _recorderAgent = model;
+        setrecorderAgent(model);
+
+        // Retrieve all records
+        Q_EMIT commandAskedToAgent(_recorderAgent->peerId().split(","), "GET_RECORDS");
+        qDebug() << "New recorder on the network, get all its records";
     }
 }
 
@@ -124,6 +138,60 @@ void RecordsSupervisionController::deleteSelectedRecord()
 
         setselectedRecord(NULL);
     }
+}
+
+
+/**
+ * @brief Delete the selected agent from the list
+ */
+void RecordsSupervisionController::controlRecord(QString recordId, bool startPlaying)
+{
+    if(_recorderAgent != NULL)
+    {
+        QString command = startPlaying? "PLAY_RECORD#" : "PAUSE_RECORD#";
+        Q_EMIT commandAskedToAgent(_recorderAgent->peerId().split(","), QString("%1%2").arg(command).arg(recordId));
+    }
+}
+
+
+/**
+ * @brief Custom setter on is recording command for the scenario
+ * @param is recording flag
+ */
+void RecordsSupervisionController::setisRecording(bool isRecording)
+{
+    if(_isRecording != isRecording)
+    {
+        _isRecording = isRecording;
+
+        Q_EMIT isRecordingChanged(_isRecording);
+
+        if(_recorderAgent != NULL)
+        {
+            QString command = _isRecording? "START_RECORD" : "STOP_RECORD";
+            Q_EMIT commandAskedToAgent(_recorderAgent->peerId().split(","), command);
+        }
+
+        // Update display of elapsed time
+        if(isRecording)
+        {
+            _timerToDisplayTime.start();
+        }
+        else
+        {
+            _timerToDisplayTime.stop();
+            setcurrentRecordTime(QTime::fromMSecsSinceStartOfDay(0));
+        }
+    }
+}
+
+
+/**
+ * @brief Called at each interval of our timer to display elapsed time
+ */
+void RecordsSupervisionController::_onTimeout_DisplayTime()
+{
+    setcurrentRecordTime(_currentRecordTime.addMSecs(INTERVAL_ELAPSED_TIME));
 }
 
 /**

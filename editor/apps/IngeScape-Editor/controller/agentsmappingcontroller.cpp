@@ -442,29 +442,6 @@ void AgentsMappingController::onIdenticalAgentModelReplaced(AgentM* previousMode
 
 
 /**
- * @brief Slot when an identical agent model is added
- * @param newModel
- */
-void AgentsMappingController::onIdenticalAgentModelAdded(AgentM* newModel)
-{
-    if (newModel != NULL)
-    {
-        AgentInMappingVM* agentInMapping = getAgentInMappingFromName(newModel->name());
-        if (agentInMapping != NULL)
-        {
-            agentInMapping->models()->append(newModel);
-
-            // Our global mapping is controlled
-            if (_modelManager && _modelManager->isMappingControlled()) {
-                // OverWrite the mapping of the model of agent (with the mapping currently edited in the agent in mapping)
-                _overWriteMappingOfAgentModel(newModel, agentInMapping->temporaryMapping());
-            }
-        }
-    }
-}
-
-
-/**
  * @brief Slot when the flag "is Mapping Activated" changed
  * @param isMappingActivated
  */
@@ -628,11 +605,21 @@ void AgentsMappingController::onActiveAgentDefined(AgentM* agent)
             // Get the agent in mapping for the agent name
             AgentInMappingVM* agentInMapping = getAgentInMappingFromName(agentName);
 
-            // The agent is not in the mapping...
+            // The agent is not yet in the mapping...
             if (agentInMapping == NULL)
             {
                 // Send the command "CLEAR_MAPPING" on the network to this agent
                 Q_EMIT commandAskedToAgent(peerIdsList, "CLEAR_MAPPING");
+            }
+            // The agent is already in the mapping
+            else
+            {
+                if (!agentInMapping->models()->contains(agent)) {
+                    agentInMapping->models()->append(agent);
+
+                    // OverWrite the mapping of the model of agent (with the mapping currently edited in the agent in mapping)
+                    _overWriteMappingOfAgentModel(agent, agentInMapping->temporaryMapping());
+                }
             }
         }
         // OBSERVE
@@ -643,7 +630,7 @@ void AgentsMappingController::onActiveAgentDefined(AgentM* agent)
             // Get the agent in mapping for the agent name
             AgentInMappingVM* agentInMapping = getAgentInMappingFromName(agentName);
 
-            // The agent is not in the mapping...
+            // The agent is not yet in the mapping...
             if (agentInMapping == NULL)
             {
                 QList<AgentM*> activeAgentsList = QList<AgentM*>();
@@ -658,9 +645,13 @@ void AgentsMappingController::onActiveAgentDefined(AgentM* agent)
                 // Add new model(s) of agent to the current mapping
                 _addAgentModelsToMappingAtPosition(agentName, activeAgentsList, position);
             }
-            //else {
-                // Nothing to do (because the model has already been added to the models list of this "Agent in Mapping VM")
-            //}
+            // The agent is already in the mapping
+            else
+            {
+                if (!agentInMapping->models()->contains(agent)) {
+                    agentInMapping->models()->append(agent);
+                }
+            }
 
             // If there are waiting links (where this agent is involved as "Output Agent")
             if (_hashFromAgentNameToListOfWaitingLinks.contains(agentName))
@@ -709,7 +700,8 @@ void AgentsMappingController::onActiveAgentMappingDefined(AgentM* agent)
             {
                 qDebug() << "unmapped" << idsOfRemovedMappingElements;
 
-                foreach (ElementMappingM* mappingElement, agentInMapping->temporaryMapping()->mappingElements()->toList()) {
+                foreach (ElementMappingM* mappingElement, agentInMapping->temporaryMapping()->mappingElements()->toList())
+                {
                     if ((mappingElement != NULL) && idsOfRemovedMappingElements.contains(mappingElement->id()))
                     {
                         onUnmapped(mappingElement);
@@ -721,7 +713,8 @@ void AgentsMappingController::onActiveAgentMappingDefined(AgentM* agent)
             {
                 qDebug() << "mapped" << idsOfAddedMappingElements;
 
-                foreach (ElementMappingM* mappingElement, agent->mapping()->mappingElements()->toList()) {
+                foreach (ElementMappingM* mappingElement, agent->mapping()->mappingElements()->toList())
+                {
                     if ((mappingElement != NULL) && idsOfAddedMappingElements.contains(mappingElement->id()))
                     {
                         onMapped(mappingElement);
@@ -889,14 +882,10 @@ void AgentsMappingController::_onAgentsInMappingChanged()
                 Q_EMIT agentInMappingAdded(agentInMapping);
 
                 // Connect to signals from the new agent in mapping
-                //connect(agentInMapping, &AgentInMappingVM::inputsListAdded, this, &AgentsMappingController::_onInputsListAdded);
-                //connect(agentInMapping, &AgentInMappingVM::outputsListAdded, this, &AgentsMappingController::_onOutputsListAdded);
-                //connect(agentInMapping, &AgentInMappingVM::inputsListWillBeRemoved, this, &AgentsMappingController::_onInputsListWillBeRemoved);
-                //connect(agentInMapping, &AgentInMappingVM::outputsListWillBeRemoved, this, &AgentsMappingController::_onOutputsListWillBeRemoved);
-
-                // Emit signals "Inputs/Outputs List Added" for initial list of inputs and initial list of outputs
-                //agentInMapping->inputsListAdded(agentInMapping->inputsList()->toList());
-                //agentInMapping->outputsListAdded(agentInMapping->outputsList()->toList());
+                connect(agentInMapping, &AgentInMappingVM::inputsListHaveBeenAdded, this, &AgentsMappingController::_onInputsListHaveBeenAdded);
+                connect(agentInMapping, &AgentInMappingVM::outputsListHaveBeenAdded, this, &AgentsMappingController::_onOutputsListHaveBeenAdded);
+                connect(agentInMapping, &AgentInMappingVM::inputsListWillBeRemoved, this, &AgentsMappingController::_onInputsListWillBeRemoved);
+                connect(agentInMapping, &AgentInMappingVM::outputsListWillBeRemoved, this, &AgentsMappingController::_onOutputsListWillBeRemoved);
             }
         }
     }
@@ -913,15 +902,12 @@ void AgentsMappingController::_onAgentsInMappingChanged()
                 // Emit the signal "Agent in Mapping Removed"
                 Q_EMIT agentInMappingRemoved(agentInMapping);
 
-                // Emit signals "Inputs/Outputs List Removed" with current list of inputs and current list of outputs
-                //agentInMapping->inputsListWillBeRemoved(agentInMapping->inputsList()->toList());
-                //agentInMapping->outputsListWillBeRemoved(agentInMapping->outputsList()->toList());
-
                 // DIS-connect to signals from the previous agent in mapping
-                //disconnect(agentInMapping, &AgentInMappingVM::inputsListAdded, this, &AgentsMappingController::_onInputsListAdded);
-                //disconnect(agentInMapping, &AgentInMappingVM::outputsListAdded, this, &AgentsMappingController::_onOutputsListAdded);
-                //disconnect(agentInMapping, &AgentInMappingVM::inputsListWillBeRemoved, this, &AgentsMappingController::_onInputsListWillBeRemoved);
-                //disconnect(agentInMapping, &AgentInMappingVM::outputsListWillBeRemoved, this, &AgentsMappingController::_onOutputsListWillBeRemoved);
+                disconnect(agentInMapping, &AgentInMappingVM::inputsListHaveBeenAdded, this, &AgentsMappingController::_onInputsListHaveBeenAdded);
+                disconnect(agentInMapping, &AgentInMappingVM::outputsListHaveBeenAdded, this, &AgentsMappingController::_onOutputsListHaveBeenAdded);
+                disconnect(agentInMapping, &AgentInMappingVM::inputsListWillBeRemoved, this, &AgentsMappingController::_onInputsListWillBeRemoved);
+                disconnect(agentInMapping, &AgentInMappingVM::outputsListWillBeRemoved, this, &AgentsMappingController::_onOutputsListWillBeRemoved);
+
             }
         }
     }
@@ -931,59 +917,122 @@ void AgentsMappingController::_onAgentsInMappingChanged()
 
 
 /**
- * @brief Slot when some view models of inputs have been added to an agent in mapping
- * @param inputsListAdded
+ * @brief Slot called when some view models of inputs have been added to an agent in mapping
+ * @param inputsListHaveBeenAdded
  */
-/*void AgentsMappingController::_onInputsListAdded(QList<InputVM*> inputsListAdded)
+void AgentsMappingController::_onInputsListHaveBeenAdded(QList<InputVM*> inputsListHaveBeenAdded)
 {
     AgentInMappingVM* agentInMapping = qobject_cast<AgentInMappingVM*>(sender());
-    if ((agentInMapping != NULL) && (inputsListAdded.count() > 0))
+    if ((agentInMapping != NULL) && !inputsListHaveBeenAdded.isEmpty())
     {
-        qDebug() << "_on Inputs List Added from agent" << agentInMapping->name() << inputsListAdded.count();
+        QStringList namesOfInputs;
+        for (InputVM* input : inputsListHaveBeenAdded) {
+            if (input != NULL) {
+                namesOfInputs.append(input->name());
+            }
+        }
+
+        if (agentInMapping->temporaryMapping() != NULL)
+        {
+            foreach (ElementMappingM* mappingElement, agentInMapping->temporaryMapping()->mappingElements()->toList())
+            {
+                if ((mappingElement != NULL) && namesOfInputs.contains(mappingElement->input()))
+                {
+                    // Try to create the link corresponding to the mapping element
+                    onMapped(mappingElement);
+                }
+            }
+        }
     }
-}*/
+}
 
 
 /**
- * @brief Slot when some view models of outputs have been added to an agent in mapping
- * @param outputsListAdded
+ * @brief Slot called when some view models of outputs have been added to an agent in mapping
+ * @param outputsListHaveBeenAdded
  */
-/*void AgentsMappingController::_onOutputsListAdded(QList<OutputVM*> outputsListAdded)
+void AgentsMappingController::_onOutputsListHaveBeenAdded(QList<OutputVM*> outputsListHaveBeenAdded)
 {
     AgentInMappingVM* agentInMapping = qobject_cast<AgentInMappingVM*>(sender());
-    if ((agentInMapping != NULL) && (outputsListAdded.count() > 0))
+    if ((agentInMapping != NULL) && !outputsListHaveBeenAdded.isEmpty())
     {
-        qDebug() << "_on Outputs List Added from agent" << agentInMapping->name() << outputsListAdded.count();
+        QStringList namesOfOutputs;
+        for (OutputVM* output : outputsListHaveBeenAdded) {
+            if (output != NULL) {
+                namesOfOutputs.append(output->name());
+            }
+        }
+
+        for (AgentInMappingVM* iterator : _allAgentsInMapping.toList())
+        {
+            if ((iterator != NULL) && (iterator != agentInMapping) && (iterator->temporaryMapping() != NULL))
+            {
+                foreach (ElementMappingM* mappingElement, iterator->temporaryMapping()->mappingElements()->toList())
+                {
+                    if ((mappingElement != NULL) && (mappingElement->outputAgent() == agentInMapping->name()) && namesOfOutputs.contains(mappingElement->output()))
+                    {
+                        // Try to create the link corresponding to the mapping element
+                        onMapped(mappingElement);
+                    }
+                }
+            }
+        }
     }
-}*/
+}
 
 
 /**
  * @brief Slot when some view models of inputs will be removed from an agent in mapping
  * @param inputsListWillBeRemoved
  */
-/*void AgentsMappingController::_onInputsListWillBeRemoved(QList<InputVM*> inputsListWillBeRemoved)
+void AgentsMappingController::_onInputsListWillBeRemoved(QList<InputVM*> inputsListWillBeRemoved)
 {
     AgentInMappingVM* agentInMapping = qobject_cast<AgentInMappingVM*>(sender());
-    if ((agentInMapping != NULL) && (inputsListWillBeRemoved.count() > 0))
+    if ((agentInMapping != NULL) && !inputsListWillBeRemoved.isEmpty())
     {
-        qDebug() << "_on Intputs List Will Be Removed from agent" << agentInMapping->name() << inputsListWillBeRemoved.count();
+        //qDebug() << "_on Intputs List Will Be Removed from agent" << agentInMapping->name() << inputsListWillBeRemoved.count();
+
+        for (MapBetweenIOPVM* link : _allLinksInMapping.toList())
+        {
+            if ((link != NULL) && (link->inputAgent() != NULL) && (link->inputAgent() == agentInMapping)
+                    && (link->input() != NULL) && inputsListWillBeRemoved.contains(link->input()))
+            {
+                // Remove the link between two agents from the mapping
+                //removeLinkBetweenTwoAgents(link);
+
+                // Delete the link between two agents
+                _deleteLinkBetweenTwoAgents(link);
+            }
+        }
     }
-}*/
+}
 
 
 /**
  * @brief Slot when some view models of outputs will be removed from an agent in mapping
  * @param outputsListWillBeRemoved
  */
-/*void AgentsMappingController::_onOutputsListWillBeRemoved(QList<OutputVM*> outputsListWillBeRemoved)
+void AgentsMappingController::_onOutputsListWillBeRemoved(QList<OutputVM*> outputsListWillBeRemoved)
 {
     AgentInMappingVM* agentInMapping = qobject_cast<AgentInMappingVM*>(sender());
-    if ((agentInMapping != NULL) && (outputsListWillBeRemoved.count() > 0))
+    if ((agentInMapping != NULL) && !outputsListWillBeRemoved.isEmpty())
     {
-        qDebug() << "_on Outputs List Will Be Removed from agent" << agentInMapping->name() << outputsListWillBeRemoved.count();
+        //qDebug() << "_on Outputs List Will Be Removed from agent" << agentInMapping->name() << outputsListWillBeRemoved.count();
+
+        for (MapBetweenIOPVM* link : _allLinksInMapping.toList())
+        {
+            if ((link != NULL) && (link->outputAgent() != NULL) && (link->outputAgent() == agentInMapping)
+                    && (link->output() != NULL) && outputsListWillBeRemoved.contains(link->output()))
+            {
+                // Remove the link between two agents from the mapping
+                //removeLinkBetweenTwoAgents(link);
+
+                // Delete the link between two agents
+                _deleteLinkBetweenTwoAgents(link);
+            }
+        }
     }
-}*/
+}
 
 
 /**

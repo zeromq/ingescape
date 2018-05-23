@@ -66,26 +66,23 @@ class AgentM : public QObject
     // Flag indicating if our agent can be frozen
     I2_QML_PROPERTY_READONLY(bool, canBeFrozen)
 
-    // Command line of our agent
+    // Flag indicating if our agent is a recorder
     I2_CPP_NOSIGNAL_PROPERTY(bool, isRecorder)
 
     // Flag indicating if our agent is frozen
     I2_QML_PROPERTY_READONLY(bool, isFrozen)
 
-    // State of our agent
-    I2_QML_PROPERTY(QString, state)
-
-    // Status defined by the agent
-    //I2_QML_PROPERTY_READONLY(QString, status)
-
     // Definition of our agent
-    I2_QML_PROPERTY_READONLY(DefinitionM*, definition)
+    I2_QML_PROPERTY_READONLY_CUSTOM_SETTER(DefinitionM*, definition)
 
     // Mapping of our agent
     I2_QML_PROPERTY_READONLY(AgentMappingM*, mapping)
 
     // Flag indicating if we have to overwrite the mapping of our agent (when it will send its mapping)
     I2_QML_PROPERTY_READONLY(bool, mustOverWriteMapping)
+
+    // State of our agent
+    I2_QML_PROPERTY(QString, state)
 
 
 public:
@@ -127,6 +124,15 @@ public:
 
 
 Q_SIGNALS:
+
+
+    /**
+     * @brief Signal emitted when the definition changed (with previous and new values)
+     * @param previousValue
+     * @param newValue
+     */
+    void definitionChangedWithPreviousAndNewValues(DefinitionM* previousValue, DefinitionM* newValue);
+
 
 public Q_SLOTS:
 };

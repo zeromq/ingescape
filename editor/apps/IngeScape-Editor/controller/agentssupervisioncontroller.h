@@ -129,13 +129,6 @@ Q_SIGNALS:
     void identicalAgentModelReplaced(AgentM* previousModel, AgentM* newModel);
 
 
-    /**
-     * @brief Signal emitted when an identical agent model is added
-     * @param newModel
-     */
-    void identicalAgentModelAdded(AgentM* newModel);
-
-
 public Q_SLOTS:
 
     /**
@@ -148,14 +141,29 @@ public Q_SLOTS:
 private Q_SLOTS:
 
     /**
-     * @brief Slot when the definition of a view model of agent changed
+     * @brief Slot called when the definition of a view model of agent changed (with previous and new values)
      * @param previousValue
      * @param newValue
      */
-    void _onAgentDefinitionChangedWithPreviousValue(DefinitionM* previousValue, DefinitionM* newValue);
+    void _onAgentDefinitionChangedWithPreviousAndNewValues(DefinitionM* previousValue, DefinitionM* newValue);
+
+
+    /**
+     * @brief Slot called when a different definition is detected on a model of agent
+     * (compared to the definition of our view model)
+     * @param model
+     */
+    void _onDifferentDefinitionDetectedOnModelOfAgent(AgentM* model);
 
 
 private:
+
+    /**
+     * @brief Check if we have to merge an agent with another one that have the same definition
+     * @param agent
+     */
+    void _checkHaveToMergeAgent(AgentVM* agent);
+
 
     /**
      * @brief Delete the view model of Agent

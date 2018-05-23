@@ -119,30 +119,30 @@ Q_SIGNALS:
 
     /**
      * @brief Signal emitted when some view models of inputs have been added to our agent in mapping
-     * @param inputsListAdded
+     * @param inputsListHaveBeenAdded
      */
-    //void inputsListAdded(QList<InputVM*> inputsListAdded);
+    void inputsListHaveBeenAdded(QList<InputVM*> inputsListHaveBeenAdded);
 
 
     /**
      * @brief Signal emitted when some view models of outputs have been added to our agent in mapping
-     * @param outputsListAdded
+     * @param outputsListHaveBeenAdded
      */
-    //void outputsListAdded(QList<OutputVM*> outputsListAdded);
+    void outputsListHaveBeenAdded(QList<OutputVM*> outputsListHaveBeenAdded);
 
 
     /**
      * @brief Signal emitted when some view models of inputs will be removed from our agent in mapping
      * @param inputsListWillBeRemoved
      */
-    //void inputsListWillBeRemoved(QList<InputVM*> inputsListWillBeRemoved);
+    void inputsListWillBeRemoved(QList<InputVM*> inputsListWillBeRemoved);
 
 
     /**
      * @brief Signal emitted when some view models of outputs will be removed from our agent in mapping
      * @param outputsListWillBeRemoved
      */
-    //void outputsListWillBeRemoved(QList<OutputVM*> outputsListWillBeRemoved);
+    void outputsListWillBeRemoved(QList<OutputVM*> outputsListWillBeRemoved);
 
 
     /**
@@ -208,10 +208,11 @@ private Q_SLOTS:
 
 
     /**
-     * @brief Slot when the definition of a model changed
-     * @param definition
+     * @brief Slot called when the definition of a model changed (with previous and new values)
+     * @param previousValue
+     * @param newValue
      */
-    void _onDefinitionOfModelChanged(DefinitionM* definition);
+    void _onDefinitionOfModelChangedWithPreviousAndNewValues(DefinitionM* previousValue, DefinitionM* newValue);
 
 
 private:
@@ -272,6 +273,12 @@ private:
      * @brief Update the flag "is ON" in function of flags of models
      */
     void _updateIsON();
+
+
+    /**
+     * @brief Update the flag "Are Identicals All Definitions"
+     */
+    void _updateAreIdenticalsAllDefinitions();
 
 
     /**

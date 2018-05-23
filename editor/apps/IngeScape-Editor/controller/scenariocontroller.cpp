@@ -31,8 +31,6 @@ ScenarioController::ScenarioController(IngeScapeModelManager* modelManager,
     _isPlaying(false),
     _currentTime(QTime::fromMSecsSinceStartOfDay(0)),
     _nextActionVMToActive(NULL),
-    _isRecording(false),
-    _recorderAgent(NULL),
     _modelManager(modelManager),
     _scenariosDirectoryPath(scenariosPath),
     _jsonHelper(NULL)
@@ -327,17 +325,6 @@ void ScenarioController::closeActionEditor(ActionEditorController* actionEditorC
     }
 }
 
-/**
- * @brief Slot when a new model of agent has been created
- * @param agent
- */
-void ScenarioController::onAgentModelCreated(AgentM* model)
-{
-    if(model->isRecorder())
-    {
-        setrecorderAgent(model);
-    }
-}
 
 /**
   * @brief slot on agent added in mapping
@@ -868,26 +855,6 @@ void ScenarioController::setisPlaying(bool isPlaying)
     }
 }
 
-
-/**
- * @brief Custom setter on is recording command for the scenario
- * @param is recording flag
- */
-void ScenarioController::setisRecording(bool isRecording)
-{
-    if(_isRecording != isRecording)
-    {
-        _isRecording = isRecording;
-
-        Q_EMIT isRecordingChanged(_isRecording);
-
-        if(_recorderAgent != NULL)
-        {
-            QString command = _isRecording? "START_RECORD" : "STOP_RECORD";
-            Q_EMIT commandAskedToAgent(_recorderAgent->peerId().split(","), command);
-        }
-    }
-}
 
 /**
  * @brief Called when our timer time out to handle the scenario and execute actions

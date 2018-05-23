@@ -35,6 +35,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _networkDevice(""),
     _ipAddress(""),
     _port(0),
+    _errorMessageWhenConnectionFailed(""),
     _modelManager(NULL),
     _agentsSupervisionC(NULL),
     _agentsMappingC(NULL),
@@ -177,7 +178,6 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(_modelManager, &IngeScapeModelManager::isMappingControlledChanged, _agentsMappingC, &AgentsMappingController::onIsMappingControlledChanged);
 
     connect(_modelManager, &IngeScapeModelManager::agentModelCreated, _agentsSupervisionC, &AgentsSupervisionController::onAgentModelCreated);
-    connect(_modelManager, &IngeScapeModelManager::agentModelCreated, _scenarioC, &ScenarioController::onAgentModelCreated);
     connect(_modelManager, &IngeScapeModelManager::agentModelCreated, _hostsSupervisionC, &HostsSupervisionController::onAgentModelCreated);
     connect(_modelManager, &IngeScapeModelManager::agentModelCreated, _recordsSupervisionC, &RecordsSupervisionController::onAgentModelCreated);
 
@@ -203,7 +203,6 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(_agentsSupervisionC, &AgentsSupervisionController::commandAskedToAgent, _networkC, &NetworkController::onCommandAskedToAgent);
     connect(_agentsSupervisionC, &AgentsSupervisionController::commandAskedToAgentAboutOutput, _networkC, &NetworkController::onCommandAskedToAgentAboutOutput);
     connect(_agentsSupervisionC, &AgentsSupervisionController::identicalAgentModelReplaced, _agentsMappingC, &AgentsMappingController::onIdenticalAgentModelReplaced);
-    connect(_agentsSupervisionC, &AgentsSupervisionController::identicalAgentModelAdded, _agentsMappingC, &AgentsMappingController::onIdenticalAgentModelAdded);
     connect(_agentsSupervisionC, &AgentsSupervisionController::openValuesHistoryOfAgent, _valuesHistoryC, &ValuesHistoryController::filterValuesToShowOnlyAgent);
 
     // Connect to signals from the ingescape launcher manager
@@ -239,10 +238,13 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     // Start our INGESCAPE agent with a network device (or an IP address) and a port
     bool isStarted = _networkC->start(_networkDevice, _ipAddress, _port);
 
-    if (isStarted && (_modelManager != NULL))
+    if (isStarted)
     {
         // Initialize platform from online mapping
         _modelManager->setisMappingActivated(true);
+    }
+    else {
+        seterrorMessageWhenConnectionFailed(tr("Failed to connect with network device %1 on port %2").arg(_networkDevice, QString::number(_port)));
     }
 
 
@@ -262,7 +264,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
 
 
 
-    // FIXME: sleep to display our loading screen
+    // Sleep to display our loading screen
     //QThread::msleep(2000);
 }
 
@@ -678,16 +680,20 @@ bool IngeScapeEditorController::restartNetwork(QString strPort, QString networkD
 {
     bool success = false;
 
+    // Reset the error message
+    seterrorMessageWhenConnectionFailed("");
+
     if ((_networkC != NULL) && (_modelManager != NULL))
     {
         bool isInt = false;
         int nPort = strPort.toInt(&isInt);
-        if (isInt)
+        if (isInt && (nPort > 0))
         {
             // Port and Network device have not changed...
             if ((nPort == _port) && (networkDevice == _networkDevice))
             {
                 // Nothing to do
+                success = true;
             }
             // Port and Network device
             else
@@ -729,8 +735,18 @@ bool IngeScapeEditorController::restartNetwork(QString strPort, QString networkD
             }
         }
         else {
-            qWarning() << "Port" << strPort << "is not an int !";
+            if (!isInt) {
+                qWarning() << "Port" << strPort << "is not an int !";
+            }
+            else if (nPort <= 0) {
+                qWarning() << "Port" << strPort << "is negative or null !";
+            }
         }
     }
+
+    if (!success) {
+        seterrorMessageWhenConnectionFailed(tr("Failed to connect with network device %1 on port %2").arg(networkDevice, strPort));
+    }
+
     return success;
 }

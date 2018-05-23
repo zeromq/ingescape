@@ -272,8 +272,32 @@ void IngeScapeModelManager::simulateExitForEachActiveAgent()
 {
     for (AgentM* agent : _mapFromPeerIdToAgentM.values())
     {
-        if (agent != NULL) {
+        if ((agent != NULL) && agent->isON())
+        {
+            // Simulate an exit for each agent
             onAgentExited(agent->peerId(), agent->name());
+
+            // Reset the peer id and address
+            if (!agent->peerId().isEmpty())
+            {
+                _mapFromPeerIdToAgentM.remove(agent->peerId());
+
+                agent->setpeerId("");
+                agent->setaddress("");
+                agent->setneverAppearedOnNetwork(true);
+            }
+
+            // Reset the mapping
+            if (agent->mapping() != NULL)
+            {
+                AgentMappingM* mapping = agent->mapping();
+
+                // Reset its model of mapping
+                agent->setmapping(NULL);
+
+                // Delete the model of agent mapping
+                deleteAgentMapping(mapping);
+            }
         }
     }
 }
@@ -448,17 +472,46 @@ void IngeScapeModelManager::onDefinitionReceived(QString peerId, QString agentNa
                  else
                  {
                      DefinitionM* previousDefinition = agent->definition();
+                     if (previousDefinition != NULL)
+                     {
+                         //
+                         // Check if output(s) have been removed
+                         //
+                         QList<OutputM*> removedOutputsList;
+                         for (OutputM* output : previousDefinition->outputsList()->toList()) {
+                             if ((output != NULL) && !output->id().isEmpty() && !agentDefinition->outputsIdsList().contains(output->id())) {
+                                 removedOutputsList.append(output);
+                             }
+                         }
+                         if (!removedOutputsList.isEmpty()) {
+                             // Emit the signal "Remove Inputs to Editor for Outputs"
+                             Q_EMIT removeInputsToEditorForOutputs(agentName, removedOutputsList);
+                         }
 
-                     // Add this new model of agent definition for the agent name
-                     addAgentDefinitionForAgentName(agentDefinition, agentName);
 
-                     // Set this definition to the agent
-                     agent->setdefinition(agentDefinition);
+                         // Add this new model of agent definition for the agent name
+                         addAgentDefinitionForAgentName(agentDefinition, agentName);
 
-                     // Emit the signal "Add Inputs to Editor for Outputs"
-                     Q_EMIT addInputsToEditorForOutputs(agentName, agentDefinition->outputsList()->toList());
+                         // Set this definition to the agent
+                         agent->setdefinition(agentDefinition);
 
-                     if (previousDefinition != NULL) {
+
+                         //
+                         // Check if output(s) have been added
+                         //
+                         QList<OutputM*> addedOutputsList;
+                         for (OutputM* output : agentDefinition->outputsList()->toList()) {
+                             if ((output != NULL) && !output->id().isEmpty() && !previousDefinition->outputsIdsList().contains(output->id())) {
+                                 addedOutputsList.append(output);
+                             }
+                         }
+                         if (!addedOutputsList.isEmpty()) {
+                             // Emit the signal "Add Inputs to Editor for Outputs"
+                             Q_EMIT addInputsToEditorForOutputs(agentName, addedOutputsList);
+                         }
+
+
+                         // Delete the previous model of agent definition
                          deleteAgentDefinition(previousDefinition);
                      }
                  }
@@ -530,10 +583,8 @@ void IngeScapeModelManager::onMappingReceived(QString peerId, QString agentName,
                 }
 
                 // If there are some Removed mapping elements
-                if (idsOfRemovedMappingElements.count() > 0)
+                if (!idsOfRemovedMappingElements.isEmpty())
                 {
-                    //qDebug() << "unmapped" << idsOfRemovedMappingElements;
-
                     foreach (ElementMappingM* mappingElement, previousMapping->mappingElements()->toList()) {
                         if ((mappingElement != NULL) && idsOfRemovedMappingElements.contains(mappingElement->id()))
                         {
@@ -543,10 +594,8 @@ void IngeScapeModelManager::onMappingReceived(QString peerId, QString agentName,
                     }
                 }
                 // If there are some Added mapping elements
-                if (idsOfAddedMappingElements.count() > 0)
+                if (!idsOfAddedMappingElements.isEmpty())
                 {
-                    //qDebug() << "mapped" << idsOfAddedMappingElements;
-
                     foreach (ElementMappingM* mappingElement, agentMapping->mappingElements()->toList()) {
                         if ((mappingElement != NULL) && idsOfAddedMappingElements.contains(mappingElement->id()))
                         {
@@ -696,6 +745,7 @@ void IngeScapeModelManager::onIsMutedFromOutputOfAgentUpdated(QString peerId, bo
         agent->setisMutedOfOutput(isMuted, outputName);
     }
 }
+
 
 /**
  * @brief Slot called when the state of an agent changes
@@ -1118,7 +1168,8 @@ void IngeScapeModelManager::_updateDefinitionVariants(QString definitionName)
             QList<DefinitionM*> definitionsListForVersion;
 
             // Other(s) definition(s) have the same version (and the same name)
-            if (mapFromVersionToDefinitionsList.contains(version)) {
+            if (mapFromVersionToDefinitionsList.contains(version))
+            {
                 definitionsListForVersion = mapFromVersionToDefinitionsList.value(version);
 
                 // The lists of I/O/P must be different to have a variant !

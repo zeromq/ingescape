@@ -57,7 +57,8 @@ AgentM::AgentM(QString name,
     _isFrozen(false),
     _definition(NULL),
     _mapping(NULL),
-    _mustOverWriteMapping(false)
+    _mustOverWriteMapping(false),
+    _state("")
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -113,6 +114,27 @@ void AgentM::setisMuted(bool value)
         }
 
         Q_EMIT isMutedChanged(value);
+    }
+}
+
+
+/**
+ * @brief Setter for property "Definition"
+ * @param value
+ */
+void AgentM::setdefinition(DefinitionM *value)
+{
+    if (_definition != value)
+    {
+        DefinitionM* previousValue = _definition;
+
+        _definition = value;
+
+        // Emit default signal for QML
+        Q_EMIT definitionChanged(value);
+
+        // Emit the signal "Definition Changed" with previous and new values
+        Q_EMIT definitionChangedWithPreviousAndNewValues(previousValue, value);
     }
 }
 

@@ -1142,51 +1142,6 @@ Item {
     }
 
 
-    // Button to start record
-    Button {
-        id: startRecordBtn
-        anchors {
-            horizontalCenter: parent.horizontalCenter
-            bottom : parent.top
-            leftMargin: 40
-        }
-
-        text:"start"
-        height : 20
-        width : 40
-
-        visible: controller.recorderAgent !== null && controller.recorderAgent.isON
-        enabled: !controller.isRecording
-
-        onClicked: {
-            if (controller) {
-                controller.isRecording = true;
-            }
-        }
-    }
-
-    // Button to strop record
-    Button {
-        id: stopRecordBtn
-        anchors {
-            left : startRecordBtn.right
-            bottom : parent.top
-            leftMargin: 20
-        }
-        text: "stop"
-        height : 20
-        width : 40
-
-        visible: controller.recorderAgent !== null && controller.recorderAgent.isON
-        enabled: controller.isRecording
-
-        onClicked: {
-            if (controller) {
-                controller.isRecording = false;
-            }
-        }
-    }
-
     //Zone allowing to change height of the time line
     Rectangle {
         id : resizeRectangle

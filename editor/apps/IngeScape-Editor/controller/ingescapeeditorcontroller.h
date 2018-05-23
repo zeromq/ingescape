@@ -55,6 +55,9 @@ class IngeScapeEditorController : public QObject
     // Network settings - port
     I2_QML_PROPERTY_READONLY(int, port)
 
+    // Error message when a connection attempt fails
+    I2_QML_PROPERTY_READONLY(QString, errorMessageWhenConnectionFailed)
+
     // Snapshot Directory
     I2_QML_PROPERTY_READONLY(QString, snapshotDirectory)
 
@@ -118,15 +121,18 @@ public:
       */
     Q_INVOKABLE void openPlatformFromFile();
 
+
     /**
       * @brief Save a platform to a selected file (actions, palette, timeline actions, mappings)
       */
     Q_INVOKABLE void savePlatformToSelectedFile();
 
+
     /**
       * @brief Save a platform to the default file (actions, palette, timeline actions, mappings)
       */
     void savePlatformToDefaultFile();
+
 
     /**
       * @brief Create a new platform (actions, palette, timeline actions, mappings)
@@ -134,10 +140,12 @@ public:
       */
     Q_INVOKABLE void createNewPlatform();
 
+
     /**
       * @brief Actions to perform before the application closing
       */
     Q_INVOKABLE void processBeforeClosing();
+
 
     /**
       * @brief Can delete an agent view model from the list function
@@ -145,6 +153,7 @@ public:
       * @param agent to delete
       */
     Q_INVOKABLE bool canDeleteAgentVMFromList(AgentVM* agent);
+
 
     /**
       * @brief Can delete an agent in mapping from the mapping view
@@ -211,12 +220,15 @@ private:
       */
     void _openPlatformFromFile(QString platformFilePath);
 
+
     /**
       * @brief Save the platform to JSON file
       * @param platformFilePath
       */
     void _savePlatformToFile(QString platformFilePath);
 
+
+private:
 
     // To subscribe to termination signals
     TerminationSignalWatcher *_terminationSignalWatcher;

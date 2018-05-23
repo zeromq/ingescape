@@ -166,9 +166,11 @@ Item {
                     frameOverlap: 1
                     tab: I2CustomRectangle {
                         color: styleData.selected ? IngeScapeTheme.selectedTabsBackgroundColor : "transparent"
-                        implicitWidth: leftPanelTabs.width/4
+                        implicitWidth: (IngeScapeEditorC.recordsSupervisionC !== null && IngeScapeEditorC.recordsSupervisionC.recorderAgent !== null && IngeScapeEditorC.recordsSupervisionC.recorderAgent.isON) ? leftPanelTabs.width/4 : leftPanelTabs.width/3
                         implicitHeight: 26
                         topRightRadius : 5
+
+                        visible: styleData.title !== "Records" || (IngeScapeEditorC.recordsSupervisionC !== null && IngeScapeEditorC.recordsSupervisionC.recorderAgent !== null && IngeScapeEditorC.recordsSupervisionC.recorderAgent.isON)
 
                         Text {
                             id: text
