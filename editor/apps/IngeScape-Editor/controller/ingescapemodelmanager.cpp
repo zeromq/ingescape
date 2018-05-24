@@ -836,7 +836,7 @@ QHash<QString, QList<AgentM*>> IngeScapeModelManager::getMapFromAgentNameToActiv
                 activeAgentsList.append(agent);
             }
         }
-        if (activeAgentsList.count() > 0) {
+        if (!activeAgentsList.isEmpty()) {
             mapFromAgentNameToActiveAgentsList.insert(agentName, activeAgentsList);
         }
     }
