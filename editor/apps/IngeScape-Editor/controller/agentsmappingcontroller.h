@@ -344,6 +344,15 @@ private:
      */
     void _overWriteMappingOfAgentModel(AgentM* agentModel, AgentMappingM* temporaryMapping);
 
+
+    /**
+     * @brief Get a random position in the current window
+     * @param randomMax
+     * @return
+     */
+    QPointF _getRandomPosition(double randomMax);
+
+
     /**
      * @brief Open the mapping from JSON file
      * @param mappingFilePath

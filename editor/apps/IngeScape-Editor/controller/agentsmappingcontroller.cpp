@@ -141,71 +141,6 @@ void AgentsMappingController::saveMapping()
     }
 }
 
-/**
- * @brief Open the mapping from JSON file
- * @param mappingFilePath
- */
-void AgentsMappingController::_openMappingFromFile(QString mappingFilePath)
-{
-    if (!mappingFilePath.isEmpty() && (_jsonHelper != NULL))
-    {
-        qInfo() << "Open the mapping from JSON file" << mappingFilePath;
-
-        QFile jsonFile(mappingFilePath);
-        if (jsonFile.exists())
-        {
-            if (jsonFile.open(QIODevice::ReadOnly))
-            {
-
-                QByteArray byteArrayOfJson = jsonFile.readAll();
-                jsonFile.close();
-
-                // Import the new mapping
-                importMappingFromJson(byteArrayOfJson);
-            }
-            else {
-                qCritical() << "Can not open file" << mappingFilePath;
-            }
-        }
-        else {
-            qWarning() << "There is no file" << mappingFilePath;
-        }
-    }
-}
-
-/**
- * @brief Save the mapping to JSON file
- * @param mappingFilePath
- */
-void AgentsMappingController::_saveMappingToFile(QString mappingFilePath)
-{
-    if (!mappingFilePath.isEmpty() && (_jsonHelper != NULL))
-    {
-        qInfo() << "Save the mapping to JSON file" << mappingFilePath;
-
-        QJsonArray jsonArray = _jsonHelper->exportAllAgentsInMapping(_allAgentsInMapping.toList());
-
-        if(jsonArray.count() > 0)
-        {
-            // Create json document
-            QJsonDocument jsonDocument = QJsonDocument(jsonArray);
-            QByteArray byteArrayOfJson = jsonDocument.toJson();
-
-            // Write file
-            QFile jsonFile(mappingFilePath);
-            if (jsonFile.open(QIODevice::WriteOnly))
-            {
-                jsonFile.write(byteArrayOfJson);
-                jsonFile.close();
-            }
-            else {
-                qCritical() << "Can not open file" << mappingFilePath;
-            }
-        }
-    }
-}
-
-
 
 /**
  * @brief Remove the agent from the mapping and delete it
@@ -311,7 +246,8 @@ void AgentsMappingController::dropAgentToMappingAtPosition(QString agentName, Ab
                     // Mapping is already activated
                     if ((_modelManager != NULL) && _modelManager->isMappingActivated())
                     {
-                        foreach (AgentM* model, agentsList->toList()) {
+                        foreach (AgentM* model, agentsList->toList())
+                        {
                             if (model != NULL)
                             {
                                 // OverWrite the mapping of the model of agent (with the mapping currently edited in the agent in mapping)
@@ -414,6 +350,69 @@ AgentInMappingVM* AgentsMappingController::getAgentInMappingFromName(QString nam
 
 
 /**
+ * @brief Import the mappings from the json byte content
+ * @param byteArrayOfJson
+ * @param fromPlatform
+ */
+void AgentsMappingController::importMappingFromJson(QByteArray byteArrayOfJson, bool fromPlatform)
+{
+    // Clear the previous mapping
+    createNewMapping();
+
+    // Initialize mapping lists from JSON file
+    QList< mapping_agent_import_t* > listMappingImported = _jsonHelper->importMapping(byteArrayOfJson, fromPlatform);
+    if(listMappingImported.count() > 0)
+    {
+        QList<ElementMappingM*> mappingElements;
+        foreach (mapping_agent_import_t* importedMapping, listMappingImported)
+        {
+            DefinitionM* definition = importedMapping->definition;
+            AgentMappingM* agentMapping = importedMapping->mapping;
+
+            QList<AgentM*> agentModelList = _modelManager->getAgentModelsListFromName(importedMapping->name);
+            if(agentModelList.count() == 0)
+            {
+                AgentM * newAgent = new AgentM(importedMapping->name);
+                newAgent->setdefinition(definition);
+
+                agentModelList.append(newAgent);
+                Q_EMIT agentCreatedByMapping(newAgent);
+            }
+
+            if(agentModelList.count() > 0)
+            {
+                // Create a new Agent In Mapping
+                _addAgentModelsToMappingAtPosition(importedMapping->name, agentModelList, importedMapping->position);
+
+                AgentInMappingVM* agentInMapping = getAgentInMappingFromName(importedMapping->name);
+                if(agentInMapping != NULL)
+                {
+                    // Add the link elements
+                    mappingElements.append(agentMapping->mappingElements()->toList());
+
+                    // Set agent mapping
+                    if(agentMapping != NULL)
+                    {
+                        agentInMapping->settemporaryMapping(agentMapping);
+                    }
+                }
+            }
+        }
+
+        // Add links
+        if (mappingElements.count() > 0)
+        {
+            // Create all mapping links
+            foreach (ElementMappingM* elementMapping, mappingElements)
+            {
+                onMapped(elementMapping);
+            }
+        }
+    }
+}
+
+
+/**
  * @brief Slot when a previous agent model is replaced by a new one strictly identical
  * @param previousModel
  * @param newModel
@@ -430,8 +429,8 @@ void AgentsMappingController::onIdenticalAgentModelReplaced(AgentM* previousMode
             agentInMapping->models()->append(newModel);
             agentInMapping->models()->remove(previousModel);
 
-            // Our global mapping is controlled
-            if (_modelManager && _modelManager->isMappingControlled())
+            // Our global mapping is activated and controlled
+            if (_modelManager && _modelManager->isMappingActivated() && _modelManager->isMappingControlled())
             {
                 // OverWrite the mapping of the model of agent (with the mapping currently edited in the agent in mapping)
                 _overWriteMappingOfAgentModel(newModel, agentInMapping->temporaryMapping());
@@ -449,97 +448,79 @@ void AgentsMappingController::onIsMappingActivatedChanged(bool isMappingActivate
 {
     if ((_modelManager != NULL) && isMappingActivated)
     {
-        // Empty mapping
-        if (_isEmptyMapping)
+        // CONTROL
+        if (_modelManager->isMappingControlled())
         {
-            // CONTROL
-            if (_modelManager->isMappingControlled())
+            qDebug() << "Mapping Activated in mode CONTROL";
+
+            // Apply all temporary mappings
+            foreach (AgentInMappingVM* agent, _allAgentsInMapping.toList())
             {
-                qDebug() << "Mapping Activated in mode CONTROL and our HMI is completely EMPTY";
-
-            }
-            // OBSERVE
-            else
-            {
-                qDebug() << "Mapping Activated in mode OBSERVE and our HMI is completely EMPTY";
-
-                // Get the map from agent name to list of active agents
-                QHash<QString, QList<AgentM*>> mapFromAgentNameToActiveAgentsList = _modelManager->getMapFromAgentNameToActiveAgentsList();
-
-                if (!mapFromAgentNameToActiveAgentsList.isEmpty())
+                if ((agent != NULL) && (agent->temporaryMapping() != NULL))
                 {
-                    double randomMax = (double)RAND_MAX;
+                    // Get the JSON of a mapping
+                    QString jsonOfMapping = _modelManager->getJsonOfMapping(agent->temporaryMapping());
 
-                    // Create all agents in mapping
-                    foreach (QString agentName, mapFromAgentNameToActiveAgentsList.keys())
+                    QString command = QString("LOAD_THIS_MAPPING#%1").arg(jsonOfMapping);
+
+                    // Emit signal "Command asked to agent"
+                    Q_EMIT commandAskedToAgent(agent->peerIdsList(), command);
+                }
+            }
+        }
+        // OBSERVE
+        else
+        {
+            qDebug() << "Mapping Activated in mode OBSERVE";
+
+            // Get the map from agent name to list of active agents
+            QHash<QString, QList<AgentM*>> mapFromAgentNameToActiveAgentsList = _modelManager->getMapFromAgentNameToActiveAgentsList();
+
+            if (!mapFromAgentNameToActiveAgentsList.isEmpty())
+            {
+                double randomMax = (double)RAND_MAX;
+
+                // Create all agents in mapping
+                foreach (QString agentName, mapFromAgentNameToActiveAgentsList.keys())
+                {
+                    QList<AgentM*> activeAgentsList = mapFromAgentNameToActiveAgentsList.value(agentName);
+
+                    // Get a random position in the current window
+                    QPointF position = _getRandomPosition(randomMax);
+
+                    //qDebug() << "Random position:" << position << "for agent" << agentName;
+
+                    // Add new model(s) of agent to the current mapping
+                    _addAgentModelsToMappingAtPosition(agentName, activeAgentsList, position);
+                }
+
+                // Create all links in mapping
+                foreach (AgentInMappingVM* agent, _allAgentsInMapping.toList())
+                {
+                    if ((agent != NULL) && (agent->temporaryMapping() != NULL))
                     {
-                        QList<AgentM*> activeAgentsList = mapFromAgentNameToActiveAgentsList.value(agentName);
+                        // Delete all "mapping elements" in the temporary mapping
+                        agent->temporaryMapping()->mappingElements()->deleteAllItems();
 
-                        double randomX = (double)qrand() / randomMax;
-                        double randomY = (double)qrand() / randomMax;
-                        QPointF position = QPointF(randomX * _viewWidth, randomY * _viewHeight);
-                        //qDebug() << "Random position:" << position << "for agent" << agentName << "(" << randomX << randomY << ")";
-
-                        // Add new model(s) of agent to the current mapping
-                        _addAgentModelsToMappingAtPosition(agentName, activeAgentsList, position);
-                    }
-
-                    // Create all links in mapping
-                    foreach (AgentInMappingVM* agent, _allAgentsInMapping.toList())
-                    {
-                        if ((agent != NULL) && (agent->temporaryMapping() != NULL))
+                        foreach (AgentM* model, agent->models()->toList())
                         {
-                            // Delete all "mapping elements" in the temporary mapping
-                            agent->temporaryMapping()->mappingElements()->deleteAllItems();
-
-                            foreach (AgentM* model, agent->models()->toList())
+                            if ((model != NULL) && (model->mapping() != NULL))
                             {
-                                if ((model != NULL) && (model->mapping() != NULL))
+                                foreach (ElementMappingM* mappingElement, model->mapping()->mappingElements()->toList())
                                 {
-                                    foreach (ElementMappingM* mappingElement, model->mapping()->mappingElements()->toList())
+                                    if (mappingElement != NULL)
                                     {
-                                        if (mappingElement != NULL)
-                                        {
-                                            // Simulate slot "on Mapped"
-                                            onMapped(mappingElement);
-                                        }
+                                        // Simulate slot "on Mapped"
+                                        onMapped(mappingElement);
                                     }
                                 }
                             }
                         }
                     }
-
-                    // Notify the QML to fit the view
-                    //Q_EMIT fitToView();
                 }
-            }
-        }
-        // Mapping has some agents (and links)
-        else
-        {
-            // CONTROL
-            if (_modelManager->isMappingControlled())
-            {
-                qDebug() << "Mapping Activated in mode CONTROL and there are already some agents (and links) on our HMI";
 
-                // Apply all temporary mappings
-                foreach (AgentInMappingVM* agent, _allAgentsInMapping.toList())
-                {
-                    if ((agent != NULL) && (agent->temporaryMapping() != NULL)) // && (agent->temporaryMapping()->mappingElements()->count() > 0)
-                    {
-                        // Get the JSON of a mapping
-                        QString jsonOfMapping = _modelManager->getJsonOfMapping(agent->temporaryMapping());
-
-                        QString command = QString("LOAD_THIS_MAPPING#%1").arg(jsonOfMapping);
-
-                        // Emit signal "Command asked to agent"
-                        Q_EMIT commandAskedToAgent(agent->peerIdsList(), command);
-                    }
-                }
-            }
-            // OBSERVE
-            else {
-                qDebug() << "Mapping Activated in mode OBSERVE and there are already some agents (and links) on our HMI";
+                // Notify the QML to fit the view
+                //Q_EMIT fitToView();
             }
         }
     }
@@ -636,10 +617,11 @@ void AgentsMappingController::onActiveAgentDefined(AgentM* agent)
                 activeAgentsList.append(agent);
 
                 double randomMax = (double)RAND_MAX;
-                double randomX = (double)qrand() / randomMax;
-                double randomY = (double)qrand() / randomMax;
-                QPointF position = QPointF(randomX * _viewWidth, randomY * _viewHeight);
-                //qDebug() << "Random position:" << position << "for agent" << agentName << "(" << randomX << randomY << ")";
+
+                // Get a random position in the current window
+                QPointF position = _getRandomPosition(randomMax);
+
+                //qDebug() << "Random position:" << position << "for agent" << agentName;
 
                 // Add new model(s) of agent to the current mapping
                 _addAgentModelsToMappingAtPosition(agentName, activeAgentsList, position);
@@ -1050,13 +1032,15 @@ void AgentsMappingController::_addAgentModelsToMappingAtPosition(QString agentNa
         // The agent is defined, only add models of agent in the internal list of the agentInMappingVM
         if (agentInMapping != NULL)
         {   
-            foreach (AgentM* model, agentsList) {
-                if (model != NULL) {
+            foreach (AgentM* model, agentsList)
+            {
+                if ((model != NULL) && !agentInMapping->models()->contains(model))
+                {
                     agentInMapping->models()->append(model);
+
+                    qInfo() << "The agent in mapping already exist, new agent model added to" << agentName;
                 }
             }
-
-            qInfo() << "The agent in mapping already exist, new agent models added to" << agentName;
         }
         // Instanciate a new view model of agent in mapping (and add models)
         else
@@ -1164,90 +1148,104 @@ void AgentsMappingController::_removeAllLinksWithAgent(AgentInMappingVM* agent)
  */
 void AgentsMappingController::_overWriteMappingOfAgentModel(AgentM* agentModel, AgentMappingM* temporaryMapping)
 {
-    if (agentModel != NULL)
+    // Model is ON
+    if ((agentModel != NULL) && agentModel->isON() && (temporaryMapping != NULL)
+            && (_modelManager != NULL) && _modelManager->isMappingActivated()  && _modelManager->isMappingControlled())
     {
-        // Model is ON
-        if (agentModel->isON())
+        QStringList peerIdsList;
+        peerIdsList.append(agentModel->peerId());
+
+        // Get the JSON of a mapping
+        QString jsonOfMapping = _modelManager->getJsonOfMapping(temporaryMapping);
+
+        QString command = QString("LOAD_THIS_MAPPING#%1").arg(jsonOfMapping);
+
+        // Emit signal "Command asked to agent"
+        Q_EMIT commandAskedToAgent(peerIdsList, command);
+    }
+}
+
+
+/**
+ * @brief Get a random position in the current window
+ * @param randomMax
+ * @return
+ */
+QPointF AgentsMappingController::_getRandomPosition(double randomMax)
+{
+    double randomX = (double)qrand() / randomMax;
+    double randomY = (double)qrand() / randomMax;
+
+    // 5% + (random * 90% of the width)
+    double x = 0.05 * _viewWidth + (0.90 * _viewWidth * randomX);
+
+    // 5% + (random * 90% of the height)
+    double y = 0.05 * _viewHeight + (0.90 * _viewHeight * randomY);
+
+    return QPointF(x, y);
+}
+
+
+/**
+ * @brief Open the mapping from JSON file
+ * @param mappingFilePath
+ */
+void AgentsMappingController::_openMappingFromFile(QString mappingFilePath)
+{
+    if (!mappingFilePath.isEmpty() && (_jsonHelper != NULL))
+    {
+        qInfo() << "Open the mapping from JSON file" << mappingFilePath;
+
+        QFile jsonFile(mappingFilePath);
+        if (jsonFile.exists())
         {
-            if ((_modelManager != NULL) && (temporaryMapping != NULL))
+            if (jsonFile.open(QIODevice::ReadOnly))
             {
-                QStringList peerIdsList;
-                peerIdsList.append(agentModel->peerId());
 
-                // Get the JSON of a mapping
-                QString jsonOfMapping = _modelManager->getJsonOfMapping(temporaryMapping);
+                QByteArray byteArrayOfJson = jsonFile.readAll();
+                jsonFile.close();
 
-                QString command = QString("LOAD_THIS_MAPPING#%1").arg(jsonOfMapping);
-
-                // Emit signal "Command asked to agent"
-                Q_EMIT commandAskedToAgent(peerIdsList, command);
+                // Import the new mapping
+                importMappingFromJson(byteArrayOfJson);
+            }
+            else {
+                qCritical() << "Can not open file" << mappingFilePath;
             }
         }
-        // Model is OFF
         else {
-            agentModel->setmustOverWriteMapping(true);
+            qWarning() << "There is no file" << mappingFilePath;
         }
     }
 }
 
 
 /**
- * @brief Import the mappings from the json byte content
- * @param byteArrayOfJson
- * @param fromPlatform
+ * @brief Save the mapping to JSON file
+ * @param mappingFilePath
  */
-void AgentsMappingController::importMappingFromJson(QByteArray byteArrayOfJson, bool fromPlatform)
+void AgentsMappingController::_saveMappingToFile(QString mappingFilePath)
 {
-    // Clear the previous mapping
-    createNewMapping();
-
-    // Initialize mapping lists from JSON file
-    QList< mapping_agent_import_t* > listMappingImported = _jsonHelper->importMapping(byteArrayOfJson, fromPlatform);
-    if(listMappingImported.count() > 0)
+    if (!mappingFilePath.isEmpty() && (_jsonHelper != NULL))
     {
-        QList<ElementMappingM*> mappingElements;
-        foreach (mapping_agent_import_t* importedMapping, listMappingImported)
+        qInfo() << "Save the mapping to JSON file" << mappingFilePath;
+
+        QJsonArray jsonArray = _jsonHelper->exportAllAgentsInMapping(_allAgentsInMapping.toList());
+
+        if(jsonArray.count() > 0)
         {
-            DefinitionM* definition = importedMapping->definition;
-            AgentMappingM* agentMapping = importedMapping->mapping;
+            // Create json document
+            QJsonDocument jsonDocument = QJsonDocument(jsonArray);
+            QByteArray byteArrayOfJson = jsonDocument.toJson();
 
-            QList<AgentM*> agentModelList = _modelManager->getAgentModelsListFromName(importedMapping->name);
-            if(agentModelList.count() == 0)
+            // Write file
+            QFile jsonFile(mappingFilePath);
+            if (jsonFile.open(QIODevice::WriteOnly))
             {
-                AgentM * newAgent = new AgentM(importedMapping->name);
-                newAgent->setdefinition(definition);
-
-                agentModelList.append(newAgent);
-                Q_EMIT agentCreatedByMapping(newAgent);
+                jsonFile.write(byteArrayOfJson);
+                jsonFile.close();
             }
-
-            if(agentModelList.count() > 0)
-            {
-                // Create a new Agent In Mapping
-                _addAgentModelsToMappingAtPosition(importedMapping->name, agentModelList, importedMapping->position);
-
-                AgentInMappingVM* agentInMapping = getAgentInMappingFromName(importedMapping->name);
-                if(agentInMapping != NULL)
-                {
-                    // Add the link elements
-                    mappingElements.append(agentMapping->mappingElements()->toList());
-
-                    // Set agent mapping
-                    if(agentMapping != NULL)
-                    {
-                        agentInMapping->settemporaryMapping(agentMapping);
-                    }
-                }
-            }
-        }
-
-        // Add links
-        if (mappingElements.count() > 0)
-        {
-            // Create all mapping links
-            foreach (ElementMappingM* elementMapping, mappingElements)
-            {
-                onMapped(elementMapping);
+            else {
+                qCritical() << "Can not open file" << mappingFilePath;
             }
         }
     }
