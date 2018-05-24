@@ -71,7 +71,7 @@ Item {
             width: 0
         }
 
-        color: agentItemIsHovered? IngeScapeTheme.agentsListItemRollOverBackgroundColor : IngeScapeTheme.agentsListItemBackgroundColor
+        color: agentItemIsHovered ? IngeScapeTheme.agentsListItemRollOverBackgroundColor : IngeScapeTheme.agentsListItemBackgroundColor
 
         Rectangle {
             anchors {
@@ -329,8 +329,93 @@ Item {
 
         }
 
+
+        // Button Options
         Button {
-            id: offButton
+            id: btnOptions
+            visible: false
+
+            anchors {
+                bottom: btnOnOff.top
+                bottomMargin: 5
+                horizontalCenter: muteButton.horizontalCenter
+            }
+
+            text: "..."
+
+            onClicked: {
+                console.log("Open options...");
+                popupOptions.open();
+            }
+        }
+        I2PopupBase {
+            id : popupOptions
+            anchors {
+                top: btnOptions.top
+                left: btnOptions.right
+            }
+
+            width: 100
+            height: 120
+
+            isModal: true;
+            layerColor: "transparent"
+            dismissOnOutsideTap : true;
+
+            keepRelativePositionToInitialParent : true;
+
+            onClosed: {
+
+            }
+            onOpened: {
+
+            }
+
+            Rectangle {
+                id : popUpBackground
+                anchors.fill : parent
+                color:  "#2C333E"
+
+                Column {
+                    spacing: 5
+
+                    Button {
+                        id: btnOption1
+
+                        text: "Option 1"
+
+                        onClicked: {
+                            console.log("Option 1");
+                        }
+                    }
+
+                    Button {
+                        id: btnOption2
+
+                        text: "Option 2"
+
+                        onClicked: {
+                            console.log("Option 2");
+                        }
+                    }
+
+                    Button {
+                        id: btnOption3
+
+                        text: "Option 3"
+
+                        onClicked: {
+                            console.log("Option 3");
+                        }
+                    }
+                }
+            }
+        }
+
+
+        // Button ON/OFF
+        Button {
+            id: btnOnOff
 
             // Agent is "ON" OR Agent can be restarted
             visible: (root.agent && (root.agent.isON || root.agent.canBeRestarted))
@@ -357,6 +442,8 @@ Item {
             }
         }
 
+
+        // Button Mute
         Button {
             id: muteButton
 
@@ -383,6 +470,8 @@ Item {
             }
         }
 
+
+        // Button Freeze
         Button {
             id: freezeButton
 
