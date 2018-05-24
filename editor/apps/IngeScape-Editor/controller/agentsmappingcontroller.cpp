@@ -423,18 +423,18 @@ void AgentsMappingController::onIdenticalAgentModelReplaced(AgentM* previousMode
     if ((previousModel != NULL) && (newModel != NULL))
     {
         AgentInMappingVM* agentInMapping = getAgentInMappingFromName(newModel->name());
-        if (agentInMapping != NULL)
+        if ((agentInMapping != NULL) && agentInMapping->models()->contains(previousModel))
         {
-            int index = agentInMapping->models()->indexOf(previousModel);
-            if (index > -1)
-            {
-                agentInMapping->models()->replace(index, newModel);
+            // First add the new model before remove the previous model
+            // (allows to prevent to have 0 model at a given moment and to prevent to emit signal in/out..putsListWillBeRemoved that remove links)
+            agentInMapping->models()->append(newModel);
+            agentInMapping->models()->remove(previousModel);
 
-                // Our global mapping is controlled
-                if (_modelManager && _modelManager->isMappingControlled()) {
-                    // OverWrite the mapping of the model of agent (with the mapping currently edited in the agent in mapping)
-                    _overWriteMappingOfAgentModel(newModel, agentInMapping->temporaryMapping());
-                }
+            // Our global mapping is controlled
+            if (_modelManager && _modelManager->isMappingControlled())
+            {
+                // OverWrite the mapping of the model of agent (with the mapping currently edited in the agent in mapping)
+                _overWriteMappingOfAgentModel(newModel, agentInMapping->temporaryMapping());
             }
         }
     }
@@ -614,7 +614,8 @@ void AgentsMappingController::onActiveAgentDefined(AgentM* agent)
             // The agent is already in the mapping
             else
             {
-                if (!agentInMapping->models()->contains(agent)) {
+                if (!agentInMapping->models()->contains(agent))
+                {
                     agentInMapping->models()->append(agent);
 
                     // OverWrite the mapping of the model of agent (with the mapping currently edited in the agent in mapping)
