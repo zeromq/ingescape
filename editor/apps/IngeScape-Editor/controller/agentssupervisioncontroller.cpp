@@ -193,13 +193,18 @@ void AgentsSupervisionController::onAgentModelCreated(AgentM* model)
         // Create a new view model of agent
         AgentVM* agent = new AgentVM(model, this);
 
-        // Connect to signals from this new view model of agent
+        // Connect slots to signals from this new view model of agent
         connect(agent, &AgentVM::definitionChangedWithPreviousAndNewValues, this, &AgentsSupervisionController::_onAgentDefinitionChangedWithPreviousAndNewValues);
         connect(agent, &AgentVM::differentDefinitionDetectedOnModelOfAgent, this, &AgentsSupervisionController::_onDifferentDefinitionDetectedOnModelOfAgent);
+        connect(agent, &AgentVM::downloadAgentDefinitionToPath, this, &AgentsSupervisionController::_onDownloadAgentDefinitionToPath);
+        connect(agent, &AgentVM::downloadAgentMappingToPath, this, &AgentsSupervisionController::_onDownloadAgentMappingToPath);
+
+        // Propagate some signals from this new view model of agent
         connect(agent, &AgentVM::commandAskedToLauncher, this, &AgentsSupervisionController::commandAskedToLauncher);
         connect(agent, &AgentVM::commandAskedToAgent, this, &AgentsSupervisionController::commandAskedToAgent);
         connect(agent, &AgentVM::commandAskedToAgentAboutOutput, this, &AgentsSupervisionController::commandAskedToAgentAboutOutput);
         connect(agent, &AgentVM::openValuesHistoryOfAgent, this, &AgentsSupervisionController::openValuesHistoryOfAgent);
+
 
         agentViewModelsList.append(agent);
         _mapFromNameToAgentViewModelsList.insert(model->name(), agentViewModelsList);
@@ -417,6 +422,70 @@ void AgentsSupervisionController::_onDifferentDefinitionDetectedOnModelOfAgent(A
 
 
 /**
+ * @brief Slot called when we have to download an agent definition to a path (JSON file)
+ * @param agentDefinition
+ * @param definitionFilePath
+ */
+void AgentsSupervisionController::_onDownloadAgentDefinitionToPath(DefinitionM* agentDefinition, QString definitionFilePath)
+{
+    AgentVM* agent = qobject_cast<AgentVM*>(sender());
+    if ((_modelManager != NULL) && (agent != NULL) && (agentDefinition != NULL) && !definitionFilePath.isEmpty())
+    {
+        // Get the JSON of the agent definition
+        QString jsonOfDefinition = _modelManager->getJsonOfAgentDefinition(agentDefinition, QJsonDocument::Indented);
+        if (!jsonOfDefinition.isEmpty())
+        {
+            QFile jsonFile(definitionFilePath);
+            /*if (jsonFile.exists()) {
+                qWarning() << "The file" << definitionFilePath << "already exist !";
+            }*/
+
+            if (jsonFile.open(QIODevice::WriteOnly))
+            {
+                jsonFile.write(jsonOfDefinition.toUtf8());
+                jsonFile.close();
+            }
+            else {
+                qCritical() << "Can not open file" << definitionFilePath << "(to save the definition of" << agent->name() << ")";
+            }
+        }
+    }
+}
+
+
+/**
+ * @brief Slot called when we have to download an agent mapping to a path (JSON file)
+ * @param agentMapping
+ * @param mappingFilePath
+ */
+void AgentsSupervisionController::_onDownloadAgentMappingToPath(AgentMappingM* agentMapping, QString mappingFilePath)
+{
+    AgentVM* agent = qobject_cast<AgentVM*>(sender());
+    if ((_modelManager != NULL) && (agent != NULL) && (agentMapping != NULL) && !mappingFilePath.isEmpty())
+    {
+        // Get the JSON of the agent mapping
+        QString jsonOfMapping = _modelManager->getJsonOfAgentMapping(agentMapping, QJsonDocument::Indented);
+        if (!jsonOfMapping.isEmpty())
+        {
+            QFile jsonFile(mappingFilePath);
+            /*if (jsonFile.exists()) {
+                qWarning() << "The file" << mappingFilePath << "already exist !";
+            }*/
+
+            if (jsonFile.open(QIODevice::WriteOnly))
+            {
+                jsonFile.write(jsonOfMapping.toUtf8());
+                jsonFile.close();
+            }
+            else {
+                qCritical() << "Can not open file" << mappingFilePath << "(to save the mapping of" << agent->name() << ")";
+            }
+        }
+    }
+}
+
+
+/**
  * @brief Check if we have to merge an agent with another one that have the same definition
  * @param agent
  */
@@ -505,12 +574,7 @@ void AgentsSupervisionController::_deleteAgentViewModel(AgentVM* agent)
         _mapFromNameToAgentViewModelsList.insert(agent->name(), agentViewModelsList);
 
         // DIS-connect from signals from this old view model of agent
-        disconnect(agent, &AgentVM::definitionChangedWithPreviousAndNewValues, this, &AgentsSupervisionController::_onAgentDefinitionChangedWithPreviousAndNewValues);
-        disconnect(agent, &AgentVM::differentDefinitionDetectedOnModelOfAgent, this, &AgentsSupervisionController::_onDifferentDefinitionDetectedOnModelOfAgent);
-        disconnect(agent, &AgentVM::commandAskedToLauncher, this, &AgentsSupervisionController::commandAskedToLauncher);
-        disconnect(agent, &AgentVM::commandAskedToAgent, this, &AgentsSupervisionController::commandAskedToAgent);
-        disconnect(agent, &AgentVM::commandAskedToAgentAboutOutput, this, &AgentsSupervisionController::commandAskedToAgentAboutOutput);
-        disconnect(agent, &AgentVM::openValuesHistoryOfAgent, this, &AgentsSupervisionController::openValuesHistoryOfAgent);
+        disconnect(agent, 0, this, 0);
 
         // Free memory
         delete agent;

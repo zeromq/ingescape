@@ -78,9 +78,6 @@ class AgentM : public QObject
     // Mapping of our agent
     I2_QML_PROPERTY_READONLY(AgentMappingM*, mapping)
 
-    // Flag indicating if we have to overwrite the mapping of our agent (when it will send its mapping)
-    I2_QML_PROPERTY_READONLY(bool, mustOverWriteMapping)
-
     // State of our agent
     I2_QML_PROPERTY(QString, state)
 

@@ -282,6 +282,12 @@ private:
 
 
     /**
+     * @brief Update the flag "Is Defined in All Definitions" for each Input/Output
+     */
+    void _updateIsDefinedInAllDefinitionsForEachInputOutput();
+
+
+    /**
      * @brief Update the group (of value type) of the reduced map (= brin) in input of our agent
      */
     void _updateReducedMapValueTypeGroupInInput();

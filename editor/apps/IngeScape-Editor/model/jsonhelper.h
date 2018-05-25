@@ -64,6 +64,7 @@ class JsonHelper : public QObject
 {
     Q_OBJECT
 
+
 public:
     /**
      * @brief Constructor
@@ -87,11 +88,21 @@ public:
 
 
     /**
-     * @brief Create a model of agent definition from JSON file
+     * @brief Create a model of agent definition from a JSON file
      * @param byteArrayOfJson
      * @return
      */
-    DefinitionM* createModelOfDefinition(QByteArray byteArrayOfJson);
+    DefinitionM* createModelOfAgentDefinition(QByteArray byteArrayOfJson);
+
+
+    /**
+     * @brief Create a model of agent mapping with JSON and the corresponding input agent name
+     * @param inputAgentName
+     * @param byteArrayOfJson
+     * @return
+     */
+    AgentMappingM* createModelOfAgentMapping(QString inputAgentName, QByteArray byteArrayOfJson);
+
 
     /**
      * @brief Export the agents list
@@ -99,33 +110,40 @@ public:
      */
     QByteArray exportAgentsList(QList<QPair<QStringList, DefinitionM*>> agentsListToExport);
 
-    /**
-     * @brief Create a model of agent mapping with JSON and the input agent name corresponding
-     * @param inputAgentName, byteArrayOfJson
-     * @return
-     */
-    AgentMappingM* createModelOfAgentMapping(QString inputAgentName, QByteArray byteArrayOfJson);
 
     /**
-     * @brief Create a model of record from JSON data
-     * @param byteArrayOfJson
-     * @return
+     * @brief Export the model of agent definition into a JSON object
+     * @param agentDefinition
+     * @return JSON object
      */
-    QList<RecordM*> createRecordModelList(QByteArray byteArrayOfJson);
+    QJsonObject exportAgentDefinitionToJson(DefinitionM* agentDefinition);
+
 
     /**
-     * @brief Get the JSON of a mapping
+     * @brief Export the model of agent mapping into a JSON object
      * @param agentMapping
-     * @return
+     * @return JSON object
      */
-    QString getJsonOfMapping(AgentMappingM* agentMapping);
+    QJsonObject exportAgentMappingToJson(AgentMappingM* agentMapping);
+
 
     /**
-     * @brief Export the agent mapping model into the json object
-     * @param agentMapping
-     * @return QJson object
+     * @brief Get the JSON of an agent definition
+     * @param agentDefinition
+     * @param jsonFormat
+     * @return
      */
-    QJsonObject exportMappingToJson(AgentMappingM* agentMapping);
+    QString getJsonOfAgentDefinition(DefinitionM* agentDefinition, QJsonDocument::JsonFormat jsonFormat);
+
+
+    /**
+     * @brief Get the JSON of an agent mapping
+     * @param agentMapping
+     * @param jsonFormat
+     * @return
+     */
+    QString getJsonOfAgentMapping(AgentMappingM* agentMapping, QJsonDocument::JsonFormat jsonFormat);
+
 
     /**
      * @brief Initialize actions list from JSON file
@@ -136,6 +154,7 @@ public:
      */
     scenario_import_actions_lists_t * initActionsList(QByteArray byteArrayOfJson, QList<AgentInMappingVM*> listAgentsInMapping);
 
+
     /**
      * @brief Export the actions lists into json object
      * @param actions list in table
@@ -145,11 +164,6 @@ public:
      */
     QJsonObject exportScenario(QList<ActionM*> actionsList, QList<ActionInPaletteVM*> actionsInPaletteList, QList<ActionVM*> actionsInTimeLine);
 
-    /**
-     * @brief Export the agent definition into a json format
-     * @param agent definition model
-     */
-    QJsonObject exportAgentDefinition(DefinitionM* definition);
 
     /**
      * @brief Import the mapping from the json content
@@ -158,12 +172,22 @@ public:
      */
     QList<mapping_agent_import_t *> importMapping(QByteArray byteArrayOfJson, bool fromPlatform = false);
 
+
     /**
      * @brief Export the agents in mapping list into json array object
      * @param agents in mapping list
      * @return
      */
     QJsonArray exportAllAgentsInMapping(QList<AgentInMappingVM*> agentsInMapping);
+
+
+    /**
+     * @brief Create a model of record from JSON data
+     * @param byteArrayOfJson
+     * @return
+     */
+    QList<RecordM*> createRecordModelList(QByteArray byteArrayOfJson);
+
 
 Q_SIGNALS:
 
@@ -172,11 +196,20 @@ public Q_SLOTS:
 private:
 
     /**
-     * @brief Create a model of agent definition from JSON object
+     * @brief Create a model of agent definition from a JSON object
      * @param jsonDefinition
      * @return
      */
-    DefinitionM* _createModelOfDefinitionFromJSON(QJsonObject jsonDefinition);
+    DefinitionM* _createModelOfAgentDefinitionFromJSON(QJsonObject jsonDefinition);
+
+
+    /**
+     * @brief Create a model of agent mapping from JsonObject and the corresponding input agent name
+     * @param inputAgentName
+     * @param jsonObject
+     * @return
+     */
+    AgentMappingM* _createModelOfAgentMappingFromJSON(QString inputAgentName,QJsonObject jsonObject);
 
 
     /**
@@ -204,12 +237,14 @@ private:
      */
     ElementMappingM* _createModelOfElementMapping(QString inputAgentName, QJsonObject jsonObject);
 
+
     /**
      * @brief Create a model of agent mapping with JSON and the input agent name corresponding
      * @param inputAgentName, byteArrayOfJson
      * @return
      */
     ActionEffectVM* _parseEffectVMFromJson(QJsonObject jsonEffect, QList<AgentInMappingVM *> listAgentsInMapping);
+
 
     /**
      * @brief Create an action condition VM from JSON object
@@ -219,12 +254,6 @@ private:
      */
     ActionConditionVM* _parseConditionsVMFromJson(QJsonObject jsonCondition, QList<AgentInMappingVM*> listAgentsInMapping);
 
-    /**
-     * @brief Create a model of agent mapping from JsonObject and the input agent name corresponding
-     * @param inputAgentName, byteArrayOfJson
-     * @return
-     */
-    AgentMappingM* _createModelOfAgentMappingFromJson(QString inputAgentName,QJsonObject jsonObject);
 };
 
 #endif // JSONHELPER_H

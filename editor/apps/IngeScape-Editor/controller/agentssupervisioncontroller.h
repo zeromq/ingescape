@@ -156,6 +156,22 @@ private Q_SLOTS:
     void _onDifferentDefinitionDetectedOnModelOfAgent(AgentM* model);
 
 
+    /**
+     * @brief Slot called when we have to download an agent definition to a path (JSON file)
+     * @param agentDefinition
+     * @param definitionFilePath
+     */
+    void _onDownloadAgentDefinitionToPath(DefinitionM* agentDefinition, QString definitionFilePath);
+
+
+    /**
+     * @brief Slot called when we have to download an agent mapping to a path (JSON file)
+     * @param agentMapping
+     * @param mappingFilePath
+     */
+    void _onDownloadAgentMappingToPath(AgentMappingM* agentMapping, QString mappingFilePath);
+
+
 private:
 
     /**

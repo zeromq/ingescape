@@ -473,7 +473,7 @@ Item {
 
 
     //
-    // Delete Confirmation
+    // Popup about Delete Confirmation
     //
     Editor.DeleteConfirmationPopup {
         id : deleteConfirmationPopup
