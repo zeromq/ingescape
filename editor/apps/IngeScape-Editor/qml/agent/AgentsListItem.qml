@@ -421,6 +421,9 @@ Item {
             Button {
                 id: btnOptions
 
+                visible: (model.isON === true)
+                activeFocusOnPress: true
+
                 style: Theme.LabellessSvgButtonStyle {
                     fileCache: IngeScapeTheme.svgFileINGESCAPE
 

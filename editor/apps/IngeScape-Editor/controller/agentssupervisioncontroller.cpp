@@ -463,7 +463,24 @@ void AgentsSupervisionController::_onDownloadAgentMappingToPath(AgentMappingM* a
     AgentVM* agent = qobject_cast<AgentVM*>(sender());
     if ((_modelManager != NULL) && (agent != NULL) && (agentMapping != NULL) && !mappingFilePath.isEmpty())
     {
+        // Get the JSON of the agent mapping
+        QString jsonOfMapping = _modelManager->getJsonOfAgentMapping(agentMapping, QJsonDocument::Indented);
+        if (!jsonOfMapping.isEmpty())
+        {
+            QFile jsonFile(mappingFilePath);
+            /*if (jsonFile.exists()) {
+                qWarning() << "The file" << mappingFilePath << "already exist !";
+            }*/
 
+            if (jsonFile.open(QIODevice::WriteOnly))
+            {
+                jsonFile.write(jsonOfMapping.toUtf8());
+                jsonFile.close();
+            }
+            else {
+                qCritical() << "Can not open file" << mappingFilePath << "(to save the mapping of" << agent->name() << ")";
+            }
+        }
     }
 }
 

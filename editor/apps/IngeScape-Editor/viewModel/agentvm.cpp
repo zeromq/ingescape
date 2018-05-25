@@ -240,10 +240,7 @@ void AgentVM::downloadDefinition()
                                                               "",
                                                               "JSON (*.json)");
 
-    if (!definitionFilePath.isEmpty() && (_definition != NULL))
-    {
-        qDebug() << "Download Definition to" << definitionFilePath;
-
+    if (!definitionFilePath.isEmpty() && (_definition != NULL)) {
         Q_EMIT downloadAgentDefinitionToPath(_definition, definitionFilePath);
     }
 }
@@ -260,11 +257,21 @@ void AgentVM::downloadMapping()
                                                            "",
                                                            "JSON (*.json)");
 
-    if (!mappingFilePath.isEmpty()) {
-        qDebug() << "Download Mapping to" << mappingFilePath;
-
-        // TODO _mapping
-        //Q_EMIT downloadAgentMappingToPath(_mapping, definitionFilePath);
+    if (!mappingFilePath.isEmpty() && !_models.isEmpty())
+    {
+        // Get the mapping of an active agent
+        AgentMappingM* agentMapping = NULL;
+        for (AgentM* model : _models.toList())
+        {
+            if ((model != NULL) && model->isON() && (model->mapping() != NULL))
+            {
+                agentMapping = model->mapping();
+                break;
+            }
+        }
+        if (agentMapping != NULL) {
+            Q_EMIT downloadAgentMappingToPath(agentMapping, mappingFilePath);
+        }
     }
 }
 
