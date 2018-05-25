@@ -160,6 +160,21 @@ I2PopupBase {
             useQStringList: true
 
             //placeholderText: (IngeScapeEditorC.networkC && IngeScapeEditorC.networkC.availableNetworkDevices.count === 0 ? "- No network device -" : "- Select a network device -")
+
+            onSelectedItemChanged: {
+                var selectedNetworkDevice = "";
+
+                if (typeof combobox.selectedItem === "string") {
+                    console.log("onSelectedItemChanged (string) " + combobox.selectedItem);
+                    selectedNetworkDevice = combobox.selectedItem;
+                }
+                else {
+                    console.log("onSelectedItemChanged (object) " + combobox.selectedItem.modelData);
+                    selectedNetworkDevice = combobox.selectedItem.modelData;
+                }
+
+                okButton.enabled = IngeScapeEditorC.networkC.isAvailableNetworkDevice(selectedNetworkDevice);
+            }
         }
 
         Rectangle {
@@ -247,6 +262,7 @@ I2PopupBase {
 
             activeFocusOnPress: true
             text : "OK"
+            //enabled: true
 
             anchors {
                 verticalCenter: parent.verticalCenter
@@ -257,7 +273,7 @@ I2PopupBase {
 
                 pressedID: releasedID + "-pressed"
                 releasedID: "button"
-                disabledID : releasedID
+                disabledID: releasedID + "-disabled"
 
                 font {
                     family: IngeScapeTheme.textFontFamily
@@ -266,7 +282,7 @@ I2PopupBase {
                 }
                 labelColorPressed: IngeScapeTheme.blackColor
                 labelColorReleased: IngeScapeTheme.whiteColor
-                labelColorDisabled: IngeScapeTheme.whiteColor
+                labelColorDisabled: IngeScapeTheme.darkGreyColor
 
             }
 

@@ -631,6 +631,22 @@ void NetworkController::manageMessageFrozenUnfrozen(QString peerId, QString mess
 
 
 /**
+ * @brief Return true if the network device is available
+ * @param networkDevice
+ * @return
+ */
+bool NetworkController::isAvailableNetworkDevice(QString networkDevice)
+{
+    if (!networkDevice.isEmpty() && _availableNetworkDevices.contains(networkDevice)) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+
+/**
  * @brief Slot when a command must be sent on the network to a launcher
  * @param command
  * @param hostname

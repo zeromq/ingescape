@@ -74,6 +74,16 @@ Item {
     }
 
 
+    // When the QML is loaded, we check the value of the error message when a connection attempt fails
+    Component.onCompleted: {
+        if (IngeScapeEditorC.errorMessageWhenConnectionFailed !== "")
+        {
+            //console.error("On Completed: Error Message = " + IngeScapeEditorC.errorMessageWhenConnectionFailed);
+            networkConfigurationPopup.open();
+        }
+    }
+
+
 
     //--------------------------------------------------------
     //

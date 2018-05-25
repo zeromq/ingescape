@@ -521,6 +521,8 @@
 	</linearGradient>
 	
 		<rect id="tab-1-Selected" x="532.8" y="624.2" fill="url(#tab-1-Selected_1_)" stroke="#17191E" stroke-width="0.2932" stroke-miterlimit="10" width="102.7" height="29.5"/>
+	<path id="button-disabled" fill="#717070" stroke="#878787" stroke-width="0.2588" stroke-miterlimit="10" d="M387.1,747.6h-71.8
+		c-2.3,0-4.1-1.8-4.1-4.1v-21.3c0-2.3,1.8-4.1,4.1-4.1h71.8c2.3,0,4.1,1.8,4.1,4.1v21.3C391.2,745.8,389.4,747.6,387.1,747.6z"/>
 	<linearGradient id="button_1_" gradientUnits="userSpaceOnUse" x1="467.3487" y1="747.6381" x2="467.3487" y2="718.1724">
 		<stop  offset="0" style="stop-color:#17191E"/>
 		<stop  offset="1" style="stop-color:#3C424F"/>

@@ -86,6 +86,14 @@ public:
     void manageMessageFrozenUnfrozen(QString peerId, QString message);
 
 
+    /**
+     * @brief Return true if the network device is available
+     * @param networkDevice
+     * @return
+     */
+    Q_INVOKABLE bool isAvailableNetworkDevice(QString networkDevice);
+
+
 Q_SIGNALS:
 
     /**
