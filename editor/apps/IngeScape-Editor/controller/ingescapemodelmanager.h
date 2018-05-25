@@ -188,11 +188,21 @@ public:
 
 
     /**
-     * @brief Get the JSON of a mapping
-     * @param agentMapping
+     * @brief Get the JSON of an agent definition
+     * @param agentDefinition
+     * @param jsonFormat
      * @return
      */
-    QString getJsonOfMapping(AgentMappingM* agentMapping);
+    QString getJsonOfAgentDefinition(DefinitionM* agentDefinition, QJsonDocument::JsonFormat jsonFormat);
+
+
+    /**
+     * @brief Get the JSON of an agent mapping
+     * @param agentMapping
+     * @param jsonFormat
+     * @return
+     */
+    QString getJsonOfAgentMapping(AgentMappingM* agentMapping, QJsonDocument::JsonFormat jsonFormat);
 
 
     /**

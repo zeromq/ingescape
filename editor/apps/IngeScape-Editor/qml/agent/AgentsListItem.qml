@@ -156,7 +156,7 @@ Item {
                 leftMargin: 28
                 top: parent.top
                 topMargin: 12
-                right : freezeButton.left
+                right : bottomRow.left
             }
             height : childrenRect.height
 
@@ -171,7 +171,7 @@ Item {
                 }
                 elide: Text.ElideRight
 
-                text: root.agent? root.agent.name : ""
+                text: root.agent ? root.agent.name : ""
                 color: (root.agent && (root.agent.isON === true)) ? IngeScapeTheme.agentsListLabelColor : IngeScapeTheme.agentOFFLabelColor
 
 
@@ -330,89 +330,6 @@ Item {
         }
 
 
-        // Button Options
-        Button {
-            id: btnOptions
-            visible: false
-
-            anchors {
-                bottom: btnOnOff.top
-                bottomMargin: 5
-                horizontalCenter: muteButton.horizontalCenter
-            }
-
-            text: "..."
-
-            onClicked: {
-                console.log("Open options...");
-                popupOptions.open();
-            }
-        }
-        I2PopupBase {
-            id : popupOptions
-            anchors {
-                top: btnOptions.top
-                left: btnOptions.right
-            }
-
-            width: 100
-            height: 120
-
-            isModal: true;
-            layerColor: "transparent"
-            dismissOnOutsideTap : true;
-
-            keepRelativePositionToInitialParent : true;
-
-            onClosed: {
-
-            }
-            onOpened: {
-
-            }
-
-            Rectangle {
-                id : popUpBackground
-                anchors.fill : parent
-                color:  "#2C333E"
-
-                Column {
-                    spacing: 5
-
-                    Button {
-                        id: btnOption1
-
-                        text: "Option 1"
-
-                        onClicked: {
-                            console.log("Option 1");
-                        }
-                    }
-
-                    Button {
-                        id: btnOption2
-
-                        text: "Option 2"
-
-                        onClicked: {
-                            console.log("Option 2");
-                        }
-                    }
-
-                    Button {
-                        id: btnOption3
-
-                        text: "Option 3"
-
-                        onClicked: {
-                            console.log("Option 3");
-                        }
-                    }
-                }
-            }
-        }
-
-
         // Button ON/OFF
         Button {
             id: btnOnOff
@@ -424,9 +341,10 @@ Item {
             enabled: visible
 
             anchors {
-                bottom: muteButton.top
+                bottom: bottomRow.top
                 bottomMargin: 5
-                horizontalCenter: muteButton.horizontalCenter
+                right : parent.right
+                rightMargin: 12
             }
 
             style: Theme.LabellessSvgButtonStyle {
@@ -443,12 +361,8 @@ Item {
         }
 
 
-        // Button Mute
-        Button {
-            id: muteButton
-
-            visible : (model.isON === true)
-            activeFocusOnPress: true
+        Row {
+            id: bottomRow
 
             anchors {
                 bottom: parent.bottom
@@ -457,46 +371,228 @@ Item {
                 rightMargin: 12
             }
 
-            style: Theme.LabellessSvgButtonStyle {
-                fileCache: IngeScapeTheme.svgFileINGESCAPE
+            spacing: 5
 
-                pressedID: releasedID + "-pressed"
-                releasedID: model.isMuted? "muteactif" : "muteinactif"
-                disabledID : releasedID
+
+            // Button Freeze
+            Button {
+                id: freezeButton
+
+                visible: model.canBeFrozen && (model.isON === true)
+                enabled : visible
+                activeFocusOnPress: true
+
+                style: Theme.LabellessSvgButtonStyle {
+                    fileCache: IngeScapeTheme.svgFileINGESCAPE
+
+                    pressedID: releasedID + "-pressed"
+                    releasedID: model.isFrozen? "freezeactif" : "freezeinactif"
+                    disabledID : releasedID
+                }
+
+                onClicked: {
+                    model.QtObject.changeFreeze();
+                }
             }
 
-            onClicked: {
-                model.QtObject.changeMuteAllOutputs();
+
+            // Button Mute
+            Button {
+                id: muteButton
+
+                visible: (model.isON === true)
+                activeFocusOnPress: true
+
+                style: Theme.LabellessSvgButtonStyle {
+                    fileCache: IngeScapeTheme.svgFileINGESCAPE
+
+                    pressedID: releasedID + "-pressed"
+                    releasedID: model.isMuted? "muteactif" : "muteinactif"
+                    disabledID : releasedID
+                }
+
+                onClicked: {
+                    model.QtObject.changeMuteAllOutputs();
+                }
+            }
+
+
+            // Button Options
+            Button {
+                id: btnOptions
+
+                style: Theme.LabellessSvgButtonStyle {
+                    fileCache: IngeScapeTheme.svgFileINGESCAPE
+
+                    pressedID: "empty-button"
+                    releasedID: "empty-button"
+                    disabledID : releasedID
+                }
+
+                Text {
+                    text: "..."
+
+                    anchors {
+                        left: parent.left
+                        right: parent.right
+                        bottom: parent.bottom
+                        bottomMargin: 5
+                    }
+                    horizontalAlignment: Text.AlignHCenter
+
+                    color: btnOptions.pressed ? "gray" : "black"
+
+                    font {
+                        family: IngeScapeTheme.labelFontFamily
+                        pixelSize: 20
+                        //bold: true
+                    }
+                }
+
+                onClicked: {
+                    console.log("Open options...");
+                    popupOptions.open();
+                }
             }
         }
 
-
-        // Button Freeze
-        Button {
-            id: freezeButton
-
-            visible: model.canBeFrozen && (model.isON === true)
-            enabled : visible
-            activeFocusOnPress: true
-
+        I2PopupBase {
+            id : popupOptions
             anchors {
-                verticalCenter: muteButton.verticalCenter
-                right : muteButton.left
-                rightMargin: 5
+                top: bottomRow.top
+                left: bottomRow.right
             }
 
-            style: Theme.LabellessSvgButtonStyle {
-                fileCache: IngeScapeTheme.svgFileINGESCAPE
+            width: 220
+            height: 300
 
-                pressedID: releasedID + "-pressed"
-                releasedID: model.isFrozen? "freezeactif" : "freezeinactif"
-                disabledID : releasedID
+            isModal: true;
+            layerColor: "transparent"
+            dismissOnOutsideTap : true;
+
+            keepRelativePositionToInitialParent : true;
+
+            onClosed: {
+
+            }
+            onOpened: {
+
             }
 
-            onClicked: {
-                model.QtObject.changeFreeze();
+            Rectangle {
+                id: popUpBackground
+                anchors {
+                    fill: parent
+                }
+                color: "black"
+
+                Column {
+                    anchors {
+                        fill: parent
+                        margins: 10
+                    }
+
+                    spacing: 4
+
+                    Button {
+                        id: optionLoadDefinition
+
+                        text: qsTr("Load Definition")
+
+                        onClicked: {
+                            if (root.agent) {
+                                root.agent.loadDefinition();
+
+                                popupOptions.close();
+                            }
+                        }
+                    }
+
+                    Button {
+                        id: optionLoadMapping
+
+                        text: qsTr("Load Mapping")
+
+                        onClicked: {
+                            if (root.agent) {
+                                root.agent.loadMapping();
+
+                                popupOptions.close();
+                            }
+                        }
+                    }
+
+                    Button {
+                        id: optionDownloadDefinition
+
+                        text: qsTr("Download Definition")
+
+                        onClicked: {
+                            if (root.agent) {
+                                root.agent.downloadDefinition();
+
+                                popupOptions.close();
+                            }
+                        }
+                    }
+
+                    Button {
+                        id: optionDownloadMapping
+
+                        text: qsTr("Download Mapping")
+
+                        onClicked: {
+                            if (root.agent) {
+                                root.agent.downloadMapping();
+
+                                popupOptions.close();
+                            }
+                        }
+                    }
+
+                    Button {
+                        id: optionSetPath
+
+                        text: qsTr("Set Path for Def./Mapping")
+
+                        onClicked: {
+                            console.log("Set Path for Definition/Mapping");
+                        }
+                    }
+
+                    Button {
+                        id: optionSaveToPath
+
+                        text: qsTr("Save Def./Mapping to Path")
+
+                        onClicked: {
+                            console.log("Save Definition/Mapping to Path");
+                        }
+                    }
+
+                    Button {
+                        id: optionLogFile
+
+                        text: qsTr("Enable/Disable Log File")
+
+                        onClicked: {
+                            console.log("Enable/Disable Log File");
+                        }
+                    }
+
+                    Button {
+                        id: optionLogStream
+
+                        text: qsTr("Enable/Disable Log Stream")
+
+                        onClicked: {
+                            console.log("Enable/Disable Log Stream");
+                        }
+                    }
+                }
             }
         }
+
 
     }
 }

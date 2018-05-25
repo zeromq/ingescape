@@ -178,8 +178,8 @@ bool IngeScapeModelManager::importAgentOrAgentsListFromSelectedFile()
             // One JSON object
             if (jsonDocument.isObject())
             {
-                // Create a model of agent definition with JSON
-                DefinitionM* agentDefinition = _jsonHelper->createModelOfDefinition(byteArrayOfJson);
+                // Create a model of agent definition from the JSON
+                DefinitionM* agentDefinition = _jsonHelper->createModelOfAgentDefinition(byteArrayOfJson);
                 if (agentDefinition != NULL)
                 {
                     QString agentName = agentDefinition->name();
@@ -249,15 +249,32 @@ void IngeScapeModelManager::exportAgentsListToSelectedFile(QList<QPair<QStringLi
 }
 
 
+
 /**
- * @brief Get the JSON of a mapping
+ * @brief Get the JSON of an agent definition
+ * @param agentDefinition
+ * @return
+ */
+QString IngeScapeModelManager::getJsonOfAgentDefinition(DefinitionM* agentDefinition, QJsonDocument::JsonFormat jsonFormat)
+{
+    if (_jsonHelper != NULL) {
+        return _jsonHelper->getJsonOfAgentDefinition(agentDefinition, jsonFormat);
+    }
+    else {
+        return "";
+    }
+}
+
+
+/**
+ * @brief Get the JSON of an agent mapping
  * @param agentMapping
  * @return
  */
-QString IngeScapeModelManager::getJsonOfMapping(AgentMappingM* agentMapping)
+QString IngeScapeModelManager::getJsonOfAgentMapping(AgentMappingM* agentMapping, QJsonDocument::JsonFormat jsonFormat)
 {
     if (_jsonHelper != NULL) {
-        return _jsonHelper->getJsonOfMapping(agentMapping);
+        return _jsonHelper->getJsonOfAgentMapping(agentMapping, jsonFormat);
     }
     else {
         return "";
@@ -451,10 +468,8 @@ void IngeScapeModelManager::onDefinitionReceived(QString peerId, QString agentNa
         AgentM* agent = getAgentModelFromPeerId(peerId);
         if (agent != NULL)
         {
-            QByteArray byteArrayOfJson = definitionJSON.toUtf8();
-
-            // Create a model of agent definition with JSON
-            DefinitionM* agentDefinition = _jsonHelper->createModelOfDefinition(byteArrayOfJson);
+            // Create a model of agent definition from JSON
+            DefinitionM* agentDefinition = _jsonHelper->createModelOfAgentDefinition(definitionJSON.toUtf8());
             if (agentDefinition != NULL)
             {
                  if (agent->definition() == NULL)
@@ -634,6 +649,7 @@ void IngeScapeModelManager::onAllRecordsReceived(QString recordsJSON)
     }
 }
 
+
 /**
  * @brief Occurs when records from DB have been received
  * @param mappingJSON
@@ -653,7 +669,6 @@ void IngeScapeModelManager::onNewRecordReceived(QString recordJSON)
         }
     }
 }
-
 
 
 /**

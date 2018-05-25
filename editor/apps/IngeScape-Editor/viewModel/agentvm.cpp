@@ -14,6 +14,7 @@
  */
 
 #include "agentvm.h"
+#include <QFileDialog>
 
 
 /**
@@ -189,6 +190,81 @@ void AgentVM::changeFreeze()
     }
     else {
         Q_EMIT commandAskedToAgent(_peerIdsList, "FREEZE");
+    }
+}
+
+
+/**
+ * @brief Load a (new) definition
+ */
+void AgentVM::loadDefinition()
+{
+    // "File Dialog" to get the file path to open
+    QString definitionFilePath = QFileDialog::getOpenFileName(NULL,
+                                                              "Open definition",
+                                                              "",
+                                                              "JSON (*.json)");
+
+    if (!definitionFilePath.isEmpty()) {
+        qDebug() << "Load Definition of" << definitionFilePath;
+    }
+
+}
+
+
+/**
+ * @brief Load a (new) mapping
+ */
+void AgentVM::loadMapping()
+{
+    // "File Dialog" to get the file path to open
+    QString mappingFilePath = QFileDialog::getOpenFileName(NULL,
+                                                           "Open mapping",
+                                                           "",
+                                                           "JSON (*.json)");
+
+    if (!mappingFilePath.isEmpty()) {
+        qDebug() << "Load Mapping of" << mappingFilePath;
+    }
+}
+
+
+/**
+ * @brief Download the current definition
+ */
+void AgentVM::downloadDefinition()
+{
+    // "File Dialog" to get the file path to save
+    QString definitionFilePath = QFileDialog::getSaveFileName(NULL,
+                                                              "Save definition",
+                                                              "",
+                                                              "JSON (*.json)");
+
+    if (!definitionFilePath.isEmpty() && (_definition != NULL))
+    {
+        qDebug() << "Download Definition to" << definitionFilePath;
+
+        Q_EMIT downloadAgentDefinitionToPath(_definition, definitionFilePath);
+    }
+}
+
+
+/**
+ * @brief Download the current mapping
+ */
+void AgentVM::downloadMapping()
+{
+    // "File Dialog" to get the file path to save
+    QString mappingFilePath = QFileDialog::getSaveFileName(NULL,
+                                                           "Save mapping",
+                                                           "",
+                                                           "JSON (*.json)");
+
+    if (!mappingFilePath.isEmpty()) {
+        qDebug() << "Download Mapping to" << mappingFilePath;
+
+        // TODO _mapping
+        //Q_EMIT downloadAgentMappingToPath(_mapping, definitionFilePath);
     }
 }
 

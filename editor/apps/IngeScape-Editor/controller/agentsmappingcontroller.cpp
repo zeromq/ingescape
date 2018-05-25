@@ -458,8 +458,8 @@ void AgentsMappingController::onIsMappingActivatedChanged(bool isMappingActivate
             {
                 if ((agent != NULL) && (agent->temporaryMapping() != NULL))
                 {
-                    // Get the JSON of a mapping
-                    QString jsonOfMapping = _modelManager->getJsonOfMapping(agent->temporaryMapping());
+                    // Get the JSON of the agent mapping
+                    QString jsonOfMapping = _modelManager->getJsonOfAgentMapping(agent->temporaryMapping(), QJsonDocument::Compact);
 
                     QString command = QString("LOAD_THIS_MAPPING#%1").arg(jsonOfMapping);
 
@@ -1155,8 +1155,8 @@ void AgentsMappingController::_overWriteMappingOfAgentModel(AgentM* agentModel, 
         QStringList peerIdsList;
         peerIdsList.append(agentModel->peerId());
 
-        // Get the JSON of a mapping
-        QString jsonOfMapping = _modelManager->getJsonOfMapping(temporaryMapping);
+        // Get the JSON of the agent mapping
+        QString jsonOfMapping = _modelManager->getJsonOfAgentMapping(temporaryMapping, QJsonDocument::Compact);
 
         QString command = QString("LOAD_THIS_MAPPING#%1").arg(jsonOfMapping);
 

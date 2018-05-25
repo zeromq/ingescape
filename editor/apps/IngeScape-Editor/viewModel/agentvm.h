@@ -105,6 +105,30 @@ public:
     Q_INVOKABLE void changeFreeze();
 
 
+    /**
+     * @brief Load a (new) definition
+     */
+    Q_INVOKABLE void loadDefinition();
+
+
+    /**
+     * @brief Load a (new) mapping
+     */
+    Q_INVOKABLE void loadMapping();
+
+
+    /**
+     * @brief Download the current definition
+     */
+    Q_INVOKABLE void downloadDefinition();
+
+
+    /**
+     * @brief Download the current mapping
+     */
+    Q_INVOKABLE void downloadMapping();
+
+
 Q_SIGNALS:
 
     /**
@@ -154,6 +178,22 @@ Q_SIGNALS:
      * @param agent
      */
     void differentDefinitionDetectedOnModelOfAgent(AgentM* agent);
+
+
+    /**
+     * @brief Signal emitted when we have to download an agent definition to a path (JSON file)
+     * @param agentDefinition
+     * @param definitionFilePath
+     */
+    void downloadAgentDefinitionToPath(DefinitionM* agentDefinition, QString definitionFilePath);
+
+
+    /**
+     * @brief Signal emitted when we have to download an agent mapping to a path (JSON file)
+     * @param agentMapping
+     * @param mappingFilePath
+     */
+    void downloadAgentMappingToPath(AgentMappingM* agentMapping, QString mappingFilePath);
 
 
 private Q_SLOTS:
