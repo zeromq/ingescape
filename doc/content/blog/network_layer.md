@@ -35,7 +35,7 @@ ingeScape has been designed to support hundreds of agents possibly involving hun
 
 ### Patterns based on the ingeScape paradigm and library
 
-To organize a given environment, ingeScape proposes a simple paradigms based on data flows between inputs and outputs of agents. This paradigm was designed to be as simple and straightforward as possible. However, this simplicity still enables to cover most of the possibilities offered by software bus solutions, sometimes without their pitfalls.
+To organize a given environment, ingeScape proposes a simple paradigm based on data flows between inputs and outputs of agents. This paradigm was designed to be as simple and straightforward as possible. However, this simplicity still enables to cover most of the possibilities offered by software bus solutions, sometimes without their pitfalls.
 
 #### Publish/Subscribe
 
@@ -65,7 +65,7 @@ Agents interested in a variable just have to connect one of their inputs to the 
 Finally, when an agent adds a new map from one of its inputs to another agent's output, this output is sent specifically to the input so that it is immediately updated with the latest value, so that later joiners or restarting agents do not miss at least the last value.
 
 
-#### Enterprise Service Buse
+#### Enterprise Service Buses
 
 An [Enterprise Service Bus](https://en.wikipedia.org/wiki/Enterprise_service_bus) (ESB) enables various types of software to offer and receive services over in network. The ingeScape paradigm is globally compliant with this approach. The *definition* models in ingeScape, that can be versioned if needed, are very similar to services descriptions. An agent can both provide and receive services to or from other agents, and redundancy is possible.
 
@@ -96,5 +96,5 @@ In addition to the advanced patterns described before, the ingeScape network lay
 - Low-level protocols other than TCP/IP and including UDP, Multicast, IPC, TIPC, shared memory, etc.
 - Time management (latency, synchronicity, timeouts, etc.)
 - Multithreading and threads synchronisation (with a sane state of mind, avoiding the multiplication of mutexes and other sources of deadlocks)
-- Authentification and encryption
+- Authentication and encryption
 
