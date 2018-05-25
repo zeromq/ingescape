@@ -20,14 +20,17 @@
 
 
 /**
- * @brief Default constructor
+ * @brief Constructor
  * @param modelManager
+ * @param jsonHelper
  * @param parent
  */
 AgentsSupervisionController::AgentsSupervisionController(IngeScapeModelManager* modelManager,
+                                                         JsonHelper* jsonHelper,
                                                          QObject *parent) : QObject(parent),
     _selectedAgent(NULL),
-    _modelManager(modelManager)
+    _modelManager(modelManager),
+    _jsonHelper(jsonHelper)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -60,7 +63,9 @@ AgentsSupervisionController::~AgentsSupervisionController()
     // Delete all VM of agents
     _agentsList.deleteAllItems();
 
+    // Reset pointers
     _modelManager = NULL;
+    _jsonHelper = NULL;
 }
 
 
@@ -196,6 +201,8 @@ void AgentsSupervisionController::onAgentModelCreated(AgentM* model)
         // Connect slots to signals from this new view model of agent
         connect(agent, &AgentVM::definitionChangedWithPreviousAndNewValues, this, &AgentsSupervisionController::_onAgentDefinitionChangedWithPreviousAndNewValues);
         connect(agent, &AgentVM::differentDefinitionDetectedOnModelOfAgent, this, &AgentsSupervisionController::_onDifferentDefinitionDetectedOnModelOfAgent);
+        connect(agent, &AgentVM::loadAgentDefinitionFromPath, this, &AgentsSupervisionController::_onLoadAgentDefinitionFromPath);
+        connect(agent, &AgentVM::loadAgentMappingFromPath, this, &AgentsSupervisionController::_onLoadAgentMappingFromPath);
         connect(agent, &AgentVM::downloadAgentDefinitionToPath, this, &AgentsSupervisionController::_onDownloadAgentDefinitionToPath);
         connect(agent, &AgentVM::downloadAgentMappingToPath, this, &AgentsSupervisionController::_onDownloadAgentMappingToPath);
 
@@ -422,17 +429,60 @@ void AgentsSupervisionController::_onDifferentDefinitionDetectedOnModelOfAgent(A
 
 
 /**
- * @brief Slot called when we have to download an agent definition to a path (JSON file)
+ * @brief Slot called when we have to load an agent definition from a JSON file (path)
+ * @param peerIdsList
+ * @param definitionFilePath
+ */
+void AgentsSupervisionController::_onLoadAgentDefinitionFromPath(QStringList peerIdsList, QString definitionFilePath)
+{
+    AgentVM* agent = qobject_cast<AgentVM*>(sender());
+    if ((_jsonHelper != NULL) && (agent != NULL) && !peerIdsList.isEmpty() && !definitionFilePath.isEmpty())
+    {
+        /*QFile jsonFile(agentFilePath);
+        if (jsonFile.open(QIODevice::ReadOnly))
+        {
+            QByteArray byteArrayOfJson = jsonFile.readAll();
+            jsonFile.close();
+
+            QJsonDocument jsonDocument = QJsonDocument::fromJson(byteArrayOfJson);
+
+            // One JSON object
+            if (jsonDocument.isObject())
+            {
+                // Create a model of agent definition from the JSON
+                DefinitionM* agentDefinition = _jsonHelper->createModelOfAgentDefinition(byteArrayOfJson);
+                if (agentDefinition != NULL)
+                {*/
+    }
+}
+
+
+/**
+ * @brief Slot called when we have to load an agent mapping from a JSON file (path)
+ * @param mappingFilePath
+ */
+void AgentsSupervisionController::_onLoadAgentMappingFromPath(QStringList peerIdsList, QString mappingFilePath)
+{
+    AgentVM* agent = qobject_cast<AgentVM*>(sender());
+    if ((_jsonHelper != NULL) && (agent != NULL) && !peerIdsList.isEmpty() && !mappingFilePath.isEmpty())
+    {
+
+    }
+}
+
+
+/**
+ * @brief Slot called when we have to download an agent definition to a JSON file (path)
  * @param agentDefinition
  * @param definitionFilePath
  */
 void AgentsSupervisionController::_onDownloadAgentDefinitionToPath(DefinitionM* agentDefinition, QString definitionFilePath)
 {
     AgentVM* agent = qobject_cast<AgentVM*>(sender());
-    if ((_modelManager != NULL) && (agent != NULL) && (agentDefinition != NULL) && !definitionFilePath.isEmpty())
+    if ((_jsonHelper != NULL) && (agent != NULL) && (agentDefinition != NULL) && !definitionFilePath.isEmpty())
     {
         // Get the JSON of the agent definition
-        QString jsonOfDefinition = _modelManager->getJsonOfAgentDefinition(agentDefinition, QJsonDocument::Indented);
+        QString jsonOfDefinition = _jsonHelper->getJsonOfAgentDefinition(agentDefinition, QJsonDocument::Indented);
         if (!jsonOfDefinition.isEmpty())
         {
             QFile jsonFile(definitionFilePath);
@@ -454,17 +504,17 @@ void AgentsSupervisionController::_onDownloadAgentDefinitionToPath(DefinitionM* 
 
 
 /**
- * @brief Slot called when we have to download an agent mapping to a path (JSON file)
+ * @brief Slot called when we have to download an agent mapping to a JSON file (path)
  * @param agentMapping
  * @param mappingFilePath
  */
 void AgentsSupervisionController::_onDownloadAgentMappingToPath(AgentMappingM* agentMapping, QString mappingFilePath)
 {
     AgentVM* agent = qobject_cast<AgentVM*>(sender());
-    if ((_modelManager != NULL) && (agent != NULL) && (agentMapping != NULL) && !mappingFilePath.isEmpty())
+    if ((_jsonHelper != NULL) && (agent != NULL) && (agentMapping != NULL) && !mappingFilePath.isEmpty())
     {
         // Get the JSON of the agent mapping
-        QString jsonOfMapping = _modelManager->getJsonOfAgentMapping(agentMapping, QJsonDocument::Indented);
+        QString jsonOfMapping = _jsonHelper->getJsonOfAgentMapping(agentMapping, QJsonDocument::Indented);
         if (!jsonOfMapping.isEmpty())
         {
             QFile jsonFile(mappingFilePath);

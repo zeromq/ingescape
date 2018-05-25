@@ -233,12 +233,12 @@ private:
     // To subscribe to termination signals
     TerminationSignalWatcher *_terminationSignalWatcher;
 
+    // Helper to manage JSON files
+    JsonHelper* _jsonHelper;
+
     // Path to the directory containing JSON files to save platform
     QString _platformDirectoryPath;
     QString _platformDefaultFilePath;
-
-    // Helper to manage JSON the saving/opening platform files
-    JsonHelper* _jsonHelper;
 
 };
 

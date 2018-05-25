@@ -40,11 +40,14 @@ class AgentsSupervisionController : public QObject
 
 public:
     /**
-     * @brief Default constructor
+     * @brief Constructor
      * @param modelManager
+     * @param jsonHelper
      * @param parent
      */
-    explicit AgentsSupervisionController(IngeScapeModelManager* modelManager, QObject *parent = nullptr);
+    explicit AgentsSupervisionController(IngeScapeModelManager* modelManager,
+                                         JsonHelper* jsonHelper,
+                                         QObject *parent = nullptr);
 
 
     /**
@@ -129,6 +132,21 @@ Q_SIGNALS:
     void identicalAgentModelReplaced(AgentM* previousModel, AgentM* newModel);
 
 
+    /**
+     * @brief Signal emitted when we have to load an agent definition from a JSON file (path)
+     * @param peerIdsList
+     * @param definitionFilePath
+     */
+    void loadAgentDefinitionFromPath(QStringList peerIdsList, QString definitionFilePath);
+
+
+    /**
+     * @brief Signal emitted when we have to load an agent mapping from a JSON file (path)
+     * @param mappingFilePath
+     */
+    void loadAgentMappingFromPath(QStringList peerIdsList, QString mappingFilePath);
+
+
 public Q_SLOTS:
 
     /**
@@ -157,7 +175,22 @@ private Q_SLOTS:
 
 
     /**
-     * @brief Slot called when we have to download an agent definition to a path (JSON file)
+     * @brief Slot called when we have to load an agent definition from a JSON file (path)
+     * @param peerIdsList
+     * @param definitionFilePath
+     */
+    void _onLoadAgentDefinitionFromPath(QStringList peerIdsList, QString definitionFilePath);
+
+
+    /**
+     * @brief Slot called when we have to load an agent mapping from a JSON file (path)
+     * @param mappingFilePath
+     */
+    void _onLoadAgentMappingFromPath(QStringList peerIdsList, QString mappingFilePath);
+
+
+    /**
+     * @brief Slot called when we have to download an agent definition to a JSON file (path)
      * @param agentDefinition
      * @param definitionFilePath
      */
@@ -165,7 +198,7 @@ private Q_SLOTS:
 
 
     /**
-     * @brief Slot called when we have to download an agent mapping to a path (JSON file)
+     * @brief Slot called when we have to download an agent mapping to a JSON file (path)
      * @param agentMapping
      * @param mappingFilePath
      */
@@ -198,6 +231,9 @@ private:
 private:
     // Manager for the data model of INGESCAPE
     IngeScapeModelManager* _modelManager;
+
+    // Helper to manage JSON files
+    JsonHelper* _jsonHelper;
 
     // Map from agent name to a list of view models of agent
     QHash<QString, QList<AgentVM*>> _mapFromNameToAgentViewModelsList;

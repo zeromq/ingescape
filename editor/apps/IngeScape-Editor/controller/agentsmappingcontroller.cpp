@@ -27,28 +27,23 @@
  * @param parent
  */
 AgentsMappingController::AgentsMappingController(IngeScapeModelManager* modelManager,
+                                                 JsonHelper* jsonHelper,
                                                  QString mappingsPath,
-                                                 QObject *parent)
-    : QObject(parent),
+                                                 QObject *parent) : QObject(parent),
       _viewWidth(1920 - 320), // Full HD - Width of left panel
       _viewHeight(1080 - 100), // Full HD - Height of top & bottom bars of OS
       _isEmptyMapping(true),
       _selectedAgent(NULL),
       _selectedLink(NULL),
       _modelManager(modelManager),
+      _jsonHelper(jsonHelper),
       _mappingsDirectoryPath(mappingsPath)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    if (_modelManager != NULL)
-    {   
-        // Connect to signal "Count Changed" from the list of agents in mapping
-        connect(&_allAgentsInMapping, &AbstractI2CustomItemListModel::countChanged, this, &AgentsMappingController::_onAgentsInMappingChanged);
-    }
-
-    // Create the helper to manage JSON definitions of agents
-    _jsonHelper = new JsonHelper(this);
+    // Connect to signal "Count Changed" from the list of agents in mapping
+    connect(&_allAgentsInMapping, &AbstractI2CustomItemListModel::countChanged, this, &AgentsMappingController::_onAgentsInMappingChanged);
 }
 
 
@@ -72,14 +67,9 @@ AgentsMappingController::~AgentsMappingController()
     _previousListOfAgentsInMapping.clear();
     _allAgentsInMapping.deleteAllItems();
 
+    // Reset pointers
     _modelManager = NULL;
-
-    // Delete json helper
-    if(_jsonHelper != NULL)
-    {
-        delete _jsonHelper;
-        _jsonHelper = NULL;
-    }
+    _jsonHelper = NULL;
 }
 
 
@@ -356,56 +346,59 @@ AgentInMappingVM* AgentsMappingController::getAgentInMappingFromName(QString nam
  */
 void AgentsMappingController::importMappingFromJson(QByteArray byteArrayOfJson, bool fromPlatform)
 {
-    // Clear the previous mapping
-    createNewMapping();
-
-    // Initialize mapping lists from JSON file
-    QList< mapping_agent_import_t* > listMappingImported = _jsonHelper->importMapping(byteArrayOfJson, fromPlatform);
-    if(listMappingImported.count() > 0)
+    if (_jsonHelper != NULL)
     {
-        QList<ElementMappingM*> mappingElements;
-        foreach (mapping_agent_import_t* importedMapping, listMappingImported)
+        // Clear the previous mapping
+        createNewMapping();
+
+        // Initialize mapping lists from JSON file
+        QList< mapping_agent_import_t* > listMappingImported = _jsonHelper->importMapping(byteArrayOfJson, fromPlatform);
+        if(listMappingImported.count() > 0)
         {
-            DefinitionM* definition = importedMapping->definition;
-            AgentMappingM* agentMapping = importedMapping->mapping;
-
-            QList<AgentM*> agentModelList = _modelManager->getAgentModelsListFromName(importedMapping->name);
-            if(agentModelList.count() == 0)
+            QList<ElementMappingM*> mappingElements;
+            foreach (mapping_agent_import_t* importedMapping, listMappingImported)
             {
-                AgentM * newAgent = new AgentM(importedMapping->name);
-                newAgent->setdefinition(definition);
+                DefinitionM* definition = importedMapping->definition;
+                AgentMappingM* agentMapping = importedMapping->mapping;
 
-                agentModelList.append(newAgent);
-                Q_EMIT agentCreatedByMapping(newAgent);
-            }
-
-            if(agentModelList.count() > 0)
-            {
-                // Create a new Agent In Mapping
-                _addAgentModelsToMappingAtPosition(importedMapping->name, agentModelList, importedMapping->position);
-
-                AgentInMappingVM* agentInMapping = getAgentInMappingFromName(importedMapping->name);
-                if(agentInMapping != NULL)
+                QList<AgentM*> agentModelList = _modelManager->getAgentModelsListFromName(importedMapping->name);
+                if(agentModelList.count() == 0)
                 {
-                    // Add the link elements
-                    mappingElements.append(agentMapping->mappingElements()->toList());
+                    AgentM * newAgent = new AgentM(importedMapping->name);
+                    newAgent->setdefinition(definition);
 
-                    // Set agent mapping
-                    if(agentMapping != NULL)
+                    agentModelList.append(newAgent);
+                    Q_EMIT agentCreatedByMapping(newAgent);
+                }
+
+                if(agentModelList.count() > 0)
+                {
+                    // Create a new Agent In Mapping
+                    _addAgentModelsToMappingAtPosition(importedMapping->name, agentModelList, importedMapping->position);
+
+                    AgentInMappingVM* agentInMapping = getAgentInMappingFromName(importedMapping->name);
+                    if(agentInMapping != NULL)
                     {
-                        agentInMapping->settemporaryMapping(agentMapping);
+                        // Add the link elements
+                        mappingElements.append(agentMapping->mappingElements()->toList());
+
+                        // Set agent mapping
+                        if(agentMapping != NULL)
+                        {
+                            agentInMapping->settemporaryMapping(agentMapping);
+                        }
                     }
                 }
             }
-        }
 
-        // Add links
-        if (mappingElements.count() > 0)
-        {
-            // Create all mapping links
-            foreach (ElementMappingM* elementMapping, mappingElements)
+            // Add links
+            if (mappingElements.count() > 0)
             {
-                onMapped(elementMapping);
+                // Create all mapping links
+                foreach (ElementMappingM* elementMapping, mappingElements)
+                {
+                    onMapped(elementMapping);
+                }
             }
         }
     }
@@ -446,7 +439,7 @@ void AgentsMappingController::onIdenticalAgentModelReplaced(AgentM* previousMode
  */
 void AgentsMappingController::onIsMappingActivatedChanged(bool isMappingActivated)
 {
-    if ((_modelManager != NULL) && isMappingActivated)
+    if ((_modelManager != NULL) && (_jsonHelper != NULL) && isMappingActivated)
     {
         // CONTROL
         if (_modelManager->isMappingControlled())
@@ -459,7 +452,7 @@ void AgentsMappingController::onIsMappingActivatedChanged(bool isMappingActivate
                 if ((agent != NULL) && (agent->temporaryMapping() != NULL))
                 {
                     // Get the JSON of the agent mapping
-                    QString jsonOfMapping = _modelManager->getJsonOfAgentMapping(agent->temporaryMapping(), QJsonDocument::Compact);
+                    QString jsonOfMapping = _jsonHelper->getJsonOfAgentMapping(agent->temporaryMapping(), QJsonDocument::Compact);
 
                     QString command = QString("LOAD_THIS_MAPPING#%1").arg(jsonOfMapping);
 
@@ -1149,14 +1142,14 @@ void AgentsMappingController::_removeAllLinksWithAgent(AgentInMappingVM* agent)
 void AgentsMappingController::_overWriteMappingOfAgentModel(AgentM* agentModel, AgentMappingM* temporaryMapping)
 {
     // Model is ON
-    if ((agentModel != NULL) && agentModel->isON() && (temporaryMapping != NULL)
+    if ((agentModel != NULL) && agentModel->isON() && (temporaryMapping != NULL) && (_jsonHelper != NULL)
             && (_modelManager != NULL) && _modelManager->isMappingActivated()  && _modelManager->isMappingControlled())
     {
         QStringList peerIdsList;
         peerIdsList.append(agentModel->peerId());
 
         // Get the JSON of the agent mapping
-        QString jsonOfMapping = _modelManager->getJsonOfAgentMapping(temporaryMapping, QJsonDocument::Compact);
+        QString jsonOfMapping = _jsonHelper->getJsonOfAgentMapping(temporaryMapping, QJsonDocument::Compact);
 
         QString command = QString("LOAD_THIS_MAPPING#%1").arg(jsonOfMapping);
 
