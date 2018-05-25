@@ -438,7 +438,7 @@ void AgentsSupervisionController::_onLoadAgentDefinitionFromPath(QStringList pee
     AgentVM* agent = qobject_cast<AgentVM*>(sender());
     if ((_jsonHelper != NULL) && (agent != NULL) && !peerIdsList.isEmpty() && !definitionFilePath.isEmpty())
     {
-        /*QFile jsonFile(agentFilePath);
+        QFile jsonFile(definitionFilePath);
         if (jsonFile.open(QIODevice::ReadOnly))
         {
             QByteArray byteArrayOfJson = jsonFile.readAll();
@@ -446,13 +446,17 @@ void AgentsSupervisionController::_onLoadAgentDefinitionFromPath(QStringList pee
 
             QJsonDocument jsonDocument = QJsonDocument::fromJson(byteArrayOfJson);
 
-            // One JSON object
-            if (jsonDocument.isObject())
-            {
-                // Create a model of agent definition from the JSON
-                DefinitionM* agentDefinition = _jsonHelper->createModelOfAgentDefinition(byteArrayOfJson);
-                if (agentDefinition != NULL)
-                {*/
+            // Compact JSON
+            QString jsonOfDefinition = QString(jsonDocument.toJson(QJsonDocument::Compact));
+
+            // Create the command "Load Definition"
+            QString command = QString("%1%2").arg(prefix_LoadDefinition, jsonOfDefinition);
+
+            Q_EMIT commandAskedToAgent(peerIdsList, command);
+        }
+        else {
+            qCritical() << "Can not open file" << definitionFilePath << "(to load the definition of" << agent->name() << ")";
+        }
     }
 }
 
@@ -466,7 +470,25 @@ void AgentsSupervisionController::_onLoadAgentMappingFromPath(QStringList peerId
     AgentVM* agent = qobject_cast<AgentVM*>(sender());
     if ((_jsonHelper != NULL) && (agent != NULL) && !peerIdsList.isEmpty() && !mappingFilePath.isEmpty())
     {
+        QFile jsonFile(mappingFilePath);
+        if (jsonFile.open(QIODevice::ReadOnly))
+        {
+            QByteArray byteArrayOfJson = jsonFile.readAll();
+            jsonFile.close();
 
+            QJsonDocument jsonDocument = QJsonDocument::fromJson(byteArrayOfJson);
+
+            // Compact JSON
+            QString jsonOfMapping = QString(jsonDocument.toJson(QJsonDocument::Compact));
+
+            // Create the command "Load Mapping"
+            QString command = QString("%1%2").arg(prefix_LoadMapping, jsonOfMapping);
+
+            Q_EMIT commandAskedToAgent(peerIdsList, command);
+        }
+        else {
+            qCritical() << "Can not open file" << mappingFilePath << "(to load the mapping of" << agent->name() << ")";
+        }
     }
 }
 
