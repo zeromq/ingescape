@@ -580,8 +580,8 @@ void AgentsMappingController::onActiveAgentDefined(AgentM* agent)
             // The agent is not yet in the mapping...
             if (agentInMapping == NULL)
             {
-                // Send the command "CLEAR_MAPPING" on the network to this agent
-                Q_EMIT commandAskedToAgent(peerIdsList, "CLEAR_MAPPING");
+                // Send the command "Clear Mapping" on the network to this agent
+                Q_EMIT commandAskedToAgent(peerIdsList, command_ClearMapping);
             }
             // The agent is already in the mapping
             else

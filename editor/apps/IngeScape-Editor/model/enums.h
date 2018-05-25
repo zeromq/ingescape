@@ -48,6 +48,7 @@ static const QString SEPARATOR_IOP_NAME_AND_IOP_VALUE_TYPE = QString("::");
 
 static const QString prefix_LoadDefinition = "LOAD_THIS_DEFINITION#";
 static const QString prefix_LoadMapping = "LOAD_THIS_MAPPING#";
+static const QString command_ClearMapping = "CLEAR_MAPPING";
 
 
 /**
