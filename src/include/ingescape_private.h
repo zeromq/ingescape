@@ -189,13 +189,13 @@ typedef struct serviceHeader {
 //////////////////  FUNCTIONS  //////////////////
 
 //  definition
-
+extern char definitionPath[MAX_PATH];
 extern definition* igs_internal_definition;
 void definition_freeDefinition (definition* definition);
 
 
 //  mapping
-
+extern char mappingPath[MAX_PATH];
 extern mapping_t *igs_internal_mapping;
 
 void mapping_freeMapping (mapping_t* map);
@@ -236,6 +236,8 @@ mapping_t* parser_LoadMapFromPath (const char* load_file);
 
 // admin
 extern bool admin_logInStream;
+extern bool admin_logInFile;
+extern char admin_logFile[1024];
 
 //bus
 extern serviceHeader_t *serviceHeaders;
