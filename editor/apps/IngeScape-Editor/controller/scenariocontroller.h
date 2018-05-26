@@ -114,10 +114,12 @@ public:
     /**
      * @brief Constructor
      * @param modelManager
-     * @param scenariosPath Path of files with scenarios
+     * @param jsonHelper
+     * @param scenariosPath
      * @param parent
      */
     explicit ScenarioController(IngeScapeModelManager* modelManager,
+                                JsonHelper* jsonHelper,
                                 QString scenariosPath,
                                 QObject *parent = 0);
 
@@ -126,6 +128,7 @@ public:
       * @brief Destructor
       */
     ~ScenarioController();
+
 
     /**
     * @brief Get our filtered list of "time ticks"
@@ -423,11 +426,11 @@ protected:
     // Manager for the data model of INGESCAPE
     IngeScapeModelManager* _modelManager;
 
+    // Helper to manage JSON files
+    JsonHelper* _jsonHelper;
+
     // Path to the directory containing JSON files to save scenarios
     QString _scenariosDirectoryPath;
-
-    // Helper to manage JSON definitions of agents
-    JsonHelper* _jsonHelper;
 
     // Map of actions editors controllers from the actions model
     QHash<ActionM*, ActionEditorController*> _mapActionsEditorControllersFromActionM;

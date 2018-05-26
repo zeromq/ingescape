@@ -206,7 +206,7 @@ void AgentVM::loadDefinition()
                                                               "JSON (*.json)");
 
     if (!definitionFilePath.isEmpty()) {
-        qDebug() << "Load Definition of" << definitionFilePath;
+        Q_EMIT loadAgentDefinitionFromPath(_peerIdsList, definitionFilePath);
     }
 
 }
@@ -224,7 +224,7 @@ void AgentVM::loadMapping()
                                                            "JSON (*.json)");
 
     if (!mappingFilePath.isEmpty()) {
-        qDebug() << "Load Mapping of" << mappingFilePath;
+        Q_EMIT loadAgentMappingFromPath(_peerIdsList, mappingFilePath);
     }
 }
 

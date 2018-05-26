@@ -45,8 +45,9 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _timeLineC(NULL),
     _launcherManager(NULL),
     _terminationSignalWatcher(NULL),
+    _jsonHelper(NULL),
     _platformDirectoryPath(""),
-    _jsonHelper(NULL)
+    _platformDefaultFilePath("")
 {
     qInfo() << "New IngeScape Editor Controller";
 
@@ -119,7 +120,8 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     QDate today = QDate::currentDate();
     _platformDefaultFilePath = QString("%1platform_%2.json").arg(_platformDirectoryPath, today.toString("ddMMyy"));
 
-    // Create the helper to manage JSON definitions of agents
+
+    // Create the helper to manage JSON files
     _jsonHelper = new JsonHelper(this);
 
     //
@@ -127,13 +129,13 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     //
 
     // Create the manager for the data model of INGESCAPE
-    _modelManager = new IngeScapeModelManager(agentsListPath, agentsMappingsPath, dataPath, this);
+    _modelManager = new IngeScapeModelManager(_jsonHelper, agentsListPath, agentsMappingsPath, dataPath, this);
 
     // Create the controller for network communications
     _networkC = new NetworkController(this);
 
     // Create the controller for agents supervision
-    _agentsSupervisionC = new AgentsSupervisionController(_modelManager, this);
+    _agentsSupervisionC = new AgentsSupervisionController(_modelManager, _jsonHelper, this);
 
     // Create the controller for hosts supervision
     _hostsSupervisionC = new HostsSupervisionController(_launcherManager, this);
@@ -142,10 +144,10 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _recordsSupervisionC = new RecordsSupervisionController(_modelManager, this);
 
     // Create the controller for agents mapping
-    _agentsMappingC = new AgentsMappingController(_modelManager, agentsMappingsPath, this);
+    _agentsMappingC = new AgentsMappingController(_modelManager, _jsonHelper, agentsMappingsPath, this);
 
     // Create the controller for scenario management
-    _scenarioC = new ScenarioController(_modelManager, scenariosPath, this);
+    _scenarioC = new ScenarioController(_modelManager, _jsonHelper, scenariosPath, this);
 
     // Create the controller for the history of values
     _valuesHistoryC = new ValuesHistoryController(_modelManager, this);
@@ -369,7 +371,7 @@ IngeScapeEditorController::~IngeScapeEditorController()
     }
 
     // Delete json helper
-    if(_jsonHelper != NULL)
+    if (_jsonHelper != NULL)
     {
         delete _jsonHelper;
         _jsonHelper = NULL;
@@ -465,7 +467,7 @@ void IngeScapeEditorController::openPlatformFromFile()
  */
 void IngeScapeEditorController::_openPlatformFromFile(QString platformFilePath)
 {
-    if (!platformFilePath.isEmpty() && (_jsonHelper != NULL))
+    if (!platformFilePath.isEmpty())
     {
         qInfo() << "Open the platform from JSON file" << platformFilePath;
 
@@ -552,7 +554,7 @@ void IngeScapeEditorController::_savePlatformToFile(QString platformFilePath)
         // Save the scenario
         if(_scenarioC != NULL)
         {
-            platformJsonObject = _jsonHelper->exportScenario(_scenarioC->actionsList()->toList(),_scenarioC->actionsInPaletteList()->toList(),_scenarioC->actionsInTimeLine()->toList());
+            platformJsonObject = _jsonHelper->exportScenario(_scenarioC->actionsList()->toList(), _scenarioC->actionsInPaletteList()->toList(), _scenarioC->actionsInTimeLine()->toList());
         }
 
         // Save mapping

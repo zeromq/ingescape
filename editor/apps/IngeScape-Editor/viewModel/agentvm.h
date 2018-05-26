@@ -181,7 +181,22 @@ Q_SIGNALS:
 
 
     /**
-     * @brief Signal emitted when we have to download an agent definition to a path (JSON file)
+     * @brief Signal emitted when we have to load an agent definition from a JSON file (path)
+     * @param peerIdsList
+     * @param definitionFilePath
+     */
+    void loadAgentDefinitionFromPath(QStringList peerIdsList, QString definitionFilePath);
+
+
+    /**
+     * @brief Signal emitted when we have to load an agent mapping from a JSON file (path)
+     * @param mappingFilePath
+     */
+    void loadAgentMappingFromPath(QStringList peerIdsList, QString mappingFilePath);
+
+
+    /**
+     * @brief Signal emitted when we have to download an agent definition to a JSON file (path)
      * @param agentDefinition
      * @param definitionFilePath
      */
@@ -189,7 +204,7 @@ Q_SIGNALS:
 
 
     /**
-     * @brief Signal emitted when we have to download an agent mapping to a path (JSON file)
+     * @brief Signal emitted when we have to download an agent mapping to a JSON file (path)
      * @param agentMapping
      * @param mappingFilePath
      */

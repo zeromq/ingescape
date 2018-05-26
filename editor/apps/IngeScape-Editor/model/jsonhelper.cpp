@@ -288,7 +288,7 @@ QString JsonHelper::getJsonOfAgentDefinition(DefinitionM* agentDefinition, QJson
         jsonObject.insert("definition", jsonDefinition);
 
         QJsonDocument jsonDocument(jsonObject);
-        jsonOfDefinition = jsonDocument.toJson(jsonFormat);
+        jsonOfDefinition = QString(jsonDocument.toJson(jsonFormat));
     }
 
     return jsonOfDefinition;
@@ -312,7 +312,7 @@ QString JsonHelper::getJsonOfAgentMapping(AgentMappingM* agentMapping, QJsonDocu
         jsonObject.insert("mapping", jsonMapping);
 
         QJsonDocument jsonDocument(jsonObject);
-        jsonOfMapping = jsonDocument.toJson(jsonFormat);
+        jsonOfMapping = QString(jsonDocument.toJson(jsonFormat));
     }
 
     return jsonOfMapping;

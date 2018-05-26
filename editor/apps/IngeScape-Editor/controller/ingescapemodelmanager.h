@@ -47,16 +47,18 @@ class IngeScapeModelManager : public QObject
 
 public:
     /**
-     * @brief Default constructor
+     * @brief Constructor
+     * @param jsonHelper
      * @param agentsListDirectoryPath
      * @param agentsMappingsDirectoryPath
      * @param dataDirectoryPath
      * @param parent
      */
-    explicit IngeScapeModelManager(QString agentsListDirectoryPath,
-                                QString agentsMappingsDirectoryPath,
-                                QString dataDirectoryPath,
-                                QObject *parent = nullptr);
+    explicit IngeScapeModelManager(JsonHelper* jsonHelper,
+                                   QString agentsListDirectoryPath,
+                                   QString agentsMappingsDirectoryPath,
+                                   QString dataDirectoryPath,
+                                   QObject *parent = nullptr);
 
 
     /**
@@ -185,24 +187,6 @@ public:
      * @param agentsListToExport list of pairs <agent name (and parameters to restart), definition>
      */
     void exportAgentsListToSelectedFile(QList<QPair<QStringList, DefinitionM*>> agentsListToExport);
-
-
-    /**
-     * @brief Get the JSON of an agent definition
-     * @param agentDefinition
-     * @param jsonFormat
-     * @return
-     */
-    QString getJsonOfAgentDefinition(DefinitionM* agentDefinition, QJsonDocument::JsonFormat jsonFormat);
-
-
-    /**
-     * @brief Get the JSON of an agent mapping
-     * @param agentMapping
-     * @param jsonFormat
-     * @return
-     */
-    QString getJsonOfAgentMapping(AgentMappingM* agentMapping, QJsonDocument::JsonFormat jsonFormat);
 
 
     /**
@@ -443,6 +427,9 @@ private:
 
 private:
 
+    // Helper to manage JSON files
+    JsonHelper* _jsonHelper;
+
     // Path to the directory containing JSON files to save agents list
     QString _agentsListDirectoryPath;
     QString _agentsListDefaultFilePath;
@@ -453,9 +440,6 @@ private:
 
     // Path to the directory containing data files
     QString _dataDirectoryPath;
-
-    // Helper to manage JSON definitions of agents
-    JsonHelper* _jsonHelper;
 
     // Map from "peer id" to a model of agent
     QHash<QString, AgentM*> _mapFromPeerIdToAgentM;

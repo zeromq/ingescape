@@ -25,22 +25,24 @@
 
 
 /**
- * @brief Default constructor
+ * @brief Constructor
+ * @param jsonHelper
  * @param agentsListDirectoryPath
  * @param agentsMappingsDirectoryPath
  * @param dataDirectoryPath
  * @param parent
  */
-IngeScapeModelManager::IngeScapeModelManager(QString agentsListDirectoryPath,
-                                       QString agentsMappingsDirectoryPath,
-                                       QString dataDirectoryPath,
-                                       QObject *parent) : QObject(parent),
+IngeScapeModelManager::IngeScapeModelManager(JsonHelper* jsonHelper,
+                                             QString agentsListDirectoryPath,
+                                             QString agentsMappingsDirectoryPath,
+                                             QString dataDirectoryPath,
+                                             QObject *parent) : QObject(parent),
     _isMappingActivated(false),
     _isMappingControlled(false),
+    _jsonHelper(jsonHelper),
     _agentsListDirectoryPath(agentsListDirectoryPath),
     _agentsMappingsDirectoryPath(agentsMappingsDirectoryPath),
-    _dataDirectoryPath(dataDirectoryPath),
-    _jsonHelper(NULL)
+    _dataDirectoryPath(dataDirectoryPath)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -52,8 +54,6 @@ IngeScapeModelManager::IngeScapeModelManager(QString agentsListDirectoryPath,
     _agentsListDefaultFilePath = QString("%1agents_list_%2.json").arg(_agentsListDirectoryPath, today.toString("yyyyMMdd"));
     _agentsMappingsDefaultFilePath = QString("%1agents_mappings_%2.json").arg(_agentsMappingsDirectoryPath, today.toString("yyyyMMdd"));
 
-    // Create the helper to manage JSON definitions of agents
-    _jsonHelper = new JsonHelper(this);
 }
 
 
@@ -70,12 +70,8 @@ IngeScapeModelManager::~IngeScapeModelManager()
     // Free memory
     _publishedValues.deleteAllItems();
 
-    // Delete json helper
-    if(_jsonHelper != NULL)
-    {
-        delete _jsonHelper;
-        _jsonHelper = NULL;
-    }
+    // Reset pointers
+    _jsonHelper = NULL;
 }
 
 
@@ -165,7 +161,7 @@ bool IngeScapeModelManager::importAgentOrAgentsListFromSelectedFile()
                                                          _dataDirectoryPath,
                                                          "JSON (*.json)");
 
-    if (!agentFilePath.isEmpty())
+    if (!agentFilePath.isEmpty() && (_jsonHelper != NULL))
     {
         QFile jsonFile(agentFilePath);
         if (jsonFile.open(QIODevice::ReadOnly))
@@ -245,39 +241,6 @@ void IngeScapeModelManager::exportAgentsListToSelectedFile(QList<QPair<QStringLi
     if(!agentsListFilePath.isEmpty()) {
         // Export the agents list to JSON file
         _exportAgentsListToFile(agentsListToExport, agentsListFilePath);
-    }
-}
-
-
-
-/**
- * @brief Get the JSON of an agent definition
- * @param agentDefinition
- * @return
- */
-QString IngeScapeModelManager::getJsonOfAgentDefinition(DefinitionM* agentDefinition, QJsonDocument::JsonFormat jsonFormat)
-{
-    if (_jsonHelper != NULL) {
-        return _jsonHelper->getJsonOfAgentDefinition(agentDefinition, jsonFormat);
-    }
-    else {
-        return "";
-    }
-}
-
-
-/**
- * @brief Get the JSON of an agent mapping
- * @param agentMapping
- * @return
- */
-QString IngeScapeModelManager::getJsonOfAgentMapping(AgentMappingM* agentMapping, QJsonDocument::JsonFormat jsonFormat)
-{
-    if (_jsonHelper != NULL) {
-        return _jsonHelper->getJsonOfAgentMapping(agentMapping, jsonFormat);
-    }
-    else {
-        return "";
     }
 }
 
@@ -463,7 +426,7 @@ void IngeScapeModelManager::onLauncherExited(QString peerId, QString hostname)
  */
 void IngeScapeModelManager::onDefinitionReceived(QString peerId, QString agentName, QString definitionJSON)
 {
-    if (!definitionJSON.isEmpty())
+    if (!definitionJSON.isEmpty() && (_jsonHelper != NULL))
     {
         AgentM* agent = getAgentModelFromPeerId(peerId);
         if (agent != NULL)
@@ -548,7 +511,7 @@ void IngeScapeModelManager::onDefinitionReceived(QString peerId, QString agentNa
 void IngeScapeModelManager::onMappingReceived(QString peerId, QString agentName, QString mappingJSON)
 {
     AgentM* agent = getAgentModelFromPeerId(peerId);
-    if (agent != NULL)
+    if ((agent != NULL) && (_jsonHelper != NULL))
     {
         AgentMappingM* agentMapping = NULL;
 
@@ -640,7 +603,7 @@ void IngeScapeModelManager::onMappingReceived(QString peerId, QString agentName,
  */
 void IngeScapeModelManager::onAllRecordsReceived(QString recordsJSON)
 {
-    if (!recordsJSON.isEmpty())
+    if (!recordsJSON.isEmpty() && (_jsonHelper != NULL))
     {
         QByteArray byteArrayOfJson = recordsJSON.toUtf8();
         _recordsList = _jsonHelper->createRecordModelList(byteArrayOfJson);
@@ -656,7 +619,7 @@ void IngeScapeModelManager::onAllRecordsReceived(QString recordsJSON)
  */
 void IngeScapeModelManager::onNewRecordReceived(QString recordJSON)
 {
-    if (!recordJSON.isEmpty())
+    if (!recordJSON.isEmpty() && (_jsonHelper != NULL))
     {
         QByteArray byteArrayOfJson = recordJSON.toUtf8();
         QList<RecordM*> tmpRecords = _jsonHelper->createRecordModelList(byteArrayOfJson);
