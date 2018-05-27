@@ -269,12 +269,14 @@ igs_logLevel_t igs_getLogLevel (void) {
 }
 
 void igs_setLogInFile (bool allow){
-    admin_logInFile = allow;
-    if (agentElements != NULL && agentElements->node != NULL){
-        if (allow){
-            zyre_shouts(agentElements->node, CHANNEL, "LOG_IN_FILE=1");
-        }else{
-            zyre_shouts(agentElements->node, CHANNEL, "LOG_IN_FILE=0");
+    if (allow != admin_logInFile){
+        admin_logInFile = allow;
+        if (agentElements != NULL && agentElements->node != NULL){
+            if (allow){
+                zyre_shouts(agentElements->node, CHANNEL, "LOG_IN_FILE=1");
+            }else{
+                zyre_shouts(agentElements->node, CHANNEL, "LOG_IN_FILE=0");
+            }
         }
     }
 }
@@ -300,20 +302,22 @@ bool igs_getUseColorVerbose (void) {
 }
 
 void igs_setLogStream(bool stream){
-    if (agentElements != NULL){
-        if (stream){
-            igs_warn("agent is already started, log stream cannot be created anymore");
-        }else{
-            igs_warn("agent is already started, log stream cannot be disabled anymore");
+    if (stream != admin_logInStream){
+        if (agentElements != NULL){
+            if (stream){
+                igs_warn("agent is already started, log stream cannot be created anymore");
+            }else{
+                igs_warn("agent is already started, log stream cannot be disabled anymore");
+            }
+            return;
         }
-        return;
-    }
-    admin_logInStream = stream;
-    if (agentElements != NULL && agentElements->node != NULL){
-        if (stream){
-            zyre_shouts(agentElements->node, CHANNEL, "LOG_IN_STREAM=1");
-        }else{
-            zyre_shouts(agentElements->node, CHANNEL, "LOG_IN_STREAM=0");
+        admin_logInStream = stream;
+        if (agentElements != NULL && agentElements->node != NULL){
+            if (stream){
+                zyre_shouts(agentElements->node, CHANNEL, "LOG_IN_STREAM=1");
+            }else{
+                zyre_shouts(agentElements->node, CHANNEL, "LOG_IN_STREAM=0");
+            }
         }
     }
 }
@@ -324,6 +328,10 @@ bool igs_getLogStream (void) {
 
 void igs_setLogPath(const char *path){
     if ((path != NULL) && (strlen(path) > 0)){
+        if (strncmp(admin_logFile, path, strlen(admin_logFile)) == 0){
+            igs_warn("'%s' is already the log path", admin_logFile);
+            return;
+        }
         bool needToResetFile = false;
         if (fp != NULL){
             //we need to close previous and initiate new one
@@ -340,7 +348,7 @@ void igs_setLogPath(const char *path){
             }
             fp = fopen (admin_logFile,"a");
             if (fp == NULL){
-                igs_error("error when trying to initiate log file at path %s", admin_logFile);
+                igs_error("could initiate log file at path %s", admin_logFile);
             }else{
                 igs_info("switching to new log file: %s", admin_logFile);
             }
