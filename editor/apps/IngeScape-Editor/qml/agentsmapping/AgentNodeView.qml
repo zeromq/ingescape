@@ -269,7 +269,7 @@ Rectangle {
 
                             //color: (rootItem.agentMappingVM && rootItem.agentMappingVM.isON) ? IngeScapeTheme.agentsONInputsOutputsMappingColor : IngeScapeTheme.agentsOFFInputsOutputsMappingColor
                             color: (myModel && myModel.isDefinedInAllDefinitions) ? (rootItem.agentMappingVM && rootItem.agentMappingVM.isON ? IngeScapeTheme.agentsONInputsOutputsMappingColor : IngeScapeTheme.agentsOFFInputsOutputsMappingColor)
-                                                                                  : (rootItem.agentMappingVM && rootItem.agentMappingVM.isON ? IngeScapeTheme.redColor : IngeScapeTheme.redColor)
+                                                                                  : (rootItem.agentMappingVM && rootItem.agentMappingVM.isON ? IngeScapeTheme.redColor : IngeScapeTheme.middleDarkRedColor)
 
                             font: IngeScapeTheme.heading2Font
                         }
@@ -512,9 +512,9 @@ Rectangle {
                             elide: Text.ElideRight
                             text: myModel ? myModel.name : ""
 
-                            //color: (rootItem.agentMappingVM && rootItem.agentMappingVM.isON)? IngeScapeTheme.agentsONInputsOutputsMappingColor : IngeScapeTheme.agentsOFFInputsOutputsMappingColor
+                            //color: (rootItem.agentMappingVM && rootItem.agentMappingVM.isON) ? IngeScapeTheme.agentsONInputsOutputsMappingColor : IngeScapeTheme.agentsOFFInputsOutputsMappingColor
                             color: (myModel && myModel.isDefinedInAllDefinitions) ? (rootItem.agentMappingVM && rootItem.agentMappingVM.isON ? IngeScapeTheme.agentsONInputsOutputsMappingColor : IngeScapeTheme.agentsOFFInputsOutputsMappingColor)
-                                                                                  : (rootItem.agentMappingVM && rootItem.agentMappingVM.isON ? IngeScapeTheme.redColor : IngeScapeTheme.redColor)
+                                                                                  : (rootItem.agentMappingVM && rootItem.agentMappingVM.isON ? IngeScapeTheme.redColor : IngeScapeTheme.middleDarkRedColor)
                             font: IngeScapeTheme.heading2Font
                         }
 

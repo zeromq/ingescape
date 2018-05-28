@@ -88,7 +88,8 @@ SOURCES += main.cpp \
     viewModel/hostvm.cpp \
     model/recordm.cpp \
     controller/recordssupervisioncontroller.cpp \
-    viewModel/recordvm.cpp
+    viewModel/recordvm.cpp \
+    controller/logstreamcontroller.cpp
 
 HEADERS += \
     stable.h \
@@ -154,7 +155,8 @@ HEADERS += \
     viewModel/hostvm.h \
     model/recordm.h \
     controller/recordssupervisioncontroller.h \
-    viewModel/recordvm.h
+    viewModel/recordvm.h \
+    controller/logstreamcontroller.h
 
 
 RESOURCES += qml.qrc
@@ -265,7 +267,8 @@ mac {
 
 
     # Set icon of our executable
-    ICON = icon.icns
+    ICON = icon_IGS.icns
+
 }
 
 
@@ -322,7 +325,7 @@ win32 {
 
 
     # Set icon of our executable
-    RC_ICONS = icon.ico
+    RC_ICONS = icon_IGS.ico
 
     # Set application info
     QMAKE_TARGET_COMPANY = Ingenuity i/o

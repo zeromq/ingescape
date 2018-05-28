@@ -592,6 +592,16 @@ Item {
                             console.log("Enable/Disable Log Stream");
                         }
                     }
+
+                    Button {
+                        id: optionViewLogStream
+
+                        text: qsTr("View Log Stream")
+
+                        onClicked: {
+                            console.log("View Log Stream");
+                        }
+                    }
                 }
             }
         }
