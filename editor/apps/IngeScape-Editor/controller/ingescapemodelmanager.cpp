@@ -764,8 +764,7 @@ void IngeScapeModelManager::onAgentHasLogInFile(QString peerId, bool hasLogInFil
 {
     AgentM* agent = getAgentModelFromPeerId(peerId);
     if (agent != NULL) {
-        qDebug() << agent->name() << "Has Log in FILE ?" << hasLogInFile;
-
+        //qDebug() << agent->name() << "Has Log in FILE ?" << hasLogInFile;
         agent->sethasLogInFile(hasLogInFile);
     }
 }

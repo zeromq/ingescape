@@ -450,7 +450,7 @@ void AgentsSupervisionController::_onLoadAgentDefinitionFromPath(QStringList pee
             QString jsonOfDefinition = QString(jsonDocument.toJson(QJsonDocument::Compact));
 
             // Create the command "Load Definition"
-            QString command = QString("%1%2").arg(prefix_LoadDefinition, jsonOfDefinition);
+            QString command = QString("%1%2").arg(command_LoadDefinition, jsonOfDefinition);
 
             Q_EMIT commandAskedToAgent(peerIdsList, command);
         }
@@ -482,7 +482,7 @@ void AgentsSupervisionController::_onLoadAgentMappingFromPath(QStringList peerId
             QString jsonOfMapping = QString(jsonDocument.toJson(QJsonDocument::Compact));
 
             // Create the command "Load Mapping"
-            QString command = QString("%1%2").arg(prefix_LoadMapping, jsonOfMapping);
+            QString command = QString("%1%2").arg(command_LoadMapping, jsonOfMapping);
 
             Q_EMIT commandAskedToAgent(peerIdsList, command);
         }

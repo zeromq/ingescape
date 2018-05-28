@@ -214,6 +214,28 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
                 // Emit the signal "State changed"
                 Q_EMIT networkController->agentStateChanged(peerId, stateName);
             }
+            // LOG IN STREAM
+            else if (message.startsWith(prefix_LogInStream))
+            {
+                QString hasLogInStream = message.remove(0, prefix_LogInStream.length());
+                if (hasLogInStream == "1") {
+                    Q_EMIT networkController->agentHasLogInStream(peerId, true);
+                }
+                else {
+                    Q_EMIT networkController->agentHasLogInStream(peerId, false);
+                }
+            }
+            // LOG IN FILE
+            else if (message.startsWith(prefix_LogInFile))
+            {
+                QString hasLogInFile = message.remove(0, prefix_LogInFile.length());
+                if (hasLogInFile == "1") {
+                    Q_EMIT networkController->agentHasLogInFile(peerId, true);
+                }
+                else {
+                    Q_EMIT networkController->agentHasLogInFile(peerId, false);
+                }
+            }
             else
             {
                 qWarning() << "Not yet managed (SHOUT) message '" << message << "' for agent" << peerName << "(" << peerId << ")";
@@ -926,6 +948,7 @@ void NetworkController::onRemoveInputsToEditorForOutputs(QString agentName, QLis
             _mapFromInputNameToNumberOfAgentsON.insert(inputName, numberOfAgentsON);
 
             qDebug() << "on Remove Inputs: There are" << numberOfAgentsON << "agents ON for input name" << inputName;
+            // FIXME: Debug numberOfAgentsON < 0
             if (numberOfAgentsON < 0) {
                 qWarning() << "There are" << numberOfAgentsON << "agents ON for input name" << inputName;
             }

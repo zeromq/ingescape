@@ -576,22 +576,36 @@ Item {
                     Button {
                         id: optionLogFile
 
-                        text: qsTr("Enable/Disable Log File")
+                        text: (root.agent && (root.agent.hasLogInFile === true)) ? qsTr("Disable Log File") : qsTr("Enable Log File")
 
                         onClicked: {
-                            console.log("Enable/Disable Log File");
+                            if (root.agent && (root.agent.hasLogInFile === true)) {
+                                //console.log("QML: Disable Log File");
+                                root.agent.changeLogInFile(false);
+                            }
+                            else {
+                                //console.log("QML: Enable Log File");
+                                root.agent.changeLogInFile(true);
+                            }
                         }
                     }
 
-                    Button {
+                    /*Button {
                         id: optionLogStream
 
-                        text: qsTr("Enable/Disable Log Stream")
+                        text: (root.agent && (root.agent.hasLogInStream === true)) ? qsTr("Disable Log Stream") : qsTr("Enable Log Stream")
 
                         onClicked: {
-                            console.log("Enable/Disable Log Stream");
+                            if (root.agent && (root.agent.hasLogInStream === true)) {
+                                console.log("QML: Disable Log Stream");
+                                root.agent.changeLogInStream(false);
+                            }
+                            else {
+                                console.log("QML: Enable Log Stream");
+                                root.agent.changeLogInStream(true);
+                            }
                         }
-                    }
+                    }*/
 
                     Button {
                         id: optionViewLogStream

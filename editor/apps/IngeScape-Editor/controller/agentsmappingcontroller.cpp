@@ -454,7 +454,7 @@ void AgentsMappingController::onIsMappingActivatedChanged(bool isMappingActivate
                     // Get the JSON of the agent mapping
                     QString jsonOfMapping = _jsonHelper->getJsonOfAgentMapping(agent->temporaryMapping(), QJsonDocument::Compact);
 
-                    QString command = QString("%1%2").arg(prefix_LoadMapping, jsonOfMapping);
+                    QString command = QString("%1%2").arg(command_LoadMapping, jsonOfMapping);
 
                     // Emit signal "Command asked to agent"
                     Q_EMIT commandAskedToAgent(agent->peerIdsList(), command);
@@ -1151,7 +1151,7 @@ void AgentsMappingController::_overWriteMappingOfAgentModel(AgentM* agentModel, 
         // Get the JSON of the agent mapping
         QString jsonOfMapping = _jsonHelper->getJsonOfAgentMapping(temporaryMapping, QJsonDocument::Compact);
 
-        QString command = QString("%1%2").arg(prefix_LoadMapping, jsonOfMapping);
+        QString command = QString("%1%2").arg(command_LoadMapping, jsonOfMapping);
 
         // Emit signal "Command asked to agent"
         Q_EMIT commandAskedToAgent(peerIdsList, command);

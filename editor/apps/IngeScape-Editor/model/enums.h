@@ -46,9 +46,13 @@ static const QString SEPARATOR_AGENT_NAME_AND_IOP = QString("##");
 static const QString SEPARATOR_IOP_NAME_AND_IOP_VALUE_TYPE = QString("::");
 
 
-static const QString prefix_LoadDefinition = "LOAD_THIS_DEFINITION#";
-static const QString prefix_LoadMapping = "LOAD_THIS_MAPPING#";
+static const QString command_LoadDefinition = "LOAD_THIS_DEFINITION#";
+static const QString command_LoadMapping = "LOAD_THIS_MAPPING#";
 static const QString command_ClearMapping = "CLEAR_MAPPING";
+static const QString command_EnableLogStream = "ENABLE_LOG_STREAM";
+static const QString command_DisableLogStream = "DISABLE_LOG_STREAM";
+static const QString command_EnableLogFile = "ENABLE_LOG_FILE";
+static const QString command_DisableLogFile = "DISABLE_LOG_FILE";
 
 
 /**

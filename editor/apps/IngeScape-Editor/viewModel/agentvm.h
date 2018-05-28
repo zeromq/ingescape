@@ -144,6 +144,20 @@ public:
     Q_INVOKABLE void downloadMapping();
 
 
+    /**
+     * @brief Change the flag "(has) Log in Stream"
+     * @param logInStream
+     */
+    Q_INVOKABLE void changeLogInStream(bool logInStream);
+
+
+    /**
+     * @brief Change the flag "(has) Log in File"
+     * @param logInFile
+     */
+    Q_INVOKABLE void changeLogInFile(bool logInFile);
+
+
 Q_SIGNALS:
 
     /**
@@ -277,6 +291,41 @@ private Q_SLOTS:
 
 
     /**
+     * @brief Slot called when the flag "has Log in Stream" of a model changed
+     * @param hasLogInStream
+     */
+    void _onHasLogInStreamOfModelChanged(bool hasLogInStream);
+
+
+    /**
+     * @brief Slot called when the flag "has Log in File" of a model changed
+     * @param hasLogInFile
+     */
+    void _onHasLogInFileOfModelChanged(bool hasLogInFile);
+
+
+    /**
+     * @brief Slot called when the path of "Log File" of a model changed
+     * @param logFilePath
+     */
+    void _onLogFilePathOfModelChanged(QString logFilePath);
+
+
+    /**
+     * @brief Slot called when the path of "Definition File" of a model changed
+     * @param definitionFilePath
+     */
+    void _onDefinitionFilePathOfModelChanged(QString definitionFilePath);
+
+
+    /**
+     * @brief Slot called when the path of "Mapping File" of a model changed
+     * @param mappingFilePath
+     */
+    void _onMappingFilePathOfModelChanged(QString mappingFilePath);
+
+
+    /**
      * @brief Slot when a command must be sent on the network to an agent about one of its output
      * @param command
      * @param outputName
@@ -322,6 +371,18 @@ private:
 
 
     /**
+     * @brief Update the flag "has Log in Stram" in function of flags of models
+     */
+    void _updateHasLogInStream();
+
+
+    /**
+     * @brief Update the flag "has Log in File" in function of flags of models
+     */
+    void _updateHasLogInFile();
+
+
+    /**
      * @brief Update with the definition of the first model
      */
     void _updateWithDefinitionOfFirstModel();
@@ -331,6 +392,24 @@ private:
      * @brief Update with the state of the first model
      */
     void _updateWithStateOfFirstModel();
+
+
+    /**
+     * @brief Update with the log file path of the first model
+     */
+    void _updateWithLogFilePathOfFirstModel();
+
+
+    /**
+     * @brief Update with the definition file path of the first model
+     */
+    void _updateWithDefinitionFilePathOfFirstModel();
+
+
+    /**
+     * @brief Update with the mapping file path of the first model
+     */
+    void _updateWithMappingFilePathOfFirstModel();
 
 
 private:

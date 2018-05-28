@@ -282,6 +282,36 @@ void AgentVM::downloadMapping()
 
 
 /**
+ * @brief Change the flag "(has) Log in Stream"
+ * @param logInStream
+ */
+void AgentVM::changeLogInStream(bool logInStream)
+{
+    if (logInStream) {
+        Q_EMIT commandAskedToAgent(_peerIdsList, command_EnableLogStream);
+    }
+    else {
+        Q_EMIT commandAskedToAgent(_peerIdsList, command_DisableLogStream);
+    }
+}
+
+
+/**
+ * @brief Change the flag "(has) Log in File"
+ * @param logInFile
+ */
+void AgentVM::changeLogInFile(bool logInFile)
+{
+    if (logInFile) {
+        Q_EMIT commandAskedToAgent(_peerIdsList, command_EnableLogFile);
+    }
+    else {
+        Q_EMIT commandAskedToAgent(_peerIdsList, command_DisableLogFile);
+    }
+}
+
+
+/**
  * @brief Slot when the list of models changed
  */
 void AgentVM::_onModelsChanged()
@@ -306,6 +336,12 @@ void AgentVM::_onModelsChanged()
                 connect(model, &AgentM::definitionChanged, this, &AgentVM::_onDefinitionOfModelChanged, Qt::UniqueConnection);
                 //connect(model, &AgentM::definitionChangedWithPreviousAndNewValues, this, &AgentVM::_onDefinitionOfModelChangedWithPreviousAndNewValues, Qt::UniqueConnection);
                 connect(model, &AgentM::stateChanged, this, &AgentVM::_onStateOfModelChanged, Qt::UniqueConnection);
+
+                connect(model, &AgentM::hasLogInStreamChanged, this, &AgentVM::_onHasLogInStreamOfModelChanged);
+                connect(model, &AgentM::hasLogInFileChanged, this, &AgentVM::_onHasLogInFileOfModelChanged);
+                connect(model, &AgentM::logFilePathChanged, this, &AgentVM::_onLogFilePathOfModelChanged);
+                connect(model, &AgentM::definitionFilePathChanged, this, &AgentVM::_onDefinitionFilePathOfModelChanged);
+                connect(model, &AgentM::mappingFilePathChanged, this, &AgentVM::_onMappingFilePathOfModelChanged);
             }
         }
     }
@@ -422,8 +458,73 @@ void AgentVM::_onStateOfModelChanged(QString state)
 {
     Q_UNUSED(state)
 
-    // Update with the state of first model
+    // Update with the state of the first model
     _updateWithStateOfFirstModel();
+}
+
+
+/**
+ * @brief Slot called when the flag "has Log in Stream" of a model changed
+ * @param hasLogInStream
+ */
+void AgentVM::_onHasLogInStreamOfModelChanged(bool hasLogInStream)
+{
+    Q_UNUSED(hasLogInStream)
+
+    // Update the flag "has Log in Stream" in function of all models
+    _updateHasLogInStream();
+}
+
+
+/**
+ * @brief Slot called when the flag "has Log in File" of a model changed
+ * @param hasLogInFile
+ */
+void AgentVM::_onHasLogInFileOfModelChanged(bool hasLogInFile)
+{
+    Q_UNUSED(hasLogInFile)
+
+    // Update the flag "has Log in File" in function of all models
+    _updateHasLogInFile();
+}
+
+
+/**
+ * @brief Slot called when the path of "Log File" of a model changed
+ * @param logFilePath
+ */
+void AgentVM::_onLogFilePathOfModelChanged(QString logFilePath)
+{
+    Q_UNUSED(logFilePath)
+
+    // Update with the log file path of the first model
+    _updateWithLogFilePathOfFirstModel();
+}
+
+
+/**
+ * @brief Slot called when the path of "Definition File" of a model changed
+ * @param definitionFilePath
+ */
+void AgentVM::_onDefinitionFilePathOfModelChanged(QString definitionFilePath)
+{
+    Q_UNUSED(definitionFilePath)
+
+    // Update with the definition file path of the first model
+    _updateWithDefinitionFilePathOfFirstModel();
+}
+
+
+/**
+ * @brief Slot called when the path of "Mapping File" of a model changed
+ * @param mappingFilePath
+ */
+void AgentVM::_onMappingFilePathOfModelChanged(QString mappingFilePath)
+{
+    Q_UNUSED(mappingFilePath)
+
+    // Update with the mapping file path of the first model
+    _updateWithMappingFilePathOfFirstModel();
 }
 
 
@@ -494,10 +595,15 @@ void AgentVM::_updateWithAllModels()
     _updateCanBeRestarted();
     _updateIsMuted();
     _updateIsFrozen();
+    _updateHasLogInStream();
+    _updateHasLogInFile();
 
     // Update with the first model
     _updateWithDefinitionOfFirstModel();
     _updateWithStateOfFirstModel();
+    _updateWithLogFilePathOfFirstModel();
+    _updateWithDefinitionFilePathOfFirstModel();
+    _updateWithMappingFilePathOfFirstModel();
 }
 
 
@@ -581,6 +687,40 @@ void AgentVM::_updateIsFrozen()
 
 
 /**
+ * @brief Update the flag "has Log in Stram" in function of flags of models
+ */
+void AgentVM::_updateHasLogInStream()
+{
+    bool globalHasLogInStream = false;
+
+    foreach (AgentM* model, _models.toList()) {
+        if ((model != NULL) && model->hasLogInStream()) {
+            globalHasLogInStream = true;
+            break;
+        }
+    }
+    sethasLogInStream(globalHasLogInStream);
+}
+
+
+/**
+ * @brief Update the flag "has Log in File" in function of flags of models
+ */
+void AgentVM::_updateHasLogInFile()
+{
+    bool globalHasLogInFile = false;
+
+    foreach (AgentM* model, _models.toList()) {
+        if ((model != NULL) && model->hasLogInFile()) {
+            globalHasLogInFile = true;
+            break;
+        }
+    }
+    sethasLogInFile(globalHasLogInFile);
+}
+
+
+/**
  * @brief Update with the definition of the first model
  */
 void AgentVM::_updateWithDefinitionOfFirstModel()
@@ -607,6 +747,51 @@ void AgentVM::_updateWithStateOfFirstModel()
         AgentM* model = _models.at(0);
         if (model != NULL) {
             setstate(model->state());
+        }
+    }
+}
+
+
+/**
+ * @brief Update with the log file path of the first model
+ */
+void AgentVM::_updateWithLogFilePathOfFirstModel()
+{
+    if (!_models.isEmpty())
+    {
+        AgentM* model = _models.at(0);
+        if (model != NULL) {
+            setlogFilePath(model->logFilePath());
+        }
+    }
+}
+
+
+/**
+ * @brief Update with the definition file path of the first model
+ */
+void AgentVM::_updateWithDefinitionFilePathOfFirstModel()
+{
+    if (!_models.isEmpty())
+    {
+        AgentM* model = _models.at(0);
+        if (model != NULL) {
+            setdefinitionFilePath(model->definitionFilePath());
+        }
+    }
+}
+
+
+/**
+ * @brief Update with the mapping file path of the first model
+ */
+void AgentVM::_updateWithMappingFilePathOfFirstModel()
+{
+    if (!_models.isEmpty())
+    {
+        AgentM* model = _models.at(0);
+        if (model != NULL) {
+            setmappingFilePath(model->mappingFilePath());
         }
     }
 }
