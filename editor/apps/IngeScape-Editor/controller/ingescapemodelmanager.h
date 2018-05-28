@@ -332,17 +332,20 @@ public Q_SLOTS:
      */
     void onMappingReceived(QString peerId, QString agentName, QString mappingJSON);
 
+
     /**
      * @brief Slot called when all records of DB have been received and must be processed
      * @param records in JSON format
      */
     void onAllRecordsReceived(QString records);
 
+
     /**
      * @brief Slot called when a new record has been stored into DB
      * @param record in JSON format
      */
     void onNewRecordReceived(QString record);
+
 
     /**
      * @brief Slot called when a new value is published
@@ -375,12 +378,53 @@ public Q_SLOTS:
      */
     void onIsMutedFromOutputOfAgentUpdated(QString peerId, bool isMuted, QString outputName);
 
+
     /**
      * @brief Slot called when the state of an agent changes
      * @param peerId
      * @param stateName
      */
     void onAgentStateChanged(QString peerId, QString stateName);
+
+
+    /**
+     * @brief Slot called when we receive the flag "Log In Stream" for an agent
+     * @param peerId
+     * @param hasLogInStream
+     */
+    void onAgentHasLogInStream(QString peerId, bool hasLogInStream);
+
+
+    /**
+     * @brief Slot called when we receive the flag "Log In File" for an agent
+     * @param peerId
+     * @param hasLogInStream
+     */
+    void onAgentHasLogInFile(QString peerId, bool hasLogInFile);
+
+
+    /**
+     * @brief Slot called when we receive the path of "Log File" for an agent
+     * @param peerId
+     * @param logFilePath
+     */
+    void onAgentLogFilePath(QString peerId, QString logFilePath);
+
+
+    /**
+     * @brief Slot called when we receive the path of "Definition File" for an agent
+     * @param peerId
+     * @param definitionFilePath
+     */
+    void onAgentDefinitionFilePath(QString peerId, QString definitionFilePath);
+
+
+    /**
+     * @brief Slot called when we receive the path of "Mapping File" for an agent
+     * @param peerId
+     * @param mappingFilePath
+     */
+    void onAgentMappingFilePath(QString peerId, QString mappingFilePath);
 
 
 private:

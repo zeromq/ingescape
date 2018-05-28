@@ -206,6 +206,46 @@ Q_SIGNALS:
     void agentStateChanged(QString peerId, QString stateName);
 
 
+    /**
+     * @brief Signal emitted when we receive the flag "Log In Stream" for an agent
+     * @param peerId
+     * @param hasLogInStream
+     */
+    void agentHasLogInStream(QString peerId, bool hasLogInStream);
+
+
+    /**
+     * @brief Signal emitted when we receive the flag "Log In File" for an agent
+     * @param peerId
+     * @param hasLogInStream
+     */
+    void agentHasLogInFile(QString peerId, bool hasLogInFile);
+
+
+    /**
+     * @brief Signal emitted when we receive the path of "Log File" for an agent
+     * @param peerId
+     * @param logFilePath
+     */
+    void agentLogFilePath(QString peerId, QString logFilePath);
+
+
+    /**
+     * @brief Signal emitted when we receive the path of "Definition File" for an agent
+     * @param peerId
+     * @param definitionFilePath
+     */
+    void agentDefinitionFilePath(QString peerId, QString definitionFilePath);
+
+
+    /**
+     * @brief Signal emitted when we receive the path of "Mapping File" for an agent
+     * @param peerId
+     * @param mappingFilePath
+     */
+    void agentMappingFilePath(QString peerId, QString mappingFilePath);
+
+
 public Q_SLOTS:
 
     /**

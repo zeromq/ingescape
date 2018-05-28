@@ -33,7 +33,12 @@ AgentVM::AgentVM(AgentM* model, QObject *parent) : QObject(parent),
     _definition(NULL),
     _clonesNumber(0),
     _canBeRestarted(false),
-    _state("")
+    _state(""),
+    _hasLogInStream(false),
+    _hasLogInFile(false),
+    _logFilePath(""),
+    _definitionFilePath(""),
+    _mappingFilePath("")
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -293,7 +298,7 @@ void AgentVM::_onModelsChanged()
             {
                 //qDebug() << "New model" << model->name() << "ADDED (" << model->peerId() << ")";
 
-                // Connect to signals from a model
+                // Connect to signals of the model
                 connect(model, &AgentM::isONChanged, this, &AgentVM::_onIsONofModelChanged, Qt::UniqueConnection);
                 connect(model, &AgentM::canBeRestartedChanged, this, &AgentVM::_onCanBeRestartedOfModelChanged, Qt::UniqueConnection);
                 connect(model, &AgentM::isMutedChanged, this, &AgentVM::_onIsMutedOfModelChanged, Qt::UniqueConnection);
@@ -314,14 +319,8 @@ void AgentVM::_onModelsChanged()
             {
                 //qDebug() << "Old model" << model->name() << "REMOVED (" << model->peerId() << ")";
 
-                // DIS-connect from signals from a model
-                disconnect(model, &AgentM::isONChanged, this, &AgentVM::_onIsONofModelChanged);
-                disconnect(model, &AgentM::canBeRestartedChanged, this, &AgentVM::_onCanBeRestartedOfModelChanged);
-                disconnect(model, &AgentM::isMutedChanged, this, &AgentVM::_onIsMutedOfModelChanged);
-                disconnect(model, &AgentM::isFrozenChanged, this, &AgentVM::_onIsFrozenOfModelChanged);
-                disconnect(model, &AgentM::definitionChanged, this, &AgentVM::_onDefinitionOfModelChanged);
-                //disconnect(model, &AgentM::definitionChangedWithPreviousAndNewValues, this, &AgentVM::_onDefinitionOfModelChangedWithPreviousAndNewValues, Qt::UniqueConnection);
-                disconnect(model, &AgentM::stateChanged, this, &AgentVM::_onStateOfModelChanged);
+                // DIS-connect from signals of the model
+                disconnect(model, 0, this, 0);
             }
         }
     }

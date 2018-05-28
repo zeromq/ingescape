@@ -79,7 +79,22 @@ class AgentM : public QObject
     I2_QML_PROPERTY_READONLY(AgentMappingM*, mapping)
 
     // State of our agent
-    I2_QML_PROPERTY(QString, state)
+    I2_CPP_PROPERTY(QString, state)
+
+    // Flag indicating if our agent has its log in a stream
+    I2_CPP_PROPERTY(bool, hasLogInStream)
+
+    // Flag indicating if our agent has its log in a file
+    I2_CPP_PROPERTY(bool, hasLogInFile)
+
+    // Path of the log file of our agent
+    I2_CPP_PROPERTY(QString, logFilePath)
+
+    // Path of the definition file of our agent
+    I2_CPP_PROPERTY(QString, definitionFilePath)
+
+    // Path of the mapping file of our agent
+    I2_CPP_PROPERTY(QString, mappingFilePath)
 
 
 public:

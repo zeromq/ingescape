@@ -71,6 +71,21 @@ class AgentVM : public QObject
     // State of our agent
     I2_QML_PROPERTY(QString, state)
 
+    // Flag indicating if our agent has its log in a stream
+    I2_QML_PROPERTY_READONLY(bool, hasLogInStream)
+
+    // Flag indicating if our agent has its log in a file
+    I2_QML_PROPERTY_READONLY(bool, hasLogInFile)
+
+    // Path of the log file of our agent
+    I2_QML_PROPERTY_READONLY(QString, logFilePath)
+
+    // Path of the definition file of our agent
+    I2_QML_PROPERTY_READONLY(QString, definitionFilePath)
+
+    // Path of the mapping file of our agent
+    I2_QML_PROPERTY_READONLY(QString, mappingFilePath)
+
 
 public:
     /**

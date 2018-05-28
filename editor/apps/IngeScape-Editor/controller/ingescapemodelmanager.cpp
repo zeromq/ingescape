@@ -733,8 +733,88 @@ void IngeScapeModelManager::onIsMutedFromOutputOfAgentUpdated(QString peerId, bo
 void IngeScapeModelManager::onAgentStateChanged(QString peerId, QString stateName)
 {
     AgentM* agent = getAgentModelFromPeerId(peerId);
-    if(agent != NULL) {
+    if (agent != NULL) {
         agent->setstate(stateName);
+    }
+}
+
+
+/**
+ * @brief Slot called when we receive the flag "Log In Stream" for an agent
+ * @param peerId
+ * @param hasLogInStream
+ */
+void IngeScapeModelManager::onAgentHasLogInStream(QString peerId, bool hasLogInStream)
+{
+    AgentM* agent = getAgentModelFromPeerId(peerId);
+    if (agent != NULL) {
+        qDebug() << agent->name() << "Has Log in STREAM ?" << hasLogInStream;
+
+        agent->sethasLogInStream(hasLogInStream);
+    }
+}
+
+
+/**
+ * @brief Slot called when we receive the flag "Log In File" for an agent
+ * @param peerId
+ * @param hasLogInStream
+ */
+void IngeScapeModelManager::onAgentHasLogInFile(QString peerId, bool hasLogInFile)
+{
+    AgentM* agent = getAgentModelFromPeerId(peerId);
+    if (agent != NULL) {
+        qDebug() << agent->name() << "Has Log in FILE ?" << hasLogInFile;
+
+        agent->sethasLogInFile(hasLogInFile);
+    }
+}
+
+
+/**
+ * @brief Slot called when we receive the path of "Log File" for an agent
+ * @param peerId
+ * @param logFilePath
+ */
+void IngeScapeModelManager::onAgentLogFilePath(QString peerId, QString logFilePath)
+{
+    AgentM* agent = getAgentModelFromPeerId(peerId);
+    if (agent != NULL) {
+        qDebug() << agent->name() << "Log file path:" << logFilePath;
+
+        agent->setlogFilePath(logFilePath);
+    }
+}
+
+
+/**
+ * @brief Slot called when we receive the path of "Definition File" for an agent
+ * @param peerId
+ * @param definitionFilePath
+ */
+void IngeScapeModelManager::onAgentDefinitionFilePath(QString peerId, QString definitionFilePath)
+{
+    AgentM* agent = getAgentModelFromPeerId(peerId);
+    if (agent != NULL) {
+        qDebug() << agent->name() << "Definition file path:" << definitionFilePath;
+
+        agent->setdefinitionFilePath(definitionFilePath);
+    }
+}
+
+
+/**
+ * @brief Slot called when we receive the path of "Mapping File" for an agent
+ * @param peerId
+ * @param mappingFilePath
+ */
+void IngeScapeModelManager::onAgentMappingFilePath(QString peerId, QString mappingFilePath)
+{
+    AgentM* agent = getAgentModelFromPeerId(peerId);
+    if (agent != NULL) {
+        qDebug() << agent->name() << "Mapping file path:" << mappingFilePath;
+
+        agent->setmappingFilePath(mappingFilePath);
     }
 }
 
