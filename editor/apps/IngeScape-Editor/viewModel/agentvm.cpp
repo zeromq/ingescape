@@ -312,6 +312,64 @@ void AgentVM::changeLogInFile(bool logInFile)
 
 
 /**
+ * @brief Save the "files paths" of our agent
+ * @param definitionFilePath
+ * @param mappingFilePath
+ * @param logFilePath
+ */
+void AgentVM::saveFilesPaths(QString definitionFilePath, QString mappingFilePath, QString logFilePath)
+{
+    // Path for definition file changed
+    if (definitionFilePath != _definitionFilePath)
+    {
+        qDebug() << "Path of definition changed to" << definitionFilePath;
+
+        QString command = QString("%1 %2").arg(command_SetDefinitionPath, definitionFilePath);
+
+        Q_EMIT commandAskedToAgent(_peerIdsList, command);
+    }
+
+    // Path for mapping file changed
+    if (mappingFilePath != _mappingFilePath)
+    {
+        qDebug() << "Path of mapping changed to" << mappingFilePath;
+
+        QString command = QString("%1 %2").arg(command_SetMappingPath, mappingFilePath);
+
+        Q_EMIT commandAskedToAgent(_peerIdsList, command);
+    }
+
+    // Path for log file changed
+    if (logFilePath != _logFilePath)
+    {
+        qDebug() << "Path of log changed to" << logFilePath;
+
+        QString command = QString("%1 %2").arg(command_SetLogPath, logFilePath);
+
+        Q_EMIT commandAskedToAgent(_peerIdsList, command);
+    }
+}
+
+
+/**
+ * @brief Save the definition of our agent to its path
+ */
+void AgentVM::saveDefinitionToPath()
+{
+    Q_EMIT commandAskedToAgent(_peerIdsList, command_SaveDefinitionToPath);
+}
+
+
+/**
+ * @brief Save the mapping of our agent to its path
+ */
+void AgentVM::saveMappingToPath()
+{
+    Q_EMIT commandAskedToAgent(_peerIdsList, command_SaveMappingToPath);
+}
+
+
+/**
  * @brief Slot when the list of models changed
  */
 void AgentVM::_onModelsChanged()

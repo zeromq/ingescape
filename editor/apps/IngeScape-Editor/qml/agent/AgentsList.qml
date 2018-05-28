@@ -458,6 +458,12 @@ Item {
                         onNeedConfirmationtoDeleteAgent : {
                             deleteConfirmationPopup.open();
                         }
+
+                        onConfigureFilesPaths: {
+                            //console.log("Open 'Configure Files Paths' for " + agent.name);
+                            agentFilesPathsPopup.agent = agent;
+                            agentFilesPathsPopup.open();
+                        }
                     }
 
                     AgentMapping.AgentNodeView {
@@ -500,8 +506,8 @@ Item {
         anchors.centerIn: parent
 
         isModal: true
-        dismissOnOutsideTap : true
-        keepRelativePositionToInitialParent : false
+        dismissOnOutsideTap: true
+        keepRelativePositionToInitialParent: false
 
         Rectangle {
 
@@ -573,5 +579,16 @@ Item {
                 }
             }
         }
+    }
+
+
+    //
+    // Network Configuration (Popup)
+    //
+    AgentFilesPaths {
+        id: agentFilesPathsPopup
+
+        anchors.centerIn: parent
+
     }
 }

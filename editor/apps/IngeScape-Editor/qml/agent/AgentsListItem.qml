@@ -49,6 +49,10 @@ Item {
     // signal emitted when the delete confirmation popup is needed because the agent is already used in the platform
     signal needConfirmationtoDeleteAgent();
 
+    // signal emitted when the user clicks on the option "Set Path for Definition/Mapping"
+    signal configureFilesPaths(var agent);
+
+
     //-----------------------------------------
     //
     // Functions
@@ -140,7 +144,9 @@ Item {
                                 // Delete selected agent
                                 controller.deleteSelectedAgent();
                             }
-                        } else {
+                        }
+                        else {
+                            // Emit the signal "needConfirmationtoDeleteAgent"
                             root.needConfirmationtoDeleteAgent();
                         }
                     }
@@ -453,7 +459,8 @@ Item {
                 }
 
                 onClicked: {
-                    console.log("Open options...");
+                    //console.log("QML: Open options...");
+
                     popupOptions.open();
                 }
             }
@@ -556,20 +563,43 @@ Item {
                     Button {
                         id: optionSetPath
 
-                        text: qsTr("Set Path for Def./Mapping")
+                        text: qsTr("Set Path for files")
 
                         onClicked: {
-                            console.log("Set Path for Definition/Mapping");
+                            console.log("QML: Set Path for Definition/Mapping/Log files");
+
+                            // Emit the signal "configureFilesPaths"
+                            root.configureFilesPaths(root.agent);
+
+                            popupOptions.close();
                         }
                     }
 
                     Button {
-                        id: optionSaveToPath
+                        id: optionSaveDefinitionToPath
 
-                        text: qsTr("Save Def./Mapping to Path")
+                        text: qsTr("Save Definition to Path")
 
                         onClicked: {
-                            console.log("Save Definition/Mapping to Path");
+                            //console.log("QML: Save Definition to Path");
+
+                            root.agent.saveDefinitionToPath();
+
+                            popupOptions.close();
+                        }
+                    }
+
+                    Button {
+                        id: optionSaveMappingToPath
+
+                        text: qsTr("Save Mapping to Path")
+
+                        onClicked: {
+                            //console.log("QML: Save Mapping to Path");
+
+                            root.agent.saveMappingToPath();
+
+                            popupOptions.close();
                         }
                     }
 
@@ -613,7 +643,7 @@ Item {
                         text: qsTr("View Log Stream")
 
                         onClicked: {
-                            console.log("View Log Stream");
+                            console.log("QML: View Log Stream");
                         }
                     }
                 }

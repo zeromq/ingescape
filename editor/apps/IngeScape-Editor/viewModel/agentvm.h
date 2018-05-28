@@ -158,6 +158,27 @@ public:
     Q_INVOKABLE void changeLogInFile(bool logInFile);
 
 
+    /**
+     * @brief Save the "files paths" of our agent
+     * @param definitionFilePath
+     * @param mappingFilePath
+     * @param logFilePath
+     */
+    Q_INVOKABLE void saveFilesPaths(QString definitionFilePath, QString mappingFilePath, QString logFilePath);
+
+
+    /**
+     * @brief Save the definition of our agent to its path
+     */
+    Q_INVOKABLE void saveDefinitionToPath();
+
+
+    /**
+     * @brief Save the mapping of our agent to its path
+     */
+    Q_INVOKABLE void saveMappingToPath();
+
+
 Q_SIGNALS:
 
     /**

@@ -236,6 +236,27 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
                     Q_EMIT networkController->agentHasLogInFile(peerId, false);
                 }
             }
+            // LOG FILE PATH
+            else if (message.startsWith(prefix_LogFilePath))
+            {
+                QString logFilePath = message.remove(0, prefix_LogFilePath.length());
+
+                Q_EMIT networkController->agentLogFilePath(peerId, logFilePath);
+            }
+            // DEFINITION FILE PATH
+            else if (message.startsWith(prefix_DefinitionFilePath))
+            {
+                QString definitionFilePath = message.remove(0, prefix_DefinitionFilePath.length());
+
+                Q_EMIT networkController->agentDefinitionFilePath(peerId, definitionFilePath);
+            }
+            // MAPPING FILE PATH
+            else if (message.startsWith(prefix_MappingFilePath))
+            {
+                QString mappingFilePath = message.remove(0, prefix_MappingFilePath.length());
+
+                Q_EMIT networkController->agentMappingFilePath(peerId, mappingFilePath);
+            }
             else
             {
                 qWarning() << "Not yet managed (SHOUT) message '" << message << "' for agent" << peerName << "(" << peerId << ")";
