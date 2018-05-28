@@ -94,6 +94,7 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
             bool canBeFrozen = false;
             QString hostname = "";
             QString commandLine = "";
+            QString loggerPort = "";
             QString streamingPort = "";
 
             zlist_t *keys = zhash_keys(headers);
@@ -135,6 +136,9 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
                     else if (key == "hostname") {
                         hostname = value;
                     }
+                    else if (key == "logger") {
+                        loggerPort = value;
+                    }
                     else if (key == "videoStream") {
                         streamingPort = value;
                     }
@@ -159,7 +163,7 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
                 //qDebug() << "Our zyre event is about INGESCAPE publisher:" << pid << hostname << commandLine;
 
                 // Emit the signal "Agent Entered"
-                Q_EMIT networkController->agentEntered(peerId, peerName, ipAddress, pid, hostname, commandLine, canBeFrozen, isIngeScapeRecorder);
+                Q_EMIT networkController->agentEntered(peerId, peerName, ipAddress, pid, hostname, commandLine, canBeFrozen, loggerPort, isIngeScapeRecorder);
             }
         }
         // JOIN (group)

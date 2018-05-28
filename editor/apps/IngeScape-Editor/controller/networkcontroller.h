@@ -105,8 +105,10 @@ Q_SIGNALS:
      * @param hostname
      * @param commandLine
      * @param canBeFrozen
+     * @param loggerPort
+     * @param isRecorder
      */
-    void agentEntered(QString peerId, QString peerName, QString peerAddress, int pid, QString hostname, QString commandLine, bool canBeFrozen, bool isRecorder);
+    void agentEntered(QString peerId, QString peerName, QString peerAddress, int pid, QString hostname, QString commandLine, bool canBeFrozen, QString loggerPort, bool isRecorder);
 
 
     /**

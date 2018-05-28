@@ -286,8 +286,10 @@ public Q_SLOTS:
      * @param hostname
      * @param commandLine
      * @param canBeFrozen
+     * @param loggerPort
+     * @param isRecorder
      */
-    void onAgentEntered(QString peerId, QString agentName, QString agentAddress, int pid, QString hostname, QString commandLine, bool canBeFrozen, bool isRecorder);
+    void onAgentEntered(QString peerId, QString agentName, QString agentAddress, int pid, QString hostname, QString commandLine, bool canBeFrozen, QString loggerPort, bool isRecorder);
 
 
     /**

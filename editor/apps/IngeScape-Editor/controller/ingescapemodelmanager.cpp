@@ -292,8 +292,10 @@ void IngeScapeModelManager::simulateExitForEachActiveAgent()
  * @param hostname
  * @param commandLine
  * @param canBeFrozen
+ * @param loggerPort
+ * @param isRecorder
  */
-void IngeScapeModelManager::onAgentEntered(QString peerId, QString agentName, QString agentAddress, int pid, QString hostname, QString commandLine, bool canBeFrozen, bool isRecorder)
+void IngeScapeModelManager::onAgentEntered(QString peerId, QString agentName, QString agentAddress, int pid, QString hostname, QString commandLine, bool canBeFrozen, QString loggerPort, bool isRecorder)
 {
     if (!peerId.isEmpty() && !agentName.isEmpty() && !agentAddress.isEmpty())
     {
@@ -315,6 +317,7 @@ void IngeScapeModelManager::onAgentEntered(QString peerId, QString agentName, QS
 
             agent->sethostname(hostname);
             agent->setcommandLine(commandLine);
+
             agent->setisRecorder(isRecorder);
 
             if (!hostname.isEmpty() && !isRecorder)
@@ -333,6 +336,7 @@ void IngeScapeModelManager::onAgentEntered(QString peerId, QString agentName, QS
 
             agent->setpid(pid);
             agent->setcanBeFrozen(canBeFrozen);
+            agent->setloggerPort(loggerPort);
 
             // Update the state (flag "is ON")
             agent->setisON(true);
