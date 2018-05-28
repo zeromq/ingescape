@@ -561,6 +561,9 @@ int igs_removeMappingEntryWithName(const char *fromOurInput, const char *toAgent
 
 void igs_setMappingPath(const char *path){
     strncpy(mappingPath, path, MAX_PATH - 1);
+    if (agentElements != NULL && agentElements->node != NULL){
+        zyre_shouts(agentElements->node, CHANNEL, "MAPPING_FILE_PATH=%s", mappingPath);
+    }
 }
 
 void igs_writeMappingToPath(void){

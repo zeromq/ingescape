@@ -564,7 +564,7 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 }else{
                     sendMappingToAgent(peer, "");
                 }
-                //we also send our frozen and muted states
+                //we also send our frozen and muted states, and other usefull information
                 if (isWholeAgentMuted){
                     zyre_whispers(agentElements->node, peer, "MUTED=1");
                 }
@@ -582,7 +582,19 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                         }
                     }
                 }
-                
+                if (admin_logInStream){
+                    zyre_whispers(agentElements->node, peer, "LOG_IN_STREAM=1");
+                }
+                if (admin_logInFile && strlen(admin_logFile) > 0){
+                    zyre_whispers(agentElements->node, peer, "LOG_IN_FILE=1");
+                    zyre_whispers(agentElements->node, peer, "LOG_FILE_PATH=%s", admin_logFile);
+                }
+                if (strlen(definitionPath) > 0){
+                    zyre_whispers(agentElements->node, peer, "DEFINITION_FILE_PATH=%s", definitionPath);
+                }
+                if (strlen(mappingPath) > 0){
+                    zyre_whispers(agentElements->node, peer, "MAPPING_FILE_PATH=%s", mappingPath);
+                }
                 
                 zyreAgent_t *zagent = NULL;
                 HASH_FIND_STR(zyreAgents, peer, zagent);

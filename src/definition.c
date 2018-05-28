@@ -472,6 +472,9 @@ int igs_removeParameter(const char *name){
 
 void igs_setDefinitionPath(const char *path){
     strncpy(definitionPath, path, MAX_PATH - 1);
+    if (agentElements != NULL && agentElements->node != NULL){
+        zyre_shouts(agentElements->node, CHANNEL, "DEFINITION_FILE_PATH=%s", definitionPath);
+    }
 }
 
 void igs_writeDefinitionToPath(void){
