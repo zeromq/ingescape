@@ -83,10 +83,10 @@ Item {
 
     readonly property color veryDarkGreyColor: "#282D34"
     readonly property color darkGreyColor2: "#2B3137"
-    readonly property color darkGreyColor : "#575756"
-    readonly property color greyColor : "#706f6f"
+    readonly property color darkGreyColor : "#575757"
+    readonly property color greyColor : "#6F6F6F"
     readonly property color greyColor2 : "#878787"
-    readonly property color lightGreyColor : "#9D9C9C"
+    readonly property color lightGreyColor : "#9C9C9C"
     readonly property color veryLightGreyColor : "#ECECEC"
 
     readonly property color orangeColor: "#F39200"

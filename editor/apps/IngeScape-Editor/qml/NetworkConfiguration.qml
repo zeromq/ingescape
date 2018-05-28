@@ -282,7 +282,7 @@ I2PopupBase {
                 }
                 labelColorPressed: IngeScapeTheme.blackColor
                 labelColorReleased: IngeScapeTheme.whiteColor
-                labelColorDisabled: IngeScapeTheme.darkGreyColor
+                labelColorDisabled: IngeScapeTheme.greyColor
 
             }
 
