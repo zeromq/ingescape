@@ -666,6 +666,8 @@ Item {
                             //console.log("QML: Enable Log File");
                             rootItem.agent.changeLogInFile(true);
                         }
+
+                        popupOptions.close();
                     }
                 }
 
@@ -690,6 +692,8 @@ Item {
                             console.log("QML: Enable Log Stream");
                             rootItem.agent.changeLogInStream(true);
                         }
+
+                        popupOptions.close();
                     }
                 }*/
 
@@ -706,7 +710,11 @@ Item {
                     }
 
                     onClicked: {
-                        console.log("QML: View Log Stream");
+                        //console.log("QML: View Log Stream");
+
+                        rootItem.agent.openLogStream();
+
+                        popupOptions.close();
                     }
                 }
             }

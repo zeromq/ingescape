@@ -179,6 +179,12 @@ public:
     Q_INVOKABLE void saveMappingToPath();
 
 
+    /**
+     * @brief Open the "Log Stream" of our agent
+     */
+    Q_INVOKABLE void openLogStream();
+
+
 Q_SIGNALS:
 
     /**

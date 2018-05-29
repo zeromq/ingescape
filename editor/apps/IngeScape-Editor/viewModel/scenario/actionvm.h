@@ -70,6 +70,7 @@ class ActionVM: public QObject
     // Timer to wait for action rearm
     I2_CPP_PROPERTY(QTimer*, timerToRearm)
 
+
 public:
 
     /**
