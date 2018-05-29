@@ -1382,7 +1382,7 @@ Window {
                                 verticalCenter : parent.verticalCenter
                             }
 
-                            visible :  actionM && actionM.validityDurationType === ValidationDurationType.CUSTOM
+                            visible :  actionM && actionM.validityDurationType === ValidationDurationTypes.CUSTOM
                             enabled: visible
                             height: 25
                             width: 57
@@ -1660,7 +1660,7 @@ Window {
                                     IngeScapeComboBoxAgentsIOP {
                                         id : ioCombo
 
-                                        visible : myCondition && myCondition.conditionType === ActionConditionType.VALUE
+                                        visible : myCondition && myCondition.conditionType === ActionConditionTypes.VALUE
                                         enabled : visible
                                         anchors {
                                             verticalCenter : parent.verticalCenter
@@ -1704,13 +1704,13 @@ Window {
                                         }
 
                                         height : 25
-                                        width : (myCondition && myCondition.conditionType === ActionConditionType.VALUE) ? 44 : 78
+                                        width : (myCondition && myCondition.conditionType === ActionConditionTypes.VALUE) ? 44 : 78
 
                                         model :
                                         {
                                             if(controller)
                                             {
-                                                (myCondition && myCondition.conditionType === ActionConditionType.VALUE) ? controller.comparisonsValuesTypesList : controller.comparisonsAgentsTypesList
+                                                (myCondition && myCondition.conditionType === ActionConditionTypes.VALUE) ? controller.comparisonsValuesTypesList : controller.comparisonsAgentsTypesList
                                             }
                                             else {
                                                 0
@@ -1729,7 +1729,7 @@ Window {
                                             property : "selectedItem"
                                             value : if (myCondition && myCondition.modelM && controller)
                                                     {
-                                                        (myCondition && myCondition.conditionType === ActionConditionType.VALUE) ?
+                                                        (myCondition && myCondition.conditionType === ActionConditionTypes.VALUE) ?
                                                                     controller.comparisonsValuesTypesList.getItemWithValue(myCondition.modelM.comparison)
                                                                   :  controller.comparisonsAgentsTypesList.getItemWithValue(myCondition.modelM.comparison);
                                                     }
@@ -1757,7 +1757,7 @@ Window {
                                             verticalCenter : parent.verticalCenter
                                         }
 
-                                        visible : myCondition && myCondition.conditionType === ActionConditionType.VALUE
+                                        visible : myCondition && myCondition.conditionType === ActionConditionTypes.VALUE
 
                                         enabled : visible
                                         height: 25

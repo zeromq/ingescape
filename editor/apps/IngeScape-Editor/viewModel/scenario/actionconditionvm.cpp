@@ -17,29 +17,25 @@
 #include <QDebug>
 
 /**
- * @brief Action condition type
+ * @brief Enum "ActionConditionTypes" to string
  * @param value
  * @return
  */
-QString ActionConditionType::enumToString(int value)
+QString ActionConditionTypes::enumToString(int value)
 {
-    QString string = "Action condition type";
+    switch (value)
+    {
+    case ActionConditionTypes::VALUE:
+        return tr("Value");
 
-    switch (value) {
-    case ActionConditionType::VALUE:
-        string = "Value";
-        break;
-
-    case ActionConditionType::AGENT:
-        string = "Agent";
-        break;
+    case ActionConditionTypes::AGENT:
+        return tr("Agent");
 
     default:
-        break;
+        return "";
     }
-
-    return string;
 }
+
 
 //--------------------------------------------------------------
 //
@@ -54,7 +50,7 @@ QString ActionConditionType::enumToString(int value)
  */
 ActionConditionVM::ActionConditionVM(QObject *parent) : QObject(parent),
     _modelM(NULL),
-    _conditionType(ActionConditionType::VALUE)
+    _conditionType(ActionConditionTypes::VALUE)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -75,10 +71,11 @@ ActionConditionVM::~ActionConditionVM()
     }
 }
 
+
 /**
  * @brief Custom setter on the condition type
  */
-void ActionConditionVM::setconditionType(ActionConditionType::Value value)
+void ActionConditionVM::setconditionType(ActionConditionTypes::Value value)
 {
     if(_conditionType != value)
     {
@@ -91,10 +88,11 @@ void ActionConditionVM::setconditionType(ActionConditionType::Value value)
     }
 }
 
+
 /**
  * @brief Configure action condition VM into a specific type
  */
-void ActionConditionVM::_configureToType(ActionConditionType::Value value)
+void ActionConditionVM::_configureToType(ActionConditionTypes::Value value)
 {
     AgentInMappingVM* agent = NULL;
 
@@ -113,14 +111,14 @@ void ActionConditionVM::_configureToType(ActionConditionType::Value value)
     // Create the new type condition
     switch (value)
     {
-        case ActionConditionType::AGENT :
+        case ActionConditionTypes::AGENT :
         {
             setmodelM(new ActionConditionM());
             _modelM->setagent(agent);
             break;
         }
 
-        case ActionConditionType::VALUE :
+        case ActionConditionTypes::VALUE :
         {
             setmodelM(new IOPValueConditionM());
             _modelM->setagent(agent);

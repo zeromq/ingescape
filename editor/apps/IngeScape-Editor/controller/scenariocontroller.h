@@ -57,12 +57,12 @@ class ScenarioController: public QObject
     I2_QML_PROPERTY_DELETE_PROOF(ActionM*, selectedAction)
 
     // Used for action edition
-    // --- List of comparisons values types
-    I2_ENUM_LISTMODEL(ActionComparisonValueType, comparisonsValuesTypesList)
-    // --- List of comparisons state types
-    I2_ENUM_LISTMODEL(ActionComparisonValueType, comparisonsAgentsTypesList)
+    // --- List of types of comparisons on values
+    I2_ENUM_LISTMODEL(ActionComparisonTypes, comparisonsValuesTypesList)
+    // --- List of types of comparisons on agent state
+    I2_ENUM_LISTMODEL(ActionComparisonTypes, comparisonsAgentsTypesList)
     // --- List of validity duration type
-    I2_ENUM_LISTMODEL(ValidationDurationType, validationDurationsTypesList)
+    I2_ENUM_LISTMODEL(ValidationDurationTypes, validationDurationsTypesList)
 
     // --- List of values about effect on agent
     I2_ENUM_LISTMODEL(AgentEffectValues, agentEffectValuesList)
@@ -70,7 +70,7 @@ class ScenarioController: public QObject
     I2_ENUM_LISTMODEL(MappingEffectValues, mappingEffectValuesList)
 
     // --- List of conditions type
-    I2_ENUM_LISTMODEL(ActionConditionType, conditionsTypesList)
+    I2_ENUM_LISTMODEL(ActionConditionTypes, conditionsTypesList)
     // --- List of effects type
     I2_ENUM_LISTMODEL(ActionEffectTypes, effectsTypesList)
 

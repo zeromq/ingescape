@@ -18,41 +18,34 @@
 
 
 /**
- * @brief Comparison type for an action
+ * @brief Enum "ActionComparisonTypes" to string
  * @param value
  * @return
  */
-QString ActionComparisonValueType::enumToString(int value)
+QString ActionComparisonTypes::enumToString(int value)
 {
-    QString string = "Comparison type";
+    switch (value)
+    {
+    case ActionComparisonTypes::SUPERIOR_TO:
+        return tr(">");
 
-    switch (value) {
-    case ActionComparisonValueType::SUPERIOR_TO:
-        string = ">";
-        break;
+    case ActionComparisonTypes::INFERIOR_TO:
+        return tr("<");
 
-    case ActionComparisonValueType::INFERIOR_TO:
-        string = "<";
-        break;
+    case ActionComparisonTypes::EQUAL_TO:
+        return tr("=");
 
-    case ActionComparisonValueType::EQUAL_TO:
-        string = "=";
-        break;
+    case ActionComparisonTypes::ON:
+        return tr("ON");
 
-    case ActionComparisonValueType::ON:
-        string = "ON";
-        break;
-
-    case ActionComparisonValueType::OFF:
-        string = "OFF";
-        break;
+    case ActionComparisonTypes::OFF:
+        return tr("OFF");
 
     default:
-        break;
+        return "";
     }
-
-    return string;
 }
+
 
 //--------------------------------------------------------------
 //
@@ -67,14 +60,14 @@ QString ActionComparisonValueType::enumToString(int value)
  */
 ActionConditionM::ActionConditionM(QObject *parent) : QObject(parent),
     _agent(NULL),
-    _comparison(ActionComparisonValueType::ON),
+    _comparison(ActionComparisonTypes::ON),
     _isValid(false)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
     // Set the condition comparision type
-    setcomparison(ActionComparisonValueType::ON);
+    setcomparison(ActionComparisonTypes::ON);
 }
 
 
@@ -117,6 +110,7 @@ void ActionConditionM::setagent(AgentInMappingVM* value)
     }
 }
 
+
 /**
 * @brief Copy from another condition model
 * @param condition to copy
@@ -137,9 +131,9 @@ void ActionConditionM::copyFrom(ActionConditionM* condition)
   */
 void ActionConditionM::onAgentModelIsOnChange(bool isON)
 {
-    if ((_comparison == ActionComparisonValueType::ON && isON)
+    if ((_comparison == ActionComparisonTypes::ON && isON)
             ||
-            (_comparison == ActionComparisonValueType::OFF && !isON)) {
+            (_comparison == ActionComparisonTypes::OFF && !isON)) {
         setisValid(true);
     }
     else {
@@ -147,12 +141,13 @@ void ActionConditionM::onAgentModelIsOnChange(bool isON)
     }
 }
 
+
 /**
   * @brief Initialize the agent connections for the action condition
   */
 void ActionConditionM::initializeConnections()
 {
-    if(_agent != NULL)
+    if (_agent != NULL)
     {
         // Reset the connections
         resetConnections();
@@ -165,6 +160,7 @@ void ActionConditionM::initializeConnections()
     }
 }
 
+
 /**
   * @brief Reset the agent connections for the action condition
   */
@@ -175,6 +171,7 @@ void ActionConditionM::resetConnections()
         disconnect(_agent, &AgentInMappingVM::isONChanged, this, &ActionConditionM::onAgentModelIsOnChange);
     }
 }
+
 
 /**
  * @brief Called when our agent model is destroyed

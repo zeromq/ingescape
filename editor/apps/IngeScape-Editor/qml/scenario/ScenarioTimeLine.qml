@@ -600,13 +600,13 @@ Item {
                                 width : if (actionModelGhost) {
                                             switch (actionModelGhost.validityDurationType)
                                             {
-                                            case ValidationDurationType.IMMEDIATE:
+                                            case ValidationDurationTypes.IMMEDIATE:
                                                 0;
                                                 break;
-                                            case ValidationDurationType.FOREVER:
+                                            case ValidationDurationTypes.FOREVER:
                                                 (viewController.timeTicksTotalWidth - viewController.convertQTimeToAbscissaInCoordinateSystem(startTime, viewController.pixelsPerMinute))
                                                 break;
-                                            case ValidationDurationType.CUSTOM:
+                                            case ValidationDurationTypes.CUSTOM:
                                                 viewController.convertDurationInMillisecondsToLengthInCoordinateSystem(actionModelGhost.validityDuration, viewController.pixelsPerMinute)
                                                 break;
                                             default:

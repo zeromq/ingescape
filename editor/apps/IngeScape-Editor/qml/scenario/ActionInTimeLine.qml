@@ -103,13 +103,13 @@ Item {
             {
                 switch (myActionVM.modelM.validityDurationType)
                 {
-                case ValidationDurationType.IMMEDIATE:
+                case ValidationDurationTypes.IMMEDIATE:
                     0;
                     break;
-                case ValidationDurationType.FOREVER:
+                case ValidationDurationTypes.FOREVER:
                     (viewController.timeTicksTotalWidth - viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(myActionVM.startTime, viewController.pixelsPerMinute))
                     break;
-                case ValidationDurationType.CUSTOM:
+                case ValidationDurationTypes.CUSTOM:
                     viewController.convertDurationInMillisecondsToLengthInCoordinateSystem(myActionVM.modelM.validityDuration, viewController.pixelsPerMinute)
                     break;
                 default:

@@ -26,7 +26,7 @@
 
 
 /**
- * Values of effect on mapping: MAPPED, UNMAPPED
+ * Values of effect on mapping
  */
 I2_ENUM_CUSTOM(MappingEffectValues, MAPPED, UNMAPPED)
 

@@ -362,8 +362,8 @@ scenario_import_actions_lists_t *JsonHelper::initActionsList(QByteArray byteArra
                         QJsonValue jsonValue = jsonAction.value("validity_duration_type");
                         if(jsonValue.isString())
                         {
-                            int validationDurationType = ValidationDurationType::staticEnumFromKey(jsonValue.toString());
-                            actionM->setvalidityDurationType((ValidationDurationType::Value)validationDurationType);
+                            int validationDurationType = ValidationDurationTypes::staticEnumFromKey(jsonValue.toString());
+                            actionM->setvalidityDurationType((ValidationDurationTypes::Value)validationDurationType);
                         }
 
                         jsonValue = jsonAction.value("validity_duration_value");
@@ -557,7 +557,7 @@ QJsonObject JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<Action
         // Create properties
         QJsonObject jsonAgent;
         jsonAgent.insert("name", actionM->name());
-        jsonAgent.insert("validity_duration_type", ValidationDurationType::staticEnumToKey(actionM->validityDurationType()));
+        jsonAgent.insert("validity_duration_type", ValidationDurationTypes::staticEnumToKey(actionM->validityDurationType()));
         jsonAgent.insert("validity_duration_value", actionM->validityDurationString());
         jsonAgent.insert("shall_revert", actionM->shallRevert());
         jsonAgent.insert("shall_revert_at_validity_end", actionM->shallRevertWhenValidityIsOver());
@@ -577,18 +577,18 @@ QJsonObject JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<Action
             if(actionCondition != NULL)
             {
                 QJsonObject jsonCondition;
-                jsonCondition.insert("type", ActionConditionType::staticEnumToKey(conditionVM->conditionType()));
+                jsonCondition.insert("type", ActionConditionTypes::staticEnumToKey(conditionVM->conditionType()));
                 jsonCondition.insert("agent_name", actionCondition->agent()->name());
 
                 switch (conditionVM->conditionType())
                 {
-                case ActionConditionType::VALUE:
+                case ActionConditionTypes::VALUE:
                 {
                     IOPValueConditionM* iopCondition = qobject_cast<IOPValueConditionM*>(actionCondition);
                     if(iopCondition != NULL && iopCondition->agentIOP() != NULL)
                     {
                         jsonCondition.insert("iop_name", iopCondition->agentIOP()->name());
-                        jsonCondition.insert("operator", ActionComparisonValueType::staticEnumToKey(iopCondition->comparison()));
+                        jsonCondition.insert("operator", ActionComparisonTypes::staticEnumToKey(iopCondition->comparison()));
                         jsonCondition.insert("value", iopCondition->value());
 
                         jsonFilled = true;
@@ -596,11 +596,11 @@ QJsonObject JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<Action
 
                     break;
                 }
-                case ActionConditionType::AGENT:
+                case ActionConditionTypes::AGENT:
                 {
                     if(actionCondition->agent() != NULL)
                     {
-                        jsonCondition.insert("value", ActionComparisonValueType::staticEnumToKey(actionCondition->comparison()));
+                        jsonCondition.insert("value", ActionComparisonTypes::staticEnumToKey(actionCondition->comparison()));
 
                         jsonFilled = true;
                     }
@@ -1542,12 +1542,12 @@ ActionConditionVM* JsonHelper::_parseConditionsVMFromJson(QJsonObject jsonCondit
     QJsonValue jsonValue = jsonCondition.value("type");
     if(jsonValue.isString())
     {
-        int conditionType = ActionConditionType::staticEnumFromKey(jsonValue.toString().toUpper());
+        int conditionType = ActionConditionTypes::staticEnumFromKey(jsonValue.toString().toUpper());
         if(conditionType >= 0)
         {
             switch (conditionType)
             {
-                case ActionConditionType::VALUE:
+                case ActionConditionTypes::VALUE:
                 {
                     QJsonValue jsonAgentName = jsonCondition.value("agent_name");
                     QJsonValue jsonIOPName = jsonCondition.value("iop_name");
@@ -1611,7 +1611,7 @@ ActionConditionVM* JsonHelper::_parseConditionsVMFromJson(QJsonObject jsonCondit
 
                             // Create view model
                             actionConditionVM = new ActionConditionVM();
-                            actionConditionVM->setconditionType(ActionConditionType::VALUE);
+                            actionConditionVM->setconditionType(ActionConditionTypes::VALUE);
 
                             actionConditionVM->setmodelM(iopConditionM);
 
@@ -1619,7 +1619,7 @@ ActionConditionVM* JsonHelper::_parseConditionsVMFromJson(QJsonObject jsonCondit
                             jsonValue = jsonCondition.value("operator");
                             if(jsonValue.isString())
                             {
-                                iopConditionM->setcomparison((ActionComparisonValueType::Value)ActionComparisonValueType::staticEnumFromKey(jsonValue.toString().toUpper()));
+                                iopConditionM->setcomparison((ActionComparisonTypes::Value)ActionComparisonTypes::staticEnumFromKey(jsonValue.toString().toUpper()));
                             }
 
                             // set value
@@ -1640,7 +1640,7 @@ ActionConditionVM* JsonHelper::_parseConditionsVMFromJson(QJsonObject jsonCondit
 
                     break;
                 }
-                case ActionConditionType::AGENT:
+                case ActionConditionTypes::AGENT:
                 {
                     QJsonValue jsonAgentName = jsonCondition.value("agent_name");
                     if(jsonAgentName.isString())
@@ -1667,14 +1667,14 @@ ActionConditionVM* JsonHelper::_parseConditionsVMFromJson(QJsonObject jsonCondit
 
                             // Create view model
                             actionConditionVM = new ActionConditionVM();
-                            actionConditionVM->setconditionType(ActionConditionType::AGENT);
+                            actionConditionVM->setconditionType(ActionConditionTypes::AGENT);
                             actionConditionVM->setmodelM(actionConditionM);
 
                             // set value
                             jsonValue = jsonCondition.value("value");
                             if(jsonValue.isString())
                             {
-                                actionConditionM->setcomparison((ActionComparisonValueType::Value)ActionComparisonValueType::staticEnumFromKey(jsonValue.toString().toUpper()));
+                                actionConditionM->setcomparison((ActionComparisonTypes::Value)ActionComparisonTypes::staticEnumFromKey(jsonValue.toString().toUpper()));
                             }
 
                             // set agent

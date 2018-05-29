@@ -375,23 +375,23 @@ void ActionVM::_computeEndTime()
     if(_modelM != NULL)
     {
         int itemDurationTime = 0;
-        if(_modelM->validityDurationType() == ValidationDurationType::FOREVER)
+        if (_modelM->validityDurationType() == ValidationDurationTypes::FOREVER)
         {
             endTime = -1;
         }
-        else if(_modelM->validityDurationType() == ValidationDurationType::CUSTOM)
+        else if (_modelM->validityDurationType() == ValidationDurationTypes::CUSTOM)
         {
             itemDurationTime = _modelM->validityDuration();
         }
 
         // Compare with the time before revert if selected
-        if(_modelM->shallRevertAfterTime() && _modelM->revertAfterTime() > itemDurationTime)
+        if (_modelM->shallRevertAfterTime() && _modelM->revertAfterTime() > itemDurationTime)
         {
             itemDurationTime = _modelM->revertAfterTime();
         }
 
         // If not forever, add duration
-        if(endTime != -1)
+        if (endTime != -1)
         {
             endTime += itemDurationTime;
         }

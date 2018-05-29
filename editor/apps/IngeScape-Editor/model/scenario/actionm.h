@@ -27,13 +27,9 @@
 #include <viewModel/scenario/actioneffectvm.h>
 
 /**
-  * @brief Validation duration type for an action
-  * Types:
-  * - Custom
-  * - Immediate
-  * - Forever
+  * @brief Types of validation duration (for an action)
   */
-I2_ENUM_CUSTOM(ValidationDurationType, IMMEDIATE, FOREVER, CUSTOM)
+I2_ENUM_CUSTOM(ValidationDurationTypes, IMMEDIATE, FOREVER, CUSTOM)
 
 
 /**
@@ -47,7 +43,7 @@ class ActionM: public QObject
     I2_QML_PROPERTY(QString, name)
 
     // Validity duration type
-    I2_QML_PROPERTY(ValidationDurationType::Value, validityDurationType)
+    I2_QML_PROPERTY(ValidationDurationTypes::Value, validityDurationType)
 
     // Validity duration in milliseconds
     I2_QML_PROPERTY(int, validityDuration)

@@ -21,23 +21,29 @@
  */
 QString AgentEffectValues::enumToString(int value)
 {
-    QString string = "Agent Effect Value";
-
     switch (value)
     {
     case AgentEffectValues::ON:
-        string = "ON";
-        break;
+        return tr("ON");
 
     case AgentEffectValues::OFF:
-        string = "OFF";
-        break;
+        return tr("OFF");
+
+    case AgentEffectValues::MUTE:
+        return tr("MUTE");
+
+    case AgentEffectValues::UNMUTE:
+        return tr("UNMUTE");
+
+    case AgentEffectValues::FREEZE:
+        return tr("FREEZE");
+
+    case AgentEffectValues::UNFREEZE:
+        return tr("UNFREEZE");
 
     default:
-        break;
+        return "";
     }
-
-    return string;
 }
 
 

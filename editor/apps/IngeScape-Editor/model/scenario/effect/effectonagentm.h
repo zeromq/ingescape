@@ -21,9 +21,9 @@
 #include "I2PropertyHelpers.h"
 
 /**
- * Values of effect on agent: ON, OFF
+ * Values of effect on agent
  */
-I2_ENUM_CUSTOM(AgentEffectValues, ON, OFF)
+I2_ENUM_CUSTOM(AgentEffectValues, ON, OFF, MUTE, UNMUTE, FREEZE, UNFREEZE)
 
 
 /**

@@ -47,13 +47,13 @@ ScenarioController::ScenarioController(IngeScapeModelManager* modelManager,
     _agentsInMappingList.setSortProperty("name");
 
     // Fill state comparisons types list
-    _comparisonsAgentsTypesList.appendEnumValue(ActionComparisonValueType::ON);
-    _comparisonsAgentsTypesList.appendEnumValue(ActionComparisonValueType::OFF);
+    _comparisonsAgentsTypesList.appendEnumValue(ActionComparisonTypes::ON);
+    _comparisonsAgentsTypesList.appendEnumValue(ActionComparisonTypes::OFF);
 
     // Fill value comparisons types list
     _comparisonsValuesTypesList.fillWithAllEnumValues();
-    _comparisonsValuesTypesList.removeEnumValue(ActionComparisonValueType::ON);
-    _comparisonsValuesTypesList.removeEnumValue(ActionComparisonValueType::OFF);
+    _comparisonsValuesTypesList.removeEnumValue(ActionComparisonTypes::ON);
+    _comparisonsValuesTypesList.removeEnumValue(ActionComparisonTypes::OFF);
 
     // Fill with all values
     _agentEffectValuesList.fillWithAllEnumValues();
@@ -749,14 +749,14 @@ bool ScenarioController::canInsertActionVMTo(ActionM* actionMToInsert, int time,
                         int insertionEndTime = time + MARGIN_FOR_ACTION_INSERTION_IN_MS;
                         int itemDurationTime = 0;
                         // If we insert a forever item and an item exists in the future, we cannot insert
-                        if(actionMToInsert->validityDurationType() == ValidationDurationType::FOREVER)
+                        if (actionMToInsert->validityDurationType() == ValidationDurationTypes::FOREVER)
                         {
                             // Try with the next line
                             canInsert = false;
                             break;
                         }
                         // If we insert a custom temporal action, we compute the end time
-                        else if(actionMToInsert->validityDurationType() == ValidationDurationType::CUSTOM)
+                        else if(actionMToInsert->validityDurationType() == ValidationDurationTypes::CUSTOM)
                         {
                             itemDurationTime = actionMToInsert->validityDuration();
                         }
@@ -878,7 +878,7 @@ void ScenarioController::_onTimeout_ExecuteActions()
                     {
                         if (actionVM->modelM()->isValid()
                             // And the action has no validation duration
-                            && actionVM->modelM()->validityDurationType() == ValidationDurationType::IMMEDIATE)
+                            && actionVM->modelM()->validityDurationType() == ValidationDurationTypes::IMMEDIATE)
                         {
                             // Execute action
                             _executeAction(actionVM, actionExecution, currentTimeInMilliSeconds);
@@ -887,7 +887,7 @@ void ScenarioController::_onTimeout_ExecuteActions()
                             disconnect(actionVM,&ActionVM::revertAction, this, &ScenarioController::onRevertAction);
                             disconnect(actionVM,&ActionVM::rearmAction, this, &ScenarioController::onRearmAction);
                         }
-                        else if (actionVM->modelM()->validityDurationType() != ValidationDurationType::IMMEDIATE)
+                        else if (actionVM->modelM()->validityDurationType() != ValidationDurationTypes::IMMEDIATE)
                         {
                             if (actionVM->modelM()->isValid())
                             {
@@ -994,7 +994,7 @@ void ScenarioController::_onTimeout_DelayOrExecuteActions()
 
                     // If there is at least another execution for this action...
                     if ( (actionVM->executionsList()->count() > 1)
-                            || (actionExecution->neverExecuted() && (actionVM->modelM()->validityDurationType() == ValidationDurationType::CUSTOM)) )
+                            || (actionExecution->neverExecuted() && (actionVM->modelM()->validityDurationType() == ValidationDurationTypes::CUSTOM)) )
                     {
                         // ...we remove the current execution
                         actionVM->setcurrentExecution(NULL);

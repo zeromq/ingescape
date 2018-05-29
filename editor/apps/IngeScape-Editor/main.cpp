@@ -42,15 +42,15 @@ void registerCustomQmlTypes()
     // Enums
     //
     //---------------
-    qmlRegisterSingletonType<ActionComparisonValueType>("INGESCAPE", 1, 0, "ActionComparisonValueType", &ActionComparisonValueType::qmlSingleton);
-    qmlRegisterSingletonType<ActionConditionType>("INGESCAPE", 1, 0, "ActionConditionType", &ActionConditionType::qmlSingleton);
+    qmlRegisterSingletonType<ActionComparisonTypes>("INGESCAPE", 1, 0, "ActionComparisonTypes", &ActionComparisonTypes::qmlSingleton);
+    qmlRegisterSingletonType<ActionConditionTypes>("INGESCAPE", 1, 0, "ActionConditionTypes", &ActionConditionTypes::qmlSingleton);
     qmlRegisterSingletonType<ActionEffectTypes>("INGESCAPE", 1, 0, "ActionEffectTypes", &ActionEffectTypes::qmlSingleton);
     qmlRegisterSingletonType<AgentEffectValues>("INGESCAPE", 1, 0, "AgentEffectValues", &AgentEffectValues::qmlSingleton);
     qmlRegisterSingletonType<AgentIOPTypes>("INGESCAPE", 1, 0, "AgentIOPTypes", &AgentIOPTypes::qmlSingleton);
     qmlRegisterSingletonType<AgentIOPValueTypes>("INGESCAPE", 1, 0, "AgentIOPValueTypes", &AgentIOPValueTypes::qmlSingleton);
     qmlRegisterSingletonType<AgentIOPValueTypeGroups>("INGESCAPE", 1, 0, "AgentIOPValueTypeGroups", &AgentIOPValueTypeGroups::qmlSingleton);
     qmlRegisterSingletonType<MappingEffectValues>("INGESCAPE", 1, 0, "MappingEffectValues", &MappingEffectValues::qmlSingleton);
-    qmlRegisterSingletonType<ValidationDurationType>("INGESCAPE", 1, 0, "ValidationDurationType", &ValidationDurationType::qmlSingleton);
+    qmlRegisterSingletonType<ValidationDurationTypes>("INGESCAPE", 1, 0, "ValidationDurationTypes", &ValidationDurationTypes::qmlSingleton);
 
 
     //----------------
