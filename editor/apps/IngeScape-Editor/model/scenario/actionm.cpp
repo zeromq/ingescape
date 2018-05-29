@@ -367,10 +367,9 @@ void ActionM::initializeConditionsConnections()
 {
     if (!_isConnected)
     {
-        // Initialize conditions connections
         foreach (ActionConditionVM* conditionVM, _conditionsList.toList())
         {
-            if(conditionVM->modelM() != NULL)
+            if (conditionVM->modelM() != NULL)
             {
                 // Connect to changes on flag "is valid"
                 connect(conditionVM->modelM(), &ActionConditionM::isValidChanged, this, &ActionM::_onConditionValidationChange);
@@ -395,11 +394,11 @@ void ActionM::resetConditionsConnections()
 {
     if (_isConnected)
     {
-        // Initialize conditions connections
         foreach (ActionConditionVM* conditionVM, _conditionsList.toList())
         {
-            if(conditionVM->modelM() != NULL)
+            if (conditionVM->modelM() != NULL)
             {
+                // DIS-connect from changes on flag "is valid"
                 disconnect(conditionVM->modelM(), &ActionConditionM::isValidChanged, this, &ActionM::_onConditionValidationChange);
 
                 conditionVM->modelM()->resetConnections();

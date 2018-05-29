@@ -123,10 +123,12 @@ public:
      */
     void resetConditionsConnections();
 
+
     /**
      * @brief Add effect to the list
      */
     void addEffectToList(ActionEffectVM* effectVM);
+
 
     /**
      * @brief Add condition to the list

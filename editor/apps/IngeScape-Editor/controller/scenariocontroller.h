@@ -139,11 +139,13 @@ public:
         return &_filteredListActionsInTimeLine;
     }
 
+
     /**
       * @brief Import the scenario lists structure from the json byte content
       * @param byte array content
       */
     void importScenarioFromJson(QByteArray byteArrayOfJson);
+
 
     /**
       * @brief Check if an agent is defined into tha actions (conditions and effects)
@@ -151,11 +153,13 @@ public:
       */
     bool isAgentDefinedInActions(QString agentName);
 
+
     /**
       * @brief Open the action editor
       * @param action model
       */
     Q_INVOKABLE void openActionEditor(ActionM* actionM);
+
 
     /**
       * @brief Open the action editor
@@ -163,11 +167,13 @@ public:
       */
     Q_INVOKABLE void openActionEditorFromActionVM(ActionVM* actionVM);
 
+
     /**
       * @brief Delete an action from the list
       * @param action model
       */
     Q_INVOKABLE void deleteAction(ActionM * actionM);
+
 
     /**
       * @brief Valide action edition
@@ -175,11 +181,13 @@ public:
       */
     Q_INVOKABLE void valideActionEditor(ActionEditorController* actionEditorC);
 
+
     /**
       * @brief Close action edition
       * @param action editor controller
       */
     Q_INVOKABLE void closeActionEditor(ActionEditorController* actionEditorC);
+
 
     /**
      * @brief Set an action into the palette at index
@@ -188,6 +196,7 @@ public:
      */
     Q_INVOKABLE void setActionInPalette(int index, ActionM* actionM);
 
+
     /**
      * @brief Add an action VM at the time in ms
      * @param action model
@@ -195,11 +204,13 @@ public:
      */
     Q_INVOKABLE void addActionVMAtTime(ActionM* actionM, int timeInMs, int lineNumber = -1);
 
+
     /**
      * @brief Add an action VM at the current date time
      * @param action model
      */
     Q_INVOKABLE void addActionVMAtCurrentTime(ActionM* actionM);
+
 
     /**
      * @brief Remove an action VM from the time line
@@ -207,15 +218,18 @@ public:
      */
     Q_INVOKABLE void removeActionVMFromTimeLine(ActionVM * actionVM);
 
-    /**
-     * @brief Make conditions connections
-     */
-    Q_INVOKABLE void conditionsConnect();
 
     /**
-     * @brief Conditions disconnections
+     * @brief Initialize the connections for conditions of all actions
      */
-    Q_INVOKABLE void conditionsDisconnect();
+    Q_INVOKABLE void initializeConditionsConnectionsOfAllActions();
+
+
+    /**
+     * @brief Reset the connections for conditions of all actions
+     */
+    Q_INVOKABLE void resetConditionsConnectionsOfAllActions();
+
 
     /**
      * @brief Test if an item can be inserted into a line number
@@ -233,16 +247,12 @@ public:
      */
     Q_INVOKABLE void executeEffectsOfAction(ActionM* action);
 
-    /**
-     * @brief Set the current time in milliseconds
-     * @param current time in milliseconds
-     */
-    Q_INVOKABLE void updateCurrentTimeInMs(int currentTimeInMs);
 
     /**
      * @brief Clear the list of actions in the table / palette / timeline
      */
     Q_INVOKABLE void clearScenario();
+
 
     /**
      * @brief Move an actionVM to a start time position in ms and a specific line number
@@ -251,6 +261,7 @@ public:
      * @param line number
      */
     Q_INVOKABLE void moveActionVMAtTimeAndLine(ActionVM* actionVM, int timeInMilliseconds, int lineNumber);
+
 
     /**
      * @brief Can delete an action from the list
