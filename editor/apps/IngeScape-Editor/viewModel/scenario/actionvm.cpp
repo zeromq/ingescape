@@ -72,7 +72,6 @@ ActionVM::ActionVM(ActionM* model,
     _timerToRearm->setSingleShot(true);
     connect(_timerToRearm, &QTimer::timeout, this, &ActionVM::_onTimeout_RearmAction);
 
-
 }
 
 
@@ -91,15 +90,19 @@ ActionVM::~ActionVM()
     setmodelM(NULL);
 
     // Remove revert timer
-    if(_timerToReverse != NULL)
+    if (_timerToReverse != NULL)
     {
+        disconnect(_timerToReverse, 0, this, 0);
+        _timerToReverse->stop();
         delete _timerToReverse;
         _timerToReverse = NULL;
     }
 
     // Remove rearm timer
-    if(_timerToRearm != NULL)
+    if (_timerToRearm != NULL)
     {
+        disconnect(_timerToRearm, 0, this, 0);
+        _timerToRearm->stop();
         delete _timerToRearm;
         _timerToRearm = NULL;
     }
@@ -265,7 +268,7 @@ void ActionVM::effectsExecuted(int currentTimeInMilliSeconds)
         _currentExecution->setisExecuted(true);
 
         // Shall revert
-        if (_modelM->shallRevertAfterTime() && _modelM->revertAfterTime() > 0)
+        if (_modelM->shallRevertAfterTime() && (_modelM->revertAfterTime() > 0))
         {
             // Launch timer for revert
             _timerToReverse->start(_modelM->revertAfterTime());
@@ -301,12 +304,13 @@ void ActionVM::reverseEffectsExecuted(int currentTimeInMilliSeconds)
         setcurrentExecution(NULL);
 
         // Shall rearm
-        if (_modelM->shallRearm() && (currentTimeInMilliSeconds < _endTime || _endTime == -1))
+        if (_modelM->shallRearm() && ((currentTimeInMilliSeconds < _endTime) || (_endTime == -1) ))
         {
             _timerToRearm->start(_modelM->rearmAfterTime());
         }
     }
 }
+
 
 /**
  * @brief Notify our action that it need to be rearmed
@@ -317,7 +321,6 @@ void ActionVM::rearmCurrentActionExecution(int currentTimeInMilliSeconds)
     // Create a new (view model of) action execution
     _createActionExecution(currentTimeInMilliSeconds);
 }
-
 
 
 /**
@@ -372,7 +375,7 @@ void ActionVM::_onValidityDurationChange()
 void ActionVM::_computeEndTime()
 {
     int endTime = _startTime;
-    if(_modelM != NULL)
+    if (_modelM != NULL)
     {
         int itemDurationTime = 0;
         if (_modelM->validityDurationType() == ValidationDurationTypes::FOREVER)
@@ -448,17 +451,19 @@ void ActionVM::_createActionExecution(int startTime)
     }
 }
 
+
 /**
  * @brief Called when our timer time out to handle the action reversion
  */
 void ActionVM::_onTimeout_ReserseAction()
 {
-    if(_currentExecution != NULL)
+    if (_currentExecution != NULL)
     {
         // Emit the signal to send the action reversion
         Q_EMIT revertAction(_currentExecution);
     }
 }
+
 
 /**
  * @brief Called when our timer time out to handle the action rearm
@@ -477,10 +482,11 @@ void ActionVM::_onTimeout_RearmAction()
 void ActionVM::resetDataFrom(int time)
 {
     // Update the conditions validation flag
-    if(_modelM->isConnected())
+    if (_modelM->isConnected())
     {
         setareConditionsValid(modelM()->isValid());
-    } else {
+    }
+    else {
         setareConditionsValid(false);
     }
 
@@ -494,26 +500,25 @@ void ActionVM::resetDataFrom(int time)
     foreach (ActionExecutionVM* actionExecution, _executionsList.toList())
     {
         // The action execution is in the future
-        if(actionExecution->executionTime() >= relativeTime ||
-                (actionExecution->shallRevert()
-                                 && ((actionExecution->reverseTime() >= relativeTime))))
+        if ( (actionExecution->executionTime() >= relativeTime)
+             || (actionExecution->shallRevert() && (actionExecution->reverseTime() >= relativeTime)) )
         {
             _executionsList.remove(actionExecution);
         }
     }
 
     // If the action is empty or the rearm is asked, we can create a new action execution
-    if(_executionsList.count() == 0 || _modelM->shallRearm())
+    if (_executionsList.isEmpty() || _modelM->shallRearm())
     {
         // Create the first action execution
-        if(time <= _startTime)
+        if (time <= _startTime)
         {
             // Create the first (view model of) action execution
             _createActionExecution(0);
-        } else {
+        }
+        else {
             // Create one default action execution in the current validation duration
             _createActionExecution(relativeTime);
         }
     }
-
 }

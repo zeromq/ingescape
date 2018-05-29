@@ -452,7 +452,7 @@ void ScenarioController::addActionVMAtTime(ActionM* actionM, int timeInMs, int l
         {
             // Add the new action VM to our map
             QList<ActionVM*> actionsVMsList;
-            if(_mapActionsVMsInTimelineFromActionModel.contains(actionM)) {
+            if (_mapActionsVMsInTimelineFromActionModel.contains(actionM)) {
                 actionsVMsList = _mapActionsVMsInTimelineFromActionModel.value(actionM);
             }
             actionsVMsList.append(actionVM);
@@ -462,14 +462,14 @@ void ScenarioController::addActionVMAtTime(ActionM* actionM, int timeInMs, int l
             _actionsInTimeLine.append(actionVM);
 
             // If scenario is playing we add the actionVM to the active ones
-            if(_isPlaying)
+            if (_isPlaying)
             {
                 // Initialize the action connections
                 actionVM->modelM()->initializeConditionsConnections();
 
                 // Connect the revert action
-                connect(actionVM,&ActionVM::revertAction, this, &ScenarioController::onRevertAction);
-                connect(actionVM,&ActionVM::rearmAction, this, &ScenarioController::onRearmAction);
+                connect(actionVM, &ActionVM::revertAction, this, &ScenarioController::onRevertAction);
+                connect(actionVM, &ActionVM::rearmAction, this, &ScenarioController::onRearmAction);
 
                 // Add action to the ones to check
                 _actionsVMToEvaluateVMList.append(actionVM);
@@ -884,8 +884,8 @@ void ScenarioController::_onTimeout_ExecuteActions()
                             _executeAction(actionVM, actionExecution, currentTimeInMilliSeconds);
 
                             // Disconnect before removing from the list
-                            disconnect(actionVM,&ActionVM::revertAction, this, &ScenarioController::onRevertAction);
-                            disconnect(actionVM,&ActionVM::rearmAction, this, &ScenarioController::onRearmAction);
+                            //disconnect(actionVM, &ActionVM::revertAction, this, &ScenarioController::onRevertAction);
+                            //disconnect(actionVM, &ActionVM::rearmAction, this, &ScenarioController::onRearmAction);
                         }
                         else if (actionVM->modelM()->validityDurationType() != ValidationDurationTypes::IMMEDIATE)
                         {
@@ -1013,12 +1013,12 @@ void ScenarioController::_onTimeout_DelayOrExecuteActions()
                 if (!actionVM->timerToReverse()->isActive())
                 {
                     // Disconnect the revert action signal
-                    disconnect(actionVM,&ActionVM::revertAction, this, &ScenarioController::onRevertAction);
+                    disconnect(actionVM, &ActionVM::revertAction, this, &ScenarioController::onRevertAction);
                 }
-                if(!actionVM->timerToRearm()->isActive())
+                if (!actionVM->timerToRearm()->isActive())
                 {
                     // Disconnect the rearm action signal
-                    disconnect(actionVM,&ActionVM::rearmAction, this, &ScenarioController::onRearmAction);
+                    disconnect(actionVM, &ActionVM::rearmAction, this, &ScenarioController::onRearmAction);
                 }
                 _activeActionsVMList.remove(actionVM);
             }
@@ -1051,8 +1051,8 @@ void ScenarioController::_startScenario()
     // Set the list of Actions to process at currentTime
     foreach (ActionVM* actionVM, _actionsVMToEvaluateVMList.toList())
     {
-        disconnect(actionVM,&ActionVM::revertAction, this, &ScenarioController::onRevertAction);
-        disconnect(actionVM,&ActionVM::rearmAction, this, &ScenarioController::onRearmAction);
+        disconnect(actionVM, &ActionVM::revertAction, this, &ScenarioController::onRevertAction);
+        disconnect(actionVM, &ActionVM::rearmAction, this, &ScenarioController::onRearmAction);
     }
     _actionsVMToEvaluateVMList.clear();
     _activeActionsVMList.clear();
@@ -1065,19 +1065,21 @@ void ScenarioController::_startScenario()
         if ((actionVM->endTime() > currentTimeInMilliSeconds) || (actionVM->endTime() == -1))
         {
             // Connect on the action revert signal
-            connect(actionVM,&ActionVM::revertAction, this, &ScenarioController::onRevertAction);
-            connect(actionVM,&ActionVM::rearmAction, this, &ScenarioController::onRearmAction);
+            connect(actionVM, &ActionVM::revertAction, this, &ScenarioController::onRevertAction);
+            connect(actionVM, &ActionVM::rearmAction, this, &ScenarioController::onRearmAction);
 
             // Initialize the action view model at a specific time.
             actionVM->resetDataFrom(currentTimeInMilliSeconds);
 
-            if(actionVM->startTime() <= currentTimeInMilliSeconds)
+            if (actionVM->startTime() <= currentTimeInMilliSeconds)
             {
                 // Add our action
                 _activeActionsVMList.append(actionVM);
-            } else {
+            }
+            else
+            {
                 // Check the next mission to launch
-                if(nextActionToLaunch == NULL || nextActionToLaunch->startTime() > actionVM->startTime())
+                if ((nextActionToLaunch == NULL) || (nextActionToLaunch->startTime() > actionVM->startTime()))
                 {
                     nextActionToLaunch = actionVM;
                 }
@@ -1101,7 +1103,7 @@ void ScenarioController::_startScenario()
 
     // Start timers
     // init the timer with the time of the next action execution
-    if(_nextActionVMToActive != NULL)
+    if (_nextActionVMToActive != NULL)
     {
         _timerToExecuteActions.start(_nextActionVMToActive->startTime() - currentTimeInMilliSeconds);
     }
@@ -1118,12 +1120,10 @@ void ScenarioController::_startScenario()
 void ScenarioController::_stopScenario()
 {
     // Stop timers
-    if(_timerToExecuteActions.isActive())
-    {
+    if (_timerToExecuteActions.isActive()) {
         _timerToExecuteActions.stop();
     }
-    if(_timerToRegularlyDelayActions.isActive())
-    {
+    if (_timerToRegularlyDelayActions.isActive()) {
         _timerToRegularlyDelayActions.stop();
     }
 
@@ -1131,18 +1131,16 @@ void ScenarioController::_stopScenario()
     foreach (ActionVM* actionVM, _activeActionsVMList.toList())
     {
         // Disconnect revert action
-        if(actionVM->timerToReverse()->isActive())
-        {
+        if (actionVM->timerToReverse()->isActive()) {
             actionVM->timerToReverse()->stop();
         }
-        disconnect(actionVM,&ActionVM::revertAction, this, &ScenarioController::onRevertAction);
+        disconnect(actionVM, &ActionVM::revertAction, this, &ScenarioController::onRevertAction);
 
         // Disconnect rearm action
-        if(actionVM->timerToRearm()->isActive())
-        {
+        if (actionVM->timerToRearm()->isActive()) {
             actionVM->timerToRearm()->stop();
         }
-        disconnect(actionVM,&ActionVM::rearmAction, this, &ScenarioController::onRearmAction);
+        disconnect(actionVM, &ActionVM::rearmAction, this, &ScenarioController::onRearmAction);
     }
 
     // Reset the next action VM to active
@@ -1150,8 +1148,6 @@ void ScenarioController::_stopScenario()
 
     // Disconnect actions conditions
     conditionsDisconnect();
-
-
 }
 
 
@@ -1335,11 +1331,12 @@ void ScenarioController::onRevertAction(ActionExecutionVM* actionExecution)
             actionVM->setcurrentExecution(NULL);
 
             // Remove from the list of "active" actions
-            disconnect(actionVM,&ActionVM::revertAction, this, &ScenarioController::onRevertAction);
-            disconnect(actionVM,&ActionVM::rearmAction, this, &ScenarioController::onRearmAction);
+            disconnect(actionVM, &ActionVM::revertAction, this, &ScenarioController::onRevertAction);
+            disconnect(actionVM, &ActionVM::rearmAction, this, &ScenarioController::onRearmAction);
         }
     }
 }
+
 
 /**
   * @brief slot on the action rearm
@@ -1358,12 +1355,11 @@ void ScenarioController::onRearmAction()
         {
             ActionExecutionVM * lastActionExecution = actionVM->executionsList()->toList().last();
             currentTimeInMilliSeconds = lastActionExecution->executionTime();
-            if(lastActionExecution->shallRevert() == true)
-            {
+
+            if (lastActionExecution->shallRevert()) {
                 currentTimeInMilliSeconds += actionVM->modelM()->revertAfterTime();
             }
-            if(actionVM->modelM()->shallRearm() == true)
-            {
+            if (actionVM->modelM()->shallRearm()) {
                 currentTimeInMilliSeconds += actionVM->modelM()->rearmAfterTime();
             }
         }
@@ -1371,14 +1367,14 @@ void ScenarioController::onRearmAction()
         actionVM->rearmCurrentActionExecution(currentTimeInMilliSeconds);
 
         // The rearm action has been done after the end of the action validity
-        if(actionVM->endTime() >= 0 && currentTimeInMilliSeconds >= actionVM->endTime())
+        if ((actionVM->endTime() >= 0) && (currentTimeInMilliSeconds >= actionVM->endTime()))
         {
             // ...we remove the current execution
             actionVM->setcurrentExecution(NULL);
 
             // Remove from the list of "active" actions
-            disconnect(actionVM,&ActionVM::revertAction, this, &ScenarioController::onRevertAction);
-            disconnect(actionVM,&ActionVM::rearmAction, this, &ScenarioController::onRearmAction);
+            disconnect(actionVM, &ActionVM::revertAction, this, &ScenarioController::onRevertAction);
+            disconnect(actionVM, &ActionVM::rearmAction, this, &ScenarioController::onRearmAction);
         }
     }
 }
@@ -1477,6 +1473,7 @@ void ScenarioController::importScenarioFromJson(QByteArray byteArrayOfJson)
     }
 }
 
+
 /**
  * @brief Clear the list of actions in the table / palette / timeline
  */
@@ -1514,6 +1511,7 @@ void ScenarioController::clearScenario()
     setcurrentTime(QTime::fromMSecsSinceStartOfDay(0));
 }
 
+
 /**
  * @brief Move an actionVM to a start time position in ms and a specific line number
  * @param action VM
@@ -1522,7 +1520,7 @@ void ScenarioController::clearScenario()
  */
 void ScenarioController::moveActionVMAtTimeAndLine(ActionVM* actionVM, int timeInMilliseconds, int lineNumber)
 {
-    if(actionVM != NULL && timeInMilliseconds >= 0 && lineNumber >= 0)
+    if ((actionVM != NULL) && (timeInMilliseconds >= 0) && (lineNumber >= 0))
     {
         bool canInsert = canInsertActionVMTo(actionVM->modelM(), timeInMilliseconds, lineNumber,actionVM);
         // Insert our item if possible
@@ -1530,19 +1528,18 @@ void ScenarioController::moveActionVMAtTimeAndLine(ActionVM* actionVM, int timeI
         {
             // Reset connections
             // Connect the revert action
-            if(actionVM->timerToReverse()->isActive())
-            {
+            if (actionVM->timerToReverse()->isActive()) {
                 actionVM->timerToReverse()->stop();
             }
-            disconnect(actionVM,&ActionVM::revertAction, this, &ScenarioController::onRevertAction);
-            disconnect(actionVM,&ActionVM::rearmAction, this, &ScenarioController::onRearmAction);
+            disconnect(actionVM, &ActionVM::revertAction, this, &ScenarioController::onRevertAction);
+            disconnect(actionVM, &ActionVM::rearmAction, this, &ScenarioController::onRearmAction);
 
-            if(_actionsVMToEvaluateVMList.contains(actionVM))
-            {
+            // FIXME: need to connect something later ?
+
+            if (_actionsVMToEvaluateVMList.contains(actionVM)) {
                 _actionsVMToEvaluateVMList.remove(actionVM);
             }
-            if(_activeActionsVMList.contains(actionVM))
-            {
+            if (_activeActionsVMList.contains(actionVM)) {
                 _activeActionsVMList.remove(actionVM);
             }
 
@@ -1554,7 +1551,7 @@ void ScenarioController::moveActionVMAtTimeAndLine(ActionVM* actionVM, int timeI
             actionVM->setstartTimeString(QString::number(hours).rightJustified(2, '0') + ":" + QString::number(minutes).rightJustified(2, '0') + ":" + QString::number(seconds).rightJustified(2, '0') + "." + QString::number(milliseconds).leftJustified(3, '0'));
 
             // If the mine number has changed
-            if(actionVM->lineInTimeLine() != lineNumber)
+            if (actionVM->lineInTimeLine() != lineNumber)
             {
                 // Remove the actionVM from the previous line if different
                 if (_mapActionsVMsInTimelineFromLineIndex.contains(actionVM->lineInTimeLine()))
@@ -1585,7 +1582,8 @@ void ScenarioController::moveActionVMAtTimeAndLine(ActionVM* actionVM, int timeI
                         }
                     }
                 }
-                else {
+                else
+                {
                     // Create a new list
                     I2CustomItemSortFilterListModel<ActionVM>* actionVMSortedList = new I2CustomItemSortFilterListModel<ActionVM>();
                     actionVMSortedList->setSortProperty("startTime");
@@ -1598,7 +1596,7 @@ void ScenarioController::moveActionVMAtTimeAndLine(ActionVM* actionVM, int timeI
                     _mapActionsVMsInTimelineFromLineIndex.insert(lineNumber,actionVMSortedList);
 
                     // Add an extra line if inserted our actionVM at the last line
-                    if(lineNumber >= _linesNumberInTimeLine -1)
+                    if (lineNumber >= _linesNumberInTimeLine -1)
                     {
                         setlinesNumberInTimeLine(lineNumber+2);
                     }
@@ -1607,6 +1605,7 @@ void ScenarioController::moveActionVMAtTimeAndLine(ActionVM* actionVM, int timeI
         }
     }
 }
+
 
 /**
   * @brief Check if an agent is defined into tha actions (conditions and effects)
@@ -1621,8 +1620,8 @@ bool ScenarioController::isAgentDefinedInActions(QString agentName)
         // Check the action conditions
         foreach (ActionConditionVM* conditionVM, actionM->conditionsList()->toList())
         {
-            if(conditionVM->modelM() != NULL && conditionVM->modelM()->agent() != NULL
-                    && conditionVM->modelM()->agent()->name() == agentName)
+            if ((conditionVM->modelM() != NULL) && (conditionVM->modelM()->agent() != NULL)
+                    && (conditionVM->modelM()->agent()->name() == agentName))
             {
                 exists = true;
                 break;
@@ -1634,8 +1633,8 @@ bool ScenarioController::isAgentDefinedInActions(QString agentName)
         {
             foreach (ActionEffectVM* effectVM, actionM->effectsList()->toList())
             {
-                if(effectVM->modelM() != NULL && effectVM->modelM()->agent() != NULL
-                        && effectVM->modelM()->agent()->name() == agentName)
+                if ((effectVM->modelM() != NULL) && (effectVM->modelM()->agent() != NULL)
+                        && (effectVM->modelM()->agent()->name() == agentName))
                 {
                     exists = true;
                     break;
@@ -1647,6 +1646,7 @@ bool ScenarioController::isAgentDefinedInActions(QString agentName)
     return exists;
 }
 
+
 /**
  * @brief Can delete an action from the list
  *        Check dependencies in the timeline
@@ -1657,13 +1657,13 @@ bool ScenarioController::canDeleteActionFromList(ActionM* actionM)
 {
     bool canBeDeleted = true;
 
-    if(actionM != NULL)
-    {
+    if (actionM != NULL) {
         canBeDeleted = !_mapActionsVMsInTimelineFromActionModel.contains(actionM);
     }
 
     return canBeDeleted;
 }
+
 
 /**
   * @brief slot on the time line range change
