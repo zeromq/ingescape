@@ -25,7 +25,7 @@ import "../theme" as Theme
 
 
 Item {
-    id : root
+    id: rootItem
 
     //--------------------------------
     //
@@ -101,7 +101,7 @@ Item {
             // Selected Agent
             Item {
                 anchors.fill: parent
-                visible : controller && root.agent && (controller.selectedAgent === root.agent);
+                visible : controller && rootItem.agent && (controller.selectedAgent === rootItem.agent);
 
                 Rectangle {
                     anchors {
@@ -147,7 +147,7 @@ Item {
                         }
                         else {
                             // Emit the signal "needConfirmationtoDeleteAgent"
-                            root.needConfirmationtoDeleteAgent();
+                            rootItem.needConfirmationtoDeleteAgent();
                         }
                     }
                 }
@@ -177,8 +177,8 @@ Item {
                 }
                 elide: Text.ElideRight
 
-                text: root.agent ? root.agent.name : ""
-                color: (root.agent && (root.agent.isON === true)) ? IngeScapeTheme.agentsListLabelColor : IngeScapeTheme.agentOFFLabelColor
+                text: rootItem.agent ? rootItem.agent.name : ""
+                color: (rootItem.agent && (rootItem.agent.isON === true)) ? IngeScapeTheme.agentsListLabelColor : IngeScapeTheme.agentOFFLabelColor
 
 
                 font: IngeScapeTheme.headingFont
@@ -247,9 +247,9 @@ Item {
 
                 hoverEnabled: true
                 onClicked: {
-                    if (controller && root.agent) {
+                    if (controller && rootItem.agent) {
                         // Open the definition of our agent
-                        controller.openDefinition(root.agent);
+                        controller.openDefinition(rootItem.agent);
                     }
                 }
 
@@ -259,7 +259,7 @@ Item {
                     elideWidth: (columnName.width - versionName.width)
                     elide: Text.ElideRight
 
-                    text: root.agent && root.agent.definition ? root.agent.definition.name : ""
+                    text: rootItem.agent && rootItem.agent.definition ? rootItem.agent.definition.name : ""
                 }
 
                 Text {
@@ -270,7 +270,7 @@ Item {
                     }
 
                     text : definitionName.elidedText
-                    color: if (root.agent && (root.agent.isON === true)) {
+                    color: if (rootItem.agent && (rootItem.agent.isON === true)) {
                                ((model.definition && model.definition.isVariant) ?
                                     definitionNameBtn.pressed? IngeScapeTheme.middleDarkRedColor : IngeScapeTheme.redColor
                                 : definitionNameBtn.pressed? IngeScapeTheme.agentsListPressedLabel2Color : IngeScapeTheme.agentsListLabel2Color)
@@ -292,7 +292,7 @@ Item {
                         leftMargin: 5
                     }
 
-                    text: root.agent && root.agent.definition ? "(v" + root.agent.definition.version + ")" : ""
+                    text: rootItem.agent && rootItem.agent.definition ? "(v" + rootItem.agent.definition.version + ")" : ""
                     color: definitionNameTxt.color
 
                     font {
@@ -327,9 +327,9 @@ Item {
                 }
                 elide: Text.ElideRight
 
-                text: root.agent ? root.agent.hostnames: ""
+                text: rootItem.agent ? rootItem.agent.hostnames: ""
 
-                color: (root.agent && (root.agent.isON === true)) ? IngeScapeTheme.agentsListTextColor : IngeScapeTheme.agentOFFTextColor
+                color: (rootItem.agent && (rootItem.agent.isON === true)) ? IngeScapeTheme.agentsListTextColor : IngeScapeTheme.agentOFFTextColor
                 font: IngeScapeTheme.normalFont
             }
 
@@ -339,8 +339,8 @@ Item {
             id: middleRow
 
             anchors {
-                bottom: bottomRow.top
-                bottomMargin: 5
+                bottom: parent.bottom
+                bottomMargin: 35
                 right : parent.right
                 rightMargin: 10
             }
@@ -372,7 +372,7 @@ Item {
                 id: btnOnOff
 
                 // Agent is "ON" OR Agent can be restarted
-                visible: (root.agent && (root.agent.isON || root.agent.canBeRestarted))
+                visible: (rootItem.agent && (rootItem.agent.isON || rootItem.agent.canBeRestarted))
 
                 activeFocusOnPress: true
                 enabled: visible
@@ -445,6 +445,7 @@ Item {
                 onClicked: {
                     //console.log("QML: Open options...");
 
+                    // Open the popup with options
                     popupOptions.open();
                 }
             }
@@ -455,15 +456,16 @@ Item {
         id : popupOptions
 
         anchors {
-            top: root.top
-            left: root.right
+            top: rootItem.top
+            left: rootItem.right
             leftMargin: 2
         }
 
         property int optionHeight: 30
 
-        width: 200
+        // 9 options x optionHeight
         height: 9 * optionHeight
+        width: 200
 
         isModal: true;
         layerColor: "transparent"
@@ -508,8 +510,8 @@ Item {
                     }
 
                     onClicked: {
-                        if (root.agent) {
-                            root.agent.loadDefinition();
+                        if (rootItem.agent) {
+                            rootItem.agent.loadDefinition();
 
                             popupOptions.close();
                         }
@@ -529,8 +531,8 @@ Item {
                     }
 
                     onClicked: {
-                        if (root.agent) {
-                            root.agent.loadMapping();
+                        if (rootItem.agent) {
+                            rootItem.agent.loadMapping();
 
                             popupOptions.close();
                         }
@@ -550,8 +552,8 @@ Item {
                     }
 
                     onClicked: {
-                        if (root.agent) {
-                            root.agent.downloadDefinition();
+                        if (rootItem.agent) {
+                            rootItem.agent.downloadDefinition();
 
                             popupOptions.close();
                         }
@@ -571,8 +573,8 @@ Item {
                     }
 
                     onClicked: {
-                        if (root.agent) {
-                            root.agent.downloadMapping();
+                        if (rootItem.agent) {
+                            rootItem.agent.downloadMapping();
 
                             popupOptions.close();
                         }
@@ -595,7 +597,7 @@ Item {
                         console.log("QML: Set Path for Definition/Mapping/Log files");
 
                         // Emit the signal "configureFilesPaths"
-                        root.configureFilesPaths(root.agent);
+                        rootItem.configureFilesPaths(rootItem.agent);
 
                         popupOptions.close();
                     }
@@ -616,7 +618,7 @@ Item {
                     onClicked: {
                         //console.log("QML: Save Definition to Path");
 
-                        root.agent.saveDefinitionToPath();
+                        rootItem.agent.saveDefinitionToPath();
 
                         popupOptions.close();
                     }
@@ -637,7 +639,7 @@ Item {
                     onClicked: {
                         //console.log("QML: Save Mapping to Path");
 
-                        root.agent.saveMappingToPath();
+                        rootItem.agent.saveMappingToPath();
 
                         popupOptions.close();
                     }
@@ -649,20 +651,20 @@ Item {
                     height: popupOptions.optionHeight
                     width: parent.width
 
-                    text: (root.agent && (root.agent.hasLogInFile === true)) ? qsTr("Disable Log File") : qsTr("Enable Log File")
+                    text: (rootItem.agent && (rootItem.agent.hasLogInFile === true)) ? qsTr("Disable Log File") : qsTr("Enable Log File")
 
                     style: Theme.ButtonStyleOfOption {
 
                     }
 
                     onClicked: {
-                        if (root.agent && (root.agent.hasLogInFile === true)) {
+                        if (rootItem.agent && (rootItem.agent.hasLogInFile === true)) {
                             //console.log("QML: Disable Log File");
-                            root.agent.changeLogInFile(false);
+                            rootItem.agent.changeLogInFile(false);
                         }
                         else {
                             //console.log("QML: Enable Log File");
-                            root.agent.changeLogInFile(true);
+                            rootItem.agent.changeLogInFile(true);
                         }
                     }
                 }
@@ -673,20 +675,20 @@ Item {
                     height: popupOptions.optionHeight
                     width: parent.width
 
-                    text: (root.agent && (root.agent.hasLogInStream === true)) ? qsTr("Disable Log Stream") : qsTr("Enable Log Stream")
+                    text: (rootItem.agent && (rootItem.agent.hasLogInStream === true)) ? qsTr("Disable Log Stream") : qsTr("Enable Log Stream")
 
                     style: Theme.ButtonStyleOfOption {
 
                     }
 
                     onClicked: {
-                        if (root.agent && (root.agent.hasLogInStream === true)) {
+                        if (rootItem.agent && (rootItem.agent.hasLogInStream === true)) {
                             console.log("QML: Disable Log Stream");
-                            root.agent.changeLogInStream(false);
+                            rootItem.agent.changeLogInStream(false);
                         }
                         else {
                             console.log("QML: Enable Log Stream");
-                            root.agent.changeLogInStream(true);
+                            rootItem.agent.changeLogInStream(true);
                         }
                     }
                 }*/

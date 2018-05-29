@@ -45,7 +45,7 @@ Item {
     // Controller associated to our view
     property var controller : null;
 
-
+    property var hostDeltaY: 0
 
 
     //--------------------------------
@@ -278,6 +278,39 @@ Item {
                 }
             }
 
+            // Button Options
+            Button {
+                id: btnOptions
+
+                anchors {
+                    bottom: parent.bottom
+                    bottomMargin: 10
+                    right : parent.right
+                    rightMargin: 10
+                }
+
+                activeFocusOnPress: true
+
+                style: Theme.LabellessSvgButtonStyle {
+                    fileCache: IngeScapeTheme.svgFileINGESCAPE
+
+                    pressedID: releasedID + "-pressed"
+                    releasedID: "button-options"
+                    disabledID : releasedID
+                }
+
+                onClicked: {
+                    console.log("QML: Open options...");
+
+                    var position = hostItem.mapToItem(rootItem, 0, 0);
+                    //console.log("position = " + position);
+                    rootItem.hostDeltaY = position.y
+
+                    // Open the popup with options
+                    popupOptions.open();
+                }
+            }
+
             Button {
                 id: streamButton
 
@@ -326,6 +359,8 @@ Item {
 //                    }
 //            }
        }
+
+
     }
 
     //
@@ -352,6 +387,94 @@ Item {
         }
     }
     */
+
+
+    I2PopupBase {
+        id : popupOptions
+
+        anchors {
+            top: rootItem.top
+            topMargin: rootItem.hostDeltaY
+            left: rootItem.right
+            leftMargin: 2
+        }
+
+        property int optionHeight: 30
+
+        // 2 options x optionHeight
+        height: 2 * optionHeight
+        width: 200
+
+        isModal: true;
+        layerColor: "transparent"
+        dismissOnOutsideTap : true;
+
+        keepRelativePositionToInitialParent : true;
+
+        onClosed: {
+
+        }
+        onOpened: {
+
+        }
+
+        Rectangle {
+            id: popUpBackground
+            anchors {
+                fill: parent
+            }
+            color: IngeScapeTheme.veryDarkGreyColor
+            radius: 5
+            border {
+                color: IngeScapeTheme.blueGreyColor2
+                width: 1
+            }
+
+            Column {
+                anchors {
+                    fill: parent
+                }
+
+                Button {
+                    id: optionReboot
+
+                    height: popupOptions.optionHeight
+                    width: parent.width
+
+                    text: qsTr("Reboot")
+
+                    style: Theme.ButtonStyleOfOption {
+
+                    }
+
+                    onClicked: {
+                        console.log("QML: clik on option 'Reboot'");
+
+                        popupOptions.close();
+                    }
+                }
+
+                Button {
+                    id: optionViewScreen
+
+                    height: popupOptions.optionHeight
+                    width: parent.width
+
+                    text: qsTr("View Screen")
+
+                    style: Theme.ButtonStyleOfOption {
+                        isVisibleSeparation: false
+                    }
+
+                    onClicked: {
+                        console.log("QML: clik on option 'View Screen'");
+
+                        popupOptions.close();
+                    }
+                }
+            }
+        }
+    }
 
 }
 
