@@ -551,7 +551,7 @@ Item {
 
                 property var boundingBox: IngeScapeTheme.svgFileINGESCAPE.boundsOnElement("button");
                 height: boundingBox.height
-                width:  boundingBox.width
+                width: boundingBox.width
 
                 activeFocusOnPress: true
                 text: "OK"

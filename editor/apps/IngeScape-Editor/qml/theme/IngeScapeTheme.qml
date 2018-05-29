@@ -76,10 +76,10 @@ Item {
     readonly property color darkRedColor:"#7A110E"
 
     readonly property color darkBlueGreyColor: "#3C424F"
-    readonly property color blueGreyColor2: "#434a58"
+    readonly property color blueGreyColor2: "#434B57"
     readonly property color blueGreyColor : "#525A66"
 
-    readonly property color lightBlueGreyColor: "#8896AA"
+    readonly property color lightBlueGreyColor: "#8895AA"
 
     readonly property color veryDarkGreyColor: "#282D34"
     readonly property color darkGreyColor2: "#2B3137"

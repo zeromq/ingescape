@@ -186,12 +186,12 @@ Item {
                 Text {
                     anchors
                     {
-                        left:parent.right
-                        leftMargin:5
-                        baseline:parent.baseline
+                        left: parent.right
+                        leftMargin: 5
+                        baseline: parent.baseline
                     }
 
-                    text:  model.state !== "" ? qsTr("(%1)").arg(model.state): ""
+                    text: (model.state !== "") ? qsTr("(%1)").arg(model.state) : ""
 
                     color : IngeScapeTheme.whiteColor
                     font {
@@ -335,34 +335,59 @@ Item {
 
         }
 
-
-        // Button ON/OFF
-        Button {
-            id: btnOnOff
-
-            // Agent is "ON" OR Agent can be restarted
-            visible: (root.agent && (root.agent.isON || root.agent.canBeRestarted))
-
-            activeFocusOnPress: true
-            enabled: visible
+        Row {
+            id: middleRow
 
             anchors {
                 bottom: bottomRow.top
                 bottomMargin: 5
                 right : parent.right
-                rightMargin: 12
+                rightMargin: 10
             }
 
-            style: Theme.LabellessSvgButtonStyle {
-                fileCache: IngeScapeTheme.svgFileINGESCAPE
+            spacing: 5
 
-                pressedID: releasedID + "-pressed"
-                releasedID: model.isON? "on" : "off"
-                disabledID : releasedID
+            // Button Mute
+            Button {
+                id: muteButton
+
+                visible: (model.isON === true)
+                activeFocusOnPress: true
+
+                style: Theme.LabellessSvgButtonStyle {
+                    fileCache: IngeScapeTheme.svgFileINGESCAPE
+
+                    pressedID: releasedID + "-pressed"
+                    releasedID: model.isMuted ? "muteactif" : "muteinactif"
+                    disabledID : releasedID
+                }
+
+                onClicked: {
+                    model.QtObject.changeMuteAllOutputs();
+                }
             }
 
-            onClicked: {
-                model.QtObject.changeState();
+            // Button ON/OFF
+            Button {
+                id: btnOnOff
+
+                // Agent is "ON" OR Agent can be restarted
+                visible: (root.agent && (root.agent.isON || root.agent.canBeRestarted))
+
+                activeFocusOnPress: true
+                enabled: visible
+
+                style: Theme.LabellessSvgButtonStyle {
+                    fileCache: IngeScapeTheme.svgFileINGESCAPE
+
+                    pressedID: releasedID + "-pressed"
+                    releasedID: model.isON ? "on" : "off"
+                    disabledID : releasedID
+                }
+
+                onClicked: {
+                    model.QtObject.changeState();
+                }
             }
         }
 
@@ -374,7 +399,7 @@ Item {
                 bottom: parent.bottom
                 bottomMargin: 10
                 right : parent.right
-                rightMargin: 12
+                rightMargin: 10
             }
 
             spacing: 5
@@ -392,33 +417,12 @@ Item {
                     fileCache: IngeScapeTheme.svgFileINGESCAPE
 
                     pressedID: releasedID + "-pressed"
-                    releasedID: model.isFrozen? "freezeactif" : "freezeinactif"
+                    releasedID: model.isFrozen ? "freezeactif" : "freezeinactif"
                     disabledID : releasedID
                 }
 
                 onClicked: {
                     model.QtObject.changeFreeze();
-                }
-            }
-
-
-            // Button Mute
-            Button {
-                id: muteButton
-
-                visible: (model.isON === true)
-                activeFocusOnPress: true
-
-                style: Theme.LabellessSvgButtonStyle {
-                    fileCache: IngeScapeTheme.svgFileINGESCAPE
-
-                    pressedID: releasedID + "-pressed"
-                    releasedID: model.isMuted? "muteactif" : "muteinactif"
-                    disabledID : releasedID
-                }
-
-                onClicked: {
-                    model.QtObject.changeMuteAllOutputs();
                 }
             }
 
@@ -433,29 +437,9 @@ Item {
                 style: Theme.LabellessSvgButtonStyle {
                     fileCache: IngeScapeTheme.svgFileINGESCAPE
 
-                    pressedID: "empty-button"
-                    releasedID: "empty-button"
+                    pressedID: releasedID + "-pressed"
+                    releasedID: "button-options"
                     disabledID : releasedID
-                }
-
-                Text {
-                    text: "..."
-
-                    anchors {
-                        left: parent.left
-                        right: parent.right
-                        bottom: parent.bottom
-                        bottomMargin: 5
-                    }
-                    horizontalAlignment: Text.AlignHCenter
-
-                    color: btnOptions.pressed ? "gray" : "black"
-
-                    font {
-                        family: IngeScapeTheme.labelFontFamily
-                        pixelSize: 20
-                        //bold: true
-                    }
                 }
 
                 onClicked: {
@@ -465,192 +449,266 @@ Item {
                 }
             }
         }
+    }
 
-        I2PopupBase {
-            id : popupOptions
+    I2PopupBase {
+        id : popupOptions
+
+        anchors {
+            top: root.top
+            left: root.right
+            leftMargin: 2
+        }
+
+        property int optionHeight: 30
+
+        width: 200
+        height: 9 * optionHeight
+
+        isModal: true;
+        layerColor: "transparent"
+        dismissOnOutsideTap : true;
+
+        keepRelativePositionToInitialParent : true;
+
+        onClosed: {
+
+        }
+        onOpened: {
+
+        }
+
+        Rectangle {
+            id: popUpBackground
             anchors {
-                top: bottomRow.top
-                left: bottomRow.right
+                fill: parent
+            }
+            color: IngeScapeTheme.veryDarkGreyColor
+            radius: 5
+            border {
+                color: IngeScapeTheme.blueGreyColor2
+                width: 1
             }
 
-            width: 220
-            height: 300
-
-            isModal: true;
-            layerColor: "transparent"
-            dismissOnOutsideTap : true;
-
-            keepRelativePositionToInitialParent : true;
-
-            onClosed: {
-
-            }
-            onOpened: {
-
-            }
-
-            Rectangle {
-                id: popUpBackground
+            Column {
                 anchors {
                     fill: parent
                 }
-                color: "black"
 
-                Column {
-                    anchors {
-                        fill: parent
-                        margins: 10
+                Button {
+                    id: optionLoadDefinition
+
+                    height: popupOptions.optionHeight
+                    width: parent.width
+
+                    text: qsTr("Load Definition")
+
+                    style: Theme.ButtonStyleOfOption {
+
                     }
 
-                    spacing: 4
-
-                    Button {
-                        id: optionLoadDefinition
-
-                        text: qsTr("Load Definition")
-
-                        onClicked: {
-                            if (root.agent) {
-                                root.agent.loadDefinition();
-
-                                popupOptions.close();
-                            }
-                        }
-                    }
-
-                    Button {
-                        id: optionLoadMapping
-
-                        text: qsTr("Load Mapping")
-
-                        onClicked: {
-                            if (root.agent) {
-                                root.agent.loadMapping();
-
-                                popupOptions.close();
-                            }
-                        }
-                    }
-
-                    Button {
-                        id: optionDownloadDefinition
-
-                        text: qsTr("Download Definition")
-
-                        onClicked: {
-                            if (root.agent) {
-                                root.agent.downloadDefinition();
-
-                                popupOptions.close();
-                            }
-                        }
-                    }
-
-                    Button {
-                        id: optionDownloadMapping
-
-                        text: qsTr("Download Mapping")
-
-                        onClicked: {
-                            if (root.agent) {
-                                root.agent.downloadMapping();
-
-                                popupOptions.close();
-                            }
-                        }
-                    }
-
-                    Button {
-                        id: optionSetPath
-
-                        text: qsTr("Set Path for files")
-
-                        onClicked: {
-                            console.log("QML: Set Path for Definition/Mapping/Log files");
-
-                            // Emit the signal "configureFilesPaths"
-                            root.configureFilesPaths(root.agent);
+                    onClicked: {
+                        if (root.agent) {
+                            root.agent.loadDefinition();
 
                             popupOptions.close();
                         }
                     }
+                }
 
-                    Button {
-                        id: optionSaveDefinitionToPath
+                Button {
+                    id: optionLoadMapping
 
-                        text: qsTr("Save Definition to Path")
+                    height: popupOptions.optionHeight
+                    width: parent.width
 
-                        onClicked: {
-                            //console.log("QML: Save Definition to Path");
+                    text: qsTr("Load Mapping")
 
-                            root.agent.saveDefinitionToPath();
+                    style: Theme.ButtonStyleOfOption {
+
+                    }
+
+                    onClicked: {
+                        if (root.agent) {
+                            root.agent.loadMapping();
 
                             popupOptions.close();
                         }
                     }
+                }
 
-                    Button {
-                        id: optionSaveMappingToPath
+                Button {
+                    id: optionDownloadDefinition
 
-                        text: qsTr("Save Mapping to Path")
+                    height: popupOptions.optionHeight
+                    width: parent.width
 
-                        onClicked: {
-                            //console.log("QML: Save Mapping to Path");
+                    text: qsTr("Download Definition")
 
-                            root.agent.saveMappingToPath();
+                    style: Theme.ButtonStyleOfOption {
+
+                    }
+
+                    onClicked: {
+                        if (root.agent) {
+                            root.agent.downloadDefinition();
 
                             popupOptions.close();
                         }
                     }
+                }
 
-                    Button {
-                        id: optionLogFile
+                Button {
+                    id: optionDownloadMapping
 
-                        text: (root.agent && (root.agent.hasLogInFile === true)) ? qsTr("Disable Log File") : qsTr("Enable Log File")
+                    height: popupOptions.optionHeight
+                    width: parent.width
 
-                        onClicked: {
-                            if (root.agent && (root.agent.hasLogInFile === true)) {
-                                //console.log("QML: Disable Log File");
-                                root.agent.changeLogInFile(false);
-                            }
-                            else {
-                                //console.log("QML: Enable Log File");
-                                root.agent.changeLogInFile(true);
-                            }
-                        }
+                    text: qsTr("Download Mapping")
+
+                    style: Theme.ButtonStyleOfOption {
+
                     }
 
-                    /*Button {
-                        id: optionLogStream
+                    onClicked: {
+                        if (root.agent) {
+                            root.agent.downloadMapping();
 
-                        text: (root.agent && (root.agent.hasLogInStream === true)) ? qsTr("Disable Log Stream") : qsTr("Enable Log Stream")
-
-                        onClicked: {
-                            if (root.agent && (root.agent.hasLogInStream === true)) {
-                                console.log("QML: Disable Log Stream");
-                                root.agent.changeLogInStream(false);
-                            }
-                            else {
-                                console.log("QML: Enable Log Stream");
-                                root.agent.changeLogInStream(true);
-                            }
+                            popupOptions.close();
                         }
-                    }*/
+                    }
+                }
 
-                    Button {
-                        id: optionViewLogStream
+                Button {
+                    id: optionSetPath
 
-                        text: qsTr("View Log Stream")
+                    height: popupOptions.optionHeight
+                    width: parent.width
 
-                        onClicked: {
-                            console.log("QML: View Log Stream");
+                    text: qsTr("Set Path for files")
+
+                    style: Theme.ButtonStyleOfOption {
+
+                    }
+
+                    onClicked: {
+                        console.log("QML: Set Path for Definition/Mapping/Log files");
+
+                        // Emit the signal "configureFilesPaths"
+                        root.configureFilesPaths(root.agent);
+
+                        popupOptions.close();
+                    }
+                }
+
+                Button {
+                    id: optionSaveDefinitionToPath
+
+                    height: popupOptions.optionHeight
+                    width: parent.width
+
+                    text: qsTr("Save Definition to Path")
+
+                    style: Theme.ButtonStyleOfOption {
+
+                    }
+
+                    onClicked: {
+                        //console.log("QML: Save Definition to Path");
+
+                        root.agent.saveDefinitionToPath();
+
+                        popupOptions.close();
+                    }
+                }
+
+                Button {
+                    id: optionSaveMappingToPath
+
+                    height: popupOptions.optionHeight
+                    width: parent.width
+
+                    text: qsTr("Save Mapping to Path")
+
+                    style: Theme.ButtonStyleOfOption {
+
+                    }
+
+                    onClicked: {
+                        //console.log("QML: Save Mapping to Path");
+
+                        root.agent.saveMappingToPath();
+
+                        popupOptions.close();
+                    }
+                }
+
+                Button {
+                    id: optionLogFile
+
+                    height: popupOptions.optionHeight
+                    width: parent.width
+
+                    text: (root.agent && (root.agent.hasLogInFile === true)) ? qsTr("Disable Log File") : qsTr("Enable Log File")
+
+                    style: Theme.ButtonStyleOfOption {
+
+                    }
+
+                    onClicked: {
+                        if (root.agent && (root.agent.hasLogInFile === true)) {
+                            //console.log("QML: Disable Log File");
+                            root.agent.changeLogInFile(false);
                         }
+                        else {
+                            //console.log("QML: Enable Log File");
+                            root.agent.changeLogInFile(true);
+                        }
+                    }
+                }
+
+                /*Button {
+                    id: optionLogStream
+
+                    height: popupOptions.optionHeight
+                    width: parent.width
+
+                    text: (root.agent && (root.agent.hasLogInStream === true)) ? qsTr("Disable Log Stream") : qsTr("Enable Log Stream")
+
+                    style: Theme.ButtonStyleOfOption {
+
+                    }
+
+                    onClicked: {
+                        if (root.agent && (root.agent.hasLogInStream === true)) {
+                            console.log("QML: Disable Log Stream");
+                            root.agent.changeLogInStream(false);
+                        }
+                        else {
+                            console.log("QML: Enable Log Stream");
+                            root.agent.changeLogInStream(true);
+                        }
+                    }
+                }*/
+
+                Button {
+                    id: optionViewLogStream
+
+                    height: popupOptions.optionHeight
+                    width: parent.width
+
+                    text: qsTr("View Log Stream")
+
+                    style: Theme.ButtonStyleOfOption {
+                        isVisibleSeparation: false
+                    }
+
+                    onClicked: {
+                        console.log("QML: View Log Stream");
                     }
                 }
             }
         }
-
-
     }
 }
 
