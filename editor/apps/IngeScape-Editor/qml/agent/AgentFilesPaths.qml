@@ -261,7 +261,7 @@ I2PopupBase {
 
                 pressedID: releasedID + "-pressed"
                 releasedID: "button"
-                disabledID : releasedID
+                disabledID: releasedID + "-disabled"
 
                 font {
                     family: IngeScapeTheme.textFontFamily
