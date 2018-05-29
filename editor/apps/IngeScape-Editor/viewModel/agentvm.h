@@ -146,16 +146,14 @@ public:
 
     /**
      * @brief Change the flag "(has) Log in Stream"
-     * @param logInStream
      */
-    Q_INVOKABLE void changeLogInStream(bool logInStream);
+    Q_INVOKABLE void changeLogInStream();
 
 
     /**
      * @brief Change the flag "(has) Log in File"
-     * @param logInFile
      */
-    Q_INVOKABLE void changeLogInFile(bool logInFile);
+    Q_INVOKABLE void changeLogInFile();
 
 
     /**

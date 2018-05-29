@@ -1217,8 +1217,8 @@ void ScenarioController::_executeCommandForAgent(AgentInMappingVM* agent, QStrin
 
         QString command = commandAndParameters.at(0);
 
-        // RUN
-        if (command == "RUN")
+        // START
+        if (command == command_StartAgent)
         {
             foreach (AgentM* model, agent->models()->toList())
             {
@@ -1230,8 +1230,10 @@ void ScenarioController::_executeCommandForAgent(AgentInMappingVM* agent, QStrin
                 }
             }
         }
-        // STOP
-        else if (command == "STOP")
+        // STOP or MUTE/UN-MUTE or FREEZE/UN-FREEZE
+        else if ( (command == command_StopAgent)
+                 || (command == command_MuteAgent) || (command == command_UnmuteAgent)
+                 || (command == command_FreezeAgent) || (command == command_UnfreezeAgent) )
         {
             // Emit signal "Command asked to agent"
             Q_EMIT commandAskedToAgent(agent->peerIdsList(), command);
@@ -1269,6 +1271,7 @@ void ScenarioController::_executeCommandForAgent(AgentInMappingVM* agent, QStrin
         }
     }
 }
+
 
 /**
  * @brief Set the current time in milliseconds

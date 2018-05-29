@@ -154,7 +154,7 @@ void AgentVM::changeState()
 {
     // is ON --> Kill all agents
     if (_isON) {
-        Q_EMIT commandAskedToAgent(_peerIdsList, "STOP");
+        Q_EMIT commandAskedToAgent(_peerIdsList, command_StopAgent);
     }
     // is OFF --> Execute all agents
     else
@@ -164,7 +164,7 @@ void AgentVM::changeState()
             // Check if the model has a hostname
             if ((model != NULL) && !model->hostname().isEmpty())
             {
-                Q_EMIT commandAskedToLauncher("RUN", model->hostname(), model->commandLine());
+                Q_EMIT commandAskedToLauncher(command_StartAgent, model->hostname(), model->commandLine());
             }
         }
     }
@@ -177,10 +177,10 @@ void AgentVM::changeState()
 void AgentVM::changeMuteAllOutputs()
 {
     if (_isMuted) {
-        Q_EMIT commandAskedToAgent(_peerIdsList, "UNMUTE_ALL");
+        Q_EMIT commandAskedToAgent(_peerIdsList, command_UnmuteAgent);
     }
     else {
-        Q_EMIT commandAskedToAgent(_peerIdsList, "MUTE_ALL");
+        Q_EMIT commandAskedToAgent(_peerIdsList, command_MuteAgent);
     }
 }
 
@@ -191,10 +191,10 @@ void AgentVM::changeMuteAllOutputs()
 void AgentVM::changeFreeze()
 {
     if (_isFrozen) {
-        Q_EMIT commandAskedToAgent(_peerIdsList, "UNFREEZE");
+        Q_EMIT commandAskedToAgent(_peerIdsList, command_UnfreezeAgent);
     }
     else {
-        Q_EMIT commandAskedToAgent(_peerIdsList, "FREEZE");
+        Q_EMIT commandAskedToAgent(_peerIdsList, command_FreezeAgent);
     }
 }
 
@@ -283,30 +283,28 @@ void AgentVM::downloadMapping()
 
 /**
  * @brief Change the flag "(has) Log in Stream"
- * @param logInStream
  */
-void AgentVM::changeLogInStream(bool logInStream)
+void AgentVM::changeLogInStream()
 {
-    if (logInStream) {
-        Q_EMIT commandAskedToAgent(_peerIdsList, command_EnableLogStream);
+    if (_hasLogInStream) {
+        Q_EMIT commandAskedToAgent(_peerIdsList, command_DisableLogStream);
     }
     else {
-        Q_EMIT commandAskedToAgent(_peerIdsList, command_DisableLogStream);
+        Q_EMIT commandAskedToAgent(_peerIdsList, command_EnableLogStream);
     }
 }
 
 
 /**
  * @brief Change the flag "(has) Log in File"
- * @param logInFile
  */
-void AgentVM::changeLogInFile(bool logInFile)
+void AgentVM::changeLogInFile()
 {
-    if (logInFile) {
-        Q_EMIT commandAskedToAgent(_peerIdsList, command_EnableLogFile);
+    if (_hasLogInFile) {
+        Q_EMIT commandAskedToAgent(_peerIdsList, command_DisableLogFile);
     }
     else {
-        Q_EMIT commandAskedToAgent(_peerIdsList, command_DisableLogFile);
+        Q_EMIT commandAskedToAgent(_peerIdsList, command_EnableLogFile);
     }
 }
 

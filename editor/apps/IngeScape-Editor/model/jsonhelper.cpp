@@ -362,8 +362,8 @@ scenario_import_actions_lists_t *JsonHelper::initActionsList(QByteArray byteArra
                         QJsonValue jsonValue = jsonAction.value("validity_duration_type");
                         if(jsonValue.isString())
                         {
-                            int validationDurationType = ValidationDurationTypes::staticEnumFromKey(jsonValue.toString());
-                            actionM->setvalidityDurationType((ValidationDurationTypes::Value)validationDurationType);
+                            int nValidationDurationType = ValidationDurationTypes::staticEnumFromKey(jsonValue.toString().toUpper());
+                            actionM->setvalidityDurationType(static_cast<ValidationDurationTypes::Value>(nValidationDurationType));
                         }
 
                         jsonValue = jsonAction.value("validity_duration_value");
@@ -1381,8 +1381,8 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
                             // set value
                             jsonValue = jsonEffect.value("value");
                             if (jsonValue.isString()) {
-                                int agentEffectValue = AgentEffectValues::staticEnumFromKey(jsonValue.toString().toUpper());
-                                effectOnAgent->setagentEffectValue(static_cast<AgentEffectValues::Value>(agentEffectValue));
+                                int nAgentEffectValue = AgentEffectValues::staticEnumFromKey(jsonValue.toString().toUpper());
+                                effectOnAgent->setagentEffectValue(static_cast<AgentEffectValues::Value>(nAgentEffectValue));
                             }
 
                             // set agent
@@ -1508,8 +1508,8 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
                             // set value
                             jsonValue = jsonEffect.value("value");
                             if (jsonValue.isString()) {
-                                int mappingEffectValue = MappingEffectValues::staticEnumFromKey(jsonValue.toString().toUpper());
-                                mappingEffectM->setmappingEffectValue(static_cast<MappingEffectValues::Value>(mappingEffectValue));
+                                int nMappingEffectValue = MappingEffectValues::staticEnumFromKey(jsonValue.toString().toUpper());
+                                mappingEffectM->setmappingEffectValue(static_cast<MappingEffectValues::Value>(nMappingEffectValue));
                             }
 
                             // Set the list of agent iop
@@ -1619,7 +1619,8 @@ ActionConditionVM* JsonHelper::_parseConditionsVMFromJson(QJsonObject jsonCondit
                             jsonValue = jsonCondition.value("operator");
                             if(jsonValue.isString())
                             {
-                                iopConditionM->setcomparison((ActionComparisonTypes::Value)ActionComparisonTypes::staticEnumFromKey(jsonValue.toString().toUpper()));
+                                int nActionComparisonType = ActionComparisonTypes::staticEnumFromKey(jsonValue.toString().toUpper());
+                                iopConditionM->setcomparison(static_cast<ActionComparisonTypes::Value>(nActionComparisonType));
                             }
 
                             // set value
@@ -1660,7 +1661,7 @@ ActionConditionVM* JsonHelper::_parseConditionsVMFromJson(QJsonObject jsonCondit
                             }
                         }
 
-                        if(agentM != NULL)
+                        if (agentM != NULL)
                         {
                             // Create model
                             ActionConditionM* actionConditionM = new ActionConditionM();
@@ -1672,9 +1673,10 @@ ActionConditionVM* JsonHelper::_parseConditionsVMFromJson(QJsonObject jsonCondit
 
                             // set value
                             jsonValue = jsonCondition.value("value");
-                            if(jsonValue.isString())
+                            if (jsonValue.isString())
                             {
-                                actionConditionM->setcomparison((ActionComparisonTypes::Value)ActionComparisonTypes::staticEnumFromKey(jsonValue.toString().toUpper()));
+                                int nActionComparisonType = ActionComparisonTypes::staticEnumFromKey(jsonValue.toString().toUpper());
+                                actionConditionM->setcomparison(static_cast<ActionComparisonTypes::Value>(nActionComparisonType));
                             }
 
                             // set agent

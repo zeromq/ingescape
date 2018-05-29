@@ -658,13 +658,8 @@ Item {
                     }
 
                     onClicked: {
-                        if (rootItem.agent && (rootItem.agent.hasLogInFile === true)) {
-                            //console.log("QML: Disable Log File");
-                            rootItem.agent.changeLogInFile(false);
-                        }
-                        else {
-                            //console.log("QML: Enable Log File");
-                            rootItem.agent.changeLogInFile(true);
+                        if (rootItem.agent) {
+                            rootItem.agent.changeLogInFile();
                         }
 
                         popupOptions.close();
@@ -684,13 +679,8 @@ Item {
                     }
 
                     onClicked: {
-                        if (rootItem.agent && (rootItem.agent.hasLogInStream === true)) {
-                            console.log("QML: Disable Log Stream");
-                            rootItem.agent.changeLogInStream(false);
-                        }
-                        else {
-                            console.log("QML: Enable Log Stream");
-                            rootItem.agent.changeLogInStream(true);
+                        if (rootItem.agent) {
+                            rootItem.agent.changeLogInStream();
                         }
 
                         popupOptions.close();

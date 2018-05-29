@@ -49,6 +49,16 @@ static const QString SEPARATOR_IOP_NAME_AND_IOP_VALUE_TYPE = QString("::");
 static const QString command_LoadDefinition = "LOAD_THIS_DEFINITION#";
 static const QString command_LoadMapping = "LOAD_THIS_MAPPING#";
 static const QString command_ClearMapping = "CLEAR_MAPPING";
+
+static const QString command_StartAgent = "RUN";
+static const QString command_StopAgent = "STOP";
+static const QString command_MuteAgent = "MUTE_ALL";
+static const QString command_UnmuteAgent = "UNMUTE_ALL";
+static const QString command_MuteAgentOutput = "MUTE";
+static const QString command_UnmuteAgentOutput = "UNMUTE";
+static const QString command_FreezeAgent = "FREEZE";
+static const QString command_UnfreezeAgent = "UNFREEZE";
+
 static const QString command_EnableLogStream = "ENABLE_LOG_STREAM";
 static const QString command_DisableLogStream = "DISABLE_LOG_STREAM";
 static const QString command_EnableLogFile = "ENABLE_LOG_FILE";

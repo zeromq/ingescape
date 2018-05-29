@@ -667,14 +667,14 @@ Window {
                                         }
 
                                         height : 25
-                                        width : 78
+                                        width : 98
 
                                         visible : (myEffect && myEffect.effectType === ActionEffectTypes.AGENT)
                                         enabled : visible
 
                                         model :
                                         {
-                                            if(controller) {
+                                            if (controller) {
                                                 controller.agentEffectValuesList
                                             }
                                             else {
