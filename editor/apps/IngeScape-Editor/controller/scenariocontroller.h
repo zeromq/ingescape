@@ -77,7 +77,6 @@ class ScenarioController: public QObject
     // --- agents list in mapping
     I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(AgentInMappingVM, agentsInMappingList)
 
-
     // List of actions in palette
     I2_QOBJECT_LISTMODEL(ActionInPaletteVM, actionsInPaletteList)
 
@@ -90,23 +89,23 @@ class ScenarioController: public QObject
     // Selected action VM in timeline
     I2_QML_PROPERTY_DELETE_PROOF(ActionVM*, selectedActionVMInTimeline)
 
-    // Number of line in our timeline
+    // Number of lines in our timeline
     I2_QML_PROPERTY(int, linesNumberInTimeLine)
 
-    // Is playing scenario flag
+    // Flag indicating if our scenario is currently playing
     I2_QML_PROPERTY_CUSTOM_SETTER(bool, isPlaying)
 
     // Current time (from the beginning of our scenario)
     I2_QML_PROPERTY(QTime, currentTime)
 
-    // List of actionsVM to evaluate each timeout of our timer linked to our scenario
-    I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(ActionVM, actionsVMToEvaluateVMList)
+    // List of (future) actions to evaluate at each timeout of our timer
+    I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(ActionVM, listOfActionsToEvaluate)
 
-    // List of activated actionsVM
-    I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(ActionVM, activeActionsVMList)
+    // List of active actions (the current time is between start time and end time of these actions)
+    I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(ActionVM, listOfActiveActions)
 
-    // Next action view model to active
-    I2_QML_PROPERTY(ActionVM*, nextActionVMToActive)
+    // Next action view model to activate
+    I2_QML_PROPERTY(ActionVM*, nextActionToActivate)
 
 
 public:
@@ -311,33 +310,40 @@ Q_SIGNALS:
      */
     void commandAskedToAgentAboutMappingInput(QStringList peerIdsList, QString command, QString inputName, QString outputAgentName, QString outputName);
 
+
 public Q_SLOTS:
 
     /**
-      * @brief slot on agent added in mapping
+      * @brief Slot called when an agent is added in the mapping
       */
     void onAgentInMappingAdded(AgentInMappingVM* agentAdded);
 
 
     /**
-      * @brief slot on agent removed in mapping
+      * @brief Slot called when an agent is removed from the mapping
       */
     void onAgentInMappingRemoved(AgentInMappingVM* agentRemoved);
 
+
     /**
-      * @brief slot on the action reversion
-      */
+     * @brief Slot called when an action must be reverted
+     * @param actionExecution
+     */
     void onRevertAction(ActionExecutionVM* actionExecution);
 
-    /**
-      * @brief slot on the action rearm
-      */
-    void onRearmAction();
 
     /**
-      * @brief slot on the time line range change
-      */
-    void ontimeRangeChange(int startTimeInMilliseconds, int endTimeInMilliseconds);
+     * @brief Slot called when an action must be rearmed
+     */
+    void onRearmAction();
+
+
+    /**
+     * @brief Slot called when the time line range changed
+     * @param startTimeInMilliseconds
+     * @param endTimeInMilliseconds
+     */
+    void onTimeRangeChanged(int startTimeInMilliseconds, int endTimeInMilliseconds);
 
 
 
@@ -356,10 +362,12 @@ private Q_SLOTS:
 
 
 private :
+
     /**
      * @brief Get a new action name
      */
     QString _buildNewActionName();
+
 
     /**
      * @brief Open the scenario from JSON file
@@ -367,11 +375,13 @@ private :
      */
     void _openScenarioFromFile(QString scenarioFilePath);
 
+
     /**
      * @brief Save the scenario to JSON file
      * @param scenarioFilePath
      */
     void _saveScenarioToFile(QString scenarioFilePath);
+
 
     /**
      * @brief Insert an actionVM into our timeline

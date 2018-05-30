@@ -32,7 +32,7 @@ ScenarioController::ScenarioController(IngeScapeModelManager* modelManager,
     _linesNumberInTimeLine(MINIMUM_DISPLAYED_LINES_NUMBER_IN_TIMELINE),
     _isPlaying(false),
     _currentTime(QTime::fromMSecsSinceStartOfDay(0)),
-    _nextActionVMToActive(NULL),
+    _nextActionToActivate(NULL),
     _modelManager(modelManager),
     _jsonHelper(jsonHelper),
     _scenariosDirectoryPath(scenariosPath)
@@ -82,10 +82,10 @@ ScenarioController::ScenarioController(IngeScapeModelManager* modelManager,
     _actionsInTimeLine.setSortProperty("startTime");
 
     // Set the sort property for the actionsVM to evaluate
-    _actionsVMToEvaluateVMList.setSortProperty("startTime");
+    _listOfActionsToEvaluate.setSortProperty("startTime");
 
-    // Set the sort property for the active actionsVM
-    _activeActionsVMList.setSortProperty("startTime");
+    // Set the sort property for the list of active actions
+    _listOfActiveActions.setSortProperty("startTime");
 
 
     //
@@ -120,6 +120,29 @@ ScenarioController::~ScenarioController()
     // Reset pointers
     _modelManager = NULL;
     _jsonHelper = NULL;
+}
+
+
+/**
+ * @brief Custom setter on is playing command for the scenario
+ * @param is playing flag
+ */
+void ScenarioController::setisPlaying(bool isPlaying)
+{
+    if(_isPlaying != isPlaying)
+    {
+        _isPlaying = isPlaying;
+
+        // Start/Stop scenario according to the flag
+        if (_isPlaying) {
+            _startScenario();
+        }
+        else {
+            _stopScenario();
+        }
+
+        Q_EMIT isPlayingChanged(_isPlaying);
+    }
 }
 
 
@@ -327,35 +350,12 @@ void ScenarioController::closeActionEditor(ActionEditorController* actionEditorC
  */
 void ScenarioController::setActionInPalette(int index, ActionM* actionM)
 {
-    // Set action in palette
     if (index < _actionsInPaletteList.count())
     {
         ActionInPaletteVM* actionInPalette = _actionsInPaletteList.at(index);
         if (actionInPalette != NULL) {
             actionInPalette->setmodelM(actionM);
         }
-    }
-}
-
-
-/**
-  * @brief slot on agent added in mapping
-  */
-void ScenarioController::onAgentInMappingAdded(AgentInMappingVM * agentAdded)
-{
-    if (!_agentsInMappingList.contains(agentAdded)) {
-        _agentsInMappingList.append(agentAdded);
-    }
-}
-
-
-/**
-  * @brief slot on agent removed in mapping
-  */
-void ScenarioController::onAgentInMappingRemoved(AgentInMappingVM * agentRemoved)
-{
-    if (_agentsInMappingList.contains(agentRemoved)) {
-        _agentsInMappingList.remove(agentRemoved);
     }
 }
 
@@ -409,6 +409,7 @@ void ScenarioController::_openScenarioFromFile(QString scenarioFilePath)
     }
 
 }
+
 
 /**
  * @brief Save the scenario to JSON file
@@ -478,18 +479,18 @@ void ScenarioController::addActionVMAtTime(ActionM* actionM, int timeInMs, int l
                 connect(actionVM, &ActionVM::rearmAction, this, &ScenarioController::onRearmAction);
 
                 // Add action to the ones to check
-                _actionsVMToEvaluateVMList.append(actionVM);
+                _listOfActionsToEvaluate.append(actionVM);
 
-                // The new actionVM is the next one to active, we change the next timer trigger
-                if ( ((_nextActionVMToActive == NULL) && (timeInMs >= _currentTime.msecsSinceStartOfDay()))
-                     || ((_nextActionVMToActive != NULL) && (timeInMs < _nextActionVMToActive->startTime())) )
+                // The new action VM is the next one to activate, we change the next timer trigger
+                if ( ((_nextActionToActivate == NULL) && (timeInMs >= _currentTime.msecsSinceStartOfDay()))
+                     || ((_nextActionToActivate != NULL) && (timeInMs < _nextActionToActivate->startTime())) )
                 {
                     // Stop the timer if necessary
                     if (_timerToExecuteActions.isActive()) {
                         _timerToExecuteActions.stop();
                     }
 
-                    setnextActionVMToActive(actionVM);
+                    setnextActionToActivate(actionVM);
                     _timerToExecuteActions.start(actionVM->startTime() - _currentTime.msecsSinceStartOfDay());
                 }
             }
@@ -837,48 +838,27 @@ void ScenarioController::executeEffectsOfAction(ActionM* action)
 
 
 /**
- * @brief Custom setter on is playing command for the scenario
- * @param is playing flag
- */
-void ScenarioController::setisPlaying(bool isPlaying)
-{
-    if(_isPlaying != isPlaying)
-    {
-        _isPlaying = isPlaying;
-
-        // Start/Stop scenario according to the flag
-        if (_isPlaying) {
-            _startScenario();
-        }
-        else {
-            _stopScenario();
-        }
-
-        Q_EMIT isPlayingChanged(_isPlaying);
-    }
-}
-
-
-/**
  * @brief Called when our timer time out to handle the scenario and execute actions
  */
 void ScenarioController::_onTimeout_ExecuteActions()
 {
-    if(_actionsVMToEvaluateVMList.count() > 0)
+    if (!_listOfActionsToEvaluate.isEmpty())
     {
-        QList<ActionVM*> actionsVMToRemove;
-        ActionVM* actionToExecute = _actionsVMToEvaluateVMList.at(0);
-        ActionVM* nextActionToExecute = NULL;
+        //ActionVM* actionToExecute = _listOfActionsToEvaluate.at(0);
 
-        int currentTimeInMilliSeconds = actionToExecute->startTime();
+        int currentTimeInMilliSeconds = 0;
+        if (_nextActionToActivate != NULL) {
+            currentTimeInMilliSeconds = _nextActionToActivate->startTime();
+        }
+        ActionVM* tmpNextActionToActivate = NULL;
 
-        // Traverse the list of active actions
-        for (int indexAction = 0; indexAction < _actionsVMToEvaluateVMList.count(); indexAction++)
+
+        // Traverse the list of actions to evaluate
+        for (ActionVM* actionVM : _listOfActionsToEvaluate.toList())
         {
-            ActionVM* actionVM = _actionsVMToEvaluateVMList.at(indexAction);
             if ((actionVM != NULL) && (actionVM->modelM() != NULL))
             {
-                // Current time is after the start time of action
+                // Current time is after the start time of the action
                 if (actionVM->startTime() <= currentTimeInMilliSeconds)
                 {
                     ActionExecutionVM* actionExecution = actionVM->currentExecution();
@@ -891,11 +871,11 @@ void ScenarioController::_onTimeout_ExecuteActions()
                             _executeAction(actionVM, actionExecution, currentTimeInMilliSeconds);
                         }
 
-                        // The action has a validation duration
+                        // The action has a (validation) duration
                         if (actionVM->modelM()->validityDurationType() != ValidationDurationTypes::IMMEDIATE)
                         {
-                            // Add the action VM to the active list
-                            _activeActionsVMList.append(actionVM);
+                            // Add to the list of active actions
+                            _listOfActiveActions.append(actionVM);
                         }
                         else
                         {
@@ -908,43 +888,31 @@ void ScenarioController::_onTimeout_ExecuteActions()
                         }
                     }
 
-                    // Remove from the list of "active" actions
-                    actionsVMToRemove.append(actionVM);
+                    // Remove from the list of actions to evaluate
+                    _listOfActionsToEvaluate.remove(actionVM);
                 }
                 // Action is in the future
                 else
                 {
                     // Set the next action to launch
-                    nextActionToExecute = actionVM;
+                    tmpNextActionToActivate = actionVM;
 
                     break;
                 }
             }
         }
 
-        // Remove processed actions VM
-        if (actionsVMToRemove.count() > 0)
+        if (tmpNextActionToActivate != NULL)
         {
-            for (ActionVM* actionRemoved : actionsVMToRemove)
-            {
-                if (actionRemoved != NULL) {
-                    _actionsVMToEvaluateVMList.remove(actionRemoved);
-                }
-            }
-        }
-
-        // Set the next action (to activate)
-        if (nextActionToExecute != NULL)
-        {
-            // Set the next action VM to active
-            setnextActionVMToActive(nextActionToExecute);
+            // Set the next action to activate
+            setnextActionToActivate(tmpNextActionToActivate);
 
             // Set the timer to the next action
-            _timerToExecuteActions.start(nextActionToExecute->startTime() - currentTimeInMilliSeconds);
+            _timerToExecuteActions.start(_nextActionToActivate->startTime() - currentTimeInMilliSeconds);
         }
         else {
-            // Reset the next action VM to active
-            setnextActionVMToActive(NULL);
+            // Reset the next action to activate
+            setnextActionToActivate(NULL);
         }
     }
  }
@@ -963,14 +931,14 @@ void ScenarioController::_onTimeout_DelayOrExecuteActions()
     int currentTimeInMilliSeconds = _currentTime.msecsSinceStartOfDay();
 
     // Traverse the list of active actions
-    foreach (ActionVM* actionVM, _activeActionsVMList.toList())
+    foreach (ActionVM* actionVM, _listOfActiveActions.toList())
     {
-        if (actionVM != NULL)
+        if ((actionVM != NULL) && (actionVM->modelM() != NULL))
         {
             ActionExecutionVM* actionExecution = actionVM->currentExecution();
 
-            // Current time is after the start time of action
-            if ((actionExecution != NULL) && (actionVM->modelM() != NULL) && (actionVM->startTime() < currentTimeInMilliSeconds)
+            // Current time is after the start time of the action
+            if ((actionExecution != NULL) && (actionVM->startTime() < currentTimeInMilliSeconds)
                     // the action has not finished or is forever
                     && (actionVM->endTime() == -1 || actionVM->endTime() > currentTimeInMilliSeconds))
             {
@@ -988,7 +956,7 @@ void ScenarioController::_onTimeout_DelayOrExecuteActions()
                     }
                 }
             }
-            // Current time is after the end time of action (or the action has no validity duration --> Immediate)
+            // Current time is after the end time of the action (or the action has no validity duration --> Immediate)
             else if (actionVM->endTime() <= currentTimeInMilliSeconds)
             {
                 if ((actionExecution != NULL) && !actionVM->timerToReverse()->isActive())
@@ -1029,7 +997,7 @@ void ScenarioController::_onTimeout_DelayOrExecuteActions()
                     // Disconnect the rearm action signal
                     disconnect(actionVM, &ActionVM::rearmAction, this, &ScenarioController::onRearmAction);
                 }
-                _activeActionsVMList.remove(actionVM);
+                _listOfActiveActions.remove(actionVM);
             }
         }
     }
@@ -1058,17 +1026,19 @@ void ScenarioController::_startScenario()
     }
 
     // Disconnect from signals
-    foreach (ActionVM* actionVM, _actionsVMToEvaluateVMList.toList())
+    foreach (ActionVM* actionVM, _listOfActionsToEvaluate.toList())
     {
         disconnect(actionVM, &ActionVM::revertAction, this, &ScenarioController::onRevertAction);
         disconnect(actionVM, &ActionVM::rearmAction, this, &ScenarioController::onRearmAction);
     }
-    _actionsVMToEvaluateVMList.clear();
-    _activeActionsVMList.clear();
-    setnextActionVMToActive(NULL);
+
+    // Reset lists and next action to activate
+    _listOfActionsToEvaluate.clear();
+    _listOfActiveActions.clear();
+    setnextActionToActivate(NULL);
 
     // Look for the current and futures actions
-    ActionVM * nextActionToLaunch = NULL;
+    ActionVM* tmpNextActionToActivate = NULL;
     foreach (ActionVM* actionVM , _actionsInTimeLine.toList())
     {
         if ((actionVM->endTime() > currentTimeInMilliSeconds) || (actionVM->endTime() == -1))
@@ -1080,26 +1050,29 @@ void ScenarioController::_startScenario()
             // Initialize the action view model at a specific time.
             actionVM->resetDataFrom(currentTimeInMilliSeconds);
 
+            // Current time is after the start time of the action
             if (actionVM->startTime() <= currentTimeInMilliSeconds)
             {
-                // Add our action
-                _activeActionsVMList.append(actionVM);
+                // Add to the list of active actions
+                _listOfActiveActions.append(actionVM);
             }
             else
             {
-                // Check the next action to launch
-                if ((nextActionToLaunch == NULL) || (nextActionToLaunch->startTime() > actionVM->startTime())) {
-                    nextActionToLaunch = actionVM;
+                // Check the next action to activate
+                if ( (tmpNextActionToActivate == NULL)
+                     || ((tmpNextActionToActivate != NULL) && (tmpNextActionToActivate->startTime() > actionVM->startTime())) )
+                {
+                    tmpNextActionToActivate = actionVM;
                 }
 
                 // Add our action
-                _actionsVMToEvaluateVMList.append(actionVM);
+                _listOfActionsToEvaluate.append(actionVM);
             }
         }
     }
 
-    if (nextActionToLaunch != NULL) {
-        setnextActionVMToActive(nextActionToLaunch);
+    if (tmpNextActionToActivate != NULL) {
+        setnextActionToActivate(tmpNextActionToActivate);
     }
 
     // Initialize the connections for conditions of all actions
@@ -1110,8 +1083,8 @@ void ScenarioController::_startScenario()
 
     // Start timers
     // init the timer with the time of the next action execution
-    if (_nextActionVMToActive != NULL) {
-        _timerToExecuteActions.start(_nextActionVMToActive->startTime() - currentTimeInMilliSeconds);
+    if (_nextActionToActivate != NULL) {
+        _timerToExecuteActions.start(_nextActionToActivate->startTime() - currentTimeInMilliSeconds);
     }
 
     _timerToRegularlyDelayActions.start(INTERVAL_DELAY_ACTIONS);
@@ -1134,7 +1107,7 @@ void ScenarioController::_stopScenario()
     }
 
     // De-active timers for revert and rearm
-    foreach (ActionVM* actionVM, _activeActionsVMList.toList())
+    foreach (ActionVM* actionVM, _listOfActiveActions.toList())
     {
         // Disconnect revert action
         if (actionVM->timerToReverse()->isActive()) {
@@ -1149,8 +1122,8 @@ void ScenarioController::_stopScenario()
         disconnect(actionVM, &ActionVM::rearmAction, this, &ScenarioController::onRearmAction);
     }
 
-    // Reset the next action VM to active
-    setnextActionVMToActive(NULL);
+    // Reset the next action VM to activate
+    setnextActionToActivate(NULL);
 
     // Reset the connections for conditions of all actions
     resetConditionsConnectionsOfAllActions();
@@ -1300,8 +1273,31 @@ void ScenarioController::_executeAction(ActionVM* actionVM, ActionExecutionVM* a
 
 
 /**
-  * @brief slot on the action reversion
+  * @brief Slot called when an agent is added in the mapping
   */
+void ScenarioController::onAgentInMappingAdded(AgentInMappingVM* agentAdded)
+{
+    if ((agentAdded != NULL) && !_agentsInMappingList.contains(agentAdded)) {
+        _agentsInMappingList.append(agentAdded);
+    }
+}
+
+
+/**
+  * @brief Slot called when an agent is removed from the mapping
+  */
+void ScenarioController::onAgentInMappingRemoved(AgentInMappingVM* agentRemoved)
+{
+    if ((agentRemoved != NULL) && _agentsInMappingList.contains(agentRemoved)) {
+        _agentsInMappingList.remove(agentRemoved);
+    }
+}
+
+
+/**
+ * @brief Slot called when an action must be reverted
+ * @param actionExecution
+ */
 void ScenarioController::onRevertAction(ActionExecutionVM* actionExecution)
 {
     ActionVM* actionVM = qobject_cast<ActionVM*>(sender());
@@ -1330,7 +1326,7 @@ void ScenarioController::onRevertAction(ActionExecutionVM* actionExecution)
 
 
 /**
-  * @brief slot on the action rearm
+  * @brief Slot called when an action must be rearmed
   */
 void ScenarioController::onRearmAction()
 {
@@ -1371,6 +1367,17 @@ void ScenarioController::onRearmAction()
             disconnect(actionVM, &ActionVM::rearmAction, this, &ScenarioController::onRearmAction);
         }
     }
+}
+
+
+/**
+ * @brief Slot called when the time line range changed
+ * @param startTimeInMilliseconds
+ * @param endTimeInMilliseconds
+ */
+void ScenarioController::onTimeRangeChanged(int startTimeInMilliseconds, int endTimeInMilliseconds)
+{
+    _filteredListActionsInTimeLine.setTimeRange(startTimeInMilliseconds,endTimeInMilliseconds);
 }
 
 
@@ -1530,18 +1537,18 @@ void ScenarioController::moveActionVMAtTimeAndLine(ActionVM* actionVM, int timeI
 
             // FIXME: need to connect something later ?
 
-            if (_actionsVMToEvaluateVMList.contains(actionVM)) {
-                _actionsVMToEvaluateVMList.remove(actionVM);
+            if (_listOfActionsToEvaluate.contains(actionVM)) {
+                _listOfActionsToEvaluate.remove(actionVM);
             }
-            if (_activeActionsVMList.contains(actionVM)) {
-                _activeActionsVMList.remove(actionVM);
+            if (_listOfActiveActions.contains(actionVM)) {
+                _listOfActiveActions.remove(actionVM);
             }
 
             // Set the new start time
-            int hours = timeInMilliseconds / 3600000;
-            int minutes = (timeInMilliseconds - hours*3600000)/60000 ;
-            int seconds = (timeInMilliseconds - hours*3600000 - minutes*60000) / 1000;
-            int milliseconds = timeInMilliseconds%1000;
+            int hours = timeInMilliseconds / NB_MILLI_SECONDS_IN_ONE_HOUR;
+            int minutes = (timeInMilliseconds - hours * NB_MILLI_SECONDS_IN_ONE_HOUR) / NB_MILLI_SECONDS_IN_ONE_MINUTE;
+            int seconds = (timeInMilliseconds - hours * NB_MILLI_SECONDS_IN_ONE_HOUR - minutes * NB_MILLI_SECONDS_IN_ONE_MINUTE) / 1000;
+            int milliseconds = timeInMilliseconds % 1000;
             actionVM->setstartTimeString(QString::number(hours).rightJustified(2, '0') + ":" + QString::number(minutes).rightJustified(2, '0') + ":" + QString::number(seconds).rightJustified(2, '0') + "." + QString::number(milliseconds).leftJustified(3, '0'));
 
             // If the line number has changed
@@ -1653,14 +1660,5 @@ bool ScenarioController::canDeleteActionFromList(ActionM* actionM)
     }
 
     return canBeDeleted;
-}
-
-
-/**
-  * @brief slot on the time line range change
-  */
-void ScenarioController::ontimeRangeChange(int startTimeInMilliseconds, int endTimeInMilliseconds)
-{
-    _filteredListActionsInTimeLine.setTimeRange(startTimeInMilliseconds,endTimeInMilliseconds);
 }
 

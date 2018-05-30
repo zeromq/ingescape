@@ -16,6 +16,7 @@
 
 #include <QDebug>
 
+
 /**
  * @brief Constructor
  * @param model
@@ -40,10 +41,10 @@ ActionVM::ActionVM(ActionM* model,
     {
         if (startTime >= 0)
         {
-            int hours = startTime / 3600000;
-            int minutes = (startTime - hours*3600000)/60000 ;
-            int seconds = (startTime - hours*3600000 - minutes*60000) / 1000;
-            int milliseconds = startTime%1000;
+            int hours = startTime / NB_MILLI_SECONDS_IN_ONE_HOUR;
+            int minutes = (startTime - hours * NB_MILLI_SECONDS_IN_ONE_HOUR) / NB_MILLI_SECONDS_IN_ONE_MINUTE;
+            int seconds = (startTime - hours * NB_MILLI_SECONDS_IN_ONE_HOUR - minutes * NB_MILLI_SECONDS_IN_ONE_MINUTE) / 1000;
+            int milliseconds = startTime % 1000;
 
             _startTimeString = QString::number(hours).rightJustified(2, '0') + ":" + QString::number(minutes).rightJustified(2, '0') + ":" + QString::number(seconds).rightJustified(2, '0') + "." + QString::number(milliseconds).leftJustified(3, '0');
         }
@@ -115,12 +116,12 @@ ActionVM::~ActionVM()
  */
 void ActionVM::copyFrom(ActionVM* actionVM)
 {
-    if(actionVM != NULL)
+    if (actionVM != NULL)
     {
         ActionM* originalModel = actionVM->modelM();
 
         // Copy the model
-        if(originalModel != NULL)
+        if (originalModel != NULL)
         {
             ActionM* model = new ActionM(originalModel->name());
             model->copyFrom(originalModel);
@@ -183,10 +184,10 @@ void ActionVM::setstartTimeString(QString value)
                 }
             }
 
-            if(successHours && successMinutes && successSeconds)
+            if (successHours && successMinutes && successSeconds)
             {
-                int totalMilliseconds = hours*3600000 + minutes*60000 + seconds*1000;
-                if(successMilliSeconds)
+                int totalMilliseconds = (hours * NB_MILLI_SECONDS_IN_ONE_HOUR) + (minutes * NB_MILLI_SECONDS_IN_ONE_MINUTE) + (seconds * 1000);
+                if (successMilliSeconds)
                 {
                     totalMilliseconds += milliSeconds;
                     setstartTime(totalMilliseconds);
@@ -378,24 +379,20 @@ void ActionVM::_computeEndTime()
     if (_modelM != NULL)
     {
         int itemDurationTime = 0;
-        if (_modelM->validityDurationType() == ValidationDurationTypes::FOREVER)
-        {
+        if (_modelM->validityDurationType() == ValidationDurationTypes::FOREVER) {
             endTime = -1;
         }
-        else if (_modelM->validityDurationType() == ValidationDurationTypes::CUSTOM)
-        {
+        else if (_modelM->validityDurationType() == ValidationDurationTypes::CUSTOM) {
             itemDurationTime = _modelM->validityDuration();
         }
 
         // Compare with the time before revert if selected
-        if (_modelM->shallRevertAfterTime() && _modelM->revertAfterTime() > itemDurationTime)
-        {
+        if (_modelM->shallRevertAfterTime() && (_modelM->revertAfterTime() > itemDurationTime)) {
             itemDurationTime = _modelM->revertAfterTime();
         }
 
         // If not forever, add duration
-        if (endTime != -1)
-        {
+        if (endTime != -1) {
             endTime += itemDurationTime;
         }
     }
