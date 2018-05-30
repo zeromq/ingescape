@@ -2673,10 +2673,10 @@ Window {
                 }
 
                 onClicked: {
-                    if(controller)
-                    {
-                        controller.valideActionEditor(model.QtObject);
+                    if (controller) {
+                        controller.validateActionEditor(model.QtObject);
                     }
+
                     // Close our popup
                     rootItem.close();
                 }

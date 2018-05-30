@@ -141,7 +141,7 @@ public:
 
     /**
       * @brief Import the scenario lists structure from the json byte content
-      * @param byte array content
+      * @param byteArrayOfJson
       */
     void importScenarioFromJson(QByteArray byteArrayOfJson);
 
@@ -154,31 +154,31 @@ public:
 
 
     /**
-      * @brief Open the action editor
-      * @param action model
+      * @brief Open the action editor with a model of action
+      * @param action
       */
-    Q_INVOKABLE void openActionEditor(ActionM* actionM);
+    Q_INVOKABLE void openActionEditorWithModel(ActionM* action);
 
 
     /**
-      * @brief Open the action editor
-      * @param action view model
+      * @brief Open the action editor with a view model of action
+      * @param action
       */
-    Q_INVOKABLE void openActionEditorFromActionVM(ActionVM* actionVM);
+    Q_INVOKABLE void openActionEditorWithViewModel(ActionVM* action);
 
 
     /**
       * @brief Delete an action from the list
-      * @param action model
+      * @param action
       */
-    Q_INVOKABLE void deleteAction(ActionM * actionM);
+    Q_INVOKABLE void deleteAction(ActionM* action);
 
 
     /**
-      * @brief Valide action edition
+      * @brief Validate action edition
       * @param action editor controller
       */
-    Q_INVOKABLE void valideActionEditor(ActionEditorController* actionEditorC);
+    Q_INVOKABLE void validateActionEditor(ActionEditorController* actionEditorC);
 
 
     /**
@@ -390,12 +390,14 @@ private :
      */
     void _insertActionVMIntoMapByLineNumber(ActionVM* actionVMToInsert, int lineNumberRef);
 
+
     /**
      * @brief Start the scenario by
      *        making connections for the actions conditions
      *        starting the action evaluation timer
      */
     void _startScenario();
+
 
     /**
      * @brief Stop the scenario by
@@ -427,6 +429,7 @@ private :
      */
     void _executeCommandForAgent(AgentInMappingVM* agent, QStringList commandAndParameters);
 
+
     /**
      * @brief Exectute the action with the revert initialization if necessary
      * @param action view model
@@ -434,13 +437,6 @@ private :
      * @param current time in ms
      */
     void _executeAction(ActionVM* actionVM, ActionExecutionVM* actionExecution, int currentTimeInMilliSeconds);
-
-    /**
-      * @brief Initialize the action view model at a specific time
-      * @param action view model
-      * @param time when to initialize the action VM
-      */
-    void _initializeActionVMAt(ActionVM * actionVM, int currentTimeInMilliSeconds);
 
 
 private:

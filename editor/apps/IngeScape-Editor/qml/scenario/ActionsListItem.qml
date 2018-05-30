@@ -153,7 +153,7 @@ Item {
                 onClicked: {
                     if (controller && rootItem.action) {
                         // Open the editor of our action
-                        controller.openActionEditor(rootItem.action);
+                        controller.openActionEditorWithModel(rootItem.action);
                     }
                 }
 
