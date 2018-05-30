@@ -442,7 +442,8 @@ private :
       */
     void _initializeActionVMAt(ActionVM * actionVM, int currentTimeInMilliSeconds);
 
-protected:
+
+private:
 
     // Manager for the data model of INGESCAPE
     IngeScapeModelManager* _modelManager;
@@ -474,14 +475,14 @@ protected:
     // Timer to regularly delay actions (when their conditions are not valid)
     QTimer _timerToRegularlyDelayActions;
 
-
-private:
     // Time in milliseconds of our scenario start
     int _scenarioStartingTimeInMs;
 
     // List of actionVM in timeline filtered with a given time range in milliseconds
     AbstractTimeRangeFilter _filteredListActionsInTimeLine;
 
+    // Map from agent name to the (view model of) agent in mapping
+    QHash<QString, AgentInMappingVM*> _mapFromNameToAgentInMapping;
 
 };
 

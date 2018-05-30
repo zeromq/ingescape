@@ -111,6 +111,10 @@ ScenarioController::~ScenarioController()
     disconnect(&_timerToRegularlyDelayActions, &QTimer::timeout, this, &ScenarioController::_onTimeout_DelayOrExecuteActions);
     _timerToRegularlyDelayActions.stop();
 
+    // Clear list and hash table of agents in mapping
+    _agentsInMappingList.clear();
+    _mapFromNameToAgentInMapping.clear();
+
     // Clear all scenario and delete objects
     clearScenario();
 
@@ -1137,19 +1141,12 @@ void ScenarioController::_stopScenario()
  */
 AgentInMappingVM* ScenarioController::_getAgentInMappingFromName(QString agentName)
 {
-    /*if (_mapFromNameToAgentInMapping.contains(name)) {
-        return _mapFromNameToAgentInMapping.value(name);
+    if (_mapFromNameToAgentInMapping.contains(agentName)) {
+        return _mapFromNameToAgentInMapping.value(agentName);
     }
     else {
         return NULL;
-    }*/
-
-    foreach (AgentInMappingVM* agent, _agentsInMappingList.toList()) {
-        if ((agent != NULL) && (agent->name() == agentName)) {
-            return agent;
-        }
     }
-    return NULL;
 }
 
 
@@ -1277,7 +1274,9 @@ void ScenarioController::_executeAction(ActionVM* actionVM, ActionExecutionVM* a
   */
 void ScenarioController::onAgentInMappingAdded(AgentInMappingVM* agentAdded)
 {
-    if ((agentAdded != NULL) && !_agentsInMappingList.contains(agentAdded)) {
+    if ((agentAdded != NULL) && !_mapFromNameToAgentInMapping.contains(agentAdded->name()))
+    {
+        _mapFromNameToAgentInMapping.insert(agentAdded->name(), agentAdded);
         _agentsInMappingList.append(agentAdded);
     }
 }
@@ -1288,7 +1287,9 @@ void ScenarioController::onAgentInMappingAdded(AgentInMappingVM* agentAdded)
   */
 void ScenarioController::onAgentInMappingRemoved(AgentInMappingVM* agentRemoved)
 {
-    if ((agentRemoved != NULL) && _agentsInMappingList.contains(agentRemoved)) {
+    if ((agentRemoved != NULL) && _mapFromNameToAgentInMapping.contains(agentRemoved->name()))
+    {
+        _mapFromNameToAgentInMapping.remove(agentRemoved->name());
         _agentsInMappingList.remove(agentRemoved);
     }
 }
