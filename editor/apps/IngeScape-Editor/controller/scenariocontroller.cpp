@@ -35,7 +35,8 @@ ScenarioController::ScenarioController(IngeScapeModelManager* modelManager,
     _nextActionToActivate(NULL),
     _modelManager(modelManager),
     _jsonHelper(jsonHelper),
-    _scenariosDirectoryPath(scenariosPath)
+    _scenariosDirectoryPath(scenariosPath),
+    _timeOfDayInMS_WhenStartScenario_ThenAtLastTimeOut(0)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -371,7 +372,7 @@ void ScenarioController::deleteAction(ActionM* action)
         {
             _openedActionsEditorsControllers.remove(actionEditorC);
             delete actionEditorC;
-            actionEditorC = NULL;      
+            actionEditorC = NULL;
         }
         _mapActionsEditorControllersFromActionM.remove(action);
     }
@@ -836,6 +837,8 @@ void ScenarioController::clearScenario()
 
     // Reset current time
     setcurrentTime(QTime::fromMSecsSinceStartOfDay(0));
+
+    //qDebug() << "clearScenario:" << _currentTime << QTime::currentTime();
 }
 
 
@@ -1140,7 +1143,7 @@ void ScenarioController::_onTimeout_ExecuteActions()
             setnextActionToActivate(NULL);
         }
     }
- }
+}
 
 
 /**
@@ -1148,10 +1151,11 @@ void ScenarioController::_onTimeout_ExecuteActions()
  */
 void ScenarioController::_onTimeout_DelayOrExecuteActions()
 {
-    // Update the current time
-    int currentTimeOfDay = QTime::currentTime().msecsSinceStartOfDay();
+    // Get the current time of the day
+    int currentTimeOfDayInMS = QTime::currentTime().msecsSinceStartOfDay();
 
-    setcurrentTime(_currentTime.addMSecs(currentTimeOfDay - _scenarioStartingTimeInMs));
+    // Update the current time of our scenario (from the beginning of our scenario)
+    setcurrentTime(_currentTime.addMSecs(currentTimeOfDayInMS - _timeOfDayInMS_WhenStartScenario_ThenAtLastTimeOut));
 
     int currentTimeInMilliSeconds = _currentTime.msecsSinceStartOfDay();
 
@@ -1196,7 +1200,7 @@ void ScenarioController::_onTimeout_DelayOrExecuteActions()
 
                     // If there is at least another execution for this action...
                     if ( (actionVM->executionsList()->count() > 1)
-                            || (actionExecution->neverExecuted() && (actionVM->modelM()->validityDurationType() == ValidationDurationTypes::CUSTOM)) )
+                         || (actionExecution->neverExecuted() && (actionVM->modelM()->validityDurationType() == ValidationDurationTypes::CUSTOM)) )
                     {
                         // ...we remove the current execution
                         actionVM->setcurrentExecution(NULL);
@@ -1227,8 +1231,10 @@ void ScenarioController::_onTimeout_DelayOrExecuteActions()
         }
     }
 
-    // Save our scenario start
-    _scenarioStartingTimeInMs = currentTimeOfDay;
+    // Update the time of the day
+    _timeOfDayInMS_WhenStartScenario_ThenAtLastTimeOut = currentTimeOfDayInMS;
+
+    //qDebug() << "_onTimeout_DelayOrExecuteActions:" << _currentTime << QTime::currentTime();
 
     if (_isPlaying) {
         _timerToRegularlyDelayActions.start(INTERVAL_DELAY_ACTIONS);
@@ -1480,8 +1486,10 @@ void ScenarioController::_startScenario()
     // Initialize the connections for conditions of all actions
     initializeConditionsConnectionsOfAllActions();
 
-    // Save our scenario start
-    _scenarioStartingTimeInMs = QTime::currentTime().msecsSinceStartOfDay();
+    // Save the time of the day
+    _timeOfDayInMS_WhenStartScenario_ThenAtLastTimeOut = QTime::currentTime().msecsSinceStartOfDay();
+
+    //qDebug() << "_startScenario:" << _currentTime << QTime::currentTime();
 
     // Start timers
     // init the timer with the time of the next action execution
@@ -1602,8 +1610,8 @@ void ScenarioController::_executeCommandForAgent(AgentInMappingVM* agent, QStrin
         }
         // STOP or MUTE/UN-MUTE or FREEZE/UN-FREEZE
         else if ( (command == command_StopAgent)
-                 || (command == command_MuteAgent) || (command == command_UnmuteAgent)
-                 || (command == command_FreezeAgent) || (command == command_UnfreezeAgent) )
+                  || (command == command_MuteAgent) || (command == command_UnmuteAgent)
+                  || (command == command_FreezeAgent) || (command == command_UnfreezeAgent) )
         {
             // Emit signal "Command asked to agent"
             Q_EMIT commandAskedToAgent(agent->peerIdsList(), command);

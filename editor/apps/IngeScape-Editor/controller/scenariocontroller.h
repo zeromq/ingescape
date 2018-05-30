@@ -471,8 +471,8 @@ private:
     // Timer to regularly delay actions (when their conditions are not valid)
     QTimer _timerToRegularlyDelayActions;
 
-    // Time in milliseconds of our scenario start
-    int _scenarioStartingTimeInMs;
+    // Time of the day in milli-seconds when user starts the scenario, then at the last timeout (of the timer which regularly delay actions)
+    int _timeOfDayInMS_WhenStartScenario_ThenAtLastTimeOut;
 
     // List of actionVM in timeline filtered with a given time range in milliseconds
     AbstractTimeRangeFilter _filteredListActionsInTimeLine;
