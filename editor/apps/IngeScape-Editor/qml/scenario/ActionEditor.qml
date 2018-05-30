@@ -1895,7 +1895,7 @@ Window {
                     topMargin: 15
                 }
                 clip : true
-                height: isOpened ? (titleadvModeMouseArea.height + 1 + revertActionitem.height + revertActionitem.anchors.topMargin + rearmActionitem.height + rearmActionitem.anchors.topMargin)
+                height: isOpened ? (titleadvModeMouseArea.height + 1 + revertActionitem.height + revertActionitem.anchors.topMargin + rearmActionitem.height + rearmActionitem.anchors.topMargin + 2)
                                  : titleadvModeMouseArea.height + 1
 
 //                Rectangle {

@@ -290,7 +290,7 @@ bool ScenarioController::isAgentDefinedInActions(QString agentName)
   */
 void ScenarioController::openActionEditorWithModel(ActionM* action)
 {
-    // We check that or editor is not already opened
+    // We check that the corresponding editor is not already opened
     if (!_mapActionsEditorControllersFromActionM.contains(action))
     {
         if (action != NULL)
@@ -330,7 +330,7 @@ void ScenarioController::openActionEditorWithViewModel(ActionVM* action)
 {
     if ((action != NULL) && (action->modelM() != NULL))
     {
-        // We check that or editor is not already opened
+        // We check that the corresponding editor is not already opened
         if (!_mapActionsEditorControllersFromActionVM.contains(action))
         {
             setselectedAction(action->modelM());
@@ -1062,7 +1062,6 @@ void ScenarioController::onTimeRangeChanged(int startTimeInMilliseconds, int end
 }
 
 
-
 /**
  * @brief Called when our timer time out to handle the scenario and execute actions
  */
@@ -1149,14 +1148,14 @@ void ScenarioController::_onTimeout_ExecuteActions()
  */
 void ScenarioController::_onTimeout_DelayOrExecuteActions()
 {
-    // Move the currenttime
+    // Update the current time
     int currentTimeOfDay = QTime::currentTime().msecsSinceStartOfDay();
 
     setcurrentTime(_currentTime.addMSecs(currentTimeOfDay - _scenarioStartingTimeInMs));
 
     int currentTimeInMilliSeconds = _currentTime.msecsSinceStartOfDay();
 
-    // Traverse the list of active actions
+    // Traverse the list of active actions (the current time (is) was between start time and end time of these actions)
     foreach (ActionVM* actionVM, _listOfActiveActions.toList())
     {
         if ((actionVM != NULL) && (actionVM->modelM() != NULL))
@@ -1323,28 +1322,56 @@ void ScenarioController::_saveScenarioToFile(QString scenarioFilePath)
  */
 void ScenarioController::_insertActionVMIntoMapByLineNumber(ActionVM* actionVMToInsert, int lineNumberRef)
 {
-    int insertionStartTime = actionVMToInsert->startTime();
-
-    int lineNumber = lineNumberRef != -1 ? lineNumberRef : 0;
-    while (lineNumber < _linesNumberInTimeLine)
+    if (actionVMToInsert != NULL)
     {
-        bool canInsert = canInsertActionVMTo(actionVMToInsert->modelM(), insertionStartTime, lineNumber);
-        // Insert our item if possible
-        if (canInsert)
-        {
-            if (_mapActionsVMsInTimelineFromLineIndex.contains(lineNumber))
-            {
-                I2CustomItemSortFilterListModel<ActionVM>* actionVMSortedList = _mapActionsVMsInTimelineFromLineIndex.value(lineNumber);
-                if(actionVMSortedList != NULL)
-                {
-                    // set the line number
-                    actionVMToInsert->setlineInTimeLine(lineNumber);
+        int insertionStartTime = actionVMToInsert->startTime();
 
-                    // Insert the action
+        int lineNumber = 0;
+        if (lineNumberRef != -1) {
+            lineNumber = lineNumberRef;
+        }
+
+        while (lineNumber < _linesNumberInTimeLine)
+        {
+            bool canInsert = canInsertActionVMTo(actionVMToInsert->modelM(), insertionStartTime, lineNumber);
+            // Insert our item if possible
+            if (canInsert)
+            {
+                if (_mapActionsVMsInTimelineFromLineIndex.contains(lineNumber))
+                {
+                    I2CustomItemSortFilterListModel<ActionVM>* actionVMSortedList = _mapActionsVMsInTimelineFromLineIndex.value(lineNumber);
+                    if(actionVMSortedList != NULL)
+                    {
+                        // set the line number
+                        actionVMToInsert->setlineInTimeLine(lineNumber);
+
+                        // Insert the action
+                        actionVMSortedList->append(actionVMToInsert);
+
+                        // Add an extra line if inserted our actionVM at the last line
+                        if(lineNumber >= _linesNumberInTimeLine -1)
+                        {
+                            setlinesNumberInTimeLine(lineNumber+2);
+                        }
+
+                        break;
+                    }
+                }
+                else
+                {
+                    // Create a new list
+                    I2CustomItemSortFilterListModel<ActionVM>* actionVMSortedList = new I2CustomItemSortFilterListModel<ActionVM>();
+                    actionVMSortedList->setSortProperty("startTime");
                     actionVMSortedList->append(actionVMToInsert);
 
+                    // Set the line number
+                    actionVMToInsert->setlineInTimeLine(lineNumber);
+
+                    // Add into our map
+                    _mapActionsVMsInTimelineFromLineIndex.insert(lineNumber,actionVMSortedList);
+
                     // Add an extra line if inserted our actionVM at the last line
-                    if(lineNumber >= _linesNumberInTimeLine -1)
+                    if (lineNumber >= _linesNumberInTimeLine -1)
                     {
                         setlinesNumberInTimeLine(lineNumber+2);
                     }
@@ -1352,58 +1379,36 @@ void ScenarioController::_insertActionVMIntoMapByLineNumber(ActionVM* actionVMTo
                     break;
                 }
             }
-            else {
-                // Create a new list
-                I2CustomItemSortFilterListModel<ActionVM>* actionVMSortedList = new I2CustomItemSortFilterListModel<ActionVM>();
-                actionVMSortedList->setSortProperty("startTime");
-                actionVMSortedList->append(actionVMToInsert);
 
-                // Set the line number
-                actionVMToInsert->setlineInTimeLine(lineNumber);
-
-                // Add into our map
-                _mapActionsVMsInTimelineFromLineIndex.insert(lineNumber,actionVMSortedList);
-
-                // Add an extra line if inserted our actionVM at the last line
-                if(lineNumber >= _linesNumberInTimeLine -1)
-                {
-                    setlinesNumberInTimeLine(lineNumber+2);
-                }
-
+            if (lineNumberRef != -1) {
                 break;
             }
+            else {
+                lineNumber++;
+            }
+
         }
 
-        if(lineNumberRef != -1)
+        // If the action has not been inserted yet, we create a new line
+        // only if we are not dropping at a busy position the actionVM
+        if ((actionVMToInsert->lineInTimeLine() == -1) && (lineNumberRef == -1))
         {
-            break;
+            // Add an extra line if inserted our actionVM at the last line
+            if (lineNumber >= _linesNumberInTimeLine -1) {
+                setlinesNumberInTimeLine(lineNumber + 2);
+            }
+
+            // Create the new line number
+            actionVMToInsert->setlineInTimeLine(lineNumber);
+
+            // Create a new list
+            I2CustomItemSortFilterListModel<ActionVM>* actionVMSortedList = new I2CustomItemSortFilterListModel<ActionVM>();
+            actionVMSortedList->setSortProperty("startTime");
+            actionVMSortedList->append(actionVMToInsert);
+
+            // Add into our map
+            _mapActionsVMsInTimelineFromLineIndex.insert(lineNumber, actionVMSortedList);
         }
-        else {
-            lineNumber++;
-        }
-
-    }
-
-    // If the action has not been inserted yet, we create a new line
-    // only if we are not dropping at a busy position the actionVM
-    if(actionVMToInsert->lineInTimeLine() == -1 && lineNumberRef == -1)
-    {
-        // Add an extra line if inserted our actionVM at the last line
-        if(lineNumber >= _linesNumberInTimeLine -1)
-        {
-            setlinesNumberInTimeLine(lineNumber+2);
-        }
-
-        // Create the new line number
-        actionVMToInsert->setlineInTimeLine(lineNumber);
-
-        // Create a new list
-        I2CustomItemSortFilterListModel<ActionVM>* actionVMSortedList = new I2CustomItemSortFilterListModel<ActionVM>();
-        actionVMSortedList->setSortProperty("startTime");
-        actionVMSortedList->append(actionVMToInsert);
-
-        // Add into our map
-        _mapActionsVMsInTimelineFromLineIndex.insert(lineNumber,actionVMSortedList);
     }
 }
 
