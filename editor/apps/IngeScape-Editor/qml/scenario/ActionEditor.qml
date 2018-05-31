@@ -87,57 +87,7 @@ Window {
             color: IngeScapeTheme.editorsBackgroundBorderColor
         }
         color: IngeScapeTheme.editorsBackgroundColor
-        //        clip : true
 
-        //        // catch events
-        //        MultiPointTouchArea {
-        //            anchors.fill: parent
-        //        }
-
-        // drag Area
-        //        I2CustomRectangle {
-        //            id : dragRect
-        //            anchors {
-        //                top : parent.top
-        //                left : parent.left
-        //                right : parent.right
-        //                margins : 2
-        //            }
-        //            height : 50
-        //            topLeftRadius : 5
-        //            topRightRadius : 5
-
-        //            color :  /dragMouseArea.pressed? IngeScapeTheme.editorsBackgroundColor : IngeScapeTheme.darkBlueGreyColor
-
-        //            MouseArea {
-        //                id : dragMouseArea
-        //                hoverEnabled: true
-        //                anchors.fill: parent
-        //                drag.target: rootItem
-
-        //                drag.minimumX : - rootItem.width/2
-        //                drag.maximumX : rootItem.parent.width - rootItem.width/2
-        //                drag.minimumY :  0
-        //                drag.maximumY :  rootItem.parent.height - rootItem.height/2
-
-        //                onPressed: {
-        //                    // Emit signal "bring to front"
-        //                    rootItem.bringToFront();
-        //                }
-        //            }
-        //        }
-
-        // separator
-        //        Rectangle {
-        //            anchors {
-        //                top : parent.top
-        //                topMargin: 50
-        //                left : parent.left
-        //                right : parent.right
-        //            }
-        //            height : 1
-        //            color : IngeScapeTheme.editorsBackgroundBorderColor
-        //        }
 
         Item {
             id: mainItem

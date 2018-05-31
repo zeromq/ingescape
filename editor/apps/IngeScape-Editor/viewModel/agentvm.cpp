@@ -372,18 +372,9 @@ void AgentVM::saveMappingToPath()
  */
 void AgentVM::openLogStream()
 {
-    // FIXME TODO
-    qDebug() << "Open the 'Log Stream' of" << _name;
+    //qDebug() << "Open the 'Log Stream' of" << _name;
 
-    for (AgentM* model : _models.toList())
-    {
-        if ((model != NULL) && model->isON())
-        {
-            QString subscriberAddress = QString("tcp://%1:%2").arg(model->address(), model->loggerPort());
-
-            qDebug() << "Address:" << model->address() << "+ Logger Port:" << model->loggerPort() << "--> Subscriber Address:" << subscriberAddress;
-        }
-    }
+    Q_EMIT openLogStreamOfAgents(_models.toList());
 }
 
 

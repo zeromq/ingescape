@@ -332,6 +332,33 @@ Item {
 
 
     //
+    // List of "Log Stream Viewer"
+    //
+    Repeater {
+        model : IngeScapeEditorC.openedLogStreamControllers
+
+        delegate: Item {
+            Agent.LogStreamPanel {
+                id: logStreamPanel
+
+                controller: model.QtObject
+                visible : true
+
+                Component.onCompleted:  {
+                    x = rootItem.Window.window.x + rootItem.Window.width/2 - logStreamPanel.width/2  + (index * 40);
+                    y = rootItem.Window.window.y + rootItem.Window.height/2 - logStreamPanel.height/2 + (index * 40);
+
+                }
+
+                onClosing: {
+                    IngeScapeEditorC.closeLogStreamController(model.QtObject);
+                }
+            }
+        }
+    }
+
+
+    //
     // History Panel
     //
     Agent.HistoryPanel {

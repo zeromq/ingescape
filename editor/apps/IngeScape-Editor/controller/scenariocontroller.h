@@ -47,10 +47,10 @@ class ScenarioController: public QObject
 {
     Q_OBJECT
 
-    // Filtered Sorted list of actions
+    // List of actions
     I2_QOBJECT_LISTMODEL(ActionM, actionsList)
 
-    // Sorted list of ations by start time
+    // Opened actions editors
     I2_QOBJECT_LISTMODEL(ActionEditorController, openedActionsEditorsControllers)
 
     // Selected action

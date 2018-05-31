@@ -265,6 +265,13 @@ Q_SIGNALS:
     void downloadAgentMappingToPath(AgentMappingM* agentMapping, QString mappingFilePath);
 
 
+    /**
+     * @brief Signal emitted when we have to open the "Log Stream" of a list of agents
+     * @param models
+     */
+    void openLogStreamOfAgents(QList<AgentM*> models);
+
+
 private Q_SLOTS:
 
     /**

@@ -211,6 +211,7 @@ void AgentsSupervisionController::onAgentModelCreated(AgentM* model)
         connect(agent, &AgentVM::commandAskedToAgent, this, &AgentsSupervisionController::commandAskedToAgent);
         connect(agent, &AgentVM::commandAskedToAgentAboutOutput, this, &AgentsSupervisionController::commandAskedToAgentAboutOutput);
         connect(agent, &AgentVM::openValuesHistoryOfAgent, this, &AgentsSupervisionController::openValuesHistoryOfAgent);
+        connect(agent, &AgentVM::openLogStreamOfAgents, this, &AgentsSupervisionController::openLogStreamOfAgents);
 
 
         agentViewModelsList.append(agent);

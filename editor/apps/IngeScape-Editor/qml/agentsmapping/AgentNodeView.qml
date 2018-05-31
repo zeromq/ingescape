@@ -825,19 +825,19 @@ Rectangle {
             }
 
             onClicked: {
-                if (controller) {
-                    if(IngeScapeEditorC.canDeleteAgentInMapping(model.QtObject))
+                if (controller)
+                {
+                    if (IngeScapeEditorC.canDeleteAgentInMapping(rootItem.agentName))
                     {
                         // Delete our agent
                         controller.deleteSelectedAgentInMapping();
-                    } else {
+                    }
+                    else {
                         rootItem.needConfirmationtoDeleteAgentInMapping();
                     }
                 }
             }
         }
-
-
 
 
         //-------------------

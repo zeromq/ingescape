@@ -28,13 +28,23 @@ class LogStreamController : public QObject
 {
     Q_OBJECT
 
+    // Name of the corresponding agent
+    I2_QML_PROPERTY_READONLY(QString, agentName)
+
+    // Address of subscriber
+    I2_CPP_NOSIGNAL_PROPERTY(QString, subscriberAddress)
+
 
 public:
     /**
      * @brief Constructor
+     * @param agentName
+     * @param subscriberAddress
      * @param parent
      */
-    explicit LogStreamController(QObject *parent = nullptr);
+    explicit LogStreamController(QString agentName,
+                                 QString subscriberAddress,
+                                 QObject *parent = nullptr);
 
 
     /**
@@ -46,6 +56,9 @@ public:
 signals:
 
 public slots:
+
+private:
+
 };
 
 QML_DECLARE_TYPE(LogStreamController)

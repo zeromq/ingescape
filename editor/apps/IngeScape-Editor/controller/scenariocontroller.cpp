@@ -428,7 +428,7 @@ void ScenarioController::validateActionEditor(ActionEditorController* actionEdit
     // We check that or editor is not already opened
     if (!_actionsList.contains(originalActionM))
     {
-        // Insert in to the list
+        // Insert into the list
         _actionsList.append(originalActionM);
 
         // Insert into the map
@@ -1603,7 +1603,7 @@ void ScenarioController::_executeCommandForAgent(AgentInMappingVM* agent, QStrin
                 // Check if the model has a hostname
                 if ((model != NULL) && !model->hostname().isEmpty())
                 {
-                    // Emit signal "Command asked to agent"
+                    // Emit signal "Command asked to launcher"
                     Q_EMIT commandAskedToLauncher(command, model->hostname(), model->commandLine());
                 }
             }

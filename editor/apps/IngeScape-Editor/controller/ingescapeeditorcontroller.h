@@ -24,19 +24,19 @@
 
 #include <I2PropertyHelpers.h>
 
-#include <controller/ingescapemodelmanager.h>
+#include <controller/abstracttimeactionslinescenarioviewcontroller.h>
+#include <controller/agentsmappingcontroller.h>
 #include <controller/agentssupervisioncontroller.h>
 #include <controller/hostssupervisioncontroller.h>
-#include <controller/recordssupervisioncontroller.h>
-#include <controller/agentsmappingcontroller.h>
+#include <controller/ingescapelaunchermanager.h>
+#include <controller/ingescapemodelmanager.h>
+#include <controller/logstreamcontroller.h>
 #include <controller/networkcontroller.h>
+#include <controller/recordssupervisioncontroller.h>
 #include <controller/scenariocontroller.h>
 #include <controller/valueshistorycontroller.h>
-#include <controller/abstracttimeactionslinescenarioviewcontroller.h>
-#include <controller/ingescapelaunchermanager.h>
 
 #include <misc/terminationsignalwatcher.h>
-
 
 
 /**
@@ -90,6 +90,9 @@ class IngeScapeEditorController : public QObject
 
     // Manager for launchers of INGESCAPE agents
     I2_QML_PROPERTY_READONLY(IngeScapeLauncherManager*, launcherManager)
+
+    // Opened log stream viewers
+    I2_QOBJECT_LISTMODEL(LogStreamController, openedLogStreamControllers)
 
 
 public:
@@ -148,19 +151,19 @@ public:
 
 
     /**
-      * @brief Can delete an agent view model from the list function
+      * @brief Check if we can delete an agent (view model) from the list in supervision
       *        Check dependencies in the mapping and in the actions (conditions, effects)
-      * @param agent to delete
+      * @param agentName
       */
-    Q_INVOKABLE bool canDeleteAgentVMFromList(AgentVM* agent);
+    Q_INVOKABLE bool canDeleteAgentFromSupervision(QString agentName);
 
 
     /**
-      * @brief Can delete an agent in mapping from the mapping view
+      * @brief Check if we can delete an agent (in mapping) from the mapping view
       *        Check dependencies in the actions (conditions, effects)
       * @param agent in mapping to delete
       */
-    Q_INVOKABLE bool canDeleteAgentInMapping(AgentInMappingVM* agentInMapping);
+    Q_INVOKABLE bool canDeleteAgentInMapping(QString agentName);
 
 
     /**
@@ -172,21 +175,28 @@ public:
     Q_INVOKABLE bool restartNetwork(QString strPort, QString networkDevice);
 
 
-public Q_SLOTS:
-
     /**
       * @brief Close a definition
       * @param definition
       */
-    void closeDefinition(DefinitionM* definition);
+    Q_INVOKABLE void closeDefinition(DefinitionM* definition);
 
 
     /**
       * @brief Close an action editor
-      * @param action editor controller
+      * @param actionEditorC
       */
-    void closeActionEditor(ActionEditorController *actionEditorC);
+    Q_INVOKABLE void closeActionEditor(ActionEditorController* actionEditorC);
 
+
+    /**
+     * @brief Close a "Log Stream" controller
+     * @param logStreamC
+     */
+    Q_INVOKABLE void closeLogStreamController(LogStreamController* logStreamC);
+
+
+public Q_SLOTS:
 
     /**
       * @brief Method used to force the creation of our singleton from QML
@@ -202,6 +212,13 @@ public Q_SLOTS:
       * @return
       */
     QPointF getGlobalMousePosition();
+
+
+    /**
+     * @brief Slot called when we have to open the "Log Stream" of a list of agents
+     * @param models
+     */
+    void onOpenLogStreamOfAgents(QList<AgentM*> models);
 
 
 Q_SIGNALS:

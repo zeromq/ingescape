@@ -137,7 +137,7 @@ Item {
 
                     onClicked: {
 
-                        if(IngeScapeEditorC.canDeleteAgentVMFromList(model.QtObject))
+                        if (IngeScapeEditorC.canDeleteAgentFromSupervision(model.name))
                         {
                             if (controller)
                             {

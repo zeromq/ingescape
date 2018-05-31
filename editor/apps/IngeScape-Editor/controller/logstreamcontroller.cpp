@@ -14,13 +14,22 @@
 
 #include "logstreamcontroller.h"
 
+extern "C" {
+//#include <ingescape_advanced.h>
+#include <ingescape_private.h>
+//#include <czmq.h>
+}
+
+bool verbose = true;
 
 
-/*static void zyre_actor (zsock_t *pipe, void *args)
+/*static void zyre_actor(zsock_t *pipe, void *args)
 {
-    zyreloopElements_t *zEl = (zyreloopElements_t *)args;
-    zyre_t *node = zyre_new (zEl->name);
-    zEl->node = node;
+    zyreloopElements_t *zLoopElement = (zyreloopElements_t *)args;
+
+    zyre_t *node = zyre_new("FIXME_TO_RENAME");
+
+    //zLoopElement->node = node;
 
 
         //gossip
@@ -44,14 +53,16 @@
         }
 
 
-    if (verbose){
+    if (verbose) {
         zyre_set_verbose(node);
     }
-    if (!node)
-        return;
 
-    zyre_start (node);
-    zsock_signal (pipe, 0); //notify main thread that we are ready
+    if (!node) {
+        return;
+    }
+
+    zyre_start(node);
+    zsock_signal(pipe, 0); //notify main thread that we are ready
     zyre_print(node);
 
     //preparing and running zyre mainloop
@@ -88,8 +99,8 @@
 
     zloop_set_verbose(loop, verbose);
 
-    zloop_poller (loop, &zpipePollItem, manageParent, args);
-    zloop_poller_set_tolerant(loop, &zpipePollItem);
+    //zloop_poller (loop, &zpipePollItem, manageParent, args);
+    //zloop_poller_set_tolerant(loop, &zpipePollItem);
     zloop_poller (loop, &zyrePollItem, manageIncoming, args);
     zloop_poller_set_tolerant(loop, &zyrePollItem);
 
@@ -98,16 +109,15 @@
     }
 
     // start returns when one of the pollers returns -1
-    zloop_start (loop);
+    zloop_start(loop);
 
     printf("shutting down...\n");
 
     // clean
-    zloop_destroy (&loop);
-    assert (loop == NULL);
+    zloop_destroy(&loop);
+    assert(loop == NULL);
 
     agent *current, *tmp;
-
     HASH_ITER(hh, zEl->agents, current, tmp) {
         HASH_DEL(zEl->agents,current);
         free(current->name);
@@ -133,61 +143,66 @@
         }
         free(current);
     }
-    zyre_stop (node);
-    zclock_sleep (100);
-    zyre_destroy (&node);
-    keepRunning = false;
-    free(zEl);
+    zyre_stop(node);
+    zclock_sleep(100);
+    zyre_destroy(&node);
+
+    free(zLoopElement);
 }*/
 
 
 
 /**
  * @brief Constructor
+ * @param agentName
+ * @param subscriberAddress
  * @param parent
  */
-LogStreamController::LogStreamController(QObject *parent) : QObject(parent)
+LogStreamController::LogStreamController(QString agentName,
+                                         QString subscriberAddress,
+                                         QObject *parent) : QObject(parent),
+    _agentName(agentName),
+    _subscriberAddress(subscriberAddress)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
+    qInfo() << "New Log Stream Controller for" << _agentName << "on" << _subscriberAddress;
+
     /*zactor_t *zActor = NULL;
 
-    zyreloopElements_t *zEl = calloc(1, sizeof(zyreloopElements_t));
-    assert(zEl);
+    zyreloopElements_t *zLoopElement = calloc(1, sizeof(zyreloopElements_t));
+    assert(zLoopElement);
 
-    zEl->name = strdup(name);
-    zEl->useGossip = true;
-    zEl->agents = NULL;
+    //zLoopElement->name = strdup(name);
+    //zLoopElement->useGossip = true;
+    //zLoopElement->agents = NULL;
 
-    zActor = zactor_new (zyre_actor, zEl);
-    assert (zActor);
-
-
-    macosAgent has entered the network with peer id 24B7D7C1A62E45B4A10B0C246709B78F and endpoint tcp://10.0.0.104:49154
-    @macosAgent's headers are:
-        pid -> 9089
-        canBeFrozen -> 1
-        commandline ->  /Users/Vincent/Library/Developer/Xcode/DerivedData/cocoaAgents-cbddaxwvdoulyofkunbobgtsjxti/Build/Products/Debug/macosAgent.app/Contents/MacOS/macosAgent -NSDocumentRevisionsDebugMode YES
-        test -> worked properly
-        logger -> 49153
-
-    // tcp:// 10.0.0.104 (address of agent) : 49153 (port of logger)
+    zActor = zactor_new(zyre_actor, zLoopElement);
+    assert(zActor);*/
 
 
-    a->subscriber = zsock_new_sub(endpointAddress, NULL);
+
+
+    /*//agent *a = NULL;
+    zyreAgent_t *a = NULL;
+    //zyreloopElements_t *a = NULL;
+    //subscriber_t *a = NULL;
+
+    a->subscriber = zsock_new_sub(subscriberAddress.toStdString().c_str(), NULL);
 
     // Subscribe to all
     zsock_set_subscribe(a->subscriber, "");
 
-    zmq_pollitem_t *poller = a->subscriberPoller = calloc(1, sizeof(zmq_pollitem_t));;
+    a->subscriberPoller = calloc(1, sizeof(zmq_pollitem_t));
+    zmq_pollitem_t *poller = a->subscriberPoller;
 
     poller->socket = zsock_resolve(a->subscriber);
     poller->fd = 0;
     poller->events = ZMQ_POLLIN;
     poller->revents = 0;
 
-    zloop_poller (loop, poller, manageSubscription, (void*)a);
+    zloop_poller(loop, poller, manageSubscription, (void*)a);
     zloop_poller_set_tolerant(loop, poller);
 
     printf("Subscriber created for %s\n", a->name);*/
@@ -199,5 +214,5 @@ LogStreamController::LogStreamController(QObject *parent) : QObject(parent)
  */
 LogStreamController::~LogStreamController()
 {
-
+    qInfo() << "Delete Log Stream Controller for" << _agentName << "on" << _subscriberAddress;
 }

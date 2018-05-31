@@ -52,5 +52,6 @@
         <file>qml/NetworkConfiguration.qml</file>
         <file>qml/agent/AgentFilesPaths.qml</file>
         <file>qml/theme/ButtonStyleOfOption.qml</file>
+        <file>qml/agent/LogStreamPanel.qml</file>
     </qresource>
 </RCC>

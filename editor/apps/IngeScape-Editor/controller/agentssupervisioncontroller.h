@@ -125,26 +125,18 @@ Q_SIGNALS:
 
 
     /**
+     * @brief Signal emitted when we have to open the "Log Stream" of a list of agents
+     * @param models
+     */
+    void openLogStreamOfAgents(QList<AgentM*> models);
+
+
+    /**
      * @brief Signal emitted when a previous agent model is replaced by a new one strictly identical
      * @param previousModel
      * @param newModel
      */
     void identicalAgentModelReplaced(AgentM* previousModel, AgentM* newModel);
-
-
-    /**
-     * @brief Signal emitted when we have to load an agent definition from a JSON file (path)
-     * @param peerIdsList
-     * @param definitionFilePath
-     */
-    void loadAgentDefinitionFromPath(QStringList peerIdsList, QString definitionFilePath);
-
-
-    /**
-     * @brief Signal emitted when we have to load an agent mapping from a JSON file (path)
-     * @param mappingFilePath
-     */
-    void loadAgentMappingFromPath(QStringList peerIdsList, QString mappingFilePath);
 
 
 public Q_SLOTS:
@@ -229,6 +221,7 @@ private:
 
 
 private:
+
     // Manager for the data model of INGESCAPE
     IngeScapeModelManager* _modelManager;
 
