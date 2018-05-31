@@ -49,6 +49,14 @@ Window {
     property var controller: null;
 
 
+    // List of widths
+    property var widthsOfColumns: [
+        140,
+        60,
+        400
+    ]
+
+
     //--------------------------------
     //
     // Signals
@@ -142,9 +150,10 @@ Window {
             }
         }
 
+
         // Logs List
         Item {
-            id : logsList
+            id : tableLogs
 
             anchors {
                 top: parent.top
@@ -157,11 +166,70 @@ Window {
                 bottomMargin: 55
             }
 
+            /// ****** Headers of columns ***** ////
+            Row {
+                id: tableauHeaderRow
+
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    top: parent.top
+                    topMargin: 15
+                }
+                height : 33
+
+                Repeater {
+                    model: [
+                        qsTr("Date"),
+                        qsTr("Type"),
+                        qsTr("Log"),
+                    ]
+
+                    Item {
+                        height : 33
+                        width : rootItem.widthsOfColumns[index]
+
+                        Text {
+                            anchors {
+                                left: parent.left
+                                leftMargin: 2
+                                verticalCenter: parent.verticalCenter
+                            }
+
+                            text : modelData
+
+                            color : IngeScapeTheme.lightGreyColor
+                            font {
+                                family: IngeScapeTheme.textFontFamily
+                                pixelSize : 16
+                            }
+                        }
+                    }
+                }
+            }
+
+
+            // separator
+            Rectangle {
+                anchors {
+                    left : parent.left
+                    right : parent.right
+                    top : tableauHeaderRow.bottom
+                }
+                height : 1
+
+                color : IngeScapeTheme.blackColor
+            }
+
+            /// ****** List ***** ////
             ScrollView {
                 id : scrollView
 
                 anchors {
-                    fill: parent
+                    top: tableauHeaderRow.bottom
+                    left : parent.left
+                    right : parent.right
+                    bottom : parent.bottom
                 }
 
                 style: IngeScapeScrollViewStyle {
@@ -184,25 +252,95 @@ Window {
                             left : parent.left
                             right : parent.right
                         }
-                        height: 20
+                        height : 30
 
-                        Text {
-                            text: modelData
+                        Row {
+                            id: listLine
 
-                            elide: Text.ElideRight
-                            color: IngeScapeTheme.whiteColor
-                            font {
-                                family: IngeScapeTheme.textFontFamily
-                                bold: false
-                                pixelSize: 13
+                            anchors {
+                                fill: parent
+                                leftMargin: 2
+                            }
+
+                            // Date and time
+                            Text {
+                                text: model.logDateTime.toLocaleString(Qt.locale(),"dd/MM hh:mm:ss.zzz")
+
+                                anchors {
+                                    verticalCenter: parent.verticalCenter
+                                }
+                                verticalAlignment: Text.AlignVCenter
+                                width : rootItem.widthsOfColumns[0]
+                                height: parent.height
+
+                                //elide: Text.ElideRight
+                                color: IngeScapeTheme.whiteColor
+                                font {
+                                    family: IngeScapeTheme.textFontFamily
+                                    pixelSize: 14
+                                }
+                            }
+
+                            // Type
+                            Text {
+                                text: model.logType
+
+                                anchors {
+                                    verticalCenter: parent.verticalCenter
+                                }
+                                verticalAlignment: Text.AlignVCenter
+
+                                width : rootItem.widthsOfColumns[1]
+                                height: parent.height
+
+                                //elide: Text.ElideRight
+                                color: IngeScapeTheme.whiteColor
+                                font {
+                                    family: IngeScapeTheme.textFontFamily
+                                    pixelSize: 14
+                                }
+                            }
+
+                            // Content
+                            Text {
+                                text: model.logContent
+
+                                anchors {
+                                    verticalCenter: parent.verticalCenter
+                                }
+                                verticalAlignment: Text.AlignVCenter
+
+                                width : rootItem.widthsOfColumns[2]
+                                height: parent.height
+
+                                elide: Text.ElideRight
+                                color: IngeScapeTheme.whiteColor
+                                font {
+                                    family: IngeScapeTheme.textFontFamily
+                                    pixelSize: 14
+                                }
                             }
 
                         }
+
+                        // separator
+                        Rectangle {
+                            anchors {
+                                left : parent.left
+                                right : parent.right
+                                bottom : parent.bottom
+                            }
+                            height : 1
+
+                            color : IngeScapeTheme.blackColor
+                        }
+
                     }
                 }
             }
-
         }
+
+
 
         Button {
             id: okButton

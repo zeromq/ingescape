@@ -19,6 +19,13 @@
 #include <QtQml>
 
 #include <I2PropertyHelpers.h>
+#include <model/logm.h>
+
+extern "C" {
+//#include <ingescape_advanced.h>
+#include <ingescape_private.h>
+//#include <czmq.h>
+}
 
 
 /**
@@ -35,8 +42,7 @@ class LogStreamController : public QObject
     I2_CPP_NOSIGNAL_PROPERTY(QString, subscriberAddress)
 
     // List of logs
-    //I2_QOBJECT_LISTMODEL()
-    I2_QML_PROPERTY(QStringList, logs)
+    I2_QOBJECT_LISTMODEL(LogM, logs)
 
 
 public:
@@ -61,21 +67,25 @@ signals:
 
     /**
      * @brief Signal emitted when a log has been received from the agent
-     * @param log
+     * @param logDateTime
+     * @param parametersOfLog
      */
-    void logReceived(QString log);
+    void logReceived(QDateTime logDateTime, QStringList parametersOfLog);
 
 
 private slots:
 
     /**
      * @brief Slot called when a log has been received from the agent
-     * @param log
+     * @param logDateTime
+     * @param parametersOfLog
      */
-    void _onLogReceived(QString log);
+    void _onLogReceived(QDateTime logDateTime, QStringList parametersOfLog);
 
 
 private:
+    // zactor
+    zactor_t *_zActor;
 
 };
 

@@ -655,7 +655,7 @@ Window {
 
                             text : modelData
 
-                            color : IngeScapeTheme.definitionEditorsAgentDescriptionColor
+                            color : IngeScapeTheme.lightGreyColor
                             font {
                                 family: IngeScapeTheme.textFontFamily
                                 pixelSize : 16

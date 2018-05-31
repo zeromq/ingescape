@@ -108,6 +108,7 @@ void registerCustomQmlTypes()
     qmlRegisterUncreatableType<ElementMappingM>("INGESCAPE", 1, 0, "ElementMappingM", "Internal class");
     qmlRegisterUncreatableType<Enums>("INGESCAPE", 1, 0, "Enums", "Internal class");
     qmlRegisterUncreatableType<HostM>("INGESCAPE", 1, 0, "HostM", "Internal class");
+    qmlRegisterUncreatableType<LogM>("INGESCAPE", 1, 0, "LogM", "Internal class");
     qmlRegisterUncreatableType<OutputM>("INGESCAPE", 1, 0, "OutputM", "Internal class");
     qmlRegisterUncreatableType<PublishedValueM>("INGESCAPE", 1, 0, "PublishedValueM", "Internal class");
     qmlRegisterUncreatableType<ActionConditionM>("INGESCAPE", 1, 0, "ActionConditionM", "Internal class");
