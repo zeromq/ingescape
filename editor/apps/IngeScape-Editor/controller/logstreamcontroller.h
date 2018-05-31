@@ -34,6 +34,10 @@ class LogStreamController : public QObject
     // Address of subscriber
     I2_CPP_NOSIGNAL_PROPERTY(QString, subscriberAddress)
 
+    // List of logs
+    //I2_QOBJECT_LISTMODEL()
+    I2_QML_PROPERTY(QStringList, logs)
+
 
 public:
     /**
@@ -55,7 +59,21 @@ public:
 
 signals:
 
-public slots:
+    /**
+     * @brief Signal emitted when a log has been received from the agent
+     * @param log
+     */
+    void logReceived(QString log);
+
+
+private slots:
+
+    /**
+     * @brief Slot called when a log has been received from the agent
+     * @param log
+     */
+    void _onLogReceived(QString log);
+
 
 private:
 

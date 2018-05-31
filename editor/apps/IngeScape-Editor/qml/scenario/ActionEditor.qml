@@ -108,7 +108,7 @@ Window {
 
                 text : "Action"
                 elide: Text.ElideRight
-                color: IngeScapeTheme.definitionEditorsLabelColor
+                color: IngeScapeTheme.whiteColor
                 font {
                     family: IngeScapeTheme.textFontFamily
                     pixelSize: 23

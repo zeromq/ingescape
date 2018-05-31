@@ -131,8 +131,9 @@ Window {
                 }
 
                 text: (controller ? qsTr("Log Stream of %1").arg(controller.agentName) : qsTr("Log Stream"))
+
                 elide: Text.ElideRight
-                color: IngeScapeTheme.definitionEditorsLabelColor
+                color: IngeScapeTheme.whiteColor
                 font {
                     family: IngeScapeTheme.textFontFamily
                     pixelSize: 23
@@ -141,9 +142,9 @@ Window {
             }
         }
 
-        // Log List
-        /*Item {
-            id : logList
+        // Logs List
+        Item {
+            id : logsList
 
             anchors {
                 top: parent.top
@@ -156,7 +157,52 @@ Window {
                 bottomMargin: 55
             }
 
-        }*/
+            ScrollView {
+                id : scrollView
+
+                anchors {
+                    fill: parent
+                }
+
+                style: IngeScapeScrollViewStyle {
+                }
+
+                // Prevent drag overshoot on Windows
+                flickableItem.boundsBehavior: Flickable.OvershootBounds
+
+                // Content of our scrollview
+                ListView {
+                    model: if (controller) {
+                               controller.logs
+                           }
+                           else {
+                               0
+                           }
+
+                    delegate: Item {
+                        anchors {
+                            left : parent.left
+                            right : parent.right
+                        }
+                        height: 20
+
+                        Text {
+                            text: modelData
+
+                            elide: Text.ElideRight
+                            color: IngeScapeTheme.whiteColor
+                            font {
+                                family: IngeScapeTheme.textFontFamily
+                                bold: false
+                                pixelSize: 13
+                            }
+
+                        }
+                    }
+                }
+            }
+
+        }
 
         Button {
             id: okButton

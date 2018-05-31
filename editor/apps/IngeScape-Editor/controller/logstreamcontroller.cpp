@@ -20,136 +20,101 @@ extern "C" {
 //#include <czmq.h>
 }
 
-bool verbose = true;
+bool verbose = false;
 
 
-/*static void zyre_actor(zsock_t *pipe, void *args)
+/**
+ * @brief Incoming event callback
+ * @param loop
+ * @param item
+ * @param args
+ * @return
+ */
+int incomingEventCallback(zloop_t *loop, zmq_pollitem_t *item, void *args)
 {
-    zyreloopElements_t *zLoopElement = (zyreloopElements_t *)args;
+    Q_UNUSED(loop)
 
-    zyre_t *node = zyre_new("FIXME_TO_RENAME");
+    if ((item != NULL) && (args != NULL))
+    {
+        //if (item->revents & ZMQ_POLLIN)
 
-    //zLoopElement->node = node;
+        LogStreamController* logStreamC = (LogStreamController*)args;
+        if (logStreamC != NULL)
+        {
+            zmsg_t *msg = zmsg_recv((zsock_t *)item->socket);
 
+            QString log = zmsg_popstr(msg);
+            //qDebug() << "Incoming event:" << log;
 
-        //gossip
-        if (endpoint != NULL){
-            int res = zyre_set_endpoint(node, "%s", endpoint);
-            if (res != 0){
-                printf("impossible to create our endpoint %s ...exiting.", endpoint);
-            }
-            printf("using endpoint %s\n", endpoint);
-            if (gossipconnect == NULL && gossipbind == NULL){
-                printf("warning : endpoint specified but no attached gossip information, %s won't reach any other agent", name);
-            }
+            Q_EMIT logStreamC->logReceived(log);
+
+            free(msg);
         }
-        if (gossipconnect != NULL){
-            zyre_gossip_connect(node, "%s", gossipconnect);
-            printf("connecting to P2P node at %s\n", gossipconnect);
-        }
-        if (gossipbind != NULL){
-            zyre_gossip_bind(node, "%s", gossipbind);
-            printf("creating P2P node %s\n", gossipbind);
-        }
-
-
-    if (verbose) {
-        zyre_set_verbose(node);
     }
 
-    if (!node) {
-        return;
+    return 0;
+}
+
+
+/**
+ * @brief zactor callback
+ * @param pipe
+ * @param args
+ */
+static void zactorCallback(zsock_t *pipe, void *args)
+{
+    if (args != NULL)
+    {
+        LogStreamController* logStreamC = (LogStreamController*)args;
+        if (logStreamC != NULL)
+        {
+            // Make a copy of the "char*"
+            char *subscriberAddress = strdup(logStreamC->subscriberAddress().toStdString().c_str());
+
+            // Notify main thread that we are ready
+            zsock_signal(pipe, 0);
+
+            // New Zyre LOOP
+            zloop_t *loop = zloop_new();
+            assert(loop);
+
+            zloop_set_verbose(loop, verbose);
+
+            // New Zyre Socket
+            zsock_t *zSocket = zsock_new_sub(subscriberAddress, NULL);
+
+            // Subscribe to all
+            zsock_set_subscribe(zSocket, "");
+
+
+            // Init Zyre poll item
+            zmq_pollitem_t zyrePollItem;
+            //zyrePollItem.socket = zSocket;
+            zyrePollItem.socket = zsock_resolve(zSocket);
+            zyrePollItem.fd = 0;
+            zyrePollItem.events = ZMQ_POLLIN;
+            zyrePollItem.revents = 0;
+
+            // Register the callback about "incoming event"
+            zloop_poller(loop, &zyrePollItem, incomingEventCallback, args);
+            zloop_poller_set_tolerant(loop, &zyrePollItem);
+
+
+            // Start returns when one of the pollers returns -1
+            zloop_start(loop);
+
+            printf("shutting down...\n");
+
+            // Clean
+            zloop_destroy(&loop);
+            assert(loop == NULL);
+
+            //free(subscriberAddress);
+
+            // Free zSocket ?
+        }
     }
-
-    zyre_start(node);
-    zsock_signal(pipe, 0); //notify main thread that we are ready
-    zyre_print(node);
-
-    //preparing and running zyre mainloop
-    zmq_pollitem_t zpipePollItem;
-    zmq_pollitem_t zyrePollItem;
-
-    //main zmq socket (i.e. main thread)
-    void *zpipe = zsock_resolve(pipe);
-    if (zpipe == NULL){
-        printf("Error : could not get the pipe descriptor for polling... exiting.\n");
-        exit(EXIT_FAILURE);
-    }
-    zpipePollItem.socket = zpipe;
-    zpipePollItem.fd = 0;
-    zpipePollItem.events = ZMQ_POLLIN;
-    zpipePollItem.revents = 0;
-
-    //zyre socket
-    void *zsock = zsock_resolve(zyre_socket (node));
-    if (zsock == NULL){
-        printf("Error : could not get the zyre socket for polling... exiting.\n");
-        exit(EXIT_FAILURE);
-    }
-    zyrePollItem.socket = zsock;
-    zyrePollItem.fd = 0;
-    zyrePollItem.events = ZMQ_POLLIN;
-    zyrePollItem.revents = 0;
-
-
-
-    // New LOOP
-    zloop_t *loop = zloop_new();
-    assert (loop);
-
-    zloop_set_verbose(loop, verbose);
-
-    //zloop_poller (loop, &zpipePollItem, manageParent, args);
-    //zloop_poller_set_tolerant(loop, &zpipePollItem);
-    zloop_poller (loop, &zyrePollItem, manageIncoming, args);
-    zloop_poller_set_tolerant(loop, &zyrePollItem);
-
-    if (paramText != NULL && strlen(paramText) > 0){
-        zloop_timer(loop, 10, 1, triggerMessageSend, (void *)args);
-    }
-
-    // start returns when one of the pollers returns -1
-    zloop_start(loop);
-
-    printf("shutting down...\n");
-
-    // clean
-    zloop_destroy(&loop);
-    assert(loop == NULL);
-
-    agent *current, *tmp;
-    HASH_ITER(hh, zEl->agents, current, tmp) {
-        HASH_DEL(zEl->agents,current);
-        free(current->name);
-        free(current->uuid);
-        free(current->endpoint);
-        if (current->publisherPort != NULL){
-            free(current->publisherPort);
-        }
-        if (current->subscriber != NULL){
-            zsock_destroy(&(current->subscriber));
-        }
-        if (current->subscriberPoller != NULL){
-            free(current->subscriberPoller);
-        }
-        if (current->logPort != NULL){
-            free(current->logPort);
-        }
-        if (current->logger != NULL){
-            zsock_destroy(&(current->logger));
-        }
-        if (current->loggerPoller != NULL){
-            free(current->loggerPoller);
-        }
-        free(current);
-    }
-    zyre_stop(node);
-    zclock_sleep(100);
-    zyre_destroy(&node);
-
-    free(zLoopElement);
-}*/
-
+}
 
 
 /**
@@ -169,43 +134,11 @@ LogStreamController::LogStreamController(QString agentName,
 
     qInfo() << "New Log Stream Controller for" << _agentName << "on" << _subscriberAddress;
 
-    /*zactor_t *zActor = NULL;
+    connect(this, &LogStreamController::logReceived, this, &LogStreamController::_onLogReceived);
 
-    zyreloopElements_t *zLoopElement = calloc(1, sizeof(zyreloopElements_t));
-    assert(zLoopElement);
-
-    //zLoopElement->name = strdup(name);
-    //zLoopElement->useGossip = true;
-    //zLoopElement->agents = NULL;
-
-    zActor = zactor_new(zyre_actor, zLoopElement);
-    assert(zActor);*/
-
-
-
-
-    /*//agent *a = NULL;
-    zyreAgent_t *a = NULL;
-    //zyreloopElements_t *a = NULL;
-    //subscriber_t *a = NULL;
-
-    a->subscriber = zsock_new_sub(subscriberAddress.toStdString().c_str(), NULL);
-
-    // Subscribe to all
-    zsock_set_subscribe(a->subscriber, "");
-
-    a->subscriberPoller = calloc(1, sizeof(zmq_pollitem_t));
-    zmq_pollitem_t *poller = a->subscriberPoller;
-
-    poller->socket = zsock_resolve(a->subscriber);
-    poller->fd = 0;
-    poller->events = ZMQ_POLLIN;
-    poller->revents = 0;
-
-    zloop_poller(loop, poller, manageSubscription, (void*)a);
-    zloop_poller_set_tolerant(loop, poller);
-
-    printf("Subscriber created for %s\n", a->name);*/
+    // Create a new zactor and register the callback
+    zactor_t *zActor = zactor_new(zactorCallback, this);
+    assert(zActor);
 }
 
 
@@ -215,4 +148,20 @@ LogStreamController::LogStreamController(QString agentName,
 LogStreamController::~LogStreamController()
 {
     qInfo() << "Delete Log Stream Controller for" << _agentName << "on" << _subscriberAddress;
+}
+
+
+/**
+ * @brief Slot called when a log has been received from the agent
+ * @param log
+ */
+void LogStreamController::_onLogReceived(QString log)
+{
+    if (!log.isEmpty())
+    {
+        QStringList newLogs = _logs;
+        newLogs.prepend(log);
+
+        setlogs(newLogs);
+    }
 }
