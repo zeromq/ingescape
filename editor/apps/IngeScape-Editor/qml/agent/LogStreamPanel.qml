@@ -526,7 +526,8 @@ Window {
                                                 verticalCenterOffset: 1
                                             }
 
-                                            color: IngeScapeTheme.lightGreyColor
+                                            //color: IngeScapeTheme.lightGreyColor
+                                            color: IngeScapeTheme.colorOfLogType(model.value)
 
                                             text: " " + model.name
                                             elide: Text.ElideRight
@@ -758,7 +759,10 @@ Window {
                                 height: parent.height
 
                                 //elide: Text.ElideRight
-                                color: IngeScapeTheme.whiteColor
+
+                                //color: IngeScapeTheme.whiteColor
+                                color: IngeScapeTheme.colorOfLogType(model.logType)
+
                                 font {
                                     family: IngeScapeTheme.textFontFamily
                                     pixelSize: 14
