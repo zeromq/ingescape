@@ -389,8 +389,8 @@ Window {
 
                             property bool isPartiallyChecked : false
 
-                            checked : false;
-                            partiallyCheckedEnabled : false;
+                            checked: false;
+                            partiallyCheckedEnabled: false;
                             activeFocusOnPress: true;
 
                             style: CheckBoxStyle {
@@ -419,7 +419,7 @@ Window {
                                     color : IngeScapeTheme.veryDarkGreyColor
 
                                     I2SvgItem {
-                                        visible : control.checkedState === Qt.Checked
+                                        visible: (control.checkedState === Qt.Checked)
                                         anchors.centerIn: parent
 
                                         svgFileCache : IngeScapeTheme.svgFileINGESCAPE;
@@ -467,15 +467,21 @@ Window {
 
                             Connections {
                                 target : popup
+
                                 onOpened : {
                                     // update "all agents" checkbox state
                                     // reset isPartiallyChecked and checkedState properties
-                                    filterAllAgentCB.isPartiallyChecked =  false;
-                                    filterAllAgentCB.checkedState =  Qt.Unchecked;
-                                    if (rootItem.controller && rootItem.controller.selectedAgentNamesList.length>0) {
-                                        (rootItem.controller.selectedAgentNamesList.length === rootItem.controller.allAgentNamesList.length)?
-                                                    filterAllAgentCB.checkedState =  Qt.Checked
-                                                  :  filterAllAgentCB.isPartiallyChecked =  true;
+                                    filterAllAgentCB.isPartiallyChecked = false;
+                                    filterAllAgentCB.checkedState = Qt.Unchecked;
+
+                                    if (rootItem.controller && (rootItem.controller.selectedAgentNamesList.length > 0))
+                                    {
+                                        if (rootItem.controller.selectedAgentNamesList.length === rootItem.controller.allAgentNamesList.length) {
+                                            filterAllAgentCB.checkedState = Qt.Checked;
+                                        }
+                                        else {
+                                            filterAllAgentCB.isPartiallyChecked = true;
+                                        }
                                     }
                                 }
                             }
@@ -546,7 +552,7 @@ Window {
                                             color : IngeScapeTheme.veryDarkGreyColor
 
                                             I2SvgItem {
-                                                visible : control.checkedState === Qt.Checked
+                                                visible: (control.checkedState === Qt.Checked)
                                                 anchors.centerIn: parent
 
                                                 svgFileCache : IngeScapeTheme.svgFileINGESCAPE;
@@ -568,12 +574,17 @@ Window {
 
                                             // update "all agents" checkbox state
                                             // reset isPartiallyChecked and checkedState properties
-                                            filterAllAgentCB.isPartiallyChecked =  false;
-                                            filterAllAgentCB.checkedState =  Qt.Unchecked;
-                                            if (rootItem.controller && rootItem.controller.selectedAgentNamesList.length>0) {
-                                                (rootItem.controller.selectedAgentNamesList.length === rootItem.controller.allAgentNamesList.length)?
-                                                            filterAllAgentCB.checkedState =  Qt.Checked
-                                                          :  filterAllAgentCB.isPartiallyChecked =  true;
+                                            filterAllAgentCB.isPartiallyChecked = false;
+                                            filterAllAgentCB.checkedState = Qt.Unchecked;
+
+                                            if (rootItem.controller && (rootItem.controller.selectedAgentNamesList.length > 0))
+                                            {
+                                                if (rootItem.controller.selectedAgentNamesList.length === rootItem.controller.allAgentNamesList.length) {
+                                                    filterAllAgentCB.checkedState = Qt.Checked;
+                                                }
+                                                else {
+                                                    filterAllAgentCB.isPartiallyChecked = true;
+                                                }
                                             }
                                         }
                                     }

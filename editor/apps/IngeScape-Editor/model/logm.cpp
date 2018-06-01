@@ -22,7 +22,7 @@
  * @param parent
  */
 LogM::LogM(QDateTime logDateTime,
-           QString logType,
+           LogTypes::Value logType,
            QString logContent,
            QObject *parent) : QObject(parent),
     _logDateTime(logDateTime),

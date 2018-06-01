@@ -34,12 +34,6 @@ class ValuesHistoryController : public QObject
     // List of filtered (and sorted) values
     Q_PROPERTY(ValuesHistorySortFilter* filteredValues READ filteredValues CONSTANT)
 
-    // List with all agent Input/Output/Parameter types
-    I2_ENUM_LISTMODEL(AgentIOPTypes, allAgentIOPTypes)
-
-    // List with types of selected agent Input/Output/Parameter
-    I2_ENUM_LISTMODEL(AgentIOPTypes, selectedAgentIOPTypes)
-
     // List with all agent names
     I2_QML_PROPERTY_READONLY(QStringList, allAgentNamesList)
 
@@ -70,20 +64,6 @@ public:
     {
         return &_filteredValues;
     }
-
-
-    /**
-     * @brief Show the values of agent Input/Output/Parameter type
-     * @param agentIOPType
-     */
-    Q_INVOKABLE void showValuesOfAgentIOPType(AgentIOPTypes::Value agentIOPType);
-
-
-    /**
-     * @brief Hide the values of agent Input/Output/Parameter type
-     * @param agentIOPType
-     */
-    Q_INVOKABLE void hideValuesOfAgentIOPType(AgentIOPTypes::Value agentIOPType);
 
 
     /**
