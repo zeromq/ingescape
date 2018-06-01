@@ -20,6 +20,8 @@
 
 #include <I2PropertyHelpers.h>
 #include <model/logm.h>
+#include <sortFilter/logssortfilter.h>
+
 
 extern "C" {
 //#include <ingescape_advanced.h>
@@ -44,13 +46,19 @@ class LogStreamController : public QObject
     // Address of subscriber
     I2_CPP_NOSIGNAL_PROPERTY(QString, subscriberAddress)
 
+    // List of all logs
+    I2_QOBJECT_LISTMODEL(LogM, allLogs)
+
     // List of filtered logs
-    I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(LogM, filteredLogs)
+    //I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(LogM, filteredLogs)
+
+    // List of filtered (and sorted) logs
+    Q_PROPERTY(LogsSortFilter* filteredLogs READ filteredLogs CONSTANT)
 
     // List with all log types
     I2_ENUM_LISTMODEL(LogTypes, allLogTypes)
 
-    // List with selected log types
+    // List of selected log types
     I2_ENUM_LISTMODEL(LogTypes, selectedLogTypes)
 
 
@@ -72,6 +80,16 @@ public:
      * @brief Destructor
      */
     ~LogStreamController();
+
+
+    /**
+     * @brief Get our filtered list of logs
+     * @return
+     */
+    LogsSortFilter* filteredLogs()
+    {
+        return &_filteredLogs;
+    }
 
 
     /**
@@ -129,8 +147,18 @@ private slots:
 
 
 private:
+    /**
+     * @brief Update the filters on the list of logs
+     */
+    void _updateFilters();
+
+
+private:
     // zactor
     zactor_t *_zActor;
+
+    // List of filtered (and sorted) logs
+    LogsSortFilter _filteredLogs;
 
 };
 

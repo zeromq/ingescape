@@ -204,11 +204,16 @@ LogStreamController::LogStreamController(QString agentName,
     _selectedLogTypes.fillWithAllEnumValues();
 
     // Init sort and filter
-    _filteredLogs.setSortProperty("logDateTime");
-    _filteredLogs.setSortOrder(Qt::DescendingOrder);
+    //_filteredLogs.setSortProperty("logDateTime");
+    //_filteredLogs.setSortOrder(Qt::DescendingOrder);
 
     //_filteredLogs.setFilterProperty("logType");
     //_filteredLogs.setFilterFixedString("true");
+
+    //
+    // Link the filtered list to the list of the all logs
+    //
+    _filteredLogs.setSourceModel(allLogs());
 
     connect(this, &LogStreamController::logReceived, this, &LogStreamController::_onLogReceived);
 
@@ -225,7 +230,7 @@ LogStreamController::~LogStreamController()
 {
     qInfo() << "Delete Log Stream Controller for" << _agentName << "on" << _subscriberAddress;
 
-    _filteredLogs.deleteAllItems();
+    _allLogs.deleteAllItems();
 
     if (_zActor != NULL)
     {
@@ -256,8 +261,12 @@ bool LogStreamController::isSelectedLogType(int nLogType)
  */
 void LogStreamController::showLogsOfType(int nLogType)
 {
-    if (!_selectedLogTypes.containsEnumValue(nLogType)) {
+    if (!_selectedLogTypes.containsEnumValue(nLogType))
+    {
         _selectedLogTypes.appendEnumValue(nLogType);
+
+        // Update the filters on the list of logs
+        _updateFilters();
     }
 }
 
@@ -268,8 +277,12 @@ void LogStreamController::showLogsOfType(int nLogType)
  */
 void LogStreamController::hideLogsOfType(int nLogType)
 {
-    if (_selectedLogTypes.containsEnumValue(nLogType)) {
+    if (_selectedLogTypes.containsEnumValue(nLogType))
+    {
         _selectedLogTypes.removeEnumValue(nLogType);
+
+        // Update the filters on the list of logs
+        _updateFilters();
     }
 }
 
@@ -279,11 +292,17 @@ void LogStreamController::hideLogsOfType(int nLogType)
  */
 void LogStreamController::showAllLogs()
 {
-    for (int nLogType : _allLogTypes.toEnumValuesList())
+    if (_selectedLogTypes.count() < _allLogTypes.count())
     {
-        if (!_selectedLogTypes.containsEnumValue(nLogType)) {
-            _selectedLogTypes.appendEnumValue(nLogType);
+        for (int nLogType : _allLogTypes.toEnumValuesList())
+        {
+            if (!_selectedLogTypes.containsEnumValue(nLogType)) {
+                _selectedLogTypes.appendEnumValue(nLogType);
+            }
         }
+
+        // Update the filters on the list of logs
+        _updateFilters();
     }
 }
 
@@ -293,9 +312,15 @@ void LogStreamController::showAllLogs()
  */
 void LogStreamController::hideAllLogs()
 {
-    QList<int> copy = _selectedLogTypes.toEnumValuesList();
-    for (int nLogType : copy) {
-        _selectedLogTypes.removeEnumValue(nLogType);
+    if (!_selectedLogTypes.isEmpty())
+    {
+        QList<int> copy = _selectedLogTypes.toEnumValuesList();
+        for (int nLogType : copy) {
+            _selectedLogTypes.removeEnumValue(nLogType);
+        }
+
+        // Update the filters on the list of logs
+        _updateFilters();
     }
 }
 
@@ -331,6 +356,18 @@ void LogStreamController::_onLogReceived(QDateTime logDateTime, QStringList para
         LogM* log = new LogM(logDateTime, logType, logContent, this);
 
         // Add to the list
-        _filteredLogs.prepend(log);
+        _allLogs.prepend(log);
     }
+}
+
+
+/**
+ * @brief Update the filters on the list of logs
+ */
+void LogStreamController::_updateFilters()
+{
+    QList<int> selectedLogTypesAsInt = _selectedLogTypes.toEnumValuesList();
+
+    // Update the filter (with the new list of selected log types)
+    _filteredLogs.updateFilter(selectedLogTypesAsInt);
 }

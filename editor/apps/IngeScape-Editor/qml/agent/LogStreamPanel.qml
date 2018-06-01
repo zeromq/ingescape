@@ -212,7 +212,7 @@ Window {
             function close() {
                 _comboButton.checked = false;
                 _combobox.forceActiveFocus();
-                //popup.close();
+                popup.close();
             }
 
             Rectangle {

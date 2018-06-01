@@ -690,6 +690,8 @@ Item {
                 Button {
                     id: optionViewLogStream
 
+                    enabled: (rootItem.agent ? rootItem.agent.isEnabledViewLogStream : false)
+
                     height: popupOptions.optionHeight
                     width: parent.width
 

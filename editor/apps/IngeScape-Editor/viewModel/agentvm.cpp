@@ -38,7 +38,8 @@ AgentVM::AgentVM(AgentM* model, QObject *parent) : QObject(parent),
     _hasLogInFile(false),
     _logFilePath(""),
     _definitionFilePath(""),
-    _mappingFilePath("")
+    _mappingFilePath(""),
+    _isEnabledViewLogStream(false)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -663,6 +664,7 @@ void AgentVM::_updateWithAllModels()
     _updateIsMuted();
     _updateIsFrozen();
     _updateHasLogInStream();
+    _updateIsEnabledViewLogStream();
     _updateHasLogInFile();
 
     // Update with the first model
@@ -767,6 +769,25 @@ void AgentVM::_updateHasLogInStream()
         }
     }
     sethasLogInStream(globalHasLogInStream);
+}
+
+
+/**
+ * @brief Update the flag "is Enabled View Log Stram" in function of flags of models
+ */
+void AgentVM::_updateIsEnabledViewLogStream()
+{
+    bool globalIsEnabledViewLogStream = false;
+
+    foreach (AgentM* model, _models.toList())
+    {
+        // Check that its logger port is defined
+        if ((model != NULL) && !model->loggerPort().isEmpty()) {
+            globalIsEnabledViewLogStream = true;
+            break;
+        }
+    }
+    setisEnabledViewLogStream(globalIsEnabledViewLogStream);
 }
 
 

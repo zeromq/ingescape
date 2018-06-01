@@ -90,7 +90,8 @@ SOURCES += main.cpp \
     controller/recordssupervisioncontroller.cpp \
     viewModel/recordvm.cpp \
     controller/logstreamcontroller.cpp \
-    model/logm.cpp
+    model/logm.cpp \
+    sortFilter/logssortfilter.cpp
 
 HEADERS += \
     stable.h \
@@ -158,7 +159,8 @@ HEADERS += \
     controller/recordssupervisioncontroller.h \
     viewModel/recordvm.h \
     controller/logstreamcontroller.h \
-    model/logm.h
+    model/logm.h \
+    sortFilter/logssortfilter.h
 
 
 RESOURCES += qml.qrc

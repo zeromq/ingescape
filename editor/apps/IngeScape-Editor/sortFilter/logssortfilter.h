@@ -12,8 +12,8 @@
  *
  */
 
-#ifndef VALUESHISTORYSORTFILTER_H
-#define VALUESHISTORYSORTFILTER_H
+#ifndef LOGSSORTFILTER_H
+#define LOGSSORTFILTER_H
 
 #include <QObject>
 #include <QtQml>
@@ -21,16 +21,20 @@
 #include <I2PropertyHelpers.h>
 #include <I2Quick.h>
 
+#include <model/logm.h>
+
 
 /**
- * @brief The ValuesHistorySortFilter class defines a specific filter for the history of values
+ * @brief The LogsSortFilter class defines a specific filter for the logs
  */
-class ValuesHistorySortFilter : public I2SortFilterProxyModel
+class LogsSortFilter : public I2SortFilterProxyModel
 {
     Q_OBJECT
 
-    // List with names of selected agents
-    I2_CPP_NOSIGNAL_PROPERTY(QStringList, selectedAgentNamesList)
+    // List with selected log types
+    //I2_ENUM_LISTMODEL(LogTypes, selectedLogTypes)
+
+
 
 
 public:
@@ -38,25 +42,20 @@ public:
      * @brief Constructor
      * @param parent
      */
-    explicit ValuesHistorySortFilter(QObject *parent = nullptr);
+    explicit LogsSortFilter(QObject *parent = nullptr);
 
 
     /**
       * @brief Destructor
       */
-    ~ValuesHistorySortFilter();
+    ~LogsSortFilter();
 
 
     /**
-     * @brief Update the filter
+     * @brief Update the filter (with the new list of selected log types)
+     * @param selectedLogTypes
      */
-    void updateFilter();
-
-
-Q_SIGNALS:
-
-
-public Q_SLOTS:
+    void updateFilter(QList<int> selectedLogTypes);
 
 
 protected:
@@ -84,8 +83,14 @@ protected:
      */
     bool isLessThan(QObject* item1, int indexItem1, QObject* item2, int indexItem2) const Q_DECL_OVERRIDE;
 
+
+private:
+
+    // List of selected log types
+    QList<int> _selectedLogTypes;
+
 };
 
-QML_DECLARE_TYPE(ValuesHistorySortFilter)
+QML_DECLARE_TYPE(LogsSortFilter)
 
-#endif // VALUESHISTORYSORTFILTER_H
+#endif // LOGSSORTFILTER_H
