@@ -203,18 +203,13 @@ LogStreamController::LogStreamController(QString agentName,
     // By default: all types are selected
     _selectedLogTypes.fillWithAllEnumValues();
 
-    // Init sort and filter
-    //_filteredLogs.setSortProperty("logDateTime");
-    //_filteredLogs.setSortOrder(Qt::DescendingOrder);
-
-    //_filteredLogs.setFilterProperty("logType");
-    //_filteredLogs.setFilterFixedString("true");
-
-    //
-    // Link the filtered list to the list of the all logs
-    //
+    // Link the filtered list to the list of all logs
     _filteredLogs.setSourceModel(allLogs());
 
+    // Init the filters on the list of logs
+    _updateFilters();
+
+    // Connect to the signal "Log Received" emitted in another thread
     connect(this, &LogStreamController::logReceived, this, &LogStreamController::_onLogReceived);
 
     // Create a new zactor and register the callback
@@ -355,7 +350,7 @@ void LogStreamController::_onLogReceived(QDateTime logDateTime, QStringList para
         // Create a new log
         LogM* log = new LogM(logDateTime, logType, logContent, this);
 
-        // Add to the list
+        // Add at te beginning of the list
         _allLogs.prepend(log);
     }
 }
