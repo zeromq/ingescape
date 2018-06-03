@@ -58,7 +58,7 @@ iopType_t string_to_value_type(const char* str) {
     if (!strcmp(str, "DATA"))
         return IGS_DATA_T;
     
-    igs_error("unknown string \"%s\" to convert", str);
+    igs_error("unknown value type \"%s\" to convert", str);
     return IGS_UNKNOWN_T;
 }
 

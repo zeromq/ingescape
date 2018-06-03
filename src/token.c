@@ -219,6 +219,10 @@ int igs_addArgumentToToken(const char *tokenName, const char *argName, iopType_t
         igs_error("impulsion type is not allowed as a token argument");
         return -1;
     }
+    if (type == IGS_UNKNOWN_T){
+        igs_error("unknown type is not allowed as a token argument");
+        return -1;
+    }
     if (t == NULL){
         igs_error("token with name %s does not exist", tokenName);
         return -1;
