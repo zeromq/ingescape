@@ -1,0 +1,28 @@
+{
+    "mapping": {
+        "name": "macosAgent",
+        "description": "",
+        "version": "0.1",
+        "mapping_out": [{
+                        "map_id": "1",
+                        "input_name": "input1",
+                        "agent_name": "iosAgent",
+                        "output_name": "button1"
+                        },
+                        {
+                        "map_id": "2",
+                        "input_name": "input2",
+                        "agent_name": "iosAgent",
+                        "output_name": "button2"
+                        },
+                        {
+                        "map_id": "4",
+                        "input_name": "stream",
+                        "agent_name": "iosAgent",
+                        "output_name": "stream"
+                        }
+                        ],
+        "mapping_cat": []
+    }
+}
+

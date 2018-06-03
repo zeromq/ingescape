@@ -32,6 +32,8 @@
 		9762EDFB1EAE55D2002062A1 /* utvector.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79971EA7B112003153EF /* utvector.h */; };
 		9766A8C72088DC8C0046C63F /* libczmq.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 9766A8C52088DC8C0046C63F /* libczmq.4.dylib */; };
 		9766A8C82088DC8C0046C63F /* libzyre.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 9766A8C62088DC8C0046C63F /* libzyre.2.dylib */; };
+		9772A52720BDE42700729D59 /* token.c in Sources */ = {isa = PBXBuildFile; fileRef = 9772A52620BDE42700729D59 /* token.c */; };
+		9772A52820BDE42700729D59 /* token.c in Sources */ = {isa = PBXBuildFile; fileRef = 9772A52620BDE42700729D59 /* token.c */; };
 		977C247A1F03F4FA00CA1675 /* ingescape.h in Headers */ = {isa = PBXBuildFile; fileRef = 977C24791F03F4FA00CA1675 /* ingescape.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		977C247B1F03F50F00CA1675 /* ingescape.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 977C24791F03F4FA00CA1675 /* ingescape.h */; };
 		979A799E1EA7B112003153EF /* definition.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A79851EA7B112003153EF /* definition.c */; };
@@ -347,8 +349,11 @@
 		9762EDE41EAE54D6002062A1 /* libsodium.18.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsodium.18.dylib; path = ../../../../../../../../../usr/local/lib/libsodium.18.dylib; sourceTree = "<group>"; };
 		9762EDE51EAE54D6002062A1 /* libzmq.5.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libzmq.5.dylib; path = ../../../../../../../../../usr/local/lib/libzmq.5.dylib; sourceTree = "<group>"; };
 		9762EDE61EAE54D6002062A1 /* libzyre.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libzyre.1.dylib; path = ../../../../../../../../../usr/local/lib/libzyre.1.dylib; sourceTree = "<group>"; };
+		97645AA1209704F800F7D47F /* example_definition.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = example_definition.json; path = ../resources/example_definition.json; sourceTree = "<group>"; };
+		97645AA2209704F800F7D47F /* example_mapping.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = example_mapping.json; path = ../resources/example_mapping.json; sourceTree = "<group>"; };
 		9766A8C52088DC8C0046C63F /* libczmq.4.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libczmq.4.dylib; path = ../../../../../../../../usr/local/Cellar/czmq/4.1.1/lib/libczmq.4.dylib; sourceTree = "<group>"; };
 		9766A8C62088DC8C0046C63F /* libzyre.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libzyre.2.dylib; path = ../../../../../../../../usr/local/Cellar/zyre/2.0.0/lib/libzyre.2.dylib; sourceTree = "<group>"; };
+		9772A52620BDE42700729D59 /* token.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = token.c; sourceTree = "<group>"; };
 		977C24791F03F4FA00CA1675 /* ingescape.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ingescape.h; sourceTree = "<group>"; };
 		979A79781EA7B0D6003153EF /* libingescape.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libingescape.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		979A79851EA7B112003153EF /* definition.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = definition.c; sourceTree = "<group>"; };
@@ -1241,6 +1246,15 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		97645AA02096FD1200F7D47F /* resources */ = {
+			isa = PBXGroup;
+			children = (
+				97645AA1209704F800F7D47F /* example_definition.json */,
+				97645AA2209704F800F7D47F /* example_mapping.json */,
+			);
+			name = resources;
+			sourceTree = "<group>";
+		};
 		979A796F1EA7B0D6003153EF = {
 			isa = PBXGroup;
 			children = (
@@ -1249,6 +1263,7 @@
 				979A79841EA7B112003153EF /* src */,
 				9762EDCE1EAE5414002062A1 /* ingescape-macos */,
 				9762EDE21EAE54D5002062A1 /* Frameworks */,
+				97645AA02096FD1200F7D47F /* resources */,
 				979A79791EA7B0D6003153EF /* Products */,
 			);
 			sourceTree = "<group>";
@@ -1273,6 +1288,7 @@
 				979A799C1EA7B112003153EF /* parser.c */,
 				972A52631FD1733E00711352 /* admin.c */,
 				973DC287207A93E6004C1D80 /* bus.c */,
+				9772A52620BDE42700729D59 /* token.c */,
 			);
 			name = src;
 			path = ../src;
@@ -2701,6 +2717,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9762EDDA1EAE547B002062A1 /* definition.c in Sources */,
+				9772A52820BDE42700729D59 /* token.c in Sources */,
 				9762EDDB1EAE547B002062A1 /* mapping.c in Sources */,
 				973DC289207A93E6004C1D80 /* bus.c in Sources */,
 				9762EDDC1EAE547B002062A1 /* model.c in Sources */,
@@ -2715,6 +2732,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				979A79A11EA7B112003153EF /* network.c in Sources */,
+				9772A52720BDE42700729D59 /* token.c in Sources */,
 				979A79A01EA7B112003153EF /* model.c in Sources */,
 				973DC288207A93E6004C1D80 /* bus.c in Sources */,
 				979A799F1EA7B112003153EF /* mapping.c in Sources */,
