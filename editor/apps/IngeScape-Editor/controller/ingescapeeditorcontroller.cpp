@@ -712,7 +712,9 @@ void IngeScapeEditorController::onOpenLogStreamOfAgents(QList<AgentM*> models)
 
                 if (logStreamController != NULL)
                 {
-                    qDebug() << "The 'Log Stream' for" << logStreamController->agentName() << "on" << logStreamController->subscriberAddress() << "already exists !";
+                    qDebug() << "The 'Log Stream' for" << logStreamController->agentName() << "on" << logStreamController->subscriberAddress() << "already exists...bring to front !";
+
+                    Q_EMIT logStreamController->bringToFront();
                 }
                 else
                 {

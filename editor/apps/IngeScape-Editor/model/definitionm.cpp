@@ -304,15 +304,6 @@ AgentIOPM* DefinitionM::getParameterWithName(QString parameterName)
 
 
 /**
- * @brief Open the values history for our agent definition
- */
-void DefinitionM::openValuesHistory()
-{
-    Q_EMIT openValuesHistoryOfAgent();
-}
-
-
-/**
  * @brief Return true if the 2 list of ids are strictly identicals
  * @param idsList1
  * @param idsList2

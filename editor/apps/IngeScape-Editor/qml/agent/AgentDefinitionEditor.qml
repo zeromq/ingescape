@@ -112,12 +112,29 @@ Window {
     //
     //--------------------------------
 
-    // Emitted when user pressed our popup
-    // signal bringToFront();
-
-
-    // Emitted when user clicks on "istory" button
+    // Emitted when user clicks on "history" button
     signal openHistory();
+
+
+    //--------------------------------
+    //
+    // Behavior
+    //
+    //--------------------------------
+
+    Connections {
+        target: definition
+
+        //ignoreUnknownSignals: true
+
+        onBringToFront: {
+            //console.log("QML of Agent Definition Editor: onBringToFront");
+
+            // Raises the window in the windowing system.
+            rootItem.raise();
+        }
+    }
+
 
     //--------------------------------
     //
@@ -606,6 +623,7 @@ Window {
             width : history.width
 
             hoverEnabled: true
+
             onClicked: {
                 if (definition) {
                     definition.openValuesHistoryOfAgent();
@@ -619,7 +637,7 @@ Window {
                 anchors {
                     left : parent.left
                 }
-                text : "> History"
+                text : "> Outputs history"
                 color: historyBtn.pressed ? IngeScapeTheme.lightGreyColor : IngeScapeTheme.whiteColor
                 elide: Text.ElideRight
 

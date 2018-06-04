@@ -136,6 +136,12 @@ signals:
     void logReceived(QDateTime logDateTime, QStringList parametersOfLog);
 
 
+    /**
+     * @brief Signal emitted when the corresponding window must be bring to front (in the windowing system)
+     */
+    void bringToFront();
+
+
 private slots:
 
     /**

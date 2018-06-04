@@ -63,12 +63,28 @@ Window {
     //
     //--------------------------------
 
-    // Emitted when user pressed our popup
-    // signal bringToFront();
-
-
     // Emitted when "All Log Types" is selected or unselected
     signal clickAllLogTypes();
+
+
+    //--------------------------------
+    //
+    // Behavior
+    //
+    //--------------------------------
+
+    Connections {
+        target: controller
+
+        //ignoreUnknownSignals: true
+
+        onBringToFront: {
+            //console.log("QML of Log Stream Panel: onBringToFront");
+
+            // Raises the window in the windowing system.
+            rootItem.raise();
+        }
+    }
 
 
     //--------------------------------

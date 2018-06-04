@@ -130,7 +130,8 @@ void AgentsSupervisionController::openDefinition(AgentVM* agent)
             // Get the list (of models) of agent definition from a definition name
             QList<DefinitionM*> agentDefinitionsList = _modelManager->getAgentDefinitionsListFromDefinitionName(definition->name());
 
-            foreach (DefinitionM* iterator, agentDefinitionsList) {
+            foreach (DefinitionM* iterator, agentDefinitionsList)
+            {
                 // Same name, same version and variant, we have to open it
                 if ((iterator != NULL) && iterator->isVariant() && (iterator->version() == definition->version())) {
                     definitionsToOpen.append(iterator);
@@ -143,9 +144,18 @@ void AgentsSupervisionController::openDefinition(AgentVM* agent)
         }
 
         // Traverse the list of definitions to open
-        foreach (DefinitionM* iterator, definitionsToOpen) {
-            if (!_modelManager->openedDefinitions()->contains(iterator)) {
-                _modelManager->openedDefinitions()->append(iterator);
+        foreach (DefinitionM* iterator, definitionsToOpen)
+        {
+            if (iterator != NULL)
+            {
+                if (!_modelManager->openedDefinitions()->contains(iterator)) {
+                    _modelManager->openedDefinitions()->append(iterator);
+                }
+                else {
+                    qDebug() << "The 'Definition'" << iterator->name() << "is already opened...bring to front !";
+
+                    Q_EMIT iterator->bringToFront();
+                }
             }
         }
     }
