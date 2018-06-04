@@ -246,7 +246,7 @@ mapping_t* parser_LoadMapFromPath (const char* load_file);
 // admin
 extern bool admin_logInStream;
 extern bool admin_logInFile;
-extern char admin_logFile[1024];
+extern char admin_logFile[4096];
 
 //bus
 extern serviceHeader_t *serviceHeaders;
