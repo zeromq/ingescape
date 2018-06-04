@@ -12,7 +12,7 @@
 #include "ingescape_private.h"
 #include "uthash/uthash.h"
 #include "uthash/utlist.h"
-#ifdef _WIN32
+#if (defined WIN32 || defined _WIN32)
 #include "unixfunctions.h"
 #endif
 

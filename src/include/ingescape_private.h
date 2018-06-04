@@ -10,7 +10,7 @@
 #ifndef ingescape_private_h
 #define ingescape_private_h
 
-#if defined WINDOWS
+#if (defined WIN32 || defined _WIN32)
 #if defined INGESCAPE
 #define INGESCAPEAPI_COMMON_DLLSPEC __declspec(dllexport)
 #else
@@ -30,7 +30,7 @@
 #include "uthash/uthash.h"
 #include "uthash/utlist.h"
 
-#ifdef _WIN32
+#if (defined WIN32 || defined _WIN32)
 #include <winsock2.h>
 #include <Ws2tcpip.h>
 #include <iphlpapi.h>
