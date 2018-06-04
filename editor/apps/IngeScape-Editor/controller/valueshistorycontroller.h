@@ -106,11 +106,10 @@ Q_SIGNALS:
 public Q_SLOTS:
 
     /**
-     * @brief Slot called when we start to observe the outputs of an agent
-     * @param agentName
-     * @param outputsList
+     * @brief Slot called when a new model of agent has been created
+     * @param agent
      */
-    void onAgentOutputsObserved(QString agentName, QList<OutputM*> outputsList);
+    void onAgentModelCreated(AgentM* agent);
 
 
     /**

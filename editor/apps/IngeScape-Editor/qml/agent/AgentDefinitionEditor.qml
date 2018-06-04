@@ -609,7 +609,10 @@ Window {
 
         }
 
-        // History
+
+        //
+        // History button
+        //
         MouseArea {
             id : historyBtn
             enabled: visible
@@ -647,7 +650,7 @@ Window {
                 }
             }
 
-            // underline
+            // Underline
             Rectangle {
                 visible: historyBtn.containsMouse
 
@@ -661,19 +664,6 @@ Window {
 
                 color : history.color
             }
-        }
-
-
-        Row {
-            anchors {
-                right : tabs.right
-                top : tabs.bottom
-                topMargin: 12
-                bottom : parent.bottom
-                bottomMargin: 16
-            }
-            spacing : 15
-
         }
 
     }

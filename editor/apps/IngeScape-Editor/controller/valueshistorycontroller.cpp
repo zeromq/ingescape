@@ -119,33 +119,35 @@ bool ValuesHistoryController::areShownValuesOfAgent(QString agentName)
 
 
 /**
- * @brief Slot called when we start to observe the outputs of an agent
- * @param agentName
- * @param outputsList
+ * @brief Slot called when a new model of agent has been created
+ * @param agent
  */
-void ValuesHistoryController::onAgentOutputsObserved(QString agentName, QList<OutputM*> outputsList)
+void ValuesHistoryController::onAgentModelCreated(AgentM* agent)
 {
-    Q_UNUSED(outputsList)
-
-    if (!_allAgentNamesList.contains(agentName))
+    if ((agent != NULL) && !agent->name().isEmpty())
     {
-        QStringList temp1 = _allAgentNamesList;
-        temp1.append(agentName);
-        temp1.sort(Qt::CaseInsensitive);
+        QString agentName = agent->name();
 
-        // Use the setter to emit a signal for QML binding
-        setallAgentNamesList(temp1);
+        if (!_allAgentNamesList.contains(agentName))
+        {
+            QStringList temp1 = _allAgentNamesList;
+            temp1.append(agentName);
+            temp1.sort(Qt::CaseInsensitive);
 
-        // By default: the agent name is selected
-        QStringList temp2 = _selectedAgentNamesList;
-        temp2.append(agentName);
-        temp2.sort(Qt::CaseInsensitive);
+            // Use the setter to emit a signal for QML binding
+            setallAgentNamesList(temp1);
 
-        // Use the setter to emit a signal for QML binding
-        setselectedAgentNamesList(temp2);
+            // By default: the agent name is selected
+            QStringList temp2 = _selectedAgentNamesList;
+            temp2.append(agentName);
+            temp2.sort(Qt::CaseInsensitive);
 
-        // Update the filters on the list of values
-        _updateFilters();
+            // Use the setter to emit a signal for QML binding
+            setselectedAgentNamesList(temp2);
+
+            // Update the filters on the list of values
+            _updateFilters();
+        }
     }
 }
 
