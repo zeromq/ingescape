@@ -89,7 +89,7 @@ Item {
     readonly property color lightGreyColor : "#9D9C9C"
     readonly property color veryLightGreyColor : "#ECECEC"
 
-    readonly property color orangeColor: "#F39200"
+    readonly property color orangeColor: "#F07F0A"
 
     //-----------------------------------------
     //
