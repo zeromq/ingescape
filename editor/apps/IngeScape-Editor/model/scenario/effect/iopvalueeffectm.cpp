@@ -360,5 +360,3 @@ void IOPValueEffectM::_onAgentIopModelDestroyed(QObject* sender)
 
     setagentIOP(NULL);
 }
-
-

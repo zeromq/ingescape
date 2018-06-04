@@ -49,8 +49,10 @@ Item {
     //Model
     property alias model: combolist.model
 
-    // nuber of inputs in IOP list (in order to place the separator)
+    // number of inputs and outputs in IOP list (in order to place the separators)
     property int inputsNumber: 0;
+    property int outputsNumber: 0;
+    property int parametersNumber: 0;
 
 
     /////////////////////////////////////////////////////
@@ -303,7 +305,7 @@ Item {
 
                     color : _mouseAreaItem.containsPress ? IngeScapeTheme.darkBlueGreyColor :  "transparent"
 
-                    //Separator
+                    // Inputs / Outputs separator
                     Rectangle {
                         anchors {
                             left: parent.left
@@ -313,8 +315,22 @@ Item {
                             top : parent.top
                         }
                         height : 1
-                        color : IngeScapeTheme.lightGreyColor
-                        visible : (combobox.inputsNumber !== 0 && index === combobox.inputsNumber)
+                        color: IngeScapeTheme.lightGreyColor
+                        visible: ((combobox.inputsNumber > 0) && (index === combobox.inputsNumber))
+                    }
+
+                    // Outputs / Parameters separator
+                    Rectangle {
+                        anchors {
+                            left: parent.left
+                            leftMargin: 5
+                            right: parent.right
+                            rightMargin: 5
+                            top : parent.top
+                        }
+                        height : 1
+                        color: IngeScapeTheme.lightGreyColor
+                        visible: ((combobox.parametersNumber > 0) && (index === (combobox.inputsNumber + combobox.outputsNumber)))
                     }
 
                     Rectangle {
