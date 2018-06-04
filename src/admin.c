@@ -11,7 +11,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include <time.h>
-#ifdef _WIN32
+#if (defined WIN32 || defined _WIN32)
 #include "unixfunctions.h"
 #endif
 
@@ -60,7 +60,7 @@ static const char *log_colors[] = {
 // INTERNAL FUNCTIONS
 ////////////////////////////////////////////////////////////////////////
 
-#if defined(_WIN32)
+#if (defined WIN32 || defined _WIN32)
     int gettimeofday(struct timeval* p, void* tz) {
         ULARGE_INTEGER ul; // As specified on MSDN.
         FILETIME ft;
@@ -104,7 +104,7 @@ static const char *log_colors[] = {
 #endif
 
 void admin_computeTime(char *dest){
-#if defined(_WIN32)
+#if (defined WIN32 || defined _WIN32)
     struct timeval tick;
     gettimeofday(&tick, NULL);
     time_t t = tick.tv_sec;

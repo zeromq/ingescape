@@ -13,7 +13,7 @@
 #include <string.h>
 #include <errno.h>
 
-#ifdef _WIN32
+#if (defined WIN32 || defined _WIN32)
 #endif
 #ifdef __linux__
 #include <unistd.h>
@@ -28,7 +28,7 @@
 
 #include <zyre.h>
 #include <czmq.h>
-#ifdef _WIN32
+#if (defined WIN32 || defined _WIN32)
 #include "unixfunctions.h"
 #endif
 #include "uthash/uthash.h"
@@ -1139,7 +1139,7 @@ initLoop (zsock_t *pipe, void *args){
     }
 #endif
     
-#ifdef _WIN32
+#if (defined WIN32 || defined _WIN32)
     WSADATA wsaData;
     WSAStartup(MAKEWORD(2,2), &wsaData);
     if (strlen(commandLine) == 0){
@@ -1164,7 +1164,7 @@ initLoop (zsock_t *pipe, void *args){
     char hostname[1024];
     hostname[1023] = '\0';
     gethostname(hostname, 1023);
-    #ifdef _WIN32
+    #if (defined WIN32 || defined _WIN32)
         WSACleanup();
     #endif
     zyre_set_header(agentElements->node, "hostname", "%s", hostname);
@@ -1388,7 +1388,7 @@ int igs_startWithDevice(const char *networkDevice, unsigned int port){
     agentElements->brokerEndPoint[0] = '\0';
     agentElements->ipAddress[0] = '\0';
     
-#if defined (__WINDOWS__)
+#if (defined WIN32 || defined _WIN32)
     WORD version_requested = MAKEWORD (2, 2);
     WSADATA wsa_data;
     int rc = WSAStartup (version_requested, &wsa_data);
@@ -1448,7 +1448,7 @@ int igs_startWithIP(const char *ipAddress, unsigned int port){
     agentElements->brokerEndPoint[0] = '\0';
     strncpy(agentElements->ipAddress, ipAddress, IP_ADDRESS_LENGTH);
     
-#if defined (__WINDOWS__)
+#if (defined WIN32 || defined _WIN32)
     WORD version_requested = MAKEWORD (2, 2);
     WSADATA wsa_data;
     int rc = WSAStartup (version_requested, &wsa_data);
@@ -1505,7 +1505,7 @@ int igs_startWithDeviceOnBroker(const char *networkDevice, const char *brokerIpA
     strncpy(agentElements->networkDevice, networkDevice, NETWORK_DEVICE_LENGTH);
     agentElements->ipAddress[0] = '\0';
     
-#if defined (__WINDOWS__)
+#if (defined WIN32 || defined _WIN32)
     WORD version_requested = MAKEWORD (2, 2);
     WSADATA wsa_data;
     int rc = WSAStartup (version_requested, &wsa_data);
@@ -1564,7 +1564,7 @@ int igs_stop(){
         //cleaning agent
         free (agentElements);
         agentElements = NULL;
-        #ifdef _WIN32
+        #if (defined WIN32 || defined _WIN32)
         zsys_shutdown();
         #endif
         igs_info("Agent stopped");
@@ -1896,7 +1896,7 @@ bool igs_getRequestOutputsFromMappedAgents(){
 #define MAX_NUMBER_OF_NETDEVICES 16
 
 void igs_getNetdevicesList(char ***devices, int *nb){
-#if defined (__WINDOWS__)
+#if (defined WIN32 || defined _WIN32)
     WORD version_requested = MAKEWORD (2, 2);
     WSADATA wsa_data;
     int rc = WSAStartup (version_requested, &wsa_data);
@@ -1920,7 +1920,7 @@ void igs_getNetdevicesList(char ***devices, int *nb){
     }
     ziflist_destroy (&iflist);
     *nb = currentDeviceNb;
-#if defined (__WINDOWS__)
+#if (defined WIN32 || defined _WIN32)
     WSACleanup();
 #endif
 }

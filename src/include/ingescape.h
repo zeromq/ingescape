@@ -13,7 +13,7 @@
 
 #include <stdbool.h>
 
-#if defined WINDOWS
+#if (defined WIN32 || defined _WIN32)
 #if defined INGESCAPE
 #define PUBLIC __declspec(dllexport)
 #else
