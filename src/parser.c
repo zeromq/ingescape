@@ -121,7 +121,7 @@ static void json_add_iop_to_hash (agent_iop_t **hasht, iop_t type,
 
     if (YAJL_IS_OBJECT(obj)){
         size_t nb = obj->u.object.len;
-        for (int i = 0; i < nb; i++){
+        for (size_t i = 0; i < nb; i++){
             const char *key = obj->u.object.keys[i];
             if (strcmp("name", key) == 0){
                 name = YAJL_GET_STRING(obj->u.object.values[i]);
@@ -211,7 +211,7 @@ static void json_add_iops (yajl_val node, const char** path, iop_t type,
 static void json_parse_token_arguments (igs_token_t *token, yajl_val arguments){
     if (YAJL_IS_ARRAY(arguments)){
         size_t nbArgs = arguments->u.array.len;
-        for (int i = 0; i < nbArgs; i++){
+        for (size_t i = 0; i < nbArgs; i++){
             //iterate on arguments
             yajl_val arg = arguments->u.array.values[i];
             
@@ -220,7 +220,7 @@ static void json_parse_token_arguments (igs_token_t *token, yajl_val arguments){
                 const char *name = NULL;
                 iopType_t valType = IGS_UNKNOWN_T;
                 
-                for (int j = 0; j < nbKeys; j++){
+                for (size_t j = 0; j < nbKeys; j++){
                     //iterate on keys for this argument
                     const char *key = arg->u.object.keys[j];
                     if (strcmp("name", key) == 0){
@@ -269,7 +269,7 @@ static void json_add_token_to_hash (igs_token_t **hasht, yajl_val obj){
     
     if (YAJL_IS_OBJECT(obj)){
         size_t nb = obj->u.object.len;
-        for (int i = 0; i < nb; i++){
+        for (size_t i = 0; i < nb; i++){
             const char *key = obj->u.object.keys[i];
             if (strcmp("name", key) == 0){
                 name = YAJL_GET_STRING(obj->u.object.values[i]);
