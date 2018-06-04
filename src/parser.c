@@ -26,6 +26,9 @@
 #define STR_PARAMETERS "parameters"
 #define STR_OUTPUTS "outputs"
 #define STR_INPUTS "inputs"
+#define STR_TOKENS "tokens"
+#define STR_ARGUMENTS "arguments"
+#define STR_REPLY "reply"
 #define STR_CATEGORIES "categories"
 #define STR_TYPE "type"
 #define STR_VALUE "value"
@@ -55,8 +58,8 @@ iopType_t string_to_value_type(const char* str) {
     if (!strcmp(str, "DATA"))
         return IGS_DATA_T;
     
-    fprintf(stderr, "%s - ERROR -  unknown string \"%s\" to convert\n", __FUNCTION__, str);
-    return -1;
+    igs_error("unknown value type \"%s\" to convert", str);
+    return IGS_UNKNOWN_T;
 }
 
 bool string_to_boolean(const char* str) {
@@ -67,7 +70,7 @@ bool string_to_boolean(const char* str) {
     if (!strcmp(str, "false"))
         return false;
     
-    fprintf(stderr, "%s - ERROR -  unknown string \"%s\" to convert\n", __FUNCTION__, str);
+    igs_warn("unknown string \"%s\" to convert", str);
     return false;
 }
 
@@ -91,42 +94,51 @@ const char* value_type_to_string (iopType_t type) {
         case IGS_DATA_T:
             return "DATA";
             break;
+        case IGS_UNKNOWN_T:
+            return "UNKNOWN";
+            break;
         default:
-            fprintf(stderr, "%s - ERROR -  unknown iopType_t to convert\n", __FUNCTION__);
+            igs_error("unknown iopType_t to convert");
             break;
     }
     
     return "";
 }
 
-
-/**
- * @brief Get the string representation of a boolean
- * @param boolean
- * @return
- */
 const char* boolean_to_string (bool boolean) {
     return (boolean ? "true" : "false");
 }
 
+////////////////////////////////////////
+// IOP parsing
 
-
-/*
- * Function: json_add_data_to_hash
- * ----------------------------
- *   parse a agent_iop_t data and add it to the corresponding hash table
- */
-
-static void json_add_data_to_hash (agent_iop_t ** hasht,iop_t type,
+//parse an agent_iop_t data and add it to the corresponding hash table
+static void json_add_iop_to_hash (agent_iop_t **hasht, iop_t type,
                                    yajl_val obj){
+    const char *name = NULL;
+    iopType_t valType = IGS_UNKNOWN_T;
+    yajl_val value = NULL;
 
-    agent_iop_t *data = NULL;
-
-    /* check if the key already exist */
-    const char* name = YAJL_GET_STRING(obj->u.object.values[0]);
-    HASH_FIND_STR(*hasht, name , data);
-    if (data == NULL) {
-        data = calloc (1, sizeof (agent_iop_t));
+    if (YAJL_IS_OBJECT(obj)){
+        size_t nb = obj->u.object.len;
+        for (size_t i = 0; i < nb; i++){
+            const char *key = obj->u.object.keys[i];
+            if (strcmp("name", key) == 0){
+                name = YAJL_GET_STRING(obj->u.object.values[i]);
+            }else if (strcmp("type", key) == 0){
+                valType = string_to_value_type (YAJL_GET_STRING(obj->u.object.values[i]));
+                if (valType == IGS_UNKNOWN_T){
+                    return;
+                }
+            }else if (strcmp("value", key) == 0){
+                value = obj->u.object.values[i];
+            }
+        }
+    }
+    
+    agent_iop_t *iop = NULL;
+    if (name != NULL){
+        //handle name, value type and value
         char *n = strndup(name, MAX_IOP_NAME_LENGTH);
         bool spaceInName = false;
         size_t lengthOfN = strlen(n);
@@ -137,49 +149,49 @@ static void json_add_data_to_hash (agent_iop_t ** hasht,iop_t type,
             }
         }
         if (spaceInName){
-            igs_warn("Spaces are not allowed in IOP: %s has been renamed to %s\n", name, n);
+            igs_warn("Spaces are not allowed in IOP name: %s has been renamed to %s", name, n);
         }
-        data->name = n;
-
-        data->value_type = string_to_value_type (YAJL_GET_STRING(obj->u.object.values[1]));
-        switch (data->value_type) {
-            case IGS_INTEGER_T:
-                data->value.i =(int) YAJL_GET_INTEGER (obj->u.object.values[2]);
-                break;
-            case IGS_DOUBLE_T:
-                data->value.d = YAJL_GET_DOUBLE (obj->u.object.values[2]);
-                break;
-            case IGS_BOOL_T:
-                data->value.b = string_to_boolean (YAJL_GET_STRING(obj->u.object.values[2]));
-                break;
-            case IGS_STRING_T:
-                data->value.s = strdup (YAJL_IS_STRING(obj->u.object.values[2]) ? obj->u.object.values[2]->u.string : "");
-                break;
-            case IGS_IMPULSION_T:
-                //IMPULSION has no value
-                break;
-            case IGS_DATA_T:
-                //FIXME : we store data as string but we should check it convert it to hexa
-                //data->value.s = strdup (YAJL_IS_STRING(obj->u.object.values[2]) ? obj->u.object.values[2]->u.string : "");
-                break;
-            default:
-                fprintf(stderr, "%s - ERROR -  unknown data type to load from json\n", __FUNCTION__);
-                break;
+        HASH_FIND_STR(*hasht, n, iop);
+        if (iop == NULL){
+            iop = calloc (1, sizeof (agent_iop_t));
+            iop->name = n;
+            iop->value_type = valType;
+            switch (iop->value_type) {
+                case IGS_INTEGER_T:
+                    iop->value.i =(int) YAJL_GET_INTEGER (value);
+                    break;
+                case IGS_DOUBLE_T:
+                    iop->value.d = YAJL_GET_DOUBLE (value);
+                    break;
+                case IGS_BOOL_T:
+                    iop->value.b = string_to_boolean (YAJL_GET_STRING(value));
+                    break;
+                case IGS_STRING_T:
+                    iop->value.s = strdup (YAJL_IS_STRING(value) ? value->u.string : NULL);
+                    break;
+                case IGS_IMPULSION_T:
+                    //IMPULSION has no value
+                    break;
+                case IGS_DATA_T:
+                    //FIXME : we store data as string but we should check it convert it to hexa
+                    //data->value.s = strdup (YAJL_IS_STRING(obj->u.object.values[2]) ? obj->u.object.values[2]->u.string : "");
+                    break;
+                default:
+                    igs_warn("unknown data type to load from json for %s", n);
+                    break;
+            }
+            iop->is_muted = false;
+            iop->type = type;
+            HASH_ADD_STR(*hasht, name, iop);
+        }else{
+            igs_warn("%s already exists", n);
         }
-        data->is_muted = false;
-        data->type = type;
-        HASH_ADD_STR(*hasht , name, data );  /* id: name of key field */
     }
 }
 
-/*
- * Function: jason_add_data
- * ----------------------------
- *   parse a tab of agent_iop_t data and add them into the corresponding hash table
- */
-
-static void json_add_data (yajl_val node, const char** path,iop_t type,
-                           agent_iop_t ** hasht) {
+//parse a tab of agent_iop_t data and add them into the corresponding hash table
+static void json_add_iops (yajl_val node, const char** path, iop_t type,
+                           agent_iop_t **hasht) {
     yajl_val v;
     v = yajl_tree_get(node, path, yajl_t_array);
 
@@ -188,17 +200,142 @@ static void json_add_data (yajl_val node, const char** path,iop_t type,
         for (i = 0; i < v->u.array.len; i++ ){
             yajl_val obj = v->u.array.values[i];
             if( obj && YAJL_IS_OBJECT(obj))
-                json_add_data_to_hash (hasht,type, obj);
+                json_add_iop_to_hash (hasht, type, obj);
         }
     }
 }
 
-/*
- * Function: json_fetch
- * ----------------------------
- *   fetch a Json file and convert it into string readable by the Json parser
- */
+////////////////////////////////////////
+// tokens parsing
 
+static void json_parse_token_arguments (igs_token_t *token, yajl_val arguments){
+    if (YAJL_IS_ARRAY(arguments)){
+        size_t nbArgs = arguments->u.array.len;
+        for (size_t i = 0; i < nbArgs; i++){
+            //iterate on arguments
+            yajl_val arg = arguments->u.array.values[i];
+            
+            if (YAJL_IS_OBJECT(arg)){
+                size_t nbKeys = arg->u.object.len;
+                const char *name = NULL;
+                iopType_t valType = IGS_UNKNOWN_T;
+                
+                for (size_t j = 0; j < nbKeys; j++){
+                    //iterate on keys for this argument
+                    const char *key = arg->u.object.keys[j];
+                    if (strcmp("name", key) == 0){
+                        name = YAJL_GET_STRING(arg->u.object.values[j]);
+                    }else if (strcmp("type", key) == 0){
+                        valType = string_to_value_type (YAJL_GET_STRING(arg->u.object.values[j]));
+                    }
+                }
+                
+                if (name != NULL){
+                    char *n = strndup(name, MAX_IOP_NAME_LENGTH);
+                    bool spaceInName = false;
+                    size_t lengthOfN = strlen(n);
+                    for (size_t i = 0; i < lengthOfN; i++){
+                        if (n[i] == ' '){
+                            n[i] = '_';
+                            spaceInName = true;
+                        }
+                    }
+                    if (spaceInName){
+                        igs_warn("Spaces are not allowed in token argument name: %s has been renamed to %s", name, n);
+                    }
+                    if (valType != IGS_UNKNOWN_T){
+                        igs_tokenArgument_t *tokenArg = calloc(1, sizeof(igs_tokenArgument_t));
+                        tokenArg->name = n;
+                        tokenArg->type = valType;
+                        LL_APPEND(token->arguments, tokenArg);
+                    }
+                }
+            }else{
+                igs_error("argument is not passed as an object");
+            }
+        }
+    }else{
+        igs_error("arguments are not passed as an array");
+    }
+}
+
+//parse a token and add it to the corresponding hash table
+static void json_add_token_to_hash (igs_token_t **hasht, yajl_val obj){
+    
+    const char *name = NULL;
+    const char *description = NULL;
+    yajl_val arguments = NULL;
+    yajl_val reply = NULL;
+    
+    if (YAJL_IS_OBJECT(obj)){
+        size_t nb = obj->u.object.len;
+        for (size_t i = 0; i < nb; i++){
+            const char *key = obj->u.object.keys[i];
+            if (strcmp("name", key) == 0){
+                name = YAJL_GET_STRING(obj->u.object.values[i]);
+            }else if (strcmp("description", key) == 0){
+                description = YAJL_GET_STRING(obj->u.object.values[i]);
+            }else if (strcmp("arguments", key) == 0){
+                arguments = obj->u.object.values[i];
+            }else if (strcmp("reply", key) == 0){
+                reply = obj->u.object.values[i];
+            }
+        }
+    }
+    char *n = NULL;
+    if (name != NULL){
+        n = strndup(name, MAX_IOP_NAME_LENGTH);
+        bool spaceInName = false;
+        size_t lengthOfN = strlen(n);
+        for (size_t i = 0; i < lengthOfN; i++){
+            if (n[i] == ' '){
+                n[i] = '_';
+                spaceInName = true;
+            }
+        }
+        if (spaceInName){
+            igs_warn("Spaces are not allowed in token name: %s has been renamed to %s", name, n);
+        }
+    }else{
+        igs_warn("parsed token with NULL name");
+    }
+    
+    igs_token_t *token = NULL;
+    HASH_FIND_STR(*hasht, n, token);
+    if (token == NULL){
+        token = calloc(1, sizeof(igs_token_t));
+        token->name = n;
+        if (description != NULL)
+            token->description = strndup(description, MAX_DESCRIPTION_LENGTH);
+        if (arguments != NULL){
+            json_parse_token_arguments(token, arguments);
+        }
+        //TODO: parse reply
+        HASH_ADD_STR(*hasht, name, token);
+    }else{
+        igs_warn("%s already exists", name);
+    }
+}
+
+//parse a tab of tokens and add them into the corresponding hash table
+static void json_add_tokens (yajl_val node, const char **path, igs_token_t **hasht){
+    yajl_val v;
+    v = yajl_tree_get(node, path, yajl_t_array);
+    
+    if (v && YAJL_IS_ARRAY(v)){
+        unsigned int  i;
+        for (i = 0; i < v->u.array.len; i++ ){
+            yajl_val obj = v->u.array.values[i];
+            if( obj && YAJL_IS_OBJECT(obj))
+                json_add_token_to_hash (hasht, obj);
+        }
+    }
+}
+
+////////////////////////////////////////
+// File reading and parsing
+
+// fetch a JSON file and convert it into string readable by the JSON parser
 static char* json_fetch (const char* path) {
 
     FILE *file;
@@ -209,7 +346,7 @@ static char* json_fetch (const char* path) {
 
     file = fopen(path, "r");
     if (!file){
-        fprintf(stderr, "json parser - ERROR - fopen(): file %s NOT found\n", path);
+        igs_error("file %s not found", path);
         return 0;
     }
 
@@ -219,14 +356,14 @@ static char* json_fetch (const char* path) {
         rd = (unsigned int) fread(buff, 1, sizeof(buff) , file);
         /* file read error handling */
         if (rd == 0 && !feof(stdin)) {
-            fprintf(stderr, "json parser - ERROR -  fread(): error encountered on file read\n");
+            igs_error("could not read %s", path);
             return 0;
         }
 
         /* rebuild the json string */
         js = realloc(js, jslen + rd + 1);
         if (!js) {
-            fprintf(stderr, "json parser - ERROR -  realloc(): error encountered realloc\n");
+            igs_error("could not realloc parsed string");
             return 0;
         }
         strncpy(js + jslen, buff, rd);
@@ -240,92 +377,74 @@ static char* json_fetch (const char* path) {
     return js;
 }
 
-/*
- * Function: json_tokenized
- * ----------------------------
- *   convert un string (json) into a DOM
- */
+// convert JSON string into DOM
+static int json_tokenize (const char* json_str, yajl_val *node) {
 
-static int json_tokenized (const char* json_str,
-                           yajl_val *node) {
-
-    char errbuf[BUFSIZ];
-
+    char errbuf[BUFSIZ] = "unknown error";
     /* we have the whole config file in memory.  let's parse it ... */
     *node = yajl_tree_parse(json_str, errbuf, sizeof(errbuf));
 
     /* parse error handling */
     if (!node || strlen(errbuf) > 0) {
-        fprintf(stderr, "json parser - ERROR : ");
-        if (strlen(errbuf))
-            fprintf(stderr, " %s", errbuf);
-        else
-            fprintf(stderr, "unknown error");
-        fprintf(stderr, "\n");
+        igs_error("could not parse string (%s)", errbuf);
         return 0;
     }
 
     return 1;
 }
 
-/*
- * Function: json_parse_definition
- * ----------------------------
- *   convert a definition.json file into a definition structure
- */
-
+// convert a definition json file into a definition structure
 static definition* json_parse_definition (yajl_val node) {
-    definition* def;
+    definition *def;
     yajl_val v;
     def = (definition*) calloc(1, sizeof(definition));
     const char * path[] = { STR_DEFINITION, "", (const char *) 0 };
 
     path[1] = STR_NAME;
     v = yajl_tree_get(node, path, yajl_t_any);
-
     if (v){
-        def->name = strdup (YAJL_IS_STRING(v) ? (v)->u.string : "");
+        def->name = strdup (YAJL_IS_STRING(v) ? (v)->u.string : NULL);
     }
 
     path[1] = STR_DESCRIPTION;
     v = yajl_tree_get(node, path, yajl_t_any);
-    if (v)
-        def->description = strdup (YAJL_IS_STRING(v) ? (v)->u.string : "");
+    if (v){
+        def->description = strdup (YAJL_IS_STRING(v) ? (v)->u.string : NULL);
+    }
 
     path[1] = STR_VERSION;
     v = yajl_tree_get(node, path, yajl_t_any);
-    if (v)
-        def->version = strdup (YAJL_IS_STRING(v) ? (v)->u.string : "");
+    if (v){
+        def->version = strdup (YAJL_IS_STRING(v) ? (v)->u.string : NULL);
+    }
 
     path[1] = STR_INPUTS;
-    json_add_data (node, path,IGS_INPUT_T, &def->inputs_table);
+    json_add_iops (node, path, IGS_INPUT_T, &def->inputs_table);
 
     path[1] = STR_OUTPUTS;
-    json_add_data (node, path,IGS_OUTPUT_T, &def->outputs_table);
+    json_add_iops (node, path, IGS_OUTPUT_T, &def->outputs_table);
 
     path[1] = STR_PARAMETERS;
-    json_add_data (node, path,IGS_PARAMETER_T, &def->params_table);
+    json_add_iops (node, path, IGS_PARAMETER_T, &def->params_table);
+    
+    path[1] = STR_TOKENS;
+    json_add_tokens (node, path, &def->tokens_table);
 
-    path[1] = STR_CATEGORIES;
-    v = yajl_tree_get(node, path, yajl_t_array);
-    if (v && YAJL_IS_ARRAY(v)){
-        unsigned int  i;
-        for (i = 0; i < v->u.array.len; i++ ){
+//    path[1] = STR_CATEGORIES;
+//    v = yajl_tree_get(node, path, yajl_t_array);
+//    if (v && YAJL_IS_ARRAY(v)){
+//        unsigned int  i;
+//        for (i = 0; i < v->u.array.len; i++ ){
 //            yajl_val obj = v->u.array.values[i];
 //            if( obj && YAJL_IS_OBJECT(obj))
 //                json_add_category_to_hash (&def->categories, obj);
-        }
-    }
+//        }
+//    }
 
     return def;
 }
 
-/*
- * Function: json_add_map_out_to_hash
- * ----------------------------
- *   parse a tab of mapping output type and add them into the corresponding hash table
- */
-
+// parse a tab of mapping output type and add them into the corresponding hash table
 static void json_add_map_out_to_hash (mapping_element_t** hasht,
                                        yajl_val current_map_out){
 
@@ -418,12 +537,7 @@ static void json_add_map_out_to_hash (mapping_element_t** hasht,
     free(reviewedWithOutput);
 }
 
-/*
- * Function: json_add_map_cat_to_hash
- * ----------------------------
- *   parse a tab of mapping category type and add them into the corresponding hash table
- */
-
+// parse a tab of mapping category type and add them into the corresponding hash table
 static void json_add_map_cat_to_hash (mapping_element_t** hasht,
                                        yajl_val current_map_out){
     INGESCAPE_UNUSED(hasht)
@@ -470,12 +584,7 @@ static void json_add_map_cat_to_hash (mapping_element_t** hasht,
 //    }
 }
 
-/*
- * Function: json_parse_mapping
- * ----------------------------
- *   convert a map.json file into a mapping (output & category) structure
- */
-
+// convert a map.json file into a mapping (output & category) structure
 static mapping_t* json_parse_mapping (yajl_val node) {
 
     mapping_t* mapp;
@@ -530,12 +639,46 @@ static mapping_t* json_parse_mapping (yajl_val node) {
     return mapp;
 }
 
-/*
- * Function: json_dump_iop
- * -----------------------
- *   convert an agent_iop_t structure into json string
- */
+/////////////////////////
+// Dumping functions
 
+
+// convert an agent_iop_t structure into json string
+static void json_dump_token (yajl_gen *g, igs_token_t *token) {
+    
+    yajl_gen_map_open(*g);
+    
+    yajl_gen_string(*g, (const unsigned char *) STR_NAME, strlen(STR_NAME));
+    yajl_gen_string(*g, (const unsigned char *) token->name, strlen (token->name));
+    
+    if (token->description != NULL){
+        yajl_gen_string(*g, (const unsigned char *) STR_DESCRIPTION, strlen(STR_DESCRIPTION));
+        yajl_gen_string(*g, (const unsigned char *) token->description, strlen (token->description));
+    }
+    
+    igs_tokenArgument_t *arg = NULL;
+    int nbArgs = 0;
+    DL_COUNT(token->arguments, arg, nbArgs);
+    if ((token->arguments != NULL) && (nbArgs > 0)){
+        yajl_gen_string(*g, (const unsigned char *) STR_ARGUMENTS, strlen(STR_ARGUMENTS));
+        yajl_gen_array_open(*g);
+        DL_FOREACH(token->arguments, arg){
+            yajl_gen_map_open(*g);
+            yajl_gen_string(*g, (const unsigned char *) STR_NAME, strlen(STR_NAME));
+            yajl_gen_string(*g, (const unsigned char *) arg->name, strlen(arg->name));
+            yajl_gen_string(*g, (const unsigned char *) STR_TYPE, strlen(STR_TYPE));
+            const char *type = value_type_to_string(arg->type);
+            yajl_gen_string(*g, (const unsigned char *) type, strlen(type));
+            yajl_gen_map_close(*g);
+        }
+        yajl_gen_array_close(*g);
+    }
+    //TODO: dump reply
+    
+    yajl_gen_map_close(*g);
+}
+
+// convert an agent_iop_t structure into json string
 static void json_dump_iop (yajl_gen *g, agent_iop_t* aiop) {
     
     yajl_gen_map_open(*g);
@@ -589,13 +732,7 @@ static void json_dump_iop (yajl_gen *g, agent_iop_t* aiop) {
     yajl_gen_map_close(*g);
 }
 
-
-/*
- * Function: json_dump_definition
- * ------------------------------
- *   convert a definition structure into definition.json string
- */
-
+// convert a definition structure into definition.json string
 static void json_dump_definition (yajl_gen *g, definition* def) {
     
     unsigned int hashCount = 0;
@@ -656,6 +793,17 @@ static void json_dump_definition (yajl_gen *g, definition* def) {
         yajl_gen_array_close(*g);
     }
     
+    hashCount = HASH_COUNT(def->tokens_table);
+    if (hashCount) {
+        yajl_gen_string(*g, (const unsigned char *) STR_TOKENS, strlen(STR_TOKENS));
+        yajl_gen_array_open(*g);
+        igs_token_t *t = NULL, *tmp = NULL;
+        HASH_ITER(hh, def->tokens_table, t, tmp){
+            json_dump_token (g, t);
+        }
+        yajl_gen_array_close(*g);
+    }
+    
 //    struct category *cat;
 //    hashCount = HASH_COUNT(def->categories);
 //    if (hashCount) {
@@ -670,12 +818,7 @@ static void json_dump_definition (yajl_gen *g, definition* def) {
     yajl_gen_map_close(*g);
 }
 
-/*
- * Function: json_dump_mapping_out
- * -----------------------
- *   convert a mapping_out structure into json string
- */
-
+//convert a mapping_out structure into json string
 static void json_dump_mapping_out (yajl_gen *g, mapping_element_t* mapp_out) {
 
     yajl_gen_map_open(*g);
@@ -711,12 +854,7 @@ static void json_dump_mapping_out (yajl_gen *g, mapping_element_t* mapp_out) {
 //    yajl_gen_map_close(*g);
 //}
 
-/*
- * Function: json_dump_mapping
- * ------------------------------
- *   convert a mapping structure into mapping.json string
- */
-
+//convert a mapping structure into mapping.json string
 static void json_dump_mapping (yajl_gen *g, mapping_t* mapp) {
 
     unsigned int hashCount = 0;
@@ -772,68 +910,6 @@ static void json_dump_mapping (yajl_gen *g, mapping_t* mapp) {
     }
 }
 
-/*
- * Function: init_mapping
- * ----------------------------
- *   read mapping from file path and init inernal mapping data
- *
- *   mapping_file_path : path to the agent mapping file
- *
- */
-
-int igs_init_mapping (const char* mapping_file_path)
-{
-    int errorCode = -1;
-
-    if (mapping_file_path != NULL){
-        // Init definition
-        igs_internal_mapping = parser_LoadMapFromPath(mapping_file_path);
-        if(igs_internal_mapping == NULL)
-        {
-            fprintf(stderr, "Error : Mapping file has not been loaded : %s\n", mapping_file_path );
-            exit(EXIT_FAILURE);
-        } else {
-            errorCode = 0;
-        }
-    }
-
-    return errorCode;
-}
-
-/*
- * Function: igs_init_internal_data
- * ----------------------------
- *   read definition from file path and init internal agent data
- *   initialize definition_load and igs_internal_definition data structures
- *
- *   definition_file_path : path to the agent definiton file
- *
- */
-
-int igs_init_internal_data (const char* definition_file_path)
-{
-    int errorCode = -1;
-    if (definition_file_path != NULL){
-        // Init definition
-        igs_internal_definition = parser_loadDefinitionFromPath(definition_file_path);
-
-        if(igs_internal_definition != NULL)
-        {
-            // Live data corresponds to a copy of the initial definition
-            igs_internal_definition = calloc(1, sizeof(definition));
-            errorCode = 0;
-        } else {
-            fprintf(stderr, "Error : Definition file has not been loaded : %s\n", definition_file_path );
-            exit(EXIT_FAILURE);
-        }
-    } else {
-        fprintf(stderr, "Error : Definition file has not been specified\n");
-        exit(EXIT_FAILURE);
-    }
-
-    return errorCode;
-}
-
 ////////////////////////////////////////////////////////////////////////
 // PRIVATE API
 ////////////////////////////////////////////////////////////////////////
@@ -853,8 +929,8 @@ definition* parser_loadDefinition (const char* json_str) {
     definition *def = NULL;
     yajl_val node;
     
-    json_tokenized(json_str, &node);
-    def = json_parse_definition (node);
+    json_tokenize(json_str, &node);
+    def = json_parse_definition(node);
     
     yajl_tree_free(node);
     node = NULL;
@@ -915,15 +991,13 @@ char* parser_export_definition (definition* def) {
         yajl_gen_map_open(g);
         yajl_gen_string(g, (const unsigned char *) STR_DEFINITION, strlen(STR_DEFINITION));
         
-        if(def != NULL)
-        {
+        if(def != NULL){
             json_dump_definition(&g, def);
         }
         yajl_gen_map_close(g);
         
         // try to get our dumping result
-        if (yajl_gen_get_buf(g, &json_str, &len) == yajl_gen_status_ok)
-        {
+        if (yajl_gen_get_buf(g, &json_str, &len) == yajl_gen_status_ok){
             result = strdup((const char*) json_str);
         }
         
@@ -985,7 +1059,7 @@ mapping_t* parser_LoadMap(const char* json_str){
     mapping_t *mapp = NULL;
     yajl_val node;
     
-    json_tokenized(json_str, &node);
+    json_tokenize(json_str, &node);
     mapp = json_parse_mapping (node);
     
     //Copy the mapp structure to the global variable map

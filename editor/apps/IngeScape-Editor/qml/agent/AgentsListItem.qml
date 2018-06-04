@@ -465,7 +465,7 @@ Item {
 
         // 9 options x optionHeight
         height: 9 * optionHeight
-        width: 200
+        width: 230
 
         isModal: true;
         layerColor: "transparent"
@@ -503,7 +503,7 @@ Item {
                     height: popupOptions.optionHeight
                     width: parent.width
 
-                    text: qsTr("Load Definition")
+                    text: qsTr("Upload Definition...")
 
                     style: Theme.ButtonStyleOfOption {
 
@@ -524,7 +524,7 @@ Item {
                     height: popupOptions.optionHeight
                     width: parent.width
 
-                    text: qsTr("Load Mapping")
+                    text: qsTr("Upload Mapping...")
 
                     style: Theme.ButtonStyleOfOption {
 
@@ -545,7 +545,7 @@ Item {
                     height: popupOptions.optionHeight
                     width: parent.width
 
-                    text: qsTr("Download Definition")
+                    text: qsTr("Download Definition...")
 
                     style: Theme.ButtonStyleOfOption {
 
@@ -566,7 +566,7 @@ Item {
                     height: popupOptions.optionHeight
                     width: parent.width
 
-                    text: qsTr("Download Mapping")
+                    text: qsTr("Download Mapping...")
 
                     style: Theme.ButtonStyleOfOption {
 
@@ -587,7 +587,7 @@ Item {
                     height: popupOptions.optionHeight
                     width: parent.width
 
-                    text: qsTr("Set Path for files")
+                    text: qsTr("Set local paths...")
 
                     style: Theme.ButtonStyleOfOption {
 
@@ -609,7 +609,7 @@ Item {
                     height: popupOptions.optionHeight
                     width: parent.width
 
-                    text: qsTr("Save Definition to Path")
+                    text: qsTr("Save Definition to local path")
 
                     style: Theme.ButtonStyleOfOption {
 
@@ -630,7 +630,7 @@ Item {
                     height: popupOptions.optionHeight
                     width: parent.width
 
-                    text: qsTr("Save Mapping to Path")
+                    text: qsTr("Save Mapping to local path")
 
                     style: Theme.ButtonStyleOfOption {
 
@@ -651,7 +651,7 @@ Item {
                     height: popupOptions.optionHeight
                     width: parent.width
 
-                    text: (rootItem.agent && (rootItem.agent.hasLogInFile === true)) ? qsTr("Disable Log File") : qsTr("Enable Log File")
+                    text: (rootItem.agent && (rootItem.agent.hasLogInFile === true)) ? qsTr("Disable log file") : qsTr("Enable log file")
 
                     style: Theme.ButtonStyleOfOption {
 
@@ -695,7 +695,7 @@ Item {
                     height: popupOptions.optionHeight
                     width: parent.width
 
-                    text: qsTr("View Log Stream")
+                    text: qsTr("Open log stream")
 
                     style: Theme.ButtonStyleOfOption {
                         isVisibleSeparation: false

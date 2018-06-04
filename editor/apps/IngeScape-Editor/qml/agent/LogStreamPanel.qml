@@ -136,7 +136,7 @@ Window {
                 elideWidth: (titleItem.width - txtHostname.width)
                 elide: Text.ElideRight
 
-                text: (controller ? qsTr("Log Stream of %1").arg(controller.agentName) : qsTr("Log Stream"))
+                text: (controller ? qsTr("Log stream for %1").arg(controller.agentName) : qsTr("Log stream"))
             }
 
             Text {

@@ -942,6 +942,29 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     igs_info("received SAVE_MAPPING_TO_PATH command from %s (%s)", name, peer);
                     igs_writeMappingToPath();
                 }
+                //TOKENS
+                else if (strcmp (message, "TOKEN") == 0){
+                    char *tokenName = zmsg_popstr(msgDuplicate);
+                    igs_token_t *token = NULL;
+                    if (igs_internal_definition != NULL && igs_internal_definition->tokens_table != NULL){
+                        HASH_FIND_STR(igs_internal_definition->tokens_table, tokenName, token);
+                        if (token != NULL ){
+                            if (token->cb != NULL){
+                                size_t nbArgs = 0;
+                                igs_tokenArgument_t *arg = NULL;
+                                LL_COUNT(token->arguments, arg, nbArgs);
+                                if (token_addValuesToArgumentsFromMessage(tokenName, token->arguments, msgDuplicate)){
+                                    (token->cb)(name, peer, tokenName, token->arguments, nbArgs, token->cbData);
+                                    token_freeValuesInArguments(token->arguments);
+                                }
+                            }else{
+                                igs_warn("no defined callback to handle received token %s", tokenName);
+                            }
+                        }else{
+                            igs_warn("agent %s has no token named %s", name, tokenName);
+                        }
+                    }
+                }
             }
             free(message);
         } else if (streq (event, "EXIT")){
