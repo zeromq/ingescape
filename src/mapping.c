@@ -15,7 +15,7 @@
 #endif
 #include "ingescape_private.h"
 
-mapping_t* igs_internal_mapping = NULL;
+mapping_t *igs_internal_mapping = NULL;
 char mappingPath[MAX_PATH] = "";
 
 ////////////////////////////////////////////////////////////////////////

@@ -16,13 +16,7 @@
 #include "unixfunctions.h"
 #endif
 
-definition * igs_internal_definition = NULL;
-
-typedef struct agent_port_t {
-    const char * name;          //Needs to be unique : the table hash key
-    int port;
-    UT_hash_handle hh;
-} agent_port;
+definition *igs_internal_definition = NULL;
 
 ////////////////////////////////////////////////////////////////////////
 // INTERNAL FUNCTIONS
@@ -170,6 +164,11 @@ void definition_freeDefinition (definition* def) {
         definition_freeIOP(current_iop);
         current_iop = NULL;
     }
+    igs_token_t *token, *tmpToken;
+    HASH_ITER(hh, def->tokens_table, token, tmpToken) {
+        HASH_DEL(def->tokens_table,token);
+        token_freeToken(token);
+    }
     free(def);
 }
 
@@ -204,6 +203,7 @@ int igs_clearDefinition(){
     igs_internal_definition->params_table = NULL;
     igs_internal_definition->inputs_table = NULL;
     igs_internal_definition->outputs_table = NULL;
+    igs_internal_definition->tokens_table = NULL;
     network_needToSendDefinitionUpdate = true;
     return 1;
 }
@@ -276,7 +276,7 @@ int igs_setDefinitionDescription(const char *description){
     if(igs_internal_definition->description != NULL){
         free((char*)igs_internal_definition->description);
     }
-    igs_internal_definition->description = strndup(description, MAX_DEFINITION_DESCRIPTION_LENGTH);
+    igs_internal_definition->description = strndup(description, MAX_DESCRIPTION_LENGTH);
     network_needToSendDefinitionUpdate = true;
     return 1;
 }

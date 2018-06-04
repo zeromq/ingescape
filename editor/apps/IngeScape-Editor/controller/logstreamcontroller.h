@@ -20,6 +20,8 @@
 
 #include <I2PropertyHelpers.h>
 #include <model/logm.h>
+#include <sortFilter/logssortfilter.h>
+
 
 extern "C" {
 //#include <ingescape_advanced.h>
@@ -38,21 +40,38 @@ class LogStreamController : public QObject
     // Name of the corresponding agent
     I2_QML_PROPERTY_READONLY(QString, agentName)
 
+    // Host name of the corresponding agent
+    I2_QML_PROPERTY_READONLY(QString, agentHostname)
+
     // Address of subscriber
     I2_CPP_NOSIGNAL_PROPERTY(QString, subscriberAddress)
 
-    // List of logs
-    I2_QOBJECT_LISTMODEL(LogM, logs)
+    // List of all logs
+    I2_QOBJECT_LISTMODEL(LogM, allLogs)
+
+    // List of filtered logs
+    //I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(LogM, filteredLogs)
+
+    // List of filtered (and sorted) logs
+    Q_PROPERTY(LogsSortFilter* filteredLogs READ filteredLogs CONSTANT)
+
+    // List with all log types
+    I2_ENUM_LISTMODEL(LogTypes, allLogTypes)
+
+    // List of selected log types
+    I2_ENUM_LISTMODEL(LogTypes, selectedLogTypes)
 
 
 public:
     /**
      * @brief Constructor
      * @param agentName
+     * @param agentHostname
      * @param subscriberAddress
      * @param parent
      */
     explicit LogStreamController(QString agentName,
+                                 QString agentHostname,
                                  QString subscriberAddress,
                                  QObject *parent = nullptr);
 
@@ -61,6 +80,50 @@ public:
      * @brief Destructor
      */
     ~LogStreamController();
+
+
+    /**
+     * @brief Get our filtered list of logs
+     * @return
+     */
+    LogsSortFilter* filteredLogs()
+    {
+        return &_filteredLogs;
+    }
+
+
+    /**
+     * @brief Return true if the "Log Type" is selected
+     * @param nLogType
+     * @return
+     */
+    Q_INVOKABLE bool isSelectedLogType(int nLogType);
+
+
+    /**
+     * @brief Show logs of the type
+     * @param nLogType
+     */
+    Q_INVOKABLE void showLogsOfType(int nLogType);
+
+
+    /**
+     * @brief Hide logs of the type
+     * @param nLogType
+     */
+    Q_INVOKABLE void hideLogsOfType(int nLogType);
+
+
+    /**
+     * @brief Show all logs (select all log types)
+     */
+    Q_INVOKABLE void showAllLogs();
+
+
+    /**
+     * @brief Hide all logs (un-select all log types)
+     */
+    Q_INVOKABLE void hideAllLogs();
 
 
 signals:
@@ -84,8 +147,18 @@ private slots:
 
 
 private:
+    /**
+     * @brief Update the filters on the list of logs
+     */
+    void _updateFilters();
+
+
+private:
     // zactor
     zactor_t *_zActor;
+
+    // List of filtered (and sorted) logs
+    LogsSortFilter _filteredLogs;
 
 };
 

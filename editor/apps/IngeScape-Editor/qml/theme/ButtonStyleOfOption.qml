@@ -54,7 +54,8 @@ ButtonStyle {
     label: Text {
         text: control.text
 
-        color: control.pressed ? IngeScapeTheme.orangeColor : "white"
+        color: control.enabled ? (control.pressed ? IngeScapeTheme.orangeColor : "white")
+                               : IngeScapeTheme.darkGreyColor
 
         verticalAlignment: Text.AlignVCenter
 

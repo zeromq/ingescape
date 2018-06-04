@@ -717,7 +717,7 @@ void IngeScapeEditorController::onOpenLogStreamOfAgents(QList<AgentM*> models)
                 else
                 {
                     // Create a new "Log Stream" controller
-                    LogStreamController* logStreamController = new LogStreamController(model->name(), subscriberAddress, this);
+                    LogStreamController* logStreamController = new LogStreamController(model->name(), model->hostname(), subscriberAddress, this);
 
                     _openedLogStreamControllers.append(logStreamController);
                 }

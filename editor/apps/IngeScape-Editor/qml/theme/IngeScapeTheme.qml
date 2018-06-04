@@ -89,7 +89,7 @@ Item {
     readonly property color lightGreyColor : "#9C9C9C"
     readonly property color veryLightGreyColor : "#ECECEC"
 
-    readonly property color orangeColor: "#F39200"
+    readonly property color orangeColor: "#F07F0A"
 
     //-----------------------------------------
     //
@@ -307,6 +307,41 @@ Item {
             return "#000000";
         }
     }
+
+
+    function colorOfLogType(logType)
+    {
+        switch (logType)
+        {
+        case 0: //LogTypes.TRACE:
+            // Light Blue
+            return "#ADD8E6";
+
+        case 1: //LogTypes.DEBUG:
+            // Cyan
+            return "#00FFFF";
+
+        case 2: //LogTypes.INFO:
+            // Green
+            return "#00FF00";
+
+        case 3: //LogTypes.WARNING:
+            // Yellow
+            return "#FFFF00";
+
+        case 4: //LogTypes.ERROR:
+            // Red
+            return "#FF0000";
+
+        case 5: //LogTypes.FATAL:
+            // Magenta
+            return "#FF00FF";
+
+        default:
+            return "#FFFFFF";
+        }
+    }
+
 
     //
     // Agents

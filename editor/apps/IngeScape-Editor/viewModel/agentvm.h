@@ -86,6 +86,9 @@ class AgentVM : public QObject
     // Path of the mapping file of our agent
     I2_QML_PROPERTY_READONLY(QString, mappingFilePath)
 
+    // Flag indicating if the option "View Log Stream" is enabled
+    I2_QML_PROPERTY_READONLY(bool, isEnabledViewLogStream)
+
 
 public:
     /**
@@ -406,6 +409,12 @@ private:
      * @brief Update the flag "has Log in Stram" in function of flags of models
      */
     void _updateHasLogInStream();
+
+
+    /**
+     * @brief Update the flag "is Enabled View Log Stram" in function of flags of models
+     */
+    void _updateIsEnabledViewLogStream();
 
 
     /**

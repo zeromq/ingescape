@@ -99,7 +99,8 @@ typedef enum {
     IGS_STRING_T,       ///< string value type
     IGS_BOOL_T,         ///< bool value type
     IGS_IMPULSION_T,    ///< impulsion value type
-    IGS_DATA_T          ///< data value type
+    IGS_DATA_T,         ///< data value type
+    IGS_UNKNOWN_T       ///< for unknown parsed types
 } iopType_t;
 
 //read IOP using void*

@@ -1,0 +1,85 @@
+{
+    "definition": {
+
+        "name": "macosAgent",
+        "description": "macosAgent sends one value and recceives two impulsions",
+        "version": "0.1",
+        "parameters": [{
+                       "name": "param1",
+                       "type": "INTEGER",
+                       "value": -1
+                       }],
+        "inputs": [{
+                   "name": "input1",
+                   "type": "INTEGER",
+                   "value": 30
+                   },
+                   {
+                   "name": "input2",
+                   "type": "IMPULSION",
+                   "value": ""
+                   },
+                   {
+                   "name": "input3",
+                   "type": "INTEGER",
+                   "value": 30
+                   },
+                   {
+                   "name": "stream",
+                   "type": "DATA",
+                   "value": ""
+                   }],
+        "outputs": [{
+                    "name": "value1",
+                    "type": "DOUBLE",
+                    "value": 3.14
+                    }],
+        "categories": [],
+        "tokens": [
+                   {
+                   "name": "MY_TOKEN",
+                   "description": "this token is used to blah blah blah",
+                   "arguments": [
+                                 {
+                                 "name": "param1",
+                                 "type": "INTEGER"
+                                 },
+                                 {
+                                 "name": "param2",
+                                 "type": "DOUBLE"
+                                 },
+                                 {
+                                 "name": "param3",
+                                 "type": "BOOL"
+                                 },
+                                 {
+                                 "name": "param4",
+                                 "type": "STRING"
+                                 },
+                                 {
+                                 "name": "param5",
+                                 "type": "DATA"
+                                 },
+                                 {
+                                 "name": "param6",
+                                 "type": "MACHIN"
+                                 }
+                                 ],
+                   "reply": {
+                   "name": "MY_REPLY",
+                   "elements": [
+                                {
+                                "name": "param1",
+                                "type": "DOUBLE"
+                                },
+                                {
+                                "name": "param2",
+                                "type": "STRING"
+                                }
+                                ]
+                   }
+                   }
+                   ]
+    }
+}
+

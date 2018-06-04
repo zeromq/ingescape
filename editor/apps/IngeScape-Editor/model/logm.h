@@ -17,6 +17,8 @@
 
 #include <QObject>
 #include <I2PropertyHelpers.h>
+#include <model/enums.h>
+
 
 /**
  * @brief The LogM class defines a model of log
@@ -29,7 +31,7 @@ class LogM : public QObject
     I2_QML_PROPERTY_READONLY(QDateTime, logDateTime)
 
     // Type of our log
-    I2_QML_PROPERTY_READONLY(QString, logType)
+    I2_QML_PROPERTY_READONLY(LogTypes::Value, logType)
 
     // Content of our log
     I2_QML_PROPERTY_READONLY(QString, logContent)
@@ -44,7 +46,7 @@ public:
      * @param parent
      */
     explicit LogM(QDateTime logDateTime,
-                  QString logType,
+                  LogTypes::Value logType,
                   QString logContent,
                   QObject *parent = nullptr);
 

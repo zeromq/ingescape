@@ -42,6 +42,12 @@ I2_ENUM(AgentIOPValueTypes, INTEGER = 1, DOUBLE, STRING, BOOL, IMPULSION, DATA, 
 I2_ENUM(AgentIOPValueTypeGroups, NUMBER, STRING, IMPULSION, DATA, MIXED, UNKNOWN)
 
 
+/**
+  * Types of log
+  */
+I2_ENUM(LogTypes, TRACE, DEBUG, INFO, WARNING, ERROR, FATAL)
+
+
 static const QString SEPARATOR_AGENT_NAME_AND_IOP = QString("##");
 static const QString SEPARATOR_IOP_NAME_AND_IOP_VALUE_TYPE = QString("::");
 

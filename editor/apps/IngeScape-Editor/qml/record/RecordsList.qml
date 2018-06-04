@@ -238,6 +238,15 @@ Item {
                     right : parent.right
                 }
 
+                // Playing feedback
+                Rectangle {
+                    anchors {
+                        fill: parent
+                    }
+                    visible: playPauseRecordButton.checked
+                    color : IngeScapeTheme.selectedAgentColor
+                }
+
                 // separator
                 Rectangle {
                     anchors {
@@ -370,6 +379,7 @@ Item {
                             left : parent.left
                             top : parent.top
                             bottom: parent.bottom
+                            bottomMargin: 1
                         }
 
                         width : 6

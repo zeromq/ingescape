@@ -32,12 +32,6 @@ ValuesHistoryController::ValuesHistoryController(IngeScapeModelManager* modelMan
         // Link our list to the list of the model manager
         //
         _filteredValues.setSourceModel(_modelManager->publishedValues());
-
-        // Fill the list with all enum values
-        _allAgentIOPTypes.fillWithAllEnumValues();
-
-        // By default: all types are selected
-        _selectedAgentIOPTypes.fillWithAllEnumValues();
     }
 }
 
@@ -47,36 +41,7 @@ ValuesHistoryController::ValuesHistoryController(IngeScapeModelManager* modelMan
  */
 ValuesHistoryController::~ValuesHistoryController()
 {
-    _selectedAgentIOPTypes.deleteAllItems();
-    _allAgentIOPTypes.deleteAllItems();
-
     _modelManager = NULL;
-}
-
-
-/**
- * @brief Show the values of agent Input/Output/Parameter type
- * @param agentIOPType
- */
-void ValuesHistoryController::showValuesOfAgentIOPType(AgentIOPTypes::Value agentIOPType)
-{
-    _selectedAgentIOPTypes.appendEnumValue(agentIOPType);
-
-    // Update the filters on the list of values
-    _updateFilters();
-}
-
-
-/**
- * @brief Hide the values of agent Input/Output/Parameter type
- * @param agentIOPType
- */
-void ValuesHistoryController::hideValuesOfAgentIOPType(AgentIOPTypes::Value agentIOPType)
-{
-    _selectedAgentIOPTypes.removeEnumValue(agentIOPType);
-
-    // Update the filters on the list of values
-    _updateFilters();
 }
 
 
@@ -211,12 +176,6 @@ void ValuesHistoryController::filterValuesToShowOnlyAgent(QString agentName)
  */
 void ValuesHistoryController::_updateFilters()
 {
-    /*qDebug() << "Display Values for type:";
-    foreach (int iterator, _selectedAgentIOPTypes.toEnumValuesList()) {
-        AgentIOPTypes::Value agentIOPType = static_cast<AgentIOPTypes::Value>(iterator);
-        qDebug() << AgentIOPTypes::staticEnumToString(agentIOPType);
-    }*/
-
     //qDebug() << "All agents" << _allAgentNamesList << "-- selected agents" << _selectedAgentNamesList;
 
     // Update the list of agent names of the filter
