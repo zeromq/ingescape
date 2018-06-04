@@ -59,10 +59,12 @@ public:
       */
     ~IOPValueConditionM();
 
+
     /**
       * @brief Redefinition of action condition copy
       */
     void copyFrom(ActionConditionM* condition);
+
 
     /**
     * @brief Custom setter on set agent
@@ -71,50 +73,53 @@ public:
     */
     void setagent(AgentInMappingVM* agent);
 
+
     /**
       * @brief Initialize the agent connections for the action condition
       */
     void initializeConnections();
+
 
     /**
       * @brief Reset the agent connections for the action condition
       */
     void resetConnections();
 
+
 Q_SIGNALS:
 
 
-public Q_SLOTS:
-
-    /**
-      * @brief Slot on agent inputs/outputs list change
-      */
-    void onInputsOutputsListChange();
-
-    /**
-      * @brief Slot on IsON flag agent change
-      */
-    void onAgentModelIsOnChange(bool isON);
-
 protected Q_SLOTS:
+    /**
+      * @brief Slot called when the models of Inputs/Outputs/Parameters changed of the agent in mapping
+      */
+    void _onModelsOfIOPChanged();
+
+
+    /**
+      * @brief Slot called when the flag "is ON" of an agent changed
+      */
+    void _onAgentModelIsOnChanged(bool isON);
+
+
     /**
      * @brief Called when our agent iop model is destroyed
      * @param sender
      */
     void _onAgentIopModelDestroyed(QObject* sender);
 
-    /**
-      * @brief Slot on agent iop value change
-      */
-    void _onCurrentValueChange(QVariant currentValue);
 
-protected:
+    /**
+      * @brief Slot called when the current value of our agent iop changed
+      */
+    void _onCurrentValueChanged(QVariant currentValue);
+
 
 private:
     /**
     * @brief Update the selected agent iop
     */
-    void updateAgentIOPSelected(AgentIOPM *newAgentIOP);
+    void _updateAgentIOPSelected(AgentIOPM *newAgentIOP);
 
 };
 

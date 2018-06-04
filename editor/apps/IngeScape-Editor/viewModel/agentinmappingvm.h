@@ -146,9 +146,9 @@ Q_SIGNALS:
 
 
     /**
-     * @brief Signal emitted when the models of Inputs and Outputs changed
+     * @brief Signal emitted when the models of Inputs/Outputs/Parameters changed
      */
-    void modelsOfInputsAndOutputsChanged();
+    void modelsOfIOPChanged();
 
 
 public Q_SLOTS:
@@ -181,7 +181,22 @@ public Q_SLOTS:
     OutputVM* getOutputFromId(QString outputId);
 
 
+    /**
+     * @brief Return the list of view models of parameter from the parameter name
+     * @param parameterName
+     */
+    QList<ParameterVM*> getParametersListFromName(QString parameterName);
+
+
+    /**
+     * @brief Return the view model of parameter from the parameter id
+     * @param parameterId
+     */
+    ParameterVM* getParameterFromId(QString parameterId);
+
+
 private Q_SLOTS:
+
     /**
      * @brief Slot when the list of models changed
      */
@@ -263,6 +278,23 @@ private:
     OutputVM* _outputModelRemoved(OutputM* output);
 
 
+
+    /**
+     * @brief A model of parameter has been added
+     * @param parameter
+     * @return
+     */
+    ParameterVM* _parameterModelAdded(AgentIOPM* parameter);
+
+
+    /**
+     * @brief A model of parameter has been removed
+     * @param parameter
+     * @return
+     */
+    ParameterVM* _parameterModelRemoved(AgentIOPM* parameter);
+
+
     /**
      * @brief Update with all models of agents
      */
@@ -282,9 +314,9 @@ private:
 
 
     /**
-     * @brief Update the flag "Is Defined in All Definitions" for each Input/Output
+     * @brief Update the flag "Is Defined in All Definitions" for each Input/Output/Parameter
      */
-    void _updateIsDefinedInAllDefinitionsForEachInputOutput();
+    void _updateIsDefinedInAllDefinitionsForEachIOP();
 
 
     /**
@@ -328,6 +360,12 @@ private:
     // Map from a (unique) output id to a view model of output
     QHash<QString, OutputVM*> _mapFromUniqueIdToOutput;
 
+    // Parameter name as key is not unique (value type can be different)
+    // Map from a parameter name to a list of view models of parameters
+    QHash<QString, QList<ParameterVM*>> _mapFromNameToParametersList;
+
+    // Map from a (unique) parameter id to a view model of parameter
+    QHash<QString, ParameterVM*> _mapFromUniqueIdToParameter;
 };
 
 QML_DECLARE_TYPE(AgentInMappingVM)

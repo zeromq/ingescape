@@ -56,6 +56,7 @@ void ActionEffectM::copyFrom(ActionEffectM* effect)
     }
 }
 
+
 /**
 * @brief Custom setter for agent
 * @param value
@@ -95,5 +96,3 @@ void ActionEffectM::_onAgentDestroyed(QObject* sender)
 
     Q_EMIT askForDestruction();
 }
-
-

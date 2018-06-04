@@ -38,13 +38,13 @@ class ParameterVM : public AgentIOPVM
 public:
     /**
      * @brief Constructor
-     * @param name
-     * @param id
+     * @param parameterName
+     * @param parameterId
      * @param modelM
      * @param parent
      */
-    explicit ParameterVM(QString name,
-                         QString id,
+    explicit ParameterVM(QString parameterName,
+                         QString parameterId,
                          AgentIOPM* modelM,
                          QObject *parent = nullptr);
 

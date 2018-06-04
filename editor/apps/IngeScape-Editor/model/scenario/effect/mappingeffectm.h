@@ -66,7 +66,7 @@ class MappingEffectM: public ActionEffectM
 public:
 
     /**
-     * @brief Default constructor
+     * @brief Constructor
      * @param parent
      */
     explicit MappingEffectM(QObject *parent = 0);
@@ -85,7 +85,7 @@ public:
 
 
     /**
-    * @brief Custom setter on set agent to fill inputs and outputs
+    * @brief Custom setter for property "agent"
     * @param agent
     */
     void setagent(AgentInMappingVM* agent) Q_DECL_OVERRIDE;
@@ -108,7 +108,7 @@ public:
 Q_SIGNALS:
 
 
-public Q_SLOTS:
+protected Q_SLOTS:
 
     /**
      * @brief Called when our "output agent" is destroyed
@@ -116,11 +116,13 @@ public Q_SLOTS:
      */
     void _onOutputAgentDestroyed(QObject* sender);
 
+
     /**
      * @brief Called when our input is destroyed
      * @param sender
      */
     void _onInputDestroyed(QObject* sender);
+
 
     /**
      * @brief Called when our output is destroyed
@@ -128,17 +130,17 @@ public Q_SLOTS:
      */
     void _onOutputDestroyed(QObject* sender);
 
-    /**
-      * @brief Slot on agent inputs/outputs lists change
-      */
-    void _onAgentIOPInputsOutputsListChange();
 
     /**
-      * @brief Slot on output agent inputs/outputs lists change
+      * @brief Slot called when the models of Inputs/Outputs/Parameters changed of the "Input agent (in mapping)"
       */
-    void _onOutputAgentIOPInputsOutputsListChange();
+    void _onModelsOfIOPofInputAgentChanged();
 
-protected:
+
+    /**
+      * @brief Slot called when the models of Inputs/Outputs/Parameters changed of the "Output agent (in mapping)"
+      */
+    void _onModelsOfIOPofOutputAgentChanged();
 
 
 private:
@@ -146,12 +148,13 @@ private:
     /**
     * @brief Update the selected input
     */
-    void updateInputSelected();
+    void _updateInputSelected();
+
 
     /**
     * @brief Update the selected output
     */
-    void updateOutputSelected();
+    void _updateOutputSelected();
 
 
 };

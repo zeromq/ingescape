@@ -99,7 +99,7 @@ bool OutputVM::canLinkWith(PointMapVM* pointMap)
 void OutputVM::_onModelsChanged()
 {
     // Update the first model
-    if (_models.count() > 0) {
+    if (!_models.isEmpty()) {
         setfirstModel(_models.at(0));
     }
     else {
