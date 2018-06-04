@@ -24,23 +24,17 @@
  */
 QString MappingEffectValues::enumToString(int value)
 {
-    QString string = "Mapping Effect Value";
-
     switch (value)
     {
     case MappingEffectValues::MAPPED:
-        string = "MAPPED";
-        break;
+        return tr("MAPPED");
 
     case MappingEffectValues::UNMAPPED:
-        string = "UNMAPPED";
-        break;
+        return tr("UNMAPPED");
 
     default:
-        break;
+        return "";
     }
-
-    return string;
 }
 
 

@@ -24,9 +24,9 @@
 #include "viewModel/agentinmappingvm.h"
 
 /**
-  * Comparison type for an action: SUPERIOR_TO, INFERIOR_TO, DIFFER_TO, ON, OFF
+  * Comparison type for an action
   */
-I2_ENUM_CUSTOM(ActionComparisonValueType, EQUAL_TO, SUPERIOR_TO, INFERIOR_TO, ON, OFF)
+I2_ENUM_CUSTOM(ActionComparisonTypes, EQUAL_TO, SUPERIOR_TO, INFERIOR_TO, ON, OFF)
 
 
 /**
@@ -36,11 +36,11 @@ class ActionConditionM: public QObject
 {
     Q_OBJECT
 
-    // Agent model
+    // Agent
     I2_QML_PROPERTY_CUSTOM_SETTER(AgentInMappingVM*, agent)
 
-    // Effect type
-    I2_QML_PROPERTY(ActionComparisonValueType::Value, comparison)
+    // Comparison
+    I2_QML_PROPERTY(ActionComparisonTypes::Value, comparison)
 
     // Flag indicating if our condition is valid
     I2_QML_PROPERTY(bool, isValid)
@@ -60,21 +60,25 @@ public:
       */
     virtual ~ActionConditionM();
 
+
     /**
     * @brief Copy from another condition model
     * @param condition to copy
     */
     void copyFrom(ActionConditionM* condition);
 
+
     /**
       * @brief Initialize the agent connections for the action condition
       */
     virtual void initializeConnections();
 
+
     /**
       * @brief Reset the agent connections for the action condition
       */
     virtual void resetConnections();
+
 
 Q_SIGNALS:
 
@@ -83,12 +87,14 @@ Q_SIGNALS:
      */
     void askForDestruction();
 
+
 public Q_SLOTS:
 
     /**
       * @brief Slot on IsON flag agent change
       */
     virtual void onAgentModelIsOnChange(bool isON);
+
 
 protected Q_SLOTS:
 
@@ -98,8 +104,8 @@ protected Q_SLOTS:
      */
     void _onAgentDestroyed(QObject* sender);
 
-protected:
 
+protected:
 
 
 };

@@ -84,8 +84,8 @@ protected:
      */
     bool isLessThan(QObject* item1, int indexItem1, QObject* item2, int indexItem2) const Q_DECL_OVERRIDE;
 
-
-
 };
+
+QML_DECLARE_TYPE(ValuesHistorySortFilter)
 
 #endif // VALUESHISTORYSORTFILTER_H

@@ -55,12 +55,14 @@ class AgentsMappingController : public QObject
 
 public:
     /**
-     * @brief Default constructor
+     * @brief Constructor
      * @param modelManager
-     * @param mapping directory path
+     * @param jsonHelper
+     * @param mappingsPath
      * @param parent
      */
     explicit AgentsMappingController(IngeScapeModelManager* modelManager,
+                                     JsonHelper* jsonHelper,
                                      QString mappingsPath,
                                      QObject *parent = nullptr);
 
@@ -221,13 +223,6 @@ public Q_SLOTS:
 
 
     /**
-     * @brief Slot when an identical agent model is added
-     * @param newModel
-     */
-    void onIdenticalAgentModelAdded(AgentM* newModel);
-
-
-    /**
      * @brief Slot when the flag "is Mapping Activated" changed
      * @param isMappingActivated
      */
@@ -351,6 +346,15 @@ private:
      */
     void _overWriteMappingOfAgentModel(AgentM* agentModel, AgentMappingM* temporaryMapping);
 
+
+    /**
+     * @brief Get a random position in the current window
+     * @param randomMax
+     * @return
+     */
+    QPointF _getRandomPosition(double randomMax);
+
+
     /**
      * @brief Open the mapping from JSON file
      * @param mappingFilePath
@@ -369,12 +373,12 @@ private:
     // Manager for the data model of INGESCAPE
     IngeScapeModelManager* _modelManager;
 
+    // Helper to manage JSON files
+    JsonHelper* _jsonHelper;
+
     // Path to the directory containing JSON files to save mappings
     QString _mappingsDirectoryPath;
     QString _mappingsDefaultFilePath;
-
-    // Helper to manage JSON files loading and saving
-    JsonHelper* _jsonHelper;
 
     // Map from agent name to the (view model of) agent in mapping
     QHash<QString, AgentInMappingVM*> _mapFromNameToAgentInMapping;

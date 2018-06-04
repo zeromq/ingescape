@@ -39,7 +39,7 @@ IOPValueConditionM::IOPValueConditionM(QObject *parent) : ActionConditionM(paren
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
     // Initialize value comparison type
-    setcomparison(ActionComparisonValueType::EQUAL_TO);
+    setcomparison(ActionComparisonTypes::EQUAL_TO);
 }
 
 
@@ -280,17 +280,17 @@ void IOPValueConditionM::_onCurrentValueChange(QVariant currentValue)
 
                 switch(_comparison)
                 {
-                    case ActionComparisonValueType::INFERIOR_TO :
+                    case ActionComparisonTypes::INFERIOR_TO :
                     {
                         isValid = (((double)currentValueDblValue < (double)conditionDblValue)? true : false);
                         break;
                     }
-                    case ActionComparisonValueType::SUPERIOR_TO :
+                    case ActionComparisonTypes::SUPERIOR_TO :
                     {
                         isValid = (((double)currentValueDblValue > (double)conditionDblValue) ? true : false);
                         break;
                     }
-                    case ActionComparisonValueType::EQUAL_TO :
+                    case ActionComparisonTypes::EQUAL_TO :
                     {
                         isValid = qFuzzyCompare(conditionDblValue,currentValueDblValue);
                         break;
@@ -308,17 +308,17 @@ void IOPValueConditionM::_onCurrentValueChange(QVariant currentValue)
             {
                 switch(_comparison)
                 {
-                    case ActionComparisonValueType::INFERIOR_TO :
+                    case ActionComparisonTypes::INFERIOR_TO :
                     {
                         isValid = currentValue.toString().compare(valueTrimmed) < 0 ? true : false;
                         break;
                     }
-                    case ActionComparisonValueType::SUPERIOR_TO :
+                    case ActionComparisonTypes::SUPERIOR_TO :
                     {
                         isValid = currentValue.toString().compare(valueTrimmed) > 0 ? true : false;
                         break;
                     }
-                    case ActionComparisonValueType::EQUAL_TO :
+                    case ActionComparisonTypes::EQUAL_TO :
                     {
                         isValid = currentValue.toString().compare(valueTrimmed) == 0 ? true : false;
                         break;
@@ -339,17 +339,17 @@ void IOPValueConditionM::_onCurrentValueChange(QVariant currentValue)
                 }
                 switch(_comparison)
                 {
-                    case ActionComparisonValueType::INFERIOR_TO :
+                    case ActionComparisonTypes::INFERIOR_TO :
                     {
                         isValid = currentValue.toBool() < conditionBoolValue ? true : false;
                         break;
                     }
-                    case ActionComparisonValueType::SUPERIOR_TO :
+                    case ActionComparisonTypes::SUPERIOR_TO :
                     {
                         isValid = currentValue.toBool() > conditionBoolValue ? true : false;
                         break;
                     }
-                    case ActionComparisonValueType::EQUAL_TO :
+                    case ActionComparisonTypes::EQUAL_TO :
                     {
                         isValid = currentValue.toBool() == conditionBoolValue ? true : false;
                         break;

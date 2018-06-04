@@ -115,7 +115,7 @@ void ActionEditorController::createNewCondition()
     _editedAction->addConditionToList(conditionVM);
 
     // Set condition VM type
-    conditionVM->setconditionType(ActionConditionType::VALUE);
+    conditionVM->setconditionType(ActionConditionTypes::VALUE);
 }
 
 /**

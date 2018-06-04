@@ -23,7 +23,7 @@ else
 endif
 STARGET_LIB = libingescape.a
 
-SRCS = definition.c mapping.c model.c network.c parser.c admin.c bus.c
+SRCS = definition.c mapping.c model.c network.c parser.c admin.c bus.c token.c
 OBJS = $(SRCS:.c=.o)
 
 .PHONY: all

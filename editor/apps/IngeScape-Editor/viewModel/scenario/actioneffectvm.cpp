@@ -17,32 +17,26 @@
 #include <QDebug>
 
 /**
- * @brief Action effect type
+ * @brief Enum "ActionEffectTypes" to string
  * @param value
  * @return
  */
 QString ActionEffectTypes::enumToString(int value)
 {
-    QString string = "Action effect type";
-
-    switch (value) {
+    switch (value)
+    {
     case ActionEffectTypes::VALUE:
-        string = "Value";
-        break;
+        return tr("Value");
 
     case ActionEffectTypes::AGENT:
-        string = "Agent";
-        break;
+        return tr("Agent");
 
     case ActionEffectTypes::MAPPING:
-        string = "Mapping";
-        break;
+        return tr("Mapping");
 
     default:
-        break;
+        return "";
     }
-
-    return string;
 }
 
 

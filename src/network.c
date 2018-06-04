@@ -564,7 +564,7 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 }else{
                     sendMappingToAgent(peer, "");
                 }
-                //we also send our frozen and muted states
+                //we also send our frozen and muted states, and other usefull information
                 if (isWholeAgentMuted){
                     zyre_whispers(agentElements->node, peer, "MUTED=1");
                 }
@@ -582,7 +582,19 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                         }
                     }
                 }
-                
+                if (admin_logInStream){
+                    zyre_whispers(agentElements->node, peer, "LOG_IN_STREAM=1");
+                }
+                if (admin_logInFile && strlen(admin_logFile) > 0){
+                    zyre_whispers(agentElements->node, peer, "LOG_IN_FILE=1");
+                    zyre_whispers(agentElements->node, peer, "LOG_FILE_PATH=%s", admin_logFile);
+                }
+                if (strlen(definitionPath) > 0){
+                    zyre_whispers(agentElements->node, peer, "DEFINITION_FILE_PATH=%s", definitionPath);
+                }
+                if (strlen(mappingPath) > 0){
+                    zyre_whispers(agentElements->node, peer, "MAPPING_FILE_PATH=%s", mappingPath);
+                }
                 
                 zyreAgent_t *zagent = NULL;
                 HASH_FIND_STR(zyreAgents, peer, zagent);
@@ -930,6 +942,29 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     igs_info("received SAVE_MAPPING_TO_PATH command from %s (%s)", name, peer);
                     igs_writeMappingToPath();
                 }
+                //TOKENS
+                else if (strcmp (message, "TOKEN") == 0){
+                    char *tokenName = zmsg_popstr(msgDuplicate);
+                    igs_token_t *token = NULL;
+                    if (igs_internal_definition != NULL && igs_internal_definition->tokens_table != NULL){
+                        HASH_FIND_STR(igs_internal_definition->tokens_table, tokenName, token);
+                        if (token != NULL ){
+                            if (token->cb != NULL){
+                                size_t nbArgs = 0;
+                                igs_tokenArgument_t *arg = NULL;
+                                LL_COUNT(token->arguments, arg, nbArgs);
+                                if (token_addValuesToArgumentsFromMessage(tokenName, token->arguments, msgDuplicate)){
+                                    (token->cb)(name, peer, tokenName, token->arguments, nbArgs, token->cbData);
+                                    token_freeValuesInArguments(token->arguments);
+                                }
+                            }else{
+                                igs_warn("no defined callback to handle received token %s", tokenName);
+                            }
+                        }else{
+                            igs_warn("agent %s has no token named %s", name, tokenName);
+                        }
+                    }
+                }
             }
             free(message);
         } else if (streq (event, "EXIT")){
@@ -1033,7 +1068,7 @@ initLoop (zsock_t *pipe, void *args){
 
     bool canContinue = true;
     //prepare zyre
-    agentElements->node = zyre_new (agentName);
+    zyre_t *node =  agentElements->node = zyre_new (agentName);
     if (strlen(agentElements->brokerEndPoint) > 0){
         zyre_gossip_connect(agentElements->node,
                             "%s", agentElements->brokerEndPoint);
@@ -1067,7 +1102,7 @@ initLoop (zsock_t *pipe, void *args){
     }else{
         sprintf(endpoint, "tcp://%s:%d", agentElements->ipAddress, network_publishingPort);
     }
-    agentElements->publisher = zsock_new_pub(endpoint);
+    zsock_t *publisher = agentElements->publisher = zsock_new_pub(endpoint);
     if (agentElements->publisher == NULL){
         igs_error("Could not create publishing socket : Agent will interrupt immediately.");
         canContinue = false;
@@ -1081,9 +1116,10 @@ initLoop (zsock_t *pipe, void *args){
     }
     
     //start logger stream if needed
+    zsock_t *logger = NULL;
     if (admin_logInStream){
         sprintf(endpoint, "tcp://%s:*", agentElements->ipAddress);
-        agentElements->logger = zsock_new_pub(endpoint);
+        logger = agentElements->logger = zsock_new_pub(endpoint);
         strncpy(endpoint, zsock_endpoint(agentElements->logger), 256);
         char *insert = endpoint + strlen(endpoint) - 1;
         while (*insert != ':' && insert > endpoint) {
@@ -1232,13 +1268,14 @@ initLoop (zsock_t *pipe, void *args){
     HASH_ITER(hh, subscribers, s, tmps) {
         network_cleanAndFreeSubscriber(s);
     }
-    zyre_stop (agentElements->node);
+    zyre_stop (node);
     zclock_sleep (100);
-    zyre_destroy (&agentElements->node);
-    zsock_destroy(&agentElements->publisher);
-    if (agentElements->logger != NULL){
-        zsock_destroy(&agentElements->logger);
+    zyre_destroy (&node);
+    zsock_destroy(&publisher);
+    if (logger != NULL){
+        zsock_destroy(&logger);
     }
+    
     zloop_destroy (&loop);
     assert (loop == NULL);
     //call registered interruption callbacks

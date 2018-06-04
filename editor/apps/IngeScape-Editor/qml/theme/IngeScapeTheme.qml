@@ -76,17 +76,17 @@ Item {
     readonly property color darkRedColor:"#7A110E"
 
     readonly property color darkBlueGreyColor: "#3C424F"
-    readonly property color blueGreyColor2: "#434a58"
+    readonly property color blueGreyColor2: "#434B57"
     readonly property color blueGreyColor : "#525A66"
 
-    readonly property color lightBlueGreyColor: "#8896AA"
+    readonly property color lightBlueGreyColor: "#8895AA"
 
     readonly property color veryDarkGreyColor: "#282D34"
     readonly property color darkGreyColor2: "#2B3137"
-    readonly property color darkGreyColor : "#575756"
-    readonly property color greyColor : "#706f6f"
+    readonly property color darkGreyColor : "#575757"
+    readonly property color greyColor : "#6F6F6F"
     readonly property color greyColor2 : "#878787"
-    readonly property color lightGreyColor : "#9D9C9C"
+    readonly property color lightGreyColor : "#9C9C9C"
     readonly property color veryLightGreyColor : "#ECECEC"
 
     readonly property color orangeColor: "#F07F0A"
@@ -268,51 +268,80 @@ Item {
     readonly property color agentsMappingLinkPressColor: "firebrick"
 
 
-    // links colors
-//    readonly property color orangeColor2 : "#e37724"
-//    readonly property color darkOrangeColor2 : "#53382c"
+    // Input/Output type colors
+    readonly property color yellowColor : "#ECB52E" // "#FFEE0B"
+    readonly property color darkYellowColor : "#936F20"
 
-//    readonly property color redColor2 : "#cf4f56"
-//    readonly property color darkRedColor2 : "#4d3033"
+    readonly property color redColor2 : "#E33E36" //"#E02424"
+    readonly property color darkRedColor2 :  "#672B28"
 
-//    readonly property color purpleColor : "#8e71b0"
-//    readonly property color darkPurpleColor : "#3b3649"
+    readonly property color purpleColor : "#854D97"
+    readonly property color darkPurpleColor : "#483059"
 
-//    readonly property color greenColor : "#14b2ad"
-//    readonly property color darkGreenColor : "#214848"
-
-        readonly property color yellowColor : "#ECB52E" // "#FFEE0B"
-        readonly property color darkYellowColor : "#936F20"
-
-        readonly property color redColor2 : "#E33E36" //"#E02424"
-        readonly property color darkRedColor2 :  "#672B28"
-
-        readonly property color purpleColor : "#854D97"
-        readonly property color darkPurpleColor : "#483059"
-
-        readonly property color greenColor : "#00AE8B"
-        readonly property color darkGreenColor : "#1E564F"
+    readonly property color greenColor : "#00AE8B"
+    readonly property color darkGreenColor : "#1E564F"
 
 
     function colorOfIOPTypeWithConditions(iOPType, conditions) {
         switch (iOPType)
         {
         case 0: //AgentIOPValueTypeGroups.NUMBER:
-            return (conditions === true)? theme.yellowColor : theme.darkYellowColor
+            return (conditions === true) ? theme.yellowColor : theme.darkYellowColor
+
         case 1 : //AgentIOPValueTypeGroups.STRING:
-            return (conditions === true)? theme.greenColor : theme.darkGreenColor
+            return (conditions === true) ? theme.greenColor : theme.darkGreenColor
+
         case 2 : //AgentIOPValueTypeGroups.IMPULSION:
-           return (conditions === true)? theme.purpleColor : theme.darkPurpleColor
+           return (conditions === true) ? theme.purpleColor : theme.darkPurpleColor
+
         case 3 :  //AgentIOPValueTypeGroups.DATA:
-            return (conditions === true)? theme.redColor2 : theme.darkRedColor2
+            return (conditions === true) ? theme.redColor2 : theme.darkRedColor2
+
         case 4 : //AgentIOPValueTypeGroups.MIXED:
-            return (conditions === true)? theme.whiteColor : theme.darkGreyColor
+            return (conditions === true) ? theme.whiteColor : theme.darkGreyColor
+
         case 5 : //AgentIOPValueTypeGroups.UNKNOWN:
             return "#000000";
+
         default:
             return "#000000";
         }
     }
+
+
+    function colorOfLogType(logType)
+    {
+        switch (logType)
+        {
+        case 0: //LogTypes.TRACE:
+            // Light Blue
+            return "#ADD8E6";
+
+        case 1: //LogTypes.DEBUG:
+            // Cyan
+            return "#00FFFF";
+
+        case 2: //LogTypes.INFO:
+            // Green
+            return "#00FF00";
+
+        case 3: //LogTypes.WARNING:
+            // Yellow
+            return "#FFFF00";
+
+        case 4: //LogTypes.ERROR:
+            // Red
+            return "#FF0000";
+
+        case 5: //LogTypes.FATAL:
+            // Magenta
+            return "#FF00FF";
+
+        default:
+            return "#FFFFFF";
+        }
+    }
+
 
     //
     // Agents

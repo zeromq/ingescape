@@ -47,22 +47,22 @@ class ScenarioController: public QObject
 {
     Q_OBJECT
 
-    // Filtered Sorted list of actions
+    // List of actions
     I2_QOBJECT_LISTMODEL(ActionM, actionsList)
 
-    // Sorted list of ations by start time
+    // Opened actions editors
     I2_QOBJECT_LISTMODEL(ActionEditorController, openedActionsEditorsControllers)
 
     // Selected action
     I2_QML_PROPERTY_DELETE_PROOF(ActionM*, selectedAction)
 
     // Used for action edition
-    // --- List of comparisons values types
-    I2_ENUM_LISTMODEL(ActionComparisonValueType, comparisonsValuesTypesList)
-    // --- List of comparisons state types
-    I2_ENUM_LISTMODEL(ActionComparisonValueType, comparisonsAgentsTypesList)
+    // --- List of types of comparisons on values
+    I2_ENUM_LISTMODEL(ActionComparisonTypes, comparisonsValuesTypesList)
+    // --- List of types of comparisons on agent state
+    I2_ENUM_LISTMODEL(ActionComparisonTypes, comparisonsAgentsTypesList)
     // --- List of validity duration type
-    I2_ENUM_LISTMODEL(ValidationDurationType, validationDurationsTypesList)
+    I2_ENUM_LISTMODEL(ValidationDurationTypes, validationDurationsTypesList)
 
     // --- List of values about effect on agent
     I2_ENUM_LISTMODEL(AgentEffectValues, agentEffectValuesList)
@@ -70,13 +70,12 @@ class ScenarioController: public QObject
     I2_ENUM_LISTMODEL(MappingEffectValues, mappingEffectValuesList)
 
     // --- List of conditions type
-    I2_ENUM_LISTMODEL(ActionConditionType, conditionsTypesList)
+    I2_ENUM_LISTMODEL(ActionConditionTypes, conditionsTypesList)
     // --- List of effects type
     I2_ENUM_LISTMODEL(ActionEffectTypes, effectsTypesList)
 
     // --- agents list in mapping
     I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(AgentInMappingVM, agentsInMappingList)
-
 
     // List of actions in palette
     I2_QOBJECT_LISTMODEL(ActionInPaletteVM, actionsInPaletteList)
@@ -90,23 +89,23 @@ class ScenarioController: public QObject
     // Selected action VM in timeline
     I2_QML_PROPERTY_DELETE_PROOF(ActionVM*, selectedActionVMInTimeline)
 
-    // Number of line in our timeline
+    // Number of lines in our timeline
     I2_QML_PROPERTY(int, linesNumberInTimeLine)
 
-    // Is playing scenario flag
+    // Flag indicating if our scenario is currently playing
     I2_QML_PROPERTY_CUSTOM_SETTER(bool, isPlaying)
 
     // Current time (from the beginning of our scenario)
     I2_QML_PROPERTY(QTime, currentTime)
 
-    // List of actionsVM to evaluate each timeout of our timer linked to our scenario
-    I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(ActionVM, actionsVMToEvaluateVMList)
+    // List of (future) actions to evaluate at each timeout of our timer
+    I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(ActionVM, listOfActionsToEvaluate)
 
-    // List of activated actionsVM
-    I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(ActionVM, activeActionsVMList)
+    // List of active actions (the current time is between start time and end time of these actions)
+    I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(ActionVM, listOfActiveActions)
 
-    // Next action view model to active
-    I2_QML_PROPERTY(ActionVM*, nextActionVMToActive)
+    // Next action view model to activate
+    I2_QML_PROPERTY(ActionVM*, nextActionToActivate)
 
 
 public:
@@ -114,10 +113,12 @@ public:
     /**
      * @brief Constructor
      * @param modelManager
-     * @param scenariosPath Path of files with scenarios
+     * @param jsonHelper
+     * @param scenariosPath
      * @param parent
      */
     explicit ScenarioController(IngeScapeModelManager* modelManager,
+                                JsonHelper* jsonHelper,
                                 QString scenariosPath,
                                 QObject *parent = 0);
 
@@ -126,6 +127,7 @@ public:
       * @brief Destructor
       */
     ~ScenarioController();
+
 
     /**
     * @brief Get our filtered list of "time ticks"
@@ -136,11 +138,13 @@ public:
         return &_filteredListActionsInTimeLine;
     }
 
+
     /**
       * @brief Import the scenario lists structure from the json byte content
-      * @param byte array content
+      * @param byteArrayOfJson
       */
     void importScenarioFromJson(QByteArray byteArrayOfJson);
+
 
     /**
       * @brief Check if an agent is defined into tha actions (conditions and effects)
@@ -148,35 +152,41 @@ public:
       */
     bool isAgentDefinedInActions(QString agentName);
 
-    /**
-      * @brief Open the action editor
-      * @param action model
-      */
-    Q_INVOKABLE void openActionEditor(ActionM* actionM);
 
     /**
-      * @brief Open the action editor
-      * @param action view model
+      * @brief Open the action editor with a model of action
+      * @param action
       */
-    Q_INVOKABLE void openActionEditorFromActionVM(ActionVM* actionVM);
+    Q_INVOKABLE void openActionEditorWithModel(ActionM* action);
+
+
+    /**
+      * @brief Open the action editor with a view model of action
+      * @param action
+      */
+    Q_INVOKABLE void openActionEditorWithViewModel(ActionVM* action);
+
 
     /**
       * @brief Delete an action from the list
-      * @param action model
+      * @param action
       */
-    Q_INVOKABLE void deleteAction(ActionM * actionM);
+    Q_INVOKABLE void deleteAction(ActionM* action);
+
 
     /**
-      * @brief Valide action edition
+      * @brief Validate action edition
       * @param action editor controller
       */
-    Q_INVOKABLE void valideActionEditor(ActionEditorController* actionEditorC);
+    Q_INVOKABLE void validateActionEditor(ActionEditorController* actionEditorC);
+
 
     /**
       * @brief Close action edition
       * @param action editor controller
       */
     Q_INVOKABLE void closeActionEditor(ActionEditorController* actionEditorC);
+
 
     /**
      * @brief Set an action into the palette at index
@@ -185,6 +195,7 @@ public:
      */
     Q_INVOKABLE void setActionInPalette(int index, ActionM* actionM);
 
+
     /**
      * @brief Add an action VM at the time in ms
      * @param action model
@@ -192,11 +203,13 @@ public:
      */
     Q_INVOKABLE void addActionVMAtTime(ActionM* actionM, int timeInMs, int lineNumber = -1);
 
+
     /**
      * @brief Add an action VM at the current date time
      * @param action model
      */
     Q_INVOKABLE void addActionVMAtCurrentTime(ActionM* actionM);
+
 
     /**
      * @brief Remove an action VM from the time line
@@ -204,15 +217,18 @@ public:
      */
     Q_INVOKABLE void removeActionVMFromTimeLine(ActionVM * actionVM);
 
-    /**
-     * @brief Make conditions connections
-     */
-    Q_INVOKABLE void conditionsConnect();
 
     /**
-     * @brief Conditions disconnections
+     * @brief Initialize the connections for conditions of all actions
      */
-    Q_INVOKABLE void conditionsDisconnect();
+    Q_INVOKABLE void initializeConditionsConnectionsOfAllActions();
+
+
+    /**
+     * @brief Reset the connections for conditions of all actions
+     */
+    Q_INVOKABLE void resetConditionsConnectionsOfAllActions();
+
 
     /**
      * @brief Test if an item can be inserted into a line number
@@ -230,16 +246,12 @@ public:
      */
     Q_INVOKABLE void executeEffectsOfAction(ActionM* action);
 
-    /**
-     * @brief Set the current time in milliseconds
-     * @param current time in milliseconds
-     */
-    Q_INVOKABLE void updateCurrentTimeInMs(int currentTimeInMs);
 
     /**
      * @brief Clear the list of actions in the table / palette / timeline
      */
     Q_INVOKABLE void clearScenario();
+
 
     /**
      * @brief Move an actionVM to a start time position in ms and a specific line number
@@ -248,6 +260,7 @@ public:
      * @param line number
      */
     Q_INVOKABLE void moveActionVMAtTimeAndLine(ActionVM* actionVM, int timeInMilliseconds, int lineNumber);
+
 
     /**
      * @brief Can delete an action from the list
@@ -297,33 +310,40 @@ Q_SIGNALS:
      */
     void commandAskedToAgentAboutMappingInput(QStringList peerIdsList, QString command, QString inputName, QString outputAgentName, QString outputName);
 
+
 public Q_SLOTS:
 
     /**
-      * @brief slot on agent added in mapping
+      * @brief Slot called when an agent is added in the mapping
       */
     void onAgentInMappingAdded(AgentInMappingVM* agentAdded);
 
 
     /**
-      * @brief slot on agent removed in mapping
+      * @brief Slot called when an agent is removed from the mapping
       */
     void onAgentInMappingRemoved(AgentInMappingVM* agentRemoved);
 
+
     /**
-      * @brief slot on the action reversion
-      */
+     * @brief Slot called when an action must be reverted
+     * @param actionExecution
+     */
     void onRevertAction(ActionExecutionVM* actionExecution);
 
-    /**
-      * @brief slot on the action rearm
-      */
-    void onRearmAction();
 
     /**
-      * @brief slot on the time line range change
-      */
-    void ontimeRangeChange(int startTimeInMilliseconds, int endTimeInMilliseconds);
+     * @brief Slot called when an action must be rearmed
+     */
+    void onRearmAction();
+
+
+    /**
+     * @brief Slot called when the time line range changed
+     * @param startTimeInMilliseconds
+     * @param endTimeInMilliseconds
+     */
+    void onTimeRangeChanged(int startTimeInMilliseconds, int endTimeInMilliseconds);
 
 
 
@@ -342,10 +362,12 @@ private Q_SLOTS:
 
 
 private :
+
     /**
      * @brief Get a new action name
      */
     QString _buildNewActionName();
+
 
     /**
      * @brief Open the scenario from JSON file
@@ -353,11 +375,13 @@ private :
      */
     void _openScenarioFromFile(QString scenarioFilePath);
 
+
     /**
      * @brief Save the scenario to JSON file
      * @param scenarioFilePath
      */
     void _saveScenarioToFile(QString scenarioFilePath);
+
 
     /**
      * @brief Insert an actionVM into our timeline
@@ -366,12 +390,14 @@ private :
      */
     void _insertActionVMIntoMapByLineNumber(ActionVM* actionVMToInsert, int lineNumberRef);
 
+
     /**
      * @brief Start the scenario by
      *        making connections for the actions conditions
      *        starting the action evaluation timer
      */
     void _startScenario();
+
 
     /**
      * @brief Stop the scenario by
@@ -403,6 +429,7 @@ private :
      */
     void _executeCommandForAgent(AgentInMappingVM* agent, QStringList commandAndParameters);
 
+
     /**
      * @brief Exectute the action with the revert initialization if necessary
      * @param action view model
@@ -411,23 +438,17 @@ private :
      */
     void _executeAction(ActionVM* actionVM, ActionExecutionVM* actionExecution, int currentTimeInMilliSeconds);
 
-    /**
-      * @brief Initialize the action view model at a specific time
-      * @param action view model
-      * @param time when to initialize the action VM
-      */
-    void _initializeActionVMAt(ActionVM * actionVM, int currentTimeInMilliSeconds);
 
-protected:
+private:
 
     // Manager for the data model of INGESCAPE
     IngeScapeModelManager* _modelManager;
 
+    // Helper to manage JSON files
+    JsonHelper* _jsonHelper;
+
     // Path to the directory containing JSON files to save scenarios
     QString _scenariosDirectoryPath;
-
-    // Helper to manage JSON definitions of agents
-    JsonHelper* _jsonHelper;
 
     // Map of actions editors controllers from the actions model
     QHash<ActionM*, ActionEditorController*> _mapActionsEditorControllersFromActionM;
@@ -450,14 +471,14 @@ protected:
     // Timer to regularly delay actions (when their conditions are not valid)
     QTimer _timerToRegularlyDelayActions;
 
-
-private:
-    // Time in milliseconds of our scenario start
-    int _scenarioStartingTimeInMs;
+    // Time of the day in milli-seconds when user starts the scenario, then at the last timeout (of the timer which regularly delay actions)
+    int _timeOfDayInMS_WhenStartScenario_ThenAtLastTimeOut;
 
     // List of actionVM in timeline filtered with a given time range in milliseconds
     AbstractTimeRangeFilter _filteredListActionsInTimeLine;
 
+    // Map from agent name to the (view model of) agent in mapping
+    QHash<QString, AgentInMappingVM*> _mapFromNameToAgentInMapping;
 
 };
 

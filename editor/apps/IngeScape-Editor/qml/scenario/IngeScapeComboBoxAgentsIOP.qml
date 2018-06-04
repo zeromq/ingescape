@@ -150,13 +150,13 @@ Item {
                             IngeScapeTheme.yellowColor
                             break;
                         case AgentIOPValueTypes.STRING:
-                            IngeScapeTheme.redColor2
+                            IngeScapeTheme.greenColor
                             break;
                         case AgentIOPValueTypes.IMPULSION:
                             IngeScapeTheme.purpleColor
                             break;
                         case AgentIOPValueTypes.DATA:
-                            IngeScapeTheme.greenColor
+                            IngeScapeTheme.redColor2
                             break;
                         case AgentIOPValueTypes.MIXED:
                             IngeScapeTheme.whiteColor
@@ -341,13 +341,13 @@ Item {
                                     IngeScapeTheme.yellowColor
                                     break;
                                 case AgentIOPValueTypes.STRING:
-                                    IngeScapeTheme.redColor2
+                                    IngeScapeTheme.greenColor
                                     break;
                                 case AgentIOPValueTypes.IMPULSION:
                                     IngeScapeTheme.purpleColor
                                     break;
                                 case AgentIOPValueTypes.DATA:
-                                    IngeScapeTheme.greenColor
+                                    IngeScapeTheme.redColor2
                                     break;
                                 case AgentIOPValueTypes.MIXED:
                                     IngeScapeTheme.whiteColor

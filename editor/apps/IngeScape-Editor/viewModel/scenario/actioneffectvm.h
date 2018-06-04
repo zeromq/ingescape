@@ -28,7 +28,7 @@
 
 
 /**
-  * Types of Action Effect : AGENT, VALUE, MAPPING
+  * Types of Action Effect
   */
 I2_ENUM_CUSTOM(ActionEffectTypes, VALUE, MAPPING, AGENT)
 

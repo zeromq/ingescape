@@ -12,7 +12,8 @@ SOURCES += \
     $$PWD/../src/network.c \
     $$PWD/../src/parser.c \
     $$PWD/../src/admin.c \
-    $$PWD/../src/bus.c
+    $$PWD/../src/bus.c \
+    $$PWD/../src/token.c
 
 HEADERS += \
     $$PWD/../src/include/uthash/uthash.h \

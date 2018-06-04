@@ -35,6 +35,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _networkDevice(""),
     _ipAddress(""),
     _port(0),
+    _errorMessageWhenConnectionFailed(""),
     _modelManager(NULL),
     _agentsSupervisionC(NULL),
     _agentsMappingC(NULL),
@@ -44,8 +45,9 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _timeLineC(NULL),
     _launcherManager(NULL),
     _terminationSignalWatcher(NULL),
+    _jsonHelper(NULL),
     _platformDirectoryPath(""),
-    _jsonHelper(NULL)
+    _platformDefaultFilePath("")
 {
     qInfo() << "New IngeScape Editor Controller";
 
@@ -118,7 +120,8 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     QDate today = QDate::currentDate();
     _platformDefaultFilePath = QString("%1platform_%2.json").arg(_platformDirectoryPath, today.toString("ddMMyy"));
 
-    // Create the helper to manage JSON definitions of agents
+
+    // Create the helper to manage JSON files
     _jsonHelper = new JsonHelper(this);
 
     //
@@ -126,13 +129,13 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     //
 
     // Create the manager for the data model of INGESCAPE
-    _modelManager = new IngeScapeModelManager(agentsListPath, agentsMappingsPath, dataPath, this);
+    _modelManager = new IngeScapeModelManager(_jsonHelper, agentsListPath, agentsMappingsPath, dataPath, this);
 
     // Create the controller for network communications
     _networkC = new NetworkController(this);
 
     // Create the controller for agents supervision
-    _agentsSupervisionC = new AgentsSupervisionController(_modelManager, this);
+    _agentsSupervisionC = new AgentsSupervisionController(_modelManager, _jsonHelper, this);
 
     // Create the controller for hosts supervision
     _hostsSupervisionC = new HostsSupervisionController(_launcherManager, this);
@@ -141,10 +144,10 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _recordsSupervisionC = new RecordsSupervisionController(_modelManager, this);
 
     // Create the controller for agents mapping
-    _agentsMappingC = new AgentsMappingController(_modelManager, agentsMappingsPath, this);
+    _agentsMappingC = new AgentsMappingController(_modelManager, _jsonHelper, agentsMappingsPath, this);
 
     // Create the controller for scenario management
-    _scenarioC = new ScenarioController(_modelManager, scenariosPath, this);
+    _scenarioC = new ScenarioController(_modelManager, _jsonHelper, scenariosPath, this);
 
     // Create the controller for the history of values
     _valuesHistoryC = new ValuesHistoryController(_modelManager, this);
@@ -170,6 +173,11 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(_networkC, &NetworkController::isFrozenFromAgentUpdated, _modelManager, &IngeScapeModelManager::onIsFrozenFromAgentUpdated);
     connect(_networkC, &NetworkController::isMutedFromOutputOfAgentUpdated, _modelManager, &IngeScapeModelManager::onIsMutedFromOutputOfAgentUpdated);
     connect(_networkC, &NetworkController::agentStateChanged, _modelManager, &IngeScapeModelManager::onAgentStateChanged);
+    connect(_networkC, &NetworkController::agentHasLogInStream, _modelManager, &IngeScapeModelManager::onAgentHasLogInStream);
+    connect(_networkC, &NetworkController::agentHasLogInFile, _modelManager, &IngeScapeModelManager::onAgentHasLogInFile);
+    connect(_networkC, &NetworkController::agentLogFilePath, _modelManager, &IngeScapeModelManager::onAgentLogFilePath);
+    connect(_networkC, &NetworkController::agentDefinitionFilePath, _modelManager, &IngeScapeModelManager::onAgentDefinitionFilePath);
+    connect(_networkC, &NetworkController::agentMappingFilePath, _modelManager, &IngeScapeModelManager::onAgentMappingFilePath);
 
 
     // Connect to signals from the model manager
@@ -179,7 +187,6 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(_modelManager, &IngeScapeModelManager::agentModelCreated, _agentsSupervisionC, &AgentsSupervisionController::onAgentModelCreated);
     connect(_modelManager, &IngeScapeModelManager::agentModelCreated, _hostsSupervisionC, &HostsSupervisionController::onAgentModelCreated);
     connect(_modelManager, &IngeScapeModelManager::agentModelCreated, _recordsSupervisionC, &RecordsSupervisionController::onAgentModelCreated);
-
     connect(_modelManager, &IngeScapeModelManager::agentModelWillBeDeleted, _agentsMappingC, &AgentsMappingController::onAgentModelWillBeDeleted);
     connect(_modelManager, &IngeScapeModelManager::agentModelWillBeDeleted, _hostsSupervisionC, &HostsSupervisionController::onAgentModelWillBeDeleted);
 
@@ -202,8 +209,8 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(_agentsSupervisionC, &AgentsSupervisionController::commandAskedToAgent, _networkC, &NetworkController::onCommandAskedToAgent);
     connect(_agentsSupervisionC, &AgentsSupervisionController::commandAskedToAgentAboutOutput, _networkC, &NetworkController::onCommandAskedToAgentAboutOutput);
     connect(_agentsSupervisionC, &AgentsSupervisionController::identicalAgentModelReplaced, _agentsMappingC, &AgentsMappingController::onIdenticalAgentModelReplaced);
-    connect(_agentsSupervisionC, &AgentsSupervisionController::identicalAgentModelAdded, _agentsMappingC, &AgentsMappingController::onIdenticalAgentModelAdded);
     connect(_agentsSupervisionC, &AgentsSupervisionController::openValuesHistoryOfAgent, _valuesHistoryC, &ValuesHistoryController::filterValuesToShowOnlyAgent);
+    connect(_agentsSupervisionC, &AgentsSupervisionController::openLogStreamOfAgents, this, &IngeScapeEditorController::onOpenLogStreamOfAgents);
 
     // Connect to signals from the ingescape launcher manager
     connect(_launcherManager, &IngeScapeLauncherManager::hostModelCreated, _hostsSupervisionC, &HostsSupervisionController::onHostModelCreated);
@@ -227,7 +234,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(_scenarioC, &ScenarioController::commandAskedToAgentAboutMappingInput, _networkC, &NetworkController::onCommandAskedToAgentAboutMappingInput);
 
     // Connect to signals from the time line time line visible range change to the scenario controller to filter the action view models
-    connect(_timeLineC, &AbstractTimeActionslineScenarioViewController::timeRangeChanged, _scenarioC, &ScenarioController::ontimeRangeChange);
+    connect(_timeLineC, &AbstractTimeActionslineScenarioViewController::timeRangeChanged, _scenarioC, &ScenarioController::onTimeRangeChanged);
 
     // Connect to signals from Record supervision controller
     connect(_recordsSupervisionC, &RecordsSupervisionController::commandAskedToAgent, _networkC, &NetworkController::onCommandAskedToAgent);
@@ -238,10 +245,13 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     // Start our INGESCAPE agent with a network device (or an IP address) and a port
     bool isStarted = _networkC->start(_networkDevice, _ipAddress, _port);
 
-    if (isStarted && (_modelManager != NULL))
+    if (isStarted)
     {
         // Initialize platform from online mapping
         _modelManager->setisMappingActivated(true);
+    }
+    else {
+        seterrorMessageWhenConnectionFailed(tr("Failed to connect with network device %1 on port %2").arg(_networkDevice, QString::number(_port)));
     }
 
 
@@ -271,6 +281,10 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
  */
 IngeScapeEditorController::~IngeScapeEditorController()
 {
+    // Delete all log stream viewers
+    _openedLogStreamControllers.deleteAllItems();
+
+
     //
     // Clean-up our TerminationSignalWatcher first
     //
@@ -366,7 +380,7 @@ IngeScapeEditorController::~IngeScapeEditorController()
     }
 
     // Delete json helper
-    if(_jsonHelper != NULL)
+    if (_jsonHelper != NULL)
     {
         delete _jsonHelper;
         _jsonHelper = NULL;
@@ -394,53 +408,6 @@ QObject* IngeScapeEditorController::qmlSingleton(QQmlEngine* engine, QJSEngine* 
 
 
 /**
- * @brief Close a definition
- * @param definition
- */
-void IngeScapeEditorController::closeDefinition(DefinitionM* definition)
-{
-    if ((definition != NULL) && (_modelManager != NULL))
-    {
-        _modelManager->openedDefinitions()->remove(definition);
-    }
-}
-
-/**
- * @brief Close an action editor
- * @param action editor controller
- */
-void IngeScapeEditorController::closeActionEditor(ActionEditorController* actionEditorC)
-{
-    if (_scenarioC != NULL)
-    {
-        _scenarioC->closeActionEditor(actionEditorC);
-    }
-}
-
-
-/**
- * @brief Method used to force the creation of our singleton from QML
- */
-void IngeScapeEditorController::forceCreation()
-{
-    qDebug() << "Force the creation of our singleton from QML";
-}
-
-
-/**
- * @brief Get the position of the mouse cursor in global screen coordinates
- *
- * @remarks You must use mapToGlobal to convert it to local coordinates
- *
- * @return
- */
-QPointF IngeScapeEditorController::getGlobalMousePosition()
-{
-    return QCursor::pos();
-}
-
-
-/**
  * @brief Open a platform file (actions, palette, timeline actions, mappings)
  */
 void IngeScapeEditorController::openPlatformFromFile()
@@ -453,55 +420,6 @@ void IngeScapeEditorController::openPlatformFromFile()
 
     // Open the platform from JSON file
     _openPlatformFromFile(platformFilePath);
-}
-
-
-/**
- * @brief Open the platform from JSON file
- * @param platformFilePath
- */
-void IngeScapeEditorController::_openPlatformFromFile(QString platformFilePath)
-{
-    if (!platformFilePath.isEmpty() && (_jsonHelper != NULL))
-    {
-        qInfo() << "Open the platform from JSON file" << platformFilePath;
-
-        QFile jsonFile(platformFilePath);
-        if (jsonFile.exists())
-        {
-            if (jsonFile.open(QIODevice::ReadOnly))
-            {
-                QByteArray byteArrayOfJson = jsonFile.readAll();
-                jsonFile.close();
-
-                // Import mapping
-                if(_agentsMappingC != NULL)
-                {
-                    _agentsMappingC->importMappingFromJson(byteArrayOfJson, true);
-                }
-
-                // Import scenario
-                if(_scenarioC != NULL)
-                {
-                    // Clear scenario
-                    _scenarioC->clearScenario();
-
-                    // Import new scenario
-                    _scenarioC->importScenarioFromJson(byteArrayOfJson);
-                }
-
-                // Notify QML to reset view
-                Q_EMIT resetMappindAndTimeLineViews();
-            }
-            else {
-                qCritical() << "Can not open file" << platformFilePath;
-            }
-        }
-        else {
-            qWarning() << "There is no file" << platformFilePath;
-        }
-    }
-
 }
 
 
@@ -531,50 +449,6 @@ void IngeScapeEditorController::savePlatformToDefaultFile()
     if (!_platformDefaultFilePath.isEmpty()) {
         // Save the platform to JSON file
         _savePlatformToFile(_platformDefaultFilePath);
-    }
-}
-
-/**
- * @brief Save the platform to JSON file
- * @param platformFilePath
- */
-void IngeScapeEditorController::_savePlatformToFile(QString platformFilePath)
-{
-    if (!platformFilePath.isEmpty() && (_jsonHelper != NULL))
-    {
-        qInfo() << "Save the scenario to JSON file" << platformFilePath;
-
-        QJsonObject platformJsonObject;
-
-        // Save the scenario
-        if(_scenarioC != NULL)
-        {
-            platformJsonObject = _jsonHelper->exportScenario(_scenarioC->actionsList()->toList(),_scenarioC->actionsInPaletteList()->toList(),_scenarioC->actionsInTimeLine()->toList());
-        }
-
-        // Save mapping
-        if(_agentsMappingC != NULL)
-        {
-            QJsonArray jsonArray = _jsonHelper->exportAllAgentsInMapping(_agentsMappingC->allAgentsInMapping()->toList());
-
-            if(jsonArray.count() > 0)
-            {
-                platformJsonObject.insert("mappings",jsonArray);
-            }
-        }
-
-        // Conversion into byteArray
-        QByteArray byteArrayOfJson = QJsonDocument(platformJsonObject).toJson();
-
-        QFile jsonFile(platformFilePath);
-        if (jsonFile.open(QIODevice::WriteOnly))
-        {
-            jsonFile.write(byteArrayOfJson);
-            jsonFile.close();
-        }
-        else {
-            qCritical() << "Can not open file" << platformFilePath;
-        }
     }
 }
 
@@ -620,28 +494,26 @@ void IngeScapeEditorController::processBeforeClosing()
 
 
 /**
- * @brief Can delete an agent view model from the list function
- *        Check dependencies in the mapping and in the actions (conditions, effects)
- * @param agent to delete
- */
-bool IngeScapeEditorController::canDeleteAgentVMFromList(AgentVM* agent)
+  * @brief Check if we can delete an agent (view model) from the list in supervision
+  *        Check dependencies in the mapping and in the actions (conditions, effects)
+  * @param agentName
+  */
+bool IngeScapeEditorController::canDeleteAgentFromSupervision(QString agentName)
 {
     bool canBeDeleted = true;
 
     // Check if the agent is in the curent mapping
-    if (_agentsMappingC && (agent != NULL))
+    if ((_agentsMappingC != NULL) && !agentName.isEmpty())
     {
-        AgentInMappingVM* agentInMapping = _agentsMappingC->getAgentInMappingFromName(agent->name());
-        if (agentInMapping != NULL)
-        {
+        AgentInMappingVM* agentInMapping = _agentsMappingC->getAgentInMappingFromName(agentName);
+        if (agentInMapping != NULL) {
             canBeDeleted = false;
         }
     }
 
     // Check if the agent is in action condition or effect
-    if (canBeDeleted && (_scenarioC != NULL))
-    {
-        canBeDeleted = !_scenarioC->isAgentDefinedInActions(agent->name());
+    if (canBeDeleted && (_scenarioC != NULL)) {
+        canBeDeleted = !_scenarioC->isAgentDefinedInActions(agentName);
     }
 
     return canBeDeleted;
@@ -649,18 +521,17 @@ bool IngeScapeEditorController::canDeleteAgentVMFromList(AgentVM* agent)
 
 
 /**
- * @brief Can delete an agent in mapping from the mapping view
+ * @brief Check if we can delete an agent (in mapping) from the mapping view
  *        Check dependencies in the actions (conditions, effects)
- * @param agent in mapping to delete
+ * @param agentName
  */
-bool IngeScapeEditorController::canDeleteAgentInMapping(AgentInMappingVM* agentInMapping)
+bool IngeScapeEditorController::canDeleteAgentInMapping(QString agentName)
 {
     bool canBeDeleted = true;
 
     // Check if the agent is in action condition or effect
-    if (_scenarioC != NULL)
-    {
-        canBeDeleted = !_scenarioC->isAgentDefinedInActions(agentInMapping->name());
+    if (_scenarioC != NULL) {
+        canBeDeleted = !_scenarioC->isAgentDefinedInActions(agentName);
     }
 
     return canBeDeleted;
@@ -677,11 +548,14 @@ bool IngeScapeEditorController::restartNetwork(QString strPort, QString networkD
 {
     bool success = false;
 
+    // Reset the error message
+    seterrorMessageWhenConnectionFailed("");
+
     if ((_networkC != NULL) && (_modelManager != NULL))
     {
         bool isInt = false;
         int nPort = strPort.toInt(&isInt);
-        if (isInt)
+        if (isInt && (nPort > 0))
         {
             // Port and Network device have not changed...
             if ((nPort == _port) && (networkDevice == _networkDevice))
@@ -729,8 +603,221 @@ bool IngeScapeEditorController::restartNetwork(QString strPort, QString networkD
             }
         }
         else {
-            qWarning() << "Port" << strPort << "is not an int !";
+            if (!isInt) {
+                qWarning() << "Port" << strPort << "is not an int !";
+            }
+            else if (nPort <= 0) {
+                qWarning() << "Port" << strPort << "is negative or null !";
+            }
         }
     }
+
+    if (!success) {
+        seterrorMessageWhenConnectionFailed(tr("Failed to connect with network device %1 on port %2").arg(networkDevice, strPort));
+    }
+
     return success;
 }
+
+
+/**
+ * @brief Close a definition
+ * @param definition
+ */
+void IngeScapeEditorController::closeDefinition(DefinitionM* definition)
+{
+    if ((definition != NULL) && (_modelManager != NULL) && _modelManager->openedDefinitions()->contains(definition))
+    {
+        _modelManager->openedDefinitions()->remove(definition);
+    }
+}
+
+
+/**
+ * @brief Close an action editor
+ * @param actionEditorC
+ */
+void IngeScapeEditorController::closeActionEditor(ActionEditorController* actionEditorC)
+{
+    if ((actionEditorC != NULL) && (_scenarioC != NULL)) {
+        _scenarioC->closeActionEditor(actionEditorC);
+    }
+}
+
+
+/**
+ * @brief Close a "Log Stream" controller
+ * @param logStreamC
+ */
+void IngeScapeEditorController::closeLogStreamController(LogStreamController* logStreamC)
+{
+    if (logStreamC != NULL)
+    {
+        // Remove from the list
+        _openedLogStreamControllers.remove(logStreamC);
+
+        // Free memory
+        delete logStreamC;
+    }
+}
+
+
+/**
+ * @brief Method used to force the creation of our singleton from QML
+ */
+void IngeScapeEditorController::forceCreation()
+{
+    qDebug() << "Force the creation of our singleton from QML";
+}
+
+
+/**
+ * @brief Get the position of the mouse cursor in global screen coordinates
+ *
+ * @remarks You must use mapToGlobal to convert it to local coordinates
+ *
+ * @return
+ */
+QPointF IngeScapeEditorController::getGlobalMousePosition()
+{
+    return QCursor::pos();
+}
+
+
+/**
+ * @brief Slot called when we have to open the "Log Stream" of a list of agents
+ * @param models
+ */
+void IngeScapeEditorController::onOpenLogStreamOfAgents(QList<AgentM*> models)
+{
+    if (!models.isEmpty())
+    {
+        for (AgentM* model : models)
+        {
+            if ((model != NULL) && model->isON())
+            {
+                QString subscriberAddress = QString("tcp://%1:%2").arg(model->address(), model->loggerPort());
+
+                qDebug() << "Open the 'Log Stream' of" << model->name() << "(Address:" << model->address() << "+ Logger Port:" << model->loggerPort() << "--> Subscriber Address:" << subscriberAddress << ")";
+
+                LogStreamController* logStreamController = NULL;
+
+                for (LogStreamController* iterator : _openedLogStreamControllers.toList())
+                {
+                    if ((iterator != NULL) && (iterator->agentName() == model->name()) && (iterator->subscriberAddress() == subscriberAddress))
+                    {
+                        logStreamController = iterator;
+                    }
+                }
+
+                if (logStreamController != NULL)
+                {
+                    qDebug() << "The 'Log Stream' for" << logStreamController->agentName() << "on" << logStreamController->subscriberAddress() << "already exists !";
+                }
+                else
+                {
+                    // Create a new "Log Stream" controller
+                    LogStreamController* logStreamController = new LogStreamController(model->name(), model->hostname(), subscriberAddress, this);
+
+                    _openedLogStreamControllers.append(logStreamController);
+                }
+            }
+        }
+    }
+}
+
+
+/**
+ * @brief Open the platform from JSON file
+ * @param platformFilePath
+ */
+void IngeScapeEditorController::_openPlatformFromFile(QString platformFilePath)
+{
+    if (!platformFilePath.isEmpty())
+    {
+        qInfo() << "Open the platform from JSON file" << platformFilePath;
+
+        QFile jsonFile(platformFilePath);
+        if (jsonFile.exists())
+        {
+            if (jsonFile.open(QIODevice::ReadOnly))
+            {
+                QByteArray byteArrayOfJson = jsonFile.readAll();
+                jsonFile.close();
+
+                // Import mapping
+                if(_agentsMappingC != NULL)
+                {
+                    _agentsMappingC->importMappingFromJson(byteArrayOfJson, true);
+                }
+
+                // Import scenario
+                if(_scenarioC != NULL)
+                {
+                    // Clear scenario
+                    _scenarioC->clearScenario();
+
+                    // Import new scenario
+                    _scenarioC->importScenarioFromJson(byteArrayOfJson);
+                }
+
+                // Notify QML to reset view
+                Q_EMIT resetMappindAndTimeLineViews();
+            }
+            else {
+                qCritical() << "Can not open file" << platformFilePath;
+            }
+        }
+        else {
+            qWarning() << "There is no file" << platformFilePath;
+        }
+    }
+}
+
+
+/**
+ * @brief Save the platform to JSON file
+ * @param platformFilePath
+ */
+void IngeScapeEditorController::_savePlatformToFile(QString platformFilePath)
+{
+    if (!platformFilePath.isEmpty() && (_jsonHelper != NULL))
+    {
+        qInfo() << "Save the scenario to JSON file" << platformFilePath;
+
+        QJsonObject platformJsonObject;
+
+        // Save the scenario
+        if(_scenarioC != NULL)
+        {
+            platformJsonObject = _jsonHelper->exportScenario(_scenarioC->actionsList()->toList(), _scenarioC->actionsInPaletteList()->toList(), _scenarioC->actionsInTimeLine()->toList());
+        }
+
+        // Save mapping
+        if(_agentsMappingC != NULL)
+        {
+            QJsonArray jsonArray = _jsonHelper->exportAllAgentsInMapping(_agentsMappingC->allAgentsInMapping()->toList());
+
+            if(jsonArray.count() > 0)
+            {
+                platformJsonObject.insert("mappings",jsonArray);
+            }
+        }
+
+        // Conversion into byteArray
+        QByteArray byteArrayOfJson = QJsonDocument(platformJsonObject).toJson();
+
+        QFile jsonFile(platformFilePath);
+        if (jsonFile.open(QIODevice::WriteOnly))
+        {
+            jsonFile.write(byteArrayOfJson);
+            jsonFile.close();
+        }
+        else {
+            qCritical() << "Can not open file" << platformFilePath;
+        }
+    }
+}
+
+
+

@@ -131,57 +131,6 @@ Window {
         color: IngeScapeTheme.editorsBackgroundColor
 
 
-        //        // catch events
-        //        MultiPointTouchArea {
-        //            anchors.fill: parent
-        //        }
-
-        //        // drag Area
-        //        I2CustomRectangle {
-        //            id : dragRect
-        //            anchors {
-        //                top : parent.top
-        //                left : parent.left
-        //                right : parent.right
-        //                margins : 2
-        //            }
-        //            height : 50
-        //            topLeftRadius : 5
-        //            topRightRadius : 5
-
-        //            color :dragMouseArea.pressed? IngeScapeTheme.editorsBackgroundColor : IngeScapeTheme.darkBlueGreyColor
-
-        //            MouseArea {
-        //                id : dragMouseArea
-        //                hoverEnabled: true
-        //                anchors.fill: parent
-        //                drag.target: rootItem
-
-        //                drag.minimumX : - rootItem.width/2
-        //                drag.maximumX : rootItem.parent.width - rootItem.width/2
-        //                drag.minimumY :  0
-        //                drag.maximumY :  rootItem.parent.height - rootItem.height/2
-
-        //                onPressed: {
-        //                    // Emit signal "bring to front"
-        //                    rootItem.bringToFront();
-        //                }
-        //            }
-        //        }
-
-        // separator
-        //        Rectangle {
-        //            anchors {
-        //                top : parent.top
-        //                topMargin: 50
-        //                left : parent.left
-        //                right : parent.right
-        //            }
-        //            height : 1
-        //            color : IngeScapeTheme.editorsBackgroundBorderColor
-        //        }
-
-
 
         Button {
             id: btnClose
@@ -233,7 +182,7 @@ Window {
 
                 text : "Outputs history"
                 elide: Text.ElideRight
-                color: IngeScapeTheme.definitionEditorsLabelColor
+                color: IngeScapeTheme.whiteColor
                 font {
                     family: IngeScapeTheme.textFontFamily
                     pixelSize: 23
@@ -440,8 +389,8 @@ Window {
 
                             property bool isPartiallyChecked : false
 
-                            checked : false;
-                            partiallyCheckedEnabled : false;
+                            checked: false;
+                            partiallyCheckedEnabled: false;
                             activeFocusOnPress: true;
 
                             style: CheckBoxStyle {
@@ -470,7 +419,7 @@ Window {
                                     color : IngeScapeTheme.veryDarkGreyColor
 
                                     I2SvgItem {
-                                        visible : control.checkedState === Qt.Checked
+                                        visible: (control.checkedState === Qt.Checked)
                                         anchors.centerIn: parent
 
                                         svgFileCache : IngeScapeTheme.svgFileINGESCAPE;
@@ -518,15 +467,21 @@ Window {
 
                             Connections {
                                 target : popup
+
                                 onOpened : {
                                     // update "all agents" checkbox state
                                     // reset isPartiallyChecked and checkedState properties
-                                    filterAllAgentCB.isPartiallyChecked =  false;
-                                    filterAllAgentCB.checkedState =  Qt.Unchecked;
-                                    if (rootItem.controller && rootItem.controller.selectedAgentNamesList.length>0) {
-                                        (rootItem.controller.selectedAgentNamesList.length === rootItem.controller.allAgentNamesList.length)?
-                                                    filterAllAgentCB.checkedState =  Qt.Checked
-                                                  :  filterAllAgentCB.isPartiallyChecked =  true;
+                                    filterAllAgentCB.isPartiallyChecked = false;
+                                    filterAllAgentCB.checkedState = Qt.Unchecked;
+
+                                    if (rootItem.controller && (rootItem.controller.selectedAgentNamesList.length > 0))
+                                    {
+                                        if (rootItem.controller.selectedAgentNamesList.length === rootItem.controller.allAgentNamesList.length) {
+                                            filterAllAgentCB.checkedState = Qt.Checked;
+                                        }
+                                        else {
+                                            filterAllAgentCB.isPartiallyChecked = true;
+                                        }
                                     }
                                 }
                             }
@@ -597,7 +552,7 @@ Window {
                                             color : IngeScapeTheme.veryDarkGreyColor
 
                                             I2SvgItem {
-                                                visible : control.checkedState === Qt.Checked
+                                                visible: (control.checkedState === Qt.Checked)
                                                 anchors.centerIn: parent
 
                                                 svgFileCache : IngeScapeTheme.svgFileINGESCAPE;
@@ -619,12 +574,17 @@ Window {
 
                                             // update "all agents" checkbox state
                                             // reset isPartiallyChecked and checkedState properties
-                                            filterAllAgentCB.isPartiallyChecked =  false;
-                                            filterAllAgentCB.checkedState =  Qt.Unchecked;
-                                            if (rootItem.controller && rootItem.controller.selectedAgentNamesList.length>0) {
-                                                (rootItem.controller.selectedAgentNamesList.length === rootItem.controller.allAgentNamesList.length)?
-                                                            filterAllAgentCB.checkedState =  Qt.Checked
-                                                          :  filterAllAgentCB.isPartiallyChecked =  true;
+                                            filterAllAgentCB.isPartiallyChecked = false;
+                                            filterAllAgentCB.checkedState = Qt.Unchecked;
+
+                                            if (rootItem.controller && (rootItem.controller.selectedAgentNamesList.length > 0))
+                                            {
+                                                if (rootItem.controller.selectedAgentNamesList.length === rootItem.controller.allAgentNamesList.length) {
+                                                    filterAllAgentCB.checkedState = Qt.Checked;
+                                                }
+                                                else {
+                                                    filterAllAgentCB.isPartiallyChecked = true;
+                                                }
                                             }
                                         }
                                     }
@@ -706,7 +666,7 @@ Window {
 
                             text : modelData
 
-                            color : IngeScapeTheme.definitionEditorsAgentDescriptionColor
+                            color : IngeScapeTheme.lightGreyColor
                             font {
                                 family: IngeScapeTheme.textFontFamily
                                 pixelSize : 16
@@ -916,7 +876,6 @@ Window {
             height : boundingBox.height
             width :  boundingBox.width
 
-            enabled : visible
             activeFocusOnPress: true
             text : "OK"
 
@@ -932,7 +891,7 @@ Window {
 
                 pressedID: releasedID + "-pressed"
                 releasedID: "button"
-                disabledID : releasedID
+                disabledID: releasedID + "-disabled"
 
                 font {
                     family: IngeScapeTheme.textFontFamily

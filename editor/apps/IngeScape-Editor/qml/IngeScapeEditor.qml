@@ -74,6 +74,16 @@ Item {
     }
 
 
+    // When the QML is loaded, we check the value of the error message when a connection attempt fails
+    Component.onCompleted: {
+        if (IngeScapeEditorC.errorMessageWhenConnectionFailed !== "")
+        {
+            //console.error("On Completed: Error Message = " + IngeScapeEditorC.errorMessageWhenConnectionFailed);
+            networkConfigurationPopup.open();
+        }
+    }
+
+
 
     //--------------------------------------------------------
     //
@@ -315,6 +325,33 @@ Item {
 
                 onClosing: {
                     IngeScapeEditorC.closeActionEditor(model.QtObject);
+                }
+            }
+        }
+    }
+
+
+    //
+    // List of "Log Stream Viewer"
+    //
+    Repeater {
+        model : IngeScapeEditorC.openedLogStreamControllers
+
+        delegate: Item {
+            Agent.LogStreamPanel {
+                id: logStreamPanel
+
+                controller: model.QtObject
+                visible : true
+
+                Component.onCompleted:  {
+                    x = rootItem.Window.window.x + rootItem.Window.width/2 - logStreamPanel.width/2  + (index * 40);
+                    y = rootItem.Window.window.y + rootItem.Window.height/2 - logStreamPanel.height/2 + (index * 40);
+
+                }
+
+                onClosing: {
+                    IngeScapeEditorC.closeLogStreamController(model.QtObject);
                 }
             }
         }

@@ -33,6 +33,9 @@ class PointMapVM : public AgentIOPVM
     // Position the center of the connector (Absolute coordinate)
     I2_QML_PROPERTY(QPointF, position)
 
+    // Flag indicating if our input/output is defined in all definitions
+    I2_QML_PROPERTY_READONLY(bool, isDefinedInAllDefinitions)
+
 
 public:
 

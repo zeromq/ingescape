@@ -20,6 +20,7 @@
 #endif
 
 #include <zyre.h>
+#include "ingescape.h"
 
 #define MAX_STRING_MSG_LENGTH 4096
 
@@ -57,6 +58,89 @@ PUBLIC int igs_busSendZMQMsgToAgent(const char *agentNameOrPeerID, zmsg_t **msg_
 
 PUBLIC void igs_busAddServiceDescription(const char *key, const char *value);
 PUBLIC void igs_busRemoveServiceDescription(const char *key);
+
+//////////////////////////////////////////////////
+//Tokens Model : create, remove, call, react
+/*NOTES:
+ - one and only one mandatory callback per token, set using igs_handleToken : warn if cb missing when loading definition or receiving token
+ - one optional reply per token
+ - reply shall be sent in callabck, using igs_sendToken with sender's UUID or name
+ - token names shall be unique for a given agent
+ */
+
+
+///////////////
+//SENDING TOKENS to other agents
+//token arguments are provided as a chained list
+typedef struct igs_tokenArgument{
+    char *name;
+    iopType_t type;
+    union{
+        bool b;
+        int i;
+        double d;
+        char *c;
+        void *data;
+    };
+    size_t size;
+    struct igs_tokenArgument *next;
+} igs_tokenArgument_t;
+
+
+//arguments management
+void igs_destroyArgumentsList(igs_tokenArgument_t **list);
+void igs_addIntToArgumentsList(igs_tokenArgument_t **list, int value);
+void igs_addBoolToArgumentsList(igs_tokenArgument_t **list, bool value);
+void igs_addDoubleToArgumentsList(igs_tokenArgument_t **list, double value);
+void igs_addStringToArgumentsList(igs_tokenArgument_t **list, char *value);
+void igs_addDataToArgumentsList(igs_tokenArgument_t **list, void *value, size_t size);
+
+//send a token to another agent
+//requires to pass agent name or UUID, token name and a list of arguments
+int igs_sendToken(const char *agentNameOrUUID, const char *tokenName, igs_tokenArgument_t *list);
+
+
+///////////////
+//CREATING TOKENS for our agent
+//callback model to handle tokens received by our agent
+typedef void (*igs_tokenCallback)(const char *senderAgentName, const char *senderAgentUUID,
+                                  const char *tokenName, igs_tokenArgument_t *firstArgument, size_t nbArgs,
+                                  void* myData);
+
+
+//manage tokens supported by our agent
+//Tokens can be created either by code or by loading a definition. The function below will
+//create a token if it does not exist or will attach callback and data if they are
+//stil undefined. Warning: only one callback can be attached to a token (further attempts
+//will be ignored and signaled by an error log).
+PUBLIC int igs_initToken(const char *name, igs_tokenCallback cb, void *myData);
+PUBLIC int igs_removeToken(const char *name);
+PUBLIC int igs_addArgumentToToken(const char *tokenName, const char *argName, iopType_t type);
+PUBLIC int igs_removeArgumentFromToken(const char *tokenName, const char *argName); //removes first occurence with this name
+
+
+//manage optional reply
+//NB: a reply can be seen as a subtoken used to answer to sender upon token reception.
+//PUBLIC int igs_addReplyToToken(const char *tokenName, const char *replyName);
+//PUBLIC int igs_addArgumentToReplyForToken(const char *tokeName, const char *argName, iopType_t type);
+//PUBLIC int igs_removeArgumentFromReplyForToken(const char *tokeName, const char *argName);
+//PUBLIC int igs_removeReplyFromToken(const char *tokenName); //reply elements will be destroyed as well
+
+//introspection for tokens, arguments and replies
+PUBLIC size_t igs_getNumberOfTokens(void);
+PUBLIC bool igs_checkTokenExistence(const char *name);
+PUBLIC char** igs_getTokensList(size_t *nbOfElements); //returned char** shall be freed by caller
+PUBLIC void igs_freeTokensList(char **list, size_t nbOfTokens);
+
+PUBLIC igs_tokenArgument_t* igs_getFirstArgumentForToken(const char *tokenName);
+PUBLIC size_t igs_getNumberOfArgumentsForToken(const char *tokenName);
+PUBLIC bool igs_checkTokenArgumentExistence(const char *tokenName, const char *argName);
+//PUBLIC igs_tokenArgument_t* igs_getFirstArgumentForReplyInToken(const char *tokenName);
+//PUBLIC size_t igs_getNumberOfArgumentsForReplyInToken(const char *tokenName);
+//PUBLIC char* igs_getReplyNameInToken(const char *tokenName); //returned char* must be freed by caller, NULL if no reply
+//PUBLIC bool igs_isReplyAddedForToken(const char *name);
+//PUBLIC bool igs_checkTokenReplyArgumentExistence(const char *tokenName, const char *argName);
+
 
 //security
 //TODO when officially supported in Zyre 2.0.x

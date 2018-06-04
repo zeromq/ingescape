@@ -6,7 +6,7 @@ import I2Quick 1.0
 import INGESCAPE 1.0
 
 I2Combobox {
-    id : root
+    id: root
     height : 22
     width : 115
 

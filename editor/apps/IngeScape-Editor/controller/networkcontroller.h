@@ -86,6 +86,14 @@ public:
     void manageMessageFrozenUnfrozen(QString peerId, QString message);
 
 
+    /**
+     * @brief Return true if the network device is available
+     * @param networkDevice
+     * @return
+     */
+    Q_INVOKABLE bool isAvailableNetworkDevice(QString networkDevice);
+
+
 Q_SIGNALS:
 
     /**
@@ -97,8 +105,10 @@ Q_SIGNALS:
      * @param hostname
      * @param commandLine
      * @param canBeFrozen
+     * @param loggerPort
+     * @param isRecorder
      */
-    void agentEntered(QString peerId, QString peerName, QString peerAddress, int pid, QString hostname, QString commandLine, bool canBeFrozen, bool isRecorder);
+    void agentEntered(QString peerId, QString peerName, QString peerAddress, int pid, QString hostname, QString commandLine, bool canBeFrozen, QString loggerPort, bool isRecorder);
 
 
     /**
@@ -196,6 +206,46 @@ Q_SIGNALS:
      * @param stateName
      */
     void agentStateChanged(QString peerId, QString stateName);
+
+
+    /**
+     * @brief Signal emitted when we receive the flag "Log In Stream" for an agent
+     * @param peerId
+     * @param hasLogInStream
+     */
+    void agentHasLogInStream(QString peerId, bool hasLogInStream);
+
+
+    /**
+     * @brief Signal emitted when we receive the flag "Log In File" for an agent
+     * @param peerId
+     * @param hasLogInStream
+     */
+    void agentHasLogInFile(QString peerId, bool hasLogInFile);
+
+
+    /**
+     * @brief Signal emitted when we receive the path of "Log File" for an agent
+     * @param peerId
+     * @param logFilePath
+     */
+    void agentLogFilePath(QString peerId, QString logFilePath);
+
+
+    /**
+     * @brief Signal emitted when we receive the path of "Definition File" for an agent
+     * @param peerId
+     * @param definitionFilePath
+     */
+    void agentDefinitionFilePath(QString peerId, QString definitionFilePath);
+
+
+    /**
+     * @brief Signal emitted when we receive the path of "Mapping File" for an agent
+     * @param peerId
+     * @param mappingFilePath
+     */
+    void agentMappingFilePath(QString peerId, QString mappingFilePath);
 
 
 public Q_SLOTS:

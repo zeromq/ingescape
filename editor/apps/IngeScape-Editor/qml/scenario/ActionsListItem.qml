@@ -8,7 +8,7 @@ import INGESCAPE 1.0
 import "../theme" as Theme
 
 Item {
-    id : root
+    id: rootItem
 
     //--------------------------------
     //
@@ -72,7 +72,7 @@ Item {
             // Selected Action
             Item {
                 anchors.fill: parent
-                visible : controller && root.action && (controller.selectedAction === root.action);
+                visible : controller && rootItem.action && (controller.selectedAction === rootItem.action);
 
                 Rectangle {
                     anchors {
@@ -105,14 +105,14 @@ Item {
                     }
 
                     onClicked: {
-                        if (controller && root.action)
+                        if (controller && rootItem.action)
                         {
-                            if(controller.canDeleteActionFromList(root.action))
+                            if(controller.canDeleteActionFromList(rootItem.action))
                             {
                                 // Delete our action
-                                controller.deleteAction(root.action);
+                                controller.deleteAction(rootItem.action);
                             } else {
-                                root.needConfirmationtoDeleteAction(root.action);
+                                rootItem.needConfirmationtoDeleteAction(rootItem.action);
                             }
                         }
                     }
@@ -132,7 +132,7 @@ Item {
                 width : 2
 
                 color: IngeScapeTheme.whiteColor
-                visible : root.action && root.action.isValid
+                visible : rootItem.action && rootItem.action.isValid
             }
 
 
@@ -151,9 +151,9 @@ Item {
 
                 hoverEnabled: true
                 onClicked: {
-                    if (controller && root.action) {
+                    if (controller && rootItem.action) {
                         // Open the editor of our action
-                        controller.openActionEditor(root.action);
+                        controller.openActionEditorWithModel(rootItem.action);
                     }
                 }
 
@@ -163,7 +163,7 @@ Item {
                     elideWidth: 220
                     elide: Text.ElideRight
 
-                    text: (root.action)? root.action.name : ""
+                    text: (rootItem.action)? rootItem.action.name : ""
                 }
 
                 // Name

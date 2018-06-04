@@ -87,10 +87,10 @@ void OutputM::setisMutedAllOutputs(bool value)
 void OutputM::changeMuteOutput()
 {
     if (_isMuted) {
-        Q_EMIT commandAsked("UNMUTE", _name);
+        Q_EMIT commandAsked(command_UnmuteAgentOutput, _name);
     }
     else {
-        Q_EMIT commandAsked("MUTE", _name);
+        Q_EMIT commandAsked(command_MuteAgentOutput, _name);
     }
 }
 

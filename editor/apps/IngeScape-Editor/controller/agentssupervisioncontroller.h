@@ -40,11 +40,14 @@ class AgentsSupervisionController : public QObject
 
 public:
     /**
-     * @brief Default constructor
+     * @brief Constructor
      * @param modelManager
+     * @param jsonHelper
      * @param parent
      */
-    explicit AgentsSupervisionController(IngeScapeModelManager* modelManager, QObject *parent = nullptr);
+    explicit AgentsSupervisionController(IngeScapeModelManager* modelManager,
+                                         JsonHelper* jsonHelper,
+                                         QObject *parent = nullptr);
 
 
     /**
@@ -122,18 +125,18 @@ Q_SIGNALS:
 
 
     /**
+     * @brief Signal emitted when we have to open the "Log Stream" of a list of agents
+     * @param models
+     */
+    void openLogStreamOfAgents(QList<AgentM*> models);
+
+
+    /**
      * @brief Signal emitted when a previous agent model is replaced by a new one strictly identical
      * @param previousModel
      * @param newModel
      */
     void identicalAgentModelReplaced(AgentM* previousModel, AgentM* newModel);
-
-
-    /**
-     * @brief Signal emitted when an identical agent model is added
-     * @param newModel
-     */
-    void identicalAgentModelAdded(AgentM* newModel);
 
 
 public Q_SLOTS:
@@ -148,14 +151,60 @@ public Q_SLOTS:
 private Q_SLOTS:
 
     /**
-     * @brief Slot when the definition of a view model of agent changed
+     * @brief Slot called when the definition of a view model of agent changed (with previous and new values)
      * @param previousValue
      * @param newValue
      */
-    void _onAgentDefinitionChangedWithPreviousValue(DefinitionM* previousValue, DefinitionM* newValue);
+    void _onAgentDefinitionChangedWithPreviousAndNewValues(DefinitionM* previousValue, DefinitionM* newValue);
+
+
+    /**
+     * @brief Slot called when a different definition is detected on a model of agent
+     * (compared to the definition of our view model)
+     * @param model
+     */
+    void _onDifferentDefinitionDetectedOnModelOfAgent(AgentM* model);
+
+
+    /**
+     * @brief Slot called when we have to load an agent definition from a JSON file (path)
+     * @param peerIdsList
+     * @param definitionFilePath
+     */
+    void _onLoadAgentDefinitionFromPath(QStringList peerIdsList, QString definitionFilePath);
+
+
+    /**
+     * @brief Slot called when we have to load an agent mapping from a JSON file (path)
+     * @param mappingFilePath
+     */
+    void _onLoadAgentMappingFromPath(QStringList peerIdsList, QString mappingFilePath);
+
+
+    /**
+     * @brief Slot called when we have to download an agent definition to a JSON file (path)
+     * @param agentDefinition
+     * @param definitionFilePath
+     */
+    void _onDownloadAgentDefinitionToPath(DefinitionM* agentDefinition, QString definitionFilePath);
+
+
+    /**
+     * @brief Slot called when we have to download an agent mapping to a JSON file (path)
+     * @param agentMapping
+     * @param mappingFilePath
+     */
+    void _onDownloadAgentMappingToPath(AgentMappingM* agentMapping, QString mappingFilePath);
 
 
 private:
+
+    /**
+     * @brief Check if we have to merge an agent with another one that have the same definition
+     * @param agent
+     */
+    void _checkHaveToMergeAgent(AgentVM* agent);
+
 
     /**
      * @brief Delete the view model of Agent
@@ -172,8 +221,12 @@ private:
 
 
 private:
+
     // Manager for the data model of INGESCAPE
     IngeScapeModelManager* _modelManager;
+
+    // Helper to manage JSON files
+    JsonHelper* _jsonHelper;
 
     // Map from agent name to a list of view models of agent
     QHash<QString, QList<AgentVM*>> _mapFromNameToAgentViewModelsList;

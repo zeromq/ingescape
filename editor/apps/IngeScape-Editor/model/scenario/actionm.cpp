@@ -18,32 +18,26 @@
 #include <QDebug>
 
 /**
- * @brief Validation duration type for an action
+ * @brief Enum "ValidationDurationTypes" to string
  * @param value
  * @return
  */
-QString ValidationDurationType::enumToString(int value)
+QString ValidationDurationTypes::enumToString(int value)
 {
-    QString string = "Validation duration";
+    switch (value)
+    {
+    case ValidationDurationTypes::CUSTOM:
+        return tr("during");
 
-    switch (value) {
-    case ValidationDurationType::CUSTOM:
-        string = "during";
-        break;
+    case ValidationDurationTypes::IMMEDIATE:
+        return tr("at start only");
 
-    case ValidationDurationType::IMMEDIATE:
-        string = "at start only";
-        break;
-
-    case ValidationDurationType::FOREVER:
-        string = "forever";
-        break;
+    case ValidationDurationTypes::FOREVER:
+        return tr("forever");
 
     default:
-        break;
+        return "";
     }
-
-    return string;
 }
 
 
@@ -60,7 +54,7 @@ QString ValidationDurationType::enumToString(int value)
  */
 ActionM::ActionM(QString name, QObject *parent) : QObject(parent),
     _name(name),
-    _validityDurationType(ValidationDurationType::IMMEDIATE),
+    _validityDurationType(ValidationDurationTypes::IMMEDIATE),
     _validityDuration(-1),
     _validityDurationString("0.0"),
     _shallRevert(false),
@@ -373,10 +367,9 @@ void ActionM::initializeConditionsConnections()
 {
     if (!_isConnected)
     {
-        // Initialize conditions connections
         foreach (ActionConditionVM* conditionVM, _conditionsList.toList())
         {
-            if(conditionVM->modelM() != NULL)
+            if (conditionVM->modelM() != NULL)
             {
                 // Connect to changes on flag "is valid"
                 connect(conditionVM->modelM(), &ActionConditionM::isValidChanged, this, &ActionM::_onConditionValidationChange);
@@ -401,11 +394,11 @@ void ActionM::resetConditionsConnections()
 {
     if (_isConnected)
     {
-        // Initialize conditions connections
         foreach (ActionConditionVM* conditionVM, _conditionsList.toList())
         {
-            if(conditionVM->modelM() != NULL)
+            if (conditionVM->modelM() != NULL)
             {
+                // DIS-connect from changes on flag "is valid"
                 disconnect(conditionVM->modelM(), &ActionConditionM::isValidChanged, this, &ActionM::_onConditionValidationChange);
 
                 conditionVM->modelM()->resetConnections();

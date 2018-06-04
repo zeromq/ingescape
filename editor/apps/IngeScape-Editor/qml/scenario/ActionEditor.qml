@@ -87,57 +87,7 @@ Window {
             color: IngeScapeTheme.editorsBackgroundBorderColor
         }
         color: IngeScapeTheme.editorsBackgroundColor
-        //        clip : true
 
-        //        // catch events
-        //        MultiPointTouchArea {
-        //            anchors.fill: parent
-        //        }
-
-        // drag Area
-        //        I2CustomRectangle {
-        //            id : dragRect
-        //            anchors {
-        //                top : parent.top
-        //                left : parent.left
-        //                right : parent.right
-        //                margins : 2
-        //            }
-        //            height : 50
-        //            topLeftRadius : 5
-        //            topRightRadius : 5
-
-        //            color :  /dragMouseArea.pressed? IngeScapeTheme.editorsBackgroundColor : IngeScapeTheme.darkBlueGreyColor
-
-        //            MouseArea {
-        //                id : dragMouseArea
-        //                hoverEnabled: true
-        //                anchors.fill: parent
-        //                drag.target: rootItem
-
-        //                drag.minimumX : - rootItem.width/2
-        //                drag.maximumX : rootItem.parent.width - rootItem.width/2
-        //                drag.minimumY :  0
-        //                drag.maximumY :  rootItem.parent.height - rootItem.height/2
-
-        //                onPressed: {
-        //                    // Emit signal "bring to front"
-        //                    rootItem.bringToFront();
-        //                }
-        //            }
-        //        }
-
-        // separator
-        //        Rectangle {
-        //            anchors {
-        //                top : parent.top
-        //                topMargin: 50
-        //                left : parent.left
-        //                right : parent.right
-        //            }
-        //            height : 1
-        //            color : IngeScapeTheme.editorsBackgroundBorderColor
-        //        }
 
         Item {
             id: mainItem
@@ -158,7 +108,7 @@ Window {
 
                 text : "Action"
                 elide: Text.ElideRight
-                color: IngeScapeTheme.definitionEditorsLabelColor
+                color: IngeScapeTheme.whiteColor
                 font {
                     family: IngeScapeTheme.textFontFamily
                     pixelSize: 23
@@ -667,14 +617,14 @@ Window {
                                         }
 
                                         height : 25
-                                        width : 78
+                                        width : 98
 
                                         visible : (myEffect && myEffect.effectType === ActionEffectTypes.AGENT)
                                         enabled : visible
 
                                         model :
                                         {
-                                            if(controller) {
+                                            if (controller) {
                                                 controller.agentEffectValuesList
                                             }
                                             else {
@@ -1382,7 +1332,7 @@ Window {
                                 verticalCenter : parent.verticalCenter
                             }
 
-                            visible :  actionM && actionM.validityDurationType === ValidationDurationType.CUSTOM
+                            visible :  actionM && actionM.validityDurationType === ValidationDurationTypes.CUSTOM
                             enabled: visible
                             height: 25
                             width: 57
@@ -1660,7 +1610,7 @@ Window {
                                     IngeScapeComboBoxAgentsIOP {
                                         id : ioCombo
 
-                                        visible : myCondition && myCondition.conditionType === ActionConditionType.VALUE
+                                        visible : myCondition && myCondition.conditionType === ActionConditionTypes.VALUE
                                         enabled : visible
                                         anchors {
                                             verticalCenter : parent.verticalCenter
@@ -1704,13 +1654,13 @@ Window {
                                         }
 
                                         height : 25
-                                        width : (myCondition && myCondition.conditionType === ActionConditionType.VALUE) ? 44 : 78
+                                        width : (myCondition && myCondition.conditionType === ActionConditionTypes.VALUE) ? 44 : 78
 
                                         model :
                                         {
                                             if(controller)
                                             {
-                                                (myCondition && myCondition.conditionType === ActionConditionType.VALUE) ? controller.comparisonsValuesTypesList : controller.comparisonsAgentsTypesList
+                                                (myCondition && myCondition.conditionType === ActionConditionTypes.VALUE) ? controller.comparisonsValuesTypesList : controller.comparisonsAgentsTypesList
                                             }
                                             else {
                                                 0
@@ -1729,7 +1679,7 @@ Window {
                                             property : "selectedItem"
                                             value : if (myCondition && myCondition.modelM && controller)
                                                     {
-                                                        (myCondition && myCondition.conditionType === ActionConditionType.VALUE) ?
+                                                        (myCondition && myCondition.conditionType === ActionConditionTypes.VALUE) ?
                                                                     controller.comparisonsValuesTypesList.getItemWithValue(myCondition.modelM.comparison)
                                                                   :  controller.comparisonsAgentsTypesList.getItemWithValue(myCondition.modelM.comparison);
                                                     }
@@ -1757,7 +1707,7 @@ Window {
                                             verticalCenter : parent.verticalCenter
                                         }
 
-                                        visible : myCondition && myCondition.conditionType === ActionConditionType.VALUE
+                                        visible : myCondition && myCondition.conditionType === ActionConditionTypes.VALUE
 
                                         enabled : visible
                                         height: 25
@@ -1895,7 +1845,7 @@ Window {
                     topMargin: 15
                 }
                 clip : true
-                height: isOpened ? (titleadvModeMouseArea.height + 1 + revertActionitem.height + revertActionitem.anchors.topMargin + rearmActionitem.height + rearmActionitem.anchors.topMargin)
+                height: isOpened ? (titleadvModeMouseArea.height + 1 + revertActionitem.height + revertActionitem.anchors.topMargin + rearmActionitem.height + rearmActionitem.anchors.topMargin + 2)
                                  : titleadvModeMouseArea.height + 1
 
 //                Rectangle {
@@ -2618,7 +2568,7 @@ Window {
 
                     pressedID: releasedID + "-pressed"
                     releasedID: "button"
-                    disabledID : releasedID
+                    disabledID: releasedID + "-disabled"
 
                     font {
                         family: IngeScapeTheme.textFontFamily
@@ -2659,7 +2609,7 @@ Window {
 
                     pressedID: releasedID + "-pressed"
                     releasedID: "button"
-                    disabledID : releasedID
+                    disabledID: releasedID + "-disabled"
 
                     font {
                         family: IngeScapeTheme.textFontFamily
@@ -2673,10 +2623,10 @@ Window {
                 }
 
                 onClicked: {
-                    if(controller)
-                    {
-                        controller.valideActionEditor(model.QtObject);
+                    if (controller) {
+                        controller.validateActionEditor(model.QtObject);
                     }
+
                     // Close our popup
                     rootItem.close();
                 }

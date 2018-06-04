@@ -59,7 +59,7 @@ QList<QPair<QStringList, DefinitionM*>> JsonHelper::initAgentsList(QByteArray by
                 if (jsonName.isString() && jsonDefinition.isObject())
                 {
                     // Create a model of agent definition from JSON object
-                    DefinitionM* definition = _createModelOfDefinitionFromJSON(jsonDefinition.toObject());
+                    DefinitionM* definition = _createModelOfAgentDefinitionFromJSON(jsonDefinition.toObject());
                     if (definition != NULL)
                     {
                         qDebug() << "Initialize agent" << jsonName.toString() << "with definition" << definition->name();
@@ -95,13 +95,13 @@ QList<QPair<QStringList, DefinitionM*>> JsonHelper::initAgentsList(QByteArray by
 
 
 /**
- * @brief Create a model of agent definition from JSON file
+ * @brief Create a model of agent definition from a JSON file
  * @param byteArrayOfJson
  * @return
  */
-DefinitionM* JsonHelper::createModelOfDefinition(QByteArray byteArrayOfJson)
+DefinitionM* JsonHelper::createModelOfAgentDefinition(QByteArray byteArrayOfJson)
 {
-    DefinitionM* definition = NULL;
+    DefinitionM* agentDefinition = NULL;
 
     QJsonDocument jsonAgentDefinition = QJsonDocument::fromJson(byteArrayOfJson);
     if (jsonAgentDefinition.isObject())
@@ -111,12 +111,752 @@ DefinitionM* JsonHelper::createModelOfDefinition(QByteArray byteArrayOfJson)
         if (jsonObject.contains("definition"))
         {
             // Create a model of agent definition from JSON object
-            definition = _createModelOfDefinitionFromJSON(jsonObject.value("definition").toObject());
+            agentDefinition = _createModelOfAgentDefinitionFromJSON(jsonObject.value("definition").toObject());
+        }
+    }
+    return agentDefinition;
+}
+
+
+/**
+ * @brief Create a model of agent mapping with JSON and the corresponding input agent name
+ * @param inputAgentName
+ * @param byteArrayOfJson
+ * @return
+ */
+AgentMappingM* JsonHelper::createModelOfAgentMapping(QString inputAgentName, QByteArray byteArrayOfJson)
+{
+    AgentMappingM* agentMapping = NULL;
+
+    QJsonDocument jsonAgentMapping = QJsonDocument::fromJson(byteArrayOfJson);
+    if (jsonAgentMapping.isObject())
+    {
+        QJsonObject jsonObject = jsonAgentMapping.object();
+
+        agentMapping = _createModelOfAgentMappingFromJSON(inputAgentName, jsonObject);
+    }
+    return agentMapping;
+}
+
+
+/**
+ * @brief Export the agents list
+ * @param agentsListToExport list of pairs <agent name (and parameters to restart), definition>
+ */
+QByteArray JsonHelper::exportAgentsList(QList<QPair<QStringList, DefinitionM*>> agentsListToExport)
+{
+    QJsonArray jsonArray;
+
+    for (int i = 0; i < agentsListToExport.count(); i++)
+    {
+        QPair<QStringList, DefinitionM*> pair = agentsListToExport.at(i);
+        QStringList agentNameAndParametersToRestart = pair.first;
+        DefinitionM* definition = pair.second;
+
+        QString agentName = agentNameAndParametersToRestart.first();
+
+        if (!agentName.isEmpty() && (definition != NULL))
+        {
+            QJsonObject jsonAgent;
+            jsonAgent.insert("agentName", agentName);
+
+            if (agentNameAndParametersToRestart.count() == 3)
+            {
+                QString hostname = agentNameAndParametersToRestart.at(1);
+                QString commandLine = agentNameAndParametersToRestart.at(2);
+                jsonAgent.insert("hostname", hostname);
+                jsonAgent.insert("commandLine", commandLine);
+            }
+
+            QJsonObject jsonDefinition = exportAgentDefinitionToJson(definition);
+
+            jsonAgent.insert("definition", jsonDefinition);
+
+            jsonArray.append(jsonAgent);
         }
     }
 
-    return definition;
+    QJsonDocument jsonDocument = QJsonDocument(jsonArray);
+
+    return jsonDocument.toJson();
 }
+
+
+/**
+ * @brief Export the model of agent definition into a JSON object
+ * @param agentDefinition
+ * @return JSON object
+ */
+QJsonObject JsonHelper::exportAgentDefinitionToJson(DefinitionM* agentDefinition)
+{
+    QJsonObject jsonDefinition = QJsonObject();
+
+    if (agentDefinition != NULL)
+    {
+        jsonDefinition.insert("name", agentDefinition->name());
+        jsonDefinition.insert("version", agentDefinition->version());
+        jsonDefinition.insert("description", agentDefinition->description());
+
+        QJsonArray jsonInputs = QJsonArray();
+        foreach (AgentIOPM* agentIOP, agentDefinition->inputsList()->toList()) {
+            if (agentIOP != NULL) {
+                // Get JSON object from the agent Input/Output/Parameter
+                QJsonObject jsonAgentIOP = _getJsonFromAgentIOP(agentIOP);
+
+                jsonInputs.append(jsonAgentIOP);
+            }
+        }
+
+        QJsonArray jsonOutputs = QJsonArray();
+        foreach (AgentIOPM* agentIOP, agentDefinition->outputsList()->toList()) {
+            if (agentIOP != NULL) {
+                // Get JSON object from the agent Input/Output/Parameter
+                QJsonObject jsonAgentIOP = _getJsonFromAgentIOP(agentIOP);
+
+                jsonOutputs.append(jsonAgentIOP);
+            }
+        }
+
+        QJsonArray jsonParameters = QJsonArray();
+        foreach (AgentIOPM* agentIOP, agentDefinition->parametersList()->toList()) {
+            if (agentIOP != NULL) {
+                // Get JSON object from the agent Input/Output/Parameter
+                QJsonObject jsonAgentIOP = _getJsonFromAgentIOP(agentIOP);
+
+                jsonParameters.append(jsonAgentIOP);
+            }
+        }
+
+        jsonDefinition.insert("inputs", jsonInputs);
+        jsonDefinition.insert("outputs", jsonOutputs);
+        jsonDefinition.insert("parameters", jsonParameters);
+    }
+
+    return jsonDefinition;
+}
+
+
+/**
+ * @brief Export the model of agent mapping into a JSON object
+ * @param agentMapping
+ * @return JSON object
+ */
+QJsonObject JsonHelper::exportAgentMappingToJson(AgentMappingM* agentMapping)
+{
+    QJsonObject jsonMapping;
+
+    if (agentMapping != NULL)
+    {
+        jsonMapping.insert("name", agentMapping->name());
+        jsonMapping.insert("description", agentMapping->description());
+        jsonMapping.insert("version", agentMapping->version());
+
+        QJsonArray jsonArray;
+        foreach (ElementMappingM* mappingElement, agentMapping->mappingElements()->toList()) {
+            if (mappingElement != NULL)
+            {
+                QJsonObject jsonMappingElement;
+                jsonMappingElement.insert("input_name", mappingElement->input());
+                jsonMappingElement.insert("agent_name", mappingElement->outputAgent());
+                jsonMappingElement.insert("output_name", mappingElement->output());
+
+                jsonArray.append(jsonMappingElement);
+            }
+        }
+
+        jsonMapping.insert("mapping_out", jsonArray);
+    }
+
+    return jsonMapping;
+}
+
+
+/**
+ * @brief Get the JSON of an agent definition
+ * @param agentDefinition
+ * @return
+ */
+QString JsonHelper::getJsonOfAgentDefinition(DefinitionM* agentDefinition, QJsonDocument::JsonFormat jsonFormat)
+{
+    QString jsonOfDefinition = "";
+
+    if (agentDefinition != NULL)
+    {
+        QJsonObject jsonDefinition = exportAgentDefinitionToJson(agentDefinition);
+
+        QJsonObject jsonObject;
+        jsonObject.insert("definition", jsonDefinition);
+
+        QJsonDocument jsonDocument(jsonObject);
+        jsonOfDefinition = QString(jsonDocument.toJson(jsonFormat));
+    }
+
+    return jsonOfDefinition;
+}
+
+
+/**
+ * @brief Get the JSON of an agent mapping
+ * @param agentMapping
+ * @return
+ */
+QString JsonHelper::getJsonOfAgentMapping(AgentMappingM* agentMapping, QJsonDocument::JsonFormat jsonFormat)
+{
+    QString jsonOfMapping = "";
+
+    if (agentMapping != NULL)
+    {
+        QJsonObject jsonMapping = exportAgentMappingToJson(agentMapping);
+
+        QJsonObject jsonObject;
+        jsonObject.insert("mapping", jsonMapping);
+
+        QJsonDocument jsonDocument(jsonObject);
+        jsonOfMapping = QString(jsonDocument.toJson(jsonFormat));
+    }
+
+    return jsonOfMapping;
+}
+
+
+/**
+ * @brief Initialize actions list from JSON file
+ * @param byteArrayOfJson
+ * @return
+ */
+scenario_import_actions_lists_t *JsonHelper::initActionsList(QByteArray byteArrayOfJson, QList<AgentInMappingVM*> listAgentsInMapping)
+{
+    scenario_import_actions_lists_t * scenarioImport = NULL;
+    QList<ActionM*> actionsListToImport;
+    QList<ActionInPaletteVM*> actionsInPalette;
+    QList<ActionVM*> actionsInTimeLine;
+
+    QHash<QString, ActionM*> mapActionsMFromActionName;
+
+    QJsonDocument jsonFileRoot = QJsonDocument::fromJson(byteArrayOfJson);
+    if (jsonFileRoot.isObject())
+    {
+        QJsonObject jsonActionsRoot = jsonFileRoot.object();
+
+        scenarioImport = new scenario_import_actions_lists_t();
+
+        // ------
+        // Actions in table list
+        // ------
+        QJsonValue jsonActionsList = jsonActionsRoot.value("actions");
+        if(jsonActionsList.isArray())
+        {
+            foreach (QJsonValue jsonTmp, jsonActionsList.toArray())
+            {
+                if (jsonTmp.isObject())
+                {
+                    ActionM* actionM = NULL;
+
+                    QJsonObject jsonAction = jsonTmp.toObject();
+                    QJsonValue jsonName = jsonAction.value("name");
+                    if(jsonName.isString())
+                    {
+                        // Create the model
+                        actionM = new ActionM(jsonName.toString());
+
+                        QJsonValue jsonValue = jsonAction.value("validity_duration_type");
+                        if(jsonValue.isString())
+                        {
+                            int nValidationDurationType = ValidationDurationTypes::staticEnumFromKey(jsonValue.toString().toUpper());
+                            actionM->setvalidityDurationType(static_cast<ValidationDurationTypes::Value>(nValidationDurationType));
+                        }
+
+                        jsonValue = jsonAction.value("validity_duration_value");
+                        if(jsonValue.isString())
+                        {
+                            actionM->setvalidityDurationString(jsonValue.toString());
+                        }
+
+                        jsonValue = jsonAction.value("shall_revert");
+                        if(jsonValue.isBool())
+                        {
+                            actionM->setshallRevert(jsonValue.toBool());
+                        }
+
+                        jsonValue = jsonAction.value("shall_revert_at_validity_end");
+                        if(jsonValue.isBool())
+                        {
+                            actionM->setshallRevertWhenValidityIsOver(jsonValue.toBool());
+                        }
+
+                        jsonValue = jsonAction.value("shall_revert_after_time");
+                        if(jsonValue.isBool())
+                        {
+                            actionM->setshallRevertAfterTime(jsonValue.toBool());
+                        }
+
+                        jsonValue = jsonAction.value("shall_rearm");
+                        if(jsonValue.isBool())
+                        {
+                            actionM->setshallRearm(jsonValue.toBool());
+                        }
+
+                        jsonValue = jsonAction.value("revert_after_time");
+                        if(jsonValue.isString())
+                        {
+                            actionM->setrevertAfterTimeString(jsonValue.toString());
+                        }
+
+                        QJsonValue jsonEffectsList = jsonAction.value("effects");
+                        if(jsonEffectsList.isArray())
+                        {
+                            foreach (QJsonValue jsonEffect, jsonEffectsList.toArray())
+                            {
+                                if (jsonEffect.isObject())
+                                {
+                                    QJsonObject jsonEffectObj = jsonEffect.toObject();
+                                    ActionEffectVM* effectVM = _parseEffectVMFromJson(jsonEffectObj, listAgentsInMapping);
+
+                                    if(effectVM != NULL)
+                                    {
+                                        actionM->addEffectToList(effectVM);
+                                    }
+                                }
+                            }
+                        }
+
+                        QJsonValue jsonConditionsList = jsonAction.value("conditions");
+                        if(jsonConditionsList.isArray())
+                        {
+                            foreach (QJsonValue jsonCondition, jsonConditionsList.toArray())
+                            {
+                                if (jsonCondition.isObject())
+                                {
+                                    QJsonObject jsonConditionObj = jsonCondition.toObject();
+                                    ActionConditionVM* conditionVM = _parseConditionsVMFromJson(jsonConditionObj, listAgentsInMapping);
+
+                                    if(conditionVM != NULL)
+                                    {
+                                        actionM->addConditionToList(conditionVM);
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+
+                    if(actionM != NULL)
+                    {
+                        actionsListToImport.append(actionM);
+                        mapActionsMFromActionName.insert(actionM->name(),actionM);
+                    }
+                }
+            }
+        }
+
+
+        // ------
+        // Actions in palette
+        // ------
+        QJsonValue jsonActionsInPaletteList = jsonActionsRoot.value("actions_palette");
+        if(jsonActionsInPaletteList.isArray())
+        {
+            foreach (QJsonValue jsonTmp, jsonActionsInPaletteList.toArray())
+            {
+                if (jsonTmp.isObject())
+                {
+                    QJsonObject jsonActionInPalette = jsonTmp.toObject();
+                    QJsonValue jsonActionName = jsonActionInPalette.value("action_name");
+                    QJsonValue jsonActionIndex = jsonActionInPalette.value("index");
+                    if(jsonActionName.isString())
+                    {
+                        QString actionName = jsonActionName.toString();
+                        if(mapActionsMFromActionName.contains(actionName))
+                        {
+                            ActionM * actionM = mapActionsMFromActionName.value(actionName);
+                            if(actionM != NULL)
+                            {
+                                int index = jsonActionIndex.toInt();
+                                if(index >= 0 && index < 9)
+                                {
+                                    // Add action in palette
+                                    actionsInPalette.append(new ActionInPaletteVM(actionM,index));
+                                }
+                            }
+                        }
+
+                    }
+                }
+            }
+        }
+
+        // ------
+        // Actions in timeline
+        // ------
+        QJsonValue jsonActionsInTimelineList = jsonActionsRoot.value("actions_timeline");
+        if(jsonActionsInTimelineList.isArray())
+        {
+            foreach (QJsonValue jsonTmp, jsonActionsInTimelineList.toArray())
+            {
+                if (jsonTmp.isObject())
+                {
+                    QJsonObject jsonActionInTimeline = jsonTmp.toObject();
+                    QJsonValue jsonActionName = jsonActionInTimeline.value("action_name");
+                    QJsonValue jsonActionStartTime = jsonActionInTimeline.value("start_time");
+                    QJsonValue jsonActionColor = jsonActionInTimeline.value("color");
+                    QJsonValue jsonActionLineInTimeline = jsonActionInTimeline.value("line_number");
+                    if(jsonActionName.isString() && jsonActionStartTime.isDouble())
+                    {
+                        QString actionName = jsonActionName.toString();
+                        if(mapActionsMFromActionName.contains(actionName))
+                        {
+                            ActionM * actionM = mapActionsMFromActionName.value(actionName);
+                            if(actionM != NULL)
+                            {
+                                ActionVM * actionVM = new ActionVM(actionM,jsonActionStartTime.toDouble());
+                                if(jsonActionColor.isString())
+                                {
+                                    actionVM->setcolor(jsonActionColor.toString());
+                                }
+
+                                // Set line in timeline
+                                actionVM->setlineInTimeLine(jsonActionLineInTimeline.toInt());
+
+                                // Add our action from timeline
+                                actionsInTimeLine.append(actionVM);
+                            }
+                        }
+
+                    }
+                }
+            }
+        }
+
+        // Set results
+        scenarioImport->actionsInTableList.append(actionsListToImport);
+        scenarioImport->actionsInPaletteList.append(actionsInPalette);
+        scenarioImport->actionsInTimelineList.append(actionsInTimeLine);
+    }
+
+    return scenarioImport;
+}
+
+
+/**
+ * @brief Export the actions lists into json object
+ * @param actions list in table
+ * @param actions list in the palette
+ * @param actions list in the timeline
+ * @return
+ */
+QJsonObject JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<ActionInPaletteVM*> actionsInPaletteList, QList<ActionVM*> actionsInTimeLine)
+{
+    QJsonObject jsonScenario;
+
+    // ----
+    // Actions list
+    // ----
+    QJsonArray jsonActionsArray;
+    foreach (ActionM* actionM, actionsList)
+    {
+        // Create properties
+        QJsonObject jsonAgent;
+        jsonAgent.insert("name", actionM->name());
+        jsonAgent.insert("validity_duration_type", ValidationDurationTypes::staticEnumToKey(actionM->validityDurationType()));
+        jsonAgent.insert("validity_duration_value", actionM->validityDurationString());
+        jsonAgent.insert("shall_revert", actionM->shallRevert());
+        jsonAgent.insert("shall_revert_at_validity_end", actionM->shallRevertWhenValidityIsOver());
+        jsonAgent.insert("shall_revert_after_time", actionM->shallRevertAfterTime());
+        jsonAgent.insert("revert_after_time", actionM->revertAfterTimeString());
+        jsonAgent.insert("shall_rearm", actionM->shallRearm());
+
+        bool jsonFilled = false;
+
+        QJsonArray jsonConditionsArray;
+        // Create conditions view models
+        foreach (ActionConditionVM* conditionVM, actionM->conditionsList()->toList())
+        {
+            ActionConditionM* actionCondition = conditionVM->modelM();
+            jsonFilled = false;
+
+            if(actionCondition != NULL)
+            {
+                QJsonObject jsonCondition;
+                jsonCondition.insert("type", ActionConditionTypes::staticEnumToKey(conditionVM->conditionType()));
+                jsonCondition.insert("agent_name", actionCondition->agent()->name());
+
+                switch (conditionVM->conditionType())
+                {
+                case ActionConditionTypes::VALUE:
+                {
+                    IOPValueConditionM* iopCondition = qobject_cast<IOPValueConditionM*>(actionCondition);
+                    if(iopCondition != NULL && iopCondition->agentIOP() != NULL)
+                    {
+                        jsonCondition.insert("iop_name", iopCondition->agentIOP()->name());
+                        jsonCondition.insert("operator", ActionComparisonTypes::staticEnumToKey(iopCondition->comparison()));
+                        jsonCondition.insert("value", iopCondition->value());
+
+                        jsonFilled = true;
+                    }
+
+                    break;
+                }
+                case ActionConditionTypes::AGENT:
+                {
+                    if(actionCondition->agent() != NULL)
+                    {
+                        jsonCondition.insert("value", ActionComparisonTypes::staticEnumToKey(actionCondition->comparison()));
+
+                        jsonFilled = true;
+                    }
+                    break;
+                }
+                default:
+                    break;
+                }
+
+                if (jsonFilled) {
+                    jsonConditionsArray.append(jsonCondition);
+                }
+
+            }
+        }
+
+        // Insert the list of conditions
+        jsonAgent.insert("conditions", jsonConditionsArray);
+
+        // Create effects view models
+        QJsonArray jsonEffectsArray;
+        foreach (ActionEffectVM* effectVM, actionM->effectsList()->toList())
+        {
+            ActionEffectM* actionEffect = effectVM->modelM();
+
+            jsonFilled = false;
+
+            if(actionEffect != NULL)
+            {
+                QJsonObject jsonEffect;
+                jsonEffect.insert("type", ActionEffectTypes::staticEnumToKey(effectVM->effectType()));
+
+                switch (effectVM->effectType())
+                {
+                case ActionEffectTypes::AGENT:
+                {
+                    EffectOnAgentM* effectOnAgent = qobject_cast<EffectOnAgentM*>(actionEffect);
+                    if ((effectOnAgent != NULL) && (effectOnAgent->agent() != NULL))
+                    {
+                        jsonEffect.insert("agent_name", effectOnAgent->agent()->name());
+                        jsonEffect.insert("value", AgentEffectValues::staticEnumToKey(effectOnAgent->agentEffectValue()));
+
+                        jsonFilled = true;
+                    }
+                    break;
+                }
+                case ActionEffectTypes::VALUE:
+                {
+                    IOPValueEffectM* iopEffect = qobject_cast<IOPValueEffectM*>(actionEffect);
+                    if ((iopEffect != NULL) && (iopEffect->agent() != NULL) && (iopEffect->agentIOP() != NULL))
+                    {
+                        jsonEffect.insert("agent_name", iopEffect->agent()->name());
+                        jsonEffect.insert("iop_name", iopEffect->agentIOP()->name());
+                        jsonEffect.insert("value", iopEffect->value());
+
+                        jsonFilled = true;
+                    }
+
+                    break;
+                }
+                case ActionEffectTypes::MAPPING:
+                {
+                    MappingEffectM* mappingEffect = qobject_cast<MappingEffectM*>(actionEffect);
+                    if ((mappingEffect != NULL) && (mappingEffect->agent() != NULL) && (mappingEffect->input() != NULL)
+                            && (mappingEffect->outputAgent() != NULL)  && (mappingEffect->output() != NULL))
+                    {
+                        jsonEffect.insert("input_agent_name", mappingEffect->agent()->name());
+                        jsonEffect.insert("input_name", mappingEffect->input()->name());
+                        jsonEffect.insert("output_agent_name", mappingEffect->outputAgent()->name());
+                        jsonEffect.insert("output_name", mappingEffect->output()->name());
+                        jsonEffect.insert("value", MappingEffectValues::staticEnumToKey(mappingEffect->mappingEffectValue()));
+
+                        jsonFilled = true;
+                    }
+                    break;
+                }
+                default:
+                    break;
+                }
+
+                if (jsonFilled) {
+                    jsonEffectsArray.append(jsonEffect);
+                }
+            }
+        }
+
+        // Insert the list of effects
+        jsonAgent.insert("effects", jsonEffectsArray);
+
+        jsonActionsArray.append(jsonAgent);
+    }
+    jsonScenario.insert("actions", jsonActionsArray);
+
+    // ----
+    // Actions list in palette
+    // ----
+    QJsonArray jsonActionsInPaletteArray;
+    foreach (ActionInPaletteVM* actionInPalette, actionsInPaletteList)
+    {
+        if (actionInPalette->modelM() != NULL)
+        {
+            QJsonObject jsonActionsInPalette;
+            jsonActionsInPalette.insert("index", actionInPalette->indexInPanel());
+            jsonActionsInPalette.insert("action_name", actionInPalette->modelM()->name());
+
+            jsonActionsInPaletteArray.append(jsonActionsInPalette);
+        }
+    }
+    jsonScenario.insert("actions_palette", jsonActionsInPaletteArray);
+
+    // ----
+    // Actions list in timeline
+    // ----
+    QJsonArray jsonActionsInTimelineArray;
+    foreach (ActionVM* actionVM, actionsInTimeLine)
+    {
+        if (actionVM->modelM() != NULL && actionVM->startTime() >= 0)
+        {
+            QJsonObject jsonActionsInTimeLine;
+            jsonActionsInTimeLine.insert("action_name", actionVM->modelM()->name());
+            jsonActionsInTimeLine.insert("start_time", actionVM->startTime());
+            jsonActionsInTimeLine.insert("color", actionVM->color().name());
+            jsonActionsInTimeLine.insert("line_number", actionVM->lineInTimeLine());
+
+            jsonActionsInTimelineArray.append(jsonActionsInTimeLine);
+        }
+
+    }
+    jsonScenario.insert("actions_timeline", jsonActionsInTimelineArray);
+
+    return jsonScenario;
+}
+
+
+/**
+ * @brief Import the mapping from the json content
+ * @param byteArrayOfJson
+ * @return list of mapping_agent_import_t objects
+ */
+QList< mapping_agent_import_t* > JsonHelper::importMapping(QByteArray byteArrayOfJson, bool fromPlatform)
+{
+    QList< mapping_agent_import_t* > listAgentsMapping;
+
+    QJsonDocument jsonFileRoot = QJsonDocument::fromJson(byteArrayOfJson);
+    if ((fromPlatform == false && jsonFileRoot.isArray()) || (fromPlatform == true && jsonFileRoot.isObject()))
+    {
+        // Take into account the origin of the opening
+        // if mapping is from a patform file, we get the mappings value
+        // if not we get directly the value.
+        QJsonArray jsonArray;
+        if(fromPlatform == true)
+        {
+            QJsonValue mappingsValue = jsonFileRoot.object().value("mappings");
+            if(mappingsValue.isArray())
+            {
+                jsonArray = mappingsValue.toArray();
+            }
+        } else {
+            jsonArray = jsonFileRoot.array();
+        }
+
+        foreach (QJsonValue jsonValue, jsonArray)
+        {
+            if (jsonValue.isObject())
+            {
+                QJsonObject jsonAllMapping = jsonValue.toObject();
+
+                // Get value for keys "agentName" and "definition"
+                QJsonValue jsonName = jsonAllMapping.value("agentName");
+                QJsonValue jsonDefinition = jsonAllMapping.value("definition");
+                QJsonValue jsonPosition = jsonAllMapping.value("position");
+
+                if (jsonName.isString() && jsonDefinition.isObject())
+                {
+                    // Create the agent definition and mapping
+                    DefinitionM* definition = _createModelOfAgentDefinitionFromJSON(jsonDefinition.toObject());
+                    AgentMappingM* agentMapping = _createModelOfAgentMappingFromJSON(jsonName.toString(), jsonAllMapping);
+
+
+                    if (definition != NULL)
+                    {
+                        // Add our agent in mapping
+                        mapping_agent_import_t* mappingAgent = new mapping_agent_import_t();
+                        mappingAgent->definition = definition;
+                        mappingAgent->mapping = agentMapping;
+                        mappingAgent->name = jsonName.toString();
+                        mappingAgent->position = QPointF(0.0,0.0);
+
+                        // Load position
+                        QStringList positionStringList = jsonPosition.toString().split(',');
+                        if(positionStringList.count() == 2)
+                        {
+                            QString xStr = positionStringList.first().remove('(');
+                            QString yStr = positionStringList.last().remove(')');
+
+                            if(xStr.isEmpty() == false && yStr.isEmpty() == false)
+                            {
+                                mappingAgent->position = QPointF(xStr.toFloat(),yStr.toFloat());
+                            }
+                        }
+
+                        // Add to list
+                        listAgentsMapping.append(mappingAgent);
+                    }
+                    else
+                    {
+                        // No definition, we delete the mapping
+                        if (agentMapping != NULL)
+                        {
+                            delete agentMapping;
+                            agentMapping = NULL;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return listAgentsMapping;
+}
+
+
+/**
+ * @brief Export the agents in mapping list into json array object
+ * @param agents in mapping list
+ * @return
+ */
+QJsonArray JsonHelper::exportAllAgentsInMapping(QList<AgentInMappingVM*> agentsInMapping)
+{
+    QJsonArray jsonArray;
+
+    foreach (AgentInMappingVM* agentInMapVM, agentsInMapping)
+    {
+        if(agentInMapVM->temporaryMapping() != NULL && agentInMapVM->models()->count() > 0)
+        {
+            // Set agent name
+            QJsonObject jsonFullMapping;
+            jsonFullMapping.insert("agentName", agentInMapVM->name());
+            jsonFullMapping.insert("position", "("+ QString::number(agentInMapVM->position().x())+","+QString::number(agentInMapVM->position().y())+")");
+
+            // Set the mapping
+            QJsonObject jsonMapping = exportAgentMappingToJson(agentInMapVM->temporaryMapping());
+            jsonFullMapping.insert("mapping", jsonMapping);
+
+            // Set the definition
+            QJsonObject jsonDefinition = exportAgentDefinitionToJson(agentInMapVM->models()->at(0)->definition());
+            jsonFullMapping.insert("definition", jsonDefinition);
+
+            // Append to the list of mapping agents
+            jsonArray.append(jsonFullMapping);
+        }
+    }
+
+    return jsonArray;
+}
+
 
 /**
  * @brief Create a model of record from JSON data
@@ -171,322 +911,13 @@ QList<RecordM*> JsonHelper::createRecordModelList(QByteArray byteArrayOfJson)
     return recordsList;
 }
 
-/**
- * @brief Export the agents list
- * @param agentsListToExport list of pairs <agent name (and parameters to restart), definition>
- */
-QByteArray JsonHelper::exportAgentsList(QList<QPair<QStringList, DefinitionM*>> agentsListToExport)
-{
-    QJsonArray jsonArray;
-
-    for (int i = 0; i < agentsListToExport.count(); i++)
-    {
-        QPair<QStringList, DefinitionM*> pair = agentsListToExport.at(i);
-        QStringList agentNameAndParametersToRestart = pair.first;
-        DefinitionM* definition = pair.second;
-
-        QString agentName = agentNameAndParametersToRestart.first();
-
-        if (!agentName.isEmpty() && (definition != NULL))
-        {
-            QJsonObject jsonAgent;
-            jsonAgent.insert("agentName", agentName);
-
-            if (agentNameAndParametersToRestart.count() == 3)
-            {
-                QString hostname = agentNameAndParametersToRestart.at(1);
-                QString commandLine = agentNameAndParametersToRestart.at(2);
-                jsonAgent.insert("hostname", hostname);
-                jsonAgent.insert("commandLine", commandLine);
-            }
-
-            QJsonObject jsonDefinition = exportAgentDefinition(definition);
-
-            jsonAgent.insert("definition", jsonDefinition);
-
-            jsonArray.append(jsonAgent);
-        }
-    }
-
-    QJsonDocument jsonDocument = QJsonDocument(jsonArray);
-
-    return jsonDocument.toJson();
-}
-
 
 /**
- * @brief Export the agent definition into a json format
- * @param agent definition model
- */
-QJsonObject JsonHelper::exportAgentDefinition(DefinitionM* definition)
-{
-    QJsonObject jsonDefinition = QJsonObject();
-
-    if (definition != NULL)
-    {
-        jsonDefinition.insert("name", definition->name());
-        jsonDefinition.insert("version", definition->version());
-        jsonDefinition.insert("description", definition->description());
-
-        QJsonArray jsonInputs = QJsonArray();
-        foreach (AgentIOPM* agentIOP, definition->inputsList()->toList()) {
-            if (agentIOP != NULL) {
-                // Get JSON object from the agent Input/Output/Parameter
-                QJsonObject jsonAgentIOP = _getJsonFromAgentIOP(agentIOP);
-
-                jsonInputs.append(jsonAgentIOP);
-            }
-        }
-
-        QJsonArray jsonOutputs = QJsonArray();
-        foreach (AgentIOPM* agentIOP, definition->outputsList()->toList()) {
-            if (agentIOP != NULL) {
-                // Get JSON object from the agent Input/Output/Parameter
-                QJsonObject jsonAgentIOP = _getJsonFromAgentIOP(agentIOP);
-
-                jsonOutputs.append(jsonAgentIOP);
-            }
-        }
-
-        QJsonArray jsonParameters = QJsonArray();
-        foreach (AgentIOPM* agentIOP, definition->parametersList()->toList()) {
-            if (agentIOP != NULL) {
-                // Get JSON object from the agent Input/Output/Parameter
-                QJsonObject jsonAgentIOP = _getJsonFromAgentIOP(agentIOP);
-
-                jsonParameters.append(jsonAgentIOP);
-            }
-        }
-
-        jsonDefinition.insert("inputs", jsonInputs);
-        jsonDefinition.insert("outputs", jsonOutputs);
-        jsonDefinition.insert("parameters", jsonParameters);
-    }
-
-    return jsonDefinition;
-}
-
-
-/**
- * @brief Create a model of agent mapping with JSON and the input agent name corresponding
- * @param inputAgentName, byteArrayOfJson
- * @return
- */
-AgentMappingM* JsonHelper::createModelOfAgentMapping(QString inputAgentName, QByteArray byteArrayOfJson)
-{
-    AgentMappingM* agentMapping = NULL;
-
-    QJsonDocument jsonAgentMapping = QJsonDocument::fromJson(byteArrayOfJson);
-
-    if (jsonAgentMapping.isObject())
-    {
-        QJsonObject jsonObject = jsonAgentMapping.object();
-
-        agentMapping = _createModelOfAgentMappingFromJson(inputAgentName, jsonObject);
-    }
-
-    return agentMapping;
-}
-
-
-/**
- * @brief Create a model of agent mapping from JsonObject and the input agent name corresponding
- * @param inputAgentName, byteArrayOfJson
- * @return
- */
-AgentMappingM* JsonHelper::_createModelOfAgentMappingFromJson(QString inputAgentName, QJsonObject jsonObject)
-{
-    AgentMappingM* agentMapping = NULL;
-
-    QJsonValue jsonMapping = jsonObject.value("mapping");
-    if (jsonMapping.isObject())
-    {
-        QJsonObject jsonSubObject = jsonMapping.toObject();
-
-        QJsonValue jsonName = jsonSubObject.value("name");
-        QJsonValue jsonDescription = jsonSubObject.value("description");
-        QJsonValue jsonVersion = jsonSubObject.value("version");
-        QJsonValue jsonMappingOut = jsonSubObject.value("mapping_out");
-
-        if (jsonName.isString() && jsonDescription.isString() && jsonVersion.isString())
-        {
-            // Create the agent definition
-            agentMapping = new AgentMappingM(jsonName.toString(), jsonVersion.toString(), jsonDescription.toString());
-
-            if (jsonMappingOut.isArray()) {
-                QList<ElementMappingM*> mappingElements;
-
-                foreach (QJsonValue jsonMap, jsonMappingOut.toArray())
-                {
-                    if (jsonMap.isObject())
-                    {
-                        ElementMappingM* mappingElement = _createModelOfElementMapping(inputAgentName, jsonMap.toObject());
-                        if (mappingElement != NULL) {
-                            mappingElements.append(mappingElement);
-                        }
-                    }
-                }
-                if (mappingElements.count() > 0)
-                {
-                    agentMapping->mappingElements()->append(mappingElements);
-                }
-            }
-        }
-    }
-
-    return agentMapping;
-}
-
-/**
- * @brief Export the agent mapping model into the json object
- * @param agentMapping
- * @return QJson object
- */
-QJsonObject JsonHelper::exportMappingToJson(AgentMappingM* agentMapping)
-{
-    QJsonObject jsonMapping;
-
-    if (agentMapping != NULL)
-    {
-        jsonMapping.insert("name", agentMapping->name());
-        jsonMapping.insert("description", agentMapping->description());
-        jsonMapping.insert("version", agentMapping->version());
-
-        QJsonArray jsonArray;
-        foreach (ElementMappingM* mappingElement, agentMapping->mappingElements()->toList()) {
-            if (mappingElement != NULL)
-            {
-                QJsonObject jsonMappingElement;
-                jsonMappingElement.insert("input_name", mappingElement->input());
-                jsonMappingElement.insert("agent_name", mappingElement->outputAgent());
-                jsonMappingElement.insert("output_name", mappingElement->output());
-
-                jsonArray.append(jsonMappingElement);
-            }
-        }
-
-        jsonMapping.insert("mapping_out", jsonArray);
-    }
-
-    return jsonMapping;
-}
-
-/**
- * @brief Import the mapping from the json content
- * @param byteArrayOfJson
- * @return list of mapping_agent_import_t objects
- */
-QList< mapping_agent_import_t* > JsonHelper::importMapping(QByteArray byteArrayOfJson, bool fromPlatform)
-{
-    QList< mapping_agent_import_t* > listAgentsMapping;
-
-    QJsonDocument jsonFileRoot = QJsonDocument::fromJson(byteArrayOfJson);
-    if ((fromPlatform == false && jsonFileRoot.isArray()) || (fromPlatform == true && jsonFileRoot.isObject()))
-    {
-        // Take into account the origin of the opening
-        // if mapping is from a patform file, we get the mappings value
-        // if not we get directly the value.
-        QJsonArray jsonArray;
-        if(fromPlatform == true)
-        {
-            QJsonValue mappingsValue = jsonFileRoot.object().value("mappings");
-            if(mappingsValue.isArray())
-            {
-                jsonArray = mappingsValue.toArray();
-            }
-        } else {
-            jsonArray = jsonFileRoot.array();
-        }
-
-        foreach (QJsonValue jsonValue, jsonArray)
-        {
-            if (jsonValue.isObject())
-            {
-                QJsonObject jsonAllMapping = jsonValue.toObject();
-
-                // Get value for keys "agentName" and "definition"
-                QJsonValue jsonName = jsonAllMapping.value("agentName");
-                QJsonValue jsonDefinition = jsonAllMapping.value("definition");
-                QJsonValue jsonPosition = jsonAllMapping.value("position");
-
-                if (jsonName.isString() && jsonDefinition.isObject())
-                {
-                    // Create mapping and definition
-                    AgentMappingM* agentMapping = _createModelOfAgentMappingFromJson(jsonName.toString(),jsonAllMapping);
-                    DefinitionM* definition = _createModelOfDefinitionFromJSON(jsonDefinition.toObject());
-
-                    if(definition != NULL)
-                    {
-                        // Add our agent in mapping
-                        mapping_agent_import_t* mappingAgent = new mapping_agent_import_t();
-                        mappingAgent->definition = definition;
-                        mappingAgent->mapping = agentMapping;
-                        mappingAgent->name = jsonName.toString();
-                        mappingAgent->position = QPointF(0.0,0.0);
-
-                        // Load position
-                        QStringList positionStringList = jsonPosition.toString().split(',');
-                        if(positionStringList.count() == 2)
-                        {
-                            QString xStr = positionStringList.first().remove('(');
-                            QString yStr = positionStringList.last().remove(')');
-
-                            if(xStr.isEmpty() == false && yStr.isEmpty() == false)
-                            {
-                                mappingAgent->position = QPointF(xStr.toFloat(),yStr.toFloat());
-                            }
-                        }
-
-                        // Add to list
-                        listAgentsMapping.append(mappingAgent);
-                    }
-                    else
-                    {
-                        // No definition , we delete the mapping
-                        if(agentMapping != NULL)
-                        {
-                            delete agentMapping;
-                            agentMapping = NULL;
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    return listAgentsMapping;
-}
-
-/**
- * @brief Get the JSON of a mapping
- * @param agentMapping
- * @return
- */
-QString JsonHelper::getJsonOfMapping(AgentMappingM* agentMapping)
-{
-    QString jsonOfMapping = "";
-
-    if (agentMapping != NULL)
-    {
-        QJsonObject jsonMapping = exportMappingToJson(agentMapping);
-
-        QJsonObject jsonObject;
-        jsonObject.insert("mapping", jsonMapping);
-
-        QJsonDocument jsonDocument(jsonObject);
-        jsonOfMapping = jsonDocument.toJson(QJsonDocument::Compact);
-    }
-
-    return jsonOfMapping;
-}
-
-
-/**
- * @brief Create a model of agent definition from JSON object
+ * @brief Create a model of agent definition from a JSON object
  * @param jsonDefinition
  * @return
  */
-DefinitionM* JsonHelper::_createModelOfDefinitionFromJSON(QJsonObject jsonDefinition)
+DefinitionM* JsonHelper::_createModelOfAgentDefinitionFromJSON(QJsonObject jsonDefinition)
 {
     DefinitionM* definition = NULL;
 
@@ -545,6 +976,55 @@ DefinitionM* JsonHelper::_createModelOfDefinitionFromJSON(QJsonObject jsonDefini
     return definition;
 }
 
+
+/**
+ * @brief Create a model of agent mapping from JsonObject and the corresponding input agent name
+ * @param inputAgentName
+ * @param jsonObject
+ * @return
+ */
+AgentMappingM* JsonHelper::_createModelOfAgentMappingFromJSON(QString inputAgentName, QJsonObject jsonObject)
+{
+    AgentMappingM* agentMapping = NULL;
+
+    QJsonValue jsonMapping = jsonObject.value("mapping");
+    if (jsonMapping.isObject())
+    {
+        QJsonObject jsonSubObject = jsonMapping.toObject();
+
+        QJsonValue jsonName = jsonSubObject.value("name");
+        QJsonValue jsonDescription = jsonSubObject.value("description");
+        QJsonValue jsonVersion = jsonSubObject.value("version");
+        QJsonValue jsonMappingOut = jsonSubObject.value("mapping_out");
+
+        if (jsonName.isString() && jsonDescription.isString() && jsonVersion.isString())
+        {
+            // Create the agent definition
+            agentMapping = new AgentMappingM(jsonName.toString(), jsonVersion.toString(), jsonDescription.toString());
+
+            if (jsonMappingOut.isArray()) {
+                QList<ElementMappingM*> mappingElements;
+
+                foreach (QJsonValue jsonMap, jsonMappingOut.toArray())
+                {
+                    if (jsonMap.isObject())
+                    {
+                        ElementMappingM* mappingElement = _createModelOfElementMapping(inputAgentName, jsonMap.toObject());
+                        if (mappingElement != NULL) {
+                            mappingElements.append(mappingElement);
+                        }
+                    }
+                }
+                if (mappingElements.count() > 0)
+                {
+                    agentMapping->mappingElements()->append(mappingElements);
+                }
+            }
+        }
+    }
+
+    return agentMapping;
+}
 
 
 /**
@@ -769,224 +1249,6 @@ ElementMappingM* JsonHelper::_createModelOfElementMapping(QString inputAgentName
 
 
 /**
- * @brief Initialize actions list from JSON file
- * @param byteArrayOfJson
- * @return
- */
-scenario_import_actions_lists_t *JsonHelper::initActionsList(QByteArray byteArrayOfJson, QList<AgentInMappingVM*> listAgentsInMapping)
-{
-    scenario_import_actions_lists_t * scenarioImport = NULL;
-    QList<ActionM*> actionsListToImport;
-    QList<ActionInPaletteVM*> actionsInPalette;
-    QList<ActionVM*> actionsInTimeLine;
-
-    QHash<QString, ActionM*> mapActionsMFromActionName;
-
-    QJsonDocument jsonFileRoot = QJsonDocument::fromJson(byteArrayOfJson);
-    if (jsonFileRoot.isObject())
-    {
-        QJsonObject jsonActionsRoot = jsonFileRoot.object();
-
-        scenarioImport = new scenario_import_actions_lists_t();
-
-        // ------
-        // Actions in table list
-        // ------
-        QJsonValue jsonActionsList = jsonActionsRoot.value("actions");
-        if(jsonActionsList.isArray())
-        {
-            foreach (QJsonValue jsonTmp, jsonActionsList.toArray())
-            {
-                if (jsonTmp.isObject())
-                {
-                    ActionM* actionM = NULL;
-
-                    QJsonObject jsonAction = jsonTmp.toObject();
-                    QJsonValue jsonName = jsonAction.value("name");
-                    if(jsonName.isString())
-                    {
-                        // Create the model
-                        actionM = new ActionM(jsonName.toString());
-
-                        QJsonValue jsonValue = jsonAction.value("validity_duration_type");
-                        if(jsonValue.isString())
-                        {
-                            int validationDurationType = ValidationDurationType::staticEnumFromKey(jsonValue.toString());
-                            actionM->setvalidityDurationType((ValidationDurationType::Value)validationDurationType);
-                        }
-
-                        jsonValue = jsonAction.value("validity_duration_value");
-                        if(jsonValue.isString())
-                        {
-                            actionM->setvalidityDurationString(jsonValue.toString());
-                        }
-
-                        jsonValue = jsonAction.value("shall_revert");
-                        if(jsonValue.isBool())
-                        {
-                            actionM->setshallRevert(jsonValue.toBool());
-                        }
-
-                        jsonValue = jsonAction.value("shall_revert_at_validity_end");
-                        if(jsonValue.isBool())
-                        {
-                            actionM->setshallRevertWhenValidityIsOver(jsonValue.toBool());
-                        }
-
-                        jsonValue = jsonAction.value("shall_revert_after_time");
-                        if(jsonValue.isBool())
-                        {
-                            actionM->setshallRevertAfterTime(jsonValue.toBool());
-                        }
-
-                        jsonValue = jsonAction.value("shall_rearm");
-                        if(jsonValue.isBool())
-                        {
-                            actionM->setshallRearm(jsonValue.toBool());
-                        }
-
-                        jsonValue = jsonAction.value("revert_after_time");
-                        if(jsonValue.isString())
-                        {
-                            actionM->setrevertAfterTimeString(jsonValue.toString());
-                        }
-
-                        QJsonValue jsonEffectsList = jsonAction.value("effects");
-                        if(jsonEffectsList.isArray())
-                        {
-                            foreach (QJsonValue jsonEffect, jsonEffectsList.toArray())
-                            {
-                                if (jsonEffect.isObject())
-                                {
-                                    QJsonObject jsonEffectObj = jsonEffect.toObject();
-                                    ActionEffectVM* effectVM = _parseEffectVMFromJson(jsonEffectObj, listAgentsInMapping);
-
-                                    if(effectVM != NULL)
-                                    {
-                                        actionM->addEffectToList(effectVM);
-                                    }
-                                }
-                            }
-                        }
-
-                        QJsonValue jsonConditionsList = jsonAction.value("conditions");
-                        if(jsonConditionsList.isArray())
-                        {
-                            foreach (QJsonValue jsonCondition, jsonConditionsList.toArray())
-                            {
-                                if (jsonCondition.isObject())
-                                {
-                                    QJsonObject jsonConditionObj = jsonCondition.toObject();
-                                    ActionConditionVM* conditionVM = _parseConditionsVMFromJson(jsonConditionObj, listAgentsInMapping);
-
-                                    if(conditionVM != NULL)
-                                    {
-                                        actionM->addConditionToList(conditionVM);
-                                    }
-                                }
-                            }
-                        }
-
-                    }
-
-                    if(actionM != NULL)
-                    {
-                        actionsListToImport.append(actionM);
-                        mapActionsMFromActionName.insert(actionM->name(),actionM);
-                    }
-                }
-            }
-        }
-
-
-        // ------
-        // Actions in palette
-        // ------
-        QJsonValue jsonActionsInPaletteList = jsonActionsRoot.value("actions_palette");
-        if(jsonActionsInPaletteList.isArray())
-        {
-            foreach (QJsonValue jsonTmp, jsonActionsInPaletteList.toArray())
-            {
-                if (jsonTmp.isObject())
-                {
-                    QJsonObject jsonActionInPalette = jsonTmp.toObject();
-                    QJsonValue jsonActionName = jsonActionInPalette.value("action_name");
-                    QJsonValue jsonActionIndex = jsonActionInPalette.value("index");
-                    if(jsonActionName.isString())
-                    {
-                        QString actionName = jsonActionName.toString();
-                        if(mapActionsMFromActionName.contains(actionName))
-                        {
-                            ActionM * actionM = mapActionsMFromActionName.value(actionName);
-                            if(actionM != NULL)
-                            {
-                                int index = jsonActionIndex.toInt();
-                                if(index >= 0 && index < 9)
-                                {
-                                    // Add action in palette
-                                    actionsInPalette.append(new ActionInPaletteVM(actionM,index));
-                                }
-                            }
-                        }
-
-                    }
-                }
-            }
-        }
-
-        // ------
-        // Actions in timeline
-        // ------
-        QJsonValue jsonActionsInTimelineList = jsonActionsRoot.value("actions_timeline");
-        if(jsonActionsInTimelineList.isArray())
-        {
-            foreach (QJsonValue jsonTmp, jsonActionsInTimelineList.toArray())
-            {
-                if (jsonTmp.isObject())
-                {
-                    QJsonObject jsonActionInTimeline = jsonTmp.toObject();
-                    QJsonValue jsonActionName = jsonActionInTimeline.value("action_name");
-                    QJsonValue jsonActionStartTime = jsonActionInTimeline.value("start_time");
-                    QJsonValue jsonActionColor = jsonActionInTimeline.value("color");
-                    QJsonValue jsonActionLineInTimeline = jsonActionInTimeline.value("line_number");
-                    if(jsonActionName.isString() && jsonActionStartTime.isDouble())
-                    {
-                        QString actionName = jsonActionName.toString();
-                        if(mapActionsMFromActionName.contains(actionName))
-                        {
-                            ActionM * actionM = mapActionsMFromActionName.value(actionName);
-                            if(actionM != NULL)
-                            {
-                                ActionVM * actionVM = new ActionVM(actionM,jsonActionStartTime.toDouble());
-                                if(jsonActionColor.isString())
-                                {
-                                    actionVM->setcolor(jsonActionColor.toString());
-                                }
-
-                                // Set line in timeline
-                                actionVM->setlineInTimeLine(jsonActionLineInTimeline.toInt());
-
-                                // Add our action from timeline
-                                actionsInTimeLine.append(actionVM);
-                            }
-                        }
-
-                    }
-                }
-            }
-        }
-
-        // Set results
-        scenarioImport->actionsInTableList.append(actionsListToImport);
-        scenarioImport->actionsInPaletteList.append(actionsInPalette);
-        scenarioImport->actionsInTimelineList.append(actionsInTimeLine);
-    }
-
-    return scenarioImport;
-}
-
-
-/**
  * @brief Create an action effect VM from JSON object
  * @param jsonObject
  * @param list of agents in mapping
@@ -1119,8 +1381,8 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
                             // set value
                             jsonValue = jsonEffect.value("value");
                             if (jsonValue.isString()) {
-                                int agentEffectValue = AgentEffectValues::staticEnumFromKey(jsonValue.toString().toUpper());
-                                effectOnAgent->setagentEffectValue(static_cast<AgentEffectValues::Value>(agentEffectValue));
+                                int nAgentEffectValue = AgentEffectValues::staticEnumFromKey(jsonValue.toString().toUpper());
+                                effectOnAgent->setagentEffectValue(static_cast<AgentEffectValues::Value>(nAgentEffectValue));
                             }
 
                             // set agent
@@ -1246,8 +1508,8 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
                             // set value
                             jsonValue = jsonEffect.value("value");
                             if (jsonValue.isString()) {
-                                int mappingEffectValue = MappingEffectValues::staticEnumFromKey(jsonValue.toString().toUpper());
-                                mappingEffectM->setmappingEffectValue(static_cast<MappingEffectValues::Value>(mappingEffectValue));
+                                int nMappingEffectValue = MappingEffectValues::staticEnumFromKey(jsonValue.toString().toUpper());
+                                mappingEffectM->setmappingEffectValue(static_cast<MappingEffectValues::Value>(nMappingEffectValue));
                             }
 
                             // Set the list of agent iop
@@ -1266,6 +1528,7 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
     return actionEffectVM;
 }
 
+
 /**
  * @brief Create an action condition VM from JSON object
  * @param jsonObject
@@ -1279,12 +1542,12 @@ ActionConditionVM* JsonHelper::_parseConditionsVMFromJson(QJsonObject jsonCondit
     QJsonValue jsonValue = jsonCondition.value("type");
     if(jsonValue.isString())
     {
-        int conditionType = ActionConditionType::staticEnumFromKey(jsonValue.toString().toUpper());
+        int conditionType = ActionConditionTypes::staticEnumFromKey(jsonValue.toString().toUpper());
         if(conditionType >= 0)
         {
             switch (conditionType)
             {
-                case ActionConditionType::VALUE:
+                case ActionConditionTypes::VALUE:
                 {
                     QJsonValue jsonAgentName = jsonCondition.value("agent_name");
                     QJsonValue jsonIOPName = jsonCondition.value("iop_name");
@@ -1348,7 +1611,7 @@ ActionConditionVM* JsonHelper::_parseConditionsVMFromJson(QJsonObject jsonCondit
 
                             // Create view model
                             actionConditionVM = new ActionConditionVM();
-                            actionConditionVM->setconditionType(ActionConditionType::VALUE);
+                            actionConditionVM->setconditionType(ActionConditionTypes::VALUE);
 
                             actionConditionVM->setmodelM(iopConditionM);
 
@@ -1356,7 +1619,8 @@ ActionConditionVM* JsonHelper::_parseConditionsVMFromJson(QJsonObject jsonCondit
                             jsonValue = jsonCondition.value("operator");
                             if(jsonValue.isString())
                             {
-                                iopConditionM->setcomparison((ActionComparisonValueType::Value)ActionComparisonValueType::staticEnumFromKey(jsonValue.toString().toUpper()));
+                                int nActionComparisonType = ActionComparisonTypes::staticEnumFromKey(jsonValue.toString().toUpper());
+                                iopConditionM->setcomparison(static_cast<ActionComparisonTypes::Value>(nActionComparisonType));
                             }
 
                             // set value
@@ -1377,7 +1641,7 @@ ActionConditionVM* JsonHelper::_parseConditionsVMFromJson(QJsonObject jsonCondit
 
                     break;
                 }
-                case ActionConditionType::AGENT:
+                case ActionConditionTypes::AGENT:
                 {
                     QJsonValue jsonAgentName = jsonCondition.value("agent_name");
                     if(jsonAgentName.isString())
@@ -1397,21 +1661,22 @@ ActionConditionVM* JsonHelper::_parseConditionsVMFromJson(QJsonObject jsonCondit
                             }
                         }
 
-                        if(agentM != NULL)
+                        if (agentM != NULL)
                         {
                             // Create model
                             ActionConditionM* actionConditionM = new ActionConditionM();
 
                             // Create view model
                             actionConditionVM = new ActionConditionVM();
-                            actionConditionVM->setconditionType(ActionConditionType::AGENT);
+                            actionConditionVM->setconditionType(ActionConditionTypes::AGENT);
                             actionConditionVM->setmodelM(actionConditionM);
 
                             // set value
                             jsonValue = jsonCondition.value("value");
-                            if(jsonValue.isString())
+                            if (jsonValue.isString())
                             {
-                                actionConditionM->setcomparison((ActionComparisonValueType::Value)ActionComparisonValueType::staticEnumFromKey(jsonValue.toString().toUpper()));
+                                int nActionComparisonType = ActionComparisonTypes::staticEnumFromKey(jsonValue.toString().toUpper());
+                                actionConditionM->setcomparison(static_cast<ActionComparisonTypes::Value>(nActionComparisonType));
                             }
 
                             // set agent
@@ -1426,235 +1691,4 @@ ActionConditionVM* JsonHelper::_parseConditionsVMFromJson(QJsonObject jsonCondit
         }
     }
     return actionConditionVM;
-}
-
-/**
- * @brief Export the actions lists into json object
- * @param actions list in table
- * @param actions list in the palette
- * @param actions list in the timeline
- * @return
- */
-QJsonObject JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<ActionInPaletteVM*> actionsInPaletteList, QList<ActionVM*> actionsInTimeLine)
-{
-    QJsonObject jsonScenario;
-
-    // ----
-    // Actions list
-    // ----
-    QJsonArray jsonActionsArray;
-    foreach (ActionM* actionM, actionsList)
-    {
-        // Create properties
-        QJsonObject jsonAgent;
-        jsonAgent.insert("name", actionM->name());
-        jsonAgent.insert("validity_duration_type", ValidationDurationType::staticEnumToKey(actionM->validityDurationType()));
-        jsonAgent.insert("validity_duration_value", actionM->validityDurationString());
-        jsonAgent.insert("shall_revert", actionM->shallRevert());
-        jsonAgent.insert("shall_revert_at_validity_end", actionM->shallRevertWhenValidityIsOver());
-        jsonAgent.insert("shall_revert_after_time", actionM->shallRevertAfterTime());
-        jsonAgent.insert("revert_after_time", actionM->revertAfterTimeString());
-        jsonAgent.insert("shall_rearm", actionM->shallRearm());
-
-        bool jsonFilled = false;
-
-        QJsonArray jsonConditionsArray;
-        // Create conditions view models
-        foreach (ActionConditionVM* conditionVM, actionM->conditionsList()->toList())
-        {
-            ActionConditionM* actionCondition = conditionVM->modelM();
-            jsonFilled = false;
-
-            if(actionCondition != NULL)
-            {
-                QJsonObject jsonCondition;
-                jsonCondition.insert("type", ActionConditionType::staticEnumToKey(conditionVM->conditionType()));
-                jsonCondition.insert("agent_name", actionCondition->agent()->name());
-
-                switch (conditionVM->conditionType())
-                {
-                case ActionConditionType::VALUE:
-                {
-                    IOPValueConditionM* iopCondition = qobject_cast<IOPValueConditionM*>(actionCondition);
-                    if(iopCondition != NULL && iopCondition->agentIOP() != NULL)
-                    {
-                        jsonCondition.insert("iop_name", iopCondition->agentIOP()->name());
-                        jsonCondition.insert("operator", ActionComparisonValueType::staticEnumToKey(iopCondition->comparison()));
-                        jsonCondition.insert("value", iopCondition->value());
-
-                        jsonFilled = true;
-                    }
-
-                    break;
-                }
-                case ActionConditionType::AGENT:
-                {
-                    if(actionCondition->agent() != NULL)
-                    {
-                        jsonCondition.insert("value", ActionComparisonValueType::staticEnumToKey(actionCondition->comparison()));
-
-                        jsonFilled = true;
-                    }
-                    break;
-                }
-                default:
-                    break;
-                }
-
-                if (jsonFilled) {
-                    jsonConditionsArray.append(jsonCondition);
-                }
-
-            }
-        }
-
-        // Insert the list of conditions
-        jsonAgent.insert("conditions", jsonConditionsArray);
-
-        // Create effects view models
-        QJsonArray jsonEffectsArray;
-        foreach (ActionEffectVM* effectVM, actionM->effectsList()->toList())
-        {
-            ActionEffectM* actionEffect = effectVM->modelM();
-
-            jsonFilled = false;
-
-            if(actionEffect != NULL)
-            {
-                QJsonObject jsonEffect;
-                jsonEffect.insert("type", ActionEffectTypes::staticEnumToKey(effectVM->effectType()));
-
-                switch (effectVM->effectType())
-                {
-                case ActionEffectTypes::AGENT:
-                {
-                    EffectOnAgentM* effectOnAgent = qobject_cast<EffectOnAgentM*>(actionEffect);
-                    if ((effectOnAgent != NULL) && (effectOnAgent->agent() != NULL))
-                    {
-                        jsonEffect.insert("agent_name", effectOnAgent->agent()->name());
-                        jsonEffect.insert("value", AgentEffectValues::staticEnumToKey(effectOnAgent->agentEffectValue()));
-
-                        jsonFilled = true;
-                    }
-                    break;
-                }
-                case ActionEffectTypes::VALUE:
-                {
-                    IOPValueEffectM* iopEffect = qobject_cast<IOPValueEffectM*>(actionEffect);
-                    if ((iopEffect != NULL) && (iopEffect->agent() != NULL) && (iopEffect->agentIOP() != NULL))
-                    {
-                        jsonEffect.insert("agent_name", iopEffect->agent()->name());
-                        jsonEffect.insert("iop_name", iopEffect->agentIOP()->name());
-                        jsonEffect.insert("value", iopEffect->value());
-
-                        jsonFilled = true;
-                    }
-
-                    break;
-                }
-                case ActionEffectTypes::MAPPING:
-                {
-                    MappingEffectM* mappingEffect = qobject_cast<MappingEffectM*>(actionEffect);
-                    if ((mappingEffect != NULL) && (mappingEffect->agent() != NULL) && (mappingEffect->input() != NULL)
-                            && (mappingEffect->outputAgent() != NULL)  && (mappingEffect->output() != NULL))
-                    {
-                        jsonEffect.insert("input_agent_name", mappingEffect->agent()->name());
-                        jsonEffect.insert("input_name", mappingEffect->input()->name());
-                        jsonEffect.insert("output_agent_name", mappingEffect->outputAgent()->name());
-                        jsonEffect.insert("output_name", mappingEffect->output()->name());
-                        jsonEffect.insert("value", MappingEffectValues::staticEnumToKey(mappingEffect->mappingEffectValue()));
-
-                        jsonFilled = true;
-                    }
-                    break;
-                }
-                default:
-                    break;
-                }
-
-                if (jsonFilled) {
-                    jsonEffectsArray.append(jsonEffect);
-                }
-            }
-        }
-
-        // Insert the list of effects
-        jsonAgent.insert("effects", jsonEffectsArray);
-
-        jsonActionsArray.append(jsonAgent);
-    }
-    jsonScenario.insert("actions", jsonActionsArray);
-
-    // ----
-    // Actions list in palette
-    // ----
-    QJsonArray jsonActionsInPaletteArray;
-    foreach (ActionInPaletteVM* actionInPalette, actionsInPaletteList)
-    {
-        if (actionInPalette->modelM() != NULL)
-        {
-            QJsonObject jsonActionsInPalette;
-            jsonActionsInPalette.insert("index", actionInPalette->indexInPanel());
-            jsonActionsInPalette.insert("action_name", actionInPalette->modelM()->name());
-
-            jsonActionsInPaletteArray.append(jsonActionsInPalette);
-        }
-    }
-    jsonScenario.insert("actions_palette", jsonActionsInPaletteArray);
-
-    // ----
-    // Actions list in timeline
-    // ----
-    QJsonArray jsonActionsInTimelineArray;
-    foreach (ActionVM* actionVM, actionsInTimeLine)
-    {
-        if (actionVM->modelM() != NULL && actionVM->startTime() >= 0)
-        {
-            QJsonObject jsonActionsInTimeLine;
-            jsonActionsInTimeLine.insert("action_name", actionVM->modelM()->name());
-            jsonActionsInTimeLine.insert("start_time", actionVM->startTime());
-            jsonActionsInTimeLine.insert("color", actionVM->color().name());
-            jsonActionsInTimeLine.insert("line_number", actionVM->lineInTimeLine());
-
-            jsonActionsInTimelineArray.append(jsonActionsInTimeLine);
-        }
-
-    }
-    jsonScenario.insert("actions_timeline", jsonActionsInTimelineArray);
-
-    return jsonScenario;
-}
-
-/**
- * @brief Export the agents in mapping list into json array object
- * @param agents in mapping list
- * @return
- */
-QJsonArray JsonHelper::exportAllAgentsInMapping(QList<AgentInMappingVM*> agentsInMapping)
-{
-    QJsonArray jsonArray;
-
-    foreach (AgentInMappingVM* agentInMapVM, agentsInMapping)
-    {
-        if(agentInMapVM->temporaryMapping() != NULL && agentInMapVM->models()->count() > 0)
-        {
-            // Set agent name
-            QJsonObject jsonFullMapping;
-            jsonFullMapping.insert("agentName", agentInMapVM->name());
-            jsonFullMapping.insert("position", "("+ QString::number(agentInMapVM->position().x())+","+QString::number(agentInMapVM->position().y())+")");
-
-            // Set the mapping
-            QJsonObject jsonMapping = exportMappingToJson(agentInMapVM->temporaryMapping());
-            jsonFullMapping.insert("mapping", jsonMapping);
-
-            // Set the definition
-            QJsonObject jsonDefinition = exportAgentDefinition(agentInMapVM->models()->at(0)->definition());
-            jsonFullMapping.insert("definition", jsonDefinition);
-
-            // Append to the list of mapping agents
-            jsonArray.append(jsonFullMapping);
-        }
-    }
-
-    return jsonArray;
 }

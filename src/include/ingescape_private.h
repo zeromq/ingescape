@@ -28,6 +28,7 @@
 #include <zyre.h>
 
 #include "uthash/uthash.h"
+#include "uthash/utlist.h"
 
 #ifdef _WIN32
 #include <winsock2.h>
@@ -36,17 +37,15 @@
 #endif
 
 #include "ingescape.h"
+#include "ingescape_advanced.h"
 
 #define MAX_PATH 2048
 #define MAX_IOP_NAME_LENGTH 256
 #define MAX_AGENT_NAME_LENGTH 256
 #define MAX_DEFINITION_NAME_LENGTH 1024
 #define MAX_MAPPING_NAME_LENGTH 1024
-#define MAX_DEFINITION_DESCRIPTION_LENGTH 4096
+#define MAX_DESCRIPTION_LENGTH 4096
 #define MAX_MAPPING_DESCRIPTION_LENGTH 4096
-
-extern char definitionPath[MAX_PATH];
-extern char mappingPath[MAX_PATH];
 
 //////////////////  STRUCTURES AND ENUMS   //////////////////
 
@@ -77,11 +76,20 @@ typedef struct agent_iop {
         bool b;                 //in accordante to type IGS_BOOL_T ex. 0 or 1
         void* data;             //in accordance to type IGS_DATA_T i.e. binary memory space
     } value;
-    long valueSize;
+    size_t valueSize;
     bool is_muted;
     igs_observe_callback_t *callbacks;
     UT_hash_handle hh;         /* makes this structure hashable */
 } agent_iop_t;
+
+typedef struct token{
+    char * name;
+    char * description;
+    igs_tokenCallback cb;
+    void *cbData;
+    igs_tokenArgument_t *arguments;
+    UT_hash_handle hh;
+} igs_token_t;
 
 /*
  * Define the structure DEFINITION :
@@ -100,6 +108,7 @@ typedef struct definition {
     agent_iop_t* params_table;
     agent_iop_t* inputs_table;
     agent_iop_t* outputs_table;
+    igs_token_t *tokens_table;
     UT_hash_handle hh;
 } definition;
 
@@ -189,13 +198,13 @@ typedef struct serviceHeader {
 //////////////////  FUNCTIONS  //////////////////
 
 //  definition
-
+extern char definitionPath[MAX_PATH];
 extern definition* igs_internal_definition;
 void definition_freeDefinition (definition* definition);
 
 
 //  mapping
-
+extern char mappingPath[MAX_PATH];
 extern mapping_t *igs_internal_mapping;
 
 void mapping_freeMapping (mapping_t* map);
@@ -236,8 +245,15 @@ mapping_t* parser_LoadMapFromPath (const char* load_file);
 
 // admin
 extern bool admin_logInStream;
+extern bool admin_logInFile;
+extern char admin_logFile[1024];
 
 //bus
 extern serviceHeader_t *serviceHeaders;
+
+//token
+void token_freeToken(igs_token_t *t);
+int token_addValuesToArgumentsFromMessage(const char *name, igs_tokenArgument_t *arg, zmsg_t *msg);
+int token_freeValuesInArguments(igs_tokenArgument_t *arg);
 
 #endif /* ingescape_private_h */

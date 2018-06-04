@@ -267,7 +267,10 @@ Rectangle {
                             elide: Text.ElideRight
                             text: myModel ? myModel.name : ""
 
-                            color: (rootItem.agentMappingVM && rootItem.agentMappingVM.isON) ? IngeScapeTheme.agentsONInputsOutputsMappingColor : IngeScapeTheme.agentsOFFInputsOutputsMappingColor
+                            //color: (rootItem.agentMappingVM && rootItem.agentMappingVM.isON) ? IngeScapeTheme.agentsONInputsOutputsMappingColor : IngeScapeTheme.agentsOFFInputsOutputsMappingColor
+                            color: (myModel && myModel.isDefinedInAllDefinitions) ? (rootItem.agentMappingVM && rootItem.agentMappingVM.isON ? IngeScapeTheme.agentsONInputsOutputsMappingColor : IngeScapeTheme.agentsOFFInputsOutputsMappingColor)
+                                                                                  : (rootItem.agentMappingVM && rootItem.agentMappingVM.isON ? IngeScapeTheme.redColor : IngeScapeTheme.middleDarkRedColor)
+
                             font: IngeScapeTheme.heading2Font
                         }
 
@@ -494,7 +497,7 @@ Rectangle {
                         }
 
                         Text {
-                            id : agentOutput
+                            id: agentOutput
 
                             anchors {
                                 left: parent.horizontalCenter
@@ -509,7 +512,9 @@ Rectangle {
                             elide: Text.ElideRight
                             text: myModel ? myModel.name : ""
 
-                            color: (rootItem.agentMappingVM && rootItem.agentMappingVM.isON)? IngeScapeTheme.agentsONInputsOutputsMappingColor : IngeScapeTheme.agentsOFFInputsOutputsMappingColor
+                            //color: (rootItem.agentMappingVM && rootItem.agentMappingVM.isON) ? IngeScapeTheme.agentsONInputsOutputsMappingColor : IngeScapeTheme.agentsOFFInputsOutputsMappingColor
+                            color: (myModel && myModel.isDefinedInAllDefinitions) ? (rootItem.agentMappingVM && rootItem.agentMappingVM.isON ? IngeScapeTheme.agentsONInputsOutputsMappingColor : IngeScapeTheme.agentsOFFInputsOutputsMappingColor)
+                                                                                  : (rootItem.agentMappingVM && rootItem.agentMappingVM.isON ? IngeScapeTheme.redColor : IngeScapeTheme.middleDarkRedColor)
                             font: IngeScapeTheme.heading2Font
                         }
 
@@ -820,19 +825,19 @@ Rectangle {
             }
 
             onClicked: {
-                if (controller) {
-                    if(IngeScapeEditorC.canDeleteAgentInMapping(model.QtObject))
+                if (controller)
+                {
+                    if (IngeScapeEditorC.canDeleteAgentInMapping(rootItem.agentName))
                     {
                         // Delete our agent
                         controller.deleteSelectedAgentInMapping();
-                    } else {
+                    }
+                    else {
                         rootItem.needConfirmationtoDeleteAgentInMapping();
                     }
                 }
             }
         }
-
-
 
 
         //-------------------
@@ -847,13 +852,13 @@ Rectangle {
             width: height
             radius: height/2
 
-            visible: (agentMappingVM && agentMappingVM.activeAgentsNumber > 1)
+            visible: (rootItem.agentMappingVM && (rootItem.agentMappingVM.activeAgentsNumber > 1))
 
             anchors {
                 verticalCenter: agentName.verticalCenter
                 verticalCenterOffset:  2
                 right: parent.right
-                rightMargin: 48
+                rightMargin: 25
             }
 
             color: IngeScapeTheme.redColor
@@ -877,12 +882,12 @@ Rectangle {
         }
 
 
-        Rectangle {
+        /*Rectangle {
             height: 17
             width: height
             radius: height/2
 
-            visible: rootItem.agentMappingVM && !rootItem.agentMappingVM.areIdenticalsAllDefinitions
+            visible: (rootItem.agentMappingVM && !rootItem.agentMappingVM.areIdenticalsAllDefinitions)
 
             anchors {
                 verticalCenter: agentName.verticalCenter
@@ -909,7 +914,7 @@ Rectangle {
                     pixelSize: 14
                 }
             }
-        }
+        }*/
 
 
         // Drop Impossible

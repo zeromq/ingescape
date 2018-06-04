@@ -25,7 +25,7 @@ import "../theme" as Theme
 
 
 Item {
-    id : root
+    id: rootItem
 
     //--------------------------------
     //
@@ -49,6 +49,10 @@ Item {
     // signal emitted when the delete confirmation popup is needed because the agent is already used in the platform
     signal needConfirmationtoDeleteAgent();
 
+    // signal emitted when the user clicks on the option "Set Path for Definition/Mapping"
+    signal configureFilesPaths(var agent);
+
+
     //-----------------------------------------
     //
     // Functions
@@ -71,7 +75,7 @@ Item {
             width: 0
         }
 
-        color: agentItemIsHovered? IngeScapeTheme.agentsListItemRollOverBackgroundColor : IngeScapeTheme.agentsListItemBackgroundColor
+        color: agentItemIsHovered ? IngeScapeTheme.agentsListItemRollOverBackgroundColor : IngeScapeTheme.agentsListItemBackgroundColor
 
         Rectangle {
             anchors {
@@ -97,7 +101,7 @@ Item {
             // Selected Agent
             Item {
                 anchors.fill: parent
-                visible : controller && root.agent && (controller.selectedAgent === root.agent);
+                visible : controller && rootItem.agent && (controller.selectedAgent === rootItem.agent);
 
                 Rectangle {
                     anchors {
@@ -133,15 +137,17 @@ Item {
 
                     onClicked: {
 
-                        if(IngeScapeEditorC.canDeleteAgentVMFromList(model.QtObject))
+                        if (IngeScapeEditorC.canDeleteAgentFromSupervision(model.name))
                         {
                             if (controller)
                             {
                                 // Delete selected agent
                                 controller.deleteSelectedAgent();
                             }
-                        } else {
-                            root.needConfirmationtoDeleteAgent();
+                        }
+                        else {
+                            // Emit the signal "needConfirmationtoDeleteAgent"
+                            rootItem.needConfirmationtoDeleteAgent();
                         }
                     }
                 }
@@ -156,7 +162,7 @@ Item {
                 leftMargin: 28
                 top: parent.top
                 topMargin: 12
-                right : freezeButton.left
+                right : bottomRow.left
             }
             height : childrenRect.height
 
@@ -171,8 +177,8 @@ Item {
                 }
                 elide: Text.ElideRight
 
-                text: root.agent? root.agent.name : ""
-                color: (root.agent && (root.agent.isON === true)) ? IngeScapeTheme.agentsListLabelColor : IngeScapeTheme.agentOFFLabelColor
+                text: rootItem.agent ? rootItem.agent.name : ""
+                color: (rootItem.agent && (rootItem.agent.isON === true)) ? IngeScapeTheme.agentsListLabelColor : IngeScapeTheme.agentOFFLabelColor
 
 
                 font: IngeScapeTheme.headingFont
@@ -180,12 +186,12 @@ Item {
                 Text {
                     anchors
                     {
-                        left:parent.right
-                        leftMargin:5
-                        baseline:parent.baseline
+                        left: parent.right
+                        leftMargin: 5
+                        baseline: parent.baseline
                     }
 
-                    text:  model.state !== "" ? qsTr("(%1)").arg(model.state): ""
+                    text: (model.state !== "") ? qsTr("(%1)").arg(model.state) : ""
 
                     color : IngeScapeTheme.whiteColor
                     font {
@@ -241,9 +247,9 @@ Item {
 
                 hoverEnabled: true
                 onClicked: {
-                    if (controller && root.agent) {
+                    if (controller && rootItem.agent) {
                         // Open the definition of our agent
-                        controller.openDefinition(root.agent);
+                        controller.openDefinition(rootItem.agent);
                     }
                 }
 
@@ -253,7 +259,7 @@ Item {
                     elideWidth: (columnName.width - versionName.width)
                     elide: Text.ElideRight
 
-                    text: root.agent && root.agent.definition ? root.agent.definition.name : ""
+                    text: rootItem.agent && rootItem.agent.definition ? rootItem.agent.definition.name : ""
                 }
 
                 Text {
@@ -264,7 +270,7 @@ Item {
                     }
 
                     text : definitionName.elidedText
-                    color: if (root.agent && (root.agent.isON === true)) {
+                    color: if (rootItem.agent && (rootItem.agent.isON === true)) {
                                ((model.definition && model.definition.isVariant) ?
                                     definitionNameBtn.pressed? IngeScapeTheme.middleDarkRedColor : IngeScapeTheme.redColor
                                 : definitionNameBtn.pressed? IngeScapeTheme.agentsListPressedLabel2Color : IngeScapeTheme.agentsListLabel2Color)
@@ -286,7 +292,7 @@ Item {
                         leftMargin: 5
                     }
 
-                    text: root.agent && root.agent.definition ? "(v" + root.agent.definition.version + ")" : ""
+                    text: rootItem.agent && rootItem.agent.definition ? "(v" + rootItem.agent.definition.version + ")" : ""
                     color: definitionNameTxt.color
 
                     font {
@@ -321,94 +327,390 @@ Item {
                 }
                 elide: Text.ElideRight
 
-                text: root.agent ? root.agent.hostnames: ""
+                text: rootItem.agent ? rootItem.agent.hostnames: ""
 
-                color: (root.agent && (root.agent.isON === true)) ? IngeScapeTheme.agentsListTextColor : IngeScapeTheme.agentOFFTextColor
+                color: (rootItem.agent && (rootItem.agent.isON === true)) ? IngeScapeTheme.agentsListTextColor : IngeScapeTheme.agentOFFTextColor
                 font: IngeScapeTheme.normalFont
             }
 
         }
 
-        Button {
-            id: offButton
-
-            // Agent is "ON" OR Agent can be restarted
-            visible: (root.agent && (root.agent.isON || root.agent.canBeRestarted))
-
-            activeFocusOnPress: true
-            enabled: visible
+        Row {
+            id: middleRow
 
             anchors {
-                bottom: muteButton.top
-                bottomMargin: 5
-                horizontalCenter: muteButton.horizontalCenter
+                bottom: parent.bottom
+                bottomMargin: 35
+                right : parent.right
+                rightMargin: 10
             }
 
-            style: Theme.LabellessSvgButtonStyle {
-                fileCache: IngeScapeTheme.svgFileINGESCAPE
+            spacing: 5
 
-                pressedID: releasedID + "-pressed"
-                releasedID: model.isON? "on" : "off"
-                disabledID : releasedID
+            // Button Mute
+            Button {
+                id: muteButton
+
+                visible: (model.isON === true)
+                activeFocusOnPress: true
+
+                style: Theme.LabellessSvgButtonStyle {
+                    fileCache: IngeScapeTheme.svgFileINGESCAPE
+
+                    pressedID: releasedID + "-pressed"
+                    releasedID: model.isMuted ? "muteactif" : "muteinactif"
+                    disabledID : releasedID
+                }
+
+                onClicked: {
+                    model.QtObject.changeMuteAllOutputs();
+                }
             }
 
-            onClicked: {
-                model.QtObject.changeState();
+            // Button ON/OFF
+            Button {
+                id: btnOnOff
+
+                // Agent is "ON" OR Agent can be restarted
+                visible: (rootItem.agent && (rootItem.agent.isON || rootItem.agent.canBeRestarted))
+
+                activeFocusOnPress: true
+                enabled: visible
+
+                style: Theme.LabellessSvgButtonStyle {
+                    fileCache: IngeScapeTheme.svgFileINGESCAPE
+
+                    pressedID: releasedID + "-pressed"
+                    releasedID: model.isON ? "on" : "off"
+                    disabledID : releasedID
+                }
+
+                onClicked: {
+                    model.QtObject.changeState();
+                }
             }
         }
 
-        Button {
-            id: muteButton
 
-            visible : (model.isON === true)
-            activeFocusOnPress: true
+        Row {
+            id: bottomRow
 
             anchors {
                 bottom: parent.bottom
                 bottomMargin: 10
                 right : parent.right
-                rightMargin: 12
+                rightMargin: 10
             }
 
-            style: Theme.LabellessSvgButtonStyle {
-                fileCache: IngeScapeTheme.svgFileINGESCAPE
+            spacing: 5
 
-                pressedID: releasedID + "-pressed"
-                releasedID: model.isMuted? "muteactif" : "muteinactif"
-                disabledID : releasedID
+
+            // Button Freeze
+            Button {
+                id: freezeButton
+
+                visible: model.canBeFrozen && (model.isON === true)
+                enabled : visible
+                activeFocusOnPress: true
+
+                style: Theme.LabellessSvgButtonStyle {
+                    fileCache: IngeScapeTheme.svgFileINGESCAPE
+
+                    pressedID: releasedID + "-pressed"
+                    releasedID: model.isFrozen ? "freezeactif" : "freezeinactif"
+                    disabledID : releasedID
+                }
+
+                onClicked: {
+                    model.QtObject.changeFreeze();
+                }
             }
 
-            onClicked: {
-                model.QtObject.changeMuteAllOutputs();
+
+            // Button Options
+            Button {
+                id: btnOptions
+
+                visible: (model.isON === true)
+                activeFocusOnPress: true
+
+                style: Theme.LabellessSvgButtonStyle {
+                    fileCache: IngeScapeTheme.svgFileINGESCAPE
+
+                    pressedID: releasedID + "-pressed"
+                    releasedID: "button-options"
+                    disabledID : releasedID
+                }
+
+                onClicked: {
+                    //console.log("QML: Open options...");
+
+                    // Open the popup with options
+                    popupOptions.open();
+                }
             }
         }
+    }
 
-        Button {
-            id: freezeButton
+    I2PopupBase {
+        id : popupOptions
 
-            visible: model.canBeFrozen && (model.isON === true)
-            enabled : visible
-            activeFocusOnPress: true
+        anchors {
+            top: rootItem.top
+            left: rootItem.right
+            leftMargin: 2
+        }
 
+        property int optionHeight: 30
+
+        // 9 options x optionHeight
+        height: 9 * optionHeight
+        width: 200
+
+        isModal: true;
+        layerColor: "transparent"
+        dismissOnOutsideTap : true;
+
+        keepRelativePositionToInitialParent : true;
+
+        onClosed: {
+
+        }
+        onOpened: {
+
+        }
+
+        Rectangle {
+            id: popUpBackground
             anchors {
-                verticalCenter: muteButton.verticalCenter
-                right : muteButton.left
-                rightMargin: 5
+                fill: parent
+            }
+            color: IngeScapeTheme.veryDarkGreyColor
+            radius: 5
+            border {
+                color: IngeScapeTheme.blueGreyColor2
+                width: 1
             }
 
-            style: Theme.LabellessSvgButtonStyle {
-                fileCache: IngeScapeTheme.svgFileINGESCAPE
+            Column {
+                anchors {
+                    fill: parent
+                }
 
-                pressedID: releasedID + "-pressed"
-                releasedID: model.isFrozen? "freezeactif" : "freezeinactif"
-                disabledID : releasedID
-            }
+                Button {
+                    id: optionLoadDefinition
 
-            onClicked: {
-                model.QtObject.changeFreeze();
+                    height: popupOptions.optionHeight
+                    width: parent.width
+
+                    text: qsTr("Load Definition")
+
+                    style: Theme.ButtonStyleOfOption {
+
+                    }
+
+                    onClicked: {
+                        if (rootItem.agent) {
+                            rootItem.agent.loadDefinition();
+
+                            popupOptions.close();
+                        }
+                    }
+                }
+
+                Button {
+                    id: optionLoadMapping
+
+                    height: popupOptions.optionHeight
+                    width: parent.width
+
+                    text: qsTr("Load Mapping")
+
+                    style: Theme.ButtonStyleOfOption {
+
+                    }
+
+                    onClicked: {
+                        if (rootItem.agent) {
+                            rootItem.agent.loadMapping();
+
+                            popupOptions.close();
+                        }
+                    }
+                }
+
+                Button {
+                    id: optionDownloadDefinition
+
+                    height: popupOptions.optionHeight
+                    width: parent.width
+
+                    text: qsTr("Download Definition")
+
+                    style: Theme.ButtonStyleOfOption {
+
+                    }
+
+                    onClicked: {
+                        if (rootItem.agent) {
+                            rootItem.agent.downloadDefinition();
+
+                            popupOptions.close();
+                        }
+                    }
+                }
+
+                Button {
+                    id: optionDownloadMapping
+
+                    height: popupOptions.optionHeight
+                    width: parent.width
+
+                    text: qsTr("Download Mapping")
+
+                    style: Theme.ButtonStyleOfOption {
+
+                    }
+
+                    onClicked: {
+                        if (rootItem.agent) {
+                            rootItem.agent.downloadMapping();
+
+                            popupOptions.close();
+                        }
+                    }
+                }
+
+                Button {
+                    id: optionSetPath
+
+                    height: popupOptions.optionHeight
+                    width: parent.width
+
+                    text: qsTr("Set Path for files")
+
+                    style: Theme.ButtonStyleOfOption {
+
+                    }
+
+                    onClicked: {
+                        console.log("QML: Set Path for Definition/Mapping/Log files");
+
+                        // Emit the signal "configureFilesPaths"
+                        rootItem.configureFilesPaths(rootItem.agent);
+
+                        popupOptions.close();
+                    }
+                }
+
+                Button {
+                    id: optionSaveDefinitionToPath
+
+                    height: popupOptions.optionHeight
+                    width: parent.width
+
+                    text: qsTr("Save Definition to Path")
+
+                    style: Theme.ButtonStyleOfOption {
+
+                    }
+
+                    onClicked: {
+                        //console.log("QML: Save Definition to Path");
+
+                        rootItem.agent.saveDefinitionToPath();
+
+                        popupOptions.close();
+                    }
+                }
+
+                Button {
+                    id: optionSaveMappingToPath
+
+                    height: popupOptions.optionHeight
+                    width: parent.width
+
+                    text: qsTr("Save Mapping to Path")
+
+                    style: Theme.ButtonStyleOfOption {
+
+                    }
+
+                    onClicked: {
+                        //console.log("QML: Save Mapping to Path");
+
+                        rootItem.agent.saveMappingToPath();
+
+                        popupOptions.close();
+                    }
+                }
+
+                Button {
+                    id: optionLogFile
+
+                    height: popupOptions.optionHeight
+                    width: parent.width
+
+                    text: (rootItem.agent && (rootItem.agent.hasLogInFile === true)) ? qsTr("Disable Log File") : qsTr("Enable Log File")
+
+                    style: Theme.ButtonStyleOfOption {
+
+                    }
+
+                    onClicked: {
+                        if (rootItem.agent) {
+                            rootItem.agent.changeLogInFile();
+                        }
+
+                        popupOptions.close();
+                    }
+                }
+
+                /*Button {
+                    id: optionLogStream
+
+                    height: popupOptions.optionHeight
+                    width: parent.width
+
+                    text: (rootItem.agent && (rootItem.agent.hasLogInStream === true)) ? qsTr("Disable Log Stream") : qsTr("Enable Log Stream")
+
+                    style: Theme.ButtonStyleOfOption {
+
+                    }
+
+                    onClicked: {
+                        if (rootItem.agent) {
+                            rootItem.agent.changeLogInStream();
+                        }
+
+                        popupOptions.close();
+                    }
+                }*/
+
+                Button {
+                    id: optionViewLogStream
+
+                    enabled: (rootItem.agent ? rootItem.agent.isEnabledViewLogStream : false)
+
+                    height: popupOptions.optionHeight
+                    width: parent.width
+
+                    text: qsTr("View Log Stream")
+
+                    style: Theme.ButtonStyleOfOption {
+                        isVisibleSeparation: false
+                    }
+
+                    onClicked: {
+                        //console.log("QML: View Log Stream");
+
+                        rootItem.agent.openLogStream();
+
+                        popupOptions.close();
+                    }
+                }
             }
         }
-
     }
 }
 

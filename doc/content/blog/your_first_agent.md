@@ -46,7 +46,7 @@ Agents are connected to one another by ***mapping*** outputs from agents to inpu
 
 
 ### The code
-Here we are, this is all you need to know to design your first agent. The example below is developed in C. The code is filled with comments enabling to understand each function and each code block. Just after the code example are several resources to help you compile it on different operating systems dans developing environments.
+Here we are, this is all you need to know to design your first agent. The example below is developed in C. The code is filled with comments enabling to understand each function and each code block. Just after the code example are several resources to help you compile it on different operating systems and developing environments.
 
 We recommend that you immediately copy and paste this code in your favorite C code editor.
 

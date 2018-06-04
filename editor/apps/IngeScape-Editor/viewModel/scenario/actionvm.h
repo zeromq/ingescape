@@ -25,6 +25,9 @@
 #include <model/scenario/actionm.h>
 #include <viewModel/scenario/actionexecutionvm.h>
 
+#define NB_MILLI_SECONDS_IN_ONE_HOUR 3600000
+#define NB_MILLI_SECONDS_IN_ONE_MINUTE 60000
+
 
 /**
  * @brief The ActionVM class defines a view model of action
@@ -57,7 +60,6 @@ class ActionVM: public QObject
     // Current execution (waiting to execute)
     I2_QML_PROPERTY(ActionExecutionVM*, currentExecution)
 
-
     // End time in milliseconds (evaluated from the action type)
     // CUSTOM : startime + validation duration
     // FOREVER : -1
@@ -69,6 +71,7 @@ class ActionVM: public QObject
 
     // Timer to wait for action rearm
     I2_CPP_PROPERTY(QTimer*, timerToRearm)
+
 
 public:
 

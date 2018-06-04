@@ -30,11 +30,11 @@
 
 FILE *fp = NULL;
 bool admin_logInStream = false;
-bool logInFile = false;
+bool admin_logInFile = false;
 bool logInConsole = false;
 bool useColorInConsole = false;
 igs_logLevel_t logLevel = IGS_LOG_INFO;
-char logFile[1024] = "";
+char admin_logFile[1024] = "";
 char logContent[2048] = "";
 char logTime[128] = "";
 #define NUMBER_OF_LOGS_FOR_FFLUSH 0
@@ -204,26 +204,29 @@ void igs_log(igs_logLevel_t level, const char *function, const char *fmt, ...){
         logContent[strlen(logContent) - 1] = '\0';
     }
 
-    if (logInFile){
+    if (admin_logInFile){
         //create default path if current is empty
-        if (strlen(logFile) == 0){
+        if (strlen(admin_logFile) == 0){
             char *name = igs_getAgentName();
 #if defined(__unix__) || defined(__unix) || \
 (defined(__APPLE__) && defined(__MACH__))
-            snprintf(logFile, 1023, "~/%s_log.csv", name);
+            snprintf(admin_logFile, 1023, "~/%s_log.csv", name);
 #else
             //default path for Windows is current PATH
-            snprintf(logFile, 1023, "%s_log.csv", name);
+            snprintf(admin_logFile, 1023, "%s_log.csv", name);
 #endif
+            if (agentElements != NULL && agentElements->node != NULL){
+                zyre_shouts(agentElements->node, CHANNEL, "LOG_FILE_PATH=%s", admin_logFile);
+            }
             free(name);
         }
-        if (logFile[0] == '~'){
+        if (admin_logFile[0] == '~'){
             char buff[1024] = "";
-            strncpy(buff, logFile, 1023);
-            admin_makeFilePath(buff, logFile, 1023);
+            strncpy(buff, admin_logFile, 1023);
+            admin_makeFilePath(buff, admin_logFile, 1023);
         }
-        if (access(logFile, W_OK) == -1){
-            printf("creating log file: %s\n", logFile);
+        if (access(admin_logFile, W_OK) == -1){
+            printf("creating log file: %s\n", admin_logFile);
 #if defined(__unix__) || defined(__unix) || \
     (defined(__APPLE__) && defined(__MACH__))
             fclose(fp);
@@ -231,9 +234,9 @@ void igs_log(igs_logLevel_t level, const char *function, const char *fmt, ...){
 #endif
         }
         if (fp == NULL){
-            fp = fopen (logFile,"a");
+            fp = fopen (admin_logFile,"a");
             if (fp == NULL){
-                printf("error when trying to initiate log file: %s\n", logFile);
+                printf("error when trying to initiate log file: %s\n", admin_logFile);
             }
         }
         admin_computeTime(logTime);
@@ -266,11 +269,20 @@ igs_logLevel_t igs_getLogLevel (void) {
 }
 
 void igs_setLogInFile (bool allow){
-    logInFile = allow;
+    if (allow != admin_logInFile){
+        admin_logInFile = allow;
+        if (agentElements != NULL && agentElements->node != NULL){
+            if (allow){
+                zyre_shouts(agentElements->node, CHANNEL, "LOG_IN_FILE=1");
+            }else{
+                zyre_shouts(agentElements->node, CHANNEL, "LOG_IN_FILE=0");
+            }
+        }
+    }
 }
 
 bool igs_getLogInFile (void) {
-    return logInFile;
+    return admin_logInFile;
 }
 
 void igs_setVerbose (bool allow){
@@ -290,15 +302,24 @@ bool igs_getUseColorVerbose (void) {
 }
 
 void igs_setLogStream(bool stream){
-    if (agentElements != NULL){
-        if (stream){
-            igs_warn("agent is already started, log stream cannot be created anymore");
-        }else{
-            igs_warn("agent is already started, log stream cannot be disabled anymore");
+    if (stream != admin_logInStream){
+        if (agentElements != NULL){
+            if (stream){
+                igs_warn("agent is already started, log stream cannot be created anymore");
+            }else{
+                igs_warn("agent is already started, log stream cannot be disabled anymore");
+            }
+            return;
         }
-        return;
+        admin_logInStream = stream;
+        if (agentElements != NULL && agentElements->node != NULL){
+            if (stream){
+                zyre_shouts(agentElements->node, CHANNEL, "LOG_IN_STREAM=1");
+            }else{
+                zyre_shouts(agentElements->node, CHANNEL, "LOG_IN_STREAM=0");
+            }
+        }
     }
-    admin_logInStream = stream;
 }
 
 bool igs_getLogStream (void) {
@@ -307,27 +328,34 @@ bool igs_getLogStream (void) {
 
 void igs_setLogPath(const char *path){
     if ((path != NULL) && (strlen(path) > 0)){
+        if (strncmp(admin_logFile, path, strlen(admin_logFile)) == 0){
+            igs_warn("'%s' is already the log path", admin_logFile);
+            return;
+        }
         bool needToResetFile = false;
         if (fp != NULL){
             //we need to close previous and initiate new one
             needToResetFile = true;
         }
-        admin_makeFilePath(path, logFile, 1023);
+        admin_makeFilePath(path, admin_logFile, 1023);
         if (needToResetFile){
             admin_lock();
             fflush(fp);
             fclose(fp);
             fp = NULL;
-            if (access(logFile, W_OK) == -1){
-                igs_info("creating new log file: %s", logFile);
+            if (access(admin_logFile, W_OK) == -1){
+                igs_info("creating new log file: %s", admin_logFile);
             }
-            fp = fopen (logFile,"a");
+            fp = fopen (admin_logFile,"a");
             if (fp == NULL){
-                igs_error("error when trying to initiate log file at path %s", logFile);
+                igs_error("could initiate log file at path %s", admin_logFile);
             }else{
-                igs_info("switching to new log file: %s", logFile);
+                igs_info("switching to new log file: %s", admin_logFile);
             }
             admin_unlock();
+        }
+        if (agentElements != NULL && agentElements->node != NULL){
+            zyre_shouts(agentElements->node, CHANNEL, "LOG_FILE_PATH=%s", admin_logFile);
         }
     }else{
         igs_error("passed path cannot be NULL or with length equal to zero");
@@ -335,5 +363,5 @@ void igs_setLogPath(const char *path){
 }
 
 char* igs_getLogPath (void) {
-    return strdup(logFile);
+    return strdup(admin_logFile);
 }

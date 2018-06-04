@@ -47,16 +47,18 @@ class IngeScapeModelManager : public QObject
 
 public:
     /**
-     * @brief Default constructor
+     * @brief Constructor
+     * @param jsonHelper
      * @param agentsListDirectoryPath
      * @param agentsMappingsDirectoryPath
      * @param dataDirectoryPath
      * @param parent
      */
-    explicit IngeScapeModelManager(QString agentsListDirectoryPath,
-                                QString agentsMappingsDirectoryPath,
-                                QString dataDirectoryPath,
-                                QObject *parent = nullptr);
+    explicit IngeScapeModelManager(JsonHelper* jsonHelper,
+                                   QString agentsListDirectoryPath,
+                                   QString agentsMappingsDirectoryPath,
+                                   QString dataDirectoryPath,
+                                   QObject *parent = nullptr);
 
 
     /**
@@ -188,14 +190,6 @@ public:
 
 
     /**
-     * @brief Get the JSON of a mapping
-     * @param agentMapping
-     * @return
-     */
-    QString getJsonOfMapping(AgentMappingM* agentMapping);
-
-
-    /**
      * @brief Simulate an exit for each agent
      */
     void simulateExitForEachActiveAgent();
@@ -292,8 +286,10 @@ public Q_SLOTS:
      * @param hostname
      * @param commandLine
      * @param canBeFrozen
+     * @param loggerPort
+     * @param isRecorder
      */
-    void onAgentEntered(QString peerId, QString agentName, QString agentAddress, int pid, QString hostname, QString commandLine, bool canBeFrozen, bool isRecorder);
+    void onAgentEntered(QString peerId, QString agentName, QString agentAddress, int pid, QString hostname, QString commandLine, bool canBeFrozen, QString loggerPort, bool isRecorder);
 
 
     /**
@@ -338,17 +334,20 @@ public Q_SLOTS:
      */
     void onMappingReceived(QString peerId, QString agentName, QString mappingJSON);
 
+
     /**
      * @brief Slot called when all records of DB have been received and must be processed
      * @param records in JSON format
      */
     void onAllRecordsReceived(QString records);
 
+
     /**
      * @brief Slot called when a new record has been stored into DB
      * @param record in JSON format
      */
     void onNewRecordReceived(QString record);
+
 
     /**
      * @brief Slot called when a new value is published
@@ -381,12 +380,53 @@ public Q_SLOTS:
      */
     void onIsMutedFromOutputOfAgentUpdated(QString peerId, bool isMuted, QString outputName);
 
+
     /**
      * @brief Slot called when the state of an agent changes
      * @param peerId
      * @param stateName
      */
     void onAgentStateChanged(QString peerId, QString stateName);
+
+
+    /**
+     * @brief Slot called when we receive the flag "Log In Stream" for an agent
+     * @param peerId
+     * @param hasLogInStream
+     */
+    void onAgentHasLogInStream(QString peerId, bool hasLogInStream);
+
+
+    /**
+     * @brief Slot called when we receive the flag "Log In File" for an agent
+     * @param peerId
+     * @param hasLogInStream
+     */
+    void onAgentHasLogInFile(QString peerId, bool hasLogInFile);
+
+
+    /**
+     * @brief Slot called when we receive the path of "Log File" for an agent
+     * @param peerId
+     * @param logFilePath
+     */
+    void onAgentLogFilePath(QString peerId, QString logFilePath);
+
+
+    /**
+     * @brief Slot called when we receive the path of "Definition File" for an agent
+     * @param peerId
+     * @param definitionFilePath
+     */
+    void onAgentDefinitionFilePath(QString peerId, QString definitionFilePath);
+
+
+    /**
+     * @brief Slot called when we receive the path of "Mapping File" for an agent
+     * @param peerId
+     * @param mappingFilePath
+     */
+    void onAgentMappingFilePath(QString peerId, QString mappingFilePath);
 
 
 private:
@@ -433,6 +473,9 @@ private:
 
 private:
 
+    // Helper to manage JSON files
+    JsonHelper* _jsonHelper;
+
     // Path to the directory containing JSON files to save agents list
     QString _agentsListDirectoryPath;
     QString _agentsListDefaultFilePath;
@@ -443,9 +486,6 @@ private:
 
     // Path to the directory containing data files
     QString _dataDirectoryPath;
-
-    // Helper to manage JSON definitions of agents
-    JsonHelper* _jsonHelper;
 
     // Map from "peer id" to a model of agent
     QHash<QString, AgentM*> _mapFromPeerIdToAgentM;

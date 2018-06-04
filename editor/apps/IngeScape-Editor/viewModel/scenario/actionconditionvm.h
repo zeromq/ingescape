@@ -26,9 +26,9 @@
 
 
 /**
-  * Action condition type : AGENT, VALUE
+  * Types of Action Condition
   */
-I2_ENUM_CUSTOM(ActionConditionType, VALUE, AGENT)
+I2_ENUM_CUSTOM(ActionConditionTypes, VALUE, AGENT)
 
 
 /**
@@ -42,7 +42,7 @@ class ActionConditionVM: public QObject
     I2_QML_PROPERTY(ActionConditionM*, modelM)
 
     // Action condition type
-    I2_QML_PROPERTY_CUSTOM_SETTER(ActionConditionType::Value, conditionType)
+    I2_QML_PROPERTY_CUSTOM_SETTER(ActionConditionTypes::Value, conditionType)
 
 
 public:
@@ -71,7 +71,7 @@ private:
     /**
      * @brief Configure action condition VM into a specific type
      */
-    void _configureToType(ActionConditionType::Value value);
+    void _configureToType(ActionConditionTypes::Value value);
 
 protected:
 

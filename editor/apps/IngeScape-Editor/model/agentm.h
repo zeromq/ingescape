@@ -66,7 +66,10 @@ class AgentM : public QObject
     // Flag indicating if our agent can be frozen
     I2_QML_PROPERTY_READONLY(bool, canBeFrozen)
 
-    // Command line of our agent
+    // Port for log in stream
+    I2_CPP_PROPERTY(QString, loggerPort)
+
+    // Flag indicating if our agent is a recorder
     I2_CPP_NOSIGNAL_PROPERTY(bool, isRecorder)
 
     // Flag indicating if our agent is frozen
@@ -78,11 +81,23 @@ class AgentM : public QObject
     // Mapping of our agent
     I2_QML_PROPERTY_READONLY(AgentMappingM*, mapping)
 
-    // Flag indicating if we have to overwrite the mapping of our agent (when it will send its mapping)
-    I2_QML_PROPERTY_READONLY(bool, mustOverWriteMapping)
-
     // State of our agent
-    I2_QML_PROPERTY(QString, state)
+    I2_CPP_PROPERTY(QString, state)
+
+    // Flag indicating if our agent has its log in a stream
+    I2_CPP_PROPERTY(bool, hasLogInStream)
+
+    // Flag indicating if our agent has its log in a file
+    I2_CPP_PROPERTY(bool, hasLogInFile)
+
+    // Path of the log file of our agent
+    I2_CPP_PROPERTY(QString, logFilePath)
+
+    // Path of the definition file of our agent
+    I2_CPP_PROPERTY(QString, definitionFilePath)
+
+    // Path of the mapping file of our agent
+    I2_CPP_PROPERTY(QString, mappingFilePath)
 
 
 public:

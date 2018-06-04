@@ -458,6 +458,12 @@ Item {
                         onNeedConfirmationtoDeleteAgent : {
                             deleteConfirmationPopup.open();
                         }
+
+                        onConfigureFilesPaths: {
+                            //console.log("Open 'Configure Files Paths' for " + agent.name);
+                            agentFilesPathsPopup.agent = agent;
+                            agentFilesPathsPopup.open();
+                        }
                     }
 
                     AgentMapping.AgentNodeView {
@@ -473,7 +479,7 @@ Item {
 
 
     //
-    // Delete Confirmation
+    // Popup about Delete Confirmation
     //
     Editor.DeleteConfirmationPopup {
         id : deleteConfirmationPopup
@@ -500,8 +506,8 @@ Item {
         anchors.centerIn: parent
 
         isModal: true
-        dismissOnOutsideTap : true
-        keepRelativePositionToInitialParent : false
+        dismissOnOutsideTap: true
+        keepRelativePositionToInitialParent: false
 
         Rectangle {
 
@@ -545,7 +551,7 @@ Item {
 
                 property var boundingBox: IngeScapeTheme.svgFileINGESCAPE.boundsOnElement("button");
                 height: boundingBox.height
-                width:  boundingBox.width
+                width: boundingBox.width
 
                 activeFocusOnPress: true
                 text: "OK"
@@ -555,7 +561,7 @@ Item {
 
                     pressedID: releasedID + "-pressed"
                     releasedID: "button"
-                    disabledID : releasedID
+                    disabledID: releasedID + "-disabled"
 
                     font {
                         family: IngeScapeTheme.textFontFamily
@@ -573,5 +579,16 @@ Item {
                 }
             }
         }
+    }
+
+
+    //
+    // Network Configuration (Popup)
+    //
+    AgentFilesPaths {
+        id: agentFilesPathsPopup
+
+        anchors.centerIn: parent
+
     }
 }

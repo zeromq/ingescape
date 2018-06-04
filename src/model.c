@@ -521,7 +521,7 @@ int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void*
                     }
                     outSize = iop->valueSize = (strlen(iop->value.s) + 1)*sizeof(char);
                     outValue = iop->value.s;
-                    igs_info("set %s to %s (length: %d)", iopName, iop->value.s, iop->valueSize - 1);
+                    igs_info("set %s to %s (length: %lu)", iopName, iop->value.s, iop->valueSize - 1);
                 }
                     break;
                 case IGS_IMPULSION_T:
@@ -539,7 +539,7 @@ int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void*
                     memcpy(iop->value.data, value, sizeof(int));
                     outSize = iop->valueSize = sizeof(int);
                     outValue = iop->value.data;
-                    igs_info("set %s data (length: %d)", iopName, iop->valueSize);
+                    igs_info("set %s data (length: %zu)", iopName, iop->valueSize);
                 }
                     break;
                 default:
@@ -583,7 +583,7 @@ int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void*
                     }
                     outSize = iop->valueSize = (strlen(iop->value.s) + 1)*sizeof(char);
                     outValue = iop->value.s;
-                    igs_info("set %s to %s (length: %d)", iopName, iop->value.s, iop->valueSize - 1);
+                    igs_info("set %s to %s (length: %lu)", iopName, iop->value.s, iop->valueSize - 1);
                 }
                     break;
                 case IGS_IMPULSION_T:
@@ -601,7 +601,7 @@ int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void*
                     memcpy(iop->value.data, value, sizeof(double));
                     outSize = iop->valueSize = sizeof(double);
                     outValue = iop->value.data;
-                    igs_info("set %s data (length: %d)", iopName, iop->valueSize);
+                    igs_info("set %s data (length: %zu)", iopName, iop->valueSize);
                 }
                     break;
                 default:
@@ -645,7 +645,7 @@ int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void*
                     }
                     outSize = iop->valueSize = (strlen(iop->value.s) + 1)*sizeof(char);
                     outValue = iop->value.s;
-                    igs_info("set %s to %s (length: %d)", iopName, iop->value.s, iop->valueSize - 1);
+                    igs_info("set %s to %s (length: %lu)", iopName, iop->value.s, iop->valueSize - 1);
                 }
                     break;
                 case IGS_IMPULSION_T:
@@ -663,7 +663,7 @@ int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void*
                     memcpy(iop->value.data, value, sizeof(bool));
                     outSize = iop->valueSize = sizeof(bool);
                     outValue = iop->value.data;
-                    igs_info("set %s data (length: %d)", iopName, iop->valueSize);
+                    igs_info("set %s data (length: %zu)", iopName, iop->valueSize);
                 }
                     break;
                 default:
@@ -705,7 +705,7 @@ int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void*
                     }
                     outSize = iop->valueSize = (strlen(iop->value.s) + 1)*sizeof(char);
                     outValue = iop->value.s;
-                    igs_info("set %s to %s (length: %d)", iopName, iop->value.s, iop->valueSize - 1);
+                    igs_info("set %s to %s (length: %lu)", iopName, iop->value.s, iop->valueSize - 1);
                 }
                     break;
                 case IGS_IMPULSION_T:
@@ -728,7 +728,7 @@ int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void*
                     }
                     outSize = iop->valueSize = s;
                     outValue = iop->value.data;
-                    igs_info("set %s data (length: %d)", iopName, s);
+                    igs_info("set %s data (length: %zu)", iopName, s);
                 }
                     break;
                 default:
@@ -779,7 +779,7 @@ int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void*
                     memcpy(iop->value.data, value, size);
                     outSize = iop->valueSize = size;
                     outValue = iop->value.data;
-                    igs_info("set %s data (length: %d)", iopName, size);
+                    igs_info("set %s data (length: %zu)", iopName, size);
                 }
                     break;
                 default:

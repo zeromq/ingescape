@@ -24,19 +24,19 @@
 
 #include <I2PropertyHelpers.h>
 
-#include <controller/ingescapemodelmanager.h>
+#include <controller/abstracttimeactionslinescenarioviewcontroller.h>
+#include <controller/agentsmappingcontroller.h>
 #include <controller/agentssupervisioncontroller.h>
 #include <controller/hostssupervisioncontroller.h>
-#include <controller/recordssupervisioncontroller.h>
-#include <controller/agentsmappingcontroller.h>
+#include <controller/ingescapelaunchermanager.h>
+#include <controller/ingescapemodelmanager.h>
+#include <controller/logstreamcontroller.h>
 #include <controller/networkcontroller.h>
+#include <controller/recordssupervisioncontroller.h>
 #include <controller/scenariocontroller.h>
 #include <controller/valueshistorycontroller.h>
-#include <controller/abstracttimeactionslinescenarioviewcontroller.h>
-#include <controller/ingescapelaunchermanager.h>
 
 #include <misc/terminationsignalwatcher.h>
-
 
 
 /**
@@ -54,6 +54,9 @@ class IngeScapeEditorController : public QObject
 
     // Network settings - port
     I2_QML_PROPERTY_READONLY(int, port)
+
+    // Error message when a connection attempt fails
+    I2_QML_PROPERTY_READONLY(QString, errorMessageWhenConnectionFailed)
 
     // Snapshot Directory
     I2_QML_PROPERTY_READONLY(QString, snapshotDirectory)
@@ -88,6 +91,9 @@ class IngeScapeEditorController : public QObject
     // Manager for launchers of INGESCAPE agents
     I2_QML_PROPERTY_READONLY(IngeScapeLauncherManager*, launcherManager)
 
+    // Opened log stream viewers
+    I2_QOBJECT_LISTMODEL(LogStreamController, openedLogStreamControllers)
+
 
 public:
 
@@ -118,15 +124,18 @@ public:
       */
     Q_INVOKABLE void openPlatformFromFile();
 
+
     /**
       * @brief Save a platform to a selected file (actions, palette, timeline actions, mappings)
       */
     Q_INVOKABLE void savePlatformToSelectedFile();
 
+
     /**
       * @brief Save a platform to the default file (actions, palette, timeline actions, mappings)
       */
     void savePlatformToDefaultFile();
+
 
     /**
       * @brief Create a new platform (actions, palette, timeline actions, mappings)
@@ -134,24 +143,27 @@ public:
       */
     Q_INVOKABLE void createNewPlatform();
 
+
     /**
       * @brief Actions to perform before the application closing
       */
     Q_INVOKABLE void processBeforeClosing();
 
-    /**
-      * @brief Can delete an agent view model from the list function
-      *        Check dependencies in the mapping and in the actions (conditions, effects)
-      * @param agent to delete
-      */
-    Q_INVOKABLE bool canDeleteAgentVMFromList(AgentVM* agent);
 
     /**
-      * @brief Can delete an agent in mapping from the mapping view
+      * @brief Check if we can delete an agent (view model) from the list in supervision
+      *        Check dependencies in the mapping and in the actions (conditions, effects)
+      * @param agentName
+      */
+    Q_INVOKABLE bool canDeleteAgentFromSupervision(QString agentName);
+
+
+    /**
+      * @brief Check if we can delete an agent (in mapping) from the mapping view
       *        Check dependencies in the actions (conditions, effects)
       * @param agent in mapping to delete
       */
-    Q_INVOKABLE bool canDeleteAgentInMapping(AgentInMappingVM* agentInMapping);
+    Q_INVOKABLE bool canDeleteAgentInMapping(QString agentName);
 
 
     /**
@@ -163,21 +175,28 @@ public:
     Q_INVOKABLE bool restartNetwork(QString strPort, QString networkDevice);
 
 
-public Q_SLOTS:
-
     /**
       * @brief Close a definition
       * @param definition
       */
-    void closeDefinition(DefinitionM* definition);
+    Q_INVOKABLE void closeDefinition(DefinitionM* definition);
 
 
     /**
       * @brief Close an action editor
-      * @param action editor controller
+      * @param actionEditorC
       */
-    void closeActionEditor(ActionEditorController *actionEditorC);
+    Q_INVOKABLE void closeActionEditor(ActionEditorController* actionEditorC);
 
+
+    /**
+     * @brief Close a "Log Stream" controller
+     * @param logStreamC
+     */
+    Q_INVOKABLE void closeLogStreamController(LogStreamController* logStreamC);
+
+
+public Q_SLOTS:
 
     /**
       * @brief Method used to force the creation of our singleton from QML
@@ -193,6 +212,13 @@ public Q_SLOTS:
       * @return
       */
     QPointF getGlobalMousePosition();
+
+
+    /**
+     * @brief Slot called when we have to open the "Log Stream" of a list of agents
+     * @param models
+     */
+    void onOpenLogStreamOfAgents(QList<AgentM*> models);
 
 
 Q_SIGNALS:
@@ -211,6 +237,7 @@ private:
       */
     void _openPlatformFromFile(QString platformFilePath);
 
+
     /**
       * @brief Save the platform to JSON file
       * @param platformFilePath
@@ -218,15 +245,17 @@ private:
     void _savePlatformToFile(QString platformFilePath);
 
 
+private:
+
     // To subscribe to termination signals
     TerminationSignalWatcher *_terminationSignalWatcher;
+
+    // Helper to manage JSON files
+    JsonHelper* _jsonHelper;
 
     // Path to the directory containing JSON files to save platform
     QString _platformDirectoryPath;
     QString _platformDefaultFilePath;
-
-    // Helper to manage JSON the saving/opening platform files
-    JsonHelper* _jsonHelper;
 
 };
 

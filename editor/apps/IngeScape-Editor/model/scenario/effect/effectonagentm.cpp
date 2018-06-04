@@ -21,23 +21,29 @@
  */
 QString AgentEffectValues::enumToString(int value)
 {
-    QString string = "Agent Effect Value";
-
     switch (value)
     {
     case AgentEffectValues::ON:
-        string = "ON";
-        break;
+        return tr("ON");
 
     case AgentEffectValues::OFF:
-        string = "OFF";
-        break;
+        return tr("OFF");
+
+    case AgentEffectValues::MUTE:
+        return tr("MUTE");
+
+    case AgentEffectValues::UNMUTE:
+        return tr("UNMUTE");
+
+    case AgentEffectValues::FREEZE:
+        return tr("FREEZE");
+
+    case AgentEffectValues::UNFREEZE:
+        return tr("UNFREEZE");
 
     default:
-        break;
+        return "";
     }
-
-    return string;
 }
 
 
@@ -103,11 +109,27 @@ QPair<AgentInMappingVM*, QStringList> EffectOnAgentM::getAgentAndCommandWithPara
         switch (_agentEffectValue)
         {
         case AgentEffectValues::ON: {
-            commandAndParameters << "RUN";
+            commandAndParameters << command_StartAgent;
             break;
         }
         case AgentEffectValues::OFF: {
-            commandAndParameters << "STOP";
+            commandAndParameters << command_StopAgent;
+            break;
+        }
+        case AgentEffectValues::MUTE: {
+            commandAndParameters << command_MuteAgent;
+            break;
+        }
+        case AgentEffectValues::UNMUTE: {
+            commandAndParameters << command_UnmuteAgent;
+            break;
+        }
+        case AgentEffectValues::FREEZE: {
+            commandAndParameters << command_FreezeAgent;
+            break;
+        }
+        case AgentEffectValues::UNFREEZE: {
+            commandAndParameters << command_UnfreezeAgent;
             break;
         }
         default:
@@ -138,11 +160,27 @@ QPair<QString, QStringList> EffectOnAgentM::getAgentNameAndReverseCommandWithPar
         switch (_agentEffectValue)
         {
         case AgentEffectValues::ON: {
-            reverseCommandAndParameters << "STOP";
+            reverseCommandAndParameters << command_StopAgent;
             break;
         }
         case AgentEffectValues::OFF: {
-            reverseCommandAndParameters << "RUN";
+            reverseCommandAndParameters << command_StartAgent;
+            break;
+        }
+        case AgentEffectValues::MUTE: {
+            reverseCommandAndParameters << command_UnmuteAgent;
+            break;
+        }
+        case AgentEffectValues::UNMUTE: {
+            reverseCommandAndParameters << command_MuteAgent;
+            break;
+        }
+        case AgentEffectValues::FREEZE: {
+            reverseCommandAndParameters << command_UnfreezeAgent;
+            break;
+        }
+        case AgentEffectValues::UNFREEZE: {
+            reverseCommandAndParameters << command_FreezeAgent;
             break;
         }
         default:

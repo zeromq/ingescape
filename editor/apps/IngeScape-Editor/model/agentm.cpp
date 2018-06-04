@@ -53,12 +53,17 @@ AgentM::AgentM(QString name,
     _canBeRestarted(false),
     _isMuted(false),
     _canBeFrozen(false),
+    _loggerPort(""),
     _isRecorder(false),
     _isFrozen(false),
     _definition(NULL),
     _mapping(NULL),
-    _mustOverWriteMapping(false),
-    _state("")
+    _state(""),
+    _hasLogInStream(false),
+    _hasLogInFile(false),
+    _logFilePath(""),
+    _definitionFilePath(""),
+    _mappingFilePath("")
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -130,12 +135,11 @@ void AgentM::setdefinition(DefinitionM *value)
 
         _definition = value;
 
+        // Emit default signal for QML
         Q_EMIT definitionChanged(value);
 
-        if (previousValue != NULL) {
-            // Emit the signal "Definition Changed" with previous and new values
-            Q_EMIT definitionChangedWithPreviousAndNewValues(previousValue, value);
-        }
+        // Emit the signal "Definition Changed" with previous and new values
+        Q_EMIT definitionChangedWithPreviousAndNewValues(previousValue, value);
     }
 }
 

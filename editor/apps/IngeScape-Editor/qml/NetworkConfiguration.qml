@@ -98,6 +98,11 @@ I2PopupBase {
             verticalAlignment: TextInput.AlignVCenter
             text: IngeScapeEditorC.port
 
+            validator: IntValidator {
+                bottom: 1;
+                top: 65535;
+            }
+
             style: I2TextFieldStyle {
                 backgroundColor: IngeScapeTheme.darkBlueGreyColor
                 borderColor: IngeScapeTheme.whiteColor;
@@ -155,6 +160,48 @@ I2PopupBase {
             useQStringList: true
 
             //placeholderText: (IngeScapeEditorC.networkC && IngeScapeEditorC.networkC.availableNetworkDevices.count === 0 ? "- No network device -" : "- Select a network device -")
+
+            onSelectedItemChanged: {
+                var selectedNetworkDevice = "";
+
+                if (typeof combobox.selectedItem === "string") {
+                    console.log("onSelectedItemChanged (string) " + combobox.selectedItem);
+                    selectedNetworkDevice = combobox.selectedItem;
+                }
+                else {
+                    console.log("onSelectedItemChanged (object) " + combobox.selectedItem.modelData);
+                    selectedNetworkDevice = combobox.selectedItem.modelData;
+                }
+
+                okButton.enabled = IngeScapeEditorC.networkC.isAvailableNetworkDevice(selectedNetworkDevice);
+            }
+        }
+
+        Rectangle {
+            id: space3
+            color: "transparent"
+            width: 10
+            height: 10
+        }
+
+        Text {
+            id: error
+
+            anchors {
+                left: parent.left
+                right: parent.right
+            }
+            horizontalAlignment: Text.AlignHCenter
+            wrapMode: Text.WordWrap
+
+            text: IngeScapeEditorC.errorMessageWhenConnectionFailed
+
+            color: IngeScapeTheme.redColor
+            font {
+                family: IngeScapeTheme.textFontFamily
+                weight : Font.Medium
+                pixelSize : 16
+            }
         }
     }
 
@@ -187,7 +234,7 @@ I2PopupBase {
 
                 pressedID: releasedID + "-pressed"
                 releasedID: "button"
-                disabledID : releasedID
+                disabledID: releasedID + "-disabled"
 
                 font {
                     family: IngeScapeTheme.textFontFamily
@@ -215,6 +262,7 @@ I2PopupBase {
 
             activeFocusOnPress: true
             text : "OK"
+            //enabled: true
 
             anchors {
                 verticalCenter: parent.verticalCenter
@@ -225,7 +273,7 @@ I2PopupBase {
 
                 pressedID: releasedID + "-pressed"
                 releasedID: "button"
-                disabledID : releasedID
+                disabledID: releasedID + "-disabled"
 
                 font {
                     family: IngeScapeTheme.textFontFamily
@@ -234,7 +282,7 @@ I2PopupBase {
                 }
                 labelColorPressed: IngeScapeTheme.blackColor
                 labelColorReleased: IngeScapeTheme.whiteColor
-                labelColorDisabled: IngeScapeTheme.whiteColor
+                labelColorDisabled: IngeScapeTheme.greyColor
 
             }
 

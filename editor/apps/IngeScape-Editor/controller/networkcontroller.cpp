@@ -27,18 +27,23 @@ extern "C" {
 #include "misc/ingescapeeditorutils.h"
 #include "model/definitionm.h"
 
-static const QString launcherSuffix = ".ingescapelauncher";
+static const QString suffix_Launcher = ".ingescapelauncher";
 
-static const QString definitionPrefix = "EXTERNAL_DEFINITION#";
-static const QString mappingPrefix = "EXTERNAL_MAPPING#";
-static const QString allRecordsPrefix = "RECORDS_LIST#";
-static const QString newRecordPrefix = "NEW_RECORD#";
+static const QString prefix_Definition = "EXTERNAL_DEFINITION#";
+static const QString prefix_Mapping = "EXTERNAL_MAPPING#";
+static const QString prefix_AllRecords = "RECORDS_LIST#";
+static const QString prefix_NewRecord = "NEW_RECORD#";
 
-static const QString mutedAllPrefix = "MUTED=";
-static const QString frozenPrefix = "FROZEN=";
-static const QString mutedOutputPrefix = "OUTPUT_MUTED ";
-static const QString unmutedOutputPrefix = "OUTPUT_UNMUTED ";
-static const QString statePrefix = "STATE=";
+static const QString prefix_Muted = "MUTED=";
+static const QString prefix_Frozen = "FROZEN=";
+static const QString prefix_OutputMuted = "OUTPUT_MUTED ";
+static const QString prefix_OutputUnmuted = "OUTPUT_UNMUTED ";
+static const QString prefix_State = "STATE=";
+static const QString prefix_LogInStream = "LOG_IN_STREAM=";
+static const QString prefix_LogInFile = "LOG_IN_FILE=";
+static const QString prefix_LogFilePath = "LOG_FILE_PATH=";
+static const QString prefix_DefinitionFilePath = "DEFINITION_FILE_PATH=";
+static const QString prefix_MappingFilePath = "MAPPING_FILE_PATH=";
 
 
 /**
@@ -89,6 +94,7 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
             bool canBeFrozen = false;
             QString hostname = "";
             QString commandLine = "";
+            QString loggerPort = "";
             QString streamingPort = "";
 
             zlist_t *keys = zhash_keys(headers);
@@ -130,6 +136,9 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
                     else if (key == "hostname") {
                         hostname = value;
                     }
+                    else if (key == "logger") {
+                        loggerPort = value;
+                    }
                     else if (key == "videoStream") {
                         streamingPort = value;
                     }
@@ -142,9 +151,9 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
 
 
             // IngeScape Launcher
-            if (peerName.endsWith(launcherSuffix))
+            if (peerName.endsWith(suffix_Launcher))
             {
-                hostname = peerName.left(peerName.length() - launcherSuffix.length());
+                hostname = peerName.left(peerName.length() - suffix_Launcher.length());
 
                 // Emit the signal "Launcher Entered"
                 Q_EMIT networkController->launcherEntered(peerId, hostname, ipAddress, streamingPort);
@@ -154,7 +163,7 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
                 //qDebug() << "Our zyre event is about INGESCAPE publisher:" << pid << hostname << commandLine;
 
                 // Emit the signal "Agent Entered"
-                Q_EMIT networkController->agentEntered(peerId, peerName, ipAddress, pid, hostname, commandLine, canBeFrozen, isIngeScapeRecorder);
+                Q_EMIT networkController->agentEntered(peerId, peerName, ipAddress, pid, hostname, commandLine, canBeFrozen, loggerPort, isIngeScapeRecorder);
             }
         }
         // JOIN (group)
@@ -174,40 +183,83 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
             QString message = zmsg_popstr(msg_dup);
 
             // MUTED / UN-MUTED
-            if (message.startsWith(mutedAllPrefix))
+            if (message.startsWith(prefix_Muted))
             {
                 // Manage the message "MUTED / UN-MUTED"
-                networkController->manageMessageMutedUnmuted(peerId, message.remove(0, mutedAllPrefix.length()));
+                networkController->manageMessageMutedUnmuted(peerId, message.remove(0, prefix_Muted.length()));
             }
             // FROZEN / UN-FROZEN
-            else if (message.startsWith(frozenPrefix))
+            else if (message.startsWith(prefix_Frozen))
             {
                 // Manage the message "FROZEN / UN-FROZEN"
-                networkController->manageMessageFrozenUnfrozen(peerId, message.remove(0, frozenPrefix.length()));
+                networkController->manageMessageFrozenUnfrozen(peerId, message.remove(0, prefix_Frozen.length()));
             }
             // OUTPUT MUTED
-            else if (message.startsWith(mutedOutputPrefix))
+            else if (message.startsWith(prefix_OutputMuted))
             {
-                QString outputName = message.remove(0, mutedOutputPrefix.length());
+                QString outputName = message.remove(0, prefix_OutputMuted.length());
 
                 // Emit the signal "is Muted from OUTPUT of Agent Updated"
                 Q_EMIT networkController->isMutedFromOutputOfAgentUpdated(peerId, true, outputName);
             }
             // OUTPUT UN-MUTED
-            else if (message.startsWith(unmutedOutputPrefix))
+            else if (message.startsWith(prefix_OutputUnmuted))
             {
-                QString outputName = message.remove(0, unmutedOutputPrefix.length());
+                QString outputName = message.remove(0, prefix_OutputUnmuted.length());
 
                 // Emit the signal "is Muted from OUTPUT of Agent Updated"
                 Q_EMIT networkController->isMutedFromOutputOfAgentUpdated(peerId, false, outputName);
             }
             // STATE
-            else if (message.startsWith(statePrefix))
+            else if (message.startsWith(prefix_State))
             {
-                QString stateName = message.remove(0, statePrefix.length());
+                QString stateName = message.remove(0, prefix_State.length());
 
                 // Emit the signal "State changed"
                 Q_EMIT networkController->agentStateChanged(peerId, stateName);
+            }
+            // LOG IN STREAM
+            else if (message.startsWith(prefix_LogInStream))
+            {
+                QString hasLogInStream = message.remove(0, prefix_LogInStream.length());
+                if (hasLogInStream == "1") {
+                    Q_EMIT networkController->agentHasLogInStream(peerId, true);
+                }
+                else {
+                    Q_EMIT networkController->agentHasLogInStream(peerId, false);
+                }
+            }
+            // LOG IN FILE
+            else if (message.startsWith(prefix_LogInFile))
+            {
+                QString hasLogInFile = message.remove(0, prefix_LogInFile.length());
+                if (hasLogInFile == "1") {
+                    Q_EMIT networkController->agentHasLogInFile(peerId, true);
+                }
+                else {
+                    Q_EMIT networkController->agentHasLogInFile(peerId, false);
+                }
+            }
+            // LOG FILE PATH
+            else if (message.startsWith(prefix_LogFilePath))
+            {
+                QString logFilePath = message.remove(0, prefix_LogFilePath.length());
+
+                Q_EMIT networkController->agentLogFilePath(peerId, logFilePath);
+            }
+            // DEFINITION FILE PATH
+            else if (message.startsWith(prefix_DefinitionFilePath))
+            {
+                QString definitionFilePath = message.remove(0, prefix_DefinitionFilePath.length());
+
+                Q_EMIT networkController->agentDefinitionFilePath(peerId, definitionFilePath);
+            }
+            // MAPPING FILE PATH
+            else if (message.startsWith(prefix_MappingFilePath))
+            {
+                QString mappingFilePath = message.remove(0, prefix_MappingFilePath.length());
+
+                Q_EMIT networkController->agentMappingFilePath(peerId, mappingFilePath);
             }
             else
             {
@@ -223,72 +275,119 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
             QString message = zmsg_popstr(msg_dup);
 
             // Definition
-            if (message.startsWith(definitionPrefix))
+            if (message.startsWith(prefix_Definition))
             {
-                message.remove(0, definitionPrefix.length());
+                message.remove(0, prefix_Definition.length());
 
                 // Emit the signal "Definition Received"
                 Q_EMIT networkController->definitionReceived(peerId, peerName, message);
             }
             // Mapping
-            else if (message.startsWith(mappingPrefix))
+            else if (message.startsWith(prefix_Mapping))
             {
-                message.remove(0, mappingPrefix.length());
+                message.remove(0, prefix_Mapping.length());
 
                 // Emit the signal "Mapping Received"
                 Q_EMIT networkController->mappingReceived(peerId, peerName, message);
             }
             // All records
-            else if (message.startsWith(allRecordsPrefix))
+            else if (message.startsWith(prefix_AllRecords))
             {
-                message.remove(0, allRecordsPrefix.length());
+                message.remove(0, prefix_AllRecords.length());
 
                 // Emit the signal "All records Received"
                 Q_EMIT networkController->allRecordsReceived(message);
             }
             // New record
-            else if (message.startsWith(newRecordPrefix))
+            else if (message.startsWith(prefix_NewRecord))
             {
-                message.remove(0, newRecordPrefix.length());
+                message.remove(0, prefix_NewRecord.length());
 
                 // Emit the signal "New record Received"
                 Q_EMIT networkController->newRecordReceived(message);
             }
             // MUTED / UN-MUTED
-            else if (message.startsWith(mutedAllPrefix))
+            else if (message.startsWith(prefix_Muted))
             {
+                message.remove(0, prefix_Muted.length());
+
                 // Manage the message "MUTED / UN-MUTED"
-                networkController->manageMessageMutedUnmuted(peerId, message.remove(0, mutedAllPrefix.length()));
+                networkController->manageMessageMutedUnmuted(peerId, message);
             }
             // FROZEN / UN-FROZEN
-            else if (message.startsWith(frozenPrefix))
+            else if (message.startsWith(prefix_Frozen))
             {
+                message.remove(0, prefix_Frozen.length());
+
                 // Manage the message "FROZEN / UN-FROZEN"
-                networkController->manageMessageFrozenUnfrozen(peerId, message.remove(0, frozenPrefix.length()));
+                networkController->manageMessageFrozenUnfrozen(peerId, message);
             }
             // OUTPUT MUTED
-            else if (message.startsWith(mutedOutputPrefix))
+            else if (message.startsWith(prefix_OutputMuted))
             {
-                QString outputName = message.remove(0, mutedOutputPrefix.length());
+                QString outputName = message.remove(0, prefix_OutputMuted.length());
 
                 // Emit the signal "is Muted from OUTPUT of Agent Updated"
                 Q_EMIT networkController->isMutedFromOutputOfAgentUpdated(peerId, true, outputName);
             }
             // OUTPUT UN-MUTED
-            else if (message.startsWith(unmutedOutputPrefix))
+            else if (message.startsWith(prefix_OutputUnmuted))
             {
-                QString outputName = message.remove(0, unmutedOutputPrefix.length());
+                QString outputName = message.remove(0, prefix_OutputUnmuted.length());
 
                 // Emit the signal "is Muted from OUTPUT of Agent Updated"
                 Q_EMIT networkController->isMutedFromOutputOfAgentUpdated(peerId, false, outputName);
             }
             // STATE
-            else if (message.startsWith(statePrefix))
+            else if (message.startsWith(prefix_State))
             {
-                QString stateName = message.remove(0, statePrefix.length());
+                QString stateName = message.remove(0, prefix_State.length());
 
                 // Emit the signal "State changed"
                 Q_EMIT networkController->agentStateChanged(peerId, stateName);
+            }
+            // LOG IN STREAM
+            else if (message.startsWith(prefix_LogInStream))
+            {
+                QString hasLogInStream = message.remove(0, prefix_LogInStream.length());
+                if (hasLogInStream == "1") {
+                    Q_EMIT networkController->agentHasLogInStream(peerId, true);
+                }
+                else {
+                    Q_EMIT networkController->agentHasLogInStream(peerId, false);
+                }
+            }
+            // LOG IN FILE
+            else if (message.startsWith(prefix_LogInFile))
+            {
+                QString hasLogInFile = message.remove(0, prefix_LogInFile.length());
+                if (hasLogInFile == "1") {
+                    Q_EMIT networkController->agentHasLogInFile(peerId, true);
+                }
+                else {
+                    Q_EMIT networkController->agentHasLogInFile(peerId, false);
+                }
+            }
+            // LOG FILE PATH
+            else if (message.startsWith(prefix_LogFilePath))
+            {
+                QString logFilePath = message.remove(0, prefix_LogFilePath.length());
+
+                Q_EMIT networkController->agentLogFilePath(peerId, logFilePath);
+            }
+            // DEFINITION FILE PATH
+            else if (message.startsWith(prefix_DefinitionFilePath))
+            {
+                QString definitionFilePath = message.remove(0, prefix_DefinitionFilePath.length());
+
+                Q_EMIT networkController->agentDefinitionFilePath(peerId, definitionFilePath);
+            }
+            // MAPPING FILE PATH
+            else if (message.startsWith(prefix_MappingFilePath))
+            {
+                QString mappingFilePath = message.remove(0, prefix_MappingFilePath.length());
+
+                Q_EMIT networkController->agentMappingFilePath(peerId, mappingFilePath);
             }
             else
             {
@@ -303,8 +402,9 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
             qDebug() << QString("<-- %1 (%2) exited").arg(peerName, peerId);
 
             // IngeScape Launcher
-            if (peerName.endsWith(launcherSuffix)) {
-                QString hostname = peerName.left(peerName.length() - launcherSuffix.length());
+            if (peerName.endsWith(suffix_Launcher))
+            {
+                QString hostname = peerName.left(peerName.length() - suffix_Launcher.length());
 
                 // Emit the signal "Launcher Exited"
                 Q_EMIT networkController->launcherExited(peerId, hostname);
@@ -631,6 +731,22 @@ void NetworkController::manageMessageFrozenUnfrozen(QString peerId, QString mess
 
 
 /**
+ * @brief Return true if the network device is available
+ * @param networkDevice
+ * @return
+ */
+bool NetworkController::isAvailableNetworkDevice(QString networkDevice)
+{
+    if (!networkDevice.isEmpty() && _availableNetworkDevices.contains(networkDevice)) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+
+/**
  * @brief Slot when a command must be sent on the network to a launcher
  * @param command
  * @param hostname
@@ -857,6 +973,10 @@ void NetworkController::onRemoveInputsToEditorForOutputs(QString agentName, QLis
             _mapFromInputNameToNumberOfAgentsON.insert(inputName, numberOfAgentsON);
 
             qDebug() << "on Remove Inputs: There are" << numberOfAgentsON << "agents ON for input name" << inputName;
+            // FIXME: Debug numberOfAgentsON < 0
+            if (numberOfAgentsON < 0) {
+                qWarning() << "There are" << numberOfAgentsON << "agents ON for input name" << inputName;
+            }
 
             // If there is no more agent in state ON for this input name, we remove an old input on our agent
             if (numberOfAgentsON == 0)

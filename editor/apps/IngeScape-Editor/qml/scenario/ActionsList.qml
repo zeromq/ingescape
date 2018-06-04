@@ -205,7 +205,7 @@ Item {
                 }
 
                 onClicked: {
-                    controller.openActionEditor(null);
+                    controller.openActionEditorWithModel(null);
                     //actionEditor.show();
                 }
             }
