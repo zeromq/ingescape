@@ -45,6 +45,9 @@ class RecordsSupervisionController : public QObject
     // Indicating if a recorder agent is currently recording
     I2_QML_PROPERTY_CUSTOM_SETTER(bool, isRecording)
 
+    // Stores the id of the currently played record
+    I2_QML_PROPERTY(QString, playingRecordId)
+
     // Current elapsed time of our record
     I2_QML_PROPERTY(QTime, currentRecordTime)
 

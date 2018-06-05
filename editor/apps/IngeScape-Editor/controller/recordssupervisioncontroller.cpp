@@ -31,6 +31,7 @@ RecordsSupervisionController::RecordsSupervisionController(IngeScapeModelManager
     _recorderAgent(NULL),
     _selectedRecord(NULL),
     _isRecording(false),
+    _playingRecordId(""),
     _currentRecordTime(QTime::fromMSecsSinceStartOfDay(0)),
     _modelManager(modelManager)
 {
@@ -149,6 +150,7 @@ void RecordsSupervisionController::controlRecord(QString recordId, bool startPla
     if(_recorderAgent != NULL)
     {
         QString command = startPlaying? "PLAY_RECORD#" : "PAUSE_RECORD#";
+        setplayingRecordId(startPlaying ? recordId : "");
         Q_EMIT commandAskedToAgent(_recorderAgent->peerId().split(","), QString("%1%2").arg(command).arg(recordId));
     }
 }
