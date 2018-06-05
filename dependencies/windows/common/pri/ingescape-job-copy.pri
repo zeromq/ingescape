@@ -2,7 +2,7 @@
 
 #IngeScape.h
 header_source_path = $$shell_path($$clean_path($$absolute_path($$PWD/../../../../src/include/ingescape.h)))
-header_dest_path = $$shell_path($$clean_path("C:/ingescape/include/"))
+header_dest_path = $$shell_path($$clean_path("C:/ingescape/include/*"))
 
 #Create a command, using the 'cmd' command line and Window's 'xcopy'
 copyHeaders.commands = $$quote(cmd /c xcopy /S /Y /I $${header_source_path} $${header_dest_path})
