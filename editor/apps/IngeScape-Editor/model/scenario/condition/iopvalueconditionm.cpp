@@ -27,7 +27,7 @@
 
 
 /**
- * @brief Default constructor
+ * @brief Constructor
  * @param parent
  */
 IOPValueConditionM::IOPValueConditionM(QObject *parent) : ActionConditionM(parent),
@@ -57,7 +57,7 @@ IOPValueConditionM::~IOPValueConditionM()
 
 
 /**
-* @brief Custom setter for agent iop model
+* @brief Custom setter for agent IOP model
 * @param agent iop model
 */
 void IOPValueConditionM::setagentIOP(AgentIOPM* agentIop)
@@ -93,7 +93,7 @@ void IOPValueConditionM::setagentIOP(AgentIOPM* agentIop)
 */
 void IOPValueConditionM::copyFrom(ActionConditionM* condition)
 {
-    // Call mother class
+    // Call our mother class
     ActionConditionM::copyFrom(condition);
 
     IOPValueConditionM* iopCondition = qobject_cast<IOPValueConditionM*>(condition);
@@ -109,10 +109,9 @@ void IOPValueConditionM::copyFrom(ActionConditionM* condition)
 
 
 /**
-* @brief Custom setter on set agent
-*        to fill with outputs
-* @param agent
-*/
+ * @brief Setter for property "Agent"
+ * @param agent
+ */
 void IOPValueConditionM::setagent(AgentInMappingVM* agent)
 {
     // Save the previous agent before the call to the setter of our mother class
@@ -154,16 +153,18 @@ void IOPValueConditionM::setagent(AgentInMappingVM* agent)
     }
 }
 
+
 /**
   * @brief Initialize the agent connections for the action condition
   */
 void IOPValueConditionM::initializeConnections()
 {
-    if(_agent != NULL)
+    if (_agent != NULL)
     {
+        // Call our mother class
         ActionConditionM::initializeConnections();
 
-        if(_agentIOP != NULL)
+        if (_agentIOP != NULL)
         {
             // Subscribe to value change
             connect(_agentIOP, &AgentIOPM::currentValueChanged, this, &IOPValueConditionM::_onCurrentValueChanged);
@@ -180,16 +181,28 @@ void IOPValueConditionM::initializeConnections()
   */
 void IOPValueConditionM::resetConnections()
 {
-    if(_agent != NULL)
+    if (_agent != NULL)
     {
+        // Call our mother class
         ActionConditionM::resetConnections();
 
-        if(_agentIOP != NULL)
+        if (_agentIOP != NULL)
         {
             // UnSubscribe to value change
             disconnect(_agentIOP, &AgentIOPM::currentValueChanged, this, &IOPValueConditionM::_onCurrentValueChanged);
         }
     }
+}
+
+
+/**
+  * @brief Slot called when the flag "is ON" of an agent changed
+  */
+void IOPValueConditionM::_onAgentModelIsOnChanged(bool isON)
+{
+    Q_UNUSED(isON)
+
+    _onModelsOfIOPChanged();
 }
 
 
@@ -223,17 +236,6 @@ void IOPValueConditionM::_onModelsOfIOPChanged()
 
 
 /**
-  * @brief Slot called when the flag "is ON" of an agent changed
-  */
-void IOPValueConditionM::_onAgentModelIsOnChanged(bool isON)
-{
-    Q_UNUSED(isON)
-
-    _onModelsOfIOPChanged();
-}
-
-
-/**
  * @brief Called when our agent iop model is destroyed
  * @param sender
  */
@@ -254,7 +256,7 @@ void IOPValueConditionM::_onCurrentValueChanged(QVariant currentValue)
     QString valueTrimmed = _value.trimmed();
 
     bool isValid = false;
-    if(_agentIOP != NULL)
+    if (_agentIOP != NULL)
     {
         // According to the iop type
         switch(_agentIOP->agentIOPValueType())
@@ -369,11 +371,11 @@ void IOPValueConditionM::_onCurrentValueChanged(QVariant currentValue)
 */
 void IOPValueConditionM::_updateAgentIOPSelected(AgentIOPM * newAgentIOP)
 {
-    // Reset the agentIOP
+    // Reset the agent IOP
     if (newAgentIOP != _agentIOP)
     {
         // Disconnect old agent iop
-        if(_agentIOP != NULL)
+        if (_agentIOP != NULL)
         {
             // UnSubscribe to value change
             disconnect(_agentIOP, &AgentIOPM::currentValueChanged, this, &IOPValueConditionM::_onCurrentValueChanged);
@@ -383,7 +385,7 @@ void IOPValueConditionM::_updateAgentIOPSelected(AgentIOPM * newAgentIOP)
         setagentIOP(newAgentIOP);
 
         // Connect new agent iop
-        if(newAgentIOP != NULL)
+        if (newAgentIOP != NULL)
         {
             // Subscribe to value change
             connect(newAgentIOP, &AgentIOPM::currentValueChanged, this, &IOPValueConditionM::_onCurrentValueChanged);

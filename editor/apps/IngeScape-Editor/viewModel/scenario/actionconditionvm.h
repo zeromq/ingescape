@@ -23,6 +23,7 @@
 #include "I2PropertyHelpers.h"
 #include <model/scenario/condition/actionconditionm.h>
 #include <model/scenario/condition/iopvalueconditionm.h>
+#include <model/scenario/condition/conditiononagentm.h>
 
 
 /**

@@ -86,7 +86,7 @@ void IOPValueEffectM::setagentIOP(AgentIOPM* agentIop)
 */
 void IOPValueEffectM::copyFrom(ActionEffectM* effect)
 {
-    // Call mother class
+    // Call our mother class
     ActionEffectM::copyFrom(effect);
 
     IOPValueEffectM* iopEffect = qobject_cast<IOPValueEffectM*>(effect);
@@ -94,15 +94,17 @@ void IOPValueEffectM::copyFrom(ActionEffectM* effect)
     {
         setagentIOP(iopEffect->agentIOP());
         setagentIOPName(iopEffect->agentIOPName());
+
         _iopMergedList.clear();
         _iopMergedList.append(iopEffect->iopMergedList()->toList());
+
         setvalue(iopEffect->value());
     }
 }
 
 
 /**
-* @brief Custom setter for property "agent"
+* @brief Setter for property "Agent"
 * @param agent
 */
 void IOPValueEffectM::setagent(AgentInMappingVM* agent)

@@ -24,31 +24,30 @@
 #include "actionconditionm.h"
 
 
-
 /**
  * @brief The IOPValueConditionM class defines an action condition on iop value
  */
-class IOPValueConditionM: public ActionConditionM
+class IOPValueConditionM : public ActionConditionM
 {
     Q_OBJECT
 
-    // Agent IOP
-    I2_QML_PROPERTY_CUSTOM_SETTER(AgentIOPM* , agentIOP)
+    // Model of agent IOP
+    I2_QML_PROPERTY_CUSTOM_SETTER(AgentIOPM*, agentIOP)
 
     // Agent IOP name
-    I2_QML_PROPERTY(QString , agentIOPName)
+    I2_QML_PROPERTY(QString, agentIOPName)
 
     // value in string format
-    I2_QML_PROPERTY(QString , value)
+    I2_QML_PROPERTY(QString, value)
 
     // Concatened list of iop agents items
-    I2_QOBJECT_LISTMODEL(AgentIOPM , agentIopList)
+    I2_QOBJECT_LISTMODEL(AgentIOPM, agentIopList)
 
 
 public:
 
     /**
-     * @brief Default constructor
+     * @brief Constructor
      * @param parent
      */
     explicit IOPValueConditionM(QObject *parent = 0);
@@ -63,43 +62,43 @@ public:
     /**
       * @brief Redefinition of action condition copy
       */
-    void copyFrom(ActionConditionM* condition);
+    void copyFrom(ActionConditionM* condition) Q_DECL_OVERRIDE;
 
 
     /**
-    * @brief Custom setter on set agent
-    *        to fill with outputs
+    * @brief Setter for property "Agent"
     * @param agent
     */
-    void setagent(AgentInMappingVM* agent);
+    void setagent(AgentInMappingVM* agent) Q_DECL_OVERRIDE;
 
 
     /**
       * @brief Initialize the agent connections for the action condition
       */
-    void initializeConnections();
+    void initializeConnections() Q_DECL_OVERRIDE;
 
 
     /**
       * @brief Reset the agent connections for the action condition
       */
-    void resetConnections();
+    void resetConnections() Q_DECL_OVERRIDE;
 
 
 Q_SIGNALS:
 
 
 protected Q_SLOTS:
-    /**
-      * @brief Slot called when the models of Inputs/Outputs/Parameters changed of the agent in mapping
-      */
-    void _onModelsOfIOPChanged();
-
 
     /**
       * @brief Slot called when the flag "is ON" of an agent changed
       */
-    void _onAgentModelIsOnChanged(bool isON);
+    void _onAgentModelIsOnChanged(bool isON) Q_DECL_OVERRIDE;
+
+
+    /**
+      * @brief Slot called when the models of Inputs/Outputs/Parameters changed of the agent in mapping
+      */
+    void _onModelsOfIOPChanged();
 
 
     /**

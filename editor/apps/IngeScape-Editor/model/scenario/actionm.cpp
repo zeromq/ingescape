@@ -335,14 +335,14 @@ void ActionM::setvalidityDurationString(QString value)
 }
 
 /**
- * @brief Custom setter on the shall revert flag
- * @param shall revert flag
+ * @brief Setter for property "Shall Revert"
+ * @param value
  */
-void ActionM::setshallRevert(bool shallRevert)
+void ActionM::setshallRevert(bool value)
 {
-    if(_shallRevert != shallRevert)
+    if (_shallRevert != value)
     {
-        _shallRevert = shallRevert;
+        _shallRevert = value;
 
         // Reset properties if the shall revert is unchecked
         if (!_shallRevert)
@@ -355,7 +355,7 @@ void ActionM::setshallRevert(bool shallRevert)
             setshallRevertWhenValidityIsOver(true);
         }
 
-        Q_EMIT shallRevertChanged(shallRevert);
+        Q_EMIT shallRevertChanged(value);
     }
 }
 

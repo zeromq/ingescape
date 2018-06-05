@@ -60,7 +60,7 @@ Rectangle {
     width : 258
 
     height : (rootItem.agentMappingVM && !rootItem.isReduced)
-             ? (54 + 22 * Math.max(rootItem.agentMappingVM.inputsList.count , rootItem.agentMappingVM.outputsList.count))
+             ? (54 + 22 * Math.max(rootItem.agentMappingVM.inputsList.count, rootItem.agentMappingVM.outputsList.count))
              : 42
 
 
@@ -337,7 +337,7 @@ Rectangle {
                                 visible: draggablePointFROM.dragActive
 
                                 secondPoint: Qt.point(myModel.position.x, myModel.position.y)
-                                firstPoint: Qt.point(draggablePointFROM.x + draggablePointFROM.width , draggablePointFROM.y + draggablePointFROM.height/2)
+                                firstPoint: Qt.point(draggablePointFROM.x + draggablePointFROM.width, draggablePointFROM.y + draggablePointFROM.height/2)
 
                                 defaultColor:linkPoint.color
                             }
@@ -584,7 +584,7 @@ Rectangle {
                                 visible: draggablePointTO.dragActive
 
                                 firstPoint: Qt.point(myModel.position.x, myModel.position.y)
-                                secondPoint: Qt.point(draggablePointTO.x , draggablePointTO.y + draggablePointTO.height/2)
+                                secondPoint: Qt.point(draggablePointTO.x, draggablePointTO.y + draggablePointTO.height/2)
 
                                 defaultColor:linkPointOut.color
                             }

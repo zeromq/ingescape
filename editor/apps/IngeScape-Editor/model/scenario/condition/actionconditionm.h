@@ -65,7 +65,7 @@ public:
     * @brief Copy from another condition model
     * @param condition to copy
     */
-    void copyFrom(ActionConditionM* condition);
+    virtual void copyFrom(ActionConditionM* condition);
 
 
     /**
@@ -101,10 +101,6 @@ protected Q_SLOTS:
      * @param sender
      */
     void _onAgentDestroyed(QObject* sender);
-
-
-protected:
-
 
 };
 

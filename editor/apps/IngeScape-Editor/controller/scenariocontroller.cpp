@@ -1474,9 +1474,9 @@ void ScenarioController::_startScenario()
 
     // Look for the current and futures actions
     ActionVM* tmpNextActionToActivate = NULL;
-    foreach (ActionVM* actionVM , _actionsInTimeLine.toList())
+    for (ActionVM* actionVM : _actionsInTimeLine.toList())
     {
-        if ((actionVM->endTime() > currentTimeInMilliSeconds) || (actionVM->endTime() == -1))
+        if ((actionVM != NULL) && ((actionVM->endTime() > currentTimeInMilliSeconds) || (actionVM->endTime() == -1)) )
         {
             // Connect on the action revert signal
             connect(actionVM, &ActionVM::revertAction, this, &ScenarioController::onRevertAction);

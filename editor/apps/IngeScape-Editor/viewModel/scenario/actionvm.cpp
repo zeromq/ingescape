@@ -223,7 +223,7 @@ void ActionVM::setstartTimeString(QString value)
 
 
 /**
- * @brief Custom setter for property "modelM"
+ * @brief Setter for property "Model"
  * @param value
  */
 void ActionVM::setmodelM(ActionM* value)

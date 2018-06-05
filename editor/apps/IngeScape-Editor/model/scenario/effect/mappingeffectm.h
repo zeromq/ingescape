@@ -48,19 +48,19 @@ class MappingEffectM: public ActionEffectM
     I2_QML_PROPERTY_CUSTOM_SETTER(AgentIOPM*, output)
 
     // Output name of the output agent
-    I2_QML_PROPERTY(QString , outputName)
+    I2_QML_PROPERTY(QString, outputName)
 
     // Input of the input agent
     I2_QML_PROPERTY_CUSTOM_SETTER(AgentIOPM*, input)
 
     // Input name of the input agent
-    I2_QML_PROPERTY(QString , inputName)
+    I2_QML_PROPERTY(QString, inputName)
 
     // List of outputs
-    I2_QOBJECT_LISTMODEL(AgentIOPM , outputsList)
+    I2_QOBJECT_LISTMODEL(AgentIOPM, outputsList)
 
     // List of inputs
-    I2_QOBJECT_LISTMODEL(AgentIOPM , inputsList)
+    I2_QOBJECT_LISTMODEL(AgentIOPM, inputsList)
 
 
 public:
@@ -85,7 +85,7 @@ public:
 
 
     /**
-    * @brief Custom setter for property "agent"
+    * @brief Setter for property "Agent"
     * @param agent
     */
     void setagent(AgentInMappingVM* agent) Q_DECL_OVERRIDE;

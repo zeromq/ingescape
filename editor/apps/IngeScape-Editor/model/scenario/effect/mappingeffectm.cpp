@@ -199,7 +199,7 @@ void MappingEffectM::setinput(AgentIOPM* value)
 */
 void MappingEffectM::copyFrom(ActionEffectM *effect)
 {
-    // Call mother class
+    // Call our mother class
     ActionEffectM::copyFrom(effect);
 
     MappingEffectM* mappingEffect = qobject_cast<MappingEffectM*>(effect);
@@ -220,7 +220,7 @@ void MappingEffectM::copyFrom(ActionEffectM *effect)
 
 
 /**
-* @brief Custom setter for property "agent"
+* @brief Setter for property "Agent"
 * @param agent
 */
 void MappingEffectM::setagent(AgentInMappingVM* agent)
