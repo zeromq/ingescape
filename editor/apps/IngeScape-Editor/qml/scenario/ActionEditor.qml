@@ -67,8 +67,27 @@ Window {
     //
     //--------------------------------
 
-    // Emitted when user pressed our popup
-    //signal bringToFront();
+
+
+    //--------------------------------
+    //
+    // Behavior
+    //
+    //--------------------------------
+
+    Connections {
+        target: panelController
+
+        //ignoreUnknownSignals: true
+
+        onBringToFront: {
+            //console.log("QML of Action Editor: onBringToFront");
+
+            // Raises the window in the windowing system.
+            rootItem.raise();
+        }
+    }
+
 
     //--------------------------------
     //
@@ -403,7 +422,11 @@ Window {
                             model : actionM ? actionM.effectsList : 0
 
                             Rectangle {
-                                height :  (myEffect && myEffect.effectType === ActionEffectTypes.MAPPING) ? 90 : 62
+
+                                // my effect
+                                property var myEffect: model.QtObject
+
+                                height :  (myEffect && (myEffect.effectType === ActionEffectTypes.MAPPING)) ? 90 : 62
                                 anchors {
                                     left : parent.left
                                     right :parent.right
@@ -415,9 +438,6 @@ Window {
                                     width : 1
                                     color : IngeScapeTheme.blackColor
                                 }
-
-                                // my effect
-                                property var myEffect: model.QtObject
 
                                 // Effect Type
                                 Row {
@@ -576,8 +596,11 @@ Window {
                                         height : 25
                                         width : 148
 
-                                        model: (myEffect && myEffect.modelM && myEffect.modelM.iopMergedList) ? myEffect.modelM.iopMergedList : 0
+                                        model: (myEffect && myEffect.modelM) ? myEffect.modelM.iopMergedList : 0
+
                                         inputsNumber: (myEffect && myEffect.modelM && myEffect.modelM.agent) ? myEffect.modelM.agent.inputsList.count : 0;
+                                        outputsNumber: (myEffect && myEffect.modelM && myEffect.modelM.agent) ? myEffect.modelM.agent.outputsList.count : 0;
+                                        parametersNumber: (myEffect && myEffect.modelM && myEffect.modelM.agent) ? myEffect.modelM.agent.parametersList.count : 0;
 
                                         function modelToString(model)
                                         {
@@ -1610,17 +1633,21 @@ Window {
                                     IngeScapeComboBoxAgentsIOP {
                                         id : ioCombo
 
-                                        visible : myCondition && myCondition.conditionType === ActionConditionTypes.VALUE
-                                        enabled : visible
+                                        visible: (myCondition && myCondition.conditionType === ActionConditionTypes.VALUE)
+                                        enabled: visible
                                         anchors {
-                                            verticalCenter : parent.verticalCenter
+                                            verticalCenter: parent.verticalCenter
                                         }
 
                                         height : 25
                                         width : 148
 
-                                        model: (myCondition && myCondition.modelM && myCondition.modelM.agentIopList) ? myCondition.modelM.agentIopList : 0
-                                        inputsNumber: (myCondition && myCondition.modelM && myCondition.modelM.agent)? myCondition.modelM.agent.inputsList.count : 0;
+                                        model: (myCondition && myCondition.modelM) ? myCondition.modelM.agentIopList : 0
+
+                                        // Condition on a value is available only for outputs (no need of separator position)
+                                        inputsNumber: 0 // (myCondition && myCondition.modelM && myCondition.modelM.agent) ? myCondition.modelM.agent.inputsList.count : 0;
+                                        outputsNumber: 0
+                                        parametersNumber: 0
 
                                         Binding {
                                             target : ioCombo

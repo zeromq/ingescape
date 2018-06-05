@@ -82,11 +82,13 @@ AgentInMappingVM::~AgentInMappingVM()
         delete _temporaryMapping;
     }
 
-    // Clear maps of Inputs & Outputs
+    // Clear maps of Inputs, Outputs and Parameters
     _mapFromNameToInputsList.clear();
     _mapFromUniqueIdToInput.clear();
     _mapFromNameToOutputsList.clear();
     _mapFromUniqueIdToOutput.clear();
+    _mapFromNameToParametersList.clear();
+    _mapFromUniqueIdToParameter.clear();
 
     // Delete elements in the lists of Inputs & Outputs
     _inputsList.deleteAllItems();
@@ -196,6 +198,36 @@ OutputVM* AgentInMappingVM::getOutputFromId(QString outputId)
 {
     if (_mapFromUniqueIdToOutput.contains(outputId)) {
         return _mapFromUniqueIdToOutput.value(outputId);
+    }
+    else {
+        return NULL;
+    }
+}
+
+
+/**
+ * @brief Return the list of view models of parameter from the parameter name
+ * @param parameterName
+ */
+QList<ParameterVM*> AgentInMappingVM::getParametersListFromName(QString parameterName)
+{
+    if (_mapFromNameToParametersList.contains(parameterName)) {
+        return _mapFromNameToParametersList.value(parameterName);
+    }
+    else {
+        return QList<ParameterVM*>();
+    }
+}
+
+
+/**
+ * @brief Return the view model of parameter from the parameter id
+ * @param parameterId
+ */
+ParameterVM* AgentInMappingVM::getParameterFromId(QString parameterId)
+{
+    if (_mapFromUniqueIdToParameter.contains(parameterId)) {
+        return _mapFromUniqueIdToParameter.value(parameterId);
     }
     else {
         return NULL;
@@ -366,6 +398,37 @@ void AgentInMappingVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(Defin
 
 
         //
+        // Check if parameter(s) have been removed
+        //
+        QList<ParameterVM*> parametersListToRemove;
+        for (AgentIOPM* parameter : previousValue->parametersList()->toList())
+        {
+            if ((parameter != NULL) && !parameter->id().isEmpty() && !newValue->parametersIdsList().contains(parameter->id()))
+            {
+                ParameterVM* parameterVM = _parameterModelRemoved(parameter);
+                if (parameterVM != NULL)
+                {
+                    // The view model of parameter is empty
+                    if (parameterVM->models()->isEmpty()) {
+                        parametersListToRemove.append(parameterVM);
+                    }
+                }
+            }
+        }
+        if (!parametersListToRemove.isEmpty())
+        {
+            // Emit signal "Parameters List Will Be Removed"
+            //Q_EMIT parametersListWillBeRemoved(parametersListToRemove);
+
+            // FIXME TODO I2 Quick: Allow to remove a QList
+            //_parametersList.remove(parametersListToRemove);
+            foreach (ParameterVM* parameterVM, parametersListToRemove) {
+                _parametersList.remove(parameterVM);
+            }
+        }
+
+
+        //
         // Check if input(s) have been added
         //
         QList<InputVM*> inputsListToAdd;
@@ -459,15 +522,62 @@ void AgentInMappingVM::_onDefinitionOfModelChangedWithPreviousAndNewValues(Defin
         }
 
 
-        // Emit signal "models of Inputs and Outputs Changed"
-        Q_EMIT modelsOfInputsAndOutputsChanged();
+        //
+        // Check if parameter(s) have been added
+        //
+        QList<ParameterVM*> parametersListToAdd;
+        for (AgentIOPM* parameter : newValue->parametersList()->toList())
+        {
+            if ((parameter != NULL) && !parameter->id().isEmpty())
+            {
+                ParameterVM* parameterVM = NULL;
+
+                // This parameter was already in the previous definition (just replace the model)
+                if (previousValue->parametersIdsList().contains(parameter->id()))
+                {
+                    AgentIOPM* previousModelOfParameter = previousValue->getParameterWithName(parameter->name());
+                    parameterVM = getParameterFromId(parameter->id());
+
+                    if ((parameterVM != NULL) && (previousModelOfParameter != NULL))
+                    {
+                        int index = parameterVM->models()->indexOf(previousModelOfParameter);
+                        if (index > -1) {
+                            parameterVM->models()->replace(index, parameter);
+                        }
+                    }
+                }
+                // This parameter is a new one
+                else
+                {
+                    parameterVM = _parameterModelAdded(parameter);
+                    if (parameterVM != NULL)
+                    {
+                        // New view model of parameter
+                        if (!_parametersList.contains(parameterVM)) {
+                            parametersListToAdd.append(parameterVM);
+                        }
+                    }
+                }
+            }
+        }
+        if (!parametersListToAdd.isEmpty())
+        {
+            _parametersList.append(parametersListToAdd);
+
+            // Emit signal "parameters List Have Been Added"
+            //Q_EMIT parametersListHaveBeenAdded(parametersListToAdd);
+        }
+
+
+        // Emit signal "models of Inputs/Outputs/Parameters Changed"
+        Q_EMIT modelsOfIOPChanged();
 
 
         // Update the flag "Are Identicals All Definitions"
         //_updateAreIdenticalsAllDefinitions();
 
         // Update the flag "Are Identicals All Definitions"
-        _updateIsDefinedInAllDefinitionsForEachInputOutput();
+        _updateIsDefinedInAllDefinitionsForEachIOP();
     }
 }
 
@@ -482,6 +592,7 @@ void AgentInMappingVM::_agentModelAdded(AgentM* model)
     {
         QList<InputVM*> inputsListToAdd;
         QList<OutputVM*> outputsListToAdd;
+        QList<ParameterVM*> parametersListToAdd;
 
         // Traverse the list of models of inputs in the definition
         foreach (AgentIOPM* input, model->definition()->inputsList()->toList())
@@ -510,25 +621,33 @@ void AgentInMappingVM::_agentModelAdded(AgentM* model)
         }
 
         // Traverse the list of models of parameters in the definition
-        /*foreach (AgentIOPM* parameter, model->definition()->parametersList()->toList())
+        foreach (AgentIOPM* parameter, model->definition()->parametersList()->toList())
         {
-            // FIXME TODO: ParameterVM
-            ParameterVM* parameterVM =
-        }*/
+            ParameterVM* parameterVM = _parameterModelAdded(parameter);
+            if (parameterVM != NULL)
+            {
+                // New view model of parameter
+                if (!_parametersList.contains(parameterVM)) {
+                    parametersListToAdd.append(parameterVM);
+                }
+            }
+        }
 
         if (!inputsListToAdd.isEmpty()) {
             _inputsList.append(inputsListToAdd);
         }
-
         if (!outputsListToAdd.isEmpty()) {
             _outputsList.append(outputsListToAdd);
         }
+        if (!parametersListToAdd.isEmpty()) {
+            _parametersList.append(parametersListToAdd);
+        }
 
-        // Emit signal "models of Inputs and Outputs Changed"
-        Q_EMIT modelsOfInputsAndOutputsChanged();
+        // Emit signal "models of Inputs/Outputs/Parameters Changed"
+        Q_EMIT modelsOfIOPChanged();
 
         // Update the flag "Are Identicals All Definitions"
-        _updateIsDefinedInAllDefinitionsForEachInputOutput();
+        _updateIsDefinedInAllDefinitionsForEachIOP();
     }
 }
 
@@ -596,11 +715,40 @@ void AgentInMappingVM::_agentModelRemoved(AgentM* model)
             }
         }
 
-        // Emit signal "models of Inputs and Outputs Changed"
-        Q_EMIT modelsOfInputsAndOutputsChanged();
+
+        //
+        // Traverse the list of models of parameters in the definition
+        //
+        QList<ParameterVM*> parametersListToRemove;
+        foreach (AgentIOPM* parameter, model->definition()->parametersList()->toList())
+        {
+            ParameterVM* parameterVM = _parameterModelRemoved(parameter);
+            if (parameterVM != NULL)
+            {
+                // The view model of parameter is empty
+                if (parameterVM->models()->isEmpty()) {
+                    parametersListToRemove.append(parameterVM);
+                }
+            }
+        }
+        if (!parametersListToRemove.isEmpty())
+        {
+            // Emit signal "Parameters List Will Be Removed"
+            //Q_EMIT parametersListWillBeRemoved(parametersListToRemove);
+
+            // FIXME TODO I2 Quick: Allow to remove a QList
+            //_parametersList.remove(parametersListToRemove);
+            foreach (ParameterVM* parameterVM, parametersListToRemove) {
+                _parametersList.remove(parameterVM);
+            }
+        }
+
+
+        // Emit signal "models of Inputs/Outputs/Parameters Changed"
+        Q_EMIT modelsOfIOPChanged();
 
         // Update the flag "Are Identicals All Definitions"
-        _updateIsDefinedInAllDefinitionsForEachInputOutput();
+        _updateIsDefinedInAllDefinitionsForEachIOP();
     }
 }
 
@@ -865,6 +1013,135 @@ OutputVM* AgentInMappingVM::_outputModelRemoved(OutputM* output)
 
 
 /**
+ * @brief A model of parameter has been added
+ * @param parameter
+ * @return
+ */
+ParameterVM* AgentInMappingVM::_parameterModelAdded(AgentIOPM* parameter)
+{
+    ParameterVM* parameterVM = NULL;
+
+    if (parameter != NULL)
+    {
+        // First, we get a ghost of this parameter: a parameter without id (only the same name)
+        QList<ParameterVM*> parametersWithSameName = getParametersListFromName(parameter->name());
+        ParameterVM* parameterWithoutId = NULL;
+
+        foreach (ParameterVM* iterator, parametersWithSameName)
+        {
+            // Already a view model with an EMPTY id (NOT defined)
+            if ((iterator != NULL) && iterator->id().isEmpty()) {
+                parameterWithoutId = iterator;
+                break;
+            }
+        }
+
+        // Parameter id is NOT defined
+        if (parameter->id().isEmpty())
+        {
+            // There is already a view model without id
+            if (parameterWithoutId != NULL)
+            {
+                parameterVM = parameterWithoutId;
+
+                // Add this new model to the list
+                parameterVM->models()->append(parameter);
+            }
+            // There is not yet a view model without id
+            else
+            {
+                // Create a new view model of parameter (without id)
+                parameterVM = new ParameterVM(parameter->name(),
+                                              "",
+                                              parameter,
+                                              this);
+
+                // Don't add to the list here (this parameter will be added globally via temporary list)
+
+                // Update the hash table with the parameter name
+                parametersWithSameName.append(parameterVM);
+                _mapFromNameToParametersList.insert(parameter->name(), parametersWithSameName);
+            }
+        }
+        // Parameter id is defined
+        else
+        {
+            // There is already a view model without id
+            if (parameterWithoutId != NULL)
+            {
+                // FIXME TODO: gestion du ghost...passage en view model avec id
+            }
+
+            parameterVM = getParameterFromId(parameter->id());
+
+            // There is already a view model for this id
+            if (parameterVM != NULL)
+            {
+                // Add this new model to the list
+                parameterVM->models()->append(parameter);
+            }
+            // There is not yet a view model for this id
+            else
+            {
+                // Create a new view model of parameter
+                parameterVM = new ParameterVM(parameter->name(),
+                                              parameter->id(),
+                                              parameter,
+                                              this);
+
+                // Don't add to the list here (this parameter will be added globally via temporary list)
+
+                // Update the hash table with the parameter id
+                _mapFromUniqueIdToParameter.insert(parameter->id(), parameterVM);
+
+                // Update the hash table with the parameter name
+                parametersWithSameName.append(parameterVM);
+                _mapFromNameToParametersList.insert(parameter->name(), parametersWithSameName);
+            }
+        }
+    }
+
+    return parameterVM;
+}
+
+
+/**
+ * @brief A model of parameter has been removed
+ * @param parameter
+ * @return
+ */
+ParameterVM* AgentInMappingVM::_parameterModelRemoved(AgentIOPM* parameter)
+{
+    ParameterVM* parameterVM = NULL;
+
+    if (parameter != NULL)
+    {
+        // Parameter id is defined
+        if (!parameter->id().isEmpty())
+        {
+            parameterVM = getParameterFromId(parameter->id());
+            if (parameterVM != NULL)
+            {
+                // Remove this model from the list
+                parameterVM->models()->remove(parameter);
+            }
+            /*else
+            {
+                parameterVM = getParameterFromName(parameter->name());
+                if (parameterVM != NULL)
+                {
+                    // Remove this model from the list
+                    parameterVM->models().remove(parameter);
+                }
+            }*/
+        }
+    }
+
+    return parameterVM;
+}
+
+
+/**
  * @brief Update with all models of agents
  */
 void AgentInMappingVM::_updateWithAllModels()
@@ -949,9 +1226,9 @@ void AgentInMappingVM::_updateAreIdenticalsAllDefinitions()
 
 
 /**
- * @brief Update the flag "Is Defined in All Definitions" for each Input/Output
+ * @brief Update the flag "Is Defined in All Definitions" for each Input/Output/Parameter
  */
-void AgentInMappingVM::_updateIsDefinedInAllDefinitionsForEachInputOutput()
+void AgentInMappingVM::_updateIsDefinedInAllDefinitionsForEachIOP()
 {
     int numberOfModels = _models.count();
 
@@ -982,6 +1259,20 @@ void AgentInMappingVM::_updateIsDefinedInAllDefinitionsForEachInputOutput()
             }
         }
     }
+
+    // Update the flag "Is Defined in All Definitions" for each parameter
+    /*for (ParameterVM* parameter : _parametersList.toList())
+    {
+        if (parameter != NULL)
+        {
+            if (parameter->models()->count() == numberOfModels) {
+                parameter->setisDefinedInAllDefinitions(true);
+            }
+            else {
+                parameter->setisDefinedInAllDefinitions(false);
+            }
+        }
+    }*/
 }
 
 
@@ -995,7 +1286,8 @@ void AgentInMappingVM::_updateReducedMapValueTypeGroupInInput()
     for (int i = 0; i < _inputsList.count(); i++)
     {
         InputVM* input = _inputsList.at(i);
-        if ((input != NULL) && (input->firstModel() != NULL)) {
+        if ((input != NULL) && (input->firstModel() != NULL))
+        {
             if (i == 0) {
                 globalReducedMapValueTypeGroupInInput = input->firstModel()->agentIOPValueTypeGroup();
             }

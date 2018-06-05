@@ -36,13 +36,13 @@ class IOPValueEffectM: public ActionEffectM
     // Agent IOP
     I2_QML_PROPERTY_CUSTOM_SETTER(AgentIOPM*, agentIOP)
 
-    // Agent IOP name
+    // Name of our Agent IOP
     I2_QML_PROPERTY(QString, agentIOPName)
 
     // Value converted into string
     I2_QML_PROPERTY(QString, value)
 
-    // Merged list of Inputs and Outputs of the agent
+    // Merged list of Inputs/Outputs/Parameters of the agent
     I2_QOBJECT_LISTMODEL(AgentIOPM, iopMergedList)
 
 
@@ -68,7 +68,7 @@ public:
 
 
     /**
-    * @brief Custom setter on set agent to fill inputs and outputs
+    * @brief Custom setter for property "agent"
     * @param agent
     */
     void setagent(AgentInMappingVM* agent) Q_DECL_OVERRIDE;
@@ -88,14 +88,14 @@ public:
     QPair<QString, QStringList> getAgentNameAndReverseCommandWithParameters() Q_DECL_OVERRIDE;
 
 
-public Q_SLOTS:
+protected Q_SLOTS:
 
     /**
-      * @brief Slot on agent inputs/outputs lists change
+      * @brief Slot called when the models of Inputs/Outputs/Parameters changed of the agent in mapping
       */
-    void onInputsOutputsListChange();
+    void _onModelsOfIOPChanged();
 
-protected Q_SLOTS:
+
     /**
      * @brief Called when our agent iop model is destroyed
      * @param sender

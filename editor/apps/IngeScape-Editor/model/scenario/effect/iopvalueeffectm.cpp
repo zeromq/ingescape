@@ -52,6 +52,35 @@ IOPValueEffectM::~IOPValueEffectM()
 
 
 /**
+* @brief Custom setter for agent iop model
+* @param agent iop model
+*/
+void IOPValueEffectM::setagentIOP(AgentIOPM* agentIop)
+{
+    if (_agentIOP != agentIop)
+    {
+        if (_agentIOP != NULL)
+        {
+            // UnSubscribe to destruction
+            disconnect(_agentIOP, &AgentIOPM::destroyed, this, &IOPValueEffectM::_onAgentIopModelDestroyed);
+        }
+
+        _agentIOP = agentIop;
+
+        if (_agentIOP != NULL)
+        {
+            setagentIOPName(_agentIOP->name());
+
+            // Subscribe to destruction
+            connect(_agentIOP, &AgentIOPM::destroyed, this, &IOPValueEffectM::_onAgentIopModelDestroyed);
+        }
+
+        Q_EMIT agentIOPChanged(agentIop);
+    }
+}
+
+
+/**
 * @brief Copy from another effect model
 * @param effect to copy
 */
@@ -73,23 +102,25 @@ void IOPValueEffectM::copyFrom(ActionEffectM* effect)
 
 
 /**
-* @brief Custom setter on set agent to fill inputs and outputs
+* @brief Custom setter for property "agent"
 * @param agent
 */
 void IOPValueEffectM::setagent(AgentInMappingVM* agent)
 {
+    // Save the previous agent before the call to the setter of our mother class
     AgentInMappingVM* previousAgent = _agent;
 
-    // Call setter of mother class
+    // Call the setter of our mother class
     ActionEffectM::setagent(agent);
 
-    if (previousAgent != agent)
+    // Value of agent changed
+    if (previousAgent != _agent)
     {
-        if(_agent != NULL)
-        {
-            disconnect(_agent, &AgentInMappingVM::modelsOfInputsAndOutputsChanged, this, &IOPValueEffectM::onInputsOutputsListChange);
+        if (previousAgent != NULL) {
+            disconnect(previousAgent, &AgentInMappingVM::modelsOfIOPChanged, this, &IOPValueEffectM::_onModelsOfIOPChanged);
         }
 
+        // Reset the agent IOP
         setagentIOP(NULL);
 
         // Clear the list
@@ -100,7 +131,7 @@ void IOPValueEffectM::setagent(AgentInMappingVM* agent)
             // Fill with inputs
             foreach (InputVM* input, _agent->inputsList()->toList())
             {
-                if (input->firstModel() != NULL)
+                if ((input != NULL) && (input->firstModel() != NULL))
                 {
                     _iopMergedList.append(input->firstModel());
                 }
@@ -109,18 +140,27 @@ void IOPValueEffectM::setagent(AgentInMappingVM* agent)
             // Fill with outputs
             foreach (OutputVM* output, _agent->outputsList()->toList())
             {
-                if (output->firstModel() != NULL)
+                if ((output != NULL) && (output->firstModel() != NULL))
                 {
                     _iopMergedList.append(output->firstModel());
                 }
             }
 
-            // Select the first item
-            if (_iopMergedList.count() > 0) {
+            // Fill with parameters
+            foreach (ParameterVM* parameter, _agent->parametersList()->toList())
+            {
+                if ((parameter != NULL) && (parameter->firstModel() != NULL))
+                {
+                    _iopMergedList.append(parameter->firstModel());
+                }
+            }
+
+            // By default, select the first item
+            if (!_iopMergedList.isEmpty()) {
                 setagentIOP(_iopMergedList.at(0));
             }
 
-            connect(_agent, &AgentInMappingVM::modelsOfInputsAndOutputsChanged, this, &IOPValueEffectM::onInputsOutputsListChange);
+            connect(_agent, &AgentInMappingVM::modelsOfIOPChanged, this, &IOPValueEffectM::_onModelsOfIOPChanged);
          }
     }
 }
@@ -252,80 +292,63 @@ QPair<QString, QStringList> IOPValueEffectM::getAgentNameAndReverseCommandWithPa
 
 
 /**
-  * @brief Slot on agent inputs/outputs lists change
+  * @brief Slot called when the models of Inputs/Outputs/Parameters changed of the agent in mapping
   */
-void IOPValueEffectM::onInputsOutputsListChange()
+void IOPValueEffectM::_onModelsOfIOPChanged()
 {
-    AgentIOPM * newAgentIOP = NULL;
+    AgentIOPM* newAgentIOP = NULL;
 
     // If we have a selected agent iop
     if (!_agentIOPName.isEmpty())
     {
         _iopMergedList.clear();
 
-        // Check that our input list update concern our selected agent iop
+        // Add inputs to the merged list
         foreach (InputVM* inputVM, _agent->inputsList()->toList())
         {
-            if(inputVM->firstModel() != NULL)
+            if ((inputVM != NULL) && (inputVM->firstModel() != NULL))
             {
                 _iopMergedList.append(inputVM->firstModel());
-                if(inputVM->name() == _agentIOPName)
-                {
+
+                if (inputVM->name() == _agentIOPName) {
                     newAgentIOP = inputVM->firstModel();
                 }
             }
         }
 
-        // Check that our output list update concern our selected agent iop
+        // Add outputs to the merged list
         foreach (OutputVM* outputVM, _agent->outputsList()->toList())
         {
-            if(outputVM->firstModel() != NULL)
+            if ((outputVM != NULL) && (outputVM->firstModel() != NULL))
             {
                 _iopMergedList.append(outputVM->firstModel());
-                if(outputVM->name() == _agentIOPName)
-                {
+
+                if (outputVM->name() == _agentIOPName) {
                     newAgentIOP = outputVM->firstModel();
+                }
+            }
+        }
+
+        // Add parameters to the merged list
+        foreach (ParameterVM* parameterVM, _agent->parametersList()->toList())
+        {
+            if ((parameterVM != NULL) && (parameterVM->firstModel() != NULL))
+            {
+                _iopMergedList.append(parameterVM->firstModel());
+
+                if (parameterVM->name() == _agentIOPName) {
+                    newAgentIOP = parameterVM->firstModel();
                 }
             }
         }
     }
 
-    // Reset the agentIOP
-    if (newAgentIOP != _agentIOP)
-    {
-        // Set the new agent
+    // Update the agent IOP
+    if (newAgentIOP != _agentIOP) {
         setagentIOP(newAgentIOP);
     }
 }
 
-
-/**
-* @brief Custom setter for agent iop model
-* @param agent iop model
-*/
-void IOPValueEffectM::setagentIOP(AgentIOPM* agentIop)
-{
-    if(_agentIOP != agentIop)
-    {
-        if(_agentIOP != NULL)
-        {
-            // UnSubscribe to destruction
-            disconnect(_agentIOP, &AgentIOPM::destroyed, this, &IOPValueEffectM::_onAgentIopModelDestroyed);
-        }
-
-        _agentIOP = agentIop;
-
-        if(_agentIOP != NULL)
-        {
-            setagentIOPName(_agentIOP->name());
-
-            // Subscribe to destruction
-            connect(_agentIOP, &AgentIOPM::destroyed, this, &IOPValueEffectM::_onAgentIopModelDestroyed);
-        }
-
-        Q_EMIT agentIOPChanged(agentIop);
-    }
-}
 
 /**
  * @brief Called when our agent iop model is destroyed
@@ -337,5 +360,3 @@ void IOPValueEffectM::_onAgentIopModelDestroyed(QObject* sender)
 
     setagentIOP(NULL);
 }
-
-

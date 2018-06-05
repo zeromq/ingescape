@@ -16,16 +16,16 @@
 
 /**
  * @brief Constructor
- * @param name
- * @param id
+ * @param parameterName
+ * @param parameterId
  * @param modelM
  * @param parent
  */
-ParameterVM::ParameterVM(QString name,
-                         QString id,
+ParameterVM::ParameterVM(QString parameterName,
+                         QString parameterId,
                          AgentIOPM* modelM,
-                         QObject *parent) : AgentIOPVM(name,
-                                                       id,
+                         QObject *parent) : AgentIOPVM(parameterName,
+                                                       parameterId,
                                                        parent),
     _firstModel(NULL)
 {
@@ -63,7 +63,7 @@ ParameterVM::~ParameterVM()
 void ParameterVM::_onModelsChanged()
 {
     // Update the first model
-    if (_models.count() > 0) {
+    if (!_models.isEmpty()) {
         setfirstModel(_models.at(0));
     }
     else {

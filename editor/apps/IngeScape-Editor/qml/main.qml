@@ -180,7 +180,7 @@ ApplicationWindow {
             }
 
             MenuItem {
-                text: qsTr("Show history")
+                text: qsTr("Show outputs history")
                 onTriggered: {
                     if (applicationLoader.item) {
                         applicationLoader.item.openHistory();

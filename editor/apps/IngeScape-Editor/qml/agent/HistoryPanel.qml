@@ -105,12 +105,9 @@ Window {
     //
     //--------------------------------
 
-    // Emitted when user pressed our popup
-    // signal bringToFront();
-
-
     // Emitted when "All Agents" is selected or unselected
     signal clickAllAgents();
+
 
     //--------------------------------
     //

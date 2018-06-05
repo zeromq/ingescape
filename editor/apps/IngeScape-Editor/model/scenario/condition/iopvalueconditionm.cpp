@@ -55,12 +55,45 @@ IOPValueConditionM::~IOPValueConditionM()
     setagentIOP(NULL);
 }
 
+
+/**
+* @brief Custom setter for agent iop model
+* @param agent iop model
+*/
+void IOPValueConditionM::setagentIOP(AgentIOPM* agentIop)
+{
+    if (_agentIOP != agentIop)
+    {
+        if (_agentIOP != NULL)
+        {
+            // UnSubscribe to destruction
+            disconnect(_agentIOP, &AgentIOPM::destroyed, this, &IOPValueConditionM::_onAgentIopModelDestroyed);
+        }
+
+        setisValid(false);
+
+        _agentIOP = agentIop;
+
+        if (_agentIOP != NULL)
+        {
+            setagentIOPName(_agentIOP->name());
+
+            // Subscribe to destruction
+            connect(_agentIOP, &AgentIOPM::destroyed, this, &IOPValueConditionM::_onAgentIopModelDestroyed);
+        }
+
+        Q_EMIT agentIOPChanged(agentIop);
+    }
+}
+
+
 /**
 * @brief Copy from another condition model
 * @param condition to copy
 */
 void IOPValueConditionM::copyFrom(ActionConditionM* condition)
 {
+    // Call mother class
     ActionConditionM::copyFrom(condition);
 
     IOPValueConditionM* iopCondition = qobject_cast<IOPValueConditionM*>(condition);
@@ -74,6 +107,7 @@ void IOPValueConditionM::copyFrom(ActionConditionM* condition)
     }
 }
 
+
 /**
 * @brief Custom setter on set agent
 *        to fill with outputs
@@ -81,41 +115,41 @@ void IOPValueConditionM::copyFrom(ActionConditionM* condition)
 */
 void IOPValueConditionM::setagent(AgentInMappingVM* agent)
 {
-    AgentInMappingVM* previousAgentM = _agent;
+    // Save the previous agent before the call to the setter of our mother class
+    AgentInMappingVM* previousAgent = _agent;
 
-    // Call setter of mother class
+    // Call the setter of our mother class
     ActionConditionM::setagent(agent);
 
-    if(previousAgentM != agent)
+    // Value of agent changed
+    if (previousAgent != _agent)
     {
-        if(previousAgentM != NULL)
-        {
-            disconnect(previousAgentM, &AgentInMappingVM::modelsOfInputsAndOutputsChanged, this, &IOPValueConditionM::onInputsOutputsListChange);
+        if (previousAgent != NULL) {
+            disconnect(previousAgent, &AgentInMappingVM::modelsOfIOPChanged, this, &IOPValueConditionM::_onModelsOfIOPChanged);
         }
+
+        // Reset the agent IOP
+        setagentIOP(NULL);
 
         // Clear the list
         _agentIopList.clear();
-        setagentIOP(NULL);
 
-        if(_agent != NULL)
+        if (_agent != NULL)
         {
             // Fill with outputs
             foreach (OutputVM* output, _agent->outputsList()->toList())
             {
-                if(output->firstModel() != NULL)
-                {
+                if (output->firstModel() != NULL) {
                     _agentIopList.append(output->firstModel());
                 }
             }
 
             // Select the first item
-            if(_agentIopList.count() > 0)
-            {
+            if (!_agentIopList.isEmpty()) {
                 setagentIOP(_agentIopList.at(0));
             }
 
-            connect(_agent, &AgentInMappingVM::modelsOfInputsAndOutputsChanged, this, &IOPValueConditionM::onInputsOutputsListChange);
-
+            connect(_agent, &AgentInMappingVM::modelsOfIOPChanged, this, &IOPValueConditionM::_onModelsOfIOPChanged);
         }
     }
 }
@@ -132,13 +166,14 @@ void IOPValueConditionM::initializeConnections()
         if(_agentIOP != NULL)
         {
             // Subscribe to value change
-            connect(_agentIOP, &AgentIOPM::currentValueChanged, this, &IOPValueConditionM::_onCurrentValueChange);
+            connect(_agentIOP, &AgentIOPM::currentValueChanged, this, &IOPValueConditionM::_onCurrentValueChanged);
 
             // Update valid status
-            _onCurrentValueChange(_agentIOP->currentValue());
+            _onCurrentValueChanged(_agentIOP->currentValue());
         }
     }
 }
+
 
 /**
   * @brief Reset the agent connections for the action condition
@@ -152,16 +187,16 @@ void IOPValueConditionM::resetConnections()
         if(_agentIOP != NULL)
         {
             // UnSubscribe to value change
-            disconnect(_agentIOP, &AgentIOPM::currentValueChanged, this, &IOPValueConditionM::_onCurrentValueChange);
+            disconnect(_agentIOP, &AgentIOPM::currentValueChanged, this, &IOPValueConditionM::_onCurrentValueChanged);
         }
     }
 }
 
 
 /**
-  * @brief Slot on agent outputs list change
+  * @brief Slot called when the models of Inputs/Outputs/Parameters changed of the agent in mapping
   */
-void IOPValueConditionM::onInputsOutputsListChange()
+void IOPValueConditionM::_onModelsOfIOPChanged()
 {
     // If we have a selected agent iop
     if (!_agentIOPName.isEmpty())
@@ -176,75 +211,27 @@ void IOPValueConditionM::onInputsOutputsListChange()
                 _agentIopList.append(outputVM->firstModel());
 
                 if (outputVM->name() == _agentIOPName) {
-                    updateAgentIOPSelected(outputVM->firstModel());
+                    _updateAgentIOPSelected(outputVM->firstModel());
                 }
             }
         }
 
         // FIXME: pourquoi on ne remplit pas "_agentIopList" aussi avec la liste "_agent->inputsList()" ?
+        // --> à priori, parce que les conditions ne s'appliquent que sur les outputs
     }
 }
 
 
 /**
-* @brief Update the selected agent iop
-*/
-void IOPValueConditionM::updateAgentIOPSelected(AgentIOPM * newAgentIOP)
+  * @brief Slot called when the flag "is ON" of an agent changed
+  */
+void IOPValueConditionM::_onAgentModelIsOnChanged(bool isON)
 {
-    // Reset the agentIOP
-    if (newAgentIOP != _agentIOP)
-    {
-        // Disconnect old agent iop
-        if(_agentIOP != NULL)
-        {
-            // UnSubscribe to value change
-            disconnect(_agentIOP, &AgentIOPM::currentValueChanged, this, &IOPValueConditionM::_onCurrentValueChange);
-        }
+    Q_UNUSED(isON)
 
-        // Set the new agent
-        setagentIOP(newAgentIOP);
-
-        // Connect new agent iop
-        if(newAgentIOP != NULL)
-        {
-            // Subscribe to value change
-            connect(newAgentIOP, &AgentIOPM::currentValueChanged, this, &IOPValueConditionM::_onCurrentValueChange);
-
-            // Update valid status
-            _onCurrentValueChange(_agentIOP->currentValue());
-        }
-    }
+    _onModelsOfIOPChanged();
 }
 
-/**
-* @brief Custom setter for agent iop model
-* @param agent iop model
-*/
-void IOPValueConditionM::setagentIOP(AgentIOPM* agentIop)
-{
-    if(_agentIOP != agentIop)
-    {
-        if(_agentIOP != NULL)
-        {
-            // UnSubscribe to destruction
-            disconnect(_agentIOP, &AgentIOPM::destroyed, this, &IOPValueConditionM::_onAgentIopModelDestroyed);
-        }
-
-        setisValid(false);
-
-        _agentIOP = agentIop;
-
-        if(_agentIOP != NULL)
-        {
-            setagentIOPName(_agentIOP->name());
-
-            // Subscribe to destruction
-            connect(_agentIOP, &AgentIOPM::destroyed, this, &IOPValueConditionM::_onAgentIopModelDestroyed);
-        }
-
-        Q_EMIT agentIOPChanged(agentIop);
-    }
-}
 
 /**
  * @brief Called when our agent iop model is destroyed
@@ -257,11 +244,11 @@ void IOPValueConditionM::_onAgentIopModelDestroyed(QObject* sender)
     setagentIOP(NULL);
 }
 
+
 /**
-  * @brief Slot on agent iop value change
-  * @param current value
+  * @brief Slot called when the current value of our agent iop changed
   */
-void IOPValueConditionM::_onCurrentValueChange(QVariant currentValue)
+void IOPValueConditionM::_onCurrentValueChanged(QVariant currentValue)
 {
     // Trim the condition value to compare with
     QString valueTrimmed = _value.trimmed();
@@ -376,12 +363,34 @@ void IOPValueConditionM::_onCurrentValueChange(QVariant currentValue)
     setisValid(isValid);
 }
 
-/**
-  * @brief Slot on IsON flag agent change
-  */
-void IOPValueConditionM::onAgentModelIsOnChange(bool isON)
-{
-    Q_UNUSED(isON)
 
-    onInputsOutputsListChange();
+/**
+* @brief Update the selected agent iop
+*/
+void IOPValueConditionM::_updateAgentIOPSelected(AgentIOPM * newAgentIOP)
+{
+    // Reset the agentIOP
+    if (newAgentIOP != _agentIOP)
+    {
+        // Disconnect old agent iop
+        if(_agentIOP != NULL)
+        {
+            // UnSubscribe to value change
+            disconnect(_agentIOP, &AgentIOPM::currentValueChanged, this, &IOPValueConditionM::_onCurrentValueChanged);
+        }
+
+        // Set the new agent
+        setagentIOP(newAgentIOP);
+
+        // Connect new agent iop
+        if(newAgentIOP != NULL)
+        {
+            // Subscribe to value change
+            connect(newAgentIOP, &AgentIOPM::currentValueChanged, this, &IOPValueConditionM::_onCurrentValueChanged);
+
+            // Update valid status
+            _onCurrentValueChanged(_agentIOP->currentValue());
+        }
+    }
 }
+

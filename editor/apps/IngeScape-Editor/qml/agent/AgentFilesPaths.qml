@@ -62,7 +62,7 @@ I2PopupBase {
         Text {
             id: title
 
-            text: (rootItem.agent ? qsTr("Paths for Definition and Mapping of %1").arg(rootItem.agent.name) : "")
+            text: (rootItem.agent ? qsTr("Local paths for %1").arg(rootItem.agent.name) : "")
 
             color: IngeScapeTheme.whiteColor
             font {

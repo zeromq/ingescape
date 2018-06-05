@@ -161,6 +161,9 @@ Item {
                 leftMargin:15
             }
 
+            opacity: controller.playingRecordId !== "" ? 0.3 : 1
+            enabled: controller.playingRecordId === ""
+
             style: I2SvgToggleButtonStyle {
                 fileCache: IngeScapeTheme.svgFileINGESCAPE
 
@@ -170,8 +173,8 @@ Item {
                 toggleUncheckedPressedID : "record_pressed";
 
                 // No disabled states
-                toggleCheckedDisabledID: ""
-                toggleUncheckedDisabledID: ""
+                toggleCheckedDisabledID: "record"
+                toggleUncheckedDisabledID: "record"
 
                 labelMargin: 0;
             }
@@ -338,6 +341,10 @@ Item {
                         leftMargin:25
                     }
 
+                    opacity: controller.isRecording || (controller.playingRecordId !== "" && controller.playingRecordId !== model.recordModel.id) ? 0.3 : 1
+                    enabled: !(controller.isRecording || (controller.playingRecordId !== "" && controller.playingRecordId !== model.recordModel.id))
+
+
                     style: I2SvgToggleButtonStyle {
                         fileCache: IngeScapeTheme.svgFileINGESCAPE
 
@@ -347,10 +354,11 @@ Item {
                         toggleUncheckedPressedID : "play_actif_pressed";
 
                         // No disabled states
-                        toggleCheckedDisabledID: ""
-                        toggleUncheckedDisabledID: ""
+                        toggleCheckedDisabledID: "play_actif"
+                        toggleUncheckedDisabledID: "play_actif"
 
                         labelMargin: 0;
+
                     }
 
                     onCheckedChanged: {

@@ -77,11 +77,12 @@ ActionConditionM::ActionConditionM(QObject *parent) : QObject(parent),
 ActionConditionM::~ActionConditionM()
 {
     // Disconnect the agent model
-    if(_agent != NULL)
+    if (_agent != NULL)
     {
-        disconnect(_agent, &AgentInMappingVM::isONChanged, this, &ActionConditionM::onAgentModelIsOnChange);
+        disconnect(_agent, &AgentInMappingVM::isONChanged, this, &ActionConditionM::_onAgentModelIsOnChanged);
     }
 }
+
 
 /**
 * @brief Custom setter for agent
@@ -89,9 +90,9 @@ ActionConditionM::~ActionConditionM()
 */
 void ActionConditionM::setagent(AgentInMappingVM* value)
 {
-    if(_agent != value)
+    if (_agent != value)
     {
-        if(_agent != NULL)
+        if (_agent != NULL)
         {
             // UnSubscribe to destruction
             disconnect(_agent, &AgentInMappingVM::destroyed, this, &ActionConditionM::_onAgentDestroyed);
@@ -100,7 +101,7 @@ void ActionConditionM::setagent(AgentInMappingVM* value)
 
         _agent = value;
 
-        if(_agent != NULL)
+        if (_agent != NULL)
         {
             // Subscribe to destruction
             connect(_agent, &AgentInMappingVM::destroyed, this, &ActionConditionM::_onAgentDestroyed);
@@ -117,27 +118,11 @@ void ActionConditionM::setagent(AgentInMappingVM* value)
 */
 void ActionConditionM::copyFrom(ActionConditionM* condition)
 {
-    if(condition != NULL)
+    if (condition != NULL)
     {
         setagent(condition->agent());
         setcomparison(condition->comparison());
         setisValid(condition->isValid());
-    }
-}
-
-
-/**
-  * @brief Slot on IsON flag agent change
-  */
-void ActionConditionM::onAgentModelIsOnChange(bool isON)
-{
-    if ((_comparison == ActionComparisonTypes::ON && isON)
-            ||
-            (_comparison == ActionComparisonTypes::OFF && !isON)) {
-        setisValid(true);
-    }
-    else {
-        setisValid(false);
     }
 }
 
@@ -153,10 +138,10 @@ void ActionConditionM::initializeConnections()
         resetConnections();
 
         // Make connection for the futur changes
-        connect(_agent, &AgentInMappingVM::isONChanged, this, &ActionConditionM::onAgentModelIsOnChange);
+        connect(_agent, &AgentInMappingVM::isONChanged, this, &ActionConditionM::_onAgentModelIsOnChanged);
 
         // Initialize the action state with the current agent state
-        onAgentModelIsOnChange(_agent->isON());
+        _onAgentModelIsOnChanged(_agent->isON());
     }
 }
 
@@ -166,9 +151,26 @@ void ActionConditionM::initializeConnections()
   */
 void ActionConditionM::resetConnections()
 {
-    if(_agent != NULL)
+    if (_agent != NULL)
     {
-        disconnect(_agent, &AgentInMappingVM::isONChanged, this, &ActionConditionM::onAgentModelIsOnChange);
+        disconnect(_agent, &AgentInMappingVM::isONChanged, this, &ActionConditionM::_onAgentModelIsOnChanged);
+    }
+}
+
+
+/**
+  * @brief Slot called when the flag "is ON" of an agent changed
+  */
+void ActionConditionM::_onAgentModelIsOnChanged(bool isON)
+{
+    if ( ((_comparison == ActionComparisonTypes::ON) && isON)
+         ||
+         ((_comparison == ActionComparisonTypes::OFF) && !isON) )
+    {
+        setisValid(true);
+    }
+    else {
+        setisValid(false);
     }
 }
 

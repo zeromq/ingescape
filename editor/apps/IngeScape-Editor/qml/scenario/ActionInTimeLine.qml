@@ -368,9 +368,11 @@ Item {
 
         onDoubleClicked: {
             // open action editor
-            if (controller && actionVMItem.myActionVM) {
+            if (controller && actionVMItem.myActionVM)
+            {
                 controller.openActionEditorWithViewModel(actionVMItem.myActionVM);
-                // selection of the action VM
+
+                // select the action VM
                 controller.selectedActionVMInTimeline = actionVMItem.myActionVM;
             }
         }

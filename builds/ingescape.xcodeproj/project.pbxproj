@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		15326AAB20C683F70020BA75 /* libsodium.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 15326AAA20C683F70020BA75 /* libsodium.dylib */; };
 		970670DF1EDC187900CCDFDC /* ingescape_private.h in Headers */ = {isa = PBXBuildFile; fileRef = 97C926AB1EB23ED100D2B0CE /* ingescape_private.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		972A52641FD1733E00711352 /* admin.c in Sources */ = {isa = PBXBuildFile; fileRef = 972A52631FD1733E00711352 /* admin.c */; };
 		972A52651FD1733E00711352 /* admin.c in Sources */ = {isa = PBXBuildFile; fileRef = 972A52631FD1733E00711352 /* admin.c */; };
@@ -19,7 +20,6 @@
 		9762EDDC1EAE547B002062A1 /* model.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A79991EA7B112003153EF /* model.c */; };
 		9762EDDD1EAE547B002062A1 /* network.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A799A1EA7B112003153EF /* network.c */; };
 		9762EDDF1EAE547B002062A1 /* parser.c in Sources */ = {isa = PBXBuildFile; fileRef = 979A799C1EA7B112003153EF /* parser.c */; };
-		9762EDE81EAE54D6002062A1 /* libsodium.18.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 9762EDE41EAE54D6002062A1 /* libsodium.18.dylib */; };
 		9762EDE91EAE54D6002062A1 /* libzmq.5.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 9762EDE51EAE54D6002062A1 /* libzmq.5.dylib */; };
 		9762EDF31EAE55D2002062A1 /* libut.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A798F1EA7B112003153EF /* libut.h */; };
 		9762EDF41EAE55D2002062A1 /* ringbuf.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 979A79901EA7B112003153EF /* ringbuf.h */; };
@@ -340,6 +340,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		15326AAA20C683F70020BA75 /* libsodium.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsodium.dylib; path = ../../../../../usr/local/lib/libsodium.dylib; sourceTree = "<group>"; };
 		972A52631FD1733E00711352 /* admin.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = admin.c; sourceTree = "<group>"; };
 		973DC287207A93E6004C1D80 /* bus.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = bus.c; sourceTree = "<group>"; };
 		975512902078EF1900720931 /* ingescape_advanced.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ingescape_advanced.h; sourceTree = "<group>"; };
@@ -1205,7 +1206,7 @@
 				9766A8C72088DC8C0046C63F /* libczmq.4.dylib in Frameworks */,
 				9766A8C82088DC8C0046C63F /* libzyre.2.dylib in Frameworks */,
 				97C9272A1EB38FF300D2B0CE /* yajl.framework in Frameworks */,
-				9762EDE81EAE54D6002062A1 /* libsodium.18.dylib in Frameworks */,
+				15326AAB20C683F70020BA75 /* libsodium.dylib in Frameworks */,
 				9762EDE91EAE54D6002062A1 /* libzmq.5.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1236,6 +1237,7 @@
 		9762EDE21EAE54D5002062A1 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				15326AAA20C683F70020BA75 /* libsodium.dylib */,
 				9766A8C52088DC8C0046C63F /* libczmq.4.dylib */,
 				9766A8C62088DC8C0046C63F /* libzyre.2.dylib */,
 				9762EDE31EAE54D6002062A1 /* libczmq.3.dylib */,

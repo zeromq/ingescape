@@ -51,8 +51,6 @@ Item {
     //
     //--------------------------------------------------------
 
-    property int popupTopmostZIndex: 1
-
 
 
     //--------------------------------------------------------
@@ -65,7 +63,12 @@ Item {
 
     // function allowing to open the history panel
     function openHistory() {
+        //console.log("QML: function openHistory()");
+
         historyPanel.show();
+
+        // Raises the window in the windowing system
+        historyPanel.raise();
     }
 
     // function allowing to open the network configuration popup
@@ -281,7 +284,7 @@ Item {
 
     // List of "Agent Definition Editor(s)"
     Repeater {
-        model: IngeScapeEditorC.modelManager.openedDefinitions
+        model: (IngeScapeEditorC.modelManager ? IngeScapeEditorC.modelManager.openedDefinitions : 0)
 
         delegate: Item {
             Agent.AgentDefinitionEditor {
@@ -298,7 +301,12 @@ Item {
                 }
 
                 onOpenHistory : {
+                    //console.log("QML: slot onOpenHistory");
+
                     historyPanel.show();
+
+                    // Raises the window in the windowing system
+                    historyPanel.raise();
                 }
             }
         }

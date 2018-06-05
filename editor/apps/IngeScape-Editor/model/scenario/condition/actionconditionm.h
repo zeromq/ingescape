@@ -88,15 +88,13 @@ Q_SIGNALS:
     void askForDestruction();
 
 
-public Q_SLOTS:
+protected Q_SLOTS:
 
     /**
-      * @brief Slot on IsON flag agent change
+      * @brief Slot called when the flag "is ON" of an agent changed
       */
-    virtual void onAgentModelIsOnChange(bool isON);
+    virtual void _onAgentModelIsOnChanged(bool isON);
 
-
-protected Q_SLOTS:
 
     /**
      * @brief Called when our agent is destroyed

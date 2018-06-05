@@ -63,7 +63,7 @@ Window {
     // - Name
     property int minWidthColumnName: 143
     // - Definition Value
-    property int minWidthColumnDefaultValue: 150
+    property int minWidthColumnInitialValue: 150
     // - Mapping Value
     property int minWidthColumnCurrentValue: 150
 
@@ -76,7 +76,7 @@ Window {
     // - Name
     // 8 <=> scrollbar width
     // - Available extra width that can be splitted between our 3 resizable columns
-    property int splittableAvailableWidth: (tabs.width - 8 - widthColumnType - minWidthColumnDefaultValue - minWidthColumnCurrentValue - minWidthColumnName - widthColumnMute)
+    property int splittableAvailableWidth: (tabs.width - 8 - widthColumnType - minWidthColumnInitialValue - minWidthColumnCurrentValue - minWidthColumnName - widthColumnMute)
     property int extraWidthForResizableColumns: Math.max(0, (splittableAvailableWidth/3))
     property int extraWidthForValuesOnly : if (widthColumnName === maxWidthColumnName) {
                                               Math.max(0, ((splittableAvailableWidth - (maxWidthColumnName - minWidthColumnName))/2));
@@ -86,10 +86,10 @@ Window {
 
     // - Width Resizable Columns
     property int widthColumnName: ((minWidthColumnName + extraWidthForResizableColumns) > maxWidthColumnName) ? maxWidthColumnName : (minWidthColumnName + extraWidthForResizableColumns);
-    property int widthColumnDefaultValue:  if (widthColumnName === maxWidthColumnName) {
-                                               minWidthColumnDefaultValue + extraWidthForValuesOnly;
+    property int widthColumnInitialValue:  if (widthColumnName === maxWidthColumnName) {
+                                               minWidthColumnInitialValue + extraWidthForValuesOnly;
                                            } else {
-                                               minWidthColumnDefaultValue + extraWidthForResizableColumns;
+                                               minWidthColumnInitialValue + extraWidthForResizableColumns;
                                            }
     property int widthColumnCurrentValue: if (widthColumnName === maxWidthColumnName) {
                                        minWidthColumnCurrentValue + extraWidthForValuesOnly;
@@ -101,7 +101,7 @@ Window {
     property var widthsOfColumns: [
         widthColumnName,
         widthColumnType,
-        widthColumnDefaultValue,
+        widthColumnInitialValue,
         widthColumnCurrentValue,
         widthColumnMute
     ]
@@ -112,12 +112,29 @@ Window {
     //
     //--------------------------------
 
-    // Emitted when user pressed our popup
-    // signal bringToFront();
-
-
-    // Emitted when user clicks on "istory" button
+    // Emitted when user clicks on "history" button
     signal openHistory();
+
+
+    //--------------------------------
+    //
+    // Behavior
+    //
+    //--------------------------------
+
+    Connections {
+        target: definition
+
+        //ignoreUnknownSignals: true
+
+        onBringToFront: {
+            //console.log("QML of Agent Definition Editor: onBringToFront");
+
+            // Raises the window in the windowing system.
+            rootItem.raise();
+        }
+    }
+
 
     //--------------------------------
     //
@@ -336,7 +353,7 @@ Window {
                                 model: [
                                     qsTr("Name"),
                                     qsTr("Type"),
-                                    qsTr("Default value"),
+                                    qsTr("Initial value"),
                                     qsTr("Current value"),
                                     qsTr("Mute")
                                 ]
@@ -352,7 +369,8 @@ Window {
                                             verticalCenter: parent.verticalCenter
                                         }
 
-                                        text : (modelData !== "Mute" || tab.title === "Outputs") ? modelData : ""
+                                        // Allow to hide the header of column "Current value" (index = 3) and "Mute" (index = 4) for Inputs and Parameters
+                                        text: ((tab.title !== "Outputs") && ((index === 3) || (index === 4))) ? "" : modelData
 
                                         color : IngeScapeTheme.definitionEditorsAgentDescriptionColor
                                         font {
@@ -495,7 +513,7 @@ Window {
                                         }
 
 
-                                        // Default Value
+                                        // Initial Value
                                         Text {
                                             text: model.displayableDefaultValue
 
@@ -517,6 +535,8 @@ Window {
                                         // Current Value
                                         Text {
                                             text: model.displayableCurrentValue
+
+                                            visible: (model.agentIOPType === AgentIOPTypes.OUTPUT)
 
                                             anchors {
                                                 verticalCenter: parent.verticalCenter
@@ -592,7 +612,10 @@ Window {
 
         }
 
-        // History
+
+        //
+        // History button
+        //
         MouseArea {
             id : historyBtn
             enabled: visible
@@ -606,6 +629,7 @@ Window {
             width : history.width
 
             hoverEnabled: true
+
             onClicked: {
                 if (definition) {
                     definition.openValuesHistoryOfAgent();
@@ -619,7 +643,7 @@ Window {
                 anchors {
                     left : parent.left
                 }
-                text : "> History"
+                text : "> Outputs history"
                 color: historyBtn.pressed ? IngeScapeTheme.lightGreyColor : IngeScapeTheme.whiteColor
                 elide: Text.ElideRight
 
@@ -629,7 +653,7 @@ Window {
                 }
             }
 
-            // underline
+            // Underline
             Rectangle {
                 visible: historyBtn.containsMouse
 
@@ -643,19 +667,6 @@ Window {
 
                 color : history.color
             }
-        }
-
-
-        Row {
-            anchors {
-                right : tabs.right
-                top : tabs.bottom
-                topMargin: 12
-                bottom : parent.bottom
-                bottomMargin: 16
-            }
-            spacing : 15
-
         }
 
     }
