@@ -36,20 +36,21 @@ class ActionEditorController: public QObject
 {
     Q_OBJECT
 
-    // Original action view model
+    // Original model of action
     I2_QML_PROPERTY(ActionM*, originalAction)
 
-    // Temporary action view model
+    // Temporary model of action
     I2_QML_PROPERTY(ActionM*, editedAction)
 
-    // Action view model
+    // Original view model of action
     I2_QML_PROPERTY(ActionVM*, originalViewModel)
 
-    // Temporary view model
+    // Temporary view model of action
     I2_QML_PROPERTY(ActionVM*, editedViewModel)
 
-    // Agents in mapping list
-    I2_QML_PROPERTY(I2CustomItemSortFilterListModel<AgentInMappingVM> *, listAgentsInMapping)
+    // List of all agents in mapping
+    I2_CPP_NOSIGNAL_PROPERTY(I2CustomItemSortFilterListModel<AgentInMappingVM> *, listAgentsInMapping)
+
 
 public:
 
@@ -59,7 +60,7 @@ public:
      * @param original action
      * @param parent
      */
-    explicit ActionEditorController(QString actionName, ActionM * originalAction, I2CustomItemSortFilterListModel<AgentInMappingVM> * listAgentsInMapping, QObject *parent = 0);
+    explicit ActionEditorController(QString actionName, ActionM * originalAction, I2CustomItemSortFilterListModel<AgentInMappingVM>* listAgentsInMapping, QObject *parent = 0);
 
 
     /**

@@ -50,7 +50,7 @@ class ScenarioController: public QObject
     // List of actions
     I2_QOBJECT_LISTMODEL(ActionM, actionsList)
 
-    // Opened actions editors
+    // List of opened action editors
     I2_QOBJECT_LISTMODEL(ActionEditorController, openedActionsEditorsControllers)
 
     // Selected action
@@ -175,14 +175,14 @@ public:
 
 
     /**
-      * @brief Validate action edition
+      * @brief Validate action editior
       * @param action editor controller
       */
     Q_INVOKABLE void validateActionEditor(ActionEditorController* actionEditorC);
 
 
     /**
-      * @brief Close action edition
+      * @brief Close action editior
       * @param action editor controller
       */
     Q_INVOKABLE void closeActionEditor(ActionEditorController* actionEditorC);
@@ -361,7 +361,7 @@ private Q_SLOTS:
     void _onTimeout_DelayOrExecuteActions();
 
 
-private :
+private:
 
     /**
      * @brief Get a new action name
@@ -439,6 +439,20 @@ private :
     void _executeAction(ActionVM* actionVM, ActionExecutionVM* actionExecution, int currentTimeInMilliSeconds);
 
 
+    /**
+     * @brief Get the "Action Editor" from a model of action
+     * @return
+     */
+    ActionEditorController* _getActionEditorFromModelOfAction(ActionM* action);
+
+
+    /**
+     * @brief Get the "Action Editor" from a view model of action
+     * @return
+     */
+    ActionEditorController* _getActionEditorFromViewModelOfAction(ActionVM* action);
+
+
 private:
 
     // Manager for the data model of INGESCAPE
@@ -450,11 +464,11 @@ private:
     // Path to the directory containing JSON files to save scenarios
     QString _scenariosDirectoryPath;
 
-    // Map of actions editors controllers from the actions model
-    QHash<ActionM*, ActionEditorController*> _mapActionsEditorControllersFromActionM;
+    // Hash table of action editor controller from a model of action
+    QHash<ActionM*, ActionEditorController*> _hashActionEditorControllerFromModelOfAction;
 
-    // Map of actions editors controllers from the actions view model
-    QHash<ActionVM*, ActionEditorController*> _mapActionsEditorControllersFromActionVM;
+    // Hash table of action editor controller from a view model of action
+    QHash<ActionVM*, ActionEditorController*> _hashActionEditorControllerFromViewModelOfAction;
 
     // Map of actions model from the action name
     QHash<QString, ActionM*> _mapActionsFromActionName;
