@@ -354,6 +354,16 @@ void ScenarioController::openActionEditorWithViewModel(ActionVM* action)
             // Add to list
             _openedActionsEditorsControllers.append(actionEditorC);
         }
+        else
+        {
+            ActionEditorController* actionEditorC = _mapActionsEditorControllersFromActionVM.value(action);
+            if (actionEditorC != NULL)
+            {
+                qDebug() << "The 'Action Editor' of" << action->modelM()->name() << "is already opened...bring to front !";
+
+                Q_EMIT actionEditorC->bringToFront();
+            }
+        }
     }
 }
 

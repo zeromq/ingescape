@@ -67,25 +67,30 @@ public:
       */
     ~ActionEditorController();
 
+
     /**
      * @brief Valide the edition/creation
      */
     void validateModification();
+
 
     /**
      * @brief Create a new condition
      */
     Q_INVOKABLE void createNewCondition();
 
+
     /**
      * @brief Remove the condition
      */
     Q_INVOKABLE void removeCondition(ActionConditionVM* conditionVM);
 
+
     /**
      * @brief Create a new effect
      */
     Q_INVOKABLE void createNewEffect();
+
 
     /**
      * @brief Remove the effect
@@ -94,6 +99,11 @@ public:
 
 
 Q_SIGNALS:
+
+    /**
+     * @brief Signal emitted when the corresponding window must be bring to front (in the windowing system)
+     */
+    void bringToFront();
 
 
 public Q_SLOTS:
