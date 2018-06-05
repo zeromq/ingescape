@@ -611,11 +611,13 @@ Window {
                                         Binding {
                                             target : ioEffectsCombo
                                             property : "selectedItem"
-                                            value : if (myEffect && myEffect.modelM)
+                                            value : if (myEffect && myEffect.modelM && myEffect.modelM.agentIOP)
                                                     {
+                                                        console.log("QML (Binding): Combo set agent IOP to " + myEffect.modelM.agentIOP.name);
                                                         myEffect.modelM.agentIOP;
                                                     }
                                                     else {
+                                                        console.log("QML (Binding): Combo set agent IOP to NULL !!!");
                                                         null;
                                                     }
                                         }
@@ -625,13 +627,20 @@ Window {
                                         {
                                             if (myEffect && myEffect.modelM)
                                             {
+                                                if (myEffect.modelM.iopMergedList.count > 0) {
+                                                    console.log("QML: Combo Selected Item changed...set agent IOP to " + ioEffectsCombo.selectedItem + " (iopMergedList.count = " + myEffect.modelM.iopMergedList.count + ")");
+                                                }
+                                                else {
+                                                    console.log("QML: Combo Selected Item changed...set agent IOP to " + ioEffectsCombo.selectedItem + " (iopMergedList is EMPTY !!!)");
+                                                }
+
                                                 myEffect.modelM.agentIOP = ioEffectsCombo.selectedItem;
                                             }
                                         }
 
                                     }
 
-                                    // Comparison Type
+                                    // Effect Type
                                     IngeScapeComboBox {
                                         id : effectTypeCombo
 
@@ -1685,9 +1694,9 @@ Window {
 
                                         model :
                                         {
-                                            if(controller)
+                                            if (controller)
                                             {
-                                                (myCondition && myCondition.conditionType === ActionConditionTypes.VALUE) ? controller.comparisonsValuesTypesList : controller.comparisonsAgentsTypesList
+                                                (myCondition && myCondition.conditionType === ActionConditionTypes.VALUE) ? controller.allValueComparisonTypes : controller.allAgentConditionValues
                                             }
                                             else {
                                                 0
@@ -1704,7 +1713,8 @@ Window {
                                         Binding {
                                             target : comparisonCombo
                                             property : "selectedItem"
-                                            value : if (myCondition && myCondition.modelM && controller)
+                                            value : null;
+                                            /*if (myCondition && myCondition.modelM && controller)
                                                     {
                                                         (myCondition && myCondition.conditionType === ActionConditionTypes.VALUE) ?
                                                                     controller.comparisonsValuesTypesList.getItemWithValue(myCondition.modelM.comparison)
@@ -1712,7 +1722,7 @@ Window {
                                                     }
                                                     else {
                                                         null;
-                                                    }
+                                                    }*/
                                         }
 
 
@@ -1720,7 +1730,7 @@ Window {
                                         {
                                             if (myCondition && myCondition.modelM && comparisonCombo.selectedItem)
                                             {
-                                                myCondition.modelM.comparison = comparisonCombo.selectedItem.value;
+                                                //myCondition.modelM.comparison = comparisonCombo.selectedItem.value;
                                             }
                                         }
 
@@ -1734,7 +1744,7 @@ Window {
                                             verticalCenter : parent.verticalCenter
                                         }
 
-                                        visible : myCondition && myCondition.conditionType === ActionConditionTypes.VALUE
+                                        visible: (myCondition && myCondition.conditionType === ActionConditionTypes.VALUE)
 
                                         enabled : visible
                                         height: 25
@@ -1785,7 +1795,7 @@ Window {
                                         Binding {
                                             target : textFieldComparisonValue
                                             property :  "text"
-                                            value : if  (myCondition && myCondition.modelM) {
+                                            value : if (myCondition && myCondition.modelM) {
                                                         myCondition.modelM.value
                                                     }
                                                     else {

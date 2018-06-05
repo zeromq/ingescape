@@ -20,6 +20,13 @@
 #include "I2PropertyHelpers.h"
 #include "actionconditionm.h"
 
+
+/**
+  * Values of condition for an agent (state)
+  */
+I2_ENUM_CUSTOM(AgentConditionValues, ON, OFF)
+
+
 /**
  * @brief The ConditionOnAgentM class defines an action condition on an agent
  * condition on the state (ON/OFF) of an agent
@@ -28,8 +35,12 @@ class ConditionOnAgentM : public ActionConditionM
 {
     Q_OBJECT
 
+    // Value of condition for an agent
+    I2_QML_PROPERTY(AgentConditionValues::Value, agentConditionValue)
+
 
 public:
+
     /**
      * @brief Constructor
      * @param parent
@@ -76,7 +87,7 @@ protected Q_SLOTS:
     /**
       * @brief Slot called when the flag "is ON" of an agent changed
       */
-    void _onAgentModelIsOnChanged(bool isON) Q_DECL_OVERRIDE;
+    void _onAgentIsOnChanged(bool isON) Q_DECL_OVERRIDE;
 
 };
 

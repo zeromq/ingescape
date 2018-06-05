@@ -25,6 +25,12 @@
 
 
 /**
+  * Types of value (of an agent) comparison
+  */
+I2_ENUM_CUSTOM(ValueComparisonTypes, EQUAL_TO, SUPERIOR_TO, INFERIOR_TO)
+
+
+/**
  * @brief The IOPValueConditionM class defines an action condition on iop value
  */
 class IOPValueConditionM : public ActionConditionM
@@ -39,6 +45,9 @@ class IOPValueConditionM : public ActionConditionM
 
     // value in string format
     I2_QML_PROPERTY(QString, value)
+
+    // Type of value comparison
+    I2_QML_PROPERTY(ValueComparisonTypes::Value, valueComparisonType)
 
     // Concatened list of iop agents items
     I2_QOBJECT_LISTMODEL(AgentIOPM, agentIopList)
@@ -92,7 +101,7 @@ protected Q_SLOTS:
     /**
       * @brief Slot called when the flag "is ON" of an agent changed
       */
-    void _onAgentModelIsOnChanged(bool isON) Q_DECL_OVERRIDE;
+    void _onAgentIsOnChanged(bool isON) Q_DECL_OVERRIDE;
 
 
     /**

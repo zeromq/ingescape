@@ -14,11 +14,40 @@
 
 #include "conditiononagentm.h"
 
+
+/**
+ * @brief Enum "AgentConditionValues" to string
+ * @param value
+ * @return
+ */
+QString AgentConditionValues::enumToString(int value)
+{
+    switch (value)
+    {
+    case AgentConditionValues::ON:
+        return tr("ON");
+
+    case AgentConditionValues::OFF:
+        return tr("OFF");
+
+    default:
+        return "";
+    }
+}
+
+
+//--------------------------------------------------------------
+//
+// ConditionOnAgentM
+//
+//--------------------------------------------------------------
+
 /**
  * @brief Constructor
  * @param parent
  */
-ConditionOnAgentM::ConditionOnAgentM(QObject *parent) : ActionConditionM(parent)
+ConditionOnAgentM::ConditionOnAgentM(QObject *parent) : ActionConditionM(parent),
+    _agentConditionValue(AgentConditionValues::ON)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -46,7 +75,7 @@ void ConditionOnAgentM::copyFrom(ActionConditionM* condition)
     ConditionOnAgentM* conditionOnAgent = qobject_cast<ConditionOnAgentM*>(condition);
     if (conditionOnAgent != NULL)
     {
-        // TODO
+        setagentConditionValue(conditionOnAgent->agentConditionValue());
     }
 }
 
@@ -76,12 +105,8 @@ void ConditionOnAgentM::setagent(AgentInMappingVM* agent)
   */
 void ConditionOnAgentM::initializeConnections()
 {
-    if (_agent != NULL)
-    {
-        // Call our mother class
-        ActionConditionM::initializeConnections();
-
-    }
+    // Call our mother class
+    ActionConditionM::initializeConnections();
 }
 
 
@@ -90,21 +115,27 @@ void ConditionOnAgentM::initializeConnections()
   */
 void ConditionOnAgentM::resetConnections()
 {
-    if (_agent != NULL)
-    {
-        // Call our mother class
-        ActionConditionM::resetConnections();
-
-    }
+    // Call our mother class
+    ActionConditionM::resetConnections();
 }
 
 
 /**
   * @brief Slot called when the flag "is ON" of an agent changed
   */
-void ConditionOnAgentM::_onAgentModelIsOnChanged(bool isON)
+void ConditionOnAgentM::_onAgentIsOnChanged(bool isON)
 {
-    Q_UNUSED(isON)
+    if ( ((_agentConditionValue == AgentConditionValues::ON) && isON)
+         ||
+         ((_agentConditionValue == AgentConditionValues::OFF) && !isON) )
+    {
+        // Update flag "is Valid"
+        setisValid(true);
+    }
+    else {
+        // Update flag "is Valid"
+        setisValid(false);
+    }
 }
 
 

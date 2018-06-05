@@ -232,6 +232,7 @@ void ActionM::setrevertAfterTimeString(QString value)
     }
 }
 
+
 /**
  * @brief Setter for property "Rearm After Time String"
  * @param value
@@ -282,6 +283,7 @@ void ActionM::setrearmAfterTimeString(QString value)
         Q_EMIT rearmAfterTimeStringChanged(value);
     }
 }
+
 
 /**
  * @brief Setter for property "Validity Duration String"
@@ -367,9 +369,9 @@ void ActionM::initializeConditionsConnections()
 {
     if (!_isConnected)
     {
-        foreach (ActionConditionVM* conditionVM, _conditionsList.toList())
+        for (ActionConditionVM* conditionVM : _conditionsList.toList())
         {
-            if (conditionVM->modelM() != NULL)
+            if ((conditionVM != NULL) && (conditionVM->modelM() != NULL))
             {
                 // Connect to changes on flag "is valid"
                 connect(conditionVM->modelM(), &ActionConditionM::isValidChanged, this, &ActionM::_onConditionValidationChange);
@@ -394,9 +396,9 @@ void ActionM::resetConditionsConnections()
 {
     if (_isConnected)
     {
-        foreach (ActionConditionVM* conditionVM, _conditionsList.toList())
+        for (ActionConditionVM* conditionVM : _conditionsList.toList())
         {
-            if (conditionVM->modelM() != NULL)
+            if ((conditionVM != NULL) && (conditionVM->modelM() != NULL))
             {
                 // DIS-connect from changes on flag "is valid"
                 disconnect(conditionVM->modelM(), &ActionConditionM::isValidChanged, this, &ActionM::_onConditionValidationChange);
@@ -444,8 +446,7 @@ void ActionM::_onConditionValidationChange(bool isValid)
  */
 void ActionM::addEffectToList(ActionEffectVM* effectVM)
 {
-    if(effectVM != NULL && effectVM->modelM())
-    {
+    if ((effectVM != NULL) && (effectVM->modelM() != NULL)) {
         connect(effectVM->modelM(), &ActionEffectM::askForDestruction, this, &ActionM::_onEffectDestructionAsked);
     }
 
@@ -457,13 +458,13 @@ void ActionM::addEffectToList(ActionEffectVM* effectVM)
  */
 void ActionM::addConditionToList(ActionConditionVM* conditionVM)
 {
-    if(conditionVM != NULL && conditionVM->modelM())
-    {
+    if ((conditionVM != NULL) && (conditionVM->modelM() != NULL)) {
         connect(conditionVM->modelM(), &ActionConditionM::askForDestruction, this, &ActionM::_onConditionDestructionAsked);
     }
 
     _conditionsList.append(conditionVM);
 }
+
 
 /**
  * @brief Triggered when an agent model associated to an effect has been destroyed from the mapping
@@ -476,17 +477,19 @@ void ActionM::_onEffectDestructionAsked()
     {
         disconnect(actionEffect, &ActionEffectM::askForDestruction, this, &ActionM::_onEffectDestructionAsked);
 
-        foreach (ActionEffectVM * effectVM, _effectsList.toList())
+        for (ActionEffectVM* effectVM : _effectsList.toList())
         {
-            if(effectVM != NULL && effectVM->modelM() == actionEffect)
+            if ((effectVM != NULL) && (effectVM->modelM() == actionEffect))
             {
                 _effectsList.remove(effectVM);
+
                 delete effectVM;
                 effectVM = NULL;
             }
         }
     }
 }
+
 
 /**
  * @brief Triggered when an agent model associated to a condition has been destroyed from the mapping
@@ -499,11 +502,12 @@ void ActionM::_onConditionDestructionAsked()
     {
         disconnect(actionCondition, &ActionConditionM::askForDestruction, this, &ActionM::_onConditionDestructionAsked);
 
-        foreach (ActionConditionVM * conditionVM, _conditionsList.toList())
+        for (ActionConditionVM* conditionVM : _conditionsList.toList())
         {
-            if(conditionVM != NULL && conditionVM->modelM() == actionCondition)
+            if ((conditionVM != NULL) && (conditionVM->modelM() == actionCondition))
             {
                 _conditionsList.remove(conditionVM);
+
                 delete conditionVM;
                 conditionVM = NULL;
             }
