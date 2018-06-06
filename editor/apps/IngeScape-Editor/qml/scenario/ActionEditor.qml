@@ -611,11 +611,13 @@ Window {
                                         Binding {
                                             target : ioEffectsCombo
                                             property : "selectedItem"
-                                            value : if (myEffect && myEffect.modelM)
+                                            value : if (myEffect && myEffect.modelM && myEffect.modelM.agentIOP)
                                                     {
+                                                        console.log("QML (Binding): Combo set agent IOP to " + myEffect.modelM.agentIOP.name);
                                                         myEffect.modelM.agentIOP;
                                                     }
                                                     else {
+                                                        console.log("QML (Binding): Combo set agent IOP to NULL !!!");
                                                         null;
                                                     }
                                         }
@@ -625,13 +627,20 @@ Window {
                                         {
                                             if (myEffect && myEffect.modelM)
                                             {
+                                                if (myEffect.modelM.iopMergedList.count > 0) {
+                                                    console.log("QML: Combo Selected Item changed...set agent IOP to " + ioEffectsCombo.selectedItem + " (iopMergedList.count = " + myEffect.modelM.iopMergedList.count + ")");
+                                                }
+                                                else {
+                                                    console.log("QML: Combo Selected Item changed...set agent IOP to " + ioEffectsCombo.selectedItem + " (iopMergedList is EMPTY !!!)");
+                                                }
+
                                                 myEffect.modelM.agentIOP = ioEffectsCombo.selectedItem;
                                             }
                                         }
 
                                     }
 
-                                    // Comparison Type
+                                    // Effect Type
                                     IngeScapeComboBox {
                                         id : effectTypeCombo
 
@@ -1672,28 +1681,21 @@ Window {
 
                                     }
 
-                                    // Comparison Type
+
+                                    // Combo to select the value of the agent condition
                                     IngeScapeComboBox {
-                                        id : comparisonCombo
-                                        enabled : visible
+                                        id : comboAgentConditionValues
+
                                         anchors {
                                             verticalCenter : parent.verticalCenter
                                         }
 
-                                        height : 25
-                                        width : (myCondition && myCondition.conditionType === ActionConditionTypes.VALUE) ? 44 : 78
+                                        visible: (myCondition && myCondition.conditionType === ActionConditionTypes.AGENT)
 
-                                        model :
-                                        {
-                                            if(controller)
-                                            {
-                                                (myCondition && myCondition.conditionType === ActionConditionTypes.VALUE) ? controller.comparisonsValuesTypesList : controller.comparisonsAgentsTypesList
-                                            }
-                                            else {
-                                                0
-                                            }
+                                        height: 25
+                                        width: 78
 
-                                        }
+                                        model: (controller ? controller.allAgentConditionValues : 0)
 
                                         function modelToString(model)
                                         {
@@ -1702,29 +1704,55 @@ Window {
 
 
                                         Binding {
-                                            target : comparisonCombo
-                                            property : "selectedItem"
-                                            value : if (myCondition && myCondition.modelM && controller)
-                                                    {
-                                                        (myCondition && myCondition.conditionType === ActionConditionTypes.VALUE) ?
-                                                                    controller.comparisonsValuesTypesList.getItemWithValue(myCondition.modelM.comparison)
-                                                                  :  controller.comparisonsAgentsTypesList.getItemWithValue(myCondition.modelM.comparison);
-                                                    }
-                                                    else {
-                                                        null;
-                                                    }
+                                            target: comboAgentConditionValues
+                                            property: "selectedItem"
+                                            value: (myCondition && myCondition.modelM && controller ? controller.allAgentConditionValues.getItemWithValue(myCondition.modelM.agentConditionValue) : null)
                                         }
 
-
-                                        onSelectedItemChanged:
-                                        {
-                                            if (myCondition && myCondition.modelM && comparisonCombo.selectedItem)
+                                        onSelectedItemChanged: {
+                                            if (myCondition && myCondition.modelM && comboAgentConditionValues.selectedItem)
                                             {
-                                                myCondition.modelM.comparison = comparisonCombo.selectedItem.value;
+                                                myCondition.modelM.agentConditionValue = comboAgentConditionValues.selectedItem.value;
                                             }
                                         }
-
                                     }
+
+
+                                    // Combo to select the type of the value comparison
+                                    IngeScapeComboBox {
+                                        id : comboValueComparisonTypes
+
+                                        anchors {
+                                            verticalCenter : parent.verticalCenter
+                                        }
+
+                                        visible: (myCondition && myCondition.conditionType === ActionConditionTypes.VALUE)
+
+                                        height: 25
+                                        width: 44
+
+                                        model: (controller ? controller.allValueComparisonTypes : 0)
+
+                                        function modelToString(model)
+                                        {
+                                            return model.name;
+                                        }
+
+
+                                        Binding {
+                                            target: comboValueComparisonTypes
+                                            property: "selectedItem"
+                                            value: (myCondition && myCondition.modelM && controller ? controller.allValueComparisonTypes.getItemWithValue(myCondition.modelM.valueComparisonType) : null)
+                                        }
+
+                                        onSelectedItemChanged: {
+                                            if (myCondition && myCondition.modelM && comboValueComparisonTypes.selectedItem)
+                                            {
+                                                myCondition.modelM.valueComparisonType = comboValueComparisonTypes.selectedItem.value;
+                                            }
+                                        }
+                                    }
+
 
                                     // Comparison Value
                                     TextField {
@@ -1734,7 +1762,7 @@ Window {
                                             verticalCenter : parent.verticalCenter
                                         }
 
-                                        visible : myCondition && myCondition.conditionType === ActionConditionTypes.VALUE
+                                        visible: (myCondition && myCondition.conditionType === ActionConditionTypes.VALUE)
 
                                         enabled : visible
                                         height: 25
@@ -1785,7 +1813,7 @@ Window {
                                         Binding {
                                             target : textFieldComparisonValue
                                             property :  "text"
-                                            value : if  (myCondition && myCondition.modelM) {
+                                            value : if (myCondition && myCondition.modelM) {
                                                         myCondition.modelM.value
                                                     }
                                                     else {

@@ -68,7 +68,7 @@ public:
 
 
     /**
-    * @brief Custom setter for property "agent"
+    * @brief Setter for property "Agent"
     * @param agent
     */
     void setagent(AgentInMappingVM* agent) Q_DECL_OVERRIDE;
@@ -86,6 +86,9 @@ public:
      * @return
      */
     QPair<QString, QStringList> getAgentNameAndReverseCommandWithParameters() Q_DECL_OVERRIDE;
+
+
+Q_SIGNALS:
 
 
 protected Q_SLOTS:

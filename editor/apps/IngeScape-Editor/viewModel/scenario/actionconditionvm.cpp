@@ -97,7 +97,7 @@ void ActionConditionVM::_configureToType(ActionConditionTypes::Value value)
     AgentInMappingVM* agent = NULL;
 
     // Delete the old condition if exists
-    if(_modelM != NULL)
+    if (_modelM != NULL)
     {
         // Save the agent
         agent = _modelM->agent();
@@ -108,17 +108,19 @@ void ActionConditionVM::_configureToType(ActionConditionTypes::Value value)
         tmp = NULL;
     }
 
-    // Create the new type condition
+    // Create the new model of condition
     switch (value)
     {
-        case ActionConditionTypes::AGENT :
+        // AGENT
+        case ActionConditionTypes::AGENT:
         {
             setmodelM(new ActionConditionM());
+            //setmodelM(new ConditionOnAgentM());
             _modelM->setagent(agent);
             break;
         }
-
-        case ActionConditionTypes::VALUE :
+        // VALUE
+        case ActionConditionTypes::VALUE:
         {
             setmodelM(new IOPValueConditionM());
             _modelM->setagent(agent);

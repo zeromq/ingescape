@@ -14,60 +14,16 @@
 
 #include "actionconditionm.h"
 
-#include <QDebug>
-
-
-/**
- * @brief Enum "ActionComparisonTypes" to string
- * @param value
- * @return
- */
-QString ActionComparisonTypes::enumToString(int value)
-{
-    switch (value)
-    {
-    case ActionComparisonTypes::SUPERIOR_TO:
-        return tr(">");
-
-    case ActionComparisonTypes::INFERIOR_TO:
-        return tr("<");
-
-    case ActionComparisonTypes::EQUAL_TO:
-        return tr("=");
-
-    case ActionComparisonTypes::ON:
-        return tr("ON");
-
-    case ActionComparisonTypes::OFF:
-        return tr("OFF");
-
-    default:
-        return "";
-    }
-}
-
-
-//--------------------------------------------------------------
-//
-// ActionConditionM
-//
-//--------------------------------------------------------------
-
-
 /**
  * @brief Default constructor
  * @param parent
  */
 ActionConditionM::ActionConditionM(QObject *parent) : QObject(parent),
     _agent(NULL),
-    _comparison(ActionComparisonTypes::ON),
     _isValid(false)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
-
-    // Set the condition comparision type
-    setcomparison(ActionComparisonTypes::ON);
 }
 
 
@@ -76,11 +32,8 @@ ActionConditionM::ActionConditionM(QObject *parent) : QObject(parent),
  */
 ActionConditionM::~ActionConditionM()
 {
-    // Disconnect the agent model
-    if (_agent != NULL)
-    {
-        disconnect(_agent, &AgentInMappingVM::isONChanged, this, &ActionConditionM::_onAgentModelIsOnChanged);
-    }
+    // Reset the agent connections
+    resetConnections();
 }
 
 
@@ -97,6 +50,8 @@ void ActionConditionM::setagent(AgentInMappingVM* value)
             // UnSubscribe to destruction
             disconnect(_agent, &AgentInMappingVM::destroyed, this, &ActionConditionM::_onAgentDestroyed);
         }
+
+        // Reset
         setisValid(false);
 
         _agent = value;
@@ -121,7 +76,6 @@ void ActionConditionM::copyFrom(ActionConditionM* condition)
     if (condition != NULL)
     {
         setagent(condition->agent());
-        setcomparison(condition->comparison());
         setisValid(condition->isValid());
     }
 }
@@ -134,14 +88,14 @@ void ActionConditionM::initializeConnections()
 {
     if (_agent != NULL)
     {
-        // Reset the connections
+        // Reset the agent connections
         resetConnections();
 
-        // Make connection for the futur changes
-        connect(_agent, &AgentInMappingVM::isONChanged, this, &ActionConditionM::_onAgentModelIsOnChanged);
+        // Connect to signal emitted when the flag "is ON" changed
+        connect(_agent, &AgentInMappingVM::isONChanged, this, &ActionConditionM::_onAgentIsOnChanged);
 
-        // Initialize the action state with the current agent state
-        _onAgentModelIsOnChanged(_agent->isON());
+        // Force the call of the slot
+        _onAgentIsOnChanged(_agent->isON());
     }
 }
 
@@ -153,25 +107,19 @@ void ActionConditionM::resetConnections()
 {
     if (_agent != NULL)
     {
-        disconnect(_agent, &AgentInMappingVM::isONChanged, this, &ActionConditionM::_onAgentModelIsOnChanged);
+        // DIS-connect to signal emitted when the flag "is ON" changed
+        disconnect(_agent, &AgentInMappingVM::isONChanged, this, &ActionConditionM::_onAgentIsOnChanged);
     }
 }
 
 
 /**
-  * @brief Slot called when the flag "is ON" of an agent changed
-  */
-void ActionConditionM::_onAgentModelIsOnChanged(bool isON)
+ * @brief Slot called when the flag "is ON" of an agent changed
+ * @param isON
+ */
+void ActionConditionM::_onAgentIsOnChanged(bool isON)
 {
-    if ( ((_comparison == ActionComparisonTypes::ON) && isON)
-         ||
-         ((_comparison == ActionComparisonTypes::OFF) && !isON) )
-    {
-        setisValid(true);
-    }
-    else {
-        setisValid(false);
-    }
+    Q_UNUSED(isON)
 }
 
 
@@ -183,6 +131,7 @@ void ActionConditionM::_onAgentDestroyed(QObject* sender)
 {
     Q_UNUSED(sender)
 
+    // Reset our agent
     setagent(NULL);
 
     Q_EMIT askForDestruction();

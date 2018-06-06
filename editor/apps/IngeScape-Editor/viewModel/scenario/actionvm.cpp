@@ -30,7 +30,7 @@ ActionVM::ActionVM(ActionM* model,
     _startTime(startTime),
     _startTimeString("00:00:00.000"),
     _lineInTimeLine(-1),
-    _areConditionsValid(false),
+    _areAllConditionsValid(false),
     _currentExecution(NULL),
     _endTime(startTime)
 {
@@ -49,8 +49,8 @@ ActionVM::ActionVM(ActionM* model,
             _startTimeString = QString::number(hours).rightJustified(2, '0') + ":" + QString::number(minutes).rightJustified(2, '0') + ":" + QString::number(seconds).rightJustified(2, '0') + "." + QString::number(milliseconds).leftJustified(3, '0');
         }
 
-        // Update valid flag
-        setareConditionsValid(model->isValid());
+        // Update flag
+        setareAllConditionsValid(model->isValid());
 
         // Set the action model
         setmodelM(model);
@@ -138,7 +138,7 @@ void ActionVM::copyFrom(ActionVM* actionVM)
         setendTime(actionVM->endTime());
         setlineInTimeLine(actionVM->lineInTimeLine());
         setstartTimeString(actionVM->startTimeString());
-        setareConditionsValid(actionVM->areConditionsValid());
+        setareAllConditionsValid(actionVM->areAllConditionsValid());
     }
 }
 
@@ -223,7 +223,7 @@ void ActionVM::setstartTimeString(QString value)
 
 
 /**
- * @brief Custom setter for property "modelM"
+ * @brief Setter for property "Model"
  * @param value
  */
 void ActionVM::setmodelM(ActionM* value)
@@ -352,11 +352,11 @@ void ActionVM::delayCurrentExecution(int currentTimeInMilliSeconds)
 
 /**
  * @brief Slot when the flag "is valid" changed in the model of action
- * @param isValid flag "is valid"
+ * @param isValid
  */
-void ActionVM::_onIsValidChangedInModel(bool areConditionsValid)
+void ActionVM::_onIsValidChangedInModel(bool isValid)
 {
-    setareConditionsValid(areConditionsValid);
+    setareAllConditionsValid(isValid);
 }
 
 
@@ -481,10 +481,10 @@ void ActionVM::resetDataFrom(int time)
     // Update the conditions validation flag
     if (_modelM->isConnected())
     {
-        setareConditionsValid(modelM()->isValid());
+        setareAllConditionsValid(_modelM->isValid());
     }
     else {
-        setareConditionsValid(false);
+        setareAllConditionsValid(false);
     }
 
     // Reset the current action execution

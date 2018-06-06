@@ -1,13 +1,14 @@
 /*
- *	ScenarioController
+ *	IngeScape Editor
  *
- *  Copyright (c) 2016-2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
  *
  *
  *	Contributors:
+ *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *
  */
 
@@ -47,14 +48,11 @@ ScenarioController::ScenarioController(IngeScapeModelManager* modelManager,
     // Set the agent in mapping list sort by name property
     _agentsInMappingList.setSortProperty("name");
 
-    // Fill state comparisons types list
-    _comparisonsAgentsTypesList.appendEnumValue(ActionComparisonTypes::ON);
-    _comparisonsAgentsTypesList.appendEnumValue(ActionComparisonTypes::OFF);
+    // Fill the list of all values of condition on agent (state)
+    _allAgentConditionValues.fillWithAllEnumValues();
 
-    // Fill value comparisons types list
-    _comparisonsValuesTypesList.fillWithAllEnumValues();
-    _comparisonsValuesTypesList.removeEnumValue(ActionComparisonTypes::ON);
-    _comparisonsValuesTypesList.removeEnumValue(ActionComparisonTypes::OFF);
+    // Fill the list of all types for values comparison
+    _allValueComparisonTypes.fillWithAllEnumValues();
 
     // Fill with all values
     _agentEffectValuesList.fillWithAllEnumValues();
@@ -1474,9 +1472,9 @@ void ScenarioController::_startScenario()
 
     // Look for the current and futures actions
     ActionVM* tmpNextActionToActivate = NULL;
-    foreach (ActionVM* actionVM , _actionsInTimeLine.toList())
+    for (ActionVM* actionVM : _actionsInTimeLine.toList())
     {
-        if ((actionVM->endTime() > currentTimeInMilliSeconds) || (actionVM->endTime() == -1))
+        if ((actionVM != NULL) && ((actionVM->endTime() > currentTimeInMilliSeconds) || (actionVM->endTime() == -1)) )
         {
             // Connect on the action revert signal
             connect(actionVM, &ActionVM::revertAction, this, &ScenarioController::onRevertAction);

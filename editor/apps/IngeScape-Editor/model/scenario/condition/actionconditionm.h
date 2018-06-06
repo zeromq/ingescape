@@ -23,11 +23,6 @@
 #include "I2PropertyHelpers.h"
 #include "viewModel/agentinmappingvm.h"
 
-/**
-  * Comparison type for an action
-  */
-I2_ENUM_CUSTOM(ActionComparisonTypes, EQUAL_TO, SUPERIOR_TO, INFERIOR_TO, ON, OFF)
-
 
 /**
  * @brief The ActionConditionM class defines an action condition model
@@ -38,9 +33,6 @@ class ActionConditionM: public QObject
 
     // Agent
     I2_QML_PROPERTY_CUSTOM_SETTER(AgentInMappingVM*, agent)
-
-    // Comparison
-    I2_QML_PROPERTY(ActionComparisonTypes::Value, comparison)
 
     // Flag indicating if our condition is valid
     I2_QML_PROPERTY(bool, isValid)
@@ -65,7 +57,7 @@ public:
     * @brief Copy from another condition model
     * @param condition to copy
     */
-    void copyFrom(ActionConditionM* condition);
+    virtual void copyFrom(ActionConditionM* condition);
 
 
     /**
@@ -91,9 +83,10 @@ Q_SIGNALS:
 protected Q_SLOTS:
 
     /**
-      * @brief Slot called when the flag "is ON" of an agent changed
-      */
-    virtual void _onAgentModelIsOnChanged(bool isON);
+     * @brief Slot called when the flag "is ON" of an agent changed
+     * @param isON
+     */
+    virtual void _onAgentIsOnChanged(bool isON);
 
 
     /**
@@ -101,10 +94,6 @@ protected Q_SLOTS:
      * @param sender
      */
     void _onAgentDestroyed(QObject* sender);
-
-
-protected:
-
 
 };
 
