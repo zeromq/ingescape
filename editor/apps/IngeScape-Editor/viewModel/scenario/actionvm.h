@@ -52,7 +52,7 @@ class ActionVM: public QObject
     I2_QML_PROPERTY(int, lineInTimeLine)
 
     // Flag indicating if all conditions of our action are valid
-    I2_QML_PROPERTY(bool, areConditionsValid)
+    I2_QML_PROPERTY(bool, areAllConditionsValid)
 
     // List of executions of our action
     I2_QOBJECT_LISTMODEL(ActionExecutionVM, executionsList)
@@ -149,9 +149,9 @@ private Q_SLOTS:
 
     /**
      * @brief Slot when the flag "is valid" changed in the model of action
-     * @param areConditionsValid
+     * @param isValid
      */
-    void _onIsValidChangedInModel(bool areConditionsValid);
+    void _onIsValidChangedInModel(bool isValid);
 
 
     /**

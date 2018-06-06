@@ -126,12 +126,14 @@ public:
 
     /**
      * @brief Add effect to the list
+     * @param effectVM
      */
     void addEffectToList(ActionEffectVM* effectVM);
 
 
     /**
      * @brief Add condition to the list
+     * @param conditionVM
      */
     void addConditionToList(ActionConditionVM* conditionVM);
 
@@ -144,15 +146,18 @@ public Q_SLOTS:
 protected Q_SLOTS:
 
     /**
-     * @brief Slot on the condition validation change
+     * @brief Slot called when the flag "is Valid" of a condition changed
+     * @param isValid
      */
-    void _onConditionValidationChange(bool isValid);
+    void _onIsValidConditionChanged(bool isValid);
+
 
     /**
      * @brief Triggered when an agent model associated to an effect has been destroyed from the mapping
      *        The effect does not need to exist anymore, we can delete it
      */
     void _onEffectDestructionAsked();
+
 
     /**
      * @brief Triggered when an agent model associated to a condition has been destroyed from the mapping

@@ -219,13 +219,14 @@ void IOPValueConditionM::resetConnections()
 
 
 /**
-  * @brief Slot called when the flag "is ON" of an agent changed
-  */
+ * @brief Slot called when the flag "is ON" of an agent changed
+ * @param isON
+ */
 void IOPValueConditionM::_onAgentIsOnChanged(bool isON)
 {
-    Q_UNUSED(isON)
-
-    _onModelsOfIOPChanged();
+    if (isON) {
+        _onModelsOfIOPChanged();
+    }
 }
 
 

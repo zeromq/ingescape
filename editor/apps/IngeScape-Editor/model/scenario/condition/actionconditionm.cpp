@@ -114,8 +114,9 @@ void ActionConditionM::resetConnections()
 
 
 /**
-  * @brief Slot called when the flag "is ON" of an agent changed
-  */
+ * @brief Slot called when the flag "is ON" of an agent changed
+ * @param isON
+ */
 void ActionConditionM::_onAgentIsOnChanged(bool isON)
 {
     Q_UNUSED(isON)

@@ -95,7 +95,9 @@ void ConditionOnAgentM::setagent(AgentInMappingVM* agent)
     // Value of agent changed
     if (previousAgent != _agent)
     {
-
+        if (_agent != NULL) {
+            _onAgentIsOnChanged(_agent->isON());
+        }
     }
 }
 
@@ -121,8 +123,9 @@ void ConditionOnAgentM::resetConnections()
 
 
 /**
-  * @brief Slot called when the flag "is ON" of an agent changed
-  */
+ * @brief Slot called when the flag "is ON" of an agent changed
+ * @param isON
+ */
 void ConditionOnAgentM::_onAgentIsOnChanged(bool isON)
 {
     if ( ((_agentConditionValue == AgentConditionValues::ON) && isON)
