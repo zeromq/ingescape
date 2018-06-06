@@ -149,7 +149,7 @@ private Q_SLOTS:
 
     /**
      * @brief Slot when the flag "is valid" changed in the model of action
-     * @param isValid flag "is valid"
+     * @param areConditionsValid
      */
     void _onIsValidChangedInModel(bool areConditionsValid);
 

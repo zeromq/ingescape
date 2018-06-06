@@ -352,7 +352,7 @@ void ActionVM::delayCurrentExecution(int currentTimeInMilliSeconds)
 
 /**
  * @brief Slot when the flag "is valid" changed in the model of action
- * @param isValid flag "is valid"
+ * @param areConditionsValid
  */
 void ActionVM::_onIsValidChangedInModel(bool areConditionsValid)
 {
