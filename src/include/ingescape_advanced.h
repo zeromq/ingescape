@@ -39,7 +39,7 @@ PUBLIC int igs_readInputAsZMQMsg(const char *name, zmsg_t **msg); //msg must be 
 
 
 //ZMQ internal bus
-typedef void (*igs_BusMessageIncoming) (const char *event, const char *peer, const char *name,
+typedef void (*igs_BusMessageIncoming) (const char *event, const char *peerID, const char *name,
                                          const char *address, const char *channel,
                                          zhash_t *headers, zmsg_t *msg, void *myData);
 PUBLIC int igs_observeBus(igs_BusMessageIncoming cb, void *myData);
@@ -68,9 +68,7 @@ PUBLIC void igs_busRemoveServiceDescription(const char *key);
  - token names shall be unique for a given agent
  */
 
-
-///////////////
-//SENDING TOKENS to other agents
+//SEND TOKENS to other agents
 //token arguments are provided as a chained list
 typedef struct igs_tokenArgument{
     char *name;
@@ -100,8 +98,7 @@ void igs_addDataToArgumentsList(igs_tokenArgument_t **list, void *value, size_t 
 int igs_sendToken(const char *agentNameOrUUID, const char *tokenName, igs_tokenArgument_t *list);
 
 
-///////////////
-//CREATING TOKENS for our agent
+//CREATE TOKENS for our agent
 //callback model to handle tokens received by our agent
 typedef void (*igs_tokenCallback)(const char *senderAgentName, const char *senderAgentUUID,
                                   const char *tokenName, igs_tokenArgument_t *firstArgument, size_t nbArgs,
@@ -142,6 +139,7 @@ PUBLIC bool igs_checkTokenArgumentExistence(const char *tokenName, const char *a
 //PUBLIC bool igs_checkTokenReplyArgumentExistence(const char *tokenName, const char *argName);
 
 
+//////////////////////////////////////////////////
 //security
 //TODO when officially supported in Zyre 2.0.x
 

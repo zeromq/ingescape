@@ -245,9 +245,9 @@ PUBLIC void igs_freeNetdevicesList(char **devices, int nb);
 PUBLIC void igs_setCommandLine(const char *line);
 
 
-//When mapping an agent setting the option below requests the
-//mapped agent to send its outputs (except for data & impulsions)
-//to us through a private communication for our proper initialization.
+//When mapping agents, it is possible to request the
+//mapped agents to send us their current output values
+//through a private communication for our proper initialization.
 //By default, this behavior is disabled.
 PUBLIC void igs_setRequestOutputsFromMappedAgents(bool notify);
 PUBLIC bool igs_getRequestOutputsFromMappedAgents(void);
