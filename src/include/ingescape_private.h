@@ -202,11 +202,9 @@ extern char definitionPath[MAX_PATH];
 extern definition* igs_internal_definition;
 void definition_freeDefinition (definition* definition);
 
-
 //  mapping
 extern char mappingPath[MAX_PATH];
 extern mapping_t *igs_internal_mapping;
-
 void mapping_freeMapping (mapping_t* map);
 mapping_element_t * mapping_createMappingElement(const char * input_name,
                                                  const char *agent_name,
@@ -215,13 +213,10 @@ unsigned long djb2_hash (unsigned char *str);
 bool mapping_checkCompatibilityInputOutput(agent_iop_t *foundInput, agent_iop_t *foundOutput);
 
 // model
-
 extern bool isWholeAgentMuted;
-
 int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void* value, size_t size);
 agent_iop_t* model_findIopByName(const char* name, iop_t type);
 char* model_getIOPValueAsString (agent_iop_t* iop); //returned value must be freed by user
-
 
 // network
 #define CHANNEL "INGESCAPE_PRIVATE"
@@ -235,7 +230,6 @@ extern zyreloopElements_t *agentElements;
 int network_publishOutput (const char* output_name);
 
 // parser
-
 definition* parser_loadDefinition (const char* json_str);
 definition* parser_loadDefinitionFromPath (const char* file_path);
 char* parser_export_definition (definition* def);
