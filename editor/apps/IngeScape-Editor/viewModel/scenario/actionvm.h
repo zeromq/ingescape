@@ -112,17 +112,20 @@ public:
      */
     void reverseEffectsExecuted(int currentTimeInMilliSeconds);
 
+
     /**
      * @brief Notify our action that it need to be rearmed
      * @param currentTimeInMilliSeconds
      */
     void rearmCurrentActionExecution(int currentTimeInMilliSeconds);
 
+
     /**
      * @brief Delay the current execution of our action
      * @param currentTimeInMilliSeconds
      */
     void delayCurrentExecution(int currentTimeInMilliSeconds);
+
 
     /**
       * @brief Initialize the action view model at a specific time
@@ -173,6 +176,7 @@ private Q_SLOTS:
 
 
 private:
+
     /**
      * @brief Compute the endTime according to the action model and its type
      */
