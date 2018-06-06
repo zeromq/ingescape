@@ -240,7 +240,7 @@ Rectangle {
 
                 Repeater {
                     // List of intput slots VM
-                    model: rootItem.agentMappingVM ? rootItem.agentMappingVM.inputsList : 0
+                    model: (rootItem.agentMappingVM ? rootItem.agentMappingVM.inputsList : 0)
 
                     delegate: Item {
                         id: inputSlotItem
@@ -483,7 +483,7 @@ Rectangle {
 
                 Repeater {
                     // List of output slots VM
-                    model: (rootItem.agentMappingVM)? rootItem.agentMappingVM.outputsList : 0
+                    model: (rootItem.agentMappingVM ? rootItem.agentMappingVM.outputsList : 0)
 
                     delegate: Item {
                         id: outputSlotItem

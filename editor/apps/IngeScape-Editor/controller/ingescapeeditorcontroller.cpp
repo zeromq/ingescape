@@ -663,6 +663,40 @@ void IngeScapeEditorController::closeLogStreamController(LogStreamController* lo
 
 
 /**
+ * @brief Add the window to the list of opened windows
+ * @param window
+ */
+void IngeScapeEditorController::addOpenedWindow(QObject* window)
+{
+    if (window != NULL)
+    {
+        //qDebug() << "Add Opened Window:" << window << "(" << _openedWindows.count() << ")";
+
+        if (!_openedWindows.contains(window)) {
+            _openedWindows.append(window);
+        }
+    }
+}
+
+
+/**
+ * @brief Remove the window from the list of opened windows
+ * @param window
+ */
+void IngeScapeEditorController::removeOpenedWindow(QObject* window)
+{
+    if (window != NULL)
+    {
+        //qDebug() << "Remove Opened Window:" << window << "(" << _openedWindows.count() << ")";
+
+        if (_openedWindows.contains(window)) {
+            _openedWindows.remove(window);
+        }
+    }
+}
+
+
+/**
  * @brief Method used to force the creation of our singleton from QML
  */
 void IngeScapeEditorController::forceCreation()

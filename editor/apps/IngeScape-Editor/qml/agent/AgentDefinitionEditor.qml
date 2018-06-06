@@ -27,6 +27,8 @@ import "../theme" as Theme;
 Window {
     id: rootItem
 
+    title: (model.QtObject ? model.QtObject.name : qsTr("Definition"))
+
     height: minimumHeight
     width: minimumWidth
 
@@ -105,6 +107,7 @@ Window {
         widthColumnCurrentValue,
         widthColumnMute
     ]
+
 
     //--------------------------------
     //
