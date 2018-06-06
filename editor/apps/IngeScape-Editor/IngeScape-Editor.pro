@@ -288,7 +288,7 @@ win32 {
 
     # Warnings = error
     QMAKE_CXXFLAGS -= -Werror
-    QMAKE_CXXFLAGS += /WX
+#    QMAKE_CXXFLAGS += /WX
 
     # Custom DESTDIR to avoid useless files (pch, etc.)
     DESTDIR = $${OUT_PWD}/bin
