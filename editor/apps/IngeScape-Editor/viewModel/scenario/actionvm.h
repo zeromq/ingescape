@@ -155,20 +155,22 @@ private Q_SLOTS:
 
 
     /**
-     * @brief Slot on the validity duration change
-     * @param validity duration
+     * @brief Slot called when the validity duration changed and when the type of the validity duration changed
      */
-    void _onValidityDurationChange();
+    void _onValidityDurationChanged();
+
 
     /**
      * @brief Called when our timer time out to handle the action reversion
      */
     void _onTimeout_ReserseAction();
 
+
     /**
      * @brief Called when our timer time out to handle the action rearm
      */
     void _onTimeout_RearmAction();
+
 
 private:
     /**

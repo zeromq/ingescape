@@ -234,9 +234,9 @@ void ActionVM::setmodelM(ActionM* value)
         {
             disconnect(_modelM, &ActionM::isValidChanged, this, &ActionVM::_onIsValidChangedInModel);
 
-            // Endtime reevaluation disconnection
-            disconnect(_modelM, &ActionM::validityDurationChanged, this, &ActionVM::_onValidityDurationChange);
-            disconnect(_modelM, &ActionM::validityDurationTypeChanged, this, &ActionVM::_onValidityDurationChange);
+            // End time re-evaluation disconnection
+            disconnect(_modelM, &ActionM::validityDurationChanged, this, &ActionVM::_onValidityDurationChanged);
+            disconnect(_modelM, &ActionM::validityDurationTypeChanged, this, &ActionVM::_onValidityDurationChanged);
         }
 
         _modelM = value;
@@ -245,12 +245,12 @@ void ActionVM::setmodelM(ActionM* value)
         {
             connect(_modelM, &ActionM::isValidChanged, this, &ActionVM::_onIsValidChangedInModel);
 
-            // Endtime reevaluation connection
-            connect(_modelM, &ActionM::validityDurationChanged, this, &ActionVM::_onValidityDurationChange);
-            connect(_modelM, &ActionM::validityDurationTypeChanged, this, &ActionVM::_onValidityDurationChange);
+            // End time re-evaluation connection
+            connect(_modelM, &ActionM::validityDurationChanged, this, &ActionVM::_onValidityDurationChanged);
+            connect(_modelM, &ActionM::validityDurationTypeChanged, this, &ActionVM::_onValidityDurationChanged);
         }
 
-        // Compute the new endtime
+        // Compute the new end time
         _computeEndTime();
 
         Q_EMIT modelMChanged(value);
@@ -305,7 +305,7 @@ void ActionVM::reverseEffectsExecuted(int currentTimeInMilliSeconds)
         setcurrentExecution(NULL);
 
         // Shall rearm
-        if (_modelM->shallRearm() && ((currentTimeInMilliSeconds < _endTime) || (_endTime == -1) ))
+        if (_modelM->shallRearm() && ((currentTimeInMilliSeconds < _endTime) || (_endTime == -1)) )
         {
             _timerToRearm->start(_modelM->rearmAfterTime());
         }
@@ -357,14 +357,15 @@ void ActionVM::delayCurrentExecution(int currentTimeInMilliSeconds)
 void ActionVM::_onIsValidChangedInModel(bool isValid)
 {
     setareAllConditionsValid(isValid);
+
+    // FIXME TODO: connect to areAllConditionsValidChanged(); to execute the corresponding action
 }
 
 
 /**
- * @brief Slot on the validity duration change
- * @param validity duration
+ * @brief Slot called when the validity duration changed and when the type of the validity duration changed
  */
-void ActionVM::_onValidityDurationChange()
+void ActionVM::_onValidityDurationChanged()
 {
     _computeEndTime();
 }
