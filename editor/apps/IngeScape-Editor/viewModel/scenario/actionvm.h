@@ -112,17 +112,20 @@ public:
      */
     void reverseEffectsExecuted(int currentTimeInMilliSeconds);
 
+
     /**
      * @brief Notify our action that it need to be rearmed
      * @param currentTimeInMilliSeconds
      */
     void rearmCurrentActionExecution(int currentTimeInMilliSeconds);
 
+
     /**
      * @brief Delay the current execution of our action
      * @param currentTimeInMilliSeconds
      */
     void delayCurrentExecution(int currentTimeInMilliSeconds);
+
 
     /**
       * @brief Initialize the action view model at a specific time
@@ -155,22 +158,25 @@ private Q_SLOTS:
 
 
     /**
-     * @brief Slot on the validity duration change
-     * @param validity duration
+     * @brief Slot called when the validity duration changed and when the type of the validity duration changed
      */
-    void _onValidityDurationChange();
+    void _onValidityDurationChanged();
+
 
     /**
      * @brief Called when our timer time out to handle the action reversion
      */
     void _onTimeout_ReserseAction();
 
+
     /**
      * @brief Called when our timer time out to handle the action rearm
      */
     void _onTimeout_RearmAction();
 
+
 private:
+
     /**
      * @brief Compute the endTime according to the action model and its type
      */

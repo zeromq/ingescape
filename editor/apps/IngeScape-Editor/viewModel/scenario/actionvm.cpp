@@ -111,34 +111,37 @@ ActionVM::~ActionVM()
 
 
 /**
- * @brief Copy from another action view model
- * @param action VM to copy
+ * @brief Setter for property "Model"
+ * @param value
  */
-void ActionVM::copyFrom(ActionVM* actionVM)
+void ActionVM::setmodelM(ActionM* value)
 {
-    if (actionVM != NULL)
+    if (_modelM != value)
     {
-        ActionM* originalModel = actionVM->modelM();
-
-        // Copy the model
-        if (originalModel != NULL)
+        if(_modelM != NULL)
         {
-            ActionM* model = new ActionM(originalModel->name());
-            model->copyFrom(originalModel);
+            disconnect(_modelM, &ActionM::isValidChanged, this, &ActionVM::_onIsValidChangedInModel);
 
-            setmodelM(model);
-        }
-        else {
-            setmodelM(NULL);
+            // End time re-evaluation disconnection
+            disconnect(_modelM, &ActionM::validityDurationChanged, this, &ActionVM::_onValidityDurationChanged);
+            disconnect(_modelM, &ActionM::validityDurationTypeChanged, this, &ActionVM::_onValidityDurationChanged);
         }
 
-        // Copy the view model attributes
-        setcolor(actionVM->color());
-        setstartTime(actionVM->startTime());
-        setendTime(actionVM->endTime());
-        setlineInTimeLine(actionVM->lineInTimeLine());
-        setstartTimeString(actionVM->startTimeString());
-        setareAllConditionsValid(actionVM->areAllConditionsValid());
+        _modelM = value;
+
+        if(_modelM != NULL)
+        {
+            connect(_modelM, &ActionM::isValidChanged, this, &ActionVM::_onIsValidChangedInModel);
+
+            // End time re-evaluation connection
+            connect(_modelM, &ActionM::validityDurationChanged, this, &ActionVM::_onValidityDurationChanged);
+            connect(_modelM, &ActionM::validityDurationTypeChanged, this, &ActionVM::_onValidityDurationChanged);
+        }
+
+        // Compute the new end time
+        _computeEndTime();
+
+        Q_EMIT modelMChanged(value);
     }
 }
 
@@ -223,37 +226,34 @@ void ActionVM::setstartTimeString(QString value)
 
 
 /**
- * @brief Setter for property "Model"
- * @param value
+ * @brief Copy from another action view model
+ * @param action VM to copy
  */
-void ActionVM::setmodelM(ActionM* value)
+void ActionVM::copyFrom(ActionVM* actionVM)
 {
-    if (_modelM != value)
+    if (actionVM != NULL)
     {
-        if(_modelM != NULL)
-        {
-            disconnect(_modelM, &ActionM::isValidChanged, this, &ActionVM::_onIsValidChangedInModel);
+        ActionM* originalModel = actionVM->modelM();
 
-            // Endtime reevaluation disconnection
-            disconnect(_modelM, &ActionM::validityDurationChanged, this, &ActionVM::_onValidityDurationChange);
-            disconnect(_modelM, &ActionM::validityDurationTypeChanged, this, &ActionVM::_onValidityDurationChange);
+        // Copy the model
+        if (originalModel != NULL)
+        {
+            ActionM* model = new ActionM(originalModel->name());
+            model->copyFrom(originalModel);
+
+            setmodelM(model);
+        }
+        else {
+            setmodelM(NULL);
         }
 
-        _modelM = value;
-
-        if(_modelM != NULL)
-        {
-            connect(_modelM, &ActionM::isValidChanged, this, &ActionVM::_onIsValidChangedInModel);
-
-            // Endtime reevaluation connection
-            connect(_modelM, &ActionM::validityDurationChanged, this, &ActionVM::_onValidityDurationChange);
-            connect(_modelM, &ActionM::validityDurationTypeChanged, this, &ActionVM::_onValidityDurationChange);
-        }
-
-        // Compute the new endtime
-        _computeEndTime();
-
-        Q_EMIT modelMChanged(value);
+        // Copy the view model attributes
+        setcolor(actionVM->color());
+        setstartTime(actionVM->startTime());
+        setendTime(actionVM->endTime());
+        setlineInTimeLine(actionVM->lineInTimeLine());
+        setstartTimeString(actionVM->startTimeString());
+        setareAllConditionsValid(actionVM->areAllConditionsValid());
     }
 }
 
@@ -305,7 +305,7 @@ void ActionVM::reverseEffectsExecuted(int currentTimeInMilliSeconds)
         setcurrentExecution(NULL);
 
         // Shall rearm
-        if (_modelM->shallRearm() && ((currentTimeInMilliSeconds < _endTime) || (_endTime == -1) ))
+        if (_modelM->shallRearm() && ((currentTimeInMilliSeconds < _endTime) || (_endTime == -1)) )
         {
             _timerToRearm->start(_modelM->rearmAfterTime());
         }
@@ -350,6 +350,59 @@ void ActionVM::delayCurrentExecution(int currentTimeInMilliSeconds)
 }
 
 
+
+/**
+  * @brief Initialize the action view model at a specific time
+  * @param time when to initialize the action VM
+  */
+void ActionVM::resetDataFrom(int time)
+{
+    if (_modelM != NULL)
+    {
+        // Update the conditions validation flag
+        if (_modelM->isConnected())
+        {
+            setareAllConditionsValid(_modelM->isValid());
+        }
+        else {
+            setareAllConditionsValid(false);
+        }
+
+        // Reset the current action execution
+        setcurrentExecution(NULL);
+
+        // Get the relative time to the action view model
+        int relativeTime = time - _startTime;
+
+        // Check the actions executions
+        for (ActionExecutionVM* actionExecution : _executionsList.toList())
+        {
+            // The action execution is in the future
+            if ((actionExecution != NULL)
+                    && ( (actionExecution->executionTime() >= relativeTime) || (actionExecution->shallRevert() && (actionExecution->reverseTime() >= relativeTime)) ))
+            {
+                _executionsList.remove(actionExecution);
+            }
+        }
+
+        // If the action is empty or the rearm is asked, we can create a new action execution
+        if (_executionsList.isEmpty() || _modelM->shallRearm())
+        {
+            // Create the first action execution
+            if (time <= _startTime)
+            {
+                // Create the first (view model of) action execution
+                _createActionExecution(0);
+            }
+            else {
+                // Create one default action execution in the current validation duration
+                _createActionExecution(relativeTime);
+            }
+        }
+    }
+}
+
+
 /**
  * @brief Slot when the flag "is valid" changed in the model of action
  * @param isValid
@@ -357,16 +410,40 @@ void ActionVM::delayCurrentExecution(int currentTimeInMilliSeconds)
 void ActionVM::_onIsValidChangedInModel(bool isValid)
 {
     setareAllConditionsValid(isValid);
+
+    // FIXME TODO: connect to areAllConditionsValidChanged(); to execute the corresponding action
 }
 
 
 /**
- * @brief Slot on the validity duration change
- * @param validity duration
+ * @brief Slot called when the validity duration changed and when the type of the validity duration changed
  */
-void ActionVM::_onValidityDurationChange()
+void ActionVM::_onValidityDurationChanged()
 {
     _computeEndTime();
+}
+
+
+/**
+ * @brief Called when our timer time out to handle the action reversion
+ */
+void ActionVM::_onTimeout_ReserseAction()
+{
+    if (_currentExecution != NULL)
+    {
+        // Emit the signal to send the action reversion
+        Q_EMIT revertAction(_currentExecution);
+    }
+}
+
+
+/**
+ * @brief Called when our timer time out to handle the action rearm
+ */
+void ActionVM::_onTimeout_RearmAction()
+{
+    // Emit the signal to send the action rearm
+    Q_EMIT rearmAction();
 }
 
 
@@ -448,74 +525,3 @@ void ActionVM::_createActionExecution(int startTime)
     }
 }
 
-
-/**
- * @brief Called when our timer time out to handle the action reversion
- */
-void ActionVM::_onTimeout_ReserseAction()
-{
-    if (_currentExecution != NULL)
-    {
-        // Emit the signal to send the action reversion
-        Q_EMIT revertAction(_currentExecution);
-    }
-}
-
-
-/**
- * @brief Called when our timer time out to handle the action rearm
- */
-void ActionVM::_onTimeout_RearmAction()
-{
-    // Emit the signal to send the action rearm
-    Q_EMIT rearmAction();
-}
-
-
-/**
-  * @brief Initialize the action view model at a specific time
-  * @param time when to initialize the action VM
-  */
-void ActionVM::resetDataFrom(int time)
-{
-    // Update the conditions validation flag
-    if (_modelM->isConnected())
-    {
-        setareAllConditionsValid(_modelM->isValid());
-    }
-    else {
-        setareAllConditionsValid(false);
-    }
-
-    // Reset the current action execution
-    setcurrentExecution(NULL);
-
-    // Get the relative time to the action view model
-    int relativeTime = time - _startTime;
-
-    // Check the actions executions
-    foreach (ActionExecutionVM* actionExecution, _executionsList.toList())
-    {
-        // The action execution is in the future
-        if ( (actionExecution->executionTime() >= relativeTime)
-             || (actionExecution->shallRevert() && (actionExecution->reverseTime() >= relativeTime)) )
-        {
-            _executionsList.remove(actionExecution);
-        }
-    }
-
-    // If the action is empty or the rearm is asked, we can create a new action execution
-    if (_executionsList.isEmpty() || _modelM->shallRearm())
-    {
-        // Create the first action execution
-        if (time <= _startTime)
-        {
-            // Create the first (view model of) action execution
-            _createActionExecution(0);
-        }
-        else {
-            // Create one default action execution in the current validation duration
-            _createActionExecution(relativeTime);
-        }
-    }
-}
