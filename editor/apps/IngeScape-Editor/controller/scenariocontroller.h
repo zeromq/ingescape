@@ -1,14 +1,14 @@
-
 /*
- *	ScenarioController
+ *	IngeScape Editor
  *
- *  Copyright (c) 2016-2017 Ingenuity i/o. All rights reserved.
+ *  Copyright © 2017-2018 Ingenuity i/o. All rights reserved.
  *
  *	See license terms for the rights and conditions
  *	defined by copyright holders.
  *
  *
  *	Contributors:
+ *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *
  */
 
@@ -56,12 +56,13 @@ class ScenarioController: public QObject
     // Selected action
     I2_QML_PROPERTY_DELETE_PROOF(ActionM*, selectedAction)
 
-    // Used for action edition
-    // --- List of types of comparisons on values
-    I2_ENUM_LISTMODEL(ActionComparisonTypes, comparisonsValuesTypesList)
-    // --- List of types of comparisons on agent state
-    I2_ENUM_LISTMODEL(ActionComparisonTypes, comparisonsAgentsTypesList)
-    // --- List of validity duration type
+    // List of all values of condition on agent (state)
+    I2_ENUM_LISTMODEL(AgentConditionValues, allAgentConditionValues)
+
+    // List of all types for values comparison
+    I2_ENUM_LISTMODEL(ValueComparisonTypes, allValueComparisonTypes)
+
+    // List of validity duration type
     I2_ENUM_LISTMODEL(ValidationDurationTypes, validationDurationsTypesList)
 
     // --- List of values about effect on agent

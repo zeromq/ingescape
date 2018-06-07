@@ -82,7 +82,7 @@ Item {
         rowSpacing : 4
 
         Repeater {
-            model : controller.actionsInPaletteList
+            model: controller.actionsInPaletteList
 
             I2Rectangle {
                 id : panelRectangle

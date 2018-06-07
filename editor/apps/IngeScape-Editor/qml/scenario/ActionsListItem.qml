@@ -29,9 +29,15 @@ Item {
     height: 42
 
 
+    //--------------------------------
+    //
+    // Signals
+    //
+    //--------------------------------
 
     // signal emitted when the delete confirmation popup is needed because the action is already used in the platform
     signal needConfirmationtoDeleteAction(var action);
+
 
     //--------------------------------
     //
@@ -120,7 +126,7 @@ Item {
             }
 
 
-            // display if  conditions are verified
+            // Feedback visible if all conditions are valids
             Rectangle {
                 anchors {
                     verticalCenter: actionNameBtn.verticalCenter
@@ -132,7 +138,7 @@ Item {
                 width : 2
 
                 color: IngeScapeTheme.whiteColor
-                visible : rootItem.action && rootItem.action.isValid
+                visible: (rootItem.action && rootItem.action.isValid)
             }
 
 

@@ -240,10 +240,15 @@ void AgentVM::loadMapping()
  */
 void AgentVM::downloadDefinition()
 {
+    QString defaultDefinitionName = QString("Definition_of_%1.json").arg(_name);
+    if (_definition != NULL) {
+        defaultDefinitionName = QString("%1.json").arg(_definition->name());
+    }
+
     // "File Dialog" to get the file path to save
     QString definitionFilePath = QFileDialog::getSaveFileName(NULL,
                                                               "Save definition",
-                                                              "",
+                                                              defaultDefinitionName,
                                                               "JSON (*.json)");
 
     if (!definitionFilePath.isEmpty() && (_definition != NULL)) {
@@ -257,10 +262,19 @@ void AgentVM::downloadDefinition()
  */
 void AgentVM::downloadMapping()
 {
+    QString defaultMappingName = QString("Mapping_of_%1.json").arg(_name);
+    if (!_models.isEmpty())
+    {
+        AgentM* model = _models.at(0);
+        if ((model != NULL) && (model->mapping() != NULL)) {
+            defaultMappingName = QString("%1.json").arg(model->mapping()->name());
+        }
+    }
+
     // "File Dialog" to get the file path to save
     QString mappingFilePath = QFileDialog::getSaveFileName(NULL,
                                                            "Save mapping",
-                                                           "",
+                                                           defaultMappingName,
                                                            "JSON (*.json)");
 
     if (!mappingFilePath.isEmpty() && !_models.isEmpty())

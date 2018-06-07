@@ -26,6 +26,8 @@ import "../theme" as Theme;
 Window {
     id: rootItem
 
+    title: qsTr("Outputs history")
+
     height: minimumHeight
     width: minimumWidth
 
@@ -177,7 +179,7 @@ Window {
                     left : parent.left
                 }
 
-                text : "Outputs history"
+                text: title
                 elide: Text.ElideRight
                 color: IngeScapeTheme.whiteColor
                 font {

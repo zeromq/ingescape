@@ -72,7 +72,13 @@ win32:{
                   $$yajl_include_path \
 
     #include the pri to copy files to C:\
-    include ("$$PWD/../dependencies/windows/common/pri/ingescape-job-copy.pri")
+    equals(TEMPLATE, "lib"){
+        message("Template is type lib, we will copy the ingescape and zyre dll to the C:")
+        include ("$$PWD/../dependencies/windows/common/pri/ingescape-job-copy.pri")
+    }
+    equals(TEMPLATE, "app"){
+        message("Template is type app, we dont copy the ingescape and zyre dll to the C:")
+    }
 }
 
 

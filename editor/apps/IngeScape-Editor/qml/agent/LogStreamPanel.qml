@@ -26,6 +26,8 @@ import "../theme" as Theme;
 Window {
     id: rootItem
 
+    title: (controller ? qsTr("Log stream for %1").arg(controller.agentName) : qsTr("Log stream"))
+
     height: minimumHeight
     width: minimumWidth
 

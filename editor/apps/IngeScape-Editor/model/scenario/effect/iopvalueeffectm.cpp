@@ -69,10 +69,17 @@ void IOPValueEffectM::setagentIOP(AgentIOPM* agentIop)
 
         if (_agentIOP != NULL)
         {
+            qDebug() << "set agent IOP to" << _agentIOP->name();
+
             setagentIOPName(_agentIOP->name());
 
             // Subscribe to destruction
             connect(_agentIOP, &AgentIOPM::destroyed, this, &IOPValueEffectM::_onAgentIopModelDestroyed);
+        }
+        else {
+            qDebug() << "set agent IOP to NULL !!!";
+
+            //setagentIOPName("");
         }
 
         Q_EMIT agentIOPChanged(agentIop);
@@ -86,7 +93,7 @@ void IOPValueEffectM::setagentIOP(AgentIOPM* agentIop)
 */
 void IOPValueEffectM::copyFrom(ActionEffectM* effect)
 {
-    // Call mother class
+    // Call our mother class
     ActionEffectM::copyFrom(effect);
 
     IOPValueEffectM* iopEffect = qobject_cast<IOPValueEffectM*>(effect);
@@ -94,15 +101,17 @@ void IOPValueEffectM::copyFrom(ActionEffectM* effect)
     {
         setagentIOP(iopEffect->agentIOP());
         setagentIOPName(iopEffect->agentIOPName());
+
         _iopMergedList.clear();
         _iopMergedList.append(iopEffect->iopMergedList()->toList());
+
         setvalue(iopEffect->value());
     }
 }
 
 
 /**
-* @brief Custom setter for property "agent"
+* @brief Setter for property "Agent"
 * @param agent
 */
 void IOPValueEffectM::setagent(AgentInMappingVM* agent)
@@ -119,6 +128,9 @@ void IOPValueEffectM::setagent(AgentInMappingVM* agent)
         if (previousAgent != NULL) {
             disconnect(previousAgent, &AgentInMappingVM::modelsOfIOPChanged, this, &IOPValueEffectM::_onModelsOfIOPChanged);
         }
+
+
+        qDebug() << "setagent: setagentIOP(NULL)";
 
         // Reset the agent IOP
         setagentIOP(NULL);
@@ -157,6 +169,7 @@ void IOPValueEffectM::setagent(AgentInMappingVM* agent)
 
             // By default, select the first item
             if (!_iopMergedList.isEmpty()) {
+                qDebug() << "setagent: setagentIOP(first item by default)";
                 setagentIOP(_iopMergedList.at(0));
             }
 
@@ -298,6 +311,8 @@ void IOPValueEffectM::_onModelsOfIOPChanged()
 {
     AgentIOPM* newAgentIOP = NULL;
 
+    qDebug() << "_onModelsOfIOPChanged" << _agentIOPName;
+
     // If we have a selected agent iop
     if (!_agentIOPName.isEmpty())
     {
@@ -345,6 +360,7 @@ void IOPValueEffectM::_onModelsOfIOPChanged()
 
     // Update the agent IOP
     if (newAgentIOP != _agentIOP) {
+        qDebug() << "setagent: setagentIOP(newAgentIOP)";
         setagentIOP(newAgentIOP);
     }
 }
@@ -357,6 +373,8 @@ void IOPValueEffectM::_onModelsOfIOPChanged()
 void IOPValueEffectM::_onAgentIopModelDestroyed(QObject* sender)
 {
     Q_UNUSED(sender)
+
+    qDebug() << "_onAgentIopModelDestroyed --> setagentIOP(NULL)";
 
     setagentIOP(NULL);
 }

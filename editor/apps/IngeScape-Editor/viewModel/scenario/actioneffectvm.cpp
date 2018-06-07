@@ -103,7 +103,7 @@ void ActionEffectVM::_configureToType(ActionEffectTypes::Value effectType)
     AgentInMappingVM* agent = NULL;
 
     // Delete the old model of effect if exists
-    if(_modelM != NULL)
+    if (_modelM != NULL)
     {
         // Save the agent
         agent = _modelM->agent();
@@ -114,7 +114,7 @@ void ActionEffectVM::_configureToType(ActionEffectTypes::Value effectType)
         tmp = NULL;
     }
 
-    // Create the new type effect
+    // Create the new model of effect
     switch (effectType)
     {
         case ActionEffectTypes::AGENT: {

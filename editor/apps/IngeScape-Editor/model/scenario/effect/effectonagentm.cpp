@@ -81,7 +81,7 @@ EffectOnAgentM::~EffectOnAgentM()
 */
 void EffectOnAgentM::copyFrom(ActionEffectM* effect)
 {
-    // Call mother class
+    // Call our mother class
     ActionEffectM::copyFrom(effect);
 
     EffectOnAgentM* effectOnAgent = qobject_cast<EffectOnAgentM*>(effect);

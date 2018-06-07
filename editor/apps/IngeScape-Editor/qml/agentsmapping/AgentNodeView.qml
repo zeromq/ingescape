@@ -60,7 +60,7 @@ Rectangle {
     width : 258
 
     height : (rootItem.agentMappingVM && !rootItem.isReduced)
-             ? (54 + 22 * Math.max(rootItem.agentMappingVM.inputsList.count , rootItem.agentMappingVM.outputsList.count))
+             ? (54 + 22 * Math.max(rootItem.agentMappingVM.inputsList.count, rootItem.agentMappingVM.outputsList.count))
              : 42
 
 
@@ -240,7 +240,7 @@ Rectangle {
 
                 Repeater {
                     // List of intput slots VM
-                    model: rootItem.agentMappingVM ? rootItem.agentMappingVM.inputsList : 0
+                    model: (rootItem.agentMappingVM ? rootItem.agentMappingVM.inputsList : 0)
 
                     delegate: Item {
                         id: inputSlotItem
@@ -337,7 +337,7 @@ Rectangle {
                                 visible: draggablePointFROM.dragActive
 
                                 secondPoint: Qt.point(myModel.position.x, myModel.position.y)
-                                firstPoint: Qt.point(draggablePointFROM.x + draggablePointFROM.width , draggablePointFROM.y + draggablePointFROM.height/2)
+                                firstPoint: Qt.point(draggablePointFROM.x + draggablePointFROM.width, draggablePointFROM.y + draggablePointFROM.height/2)
 
                                 defaultColor:linkPoint.color
                             }
@@ -483,7 +483,7 @@ Rectangle {
 
                 Repeater {
                     // List of output slots VM
-                    model: (rootItem.agentMappingVM)? rootItem.agentMappingVM.outputsList : 0
+                    model: (rootItem.agentMappingVM ? rootItem.agentMappingVM.outputsList : 0)
 
                     delegate: Item {
                         id: outputSlotItem
@@ -584,7 +584,7 @@ Rectangle {
                                 visible: draggablePointTO.dragActive
 
                                 firstPoint: Qt.point(myModel.position.x, myModel.position.y)
-                                secondPoint: Qt.point(draggablePointTO.x , draggablePointTO.y + draggablePointTO.height/2)
+                                secondPoint: Qt.point(draggablePointTO.x, draggablePointTO.y + draggablePointTO.height/2)
 
                                 defaultColor:linkPointOut.color
                             }
