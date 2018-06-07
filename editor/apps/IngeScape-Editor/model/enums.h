@@ -128,15 +128,6 @@ public:
 
     static QByteArray getDataFromValue(QVariant value);*/
 
-
-
-    /**
-     * @brief Get the enum "Log Types" from the corresponding string (from the library C of IngeScape)
-     * @param strLogType
-     * @return
-     */
-    static LogTypes::Value getEnumLogTypesFromString(QString strLogType);
-
 };
 
 #endif // ENUMS_H
