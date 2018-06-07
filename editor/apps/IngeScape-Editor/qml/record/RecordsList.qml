@@ -161,7 +161,7 @@ Item {
                 leftMargin:15
             }
 
-            opacity: controller.playingRecordId !== "" ? 0.3 : 1
+            opacity: !enabled ? 0.3 : 1
             enabled: controller.playingRecordId === ""
 
             style: I2SvgToggleButtonStyle {
@@ -174,7 +174,7 @@ Item {
 
                 // No disabled states
                 toggleCheckedDisabledID: "record"
-                toggleUncheckedDisabledID: "record"
+                toggleUncheckedDisabledID: toggleCheckedDisabledID
 
                 labelMargin: 0;
             }
@@ -243,6 +243,7 @@ Item {
 
                 // Playing feedback
                 Rectangle {
+
                     anchors {
                         fill: parent
                     }
@@ -288,7 +289,7 @@ Item {
                         elide: Text.ElideRight
 
                         text: model.recordModel.name
-                        color: IngeScapeTheme.agentsListLabelColor
+                        color: playPauseRecordButton.checked ? IngeScapeTheme.agentsListItemBackgroundColor : IngeScapeTheme.agentsListLabelColor
                         font: IngeScapeTheme.headingFont
                     }
 
@@ -307,7 +308,7 @@ Item {
                                                     .arg(Qt.formatDate(model.recordModel.endDateTime, "dd/MM/yyyy"))
                                                     .arg(Qt.formatTime(model.recordModel.endDateTime, "HH:mm"))
 
-                        color: IngeScapeTheme.agentsListTextColor
+                        color: playPauseRecordButton.checked ? IngeScapeTheme.agentsListItemBackgroundColor :IngeScapeTheme.agentsListTextColor
                         font: IngeScapeTheme.normalFont
                     }
                 }
@@ -341,7 +342,7 @@ Item {
                         leftMargin:25
                     }
 
-                    opacity: controller.isRecording || (controller.playingRecordId !== "" && controller.playingRecordId !== model.recordModel.id) ? 0.3 : 1
+                    opacity: !enabled ? 0.3 : 1
                     enabled: !(controller.isRecording || (controller.playingRecordId !== "" && controller.playingRecordId !== model.recordModel.id))
 
 
@@ -355,7 +356,7 @@ Item {
 
                         // No disabled states
                         toggleCheckedDisabledID: "play_actif"
-                        toggleUncheckedDisabledID: "play_actif"
+                        toggleUncheckedDisabledID: toggleCheckedDisabledID
 
                         labelMargin: 0;
 
