@@ -344,8 +344,10 @@ void LogStreamController::_onLogReceived(QDateTime logDateTime, QStringList para
             logContent.remove(length - 1, 1);
         }
 
-        int nLogType = LogTypes::staticEnumFromKey(strLogType);
-        LogTypes::Value logType = static_cast<LogTypes::Value>(nLogType);
+        //int nLogType = LogTypes::staticEnumFromKey(strLogType);
+        //LogTypes::Value logType = static_cast<LogTypes::Value>(nLogType);
+
+        LogTypes::Value logType = Enums::getEnumLogTypesFromString(strLogType);
 
         // Create a new log
         LogM* log = new LogM(logDateTime, logType, logContent, this);

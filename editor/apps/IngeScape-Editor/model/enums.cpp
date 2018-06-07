@@ -15,6 +15,46 @@
 #include "enums.h"
 
 /**
+ * @brief Enum "LogTypes" to string
+ * @param value
+ * @return
+ */
+QString LogTypes::enumToString(int value)
+{
+    switch (value)
+    {
+    case LogTypes::IGS_LOG_TRACE:
+        return tr("TRACE");
+
+    case LogTypes::IGS_LOG_DEBUG:
+        return tr("DEBUG");
+
+    case LogTypes::IGS_LOG_INFO:
+        return tr("INFO");
+
+    case LogTypes::IGS_LOG_WARNING:
+        return tr("WARNING");
+
+    case LogTypes::IGS_LOG_ERROR:
+        return tr("ERROR");
+
+    case LogTypes::IGS_LOG_FATAL:
+        return tr("FATAL");
+
+    default:
+        return "";
+    }
+}
+
+
+//--------------------------------------------------------------
+//
+//  Enums
+//
+//--------------------------------------------------------------
+
+
+/**
  * @brief Constructor
  * @param parent
  */
@@ -168,3 +208,35 @@ QByteArray Enums::getDataFromValue(QVariant value)
 {
 
 }*/
+
+
+/**
+ * @brief Get the enum "Log Types" from the corresponding string (from the library C of IngeScape)
+ * @param strLogType
+ * @return
+ */
+LogTypes::Value Enums::getEnumLogTypesFromString(QString strLogType)
+{
+    if (strLogType == "FATAL") {
+        return LogTypes::IGS_LOG_FATAL;
+    }
+    else if (strLogType == "ERROR") {
+        return LogTypes::IGS_LOG_ERROR;
+    }
+    else if (strLogType == "WARNING") {
+        return LogTypes::IGS_LOG_WARNING;
+    }
+    else if (strLogType == "INFO") {
+        return LogTypes::IGS_LOG_INFO;
+    }
+    else if (strLogType == "DEBUG") {
+        return LogTypes::IGS_LOG_DEBUG;
+    }
+    else if (strLogType == "TRACE") {
+        return LogTypes::IGS_LOG_TRACE;
+    }
+    else {
+        qWarning() << "Unknown log type" << strLogType;
+        return LogTypes::IGS_LOG_TRACE;
+    }
+}

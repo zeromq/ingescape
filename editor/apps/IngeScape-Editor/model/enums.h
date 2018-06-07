@@ -45,7 +45,7 @@ I2_ENUM(AgentIOPValueTypeGroups, NUMBER, STRING, IMPULSION, DATA, MIXED, UNKNOWN
 /**
   * Types of log
   */
-I2_ENUM(LogTypes, TRACE, DEBUG, INFO, WARNING, LOG_ERROR, FATAL)
+I2_ENUM_CUSTOM(LogTypes, IGS_LOG_TRACE, IGS_LOG_DEBUG, IGS_LOG_INFO, IGS_LOG_WARNING, IGS_LOG_ERROR, IGS_LOG_FATAL)
 
 
 static const QString SEPARATOR_AGENT_NAME_AND_IOP = QString("##");
@@ -127,6 +127,15 @@ public:
     static bool getBoolFromValue(QVariant value);
 
     static QByteArray getDataFromValue(QVariant value);*/
+
+
+
+    /**
+     * @brief Get the enum "Log Types" from the corresponding string (from the library C of IngeScape)
+     * @param strLogType
+     * @return
+     */
+    static LogTypes::Value getEnumLogTypesFromString(QString strLogType);
 
 };
 

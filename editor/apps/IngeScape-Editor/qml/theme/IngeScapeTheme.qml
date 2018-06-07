@@ -313,27 +313,27 @@ Item {
     {
         switch (logType)
         {
-        case 0: //LogTypes.TRACE:
+        case 0: //LogTypes.IGS_LOG_TRACE:
             // Light Blue
             return "#ADD8E6";
 
-        case 1: //LogTypes.DEBUG:
+        case 1: //LogTypes.IGS_LOG_DEBUG:
             // Cyan
             return "#00FFFF";
 
-        case 2: //LogTypes.INFO:
+        case 2: //LogTypes.IGS_LOG_INFO:
             // Green
             return "#00FF00";
 
-        case 3: //LogTypes.WARNING:
+        case 3: //LogTypes.IGS_LOG_WARNING:
             // Yellow
             return "#FFFF00";
 
-        case 4: //LogTypes.ERROR:
+        case 4: //LogTypes.IGS_LOG_ERROR:
             // Red
             return "#FF0000";
 
-        case 5: //LogTypes.FATAL:
+        case 5: //LogTypes.IGS_LOG_FATAL:
             // Magenta
             return "#FF00FF";
 
