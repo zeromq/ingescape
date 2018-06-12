@@ -228,7 +228,7 @@
         Q_OBJECT \
     public: \
         enum Value { __VA_ARGS__ }; \
-        Q_ENUMS (Value) \
+        Q_ENUM (Value) \
         static QObject *qmlSingleton(QQmlEngine *engine, QJSEngine *scriptEngine) { \
             Q_UNUSED(engine); \
             Q_UNUSED(scriptEngine); \
@@ -273,9 +273,6 @@
             name instance; \
             return instance.allValues(); \
         } \
-        static void registerMetaType() { \
-            _registerMetaType<name::Value>(); \
-        } \
     }; \
     QML_DECLARE_TYPE(name) \
     Q_DECLARE_METATYPE(name::Value)
@@ -295,19 +292,6 @@ public:
      * @param parent
      */
     AbstractPlaygroundEnumClass(QObject *parent = 0);
-
-
-    /**
-     * @brief Call this function to register the type T
-     *
-     * @remark We use this function as a proxy to qRegisterMetaType because we can not call
-     *         qRegisterMetaType in macros. Otherwise, it does not compile due to
-     *         "explicit specialization of 'QMetaTypeId<IngeScapeLogLevel::Value>' after instantiation" errors
-     */
-    template <class T> static void _registerMetaType()
-    {
-        qRegisterMetaType<T>();
-    }
 
 
     /**

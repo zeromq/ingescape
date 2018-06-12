@@ -1008,10 +1008,8 @@ void IngeScapeQuick::registerTypes(const char* uri)
     //
     // - IOP types
     qmlRegisterSingletonType<IngeScapeIopType>("IngeScapeQuick", 1, 0, "IngeScapeIopType", &IngeScapeIopType::qmlSingleton);
-    IngeScapeIopType::registerMetaType();
     // - Log levels
     qmlRegisterSingletonType<IngeScapeLogLevel>("IngeScapeQuick", 1, 0, "IngeScapeLogLevel", &IngeScapeLogLevel::qmlSingleton);
-    IngeScapeLogLevel::registerMetaType();
 
 
     //
