@@ -2941,7 +2941,7 @@ QStringList IngeScapeQuick::getNetdevicesList(QVariant qmlUpdateExtraParameter)
  */
 void IngeScapeQuick::trace(QString text)
 {
-    igs_trace(text.toStdString().c_str());
+    igs_trace("%s", text.toStdString().c_str());
 }
 
 
@@ -2952,7 +2952,7 @@ void IngeScapeQuick::trace(QString text)
  */
 void IngeScapeQuick::debug(QString text)
 {
-    igs_debug(text.toStdString().c_str());
+    igs_debug("%s", text.toStdString().c_str());
 }
 
 
@@ -2963,7 +2963,7 @@ void IngeScapeQuick::debug(QString text)
  */
 void IngeScapeQuick::info(QString text)
 {
-    igs_info(text.toStdString().c_str());
+    igs_info("%s", text.toStdString().c_str());
 }
 
 
@@ -2974,7 +2974,7 @@ void IngeScapeQuick::info(QString text)
  */
 void IngeScapeQuick::warn(QString text)
 {
-    igs_warn(text.toStdString().c_str());
+    igs_warn("%s", text.toStdString().c_str());
 }
 
 
@@ -2985,7 +2985,7 @@ void IngeScapeQuick::warn(QString text)
  */
 void IngeScapeQuick::error(QString text)
 {
-    igs_error(text.toStdString().c_str());
+    igs_error("%s", text.toStdString().c_str());
 }
 
 
@@ -2996,7 +2996,7 @@ void IngeScapeQuick::error(QString text)
  */
 void IngeScapeQuick::fatal(QString text)
 {
-    igs_fatal(text.toStdString().c_str());
+    igs_fatal("%s", text.toStdString().c_str());
 }
 
 
