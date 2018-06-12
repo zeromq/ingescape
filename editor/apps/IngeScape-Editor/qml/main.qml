@@ -87,7 +87,9 @@ ApplicationWindow {
             title: qsTr("Mapping")
 
             MenuItem {
-                text: (IngeScapeEditorC.modelManager && IngeScapeEditorC.modelManager.isMappingActivated) ? qsTr("Unplug mapping") : qsTr("Plug mapping")
+                id: menuPlugUNplugMapping
+
+                text: "" // (IngeScapeEditorC.modelManager && IngeScapeEditorC.modelManager.isMappingActivated) ? qsTr("Unplug mapping") : qsTr("Plug mapping")
 
                 onTriggered: {
                     if (IngeScapeEditorC.modelManager && IngeScapeEditorC.modelManager.isMappingActivated) {
@@ -361,6 +363,10 @@ ApplicationWindow {
                 // Binding to display our application loader
                 applicationLoader.visible = Qt.binding(function() {
                     return ((applicationLoader.status === Loader.Ready) && (IngeScapeEditorC.modelManager !== null));
+                });
+
+                menuPlugUNplugMapping.text = Qt.binding(function() {
+                    return (((IngeScapeEditorC.modelManager !== null) && IngeScapeEditorC.modelManager.isMappingActivated) ? qsTr("Unplug mapping") : qsTr("Plug mapping"));
                 });
 
                 // Load our QML UI

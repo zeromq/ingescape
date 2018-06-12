@@ -167,6 +167,21 @@ Q_SIGNALS:
      */
     void newRecordReceived(QString recordJSON);
 
+    /**
+     * @brief Signal emitted when a record playing has ended
+     */
+    void endOfRecordReceived();
+
+    /**
+     * @brief Signal emitted when a record is being loaded
+     */
+    void loadingRecordReceived();
+
+    /**
+     * @brief Signal emitted when a record has been loaded
+     */
+    void loadedRecordReceived();
+
 
     /**
      * @brief Signal emitted when a new value is published

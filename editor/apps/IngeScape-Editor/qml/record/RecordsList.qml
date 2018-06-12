@@ -162,7 +162,7 @@ Item {
             }
 
             opacity: !enabled ? 0.3 : 1
-            enabled: controller.playingRecordId === ""
+            enabled: controller.playingRecord === null
 
             style: I2SvgToggleButtonStyle {
                 fileCache: IngeScapeTheme.svgFileINGESCAPE
@@ -332,6 +332,22 @@ Item {
                 }
 
 
+                BusyIndicator
+                {
+                    id:loadingRecordIndicator
+                    running: true
+                    width: 20
+                    height: 20
+                    anchors
+                    {
+                        verticalCenter:parent.verticalCenter
+                        left:parent.left
+                        leftMargin:25
+                    }
+
+                    visible: controller.isLoadingRecord && controller.playingRecord !== null && controller.playingRecord.recordModel.id === model.recordModel.id
+                }
+
                 // Play record button
                 Button {
                     id : playPauseRecordButton
@@ -342,9 +358,9 @@ Item {
                         leftMargin:25
                     }
 
+                    visible: !loadingRecordIndicator.visible
                     opacity: !enabled ? 0.3 : 1
-                    enabled: !(controller.isRecording || (controller.playingRecordId !== "" && controller.playingRecordId !== model.recordModel.id))
-
+                    enabled: !controller.isRecording && (controller.playingRecord === null || controller.playingRecord.recordModel.id === model.recordModel.id)
 
                     style: I2SvgToggleButtonStyle {
                         fileCache: IngeScapeTheme.svgFileINGESCAPE
@@ -362,17 +378,16 @@ Item {
 
                     }
 
-                    onCheckedChanged: {
+                    onClicked: {
                         if (controller) {
                             controller.controlRecord(model.recordModel.id, checked)
                         }
                     }
 
-        //            Binding {
-        //                target : enabledbutton
-        //                property : "checked"
-        //                value : (myEffect && myEffect.modelM && myEffect.modelM.mappingEffectValue === MappingEffectValues.MAPPED) ? true : false;
-        //            }
+                    Connections {
+                        target: controller
+                        onPlayingRecordChanged: playPauseRecordButton.checked = controller.playingRecord !== null && controller.playingRecord.recordModel.id === model.recordModel.id
+                    }
                 }
 
 

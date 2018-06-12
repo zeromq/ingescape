@@ -45,8 +45,11 @@ class RecordsSupervisionController : public QObject
     // Indicating if a recorder agent is currently recording
     I2_QML_PROPERTY_CUSTOM_SETTER(bool, isRecording)
 
-    // Stores the id of the currently played record
-    I2_QML_PROPERTY(QString, playingRecordId)
+    // Indicating if a record is being loaded
+    I2_QML_PROPERTY(bool, isLoadingRecord)
+
+    // Stores the currently played record
+    I2_QML_PROPERTY(RecordVM*, playingRecord)
 
     // Current elapsed time of our record
     I2_QML_PROPERTY(QTime, currentRecordTime)
@@ -109,6 +112,22 @@ public Q_SLOTS:
      */
     void onAgentModelCreated(AgentM* model);
 
+    /**
+     * @brief Slot called when a record playing has ended
+     */
+    void onEndOfRecordReceived();
+
+    /**
+     * @brief Slot called when a record is being loaded
+     */
+    void onLoadingRecordReceived();
+
+    /**
+     * @brief Slot called when a record has been loaded
+     */
+    void onLoadedRecordReceived();
+
+
 
 private Q_SLOTS:
 
@@ -130,11 +149,12 @@ private:
     // Manager for the data model of INGESCAPE
     IngeScapeModelManager* _modelManager;
 
-    // Map from record name to a list of view models of record
-    QHash<RecordM*, RecordVM*> _mapFromRecordModelToViewModel;
+    // Map from record id to a view model of record
+    QHash<QString, RecordVM*> _mapFromRecordIdToViewModel;
 
     // Timer to rdisplay elapsed time on current record
     QTimer _timerToDisplayTime;
+
 };
 
 QML_DECLARE_TYPE(RecordsSupervisionController)

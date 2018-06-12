@@ -31,7 +31,8 @@ RecordsSupervisionController::RecordsSupervisionController(IngeScapeModelManager
     _recorderAgent(NULL),
     _selectedRecord(NULL),
     _isRecording(false),
-    _playingRecordId(""),
+    _isLoadingRecord(false),
+    _playingRecord(NULL),
     _currentRecordTime(QTime::fromMSecsSinceStartOfDay(0)),
     _modelManager(modelManager)
 {
@@ -52,7 +53,7 @@ RecordsSupervisionController::~RecordsSupervisionController()
     // Clean-up current selection
     setselectedRecord(NULL);
 
-    _mapFromRecordModelToViewModel.clear();
+    _mapFromRecordIdToViewModel.clear();
 
     disconnect(&_timerToDisplayTime, &QTimer::timeout, this, &RecordsSupervisionController::_onTimeout_DisplayTime);
 
@@ -79,6 +80,7 @@ void RecordsSupervisionController::onRecordsListChanged(QList<RecordM*> newRecor
     foreach (RecordM* model, newRecords) {
         RecordVM* vm = new RecordVM(model);
         recordsToAdd.append(vm);
+        _mapFromRecordIdToViewModel.insert(model->id(), vm);
     }
 
     _recordsList.append(recordsToAdd);
@@ -93,6 +95,7 @@ void RecordsSupervisionController::onRecordAdded(RecordM* model)
 {
     RecordVM* vm = new RecordVM(model);
     _recordsList.insert(0, vm);
+    _mapFromRecordIdToViewModel.insert(model->id(), vm);
 }
 
 
@@ -111,6 +114,39 @@ void RecordsSupervisionController::onAgentModelCreated(AgentM* model)
         qDebug() << "New recorder on the network, get all its records";
     }
 }
+
+
+
+/**
+ * @brief Slot called when a record playing has ended
+ */
+void RecordsSupervisionController::onEndOfRecordReceived()
+{
+    if(_playingRecord != NULL)
+    {
+        setplayingRecord(NULL);
+    }
+    setisLoadingRecord(false);
+}
+
+
+
+/**
+ * @brief Slot called when a record is being loaded
+ */
+void RecordsSupervisionController::onLoadingRecordReceived()
+{
+    setisLoadingRecord(true);
+}
+
+/**
+ * @brief Slot called when a record has been loaded
+ */
+void RecordsSupervisionController::onLoadedRecordReceived()
+{
+    setisLoadingRecord(false);
+}
+
 
 /**
  * @brief Delete the selected agent from the list
@@ -149,9 +185,17 @@ void RecordsSupervisionController::controlRecord(QString recordId, bool startPla
 {
     if(_recorderAgent != NULL)
     {
-        QString command = startPlaying? "PLAY_RECORD#" : "PAUSE_RECORD#";
-        setplayingRecordId(startPlaying ? recordId : "");
-        Q_EMIT commandAskedToAgent(_recorderAgent->peerId().split(","), QString("%1%2").arg(command).arg(recordId));
+        if (_mapFromRecordIdToViewModel.contains(recordId))
+        {
+            RecordVM* recordVM = _mapFromRecordIdToViewModel.value(recordId);
+
+            QString command = startPlaying? "PLAY_RECORD#" : "PAUSE_RECORD#";
+            setplayingRecord(startPlaying ? recordVM : NULL);
+
+            setisLoadingRecord(true);
+
+            Q_EMIT commandAskedToAgent(_recorderAgent->peerId().split(","), QString("%1%2").arg(command).arg(recordId));
+        }
     }
 }
 
