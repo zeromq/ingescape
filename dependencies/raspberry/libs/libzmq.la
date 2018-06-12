@@ -8,7 +8,7 @@
 dlname='libzmq.so.5'
 
 # Names of this library.
-library_names='libzmq.so.5.1.4 libzmq.so.5 libzmq.so'
+library_names='libzmq.so.5.1.3 libzmq.so.5 libzmq.so'
 
 # The name of the static archive.
 old_library='libzmq.a'
@@ -25,7 +25,7 @@ weak_library_names=''
 # Version information for libzmq.
 current=6
 age=1
-revision=4
+revision=3
 
 # Is this an already installed library?
 installed=yes

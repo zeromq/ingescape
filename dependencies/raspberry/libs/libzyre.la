@@ -8,7 +8,7 @@
 dlname='libzyre.so.2'
 
 # Names of this library.
-library_names='libzyre.so.2.0.1 libzyre.so.2 libzyre.so'
+library_names='libzyre.so.2.0.0 libzyre.so.2 libzyre.so'
 
 # The name of the static archive.
 old_library='libzyre.a'
@@ -25,7 +25,7 @@ weak_library_names=''
 # Version information for libzyre.
 current=2
 age=0
-revision=1
+revision=0
 
 # Is this an already installed library?
 installed=yes
