@@ -54,7 +54,7 @@ unix:{
 
     android_compilation{
         dependencies_src_path = $$shell_path($$clean_path($$absolute_path( $${libs_path}/lib*)))
-        ingescape_lib_src_path = $$shell_path($$clean_path($$absolute_path( $$OUT_PWD/libingescape.so)))
+        ingescape_lib_src_path = $$shell_path($$clean_path($$absolute_path( $$OUT_PWD/android-build/libs/armeabi-v7a/libingescape.so)))
 
         message($$ingescape_lib_src_path)
 
