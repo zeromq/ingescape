@@ -182,9 +182,9 @@ Support for actions and scenarios in the editor is still evolving quickly and wi
 
 ## Platform data record and replay
 
-A dedicated ingeScape agent gives record and replay capabilities to any ingeScape system. When present, the editor is extended with record and replay control features. A system can be recorded at any time whether running a scenario or just executing on its own. 
+The editor embeds record and replay capabilities for any ingeScape system at any time. These capabilities are useful for functions testing, user experimentations and overall system validation.
 
-Previous records are available for replay with several possibilities for the behavior of the agents towards recorded date. Previous records can also be exported for exploitation in third-party tools, for test campaigns or human factors experiments.
+Previous records are available for replay with several possibilities regarding the behavior of the agents and recorded data. Previous records can also be exported for exploitation and analysis in third-party tools, to help data scientists, engineers and human factors experts.
 
 
 
