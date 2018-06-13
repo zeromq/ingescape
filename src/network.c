@@ -747,7 +747,7 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 memcpy(strMapping, &message[strlen(loadMappingPrefix)], strlen(message)- strlen(loadMappingPrefix));
                 strMapping[strlen(message)- strlen(loadMappingPrefix)] = '\0';
                 
-                // Load definition from string content
+                // Load mapping from string content
                 mapping_t *m = parser_LoadMap(strMapping);
                 if (m != NULL){
                     if (igs_internal_mapping != NULL){
