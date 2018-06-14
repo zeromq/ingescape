@@ -206,7 +206,6 @@ Item {
 
                 onClicked: {
                     controller.openActionEditorWithModel(null);
-                    //actionEditor.show();
                 }
             }
 

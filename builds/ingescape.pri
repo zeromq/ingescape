@@ -72,7 +72,13 @@ win32:{
                   $$yajl_include_path \
 
     #include the pri to copy files to C:\
-    include ("$$PWD/../dependencies/windows/common/pri/ingescape-job-copy.pri")
+    equals(TEMPLATE, "lib"){
+        message("Template is type lib, we will copy the ingescape and zyre dll to the C:")
+        include ("$$PWD/../dependencies/windows/common/pri/ingescape-job-copy.pri")
+    }
+    equals(TEMPLATE, "app"){
+        message("Template is type app, we dont copy the ingescape and zyre dll to the C:")
+    }
 }
 
 
@@ -133,6 +139,17 @@ mac:{
 # Unix except macOS and iOS
 #
 unix:!mac {
+
+    ##Add headers from dependencies
+    zyre_include_path = $$PWD/../dependencies/windows/headers/zyre_suite
+    yajl_include_path = $$PWD/../dependencies/windows/headers/
+
+    INCLUDEPATH += $$zyre_include_path \
+                   $$yajl_include_path \
+
+    DEPENDPATH += $$zyre_include_path \
+                  $$yajl_include_path \
+
     raspberry_compilation {
         ############ Raspberry ###########
     message("Compilation raspberry scope ...")

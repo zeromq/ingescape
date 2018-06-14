@@ -25,6 +25,8 @@ import ".." as Editor;
 Window {
     id: rootItem
 
+    title: (actionM ? actionM.name : "Action")
+
     height: minimumHeight
     width: minimumWidth
 
@@ -125,7 +127,8 @@ Window {
                     right : parent.right
                 }
 
-                text : "Action"
+                text: (actionVM ? qsTr("Action in timeline") : qsTr("Action"))
+
                 elide: Text.ElideRight
                 color: IngeScapeTheme.whiteColor
                 font {
@@ -183,7 +186,7 @@ Window {
                     height: 25
                     width: 185
                     verticalAlignment: TextInput.AlignVCenter
-                    text: actionM ? actionM.name : ""
+                    text: (actionM ? actionM.name : "")
 
                     style: I2TextFieldStyle {
                         backgroundColor: IngeScapeTheme.darkBlueGreyColor
@@ -1476,7 +1479,7 @@ Window {
                         width : scrollViewConditions.width - 9 // scrollbar size + 1
 
                         Repeater {
-                            model : (actionM &&  conditionsItem.isOpened) ? actionM.conditionsList : 0
+                            model: (actionM && conditionsItem.isOpened) ? actionM.conditionsList : 0
 
                             Rectangle {
                                 height : 62
@@ -1513,7 +1516,7 @@ Window {
                                     }
 
                                     Repeater {
-                                        model : controller? controller.conditionsTypesList : 0
+                                        model : controller ? controller.conditionsTypesList : 0
 
                                         CheckBox {
                                             id : conditionsTypeCB

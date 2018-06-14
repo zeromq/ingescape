@@ -168,6 +168,9 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(_networkC, &NetworkController::mappingReceived, _modelManager, &IngeScapeModelManager::onMappingReceived);
     connect(_networkC, &NetworkController::allRecordsReceived, _modelManager, &IngeScapeModelManager::onAllRecordsReceived);
     connect(_networkC, &NetworkController::newRecordReceived, _modelManager, &IngeScapeModelManager::onNewRecordReceived);
+    connect(_networkC, &NetworkController::endOfRecordReceived, _recordsSupervisionC, &RecordsSupervisionController::onEndOfRecordReceived);
+    connect(_networkC, &NetworkController::loadingRecordReceived, _recordsSupervisionC, &RecordsSupervisionController::onLoadingRecordReceived);
+    connect(_networkC, &NetworkController::loadedRecordReceived, _recordsSupervisionC, &RecordsSupervisionController::onLoadedRecordReceived);
     connect(_networkC, &NetworkController::valuePublished, _modelManager, &IngeScapeModelManager::onValuePublished);
     connect(_networkC, &NetworkController::isMutedFromAgentUpdated, _modelManager, &IngeScapeModelManager::onisMutedFromAgentUpdated);
     connect(_networkC, &NetworkController::isFrozenFromAgentUpdated, _modelManager, &IngeScapeModelManager::onIsFrozenFromAgentUpdated);
@@ -658,6 +661,40 @@ void IngeScapeEditorController::closeLogStreamController(LogStreamController* lo
 
         // Free memory
         delete logStreamC;
+    }
+}
+
+
+/**
+ * @brief Add the window to the list of opened windows
+ * @param window
+ */
+void IngeScapeEditorController::addOpenedWindow(QObject* window)
+{
+    if (window != NULL)
+    {
+        //qDebug() << "Add Opened Window:" << window << "(" << _openedWindows.count() << ")";
+
+        if (!_openedWindows.contains(window)) {
+            _openedWindows.append(window);
+        }
+    }
+}
+
+
+/**
+ * @brief Remove the window from the list of opened windows
+ * @param window
+ */
+void IngeScapeEditorController::removeOpenedWindow(QObject* window)
+{
+    if (window != NULL)
+    {
+        //qDebug() << "Remove Opened Window:" << window << "(" << _openedWindows.count() << ")";
+
+        if (_openedWindows.contains(window)) {
+            _openedWindows.remove(window);
+        }
     }
 }
 

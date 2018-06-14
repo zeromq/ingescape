@@ -31,11 +31,6 @@ class LogsSortFilter : public I2SortFilterProxyModel
 {
     Q_OBJECT
 
-    // List with selected log types
-    //I2_ENUM_LISTMODEL(LogTypes, selectedLogTypes)
-
-
-
 
 public:
     /**

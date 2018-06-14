@@ -94,6 +94,9 @@ class IngeScapeEditorController : public QObject
     // Opened log stream viewers
     I2_QOBJECT_LISTMODEL(LogStreamController, openedLogStreamControllers)
 
+    // List of opened windows
+    I2_QOBJECT_LISTMODEL(QObject, openedWindows)
+
 
 public:
 
@@ -194,6 +197,20 @@ public:
      * @param logStreamC
      */
     Q_INVOKABLE void closeLogStreamController(LogStreamController* logStreamC);
+
+
+    /**
+     * @brief Add the window to the list of opened windows
+     * @param window
+     */
+    Q_INVOKABLE void addOpenedWindow(QObject* window);
+
+
+    /**
+     * @brief Remove the window from the list of opened windows
+     * @param window
+     */
+    Q_INVOKABLE void removeOpenedWindow(QObject* window);
 
 
 public Q_SLOTS:

@@ -16,6 +16,7 @@
 import QtQuick 2.8
 import QtQuick.Controls 1.4
 import QtQuick.Controls.Styles 1.4
+import QtQuick.Controls.Private 1.0
 
 import I2Quick 1.0
 
@@ -240,7 +241,7 @@ Rectangle {
 
                 Repeater {
                     // List of intput slots VM
-                    model: rootItem.agentMappingVM ? rootItem.agentMappingVM.inputsList : 0
+                    model: (rootItem.agentMappingVM ? rootItem.agentMappingVM.inputsList : 0)
 
                     delegate: Item {
                         id: inputSlotItem
@@ -272,7 +273,27 @@ Rectangle {
                                                                                   : (rootItem.agentMappingVM && rootItem.agentMappingVM.isON ? IngeScapeTheme.redColor : IngeScapeTheme.middleDarkRedColor)
 
                             font: IngeScapeTheme.heading2Font
+
+                            MouseArea {
+                                property string text: myModel ? myModel.name : ""
+
+                                id: rootTooltipInput
+                                anchors.fill: parent
+                                acceptedButtons: Qt.NoButton
+                                hoverEnabled: true
+
+                                onExited: Tooltip.hideText()
+                                onCanceled: Tooltip.hideText()
+                                cursorShape: Qt.PointingHandCursor
+
+                                Timer {
+                                    interval: 300
+                                    running: rootTooltipInput.enabled && rootTooltipInput.containsMouse && rootTooltipInput.text.length
+                                    onTriggered: Tooltip.showText(rootTooltipInput, Qt.point(rootTooltipInput.mouseX, rootTooltipInput.mouseY), rootTooltipInput.text)
+                                }
+                            }
                         }
+
 
                         Rectangle {
                             id: draggablePointFROM
@@ -483,7 +504,7 @@ Rectangle {
 
                 Repeater {
                     // List of output slots VM
-                    model: (rootItem.agentMappingVM)? rootItem.agentMappingVM.outputsList : 0
+                    model: (rootItem.agentMappingVM ? rootItem.agentMappingVM.outputsList : 0)
 
                     delegate: Item {
                         id: outputSlotItem
@@ -516,6 +537,25 @@ Rectangle {
                             color: (myModel && myModel.isDefinedInAllDefinitions) ? (rootItem.agentMappingVM && rootItem.agentMappingVM.isON ? IngeScapeTheme.agentsONInputsOutputsMappingColor : IngeScapeTheme.agentsOFFInputsOutputsMappingColor)
                                                                                   : (rootItem.agentMappingVM && rootItem.agentMappingVM.isON ? IngeScapeTheme.redColor : IngeScapeTheme.middleDarkRedColor)
                             font: IngeScapeTheme.heading2Font
+
+                            MouseArea {
+                                property string text: myModel ? myModel.name : ""
+
+                                id: rootTooltipOutput
+                                anchors.fill: parent
+                                acceptedButtons: Qt.NoButton
+                                hoverEnabled: true
+
+                                onExited: Tooltip.hideText()
+                                onCanceled: Tooltip.hideText()
+                                cursorShape: Qt.PointingHandCursor
+
+                                Timer {
+                                    interval: 300
+                                    running: rootTooltipOutput.enabled && rootTooltipOutput.containsMouse && rootTooltipOutput.text.length
+                                    onTriggered: Tooltip.showText(rootTooltipOutput, Qt.point(rootTooltipOutput.mouseX, rootTooltipOutput.mouseY), rootTooltipOutput.text)
+                                }
+                            }
                         }
 
 

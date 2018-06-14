@@ -32,6 +32,63 @@
 
 
 /**
+ * @brief Handler for "Log Message"
+ * @param type
+ * @param context
+ * @param message
+ */
+void LogMessageHandler(QtMsgType type, const QMessageLogContext& context, const QString& message)
+{
+    fprintf(stdout, "%s\n", message.toLatin1().constData());
+    fflush(stdout);
+
+    // "context.function" can be null
+    QString function = "Undefined function";
+    if (context.function != NULL) {
+        function = QString(context.function);
+    }
+
+    // Get the current log level
+    igs_logLevel_t logLevel = igs_getLogLevel();
+
+    switch (type)
+    {
+    case QtDebugMsg:
+    {
+        // Allows to prevent to log in the file useless logs (with type TRACE or DEBUG)
+        if (logLevel <= IGS_LOG_DEBUG) {
+            igs_log(IGS_LOG_DEBUG, function.toStdString().c_str(), message.toStdString().c_str(), "%s");
+        }
+        break;
+    }
+    case QtInfoMsg:
+    {
+        igs_log(IGS_LOG_INFO, function.toStdString().c_str(), message.toStdString().c_str(), "%s");
+        break;
+    }
+    case QtWarningMsg:
+    {
+        igs_log(IGS_LOG_WARN, function.toStdString().c_str(), message.toStdString().c_str(), "%s");
+        break;
+    }
+    case QtCriticalMsg:
+    {
+        igs_log(IGS_LOG_ERROR, function.toStdString().c_str(), message.toStdString().c_str(), "%s");
+        break;
+    }
+    case QtFatalMsg:
+    {
+        igs_log(IGS_LOG_FATAL, function.toStdString().c_str(), message.toStdString().c_str(), "%s");
+        break;
+    }
+    default:
+        // NO LOG IT (QtSystemMsg)
+        break;
+    }
+}
+
+
+/**
  * @brief Register our C++ types and extensions in the QML system
  */
 void registerCustomQmlTypes()
@@ -219,11 +276,17 @@ int main(int argc, char *argv[])
         //
         //------------------------------
 
-        // Open our log file
-        I2LogsManager::Instance().openLogFile(rootDirectoryPath, "log-IngeScape-Editor.csv", true);
+        QString logFilePath = QString("%1log-IngeScape-Editor.csv").arg(rootDirectoryPath);
+
+        // Set the log level from which logs are printed in the console
+        //igs_setLogLevel(IGS_LOG_DEBUG);
+        igs_setLogLevel(IGS_LOG_INFO);
+
+        igs_setLogPath(logFilePath.toStdString().c_str());
+        igs_setLogInFile(true);
 
         // Replace the default message handler with our own logger
-        qInstallMessageHandler(I2LogMessageHandler);
+        qInstallMessageHandler(LogMessageHandler);
 
         qInfo() << "Application" << app.applicationName() << "is running with version" << app.applicationVersion();
 

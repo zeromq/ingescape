@@ -17,6 +17,8 @@
 import QtQuick 2.8
 import QtQuick.Window 2.2
 import QtQuick.Controls 1.4
+import QtQml 2.2
+
 
 import I2Quick 1.0
 
@@ -47,7 +49,6 @@ ApplicationWindow {
     color: IngeScapeTheme.windowBackgroundColor
 
 
-
     //----------------------------------
     //
     // Menu
@@ -61,18 +62,21 @@ ApplicationWindow {
 
             MenuItem {
                 text: qsTr("Start a new platform description")
+
                 onTriggered: {
                     IngeScapeEditorC.createNewPlatform();
                 }
             }
             MenuItem {
                 text: qsTr("Open platform description")
+
                 onTriggered: {
                     IngeScapeEditorC.openPlatformFromFile();
                 }
             }
             MenuItem {
                 text: qsTr("Save platform description")
+
                 onTriggered: {
                     IngeScapeEditorC.savePlatformToSelectedFile();
                 }
@@ -83,8 +87,9 @@ ApplicationWindow {
             title: qsTr("Mapping")
 
             MenuItem {
-                text: (IngeScapeEditorC.modelManager && IngeScapeEditorC.modelManager.isMappingActivated) ? qsTr("Unplug mapping") : qsTr("Plug mapping")
-                //enabled: false
+                id: menuPlugUNplugMapping
+
+                text: "" // (IngeScapeEditorC.modelManager && IngeScapeEditorC.modelManager.isMappingActivated) ? qsTr("Unplug mapping") : qsTr("Plug mapping")
 
                 onTriggered: {
                     if (IngeScapeEditorC.modelManager && IngeScapeEditorC.modelManager.isMappingActivated) {
@@ -157,12 +162,14 @@ ApplicationWindow {
             MenuItem {
                 text: qsTr("Create a new Agent")
                 enabled: false
+
                 onTriggered: {
                     //console.log("Create a new Agent");
                 }
             }
             MenuItem {
                 text: qsTr("Import agents")
+
                 onTriggered: {
                     if (IngeScapeEditorC.modelManager) {
                         IngeScapeEditorC.modelManager.importAgentsListFromSelectedFile();
@@ -206,11 +213,41 @@ ApplicationWindow {
 
             MenuItem {
                 text: qsTr("Create snapshot")
+
                 onTriggered: {
                     I2SnapshotHelper.saveWindowOfItem(content, Qt.size(0,0), "INGESCAPE");
                 }
             }
+        }
 
+        Menu {
+            id: menuWindows
+
+            title: qsTr("Windows")
+
+            Instantiator {
+                   model: IngeScapeEditorC.openedWindows
+
+                   MenuItem {
+                       text: model.QtObject.title
+
+                       onTriggered: {
+                           //console.log("click on " + model.QtObject.title + " (" + model.QtObject + ")")
+
+                           // Raises the window in the windowing system
+                           model.QtObject.raise();
+                       }
+                   }
+
+                onObjectAdded: {
+                    //console.log("onObjectAdded " + index)
+                    menuWindows.insertItem(index, object)
+                }
+                onObjectRemoved: {
+                    //console.log("onObjectRemoved")
+                    menuWindows.removeItem(object)
+                }
+            }
         }
     }
 
@@ -302,6 +339,10 @@ ApplicationWindow {
                     easing.type: Easing.OutQuad;
                 }
             }
+
+            /*onLoaded: {
+                console.log("onLoaded " + applicationLoader.item)
+            }*/
         }
 
 
@@ -322,6 +363,10 @@ ApplicationWindow {
                 // Binding to display our application loader
                 applicationLoader.visible = Qt.binding(function() {
                     return ((applicationLoader.status === Loader.Ready) && (IngeScapeEditorC.modelManager !== null));
+                });
+
+                menuPlugUNplugMapping.text = Qt.binding(function() {
+                    return (((IngeScapeEditorC.modelManager !== null) && IngeScapeEditorC.modelManager.isMappingActivated) ? qsTr("Unplug mapping") : qsTr("Plug mapping"));
                 });
 
                 // Load our QML UI

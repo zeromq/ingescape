@@ -8,7 +8,7 @@
 dlname='libczmq.so.4'
 
 # Names of this library.
-library_names='libczmq.so.4.1.1 libczmq.so.4 libczmq.so'
+library_names='libczmq.so.4.1.0 libczmq.so.4 libczmq.so'
 
 # The name of the static archive.
 old_library='libczmq.a'
@@ -25,7 +25,7 @@ weak_library_names=''
 # Version information for libczmq.
 current=5
 age=1
-revision=1
+revision=0
 
 # Is this an already installed library?
 installed=yes
