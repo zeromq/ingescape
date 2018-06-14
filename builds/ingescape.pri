@@ -139,6 +139,17 @@ mac:{
 # Unix except macOS and iOS
 #
 unix:!mac {
+
+    ##Add headers from dependencies
+    zyre_include_path = $$PWD/../dependencies/windows/headers/zyre_suite
+    yajl_include_path = $$PWD/../dependencies/windows/headers/
+
+    INCLUDEPATH += $$zyre_include_path \
+                   $$yajl_include_path \
+
+    DEPENDPATH += $$zyre_include_path \
+                  $$yajl_include_path \
+
     raspberry_compilation {
         ############ Raspberry ###########
     message("Compilation raspberry scope ...")
