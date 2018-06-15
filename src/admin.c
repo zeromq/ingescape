@@ -236,11 +236,20 @@ void igs_log(igs_logLevel_t level, const char *function, const char *fmt, ...){
         }
     }
     if ((logInConsole && level >= logLevel) || level >= IGS_LOG_ERROR){
-        if (useColorInConsole){
-            fprintf(stderr,"%s%s\x1b[0m;%s;%s\n", log_colors[level], log_levels[level], function, logContent);
+        if (level >= IGS_LOG_WARN){
+            if (useColorInConsole){
+                fprintf(stderr,"%s%s\x1b[0m;%s;%s\n", log_colors[level], log_levels[level], function, logContent);
+            }else{
+                fprintf(stderr,"%s;%s;%s\n", log_levels[level], function, logContent);
+            }
         }else{
-            fprintf(stderr,"%s;%s;%s\n", log_levels[level], function, logContent);
+            if (useColorInConsole){
+                fprintf(stdout,"%s%s\x1b[0m;%s;%s\n", log_colors[level], log_levels[level], function, logContent);
+            }else{
+                fprintf(stdout,"%s;%s;%s\n", log_levels[level], function, logContent);
+            }
         }
+        
     }
     if (admin_logInStream && agentElements != NULL && agentElements->logger != NULL){
         zstr_sendf(agentElements->logger, "%s;%s;%s\n", log_levels[level], function, logContent);
