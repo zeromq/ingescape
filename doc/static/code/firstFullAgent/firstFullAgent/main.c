@@ -254,6 +254,7 @@ int main(int argc, const char * argv[]) {
         //always here.
         zloop_t *loop = zloop_new();
         zloop_start(loop); //this function is blocking until SIGINT is received
+        zloop_destroy(&loop);
     }else{
         while (!igs_Interrupted && !interruptionFlag) {
             char message [1024];

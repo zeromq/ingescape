@@ -145,13 +145,13 @@ Here is the code to do so:
 {{< / highlight >}}
 
 
-### About mainloops
+### About main loops
 
-Agents are interactive software. As such, they need to continue their execution as long as something does not explicitly make them interrupt and stop. Interactive programs rely on at least one mainloop so that they won't stop by themselves. Because of the variety of loops in the various operating systems and industrial frameworks, we decided not to force the use of yet another mainloop mechanism in ingeScape. However, it is very easy to create your own infinite loop if you need to. This example shows two different ways of doing this.
+Agents are interactive software. As such, they need to continue their execution as long as something does not explicitly make them interrupt and stop. Interactive programs rely on at least one mainloop so that they won't stop by themselves. There are many different types of loops available in the operating systems and industrial frameworks, with whom ingeScape can be used. This example shows how to manually create an interactive loop with support for keyboard inputs in the command line, and another way, using the CZMQ library, which is used by ingeScape and thus always available to you.
 
-Should you need more sophisticated mainloops, we advise you to use the ***select*** function available in ***\<sys/select.h\>*** or the mainloop extension capabilities of the framework you are using. Please note that ingeScape uses its own mainloop and threads that will not interfere with the one you are using. With some frameworks though, it will be necessary  to wrap the code in your callbacks to execute it into your frameworks's main thread or main queue. Check the ingeScape documentation for more details about this.
+Should you need more sophisticated or customized mainloops, we advise you to use the ***select*** function available in ***\<sys/select.h\>*** or the mainloop extension capabilities of the industrial framework you are using. Please note that ingeScape uses its own mainloop and threads that will not interfere with the one you are using. With some frameworks though, it will be necessary  to wrap the code in your callbacks to execute it into your frameworks's main thread or main queue. Check the ingeScape documentation for more details about this.
 
-In this example, depending on the use of the *- - noninteractiveloop* command line parameter, two different loops can be activated. Both are based on a simple infinite *while* loop.
+In this example, depending on the use of the *- - noninteractiveloop* command line parameter, two different loops can be activated.
 
 By default, the interactive loop mode is activated, i.e. the one enabling the use of commands inside the terminal once the agent is running. This loop is based on ***fgets*** function from ***\<stdio.h\>***, which has the capability to wait until some text is input in the terminal. In the case where the user uses the *Ctrl + c* key combination, this function returns *false*, which we use to break the infinite loop we have created. Here is the code for this loop:
 
@@ -164,16 +164,15 @@ while (1) {
 }
 {{< / highlight >}}
 <br>
-The other mode consists in a simple infinite loop combined with a *sleep* command. The call to *sleep* is blocking for the passed duration (here 2 seconds). This is not ideal because your agent might take up to the *sleep* duration before actually leaving the loop upon an interruption. Here is the code for this loop:
+The other mode used the ***zloop*** object provided by the CZMQ library. Here is the code for this loop:
 
 {{< highlight c "linenos=table,linenostart=1" >}}
-while (1) {
-    if (interrupted){
-        printf("Interruption signal received : stopping.\n");
-        break;
-    }
-    sleep(2);
-}
+//Run the main loop (non-interactive mode):
+//we rely on CZMQ which is an ingeScape dependency and is thus
+//always here.
+zloop_t *loop = zloop_new();
+zloop_start(loop); //this function is blocking until SIGINT is received
+zloop_destroy(&loop);
 {{< / highlight >}}
 
 ### How to properly stop an agent
@@ -186,7 +185,7 @@ The problem is how and when to call the *igs_stop* function, as there are many c
 - The ingeScape editor and some special agents have the ability to stop other agents remotely,
 - An interruption signal is received by the agent from the operating system.
 
-For each of these cases, there a good practices to follow in order to avoid any dead lock between your application's threads and the ingeScape thread.
+For each of these cases, there are good practices to follow in order to avoid any dead lock between your application's threads and the ingeScape thread.
 
 <br>
 #### Which thread am i in ?
@@ -195,7 +194,7 @@ When using ingeScape, you are in your application's threads except when executin
 
 When using a simple C program as it is the case here, your application has only one main thread, plus the ones in ingeScape that you encounter in your callbacks code.
 
-As all threads in an application share the same memory, most of the time, it is transparent for the developer to be executing code in an ingeScape callback or not. But when stopping the agent, one needs to pay extra attention because calling the *igs_stop* function from an ingeScape thread will result in a deadlock. The agent will stop anyway but the stop will not be perfectly clean.
+As all threads in an application share the same memory, most of the time, it is transparent for the developer to be executing code in an ingeScape callback or not. **But when stopping the agent, one needs to pay extra attention because calling the *igs_stop* function from an ingeScape thread will result in a deadlock. The agent will stop anyway but the stop will not be perfectly clean.**
 
 <br>
 #### Stop from any application's thread
@@ -205,13 +204,13 @@ If you are certain that you are not in an ingeScape callback, and thus not in an
 <br>
 #### Handle system interruptions
 
-The most common way to interrupt a program in a terminal is to press Ctrl + C in the terminal. This will send a SIGINT signal to your application. 
+The most common way to interrupt a program in a terminal is to press Ctrl + C in the terminal. This will send a SIGINT signal to your application. The *zloop* provided by the CZMQ library automatically handles interruptions and does not require additional code.
 
-To handle this signal, you need to :
+To handle this signal by yourself, you need to :
 
 - register to SIGINT and call a function when the signal is emitted,
 - create a global flag (or any other way to store an information) that is false by default and set to true when SIGINT is received,
-- watch this flag in your main loop and stop when the flag is set to true.
+- watch this flag in your loop and stop when the flag is set to true.
 interruption
 In short, this requires the following code:
 
@@ -239,14 +238,14 @@ while (1) {
 <br>
 #### Stop from an ingeScape callback
 
-**It is important that the *igs_stop* function is never called from an ingeScape callback.** This can be avoided by using a global flag that is set to true in the callback and induces the stop of the main loop, and/or a function call in the main thread that actually executes a call to the *igs_stop* function.
+**It is important that the *igs_stop* function is never called from an ingeScape callback.** This can be avoided by using a global flag that is set to true in the callback and induces the stop of the main thread's loop, and/or a function call in the main thread that actually executes a call to the *igs_stop* function.
 
 <br>
 #### Handle stop request from other agents
 
 Some special agents can remotely stop any other agent. This has the effect to stop the ingeScape loop and threads. But some additional code is required for your application to stop properly as well.
 
-Very simple, ingeScape brings the *igs_Interrupted* global variable that is false by default and becomes true when a stop request has been received or when the *igs_stop* function has been called. You can monitor this variable in your code to stop your application when a stop request or an actual stop is triggered.
+Very simply, ingeScape brings the *igs_Interrupted* global variable that is false by default and becomes true when a stop request has been received or when the *igs_stop* function has been called. You can monitor this variable in your code to stop your application when a stop request or an actual stop is triggered.
 
 It is possible to observe stop requests and attach callbacks to them. This is achieved by using the *igs_observeForcedStop* function. ***Be careful, such callbacks are executed in an ingeScape thread in which 
 the igs_stop function shall not be used***.
