@@ -10,6 +10,7 @@
 #include <stdlib.h> //standard C functions such as getenv, atoi, exit, etc.
 #include <string.h> //C string handling functions
 #include <signal.h> //catching interruptions
+#include <czmq.h>
 #include <ingescape/ingescape.h>
 #include "regexp.h" //regexp utilities
 
@@ -248,15 +249,11 @@ int main(int argc, const char * argv[]) {
     
     //mainloop management (two modes)
     if (noninteractiveloop){
-        //run the main loop (non-interactive mode)
-        while (1) {
-            if (igs_Interrupted || interruptionFlag){
-                printf("Interruption received : stopping.\n");
-                break;
-            }else{
-                sleep(2);
-            }
-        }
+        //Run the main loop (non-interactive mode):
+        //we rely on CZMQ which is an ingeScape dependency and is thus
+        //always here.
+        zloop_t *loop = zloop_new();
+        zloop_start(loop); //this function is blocking until SIGINT is received
     }else{
         while (!igs_Interrupted && !interruptionFlag) {
             char message [1024];

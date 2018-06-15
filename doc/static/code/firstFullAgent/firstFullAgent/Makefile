@@ -2,7 +2,7 @@ INCLOCAL = /usr/local/include/
 INCDIRS   = -I${INCLOCAL}
 
 LIBDIRLOCAL = /usr/local/lib
-DYNLIBS = -lingescape
+DYNLIBS = -lingescape -lczmq
 
 CC = gcc
 CFLAGS = -W -Wall -g $(INCDIRS) -std=gnu99
