@@ -12,6 +12,7 @@
 #define ingescape_public_h
 
 #include <stdbool.h>
+#include <stddef.h>
 
 #if (defined WIN32 || defined _WIN32)
 #if defined INGESCAPE
@@ -23,7 +24,7 @@
 #define PUBLIC
 #endif
 
-//  GCC and clang support validating format strings for functions that act like printf
+// GCC and clang can validate format strings for functions that act like printf
 // this is used to check the logging functions
 #if defined (__GNUC__) && (__GNUC__ >= 2)
 #   define CHECK_PRINTF(a)   __attribute__((format (printf, a, a + 1)))
@@ -254,7 +255,7 @@ PUBLIC bool igs_getRequestOutputsFromMappedAgents(void);
 
 
 //logs management
-PUBLIC void igs_setVerbose(bool verbose); //enable log in console (enabled by default)
+PUBLIC void igs_setVerbose(bool verbose); //enable log in console (disabled by default)
 PUBLIC bool igs_isVerbose(void);
 PUBLIC void igs_setUseColorVerbose(bool useColor); //use colors in console
 PUBLIC bool igs_getUseColorVerbose(void);
