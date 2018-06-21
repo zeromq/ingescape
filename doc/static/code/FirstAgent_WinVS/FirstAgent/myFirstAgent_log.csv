@@ -1,0 +1,27 @@
+04/06/2018;14:37:30.822123;INFO;manageBusIncoming;received DISABLE_LOG_FILE command from IngeScape-Editor (A05804B440484002B48AD5FC840E8F13)
+04/06/2018;14:43:16.795503;INFO;igs_setAgentName;Agent name is myFirstAgent
+04/06/2018;14:43:16.805510;INFO;model_writeIOP;set input1 to 0
+04/06/2018;14:43:16.832507;INFO;model_writeIOP;set output1 to 0
+04/06/2018;14:43:16.858506;INFO;igs_startWithIP;Starting with ip address 10.0.0.155 and port 5689 on device Ethernet
+04/06/2018;14:43:17.320502;INFO;manageBusIncoming;->IngeScape-Editor has entered the network with peer id A05804B440484002B48AD5FC840E8F13 and endpoint tcp://10.0.0.9:49153
+04/06/2018;14:43:17.326513;INFO;manageBusIncoming;Handling headers for agent IngeScape-Editor
+04/06/2018;14:43:17.334518;INFO;manageBusIncoming;	pid -> 56847
+04/06/2018;14:43:17.346516;INFO;manageBusIncoming;	canBeFrozen -> 0
+04/06/2018;14:43:17.363514;INFO;manageBusIncoming;	isEditor -> 1
+04/06/2018;14:43:17.370511;INFO;manageBusIncoming;	commandline -> /Users/bruno/Code/ingescape/editor/apps/build-IngeScape-Editor-Desktop_Qt_5_9_3_clang_64bit-Debug/IngeScape-Editor.app/Contents/MacOS/IngeScape-Editor
+04/06/2018;14:43:17.375510;INFO;manageBusIncoming;	publisher -> 49152
+04/06/2018;14:43:17.391513;INFO;manageBusIncoming;Subscription created for IngeScape-Editor at tcp://10.0.0.9:49152
+04/06/2018;14:43:17.399505;INFO;manageBusIncoming;	hostname -> zephyr-wifi.ingenuity.io
+04/06/2018;14:43:17.407507;INFO;manageBusIncoming;+IngeScape-Editor has joined IngeScape-Editor-IGS-REPLAY
+04/06/2018;14:43:17.460510;INFO;manageBusIncoming;+IngeScape-Editor has joined INGESCAPE_PRIVATE
+04/06/2018;14:43:17.512504;INFO;manageBusIncoming;Store definition for agent IngeScape-Editor
+04/06/2018;14:43:17.553513;INFO;manageBusIncoming;Store mapping for agent IngeScape-Editor
+04/06/2018;14:43:40.984584;INFO;manageBusIncoming;received SET_INPUT command from IngeScape-Editor (A05804B440484002B48AD5FC840E8F13)
+04/06/2018;14:43:41.000507;INFO;model_writeIOP;set input1 to 18
+04/06/2018;14:43:41.006508;INFO;model_writeIOP;set output1 to 36
+04/06/2018;14:43:41.016510;INFO;network_publishOutput;publish output1 -> 36
+04/06/2018;14:43:56.340554;INFO;manageBusIncoming;received SET_INPUT command from IngeScape-Editor (A05804B440484002B48AD5FC840E8F13)
+04/06/2018;14:43:56.353520;INFO;model_writeIOP;set input1 to 18
+04/06/2018;14:43:56.366523;INFO;model_writeIOP;set output1 to 36
+04/06/2018;14:43:56.375515;INFO;network_publishOutput;publish output1 -> 36
+04/06/2018;14:44:43.605969;INFO;manageBusIncoming;received DISABLE_LOG_FILE command from IngeScape-Editor (A05804B440484002B48AD5FC840E8F13)
