@@ -27,23 +27,29 @@ QML_IMPORT_PATH =
 # Additional import path used to resolve QML modules just for Qt Quick Designer
 QML_DESIGNER_IMPORT_PATH =
 
-# Include ingescape headers
-INCLUDEPATH += $$PWD/dependencies/headers
 
-CONFIG(debug, debug|release){
-    libs_path = $$PWD/dependencies/libs/win32/Debug
-}else {
-    libs_path = $$PWD/dependencies/libs/win32/Release
+win32:{
+    # Include ingescape headers
+    INCLUDEPATH += $$PWD/dependencies/headers
+
+    CONFIG(debug, debug|release){
+        libs_path = $$PWD/dependencies/libs/win32/Debug
+    }else {
+        libs_path = $$PWD/dependencies/libs/win32/Release
+    }
+
+    #Add librairies
+    LIBS += -L$$libs_path -lingescape -llibzyre -llibczmq -lyajl
+
+    #Windows specific libraries
+    LIBS += -L$$C:/Windows/System32 -lwsock32 -lIPHLPAPI -lws2_32
 }
 
+!win32:{
+    # Include ingescape headers
+    INCLUDEPATH += /usr/local/include
 
-#Add librairies
-LIBS += -L$$libs_path -lingescape -llibzyre -llibczmq -lyajl
-
-#To get the Ip address into the network.c
-LIBS += -L$$C:/Windows/System32 -lwsock32 -lIPHLPAPI -lws2_32 $$libs_path/ingescape.lib
-
-DEPENDPATH += $$libs_path
-
-message($$INCLUDEPATH)
+    #Add librairies
+    LIBS += -L/usr/local/lib -lingescape -lczmq -lzyre -lyajl
+}
 
