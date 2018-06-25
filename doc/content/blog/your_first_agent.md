@@ -7,7 +7,7 @@ banner = "img/banners/your_first_agent.png"
 genre = "article"
 +++
 
-This article gives you an introduction to the ingeScape library, in order to create a first software agent to be integrated in any ingeScape environment. 
+This article gives you an introduction to the ingeScape library, in order to create a first software agent to be integrated in any ingeScape environment.
 
 Creating your own agents is the key step to building the services that will make your future systems based on ingeScape.
 
@@ -98,7 +98,7 @@ int main(int argc, const char * argv[]) {
         printf("device: %s\n", devices[i]);
     }
     igs_freeNetdevicesList(devices, nb);
-    
+
     //set the agent name
     if (argc == 2){
         //either by using the argument on the command line
@@ -107,37 +107,37 @@ int main(int argc, const char * argv[]) {
         //or by giving a default name if no argument was passed
         igs_setAgentName("simpleDemoAgent");
     }
-    
+
     //Create an input and an ouput: both are of integer type
     //with default value set to zero.
     igs_createInput("input1", IGS_INTEGER_T, 0, 0);
     igs_createOutput("output1", IGS_INTEGER_T, 0, 0);
-    
+
     //Set the definition information (optional)
     igs_setDefinitionName("myDef");
     igs_setDefinitionVersion("1.0");
     igs_setDefinitionDescription("Definition for our first agent.");
-    
+
     //Attach the callback to our agent's input
     //NB: callbacks can be attached to any IOP
     igs_observeInput("input1", myIOPCallback, NULL);
-    
+
     //Actually and finally start the agent
     //First argument is the network device name to use
     //Second argument is the network port used by all the agents of your system
     igs_startWithDevice("en0", 5669);
-    
+
     getchar();
-    
+
     //Stop the agent properly before terminating the program
     igs_stop();
-    
+
     return 0;
 }
 {{< / highlight >}}
 
 ### Compile on Linux
-As a prerequisite, you need to have the ingeScape library installed on your computer. We suppose the ingeScape header is installed in */usr/local/include/* and the library in */usr/local/lib/*, which is pretty standard on most Linux environments. 
+As a prerequisite, you need to have the ingeScape library installed on your computer. We suppose the ingeScape header is installed in */usr/local/include/* and the library in */usr/local/lib/*, which is pretty standard on most Linux environments.
 
 When ready, copy the code in a *main.c* file and type the following commands in a terminal where your *main.c* file is located:
 
@@ -152,4 +152,8 @@ The first compilation method is the same as the one for Linux, exactly with the 
 The other method is the use of Apple Xcode with a dedicated project. To save your time, such a project, including the code, is available [here](/code/firstAgent.zip).
 
 ### Compile on Microsoft Windows
-*TODO*
+The easiest way to compile and run your first agent is to use the following projects:
+- [Qt project](/code/FirstAgent_Qt.zip)
+- [Visual Studio 2015 project](/code/FirstAgent_VS.zip)
+
+For both projects, ingeScape dependencies (available [here](/code/dependencies_win.zip)) have to be deployed next to the involved project file (.pro or .sln). 
