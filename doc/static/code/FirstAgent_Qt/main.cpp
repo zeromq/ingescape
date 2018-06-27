@@ -89,7 +89,7 @@ int main(int argc, char *argv[])
     //Actually and finally start the agent
     //First argument is the network device name to use
     //Second argument is the network port used by all the agents of your system
-    igs_startWithDevice("Ethernet", 5669);
+    igs_startWithDevice("Ethernet", 5670);
 
     int execValue = app.exec();
 
