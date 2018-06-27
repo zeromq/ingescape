@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		979CFD4120E3823C008154EF /* libczmq.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 979CFD4020E3823C008154EF /* libczmq.4.dylib */; };
 		97A87CDE20A325BD00DDB1FE /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 97A87CDD20A325BD00DDB1FE /* main.c */; };
 		97A87CE620A3265A00DDB1FE /* regexp.c in Sources */ = {isa = PBXBuildFile; fileRef = 97A87CE420A3265A00DDB1FE /* regexp.c */; };
 		97A87CEE20A4A0CA00DDB1FE /* libingescape.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 97A87CE820A3286600DDB1FE /* libingescape.dylib */; };
@@ -25,6 +26,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		979CFD4020E3823C008154EF /* libczmq.4.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libczmq.4.dylib; path = ../../../../../../../../../../../usr/local/Cellar/czmq/4.1.1/lib/libczmq.4.dylib; sourceTree = "<group>"; };
 		97A87CDA20A325BD00DDB1FE /* firstFullAgent */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = firstFullAgent; sourceTree = BUILT_PRODUCTS_DIR; };
 		97A87CDD20A325BD00DDB1FE /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		97A87CE420A3265A00DDB1FE /* regexp.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = regexp.c; sourceTree = "<group>"; };
@@ -37,6 +39,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				979CFD4120E3823C008154EF /* libczmq.4.dylib in Frameworks */,
 				97A87CEE20A4A0CA00DDB1FE /* libingescape.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -74,6 +77,7 @@
 		97A87CE720A3286500DDB1FE /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				979CFD4020E3823C008154EF /* libczmq.4.dylib */,
 				97A87CE820A3286600DDB1FE /* libingescape.dylib */,
 			);
 			name = Frameworks;
