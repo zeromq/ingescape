@@ -52,7 +52,8 @@ int main(int argc, char *argv[])
      Use ingeScape function to find compatible network devices
      on your computer.
      You need to use one of the returned results in the
-     igs_startWithDevice call below for your agent to start.
+     igs_startWithDevice call below for your agent to start
+     on the network.
      */
     char **devices = NULL;
     int nb = 0;
@@ -88,7 +89,7 @@ int main(int argc, char *argv[])
     //Actually and finally start the agent
     //First argument is the network device name to use
     //Second argument is the network port used by all the agents of your system
-    igs_startWithIP("10.0.0.151", 5669);
+    igs_startWithDevice("en0", 5670);
 
     return app.exec();
 }
