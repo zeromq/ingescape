@@ -17,6 +17,7 @@
  */
 void myIOPCallback(iop_t iopType, const char* name, iopType_t valueType,
                    void* value, size_t valueSize, void* myData){
+    
     /*
      This callback is fed with all the information necessary:
      - the IOP type : input, output or parameter
@@ -29,6 +30,15 @@ void myIOPCallback(iop_t iopType, const char* name, iopType_t valueType,
     int r = igs_readInputAsInt(name);
     printf("%s changed to %d\n", name, r);
     igs_writeOutputAsInt("output1", 2*r);
+    
+    //flag unused parameters to avoid compilation warnings with some compilers
+    //NB: in real-world cases, theses parameters would be used most of
+    //the time.
+    IGS_UNUSED(iopType);
+    IGS_UNUSED(valueType);
+    IGS_UNUSED(value);
+    IGS_UNUSED(valueSize);
+    IGS_UNUSED(myData);
 }
 
 /*
@@ -42,7 +52,8 @@ int main(int argc, const char * argv[]) {
      Use ingeScape function to find compatible network devices
      on your computer.
      You need to use one of the returned results in the
-     igs_startWithDevice call below for your agent to start.
+     igs_startWithDevice call below for your agent to start
+     on the network.
      */
     char **devices = NULL;
     int nb = 0;
@@ -78,7 +89,7 @@ int main(int argc, const char * argv[]) {
     //Actually and finally start the agent
     //First argument is the network device name to use
     //Second argument is the network port used by all the agents of your system
-    igs_startWithDevice("en0", 5669);
+    igs_startWithDevice("en0", 5670);
     
     getchar();
     
