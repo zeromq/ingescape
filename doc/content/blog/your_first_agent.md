@@ -154,7 +154,8 @@ The other method is the use of Apple Xcode with a dedicated project. To save you
 
 ### Compile on Microsoft Windows
 The easiest way to compile and run your first agent is to use the following projects:
+
 - [Qt project](/code/FirstAgent_Qt.zip)
 - [Visual Studio 2015 project](/code/FirstAgent_VS.zip)
 
-For both projects, ingeScape dependencies (available [here](/code/dependencies_win.zip)) have to be deployed next to the involved project file (.pro or .sln). 
+For both projects, ingeScape dependencies have to be deployed next to the involved project file (.pro or .sln).
