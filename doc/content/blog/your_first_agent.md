@@ -149,12 +149,27 @@ gcc -o myFirstAgent main.o -L/usr/local/lib -lingescape
 
 You can also use an example [Qt project](/code/FirstAgent_Qt.zip) embedding ingeScape in a simple graphical Qt application with an empty UI.
 
-### Compile on macOS (two methods)
+### Compile on macOS (three methods)
+#### GCC
 The first compilation method is the same as the one for Linux, exactly with the same assumptions for headers and libraries location.
 
+#### Xcode
 Another method is the use of Apple Xcode with a dedicated project. To save your time, such a project, including the code, is available [here](/code/firstAgent.zip).
 
+#### Qt
 You can also use an example [Qt project](/code/FirstAgent_Qt.zip) embedding ingeScape in a simple graphical Qt application with an empty UI.
+
+In some cases, if you are using Homebrew to install third-party libraries, there might be an incompatibility between the JPEG, TIFF, etc. libraries embedded in CoreImage and the ones installed in */usr/local/lib* by Homebrew. This has nothing to do with ingeScape but might block the execution of the example.
+
+The following error message is then displayed at runtime:
+{{< highlight shell "linenos=inline" >}}
+dyld: Symbol not found: __cg_jpeg_resync_to_restart
+  Referenced from: /System/Library/Frameworks/ImageIO.framework/Versions/A/ImageIO
+  Expected in: /usr/local/lib/libJPEG.dylib
+ in /System/Library/Frameworks/ImageIO.framework/Versions/A/ImageIO
+{{< / highlight >}}
+
+If this happens, you need to edit the Run properties for your Qt project by editing the DYLD_LIBRARY_PATH environment variable and adding */System/Library/Frameworks/ImageIO.framework/Versions/A/Resources/* as the first path to be checked, generally followed by your local project path and */usr/local/lib/*.
 
 ### Compile on Microsoft Windows
 The easiest ways to compile and run your first agent are to use the following projects:
