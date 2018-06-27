@@ -138,7 +138,7 @@ int main(int argc, const char * argv[]) {
 {{< / highlight >}}
 
 ### Compile on Linux
-As a prerequisite, you need to have the ingeScape library installed on your computer. We suppose the ingeScape header is installed in */usr/local/include/* and the library in */usr/local/lib/*, which is pretty standard on most Linux environments.
+As a prerequisite, you need to have the ingeScape library and its dependencies installed on your computer. We suppose the ingeScape headers are installed in */usr/local/include/* and the libraries in */usr/local/lib/*, which is pretty standard on most Linux environments.
 
 When ready, copy the code in a *main.c* file and type the following commands in a terminal where your *main.c* file is located:
 
@@ -147,15 +147,19 @@ gcc -W -Wall -g -I/usr/local/include/ -std=gnu99 -o main.o -c main.c
 gcc -o myFirstAgent main.o -L/usr/local/lib -lingescape
 {{< / highlight >}}
 
-### Compile on macOS (two methods)
-The first compilation method is the same as the one for Linux, exactly with the same assumptions for header and library location.
+You can also use an example [Qt project](/code/FirstAgent_Qt.zip) embedding ingeScape in a simple graphical Qt application with an empty UI.
 
-The other method is the use of Apple Xcode with a dedicated project. To save your time, such a project, including the code, is available [here](/code/firstAgent.zip).
+### Compile on macOS (two methods)
+The first compilation method is the same as the one for Linux, exactly with the same assumptions for headers and libraries location.
+
+Another method is the use of Apple Xcode with a dedicated project. To save your time, such a project, including the code, is available [here](/code/firstAgent.zip).
+
+You can also use an example [Qt project](/code/FirstAgent_Qt.zip) embedding ingeScape in a simple graphical Qt application with an empty UI.
 
 ### Compile on Microsoft Windows
-The easiest way to compile and run your first agent is to use the following projects:
+The easiest ways to compile and run your first agent are to use the following projects:
 
 - [Qt project](/code/FirstAgent_Qt.zip)
 - [Visual Studio 2015 project](/code/FirstAgent_VS.zip)
 
-For both projects, ingeScape dependencies have to be deployed next to the involved project file (.pro or .sln).
+For both projects, ingeScape and its dependencies have to be deployed next to the involved project file (.pro or .sln).
