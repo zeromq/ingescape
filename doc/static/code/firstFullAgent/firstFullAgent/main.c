@@ -30,6 +30,7 @@ char mappingFile[BUFFER_SIZE];
 //SIGINT handling
 static volatile bool interruptionFlag = false;
 void interruptionReceived(int val) {
+    IGS_UNUSED(val);
     interruptionFlag = true;
 }
 
@@ -97,6 +98,12 @@ void myIOPCallback(iop_t iopType, const char* name, iopType_t valueType,
         }
     }
     //NB: exactly the same could be done for outputs and parameters
+    
+    //flag unused parameters to avoid compilation warnings with some compilers
+    //NB: in real-world cases, theses parameters would be used most of
+    //the time.
+    IGS_UNUSED(value);
+    IGS_UNUSED(myData);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
