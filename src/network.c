@@ -187,8 +187,8 @@ int unsubscribeToPublisherOutput(subscriber_t *subscriber, const char *outputNam
 
 //Timer callback to send REQUEST_OUPUTS notification for agents we subscribed to
 int triggerMappingNotificationToNewcomer(zloop_t *loop, int timer_id, void *arg){
-    INGESCAPE_UNUSED(loop)
-    INGESCAPE_UNUSED(timer_id)
+    IGS_UNUSED(loop)
+    IGS_UNUSED(timer_id)
 
     subscriber_t *subscriber = (subscriber_t *) arg;
     if (subscriber->mappedNotificationToSend){
@@ -305,8 +305,8 @@ void network_cleanAndFreeSubscriber(subscriber_t *subscriber){
 
 //manage messages from the parent thread
 int manageParent (zloop_t *loop, zmq_pollitem_t *item, void *arg){
-    INGESCAPE_UNUSED(loop)
-    INGESCAPE_UNUSED(arg)
+    IGS_UNUSED(loop)
+    IGS_UNUSED(arg)
 
     if (item->revents & ZMQ_POLLIN)
     {
@@ -416,7 +416,7 @@ int handleSubscriptionMessage(zmsg_t *msg, const char *subscriberPeerId){
 
 //manage incoming messages from one of the publisher agents we subscribed to
 int manageSubscription (zloop_t *loop, zmq_pollitem_t *item, void *arg){
-    INGESCAPE_UNUSED(loop)
+    IGS_UNUSED(loop)
 
     //get subscriber id
     char *subscriberPeerId = (char *)arg;
@@ -431,7 +431,7 @@ int manageSubscription (zloop_t *loop, zmq_pollitem_t *item, void *arg){
 
 //manage messages received on the bus
 int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
-    INGESCAPE_UNUSED(arg)
+    IGS_UNUSED(arg)
 
     zyre_t *node = agentElements->node;
     if (item->revents & ZMQ_POLLIN){
@@ -1009,9 +1009,9 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
 
 //Timer callback to (re)send our definition to agents present on the private channel
 int triggerDefinitionUpdate(zloop_t *loop, int timer_id, void *arg){
-    INGESCAPE_UNUSED(loop)
-    INGESCAPE_UNUSED(timer_id)
-    INGESCAPE_UNUSED(arg)
+    IGS_UNUSED(loop)
+    IGS_UNUSED(timer_id)
+    IGS_UNUSED(arg)
 
     if (network_needToSendDefinitionUpdate){
         char * definitionStr = NULL;
@@ -1034,9 +1034,9 @@ int triggerDefinitionUpdate(zloop_t *loop, int timer_id, void *arg){
 
 //Timer callback to update and (re)send our mapping to agents on the private channel
 int triggerMappingUpdate(zloop_t *loop, int timer_id, void *arg){
-    INGESCAPE_UNUSED(loop)
-    INGESCAPE_UNUSED(timer_id)
-    INGESCAPE_UNUSED(arg)
+    IGS_UNUSED(loop)
+    IGS_UNUSED(timer_id)
+    IGS_UNUSED(arg)
 
     if (network_needToUpdateMapping){
         char *mappingStr = NULL;
@@ -1061,7 +1061,7 @@ int triggerMappingUpdate(zloop_t *loop, int timer_id, void *arg){
 
 static void
 initLoop (zsock_t *pipe, void *args){
-    INGESCAPE_UNUSED(args)
+    IGS_UNUSED(args)
 
     network_needToSendDefinitionUpdate = false;
     network_needToUpdateMapping = false;

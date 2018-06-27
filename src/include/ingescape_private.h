@@ -20,9 +20,6 @@
 #define INGESCAPEAPI_COMMON_DLLSPEC
 #endif
 
-//Macro to avoid "unused parameter" warnings
-#define INGESCAPE_UNUSED(x) (void)x;
-
 #include <stdbool.h>
 #include <string.h>
 #include <zyre.h>

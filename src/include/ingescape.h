@@ -32,6 +32,9 @@
 #   define CHECK_PRINTF(a)
 #endif
 
+//Macro to avoid "unused parameter" warnings
+#define IGS_UNUSED(x) (void)x;
+
 //////////////////////////////////////////////////
 //initialization and control
 
@@ -254,18 +257,6 @@ PUBLIC void igs_setRequestOutputsFromMappedAgents(bool notify);
 PUBLIC bool igs_getRequestOutputsFromMappedAgents(void);
 
 
-//logs management
-PUBLIC void igs_setVerbose(bool verbose); //enable log in console (disabled by default)
-PUBLIC bool igs_isVerbose(void);
-PUBLIC void igs_setUseColorVerbose(bool useColor); //use colors in console
-PUBLIC bool igs_getUseColorVerbose(void);
-PUBLIC void igs_setLogStream(bool useLogStream); //enable log in socket
-PUBLIC bool igs_getLogStream(void);
-PUBLIC void igs_setLogInFile(bool useLogFile); //enable log in file
-PUBLIC bool igs_getLogInFile(void);
-PUBLIC void igs_setLogPath(const char *path); //default directory is ~/ on UNIX systems and current PATH on Windows
-PUBLIC char* igs_getLogPath(void); // must be freed by caller
-
 /* Logs policy
  - fatal : Events that force application termination.
  - error : Events that are fatal to the current operation but not the whole application.
@@ -282,6 +273,19 @@ typedef enum {
     IGS_LOG_ERROR,
     IGS_LOG_FATAL
 } igs_logLevel_t;
+
+//logs management
+PUBLIC void igs_setVerbose(bool verbose); //enable logs in console (ERROR and FATAL are always displayed)
+PUBLIC bool igs_isVerbose(void);
+PUBLIC void igs_setUseColorVerbose(bool useColor); //use colors in console
+PUBLIC bool igs_getUseColorVerbose(void);
+PUBLIC void igs_setLogStream(bool useLogStream); //enable logs in socket stream
+PUBLIC bool igs_getLogStream(void);
+PUBLIC void igs_setLogInFile(bool useLogFile); //enable logs in file
+PUBLIC bool igs_getLogInFile(void);
+PUBLIC void igs_setLogPath(const char *path); //default directory is ~/ on UNIX systems and current PATH on Windows
+PUBLIC char* igs_getLogPath(void); // must be freed by caller
+
 PUBLIC void igs_setLogLevel (igs_logLevel_t level); //set log level in console, default is IGS_LOG_INFO
 PUBLIC igs_logLevel_t igs_getLogLevel(void);
 PUBLIC void igs_log(igs_logLevel_t, const char *function, const char *format, ...)  CHECK_PRINTF (3);

@@ -540,8 +540,8 @@ static void json_add_map_out_to_hash (mapping_element_t** hasht,
 // parse a tab of mapping category type and add them into the corresponding hash table
 static void json_add_map_cat_to_hash (mapping_element_t** hasht,
                                        yajl_val current_map_out){
-    INGESCAPE_UNUSED(hasht)
-    INGESCAPE_UNUSED(current_map_out)
+    IGS_UNUSED(hasht)
+    IGS_UNUSED(current_map_out)
 
     return;
 //    const char* agent_name;
