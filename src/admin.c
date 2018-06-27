@@ -217,7 +217,7 @@ void igs_log(igs_logLevel_t level, const char *function, const char *fmt, ...){
         }
         if (access(admin_logFile, W_OK) == -1){
             printf("need to create log file: %s\n", admin_logFile);
-            if (fp == NULL){
+            if (fp != NULL){
                 fclose(fp);
                 fp = NULL;
             }
