@@ -63,6 +63,105 @@ RecordsSupervisionController::~RecordsSupervisionController()
     _modelManager = NULL;
 }
 
+
+/**
+ * @brief Custom setter on is recording command for the scenario
+ * @param is recording flag
+ */
+void RecordsSupervisionController::setisRecording(bool isRecording)
+{
+    if(_isRecording != isRecording)
+    {
+        _isRecording = isRecording;
+
+        Q_EMIT isRecordingChanged(_isRecording);
+
+        if (_recorderAgent != NULL)
+        {
+            QStringList peerIdsList = QStringList(_recorderAgent->peerId());
+            QString command = _isRecording ? "START_RECORD" : "STOP_RECORD";
+
+            Q_EMIT commandAskedToAgent(peerIdsList, command);
+        }
+
+        // Update display of elapsed time
+        if (isRecording)
+        {
+            _timerToDisplayTime.start();
+        }
+        else
+        {
+            _timerToDisplayTime.stop();
+            setcurrentRecordTime(QTime::fromMSecsSinceStartOfDay(0));
+        }
+    }
+}
+
+
+/**
+ * @brief Delete the selected agent from the list
+ */
+void RecordsSupervisionController::deleteSelectedRecord()
+{
+    if ((_modelManager != NULL) && (_selectedRecord != NULL))
+    {
+        qDebug() << "Delete _selectedRecord " << _selectedRecord->recordModel()->name();
+
+        // Notify the recorder that he has to remove entry from db
+        if (_recorderAgent != NULL)
+        {
+            QStringList peerIdsList = QStringList(_recorderAgent->peerId());
+            QString command = QString("DELETE_RECORD=%1").arg(_selectedRecord->recordModel()->id());
+
+            Q_EMIT commandAskedToAgent(peerIdsList, command);
+        }
+
+        // Remove it from the list
+        _recordsList.remove(_selectedRecord);
+
+        // Delete each model of record
+        _modelManager->deleteRecordModel(_selectedRecord->recordModel());
+
+        // Delete the view model of record
+        RecordVM* temp = _selectedRecord;
+        setselectedRecord(NULL);
+        delete temp;
+    }
+}
+
+
+/**
+ * @brief Controls the selected record from the list
+ * @param recordId
+ * @param startPlaying
+ */
+void RecordsSupervisionController::controlRecord(QString recordId, bool startPlaying)
+{
+    if ((_recorderAgent != NULL) && _mapFromRecordIdToViewModel.contains(recordId))
+    {
+        RecordVM* recordVM = _mapFromRecordIdToViewModel.value(recordId);
+
+        QStringList peerIdsList = QStringList(_recorderAgent->peerId());
+        QString command = "";
+
+        if (startPlaying)
+        {
+            command = QString("PLAY_RECORD=%1").arg(recordId);
+            setplayingRecord(recordVM);
+        }
+        else
+        {
+            command = QString("PAUSE_RECORD=%1").arg(recordId);
+            setplayingRecord(NULL);
+        }
+
+        setisLoadingRecord(true);
+
+        Q_EMIT commandAskedToAgent(peerIdsList, command);
+    }
+}
+
+
 /**
  * @brief Slot when the list of records model changes
  * @param records
@@ -77,10 +176,14 @@ void RecordsSupervisionController::onRecordsListChanged(QList<RecordM*> newRecor
     }
 
     QList<RecordVM*> recordsToAdd;
-    foreach (RecordM* model, newRecords) {
-        RecordVM* vm = new RecordVM(model);
-        recordsToAdd.append(vm);
-        _mapFromRecordIdToViewModel.insert(model->id(), vm);
+    foreach (RecordM* model, newRecords)
+    {
+        if (model != NULL)
+        {
+            RecordVM* vm = new RecordVM(model);
+            recordsToAdd.append(vm);
+            _mapFromRecordIdToViewModel.insert(model->id(), vm);
+        }
     }
 
     _recordsList.append(recordsToAdd);
@@ -93,9 +196,12 @@ void RecordsSupervisionController::onRecordsListChanged(QList<RecordM*> newRecor
  */
 void RecordsSupervisionController::onRecordAdded(RecordM* model)
 {
-    RecordVM* vm = new RecordVM(model);
-    _recordsList.insert(0, vm);
-    _mapFromRecordIdToViewModel.insert(model->id(), vm);
+    if (model != NULL)
+    {
+        RecordVM* vm = new RecordVM(model);
+        _recordsList.insert(0, vm);
+        _mapFromRecordIdToViewModel.insert(model->id(), vm);
+    }
 }
 
 
@@ -105,16 +211,18 @@ void RecordsSupervisionController::onRecordAdded(RecordM* model)
  */
 void RecordsSupervisionController::onAgentModelCreated(AgentM* model)
 {
-    if (model != NULL && model->isRecorder() && model != _recorderAgent)
+    if ((model != NULL) && model->isRecorder() && (model != _recorderAgent))
     {
         setrecorderAgent(model);
 
-        // Retrieve all records
-        Q_EMIT commandAskedToAgent(_recorderAgent->peerId().split(","), "GET_RECORDS");
         qDebug() << "New recorder on the network, get all its records";
+
+        QStringList peerIdsList = QStringList(_recorderAgent->peerId());
+
+        // Retrieve all records
+        Q_EMIT commandAskedToAgent(peerIdsList, "GET_RECORDS");
     }
 }
-
 
 
 /**
@@ -122,13 +230,12 @@ void RecordsSupervisionController::onAgentModelCreated(AgentM* model)
  */
 void RecordsSupervisionController::onEndOfRecordReceived()
 {
-    if(_playingRecord != NULL)
+    if (_playingRecord != NULL)
     {
         setplayingRecord(NULL);
     }
     setisLoadingRecord(false);
 }
-
 
 
 /**
@@ -138,6 +245,7 @@ void RecordsSupervisionController::onLoadingRecordReceived()
 {
     setisLoadingRecord(true);
 }
+
 
 /**
  * @brief Slot called when a record has been loaded
@@ -149,90 +257,6 @@ void RecordsSupervisionController::onLoadedRecordReceived()
 
 
 /**
- * @brief Delete the selected agent from the list
- */
-void RecordsSupervisionController::deleteSelectedRecord()
-{
-    if ((_modelManager != NULL) && (_selectedRecord != NULL))
-    {
-        qDebug() << "Delete _selectedRecord " << _selectedRecord->recordModel()->name();
-
-        // Notify the recorder that he has to remove entry from db
-        if(_recorderAgent != NULL)
-        {
-            QString idToRemove = _selectedRecord->recordModel()->id();
-            Q_EMIT commandAskedToAgent(_recorderAgent->peerId().split(","), QString("DELETE_RECORD#%1").arg(idToRemove));
-        }
-
-        // Remove it from the list
-        _recordsList.remove(_selectedRecord);
-
-        // Delete each model of record
-        _modelManager->deleteRecordModel(_selectedRecord->recordModel());
-
-        // Delete the view model of record
-        delete _selectedRecord;
-
-        setselectedRecord(NULL);
-    }
-}
-
-
-/**
- * @brief Delete the selected agent from the list
- */
-void RecordsSupervisionController::controlRecord(QString recordId, bool startPlaying)
-{
-    if(_recorderAgent != NULL)
-    {
-        if (_mapFromRecordIdToViewModel.contains(recordId))
-        {
-            RecordVM* recordVM = _mapFromRecordIdToViewModel.value(recordId);
-
-            QString command = startPlaying? "PLAY_RECORD#" : "PAUSE_RECORD#";
-            setplayingRecord(startPlaying ? recordVM : NULL);
-
-            setisLoadingRecord(true);
-
-            Q_EMIT commandAskedToAgent(_recorderAgent->peerId().split(","), QString("%1%2").arg(command).arg(recordId));
-        }
-    }
-}
-
-
-/**
- * @brief Custom setter on is recording command for the scenario
- * @param is recording flag
- */
-void RecordsSupervisionController::setisRecording(bool isRecording)
-{
-    if(_isRecording != isRecording)
-    {
-        _isRecording = isRecording;
-
-        Q_EMIT isRecordingChanged(_isRecording);
-
-        if(_recorderAgent != NULL)
-        {
-            QString command = _isRecording? "START_RECORD" : "STOP_RECORD";
-            Q_EMIT commandAskedToAgent(_recorderAgent->peerId().split(","), command);
-        }
-
-        // Update display of elapsed time
-        if(isRecording)
-        {
-            _timerToDisplayTime.start();
-        }
-        else
-        {
-            _timerToDisplayTime.stop();
-            setcurrentRecordTime(QTime::fromMSecsSinceStartOfDay(0));
-        }
-    }
-}
-
-
-/**
  * @brief Called at each interval of our timer to display elapsed time
  */
 void RecordsSupervisionController::_onTimeout_DisplayTime()
@@ -240,17 +264,21 @@ void RecordsSupervisionController::_onTimeout_DisplayTime()
     setcurrentRecordTime(_currentRecordTime.addMSecs(INTERVAL_ELAPSED_TIME));
 }
 
+
 /**
  * @brief Aims at deleting VM and model of a record
  * @param record
  */
 void RecordsSupervisionController::_deleteRecordVM(RecordVM* record)
 {
-    // Delete each model of record
-    _modelManager->deleteRecordModel(record->recordModel());
+    if (record != NULL)
+    {
+        // Delete each model of record
+        _modelManager->deleteRecordModel(record->recordModel());
 
-    // Delete the view model of record
-    delete record;
+        // Delete the view model of record
+        delete record;
+    }
 }
 
 

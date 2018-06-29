@@ -78,8 +78,11 @@ public:
 
     /**
      * @brief Controls the selected record from the list
+     * @param recordId
+     * @param startPlaying
      */
     Q_INVOKABLE void controlRecord(QString recordId, bool startPlaying);
+
 
 Q_SIGNALS:
 

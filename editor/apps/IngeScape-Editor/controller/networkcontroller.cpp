@@ -33,9 +33,6 @@ static const QString prefix_Definition = "EXTERNAL_DEFINITION#";
 static const QString prefix_Mapping = "EXTERNAL_MAPPING#";
 static const QString prefix_AllRecords = "RECORDS_LIST#";
 static const QString prefix_NewRecord = "NEW_RECORD#";
-static const QString prefix_LoadingRecord = "LOADING_RECORD#";
-static const QString prefix_LoadedRecord = "RECORD_LOADED#";
-static const QString prefix_EndedRecord = "RECORD_ENDED#";
 
 static const QString prefix_Muted = "MUTED=";
 static const QString prefix_Frozen = "FROZEN=";
@@ -47,6 +44,10 @@ static const QString prefix_LogInFile = "LOG_IN_FILE=";
 static const QString prefix_LogFilePath = "LOG_FILE_PATH=";
 static const QString prefix_DefinitionFilePath = "DEFINITION_FILE_PATH=";
 static const QString prefix_MappingFilePath = "MAPPING_FILE_PATH=";
+
+static const QString prefix_LoadingRecord = "LOADING_RECORD";
+static const QString prefix_LoadedRecord = "RECORD_LOADED";
+static const QString prefix_EndedRecord = "RECORD_ENDED";
 
 
 /**
@@ -312,24 +313,18 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
             // Loading record
             else if (message.startsWith(prefix_LoadingRecord))
             {
-                message.remove(0, prefix_LoadingRecord.length());
-
                 // Emit the signal "Loading record Received"
                 Q_EMIT networkController->loadingRecordReceived();
             }
             // Loaded record
             else if (message.startsWith(prefix_LoadedRecord))
             {
-                message.remove(0, prefix_LoadedRecord.length());
-
                 // Emit the signal "Loaded record Received"
                 Q_EMIT networkController->loadedRecordReceived();
             }
             // End of record
             else if (message.startsWith(prefix_EndedRecord))
             {
-                message.remove(0, prefix_EndedRecord.length());
-
                 // Emit the signal "End of record Received"
                 Q_EMIT networkController->endOfRecordReceived();
             }

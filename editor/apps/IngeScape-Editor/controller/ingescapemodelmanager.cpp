@@ -603,7 +603,7 @@ void IngeScapeModelManager::onMappingReceived(QString peerId, QString agentName,
 
 /**
  * @brief Occurs when records from DB have been received
- * @param mappingJSON
+ * @param recordsJSON
  */
 void IngeScapeModelManager::onAllRecordsReceived(QString recordsJSON)
 {
@@ -619,7 +619,7 @@ void IngeScapeModelManager::onAllRecordsReceived(QString recordsJSON)
 
 /**
  * @brief Occurs when records from DB have been received
- * @param mappingJSON
+ * @param recordsJSON
  */
 void IngeScapeModelManager::onNewRecordReceived(QString recordJSON)
 {
@@ -628,10 +628,13 @@ void IngeScapeModelManager::onNewRecordReceived(QString recordJSON)
         QByteArray byteArrayOfJson = recordJSON.toUtf8();
         QList<RecordM*> tmpRecords = _jsonHelper->createRecordModelList(byteArrayOfJson);
 
-        if(tmpRecords.count() > 0)
+        // FIXME: == 1
+        if (tmpRecords.count() > 0)
         {
             RecordM* newRecord = tmpRecords.at(0);
+
             _recordsList.insert(0, newRecord);
+
             Q_EMIT recordAdded(newRecord);
         }
     }
