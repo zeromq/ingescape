@@ -150,8 +150,10 @@ gcc -o myFirstAgent main.o -L/usr/local/lib -lingescape
 You can also use an example [Qt project](/code/FirstAgent_Qt.zip) embedding ingeScape in a simple graphical Qt application with an empty UI.
 
 ### Compile on macOS (three methods)
-#### GCC
+#### GCC/Clang
 The first compilation method is the same as the one for Linux, exactly with the same assumptions for headers and libraries location.
+
+*NB: on macOS gcc is an alias for clang. Both can be used indifferently.*
 
 #### Xcode
 Another method is the use of Apple Xcode with a dedicated project. To save your time, such a project, including the code, is available [here](/code/firstAgent.zip).
