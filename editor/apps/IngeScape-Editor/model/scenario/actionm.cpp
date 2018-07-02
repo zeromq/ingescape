@@ -52,7 +52,8 @@ QString ValidationDurationTypes::enumToString(int value)
  * @brief Default constructor
  * @param parent
  */
-ActionM::ActionM(QString name, QObject *parent) : QObject(parent),
+ActionM::ActionM(int uid, QString name, QObject *parent) : QObject(parent),
+    _uid(uid),
     _name(name),
     _validityDurationType(ValidationDurationTypes::IMMEDIATE),
     _validityDuration(-1),

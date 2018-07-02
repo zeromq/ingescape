@@ -226,39 +226,6 @@ void ActionVM::setstartTimeString(QString value)
 
 
 /**
- * @brief Copy from another action view model
- * @param action VM to copy
- */
-void ActionVM::copyFrom(ActionVM* actionVM)
-{
-    if (actionVM != NULL)
-    {
-        ActionM* originalModel = actionVM->modelM();
-
-        // Copy the model
-        if (originalModel != NULL)
-        {
-            ActionM* model = new ActionM(originalModel->name());
-            model->copyFrom(originalModel);
-
-            setmodelM(model);
-        }
-        else {
-            setmodelM(NULL);
-        }
-
-        // Copy the view model attributes
-        setcolor(actionVM->color());
-        setstartTime(actionVM->startTime());
-        setendTime(actionVM->endTime());
-        setlineInTimeLine(actionVM->lineInTimeLine());
-        setstartTimeString(actionVM->startTimeString());
-        setareAllConditionsValid(actionVM->areAllConditionsValid());
-    }
-}
-
-
-/**
  * @brief Notify our action that its effects has been executed
  * @param currentTimeInMilliSeconds
  */

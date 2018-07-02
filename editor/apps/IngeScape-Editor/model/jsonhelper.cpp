@@ -353,11 +353,14 @@ scenario_import_actions_lists_t *JsonHelper::initActionsList(QByteArray byteArra
                     ActionM* actionM = NULL;
 
                     QJsonObject jsonAction = jsonTmp.toObject();
+
+                    // FIXME TODO
+                    //QJsonValue jsonId = jsonAction.value("id");
                     QJsonValue jsonName = jsonAction.value("name");
                     if(jsonName.isString())
                     {
                         // Create the model
-                        actionM = new ActionM(jsonName.toString());
+                        actionM = new ActionM(-1, jsonName.toString());
 
                         QJsonValue jsonValue = jsonAction.value("validity_duration_type");
                         if(jsonValue.isString())
@@ -508,7 +511,7 @@ scenario_import_actions_lists_t *JsonHelper::initActionsList(QByteArray byteArra
                             ActionM * actionM = mapActionsMFromActionName.value(actionName);
                             if(actionM != NULL)
                             {
-                                ActionVM * actionVM = new ActionVM(actionM,jsonActionStartTime.toDouble());
+                                ActionVM * actionVM = new ActionVM(actionM, jsonActionStartTime.toDouble());
                                 if(jsonActionColor.isString())
                                 {
                                     actionVM->setcolor(jsonActionColor.toString());

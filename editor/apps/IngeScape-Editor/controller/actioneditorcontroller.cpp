@@ -16,8 +16,15 @@
 
 #include <QDebug>
 
+// Unique id of the last created model of action
+static int UID_LAST_CREATED_MODEL_OF_ACTION = -1;
+
+
 /**
- * @brief Default constructor
+ * @brief Constructor
+ * @param actionName
+ * @param originalAction
+ * @param listAgentsInMapping
  * @param parent
  */
 ActionEditorController::ActionEditorController(QString actionName,
@@ -33,7 +40,9 @@ ActionEditorController::ActionEditorController(QString actionName,
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    _editedAction = new ActionM(actionName);
+    UID_LAST_CREATED_MODEL_OF_ACTION++;
+
+    _editedAction = new ActionM(UID_LAST_CREATED_MODEL_OF_ACTION, actionName);
 
     if (_originalAction != NULL) {
         _editedAction->copyFrom(_originalAction);

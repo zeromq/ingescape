@@ -55,12 +55,16 @@ class ActionEditorController: public QObject
 public:
 
     /**
-     * @brief Default constructor
-     * @param action name
-     * @param original action
+     * @brief Constructor
+     * @param actionName
+     * @param originalAction
+     * @param listAgentsInMapping
      * @param parent
      */
-    explicit ActionEditorController(QString actionName, ActionM * originalAction, I2CustomItemSortFilterListModel<AgentInMappingVM>* listAgentsInMapping, QObject *parent = 0);
+    explicit ActionEditorController(QString actionName,
+                                    ActionM * originalAction,
+                                    I2CustomItemSortFilterListModel<AgentInMappingVM>* listAgentsInMapping,
+                                    QObject *parent = 0);
 
 
     /**

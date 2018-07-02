@@ -162,7 +162,7 @@ void ScenarioController::importScenarioFromJson(QByteArray byteArrayOfJson)
         if(scenarioToImport != NULL)
         {
             // Append the list of actions
-            if (scenarioToImport->actionsInTableList.count() > 0)
+            if (!scenarioToImport->actionsInTableList.isEmpty())
             {
                 // Add each actions to out list
                 foreach (ActionM* actionM, scenarioToImport->actionsInTableList)
@@ -171,16 +171,16 @@ void ScenarioController::importScenarioFromJson(QByteArray byteArrayOfJson)
                     _actionsList.append(actionM);
 
                     // Add action into the map
-                    _mapActionsFromActionName.insert(actionM->name(),actionM);
+                    _mapActionsFromActionName.insert(actionM->name(), actionM);
                 }
             }
 
             // Set the list of actions in palette
-            if (scenarioToImport->actionsInPaletteList.count() > 0)
+            if (!scenarioToImport->actionsInPaletteList.isEmpty())
             {
                 foreach (ActionInPaletteVM* actionInPalette, scenarioToImport->actionsInPaletteList)
                 {
-                    if(actionInPalette->modelM() != NULL)
+                    if (actionInPalette->modelM() != NULL)
                     {
                         setActionInPalette(actionInPalette->indexInPanel(), actionInPalette->modelM());
                     }
@@ -191,7 +191,7 @@ void ScenarioController::importScenarioFromJson(QByteArray byteArrayOfJson)
             }
 
             // Append the list of actions in timeline
-            if(scenarioToImport->actionsInTimelineList.count() > 0)
+            if (!scenarioToImport->actionsInTimelineList.isEmpty())
             {
                 // Add each actionVM in to the right line of our timeline
                 foreach (ActionVM* actionVM, scenarioToImport->actionsInTimelineList)
@@ -317,7 +317,7 @@ void ScenarioController::openActionEditorWithModel(ActionM* action)
     else
     {
         // Create action editor controller
-        ActionEditorController* actionEditorC = new ActionEditorController(_buildNewActionName(), action, agentsInMappingList());
+        ActionEditorController* actionEditorC = new ActionEditorController(_buildNewActionName(), NULL, agentsInMappingList());
 
         _hashActionEditorControllerFromModelOfAction.insert(actionEditorC->editedAction(), actionEditorC);
 
@@ -360,6 +360,7 @@ void ScenarioController::openActionEditorWithViewModel(ActionVM* action)
             ActionVM* temporaryActionVM = new ActionVM(NULL, -1);
             temporaryActionVM->setstartTimeString(action->startTimeString());
             temporaryActionVM->setcolor(action->color());
+
             actionEditorC->seteditedViewModel(temporaryActionVM);
 
             // Add to the list of opened action editors
@@ -804,7 +805,7 @@ bool ScenarioController::canInsertActionVMTo(ActionM* actionMToInsert, int time,
  */
 void ScenarioController::executeEffectsOfAction(ActionM* action)
 {
-    if ((action != NULL) && (action->effectsList()->count() > 0))
+    if ((action != NULL) && !action->effectsList()->isEmpty())
     {
         // Active the mapping if needed
         if ((_modelManager != NULL) && !_modelManager->isMappingActivated()) {
@@ -1274,12 +1275,15 @@ QString ScenarioController::_buildNewActionName()
 {
     int index = _mapActionsFromActionName.count() + 1;
 
-    QString tmpName = "Action_" + QString("%1").arg(index, 3, 10, QChar('0'));
+    // QString::arg(int a, int fieldWidth = 0, int base = 10, QChar fillChar = QLatin1Char(' '))
+    // The a argument is expressed in base base, which is 10 by default.
+    // fieldWidth specifies the minimum amount of space that a is padded to and filled with the character fillChar.
+    QString tmpName = QString("Action_%1").arg(index, 3, 10, QChar('0'));
 
     while(_mapActionsFromActionName.contains(tmpName))
     {
         index++;
-        tmpName = "Action_" + QString("%1").arg(index, 3, 10, QChar('0'));
+        tmpName = QString("Action_%1").arg(index, 3, 10, QChar('0'));
     }
 
     return tmpName;

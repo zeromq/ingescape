@@ -39,6 +39,9 @@ class ActionM: public QObject
 {
     Q_OBJECT
 
+    // Unique identifier of our action
+    I2_CPP_NOSIGNAL_PROPERTY(int, uid)
+
     // Action name
     I2_QML_PROPERTY(QString, name)
 
@@ -93,10 +96,12 @@ class ActionM: public QObject
 public:
 
     /**
-     * @brief Default constructor
+     * @brief Constructor
+     * @param uid
+     * @param name
      * @param parent
      */
-    explicit ActionM(QString name, QObject *parent = 0);
+    explicit ActionM(int uid, QString name, QObject *parent = 0);
 
 
     /**

@@ -93,13 +93,6 @@ public:
 
 
     /**
-     * @brief Copy from another action view model
-     * @param action VM to copy
-     */
-    void copyFrom(ActionVM* actionVM);
-
-
-    /**
      * @brief Notify our action that its effects has been executed
      * @param currentTimeInMilliSeconds
      */
