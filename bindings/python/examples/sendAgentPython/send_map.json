@@ -1,0 +1,10 @@
+{
+    "mapping": {
+        
+        "name": "Mapping name of sendAgent in INGESCAPE Editor",
+        "description": "Mapping description of sendAgent in INGESCAPE Editor",
+        "version": "0.0",
+        "mapping_out": []
+    }
+
+}
