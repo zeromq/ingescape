@@ -350,103 +350,105 @@ scenario_import_actions_lists_t *JsonHelper::initActionsList(QByteArray byteArra
             {
                 if (jsonTmp.isObject())
                 {
+                    QJsonObject jsonAction = jsonTmp.toObject();
                     ActionM* actionM = NULL;
 
-                    QJsonObject jsonAction = jsonTmp.toObject();
-
-                    // FIXME TODO
-                    //QJsonValue jsonId = jsonAction.value("id");
-                    QJsonValue jsonName = jsonAction.value("name");
-                    if(jsonName.isString())
+                    if (jsonAction.contains("uid") && jsonAction.contains("name"))
                     {
-                        // Create the model
-                        actionM = new ActionM(-1, jsonName.toString());
+                        QJsonValue jsonUID = jsonAction.value("uid");
+                        QJsonValue jsonName = jsonAction.value("name");
 
-                        QJsonValue jsonValue = jsonAction.value("validity_duration_type");
-                        if(jsonValue.isString())
+                        if (jsonUID.isDouble() && jsonName.isString())
                         {
-                            int nValidationDurationType = ValidationDurationTypes::staticEnumFromKey(jsonValue.toString().toUpper());
-                            actionM->setvalidityDurationType(static_cast<ValidationDurationTypes::Value>(nValidationDurationType));
-                        }
+                            // Create the model of action
+                            actionM = new ActionM((int)jsonUID.toDouble(), jsonName.toString());
 
-                        jsonValue = jsonAction.value("validity_duration_value");
-                        if(jsonValue.isString())
-                        {
-                            actionM->setvalidityDurationString(jsonValue.toString());
-                        }
-
-                        jsonValue = jsonAction.value("shall_revert");
-                        if(jsonValue.isBool())
-                        {
-                            actionM->setshallRevert(jsonValue.toBool());
-                        }
-
-                        jsonValue = jsonAction.value("shall_revert_at_validity_end");
-                        if(jsonValue.isBool())
-                        {
-                            actionM->setshallRevertWhenValidityIsOver(jsonValue.toBool());
-                        }
-
-                        jsonValue = jsonAction.value("shall_revert_after_time");
-                        if(jsonValue.isBool())
-                        {
-                            actionM->setshallRevertAfterTime(jsonValue.toBool());
-                        }
-
-                        jsonValue = jsonAction.value("shall_rearm");
-                        if(jsonValue.isBool())
-                        {
-                            actionM->setshallRearm(jsonValue.toBool());
-                        }
-
-                        jsonValue = jsonAction.value("revert_after_time");
-                        if(jsonValue.isString())
-                        {
-                            actionM->setrevertAfterTimeString(jsonValue.toString());
-                        }
-
-                        QJsonValue jsonEffectsList = jsonAction.value("effects");
-                        if(jsonEffectsList.isArray())
-                        {
-                            foreach (QJsonValue jsonEffect, jsonEffectsList.toArray())
+                            QJsonValue jsonValue = jsonAction.value("validity_duration_type");
+                            if(jsonValue.isString())
                             {
-                                if (jsonEffect.isObject())
-                                {
-                                    QJsonObject jsonEffectObj = jsonEffect.toObject();
-                                    ActionEffectVM* effectVM = _parseEffectVMFromJson(jsonEffectObj, listAgentsInMapping);
+                                int nValidationDurationType = ValidationDurationTypes::staticEnumFromKey(jsonValue.toString().toUpper());
+                                actionM->setvalidityDurationType(static_cast<ValidationDurationTypes::Value>(nValidationDurationType));
+                            }
 
-                                    if(effectVM != NULL)
+                            jsonValue = jsonAction.value("validity_duration_value");
+                            if(jsonValue.isString())
+                            {
+                                actionM->setvalidityDurationString(jsonValue.toString());
+                            }
+
+                            jsonValue = jsonAction.value("shall_revert");
+                            if(jsonValue.isBool())
+                            {
+                                actionM->setshallRevert(jsonValue.toBool());
+                            }
+
+                            jsonValue = jsonAction.value("shall_revert_at_validity_end");
+                            if(jsonValue.isBool())
+                            {
+                                actionM->setshallRevertWhenValidityIsOver(jsonValue.toBool());
+                            }
+
+                            jsonValue = jsonAction.value("shall_revert_after_time");
+                            if(jsonValue.isBool())
+                            {
+                                actionM->setshallRevertAfterTime(jsonValue.toBool());
+                            }
+
+                            jsonValue = jsonAction.value("shall_rearm");
+                            if(jsonValue.isBool())
+                            {
+                                actionM->setshallRearm(jsonValue.toBool());
+                            }
+
+                            jsonValue = jsonAction.value("revert_after_time");
+                            if(jsonValue.isString())
+                            {
+                                actionM->setrevertAfterTimeString(jsonValue.toString());
+                            }
+
+                            QJsonValue jsonEffectsList = jsonAction.value("effects");
+                            if(jsonEffectsList.isArray())
+                            {
+                                foreach (QJsonValue jsonEffect, jsonEffectsList.toArray())
+                                {
+                                    if (jsonEffect.isObject())
                                     {
-                                        actionM->addEffectToList(effectVM);
+                                        QJsonObject jsonEffectObj = jsonEffect.toObject();
+                                        ActionEffectVM* effectVM = _parseEffectVMFromJson(jsonEffectObj, listAgentsInMapping);
+
+                                        if(effectVM != NULL)
+                                        {
+                                            actionM->addEffectToList(effectVM);
+                                        }
                                     }
                                 }
                             }
-                        }
 
-                        QJsonValue jsonConditionsList = jsonAction.value("conditions");
-                        if(jsonConditionsList.isArray())
-                        {
-                            foreach (QJsonValue jsonCondition, jsonConditionsList.toArray())
+                            QJsonValue jsonConditionsList = jsonAction.value("conditions");
+                            if(jsonConditionsList.isArray())
                             {
-                                if (jsonCondition.isObject())
+                                foreach (QJsonValue jsonCondition, jsonConditionsList.toArray())
                                 {
-                                    QJsonObject jsonConditionObj = jsonCondition.toObject();
-                                    ActionConditionVM* conditionVM = _parseConditionsVMFromJson(jsonConditionObj, listAgentsInMapping);
-
-                                    if(conditionVM != NULL)
+                                    if (jsonCondition.isObject())
                                     {
-                                        actionM->addConditionToList(conditionVM);
+                                        QJsonObject jsonConditionObj = jsonCondition.toObject();
+                                        ActionConditionVM* conditionVM = _parseConditionsVMFromJson(jsonConditionObj, listAgentsInMapping);
+
+                                        if(conditionVM != NULL)
+                                        {
+                                            actionM->addConditionToList(conditionVM);
+                                        }
                                     }
                                 }
                             }
-                        }
 
+                        }
                     }
 
-                    if(actionM != NULL)
+                    if (actionM != NULL)
                     {
                         actionsListToImport.append(actionM);
-                        mapActionsMFromActionName.insert(actionM->name(),actionM);
+                        mapActionsMFromActionName.insert(actionM->name(), actionM);
                     }
                 }
             }
@@ -478,7 +480,7 @@ scenario_import_actions_lists_t *JsonHelper::initActionsList(QByteArray byteArra
                                 if(index >= 0 && index < 9)
                                 {
                                     // Add action in palette
-                                    actionsInPalette.append(new ActionInPaletteVM(actionM,index));
+                                    actionsInPalette.append(new ActionInPaletteVM(actionM, index));
                                 }
                             }
                         }
@@ -559,6 +561,7 @@ QJsonObject JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<Action
     {
         // Create properties
         QJsonObject jsonAgent;
+        jsonAgent.insert("uid", actionM->uid());
         jsonAgent.insert("name", actionM->name());
         jsonAgent.insert("validity_duration_type", ValidationDurationTypes::staticEnumToKey(actionM->validityDurationType()));
         jsonAgent.insert("validity_duration_value", actionM->validityDurationString());
@@ -802,7 +805,7 @@ QList< mapping_agent_import_t* > JsonHelper::importMapping(QByteArray byteArrayO
 
                             if(xStr.isEmpty() == false && yStr.isEmpty() == false)
                             {
-                                mappingAgent->position = QPointF(xStr.toFloat(),yStr.toFloat());
+                                mappingAgent->position = QPointF(xStr.toFloat(), yStr.toFloat());
                             }
                         }
 
