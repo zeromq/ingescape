@@ -448,9 +448,9 @@ static definition* json_parse_definition (yajl_val node) {
 static void json_add_map_out_to_hash (mapping_element_t** hasht,
                                        yajl_val current_map_out){
 
-    const char* input_name;
-    const char* agent_name;
-    const char* output_name;
+    const char* input_name = NULL;
+    const char* agent_name = NULL;
+    const char* output_name = NULL;
     yajl_val v;
     const char * path_in_current[] = { "", (const char *) 0 };
 
