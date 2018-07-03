@@ -40,12 +40,17 @@ ActionEditorController::ActionEditorController(QString actionName,
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
+    // Increment the unique id of the last created model of action
     UID_LAST_CREATED_MODEL_OF_ACTION++;
 
     _editedAction = new ActionM(UID_LAST_CREATED_MODEL_OF_ACTION, actionName);
 
-    if (_originalAction != NULL) {
+    if (_originalAction != NULL)
+    {
         _editedAction->copyFrom(_originalAction);
+
+        // Cancel the increment because the edited action uses now (after the call to "copyFrom") the uid of the original action
+        UID_LAST_CREATED_MODEL_OF_ACTION--;
     }
 }
 

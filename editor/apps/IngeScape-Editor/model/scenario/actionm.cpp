@@ -95,7 +95,9 @@ void ActionM::copyFrom(ActionM* actionModel)
 {
     if (actionModel != NULL)
     {
+        setuid(actionModel->uid());
         setname(actionModel->name());
+
         setvalidityDurationType(actionModel->validityDurationType());
         setvalidityDuration(actionModel->validityDuration());
         setvalidityDurationString(actionModel->validityDurationString());

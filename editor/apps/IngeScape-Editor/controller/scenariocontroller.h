@@ -474,6 +474,9 @@ private:
     // Map of actions model from the action name
     QHash<QString, ActionM*> _mapActionsFromActionName;
 
+    // Hash table from UID to the corresponding model of action
+    QHash<int, ActionM*> _hashFromUidToModelOfAction;
+
     // Map of actions VM in the timeline from the action model
     QHash<ActionM*, QList<ActionVM*> > _mapActionsVMsInTimelineFromActionModel;
 
