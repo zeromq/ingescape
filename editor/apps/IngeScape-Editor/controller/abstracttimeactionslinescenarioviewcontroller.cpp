@@ -288,7 +288,7 @@ int AbstractTimeActionslineScenarioViewController::convertAbscissaInCoordinateSy
  */
 QTime AbstractTimeActionslineScenarioViewController::convertAbscissaInCoordinateSystemToQTime(qreal xValue, qreal extraQmlUpdateField)
 {
-    int millisecondsTime = convertAbscissaInCoordinateSystemToTimeInMilliseconds(xValue,extraQmlUpdateField);
+    int millisecondsTime = convertAbscissaInCoordinateSystemToTimeInMilliseconds(xValue, extraQmlUpdateField);
 
     return QTime::fromMSecsSinceStartOfDay(millisecondsTime);
 }
@@ -305,7 +305,7 @@ QTime AbstractTimeActionslineScenarioViewController::convertAbscissaInCoordinate
  */
 qreal AbstractTimeActionslineScenarioViewController::convertQTimeToAbscissaInCoordinateSystem(QTime time, qreal extraQmlUpdateField)
 {
-    return convertTimeInMillisecondsToAbscissaInCoordinateSystem(time.msecsSinceStartOfDay(),extraQmlUpdateField);
+    return convertTimeInMillisecondsToAbscissaInCoordinateSystem(time.msecsSinceStartOfDay(), extraQmlUpdateField);
 }
 
 

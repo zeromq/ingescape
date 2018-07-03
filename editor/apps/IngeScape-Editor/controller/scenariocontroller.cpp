@@ -75,7 +75,7 @@ ScenarioController::ScenarioController(IngeScapeModelManager* modelManager,
     I2CustomItemSortFilterListModel<ActionVM>* actionVMSortedList = new I2CustomItemSortFilterListModel<ActionVM>();
     actionVMSortedList->setSortProperty("startTime");
     // Add into our map
-    _mapActionsVMsInTimelineFromLineIndex.insert(0,actionVMSortedList);
+    _mapActionsVMsInTimelineFromLineIndex.insert(0, actionVMSortedList);
 
     // Set the sort property for the actionVM in the time line
     _actionsInTimeLine.setSortProperty("startTime");
@@ -215,7 +215,7 @@ void ScenarioController::importScenarioFromJson(QByteArray byteArrayOfJson)
                         actionVMSortedList->append(actionVM);
 
                         // Add into our map
-                        _mapActionsVMsInTimelineFromLineIndex.insert(lineNumber,actionVMSortedList);
+                        _mapActionsVMsInTimelineFromLineIndex.insert(lineNumber, actionVMSortedList);
                     }
 
                     // Add the new action VM to our map
@@ -612,7 +612,7 @@ void ScenarioController::removeActionVMFromTimeLine(ActionVM* actionVM)
         {
             QList<ActionVM*> actionsVMsList = _mapActionsVMsInTimelineFromActionModel.value(actionVM->modelM());
             actionsVMsList.removeAll(actionVM);
-            _mapActionsVMsInTimelineFromActionModel.insert(actionVM->modelM(),actionsVMsList);
+            _mapActionsVMsInTimelineFromActionModel.insert(actionVM->modelM(), actionsVMsList);
 
             // Remove the action VM from the timeline map by line number
             if(actionVM->lineInTimeLine() != -1)
@@ -878,7 +878,7 @@ void ScenarioController::moveActionVMAtTimeAndLine(ActionVM* actionVM, int timeI
 {
     if ((actionVM != NULL) && (timeInMilliseconds >= 0) && (lineNumber >= 0))
     {
-        bool canInsert = canInsertActionVMTo(actionVM->modelM(), timeInMilliseconds, lineNumber,actionVM);
+        bool canInsert = canInsertActionVMTo(actionVM->modelM(), timeInMilliseconds, lineNumber, actionVM);
         // Insert our item if possible
         if (canInsert)
         {
@@ -947,7 +947,7 @@ void ScenarioController::moveActionVMAtTimeAndLine(ActionVM* actionVM, int timeI
                     actionVM->setlineInTimeLine(lineNumber);
 
                     // Add into our map
-                    _mapActionsVMsInTimelineFromLineIndex.insert(lineNumber,actionVMSortedList);
+                    _mapActionsVMsInTimelineFromLineIndex.insert(lineNumber, actionVMSortedList);
 
                     // Add an extra line if inserted our actionVM at the last line
                     if (lineNumber >= _linesNumberInTimeLine - 1) {
@@ -1087,7 +1087,7 @@ void ScenarioController::onRearmAction()
  */
 void ScenarioController::onTimeRangeChanged(int startTimeInMilliseconds, int endTimeInMilliseconds)
 {
-    _filteredListActionsInTimeLine.setTimeRange(startTimeInMilliseconds,endTimeInMilliseconds);
+    _filteredListActionsInTimeLine.setTimeRange(startTimeInMilliseconds, endTimeInMilliseconds);
 }
 
 
@@ -1403,7 +1403,7 @@ void ScenarioController::_insertActionVMIntoMapByLineNumber(ActionVM* actionVMTo
                     actionVMToInsert->setlineInTimeLine(lineNumber);
 
                     // Add into our map
-                    _mapActionsVMsInTimelineFromLineIndex.insert(lineNumber,actionVMSortedList);
+                    _mapActionsVMsInTimelineFromLineIndex.insert(lineNumber, actionVMSortedList);
 
                     // Add an extra line if inserted our actionVM at the last line
                     if (lineNumber >= _linesNumberInTimeLine -1)

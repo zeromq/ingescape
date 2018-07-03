@@ -167,7 +167,7 @@ public:
        /**
         * @brief Emitted when the visible time range of our timeline has changed
         */
-       void timeRangeChanged(int viewportTimeRangeStartInMilliseconds,int viewportTimeRangeEndInMilliseconds);
+       void timeRangeChanged(int viewportTimeRangeStartInMilliseconds, int viewportTimeRangeEndInMilliseconds);
 
 
     protected:
