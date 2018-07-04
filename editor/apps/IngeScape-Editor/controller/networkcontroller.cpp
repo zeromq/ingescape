@@ -45,7 +45,6 @@ static const QString prefix_LogFilePath = "LOG_FILE_PATH=";
 static const QString prefix_DefinitionFilePath = "DEFINITION_FILE_PATH=";
 static const QString prefix_MappingFilePath = "MAPPING_FILE_PATH=";
 
-static const QString prefix_LoadingRecord = "LOADING_RECORD";
 static const QString prefix_LoadedRecord = "RECORD_LOADED";
 static const QString prefix_EndedRecord = "RECORD_ENDED";
 
@@ -332,12 +331,6 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
 
                 // Emit the signal "New record Received"
                 Q_EMIT networkController->newRecordReceived(message);
-            }
-            // Loading record
-            else if (message == prefix_LoadingRecord)
-            {
-                // Emit the signal "Loading record Received"
-                Q_EMIT networkController->loadingRecordReceived();
             }
             // Loaded record
             else if (message == prefix_LoadedRecord)

@@ -194,10 +194,6 @@ Q_SIGNALS:
      */
     void endOfRecordReceived();
 
-    /**
-     * @brief Signal emitted when a record is being loaded
-     */
-    void loadingRecordReceived();
 
     /**
      * @brief Signal emitted when a record has been loaded

@@ -80,7 +80,7 @@ void RecordsSupervisionController::setisRecording(bool isRecording)
         if (_isRecorderON && !_peerIdOfRecorder.isEmpty())
         {
             QStringList peerIdsList = QStringList(_peerIdOfRecorder);
-            QString command = _isRecording ? "START_RECORD" : "STOP_RECORD";
+            QString command = _isRecording ? "START_TO_RECORD" : "STOP_TO_RECORD";
 
             Q_EMIT commandAskedToAgent(peerIdsList, command);
         }
@@ -150,14 +150,14 @@ void RecordsSupervisionController::controlRecord(QString recordId, bool startPla
         {
             command = QString("PLAY_RECORD=%1").arg(recordId);
             setplayingRecord(recordVM);
+
+            setisLoadingRecord(true);
         }
         else
         {
-            command = QString("PAUSE_RECORD=%1").arg(recordId);
+            command = QString("STOP_RECORD=%1").arg(recordId);
             setplayingRecord(NULL);
         }
-
-        setisLoadingRecord(true);
 
         Q_EMIT commandAskedToAgent(peerIdsList, command);
     }
@@ -215,17 +215,20 @@ void RecordsSupervisionController::onRecorderExited(QString peerId, QString peer
  * @brief Slot when the list of records model changes
  * @param records
  */
-void RecordsSupervisionController::onRecordsListChanged(QList<RecordM*> newRecords)
+void RecordsSupervisionController::onRecordsListChanged(QList<RecordM*> records)
 {
     QList<RecordVM*> recordsToDelete = _recordsList.toList();
     _recordsList.clear();
 
-    foreach (RecordVM* vm, recordsToDelete) {
-        _deleteRecordVM(vm);
+    for (RecordVM* vm : recordsToDelete)
+    {
+        if (vm != NULL) {
+            _deleteRecordVM(vm);
+        }
     }
 
     QList<RecordVM*> recordsToAdd;
-    foreach (RecordM* model, newRecords)
+    for (RecordM* model : records)
     {
         if (model != NULL)
         {
@@ -264,15 +267,6 @@ void RecordsSupervisionController::onEndOfRecordReceived()
         setplayingRecord(NULL);
     }
     setisLoadingRecord(false);
-}
-
-
-/**
- * @brief Slot called when a record is being loaded
- */
-void RecordsSupervisionController::onLoadingRecordReceived()
-{
-    setisLoadingRecord(true);
 }
 
 

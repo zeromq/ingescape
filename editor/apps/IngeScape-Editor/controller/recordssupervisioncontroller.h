@@ -135,12 +135,6 @@ public Q_SLOTS:
 
 
     /**
-     * @brief Slot called when a record is being loaded
-     */
-    void onLoadingRecordReceived();
-
-
-    /**
      * @brief Slot called when a record has been loaded
      */
     void onLoadedRecordReceived();
