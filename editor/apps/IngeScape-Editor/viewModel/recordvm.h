@@ -29,6 +29,7 @@ class RecordVM : public QObject
 {
     Q_OBJECT
 
+    // FIXME: modelM instead of recordModel
     // Model of our record
     I2_QML_PROPERTY_DELETE_PROOF(RecordM*, recordModel)
 

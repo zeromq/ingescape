@@ -30,7 +30,6 @@
 RecordsSupervisionController::RecordsSupervisionController(IngeScapeModelManager* modelManager,
                                                            QObject *parent) : QObject(parent),
     _isRecorderON(false),
-    _recorderAgent(NULL),
     _selectedRecord(NULL),
     _isRecording(false),
     _isLoadingRecord(false),
@@ -72,15 +71,15 @@ RecordsSupervisionController::~RecordsSupervisionController()
  */
 void RecordsSupervisionController::setisRecording(bool isRecording)
 {
-    if(_isRecording != isRecording)
+    if (_isRecording != isRecording)
     {
         _isRecording = isRecording;
 
         Q_EMIT isRecordingChanged(_isRecording);
 
-        if (_recorderAgent != NULL)
+        if (_isRecorderON && !_peerIdOfRecorder.isEmpty())
         {
-            QStringList peerIdsList = QStringList(_recorderAgent->peerId());
+            QStringList peerIdsList = QStringList(_peerIdOfRecorder);
             QString command = _isRecording ? "START_RECORD" : "STOP_RECORD";
 
             Q_EMIT commandAskedToAgent(peerIdsList, command);
@@ -94,7 +93,7 @@ void RecordsSupervisionController::setisRecording(bool isRecording)
         else
         {
             _timerToDisplayTime.stop();
-            setcurrentRecordTime(QTime::fromMSecsSinceStartOfDay(0));
+            setcurrentRecordTime(QTime(0, 0, 0, 0));
         }
     }
 }
@@ -105,14 +104,14 @@ void RecordsSupervisionController::setisRecording(bool isRecording)
  */
 void RecordsSupervisionController::deleteSelectedRecord()
 {
-    if ((_modelManager != NULL) && (_selectedRecord != NULL))
+    if ((_modelManager != NULL) && (_selectedRecord != NULL) && (_selectedRecord->recordModel() != NULL))
     {
-        qDebug() << "Delete _selectedRecord " << _selectedRecord->recordModel()->name();
+        qDebug() << "Delete the selected record " << _selectedRecord->recordModel()->name();
 
         // Notify the recorder that he has to remove entry from db
-        if (_recorderAgent != NULL)
+        if (_isRecorderON && !_peerIdOfRecorder.isEmpty())
         {
-            QStringList peerIdsList = QStringList(_recorderAgent->peerId());
+            QStringList peerIdsList = QStringList(_peerIdOfRecorder);
             QString command = QString("DELETE_RECORD=%1").arg(_selectedRecord->recordModel()->id());
 
             Q_EMIT commandAskedToAgent(peerIdsList, command);
@@ -139,11 +138,12 @@ void RecordsSupervisionController::deleteSelectedRecord()
  */
 void RecordsSupervisionController::controlRecord(QString recordId, bool startPlaying)
 {
-    if ((_recorderAgent != NULL) && _mapFromRecordIdToViewModel.contains(recordId))
+    if (_isRecorderON && !_peerIdOfRecorder.isEmpty() && _mapFromRecordIdToViewModel.contains(recordId))
     {
         RecordVM* recordVM = _mapFromRecordIdToViewModel.value(recordId);
+        //if (recordVM != NULL)
 
-        QStringList peerIdsList = QStringList(_recorderAgent->peerId());
+        QStringList peerIdsList = QStringList(_peerIdOfRecorder);
         QString command = "";
 
         if (startPlaying)
