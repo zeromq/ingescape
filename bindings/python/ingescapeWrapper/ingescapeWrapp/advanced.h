@@ -17,21 +17,83 @@ PyDoc_STRVAR(
              "igs_setPublishingPort(port)\n"
              "--\n"
              "\n"
-             "Set the publishing port");
+             "Set the publishing port\n");
 
 PyDoc_STRVAR(
              setDiscoveryIntervalDoc,
              "igs_setDiscoveryInterval(interval)\n"
              "--\n"
              "\n"
-             "usefull only with gossip discovery");
+             "usefull only with gossip discovery\n");
 
 PyDoc_STRVAR(
              setAgentTimeoutDoc,
              "igs_setAgentTimeout(duration)\n"
              "--\n"
              "\n"
-             "usefull only with gossip discovery");
+             "usefull only with gossip discovery\n");
+
+PyDoc_STRVAR(
+             busJoinChannelDoc,
+             "igs_busJoinChannel(channel)\n"
+             "--\n"
+             "\n"
+             "Join a ZMQ channel called 'channel' and listen to messages on it \n");
+
+PyDoc_STRVAR(
+             busLeaveChannelDoc,
+             "igs_busLeaveChannel(channel)\n"
+             "--\n"
+             "\n"
+             "Leave a ZMQ channel called 'channel'\n");
+
+PyDoc_STRVAR(
+             busSendStringToChannelDoc,
+             "igs_busSendStringToChannel(channel, msg)\n"
+             "--\n"
+             "\n"
+             "Send the string 'msg' to the channel\n"
+             "Return 1 if ok else return 0 \n");
+
+PyDoc_STRVAR(
+             busSendDataToChannelDoc,
+             "igs_busSendDataToChannel(channel, data, size)\n"
+             "--\n"
+             "\n"
+             "Send data to the channel\n"
+             "Data is a buffer containing data and size an int \n"
+             "Return 1 if ok else return 0 \n");
+
+PyDoc_STRVAR(
+             busSendStringToAgentDoc,
+             "igs_busSendStringToAgent(channel, msg)\n"
+             "--\n"
+             "\n"
+             "Send the string 'msg' to the agent\n"
+             "Return 1 if ok else return 0 \n");
+
+PyDoc_STRVAR(
+             busSendDataToAgentDoc,
+             "igs_busSendDataToAgent(channel, data, size)\n"
+             "--\n"
+             "\n"
+             "Send data to the agent\n"
+             "Data is a buffer containing data and size an int \n"
+             "Return 1 if ok else return 0 \n");
+
+PyDoc_STRVAR(
+             busAddServiceDescriptionDoc,
+             "igs_busAddServiceDescription(key, char)\n"
+             "--\n"
+             "\n"
+             "\n");
+
+PyDoc_STRVAR(
+             busremoveServiceDescriptionDoc,
+             "igs_busRemoveServiceDescription(key)\n"
+             "--\n"
+             "\n"
+             "\n");
 
 //network configuration
 PyObject * igs_setPublishingPort_wrapper(PyObject *self, PyObject *args);
