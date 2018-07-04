@@ -201,11 +201,12 @@ static PyMethodDef ingescapeMethods[] =
     {"igs_interrupted", interrupted_wrapper, METH_NOARGS, interruptedDoc},
     
     //observe Iop, freeze and forced stop
-    {"igs_observeInput", igs_observeInput_wrapper, METH_VARARGS, "Observe a input and associate a callback to it.\nWhen the input value will change the associated callback will be called.\n param name is the name of the agent's input.\n param cb is a pointer to the associated callback.\n param myData is a pointer to user's data if needed.\n return 1 if correct or 0"},
-    {"igs_observeOutput", igs_observeOutput_wrapper, METH_VARARGS, "observe a output and associate a callback to it.\n When the output value will change the associated callback will be called.\n param name is the name of the agent's output.\n param cb is a pointer to the associated callback.\n param myData is a pointer to user's data if needed.\n return 1 if correct or 0"},
-    {"igs_observeParameter", igs_observeParameter_wrapper, METH_VARARGS, "Observe a parameter and associate a callback to it.\n When the output value will change the associated callback will be called.\n param name is the name of the agent's parameter.\n param cb is a pointer to the associated callback.\n param myData is a pointer to user's data if needed.\n return 1 if correct or 0"},
-    {"igs_observeFreeze", igs_observeFreeze_wrapper, METH_VARARGS, "Add a igs_freezeCallback on an agent.\n param cb is a pointer to a igs_freezeCallback.\n param myData the user data is needed.\n return 1 if ok, else 0.\n"},
-    {"igs_observeForcedStop", igs_observeForcedStop_wrapper, METH_VARARGS, "Add a igs_forcedStopCallback to the agent"},
+    //observe Iop, freeze and forced stop
+    {"igs_observeInput", igs_observeInput_wrapper, METH_VARARGS, observeInputDoc},
+    {"igs_observeOutput", igs_observeOutput_wrapper, METH_VARARGS, observeOutputDoc},
+    {"igs_observeParameter", igs_observeParameter_wrapper, METH_VARARGS, observeParameterDoc},
+    {"igs_observeFreeze", igs_observeFreeze_wrapper, METH_VARARGS, observeFreezeDoc},
+    {"igs_observeForcedStop", igs_observeForcedStop_wrapper, METH_VARARGS, observeForcedStopDoc},
 
     //resources file management
     {"igs_setDefinitionPath", setDefinitionPath_wrapper, METH_VARARGS, setDefinitionPathDoc},
@@ -218,14 +219,14 @@ static PyMethodDef ingescapeMethods[] =
     {"igs_setPublishingPort", igs_setPublishingPort_wrapper, METH_VARARGS, setPublishingPortDoc},
     {"igs_setDiscoveryInterval", igs_setDiscoveryInterval_wrapper, METH_VARARGS, setDiscoveryIntervalDoc},
     {"igs_setAgentTimeOut", igs_setAgentTimeOut_wrapper, METH_VARARGS, setAgentTimeoutDoc},
-    {"igs_busJoinChannel", igs_busJoinChannel_wrapper, METH_VARARGS, ""},
-    {"igs_busLeaveChannel", igs_busLeaveChannel_wrapper, METH_VARARGS, ""},
-    {"igs_busSendStringToChannel", igs_busSendStringToChannel_wrapper, METH_VARARGS, ""},
-    {"igs_busSendDataToChannel", igs_busSendDataToChannel_wrapper, METH_VARARGS, ""},
-    {"igs_busSendStringToAgent", igs_busSendStringToAgent_wrapper, METH_VARARGS, ""},
-    {"igs_busSendDataToAgent", igs_busSendDataToAgent_wrapper, METH_VARARGS, ""},
-    {"igs_busAddServiceDescription", igs_busAddServiceDescription_wrapper, METH_VARARGS, ""},
-    {"igs_busRemoveServiceDescription", igs_busRemoveServiceDescription_wrapper, METH_VARARGS, ""},
+    {"igs_busJoinChannel", igs_busJoinChannel_wrapper, METH_VARARGS, busJoinChannelDoc},
+    {"igs_busLeaveChannel", igs_busLeaveChannel_wrapper, METH_VARARGS, busLeaveChannelDoc},
+    {"igs_busSendStringToChannel", igs_busSendStringToChannel_wrapper, METH_VARARGS, busSendStringToChannelDoc},
+    {"igs_busSendDataToChannel", igs_busSendDataToChannel_wrapper, METH_VARARGS, busSendDataToChannelDoc},
+    {"igs_busSendStringToAgent", igs_busSendStringToAgent_wrapper, METH_VARARGS, busSendStringToAgentDoc},
+    {"igs_busSendDataToAgent", igs_busSendDataToAgent_wrapper, METH_VARARGS, busSendDataToAgentDoc},
+    {"igs_busAddServiceDescription", igs_busAddServiceDescription_wrapper, METH_VARARGS, busAddServiceDescriptionDoc},
+    {"igs_busRemoveServiceDescription", igs_busRemoveServiceDescription_wrapper, METH_VARARGS, busremoveServiceDescriptionDoc},
     
     {NULL, NULL, 0, NULL}       /* Sentinel */
 };
