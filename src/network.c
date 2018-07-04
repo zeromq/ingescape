@@ -1149,6 +1149,7 @@ initLoop (zsock_t *pipe, void *args){
 #endif
 #else
         char pathbuf[4*1024];
+        memset(pathbuf, 0, 4*1024);
         ret = readlink("/proc/self/exe", pathbuf, sizeof(pathbuf));
 #endif
         if ( ret <= 0 ) {
