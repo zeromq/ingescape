@@ -38,6 +38,12 @@ class NetworkController: public QObject
     // List of available network devices
     I2_QML_PROPERTY_READONLY(QStringList, availableNetworkDevices)
 
+    // List of peer id of IngeScape Launchers
+    I2_CPP_NOSIGNAL_PROPERTY(QStringList, peerIdOfLaunchers)
+
+    // List of peer id of IngeScape Recorders
+    I2_CPP_NOSIGNAL_PROPERTY(QStringList, peerIdOfRecorders)
+
 
 public:
 
@@ -100,15 +106,14 @@ Q_SIGNALS:
      * @brief Signal emitted when an agent enter the network
      * @param peerId
      * @param peerName
-     * @param peerAddress
-     * @param pid
+     * @param ipAddress
      * @param hostname
      * @param commandLine
      * @param canBeFrozen
      * @param loggerPort
      * @param isRecorder
      */
-    void agentEntered(QString peerId, QString peerName, QString peerAddress, int pid, QString hostname, QString commandLine, bool canBeFrozen, QString loggerPort, bool isRecorder);
+    void agentEntered(QString peerId, QString peerName, QString ipAddress, QString hostname, QString commandLine, bool canBeFrozen, QString loggerPort, bool isRecorder);
 
 
     /**
@@ -134,6 +139,24 @@ Q_SIGNALS:
      * @param hostname
      */
     void launcherExited(QString peerId, QString hostname);
+
+
+    /**
+     * @brief Signal emitted when a recorder enter the network
+     * @param peerId
+     * @param peerName
+     * @param ipAddress
+     * @param hostname
+     */
+    void recorderEntered(QString peerId, QString peerName, QString ipAddress, QString hostname);
+
+
+    /**
+     * @brief Signal emitted when a recorder quit the network
+     * @param peerId
+     * @param peerName
+     */
+    void recorderExited(QString peerId, QString peerName);
 
 
     /**

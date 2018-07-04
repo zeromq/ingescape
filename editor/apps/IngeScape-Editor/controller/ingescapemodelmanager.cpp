@@ -287,24 +287,23 @@ void IngeScapeModelManager::simulateExitForEachActiveAgent()
  * @brief Slot called when an agent enter the network
  * @param peerId
  * @param agentName
- * @param agentAddress
- * @param pid
+ * @param ipAddress
  * @param hostname
  * @param commandLine
  * @param canBeFrozen
  * @param loggerPort
  * @param isRecorder
  */
-void IngeScapeModelManager::onAgentEntered(QString peerId, QString agentName, QString agentAddress, int pid, QString hostname, QString commandLine, bool canBeFrozen, QString loggerPort, bool isRecorder)
+void IngeScapeModelManager::onAgentEntered(QString peerId, QString agentName, QString ipAddress, QString hostname, QString commandLine, bool canBeFrozen, QString loggerPort, bool isRecorder)
 {
-    if (!peerId.isEmpty() && !agentName.isEmpty() && !agentAddress.isEmpty())
+    if (!peerId.isEmpty() && !agentName.isEmpty() && !ipAddress.isEmpty())
     {
         AgentM* agent = getAgentModelFromPeerId(peerId);
 
         // An agent with this peer id already exist
         if (agent != NULL)
         {
-            qInfo() << "The agent" << agentName << "with peer id" << peerId << "and address" << agentAddress << "is back on the network !";
+            qInfo() << "The agent" << agentName << "with peer id" << peerId << "and IP address" << ipAddress << "is back on the network !";
 
             // Update the state (flag "is ON")
             agent->setisON(true);
@@ -313,7 +312,7 @@ void IngeScapeModelManager::onAgentEntered(QString peerId, QString agentName, QS
         else
         {
             // Create a new model of agent
-            agent = new AgentM(agentName, peerId, agentAddress, this);
+            agent = new AgentM(agentName, peerId, ipAddress, this);
 
             agent->sethostname(hostname);
             agent->setcommandLine(commandLine);
@@ -334,7 +333,6 @@ void IngeScapeModelManager::onAgentEntered(QString peerId, QString agentName, QS
                 }
             }
 
-            agent->setpid(pid);
             agent->setcanBeFrozen(canBeFrozen);
             agent->setloggerPort(loggerPort);
 
@@ -356,7 +354,7 @@ void IngeScapeModelManager::onAgentEntered(QString peerId, QString agentName, QS
 void IngeScapeModelManager::onAgentExited(QString peerId, QString agentName)
 {
     AgentM* agent = getAgentModelFromPeerId(peerId);
-    if(agent != NULL)
+    if (agent != NULL)
     {
         qInfo() << "The agent" << agentName << "with peer id" << peerId << "exited from the network !";
 

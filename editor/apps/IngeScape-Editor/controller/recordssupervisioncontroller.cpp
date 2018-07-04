@@ -27,7 +27,9 @@
  * @param modelManager
  * @param parent
  */
-RecordsSupervisionController::RecordsSupervisionController(IngeScapeModelManager* modelManager, QObject *parent) : QObject(parent),
+RecordsSupervisionController::RecordsSupervisionController(IngeScapeModelManager* modelManager,
+                                                           QObject *parent) : QObject(parent),
+    _isRecorderON(false),
     _recorderAgent(NULL),
     _selectedRecord(NULL),
     _isRecording(false),
@@ -163,6 +165,53 @@ void RecordsSupervisionController::controlRecord(QString recordId, bool startPla
 
 
 /**
+ * @brief Slot called when a recorder enter the network
+ * @param peerId
+ * @param peerName
+ * @param ipAddress
+ * @param hostname
+ */
+void RecordsSupervisionController::onRecorderEntered(QString peerId, QString peerName, QString ipAddress, QString hostname)
+{
+    qDebug() << "Recorder Entered (" << peerId << ")" << peerName << "on" << hostname << "(" << ipAddress << ")";
+
+    if (!_isRecorderON)
+    {
+        _peerIdOfRecorder = peerId;
+        _peerNameOfRecorder = peerName;
+
+        setisRecorderON(true);
+
+        qDebug() << "New recorder on the network, get all its records...";
+
+        QStringList peerIdsList = QStringList(_peerIdOfRecorder);
+
+        // Get all records
+        Q_EMIT commandAskedToAgent(peerIdsList, "GET_RECORDS");
+    }
+}
+
+
+/**
+ * @brief Slot called when a recorder quit the network
+ * @param peerId
+ * @param peerName
+ */
+void RecordsSupervisionController::onRecorderExited(QString peerId, QString peerName)
+{
+    qDebug() << "Recorder Exited (" << peerId << ")" << peerName;
+
+    if (_isRecorderON && (_peerIdOfRecorder == peerId))
+    {
+        _peerIdOfRecorder = "";
+        _peerNameOfRecorder = "";
+
+        setisRecorderON(false);
+    }
+}
+
+
+/**
  * @brief Slot when the list of records model changes
  * @param records
  */
@@ -209,7 +258,7 @@ void RecordsSupervisionController::onRecordAdded(RecordM* model)
  * @brief Slot when a new model of agent has been created
  * @param agent
  */
-void RecordsSupervisionController::onAgentModelCreated(AgentM* model)
+/*void RecordsSupervisionController::onAgentModelCreated(AgentM* model)
 {
     if ((model != NULL) && model->isRecorder() && (model != _recorderAgent))
     {
@@ -222,7 +271,7 @@ void RecordsSupervisionController::onAgentModelCreated(AgentM* model)
         // Retrieve all records
         Q_EMIT commandAskedToAgent(peerIdsList, "GET_RECORDS");
     }
-}
+}*/
 
 
 /**

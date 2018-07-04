@@ -51,9 +51,6 @@ class AgentM : public QObject
     // Command line of our agent
     I2_CPP_NOSIGNAL_PROPERTY(QString, commandLine)
 
-    // Process Id of our agent
-    I2_CPP_NOSIGNAL_PROPERTY(int, pid)
-
     // Flag indicating if our agent is ON (vs OFF)
     I2_QML_PROPERTY_READONLY(bool, isON)
 
@@ -115,12 +112,12 @@ public:
      * @brief Constructor with peer id and address
      * @param name
      * @param peerId
-     * @param address
+     * @param ipAddress
      * @param parent
      */
     AgentM(QString name,
            QString peerId,
-           QString address,
+           QString ipAddress,
            QObject *parent = nullptr);
 
 

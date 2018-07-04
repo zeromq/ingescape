@@ -33,6 +33,9 @@ class RecordsSupervisionController : public QObject
 {
     Q_OBJECT
 
+    // Flag indicating is there is a recorder with state ON
+    I2_QML_PROPERTY_READONLY(bool, isRecorderON)
+
     // Reference on recorder agent
     I2_QML_PROPERTY(AgentM*, recorderAgent)
 
@@ -96,6 +99,23 @@ Q_SIGNALS:
 
 public Q_SLOTS:
 
+    /**
+     * @brief Slot called when a recorder enter the network
+     * @param peerId
+     * @param peerName
+     * @param ipAddress
+     * @param hostname
+     */
+    void onRecorderEntered(QString peerId, QString peerName, QString ipAddress, QString hostname);
+
+
+    /**
+     * @brief Slot called when a recorder quit the network
+     * @param peerId
+     * @param peerName
+     */
+    void onRecorderExited(QString peerId, QString peerName);
+
 
     /**
      * @brief Slot when the list of records model changes
@@ -113,7 +133,7 @@ public Q_SLOTS:
      * @brief Slot when a new model of agent has been created
      * @param agent
      */
-    void onAgentModelCreated(AgentM* model);
+    //void onAgentModelCreated(AgentM* model);
 
     /**
      * @brief Slot called when a record playing has ended
@@ -147,6 +167,7 @@ private:
      */
     void _deleteRecordVM(RecordVM* record);
 
+
 private:
 
     // Manager for the data model of INGESCAPE
@@ -157,6 +178,12 @@ private:
 
     // Timer to rdisplay elapsed time on current record
     QTimer _timerToDisplayTime;
+
+    // Peer id of the recorder
+    QString _peerIdOfRecorder;
+
+    // Peer name of the recorder
+    QString _peerNameOfRecorder;
 
 };
 

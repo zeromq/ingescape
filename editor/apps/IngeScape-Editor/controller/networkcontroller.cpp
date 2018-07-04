@@ -91,12 +91,11 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
             }
 
             // Initialize properties related to message headers
-            bool isIngeScapePublisher = false;
+            bool isIngeScapeLauncher = false;
             bool isIngeScapeRecorder = false;
-            bool isIntPID = false;
-            int pid = -1;
-            bool canBeFrozen = false;
+            bool isIngeScapePlayer = false;
             QString hostname = "";
+            bool canBeFrozen = false;
             QString commandLine = "";
             QString loggerPort = "";
             QString streamingPort = "";
@@ -117,17 +116,21 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
                     key = QString(k);
                     value = QString(v);
 
-                    // We check that the key "publisher" exists
-                    if (key == "publisher") {
-                        isIngeScapePublisher = true;
+                    if (key == "isLauncher") {
+                        if (value == "1") {
+                            isIngeScapeLauncher = true;
+                        }
                     }
                     else if (key == "isRecorder") {
                         if (value == "1") {
                             isIngeScapeRecorder = true;
+
+                            // FIXME flag isIngeScapePlayer
+                            isIngeScapePlayer = true;
                         }
                     }
-                    else if (key == "pid") {
-                        pid = value.toInt(&isIntPID);
+                    else if (key == "hostname") {
+                        hostname = value;
                     }
                     else if (key == "canBeFrozen") {
                         if (value == "1") {
@@ -136,9 +139,6 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
                     }
                     else if (key == "commandline") {
                         commandLine = value;
-                    }
-                    else if (key == "hostname") {
-                        hostname = value;
                     }
                     else if (key == "logger") {
                         loggerPort = value;
@@ -154,20 +154,43 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
             zlist_destroy(&keys);
 
 
-            // IngeScape Launcher
-            if (peerName.endsWith(suffix_Launcher))
+            // IngeScape LAUNCHER
+            if (isIngeScapeLauncher)
             {
-                hostname = peerName.left(peerName.length() - suffix_Launcher.length());
+                qDebug() << "Our zyre event is about IngeScape LAUNCHER";
+
+                // Save the peer id of this launcher
+                QStringList peerIdOfLaunchers = networkController->peerIdOfLaunchers();
+                peerIdOfLaunchers.append(peerId);
+                networkController->setpeerIdOfLaunchers(peerIdOfLaunchers);
+
+                if (peerName.endsWith(suffix_Launcher)) {
+                    hostname = peerName.left(peerName.length() - suffix_Launcher.length());
+                }
 
                 // Emit the signal "Launcher Entered"
                 Q_EMIT networkController->launcherEntered(peerId, hostname, ipAddress, streamingPort);
             }
-            else if (isIngeScapePublisher && isIntPID)
+            // IngeScape RECORDER
+            else if (isIngeScapeRecorder)
             {
-                //qDebug() << "Our zyre event is about INGESCAPE publisher:" << pid << hostname << commandLine;
+                qDebug() << "Our zyre event is about IngeScape RECORDER";
+
+                // Save the peer id of this recorder
+                QStringList peerIdOfRecorders = networkController->peerIdOfRecorders();
+                peerIdOfRecorders.append(peerId);
+                networkController->setpeerIdOfRecorders(peerIdOfRecorders);
+
+                // Emit the signal "Recorder Entered"
+                Q_EMIT networkController->recorderEntered(peerId, peerName, ipAddress, hostname);
+            }
+            // IngeScape AGENT
+            else
+            {
+                qDebug() << "Our zyre event is about IngeScape AGENT on" << hostname;
 
                 // Emit the signal "Agent Entered"
-                Q_EMIT networkController->agentEntered(peerId, peerName, ipAddress, pid, hostname, commandLine, canBeFrozen, loggerPort, isIngeScapeRecorder);
+                Q_EMIT networkController->agentEntered(peerId, peerName, ipAddress, hostname, commandLine, canBeFrozen, loggerPort, isIngeScapeRecorder);
             }
         }
         // JOIN (group)
@@ -311,19 +334,19 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
                 Q_EMIT networkController->newRecordReceived(message);
             }
             // Loading record
-            else if (message.startsWith(prefix_LoadingRecord))
+            else if (message == prefix_LoadingRecord)
             {
                 // Emit the signal "Loading record Received"
                 Q_EMIT networkController->loadingRecordReceived();
             }
             // Loaded record
-            else if (message.startsWith(prefix_LoadedRecord))
+            else if (message == prefix_LoadedRecord)
             {
                 // Emit the signal "Loaded record Received"
                 Q_EMIT networkController->loadedRecordReceived();
             }
             // End of record
-            else if (message.startsWith(prefix_EndedRecord))
+            else if (message == prefix_EndedRecord)
             {
                 // Emit the signal "End of record Received"
                 Q_EMIT networkController->endOfRecordReceived();
@@ -423,15 +446,27 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
         {
             qDebug() << QString("<-- %1 (%2) exited").arg(peerName, peerId);
 
-            // IngeScape Launcher
-            if (peerName.endsWith(suffix_Launcher))
+            // IngeScape LAUNCHER
+            if (networkController->peerIdOfLaunchers().contains(peerId))
             {
-                QString hostname = peerName.left(peerName.length() - suffix_Launcher.length());
+                QString hostname = "";
+
+                if (peerName.endsWith(suffix_Launcher)) {
+                    hostname = peerName.left(peerName.length() - suffix_Launcher.length());
+                }
 
                 // Emit the signal "Launcher Exited"
                 Q_EMIT networkController->launcherExited(peerId, hostname);
             }
-            else {
+            // IngeScape RECORDER
+            else if (networkController->peerIdOfRecorders().contains(peerId))
+            {
+                // Emit the signal "Recorder Exited"
+                Q_EMIT networkController->recorderExited(peerId, peerName);
+            }
+            // IngeScape AGENT
+            else
+            {
                 // Emit the signal "Agent Exited"
                 Q_EMIT networkController->agentExited(peerId, peerName);
             }

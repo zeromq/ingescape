@@ -36,19 +36,18 @@ AgentM::AgentM(QString name,
  * @brief Constructor with peer id and address
  * @param name
  * @param peerId
- * @param address
+ * @param ipAddress
  * @param parent
  */
 AgentM::AgentM(QString name,
                QString peerId,
-               QString address,
+               QString ipAddress,
                QObject *parent) : QObject(parent),
     _name(name),
     _peerId(peerId),
-    _address(address),
+    _address(ipAddress),
     _hostname(""),
     _commandLine(""),
-    _pid(0),
     _isON(false),
     _canBeRestarted(false),
     _isMuted(false),
