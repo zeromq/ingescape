@@ -29,6 +29,7 @@ class HostVM : public QObject
 {
     Q_OBJECT
 
+    // FIXME: modelM instead of hostModel
     // Model of our host
     I2_QML_PROPERTY_DELETE_PROOF(HostM*, hostModel)
 

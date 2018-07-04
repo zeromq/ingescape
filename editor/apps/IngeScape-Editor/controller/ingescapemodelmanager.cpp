@@ -292,9 +292,8 @@ void IngeScapeModelManager::simulateExitForEachActiveAgent()
  * @param commandLine
  * @param canBeFrozen
  * @param loggerPort
- * @param isRecorder
  */
-void IngeScapeModelManager::onAgentEntered(QString peerId, QString agentName, QString ipAddress, QString hostname, QString commandLine, bool canBeFrozen, QString loggerPort, bool isRecorder)
+void IngeScapeModelManager::onAgentEntered(QString peerId, QString agentName, QString ipAddress, QString hostname, QString commandLine, bool canBeFrozen, QString loggerPort)
 {
     if (!peerId.isEmpty() && !agentName.isEmpty() && !ipAddress.isEmpty())
     {
@@ -317,9 +316,7 @@ void IngeScapeModelManager::onAgentEntered(QString peerId, QString agentName, QS
             agent->sethostname(hostname);
             agent->setcommandLine(commandLine);
 
-            agent->setisRecorder(isRecorder);
-
-            if (!hostname.isEmpty() && !isRecorder)
+            if (!hostname.isEmpty())
             {
                 HostM* host = IngeScapeLauncherManager::Instance().getHostWithName(hostname);
                 if (host != NULL)
@@ -959,7 +956,9 @@ void IngeScapeModelManager::deleteRecordModel(RecordM* record)
 {
     if (record != NULL)
     {
-        _recordsList.removeOne(record);
+        if (_recordsList.contains(record)) {
+            _recordsList.removeOne(record);
+        }
 
         // Free memory
         delete record;

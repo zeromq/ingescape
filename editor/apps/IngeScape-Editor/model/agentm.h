@@ -66,9 +66,6 @@ class AgentM : public QObject
     // Port for log in stream
     I2_CPP_PROPERTY(QString, loggerPort)
 
-    // Flag indicating if our agent is a recorder
-    I2_CPP_NOSIGNAL_PROPERTY(bool, isRecorder)
-
     // Flag indicating if our agent is frozen
     I2_QML_PROPERTY_READONLY(bool, isFrozen)
 

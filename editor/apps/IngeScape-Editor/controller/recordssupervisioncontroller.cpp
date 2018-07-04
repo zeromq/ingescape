@@ -255,26 +255,6 @@ void RecordsSupervisionController::onRecordAdded(RecordM* model)
 
 
 /**
- * @brief Slot when a new model of agent has been created
- * @param agent
- */
-/*void RecordsSupervisionController::onAgentModelCreated(AgentM* model)
-{
-    if ((model != NULL) && model->isRecorder() && (model != _recorderAgent))
-    {
-        setrecorderAgent(model);
-
-        qDebug() << "New recorder on the network, get all its records";
-
-        QStringList peerIdsList = QStringList(_recorderAgent->peerId());
-
-        // Retrieve all records
-        Q_EMIT commandAskedToAgent(peerIdsList, "GET_RECORDS");
-    }
-}*/
-
-
-/**
  * @brief Slot called when a record playing has ended
  */
 void RecordsSupervisionController::onEndOfRecordReceived()

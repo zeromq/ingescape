@@ -33,8 +33,7 @@ HostsSupervisionController::HostsSupervisionController(IngeScapeLauncherManager*
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    setingescapeLauncherManager( ingescapeLauncherManager );
-
+    setingescapeLauncherManager(ingescapeLauncherManager);
 }
 
 
@@ -108,8 +107,9 @@ void HostsSupervisionController::onHostModelWillBeRemoved(HostM* hostModel)
 
             disconnect(hostToRemove, &HostVM::commandAskedToHost, this, &HostsSupervisionController::commandAskedToHost);
 
-            if(_hostsList.contains(hostToRemove))
+            if (_hostsList.contains(hostToRemove)) {
                 _hostsList.remove(hostToRemove);
+            }
 
             _mapFromHostModelToViewModel.remove(hostModel);
         }
@@ -122,16 +122,16 @@ void HostsSupervisionController::onHostModelWillBeRemoved(HostM* hostModel)
  */
 void HostsSupervisionController::onAgentModelCreated(AgentM* agent)
 {
-    if (agent != NULL && !agent->isRecorder())
+    if (agent != NULL)
     {
-        if (!_agentsList.contains(agent))
+        if (!_agentsList.contains(agent)) {
             _agentsList.append(agent);
+        }
 
         // try to get the involved hostVM with agent's host name
         for (HostVM* host : _hostsList)
         {
-            if (
-                (host->hostModel() != NULL)
+            if ( (host != NULL) && (host->hostModel() != NULL)
                 &&
                 (host->hostModel()->ipAddress() == agent->address())
                 &&
@@ -155,14 +155,14 @@ void HostsSupervisionController::onAgentModelWillBeDeleted(AgentM* agent)
 {
     if (agent != NULL)
     {
-        int indexOfAgent = _agentsList.indexOf(agent);
-        if(indexOfAgent != -1)
-            _agentsList.removeAt(indexOfAgent);
+        if (_agentsList.contains(agent)) {
+            _agentsList.removeOne(agent);
+        }
 
         // try to get the involved hostVM with agent's host name
         for (HostVM* host : _hostsList)
         {
-            if (host->listOfAgents()->contains(agent))
+            if ((host != NULL) && host->listOfAgents()->contains(agent))
             {
                 host->listOfAgents()->remove(agent);
                 qDebug() << "Remove agent " << agent->name() << " from host " << host->hostModel()->name();

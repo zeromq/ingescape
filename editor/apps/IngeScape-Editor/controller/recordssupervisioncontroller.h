@@ -123,33 +123,30 @@ public Q_SLOTS:
      */
     void onRecordsListChanged(QList<RecordM*> records);
 
+
     /**
      * @brief Slot when a new model of record has been added
      * @param records
      */
     void onRecordAdded(RecordM* record);
 
-    /**
-     * @brief Slot when a new model of agent has been created
-     * @param agent
-     */
-    //void onAgentModelCreated(AgentM* model);
 
     /**
      * @brief Slot called when a record playing has ended
      */
     void onEndOfRecordReceived();
 
+
     /**
      * @brief Slot called when a record is being loaded
      */
     void onLoadingRecordReceived();
 
+
     /**
      * @brief Slot called when a record has been loaded
      */
     void onLoadedRecordReceived();
-
 
 
 private Q_SLOTS:
