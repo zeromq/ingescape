@@ -17,6 +17,8 @@ Dependencies :
     	-libzmq.5.dylib
     	-libczmq.4.dylib
 
+Python3 and python3-dev for python3's Python.h
+
 -------------------INSTALLATION--------------------
 ===================================================
 

@@ -115,7 +115,7 @@ PyObject * igs_busSendStringToChannel_wrapper(PyObject *self, PyObject *args)
 PyObject * igs_busSendDataToChannel_wrapper(PyObject *self, PyObject *args)
 {
     char * channel;
-    long size;
+    size_t size;
     Py_buffer buf;
     
     int  result;
@@ -154,7 +154,7 @@ PyObject * igs_busSendStringToAgent_wrapper(PyObject *self, PyObject *args)
 PyObject * igs_busSendDataToAgent_wrapper(PyObject *self, PyObject *args)
 {
     char * agentNameOrPeerID;
-    long size;
+    size_t size;
     Py_buffer buf;
     
     int  result;

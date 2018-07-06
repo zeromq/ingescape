@@ -64,6 +64,21 @@
 
 
 PyDoc_STRVAR(
+             setRequestOutputsFromMappedAgentsDoc,
+             "igs_setRequestOutputsFromMappedAgents(notify)\n"
+             "--\n"
+             "boolean notify\n"
+             "\n");
+
+PyDoc_STRVAR(
+             getRequestOutputsFromMappedAgentsDoc,
+             "igs_getRequestOutputsFromMappedAgents()\n"
+             "--\n"
+             "\n"
+             "\n");
+
+
+PyDoc_STRVAR(
              removeMappingEntryWithNameDoc,
              "igs_removeMappingEntryWithName(fromInput, toAgent, toOutput)\n"
              "--\n"

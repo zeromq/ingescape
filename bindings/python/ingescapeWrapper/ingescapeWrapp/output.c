@@ -15,7 +15,7 @@
 {
     char * name;
     void * value;
-    long * size;
+    size_t * size;
     
     int result;
     PyObject * ret;
@@ -38,7 +38,6 @@
 {
     char * name;
     bool result;
-    PyObject * ret;
     
     // parse arguments and cast them : the name of the output and the boolean
     if (!PyArg_ParseTuple(args, "s", &name)) {
@@ -49,12 +48,10 @@
 
     // build the resulting bool into a Python object.
     if (result) {
-        ret = Py_True;
+        Py_RETURN_TRUE;
     } else{
-        ret = Py_False;
+        Py_RETURN_FALSE;
     }
-    free(&result);
-    return ret;
 }
 
 //igs_readOutputAsInt
@@ -140,7 +137,7 @@
     
     // build the resulting int into a Python object.
     ret = PyLong_FromLong(result);
-    free(&result);
+//    free(&result);
     return ret;
 }
 

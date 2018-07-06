@@ -15,7 +15,7 @@
 {
     char * name;
     void * value;
-    long * size;
+    size_t * size;
     
     int result;
     PyObject * ret;
@@ -49,12 +49,10 @@
     
     // build the resulting bool into a Python object and return it
     if (result) {
-        ret = Py_True;
+        Py_RETURN_TRUE;
     } else{
-        ret = Py_False;
+        Py_RETURN_TRUE;
     }
-    free(&result);
-    return ret;
 }
 
 //igs_readInputAsInt
