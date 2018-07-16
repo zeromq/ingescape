@@ -135,7 +135,7 @@ void print_usage(){
     qDebug("--verbose : enable verbose mode in the application (default is disabled)\n");
     qDebug("--port port_number : port used for autodiscovery between agents (default: %d)\n", port);
     qDebug("--device device_name : name of the network device to be used (useful if several devices available)\n");
-    qDebug("--name agent_name : published name of this agent (default: %s)\n", agentName);
+    qDebug("--name agent_name : published name of this agent (default: %s)\n", agentName.toStdString().c_str());
     qDebug("--noninteractiveloop : non-interactive loop for use as a deamon (default is false)\n");
 }
 

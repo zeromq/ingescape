@@ -59,4 +59,12 @@ win32:{
     LIBS += -L$$C:/Windows/System32 -lwsock32 -lIPHLPAPI -lws2_32
 }
 
+!win32:{
+    # Include ingescape headers
+    INCLUDEPATH += /usr/local/include
+
+    #Add librairies
+    LIBS += -L/usr/local/lib -lingescape -lczmq -lzyre -lyajl
+}
+
 
