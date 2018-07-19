@@ -271,6 +271,13 @@ public Q_SLOTS:
     void onUnmapped(ElementMappingM* mappingElement);
 
 
+    /**
+     * @brief Slot called when we receive the command highlight link from a recorder
+     * @param parameters
+     */
+    void onHighlightLink(QStringList parameters);
+
+
 private Q_SLOTS:
 
     /**

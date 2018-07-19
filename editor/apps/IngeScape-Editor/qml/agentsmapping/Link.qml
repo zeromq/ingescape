@@ -36,8 +36,8 @@ I2CubicBezierCurve {
     property var outputModel : mapBetweenIOPVM ? mapBetweenIOPVM.output : null
 
 
-    secondPoint: inputModel? inputModel.position : Qt.point(0,0)
-    firstPoint: outputModel? outputModel.position : Qt.point(0,0)
+    secondPoint: inputModel ? inputModel.position : Qt.point(0,0)
+    firstPoint: outputModel ? outputModel.position : Qt.point(0,0)
 
 
     // Minimum offset of control points
@@ -69,7 +69,7 @@ I2CubicBezierCurve {
                             )
 
 
-    // NB: Clip MUST be true to clip our mousearea
+    // NB: Clip MUST be true to clip our mouse area
     clip: true
 
     // allowing to increase mouse area
@@ -94,9 +94,8 @@ I2CubicBezierCurve {
 
     strokeWidth: (rootItem._isBrin ? IngeScapeTheme.agentsMappingBrinDefaultWidth : IngeScapeTheme.agentsMappingLinkDefaultWidth)
 
-    strokeDashArray: (mapBetweenIOPVM && mapBetweenIOPVM.isVirtual)
-                     ? (rootItem._isBrin ? IngeScapeTheme.agentsMappingBrinVirtualStrokeDashArray : IngeScapeTheme.agentsMappingLinkVirtualStrokeDashArray)
-                     : ""
+    strokeDashArray: (mapBetweenIOPVM && mapBetweenIOPVM.isVirtual) ? (rootItem._isBrin ? IngeScapeTheme.agentsMappingBrinVirtualStrokeDashArray : IngeScapeTheme.agentsMappingLinkVirtualStrokeDashArray)
+                                                                    : ""
 
     // Fuzzy contour
     fuzzyColor: IngeScapeTheme.lightGreyColor

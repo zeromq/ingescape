@@ -73,6 +73,16 @@ OutputVM::~OutputVM()
 }
 
 
+
+/**
+ * @brief Simulate that the current value of model changed: allows to highlight the corresponding link(s)
+ */
+void OutputVM::simulateCurrentValueOfModelChanged()
+{
+    _onCurrentValueOfModelChanged(QVariant());
+}
+
+
 /**
  * @brief Return true if our output can link with the input (types are compatible)
  * @param pointMap

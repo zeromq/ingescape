@@ -61,7 +61,14 @@ public:
     ~OutputVM();
 
 
+    /**
+     * @brief Simulate that the current value of model changed: allows to highlight the corresponding link(s)
+     */
+    void simulateCurrentValueOfModelChanged();
+
+
 Q_SIGNALS:
+
 
 public Q_SLOTS:
 

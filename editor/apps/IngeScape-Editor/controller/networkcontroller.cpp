@@ -48,6 +48,7 @@ static const QString prefix_NewRecord = "NEW_RECORD#";
 static const QString prefix_DeletedRecord = "DELETED_RECORD=";
 static const QString prefix_LoadedRecord = "RECORD_LOADED";
 static const QString prefix_EndedRecord = "RECORD_ENDED";
+static const QString prefix_HighlightLink = "HIGHLIGHT_LINK=";
 
 
 /**
@@ -434,6 +435,13 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
                 QString mappingFilePath = message.remove(0, prefix_MappingFilePath.length());
 
                 Q_EMIT networkController->agentMappingFilePath(peerId, mappingFilePath);
+            }
+            // HIGHLIGHT LINK
+            else if (message.startsWith(prefix_HighlightLink))
+            {
+                message.remove(0, prefix_HighlightLink.length());
+
+                Q_EMIT networkController->highlightLink(message.split('|'));
             }
             else
             {

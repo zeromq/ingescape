@@ -289,6 +289,13 @@ Q_SIGNALS:
     void agentMappingFilePath(QString peerId, QString mappingFilePath);
 
 
+    /**
+     * @brief Signal emitted when we receive the command highlight link from a recorder
+     * @param parameters
+     */
+    void highlightLink(QStringList parameters);
+
+
 public Q_SLOTS:
 
     /**

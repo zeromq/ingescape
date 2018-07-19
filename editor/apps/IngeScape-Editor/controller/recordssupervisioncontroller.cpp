@@ -46,9 +46,6 @@ RecordsSupervisionController::RecordsSupervisionController(IngeScapeModelManager
     // init display timer
     _timerToDisplayTime.setInterval(INTERVAL_ELAPSED_TIME);
     connect(&_timerToDisplayTime, &QTimer::timeout, this, &RecordsSupervisionController::_onTimeout_DisplayTime);
-
-    //HIGHLIGHT_LINK=macosAgent-myBool-simpleDemoAgent-output4
-    //HIGHLIGHT_LINK|macosAgent|myBool|simpleDemoAgent|output4
 }
 
 

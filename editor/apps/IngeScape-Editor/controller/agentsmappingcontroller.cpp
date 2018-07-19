@@ -829,6 +829,46 @@ void AgentsMappingController::onUnmapped(ElementMappingM* mappingElement)
 
 
 /**
+ * @brief Slot called when we receive the command highlight link from a recorder
+ * @param parameters
+ */
+void AgentsMappingController::onHighlightLink(QStringList parameters)
+{
+    if (parameters.count() == 4)
+    {
+        QString inputAgentName = parameters.at(0);
+        QString inputName = parameters.at(1);
+        QString outputAgentName = parameters.at(2);
+        QString outputName = parameters.at(3);
+
+        // Get the view model of link which corresponds to these parameters
+        MapBetweenIOPVM* link = NULL;
+
+        for (MapBetweenIOPVM* iterator : _allLinksInMapping.toList())
+        {
+            if ((iterator != NULL)
+                    && (iterator->outputAgent() != NULL) && (iterator->outputAgent()->name() == outputAgentName)
+                    && (iterator->inputAgent() != NULL) && (iterator->inputAgent()->name() == inputAgentName)
+                    && (iterator->output() != NULL) && (iterator->output()->name() == outputName)
+                    && (iterator->input() != NULL) && (iterator->input()->name() == inputName))
+            {
+                link = iterator;
+                break;
+            }
+        }
+
+        if ((link != NULL) && (link->output() != NULL))
+        {
+            qDebug() << "Highlight the link between" << inputAgentName << "." << inputName << "and " << outputAgentName << "." << outputName;
+
+            // Simulate that the current value of output model changed: allows to highlight the link
+            link->output()->simulateCurrentValueOfModelChanged();
+        }
+    }
+}
+
+
+/**
  * @brief Slot when the list of "Agents in Mapping" changed
  */
 void AgentsMappingController::_onAgentsInMappingChanged()
@@ -1086,7 +1126,7 @@ MapBetweenIOPVM* AgentsMappingController::_getLinkFromMappingElement(ElementMapp
 
     if (mappingElement != NULL)
     {
-        foreach (MapBetweenIOPVM* iterator, _allLinksInMapping.toList())
+        for (MapBetweenIOPVM* iterator : _allLinksInMapping.toList())
         {
             // FIXME: An agent in mapping can have several Inputs (or Outputs) with the same name but with different types
             // --> Instead, this method must return a list of MapBetweenIOPVM

@@ -47,13 +47,13 @@ class AgentMappingM : public QObject
 
 
 public:
-        /**
-         * @brief Constructor
-         * @param name
-         * @param version
-         * @param description
-         * @param parent
-         */
+    /**
+     * @brief Constructor
+     * @param name
+     * @param version
+     * @param description
+     * @param parent
+     */
     explicit AgentMappingM(QString name, QString version, QString description, QObject *parent = nullptr);
 
 
