@@ -288,7 +288,7 @@ Item {
                         }
                         elide: Text.ElideRight
 
-                        text: model.recordModel.name
+                        text: model.modelM.name
                         color: playPauseRecordButton.checked ? IngeScapeTheme.agentsListItemBackgroundColor : IngeScapeTheme.agentsListLabelColor
                         font: IngeScapeTheme.headingFont
                     }
@@ -303,10 +303,10 @@ Item {
                         }
                         elide: Text.ElideRight
 
-                        text: qsTr("%1 %2 - %3 %4").arg(Qt.formatDate(model.recordModel.beginDateTime, "dd/MM/yyyy"))
-                                                    .arg(Qt.formatTime(model.recordModel.beginDateTime, "HH:mm"))
-                                                    .arg(Qt.formatDate(model.recordModel.endDateTime, "dd/MM/yyyy"))
-                                                    .arg(Qt.formatTime(model.recordModel.endDateTime, "HH:mm"))
+                        text: qsTr("%1 %2 - %3 %4").arg(Qt.formatDate(model.modelM.beginDateTime, "dd/MM/yyyy"))
+                                                    .arg(Qt.formatTime(model.modelM.beginDateTime, "HH:mm"))
+                                                    .arg(Qt.formatDate(model.modelM.endDateTime, "dd/MM/yyyy"))
+                                                    .arg(Qt.formatTime(model.modelM.endDateTime, "HH:mm"))
 
                         color: playPauseRecordButton.checked ? IngeScapeTheme.agentsListItemBackgroundColor :IngeScapeTheme.agentsListTextColor
                         font: IngeScapeTheme.normalFont
@@ -345,7 +345,7 @@ Item {
                         leftMargin:25
                     }
 
-                    visible: controller.isLoadingRecord && controller.playingRecord !== null && controller.playingRecord.recordModel.id === model.recordModel.id
+                    visible: controller.isLoadingRecord && controller.playingRecord !== null && controller.playingRecord.modelM.id === model.modelM.id
                 }
 
                 // Play record button
@@ -360,7 +360,7 @@ Item {
 
                     visible: !loadingRecordIndicator.visible
                     opacity: !enabled ? 0.3 : 1
-                    enabled: !controller.isRecording && (controller.playingRecord === null || controller.playingRecord.recordModel.id === model.recordModel.id)
+                    enabled: !controller.isRecording && (controller.playingRecord === null || controller.playingRecord.modelM.id === model.modelM.id)
 
                     style: I2SvgToggleButtonStyle {
                         fileCache: IngeScapeTheme.svgFileINGESCAPE
@@ -380,13 +380,13 @@ Item {
 
                     onClicked: {
                         if (controller) {
-                            controller.controlRecord(model.recordModel.id, checked)
+                            controller.controlRecord(model.modelM.id, checked)
                         }
                     }
 
                     Connections {
                         target: controller
-                        onPlayingRecordChanged: playPauseRecordButton.checked = controller.playingRecord !== null && controller.playingRecord.recordModel.id === model.recordModel.id
+                        onPlayingRecordChanged: playPauseRecordButton.checked = controller.playingRecord !== null && controller.playingRecord.modelM.id === model.modelM.id
                     }
                 }
 

@@ -9,6 +9,7 @@
  *
  *	Contributors:
  *      Bruno Lemenicier <lemenicier@ingenuity.io>
+ *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *
  */
 
@@ -29,15 +30,15 @@ class RecordVM : public QObject
 {
     Q_OBJECT
 
-    // FIXME: modelM instead of recordModel
     // Model of our record
-    I2_QML_PROPERTY_DELETE_PROOF(RecordM*, recordModel)
+    I2_QML_PROPERTY_DELETE_PROOF(RecordM*, modelM)
 
 
 public:
 
     /**
-     * @brief HostVM Default constructor
+     * @brief Constructor
+     * @param model
      * @param parent
      */
     explicit RecordVM(RecordM* model, QObject *parent = nullptr);

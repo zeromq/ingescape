@@ -41,7 +41,7 @@
 
 
 /**
- * @brief The ScenarioController class defines the main controller of our scenario edition
+ * @brief The ScenarioController class defines the controller of our scenario edition
  */
 class ScenarioController: public QObject
 {
@@ -281,6 +281,13 @@ Q_SIGNALS:
      * @param commandLine
      */
     void commandAskedToLauncher(QString command, QString hostname, QString commandLine);
+
+
+    /**
+     * @brief Signal emitted when a command must be sent on the network to a recorder
+     * @param commandAndParameters
+     */
+    void commandAskedToRecorder(QString commandAndParameters);
 
 
     /**

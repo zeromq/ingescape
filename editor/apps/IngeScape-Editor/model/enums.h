@@ -75,6 +75,8 @@ static const QString command_SetMappingPath = "SET_MAPPING_PATH";
 static const QString command_SaveDefinitionToPath = "SAVE_DEFINITION_TO_PATH";
 static const QString command_SaveMappingToPath = "SAVE_MAPPING_TO_PATH";
 
+static const QString command_ExecutedAction = "EXECUTED_ACTION";
+
 
 /**
  * @brief The Enums class is a helper for general enumerations

@@ -1703,12 +1703,20 @@ void ScenarioController::_executeCommandForAgent(AgentInMappingVM* agent, QStrin
  */
 void ScenarioController::_executeAction(ActionVM* actionVM, ActionExecutionVM* actionExecution, int currentTimeInMilliSeconds)
 {
-    if ((actionVM != NULL) && (actionExecution != NULL))
+    if ((actionVM != NULL) && (actionVM->modelM() != NULL) && (actionExecution != NULL))
     {
         if (actionExecution->shallRevert()) {
             // Initialize the reverse command (and parameters) for each effect
             actionExecution->initReverseCommandsForEffects(actionVM->modelM()->effectsList()->toList());
         }
+
+        //actionVM->modelM()->name()
+        QString commandAndParameters = QString("%1|%2|%3").arg(command_ExecutedAction,
+                                                               QString::number(actionVM->modelM()->uid()),
+                                                               QString::number(actionVM->lineInTimeLine()));
+
+        // Emit the signal "Command asked to Recorder"
+        Q_EMIT commandAskedToRecorder(commandAndParameters);
 
         // Execute all effects of the action
         executeEffectsOfAction(actionVM->modelM());

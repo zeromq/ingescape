@@ -299,12 +299,19 @@ Q_SIGNALS:
 public Q_SLOTS:
 
     /**
-     * @brief Slot when a command must be sent on the network to a launcher
+     * @brief Slot called when a command must be sent on the network to a launcher
      * @param command
      * @param hostname
-     * @param commandParameter
+     * @param commandLine
      */
-    void onCommandAskedToLauncher(QString command, QString hostname, QString commandParameter);
+    void onCommandAskedToLauncher(QString command, QString hostname, QString commandLine);
+
+
+    /**
+     * @brief Slot called when a command must be sent on the network to a recorder
+     * @param commandAndParameters
+     */
+    void onCommandAskedToRecorder(QString commandAndParameters);
 
 
     /**

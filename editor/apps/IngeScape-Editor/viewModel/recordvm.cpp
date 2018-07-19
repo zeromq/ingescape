@@ -10,6 +10,7 @@
  *	Contributors:
  *      Bruno Lemenicier <lemenicier@ingenuity.io>
  *      Alexandre Lemort <lemort@ingenuity.io>
+ *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *
  */
 
@@ -19,21 +20,19 @@
 
 
 /**
- * @brief Default constructor
+ * @brief Constructor
  * @param model
  * @param parent
  */
 RecordVM::RecordVM(RecordM* model,
                    QObject *parent) : QObject(parent),
-    _recordModel(NULL)
+    _modelM(model)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    if (model != NULL)
-    {
-        // Init model
-        setrecordModel( model );
+    if (_modelM != NULL) {
+        qDebug() << "New View Model of Record" << _modelM->name();
     }
 }
 
@@ -43,10 +42,9 @@ RecordVM::RecordVM(RecordM* model,
  */
 RecordVM::~RecordVM()
 {
-    if (_recordModel != NULL)
-    {
-        qInfo() << "Delete View Model of Record" << _recordModel->name();
+    if (_modelM != NULL) {
+        qDebug() << "Delete View Model of Record" << _modelM->name();
+        setmodelM(NULL);
     }
-    setrecordModel(NULL);
 }
 

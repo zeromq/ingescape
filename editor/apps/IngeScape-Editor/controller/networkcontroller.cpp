@@ -818,23 +818,51 @@ bool NetworkController::isAvailableNetworkDevice(QString networkDevice)
  * @param hostname
  * @param commandLine
  */
-void NetworkController::onCommandAskedToLauncher(QString command, QString hostname, QString commandParameter)
+void NetworkController::onCommandAskedToLauncher(QString command, QString hostname, QString commandLine)
 {
     if (!hostname.isEmpty())
     {
         // Get the peer id of The IngeScape Launcher with a HostName
         QString peerIdLauncher = IngeScapeLauncherManager::Instance().getPeerIdOfLauncherWithHostName(hostname);
 
-        if (!peerIdLauncher.isEmpty()) {
+        if (!peerIdLauncher.isEmpty())
+        {
             // Send the command with command line to the peer id of the launcher
             int success = igs_busSendStringToAgent(peerIdLauncher.toStdString().c_str(), "%s %s",
-                                                    command.toStdString().c_str(),
-                                                    commandParameter.toStdString().c_str());
-            qInfo() << "Send command" << command << "to launcher on" << hostname << "with command parameter" << commandParameter << "with success ?" << success;
+                                                   command.toStdString().c_str(),
+                                                   commandLine.toStdString().c_str());
+
+            qInfo() << "Send command" << command << "to launcher on" << hostname << "with command line" << commandLine << "with success ?" << success;
         }
         else {
             qInfo() << "There is no launcher on" << hostname;
         }
+    }
+}
+
+
+/**
+ * @brief Slot called when a command must be sent on the network to a recorder
+ * @param commandAndParameters
+ */
+void NetworkController::onCommandAskedToRecorder(QString commandAndParameters)
+{
+    if (_peerIdOfRecorders.count() == 1)
+    {
+        QString peerIdOfRecorder = _peerIdOfRecorders.first();
+        if (!peerIdOfRecorder.isEmpty())
+        {
+            // Send the command (and parameters) to the peer id of the recorder
+            int success = igs_busSendStringToAgent(peerIdOfRecorder.toStdString().c_str(), "%s", commandAndParameters.toStdString().c_str());
+
+            qInfo() << "Send command (and parameters)" << commandAndParameters << "to recorder" << peerIdOfRecorder << "with success ?" << success;
+        }
+    }
+    else if (_peerIdOfRecorders.count() == 0) {
+        qDebug() << "There is no recorder !";
+    }
+    else {
+        qWarning() << "There are several recorders (" << _peerIdOfRecorders.count() << ")";
     }
 }
 
@@ -846,7 +874,8 @@ void NetworkController::onCommandAskedToLauncher(QString command, QString hostna
  */
 void NetworkController::onCommandAskedToAgent(QStringList peerIdsList, QString command)
 {
-    if (!command.isEmpty() && (peerIdsList.count() > 0)) {
+    if (!command.isEmpty() && (peerIdsList.count() > 0))
+    {
         foreach (QString peerId, peerIdsList)
         {
             // Send the command to a peer id of agent
@@ -866,7 +895,8 @@ void NetworkController::onCommandAskedToAgent(QStringList peerIdsList, QString c
  */
 void NetworkController::onCommandAskedToAgentAboutOutput(QStringList peerIdsList, QString command, QString outputName)
 {
-    if (!command.isEmpty() && !outputName.isEmpty() && (peerIdsList.count() > 0)) {
+    if (!command.isEmpty() && !outputName.isEmpty() && (peerIdsList.count() > 0))
+    {
         foreach (QString peerId, peerIdsList)
         {
             // Send the command to a peer id of agent
@@ -889,7 +919,8 @@ void NetworkController::onCommandAskedToAgentAboutOutput(QStringList peerIdsList
  */
 void NetworkController::onCommandAskedToAgentAboutSettingValue(QStringList peerIdsList, QString command, QString agentIOPName, QString value)
 {
-    if (!command.isEmpty() && !agentIOPName.isEmpty() && !value.isEmpty() && (peerIdsList.count() > 0)) {
+    if (!command.isEmpty() && !agentIOPName.isEmpty() && !value.isEmpty() && (peerIdsList.count() > 0))
+    {
         foreach (QString peerId, peerIdsList)
         {
             // Send the command to a peer id of agent
