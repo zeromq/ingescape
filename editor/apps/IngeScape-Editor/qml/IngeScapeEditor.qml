@@ -133,11 +133,7 @@ Item {
         }
         height: 0
         controller: IngeScapeEditorC.scenarioC;
-
-
     }
-
-
 
 
     //
@@ -177,13 +173,16 @@ Item {
 
                 style: I2TabViewStyle {
                     frameOverlap: 1
+
                     tab: I2CustomRectangle {
                         color: styleData.selected ? IngeScapeTheme.selectedTabsBackgroundColor : "transparent"
-                        implicitWidth: (IngeScapeEditorC.recordsSupervisionC && (IngeScapeEditorC.recordsSupervisionC.isRecorderON === true)) ? leftPanelTabs.width/4 : leftPanelTabs.width/3
+                        implicitWidth: (IngeScapeEditorC.recordsSupervisionC && (IngeScapeEditorC.recordsSupervisionC.isRecorderON === true)) ? leftPanelTabs.width / 4
+                                                                                                                                              : leftPanelTabs.width / 3
                         implicitHeight: 26
                         topRightRadius : 5
 
-                        visible: (styleData.title !== "Records") || (IngeScapeEditorC.recordsSupervisionC && (IngeScapeEditorC.recordsSupervisionC.isRecorderON === true))
+                        visible: (styleData.index === 3) ? (IngeScapeEditorC.recordsSupervisionC && (IngeScapeEditorC.recordsSupervisionC.isRecorderON === true))
+                                                         : true
 
                         Text {
                             id: text
@@ -202,20 +201,37 @@ Item {
                             }
                         }
                     }
+
                     frame: Rectangle {
                         color: IngeScapeTheme.selectedTabsBackgroundColor
                     }
                 }
 
-                currentIndex : 0
+                currentIndex: 0
 
-                onCurrentIndexChanged: {
+                /*onCurrentIndexChanged: {
+                    console.log("on Current Index changed: " + currentIndex);
+                }*/
+
+                Connections {
+                    target: IngeScapeEditorC.recordsSupervisionC
+
+                    onIsRecorderONChanged: {
+                        //console.log("on Is Recorder ON changed: " + IngeScapeEditorC.recordsSupervisionC.isRecorderON);
+
+                        if (IngeScapeEditorC.recordsSupervisionC && (IngeScapeEditorC.recordsSupervisionC.isRecorderON === false)) {
+                            leftPanelTabs.currentIndex = 0;
+                        }
+                    }
                 }
 
 
                 Tab {
+                    id: tabAgents
+
                     title: qsTr("Agents");
                     active : true
+
                     Agent.AgentsList {
                         id: agentsList
 
@@ -226,7 +242,10 @@ Item {
                 }
 
                 Tab {
+                    id: tabHosts
+
                     title: qsTr("Hosts");
+
                     Host.HostsList {
                         id: hostsList
 
@@ -237,6 +256,8 @@ Item {
                 }
 
                 Tab {
+                    id: idActions
+
                     title: qsTr("ACTIONS");
                     active : false
 
@@ -268,6 +289,8 @@ Item {
                 }
 
                 Tab {
+                    id: tabRecords
+
                     title: qsTr("Records");
 
                     Record.RecordsList {
@@ -277,7 +300,6 @@ Item {
                     }
                 }
             }
-
         }
     }
 
