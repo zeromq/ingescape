@@ -877,39 +877,33 @@ QList<RecordM*> JsonHelper::createRecordModelList(QByteArray byteArrayOfJson)
     QJsonDocument jsonAgentDefinition = QJsonDocument::fromJson(byteArrayOfJson);
     if (jsonAgentDefinition.isObject())
     {
-        QJsonArray jsonArray;
-
         QJsonDocument jsonFileRoot = QJsonDocument::fromJson(byteArrayOfJson);
         QJsonValue recordsValue = jsonFileRoot.object().value("Records");
 
-        if(recordsValue.isArray())
-        {
-            jsonArray = recordsValue.toArray();
-        }
-
-        foreach (QJsonValue jsonValue, jsonArray)
-        {
-            if (jsonValue.isObject())
+        if (recordsValue.isArray())
+        {   
+            foreach (QJsonValue jsonValue, recordsValue.toArray())
             {
-                QJsonObject jsonAllMapping = jsonValue.toObject();
-
-                // Get value for keys "agentName" and "definition"
-                QJsonValue jsonId = jsonAllMapping.value("id");
-                QJsonValue jsonName = jsonAllMapping.value("name_record");
-                QJsonValue jsonBeginDateTime = jsonAllMapping.value("time_beg");
-                QJsonValue jsonEndDateTime = jsonAllMapping.value("time_end");
-
-                if (jsonName.isString() && jsonId.isString())
+                if (jsonValue.isObject())
                 {
-                    // Create record
-                    RecordM* record = new RecordM(jsonId.toString(),
-                                                  jsonName.toString(),
-                                                  QDateTime::fromSecsSinceEpoch(jsonBeginDateTime.toDouble()),
-                                                  QDateTime::fromSecsSinceEpoch(jsonEndDateTime.toDouble()));
+                    QJsonObject jsonAllMapping = jsonValue.toObject();
+
+                    QJsonValue jsonId = jsonAllMapping.value("id");
+                    QJsonValue jsonName = jsonAllMapping.value("name_record");
+                    QJsonValue jsonBeginDateTime = jsonAllMapping.value("time_beg");
+                    QJsonValue jsonEndDateTime = jsonAllMapping.value("time_end");
+
+                    if (jsonName.isString() && jsonId.isString())
+                    {
+                        // Create record
+                        RecordM* record = new RecordM(jsonId.toString(),
+                                                      jsonName.toString(),
+                                                      QDateTime::fromSecsSinceEpoch(jsonBeginDateTime.toDouble()),
+                                                      QDateTime::fromSecsSinceEpoch(jsonEndDateTime.toDouble()));
 
 
-                    recordsList.append(record);
-
+                        recordsList.append(record);
+                    }
                 }
             }
         }

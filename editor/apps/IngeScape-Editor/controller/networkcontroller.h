@@ -189,6 +189,14 @@ Q_SIGNALS:
      */
     void newRecordReceived(QString recordJSON);
 
+
+    /**
+     * @brief Signal emitted when a record has been deleted
+     * @param recordId
+     */
+    void recordDeleted(QString recordId);
+
+
     /**
      * @brief Signal emitted when a record playing has ended
      */

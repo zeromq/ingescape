@@ -23,7 +23,8 @@
  * @param model
  * @param parent
  */
-RecordVM::RecordVM(RecordM* model, QObject *parent) : QObject(parent),
+RecordVM::RecordVM(RecordM* model,
+                   QObject *parent) : QObject(parent),
     _recordModel(NULL)
 {
     // Force ownership of our object, it will prevent Qml from stealing it

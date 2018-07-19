@@ -141,7 +141,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _hostsSupervisionC = new HostsSupervisionController(_launcherManager, this);
 
     // Create the controller for records supervision
-    _recordsSupervisionC = new RecordsSupervisionController(_modelManager, this);
+    _recordsSupervisionC = new RecordsSupervisionController(_modelManager, _jsonHelper, this);
 
     // Create the controller for agents mapping
     _agentsMappingC = new AgentsMappingController(_modelManager, _jsonHelper, agentsMappingsPath, this);
@@ -169,10 +169,6 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
 
     connect(_networkC, &NetworkController::definitionReceived, _modelManager, &IngeScapeModelManager::onDefinitionReceived);
     connect(_networkC, &NetworkController::mappingReceived, _modelManager, &IngeScapeModelManager::onMappingReceived);
-    connect(_networkC, &NetworkController::allRecordsReceived, _modelManager, &IngeScapeModelManager::onAllRecordsReceived);
-    connect(_networkC, &NetworkController::newRecordReceived, _modelManager, &IngeScapeModelManager::onNewRecordReceived);
-    connect(_networkC, &NetworkController::endOfRecordReceived, _recordsSupervisionC, &RecordsSupervisionController::onEndOfRecordReceived);
-    connect(_networkC, &NetworkController::loadedRecordReceived, _recordsSupervisionC, &RecordsSupervisionController::onLoadedRecordReceived);
     connect(_networkC, &NetworkController::valuePublished, _modelManager, &IngeScapeModelManager::onValuePublished);
     connect(_networkC, &NetworkController::isMutedFromAgentUpdated, _modelManager, &IngeScapeModelManager::onisMutedFromAgentUpdated);
     connect(_networkC, &NetworkController::isFrozenFromAgentUpdated, _modelManager, &IngeScapeModelManager::onIsFrozenFromAgentUpdated);
@@ -183,6 +179,12 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(_networkC, &NetworkController::agentLogFilePath, _modelManager, &IngeScapeModelManager::onAgentLogFilePath);
     connect(_networkC, &NetworkController::agentDefinitionFilePath, _modelManager, &IngeScapeModelManager::onAgentDefinitionFilePath);
     connect(_networkC, &NetworkController::agentMappingFilePath, _modelManager, &IngeScapeModelManager::onAgentMappingFilePath);
+
+    connect(_networkC, &NetworkController::allRecordsReceived, _recordsSupervisionC, &RecordsSupervisionController::onAllRecordsReceived);
+    connect(_networkC, &NetworkController::newRecordReceived, _recordsSupervisionC, &RecordsSupervisionController::onNewRecordReceived);
+    connect(_networkC, &NetworkController::recordDeleted, _recordsSupervisionC, &RecordsSupervisionController::onRecordDeleted);
+    connect(_networkC, &NetworkController::endOfRecordReceived, _recordsSupervisionC, &RecordsSupervisionController::onEndOfRecordReceived);
+    connect(_networkC, &NetworkController::loadedRecordReceived, _recordsSupervisionC, &RecordsSupervisionController::onLoadedRecordReceived);
 
 
     // Connect to signals from the model manager
@@ -202,10 +204,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
 
     connect(_modelManager, &IngeScapeModelManager::addInputsToEditorForOutputs, _networkC, &NetworkController::onAddInputsToEditorForOutputs);
     connect(_modelManager, &IngeScapeModelManager::removeInputsToEditorForOutputs, _networkC, &NetworkController::onRemoveInputsToEditorForOutputs);
-
-    connect(_modelManager, &IngeScapeModelManager::commandAskedToAgent, _networkC, &NetworkController::onCommandAskedToAgent);
-    connect(_modelManager, &IngeScapeModelManager::recordsListChanged, _recordsSupervisionC, &RecordsSupervisionController::onRecordsListChanged);
-    connect(_modelManager, &IngeScapeModelManager::recordAdded, _recordsSupervisionC, &RecordsSupervisionController::onRecordAdded);
+    //connect(_modelManager, &IngeScapeModelManager::commandAskedToAgent, _networkC, &NetworkController::onCommandAskedToAgent);
 
 
     // Connect to signals from the controller for supervision of agents

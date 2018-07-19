@@ -33,6 +33,7 @@ class RecordVM : public QObject
     // Model of our record
     I2_QML_PROPERTY_DELETE_PROOF(RecordM*, recordModel)
 
+
 public:
 
     /**
@@ -40,6 +41,7 @@ public:
      * @param parent
      */
     explicit RecordVM(RecordM* model, QObject *parent = nullptr);
+
 
     /**
      * @brief Destructor
@@ -49,13 +51,6 @@ public:
 
 Q_SIGNALS:
 
-//    /**
-//     * @brief Signal emitted when a command must be sent on the network to a launcher
-//     * @param command
-//     * @param hostname
-//     * @param commandLine
-//     */
-//    void commandAskedToHost(QString command, QString hostname, QString commandLine);
 
 };
 

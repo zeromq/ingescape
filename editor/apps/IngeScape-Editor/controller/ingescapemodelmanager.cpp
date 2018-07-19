@@ -597,47 +597,6 @@ void IngeScapeModelManager::onMappingReceived(QString peerId, QString agentName,
 
 
 /**
- * @brief Occurs when records from DB have been received
- * @param recordsJSON
- */
-void IngeScapeModelManager::onAllRecordsReceived(QString recordsJSON)
-{
-    if (!recordsJSON.isEmpty() && (_jsonHelper != NULL))
-    {
-        QByteArray byteArrayOfJson = recordsJSON.toUtf8();
-        _recordsList = _jsonHelper->createRecordModelList(byteArrayOfJson);
-
-        Q_EMIT recordsListChanged(_recordsList);
-    }
-}
-
-
-/**
- * @brief Occurs when records from DB have been received
- * @param recordsJSON
- */
-void IngeScapeModelManager::onNewRecordReceived(QString recordJSON)
-{
-    if (!recordJSON.isEmpty() && (_jsonHelper != NULL))
-    {
-        QByteArray byteArrayOfJson = recordJSON.toUtf8();
-        QList<RecordM*> tmpRecords = _jsonHelper->createRecordModelList(byteArrayOfJson);
-
-        if (tmpRecords.count() == 1)
-        {
-            RecordM* newRecord = tmpRecords.at(0);
-            if (newRecord != NULL)
-            {
-                _recordsList.insert(0, newRecord);
-
-                Q_EMIT recordAdded(newRecord);
-            }
-        }
-    }
-}
-
-
-/**
  * @brief Slot called when a new value is published
  * @param publishedValue
  */
@@ -944,24 +903,6 @@ void IngeScapeModelManager::deleteAgentModel(AgentM* agent)
         delete agent;
 
         //_printAgents();
-    }
-}
-
-
-/**
- * @brief Delete a model of Record
- * @param agent
- */
-void IngeScapeModelManager::deleteRecordModel(RecordM* record)
-{
-    if (record != NULL)
-    {
-        if (_recordsList.contains(record)) {
-            _recordsList.removeOne(record);
-        }
-
-        // Free memory
-        delete record;
     }
 }
 

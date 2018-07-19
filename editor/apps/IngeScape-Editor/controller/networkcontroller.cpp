@@ -31,8 +31,6 @@ static const QString suffix_Launcher = ".ingescapelauncher";
 
 static const QString prefix_Definition = "EXTERNAL_DEFINITION#";
 static const QString prefix_Mapping = "EXTERNAL_MAPPING#";
-static const QString prefix_AllRecords = "RECORDS_LIST#";
-static const QString prefix_NewRecord = "NEW_RECORD#";
 
 static const QString prefix_Muted = "MUTED=";
 static const QString prefix_Frozen = "FROZEN=";
@@ -45,6 +43,9 @@ static const QString prefix_LogFilePath = "LOG_FILE_PATH=";
 static const QString prefix_DefinitionFilePath = "DEFINITION_FILE_PATH=";
 static const QString prefix_MappingFilePath = "MAPPING_FILE_PATH=";
 
+static const QString prefix_AllRecords = "RECORDS_LIST#";
+static const QString prefix_NewRecord = "NEW_RECORD#";
+static const QString prefix_DeletedRecord = "DELETED_RECORD=";
 static const QString prefix_LoadedRecord = "RECORD_LOADED";
 static const QString prefix_EndedRecord = "RECORD_ENDED";
 
@@ -331,6 +332,13 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
 
                 // Emit the signal "New record Received"
                 Q_EMIT networkController->newRecordReceived(message);
+            }
+            // Deleted Record
+            else if (message.startsWith(prefix_DeletedRecord))
+            {
+                message.remove(0, prefix_DeletedRecord.length());
+
+                Q_EMIT networkController->recordDeleted(message);
             }
             // Loaded record
             else if (message == prefix_LoadedRecord)

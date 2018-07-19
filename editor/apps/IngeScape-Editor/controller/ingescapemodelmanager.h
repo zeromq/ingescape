@@ -105,13 +105,6 @@ public:
 
 
     /**
-     * @brief Delete a model of Record
-     * @param record
-     */
-    void deleteRecordModel(RecordM* record);
-
-
-    /**
      * @brief Add a model of agent definition for an agent name
      * @param agentDefinition
      * @param agentName
@@ -260,19 +253,7 @@ Q_SIGNALS:
      * @param peerIdsList
      * @param command
      */
-    void commandAskedToAgent(QStringList peerIdsList, QString command);
-
-    /**
-     * @brief Emitted when the list of records changes
-     * @param records
-     */
-    void recordsListChanged(QList<RecordM*> records);
-
-    /**
-     * @brief Emitted when a record has been added
-     * @param record
-     */
-    void recordAdded(RecordM* record);
+    //void commandAskedToAgent(QStringList peerIdsList, QString command);
 
 
 public Q_SLOTS:
@@ -331,20 +312,6 @@ public Q_SLOTS:
      * @param mapping in JSON format
      */
     void onMappingReceived(QString peerId, QString agentName, QString mappingJSON);
-
-
-    /**
-     * @brief Slot called when all records of DB have been received and must be processed
-     * @param records in JSON format
-     */
-    void onAllRecordsReceived(QString records);
-
-
-    /**
-     * @brief Slot called when a new record has been stored into DB
-     * @param record in JSON format
-     */
-    void onNewRecordReceived(QString record);
 
 
     /**
@@ -496,9 +463,6 @@ private:
 
     // Map from "mapping name" to a list (of models) of agent mapping
     QHash<QString, QList<AgentMappingM*>> _mapFromNameToAgentMappingsList;
-
-    // List of records from DB
-    QList<RecordM*> _recordsList;
 
 };
 

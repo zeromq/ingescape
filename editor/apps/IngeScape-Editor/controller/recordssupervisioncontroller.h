@@ -57,11 +57,14 @@ class RecordsSupervisionController : public QObject
 
 public:
     /**
-     * @brief Default constructor
+     * @brief Constructor
      * @param modelManager
+     * @param jsonHelper
      * @param parent
      */
-    explicit RecordsSupervisionController(IngeScapeModelManager* modelManager, QObject *parent = nullptr);
+    explicit RecordsSupervisionController(IngeScapeModelManager* modelManager,
+                                          JsonHelper* jsonHelper,
+                                          QObject *parent = nullptr);
 
 
     /**
@@ -115,17 +118,24 @@ public Q_SLOTS:
 
 
     /**
-     * @brief Slot when the list of records model changes
-     * @param records
+     * @brief Slot called when all records of DB have been received
+     * @param list of records in JSON format
      */
-    void onRecordsListChanged(QList<RecordM*> records);
+    void onAllRecordsReceived(QString records);
 
 
     /**
-     * @brief Slot when a new model of record has been added
-     * @param records
+     * @brief Slot called when a new record has been stored into DB
+     * @param record in JSON format
      */
-    void onRecordAdded(RecordM* record);
+    void onNewRecordReceived(QString record);
+
+
+    /**
+     * @brief Slot called when a record has been deleted
+     * @param recordId
+     */
+    void onRecordDeleted(QString recordId);
 
 
     /**
@@ -147,19 +157,33 @@ private Q_SLOTS:
      */
     void _onTimeout_DisplayTime();
 
+
 private:
 
     /**
-     * @brief Aims at deleting VM and model of a record
-     * @param record
+     * @brief Create a view model of record with a model
+     * @param model
      */
-    void _deleteRecordVM(RecordVM* record);
+    void _createRecordVMwithModel(RecordM* model);
+
+
+    /**
+     * @brief Delete a view model of record with its model
+     * @param model
+     */
+    void _deleteRecordVMwithModel(RecordM* model);
 
 
 private:
 
     // Manager for the data model of INGESCAPE
     IngeScapeModelManager* _modelManager;
+
+    // Helper to manage JSON files
+    JsonHelper* _jsonHelper;
+
+    // Map from record id to a model of record
+    QHash<QString, RecordM*> _mapFromRecordIdToModel;
 
     // Map from record id to a view model of record
     QHash<QString, RecordVM*> _mapFromRecordIdToViewModel;

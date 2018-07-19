@@ -23,11 +23,13 @@
 #define INTERVAL_ELAPSED_TIME 25
 
 /**
- * @brief Default constructor
+ * @brief Constructor
  * @param modelManager
+ * @param jsonHelper
  * @param parent
  */
 RecordsSupervisionController::RecordsSupervisionController(IngeScapeModelManager* modelManager,
+                                                           JsonHelper* jsonHelper,
                                                            QObject *parent) : QObject(parent),
     _isRecorderON(false),
     _selectedRecord(NULL),
@@ -35,7 +37,8 @@ RecordsSupervisionController::RecordsSupervisionController(IngeScapeModelManager
     _isLoadingRecord(false),
     _playingRecord(NULL),
     _currentRecordTime(QTime::fromMSecsSinceStartOfDay(0)),
-    _modelManager(modelManager)
+    _modelManager(modelManager),
+    _jsonHelper(jsonHelper)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -43,6 +46,9 @@ RecordsSupervisionController::RecordsSupervisionController(IngeScapeModelManager
     // init display timer
     _timerToDisplayTime.setInterval(INTERVAL_ELAPSED_TIME);
     connect(&_timerToDisplayTime, &QTimer::timeout, this, &RecordsSupervisionController::_onTimeout_DisplayTime);
+
+    //HIGHLIGHT_LINK=macosAgent-myBool-simpleDemoAgent-output4
+    //HIGHLIGHT_LINK|macosAgent|myBool|simpleDemoAgent|output4
 }
 
 
@@ -61,7 +67,9 @@ RecordsSupervisionController::~RecordsSupervisionController()
     // Delete all VM of host
     _recordsList.deleteAllItems();
 
+    // Reset pointers
     _modelManager = NULL;
+    _jsonHelper = NULL;
 }
 
 
@@ -86,8 +94,7 @@ void RecordsSupervisionController::setisRecording(bool isRecording)
         }
 
         // Update display of elapsed time
-        if (isRecording)
-        {
+        if (isRecording) {
             _timerToDisplayTime.start();
         }
         else
@@ -116,17 +123,6 @@ void RecordsSupervisionController::deleteSelectedRecord()
 
             Q_EMIT commandAskedToAgent(peerIdsList, command);
         }
-
-        // Remove it from the list
-        _recordsList.remove(_selectedRecord);
-
-        // Delete each model of record
-        _modelManager->deleteRecordModel(_selectedRecord->recordModel());
-
-        // Delete the view model of record
-        RecordVM* temp = _selectedRecord;
-        setselectedRecord(NULL);
-        delete temp;
     }
 }
 
@@ -141,25 +137,26 @@ void RecordsSupervisionController::controlRecord(QString recordId, bool startPla
     if (_isRecorderON && !_peerIdOfRecorder.isEmpty() && _mapFromRecordIdToViewModel.contains(recordId))
     {
         RecordVM* recordVM = _mapFromRecordIdToViewModel.value(recordId);
-        //if (recordVM != NULL)
-
-        QStringList peerIdsList = QStringList(_peerIdOfRecorder);
-        QString command = "";
-
-        if (startPlaying)
+        if (recordVM != NULL)
         {
-            command = QString("PLAY_RECORD=%1").arg(recordId);
-            setplayingRecord(recordVM);
+            QStringList peerIdsList = QStringList(_peerIdOfRecorder);
+            QString command = "";
 
-            setisLoadingRecord(true);
-        }
-        else
-        {
-            command = QString("STOP_RECORD=%1").arg(recordId);
-            setplayingRecord(NULL);
-        }
+            if (startPlaying)
+            {
+                command = QString("PLAY_RECORD=%1").arg(recordId);
+                setplayingRecord(recordVM);
 
-        Q_EMIT commandAskedToAgent(peerIdsList, command);
+                setisLoadingRecord(true);
+            }
+            else
+            {
+                command = QString("STOP_RECORD=%1").arg(recordId);
+                setplayingRecord(NULL);
+            }
+
+            Q_EMIT commandAskedToAgent(peerIdsList, command);
+        }
     }
 }
 
@@ -212,47 +209,100 @@ void RecordsSupervisionController::onRecorderExited(QString peerId, QString peer
 
 
 /**
- * @brief Slot when the list of records model changes
- * @param records
+ * @brief Occurs when records from DB have been received
+ * @param list of records in JSON format
  */
-void RecordsSupervisionController::onRecordsListChanged(QList<RecordM*> records)
+void RecordsSupervisionController::onAllRecordsReceived(QString recordsJSON)
 {
-    QList<RecordVM*> recordsToDelete = _recordsList.toList();
-    _recordsList.clear();
-
-    for (RecordVM* vm : recordsToDelete)
+    if (!_mapFromRecordIdToModel.isEmpty())
     {
-        if (vm != NULL) {
-            _deleteRecordVM(vm);
-        }
-    }
+        QList<RecordM*> copy = _mapFromRecordIdToModel.values();
+        _mapFromRecordIdToModel.clear();
 
-    QList<RecordVM*> recordsToAdd;
-    for (RecordM* model : records)
-    {
-        if (model != NULL)
+        for (RecordM* model : copy)
         {
-            RecordVM* vm = new RecordVM(model);
-            recordsToAdd.append(vm);
-            _mapFromRecordIdToViewModel.insert(model->id(), vm);
+            if (model != NULL)
+            {
+                // Delete the view model of record with the model
+                _deleteRecordVMwithModel(model);
+
+                // Free memory
+                delete model;
+            }
         }
     }
 
-    _recordsList.append(recordsToAdd);
+    if (!recordsJSON.isEmpty() && (_jsonHelper != NULL))
+    {
+        QByteArray byteArrayOfJson = recordsJSON.toUtf8();
+        QList<RecordM*> recordsList = _jsonHelper->createRecordModelList(byteArrayOfJson);
+
+        if (!recordsList.isEmpty())
+        {
+            for (RecordM* record : recordsList)
+            {
+                if ((record != NULL) && !_mapFromRecordIdToModel.contains(record->id()))
+                {
+                    _mapFromRecordIdToModel.insert(record->id(), record);
+
+                    // Create a view model of record with this model
+                    _createRecordVMwithModel(record);
+                }
+            }
+        }
+    }
 }
 
 
 /**
- * @brief Slot when a new model of record has been added
- * @param record
+ * @brief Occurs when records from DB have been received
+ * @param record in JSON format
  */
-void RecordsSupervisionController::onRecordAdded(RecordM* model)
+void RecordsSupervisionController::onNewRecordReceived(QString recordJSON)
 {
-    if (model != NULL)
+    if (!recordJSON.isEmpty() && (_jsonHelper != NULL))
     {
-        RecordVM* vm = new RecordVM(model);
-        _recordsList.insert(0, vm);
-        _mapFromRecordIdToViewModel.insert(model->id(), vm);
+        QByteArray byteArrayOfJson = recordJSON.toUtf8();
+        QList<RecordM*> recordsList = _jsonHelper->createRecordModelList(byteArrayOfJson);
+
+        if (recordsList.count() == 1)
+        {
+            RecordM* newRecord = recordsList.at(0);
+
+            if ((newRecord != NULL) && !_mapFromRecordIdToModel.contains(newRecord->id()))
+            {
+                _mapFromRecordIdToModel.insert(newRecord->id(), newRecord);
+
+                // Create a view model of record with this model
+                _createRecordVMwithModel(newRecord);
+            }
+        }
+    }
+}
+
+
+/**
+ * @brief Slot called when a record has been deleted
+ * @param recordId
+ */
+void RecordsSupervisionController::onRecordDeleted(QString recordId)
+{
+    qDebug() << "onRecordDeleted" << recordId;
+
+    if (_mapFromRecordIdToModel.contains(recordId))
+    {
+        RecordM* model = _mapFromRecordIdToModel.value(recordId);
+
+        _mapFromRecordIdToModel.remove(recordId);
+
+        if (model != NULL)
+        {
+            // Delete the view model of record with the model
+            _deleteRecordVMwithModel(model);
+
+            // Free memory
+            delete model;
+        }
     }
 }
 
@@ -289,18 +339,49 @@ void RecordsSupervisionController::_onTimeout_DisplayTime()
 
 
 /**
- * @brief Aims at deleting VM and model of a record
- * @param record
+ * @brief Create a view model of record with a model
+ * @param model
  */
-void RecordsSupervisionController::_deleteRecordVM(RecordVM* record)
+void RecordsSupervisionController::_createRecordVMwithModel(RecordM* model)
 {
-    if (record != NULL)
+    if ((model != NULL) && !_mapFromRecordIdToViewModel.contains(model->id()))
     {
-        // Delete each model of record
-        _modelManager->deleteRecordModel(record->recordModel());
+        RecordVM* vm = new RecordVM(model);
 
-        // Delete the view model of record
-        delete record;
+        _mapFromRecordIdToViewModel.insert(model->id(), vm);
+
+        // Insert in the displayed list
+        _recordsList.insert(0, vm);
+    }
+}
+
+
+/**
+ * @brief Delete a view model of record with its model
+ * @param model
+ */
+void RecordsSupervisionController::_deleteRecordVMwithModel(RecordM* model)
+{
+    if ((model != NULL) && _mapFromRecordIdToViewModel.contains(model->id()))
+    {
+        RecordVM* vm = _mapFromRecordIdToViewModel.value(model->id());
+        if (vm != NULL)
+        {
+            _mapFromRecordIdToViewModel.remove(model->id());
+
+            if (_playingRecord != NULL) {
+                setplayingRecord(NULL);
+            }
+            if (_selectedRecord == vm) {
+                setselectedRecord(NULL);
+            }
+
+            // Remove from the displayed list
+            _recordsList.remove(vm);
+
+            // Free memory
+            delete vm;
+        }
     }
 }
 
