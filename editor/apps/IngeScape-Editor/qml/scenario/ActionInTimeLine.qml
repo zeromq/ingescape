@@ -348,7 +348,6 @@ Item {
                 actionVMItem.x = actionVMItem.viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(actionVMItem.myActionVM.startTime, actionVMItem.viewController.pixelsPerMinute);
                 actionVMItem.y = (actionVMItem.lineHeight * actionVMItem.myActionVM.lineInTimeLine);
             }
-
         }
 
 

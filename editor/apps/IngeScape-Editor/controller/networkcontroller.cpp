@@ -472,6 +472,10 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
             {
                 // Emit the signal "Recorder Exited"
                 Q_EMIT networkController->recorderExited(peerId, peerName);
+
+                QStringList peerIdOfRecorders = networkController->peerIdOfRecorders();
+                peerIdOfRecorders.removeOne(peerId);
+                networkController->setpeerIdOfRecorders(peerIdOfRecorders);
             }
             // IngeScape AGENT
             else
