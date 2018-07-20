@@ -42,7 +42,7 @@ Item {
     //
     //--------------------------------
 
-    //Title
+    // Title
     Text {
         id : titleActionsPanel
 
@@ -63,7 +63,7 @@ Item {
     }
 
 
-    // Actions list
+    // "Palette" of actions
     Grid {
         id : gridActionsPanel
 
@@ -85,11 +85,11 @@ Item {
             model: controller.actionsInPaletteList
 
             I2Rectangle {
-                id : panelRectangle
-                width : (gridActionsPanel.width - (gridActionsPanel.columnSpacing* (gridActionsPanel.columns-1)))/ gridActionsPanel.columns
-                height : 78
-                radiusX : 5
-                radiusY : 5
+                id: panelRectangle
+                width: (gridActionsPanel.width - (gridActionsPanel.columnSpacing * (gridActionsPanel.columns - 1))) / gridActionsPanel.columns
+                height: 78
+                radiusX: 5
+                radiusY: 5
 
                 strokeDashArray: "3, 3"
                 stroke : IngeScapeTheme.darkGreyColor
@@ -117,27 +117,25 @@ Item {
 
                     onDropped: {
                         var dragItem = drag.source;
-                        if (typeof dragItem.action !== 'undefined' && controller)
+                        if ((typeof dragItem.action !== 'undefined') && controller)
                         {
-
                             controller.setActionInPalette(index, dragItem.action);
 
                             // Restore color of panel Rectangle
                             panelRectangle.stroke = IngeScapeTheme.darkGreyColor
                         }
-
                     }
                 }
 
 
                 Button {
                     anchors.fill: parent
-                    visible : model.modelM !== null
-                    enabled : visible
+                    visible: model.modelM !== null
+                    enabled: visible
 
-                    text :  model.modelM ?  model.modelM.name : "";
+                    text: model.modelM ? model.modelM.name : ""
 
-                    style : I2ColorButtonStyle {
+                    style: I2ColorButtonStyle {
                         backgroundColorDisabled: IngeScapeTheme.darkBlueGreyColor;
                         backgroundColorReleased: IngeScapeTheme.darkBlueGreyColor;
                         backgroundColorPressed: IngeScapeTheme.darkBlueGreyColor;
@@ -203,7 +201,5 @@ Item {
             }
         }
     }
-
-
 
 }

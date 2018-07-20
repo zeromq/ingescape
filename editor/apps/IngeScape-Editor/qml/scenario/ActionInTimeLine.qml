@@ -391,18 +391,17 @@ Item {
         fuzzyColor : IngeScapeTheme.blackColor
 
         Column {
-            id : columnText
-            height : temporaryStartTimeAction.visible ?
-                         (nameAction.height + temporaryStartTimeAction.height) + 3
-                       : nameAction.height
+            id: columnText
+            height: temporaryStartTimeAction.visible ? (nameAction.height + temporaryStartTimeAction.height) + 3
+                                                     : nameAction.height
 
             anchors.centerIn: parent
             spacing: 6
 
             Text {
-                id : nameAction
-                color : IngeScapeTheme.lightGreyColor
-                text : (actionVMItem.myActionVM && actionVMItem.myActionVM.modelM) ? actionVMItem.myActionVM.modelM.name : ""
+                id: nameAction
+                color: IngeScapeTheme.lightGreyColor
+                text: (actionVMItem.myActionVM && actionVMItem.myActionVM.modelM) ? actionVMItem.myActionVM.modelM.name : ""
                 anchors.horizontalCenter: parent.horizontalCenter
                 horizontalAlignment: Text.AlignHCenter
 
@@ -413,12 +412,12 @@ Item {
             }
 
             Text {
-                id : temporaryStartTimeAction
+                id: temporaryStartTimeAction
+
                 visible: text !== ""
-                color : IngeScapeTheme.lightGreyColor
-                text : actionVMItem.temporaryStartTime?
-                           actionVMItem.temporaryStartTime.toLocaleString(Qt.locale(),"hh:mm:ss.zzz")
-                         : "";
+                color: IngeScapeTheme.lightGreyColor
+                text: actionVMItem.temporaryStartTime ? actionVMItem.temporaryStartTime.toLocaleString(Qt.locale(),"hh:mm:ss.zzz")
+                                                      : "";
 
                 anchors.horizontalCenter: parent.horizontalCenter
                 horizontalAlignment: Text.AlignHCenter

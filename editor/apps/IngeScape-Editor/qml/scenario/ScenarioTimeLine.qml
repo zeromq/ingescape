@@ -210,11 +210,25 @@ Item {
 
                         // Lower separator
                         Rectangle {
-                            anchors.left: parent.left
-                            anchors.right: parent.right
-                            anchors.bottom: parent.bottom
+                            anchors {
+                                left: parent.left
+                                right: parent.right
+                                bottom: parent.bottom
+                            }
 
                             height: 1
+                            color: IngeScapeTheme.veryDarkGreyColor
+                        }
+
+                        Text {
+                            anchors {
+                                left: parent.left
+                                leftMargin: 5
+                                verticalCenter: parent.verticalCenter
+                            }
+
+                            text: (index === 0) ? "AUTO" : index
+
                             color: IngeScapeTheme.veryDarkGreyColor
                         }
                     }
@@ -732,7 +746,7 @@ Item {
         // Current Time
         //
         Flickable {
-            id: currenttimeLine
+            id: currentTimeVerticalLine
 
             anchors.fill: parent
 
@@ -744,17 +758,12 @@ Item {
             clip : true
 
             Item {
-                id: currentTimeContent
-
                 width: viewController.timeTicksTotalWidth
                 height: timeLineArea.height
 
-
-                // Current time
                 // NB: two items to avoid complex QML bindings that
                 //     are interpreted by the Javascript stack
                 Item {
-                    id: currentTimeLine
                     x: currentTimeItem.x
                     y: 0
 
@@ -768,10 +777,8 @@ Item {
                         color: IngeScapeTheme.whiteColor
                     }
                 }
-
             }
         }
-
 
     }
 
@@ -942,7 +949,7 @@ Item {
 
 
                 //
-                // Current time
+                // Current time item
                 //
                 Item {
                     id: currentTimeItem
@@ -1120,7 +1127,7 @@ Item {
         topLeftRadius: 5
         topRightRadius: 5
 
-        color :  mouseAreaReduceTimeLine.pressed? IngeScapeTheme.darkBlueGreyColor : IngeScapeTheme.editorsBackgroundColor
+        color:  mouseAreaReduceTimeLine.pressed ? IngeScapeTheme.darkBlueGreyColor : IngeScapeTheme.editorsBackgroundColor
 
         I2SvgItem {
             anchors.centerIn: parent
@@ -1234,7 +1241,7 @@ Item {
                 fileCache: IngeScapeTheme.svgFileINGESCAPE
 
                 pressedID: releasedID + "-pressed"
-                releasedID: (controller && controller.isPlaying)? "pause" : "play"
+                releasedID: (controller && controller.isPlaying) ? "pause" : "play"
                 disabledID : releasedID
             }
 

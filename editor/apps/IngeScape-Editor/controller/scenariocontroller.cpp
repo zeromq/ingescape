@@ -1399,11 +1399,10 @@ void ScenarioController::_insertActionVMIntoMapByLineNumber(ActionVM* actionVMTo
                         actionVMSortedList->append(actionVMToInsert);
 
                         // Add an extra line if inserted our actionVM at the last line
-                        if(lineNumber >= _linesNumberInTimeLine -1)
+                        if(lineNumber >= _linesNumberInTimeLine - 1)
                         {
-                            setlinesNumberInTimeLine(lineNumber+2);
+                            setlinesNumberInTimeLine(lineNumber + 2);
                         }
-
                         break;
                     }
                 }
@@ -1421,9 +1420,9 @@ void ScenarioController::_insertActionVMIntoMapByLineNumber(ActionVM* actionVMTo
                     _mapActionsVMsInTimelineFromLineIndex.insert(lineNumber, actionVMSortedList);
 
                     // Add an extra line if inserted our actionVM at the last line
-                    if (lineNumber >= _linesNumberInTimeLine -1)
+                    if (lineNumber >= _linesNumberInTimeLine - 1)
                     {
-                        setlinesNumberInTimeLine(lineNumber+2);
+                        setlinesNumberInTimeLine(lineNumber + 2);
                     }
 
                     break;
