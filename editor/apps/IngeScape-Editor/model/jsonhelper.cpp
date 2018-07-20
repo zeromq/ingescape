@@ -331,20 +331,20 @@ scenario_import_actions_lists_t *JsonHelper::initActionsList(QByteArray byteArra
     QList<ActionInPaletteVM*> actionsInPalette;
     QList<ActionVM*> actionsInTimeLine;
 
-    QHash<QString, ActionM*> mapActionsMFromActionName;
+    QHash<int, ActionM*> hashFromUidToActionM;
 
-    QJsonDocument jsonFileRoot = QJsonDocument::fromJson(byteArrayOfJson);
-    if (jsonFileRoot.isObject())
+    QJsonDocument jsonDocument = QJsonDocument::fromJson(byteArrayOfJson);
+    if (jsonDocument.isObject())
     {
-        QJsonObject jsonActionsRoot = jsonFileRoot.object();
+        QJsonObject jsonRoot = jsonDocument.object();
 
         scenarioImport = new scenario_import_actions_lists_t();
 
         // ------
         // Actions in table list
         // ------
-        QJsonValue jsonActionsList = jsonActionsRoot.value("actions");
-        if(jsonActionsList.isArray())
+        QJsonValue jsonActionsList = jsonRoot.value("actions");
+        if (jsonActionsList.isArray())
         {
             foreach (QJsonValue jsonTmp, jsonActionsList.toArray())
             {
@@ -361,53 +361,53 @@ scenario_import_actions_lists_t *JsonHelper::initActionsList(QByteArray byteArra
                         if (jsonUID.isDouble() && jsonName.isString())
                         {
                             // Create the model of action
-                            actionM = new ActionM((int)jsonUID.toDouble(), jsonName.toString());
+                            actionM = new ActionM(jsonUID.toInt(), jsonName.toString());
 
                             QJsonValue jsonValue = jsonAction.value("validity_duration_type");
-                            if(jsonValue.isString())
+                            if (jsonValue.isString())
                             {
                                 int nValidationDurationType = ValidationDurationTypes::staticEnumFromKey(jsonValue.toString().toUpper());
                                 actionM->setvalidityDurationType(static_cast<ValidationDurationTypes::Value>(nValidationDurationType));
                             }
 
                             jsonValue = jsonAction.value("validity_duration_value");
-                            if(jsonValue.isString())
+                            if (jsonValue.isString())
                             {
                                 actionM->setvalidityDurationString(jsonValue.toString());
                             }
 
                             jsonValue = jsonAction.value("shall_revert");
-                            if(jsonValue.isBool())
+                            if (jsonValue.isBool())
                             {
                                 actionM->setshallRevert(jsonValue.toBool());
                             }
 
                             jsonValue = jsonAction.value("shall_revert_at_validity_end");
-                            if(jsonValue.isBool())
+                            if (jsonValue.isBool())
                             {
                                 actionM->setshallRevertWhenValidityIsOver(jsonValue.toBool());
                             }
 
                             jsonValue = jsonAction.value("shall_revert_after_time");
-                            if(jsonValue.isBool())
+                            if (jsonValue.isBool())
                             {
                                 actionM->setshallRevertAfterTime(jsonValue.toBool());
                             }
 
                             jsonValue = jsonAction.value("shall_rearm");
-                            if(jsonValue.isBool())
+                            if (jsonValue.isBool())
                             {
                                 actionM->setshallRearm(jsonValue.toBool());
                             }
 
                             jsonValue = jsonAction.value("revert_after_time");
-                            if(jsonValue.isString())
+                            if (jsonValue.isString())
                             {
                                 actionM->setrevertAfterTimeString(jsonValue.toString());
                             }
 
                             QJsonValue jsonEffectsList = jsonAction.value("effects");
-                            if(jsonEffectsList.isArray())
+                            if (jsonEffectsList.isArray())
                             {
                                 foreach (QJsonValue jsonEffect, jsonEffectsList.toArray())
                                 {
@@ -425,7 +425,7 @@ scenario_import_actions_lists_t *JsonHelper::initActionsList(QByteArray byteArra
                             }
 
                             QJsonValue jsonConditionsList = jsonAction.value("conditions");
-                            if(jsonConditionsList.isArray())
+                            if (jsonConditionsList.isArray())
                             {
                                 foreach (QJsonValue jsonCondition, jsonConditionsList.toArray())
                                 {
@@ -445,10 +445,10 @@ scenario_import_actions_lists_t *JsonHelper::initActionsList(QByteArray byteArra
                         }
                     }
 
-                    if (actionM != NULL)
+                    if ((actionM != NULL) && !hashFromUidToActionM.contains(actionM->uid()))
                     {
                         actionsListToImport.append(actionM);
-                        mapActionsMFromActionName.insert(actionM->name(), actionM);
+                        hashFromUidToActionM.insert(actionM->uid(), actionM);
                     }
                 }
             }
@@ -458,26 +458,30 @@ scenario_import_actions_lists_t *JsonHelper::initActionsList(QByteArray byteArra
         // ------
         // Actions in palette
         // ------
-        QJsonValue jsonActionsInPaletteList = jsonActionsRoot.value("actions_palette");
-        if(jsonActionsInPaletteList.isArray())
+        QJsonValue jsonActionsInPaletteList = jsonRoot.value("actions_palette");
+        if (jsonActionsInPaletteList.isArray())
         {
-            foreach (QJsonValue jsonTmp, jsonActionsInPaletteList.toArray())
+            for (QJsonValue jsonTmp : jsonActionsInPaletteList.toArray())
             {
                 if (jsonTmp.isObject())
                 {
                     QJsonObject jsonActionInPalette = jsonTmp.toObject();
-                    QJsonValue jsonActionName = jsonActionInPalette.value("action_name");
+
+                    QJsonValue jsonActionId = jsonActionInPalette.value("action_id");
+                    //QJsonValue jsonActionName = jsonActionInPalette.value("action_name");
                     QJsonValue jsonActionIndex = jsonActionInPalette.value("index");
-                    if(jsonActionName.isString())
+
+                    if (jsonActionId.isDouble() && jsonActionIndex.isDouble())
                     {
-                        QString actionName = jsonActionName.toString();
-                        if(mapActionsMFromActionName.contains(actionName))
+                        int actionId = jsonActionId.toInt();
+
+                        if (hashFromUidToActionM.contains(actionId))
                         {
-                            ActionM * actionM = mapActionsMFromActionName.value(actionName);
-                            if(actionM != NULL)
+                            ActionM* actionM = hashFromUidToActionM.value(actionId);
+                            if (actionM != NULL)
                             {
                                 int index = jsonActionIndex.toInt();
-                                if(index >= 0 && index < 9)
+                                if (index >= 0 && index < 9)
                                 {
                                     // Add action in palette
                                     actionsInPalette.append(new ActionInPaletteVM(actionM, index));
@@ -493,40 +497,44 @@ scenario_import_actions_lists_t *JsonHelper::initActionsList(QByteArray byteArra
         // ------
         // Actions in timeline
         // ------
-        QJsonValue jsonActionsInTimelineList = jsonActionsRoot.value("actions_timeline");
+        QJsonValue jsonActionsInTimelineList = jsonRoot.value("actions_timeline");
         if(jsonActionsInTimelineList.isArray())
         {
-            foreach (QJsonValue jsonTmp, jsonActionsInTimelineList.toArray())
+            for (QJsonValue jsonTmp : jsonActionsInTimelineList.toArray())
             {
                 if (jsonTmp.isObject())
                 {
                     QJsonObject jsonActionInTimeline = jsonTmp.toObject();
-                    QJsonValue jsonActionName = jsonActionInTimeline.value("action_name");
+
+                    QJsonValue jsonActionId = jsonActionInTimeline.value("action_id");
+                    //QJsonValue jsonActionName = jsonActionInTimeline.value("action_name");
                     QJsonValue jsonActionStartTime = jsonActionInTimeline.value("start_time");
                     QJsonValue jsonActionColor = jsonActionInTimeline.value("color");
                     QJsonValue jsonActionLineInTimeline = jsonActionInTimeline.value("line_number");
-                    if(jsonActionName.isString() && jsonActionStartTime.isDouble())
+
+                    if (jsonActionId.isDouble() && jsonActionStartTime.isDouble() && jsonActionLineInTimeline.isDouble())
                     {
-                        QString actionName = jsonActionName.toString();
-                        if(mapActionsMFromActionName.contains(actionName))
+                        int actionId = jsonActionId.toInt();
+
+                        if (hashFromUidToActionM.contains(actionId))
                         {
-                            ActionM * actionM = mapActionsMFromActionName.value(actionName);
-                            if(actionM != NULL)
+                            ActionM* actionM = hashFromUidToActionM.value(actionId);
+                            if (actionM != NULL)
                             {
-                                ActionVM * actionVM = new ActionVM(actionM, jsonActionStartTime.toDouble());
-                                if(jsonActionColor.isString())
-                                {
-                                    actionVM->setcolor(jsonActionColor.toString());
-                                }
+                                // Create the view model for the timeline
+                                ActionVM* actionVM = new ActionVM(actionM, jsonActionStartTime.toInt());
 
                                 // Set line in timeline
                                 actionVM->setlineInTimeLine(jsonActionLineInTimeline.toInt());
 
-                                // Add our action from timeline
+                                if (jsonActionColor.isString()) {
+                                    actionVM->setcolor(jsonActionColor.toString());
+                                }
+
+                                // Add our view model of action in the list
                                 actionsInTimeLine.append(actionVM);
                             }
                         }
-
                     }
                 }
             }
@@ -575,7 +583,7 @@ QJsonObject JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<Action
 
         QJsonArray jsonConditionsArray;
         // Create conditions view models
-        foreach (ActionConditionVM* conditionVM, actionM->conditionsList()->toList())
+        for (ActionConditionVM* conditionVM : actionM->conditionsList()->toList())
         {
             ActionConditionM* actionCondition = conditionVM->modelM();
             jsonFilled = false;
@@ -701,16 +709,18 @@ QJsonObject JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<Action
     }
     jsonScenario.insert("actions", jsonActionsArray);
 
+
     // ----
     // Actions list in palette
     // ----
     QJsonArray jsonActionsInPaletteArray;
-    foreach (ActionInPaletteVM* actionInPalette, actionsInPaletteList)
+    for (ActionInPaletteVM* actionInPalette : actionsInPaletteList)
     {
         if (actionInPalette->modelM() != NULL)
         {
             QJsonObject jsonActionsInPalette;
             jsonActionsInPalette.insert("index", actionInPalette->indexInPanel());
+            jsonActionsInPalette.insert("action_id", actionInPalette->modelM()->uid());
             jsonActionsInPalette.insert("action_name", actionInPalette->modelM()->name());
 
             jsonActionsInPaletteArray.append(jsonActionsInPalette);
@@ -718,15 +728,17 @@ QJsonObject JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<Action
     }
     jsonScenario.insert("actions_palette", jsonActionsInPaletteArray);
 
+
     // ----
     // Actions list in timeline
     // ----
     QJsonArray jsonActionsInTimelineArray;
-    foreach (ActionVM* actionVM, actionsInTimeLine)
+    for (ActionVM* actionVM : actionsInTimeLine)
     {
-        if (actionVM->modelM() != NULL && actionVM->startTime() >= 0)
+        if ((actionVM != NULL) && (actionVM->modelM() != NULL) && (actionVM->startTime() >= 0))
         {
             QJsonObject jsonActionsInTimeLine;
+            jsonActionsInTimeLine.insert("action_id", actionVM->modelM()->uid());
             jsonActionsInTimeLine.insert("action_name", actionVM->modelM()->name());
             jsonActionsInTimeLine.insert("start_time", actionVM->startTime());
             jsonActionsInTimeLine.insert("color", actionVM->color().name());
@@ -734,7 +746,6 @@ QJsonObject JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<Action
 
             jsonActionsInTimelineArray.append(jsonActionsInTimeLine);
         }
-
     }
     jsonScenario.insert("actions_timeline", jsonActionsInTimelineArray);
 
@@ -901,14 +912,12 @@ QList<RecordM*> JsonHelper::createRecordModelList(QByteArray byteArrayOfJson)
                                                       QDateTime::fromSecsSinceEpoch(jsonBeginDateTime.toDouble()),
                                                       QDateTime::fromSecsSinceEpoch(jsonEndDateTime.toDouble()));
 
-
                         recordsList.append(record);
                     }
                 }
             }
         }
     }
-
     return recordsList;
 }
 
@@ -1065,7 +1074,7 @@ AgentIOPM* JsonHelper::_createModelOfAgentIOP(QJsonObject jsonObject, AgentIOPTy
             {
             case AgentIOPValueTypes::INTEGER:
                 if (jsonValue.isDouble()) {
-                    int value = (int)jsonValue.toDouble();
+                    int value = jsonValue.toInt();
 
                     agentIOP->setdefaultValue(QVariant(value));
                 }

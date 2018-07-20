@@ -344,9 +344,9 @@ Item {
             //
             itemDragged.parent = actionVMItem;
 
-            if (actionVMItem.myActionVM) {
-                actionVMItem.x = viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(myActionVM.startTime, viewController.pixelsPerMinute);
-                actionVMItem.y = (actionVMItem.lineHeight * myActionVM.lineInTimeLine);
+            if (actionVMItem && actionVMItem.myActionVM && actionVMItem.viewController) {
+                actionVMItem.x = actionVMItem.viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(actionVMItem.myActionVM.startTime, actionVMItem.viewController.pixelsPerMinute);
+                actionVMItem.y = (actionVMItem.lineHeight * actionVMItem.myActionVM.lineInTimeLine);
             }
 
         }
