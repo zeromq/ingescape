@@ -101,11 +101,10 @@ public:
 
 
     /**
-     * @brief Send a command to the recorder with a JSON file content
+     * @brief Send a command, parameters and the content of a JSON file to the recorder
      * @param commandAndParameters
-     * @param jsonString
      */
-    void sendCommandWithJsonToRecorder(QString commandAndParameters, QString jsonString);
+    void sendCommandWithJsonToRecorder(QStringList commandAndParameters);
 
 
 Q_SIGNALS:

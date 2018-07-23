@@ -775,20 +775,27 @@ void IngeScapeEditorController::onOpenLogStreamOfAgents(QList<AgentM*> models)
  */
 void IngeScapeEditorController::_onStartToRecord()
 {
-     if (_networkC != NULL)
-     {
-         QString commandAndParameters = QString("%1=%2").arg(command_StartToRecord, "0");
+    // Get the JSON of the current platform
+    QJsonDocument jsonDocument = _getJsonOfCurrentPlatform();
 
-         // Get the JSON of the current platform
-         QJsonDocument jsonDocument = _getJsonOfCurrentPlatform();
-         if (!jsonDocument.isNull() && !jsonDocument.isEmpty())
-         {
-             QString jsonString = QString::fromUtf8(jsonDocument.toJson(QJsonDocument::Compact));
+    if ((_networkC != NULL) && !jsonDocument.isNull() && !jsonDocument.isEmpty())
+    {
+        QString jsonString = QString::fromUtf8(jsonDocument.toJson(QJsonDocument::Compact));
 
-             // Send a command to the recorder with a JSON file content
-             _networkC->sendCommandWithJsonToRecorder(commandAndParameters, jsonString);
-         }
-     }
+        QStringList commandAndParameters = QStringList();
+
+        // Add the command
+        commandAndParameters.append(command_StartToRecord);
+
+        // Add the delta of the start time from the Time Line
+        commandAndParameters.append(QString::number(0));
+
+        // Add the content of the JSON file
+        commandAndParameters.append(jsonString);
+
+        // Send the command, parameters and the content of the JSON file to the recorder
+        _networkC->sendCommandWithJsonToRecorder(commandAndParameters);
+    }
 }
 
 

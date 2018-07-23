@@ -43,9 +43,10 @@ static const QString prefix_LogFilePath = "LOG_FILE_PATH=";
 static const QString prefix_DefinitionFilePath = "DEFINITION_FILE_PATH=";
 static const QString prefix_MappingFilePath = "MAPPING_FILE_PATH=";
 
-static const QString prefix_AllRecords = "RECORDS_LIST#";
+static const QString prefix_AllRecords = "RECORDS_LIST=";
 static const QString prefix_AddedRecord = "ADDED_RECORD=";
 static const QString prefix_DeletedRecord = "DELETED_RECORD=";
+static const QString prefix_LoadingRecord = "RECORD_LOADING=";
 static const QString prefix_LoadedRecord = "RECORD_LOADED";
 static const QString prefix_EndedRecord = "RECORD_ENDED";
 static const QString prefix_HighlightLink = "HIGHLIGHT_LINK=";
@@ -817,35 +818,35 @@ bool NetworkController::isAvailableNetworkDevice(QString networkDevice)
 
 
 /**
- * @brief Send a command to the recorder with a JSON file content
+ * @brief Send a command, parameters and the content of a JSON file to the recorder
  * @param commandAndParameters
- * @param jsonString
  */
-void NetworkController::sendCommandWithJsonToRecorder(QString commandAndParameters, QString jsonString)
+void NetworkController::sendCommandWithJsonToRecorder(QStringList commandAndParameters)
 {
     if (_peerIdOfRecorders.count() == 1)
     {
         QString peerIdOfRecorder = _peerIdOfRecorders.first();
 
-        if (!peerIdOfRecorder.isEmpty() && !commandAndParameters.isEmpty() && !jsonString.isEmpty())
+        if (!peerIdOfRecorder.isEmpty() && !commandAndParameters.isEmpty())
         {
             // Create ZMQ message
             zmsg_t* msg = zmsg_new();
 
-            // Add a frame with STRING
-            zframe_t* frameString1 = zframe_new(commandAndParameters.toStdString().c_str(), commandAndParameters.length());
-            zmsg_append(msg, &frameString1);
-
-            // Add a frame with STRING
-            zframe_t* frameString2 = zframe_new(jsonString.toStdString().c_str(), jsonString.length());
-            zmsg_append(msg, &frameString2);
+            foreach (QString string, commandAndParameters)
+            {
+                // Add a frame with STRING
+                zframe_t* frameString = zframe_new(string.toStdString().c_str(), string.length());
+                zmsg_append(msg, &frameString);
+            }
 
             //int framesNumber = zmsg_size(msg);
 
             // Send ZMQ message to the recorder
             int success = igs_busSendZMQMsgToAgent(peerIdOfRecorder.toStdString().c_str(), &msg);
 
-            qInfo() << "Send command (and parameters)" << commandAndParameters << "to recorder" << peerIdOfRecorder << "with success ?" << success << "(with JSON:" << jsonString << ")";
+            // Do not print the JSON file content
+            commandAndParameters.removeLast();
+            qInfo() << "Send command, parameters and the content of a JSON file" << commandAndParameters << "to recorder" << peerIdOfRecorder << "with success ?" << success;
 
             zmsg_destroy(&msg);
         }
