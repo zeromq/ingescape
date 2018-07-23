@@ -206,7 +206,6 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
 
     connect(_modelManager, &IngeScapeModelManager::addInputsToEditorForOutputs, _networkC, &NetworkController::onAddInputsToEditorForOutputs);
     connect(_modelManager, &IngeScapeModelManager::removeInputsToEditorForOutputs, _networkC, &NetworkController::onRemoveInputsToEditorForOutputs);
-    //connect(_modelManager, &IngeScapeModelManager::commandAskedToAgent, _networkC, &NetworkController::onCommandAskedToAgent);
 
 
     // Connect to signals from the controller for supervision of agents
@@ -243,7 +242,9 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(_timeLineC, &AbstractTimeActionslineScenarioViewController::timeRangeChanged, _scenarioC, &ScenarioController::onTimeRangeChanged);
 
     // Connect to signals from Record supervision controller
-    connect(_recordsSupervisionC, &RecordsSupervisionController::commandAskedToAgent, _networkC, &NetworkController::onCommandAskedToAgent);
+    connect(_recordsSupervisionC, &RecordsSupervisionController::commandAskedToRecorder, _networkC, &NetworkController::onCommandAskedToRecorder);
+    connect(_recordsSupervisionC, &RecordsSupervisionController::startToRecord, this, &IngeScapeEditorController::_onStartToRecord);
+
 
     // Initialize agents list from default file
     _modelManager->importAgentsListFromDefaultFile();
@@ -770,6 +771,28 @@ void IngeScapeEditorController::onOpenLogStreamOfAgents(QList<AgentM*> models)
 
 
 /**
+ * @brief Slot called when the user wants to start to record
+ */
+void IngeScapeEditorController::_onStartToRecord()
+{
+     if (_networkC != NULL)
+     {
+         QString commandAndParameters = QString("%1=%2").arg(command_StartToRecord, "0");
+
+         // Get the JSON of the current platform
+         QJsonDocument jsonDocument = _getJsonOfCurrentPlatform();
+         if (!jsonDocument.isNull() && !jsonDocument.isEmpty())
+         {
+             QString jsonString = QString::fromUtf8(jsonDocument.toJson(QJsonDocument::Compact));
+
+             // Send a command to the recorder with a JSON file content
+             _networkC->sendCommandWithJsonToRecorder(commandAndParameters, jsonString);
+         }
+     }
+}
+
+
+/**
  * @brief Open the platform from JSON file
  * @param platformFilePath
  */
@@ -794,7 +817,7 @@ void IngeScapeEditorController::_openPlatformFromFile(QString platformFilePath)
                 }
 
                 // Import scenario
-                if(_scenarioC != NULL)
+                if (_scenarioC != NULL)
                 {
                     // Clear scenario
                     _scenarioC->clearScenario();
@@ -823,43 +846,57 @@ void IngeScapeEditorController::_openPlatformFromFile(QString platformFilePath)
  */
 void IngeScapeEditorController::_savePlatformToFile(QString platformFilePath)
 {
-    if (!platformFilePath.isEmpty() && (_jsonHelper != NULL))
+    if (!platformFilePath.isEmpty())
     {
-        qInfo() << "Save the scenario to JSON file" << platformFilePath;
+        qInfo() << "Save the current platform to JSON file" << platformFilePath;
 
-        QJsonObject platformJsonObject;
-
-        // Save the scenario
-        if(_scenarioC != NULL)
+        // Get the JSON of the current platform
+        QJsonDocument jsonDocument = _getJsonOfCurrentPlatform();
+        if (!jsonDocument.isNull() && !jsonDocument.isEmpty())
         {
-            platformJsonObject = _jsonHelper->exportScenario(_scenarioC->actionsList()->toList(), _scenarioC->actionsInPaletteList()->toList(), _scenarioC->actionsInTimeLine()->toList());
-        }
-
-        // Save mapping
-        if(_agentsMappingC != NULL)
-        {
-            QJsonArray jsonArray = _jsonHelper->exportAllAgentsInMapping(_agentsMappingC->allAgentsInMapping()->toList());
-
-            if(jsonArray.count() > 0)
+            QFile jsonFile(platformFilePath);
+            if (jsonFile.open(QIODevice::WriteOnly))
             {
-                platformJsonObject.insert("mappings",jsonArray);
+                jsonFile.write(jsonDocument.toJson(QJsonDocument::Indented));
+                jsonFile.close();
             }
-        }
-
-        // Conversion into byteArray
-        QByteArray byteArrayOfJson = QJsonDocument(platformJsonObject).toJson();
-
-        QFile jsonFile(platformFilePath);
-        if (jsonFile.open(QIODevice::WriteOnly))
-        {
-            jsonFile.write(byteArrayOfJson);
-            jsonFile.close();
-        }
-        else {
-            qCritical() << "Can not open file" << platformFilePath;
+            else {
+                qCritical() << "Can not open file" << platformFilePath;
+            }
         }
     }
 }
 
 
+/**
+ * @brief Get the JSON of the current platform
+ * @return
+ */
+QJsonDocument IngeScapeEditorController::_getJsonOfCurrentPlatform()
+{
+    QJsonDocument jsonDocument;
 
+    if (_jsonHelper != NULL)
+    {
+        QJsonObject platformJsonObject;
+
+        // Save the scenario
+        if (_scenarioC != NULL)
+        {
+            platformJsonObject = _jsonHelper->exportScenario(_scenarioC->actionsList()->toList(), _scenarioC->actionsInPaletteList()->toList(), _scenarioC->actionsInTimeLine()->toList());
+        }
+
+        // Save mapping
+        if (_agentsMappingC != NULL)
+        {
+            QJsonArray jsonArray = _jsonHelper->exportAllAgentsInMapping(_agentsMappingC->allAgentsInMapping()->toList());
+
+            if (!jsonArray.isEmpty()) {
+                platformJsonObject.insert("mappings", jsonArray);
+            }
+        }
+
+        jsonDocument = QJsonDocument(platformJsonObject);
+    }
+    return jsonDocument;
+}

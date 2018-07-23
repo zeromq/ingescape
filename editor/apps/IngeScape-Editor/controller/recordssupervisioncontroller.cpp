@@ -82,12 +82,14 @@ void RecordsSupervisionController::setisRecording(bool isRecording)
 
         Q_EMIT isRecordingChanged(_isRecording);
 
-        if (_isRecorderON && !_peerIdOfRecorder.isEmpty())
+        if (_isRecorderON)
         {
-            QStringList peerIdsList = QStringList(_peerIdOfRecorder);
-            QString command = _isRecording ? "START_TO_RECORD" : "STOP_TO_RECORD";
-
-            Q_EMIT commandAskedToAgent(peerIdsList, command);
+            if (_isRecording) {
+                Q_EMIT startToRecord();
+            }
+            else {
+                Q_EMIT commandAskedToRecorder(command_StopToRecord);
+            }
         }
 
         // Update display of elapsed time
@@ -113,12 +115,11 @@ void RecordsSupervisionController::deleteSelectedRecord()
         qDebug() << "Delete the selected record " << _selectedRecord->modelM()->name();
 
         // Notify the recorder that he has to remove entry from db
-        if (_isRecorderON && !_peerIdOfRecorder.isEmpty())
+        if (_isRecorderON)
         {
-            QStringList peerIdsList = QStringList(_peerIdOfRecorder);
-            QString command = QString("DELETE_RECORD=%1").arg(_selectedRecord->modelM()->id());
+            QString commandAndParameters = QString("%1=%2").arg(command_DeleteRecord, _selectedRecord->modelM()->id());
 
-            Q_EMIT commandAskedToAgent(peerIdsList, command);
+            Q_EMIT commandAskedToRecorder(commandAndParameters);
         }
     }
 }
@@ -131,28 +132,27 @@ void RecordsSupervisionController::deleteSelectedRecord()
  */
 void RecordsSupervisionController::controlRecord(QString recordId, bool startPlaying)
 {
-    if (_isRecorderON && !_peerIdOfRecorder.isEmpty() && _mapFromRecordIdToViewModel.contains(recordId))
+    if (_isRecorderON && _mapFromRecordIdToViewModel.contains(recordId))
     {
         RecordVM* recordVM = _mapFromRecordIdToViewModel.value(recordId);
         if (recordVM != NULL)
         {
-            QStringList peerIdsList = QStringList(_peerIdOfRecorder);
-            QString command = "";
+            QString commandAndParameters = "";
 
             if (startPlaying)
             {
-                command = QString("PLAY_RECORD=%1").arg(recordId);
+                commandAndParameters = QString("%1=%2").arg(command_PlayTheRecord, recordId);
                 setplayingRecord(recordVM);
 
                 setisLoadingRecord(true);
             }
             else
             {
-                command = QString("STOP_RECORD=%1").arg(recordId);
+                commandAndParameters = QString("%1=%2").arg(command_StopTheRecord, recordId);
                 setplayingRecord(NULL);
             }
 
-            Q_EMIT commandAskedToAgent(peerIdsList, command);
+            Q_EMIT commandAskedToRecorder(commandAndParameters);
         }
     }
 }
@@ -178,10 +178,8 @@ void RecordsSupervisionController::onRecorderEntered(QString peerId, QString pee
 
         qDebug() << "New recorder on the network, get all its records...";
 
-        QStringList peerIdsList = QStringList(_peerIdOfRecorder);
-
         // Get all records
-        Q_EMIT commandAskedToAgent(peerIdsList, "GET_RECORDS");
+        Q_EMIT commandAskedToRecorder("GET_RECORDS");
     }
 }
 

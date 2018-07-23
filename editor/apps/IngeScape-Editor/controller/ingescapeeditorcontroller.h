@@ -246,6 +246,14 @@ Q_SIGNALS:
     void resetMappindAndTimeLineViews();
 
 
+private Q_SLOTS:
+
+    /**
+     * @brief Slot called when the user wants to start to record
+     */
+    void _onStartToRecord();
+
+
 private:
 
     /**
@@ -260,6 +268,13 @@ private:
       * @param platformFilePath
       */
     void _savePlatformToFile(QString platformFilePath);
+
+
+    /**
+     * @brief Get the JSON of the current platform
+     * @return
+     */
+    QJsonDocument _getJsonOfCurrentPlatform();
 
 
 private:

@@ -100,6 +100,14 @@ public:
     Q_INVOKABLE bool isAvailableNetworkDevice(QString networkDevice);
 
 
+    /**
+     * @brief Send a command to the recorder with a JSON file content
+     * @param commandAndParameters
+     * @param jsonString
+     */
+    void sendCommandWithJsonToRecorder(QString commandAndParameters, QString jsonString);
+
+
 Q_SIGNALS:
 
     /**

@@ -168,6 +168,7 @@ public:
     /**
      * @brief Import the mapping from the json content
      * @param byteArrayOfJson
+     * @param fromPlatform
      * @return list of mapping_agent_import_t objects
      */
     QList<mapping_agent_import_t *> importMapping(QByteArray byteArrayOfJson, bool fromPlatform = false);

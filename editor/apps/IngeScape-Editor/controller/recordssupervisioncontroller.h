@@ -90,11 +90,16 @@ public:
 Q_SIGNALS:
 
     /**
-     * @brief Signal emitted when a command must be sent on the network to an agent
-     * @param peerIdsList
-     * @param command
+     * @brief Signal emitted when a command must be sent on the network to the recorder
+     * @param commandAndParameters
      */
-    void commandAskedToAgent(QStringList peerIdsList, QString command);
+    void commandAskedToRecorder(QString commandAndParameters);
+
+
+    /**
+     * @brief Signal emitted when the user wants to start to record
+     */
+    void startToRecord();
 
 
 public Q_SLOTS:

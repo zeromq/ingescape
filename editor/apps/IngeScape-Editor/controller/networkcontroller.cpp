@@ -44,7 +44,7 @@ static const QString prefix_DefinitionFilePath = "DEFINITION_FILE_PATH=";
 static const QString prefix_MappingFilePath = "MAPPING_FILE_PATH=";
 
 static const QString prefix_AllRecords = "RECORDS_LIST#";
-static const QString prefix_NewRecord = "NEW_RECORD#";
+static const QString prefix_AddedRecord = "ADDED_RECORD=";
 static const QString prefix_DeletedRecord = "DELETED_RECORD=";
 static const QString prefix_LoadedRecord = "RECORD_LOADED";
 static const QString prefix_EndedRecord = "RECORD_ENDED";
@@ -326,10 +326,10 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
                 // Emit the signal "All records Received"
                 Q_EMIT networkController->allRecordsReceived(message);
             }
-            // New record
-            else if (message.startsWith(prefix_NewRecord))
+            // Added record
+            else if (message.startsWith(prefix_AddedRecord))
             {
-                message.remove(0, prefix_NewRecord.length());
+                message.remove(0, prefix_AddedRecord.length());
 
                 // Emit the signal "New record Received"
                 Q_EMIT networkController->newRecordReceived(message);
@@ -817,6 +817,49 @@ bool NetworkController::isAvailableNetworkDevice(QString networkDevice)
 
 
 /**
+ * @brief Send a command to the recorder with a JSON file content
+ * @param commandAndParameters
+ * @param jsonString
+ */
+void NetworkController::sendCommandWithJsonToRecorder(QString commandAndParameters, QString jsonString)
+{
+    if (_peerIdOfRecorders.count() == 1)
+    {
+        QString peerIdOfRecorder = _peerIdOfRecorders.first();
+
+        if (!peerIdOfRecorder.isEmpty() && !commandAndParameters.isEmpty() && !jsonString.isEmpty())
+        {
+            // Create ZMQ message
+            zmsg_t* msg = zmsg_new();
+
+            // Add a frame with STRING
+            zframe_t* frameString1 = zframe_new(commandAndParameters.toStdString().c_str(), commandAndParameters.length());
+            zmsg_append(msg, &frameString1);
+
+            // Add a frame with STRING
+            zframe_t* frameString2 = zframe_new(jsonString.toStdString().c_str(), jsonString.length());
+            zmsg_append(msg, &frameString2);
+
+            //int framesNumber = zmsg_size(msg);
+
+            // Send ZMQ message to the recorder
+            int success = igs_busSendZMQMsgToAgent(peerIdOfRecorder.toStdString().c_str(), &msg);
+
+            qInfo() << "Send command (and parameters)" << commandAndParameters << "to recorder" << peerIdOfRecorder << "with success ?" << success << "(with JSON:" << jsonString << ")";
+
+            zmsg_destroy(&msg);
+        }
+    }
+    else if (_peerIdOfRecorders.count() == 0) {
+        qDebug() << "There is no recorder !";
+    }
+    else {
+        qWarning() << "There are several recorders (" << _peerIdOfRecorders.count() << ")";
+    }
+}
+
+
+/**
  * @brief Slot when a command must be sent on the network to a launcher
  * @param command
  * @param hostname
@@ -832,7 +875,8 @@ void NetworkController::onCommandAskedToLauncher(QString command, QString hostna
         if (!peerIdLauncher.isEmpty())
         {
             // Send the command with command line to the peer id of the launcher
-            int success = igs_busSendStringToAgent(peerIdLauncher.toStdString().c_str(), "%s %s",
+            int success = igs_busSendStringToAgent(peerIdLauncher.toStdString().c_str(),
+                                                   "%s %s",
                                                    command.toStdString().c_str(),
                                                    commandLine.toStdString().c_str());
 

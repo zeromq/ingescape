@@ -77,6 +77,13 @@ static const QString command_SaveMappingToPath = "SAVE_MAPPING_TO_PATH";
 
 static const QString command_ExecutedAction = "EXECUTED_ACTION";
 
+static const QString command_StartToRecord = "START_TO_RECORD";
+static const QString command_StopToRecord = "STOP_TO_RECORD";
+static const QString command_DeleteRecord = "DELETE_RECORD";
+static const QString command_PlayTheRecord = "PLAY_THE_RECORD";
+static const QString command_StopTheRecord = "STOP_THE_RECORD";
+static const QString command_PauseTheRecord = "PAUSE_THE_RECORD";
+
 
 /**
  * @brief The Enums class is a helper for general enumerations

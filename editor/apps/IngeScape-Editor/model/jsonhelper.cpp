@@ -756,6 +756,7 @@ QJsonObject JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<Action
 /**
  * @brief Import the mapping from the json content
  * @param byteArrayOfJson
+ * @param fromPlatform
  * @return list of mapping_agent_import_t objects
  */
 QList< mapping_agent_import_t* > JsonHelper::importMapping(QByteArray byteArrayOfJson, bool fromPlatform)
@@ -763,20 +764,21 @@ QList< mapping_agent_import_t* > JsonHelper::importMapping(QByteArray byteArrayO
     QList< mapping_agent_import_t* > listAgentsMapping;
 
     QJsonDocument jsonFileRoot = QJsonDocument::fromJson(byteArrayOfJson);
-    if ((fromPlatform == false && jsonFileRoot.isArray()) || (fromPlatform == true && jsonFileRoot.isObject()))
+    if ( (!fromPlatform && jsonFileRoot.isArray())
+         || (fromPlatform && jsonFileRoot.isObject()))
     {
         // Take into account the origin of the opening
         // if mapping is from a patform file, we get the mappings value
         // if not we get directly the value.
         QJsonArray jsonArray;
-        if(fromPlatform == true)
+        if (fromPlatform)
         {
             QJsonValue mappingsValue = jsonFileRoot.object().value("mappings");
-            if(mappingsValue.isArray())
-            {
+            if (mappingsValue.isArray()) {
                 jsonArray = mappingsValue.toArray();
             }
-        } else {
+        }
+        else {
             jsonArray = jsonFileRoot.array();
         }
 
