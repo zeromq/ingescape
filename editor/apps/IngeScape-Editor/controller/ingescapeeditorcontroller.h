@@ -231,13 +231,6 @@ public Q_SLOTS:
     QPointF getGlobalMousePosition();
 
 
-    /**
-     * @brief Slot called when we have to open the "Log Stream" of a list of agents
-     * @param models
-     */
-    void onOpenLogStreamOfAgents(QList<AgentM*> models);
-
-
 Q_SIGNALS:
 
     /**
@@ -249,9 +242,24 @@ Q_SIGNALS:
 private Q_SLOTS:
 
     /**
+     * @brief Slot called when we have to open the "Log Stream" of a list of agents
+     * @param models
+     */
+    void _onOpenLogStreamOfAgents(QList<AgentM*> models);
+
+
+    /**
      * @brief Slot called when the user wants to start to record
      */
     void _onStartToRecord();
+
+
+    /**
+     * @brief Slot called when a record is loading
+     * @param deltaTimeFromTimeLine
+     * @param jsonString
+     */
+    void _onLoadingRecord(int deltaTimeFromTimeLine, QString jsonString);
 
 
 private:

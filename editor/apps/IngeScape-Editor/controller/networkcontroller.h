@@ -191,29 +191,37 @@ Q_SIGNALS:
 
 
     /**
-     * @brief Signal emitted when a new record has been received
+     * @brief Signal emitted when a new record has been added
      * @param recordJSON
      */
-    void newRecordReceived(QString recordJSON);
+    void addedRecordReceived(QString recordJSON);
 
 
     /**
      * @brief Signal emitted when a record has been deleted
      * @param recordId
      */
-    void recordDeleted(QString recordId);
+    void deletedRecordReceived(QString recordId);
 
 
     /**
-     * @brief Signal emitted when a record playing has ended
+     * @brief Signal emitted when a record is loading
+     * @param deltaTimeFromTimeLine
+     * @param jsonString
      */
-    void endOfRecordReceived();
+    void loadingRecordReceived(int deltaTimeFromTimeLine, QString jsonString);
 
 
     /**
      * @brief Signal emitted when a record has been loaded
      */
     void loadedRecordReceived();
+
+
+    /**
+     * @brief Signal emitted when a record playing has ended
+     */
+    void endOfRecordReceived();
 
 
     /**

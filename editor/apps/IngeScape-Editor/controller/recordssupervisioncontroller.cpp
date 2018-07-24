@@ -20,7 +20,8 @@
 #include <QDebug>
 
 // Interval in milli-seconds to display current record elapsed time
-#define INTERVAL_ELAPSED_TIME 25
+#define INTERVAL_ELAPSED_TIME 50
+
 
 /**
  * @brief Constructor
@@ -143,8 +144,6 @@ void RecordsSupervisionController::controlRecord(QString recordId, bool startPla
             {
                 commandAndParameters = QString("%1=%2").arg(command_PlayTheRecord, recordId);
                 setplayingRecord(recordVM);
-
-                setisLoadingRecord(true);
             }
             else
             {
@@ -250,10 +249,10 @@ void RecordsSupervisionController::onAllRecordsReceived(QString recordsJSON)
 
 
 /**
- * @brief Occurs when records from DB have been received
+ * @brief Slot called when a new record has been added (into the DB)
  * @param record in JSON format
  */
-void RecordsSupervisionController::onNewRecordReceived(QString recordJSON)
+void RecordsSupervisionController::onAddedRecord(QString recordJSON)
 {
     if (!recordJSON.isEmpty() && (_jsonHelper != NULL))
     {
@@ -280,7 +279,7 @@ void RecordsSupervisionController::onNewRecordReceived(QString recordJSON)
  * @brief Slot called when a record has been deleted
  * @param recordId
  */
-void RecordsSupervisionController::onRecordDeleted(QString recordId)
+void RecordsSupervisionController::onDeletedRecord(QString recordId)
 {
     qDebug() << "onRecordDeleted" << recordId;
 
@@ -303,24 +302,38 @@ void RecordsSupervisionController::onRecordDeleted(QString recordId)
 
 
 /**
- * @brief Slot called when a record playing has ended
+ * @brief Slot called when a record is loading
+ * @param deltaTimeFromTimeLine
+ * @param jsonString
  */
-void RecordsSupervisionController::onEndOfRecordReceived()
+void RecordsSupervisionController::onLoadingRecord(int deltaTimeFromTimeLine, QString jsonString)
 {
-    if (_playingRecord != NULL)
-    {
-        setplayingRecord(NULL);
-    }
-    setisLoadingRecord(false);
+    Q_UNUSED(deltaTimeFromTimeLine)
+    Q_UNUSED(jsonString)
+
+    setisLoadingRecord(true);
 }
 
 
 /**
  * @brief Slot called when a record has been loaded
  */
-void RecordsSupervisionController::onLoadedRecordReceived()
+void RecordsSupervisionController::onLoadedRecord()
 {
     setisLoadingRecord(false);
+}
+
+
+/**
+ * @brief Slot called when a record playing has ended
+ */
+void RecordsSupervisionController::onEndOfRecord()
+{
+    setisLoadingRecord(false);
+
+    if (_playingRecord != NULL) {
+        setplayingRecord(NULL);
+    }
 }
 
 

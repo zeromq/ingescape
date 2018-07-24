@@ -332,25 +332,45 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
             {
                 message.remove(0, prefix_AddedRecord.length());
 
-                // Emit the signal "New record Received"
-                Q_EMIT networkController->newRecordReceived(message);
+                // Emit the signal "Added record received"
+                Q_EMIT networkController->addedRecordReceived(message);
             }
             // Deleted Record
             else if (message.startsWith(prefix_DeletedRecord))
             {
                 message.remove(0, prefix_DeletedRecord.length());
 
-                Q_EMIT networkController->recordDeleted(message);
+                // Emit the signal "Deleted record received"
+                Q_EMIT networkController->deletedRecordReceived(message);
+            }
+            // Loading record
+            else if (message == prefix_LoadingRecord)
+            {
+                qDebug() << prefix_LoadingRecord << zmsg_size(msg_dup) << "frames";
+
+                // Check that there are still 2 frames
+                if (zmsg_size(msg_dup) == 2)
+                {
+                    QString deltaTimeFromTimeLine = zmsg_popstr(msg_dup);
+                    QString jsonString = zmsg_popstr(msg_dup);
+
+                    // Emit the signal "Loading record received"
+                    Q_EMIT networkController->loadingRecordReceived(deltaTimeFromTimeLine.toInt(), jsonString);
+                }
             }
             // Loaded record
             else if (message == prefix_LoadedRecord)
             {
-                // Emit the signal "Loaded record Received"
+                qDebug() << prefix_LoadedRecord;
+
+                // Emit the signal "Loaded record received"
                 Q_EMIT networkController->loadedRecordReceived();
             }
             // End of record
             else if (message == prefix_EndedRecord)
             {
+                qDebug() << prefix_EndedRecord;
+
                 // Emit the signal "End of record Received"
                 Q_EMIT networkController->endOfRecordReceived();
             }

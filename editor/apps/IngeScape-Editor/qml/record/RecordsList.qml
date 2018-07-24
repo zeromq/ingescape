@@ -194,7 +194,9 @@ Item {
                 verticalCenter: parent.verticalCenter
             }
 
-            text : controller ? controller.currentRecordTime.toLocaleTimeString(Qt.locale(), "HH':'mm':'ss':'zzz") : "00:00:00.000"
+            text : controller ? controller.currentRecordTime.toLocaleTimeString(Qt.locale(), "hh':'mm':'ss'.'zzz")
+                              : "00:00:00.00"
+
             color: IngeScapeTheme.whiteColor
             font {
                 family: IngeScapeTheme.textFontFamily

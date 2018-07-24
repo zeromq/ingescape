@@ -181,10 +181,12 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(_networkC, &NetworkController::agentMappingFilePath, _modelManager, &IngeScapeModelManager::onAgentMappingFilePath);
 
     connect(_networkC, &NetworkController::allRecordsReceived, _recordsSupervisionC, &RecordsSupervisionController::onAllRecordsReceived);
-    connect(_networkC, &NetworkController::newRecordReceived, _recordsSupervisionC, &RecordsSupervisionController::onNewRecordReceived);
-    connect(_networkC, &NetworkController::recordDeleted, _recordsSupervisionC, &RecordsSupervisionController::onRecordDeleted);
-    connect(_networkC, &NetworkController::endOfRecordReceived, _recordsSupervisionC, &RecordsSupervisionController::onEndOfRecordReceived);
-    connect(_networkC, &NetworkController::loadedRecordReceived, _recordsSupervisionC, &RecordsSupervisionController::onLoadedRecordReceived);
+    connect(_networkC, &NetworkController::addedRecordReceived, _recordsSupervisionC, &RecordsSupervisionController::onAddedRecord);
+    connect(_networkC, &NetworkController::deletedRecordReceived, _recordsSupervisionC, &RecordsSupervisionController::onDeletedRecord);
+    connect(_networkC, &NetworkController::loadingRecordReceived, _recordsSupervisionC, &RecordsSupervisionController::onLoadingRecord);
+    connect(_networkC, &NetworkController::loadingRecordReceived, this, &IngeScapeEditorController::_onLoadingRecord);
+    connect(_networkC, &NetworkController::loadedRecordReceived, _recordsSupervisionC, &RecordsSupervisionController::onLoadedRecord);
+    connect(_networkC, &NetworkController::endOfRecordReceived, _recordsSupervisionC, &RecordsSupervisionController::onEndOfRecord);
 
     connect(_networkC, &NetworkController::highlightLink, _agentsMappingC, &AgentsMappingController::onHighlightLink);
 
@@ -214,7 +216,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(_agentsSupervisionC, &AgentsSupervisionController::commandAskedToAgentAboutOutput, _networkC, &NetworkController::onCommandAskedToAgentAboutOutput);
     connect(_agentsSupervisionC, &AgentsSupervisionController::identicalAgentModelReplaced, _agentsMappingC, &AgentsMappingController::onIdenticalAgentModelReplaced);
     connect(_agentsSupervisionC, &AgentsSupervisionController::openValuesHistoryOfAgent, _valuesHistoryC, &ValuesHistoryController::filterValuesToShowOnlyAgent);
-    connect(_agentsSupervisionC, &AgentsSupervisionController::openLogStreamOfAgents, this, &IngeScapeEditorController::onOpenLogStreamOfAgents);
+    connect(_agentsSupervisionC, &AgentsSupervisionController::openLogStreamOfAgents, this, &IngeScapeEditorController::_onOpenLogStreamOfAgents);
 
     // Connect to signals from the ingescape launcher manager
     connect(_launcherManager, &IngeScapeLauncherManager::hostModelCreated, _hostsSupervisionC, &HostsSupervisionController::onHostModelCreated);
@@ -729,7 +731,7 @@ QPointF IngeScapeEditorController::getGlobalMousePosition()
  * @brief Slot called when we have to open the "Log Stream" of a list of agents
  * @param models
  */
-void IngeScapeEditorController::onOpenLogStreamOfAgents(QList<AgentM*> models)
+void IngeScapeEditorController::_onOpenLogStreamOfAgents(QList<AgentM*> models)
 {
     if (!models.isEmpty())
     {
@@ -788,13 +790,34 @@ void IngeScapeEditorController::_onStartToRecord()
         commandAndParameters.append(command_StartToRecord);
 
         // Add the delta of the start time from the Time Line
-        commandAndParameters.append(QString::number(0));
+        int deltaTimeFromTimeLine = 0;
+
+        if (_scenarioC != NULL) {
+            deltaTimeFromTimeLine = _scenarioC->currentTime().msecsSinceStartOfDay();
+        }
+        commandAndParameters.append(QString::number(deltaTimeFromTimeLine));
 
         // Add the content of the JSON file
         commandAndParameters.append(jsonString);
 
         // Send the command, parameters and the content of the JSON file to the recorder
         _networkC->sendCommandWithJsonToRecorder(commandAndParameters);
+    }
+}
+
+
+/**
+ * @brief Slot called when a record is loading
+ * @param deltaTimeFromTimeLine
+ * @param jsonString
+ */
+void IngeScapeEditorController::_onLoadingRecord(int deltaTimeFromTimeLine, QString jsonString)
+{
+    qDebug() << "IngeScapeEditorController _onLoadingRecord";
+
+    if ((deltaTimeFromTimeLine >= 0) && !jsonString.isEmpty())
+    {
+
     }
 }
 

@@ -130,29 +130,37 @@ public Q_SLOTS:
 
 
     /**
-     * @brief Slot called when a new record has been stored into DB
+     * @brief Slot called when a new record has been added (into the DB)
      * @param record in JSON format
      */
-    void onNewRecordReceived(QString record);
+    void onAddedRecord(QString record);
 
 
     /**
      * @brief Slot called when a record has been deleted
      * @param recordId
      */
-    void onRecordDeleted(QString recordId);
+    void onDeletedRecord(QString recordId);
 
 
     /**
-     * @brief Slot called when a record playing has ended
+     * @brief Slot called when a record is loading
+     * @param deltaTimeFromTimeLine
+     * @param jsonString
      */
-    void onEndOfRecordReceived();
+    void onLoadingRecord(int deltaTimeFromTimeLine, QString jsonString);
 
 
     /**
      * @brief Slot called when a record has been loaded
      */
-    void onLoadedRecordReceived();
+    void onLoadedRecord();
+
+
+    /**
+     * @brief Slot called when a record playing has ended
+     */
+    void onEndOfRecord();
 
 
 private Q_SLOTS:
