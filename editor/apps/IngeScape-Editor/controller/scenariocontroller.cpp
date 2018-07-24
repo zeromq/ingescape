@@ -72,10 +72,9 @@ ScenarioController::ScenarioController(IngeScapeModelManager* modelManager,
     }
 
     // Add the first timeline line
-    I2CustomItemSortFilterListModel<ActionVM>* actionVMSortedList = new I2CustomItemSortFilterListModel<ActionVM>();
-    actionVMSortedList->setSortProperty("startTime");
-    // Add into our map
-    _mapActionsVMsInTimelineFromLineIndex.insert(0, actionVMSortedList);
+    I2CustomItemSortFilterListModel<ActionVM>* sortedListOfActionVM = new I2CustomItemSortFilterListModel<ActionVM>();
+    sortedListOfActionVM->setSortProperty("startTime");
+    _hashFromLineIndexToSortedViewModelsOfAction.insert(0, sortedListOfActionVM);
 
     // Set the sort property for the actionVM in the time line
     _actionsInTimeLine.setSortProperty("startTime");
@@ -203,48 +202,94 @@ void ScenarioController::importScenarioFromJson(QByteArray byteArrayOfJson)
                 // Add each actionVM in to the right line of our timeline
                 foreach (ActionVM* actionVM, scenarioToImport->actionsInTimelineList)
                 {
-                    int lineNumber = actionVM->lineInTimeLine();
-
-                    // Increment actionVM into the line number
-                    if (_mapActionsVMsInTimelineFromLineIndex.contains(lineNumber))
+                    if ((actionVM != NULL) && (actionVM->modelM() != NULL))
                     {
-                        I2CustomItemSortFilterListModel<ActionVM>* actionVMSortedList = _mapActionsVMsInTimelineFromLineIndex.value(lineNumber);
-                        if(actionVMSortedList != NULL)
-                        {
-                            // Insert the action
-                            actionVMSortedList->append(actionVM);
+                        int actionId = actionVM->modelM()->uid();
+                        int lineIndexInTimeLine = actionVM->lineInTimeLine();
+
+                        // Add the new action VM to our hash table
+                        QList<ActionVM*> listOfActionVM = _getListOfActionVMwithId(actionId);
+                        listOfActionVM.append(actionVM);
+                        _hashFromUidToViewModelsOfAction.insert(actionId, listOfActionVM);
+
+                        // Get the "Sorted" list of view models of action with the index of the line (in the time line)
+                        I2CustomItemSortFilterListModel<ActionVM>* sortedListOfActionVM = _getSortedListOfActionVMwithLineIndex(lineIndexInTimeLine);
+
+                        // Add the action VM to the line
+                        if (sortedListOfActionVM != NULL) {
+                            sortedListOfActionVM->append(actionVM);
                         }
-                    }
-                    else {
-                        // Create a new list
-                        I2CustomItemSortFilterListModel<ActionVM>* actionVMSortedList = new I2CustomItemSortFilterListModel<ActionVM>();
-                        actionVMSortedList->setSortProperty("startTime");
-                        actionVMSortedList->append(actionVM);
+                        else
+                        {
+                            // Create a new list and add to the hash table
+                            sortedListOfActionVM = new I2CustomItemSortFilterListModel<ActionVM>();
+                            sortedListOfActionVM->setSortProperty("startTime");
+                            sortedListOfActionVM->append(actionVM);
 
-                        // Add into our map
-                        _mapActionsVMsInTimelineFromLineIndex.insert(lineNumber, actionVMSortedList);
-                    }
+                            _hashFromLineIndexToSortedViewModelsOfAction.insert(lineIndexInTimeLine, sortedListOfActionVM);
+                        }
 
-                    // Add the new action VM to our map
-                    QList<ActionVM*> actionsVMsList;
-                    if (_mapActionsVMsInTimelineFromActionModel.contains(actionVM->modelM())) {
-                        actionsVMsList = _mapActionsVMsInTimelineFromActionModel.value(actionVM->modelM());
-                    }
-                    actionsVMsList.append(actionVM);
-                    _mapActionsVMsInTimelineFromActionModel.insert(actionVM->modelM(), actionsVMsList);
+                        _actionsInTimeLine.append(actionVM);
 
-                    _actionsInTimeLine.append(actionVM);
-
-                    // Increment the line number if necessary
-                    if (_linesNumberInTimeLine < lineNumber + 2)
-                    {
-                        setlinesNumberInTimeLine(lineNumber + 2);
+                        // Increment the line number if necessary
+                        if (_linesNumberInTimeLine < lineNumber + 2) {
+                            setlinesNumberInTimeLine(lineNumber + 2);
+                        }
                     }
                 }
             }
 
             delete scenarioToImport;
             scenarioToImport = NULL;
+        }
+    }
+}
+
+
+/**
+ * @brief Import the executed actions for a scenario from JSON
+ * @param byteArrayOfJson
+ */
+void ScenarioController::importExecutedActionsFromJson(QByteArray byteArrayOfJson)
+{
+    QJsonDocument jsonDocument = QJsonDocument::fromJson(byteArrayOfJson);
+    if (jsonDocument.isObject())
+    {
+        QJsonObject jsonRoot = jsonDocument.object();
+        if (jsonRoot.contains("Actions"))
+        {
+            QJsonValue jsonExecutedActions = jsonRoot.value("Actions");
+            if (jsonExecutedActions.isArray())
+            {
+                for (QJsonValue iterator : jsonExecutedActions.toArray())
+                {
+                    QJsonObject jsonExecutedAction = iterator.toObject();
+
+                    if (jsonExecutedAction.contains("id_action")
+                            && jsonExecutedAction.contains("line_action")
+                            && jsonExecutedAction.contains("time_action"))
+                    {
+                        int actionId = jsonExecutedAction.value("id_action").toInt();
+                        int lineIndexInTimeLine = jsonExecutedAction.value("line_action").toInt();
+                        int executionTime = jsonExecutedAction.value("time_action").toInt();
+
+                        qDebug() << actionId << lineIndexInTimeLine << executionTime;
+
+                        // Get the model of action with its (unique) id
+                        //ActionM* action = _getModelOfActionWithId(actionId);
+
+                        // Get the list of view models of action with its (unique) id
+                        //QList<ActionVM*> listOfActionVM = _getListOfActionVMwithId(actionId);
+
+                        // Get the "Sorted" list of view models of action with the index of the line (in the time line)
+                        I2CustomItemSortFilterListModel<ActionVM>* sortedListOfActionVM = _getSortedListOfActionVMwithLineIndex(lineIndexInTimeLine);
+                        if (sortedListOfActionVM != NULL)
+                        {
+                            // FIXME TODO
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -385,6 +430,8 @@ void ScenarioController::deleteAction(ActionM* action)
 {
     if (action != NULL)
     {
+        int actionId = action->uid();
+
         // Delete the popup if necessary
         ActionEditorController* actionEditorC = _getActionEditorFromModelOfAction(action);
         if (actionEditorC != NULL)
@@ -412,13 +459,16 @@ void ScenarioController::deleteAction(ActionM* action)
         }
 
         // Remove action from the timeline if exists
-        if (_mapActionsVMsInTimelineFromActionModel.contains(action))
+        QList<ActionVM*> listOfActionVM = _getListOfActionVMwithId(actionId);
+        if (!listOfActionVM.isEmpty())
         {
-            QList<ActionVM*> actionVMList = _mapActionsVMsInTimelineFromActionModel.value(action);
-            foreach (ActionVM* actionVM, actionVMList)
+            for (ActionVM* actionVM : listOfActionVM)
             {
-                removeActionVMFromTimeLine(actionVM);
+                if (actionVM != NULL) {
+                    removeActionVMFromTimeLine(actionVM);
+                }
             }
+            _hashFromUidToViewModelsOfAction.remove(actionId);
         }
 
         // Delete the action item
@@ -428,7 +478,7 @@ void ScenarioController::deleteAction(ActionM* action)
 
             _mapActionsFromActionName.remove(action->name());
 
-            _hashFromUidToModelOfAction.remove(action->uid());
+            _hashFromUidToModelOfAction.remove(actionId);
 
             delete action;
             action = NULL;
@@ -543,21 +593,20 @@ void ScenarioController::addActionVMAtTime(ActionM* actionM, int timeInMs, int l
 {
     if (actionM != NULL)
     {
-        ActionVM * actionVM = new ActionVM(actionM, timeInMs);
+        int actionId = actionM->uid();
+
+        ActionVM* actionVM = new ActionVM(actionM, timeInMs);
 
         // Insert the actionVM to the reight line number
         _insertActionVMIntoMapByLineNumber(actionVM, lineNumber);
 
         // If the action VM found a line to be insert in
-        if (actionVM->lineInTimeLine() != -1)
+        if (actionVM->lineInTimeLine() > -1)
         {
-            // Add the new action VM to our map
-            QList<ActionVM*> actionsVMsList;
-            if (_mapActionsVMsInTimelineFromActionModel.contains(actionM)) {
-                actionsVMsList = _mapActionsVMsInTimelineFromActionModel.value(actionM);
-            }
-            actionsVMsList.append(actionVM);
-            _mapActionsVMsInTimelineFromActionModel.insert(actionM, actionsVMsList);
+            // Add the new action VM to our hash table
+            QList<ActionVM*> listOfActionVM = _getListOfActionVMwithId(actionId);
+            listOfActionVM.append(actionVM);
+            _hashFromUidToViewModelsOfAction.insert(actionId, listOfActionVM);
 
             // Add the action VM to the timeline
             _actionsInTimeLine.append(actionVM);
@@ -604,7 +653,7 @@ void ScenarioController::addActionVMAtTime(ActionM* actionM, int timeInMs, int l
 void ScenarioController::addActionVMAtCurrentTime(ActionM* actionM)
 {
     if (actionM != NULL) {
-        addActionVMAtTime(actionM, _currentTime.msecsSinceStartOfDay());
+        addActionVMAtTime(actionM, _currentTime.msecsSinceStartOfDay(), 0);
     }
 }
 
@@ -615,22 +664,25 @@ void ScenarioController::addActionVMAtCurrentTime(ActionM* actionM)
  */
 void ScenarioController::removeActionVMFromTimeLine(ActionVM* actionVM)
 {
-    if ((actionVM != NULL) && _actionsInTimeLine.contains(actionVM))
+    if ((actionVM != NULL) && (actionVM->modelM() != NULL) && _actionsInTimeLine.contains(actionVM))
     {
         _actionsInTimeLine.remove(actionVM);
 
-        // Delete action vm from timeline
-        if(actionVM->modelM() != NULL && _mapActionsVMsInTimelineFromActionModel.contains(actionVM->modelM()))
+        int actionId = actionVM->modelM()->uid();
+
+        // Get the list of view models of action with its (unique) id
+        QList<ActionVM*> listOfActionVM = _getListOfActionVMwithId(actionId);
+
+        if (!listOfActionVM.isEmpty())
         {
-            QList<ActionVM*> actionsVMsList = _mapActionsVMsInTimelineFromActionModel.value(actionVM->modelM());
-            actionsVMsList.removeAll(actionVM);
-            _mapActionsVMsInTimelineFromActionModel.insert(actionVM->modelM(), actionsVMsList);
+            listOfActionVM.removeOne(actionVM);
+            _hashFromUidToViewModelsOfAction.insert(actionId, listOfActionVM);
 
             // Remove the action VM from the timeline map by line number
-            if(actionVM->lineInTimeLine() != -1)
+            if (actionVM->lineInTimeLine() != -1)
             {
                 int lineNumber = actionVM->lineInTimeLine();
-                if(_mapActionsVMsInTimelineFromLineIndex.contains(lineNumber))
+                if (_mapActionsVMsInTimelineFromLineIndex.contains(lineNumber))
                 {
                     I2CustomItemSortFilterListModel<ActionVM>* actionVMSortedList = _mapActionsVMsInTimelineFromLineIndex.value(lineNumber);
                     if ((actionVMSortedList != NULL) && actionVMSortedList->contains(actionVM))
@@ -639,10 +691,10 @@ void ScenarioController::removeActionVMFromTimeLine(ActionVM* actionVM)
                         actionVMSortedList->remove(actionVM);
 
                         // Check if the list is empty to remove the line
-                        if(actionVMSortedList->count() == 0)
+                        if (actionVMSortedList->isEmpty())
                         {
                             // We delete the last line, redice the number of display line in the limite of MINIMUM_DISPLAYED_LINES_NUMBER_IN_TIMELINE
-                            if(_linesNumberInTimeLine > MINIMUM_DISPLAYED_LINES_NUMBER_IN_TIMELINE && lineNumber+2 == _linesNumberInTimeLine)
+                            if ((_linesNumberInTimeLine > MINIMUM_DISPLAYED_LINES_NUMBER_IN_TIMELINE) && (lineNumber + 2 == _linesNumberInTimeLine))
                             {
                                 int nbOfDecrement = 1;
 
@@ -889,9 +941,10 @@ void ScenarioController::clearScenario()
  */
 void ScenarioController::moveActionVMAtTimeAndLine(ActionVM* actionVM, int timeInMilliseconds, int lineNumber)
 {
-    if ((actionVM != NULL) && (timeInMilliseconds >= 0) && (lineNumber >= 0))
+    if ((actionVM != NULL) && (timeInMilliseconds >= 0) && (lineNumber > 0))
     {
         bool canInsert = canInsertActionVMTo(actionVM->modelM(), timeInMilliseconds, lineNumber, actionVM);
+
         // Insert our item if possible
         if (canInsert)
         {
@@ -974,20 +1027,19 @@ void ScenarioController::moveActionVMAtTimeAndLine(ActionVM* actionVM, int timeI
 
 
 /**
- * @brief Can delete an action from the list
- *        Check dependencies in the timeline
+ * @brief Can delete an action from the list: check dependencies in the timeline
  * @param action to delete
- * @return can delete response
+ * @return false if there is a VM of this action in the timeline
  */
 bool ScenarioController::canDeleteActionFromList(ActionM* actionM)
 {
-    bool canBeDeleted = true;
-
-    if (actionM != NULL) {
-        canBeDeleted = !_mapActionsVMsInTimelineFromActionModel.contains(actionM);
+    if ((actionM != NULL) && _hashFromUidToViewModelsOfAction.contains(actionM->uid()))
+    {
+        return false;
     }
-
-    return canBeDeleted;
+    else {
+        return true;
+    }
 }
 
 
@@ -1383,7 +1435,14 @@ void ScenarioController::_insertActionVMIntoMapByLineNumber(ActionVM* actionVMTo
 
         while (lineNumber < _linesNumberInTimeLine)
         {
-            bool canInsert = canInsertActionVMTo(actionVMToInsert->modelM(), insertionStartTime, lineNumber);
+            bool canInsert = false;
+            if (lineNumber == 0) {
+                canInsert = true;
+            }
+            else {
+                canInsert = canInsertActionVMTo(actionVMToInsert->modelM(), insertionStartTime, lineNumber);
+            }
+
             // Insert our item if possible
             if (canInsert)
             {
@@ -1722,6 +1781,54 @@ void ScenarioController::_executeAction(ActionVM* actionVM, ActionExecutionVM* a
 
         // Notify the action that its effects has been executed
         actionVM->effectsExecuted(currentTimeInMilliSeconds);
+    }
+}
+
+
+/**
+ * @brief Get the model of action with its (unique) id
+ * @param actionId
+ * @return
+ */
+ActionM* ScenarioController::_getModelOfActionWithId(int actionId)
+{
+    if (_hashFromUidToModelOfAction.contains(actionId)) {
+        return _hashFromUidToModelOfAction.value(actionId);
+    }
+    else {
+        return NULL;
+    }
+}
+
+
+/**
+ * @brief Get the list of view models of action with its (unique) id
+ * @param actionId
+ * @return
+ */
+QList<ActionVM*> ScenarioController::_getListOfActionVMwithId(int actionId)
+{
+    if (_hashFromUidToViewModelsOfAction.contains(actionId)) {
+        return _hashFromUidToViewModelsOfAction.value(actionId);
+    }
+    else {
+        return QList<ActionVM*>();
+    }
+}
+
+
+/**
+ * @brief Get the "Sorted" list of view models of action with the index of the line (in the time line)
+ * @param index
+ * @return
+ */
+I2CustomItemSortFilterListModel<ActionVM>* ScenarioController::_getSortedListOfActionVMwithLineIndex(int index)
+{
+    if (_hashFromLineIndexToSortedViewModelsOfAction.contains(index)) {
+        return _hashFromLineIndexToSortedViewModelsOfAction.value(index);
+    }
+    else {
+        return NULL;
     }
 }
 

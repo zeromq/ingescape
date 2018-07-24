@@ -489,7 +489,8 @@ Item {
                                     var canInsertActionVM = false;
 
                                     // action comes from the actions list
-                                    if (controller && (typeof dragItem.action !== 'undefined')) {
+                                    if (controller && (typeof dragItem.action !== 'undefined'))
+                                    {
                                         // test if the drop is possible
                                         canInsertActionVM = controller.canInsertActionVMTo(dragItem.action, starttimeInMilliseconds, lineNumber)
 
@@ -517,7 +518,8 @@ Item {
                                     }
 
                                     // action comes from the timeline
-                                    if (controller && (typeof dragItem.myActionVM !== 'undefined' && dragItem.myActionVM.modelM !== null)) {
+                                    if (controller && (typeof dragItem.myActionVM !== 'undefined') && (dragItem.myActionVM.modelM !== null))
+                                    {
                                         // test if the drop is possible
                                         canInsertActionVM = controller.canInsertActionVMTo(dragItem.myActionVM.modelM, starttimeInMilliseconds, lineNumber, dragItem.myActionVM)
 
@@ -560,18 +562,23 @@ Item {
 
                                 onDropped: {
                                     var dragItem = drag.source;
-                                    var timeInMilliseconds = viewController.convertAbscissaInCoordinateSystemToTimeInMilliseconds(drag.x, viewController.pixelsPerMinute)
-                                    var lineNumber = Math.floor(drag.y / rootItem.lineHeight)
+                                    var timeInMilliseconds = viewController.convertAbscissaInCoordinateSystemToTimeInMilliseconds(drag.x, viewController.pixelsPerMinute);
+                                    var lineNumber = Math.floor(drag.y / rootItem.lineHeight);
+
+                                    // FIXME: lineNumber 0 is reserved for auto
+                                    if (lineNumber == 0) {
+                                        lineNumber = 1;
+                                    }
 
                                     // action comes from the actions list : add the action on the time line
-                                    if (typeof dragItem.action !== 'undefined' && controller)
+                                    if ((typeof dragItem.action !== 'undefined') && controller)
                                     {
                                         controller.addActionVMAtTime(dragItem.action, timeInMilliseconds, lineNumber);
                                     }
 
 
                                     // action comes from the timeline : update start time and line number
-                                    if (typeof dragItem.myActionVM !== 'undefined' && dragItem.myActionVM.modelM !== null)
+                                    if ((typeof dragItem.myActionVM !== 'undefined') && (dragItem.myActionVM.modelM !== null))
                                     {
                                         controller.moveActionVMAtTimeAndLine(dragItem.myActionVM, timeInMilliseconds, lineNumber);
                                     }

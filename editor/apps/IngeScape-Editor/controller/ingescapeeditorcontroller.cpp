@@ -819,7 +819,7 @@ void IngeScapeEditorController::_onLoadingRecord(int deltaTimeFromTimeLine, QStr
 
     if ((deltaTimeFromTimeLine >= 0) && !jsonPlatform.isEmpty())
     {
-        //qDebug() << "jsonExecutedActions" << jsonExecutedActions;
+        qDebug() << "jsonExecutedActions" << jsonExecutedActions;
 
         QByteArray byteArrayOfJson = jsonPlatform.toUtf8();
 
@@ -828,21 +828,23 @@ void IngeScapeEditorController::_onLoadingRecord(int deltaTimeFromTimeLine, QStr
             _agentsMappingC->importMappingFromJson(byteArrayOfJson, true);
         }
 
-        // Import the scenario from JSON
         if (_scenarioC != NULL)
         {
             // Clear scenario
             _scenarioC->clearScenario();
 
-            // Import new scenario
+            // Import the scenario from JSON
             _scenarioC->importScenarioFromJson(byteArrayOfJson);
 
             // Update the current time
             _scenarioC->setcurrentTime(QTime::fromMSecsSinceStartOfDay(deltaTimeFromTimeLine));
+
+            // Import the executed actions for this scenario from JSON
+            _scenarioC->importExecutedActionsFromJson(jsonExecutedActions.toUtf8());
         }
 
         // Notify QML to reset view
-        //Q_EMIT resetMappindAndTimeLineViews();
+        Q_EMIT resetMappindAndTimeLineViews();
     }
 }
 

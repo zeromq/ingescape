@@ -148,6 +148,13 @@ public:
 
 
     /**
+     * @brief Import the executed actions for a scenario from JSON
+     * @param byteArrayOfJson
+     */
+    void importExecutedActionsFromJson(QByteArray byteArrayOfJson);
+
+
+    /**
       * @brief Check if an agent is defined into tha actions (conditions and effects)
       * @param agent name
       */
@@ -202,7 +209,7 @@ public:
      * @param action model
      * @param line number
      */
-    Q_INVOKABLE void addActionVMAtTime(ActionM* actionM, int timeInMs, int lineNumber = -1);
+    Q_INVOKABLE void addActionVMAtTime(ActionM* actionM, int timeInMs, int lineNumber);
 
 
     /**
@@ -264,10 +271,9 @@ public:
 
 
     /**
-     * @brief Can delete an action from the list
-     *        Check dependencies in the timeline
+     * @brief Can delete an action from the list: check dependencies in the timeline
      * @param action to delete
-     * @return can delete response
+     * @return false if there is a VM of this action in the timeline
      */
     Q_INVOKABLE bool canDeleteActionFromList(ActionM* actionM);
 
@@ -448,6 +454,30 @@ private:
 
 
     /**
+     * @brief Get the model of action with its (unique) id
+     * @param actionId
+     * @return
+     */
+    ActionM* _getModelOfActionWithId(int actionId);
+
+
+    /**
+     * @brief Get the list of view models of action with its (unique) id
+     * @param actionId
+     * @return
+     */
+    QList<ActionVM*> _getListOfActionVMwithId(int actionId);
+
+
+    /**
+     * @brief Get the "Sorted" list of view models of action with the index of the line (in the time line)
+     * @param index
+     * @return
+     */
+    I2CustomItemSortFilterListModel<ActionVM>* _getSortedListOfActionVMwithLineIndex(int index);
+
+
+    /**
      * @brief Get the "Action Editor" from a model of action
      * @return
      */
@@ -481,14 +511,14 @@ private:
     // Map of actions model from the action name
     QHash<QString, ActionM*> _mapActionsFromActionName;
 
-    // Hash table from UID to the corresponding model of action
+    // Hash table from action UID to the corresponding model of action
     QHash<int, ActionM*> _hashFromUidToModelOfAction;
 
-    // Map of actions VM in the timeline from the action model
-    QHash<ActionM*, QList<ActionVM*> > _mapActionsVMsInTimelineFromActionModel;
+    // Hash table from action UID to the corresponding list of view models of action (in the timeline)
+    QHash<int, QList<ActionVM*> > _hashFromUidToViewModelsOfAction;
 
-    // Map of actions VM in the timeline from the line index
-    QHash<int, I2CustomItemSortFilterListModel<ActionVM>* > _mapActionsVMsInTimelineFromLineIndex;
+    // Hash table from line index (in the timeline) to the corresponding list of view models of action
+    QHash<int, I2CustomItemSortFilterListModel<ActionVM>* > _hashFromLineIndexToSortedViewModelsOfAction;
 
     // Timer to handle the scenario and execute actions
     QTimer _timerToExecuteActions;
