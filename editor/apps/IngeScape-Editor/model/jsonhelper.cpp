@@ -811,12 +811,12 @@ QList< mapping_agent_import_t* > JsonHelper::importMapping(QByteArray byteArrayO
 
                         // Load position
                         QStringList positionStringList = jsonPosition.toString().split(',');
-                        if(positionStringList.count() == 2)
+                        if (positionStringList.count() == 2)
                         {
                             QString xStr = positionStringList.first().remove('(');
                             QString yStr = positionStringList.last().remove(')');
 
-                            if(xStr.isEmpty() == false && yStr.isEmpty() == false)
+                            if (!xStr.isEmpty() && !yStr.isEmpty())
                             {
                                 mappingAgent->position = QPointF(xStr.toFloat(), yStr.toFloat());
                             }

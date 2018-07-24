@@ -814,10 +814,35 @@ void IngeScapeEditorController::_onStartToRecord()
  */
 void IngeScapeEditorController::_onLoadingRecord(int deltaTimeFromTimeLine, QString jsonPlatform, QString jsonExecutedActions)
 {
+    // TODO jsonExecutedActions
+    Q_UNUSED(jsonExecutedActions)
+
     if ((deltaTimeFromTimeLine >= 0) && !jsonPlatform.isEmpty())
     {
-        //qDebug() << "jsonPlatform" << jsonPlatform;
         //qDebug() << "jsonExecutedActions" << jsonExecutedActions;
+
+        QByteArray byteArrayOfJson = jsonPlatform.toUtf8();
+
+        // Import the mapping from JSON
+        if (_agentsMappingC != NULL) {
+            _agentsMappingC->importMappingFromJson(byteArrayOfJson, true);
+        }
+
+        // Import the scenario from JSON
+        if (_scenarioC != NULL)
+        {
+            // Clear scenario
+            _scenarioC->clearScenario();
+
+            // Import new scenario
+            _scenarioC->importScenarioFromJson(byteArrayOfJson);
+
+            // Update the current time
+            _scenarioC->setcurrentTime(QTime::fromMSecsSinceStartOfDay(deltaTimeFromTimeLine));
+        }
+
+        // Notify QML to reset view
+        //Q_EMIT resetMappindAndTimeLineViews();
     }
 }
 
@@ -840,9 +865,8 @@ void IngeScapeEditorController::_openPlatformFromFile(QString platformFilePath)
                 QByteArray byteArrayOfJson = jsonFile.readAll();
                 jsonFile.close();
 
-                // Import mapping
-                if(_agentsMappingC != NULL)
-                {
+                // Import the mapping from JSON
+                if (_agentsMappingC != NULL) {
                     _agentsMappingC->importMappingFromJson(byteArrayOfJson, true);
                 }
 
