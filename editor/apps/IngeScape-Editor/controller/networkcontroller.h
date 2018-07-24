@@ -207,9 +207,10 @@ Q_SIGNALS:
     /**
      * @brief Signal emitted when a record is loading
      * @param deltaTimeFromTimeLine
-     * @param jsonString
+     * @param jsonPlatform
+     * @param jsonExecutedActions
      */
-    void loadingRecordReceived(int deltaTimeFromTimeLine, QString jsonString);
+    void loadingRecordReceived(int deltaTimeFromTimeLine, QString jsonPlatform, QString jsonExecutedActions);
 
 
     /**

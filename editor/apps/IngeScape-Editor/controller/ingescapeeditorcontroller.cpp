@@ -809,15 +809,15 @@ void IngeScapeEditorController::_onStartToRecord()
 /**
  * @brief Slot called when a record is loading
  * @param deltaTimeFromTimeLine
- * @param jsonString
+ * @param jsonPlatform
+ * @param jsonExecutedActions
  */
-void IngeScapeEditorController::_onLoadingRecord(int deltaTimeFromTimeLine, QString jsonString)
+void IngeScapeEditorController::_onLoadingRecord(int deltaTimeFromTimeLine, QString jsonPlatform, QString jsonExecutedActions)
 {
-    qDebug() << "IngeScapeEditorController _onLoadingRecord";
-
-    if ((deltaTimeFromTimeLine >= 0) && !jsonString.isEmpty())
+    if ((deltaTimeFromTimeLine >= 0) && !jsonPlatform.isEmpty())
     {
-
+        //qDebug() << "jsonPlatform" << jsonPlatform;
+        //qDebug() << "jsonExecutedActions" << jsonExecutedActions;
     }
 }
 

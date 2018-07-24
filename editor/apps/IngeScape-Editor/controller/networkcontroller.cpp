@@ -348,14 +348,15 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
             {
                 qDebug() << prefix_LoadingRecord << zmsg_size(msg_dup) << "frames";
 
-                // Check that there are still 2 frames
-                if (zmsg_size(msg_dup) == 2)
+                // Check that there are still 3 frames
+                if (zmsg_size(msg_dup) == 3)
                 {
                     QString deltaTimeFromTimeLine = zmsg_popstr(msg_dup);
-                    QString jsonString = zmsg_popstr(msg_dup);
+                    QString jsonPlatform = zmsg_popstr(msg_dup);
+                    QString jsonExecutedActions = zmsg_popstr(msg_dup);
 
                     // Emit the signal "Loading record received"
-                    Q_EMIT networkController->loadingRecordReceived(deltaTimeFromTimeLine.toInt(), jsonString);
+                    Q_EMIT networkController->loadingRecordReceived(deltaTimeFromTimeLine.toInt(), jsonPlatform, jsonExecutedActions);
                 }
             }
             // Loaded record

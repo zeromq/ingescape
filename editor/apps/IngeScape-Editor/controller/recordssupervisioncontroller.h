@@ -146,9 +146,10 @@ public Q_SLOTS:
     /**
      * @brief Slot called when a record is loading
      * @param deltaTimeFromTimeLine
-     * @param jsonString
+     * @param jsonPlatform
+     * @param jsonExecutedActions
      */
-    void onLoadingRecord(int deltaTimeFromTimeLine, QString jsonString);
+    void onLoadingRecord(int deltaTimeFromTimeLine, QString jsonPlatform, QString jsonExecutedActions);
 
 
     /**

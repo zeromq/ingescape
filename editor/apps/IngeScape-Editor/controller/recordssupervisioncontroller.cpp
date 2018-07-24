@@ -304,12 +304,14 @@ void RecordsSupervisionController::onDeletedRecord(QString recordId)
 /**
  * @brief Slot called when a record is loading
  * @param deltaTimeFromTimeLine
- * @param jsonString
+ * @param jsonPlatform
+ * @param jsonExecutedActions
  */
-void RecordsSupervisionController::onLoadingRecord(int deltaTimeFromTimeLine, QString jsonString)
+void RecordsSupervisionController::onLoadingRecord(int deltaTimeFromTimeLine, QString jsonPlatform, QString jsonExecutedActions)
 {
     Q_UNUSED(deltaTimeFromTimeLine)
-    Q_UNUSED(jsonString)
+    Q_UNUSED(jsonPlatform)
+    Q_UNUSED(jsonExecutedActions)
 
     setisLoadingRecord(true);
 }
