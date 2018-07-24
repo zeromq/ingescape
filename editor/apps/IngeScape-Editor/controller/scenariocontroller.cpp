@@ -1710,7 +1710,7 @@ void ScenarioController::_executeAction(ActionVM* actionVM, ActionExecutionVM* a
         }
 
         //actionVM->modelM()->name()
-        QString commandAndParameters = QString("%1|%2|%3").arg(command_ExecutedAction,
+        QString commandAndParameters = QString("%1=%2|%3").arg(command_ExecutedAction,
                                                                QString::number(actionVM->modelM()->uid()),
                                                                QString::number(actionVM->lineInTimeLine()));
 
