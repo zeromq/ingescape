@@ -2557,16 +2557,15 @@ Window {
 
                 hoverEnabled: true
                 onClicked: {
-                    if (controller && panelController && panelController.originalAction) {
-                        if(controller.canDeleteActionFromList(panelController.originalAction))
+                    if (controller && panelController && panelController.originalAction)
+                    {
+                        if (controller.isInsertedInTimeLine(panelController.originalAction))
                         {
-                            if (controller)
-                            {
-                                // Delete our action
-                                controller.deleteAction(panelController.originalAction);
-                            }
-                        } else {
                             deleteConfirmationPopup.open();
+                        }
+                        else {
+                            // Delete our action
+                            controller.deleteAction(panelController.originalAction);
                         }
                     }
                 }

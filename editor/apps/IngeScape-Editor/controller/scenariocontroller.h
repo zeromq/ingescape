@@ -223,7 +223,7 @@ public:
      * @brief Remove an action VM from the time line
      * @param action view model
      */
-    Q_INVOKABLE void removeActionVMFromTimeLine(ActionVM * actionVM);
+    Q_INVOKABLE void removeActionVMfromTimeLine(ActionVM* actionVM);
 
 
     /**
@@ -271,11 +271,11 @@ public:
 
 
     /**
-     * @brief Can delete an action from the list: check dependencies in the timeline
-     * @param action to delete
-     * @return false if there is a VM of this action in the timeline
+     * @brief Check if a view model of an action is inserted in the timeline
+     * @param actionM
+     * @return
      */
-    Q_INVOKABLE bool canDeleteActionFromList(ActionM* actionM);
+    Q_INVOKABLE bool isInsertedInTimeLine(ActionM* actionM);
 
 
 Q_SIGNALS:

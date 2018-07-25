@@ -465,7 +465,7 @@ void ScenarioController::deleteAction(ActionM* action)
             for (ActionVM* actionVM : listOfActionVM)
             {
                 if (actionVM != NULL) {
-                    removeActionVMFromTimeLine(actionVM);
+                    removeActionVMfromTimeLine(actionVM);
                 }
             }
             _hashFromUidToViewModelsOfAction.remove(actionId);
@@ -662,7 +662,7 @@ void ScenarioController::addActionVMAtCurrentTime(ActionM* actionM)
  * @brief Remove an action VM from the time line
  * @param action view model
  */
-void ScenarioController::removeActionVMFromTimeLine(ActionVM* actionVM)
+void ScenarioController::removeActionVMfromTimeLine(ActionVM* actionVM)
 {
     if ((actionVM != NULL) && (actionVM->modelM() != NULL) && _actionsInTimeLine.contains(actionVM))
     {
@@ -676,9 +676,14 @@ void ScenarioController::removeActionVMFromTimeLine(ActionVM* actionVM)
         if (!listOfActionVM.isEmpty())
         {
             listOfActionVM.removeOne(actionVM);
-            _hashFromUidToViewModelsOfAction.insert(actionId, listOfActionVM);
+            if (listOfActionVM.isEmpty()) {
+                _hashFromUidToViewModelsOfAction.remove(actionId);
+            }
+            else {
+                _hashFromUidToViewModelsOfAction.insert(actionId, listOfActionVM);
+            }
 
-            // Remove the action VM from the timeline has table by line index
+            // Remove the action VM from the timeline hash table by line index
             if (actionVM->lineInTimeLine() > -1)
             {
                 int lineIndex = actionVM->lineInTimeLine();
@@ -687,7 +692,7 @@ void ScenarioController::removeActionVMFromTimeLine(ActionVM* actionVM)
                 I2CustomItemSortFilterListModel<ActionVM>* sortedListOfActionVM = _getSortedListOfActionVMwithLineIndex(lineIndex);
                 if ((sortedListOfActionVM != NULL) && sortedListOfActionVM->contains(actionVM))
                 {
-                    // Remove item
+                    // Remove the view model of action
                     sortedListOfActionVM->remove(actionVM);
 
                     // Check if the list is empty to remove the line index
@@ -782,7 +787,7 @@ void ScenarioController::resetConditionsConnectionsOfAllActions()
  */
 bool ScenarioController::canInsertActionVMTo(ActionM* actionMToInsert, int time, int lineIndex, ActionVM* excludedActionVM)
 {
-    // Prevent insertion on the first line because it is reserved to automatic insertions
+    // Prevent insertion on the first line because it is reserved for live insertions from the palette
     if (lineIndex == 0) {
         return false;
     }
@@ -1029,18 +1034,18 @@ void ScenarioController::moveActionVMAtTimeAndLine(ActionVM* actionVM, int timeI
 
 
 /**
- * @brief Can delete an action from the list: check dependencies in the timeline
- * @param action to delete
- * @return false if there is a VM of this action in the timeline
+ * @brief Check if a view model of an action is inserted in the timeline
+ * @param actionM
+ * @return
  */
-bool ScenarioController::canDeleteActionFromList(ActionM* actionM)
+bool ScenarioController::isInsertedInTimeLine(ActionM* actionM)
 {
     if ((actionM != NULL) && _hashFromUidToViewModelsOfAction.contains(actionM->uid()))
     {
-        return false;
+        return true;
     }
     else {
-        return true;
+        return false;
     }
 }
 
@@ -1534,37 +1539,59 @@ void ScenarioController::_startScenario()
     _listOfActiveActions.clear();
     setnextActionToActivate(NULL);
 
-    // Look for the current and futures actions
+    // "Future" actions previously added to the time line (on the first line) from the "palette" must be removed
+    QList<ActionVM*> futureActionsOnFIrstLineToRemove;
+
     ActionVM* tmpNextActionToActivate = NULL;
+
+    // Look for the current and futures actions
     for (ActionVM* actionVM : _actionsInTimeLine.toList())
     {
+        // Ends in the future
         if ((actionVM != NULL) && ((actionVM->endTime() > currentTimeInMilliSeconds) || (actionVM->endTime() == -1)) )
         {
-            // Connect on the action revert signal
-            connect(actionVM, &ActionVM::revertAction, this, &ScenarioController::onRevertAction);
-            connect(actionVM, &ActionVM::rearmAction, this, &ScenarioController::onRearmAction);
-
-            // Initialize the action view model at a specific time.
-            actionVM->resetDataFrom(currentTimeInMilliSeconds);
-
-            // Current time is after the start time of the action
-            if (actionVM->startTime() <= currentTimeInMilliSeconds)
+            // First line is reserved for live insertions from the palette
+            if (actionVM->lineInTimeLine() == 0)
             {
-                // Add to the list of active actions
-                _listOfActiveActions.append(actionVM);
+                // We have to remove this action that ends in the future
+                futureActionsOnFIrstLineToRemove.append(actionVM);
             }
             else
             {
-                // Check the next action to activate
-                if ( (tmpNextActionToActivate == NULL)
-                     || ((tmpNextActionToActivate != NULL) && (tmpNextActionToActivate->startTime() > actionVM->startTime())) )
-                {
-                    tmpNextActionToActivate = actionVM;
-                }
+                // Connect on the action revert signal
+                connect(actionVM, &ActionVM::revertAction, this, &ScenarioController::onRevertAction);
+                connect(actionVM, &ActionVM::rearmAction, this, &ScenarioController::onRearmAction);
 
-                // Add our action
-                _listOfActionsToEvaluate.append(actionVM);
+                // Initialize the action view model at a specific time.
+                actionVM->resetDataFrom(currentTimeInMilliSeconds);
+
+                // Current time is after the start time of the action
+                if (actionVM->startTime() <= currentTimeInMilliSeconds)
+                {
+                    // Add to the list of active actions
+                    _listOfActiveActions.append(actionVM);
+                }
+                else
+                {
+                    // Check the next action to activate
+                    if ( (tmpNextActionToActivate == NULL)
+                         || ((tmpNextActionToActivate != NULL) && (tmpNextActionToActivate->startTime() > actionVM->startTime())) )
+                    {
+                        tmpNextActionToActivate = actionVM;
+                    }
+
+                    // Add our action
+                    _listOfActionsToEvaluate.append(actionVM);
+                }
             }
+        }
+    }
+
+    if (!futureActionsOnFIrstLineToRemove.isEmpty())
+    {
+        // Remove each "future" action previously added to the time line (on the first line) from the "palette"
+        for (ActionVM* actionVM : futureActionsOnFIrstLineToRemove) {
+            removeActionVMfromTimeLine(actionVM);
         }
     }
 

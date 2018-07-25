@@ -113,12 +113,13 @@ Item {
                     onClicked: {
                         if (controller && rootItem.action)
                         {
-                            if(controller.canDeleteActionFromList(rootItem.action))
+                            if (controller.isInsertedInTimeLine(rootItem.action))
                             {
+                                rootItem.needConfirmationtoDeleteAction(rootItem.action);
+                            }
+                            else {
                                 // Delete our action
                                 controller.deleteAction(rootItem.action);
-                            } else {
-                                rootItem.needConfirmationtoDeleteAction(rootItem.action);
                             }
                         }
                     }

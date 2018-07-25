@@ -129,7 +129,7 @@ Item {
         if (event.key === Qt.Key_Backspace || event.key === Qt.Key_Delete)
         {
             if (controller && controller.selectedActionVMInTimeline) {
-                controller.removeActionVMFromTimeLine(controller.selectedActionVMInTimeline);
+                controller.removeActionVMfromTimeLine(controller.selectedActionVMInTimeline);
             }
 
             event.accepted = true;

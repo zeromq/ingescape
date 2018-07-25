@@ -227,9 +227,14 @@ Item {
                                 verticalCenter: parent.verticalCenter
                             }
 
-                            text: (index === 0) ? "AUTO" : index
+                            text: (index === 0) ? "Manual" : index
 
                             color: IngeScapeTheme.veryDarkGreyColor
+
+                            font {
+                                family: IngeScapeTheme.textFontFamily
+                                pixelSize: 12
+                            }
                         }
                     }
                 }
@@ -563,7 +568,7 @@ Item {
                                     var timeInMilliseconds = viewController.convertAbscissaInCoordinateSystemToTimeInMilliseconds(drag.x, viewController.pixelsPerMinute);
                                     var lineNumber = Math.floor(drag.y / rootItem.lineHeight);
 
-                                    // The first line is reserved to automatic insertions
+                                    // The first line is reserved for live insertions from the palette
                                     if (lineNumber > 0)
                                     {
                                         // action comes from the actions list : add the action on the time line
