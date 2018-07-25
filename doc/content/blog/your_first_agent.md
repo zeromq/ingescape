@@ -174,9 +174,9 @@ dyld: Symbol not found: __cg_jpeg_resync_to_restart
 If this happens, you need to edit the Run properties for your Qt project by editing the DYLD_LIBRARY_PATH environment variable and adding */System/Library/Frameworks/ImageIO.framework/Versions/A/Resources/* as the first path to be checked, generally followed by your local project path and */usr/local/lib/*.
 
 ### Compile on Microsoft Windows
-The easiest ways to compile and run your first agent are to use the following projects:
+The easiest way to compile and run your first agent on Microsoft Windows is to use one of the following projects:
 
 - [Qt project](/code/FirstAgent_Qt.zip)
 - [Visual Studio 2015 project](/code/FirstAgent_VS.zip)
 
-For both projects, ingeScape and its dependencies have to be deployed next to the involved project file (.pro or .sln).
+For both projects, the ingeScape library and its dependencies have to be deployed next to the project file (.pro or .sln).

@@ -364,4 +364,9 @@ The first compilation method is the same as the one for Linux, exactly with the 
 The other method is the use of Apple Xcode with a dedicated project. To save your time, such a project, including the code above, is available [here](/code/firstFullAgent.zip).
 
 ### Compile on Microsoft Windows
-*TODO*
+The easiest way to compile and run your first agent on Microsoft Windows is to use one of the following projects:
+
+- [Qt project](/code/FirstFullAgent_Qt.zip)
+- [Visual Studio 2015 project](/code/FirstFullAgent_VS.zip)
+
+For both projects, the ingeScape library and its dependencies have to be deployed next to the project file (.pro or .sln).
