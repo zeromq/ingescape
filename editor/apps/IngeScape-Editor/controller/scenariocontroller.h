@@ -207,9 +207,9 @@ public:
     /**
      * @brief Add an action VM at the time in ms
      * @param action model
-     * @param line number
+     * @param line index
      */
-    Q_INVOKABLE void addActionVMAtTime(ActionM* actionM, int timeInMs, int lineNumber);
+    Q_INVOKABLE void addActionVMAtTime(ActionM* actionM, int timeInMs, int lineIndex);
 
 
     /**
@@ -242,10 +242,10 @@ public:
      * @brief Test if an item can be inserted into a line number
      * @param actionM to insert
      * @param time into insert
-     * @param line number
+     * @param line index
      * @param optional excluded actionVM from the check
      */
-    Q_INVOKABLE bool canInsertActionVMTo(ActionM *actionMToInsert, int time, int lineNumber, ActionVM* excludedActionVM = NULL);
+    Q_INVOKABLE bool canInsertActionVMTo(ActionM *actionMToInsert, int time, int lineIndex, ActionVM* excludedActionVM = NULL);
 
 
     /**
@@ -265,9 +265,9 @@ public:
      * @brief Move an actionVM to a start time position in ms and a specific line number
      * @param action VM
      * @param time in milliseconds
-     * @param line number
+     * @param line index
      */
-    Q_INVOKABLE void moveActionVMAtTimeAndLine(ActionVM* actionVM, int timeInMilliseconds, int lineNumber);
+    Q_INVOKABLE void moveActionVMAtTimeAndLine(ActionVM* actionVM, int timeInMilliseconds, int lineIndex);
 
 
     /**

@@ -546,8 +546,6 @@ Item {
 
                                     }
 
-
-
                                 }
 
                                 onExited: {
@@ -565,32 +563,30 @@ Item {
                                     var timeInMilliseconds = viewController.convertAbscissaInCoordinateSystemToTimeInMilliseconds(drag.x, viewController.pixelsPerMinute);
                                     var lineNumber = Math.floor(drag.y / rootItem.lineHeight);
 
-                                    // FIXME: lineNumber 0 is reserved for auto
-                                    if (lineNumber == 0) {
-                                        lineNumber = 1;
-                                    }
-
-                                    // action comes from the actions list : add the action on the time line
-                                    if ((typeof dragItem.action !== 'undefined') && controller)
+                                    // The first line is reserved to automatic insertions
+                                    if (lineNumber > 0)
                                     {
-                                        controller.addActionVMAtTime(dragItem.action, timeInMilliseconds, lineNumber);
+                                        // action comes from the actions list : add the action on the time line
+                                        if ((typeof dragItem.action !== 'undefined') && controller)
+                                        {
+                                            controller.addActionVMAtTime(dragItem.action, timeInMilliseconds, lineNumber);
+                                        }
+
+
+                                        // action comes from the timeline : update start time and line number
+                                        if ((typeof dragItem.myActionVM !== 'undefined') && (dragItem.myActionVM.modelM !== null))
+                                        {
+                                            controller.moveActionVMAtTimeAndLine(dragItem.myActionVM, timeInMilliseconds, lineNumber);
+                                        }
                                     }
-
-
-                                    // action comes from the timeline : update start time and line number
-                                    if ((typeof dragItem.myActionVM !== 'undefined') && (dragItem.myActionVM.modelM !== null))
-                                    {
-                                        controller.moveActionVMAtTimeAndLine(dragItem.myActionVM, timeInMilliseconds, lineNumber);
-                                    }
-
 
                                     // remove ghost
                                     ghostAction.actionModelGhost = null;
                                     ghostDropImpossible.visible = false;
-                                    if  (typeof dragItem.temporaryStartTime !== 'undefined') {
+
+                                    if (typeof dragItem.temporaryStartTime !== 'undefined') {
                                         dragItem.temporaryStartTime = null;
                                     }
-
                                 }
                             }
 
