@@ -54,7 +54,7 @@ Window {
 
     // - Type
     property int widthColumnType: 110
-    // - Mapping Value
+    // - Date
     property int widthColumnDate: 100
 
     // Minimum widht of resizable columns
@@ -78,7 +78,8 @@ Window {
     property int extraWidthForResizableColumns: Math.max(0, Math.round(splittableAvailableWidth/3))
     property int extraWidthForValueOnly : if (widthColumnName === maxWidthColumnName && widthColumnAgent === maxWidthColumnAgent) {
                                               Math.max(0, (tableHistory.width - widthColumnType - widthColumnDate - maxWidthColumnName - maxWidthColumnAgent - minWidthColumnValue));
-                                          } else {
+                                          }
+                                          else {
                                               0;
                                           }
 
@@ -87,7 +88,8 @@ Window {
     property int widthColumnAgent: ((minWidthColumnAgent + extraWidthForResizableColumns) > maxWidthColumnAgent) ? maxWidthColumnAgent : (minWidthColumnAgent + extraWidthForResizableColumns);
     property int widthColumnValue: if (widthColumnName === maxWidthColumnName && widthColumnAgent === maxWidthColumnAgent) {
                                        minWidthColumnValue + extraWidthForValueOnly;
-                                   } else {
+                                   }
+                                   else {
                                        minWidthColumnValue + extraWidthForResizableColumns;
                                    }
 
@@ -723,6 +725,7 @@ Window {
 
                         Row {
                             id: listLine
+                            //spacing: 5
 
                             anchors {
                                 fill : parent
@@ -811,7 +814,7 @@ Window {
 
 
                             // Value
-                            Text {
+                            /*Text {
                                 text: model.displayableValue
 
                                 anchors {
@@ -826,6 +829,34 @@ Window {
                                     family: IngeScapeTheme.textFontFamily
                                     pixelSize : 16
                                 }
+                            }*/
+                            TextField {
+                                anchors {
+                                    verticalCenter: parent.verticalCenter
+                                }
+                                verticalAlignment: TextInput.AlignVCenter
+                                horizontalAlignment: TextInput.AlignLeft
+                                width : rootItem.widthsOfColumns[3]
+                                height: parent.height
+
+                                text: model.displayableValue
+                                readOnly: true
+                                //elide: Text.ElideRight
+
+                                textColor: IngeScapeTheme.whiteColor
+
+                                font {
+                                    family: IngeScapeTheme.textFontFamily
+                                    pixelSize : 16
+                                }
+
+                                style: TextFieldStyle {
+                                        //textColor: "black"
+
+                                        background: Rectangle {
+                                            color: "transparent"
+                                        }
+                                    }
                             }
 
 

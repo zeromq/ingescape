@@ -194,7 +194,7 @@ void ActionVM::setstartTimeString(QString value)
                 {
                     totalMilliseconds += milliSeconds;
                     setstartTime(totalMilliseconds);
-                    qDebug() << "Start Time =" << _startTime;
+                    //qDebug() << "Start Time =" << _startTime;
                 }
                 else {
                     setstartTime(-1);
