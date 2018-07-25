@@ -857,7 +857,7 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     char *subStr = message + strlen("SET_INPUT") + 1;
                     char *name, *value;
                     name = strtok (subStr," ");
-                    value = strtok (NULL," ");
+                    value = strtok (NULL,"\0");
                     if (name != NULL && value != NULL){
                         igs_writeInputAsString(name, value);//last parameter is used for DATA only
                     }
@@ -866,7 +866,7 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     char *subStr = message + strlen("SET_OUTPUT") + 1;
                     char *name, *value;
                     name = strtok (subStr," ");
-                    value = strtok (NULL," ");
+                    value = strtok (NULL,"\0");
                     if (name != NULL && value != NULL){
                         igs_writeOutputAsString(name, value);//last paramter is used for DATA only
                     }
@@ -875,7 +875,7 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                     char *subStr = message + strlen("SET_PARAMETER") + 1;
                     char *name, *value;
                     name = strtok (subStr," ");
-                    value = strtok (NULL," ");
+                    value = strtok (NULL,"\0");
                     if (name != NULL && value != NULL){
                         igs_writeParameterAsString(name, value);//last paramter is used for DATA only
                     }
