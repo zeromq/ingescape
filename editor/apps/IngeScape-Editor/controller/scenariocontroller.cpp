@@ -814,7 +814,8 @@ bool ScenarioController::canInsertActionVMTo(ActionM* actionMToInsert, int time,
 
                     // We reach the current action VM
                     // Check with the previous actionM
-                    if ((previousActionVM != NULL) && (previousActionVM->modelM() != NULL))
+                    if ((previousActionVM != NULL) && (previousActionVM->modelM() != NULL)
+                            && ((excludedActionVM == NULL) || (excludedActionVM != previousActionVM)) )
                     {
                         // If the previous action ends after the beginning of the new one, we skip it
                         if ((previousActionVM->endTime() + MARGIN_FOR_ACTION_INSERTION_IN_MS >= time) || (previousActionVM->endTime() == -1))
