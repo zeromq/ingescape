@@ -241,7 +241,7 @@ public:
     /**
      * @brief Test if an item can be inserted into a line number
      * @param actionM to insert
-     * @param time into insert
+     * @param time to insert
      * @param line index
      * @param optional excluded actionVM from the check
      */

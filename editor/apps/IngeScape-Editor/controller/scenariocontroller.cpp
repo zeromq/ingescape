@@ -781,7 +781,7 @@ void ScenarioController::resetConditionsConnectionsOfAllActions()
 /**
  * @brief Test if an item can be inserted into a line number
  * @param actionM to insert
- * @param time into insert
+ * @param time to insert
  * @param line index
  * @param optional excluded actionVM from the check
  */
@@ -792,14 +792,29 @@ bool ScenarioController::canInsertActionVMTo(ActionM* actionMToInsert, int time,
         return false;
     }
 
-    bool canInsert = true;
-
     // Get the "Sorted" list of view models of action with the index of the line (in the time line)
     I2CustomItemSortFilterListModel<ActionVM>* sortedListOfActionVM = _getSortedListOfActionVMwithLineIndex(lineIndex);
     if (sortedListOfActionVM != NULL)
     {
-        bool reachPosition = false;
-        ActionVM* previousActionVM = NULL;
+        int insertionStartTime = time - MARGIN_FOR_ACTION_INSERTION_IN_MS;
+        int insertionEndTime = time + MARGIN_FOR_ACTION_INSERTION_IN_MS;
+
+        // If we insert a FOREVER action
+        if (actionMToInsert->validityDurationType() == ValidationDurationTypes::FOREVER) {
+            insertionEndTime = -1;
+        }
+        // If we insert a CUSTOM temporal action
+        else if (actionMToInsert->validityDurationType() == ValidationDurationTypes::CUSTOM)
+        {
+            insertionEndTime = time + MARGIN_FOR_ACTION_INSERTION_IN_MS + actionMToInsert->validityDuration();
+        }
+
+        // Revert After Time > Validity Duration
+        if ((insertionEndTime > -1)
+                && actionMToInsert->shallRevertAfterTime() && (actionMToInsert->revertAfterTime() > actionMToInsert->validityDuration()))
+        {
+            insertionEndTime = time + MARGIN_FOR_ACTION_INSERTION_IN_MS + actionMToInsert->revertAfterTime();
+        }
 
         for (int indexAction = 0; indexAction < sortedListOfActionVM->count(); indexAction++)
         {
@@ -808,7 +823,7 @@ bool ScenarioController::canInsertActionVMTo(ActionM* actionMToInsert, int time,
             if ((actionVM != NULL) && (actionVM->modelM() != NULL)
                     && ((excludedActionVM == NULL) || (excludedActionVM != actionVM)) )
             {
-                if (time < actionVM->startTime())
+                /*if (time < actionVM->startTime())
                 {
                     reachPosition = true;
 
@@ -856,25 +871,37 @@ bool ScenarioController::canInsertActionVMTo(ActionM* actionMToInsert, int time,
                     }
 
                     break;
+                }*/
+
+                // Check insertion start time
+                /*if ((time > actionVM->startTime() - MARGIN_FOR_ACTION_INSERTION_IN_MS)
+                        && ((actionVM->endTime() == -1) || (time < actionVM->endTime() + MARGIN_FOR_ACTION_INSERTION_IN_MS)) )
+                {
+                    return false;
+                }*/
+                // Check insertion end time
+
+                if (
+                        // Action is Inside
+                        ((actionVM->startTime() > insertionStartTime) && (actionVM->endTime() < insertionEndTime))
+                        ||
+                        // Action is around "Insertion Start Time
+                        ((actionVM->startTime() < insertionStartTime) && (actionVM->endTime() > insertionStartTime))
+                        ||
+                        // Action is around "Insertion End Time
+                        ((actionVM->startTime() < insertionEndTime) && (actionVM->endTime() > insertionEndTime))
+                        ||
+                        // Action starts before and ends after
+                        ((actionVM->startTime() < insertionStartTime) && (actionVM->endTime() > insertionEndTime))
+                        )
+                {
+                    return false;
                 }
-            }
 
-            previousActionVM = actionVM;
-        }
-
-        // If we didn't reach the position, we test with the previous action
-        if (!reachPosition && (previousActionVM != NULL)
-                && ((excludedActionVM == NULL) || (excludedActionVM != previousActionVM)) )
-        {
-            // If the previous action ends after the beginning of the new one, we skip it
-            if ((previousActionVM->endTime() + MARGIN_FOR_ACTION_INSERTION_IN_MS >= time) || (previousActionVM->endTime() == -1))
-            {
-                canInsert = false;
             }
         }
     }
-
-    return canInsert;
+    return true;
 }
 
 
