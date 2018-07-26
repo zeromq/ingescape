@@ -796,8 +796,8 @@ bool ScenarioController::canInsertActionVMTo(ActionM* actionMToInsert, int time,
     I2CustomItemSortFilterListModel<ActionVM>* sortedListOfActionVM = _getSortedListOfActionVMwithLineIndex(lineIndex);
     if (sortedListOfActionVM != NULL)
     {
-        int insertionStartTime = time - MARGIN_FOR_ACTION_INSERTION_IN_MS;
-        int insertionEndTime = time + MARGIN_FOR_ACTION_INSERTION_IN_MS;
+        int insertionStartTime = time;
+        int insertionEndTime = time;
 
         // If we insert a FOREVER action
         if (actionMToInsert->validityDurationType() == ValidationDurationTypes::FOREVER) {
@@ -806,14 +806,20 @@ bool ScenarioController::canInsertActionVMTo(ActionM* actionMToInsert, int time,
         // If we insert a CUSTOM temporal action
         else if (actionMToInsert->validityDurationType() == ValidationDurationTypes::CUSTOM)
         {
-            insertionEndTime = time + MARGIN_FOR_ACTION_INSERTION_IN_MS + actionMToInsert->validityDuration();
+            insertionEndTime = time + actionMToInsert->validityDuration();
         }
 
         // Revert After Time > Validity Duration
         if ((insertionEndTime > -1)
                 && actionMToInsert->shallRevertAfterTime() && (actionMToInsert->revertAfterTime() > actionMToInsert->validityDuration()))
         {
-            insertionEndTime = time + MARGIN_FOR_ACTION_INSERTION_IN_MS + actionMToInsert->revertAfterTime();
+            insertionEndTime = time + actionMToInsert->revertAfterTime();
+        }
+
+        // Add some margin
+        if (insertionStartTime == insertionEndTime) {
+            insertionStartTime = time - MARGIN_FOR_ACTION_INSERTION_IN_MS;
+            insertionEndTime = time + MARGIN_FOR_ACTION_INSERTION_IN_MS;
         }
 
         for (int indexAction = 0; indexAction < sortedListOfActionVM->count(); indexAction++)
@@ -823,81 +829,39 @@ bool ScenarioController::canInsertActionVMTo(ActionM* actionMToInsert, int time,
             if ((actionVM != NULL) && (actionVM->modelM() != NULL)
                     && ((excludedActionVM == NULL) || (excludedActionVM != actionVM)) )
             {
-                /*if (time < actionVM->startTime())
+                //qDebug() << "Insert" << insertionStartTime << insertionEndTime << "inside" << actionVM->startTime() << actionVM->endTime();
+
+                if ((actionVM->endTime() == -1) || (insertionEndTime == -1))
                 {
-                    reachPosition = true;
-
-                    // We reach the current action VM
-                    // Check with the previous actionM
-                    if ((previousActionVM != NULL) && (previousActionVM->modelM() != NULL)
-                            && ((excludedActionVM == NULL) || (excludedActionVM != previousActionVM)) )
+                    // Both have no end time
+                    if ( ((actionVM->endTime() == -1) && (insertionEndTime == -1))
+                         ||
+                         // Action starts before "Insertion END Time"
+                         ((actionVM->endTime() == -1) && (actionVM->startTime() < insertionEndTime))
+                         ||
+                         // Action ends after "Insertion START Time"
+                         ((insertionEndTime == -1) && (actionVM->endTime() > insertionStartTime)) )
                     {
-                        // If the previous action ends after the beginning of the new one, we skip it
-                        if ((previousActionVM->endTime() + MARGIN_FOR_ACTION_INSERTION_IN_MS >= time) || (previousActionVM->endTime() == -1))
-                        {
-                            canInsert = false;
-                            break;
-                        }
+                        return false;
                     }
-
-                    int insertionEndTime = time + MARGIN_FOR_ACTION_INSERTION_IN_MS;
-                    int itemDurationTime = 0;
-
-                    // If we insert a forever item and an item exists in the future, we cannot insert
-                    if (actionMToInsert->validityDurationType() == ValidationDurationTypes::FOREVER)
-                    {
-                        // Try with the next line
-                        canInsert = false;
-                        break;
-                    }
-                    // If we insert a custom temporal action, we compute the end time
-                    else if (actionMToInsert->validityDurationType() == ValidationDurationTypes::CUSTOM)
-                    {
-                        itemDurationTime = actionMToInsert->validityDuration();
-                    }
-
-                    // Compare with the time before revert if selected
-                    if (actionMToInsert->shallRevertAfterTime()  && (actionMToInsert->revertAfterTime() > itemDurationTime))
-                    {
-                        itemDurationTime = actionMToInsert->revertAfterTime();
-                    }
-                    insertionEndTime += itemDurationTime;
-
-                    // If the next action starts after the end of the new one, we skip it
-                    if (insertionEndTime >= actionVM->startTime())
-                    {
-                        canInsert = false;
-                        break;
-                    }
-
-                    break;
-                }*/
-
-                // Check insertion start time
-                /*if ((time > actionVM->startTime() - MARGIN_FOR_ACTION_INSERTION_IN_MS)
-                        && ((actionVM->endTime() == -1) || (time < actionVM->endTime() + MARGIN_FOR_ACTION_INSERTION_IN_MS)) )
-                {
-                    return false;
-                }*/
-                // Check insertion end time
-
-                if (
-                        // Action is Inside
-                        ((actionVM->startTime() > insertionStartTime) && (actionVM->endTime() < insertionEndTime))
-                        ||
-                        // Action is around "Insertion Start Time
-                        ((actionVM->startTime() < insertionStartTime) && (actionVM->endTime() > insertionStartTime))
-                        ||
-                        // Action is around "Insertion End Time
-                        ((actionVM->startTime() < insertionEndTime) && (actionVM->endTime() > insertionEndTime))
-                        ||
-                        // Action starts before and ends after
-                        ((actionVM->startTime() < insertionStartTime) && (actionVM->endTime() > insertionEndTime))
-                        )
-                {
-                    return false;
                 }
-
+                else
+                {
+                    // Action is Inside
+                    if ( ((actionVM->startTime() > insertionStartTime) && (actionVM->endTime() < insertionEndTime))
+                            ||
+                            // Action is around "Insertion START Time"
+                            ((actionVM->startTime() < insertionStartTime) && (actionVM->endTime() > insertionStartTime))
+                            ||
+                            // Action is around "Insertion END Time"
+                            ((actionVM->startTime() < insertionEndTime) && (actionVM->endTime() > insertionEndTime))
+                            ||
+                            // Action starts before and ends after
+                            ((actionVM->startTime() < insertionStartTime) && (actionVM->endTime() > insertionEndTime)) )
+                    {
+                        return false;
+                    }
+                }
             }
         }
     }
