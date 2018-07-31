@@ -31,9 +31,6 @@
  *{"name of the method", function_wrapper called, calling convention, "Docstring in python"}
  */
 
-
-
-
 static PyMethodDef ingescapeMethods[] =
 {
     //start & stop the agent
@@ -200,7 +197,6 @@ static PyMethodDef ingescapeMethods[] =
     {"igs_getLogPath", getLogPath_wrapper, METH_NOARGS, getLogPathDoc},
     {"igs_interrupted", interrupted_wrapper, METH_NOARGS, interruptedDoc},
     
-    //observe Iop, freeze and forced stop
     //observe Iop, freeze and forced stop
     {"igs_observeInput", igs_observeInput_wrapper, METH_VARARGS, observeInputDoc},
     {"igs_observeOutput", igs_observeOutput_wrapper, METH_VARARGS, observeOutputDoc},

@@ -9,64 +9,24 @@
 #include "stopcallback.h"
 #include <stdio.h>
 #include <ingescape/ingescape.h>
+#include "uthash/utlist.h"
 
-// chained list to stock all stopCallbacks
-typedef struct stopElement stopElement;
-struct stopElement
-{
+typedef struct stopCallback{
     PyObject *call;         //stopCallback
     PyObject *argstopList;  // argument for stopCallback
-    stopElement *suivant;
-};
+    struct stopCallback *next;
+    struct stopCallback *prev;
+}stopCallback;
 
-typedef struct stopListe stopListe;
-struct stopListe
-{
-    stopElement *premier;
-};
-
-stopListe *initialisationStopCallback()
-{
-    stopListe *stopListe = malloc(sizeof(*stopListe));
-    stopElement *stopElement = malloc(sizeof(*stopElement));
-    
-    if (stopListe == NULL || stopElement == NULL)
-    {
-        exit(EXIT_FAILURE);
-    }
-    
-    stopElement->call = NULL;
-    stopElement->argstopList = NULL;
-    stopListe->premier = NULL;
-    
-    return stopListe;
-}
+stopCallback *stopList = NULL;
 
 
-void insertionStop(stopListe *stopListe, PyObject *nvcall, PyObject *nvargstopList)
-{
-    /* Création du nouvel élément */
-    stopElement *nouveau = malloc(sizeof(*nouveau));
-    if (stopListe == NULL || nouveau == NULL)
-    {
-        exit(EXIT_FAILURE);
-    }
-    nouveau->call = nvcall;
-    nouveau->argstopList = nvargstopList;
-    
-    /* insertionStop de l'élément au début de la stopListe */
-    nouveau->suivant = stopListe->premier;
-    stopListe->premier = nouveau;
-}
-
-
-stopListe *callbackStopstopList;
 
 //stopCallback : execute the callback stacked with the igs_observeForcedStop_wrapper
 void stop(void *myData){
     //run through all callbacks to execute them
-    stopElement * actuel = callbackStopstopList -> premier;
-    while (actuel != NULL){
+    stopCallback *actuel = NULL;
+    DL_FOREACH(stopList, actuel){
         // Lock the GIL to execute the callback safely
         PyGILState_STATE d_gstate;
         d_gstate = PyGILState_Ensure();
@@ -76,7 +36,6 @@ void stop(void *myData){
         
         //release the GIL
         PyGILState_Release(d_gstate);
-        actuel = actuel -> suivant;
     }
     
 }
@@ -96,10 +55,6 @@ PyObject * igs_observeForcedStop_wrapper(PyObject *self, PyObject *args)
         }
     }
     
-    if (callbackStopstopList == NULL){
-        callbackStopstopList = initialisationStopCallback();
-    }
-    
     Py_XINCREF(temp);               // Add a reference to new callback
     
     tempargstopList = Py_BuildValue("(O)", arg); //cast arglist into a tuple
@@ -107,8 +62,11 @@ PyObject * igs_observeForcedStop_wrapper(PyObject *self, PyObject *args)
     Py_XINCREF(tempargstopList);    // Add a reference to arglist
 
     // add the callback to the list of stopCallback
-    insertionStop(callbackStopstopList, temp, tempargstopList);
-
+    stopCallback *newElt = calloc(1, sizeof(stopCallback));
+    newElt->argstopList = tempargstopList;
+    newElt->call = temp;
+    DL_APPEND(stopList, newElt);
+    
     igs_observeForcedStop(stop, NULL);
     
     //return 1 if ok

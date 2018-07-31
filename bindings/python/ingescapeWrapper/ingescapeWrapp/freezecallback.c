@@ -9,63 +9,23 @@
 #include "freezecallback.h"
 #include <stdio.h>
 #include <ingescape/ingescape.h>
+#include "uthash/utlist.h"
 
 // chained list to stock all freezeCallbacks
-typedef struct Element Element;
-struct Element
-{
+typedef struct freezeCallback{
     PyObject *call;     //freeze callback
     PyObject *arglist;  //arguments for the callback
-    Element *suivant;
-};
+    struct freezeCallback *next;
+    struct freezeCallback *prev;
+}freezeCallback;
 
-typedef struct Liste Liste;
-struct Liste
-{
-    Element *premier;
-};
+freezeCallback *freezeList = NULL;
 
-Liste *initialisationCallback()
-{
-    Liste *liste = malloc(sizeof(*liste));
-    Element *element = malloc(sizeof(*element));
-    
-    if (liste == NULL || element == NULL)
-    {
-        exit(EXIT_FAILURE);
-    }
-    
-    element->call = NULL;
-    element->arglist = NULL;
-    liste->premier = NULL;
-    
-    return liste;
-}
-
-
-void insertion(Liste *liste, PyObject *nvcall, PyObject *nvarglist)
-{
-    /* Création du nouvel élément */
-    Element *nouveau = malloc(sizeof(*nouveau));
-    if (liste == NULL || nouveau == NULL)
-    {
-        exit(EXIT_FAILURE);
-    }
-    nouveau->call = nvcall;
-    nouveau->arglist = nvarglist;
-    
-    /* Insertion de l'élément au début de la liste */
-    nouveau->suivant = liste->premier;
-    liste->premier = nouveau;
-}
-
-
-Liste *callbackFreezeList;
 
 // freezeCallback : execute the callback stacked with 
 void freeze(bool isPaused, void *myData){
-    Element * actuel = callbackFreezeList -> premier;
-    while (actuel != NULL){
+    freezeCallback *actuel = NULL;
+    DL_FOREACH(freezeList, actuel){
         // Lock the GIL in order to execute the callback saffely
         PyGILState_STATE d_gstate;
         d_gstate = PyGILState_Ensure();
@@ -74,7 +34,6 @@ void freeze(bool isPaused, void *myData){
         
         // Release the GIL
         PyGILState_Release(d_gstate);
-        actuel = actuel -> suivant;
     }
     
 }
@@ -93,17 +52,16 @@ void freeze(bool isPaused, void *myData){
         }
     }
     
-    if (callbackFreezeList == NULL){
-        callbackFreezeList = initialisationCallback();
-    }
-    
     Py_XINCREF(temp);         // Add a reference to new callback
     
     temparglist = Py_BuildValue("(O)", arg);
 
     Py_XINCREF(temparglist);         // Add a reference to new arglist
     
-    insertion(callbackFreezeList, temp, temparglist);
+    freezeCallback *newElt = calloc(1, sizeof(freezeCallback));
+    newElt->call = temp;
+    newElt->arglist = temparglist;
+    DL_APPEND(freezeList, newElt);
 
     PyObject *result;
     int ret = igs_observeFreeze(freeze, NULL);
