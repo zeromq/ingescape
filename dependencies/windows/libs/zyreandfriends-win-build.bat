@@ -29,9 +29,23 @@ cd zyre
 git checkout tags/v%zyreVersion%
 cd ../
 
-:modifyfiles
-CALL modify_files.bat
+:choiceVS
+set /P c=Which Visual Studio version do you want to use [2015/2017]?
+if /I "%c%" EQU "2015" goto :modifyfiles2015
+if /I "%c%" EQU "2017" goto :modifyfiles2017
+goto :choiceVS
+
+:modifyfiles2015
+CALL modify_files_vs2015.bat
+goto :compilation2015
+
+:modifyfiles2017
+CALL modify_files_vs2017.bat
+goto :compilation2017
 
 
-:compilation
-CALL compilation-win.bat
+:compilation2015
+CALL compilation_vs2015.bat
+
+:compilation2017
+CALL compilation_vs2017.bat
