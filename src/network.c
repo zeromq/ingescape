@@ -1264,6 +1264,7 @@ initLoop (zsock_t *pipe, void *args){
     zyreAgent_t *zagent, *tmpa;
     HASH_ITER(hh, zyreAgents, zagent, tmpa){
         HASH_DEL(zyreAgents, zagent);
+        free(zagent);
     }
     subscriber_t *s, *tmps;
     HASH_ITER(hh, subscribers, s, tmps) {
