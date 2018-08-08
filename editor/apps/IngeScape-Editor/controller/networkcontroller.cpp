@@ -1111,9 +1111,9 @@ void NetworkController::onAddInputsToEditorForOutputs(QString agentName, QList<O
                 }
             }
 
-            qDebug() << "on Add Inputs: There are already" << numberOfAgentsON << "agents ON for input name" << inputName;
-
             numberOfAgentsON++;
+            qDebug() << "on Add Inputs: There are" << numberOfAgentsON << "agents ON for input name" << inputName;
+
             _mapFromInputNameToNumberOfAgentsON.insert(inputName, numberOfAgentsON);
         }
     }
@@ -1140,6 +1140,7 @@ void NetworkController::onRemoveInputsToEditorForOutputs(QString agentName, QLis
             _mapFromInputNameToNumberOfAgentsON.insert(inputName, numberOfAgentsON);
 
             qDebug() << "on Remove Inputs: There are" << numberOfAgentsON << "agents ON for input name" << inputName;
+
             // FIXME: Debug numberOfAgentsON < 0
             if (numberOfAgentsON < 0) {
                 qWarning() << "There are" << numberOfAgentsON << "agents ON for input name" << inputName;
