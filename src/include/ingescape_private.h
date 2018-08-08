@@ -244,7 +244,7 @@ extern serviceHeader_t *serviceHeaders;
 
 //token
 void token_freeToken(igs_token_t *t);
-int token_addValuesToArgumentsFromMessage(const char *name, igs_tokenArgument_t *arg, zmsg_t *msg);
+bool token_addValuesToArgumentsFromMessage(const char *name, igs_tokenArgument_t *arg, zmsg_t *msg);
 int token_freeValuesInArguments(igs_tokenArgument_t *arg);
 
 #endif /* ingescape_private_h */
