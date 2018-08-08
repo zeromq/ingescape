@@ -33,7 +33,7 @@ PUBLIC void igs_setAgentTimeout(unsigned int duration); //in milliseconds
 
 
 //data serialization using ZMQ
-//give code examples here or link to documentation for zmsg and zframe
+//TODO: give code examples here or link to documentation for zmsg and zframe
 PUBLIC int igs_writeOutputAsZMQMsg(const char *name, zmsg_t *msg);
 PUBLIC int igs_readInputAsZMQMsg(const char *name, zmsg_t **msg); //msg must be freed by caller using zmsg_destroy
 
