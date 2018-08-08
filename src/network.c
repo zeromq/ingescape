@@ -1073,11 +1073,12 @@ initLoop (zsock_t *pipe, void *args){
         zyre_gossip_connect(agentElements->node,
                             "%s", agentElements->brokerEndPoint);
     }else{
-        zyre_set_interface(agentElements->node, agentElements->networkDevice);
-        zyre_set_port(agentElements->node, agentElements->zyrePort);
         if (agentElements->node == NULL){
             igs_error("Could not create bus node : Agent will interrupt immediately.");
             canContinue = false;
+        }else{
+            zyre_set_interface(agentElements->node, agentElements->networkDevice);
+            zyre_set_port(agentElements->node, agentElements->zyrePort);
         }
     }
     zyre_set_interval(agentElements->node, network_discoveryInterval);
@@ -1102,6 +1103,7 @@ initLoop (zsock_t *pipe, void *args){
     }else{
         sprintf(endpoint, "tcp://%s:%d", agentElements->ipAddress, network_publishingPort);
     }
+    
     zsock_t *publisher = agentElements->publisher = zsock_new_pub(endpoint);
     if (agentElements->publisher == NULL){
         igs_error("Could not create publishing socket : Agent will interrupt immediately.");
