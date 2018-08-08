@@ -306,6 +306,15 @@ void IngeScapeModelManager::onAgentEntered(QString peerId, QString agentName, QS
 
             // Update the state (flag "is ON")
             agent->setisON(true);
+
+            // When this agent exited, we set its flag to "OFF" and emited "removeInputsToEditorForOutputs"
+            // Now, we just set its flag to ON and we have to emit "addInputsToEditorForOutputs"
+            // Because we consider that its definition will be the same...consequently, when "onDefinitionReceived" will be called,
+            // there will be no change detected and the signal "addInputsToEditorForOutputs" will not be called
+            if ((agent->definition() != NULL) && !agent->definition()->outputsList()->isEmpty())
+            {
+                Q_EMIT addInputsToEditorForOutputs(agentName, agent->definition()->outputsList()->toList());
+            }
         }
         // New peer id
         else
@@ -358,8 +367,7 @@ void IngeScapeModelManager::onAgentExited(QString peerId, QString agentName)
         // Update the state (flag "is ON")
         agent->setisON(false);
 
-        if (agent->definition() != NULL) {
-            // Emit the signal "Remove Inputs to Editor for Outputs"
+        if ((agent->definition() != NULL) && !agent->definition()->outputsList()->isEmpty()) {
             Q_EMIT removeInputsToEditorForOutputs(agentName, agent->definition()->outputsList()->toList());
         }
     }
@@ -442,8 +450,9 @@ void IngeScapeModelManager::onDefinitionReceived(QString peerId, QString agentNa
                      // Set this definition to the agent
                      agent->setdefinition(agentDefinition);
 
-                     // Emit the signal "Add Inputs to Editor for Outputs"
-                     Q_EMIT addInputsToEditorForOutputs(agentName, agentDefinition->outputsList()->toList());
+                     if (!agentDefinition->outputsList()->isEmpty()) {
+                         Q_EMIT addInputsToEditorForOutputs(agentName, agentDefinition->outputsList()->toList());
+                     }
                  }
                  // Update with the new definition
                  else
