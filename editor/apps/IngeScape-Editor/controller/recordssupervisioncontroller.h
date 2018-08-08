@@ -42,8 +42,11 @@ class RecordsSupervisionController : public QObject
     // Selected Record in the Records list
     I2_QML_PROPERTY_DELETE_PROOF(RecordVM*, selectedRecord)
 
-    // Indicating if a recorder agent is currently recording
-    I2_QML_PROPERTY_CUSTOM_SETTER(bool, isRecording)
+    // Flag indicating if a recorder is currently recording
+    I2_QML_PROPERTY(bool, isRecording)
+
+    // Flag indicating if the actions in the timeline are currently recorded
+    I2_QML_PROPERTY(bool, isRecordingTimeLine)
 
     // Indicating if a record is being loaded
     I2_QML_PROPERTY(bool, isLoadingRecord)
@@ -71,6 +74,14 @@ public:
      * @brief Destructor
      */
     ~RecordsSupervisionController();
+
+
+    /**
+     * @brief Start/Stop to record (optionaly with the actions in the timeline)
+     * @param isStart flag indicating if we start to record or if we stop to record
+     * @param withTimeLine flag indicating if the actions in the timeline must be recorded
+     */
+    Q_INVOKABLE void startOrStopToRecord(bool isStart, bool withTimeLine = false);
 
 
     /**

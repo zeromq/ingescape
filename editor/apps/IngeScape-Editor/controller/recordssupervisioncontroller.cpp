@@ -35,6 +35,7 @@ RecordsSupervisionController::RecordsSupervisionController(IngeScapeModelManager
     _isRecorderON(false),
     _selectedRecord(NULL),
     _isRecording(false),
+    _isRecordingTimeLine(false),
     _isLoadingRecord(false),
     _playingRecord(NULL),
     _currentRecordTime(QTime::fromMSecsSinceStartOfDay(0)),
@@ -72,35 +73,44 @@ RecordsSupervisionController::~RecordsSupervisionController()
 
 
 /**
- * @brief Custom setter on is recording command for the scenario
- * @param is recording flag
+ * @brief Start/Stop to record (optionaly with the actions in the timeline)
+ * @param isStart flag indicating if we start to record or if we stop to record
+ * @param withTimeLine flag indicating if the actions in the timeline must be recorded
  */
-void RecordsSupervisionController::setisRecording(bool isRecording)
+void RecordsSupervisionController::startOrStopToRecord(bool isStart, bool withTimeLine)
 {
-    if (_isRecording != isRecording)
+    if (_isRecorderON)
     {
-        _isRecording = isRecording;
-
-        Q_EMIT isRecordingChanged(_isRecording);
-
-        if (_isRecorderON)
+        // Start to record
+        if (isStart)
         {
-            if (_isRecording) {
+            if (!_isRecording)
+            {
+                // Update flags
+                setisRecording(true);
+                setisRecordingTimeLine(withTimeLine);
+
+                // Start the timer for feedback
+                _timerToDisplayTime.start();
+
                 Q_EMIT startToRecord();
             }
-            else {
-                Q_EMIT commandAskedToRecorder(command_StopToRecord);
-            }
         }
-
-        // Update display of elapsed time
-        if (isRecording) {
-            _timerToDisplayTime.start();
-        }
+        // Stop to record
         else
         {
-            _timerToDisplayTime.stop();
-            setcurrentRecordTime(QTime(0, 0, 0, 0));
+            if (_isRecording)
+            {
+                // Update the flag
+                setisRecording(false);
+                setisRecordingTimeLine(false);
+
+                // Stop the timer for feedback
+                _timerToDisplayTime.stop();
+                setcurrentRecordTime(QTime(0, 0, 0, 0));
+
+                Q_EMIT commandAskedToRecorder(command_StopToRecord);
+            }
         }
     }
 }

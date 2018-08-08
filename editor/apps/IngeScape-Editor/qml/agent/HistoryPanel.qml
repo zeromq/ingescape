@@ -834,8 +834,8 @@ Window {
                                 anchors {
                                     verticalCenter: parent.verticalCenter
                                 }
-                                verticalAlignment: TextInput.AlignVCenter
-                                horizontalAlignment: TextInput.AlignLeft
+                                //verticalAlignment: TextInput.AlignVCenter
+                                //horizontalAlignment: TextInput.AlignLeft
                                 width : rootItem.widthsOfColumns[3]
                                 height: parent.height
 

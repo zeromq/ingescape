@@ -154,6 +154,7 @@ Item {
 
         Button {
             id : startStopRecordButton
+
             anchors
             {
                 verticalCenter:parent.verticalCenter
@@ -181,7 +182,9 @@ Item {
 
             onCheckedChanged: {
                 if (controller) {
-                    controller.isRecording = checked;
+                    // FIXME TEST
+                    //controller.startOrStopToRecord(checked, false);
+                    controller.startOrStopToRecord(checked, true);
                 }
             }
         }
