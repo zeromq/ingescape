@@ -47,14 +47,14 @@ void token_freeToken(igs_token_t *t){
     }
 }
 
-int token_addValuesToArgumentsFromMessage(const char *name, igs_tokenArgument_t *arg, zmsg_t *msg){
+bool token_addValuesToArgumentsFromMessage(const char *name, igs_tokenArgument_t *arg, zmsg_t *msg){
     size_t nbFrames = zmsg_size(msg);
     size_t nbArgs = 0;
     igs_tokenArgument_t *tmp = NULL;
     DL_COUNT(arg, tmp, nbArgs);
     if (nbFrames != nbArgs){
-        igs_error("arguments number do not match in received message for token %s", name);
-        return -1;
+        igs_error("arguments count do not match in received message for token %s (%zu vs. %zu expected)", name, nbFrames, nbArgs);
+        return 0;
     }
     igs_tokenArgument_t *current = NULL;
     DL_FOREACH(arg, current){

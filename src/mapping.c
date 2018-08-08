@@ -117,7 +117,7 @@ bool mapping_checkCompatibilityInputOutput(agent_iop_t *input, agent_iop_t *outp
     if (output->value_type == IGS_DATA_T){
         if (type != IGS_DATA_T && type != IGS_IMPULSION_T){
             isCompatible = false;
-            igs_warn("DATA inputs can only be mapped to DATA or IMPULSION outputs");
+            igs_warn("DATA outputs can only be mapped by DATA or IMPULSION inputs");
         }
     }
     return isCompatible;
