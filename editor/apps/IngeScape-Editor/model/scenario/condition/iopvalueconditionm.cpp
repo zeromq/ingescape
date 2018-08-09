@@ -252,9 +252,6 @@ void IOPValueConditionM::_onModelsOfIOPChanged()
                 }
             }
         }
-
-        // FIXME: pourquoi on ne remplit pas "_agentIopList" aussi avec la liste "_agent->inputsList()" ?
-        // --> à priori, parce que les conditions ne s'appliquent que sur les outputs
     }
 }
 

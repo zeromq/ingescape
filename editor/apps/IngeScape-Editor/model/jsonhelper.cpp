@@ -1301,10 +1301,9 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
 
                         AgentInMappingVM* agent = NULL;
                         AgentIOPM* iopAgentM = NULL;
-                        QList<AgentIOPM*> listIOPAgents;
                         bool found = false;
 
-                        foreach (AgentInMappingVM* iterator, listAgentsInMapping)
+                        for (AgentInMappingVM* iterator : listAgentsInMapping)
                         {
                             if ((iterator != NULL) && (iterator->name() == agentName))
                             {
@@ -1315,8 +1314,6 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
                                 {
                                     if ((inputVM != NULL) && (inputVM->firstModel() != NULL))
                                     {
-                                        listIOPAgents.append(inputVM->firstModel());
-
                                         if (!found && (agentIOPType == AgentIOPTypes::INPUT) && (agentIOPName == inputVM->name()))
                                         {
                                             iopAgentM = inputVM->firstModel();
@@ -1330,8 +1327,6 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
                                 {
                                     if ((outputVM != NULL) && (outputVM->firstModel() != NULL))
                                     {
-                                        listIOPAgents.append(outputVM->firstModel());
-
                                         if (!found && (agentIOPType == AgentIOPTypes::OUTPUT) && (agentIOPName == outputVM->name()))
                                         {
                                             iopAgentM = outputVM->firstModel();
@@ -1360,9 +1355,6 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
                             if (jsonValue.isString()) {
                                 iopEffectM->setvalue(jsonValue.toString());
                             }
-
-                            // Set the list of agent iop
-                            iopEffectM->iopMergedList()->append(listIOPAgents);
 
                             // set agent and I/O/P
                             iopEffectM->setagent(agent);
@@ -1449,20 +1441,6 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
                                     outputAgent = iterator;
                                     found = false;
 
-                                    /*// Go through the inputs
-                                    foreach (InputVM* inputVM, iterator->inputsList()->toList())
-                                    {
-                                        if (!found && (inputVM->name() == outputName))
-                                        {
-                                            output = inputVM->firstModel();
-                                            found = true;
-                                        }
-
-                                        if (inputVM->firstModel() != NULL) {
-                                            outputsList.append(inputVM->firstModel());
-                                        }
-                                    }*/
-
                                     // Go through the outputs
                                     foreach (OutputVM* outputVM, iterator->outputsList()->toList())
                                     {
@@ -1496,20 +1474,6 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
                                             inputsList.append(inputVM->firstModel());
                                         }
                                     }
-
-                                    /*// Go through the outputs
-                                    foreach (OutputVM* outputVM, iterator->outputsList()->toList())
-                                    {
-                                        if (!found && (outputVM->name() == inputName))
-                                        {
-                                            input = outputVM->firstModel();
-                                            found = true;
-                                        }
-
-                                        if (outputVM->firstModel() != NULL) {
-                                            inputsList.append(outputVM->firstModel());
-                                        }
-                                    }*/
                                 }
                             }
                         }
@@ -1585,7 +1549,6 @@ ActionConditionVM* JsonHelper::_parseConditionsVMFromJson(QJsonObject jsonCondit
 
                         AgentInMappingVM* agentM = NULL;
                         AgentIOPM* iopAgentM = NULL;
-                        QList<AgentIOPM*> listIOPAgents;
                         bool found = false;
 
                         foreach (AgentInMappingVM* agent, listAgentsInMapping)
@@ -1594,36 +1557,18 @@ ActionConditionVM* JsonHelper::_parseConditionsVMFromJson(QJsonObject jsonCondit
                             {
                                 agentM = agent;
 
-                                // Go through the inputs
-                                foreach (InputVM* inputVM, agent->inputsList()->toList())
+                                // Go only through outputs
+                                for (OutputVM* outputVM : agent->outputsList()->toList())
                                 {
-                                    if (!found && (inputVM->name() == agentIOPName))
+                                    if ((outputVM != NULL) && (outputVM->firstModel() != NULL))
                                     {
-                                        iopAgentM = inputVM->firstModel();
-                                        found = true;
-                                    }
-
-                                    if(inputVM->firstModel() != NULL)
-                                    {
-                                        listIOPAgents.append(inputVM->firstModel());
+                                        if (!found && (outputVM->name() == agentIOPName))
+                                        {
+                                            iopAgentM = outputVM->firstModel();
+                                            found = true;
+                                        }
                                     }
                                 }
-
-                                // Go through the outputs
-                                foreach (OutputVM* outputVM, agent->outputsList()->toList())
-                                {
-                                    if (!found && (outputVM->name() == agentIOPName))
-                                    {
-                                        iopAgentM = outputVM->firstModel();
-                                        found = true;
-                                    }
-
-                                    if(outputVM->firstModel() != NULL)
-                                    {
-                                        listIOPAgents.append(outputVM->firstModel());
-                                    }
-                                }
-
 
                                 break;
                             }
@@ -1650,13 +1595,9 @@ ActionConditionVM* JsonHelper::_parseConditionsVMFromJson(QJsonObject jsonCondit
 
                             // set value
                             jsonValue = jsonCondition.value("value");
-                            if(jsonValue.isString())
-                            {
+                            if (jsonValue.isString()) {
                                 iopConditionM->setvalue(jsonValue.toString());
                             }
-
-                            // Set the list of agent iop
-                            iopConditionM->agentIopList()->append(listIOPAgents);
 
                             // set agent
                             iopConditionM->setagent(agentM);
