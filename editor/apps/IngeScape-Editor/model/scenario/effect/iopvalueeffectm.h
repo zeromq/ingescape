@@ -36,7 +36,10 @@ class IOPValueEffectM: public ActionEffectM
     // Agent IOP
     I2_QML_PROPERTY_CUSTOM_SETTER(AgentIOPM*, agentIOP)
 
-    // Name of our Agent IOP
+    // Type of our agent IOP
+    I2_QML_PROPERTY(AgentIOPTypes::Value, agentIOPType)
+
+    // Name of our agent IOP
     I2_QML_PROPERTY(QString, agentIOPName)
 
     // Value converted into string

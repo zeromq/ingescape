@@ -668,6 +668,7 @@ QJsonObject JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<Action
                     if ((iopEffect != NULL) && (iopEffect->agent() != NULL) && (iopEffect->agentIOP() != NULL))
                     {
                         jsonEffect.insert("agent_name", iopEffect->agent()->name());
+                        jsonEffect.insert("iop_type", AgentIOPTypes::staticEnumToKey(iopEffect->agentIOP()->agentIOPType()));
                         jsonEffect.insert("iop_name", iopEffect->agentIOP()->name());
                         jsonEffect.insert("value", iopEffect->value());
 
@@ -1271,7 +1272,7 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
     ActionEffectVM* actionEffectVM = NULL;
 
     QJsonValue jsonValue = jsonEffect.value("type");
-    if(jsonValue.isString())
+    if (jsonValue.isString())
     {
         int effectType = ActionEffectTypes::staticEnumFromKey(jsonValue.toString().toUpper());
         if (effectType >= 0)
@@ -1282,11 +1283,20 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
                 case ActionEffectTypes::VALUE:
                 {
                     QJsonValue jsonAgentName = jsonEffect.value("agent_name");
+                    QJsonValue jsonIOPType = jsonEffect.value("iop_type");
                     QJsonValue jsonIOPName = jsonEffect.value("iop_name");
-                    if(jsonAgentName.isString() && jsonIOPName.isString())
+
+                    // Check agent name and iop name exists
+                    if (jsonAgentName.isString() && jsonIOPType.isString() && jsonIOPName.isString())
                     {
-                        // Check agent name and iop name exists
                         QString agentName = jsonAgentName.toString();
+
+                        AgentIOPTypes::Value agentIOPType = AgentIOPTypes::INPUT;
+                        int nAgentIOPType = AgentIOPTypes::staticEnumFromKey(jsonIOPType.toString());
+                        if (nAgentIOPType > -1) {
+                            agentIOPType = static_cast<AgentIOPTypes::Value>(nAgentIOPType);
+                        }
+
                         QString agentIOPName = jsonIOPName.toString();
 
                         AgentInMappingVM* agent = NULL;
@@ -1303,30 +1313,33 @@ ActionEffectVM* JsonHelper::_parseEffectVMFromJson(QJsonObject jsonEffect, QList
                                 // Go through the inputs
                                 foreach (InputVM* inputVM, iterator->inputsList()->toList())
                                 {
-                                    if (!found && (inputVM->name() == agentIOPName))
+                                    if ((inputVM != NULL) && (inputVM->firstModel() != NULL))
                                     {
-                                        iopAgentM = inputVM->firstModel();
-                                        found = true;
-                                    }
-
-                                    if (inputVM->firstModel() != NULL) {
                                         listIOPAgents.append(inputVM->firstModel());
+
+                                        if (!found && (agentIOPType == AgentIOPTypes::INPUT) && (agentIOPName == inputVM->name()))
+                                        {
+                                            iopAgentM = inputVM->firstModel();
+                                            found = true;
+                                        }
                                     }
                                 }
 
                                 // Go through the outputs
                                 foreach (OutputVM* outputVM, iterator->outputsList()->toList())
                                 {
-                                    if (!found && (outputVM->name() == agentIOPName))
+                                    if ((outputVM != NULL) && (outputVM->firstModel() != NULL))
                                     {
-                                        iopAgentM = outputVM->firstModel();
-                                        found = true;
-                                    }
-
-                                    if (outputVM->firstModel() != NULL) {
                                         listIOPAgents.append(outputVM->firstModel());
+
+                                        if (!found && (agentIOPType == AgentIOPTypes::OUTPUT) && (agentIOPName == outputVM->name()))
+                                        {
+                                            iopAgentM = outputVM->firstModel();
+                                            found = true;
+                                        }
                                     }
                                 }
+
                                 break;
                             }
                         }
