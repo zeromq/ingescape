@@ -187,12 +187,15 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
                 Q_EMIT networkController->recorderEntered(peerId, peerName, ipAddress, hostname);
             }
             // IngeScape AGENT
-            else
+            else if (nbKeys > 0)
             {
                 qDebug() << "Our zyre event is about IngeScape AGENT on" << hostname;
 
                 // Emit the signal "Agent Entered"
                 Q_EMIT networkController->agentEntered(peerId, peerName, ipAddress, hostname, commandLine, canBeFrozen, loggerPort);
+            }
+            else {
+                qDebug() << "Our zyre event is about an element without headers, we ignore it !";
             }
         }
         // JOIN (group)
