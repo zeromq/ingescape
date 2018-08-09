@@ -75,9 +75,11 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(SolutionDir)dependencies\include</AdditionalIncludeDirectories>
+      <CompileAs>CompileAsC</CompileAs>
     </ClCompile>
     <Link>
       <AdditionalDependencies>$(SolutionDir)dependencies\$(Configuration)\ingescape.lib;$(SolutionDir)dependencies\$(Configuration)\libzyre.lib;$(SolutionDir)dependencies\$(Configuration)\libczmq.lib;$(SolutionDir)dependencies\$(Configuration)\libzmq.lib;$(SolutionDir)dependencies\$(Configuration)\libsodium.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)dependencies\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>copy $(SolutionDir)dependencies\$(Configuration)\*.dll $(OutputPath)
@@ -105,6 +107,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>$(SolutionDir)dependencies\$(Configuration)\ingescape.lib;$(SolutionDir)dependencies\$(Configuration)\libzyre.lib;$(SolutionDir)dependencies\$(Configuration)\libczmq.lib;$(SolutionDir)dependencies\$(Configuration)\libzmq.lib;$(SolutionDir)dependencies\$(Configuration)\libsodium.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)dependencies\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>copy $(SolutionDir)dependencies\$(Configuration)\*.dll $(OutputPath)
