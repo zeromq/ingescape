@@ -1161,10 +1161,14 @@ int igs_loadDefinition (const char* json_str){
 int igs_loadDefinitionFromPath (const char* file_path){
     
     //Check if the json string is null
-    if(file_path == NULL)
-    {
-        igs_debug("Error : file path is null \n");
+    if(file_path == NULL){
+        igs_error("Json file path is NULL");
         return 0;
+    }
+    
+    if (strlen(file_path) == 0){
+        igs_info("Json file path is empty");
+        return 1;
     }
 
     //Try to load definition
