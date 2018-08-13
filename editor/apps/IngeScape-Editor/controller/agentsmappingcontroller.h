@@ -58,12 +58,12 @@ public:
      * @brief Constructor
      * @param modelManager
      * @param jsonHelper
-     * @param mappingsPath
+     * @param directoryPath
      * @param parent
      */
     explicit AgentsMappingController(IngeScapeModelManager* modelManager,
                                      JsonHelper* jsonHelper,
-                                     QString mappingsPath,
+                                     QString directoryPath,
                                      QObject *parent = nullptr);
 
 
@@ -77,12 +77,6 @@ public:
      * @brief Create a new Mapping
      */
     Q_INVOKABLE void createNewMapping();
-
-
-    /**
-     * @brief Open a Mapping
-     */
-    Q_INVOKABLE void openMapping();
 
 
     /**
@@ -363,12 +357,6 @@ private:
 
 
     /**
-     * @brief Open the mapping from JSON file
-     * @param mappingFilePath
-     */
-    void _openMappingFromFile(QString mappingFilePath);
-
-    /**
      * @brief Save the mapping to JSON file
      * @param mappingFilePath
      */
@@ -383,9 +371,8 @@ private:
     // Helper to manage JSON files
     JsonHelper* _jsonHelper;
 
-    // Path to the directory containing JSON files to save mappings
-    QString _mappingsDirectoryPath;
-    QString _mappingsDefaultFilePath;
+    // Path to the directory to load/save files
+    QString _directoryPath;
 
     // Map from agent name to the (view model of) agent in mapping
     QHash<QString, AgentInMappingVM*> _mapFromNameToAgentInMapping;

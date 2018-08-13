@@ -71,7 +71,7 @@ ApplicationWindow {
                 text: qsTr("Open platform description")
 
                 onTriggered: {
-                    IngeScapeEditorC.openPlatformFromFile();
+                    IngeScapeEditorC.loadPlatformFromSelectedFile();
                 }
             }
             MenuItem {

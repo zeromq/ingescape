@@ -123,19 +123,29 @@ public:
 
 
     /**
-      * @brief Open a platform file (actions, palette, timeline actions, mappings)
+      * @brief Load a platform (agents, mappings, actions, palette, timeline actions)
+      * from the file selected by the user
       */
-    Q_INVOKABLE void openPlatformFromFile();
+    Q_INVOKABLE void loadPlatformFromSelectedFile();
 
 
     /**
-      * @brief Save a platform to a selected file (actions, palette, timeline actions, mappings)
+     * @brief Load a platform (agents, mappings, actions, palette, timeline actions)
+     * from the default file "last.json"
+     */
+    void loadPlatformFromDefaultFile();
+
+
+    /**
+      * @brief Save the platform (agents, mappings, actions, palette, timeline actions)
+      * to the file selected by the user
       */
     Q_INVOKABLE void savePlatformToSelectedFile();
 
 
     /**
-      * @brief Save a platform to the default file (actions, palette, timeline actions, mappings)
+      * @brief Save the platform (agents, mappings, actions, palette, timeline actions)
+      * to the default file "last.json"
       */
     void savePlatformToDefaultFile();
 
@@ -266,10 +276,10 @@ private Q_SLOTS:
 private:
 
     /**
-      * @brief Open the platform from JSON file
+      * @brief Load the platform from JSON file
       * @param platformFilePath
       */
-    void _openPlatformFromFile(QString platformFilePath);
+    void _loadPlatformFromFile(QString platformFilePath);
 
 
     /**
@@ -294,7 +304,7 @@ private:
     // Helper to manage JSON files
     JsonHelper* _jsonHelper;
 
-    // Path to the directory containing JSON files to save platform
+    // Path to the directory containing JSON files about platforms
     QString _platformDirectoryPath;
     QString _platformDefaultFilePath;
 

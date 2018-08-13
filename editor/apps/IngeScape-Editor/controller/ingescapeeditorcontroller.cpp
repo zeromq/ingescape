@@ -80,33 +80,19 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     settings.endGroup();
 
 
+    // Root directory
+    QString rootPath = IngeScapeEditorUtils::getRootPath();
+    QDir rootDir(rootPath);
+    if (!rootDir.exists()) {
+        qCritical() << "ERROR: could not create directory at '" << rootPath << "' !";
+    }
+
     // Directory for agents lists
-    QString agentsListPath = IngeScapeEditorUtils::getAgentsListPath();
+    /*QString agentsListPath = IngeScapeEditorUtils::getAgentsListPath();
     QDir agentsListDir(agentsListPath);
     if (!agentsListDir.exists()) {
         qCritical() << "ERROR: could not create directory at '" << agentsListPath << "' !";
-    }
-
-    // Directory for agents mappings
-    QString agentsMappingsPath = IngeScapeEditorUtils::getAgentsMappingsPath();
-    QDir agentsMappingsDir(agentsMappingsPath);
-    if (!agentsMappingsDir.exists()) {
-        qCritical() << "ERROR: could not create directory at '" << agentsMappingsPath << "' !";
-    }
-
-    // Directory for data
-    QString dataPath = IngeScapeEditorUtils::getDataPath();
-    QDir dataDir(dataPath);
-    if (!dataDir.exists()) {
-        qCritical() << "ERROR: could not create directory at '" << dataPath << "' !";
-    }
-
-    // Directory for scenarios
-    QString scenariosPath = IngeScapeEditorUtils::getScenariosPath();
-    QDir scenariosDir(scenariosPath);
-    if (!scenariosDir.exists()) {
-        qCritical() << "ERROR: could not create directory at '" << scenariosPath << "' !";
-    }
+    }*/
 
     // Directory for platform files
     QString platformPath = IngeScapeEditorUtils::getPlatformsPath();
@@ -117,8 +103,8 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
         _platformDirectoryPath = platformPath;
     }
 
-    QDate today = QDate::currentDate();
-    _platformDefaultFilePath = QString("%1platform_%2.json").arg(_platformDirectoryPath, today.toString("ddMMyy"));
+    // Init the path to the JSON file to load the last platform
+    _platformDefaultFilePath = QString("%1last.json").arg(_platformDirectoryPath);
 
 
     // Create the helper to manage JSON files
@@ -129,7 +115,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     //
 
     // Create the manager for the data model of INGESCAPE
-    _modelManager = new IngeScapeModelManager(_jsonHelper, agentsListPath, agentsMappingsPath, dataPath, this);
+    _modelManager = new IngeScapeModelManager(_jsonHelper, rootPath, this);
 
     // Create the controller for network communications
     _networkC = new NetworkController(this);
@@ -144,10 +130,10 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _recordsSupervisionC = new RecordsSupervisionController(_modelManager, _jsonHelper, this);
 
     // Create the controller for agents mapping
-    _agentsMappingC = new AgentsMappingController(_modelManager, _jsonHelper, agentsMappingsPath, this);
+    _agentsMappingC = new AgentsMappingController(_modelManager, _jsonHelper, rootPath, this);
 
     // Create the controller for scenario management
-    _scenarioC = new ScenarioController(_modelManager, _jsonHelper, scenariosPath, this);
+    _scenarioC = new ScenarioController(_modelManager, _jsonHelper, this);
 
     // Create the controller for the history of values
     _valuesHistoryC = new ValuesHistoryController(_modelManager, this);
@@ -248,8 +234,9 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(_recordsSupervisionC, &RecordsSupervisionController::startToRecord, this, &IngeScapeEditorController::_onStartToRecord);
 
 
-    // Initialize agents list from default file
-    _modelManager->importAgentsListFromDefaultFile();
+    // Load the platform (agents, mappings, actions, palette, timeline actions)
+    // from the default file "last.json"
+    loadPlatformFromDefaultFile();
 
     // Start our INGESCAPE agent with a network device (or an IP address) and a port
     bool isStarted = _networkC->start(_networkDevice, _ipAddress, _port);
@@ -417,9 +404,10 @@ QObject* IngeScapeEditorController::qmlSingleton(QQmlEngine* engine, QJSEngine* 
 
 
 /**
- * @brief Open a platform file (actions, palette, timeline actions, mappings)
+ * @brief Load a platform (agents, mappings, actions, palette, timeline actions)
+ * from the file selected by the user
  */
-void IngeScapeEditorController::openPlatformFromFile()
+void IngeScapeEditorController::loadPlatformFromSelectedFile()
 {
     // "File Dialog" to get the files (paths) to open
     QString platformFilePath = QFileDialog::getOpenFileName(NULL,
@@ -427,13 +415,28 @@ void IngeScapeEditorController::openPlatformFromFile()
                                                                 _platformDirectoryPath,
                                                                 "JSON (*.json)");
 
-    // Open the platform from JSON file
-    _openPlatformFromFile(platformFilePath);
+    // Load the platform from JSON file
+    _loadPlatformFromFile(platformFilePath);
 }
 
 
 /**
- * @brief Save a platform to a selected file (actions, palette, timeline actions, mappings)
+ * @brief Load a platform (agents, mappings, actions, palette, timeline actions)
+ * from the default file "last.json"
+ */
+void IngeScapeEditorController::loadPlatformFromDefaultFile()
+{
+    if (!_platformDefaultFilePath.isEmpty())
+    {
+        // Load the platform from JSON file
+        _loadPlatformFromFile(_platformDefaultFilePath);
+    }
+}
+
+
+/**
+ * @brief Save the platform (agents, mappings, actions, palette, timeline actions)
+ * to the file selected by the user
  */
 void IngeScapeEditorController::savePlatformToSelectedFile()
 {
@@ -451,11 +454,13 @@ void IngeScapeEditorController::savePlatformToSelectedFile()
 
 
 /**
- * @brief Save a platform to the default file (actions, palette, timeline actions, mappings)
+ * @brief Save the platform (agents, mappings, actions, palette, timeline actions)
+ * to the default file "last.json"
  */
 void IngeScapeEditorController::savePlatformToDefaultFile()
 {
-    if (!_platformDefaultFilePath.isEmpty()) {
+    if (!_platformDefaultFilePath.isEmpty())
+    {
         // Save the platform to JSON file
         _savePlatformToFile(_platformDefaultFilePath);
     }
@@ -463,8 +468,8 @@ void IngeScapeEditorController::savePlatformToDefaultFile()
 
 
 /**
- * @brief Create a new platform (actions, palette, timeline actions, mappings)
- *        by deleting all existing data
+ * @brief Create a new platform (agents, mappings, actions, palette, timeline actions)
+ * by deleting all existing data
  */
 void IngeScapeEditorController::createNewPlatform()
 {
@@ -491,12 +496,6 @@ void IngeScapeEditorController::createNewPlatform()
  */
 void IngeScapeEditorController::processBeforeClosing()
 {
-    // Save the agent list
-    if (_agentsSupervisionC != NULL)
-    {
-        _agentsSupervisionC->exportAgentsListToDefaultFile();
-    }
-
     // Save the platform to the default file
     savePlatformToDefaultFile();
 }
@@ -850,14 +849,14 @@ void IngeScapeEditorController::_onLoadingRecord(int deltaTimeFromTimeLine, QStr
 
 
 /**
- * @brief Open the platform from JSON file
+ * @brief Load the platform from JSON file
  * @param platformFilePath
  */
-void IngeScapeEditorController::_openPlatformFromFile(QString platformFilePath)
+void IngeScapeEditorController::_loadPlatformFromFile(QString platformFilePath)
 {
     if (!platformFilePath.isEmpty())
     {
-        qInfo() << "Open the platform from JSON file" << platformFilePath;
+        qInfo() << "Load the platform from JSON file" << platformFilePath;
 
         QFile jsonFile(platformFilePath);
         if (jsonFile.exists())

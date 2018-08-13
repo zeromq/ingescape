@@ -33,26 +33,21 @@
  * @param parent
  */
 IngeScapeModelManager::IngeScapeModelManager(JsonHelper* jsonHelper,
-                                             QString agentsListDirectoryPath,
-                                             QString agentsMappingsDirectoryPath,
-                                             QString dataDirectoryPath,
+                                             QString rootDirectoryPath,
+                                             //QString agentsListDirectoryPath,
                                              QObject *parent) : QObject(parent),
     _isMappingActivated(false),
     _isMappingControlled(false),
     _jsonHelper(jsonHelper),
-    _agentsListDirectoryPath(agentsListDirectoryPath),
-    _agentsMappingsDirectoryPath(agentsMappingsDirectoryPath),
-    _dataDirectoryPath(dataDirectoryPath)
+    _rootDirectoryPath(rootDirectoryPath)
+    //_agentsListDirectoryPath(agentsListDirectoryPath)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
     qInfo() << "New INGESCAPE Model Manager";
 
-    QDate today = QDate::currentDate();
-
-    _agentsListDefaultFilePath = QString("%1agents_list_%2.json").arg(_agentsListDirectoryPath, today.toString("yyyyMMdd"));
-    _agentsMappingsDefaultFilePath = QString("%1agents_mappings_%2.json").arg(_agentsMappingsDirectoryPath, today.toString("yyyyMMdd"));
+    //_agentsListDefaultFilePath = QString("%1last.json").arg(_agentsListDirectoryPath);
 
 }
 
@@ -120,16 +115,6 @@ void IngeScapeModelManager::setisMappingControlled(bool value)
 
 
 /**
- * @brief Import the agents list from default file
- */
-void IngeScapeModelManager::importAgentsListFromDefaultFile()
-{
-    // Import the agents list from JSON file
-    _importAgentsListFromFile(_agentsListDefaultFilePath);
-}
-
-
-/**
  * @brief Import an agents list from selected file
  */
 void IngeScapeModelManager::importAgentsListFromSelectedFile()
@@ -137,7 +122,7 @@ void IngeScapeModelManager::importAgentsListFromSelectedFile()
     // "File Dialog" to get the file (path) to open
     QString agentsListFilePath = QFileDialog::getOpenFileName(NULL,
                                                               "Open agents",
-                                                              _agentsListDirectoryPath,
+                                                              _rootDirectoryPath,
                                                               "JSON (*.json)");
 
     if (!agentsListFilePath.isEmpty())
@@ -158,7 +143,7 @@ bool IngeScapeModelManager::importAgentOrAgentsListFromSelectedFile()
     // "File Dialog" to get the file (path) to open
     QString agentFilePath = QFileDialog::getOpenFileName(NULL,
                                                          "Open an agent(s) definition",
-                                                         _dataDirectoryPath,
+                                                         _rootDirectoryPath,
                                                          "JSON (*.json)");
 
     if (!agentFilePath.isEmpty() && (_jsonHelper != NULL))
@@ -216,17 +201,6 @@ bool IngeScapeModelManager::importAgentOrAgentsListFromSelectedFile()
 
 
 /**
- * @brief Export the agents list to default file
- * @param agentsListToExport list of pairs <agent name (and parameters to restart), definition>
- */
-void IngeScapeModelManager::exportAgentsListToDefaultFile(QList<QPair<QStringList, DefinitionM*>> agentsListToExport)
-{
-    // Export the agents list to JSON file
-    _exportAgentsListToFile(agentsListToExport, _agentsListDefaultFilePath);
-}
-
-
-/**
  * @brief Export the agents list to selected file
  * @param agentsListToExport list of pairs <agent name (and parameters to restart), definition>
  */
@@ -235,10 +209,11 @@ void IngeScapeModelManager::exportAgentsListToSelectedFile(QList<QPair<QStringLi
     // "File Dialog" to get the file (path) to save
     QString agentsListFilePath = QFileDialog::getSaveFileName(NULL,
                                                               "Save agents",
-                                                              _agentsListDirectoryPath,
+                                                              _rootDirectoryPath,
                                                               "JSON (*.json)");
 
-    if(!agentsListFilePath.isEmpty()) {
+    if (!agentsListFilePath.isEmpty())
+    {
         // Export the agents list to JSON file
         _exportAgentsListToFile(agentsListToExport, agentsListFilePath);
     }

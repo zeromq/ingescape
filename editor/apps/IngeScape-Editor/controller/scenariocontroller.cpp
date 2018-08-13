@@ -21,12 +21,10 @@
  * @brief Constructor
  * @param modelManager
  * @param jsonHelper
- * @param scenariosPath
  * @param parent
  */
 ScenarioController::ScenarioController(IngeScapeModelManager* modelManager,
                                        JsonHelper* jsonHelper,
-                                       QString scenariosPath,
                                        QObject *parent) : QObject(parent),
     _selectedAction(NULL),
     _selectedActionVMInTimeline(NULL),
@@ -36,7 +34,6 @@ ScenarioController::ScenarioController(IngeScapeModelManager* modelManager,
     _nextActionToActivate(NULL),
     _modelManager(modelManager),
     _jsonHelper(jsonHelper),
-    _scenariosDirectoryPath(scenariosPath),
     _timeOfDayInMS_WhenStartScenario_ThenAtLastTimeOut(0)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
@@ -296,7 +293,7 @@ void ScenarioController::importExecutedActionsFromJson(QByteArray byteArrayOfJso
 
 
 /**
-  * @brief Check if an agent is defined into tha actions (conditions and effects)
+  * @brief Check if an agent is used in the actions (conditions and effects)
   * @param agent name
   */
 bool ScenarioController::isAgentDefinedInActions(QString agentName)

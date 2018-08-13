@@ -78,12 +78,6 @@ public:
 
 
     /**
-     * @brief Export the agents list to default file
-     */
-    Q_INVOKABLE void exportAgentsListToDefaultFile();
-
-
-    /**
      * @brief Export the agents list to selected file
      */
     Q_INVOKABLE void exportAgentsListToSelectedFile();
