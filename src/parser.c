@@ -643,7 +643,7 @@ static mapping_t* json_parse_mapping (yajl_val node) {
 // Dumping functions
 
 
-// convert an agent_iop_t structure into json string
+// convert a token into json string
 static void json_dump_token (yajl_gen *g, igs_token_t *token) {
     
     yajl_gen_map_open(*g);

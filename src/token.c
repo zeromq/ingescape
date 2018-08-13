@@ -336,11 +336,11 @@ int igs_sendToken(const char *agentNameOrUUID, const char *tokenName, igs_tokenA
                             break;
                     }
                     if (frame != NULL){
-                        igs_info("sent token %s to %s", tokenName, agentNameOrUUID);
                         zmsg_add(msg, frame);
                     }
                 }
                 zyre_whisper(agentElements->node, agent->peerId, &msg);
+                igs_info("sent token %s to %s", tokenName, agentNameOrUUID);
             }else{
                 igs_error("could not find token named %s for %s", tokenName, agentNameOrUUID);
             }
