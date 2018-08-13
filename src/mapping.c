@@ -166,8 +166,12 @@ int igs_loadMapping (const char* json_str){
  */
 int igs_loadMappingFromPath (const char* file_path){
     if(file_path == NULL || strlen(file_path) == 0){
-        igs_error("Json file path is null or empty");
+        igs_error("Json file path is null");
         return 0;
+    }
+    if (strlen(file_path) == 0){
+        igs_info("Json file path is empty");
+        return 1;
     }
     mapping_t *tmp = parser_LoadMapFromPath(file_path);
     if(tmp == NULL){

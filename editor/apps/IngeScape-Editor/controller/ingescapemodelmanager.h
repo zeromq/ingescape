@@ -49,15 +49,12 @@ public:
     /**
      * @brief Constructor
      * @param jsonHelper
-     * @param agentsListDirectoryPath
-     * @param agentsMappingsDirectoryPath
-     * @param dataDirectoryPath
+     * @param rootDirectoryPath
      * @param parent
      */
     explicit IngeScapeModelManager(JsonHelper* jsonHelper,
-                                   QString agentsListDirectoryPath,
-                                   QString agentsMappingsDirectoryPath,
-                                   QString dataDirectoryPath,
+                                   QString rootDirectoryPath,
+                                   //QString agentsListDirectoryPath,
                                    QObject *parent = nullptr);
 
 
@@ -151,12 +148,6 @@ public:
 
 
     /**
-     * @brief Import the agents list from default file
-     */
-    void importAgentsListFromDefaultFile();
-
-
-    /**
      * @brief Import an agents list from selected file
      */
     Q_INVOKABLE void importAgentsListFromSelectedFile();
@@ -166,13 +157,6 @@ public:
      * @brief Import an agent or an agents list from selected file (definition)
      */
     Q_INVOKABLE bool importAgentOrAgentsListFromSelectedFile();
-
-
-    /**
-     * @brief Export the agents list to default file
-     * @param agentsListToExport list of pairs <agent name (and parameters to restart), definition>
-     */
-    void exportAgentsListToDefaultFile(QList<QPair<QStringList, DefinitionM*>> agentsListToExport);
 
 
     /**
@@ -441,16 +425,12 @@ private:
     // Helper to manage JSON files
     JsonHelper* _jsonHelper;
 
+    // Path to the root directory to load/save files
+    QString _rootDirectoryPath;
+
     // Path to the directory containing JSON files to save agents list
-    QString _agentsListDirectoryPath;
-    QString _agentsListDefaultFilePath;
-
-    // Path to the directory containing JSON files to save agents mappings
-    QString _agentsMappingsDirectoryPath;
-    QString _agentsMappingsDefaultFilePath;
-
-    // Path to the directory containing data files
-    QString _dataDirectoryPath;
+    //QString _agentsListDirectoryPath;
+    //QString _agentsListDefaultFilePath;
 
     // Map from "peer id" to a model of agent
     QHash<QString, AgentM*> _mapFromPeerIdToAgentM;

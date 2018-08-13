@@ -722,7 +722,7 @@ int model_writeIOP (const char *iopName, iop_t iopType, iopType_t valType, void*
                     size_t s = 0;
                     if (value != NULL){
                         //warning : when copying string to data, we remove the final '\0'
-                        s = strlen(iop->value.s)*sizeof(char);
+                        s = size;
                         iop->value.data = calloc (1, s);
                         memcpy(iop->value.data, value, s);
                     }

@@ -21,14 +21,15 @@
 
 
 /**
- * @brief Default constructor
+ * @brief Constructor
  * @param modelManager
- * @param mapping directory path
+ * @param jsonHelper
+ * @param directoryPath
  * @param parent
  */
 AgentsMappingController::AgentsMappingController(IngeScapeModelManager* modelManager,
                                                  JsonHelper* jsonHelper,
-                                                 QString mappingsPath,
+                                                 QString directoryPath,
                                                  QObject *parent) : QObject(parent),
       _viewWidth(1920 - 320), // Full HD - Width of left panel
       _viewHeight(1080 - 100), // Full HD - Height of top & bottom bars of OS
@@ -37,7 +38,7 @@ AgentsMappingController::AgentsMappingController(IngeScapeModelManager* modelMan
       _selectedLink(NULL),
       _modelManager(modelManager),
       _jsonHelper(jsonHelper),
-      _mappingsDirectoryPath(mappingsPath)
+      _directoryPath(directoryPath)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -100,32 +101,18 @@ void AgentsMappingController::createNewMapping()
 
 
 /**
- * @brief Open a Mapping
- */
-void AgentsMappingController::openMapping()
-{
-    // "File Dialog" to get the files (paths) to open
-    QString mappingFilePath = QFileDialog::getOpenFileName(NULL,
-                                                                "Open mapping",
-                                                                _mappingsDirectoryPath,
-                                                                "JSON (*.json)");
-
-    // Open the mapping from JSON file
-    _openMappingFromFile(mappingFilePath);
-}
-
-/**
  * @brief Save a Mapping
  */
 void AgentsMappingController::saveMapping()
 {
     // "File Dialog" to get the file (path) to save
     QString mappingFilePath = QFileDialog::getSaveFileName(NULL,
-                                                              "Save mapping",
-                                                              _mappingsDirectoryPath,
-                                                              "JSON (*.json)");
+                                                           "Save mapping",
+                                                           _directoryPath,
+                                                           "JSON (*.json)");
 
-    if(!mappingFilePath.isEmpty()) {
+    if (!mappingFilePath.isEmpty())
+    {
         // Save the mapping to JSON file
         _saveMappingToFile(mappingFilePath);
     }
@@ -371,7 +358,7 @@ void AgentsMappingController::importMappingFromJson(QByteArray byteArrayOfJson, 
                     Q_EMIT agentCreatedByMapping(newAgent);
                 }
 
-                if(agentModelList.count() > 0)
+                if (!agentModelList.isEmpty())
                 {
                     // Create a new Agent In Mapping
                     _addAgentModelsToMappingAtPosition(importedMapping->name, agentModelList, importedMapping->position);
@@ -392,7 +379,7 @@ void AgentsMappingController::importMappingFromJson(QByteArray byteArrayOfJson, 
             }
 
             // Add links
-            if (mappingElements.count() > 0)
+            if (!mappingElements.isEmpty())
             {
                 // Create all mapping links
                 foreach (ElementMappingM* elementMapping, mappingElements)
@@ -1216,38 +1203,6 @@ QPointF AgentsMappingController::_getRandomPosition(double randomMax)
     double y = 0.05 * _viewHeight + (0.90 * _viewHeight * randomY);
 
     return QPointF(x, y);
-}
-
-
-/**
- * @brief Open the mapping from JSON file
- * @param mappingFilePath
- */
-void AgentsMappingController::_openMappingFromFile(QString mappingFilePath)
-{
-    if (!mappingFilePath.isEmpty() && (_jsonHelper != NULL))
-    {
-        qInfo() << "Open the mapping from JSON file" << mappingFilePath;
-
-        QFile jsonFile(mappingFilePath);
-        if (jsonFile.exists())
-        {
-            if (jsonFile.open(QIODevice::ReadOnly))
-            {
-                QByteArray byteArrayOfJson = jsonFile.readAll();
-                jsonFile.close();
-
-                // Import the new mapping
-                importMappingFromJson(byteArrayOfJson);
-            }
-            else {
-                qCritical() << "Can not open file" << mappingFilePath;
-            }
-        }
-        else {
-            qWarning() << "There is no file" << mappingFilePath;
-        }
-    }
 }
 
 

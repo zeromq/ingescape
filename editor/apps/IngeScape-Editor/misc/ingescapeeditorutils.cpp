@@ -107,18 +107,7 @@ QString IngeScapeEditorUtils::getRootPath()
  */
 QString IngeScapeEditorUtils::getSettingsPath()
 {
-    return IngeScapeEditorUtils::_getSubDirectoryPath("Settings");
-}
-
-
-/**
- * @brief Get (and create if needed) the data path of our application
- * "[DocumentsLocation]/IngeScape/Data/"
- * @return
- */
-QString IngeScapeEditorUtils::getDataPath()
-{
-    return IngeScapeEditorUtils::_getSubDirectoryPath("Data");
+    return IngeScapeEditorUtils::_getSubDirectoryPath("settings");
 }
 
 
@@ -129,50 +118,31 @@ QString IngeScapeEditorUtils::getDataPath()
  */
 QString IngeScapeEditorUtils::getSnapshotsPath()
 {
-    return IngeScapeEditorUtils::_getSubDirectoryPath("Snapshots");
+    return IngeScapeEditorUtils::_getSubDirectoryPath("snapshots");
 }
 
 
 /**
  * @brief Get (and create if needed) the path with files about agents list
- * "[DocumentsLocation]/IngeScape/AgentsList/"
+ * "[DocumentsLocation]/IngeScape/agents_list/"
  * @return
  */
-QString IngeScapeEditorUtils::getAgentsListPath()
+/*QString IngeScapeEditorUtils::getAgentsListPath()
 {
-    return IngeScapeEditorUtils::_getSubDirectoryPath("AgentsList");
-}
+    return IngeScapeEditorUtils::_getSubDirectoryPath("agents_list");
+}*/
 
-
-/**
- * @brief Get (and create if needed) the path with files about agents mappings
- * "[DocumentsLocation]/IngeScape/AgentsMappings/"
- * @return
- */
-QString IngeScapeEditorUtils::getAgentsMappingsPath()
-{
-    return IngeScapeEditorUtils::_getSubDirectoryPath("AgentsMappings");
-}
-
-/**
- * @brief Get (and create if needed) the path with files about scenarios
- * "[DocumentsLocation]/IngeScape/Scenarios/"
- * @return
- */
-QString IngeScapeEditorUtils::getScenariosPath()
-{
-    return IngeScapeEditorUtils::_getSubDirectoryPath("Scenarios");
-}
 
 /**
  * @brief Get (and create if needed) the path with files about platforms
- * "[DocumentsLocation]/IngeScape/Platforms/"
+ * "[DocumentsLocation]/IngeScape/platforms/"
  * @return
  */
 QString IngeScapeEditorUtils::getPlatformsPath()
 {
-    return IngeScapeEditorUtils::_getSubDirectoryPath("Platforms");
+    return IngeScapeEditorUtils::_getSubDirectoryPath("platforms");
 }
+
 
 /**
  * @brief Get (and create if needed) the fullpath of a given sub-directory

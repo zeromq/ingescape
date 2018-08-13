@@ -270,7 +270,7 @@ Item {
             Button {
                 id: btnExportAgentsList
 
-                enabled: visible & (controller.agentsList.count > 0 ? true : false)
+                enabled: visible && (controller.agentsList.count > 0)
                 activeFocusOnPress: true
 
                 anchors {

@@ -69,14 +69,6 @@ public:
 
 
     /**
-     * @brief Get (and create if needed) the data path of our application
-     * "[DocumentsLocation]/INGESCAPE/data/"
-     * @return
-     */
-    static QString getDataPath();
-
-
-    /**
      * @brief Get (and create if needed) the snapshots path of our application
      * "[DocumentsLocation]/INGESCAPE/snapshots/"
      * @return
@@ -86,29 +78,15 @@ public:
 
     /**
      * @brief Get (and create if needed) the path with files about agents list
-     * "[DocumentsLocation]/INGESCAPE/AgentsList/"
+     * "[DocumentsLocation]/INGESCAPE/agents_list/"
      * @return
      */
-    static QString getAgentsListPath();
+    //static QString getAgentsListPath();
 
-
-    /**
-     * @brief Get (and create if needed) the path with files about agents mappings
-     * "[DocumentsLocation]/INGESCAPE/AgentsMappings/"
-     * @return
-     */
-    static QString getAgentsMappingsPath();
-
-    /**
-     * @brief Get (and create if needed) the path with files about scenarios
-     * "[DocumentsLocation]/INGESCAPE/Scenarios/"
-     * @return
-     */
-    static QString getScenariosPath();
 
     /**
      * @brief Get (and create if needed) the path with files about platforms
-     * "[DocumentsLocation]/INGESCAPE/Platforms/"
+     * "[DocumentsLocation]/INGESCAPE/platforms/"
      * @return
      */
     static QString getPlatformsPath();

@@ -115,12 +115,10 @@ public:
      * @brief Constructor
      * @param modelManager
      * @param jsonHelper
-     * @param scenariosPath
      * @param parent
      */
     explicit ScenarioController(IngeScapeModelManager* modelManager,
                                 JsonHelper* jsonHelper,
-                                QString scenariosPath,
                                 QObject *parent = 0);
 
 
@@ -155,7 +153,7 @@ public:
 
 
     /**
-      * @brief Check if an agent is defined into tha actions (conditions and effects)
+      * @brief Check if an agent is used in the actions (conditions and effects)
       * @param agent name
       */
     bool isAgentDefinedInActions(QString agentName);
@@ -498,9 +496,6 @@ private:
 
     // Helper to manage JSON files
     JsonHelper* _jsonHelper;
-
-    // Path to the directory containing JSON files to save scenarios
-    QString _scenariosDirectoryPath;
 
     // Hash table of action editor controller from a model of action
     QHash<ActionM*, ActionEditorController*> _hashActionEditorControllerFromModelOfAction;

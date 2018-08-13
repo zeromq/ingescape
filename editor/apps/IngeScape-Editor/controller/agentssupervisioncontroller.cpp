@@ -163,22 +163,6 @@ void AgentsSupervisionController::openDefinition(AgentVM* agent)
 
 
 /**
- * @brief Export the agents list to default file
- */
-void AgentsSupervisionController::exportAgentsListToDefaultFile()
-{
-    if (_modelManager != NULL)
-    {   
-        // Get the agents list to export
-        QList<QPair<QStringList, DefinitionM*>> agentsListToExport = _getAgentsListToExport();
-
-        // Export the agents list to default file
-        _modelManager->exportAgentsListToDefaultFile(agentsListToExport);
-    }
-}
-
-
-/**
  * @brief Export the agents list to selected file
  */
 void AgentsSupervisionController::exportAgentsListToSelectedFile()
