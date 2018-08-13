@@ -93,6 +93,7 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
             }
 
             // Initialize properties related to message headers
+            bool isIngeScapeEditor = false;
             bool isIngeScapeLauncher = false;
             bool isIngeScapeRecorder = false;
             bool isIngeScapePlayer = false;
@@ -118,7 +119,12 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
                     key = QString(k);
                     value = QString(v);
 
-                    if (key == "isLauncher") {
+                    if (key == "isEditor") {
+                        if (value == "1") {
+                            isIngeScapeEditor = true;
+                        }
+                    }
+                    else if (key == "isLauncher") {
                         if (value == "1") {
                             isIngeScapeLauncher = true;
                         }
@@ -187,7 +193,7 @@ void onIncommingBusMessageCallback(const char *event, const char *peer, const ch
                 Q_EMIT networkController->recorderEntered(peerId, peerName, ipAddress, hostname);
             }
             // IngeScape AGENT
-            else if (nbKeys > 0)
+            else if ((nbKeys > 0) && !isIngeScapeEditor)
             {
                 qDebug() << "Our zyre event is about IngeScape AGENT on" << hostname;
 
