@@ -90,8 +90,8 @@ Item {
     // allowing to deselect selected agent
     MouseArea {
         anchors.fill: parent
-        onClicked:  {
-            if(controller.selectedAgent)
+        onClicked: {
+            if (controller.selectedAgent)
             {
                 controller.selectedAgent = null;
             }

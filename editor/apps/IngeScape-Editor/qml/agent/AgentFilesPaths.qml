@@ -247,10 +247,10 @@ I2PopupBase {
 
             property var boundingBox: IngeScapeTheme.svgFileINGESCAPE.boundsOnElement("button");
 
-            height : boundingBox.height
-            width :  boundingBox.width
+            height: boundingBox.height
+            width: boundingBox.width
 
-            text : "Cancel"
+            text: "Cancel"
 
             anchors {
                 verticalCenter: parent.verticalCenter

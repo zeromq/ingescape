@@ -81,8 +81,8 @@ Item {
     // allowing to deselect selected action
     MouseArea {
         anchors.fill: parent
-        onClicked:  {
-            if(controller.selectedAction)
+        onClicked: {
+            if (controller.selectedAction)
             {
                 controller.selectedAction = null;
             }
@@ -350,7 +350,7 @@ Item {
                         itemDragged.y = mouseY - 12 - itemDragged.height;
                     }
 
-                    onCanceled:  {
+                    onCanceled: {
                         draggableItem.Drag.drop();
 
                         //
@@ -390,7 +390,7 @@ Item {
                         actionItemIsHovered : mouseArea.containsMouse
                         visible: !mouseArea.drag.active
 
-                        onNeedConfirmationtoDeleteAction :  {
+                        onNeedConfirmationtoDeleteAction: {
                             deleteConfirmationPopup.myAction = action;
                             deleteConfirmationPopup.open();
                         }

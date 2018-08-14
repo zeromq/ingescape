@@ -916,7 +916,7 @@ Item {
                 // Time ticks
                 //
                 Repeater {
-                    model:  viewController.filteredListTimeTicks
+                    model: viewController.filteredListTimeTicks
 
                     delegate: Item {
                         x: viewController.convertTimeInMillisecondsToAbscissaInCoordinateSystem(model.timeInMilliSeconds, viewController.pixelsPerMinute)
@@ -974,12 +974,12 @@ Item {
                             bottom : svgCurrentTime.top
                             bottomMargin: -1
                         }
-                        width : 80
+                        width: 80
                         height: 20
-                        radius : 2
-                        color :  currentTimeMouseArea.pressed ? IngeScapeTheme.darkBlueGreyColor : IngeScapeTheme.blueGreyColor2
+                        radius: 2
+                        color: currentTimeMouseArea.pressed ? IngeScapeTheme.darkBlueGreyColor : IngeScapeTheme.blueGreyColor2
                         border {
-                            width : 1
+                            width: 1
                             color: currentTimeMouseArea.pressed ? IngeScapeTheme.lightGreyColor : IngeScapeTheme.whiteColor
                         }
 
@@ -1097,7 +1097,7 @@ Item {
                                             0
                                         }
             width : scrollBarSize
-            color:  mouseArea.containsPress? IngeScapeTheme.veryDarkGreyColor : IngeScapeTheme.darkGreyColor;
+            color: mouseArea.containsPress? IngeScapeTheme.veryDarkGreyColor : IngeScapeTheme.darkGreyColor;
             border {
                 color : IngeScapeTheme.blackColor;
                 width : 3
@@ -1113,10 +1113,10 @@ Item {
                 drag.smoothed: false
                 drag.target: scrollBarHorizontal
 
-                drag.minimumX : 0
-                drag.maximumX : scrollTimeLine.width - scrollBarHorizontal.width
-                drag.minimumY : 0
-                drag.maximumY :  0
+                drag.minimumX: 0
+                drag.maximumX: scrollTimeLine.width - scrollBarHorizontal.width
+                drag.minimumY: 0
+                drag.maximumY: 0
             }
         }
     }
@@ -1135,7 +1135,7 @@ Item {
         topLeftRadius: 5
         topRightRadius: 5
 
-        color:  mouseAreaReduceTimeLine.pressed ? IngeScapeTheme.darkBlueGreyColor : IngeScapeTheme.editorsBackgroundColor
+        color: mouseAreaReduceTimeLine.pressed ? IngeScapeTheme.darkBlueGreyColor : IngeScapeTheme.editorsBackgroundColor
 
         I2SvgItem {
             anchors.centerIn: parent
@@ -1165,9 +1165,9 @@ Item {
             right : parent.right
             top : parent.top
         }
-        height : 14
+        height: 14
 
-        color :  mouseAreaResizeTimeLine.pressed? IngeScapeTheme.darkBlueGreyColor : IngeScapeTheme.editorsBackgroundColor
+        color: mouseAreaResizeTimeLine.pressed? IngeScapeTheme.darkBlueGreyColor : IngeScapeTheme.editorsBackgroundColor
 
         I2SvgItem {
             anchors.centerIn: parent
@@ -1278,7 +1278,7 @@ Item {
             }
             height: 21
             radius : 2
-            color :  IngeScapeTheme.blueGreyColor2
+            color: IngeScapeTheme.blueGreyColor2
             border {
                 width : 1
                 color: IngeScapeTheme.whiteColor

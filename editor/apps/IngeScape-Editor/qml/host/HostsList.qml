@@ -57,7 +57,7 @@ Item {
     // allowing to deselect selected host
     MouseArea {
         anchors.fill: parent
-        onClicked:  {
+        onClicked: {
             if(controller.selectedHost)
             {
                 controller.selectedHost = null;

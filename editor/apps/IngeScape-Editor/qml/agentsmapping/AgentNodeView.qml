@@ -72,11 +72,9 @@ Rectangle {
 
     radius: 6
 
-    color:  (dropEnabled === true) ?
-                (mouseArea.pressed ?
-                     IngeScapeTheme.darkGreyColor2
-                   : (rootItem.agentMappingVM && rootItem.agentMappingVM.isON) ? IngeScapeTheme.darkBlueGreyColor : IngeScapeTheme.veryDarkGreyColor)
-              : IngeScapeTheme.darkGreyColor2;
+    color: (dropEnabled === true) ? (mouseArea.pressed ? IngeScapeTheme.darkGreyColor2
+                                                       : (rootItem.agentMappingVM && rootItem.agentMappingVM.isON) ? IngeScapeTheme.darkBlueGreyColor : IngeScapeTheme.veryDarkGreyColor)
+                                  : IngeScapeTheme.darkGreyColor2
 
 
     border {
@@ -896,7 +894,7 @@ Rectangle {
 
             anchors {
                 verticalCenter: agentName.verticalCenter
-                verticalCenterOffset:  2
+                verticalCenterOffset: 2
                 right: parent.right
                 rightMargin: 25
             }
@@ -931,7 +929,7 @@ Rectangle {
 
             anchors {
                 verticalCenter: agentName.verticalCenter
-                verticalCenterOffset:  2
+                verticalCenterOffset: 2
                 left: agentWithSameName.right
                 leftMargin: 5
             }

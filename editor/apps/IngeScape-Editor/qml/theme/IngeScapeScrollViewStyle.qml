@@ -63,14 +63,14 @@ ScrollViewStyle {
 
     // Increment button of our scrollbars
     incrementControl: Item {
-        implicitWidth:  1
+        implicitWidth: 1
         implicitHeight: 1
     }
 
 
     // Decrement button of our scrollbars
     decrementControl: Item {
-        implicitWidth:  1
+        implicitWidth: 1
         implicitHeight: 1
     }
 }

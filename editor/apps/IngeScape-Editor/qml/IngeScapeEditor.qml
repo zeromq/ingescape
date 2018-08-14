@@ -314,7 +314,7 @@ Item {
 
                 visible: true
 
-                Component.onCompleted:  {
+                Component.onCompleted: {
                     x = rootItem.Window.window.x + rootItem.Window.width/2 - agentDefinitionEditor.width/2 + (index * 40);
                     y = rootItem.Window.window.y + rootItem.Window.height/2  - agentDefinitionEditor.height / 2.0 + (index * 40);
 
@@ -352,7 +352,7 @@ Item {
 
                 visible: true
 
-                Component.onCompleted:  {
+                Component.onCompleted: {
                     x = rootItem.Window.window.x + rootItem.Window.width/2 - actionEditor.width/2  + (index * 40);
                     y = rootItem.Window.window.y + rootItem.Window.height/2 - actionEditor.height/2 + (index * 40);
 
@@ -382,7 +382,7 @@ Item {
 
                 visible: true
 
-                Component.onCompleted:  {
+                Component.onCompleted: {
                     x = rootItem.Window.window.x + rootItem.Window.width/2 - logStreamPanel.width/2  + (index * 40);
                     y = rootItem.Window.window.y + rootItem.Window.height/2 - logStreamPanel.height/2 + (index * 40);
 
@@ -404,7 +404,7 @@ Item {
     Agent.HistoryPanel {
         id: historyPanel
 
-        Component.onCompleted:  {
+        Component.onCompleted: {
             // Center window
             x = rootItem.Window.window.x + rootItem.Window.width/2 - historyPanel.width/2;
             y = rootItem.Window.window.y + rootItem.Window.height/2 - historyPanel.height/2;

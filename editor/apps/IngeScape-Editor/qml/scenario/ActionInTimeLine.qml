@@ -206,12 +206,11 @@ Item {
                         verticalCenter: parent.verticalCenter
                     }
 
-                    visible : !model.shallRevert
+                    visible: !model.shallRevert
 
-                    svgFileCache : IngeScapeTheme.svgFileINGESCAPE;
-                    svgElementId:  (model.neverExecuted)?
-                                       "notExcutedAction"
-                                     : ((model.isExecuted) ? "timelineAction" : "currentAction");
+                    svgFileCache: IngeScapeTheme.svgFileINGESCAPE
+                    svgElementId: (model.neverExecuted ? "notExcutedAction"
+                                                       : (model.isExecuted ? "timelineAction" : "currentAction"))
                 }
 
                 // Revert action

@@ -227,14 +227,9 @@ Window {
 
 
                     Binding {
-                        target : textFieldName
-                        property :  "text"
-                        value : if (actionM ) {
-                                    actionM.name
-                                }
-                                else {
-                                    "";
-                                }
+                        target: textFieldName
+                        property: "text"
+                        value: (actionM ? actionM.name : "")
                     }
                 }
             }
@@ -323,20 +318,15 @@ Window {
 
 
                     onTextChanged: {
-                        if (activeFocus &&  actionVM ) {
+                        if (activeFocus && actionVM) {
                             actionVM.startTimeString = text;
                         }
                     }
 
                     Binding {
-                        target : textFieldStartTime
-                        property :  "text"
-                        value : if (actionVM) {
-                                    actionVM.startTimeString
-                                }
-                                else {
-                                    "";
-                                }
+                        target: textFieldStartTime
+                        property: "text"
+                        value: (actionVM ? actionVM.startTimeString : "")
                     }
                 }
 
@@ -416,10 +406,10 @@ Window {
 
                     /// Effects List
                     contentItem: Column {
-                        id : effectsList
-                        spacing : 6
-                        height : childrenRect.height
-                        width : effectsListItem.width - 9 // scrollbar size
+                        id: effectsList
+                        spacing: 6
+                        height: childrenRect.height
+                        width: effectsListItem.width - 9 // scrollbar size
 
                         Repeater {
                             model : actionM ? actionM.effectsList : 0
@@ -429,10 +419,10 @@ Window {
                                 // my effect
                                 property var myEffect: model.QtObject
 
-                                height :  (myEffect && (myEffect.effectType === ActionEffectTypes.MAPPING)) ? 90 : 62
+                                height: (myEffect && (myEffect.effectType === ActionEffectTypes.MAPPING)) ? 90 : 62
                                 anchors {
-                                    left : parent.left
-                                    right :parent.right
+                                    left: parent.left
+                                    right: parent.right
                                 }
 
                                 color : "transparent"
@@ -754,14 +744,14 @@ Window {
                                         }
 
                                         Binding {
-                                            target : textFieldTargetValue
-                                            property :  "text"
-                                            value : if  (myEffect && myEffect.modelM) {
-                                                        myEffect.modelM.value
-                                                    }
-                                                    else {
-                                                        "";
-                                                    }
+                                            target: textFieldTargetValue
+                                            property: "text"
+                                            value: if (myEffect && myEffect.modelM) {
+                                                       myEffect.modelM.value
+                                                   }
+                                                   else {
+                                                       "";
+                                                   }
                                         }
                                     }
 
@@ -989,10 +979,10 @@ Window {
                                             style: I2SvgToggleButtonStyle {
                                                 fileCache: IngeScapeTheme.svgFileINGESCAPE
 
-                                                toggleCheckedReleasedID :  "enabledToggle-checked";
-                                                toggleCheckedPressedID :  "enabledToggle-checked-pressed";
-                                                toggleUncheckedReleasedID : "enabledToggle";
-                                                toggleUncheckedPressedID : "enabledToggle-pressed";
+                                                toggleCheckedReleasedID: "enabledToggle-checked";
+                                                toggleCheckedPressedID: "enabledToggle-checked-pressed";
+                                                toggleUncheckedReleasedID: "enabledToggle";
+                                                toggleUncheckedPressedID: "enabledToggle-pressed";
 
                                                 // No disabled states
                                                 toggleCheckedDisabledID: ""
@@ -1352,8 +1342,7 @@ Window {
 
                             onSelectedItemChanged:
                             {
-                                if (actionM)
-                                {
+                                if (actionM) {
                                     actionM.validityDurationType = validityDurationCombo.selectedItem.value;
                                 }
                             }
@@ -1367,7 +1356,7 @@ Window {
                                 verticalCenter : parent.verticalCenter
                             }
 
-                            visible :  actionM && actionM.validityDurationType === ValidationDurationTypes.CUSTOM
+                            visible: actionM && (actionM.validityDurationType === ValidationDurationTypes.CUSTOM)
                             enabled: visible
                             height: 25
                             width: 57
@@ -1416,14 +1405,9 @@ Window {
                             }
 
                             Binding {
-                                target : textFieldValidity
-                                property :  "text"
-                                value : if (actionM) {
-                                            actionM.validityDurationString
-                                        }
-                                        else {
-                                            "";
-                                        }
+                                target: textFieldValidity
+                                property: "text"
+                                value: (actionM ? actionM.validityDurationString : "")
                             }
                         }
 
@@ -1814,14 +1798,14 @@ Window {
                                         }
 
                                         Binding {
-                                            target : textFieldComparisonValue
-                                            property :  "text"
-                                            value : if (myCondition && myCondition.modelM) {
-                                                        myCondition.modelM.value
-                                                    }
-                                                    else {
-                                                        "";
-                                                    }
+                                            target: textFieldComparisonValue
+                                            property: "text"
+                                            value: if (myCondition && myCondition.modelM) {
+                                                       myCondition.modelM.value
+                                                   }
+                                                   else {
+                                                       "";
+                                                   }
                                         }
                                     }
 
@@ -2015,13 +1999,13 @@ Window {
                         activeFocusOnPress: true;
 
                         style: CheckBoxStyle {
-                            label:  Text {
+                            label: Text {
                                 anchors {
                                     verticalCenter: parent.verticalCenter
                                     verticalCenterOffset: 2
                                 }
 
-                                color: control.checked? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor
+                                color: control.checked ? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor
 
                                 text: "Revert action"
                                 elide: Text.ElideRight
@@ -2040,11 +2024,11 @@ Window {
                                 color : IngeScapeTheme.darkBlueGreyColor
 
                                 I2SvgItem {
-                                    visible : control.checked
+                                    visible: control.checked
                                     anchors.centerIn: parent
 
-                                    svgFileCache : IngeScapeTheme.svgFileINGESCAPE;
-                                    svgElementId:  "check";
+                                    svgFileCache: IngeScapeTheme.svgFileINGESCAPE;
+                                    svgElementId: "check";
 
                                 }
                             }
@@ -2196,7 +2180,7 @@ Window {
                                             radius : height / 2
 
                                             border.width: 0;
-                                            color : IngeScapeTheme.whiteColor
+                                            color: IngeScapeTheme.whiteColor
                                         }
                                     }
 
@@ -2209,9 +2193,9 @@ Window {
                                 }
 
                                 Binding {
-                                    target : revertActionAfterCB
-                                    property : "checked"
-                                    value : (actionM && actionM.shallRevertAfterTime)
+                                    target: revertActionAfterCB
+                                    property: "checked"
+                                    value: (actionM && actionM.shallRevertAfterTime)
                                 }
                             }
 
@@ -2273,14 +2257,9 @@ Window {
                                 }
 
                                 Binding {
-                                    target : textFieldDuration
-                                    property :  "text"
-                                    value : if (actionM) {
-                                                actionM.revertAfterTimeString
-                                            }
-                                            else {
-                                                "";
-                                            }
+                                    target: textFieldDuration
+                                    property: "text"
+                                    value: (actionM ? actionM.revertAfterTimeString : "")
                                 }
 
                                 onFocusChanged: {
@@ -2375,11 +2354,11 @@ Window {
                                     color : IngeScapeTheme.darkBlueGreyColor
 
                                     I2SvgItem {
-                                        visible : control.checked
+                                        visible: control.checked
                                         anchors.centerIn: parent
 
-                                        svgFileCache : IngeScapeTheme.svgFileINGESCAPE;
-                                        svgElementId:  "check";
+                                        svgFileCache: IngeScapeTheme.svgFileINGESCAPE;
+                                        svgElementId: "check";
 
                                     }
                                 }
@@ -2394,9 +2373,9 @@ Window {
 
 
                             Binding {
-                                target : rearmActionCB
-                                property : "checked"
-                                value : (actionM && actionM.shallRearm)
+                                target: rearmActionCB
+                                property: "checked"
+                                value: (actionM && actionM.shallRearm)
                             }
                         }
 
@@ -2492,14 +2471,9 @@ Window {
                                 }
 
                                 Binding {
-                                    target : textFieldTimeBeforeRearm
-                                    property :  "text"
-                                    value : if (actionM) {
-                                                actionM.rearmAfterTimeString
-                                            }
-                                            else {
-                                                "";
-                                            }
+                                    target: textFieldTimeBeforeRearm
+                                    property: "text"
+                                    value: (actionM ? actionM.rearmAfterTimeString : "")
                                 }
 
                                 onFocusChanged: {
@@ -2607,9 +2581,10 @@ Window {
             Button {
                 id: cancelButton
                 activeFocusOnPress: true
+
                 property var boundingBox: IngeScapeTheme.svgFileINGESCAPE.boundsOnElement("button");
-                height : boundingBox.height
-                width :  boundingBox.width
+                height: boundingBox.height
+                width: boundingBox.width
 
                 enabled : visible
                 text : "Cancel"
@@ -2649,12 +2624,12 @@ Window {
                 id: okButton
 
                 property var boundingBox: IngeScapeTheme.svgFileINGESCAPE.boundsOnElement("button");
-                height : boundingBox.height
-                width :  boundingBox.width
+                height: boundingBox.height
+                width: boundingBox.width
 
-                enabled : visible
+                enabled: visible
                 activeFocusOnPress: true
-                text : "OK"
+                text: "OK"
 
                 anchors {
                     bottom: parent.bottom

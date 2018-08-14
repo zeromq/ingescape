@@ -80,7 +80,7 @@ Window {
     // - Available extra width that can be splitted between our 3 resizable columns
     property int splittableAvailableWidth: (tabs.width - 8 - widthColumnType - minWidthColumnInitialValue - minWidthColumnCurrentValue - minWidthColumnName - widthColumnMute)
     property int extraWidthForResizableColumns: Math.max(0, (splittableAvailableWidth/3))
-    property int extraWidthForValuesOnly : if (widthColumnName === maxWidthColumnName) {
+    property int extraWidthForValuesOnly: if (widthColumnName === maxWidthColumnName) {
                                               Math.max(0, ((splittableAvailableWidth - (maxWidthColumnName - minWidthColumnName))/2));
                                           } else {
                                               0;
@@ -88,16 +88,16 @@ Window {
 
     // - Width Resizable Columns
     property int widthColumnName: ((minWidthColumnName + extraWidthForResizableColumns) > maxWidthColumnName) ? maxWidthColumnName : (minWidthColumnName + extraWidthForResizableColumns);
-    property int widthColumnInitialValue:  if (widthColumnName === maxWidthColumnName) {
-                                               minWidthColumnInitialValue + extraWidthForValuesOnly;
-                                           } else {
-                                               minWidthColumnInitialValue + extraWidthForResizableColumns;
-                                           }
+    property int widthColumnInitialValue: if (widthColumnName === maxWidthColumnName) {
+                                              minWidthColumnInitialValue + extraWidthForValuesOnly;
+                                          } else {
+                                              minWidthColumnInitialValue + extraWidthForResizableColumns;
+                                          }
     property int widthColumnCurrentValue: if (widthColumnName === maxWidthColumnName) {
-                                       minWidthColumnCurrentValue + extraWidthForValuesOnly;
-                                   } else {
-                                       minWidthColumnCurrentValue + extraWidthForResizableColumns;
-                                   }
+                                              minWidthColumnCurrentValue + extraWidthForValuesOnly;
+                                          } else {
+                                              minWidthColumnCurrentValue + extraWidthForResizableColumns;
+                                          }
 
     // List of widths
     property var widthsOfColumns: [
@@ -297,8 +297,9 @@ Window {
                         id : svgMenu
                         anchors.centerIn: parent
 
-                        svgFileCache : IngeScapeTheme.svgFileINGESCAPE;
-                        svgElementId:  styleData.selected ? "tab-" + index + "-Selected" : "tab-" + index;
+                        svgFileCache: IngeScapeTheme.svgFileINGESCAPE;
+                        svgElementId: styleData.selected ? "tab-" + index + "-Selected"
+                                                         : "tab-" + index;
 
                         Text {
                             anchors.centerIn: parent
@@ -439,7 +440,7 @@ Window {
                                            0
                                        }
 
-                                delegate:   Item {
+                                delegate: Item {
                                     anchors {
                                         left : parent.left
                                         right : parent.right

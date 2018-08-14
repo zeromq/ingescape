@@ -237,13 +237,13 @@ Window {
                 id: _comboButton
                 property bool checked : false;
 
-                width:  parent.width;
-                height: parent.height;
-                radius: 1;
+                width: parent.width
+                height: parent.height
+                radius: 1
 
-                border.width: _mouseAreaCombo.containsPress ? 1 : 0;
+                border.width: _mouseAreaCombo.containsPress ? 1 : 0
                 border.color: IngeScapeTheme.darkBlueGreyColor
-                color : _mouseAreaCombo.containsPress ? IngeScapeTheme.darkGreyColor2 : IngeScapeTheme.darkBlueGreyColor
+                color: _mouseAreaCombo.containsPress ? IngeScapeTheme.darkGreyColor2 : IngeScapeTheme.darkBlueGreyColor
 
                 Text {
                     id: _comboPlaceholder
@@ -359,7 +359,7 @@ Window {
                 Rectangle {
                     id : popUpBackground
                     anchors.fill : parent
-                    color:  IngeScapeTheme.darkBlueGreyColor
+                    color: IngeScapeTheme.darkBlueGreyColor
                 }
 
                 ScrollView {
@@ -368,8 +368,8 @@ Window {
                     visible: _comboButton.checked;
 
                     anchors {
-                        top:  parent.top;
-                        bottom:  parent.bottom;
+                        top: parent.top;
+                        bottom: parent.bottom;
                     }
 
                     width: _comboButton.width;
@@ -403,7 +403,7 @@ Window {
                             activeFocusOnPress: true;
 
                             style: CheckBoxStyle {
-                                label:  Text {
+                                label: Text {
                                     anchors {
                                         verticalCenter: parent.verticalCenter
                                         verticalCenterOffset: 1
@@ -520,7 +520,7 @@ Window {
                                     right: parent.right
                                 }
 
-                                width:  _comboButton.width
+                                width: _comboButton.width
                                 height: _comboButton.height
 
                                 CheckBox {
@@ -538,7 +538,7 @@ Window {
                                     activeFocusOnPress: true;
 
                                     style: CheckBoxStyle {
-                                        label:  Text {
+                                        label: Text {
                                             anchors {
                                                 verticalCenter: parent.verticalCenter
                                                 verticalCenterOffset: 1
@@ -567,8 +567,8 @@ Window {
                                                 visible: (control.checkedState === Qt.Checked)
                                                 anchors.centerIn: parent
 
-                                                svgFileCache : IngeScapeTheme.svgFileINGESCAPE;
-                                                svgElementId:  "check";
+                                                svgFileCache: IngeScapeTheme.svgFileINGESCAPE;
+                                                svgElementId: "check";
 
                                             }
                                         }
@@ -832,8 +832,8 @@ Window {
             id: okButton
 
             property var boundingBox: IngeScapeTheme.svgFileINGESCAPE.boundsOnElement("button");
-            height : boundingBox.height
-            width :  boundingBox.width
+            height: boundingBox.height
+            width: boundingBox.width
 
             activeFocusOnPress: true
             text : "OK"

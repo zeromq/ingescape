@@ -55,8 +55,8 @@ Item {
     // allowing to deselect selected record
     MouseArea {
         anchors.fill: parent
-        onClicked:  {
-            if(controller.selectedRecord)
+        onClicked: {
+            if (controller.selectedRecord)
             {
                 controller.selectedRecord = null;
             }
@@ -168,10 +168,10 @@ Item {
             style: I2SvgToggleButtonStyle {
                 fileCache: IngeScapeTheme.svgFileINGESCAPE
 
-                toggleCheckedReleasedID :  "stop";
-                toggleCheckedPressedID :  "stopped_pressed";
-                toggleUncheckedReleasedID : "record";
-                toggleUncheckedPressedID : "record_pressed";
+                toggleCheckedReleasedID: "stop";
+                toggleCheckedPressedID: "stopped_pressed";
+                toggleUncheckedReleasedID: "record";
+                toggleUncheckedPressedID: "record_pressed";
 
                 // No disabled states
                 toggleCheckedDisabledID: "record"
@@ -370,10 +370,10 @@ Item {
                     style: I2SvgToggleButtonStyle {
                         fileCache: IngeScapeTheme.svgFileINGESCAPE
 
-                        toggleCheckedReleasedID :  "pause_actif";
-                        toggleCheckedPressedID :  "pause_actif_pressed";
-                        toggleUncheckedReleasedID : "play_actif";
-                        toggleUncheckedPressedID : "play_actif_pressed";
+                        toggleCheckedReleasedID: "pause_actif";
+                        toggleCheckedPressedID: "pause_actif_pressed";
+                        toggleUncheckedReleasedID: "play_actif";
+                        toggleUncheckedPressedID: "play_actif_pressed";
 
                         // No disabled states
                         toggleCheckedDisabledID: "play_actif"

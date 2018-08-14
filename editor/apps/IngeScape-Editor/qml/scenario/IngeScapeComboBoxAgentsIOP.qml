@@ -91,10 +91,12 @@ Item {
 
     Rectangle {
         id: comboButton
-        property bool checked : false;
-        width:  parent.width;
-        height: parent.height;
-        radius: 1;
+
+        property bool checked: false
+
+        width: parent.width
+        height: parent.height
+        radius: 1
 
         border.width: _mouseAreaCombo.containsPress ? 1 : 0;
         border.color: IngeScapeTheme.darkBlueGreyColor
@@ -257,7 +259,7 @@ Item {
         Rectangle {
             id : popUpBackground
             anchors.fill : parent
-            color:  "#2C333E"
+            color: "#2C333E"
         }
 
         ScrollView {
@@ -266,12 +268,13 @@ Item {
             visible: comboButton.checked;
 
             anchors {
-                top:  parent.top;
-                bottom:  parent.bottom;
+                top: parent.top
+                bottom: parent.bottom
             }
 
-            width: comboButton.width;
-            height: ((combolist.count < 5) ? (combolist.count)*(comboButton.height+1) : 5*(comboButton.height+1) );
+            width: comboButton.width
+            height: ((combolist.count < 5) ? (combolist.count) * (comboButton.height + 1)
+                                           : 5 * (comboButton.height + 1) )
 
             style: IngeScapeScrollViewStyle {
             }
@@ -300,10 +303,10 @@ Item {
                         right: parent.right
                     }
 
-                    width:  comboButton.width
+                    width: comboButton.width
                     height: comboButton.height
 
-                    color : _mouseAreaItem.containsPress ? IngeScapeTheme.darkBlueGreyColor :  "transparent"
+                    color: _mouseAreaItem.containsPress ? IngeScapeTheme.darkBlueGreyColor : "transparent"
 
                     // Inputs / Outputs separator
                     Rectangle {

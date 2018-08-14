@@ -243,7 +243,7 @@ Item {
     //
     readonly property color agentsMappingBackgroundColor: theme.blackColor
     // - grid
-    readonly property color agentsMappingGridLineColor:  "#3E414B"
+    readonly property color agentsMappingGridLineColor: "#3E414B"
     readonly property color agentsMappingGridSublineColor: "#232830"
 
     //
@@ -269,17 +269,17 @@ Item {
 
 
     // Input/Output type colors
-    readonly property color yellowColor : "#ECB52E" // "#FFEE0B"
-    readonly property color darkYellowColor : "#936F20"
+    readonly property color yellowColor: "#ECB52E" // "#FFEE0B"
+    readonly property color darkYellowColor: "#936F20"
 
-    readonly property color redColor2 : "#E33E36" //"#E02424"
-    readonly property color darkRedColor2 :  "#672B28"
+    readonly property color redColor2: "#E33E36" //"#E02424"
+    readonly property color darkRedColor2: "#672B28"
 
-    readonly property color purpleColor : "#854D97"
-    readonly property color darkPurpleColor : "#483059"
+    readonly property color purpleColor: "#854D97"
+    readonly property color darkPurpleColor: "#483059"
 
-    readonly property color greenColor : "#00AE8B"
-    readonly property color darkGreenColor : "#1E564F"
+    readonly property color greenColor: "#00AE8B"
+    readonly property color darkGreenColor: "#1E564F"
 
 
     function colorOfIOPTypeWithConditions(iOPType, conditions) {
@@ -288,19 +288,19 @@ Item {
         case 0: //AgentIOPValueTypeGroups.NUMBER:
             return (conditions === true) ? theme.yellowColor : theme.darkYellowColor
 
-        case 1 : //AgentIOPValueTypeGroups.STRING:
+        case 1: //AgentIOPValueTypeGroups.STRING:
             return (conditions === true) ? theme.greenColor : theme.darkGreenColor
 
-        case 2 : //AgentIOPValueTypeGroups.IMPULSION:
+        case 2: //AgentIOPValueTypeGroups.IMPULSION:
            return (conditions === true) ? theme.purpleColor : theme.darkPurpleColor
 
-        case 3 :  //AgentIOPValueTypeGroups.DATA:
+        case 3: //AgentIOPValueTypeGroups.DATA:
             return (conditions === true) ? theme.redColor2 : theme.darkRedColor2
 
-        case 4 : //AgentIOPValueTypeGroups.MIXED:
+        case 4: //AgentIOPValueTypeGroups.MIXED:
             return (conditions === true) ? theme.whiteColor : theme.darkGreyColor
 
-        case 5 : //AgentIOPValueTypeGroups.UNKNOWN:
+        case 5: //AgentIOPValueTypeGroups.UNKNOWN:
             return "#000000";
 
         default:

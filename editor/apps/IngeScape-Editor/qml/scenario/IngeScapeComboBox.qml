@@ -11,15 +11,15 @@ I2Combobox {
     width : 115
 
     style : I2ComboboxStyle {
-        backgroundColorIdle : IngeScapeTheme.darkBlueGreyColor
+        backgroundColorIdle: IngeScapeTheme.darkBlueGreyColor
         backgroundColorDisabled: IngeScapeTheme.darkBlueGreyColor
-        borderWidthIdle : 0
+        borderWidthIdle: 0
         borderColorPressed: IngeScapeTheme.darkBlueGreyColor
         borderWidthPressed: 1
-        currentTextColorIdle : IngeScapeTheme.whiteColor
+        currentTextColorIdle: IngeScapeTheme.whiteColor
         placeholderTextColor: IngeScapeTheme.greyColor
-        currentTextColorDisabled:  IngeScapeTheme.greyColor
-        backgroundColorPressed : IngeScapeTheme.darkGreyColor2
+        currentTextColorDisabled: IngeScapeTheme.greyColor
+        backgroundColorPressed: IngeScapeTheme.darkGreyColor2
         radius: 1
 
         font {
