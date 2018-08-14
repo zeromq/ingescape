@@ -73,6 +73,10 @@ Item {
 
     // function allowing to open the network configuration popup
     function openNetworkConfiguration() {
+        if (IngeScapeEditorC.networkC) {
+            IngeScapeEditorC.networkC.updateAvailableNetworkDevices();
+        }
+
         networkConfigurationPopup.open();
     }
 
