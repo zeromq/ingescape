@@ -33,7 +33,7 @@ Window {
     minimumWidth: 475
     minimumHeight: IngeScapeTheme.appMinHeight
 
-    maximumWidth: 475
+    //maximumWidth: 475
     maximumHeight: IngeScapeTheme.appMinHeight
 
     flags: Qt.Dialog
@@ -519,6 +519,11 @@ Window {
                                     }
                                 }
 
+
+                                /*Item {
+
+                                }*/
+
                                 //
                                 // Effect Details for Agent and Value
                                 //
@@ -530,10 +535,10 @@ Window {
                                         bottom : parent.bottom
                                         bottomMargin: 6
                                     }
-                                    height : agentEffectCombo.height
-                                    spacing : 6
+                                    height: agentEffectCombo.height
+                                    spacing: 6
 
-                                    visible : myEffect && myEffect.effectType !== ActionEffectTypes.MAPPING
+                                    visible: myEffect && (myEffect.effectType !== ActionEffectTypes.MAPPING)
 
                                     // Agent
                                     IngeScapeComboBox {
@@ -696,7 +701,7 @@ Window {
                                         horizontalAlignment: TextInput.AlignLeft
                                         verticalAlignment: TextInput.AlignVCenter
 
-                                        text : myEffect && myEffect.modelM  ? myEffect.modelM.value : ""
+                                        text: (myEffect && myEffect.modelM) ? myEffect.modelM.value : ""
 
                                         style: I2TextFieldStyle {
                                             backgroundColor: IngeScapeTheme.darkBlueGreyColor
@@ -847,10 +852,11 @@ Window {
                                         height : 25
                                         width : 148
 
-                                        model : controller ? controller.agentsInMappingList : 0
+                                        model: controller ? controller.agentsInMappingList : 0
 
-                                        enabled: (controller && controller.agentsInMappingList.count !== 0 )
-                                        placeholderText : (controller && controller.agentsInMappingList.count === 0 ? "- No Item -" : "- Select an item -")
+                                        enabled: controller && (controller.agentsInMappingList.count !== 0)
+                                        placeholderText: (controller && (controller.agentsInMappingList.count === 0) ? "- No Item -"
+                                                                                                                     : "- Select an item -")
 
                                         function modelToString(model) {
                                             return model.name;
@@ -915,7 +921,8 @@ Window {
                                     }
 
                                     Item {
-                                        id : disableMappingItem
+                                        id: disableMappingItem
+
                                         anchors {
                                             left : comboEffectOnMapping_OutputAgent.right
                                             right : comboEffectOnMapping_InputAgent.left
@@ -1000,22 +1007,24 @@ Window {
                                             }
 
                                             Binding {
-                                                target : enabledbutton
-                                                property : "checked"
-                                                value : (myEffect && myEffect.modelM && myEffect.modelM.mappingEffectValue === MappingEffectValues.MAPPED) ? true : false;
+                                                target: enabledbutton
+                                                property: "checked"
+                                                value: (myEffect && myEffect.modelM && (myEffect.modelM.mappingEffectValue === MappingEffectValues.MAPPED)) ? true
+                                                                                                                                                            : false
                                             }
                                         }
 
 
                                         Text {
                                             anchors {
-                                                horizontalCenter : enabledbutton.horizontalCenter
-                                                top : enabledbutton.bottom
+                                                horizontalCenter: enabledbutton.horizontalCenter
+                                                top: enabledbutton.bottom
                                                 topMargin: 3
                                             }
 
-                                            text : (myEffect && myEffect.modelM && myEffect.modelM.mappingEffectValue === MappingEffectValues.MAPPED) ? "Mapped" : "Not mapped"
-                                            color : IngeScapeTheme.whiteColor
+                                            text: (myEffect && myEffect.modelM && (myEffect.modelM.mappingEffectValue === MappingEffectValues.MAPPED)) ? "Mapped"
+                                                                                                                                                        : "Not mapped"
+                                            color: IngeScapeTheme.whiteColor
                                             font {
                                                 family: IngeScapeTheme.textFontFamily
                                                 pixelSize: 12
