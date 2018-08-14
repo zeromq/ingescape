@@ -273,9 +273,11 @@ Rectangle {
                             font: IngeScapeTheme.heading2Font
 
                             MouseArea {
-                                property string text: myModel ? myModel.name : ""
+                                property string text: ((myModel && myModel.firstModel) ? myModel.name + " (" + AgentIOPValueTypes.enumToString(myModel.firstModel.agentIOPValueType) + ")"
+                                                                                       : "")
 
                                 id: rootTooltipInput
+
                                 anchors.fill: parent
                                 acceptedButtons: Qt.NoButton
                                 hoverEnabled: true
@@ -380,12 +382,12 @@ Rectangle {
                                 color : IngeScapeTheme.whiteColor
                             }
 
-                            color : if (agentMappingVM && myModel && myModel.firstModel) {
-                                        IngeScapeTheme.colorOfIOPTypeWithConditions(myModel.firstModel.agentIOPValueTypeGroup, true);
-                                    }
-                                    else {
-                                        IngeScapeTheme.whiteColor
-                                    }
+                            color: if (agentMappingVM && myModel && myModel.firstModel) {
+                                       IngeScapeTheme.colorOfIOPTypeWithConditions(myModel.firstModel.agentIOPValueTypeGroup, true);
+                                   }
+                                   else {
+                                       IngeScapeTheme.whiteColor
+                                   }
                         }
 
 
@@ -442,7 +444,7 @@ Rectangle {
                                 var dragItem = drag.source;
                                 if (dragItem)
                                 {
-                                    if (typeof dragItem.outputSlotModel !== 'undefined' && dragItem.agentInMappingVMOfOutput && rootItem.agentMappingVM)
+                                    if ((typeof dragItem.outputSlotModel !== 'undefined') && dragItem.agentInMappingVMOfOutput && rootItem.agentMappingVM)
                                     {
                                         dragItem.color = "transparent";
                                         linkPoint.border.width = 0
@@ -537,9 +539,11 @@ Rectangle {
                             font: IngeScapeTheme.heading2Font
 
                             MouseArea {
-                                property string text: myModel ? myModel.name : ""
+                                property string text: ((myModel && myModel.firstModel) ? myModel.name + " (" + AgentIOPValueTypes.enumToString(myModel.firstModel.agentIOPValueType) + ")"
+                                                                                       : "")
 
                                 id: rootTooltipOutput
+
                                 anchors.fill: parent
                                 acceptedButtons: Qt.NoButton
                                 hoverEnabled: true
