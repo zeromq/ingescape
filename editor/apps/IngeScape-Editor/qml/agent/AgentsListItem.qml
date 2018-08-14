@@ -272,52 +272,59 @@ Item {
 
                     text : definitionName.elidedText
 
-                    color: if (rootItem.agent && (rootItem.agent.isON === true))
+                    color: if (rootItem.agent)
                            {
-                               // ON & Variant
-                               if (rootItem.agent.definition && rootItem.agent.definition.isVariant)
+                               // ON
+                               if (rootItem.agent.isON === true)
                                {
-                                   if (definitionNameBtn.pressed) {
-                                       IngeScapeTheme.middleDarkRedColor;
+                                   // ON & Variant
+                                   if (rootItem.agent.definition && rootItem.agent.definition.isVariant)
+                                   {
+                                       if (definitionNameBtn.pressed) {
+                                           IngeScapeTheme.middleDarkRedColor
+                                       }
+                                       else {
+                                           IngeScapeTheme.redColor
+                                       }
                                    }
-                                   else {
-                                       IngeScapeTheme.redColor
+                                   // ON & (NO variant)
+                                   else
+                                   {
+                                       if (definitionNameBtn.pressed) {
+                                           IngeScapeTheme.agentsListPressedLabel2Color
+                                       }
+                                       else {
+                                           IngeScapeTheme.agentsListLabel2Color
+                                       }
                                    }
                                }
-                               // ON & (NO variant)
+                               // OFF
                                else
                                {
-                                   if (definitionNameBtn.pressed) {
-                                       IngeScapeTheme.agentsListPressedLabel2Color;
+                                   // OFF & Variant
+                                   if (rootItem.agent.definition && rootItem.agent.definition.isVariant)
+                                   {
+                                       if (definitionNameBtn.pressed) {
+                                           IngeScapeTheme.darkRedColor
+                                       }
+                                       else {
+                                           IngeScapeTheme.middleDarkRedColor
+                                       }
                                    }
-                                   else {
-                                       IngeScapeTheme.agentsListLabel2Color;
+                                   // OFF & (NO variant)
+                                   else
+                                   {
+                                       if (definitionNameBtn.pressed) {
+                                           IngeScapeTheme.agentOFFPressedLabel2Color
+                                       }
+                                       else {
+                                           IngeScapeTheme.agentOFFLabel2Color
+                                       }
                                    }
                                }
                            }
-                           // OFF
-                           else
-                           {
-                               // OFF & Variant
-                               if (rootItem.agent.definition && rootItem.agent.definition.isVariant)
-                               {
-                                   if (definitionNameBtn.pressed) {
-                                       IngeScapeTheme.darkRedColor;
-                                   }
-                                   else {
-                                       IngeScapeTheme.middleDarkRedColor
-                                   }
-                               }
-                               // OFF & (NO variant)
-                               else
-                               {
-                                   if (definitionNameBtn.pressed) {
-                                       IngeScapeTheme.agentOFFPressedLabel2Color;
-                                   }
-                                   else {
-                                       IngeScapeTheme.agentOFFLabel2Color;
-                                   }
-                               }
+                           else {
+                               IngeScapeTheme.agentOFFLabel2Color
                            }
 
                     font: IngeScapeTheme.heading2Font

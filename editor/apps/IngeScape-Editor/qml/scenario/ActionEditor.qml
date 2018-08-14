@@ -437,6 +437,7 @@ Window {
                                 // Effect Type
                                 Row {
                                     id : rowEffectsTypes
+
                                     anchors {
                                         right : parent.right
                                         left : parent.left
@@ -452,7 +453,7 @@ Window {
                                     }
 
                                     Repeater {
-                                        model : controller? controller.effectsTypesList : 0
+                                        model : controller ? controller.effectsTypesList : 0
 
                                         CheckBox {
                                             id : effectTypeCB
@@ -460,7 +461,7 @@ Window {
                                                 verticalCenter: parent.verticalCenter;
                                             }
 
-                                            checked : myEffect && myEffect.effectType === model.value;
+                                            checked: myEffect && (myEffect.effectType === model.value)
                                             exclusiveGroup: effectTypesExclusifGroup
                                             activeFocusOnPress: true;
 
@@ -470,7 +471,7 @@ Window {
                                                         verticalCenter: parent.verticalCenter
                                                         verticalCenterOffset: 2
                                                     }
-                                                    color: control.checked? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor
+                                                    color: control.checked ? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor
 
                                                     text: model.name
                                                     elide: Text.ElideRight
@@ -493,10 +494,10 @@ Window {
                                                         visible : control.checked
                                                         width: 8
                                                         height: 8
-                                                        radius : height / 2
+                                                        radius: height / 2
 
-                                                        border.width: 0;
-                                                        color : IngeScapeTheme.whiteColor
+                                                        border.width: 0
+                                                        color: IngeScapeTheme.whiteColor
                                                     }
                                                 }
 
@@ -510,9 +511,9 @@ Window {
 
 
                                             Binding {
-                                                target : effectTypeCB
-                                                property : "checked"
-                                                value : (myEffect && myEffect.effectType === model.value)
+                                                target: effectTypeCB
+                                                property: "checked"
+                                                value: (myEffect && (myEffect.effectType === model.value))
                                             }
                                         }
                                     }
@@ -568,8 +569,7 @@ Window {
                                         }
 
 
-                                        onSelectedItemChanged:
-                                        {
+                                        onSelectedItemChanged: {
                                             if (myEffect && myEffect.modelM)
                                             {
                                                 myEffect.modelM.agent = agentEffectCombo.selectedItem;
@@ -604,22 +604,21 @@ Window {
 
 
                                         Binding {
-                                            target : ioEffectsCombo
-                                            property : "selectedItem"
-                                            value : if (myEffect && myEffect.modelM && myEffect.modelM.agentIOP)
-                                                    {
-                                                        console.log("QML (Binding): Combo set agent IOP to " + myEffect.modelM.agentIOP.name);
-                                                        myEffect.modelM.agentIOP;
-                                                    }
-                                                    else {
-                                                        console.log("QML (Binding): Combo set agent IOP to NULL !!!");
-                                                        null;
-                                                    }
+                                            target: ioEffectsCombo
+                                            property: "selectedItem"
+                                            value: if (myEffect && myEffect.modelM && myEffect.modelM.agentIOP)
+                                                   {
+                                                       console.log("QML (Binding): Combo set agent IOP to " + myEffect.modelM.agentIOP.name);
+                                                       myEffect.modelM.agentIOP;
+                                                   }
+                                                   else {
+                                                       console.log("QML (Binding): Combo set agent IOP to NULL !!!");
+                                                       null;
+                                                   }
                                         }
 
 
-                                        onSelectedItemChanged:
-                                        {
+                                        onSelectedItemChanged: {
                                             if (myEffect && myEffect.modelM)
                                             {
                                                 if (myEffect.modelM.iopMergedList.count > 0) {
@@ -635,7 +634,7 @@ Window {
 
                                     }
 
-                                    // Effect Type
+                                    // Effect Type (on Agent)
                                     IngeScapeComboBox {
                                         id : effectTypeCombo
 
@@ -646,19 +645,10 @@ Window {
                                         height : 25
                                         width : 98
 
-                                        visible : (myEffect && myEffect.effectType === ActionEffectTypes.AGENT)
-                                        enabled : visible
+                                        visible: (myEffect && (myEffect.effectType === ActionEffectTypes.AGENT))
+                                        enabled: visible
 
-                                        model :
-                                        {
-                                            if (controller) {
-                                                controller.agentEffectValuesList
-                                            }
-                                            else {
-                                                0
-                                            }
-
-                                        }
+                                        model: (controller ? controller.agentEffectValuesList : 0)
 
                                         function modelToString(model)
                                         {
@@ -667,15 +657,15 @@ Window {
 
 
                                         Binding {
-                                            target : effectTypeCombo
-                                            property : "selectedItem"
-                                            value : if (myEffect && myEffect.modelM && controller)
-                                                    {
-                                                        controller.agentEffectValuesList.getItemWithValue(myEffect.modelM.agentEffectValue);
-                                                    }
-                                                    else {
-                                                        null;
-                                                    }
+                                            target: effectTypeCombo
+                                            property: "selectedItem"
+                                            value: if (myEffect && myEffect.modelM && controller)
+                                                   {
+                                                       controller.agentEffectValuesList.getItemWithValue(myEffect.modelM.agentEffectValue);
+                                                   }
+                                                   else {
+                                                       null;
+                                                   }
                                         }
 
 
@@ -697,8 +687,8 @@ Window {
                                             verticalCenter : parent.verticalCenter
                                         }
 
-                                        visible : myEffect && myEffect.effectType === ActionEffectTypes.VALUE
-                                        enabled : visible
+                                        visible: myEffect && (myEffect.effectType === ActionEffectTypes.VALUE)
+                                        enabled: visible
 
                                         height: 25
                                         width: 49
@@ -760,11 +750,14 @@ Window {
 
 
                                     Button {
+                                        id: btnWarningActionEditor
+
                                         anchors {
                                             verticalCenter: parent.verticalCenter
                                         }
 
-                                        visible : myEffect && myEffect.effectType === ActionEffectTypes.VALUE
+                                        visible: (myEffect && (myEffect.effectType === ActionEffectTypes.VALUE) && myEffect.modelM && (myEffect.modelM.agentIOPType !== AgentIOPTypes.OUTPUT))
+
                                         activeFocusOnPress: true
                                         checkable: true
 
@@ -783,7 +776,7 @@ Window {
 
 
                                         I2PopupBase {
-                                            id : infosBulle
+                                            id: infosBulle
 
                                             height : backgroundPopup.height
                                             width : backgroundPopup.width
@@ -1045,8 +1038,9 @@ Window {
 
                                         model : controller ? controller.agentsInMappingList : 0
 
-                                        enabled: (controller && controller.agentsInMappingList.count !== 0 )
-                                        placeholderText : (controller && controller.agentsInMappingList.count === 0 ? "- No Item -" : "- Select an item -")
+                                        enabled: (controller && (controller.agentsInMappingList.count !== 0))
+                                        placeholderText: (controller && controller.agentsInMappingList.count === 0 ? "- No Item -"
+                                                                                                                   : "- Select an item -")
 
                                         function modelToString(model) {
                                             return model.name;
@@ -1146,7 +1140,7 @@ Window {
                             }
                         }
 
-                        // add effect
+                        // Add effect
                         Button {
                             id: addEffects
 
