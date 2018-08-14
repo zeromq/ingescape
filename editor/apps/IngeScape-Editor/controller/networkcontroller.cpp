@@ -705,19 +705,8 @@ NetworkController::NetworkController(QObject *parent) : QObject(parent),
     igs_loadMapping(mappingByDefault.toStdString().c_str());
 
 
-    QStringList networkDevices;
-    char **devices = NULL;
-    int nb = 0;
-    igs_getNetdevicesList(&devices, &nb);
-    for (int i = 0; i < nb; i++)
-    {
-        QString availableNetworkDevice = QString(devices[i]);
-        networkDevices.append(availableNetworkDevice);
-    }
-    igs_freeNetdevicesList(devices, nb);
-
-    setavailableNetworkDevices(networkDevices);
-    qInfo() << "Available Network Devices:" << _availableNetworkDevices;
+    // Update the list of available network devices
+    updateAvailableNetworkDevices();
 
 
     // Begin to observe incoming messages on the bus
@@ -828,6 +817,30 @@ void NetworkController::manageMessageFrozenUnfrozen(QString peerId, QString mess
         // Emit the signal "is Frozen from Agent Updated"
         Q_EMIT isFrozenFromAgentUpdated(peerId, true);
     }
+}
+
+
+/**
+ * @brief Update the list of available network devices
+ */
+void NetworkController::updateAvailableNetworkDevices()
+{
+    QStringList networkDevices;
+
+    char **devices = NULL;
+    int nb = 0;
+    igs_getNetdevicesList(&devices, &nb);
+
+    for (int i = 0; i < nb; i++)
+    {
+        QString availableNetworkDevice = QString(devices[i]);
+        networkDevices.append(availableNetworkDevice);
+    }
+    igs_freeNetdevicesList(devices, nb);
+
+    setavailableNetworkDevices(networkDevices);
+
+    qInfo() << "Update available Network Devices:" << _availableNetworkDevices;
 }
 
 

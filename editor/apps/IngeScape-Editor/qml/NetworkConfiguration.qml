@@ -159,7 +159,8 @@ I2PopupBase {
             model: IngeScapeEditorC.networkC ? IngeScapeEditorC.networkC.availableNetworkDevices : 0
             useQStringList: true
 
-            //placeholderText: (IngeScapeEditorC.networkC && IngeScapeEditorC.networkC.availableNetworkDevices.count === 0 ? "- No network device -" : "- Select a network device -")
+//            placeholderText: (IngeScapeEditorC.networkC && (IngeScapeEditorC.networkC.availableNetworkDevices.count === 0) ? "- No network device -"
+//                                                                                                                           : "- Select a network device -")
 
             onSelectedItemChanged: {
                 var selectedNetworkDevice = "";

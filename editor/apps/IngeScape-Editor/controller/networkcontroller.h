@@ -93,6 +93,12 @@ public:
 
 
     /**
+     * @brief Update the list of available network devices
+     */
+    Q_INVOKABLE void updateAvailableNetworkDevices();
+
+
+    /**
      * @brief Return true if the network device is available
      * @param networkDevice
      * @return
