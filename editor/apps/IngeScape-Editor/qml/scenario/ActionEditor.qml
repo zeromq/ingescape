@@ -520,40 +520,37 @@ Window {
                                 }
 
 
-                                /*Item {
-
-                                }*/
-
                                 //
                                 // Effect Details for Agent and Value
                                 //
-                                Row {
+                                Item {
                                     anchors {
-                                        right : parent.right
+                                        right: parent.right
                                         rightMargin: 10
-                                        left : rowEffectsTypes.left
-                                        bottom : parent.bottom
+                                        left: rowEffectsTypes.left
+                                        bottom: parent.bottom
                                         bottomMargin: 6
                                     }
-                                    height: agentEffectCombo.height
-                                    spacing: 6
+                                    height: 25
 
-                                    visible: myEffect && (myEffect.effectType !== ActionEffectTypes.MAPPING)
+                                    visible: (myEffect && myEffect.effectType !== ActionEffectTypes.MAPPING)
 
                                     // Agent
                                     IngeScapeComboBox {
                                         id : agentEffectCombo
 
                                         anchors {
+                                            left: parent.left
                                             verticalCenter : parent.verticalCenter
                                         }
+                                        height: parent.height
+                                        width: 148
 
-                                        height : 25
-                                        width : 148
+                                        model: controller ? controller.agentsInMappingList : 0
 
-                                        model : controller ? controller.agentsInMappingList : 0
-                                        enabled: (controller && controller.agentsInMappingList.count !== 0 )
-                                        placeholderText : (controller && controller.agentsInMappingList.count === 0 ? "- No Item -" : "- Select an item -")
+                                        enabled: (controller && controller.agentsInMappingList.count !== 0)
+                                        placeholderText: (controller && (controller.agentsInMappingList.count === 0) ? "- No Item -"
+                                                                                                                     : "- Select an item -")
 
                                         function modelToString(model)
                                         {
@@ -562,17 +559,16 @@ Window {
 
 
                                         Binding {
-                                            target : agentEffectCombo
-                                            property : "selectedItem"
-                                            value : if (myEffect && myEffect.modelM)
-                                                    {
-                                                        myEffect.modelM.agent;
-                                                    }
-                                                    else {
-                                                        null;
-                                                    }
+                                            target: agentEffectCombo
+                                            property: "selectedItem"
+                                            value: if (myEffect && myEffect.modelM)
+                                                   {
+                                                       myEffect.modelM.agent;
+                                                   }
+                                                   else {
+                                                       null;
+                                                   }
                                         }
-
 
                                         onSelectedItemChanged: {
                                             if (myEffect && myEffect.modelM)
@@ -580,21 +576,23 @@ Window {
                                                 myEffect.modelM.agent = agentEffectCombo.selectedItem;
                                             }
                                         }
-
                                     }
 
                                     // Agent Inputs/Outputs
                                     IngeScapeComboBoxAgentsIOP {
-                                        id : ioEffectsCombo
+                                        id : iopEffectsCombo
 
-                                        visible : myEffect && myEffect.effectType === ActionEffectTypes.VALUE
-                                        enabled : visible
                                         anchors {
+                                            left: agentEffectCombo.right
+                                            leftMargin: 6
                                             verticalCenter : parent.verticalCenter
                                         }
 
-                                        height : 25
-                                        width : 148
+                                        height: 25
+                                        width: 148
+
+                                        visible: myEffect && (myEffect.effectType === ActionEffectTypes.VALUE)
+                                        enabled: visible
 
                                         model: (myEffect && myEffect.modelM) ? myEffect.modelM.iopMergedList : 0
 
@@ -609,7 +607,7 @@ Window {
 
 
                                         Binding {
-                                            target: ioEffectsCombo
+                                            target: iopEffectsCombo
                                             property: "selectedItem"
                                             value: if (myEffect && myEffect.modelM && myEffect.modelM.agentIOP)
                                                    {
@@ -626,14 +624,14 @@ Window {
                                         onSelectedItemChanged: {
                                             if (myEffect && myEffect.modelM)
                                             {
-                                                if (myEffect.modelM.iopMergedList.count > 0) {
-                                                    console.log("QML: Combo Selected Item changed...set agent IOP to " + ioEffectsCombo.selectedItem + " (iopMergedList.count = " + myEffect.modelM.iopMergedList.count + ")");
+                                                if (myEffect.modelM.iopMergedList && myEffect.modelM.iopMergedList.count > 0) {
+                                                    console.log("QML: Combo Selected Item changed...set agent IOP to " + iopEffectsCombo.selectedItem + " (iopMergedList.count = " + myEffect.modelM.iopMergedList.count + ")");
                                                 }
                                                 else {
-                                                    console.log("QML: Combo Selected Item changed...set agent IOP to " + ioEffectsCombo.selectedItem + " (iopMergedList is EMPTY !!!)");
+                                                    console.log("QML: Combo Selected Item changed...set agent IOP to " + iopEffectsCombo.selectedItem + " (iopMergedList is EMPTY !!!)");
                                                 }
 
-                                                myEffect.modelM.agentIOP = ioEffectsCombo.selectedItem;
+                                                myEffect.modelM.agentIOP = iopEffectsCombo.selectedItem;
                                             }
                                         }
 
@@ -644,11 +642,12 @@ Window {
                                         id : effectTypeCombo
 
                                         anchors {
+                                            left: agentEffectCombo.right
+                                            leftMargin: 6
                                             verticalCenter : parent.verticalCenter
                                         }
-
-                                        height : 25
-                                        width : 98
+                                        height: 25
+                                        width: 98
 
                                         visible: (myEffect && (myEffect.effectType === ActionEffectTypes.AGENT))
                                         enabled: visible
@@ -689,14 +688,18 @@ Window {
                                         id: textFieldTargetValue
 
                                         anchors {
-                                            verticalCenter : parent.verticalCenter
+                                            left: iopEffectsCombo.right
+                                            leftMargin: 6
+
+                                            right: (btnWarningActionEditor.visible ? btnWarningActionEditor.left : parent.right)
+                                            rightMargin: (btnWarningActionEditor.visible ? 6 : 0)
+
+                                            verticalCenter: parent.verticalCenter
                                         }
+                                        height: 25
 
                                         visible: myEffect && (myEffect.effectType === ActionEffectTypes.VALUE)
                                         enabled: visible
-
-                                        height: 25
-                                        width: 49
 
                                         horizontalAlignment: TextInput.AlignLeft
                                         verticalAlignment: TextInput.AlignVCenter
@@ -758,6 +761,8 @@ Window {
                                         id: btnWarningActionEditor
 
                                         anchors {
+                                            right: parent.right
+                                            rightMargin: 0
                                             verticalCenter: parent.verticalCenter
                                         }
 
