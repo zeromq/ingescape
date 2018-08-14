@@ -220,7 +220,8 @@ Window {
                             // (to always display the beginning or our text instead of
                             // an arbitrary part if our text is too long)
                             cursorPosition = 0;
-                        } else {
+                        }
+                        else {
                             textFieldName.selectAll();
                         }
                     }
@@ -311,7 +312,8 @@ Window {
                             // (to always display the beginning or our text instead of
                             // an arbitrary part if our text is too long)
                             cursorPosition = 0;
-                        } else {
+                        }
+                        else {
                             textFieldStartTime.selectAll();
                         }
                     }
@@ -732,7 +734,8 @@ Window {
                                                 // (to always display the beginning or our text instead of
                                                 // an arbitrary part if our text is too long)
                                                 cursorPosition = 0;
-                                            } else {
+                                            }
+                                            else {
                                                 textFieldTargetValue.selectAll();
                                             }
                                         }
@@ -1393,7 +1396,8 @@ Window {
                                     // (to always display the beginning or our text instead of
                                     // an arbitrary part if our text is too long)
                                     cursorPosition = 0;
-                                } else {
+                                }
+                                else {
                                     textFieldValidity.selectAll();
                                 }
                             }
@@ -1786,7 +1790,8 @@ Window {
                                                 // (to always display the beginning or our text instead of
                                                 // an arbitrary part if our text is too long)
                                                 cursorPosition = 0;
-                                            } else {
+                                            }
+                                            else {
                                                 textFieldComparisonValue.selectAll();
                                             }
                                         }
@@ -2245,7 +2250,8 @@ Window {
                                         // (to always display the beginning or our text instead of
                                         // an arbitrary part if our text is too long)
                                         cursorPosition = 0;
-                                    } else {
+                                    }
+                                    else {
                                         textFieldDuration.selectAll();
                                     }
                                 }
@@ -2459,7 +2465,8 @@ Window {
                                         // (to always display the beginning or our text instead of
                                         // an arbitrary part if our text is too long)
                                         cursorPosition = 0;
-                                    } else {
+                                    }
+                                    else {
                                         textFieldTimeBeforeRearm.selectAll();
                                     }
                                 }

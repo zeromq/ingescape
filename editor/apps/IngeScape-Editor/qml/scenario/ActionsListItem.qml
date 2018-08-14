@@ -74,6 +74,18 @@ Item {
                 fill: parent
             }
 
+            /*Rectangle {
+                id: grip
+
+                anchors {
+                    left: parent.left
+                    top: parent.top
+                    bottom: parent.bottom
+                }
+
+                width: 20
+                color: "black"
+            }*/
 
             // Selected Action
             Item {
@@ -81,14 +93,15 @@ Item {
                 visible : controller && rootItem.action && (controller.selectedAction === rootItem.action);
 
                 Rectangle {
+                    id: selectionFeedback
                     anchors {
-                        left : parent.left
-                        top : parent.top
+                        left: parent.left
+                        top: parent.top
                         bottom: parent.bottom
                     }
 
-                    width : 6
-                    color : IngeScapeTheme.selectedAgentColor
+                    width: 6
+                    color: IngeScapeTheme.selectedAgentColor
                 }
 
                 Button {

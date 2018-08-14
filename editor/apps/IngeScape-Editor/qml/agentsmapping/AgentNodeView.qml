@@ -162,10 +162,11 @@ Rectangle {
 
         onClicked: {
             if (controller && agentMappingVM) {
-                if(controller.selectedAgent === agentMappingVM)
+                if (controller.selectedAgent === agentMappingVM)
                 {
                     controller.selectedAgent = null;
-                } else {
+                }
+                else {
                     controller.selectedAgent = agentMappingVM;
                 }
             }

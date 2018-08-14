@@ -82,7 +82,8 @@ Window {
     property int extraWidthForResizableColumns: Math.max(0, (splittableAvailableWidth/3))
     property int extraWidthForValuesOnly: if (widthColumnName === maxWidthColumnName) {
                                               Math.max(0, ((splittableAvailableWidth - (maxWidthColumnName - minWidthColumnName))/2));
-                                          } else {
+                                          }
+                                          else {
                                               0;
                                           }
 
@@ -90,12 +91,14 @@ Window {
     property int widthColumnName: ((minWidthColumnName + extraWidthForResizableColumns) > maxWidthColumnName) ? maxWidthColumnName : (minWidthColumnName + extraWidthForResizableColumns);
     property int widthColumnInitialValue: if (widthColumnName === maxWidthColumnName) {
                                               minWidthColumnInitialValue + extraWidthForValuesOnly;
-                                          } else {
+                                          }
+                                          else {
                                               minWidthColumnInitialValue + extraWidthForResizableColumns;
                                           }
     property int widthColumnCurrentValue: if (widthColumnName === maxWidthColumnName) {
                                               minWidthColumnCurrentValue + extraWidthForValuesOnly;
-                                          } else {
+                                          }
+                                          else {
                                               minWidthColumnCurrentValue + extraWidthForResizableColumns;
                                           }
 

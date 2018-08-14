@@ -405,10 +405,11 @@ Item {
 
                     onPressed: {
                         if (controller) {
-                            if(controller.selectedAgent === model.QtObject)
+                            if (controller.selectedAgent === model.QtObject)
                             {
                                 controller.selectedAgent = null;
-                            } else {
+                            }
+                            else {
                                 controller.selectedAgent = model.QtObject;
                             }
 

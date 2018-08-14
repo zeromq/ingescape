@@ -96,15 +96,18 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
 
     // Directory for platform files
     QString platformPath = IngeScapeEditorUtils::getPlatformsPath();
+
     QDir platformDir(platformPath);
     if (!platformDir.exists()) {
         qCritical() << "ERROR: could not create directory at '" << platformPath << "' !";
-    } else {
-        _platformDirectoryPath = platformPath;
     }
+    else
+    {
+        _platformDirectoryPath = platformPath;
 
-    // Init the path to the JSON file to load the last platform
-    _platformDefaultFilePath = QString("%1last.json").arg(_platformDirectoryPath);
+        // Init the path to the JSON file to load the last platform
+        _platformDefaultFilePath = QString("%1last.json").arg(_platformDirectoryPath);
+    }
 
 
     // Create the helper to manage JSON files

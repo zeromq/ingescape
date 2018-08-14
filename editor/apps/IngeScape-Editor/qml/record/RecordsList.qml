@@ -326,10 +326,11 @@ Item {
 
                     onPressed: {
                         if (controller) {
-                            if(controller.selectedRecord === model.QtObject)
+                            if (controller.selectedRecord === model.QtObject)
                             {
                                 controller.selectedRecord = null;
-                            } else {
+                            }
+                            else {
                                 controller.selectedRecord = model.QtObject;
                             }
                         }

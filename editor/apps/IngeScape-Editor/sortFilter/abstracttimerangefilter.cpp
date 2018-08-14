@@ -100,7 +100,8 @@ bool AbstractTimeRangeFilter::filterAccepts(QObject* item, int index) const
         {
             result = ((timeInMilliseconds <= _endTimeInMilliseconds) && (timeInMilliseconds >= _startTimeInMilliseconds));
         }
-    } else {
+    }
+    else {
         ActionVM * actionVMItem = dynamic_cast<ActionVM*>(item);
         if (actionVMItem != NULL)
         {

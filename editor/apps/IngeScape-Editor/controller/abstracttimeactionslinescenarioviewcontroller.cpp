@@ -149,9 +149,11 @@ void AbstractTimeActionslineScenarioViewController::updateTimeCoordinatesOfTimeT
         int rangeForSmallTicks;
         if ( (_timeRangeBetweenTimeTicksInMilliSeconds/1000) == 5 || (_timeRangeBetweenTimeTicksInMilliSeconds/1000) == 300) {
             rangeForSmallTicks = _timeRangeBetweenTimeTicksInMilliSeconds/5;
-        } else if ((_timeRangeBetweenTimeTicksInMilliSeconds/1000) == 30)  {
+        }
+        else if ((_timeRangeBetweenTimeTicksInMilliSeconds/1000) == 30)  {
             rangeForSmallTicks = _timeRangeBetweenTimeTicksInMilliSeconds/3;
-        } else {
+        }
+        else {
             rangeForSmallTicks = _timeRangeBetweenTimeTicksInMilliSeconds/2;
         }
 

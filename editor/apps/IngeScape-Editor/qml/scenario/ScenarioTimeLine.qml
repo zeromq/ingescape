@@ -113,9 +113,11 @@ Item {
             if ((contentArea.contentX + deltaX >= 0)
                     && (contentArea.contentX + deltaX <= maxXOfTimeline)) {
                 contentArea.contentX += deltaX;
-            } else if (contentArea.contentX + deltaX < 0) {
+            }
+            else if (contentArea.contentX + deltaX < 0) {
                 contentArea.contentX = 0;
-            } else if (contentArea.contentX + deltaX > maxXOfTimeline) {
+            }
+            else if (contentArea.contentX + deltaX > maxXOfTimeline) {
                 contentArea.contentX = maxXOfTimeline;
             }
         }
@@ -124,9 +126,11 @@ Item {
             if ((contentArea.contentY + deltaY >= 0)
                     && (contentArea.contentY + deltaY <= maxYOfTimeline)) {
                 contentArea.contentY += deltaY;
-            } else if (contentArea.contentY + deltaY < 0) {
+            }
+            else if (contentArea.contentY + deltaY < 0) {
                 contentArea.contentY = 0;
-            } else if (contentArea.contentY + deltaY > maxYOfTimeline) {
+            }
+            else if (contentArea.contentY + deltaY > maxYOfTimeline) {
                 contentArea.contentY = maxYOfTimeline;
             }
         }
