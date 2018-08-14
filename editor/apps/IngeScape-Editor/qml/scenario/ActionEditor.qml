@@ -1213,7 +1213,7 @@ Window {
 
                     onActiveChanged : {
                         // make the conditions list visible if there are conditions
-                        if (rootItem.active && actionM && actionM.conditionsList.count > 0) {
+                        if (rootItem.active && actionM && (actionM.conditionsList.count > 0)) {
                             conditionsItem.isOpened = true;
                         }
                     }
@@ -1240,14 +1240,14 @@ Window {
                     I2SvgItem {
                         id : arrow
                         anchors {
-                            left : parent.left
+                            left: parent.left
                             verticalCenter: titleCdt.verticalCenter
                         }
 
-                        svgFileCache : IngeScapeTheme.svgFileINGESCAPE;
+                        svgFileCache: IngeScapeTheme.svgFileINGESCAPE;
                         svgElementId: "arrowWhite"
 
-                        rotation: conditionsItem.isOpened? 0 : 270
+                        rotation: conditionsItem.isOpened ? 0 : 270
                     }
 
                     Text {
@@ -1332,6 +1332,7 @@ Window {
                             width : 115
 
                             model : controller ? controller.validationDurationsTypesList : 0
+
                             function modelToString(model)
                             {
                                 return model.name;
@@ -1469,10 +1470,11 @@ Window {
                     // Conditions List
                     //
                     contentItem: Column {
-                        id : conditionsListColumn
-                        spacing : 6
-                        height : childrenRect.height
-                        width : scrollViewConditions.width - 9 // scrollbar size + 1
+                        id: conditionsListColumn
+
+                        spacing: 6
+                        height: childrenRect.height
+                        width: scrollViewConditions.width - 9 // scrollbar size + 1
 
                         Repeater {
                             model: (actionM && conditionsItem.isOpened) ? actionM.conditionsList : 0
@@ -1520,7 +1522,8 @@ Window {
                                                 verticalCenter: parent.verticalCenter;
                                             }
 
-                                            checked : myCondition && myCondition.conditionType === model.value;
+                                            checked: myCondition && (myCondition.conditionType === model.value)
+
                                             exclusiveGroup: cdtTypesExclusifGroup
                                             activeFocusOnPress: true;
 
@@ -1530,7 +1533,7 @@ Window {
                                                         verticalCenter: parent.verticalCenter
                                                         verticalCenterOffset: 2
                                                     }
-                                                    color: control.checked? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor
+                                                    color: control.checked ? IngeScapeTheme.whiteColor : IngeScapeTheme.lightGreyColor
 
                                                     text: model.name
                                                     elide: Text.ElideRight
@@ -1584,10 +1587,10 @@ Window {
                                 //
                                 Row {
                                     anchors {
-                                        right : parent.right
+                                        left: rowConditionsTypes.left
+                                        right: parent.right
                                         rightMargin: 10
-                                        left : rowConditionsTypes.left
-                                        bottom : parent.bottom
+                                        bottom: parent.bottom
                                         bottomMargin: 6
                                     }
                                     height : agentCombo.height
@@ -1604,9 +1607,11 @@ Window {
                                         height : 25
                                         width : 148
 
-                                        model : controller ? controller.agentsInMappingList : 0
-                                        enabled: (controller && controller.agentsInMappingList.count !== 0 )
-                                        placeholderText : (controller && controller.agentsInMappingList.count === 0 ? "- No Item -" : "- Select an item -")
+                                        model: controller ? controller.agentsInMappingList : 0
+
+                                        enabled: (controller && (controller.agentsInMappingList.count !== 0))
+                                        placeholderText: (controller && (controller.agentsInMappingList.count === 0) ? "- No Item -"
+                                                                                                                     : "- Select an item -")
 
                                         function modelToString(model)
                                         {
@@ -1615,20 +1620,19 @@ Window {
 
 
                                         Binding {
-                                            target : agentCombo
-                                            property : "selectedItem"
-                                            value : if (myCondition && myCondition.modelM)
-                                                    {
-                                                        myCondition.modelM.agent;
-                                                    }
-                                                    else {
-                                                        null;
-                                                    }
+                                            target: agentCombo
+                                            property: "selectedItem"
+                                            value: if (myCondition && myCondition.modelM)
+                                                   {
+                                                       myCondition.modelM.agent;
+                                                   }
+                                                   else {
+                                                       null;
+                                                   }
                                         }
 
 
-                                        onSelectedItemChanged:
-                                        {
+                                        onSelectedItemChanged: {
                                             if (myCondition && myCondition.modelM && agentCombo.selectedItem)
                                             {
                                                 myCondition.modelM.agent = agentCombo.selectedItem;
@@ -1641,37 +1645,36 @@ Window {
                                     IngeScapeComboBoxAgentsIOP {
                                         id : ioCombo
 
-                                        visible: (myCondition && myCondition.conditionType === ActionConditionTypes.VALUE)
-                                        enabled: visible
                                         anchors {
                                             verticalCenter: parent.verticalCenter
                                         }
-
                                         height : 25
                                         width : 148
+
+                                        visible: (myCondition && (myCondition.conditionType === ActionConditionTypes.VALUE))
+                                        enabled: visible
 
                                         model: (myCondition && myCondition.modelM) ? myCondition.modelM.agentIopList : 0
 
                                         // Condition on a value is available only for outputs (no need of separator position)
-                                        inputsNumber: 0 // (myCondition && myCondition.modelM && myCondition.modelM.agent) ? myCondition.modelM.agent.inputsList.count : 0;
+                                        inputsNumber: 0
                                         outputsNumber: 0
                                         parametersNumber: 0
 
                                         Binding {
-                                            target : ioCombo
-                                            property : "selectedItem"
-                                            value : if (myCondition && myCondition.modelM)
-                                                    {
-                                                        myCondition.modelM.agentIOP;
-                                                    }
-                                                    else {
-                                                        null;
-                                                    }
+                                            target: ioCombo
+                                            property: "selectedItem"
+                                            value: if (myCondition && myCondition.modelM)
+                                                   {
+                                                       myCondition.modelM.agentIOP;
+                                                   }
+                                                   else {
+                                                       null;
+                                                   }
                                         }
 
 
-                                        onSelectedItemChanged:
-                                        {
+                                        onSelectedItemChanged: {
                                             if (myCondition && myCondition.modelM)
                                             {
                                                 myCondition.modelM.agentIOP = ioCombo.selectedItem;
@@ -1688,11 +1691,10 @@ Window {
                                         anchors {
                                             verticalCenter : parent.verticalCenter
                                         }
-
-                                        visible: (myCondition && myCondition.conditionType === ActionConditionTypes.AGENT)
-
                                         height: 25
                                         width: 78
+
+                                        visible: (myCondition && myCondition.conditionType === ActionConditionTypes.AGENT)
 
                                         model: (controller ? controller.allAgentConditionValues : 0)
 
@@ -1724,11 +1726,10 @@ Window {
                                         anchors {
                                             verticalCenter : parent.verticalCenter
                                         }
-
-                                        visible: (myCondition && myCondition.conditionType === ActionConditionTypes.VALUE)
-
                                         height: 25
                                         width: 44
+
+                                        visible: (myCondition && myCondition.conditionType === ActionConditionTypes.VALUE)
 
                                         model: (controller ? controller.allValueComparisonTypes : 0)
 
@@ -1760,12 +1761,11 @@ Window {
                                         anchors {
                                             verticalCenter : parent.verticalCenter
                                         }
-
-                                        visible: (myCondition && myCondition.conditionType === ActionConditionTypes.VALUE)
-
-                                        enabled : visible
                                         height: 25
                                         width: 49
+
+                                        visible: (myCondition && myCondition.conditionType === ActionConditionTypes.VALUE)
+                                        enabled : visible
 
                                         horizontalAlignment: TextInput.AlignLeft
                                         verticalAlignment: TextInput.AlignVCenter
