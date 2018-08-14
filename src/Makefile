@@ -52,6 +52,7 @@ install: $(TARGET_LIB) $(STARGET_LIB)
 	install $(TARGET_LIB) $(DESTDIR)$(PREFIX)/lib/$(TARGET_LIB)
 	install $(STARGET_LIB) $(DESTDIR)$(PREFIX)/lib/$(STARGET_LIB)
 	install ./include/ingescape.h $(DESTDIR)$(PREFIX)/include/ingescape/
+	install ./include/ingescape_advanced.h $(DESTDIR)$(PREFIX)/include/ingescape/
 
 .PHONY: uninstall
 uninstall:
