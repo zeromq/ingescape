@@ -113,56 +113,6 @@ void AgentsSupervisionController::deleteSelectedAgent()
 
 
 /**
- * @brief Open the definition of an agent of the list
- * @param agent which contain the definition
- */
-void AgentsSupervisionController::openDefinition(AgentVM* agent)
-{
-    if ((agent != NULL) && (agent->definition() != NULL) && (_modelManager != NULL))
-    {
-        DefinitionM* definition = agent->definition();
-
-        QList<DefinitionM*> definitionsToOpen;
-
-        // Variant --> we have to open each variants of this definition
-        if (definition->isVariant())
-        {
-            // Get the list (of models) of agent definition from a definition name
-            QList<DefinitionM*> agentDefinitionsList = _modelManager->getAgentDefinitionsListFromDefinitionName(definition->name());
-
-            foreach (DefinitionM* iterator, agentDefinitionsList)
-            {
-                // Same name, same version and variant, we have to open it
-                if ((iterator != NULL) && iterator->isVariant() && (iterator->version() == definition->version())) {
-                    definitionsToOpen.append(iterator);
-                }
-            }
-        }
-        else {
-            // Simply add our definition
-            definitionsToOpen.append(definition);
-        }
-
-        // Traverse the list of definitions to open
-        foreach (DefinitionM* iterator, definitionsToOpen)
-        {
-            if (iterator != NULL)
-            {
-                if (!_modelManager->openedDefinitions()->contains(iterator)) {
-                    _modelManager->openedDefinitions()->append(iterator);
-                }
-                else {
-                    qDebug() << "The 'Definition'" << iterator->name() << "is already opened...bring to front !";
-
-                    Q_EMIT iterator->bringToFront();
-                }
-            }
-        }
-    }
-}
-
-
-/**
  * @brief Export the agents list to selected file
  */
 void AgentsSupervisionController::exportAgentsListToSelectedFile()

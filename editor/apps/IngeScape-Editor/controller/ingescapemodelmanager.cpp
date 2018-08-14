@@ -259,6 +259,81 @@ void IngeScapeModelManager::simulateExitForEachActiveAgent()
 
 
 /**
+ * @brief Open the definition with an agent name
+ * @param agentName
+ */
+void IngeScapeModelManager::openDefinitionWithAgentName(QString agentName)
+{
+    if (!agentName.isEmpty())
+    {
+        // Get the list of models of agent with the name
+        QList<AgentM*> agentModelsList = getAgentModelsListFromName(agentName);
+        if (!agentModelsList.isEmpty())
+        {
+            // By default, we take the first one
+            AgentM* agent = agentModelsList.at(0);
+            if ((agent != NULL) && (agent->definition() != NULL))
+            {
+                // Open its definition
+                openDefinition(agent->definition());
+            }
+        }
+    }
+}
+
+
+/**
+ * @brief Open a definition
+ * If there are variants of this definition, we open each variant
+ * @param definition
+ */
+void IngeScapeModelManager::openDefinition(DefinitionM* definition)
+{
+    if (definition != NULL)
+    {
+        qDebug() << "Open the definition" << definition->name();
+
+        QList<DefinitionM*> definitionsToOpen;
+
+        // Variant --> we have to open each variants of this definition
+        if (definition->isVariant())
+        {
+            // Get the list (of models) of agent definition from a definition name
+            QList<DefinitionM*> agentDefinitionsList = getAgentDefinitionsListFromDefinitionName(definition->name());
+
+            for (DefinitionM* iterator : agentDefinitionsList)
+            {
+                // Same name, same version and variant, we have to open it
+                if ((iterator != NULL) && (iterator->version() == definition->version()) && iterator->isVariant()) {
+                    definitionsToOpen.append(iterator);
+                }
+            }
+        }
+        else {
+            // Simply add the definition
+            definitionsToOpen.append(definition);
+        }
+
+        // Traverse the list of definitions to open
+        for (DefinitionM* iterator : definitionsToOpen)
+        {
+            if (iterator != NULL)
+            {
+                if (!_openedDefinitions.contains(iterator)) {
+                    _openedDefinitions.append(iterator);
+                }
+                else {
+                    qDebug() << "The 'Definition'" << iterator->name() << "is already opened...bring to front !";
+
+                    Q_EMIT iterator->bringToFront();
+                }
+            }
+        }
+    }
+}
+
+
+/**
  * @brief Slot called when an agent enter the network
  * @param peerId
  * @param agentName

@@ -172,6 +172,21 @@ public:
     void simulateExitForEachActiveAgent();
 
 
+    /**
+     * @brief Open the definition with an agent name
+     * @param agentName
+     */
+    Q_INVOKABLE void openDefinitionWithAgentName(QString agentName);
+
+
+    /**
+     * @brief Open a definition
+     * If there are variants of this definition, we open each variant
+     * @param definition
+     */
+    Q_INVOKABLE void openDefinition(DefinitionM* definition);
+
+
 Q_SIGNALS:
 
     /**

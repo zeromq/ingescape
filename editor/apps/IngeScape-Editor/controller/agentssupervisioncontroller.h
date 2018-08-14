@@ -71,13 +71,6 @@ public:
 
 
     /**
-     * @brief Open the definition of an agent of the list
-     * @param agent which contain the definition
-     */
-    Q_INVOKABLE void openDefinition(AgentVM* agent);
-
-
-    /**
      * @brief Export the agents list to selected file
      */
     Q_INVOKABLE void exportAgentsListToSelectedFile();

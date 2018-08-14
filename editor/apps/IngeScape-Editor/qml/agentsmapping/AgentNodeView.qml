@@ -58,11 +58,10 @@ Rectangle {
 
 
 
-    width : 258
+    width: 258
 
-    height : (rootItem.agentMappingVM && !rootItem.isReduced)
-             ? (54 + 22 * Math.max(rootItem.agentMappingVM.inputsList.count, rootItem.agentMappingVM.outputsList.count))
-             : 42
+    height: (rootItem.agentMappingVM && !rootItem.isReduced) ? (54 + 22 * Math.max(rootItem.agentMappingVM.inputsList.count, rootItem.agentMappingVM.outputsList.count))
+                                                             : 42
 
 
     // Init position of our agent
@@ -838,7 +837,7 @@ Rectangle {
 
         // Remove button
         Button {
-            id: removeButton
+            id: btnRemoveFromMapping
 
             visible: (opacity !== 0)
             enabled: visible
@@ -877,6 +876,30 @@ Rectangle {
                     else {
                         rootItem.needConfirmationtoDeleteAgentInMapping();
                     }
+                }
+            }
+        }
+
+        // Button to open the definition
+        Button {
+            id: btnOpenDefinition
+
+            anchors {
+                top: parent.top
+                topMargin: 10
+                left: parent.left
+                leftMargin: 2
+            }
+            width: 35
+            height: 25
+
+            text: "Def"
+
+            visible: rootItem._isSelected
+
+            onClicked: {
+                if (IngeScapeEditorC.modelManager) {
+                    IngeScapeEditorC.modelManager.openDefinitionWithAgentName(rootItem.agentName);
                 }
             }
         }

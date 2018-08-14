@@ -247,9 +247,9 @@ Item {
 
                 hoverEnabled: true
                 onClicked: {
-                    if (controller && rootItem.agent) {
-                        // Open the definition of our agent
-                        controller.openDefinition(rootItem.agent);
+                    if (IngeScapeEditorC.modelManager && rootItem.agent && rootItem.agent.definition)
+                    {
+                        IngeScapeEditorC.modelManager.openDefinition(rootItem.agent.definition);
                     }
                 }
 
@@ -259,7 +259,8 @@ Item {
                     elideWidth: (columnName.width - versionName.width)
                     elide: Text.ElideRight
 
-                    text: rootItem.agent && rootItem.agent.definition ? rootItem.agent.definition.name : ""
+                    text: (rootItem.agent && rootItem.agent.definition) ? rootItem.agent.definition.name
+                                                                        : ""
                 }
 
                 Text {
@@ -270,16 +271,55 @@ Item {
                     }
 
                     text : definitionName.elidedText
-                    color: if (rootItem.agent && (rootItem.agent.isON === true)) {
-                               ((model.definition && model.definition.isVariant) ?
-                                    definitionNameBtn.pressed? IngeScapeTheme.middleDarkRedColor : IngeScapeTheme.redColor
-                                : definitionNameBtn.pressed? IngeScapeTheme.agentsListPressedLabel2Color : IngeScapeTheme.agentsListLabel2Color)
+
+                    color: if (rootItem.agent && (rootItem.agent.isON === true))
+                           {
+                               // ON & Variant
+                               if (rootItem.agent.definition && rootItem.agent.definition.isVariant)
+                               {
+                                   if (definitionNameBtn.pressed) {
+                                       IngeScapeTheme.middleDarkRedColor;
+                                   }
+                                   else {
+                                       IngeScapeTheme.redColor
+                                   }
+                               }
+                               // ON & (NO variant)
+                               else
+                               {
+                                   if (definitionNameBtn.pressed) {
+                                       IngeScapeTheme.agentsListPressedLabel2Color;
+                                   }
+                                   else {
+                                       IngeScapeTheme.agentsListLabel2Color;
+                                   }
+                               }
                            }
-                           else {
-                               ((model.definition && model.definition.isVariant) ?
-                                    definitionNameBtn.pressed? IngeScapeTheme.darkRedColor : IngeScapeTheme.middleDarkRedColor
-                                : definitionNameBtn.pressed? IngeScapeTheme.agentOFFPressedLabel2Color : IngeScapeTheme.agentOFFLabel2Color)
+                           // OFF
+                           else
+                           {
+                               // OFF & Variant
+                               if (rootItem.agent.definition && rootItem.agent.definition.isVariant)
+                               {
+                                   if (definitionNameBtn.pressed) {
+                                       IngeScapeTheme.darkRedColor;
+                                   }
+                                   else {
+                                       IngeScapeTheme.middleDarkRedColor
+                                   }
+                               }
+                               // OFF & (NO variant)
+                               else
+                               {
+                                   if (definitionNameBtn.pressed) {
+                                       IngeScapeTheme.agentOFFPressedLabel2Color;
+                                   }
+                                   else {
+                                       IngeScapeTheme.agentOFFLabel2Color;
+                                   }
+                               }
                            }
+
                     font: IngeScapeTheme.heading2Font
                 }
 
@@ -292,7 +332,9 @@ Item {
                         leftMargin: 5
                     }
 
-                    text: rootItem.agent && rootItem.agent.definition ? "(v" + rootItem.agent.definition.version + ")" : ""
+                    text: (rootItem.agent && rootItem.agent.definition) ? "(v" + rootItem.agent.definition.version + ")"
+                                                                        : ""
+
                     color: definitionNameTxt.color
 
                     font {

@@ -349,7 +349,7 @@ void AgentsMappingController::importMappingFromJson(QByteArray byteArrayOfJson, 
                 AgentMappingM* agentMapping = importedMapping->mapping;
 
                 QList<AgentM*> agentModelList = _modelManager->getAgentModelsListFromName(importedMapping->name);
-                if(agentModelList.count() == 0)
+                if (agentModelList.isEmpty())
                 {
                     AgentM * newAgent = new AgentM(importedMapping->name);
                     newAgent->setdefinition(definition);
