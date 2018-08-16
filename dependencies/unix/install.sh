@@ -11,7 +11,7 @@ cd libzmq
 ./autogen.sh
 # do not specify "--with-libsodium" if you prefer to use internal tweetnacl
 # security implementation (recommended for development)
-./configure --with-libsodium
+./configure
 make check
 sudo make install
 sudo ldconfig
