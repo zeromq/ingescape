@@ -368,7 +368,7 @@ void AgentsMappingController::importMappingFromJson(QByteArray byteArrayOfJson)
                     _addAgentModelsToMappingAtPosition(importedAgent->name, agentModelList, importedAgent->position);
 
                     AgentInMappingVM* agentInMapping = getAgentInMappingFromName(importedAgent->name);
-                    if(agentInMapping != NULL)
+                    if (agentInMapping != NULL)
                     {
                         // Add the link elements
                         mappingElements.append(agentMapping->mappingElements()->toList());

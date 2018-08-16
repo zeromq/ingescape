@@ -226,7 +226,7 @@ Item {
                     }
                     elide: Text.ElideRight
 
-                    text: model.hostModel.name
+                    text: model.name
                     color: IngeScapeTheme.agentsListLabelColor
                     font: IngeScapeTheme.headingFont
                 }
@@ -241,7 +241,7 @@ Item {
                     }
                     elide: Text.ElideRight
 
-                    text: model.hostModel.ipAddress
+                    text: model.modelM.ipAddress
                     color: IngeScapeTheme.agentsListTextColor
                     font: IngeScapeTheme.heading2Font
                 }
@@ -251,6 +251,7 @@ Item {
                     id: listViewOfAgents
 
                     model: hostItem.model_listOfAgents
+
                     interactive: false
 
                     delegate: Text {
@@ -259,10 +260,12 @@ Item {
                             left : parent.left
                             leftMargin: 10
                         }
-                        elide: Text.ElideRight
 
                         text: qsTr("- %1").arg(model.name)
+                        elide: Text.ElideRight
+
                         color: model.isON ? IngeScapeTheme.agentsListLabelColor : IngeScapeTheme.agentOFFLabelColor
+
                         font: IngeScapeTheme.normalFont
                     }
 
@@ -332,7 +335,7 @@ Item {
                 }
 
                 onClicked: {
-                    if(model.isStreaming)
+                    if (model.isStreaming)
                     {
                         streamPopup.close();
                         receiver.stop();
@@ -340,7 +343,7 @@ Item {
                     else
                     {
                         streamPopup.show();
-                        streamPopup.title = model.hostModel.name;
+                        streamPopup.title = model.name;
                         receiver.start();
                     }
                     model.QtObject.changeState();

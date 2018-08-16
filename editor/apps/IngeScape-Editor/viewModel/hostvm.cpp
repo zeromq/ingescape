@@ -10,6 +10,7 @@
  *	Contributors:
  *      Bruno Lemenicier <lemenicier@ingenuity.io>
  *      Alexandre Lemort <lemort@ingenuity.io>
+ *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *
  */
 
@@ -19,24 +20,26 @@
 
 
 /**
- * @brief Default constructor
+ * @brief Constructor
  * @param model
  * @param parent
  */
 HostVM::HostVM(HostM* model, QObject *parent) : QObject(parent),
-    _hostModel(NULL),
+    _name(""),
+    _modelM(model),
     _canProvideStream(false),
     _isStreaming(false)
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    if (model != NULL)
+    if (_modelM != NULL)
     {
-        // Init model
-        sethostModel( model );
+        _name = _modelM->name();
 
-        if (model->streamingPort().length() > 0)
+        qInfo() << "New View Model of Host" << _name;
+
+        if (_modelM->streamingPort().length() > 0)
         {
             _canProvideStream = true;
         }
@@ -49,11 +52,9 @@ HostVM::HostVM(HostM* model, QObject *parent) : QObject(parent),
  */
 HostVM::~HostVM()
 {
-    if (_hostModel != NULL)
-    {
-        qInfo() << "Delete View Model of Host" << _hostModel->name();
-    }
-    sethostModel(NULL);
+    qInfo() << "Delete View Model of Host" << _name;
+
+    setmodelM(NULL);
 }
 
 
@@ -65,13 +66,13 @@ void HostVM::changeState()
     // is streaming => request streaming end
     if (_isStreaming)
     {
-        //Q_EMIT commandAskedToHost("STOP_STREAMING", _hostModel->name(), "");
+        //Q_EMIT commandAskedToHost("STOP_STREAMING", _modelM->name(), "");
         setisStreaming(false);
     }
     // is not streaming => request streaming
     else
     {
-        //Q_EMIT commandAskedToHost("START_STREAMING", _hostModel->name(), "");
+        //Q_EMIT commandAskedToHost("START_STREAMING", _modelM->name(), "");
         setisStreaming(true);
     }
 }
