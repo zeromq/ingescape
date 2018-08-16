@@ -780,10 +780,17 @@ void ScenarioController::resetConditionsConnectionsOfAllActions()
  * @param actionM to insert
  * @param time to insert
  * @param line index
- * @param optional excluded actionVM from the check
+ * @param optional dragged action VM when already in the time-line
  */
-bool ScenarioController::canInsertActionVMTo(ActionM* actionMToInsert, int time, int lineIndex, ActionVM* excludedActionVM)
+bool ScenarioController::canInsertActionVMTo(ActionM* actionMToInsert, int time, int lineIndex, ActionVM* draggedActionVM)
 {
+    // The dragged action is defined and is currently on the first line
+    if ((draggedActionVM != NULL) && (draggedActionVM->lineInTimeLine() == 0))
+    {
+        // Prevent modification on the first line because it is reserved for live insertions from the palette
+        return false;
+    }
+
     // Prevent insertion on the first line because it is reserved for live insertions from the palette
     if (lineIndex == 0) {
         return false;
@@ -824,7 +831,7 @@ bool ScenarioController::canInsertActionVMTo(ActionM* actionMToInsert, int time,
             ActionVM* actionVM = sortedListOfActionVM->at(indexAction);
 
             if ((actionVM != NULL) && (actionVM->modelM() != NULL)
-                    && ((excludedActionVM == NULL) || (excludedActionVM != actionVM)) )
+                    && ((draggedActionVM == NULL) || (draggedActionVM != actionVM)) )
             {
                 //qDebug() << "Insert" << insertionStartTime << insertionEndTime << "inside" << actionVM->startTime() << actionVM->endTime();
 

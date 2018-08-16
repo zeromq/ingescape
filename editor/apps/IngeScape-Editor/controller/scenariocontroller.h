@@ -241,9 +241,9 @@ public:
      * @param actionM to insert
      * @param time to insert
      * @param line index
-     * @param optional excluded actionVM from the check
+     * @param optional dragged action VM when already in the time-line
      */
-    Q_INVOKABLE bool canInsertActionVMTo(ActionM *actionMToInsert, int time, int lineIndex, ActionVM* excludedActionVM = NULL);
+    Q_INVOKABLE bool canInsertActionVMTo(ActionM *actionMToInsert, int time, int lineIndex, ActionVM* draggedActionVM = NULL);
 
 
     /**
