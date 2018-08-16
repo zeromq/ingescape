@@ -93,10 +93,9 @@ Item {
 
             height: contentHeight
 
-            anchors
-            {
-                left:parent.left
-                right:parent.right
+            anchors {
+                left: parent.left
+                right: parent.right
             }
 
 
@@ -157,9 +156,9 @@ Item {
 
             anchors
             {
-                verticalCenter:parent.verticalCenter
-                left:parent.left
-                leftMargin:15
+                verticalCenter: parent.verticalCenter
+                left: parent.left
+                leftMargin: 15
             }
 
             opacity: !enabled ? 0.3 : 1
@@ -338,30 +337,30 @@ Item {
                 }
 
 
-                BusyIndicator
-                {
-                    id:loadingRecordIndicator
-                    running: true
+                BusyIndicator {
+                    id: loadingRecordIndicator
+
+                    anchors {
+                        verticalCenter: parent.verticalCenter
+                        left: parent.left
+                        leftMargin: 25
+                    }
                     width: 20
                     height: 20
-                    anchors
-                    {
-                        verticalCenter:parent.verticalCenter
-                        left:parent.left
-                        leftMargin:25
-                    }
 
-                    visible: controller.isLoadingRecord && controller.playingRecord !== null && controller.playingRecord.modelM.id === model.modelM.id
+                    running: true
+
+                    visible: controller.isLoadingRecord && (controller.playingRecord !== null) && (controller.playingRecord.modelM.id === model.modelM.id)
                 }
 
                 // Play record button
                 Button {
-                    id : playPauseRecordButton
-                    anchors
-                    {
-                        verticalCenter:parent.verticalCenter
-                        left:parent.left
-                        leftMargin:25
+                    id: playPauseRecordButton
+
+                    anchors {
+                        verticalCenter: parent.verticalCenter
+                        left: parent.left
+                        leftMargin: 25
                     }
 
                     visible: !loadingRecordIndicator.visible

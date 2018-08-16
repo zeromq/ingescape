@@ -2146,9 +2146,9 @@ Window {
                         Row {
                             anchors {
                                 left: parent.left;
-                                right :parent.right
+                                right: parent.right
                             }
-                            height : 25
+                            height: 25
 
                             CheckBox {
                                 id : revertActionAfterCB

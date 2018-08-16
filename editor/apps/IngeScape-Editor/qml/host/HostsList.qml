@@ -97,8 +97,8 @@ Item {
 
             anchors
             {
-                left:parent.left
-                right:parent.right
+                left: parent.left
+                right: parent.right
             }
 
 
@@ -270,10 +270,9 @@ Item {
 
                     height: contentHeight
 
-                    anchors
-                    {
-                        left:parent.left
-                        right:parent.right
+                    anchors {
+                        left: parent.left
+                        right: parent.right
                     }
                 }
             }

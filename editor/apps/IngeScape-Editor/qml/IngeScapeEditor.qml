@@ -173,7 +173,7 @@ Item {
             I2TabView {
                 id : leftPanelTabs
 
-                anchors.fill :parent
+                anchors.fill: parent
 
                 style: I2TabViewStyle {
                     frameOverlap: 1
@@ -445,12 +445,11 @@ Item {
 
         objectName: "streamingLayer"
 
-        anchors
-        {
-            left:leftPanel.right
-            top:parent.top
-            bottom:bottomPanel.top
-            right:parent.right
+        anchors {
+            left: leftPanel.right
+            top: parent.top
+            bottom: bottomPanel.top
+            right: parent.right
             fill: null
         }
     }
