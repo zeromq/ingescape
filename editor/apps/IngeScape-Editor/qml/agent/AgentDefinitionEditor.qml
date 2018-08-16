@@ -33,7 +33,7 @@ Window {
     width: minimumWidth
 
     minimumWidth: 666
-    minimumHeight:420
+    minimumHeight: 420
 
     flags: Qt.Dialog
 

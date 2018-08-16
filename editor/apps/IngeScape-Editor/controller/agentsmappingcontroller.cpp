@@ -329,9 +329,8 @@ AgentInMappingVM* AgentsMappingController::getAgentInMappingFromName(QString nam
 /**
  * @brief Import the mappings from the json byte content
  * @param byteArrayOfJson
- * @param fromPlatform
  */
-void AgentsMappingController::importMappingFromJson(QByteArray byteArrayOfJson, bool fromPlatform)
+void AgentsMappingController::importMappingFromJson(QByteArray byteArrayOfJson)
 {
     if (_jsonHelper != NULL)
     {
@@ -339,38 +338,43 @@ void AgentsMappingController::importMappingFromJson(QByteArray byteArrayOfJson, 
         createNewMapping();
 
         // Initialize mapping lists from JSON file
-        QList< mapping_agent_import_t* > listMappingImported = _jsonHelper->importMapping(byteArrayOfJson, fromPlatform);
-        if(listMappingImported.count() > 0)
+        QList< mapping_agent_import_t* > listMappingImported = _jsonHelper->importMapping(byteArrayOfJson);
+        if (!listMappingImported.isEmpty())
         {
             QList<ElementMappingM*> mappingElements;
-            foreach (mapping_agent_import_t* importedMapping, listMappingImported)
+            for (mapping_agent_import_t* importedAgent : listMappingImported)
             {
-                DefinitionM* definition = importedMapping->definition;
-                AgentMappingM* agentMapping = importedMapping->mapping;
+                DefinitionM* definition = importedAgent->definition;
+                AgentMappingM* agentMapping = importedAgent->mapping;
 
-                QList<AgentM*> agentModelList = _modelManager->getAgentModelsListFromName(importedMapping->name);
+                QList<AgentM*> agentModelList = _modelManager->getAgentModelsListFromName(importedAgent->name);
                 if (agentModelList.isEmpty())
                 {
-                    AgentM * newAgent = new AgentM(importedMapping->name);
+                    AgentM* newAgent = new AgentM(importedAgent->name);
+
+                    newAgent->sethostname(importedAgent->hostname);
+                    newAgent->setcommandLine(importedAgent->commandLine);
+
                     newAgent->setdefinition(definition);
 
                     agentModelList.append(newAgent);
+
                     Q_EMIT agentCreatedByMapping(newAgent);
                 }
 
                 if (!agentModelList.isEmpty())
                 {
                     // Create a new Agent In Mapping
-                    _addAgentModelsToMappingAtPosition(importedMapping->name, agentModelList, importedMapping->position);
+                    _addAgentModelsToMappingAtPosition(importedAgent->name, agentModelList, importedAgent->position);
 
-                    AgentInMappingVM* agentInMapping = getAgentInMappingFromName(importedMapping->name);
+                    AgentInMappingVM* agentInMapping = getAgentInMappingFromName(importedAgent->name);
                     if(agentInMapping != NULL)
                     {
                         // Add the link elements
                         mappingElements.append(agentMapping->mappingElements()->toList());
 
                         // Set agent mapping
-                        if(agentMapping != NULL)
+                        if (agentMapping != NULL)
                         {
                             agentInMapping->settemporaryMapping(agentMapping);
                         }
@@ -382,9 +386,11 @@ void AgentsMappingController::importMappingFromJson(QByteArray byteArrayOfJson, 
             if (!mappingElements.isEmpty())
             {
                 // Create all mapping links
-                foreach (ElementMappingM* elementMapping, mappingElements)
+                for (ElementMappingM* elementMapping : mappingElements)
                 {
-                    onMapped(elementMapping);
+                    if (elementMapping != NULL) {
+                        onMapped(elementMapping);
+                    }
                 }
             }
         }

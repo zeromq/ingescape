@@ -48,8 +48,10 @@ QList<QPair<QStringList, DefinitionM*>> JsonHelper::initAgentsList(QByteArray by
     QJsonDocument jsonAgentsList = QJsonDocument::fromJson(byteArrayOfJson);
     if (jsonAgentsList.isArray())
     {
-        foreach (QJsonValue jsonValue, jsonAgentsList.array()) {
-            if (jsonValue.isObject()) {
+        for (QJsonValue jsonValue : jsonAgentsList.array())
+        {
+            if (jsonValue.isObject())
+            {
                 QJsonObject jsonAgent = jsonValue.toObject();
 
                 // Get value for keys "agentName" and "definition"
@@ -341,7 +343,7 @@ scenario_import_actions_lists_t *JsonHelper::initActionsList(QByteArray byteArra
         scenarioImport = new scenario_import_actions_lists_t();
 
         // ------
-        // Actions in table list
+        // Actions list
         // ------
         QJsonValue jsonActionsList = jsonRoot.value("actions");
         if (jsonActionsList.isArray())
@@ -456,7 +458,7 @@ scenario_import_actions_lists_t *JsonHelper::initActionsList(QByteArray byteArra
 
 
         // ------
-        // Actions in palette
+        // Actions in the palette
         // ------
         QJsonValue jsonActionsInPaletteList = jsonRoot.value("actions_palette");
         if (jsonActionsInPaletteList.isArray())
@@ -494,8 +496,9 @@ scenario_import_actions_lists_t *JsonHelper::initActionsList(QByteArray byteArra
             }
         }
 
+
         // ------
-        // Actions in timeline
+        // Actions in the timeline
         // ------
         QJsonValue jsonActionsInTimelineList = jsonRoot.value("actions_timeline");
         if(jsonActionsInTimelineList.isArray())
@@ -552,7 +555,7 @@ scenario_import_actions_lists_t *JsonHelper::initActionsList(QByteArray byteArra
 
 /**
  * @brief Export the actions lists into json object
- * @param actions list in table
+ * @param actions list
  * @param actions list in the palette
  * @param actions list in the timeline
  * @return
@@ -757,82 +760,79 @@ QJsonObject JsonHelper::exportScenario(QList<ActionM*> actionsList, QList<Action
 /**
  * @brief Import the mapping from the json content
  * @param byteArrayOfJson
- * @param fromPlatform
  * @return list of mapping_agent_import_t objects
  */
-QList< mapping_agent_import_t* > JsonHelper::importMapping(QByteArray byteArrayOfJson, bool fromPlatform)
+QList< mapping_agent_import_t* > JsonHelper::importMapping(QByteArray byteArrayOfJson)
 {
     QList< mapping_agent_import_t* > listAgentsMapping;
 
     QJsonDocument jsonFileRoot = QJsonDocument::fromJson(byteArrayOfJson);
-    if ( (!fromPlatform && jsonFileRoot.isArray())
-         || (fromPlatform && jsonFileRoot.isObject()))
+    if (jsonFileRoot.isObject())
     {
-        // Take into account the origin of the opening
-        // if mapping is from a patform file, we get the mappings value
-        // if not we get directly the value.
-        QJsonArray jsonArray;
-        if (fromPlatform)
+        QJsonValue mappingsValue = jsonFileRoot.object().value("agents");
+        if (mappingsValue.isArray())
         {
-            QJsonValue mappingsValue = jsonFileRoot.object().value("mappings");
-            if (mappingsValue.isArray()) {
-                jsonArray = mappingsValue.toArray();
-            }
-        }
-        else {
-            jsonArray = jsonFileRoot.array();
-        }
-
-        foreach (QJsonValue jsonValue, jsonArray)
-        {
-            if (jsonValue.isObject())
+            foreach (QJsonValue jsonValue, mappingsValue.toArray())
             {
-                QJsonObject jsonAllMapping = jsonValue.toObject();
-
-                // Get value for keys "agentName" and "definition"
-                QJsonValue jsonName = jsonAllMapping.value("agentName");
-                QJsonValue jsonDefinition = jsonAllMapping.value("definition");
-                QJsonValue jsonPosition = jsonAllMapping.value("position");
-
-                if (jsonName.isString() && jsonDefinition.isObject())
+                if (jsonValue.isObject())
                 {
-                    // Create the agent definition and mapping
-                    DefinitionM* definition = _createModelOfAgentDefinitionFromJSON(jsonDefinition.toObject());
-                    AgentMappingM* agentMapping = _createModelOfAgentMappingFromJSON(jsonName.toString(), jsonAllMapping);
+                    QJsonObject jsonAgent = jsonValue.toObject();
 
+                    // Get value for keys "agentName", "definition", "position", "hostname" and "commandLine"
+                    QJsonValue jsonName = jsonAgent.value("agentName");
+                    QJsonValue jsonDefinition = jsonAgent.value("definition");
+                    QJsonValue jsonPosition = jsonAgent.value("position");
+                    QJsonValue jsonHostname = jsonAgent.value("hostname");
+                    QJsonValue jsonCommandLine = jsonAgent.value("commandLine");
 
-                    if (definition != NULL)
+                    if (jsonName.isString() && jsonDefinition.isObject())
                     {
-                        // Add our agent in mapping
-                        mapping_agent_import_t* mappingAgent = new mapping_agent_import_t();
-                        mappingAgent->definition = definition;
-                        mappingAgent->mapping = agentMapping;
-                        mappingAgent->name = jsonName.toString();
-                        mappingAgent->position = QPointF(0.0,0.0);
+                        // Create the agent definition and mapping
+                        DefinitionM* definition = _createModelOfAgentDefinitionFromJSON(jsonDefinition.toObject());
+                        AgentMappingM* agentMapping = _createModelOfAgentMappingFromJSON(jsonName.toString(), jsonAgent);
 
-                        // Load position
-                        QStringList positionStringList = jsonPosition.toString().split(',');
-                        if (positionStringList.count() == 2)
+                        if (definition != NULL)
                         {
-                            QString xStr = positionStringList.first().remove('(');
-                            QString yStr = positionStringList.last().remove(')');
+                            // Add our agent in mapping
+                            mapping_agent_import_t* mappingAgent = new mapping_agent_import_t();
+                            mappingAgent->definition = definition;
+                            mappingAgent->mapping = agentMapping;
+                            mappingAgent->name = jsonName.toString();
+                            mappingAgent->position = QPointF(0.0, 0.0);
+                            mappingAgent->hostname = "";
+                            mappingAgent->commandLine = "";
 
-                            if (!xStr.isEmpty() && !yStr.isEmpty())
+                            // Set position
+                            QStringList positionStringList = jsonPosition.toString().split(", ");
+                            if (positionStringList.count() == 2)
                             {
-                                mappingAgent->position = QPointF(xStr.toFloat(), yStr.toFloat());
-                            }
-                        }
+                                QString strX = positionStringList.at(0);
+                                QString strY = positionStringList.at(1);
 
-                        // Add to list
-                        listAgentsMapping.append(mappingAgent);
-                    }
-                    else
-                    {
-                        // No definition, we delete the mapping
-                        if (agentMapping != NULL)
+                                if (!strX.isEmpty() && !strY.isEmpty())
+                                {
+                                    mappingAgent->position = QPointF(strX.toFloat(), strY.toFloat());
+                                }
+                            }
+
+                            // Set hostname and commandLine
+                            if (jsonHostname.isString() && jsonCommandLine.isString())
+                            {
+                                mappingAgent->hostname = jsonHostname.toString();
+                                mappingAgent->commandLine = jsonCommandLine.toString();
+                            }
+
+                            // Add to list
+                            listAgentsMapping.append(mappingAgent);
+                        }
+                        else
                         {
-                            delete agentMapping;
-                            agentMapping = NULL;
+                            // No definition, we delete the mapping
+                            if (agentMapping != NULL)
+                            {
+                                delete agentMapping;
+                                agentMapping = NULL;
+                            }
                         }
                     }
                 }
@@ -853,25 +853,37 @@ QJsonArray JsonHelper::exportAllAgentsInMapping(QList<AgentInMappingVM*> agentsI
 {
     QJsonArray jsonArray;
 
-    foreach (AgentInMappingVM* agentInMapVM, agentsInMapping)
+    for (AgentInMappingVM* agentInMapping : agentsInMapping)
     {
-        if(agentInMapVM->temporaryMapping() != NULL && agentInMapVM->models()->count() > 0)
+        if ((agentInMapping != NULL) && (agentInMapping->temporaryMapping() != NULL) && !agentInMapping->models()->isEmpty())
         {
-            // Set agent name
-            QJsonObject jsonFullMapping;
-            jsonFullMapping.insert("agentName", agentInMapVM->name());
-            jsonFullMapping.insert("position", "("+ QString::number(agentInMapVM->position().x())+","+QString::number(agentInMapVM->position().y())+")");
+            QJsonObject jsonAgent;
 
-            // Set the mapping
-            QJsonObject jsonMapping = exportAgentMappingToJson(agentInMapVM->temporaryMapping());
-            jsonFullMapping.insert("mapping", jsonMapping);
+            // Set the agent name
+            jsonAgent.insert("agentName", agentInMapping->name());
+
+            // Set the position
+            QString position = QString("%1, %2").arg(QString::number(agentInMapping->position().x()), QString::number(agentInMapping->position().y()));
+            jsonAgent.insert("position", position);
 
             // Set the definition
-            QJsonObject jsonDefinition = exportAgentDefinitionToJson(agentInMapVM->models()->at(0)->definition());
-            jsonFullMapping.insert("definition", jsonDefinition);
+            AgentM* firstModel = agentInMapping->models()->at(0);
+            if (firstModel != NULL)
+            {
+                QJsonObject jsonDefinition = exportAgentDefinitionToJson(firstModel->definition());
+                jsonAgent.insert("definition", jsonDefinition);
 
-            // Append to the list of mapping agents
-            jsonArray.append(jsonFullMapping);
+                // FIXME TODO when agentInMapping->models > 1
+                jsonAgent.insert("hostname", firstModel->hostname());
+                jsonAgent.insert("commandLine", firstModel->commandLine());
+            }
+
+            // Set the mapping
+            QJsonObject jsonMapping = exportAgentMappingToJson(agentInMapping->temporaryMapping());
+            jsonAgent.insert("mapping", jsonMapping);
+
+            // Append to the list of agents
+            jsonArray.append(jsonAgent);
         }
     }
 
@@ -900,12 +912,12 @@ QList<RecordM*> JsonHelper::createRecordModelList(QByteArray byteArrayOfJson)
             {
                 if (jsonValue.isObject())
                 {
-                    QJsonObject jsonAllMapping = jsonValue.toObject();
+                    QJsonObject jsonRecord = jsonValue.toObject();
 
-                    QJsonValue jsonId = jsonAllMapping.value("id");
-                    QJsonValue jsonName = jsonAllMapping.value("name_record");
-                    QJsonValue jsonBeginDateTime = jsonAllMapping.value("time_beg");
-                    QJsonValue jsonEndDateTime = jsonAllMapping.value("time_end");
+                    QJsonValue jsonId = jsonRecord.value("id");
+                    QJsonValue jsonName = jsonRecord.value("name_record");
+                    QJsonValue jsonBeginDateTime = jsonRecord.value("time_beg");
+                    QJsonValue jsonEndDateTime = jsonRecord.value("time_end");
 
                     if (jsonName.isString() && jsonId.isString())
                     {

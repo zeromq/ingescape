@@ -135,9 +135,8 @@ public:
     /**
      * @brief Import the mappings from the json byte content
      * @param byteArrayOfJson
-     * @param fromPlatform
      */
-    void importMappingFromJson(QByteArray byteArrayOfJson, bool fromPlatform = false);
+    void importMappingFromJson(QByteArray byteArrayOfJson);
 
 
 Q_SIGNALS:

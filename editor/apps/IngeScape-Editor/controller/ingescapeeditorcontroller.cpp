@@ -827,7 +827,7 @@ void IngeScapeEditorController::_onLoadingRecord(int deltaTimeFromTimeLine, QStr
 
         // Import the mapping from JSON
         if (_agentsMappingC != NULL) {
-            _agentsMappingC->importMappingFromJson(byteArrayOfJson, true);
+            _agentsMappingC->importMappingFromJson(byteArrayOfJson);
         }
 
         if (_scenarioC != NULL)
@@ -869,9 +869,15 @@ void IngeScapeEditorController::_loadPlatformFromFile(QString platformFilePath)
                 QByteArray byteArrayOfJson = jsonFile.readAll();
                 jsonFile.close();
 
+                // FIXME TODO: Import the agents list from JSON
+                /*if (_modelManager != NULL)
+                {
+                    _modelManager->importAgentsListFromJson(byteArrayOfJson);
+                }*/
+
                 // Import the mapping from JSON
                 if (_agentsMappingC != NULL) {
-                    _agentsMappingC->importMappingFromJson(byteArrayOfJson, true);
+                    _agentsMappingC->importMappingFromJson(byteArrayOfJson);
                 }
 
                 // Import scenario
@@ -941,7 +947,12 @@ QJsonDocument IngeScapeEditorController::_getJsonOfCurrentPlatform()
         // Save the scenario
         if (_scenarioC != NULL)
         {
-            platformJsonObject = _jsonHelper->exportScenario(_scenarioC->actionsList()->toList(), _scenarioC->actionsInPaletteList()->toList(), _scenarioC->actionsInTimeLine()->toList());
+            // actions list
+            // actions list in the palette
+            // actions list in the timeline
+            platformJsonObject = _jsonHelper->exportScenario(_scenarioC->actionsList()->toList(),
+                                                             _scenarioC->actionsInPaletteList()->toList(),
+                                                             _scenarioC->actionsInTimeLine()->toList());
         }
 
         // Save mapping
@@ -950,7 +961,7 @@ QJsonDocument IngeScapeEditorController::_getJsonOfCurrentPlatform()
             QJsonArray jsonArray = _jsonHelper->exportAllAgentsInMapping(_agentsMappingC->allAgentsInMapping()->toList());
 
             if (!jsonArray.isEmpty()) {
-                platformJsonObject.insert("mappings", jsonArray);
+                platformJsonObject.insert("agents", jsonArray);
             }
         }
 

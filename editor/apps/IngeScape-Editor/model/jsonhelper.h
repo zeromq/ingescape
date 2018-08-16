@@ -43,6 +43,7 @@ struct scenario_import_actions_lists_t {
   QList<ActionVM*>          actionsInTimelineList;
 };
 
+
 /**
  * @brief Structure used for mapping importation from a json string
  * @param name
@@ -53,9 +54,12 @@ struct scenario_import_actions_lists_t {
 struct mapping_agent_import_t {
   QString               name;
   QPointF               position;
+  QString               hostname;
+  QString               commandLine;
   DefinitionM*          definition;
   AgentMappingM*        mapping;
 };
+
 
 /**
  * @brief The JsonHelper class defines a helper to manage JSON definitions of agents
@@ -157,7 +161,7 @@ public:
 
     /**
      * @brief Export the actions lists into json object
-     * @param actions list in table
+     * @param actions list
      * @param actions list in the palette
      * @param actions list in the timeline
      * @return
@@ -168,10 +172,9 @@ public:
     /**
      * @brief Import the mapping from the json content
      * @param byteArrayOfJson
-     * @param fromPlatform
      * @return list of mapping_agent_import_t objects
      */
-    QList<mapping_agent_import_t *> importMapping(QByteArray byteArrayOfJson, bool fromPlatform = false);
+    QList<mapping_agent_import_t *> importMapping(QByteArray byteArrayOfJson);
 
 
     /**
