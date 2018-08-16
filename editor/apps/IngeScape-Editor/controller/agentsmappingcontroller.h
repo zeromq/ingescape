@@ -74,7 +74,7 @@ public:
 
 
     /**
-     * @brief Create a new Mapping
+     * @brief Create a new mapping (clear the previous one)
      */
     Q_INVOKABLE void createNewMapping();
 

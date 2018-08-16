@@ -254,7 +254,7 @@ public:
 
 
     /**
-     * @brief Clear the list of actions in the table / palette / timeline
+     * @brief Clear the list of actions in the list, in the palette and in the timeline
      */
     Q_INVOKABLE void clearScenario();
 

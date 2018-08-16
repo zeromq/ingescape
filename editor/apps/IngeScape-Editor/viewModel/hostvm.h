@@ -35,7 +35,7 @@ class HostVM : public QObject
     I2_QML_PROPERTY_READONLY(QString, name)
 
     // Model of our host
-    I2_QML_PROPERTY_DELETE_PROOF(HostM*, modelM)
+    I2_QML_PROPERTY_READONLY(HostM*, modelM)
 
     // List of associated Agents
     I2_QOBJECT_LISTMODEL(AgentM, listOfAgents)

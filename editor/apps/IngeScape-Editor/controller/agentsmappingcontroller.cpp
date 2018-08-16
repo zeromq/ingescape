@@ -75,7 +75,7 @@ AgentsMappingController::~AgentsMappingController()
 
 
 /**
- * @brief Create a new Mapping
+ * @brief Create a new mapping (clear the previous one)
  */
 void AgentsMappingController::createNewMapping()
 {

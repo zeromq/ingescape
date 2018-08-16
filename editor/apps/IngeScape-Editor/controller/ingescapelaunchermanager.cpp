@@ -32,11 +32,8 @@ IngeScapeLauncherManager::~IngeScapeLauncherManager()
 {
     qInfo() << "Delete IngeScape Launcher Manager";
 
-    // Clear the map
-    _mapFromNameToHost.clear();
-
-    // Free memory
-    _hosts.deleteAllItems();
+    // Reset the list of launchers
+    reset();
 }
 
 
@@ -109,6 +106,9 @@ void IngeScapeLauncherManager::removeIngeScapeLauncher(QString peerId, QString h
 
             // Remove from the map
             _mapFromNameToHost.remove(hostName);
+
+            // Free memory
+            delete host;
         }
     }
 }
@@ -144,6 +144,28 @@ QString IngeScapeLauncherManager::getPeerIdOfLauncherWithHostName(QString hostNa
     else {
         return "";
     }
+}
+
+
+/**
+ * @brief Reset the list of launchers (hosts)
+ */
+void IngeScapeLauncherManager::reset()
+{
+    for (HostM* host : _hosts)
+    {
+        if (host != NULL)
+        {
+            // Emit signal that the host model will be removed
+            Q_EMIT hostModelWillBeRemoved(host);
+        }
+    }
+
+    // Clear the hash table
+    _mapFromNameToHost.clear();
+
+    // Free memory
+    _hosts.deleteAllItems();
 }
 
 

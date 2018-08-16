@@ -52,6 +52,10 @@ public:
     ~HostsSupervisionController();
 
 
+    /**
+     * @brief Reset the list of agents
+     */
+    void reset();
 
 
 Q_SIGNALS:
@@ -96,8 +100,10 @@ public Q_SLOTS:
 
 
 private:
-    // Map from host name to a list of view models of host
-    QHash<HostM*, HostVM*> _mapFromHostModelToViewModel;
+
+    // FIXME use the IP address as key
+    // Has table from "Name" to the "(view model of) Host"
+    QHash<QString, HostVM*> _mapFromNameToHost;
 
     // List of all agents
     QList<AgentM*> _allAgents;

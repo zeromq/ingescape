@@ -42,12 +42,24 @@ HostsSupervisionController::~HostsSupervisionController()
     // Clean-up current selection
     setselectedHost(NULL);
 
-    _mapFromHostModelToViewModel.clear();
+    // Clear the hash table
+    _mapFromNameToHost.clear();
 
-    _allAgents.clear();
-
-    // Delete all VM of host
+    // Free memory
     _hostsList.deleteAllItems();
+
+    // Clear the list of agents
+    _allAgents.clear();
+}
+
+
+/**
+ * @brief Reset the list of agents
+ */
+void HostsSupervisionController::reset()
+{
+    // Clear the list of agents
+    _allAgents.clear();
 }
 
 
@@ -59,25 +71,24 @@ void HostsSupervisionController::onHostModelCreated(HostM* host)
 {
     if (host != NULL)
     {
-        HostVM* newHost = new HostVM(host, this);
+        HostVM* newHostVM = new HostVM(host, this);
 
-        _hostsList.append(newHost);
-        _mapFromHostModelToViewModel.insert(host, newHost);
+        _hostsList.append(newHostVM);
 
-        connect(newHost, &HostVM::commandAskedToHost, this, &HostsSupervisionController::commandAskedToHost);
+        if (!_mapFromNameToHost.contains(host->name())) {
+            _mapFromNameToHost.insert(host->name(), newHostVM);
+        }
 
-        // associate host with existing agents if necessary
+        connect(newHostVM, &HostVM::commandAskedToHost, this, &HostsSupervisionController::commandAskedToHost);
+
+        // Associate host with existing agents if necessary
         for (AgentM* agent : _allAgents)
         {
-            if ( (agent != NULL) && (newHost->modelM() != NULL)
-                &&
-                (newHost->modelM()->ipAddress() == agent->address())
-                &&
-                !newHost->listOfAgents()->contains(agent) )
+            if ((agent != NULL) && (agent->address() == host->ipAddress()) && !newHostVM->listOfAgents()->contains(agent))
             {
-                qDebug() << "Add agent " << agent->name() << " to host " << newHost->modelM()->name();
+                qDebug() << "Add agent " << agent->name() << " to host " << newHostVM->name();
 
-                newHost->listOfAgents()->append(agent);
+                newHostVM->listOfAgents()->append(agent);
             }
         }
     }
@@ -92,17 +103,27 @@ void HostsSupervisionController::onHostModelWillBeRemoved(HostM* host)
 {
     if (host != NULL)
     {
-        if (_mapFromHostModelToViewModel.contains(host))
+        if (_mapFromNameToHost.contains(host->name()))
         {
-            HostVM* hostToRemove = _mapFromHostModelToViewModel.value(host);
+            HostVM* hostToRemove = _mapFromNameToHost.value(host->name());
+            if (hostToRemove != NULL)
+            {
+                disconnect(hostToRemove, &HostVM::commandAskedToHost, this, &HostsSupervisionController::commandAskedToHost);
 
-            disconnect(hostToRemove, &HostVM::commandAskedToHost, this, &HostsSupervisionController::commandAskedToHost);
+                if (_hostsList.contains(hostToRemove)) {
+                    _hostsList.remove(hostToRemove);
+                }
 
-            if (_hostsList.contains(hostToRemove)) {
-                _hostsList.remove(hostToRemove);
+                if (_selectedHost == hostToRemove) {
+                    // Clean-up current selection
+                    setselectedHost(NULL);
+                }
+
+                // Free memory
+                delete hostToRemove;
             }
 
-            _mapFromHostModelToViewModel.remove(host);
+            _mapFromNameToHost.remove(host->name());
         }
     }
 }
@@ -120,7 +141,7 @@ void HostsSupervisionController::onAgentModelCreated(AgentM* agent)
             _allAgents.append(agent);
         }
 
-        // try to get the involved hostVM with agent's host name
+        // Try to get the involved hostVM with agent's host name
         for (HostVM* host : _hostsList.toList())
         {
             if ( (host != NULL) && (host->modelM() != NULL)
@@ -130,7 +151,9 @@ void HostsSupervisionController::onAgentModelCreated(AgentM* agent)
                 !host->listOfAgents()->contains(agent) )
             {
                 host->listOfAgents()->append(agent);
-                qDebug() << "Add agent " << agent->name() << " to host " << host->modelM()->name();
+
+                qDebug() << "Add agent " << agent->name() << " to host " << host->name();
+
                 break;
             }
         }
@@ -150,13 +173,15 @@ void HostsSupervisionController::onAgentModelWillBeDeleted(AgentM* agent)
             _allAgents.removeOne(agent);
         }
 
-        // try to get the involved hostVM with agent's host name
+        // Try to get the involved hostVM with agent's host name
         for (HostVM* host : _hostsList.toList())
         {
             if ((host != NULL) && host->listOfAgents()->contains(agent))
             {
                 host->listOfAgents()->remove(agent);
+
                 qDebug() << "Remove agent " << agent->name() << " from host " << host->modelM()->name();
+
                 break;
             }
         }
