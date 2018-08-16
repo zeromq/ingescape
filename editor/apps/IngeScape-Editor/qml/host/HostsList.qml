@@ -95,8 +95,7 @@ Item {
 
             height: contentHeight
 
-            anchors
-            {
+            anchors {
                 left: parent.left
                 right: parent.right
             }
@@ -177,19 +176,17 @@ Item {
     Component {
         id: componentHostListItem
 
-
         Item {
-            id : hostItem
+            id: hostItem
 
-            property var agentmodel: model.listOfAgents
+            property var model_listOfAgents: model.listOfAgents
 
-            property int margin: 5
-
-            height: hostInfos.height + margin*2
+            //height: 5 + hostInfos.height + 6
+            height: 5 + hostName.height + hostInfos.spacing + hostIP.height + hostInfos.spacing + listViewOfAgents.height + 6
 
             anchors {
-                left : parent.left
-                right : parent.right
+                left: parent.left
+                right: parent.right
             }
 
             // separator
@@ -205,19 +202,19 @@ Item {
                 height: 1
             }
 
-            Column
-            {
-                id:hostInfos
-                y: margin
+            Column {
+                id: hostInfos
 
                 anchors {
-                    left : parent.left
-                    right : parent.right
+                    top: parent.top
+                    topMargin: 5
+                    left: parent.left
+                    right: parent.right
                     leftMargin: 28
                     rightMargin: 12
                 }
 
-                spacing : 4
+                spacing: 5
 
                 // Name
                 Text {
@@ -251,8 +248,9 @@ Item {
 
                 // List of associated agents
                 ListView {
-                    id:listAgents
-                    model: agentmodel
+                    id: listViewOfAgents
+
+                    model: hostItem.model_listOfAgents
                     interactive: false
 
                     delegate: Text {
@@ -275,6 +273,7 @@ Item {
                         right: parent.right
                     }
                 }
+
             }
 
             // Button Options
