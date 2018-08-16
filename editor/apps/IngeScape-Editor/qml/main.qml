@@ -225,6 +225,15 @@ ApplicationWindow {
 
             title: qsTr("Windows")
 
+            MenuItem {
+                text: qsTr("IngeScape Editor")
+
+                onTriggered: {
+                    // Raises our window in the windowing system
+                    mainWindow.raise();
+                }
+            }
+
             Instantiator {
                    model: IngeScapeEditorC.openedWindows
 
