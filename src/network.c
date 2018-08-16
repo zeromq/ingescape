@@ -88,8 +88,8 @@ static const char *mappingPrefix = "EXTERNAL_MAPPING#";
 static const char *loadMappingPrefix = "LOAD_THIS_MAPPING#";
 static const char *loadDefinitionPrefix = "LOAD_THIS_DEFINITION#";
 #define COMMAND_LINE_LENGTH 2048
-char agentName[MAX_AGENT_NAME_LENGTH] = AGENT_NAME_DEFAULT;
-char agentState[MAX_AGENT_NAME_LENGTH] = "";
+char igsAgentName[MAX_AGENT_NAME_LENGTH] = AGENT_NAME_DEFAULT;
+char igsAgentState[MAX_AGENT_NAME_LENGTH] = "";
 char commandLine[COMMAND_LINE_LENGTH] = "";
 char replayChannel[MAX_AGENT_NAME_LENGTH + 16] = "";
 
@@ -160,7 +160,7 @@ int subscribeToPublisherOutput(subscriber_t *subscriber, const char *outputName)
             strncpy(f->filter, outputName, MAX_FILTER_SIZE);
             DL_APPEND(subscriber->mappingsFilters, f);
         }else{
-            //printf("\n****************\nFILTER BIS %s - %s\n***************\n", subscriber->agentName, outputName);
+            //printf("\n****************\nFILTER BIS %s - %s\n***************\n", subscriber->igsAgentName, outputName);
         }
         return 1;
     }
@@ -174,7 +174,7 @@ int unsubscribeToPublisherOutput(subscriber_t *subscriber, const char *outputNam
         mappingFilter_t *filter = NULL;
         DL_FOREACH(subscriber->mappingsFilters, filter){
             if (strcmp(filter->filter, outputName) == 0){
-                igs_info("Unsubscribe to agent %s output %s",agentName,outputName);
+                igs_info("Unsubscribe to agent %s output %s",igsAgentName,outputName);
                 zsock_set_unsubscribe(subscriber->subscriber, outputName);
                 DL_DELETE(subscriber->mappingsFilters, filter);
                 break;
@@ -571,8 +571,8 @@ int manageBusIncoming (zloop_t *loop, zmq_pollitem_t *item, void *arg){
                 if (isFrozen){
                     zyre_whispers(agentElements->node, peer, "FROZEN=1");
                 }
-                if (strlen(agentState) > 0){
-                    zyre_whispers(agentElements->node, peer, "STATE=%s", agentState);
+                if (strlen(igsAgentState) > 0){
+                    zyre_whispers(agentElements->node, peer, "STATE=%s", igsAgentState);
                 }
                 if (igs_internal_definition != NULL){
                     agent_iop_t *current_iop, *tmp_iop;
@@ -1068,7 +1068,7 @@ initLoop (zsock_t *pipe, void *args){
 
     bool canContinue = true;
     //prepare zyre
-    zyre_t *node =  agentElements->node = zyre_new (agentName);
+    zyre_t *node =  agentElements->node = zyre_new (igsAgentName);
     if (strlen(agentElements->brokerEndPoint) > 0){
         zyre_gossip_connect(agentElements->node,
                             "%s", agentElements->brokerEndPoint);
@@ -1085,7 +1085,7 @@ initLoop (zsock_t *pipe, void *args){
     zyre_set_expired_timeout(agentElements->node, network_agentTimeout);
     
     //create channel for replay
-    snprintf(replayChannel, MAX_AGENT_NAME_LENGTH + 15, "%s-IGS-REPLAY", agentName);
+    snprintf(replayChannel, MAX_AGENT_NAME_LENGTH + 15, "%s-IGS-REPLAY", igsAgentName);
     zyre_join(agentElements->node, replayChannel);
     
     //Add stored headers to zyre
@@ -1615,7 +1615,7 @@ int igs_setAgentName(const char *name){
         igs_error("Agent name cannot be NULL or empty");
         return 0;
     }
-    if (strcmp(agentName, name) == 0){
+    if (strcmp(igsAgentName, name) == 0){
         //nothing to do
         return 1;
     }
@@ -1646,13 +1646,13 @@ int igs_setAgentName(const char *name){
     if (spaceInName){
         igs_warn("Spaces are not allowed in agent name: %s has been renamed to %s", name, n);
     }
-    strncpy(agentName, n, MAX_AGENT_NAME_LENGTH);
+    strncpy(igsAgentName, n, MAX_AGENT_NAME_LENGTH);
     free(n);
     
     if (needRestart){
         igs_startWithIP(ipAddress, zyrePort);
     }
-    igs_info("Agent name is %s", agentName);
+    igs_info("Agent name is %s", igsAgentName);
     return 1;
 }
 
@@ -1664,7 +1664,7 @@ int igs_setAgentName(const char *name){
  * \warning Allocate memory that should be freed by the user.
  */
 char *igs_getAgentName(){
-    return strdup(agentName);
+    return strdup(igsAgentName);
 }
 
 /**
@@ -1771,11 +1771,11 @@ int igs_setAgentState(const char *state){
         return 0;
     }
     
-    if (strcmp(state, agentState) != 0){
-        strncpy(agentState, state, MAX_AGENT_NAME_LENGTH);
-        igs_info("changed to %s", agentState);
+    if (strcmp(state, igsAgentState) != 0){
+        strncpy(igsAgentState, state, MAX_AGENT_NAME_LENGTH);
+        igs_info("changed to %s", igsAgentState);
         if (agentElements != NULL && agentElements->node != NULL){
-            zyre_shouts(agentElements->node, CHANNEL, "STATE=%s", agentState);
+            zyre_shouts(agentElements->node, CHANNEL, "STATE=%s", igsAgentState);
         }
     }
     return 1;
@@ -1789,7 +1789,7 @@ int igs_setAgentState(const char *state){
  * \warning Allocate memory that should be freed by the user.
  */
 char *igs_getAgentState(){
-    return strdup(agentState);
+    return strdup(igsAgentState);
 }
 
 
