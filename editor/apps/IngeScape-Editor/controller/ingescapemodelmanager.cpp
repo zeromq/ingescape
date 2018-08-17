@@ -156,8 +156,16 @@ bool IngeScapeModelManager::importAgentOrAgentsListFromSelectedFile()
 
             QJsonDocument jsonDocument = QJsonDocument::fromJson(byteArrayOfJson);
 
-            // One JSON object
-            if (jsonDocument.isObject())
+            QJsonObject jsonRoot = jsonDocument.object();
+
+            // List of agents
+            if (jsonRoot.contains("agents"))
+            {
+                // Import the agents list from JSON file
+                _importAgentsListFromFile(agentFilePath);
+            }
+            // One agent
+            else
             {
                 // Create a model of agent definition from the JSON
                 DefinitionM* agentDefinition = _jsonHelper->createModelOfAgentDefinition(byteArrayOfJson);
@@ -182,12 +190,6 @@ bool IngeScapeModelManager::importAgentOrAgentsListFromSelectedFile()
                     qWarning() << "The file" << agentFilePath << "does not contain an agent definition !";
                     success = false;
                 }
-            }
-            // Several JSON objects
-            else if (jsonDocument.isArray())
-            {
-                // Import the agents list from JSON file
-                _importAgentsListFromFile(agentFilePath);
             }
         }
         else {
@@ -378,14 +380,9 @@ void IngeScapeModelManager::onAgentEntered(QString peerId, QString agentName, QS
             if (!hostname.isEmpty())
             {
                 HostM* host = IngeScapeLauncherManager::Instance().getHostWithName(hostname);
-                if (host != NULL)
+                if ((host != NULL) && !commandLine.isEmpty())
                 {
-                    // Add this agent to the host
-                    //host->agents()->append(agent);
-
-                    if (!commandLine.isEmpty()) {
-                        agent->setcanBeRestarted(true);
-                    }
+                    agent->setcanBeRestarted(true);
                 }
             }
 
@@ -1111,7 +1108,8 @@ void IngeScapeModelManager::_importAgentsListFromFile(QString agentsListFilePath
         qInfo() << "Import the agents list from JSON file" << agentsListFilePath;
 
         QFile jsonFile(agentsListFilePath);
-        if (jsonFile.exists()) {
+        if (jsonFile.exists())
+        {
             if (jsonFile.open(QIODevice::ReadOnly))
             {
                 QByteArray byteArrayOfJson = jsonFile.readAll();
@@ -1144,14 +1142,9 @@ void IngeScapeModelManager::_importAgentsListFromFile(QString agentsListFilePath
                             if (!hostname.isEmpty())
                             {
                                 HostM* host = IngeScapeLauncherManager::Instance().getHostWithName(hostname);
-                                if (host != NULL)
+                                if ((host != NULL) && !commandLine.isEmpty())
                                 {
-                                    // Add this agent to the host
-                                    //host->agents()->append(agent);
-
-                                    if (!commandLine.isEmpty()) {
-                                        agent->setcanBeRestarted(true);
-                                    }
+                                    agent->setcanBeRestarted(true);
                                 }
                             }
                         }

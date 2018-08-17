@@ -45,47 +45,54 @@ QList<QPair<QStringList, DefinitionM*>> JsonHelper::initAgentsList(QByteArray by
 {
     QList<QPair<QStringList, DefinitionM*>> agentsListToImport;
 
-    QJsonDocument jsonAgentsList = QJsonDocument::fromJson(byteArrayOfJson);
-    if (jsonAgentsList.isArray())
+    QJsonDocument jsonDocument = QJsonDocument::fromJson(byteArrayOfJson);
+
+    QJsonObject jsonRoot = jsonDocument.object();
+
+    if (jsonRoot.contains("agents"))
     {
-        for (QJsonValue jsonValue : jsonAgentsList.array())
+        QJsonValue jsonAgentsList = jsonRoot.value("agents");
+        if (jsonAgentsList.isArray())
         {
-            if (jsonValue.isObject())
+            for (QJsonValue jsonValue : jsonAgentsList.toArray())
             {
-                QJsonObject jsonAgent = jsonValue.toObject();
-
-                // Get value for keys "agentName" and "definition"
-                QJsonValue jsonName = jsonAgent.value("agentName");
-                QJsonValue jsonDefinition = jsonAgent.value("definition");
-
-                if (jsonName.isString() && jsonDefinition.isObject())
+                if (jsonValue.isObject())
                 {
-                    // Create a model of agent definition from JSON object
-                    DefinitionM* definition = _createModelOfAgentDefinitionFromJSON(jsonDefinition.toObject());
-                    if (definition != NULL)
+                    QJsonObject jsonAgent = jsonValue.toObject();
+
+                    // Get value for keys "agentName" and "definition"
+                    QJsonValue jsonName = jsonAgent.value("agentName");
+                    QJsonValue jsonDefinition = jsonAgent.value("definition");
+
+                    if (jsonName.isString() && jsonDefinition.isObject())
                     {
-                        qDebug() << "Initialize agent" << jsonName.toString() << "with definition" << definition->name();
-
-                        QStringList agentNameAndParametersToRestart;
-                        agentNameAndParametersToRestart.append(jsonName.toString());
-
-                        QJsonValue jsonHostname = jsonAgent.value("hostname");
-                        QJsonValue jsonCommandLine = jsonAgent.value("commandLine");
-
-                        if (jsonHostname.isString() && jsonCommandLine.isString())
+                        // Create a model of agent definition from JSON object
+                        DefinitionM* definition = _createModelOfAgentDefinitionFromJSON(jsonDefinition.toObject());
+                        if (definition != NULL)
                         {
-                            agentNameAndParametersToRestart.append(jsonHostname.toString());
-                            agentNameAndParametersToRestart.append(jsonCommandLine.toString());
+                            qDebug() << "Initialize agent" << jsonName.toString() << "with definition" << definition->name();
+
+                            QStringList agentNameAndParametersToRestart;
+                            agentNameAndParametersToRestart.append(jsonName.toString());
+
+                            QJsonValue jsonHostname = jsonAgent.value("hostname");
+                            QJsonValue jsonCommandLine = jsonAgent.value("commandLine");
+
+                            if (jsonHostname.isString() && jsonCommandLine.isString())
+                            {
+                                agentNameAndParametersToRestart.append(jsonHostname.toString());
+                                agentNameAndParametersToRestart.append(jsonCommandLine.toString());
+                            }
+
+                            // Create a pair with agent name and definition
+                            QPair<QStringList, DefinitionM*> pair;
+
+                            pair.first = agentNameAndParametersToRestart;
+                            pair.second = definition;
+
+                            // Add the pair to the list
+                            agentsListToImport.append(pair);
                         }
-
-                        // Create a pair with agent name and definition
-                        QPair<QStringList, DefinitionM*> pair;
-
-                        pair.first = agentNameAndParametersToRestart;
-                        pair.second = definition;
-
-                        // Add the pair to the list
-                        agentsListToImport.append(pair);
                     }
                 }
             }
@@ -147,38 +154,45 @@ AgentMappingM* JsonHelper::createModelOfAgentMapping(QString inputAgentName, QBy
  */
 QByteArray JsonHelper::exportAgentsList(QList<QPair<QStringList, DefinitionM*>> agentsListToExport)
 {
-    QJsonArray jsonArray;
+    QJsonObject jsonRoot = QJsonObject();
 
-    for (int i = 0; i < agentsListToExport.count(); i++)
+    if (!agentsListToExport.isEmpty())
     {
-        QPair<QStringList, DefinitionM*> pair = agentsListToExport.at(i);
-        QStringList agentNameAndParametersToRestart = pair.first;
-        DefinitionM* definition = pair.second;
+        QJsonArray jsonArray;
 
-        QString agentName = agentNameAndParametersToRestart.first();
-
-        if (!agentName.isEmpty() && (definition != NULL))
+        for (int i = 0; i < agentsListToExport.count(); i++)
         {
-            QJsonObject jsonAgent;
-            jsonAgent.insert("agentName", agentName);
+            QPair<QStringList, DefinitionM*> pair = agentsListToExport.at(i);
+            QStringList agentNameAndParametersToRestart = pair.first;
+            DefinitionM* definition = pair.second;
 
-            if (agentNameAndParametersToRestart.count() == 3)
+            QString agentName = agentNameAndParametersToRestart.first();
+
+            if (!agentName.isEmpty() && (definition != NULL))
             {
-                QString hostname = agentNameAndParametersToRestart.at(1);
-                QString commandLine = agentNameAndParametersToRestart.at(2);
-                jsonAgent.insert("hostname", hostname);
-                jsonAgent.insert("commandLine", commandLine);
+                QJsonObject jsonAgent;
+                jsonAgent.insert("agentName", agentName);
+
+                if (agentNameAndParametersToRestart.count() == 3)
+                {
+                    QString hostname = agentNameAndParametersToRestart.at(1);
+                    QString commandLine = agentNameAndParametersToRestart.at(2);
+                    jsonAgent.insert("hostname", hostname);
+                    jsonAgent.insert("commandLine", commandLine);
+                }
+
+                QJsonObject jsonDefinition = exportAgentDefinitionToJson(definition);
+
+                jsonAgent.insert("definition", jsonDefinition);
+
+                jsonArray.append(jsonAgent);
             }
-
-            QJsonObject jsonDefinition = exportAgentDefinitionToJson(definition);
-
-            jsonAgent.insert("definition", jsonDefinition);
-
-            jsonArray.append(jsonAgent);
         }
+
+        jsonRoot.insert("agents", jsonArray);
     }
 
-    QJsonDocument jsonDocument = QJsonDocument(jsonArray);
+    QJsonDocument jsonDocument = QJsonDocument(jsonRoot);
 
     return jsonDocument.toJson();
 }
