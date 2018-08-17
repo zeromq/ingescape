@@ -78,7 +78,7 @@ about_us = "<p>ingeScape is developped by <a href=\"https://ingenuity.io\">Ingen
     # Format dates with Go's time formatting
     date_format = "January 2, 2006"
 
-    logo = "imgages/test2.png"
+    logo = "img/logo.png"
     address = """<p><strong>Ingenuity i/o</strong>
         <br>16 avenue de l'Europe
         <br>31520 Ramonville Saint-Agne
