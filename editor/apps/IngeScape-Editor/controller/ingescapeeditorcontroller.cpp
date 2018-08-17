@@ -832,30 +832,43 @@ void IngeScapeEditorController::_onLoadingRecord(int deltaTimeFromTimeLine, QStr
     {
         qDebug() << "jsonExecutedActions" << jsonExecutedActions;
 
+        // FIXME: use json directly ?
         QByteArray byteArrayOfJson = jsonPlatform.toUtf8();
 
-        // Import the mapping from JSON
-        if (_agentsMappingC != NULL) {
-            _agentsMappingC->importMappingFromJson(byteArrayOfJson);
-        }
-
-        if (_scenarioC != NULL)
+        QJsonDocument jsonDocument = QJsonDocument::fromJson(jsonPlatform.toUtf8());
+        if (jsonDocument.isObject())
         {
-            // Clear scenario
-            _scenarioC->clearScenario();
+            QJsonObject jsonRoot = jsonDocument.object();
 
-            // Import the scenario from JSON
-            _scenarioC->importScenarioFromJson(byteArrayOfJson);
+            // Import the agents list from JSON
+            if ((_modelManager != NULL) && jsonRoot.contains("agents"))
+            {
+                _modelManager->importAgentsListFromJson(jsonRoot.value("agents").toArray());
+            }
 
-            // Update the current time
-            _scenarioC->setcurrentTime(QTime::fromMSecsSinceStartOfDay(deltaTimeFromTimeLine));
+            // Import the mapping from JSON
+            if (_agentsMappingC != NULL) {
+                _agentsMappingC->importMappingFromJson(byteArrayOfJson);
+            }
 
-            // Import the executed actions for this scenario from JSON
-            _scenarioC->importExecutedActionsFromJson(jsonExecutedActions.toUtf8());
+            if (_scenarioC != NULL)
+            {
+                // Clear scenario
+                _scenarioC->clearScenario();
+
+                // Import the scenario from JSON
+                _scenarioC->importScenarioFromJson(byteArrayOfJson);
+
+                // Update the current time
+                _scenarioC->setcurrentTime(QTime::fromMSecsSinceStartOfDay(deltaTimeFromTimeLine));
+
+                // Import the executed actions for this scenario from JSON
+                _scenarioC->importExecutedActionsFromJson(jsonExecutedActions.toUtf8());
+            }
+
+            // Notify QML to reset view
+            Q_EMIT resetMappindAndTimeLineViews();
         }
-
-        // Notify QML to reset view
-        Q_EMIT resetMappindAndTimeLineViews();
     }
 }
 
@@ -878,9 +891,16 @@ void IngeScapeEditorController::_loadPlatformFromFile(QString platformFilePath)
                 QByteArray byteArrayOfJson = jsonFile.readAll();
                 jsonFile.close();
 
-                // Import the agents list from JSON
-                if (_modelManager != NULL) {
-                    _modelManager->importAgentsListFromJson(byteArrayOfJson);
+                QJsonDocument jsonDocument = QJsonDocument::fromJson(byteArrayOfJson);
+                if (jsonDocument.isObject())
+                {
+                    QJsonObject jsonRoot = jsonDocument.object();
+
+                    // Import the agents list from JSON
+                    if ((_modelManager != NULL) && jsonRoot.contains("agents"))
+                    {
+                        _modelManager->importAgentsListFromJson(jsonRoot.value("agents").toArray());
+                    }
                 }
 
                 // Import the mapping from JSON
@@ -952,25 +972,11 @@ QJsonDocument IngeScapeEditorController::_getJsonOfCurrentPlatform()
     {
         QJsonObject platformJsonObject;
 
-        // Save the scenario
-        if (_scenarioC != NULL)
-        {
-            // actions list
-            // actions list in the palette
-            // actions list in the timeline
-            platformJsonObject = _jsonHelper->exportScenario(_scenarioC->actionsList()->toList(),
-                                                             _scenarioC->actionsInPaletteList()->toList(),
-                                                             _scenarioC->actionsInTimeLine()->toList());
-        }
-
         // Save the agents list
         if (_agentsSupervisionC != NULL)
         {
-            // Get the agents list to export
-            QList<QPair<QStringList, DefinitionM*>> agentsListToExport = _agentsSupervisionC->getAgentsListToExport();
-
-            // Export the agents list
-            QJsonArray arrayOfAgents = _jsonHelper->exportAgentsList(agentsListToExport);
+            // Export the agents list to JSON
+            QJsonArray arrayOfAgents = _agentsSupervisionC->exportAgentsListToJSON();
 
             if (!arrayOfAgents.isEmpty()) {
                 platformJsonObject.insert("agents", arrayOfAgents);
@@ -985,6 +991,19 @@ QJsonDocument IngeScapeEditorController::_getJsonOfCurrentPlatform()
             if (!arrayOfMappings.isEmpty()) {
                 platformJsonObject.insert("mapping", arrayOfMappings);
             }
+        }
+
+        // Save the scenario
+        if (_scenarioC != NULL)
+        {
+            // actions list
+            // actions list in the palette
+            // actions list in the timeline
+            QJsonObject jsonScenario = _jsonHelper->exportScenario(_scenarioC->actionsList()->toList(),
+                                                                   _scenarioC->actionsInPaletteList()->toList(),
+                                                                   _scenarioC->actionsInTimeLine()->toList());
+
+            platformJsonObject.insert("scenario", jsonScenario);
         }
 
         jsonDocument = QJsonDocument(platformJsonObject);

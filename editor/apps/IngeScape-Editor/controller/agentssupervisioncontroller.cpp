@@ -119,49 +119,82 @@ void AgentsSupervisionController::exportAgentsListToSelectedFile()
 {
     if (_modelManager != NULL)
     {
-        // Get the agents list to export
-        QList<QPair<QStringList, DefinitionM*>> agentsListToExport = getAgentsListToExport();
+        // Export the agents list to JSON
+        QJsonArray arrayOfAgents = exportAgentsListToJSON();
 
         // Export the agents list to selected file
-        _modelManager->exportAgentsListToSelectedFile(agentsListToExport);
+        _modelManager->exportAgentsListToSelectedFile(arrayOfAgents);
     }
 }
 
 
 /**
- * @brief Get the agents list to export
- * @return List of pairs <agent name (and parameters to restart), definition>
+ * @brief Export the agents list to JSON
+ * @return
  */
-QList<QPair<QStringList, DefinitionM*>> AgentsSupervisionController::getAgentsListToExport()
+QJsonArray AgentsSupervisionController::exportAgentsListToJSON()
 {
-    // List of pairs <agent name (and parameters to restart), definition>
-    QList<QPair<QStringList, DefinitionM*>> agentsListToExport;
+    QJsonArray jsonArray = QJsonArray();
 
-    foreach (AgentVM* agent, _agentsList.toList())
+    if (_jsonHelper != NULL)
     {
-        if ((agent != NULL) && !agent->name().isEmpty() && (agent->definition() != NULL))
+        for (AgentVM* agent : _agentsList.toList())
         {
-            QStringList agentNameAndParametersToRestart;
-            agentNameAndParametersToRestart.append(agent->name());
-
-            if (agent->models()->count() > 0)
+            if ((agent != NULL) && !agent->name().isEmpty() && (agent->definition() != NULL))
             {
-                AgentM* firstModel = agent->models()->at(0);
-                if ((firstModel != NULL) && !firstModel->hostname().isEmpty() && !firstModel->commandLine().isEmpty())
+                QJsonObject jsonAgent = QJsonObject();
+
+                // Name
+                jsonAgent.insert("agentName", agent->name());
+
+                // Definition
+                QJsonObject jsonDefinition = _jsonHelper->exportAgentDefinitionToJson(agent->definition());
+                jsonAgent.insert("definition", jsonDefinition);
+
+                // Clones (models)
+                QJsonArray jsonClones = QJsonArray();
+
+                QHash<QString, QStringList> hashFromHostnameToCommandLine;
+
+                for (AgentM* model : agent->models()->toList())
                 {
-                    agentNameAndParametersToRestart.append(firstModel->hostname());
-                    agentNameAndParametersToRestart.append(firstModel->commandLine());
+                    if ((model != NULL) && !model->hostname().isEmpty() && !model->commandLine().isEmpty())
+                    {
+                        bool alreadySameClone = false;
+                        QStringList listOfCommandLine;
+
+                        if (hashFromHostnameToCommandLine.contains(model->hostname()))
+                        {
+                            listOfCommandLine = hashFromHostnameToCommandLine.value(model->hostname());
+
+                            if (listOfCommandLine.contains(model->commandLine())) {
+                                alreadySameClone = true;
+                            }
+                        }
+
+                        if (!alreadySameClone)
+                        {
+                            qDebug() << agent->name() << model->hostname() << model->commandLine();
+
+                            listOfCommandLine.append(model->commandLine());
+                            hashFromHostnameToCommandLine.insert(model->hostname(), listOfCommandLine);
+
+                            QJsonObject jsonClone = QJsonObject();
+                            jsonClone.insert("hostname", model->hostname());
+                            jsonClone.insert("commandLine", model->commandLine());
+
+                            jsonClones.append(jsonClone);
+                        }
+                    }
                 }
+
+                jsonAgent.insert("clones", jsonClones);
+
+                jsonArray.append(jsonAgent);
             }
-
-            QPair<QStringList, DefinitionM*> pair;
-            pair.first = agentNameAndParametersToRestart;
-            pair.second = agent->definition();
-
-            agentsListToExport.append(pair);
         }
     }
-    return agentsListToExport;
+    return jsonArray;
 }
 
 

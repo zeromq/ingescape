@@ -77,10 +77,10 @@ public:
 
 
     /**
-     * @brief Get the agents list to export
-     * @return List of pairs <agent name (and parameters to restart), definition>
+     * @brief Export the agents list to JSON
+     * @return
      */
-    QList<QPair<QStringList, DefinitionM*>> getAgentsListToExport();
+    QJsonArray exportAgentsListToJSON();
 
 
 Q_SIGNALS:

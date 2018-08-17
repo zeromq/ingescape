@@ -154,17 +154,17 @@ public:
 
 
     /**
-     * @brief Import an agents list from a json byte content
-     * @param byteArrayOfJson
+     * @brief Import an agents list from a JSON array
+     * @param jsonArrayOfAgents
      */
-    void importAgentsListFromJson(QByteArray byteArrayOfJson);
+    void importAgentsListFromJson(QJsonArray jsonArrayOfAgents);
 
 
     /**
      * @brief Export the agents list to selected file
-     * @param agentsListToExport list of pairs <agent name (and parameters to restart), definition>
+     * @param jsonArrayOfAgents
      */
-    void exportAgentsListToSelectedFile(QList<QPair<QStringList, DefinitionM*>> agentsListToExport);
+    void exportAgentsListToSelectedFile(QJsonArray jsonArrayOfAgents);
 
 
     /**

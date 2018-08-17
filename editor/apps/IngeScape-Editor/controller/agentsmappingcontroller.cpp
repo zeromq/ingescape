@@ -318,6 +318,9 @@ void AgentsMappingController::importMappingFromJson(QByteArray byteArrayOfJson)
         // Clear the previous mapping
         createNewMapping();
 
+        // FIXME TODO: replace struct mapping_agent_import_t by QList<QPair<QStringList, AgentMappingM*>>
+        //QList<QPair<QStringList, AgentMappingM*>> mappingsListToImport =
+
         // Initialize mapping lists from JSON file
         QList<mapping_agent_import_t*> listMappingImported = _jsonHelper->importMapping(byteArrayOfJson);
         if (!listMappingImported.isEmpty())
@@ -342,19 +345,18 @@ void AgentsMappingController::importMappingFromJson(QByteArray byteArrayOfJson)
                         AgentInMappingVM* agentInMapping = getAgentInMappingFromName(importedAgent->name);
                         if (agentInMapping != NULL)
                         {
-                            // Add the link elements
-                            mappingElements.append(agentMapping->mappingElements()->toList());
-
                             // Set agent mapping
-                            if (agentMapping != NULL)
-                            {
+                            if (agentMapping != NULL) {
                                 agentInMapping->settemporaryMapping(agentMapping);
                             }
+
+                            // Add the link elements
+                            mappingElements.append(agentMapping->mappingElements()->toList());
                         }
                     }
-                    else {
+                    /*else {
                         qDebug() << "position is NULL:" << importedAgent->position.x() << importedAgent->position.y();
-                    }
+                    }*/
                 }
             }
 

@@ -143,13 +143,13 @@ bool IngeScapeModelManager::importAgentOrAgentsListFromSelectedFile()
             if (jsonRoot.contains("agents"))
             {
                 // Import the agents list from a json byte content
-                importAgentsListFromJson(byteArrayOfJson);
+                importAgentsListFromJson(jsonRoot.value("agents").toArray());
             }
             // One agent
             else
             {
                 // Create a model of agent definition from the JSON
-                DefinitionM* agentDefinition = _jsonHelper->createModelOfAgentDefinition(byteArrayOfJson);
+                DefinitionM* agentDefinition = _jsonHelper->createModelOfAgentDefinitionFromBytes(byteArrayOfJson);
                 if (agentDefinition != NULL)
                 {
                     QString agentName = agentDefinition->name();
@@ -184,66 +184,149 @@ bool IngeScapeModelManager::importAgentOrAgentsListFromSelectedFile()
 
 
 /**
- * @brief Import an agents list from a json byte content
- * @param byteArrayOfJson
+ * @brief Import an agents list from a JSON array
+ * @param jsonArrayOfAgents
  */
-void IngeScapeModelManager::importAgentsListFromJson(QByteArray byteArrayOfJson)
+void IngeScapeModelManager::importAgentsListFromJson(QJsonArray jsonArrayOfAgents)
 {
     if (_jsonHelper != NULL)
     {
-        // Import the agents list
-        QList<QPair<QStringList, DefinitionM*>> agentsListToImport = _jsonHelper->importAgentsList(byteArrayOfJson);
-
-        for (int i = 0; i < agentsListToImport.count(); i++)
+        for (QJsonValue jsonValue : jsonArrayOfAgents)
         {
-            QPair<QStringList, DefinitionM*> pair = agentsListToImport.at(i);
-            QStringList agentNameAndParametersToRestart = pair.first;
-            DefinitionM* agentDefinition = pair.second;
-
-            QString agentName = agentNameAndParametersToRestart.first();
-
-            if (!agentName.isEmpty() && (agentDefinition != NULL))
+            if (jsonValue.isObject())
             {
-                // Create a new model of agent with the name
-                AgentM* agent = new AgentM(agentName, this);
+                QJsonObject jsonAgent = jsonValue.toObject();
 
-                if (agentNameAndParametersToRestart.count() == 3)
+                // Get values for keys "agentName", "definition" and "clones"
+                QJsonValue jsonName = jsonAgent.value("agentName");
+                QJsonValue jsonDefinition = jsonAgent.value("definition");
+                QJsonValue jsonClones = jsonAgent.value("clones");
+
+                if (jsonName.isString() && jsonDefinition.isObject() && jsonClones.isArray())
                 {
-                    QString hostname = agentNameAndParametersToRestart.at(1);
-                    QString commandLine = agentNameAndParametersToRestart.at(2);
+                    QString agentName = jsonName.toString();
 
-                    agent->sethostname(hostname);
-                    agent->setcommandLine(commandLine);
-
-                    if (!hostname.isEmpty())
+                    // Create a model of agent definition from JSON object
+                    DefinitionM* agentDefinition = _jsonHelper->createModelOfAgentDefinitionFromJSON(jsonDefinition.toObject());
+                    if (agentDefinition != NULL)
                     {
-                        HostM* host = IngeScapeLauncherManager::Instance().getHostWithName(hostname);
-                        if ((host != NULL) && !commandLine.isEmpty())
-                        {
-                            agent->setcanBeRestarted(true);
-                        }
+                        qDebug() << "Initialize agent" << agentName << "with definition" << agentDefinition->name();
                     }
                 }
-
-                // Add this new model of agent
-                addAgentModel(agent);
-
-                // Add this new model of agent definition for the agent name
-                addAgentDefinitionForAgentName(agentDefinition, agentName);
-
-                // Set its definition
-                agent->setdefinition(agentDefinition);
             }
         }
     }
+
+    /*for (int i = 0; i < agentsListToImport.count(); i++)
+    {
+        QPair<QStringList, DefinitionM*> pair = agentsListToImport.at(i);
+        QStringList agentNameAndParametersToRestart = pair.first;
+        DefinitionM* agentDefinition = pair.second;
+
+        QString agentName = agentNameAndParametersToRestart.first();
+
+        if (!agentName.isEmpty() && (agentDefinition != NULL))
+        {
+            // Create a new model of agent with the name
+            AgentM* agent = new AgentM(agentName, this);
+
+            if (agentNameAndParametersToRestart.count() == 3)
+            {
+                QString hostname = agentNameAndParametersToRestart.at(1);
+                QString commandLine = agentNameAndParametersToRestart.at(2);
+
+                agent->sethostname(hostname);
+                agent->setcommandLine(commandLine);
+
+                if (!hostname.isEmpty())
+                {
+                    HostM* host = IngeScapeLauncherManager::Instance().getHostWithName(hostname);
+                    if ((host != NULL) && !commandLine.isEmpty())
+                    {
+                        agent->setcanBeRestarted(true);
+                    }
+                }
+            }
+
+            // Add this new model of agent
+            addAgentModel(agent);
+
+            // Add this new model of agent definition for the agent name
+            addAgentDefinitionForAgentName(agentDefinition, agentName);
+
+            // Set its definition
+            agent->setdefinition(agentDefinition);
+        }
+    }*/
 }
+
+/*QList<QPair<QStringList, DefinitionM*>> JsonHelper::importAgentsList(QByteArray byteArrayOfJson)
+{
+    QList<QPair<QStringList, DefinitionM*>> agentsListToImport;
+
+    QJsonDocument jsonDocument = QJsonDocument::fromJson(byteArrayOfJson);
+
+    QJsonObject jsonRoot = jsonDocument.object();
+
+    if (jsonRoot.contains("agents"))
+    {
+        QJsonValue jsonAgentsList = jsonRoot.value("agents");
+        if (jsonAgentsList.isArray())
+        {
+            for (QJsonValue jsonValue : jsonAgentsList.toArray())
+            {
+                if (jsonValue.isObject())
+                {
+                    QJsonObject jsonAgent = jsonValue.toObject();
+
+                    // Get value for keys "agentName" and "definition"
+                    QJsonValue jsonName = jsonAgent.value("agentName");
+                    QJsonValue jsonDefinition = jsonAgent.value("definition");
+
+                    if (jsonName.isString() && jsonDefinition.isObject())
+                    {
+                        // Create a model of agent definition from JSON object
+                        DefinitionM* definition = _createModelOfAgentDefinitionFromJSON(jsonDefinition.toObject());
+                        if (definition != NULL)
+                        {
+                            qDebug() << "Initialize agent" << jsonName.toString() << "with definition" << definition->name();
+
+                            QStringList agentNameAndParametersToRestart;
+                            agentNameAndParametersToRestart.append(jsonName.toString());
+
+                            QJsonValue jsonHostname = jsonAgent.value("hostname");
+                            QJsonValue jsonCommandLine = jsonAgent.value("commandLine");
+
+                            if (jsonHostname.isString() && jsonCommandLine.isString())
+                            {
+                                agentNameAndParametersToRestart.append(jsonHostname.toString());
+                                agentNameAndParametersToRestart.append(jsonCommandLine.toString());
+                            }
+
+                            // Create a pair with agent name and definition
+                            QPair<QStringList, DefinitionM*> pair;
+
+                            pair.first = agentNameAndParametersToRestart;
+                            pair.second = definition;
+
+                            // Add the pair to the list
+                            agentsListToImport.append(pair);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return agentsListToImport;
+}*/
 
 
 /**
  * @brief Export the agents list to selected file
- * @param agentsListToExport list of pairs <agent name (and parameters to restart), definition>
+ * @param jsonArrayOfAgents
  */
-void IngeScapeModelManager::exportAgentsListToSelectedFile(QList<QPair<QStringList, DefinitionM*>> agentsListToExport)
+void IngeScapeModelManager::exportAgentsListToSelectedFile(QJsonArray jsonArrayOfAgents)
 {
     // "File Dialog" to get the file (path) to save
     QString agentsListFilePath = QFileDialog::getSaveFileName(NULL,
@@ -251,15 +334,12 @@ void IngeScapeModelManager::exportAgentsListToSelectedFile(QList<QPair<QStringLi
                                                               _rootDirectoryPath,
                                                               "JSON (*.json)");
 
-    if (!agentsListFilePath.isEmpty() && (_jsonHelper != NULL))
+    if (!agentsListFilePath.isEmpty())
     {
         qInfo() << "Save the agents list to JSON file" << agentsListFilePath;
 
-        // Export the agents list
-        QJsonArray arrayOfAgents = _jsonHelper->exportAgentsList(agentsListToExport);
-
         QJsonObject jsonRoot = QJsonObject();
-        jsonRoot.insert("agents", arrayOfAgents);
+        jsonRoot.insert("agents", jsonArrayOfAgents);
 
         QByteArray byteArrayOfJson = QJsonDocument(jsonRoot).toJson(QJsonDocument::Indented);
 
@@ -540,7 +620,7 @@ void IngeScapeModelManager::onDefinitionReceived(QString peerId, QString agentNa
         if (agent != NULL)
         {
             // Create a model of agent definition from JSON
-            DefinitionM* agentDefinition = _jsonHelper->createModelOfAgentDefinition(definitionJSON.toUtf8());
+            DefinitionM* agentDefinition = _jsonHelper->createModelOfAgentDefinitionFromBytes(definitionJSON.toUtf8());
             if (agentDefinition != NULL)
             {
                  if (agent->definition() == NULL)
