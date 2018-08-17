@@ -53,9 +53,8 @@ char definitionFile[BUFFER_SIZE];
 char mappingFile[BUFFER_SIZE];
 
 //SIGINT handling
-static volatile bool interruptionFlag = false;
 void interruptionReceived(int val) {
-    interruptionFlag = true;
+    //add code here of needed
 }
 
 /*

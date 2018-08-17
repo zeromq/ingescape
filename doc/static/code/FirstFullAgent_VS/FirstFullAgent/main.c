@@ -39,9 +39,8 @@ char definitionFile[BUFFER_SIZE];
 char mappingFile[BUFFER_SIZE];
 
 //SIGINT handling
-static volatile bool interruptionFlag = false;
 void interruptionReceived(int val) {
-	interruptionFlag = true;
+	//add code here if needed
 }
 
 /*
@@ -270,7 +269,7 @@ int main(int argc, const char * argv[]) {
 		zloop_destroy(&loop);
 	}
 	else {
-		while (!igs_Interrupted && !interruptionFlag) {
+		while (!igs_Interrupted) {
 			char message[1024];
 			if (!fgets(message, 1024, stdin))
 				break;

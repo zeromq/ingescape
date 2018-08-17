@@ -86,7 +86,7 @@ int main(int argc, char *argv[])
     //NB: callbacks can be attached to any IOP
     igs_observeInput("input1", myIOPCallback, NULL);
 
-    //Actually and finally start the agent
+    //Actually start the agent
     //First argument is the network device name to use
     //Second argument is the network port used by all the agents of your system
     igs_startWithDevice("Ethernet", 5670);
