@@ -382,20 +382,6 @@ private:
 
 
     /**
-     * @brief Open the scenario from JSON file
-     * @param scenarioFilePath
-     */
-    void _openScenarioFromFile(QString scenarioFilePath);
-
-
-    /**
-     * @brief Save the scenario to JSON file
-     * @param scenarioFilePath
-     */
-    void _saveScenarioToFile(QString scenarioFilePath);
-
-
-    /**
      * @brief Insert an actionVM into our timeline
      * @param action view model
      * @param line number

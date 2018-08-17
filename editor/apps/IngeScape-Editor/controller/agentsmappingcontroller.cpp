@@ -322,27 +322,13 @@ void AgentsMappingController::importMappingFromJson(QByteArray byteArrayOfJson)
         QList<mapping_agent_import_t*> listMappingImported = _jsonHelper->importMapping(byteArrayOfJson);
         if (!listMappingImported.isEmpty())
         {
-            //QList<ElementMappingM*> mappingElements;
+            QList<ElementMappingM*> mappingElements;
 
             for (mapping_agent_import_t* importedAgent : listMappingImported)
             {
-                //DefinitionM* definition = importedAgent->definition;
                 AgentMappingM* agentMapping = importedAgent->mapping;
 
                 QList<AgentM*> agentModelList = _modelManager->getAgentModelsListFromName(importedAgent->name);
-                /*if (agentModelList.isEmpty())
-                {
-                    AgentM* newAgent = new AgentM(importedAgent->name);
-
-                    newAgent->sethostname(importedAgent->hostname);
-                    newAgent->setcommandLine(importedAgent->commandLine);
-
-                    newAgent->setdefinition(definition);
-
-                    agentModelList.append(newAgent);
-
-                    Q_EMIT agentCreatedByMapping(newAgent);
-                }*/
 
                 if (!agentModelList.isEmpty())
                 {
@@ -357,7 +343,7 @@ void AgentsMappingController::importMappingFromJson(QByteArray byteArrayOfJson)
                         if (agentInMapping != NULL)
                         {
                             // Add the link elements
-                            //mappingElements.append(agentMapping->mappingElements()->toList());
+                            mappingElements.append(agentMapping->mappingElements()->toList());
 
                             // Set agent mapping
                             if (agentMapping != NULL)
@@ -372,8 +358,8 @@ void AgentsMappingController::importMappingFromJson(QByteArray byteArrayOfJson)
                 }
             }
 
-            // Add links
-            /*if (!mappingElements.isEmpty())
+            // FIXME: Add links ?
+            if (!mappingElements.isEmpty())
             {
                 // Create all mapping links
                 for (ElementMappingM* elementMapping : mappingElements)
@@ -382,7 +368,7 @@ void AgentsMappingController::importMappingFromJson(QByteArray byteArrayOfJson)
                         onMapped(elementMapping);
                     }
                 }
-            }*/
+            }
         }
     }
 }

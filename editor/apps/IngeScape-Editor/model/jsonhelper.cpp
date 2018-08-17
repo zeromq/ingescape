@@ -779,7 +779,7 @@ QList< mapping_agent_import_t* > JsonHelper::importMapping(QByteArray byteArrayO
     QJsonDocument jsonFileRoot = QJsonDocument::fromJson(byteArrayOfJson);
     if (jsonFileRoot.isObject())
     {
-        QJsonValue mappingsValue = jsonFileRoot.object().value("agents");
+        QJsonValue mappingsValue = jsonFileRoot.object().value("mapping");
         if (mappingsValue.isArray())
         {
             foreach (QJsonValue jsonValue, mappingsValue.toArray())
@@ -790,27 +790,26 @@ QList< mapping_agent_import_t* > JsonHelper::importMapping(QByteArray byteArrayO
 
                     // Get value for keys "agentName", "definition", "position", "hostname" and "commandLine"
                     QJsonValue jsonName = jsonAgent.value("agentName");
-                    QJsonValue jsonDefinition = jsonAgent.value("definition");
+                    //QJsonValue jsonDefinition = jsonAgent.value("definition");
                     QJsonValue jsonPosition = jsonAgent.value("position");
-                    QJsonValue jsonHostname = jsonAgent.value("hostname");
-                    QJsonValue jsonCommandLine = jsonAgent.value("commandLine");
+                    //QJsonValue jsonHostname = jsonAgent.value("hostname");
+                    //QJsonValue jsonCommandLine = jsonAgent.value("commandLine");
 
-                    if (jsonName.isString() && jsonDefinition.isObject())
+                    if (jsonName.isString() && jsonPosition.isString())
                     {
                         // Create the agent definition and mapping
-                        DefinitionM* definition = _createModelOfAgentDefinitionFromJSON(jsonDefinition.toObject());
+                        //DefinitionM* definition = _createModelOfAgentDefinitionFromJSON(jsonDefinition.toObject());
                         AgentMappingM* agentMapping = _createModelOfAgentMappingFromJSON(jsonName.toString(), jsonAgent);
-
-                        if (definition != NULL)
+                        if (agentMapping != NULL)
                         {
                             // Add our agent in mapping
                             mapping_agent_import_t* mappingAgent = new mapping_agent_import_t();
-                            mappingAgent->definition = definition;
+                            //mappingAgent->definition = definition;
                             mappingAgent->mapping = agentMapping;
                             mappingAgent->name = jsonName.toString();
                             mappingAgent->position = QPointF(0.0, 0.0);
-                            mappingAgent->hostname = "";
-                            mappingAgent->commandLine = "";
+                            //mappingAgent->hostname = "";
+                            //mappingAgent->commandLine = "";
 
                             // Set position
                             QStringList positionStringList = jsonPosition.toString().split(", ");
@@ -826,11 +825,11 @@ QList< mapping_agent_import_t* > JsonHelper::importMapping(QByteArray byteArrayO
                             }
 
                             // Set hostname and commandLine
-                            if (jsonHostname.isString() && jsonCommandLine.isString())
+                            /*if (jsonHostname.isString() && jsonCommandLine.isString())
                             {
                                 mappingAgent->hostname = jsonHostname.toString();
                                 mappingAgent->commandLine = jsonCommandLine.toString();
-                            }
+                            }*/
 
                             // Add to list
                             listAgentsMapping.append(mappingAgent);
@@ -877,7 +876,7 @@ QJsonArray JsonHelper::exportAllAgentsInMapping(QList<AgentInMappingVM*> agentsI
             jsonAgent.insert("position", position);
 
             // Set the definition
-            AgentM* firstModel = agentInMapping->models()->at(0);
+            /*AgentM* firstModel = agentInMapping->models()->at(0);
             if (firstModel != NULL)
             {
                 QJsonObject jsonDefinition = exportAgentDefinitionToJson(firstModel->definition());
@@ -886,7 +885,7 @@ QJsonArray JsonHelper::exportAllAgentsInMapping(QList<AgentInMappingVM*> agentsI
                 // FIXME TODO when agentInMapping->models > 1
                 jsonAgent.insert("hostname", firstModel->hostname());
                 jsonAgent.insert("commandLine", firstModel->commandLine());
-            }
+            }*/
 
             // Set the mapping
             QJsonObject jsonMapping = exportAgentMappingToJson(agentInMapping->temporaryMapping());

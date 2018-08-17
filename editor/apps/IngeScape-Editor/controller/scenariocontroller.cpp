@@ -1361,66 +1361,6 @@ QString ScenarioController::_buildNewActionName()
 
 
 /**
- * @brief Open the scenario from JSON file
- * @param scenarioFilePath
- */
-void ScenarioController::_openScenarioFromFile(QString scenarioFilePath)
-{
-    if (!scenarioFilePath.isEmpty() && (_jsonHelper != NULL))
-    {
-        qInfo() << "Open the scenario from JSON file" << scenarioFilePath;
-
-        QFile jsonFile(scenarioFilePath);
-        if (jsonFile.exists())
-        {
-            if (jsonFile.open(QIODevice::ReadOnly))
-            {
-                QByteArray byteArrayOfJson = jsonFile.readAll();
-                jsonFile.close();
-
-                importScenarioFromJson(byteArrayOfJson);
-            }
-            else {
-                qCritical() << "Can not open file" << scenarioFilePath;
-            }
-        }
-        else {
-            qWarning() << "There is no file" << scenarioFilePath;
-        }
-    }
-}
-
-
-/**
- * @brief Save the scenario to JSON file
- * @param scenarioFilePath
- */
-void ScenarioController::_saveScenarioToFile(QString scenarioFilePath)
-{
-    if (!scenarioFilePath.isEmpty() && (_jsonHelper != NULL))
-    {
-        qInfo() << "Save the scenario to JSON file" << scenarioFilePath;
-
-        // Save the scenario
-        QJsonObject scenarioJsonObject = _jsonHelper->exportScenario(_actionsList.toList(),_actionsInPaletteList.toList(),_actionsInTimeLine.toList());
-
-        // Conversion into byteArray
-        QByteArray byteArrayOfJson = QJsonDocument(scenarioJsonObject).toJson();
-
-        QFile jsonFile(scenarioFilePath);
-        if (jsonFile.open(QIODevice::WriteOnly))
-        {
-            jsonFile.write(byteArrayOfJson);
-            jsonFile.close();
-        }
-        else {
-            qCritical() << "Can not open file" << scenarioFilePath;
-        }
-    }
-}
-
-
-/**
  * @brief Insert an actionVM into our timeline
  * @param action view model
  * @return timeline line number

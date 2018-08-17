@@ -952,6 +952,18 @@ QJsonDocument IngeScapeEditorController::_getJsonOfCurrentPlatform()
     {
         QJsonObject platformJsonObject;
 
+        // Save the scenario
+        if (_scenarioC != NULL)
+        {
+            // actions list
+            // actions list in the palette
+            // actions list in the timeline
+            platformJsonObject = _jsonHelper->exportScenario(_scenarioC->actionsList()->toList(),
+                                                             _scenarioC->actionsInPaletteList()->toList(),
+                                                             _scenarioC->actionsInTimeLine()->toList());
+        }
+
+        // Save the agents list
         if (_agentsSupervisionC != NULL)
         {
             // Get the agents list to export
@@ -963,17 +975,6 @@ QJsonDocument IngeScapeEditorController::_getJsonOfCurrentPlatform()
             if (!arrayOfAgents.isEmpty()) {
                 platformJsonObject.insert("agents", arrayOfAgents);
             }
-        }
-
-        // Save the scenario
-        if (_scenarioC != NULL)
-        {
-            // actions list
-            // actions list in the palette
-            // actions list in the timeline
-            platformJsonObject = _jsonHelper->exportScenario(_scenarioC->actionsList()->toList(),
-                                                             _scenarioC->actionsInPaletteList()->toList(),
-                                                             _scenarioC->actionsInTimeLine()->toList());
         }
 
         // Save the mapping
