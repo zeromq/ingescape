@@ -101,25 +101,6 @@ void AgentsMappingController::createNewMapping()
 
 
 /**
- * @brief Save a Mapping
- */
-void AgentsMappingController::saveMapping()
-{
-    // "File Dialog" to get the file (path) to save
-    QString mappingFilePath = QFileDialog::getSaveFileName(NULL,
-                                                           "Save mapping",
-                                                           _directoryPath,
-                                                           "JSON (*.json)");
-
-    if (!mappingFilePath.isEmpty())
-    {
-        // Save the mapping to JSON file
-        _saveMappingToFile(mappingFilePath);
-    }
-}
-
-
-/**
  * @brief Remove the agent from the mapping and delete it
  * @param agent
  */
@@ -338,17 +319,18 @@ void AgentsMappingController::importMappingFromJson(QByteArray byteArrayOfJson)
         createNewMapping();
 
         // Initialize mapping lists from JSON file
-        QList< mapping_agent_import_t* > listMappingImported = _jsonHelper->importMapping(byteArrayOfJson);
+        QList<mapping_agent_import_t*> listMappingImported = _jsonHelper->importMapping(byteArrayOfJson);
         if (!listMappingImported.isEmpty())
         {
-            QList<ElementMappingM*> mappingElements;
+            //QList<ElementMappingM*> mappingElements;
+
             for (mapping_agent_import_t* importedAgent : listMappingImported)
             {
-                DefinitionM* definition = importedAgent->definition;
+                //DefinitionM* definition = importedAgent->definition;
                 AgentMappingM* agentMapping = importedAgent->mapping;
 
                 QList<AgentM*> agentModelList = _modelManager->getAgentModelsListFromName(importedAgent->name);
-                if (agentModelList.isEmpty())
+                /*if (agentModelList.isEmpty())
                 {
                     AgentM* newAgent = new AgentM(importedAgent->name);
 
@@ -360,30 +342,38 @@ void AgentsMappingController::importMappingFromJson(QByteArray byteArrayOfJson)
                     agentModelList.append(newAgent);
 
                     Q_EMIT agentCreatedByMapping(newAgent);
-                }
+                }*/
 
                 if (!agentModelList.isEmpty())
                 {
-                    // Create a new Agent In Mapping
-                    _addAgentModelsToMappingAtPosition(importedAgent->name, agentModelList, importedAgent->position);
-
-                    AgentInMappingVM* agentInMapping = getAgentInMappingFromName(importedAgent->name);
-                    if (agentInMapping != NULL)
+                    if (!importedAgent->position.isNull())
                     {
-                        // Add the link elements
-                        mappingElements.append(agentMapping->mappingElements()->toList());
+                        qDebug() << "position is defined:" << importedAgent->position.x() << importedAgent->position.y();
 
-                        // Set agent mapping
-                        if (agentMapping != NULL)
+                        // Create a new Agent In Mapping
+                        _addAgentModelsToMappingAtPosition(importedAgent->name, agentModelList, importedAgent->position);
+
+                        AgentInMappingVM* agentInMapping = getAgentInMappingFromName(importedAgent->name);
+                        if (agentInMapping != NULL)
                         {
-                            agentInMapping->settemporaryMapping(agentMapping);
+                            // Add the link elements
+                            //mappingElements.append(agentMapping->mappingElements()->toList());
+
+                            // Set agent mapping
+                            if (agentMapping != NULL)
+                            {
+                                agentInMapping->settemporaryMapping(agentMapping);
+                            }
                         }
+                    }
+                    else {
+                        qDebug() << "position is NULL:" << importedAgent->position.x() << importedAgent->position.y();
                     }
                 }
             }
 
             // Add links
-            if (!mappingElements.isEmpty())
+            /*if (!mappingElements.isEmpty())
             {
                 // Create all mapping links
                 for (ElementMappingM* elementMapping : mappingElements)
@@ -392,7 +382,7 @@ void AgentsMappingController::importMappingFromJson(QByteArray byteArrayOfJson)
                         onMapped(elementMapping);
                     }
                 }
-            }
+            }*/
         }
     }
 }
@@ -1209,37 +1199,4 @@ QPointF AgentsMappingController::_getRandomPosition(double randomMax)
     double y = 0.05 * _viewHeight + (0.90 * _viewHeight * randomY);
 
     return QPointF(x, y);
-}
-
-
-/**
- * @brief Save the mapping to JSON file
- * @param mappingFilePath
- */
-void AgentsMappingController::_saveMappingToFile(QString mappingFilePath)
-{
-    if (!mappingFilePath.isEmpty() && (_jsonHelper != NULL))
-    {
-        qInfo() << "Save the mapping to JSON file" << mappingFilePath;
-
-        QJsonArray jsonArray = _jsonHelper->exportAllAgentsInMapping(_allAgentsInMapping.toList());
-
-        if(jsonArray.count() > 0)
-        {
-            // Create json document
-            QJsonDocument jsonDocument = QJsonDocument(jsonArray);
-            QByteArray byteArrayOfJson = jsonDocument.toJson();
-
-            // Write file
-            QFile jsonFile(mappingFilePath);
-            if (jsonFile.open(QIODevice::WriteOnly))
-            {
-                jsonFile.write(byteArrayOfJson);
-                jsonFile.close();
-            }
-            else {
-                qCritical() << "Can not open file" << mappingFilePath;
-            }
-        }
-    }
 }

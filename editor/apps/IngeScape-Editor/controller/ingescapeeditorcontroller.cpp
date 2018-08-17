@@ -219,7 +219,6 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(_agentsMappingC, &AgentsMappingController::commandAskedToAgentAboutMappingInput, _networkC, &NetworkController::onCommandAskedToAgentAboutMappingInput);
     connect(_agentsMappingC, &AgentsMappingController::agentInMappingAdded, _scenarioC, &ScenarioController::onAgentInMappingAdded);
     connect(_agentsMappingC, &AgentsMappingController::agentInMappingRemoved, _scenarioC, &ScenarioController::onAgentInMappingRemoved);
-    connect(_agentsMappingC, &AgentsMappingController::agentCreatedByMapping, _modelManager, &IngeScapeModelManager::addAgentModel);
 
 
     // Connect to signals from the controller of the scenario
@@ -880,39 +879,14 @@ void IngeScapeEditorController::_loadPlatformFromFile(QString platformFilePath)
                 jsonFile.close();
 
                 // Import the agents list from JSON
-                if (_modelManager != NULL)
-                {
+                if (_modelManager != NULL) {
                     _modelManager->importAgentsListFromJson(byteArrayOfJson);
                 }
 
-                /*QJsonDocument jsonFileRoot = QJsonDocument::fromJson(byteArrayOfJson);
-                if (jsonFileRoot.isObject())
-                {
-                    QJsonValue agentsValue = jsonFileRoot.object().value("agents");
-                    if (agentsValue.isArray())
-                    {
-                        QJsonDocument jsonDocFromArray = QJsonDocument(agentsValue.toArray());
-
-                        QByteArray tempByteArrayOfJson = jsonDocFromArray.toJson(QJsonDocument::Compact);
-
-                        if (_jsonHelper != NULL)
-                        {
-                            // Initialize agents list from JSON file
-                            QList<QPair<QStringList, DefinitionM*>> agentsListToImport = _jsonHelper->initAgentsList(tempByteArrayOfJson);
-
-                            for (QPair<QStringList, DefinitionM*> pair : agentsListToImport)
-                            {
-                                qDebug() << "pair" << pair.first;
-                            }
-                        }
-                    }
-                }*/
-
-
-                // FIXME TODO: Import the mapping from JSON
-                /*if (_agentsMappingC != NULL) {
+                // Import the mapping from JSON
+                if (_agentsMappingC != NULL) {
                     _agentsMappingC->importMappingFromJson(byteArrayOfJson);
-                }*/
+                }
 
                 // Import the scenario from JSON
                 if (_scenarioC != NULL)
@@ -978,6 +952,19 @@ QJsonDocument IngeScapeEditorController::_getJsonOfCurrentPlatform()
     {
         QJsonObject platformJsonObject;
 
+        if (_agentsSupervisionC != NULL)
+        {
+            // Get the agents list to export
+            QList<QPair<QStringList, DefinitionM*>> agentsListToExport = _agentsSupervisionC->getAgentsListToExport();
+
+            // Export the agents list
+            QJsonArray arrayOfAgents = _jsonHelper->exportAgentsList(agentsListToExport);
+
+            if (!arrayOfAgents.isEmpty()) {
+                platformJsonObject.insert("agents", arrayOfAgents);
+            }
+        }
+
         // Save the scenario
         if (_scenarioC != NULL)
         {
@@ -989,13 +976,13 @@ QJsonDocument IngeScapeEditorController::_getJsonOfCurrentPlatform()
                                                              _scenarioC->actionsInTimeLine()->toList());
         }
 
-        // Save mapping
+        // Save the mapping
         if (_agentsMappingC != NULL)
         {
-            QJsonArray jsonArray = _jsonHelper->exportAllAgentsInMapping(_agentsMappingC->allAgentsInMapping()->toList());
+            QJsonArray arrayOfMappings = _jsonHelper->exportAllAgentsInMapping(_agentsMappingC->allAgentsInMapping()->toList());
 
-            if (!jsonArray.isEmpty()) {
-                platformJsonObject.insert("agents", jsonArray);
+            if (!arrayOfMappings.isEmpty()) {
+                platformJsonObject.insert("mapping", arrayOfMappings);
             }
         }
 

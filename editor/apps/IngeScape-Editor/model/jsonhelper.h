@@ -111,8 +111,9 @@ public:
     /**
      * @brief Export the agents list
      * @param agentsListToExport list of pairs <agent name (and parameters to restart), definition>
+     * @return
      */
-    QByteArray exportAgentsList(QList<QPair<QStringList, DefinitionM*>> agentsListToExport);
+    QJsonArray exportAgentsList(QList<QPair<QStringList, DefinitionM*>> agentsListToExport);
 
 
     /**

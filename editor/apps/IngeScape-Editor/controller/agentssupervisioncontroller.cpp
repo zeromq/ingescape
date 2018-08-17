@@ -120,11 +120,48 @@ void AgentsSupervisionController::exportAgentsListToSelectedFile()
     if (_modelManager != NULL)
     {
         // Get the agents list to export
-        QList<QPair<QStringList, DefinitionM*>> agentsListToExport = _getAgentsListToExport();
+        QList<QPair<QStringList, DefinitionM*>> agentsListToExport = getAgentsListToExport();
 
         // Export the agents list to selected file
         _modelManager->exportAgentsListToSelectedFile(agentsListToExport);
     }
+}
+
+
+/**
+ * @brief Get the agents list to export
+ * @return List of pairs <agent name (and parameters to restart), definition>
+ */
+QList<QPair<QStringList, DefinitionM*>> AgentsSupervisionController::getAgentsListToExport()
+{
+    // List of pairs <agent name (and parameters to restart), definition>
+    QList<QPair<QStringList, DefinitionM*>> agentsListToExport;
+
+    foreach (AgentVM* agent, _agentsList.toList())
+    {
+        if ((agent != NULL) && !agent->name().isEmpty() && (agent->definition() != NULL))
+        {
+            QStringList agentNameAndParametersToRestart;
+            agentNameAndParametersToRestart.append(agent->name());
+
+            if (agent->models()->count() > 0)
+            {
+                AgentM* firstModel = agent->models()->at(0);
+                if ((firstModel != NULL) && !firstModel->hostname().isEmpty() && !firstModel->commandLine().isEmpty())
+                {
+                    agentNameAndParametersToRestart.append(firstModel->hostname());
+                    agentNameAndParametersToRestart.append(firstModel->commandLine());
+                }
+            }
+
+            QPair<QStringList, DefinitionM*> pair;
+            pair.first = agentNameAndParametersToRestart;
+            pair.second = agent->definition();
+
+            agentsListToExport.append(pair);
+        }
+    }
+    return agentsListToExport;
 }
 
 
@@ -596,41 +633,4 @@ void AgentsSupervisionController::_deleteAgentViewModel(AgentVM* agent)
         // Free memory
         delete agent;
     }
-}
-
-
-/**
- * @brief Get the agents list to export
- * @return List of pairs <agent name (and parameters to restart), definition>
- */
-QList<QPair<QStringList, DefinitionM*>> AgentsSupervisionController::_getAgentsListToExport()
-{
-    // List of pairs <agent name (and parameters to restart), definition>
-    QList<QPair<QStringList, DefinitionM*>> agentsListToExport;
-
-    foreach (AgentVM* agent, _agentsList.toList())
-    {
-        if ((agent != NULL) && !agent->name().isEmpty() && (agent->definition() != NULL))
-        {
-            QStringList agentNameAndParametersToRestart;
-            agentNameAndParametersToRestart.append(agent->name());
-
-            if (agent->models()->count() > 0)
-            {
-                AgentM* firstModel = agent->models()->at(0);
-                if ((firstModel != NULL) && !firstModel->hostname().isEmpty() && !firstModel->commandLine().isEmpty())
-                {
-                    agentNameAndParametersToRestart.append(firstModel->hostname());
-                    agentNameAndParametersToRestart.append(firstModel->commandLine());
-                }
-            }
-
-            QPair<QStringList, DefinitionM*> pair;
-            pair.first = agentNameAndParametersToRestart;
-            pair.second = agent->definition();
-
-            agentsListToExport.append(pair);
-        }
-    }
-    return agentsListToExport;
 }

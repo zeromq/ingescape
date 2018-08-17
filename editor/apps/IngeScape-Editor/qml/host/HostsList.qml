@@ -45,7 +45,7 @@ Item {
     // Controller associated to our view
     property var controller : null;
 
-    property var hostDeltaY: 0
+    property real hostDeltaY: 0.0
 
 
     //--------------------------------
@@ -261,7 +261,7 @@ Item {
                             leftMargin: 10
                         }
 
-                        text: qsTr("- %1").arg(model.name)
+                        text: model.name
                         elide: Text.ElideRight
 
                         color: model.isON ? IngeScapeTheme.agentsListLabelColor : IngeScapeTheme.agentOFFLabelColor

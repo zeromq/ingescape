@@ -80,12 +80,6 @@ public:
 
 
     /**
-     * @brief Save a Mapping
-     */
-    Q_INVOKABLE void saveMapping();
-
-
-    /**
      * @brief Remove the agent from the mapping and delete it
      * @param agent
      */
@@ -196,13 +190,6 @@ Q_SIGNALS:
      * @param outputName
      */
     void commandAskedToAgentAboutMappingInput(QStringList peerIdsList, QString command, QString inputName, QString outputAgentName, QString outputName);
-
-
-    /**
-     * @brief Emitted when the mapping creates an agent on its side
-     * @param agent
-     */
-    void agentCreatedByMapping(AgentM* agent);
 
 
 public Q_SLOTS:
@@ -353,13 +340,6 @@ private:
      * @return
      */
     QPointF _getRandomPosition(double randomMax);
-
-
-    /**
-     * @brief Save the mapping to JSON file
-     * @param mappingFilePath
-     */
-    void _saveMappingToFile(QString mappingFilePath);
 
 
 private:

@@ -256,7 +256,12 @@ void IngeScapeModelManager::exportAgentsListToSelectedFile(QList<QPair<QStringLi
         qInfo() << "Save the agents list to JSON file" << agentsListFilePath;
 
         // Export the agents list
-        QByteArray byteArrayOfJson = _jsonHelper->exportAgentsList(agentsListToExport);
+        QJsonArray arrayOfAgents = _jsonHelper->exportAgentsList(agentsListToExport);
+
+        QJsonObject jsonRoot = QJsonObject();
+        jsonRoot.insert("agents", arrayOfAgents);
+
+        QByteArray byteArrayOfJson = QJsonDocument(jsonRoot).toJson(QJsonDocument::Indented);
 
         QFile jsonFile(agentsListFilePath);
         if (jsonFile.open(QIODevice::WriteOnly))

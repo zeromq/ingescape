@@ -76,6 +76,13 @@ public:
     Q_INVOKABLE void exportAgentsListToSelectedFile();
 
 
+    /**
+     * @brief Get the agents list to export
+     * @return List of pairs <agent name (and parameters to restart), definition>
+     */
+    QList<QPair<QStringList, DefinitionM*>> getAgentsListToExport();
+
+
 Q_SIGNALS:
 
     /**
@@ -198,13 +205,6 @@ private:
      * @param agent
      */
     void _deleteAgentViewModel(AgentVM* agent);
-
-
-    /**
-     * @brief Get the agents list to export
-     * @return List of pairs <agent name (and parameters to restart), definition>
-     */
-    QList<QPair<QStringList, DefinitionM*>> _getAgentsListToExport();
 
 
 private:
