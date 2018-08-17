@@ -43,7 +43,7 @@ HostsSupervisionController::~HostsSupervisionController()
     setselectedHost(NULL);
 
     // Clear the hash table
-    _mapFromNameToHost.clear();
+    _hashFromAddressToHostVM.clear();
 
     // Free memory
     _hostsList.deleteAllItems();
@@ -64,31 +64,38 @@ void HostsSupervisionController::reset()
 
 
 /**
- * @brief Slot when a new model of host has been created
+ * @brief Slot called when a new model of host has been created
  * @param host
  */
 void HostsSupervisionController::onHostModelCreated(HostM* host)
 {
     if (host != NULL)
     {
-        HostVM* newHostVM = new HostVM(host, this);
+        QString ipAddress = host->ipAddress();
 
-        _hostsList.append(newHostVM);
-
-        if (!_mapFromNameToHost.contains(host->name())) {
-            _mapFromNameToHost.insert(host->name(), newHostVM);
-        }
-
-        connect(newHostVM, &HostVM::commandAskedToHost, this, &HostsSupervisionController::commandAskedToHost);
-
-        // Associate host with existing agents if necessary
-        for (AgentM* agent : _allAgents)
+        // Get the view model of host with this IP address
+        HostVM* hostVM = _getHostWithAddress(ipAddress);
+        if (hostVM == NULL)
         {
-            if ((agent != NULL) && (agent->address() == host->ipAddress()) && !newHostVM->listOfAgents()->contains(agent))
-            {
-                qDebug() << "Add agent " << agent->name() << " to host " << newHostVM->name();
+            // Create a view model for this model of host
+            hostVM = new HostVM(host, this);
 
-                newHostVM->listOfAgents()->append(agent);
+            connect(hostVM, &HostVM::commandAskedToHost, this, &HostsSupervisionController::commandAskedToHost);
+
+            _hashFromAddressToHostVM.insert(ipAddress, hostVM);
+
+            // Add to the sorted list of hosts
+            _hostsList.append(hostVM);
+
+            // Associate host with existing agents if necessary
+            for (AgentM* agent : _allAgents)
+            {
+                if ((agent != NULL) && (agent->address() == ipAddress) && !hostVM->listOfAgents()->contains(agent))
+                {
+                    qDebug() << "Add agent " << agent->name() << " to host " << hostVM->name();
+
+                    hostVM->listOfAgents()->append(agent);
+                }
             }
         }
     }
@@ -96,41 +103,40 @@ void HostsSupervisionController::onHostModelCreated(HostM* host)
 
 
 /**
- * @brief Slot when a model of host will be removed
+ * @brief Slot called when a model of host will be removed
  * @param host
  */
 void HostsSupervisionController::onHostModelWillBeRemoved(HostM* host)
 {
     if (host != NULL)
     {
-        if (_mapFromNameToHost.contains(host->name()))
+        QString ipAddress = host->ipAddress();
+
+        // Get the view model of host with this IP address
+        HostVM* hostVM = _getHostWithAddress(ipAddress);
+        if (hostVM != NULL)
         {
-            HostVM* hostToRemove = _mapFromNameToHost.value(host->name());
-            if (hostToRemove != NULL)
-            {
-                disconnect(hostToRemove, &HostVM::commandAskedToHost, this, &HostsSupervisionController::commandAskedToHost);
+            disconnect(hostVM, &HostVM::commandAskedToHost, this, &HostsSupervisionController::commandAskedToHost);
 
-                if (_hostsList.contains(hostToRemove)) {
-                    _hostsList.remove(hostToRemove);
-                }
+            _hashFromAddressToHostVM.remove(ipAddress);
 
-                if (_selectedHost == hostToRemove) {
-                    // Clean-up current selection
-                    setselectedHost(NULL);
-                }
-
-                // Free memory
-                delete hostToRemove;
+            if (_selectedHost == hostVM) {
+                // Clean-up current selection
+                setselectedHost(NULL);
             }
 
-            _mapFromNameToHost.remove(host->name());
+            // Remove from the sorted list of hosts
+            _hostsList.remove(hostVM);
+
+            // Free memory
+            delete hostVM;
         }
     }
 }
 
 
 /**
- * @brief Slot when a new model of agent has been created
+ * @brief Slot called when a new model of agent has been created
  * @param agent
  */
 void HostsSupervisionController::onAgentModelCreated(AgentM* agent)
@@ -141,28 +147,21 @@ void HostsSupervisionController::onAgentModelCreated(AgentM* agent)
             _allAgents.append(agent);
         }
 
-        // Try to get the involved hostVM with agent's host name
-        for (HostVM* host : _hostsList.toList())
+        // Get the view model of host with this IP address
+        HostVM* hostVM = _getHostWithAddress(agent->address());
+        if ((hostVM != NULL) && !hostVM->listOfAgents()->contains(agent))
         {
-            if ( (host != NULL) && (host->modelM() != NULL)
-                &&
-                (host->modelM()->ipAddress() == agent->address())
-                &&
-                !host->listOfAgents()->contains(agent) )
-            {
-                host->listOfAgents()->append(agent);
+            // Add this agent to the host
+            hostVM->listOfAgents()->append(agent);
 
-                qDebug() << "Add agent " << agent->name() << " to host " << host->name();
-
-                break;
-            }
+            qDebug() << "Add agent " << agent->name() << " to host " << hostVM->name();
         }
     }
 }
 
 
 /**
- * @brief Slot when a model of agent will be deleted
+ * @brief Slot called when a model of agent will be deleted
  * @param agent
  */
 void HostsSupervisionController::onAgentModelWillBeDeleted(AgentM* agent)
@@ -173,18 +172,31 @@ void HostsSupervisionController::onAgentModelWillBeDeleted(AgentM* agent)
             _allAgents.removeOne(agent);
         }
 
-        // Try to get the involved hostVM with agent's host name
-        for (HostVM* host : _hostsList.toList())
+        // Get the view model of host with this IP address
+        HostVM* hostVM = _getHostWithAddress(agent->address());
+        if ((hostVM != NULL) && hostVM->listOfAgents()->contains(agent))
         {
-            if ((host != NULL) && host->listOfAgents()->contains(agent))
-            {
-                host->listOfAgents()->remove(agent);
+            // Remove this agent from the host
+            hostVM->listOfAgents()->remove(agent);
 
-                qDebug() << "Remove agent " << agent->name() << " from host " << host->modelM()->name();
-
-                break;
-            }
+            qDebug() << "Remove agent " << agent->name() << " from host " << hostVM->modelM()->name();
         }
+    }
+}
+
+
+/**
+ * @brief Get the view model of host with an IP address
+ * @param ipAddress
+ * @return
+ */
+HostVM* HostsSupervisionController::_getHostWithAddress(QString ipAddress)
+{
+    if (_hashFromAddressToHostVM.contains(ipAddress)) {
+        return _hashFromAddressToHostVM.value(ipAddress);
+    }
+    else {
+        return NULL;
     }
 }
 

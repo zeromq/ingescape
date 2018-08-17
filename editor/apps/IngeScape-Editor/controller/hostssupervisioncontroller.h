@@ -72,28 +72,28 @@ Q_SIGNALS:
 public Q_SLOTS:
 
     /**
-     * @brief Slot when a new model of host has been created
+     * @brief Slot called when a new model of host has been created
      * @param host
      */
     void onHostModelCreated(HostM* host);
 
 
     /**
-     * @brief Slot when a model of host will be removed
+     * @brief Slot called when a model of host will be removed
      * @param host
      */
     void onHostModelWillBeRemoved(HostM* host);
 
 
     /**
-     * @brief Slot when a new model of agent has been created
+     * @brief Slot called when a new model of agent has been created
      * @param agent
      */
     void onAgentModelCreated(AgentM* agent);
 
 
     /**
-     * @brief Slot when a model of agent will be deleted
+     * @brief Slot called when a model of agent will be deleted
      * @param agent
      */
     void onAgentModelWillBeDeleted(AgentM* agent);
@@ -101,9 +101,18 @@ public Q_SLOTS:
 
 private:
 
-    // FIXME use the IP address as key
-    // Has table from "Name" to the "(view model of) Host"
-    QHash<QString, HostVM*> _mapFromNameToHost;
+    /**
+     * @brief Get the view model of host with an IP address
+     * @param ipAddress
+     * @return
+     */
+    HostVM* _getHostWithAddress(QString ipAddress);
+
+
+private:
+
+    // Has table from "IP address" to the "(view model of) Host"
+    QHash<QString, HostVM*> _hashFromAddressToHostVM;
 
     // List of all agents
     QList<AgentM*> _allAgents;
