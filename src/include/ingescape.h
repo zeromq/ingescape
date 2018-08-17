@@ -72,20 +72,19 @@ PUBLIC int igs_observeFreeze(igs_freezeCallback cb, void *myData);
 PUBLIC void igs_setCanBeFrozen(bool canBeFrozen);
 PUBLIC bool igs_canBeFrozen(void);
 
-//There are three non-exclusive ways to check & stop the execution of the ingescape
-//instance and its hosting application:
-//1- using igs_start* and igs_stop from the hosting app
-//2- monitoring the status of igs_Interrupted in the hosting app
-//3- setting igs_Interrupted from IngeScape callbacks and arranging to call igs_stop from parent thread when igs_Interrupted is set to true
-//In any case, igs_stop MUST NEVER BE CALLED from any ingeScape callback, as it would cause a thread dead lock.
+//There are four non-exclusive ways to stop the execution of an ingescape agent:
+//1- calling igs_stop from the hosting app's threads reacting on user actions or external events
+//2- handling SIGINT in the hosting app to call igs_stop and stop the rest of the app properly
+//3- monitoring the status of igs_Interrupted in the hosting app
+//4- using an igs_forcedStopCallback (see below) and calling code ON THE MAIN APP THREAD from it
+//In any case, igs_stop MUST NEVER BE CALLED directly from any ingeScape callback, as it would cause a thread deadlock.
 
-PUBLIC extern bool igs_Interrupted;
-//register a callback when the agent is asked to stop on the network
-//NB: NEVER CALL igs_stop from such a callback
+PUBLIC extern bool igs_Interrupted; //true when the ingescape library triggered SIGINT when forced to stop
 typedef void (*igs_forcedStopCallback)(void *myData);
+//register a callback when the agent is forced to stop by the ingescape platform
 PUBLIC void igs_observeForcedStop(igs_forcedStopCallback cb, void *myData);
 
-//terminate the agent and trigger the forcedStopCallbacks
+//terminate the agent with trigger of SIGINT and call to the registered igs_forcedStopCallbacks
 PUBLIC void igs_die(void);
 
 //////////////////////////////////////////////////

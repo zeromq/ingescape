@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <signal.h>
 
 #if (defined WIN32 || defined _WIN32)
 #endif
@@ -1262,7 +1263,6 @@ initLoop (zsock_t *pipe, void *args){
     igs_info("loop stopping...");
 
     //clean
-    igs_Interrupted = true;
     zyreAgent_t *zagent, *tmpa;
     HASH_ITER(hh, zyreAgents, zagent, tmpa){
         HASH_DEL(zyreAgents, zagent);
@@ -1288,9 +1288,20 @@ initLoop (zsock_t *pipe, void *args){
         DL_FOREACH(forcedStopCalbacks, cb){
             cb->callback_ptr(cb->myData);
         }
-        forcedStop = false;
     }
     igs_info("loop stopped");
+    if (forcedStop){
+        igs_Interrupted = true;
+        //in case of foreced stop, we send SIGINT to our process so
+        //that it can be trapped by main thread for a proper stop
+        #if defined __unix__ || defined __APPLE__
+        igs_info("triggering SIGINT");
+        kill(pid, SIGINT);
+        #endif
+        //TODO : do that for windows also
+        forcedStop = false;
+        igs_Interrupted = false;
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1409,6 +1420,7 @@ int igs_startWithDevice(const char *networkDevice, unsigned int port){
         igs_stop();
     }
     igs_Interrupted = false;
+    forcedStop = false;
     
     agentElements = calloc(1, sizeof(zyreloopElements_t));
     strncpy(agentElements->networkDevice, networkDevice, NETWORK_DEVICE_LENGTH);
@@ -1471,6 +1483,7 @@ int igs_startWithIP(const char *ipAddress, unsigned int port){
         igs_stop();
     }
     igs_Interrupted = false;
+    forcedStop = false;
     agentElements = calloc(1, sizeof(zyreloopElements_t));
     agentElements->brokerEndPoint[0] = '\0';
     strncpy(agentElements->ipAddress, ipAddress, IP_ADDRESS_LENGTH);
@@ -1526,6 +1539,7 @@ int igs_startWithDeviceOnBroker(const char *networkDevice, const char *brokerIpA
         igs_stop();
     }
     igs_Interrupted = false;
+    forcedStop = false;
     
     agentElements = calloc(1, sizeof(zyreloopElements_t));
     strncpy(agentElements->brokerEndPoint, brokerIpAddress, IP_ADDRESS_LENGTH);
@@ -1598,8 +1612,6 @@ int igs_stop(){
     }else{
         igs_info("Agent already stopped");
     }
-    igs_Interrupted = true;
-    
     return 1;
 }
 
