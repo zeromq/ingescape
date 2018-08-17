@@ -1299,8 +1299,6 @@ initLoop (zsock_t *pipe, void *args){
         kill(pid, SIGINT);
         #endif
         //TODO : do that for windows also
-        forcedStop = false;
-        igs_Interrupted = false;
     }
 }
 
