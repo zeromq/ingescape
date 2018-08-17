@@ -148,15 +148,16 @@ public:
 
 
     /**
-     * @brief Import an agents list from selected file
-     */
-    Q_INVOKABLE void importAgentsListFromSelectedFile();
-
-
-    /**
      * @brief Import an agent or an agents list from selected file (definition)
      */
     Q_INVOKABLE bool importAgentOrAgentsListFromSelectedFile();
+
+
+    /**
+     * @brief Import an agents list from a json byte content
+     * @param byteArrayOfJson
+     */
+    void importAgentsListFromJson(QByteArray byteArrayOfJson);
 
 
     /**
@@ -394,21 +395,6 @@ public Q_SLOTS:
 
 
 private:
-
-    /**
-     * @brief Import the agents list from JSON file
-     * @param agentsListFilePath
-     */
-    void _importAgentsListFromFile(QString agentsListFilePath);
-
-
-    /**
-     * @brief Export the agents list to JSON file
-     * @param agentsListToExport list of pairs <agent name (and parameters to restart), definition>
-     * @param agentsListFilePath
-     */
-    void _exportAgentsListToFile(QList<QPair<QStringList, DefinitionM*>> agentsListToExport, QString agentsListFilePath);
-
 
     /**
      * @brief Update definition variants of the list of definitions with the same name

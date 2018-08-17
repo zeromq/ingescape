@@ -37,11 +37,11 @@ JsonHelper::~JsonHelper()
 
 
 /**
- * @brief Initialize agents list from JSON file
+ * @brief Import a list of agents from a JSON file
  * @param byteArrayOfJson
  * @return
  */
-QList<QPair<QStringList, DefinitionM*>> JsonHelper::initAgentsList(QByteArray byteArrayOfJson)
+QList<QPair<QStringList, DefinitionM*>> JsonHelper::importAgentsList(QByteArray byteArrayOfJson)
 {
     QList<QPair<QStringList, DefinitionM*>> agentsListToImport;
 

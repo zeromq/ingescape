@@ -172,7 +172,12 @@ ApplicationWindow {
 
                 onTriggered: {
                     if (IngeScapeEditorC.modelManager) {
-                        IngeScapeEditorC.modelManager.importAgentsListFromSelectedFile();
+                        IngeScapeEditorC.modelManager.importAgentOrAgentsListFromSelectedFile();
+
+                        /*var success = IngeScapeEditorC.modelManager.importAgentOrAgentsListFromSelectedFile();
+                        if (!success) {
+                            popupErrorMessage.open();
+                        }*/
                     }
                 }
             }

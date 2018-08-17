@@ -826,7 +826,7 @@ void IngeScapeEditorController::_onStartToRecord()
  */
 void IngeScapeEditorController::_onLoadingRecord(int deltaTimeFromTimeLine, QString jsonPlatform, QString jsonExecutedActions)
 {
-    // TODO jsonExecutedActions
+    // FIXME TODO jsonExecutedActions
     Q_UNUSED(jsonExecutedActions)
 
     if ((deltaTimeFromTimeLine >= 0) && !jsonPlatform.isEmpty())
@@ -879,18 +879,42 @@ void IngeScapeEditorController::_loadPlatformFromFile(QString platformFilePath)
                 QByteArray byteArrayOfJson = jsonFile.readAll();
                 jsonFile.close();
 
-                // FIXME TODO: Import the agents list from JSON
-                /*if (_modelManager != NULL)
+                // Import the agents list from JSON
+                if (_modelManager != NULL)
                 {
                     _modelManager->importAgentsListFromJson(byteArrayOfJson);
-                }*/
-
-                // Import the mapping from JSON
-                if (_agentsMappingC != NULL) {
-                    _agentsMappingC->importMappingFromJson(byteArrayOfJson);
                 }
 
-                // Import scenario
+                /*QJsonDocument jsonFileRoot = QJsonDocument::fromJson(byteArrayOfJson);
+                if (jsonFileRoot.isObject())
+                {
+                    QJsonValue agentsValue = jsonFileRoot.object().value("agents");
+                    if (agentsValue.isArray())
+                    {
+                        QJsonDocument jsonDocFromArray = QJsonDocument(agentsValue.toArray());
+
+                        QByteArray tempByteArrayOfJson = jsonDocFromArray.toJson(QJsonDocument::Compact);
+
+                        if (_jsonHelper != NULL)
+                        {
+                            // Initialize agents list from JSON file
+                            QList<QPair<QStringList, DefinitionM*>> agentsListToImport = _jsonHelper->initAgentsList(tempByteArrayOfJson);
+
+                            for (QPair<QStringList, DefinitionM*> pair : agentsListToImport)
+                            {
+                                qDebug() << "pair" << pair.first;
+                            }
+                        }
+                    }
+                }*/
+
+
+                // FIXME TODO: Import the mapping from JSON
+                /*if (_agentsMappingC != NULL) {
+                    _agentsMappingC->importMappingFromJson(byteArrayOfJson);
+                }*/
+
+                // Import the scenario from JSON
                 if (_scenarioC != NULL)
                 {
                     // Clear scenario

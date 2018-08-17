@@ -242,7 +242,8 @@ Item {
                 }
 
                 onClicked: {
-                    if (IngeScapeEditorC.modelManager) {
+                    if (IngeScapeEditorC.modelManager)
+                    {
                         //console.log("Import Agent(s)")
                         var success = IngeScapeEditorC.modelManager.importAgentOrAgentsListFromSelectedFile();
                         if (!success) {

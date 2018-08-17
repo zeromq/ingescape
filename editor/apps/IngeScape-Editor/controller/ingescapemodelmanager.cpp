@@ -115,25 +115,6 @@ void IngeScapeModelManager::setisMappingControlled(bool value)
 
 
 /**
- * @brief Import an agents list from selected file
- */
-void IngeScapeModelManager::importAgentsListFromSelectedFile()
-{
-    // "File Dialog" to get the file (path) to open
-    QString agentsListFilePath = QFileDialog::getOpenFileName(NULL,
-                                                              "Open agents",
-                                                              _rootDirectoryPath,
-                                                              "JSON (*.json)");
-
-    if (!agentsListFilePath.isEmpty())
-    {
-        // Import the agents list from JSON file
-        _importAgentsListFromFile(agentsListFilePath);
-    }
-}
-
-
-/**
  * @brief Import an agent or an agents list from selected file (definition)
  */
 bool IngeScapeModelManager::importAgentOrAgentsListFromSelectedFile()
@@ -161,8 +142,8 @@ bool IngeScapeModelManager::importAgentOrAgentsListFromSelectedFile()
             // List of agents
             if (jsonRoot.contains("agents"))
             {
-                // Import the agents list from JSON file
-                _importAgentsListFromFile(agentFilePath);
+                // Import the agents list from a json byte content
+                importAgentsListFromJson(byteArrayOfJson);
             }
             // One agent
             else
@@ -203,6 +184,62 @@ bool IngeScapeModelManager::importAgentOrAgentsListFromSelectedFile()
 
 
 /**
+ * @brief Import an agents list from a json byte content
+ * @param byteArrayOfJson
+ */
+void IngeScapeModelManager::importAgentsListFromJson(QByteArray byteArrayOfJson)
+{
+    if (_jsonHelper != NULL)
+    {
+        // Import the agents list
+        QList<QPair<QStringList, DefinitionM*>> agentsListToImport = _jsonHelper->importAgentsList(byteArrayOfJson);
+
+        for (int i = 0; i < agentsListToImport.count(); i++)
+        {
+            QPair<QStringList, DefinitionM*> pair = agentsListToImport.at(i);
+            QStringList agentNameAndParametersToRestart = pair.first;
+            DefinitionM* agentDefinition = pair.second;
+
+            QString agentName = agentNameAndParametersToRestart.first();
+
+            if (!agentName.isEmpty() && (agentDefinition != NULL))
+            {
+                // Create a new model of agent with the name
+                AgentM* agent = new AgentM(agentName, this);
+
+                if (agentNameAndParametersToRestart.count() == 3)
+                {
+                    QString hostname = agentNameAndParametersToRestart.at(1);
+                    QString commandLine = agentNameAndParametersToRestart.at(2);
+
+                    agent->sethostname(hostname);
+                    agent->setcommandLine(commandLine);
+
+                    if (!hostname.isEmpty())
+                    {
+                        HostM* host = IngeScapeLauncherManager::Instance().getHostWithName(hostname);
+                        if ((host != NULL) && !commandLine.isEmpty())
+                        {
+                            agent->setcanBeRestarted(true);
+                        }
+                    }
+                }
+
+                // Add this new model of agent
+                addAgentModel(agent);
+
+                // Add this new model of agent definition for the agent name
+                addAgentDefinitionForAgentName(agentDefinition, agentName);
+
+                // Set its definition
+                agent->setdefinition(agentDefinition);
+            }
+        }
+    }
+}
+
+
+/**
  * @brief Export the agents list to selected file
  * @param agentsListToExport list of pairs <agent name (and parameters to restart), definition>
  */
@@ -214,10 +251,22 @@ void IngeScapeModelManager::exportAgentsListToSelectedFile(QList<QPair<QStringLi
                                                               _rootDirectoryPath,
                                                               "JSON (*.json)");
 
-    if (!agentsListFilePath.isEmpty())
+    if (!agentsListFilePath.isEmpty() && (_jsonHelper != NULL))
     {
-        // Export the agents list to JSON file
-        _exportAgentsListToFile(agentsListToExport, agentsListFilePath);
+        qInfo() << "Save the agents list to JSON file" << agentsListFilePath;
+
+        // Export the agents list
+        QByteArray byteArrayOfJson = _jsonHelper->exportAgentsList(agentsListToExport);
+
+        QFile jsonFile(agentsListFilePath);
+        if (jsonFile.open(QIODevice::WriteOnly))
+        {
+            jsonFile.write(byteArrayOfJson);
+            jsonFile.close();
+        }
+        else {
+            qCritical() << "Can not open file" << agentsListFilePath;
+        }
     }
 }
 
@@ -1093,107 +1142,6 @@ void IngeScapeModelManager::deleteAgentMapping(AgentMappingM* agentMapping)
         delete agentMapping;
 
         //_printMappings();
-    }
-}
-
-
-/**
- * @brief Import the agents list from JSON file
- * @param agentsListFilePath
- */
-void IngeScapeModelManager::_importAgentsListFromFile(QString agentsListFilePath)
-{
-    if (!agentsListFilePath.isEmpty() && (_jsonHelper != NULL))
-    {
-        qInfo() << "Import the agents list from JSON file" << agentsListFilePath;
-
-        QFile jsonFile(agentsListFilePath);
-        if (jsonFile.exists())
-        {
-            if (jsonFile.open(QIODevice::ReadOnly))
-            {
-                QByteArray byteArrayOfJson = jsonFile.readAll();
-                jsonFile.close();
-
-                // Initialize agents list from JSON file
-                QList<QPair<QStringList, DefinitionM*>> agentsListToImport = _jsonHelper->initAgentsList(byteArrayOfJson);
-
-                for (int i = 0; i < agentsListToImport.count(); i++)
-                {
-                    QPair<QStringList, DefinitionM*> pair = agentsListToImport.at(i);
-                    QStringList agentNameAndParametersToRestart = pair.first;
-                    DefinitionM* agentDefinition = pair.second;
-
-                    QString agentName = agentNameAndParametersToRestart.first();
-
-                    if (!agentName.isEmpty() && (agentDefinition != NULL))
-                    {
-                        // Create a new model of agent with the name
-                        AgentM* agent = new AgentM(agentName, this);
-
-                        if (agentNameAndParametersToRestart.count() == 3)
-                        {
-                            QString hostname = agentNameAndParametersToRestart.at(1);
-                            QString commandLine = agentNameAndParametersToRestart.at(2);
-
-                            agent->sethostname(hostname);
-                            agent->setcommandLine(commandLine);
-
-                            if (!hostname.isEmpty())
-                            {
-                                HostM* host = IngeScapeLauncherManager::Instance().getHostWithName(hostname);
-                                if ((host != NULL) && !commandLine.isEmpty())
-                                {
-                                    agent->setcanBeRestarted(true);
-                                }
-                            }
-                        }
-
-                        // Add this new model of agent
-                        addAgentModel(agent);
-
-                        // Add this new model of agent definition for the agent name
-                        addAgentDefinitionForAgentName(agentDefinition, agentName);
-
-                        // Set its definition
-                        agent->setdefinition(agentDefinition);
-                    }
-                }
-            }
-            else {
-                qCritical() << "Can not open file" << agentsListFilePath;
-            }
-        }
-        else {
-            qWarning() << "There is no file" << agentsListFilePath;
-        }
-    }
-}
-
-
-/**
- * @brief Export the agents list to JSON file
- * @param agentsListToExport list of pairs <agent name (and parameters to restart), definition>
- * @param agentsListFilePath
- */
-void IngeScapeModelManager::_exportAgentsListToFile(QList<QPair<QStringList, DefinitionM*>> agentsListToExport, QString agentsListFilePath)
-{
-    if (!agentsListFilePath.isEmpty() && (_jsonHelper != NULL))
-    {
-        qInfo() << "Save the agents list to JSON file" << agentsListFilePath;
-
-        // Export the agents list
-        QByteArray byteArrayOfJson = _jsonHelper->exportAgentsList(agentsListToExport);
-
-        QFile jsonFile(agentsListFilePath);
-        if (jsonFile.open(QIODevice::WriteOnly))
-        {
-            jsonFile.write(byteArrayOfJson);
-            jsonFile.close();
-        }
-        else {
-            qCritical() << "Can not open file" << agentsListFilePath;
-        }
     }
 }
 
