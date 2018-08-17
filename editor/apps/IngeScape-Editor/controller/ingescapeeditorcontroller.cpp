@@ -127,7 +127,7 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     _agentsSupervisionC = new AgentsSupervisionController(_modelManager, _jsonHelper, this);
 
     // Create the controller for hosts supervision
-    _hostsSupervisionC = new HostsSupervisionController(_launcherManager, this);
+    _hostsSupervisionC = new HostsSupervisionController(this);
 
     // Create the controller for records supervision
     _recordsSupervisionC = new RecordsSupervisionController(_modelManager, _jsonHelper, this);
@@ -476,16 +476,15 @@ void IngeScapeEditorController::savePlatformToDefaultFile()
  */
 void IngeScapeEditorController::createNewPlatform()
 {
-    // Create new mapping
     if (_agentsMappingC != NULL)
     {
+        // Create a new mapping (clear the previous one)
         _agentsMappingC->createNewMapping();
     }
 
-    // Create new scenario
     if (_scenarioC != NULL)
     {
-        // Reset scenario
+        // Reset scenario (clear the list of actions in the list, in the palette and in the timeline)
         _scenarioC->clearScenario();
     }
 
@@ -597,6 +596,17 @@ bool IngeScapeEditorController::restartNetwork(QString strPort, QString networkD
                 settings.endGroup();
                 // Save new values
                 settings.sync();
+
+
+                // Reset the list of launchers (hosts)
+                if (_launcherManager != NULL) {
+                    _launcherManager->reset();
+                }
+
+                // Reset the list of agents
+                if (_hostsSupervisionC != NULL) {
+                    _hostsSupervisionC->reset();
+                }
 
 
                 // Create a new empty platform by deleting all existing data

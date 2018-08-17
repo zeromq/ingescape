@@ -9,6 +9,8 @@
  *
  *	Contributors:
  *      Bruno Lemenicier <lemenicier@ingenuity.io>
+ *      Alexandre Lemort <lemort@ingenuity.io>
+ *      Vincent Peyruqueou <peyruqueou@ingenuity.io>
  *
  */
 
@@ -29,9 +31,11 @@ class HostVM : public QObject
 {
     Q_OBJECT
 
-    // FIXME: modelM instead of hostModel
+    // Name of our host
+    I2_QML_PROPERTY_READONLY(QString, name)
+
     // Model of our host
-    I2_QML_PROPERTY_DELETE_PROOF(HostM*, hostModel)
+    I2_QML_PROPERTY_READONLY(HostM*, modelM)
 
     // List of associated Agents
     I2_QOBJECT_LISTMODEL(AgentM, listOfAgents)
@@ -42,23 +46,27 @@ class HostVM : public QObject
     // Falg indicating if the host is streaming or not
     I2_QML_PROPERTY(bool, isStreaming)
 
+
 public:
 
     /**
-     * @brief HostVM Default constructor
+     * @brief Constructor
      * @param parent
      */
     explicit HostVM(HostM* model, QObject *parent = nullptr);
+
 
     /**
      * @brief Destructor
      */
     ~HostVM();
 
+
     /**
      * @brief Change the state of our host
      */
     Q_INVOKABLE void changeState();
+
 
 Q_SIGNALS:
 

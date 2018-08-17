@@ -33,7 +33,7 @@
 
 /**
  * @brief Structure used for scenario importation from a json string
- * @param list of actions models in the table
+ * @param list of actions models in the list
  * @param list of actions in the palette
  * @param list of actions in the timeline
  */
@@ -154,7 +154,7 @@ public:
      * @param byteArrayOfJson
      * @param agents list
      * @return the scenario importation structure containing the list of actions
-     *         in the table, in the palette and in the timeline
+     *         in the list, in the palette and in the timeline
      */
     scenario_import_actions_lists_t * initActionsList(QByteArray byteArrayOfJson, QList<AgentInMappingVM*> listAgentsInMapping);
 

@@ -80,6 +80,12 @@ public:
     QString getPeerIdOfLauncherWithHostName(QString hostName);
 
 
+    /**
+     * @brief Reset the list of launchers (hosts)
+     */
+    void reset();
+
+
 Q_SIGNALS:
 
     /**
@@ -88,11 +94,13 @@ Q_SIGNALS:
      */
     void hostModelCreated(HostM* host);
 
+
     /**
-     * @brief Signal emitted when a model of host has been removed
+     * @brief Signal emitted when a model of host will be removed
      * @param agent
      */
     void hostModelWillBeRemoved(HostM* host);
+
 
 private:
 
@@ -118,7 +126,7 @@ private:
 
 private:
 
-    // Map from "Name" to the "Host" of the corresponding INGESCAPE launcher
+    // Hash table from "Name" to the "Host" of the corresponding INGESCAPE launcher
     QHash<QString, HostM*> _mapFromNameToHost;
 
 };
