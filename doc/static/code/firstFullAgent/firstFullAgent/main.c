@@ -28,10 +28,9 @@ char definitionFile[BUFFER_SIZE];
 char mappingFile[BUFFER_SIZE];
 
 //SIGINT handling
-static volatile bool interruptionFlag = false;
 void interruptionReceived(int val) {
     IGS_UNUSED(val);
-    interruptionFlag = true;
+    //do something here if needed
 }
 
 /*
@@ -139,7 +138,7 @@ void makeFilePath(char *from, char *to, size_t size_of_to){
 //
 int main(int argc, const char * argv[]) {
     
-    //register to SIGINT
+    //register to SIGINT (optional)
     signal(SIGINT, interruptionReceived);
     
     //manage options
@@ -263,7 +262,7 @@ int main(int argc, const char * argv[]) {
         zloop_start(loop); //this function is blocking until SIGINT is received
         zloop_destroy(&loop);
     }else{
-        while (!igs_Interrupted && !interruptionFlag) {
+        while (!igs_Interrupted) {
             char message [1024];
             if (!fgets (message, 1024, stdin))
                 break;
