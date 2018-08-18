@@ -1292,7 +1292,7 @@ initLoop (zsock_t *pipe, void *args){
     igs_info("loop stopped");
     if (forcedStop){
         igs_Interrupted = true;
-        //in case of foreced stop, we send SIGINT to our process so
+        //in case of forced stop, we send SIGINT to our process so
         //that it can be trapped by main thread for a proper stop
         #if defined __unix__ || defined __APPLE__
         igs_info("triggering SIGINT");
