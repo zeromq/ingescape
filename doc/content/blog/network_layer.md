@@ -1,7 +1,7 @@
 +++
 title = "The ingeScape network layer"
 date = "2018-04-20T11:36:41+02:00"
-tags = ["agents"]
+tags = ["network"]
 categories = ["learn"]
 banner = "img/banners/network_layer.jpg"
 genre = "article"
@@ -35,7 +35,7 @@ ingeScape has been designed to support hundreds of agents possibly involving hun
 
 ### Patterns based on the ingeScape paradigm and library
 
-To organize a given environment, ingeScape proposes a simple paradigm based on data flows between inputs and outputs of agents. This paradigm was designed to be as simple and straightforward as possible. However, this simplicity still enables to cover most of the possibilities offered by software bus solutions, sometimes without their pitfalls.
+To organize a given environment, ingeScape proposes a simple paradigm based on data flows between inputs and outputs of agents. This paradigm was designed to be as simple and straightforward as possible. However, this simplicity still enables to cover most of the possibilities offered by software bus solutions, often without their usual pitfalls.
 
 #### Publish/Subscribe
 
@@ -50,7 +50,7 @@ This pattern is the preferred one because it shows both its relevance in many in
 
 ingeScape addresses this possibility in two different manners:
 
-- The first one is simply by using mappings from one output to several inputs, so that the inputs are fed with text, binary of numeric data. The mapping paradigm easily enables to create the links between all agents requiring to exchange messages.
+- The first one is simply by using mappings from one output to several inputs, so that the inputs are fed with text, binary of numeric data written on the other agent's output. The *mapping* concept easily enables to create the links between all agents requiring to exchange messages.
 - The second one is an actual MoM embedded in the ingeScape library. This MoM is used internally for metadata exchanges between agents. We made it available in the advanced ingeScape API so that developers can create topics (a.k.a. discussion channels) and send private messages of any kind.
 
 
@@ -58,11 +58,11 @@ ingeScape addresses this possibility in two different manners:
 
 ingeScape does not support the [Data Distribution Service](https://en.wikipedia.org/wiki/Data_Distribution_Service) (DDS) as defined by the [Object Management Group](https://en.wikipedia.org/wiki/Object_Management_Group). However, it offers a simpler equivalent solution to the DDS DCPS layer and partially to the DLRL layer with the same spirit and objectives.
 
-Based on the ingeScape paradigm and PUB/SUB pattern, it is very easy to conceive an agent (arm more) serving as data storage. This agent offers as many outputs as the variables it shall expose. Inputs can be added to this agent, to enable changing these variables. When it is done, this agent becomes a distributed shared memory space.
+Based on the ingeScape paradigm and PUB/SUB pattern, it is very easy to conceive an agent (or more) serving as data storage. This agent offers as many outputs as the variables it shall expose. Inputs can be added to this agent, to enable changing these variables. Once it is done, this agent becomes a distributed shared memory space.
 
-Agents interested in a variable just have to connect one of their inputs to the corresponding output. Agents wanting to modify a variable  may map one of their outputs to the corresponding input.
+Agents interested in a variable just have to connect one of their inputs to the corresponding output. Agents wanting to modify a variable  may map one of their outputs to the corresponding input on the data storage agent to modify it.
 
-Finally, when an agent adds a new map from one of its inputs to another agent's output, this output is sent specifically to the input so that it is immediately updated with the latest value, so that later joiners or restarting agents do not miss at least the last value.
+When an agent adds a new map from one of its inputs to another agent's output, this output is sent specifically to the input so that it is immediately updated with the latest value, so that later joiners or restarting agents do not miss the latest current value.
 
 
 #### Enterprise Service Buses
@@ -74,23 +74,25 @@ In addition to this, the advanced ingeScape API provides a services description 
 
 #### What about old good Client/Server ?
 
-The ingeScape paradigm based on *definitions* and *mapping* does not cover the Request/Reply (a.k.a REQ/REP) pattern completely: with the ingeScape paradigm, it is difficult to have a server send its reply to a specific agent only by emitting on its outputs, because an agent has no knowledge of the mappings to its outputs.
+The ingeScape paradigm based on *definitions* and *mapping* does not cover the Request/Reply (a.k.a REQ/REP) pattern completely: with this ingeScape paradigm, it is difficult to have a server send its reply to a specific agent only by emitting on its outputs, because an agent has no knowledge of the mappings to its outputs.
 
-However, the MoM features proposed by ingeScape, especially when using private messages for replies, cover REQ/REP perfectly. In addition, the ingeScape network layer implements the REQ/REP pattern natively, enabling to set it up if required by performance or security constraints.
+That is why ingeScape introduced the *tokens* concept. A token can be seen as a public service exposed by an agent to any other agent. The service is called from any agent by naming the target agent and the service name and by providing the expected complementary information as parameters. This is just like a function call in any programming language, except that the call is for an agent on the network. When a token on an agent is called, the caller is known and is thus able to receive a private custom answer, using another token.
+
+Moreover, the MoM features proposed by ingeScape, especially when using private messages for replies, also covers REQ/REP perfectly. In addition, the ingeScape network layer implements the REQ/REP pattern natively, enabling to set it up if required by performance or security constraints.
 
 
 #### Advanced patterns
 
-The PUB/SUB pattern (and the REQ/REP pattern) is not fully convenient to cover advanced task delegation scenarios, for instance when a ventilator shall distribute tasks to an arbitrary and variable number of workers, which, in turn, send their results to a collector. Fortunately, the ingeScape network layer, combined with some expertise, can handle these situations.
+The PUB/SUB pattern and the REQ/REP pattern may not be fully convenient to cover advanced task delegation scenarios, for instance when a ventilator shall distribute tasks to an arbitrary and variable number of workers, which, in turn, send their results to a collector. Fortunately, the ingeScape network layer, combined with some expertise, can handle these situations.
 
-For other patterns engaging reliability, redundancy, synchronicity, etc., ad-hoc solutions are always possible, often without breaking the simplicity of the ingeScape paradigm. The paradigm exposed by ingeScape relies on a network layer that already covers many difficulties related to network communications and can be extended to face real-world challenges, at least as efficiently as many other software buses.
+For other patterns engaging reliability, redundancy, synchronicity, etc., ad-hoc solutions are always possible, often without breaking the simplicity of the ingeScape paradigm. The paradigm exposed by ingeScape relies on a network layer that already covers many difficulties related to network communications and can be extended to face the most complex real-world challenges, at least as efficiently as many other software buses.
 
 
-### Other network features
+### Other important and advanced network features
 
 ingeScape aims at making distributed architectures as easy as possible. But it does not neglect or ignore common and advanced challenges faced by heterogeneous systems relying on network communications.
 
-In addition to the advanced patterns described before, the ingeScape network layer covers the following :
+In addition to the advanced patterns described here above, the ingeScape network layer covers the following features:
 
 - Data serialization, even for very large data streams,
 - Low-level protocols other than TCP/IP and including UDP, Multicast, IPC, TIPC, shared memory, etc.
