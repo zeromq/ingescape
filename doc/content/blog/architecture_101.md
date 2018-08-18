@@ -63,7 +63,7 @@ The main advantage of this approach is that the encapsulation behind a high-leve
 Once the high-level header has been designed and developed to match with the defined model for the agent including IOPs and tokens, one needs to finally write the code for the agent, i.e. code the reactions between inputs, outputs and tokens, including the exposed parameters...
 
 ## Coding an agent : it’s all about the glue…
-We already covered how to code command line parameters and console commands in our [Your First complete agent](). Creating IOPs and observing them is describe in [Your first ingeScape agent](). TODO: tokens.
+We already covered how to code command line parameters and console commands in our [Your First complete agent](). Creating IOPs and observing them is describe in [Your first ingeScape agent]().
 
 Basically, coding an agent is mixing the following things in your callbacks code (i.e. observe callbacks for IOPs, tokens, etc.):
 
@@ -79,7 +79,7 @@ Sometimes, an agent may be based on a legacy application with its own architectu
 
 The ingeScape library creates its own set of threads and does not need to rely on the execution control of the main application. In addition, we deigned the ingeScape library so that an application will be an agent. This means that commands sent to and  callbacks registered to the ingeScape libraries can be called from any place inside the main application code. This clean separation offers a total integration flexibility. Integration ingeScape code inside an industrial or legacy application can be seen as « surgically » integrating the ingeScape code where it suits best inside the existing or constrained code.
 
-The ingeScape library is developed in C. This enables portability on any operating system and wrapping inside any programming language. In addition to C++ and Objective-C that can include the ingeScape C API without any cost, ingeScape has already been wrapped in C# for Microsoft environments and in Python to quickly create agents by using the amazing work of the Python community. Java will be coming shortly.
+The ingeScape library is developed in C. This enables portability on any operating system and wrapping inside any programming language. In addition to C++ and Objective-C that can include the ingeScape C API without any cost, ingeScape has already been wrapped in C# for Microsoft environments, in Python to quickly create agents by using the amazing work of the Python community, and in Javascript/QML for a seamless integration in Qt Creator. Java will be coming shortly.
 
 Independently from the programming language, here are the major steps for making industrial or legacy software a proper and well designed ingeScape agent:
 
