@@ -5,15 +5,17 @@
 #####################################################################
 
 
-SOURCES += \
-    $$PWD/../src/definition.c \
-    $$PWD/../src/mapping.c \
-    $$PWD/../src/model.c \
-    $$PWD/../src/network.c \
-    $$PWD/../src/parser.c \
-    $$PWD/../src/admin.c \
-    $$PWD/../src/bus.c \
-    $$PWD/../src/token.c
+equals(TEMPLATE, "lib"){
+    SOURCES += \
+        $$PWD/../src/definition.c \
+        $$PWD/../src/mapping.c \
+        $$PWD/../src/model.c \
+        $$PWD/../src/network.c \
+        $$PWD/../src/parser.c \
+        $$PWD/../src/admin.c \
+        $$PWD/../src/bus.c \
+        $$PWD/../src/token.c
+}
 
 HEADERS += \
     $$PWD/../src/include/uthash/uthash.h \
@@ -41,16 +43,18 @@ win32:{
         #configuration DEBUG
         DESTDIR = $$OUT_PWD/debug
         libs_path = $$PWD/../dependencies/windows/libs/win32/Debug
+        ingescape_libs_path_dep = "C:/ingescape/libs/debug/"
     }else {
         #configuration RELEASE
         DESTDIR = $$OUT_PWD/release
         libs_path = $$PWD/../dependencies/windows/libs/win32/Release
+        ingescape_libs_path_dep = "C:/ingescape/libs/release/"
     }
 
     #UNIX functions
-    SOURCES += $$PWD/../dependencies/windows/unix/unixfunctions.c \
+    SOURCES += $$PWD/../dependencies/windows/unix/unixfunctions.c
 
-    HEADERS += $$PWD/../dependencies/windows/unix/unixfunctions.h \
+    HEADERS += $$PWD/../dependencies/windows/unix/unixfunctions.h
 
     #Add librairies
     LIBS += -L$$libs_path -llibzyre -llibczmq -lyajl
@@ -76,6 +80,7 @@ win32:{
     }
     equals(TEMPLATE, "app"){
         message("Template is type app, we dont copy the ingescape and zyre dll to the C:")
+        LIBS += -L$$ingescape_libs_path_dep -lingescape
     }
 }
 
@@ -129,6 +134,9 @@ mac:{
     LIBS += /usr/local/lib/libczmq.dylib
     LIBS += /usr/local/lib/libzyre.dylib
     LIBS += /usr/local/lib/libyajl.dylib
+    equals(TEMPLATE, "app"){
+        LIBS += /usr/local/lib/libingescape.dylib
+    }
 }
 
 
@@ -143,88 +151,88 @@ unix:!mac {
     yajl_include_path = $$PWD/../dependencies/windows/headers/
 
     INCLUDEPATH += $$zyre_include_path \
-                   $$yajl_include_path \
+                   $$yajl_include_path
 
     DEPENDPATH += $$zyre_include_path \
-                  $$yajl_include_path \
+                  $$yajl_include_path
 
     raspberry_compilation {
         ############ Raspberry ###########
-    message("Compilation raspberry scope ...")
+        message("Compilation raspberry scope ...")
 
-    QMAKE_CFLAGS_DEBUG = \
-        -std=gnu99
+        QMAKE_CFLAGS_DEBUG = \
+            -std=gnu99
 
-    QMAKE_CFLAGS_RELEASE = \
-        -std=gnu99
+        QMAKE_CFLAGS_RELEASE = \
+            -std=gnu99
 
-    libs_path = $$PWD/../dependencies/raspberry/libs
+        libs_path = $$PWD/../dependencies/raspberry/libs
 
-    #Destination repository for our librairy
-    DESTDIR = /usr/local/lib
+        #Destination repository for our librairy
+        DESTDIR = /usr/local/lib
 
-    #Add librairies
-    LIBS += -L$$libs_path -lzmq -lczmq -lzyre -lyajl
+        #Add librairies
+        LIBS += -L$$libs_path -lzmq -lczmq -lzyre -lyajl
 
-    #include the pri to copy files to usr/local/libs
-    include ("$$PWD/../dependencies/windows/common/pri/ingescape-job-copy.pri")
+        #include the pri to copy files to usr/local/libs
+        include ("$$PWD/../dependencies/windows/common/pri/ingescape-job-copy.pri")
     }
 
     android_compilation {
         ############ Android ###########
-    message("Compilation android scope ...")
+        message("Compilation android scope ...")
 
-    QMAKE_CFLAGS_DEBUG = \
-        -std=gnu99
+        QMAKE_CFLAGS_DEBUG = \
+            -std=gnu99
 
-    QMAKE_CFLAGS_RELEASE = \
-        -std=gnu99
+        QMAKE_CFLAGS_RELEASE = \
+            -std=gnu99
 
-    # This define is used in "network.c" to use the "ifaddrs.h" for android but only to pass the compilation
-    # After we need to use the newest functions : "igs_start_ip" & "init_actor_ip" instead of "igs_start" & "init_actor"
-    # Because getting the Ip Address dynamically by "ifaddrs.c" doesnt work
-    DEFINES +=  ANDROID
+        # This define is used in "network.c" to use the "ifaddrs.h" for android but only to pass the compilation
+        # After we need to use the newest functions : "igs_start_ip" & "init_actor_ip" instead of "igs_start" & "init_actor"
+        # Because getting the Ip Address dynamically by "ifaddrs.c" doesnt work
+        DEFINES +=  ANDROID
 
-    INCLUDEPATH += $$PWD/../dependencies/android/android-ifaddrs-master/ \
+        INCLUDEPATH += $$PWD/../dependencies/android/android-ifaddrs-master/ \
 
-    SOURCES += $$PWD/../dependencies/android/android-ifaddrs-master/ifaddrs.c \
+        SOURCES += $$PWD/../dependencies/android/android-ifaddrs-master/ifaddrs.c \
 
-    HEADERS += $$PWD/../dependencies/android/android-ifaddrs-master/ifaddrs.h \
+        HEADERS += $$PWD/../dependencies/android/android-ifaddrs-master/ifaddrs.h \
 
-    libs_path = $$PWD/../dependencies/android/libs-armeabi-v7a
-    LIBS += $$quote(-L$$libs_path/) -lzmq -lczmq -lzyre -lyajl \
+        libs_path = $$PWD/../dependencies/android/libs-armeabi-v7a
+        LIBS += $$quote(-L$$libs_path/) -lzmq -lczmq -lzyre -lyajl \
 
-    ############ Copy needed in C:\ ############
-    #include the pri to copy files to C:\
-    include ("$$PWD/../dependencies/windows/common/pri/ingescape-job-copy.pri")
+        ############ Copy needed in C:\ ############
+        #include the pri to copy files to C:\
+        include ("$$PWD/../dependencies/windows/common/pri/ingescape-job-copy.pri")
     }
 
     !raspberry_compilation:!android_compilation {
         ############ Linux ###########
-    message("Compilation Linux scope ...")
+        message("Compilation Linux scope ...")
 
-    libzyre_path = $$PWD/zyre/bin/Linux
-    libyajl_path = $$PWD/yajl/lloyd-yajl-2.1.0/Linux/lib
+        libzyre_path = $$PWD/zyre/bin/Linux
+        libyajl_path = $$PWD/yajl/lloyd-yajl-2.1.0/Linux/lib
 
-    LIBS += -L$$libzyre_path -lzmq -lczmq -lzyre \
-            -L$$libyajl_path -lyajl
+        LIBS += -L$$libzyre_path -lzmq -lczmq -lzyre \
+                -L$$libyajl_path -lyajl
 
 
-    #Destination repository for our librairy
-    DESTDIR = /usr/local/lib
+        #Destination repository for our librairy
+        DESTDIR = /usr/local/lib
 
-    #Copy includes
-    install_headers.files += $$PWD/../src/include/*.h \
-                             $$PWD/../src/include/uthash
-    install_headers.path += /usr/local/include/ingescape
+        #Copy includes
+        install_headers.files += $$PWD/../src/include/*.h \
+                                 $$PWD/../src/include/uthash
+        install_headers.path += /usr/local/include/ingescape
 
-    #Copy libraries
-    install_libs.files += $$libzyre_path/*.dylib \
-                          $$libyajl_path/*.dylib
-    install_libs.path += $$DESTDIR
+        #Copy libraries
+        install_libs.files += $$libzyre_path/*.dylib \
+                              $$libyajl_path/*.dylib
+        install_libs.path += $$DESTDIR
 
-    #Add installation options
-    INSTALLS += install_libs \
-                install_headers
+        #Add installation options
+        INSTALLS += install_libs \
+                    install_headers
     }
 }
