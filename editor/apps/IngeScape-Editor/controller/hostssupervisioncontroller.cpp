@@ -193,9 +193,27 @@ void HostsSupervisionController::onAgentModelWillBeDeleted(AgentM* agent)
  */
 void HostsSupervisionController::onAgentExecutionOnHost(QString agentName, QString hostname, QString commandLine)
 {
-    Q_UNUSED(commandLine)
+    if (!agentName.isEmpty() && !hostname.isEmpty() && !commandLine.isEmpty())
+    {
+        qDebug() << "On Agent Execution on Host" << agentName << hostname;
 
-    qDebug() << "Agent Execution on Host" << agentName << hostname;
+        HostVM* host = _getHostWithName(hostname);
+        if (host != NULL)
+        {
+            // Get the same agent execution on this host
+            AgentExecutionOnHostM* agentExecutionOnHost = host->getSameAgentExecutionOnHost(agentName, commandLine);
+            if (agentExecutionOnHost == NULL)
+            {
+                agentExecutionOnHost = new AgentExecutionOnHostM(agentName, hostname, commandLine);
+
+                host->listOfAgentExecution()->append(agentExecutionOnHost);
+            }
+        }
+
+        // Usefull to create and save AgentExecutionOnHostM when there is no host for this host name
+        // (to use it later when the corresponding host will appear) ?
+        //_allAgentExecutionOnHost.append(agentExecutionOnHost);
+    }
 }
 
 
@@ -212,5 +230,29 @@ HostVM* HostsSupervisionController::_getHostWithAddress(QString ipAddress)
     else {
         return NULL;
     }
+}
+
+
+/**
+ * @brief Get the view model of host with a name
+ * @param hostName
+ * @return
+ */
+HostVM* HostsSupervisionController::_getHostWithName(QString hostName)
+{
+    HostVM* host = NULL;
+
+    if (!hostName.isEmpty() && !_hostsList.isEmpty())
+    {
+        for (HostVM* iterator : _hostsList.toList())
+        {
+            if ((iterator != NULL) && (iterator->name() == hostName))
+            {
+                host = iterator;
+                break;
+            }
+        }
+    }
+    return host;
 }
 

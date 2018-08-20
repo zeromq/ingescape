@@ -358,11 +358,15 @@ void AgentsSupervisionController::_onAgentDefinitionChangedWithPreviousAndNewVal
                                 }
                             }
 
-                            if (!isSameModel) {
-                                // 2.2- Add the model of agent to the list of the VM
-                                agentUsingSameDefinition->models()->append(model);
+                            if (!isSameModel)
+                            {
+                                if (!model->hostname().isEmpty())
+                                {
+                                    // 2.2- Add the model of agent to the list of the VM
+                                    agentUsingSameDefinition->models()->append(model);
 
-                                qDebug() << "Add model of agent" << model->name() << "on" << model->address();
+                                    qDebug() << "Add model of agent" << model->name() << "on" << model->address();
+                                }
                             }
                         }
                     }

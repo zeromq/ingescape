@@ -180,6 +180,7 @@ Item {
             id: hostItem
 
             property var model_listOfAgents: model.listOfAgents
+            property var model_listOfAgentExecution: model.listOfAgentExecution
 
             //height: 5 + hostInfos.height + 6
             height: 5 + hostName.height + hostInfos.spacing + hostIP.height + hostInfos.spacing + listViewOfAgents.height + 6
@@ -250,7 +251,8 @@ Item {
                 ListView {
                     id: listViewOfAgents
 
-                    model: hostItem.model_listOfAgents
+                    //model: hostItem.model_listOfAgents
+                    model: hostItem.model_listOfAgentExecution
 
                     interactive: false
 
@@ -261,10 +263,11 @@ Item {
                             leftMargin: 10
                         }
 
-                        text: model.name
+                        //text: model.name
+                        text: model.agentName
                         elide: Text.ElideRight
 
-                        color: model.isON ? IngeScapeTheme.agentsListLabelColor : IngeScapeTheme.agentOFFLabelColor
+                        color: IngeScapeTheme.agentOFFLabelColor // model.isON ? IngeScapeTheme.agentsListLabelColor : IngeScapeTheme.agentOFFLabelColor
 
                         font: IngeScapeTheme.normalFont
                     }

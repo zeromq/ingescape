@@ -1035,8 +1035,11 @@ void IngeScapeModelManager::deleteAgentModel(AgentM* agent)
             _mapFromPeerIdToAgentM.remove(agent->peerId());
         }
 
-        // Free memory
-        delete agent;
+        // Free memory...later
+        // the call to "agent->setdefinition" will produce the call of the slot _onAgentDefinitionChangedWithPreviousAndNewValues
+        // ...and in some cases, the call to deleteAgentModel on this agent. So we cannot call directly "delete agent;"
+        //delete agent;
+        agent->deleteLater();
 
         //_printAgents();
     }

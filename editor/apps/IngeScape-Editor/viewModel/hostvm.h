@@ -73,6 +73,15 @@ public:
     Q_INVOKABLE void changeState();
 
 
+    /**
+     * @brief Get the same agent execution on our host
+     * @param agentName
+     * @param commandLine
+     * @return
+     */
+    AgentExecutionOnHostM* getSameAgentExecutionOnHost(QString agentName, QString commandLine);
+
+
 Q_SIGNALS:
 
     /**

@@ -118,6 +118,14 @@ private:
     HostVM* _getHostWithAddress(QString ipAddress);
 
 
+    /**
+     * @brief Get the view model of host with a name
+     * @param hostName
+     * @return
+     */
+    HostVM* _getHostWithName(QString hostName);
+
+
 private:
 
     // Has table from "IP address" to the "(view model of) Host"
@@ -125,6 +133,9 @@ private:
 
     // List of all agents
     QList<AgentM*> _allAgents;
+
+    // List of all agent execution on host
+    QList<AgentExecutionOnHostM*> _allAgentExecutionOnHost;
 };
 
 QML_DECLARE_TYPE(HostsSupervisionController)
