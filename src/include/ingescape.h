@@ -134,21 +134,21 @@ PUBLIC int igs_readParameterAsData(const char *name, void **data, size_t *size);
 PUBLIC int igs_writeInputAsBool(const char *name, bool value);
 PUBLIC int igs_writeInputAsInt(const char *name, int value);
 PUBLIC int igs_writeInputAsDouble(const char *name, double value);
-PUBLIC int igs_writeInputAsString(const char *name, char *value);
+PUBLIC int igs_writeInputAsString(const char *name, const char *value);
 PUBLIC int igs_writeInputAsImpulsion(const char *name);
 PUBLIC int igs_writeInputAsData(const char *name, void *value, size_t size);
 
 PUBLIC int igs_writeOutputAsBool(const char *name, bool value);
 PUBLIC int igs_writeOutputAsInt(const char *name, int value);
 PUBLIC int igs_writeOutputAsDouble(const char *name, double value);
-PUBLIC int igs_writeOutputAsString(const char *name, char *value);
+PUBLIC int igs_writeOutputAsString(const char *name, const char *value);
 PUBLIC int igs_writeOutputAsImpulsion(const char *name);
 PUBLIC int igs_writeOutputAsData(const char *name, void *value, size_t size);
 
 PUBLIC int igs_writeParameterAsBool(const char *name, bool value);
 PUBLIC int igs_writeParameterAsInt(const char *name, int value);
 PUBLIC int igs_writeParameterAsDouble(const char *name, double value);
-PUBLIC int igs_writeParameterAsString(const char *name, char *value);
+PUBLIC int igs_writeParameterAsString(const char *name, const char *value);
 PUBLIC int igs_writeParameterAsData(const char *name, void *value, size_t size);
 
 //check IOP type, lists and existence
