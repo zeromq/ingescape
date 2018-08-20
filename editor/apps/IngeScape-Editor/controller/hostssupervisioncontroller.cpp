@@ -186,38 +186,6 @@ void HostsSupervisionController::onAgentModelWillBeDeleted(AgentM* agent)
 
 
 /**
- * @brief Slot called when an agent execution on host must be created
- * @param agentName
- * @param hostname
- * @param commandLine
- */
-void HostsSupervisionController::onAgentExecutionOnHost(QString agentName, QString hostname, QString commandLine)
-{
-    if (!agentName.isEmpty() && !hostname.isEmpty() && !commandLine.isEmpty())
-    {
-        qDebug() << "On Agent Execution on Host" << agentName << hostname;
-
-        HostVM* host = _getHostWithName(hostname);
-        if (host != NULL)
-        {
-            // Get the same agent execution on this host
-            AgentExecutionOnHostM* agentExecutionOnHost = host->getSameAgentExecutionOnHost(agentName, commandLine);
-            if (agentExecutionOnHost == NULL)
-            {
-                agentExecutionOnHost = new AgentExecutionOnHostM(agentName, hostname, commandLine);
-
-                host->listOfAgentExecution()->append(agentExecutionOnHost);
-            }
-        }
-
-        // Usefull to create and save AgentExecutionOnHostM when there is no host for this host name
-        // (to use it later when the corresponding host will appear) ?
-        //_allAgentExecutionOnHost.append(agentExecutionOnHost);
-    }
-}
-
-
-/**
  * @brief Get the view model of host with an IP address
  * @param ipAddress
  * @return

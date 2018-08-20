@@ -99,15 +99,6 @@ public Q_SLOTS:
     void onAgentModelWillBeDeleted(AgentM* agent);
 
 
-    /**
-     * @brief Slot called when an agent execution on host must be created
-     * @param agentName
-     * @param hostname
-     * @param commandLine
-     */
-    void onAgentExecutionOnHost(QString agentName, QString hostname, QString commandLine);
-
-
 private:
 
     /**
@@ -134,8 +125,6 @@ private:
     // List of all agents
     QList<AgentM*> _allAgents;
 
-    // List of all agent execution on host
-    QList<AgentExecutionOnHostM*> _allAgentExecutionOnHost;
 };
 
 QML_DECLARE_TYPE(HostsSupervisionController)

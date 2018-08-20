@@ -92,8 +92,7 @@ SOURCES += main.cpp \
     controller/logstreamcontroller.cpp \
     model/logm.cpp \
     sortFilter/logssortfilter.cpp \
-    model/scenario/condition/conditiononagentm.cpp \
-    model/agentexecutiononhostm.cpp
+    model/scenario/condition/conditiononagentm.cpp
 
 HEADERS += \
     stable.h \
@@ -163,8 +162,7 @@ HEADERS += \
     controller/logstreamcontroller.h \
     model/logm.h \
     sortFilter/logssortfilter.h \
-    model/scenario/condition/conditiononagentm.h \
-    model/agentexecutiononhostm.h
+    model/scenario/condition/conditiononagentm.h
 
 
 RESOURCES += qml.qrc

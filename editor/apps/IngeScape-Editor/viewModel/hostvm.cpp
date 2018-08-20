@@ -81,26 +81,3 @@ void HostVM::changeState()
         setisStreaming(true);
     }
 }
-
-
-/**
- * @brief Get the same agent execution on our host
- * @param agentName
- * @param commandLine
- * @return
- */
-AgentExecutionOnHostM* HostVM::getSameAgentExecutionOnHost(QString agentName, QString commandLine)
-{
-    AgentExecutionOnHostM* agentExecutionOnHost = NULL;
-
-    for (AgentExecutionOnHostM* iterator : _listOfAgentExecution)
-    {
-        if ((iterator != NULL) && (iterator->agentName() == agentName) && (iterator->commandLine() == commandLine))
-        {
-            agentExecutionOnHost = iterator;
-            break;
-        }
-    }
-
-    return agentExecutionOnHost;
-}

@@ -256,15 +256,6 @@ Q_SIGNALS:
     //void commandAskedToAgent(QStringList peerIdsList, QString command);
 
 
-    /**
-     * @brief Signal emitted when an agent execution on host must be created
-     * @param agentName
-     * @param hostname
-     * @param commandLine
-     */
-    void agentExecutionOnHost(QString agentName, QString hostname, QString commandLine);
-
-
 public Q_SLOTS:
 
     /**

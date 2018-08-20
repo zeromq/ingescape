@@ -236,9 +236,6 @@ void IngeScapeModelManager::importAgentsListFromJson(QJsonArray jsonArrayOfAgent
                                     if (host != NULL)
                                     {
                                         agent->setcanBeRestarted(true);
-
-                                        //
-                                        Q_EMIT agentExecutionOnHost(agentName, hostname, commandLine);
                                     }
                                 }
                             }
@@ -460,9 +457,6 @@ void IngeScapeModelManager::onAgentEntered(QString peerId, QString agentName, QS
                 if (host != NULL)
                 {
                     agent->setcanBeRestarted(true);
-
-                    //
-                    Q_EMIT agentExecutionOnHost(agentName, hostname, commandLine);
                 }
             }
 

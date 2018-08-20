@@ -23,7 +23,6 @@
 
 #include <model/hostm.h>
 #include <model/agentm.h>
-#include <model/agentexecutiononhostm.h>
 
 
 /**
@@ -48,9 +47,6 @@ class HostVM : public QObject
     // Falg indicating if the host is streaming or not
     I2_QML_PROPERTY(bool, isStreaming)
 
-    // List of agent execution on our host
-    I2_QOBJECT_LISTMODEL(AgentExecutionOnHostM, listOfAgentExecution)
-
 
 public:
 
@@ -71,15 +67,6 @@ public:
      * @brief Change the state of our host
      */
     Q_INVOKABLE void changeState();
-
-
-    /**
-     * @brief Get the same agent execution on our host
-     * @param agentName
-     * @param commandLine
-     * @return
-     */
-    AgentExecutionOnHostM* getSameAgentExecutionOnHost(QString agentName, QString commandLine);
 
 
 Q_SIGNALS:
