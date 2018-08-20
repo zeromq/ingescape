@@ -76,22 +76,22 @@ struct yajl_val_s
     {
         char * string;
         struct {
-            long long i; /*< integer value, if representable. */
-            double  d;   /*< double value, if representable. */
-            char   *r;   /*< unparsed number in string form. */
+            long long i; /* integer value, if representable. */
+            double  d;   /* double value, if representable. */
+            char   *r;   /* unparsed number in string form. */
             /** Signals whether the \em i and \em d members are
              * valid. See \c YAJL_NUMBER_INT_VALID and
              * \c YAJL_NUMBER_DOUBLE_VALID. */
             unsigned int flags;
         } number;
         struct {
-            const char **keys; /*< Array of keys */
-            yajl_val *values; /*< Array of values. */
-            size_t len; /*< Number of key-value-pairs. */
+            const char **keys; /* Array of keys */
+            yajl_val *values; /* Array of values. */
+            size_t len; /* Number of key-value-pairs. */
         } object;
         struct {
-            yajl_val *values; /*< Array of elements. */
-            size_t len; /*< Number of elements. */
+            yajl_val *values; /* Array of elements. */
+            size_t len; /* Number of elements. */
         } array;
     } u;
 };

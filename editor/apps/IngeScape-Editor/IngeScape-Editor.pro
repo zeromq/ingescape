@@ -323,7 +323,7 @@ win32 {
         QMAKE_POST_LINK += $$QMAKE_COPY $$quote($$shell_path(../../frameworks/I2Quick/Win32/I2Quick.$${QMAKE_EXTENSION_SHLIB})) $$quote($$shell_path($${DESTDIR})) $$escape_expand(\n\t)
 
         #copy ingescape, zyre and friends to make a real standalone .exe
-        QMAKE_POST_LINK += $$QMAKE_COPY $$quote($$shell_path(C:\mastic\libs\release\*.dll)) $$quote($$shell_path($${DESTDIR})) $$escape_expand(\n\t)
+        QMAKE_POST_LINK += $$QMAKE_COPY $$quote($$shell_path(C:\ingescape\libs\release\*.dll)) $$quote($$shell_path($${DESTDIR})) $$escape_expand(\n\t)
 
         # Copy Qt dlls
         # NB: Some Qt libs must be explictly referenced because their are used by I2Quick.dll and not our .exe

@@ -37,8 +37,6 @@ INCLUDEPATH += $$PWD/../src/include
 win32:{
     message("Compilation win32 scope ...")
 
-    QMAKE_CXXFLAGS += -std=c11
-
     CONFIG(debug, debug|release){
         #configuration DEBUG
         DESTDIR = $$OUT_PWD/debug
