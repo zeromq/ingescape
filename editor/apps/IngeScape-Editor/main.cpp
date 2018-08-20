@@ -160,6 +160,7 @@ void registerCustomQmlTypes()
     // Models
     //
     //----------------
+    qmlRegisterUncreatableType<AgentExecutionOnHostM>("INGESCAPE", 1, 0, "AgentExecutionOnHostM", "Internal class");
     qmlRegisterUncreatableType<AgentIOPM>("INGESCAPE", 1, 0, "AgentIOPM", "Internal class");
     qmlRegisterUncreatableType<AgentM>("INGESCAPE", 1, 0, "AgentM", "Internal class");
     qmlRegisterUncreatableType<AgentMappingM>("INGESCAPE", 1, 0, "AgentMappingM", "Internal class");

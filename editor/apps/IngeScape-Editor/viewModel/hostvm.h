@@ -21,8 +21,10 @@
 
 #include <I2PropertyHelpers.h>
 
-#include "model/hostm.h"
-#include "model/agentm.h"
+#include <model/hostm.h>
+#include <model/agentm.h>
+#include <model/agentexecutiononhostm.h>
+
 
 /**
  * @brief The HostVM class defines a view model of host in the supervision list
@@ -45,6 +47,9 @@ class HostVM : public QObject
 
     // Falg indicating if the host is streaming or not
     I2_QML_PROPERTY(bool, isStreaming)
+
+    // List of agent execution on our host
+    I2_QOBJECT_LISTMODEL(AgentExecutionOnHostM, listOfAgentExecution)
 
 
 public:
