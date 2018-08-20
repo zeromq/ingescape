@@ -1,0 +1,91 @@
++++
+title = "First steps through the design and architecture of an ingeScape agent"
+date = "2018-04-20T11:36:41+02:00"
+tags = ["network"]
+categories = ["agents"]
+banner = "img/banners/network_layer.jpg"
+genre = "article"
++++
+
+This article shows some best practices that have been established when developing ingeScape agents from scratch. These practices will insure that the agent can evolve quickly in time and also includes reusable ingeScape-independent software that could be useful in many other scenarios.
+
+**Should you need to adapt existing software into an ingeScape agent, some relevant strategies are presented in the last section of this article.**
+
+## An agent seen from the outside
+With ingeScape, agents are parts of global distributed software platforms. They are assembled so that their local behaviours, combined with others, can create new, meaningful, value-adding behaviours and services. Agents can thus be considered as software components that expose a programming interface to configure and use them. This programming interface takes complementary forms.
+
+### Command line parameters and console commands
+Agents are independent pieces of software. Many agents, especially non-graphic ones, are executed using the command line, just like any other software. The command line offers parameters to configure the execution of an agent. That is all the things that will not change during the execution, wether this execution is short or lasts months (agents can run as daemons or services in operating systems).
+
+Here is a minimal list of command line parameters to consider when creating a new agent :
+
+- help : certainly the most important one, in charge of listing all the other parameters with their default values and special instructions.
+- network device and port : these are mandatory for the agent to start on the network. You need to give your agent a way to define them and the simplest one is passing them through command line arguments. Note that other strategies are possible such as putting these parameters in a configuration file, enabling the agent to introspect the compatible network devices on your computer, or even scan ports to detect the presence of other agents.
+- agent name : sometimes, it makes sense to change the name of an agent to make it more meaningful or to efficiently deal with multiple instances of an agent on the same platform (even if ingeScape manages clones properly).
+- verbose and log file path : depending on the execution context, watching logs in the console or collecting them in a log file can be a lifesaver. The ingeScape API provides everything needed to control that and exposing these possibilities as command lien parameters is always useful.
+- definition and mapping path : these are not mandatory as agents can live a long and happy life with a hardcoded definition and by having their mapping being controlled by an ingeScape editor. However, using external definition or mapping enable to manage different versions of them, to establish contracts between developers, to effortlessly have various definitions for a single implementation and to share these contracts even before an agent is actually developed.
+- noninteractiveloop : this one is explained in [your first full agent] example and is about having an agent running interactively inside a console or as a daemon or a background program.
+
+When running in a console, an agent can receive commands from the standard input. Though old-fashioned, it may be an extremely efficient way to test or configure agents during their execution, and to awake the power-user inside you.
+
+### Inputs, Outputs and Parameters, a.k.a. the IOPs
+With the tokens, the [IOPs] are the most visual and efficient parts of the ingeScape model to control an agent and make it useful. The IOPs enable the design of a whole dataflow network inside a distributed software platform. Dataflow is a Turing-complete extremely powerful model to orchestrate pieces of software.
+
+[photo ou json igsMail sans tokens]
+
+Inputs are the way to feed an agent. There are many different approaches in design an agent’s inputs: they can be independent or complementary, atomic and information-rich (especially when using the DATA type in ingeScape), data-centric or event-centric, etc. When designing an agent, think of the inputs are the ways to activate your agent and provide it with information in relation with its internal objectives and behaviour. Some agents may not have inputs. This is the case for agents encapsulating user-input devices such as an eye tracker, a spatial gestures device or even a simple keyboard.
+
+Symmetrically, an agent’s outputs are what makes your agent useful to the rest of the environment by providing events, information or reports associated with the service your agent manages. It is about what you want your agent to make available to the rest of your platform. Some agents may not have any output. This is the case for agents in charge of reaching the outside world, such an agent capable of sending emails or dropping files (received as data on their inputs) to a server, etc.
+
+The correlation between the inputs and the outputs defines the dynamics of an agent. With the dataflow model, an agent does not know where information on its inputs come from and where information to its outputs go to. This loose relation with other agents is exactly what we are looking for in evolutive, distributed, flexible distributed environments. That is why it is extremely important never to make any assumption about who will feed your agent’s inputs and who will use its outputs.
+
+In addition, parameters are here to enable dynamic configuration of an agent by using the dataflow model. At the moment, only an ingeScape editor (or an ingeScape sorcerer) is capable of writing to an agent’s parameters dynamically. It is also possible to configure parameters values when loading a definition in an agent. Think of the parameters as ways of rarely change the internal behaviour of your agent. This may be useful when starting a whole platform or when a major event occurs in your platform architecture or in your environment but should not happen as often as writing your inputs. If a parameter has to change frequently, it certainly is that this parameter should rather be an input or that there is a design flaw somewhere. A good example of parameters are the server address, the login and the password for an agent in charge of sending emails : these parameters need to change only when the server changes or when you are setting up a new platform in a new environment.
+
+### Tokens
+Token are here because sometimes, dataflow is not the fastest way to achieve communication or trigger behaviours. With tokens, it is easy to trigger a mechanism on any agent by just knowing its name and to provide necessary information to do so. Tokens are just like functions or methods calls in programming languages. By opposition to IOPs, they require to know the ecosystem you evolve in, in order to use it. Their use shall thus be limited to very specific or exceptional situations where knowing the agents emitting and/or receiving the token makes sense or is necessary. For other situations, tokens can easily be replaced by inputs of type IGS_DATA fed with all the information pieces that would be given as arguments to the token.
+
+[token igsMail]
+
+Agents may have an advantage in exposing tokens when they offer specific discrete services. The example of an agent in charge of sending emails is relevant : sending an email just requires providing the email parameters (from, to cc, subject, etc.). Dataflow is not particularly helpful for this and the email agent can be addressed by its name without any confusion. However, in the email agent we designed, both tokens and IOPs are usable in parallel to give users the choice of their strategy. Another example is our socket agent : this agent creates data inputs and ouputs for classic TCP sockets. Dataflow is very convenient both for reading and writing to the socket. However, creating and removing a socket is achieved by using tokens which contain all the necessary parameters (socket name, address and port, plus a parameter to determine if the socket is server or client). The combination between tokens for dynamic creation/removal of sockets and IOPs for reading and sending data is very flexible and appreciated.
+
+### Software bus and topics/channels
+ingeScape has been inspired by famous software buses that historically were message-oriented. To help distribute these messages to multiple entities at the same time from a single source, they often introduced the concept of channel or topic : every software connected to a channel/topic would receive any message published by another software on this topic, adding to this the possibility to send direct messages from one software to another, generally using names. This is exactly the same metaphor as the good old IRC protocol with people chatting on channels and exchanging private messages.
+
+ingeScape provides an API to create such a bus and to publish or subscribe to channels. ingeScape also provides monitoring tools to list channels and watch what is happening on them. This is done is a very performing way and can support massive amounts of data, juste like IOPs dataflow. But this is the old way to do it : no dynamic control of the flow, no data type or model-based description for exchanged data, no visual integration in an editor, no archiving of private messages, etc. That is why we recommend to use dataflow or tokens to create modern distributed systems, except of course if you want to implement an enterprise-grade chat solution in a few minutes.
+
+## Reusability inside an agent
+An agent provides a service… just like a software library does. And some agents perfectly make sense by just wrapping a powerful software library and making this library available to all other agents inside a platform. This is basically what we did for our email agent, simply wrapping the CURL library and formatting messages as expected by the SMTP protocol.
+
+However, whatever the service the agent is providing and wether it is based on a single or multiple libraries, it is always a good idea to have a « high-level library » approach. This means that your service should be available (if we take the example of the C programming language) as a high-level header with all the functions, types and variables useful for the service. All the other code should be well encapsulated behind this header, and structured in a number of files or modules fitting the complexity of the implementation.
+
+The main advantage of this approach is that the encapsulation behind a high-level header makes things simple for the rest of the code in the agent (see next section) and makes your module reusable independently from an ingeScape context : should you need to integrate your module inside another application or use it with another network library, you could use it in almost the same way.
+
+Once the high-level header has been designed and developed to match with the defined model for the agent including IOPs and tokens, one needs to finally write the code for the agent, i.e. code the reactions between inputs, outputs and tokens, including the exposed parameters...
+
+## Coding an agent : it’s all about the glue…
+We already covered how to code command line parameters and console commands in our [Your First complete agent](). Creating IOPs and observing them is describe in [Your first ingeScape agent]().
+
+Basically, coding an agent is mixing the following things in your callbacks code (i.e. observe callbacks for IOPs, tokens, etc.):
+
+- Information received on the inputs,
+- Received tokens and attached information,
+- Possible use of the agent parameters values,
+- Resulting behaviours involving function calls in your internal code and writing information to the agent outputs.
+
+If the high-level headers encapsulating the services offered by your agent are well designed, all this glue code should perfectly fit inside your main application file and represent a few dozens of lines of code.
+
+## Integrating with legacy code and industrial frameworks
+Sometimes, an agent may be based on a legacy application with its own architecture or an application based on an industrial framework such as Qt, Microsoft .Net or Apple Cocoa. In these situations, the application initialisation process and the internal architecture are constrained. However places to integrate the ingeScape code and make this legacy or industrial application an agent are pretty much the same independently from the underlying architecture.
+
+The ingeScape library creates its own set of threads and does not need to rely on the execution control of the main application. In addition, we deigned the ingeScape library so that an application will be an agent. This means that commands sent to and  callbacks registered to the ingeScape libraries can be called from any place inside the main application code. This clean separation offers a total integration flexibility. Integration ingeScape code inside an industrial or legacy application can be seen as « surgically » integrating the ingeScape code where it suits best inside the existing or constrained code.
+
+The ingeScape library is developed in C. This enables portability on any operating system and wrapping inside any programming language. In addition to C++ and Objective-C that can include the ingeScape C API without any cost, ingeScape has already been wrapped in C# for Microsoft environments, in Python to quickly create agents by using the amazing work of the Python community, and in Javascript/QML for a seamless integration in Qt Creator. Java will be coming shortly.
+
+Independently from the programming language, here are the major steps for making industrial or legacy software a proper and well designed ingeScape agent:
+
+- The ingeScape library first requires some initialisation in order to configure the agent name, its definition and other relevant parameters (logging, links with command line parameters, etc.). This is generally achieved in the application’s main class or function or in a dedicated software class that is created for the occasion. In case, this represents less than one hundred lines of codes.
+- If the agent requires to declare inputs, these inputs generally need to be observed and thus to be attached to callbacks. The callbacks can be developed in your application’s preferred language by relying on the language wrapping that has been achieved (in C#, Java, etc.). The callbacks may then trigger internal code in your application to react to the received inputs and then write ingeScape outputs if relevant.
+- Finally, some internal behaviour in your application or some user interactions may also require to write ingeScape outputs. Generally, this is achieved by simply adding the writing instructions inside the existing application functions, where the information to be written to the output is the most accessible.
+
+In our experience, transforming even a very large or very old application into an ingeScape agent only requires a few hundreds lines of code to be added in strategic places, without requiring to make any change in the existing code architecture. Due to ingeScape independent threads, there no influence in the existing execution control mechanisms, except sometimes for the necessity to call some code from the ingeScape callbacks inside one of the application’s threads or queues, using provided frameworks functions to do so. This is practically the same as have a dedicated UI thread and other threads for heavy algorithms, except that ingeScape does not require complex synchronisation mechanisms.
+

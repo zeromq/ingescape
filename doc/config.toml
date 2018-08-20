@@ -33,9 +33,14 @@ weight = 2
     weight = 3
 
 [[menu.main]]
+name = "Agents"
+url  = "/categories/agents/"
+weight = 4
+
+[[menu.main]]
     name = "Contact"
     url  = "/contact/"
-    weight = 4
+    weight = 5
 
 # Top bar social links menu
 

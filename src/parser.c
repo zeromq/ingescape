@@ -14,7 +14,10 @@
 #include "unixfunctions.h"
 #endif
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdocumentation"
 #include "yajl/yajl_tree.h"
+#pragma clang diagnostic pop
 #include "yajl/yajl_gen.h"
 #include "ingescape_private.h"
 
