@@ -46,7 +46,7 @@ AgentM::AgentM(QString name,
     _name(name),
     _peerId(peerId),
     _address(ipAddress),
-    _hostname(""),
+    _hostname(HOSTNAME_NOT_DEFINED),
     _commandLine(""),
     _isON(false),
     _canBeRestarted(false),
@@ -65,9 +65,6 @@ AgentM::AgentM(QString name,
 {
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
-
-    // Init flag indicating if our agent never yet appeared on the network
-    _neverAppearedOnNetwork = _peerId.isEmpty();
 
     qInfo() << "New Model of Agent" << _name << "(" << _peerId << ") at" << _address;
 }

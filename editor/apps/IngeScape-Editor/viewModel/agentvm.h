@@ -92,7 +92,7 @@ class AgentVM : public QObject
 
 public:
     /**
-     * @brief Default constructor
+     * @brief Constructor
      * @param model
      * @param parent
      */
@@ -184,6 +184,14 @@ public:
      * @brief Open the "Log Stream" of our agent
      */
     Q_INVOKABLE void openLogStream();
+
+
+    /**
+     * @brief Get the list of agent models on a host
+     * @param hostname
+     * @return
+     */
+    QList<AgentM*> getModelsOnHost(QString hostname);
 
 
 Q_SIGNALS:
@@ -459,6 +467,9 @@ private:
 
     // List of peer ids of our models
     QStringList _peerIdsList;
+
+    // Hash table from a hostname to a list of models of agents
+    QHash<QString, QList<AgentM*>> _hashFromHostnameToModels;
 
 };
 

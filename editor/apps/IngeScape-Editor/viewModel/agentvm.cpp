@@ -18,7 +18,7 @@
 
 
 /**
- * @brief Default constructor
+ * @brief Constructor
  * @param model
  * @param parent
  */
@@ -48,12 +48,13 @@ AgentVM::AgentVM(AgentM* model, QObject *parent) : QObject(parent),
     {
         // Init the name
         _name = model->name();
-        _neverAppearedOnNetwork = model->neverAppearedOnNetwork();
 
-        if (_neverAppearedOnNetwork) {
+        if (model->peerId().isEmpty()) {
+            _neverAppearedOnNetwork = true;
             qInfo() << "New View Model of Agent" << _name << "which never yet appeared on the network";
         }
         else {
+            _neverAppearedOnNetwork = false;
             qInfo() << "New View Model of Agent" << _name << "with peer id" << model->peerId();
         }
 
@@ -88,6 +89,7 @@ AgentVM::~AgentVM()
     // Free the memory elsewhere
     //_models.deleteAllItems();
     _models.clear();
+    _hashFromHostnameToModels.clear();
 }
 
 
@@ -394,6 +396,22 @@ void AgentVM::openLogStream()
 
 
 /**
+ * @brief Get the list of agent models on a host
+ * @param hostname
+ * @return
+ */
+QList<AgentM*> AgentVM::getModelsOnHost(QString hostname)
+{
+    if (_hashFromHostnameToModels.contains(hostname)) {
+        return _hashFromHostnameToModels.value(hostname);
+    }
+    else {
+        return QList<AgentM*>();
+    }
+}
+
+
+/**
  * @brief Slot when the list of models changed
  */
 void AgentVM::_onModelsChanged()
@@ -405,7 +423,8 @@ void AgentVM::_onModelsChanged()
     {
         //qDebug() << _previousAgentsList.count() << "--> ADD --> " << newAgentsList.count();
 
-        for (AgentM* model : newAgentsList) {
+        for (AgentM* model : newAgentsList)
+        {
             if ((model != NULL) && !_previousAgentsList.contains(model))
             {
                 //qDebug() << "New model" << model->name() << "ADDED (" << model->peerId() << ")";
@@ -639,9 +658,10 @@ void AgentVM::_updateWithAllModels()
 {
     _peerIdsList.clear();
     QStringList hostnamesList;
+    _hashFromHostnameToModels.clear();
     bool globalCanBeFrozen = true;
 
-    foreach (AgentM* model, _models.toList())
+    for (AgentM* model : _models.toList())
     {
         if (model != NULL)
         {
@@ -649,9 +669,17 @@ void AgentVM::_updateWithAllModels()
                 _peerIdsList.append(model->peerId());
             }
 
+            /*if (!hostnamesList.contains(model->hostname()) && (model->hostname() != HOSTNAME_NOT_DEFINED))
+            {
+                hostnamesList.append(model->hostname());
+            }*/
             if (!hostnamesList.contains(model->hostname())) {
                 hostnamesList.append(model->hostname());
             }
+
+            QList<AgentM*> modelsOnHost = getModelsOnHost(model->hostname());
+            modelsOnHost.append(model);
+            _hashFromHostnameToModels.insert(model->hostname(), modelsOnHost);
 
             if (!model->canBeFrozen()) {
                 globalCanBeFrozen = false;
@@ -660,13 +688,18 @@ void AgentVM::_updateWithAllModels()
     }
 
     QString globalHostnames = "";
-    for (int i = 0; i < hostnamesList.count(); i++) {
-        if (i == 0) {
-            globalHostnames = hostnamesList.at(i);
+    for (QString hostname : hostnamesList)
+    {
+        if (globalHostnames.isEmpty()) {
+            globalHostnames = hostname;
         }
         else {
-            globalHostnames = QString("%1, %2").arg(globalHostnames, hostnamesList.at(i));
+            globalHostnames = QString("%1, %2").arg(globalHostnames, hostname);
         }
+
+        // FIXME: Print for debug
+        QList<AgentM*> modelsOnHost = getModelsOnHost(hostname);
+        qDebug() << _name << "on" << hostname << ":" << modelsOnHost.count() << "agent(s)";
     }
 
     sethostnames(globalHostnames);

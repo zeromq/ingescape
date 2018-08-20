@@ -315,7 +315,6 @@ void IngeScapeModelManager::simulateExitForEachActiveAgent()
 
                 agent->setpeerId("");
                 agent->setaddress("");
-                agent->setneverAppearedOnNetwork(true);
             }
 
             // Reset the mapping
