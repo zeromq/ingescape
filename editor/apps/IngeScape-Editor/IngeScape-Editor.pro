@@ -209,7 +209,8 @@ QML_DESIGNER_IMPORT_PATH =
 # Add the include directory of I2Quick
 INCLUDEPATH += ../../frameworks/I2Quick/include
 
-
+# Ingescape is not use as library, source code are build like part of editor source code
+DEFINES += INGESCAPE
 # Include ingescape library
 !include(../../../builds/ingescape.pri) {
     error(Could not load ingescape.pri)

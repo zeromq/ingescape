@@ -4,18 +4,15 @@
 #
 #####################################################################
 
-
-equals(TEMPLATE, "lib"){
-    SOURCES += \
-        $$PWD/../src/definition.c \
-        $$PWD/../src/mapping.c \
-        $$PWD/../src/model.c \
-        $$PWD/../src/network.c \
-        $$PWD/../src/parser.c \
-        $$PWD/../src/admin.c \
-        $$PWD/../src/bus.c \
-        $$PWD/../src/token.c
-}
+SOURCES += \
+    $$PWD/../src/definition.c \
+    $$PWD/../src/mapping.c \
+    $$PWD/../src/model.c \
+    $$PWD/../src/network.c \
+    $$PWD/../src/parser.c \
+    $$PWD/../src/admin.c \
+    $$PWD/../src/bus.c \
+    $$PWD/../src/token.c
 
 HEADERS += \
     $$PWD/../src/include/uthash/uthash.h \
@@ -43,12 +40,10 @@ win32:{
         #configuration DEBUG
         DESTDIR = $$OUT_PWD/debug
         libs_path = $$PWD/../dependencies/windows/libs/win32/Debug
-        ingescape_libs_path_dep = "C:/ingescape/libs/debug/"
     }else {
         #configuration RELEASE
         DESTDIR = $$OUT_PWD/release
         libs_path = $$PWD/../dependencies/windows/libs/win32/Release
-        ingescape_libs_path_dep = "C:/ingescape/libs/release/"
     }
 
     #UNIX functions
@@ -80,7 +75,6 @@ win32:{
     }
     equals(TEMPLATE, "app"){
         message("Template is type app, we dont copy the ingescape and zyre dll to the C:")
-        LIBS += -L$$ingescape_libs_path_dep -lingescape
     }
 }
 
@@ -134,9 +128,6 @@ mac:{
     LIBS += /usr/local/lib/libczmq.dylib
     LIBS += /usr/local/lib/libzyre.dylib
     LIBS += /usr/local/lib/libyajl.dylib
-    equals(TEMPLATE, "app"){
-        LIBS += /usr/local/lib/libingescape.dylib
-    }
 }
 
 
