@@ -11,7 +11,7 @@ This article presents the high-level features of the ingeScape editor. We do not
 
 Whereas the ingeScape library is dedicated to software developers, the ingeScape editor has been designed for all the other actors who require specific visualizations or tools. The editor leverages the benefits of a graphical application to accelerate or extend tasks that can be achieved through coding.
 
-Systems built on ingeScape can contain a large number of agents and communication flows. The ingeScape editor introduces features to monitor and configure them dynamically. The editor exposes the agents ***definitions*** and the ***mappings*** between agents, which are key ingeScape concepts, detailed in the "[Your first ingeScape agent](./blog/your_first_agent)" example. Other concepts join them to provide new services to the platform users.
+Systems built on ingeScape can contain a large number of agents and communication flows. The ingeScape editor introduces features to monitor and configure them dynamically. The editor exposes the agents ***definitions*** and the ***mappings*** between agents, which are key ingeScape concepts, detailed in [your first ingeScape agent](/blog/your_first_agent). Other concepts join them to provide new services to the platform users.
 
 The current version of the editor offers the following services:
 
@@ -41,7 +41,7 @@ The editor can also import agent definitions before an agent is actually availab
 
 Agent definitions can be exported and imported with the editor using a simple JSON format. The ingeScape library supports the loading and dumping of these JSON files so that the developers do not have to always hardcode an agent definition but use an external resource file instead.
 
-Here is an example of a simple agent definition:
+Here is an example of a simple agent definition: {#definition}
 
 {{< highlight json "linenos=table,linenostart=1" >}}
 {
@@ -94,6 +94,7 @@ Here is an example of a simple agent definition:
 }
 {{< / highlight >}}
 
+<br>
 Just like for definitions, the editor provides a list of active machines in the observed system. Such machines, that can operate on Linux, Windows or macOS, embed a specific software agent giving them capabilities regarding ingeScape and hosted agents. This software can be run as a daemon or system tray program.
 
 ![hosts](/snapshots/hosts.png)
@@ -111,7 +112,8 @@ When agents exchange data, i.e. when an agent's output is written, the existing 
 
 Just like definitions, mappings can be hardcoded by developers or managed through JSON files.
 
-Here is an example of a simple agent mapping:
+Here is an example of a simple agent mapping: {#mapping}
+
 {{< highlight json "linenos=table,linenostart=1" >}}
 {
     "mapping": {
@@ -153,6 +155,7 @@ Here is an example of a simple agent mapping:
 }
 {{< / highlight >}}
 
+<br>
 The example above shows the mappings of an agent called "myOtherAgent", which consists in a strict one to one output to input mapping from the outputs of the "myAgent" agent. Note that mappings for each agent are expressed from its inputs to other agents' outputs.
 
 Any combination of mappings is allowed. An output can be connected to as many inputs as you like. An input can be fed by as many outputs as you like. You need to be careful though to avoid loops in your architecture and concurrency on a given input, if fed by several outputs at once. The ingeScape library has some advanced features enabling to deal with the most complex architectures in truly distributed and highly evolutive systems, based on state of the art network patterns.

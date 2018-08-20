@@ -17,14 +17,10 @@ Our main goal when building the ingeScape API was to make it extremely simple fo
 
 Below is a first example producing a fully functional agent, with a very simple behavior. But before jumping into the code, we need to explain the core concepts of an agent: its *name*, its *inputs*, its *outputs* and its *parameters*.
 
-**image here**
-
 The name of the agent is how it is addressed by other agents in your system and seen in the ingeScape editor. We advise it to be unique in a given system, even ingeScape supports multiple agents with the same name, as it may be useful and relevant in some contexts.
 
 
-### **I**nputs, **O**utputs and **P**arameters : the IOPs
-
-
+### Inputs, Outputs and Parameters : the IOPs
 Inputs, Outputs and Parameters, often abbreviated as ***IOPs*** by the ingeScape community, are all managed in the same way. They all carry a *name*, a *type* and a *value*. Giving a value when creating an IOP is optional.
 
 Here are the supported IOP types:

@@ -1,6 +1,6 @@
 +++
 title = "The ingeScape network layer"
-date = "2018-04-20T11:36:41+02:00"
+date = "2018-04-19T11:36:41+02:00"
 tags = ["network"]
 categories = ["learn"]
 banner = "img/banners/network_layer.jpg"
@@ -11,7 +11,13 @@ ingeScape enables to create distributed systems based on sets of connected softw
 
 This article presents standard and advanced capabilities brought by ingeScape to support a wide variety of network patterns, familiar in the domain of distributed systems and software buses.
 
-The communication between ingeScape agents relies on a software bus, which is hidden behind our model-driven paradigm using *definitions* and *mappings*, explained in [the editor tour](/blog/editor_tour/).
+Before going further we advise that you read at least:
+
+- [Your first ingeScape agent](/blog/your_first_agent)
+- [The editor tour](/blog/editor_tour)
+- [Your first complete agent](/blog/first_full_agent)
+
+The communication between ingeScape agents relies on a software bus, which is hidden behind our model-driven paradigm using *definitions* and *mappings*, presented in [the first ingeScape agent](/blog/your_first_agent) and in [the editor tour](/blog/editor_tour).
 
 
 ### Fully decentralized, asynchronous and scalable

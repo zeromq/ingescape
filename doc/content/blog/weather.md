@@ -19,7 +19,7 @@ Here is the platform architecture as seen in the ingeScape editor:
 
 [PHOTO]
 
-This example platform uses three different software agents running on three different software platforms (Microsoft Windows, Linux CentOS 7 and Apple macOS) and using a remote web service to get weather information (not shown in the editor).
+This example platform uses three different software agents running on three different software platforms (Microsoft Windows, Linux CentOS 7 and Apple macOS) and using an external remote web service to get weather information that is of course not shown in the editor.
 
 ### Voice recognition
 The **GeoVoiceRecognition** agent is a basic software agent developed on Microsoft Windows, using the Microsoft Voice Recognition module in Microsoft .Net. This is the simplest choice to introduce voice recognition on Windows. It could be replaced by any other solution that fits your actual needs.
@@ -82,3 +82,6 @@ Our **macTextToSpeech** agent is composed of the following IOPs:
 The two parameters are a sort of bonus for platform administrators : it enables them to decide if and where to store generated sound files, either to archive them, or to store them in a path that provides enough disk space.
 
 NB: In the situation where you want to generate both sound data and utterance on the speakers, you just need to send the same string on both *speak* and *recordIn* inputs. The agent will handle them in parallel.
+
+### Bonus: integrating igsMail
+In [First steps through the design and architecture of an ingeScape agent](/blog/architecture_101) we introduced the *igsMail* agent as an example. The *igsMail* agent has not been initially configured to be used in our voice-based weather service. However, it is pretty easy to use it...
