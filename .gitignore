@@ -865,3 +865,4 @@ dependencies/yajl/build/
 src/libinterceptor.dylib
 src/.scannerwork/.sonar_lock
 src/.scannerwork/report-task.txt
+dependencies/windows/innosetup/Output/
