@@ -3,7 +3,7 @@ title = "First steps through the design and architecture of an ingeScape agent"
 date = "2018-04-20T11:36:41+02:00"
 tags = ["architecture"]
 categories = ["learn"]
-banner = "img/banners/network_layer.jpg"
+banner = "img/banners/architecture.png"
 genre = "article"
 +++
 

@@ -2,7 +2,7 @@
 title = "Voice-based weather service"
 date = "2018-04-23T11:36:41+02:00"
 categories = ["agents"]
-banner = "img/banners/your_first_agent.png"
+banner = "img/banners/weather.jpg"
 +++
 
 ingeScape offers slick integration for heterogeneous software agents and make them interoperable to provide higher level, high value services to end-users. This article shows a typical example by creating a voice-based weather service, capable of: 
