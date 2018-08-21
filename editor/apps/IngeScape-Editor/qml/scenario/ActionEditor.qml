@@ -1585,7 +1585,8 @@ Window {
                                 //
                                 // Conditions Details
                                 //
-                                Row {
+                                Item {
+                                    id : conditionRowItem
                                     anchors {
                                         left: rowConditionsTypes.left
                                         right: parent.right
@@ -1593,176 +1594,186 @@ Window {
                                         bottom: parent.bottom
                                         bottomMargin: 6
                                     }
-                                    height : agentCombo.height
-                                    spacing : 6
 
-                                    // Agent
-                                    IngeScapeComboBox {
-                                        id : agentCombo
-
+                                    Row {
+                                        id : conditionRowFixeSize
+                                        height : agentCombo.height
+                                        spacing : 6
                                         anchors {
-                                            verticalCenter : parent.verticalCenter
+                                            left: parent.left
+                                            bottom: parent.bottom
                                         }
 
-                                        height : 25
-                                        width : 148
+                                        // Agent
+                                        IngeScapeComboBox {
+                                            id : agentCombo
 
-                                        model: controller ? controller.agentsInMappingList : 0
+                                            anchors {
+                                                verticalCenter : parent.verticalCenter
+                                            }
 
-                                        enabled: (controller && (controller.agentsInMappingList.count !== 0))
-                                        placeholderText: (controller && (controller.agentsInMappingList.count === 0) ? "- No Item -"
-                                                                                                                     : "- Select an item -")
+                                            height : 25
+                                            width : 148
 
-                                        function modelToString(model)
-                                        {
-                                            return model.name;
-                                        }
+                                            model: controller ? controller.agentsInMappingList : 0
 
+                                            enabled: (controller && (controller.agentsInMappingList.count !== 0))
+                                            placeholderText: (controller && (controller.agentsInMappingList.count === 0) ? "- No Item -"
+                                                                                                                         : "- Select an item -")
 
-                                        Binding {
-                                            target: agentCombo
-                                            property: "selectedItem"
-                                            value: if (myCondition && myCondition.modelM)
-                                                   {
-                                                       myCondition.modelM.agent;
-                                                   }
-                                                   else {
-                                                       null;
-                                                   }
-                                        }
-
-
-                                        onSelectedItemChanged: {
-                                            if (myCondition && myCondition.modelM && agentCombo.selectedItem)
+                                            function modelToString(model)
                                             {
-                                                myCondition.modelM.agent = agentCombo.selectedItem;
+                                                return model.name;
+                                            }
+
+
+                                            Binding {
+                                                target: agentCombo
+                                                property: "selectedItem"
+                                                value: if (myCondition && myCondition.modelM)
+                                                       {
+                                                           myCondition.modelM.agent;
+                                                       }
+                                                       else {
+                                                           null;
+                                                       }
+                                            }
+
+
+                                            onSelectedItemChanged: {
+                                                if (myCondition && myCondition.modelM && agentCombo.selectedItem)
+                                                {
+                                                    myCondition.modelM.agent = agentCombo.selectedItem;
+                                                }
+                                            }
+
+                                        }
+
+                                        // Agent Inputs/Outputs
+                                        IngeScapeComboBoxAgentsIOP {
+                                            id : ioCombo
+
+                                            anchors {
+                                                verticalCenter: parent.verticalCenter
+                                            }
+                                            height : 25
+                                            width : 148
+
+                                            visible: (myCondition && (myCondition.conditionType === ActionConditionTypes.VALUE))
+                                            enabled: visible
+
+                                            model: (myCondition && myCondition.modelM) ? myCondition.modelM.agentIopList : 0
+
+                                            // Condition on a value is available only for outputs (no need of separator position)
+                                            inputsNumber: 0
+                                            outputsNumber: 0
+                                            parametersNumber: 0
+
+                                            Binding {
+                                                target: ioCombo
+                                                property: "selectedItem"
+                                                value: if (myCondition && myCondition.modelM)
+                                                       {
+                                                           myCondition.modelM.agentIOP;
+                                                       }
+                                                       else {
+                                                           null;
+                                                       }
+                                            }
+
+
+                                            onSelectedItemChanged: {
+                                                if (myCondition && myCondition.modelM)
+                                                {
+                                                    myCondition.modelM.agentIOP = ioCombo.selectedItem;
+                                                }
+                                            }
+
+                                        }
+
+
+                                        // Combo to select the value of the agent condition
+                                        IngeScapeComboBox {
+                                            id : comboAgentConditionValues
+
+                                            anchors {
+                                                verticalCenter : parent.verticalCenter
+                                            }
+                                            height: 25
+                                            width: 78
+
+                                            visible: (myCondition && myCondition.conditionType === ActionConditionTypes.AGENT)
+
+                                            model: (controller ? controller.allAgentConditionValues : 0)
+
+                                            function modelToString(model)
+                                            {
+                                                return model.name;
+                                            }
+
+
+                                            Binding {
+                                                target: comboAgentConditionValues
+                                                property: "selectedItem"
+                                                value: (myCondition && myCondition.modelM && controller ? controller.allAgentConditionValues.getItemWithValue(myCondition.modelM.agentConditionValue) : null)
+                                            }
+
+                                            onSelectedItemChanged: {
+                                                if (myCondition && myCondition.modelM && comboAgentConditionValues.selectedItem)
+                                                {
+                                                    myCondition.modelM.agentConditionValue = comboAgentConditionValues.selectedItem.value;
+                                                }
+                                            }
+                                        }
+
+
+                                        // Combo to select the type of the value comparison
+                                        IngeScapeComboBox {
+                                            id : comboValueComparisonTypes
+
+                                            anchors {
+                                                verticalCenter : parent.verticalCenter
+                                            }
+                                            height: 25
+                                            width: 44
+
+                                            visible: (myCondition && myCondition.conditionType === ActionConditionTypes.VALUE)
+
+                                            model: (controller ? controller.allValueComparisonTypes : 0)
+
+                                            function modelToString(model)
+                                            {
+                                                return model.name;
+                                            }
+
+
+                                            Binding {
+                                                target: comboValueComparisonTypes
+                                                property: "selectedItem"
+                                                value: (myCondition && myCondition.modelM && controller ? controller.allValueComparisonTypes.getItemWithValue(myCondition.modelM.valueComparisonType) : null)
+                                            }
+
+                                            onSelectedItemChanged: {
+                                                if (myCondition && myCondition.modelM && comboValueComparisonTypes.selectedItem)
+                                                {
+                                                    myCondition.modelM.valueComparisonType = comboValueComparisonTypes.selectedItem.value;
+                                                }
                                             }
                                         }
 
                                     }
-
-                                    // Agent Inputs/Outputs
-                                    IngeScapeComboBoxAgentsIOP {
-                                        id : ioCombo
-
-                                        anchors {
-                                            verticalCenter: parent.verticalCenter
-                                        }
-                                        height : 25
-                                        width : 148
-
-                                        visible: (myCondition && (myCondition.conditionType === ActionConditionTypes.VALUE))
-                                        enabled: visible
-
-                                        model: (myCondition && myCondition.modelM) ? myCondition.modelM.agentIopList : 0
-
-                                        // Condition on a value is available only for outputs (no need of separator position)
-                                        inputsNumber: 0
-                                        outputsNumber: 0
-                                        parametersNumber: 0
-
-                                        Binding {
-                                            target: ioCombo
-                                            property: "selectedItem"
-                                            value: if (myCondition && myCondition.modelM)
-                                                   {
-                                                       myCondition.modelM.agentIOP;
-                                                   }
-                                                   else {
-                                                       null;
-                                                   }
-                                        }
-
-
-                                        onSelectedItemChanged: {
-                                            if (myCondition && myCondition.modelM)
-                                            {
-                                                myCondition.modelM.agentIOP = ioCombo.selectedItem;
-                                            }
-                                        }
-
-                                    }
-
-
-                                    // Combo to select the value of the agent condition
-                                    IngeScapeComboBox {
-                                        id : comboAgentConditionValues
-
-                                        anchors {
-                                            verticalCenter : parent.verticalCenter
-                                        }
-                                        height: 25
-                                        width: 78
-
-                                        visible: (myCondition && myCondition.conditionType === ActionConditionTypes.AGENT)
-
-                                        model: (controller ? controller.allAgentConditionValues : 0)
-
-                                        function modelToString(model)
-                                        {
-                                            return model.name;
-                                        }
-
-
-                                        Binding {
-                                            target: comboAgentConditionValues
-                                            property: "selectedItem"
-                                            value: (myCondition && myCondition.modelM && controller ? controller.allAgentConditionValues.getItemWithValue(myCondition.modelM.agentConditionValue) : null)
-                                        }
-
-                                        onSelectedItemChanged: {
-                                            if (myCondition && myCondition.modelM && comboAgentConditionValues.selectedItem)
-                                            {
-                                                myCondition.modelM.agentConditionValue = comboAgentConditionValues.selectedItem.value;
-                                            }
-                                        }
-                                    }
-
-
-                                    // Combo to select the type of the value comparison
-                                    IngeScapeComboBox {
-                                        id : comboValueComparisonTypes
-
-                                        anchors {
-                                            verticalCenter : parent.verticalCenter
-                                        }
-                                        height: 25
-                                        width: 44
-
-                                        visible: (myCondition && myCondition.conditionType === ActionConditionTypes.VALUE)
-
-                                        model: (controller ? controller.allValueComparisonTypes : 0)
-
-                                        function modelToString(model)
-                                        {
-                                            return model.name;
-                                        }
-
-
-                                        Binding {
-                                            target: comboValueComparisonTypes
-                                            property: "selectedItem"
-                                            value: (myCondition && myCondition.modelM && controller ? controller.allValueComparisonTypes.getItemWithValue(myCondition.modelM.valueComparisonType) : null)
-                                        }
-
-                                        onSelectedItemChanged: {
-                                            if (myCondition && myCondition.modelM && comboValueComparisonTypes.selectedItem)
-                                            {
-                                                myCondition.modelM.valueComparisonType = comboValueComparisonTypes.selectedItem.value;
-                                            }
-                                        }
-                                    }
-
 
                                     // Comparison Value
                                     TextField {
                                         id: textFieldComparisonValue
 
                                         anchors {
-                                            verticalCenter : parent.verticalCenter
+                                            right: parent.right
+                                            leftMargin: 6
+                                            left: conditionRowFixeSize.right
+                                            bottom: parent.bottom
                                         }
                                         height: 25
-                                        width: 49
 
                                         visible: (myCondition && myCondition.conditionType === ActionConditionTypes.VALUE)
                                         enabled : visible

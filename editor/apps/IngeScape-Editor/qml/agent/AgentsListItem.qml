@@ -22,6 +22,7 @@ import I2Quick 1.0
 
 import INGESCAPE 1.0
 import "../theme" as Theme
+import "../popup" as PopUp
 
 
 Item {
@@ -495,13 +496,13 @@ Item {
                     //console.log("QML: Open options...");
 
                     // Open the popup with options
-                    popupOptions.open();
+                    popupOptions.openInScreen();
                 }
             }
         }
     }
 
-    I2PopupBase {
+    PopUp.MenuPopup {
         id : popupOptions
 
         anchors {
@@ -510,10 +511,10 @@ Item {
             leftMargin: 2
         }
 
-        property int optionHeight: 30
+        readonly property int optionHeight: 30
 
-        // 9 options x optionHeight
-        height: 9 * optionHeight
+        // Get height from children
+        height: popUpBackground.y + popUpBackground.height
         width: 230
 
         isModal: true;
@@ -531,8 +532,10 @@ Item {
 
         Rectangle {
             id: popUpBackground
+            height: buttons.y + buttons.height
             anchors {
-                fill: parent
+                right: parent.right
+                left: parent.left
             }
             color: IngeScapeTheme.veryDarkGreyColor
             radius: 5
@@ -542,8 +545,10 @@ Item {
             }
 
             Column {
+                id: buttons
                 anchors {
-                    fill: parent
+                    right: parent.right
+                    left: parent.left
                 }
 
                 Button {

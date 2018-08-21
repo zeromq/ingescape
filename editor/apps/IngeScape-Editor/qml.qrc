@@ -53,5 +53,6 @@
         <file>qml/agent/AgentFilesPaths.qml</file>
         <file>qml/theme/ButtonStyleOfOption.qml</file>
         <file>qml/agent/LogStreamPanel.qml</file>
+        <file>qml/popup/MenuPopup.qml</file>
     </qresource>
 </RCC>
