@@ -29,6 +29,7 @@ import "../theme" as Theme;
 
 // parent-directory
 import ".." as Editor;
+import "../popup" as PopUp
 
 
 Item {
@@ -44,9 +45,6 @@ Item {
 
     // Controller associated to our view
     property var controller : null;
-
-    property real hostDeltaY: 0.0
-
 
     //--------------------------------
     //
@@ -304,14 +302,12 @@ Item {
                 }
 
                 onClicked: {
-                    console.log("QML: Open options...");
+                    // console.log("QML: Open options...");
 
-                    var position = hostItem.mapToItem(rootItem, 0, 0);
-                    //console.log("position = " + position);
-                    rootItem.hostDeltaY = position.y
-
+                    // Parent must be host item and not the list to have good x and y value
+                    popupOptions.parent = hostItem;
                     // Open the popup with options
-                    popupOptions.open();
+                    popupOptions.openInScreen();
                 }
             }
 
@@ -393,20 +389,19 @@ Item {
     */
 
 
-    I2PopupBase {
+    PopUp.MenuPopup  {
         id : popupOptions
 
         anchors {
             top: rootItem.top
-            topMargin: rootItem.hostDeltaY
             left: rootItem.right
             leftMargin: 2
         }
 
-        property int optionHeight: 30
+        readonly property int optionHeight: 30
 
-        // 2 options x optionHeight
-        height: 2 * optionHeight
+        // Get height from children
+        height: popUpBackground.y + popUpBackground.height
         width: 200
 
         isModal: true;
@@ -424,8 +419,10 @@ Item {
 
         Rectangle {
             id: popUpBackground
+            height: buttons.y + buttons.height
             anchors {
-                fill: parent
+                right: parent.right
+                left: parent.left
             }
             color: IngeScapeTheme.veryDarkGreyColor
             radius: 5
@@ -435,8 +432,10 @@ Item {
             }
 
             Column {
+                id: buttons
                 anchors {
-                    fill: parent
+                    right: parent.right
+                    left: parent.left
                 }
 
                 Button {
