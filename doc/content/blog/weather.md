@@ -82,6 +82,3 @@ Our **macTextToSpeech** agent is composed of the following IOPs:
 The two parameters are a sort of bonus for platform administrators : it enables them to decide if and where to store generated sound files, either to archive them, or to store them in a path that provides enough disk space.
 
 NB: In the situation where you want to generate both sound data and utterance on the speakers, you just need to send the same string on both *speak* and *recordIn* inputs. The agent will handle them in parallel.
-
-### Bonus: integrating igsMail
-In [First steps through the design and architecture of an ingeScape agent](/blog/architecture_101) we introduced the *igsMail* agent as an example. The *igsMail* agent has not been initially configured to be used in our voice-based weather service. However, it is pretty easy to use it...
