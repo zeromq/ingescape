@@ -119,13 +119,36 @@ Item {
         width: childrenRect.width
         height: childrenRect.height
 
-        property int blockSize: 22
+        property int blockSize: 16
         property int blockRadius: 4
         property int blockSpacing: 2
 
 
         BlockLoadingAnimation {
-            id: letterM
+            id: letterI
+
+            blockSize: ingescape.blockSize
+            blockRadius: ingescape.blockRadius
+            blockSpacing: ingescape.blockSpacing
+
+            visibilitiesOfBlock: [
+                true, true, true, true, true,
+                false, false, true, false, false,
+                false, false, true, false, false,
+                false, false, true, false, false,
+                false, false, true, false, false,
+                false, false, true, false, false,
+                true, true, true, true, true
+            ]
+        }
+
+        BlockLoadingAnimation {
+            id: letterN
+
+            anchors {
+                left: letterI.right
+                leftMargin: ingescape.blockSize + ingescape.blockSpacing
+            }
 
             blockSize: ingescape.blockSize
             blockRadius: ingescape.blockRadius
@@ -133,21 +156,21 @@ Item {
 
             visibilitiesOfBlock: [
                 true, false, false, false, true,
-                true, true, false, true, true,
+                true, true, false, false, true,
                 true, false, true, false, true,
                 true, false, true, false, true,
-                true, false, false, false, true,
-                true, false, false, false, true,
+                true, false, true, false, true,
+                true, false, false, true, true,
                 true, false, false, false, true
             ]
 
         }
 
         BlockLoadingAnimation {
-            id: letterA
+            id: letterG
 
             anchors {
-                left: letterM.right
+                left: letterN.right
                 leftMargin: ingescape.blockSize + ingescape.blockSpacing
             }
 
@@ -158,19 +181,44 @@ Item {
             visibilitiesOfBlock: [
                 false, true, true, true, false,
                 true, false, false, false, true,
+                true, false, false, false, false,
+                true, false, true, true, true,
                 true, false, false, false, true,
-                true, true, true, true, true,
                 true, false, false, false, true,
-                true, false, false, false, true,
-                true, false, false, false, true
+                false, true, true, true, false
             ]
+
+        }
+
+        BlockLoadingAnimation {
+            id: letterE
+
+            anchors {
+                left: letterG.right
+                leftMargin: ingescape.blockSize + ingescape.blockSpacing
+            }
+
+            blockSize: ingescape.blockSize
+            blockRadius: ingescape.blockRadius
+            blockSpacing: ingescape.blockSpacing
+
+            visibilitiesOfBlock: [
+                false, true, true, true, true,
+                true, false, false, false, false,
+                true, false, false, false, false,
+                true, true, true, true, false,
+                true, false, false, false, false,
+                true, false, false, false, false,
+                false, true, true, true, true
+            ]
+
         }
 
         BlockLoadingAnimation {
             id: letterS
 
             anchors {
-                left: letterA.right
+                left: letterE.right
                 leftMargin: ingescape.blockSize + ingescape.blockSpacing
             }
 
@@ -190,7 +238,7 @@ Item {
         }
 
         BlockLoadingAnimation {
-            id: letterT
+            id: letterC
 
             anchors {
                 left: letterS.right
@@ -202,21 +250,44 @@ Item {
             blockSpacing: ingescape.blockSpacing
 
             visibilitiesOfBlock: [
+                false, true, true, true, false,
+                true, false, false, false, true,
+                true, false, false, false, false,
+                true, false, false, false, false,
+                true, false, false, false, false,
+                true, false, false, false, true,
+                false, true, true, true, false
+            ]
+        }
+
+        BlockLoadingAnimation {
+            id: letterA
+
+            anchors {
+                left: letterC.right
+                leftMargin: ingescape.blockSize + ingescape.blockSpacing
+            }
+
+            blockSize: ingescape.blockSize
+            blockRadius: ingescape.blockRadius
+            blockSpacing: ingescape.blockSpacing
+
+            visibilitiesOfBlock: [
+                false, true, true, true, false,
+                true, false, false, false, true,
+                true, false, false, false, true,
                 true, true, true, true, true,
-                false, false, true, false, false,
-                false, false, true, false, false,
-                false, false, true, false, false,
-                false, false, true, false, false,
-                false, false, true, false, false,
-                false, false, true, false, false
+                true, false, false, false, true,
+                true, false, false, false, true,
+                true, false, false, false, true
             ]
         }
 
         BlockLoadingAnimation {
-            id: letterI
+            id: letterP
 
             anchors {
-                left: letterT.right
+                left: letterA.right
                 leftMargin: ingescape.blockSize + ingescape.blockSpacing
             }
 
@@ -225,21 +296,21 @@ Item {
             blockSpacing: ingescape.blockSpacing
 
             visibilitiesOfBlock: [
-                false, true, true, true, false,
-                false, false, true, false, false,
-                false, false, true, false, false,
-                false, false, true, false, false,
-                false, false, true, false, false,
-                false, false, true, false, false,
-                false, true, true, true, false
+                true, true, true, true, false,
+                true, false, false, false, true,
+                true, false, false, false, true,
+                true, true, true, true, false,
+                true, false, false, false, false,
+                true, false, false, false, false,
+                true, false, false, false, false
             ]
         }
 
         BlockLoadingAnimation {
-            id: letterC
+            id: letterEEnd
 
             anchors {
-                left: letterI.right
+                left: letterP.right
                 leftMargin: ingescape.blockSize + ingescape.blockSpacing
             }
 
@@ -248,14 +319,15 @@ Item {
             blockSpacing: ingescape.blockSpacing
 
             visibilitiesOfBlock: [
-                false, true, true, true, false,
-                true, false, false, false, true,
+                false, true, true, true, true,
                 true, false, false, false, false,
                 true, false, false, false, false,
+                true, true, true, true, false,
                 true, false, false, false, false,
-                true, false, false, false, true,
-                false, true, true, true, false
+                true, false, false, false, false,
+                false, true, true, true, true
             ]
+
         }
     }
 
