@@ -18,6 +18,7 @@ import QtQuick 2.8
 import QtQuick.Window 2.3
 import QtQuick.Controls 1.4
 import QtQuick.Controls.Styles 1.4
+import QtQuick.Controls 2.0 as Controls2
 
 import I2Quick 1.0
 
@@ -265,6 +266,19 @@ Item {
                         color: model.isON ? IngeScapeTheme.agentsListLabelColor : IngeScapeTheme.agentOFFLabelColor
 
                         font: IngeScapeTheme.normalFont
+
+                        MouseArea {
+                            id: mouseAreaToolTip
+                            anchors.fill: parent
+                            acceptedButtons: Qt.NoButton
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                        }
+
+                        // Add tooltip on name
+                        Controls2.ToolTip.delay: 300
+                        Controls2.ToolTip.visible: mouseAreaToolTip.containsMouse
+                        Controls2.ToolTip.text: (model ? model.commandLine : "")
                     }
 
                     height: contentHeight

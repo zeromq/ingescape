@@ -14,7 +14,7 @@
 
 import QtQuick 2.8
 import QtQuick.Controls 1.4
-import QtQuick.Controls 2.0 as TTImport
+import QtQuick.Controls 2.0 as Controls2
 import QtQuick.Controls.Styles 1.4
 
 import I2Quick 1.0
@@ -68,8 +68,10 @@ Item {
         if (selectedItem)
         {
             comboText.text = modelToString(combobox.selectedItem);
+            comboBoxTooltip.text = combobox.selectedItem.name + " (" + AgentIOPValueTypes.enumToString(combobox.selectedItem.agentIOPValueType) + " " + AgentIOPTypes.enumToString(combobox.selectedItem.agentIOPType).toLowerCase() + ")";
         }  else {
             comboText.text = "";
+            comboBoxTooltip.text = "";
         }
     }
 
@@ -226,6 +228,15 @@ Item {
                 _mouseAreaCombo.forceActiveFocus();
                 (comboButton.checked) ? combobox.close() : combobox.open();
             }
+            hoverEnabled: true
+        }
+
+        // Add tooltip on name
+        Controls2.ToolTip {
+            id: comboBoxTooltip
+            delay: 300
+            visible: _mouseAreaCombo.containsMouse
+            text: ""
         }
 
         onVisibleChanged: {
@@ -413,9 +424,9 @@ Item {
                     }
 
                     // Add tooltip on name
-                    TTImport.ToolTip.delay: 300
-                    TTImport.ToolTip.visible: _mouseAreaItem.containsMouse
-                    TTImport.ToolTip.text: model.name + ": " + AgentIOPValueTypes.enumToString(model.agentIOPValueType) + " " + AgentIOPTypes.enumToString(model.agentIOPType).toLowerCase()
+                    Controls2.ToolTip.delay: 300
+                    Controls2.ToolTip.visible: _mouseAreaItem.containsMouse
+                    Controls2.ToolTip.text: model.name + " (" + AgentIOPValueTypes.enumToString(model.agentIOPValueType) + " " + AgentIOPTypes.enumToString(model.agentIOPType).toLowerCase() + ")"
                 }
 
             }
