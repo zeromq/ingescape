@@ -59,8 +59,6 @@ Item {
     // Zoom-in delta scale factor
     readonly property real zoomInDeltaScaleFactor: 1.2
 
-
-
     //--------------------------------
     //
     // Functions
@@ -86,7 +84,6 @@ Item {
 
         _scrollWorkspaceTo(targetX, targetY);
     }
-
 
     // Show all
     function showAll()
@@ -130,8 +127,6 @@ Item {
             _showArea(area);
         }
     }
-
-
 
     // Set our zoom level to a given value
     function setZoomLevel(zoom)
@@ -280,7 +275,6 @@ Item {
             rootItem.setZoomLevel(1);
         }
     }
-
 
     Connections {
         target: IngeScapeEditorC

@@ -357,6 +357,14 @@ ApplicationWindow {
             /*onLoaded: {
                 console.log("onLoaded " + applicationLoader.item)
             }*/
+
+            onVisibleChanged: {
+                if (visible) {
+                    if (IngeScapeEditorC.agentsMappingC) {
+                        IngeScapeEditorC.agentsMappingC.fitToView();
+                    }
+                }
+            }
         }
 
 
