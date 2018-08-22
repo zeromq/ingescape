@@ -206,9 +206,6 @@ void IngeScapeModelManager::importAgentsListFromJson(QJsonArray jsonArrayOfAgent
                 {
                     QString agentName = jsonName.toString();
 
-                    // Create a new model of agent with the name
-                    AgentM* agent = new AgentM(agentName, this);
-
                     for (QJsonValue jsonValue : jsonClones.toArray())
                     {
                         if (jsonValue.isObject())
@@ -218,6 +215,7 @@ void IngeScapeModelManager::importAgentsListFromJson(QJsonArray jsonArrayOfAgent
                             QJsonValue jsonHostname = jsonClone.value("hostname");
                             QJsonValue jsonCommandLine = jsonClone.value("commandLine");
 
+                            // FIXME: test with a simple definition imported from a JSON of definition
                             if (jsonHostname.isString() && jsonCommandLine.isString())
                             {
                                 QString hostname = jsonHostname.toString();
@@ -226,6 +224,9 @@ void IngeScapeModelManager::importAgentsListFromJson(QJsonArray jsonArrayOfAgent
                                 if (!hostname.isEmpty() && !commandLine.isEmpty())
                                 {
                                     qDebug() << "Clone of" << agentName << "on" << hostname << "with cmd line" << commandLine;
+
+                                    // Create a new model of agent with the name
+                                    AgentM* agent = new AgentM(agentName, this);
 
                                     // Update the hostname and the command line
                                     agent->sethostname(hostname);
@@ -237,23 +238,26 @@ void IngeScapeModelManager::importAgentsListFromJson(QJsonArray jsonArrayOfAgent
                                     {
                                         agent->setcanBeRestarted(true);
                                     }
+
+                                    // Add this new model of agent
+                                    addAgentModel(agent);
+
+                                    // FIXME Optimisation: créer la définition (avec l'appel a jsonHelper->createModelOfAgentDefinitionFromJSON en dehors de la boucle for sur les clones
+                                    // Et faire un constructeur par copie de cette définition
+
+                                    // Create a model of agent definition from JSON object
+                                    DefinitionM* agentDefinition = _jsonHelper->createModelOfAgentDefinitionFromJSON(jsonDefinition.toObject());
+                                    if (agentDefinition != NULL)
+                                    {
+                                        // Add this new model of agent definition for the agent name
+                                        addAgentDefinitionForAgentName(agentDefinition, agentName);
+
+                                        // Set its definition
+                                        agent->setdefinition(agentDefinition);
+                                    }
                                 }
                             }
                         }
-                    }
-
-                    // Add this new model of agent
-                    addAgentModel(agent);
-
-                    // Create a model of agent definition from JSON object
-                    DefinitionM* agentDefinition = _jsonHelper->createModelOfAgentDefinitionFromJSON(jsonDefinition.toObject());
-                    if (agentDefinition != NULL)
-                    {
-                        // Add this new model of agent definition for the agent name
-                        addAgentDefinitionForAgentName(agentDefinition, agentName);
-
-                        // Set its definition
-                        agent->setdefinition(agentDefinition);
                     }
                 }
             }

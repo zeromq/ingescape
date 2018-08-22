@@ -106,7 +106,7 @@ private:
      * @param ipAddress
      * @return
      */
-    HostVM* _getHostWithAddress(QString ipAddress);
+    //HostVM* _getHostWithAddress(QString ipAddress);
 
 
     /**
@@ -119,8 +119,11 @@ private:
 
 private:
 
-    // Has table from "IP address" to the "(view model of) Host"
-    QHash<QString, HostVM*> _hashFromAddressToHostVM;
+    // Hash table from "IP address" to the "(view model of) Host"
+    //QHash<QString, HostVM*> _hashFromAddressToHost;
+
+    // Hash table from "(host)Name" to the "(view model of) Host"
+    QHash<QString, HostVM*> _hashFromNameToHost;
 
     // List of all agents
     QList<AgentM*> _allAgents;

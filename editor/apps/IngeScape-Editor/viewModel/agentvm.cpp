@@ -656,6 +656,8 @@ void AgentVM::_onOpenValuesHistoryOfAgent()
  */
 void AgentVM::_updateWithAllModels()
 {
+    qDebug() << "Update with all models of" << _name << "(" << this << ")";
+
     _peerIdsList.clear();
     QStringList hostnamesList;
     _hashFromHostnameToModels.clear();
@@ -699,7 +701,7 @@ void AgentVM::_updateWithAllModels()
 
         // FIXME: Print for debug
         QList<AgentM*> modelsOnHost = getModelsOnHost(hostname);
-        qDebug() << _name << "on" << hostname << ":" << modelsOnHost.count() << "agent(s)";
+        qDebug() << hostname << ":" << modelsOnHost.count() << "agent(s)";
     }
 
     sethostnames(globalHostnames);

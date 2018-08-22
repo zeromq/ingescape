@@ -298,7 +298,7 @@ void AgentsSupervisionController::_onAgentDefinitionChangedWithPreviousAndNewVal
                         QString hostname = model->hostname();
 
                         // Hostname is not defined
-                        // There is already an existing (fake) model of agent (in the VM agentUsingSameDefinition)
+                        // There is already an existing model of agent (in the VM agentUsingSameDefinition)
                         if (hostname == HOSTNAME_NOT_DEFINED)
                         {
                             // Delete this new (fake) model of agent
@@ -332,6 +332,8 @@ void AgentsSupervisionController::_onAgentDefinitionChangedWithPreviousAndNewVal
                                 // Peer id is defined: check if it is an agent that evolve from OFF to ON
                                 else
                                 {
+                                    bool isSameModel = false;
+
                                     for (AgentM* iterator : modelsOnHost)
                                     {
                                         // Peer id is defined and agent is OFF --> we consider that it is the same model
@@ -340,6 +342,8 @@ void AgentsSupervisionController::_onAgentDefinitionChangedWithPreviousAndNewVal
                                             int index = agentUsingSameDefinition->models()->indexOf(iterator);
                                             if (index > -1)
                                             {
+                                                isSameModel = true;
+
                                                 // Emit signal "Identical Agent Model Replaced"
                                                 Q_EMIT identicalAgentModelReplaced(iterator, model);
 
@@ -353,6 +357,14 @@ void AgentsSupervisionController::_onAgentDefinitionChangedWithPreviousAndNewVal
                                             }
                                             break;
                                         }
+                                    }
+
+                                    if (!isSameModel)
+                                    {
+                                        // Add the model of agent to the list of the VM
+                                        agentUsingSameDefinition->models()->append(model);
+
+                                        qDebug() << "Add model of agent" << model->name() << "on" << hostname;
                                     }
                                 }
                             }
