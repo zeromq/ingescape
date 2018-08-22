@@ -54,9 +54,6 @@ struct scenario_import_actions_lists_t {
 struct mapping_agent_import_t {
   QString               name;
   QPointF               position;
-  //QString               hostname;
-  //QString               commandLine;
-  //DefinitionM*          definition;
   AgentMappingM*        mapping;
 };
 

@@ -154,37 +154,20 @@ QJsonArray AgentsSupervisionController::exportAgentsListToJSON()
                 // Clones (models)
                 QJsonArray jsonClones = QJsonArray();
 
-                QHash<QString, QStringList> hashFromHostnameToCommandLine;
-
                 for (AgentM* model : agent->models()->toList())
                 {
+                    // Hostname and Command Line must be defined to be added to the array of clones
                     if ((model != NULL) && !model->hostname().isEmpty() && !model->commandLine().isEmpty())
                     {
-                        bool alreadySameClone = false;
-                        QStringList listOfCommandLine;
+                        qDebug() << "Export" << agent->name() << "on" << model->hostname() << "at" << model->commandLine() << "(" << model->peerId() << ")";
 
-                        if (hashFromHostnameToCommandLine.contains(model->hostname()))
-                        {
-                            listOfCommandLine = hashFromHostnameToCommandLine.value(model->hostname());
+                        QJsonObject jsonClone = QJsonObject();
+                        jsonClone.insert("hostname", model->hostname());
+                        jsonClone.insert("commandLine", model->commandLine());
+                        jsonClone.insert("peerId", model->peerId());
+                        jsonClone.insert("address", model->address());
 
-                            if (listOfCommandLine.contains(model->commandLine())) {
-                                alreadySameClone = true;
-                            }
-                        }
-
-                        if (!alreadySameClone)
-                        {
-                            qDebug() << agent->name() << model->hostname() << model->commandLine();
-
-                            listOfCommandLine.append(model->commandLine());
-                            hashFromHostnameToCommandLine.insert(model->hostname(), listOfCommandLine);
-
-                            QJsonObject jsonClone = QJsonObject();
-                            jsonClone.insert("hostname", model->hostname());
-                            jsonClone.insert("commandLine", model->commandLine());
-
-                            jsonClones.append(jsonClone);
-                        }
+                        jsonClones.append(jsonClone);
                     }
                 }
 
@@ -332,9 +315,59 @@ void AgentsSupervisionController::_onAgentDefinitionChangedWithPreviousAndNewVal
                                 // Peer id is defined: check if it is an agent that evolve from OFF to ON
                                 else
                                 {
-                                    bool isSameModel = false;
+                                    AgentM* sameModel = NULL;
+                                    QString peerId = model->peerId();
+                                    QString commandLine = model->commandLine();
 
                                     for (AgentM* iterator : modelsOnHost)
+                                    {
+                                        // Same peer id and agent is OFF --> it is the same model
+                                        if ((iterator != NULL) && !iterator->peerId().isEmpty() && (iterator->peerId() == peerId) && !iterator->isON())
+                                        {
+                                            sameModel = iterator;
+                                            break;
+                                        }
+                                    }
+
+                                    if (sameModel == NULL)
+                                    {
+                                        for (AgentM* iterator : modelsOnHost)
+                                        {
+                                            // Same command line (peer id is defined) and agent is OFF --> we consider that it is the same model
+                                            if ((iterator != NULL) && !iterator->peerId().isEmpty() && (iterator->commandLine() == commandLine) && !iterator->isON())
+                                            {
+                                                sameModel = iterator;
+                                                break;
+                                            }
+                                        }
+                                    }
+
+                                    if (sameModel != NULL)
+                                    {
+                                        int index = agentUsingSameDefinition->models()->indexOf(sameModel);
+                                        if (index > -1)
+                                        {
+                                            // Emit signal "Identical Agent Model Replaced"
+                                            Q_EMIT identicalAgentModelReplaced(sameModel, model);
+
+                                            // Replace the model
+                                            agentUsingSameDefinition->models()->replace(index, model);
+
+                                            qDebug() << "Replace model of agent" << model->name() << "on" << hostname << "(" << sameModel->peerId() << "-->" << model->peerId() << ")";
+
+                                            // Delete the previous model of agent
+                                            _modelManager->deleteAgentModel(sameModel);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        // Add the model of agent to the list of the VM
+                                        agentUsingSameDefinition->models()->append(model);
+
+                                        qDebug() << "Add model of agent" << model->name() << "on" << hostname;
+                                    }
+
+                                    /*for (AgentM* iterator : modelsOnHost)
                                     {
                                         // Peer id is defined and agent is OFF --> we consider that it is the same model
                                         if ((iterator != NULL) && !iterator->peerId().isEmpty() && !iterator->isON())
@@ -365,7 +398,7 @@ void AgentsSupervisionController::_onAgentDefinitionChangedWithPreviousAndNewVal
                                         agentUsingSameDefinition->models()->append(model);
 
                                         qDebug() << "Add model of agent" << model->name() << "on" << hostname;
-                                    }
+                                    }*/
                                 }
                             }
                         }

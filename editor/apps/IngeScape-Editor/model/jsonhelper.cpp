@@ -747,12 +747,9 @@ QList< mapping_agent_import_t* > JsonHelper::importMapping(QByteArray byteArrayO
                 {
                     QJsonObject jsonAgent = jsonValue.toObject();
 
-                    // Get value for keys "agentName", "definition", "position", "hostname" and "commandLine"
+                    // Get value for keys "agentName", and "position"
                     QJsonValue jsonName = jsonAgent.value("agentName");
-                    //QJsonValue jsonDefinition = jsonAgent.value("definition");
                     QJsonValue jsonPosition = jsonAgent.value("position");
-                    //QJsonValue jsonHostname = jsonAgent.value("hostname");
-                    //QJsonValue jsonCommandLine = jsonAgent.value("commandLine");
 
                     if (jsonName.isString() && jsonPosition.isString())
                     {
@@ -762,12 +759,9 @@ QList< mapping_agent_import_t* > JsonHelper::importMapping(QByteArray byteArrayO
                         {
                             // Add our agent in mapping
                             mapping_agent_import_t* mappingAgent = new mapping_agent_import_t();
-                            //mappingAgent->definition = definition;
                             mappingAgent->mapping = agentMapping;
                             mappingAgent->name = jsonName.toString();
                             mappingAgent->position = QPointF(0.0, 0.0);
-                            //mappingAgent->hostname = "";
-                            //mappingAgent->commandLine = "";
 
                             // Set position
                             QStringList positionStringList = jsonPosition.toString().split(", ");
@@ -781,13 +775,6 @@ QList< mapping_agent_import_t* > JsonHelper::importMapping(QByteArray byteArrayO
                                     mappingAgent->position = QPointF(strX.toFloat(), strY.toFloat());
                                 }
                             }
-
-                            // Set hostname and commandLine
-                            /*if (jsonHostname.isString() && jsonCommandLine.isString())
-                            {
-                                mappingAgent->hostname = jsonHostname.toString();
-                                mappingAgent->commandLine = jsonCommandLine.toString();
-                            }*/
 
                             // Add to list
                             listAgentsMapping.append(mappingAgent);
@@ -832,18 +819,6 @@ QJsonArray JsonHelper::exportAllAgentsInMapping(QList<AgentInMappingVM*> agentsI
             // Set the position
             QString position = QString("%1, %2").arg(QString::number(agentInMapping->position().x()), QString::number(agentInMapping->position().y()));
             jsonAgent.insert("position", position);
-
-            // Set the definition
-            /*AgentM* firstModel = agentInMapping->models()->at(0);
-            if (firstModel != NULL)
-            {
-                QJsonObject jsonDefinition = exportAgentDefinitionToJson(firstModel->definition());
-                jsonAgent.insert("definition", jsonDefinition);
-
-                // FIXME TODO when agentInMapping->models > 1
-                jsonAgent.insert("hostname", firstModel->hostname());
-                jsonAgent.insert("commandLine", firstModel->commandLine());
-            }*/
 
             // Set the mapping
             QJsonObject jsonMapping = exportAgentMappingToJson(agentInMapping->temporaryMapping());

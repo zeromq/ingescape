@@ -75,7 +75,7 @@ AgentM::AgentM(QString name,
  */
 AgentM::~AgentM()
 {
-    qInfo() << "Delete Model of Agent" << _name << "(" << _peerId << ") at" << _address;
+    qInfo() << "Delete Model of Agent" << _name << "(" << _peerId << ") on" << _hostname << "(" << _address << ")";
 
     // Delete our agent definition
     if (_definition != NULL) {

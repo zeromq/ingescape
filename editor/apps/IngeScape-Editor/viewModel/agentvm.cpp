@@ -659,7 +659,7 @@ void AgentVM::_updateWithAllModels()
     qDebug() << "Update with all models of" << _name << "(" << this << ")";
 
     _peerIdsList.clear();
-    QStringList hostnamesList;
+    QStringList temporaryListOfHostnames;
     _hashFromHostnameToModels.clear();
     bool globalCanBeFrozen = true;
 
@@ -671,12 +671,8 @@ void AgentVM::_updateWithAllModels()
                 _peerIdsList.append(model->peerId());
             }
 
-            /*if (!hostnamesList.contains(model->hostname()) && (model->hostname() != HOSTNAME_NOT_DEFINED))
-            {
-                hostnamesList.append(model->hostname());
-            }*/
-            if (!hostnamesList.contains(model->hostname())) {
-                hostnamesList.append(model->hostname());
+            if (!temporaryListOfHostnames.contains(model->hostname())) {
+                temporaryListOfHostnames.append(model->hostname());
             }
 
             QList<AgentM*> modelsOnHost = getModelsOnHost(model->hostname());
@@ -690,13 +686,16 @@ void AgentVM::_updateWithAllModels()
     }
 
     QString globalHostnames = "";
-    for (QString hostname : hostnamesList)
+    for (QString hostname : temporaryListOfHostnames)
     {
-        if (globalHostnames.isEmpty()) {
-            globalHostnames = hostname;
-        }
-        else {
-            globalHostnames = QString("%1, %2").arg(globalHostnames, hostname);
+        if (hostname != HOSTNAME_NOT_DEFINED)
+        {
+            if (globalHostnames.isEmpty()) {
+                globalHostnames = hostname;
+            }
+            else {
+                globalHostnames = QString("%1, %2").arg(globalHostnames, hostname);
+            }
         }
 
         // FIXME: Print for debug

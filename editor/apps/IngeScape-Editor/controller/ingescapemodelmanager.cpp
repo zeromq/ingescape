@@ -205,55 +205,89 @@ void IngeScapeModelManager::importAgentsListFromJson(QJsonArray jsonArrayOfAgent
                 if (jsonName.isString() && jsonDefinition.isObject() && jsonClones.isArray())
                 {
                     QString agentName = jsonName.toString();
+                    QJsonObject jsonObjectDefinition = jsonDefinition.toObject();
+                    QJsonArray arrayOfClones = jsonClones.toArray();
 
-                    for (QJsonValue jsonValue : jsonClones.toArray())
+                    // None clones have a defined hostname (agent is only defined by a definition)
+                    if (arrayOfClones.isEmpty())
                     {
-                        if (jsonValue.isObject())
+                        qDebug() << "Clone of" << agentName << "without hostname and command line";
+
+                        // Create a new model of agent with the name
+                        AgentM* agent = new AgentM(agentName, this);
+
+                        // Add this new model of agent
+                        addAgentModel(agent);
+
+                        // FIXME Optimisation: créer la définition (avec l'appel a jsonHelper->createModelOfAgentDefinitionFromJSON en dehors de la boucle for sur les clones
+                        // Et faire un constructeur par copie de cette définition
+
+                        // Create a model of agent definition from JSON object
+                        DefinitionM* agentDefinition = _jsonHelper->createModelOfAgentDefinitionFromJSON(jsonObjectDefinition);
+                        if (agentDefinition != NULL)
                         {
-                            QJsonObject jsonClone = jsonValue.toObject();
+                            // Add this new model of agent definition for the agent name
+                            addAgentDefinitionForAgentName(agentDefinition, agentName);
 
-                            QJsonValue jsonHostname = jsonClone.value("hostname");
-                            QJsonValue jsonCommandLine = jsonClone.value("commandLine");
-
-                            // FIXME: test with a simple definition imported from a JSON of definition
-                            if (jsonHostname.isString() && jsonCommandLine.isString())
+                            // Set its definition
+                            agent->setdefinition(agentDefinition);
+                        }
+                    }
+                    // There are some clones with a defined hostname
+                    else
+                    {
+                        for (QJsonValue jsonValue : arrayOfClones)
+                        {
+                            if (jsonValue.isObject())
                             {
-                                QString hostname = jsonHostname.toString();
-                                QString commandLine = jsonCommandLine.toString();
+                                QJsonObject jsonClone = jsonValue.toObject();
 
-                                if (!hostname.isEmpty() && !commandLine.isEmpty())
+                                QJsonValue jsonHostname = jsonClone.value("hostname");
+                                QJsonValue jsonCommandLine = jsonClone.value("commandLine");
+                                QJsonValue jsonPeerId = jsonClone.value("peerId");
+                                QJsonValue jsonAddress = jsonClone.value("address");
+
+                                // FIXME: test with a simple definition imported from a JSON of definition
+                                if (jsonHostname.isString() && jsonCommandLine.isString() && jsonPeerId.isString() && jsonAddress.isString())
                                 {
-                                    qDebug() << "Clone of" << agentName << "on" << hostname << "with cmd line" << commandLine;
+                                    QString hostname = jsonHostname.toString();
+                                    QString commandLine = jsonCommandLine.toString();
+                                    QString peerId = jsonPeerId.toString();
+                                    QString ipAddress = jsonAddress.toString();
 
-                                    // Create a new model of agent with the name
-                                    AgentM* agent = new AgentM(agentName, this);
-
-                                    // Update the hostname and the command line
-                                    agent->sethostname(hostname);
-                                    agent->setcommandLine(commandLine);
-
-                                    // Update corresponding host
-                                    HostM* host = IngeScapeLauncherManager::Instance().getHostWithName(hostname);
-                                    if (host != NULL)
+                                    if (!hostname.isEmpty() && !commandLine.isEmpty())
                                     {
-                                        agent->setcanBeRestarted(true);
-                                    }
+                                        qDebug() << "Clone of" << agentName << "on" << hostname << "with command line" << commandLine << "(" << peerId << ")";
 
-                                    // Add this new model of agent
-                                    addAgentModel(agent);
+                                        // Create a new model of agent with the name
+                                        AgentM* agent = new AgentM(agentName, peerId, ipAddress,  this);
 
-                                    // FIXME Optimisation: créer la définition (avec l'appel a jsonHelper->createModelOfAgentDefinitionFromJSON en dehors de la boucle for sur les clones
-                                    // Et faire un constructeur par copie de cette définition
+                                        // Update the hostname and the command line
+                                        agent->sethostname(hostname);
+                                        agent->setcommandLine(commandLine);
 
-                                    // Create a model of agent definition from JSON object
-                                    DefinitionM* agentDefinition = _jsonHelper->createModelOfAgentDefinitionFromJSON(jsonDefinition.toObject());
-                                    if (agentDefinition != NULL)
-                                    {
-                                        // Add this new model of agent definition for the agent name
-                                        addAgentDefinitionForAgentName(agentDefinition, agentName);
+                                        // Update corresponding host
+                                        HostM* host = IngeScapeLauncherManager::Instance().getHostWithName(hostname);
+                                        if (host != NULL) {
+                                            agent->setcanBeRestarted(true);
+                                        }
 
-                                        // Set its definition
-                                        agent->setdefinition(agentDefinition);
+                                        // Add this new model of agent
+                                        addAgentModel(agent);
+
+                                        // FIXME Optimisation: créer la définition (avec l'appel a jsonHelper->createModelOfAgentDefinitionFromJSON en dehors de la boucle for sur les clones
+                                        // Et faire un constructeur par copie de cette définition
+
+                                        // Create a model of agent definition from JSON object
+                                        DefinitionM* agentDefinition = _jsonHelper->createModelOfAgentDefinitionFromJSON(jsonObjectDefinition);
+                                        if (agentDefinition != NULL)
+                                        {
+                                            // Add this new model of agent definition for the agent name
+                                            addAgentDefinitionForAgentName(agentDefinition, agentName);
+
+                                            // Set its definition
+                                            agent->setdefinition(agentDefinition);
+                                        }
                                     }
                                 }
                             }
