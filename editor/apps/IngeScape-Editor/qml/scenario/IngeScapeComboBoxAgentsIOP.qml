@@ -68,8 +68,10 @@ Item {
         if (selectedItem)
         {
             comboText.text = modelToString(combobox.selectedItem);
+            comboBoxTooltip.text = combobox.selectedItem.name + " (" + AgentIOPValueTypes.enumToString(combobox.selectedItem.agentIOPValueType) + " " + AgentIOPTypes.enumToString(combobox.selectedItem.agentIOPType).toLowerCase() + ")";
         }  else {
             comboText.text = "";
+            comboBoxTooltip.text = "";
         }
     }
 
@@ -226,6 +228,15 @@ Item {
                 _mouseAreaCombo.forceActiveFocus();
                 (comboButton.checked) ? combobox.close() : combobox.open();
             }
+            hoverEnabled: true
+        }
+
+        // Add tooltip on name
+        Controls2.ToolTip {
+            id: comboBoxTooltip
+            delay: 300
+            visible: _mouseAreaCombo.containsMouse
+            text: ""
         }
 
         onVisibleChanged: {
@@ -415,7 +426,7 @@ Item {
                     // Add tooltip on name
                     Controls2.ToolTip.delay: 300
                     Controls2.ToolTip.visible: _mouseAreaItem.containsMouse
-                    Controls2.ToolTip.text: model.name + ": " + AgentIOPValueTypes.enumToString(model.agentIOPValueType) + " " + AgentIOPTypes.enumToString(model.agentIOPType).toLowerCase()
+                    Controls2.ToolTip.text: model.name + " (" + AgentIOPValueTypes.enumToString(model.agentIOPValueType) + " " + AgentIOPTypes.enumToString(model.agentIOPType).toLowerCase() + ")"
                 }
 
             }
