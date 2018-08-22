@@ -16,7 +16,7 @@
 import QtQuick 2.8
 import QtQuick.Controls 1.4
 import QtQuick.Controls.Styles 1.4
-import QtQuick.Controls.Private 1.0
+import QtQuick.Controls 2.0 as Controls2
 
 import I2Quick 1.0
 
@@ -273,25 +273,17 @@ Rectangle {
                             font: IngeScapeTheme.heading2Font
 
                             MouseArea {
-                                property string text: ((myModel && myModel.firstModel) ? myModel.name + " (" + AgentIOPValueTypes.enumToString(myModel.firstModel.agentIOPValueType) + ")"
-                                                                                       : "")
-
                                 id: rootTooltipInput
-
                                 anchors.fill: parent
                                 acceptedButtons: Qt.NoButton
                                 hoverEnabled: true
-
-                                onExited: Tooltip.hideText()
-                                onCanceled: Tooltip.hideText()
                                 cursorShape: Qt.PointingHandCursor
-
-                                Timer {
-                                    interval: 300
-                                    running: rootTooltipInput.enabled && rootTooltipInput.containsMouse && rootTooltipInput.text.length
-                                    onTriggered: Tooltip.showText(rootTooltipInput, Qt.point(rootTooltipInput.mouseX, rootTooltipInput.mouseY), rootTooltipInput.text)
-                                }
                             }
+
+                            // Add tooltip on name
+                            Controls2.ToolTip.delay: 300
+                            Controls2.ToolTip.visible: rootTooltipInput.containsMouse
+                            Controls2.ToolTip.text: ((myModel && myModel.firstModel) ? myModel.name + ": " + AgentIOPValueTypes.enumToString(myModel.firstModel.agentIOPValueType) : "")
                         }
 
 
@@ -539,28 +531,18 @@ Rectangle {
                             font: IngeScapeTheme.heading2Font
 
                             MouseArea {
-                                property string text: ((myModel && myModel.firstModel) ? myModel.name + " (" + AgentIOPValueTypes.enumToString(myModel.firstModel.agentIOPValueType) + ")"
-                                                                                       : "")
-
                                 id: rootTooltipOutput
-
                                 anchors.fill: parent
                                 acceptedButtons: Qt.NoButton
                                 hoverEnabled: true
-
-                                onExited: Tooltip.hideText()
-                                onCanceled: Tooltip.hideText()
                                 cursorShape: Qt.PointingHandCursor
-
-                                Timer {
-                                    interval: 300
-                                    running: rootTooltipOutput.enabled && rootTooltipOutput.containsMouse && rootTooltipOutput.text.length
-                                    onTriggered: Tooltip.showText(rootTooltipOutput, Qt.point(rootTooltipOutput.mouseX, rootTooltipOutput.mouseY), rootTooltipOutput.text)
-                                }
                             }
+
+                            // Add tooltip on name
+                            Controls2.ToolTip.delay: 300
+                            Controls2.ToolTip.visible: rootTooltipOutput.containsMouse
+                            Controls2.ToolTip.text: ((myModel && myModel.firstModel) ? myModel.name + ": " + AgentIOPValueTypes.enumToString(myModel.firstModel.agentIOPValueType) : "")
                         }
-
-
 
                         Rectangle {
                             id : draggablePointTO

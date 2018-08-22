@@ -14,7 +14,7 @@
 
 import QtQuick 2.8
 import QtQuick.Controls 1.4
-import QtQuick.Controls 2.0 as TTImport
+import QtQuick.Controls 2.0 as Controls2
 import QtQuick.Controls.Styles 1.4
 
 import I2Quick 1.0
@@ -413,9 +413,9 @@ Item {
                     }
 
                     // Add tooltip on name
-                    TTImport.ToolTip.delay: 300
-                    TTImport.ToolTip.visible: _mouseAreaItem.containsMouse
-                    TTImport.ToolTip.text: model.name + ": " + AgentIOPValueTypes.enumToString(model.agentIOPValueType) + " " + AgentIOPTypes.enumToString(model.agentIOPType).toLowerCase()
+                    Controls2.ToolTip.delay: 300
+                    Controls2.ToolTip.visible: _mouseAreaItem.containsMouse
+                    Controls2.ToolTip.text: model.name + ": " + AgentIOPValueTypes.enumToString(model.agentIOPValueType) + " " + AgentIOPTypes.enumToString(model.agentIOPType).toLowerCase()
                 }
 
             }
