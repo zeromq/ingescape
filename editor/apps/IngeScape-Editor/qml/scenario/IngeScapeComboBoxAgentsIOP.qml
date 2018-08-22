@@ -14,6 +14,7 @@
 
 import QtQuick 2.8
 import QtQuick.Controls 1.4
+import QtQuick.Controls 2.0 as TTImport
 import QtQuick.Controls.Styles 1.4
 
 import I2Quick 1.0
@@ -398,7 +399,6 @@ Item {
                             family: IngeScapeTheme.textFontFamily
                             pixelSize: 16
                         }
-
                     }
 
                     MouseArea {
@@ -409,7 +409,13 @@ Item {
                             combobox.selectedItem = model.QtObject;
 
                         }
+                        hoverEnabled: true
                     }
+
+                    // Add tooltip on name
+                    TTImport.ToolTip.delay: 300
+                    TTImport.ToolTip.visible: _mouseAreaItem.containsMouse
+                    TTImport.ToolTip.text: model.name + ": " + AgentIOPValueTypes.enumToString(model.agentIOPValueType) + " " + AgentIOPTypes.enumToString(model.agentIOPType).toLowerCase()
                 }
 
             }
