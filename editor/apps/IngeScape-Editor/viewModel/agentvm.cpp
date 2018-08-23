@@ -25,7 +25,6 @@
 AgentVM::AgentVM(AgentM* model, QObject *parent) : QObject(parent),
     _name(""),
     _hostnames(""),
-    _neverAppearedOnNetwork(true),
     _isON(false),
     _isMuted(false),
     _canBeFrozen(false),
@@ -49,14 +48,7 @@ AgentVM::AgentVM(AgentM* model, QObject *parent) : QObject(parent),
         // Init the name
         _name = model->name();
 
-        if (model->peerId().isEmpty()) {
-            _neverAppearedOnNetwork = true;
-            qInfo() << "New View Model of Agent" << _name << "which never yet appeared on the network";
-        }
-        else {
-            _neverAppearedOnNetwork = false;
-            qInfo() << "New View Model of Agent" << _name << "with peer id" << model->peerId();
-        }
+        qInfo() << "New View Model of Agent" << _name;
 
         // Connect to signal "Count Changed" from the list of models
         connect(&_models, &AbstractI2CustomItemListModel::countChanged, this, &AgentVM::_onModelsChanged);

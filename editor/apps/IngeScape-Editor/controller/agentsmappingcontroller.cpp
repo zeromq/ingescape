@@ -577,7 +577,7 @@ void AgentsMappingController::onActiveAgentDefined(AgentM* agent)
             // The agent is not yet in the mapping...
             if (agentInMapping == NULL)
             {
-                QList<AgentM*> activeAgentsList = QList<AgentM*>();
+                QList<AgentM*> activeAgentsList;
                 activeAgentsList.append(agent);
 
                 double randomMax = (double)RAND_MAX;
@@ -744,7 +744,7 @@ void AgentsMappingController::onMapped(ElementMappingM* mappingElement)
             // Output agent is not yet in the mapping
             else if (inputAgent != NULL) // && (outputAgent == NULL)
             {
-                QList<ElementMappingM*> listOfWaitingLinks = QList<ElementMappingM*>();
+                QList<ElementMappingM*> listOfWaitingLinks;
 
                 if (_hashFromAgentNameToListOfWaitingLinks.contains(mappingElement->outputAgent())) {
                     listOfWaitingLinks = _hashFromAgentNameToListOfWaitingLinks.value(mappingElement->outputAgent());

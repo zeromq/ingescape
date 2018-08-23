@@ -320,19 +320,13 @@ void AgentsSupervisionController::_onAgentDefinitionChangedWithPreviousAndNewVal
                                 {
                                     bool hasToDeleteNewModel = false;
                                     AgentM* sameModel = NULL;
+
                                     QString peerId = model->peerId();
                                     QString commandLine = model->commandLine();
 
                                     // Search a model already added with the same peer id...
                                     for (AgentM* iterator : modelsOnHost)
                                     {
-                                        // Same peer id and agent is OFF --> it is the same model
-                                        /*if ((iterator != NULL) && !iterator->peerId().isEmpty() && (iterator->peerId() == peerId) && !iterator->isON())
-                                        {
-                                            sameModel = iterator;
-                                            break;
-                                        }*/
-
                                         // Same peer id
                                         if ((iterator != NULL) && !iterator->peerId().isEmpty() && (iterator->peerId() == peerId))
                                         {
@@ -352,27 +346,6 @@ void AgentsSupervisionController::_onAgentDefinitionChangedWithPreviousAndNewVal
                                                     break;
                                                 }
                                             }
-
-                                            /*// ON
-                                            if (iterator->isON())
-                                            {
-                                                // New model is OFF, we have to delete it
-                                                if (!model->isON()) {
-                                                    hasToDeleteNewModel = true;
-                                                }
-                                            }
-                                            // OFF (it is the same model)
-                                            else
-                                            {
-                                                // New model is OFF, we have to delete it
-                                                if (!model->isON()) {
-                                                    hasToDeleteNewModel = true;
-                                                }
-                                                else {
-                                                    sameModel = iterator;
-                                                    break;
-                                                }
-                                            }*/
                                         }
                                     }
 
@@ -426,120 +399,9 @@ void AgentsSupervisionController::_onAgentDefinitionChangedWithPreviousAndNewVal
                                     }
 
                                     qDebug() << "There are" << agentUsingSameDefinition->models()->count() << "models of agent" << model->name() << "with the same definition";
-
-
-                                    /*for (AgentM* iterator : modelsOnHost)
-                                    {
-                                        // Peer id is defined and agent is OFF --> we consider that it is the same model
-                                        if ((iterator != NULL) && !iterator->peerId().isEmpty() && !iterator->isON())
-                                        {
-                                            int index = agentUsingSameDefinition->models()->indexOf(iterator);
-                                            if (index > -1)
-                                            {
-                                                isSameModel = true;
-
-                                                // Emit signal "Identical Agent Model Replaced"
-                                                Q_EMIT identicalAgentModelReplaced(iterator, model);
-
-                                                // Replace the model
-                                                agentUsingSameDefinition->models()->replace(index, model);
-
-                                                qDebug() << "Replace model of agent" << model->name() << "on" << hostname << "(" << iterator->peerId() << "-->" << model->peerId() << ")";
-
-                                                // Delete the previous model of agent
-                                                _modelManager->deleteAgentModel(iterator);
-                                            }
-                                            break;
-                                        }
-                                    }
-
-                                    if (!isSameModel)
-                                    {
-                                        // Add the model of agent to the list of the VM
-                                        agentUsingSameDefinition->models()->append(model);
-
-                                        qDebug() << "Add model of agent" << model->name() << "on" << hostname;
-                                    }*/
                                 }
                             }
                         }
-
-                        // 1- View model never yet appeared on the network
-                        /*if (agentUsingSameDefinition->neverAppearedOnNetwork())
-                        {
-                            // It must have only one (fake) model of agent
-                            if (agentUsingSameDefinition->models()->count() == 1)
-                            {
-                                AgentM* modelUsingSameDefinition = agentUsingSameDefinition->models()->at(0);
-                                if (modelUsingSameDefinition != NULL)
-                                {
-                                    // If the new model already appeared on the network
-                                    if (!model->neverAppearedOnNetwork())
-                                    {
-                                        // Emit signal "Identical Agent Model Replaced"
-                                        Q_EMIT identicalAgentModelReplaced(modelUsingSameDefinition, model);
-
-                                        // We replace the fake model of agent
-                                        agentUsingSameDefinition->models()->replace(0, model);
-
-                                        qDebug() << "Replace model (which never appeared on network) by agent" << model->name() << "on" << model->address() << "(" << model->hostname() << ")";
-
-                                        // Delete the previous (fake) model of agent
-                                        _modelManager->deleteAgentModel(modelUsingSameDefinition);
-
-                                        // Update the flag "Never Appeared on the Network"
-                                        agentUsingSameDefinition->setneverAppearedOnNetwork(false);
-                                    }
-                                    else {
-                                        // Delete this new (fake) model of agent
-                                        _modelManager->deleteAgentModel(model);
-                                    }
-                                }
-                            }
-                        }
-                        // 2- View model is about a real agent, which already appeared on the network
-                        else
-                        {
-                            //
-                            // Then, replace (2.1) / add (2.2) our model to the view model having the same definition
-                            //
-                            bool isSameModel = false;
-                            QList<AgentM*> models = agentUsingSameDefinition->models()->toList();
-                            for (int i = 0; i < models.count(); i++)
-                            {
-                                AgentM* iterator = models.at(i);
-
-                                // Same address and state is OFF --> we consider that it is the same model
-                                if ((iterator != NULL) && (iterator->address() == model->address()) && !iterator->isON())
-                                {
-                                    isSameModel = true;
-
-                                    // Emit signal "Identical Agent Model Replaced"
-                                    Q_EMIT identicalAgentModelReplaced(iterator, model);
-
-                                    // 2.1- We replace the model
-                                    agentUsingSameDefinition->models()->replace(i, model);
-
-                                    qDebug() << "Replace model by agent" << model->name() << "on" << model->address() << "(" << model->hostname() << ")";
-
-                                    // Delete the previous model of agent
-                                    _modelManager->deleteAgentModel(iterator);
-
-                                    break;
-                                }
-                            }
-
-                            if (!isSameModel)
-                            {
-                                if (!model->hostname().isEmpty())
-                                {
-                                    // 2.2- Add the model of agent to the list of the VM
-                                    agentUsingSameDefinition->models()->append(model);
-
-                                    qDebug() << "Add model of agent" << model->name() << "on" << model->address();
-                                }
-                            }
-                        }*/
                     }
                 }
             }
@@ -590,29 +452,8 @@ void AgentsSupervisionController::_onDifferentDefinitionDetectedOnModelOfAgent(A
         // A view model of agent already exists with exactly the same definition
         else
         {
-            // View model never yet appeared on the network
-            if (agentUsingSameDefinition->neverAppearedOnNetwork() && (agentUsingSameDefinition->models()->count() == 1))
-            {
-                AgentM* modelUsingSameDefinition = agentUsingSameDefinition->models()->at(0);
-                if (modelUsingSameDefinition != NULL)
-                {
-                    // We replace the fake model of agent
-                    agentUsingSameDefinition->models()->replace(0, model);
-
-                    qDebug() << "Replace model (which never appeared on network) by agent" << model->name() << "on" << model->address() << "(" << model->hostname() << ")";
-
-                    // Delete the previous (fake) model of agent
-                    _modelManager->deleteAgentModel(modelUsingSameDefinition);
-
-                    // Update the flag "Never Appeared on the Network"
-                    agentUsingSameDefinition->setneverAppearedOnNetwork(false);
-                }
-            }
-            else
-            {
-                // Add the model of agent to the list of the view model
-                agentUsingSameDefinition->models()->append(model);
-            }
+            // Add the model of agent to the list of the view model
+            agentUsingSameDefinition->models()->append(model);
         }
     }
 }
@@ -786,29 +627,8 @@ void AgentsSupervisionController::_checkHaveToMergeAgent(AgentVM* agent)
                 _deleteAgentViewModel(agent);
                 agent = NULL;
 
-                // View model never yet appeared on the network
-                if (agentUsingSameDefinition->neverAppearedOnNetwork() && (agentUsingSameDefinition->models()->count() == 1))
-                {
-                    AgentM* modelUsingSameDefinition = agentUsingSameDefinition->models()->at(0);
-                    if (modelUsingSameDefinition != NULL)
-                    {
-                        // We replace the fake model of agent
-                        agentUsingSameDefinition->models()->replace(0, model);
-
-                        qDebug() << "Replace model (which never appeared on network) by agent" << model->name() << "on" << model->address() << "(" << model->hostname() << ")";
-
-                        // Delete the previous (fake) model of agent
-                        _modelManager->deleteAgentModel(modelUsingSameDefinition);
-
-                        // Update the flag "Never Appeared on the Network"
-                        agentUsingSameDefinition->setneverAppearedOnNetwork(false);
-                    }
-                }
-                else
-                {
-                    // Add the model of agent to the list of the new view model
-                    agentUsingSameDefinition->models()->append(model);
-                }
+                // Add the model of agent to the list of the new view model
+                agentUsingSameDefinition->models()->append(model);
             }
         }
     }

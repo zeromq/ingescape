@@ -44,9 +44,6 @@ class AgentVM : public QObject
     // Hostname(s) on the network of our agent(s)
     I2_QML_PROPERTY_READONLY(QString, hostnames)
 
-    // Flag indicating if our agent never yet appeared on the network
-    I2_QML_PROPERTY_READONLY(bool, neverAppearedOnNetwork)
-
     // Flag indicating if our agent is ON (vs OFF)
     I2_QML_PROPERTY_READONLY(bool, isON)
 
