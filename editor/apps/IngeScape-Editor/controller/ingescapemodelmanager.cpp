@@ -465,7 +465,7 @@ void IngeScapeModelManager::onAgentEntered(QString peerId, QString agentName, QS
         // An agent with this peer id already exist
         if (agent != NULL)
         {
-            qInfo() << "The agent" << agentName << "with peer id" << peerId << "and IP address" << ipAddress << "is back on the network !";
+            qInfo() << "The agent" << agentName << "with peer id" << peerId << "on" << hostname << "(" << ipAddress << ") is back on the network !";
 
             // Update the state (flag "is ON")
             agent->setisON(true);

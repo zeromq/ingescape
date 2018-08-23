@@ -329,11 +329,12 @@ void AgentsSupervisionController::_onAgentDefinitionChangedWithPreviousAndNewVal
                                         }
                                     }
 
-                                    if (sameModel == NULL)
+                                    // New model is ON
+                                    if ((sameModel == NULL) && model->isON())
                                     {
                                         for (AgentM* iterator : modelsOnHost)
                                         {
-                                            // Same command line (peer id is defined) and agent is OFF --> we consider that it is the same model
+                                            // Same command line (peer id is defined) and agent is OFF --> we consider that it is the same model that evolve from OFF to ON
                                             if ((iterator != NULL) && !iterator->peerId().isEmpty() && (iterator->commandLine() == commandLine) && !iterator->isON())
                                             {
                                                 sameModel = iterator;
