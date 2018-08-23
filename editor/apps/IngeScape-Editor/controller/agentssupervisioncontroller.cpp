@@ -296,10 +296,10 @@ void AgentsSupervisionController::_onAgentDefinitionChangedWithPreviousAndNewVal
                             // There is NO agent on this host yet
                             if (modelsOnHost.isEmpty())
                             {
+                                qDebug() << "Add model of agent" << model->name() << "on" << hostname;
+
                                 // Add the model of agent to the list of the VM
                                 agentUsingSameDefinition->models()->append(model);
-
-                                qDebug() << "Add model of agent" << model->name() << "on" << hostname;
                             }
                             // There is already agent models on this host
                             else
@@ -307,25 +307,69 @@ void AgentsSupervisionController::_onAgentDefinitionChangedWithPreviousAndNewVal
                                 // Peer id is empty (the agent has never appeared on the network)
                                 if (model->peerId().isEmpty())
                                 {
+                                    qDebug() << "Add model of agent" << model->name() << "on" << hostname;
+
                                     // Add the model of agent to the list of the VM
                                     agentUsingSameDefinition->models()->append(model);
-
-                                    qDebug() << "Add model of agent" << model->name() << "on" << hostname;
                                 }
                                 // Peer id is defined: check if it is an agent that evolve from OFF to ON
                                 else
                                 {
+                                    bool hasToDeleteNewModel = false;
                                     AgentM* sameModel = NULL;
                                     QString peerId = model->peerId();
                                     QString commandLine = model->commandLine();
 
+                                    // Search a model already added with the same peer id...
                                     for (AgentM* iterator : modelsOnHost)
                                     {
                                         // Same peer id and agent is OFF --> it is the same model
-                                        if ((iterator != NULL) && !iterator->peerId().isEmpty() && (iterator->peerId() == peerId) && !iterator->isON())
+                                        /*if ((iterator != NULL) && !iterator->peerId().isEmpty() && (iterator->peerId() == peerId) && !iterator->isON())
                                         {
                                             sameModel = iterator;
                                             break;
+                                        }*/
+
+                                        // Same peer id
+                                        if ((iterator != NULL) && !iterator->peerId().isEmpty() && (iterator->peerId() == peerId))
+                                        {
+                                            // New model is OFF and there is already a model with the same peer id...
+                                            if (!model->isON())
+                                            {
+                                                // the new model is useless, we have to delete it
+                                                hasToDeleteNewModel = true;
+                                            }
+                                            // New model is ON and there is already a model with the same peer id...
+                                            else
+                                            {
+                                                // The model already added is OFF, we have to replace it by the new one
+                                                if (!iterator->isON())
+                                                {
+                                                    sameModel = iterator;
+                                                    break;
+                                                }
+                                            }
+
+                                            /*// ON
+                                            if (iterator->isON())
+                                            {
+                                                // New model is OFF, we have to delete it
+                                                if (!model->isON()) {
+                                                    hasToDeleteNewModel = true;
+                                                }
+                                            }
+                                            // OFF (it is the same model)
+                                            else
+                                            {
+                                                // New model is OFF, we have to delete it
+                                                if (!model->isON()) {
+                                                    hasToDeleteNewModel = true;
+                                                }
+                                                else {
+                                                    sameModel = iterator;
+                                                    break;
+                                                }
+                                            }*/
                                         }
                                     }
 
@@ -343,7 +387,14 @@ void AgentsSupervisionController::_onAgentDefinitionChangedWithPreviousAndNewVal
                                         }
                                     }
 
-                                    if (sameModel != NULL)
+                                    // We have to remove the new model
+                                    if (hasToDeleteNewModel)
+                                    {
+                                        // Delete this new (fake) model of agent
+                                        _modelManager->deleteAgentModel(model);
+                                    }
+                                    // Else if we have to replace an existing (same) model by the new one
+                                    else if (sameModel != NULL)
                                     {
                                         int index = agentUsingSameDefinition->models()->indexOf(sameModel);
                                         if (index > -1)
@@ -351,22 +402,24 @@ void AgentsSupervisionController::_onAgentDefinitionChangedWithPreviousAndNewVal
                                             // Emit signal "Identical Agent Model Replaced"
                                             Q_EMIT identicalAgentModelReplaced(sameModel, model);
 
+                                            qDebug() << "Replace model of agent" << model->name() << "on" << hostname << "(" << sameModel->peerId() << "-->" << model->peerId() << ")";
+
                                             // Replace the model
                                             agentUsingSameDefinition->models()->replace(index, model);
-
-                                            qDebug() << "Replace model of agent" << model->name() << "on" << hostname << "(" << sameModel->peerId() << "-->" << model->peerId() << ")";
 
                                             // Delete the previous model of agent
                                             _modelManager->deleteAgentModel(sameModel);
                                         }
                                     }
+                                    // Else, we add the new model
                                     else
                                     {
+                                        qDebug() << "Add model of agent" << model->name() << "on" << hostname;
+
                                         // Add the model of agent to the list of the VM
                                         agentUsingSameDefinition->models()->append(model);
-
-                                        qDebug() << "Add model of agent" << model->name() << "on" << hostname;
                                     }
+
 
                                     /*for (AgentM* iterator : modelsOnHost)
                                     {
