@@ -33,6 +33,9 @@ HostVM::HostVM(HostM* model, QObject *parent) : QObject(parent),
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
+    // Agents are sorted on their name (alphabetical order)
+    _agentsList.setSortProperty("name");
+
     if (_modelM != NULL)
     {
         _name = _modelM->name();
@@ -59,7 +62,7 @@ HostVM::~HostVM()
     }
 
     // Clear the list of agents
-    _listOfAgents.clear();
+    _agentsList.clear();
 }
 
 

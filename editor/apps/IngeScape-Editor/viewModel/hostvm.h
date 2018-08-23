@@ -38,8 +38,8 @@ class HostVM : public QObject
     // Model of our host
     I2_QML_PROPERTY_READONLY(HostM*, modelM)
 
-    // List of associated Agents
-    I2_QOBJECT_LISTMODEL(AgentM, listOfAgents)
+    // Sorted list of associated agents
+    I2_QOBJECT_LISTMODEL_WITH_SORTFILTERPROXY(AgentM, agentsList)
 
     // Flag indicating if our agent can be frozen
     I2_QML_PROPERTY_READONLY(bool, canProvideStream)

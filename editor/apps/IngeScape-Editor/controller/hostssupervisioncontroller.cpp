@@ -30,6 +30,7 @@ HostsSupervisionController::HostsSupervisionController(QObject *parent) : QObjec
     // Force ownership of our object, it will prevent Qml from stealing it
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
+    // Hosts are sorted on their name (alphabetical order)
     _hostsList.setSortProperty("name");
 }
 
@@ -90,11 +91,11 @@ void HostsSupervisionController::onHostModelCreated(HostM* host)
             // Associate host with existing agents if necessary
             for (AgentM* agent : _allAgents)
             {
-                if ((agent != NULL) && (agent->hostname() == hostname) && !hostVM->listOfAgents()->contains(agent))
+                if ((agent != NULL) && (agent->hostname() == hostname) && !hostVM->agentsList()->contains(agent))
                 {
                     qDebug() << "Add (existing) agent" << agent->name() << "to new host" << hostname;
 
-                    hostVM->listOfAgents()->append(agent);
+                    hostVM->agentsList()->append(agent);
                 }
             }
         }
@@ -150,10 +151,10 @@ void HostsSupervisionController::onAgentModelCreated(AgentM* agent)
         // Get the view model of host with its name
         HostVM* hostVM = _getHostWithName(agent->hostname());
 
-        if ((hostVM != NULL) && !hostVM->listOfAgents()->contains(agent))
+        if ((hostVM != NULL) && !hostVM->agentsList()->contains(agent))
         {
             // Add this agent to the host
-            hostVM->listOfAgents()->append(agent);
+            hostVM->agentsList()->append(agent);
 
             qDebug() << "Add agent" << agent->name() << "to host" << hostVM->name();
         }
@@ -176,10 +177,10 @@ void HostsSupervisionController::onAgentModelWillBeDeleted(AgentM* agent)
         // Get the view model of host with its name
         HostVM* hostVM = _getHostWithName(agent->hostname());
 
-        if ((hostVM != NULL) && hostVM->listOfAgents()->contains(agent))
+        if ((hostVM != NULL) && hostVM->agentsList()->contains(agent))
         {
             // Remove this agent from the host
-            hostVM->listOfAgents()->remove(agent);
+            hostVM->agentsList()->remove(agent);
 
             qDebug() << "Remove agent" << agent->name() << "from host" << hostVM->name();
         }

@@ -178,7 +178,7 @@ Item {
         Item {
             id: hostItem
 
-            property var model_listOfAgents: model.listOfAgents
+            property var model_agentsList: model.agentsList
 
             //height: 5 + hostInfos.height + 6
             height: 5 + hostName.height + hostInfos.spacing + hostIP.height + hostInfos.spacing + listViewOfAgents.height + 6
@@ -249,7 +249,7 @@ Item {
                 ListView {
                     id: listViewOfAgents
 
-                    model: hostItem.model_listOfAgents
+                    model: hostItem.model_agentsList
 
                     interactive: false
 

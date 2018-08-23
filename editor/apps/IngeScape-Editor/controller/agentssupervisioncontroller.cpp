@@ -37,6 +37,7 @@ AgentsSupervisionController::AgentsSupervisionController(IngeScapeModelManager* 
 
     if (_modelManager != NULL)
     {
+        // Agents are sorted on their name (alphabetical order)
         _agentsList.setSortProperty("name");
 
         // FIXME TODO: Add another property for sorting, because variants can provoke re-order in the list
@@ -284,6 +285,8 @@ void AgentsSupervisionController::_onAgentDefinitionChangedWithPreviousAndNewVal
                         // There is already an existing model of agent (in the VM agentUsingSameDefinition)
                         if (hostname == HOSTNAME_NOT_DEFINED)
                         {
+                            qDebug() << "Delete model of agent" << model->name() << "on" << hostname;
+
                             // Delete this new (fake) model of agent
                             _modelManager->deleteAgentModel(model);
                         }
@@ -390,6 +393,8 @@ void AgentsSupervisionController::_onAgentDefinitionChangedWithPreviousAndNewVal
                                     // We have to remove the new model
                                     if (hasToDeleteNewModel)
                                     {
+                                        qDebug() << "Delete model of agent" << model->name() << "on" << hostname;
+
                                         // Delete this new (fake) model of agent
                                         _modelManager->deleteAgentModel(model);
                                     }
@@ -419,6 +424,8 @@ void AgentsSupervisionController::_onAgentDefinitionChangedWithPreviousAndNewVal
                                         // Add the model of agent to the list of the VM
                                         agentUsingSameDefinition->models()->append(model);
                                     }
+
+                                    qDebug() << "There are" << agentUsingSameDefinition->models()->count() << "models of agent" << model->name() << "with the same definition";
 
 
                                     /*for (AgentM* iterator : modelsOnHost)

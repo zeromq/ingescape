@@ -226,230 +226,224 @@ Item {
 
 
     //
-    // Visual representation of an record in our list
+    // Visual representation of a record in our list
     //
     Component {
         id: componentRecordListItem
 
-            Item {
-                id : recordItem
+        Item {
+            id : recordItem
 
-                property var agentmodel: model.listOfAgents
+            property int margin: 5
 
-                property int margin: 5
+            height: 60//recordInfos.height + margin*2
 
-                height: 60//recordInfos.height + margin*2
+            anchors {
+                left : parent.left
+                right : parent.right
+            }
+
+            // Playing feedback
+            Rectangle {
+
+                anchors {
+                    fill: parent
+                }
+                visible: playPauseRecordButton.checked
+                color : IngeScapeTheme.selectedAgentColor
+            }
+
+            // separator
+            Rectangle {
+                anchors {
+                    bottom: parent.bottom
+                    left: parent.left
+                    right: parent.right
+                }
+
+                color: IngeScapeTheme.leftPanelBackgroundColor
+
+                height: 1
+            }
+
+            Column
+            {
+                id:recordInfos
+                y: margin
 
                 anchors {
                     left : parent.left
                     right : parent.right
+                    leftMargin: 70
+                    rightMargin: 12
                 }
 
-                // Playing feedback
-                Rectangle {
+                spacing : 4
 
-                    anchors {
-                        fill: parent
-                    }
-                    visible: playPauseRecordButton.checked
-                    color : IngeScapeTheme.selectedAgentColor
-                }
-
-                // separator
-                Rectangle {
-                    anchors {
-                        bottom: parent.bottom
-                        left: parent.left
-                        right: parent.right
-                    }
-
-                    color: IngeScapeTheme.leftPanelBackgroundColor
-
-                    height: 1
-                }
-
-                Column
-                {
-                    id:recordInfos
-                    y: margin
+                // Name
+                Text {
+                    id: recordName
 
                     anchors {
                         left : parent.left
                         right : parent.right
-                        leftMargin: 70
-                        rightMargin: 12
                     }
+                    elide: Text.ElideRight
 
-                    spacing : 4
-
-                    // Name
-                    Text {
-                        id: recordName
-
-                        anchors {
-                            left : parent.left
-                            right : parent.right
-                        }
-                        elide: Text.ElideRight
-
-                        text: model.modelM.name
-                        color: playPauseRecordButton.checked ? IngeScapeTheme.agentsListItemBackgroundColor : IngeScapeTheme.agentsListLabelColor
-                        font: IngeScapeTheme.headingFont
-                    }
-
-                    // IP address
-                    Text {
-                        id: recordIP
-
-                        anchors {
-                            left : parent.left
-                            right : parent.right
-                        }
-                        elide: Text.ElideRight
-
-                        text: qsTr("%1 %2 - %3 %4").arg(Qt.formatDate(model.modelM.beginDateTime, "dd/MM/yyyy"))
-                                                    .arg(Qt.formatTime(model.modelM.beginDateTime, "HH:mm"))
-                                                    .arg(Qt.formatDate(model.modelM.endDateTime, "dd/MM/yyyy"))
-                                                    .arg(Qt.formatTime(model.modelM.endDateTime, "HH:mm"))
-
-                        color: playPauseRecordButton.checked ? IngeScapeTheme.agentsListItemBackgroundColor :IngeScapeTheme.agentsListTextColor
-                        font: IngeScapeTheme.normalFont
-                    }
+                    text: model.modelM.name
+                    color: playPauseRecordButton.checked ? IngeScapeTheme.agentsListItemBackgroundColor : IngeScapeTheme.agentsListLabelColor
+                    font: IngeScapeTheme.headingFont
                 }
 
-
-                // Record can be clicked
-                MouseArea
-                {
-                    anchors.fill: parent
-
-                    onPressed: {
-                        if (controller) {
-                            if (controller.selectedRecord === model.QtObject)
-                            {
-                                controller.selectedRecord = null;
-                            }
-                            else {
-                                controller.selectedRecord = model.QtObject;
-                            }
-                        }
-                    }
-                }
-
-
-                BusyIndicator {
-                    id: loadingRecordIndicator
+                // IP address
+                Text {
+                    id: recordIP
 
                     anchors {
-                        verticalCenter: parent.verticalCenter
-                        left: parent.left
-                        leftMargin: 25
+                        left : parent.left
+                        right : parent.right
                     }
-                    width: 20
-                    height: 20
+                    elide: Text.ElideRight
 
-                    running: true
+                    text: qsTr("%1 %2 - %3 %4").arg(Qt.formatDate(model.modelM.beginDateTime, "dd/MM/yyyy"))
+                    .arg(Qt.formatTime(model.modelM.beginDateTime, "HH:mm"))
+                    .arg(Qt.formatDate(model.modelM.endDateTime, "dd/MM/yyyy"))
+                    .arg(Qt.formatTime(model.modelM.endDateTime, "HH:mm"))
 
-                    visible: controller.isLoadingRecord && (controller.playingRecord !== null) && (controller.playingRecord.modelM.id === model.modelM.id)
+                    color: playPauseRecordButton.checked ? IngeScapeTheme.agentsListItemBackgroundColor :IngeScapeTheme.agentsListTextColor
+                    font: IngeScapeTheme.normalFont
                 }
+            }
 
-                // Play record button
-                Button {
-                    id: playPauseRecordButton
 
-                    anchors {
-                        verticalCenter: parent.verticalCenter
-                        left: parent.left
-                        leftMargin: 25
-                    }
+            // Record can be clicked
+            MouseArea
+            {
+                anchors.fill: parent
 
-                    visible: !loadingRecordIndicator.visible
-                    opacity: !enabled ? 0.3 : 1
-                    enabled: !controller.isRecording && (controller.playingRecord === null || controller.playingRecord.modelM.id === model.modelM.id)
-
-                    style: I2SvgToggleButtonStyle {
-                        fileCache: IngeScapeTheme.svgFileINGESCAPE
-
-                        toggleCheckedReleasedID: "pause_actif";
-                        toggleCheckedPressedID: "pause_actif_pressed";
-                        toggleUncheckedReleasedID: "play_actif";
-                        toggleUncheckedPressedID: "play_actif_pressed";
-
-                        // No disabled states
-                        toggleCheckedDisabledID: "play_actif"
-                        toggleUncheckedDisabledID: toggleCheckedDisabledID
-
-                        labelMargin: 0;
-
-                    }
-
-                    onClicked: {
-                        if (controller) {
-                            controller.controlRecord(model.modelM.id, checked)
+                onPressed: {
+                    if (controller) {
+                        if (controller.selectedRecord === model.QtObject)
+                        {
+                            controller.selectedRecord = null;
                         }
-                    }
-
-                    Connections {
-                        target: controller
-                        onPlayingRecordChanged: playPauseRecordButton.checked = controller.playingRecord !== null && controller.playingRecord.modelM.id === model.modelM.id
-                    }
-                }
-
-
-
-
-                // Selected Record feedback
-                Item {
-                    anchors.fill: parent
-                    visible : controller && (controller.selectedRecord === model.QtObject);
-
-                    Rectangle {
-                        anchors {
-                            left : parent.left
-                            top : parent.top
-                            bottom: parent.bottom
-                            bottomMargin: 1
-                        }
-
-                        width : 6
-                        color : IngeScapeTheme.selectedAgentColor
-                    }
-
-                    Button {
-                        id: removeButton
-
-                        activeFocusOnPress: true
-
-                        anchors {
-                            top: parent.top
-                            topMargin: 10
-                            right : parent.right
-                            rightMargin: 12
-                        }
-
-                        style: Theme.LabellessSvgButtonStyle {
-                            fileCache: IngeScapeTheme.svgFileINGESCAPE
-
-                            pressedID: releasedID + "-pressed"
-                            releasedID: "supprimer"
-                            disabledID : releasedID
-                        }
-
-                        onClicked: {
-
-                            if (controller)
-                            {
-                                // Delete selected record
-                                controller.deleteSelectedRecord();
-                            }
+                        else {
+                            controller.selectedRecord = model.QtObject;
                         }
                     }
                 }
             }
 
 
+            BusyIndicator {
+                id: loadingRecordIndicator
+
+                anchors {
+                    verticalCenter: parent.verticalCenter
+                    left: parent.left
+                    leftMargin: 25
+                }
+                width: 20
+                height: 20
+
+                running: true
+
+                visible: controller.isLoadingRecord && (controller.playingRecord !== null) && (controller.playingRecord.modelM.id === model.modelM.id)
+            }
+
+            // Play record button
+            Button {
+                id: playPauseRecordButton
+
+                anchors {
+                    verticalCenter: parent.verticalCenter
+                    left: parent.left
+                    leftMargin: 25
+                }
+
+                visible: !loadingRecordIndicator.visible
+                opacity: !enabled ? 0.3 : 1
+                enabled: !controller.isRecording && (controller.playingRecord === null || controller.playingRecord.modelM.id === model.modelM.id)
+
+                style: I2SvgToggleButtonStyle {
+                    fileCache: IngeScapeTheme.svgFileINGESCAPE
+
+                    toggleCheckedReleasedID: "pause_actif";
+                    toggleCheckedPressedID: "pause_actif_pressed";
+                    toggleUncheckedReleasedID: "play_actif";
+                    toggleUncheckedPressedID: "play_actif_pressed";
+
+                    // No disabled states
+                    toggleCheckedDisabledID: "play_actif"
+                    toggleUncheckedDisabledID: toggleCheckedDisabledID
+
+                    labelMargin: 0;
+
+                }
+
+                onClicked: {
+                    if (controller) {
+                        controller.controlRecord(model.modelM.id, checked)
+                    }
+                }
+
+                Connections {
+                    target: controller
+                    onPlayingRecordChanged: playPauseRecordButton.checked = controller.playingRecord !== null && controller.playingRecord.modelM.id === model.modelM.id
+                }
+            }
 
 
+
+
+            // Selected Record feedback
+            Item {
+                anchors.fill: parent
+                visible : controller && (controller.selectedRecord === model.QtObject);
+
+                Rectangle {
+                    anchors {
+                        left : parent.left
+                        top : parent.top
+                        bottom: parent.bottom
+                        bottomMargin: 1
+                    }
+
+                    width : 6
+                    color : IngeScapeTheme.selectedAgentColor
+                }
+
+                Button {
+                    id: removeButton
+
+                    activeFocusOnPress: true
+
+                    anchors {
+                        top: parent.top
+                        topMargin: 10
+                        right : parent.right
+                        rightMargin: 12
+                    }
+
+                    style: Theme.LabellessSvgButtonStyle {
+                        fileCache: IngeScapeTheme.svgFileINGESCAPE
+
+                        pressedID: releasedID + "-pressed"
+                        releasedID: "supprimer"
+                        disabledID : releasedID
+                    }
+
+                    onClicked: {
+
+                        if (controller)
+                        {
+                            // Delete selected record
+                            controller.deleteSelectedRecord();
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
