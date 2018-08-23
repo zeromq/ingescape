@@ -104,7 +104,8 @@ void DefinitionM::_onInputsListChanged()
     // Input added
     if (_previousInputsList.count() < newInputsList.count())
     {
-        for (AgentIOPM* input : newInputsList) {
+        for (AgentIOPM* input : newInputsList)
+        {
             if ((input != NULL) && !_previousInputsList.contains(input))
             {
                 _inputsIdsList.append(input->id());
@@ -115,7 +116,8 @@ void DefinitionM::_onInputsListChanged()
     // Input removed
     else if (_previousInputsList.count() > newInputsList.count())
     {
-        for (AgentIOPM* input : _previousInputsList) {
+        for (AgentIOPM* input : _previousInputsList)
+        {
             if ((input != NULL) && !newInputsList.contains(input))
             {
                 _inputsIdsList.removeOne(input->id());
@@ -140,7 +142,8 @@ void DefinitionM::_onOutputsListChanged()
     // Output added
     if (_previousOutputsList.count() < newOutputsList.count())
     {
-        for (OutputM* output : newOutputsList) {
+        for (OutputM* output : newOutputsList)
+        {
             if ((output != NULL) && !_previousOutputsList.contains(output))
             {
                 _outputsIdsList.append(output->id());
@@ -155,7 +158,8 @@ void DefinitionM::_onOutputsListChanged()
     // Output removed
     else if (_previousOutputsList.count() > newOutputsList.count())
     {
-        for (OutputM* output : _previousOutputsList) {
+        for (OutputM* output : _previousOutputsList)
+        {
             if ((output != NULL) && !newOutputsList.contains(output))
             {
                 _outputsIdsList.removeOne(output->id());
@@ -184,7 +188,8 @@ void DefinitionM::_onParametersListChanged()
     // Parameter added
     if (_previousParametersList.count() < newParametersList.count())
     {
-        for (AgentIOPM* parameter : newParametersList) {
+        for (AgentIOPM* parameter : newParametersList)
+        {
             if ((parameter != NULL) && !_previousParametersList.contains(parameter))
             {
                 _parametersIdsList.append(parameter->id());
@@ -195,7 +200,8 @@ void DefinitionM::_onParametersListChanged()
     // Parameter removed
     else if (_previousParametersList.count() > newParametersList.count())
     {
-        for (AgentIOPM* parameter : _previousParametersList) {
+        for (AgentIOPM* parameter : _previousParametersList)
+        {
             if ((parameter != NULL) && !newParametersList.contains(parameter))
             {
                 _parametersIdsList.removeOne(parameter->id());
@@ -304,6 +310,76 @@ AgentIOPM* DefinitionM::getParameterWithName(QString parameterName)
 
 
 /**
+ * @brief Make a copy of our definition
+ * @return
+ */
+DefinitionM* DefinitionM::copy()
+{
+    DefinitionM* copy = new DefinitionM(_name, _version, _description);
+
+    //
+    // Inputs
+    //
+    QList<AgentIOPM*> copiesOfInputs;
+    for (AgentIOPM* iterator : _inputsList)
+    {
+        if (iterator != NULL)
+        {
+            AgentIOPM* copyOfInput = new AgentIOPM(iterator->agentIOPType(),
+                                                   iterator->name(),
+                                                   iterator->agentIOPValueType());
+
+            copyOfInput->setdefaultValue(iterator->defaultValue());
+
+            copiesOfInputs.append(copyOfInput);
+        }
+    }
+    copy->inputsList()->append(copiesOfInputs);
+
+
+    //
+    // Outputs
+    //
+    QList<OutputM*> copiesOfOutputs;
+    for (OutputM* iterator : _outputsList)
+    {
+        if (iterator != NULL)
+        {
+            OutputM* copyOfOutput = new OutputM(iterator->name(),
+                                                iterator->agentIOPValueType());
+
+            copyOfOutput->setdefaultValue(iterator->defaultValue());
+
+            copiesOfOutputs.append(copyOfOutput);
+        }
+    }
+    copy->outputsList()->append(copiesOfOutputs);
+
+
+    //
+    // Parameters
+    //
+    QList<AgentIOPM*> copiesOfParameters;
+    for (AgentIOPM* iterator : _parametersList)
+    {
+        if (iterator != NULL)
+        {
+            AgentIOPM* copyOfParameter = new AgentIOPM(iterator->agentIOPType(),
+                                                       iterator->name(),
+                                                       iterator->agentIOPValueType());
+
+            copyOfParameter->setdefaultValue(iterator->defaultValue());
+
+            copiesOfParameters.append(copyOfParameter);
+        }
+    }
+    copy->parametersList()->append(copiesOfParameters);
+
+    return copy;
+}
+
+
+/**
  * @brief Return true if the 2 list of ids are strictly identicals
  * @param idsList1
  * @param idsList2
@@ -314,7 +390,7 @@ bool DefinitionM::_areIdenticalsIdsList(QStringList idsList1, QStringList idsLis
     // Same numbers of ids
     if (idsList1.count() == idsList2.count())
     {
-        foreach (QString id, idsList1)
+        for (QString id : idsList1)
         {
             // id of list 1 is not in the list 2
             if (!idsList2.contains(id)) {

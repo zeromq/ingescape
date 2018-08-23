@@ -127,6 +127,13 @@ public:
     AgentIOPM* getParameterWithName(QString parameterName);
 
 
+    /**
+     * @brief Make a copy of our definition
+     * @return
+     */
+    DefinitionM* copy();
+
+
 Q_SIGNALS:
 
     /**
