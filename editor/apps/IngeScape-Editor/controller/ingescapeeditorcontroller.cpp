@@ -478,8 +478,8 @@ void IngeScapeEditorController::createNewPlatform()
 {
     if (_agentsMappingC != NULL)
     {
-        // Create a new mapping (clear the previous one)
-        _agentsMappingC->createNewMapping();
+        // Clear the current mapping
+        _agentsMappingC->clearMapping();
     }
 
     if (_scenarioC != NULL)
@@ -847,9 +847,15 @@ void IngeScapeEditorController::_onLoadingRecord(int deltaTimeFromTimeLine, QStr
                 _modelManager->importAgentsListFromJson(jsonRoot.value("agents").toArray());
             }
 
-            // Import the mapping from JSON
-            if (_agentsMappingC != NULL) {
-                _agentsMappingC->importMappingFromJson(byteArrayOfJson);
+            // Import the mapping of agents from JSON
+            if (_agentsMappingC != NULL)
+            {
+                // Clear the current mapping
+                _agentsMappingC->clearMapping();
+
+                if (jsonRoot.contains("mapping")) {
+                    _agentsMappingC->importMappingFromJson(jsonRoot.value("mapping").toArray());
+                }
             }
 
             if (_scenarioC != NULL)
@@ -902,25 +908,31 @@ void IngeScapeEditorController::_loadPlatformFromFile(QString platformFilePath)
                     {
                         _modelManager->importAgentsListFromJson(jsonRoot.value("agents").toArray());
                     }
+
+                    // Import the mapping of agents from JSON
+                    if (_agentsMappingC != NULL)
+                    {
+                        // Clear the current mapping
+                        _agentsMappingC->clearMapping();
+
+                        if (jsonRoot.contains("mapping")) {
+                            _agentsMappingC->importMappingFromJson(jsonRoot.value("mapping").toArray());
+                        }
+                    }
+
+                    // Import the scenario from JSON
+                    if (_scenarioC != NULL)
+                    {
+                        // Clear scenario
+                        _scenarioC->clearScenario();
+
+                        // Import new scenario
+                        _scenarioC->importScenarioFromJson(byteArrayOfJson);
+                    }
+
+                    // Notify QML to reset view
+                    Q_EMIT resetMappindAndTimeLineViews();
                 }
-
-                // Import the mapping from JSON
-                if (_agentsMappingC != NULL) {
-                    _agentsMappingC->importMappingFromJson(byteArrayOfJson);
-                }
-
-                // Import the scenario from JSON
-                if (_scenarioC != NULL)
-                {
-                    // Clear scenario
-                    _scenarioC->clearScenario();
-
-                    // Import new scenario
-                    _scenarioC->importScenarioFromJson(byteArrayOfJson);
-                }
-
-                // Notify QML to reset view
-                Q_EMIT resetMappindAndTimeLineViews();
             }
             else {
                 qCritical() << "Can not open file" << platformFilePath;

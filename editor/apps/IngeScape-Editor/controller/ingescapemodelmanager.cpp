@@ -172,6 +172,17 @@ bool IngeScapeModelManager::importAgentOrAgentsListFromSelectedFile()
                     success = false;
                 }
             }
+
+            // FIXME: à tester
+            /*else if (jsonRoot.contains("definition"))
+            {
+                QJsonValue jsonValue = jsonRoot.value("definition");
+                if (jsonValue.isObject())
+                {
+                    // Create a model of agent definition from the JSON
+                    DefinitionM* agentDefinition = _jsonHelper->createModelOfAgentDefinitionFromJSON(jsonValue.toObject());
+                }
+            }*/
         }
         else {
             qCritical() << "Can not open file" << agentFilePath;
@@ -683,8 +694,8 @@ void IngeScapeModelManager::onMappingReceived(QString peerId, QString agentName,
         }
         else
         {
-            // Create a model of agent mapping with JSON
-            agentMapping = _jsonHelper->createModelOfAgentMapping(agentName, mappingJSON.toUtf8());
+            // Create a model of agent mapping from the JSON
+            agentMapping = _jsonHelper->createModelOfAgentMappingFromBytes(agentName, mappingJSON.toUtf8());
         }
 
         if (agentMapping != NULL)
