@@ -542,8 +542,7 @@ void AgentsMappingController::onActiveAgentDefined(AgentM* agent)
         {
             //qDebug() << "CONTROL: Model of" << agentName << "is defined. CLEAR its MAPPING !";
 
-            QStringList peerIdsList;
-            peerIdsList.append(agent->peerId());
+            QStringList peerIdsList = QStringList(agent->peerId());
 
             // Get the agent in mapping for the agent name
             AgentInMappingVM* agentInMapping = getAgentInMappingFromName(agentName);
@@ -1156,8 +1155,7 @@ void AgentsMappingController::_overWriteMappingOfAgentModel(AgentM* agentModel, 
     if ((agentModel != NULL) && agentModel->isON() && (temporaryMapping != NULL) && (_jsonHelper != NULL)
             && (_modelManager != NULL) && _modelManager->isMappingActivated()  && _modelManager->isMappingControlled())
     {
-        QStringList peerIdsList;
-        peerIdsList.append(agentModel->peerId());
+        QStringList peerIdsList = QStringList(agentModel->peerId());
 
         // Get the JSON of the agent mapping
         QString jsonOfMapping = _jsonHelper->getJsonOfAgentMapping(temporaryMapping, QJsonDocument::Compact);

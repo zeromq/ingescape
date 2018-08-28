@@ -81,7 +81,8 @@ void HostsSupervisionController::onHostModelCreated(HostM* host)
             // Create a view model for this model of host
             hostVM = new HostVM(host, this);
 
-            connect(hostVM, &HostVM::commandAskedToHost, this, &HostsSupervisionController::commandAskedToHost);
+            connect(hostVM, &HostVM::commandAskedToAgent, this, &HostsSupervisionController::commandAskedToAgent);
+            connect(hostVM, &HostVM::commandAskedToLauncher, this, &HostsSupervisionController::commandAskedToLauncher);
 
             _hashFromNameToHost.insert(hostname, hostVM);
 
@@ -117,7 +118,7 @@ void HostsSupervisionController::onHostModelWillBeRemoved(HostM* host)
         HostVM* hostVM = _getHostWithName(hostname);
         if (hostVM != NULL)
         {
-            disconnect(hostVM, &HostVM::commandAskedToHost, this, &HostsSupervisionController::commandAskedToHost);
+            disconnect(hostVM, 0, this, 0);
 
             _hashFromNameToHost.remove(hostname);
 

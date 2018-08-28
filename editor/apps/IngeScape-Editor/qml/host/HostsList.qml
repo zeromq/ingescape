@@ -178,6 +178,7 @@ Item {
         Item {
             id: hostItem
 
+            property var model_host: model.QtObject
             property var model_agentsList: model.agentsList
 
             //height: 5 + hostInfos.height + 6
@@ -249,9 +250,16 @@ Item {
                 ListView {
                     id: listViewOfAgents
 
+                    anchors {
+                        left: parent.left
+                        right: parent.right
+                    }
+                    height: contentHeight
+
                     model: hostItem.model_agentsList
 
                     interactive: false
+                    spacing: 5
 
                     delegate: Text {
 
@@ -269,23 +277,31 @@ Item {
 
                         MouseArea {
                             id: mouseAreaToolTip
+
                             anchors.fill: parent
-                            acceptedButtons: Qt.NoButton
+
+                            //acceptedButtons: Qt.NoButton
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
+
+                            onDoubleClicked: {
+                                // ON
+                                if (model.isON) {
+                                    //console.log("QML: Stop " + model.name);
+                                    hostItem.model_host.stopAgent(model.QtObject);
+                                }
+                                // OFF
+                                else {
+                                    //console.log("QML: Start " + model.name);
+                                    hostItem.model_host.startAgent(model.QtObject);
+                                }
+                            }
                         }
 
                         // Add tooltip on name
                         Controls2.ToolTip.delay: 300
                         Controls2.ToolTip.visible: mouseAreaToolTip.containsMouse
                         Controls2.ToolTip.text: (model ? model.commandLine : "")
-                    }
-
-                    height: contentHeight
-
-                    anchors {
-                        left: parent.left
-                        right: parent.right
                     }
                 }
 
