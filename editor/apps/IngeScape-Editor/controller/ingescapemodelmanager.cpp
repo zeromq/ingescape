@@ -119,7 +119,7 @@ void IngeScapeModelManager::setisMappingControlled(bool value)
  */
 bool IngeScapeModelManager::importAgentOrAgentsListFromSelectedFile()
 {
-    bool success = true;
+    bool success = false;
 
     // "File Dialog" to get the file (path) to open
     QString agentFilePath = QFileDialog::getOpenFileName(NULL,
@@ -144,49 +144,44 @@ bool IngeScapeModelManager::importAgentOrAgentsListFromSelectedFile()
             {
                 // Import the agents list from a json byte content
                 importAgentsListFromJson(jsonRoot.value("agents").toArray());
+
+                success = true;
             }
             // One agent
-            else
-            {
-                // Create a model of agent definition from the JSON
-                DefinitionM* agentDefinition = _jsonHelper->createModelOfAgentDefinitionFromBytes(byteArrayOfJson);
-                if (agentDefinition != NULL)
-                {
-                    QString agentName = agentDefinition->name();
-
-                    // Create a new model of agent with the name of the definition
-                    AgentM* agent = new AgentM(agentName, this);
-
-                    // Add this new model of agent
-                    addAgentModel(agent);
-
-                    // Add this new model of agent definition for the agent name
-                    addAgentDefinitionForAgentName(agentDefinition, agentName);
-
-                    // Set its definition
-                    agent->setdefinition(agentDefinition);
-                }
-                // An error occured, the definition is NULL
-                else {
-                    qWarning() << "The file" << agentFilePath << "does not contain an agent definition !";
-                    success = false;
-                }
-            }
-
-            // FIXME: à tester
-            /*else if (jsonRoot.contains("definition"))
+            else if (jsonRoot.contains("definition"))
             {
                 QJsonValue jsonValue = jsonRoot.value("definition");
                 if (jsonValue.isObject())
                 {
                     // Create a model of agent definition from the JSON
                     DefinitionM* agentDefinition = _jsonHelper->createModelOfAgentDefinitionFromJSON(jsonValue.toObject());
+                    if (agentDefinition != NULL)
+                    {
+                        QString agentName = agentDefinition->name();
+
+                        // Create a new model of agent with the name of the definition
+                        AgentM* agent = new AgentM(agentName, this);
+
+                        // Add this new model of agent
+                        addAgentModel(agent);
+
+                        // Add this new model of agent definition for the agent name
+                        addAgentDefinitionForAgentName(agentDefinition, agentName);
+
+                        // Set its definition
+                        agent->setdefinition(agentDefinition);
+
+                        success = true;
+                    }
+                    // An error occured, the definition is NULL
+                    else {
+                        qWarning() << "The file" << agentFilePath << "does not contain an agent definition !";
+                    }
                 }
-            }*/
+            }
         }
         else {
             qCritical() << "Can not open file" << agentFilePath;
-            success = false;
         }
     }
 

@@ -285,7 +285,7 @@ void AgentsSupervisionController::_onAgentDefinitionChangedWithPreviousAndNewVal
                         // There is already an existing model of agent (in the VM agentUsingSameDefinition)
                         if (hostname == HOSTNAME_NOT_DEFINED)
                         {
-                            qDebug() << "Delete model of agent" << model->name() << "on" << hostname;
+                            //qDebug() << "Delete Model of agent" << model->name() << "on" << hostname;
 
                             // Delete this new (fake) model of agent
                             _modelManager->deleteAgentModel(model);
@@ -366,7 +366,7 @@ void AgentsSupervisionController::_onAgentDefinitionChangedWithPreviousAndNewVal
                                     // We have to remove the new model
                                     if (hasToDeleteNewModel)
                                     {
-                                        qDebug() << "Delete model of agent" << model->name() << "on" << hostname;
+                                        //qDebug() << "Delete Model of agent" << model->name() << "on" << hostname;
 
                                         // Delete this new (fake) model of agent
                                         _modelManager->deleteAgentModel(model);
