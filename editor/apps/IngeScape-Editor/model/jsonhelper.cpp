@@ -903,7 +903,8 @@ AgentIOPM* JsonHelper::_createModelOfAgentIOP(QJsonObject jsonObject, AgentIOPTy
             switch (agentIOP->agentIOPValueType())
             {
             case AgentIOPValueTypes::INTEGER:
-                if (jsonValue.isDouble()) {
+                if (jsonValue.isDouble())
+                {
                     int value = jsonValue.toInt();
 
                     agentIOP->setdefaultValue(QVariant(value));
@@ -914,7 +915,8 @@ AgentIOPM* JsonHelper::_createModelOfAgentIOP(QJsonObject jsonObject, AgentIOPTy
                 break;
 
             case AgentIOPValueTypes::DOUBLE:
-                if (jsonValue.isDouble()) {
+                if (jsonValue.isDouble())
+                {
                     double value = jsonValue.toDouble();
 
                     agentIOP->setdefaultValue(QVariant(value));
@@ -925,7 +927,8 @@ AgentIOPM* JsonHelper::_createModelOfAgentIOP(QJsonObject jsonObject, AgentIOPTy
                 break;
 
             case AgentIOPValueTypes::STRING:
-                if (jsonValue.isString()) {
+                if (jsonValue.isString())
+                {
                     QString value = jsonValue.toString();
 
                     agentIOP->setdefaultValue(QVariant(value));
@@ -936,7 +939,8 @@ AgentIOPM* JsonHelper::_createModelOfAgentIOP(QJsonObject jsonObject, AgentIOPTy
                 break;
 
             case AgentIOPValueTypes::BOOL:
-                if (jsonValue.isString()) {
+                if (jsonValue.isString())
+                {
                     // Lower case
                     QString strValue = jsonValue.toString().toLower();
                     if ((strValue == "false") || (strValue == "true"))
@@ -959,7 +963,15 @@ AgentIOPM* JsonHelper::_createModelOfAgentIOP(QJsonObject jsonObject, AgentIOPTy
                 break;
 
             case AgentIOPValueTypes::DATA:
-                if (jsonValue.isString()) {
+                /*if (jsonValue.isDouble())
+                {
+                    //QByteArray value = QByteArray();
+                    int value = jsonValue.toInt();
+
+                    agentIOP->setdefaultValue(QVariant(value));
+                }
+                else*/ if (jsonValue.isString())
+                {
                     QString strValue = jsonValue.toString();
 
                     QByteArray value = strValue.toLocal8Bit();
