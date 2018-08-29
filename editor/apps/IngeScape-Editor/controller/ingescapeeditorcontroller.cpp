@@ -833,9 +833,6 @@ void IngeScapeEditorController::_onLoadingRecord(int deltaTimeFromTimeLine, QStr
     {
         qDebug() << "jsonExecutedActions" << jsonExecutedActions;
 
-        // FIXME: use json directly ?
-        QByteArray byteArrayOfJson = jsonPlatform.toUtf8();
-
         QJsonDocument jsonDocument = QJsonDocument::fromJson(jsonPlatform.toUtf8());
         if (jsonDocument.isObject())
         {
@@ -862,6 +859,9 @@ void IngeScapeEditorController::_onLoadingRecord(int deltaTimeFromTimeLine, QStr
             {
                 // Clear scenario
                 _scenarioC->clearScenario();
+
+                // FIXME: use json directly ?
+                QByteArray byteArrayOfJson = jsonPlatform.toUtf8();
 
                 // Import the scenario from JSON
                 _scenarioC->importScenarioFromJson(byteArrayOfJson);

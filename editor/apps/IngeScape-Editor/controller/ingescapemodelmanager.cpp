@@ -347,31 +347,36 @@ void IngeScapeModelManager::simulateExitForEachActiveAgent()
 {
     for (AgentM* agent : _mapFromPeerIdToAgentM.values())
     {
-        if ((agent != NULL) && agent->isON())
+        if (agent != NULL)
         {
-            // Simulate an exit for each agent
-            onAgentExited(agent->peerId(), agent->name());
-
-            // Reset the peer id and address
-            if (!agent->peerId().isEmpty())
+            if (agent->isON())
             {
-                _mapFromPeerIdToAgentM.remove(agent->peerId());
+                // Simulate an exit for each agent
+                onAgentExited(agent->peerId(), agent->name());
 
-                agent->setpeerId("");
-                agent->setaddress("");
+                // Reset the peer id and address
+                if (!agent->peerId().isEmpty())
+                {
+                    _mapFromPeerIdToAgentM.remove(agent->peerId());
+
+                    agent->setpeerId("");
+                    agent->setaddress("");
+                }
+
+                // Reset the mapping
+                if (agent->mapping() != NULL)
+                {
+                    AgentMappingM* mapping = agent->mapping();
+
+                    // Reset its model of mapping
+                    agent->setmapping(NULL);
+
+                    // Delete the model of agent mapping
+                    deleteAgentMapping(mapping);
+                }
             }
 
-            // Reset the mapping
-            if (agent->mapping() != NULL)
-            {
-                AgentMappingM* mapping = agent->mapping();
-
-                // Reset its model of mapping
-                agent->setmapping(NULL);
-
-                // Delete the model of agent mapping
-                deleteAgentMapping(mapping);
-            }
+            agent->setcanBeRestarted(false);
         }
     }
 }
