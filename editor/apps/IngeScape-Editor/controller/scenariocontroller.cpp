@@ -933,9 +933,11 @@ void ScenarioController::clearScenario()
     _hashFromUidToModelOfAction.clear();
 
     // Reset actions in palette
-    foreach (ActionInPaletteVM* actionInPalette, _actionsInPaletteList.toList())
+    for (ActionInPaletteVM* actionInPalette : _actionsInPaletteList.toList())
     {
-        actionInPalette->setmodelM(NULL);
+        if (actionInPalette != NULL) {
+            actionInPalette->setmodelM(NULL);
+        }
     }
 
     // Reset current time

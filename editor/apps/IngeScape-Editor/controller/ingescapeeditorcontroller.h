@@ -130,13 +130,6 @@ public:
 
 
     /**
-     * @brief Load a platform (agents, mappings, actions, palette, timeline actions)
-     * from the default file "last.json"
-     */
-    void loadPlatformFromDefaultFile();
-
-
-    /**
       * @brief Save the platform (agents, mappings, actions, palette, timeline actions)
       * to the file selected by the user
       */

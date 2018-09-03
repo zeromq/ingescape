@@ -237,9 +237,13 @@ IngeScapeEditorController::IngeScapeEditorController(QObject *parent) : QObject(
     connect(_recordsSupervisionC, &RecordsSupervisionController::startToRecord, this, &IngeScapeEditorController::_onStartToRecord);
 
 
-    // Load the platform (agents, mappings, actions, palette, timeline actions)
-    // from the default file "last.json"
-    loadPlatformFromDefaultFile();
+    if (!_platformDefaultFilePath.isEmpty())
+    {
+        // Load the platform (agents, mappings, actions, palette, timeline actions)
+        // from the default file "last.json"
+        _loadPlatformFromFile(_platformDefaultFilePath);
+    }
+
 
     // Start our INGESCAPE agent with a network device (or an IP address) and a port
     bool isStarted = _networkC->start(_networkDevice, _ipAddress, _port);
@@ -418,21 +422,13 @@ void IngeScapeEditorController::loadPlatformFromSelectedFile()
                                                                 _platformDirectoryPath,
                                                                 "JSON (*.json)");
 
-    // Load the platform from JSON file
-    _loadPlatformFromFile(platformFilePath);
-}
-
-
-/**
- * @brief Load a platform (agents, mappings, actions, palette, timeline actions)
- * from the default file "last.json"
- */
-void IngeScapeEditorController::loadPlatformFromDefaultFile()
-{
-    if (!_platformDefaultFilePath.isEmpty())
+    if (!platformFilePath.isEmpty())
     {
         // Load the platform from JSON file
-        _loadPlatformFromFile(_platformDefaultFilePath);
+        _loadPlatformFromFile(platformFilePath);
+    }
+    else {
+        qDebug() << "Platform file path is empty, nothing to do";
     }
 }
 
