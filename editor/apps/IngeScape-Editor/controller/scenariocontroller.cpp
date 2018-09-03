@@ -907,6 +907,8 @@ void ScenarioController::executeEffectsOfAction(ActionM* action)
  */
 void ScenarioController::clearScenario()
 {
+    qInfo() << "Clear the current scenario";
+
     _stopScenario();
 
     // Clean-up current selection
@@ -938,8 +940,6 @@ void ScenarioController::clearScenario()
 
     // Reset current time
     setcurrentTime(QTime::fromMSecsSinceStartOfDay(0));
-
-    //qDebug() << "clearScenario:" << _currentTime << QTime::currentTime();
 }
 
 

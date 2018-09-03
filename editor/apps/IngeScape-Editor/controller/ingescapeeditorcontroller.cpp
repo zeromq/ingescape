@@ -488,6 +488,12 @@ void IngeScapeEditorController::createNewPlatform()
         _scenarioC->clearScenario();
     }
 
+    if (_agentsSupervisionC != NULL)
+    {
+        // Clear the list of agents
+        _agentsSupervisionC->clearAgentsList();
+    }
+
     // Notify QML to reset view
     Q_EMIT resetMappindAndTimeLineViews();
 }
