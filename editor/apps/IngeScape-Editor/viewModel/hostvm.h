@@ -69,7 +69,29 @@ public:
     Q_INVOKABLE void changeState();
 
 
+    /**
+     * @brief Start an agent
+     * @param agent
+     */
+    Q_INVOKABLE void startAgent(AgentM* agent);
+
+
+    /**
+     * @brief Stop an agent
+     * @param agent
+     */
+    Q_INVOKABLE void stopAgent(AgentM* agent);
+
+
 Q_SIGNALS:
+
+    /**
+     * @brief Signal emitted when a command must be sent on the network to an agent
+     * @param peerIdsList
+     * @param command
+     */
+    void commandAskedToAgent(QStringList peerIdsList, QString command);
+
 
     /**
      * @brief Signal emitted when a command must be sent on the network to a launcher
@@ -77,7 +99,7 @@ Q_SIGNALS:
      * @param hostname
      * @param commandLine
      */
-    void commandAskedToHost(QString command, QString hostname, QString commandLine);
+    void commandAskedToLauncher(QString command, QString hostname, QString commandLine);
 
 };
 

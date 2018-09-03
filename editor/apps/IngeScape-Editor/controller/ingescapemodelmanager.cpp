@@ -119,7 +119,7 @@ void IngeScapeModelManager::setisMappingControlled(bool value)
  */
 bool IngeScapeModelManager::importAgentOrAgentsListFromSelectedFile()
 {
-    bool success = true;
+    bool success = false;
 
     // "File Dialog" to get the file (path) to open
     QString agentFilePath = QFileDialog::getOpenFileName(NULL,
@@ -144,38 +144,44 @@ bool IngeScapeModelManager::importAgentOrAgentsListFromSelectedFile()
             {
                 // Import the agents list from a json byte content
                 importAgentsListFromJson(jsonRoot.value("agents").toArray());
+
+                success = true;
             }
             // One agent
-            else
+            else if (jsonRoot.contains("definition"))
             {
-                // Create a model of agent definition from the JSON
-                DefinitionM* agentDefinition = _jsonHelper->createModelOfAgentDefinitionFromBytes(byteArrayOfJson);
-                if (agentDefinition != NULL)
+                QJsonValue jsonValue = jsonRoot.value("definition");
+                if (jsonValue.isObject())
                 {
-                    QString agentName = agentDefinition->name();
+                    // Create a model of agent definition from the JSON
+                    DefinitionM* agentDefinition = _jsonHelper->createModelOfAgentDefinitionFromJSON(jsonValue.toObject());
+                    if (agentDefinition != NULL)
+                    {
+                        QString agentName = agentDefinition->name();
 
-                    // Create a new model of agent with the name of the definition
-                    AgentM* agent = new AgentM(agentName, this);
+                        // Create a new model of agent with the name of the definition
+                        AgentM* agent = new AgentM(agentName, this);
 
-                    // Add this new model of agent
-                    addAgentModel(agent);
+                        // Add this new model of agent
+                        addAgentModel(agent);
 
-                    // Add this new model of agent definition for the agent name
-                    addAgentDefinitionForAgentName(agentDefinition, agentName);
+                        // Add this new model of agent definition for the agent name
+                        addAgentDefinitionForAgentName(agentDefinition, agentName);
 
-                    // Set its definition
-                    agent->setdefinition(agentDefinition);
-                }
-                // An error occured, the definition is NULL
-                else {
-                    qWarning() << "The file" << agentFilePath << "does not contain an agent definition !";
-                    success = false;
+                        // Set its definition
+                        agent->setdefinition(agentDefinition);
+
+                        success = true;
+                    }
+                    // An error occured, the definition is NULL
+                    else {
+                        qWarning() << "The file" << agentFilePath << "does not contain an agent definition !";
+                    }
                 }
             }
         }
         else {
             qCritical() << "Can not open file" << agentFilePath;
-            success = false;
         }
     }
 
@@ -336,31 +342,36 @@ void IngeScapeModelManager::simulateExitForEachActiveAgent()
 {
     for (AgentM* agent : _mapFromPeerIdToAgentM.values())
     {
-        if ((agent != NULL) && agent->isON())
+        if (agent != NULL)
         {
-            // Simulate an exit for each agent
-            onAgentExited(agent->peerId(), agent->name());
-
-            // Reset the peer id and address
-            if (!agent->peerId().isEmpty())
+            if (agent->isON())
             {
-                _mapFromPeerIdToAgentM.remove(agent->peerId());
+                // Simulate an exit for each agent
+                onAgentExited(agent->peerId(), agent->name());
 
-                agent->setpeerId("");
-                agent->setaddress("");
+                // Reset the peer id and address
+                if (!agent->peerId().isEmpty())
+                {
+                    _mapFromPeerIdToAgentM.remove(agent->peerId());
+
+                    agent->setpeerId("");
+                    agent->setaddress("");
+                }
+
+                // Reset the mapping
+                if (agent->mapping() != NULL)
+                {
+                    AgentMappingM* mapping = agent->mapping();
+
+                    // Reset its model of mapping
+                    agent->setmapping(NULL);
+
+                    // Delete the model of agent mapping
+                    deleteAgentMapping(mapping);
+                }
             }
 
-            // Reset the mapping
-            if (agent->mapping() != NULL)
-            {
-                AgentMappingM* mapping = agent->mapping();
-
-                // Reset its model of mapping
-                agent->setmapping(NULL);
-
-                // Delete the model of agent mapping
-                deleteAgentMapping(mapping);
-            }
+            agent->setcanBeRestarted(false);
         }
     }
 }
@@ -683,8 +694,8 @@ void IngeScapeModelManager::onMappingReceived(QString peerId, QString agentName,
         }
         else
         {
-            // Create a model of agent mapping with JSON
-            agentMapping = _jsonHelper->createModelOfAgentMapping(agentName, mappingJSON.toUtf8());
+            // Create a model of agent mapping from the JSON
+            agentMapping = _jsonHelper->createModelOfAgentMappingFromBytes(agentName, mappingJSON.toUtf8());
         }
 
         if (agentMapping != NULL)

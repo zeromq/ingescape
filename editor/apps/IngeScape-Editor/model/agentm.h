@@ -130,7 +130,6 @@ public:
 
 Q_SIGNALS:
 
-
     /**
      * @brief Signal emitted when the definition changed (with previous and new values)
      * @param previousValue
@@ -140,6 +139,7 @@ Q_SIGNALS:
 
 
 public Q_SLOTS:
+
 };
 
 QML_DECLARE_TYPE(AgentM)

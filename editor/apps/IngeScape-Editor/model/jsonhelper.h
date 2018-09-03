@@ -45,20 +45,6 @@ struct scenario_import_actions_lists_t {
 
 
 /**
- * @brief Structure used for mapping importation from a json string
- * @param name
- * @param position in mapping area
- * @param definition
- * @param mapping
- */
-struct mapping_agent_import_t {
-  QString               name;
-  QPointF               position;
-  AgentMappingM*        mapping;
-};
-
-
-/**
  * @brief The JsonHelper class defines a helper to manage JSON definitions of agents
  */
 class JsonHelper : public QObject
@@ -97,12 +83,21 @@ public:
 
 
     /**
-     * @brief Create a model of agent mapping with JSON and the corresponding input agent name
+     * @brief Create a model of agent mapping from bytes (JSON file content) and the corresponding input agent name
      * @param inputAgentName
      * @param byteArrayOfJson
      * @return
      */
-    AgentMappingM* createModelOfAgentMapping(QString inputAgentName, QByteArray byteArrayOfJson);
+    AgentMappingM* createModelOfAgentMappingFromBytes(QString inputAgentName, QByteArray byteArrayOfJson);
+
+
+    /**
+     * @brief Create a model of agent mapping from a JSON object and the corresponding input agent name
+     * @param inputAgentName
+     * @param jsonMapping
+     * @return
+     */
+    AgentMappingM* createModelOfAgentMappingFromJSON(QString inputAgentName, QJsonObject jsonMapping);
 
 
     /**
@@ -160,14 +155,6 @@ public:
 
 
     /**
-     * @brief Import the mapping from the json content
-     * @param byteArrayOfJson
-     * @return list of mapping_agent_import_t objects
-     */
-    QList<mapping_agent_import_t *> importMapping(QByteArray byteArrayOfJson);
-
-
-    /**
      * @brief Export the agents in mapping list into json array object
      * @param agents in mapping list
      * @return
@@ -188,15 +175,6 @@ Q_SIGNALS:
 public Q_SLOTS:
 
 private:
-
-    /**
-     * @brief Create a model of agent mapping from JsonObject and the corresponding input agent name
-     * @param inputAgentName
-     * @param jsonObject
-     * @return
-     */
-    AgentMappingM* _createModelOfAgentMappingFromJSON(QString inputAgentName, QJsonObject jsonObject);
-
 
     /**
      * @brief Create a model of agent Input/Output/Parameter from JSON object

@@ -74,9 +74,9 @@ public:
 
 
     /**
-     * @brief Create a new mapping (clear the previous one)
+     * @brief Clear the current mapping
      */
-    Q_INVOKABLE void createNewMapping();
+    void clearMapping();
 
 
     /**
@@ -127,10 +127,10 @@ public:
 
 
     /**
-     * @brief Import the mappings from the json byte content
-     * @param byteArrayOfJson
+     * @brief Import a mapping of agents from a JSON array
+     * @param jsonArrayOfAgentsMapping
      */
-    void importMappingFromJson(QByteArray byteArrayOfJson);
+    void importMappingFromJson(QJsonArray jsonArrayOfAgentsMapping);
 
 
 Q_SIGNALS:

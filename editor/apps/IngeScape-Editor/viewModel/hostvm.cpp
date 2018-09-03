@@ -74,13 +74,42 @@ void HostVM::changeState()
     // is streaming => request streaming end
     if (_isStreaming)
     {
-        //Q_EMIT commandAskedToHost("STOP_STREAMING", _modelM->name(), "");
+        //Q_EMIT commandAskedToHost("STOP_STREAMING", _name, "");
         setisStreaming(false);
     }
     // is not streaming => request streaming
     else
     {
-        //Q_EMIT commandAskedToHost("START_STREAMING", _modelM->name(), "");
+        //Q_EMIT commandAskedToHost("START_STREAMING", _name, "");
         setisStreaming(true);
     }
 }
+
+
+/**
+ * @brief Start an agent
+ * @param agent
+ */
+void HostVM::startAgent(AgentM* agent)
+{
+    if (agent != NULL)
+    {
+         Q_EMIT commandAskedToLauncher(command_StartAgent, agent->hostname(), agent->commandLine());
+    }
+}
+
+
+/**
+ * @brief Stop an agent
+ * @param agent
+ */
+void HostVM::stopAgent(AgentM* agent)
+{
+    if (agent != NULL)
+    {
+        QStringList peerIdsList = QStringList(agent->peerId());
+
+        Q_EMIT commandAskedToAgent(peerIdsList, command_StopAgent);
+    }
+}
+
