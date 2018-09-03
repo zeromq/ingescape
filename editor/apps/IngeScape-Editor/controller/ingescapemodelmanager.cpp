@@ -1038,7 +1038,7 @@ QHash<QString, QList<AgentM*>> IngeScapeModelManager::getMapFromAgentNameToActiv
 
 
 /**
- * @brief Delete a model of Agent
+ * @brief Delete a model of agent
  * @param agent
  */
 void IngeScapeModelManager::deleteAgentModel(AgentM* agent)

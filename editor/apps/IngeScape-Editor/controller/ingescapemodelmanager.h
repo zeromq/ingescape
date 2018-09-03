@@ -95,7 +95,7 @@ public:
 
 
     /**
-     * @brief Delete a model of Agent
+     * @brief Delete a model of agent
      * @param agent
      */
     void deleteAgentModel(AgentM* agent);

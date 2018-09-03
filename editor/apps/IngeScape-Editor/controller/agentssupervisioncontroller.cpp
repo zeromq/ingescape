@@ -91,24 +91,12 @@ QList<AgentVM*> AgentsSupervisionController::getAgentViewModelsListFromName(QStr
  */
 void AgentsSupervisionController::deleteSelectedAgent()
 {
-    if ((_modelManager != NULL) && (_selectedAgent != NULL))
+    if (_selectedAgent != NULL)
     {
-        qDebug() << "Delete _selectedAgent " << _selectedAgent->name();
+        qDebug() << "Delete the selected agent" << _selectedAgent->name();
 
-        // Remove it from the list
-        _agentsList.remove(_selectedAgent);
-
-        // Reset its definition
-        _selectedAgent->setdefinition(NULL);
-
-        // Delete each model of _selectedAgent
-        foreach (AgentM* model, _selectedAgent->models()->toList()) {
-            _modelManager->deleteAgentModel(model);
-        }
-
-        // Delete the view model of _selectedAgent
-        _deleteAgentViewModel(_selectedAgent);
-        setselectedAgent(NULL);
+        // Remove from the list and delete the view model of agent
+        _removeAndDeleteAgentViewModel(_selectedAgent);
     }
 }
 
@@ -179,6 +167,42 @@ QJsonArray AgentsSupervisionController::exportAgentsListToJSON()
         }
     }
     return jsonArray;
+}
+
+
+/**
+ * @brief Clear the list of agents
+ */
+void AgentsSupervisionController::clearAgentsList()
+{
+    qInfo() << "Clear the current list of agents";
+
+    if (_modelManager != NULL)
+    {
+        for (AgentVM* agent : _agentsList.toList())
+        {
+            if (agent != NULL)
+            {
+                // ON
+                if (agent->isON())
+                {
+                    // Delete each model with state OFF
+                    foreach (AgentM* model, agent->models()->toList())
+                    {
+                        if ((model != NULL) && !model->isON()) {
+                            _modelManager->deleteAgentModel(model);
+                        }
+                    }
+                }
+                // OFF
+                else
+                {
+                    // Remove from the list and delete the view model of agent
+                    _removeAndDeleteAgentViewModel(agent);
+                }
+            }
+        }
+    }
 }
 
 
@@ -636,7 +660,37 @@ void AgentsSupervisionController::_checkHaveToMergeAgent(AgentVM* agent)
 
 
 /**
- * @brief Delete the view model of Agent
+ * @brief Remove from the list and delete the view model of agent
+ * @param agent
+ */
+void AgentsSupervisionController::_removeAndDeleteAgentViewModel(AgentVM* agent)
+{
+    if ((_modelManager != NULL) && (agent != NULL))
+    {
+        // Unselect our agent if needed
+        if (_selectedAgent == agent) {
+            setselectedAgent(NULL);
+        }
+
+        // Remove it from the list
+        _agentsList.remove(agent);
+
+        // Reset its definition
+        agent->setdefinition(NULL);
+
+        // Delete each model of this view model of agent
+        foreach (AgentM* model, agent->models()->toList()) {
+            _modelManager->deleteAgentModel(model);
+        }
+
+        // Delete the view model of agent
+        _deleteAgentViewModel(agent);
+    }
+}
+
+
+/**
+ * @brief Delete the view model of agent
  * @param agent
  */
 void AgentsSupervisionController::_deleteAgentViewModel(AgentVM* agent)

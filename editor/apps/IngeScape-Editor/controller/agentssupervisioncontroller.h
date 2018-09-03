@@ -38,6 +38,7 @@ class AgentsSupervisionController : public QObject
     // Selected agent in the agents list
     I2_QML_PROPERTY_DELETE_PROOF(AgentVM*, selectedAgent)
 
+
 public:
     /**
      * @brief Constructor
@@ -81,6 +82,12 @@ public:
      * @return
      */
     QJsonArray exportAgentsListToJSON();
+
+
+    /**
+     * @brief Clear the list of agents
+     */
+    void clearAgentsList();
 
 
 Q_SIGNALS:
@@ -201,7 +208,14 @@ private:
 
 
     /**
-     * @brief Delete the view model of Agent
+     * @brief Remove from the list and delete the view model of agent
+     * @param agent
+     */
+    void _removeAndDeleteAgentViewModel(AgentVM* agent);
+
+
+    /**
+     * @brief Delete the view model of agent
      * @param agent
      */
     void _deleteAgentViewModel(AgentVM* agent);
