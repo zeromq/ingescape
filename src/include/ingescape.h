@@ -246,6 +246,7 @@ PUBLIC void igs_freeNetdevicesList(char **devices, int nb);
 //agent's headers and to be used by ingescapeLauncher. If not set,
 //command line is initialized with exec path without any parameter.
 PUBLIC void igs_setCommandLine(const char *line);
+PUBLIC void igs_setCommandLineFromArgs(int argc, const char * argv[]);
 
 
 //When mapping agents, it is possible to request the
