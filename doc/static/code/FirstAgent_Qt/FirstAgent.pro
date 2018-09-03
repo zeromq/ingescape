@@ -31,6 +31,7 @@ QML_DESIGNER_IMPORT_PATH =
 win32:{
     # Include ingescape headers
     INCLUDEPATH += $$PWD/dependencies/headers
+    INCLUDEPATH += $$shell_path($$(IGS_INCLUDE_PATH))
 
     CONFIG(debug, debug|release){
         libs_path = $$PWD/dependencies/libs/win32/Debug
@@ -40,6 +41,7 @@ win32:{
 
     #Add librairies
     LIBS += -L$$libs_path -lingescape -llibzyre -llibczmq -lyajl
+    LIBS += -L$$shell_path($$(IGS_LIBS_PATH)) -lingescape -llibzyre -llibczmq -lyajl
 
     #Windows specific libraries
     LIBS += -L$$C:/Windows/System32 -lwsock32 -lIPHLPAPI -lws2_32

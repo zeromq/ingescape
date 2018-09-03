@@ -41,6 +41,7 @@ win32:{
          $$PWD/dependencies/headers/zyre_suite \
          $$PWD/dependencies/pcre/headers \
          $$PWD/dependencies/unix
+    INCLUDEPATH += $$shell_path($$(IGS_INCLUDE_PATH))
 
 
     CONFIG(debug, debug|release){
@@ -51,6 +52,7 @@ win32:{
 
     #Add librairies
     LIBS += -L$$libs_path -lingescape -llibzyre -llibczmq -lyajl
+    LIBS += -L$$shell_path($$(IGS_LIBS_PATH)) -lingescape -llibzyre -llibczmq -lyajl
 
     #For Regex use
     LIBS += -L$$PWD/dependencies/pcre/libs -lpcre
