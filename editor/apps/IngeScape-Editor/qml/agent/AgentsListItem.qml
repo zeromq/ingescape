@@ -118,7 +118,7 @@ Item {
                 Button {
                     id: removeButton
 
-                    visible : (model.isON === false)
+                    visible: (model.isON === false)
                     activeFocusOnPress: true
 
                     anchors {

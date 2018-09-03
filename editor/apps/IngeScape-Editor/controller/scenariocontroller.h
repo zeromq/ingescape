@@ -156,7 +156,7 @@ public:
       * @brief Check if an agent is used in the actions (conditions and effects)
       * @param agent name
       */
-    bool isAgentDefinedInActions(QString agentName);
+    bool isAgentUsedInActions(QString agentName);
 
 
     /**

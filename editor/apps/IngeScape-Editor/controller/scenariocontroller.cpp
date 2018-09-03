@@ -296,7 +296,7 @@ void ScenarioController::importExecutedActionsFromJson(QByteArray byteArrayOfJso
   * @brief Check if an agent is used in the actions (conditions and effects)
   * @param agent name
   */
-bool ScenarioController::isAgentDefinedInActions(QString agentName)
+bool ScenarioController::isAgentUsedInActions(QString agentName)
 {
     bool exists = false;
 

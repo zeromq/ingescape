@@ -253,6 +253,7 @@ Item {
                     anchors {
                         left: parent.left
                         right: parent.right
+                        rightMargin: 30
                     }
                     height: contentHeight
 
@@ -261,19 +262,34 @@ Item {
                     interactive: false
                     spacing: 5
 
-                    delegate: Text {
+                    delegate: Rectangle {
 
                         anchors {
-                            left : parent.left
-                            leftMargin: 10
+                            left: parent.left
+                            right: parent.right
                         }
+                        height: txtAgentName.height
+                        //height: 20
 
-                        text: model.name
-                        elide: Text.ElideRight
+                        //color: mouseAreaToolTip.containsMouse ? IngeScapeTheme.agentsListItemRollOverBackgroundColor : IngeScapeTheme.agentsListItemBackgroundColor
+                        color: "transparent"
 
-                        color: model.isON ? IngeScapeTheme.agentsListLabelColor : IngeScapeTheme.agentOFFLabelColor
+                        Text {
+                            id: txtAgentName
 
-                        font: IngeScapeTheme.normalFont
+                            anchors {
+                                left : parent.left
+                                leftMargin: 10
+                                bottom: parent.bottom
+                            }
+
+                            text: model.name
+                            elide: Text.ElideRight
+
+                            color: model.isON ? IngeScapeTheme.agentsListLabelColor : IngeScapeTheme.agentOFFLabelColor
+
+                            font: IngeScapeTheme.normalFont
+                        }
 
                         MouseArea {
                             id: mouseAreaToolTip
@@ -302,6 +318,48 @@ Item {
                         Controls2.ToolTip.delay: 300
                         Controls2.ToolTip.visible: mouseAreaToolTip.containsMouse
                         Controls2.ToolTip.text: (model ? model.commandLine : "")
+
+
+                        Button {
+                            id: removeButton
+
+                            visible: (model.isON === false)
+                            opacity: (removeButton.hovered || mouseAreaToolTip.containsMouse) ? 1.0 : 0.0
+
+                            activeFocusOnPress: true
+
+                            anchors {
+                                top: parent.top
+                                right : parent.right
+                            }
+
+                            style: Theme.LabellessSvgButtonStyle {
+                                fileCache: IngeScapeTheme.svgFileINGESCAPE
+
+                                pressedID: releasedID + "-pressed"
+                                releasedID: "supprimer"
+                                disabledID : releasedID
+                            }
+
+
+
+                            onClicked: {
+                                /*if (IngeScapeEditorC.canDeleteAgentFromSupervision(model.name))
+                                {
+                                    if (controller)
+                                    {
+                                        // Delete selected agent
+                                        controller.deleteSelectedAgent();
+                                    }
+                                }
+                                else {
+                                    // Emit the signal "needConfirmationtoDeleteAgent"
+                                    rootItem.needConfirmationtoDeleteAgent();
+                                }*/
+
+                                console.log("Remove agent model " + model.name + " on " + hostItem.model_host.name);
+                            }
+                        }
                     }
                 }
 
@@ -333,11 +391,13 @@ Item {
 
                     // Parent must be host item and not the list to have good x and y value
                     popupOptions.parent = hostItem;
+
                     // Open the popup with options
                     popupOptions.openInScreen();
                 }
             }
 
+            // Stream button
             Button {
                 id: streamButton
 

@@ -525,7 +525,7 @@ bool IngeScapeEditorController::canDeleteAgentFromSupervision(QString agentName)
 
     // Check if the agent is in action condition or effect
     if (canBeDeleted && (_scenarioC != NULL)) {
-        canBeDeleted = !_scenarioC->isAgentDefinedInActions(agentName);
+        canBeDeleted = !_scenarioC->isAgentUsedInActions(agentName);
     }
 
     return canBeDeleted;
@@ -543,7 +543,7 @@ bool IngeScapeEditorController::canDeleteAgentInMapping(QString agentName)
 
     // Check if the agent is in action condition or effect
     if (_scenarioC != NULL) {
-        canBeDeleted = !_scenarioC->isAgentDefinedInActions(agentName);
+        canBeDeleted = !_scenarioC->isAgentUsedInActions(agentName);
     }
 
     return canBeDeleted;
