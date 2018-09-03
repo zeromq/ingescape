@@ -88,7 +88,7 @@ static const char *definitionPrefix = "EXTERNAL_DEFINITION#";
 static const char *mappingPrefix = "EXTERNAL_MAPPING#";
 static const char *loadMappingPrefix = "LOAD_THIS_MAPPING#";
 static const char *loadDefinitionPrefix = "LOAD_THIS_DEFINITION#";
-#define COMMAND_LINE_LENGTH 2048
+#define COMMAND_LINE_LENGTH 4096
 char igsAgentName[MAX_AGENT_NAME_LENGTH] = AGENT_NAME_DEFAULT;
 char igsAgentState[MAX_AGENT_NAME_LENGTH] = "";
 char commandLine[COMMAND_LINE_LENGTH] = "";
@@ -1918,6 +1918,23 @@ void igs_die(){
 
 void igs_setCommandLine(const char *line){
     strncpy(commandLine, line, COMMAND_LINE_LENGTH);
+    igs_info("Command line set to %s", commandLine);
+}
+
+void igs_setCommandLineFromArgs(int argc, const char * argv[]){
+    char cmd[COMMAND_LINE_LENGTH] = "";
+    int i = 0;
+    for (i=0; i<argc; i++){
+        if (strlen(cmd) + strlen(argv[i]) + 2 > COMMAND_LINE_LENGTH){ // 2 is for space and EOL
+            igs_error("passed arguments exceed buffer size: concatenation will stop here with '%s'", cmd);
+            break;
+        }
+        strcat(cmd, argv[i]);
+        if (i < argc - 1){
+            strcat(cmd, " ");
+        }
+    }
+    strncpy(commandLine, cmd, COMMAND_LINE_LENGTH);
     igs_info("Command line set to %s", commandLine);
 }
 
