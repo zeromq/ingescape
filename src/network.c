@@ -1922,17 +1922,57 @@ void igs_setCommandLine(const char *line){
 }
 
 void igs_setCommandLineFromArgs(int argc, const char * argv[]){
+    if (argc < 1 || argv == NULL || argv[0] == NULL){
+        igs_error("passed args must at least contain one element");
+        return;
+    }
+    
+    
     char cmd[COMMAND_LINE_LENGTH] = "";
-    int i = 0;
-    for (i=0; i<argc; i++){
+    
+#if defined __unix__ || defined __APPLE__
+    int ret;
+    pid_t pid;
+    pid = getpid();
+#ifdef __APPLE__
+#if TARGET_OS_IOS
+    char pathbuf[64] = "no_path";
+    ret = 1;
+#elif TARGET_OS_OSX
+    char pathbuf[PROC_PIDPATHINFO_MAXSIZE];
+    ret = proc_pidpath (pid, pathbuf, sizeof(pathbuf));
+#endif
+#else
+    char pathbuf[4*1024];
+    memset(pathbuf, 0, 4*1024);
+    ret = readlink("/proc/self/exe", pathbuf, sizeof(pathbuf));
+#endif
+    if ( ret <= 0 ) {
+        igs_error("PID %d: proc_pidpath () - %s", pid, strerror(errno));
+        return;
+    } else {
+        igs_trace("proc %d: %s", pid, pathbuf);
+    }
+    if (strlen(pathbuf) < COMMAND_LINE_LENGTH){
+        strcat(cmd, pathbuf);
+    }else{
+        igs_error("path is too long: %s", pathbuf);
+        return;
+    }
+    
+#elif (defined WIN32 || defined _WIN32)
+    strcat(cmd, argv[0]);
+#endif
+    
+    int i = 1;
+    for (; i<argc; i++){
         if (strlen(cmd) + strlen(argv[i]) + 2 > COMMAND_LINE_LENGTH){ // 2 is for space and EOL
             igs_error("passed arguments exceed buffer size: concatenation will stop here with '%s'", cmd);
             break;
-        }
-        strcat(cmd, argv[i]);
-        if (i < argc - 1){
+        }else{
             strcat(cmd, " ");
         }
+        strcat(cmd, argv[i]);
     }
     strncpy(commandLine, cmd, COMMAND_LINE_LENGTH);
     igs_info("Command line set to %s", commandLine);
